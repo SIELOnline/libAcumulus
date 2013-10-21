@@ -49,7 +49,7 @@ class WebAPI {
     $result = array();
 
     // PHP 5.3 is a requirement as well because we use namespaces. But as the
-    // parser will already have failed fatally before we get here, it  makes no
+    // parser will already have failed fatally before we get here, it makes no
     // sense to check here.
     if(!extension_loaded('curl')) {
       $result['errors'][] = array(
@@ -58,11 +58,11 @@ class WebAPI {
         'message' => 'Voor het gebruik van deze extensie dient de CURL extensie actief te zijn op uw server.'
       );
     }
-    if(!extension_loaded('simplexml')) {
+    if($this->config->getOutputFormat() === 'xml' && !extension_loaded('simplexml')) {
       $result['errors'][] = array(
         'code' => 'SimpleXML',
         'codetag' => '',
-        'message' => 'Voor het gebruik van deze extensie dient de SimpleXML extensie actief te zijn op uw server.'
+        'message' => 'Voor het gebruik van deze extensie en het output format XML, dient de SimpleXML extensie actief te zijn op uw server.'
       );
     }
     if(!extension_loaded('dom')) {
@@ -73,6 +73,63 @@ class WebAPI {
       );
     }
 
+    return $result;
+  }
+
+  /**
+   * Returns the Acumulus location code for a given country code.
+   *
+   * See https://apidoc.sielsystems.nl/content/invoice-add for more information
+   * about the location code.
+   *
+   * @param string $countryCode
+   *   ISO 3166-1 alpha-2 country code
+   *
+   * @return int
+   *   Location code
+   */
+  public function getLocationCode($countryCode) {
+    // http://epp.eurostat.ec.europa.eu/statistics_explained/index.php/Glossary:Country_codes
+    $euCountryCodes = array(
+      'BE',
+      'BG',
+      'CZ',
+      'DK',
+      'DE',
+      'EE',
+      'IE',
+      'EL',
+      'ES',
+      'FR',
+      'HR',
+      'IT',
+      'CY',
+      'LV',
+      'LT',
+      'LU',
+      'HU',
+      'MT',
+      'NL',
+      'AT',
+      'PL',
+      'PT',
+      'RO',
+      'SI',
+      'SK',
+      'FI',
+      'SE',
+      'UK',
+    );
+    $countryCode = strtoupper($countryCode);
+    if ($countryCode === 'NL') {
+      $result = 1;
+    }
+    elseif (in_array($countryCode, $euCountryCodes)) {
+      $result = 2;
+    }
+    else {
+      $result = 3;
+    }
     return $result;
   }
 

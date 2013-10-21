@@ -18,7 +18,7 @@ abstract class BaseConfig implements ConfigInterface{
       'baseUri' => 'https://api.sielsystems.nl/acumulus',
       'apiVersion' => 'stable',
       'libraryVersion' => '1.0-alpha1',
-      'outputFormat' => 'xml',
+      'outputFormat' => 'json',
       'debug' => false,
     );
   }

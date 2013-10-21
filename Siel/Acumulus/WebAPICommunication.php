@@ -109,7 +109,7 @@ class WebAPICommunication {
     // The tagname is ignored by the Acumulus WebAPI.
     $message = array('myxml' => $message);
     try {
-      $xmlSent = $this->convertToXml($message);
+      $sent = $this->convertToXml($message);
     }
     catch (DOMException $e) {
       $this->setDOMError($e);
@@ -128,7 +128,7 @@ class WebAPICommunication {
       CURLOPT_RETURNTRANSFER => true,
       CURLOPT_SSL_VERIFYPEER => false,
       CURLOPT_POST => true,
-      CURLOPT_POSTFIELDS => "xmlstring=$xmlSent",
+      CURLOPT_POSTFIELDS => "xmlstring=$sent",
       //*debug with Fiddler:*/ CURLOPT_PROXY => '127.0.0.1:8888',
     );
     if (!curl_setopt_array($ch, $options)) {
@@ -137,35 +137,43 @@ class WebAPICommunication {
     }
 
     // Send and receive over the curl connection.
-    if (!($xmlReceived = curl_exec($ch))) {
+    if (!($received = curl_exec($ch))) {
       $this->setCurlError($ch, 'curl_exec()');
       return array();
     }
 
-    // Convert the response to an array. 3-way conversion:
-    // - create a simplexml object
-    // - convert that to json
-    // - convert json to array
-    libxml_use_internal_errors(true);
-    if (!($response = simplexml_load_string($xmlReceived, 'SimpleXMLElement', LIBXML_NOCDATA))) {
-      $this->setLibxmlErrors(libxml_get_errors());
-      return array();
+    if ($this->config->getOutputFormat() === 'xml') {
+      // Convert the response to an array. 3-way conversion:
+      // - create a simplexml object
+      // - convert that to json
+      // - convert json to array
+      libxml_use_internal_errors(true);
+      if (!($response = simplexml_load_string($received, 'SimpleXMLElement', LIBXML_NOCDATA))) {
+        $this->setLibxmlErrors(libxml_get_errors());
+        return array();
+      }
+
+      if (!($response = json_encode($response))) {
+        $this->setJsonError();
+        return array();
+      }
+      if (($response = json_decode($response, true)) === null) {
+        $this->setJsonError();
+        return array();
+      }
+    }
+    else {
+      if (($response = json_decode($received, true)) === null) {
+        $this->setJsonError();
+        return array();
+      }
     }
 
-    if (!($response = json_encode($response))) {
-      $this->setJsonError();
-      return array();
-    }
-    if (($response = json_decode($response, true)) === null) {
-      $this->setJsonError();
-      return array();
-    }
-
-    // Close the connection (cannot fail).
+    // Close the connection (this operation cannot fail).
     curl_close($ch);
 
     if ($this->config->getDebug()) {
-      $this->config->log(date('c') . "\n" . "send($uri):\n" . "sent: $xmlSent\n" . "received: $xmlReceived\n\n");
+      $this->config->log(date('c') . "\n" . "send($uri):\n" . "sent: $sent\n" . "received: $received\n\n");
     }
 
     return $response;
@@ -270,7 +278,7 @@ class WebAPICommunication {
   protected function convertToXml(array $values) {
     $dom = new DOMDocument('1.0', 'utf-8');
     $dom->xmlStandalone = true;
-    $dom->formatOutput = false;
+    $dom->formatOutput = true;
 
     $dom = $this->convertToDom($values, $dom);
     $dom->normalizeDocument ();

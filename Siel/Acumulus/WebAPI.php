@@ -77,6 +77,26 @@ class WebAPI {
   }
 
   /**
+   * @param int $status
+   *
+   * @return string
+   */
+  public function getStatusText($status) {
+    switch ($status) {
+      case 0:
+        return 'Success. Without warnings';
+      case 1:
+        return 'Failed. Errors found';
+      case 2:
+        return 'Success. With any warnings';
+      case 3:
+        return 'Exception. Please contact Acumulus technical support';
+      default:
+        return "Onbekende status code $status";
+    }
+  }
+
+  /**
    * Returns the Acumulus location code for a given country code.
    *
    * See https://apidoc.sielsystems.nl/content/invoice-add for more information

@@ -97,18 +97,32 @@ class WebAPI {
   }
 
   /**
-   * Returns the Acumulus location code for a given country code.
+   * Returns whether the country is the Netherlands.
    *
-   * See https://apidoc.sielsystems.nl/content/invoice-add for more information
-   * about the location code.
+   * For now only the alpha-2 codes are allowed. Other notations might be added
+   * as soon we support a web shop with a different way of storing countries.
    *
    * @param string $countryCode
-   *   ISO 3166-1 alpha-2 country code
+   *   Case insensitive ISO 3166-1 alpha-2 country code.
    *
-   * @return int
-   *   Location code
+   * @return bool
    */
-  public function getLocationCode($countryCode) {
+  public function isNl($countryCode) {
+    return strtoupper($countryCode) === 'NL';
+  }
+
+  /**
+   * Returns whether the country is a EU country outside the Netherlands.
+   *
+   * For now only the alpha-2 codes are allowed. Other notations might be added
+   * as soon we support a web shop with a different way of storing countries.
+   *
+   * @param string $countryCode
+   *   Case insensitive ISO 3166-1 alpha-2 country code.
+   *
+   * @return bool
+   */
+  public function isEu($countryCode) {
     // http://epp.eurostat.ec.europa.eu/statistics_explained/index.php/Glossary:Country_codes
     $euCountryCodes = array(
       'BE',
@@ -129,7 +143,7 @@ class WebAPI {
       'LU',
       'HU',
       'MT',
-      'NL',
+      //'NL', // Outside the Netherlands.
       'AT',
       'PL',
       'PT',
@@ -140,11 +154,29 @@ class WebAPI {
       'SE',
       'UK',
     );
-    $countryCode = strtoupper($countryCode);
-    if ($countryCode === 'NL') {
+    return in_array(strtoupper($countryCode), $euCountryCodes);
+  }
+
+  /**
+   * Returns the Acumulus location code for a given country code.
+   *
+   * See https://apidoc.sielsystems.nl/content/invoice-add for more information
+   * about the location code.
+   *
+   * This function will be deprecated once the locationcode has been removed
+   * from the API.
+   *
+   * @param string $countryCode
+   *   ISO 3166-1 alpha-2 country code
+   *
+   * @return int
+   *   Location code
+   */
+  public function getLocationCode($countryCode) {
+    if ($this->isNl($countryCode)) {
       $result = 1;
     }
-    elseif (in_array($countryCode, $euCountryCodes)) {
+    elseif ($this->isEu($countryCode)) {
       $result = 2;
     }
     else {

@@ -6,8 +6,8 @@
 namespace Siel\Acumulus;
 
 /**
- * WebAPI provides an easy interface towards the different API calls of the
- * Acumulus WebAPI.
+ * Class WebAPI provides an easy interface towards the different API calls of
+ * the Acumulus WebAPI.
  *
  * This class simplifies the communication so that the different web shop
  * specific interfaces can be more rapidly developed.
@@ -40,11 +40,22 @@ class WebAPI {
   /** @var \Siel\Acumulus\WebAPICommunication */
   protected $webAPICommunicator;
 
+  /**
+   * Constructor.
+   *
+   * @param ConfigInterface $config
+   */
   public function __construct(ConfigInterface $config) {
     $this->config = $config;
     $this->webAPICommunicator = new WebAPICommunication($config);
   }
 
+  /**
+   * Checks if the requirements for the environment are met.
+   *
+   * @return array
+   *   A possibly empty array with messages regarding missing requirements.
+   */
   public function checkRequirements() {
     $result = array();
 
@@ -183,6 +194,48 @@ class WebAPI {
       $result = 3;
     }
     return $result;
+  }
+
+
+  /**
+   * Extracts the vat type based on customer and invoice information.
+   *
+   * NOTES:
+   * For vat type 3:
+   * - We should check the delivery address as well.
+   * - Actually, the invoice should represent what the customer paid, so if that
+   *   included TAX, the invoice should say so, unless payments and payment
+   *   checking is done in Acumulus and not in the web shop (not likely).
+   *
+   * @param array $customer
+   * @param array $invoice
+   *
+   * @return int
+   *   The vat type as defined on
+   *   https://apidoc.sielsystems.nl/content/invoice-add.
+   */
+  public function getVatType(array $customer, array $invoice) {
+    // Return 5 (margin scheme) if any line is a used product with cost price.
+    foreach ($invoice['line'] as $line) {
+      if (!empty($line['costprice'])) {
+        return 5;
+      }
+    }
+
+    // Return 4 (outside EU) if outside the EU (including NL).
+    if (!$this->isNl($customer['countrycode']) && !$this->isEu($customer['countrycode'])) {
+      return 4;
+    }
+
+    // Return 3 (Reverse-charging VAT) if customer is in EU and is a company.
+    if ($this->isEu($customer['countrycode']) && !empty($customer['vatnumber '])) {
+      return 3;
+    }
+
+    // Never return 2 (national reverse-charging VAT) via the API for web shops.
+
+    // Return 1 (Normal invoice with VAT).
+    return 1;
   }
 
   /**

@@ -8,6 +8,7 @@ namespace Siel\Acumulus;
 use DOMDocument;
 use DOMElement;
 use DOMException;
+use Exception;
 use LibXMLError;
 
 /**
@@ -42,31 +43,40 @@ class WebAPICommunication {
    *   The results or an array of warning and/or error messages.
    */
   public function call($apiCall, array $message) {
-    // TODO: wrap in try catch
     // Reset warnings and errors.
     $this->warnings = array();
     $this->errors = array();
 
-    // Complete message with values common to all API calls:
-    // - contract part
-    // - format part
-    // - environment part
-    $environment = $this->config->getEnvironment();
-    $message = array_merge(array(
-      'contract' => $this->config->getCredentials(),
-      'format' => $this->config->getOutputFormat(),
-      'connector' => array(
-        'application' => "{$environment['shopName']} {$environment['shopVersion']}",
-        'webkoppel' => "Shop module: {$environment['moduleVersion']}; Library: {$environment['libraryVersion']}",
-        'development' => 'Siel',
-        'remark' => 'Stable',
-        'sourceuri' => 'http://www.siel.nl/',
-      ),
-    ), $message);
+    try {
+      // Complete message with values common to all API calls:
+      // - contract part
+      // - format part
+      // - environment part
+      $environment = $this->config->getEnvironment();
+      $message = array_merge(array(
+        'contract' => $this->config->getCredentials(),
+        'format' => $this->config->getOutputFormat(),
+        'connector' => array(
+          'application' => "{$environment['shopName']} {$environment['shopVersion']}",
+          'webkoppel' => "Shop module: {$environment['moduleVersion']}; Library: {$environment['libraryVersion']}",
+          'development' => 'Siel',
+          'remark' => 'Stable',
+          'sourceuri' => 'http://www.siel.nl/',
+        ),
+      ), $message);
 
-    // Send message, receive response.
-    $uri = $this->config->getBaseUri() . '/' . $this->config->getApiVersion() . '/' . $apiCall . '.php';
-    $response = $this->send($uri, $message);
+      // Send message, receive response.
+      $uri = $this->config->getBaseUri() . '/' . $this->config->getApiVersion() . '/' . $apiCall . '.php';
+      $response = $this->send($uri, $message);
+    }
+    catch (Exception $e) {
+      $this->errors[] = array(
+        'code' => $e->getCode(),
+        'codetag' => "File: {$e->getFile()}, Line: {$e->getLine()}",
+        'message' => $e->getMessage(),
+      );
+      $response = array();
+    }
 
     // Process response.
     if (empty($response)) {
@@ -108,13 +118,7 @@ class WebAPICommunication {
     // Convert message to XML. XML requires 1 top level tag, so add one.
     // The tagname is ignored by the Acumulus WebAPI.
     $message = array('myxml' => $message);
-    try {
-      $sent = $this->convertToXml($message);
-    }
-    catch (DOMException $e) {
-      $this->setDOMError($e);
-      return array();
-    }
+    $sent = $this->convertToXml($message);
 
     // Open a curl connection.
     if (!($ch = curl_init())) {
@@ -177,19 +181,6 @@ class WebAPICommunication {
     }
 
     return $response;
-  }
-
-  /**
-   * Helper method to add a DOM error message to the result.
-   *
-   * @param DOMException $e
-   */
-  protected function setDOMError(DOMException $e) {
-    $this->errors[] = array(
-      'code' => $e->getCode(),
-      'codetag' => "File: {$e->getFile()}, Line: {$e->getLine()}",
-      'message' => $e->getMessage(),
-    );
   }
 
   /**

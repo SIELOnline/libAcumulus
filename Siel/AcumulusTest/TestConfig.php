@@ -6,17 +6,16 @@
 namespace Siel\AcumulusTest;
 
 use Siel\Acumulus\BaseConfig;
-use Siel\Acumulus\ConfigInterface;
 
-require_once('Siel/Acumulus/ConfigInterface.php');
-require_once('Siel/Acumulus/BaseConfig.php');
+require_once(dirname(__FILE__) . '/../Acumulus/ConfigInterface.php');
+require_once(dirname(__FILE__) . '/../Acumulus/BaseConfig.php');
 
 /**
  * TestConfig defines a configuration object for test purposes.
  *
  * @package Siel\AcumulusTest
  */
-class TestConfig extends BaseConfig implements ConfigInterface {
+class TestConfig extends BaseConfig {
   public function __construct() {
     parent::__construct();
     $this->values = array_merge($this->values, array(

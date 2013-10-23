@@ -47,7 +47,13 @@ class WebAPI {
    */
   public function __construct(ConfigInterface $config) {
     $this->config = $config;
-    $this->webAPICommunicator = new WebAPICommunication($config);
+    if (!$this->config->getLocal()) {
+      $this->webAPICommunicator = new WebAPICommunication($config);
+    }
+    else {
+      require_once(dirname(__FILE__) . '/../AcumulusTest/WebAPICommunicationTest.php');
+      $this->webAPICommunicator = new \Siel\AcumulusTest\WebAPICommunicationTest($config);
+    }
   }
 
   /**

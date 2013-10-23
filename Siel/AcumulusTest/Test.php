@@ -20,9 +20,9 @@ class Test {
   }
 
   public function run() {
-    require_once('Siel/Acumulus/WebAPICommunication.php');
-    require_once('Siel/Acumulus/WebAPI.php');
-    require_once('Siel/AcumulusTest/TestConfig.php');
+    require_once(dirname(__FILE__) . '/../Acumulus/WebAPICommunication.php');
+    require_once(dirname(__FILE__) . '/../Acumulus/WebAPI.php');
+    require_once(dirname(__FILE__) . '/../AcumulusTest/TestConfig.php');
     $this->webApi = new WebAPI(new TestConfig());
     $results = '';
 

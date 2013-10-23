@@ -57,6 +57,15 @@ interface ConfigInterface {
   public function getDebug();
 
   /**
+   * Indicates whether the web api communicator should be a test class that does
+   * not actually send the message to Acumulus but logs the message that would
+   * have been sent.
+   *
+   * @return bool
+   */
+  public function getLocal();
+
+  /**
    * Returns the format the output from the Acumulus API should be in.
    *
    * @return string

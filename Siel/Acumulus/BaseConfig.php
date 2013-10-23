@@ -20,6 +20,7 @@ abstract class BaseConfig implements ConfigInterface{
       'libraryVersion' => '1.0-alpha1',
       'outputFormat' => 'json',
       'debug' => false,
+      'local' => false,
     );
   }
 
@@ -90,6 +91,13 @@ abstract class BaseConfig implements ConfigInterface{
   /**
    * @inheritdoc
    */
+  public function getLocal() {
+    return $this->get('local');
+  }
+
+  /**
+   * @inheritdoc
+   */
   public function getDebug() {
     return $this->get('debug');
   }
@@ -100,7 +108,7 @@ abstract class BaseConfig implements ConfigInterface{
    * @param bool $debug
    */
   public function setDebug($debug) {
-    return $this->values['debug'] = (bool) $debug;
+    $this->values['debug'] = (bool) $debug;
   }
 
   /**

@@ -101,7 +101,9 @@ abstract class BaseConfig implements ConfigInterface{
    * @param bool $local
    */
   public function setLocal($local) {
+    $oldValue = $this->values['local'];
     $this->values['local'] = (bool) $local;
+    return $oldValue;
   }
 
   /**
@@ -117,7 +119,9 @@ abstract class BaseConfig implements ConfigInterface{
    * @param bool $debug
    */
   public function setDebug($debug) {
+    $oldValue = $this->values['debug'];
     $this->values['debug'] = (bool) $debug;
+    return $oldValue;
   }
 
   /**
@@ -159,11 +163,48 @@ abstract class BaseConfig implements ConfigInterface{
       'defaultCostHeading' => $this->get('defaultCostHeading'),
       'defaultInvoiceTemplate' => $this->get('defaultInvoiceTemplate'),
       'triggerOrderStatus' => $this->get('triggerOrderStatus'),
-      'useMargin' => $this->get('useMargin'),
+      //@todo: useMargin wordt niet meer gebruikt.
+      //'useMargin' => $this->get('useMargin'),
       //@todo: useCostprice wordt niet gebruikt.
       //'useCostPrice' => $this->get('useCostPrice'),
       'overwriteIfExists' => $this->get('overwriteIfExists'),
     );
+  }
+
+  /**
+   * Performs common config form validation and casts values to their correct
+   * type.
+   *
+   * @param array $values
+   *
+   * @return array
+   *   A possibly empty array with validation error messages.
+   */
+  public function validateFormValues(array &$values) {
+    $result = array();
+    if (empty($values['contractcode'])) {
+      $result[] = 'Het veld Contractcode is verplicht, vul de contractcode in die u ook gebruikt om in te loggen op Acumulus.';
+    }
+    elseif (!is_numeric($values['contractcode'])) {
+      $result[] = 'Het veld Contractcode is een numeriek veld, vul de contractcode in die u ook gebruikt om in te loggen op Acumulus.';
+    }
+    if (empty($values['username'])) {
+      $result[] = 'Het veld Gebruikersnaam is verplicht, vul de gebruikersnaam in die u ook gebruikt om in te loggen op Acumulus.';
+    }
+    if (empty($values['password'])) {
+      $result[] = 'Het veld Wachtwoord is verplicht, vul het wachtwoord in dat u ook gebruikt om in te loggen op Acumulus.';
+    }
+    if (!preg_match('/^[~@]+@([~.@]\.)+[~.@]+$/', $values['emailonerror'])) {
+      $result[] = 'Het veld Email is geen valide e-mailadres, vul uw eigen e-mailadres in.';
+    }
+    $values['useAcumulusInvoiceNr'] = (bool) $values['useAcumulusInvoiceNr'];
+    $values['useOrderDate'] = (bool) $values['useOrderDate'];
+    $values['overwriteIfExists'] = (bool) $values['overwriteIfExists'];
+    $values['defaultCustomerType'] = (int) $values['defaultCustomerType'];
+    $values['defaultAccountNumber'] = (int) $values['defaultAccountNumber'];
+    $values['defaultCostHeading'] = (int) $values['defaultCostHeading'];
+    $values['defaultInvoiceTemplate'] = (int) $values['defaultInvoiceTemplate'];
+    return $result;
   }
 
   /**
@@ -184,7 +225,8 @@ abstract class BaseConfig implements ConfigInterface{
       'defaultCostHeading',
       'defaultInvoiceTemplate',
       'triggerOrderStatus',
-      'useMargin',
+      //@todo: useMargin wordt niet meer gebruikt.
+      //'useMargin',
       'overwriteIfExists',
       //@todo: useCostprice wordt niet gebruikt.
       //'useCostPrice',

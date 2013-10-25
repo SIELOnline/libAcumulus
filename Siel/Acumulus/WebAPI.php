@@ -273,18 +273,10 @@ class WebAPI {
   public function addInvoice(array $invoice, $orderId = '', $addDefaults = true) {
     if ($addDefaults) {
       $invoiceSettings = $this->config->getInvoiceSettings();
-      if (empty($invoice['customer']['type'])) {
-        $invoice['customer']['type'] = $invoiceSettings['defaultCustomerType'];
-      }
-      if (empty($invoice['customer']['invoice']['accountnumber'])) {
-        $invoice['customer']['invoice']['accountnumber'] = $invoiceSettings['defaultAccountNumber'];
-      }
-      if (empty($invoice['customer']['invoice']['costheading'])) {
-        $invoice['customer']['invoice']['costheading'] = $invoiceSettings['defaultCostHeading'];
-      }
-      if (empty($invoice['customer']['invoice']['template'])) {
-        $invoice['customer']['invoice']['template'] = $invoiceSettings['defaultInvoiceTemplate'];
-      }
+      $this->addDefault($invoice['customer'], 'type', $invoiceSettings['defaultCustomerType']);
+      $this->addDefault($invoice['customer']['invoice'], 'accountnumber', $invoiceSettings['defaultAccountNumber']);
+      $this->addDefault($invoice['customer']['invoice'], 'costheading', $invoiceSettings['defaultCostHeading']);
+      $this->addDefault($invoice['customer']['invoice'], 'template', $invoiceSettings['defaultInvoiceTemplate']);
     }
 
     // Validate order (client side).
@@ -295,6 +287,24 @@ class WebAPI {
     }
 
     return $response;
+  }
+
+  /**
+   * Helper method to add a default (without overwriting) value ot the message.
+   *
+   * @param array $array
+   * @param string $key
+   * @param mixed $value
+   *
+   * @return bool
+   *   Whether the default was added.
+   */
+  protected function addDefault(array &$array, $key, $value) {
+    if (empty($array[$key]) && !empty($value)) {
+      $array[$key] = $value;
+      return true;
+    }
+    return false;
   }
 
   /**

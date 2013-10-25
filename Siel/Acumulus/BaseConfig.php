@@ -19,8 +19,8 @@ abstract class BaseConfig implements ConfigInterface{
       'apiVersion' => 'stable',
       'libraryVersion' => '1.0-alpha1',
       'outputFormat' => 'json',
-      'debug' => false,
       'local' => false,
+      'debug' => false,
     );
   }
 
@@ -96,6 +96,15 @@ abstract class BaseConfig implements ConfigInterface{
   }
 
   /**
+   * Sets the value for the "stay local" value.
+   *
+   * @param bool $local
+   */
+  public function setLocal($local) {
+    $this->values['local'] = (bool) $local;
+  }
+
+  /**
    * @inheritdoc
    */
   public function getDebug() {
@@ -153,6 +162,7 @@ abstract class BaseConfig implements ConfigInterface{
       'useMargin' => $this->get('useMargin'),
       //@todo: useCostprice wordt niet gebruikt.
       //'useCostPrice' => $this->get('useCostPrice'),
+      'overwriteIfExists' => $this->get('overwriteIfExists'),
     );
   }
 
@@ -175,6 +185,7 @@ abstract class BaseConfig implements ConfigInterface{
       'defaultInvoiceTemplate',
       'triggerOrderStatus',
       'useMargin',
+      'overwriteIfExists',
       //@todo: useCostprice wordt niet gebruikt.
       //'useCostPrice',
     );

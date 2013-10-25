@@ -141,6 +141,8 @@ class WebAPI {
    */
   public function isEu($countryCode) {
     // http://epp.eurostat.ec.europa.eu/statistics_explained/index.php/Glossary:Country_codes
+    // EFTA countries are not part of this list because as regarding invoicing
+    // it is considered outside of the EU.
     $euCountryCodes = array(
       'BE',
       'BG',
@@ -228,7 +230,7 @@ class WebAPI {
       }
     }
 
-    // Return 4 (outside EU) if outside the EU (including NL).
+    // Return 4 (outside EU) if outside the EU.
     if (!$this->isNl($customer['countrycode']) && !$this->isEu($customer['countrycode'])) {
       return 4;
     }

@@ -45,7 +45,9 @@ class TestConfig extends BaseConfig {
     $this->values['defaultInvoiceTemplate'] = 39851;
     $this->values['triggerOrderStatus'] = 'paid';
     $this->values['useMargin'] = false;
-    $this->values['useCostPrice'] = false;
+    //@todo: useCostprice wordt niet gebruikt.
+    //$this->values['useCostPrice'] = false;
+    $this->values['overwriteIfExists'] = 1;
     return TRUE;
   }
 

@@ -88,8 +88,26 @@ class WebAPICommunication {
     else {
       // No internal error, response is from remote.
       // Simplify errors and warnings parts: remove indirection and count.
-      $response['errors'] = !empty($response['errors']['error']) ? $response['errors']['error'] : array();
-      $response['warnings'] = !empty($response['warnings']['warning']) ? $response['warnings']['warning'] : array();
+      if (!empty($response['errors']['error'])) {
+        $response['errors'] = $response['errors']['error'];
+        // If there was exactly 1 error, it wasn't put in an array of errors.
+        if (!is_array(reset($response['errors']))) {
+          $response['errors'] = array($response['errors']);
+        }
+      }
+      else {
+        $response['errors'] = array();
+      }
+      if (!empty($response['warnings']['warning'])) {
+        $response['warnings'] = $response['warnings']['warning'];
+        // If there was exactly 1 warning, it wasn't put in an array of warnings.
+        if (!is_array(reset($response['warnings']))) {
+          $response['warnings'] = array($response['warnings']);
+        }
+      }
+      else {
+        $response['warnings'] = array();
+      }
     }
 
     return $response;

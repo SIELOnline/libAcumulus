@@ -194,7 +194,7 @@ abstract class BaseConfig implements ConfigInterface{
     if (empty($values['password'])) {
       $result[] = 'Het veld Wachtwoord is verplicht, vul het wachtwoord in dat u ook gebruikt om in te loggen op Acumulus.';
     }
-    if (!preg_match('/^[~@]+@([~.@]\.)+[~.@]+$/', $values['emailonerror'])) {
+    if (!preg_match('/^[^@]+@([^.@]+\.)+[^.@]+$/', $values['emailonerror'])) {
       $result[] = 'Het veld Email is geen valide e-mailadres, vul uw eigen e-mailadres in.';
     }
     $values['useAcumulusInvoiceNr'] = (bool) $values['useAcumulusInvoiceNr'];

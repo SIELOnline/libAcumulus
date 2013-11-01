@@ -69,13 +69,18 @@ abstract class BaseConfig implements ConfigInterface{
    *   The configuration value to set.
    * @param mixed $value
    *   The new value for the configuration key.
+   *
+   * @return mixed
+   *   The old value.
    */
   public function set($key, $value) {
     if (!$this->isLoaded) {
       $this->load();
       $this->isLoaded = true;
     }
+    $oldValue = isset($this->values[$key]) ? $this->values[$key] : null;
     $this->values[$key] = $value;
+    return $oldValue;
   }
 
   /**
@@ -115,11 +120,12 @@ abstract class BaseConfig implements ConfigInterface{
    * Sets the value for the "stay local" value.
    *
    * @param bool $local
+   *
+   * @return mixed
+   *   The old value.
    */
   public function setLocal($local) {
-    $oldValue = $this->values['local'];
-    $this->values['local'] = (bool) $local;
-    return $oldValue;
+    return $this->set('local', (bool) $local);
   }
 
   /**
@@ -133,11 +139,12 @@ abstract class BaseConfig implements ConfigInterface{
    * Sets the value for the debug value.
    *
    * @param bool $debug
+   *
+   * @return mixed
+   *   The old value.
    */
   public function setDebug($debug) {
-    $oldValue = $this->values['debug'];
-    $this->values['debug'] = (bool) $debug;
-    return $oldValue;
+    return $this->set('debug', (bool) $debug);
   }
 
   /**

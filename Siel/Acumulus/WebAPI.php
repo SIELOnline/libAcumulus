@@ -236,7 +236,7 @@ class WebAPI {
     }
 
     // Return 3 (Reverse-charging VAT) if customer is in EU and is a company.
-    if ($this->isEu($customer['countrycode']) && !empty($customer['vatnumber '])) {
+    if ($this->isEu($customer['countrycode']) && !empty($customer['vatnumber'])) {
       return 3;
     }
 

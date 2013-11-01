@@ -63,6 +63,22 @@ abstract class BaseConfig implements ConfigInterface{
   }
 
   /**
+   * Sets the value of the specified configuration key.
+   *
+   * @param string $key
+   *   The configuration value to set.
+   * @param mixed $value
+   *   The new value for the configuration key.
+   */
+  public function set($key, $value) {
+    if (!$this->isLoaded) {
+      $this->load();
+      $this->isLoaded = true;
+    }
+    $this->values[$key] = $value;
+  }
+
+  /**
    * @inheritdoc
    */
   public function getBaseUri() {

@@ -7,7 +7,6 @@ namespace Siel\Acumulus;
 
 use DOMDocument;
 use DOMElement;
-use DOMException;
 use Exception;
 use LibXMLError;
 

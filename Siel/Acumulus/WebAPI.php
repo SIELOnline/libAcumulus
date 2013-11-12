@@ -141,8 +141,8 @@ class WebAPI {
    */
   public function isEu($countryCode) {
     // http://epp.eurostat.ec.europa.eu/statistics_explained/index.php/Glossary:Country_codes
-    // EFTA countries are not part of this list because as regarding invoicing
-    // it is considered outside of the EU.
+    // EFTA countries are not part of this list because regarding invoicing they
+    // are considered to be outside of the EU.
     $euCountryCodes = array(
       'BE',
       'BG',
@@ -208,36 +208,60 @@ class WebAPI {
   /**
    * Extracts the vat type based on customer and invoice information.
    *
+   * For more information see:
+   * - https://apidoc.sielsystems.nl/content/invoice-add
+   * - https://wiki.acumulus.nl/index.php?page=facturen-naar-het-buitenland
+   *
    * NOTES:
    * For vat type 3:
-   * - We should check the delivery address as well.
-   * - Actually, the invoice should represent what the customer paid, so if that
-   *   included TAX, the invoice should say so, unless payments and payment
-   *   checking is done in Acumulus and not in the web shop (not likely).
+   * - We should check the delivery address as well (but we don't as we can't).
    *
    * @param array $customer
    * @param array $invoice
    *
    * @return int
-   *   The vat type as defined on
-   *   https://apidoc.sielsystems.nl/content/invoice-add.
+   *   The vat type
    */
   public function getVatType(array $customer, array $invoice) {
-    // Return 5 (margin scheme) if any line is a used product with cost price.
-    foreach ($invoice['line'] as $line) {
-      if (!empty($line['costprice'])) {
-        return 5;
+    // Return 5 (margin scheme) if any line is:
+    // - A used product with cost price.
+    // - VAT rate is according to the margin, not the unitprice.
+    // As we cannot check the latter with the available info here, we rely on
+    // the setting useMargin.
+    $invoiceSettings = $this->config->getInvoiceSettings();
+    if ($invoiceSettings['useMargin']) {
+      foreach ($invoice['line'] as $line) {
+        if (!empty($line['costprice'])) {
+          return 5;
+        }
       }
     }
 
-    // Return 4 (outside EU) if outside the EU.
+    // Return 4 (outside EU) if:
+    // - Customer is outside the EU.
+    // - VAT rate = 0 for all lines.
     if (!$this->isNl($customer['countrycode']) && !$this->isEu($customer['countrycode'])) {
-      return 4;
+      $vatIs0 = true;
+      foreach ($invoice['line'] as $line) {
+        $vatIs0 = $vatIs0 && $line['vatrate'] == 0;
+      }
+      if ($vatIs0) {
+        return 4;
+      }
     }
 
-    // Return 3 (Reverse-charging VAT) if customer is in EU and is a company.
+    // Return 3 (Reverse-charging VAT) if:
+    // - Customer is in EU.
+    // - Customer is a company (VAT number provided).
+    // - VAT rate = 0 for all lines.
     if ($this->isEu($customer['countrycode']) && !empty($customer['vatnumber'])) {
-      return 3;
+      $vatIs0 = true;
+      foreach ($invoice['line'] as $line) {
+        $vatIs0 = $vatIs0 && $line['vatrate'] == 0;
+      }
+      if ($vatIs0) {
+        return 3;
+      }
     }
 
     // Never return 2 (national reverse-charging VAT) via the API for web shops.

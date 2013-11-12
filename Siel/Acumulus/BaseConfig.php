@@ -6,6 +6,16 @@ namespace Siel\Acumulus;
 
 
 abstract class BaseConfig implements ConfigInterface{
+  /**
+   * Increase this value on each change:
+   * - point release: bug fixes
+   * - minor version: addition of minor features, backwards compatible
+   * - major version: major or backwards incompatible changes
+   *
+   * @var string
+   */
+  public static $library_version = '1.0.0';
+
   /** @var bool */
   protected $isLoaded;
 
@@ -15,12 +25,18 @@ abstract class BaseConfig implements ConfigInterface{
   public function __construct() {
     $this->isLoaded = false;
     $this->values = array(
+      // "Internal" configuration settings.
       'baseUri' => 'https://api.sielsystems.nl/acumulus',
       'apiVersion' => 'stable',
-      'libraryVersion' => '1.0-alpha1',
+      'libraryVersion' => static::$library_version,
       'outputFormat' => 'json',
       'local' => false,
       'debug' => false,
+      // Default configuration settings.
+      'useMargin' => true,
+      'useAcumulusInvoiceNr' => false,
+      'useOrderDate' => true,
+      'overwriteIfExists' => true,
     );
   }
 
@@ -33,7 +49,8 @@ abstract class BaseConfig implements ConfigInterface{
   abstract protected function load();
 
   /**
-   * Saves the configuration to the actual configuration provider.
+   * Updates the configuration with the given values and saves the
+   * configuration to the actual configuration provider.
    *
    * @param array $values
    *   A keyed array that contains the values to store.
@@ -41,7 +58,11 @@ abstract class BaseConfig implements ConfigInterface{
    * @return bool
    *   Success.
    */
-  abstract public function save(array $values);
+  public function save(array $values) {
+    // Update internal values.
+    $this->values = array_merge($this->values, $values);
+    return true;
+  }
 
   /**
    * Returns the value of the specified configuration value.
@@ -186,10 +207,7 @@ abstract class BaseConfig implements ConfigInterface{
       'defaultCostHeading' => $this->get('defaultCostHeading'),
       'defaultInvoiceTemplate' => $this->get('defaultInvoiceTemplate'),
       'triggerOrderStatus' => $this->get('triggerOrderStatus'),
-      //@todo: useMargin wordt niet meer gebruikt.
-      //'useMargin' => $this->get('useMargin'),
-      //@todo: useCostprice wordt niet gebruikt.
-      //'useCostPrice' => $this->get('useCostPrice'),
+      'useMargin' => $this->get('useMargin'),
       'overwriteIfExists' => $this->get('overwriteIfExists'),
     );
   }
@@ -248,11 +266,8 @@ abstract class BaseConfig implements ConfigInterface{
       'defaultCostHeading',
       'defaultInvoiceTemplate',
       'triggerOrderStatus',
-      //@todo: useMargin wordt niet meer gebruikt.
-      //'useMargin',
+      'useMargin',
       'overwriteIfExists',
-      //@todo: useCostprice wordt niet gebruikt.
-      //'useCostPrice',
     );
   }
 }

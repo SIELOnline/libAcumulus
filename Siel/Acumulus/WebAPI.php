@@ -212,15 +212,12 @@ class WebAPI {
    * - https://apidoc.sielsystems.nl/content/invoice-add
    * - https://wiki.acumulus.nl/index.php?page=facturen-naar-het-buitenland
    *
-   * NOTES:
-   * For vat type 3:
-   * - We should check the delivery address as well (but we don't as we can't).
-   *
    * @param array $customer
    * @param array $invoice
    *
    * @return int
-   *   The vat type
+   *   The vat type as defined on
+   *   https://apidoc.sielsystems.nl/content/invoice-add.
    */
   public function getVatType(array $customer, array $invoice) {
     // Return 5 (margin scheme) if any line is:
@@ -254,6 +251,7 @@ class WebAPI {
     // - Customer is in EU.
     // - Customer is a company (VAT number provided).
     // - VAT rate = 0 for all lines.
+    // - We should check the delivery address as well, but we don't as we can't.
     if ($this->isEu($customer['countrycode']) && !empty($customer['vatnumber'])) {
       $vatIs0 = true;
       foreach ($invoice['line'] as $line) {

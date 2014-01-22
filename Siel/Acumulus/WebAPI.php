@@ -34,6 +34,26 @@ namespace Siel\Acumulus;
  * @package Siel\Acumulus
  */
 class WebAPI {
+  // Constants for some fields in the API.
+  const PaymentStatus_Due = 1;
+  const PaymentStatus_Paid = 2;
+
+  const OverwriteIfExists_Yes = 0;
+  const OverwriteIfExists_No = 1;
+
+  const Concept_No = 0;
+  const Concept_Yes = 1;
+
+  const LocationCode_NL = 1;
+  const LocationCode_EU = 2;
+  const LocationCode_RestOfWorld = 3;
+
+  const VatType_National = 1;
+  const VatType_NationalReversed = 2;
+  const VatType_EuReversed = 3;
+  const VatType_RestOfWorld = 4;
+  const VatType_MarginScheme = 5;
+
   /** @var \Siel\Acumulus\ConfigInterface */
   protected $config;
 
@@ -51,8 +71,8 @@ class WebAPI {
       $this->webAPICommunicator = new WebAPICommunication($config);
     }
     else {
-      require_once(dirname(__FILE__) . '/../AcumulusTest/WebAPICommunicationTest.php');
-      $this->webAPICommunicator = new \Siel\AcumulusTest\WebAPICommunicationTest($config);
+      require_once(dirname(__FILE__) . '/../Acumulus/Test/WebAPICommunicationTest.php');
+      $this->webAPICommunicator = new \Siel\Acumulus\Test\WebAPICommunicationTest($config);
     }
   }
 
@@ -72,21 +92,21 @@ class WebAPI {
       $result['errors'][] = array(
         'code' => 'curl',
         'codetag' => '',
-        'message' => 'Voor het gebruik van deze extensie dient de CURL extensie actief te zijn op uw server.'
+        'message' => $this->config->t('message_error_req_curl'),
       );
     }
     if($this->config->getOutputFormat() === 'xml' && !extension_loaded('simplexml')) {
       $result['errors'][] = array(
         'code' => 'SimpleXML',
         'codetag' => '',
-        'message' => 'Voor het gebruik van deze extensie en het output format XML, dient de SimpleXML extensie actief te zijn op uw server.'
+        'message' => $this->config->t('message_error_req_xml'),
       );
     }
     if(!extension_loaded('dom')) {
       $result['errors'][] = array(
         'code' => 'DOM',
         'codetag' => '',
-        'message' => 'Voor het gebruik van deze extensie dient de DOM extensie actief te zijn op uw server.'
+        'message' => $this->config->t('message_error_req_dom'),
       );
     }
 
@@ -101,15 +121,15 @@ class WebAPI {
   public function getStatusText($status) {
     switch ($status) {
       case 0:
-        return 'Success. Without warnings';
+        return $this->config->t('message_response_0');
       case 1:
-        return 'Failed. Errors found';
+        return $this->config->t('message_response_1');
       case 2:
-        return 'Success. With any warnings';
+        return $this->config->t('message_response_2');
       case 3:
-        return 'Exception. Please contact Acumulus technical support';
+        return $this->config->t('message_response_3');
       default:
-        return "Onbekende status code $status";
+        return $this->config->t('message_response_x') . $status;
     }
   }
 
@@ -193,13 +213,13 @@ class WebAPI {
    */
   public function getLocationCode($countryCode) {
     if ($this->isNl($countryCode)) {
-      $result = 1;
+      $result = self::LocationCode_NL;
     }
     elseif ($this->isEu($countryCode)) {
-      $result = 2;
+      $result = self::LocationCode_EU;
     }
     else {
-      $result = 3;
+      $result = self::LocationCode_RestOfWorld;
     }
     return $result;
   }
@@ -220,7 +240,7 @@ class WebAPI {
    *   https://apidoc.sielsystems.nl/content/invoice-add.
    */
   public function getVatType(array $customer, array $invoice) {
-    // Return 5 (margin scheme) if any line is:
+    // Return self::VatType_MarginScheme if any line is:
     // - A used product with cost price.
     // - VAT rate is according to the margin, not the unitprice.
     // As we cannot check the latter with the available info here, we rely on
@@ -229,12 +249,12 @@ class WebAPI {
     if ($invoiceSettings['useMargin']) {
       foreach ($invoice['line'] as $line) {
         if (!empty($line['costprice'])) {
-          return 5;
+          return self::VatType_MarginScheme;
         }
       }
     }
 
-    // Return 4 (outside EU) if:
+    // Return self::VatType_RestOfWorld if:
     // - Customer is outside the EU.
     // - VAT rate = 0 for all lines.
     if (!$this->isNl($customer['countrycode']) && !$this->isEu($customer['countrycode'])) {
@@ -243,11 +263,11 @@ class WebAPI {
         $vatIs0 = $vatIs0 && $line['vatrate'] == 0;
       }
       if ($vatIs0) {
-        return 4;
+        return self::VatType_RestOfWorld;
       }
     }
 
-    // Return 3 (Reverse-charging VAT) if:
+    // Return self::VatType_EuReversed if:
     // - Customer is in EU.
     // - Customer is a company (VAT number provided).
     // - VAT rate = 0 for all lines.
@@ -258,14 +278,14 @@ class WebAPI {
         $vatIs0 = $vatIs0 && $line['vatrate'] == 0;
       }
       if ($vatIs0) {
-        return 3;
+        return self::VatType_EuReversed;
       }
     }
 
-    // Never return 2 (national reverse-charging VAT) via the API for web shops.
+    // Never return self::VatType_NationalReversed via the API for web shops.
 
-    // Return 1 (Normal invoice with VAT).
-    return 1;
+    // Return self::VatType_National.
+    return self::VatType_National;
   }
 
   /**
@@ -277,6 +297,8 @@ class WebAPI {
    *   array with keys:
    *   - invoicenumber
    *   - token
+   *
+   * See https://apidoc.sielsystems.nl/content/invoice-add.
    *
    * @param array $invoice
    *   The invoice to add.
@@ -292,7 +314,7 @@ class WebAPI {
    *
    * @return array
    */
-  public function addInvoice(array $invoice, $orderId = '', $addDefaults = true) {
+  public function invoiceAdd(array $invoice, $orderId = '', $addDefaults = true) {
     if ($addDefaults) {
       $invoiceSettings = $this->config->getInvoiceSettings();
       $this->addDefault($invoice['customer'], 'type', $invoiceSettings['defaultCustomerType']);
@@ -360,7 +382,7 @@ class WebAPI {
       $result['errors'][] = array(
         'code' => 'Order',
         'codetag' => !empty($invoice['customer']['invoice']['number']) ? $invoice['customer']['invoice']['number'] : $orderId,
-        'message' => 'Deze order heeft zowel 19% als 21% BTW percentages. U dient deze factuur handmatig aan te maken in Acumulus.',
+        'message' => $this->config->t('message_error_vat19and21'),
       );
       $result['status'] = 1;
     }
@@ -378,7 +400,7 @@ class WebAPI {
    *   - accountnumber
    *   - accountdescription
    *
-   * see https://apidoc.sielsystems.nl/content/picklist-accounts-bankrekeningen.
+   * See https://apidoc.sielsystems.nl/content/picklist-accounts-bankrekeningen.
    *
    * @return array
    *   A keyed array.
@@ -464,7 +486,7 @@ class WebAPI {
    *
    * Besides the general response structure, the actual result of this call is
    * returned under the following key:
-   * - vattypes: an array of available invoice templates, an array with keys:
+   * - vattypes: an array of available vat types, an array with keys:
    *   - vattypeid
    *   - vattypename
    *

@@ -14,7 +14,7 @@ abstract class BaseConfig implements ConfigInterface{
    *
    * @var string
    */
-  public static $library_version = '1.0.1';
+  public static $library_version = '3.1.0';
 
   /** @var bool */
   protected $isLoaded;
@@ -22,7 +22,14 @@ abstract class BaseConfig implements ConfigInterface{
   /** @var array */
   protected $values;
 
-  public function __construct() {
+  /** @var TranslatorInterface */
+  protected $translator;
+
+  /**
+   * @param string|TranslatorInterface $language
+   *   Either the current language as a string or a translator interface
+   */
+  public function __construct($language) {
     $this->isLoaded = false;
     $this->values = array(
       // "Internal" configuration settings.
@@ -38,6 +45,7 @@ abstract class BaseConfig implements ConfigInterface{
       'useOrderDate' => true,
       'overwriteIfExists' => true,
     );
+    $this->translator = $language instanceof TranslatorInterface ? $language : new BaseTranslator($language);
   }
 
   /**
@@ -172,7 +180,21 @@ abstract class BaseConfig implements ConfigInterface{
    * @inheritdoc
    */
   public function log($message) {
-    file_put_contents('/tmp/acumulus-webapi.log', $message, FILE_APPEND);
+    $logFile = $this->get('logFile');
+    if ($logFile) {
+      $fh = @fopen($logFile, 'a');
+      if ($fh) {
+        fwrite($fh, $message);
+        fclose($fh);
+      }
+    }
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function t($key) {
+    return $this->translator->get($key);
   }
 
   /**
@@ -219,33 +241,62 @@ abstract class BaseConfig implements ConfigInterface{
    * @param array $values
    *
    * @return array
-   *   A possibly empty array with validation error messages.
+   *   A, possibly empty, array with validation error messages.
+   *
+   * @todo: rename and split in Prestashop.
    */
-  public function validateFormValues(array &$values) {
+  public function validateValues(array &$values) {
     $result = array();
     if (empty($values['contractcode'])) {
-      $result[] = 'Het veld Contractcode is verplicht, vul de contractcode in die u ook gebruikt om in te loggen op Acumulus.';
+      $result[] = $this->t('message_validate_contractcode_0');
     }
     elseif (!is_numeric($values['contractcode'])) {
-      $result[] = 'Het veld Contractcode is een numeriek veld, vul de contractcode in die u ook gebruikt om in te loggen op Acumulus.';
+      $result[] = $this->t('message_validate_contractcode_1');
     }
     if (empty($values['username'])) {
-      $result[] = 'Het veld Gebruikersnaam is verplicht, vul de gebruikersnaam in die u ook gebruikt om in te loggen op Acumulus.';
+      $result[] = $this->t('message_validate_username_0');
     }
     if (empty($values['password'])) {
-      $result[] = 'Het veld Wachtwoord is verplicht, vul het wachtwoord in dat u ook gebruikt om in te loggen op Acumulus.';
+      $result[] = $this->t('message_validate_password_0');
     }
     if (!preg_match('/^[^@]+@([^.@]+\.)+[^.@]+$/', $values['emailonerror'])) {
-      $result[] = 'Het veld Email is geen valide e-mailadres, vul uw eigen e-mailadres in.';
+      $result[] = $this->t('message_validate_email_0');
     }
-    $values['useAcumulusInvoiceNr'] = (bool) $values['useAcumulusInvoiceNr'];
-    $values['useOrderDate'] = (bool) $values['useOrderDate'];
-    $values['overwriteIfExists'] = (bool) $values['overwriteIfExists'];
-    $values['defaultCustomerType'] = (int) $values['defaultCustomerType'];
-    $values['defaultAccountNumber'] = (int) $values['defaultAccountNumber'];
-    $values['defaultCostHeading'] = (int) $values['defaultCostHeading'];
-    $values['defaultInvoiceTemplate'] = (int) $values['defaultInvoiceTemplate'];
     return $result;
+  }
+
+  /**
+   * Casts the values to their correct types.
+   *
+   * Values that come from a submitted form are all strings. The same migth hold
+   * for the config store of a web shop. However, internally we work with
+   * booleans or integers. So after reading from the config store or form, we
+   * cast the values ot their expected types.
+   *
+   * @param array $values
+   */
+  public function castValues(array &$values) {
+    if (isset($values['useAcumulusInvoiceNr'])) {
+      $values['useAcumulusInvoiceNr'] = (bool) $values['useAcumulusInvoiceNr'];
+    }
+    if (isset($values['useOrderDate'])) {
+      $values['useOrderDate'] = (bool) $values['useOrderDate'];
+    }
+    if (isset($values['overwriteIfExists'])) {
+      $values['overwriteIfExists'] = (bool) $values['overwriteIfExists'];
+    }
+    if (isset($values['defaultCustomerType'])) {
+      $values['defaultCustomerType'] = (int) $values['defaultCustomerType'];
+    }
+    if (isset($values['defaultAccountNumber'])) {
+      $values['defaultAccountNumber'] = (int) $values['defaultAccountNumber'];
+    }
+    if (isset($values['defaultCostHeading'])) {
+      $values['defaultCostHeading'] = (int) $values['defaultCostHeading'];
+    }
+    if (isset($values['defaultInvoiceTemplate'])) {
+      $values['defaultInvoiceTemplate'] = (int) $values['defaultInvoiceTemplate'];
+    }
   }
 
   /**

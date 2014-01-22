@@ -1,6 +1,6 @@
 <?php
 /**
- * @file Contains the Confgiurtion Interface.
+ * @file Contains the Configuration Interface.
  */
 
 namespace Siel\Acumulus;
@@ -12,7 +12,7 @@ namespace Siel\Acumulus;
  * Configuration is stored in the host environment (i.e. the web shop), this
  * interface abstracts from how a specific web shop does so.
  *
- * @package Siel\Acumulus
+ * @todo: add getDefaults method
  */
 interface ConfigInterface {
   /**
@@ -98,6 +98,22 @@ interface ConfigInterface {
    *   - use cost-price
    */
   public function getInvoiceSettings();
+
+  /**
+   * Get a translated string.
+   *
+   * Strictly speaking,this is no configuration thing, but as doing it this way,
+   * allows to easily pass it along. Practically everywhere the config is
+   * passed, the translation object has to be passed as well.
+   *
+   * @param string $key
+   *
+   * @return string
+   *   The translated message for the given key, or the key itself if no
+   *   translation could be found. Neither in the current language and nor in
+   *   the fallback language dutch.
+   */
+  public function t($key);
 
   /**
    * Allows the host environment to supply a log sink.

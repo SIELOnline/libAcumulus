@@ -78,35 +78,48 @@ class WebAPICommunication {
     }
 
     // Process response.
-    if (empty($response)) {
-      // Internal error, create a response with these internal messages.
-      $response['errors'] = $this->errors;
-      $response['warnings'] = $this->warnings;
-      $response['status'] = 1;
+    // - Simplify errors and warnings parts: remove indirection and count.
+    if (!empty($response['errors']['error'])) {
+      $response['errors'] = $response['errors']['error'];
+      // If there was exactly 1 error, it wasn't put in an array of errors.
+      if (!is_array(reset($response['errors']))) {
+        $response['errors'] = array($response['errors']);
+      }
+    }
+    else if (!isset($response['errors'])) {
+      $response['errors'] = array();
     }
     else {
-      // No internal error, response is from remote.
-      // Simplify errors and warnings parts: remove indirection and count.
-      if (!empty($response['errors']['error'])) {
-        $response['errors'] = $response['errors']['error'];
-        // If there was exactly 1 error, it wasn't put in an array of errors.
-        if (!is_array(reset($response['errors']))) {
-          $response['errors'] = array($response['errors']);
-        }
+      unset($response['errors']['count_errors']);
+    }
+
+    if (!empty($response['warnings']['warning'])) {
+      $response['warnings'] = $response['warnings']['warning'];
+      // If there was exactly 1 warning, it wasn't put in an array of warnings.
+      if (!is_array(reset($response['warnings']))) {
+        $response['warnings'] = array($response['warnings']);
       }
-      else {
-        $response['errors'] = array();
-      }
-      if (!empty($response['warnings']['warning'])) {
-        $response['warnings'] = $response['warnings']['warning'];
-        // If there was exactly 1 warning, it wasn't put in an array of warnings.
-        if (!is_array(reset($response['warnings']))) {
-          $response['warnings'] = array($response['warnings']);
-        }
-      }
-      else {
-        $response['warnings'] = array();
-      }
+    }
+    else if (!isset($response['warnings'])) {
+      $response['warnings'] = array();
+    }
+    else {
+      unset($response['warnings']['count_warnings']);
+    }
+
+    // - Add local errors and warnings.
+    if (!empty($this->errors)) {
+      // Internal error(s), return those as well.
+      $response['errors'] += $this->errors;
+    }
+    if (!empty($this->warnings)) {
+      // Internal warning(s), return those as well.
+      $response['warnings'] += $this->warnings;
+    }
+    // - Add status if not set. if no status is present the call failed, so we
+    //   set the status to 1.
+    if (!isset($response['status'])) {
+      $response['status'] = 1;
     }
 
     return $response;
@@ -132,6 +145,8 @@ class WebAPICommunication {
    *   https://apidoc.sielsystems.nl/content/warning-error-and-status-response-section-most-api-calls.
    */
   protected function send($uri, array $message) {
+    $response = array();
+
     // Convert message to XML. XML requires 1 top level tag, so add one.
     // The tagname is ignored by the Acumulus WebAPI.
     $message = array('myxml' => $message);
@@ -140,7 +155,7 @@ class WebAPICommunication {
     // Open a curl connection.
     if (!($ch = curl_init())) {
       $this->setCurlError($ch, 'curl_init()');
-      return array();
+      return $response;
     }
 
     // Configure the curl connection.
@@ -154,13 +169,24 @@ class WebAPICommunication {
     );
     if (!curl_setopt_array($ch, $options)) {
       $this->setCurlError($ch, 'curl_setopt_array()');
-      return array();
+      return $response;
     }
 
     // Send and receive over the curl connection.
-    if (!($received = curl_exec($ch))) {
+    // Keep track of communication for debugging/logging at higher levels.
+    $response['trace']['sent'] = preg_replace('|<password>.*</password>|', '<password>*****</password>', $sent);
+    $received = curl_exec($ch);
+    if (!$received) {
       $this->setCurlError($ch, 'curl_exec()');
-      return array();
+      return $response;
+    }
+    // Close the connection (this operation cannot fail).
+    curl_close($ch);
+    $response['trace']['received'] = $received;
+
+    // @todo: (re)move?
+    if ($this->config->getDebug()) {
+      $this->config->log(date('c') . "\n" . "send($uri):\n" . "sent: {$response['trace']['sent']}\n" . "received: {$response['trace']['received']}\n\n");
     }
 
     if ($this->config->getOutputFormat() === 'xml') {
@@ -169,34 +195,28 @@ class WebAPICommunication {
       // - convert that to json
       // - convert json to array
       libxml_use_internal_errors(true);
-      if (!($response = simplexml_load_string($received, 'SimpleXMLElement', LIBXML_NOCDATA))) {
+      if (!($received = simplexml_load_string($received, 'SimpleXMLElement', LIBXML_NOCDATA))) {
         $this->setLibxmlErrors(libxml_get_errors());
-        return array();
+        return $response;
       }
 
-      if (!($response = json_encode($response))) {
+      if (!($received = json_encode($received))) {
         $this->setJsonError();
-        return array();
+        return $response;
       }
-      if (($response = json_decode($response, true)) === null) {
+      if (($received = json_decode($received, true)) === null) {
         $this->setJsonError();
-        return array();
+        return $response;
       }
     }
     else {
-      if (($response = json_decode($received, true)) === null) {
+      if (($received = json_decode($received, true)) === null) {
         $this->setJsonError();
-        return array();
+        return $response;
       }
     }
 
-    // Close the connection (this operation cannot fail).
-    curl_close($ch);
-
-    if ($this->config->getDebug()) {
-      $this->config->log(date('c') . "\n" . "send($uri):\n" . "sent: $sent\n" . "received: $received\n\n");
-    }
-
+    $response = array_merge($response, $received);
     return $response;
   }
 
@@ -212,6 +232,7 @@ class WebAPICommunication {
       'codetag' => $function,
       'message' => $ch ? curl_error($ch) : '',
     );
+    curl_close($ch);
   }
 
 

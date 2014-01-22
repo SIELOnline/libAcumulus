@@ -3,14 +3,12 @@
  * @file Contains Siel\Acumulus\Test\Test.
  */
 
-namespace Siel\AcumulusTest;
+namespace Siel\Acumulus\Test;
 
 use Siel\Acumulus\WebAPI;
 
 /**
- * TestConfig defines a configuration object for test purposes.
- *
- * @package Siel\AcumulusTest
+ * Test defines a Class for test purposes.
  */
 class Test {
   /** @var WebAPI */
@@ -20,9 +18,6 @@ class Test {
   }
 
   public function run() {
-    require_once(dirname(__FILE__) . '/../Acumulus/WebAPICommunication.php');
-    require_once(dirname(__FILE__) . '/../Acumulus/WebAPI.php');
-    require_once(dirname(__FILE__) . '/../AcumulusTest/TestConfig.php');
     $this->webApi = new WebAPI(new TestConfig());
     $results = '';
 
@@ -107,7 +102,7 @@ class Test {
     );
     $customer['invoice'] = $invoice;
     $message['customer'] = $customer;
-    return $this->webApi->addInvoice($message);
+    return $this->webApi->invoiceAdd($message);
   }
 
   public function testPicklistAccounts() {

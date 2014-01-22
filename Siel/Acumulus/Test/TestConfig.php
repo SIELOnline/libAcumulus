@@ -3,12 +3,9 @@
  * @file Contains Siel\Acumulus\Test\TestConfig.
  */
 
-namespace Siel\AcumulusTest;
+namespace Siel\Acumulus\Test;
 
 use Siel\Acumulus\BaseConfig;
-
-require_once(dirname(__FILE__) . '/../Acumulus/ConfigInterface.php');
-require_once(dirname(__FILE__) . '/../Acumulus/BaseConfig.php');
 
 /**
  * TestConfig defines a configuration object for test purposes.
@@ -45,8 +42,6 @@ class TestConfig extends BaseConfig {
     $this->values['defaultInvoiceTemplate'] = 39851;
     $this->values['triggerOrderStatus'] = 'paid';
     $this->values['useMargin'] = false;
-    //@todo: useCostprice wordt niet gebruikt.
-    //$this->values['useCostPrice'] = false;
     $this->values['overwriteIfExists'] = 1;
     return TRUE;
   }

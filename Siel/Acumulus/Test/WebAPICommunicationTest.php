@@ -3,7 +3,7 @@
  * @file Definition of Siel\Acumulus\WebAPICommunicationTest.
  */
 
-namespace Siel\AcumulusTest;
+namespace Siel\Acumulus\Test;
 
 use Siel\Acumulus\WebAPICommunication;
 

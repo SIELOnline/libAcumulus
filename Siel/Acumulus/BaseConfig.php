@@ -242,8 +242,6 @@ abstract class BaseConfig implements ConfigInterface{
    *
    * @return array
    *   A, possibly empty, array with validation error messages.
-   *
-   * @todo: rename and split in Prestashop.
    */
   public function validateValues(array &$values) {
     $result = array();

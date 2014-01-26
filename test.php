@@ -2,11 +2,18 @@
 /**
  * @file Tests the WebAPI and displays the results.
  */
-use Siel\AcumulusTest\Test;
+use Siel\Acumulus\Test\Test;
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  require_once 'Siel/AcumulusTest/Test.php';
+  require_once 'Siel/Acumulus/TranslatorInterface.php';
+  require_once 'Siel/Acumulus/BaseTranslator.php';
+  require_once 'Siel/Acumulus/ConfigInterface.php';
+  require_once 'Siel/Acumulus/BaseConfig.php';
+  require_once 'Siel/Acumulus/WebAPICommunication.php';
+  require_once 'Siel/Acumulus/WebAPI.php';
+  require_once 'Siel/Acumulus/Test/TestConfig.php';
+  require_once 'Siel/Acumulus/Test/Test.php';
   $test = new Test();
   $results = $test->run();
   $submit = 'Rerun tests';

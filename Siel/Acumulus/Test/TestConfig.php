@@ -13,13 +13,19 @@ use Siel\Acumulus\BaseConfig;
  * @package Siel\AcumulusTest
  */
 class TestConfig extends BaseConfig {
-  public function __construct() {
-    parent::__construct();
+  /**
+   * @inheritdoc
+   */
+  public function __construct($language) {
+    parent::__construct($language);
     $this->values = array_merge($this->values, array(
       'moduleVersion' => $this->values['libraryVersion'],
       'shopName' => 'Test',
       'shopVersion' => $this->values['libraryVersion'],
+      'baseUri' => 'https://api.sielsystems.nl/acumulus',
+      'apiVersion' => 'stable',
       'debug' => true,
+      //* Enabling local means that no communication with the server takes place: the request will be returned */'local' => true,
     ));
   }
 

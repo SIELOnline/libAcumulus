@@ -18,7 +18,8 @@ class Test {
   }
 
   public function run() {
-    $this->webApi = new WebAPI(new TestConfig());
+
+    $this->webApi = new WebAPI(new TestConfig('nl'));
     $results = '';
 
     $results .= "Test getPicklistAccounts:\n";
@@ -90,7 +91,7 @@ class Test {
     );
     $line2 = array(
       'itemnumber' => 'ART2',
-      'product' => 'Tube lijm',
+      'product' => 'Test & = < > " \' co',
       'unitprice' => 1.25,
       'vatrate' => 21,
       'quantity' => 5,

@@ -31,22 +31,29 @@ class WebAPICommunication {
   }
 
   /**
-   * Sends a message to the given API call and returns the results as a simple array.
+   * Sends a message to the given API function and returns the results.
    *
-   * @param string $apiCall
-   *   The API call to invoke.
+   * For debugging purposes the return array also includes a key 'trace',
+   * containing an array with 2 keys, request and response, with the actual
+   * strings as were sent.
+   *
+   * @param string $apiFunction
+   *   The API function to invoke.
    * @param array $message
    *   The values to submit.
    *
    * @return array
-   *   The results or an array of warning and/or error messages.
+   *   An array with the results including any warning and/or error messages.
    */
-  public function call($apiCall, array $message) {
+  public function callApiFunction($apiFunction, array $message) {
     // Reset warnings and errors.
     $this->warnings = array();
     $this->errors = array();
 
     try {
+      // Compose URI.
+      $uri = $this->config->getBaseUri() . '/' . $this->config->getApiVersion() . '/' . $apiFunction . '.php';
+
       // Complete message with values common to all API calls:
       // - contract part
       // - format part
@@ -65,8 +72,7 @@ class WebAPICommunication {
       ), $message);
 
       // Send message, receive response.
-      $uri = $this->config->getBaseUri() . '/' . $this->config->getApiVersion() . '/' . $apiCall . '.php';
-      $response = $this->send($uri, $message);
+      $response = $this->sendApiMessage($uri, $message);
     }
     catch (Exception $e) {
       $this->errors[] = array(
@@ -110,11 +116,11 @@ class WebAPICommunication {
     // - Add local errors and warnings.
     if (!empty($this->errors)) {
       // Internal error(s), return those as well.
-      $response['errors'] += $this->errors;
+      $response['errors'] = array_merge($this->errors, $response['errors']);
     }
     if (!empty($this->warnings)) {
       // Internal warning(s), return those as well.
-      $response['warnings'] += $this->warnings;
+      $response['warnings'] = array_merge($this->warnings, $response['warnings']);
     }
     // - Add status if not set. if no status is present the call failed, so we
     //   set the status to 1.
@@ -144,16 +150,59 @@ class WebAPICommunication {
    *   The response as specified on
    *   https://apidoc.sielsystems.nl/content/warning-error-and-status-response-section-most-api-calls.
    */
-  protected function send($uri, array $message) {
-    $response = array();
+  protected function sendApiMessage($uri, array $message) {
+    $resultBase = array();
 
     // Convert message to XML. XML requires 1 top level tag, so add one.
     // The tagname is ignored by the Acumulus WebAPI.
-    $message = array('myxml' => $message);
-    $sent = $this->convertToXml($message);
+    $message = $this->convertToXml(array('myxml' => $message));
+    // Keep track of communication for debugging/logging at higher levels.
+    $resultBase['trace']['request'] = preg_replace('|<password>.*</password>|', '<password>REMOVED FOR SECURITY</password>', $message);
+
+    $response = $this->sendHttpPost($uri, array('xmlstring' => $message));
+
+    if ($response) {
+      $resultBase['trace']['response'] = $response;
+
+      $result = false;
+      $alsoTryAsXml = false;
+      if ($this->config->getOutputFormat() === 'json') {
+        $result = json_decode($response, true);
+        if ($result === null) {
+          $this->setJsonError();
+          // Even if we pass <format>json<.format> we might receive an XML
+          // response in case the XML was rejected before or during parsing.
+          $alsoTryAsXml = true;
+        }
+      }
+      if ($this->config->getOutputFormat() === 'xml' || $alsoTryAsXml) {
+        $result = $this->convertToArray($response);
+      }
+
+      if (is_array($result)) {
+        $resultBase += $result;
+      }
+    }
+
+    return $resultBase;
+  }
+
+  /**
+   * @param string $uri
+   *   The uri to send the HTTP request to.
+   * @param array|string $post
+   *   An array of values to be placed in the POST body or an url-encoded string
+   *   that contains all the POST values
+   *
+   * @return string|false
+   *  The response body from the HTTP response or false in case of errors.
+   */
+  protected function sendHttpPost($uri, $post) {
+    $response = false;
 
     // Open a curl connection.
-    if (!($ch = curl_init())) {
+    $ch = curl_init();
+    if (!$ch) {
       $this->setCurlError($ch, 'curl_init()');
       return $response;
     }
@@ -164,7 +213,7 @@ class WebAPICommunication {
       CURLOPT_RETURNTRANSFER => true,
       CURLOPT_SSL_VERIFYPEER => false,
       CURLOPT_POST => true,
-      CURLOPT_POSTFIELDS => "xmlstring=$sent",
+      CURLOPT_POSTFIELDS => $post,
       //*debug with Fiddler:*/ CURLOPT_PROXY => '127.0.0.1:8888',
     );
     if (!curl_setopt_array($ch, $options)) {
@@ -173,123 +222,48 @@ class WebAPICommunication {
     }
 
     // Send and receive over the curl connection.
-    // Keep track of communication for debugging/logging at higher levels.
-    $response['trace']['sent'] = preg_replace('|<password>.*</password>|', '<password>*****</password>', $sent);
-    $received = curl_exec($ch);
-    if (!$received) {
+    $response = curl_exec($ch);
+    if (!$response) {
       $this->setCurlError($ch, 'curl_exec()');
-      return $response;
-    }
-    // Close the connection (this operation cannot fail).
-    curl_close($ch);
-    $response['trace']['received'] = $received;
-
-    // @todo: (re)move?
-    if ($this->config->getDebug()) {
-      $this->config->log(date('c') . "\n" . "send($uri):\n" . "sent: {$response['trace']['sent']}\n" . "received: {$response['trace']['received']}\n\n");
-    }
-
-    if ($this->config->getOutputFormat() === 'xml') {
-      // Convert the response to an array. 3-way conversion:
-      // - create a simplexml object
-      // - convert that to json
-      // - convert json to array
-      libxml_use_internal_errors(true);
-      if (!($received = simplexml_load_string($received, 'SimpleXMLElement', LIBXML_NOCDATA))) {
-        $this->setLibxmlErrors(libxml_get_errors());
-        return $response;
-      }
-
-      if (!($received = json_encode($received))) {
-        $this->setJsonError();
-        return $response;
-      }
-      if (($received = json_decode($received, true)) === null) {
-        $this->setJsonError();
-        return $response;
-      }
     }
     else {
-      if (($received = json_decode($received, true)) === null) {
-        $this->setJsonError();
-        return $response;
-      }
+      // Close the connection (this operation cannot fail).
+      curl_close($ch);
     }
 
-    $response = array_merge($response, $received);
     return $response;
   }
 
   /**
-   * Helper method to add a curl error message to the result.
+   * Converts an XML string to an array.
    *
-   * @param resource|bool $ch
-   * @param string $function
-   */
-  protected function setCurlError($ch, $function) {
-    $this->errors[] = array(
-      'code' => $ch ? curl_errno($ch) : 0,
-      'codetag' => $function,
-      'message' => $ch ? curl_error($ch) : '',
-    );
-    curl_close($ch);
-  }
-
-
-  /**
-   * Helper method to add libxml error messages to the result.
+   * @param string $xml
+   *   A string containing XML.
    *
-   * @param LibXMLError[] $errors
+   * @return array|false
+   *  An array representation of the XML string or false on errors.
    */
-  protected function setLibxmlErrors(array $errors) {
-    foreach ($errors as $error) {
-      $message = array(
-        'code' => $error->code,
-        'codetag' => "Line: {$error->line}, Column: {$error->column}",
-        'message' => trim($error->message),
-      );
-      if ($error->level === LIBXML_ERR_WARNING) {
-         $this->warnings[] = $message;
-      }
-      else {
-        $this->errors[] = $message;
-      }
+  protected function convertToArray($xml) {
+    // Convert the response to an array via a 3-way conversion:
+    // - create a simplexml object
+    // - convert that to json
+    // - convert json to array
+    libxml_use_internal_errors(true);
+    if (!($result = simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA))) {
+      $this->setLibxmlErrors(libxml_get_errors());
+      return false;
     }
-  }
 
-  /**
-   * Helper method to add a json error message to the result.
-   */
-  protected function setJsonError() {
-    $code = json_last_error();
-    switch ($code) {
-      case JSON_ERROR_NONE:
-        $message = 'No error';
-        break;
-      case JSON_ERROR_DEPTH:
-        $message = 'Maximum stack depth exceeded';
-        break;
-      case JSON_ERROR_STATE_MISMATCH:
-        $message = 'Underflow or the modes mismatch';
-        break;
-      case JSON_ERROR_CTRL_CHAR:
-        $message = 'Unexpected control character found';
-        break;
-      case JSON_ERROR_SYNTAX:
-        $message = 'Syntax error, malformed JSON';
-        break;
-      case JSON_ERROR_UTF8:
-        $message = 'Malformed UTF-8 characters, possibly incorrectly encoded';
-        break;
-      default:
-        $message = 'Unknown error';
-        break;
+    if (!($result = json_encode($result))) {
+      $this->setJsonError();
+      return false;
     }
-    $this->errors[] = array(
-      'code' => $code,
-      'codetag' => '',
-      'message' => $message,
-    );
+    if (($result = json_decode($result, true)) === null) {
+      $this->setJsonError();
+      return false;
+    }
+
+    return $result;
   }
 
   /**
@@ -356,5 +330,76 @@ class WebAPICommunication {
     }
 
     return $element;
+  }
+
+  /**
+   * Helper method to add a curl error message to the result.
+   *
+   * @param resource|bool $ch
+   * @param string $function
+   */
+  protected function setCurlError($ch, $function) {
+    $this->errors[] = array(
+      'code' => $ch ? curl_errno($ch) : 0,
+      'codetag' => $function,
+      'message' => $ch ? curl_error($ch) : '',
+    );
+    curl_close($ch);
+  }
+
+  /**
+   * Helper method to add libxml error messages to the result.
+   *
+   * @param LibXMLError[] $errors
+   */
+  protected function setLibxmlErrors(array $errors) {
+    foreach ($errors as $error) {
+      $message = array(
+        'code' => $error->code,
+        'codetag' => "Line: {$error->line}, Column: {$error->column}",
+        'message' => trim($error->message),
+      );
+      if ($error->level === LIBXML_ERR_WARNING) {
+        $this->warnings[] = $message;
+      }
+      else {
+        $this->errors[] = $message;
+      }
+    }
+  }
+
+  /**
+   * Helper method to add a json error message to the result.
+   */
+  protected function setJsonError() {
+    $code = json_last_error();
+    switch ($code) {
+      case JSON_ERROR_NONE:
+        $message = 'No error';
+        break;
+      case JSON_ERROR_DEPTH:
+        $message = 'Maximum stack depth exceeded';
+        break;
+      case JSON_ERROR_STATE_MISMATCH:
+        $message = 'Underflow or the modes mismatch';
+        break;
+      case JSON_ERROR_CTRL_CHAR:
+        $message = 'Unexpected control character found';
+        break;
+      case JSON_ERROR_SYNTAX:
+        $message = 'Syntax error, malformed JSON';
+        break;
+      case JSON_ERROR_UTF8:
+        $message = 'Malformed UTF-8 characters, possibly incorrectly encoded';
+        break;
+      default:
+        $message = 'Unknown error';
+        break;
+    }
+    $this->errors[] = array(
+      'code' => $code,
+      'codetag' => '',
+      'message' => $message,
+    );
   }
 }

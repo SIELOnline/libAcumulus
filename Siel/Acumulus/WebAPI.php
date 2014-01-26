@@ -327,7 +327,7 @@ class WebAPI {
     $response = $this->validateInvoice($invoice, $orderId);
     if (empty($response['errors'])) {
       // Send order.
-      $response = $this->webAPICommunicator->call("invoices/invoice_add", $invoice);
+      $response = $this->webAPICommunicator->callApiFunction("invoices/invoice_add", $invoice);
     }
 
     return $response;
@@ -515,7 +515,7 @@ class WebAPI {
    */
   protected function getPicklist($picklist) {
     $plural = $picklist . 's';
-    $response =  $this->webAPICommunicator->call("picklists/picklist_$plural", array());
+    $response =  $this->webAPICommunicator->callApiFunction("picklists/picklist_$plural", array());
     // Simplify result: remove indirection.
     $plural = $picklist . 's';
     if (!empty($response[$plural][$picklist])) {

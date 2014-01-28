@@ -4,12 +4,16 @@ $_['extensions'] = 'Extensions';
 $_['modules'] = 'Modules';
 $_['page_title'] = 'Acumulus';
 $_['module_name'] = 'Acumulus';
+$_['module_description'] = 'Acumulus connection';
 $_['text_home'] = 'Home';
+$_['button_settings'] = 'Settings';
 $_['button_save'] = 'Save';
+$_['button_back'] = 'Back to list';
 $_['button_cancel'] = 'Cancel';
 
 // Messages
-$_['message_success'] = 'De settings are saved.';
+$_['message_config_saved'] = 'De settings are saved.';
+$_['message_uninstall'] = 'Are you sure to delete the configuration settings?';
 
 $_['message_validate_contractcode_0'] = 'The field Contract code is required, please fill in the contract code you use to log in to Acumulus.';
 $_['message_validate_contractcode_1'] = 'The field Contract code is a numeric field, please fill in the contract code you use to log in to Acumulus.';
@@ -43,6 +47,14 @@ $_['message_received'] = 'Message received';
 
 $_['message_no_invoice'] = 'not created';
 
+$_['order_id'] = 'Ordernumber';
+$_['shipping_costs'] = 'Shipping costs';
+$_['discount_code'] = 'Coupon code';
+$_['coupon_code'] = 'Voucher';
+$_['gift_wrapping'] = 'Gift wrapping';
+
+
+// Mails
 $_['mail_subject'] = 'Errors or warnings on sending an invoice to Acumulus';
 $_['mail_text'] = <<<LONGSTRING
 Dear madam, sir,
@@ -103,12 +115,12 @@ $_['invoiceSettingsHeader'] = 'Your invoice settings';
 $_['option_empty'] = 'Select one';
 
 $_['field_useAcumulusInvoiceNr'] = 'Invoice number';
-$_['option_useAcumulusInvoiceNr_0'] = 'Use the web shop order number';
+$_['option_useAcumulusInvoiceNr_0'] = 'Use the web shop order number as invoice number';
 $_['option_useAcumulusInvoiceNr_1'] = 'Have Acumulus create an invoice number';
 
 $_['field_useOrderDate'] = 'Invoice date';
-$_['option_useOrderDate_0'] = 'Use order create date';
-$_['option_useOrderDate_1'] = 'Use transfer date';
+$_['option_useOrderDate_0'] = 'Use the order create date';
+$_['option_useOrderDate_1'] = 'Use the transfer date';
 
 $_['field_defaultCustomerType'] = 'Create customers as';
 

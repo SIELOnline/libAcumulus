@@ -4,12 +4,16 @@ $_['extensions'] = 'Extensies';
 $_['modules'] = 'Modules';
 $_['page_title'] = 'Acumulus';
 $_['module_name'] = 'Acumulus';
+$_['module_description'] = 'Acumulus koppeling';
 $_['text_home'] = 'Home';
+$_['button_settings'] = 'Instellingen';
 $_['button_save'] = 'Opslaan';
+$_['button_back'] = 'Terug naar overzicht';
 $_['button_cancel'] = 'Annuleren';
 
 // Messages
-$_['message_success'] = 'De instellingen zijn opgeslagen.';
+$_['message_config_saved'] = 'De instellingen zijn opgeslagen.';
+$_['message_uninstall'] = 'Wilt u de configuratie-instellingen verwijderen?';
 
 $_['message_validate_contractcode_0'] = 'Het veld Contractcode is verplicht, vul de contractcode in die u ook gebruikt om in te loggen op Acumulus.';
 $_['message_validate_contractcode_1'] = 'Het veld Contractcode is een numeriek veld, vul de contractcode in die u ook gebruikt om in te loggen op Acumulus.';
@@ -24,7 +28,7 @@ $_['message_error_req_curl'] = 'Voor het gebruik van deze module dient de CURL P
 $_['message_error_req_xml'] = 'Voor het gebruik van deze module met het output format XML, dient de SimpleXML PHP extensie actief te zijn op uw server.';
 $_['message_error_req_dom'] = 'Voor het gebruik van deze module dient de DOM PHP extensie actief te zijn op uw server.';
 
-$_['message_error_auth'] = 'Uw Acumulus account gegevens zijn onjuist. Zodra u de correcte gegevens hebt ingevuld, worden hier de overige instellingen getoond.';
+$_['message_error_auth'] = 'Uw Acumulus account gegevens zijn onjuist. Zodra u de correcte gevens hebt ingevuld, worden hier de overige instellingen getoond.';
 $_['message_error_comm'] = 'Er is een fout opgetreden bij het ophalen van uw gegevens van Acumulus. Probeer het later nog eens. Zodra de verbinding hersteld is worden hier de overige instellingen getoond.';
 $_['message_auth_unknown'] = 'Zodra u uw Acumulus accountgegevens hebt ingevuld, worden hier de overige instellingen getoond.';
 
@@ -43,6 +47,13 @@ $_['message_received'] = 'Ontvangen bericht';
 
 $_['message_no_invoice'] = 'niet aangemaakt';
 
+$_['order_id'] = 'Ordernummer';
+$_['shipping_costs'] = 'Verzendkosten';
+$_['discount_code'] = 'Kortingscode';
+$_['coupon_code'] = 'Cadeaubon';
+$_['gift_wrapping'] = 'Cadeauverpakking';
+
+// Mails
 $_['mail_subject'] = 'Fouten of waarschuwingen bij verzenden factuur naar Acumulus';
 $_['mail_text'] = <<<LONGSTRING
 Geachte heer/mevrouw,
@@ -107,12 +118,12 @@ $_['invoiceSettingsHeader'] = 'Uw factuurinstellingen';
 $_['option_empty'] = 'Maak uw keuze';
 
 $_['field_useAcumulusInvoiceNr'] = 'Factuurnummer';
-$_['option_useAcumulusInvoiceNr_0'] = 'Gebruik het factuurnummer gegenereerd door uw webwinkel';
+$_['option_useAcumulusInvoiceNr_0'] = 'Gebruik het ordernummer van uw webwinkel';
 $_['option_useAcumulusInvoiceNr_1'] = 'Laat Acumulus het factuurnummer bepalen';
 
 $_['field_useOrderDate'] = 'Factuurdatum';
-$_['option_useOrderDate_0'] = 'Gebruik orderdatum';
-$_['option_useOrderDate_1'] = 'Gebruik datum van overzetten';
+$_['option_useOrderDate_0'] = 'Gebruik de orderdatum';
+$_['option_useOrderDate_1'] = 'Gebruik de datum van het overzetten';
 
 $_['field_defaultCustomerType'] = 'Importeer klanten als';
 

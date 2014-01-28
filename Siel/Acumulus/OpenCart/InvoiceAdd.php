@@ -150,12 +150,12 @@ class InvoiceAdd {
       $result['number'] = empty($order['invoice_no']) ? $order['order_id'] : $order['invoice_prefix'] . $order['invoice_no'];
     }
     if ($this->acumulusConfig->get('useOrderDate')) {
-      $result['issuedate'] = substr($order['date_added'], 0, strlen("2014-01-01"));
+      $result['issuedate'] = date('Y-m-d', strtotime($order['date_added']));
     }
     // @todo: get payment status (config?)
     if (true) {
       $result['paymentstatus'] = WebAPI::PaymentStatus_Paid;
-      $result['paymentdate'] = substr($order['date_modified'], 0, strlen("2014-01-01"));
+      $result['paymentdate'] = date('Y-m-d', strtotime($order['date_modified']));
     }
     else {
       $result['paymentstatus'] = WebAPI::PaymentStatus_Due;

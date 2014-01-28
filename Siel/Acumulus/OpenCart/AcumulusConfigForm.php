@@ -68,7 +68,7 @@ class AcumulusConfigForm {
       if ($isValid) {
         $this->saveForm($postValues);
         // Set on screen success message. (shop specific)
-        $this->module->addSuccess($this->t('message_success'));
+        $this->module->addSuccess($this->t('message_config_saved'));
       }
       else {
         // Set on screen error messages. (shop specific)

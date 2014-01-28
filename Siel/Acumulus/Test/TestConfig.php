@@ -24,6 +24,8 @@ class TestConfig extends BaseConfig {
       'shopVersion' => $this->values['libraryVersion'],
       'baseUri' => 'https://api.sielsystems.nl/acumulus',
       'apiVersion' => 'stable',
+      //'apiVersion' => 'dev',
+      //'apiVersion' => 'dev2',
       'debug' => true,
       //* Enabling local means that no communication with the server takes place: the request will be returned */'local' => true,
     ));

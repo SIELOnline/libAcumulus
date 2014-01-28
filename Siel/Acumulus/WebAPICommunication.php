@@ -214,7 +214,7 @@ class WebAPICommunication {
       CURLOPT_SSL_VERIFYPEER => false,
       CURLOPT_POST => true,
       CURLOPT_POSTFIELDS => $post,
-      //*debug with Fiddler:*/ CURLOPT_PROXY => '127.0.0.1:8888',
+      //CURLOPT_PROXY => '127.0.0.1:8888', // Uncomment to debug with Fiddler.
     );
     if (!curl_setopt_array($ch, $options)) {
       $this->setCurlError($ch, 'curl_setopt_array()');

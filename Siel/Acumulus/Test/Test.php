@@ -91,7 +91,7 @@ class Test {
     );
     $line2 = array(
       'itemnumber' => 'ART2',
-      'product' => 'Test2 &=<>#$%^`~"\';:? co',
+      'product' => 'Test2 & =<>#$%^`~"\';:? co',
       'unitprice' => 1.25,
       'vatrate' => 21,
       'quantity' => 5,

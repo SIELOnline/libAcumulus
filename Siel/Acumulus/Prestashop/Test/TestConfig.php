@@ -1,18 +1,18 @@
 <?php
 /**
- * @file Contains Siel\PrestashopTest\TestConfig.
+ * @file Contains Siel\PrestaShopTest\TestConfig.
  */
 
-namespace Siel\Acumulus\Prestashop\Test;
+namespace Siel\Acumulus\PrestaShop\Test;
 
-use PrestashopAcumulusConfig;
+use Siel\Acumulus\PrestaShop\PrestaShopAcumulusConfig;
 
 /**
  * TestConfig defines a configuration object for test purposes.
  *
  * @package Siel\PrestashopTest
  */
-class TestConfig extends PrestashopAcumulusConfig {
+class TestConfig extends PrestaShopAcumulusConfig {
 
   /**
    * @inheritdoc

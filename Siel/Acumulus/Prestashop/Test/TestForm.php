@@ -3,13 +3,13 @@
 /**
  * @file Contains Siel\Acumulus\Prestashop\Test\TestForm.
  */
-namespace Siel\Acumulus\Prestashop\Test;
+namespace Siel\Acumulus\PrestaShop\Test;
 
-use Acumulus;
 use Order;
-use PrestashopAcumulusConfig;
-use Siel\Acumulus\WebAPI;
 use Tools;
+use Acumulus;
+use Siel\Acumulus\WebAPI;
+use Siel\Acumulus\PrestaShop\PrestaShopAcumulusConfig;
 
 
 /**
@@ -20,17 +20,17 @@ class TestForm {
   /** @var Acumulus */
   protected $module;
 
-  /** @var PrestashopAcumulusConfig */
+  /** @var PrestaShopAcumulusConfig */
   protected $acumulusConfig;
 
   /** @var WebAPI */
   protected $webAPI;
 
   /**
-   * @param PrestashopAcumulusConfig $config
+   * @param PrestaShopAcumulusConfig $config
    * @param Acumulus $module
    */
-  public function __construct(PrestashopAcumulusConfig $config, Acumulus $module) {
+  public function __construct(PrestaShopAcumulusConfig $config, Acumulus $module) {
     $this->module = $module;
     $this->acumulusConfig = $config;
     $this->webAPI = new WebAPI($this->acumulusConfig);

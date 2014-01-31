@@ -149,11 +149,11 @@ class WebAPI {
     if (!empty($messages) || $this->config->getDebug()) {
       if (isset($result['trace'])) {
         $messages[] = $this->config->t('message_info_for_user');
-        if (isset($result['trace']['sent'])) {
-          $messages[] = $this->config->t('message_sent') . ":\n" . $result['trace']['sent'];
+        if (isset($result['trace']['request'])) {
+          $messages[] = $this->config->t('message_sent') . ":\n" . $result['trace']['request'];
         }
-        if (isset($result['trace']['received'])) {
-          $messages[] = $this->config->t('message_received') . ":\n" . $result['trace']['received'];
+        if (isset($result['trace']['response'])) {
+          $messages[] = $this->config->t('message_received') . ":\n" . $result['trace']['response'];
         }
       }
     }

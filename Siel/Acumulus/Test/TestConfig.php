@@ -44,8 +44,8 @@ class TestConfig extends BaseConfig {
     ));
     $this->values['defaultCustomerType'] = 3;
     $this->values['defaultAccountNumber'] = 70582;
-    $this->values['useAcumulusInvoiceNumber'] = true;
-    $this->values['useOrderDate'] = true;
+    $this->values['invoiceNrSource'] = true;
+    $this->values['dateToUse'] = true;
     $this->values['defaultCostHeading'] = 48663;
     $this->values['defaultInvoiceTemplate'] = 39851;
     $this->values['triggerOrderStatus'] = 'paid';

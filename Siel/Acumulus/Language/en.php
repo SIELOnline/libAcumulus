@@ -20,6 +20,7 @@ $_['message_validate_contractcode_1'] = 'The field Contract code is a numeric fi
 $_['message_validate_username_0'] = 'The field User name is required, please fill in the user name you use to log in to Acumulus.';
 $_['message_validate_password_0'] = 'The field Password is required, please fill in the password you use to log in to Acumulus.';
 $_['message_validate_email_0'] = 'The field Email is not a valid e-mail address, please fill in you own e-mail address.';
+$_['message_validate_email_1'] = 'The field Email is required, please fill in you own e-mail address.';
 
 $_['message_error_vat19and21'] = 'This order has both 19% and 21% VAT rates. You will have to manually enter this order into Acumulus.';
 $_['message_warning_multiplevat'] = 'This order has multiple VAT rates. due to differences in the way that your web sho and Acumulus store an invoice, it may well be that the VAT amounts in Acumulus are NOT correct. You should check this invoice in Acumulus!';
@@ -109,18 +110,22 @@ $_['field_code'] = 'Contract code';
 $_['field_username'] = 'User name';
 $_['field_password'] = 'Password';
 $_['field_email'] = 'E-mail';
-$_['desc_email'] = 'The e-mail address at which you will be informed about any errors that occur during invoice sending. If you leave this empty you may NOT be notified at all.';
+$_['desc_email'] = 'The e-mail address at which you will be informed about any errors that occur during invoice sending. As this module cannot know if it is called from an interactive administrator screen, it will not display any messages in the user interface. Therefore you have to fill in an e-mail address.';
 
 $_['invoiceSettingsHeader'] = 'Your invoice settings';
 $_['option_empty'] = 'Select one';
 
-$_['field_useAcumulusInvoiceNr'] = 'Invoice number';
-$_['option_useAcumulusInvoiceNr_0'] = 'Use the web shop order number as invoice number';
-$_['option_useAcumulusInvoiceNr_1'] = 'Have Acumulus create an invoice number';
+$_['field_invoiceNrSource'] = 'Invoice number';
+$_['option_invoiceNrSource_1'] = 'Use the web shop invoice number. Note: if no invoice has been created for the order yet, the order number will be used!';
+$_['option_invoiceNrSource_2'] = 'Use the web shop order number as invoice number';
+$_['option_invoiceNrSource_3'] = 'Have Acumulus create an invoice number';
+$_['desc_invoiceNrSource'] = 'Select which number to use for the invoice in Acumulus.';
 
-$_['field_useOrderDate'] = 'Invoice date';
-$_['option_useOrderDate_0'] = 'Use the order create date';
-$_['option_useOrderDate_1'] = 'Use the transfer date';
+$_['field_dateToUse'] = 'Invoice date';
+$_['option_dateToUse_1'] = 'Use the invoice date. Note: if no invoice has been created for the order yet, the order create date will be used!';
+$_['option_dateToUse_2'] = 'Use the order create date';
+$_['option_dateToUse_3'] = 'Use the transfer date';
+$_['desc_dateToUse'] = 'Select which date to use for the invoice in Acumulus.';
 
 $_['field_defaultCustomerType'] = 'Create customers as';
 

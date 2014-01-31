@@ -4,12 +4,14 @@
  */
 namespace Siel\Acumulus\PrestaShop;
 
+use Configuration;
 use Order;
 use OrderPayment;
 use Customer;
 use Address;
 use Country;
 use Acumulus;
+use Siel\Acumulus\ConfigInterface;
 use Siel\Acumulus\WebAPI;
 
 /**
@@ -33,11 +35,12 @@ class InvoiceAdd {
   /**
    * @param PrestaShopAcumulusConfig $config
    * @param Acumulus $module
+   * @param WebAPI $webAPI
    */
-  public function __construct(PrestaShopAcumulusConfig $config, Acumulus $module) {
+  public function __construct(PrestaShopAcumulusConfig $config, Acumulus $module, WebAPI $webAPI) {
     $this->module = $module;
     $this->acumulusConfig = $config;
-    $this->webAPI = new WebAPI($this->acumulusConfig);
+    $this->webAPI = $webAPI;
   }
 
   /**
@@ -146,26 +149,28 @@ class InvoiceAdd {
     // Set concept to 0: Issue invoice, no concept.
     $result['concept'] = 0;
 
-    if (!$this->acumulusConfig->get('useAcumulusInvoiceNr')) {
+    $invoiceNrSource = $this->acumulusConfig->get('invoiceNrSource');
+    if ($invoiceNrSource != ConfigInterface::InvoiceNrSource_Acumulus) {
       $result['number'] = $order->id;
       // Invoicing has changed in 1.5.0.1, $order->invoice_number will be deprecated in 1.6 (and removed in 1.7?).
-      // In fact, do not use at all as this is not searchable in PrestaShop.
-      //if (!empty($order->invoice_number)) {
-      //  $result['number'] = Configuration::get('PS_INVOICE_PREFIX', (int) $order->id_lang, null, $order->id_shop) . sprintf('%06d', $order->invoice_number);
-      //}
+      if ($invoiceNrSource == ConfigInterface::InvoiceNrSource_ShopInvoice && !empty($order->invoice_number)) {
+        $result['number'] = Configuration::get('PS_INVOICE_PREFIX', (int) $order->id_lang, null, $order->id_shop) . sprintf('%06d', $order->invoice_number);
+      }
     }
-    if ($this->acumulusConfig->get('useOrderDate')) {
+
+    $dateToUse = $this->acumulusConfig->get('');
+    if ($dateToUse != ConfigInterface::InvoiceDate_Transfer) {
       $result['issuedate'] = date('Y-m-d', strtotime($order->date_add));
       // Invoice_date is filled with "0000-00-00 00:00:00", so use invoice
       // number instead to check for empty.
       // Invoicing has changed in 1.5.0.1, $order->invoice_number will be deprecated in 1.6 (and removed in 1.7?).
-      // In fact, do not use at all as this is not searchable in PrestaShop.
-      //if (!empty($order->invoice_number)) {
-      //  $this->addIfNotEmpty($result, 'issuedate', date('Y-m-d', strtotime($order->invoice_date)));
-      //}
+      if ($dateToUse == ConfigInterface::InvoiceDate_InvoiceCreate  && !empty($order->invoice_number)) {
+        $this->addIfNotEmpty($result, 'issuedate', date('Y-m-d', strtotime($order->invoice_date)));
+      }
     }
+
     if ($order->hasBeenPaid()) {
-      $result['paymentstatus'] = 2; // 2  = paid.
+      $result['paymentstatus'] = WebAPI::PaymentStatus_Paid;
       // Take date of last payment as payment date.
       $paymentDate = null;
       foreach($order->getOrderPaymentCollection() as $payment) {
@@ -179,8 +184,9 @@ class InvoiceAdd {
       }
     }
     else {
-      $result['paymentstatus'] = 1; // 1 = due.
+      $result['paymentstatus'] = WebAPI::PaymentStatus_Due;
     }
+
     $result['description'] = $this->acumulusConfig->t('order_id') . ' ' . $order->id;
 
     // Add all order lines.

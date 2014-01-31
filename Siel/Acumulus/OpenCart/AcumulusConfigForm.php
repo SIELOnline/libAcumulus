@@ -7,6 +7,7 @@
 
 namespace Siel\Acumulus\OpenCart;
 
+use Siel\Acumulus\ConfigInterface;
 use Siel\Acumulus\WebAPI;
 
 /**
@@ -120,7 +121,7 @@ class AcumulusConfigForm {
     $result['contractcode'] = $formRenderer->simpleField('text', 'contractcode', $this->t('field_code'), $values['contractcode'], array('size' => 20, 'required' => true));
     $result['username'] = $formRenderer->simpleField('text', 'username', $this->t('field_username'), $values['username'], array('size' => 20, 'required' => true));
     $result['password'] = $formRenderer->simpleField('password', 'password', $this->t('field_password'), $values['password'], array('size' => 20, 'required' => true));
-    $result['emailonerror'] = $formRenderer->simpleField('text', 'emailonerror', $this->t('field_email'), $values['emailonerror'], array('size' => 30),
+    $result['emailonerror'] = $formRenderer->simpleField('text', 'emailonerror', $this->t('field_email'), $values['emailonerror'], array('size' => 30, 'required' => true),
       $this->t('desc_email'));
 
     // Check if we can retrieve a picklist. Thi indicates if the account
@@ -149,61 +150,54 @@ class AcumulusConfigForm {
     else {
       // 2nd fieldset
       $options = array(
-        0 => $this->t('option_useAcumulusInvoiceNr_0'),
-        1 => $this->t('option_useAcumulusInvoiceNr_1'),
+        ConfigInterface::InvoiceNrSource_ShopInvoice => $this->t('option_invoiceNrSource_1'),
+        ConfigInterface::InvoiceNrSource_ShopOrder => $this->t('option_invoiceNrSource_2'),
+        ConfigInterface::InvoiceNrSource_Acumulus => $this->t('option_invoiceNrSource_3'),
       );
-      $result['useAcumulusInvoiceNr'] = $formRenderer->listField('radio', 'useAcumulusInvoiceNr', $this->t('field_useAcumulusInvoiceNr'), $options, $values['useAcumulusInvoiceNr'], array('required' => true));
+      $result['invoiceNrSource'] = $formRenderer->listField('radio', 'invoiceNrSource', $this->t('field_invoiceNrSource'), $options,
+        $values['invoiceNrSource'], array('required' => true), $this->t('desc_invoiceNrSource'));
 
       $options = array(
-        1 => $this->t('option_useOrderDate_0'),
-        0 => $this->t('option_useOrderDate_1'),
+        // There doesn't seem to be an invoice date.
+        //ConfigInterface::InvoiceDate_InvoiceCreate => $this->t('option_dateToUse_1'),
+        ConfigInterface::InvoiceDate_OrderCreate => $this->t('option_dateToUse_2'),
+        ConfigInterface::InvoiceDate_Transfer => $this->t('option_dateToUse_3'),
       );
-      $result['useOrderDate'] = $formRenderer->listField('radio', 'useOrderDate', $this->t('field_useOrderDate'), $options, $values['useOrderDate'], array('required' => true));
+      $result['dateToUse'] = $formRenderer->listField('radio', 'dateToUse', $this->t('field_dateToUse'), $options,
+        $values['dateToUse'], array('required' => true), $this->t('desc_dateToUse'));
 
       $options = $this->picklistToOptions($contactTypes['contacttypes'], 0, $this->t('option_empty'));
-      $result['defaultCustomerType'] = $formRenderer->listField('select', 'defaultCustomerType', $this->t('field_defaultCustomerType'), $options, $values['defaultCustomerType']);
+      $result['defaultCustomerType'] = $formRenderer->listField('select', 'defaultCustomerType', $this->t('field_defaultCustomerType'), $options,
+        $values['defaultCustomerType']);
 
       $options = array(1 => $this->t('option_overwriteIfExists'));
-      $result['overwriteIfExists'] = $formRenderer->listField('checkbox', 'overwriteIfExists', $this->t('field_overwriteIfExists'), $options, array($values['overwriteIfExists']), array(),
-        $this->t('desc_overwriteIfExists'));
+      $result['overwriteIfExists'] = $formRenderer->listField('checkbox', 'overwriteIfExists', $this->t('field_overwriteIfExists'), $options,
+        array($values['overwriteIfExists']), array(), $this->t('desc_overwriteIfExists'));
 
       $options = $this->webAPI->getPicklistAccounts();
       $options = $this->picklistToOptions($options['accounts'], 0, $this->t('option_empty'));
-      $result['defaultAccountNumber'] = $formRenderer->listField('select', 'defaultAccountNumber', $this->t('field_defaultAccountNumber'), $options, $values['defaultAccountNumber'], array(),
-        $this->t('desc_defaultAccountNumber'));
+      $result['defaultAccountNumber'] = $formRenderer->listField('select', 'defaultAccountNumber', $this->t('field_defaultAccountNumber'), $options,
+        $values['defaultAccountNumber'], array(), $this->t('desc_defaultAccountNumber'));
 
       $options = $this->webAPI->getPicklistCostCenters();
       $options = $this->picklistToOptions($options['costcenters'], 0, $this->t('option_empty'));
-      $result['defaultCostHeading'] = $formRenderer->listField('select', 'defaultCostHeading', $this->t('field_defaultCostHeading'), $options, $values['defaultCostHeading'], array(),
-        $this->t('desc_defaultCostHeading'));
+      $result['defaultCostHeading'] = $formRenderer->listField('select', 'defaultCostHeading', $this->t('field_defaultCostHeading'), $options,
+        $values['defaultCostHeading'], array(), $this->t('desc_defaultCostHeading'));
 
       $options = $this->webAPI->getPicklistInvoiceTemplates();
       $options = $this->picklistToOptions($options['invoicetemplates'], 0, $this->t('option_empty'));
-      $result['defaultInvoiceTemplate'] = $formRenderer->listField('select', 'defaultInvoiceTemplate', $this->t('field_defaultInvoiceTemplate'), $options, $values['defaultInvoiceTemplate'], array(),
-        $this->t('desc_defaultInvoiceTemplate'));
+      $result['defaultInvoiceTemplate'] = $formRenderer->listField('select', 'defaultInvoiceTemplate', $this->t('field_defaultInvoiceTemplate'), $options,
+        $values['defaultInvoiceTemplate'], array(), $this->t('desc_defaultInvoiceTemplate'));
 
       $this->module->load->model('localisation/order_status');
       $options = $this->module->model_localisation_order_status->getOrderStatuses();
       $options = $this->picklistToOptions($options, 0, $this->t('option_empty_triggerOrderStatus'));
-      $result['triggerOrderStatus'] = $formRenderer->listField('select', 'triggerOrderStatus', $this->t('field_triggerOrderStatus'), $options, $values['triggerOrderStatus'], array(),
-        $this->t('desc_triggerOrderStatus'));
+      $result['triggerOrderStatus'] = $formRenderer->listField('select', 'triggerOrderStatus', $this->t('field_triggerOrderStatus'), $options,
+        $values['triggerOrderStatus'], array(), $this->t('desc_triggerOrderStatus'));
     }
-
-//    $result = array_merge($result, $this->getTestFields());
 
     return $result;
   }
-
-//  protected function getTestFields() {
-//    $output = array();
-//    $file = dirname(__FILE__) . '/lib/Siel/PrestashopTest/TestForm.php';
-//    if (is_file($file)) {
-//      require_once($file);
-//      $testForm = new Siel\PrestashopTest\TestForm($this->acumulusConfig, $this->module);
-//      $output = $testForm->getContent();
-//    }
-//    return $output;
-//  }
 
   protected function picklistToOptions($picklist, $emptyValue = null, $emptyText = null) {
     $result = array();

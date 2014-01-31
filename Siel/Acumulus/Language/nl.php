@@ -20,6 +20,7 @@ $_['message_validate_contractcode_1'] = 'Het veld Contractcode is een numeriek v
 $_['message_validate_username_0'] = 'Het veld Gebruikersnaam is verplicht, vul de gebruikersnaam in die u ook gebruikt om in te loggen op Acumulus.';
 $_['message_validate_password_0'] = 'Het veld Wachtwoord is verplicht, vul het wachtwoord in dat u ook gebruikt om in te loggen op Acumulus.';
 $_['message_validate_email_0'] = 'Het veld Email is geen valide e-mailadres, vul uw eigen e-mailadres in.';
+$_['message_validate_email_1'] = 'Het veld Email is verplicht, vul uw eigen e-mailadres in.';
 
 $_['message_error_vat19and21'] = 'Deze order heeft zowel 19% als 21% BTW percentages. U dient deze factuur handmatig aan te maken in Acumulus.';
 $_['message_warning_multiplevat'] = 'Deze order heeft meerdere BTW percentages. Door verschillen in de manier waarop uw web shop en Acumulus een factuur opslaan, kan het zijn dat dat de BTW bedragen in Acumulus NIET kloppen. U dient daarom deze factuur handmatig te controleren in Acumulus!';
@@ -112,24 +113,28 @@ $_['field_code'] = 'Contractcode';
 $_['field_username'] = 'Gebruikersnaam';
 $_['field_password'] = 'Wachtwoord';
 $_['field_email'] = 'E-mail';
-$_['desc_email'] = 'Als er fouten optreden tijdens een batchverwerking, ontvangt u op dit adres informatie hierover. Als u dit leeg laat ontvangt u geen meldingen.';
+$_['desc_email'] = 'Het e-mailadres waarop u geïnformeerd wordt over fouten die zijn opgetreden tijdens het versturen van facturen. Omdat deze module niet kan weten of het vanuit een beheerdersscherm is aangeroepen, zal het geen berichten op het scherm plaatsen. Daarom is het invullen van een e-mailadres verplicht.';
 
 $_['invoiceSettingsHeader'] = 'Uw factuurinstellingen';
 $_['option_empty'] = 'Maak uw keuze';
 
-$_['field_useAcumulusInvoiceNr'] = 'Factuurnummer';
-$_['option_useAcumulusInvoiceNr_0'] = 'Gebruik het ordernummer van uw webwinkel';
-$_['option_useAcumulusInvoiceNr_1'] = 'Laat Acumulus het factuurnummer bepalen';
+$_['field_invoiceNrSource'] = 'Factuurnummer';
+$_['option_invoiceNrSource_1'] = 'Gebruik het factuurnummer van uw webwinkel. Let op: als er nog geen factuur aan een order gekoppeld is, zal het bestelnummer gebruikt worden!';
+$_['option_invoiceNrSource_2'] = 'Gebruik het bestelnummer van uw webwinkel';
+$_['option_invoiceNrSource_3'] = 'Laat Acumulus het factuurnummer bepalen';
+$_['desc_invoiceNrSource'] = 'U kunt hier kiezen welk nummer Acumulus als factuurnummer moet gebruiken.';
 
-$_['field_useOrderDate'] = 'Factuurdatum';
-$_['option_useOrderDate_0'] = 'Gebruik de orderdatum';
-$_['option_useOrderDate_1'] = 'Gebruik de datum van het overzetten';
+$_['field_dateToUse'] = 'Factuurdatum';
+$_['option_dateToUse_1'] = 'Gebruik de aanmaakdatum van de factuur. Let op: als er nog geen factuur aan uw order gekoppeld is, zal de aanmaakdatum van de bestelling gebruikt worden!';
+$_['option_dateToUse_2'] = 'Gebruik de aanmaakdatum van de bestelling';
+$_['option_dateToUse_3'] = 'Gebruik de datum van het overzetten';
+$_['desc_dateToUse'] = 'U kunt hier kiezen welke datum de factuur in Acumulus moet krijgen.';
 
 $_['field_defaultCustomerType'] = 'Importeer klanten als';
 
 $_['field_overwriteIfExists'] = 'Klantadresgegevens';
 $_['option_overwriteIfExists'] = 'Overschrijf bestaande adresgegevens';
-$_['desc_overwriteIfExists'] = 'Vink deze optie aan als u niet direct in Acumulus adresgegevens van uw web shop klanten bijwerkt.';
+$_['desc_overwriteIfExists'] = 'Vink deze optie alleen uit als u direct in Acumulus adresgegevens van uw web shop klanten bijwerkt.';
 
 $_['field_defaultAccountNumber'] = 'Bankrekeningnummer';
 $_['desc_defaultAccountNumber'] = 'Maakt u binnen Acumulus gebruik van meerdere rekeningen en wilt u alle orders uit uw webwinkel op een specifieke rekening binnen laten komen, kies dan hier het bankrekeningnummer.';

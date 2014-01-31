@@ -35,6 +35,11 @@ namespace Siel\Acumulus;
  */
 class WebAPI {
   // Constants for some fields in the API.
+  const Status_Success = WebAPICommunication::Status_Success;
+  const Status_Errors = WebAPICommunication::Status_Errors;
+  const Status_Warnings = WebAPICommunication::Status_Warnings;
+  const Status_Exception = WebAPICommunication::Status_Exception;
+
   const PaymentStatus_Due = 1;
   const PaymentStatus_Paid = 2;
 
@@ -114,19 +119,88 @@ class WebAPI {
   }
 
   /**
+   * If the result contains any errors or warnings, a list of verbose messages
+   * is returned.
+   *
+   * @param array $result
+   *
+   * @return array
+   *   An array with textual messages tha can be used to inform the user.
+   */
+  public function resultToMessages(array $result) {
+    $messages = array();
+    foreach ($result['errors'] as $error) {
+      $message = "{$error['code']}: ";
+      $message .= $this->config->t($error['message']);
+      if ($error['codetag']) {
+        $message .= " ({$error['codetag']})";
+      }
+      $messages[] = $this->config->t('message_error') . ' ' . $message;
+    }
+    foreach ($result['warnings'] as $warning) {
+      $message = "{$warning['code']}: ";
+      $message .= $this->config->t($warning['message']);
+      if ($warning['codetag']) {
+        $message .= " ({$warning['codetag']})";
+      }
+      $messages[] = $this->config->t('message_warning') . ' ' . $message;
+    }
+
+    if (!empty($messages) || $this->config->getDebug()) {
+      if (isset($result['trace'])) {
+        $messages[] = $this->config->t('message_info_for_user');
+        if (isset($result['trace']['sent'])) {
+          $messages[] = $this->config->t('message_sent') . ":\n" . $result['trace']['sent'];
+        }
+        if (isset($result['trace']['received'])) {
+          $messages[] = $this->config->t('message_received') . ":\n" . $result['trace']['received'];
+        }
+      }
+    }
+
+    return $messages;
+  }
+
+  /**
+   * Converts an array of messages to a string that can be used in a text mail.
+   *
+   * @param array $messages
+   *
+   * @return string
+   */
+  public function messagesToText(array $messages) {
+    return '* '. join("\n\n* ", $messages) . "\n\n";
+  }
+
+  /**
+   * Converts an array of messages to a string that can be used in an html mail.
+   *
+   * @param array $messages
+   *
+   * @return string
+   */
+  public function messagesToHtml(array $messages) {
+    $messages_html = array();
+    foreach ($messages as $message) {
+      $messages_html[] = nl2br(htmlspecialchars($message, ENT_NOQUOTES));
+    }
+    return '<ul><li>' . join("</li><li>", $messages_html) . '</li></ul>';
+  }
+
+  /**
    * @param int $status
    *
    * @return string
    */
   public function getStatusText($status) {
     switch ($status) {
-      case 0:
+      case self::Status_Success:
         return $this->config->t('message_response_0');
-      case 1:
+      case self::Status_Errors:
         return $this->config->t('message_response_1');
-      case 2:
+      case self::Status_Warnings:
         return $this->config->t('message_response_2');
-      case 3:
+      case self::Status_Exception:
         return $this->config->t('message_response_3');
       default:
         return $this->config->t('message_response_x') . $status;
@@ -366,7 +440,7 @@ class WebAPI {
     $response = array(
       'errors' => array(),
       'warnings' => array(),
-      'status' => 0,
+      'status' => self::Status_Success,
     );
 
     // Check if both 19% and 21% vat rates occur.
@@ -384,7 +458,7 @@ class WebAPI {
         'codetag' => !empty($invoice['customer']['invoice']['number']) ? $invoice['customer']['invoice']['number'] : $orderId,
         'message' => $this->config->t('message_error_vat19and21'),
       );
-      $result['status'] = 1;
+      $result['status'] = self::Status_Errors;
     }
 
     return $response;

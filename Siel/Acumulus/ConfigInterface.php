@@ -15,6 +15,15 @@ namespace Siel\Acumulus;
  * @todo: add getDefaults method
  */
 interface ConfigInterface {
+  // Constants for configuration fields.
+  const InvoiceNrSource_ShopInvoice = 1;
+  const InvoiceNrSource_ShopOrder = 2;
+  const InvoiceNrSource_Acumulus = 3;
+
+  const InvoiceDate_InvoiceCreate = 1;
+  const InvoiceDate_OrderCreate = 2;
+  const InvoiceDate_Transfer = 3;
+
   /**
    * Returns the URI of the Acumulus API to connect with.
    *

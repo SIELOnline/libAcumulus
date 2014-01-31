@@ -6,6 +6,7 @@
 namespace Siel\Acumulus\OpenCart;
 
 use ModelModuleAcumulus;
+use Siel\Acumulus\ConfigInterface;
 use Siel\Acumulus\WebAPI;
 
 /**
@@ -32,11 +33,12 @@ class InvoiceAdd {
   /**
    * @param OpenCartAcumulusConfig $config
    * @param \ModelModuleAcumulus $module
+   * @param WebAPI $webAPI
    */
-  public function __construct(OpenCartAcumulusConfig $config, ModelModuleAcumulus $module) {
+  public function __construct(OpenCartAcumulusConfig $config, ModelModuleAcumulus $module, WebAPI $webAPI) {
     $this->module = $module;
     $this->acumulusConfig = $config;
-    $this->webAPI = new WebAPI($this->acumulusConfig);
+    $this->webAPI = $webAPI;
   }
 
   /**
@@ -72,9 +74,6 @@ class InvoiceAdd {
       // Attach token and invoice number to order: not yet implemented.
     }
 
-    if (!empty($this->warnings)) {
-      $result['warnings'] += $this->warnings;
-    }
     return $result;
   }
 
@@ -145,13 +144,22 @@ class InvoiceAdd {
     // Set concept to 0: Issue invoice, no concept.
     $result['concept'] = 0;
 
-    if (!$this->acumulusConfig->get('useAcumulusInvoiceNr')) {
-      // OpenCart has an order_id and an invoice_no, we take the latter if available.
-      $result['number'] = empty($order['invoice_no']) ? $order['order_id'] : $order['invoice_prefix'] . $order['invoice_no'];
+    $invoiceNrSource = $this->acumulusConfig->get('invoiceNrSource');
+    if ($invoiceNrSource != ConfigInterface::InvoiceNrSource_Acumulus) {
+      $result['number'] = $order['order_id'];
+      if ($invoiceNrSource == ConfigInterface::InvoiceNrSource_ShopInvoice && !empty($order['invoice_no'])) {
+        $result['number'] = $order['invoice_prefix'] . $order['invoice_no'];
+      }
+
     }
-    if ($this->acumulusConfig->get('useOrderDate')) {
+
+    $dateToUse = $this->acumulusConfig->get('dateToUse');
+    if ($dateToUse != ConfigInterface::InvoiceDate_Transfer) {
+      // There doesn't seem to be an invoice date: stick with order create date,
+      // for both InvoiceDate_Order and InvoiceDate_Invoice.
       $result['issuedate'] = date('Y-m-d', strtotime($order['date_added']));
     }
+
     // @todo: get payment status (config?)
     if (true) {
       $result['paymentstatus'] = WebAPI::PaymentStatus_Paid;
@@ -160,7 +168,7 @@ class InvoiceAdd {
     else {
       $result['paymentstatus'] = WebAPI::PaymentStatus_Due;
     }
-    $result['description'] = 'Ordernummer ' . $order['order_id'];
+    $result['description'] = $this->acumulusConfig->t('order_id') . ' ' . $order['order_id'];
 
     // Add all order lines.
     $result['line'] = $this->addInvoiceLines($order);

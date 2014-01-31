@@ -22,7 +22,7 @@ class OpenCartAcumulusConfig extends BaseConfig {
    *
    * @var string
    */
-  public static $module_version = '3.0.0';
+  public static $module_version = '3.2.0';
 
 
   /** @var \ModelSettingSetting */
@@ -39,7 +39,6 @@ class OpenCartAcumulusConfig extends BaseConfig {
       'moduleVersion' => self::$module_version,
       'shopName' => 'OpenCart',
       'shopVersion' => VERSION,
-      //'local' => true,
     ));
     $this->configuration = $configuration;
   }

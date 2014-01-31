@@ -14,7 +14,7 @@ abstract class BaseConfig implements ConfigInterface{
    *
    * @var string
    */
-  public static $library_version = '3.1.0';
+  public static $library_version = '3.2.0';
 
   /** @var bool */
   protected $isLoaded;
@@ -39,10 +39,11 @@ abstract class BaseConfig implements ConfigInterface{
       'outputFormat' => 'json',
       'local' => false,
       'debug' => false,
+
       // Default configuration settings.
       'useMargin' => true,
-      'useAcumulusInvoiceNr' => false,
-      'useOrderDate' => true,
+      'invoiceNrSource' => ConfigInterface::InvoiceNrSource_ShopInvoice,
+      'dateToUse' => ConfigInterface::InvoiceDate_InvoiceCreate,
       'overwriteIfExists' => true,
     );
     $this->translator = $language instanceof TranslatorInterface ? $language : new BaseTranslator($language);
@@ -224,8 +225,8 @@ abstract class BaseConfig implements ConfigInterface{
     return array(
       'defaultCustomerType' => $this->get('defaultCustomerType'),
       'defaultAccountNumber' => $this->get('defaultAccountNumber'),
-      'useAcumulusInvoiceNr' => $this->get('useAcumulusInvoiceNr'),
-      'useOrderDate' => $this->get('useOrderDate'),
+      'invoiceNrSource' => $this->get('invoiceNrSource'),
+      'dateToUse' => $this->get('dateToUse'),
       'defaultCostHeading' => $this->get('defaultCostHeading'),
       'defaultInvoiceTemplate' => $this->get('defaultInvoiceTemplate'),
       'triggerOrderStatus' => $this->get('triggerOrderStatus'),
@@ -257,7 +258,10 @@ abstract class BaseConfig implements ConfigInterface{
     if (empty($values['password'])) {
       $result[] = $this->t('message_validate_password_0');
     }
-    if (!preg_match('/^[^@]+@([^.@]+\.)+[^.@]+$/', $values['emailonerror'])) {
+    if (empty($values['emailonerror'])) {
+      $result[] = $this->t('message_validate_email_1');
+    }
+    else if (!preg_match('/^[^@]+@([^.@]+\.)+[^.@]+$/', $values['emailonerror'])) {
       $result[] = $this->t('message_validate_email_0');
     }
     return $result;
@@ -274,11 +278,11 @@ abstract class BaseConfig implements ConfigInterface{
    * @param array $values
    */
   public function castValues(array &$values) {
-    if (isset($values['useAcumulusInvoiceNr'])) {
-      $values['useAcumulusInvoiceNr'] = (bool) $values['useAcumulusInvoiceNr'];
+    if (isset($values['invoiceNrSource'])) {
+      $values['invoiceNrSource'] = (int) $values['invoiceNrSource'];
     }
-    if (isset($values['useOrderDate'])) {
-      $values['useOrderDate'] = (bool) $values['useOrderDate'];
+    if (isset($values['dateToUse'])) {
+      $values['dateToUse'] = (int) $values['dateToUse'];
     }
     if (isset($values['overwriteIfExists'])) {
       $values['overwriteIfExists'] = (bool) $values['overwriteIfExists'];
@@ -308,8 +312,8 @@ abstract class BaseConfig implements ConfigInterface{
       'username',
       'password',
       'emailonerror',
-      'useAcumulusInvoiceNr',
-      'useOrderDate',
+      'invoiceNrSource',
+      'dateToUse',
       'defaultCustomerType',
       'defaultAccountNumber',
       'defaultCostHeading',

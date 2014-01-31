@@ -31,7 +31,7 @@ class BaseTranslator implements TranslatorInterface {
   }
 
   protected function load($language) {
-    $file = dirname(__FILE__) . '/language/' . $language . '.php';
+    $file = dirname(__FILE__) . '/Language/' . $language . '.php';
     if (file_exists($file)) {
       $_ = array();
       require($file);

@@ -9,6 +9,7 @@ use Configuration;
 use Context;
 use HelperForm;
 use OrderState;
+use Siel\Acumulus\ConfigInterface;
 use Tools;
 use Acumulus;
 use Siel\Acumulus\WebAPI;
@@ -214,7 +215,7 @@ class AcumulusConfigForm {
       'name' => 'emailonerror',
       'desc' => $this->t('desc_email'),
       'size' => 30,
-      'required' => false,
+      'required' => true,
     );
 
     // Fieldsets seem to be impossible. Add all fields at the same level with a
@@ -260,42 +261,54 @@ class AcumulusConfigForm {
     else {
       $options = array(
         array(
-          'id'    => 'use_prestashop',
-          'value' => 0,
-          'label' => $this->t('option_useAcumulusInvoiceNr_0')
+          'id'    => 'use_shop_invoice',
+          'value' => ConfigInterface::InvoiceNrSource_ShopInvoice,
+          'label' => $this->t('option_invoiceNrSource_1')
+        ),
+        array(
+          'id'    => 'use_shop_order',
+          'value' => ConfigInterface::InvoiceNrSource_ShopOrder,
+          'label' => $this->t('option_invoiceNrSource_2')
         ),
         array(
           'id'    => 'use_acumulus',
-          'value' => 1,
-          'label' => $this->t('option_useAcumulusInvoiceNr_1'),
+          'value' => ConfigInterface::InvoiceNrSource_Acumulus,
+          'label' => $this->t('option_invoiceNrSource_3'),
         ),
       );
       $fieldset[] = array(
         'type' => 'radio',
         'class' => 't',
-        'label' => $this->t('field_useAcumulusInvoiceNr'),
-        'name' => 'useAcumulusInvoiceNr',
+        'label' => $this->t('field_invoiceNrSource'),
+        'desc' => $this->t('desc_invoiceNrSource'),
+        'name' => 'invoiceNrSource',
         'values' => $options,
         'required' => true,
       );
 
       $options = array(
         array(
-          'id'    => 'use_orderdate',
-          'value' => 1,
-          'label' => $this->t('option_useOrderDate_0'),
+          'id'    => 'use_invoicedate',
+          'value' => ConfigInterface::InvoiceDate_InvoiceCreate,
+          'label' => $this->t('option_dateToUse_1'),
         ),
         array(
-          'id'    => 'use_current',
-          'value' => 0,
-          'label' => $this->t('option_useOrderDate_1')
+          'id'    => 'use_orderdate',
+          'value' => ConfigInterface::InvoiceDate_OrderCreate,
+          'label' => $this->t('option_dateToUse_2')
+        ),
+        array(
+          'id'    => 'use_transferdate',
+          'value' => ConfigInterface::InvoiceDate_Transfer,
+          'label' => $this->t('option_dateToUse_3')
         ),
       );
       $fieldset[] = array(
         'type' => 'radio',
         'class' => 't',
-        'label' => $this->t('field_useOrderDate'),
-        'name' => 'useOrderDate',
+        'label' => $this->t('field_dateToUse'),
+        'desc' => $this->t('desc_dateToUse'),
+        'name' => 'dateToUse',
         'values' => $options,
         'required' => true,
       );
@@ -313,6 +326,25 @@ class AcumulusConfigForm {
           'name' => 'contacttypename'
         ),
         'required' => false,
+      );
+
+      $options = array(
+        array(
+          'id' => 'overwrite',
+          'name' => $this->t('option_overwriteIfExists'),
+          'val' => 1,
+        ),
+      );
+      $fieldset[] = array(
+        'type' => 'checkbox',
+        'label' => $this->t('field_overwriteIfExists'),
+        'desc' => $this->t('desc_overwriteIfExists'),
+        'name' => 'overwriteIfExists',
+        'values' => array(
+          'query' => $options,
+          'id' => 'val',
+          'name' => 'name'
+        ),
       );
 
       $options = $this->webAPI->getPicklistAccounts();
@@ -376,25 +408,6 @@ class AcumulusConfigForm {
           'name' => 'name'
         ),
         'required' => false,
-      );
-
-      $options = array(
-        array(
-          'id' => 'overwrite',
-          'name' => $this->t('option_overwriteIfExists'),
-          'val' => 1,
-        ),
-      );
-      $fieldset[] = array(
-        'type' => 'checkbox',
-        'label' => $this->t('field_overwriteIfExists'),
-        'desc' => $this->t('desc_overwriteIfExists'),
-        'name' => 'overwriteIfExists',
-        'values' => array(
-          'query' => $options,
-          'id' => 'val',
-          'name' => 'name'
-        ),
       );
 
     }

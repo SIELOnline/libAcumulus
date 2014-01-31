@@ -17,6 +17,11 @@ use LibXMLError;
  * @package Siel\Acumulus
  */
 class WebAPICommunication {
+  const Status_Success = 0;
+  const Status_Errors = 1;
+  const Status_Warnings = 2;
+  const Status_Exception = 3;
+
   /** @var \Siel\Acumulus\ConfigInterface */
   protected $config;
 
@@ -122,10 +127,22 @@ class WebAPICommunication {
       // Internal warning(s), return those as well.
       $response['warnings'] = array_merge($this->warnings, $response['warnings']);
     }
+
     // - Add status if not set. if no status is present the call failed, so we
     //   set the status to 1.
     if (!isset($response['status'])) {
-      $response['status'] = 1;
+      $response['status'] = self::Status_Errors;
+    }
+
+    // - Check if status is consistent (local errors and warnings should alter
+    //   the status as well.
+    if ($response['status'] == self::Status_Success) {
+      if (!empty($response['warnings'])) {
+        $response['status'] = self::Status_Warnings;
+      }
+      if (!empty($response['errors'])) {
+        $response['status'] = self::Status_Errors;
+      }
     }
 
     return $response;

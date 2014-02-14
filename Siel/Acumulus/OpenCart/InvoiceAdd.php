@@ -220,7 +220,7 @@ class InvoiceAdd {
   protected function addOrderLines(array $order, array &$taxesOnProducts) {
     $result = array();
 
-    foreach ($this->module->model_sale_order->getOrderProducts($order['order_id']) as $line) {
+    foreach ($this->module->orderModel->getOrderProducts($order['order_id']) as $line) {
       $result[] = $this->addOrderLine($line, $taxesOnProducts);
     }
     return $result;
@@ -237,7 +237,6 @@ class InvoiceAdd {
   protected function addOrderLine(array $line, array &$taxes) {
     $result = array();
 
-    $this->module->load->model('catalog/product');
     $product = $this->module->model_catalog_product->getProduct($line['product_id']);
     $this->addIfNotEmpty($result, 'itemnumber', $product['mpn']);
     $this->addIfNotEmpty($result, 'itemnumber', $product['isbn']);
@@ -308,7 +307,7 @@ class InvoiceAdd {
    */
   protected function addTotalLines(array $order, array &$taxLines) {
     $result = array();
-    foreach ($this->module->model_sale_order->getOrderTotals($order['order_id']) as $line) {
+    foreach ($this->module->orderModel->getOrderTotals($order['order_id']) as $line) {
       if (!in_array($line['code'], array('sub_total', 'tax', 'total', 'voucher'))) {
         $result[] = $this->addTotalLine($line);
       }

@@ -145,3 +145,5 @@ $_['desc_defaultInvoiceTemplate'] = 'Select the invoice template to print your w
 $_['option_empty_triggerOrderStatus'] = 'Do not send automatically';
 $_['field_triggerOrderStatus'] = 'Order state';
 $_['desc_triggerOrderStatus'] = 'Select the order state at which orders will be sent to Acumulus. If you select "Do not send automatically" this module will do nothing.';
+
+$_['versionInformationHeader'] = 'Module information';

@@ -196,6 +196,10 @@ class AcumulusConfigForm {
         $values['triggerOrderStatus'], array(), $this->t('desc_triggerOrderStatus'));
     }
 
+    // 3rd (or 2nd) fieldset: Acumulus version information.
+    $env = $this->acumulusConfig->getEnvironment();
+    $result['versionInformationHeader'] = '<h2>' . $this->t('versionInformationHeader') . '</h2>';
+    $result['versionInformation'] = "<p>Acumulus module {$env['moduleVersion']} (API: {$env['libraryVersion']}) voor {$env['shopName']} {$env['shopVersion']}<p>";
     return $result;
   }
 

@@ -147,3 +147,4 @@ $_['field_triggerOrderStatus'] = 'Order state';
 $_['desc_triggerOrderStatus'] = 'Select the order state at which orders will be sent to Acumulus. If you select "Do not send automatically" this module will do nothing.';
 
 $_['versionInformationHeader'] = 'Module information';
+$_['desc_versionInformation'] = 'Please mention this information with any support request.';

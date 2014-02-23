@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Siel\Acumulus\OpenCart\FormRenderer
+ * Contains \Siel\Acumulus\FormRenderer
  */
 
-namespace Siel\Acumulus\OpenCart;
+namespace Siel\Acumulus;
 
 /**
  * Class FormRenderer
@@ -50,16 +50,18 @@ class FormRenderer {
    * Renders a descriptive help text.
    *
    * @param string $text
+   * @param string $tag
+   * @param string $class
    *
    * @return string
    *   The rendered description.
    */
-  public function description($text) {
+  public function description($text, $tag = 'div', $class = 'description') {
     $output = '';
 
     // Help text.
     if (!empty($text)) {
-      $output .= '<div class="desc">' . htmlspecialchars($text, ENT_NOQUOTES, 'UTF-8', false) . '</div>';
+      $output .= "<$tag class=\"$class\">" . htmlspecialchars($text, ENT_NOQUOTES, 'UTF-8', false) . "</$tag>";
     }
 
     return $output;

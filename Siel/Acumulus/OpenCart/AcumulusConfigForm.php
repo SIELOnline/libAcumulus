@@ -8,6 +8,7 @@
 namespace Siel\Acumulus\OpenCart;
 
 use Siel\Acumulus\ConfigInterface;
+use Siel\Acumulus\FormRenderer;
 use Siel\Acumulus\WebAPI;
 
 /**
@@ -199,7 +200,9 @@ class AcumulusConfigForm {
     // 3rd (or 2nd) fieldset: Acumulus version information.
     $env = $this->acumulusConfig->getEnvironment();
     $result['versionInformationHeader'] = '<h2>' . $this->t('versionInformationHeader') . '</h2>';
-    $result['versionInformation'] = "<p>Acumulus module {$env['moduleVersion']} (API: {$env['libraryVersion']}) voor {$env['shopName']} {$env['shopVersion']}<p>";
+    $result['versionInformation'] = "<p>Acumulus module {$env['moduleVersion']} (API: {$env['libraryVersion']}) voor {$env['shopName']} {$env['shopVersion']}</p>";
+    $result['versionInformationDesc'] = $formRenderer->description($this->t('desc_versionInformation'));
+
     return $result;
   }
 

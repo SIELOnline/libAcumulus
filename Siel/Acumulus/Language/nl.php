@@ -150,3 +150,4 @@ $_['field_triggerOrderStatus'] = 'Orderstatus';
 $_['desc_triggerOrderStatus'] = 'U kunt hier kiezen bij welke orderstatus facturen worden overgezet naar Acumulus. Als u voor "Niet automatisch overzetten" kiest, doet deze module niets.';
 
 $_['versionInformationHeader'] = 'Informatie over deze module';
+$_['desc_versionInformation'] = 'Vermeldt aub deze gegevens bij een supportverzoek.';

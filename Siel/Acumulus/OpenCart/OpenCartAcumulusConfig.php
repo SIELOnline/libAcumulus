@@ -22,7 +22,7 @@ class OpenCartAcumulusConfig extends BaseConfig {
    *
    * @var string
    */
-  public static $module_version = '3.3.0';
+  public static $module_version = '3.3.1';
 
 
   /** @var \ModelSettingSetting */
@@ -48,9 +48,9 @@ class OpenCartAcumulusConfig extends BaseConfig {
    */
   public function load() {
     // Load the values from the web shop specific configuration.
-    $openCartValues = $this->configuration->getSetting('acumulus');
+    $configurationValues = $this->configuration->getSetting('acumulus');
     foreach ($this->getKeys() as $key) {
-      $this->values[$key] = array_key_exists($key, $openCartValues) ? $openCartValues[$key] : null;
+      $this->values[$key] = array_key_exists($key, $configurationValues) ? $configurationValues[$key] : null;
     }
     // And cast them to their correct types.
     $this->castValues($this->values);

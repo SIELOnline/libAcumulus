@@ -9,10 +9,10 @@ use Acumulus;
 use Siel\Acumulus\BaseConfig;
 
 /**
- * Class AcumulusConfig
+ * Class PrestaShopAcumulusConfig
  *
- * A Prestashop specific implementation of the Acumulus ConfigInterface that the
- * WebAPI and the OrderAdd classes need.
+ * A Prestashop specific implementation of the Acumulus ConfigInterface that
+ * the WebAPI and the InvoiceAdd classes need.
  */
 class PrestaShopAcumulusConfig extends BaseConfig {
 

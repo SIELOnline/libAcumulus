@@ -30,6 +30,12 @@ class AcumulusConfigForm {
   /** @var WebAPI */
   protected $webAPI;
 
+  /** @var array contact type picklist */
+  private $contactTypes;
+
+  /** @var string Authentication failure message */
+  private $message;
+
   /**
    * @param PrestaShopAcumulusConfig $config
    * @param Acumulus $module
@@ -174,10 +180,14 @@ class AcumulusConfigForm {
     // Load current values.
     $helper->fields_value = $values + $this->acumulusConfig->getCredentials() + $this->acumulusConfig->getInvoiceSettings();
     $helper->fields_value['overwriteIfExists_1'] = $helper->fields_value['overwriteIfExists'];
-    // Prevent undefined index messages in php.log...
+    // Add the "values" for the free elements.
+    $env = $this->acumulusConfig->getEnvironment();
     $helper->fields_value['legend1'] = '';
     $helper->fields_value['legend2'] = '';
-    $helper->fields_value['message2'] = '';
+    $helper->fields_value['message2'] = $this->message;
+    $helper->fields_value['legend3'] = '';
+    $helper->fields_value['message3'] = "<div class='message'>Acumulus module {$env['moduleVersion']} (API: {$env['libraryVersion']}) voor {$env['shopName']} {$env['shopVersion']}</div>";
+    $helper->fields_value['description3'] = '<p class="description">' . $this->t('desc_versionInformation') . '</p>';
     array_filter($helper->fields_value);
 
     return $helper->generateForm($fields_form);
@@ -231,29 +241,13 @@ class AcumulusConfigForm {
     // 2nd fieldset: invoice settings.
     $fieldset = array();
 
-    // Check if we can retrieve a picklist. Thi indicates if the account
-    // settings are known and correct.
-    $message = '';
-    $contactTypes = null;
-    if ($this->acumulusConfig->get('password')) {
-      $contactTypes = $this->webAPI->getPicklistContactTypes();
-      if (!empty($contactTypes['errors'])) {
-        if ($contactTypes['errors'][0]['code'] == 401) {
-          $message = $this->t('message_error_auth');
-        }
-        else {
-          $message = $this->t('message_error_comm');
-        }
-      }
-    }
-    else {
-      $message = $this->t('message_auth_unknown');
-    }
+    // Check if we can retrieve a picklist. This indicates if the account
+    $this->message = $this->checkAccountSettings();
 
-    if ($message) {
+    if ($this->message) {
       $fieldset[] = array(
         'type' => 'free',
-        'label' => $message,
+        'label' => '',
         'name' => 'message2',
         'required' => false,
       );
@@ -313,7 +307,7 @@ class AcumulusConfigForm {
         'required' => true,
       );
 
-      $options = $contactTypes;
+      $options = $this->contactTypes;
       $options = $options['contacttypes'];
       array_unshift($options, array('contacttypeid' => 0, 'contacttypename' => $this->t('option_empty')));
       $fieldset[] = array(
@@ -422,9 +416,67 @@ class AcumulusConfigForm {
     );
     $result = array_merge($result, $fieldset);
 
-    $result = array_merge($result, $this->getTestFields());
+    // 3rd fieldset: version information.
+    $fieldset = array();
+
+    $fieldset[] = array(
+      'type' => 'free',
+      'label' => '',
+      'name' => 'message3',
+      'required' => false,
+    );
+
+    $fieldset[] = array(
+      'type' => 'free',
+      'label' => '',
+      'name' => 'description3',
+      'required' => false,
+    );
+
+    $result[] = array(
+      'type' => 'free',
+      'label' => '<h2>' . $this->t('versionInformationHeader') . '</h2>',
+      'name' => 'legend3',
+      'required' => false,
+    );
+    $result = array_merge($result, $fieldset);
+
+//    $result = array_merge($result, $this->getTestFields());
 
     return $result;
+  }
+
+  /**
+   * Check if we can retrieve a picklist. This indicates if the account
+   * settings are known and correct.
+   *
+   * The picklist will be stored for later use.
+   *
+   * @return string
+   *   A user readable message indicating if the account settings needs yet to
+   *   be filled in or were incorrect. The empty string, if a successful
+   *   connection was made.
+   */
+  protected function checkAccountSettings() {
+    // Check if we can retrieve a picklist. Thi indicates if the account
+    // settings are known and correct.
+    $message = '';
+    $this->contactTypes = null;
+    if ($this->acumulusConfig->get('password')) {
+      $this->contactTypes = $this->webAPI->getPicklistContactTypes();
+      if (!empty($this->contactTypes['errors'])) {
+        if ($this->contactTypes['errors'][0]['code'] == 401) {
+          $message = $this->t('message_error_auth');
+        }
+        else {
+          $message = $this->t('message_error_comm');
+        }
+      }
+    }
+    else {
+      $message = $this->t('message_auth_unknown');
+    }
+    return $message;
   }
 
   protected function getTestFields() {

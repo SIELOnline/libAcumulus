@@ -247,22 +247,22 @@ abstract class BaseConfig implements ConfigInterface{
   public function validateValues(array &$values) {
     $result = array();
     if (empty($values['contractcode'])) {
-      $result[] = $this->t('message_validate_contractcode_0');
+      $result['contractcode'] = $this->t('message_validate_contractcode_0');
     }
     elseif (!is_numeric($values['contractcode'])) {
-      $result[] = $this->t('message_validate_contractcode_1');
+      $result['contractcode'] = $this->t('message_validate_contractcode_1');
     }
     if (empty($values['username'])) {
-      $result[] = $this->t('message_validate_username_0');
+      $result['username'] = $this->t('message_validate_username_0');
     }
     if (empty($values['password'])) {
-      $result[] = $this->t('message_validate_password_0');
+      $result['password'] = $this->t('message_validate_password_0');
     }
     if (empty($values['emailonerror'])) {
-      $result[] = $this->t('message_validate_email_1');
+      $result['emailonerror'] = $this->t('message_validate_email_1');
     }
     else if (!preg_match('/^[^@]+@([^.@]+\.)+[^.@]+$/', $values['emailonerror'])) {
-      $result[] = $this->t('message_validate_email_0');
+      $result['emailonerror'] = $this->t('message_validate_email_0');
     }
     return $result;
   }

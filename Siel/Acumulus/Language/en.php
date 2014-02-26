@@ -53,6 +53,7 @@ $_['shipping_costs'] = 'Shipping costs';
 $_['discount_code'] = 'Coupon code';
 $_['coupon_code'] = 'Voucher';
 $_['gift_wrapping'] = 'Gift wrapping';
+$_['fee'] = 'Order treatment costs';
 
 
 // Mails

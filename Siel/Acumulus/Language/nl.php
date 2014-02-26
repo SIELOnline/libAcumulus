@@ -53,6 +53,7 @@ $_['shipping_costs'] = 'Verzendkosten';
 $_['discount_code'] = 'Kortingscode';
 $_['coupon_code'] = 'Cadeaubon';
 $_['gift_wrapping'] = 'Cadeauverpakking';
+$_['fee'] = 'Behandelkosten';
 
 // Mails
 $_['mail_subject'] = 'Fouten of waarschuwingen bij verzenden factuur naar Acumulus';

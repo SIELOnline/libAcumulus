@@ -319,7 +319,7 @@ class AcumulusConfigForm {
       $result[$emptyValue] = $emptyText;
     }
     array_walk($orderStatuses, function ($value) use (&$result) {
-      $result[$value->term_id] = $value->name;
+      $result[$value->slug] = $value->name;
     });
 
     return $result;

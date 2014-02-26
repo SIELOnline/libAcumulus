@@ -207,7 +207,7 @@ class AcumulusConfigForm {
     );
     $fieldset[] = array(
       'type' => 'text',
-      'label' => $this->t('field_code'),
+      'label' => $this->t('field_username'),
       'name' => 'username',
       'size' => 20,
       'required' => true,

@@ -27,7 +27,7 @@ class WooCommerceAcumulusConfig extends BaseConfig {
       'moduleVersion' => WOOCOMMERCE_ACUMULUS_VERSION,
       'shopName' => 'WooCommerce',
       'shopVersion' => (isset($woocommerce) ? $woocommerce->version : 'unknown') . ' (WordPress: ' . $wp_version . ')',
-      //'debug' => true, // Uncomment to debug.
+      'debug' => true, // Uncomment to debug.
     ));
   }
 

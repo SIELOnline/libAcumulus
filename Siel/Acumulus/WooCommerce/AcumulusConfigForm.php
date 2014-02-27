@@ -153,7 +153,8 @@ class AcumulusConfigForm {
    */
   public function getInvoiceNrSourceField() {
     $options = array(
-      ConfigInterface::InvoiceNrSource_ShopInvoice => $this->t('option_invoiceNrSource_1'),
+      // WooCommerce does not have a separate invoice.
+      //ConfigInterface::InvoiceNrSource_ShopInvoice => $this->t('option_invoiceNrSource_1'),
       ConfigInterface::InvoiceNrSource_ShopOrder => $this->t('option_invoiceNrSource_2'),
       ConfigInterface::InvoiceNrSource_Acumulus => $this->t('option_invoiceNrSource_3'),
     );
@@ -167,8 +168,8 @@ class AcumulusConfigForm {
    */
   public function getDateToUseField() {
     $options = array(
-      // @todo: check if there is an invoice date.
-      ConfigInterface::InvoiceDate_InvoiceCreate => $this->t('option_dateToUse_1'),
+      // WooCommerce does not have a separate invoice.
+      //ConfigInterface::InvoiceDate_InvoiceCreate => $this->t('option_dateToUse_1'),
       ConfigInterface::InvoiceDate_OrderCreate => $this->t('option_dateToUse_2'),
       ConfigInterface::InvoiceDate_Transfer => $this->t('option_dateToUse_3'),
     );

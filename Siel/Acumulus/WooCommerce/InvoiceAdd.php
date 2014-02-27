@@ -143,19 +143,11 @@ class InvoiceAdd {
     $invoiceNrSource = $this->acumulusConfig->get('invoiceNrSource');
     if ($invoiceNrSource != ConfigInterface::InvoiceNrSource_Acumulus) {
       $result['number'] = $order->id;
-      // @todo: find out if there are invoices with a separate number. (if not remove this option from config screen)
-//      if ($invoiceNrSource == ConfigInterface::InvoiceNrSource_ShopInvoice && !empty($order->invoice_number)) {
-//        $result['number'] = $order->invoice_number;
-//      }
     }
 
     $dateToUse = $this->acumulusConfig->get('');
     if ($dateToUse != ConfigInterface::InvoiceDate_Transfer) {
       $result['issuedate'] = date('Y-m-d', strtotime($order->order_date));
-      // @todo: find out if there are invoices with a separate date. (if not remove this option from config screen)
-//      if ($dateToUse == ConfigInterface::InvoiceDate_InvoiceCreate  && !empty($order->invoice_date)) {
-//        $this->addIfNotEmpty($result, 'issuedate', date('Y-m-d', strtotime($order->invoice_date)));
-//      }
     }
 
     // _paid_date meta property is set in WC_Order::payment_complete().
@@ -237,7 +229,7 @@ class InvoiceAdd {
     // this method will always return false. But if this method happens to
     // return true anyway (customisation, hook), the costprice will trigger
     // vattype = 5 for Acumulus.
-    if ($this->useMarginScheme($line)) {
+    if ($this->useMarginScheme($product)) {
       // Margin scheme:
       // - Do not put VAT on invoice: send price incl VAT as unitprice.
       // - But still send the VAT rate to Acumulus.
@@ -395,12 +387,12 @@ class InvoiceAdd {
    * Note: with a standard WooCommerce install, the margin scheme is not
    * supported.
    *
-   * @param /WC_Product $product
+   * @param \WC_Product $product
    *
    * @return bool
    */
   protected function useMarginScheme(WC_Product $product) {
-    // @todo: is there a cost price on product?
+    // Standard WooCommerce cannot handle cost price, let alone the margin scheme.
     return false;
   }
 }

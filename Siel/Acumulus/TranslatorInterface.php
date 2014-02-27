@@ -22,6 +22,13 @@ interface TranslatorInterface {
   public function __construct($language);
 
   /**
+   * Returns the current (2 character) language (code).
+   *
+   * @return string
+   */
+  public function getLanguage();
+
+  /**
    * Returns the string in the current language for the given key.
    *
    * @param string $key

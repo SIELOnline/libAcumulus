@@ -109,6 +109,13 @@ interface ConfigInterface {
   public function getInvoiceSettings();
 
   /**
+   * Returns the current (2 character) language (code).
+   *
+   * @return string
+   */
+  public function getLanguage();
+
+  /**
    * Get a translated string.
    *
    * Strictly speaking,this is no configuration thing, but as doing it this way,

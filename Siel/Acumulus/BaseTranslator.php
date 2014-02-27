@@ -42,6 +42,13 @@ class BaseTranslator implements TranslatorInterface {
   /**
    * @inheritdoc
    */
+  public function getLanguage() {
+    return $this->language;
+  }
+
+  /**
+   * @inheritdoc
+   */
   public function get($key) {
     return (isset($this->data[$key]) ? $this->data[$key] : $key);
   }

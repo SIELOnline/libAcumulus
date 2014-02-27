@@ -14,7 +14,7 @@ abstract class BaseConfig implements ConfigInterface{
    *
    * @var string
    */
-  public static $library_version = '3.2.2';
+  public static $library_version = '3.2.3';
 
   /** @var bool */
   protected $isLoaded;
@@ -189,6 +189,13 @@ abstract class BaseConfig implements ConfigInterface{
         fclose($fh);
       }
     }
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function getLanguage() {
+    return $this->translator->getLanguage();
   }
 
   /**

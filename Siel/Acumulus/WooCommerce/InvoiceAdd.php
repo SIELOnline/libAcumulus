@@ -151,12 +151,14 @@ class InvoiceAdd {
     }
 
     // _paid_date meta property is set in WC_Order::payment_complete().
-    if (!empty($order->_paid_date)) {
-      $result['paymentstatus'] = WebAPI::PaymentStatus_Paid;
-      $result['paymentdate'] = date('Y-m-d', strtotime($order->_paid_date));
+    if (empty($order->_paid_date) || $order->needs_payment()) {
+      $result['paymentstatus'] = WebAPI::PaymentStatus_Due;
     }
     else {
-      $result['paymentstatus'] = WebAPI::PaymentStatus_Due;
+      $result['paymentstatus'] = WebAPI::PaymentStatus_Paid;
+      if (!empty($order->_paid_date)) {
+        $result['paymentdate'] = date('Y-m-d', strtotime($order->_paid_date));
+      }
     }
 
     $result['description'] = $this->acumulusConfig->t('order_id') . ' ' . $order->id;
@@ -175,9 +177,18 @@ class InvoiceAdd {
    *
    * This includes:
    * - all product lines
-   * - discount lines, if any
-   * - gift wrapping line, if available
-   * - shipping costs, if any
+   * - shipping costs, if any. With free shipping, no shipping costs will be
+   *   specified at all.
+   * - fees
+   *
+   * Coupon discounts:
+   * - Are applied to the item lines themselves.
+   * - if they grant free shipping, the shipping costs line will be removed.
+   * Because of the above, if $order->get_total_discount() returns a value it
+   * should not be added as a separate line to the invoice. However, this does
+   * not hold when the option "Apply discount before taxes" was not set, but
+   * this option should always be set!, or the tax calculation will fail and you
+   * will pay too much VAT.
    *
    * @param WC_Order $order
    *
@@ -187,8 +198,7 @@ class InvoiceAdd {
     $result = array_merge(
       $this->addOrderLines($order),
       $this->addShippingLines($order),
-      $this->addFeeLines($order),
-      $this->addDiscountLines($order)
+      $this->addFeeLines($order)
     );
 
     return $result;
@@ -208,6 +218,11 @@ class InvoiceAdd {
   }
 
   /**
+   * Because discounts are applied to the order lines themselves, the unit price
+   * should not be taken from the product, but from the item line. (Actually,
+   * because of possible price changes between the order creation and the
+   * sending of the order to Acumulus, this should always be done so!)
+   *
    * @param array $line
    * @param \WC_Order $order
    *
@@ -217,9 +232,10 @@ class InvoiceAdd {
     $result = array();
 
     $product = get_product($line['variation_id'] ? $line['variation_id'] : $line['product_id'] );
-    $price = $product->get_price();
+    // get_item_total returns cost per item after discount, ex vat (2nd parameter).
+    $priceEx = $order->get_item_total($line, false, false);
+    // get_item_tax returns tax per item after discount.
     $tax = $order->get_item_tax($line, false);
-    $priceEx = $price - $tax;
     $vatRate = $tax / $priceEx * 100;
 
     $this->addIfNotEmpty($result, 'itemnumber', $product->get_sku());
@@ -233,7 +249,7 @@ class InvoiceAdd {
       // Margin scheme:
       // - Do not put VAT on invoice: send price incl VAT as unitprice.
       // - But still send the VAT rate to Acumulus.
-      $result['unitprice'] = number_format($price, 4, '.', '');
+      $result['unitprice'] = number_format($priceEx + $tax, 4, '.', '');
       // Costprice > 0 is the trigger for Acumulus to use the margin scheme.
       $result['costprice'] = $line['cost_price'];
     }
@@ -249,18 +265,6 @@ class InvoiceAdd {
 
   /**
    * Adds the shipping costs to the invoice.
-   *
-   * In a WooCommerce order the shipping costs are specified in:
-   * - total_shipping_tax_incl
-   * - total_shipping_tax_excl
-   * - total_shipping (ignored)
-   *
-   * NOTE: The method getShipping allows to specify a breakdown of the shipping
-   * costs. This could probably/mainly be used to specify the shipping method,
-   * instead of the generic "Shipping costs".
-   *
-   * NOTE: The method WC_Order::updateShippingCost() only updates total_shipping,
-   * so I'm a bit unsure about which properties to use.
    *
    * @param WC_Order $order
    *
@@ -306,39 +310,6 @@ class InvoiceAdd {
       'vatrate' => number_format(($line['line_tax'] / $line['line_total']) * 100.0),
       'quantity' => 1,
     );
-  }
-
-  /**
-   * @param WC_Order $order
-   *
-   * @return array
-   */
-  protected function addDiscountLines(WC_Order $order) {
-    $result = array();
-    $discount = $order->get_order_discount();
-    if ($discount > 0) {
-      $result[] = array(
-        'product' => $this->acumulusConfig->t('discount_code'),
-        'unitprice' => number_format(-$discount, 4, '.', ''),
-        // @todo: vat on discount?
-        'vatrate' => number_format(0),
-        'quantity' => 1,
-      );
-    }
-    return $result;
-  }
-
-  /**
-   * In a Prestashop order the discount lines are specified in WC_Order cart rules
-   * that have the following fields:
-   * - value
-   * - value_tax_excl
-   *
-   * @param array $line
-   *
-   * @return array
-   */
-  protected function addDiscountLine(array $line) {
   }
 
   /**

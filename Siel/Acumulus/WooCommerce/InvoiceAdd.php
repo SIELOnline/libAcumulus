@@ -94,11 +94,13 @@ class InvoiceAdd {
    *     a company.
    * - company2: empty
    * - fax: ignore
-   * - vatnumber: ignore, not stored by default, but there is a paid module for
-   *     entering and storing VAT numbers: http://www.woothemes.com/products/eu-vat-number/
    * - bankaccountnumber: ignore, I did not find a module that covers this.
    * - mark
    *
+   * Fields for which an additional module exists:
+   * - vatnumber: there is a paid module for entering and storing VAT numbers:
+   *     http://www.woothemes.com/products/eu-vat-number/
+   * 
    * As we can't provide all fields, the customer data will only be overwritten,
    * if explicitly set via the config. This because overwriting is an all or
    * nothing operation that includes emptying not provided fields.
@@ -120,6 +122,7 @@ class InvoiceAdd {
       $result['countrycode'] = $order->billing_country;
       $result['locationcode'] = $this->webAPI->getLocationCode($result['countrycode']);
     }
+    $this->addIfNotEmpty($result, 'vatnumber', get_post_meta($order->id, 'VAT Number', true));
     $this->addIfNotEmpty($result, 'telephone', $order->billing_phone);
     $result['email'] = $order->billing_email;
     $result['overwriteifexists'] = $this->acumulusConfig->get('overwriteIfExists');

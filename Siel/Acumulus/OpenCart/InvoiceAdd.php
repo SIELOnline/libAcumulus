@@ -308,7 +308,7 @@ class InvoiceAdd {
   protected function addTotalLines(array $order, array &$taxLines) {
     $result = array();
     foreach ($this->module->orderModel->getOrderTotals($order['order_id']) as $line) {
-      if (!in_array($line['code'], array('sub_total', 'tax', 'total', 'voucher'))) {
+      if (!in_array($line['code'], array('sub_total', 'tax', 'total'))) {
         $result[] = $this->addTotalLine($line);
       }
       else if ($line['code'] === 'tax') {

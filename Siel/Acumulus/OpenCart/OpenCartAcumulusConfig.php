@@ -22,7 +22,7 @@ class OpenCartAcumulusConfig extends BaseConfig {
    *
    * @var string
    */
-  public static $module_version = '3.3.1';
+  public static $module_version = '3.3.2';
 
 
   /** @var \ModelSettingSetting */

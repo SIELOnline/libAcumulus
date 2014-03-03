@@ -215,8 +215,8 @@ class InvoiceAdd {
     $result = array_merge(
       $this->addOrderLines($order),
       $this->addWrappingLines($order),
-      $this->addDiscountLines($order),
-      $this->addShippingLines($order)
+      $this->addShippingLines($order),
+      $this->addDiscountLines($order)
     );
 
     return $result;

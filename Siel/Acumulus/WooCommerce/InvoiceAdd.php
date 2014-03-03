@@ -100,7 +100,7 @@ class InvoiceAdd {
    * Fields for which an additional module exists:
    * - vatnumber: there is a paid module for entering and storing VAT numbers:
    *     http://www.woothemes.com/products/eu-vat-number/
-   * 
+   *
    * As we can't provide all fields, the customer data will only be overwritten,
    * if explicitly set via the config. This because overwriting is an all or
    * nothing operation that includes emptying not provided fields.
@@ -355,7 +355,7 @@ class InvoiceAdd {
     $description = $this->acumulusConfig->t('discount_code') . " {$coupon->code} ($displayAmount)" ;
     $amount = $coupon->apply_before_tax() ? 0 : $coupon->get_discount_amount($orderTotalBeforeDiscount);
     return array(
-      'itemnumber' => $coupon->code,
+      'itemnumber' => '',
       'product' => $description,
       'unitprice' => number_format(-$amount, 4, '.', ''),
       'vatrate' => number_format(-1),

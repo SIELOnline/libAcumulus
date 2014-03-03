@@ -7,6 +7,7 @@ namespace Siel\Acumulus\WooCommerce;
 use Acumulus;
 use Siel\Acumulus\ConfigInterface;
 use Siel\Acumulus\WebAPI;
+use WC_Coupon;
 use WC_Order;
 use WC_Product;
 
@@ -198,7 +199,8 @@ class InvoiceAdd {
     $result = array_merge(
       $this->addOrderLines($order),
       $this->addShippingLines($order),
-      $this->addFeeLines($order)
+      $this->addFeeLines($order),
+      $this->addDiscountLines($order)
     );
 
     return $result;
@@ -308,6 +310,52 @@ class InvoiceAdd {
       'product' => $this->acumulusConfig->t($line['name']),
       'unitprice' => number_format($line['line_total'], 4, '.', ''),
       'vatrate' => number_format(($line['line_tax'] / $line['line_total']) * 100.0),
+      'quantity' => 1,
+    );
+  }
+
+  /**
+   * @param WC_Order $order
+   *
+   * @return array
+   */
+  protected function addDiscountLines(WC_Order $order) {
+    $result = array();
+    foreach ($order->get_used_coupons() as $code) {
+      if ($code) {
+        $result[] = $this->addDiscountLine(new WC_Coupon($code), $order);
+      }
+    }
+    return $result;
+  }
+
+  /**
+   * In WooCommerce discounts can be set as "apply before tax" or "aplly after
+   * tax":
+   * - The discounts before tax are applied to the product lines themselves, so
+   *   they don't have to appear in a separate discount line. However, for
+   *   reasons of clarity a 0-amount line will be added to the invoice, so one
+   *   can easily see which coupons are used for an order.
+   * - The coupons that are applied after tax are to be seen as gift vouchers
+   *   and should be added as a (partial) payment for the order. This means that
+   *   they don't have vat.
+   *
+   * @param \WC_Coupon $coupon
+   * @param \WC_Order $order
+   *
+   * @return array
+   */
+  protected function addDiscountLine(WC_Coupon $coupon, $order) {
+    $orderTotalBeforeDiscount = $order->get_total();
+    $orderTotalBeforeDiscount += $coupon->type === 'fixed_cart' ? $order->get_cart_discount() : $order->get_order_discount();
+    $displayAmount = in_array($coupon->type, array('fixed_product', 'fixed_cart')) ? "€{$coupon->amount}" : "{$coupon->amount}%";
+    $description = $this->acumulusConfig->t('discount_code') . " {$coupon->code} ($displayAmount)" ;
+    $amount = $coupon->apply_before_tax() ? 0 : $coupon->get_discount_amount($orderTotalBeforeDiscount);
+    return array(
+      'itemnumber' => $coupon->code,
+      'product' => $description,
+      'unitprice' => number_format(-$amount, 4, '.', ''),
+      'vatrate' => number_format(-1),
       'quantity' => 1,
     );
   }

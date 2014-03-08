@@ -5,7 +5,7 @@
 
 namespace Siel\Acumulus\Test;
 
-use Siel\Acumulus\WebAPICommunication;
+use Siel\Acumulus\Common\WebAPICommunication;
 
 /**
  * WebAPICommunicationTest is a class derived from WebAPICommunication that can

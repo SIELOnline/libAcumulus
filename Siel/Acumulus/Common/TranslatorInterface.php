@@ -3,7 +3,7 @@
  * @file Contains the translator Interface.
  */
 
-namespace Siel\Acumulus;
+namespace Siel\Acumulus\Common;
 
 /**
  * TranslatorInterface defines an interface to retrieve language dependent texts.

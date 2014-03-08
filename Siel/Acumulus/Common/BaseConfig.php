@@ -2,7 +2,7 @@
 /**
  * @file Contains the base Configuration class.
  */
-namespace Siel\Acumulus;
+namespace Siel\Acumulus\Common;
 
 
 abstract class BaseConfig implements ConfigInterface{
@@ -14,7 +14,7 @@ abstract class BaseConfig implements ConfigInterface{
    *
    * @var string
    */
-  public static $library_version = '3.2.3';
+  public static $library_version = '3.3.0';
 
   /** @var bool */
   protected $isLoaded;

@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Siel\Acumulus\FormRenderer
+ * Contains \Siel\Acumulus\Common\FormRenderer
  */
 
-namespace Siel\Acumulus;
+namespace Siel\Acumulus\Common;
 
 /**
  * Class FormRenderer

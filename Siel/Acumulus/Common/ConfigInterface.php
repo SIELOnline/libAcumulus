@@ -3,7 +3,7 @@
  * @file Contains the Configuration Interface.
  */
 
-namespace Siel\Acumulus;
+namespace Siel\Acumulus\Common;
 
 /**
  * ConfigInterface defines an interface to store and retrieve configuration

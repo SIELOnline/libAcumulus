@@ -1,9 +1,11 @@
 <?php
 /**
- * @file Definition of Siel\Acumulus\WebAPI.
+ * @file Definition of Siel\Acumulus\Common\WebAPI.
  */
 
-namespace Siel\Acumulus;
+namespace Siel\Acumulus\Common;
+
+use Siel\Acumulus\Test\WebAPICommunicationTest;
 
 /**
  * Class WebAPI provides an easy interface towards the different API calls of
@@ -59,10 +61,10 @@ class WebAPI {
   const VatType_RestOfWorld = 4;
   const VatType_MarginScheme = 5;
 
-  /** @var \Siel\Acumulus\ConfigInterface */
+  /** @var \Siel\Acumulus\Common\ConfigInterface */
   protected $config;
 
-  /** @var \Siel\Acumulus\WebAPICommunication */
+  /** @var \Siel\Acumulus\Common\WebAPICommunication */
   protected $webAPICommunicator;
 
   /**
@@ -76,8 +78,8 @@ class WebAPI {
       $this->webAPICommunicator = new WebAPICommunication($config);
     }
     else {
-      require_once(dirname(__FILE__) . '/../Acumulus/Test/WebAPICommunicationTest.php');
-      $this->webAPICommunicator = new \Siel\Acumulus\Test\WebAPICommunicationTest($config);
+      require_once(dirname(__FILE__) . '/../Test/WebAPICommunicationTest.php');
+      $this->webAPICommunicator = new WebAPICommunicationTest($config);
     }
   }
 

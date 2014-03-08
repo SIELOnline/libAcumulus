@@ -1,9 +1,9 @@
 <?php
 /**
- * @file Definition of Siel\Acumulus\WebAPICommunication.
+ * @file Definition of Siel\Acumulus\Common\WebAPICommunication.
  */
 
-namespace Siel\Acumulus;
+namespace Siel\Acumulus\Common;
 
 use DOMDocument;
 use DOMElement;
@@ -22,7 +22,7 @@ class WebAPICommunication {
   const Status_Warnings = 2;
   const Status_Exception = 3;
 
-  /** @var \Siel\Acumulus\ConfigInterface */
+  /** @var \Siel\Acumulus\Common\ConfigInterface */
   protected $config;
 
   /** @var array */

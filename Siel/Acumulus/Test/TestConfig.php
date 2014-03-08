@@ -5,7 +5,7 @@
 
 namespace Siel\Acumulus\Test;
 
-use Siel\Acumulus\BaseConfig;
+use Siel\Acumulus\Common\BaseConfig;
 
 /**
  * TestConfig defines a configuration object for test purposes.

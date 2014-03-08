@@ -5,7 +5,7 @@
 
 namespace Siel\Acumulus\Test;
 
-use Siel\Acumulus\WebAPI;
+use Siel\Acumulus\Common\WebAPI;
 
 /**
  * Test defines a Class for test purposes.

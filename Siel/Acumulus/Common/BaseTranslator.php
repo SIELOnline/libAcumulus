@@ -1,10 +1,10 @@
 <?php
 
 /**
- * @file Contains Siel\Acumulus\BaseTranslator
+ * @file Contains Siel\Acumulus\Common\BaseTranslator
  */
 
-namespace Siel\Acumulus;
+namespace Siel\Acumulus\Common;
 
 
 /**

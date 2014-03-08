@@ -6,12 +6,12 @@ use Siel\Acumulus\Test\Test;
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  require_once 'Siel/Acumulus/TranslatorInterface.php';
-  require_once 'Siel/Acumulus/BaseTranslator.php';
-  require_once 'Siel/Acumulus/ConfigInterface.php';
-  require_once 'Siel/Acumulus/BaseConfig.php';
-  require_once 'Siel/Acumulus/WebAPICommunication.php';
-  require_once 'Siel/Acumulus/WebAPI.php';
+  require_once 'Siel/Acumulus/Common/TranslatorInterface.php';
+  require_once 'Siel/Acumulus/Common/BaseTranslator.php';
+  require_once 'Siel/Acumulus/Common/ConfigInterface.php';
+  require_once 'Siel/Acumulus/Common/BaseConfig.php';
+  require_once 'Siel/Acumulus/Common/WebAPICommunication.php';
+  require_once 'Siel/Acumulus/Common/WebAPI.php';
   require_once 'Siel/Acumulus/Test/TestConfig.php';
   require_once 'Siel/Acumulus/Test/Test.php';
   $test = new Test();

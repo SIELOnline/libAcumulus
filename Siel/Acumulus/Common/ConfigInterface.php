@@ -100,7 +100,7 @@ interface ConfigInterface {
    *   - accountnumber
    *   - invoicenumber
    *   - issuedate
-   *   - costheading
+   *   - costcenter
    *   - template
    *   - trigger-order-status
    *   - use-margin

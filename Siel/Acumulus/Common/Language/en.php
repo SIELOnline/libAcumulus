@@ -137,8 +137,8 @@ $_['desc_overwriteIfExists'] = 'Check this option, unless you edit customer addr
 $_['field_defaultAccountNumber'] = 'Bank account number';
 $_['desc_defaultAccountNumber'] = 'Select the (bank) account number at which you want to receive all your order payments.';
 
-$_['field_defaultCostHeading'] = 'Cost center';
-$_['desc_defaultCostHeading'] = 'Select the cost center to assign your orders to.';
+$_['field_defaultCostCenter'] = 'Cost center';
+$_['desc_defaultCostCenter'] = 'Select the cost center to assign your orders to.';
 
 $_['field_defaultInvoiceTemplate'] = 'Invoice template';
 $_['desc_defaultInvoiceTemplate'] = 'Select the invoice template to print your web shop orders with.';

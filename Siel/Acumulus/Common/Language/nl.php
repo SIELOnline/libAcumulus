@@ -140,8 +140,8 @@ $_['desc_overwriteIfExists'] = 'Vink deze optie alleen uit als u direct in Acumu
 $_['field_defaultAccountNumber'] = 'Bankrekeningnummer';
 $_['desc_defaultAccountNumber'] = 'Maakt u binnen Acumulus gebruik van meerdere rekeningen en wilt u alle orders uit uw webwinkel op een specifieke rekening binnen laten komen, kies dan hier het bankrekeningnummer.';
 
-$_['field_defaultCostHeading'] = 'Kostenplaats';
-$_['desc_defaultCostHeading'] = 'Maakt u binnen Acumulus gebruik van meerdere kostenplaatsen en wilt u alle orders uit uw webwinkel op een specifieke kostenplaats binnen laten komen, kies dan hier de kostenplaats.';
+$_['field_defaultCostCenter'] = 'Kostenplaats';
+$_['desc_defaultCostCenter'] = 'Maakt u binnen Acumulus gebruik van meerdere kostenplaatsen en wilt u alle orders uit uw webwinkel op een specifieke kostenplaats binnen laten komen, kies dan hier de kostenplaats.';
 
 $_['field_defaultInvoiceTemplate'] = 'Factuur-sjabloon';
 $_['desc_defaultInvoiceTemplate'] = 'Maakt u binnen Acumulus gebruik van meerdere factuur-sjablonen en wilt u alle orders uit uw webwinkel op een specifieke factuursjabloon printen, kies dan hier het factuur-sjabloon.';

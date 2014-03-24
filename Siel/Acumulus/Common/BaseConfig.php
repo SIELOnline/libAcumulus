@@ -14,7 +14,7 @@ abstract class BaseConfig implements ConfigInterface{
    *
    * @var string
    */
-  public static $library_version = '3.3.0';
+  public static $library_version = '3.3.1';
 
   /** @var bool */
   protected $isLoaded;
@@ -234,7 +234,7 @@ abstract class BaseConfig implements ConfigInterface{
       'defaultAccountNumber' => $this->get('defaultAccountNumber'),
       'invoiceNrSource' => $this->get('invoiceNrSource'),
       'dateToUse' => $this->get('dateToUse'),
-      'defaultCostHeading' => $this->get('defaultCostHeading'),
+      'defaultCostCenter' => $this->get('defaultCostCenter'),
       'defaultInvoiceTemplate' => $this->get('defaultInvoiceTemplate'),
       'triggerOrderStatus' => $this->get('triggerOrderStatus'),
       'useMargin' => $this->get('useMargin'),
@@ -300,8 +300,8 @@ abstract class BaseConfig implements ConfigInterface{
     if (isset($values['defaultAccountNumber'])) {
       $values['defaultAccountNumber'] = (int) $values['defaultAccountNumber'];
     }
-    if (isset($values['defaultCostHeading'])) {
-      $values['defaultCostHeading'] = (int) $values['defaultCostHeading'];
+    if (isset($values['defaultCostCenter'])) {
+      $values['defaultCostCenter'] = (int) $values['defaultCostCenter'];
     }
     if (isset($values['defaultInvoiceTemplate'])) {
       $values['defaultInvoiceTemplate'] = (int) $values['defaultInvoiceTemplate'];
@@ -323,7 +323,7 @@ abstract class BaseConfig implements ConfigInterface{
       'dateToUse',
       'defaultCustomerType',
       'defaultAccountNumber',
-      'defaultCostHeading',
+      'defaultCostCenter',
       'defaultInvoiceTemplate',
       'triggerOrderStatus',
       'useMargin',

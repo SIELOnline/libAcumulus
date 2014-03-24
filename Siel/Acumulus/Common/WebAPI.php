@@ -385,7 +385,7 @@ class WebAPI {
    *   fields:
    *   - type (type of customer)
    *   - accountnumber (own account number to use)
-   *   - costheading (cost heading to use)
+   *   - costcenter (cost heading to use)
    *   - template (invoice template to use)
    *
    * @return array
@@ -395,7 +395,7 @@ class WebAPI {
       $invoiceSettings = $this->config->getInvoiceSettings();
       $this->addDefault($invoice['customer'], 'type', $invoiceSettings['defaultCustomerType']);
       $this->addDefault($invoice['customer']['invoice'], 'accountnumber', $invoiceSettings['defaultAccountNumber']);
-      $this->addDefault($invoice['customer']['invoice'], 'costheading', $invoiceSettings['defaultCostHeading']);
+      $this->addDefault($invoice['customer']['invoice'], 'costcenter', $invoiceSettings['defaultCostCenter']);
       $this->addDefault($invoice['customer']['invoice'], 'template', $invoiceSettings['defaultInvoiceTemplate']);
     }
 

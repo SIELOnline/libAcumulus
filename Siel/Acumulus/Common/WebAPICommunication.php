@@ -69,9 +69,9 @@ class WebAPICommunication {
         'format' => $this->config->getOutputFormat(),
         'connector' => array(
           'application' => "{$environment['shopName']} {$environment['shopVersion']}",
-          'webkoppel' => "Shop module: {$environment['moduleVersion']}; Library: {$environment['libraryVersion']}",
-          'development' => 'Siel',
-          'remark' => 'Stable',
+          'webkoppel' => "Acumulus {$environment['moduleVersion']}",
+          'development' => 'SIEL - Buro RaDer',
+          'remark' => "Library {$environment['libraryVersion']}",
           'sourceuri' => 'http://www.siel.nl/',
         ),
       ), $message);

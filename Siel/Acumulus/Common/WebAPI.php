@@ -95,21 +95,21 @@ class WebAPI {
     // PHP 5.3 is a requirement as well because we use namespaces. But as the
     // parser will already have failed fatally before we get here, it makes no
     // sense to check here.
-    if(!extension_loaded('curl')) {
+    if (!extension_loaded('curl')) {
       $result['errors'][] = array(
         'code' => 'curl',
         'codetag' => '',
         'message' => $this->config->t('message_error_req_curl'),
       );
     }
-    if($this->config->getOutputFormat() === 'xml' && !extension_loaded('simplexml')) {
+    if ($this->config->getOutputFormat() === 'xml' && !extension_loaded('simplexml')) {
       $result['errors'][] = array(
         'code' => 'SimpleXML',
         'codetag' => '',
         'message' => $this->config->t('message_error_req_xml'),
       );
     }
-    if(!extension_loaded('dom')) {
+    if (!extension_loaded('dom')) {
       $result['errors'][] = array(
         'code' => 'DOM',
         'codetag' => '',
@@ -171,7 +171,7 @@ class WebAPI {
    * @return string
    */
   public function messagesToText(array $messages) {
-    return '* '. join("\n\n* ", $messages) . "\n\n";
+    return '* ' . join("\n\n* ", $messages) . "\n\n";
   }
 
   /**
@@ -334,7 +334,7 @@ class WebAPI {
     // - Customer is outside the EU.
     // - VAT rate = 0 for all lines.
     if (!$this->isNl($customer['countrycode']) && !$this->isEu($customer['countrycode'])) {
-      $vatIs0 = true;
+      $vatIs0 = TRUE;
       foreach ($invoice['line'] as $line) {
         $vatIs0 = $vatIs0 && $line['vatrate'] == 0;
       }
@@ -349,7 +349,7 @@ class WebAPI {
     // - VAT rate = 0 for all lines.
     // - We should check the delivery address as well, but we don't as we can't.
     if ($this->isEu($customer['countrycode']) && !empty($customer['vatnumber'])) {
-      $vatIs0 = true;
+      $vatIs0 = TRUE;
       foreach ($invoice['line'] as $line) {
         $vatIs0 = $vatIs0 && $line['vatrate'] == 0;
       }
@@ -390,7 +390,7 @@ class WebAPI {
    *
    * @return array
    */
-  public function invoiceAdd(array $invoice, $orderId = '', $addDefaults = true) {
+  public function invoiceAdd(array $invoice, $orderId = '', $addDefaults = TRUE) {
     if ($addDefaults) {
       $invoiceSettings = $this->config->getInvoiceSettings();
       $this->addDefault($invoice['customer'], 'type', $invoiceSettings['defaultCustomerType']);
@@ -398,6 +398,9 @@ class WebAPI {
       $this->addDefault($invoice['customer']['invoice'], 'costcenter', $invoiceSettings['defaultCostCenter']);
       $this->addDefault($invoice['customer']['invoice'], 'template', $invoiceSettings['defaultInvoiceTemplate']);
     }
+
+    // Correct countrycode.
+    $invoice = $this->correctCountryCode($invoice);
 
     // Validate order (client side).
     $response = $this->validateInvoice($invoice, $orderId);
@@ -422,9 +425,9 @@ class WebAPI {
   protected function addDefault(array &$array, $key, $value) {
     if (empty($array[$key]) && !empty($value)) {
       $array[$key] = $value;
-      return true;
+      return TRUE;
     }
-    return false;
+    return FALSE;
   }
 
   /**
@@ -446,8 +449,8 @@ class WebAPI {
     );
 
     // Check if both 19% and 21% vat rates occur.
-    $has19 = false;
-    $has21 = false;
+    $has19 = FALSE;
+    $has21 = FALSE;
     foreach ($invoice['customer']['invoice']['line'] as $line) {
       if (isset($line['vatrate'])) {
         $has19 = $has19 && $line['vatrate'] == 19;
@@ -591,7 +594,7 @@ class WebAPI {
    */
   protected function getPicklist($picklist) {
     $plural = $picklist . 's';
-    $response =  $this->webAPICommunicator->callApiFunction("picklists/picklist_$plural", array());
+    $response = $this->webAPICommunicator->callApiFunction("picklists/picklist_$plural", array());
     // Simplify result: remove indirection.
     $plural = $picklist . 's';
     if (!empty($response[$plural][$picklist])) {
@@ -605,5 +608,296 @@ class WebAPI {
       $response[$plural] = array();
     }
     return $response;
+  }
+
+  /**
+   * Correct country codes if outside th EU.
+   *
+   * For countries outside the EU, the countycode should be empty and the
+   * country name should be added to the city instead.
+   *
+   * See https://apidoc.sielsystems.nl/content/invoice-add, tags city and
+   * countrycode:
+   * city non mandatory
+   *   City and optional country in capitals (Amsterdam NETHERLANDS).
+   * countrycode non mandatory
+   *   Use international standard country code (ISO 3166-1) for countries in EU
+   *   only (NL, DE etc). Defaults to NL when an empty or incorrect country code
+   *   is supplied. Leave blank for countries outside EU-zone.
+   *
+   * This should be server side, but for now it is done client side.
+   *
+   * @param array $invoice
+   *
+   * @return array
+   *
+   */
+  protected function correctCountryCode(array $invoice) {
+    if (isset($invoice['customer']['locationcode']) && $invoice['customer']['locationcode'] === self::LocationCode_RestOfWorld) {
+      if (!empty($invoice['customer']['countrycode'])) {
+        // Move countrycode to city.
+        $country = $this->getCountryName($invoice['customer']['countrycode']);
+        if (stripos($invoice['customer']['city'], $country) === FALSE) {
+          $invoice['customer']['city'] .= ' ' . strtoupper($country);
+        }
+        unset($invoice['customer']['countrycode']);
+      }
+    }
+    return $invoice;
+  }
+
+  protected function getCountryName($code) {
+    $countryNames = array(
+      'AF' => 'Afghanistan',
+      'AX' => 'Åland',
+      'AL' => 'Albanië',
+      'DZ' => 'Algerije',
+      'VI' => 'Amerikaanse Maagdeneilanden',
+      'AS' => 'Amerikaans-Samoa',
+      'AD' => 'Andorra',
+      'AO' => 'Angola',
+      'AI' => 'Anguilla',
+      'AQ' => 'Antarctica',
+      'AG' => 'Antigua en Barbuda',
+      'AR' => 'Argentinië',
+      'AM' => 'Armenië',
+      'AW' => 'Aruba',
+      'AU' => 'Australië',
+      'AZ' => 'Azerbeidzjan',
+      'BS' => 'Bahama\'s',
+      'BH' => 'Bahrein',
+      'BD' => 'Bangladesh',
+      'BB' => 'Barbados',
+      'BE' => 'België',
+      'BZ' => 'Belize',
+      'BJ' => 'Benin',
+      'BM' => 'Bermuda',
+      'BT' => 'Bhutan',
+      'BO' => 'Bolivia',
+      'BQ' => 'Bonaire, Sint Eustatius en Saba',
+      'BA' => 'Bosnië en Herzegovina',
+      'BW' => 'Botswana',
+      'BV' => 'Bouveteiland',
+      'BR' => 'Brazilië',
+      'VG' => 'Britse Maagdeneilanden',
+      'IO' => 'Brits Indische Oceaanterritorium',
+      'BN' => 'Brunei',
+      'BG' => 'Bulgarije',
+      'BF' => 'Burkina Faso',
+      'BI' => 'Burundi',
+      'KH' => 'Cambodja',
+      'CA' => 'Canada',
+      'CF' => 'Centraal-Afrikaanse Republiek',
+      'CL' => 'Chili',
+      'CN' => 'China',
+      'CX' => 'Christmaseiland',
+      'CC' => 'Cocoseilanden',
+      'CO' => 'Colombia',
+      'KM' => 'Comoren',
+      'CG' => 'Congo-Brazzaville',
+      'CD' => 'Congo-Kinshasa',
+      'CK' => 'Cookeilanden',
+      'CR' => 'Costa Rica',
+      'CU' => 'Cuba',
+      'CW' => 'Curaçao',
+      'CY' => 'Cyprus',
+      'DK' => 'Denemarken',
+      'DJ' => 'Djibouti',
+      'DM' => 'Dominica',
+      'DO' => 'Dominicaanse Republiek',
+      'DE' => 'Duitsland',
+      'EC' => 'Ecuador',
+      'EG' => 'Egypte',
+      'SV' => 'El Salvador',
+      'GQ' => 'Equatoriaal-Guinea',
+      'ER' => 'Eritrea',
+      'EE' => 'Estland',
+      'ET' => 'Ethiopië',
+      'FO' => 'Faeröer',
+      'FK' => 'Falklandeilanden',
+      'FJ' => 'Fiji',
+      'PH' => 'Filipijnen',
+      'FI' => 'Finland',
+      'FR' => 'Frankrijk',
+      'TF' => 'Franse Zuidelijke en Antarctische Gebieden',
+      'GF' => 'Frans-Guyana',
+      'PF' => 'Frans-Polynesië',
+      'GA' => 'Gabon',
+      'GM' => 'Gambia',
+      'GE' => 'Georgië',
+      'GH' => 'Ghana',
+      'GI' => 'Gibraltar',
+      'GD' => 'Grenada',
+      'GR' => 'Griekenland',
+      'GL' => 'Groenland',
+      'GP' => 'Guadeloupe',
+      'GU' => 'Guam',
+      'GT' => 'Guatemala',
+      'GG' => 'Guernsey',
+      'GN' => 'Guinee',
+      'GW' => 'Guinee-Bissau',
+      'GY' => 'Guyana',
+      'HT' => 'Haïti',
+      'HM' => 'Heard en McDonaldeilanden',
+      'HN' => 'Honduras',
+      'HU' => 'Hongarije',
+      'HK' => 'Hongkong',
+      'IE' => 'Ierland',
+      'IS' => 'IJsland',
+      'IN' => 'India',
+      'ID' => 'Indonesië',
+      'IQ' => 'Irak',
+      'IR' => 'Iran',
+      'IL' => 'Israël',
+      'IT' => 'Italië',
+      'CI' => 'Ivoorkust',
+      'JM' => 'Jamaica',
+      'JP' => 'Japan',
+      'YE' => 'Jemen',
+      'JE' => 'Jersey',
+      'JO' => 'Jordanië',
+      'KY' => 'Kaaimaneilanden',
+      'CV' => 'Kaapverdië',
+      'CM' => 'Kameroen',
+      'KZ' => 'Kazachstan',
+      'KE' => 'Kenia',
+      'KG' => 'Kirgizië',
+      'KI' => 'Kiribati',
+      'UM' => 'Kleine Pacifische eilanden van de Verenigde Staten',
+      'KW' => 'Koeweit',
+      'HR' => 'Kroatië',
+      'LA' => 'Laos',
+      'LS' => 'Lesotho',
+      'LV' => 'Letland',
+      'LB' => 'Libanon',
+      'LR' => 'Liberia',
+      'LY' => 'Libië',
+      'LI' => 'Liechtenstein',
+      'LT' => 'Litouwen',
+      'LU' => 'Luxemburg',
+      'MO' => 'Macau',
+      'MK' => 'Macedonië',
+      'MG' => 'Madagaskar',
+      'MW' => 'Malawi',
+      'MV' => 'Maldiven',
+      'MY' => 'Maleisië',
+      'ML' => 'Mali',
+      'MT' => 'Malta',
+      'IM' => 'Man',
+      'MA' => 'Marokko',
+      'MH' => 'Marshalleilanden',
+      'MQ' => 'Martinique',
+      'MR' => 'Mauritanië',
+      'MU' => 'Mauritius',
+      'YT' => 'Mayotte',
+      'MX' => 'Mexico',
+      'FM' => 'Micronesia',
+      'MD' => 'Moldavië',
+      'MC' => 'Monaco',
+      'MN' => 'Mongolië',
+      'ME' => 'Montenegro',
+      'MS' => 'Montserrat',
+      'MZ' => 'Mozambique',
+      'MM' => 'Myanmar',
+      'NA' => 'Namibië',
+      'NR' => 'Nauru',
+      'NL' => 'Nederland',
+      'NP' => 'Nepal',
+      'NI' => 'Nicaragua',
+      'NC' => 'Nieuw-Caledonië',
+      'NZ' => 'Nieuw-Zeeland',
+      'NE' => 'Niger',
+      'NG' => 'Nigeria',
+      'NU' => 'Niue',
+      'MP' => 'Noordelijke Marianen',
+      'KP' => 'Noord-Korea',
+      "NO" => 'Noorwegen',
+      'NF' => 'Norfolk',
+      'UG' => 'Oeganda',
+      'UA' => 'Oekraïne',
+      'UZ' => 'Oezbekistan',
+      'OM' => 'Oman',
+      'AT' => 'Oostenrijk',
+      'TL' => 'Oost-Timor',
+      'PK' => 'Pakistan',
+      'PW' => 'Palau',
+      'PS' => 'Palestina',
+      'PA' => 'Panama',
+      'PG' => 'Papoea-Nieuw-Guinea',
+      'PY' => 'Paraguay',
+      'PE' => 'Peru',
+      'PN' => 'Pitcairneilanden',
+      'PL' => 'Polen',
+      'PT' => 'Portugal',
+      'PR' => 'Puerto Rico',
+      'QA' => 'Qatar',
+      'RE' => 'Réunion',
+      'RO' => 'Roemenië',
+      'RU' => 'Rusland',
+      'RW' => 'Rwanda',
+      'BL' => 'Saint-Barthélemy',
+      'KN' => 'Saint Kitts en Nevis',
+      'LC' => 'Saint Lucia',
+      'PM' => 'Saint-Pierre en Miquelon',
+      'VC' => 'Saint Vincent en de Grenadines',
+      'SB' => 'Salomonseilanden',
+      'WS' => 'Samoa',
+      'SM' => 'San Marino',
+      'SA' => 'Saoedi-Arabië',
+      'ST' => 'Sao Tomé en Principe',
+      'SN' => 'Senegal',
+      'RS' => 'Servië',
+      'SC' => 'Seychellen',
+      'SL' => 'Sierra Leone',
+      'SG' => 'Singapore',
+      'SH' => 'Sint-Helena, Ascension en Tristan da Cunha',
+      'MF' => 'Sint-Maarten',
+      'SX' => 'Sint Maarten',
+      'SI' => 'Slovenië',
+      'SK' => 'Slowakije',
+      'SD' => 'Soedan',
+      'SO' => 'Somalië',
+      'ES' => 'Spanje',
+      'SJ' => 'Spitsbergen en Jan Mayen',
+      'LK' => 'Sri Lanka',
+      'SR' => 'Suriname',
+      'SZ' => 'Swaziland',
+      'SY' => 'Syrië',
+      'TJ' => 'Tadzjikistan',
+      'TW' => 'Taiwan',
+      'TZ' => 'Tanzania',
+      'TH' => 'Thailand',
+      'TG' => 'Togo',
+      'TK' => 'Tokelau',
+      'TO' => 'Tonga',
+      'TT' => 'Trinidad en Tobago',
+      'TD' => 'Tsjaad',
+      'CZ' => 'Tsjechië',
+      'TN' => 'Tunesië',
+      'TR' => 'Turkije',
+      'TM' => 'Turkmenistan',
+      'TC' => 'Turks- en Caicoseilanden',
+      'TV' => 'Tuvalu',
+      'UY' => 'Uruguay',
+      'VU' => 'Vanuatu',
+      'VA' => 'Vaticaanstad',
+      'VE' => 'Venezuela',
+      'AE' => 'Verenigde Arabische Emiraten',
+      'US' => 'VerenigdeStaten',
+      'GB' => 'VerenigdKoninkrijk',
+      'VN' => 'Vietnam',
+      'WF' => 'Wallis en Futuna',
+      'EH' => 'Westelijke Sahara',
+      'BY' => 'Wit-Rusland',
+      'ZM' => 'Zambia',
+      'ZW' => 'Zimbabwe',
+      'ZA' => 'Zuid-Afrika',
+      'GS' => 'Zuid-Georgia en de Zuidelijke Sandwicheilanden',
+      'KR' => 'Zuid-Korea',
+      'SS' => 'Zuid-Soedan',
+      'SE' => 'Zweden',
+      'CH' => 'Zwitserland',
+    );
+    return isset($countryNames[$code]) ? $countryNames[$code] : $code;
   }
 }

@@ -72,7 +72,7 @@ class WebAPICommunication {
           'webkoppel' => "Acumulus {$environment['moduleVersion']}",
           'development' => 'SIEL - Buro RaDer',
           'remark' => "Library {$environment['libraryVersion']}",
-          'sourceuri' => 'http://www.siel.nl/',
+          'sourceuri' => 'https://www.siel.nl/',
         ),
       ), $message);
 

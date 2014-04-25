@@ -2,7 +2,7 @@
 // Page elements
 $_['extensions'] = 'Extensies';
 $_['modules'] = 'Modules';
-$_['page_title'] = 'Acumulus';
+$_['page_title'] = 'Acumulus instellingen';
 $_['module_name'] = 'Acumulus';
 $_['module_description'] = 'Acumulus koppeling';
 $_['text_home'] = 'Home';

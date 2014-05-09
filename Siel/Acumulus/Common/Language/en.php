@@ -21,9 +21,10 @@ $_['message_validate_username_0'] = 'The field User name is required, please fil
 $_['message_validate_password_0'] = 'The field Password is required, please fill in the password you use to log in to Acumulus.';
 $_['message_validate_email_0'] = 'The field Email is not a valid e-mail address, please fill in you own e-mail address.';
 $_['message_validate_email_1'] = 'The field Email is required, please fill in you own e-mail address.';
+$_['message_validate_email_2'] = 'The field (fictitious customer) Email is not a valid e-mail address, please fill in a correct e-mail address.';
 
 $_['message_error_vat19and21'] = 'This order has both 19% and 21% VAT rates. You will have to manually enter this order into Acumulus.';
-$_['message_warning_multiplevat'] = 'This order has multiple VAT rates. due to differences in the way that your web sho and Acumulus store an invoice, it may well be that the VAT amounts in Acumulus are NOT correct. You should check this invoice in Acumulus!';
+$_['message_warning_incorrect_vat'] = 'The Acumulus module was not able to correctly determine the VAT amounts on the invoice. You should check and correct this invoice manually in Acumulus!';
 
 $_['message_error_req_curl'] = 'The CURL PHP extension needs to be activated on your server for this module to work.';
 $_['message_error_req_xml'] = 'The SimpleXML extension needs to be activated on your server for this module to be able to work with the XML format.';
@@ -50,13 +51,16 @@ $_['message_no_invoice'] = 'not created';
 
 $_['order_id'] = 'Ordernumber';
 $_['shipping_costs'] = 'Shipping costs';
+$_['discount'] = 'Discount';
 $_['discount_code'] = 'Coupon code';
 $_['coupon_code'] = 'Voucher';
 $_['gift_wrapping'] = 'Gift wrapping';
 $_['fee'] = 'Order treatment costs';
+$_['refund'] = 'Refund';
 
 
 // Mails
+$_['mail_sender_name'] = 'Your web store';
 $_['mail_subject'] = 'Errors or warnings on sending an invoice to Acumulus';
 $_['mail_text'] = <<<LONGSTRING
 Dear madam, sir,
@@ -129,6 +133,13 @@ $_['option_dateToUse_3'] = 'Use the transfer date';
 $_['desc_dateToUse'] = 'Select which date to use for the invoice in Acumulus.';
 
 $_['field_defaultCustomerType'] = 'Create customers as';
+
+$_['field_genericCustomer'] = 'Sending client records';
+$_['option_genericCustomer'] = 'Do not send consumer client records to Acumulus';
+$_['desc_genericCustomer'] = 'Check this option if you don\'t want client records to be sent to your Acumulus administration. All consumer invoices will be booked on 1 fictitious client.';
+
+$_['field_genericCustomerEmail'] = 'E-mail fictitious client';
+$_['desc_genericCustomerEmail'] = 'The e-mail address (that you created in Acumulus) to book consumer invoices on.';
 
 $_['field_overwriteIfExists'] = 'Customer address data';
 $_['option_overwriteIfExists'] = 'Overwrite existing  address data';

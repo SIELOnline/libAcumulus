@@ -5,8 +5,6 @@
 
 namespace Siel\Acumulus\Common;
 
-use Siel\Acumulus\Test\WebAPICommunicationTest;
-
 /**
  * Class WebAPI provides an easy interface towards the different API calls of
  * the Acumulus WebAPI.
@@ -45,8 +43,8 @@ class WebAPI {
   const PaymentStatus_Due = 1;
   const PaymentStatus_Paid = 2;
 
-  const OverwriteIfExists_Yes = 0;
-  const OverwriteIfExists_No = 1;
+  const OverwriteIfExists_No = 0;
+  const OverwriteIfExists_Yes = 1;
 
   const Concept_No = 0;
   const Concept_Yes = 1;
@@ -79,7 +77,7 @@ class WebAPI {
     }
     else {
       require_once(dirname(__FILE__) . '/../Test/WebAPICommunicationTest.php');
-      $this->webAPICommunicator = new WebAPICommunicationTest($config);
+      $this->webAPICommunicator = new \Siel\Acumulus\Test\WebAPICommunicationTest($config);
     }
   }
 
@@ -314,6 +312,10 @@ class WebAPI {
    * @return int
    *   The vat type as defined on
    *   https://apidoc.sielsystems.nl/content/invoice-add.
+   *
+   * @todo: refactor the call to this into the webapi and then refactor
+   *   convertOrderToAcumulusInvoice to add the lines form there, not within
+   *   addInvoice.
    */
   public function getVatType(array $customer, array $invoice) {
     // Return self::VatType_MarginScheme if any line is:
@@ -401,6 +403,9 @@ class WebAPI {
 
     // Correct countrycode.
     $invoice = $this->correctCountryCode($invoice);
+
+    // Change to fictitious client (if set so).
+    $invoice = $this->fictitiousClient($invoice);
 
     // Validate order (client side).
     $response = $this->validateInvoice($invoice, $orderId);
@@ -630,7 +635,6 @@ class WebAPI {
    * @param array $invoice
    *
    * @return array
-   *
    */
   protected function correctCountryCode(array $invoice) {
     if (isset($invoice['customer']['locationcode']) && $invoice['customer']['locationcode'] === self::LocationCode_RestOfWorld) {
@@ -900,4 +904,38 @@ class WebAPI {
     );
     return isset($countryNames[$code]) ? $countryNames[$code] : $code;
   }
+
+  /**
+   * Anonymize customer if set so. We don't do this for business clients, only
+   * consumers.
+   *
+   * @param array $invoice
+   *
+   * @return array
+   */
+  protected function fictitiousClient(array $invoice) {
+    $invoiceSettings = $this->config->getInvoiceSettings();
+    if ($invoiceSettings['genericCustomer'] && empty($invoice['customer']['companyname1']) && empty($invoice['customer']['vatnumber'])) {
+      unset($invoice['customer']['type']);
+      unset($invoice['customer']['companyname1']);
+      unset($invoice['customer']['companyname2']);
+      unset($invoice['customer']['fullname']);
+      unset($invoice['customer']['salutation']);
+      unset($invoice['customer']['address1']);
+      unset($invoice['customer']['address2']);
+      unset($invoice['customer']['postalcode']);
+      unset($invoice['customer']['city']);
+      unset($invoice['customer']['locationcode']);
+      unset($invoice['customer']['countrycode']);
+      unset($invoice['customer']['vatnumber']);
+      unset($invoice['customer']['telephone']);
+      unset($invoice['customer']['fax']);
+      unset($invoice['customer']['bankaccountnumber']);
+      unset($invoice['customer']['mark']);
+      $invoice['customer']['email'] = $invoiceSettings['genericCustomerEmail'] ? $invoiceSettings['genericCustomerEmail'] : 'customer@example.com';
+      $invoice['customer']['overwriteifexists'] = 0;
+    }
+    return $invoice;
+  }
+
 }

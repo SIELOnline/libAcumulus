@@ -21,9 +21,10 @@ $_['message_validate_username_0'] = 'Het veld Gebruikersnaam is verplicht, vul d
 $_['message_validate_password_0'] = 'Het veld Wachtwoord is verplicht, vul het wachtwoord in dat u ook gebruikt om in te loggen op Acumulus.';
 $_['message_validate_email_0'] = 'Het veld Email is geen valide e-mailadres, vul uw eigen e-mailadres in.';
 $_['message_validate_email_1'] = 'Het veld Email is verplicht, vul uw eigen e-mailadres in.';
+$_['message_validate_email_2'] = 'Het veld (fictieve klant) Email is geen valide e-mailadres, vul een correct e-mailadres in.';
 
 $_['message_error_vat19and21'] = 'Deze order heeft zowel 19% als 21% BTW percentages. U dient deze factuur handmatig aan te maken in Acumulus.';
-$_['message_warning_multiplevat'] = 'Deze order heeft meerdere BTW percentages. Door verschillen in de manier waarop uw web shop en Acumulus een factuur opslaan, kan het zijn dat dat de BTW bedragen in Acumulus NIET kloppen. U dient daarom deze factuur handmatig te controleren in Acumulus!';
+$_['message_warning_incorrect_vat'] = 'De Acumulus koppeling was niet in staat om de BTW bedragen op de factuur correct te herleiden. U dient daarom deze factuur handmatig te controleren in Acumulus!';
 
 $_['message_error_req_curl'] = 'Voor het gebruik van deze module dient de CURL PHP extensie actief te zijn op uw server.';
 $_['message_error_req_xml'] = 'Voor het gebruik van deze module met het output format XML, dient de SimpleXML PHP extensie actief te zijn op uw server.';
@@ -50,12 +51,15 @@ $_['message_no_invoice'] = 'niet aangemaakt';
 
 $_['order_id'] = 'Ordernummer';
 $_['shipping_costs'] = 'Verzendkosten';
+$_['discount'] = 'Korting';
 $_['discount_code'] = 'Kortingscode';
 $_['coupon_code'] = 'Cadeaubon';
 $_['gift_wrapping'] = 'Cadeauverpakking';
 $_['fee'] = 'Behandelkosten';
+$_['refund'] = 'Terugbetaling';
 
 // Mails
+$_['mail_sender_name'] = 'Uw webwinkel';
 $_['mail_subject'] = 'Fouten of waarschuwingen bij verzenden factuur naar Acumulus';
 $_['mail_text'] = <<<LONGSTRING
 Geachte heer/mevrouw,
@@ -133,9 +137,16 @@ $_['desc_dateToUse'] = 'U kunt hier kiezen welke datum de factuur in Acumulus mo
 
 $_['field_defaultCustomerType'] = 'Importeer klanten als';
 
+$_['field_genericCustomer'] = 'Klantgegevens versturen';
+$_['option_genericCustomer'] = 'Verstuur geen klantgegevens van consumenten naar Acumulus';
+$_['desc_genericCustomer'] = 'Vink deze optie aan als u geen klantgegevens naar uw Acumulus boekhouding wilt versturen. Alle facturen voor consumenten worden dan op 1 fictieve klant geboekt.';
+
+$_['field_genericCustomerEmail'] = 'Fictieve klant e-mail';
+$_['desc_genericCustomerEmail'] = 'Het e-mailadres (dat u in Acumulus heeft aangemaakt) om facturen voor consumenten op te boeken.';
+
 $_['field_overwriteIfExists'] = 'Klantadresgegevens';
 $_['option_overwriteIfExists'] = 'Overschrijf bestaande adresgegevens';
-$_['desc_overwriteIfExists'] = 'Vink deze optie alleen uit als u direct in Acumulus adresgegevens van uw web shop klanten bijwerkt.';
+$_['desc_overwriteIfExists'] = 'Vink deze optie alleen uit als u direct in Acumulus adresgegevens van uw webwinkel-klanten bijwerkt.';
 
 $_['field_defaultAccountNumber'] = 'Bankrekeningnummer';
 $_['desc_defaultAccountNumber'] = 'Maakt u binnen Acumulus gebruik van meerdere rekeningen en wilt u alle orders uit uw webwinkel op een specifieke rekening binnen laten komen, kies dan hier het bankrekeningnummer.';

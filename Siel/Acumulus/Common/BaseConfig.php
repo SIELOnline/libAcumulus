@@ -14,7 +14,7 @@ abstract class BaseConfig implements ConfigInterface{
    *
    * @var string
    */
-  public static $library_version = '3.3.3';
+  public static $library_version = '3.3.4';
 
   /** @var bool */
   protected $isLoaded;
@@ -44,6 +44,7 @@ abstract class BaseConfig implements ConfigInterface{
       'useMargin' => true,
       'invoiceNrSource' => ConfigInterface::InvoiceNrSource_ShopInvoice,
       'dateToUse' => ConfigInterface::InvoiceDate_InvoiceCreate,
+      'genericCustomer' => false,
       'overwriteIfExists' => true,
     );
     $this->translator = $language instanceof TranslatorInterface ? $language : new BaseTranslator($language);
@@ -231,6 +232,9 @@ abstract class BaseConfig implements ConfigInterface{
   public function getInvoiceSettings() {
     return array(
       'defaultCustomerType' => $this->get('defaultCustomerType'),
+      'genericCustomer' => $this->get('genericCustomer'),
+      'genericCustomerEmail' => $this->get('genericCustomerEmail'),
+      'overwriteIfExists' => $this->get('overwriteIfExists'),
       'defaultAccountNumber' => $this->get('defaultAccountNumber'),
       'invoiceNrSource' => $this->get('invoiceNrSource'),
       'dateToUse' => $this->get('dateToUse'),
@@ -238,7 +242,6 @@ abstract class BaseConfig implements ConfigInterface{
       'defaultInvoiceTemplate' => $this->get('defaultInvoiceTemplate'),
       'triggerOrderStatus' => $this->get('triggerOrderStatus'),
       'useMargin' => $this->get('useMargin'),
-      'overwriteIfExists' => $this->get('overwriteIfExists'),
     );
   }
 
@@ -271,6 +274,11 @@ abstract class BaseConfig implements ConfigInterface{
     else if (!preg_match('/^[^@]+@([^.@]+\.)+[^.@]+$/', $values['emailonerror'])) {
       $result['emailonerror'] = $this->t('message_validate_email_0');
     }
+
+    if (!empty($values['genericCustomerEmail'])  && !preg_match('/^[^@]+@([^.@]+\.)+[^.@]+$/', $values['genericCustomerEmail'])) {
+      $result['genericCustomerEmail'] = $this->t('message_validate_email_2');
+    }
+
     return $result;
   }
 
@@ -290,6 +298,9 @@ abstract class BaseConfig implements ConfigInterface{
     }
     if (isset($values['dateToUse'])) {
       $values['dateToUse'] = (int) $values['dateToUse'];
+    }
+    if (isset($values['genericCustomer'])) {
+      $values['genericCustomer'] = (bool) $values['genericCustomer'];
     }
     if (isset($values['overwriteIfExists'])) {
       $values['overwriteIfExists'] = (bool) $values['overwriteIfExists'];
@@ -322,12 +333,14 @@ abstract class BaseConfig implements ConfigInterface{
       'invoiceNrSource',
       'dateToUse',
       'defaultCustomerType',
+      'genericCustomer',
+      'genericCustomerEmail',
+      'overwriteIfExists',
       'defaultAccountNumber',
       'defaultCostCenter',
       'defaultInvoiceTemplate',
       'triggerOrderStatus',
       'useMargin',
-      'overwriteIfExists',
     );
   }
 }

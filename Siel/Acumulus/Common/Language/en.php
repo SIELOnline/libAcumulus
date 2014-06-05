@@ -132,18 +132,20 @@ $_['option_dateToUse_2'] = 'Use the order create date';
 $_['option_dateToUse_3'] = 'Use the transfer date';
 $_['desc_dateToUse'] = 'Select which date to use for the invoice in Acumulus.';
 
+$_['field_clientData'] = 'Customer address data';
+$_['option_sendCustomer'] = 'Send consumer client records to Acumulus';
+$_['option_overwriteIfExists'] = 'Overwrite existing address data';
+$_['desc_clientData'] = 'Acumulus allows you to store client data.
+This extension automatically sends client data to Acumulus.
+If you don\'t want this, uncheck this option.
+All consumer invoices will be booked on one and the same fictitious client.
+You should uncheck the second option if you edit customer address data manually in Acumulus.
+If you unchecked the first option, the second option only applies to business clients.';
+
+//$_['field_genericCustomerEmail'] = 'E-mail fictitious client';
+//$_['desc_genericCustomerEmail'] = 'If you checked the option above, then please create a fictitious relation, including an e-mail address, in Acumulus and fill in that e-mail address.';
+
 $_['field_defaultCustomerType'] = 'Create customers as';
-
-$_['field_genericCustomer'] = 'Sending client records';
-$_['option_genericCustomer'] = 'Do not send consumer client records to Acumulus';
-$_['desc_genericCustomer'] = 'Check this option if you don\'t want client records to be sent to your Acumulus administration. All consumer invoices will be booked on 1 fictitious client.';
-
-$_['field_genericCustomerEmail'] = 'E-mail fictitious client';
-$_['desc_genericCustomerEmail'] = 'The e-mail address (that you created in Acumulus) to book consumer invoices on.';
-
-$_['field_overwriteIfExists'] = 'Customer address data';
-$_['option_overwriteIfExists'] = 'Overwrite existing  address data';
-$_['desc_overwriteIfExists'] = 'Check this option, unless you edit customer address data manually in Acumulus.';
 
 $_['field_defaultAccountNumber'] = 'Bank account number';
 $_['desc_defaultAccountNumber'] = 'Select the (bank) account number at which you want to receive all your order payments.';

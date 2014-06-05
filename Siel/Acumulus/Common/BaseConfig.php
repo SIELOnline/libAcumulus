@@ -14,7 +14,7 @@ abstract class BaseConfig implements ConfigInterface{
    *
    * @var string
    */
-  public static $library_version = '3.3.4';
+  public static $library_version = '3.3.5-beta1';
 
   /** @var bool */
   protected $isLoaded;
@@ -31,6 +31,17 @@ abstract class BaseConfig implements ConfigInterface{
    */
   public function __construct($language) {
     $this->isLoaded = false;
+
+    $hostName = parse_url($_SERVER['REQUEST_URI'], PHP_URL_HOST);
+    if ($hostName) {
+      if ($pos = strpos($hostName, 'www.') !== false) {
+        $hostName = substr($hostName, $pos + strlen('www.'));
+      }
+    }
+    else {
+      $hostName = 'example.com';
+    }
+
     $this->values = array(
       // "Internal" configuration settings.
       'baseUri' => 'https://api.sielsystems.nl/acumulus',
@@ -44,8 +55,9 @@ abstract class BaseConfig implements ConfigInterface{
       'useMargin' => true,
       'invoiceNrSource' => ConfigInterface::InvoiceNrSource_ShopInvoice,
       'dateToUse' => ConfigInterface::InvoiceDate_InvoiceCreate,
-      'genericCustomer' => false,
+      'sendCustomer' => true,
       'overwriteIfExists' => true,
+      'genericCustomerEmail' => 'consumer@' . $hostName,
     );
     $this->translator = $language instanceof TranslatorInterface ? $language : new BaseTranslator($language);
   }
@@ -232,7 +244,7 @@ abstract class BaseConfig implements ConfigInterface{
   public function getInvoiceSettings() {
     return array(
       'defaultCustomerType' => $this->get('defaultCustomerType'),
-      'genericCustomer' => $this->get('genericCustomer'),
+      'sendCustomer' => $this->get('sendCustomer'),
       'genericCustomerEmail' => $this->get('genericCustomerEmail'),
       'overwriteIfExists' => $this->get('overwriteIfExists'),
       'defaultAccountNumber' => $this->get('defaultAccountNumber'),
@@ -299,8 +311,8 @@ abstract class BaseConfig implements ConfigInterface{
     if (isset($values['dateToUse'])) {
       $values['dateToUse'] = (int) $values['dateToUse'];
     }
-    if (isset($values['genericCustomer'])) {
-      $values['genericCustomer'] = (bool) $values['genericCustomer'];
+    if (isset($values['sendCustomer'])) {
+      $values['sendCustomer'] = (bool) $values['sendCustomer'];
     }
     if (isset($values['overwriteIfExists'])) {
       $values['overwriteIfExists'] = (bool) $values['overwriteIfExists'];
@@ -333,7 +345,7 @@ abstract class BaseConfig implements ConfigInterface{
       'invoiceNrSource',
       'dateToUse',
       'defaultCustomerType',
-      'genericCustomer',
+      'sendCustomer',
       'genericCustomerEmail',
       'overwriteIfExists',
       'defaultAccountNumber',

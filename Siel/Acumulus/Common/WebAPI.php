@@ -915,7 +915,7 @@ class WebAPI {
    */
   protected function fictitiousClient(array $invoice) {
     $invoiceSettings = $this->config->getInvoiceSettings();
-    if ($invoiceSettings['genericCustomer'] && empty($invoice['customer']['companyname1']) && empty($invoice['customer']['vatnumber'])) {
+    if (!$invoiceSettings['sendCustomer'] && empty($invoice['customer']['companyname1']) && empty($invoice['customer']['vatnumber'])) {
       unset($invoice['customer']['type']);
       unset($invoice['customer']['companyname1']);
       unset($invoice['customer']['companyname2']);
@@ -932,7 +932,7 @@ class WebAPI {
       unset($invoice['customer']['fax']);
       unset($invoice['customer']['bankaccountnumber']);
       unset($invoice['customer']['mark']);
-      $invoice['customer']['email'] = $invoiceSettings['genericCustomerEmail'] ? $invoiceSettings['genericCustomerEmail'] : 'customer@example.com';
+      $invoice['customer']['email'] = $invoiceSettings['genericCustomerEmail'];
       $invoice['customer']['overwriteifexists'] = 0;
     }
     return $invoice;

@@ -135,18 +135,21 @@ $_['option_dateToUse_2'] = 'Gebruik de aanmaakdatum van de bestelling';
 $_['option_dateToUse_3'] = 'Gebruik de datum van het overzetten';
 $_['desc_dateToUse'] = 'U kunt hier kiezen welke datum de factuur in Acumulus moet krijgen.';
 
-$_['field_defaultCustomerType'] = 'Importeer klanten als';
-
-$_['field_genericCustomer'] = 'Klantgegevens versturen';
-$_['option_genericCustomer'] = 'Verstuur geen klantgegevens van consumenten naar Acumulus';
-$_['desc_genericCustomer'] = 'Vink deze optie aan als u geen klantgegevens naar uw Acumulus boekhouding wilt versturen. Alle facturen voor consumenten worden dan op 1 fictieve klant geboekt.';
-
-$_['field_genericCustomerEmail'] = 'Fictieve klant e-mail';
-$_['desc_genericCustomerEmail'] = 'Het e-mailadres (dat u in Acumulus heeft aangemaakt) om facturen voor consumenten op te boeken.';
-
-$_['field_overwriteIfExists'] = 'Klantadresgegevens';
+// @todo: vooralsnog is alleen Magento overgezet op deze nieuwe veldindeling.
+$_['field_clientData'] = 'Klantadresgegevens';
+$_['option_sendCustomer'] = 'Uw (niet zakelijke) klanten automatisch aan uw relaties in Acumulus toevoegen';
 $_['option_overwriteIfExists'] = 'Overschrijf bestaande adresgegevens';
-$_['desc_overwriteIfExists'] = 'Vink deze optie alleen uit als u direct in Acumulus adresgegevens van uw webwinkel-klanten bijwerkt.';
+$_['desc_clientData'] = 'Binnen Acumulus is het mogelijk om uw klantrelaties te beheren.
+Deze koppeling voegt automatisch uw klanten aan het relatieoverzicht van Acumulus toe.
+Dit is niet altijd gewenst en kunt u voorkomen door de eerste optie uit te zetten.
+Hierdoor worden alle transacties van consumenten binnen uw webwinkel onder 1 vaste fictieve relatie ingeboekt in Acumulus.
+De tweede optie moet u alleen uitzetten als u direct in Acumulus adresgegevens van uw webwinkel-klanten bijwerkt.
+Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakelijke klanten.';
+
+//$_['field_genericCustomerEmail'] = 'Fictieve klant e-mail';
+//$_['desc_genericCustomerEmail'] = 'Als u de optie hierboven heeft aangevinkt, maak dan in Acumulus een fictieve relatie (\'debiteur\' of \'relatie\') aan, inclusief e-mailadres. Geef vervolgens hier dit e-mailadres op.';
+
+$_['field_defaultCustomerType'] = 'Importeer klanten als';
 
 $_['field_defaultAccountNumber'] = 'Bankrekeningnummer';
 $_['desc_defaultAccountNumber'] = 'Maakt u binnen Acumulus gebruik van meerdere rekeningen en wilt u alle orders uit uw webwinkel op een specifieke rekening binnen laten komen, kies dan hier het bankrekeningnummer.';

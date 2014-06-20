@@ -146,9 +146,6 @@ Hierdoor worden alle transacties van consumenten binnen uw webwinkel onder 1 vas
 De tweede optie moet u alleen uitzetten als u direct in Acumulus adresgegevens van uw webwinkel-klanten bijwerkt.
 Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakelijke klanten.';
 
-//$_['field_genericCustomerEmail'] = 'Fictieve klant e-mail';
-//$_['desc_genericCustomerEmail'] = 'Als u de optie hierboven heeft aangevinkt, maak dan in Acumulus een fictieve relatie (\'debiteur\' of \'relatie\') aan, inclusief e-mailadres. Geef vervolgens hier dit e-mailadres op.';
-
 $_['field_defaultCustomerType'] = 'Importeer klanten als';
 
 $_['field_defaultAccountNumber'] = 'Bankrekeningnummer';

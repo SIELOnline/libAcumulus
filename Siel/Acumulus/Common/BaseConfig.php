@@ -14,7 +14,7 @@ abstract class BaseConfig implements ConfigInterface{
    *
    * @var string
    */
-  public static $library_version = '3.3.4';
+  public static $library_version = '3.3.5';
 
   /** @var bool */
   protected $isLoaded;
@@ -58,6 +58,7 @@ abstract class BaseConfig implements ConfigInterface{
       'sendCustomer' => true,
       'overwriteIfExists' => true,
       'genericCustomerEmail' => 'consumer@' . $hostName,
+      'triggerOrderEvent' => ConfigInterface::TriggerOrderEvent_OrderStatus,
     );
     $this->translator = $language instanceof TranslatorInterface ? $language : new BaseTranslator($language);
   }
@@ -252,6 +253,7 @@ abstract class BaseConfig implements ConfigInterface{
       'dateToUse' => $this->get('dateToUse'),
       'defaultCostCenter' => $this->get('defaultCostCenter'),
       'defaultInvoiceTemplate' => $this->get('defaultInvoiceTemplate'),
+      'triggerOrderEvent' => $this->get('triggerOrderEvent'),
       'triggerOrderStatus' => $this->get('triggerOrderStatus'),
       'useMargin' => $this->get('useMargin'),
     );
@@ -329,6 +331,9 @@ abstract class BaseConfig implements ConfigInterface{
     if (isset($values['defaultInvoiceTemplate'])) {
       $values['defaultInvoiceTemplate'] = (int) $values['defaultInvoiceTemplate'];
     }
+    if (isset($values['triggerOrderEvent'])) {
+      $values['triggerOrderEvent'] = (int) $values['triggerOrderEvent'];
+    }
   }
 
   /**
@@ -351,6 +356,7 @@ abstract class BaseConfig implements ConfigInterface{
       'defaultAccountNumber',
       'defaultCostCenter',
       'defaultInvoiceTemplate',
+      'triggerOrderEvent',
       'triggerOrderStatus',
       'useMargin',
     );

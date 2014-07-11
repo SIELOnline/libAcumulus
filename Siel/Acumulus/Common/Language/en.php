@@ -156,6 +156,11 @@ $_['desc_defaultCostCenter'] = 'Select the cost center to assign your orders to.
 $_['field_defaultInvoiceTemplate'] = 'Invoice template';
 $_['desc_defaultInvoiceTemplate'] = 'Select the invoice template to print your web shop orders with.';
 
+$_['field_triggerOrderEvent'] = 'Send the invoice to Acumulus';
+$_['option_triggerOrderEvent_1'] = 'When an order reaches the state as defined below';
+$_['option_triggerOrderEvent_2'] = 'When the invoice gets created for this order';
+$_['desc_triggerOrderEvent'] = 'Select when to send the invoice to Acumulus. This extension only uses order data. so you may select any status. The invoice does not already have to be created.';
+
 $_['option_empty_triggerOrderStatus'] = 'Do not send automatically';
 $_['field_triggerOrderStatus'] = 'Order state';
 $_['desc_triggerOrderStatus'] = 'Select the order state at which orders will be sent to Acumulus. If you select "Do not send automatically" this module will do nothing.';

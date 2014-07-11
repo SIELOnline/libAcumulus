@@ -418,7 +418,7 @@ class WebAPI {
   }
 
   /**
-   * Helper method to add a default (without overwriting) value ot the message.
+   * Helper method to add a default (without overwriting) value to the message.
    *
    * @param array $array
    * @param string $key
@@ -439,6 +439,7 @@ class WebAPI {
    * Validates the invoice.
    *
    * Checks that are performed:
+   * - email address may not be empty, may be left out though.
    * - 19% and 21% VAT: those are not both allowed in 1 order.
    *
    * @param array $invoice
@@ -446,12 +447,17 @@ class WebAPI {
    *
    * @return array
    */
-  protected function validateInvoice(array $invoice, $orderId) {
+  protected function validateInvoice(array &$invoice, $orderId) {
     $response = array(
       'errors' => array(),
       'warnings' => array(),
       'status' => self::Status_Success,
     );
+
+    // Check email address.
+    if (empty($invoice['customer']['email'])) {
+      unset($invoice['customer']['email']);
+   }
 
     // Check if both 19% and 21% vat rates occur.
     $has19 = FALSE;

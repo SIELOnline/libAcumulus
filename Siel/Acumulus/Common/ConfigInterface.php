@@ -16,6 +16,9 @@ namespace Siel\Acumulus\Common;
  */
 interface ConfigInterface {
   // Constants for configuration fields.
+  const TriggerOrderEvent_OrderStatus = 1;
+  const TriggerOrderEvent_InvoiceCreate = 2;
+
   const InvoiceNrSource_ShopInvoice = 1;
   const InvoiceNrSource_ShopOrder = 2;
   const InvoiceNrSource_Acumulus = 3;

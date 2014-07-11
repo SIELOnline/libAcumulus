@@ -157,6 +157,11 @@ $_['desc_defaultCostCenter'] = 'Maakt u binnen Acumulus gebruik van meerdere kos
 $_['field_defaultInvoiceTemplate'] = 'Factuur-sjabloon';
 $_['desc_defaultInvoiceTemplate'] = 'Maakt u binnen Acumulus gebruik van meerdere factuur-sjablonen en wilt u alle orders uit uw webwinkel op een specifieke factuursjabloon printen, kies dan hier het factuur-sjabloon.';
 
+$_['field_triggerOrderEvent'] = 'Moment van versturen';
+$_['option_triggerOrderEvent_1'] = 'Als een order de hieronder door u gekozen status bereikt';
+$_['option_triggerOrderEvent_2'] = 'Als de factuur wordt aangemaakt voor deze order';
+$_['desc_triggerOrderEvent'] = 'U kunt hier kiezen op welk moment de factuur wordt verstuurd. Deze koppeling gebruikt alleen gegevens van de order, dus u kunt elke status kiezen. De factuur hoeft dus nog niet aangemaakt te zijn.';
+
 $_['option_empty_triggerOrderStatus'] = 'Niet automatisch overzetten';
 $_['field_triggerOrderStatus'] = 'Orderstatus';
 $_['desc_triggerOrderStatus'] = 'U kunt hier kiezen bij welke orderstatus facturen worden overgezet naar Acumulus. Als u voor "Niet automatisch overzetten" kiest, doet deze module niets.';

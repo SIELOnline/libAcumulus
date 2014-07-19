@@ -72,12 +72,12 @@ class WebAPI {
    */
   public function __construct(ConfigInterface $config) {
     $this->config = $config;
-    if (!$this->config->getLocal()) {
-      $this->webAPICommunicator = new WebAPICommunication($config);
+    if ($this->config->getDebug() == ConfigInterface::Debug_StayLocal) {
+      require_once(dirname(__FILE__) . '/WebAPICommunicationLocal.php');
+      $this->webAPICommunicator = new WebAPICommunicationLocal($config);
     }
     else {
-      require_once(dirname(__FILE__) . '/../Test/WebAPICommunicationTest.php');
-      $this->webAPICommunicator = new \Siel\Acumulus\Test\WebAPICommunicationTest($config);
+      $this->webAPICommunicator = new WebAPICommunication($config);
     }
   }
 
@@ -146,7 +146,7 @@ class WebAPI {
       $messages[] = $this->config->t('message_warning') . ' ' . $message;
     }
 
-    if (!empty($messages) || $this->config->getDebug()) {
+    if (!empty($messages) || $this->config->getDebug() != ConfigInterface::Debug_None) {
       if (isset($result['trace'])) {
         $messages[] = $this->config->t('message_info_for_user');
         if (isset($result['trace']['request'])) {
@@ -256,7 +256,7 @@ class WebAPI {
       'LU',
       'HU',
       'MT',
-      //'NL', // Outside the Netherlands.
+      //'NL', // In EU, but outside the Netherlands.
       'AT',
       'PL',
       'PT',

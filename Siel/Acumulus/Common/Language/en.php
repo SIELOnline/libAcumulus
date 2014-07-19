@@ -10,6 +10,7 @@ $_['button_settings'] = 'Settings';
 $_['button_save'] = 'Save';
 $_['button_back'] = 'Back to list';
 $_['button_cancel'] = 'Cancel';
+$_['button_send'] = 'Send';
 
 // Messages
 $_['message_config_saved'] = 'De settings are saved.';
@@ -51,6 +52,7 @@ $_['message_no_invoice'] = 'not created';
 
 $_['order_id'] = 'Ordernumber';
 $_['shipping_costs'] = 'Shipping costs';
+$_['payment_costs'] = 'Payment costs';
 $_['discount'] = 'Discount';
 $_['discount_code'] = 'Coupon code';
 $_['coupon_code'] = 'Voucher';
@@ -167,3 +169,23 @@ $_['desc_triggerOrderStatus'] = 'Select the order state at which orders will be 
 
 $_['versionInformationHeader'] = 'Module information';
 $_['desc_versionInformation'] = 'Please mention this information with any support request.';
+
+$_['field_debug'] = 'Debug and support';
+$_['option_debug_1'] = 'Send messages to Acumulus and only receive a mail when there are errors or warnings';
+$_['option_debug_2'] = 'Send messages to Acumulus and receive a mail with the results';
+$_['option_debug_3'] = 'Do not send messages to Acumulus, but receive a mail with the message as would have been sent';
+$_['desc_debug'] = 'Select a debug mode. Choose for the first option unless otherwise instructed by support staff.';
+
+// Send manual form
+$_['page_title_manual'] = 'Manually send invoice';
+$_['manualSelectIdHeader'] = 'Specify the invoice to send';
+$_['field_manual_order'] = 'Order #';
+$_['field_manual_invoice'] = 'Invoice #';
+$_['field_manual_creditmemo'] = 'Creditmemo #';
+$_['manual_form_desc'] = '<strong>ATTENTION: Use this form at your own risk.</strong> Acumulus does not check if invoices are sent twice. By sending an invoce manually (a 2nd time), your administration can become incorrect. use this form only if isntructed tod os o by support staff and even then only when the 3rd option has been chosen for the "Support and debug" mode on the settings screen.';
+$_['manual_order_sent'] = "Order '%s' has been sent";
+$_['manual_order_not_found'] = "Order '%s' not found";
+$_['manual_invoice_sent'] = "Factuur '%s' has been sent";
+$_['manual_invoice_not_found'] = "Factuur '%s' not found";
+$_['manual_creditmemo_sent'] = "Creditmemo '%s' has been sent";
+$_['manual_creditmemo_not_found'] = "Credit memo '%s' not found";

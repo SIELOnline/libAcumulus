@@ -10,6 +10,7 @@ $_['button_settings'] = 'Instellingen';
 $_['button_save'] = 'Opslaan';
 $_['button_back'] = 'Terug naar overzicht';
 $_['button_cancel'] = 'Annuleren';
+$_['button_send'] = 'Verzenden';
 
 // Messages
 $_['message_config_saved'] = 'De instellingen zijn opgeslagen.';
@@ -51,6 +52,7 @@ $_['message_no_invoice'] = 'niet aangemaakt';
 
 $_['order_id'] = 'Ordernummer';
 $_['shipping_costs'] = 'Verzendkosten';
+$_['payment_costs'] = 'Betalingskosten';
 $_['discount'] = 'Korting';
 $_['discount_code'] = 'Kortingscode';
 $_['coupon_code'] = 'Cadeaubon';
@@ -168,3 +170,23 @@ $_['desc_triggerOrderStatus'] = 'U kunt hier kiezen bij welke orderstatus factur
 
 $_['versionInformationHeader'] = 'Informatie over deze module';
 $_['desc_versionInformation'] = 'Vermeldt aub deze gegevens bij een supportverzoek.';
+
+$_['field_debug'] = 'Support en debug';
+$_['option_debug_1'] = 'Verzend berichten naar Acumulus en ontvang alleen een mail bij fouten of waarschuwingen';
+$_['option_debug_2'] = 'Verzend berichten naar Acumulus en ontvang een mail met het verzonden en ontvangen bericht';
+$_['option_debug_3'] = 'Verzend geen berichten naar Acumulus, verstuur alleen een mail met het bericht dat verstuurd zou worden';
+$_['desc_debug'] = 'U kunt hier een support mode kiezen. Kies voor de eerste optie tenzij u i.v.m. een supportverzoek bent geïnstrueerd om iets anders te kiezen.';
+
+// Send manual form
+$_['page_title_manual'] = 'Verstuur factuur handmatig';
+$_['manualSelectIdHeader'] = 'Specificeer de opnieuw te verzenden factuur';
+$_['field_manual_order'] = 'Order #';
+$_['field_manual_invoice'] = 'Factuur #';
+$_['field_manual_creditmemo'] = 'Creditmemo #';
+$_['manual_form_desc'] = '<strong>LET OP: Het gebruik van dit formulier is op eigen risico.</strong> Acumulus voert geen controle op dubbel inzenden uit. Door het (nogmaals) handmatig versturen van facturen kan uw administatie ontregeld raken. Gebruik dit formulier daarom alleen als u i.v.m. een supportverzoek bent geïnstrueerd om dit te doen en dan het liefst alleen als voor de "support en debug" mode de 3e optie is gekozen (zie het instellingen scherm).';
+$_['manual_order_sent'] = "Order '%s' verzonden";
+$_['manual_order_not_found'] = "Order '%s' niet gevonden";
+$_['manual_invoice_sent'] = "Factuur '%s' verzonden";
+$_['manual_invoice_not_found'] = "Factuur '%s' niet gevonden";
+$_['manual_creditmemo_sent'] = "Creditmemo '%s' verzonden";
+$_['manual_creditmemo_not_found'] = "Credit memo '%s' niet gevonden";

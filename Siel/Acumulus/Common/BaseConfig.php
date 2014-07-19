@@ -48,8 +48,7 @@ abstract class BaseConfig implements ConfigInterface{
       'apiVersion' => 'stable',
       'libraryVersion' => static::$library_version,
       'outputFormat' => 'json',
-      'local' => false,
-      'debug' => false,
+      'debug' => ConfigInterface::Debug_None,
 
       // Default configuration settings.
       'useMargin' => true,
@@ -156,39 +155,20 @@ abstract class BaseConfig implements ConfigInterface{
   /**
    * @inheritdoc
    */
-  public function getLocal() {
-    return $this->get('local');
-  }
-
-  /**
-   * Sets the value for the "stay local" value.
-   *
-   * @param bool $local
-   *
-   * @return mixed
-   *   The old value.
-   */
-  public function setLocal($local) {
-    return $this->set('local', (bool) $local);
-  }
-
-  /**
-   * @inheritdoc
-   */
   public function getDebug() {
     return $this->get('debug');
   }
 
   /**
-   * Sets the value for the debug value.
+   * Sets the value for the debug setting.
    *
-   * @param bool $debug
+   * @param int $debug
    *
-   * @return mixed
+   * @return int
    *   The old value.
    */
   public function setDebug($debug) {
-    return $this->set('debug', (bool) $debug);
+    return $this->set('debug', (int) $debug);
   }
 
   /**
@@ -334,6 +314,9 @@ abstract class BaseConfig implements ConfigInterface{
     if (isset($values['triggerOrderEvent'])) {
       $values['triggerOrderEvent'] = (int) $values['triggerOrderEvent'];
     }
+    if (isset($values['debug'])) {
+      $values['debug'] = (int) $values['debug'];
+    }
   }
 
   /**
@@ -359,6 +342,7 @@ abstract class BaseConfig implements ConfigInterface{
       'triggerOrderEvent',
       'triggerOrderStatus',
       'useMargin',
+      'debug',
     );
   }
 }

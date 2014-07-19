@@ -27,6 +27,10 @@ interface ConfigInterface {
   const InvoiceDate_OrderCreate = 2;
   const InvoiceDate_Transfer = 3;
 
+  const Debug_None = 1;
+  const Debug_SendAndLog = 2;
+  const Debug_StayLocal = 3;
+
   /**
    * Returns the URI of the Acumulus API to connect with.
    *
@@ -61,21 +65,12 @@ interface ConfigInterface {
   public function getEnvironment();
 
   /**
-   * Indicates whether the web api communicator should log all messages that are
-   * sent and received.
+   * Indicates the debug mode of the web api communicator.
    *
-   * @return bool
+   * @return int
+   *   One of the ConfigInterface::Debug_... constants.
    */
   public function getDebug();
-
-  /**
-   * Indicates whether the web api communicator should be a test class that does
-   * not actually send the message to Acumulus but logs the message that would
-   * have been sent.
-   *
-   * @return bool
-   */
-  public function getLocal();
 
   /**
    * Returns the format the output from the Acumulus API should be in.

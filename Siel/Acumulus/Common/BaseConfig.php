@@ -9,12 +9,12 @@ abstract class BaseConfig implements ConfigInterface{
   /**
    * Increase this value on each change:
    * - point release: bug fixes
-   * - minor version: addition of minor features, backwards compatible
+   * - minor version: addition of minor features, may be backwards incompatible
    * - major version: major or backwards incompatible changes
    *
    * @var string
    */
-  public static $library_version = '3.3.5';
+  public static $library_version = '3.4.0';
 
   /** @var bool */
   protected $isLoaded;

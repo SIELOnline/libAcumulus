@@ -300,70 +300,69 @@ class WebAPI {
 
 
   /**
-   * Extracts the vat type based on customer and invoice information.
+   * Adds the vat type based on customer and invoice information.
    *
    * For more information see:
    * - https://apidoc.sielsystems.nl/content/invoice-add
    * - https://wiki.acumulus.nl/index.php?page=facturen-naar-het-buitenland
    *
-   * @param array $customer
    * @param array $invoice
    *
-   * @return int
-   *   The vat type as defined on
-   *   https://apidoc.sielsystems.nl/content/invoice-add.
-   *
-   * @todo: refactor the call to this into the webapi and then refactor
-   *   convertOrderToAcumulusInvoice to add the lines form there, not within
-   *   addInvoice.
+   * @return array
    */
-  public function getVatType(array $customer, array $invoice) {
-    // Return self::VatType_MarginScheme if any line is:
+  protected function addVatType(array $invoice) {
+    $customer = $invoice['customer'];
+    $invoicePart = $invoice['customer']['invoice'];
+    // Set to self::VatType_MarginScheme if any line is:
     // - A used product with cost price.
     // - VAT rate is according to the margin, not the unitprice.
     // As we cannot check the latter with the available info here, we rely on
     // the setting useMargin.
     $invoiceSettings = $this->config->getInvoiceSettings();
     if ($invoiceSettings['useMargin']) {
-      foreach ($invoice['line'] as $line) {
+      foreach ($invoicePart['line'] as $line) {
         if (!empty($line['costprice'])) {
-          return self::VatType_MarginScheme;
+          $invoice['customer']['invoice']['vattype'] = self::VatType_MarginScheme;
+          return $invoice;
         }
       }
     }
 
-    // Return self::VatType_RestOfWorld if:
+    // Set to self::VatType_RestOfWorld if:
     // - Customer is outside the EU.
     // - VAT rate = 0 for all lines.
     if (!$this->isNl($customer['countrycode']) && !$this->isEu($customer['countrycode'])) {
       $vatIs0 = TRUE;
-      foreach ($invoice['line'] as $line) {
+      foreach ($invoicePart['line'] as $line) {
         $vatIs0 = $vatIs0 && $line['vatrate'] == 0;
       }
       if ($vatIs0) {
-        return self::VatType_RestOfWorld;
+        $invoice['customer']['invoice']['vattype'] = self::VatType_RestOfWorld;
+        return $invoice;
       }
     }
 
-    // Return self::VatType_EuReversed if:
+    // Set to self::VatType_EuReversed if:
     // - Customer is in EU.
     // - Customer is a company (VAT number provided).
     // - VAT rate = 0 for all lines.
     // - We should check the delivery address as well, but we don't as we can't.
     if ($this->isEu($customer['countrycode']) && !empty($customer['vatnumber'])) {
       $vatIs0 = TRUE;
-      foreach ($invoice['line'] as $line) {
+      foreach ($invoicePart['line'] as $line) {
         $vatIs0 = $vatIs0 && $line['vatrate'] == 0;
       }
       if ($vatIs0) {
-        return self::VatType_EuReversed;
+        $invoice['customer']['invoice']['vattype'] = self::VatType_EuReversed;
+        return $invoice;
       }
     }
 
-    // Never return self::VatType_NationalReversed via the API for web shops.
+    // Never set to self::VatType_NationalReversed via the API for web shops.
 
-    // Return self::VatType_National.
-    return self::VatType_National;
+    // Set to self::VatType_National.
+    $invoice['customer']['invoice']['vattype'] = self::VatType_National;
+    return $invoice;
   }
 
   /**
@@ -400,6 +399,9 @@ class WebAPI {
       $this->addDefault($invoice['customer']['invoice'], 'costcenter', $invoiceSettings['defaultCostCenter']);
       $this->addDefault($invoice['customer']['invoice'], 'template', $invoiceSettings['defaultInvoiceTemplate']);
     }
+
+    // Add vattype.
+    $invoice = $this->addVatType($invoice);
 
     // Correct countrycode.
     $invoice = $this->correctCountryCode($invoice);

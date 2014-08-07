@@ -271,218 +271,6 @@ class WebAPI {
   }
 
   /**
-   * Returns the Acumulus location code for a given country code.
-   *
-   * See https://apidoc.sielsystems.nl/content/invoice-add for more information
-   * about the location code.
-   *
-   * This function will be deprecated once the locationcode has been removed
-   * from the API.
-   *
-   * @param string $countryCode
-   *   ISO 3166-1 alpha-2 country code
-   *
-   * @return int
-   *   Location code
-   */
-  public function getLocationCode($countryCode) {
-    if ($this->isNl($countryCode)) {
-      $result = self::LocationCode_NL;
-    }
-    elseif ($this->isEu($countryCode)) {
-      $result = self::LocationCode_EU;
-    }
-    else {
-      $result = self::LocationCode_RestOfWorld;
-    }
-    return $result;
-  }
-
-
-  /**
-   * Adds the vat type based on customer and invoice information.
-   *
-   * For more information see:
-   * - https://apidoc.sielsystems.nl/content/invoice-add
-   * - https://wiki.acumulus.nl/index.php?page=facturen-naar-het-buitenland
-   *
-   * @param array $invoice
-   *
-   * @return array
-   */
-  protected function addVatType(array $invoice) {
-    $customer = $invoice['customer'];
-    $invoicePart = $invoice['customer']['invoice'];
-    // Set to self::VatType_MarginScheme if any line is:
-    // - A used product with cost price.
-    // - VAT rate is according to the margin, not the unitprice.
-    // As we cannot check the latter with the available info here, we rely on
-    // the setting useMargin.
-    $invoiceSettings = $this->config->getInvoiceSettings();
-    if ($invoiceSettings['useMargin']) {
-      foreach ($invoicePart['line'] as $line) {
-        if (!empty($line['costprice'])) {
-          $invoice['customer']['invoice']['vattype'] = self::VatType_MarginScheme;
-          return $invoice;
-        }
-      }
-    }
-
-    // Set to self::VatType_RestOfWorld if:
-    // - Customer is outside the EU.
-    // - VAT rate = 0 for all lines.
-    if (!$this->isNl($customer['countrycode']) && !$this->isEu($customer['countrycode'])) {
-      $vatIs0 = TRUE;
-      foreach ($invoicePart['line'] as $line) {
-        $vatIs0 = $vatIs0 && $line['vatrate'] == 0;
-      }
-      if ($vatIs0) {
-        $invoice['customer']['invoice']['vattype'] = self::VatType_RestOfWorld;
-        return $invoice;
-      }
-    }
-
-    // Set to self::VatType_EuReversed if:
-    // - Customer is in EU.
-    // - Customer is a company (VAT number provided).
-    // - VAT rate = 0 for all lines.
-    // - We should check the delivery address as well, but we don't as we can't.
-    if ($this->isEu($customer['countrycode']) && !empty($customer['vatnumber'])) {
-      $vatIs0 = TRUE;
-      foreach ($invoicePart['line'] as $line) {
-        $vatIs0 = $vatIs0 && $line['vatrate'] == 0;
-      }
-      if ($vatIs0) {
-        $invoice['customer']['invoice']['vattype'] = self::VatType_EuReversed;
-        return $invoice;
-      }
-    }
-
-    // Never set to self::VatType_NationalReversed via the API for web shops.
-
-    // Set to self::VatType_National.
-    $invoice['customer']['invoice']['vattype'] = self::VatType_National;
-    return $invoice;
-  }
-
-  /**
-   * Adds an invoice to Acumulus.
-   *
-   * Besides the general response structure, the actual result of this call is
-   * returned under the following key:
-   * - invoice: an array of information about the created invoice, being an
-   *   array with keys:
-   *   - invoicenumber
-   *   - token
-   *
-   * See https://apidoc.sielsystems.nl/content/invoice-add.
-   *
-   * @param array $invoice
-   *   The invoice to add.
-   * @param string $orderId
-   *   The order id, only used for error reporting.
-   * @param bool $addDefaults
-   *   Whether to add default values from the configuration to empty or absent
-   *   fields:
-   *   - type (type of customer)
-   *   - accountnumber (own account number to use)
-   *   - costcenter (cost heading to use)
-   *   - template (invoice template to use)
-   *
-   * @return array
-   */
-  public function invoiceAdd(array $invoice, $orderId = '', $addDefaults = TRUE) {
-    if ($addDefaults) {
-      $invoiceSettings = $this->config->getInvoiceSettings();
-      $this->addDefault($invoice['customer'], 'type', $invoiceSettings['defaultCustomerType']);
-      $this->addDefault($invoice['customer']['invoice'], 'accountnumber', $invoiceSettings['defaultAccountNumber']);
-      $this->addDefault($invoice['customer']['invoice'], 'costcenter', $invoiceSettings['defaultCostCenter']);
-      $this->addDefault($invoice['customer']['invoice'], 'template', $invoiceSettings['defaultInvoiceTemplate']);
-    }
-
-    // Add vattype.
-    $invoice = $this->addVatType($invoice);
-
-    // Correct countrycode.
-    $invoice = $this->correctCountryCode($invoice);
-
-    // Change to fictitious client (if set so).
-    $invoice = $this->fictitiousClient($invoice);
-
-    // Validate order (client side).
-    $response = $this->validateInvoice($invoice, $orderId);
-    if (empty($response['errors'])) {
-      // Send order.
-      $response = $this->webAPICommunicator->callApiFunction("invoices/invoice_add", $invoice);
-    }
-
-    return $response;
-  }
-
-  /**
-   * Helper method to add a default (without overwriting) value to the message.
-   *
-   * @param array $array
-   * @param string $key
-   * @param mixed $value
-   *
-   * @return bool
-   *   Whether the default was added.
-   */
-  protected function addDefault(array &$array, $key, $value) {
-    if (empty($array[$key]) && !empty($value)) {
-      $array[$key] = $value;
-      return TRUE;
-    }
-    return FALSE;
-  }
-
-  /**
-   * Validates the invoice.
-   *
-   * Checks that are performed:
-   * - email address may not be empty, may be left out though.
-   * - 19% and 21% VAT: those are not both allowed in 1 order.
-   *
-   * @param array $invoice
-   * @param string $orderId
-   *
-   * @return array
-   */
-  protected function validateInvoice(array &$invoice, $orderId) {
-    $response = array(
-      'errors' => array(),
-      'warnings' => array(),
-      'status' => self::Status_Success,
-    );
-
-    // Check email address.
-    if (empty($invoice['customer']['email'])) {
-      unset($invoice['customer']['email']);
-   }
-
-    // Check if both 19% and 21% vat rates occur.
-    $has19 = FALSE;
-    $has21 = FALSE;
-    foreach ($invoice['customer']['invoice']['line'] as $line) {
-      if (isset($line['vatrate'])) {
-        $has19 = $has19 && $line['vatrate'] == 19;
-        $has21 = $has21 && $line['vatrate'] == 21;
-      }
-    }
-    if ($has19 && $has21) {
-      $result['errors'][] = array(
-        'code' => 'Order',
-        'codetag' => !empty($invoice['customer']['invoice']['number']) ? $invoice['customer']['invoice']['number'] : $orderId,
-        'message' => $this->config->t('message_error_vat19and21'),
-      );
-      $result['status'] = self::Status_Errors;
-    }
-
-    return $response;
-  }
-
-  /**
    * Retrieves a list of accounts.
    *
    * Besides the general response structure, the actual result of this call is
@@ -621,6 +409,178 @@ class WebAPI {
       $response[$plural] = array();
     }
     return $response;
+  }
+
+  /**
+   * Adds an invoice to Acumulus.
+   *
+   * Besides the general response structure, the actual result of this call is
+   * returned under the following key:
+   * - invoice: an array of information about the created invoice, being an
+   *   array with keys:
+   *   - invoicenumber
+   *   - token
+   *   - entryid
+   * See https://apidoc.sielsystems.nl/content/invoice-add.
+   *
+   * @param array $invoice
+   *   The invoice to add.
+   * @param string $orderId
+   *   The order id, only used for error reporting.
+   *
+   * @return array
+   *
+   * @todo: remove setting locationcode and overwriteifexists from shop specific code (done: ps)
+   */
+  public function invoiceAdd(array $invoice, $orderId = '') {
+    $invoice = $this->completeInvoice($invoice);
+
+    // Correct countrycode (if in rest of world).
+    $invoice = $this->correctCountryCode($invoice);
+
+    // Change to fictitious client (if set so).
+    $invoice = $this->fictitiousClient($invoice);
+
+    // Validate order (client side).
+    $response = $this->validateInvoice($invoice, $orderId);
+    if (empty($response['errors'])) {
+      // Send order.
+      $response = $this->webAPICommunicator->callApiFunction("invoices/invoice_add", $invoice);
+    }
+
+    return $response;
+  }
+
+  /**
+   * @param array $invoice
+   *
+   * @return array
+   */
+  protected function completeInvoice(array $invoice) {
+    $invoiceSettings = $this->config->getInvoiceSettings();
+    $this->addDefault($invoice['customer'], 'locationcode', $this->getLocationCode($invoice['customer']['countrycode']));
+    $this->addDefault($invoice['customer'], 'overwriteifexists', $invoiceSettings['overwriteIfExists'] ? WebAPI::OverwriteIfExists_Yes : WebAPI::OverwriteIfExists_No);
+    $this->addDefault($invoice['customer'], 'type', $invoiceSettings['defaultCustomerType']);
+    $this->addDefault($invoice['customer']['invoice'], 'accountnumber', $invoiceSettings['defaultAccountNumber']);
+    $this->addDefault($invoice['customer']['invoice'], 'costcenter', $invoiceSettings['defaultCostCenter']);
+    $this->addDefault($invoice['customer']['invoice'], 'template', $invoiceSettings['defaultInvoiceTemplate']);
+
+    // Add vattype.
+    $invoice = $this->addVatType($invoice);
+
+    return $invoice;
+  }
+
+  /**
+   * Helper method to add a default (without overwriting) value to the message.
+   *
+   * @param array $array
+   * @param string $key
+   * @param mixed $value
+   *
+   * @return bool
+   *   Whether the default was added.
+   */
+  protected function addDefault(array &$array, $key, $value) {
+    if (empty($array[$key]) && !empty($value)) {
+      $array[$key] = $value;
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  /**
+   * Returns the Acumulus location code for a given country code.
+   *
+   * See https://apidoc.sielsystems.nl/content/invoice-add for more information
+   * about the location code.
+   *
+   * This function will be deprecated once the locationcode has been removed
+   * from the API.
+   *
+   * @param string $countryCode
+   *   ISO 3166-1 alpha-2 country code
+   *
+   * @return int
+   *   Location code
+   */
+  public function getLocationCode($countryCode) {
+    if ($this->isNl($countryCode)) {
+      $result = self::LocationCode_NL;
+    }
+    elseif ($this->isEu($countryCode)) {
+      $result = self::LocationCode_EU;
+    }
+    else {
+      $result = self::LocationCode_RestOfWorld;
+    }
+    return $result;
+  }
+
+  /**
+   * Adds the vat type based on customer and invoice information.
+   *
+   * For more information see:
+   * - https://apidoc.sielsystems.nl/content/invoice-add
+   * - https://wiki.acumulus.nl/index.php?page=facturen-naar-het-buitenland
+   *
+   * @param array $invoice
+   *
+   * @return array
+   */
+  protected function addVatType(array $invoice) {
+    $customer = $invoice['customer'];
+    $invoicePart = $invoice['customer']['invoice'];
+    // Set to self::VatType_MarginScheme if any line is:
+    // - A used product with cost price.
+    // - VAT rate is according to the margin, not the unitprice.
+    // As we cannot check the latter with the available info here, we rely on
+    // the setting useMargin.
+    $invoiceSettings = $this->config->getInvoiceSettings();
+    if ($invoiceSettings['useMargin']) {
+      foreach ($invoicePart['line'] as $line) {
+        if (!empty($line['costprice'])) {
+          $invoice['customer']['invoice']['vattype'] = self::VatType_MarginScheme;
+          return $invoice;
+        }
+      }
+    }
+
+    // Set to self::VatType_RestOfWorld if:
+    // - Customer is outside the EU.
+    // - VAT rate = 0 for all lines.
+    if (!$this->isNl($customer['countrycode']) && !$this->isEu($customer['countrycode'])) {
+      $vatIs0 = TRUE;
+      foreach ($invoicePart['line'] as $line) {
+        $vatIs0 = $vatIs0 && $line['vatrate'] == 0;
+      }
+      if ($vatIs0) {
+        $invoice['customer']['invoice']['vattype'] = self::VatType_RestOfWorld;
+        return $invoice;
+      }
+    }
+
+    // Set to self::VatType_EuReversed if:
+    // - Customer is in EU.
+    // - Customer is a company (VAT number provided).
+    // - VAT rate = 0 for all lines.
+    // - We should check the delivery address as well, but we don't as we can't.
+    if ($this->isEu($customer['countrycode']) && !empty($customer['vatnumber'])) {
+      $vatIs0 = TRUE;
+      foreach ($invoicePart['line'] as $line) {
+        $vatIs0 = $vatIs0 && $line['vatrate'] == 0;
+      }
+      if ($vatIs0) {
+        $invoice['customer']['invoice']['vattype'] = self::VatType_EuReversed;
+        return $invoice;
+      }
+    }
+
+    // Never set to self::VatType_NationalReversed via the API for web shops.
+
+    // Set to self::VatType_National.
+    $invoice['customer']['invoice']['vattype'] = self::VatType_National;
+    return $invoice;
   }
 
   /**
@@ -944,6 +904,51 @@ class WebAPI {
       $invoice['customer']['overwriteifexists'] = 0;
     }
     return $invoice;
+  }
+
+  /**
+   * Validates the invoice.
+   *
+   * Checks that are performed:
+   * - email address may not be empty, may be left out though.
+   * - 19% and 21% VAT: those are not both allowed in 1 order.
+   *
+   * @param array $invoice
+   * @param string $orderId
+   *
+   * @return array
+   */
+  protected function validateInvoice(array &$invoice, $orderId) {
+    $response = array(
+      'errors' => array(),
+      'warnings' => array(),
+      'status' => self::Status_Success,
+    );
+
+    // Check email address.
+    if (empty($invoice['customer']['email'])) {
+      unset($invoice['customer']['email']);
+    }
+
+    // Check if both 19% and 21% vat rates occur.
+    $has19 = FALSE;
+    $has21 = FALSE;
+    foreach ($invoice['customer']['invoice']['line'] as $line) {
+      if (isset($line['vatrate'])) {
+        $has19 = $has19 && $line['vatrate'] == 19;
+        $has21 = $has21 && $line['vatrate'] == 21;
+      }
+    }
+    if ($has19 && $has21) {
+      $result['errors'][] = array(
+        'code' => 'Order',
+        'codetag' => !empty($invoice['customer']['invoice']['number']) ? $invoice['customer']['invoice']['number'] : $orderId,
+        'message' => $this->config->t('message_error_vat19and21'),
+      );
+      $result['status'] = self::Status_Errors;
+    }
+
+    return $response;
   }
 
 }

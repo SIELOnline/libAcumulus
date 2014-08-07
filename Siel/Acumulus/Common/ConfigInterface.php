@@ -93,16 +93,19 @@ interface ConfigInterface {
    * Returns a set of default settings for an invoice when adding an invoice.
    *
    * @return array
-   *   A keyed array with the keys
-   *   - type
-   *   - accountnumber
-   *   - invoicenumber
-   *   - issuedate
-   *   - costcenter
-   *   - template
-   *   - trigger-order-status
-   *   - use-margin
-   *   - use cost-price
+   *   A keyed array with the keys:
+   *   - defaultCustomerType
+   *   - sendCustomer
+   *   - genericCustomerEmail
+   *   - overwriteIfExists
+   *   - defaultAccountNumber
+   *   - invoiceNrSource
+   *   - dateToUse
+   *   - defaultCostCenter
+   *   - defaultInvoiceTemplate
+   *   - triggerOrderEvent
+   *   - triggerOrderStatus
+   *   - useMargin
    */
   public function getInvoiceSettings();
 

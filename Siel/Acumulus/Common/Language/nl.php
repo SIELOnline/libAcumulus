@@ -9,6 +9,8 @@ $_['text_home'] = 'Home';
 $_['button_settings'] = 'Instellingen';
 $_['button_save'] = 'Opslaan';
 $_['button_back'] = 'Terug naar overzicht';
+$_['button_confirm_uninstall'] = 'Ja, verwijder data en instellingen';
+$_['button_cancel_uninstall'] = 'Nee, alleen uitschakelen, bewaar data en instellingen';
 $_['button_cancel'] = 'Annuleren';
 $_['button_send'] = 'Verzenden';
 
@@ -79,9 +81,9 @@ Als de verzendstatus "1 {status_1_text}" of
 U dient de factuur dan handmatig aan te maken in Acumulus of deze aan te passen
 en nogmaals te versturen.
 
-Verzendstatus: {status} {status_text}.
-Order:         {order_id}
-Factuur:       {invoice_id}
+Verzendstatus:    {status} {status_text}.
+(Webshop)Order:   {order_id}
+(Webshop)Factuur: {invoice_id}
 
 Berichten:
 {messages}
@@ -105,8 +107,8 @@ U dient de factuur dan handmatig aan te maken in Acumulus of deze aan te passen
 en nogmaals te versturen.</p>
 <table>
   <tr><td>Verzendstatus:</td><td>{status} {status_text}.</td></tr>
-  <tr><td>Order:</td><td>{order_id}</td></tr>
-  <tr><td>Factuur:</td><td>{invoice_id}</td></tr>
+  <tr><td>(Webshop)Order:</td><td>{order_id}</td></tr>
+  <tr><td>(Webshop)Factuur:</td><td>{invoice_id}</td></tr>
 </table>
 <p>Berichten:<br>
 {messages_html}</p>
@@ -190,3 +192,7 @@ $_['manual_invoice_sent'] = "Factuur '%s' verzonden";
 $_['manual_invoice_not_found'] = "Factuur '%s' niet gevonden";
 $_['manual_creditmemo_sent'] = "Creditmemo '%s' verzonden";
 $_['manual_creditmemo_not_found'] = "Credit memo '%s' niet gevonden";
+
+// Uninstall form
+$_['uninstallHeader'] = 'Bevestig verwijderen';
+$_['desc_uninstall'] = 'De module is uitgeschakeld. Maak een keuze of u ook alle data en instellingen wilt verwijderen of dat u deze (voorlopig) wilt bewaren.';

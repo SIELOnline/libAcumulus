@@ -9,6 +9,8 @@ $_['text_home'] = 'Home';
 $_['button_settings'] = 'Settings';
 $_['button_save'] = 'Save';
 $_['button_back'] = 'Back to list';
+$_['button_confirm_uninstall'] = 'Yes, uninstall data and settings';
+$_['button_cancel_uninstall'] = 'No, disable only, keep data and settings';
 $_['button_cancel'] = 'Cancel';
 $_['button_send'] = 'Send';
 
@@ -78,9 +80,9 @@ If the send state equals "1 {status_1_text}" or
 You will have to manually create the incvoice in Acumulus or adapt it in your
 web shop and resend it to Acumulus.
 
-Send state: {status} {status_text}.
-Order:      {order_id}
-Invoice:    {invoice_id}
+Send state:        {status} {status_text}.
+(Webshop) Order:   {order_id}
+(Webshop) Invoice: {invoice_id}
 
 Messages:
 {messages}
@@ -102,8 +104,8 @@ You will have to manually create the incvoice in Acumulus or adapt it in your
 web shop and resend it to Acumulus.</p>
 <table>
   <tr><td>Send state:</td><td>{status} {status_text}.</td></tr>
-  <tr><td>Order:</td><td>{order_id}</td></tr>
-  <tr><td>Invoice:</td><td>{invoice_id}</td></tr>
+  <tr><td>(Webshop) Order:</td><td>{order_id}</td></tr>
+  <tr><td>(Webshop) Invoice:</td><td>{invoice_id}</td></tr>
 </table>
 <p>Messages:<br>
 {messages_html}</p>
@@ -189,3 +191,7 @@ $_['manual_invoice_sent'] = "Factuur '%s' has been sent";
 $_['manual_invoice_not_found'] = "Factuur '%s' not found";
 $_['manual_creditmemo_sent'] = "Creditmemo '%s' has been sent";
 $_['manual_creditmemo_not_found'] = "Credit memo '%s' not found";
+
+// Uninstall form
+$_['uninstallHeader'] = 'Confirm uninstall';
+$_['desc_uninstall'] = 'The module has been disabled. Choose whether you also want to delete all data and settings or if you want to keep these for now.';

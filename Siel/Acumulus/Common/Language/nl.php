@@ -61,6 +61,7 @@ $_['coupon_code'] = 'Cadeaubon';
 $_['gift_wrapping'] = 'Cadeauverpakking';
 $_['fee'] = 'Behandelkosten';
 $_['refund'] = 'Terugbetaling';
+$_['refund_adjustment'] = 'Aanpassing kredietbedrag';
 
 // Mails
 $_['mail_sender_name'] = 'Uw webwinkel';

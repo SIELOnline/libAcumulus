@@ -61,6 +61,7 @@ $_['coupon_code'] = 'Voucher';
 $_['gift_wrapping'] = 'Gift wrapping';
 $_['fee'] = 'Order treatment costs';
 $_['refund'] = 'Refund';
+$_['refund_adjustment'] = 'Refund adjustment';
 
 
 // Mails

@@ -11,8 +11,6 @@ namespace Siel\Acumulus\Common;
  *
  * Configuration is stored in the host environment (i.e. the web shop), this
  * interface abstracts from how a specific web shop does so.
- *
- * @todo: add getDefaults method
  */
 interface ConfigInterface {
   // Constants for configuration fields.

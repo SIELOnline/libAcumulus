@@ -194,13 +194,13 @@ class WebAPI {
    */
   public function getStatusText($status) {
     switch ($status) {
-      case self::Status_Success:
+      case static::Status_Success:
         return $this->config->t('message_response_0');
-      case self::Status_Errors:
+      case static::Status_Errors:
         return $this->config->t('message_response_1');
-      case self::Status_Warnings:
+      case static::Status_Warnings:
         return $this->config->t('message_response_2');
-      case self::Status_Exception:
+      case static::Status_Exception:
         return $this->config->t('message_response_3');
       default:
         return $this->config->t('message_response_x') . $status;
@@ -429,8 +429,6 @@ class WebAPI {
    *   The order id, only used for error reporting.
    *
    * @return array
-   *
-   * @todo: remove setting locationcode and overwriteifexists from shop specific code (done: ps)
    */
   public function invoiceAdd(array $invoice, $orderId = '') {
     $invoice = $this->completeInvoice($invoice);
@@ -452,15 +450,22 @@ class WebAPI {
   }
 
   /**
+   * Completes the invoice with default settings that do not depend on shop
+   * specific data.
+   *
    * @param array $invoice
    *
    * @return array
+   *   The completed invoice.
+   *
+   * @todo: remove setting concept, locationcode and overwriteifexists from shop specific code (done: ps, wc)
    */
   protected function completeInvoice(array $invoice) {
     $invoiceSettings = $this->config->getInvoiceSettings();
     $this->addDefault($invoice['customer'], 'locationcode', $this->getLocationCode($invoice['customer']['countrycode']));
-    $this->addDefault($invoice['customer'], 'overwriteifexists', $invoiceSettings['overwriteIfExists'] ? WebAPI::OverwriteIfExists_Yes : WebAPI::OverwriteIfExists_No);
+    $this->addDefault($invoice['customer'], 'overwriteifexists', $invoiceSettings['overwriteIfExists'] ? static::OverwriteIfExists_Yes : static::OverwriteIfExists_No);
     $this->addDefault($invoice['customer'], 'type', $invoiceSettings['defaultCustomerType']);
+    $this->addDefault($invoice['customer']['invoice'], 'concept', static::Concept_No);
     $this->addDefault($invoice['customer']['invoice'], 'accountnumber', $invoiceSettings['defaultAccountNumber']);
     $this->addDefault($invoice['customer']['invoice'], 'costcenter', $invoiceSettings['defaultCostCenter']);
     $this->addDefault($invoice['customer']['invoice'], 'template', $invoiceSettings['defaultInvoiceTemplate']);
@@ -506,13 +511,13 @@ class WebAPI {
    */
   public function getLocationCode($countryCode) {
     if ($this->isNl($countryCode)) {
-      $result = self::LocationCode_NL;
+      $result = static::LocationCode_NL;
     }
     elseif ($this->isEu($countryCode)) {
-      $result = self::LocationCode_EU;
+      $result = static::LocationCode_EU;
     }
     else {
-      $result = self::LocationCode_RestOfWorld;
+      $result = static::LocationCode_RestOfWorld;
     }
     return $result;
   }
@@ -531,7 +536,7 @@ class WebAPI {
   protected function addVatType(array $invoice) {
     $customer = $invoice['customer'];
     $invoicePart = $invoice['customer']['invoice'];
-    // Set to self::VatType_MarginScheme if any line is:
+    // Set to static::VatType_MarginScheme if any line is:
     // - A used product with cost price.
     // - VAT rate is according to the margin, not the unitprice.
     // As we cannot check the latter with the available info here, we rely on
@@ -540,13 +545,13 @@ class WebAPI {
     if ($invoiceSettings['useMargin']) {
       foreach ($invoicePart['line'] as $line) {
         if (!empty($line['costprice'])) {
-          $invoice['customer']['invoice']['vattype'] = self::VatType_MarginScheme;
+          $invoice['customer']['invoice']['vattype'] = static::VatType_MarginScheme;
           return $invoice;
         }
       }
     }
 
-    // Set to self::VatType_RestOfWorld if:
+    // Set to static::VatType_RestOfWorld if:
     // - Customer is outside the EU.
     // - VAT rate = 0 for all lines.
     if (!$this->isNl($customer['countrycode']) && !$this->isEu($customer['countrycode'])) {
@@ -555,12 +560,12 @@ class WebAPI {
         $vatIs0 = $vatIs0 && $line['vatrate'] == 0;
       }
       if ($vatIs0) {
-        $invoice['customer']['invoice']['vattype'] = self::VatType_RestOfWorld;
+        $invoice['customer']['invoice']['vattype'] = static::VatType_RestOfWorld;
         return $invoice;
       }
     }
 
-    // Set to self::VatType_EuReversed if:
+    // Set to static::VatType_EuReversed if:
     // - Customer is in EU.
     // - Customer is a company (VAT number provided).
     // - VAT rate = 0 for all lines.
@@ -571,15 +576,15 @@ class WebAPI {
         $vatIs0 = $vatIs0 && $line['vatrate'] == 0;
       }
       if ($vatIs0) {
-        $invoice['customer']['invoice']['vattype'] = self::VatType_EuReversed;
+        $invoice['customer']['invoice']['vattype'] = static::VatType_EuReversed;
         return $invoice;
       }
     }
 
-    // Never set to self::VatType_NationalReversed via the API for web shops.
+    // Never set to static::VatType_NationalReversed via the API for web shops.
 
-    // Set to self::VatType_National.
-    $invoice['customer']['invoice']['vattype'] = self::VatType_National;
+    // Set to static::VatType_National.
+    $invoice['customer']['invoice']['vattype'] = static::VatType_National;
     return $invoice;
   }
 
@@ -605,7 +610,7 @@ class WebAPI {
    * @return array
    */
   protected function correctCountryCode(array $invoice) {
-    if (isset($invoice['customer']['locationcode']) && $invoice['customer']['locationcode'] === self::LocationCode_RestOfWorld) {
+    if (isset($invoice['customer']['locationcode']) && $invoice['customer']['locationcode'] === static::LocationCode_RestOfWorld) {
       if (!empty($invoice['customer']['countrycode'])) {
         // Move countrycode to city.
         $country = $this->getCountryName($invoice['customer']['countrycode']);
@@ -922,7 +927,7 @@ class WebAPI {
     $response = array(
       'errors' => array(),
       'warnings' => array(),
-      'status' => self::Status_Success,
+      'status' => static::Status_Success,
     );
 
     // Check email address.
@@ -945,7 +950,7 @@ class WebAPI {
         'codetag' => !empty($invoice['customer']['invoice']['number']) ? $invoice['customer']['invoice']['number'] : $orderId,
         'message' => $this->config->t('message_error_vat19and21'),
       );
-      $result['status'] = self::Status_Errors;
+      $result['status'] = static::Status_Errors;
     }
 
     return $response;

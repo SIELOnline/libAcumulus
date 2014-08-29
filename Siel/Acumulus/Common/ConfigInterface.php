@@ -82,13 +82,17 @@ interface ConfigInterface {
    * Returns the contract credentials to authenticate with the Acumulus API.
    *
    * @return array
-   *   A keyed array with the keys contractcode, username, password, and
-   *   optionally emailonerror, and emailonwarning.
+   *   A keyed array with the keys:
+   *   - contractcode
+   *   - username
+   *   - password
+   *   - emailonerror
+   *   - emailonwarning
    */
   public function getCredentials();
 
   /**
-   * Returns a set of default settings for an invoice when adding an invoice.
+   * Returns the set of settings related to adding an invoice.
    *
    * @return array
    *   A keyed array with the keys:
@@ -106,6 +110,19 @@ interface ConfigInterface {
    *   - useMargin
    */
   public function getInvoiceSettings();
+
+  /**
+   * Returns the set of settings related to sending an email.
+   *
+   * @return array
+   *   A keyed array with the keys:
+   *   - emailAsPdf
+   *   - emailBcc
+   *   - emailFrom
+   *   - subject
+   *   - confirmReading
+   */
+  public function getEmailAsPdfSettings();
 
   /**
    * Returns the current (2 character) language (code).

@@ -25,6 +25,8 @@ $_['message_validate_password_0'] = 'Het veld Wachtwoord is verplicht, vul het w
 $_['message_validate_email_0'] = 'Het veld Email is geen valide e-mailadres, vul uw eigen e-mailadres in.';
 $_['message_validate_email_1'] = 'Het veld Email is verplicht, vul uw eigen e-mailadres in.';
 $_['message_validate_email_2'] = 'Het veld (fictieve klant) Email is geen valide e-mailadres, vul een correct e-mailadres in.';
+$_['message_validate_email_3'] = 'Het veld BCC is geen valide e-mailadres, vul een correct e-mailadres in.';
+$_['message_validate_email_4'] = 'Het veld Afzender is geen valide e-mailadres, vul een correct e-mailadres in.';
 
 $_['message_error_vat19and21'] = 'Deze order heeft zowel 19% als 21% BTW percentages. U dient deze factuur handmatig aan te maken in Acumulus.';
 $_['message_warning_incorrect_vat'] = 'De Acumulus koppeling was niet in staat om de BTW bedragen op de factuur correct te herleiden. U dient daarom deze factuur handmatig te controleren in Acumulus!';
@@ -130,20 +132,19 @@ $_['option_empty'] = 'Maak uw keuze';
 
 $_['field_invoiceNrSource'] = 'Factuurnummer';
 $_['option_invoiceNrSource_1'] = 'Gebruik het factuurnummer van uw webwinkel. Let op: als er nog geen factuur aan een order gekoppeld is, zal het bestelnummer gebruikt worden!';
-$_['option_invoiceNrSource_2'] = 'Gebruik het bestelnummer van uw webwinkel';
-$_['option_invoiceNrSource_3'] = 'Laat Acumulus het factuurnummer bepalen';
+$_['option_invoiceNrSource_2'] = 'Gebruik het bestelnummer van uw webwinkel.';
+$_['option_invoiceNrSource_3'] = 'Laat Acumulus het factuurnummer bepalen.';
 $_['desc_invoiceNrSource'] = 'U kunt hier kiezen welk nummer Acumulus als factuurnummer moet gebruiken.';
 
 $_['field_dateToUse'] = 'Factuurdatum';
 $_['option_dateToUse_1'] = 'Gebruik de aanmaakdatum van de factuur. Let op: als er nog geen factuur aan uw order gekoppeld is, zal de aanmaakdatum van de bestelling gebruikt worden!';
-$_['option_dateToUse_2'] = 'Gebruik de aanmaakdatum van de bestelling';
-$_['option_dateToUse_3'] = 'Gebruik de datum van het overzetten';
+$_['option_dateToUse_2'] = 'Gebruik de aanmaakdatum van de bestelling.';
+$_['option_dateToUse_3'] = 'Gebruik de datum van het overzetten.';
 $_['desc_dateToUse'] = 'U kunt hier kiezen welke datum de factuur in Acumulus moet krijgen.';
 
-// @todo: vooralsnog is alleen Magento overgezet op deze nieuwe veldindeling.
 $_['field_clientData'] = 'Klantadresgegevens';
-$_['option_sendCustomer'] = 'Uw (niet zakelijke) klanten automatisch aan uw relaties in Acumulus toevoegen';
-$_['option_overwriteIfExists'] = 'Overschrijf bestaande adresgegevens';
+$_['option_sendCustomer'] = 'Uw (niet zakelijke) klanten automatisch aan uw relaties in Acumulus toevoegen.';
+$_['option_overwriteIfExists'] = 'Overschrijf bestaande adresgegevens.';
 $_['desc_clientData'] = 'Binnen Acumulus is het mogelijk om uw klantrelaties te beheren.
 Deze koppeling voegt automatisch uw klanten aan het relatieoverzicht van Acumulus toe.
 Dit is niet altijd gewenst en kunt u voorkomen door de eerste optie uit te zetten.
@@ -163,21 +164,37 @@ $_['field_defaultInvoiceTemplate'] = 'Factuur-sjabloon';
 $_['desc_defaultInvoiceTemplate'] = 'Maakt u binnen Acumulus gebruik van meerdere factuur-sjablonen en wilt u alle orders uit uw webwinkel op een specifieke factuursjabloon printen, kies dan hier het factuur-sjabloon.';
 
 $_['field_triggerOrderEvent'] = 'Moment van versturen';
-$_['option_triggerOrderEvent_1'] = 'Als een order de hieronder door u gekozen status bereikt';
-$_['option_triggerOrderEvent_2'] = 'Als de factuur wordt aangemaakt voor deze order';
+$_['option_triggerOrderEvent_1'] = 'Als een order de hieronder door u gekozen status bereikt.';
+$_['option_triggerOrderEvent_2'] = 'Als de factuur wordt aangemaakt voor deze order.';
 $_['desc_triggerOrderEvent'] = 'U kunt hier kiezen op welk moment de factuur wordt verstuurd. Deze koppeling gebruikt alleen gegevens van de order, dus u kunt elke status kiezen. De factuur hoeft dus nog niet aangemaakt te zijn.';
 
 $_['option_empty_triggerOrderStatus'] = 'Niet automatisch overzetten';
 $_['field_triggerOrderStatus'] = 'Orderstatus';
 $_['desc_triggerOrderStatus'] = 'U kunt hier kiezen bij welke orderstatus facturen worden overgezet naar Acumulus. Als u voor "Niet automatisch overzetten" kiest, doet deze module niets.';
 
+$_['emailAsPdfSettingsHeader'] = 'PDF Factuur';
+$_['desc_emailAsPdfInformation'] = 'Bij het versturen van ordergegevens naar Acumulus, kunt u Acumulus een PDF factuur laten versturen naar uw klant. Deze wordt direct verstuurd naar het door de klant opgegeven emailadres, ook bij waarschuwingen, maar niet bij fouten. Deze optie werkt ook als u uw klantgegevens niet naar Acumulus laat versturen, maar u kunt dan geen herinneringen of duplicaten meer versturen.';
+
+$_['field_emailAsPdf'] = 'Optie inschakelen';
+$_['option_emailAsPdf'] = 'Verstuur de factuur als PDF vanuit Acumulus.';
+$_['desc_emailAsPdf'] = 'Als u deze optie aanvinkt, kunt u de overige opties gebruiken om de emailverzending aan uw wensen aan te passen. Het bericht in de email body kunt u niet hier instellen, dat kunt u in Acumulus doen onder "Beheer - Factuur-sjablonen".';
+
+$_['field_emailFrom'] = 'Afzender';
+$_['desc_emailFrom'] = 'Het email adres dat als afzender gebruikt moet worden. Als u dit leeg laat wordt het standaard emailadres van de webwinkel gebruikt.';
+
+$_['field_emailBcc'] = 'BCC';
+$_['desc_emailBcc'] = 'Additionele emailadressen om de factuur naar toe te sturen, bv. het emailadres van uw eigen administratie-afdeling. Als u dit leeg laat wordt de factuur alleen naar de klant verstuurd.';
+
+$_['field_subject'] = 'Onderwerp';
+$_['desc_subject'] = 'Het onderwerp van de email. Als u dit leeg laat wordt "Factuur [factuurnummer] Order [bestelnummer]" gebruikt. U kunt [#b] gebruiken om het bestelnummer in de onderwerpregel te plaatsen en [#f] voor het factuurnummer (van de webshop, niet van Acumulus).';
+
 $_['versionInformationHeader'] = 'Informatie over deze module';
 $_['desc_versionInformation'] = 'Vermeldt aub deze gegevens bij een supportverzoek.';
 
 $_['field_debug'] = 'Support en debug';
-$_['option_debug_1'] = 'Verzend berichten naar Acumulus en ontvang alleen een mail bij fouten of waarschuwingen';
-$_['option_debug_2'] = 'Verzend berichten naar Acumulus en ontvang een mail met het verzonden en ontvangen bericht';
-$_['option_debug_3'] = 'Verzend geen berichten naar Acumulus, verstuur alleen een mail met het bericht dat verstuurd zou worden';
+$_['option_debug_1'] = 'Verzend berichten naar Acumulus en ontvang alleen een mail bij fouten of waarschuwingen.';
+$_['option_debug_2'] = 'Verzend berichten naar Acumulus en ontvang een mail met het verzonden en ontvangen bericht.';
+$_['option_debug_3'] = 'Verzend geen berichten naar Acumulus, verstuur alleen een mail met het bericht dat verstuurd zou worden.';
 $_['desc_debug'] = 'U kunt hier een support mode kiezen. Kies voor de eerste optie tenzij u i.v.m. een supportverzoek bent geïnstrueerd om iets anders te kiezen.';
 
 // Send manual form

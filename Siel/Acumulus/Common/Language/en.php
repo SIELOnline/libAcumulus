@@ -22,9 +22,11 @@ $_['message_validate_contractcode_0'] = 'The field Contract code is required, pl
 $_['message_validate_contractcode_1'] = 'The field Contract code is a numeric field, please fill in the contract code you use to log in to Acumulus.';
 $_['message_validate_username_0'] = 'The field User name is required, please fill in the user name you use to log in to Acumulus.';
 $_['message_validate_password_0'] = 'The field Password is required, please fill in the password you use to log in to Acumulus.';
-$_['message_validate_email_0'] = 'The field Email is not a valid e-mail address, please fill in you own e-mail address.';
+$_['message_validate_email_0'] = 'The field Email is not a valid e-mail address, please fill in your own e-mail address.';
 $_['message_validate_email_1'] = 'The field Email is required, please fill in you own e-mail address.';
 $_['message_validate_email_2'] = 'The field (fictitious customer) Email is not a valid e-mail address, please fill in a correct e-mail address.';
+$_['message_validate_email_3'] = 'The field BCC is not a valid e-mail address, please fill in a valid e-mail address.';
+$_['message_validate_email_4'] = 'The field Sender is not a valid e-mail address, please fill in a valid e-mail address.';
 
 $_['message_error_vat19and21'] = 'This order has both 19% and 21% VAT rates. You will have to manually enter this order into Acumulus.';
 $_['message_warning_incorrect_vat'] = 'The Acumulus module was not able to correctly determine the VAT amounts on the invoice. You should check and correct this invoice manually in Acumulus!';
@@ -127,28 +129,25 @@ $_['option_empty'] = 'Select one';
 
 $_['field_invoiceNrSource'] = 'Invoice number';
 $_['option_invoiceNrSource_1'] = 'Use the web shop invoice number. Note: if no invoice has been created for the order yet, the order number will be used!';
-$_['option_invoiceNrSource_2'] = 'Use the web shop order number as invoice number';
-$_['option_invoiceNrSource_3'] = 'Have Acumulus create an invoice number';
+$_['option_invoiceNrSource_2'] = 'Use the web shop order number as invoice number.';
+$_['option_invoiceNrSource_3'] = 'Have Acumulus create an invoice number.';
 $_['desc_invoiceNrSource'] = 'Select which number to use for the invoice in Acumulus.';
 
 $_['field_dateToUse'] = 'Invoice date';
 $_['option_dateToUse_1'] = 'Use the invoice date. Note: if no invoice has been created for the order yet, the order create date will be used!';
-$_['option_dateToUse_2'] = 'Use the order create date';
-$_['option_dateToUse_3'] = 'Use the transfer date';
+$_['option_dateToUse_2'] = 'Use the order create date.';
+$_['option_dateToUse_3'] = 'Use the transfer date.';
 $_['desc_dateToUse'] = 'Select which date to use for the invoice in Acumulus.';
 
 $_['field_clientData'] = 'Customer address data';
-$_['option_sendCustomer'] = 'Send consumer client records to Acumulus';
-$_['option_overwriteIfExists'] = 'Overwrite existing address data';
+$_['option_sendCustomer'] = 'Send consumer client records to Acumulus.';
+$_['option_overwriteIfExists'] = 'Overwrite existing address data.';
 $_['desc_clientData'] = 'Acumulus allows you to store client data.
 This extension automatically sends client data to Acumulus.
 If you don\'t want this, uncheck this option.
 All consumer invoices will be booked on one and the same fictitious client.
 You should uncheck the second option if you edit customer address data manually in Acumulus.
 If you unchecked the first option, the second option only applies to business clients.';
-
-//$_['field_genericCustomerEmail'] = 'E-mail fictitious client';
-//$_['desc_genericCustomerEmail'] = 'If you checked the option above, then please create a fictitious relation, including an e-mail address, in Acumulus and fill in that e-mail address.';
 
 $_['field_defaultCustomerType'] = 'Create customers as';
 
@@ -162,21 +161,37 @@ $_['field_defaultInvoiceTemplate'] = 'Invoice template';
 $_['desc_defaultInvoiceTemplate'] = 'Select the invoice template to print your web shop orders with.';
 
 $_['field_triggerOrderEvent'] = 'Send the invoice to Acumulus';
-$_['option_triggerOrderEvent_1'] = 'When an order reaches the state as defined below';
-$_['option_triggerOrderEvent_2'] = 'When the invoice gets created for this order';
+$_['option_triggerOrderEvent_1'] = 'When an order reaches the state as defined below.';
+$_['option_triggerOrderEvent_2'] = 'When the invoice gets created for this order.';
 $_['desc_triggerOrderEvent'] = 'Select when to send the invoice to Acumulus. This extension only uses order data. so you may select any status. The invoice does not already have to be created.';
 
 $_['option_empty_triggerOrderStatus'] = 'Do not send automatically';
 $_['field_triggerOrderStatus'] = 'Order state';
 $_['desc_triggerOrderStatus'] = 'Select the order state at which orders will be sent to Acumulus. If you select "Do not send automatically" this module will do nothing.';
 
+$_['emailAsPdfSettingsHeader'] = 'PDF Invoice';
+$_['desc_emailAsPdfInformation'] = 'On sending the orderdetails to Acumulus, Acumulus can send a PDF invoice to your customer. The mail will be sent to the clients\' email address, even if there are warnings, though not when there are errors. This feature works even if you don\'t send your customer data to Acumulus, although in that case you can\'t send a reminder or duplicate later on.';
+
+$_['field_emailAsPdf'] = 'Enable the feature';
+$_['option_emailAsPdf'] = 'Have Acumulus send the invoice as PDF.';
+$_['desc_emailAsPdf'] = 'If you check this option, you can use the other options below to configure the emails to your preferences. However, to configure the text in them mail body, go to Acumulus to "Beheer - Factuur-sjablonen".';
+
+$_['field_emailFrom'] = 'Sender';
+$_['desc_emailFrom'] = 'The email address to use as sender. If you leave this empty your default webshop email address will be used.';
+
+$_['field_emailBcc'] = 'BCC';
+$_['desc_emailBcc'] = 'Additional email addresses to send the invoice to, e.g. the email address of your own administration department. If you leave this empty the invoice email will only be sent to your client.';
+
+$_['field_subject'] = 'Subject';
+$_['desc_subject'] = 'The subject line of the email. If you leave this empty "Invoice [invoice#] Order [order#]" will be used. You can use [#b] to place the order number in the subject and [#f] for the invoice number (from the webshop, not Acumulus).';
+
 $_['versionInformationHeader'] = 'Module information';
 $_['desc_versionInformation'] = 'Please mention this information with any support request.';
 
 $_['field_debug'] = 'Debug and support';
-$_['option_debug_1'] = 'Send messages to Acumulus and only receive a mail when there are errors or warnings';
-$_['option_debug_2'] = 'Send messages to Acumulus and receive a mail with the results';
-$_['option_debug_3'] = 'Do not send messages to Acumulus, but receive a mail with the message as would have been sent';
+$_['option_debug_1'] = 'Send messages to Acumulus and only receive a mail when there are errors or warnings.';
+$_['option_debug_2'] = 'Send messages to Acumulus and receive a mail with the results.';
+$_['option_debug_3'] = 'Do not send messages to Acumulus, but receive a mail with the message as would have been sent.';
 $_['desc_debug'] = 'Select a debug mode. Choose for the first option unless otherwise instructed by support staff.';
 
 // Send manual form

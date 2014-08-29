@@ -14,7 +14,7 @@ abstract class BaseConfig implements ConfigInterface{
    *
    * @var string
    */
-  public static $library_version = '3.4.2';
+  public static $library_version = '3.5.0';
 
   /** @var bool */
   protected $isLoaded;
@@ -58,6 +58,13 @@ abstract class BaseConfig implements ConfigInterface{
       'overwriteIfExists' => true,
       'genericCustomerEmail' => 'consumer@' . $hostName,
       'triggerOrderEvent' => ConfigInterface::TriggerOrderEvent_OrderStatus,
+
+      // Default 'email invoice as pdf' settings.
+      'emailAsPdf' => false,
+      'emailBcc' => '',  // Empty: no bcc.
+      'emailFrom' => '', // Empty: default shop address.
+      'subject' => '', // Empty: default from Acumulus.
+      'confirmReading' => false, // No UI for this setting.
     );
     $this->translator = $language instanceof TranslatorInterface ? $language : new BaseTranslator($language);
   }
@@ -240,6 +247,19 @@ abstract class BaseConfig implements ConfigInterface{
   }
 
   /**
+   * @inheritdoc
+   */
+  public function getEmailAsPdfSettings() {
+    return array(
+      'emailAsPdf' => $this->get('emailAsPdf'),
+      'emailBcc' => $this->get('emailBcc'),
+      'emailFrom' => $this->get('emailFrom'),
+      'subject' => $this->get('subject'),
+      'confirmReading' => $this->get('confirmReading'),
+    );
+  }
+
+  /**
    * Performs common config form validation and casts values to their correct
    * type.
    *
@@ -249,6 +269,8 @@ abstract class BaseConfig implements ConfigInterface{
    *   A, possibly empty, array with validation error messages.
    */
   public function validateValues(array &$values) {
+    $regexpEmail = '/^[^@<>,; "\']+@([^.@ ,;]+\.)+[^.@ ,;]+$/';
+    $regexpMultiEmail = '/^[^@<>,; "\']+@([^.@ ,;]+\.)+[^.@ ,;]+([,;][^@<>,; "\']+@([^.@ ,;]+\.)+[^.@ ,;]+)*$/';
     $result = array();
     if (empty($values['contractcode'])) {
       $result['contractcode'] = $this->t('message_validate_contractcode_0');
@@ -265,14 +287,18 @@ abstract class BaseConfig implements ConfigInterface{
     if (empty($values['emailonerror'])) {
       $result['emailonerror'] = $this->t('message_validate_email_1');
     }
-    else if (!preg_match('/^[^@]+@([^.@]+\.)+[^.@]+$/', $values['emailonerror'])) {
+    else if (!preg_match($regexpEmail, $values['emailonerror'])) {
       $result['emailonerror'] = $this->t('message_validate_email_0');
     }
-
-    if (!empty($values['genericCustomerEmail'])  && !preg_match('/^[^@]+@([^.@]+\.)+[^.@]+$/', $values['genericCustomerEmail'])) {
+    if (!empty($values['genericCustomerEmail'])  && !preg_match($regexpEmail, $values['genericCustomerEmail'])) {
       $result['genericCustomerEmail'] = $this->t('message_validate_email_2');
     }
-
+    if (!empty($values['emailFrom'])  && !preg_match($regexpEmail, $values['emailFrom'])) {
+      $result['emailFrom'] = $this->t('message_validate_email_4');
+    }
+    if (!empty($values['emailBcc'])  && !preg_match($regexpMultiEmail, $values['emailBcc'])) {
+      $result['emailBcc'] = $this->t('message_validate_email_3');
+    }
     return $result;
   }
 
@@ -314,6 +340,12 @@ abstract class BaseConfig implements ConfigInterface{
     if (isset($values['triggerOrderEvent'])) {
       $values['triggerOrderEvent'] = (int) $values['triggerOrderEvent'];
     }
+    if (isset($values['emailAsPdf'])) {
+      $values['emailAsPdf'] = (bool) $values['emailAsPdf'];
+    }
+    if (isset($values['confirmReading'])) {
+      $values['confirmReading'] = (bool) $values['confirmReading'];
+    }
     if (isset($values['debug'])) {
       $values['debug'] = (int) $values['debug'];
     }
@@ -342,6 +374,11 @@ abstract class BaseConfig implements ConfigInterface{
       'triggerOrderEvent',
       'triggerOrderStatus',
       'useMargin',
+      'emailAsPdf',
+      'emailBcc',
+      'emailFrom',
+      'subject',
+      'confirmReading',
       'debug',
     );
   }

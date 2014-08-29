@@ -59,6 +59,9 @@ class WebAPI {
   const VatType_RestOfWorld = 4;
   const VatType_MarginScheme = 5;
 
+  const ConfirmReading_No = 0;
+  const ConfirmReading_Yes = 1;
+
   /** @var \Siel\Acumulus\Common\ConfigInterface */
   protected $config;
 
@@ -436,6 +439,9 @@ class WebAPI {
     // Correct countrycode (if in rest of world).
     $invoice = $this->correctCountryCode($invoice);
 
+    // Email as pdf (if set so, call before calling fictitiousClient()).
+    $invoice = $this->emailAsPdf($invoice, $orderId);
+
     // Change to fictitious client (if set so).
     $invoice = $this->fictitiousClient($invoice);
 
@@ -457,8 +463,6 @@ class WebAPI {
    *
    * @return array
    *   The completed invoice.
-   *
-   * @todo: remove setting concept, locationcode and overwriteifexists from shop specific code (done: ps, wc)
    */
   protected function completeInvoice(array $invoice) {
     $invoiceSettings = $this->config->getInvoiceSettings();
@@ -876,6 +880,31 @@ class WebAPI {
       'CH' => 'Zwitserland',
     );
     return isset($countryNames[$code]) ? $countryNames[$code] : $code;
+  }
+
+  /**
+   * Adds an emailaspdf section if enabled.
+   *
+   * @param array $invoice
+   * @param string $orderId
+   *
+   * @return array
+   */
+  protected function emailAsPdf(array $invoice, $orderId) {
+    $emailAsPdfSettings = $this->config->getEmailAsPdfSettings();
+    if ($emailAsPdfSettings['emailAsPdf'] && !empty($invoice['customer']['email'])) {
+      $invoice['customer']['invoice']['emailaspdf'] = array(
+        'emailto' => $invoice['customer']['email'],
+        'emailbcc' => $emailAsPdfSettings['emailBcc'],
+        'emailfrom' => $emailAsPdfSettings['emailFrom'],
+        'subject' => strtr($emailAsPdfSettings['subject'], array(
+          '[#b]' => $orderId,
+          '[#f]' => isset($invoice['customer']['invoice']['number']) ? $invoice['customer']['invoice']['number'] : '',
+        )),
+        'confirmreading' => $emailAsPdfSettings['confirmReading'] ? static::ConfirmReading_Yes : static::ConfirmReading_No,
+      );
+    }
+    return $invoice;
   }
 
   /**

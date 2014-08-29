@@ -27,6 +27,7 @@ $_['message_validate_email_1'] = 'The field Email is required, please fill in yo
 $_['message_validate_email_2'] = 'The field (fictitious customer) Email is not a valid e-mail address, please fill in a correct e-mail address.';
 $_['message_validate_email_3'] = 'The field BCC is not a valid e-mail address, please fill in a valid e-mail address.';
 $_['message_validate_email_4'] = 'The field Sender is not a valid e-mail address, please fill in a valid e-mail address.';
+$_['message_validate_conflicting_options'] = 'If you don\'t send customer data to Acumulus, Acumulus cannot send PDF invoices. Change one of the options.';
 
 $_['message_error_vat19and21'] = 'This order has both 19% and 21% VAT rates. You will have to manually enter this order into Acumulus.';
 $_['message_warning_incorrect_vat'] = 'The Acumulus module was not able to correctly determine the VAT amounts on the invoice. You should check and correct this invoice manually in Acumulus!';
@@ -170,7 +171,7 @@ $_['field_triggerOrderStatus'] = 'Order state';
 $_['desc_triggerOrderStatus'] = 'Select the order state at which orders will be sent to Acumulus. If you select "Do not send automatically" this module will do nothing.';
 
 $_['emailAsPdfSettingsHeader'] = 'PDF Invoice';
-$_['desc_emailAsPdfInformation'] = 'On sending the orderdetails to Acumulus, Acumulus can send a PDF invoice to your customer. The mail will be sent to the clients\' email address, even if there are warnings, though not when there are errors. This feature works even if you don\'t send your customer data to Acumulus, although in that case you can\'t send a reminder or duplicate later on.';
+$_['desc_emailAsPdfInformation'] = 'On sending the order details to Acumulus, Acumulus can send a PDF invoice to your customer. The mail will be sent to the clients\' email address.';
 
 $_['field_emailAsPdf'] = 'Enable the feature';
 $_['option_emailAsPdf'] = 'Have Acumulus send the invoice as PDF.';

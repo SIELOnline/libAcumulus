@@ -299,6 +299,10 @@ abstract class BaseConfig implements ConfigInterface{
     if (!empty($values['emailBcc'])  && !preg_match($regexpMultiEmail, $values['emailBcc'])) {
       $result['emailBcc'] = $this->t('message_validate_email_3');
     }
+    if (isset($values['emailAsPdf']) && (bool) $values['emailAsPdf'] && (!array_key_exists('sendCustomer', $values) || !(bool) $values['sendCustomer'])) {
+      $result['conflicting_options'] = $this->t('message_validate_conflicting_options');
+    }
+
     return $result;
   }
 

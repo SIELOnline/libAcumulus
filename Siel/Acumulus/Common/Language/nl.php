@@ -27,6 +27,7 @@ $_['message_validate_email_1'] = 'Het veld Email is verplicht, vul uw eigen e-ma
 $_['message_validate_email_2'] = 'Het veld (fictieve klant) Email is geen valide e-mailadres, vul een correct e-mailadres in.';
 $_['message_validate_email_3'] = 'Het veld BCC is geen valide e-mailadres, vul een correct e-mailadres in.';
 $_['message_validate_email_4'] = 'Het veld Afzender is geen valide e-mailadres, vul een correct e-mailadres in.';
+$_['message_validate_conflicting_options'] = 'Als u geen klantgegevens naar Acumulus verstuurt, kunt u Acumulus geen PDF factuur laten versturen. Pas één van beide opties aan.';
 
 $_['message_error_vat19and21'] = 'Deze order heeft zowel 19% als 21% BTW percentages. U dient deze factuur handmatig aan te maken in Acumulus.';
 $_['message_warning_incorrect_vat'] = 'De Acumulus koppeling was niet in staat om de BTW bedragen op de factuur correct te herleiden. U dient daarom deze factuur handmatig te controleren in Acumulus!';
@@ -173,7 +174,7 @@ $_['field_triggerOrderStatus'] = 'Orderstatus';
 $_['desc_triggerOrderStatus'] = 'U kunt hier kiezen bij welke orderstatus facturen worden overgezet naar Acumulus. Als u voor "Niet automatisch overzetten" kiest, doet deze module niets.';
 
 $_['emailAsPdfSettingsHeader'] = 'PDF Factuur';
-$_['desc_emailAsPdfInformation'] = 'Bij het versturen van ordergegevens naar Acumulus, kunt u Acumulus een PDF factuur laten versturen naar uw klant. Deze wordt direct verstuurd naar het door de klant opgegeven emailadres, ook bij waarschuwingen, maar niet bij fouten. Deze optie werkt ook als u uw klantgegevens niet naar Acumulus laat versturen, maar u kunt dan geen herinneringen of duplicaten meer versturen.';
+$_['desc_emailAsPdfInformation'] = 'Bij het versturen van ordergegevens naar Acumulus, kunt u Acumulus een PDF factuur laten versturen naar uw klant. Deze wordt direct verstuurd naar het door de klant opgegeven emailadres.';
 
 $_['field_emailAsPdf'] = 'Optie inschakelen';
 $_['option_emailAsPdf'] = 'Verstuur de factuur als PDF vanuit Acumulus.';

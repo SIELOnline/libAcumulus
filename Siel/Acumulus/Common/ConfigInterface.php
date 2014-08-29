@@ -105,6 +105,7 @@ interface ConfigInterface {
    *   - dateToUse
    *   - defaultCostCenter
    *   - defaultInvoiceTemplate
+   *   - defaultInvoicePaidTemplate
    *   - triggerOrderEvent
    *   - triggerOrderStatus
    *   - useMargin

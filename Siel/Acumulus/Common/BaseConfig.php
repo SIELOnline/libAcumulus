@@ -57,6 +57,7 @@ abstract class BaseConfig implements ConfigInterface{
       'sendCustomer' => true,
       'overwriteIfExists' => true,
       'genericCustomerEmail' => 'consumer@' . $hostName,
+      'defaultInvoicePaidTemplate' => 0,
       'triggerOrderEvent' => ConfigInterface::TriggerOrderEvent_OrderStatus,
 
       // Default 'email invoice as pdf' settings.
@@ -240,6 +241,7 @@ abstract class BaseConfig implements ConfigInterface{
       'dateToUse' => $this->get('dateToUse'),
       'defaultCostCenter' => $this->get('defaultCostCenter'),
       'defaultInvoiceTemplate' => $this->get('defaultInvoiceTemplate'),
+      'defaultInvoicePaidTemplate' => $this->get('defaultInvoicePaidTemplate'),
       'triggerOrderEvent' => $this->get('triggerOrderEvent'),
       'triggerOrderStatus' => $this->get('triggerOrderStatus'),
       'useMargin' => $this->get('useMargin'),
@@ -312,7 +314,7 @@ abstract class BaseConfig implements ConfigInterface{
    * Values that come from a submitted form are all strings. The same migth hold
    * for the config store of a web shop. However, internally we work with
    * booleans or integers. So after reading from the config store or form, we
-   * cast the values ot their expected types.
+   * cast the values to their expected types.
    *
    * @param array $values
    */
@@ -340,6 +342,9 @@ abstract class BaseConfig implements ConfigInterface{
     }
     if (isset($values['defaultInvoiceTemplate'])) {
       $values['defaultInvoiceTemplate'] = (int) $values['defaultInvoiceTemplate'];
+    }
+    if (isset($values['defaultInvoicePaidTemplate'])) {
+      $values['defaultInvoicePaidTemplate'] = (int) $values['defaultInvoicePaidTemplate'];
     }
     if (isset($values['triggerOrderEvent'])) {
       $values['triggerOrderEvent'] = (int) $values['triggerOrderEvent'];
@@ -375,6 +380,7 @@ abstract class BaseConfig implements ConfigInterface{
       'defaultAccountNumber',
       'defaultCostCenter',
       'defaultInvoiceTemplate',
+      'defaultInvoicePaidTemplate',
       'triggerOrderEvent',
       'triggerOrderStatus',
       'useMargin',

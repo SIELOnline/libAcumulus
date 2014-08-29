@@ -161,8 +161,10 @@ $_['desc_defaultAccountNumber'] = 'Maakt u binnen Acumulus gebruik van meerdere 
 $_['field_defaultCostCenter'] = 'Kostenplaats';
 $_['desc_defaultCostCenter'] = 'Maakt u binnen Acumulus gebruik van meerdere kostenplaatsen en wilt u alle orders uit uw webwinkel op een specifieke kostenplaats binnen laten komen, kies dan hier de kostenplaats.';
 
-$_['field_defaultInvoiceTemplate'] = 'Factuur-sjabloon';
-$_['desc_defaultInvoiceTemplate'] = 'Maakt u binnen Acumulus gebruik van meerdere factuur-sjablonen en wilt u alle orders uit uw webwinkel op een specifieke factuursjabloon printen, kies dan hier het factuur-sjabloon.';
+$_['field_defaultInvoiceTemplate'] = 'Factuur-sjabloon (niet betaald)';
+$_['field_defaultInvoicePaidTemplate'] = 'Factuur-sjabloon (betaald)';
+$_['option_same_template'] = 'Zelfde sjabloon als voor niet betaald';
+$_['desc_defaultInvoiceTemplates'] = 'Maakt u binnen Acumulus gebruik van meerdere factuur-sjablonen en wilt u alle orders uit uw webwinkel op een specifieke factuursjabloon printen, kies dan hier de factuur-sjablonen voor niet betaalde respectievelijk betaalde orders.';
 
 $_['field_triggerOrderEvent'] = 'Moment van versturen';
 $_['option_triggerOrderEvent_1'] = 'Als een order de hieronder door u gekozen status bereikt.';

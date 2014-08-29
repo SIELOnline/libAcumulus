@@ -158,8 +158,10 @@ $_['desc_defaultAccountNumber'] = 'Select the (bank) account number at which you
 $_['field_defaultCostCenter'] = 'Cost center';
 $_['desc_defaultCostCenter'] = 'Select the cost center to assign your orders to.';
 
-$_['field_defaultInvoiceTemplate'] = 'Invoice template';
-$_['desc_defaultInvoiceTemplate'] = 'Select the invoice template to print your web shop orders with.';
+$_['field_defaultInvoiceTemplate'] = 'Invoice template (due)';
+$_['field_defaultInvoicePaidTemplate'] = 'Invoice template (paid)';
+$_['option_same_template'] = 'Same template as for due';
+$_['desc_defaultInvoiceTemplates'] = 'Select the invoice templates to print your web shop orders with, for due respectively paid orders.';
 
 $_['field_triggerOrderEvent'] = 'Send the invoice to Acumulus';
 $_['option_triggerOrderEvent_1'] = 'When an order reaches the state as defined below.';

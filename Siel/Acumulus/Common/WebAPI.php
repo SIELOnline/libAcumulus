@@ -472,7 +472,14 @@ class WebAPI {
     $this->addDefault($invoice['customer']['invoice'], 'concept', static::Concept_No);
     $this->addDefault($invoice['customer']['invoice'], 'accountnumber', $invoiceSettings['defaultAccountNumber']);
     $this->addDefault($invoice['customer']['invoice'], 'costcenter', $invoiceSettings['defaultCostCenter']);
-    $this->addDefault($invoice['customer']['invoice'], 'template', $invoiceSettings['defaultInvoiceTemplate']);
+    if (isset($invoice['customer']['invoice']['paymentstatus'])
+        && $invoice['customer']['invoice']['paymentstatus'] == static::PaymentStatus_Paid
+        && $invoiceSettings['defaultInvoicePaidTemplate'] != 0) { // 0: use defaultInvoiceTemplate.
+      $this->addDefault($invoice['customer']['invoice'], 'template', $invoiceSettings['defaultInvoicePaidTemplate']);
+    }
+    else {
+      $this->addDefault($invoice['customer']['invoice'], 'template', $invoiceSettings['defaultInvoiceTemplate']);
+    }
 
     // Add vattype.
     $invoice = $this->addVatType($invoice);

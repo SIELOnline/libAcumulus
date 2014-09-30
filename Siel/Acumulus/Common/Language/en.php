@@ -180,7 +180,7 @@ $_['option_emailAsPdf'] = 'Have Acumulus send the invoice as PDF.';
 $_['desc_emailAsPdf'] = 'If you check this option, you can use the other options below to configure the emails to your preferences. However, to configure the text in them mail body, go to Acumulus to "Beheer - Factuur-sjablonen".';
 
 $_['field_emailFrom'] = 'Sender';
-$_['desc_emailFrom'] = 'The email address to use as sender. If you leave this empty your default webshop email address will be used.';
+$_['desc_emailFrom'] = 'The email address to use as sender. If you leave this empty, the email address of the Acumulus account owner will be used.';
 
 $_['field_emailBcc'] = 'BCC';
 $_['desc_emailBcc'] = 'Additional email addresses to send the invoice to, e.g. the email address of your own administration department. If you leave this empty the invoice email will only be sent to your client.';

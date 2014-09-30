@@ -14,7 +14,7 @@ abstract class BaseConfig implements ConfigInterface{
    *
    * @var string
    */
-  public static $library_version = '3.5.0';
+  public static $library_version = '3.6.0';
 
   /** @var bool */
   protected $isLoaded;

@@ -481,6 +481,9 @@ class WebAPI {
       $this->addDefault($invoice['customer']['invoice'], 'template', $invoiceSettings['defaultInvoiceTemplate']);
     }
 
+    // Add vat rate to 0-price products.
+    $invoice = $this->addVatRateTo0PriceLines($invoice);
+
     // Add vattype.
     $invoice = $this->addVatType($invoice);
 
@@ -531,6 +534,48 @@ class WebAPI {
       $result = static::LocationCode_RestOfWorld;
     }
     return $result;
+  }
+  /**
+   * Completes lines with free items (price = 0) by giving them the tax rate
+   * that appears the most in the other lines.
+   *
+   * @param array $invoice
+   *
+   * @return array
+   *   Adapted invoice.
+   */
+  protected function addVatRateTo0PriceLines(array $invoice) {
+    $lines = $invoice['customer']['invoice']['line'];
+    $vatRates = array();
+    foreach ($lines as $line) {
+      if ($line['vatrate'] !== null) {
+        if (isset($vatRates[$line['vatrate']])) {
+          $vatRates[$line['vatrate']]++;
+        }
+        else {
+          $vatRates[$line['vatrate']] = 1;
+        }
+      }
+    }
+
+    // Determine which vat rate occurs most.
+    if (count($vatRates) > 0) {
+      arsort($vatRates);
+      reset($vatRates);
+      list($vatRate) = each($vatRates);
+    }
+    else {
+      $vatRate = -1;
+    }
+
+    foreach ($lines as &$line) {
+      if ($line['vatrate'] === null) {
+        $line['vatrate'] = $vatRate;
+      }
+    }
+
+    $invoice['customer']['invoice']['line'] = $lines;
+    return $invoice;
   }
 
   /**

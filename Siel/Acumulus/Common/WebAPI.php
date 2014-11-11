@@ -276,17 +276,15 @@ class WebAPI {
   /**
    * Retrieves a list of accounts.
    *
-   * Besides the general response structure, the actual result of this call is
-   * returned under the following key:
-   * - accounts: an array of account information, being an array with keys:
+   * @return array
+   *   Besides the general response structure, the actual result of this call is
+   *   returned under the key 'accounts' and consists of an array of 'accounts',
+   *   each 'account' being a keyed array with keys:
    *   - accountid
    *   - accountnumber
    *   - accountdescription
    *
    * See https://apidoc.sielsystems.nl/content/picklist-accounts-bankrekeningen.
-   *
-   * @return array
-   *   A keyed array.
    */
   public function getPicklistAccounts() {
     return $this->getPicklist('account');
@@ -295,16 +293,14 @@ class WebAPI {
   /**
    * Retrieves a list of contact types.
    *
-   * Besides the general response structure, the actual result of this call is
-   * returned under the following key:
-   * - contacttypes: an array of contact type information, an array with keys:
+   * @return array
+   *   Besides the general response structure, the actual result of this call is
+   *   returned under the key 'contacttypes' and consists of an array of
+   *   'contacttypes', each 'contacttype' being a keyed array with keys:
    *   - contacttypeid
    *   - contacttypename
    *
-   * see https://apidoc.sielsystems.nl/content/picklist-contacttypes-contactsoorten.
-   *
-   * @return array
-   *   A keyed array.
+   * See https://apidoc.sielsystems.nl/content/picklist-contacttypes-contactsoorten.
    */
   public function getPicklistContactTypes() {
     return $this->getPicklist('contacttype');
@@ -313,52 +309,46 @@ class WebAPI {
   /**
    * Retrieves a list of cost centers.
    *
-   * Besides the general response structure, the actual result of this call is
-   * returned under the following key:
-   * - costcenters: an array of cost center information, an array with keys:
+   * @return array
+   *   Besides the general response structure, the actual result of this call is
+   *   returned under the key 'costcenters' and consists of an array of
+   *   'costcenters', each 'costcenter' being a keyed array with keys:
    *   - costcenterid
    *   - costcentername
    *
-   * see https://apidoc.sielsystems.nl/content/picklist-costcenters-kostenplaatsen.
-   *
-   * @return array
-   *   A keyed array.
+   * See https://apidoc.sielsystems.nl/content/picklist-costcenters-kostenplaatsen.
    */
   public function getPicklistCostCenters() {
     return $this->getPicklist('costcenter');
   }
 
   /**
-   * Retrieves a list of cost types.
-   *
-   * Besides the general response structure, the actual result of this call is
-   * returned under the following key:
-   * - costtypes: an array of cost center information, an array with keys:
-   *   - costtypeid
-   *   - costtypename
-   *
-   * see https://apidoc.sielsystems.nl/content/picklist-costtypes-kostensoorten.
+   * Retrieves a list of cost headings.
    *
    * @return array
-   *   A keyed array.
+   *   Besides the general response structure, the actual result of this call is
+   *   returned under the key 'costheadings' and consists of an array of
+   *   'costheadings', each 'costheading' being a keyed array with keys:
+   *   - costheadingid
+   *   - costheadingname
+   *
+   * See https://apidoc.sielsystems.nl/content/picklist-costheadings-kostensoorten.
    */
-  public function getPicklistCostTypes() {
-    return $this->getPicklist('costtype');
+  public function getPicklistCostHeadings() {
+    return $this->getPicklist('costheading');
   }
 
   /**
    * Retrieves a list of cost types.
    *
-   * Besides the general response structure, the actual result of this call is
-   * returned under the following key:
-   * - invoicetemplates: an array of available invoice templates, an array with keys:
+   * @return array
+   *   Besides the general response structure, the actual result of this call is
+   *   returned under the key 'invoicetemplates' and consists of an array of
+   *   'invoicetemplates', each 'invoicetemplate' being a keyed array with keys:
    *   - invoicetemplateid
    *   - invoicetemplatename
    *
-   * see https://apidoc.sielsystems.nl/content/picklist-invoice-templates-factuursjablonen.
-   *
-   * @return array
-   *   A keyed array.
+   * See https://apidoc.sielsystems.nl/content/picklist-invoice-templates-factuursjablonen.
    */
   public function getPicklistInvoiceTemplates() {
     return $this->getPicklist('invoicetemplate');
@@ -367,18 +357,16 @@ class WebAPI {
   /**
    * Retrieves a list of VAT types.
    *
-   * Besides the general response structure, the actual result of this call is
-   * returned under the following key:
-   * - vattypes: an array of available vat types, an array with keys:
-   *   - vattypeid
-   *   - vattypename
-   *
-   * see https://apidoc.sielsystems.nl/content/picklist-vattypes-btw-groepen.
-   *
    * @return array
-   *   A keyed array.
+   *   Besides the general response structure, the actual result of this call is
+   *   returned under the key 'vattypes' and consists of an array of 'vattypes',
+   *   each 'vattype' being a keyed array with keys:
+   *   - 'vattypeid'
+   *   - 'vattypename'
+   *
+   * See https://apidoc.sielsystems.nl/content/picklist-vattypes-btw-groepen.
    */
-  public function getPicklistVATTypes() {
+  public function getPicklistVatTypes() {
     return $this->getPicklist('vattype');
   }
 
@@ -394,13 +382,15 @@ class WebAPI {
    *   costcenter, etc.
    *
    * @return array
-   *   The given picklist as a keyed array.
+   *   Besides the general response structure, the actual result of this call is
+   *   returned under the key $picklist in plural format (with an 's' attached)
+   *   and consists of an array of keyed arrays, each keyed array being 1 result
+   *   of the requested picklist.
    */
   protected function getPicklist($picklist) {
     $plural = $picklist . 's';
     $response = $this->webAPICommunicator->callApiFunction("picklists/picklist_$plural", array());
     // Simplify result: remove indirection.
-    $plural = $picklist . 's';
     if (!empty($response[$plural][$picklist])) {
       $response[$plural] = $response[$plural][$picklist];
       // If there was only 1 result, it wasn't put in an array.
@@ -410,6 +400,46 @@ class WebAPI {
     }
     else {
       $response[$plural] = array();
+    }
+    return $response;
+  }
+
+  /**
+   * Retrieves a list of VAT rates for the given country at the given date.
+   *
+   * @param string $countryCode
+   *   Country code of the country to retrieve the VAT info for.
+   * @param string $date
+   *   ISO date string (yyyy-mm-dd) for the date to retrieve the VAT info for.
+   *
+   * @return array
+   *   Besides the general response structure, the actual result of this call is
+   *   returned under the key 'vatinfos' and consists of an array of 'vatinfos',
+   *   each 'vatinfo' being a keyed array with keys:
+   *   - vattype
+   *   - vatrate
+   *
+   * See https://apidoc.sielsystems.nl/content/picklist-vatinfo-btw-informatie.
+   */
+  public function getVatInfo($countryCode, $date = '') {
+    if (empty($date)) {
+      $date = date('Y-m-d');
+    }
+    $message = array(
+      'vatdate' => $date,
+      'vatcountry' => $countryCode,
+    );
+    $response = $this->webAPICommunicator->callApiFunction("picklists/picklist_vatinfo", $message);
+    // Simplify result: remove indirection.
+    if (!empty($response['vatinfo']['vat'])) {
+      $response['vatinfo'] = $response['vatinfo']['vat'];
+      // If there was only 1 result, it wasn't put in an array.
+      if (!is_array(reset($response['vatinfo']))) {
+        $response['vatinfo'] = array($response['vatinfo']);
+      }
+    }
+    else {
+      $response['vatinfo'] = array();
     }
     return $response;
   }

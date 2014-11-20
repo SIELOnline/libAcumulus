@@ -15,7 +15,7 @@ $_['button_cancel'] = 'Cancel';
 $_['button_send'] = 'Send';
 
 // Messages
-$_['message_config_saved'] = 'De settings are saved.';
+$_['message_config_saved'] = 'The settings are saved.';
 $_['message_uninstall'] = 'Are you sure to delete the configuration settings?';
 
 $_['message_validate_contractcode_0'] = 'The field Contract code is required, please fill in the contract code you use to log in to Acumulus.';

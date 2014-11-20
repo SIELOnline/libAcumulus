@@ -13,37 +13,34 @@ namespace Siel\Acumulus\Common;
 class FormRenderer {
 
   public function simpleField($type, $name, $label, $value = '', $attributes = array(), $description = '') {
-    $output = '';
-
-    $labelAttributes = array();
-    if (isset($attributes['required'])) {
-      $labelAttributes['required'] = $attributes['required'];
-      unset($attributes['required']);
-    }
-    $output .= '<div class="form-element">';
-    $output .= $this->label($label, $name, $labelAttributes);
-    $output .= $this->$type($name, $value, $attributes);
-    $output .= $this->description($description);
-    $output .= '</div>';
-
-    return $output;
+    return $this->field($type, $name, $label, $value, $attributes, $description);
   }
 
   public function listField($type, $name, $label, $options, $value = null, $attributes = array(), $description = '') {
+    return $this->field($type, $name, $label, $value, $attributes, $description, $options);
+  }
+
+  protected function field($type, $name, $label, $value, $attributes, $description, $options = null) {
     $output = '';
 
     $labelAttributes = array();
-    if (isset($attributes['required'])) {
+    if (!empty($attributes['required'])) {
       $labelAttributes['required'] = $attributes['required'];
-      unset($attributes['required']);
     }
     $output .= '<div class="form-element">';
-    $output .= $this->label($label, $type === 'select' ? $name : null, $labelAttributes);
-    $output .= $this->$type($name, $options, $value, $attributes);
+    $output .= $this->label($label, $type !== 'radio' && $type !== 'checkbox' ? $name : null, $labelAttributes);
+    if ($options === null) {
+      $output .= $this->$type($name, $value, $attributes);
+    }
+    else {
+      unset($attributes['required']);
+      $output .= $this->$type($name, $options, $value, $attributes);
+    }
     $output .= $this->description($description);
     $output .= '</div>';
 
     return $output;
+
   }
 
   /**
@@ -90,24 +87,9 @@ class FormRenderer {
     // Label.
     $required = !empty($attributes['required']) ? '<span class="required">*</span>' : '';
     unset($attributes['required']);
-    if ($id === null) {
-      if (isset($attributes['class'])) {
-        if (is_array($attributes['class'])) {
-          $attributes['class'][] = 'label';
-        }
-        else {
-          $attributes['class'] .= ' label';
-        }
-      }
-      else {
-        $attributes['class'] = 'label';
-      }
-      $output .= '<span' . $this->renderAttributes($attributes) . '>' . htmlspecialchars($text, ENT_NOQUOTES, 'UTF-8', false) . $required . '</span>';
-    }
-    else {
-      $attributes = array_merge(array('for' => $id), $attributes);
-      $output .= '<label' . $this->renderAttributes($attributes) . '>' . htmlspecialchars($text, ENT_NOQUOTES, 'UTF-8', false) . $required . '</label>';
-    }
+    $attributes = $this->addLabelAttributes($attributes, $id);
+    $tag = empty($id) ? 'span' : 'label';
+    $output .= '<' . $tag . $this->renderAttributes($attributes) . '>' . htmlspecialchars($text, ENT_NOQUOTES, 'UTF-8', false) . $required . '</' . $tag . '>';
 
     return $output;
   }
@@ -242,10 +224,10 @@ class FormRenderer {
     // Radio buttons.
     foreach ($options as $value => $text) {
       $id = $name . '_' . $value;
-      $radioAttributes = array('type' => 'radio', 'name' => $name, 'id' => $id, 'value' => $value);
+      $radioAttributes = $this->getRadioAttributes($name, $id, $value);
       // Do not match 0 as value with null as selected, but do match 0 and '0'.
       if ($selected !== null && $value == $selected) {
-        $radioAttributes['checked'] = 'checked';
+        $radioAttributes['checked'] = true;
       }
       $output .= '<input' . $this->renderAttributes($radioAttributes) . '>';
       $output .= $this->label($text, $id);
@@ -291,9 +273,9 @@ class FormRenderer {
     // Checkboxes.
     foreach ($options as $value => $text) {
       $id = $name . '_' . $value;
-      $checkboxAttributes = array('type' => 'checkbox', 'name' => $name, 'id' => $id, 'value' => $value);
+      $checkboxAttributes = $this->getCheckboxAttributes($name, $id, $value);
       if (in_array($value, $selected)) {
-        $checkboxAttributes['checked'] = 'checked';
+        $checkboxAttributes['checked'] = true;
       }
       $output .= '<input' . $this->renderAttributes($checkboxAttributes) . '>';
       $output .= $this->label($text, $id);
@@ -317,9 +299,70 @@ class FormRenderer {
       if (is_array($value)) {
         $value = join(' ', $value);
       }
-      $attributeString .= ' ' . htmlspecialchars($key, ENT_NOQUOTES, 'UTF-8', FALSE) . '="' . htmlspecialchars($value, ENT_NOQUOTES, 'UTF-8', false) . '"';
+      // Skip attributes that are not to be set (required, disabled, ...).
+      if ($value !== false ) {
+        $attributeString .= ' ' . htmlspecialchars($key, ENT_NOQUOTES, 'UTF-8', FALSE);
+        // HTML5: do not add ='value' to boolean attributes.
+        if ($value !== true) {
+          $attributeString .= '="' . htmlspecialchars($value, ENT_NOQUOTES, 'UTF-8', FALSE) . '"';
+        }
+      }
     }
     return $attributeString;
+  }
+
+  /**
+   * @param array $attributes
+   * @param string $id
+   * @param string $class
+   *
+   * @return array
+   */
+  protected function addLabelAttributes($attributes, $id, $class = 'label') {
+    $labelAttributes = $attributes;
+    if (!empty($id)) {
+      $labelAttributes['for'] = $id;
+    }
+    else if (!empty($class)) {
+      if (isset($labelAttributes['class'])) {
+        if (is_array($labelAttributes['class'])) {
+          $labelAttributes['class'][] = $class;
+        }
+        else {
+          $labelAttributes['class'] .= " $class";
+        }
+      }
+      else {
+        $labelAttributes['class'] = $class;
+      }
+    }
+    return $labelAttributes;
+  }
+
+  /**
+   * @param string $name
+   * @param string $id
+   * @param string $value
+   *
+   * @return array
+   *
+   */
+  protected function getCheckboxAttributes($name, $id, $value) {
+    $checkboxAttributes = array('type' => 'checkbox', 'name' => $name, 'id' => $id, 'value' => $value);
+    return $checkboxAttributes;
+  }
+
+  /**
+   * @param string $name
+   * @param string $id
+   * @param string $value
+   *
+   * @return array
+   *
+   */
+  protected function getRadioAttributes($name, $id, $value) {
+    $radioAttributes = array('type' => 'radio', 'name' => $name, 'id' => $id, 'value' => $value);
+    return $radioAttributes;
   }
 
 

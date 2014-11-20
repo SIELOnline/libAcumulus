@@ -126,11 +126,12 @@ class WebAPI {
    * is returned.
    *
    * @param array $result
+   * @param bool $addTraceMessages
    *
    * @return array
    *   An array with textual messages tha can be used to inform the user.
    */
-  public function resultToMessages(array $result) {
+  public function resultToMessages(array $result, $addTraceMessages = true) {
     $messages = array();
     foreach ($result['errors'] as $error) {
       $message = "{$error['code']}: ";
@@ -149,7 +150,7 @@ class WebAPI {
       $messages[] = $this->config->t('message_warning') . ' ' . $message;
     }
 
-    if (!empty($messages) || $this->config->getDebug() != ConfigInterface::Debug_None) {
+    if ($addTraceMessages && (!empty($messages) || $this->config->getDebug() != ConfigInterface::Debug_None)) {
       if (isset($result['trace'])) {
         $messages[] = $this->config->t('message_info_for_user');
         if (isset($result['trace']['request'])) {
@@ -643,7 +644,7 @@ class WebAPI {
     if (!$this->isNl($customer['countrycode']) && !$this->isEu($customer['countrycode'])) {
       $vatIs0 = TRUE;
       foreach ($invoicePart['line'] as $line) {
-        $vatIs0 = $vatIs0 && $line['vatrate'] == 0;
+        $vatIs0 = $vatIs0 && ($line['vatrate'] == 0 || $line['vatrate'] == -1);
       }
       if ($vatIs0) {
         $invoice['customer']['invoice']['vattype'] = static::VatType_RestOfWorld;
@@ -946,8 +947,8 @@ class WebAPI {
       'VA' => 'Vaticaanstad',
       'VE' => 'Venezuela',
       'AE' => 'Verenigde Arabische Emiraten',
-      'US' => 'VerenigdeStaten',
-      'GB' => 'VerenigdKoninkrijk',
+      'US' => 'Verenigde Staten',
+      'GB' => 'Verenigd Koninkrijk',
       'VN' => 'Vietnam',
       'WF' => 'Wallis en Futuna',
       'EH' => 'Westelijke Sahara',

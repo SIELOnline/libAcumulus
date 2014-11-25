@@ -195,6 +195,7 @@ $_['field_debug'] = 'Debug and support';
 $_['option_debug_1'] = 'Send messages to Acumulus and only receive a mail when there are errors or warnings.';
 $_['option_debug_2'] = 'Send messages to Acumulus and receive a mail with the results.';
 $_['option_debug_3'] = 'Do not send messages to Acumulus, but receive a mail with the message as would have been sent.';
+$_['option_debug_4'] = 'Send messages to Acumulus, but Acumulus will only check the input for errors and warnings, not store any changes.';
 $_['desc_debug'] = 'Select a debug mode. Choose for the first option unless otherwise instructed by support staff.';
 
 // Send manual form

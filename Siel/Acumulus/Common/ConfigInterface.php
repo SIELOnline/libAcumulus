@@ -27,6 +27,7 @@ interface ConfigInterface {
 
   const Debug_None = 1;
   const Debug_SendAndLog = 2;
+  const Debug_TestMode = 4;
   const Debug_StayLocal = 3;
 
   /**

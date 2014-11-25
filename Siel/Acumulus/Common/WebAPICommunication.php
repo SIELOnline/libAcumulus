@@ -21,6 +21,8 @@ class WebAPICommunication {
   const Status_Errors = 1;
   const Status_Warnings = 2;
   const Status_Exception = 3;
+  const TestMode_Normal = 0;
+  const TestMode_Test = 1;
 
   /** @var \Siel\Acumulus\Common\ConfigInterface */
   protected $config;
@@ -67,6 +69,7 @@ class WebAPICommunication {
       $message = array_merge(array(
         'contract' => $this->config->getCredentials(),
         'format' => $this->config->getOutputFormat(),
+        'testmode' => $this->config->getDebug() == ConfigInterface::Debug_TestMode ? static::TestMode_Test : static::TestMode_Normal ,
         'connector' => array(
           'application' => "{$environment['shopName']} {$environment['shopVersion']}",
           'webkoppel' => "Acumulus {$environment['moduleVersion']}",
@@ -131,17 +134,17 @@ class WebAPICommunication {
     // - Add status if not set. if no status is present the call failed, so we
     //   set the status to 1.
     if (!isset($response['status'])) {
-      $response['status'] = self::Status_Errors;
+      $response['status'] = static::Status_Errors;
     }
 
     // - Check if status is consistent (local errors and warnings should alter
     //   the status as well.
-    if ($response['status'] == self::Status_Success) {
+    if ($response['status'] == static::Status_Success) {
       if (!empty($response['warnings'])) {
-        $response['status'] = self::Status_Warnings;
+        $response['status'] = static::Status_Warnings;
       }
       if (!empty($response['errors'])) {
-        $response['status'] = self::Status_Errors;
+        $response['status'] = static::Status_Errors;
       }
     }
 

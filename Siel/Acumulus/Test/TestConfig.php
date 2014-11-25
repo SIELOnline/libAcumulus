@@ -28,8 +28,7 @@ class TestConfig extends BaseConfig {
       //'apiVersion' => 'stable',
       //'apiVersion' => 'dev',
       'apiVersion' => '1.22',
-      'debug' => ConfigInterface::Debug_SendAndLog,
-      //* Enabling local means that no communication with the server takes place: the request will be returned */'local' => true,
+      'debug' => ConfigInterface::Debug_TestMode,
     ));
   }
 

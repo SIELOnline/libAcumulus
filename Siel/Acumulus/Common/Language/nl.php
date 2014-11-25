@@ -198,6 +198,7 @@ $_['field_debug'] = 'Support en debug';
 $_['option_debug_1'] = 'Verzend berichten naar Acumulus en ontvang alleen een mail bij fouten of waarschuwingen.';
 $_['option_debug_2'] = 'Verzend berichten naar Acumulus en ontvang een mail met het verzonden en ontvangen bericht.';
 $_['option_debug_3'] = 'Verzend geen berichten naar Acumulus, verstuur alleen een mail met het bericht dat verstuurd zou worden.';
+$_['option_debug_4'] = 'Verzend berichten naar Acumulus maar Acumulus zal alleen de invoer controleren op fouten en waarschuwingen en geen veranderingen opslaan.';
 $_['desc_debug'] = 'U kunt hier een support mode kiezen. Kies voor de eerste optie tenzij u i.v.m. een supportverzoek bent geïnstrueerd om iets anders te kiezen.';
 
 // Send manual form

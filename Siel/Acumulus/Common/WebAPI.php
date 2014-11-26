@@ -430,7 +430,7 @@ class WebAPI {
       'vatdate' => $date,
       'vatcountry' => $countryCode,
     );
-    $response = $this->webAPICommunicator->callApiFunction("picklists/picklist_vatinfo", $message);
+    $response = $this->webAPICommunicator->callApiFunction("lookups/lookup_vatinfo", $message);
     // Simplify result: remove indirection.
     if (!empty($response['vatinfo']['vat'])) {
       $response['vatinfo'] = $response['vatinfo']['vat'];

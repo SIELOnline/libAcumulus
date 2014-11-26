@@ -25,9 +25,10 @@ class TestConfig extends BaseConfig {
       'shopName' => 'Test',
       'shopVersion' => $this->values['libraryVersion'],
       'baseUri' => 'https://api.sielsystems.nl/acumulus',
-      //'apiVersion' => 'stable',
+      'apiVersion' => 'stable',
       //'apiVersion' => 'dev',
-      'apiVersion' => '1.22',
+      //'apiVersion' => '1.22',
+      //'debug' => ConfigInterface::Debug_None,
       'debug' => ConfigInterface::Debug_TestMode,
     ));
   }

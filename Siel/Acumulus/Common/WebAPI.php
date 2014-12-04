@@ -420,7 +420,7 @@ class WebAPI {
    *   - vattype
    *   - vatrate
    *
-   * See https://apidoc.sielsystems.nl/content/picklist-vatinfo-btw-informatie.
+   * See https://apidoc.sielsystems.nl/content/lookup-vatinfo-btw-informatie.
    */
   public function getVatInfo($countryCode, $date = '') {
     if (empty($date)) {
@@ -448,21 +448,24 @@ class WebAPI {
   /**
    * Adds an invoice to Acumulus.
    *
-   * Besides the general response structure, the actual result of this call is
-   * returned under the following key:
-   * - invoice: an array of information about the created invoice, being an
-   *   array with keys:
-   *   - invoicenumber
-   *   - token
-   *   - entryid
-   * See https://apidoc.sielsystems.nl/content/invoice-add.
-   *
    * @param array $invoice
    *   The invoice to add.
    * @param string $orderId
    *   The order id, only used for error reporting.
    *
    * @return array
+   *   Besides the general response structure, the actual result of this call is
+   *   returned under the following key:
+   *   - invoice: an array of information about the created invoice, being an
+   *     array with keys:
+   *     - invoicenumber
+   *     - token
+   *     - entryid
+   *   If the key invoice is present, it indicates success.
+   *
+   * See https://apidoc.sielsystems.nl/content/invoice-add.
+   * See https://apidoc.sielsystems.nl/content/warning-error-and-status-response-section-most-api-calls
+   * for more information on the contents of the returned array.
    */
   public function invoiceAdd(array $invoice, $orderId = '') {
     $invoice = $this->completeInvoice($invoice);
@@ -516,7 +519,9 @@ class WebAPI {
     $invoice = $this->addVatRateTo0PriceLines($invoice);
 
     // Add vattype.
-    $invoice = $this->addVatType($invoice);
+    if (!isset($invoice['customer']['invoice']['vattype'])) {
+      $invoice = $this->addVatType($invoice);
+    }
 
     return $invoice;
   }

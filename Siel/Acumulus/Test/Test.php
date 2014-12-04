@@ -40,8 +40,11 @@ class Test {
     $results .= "Test getPicklistVATTypes():\n";
     $results .= var_export($this->testPicklistVatTypes(), true);
     $results .= "\n";
-    $results .= "Test getPicklistVATInfo():\n";
-    $results .= var_export($this->testPicklistVatInfo('ie', '2015-01-01'), true);
+    $results .= "Test getLookupVatInfo('nl'):\n";
+    $results .= var_export($this->testLookupVatInfo('nl', '2014-11-20'), true);
+    $results .= "\n";
+    $results .= "Test getLookupVatInfo('ie'):\n";
+    $results .= var_export($this->testLookupVatInfo('ie', '2015-01-01'), true);
     $results .= "\n";
 
     $results .= "Test addInvoice():\n";
@@ -132,7 +135,7 @@ class Test {
     return $this->webApi->getPicklistVatTypes();
   }
 
-  public function testPicklistVatInfo($countryCode, $date = '') {
+  public function testLookupVatInfo($countryCode, $date = '') {
     return $this->webApi->getVatInfo($countryCode, $date);
   }
 }

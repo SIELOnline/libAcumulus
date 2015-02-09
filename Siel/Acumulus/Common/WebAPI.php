@@ -49,6 +49,7 @@ class WebAPI {
   const Concept_No = 0;
   const Concept_Yes = 1;
 
+  const LocationCode_None = 0;
   const LocationCode_NL = 1;
   const LocationCode_EU = 2;
   const LocationCode_RestOfWorld = 3;
@@ -58,6 +59,7 @@ class WebAPI {
   const VatType_EuReversed = 3;
   const VatType_RestOfWorld = 4;
   const VatType_MarginScheme = 5;
+  const VatType_ForeignVat = 6;
 
   const ConfirmReading_No = 0;
   const ConfirmReading_Yes = 1;
@@ -415,7 +417,7 @@ class WebAPI {
    *
    * @return array
    *   Besides the general response structure, the actual result of this call is
-   *   returned under the key 'vatinfos' and consists of an array of 'vatinfos',
+   *   returned under the key 'vatinfo' and consists of an array of "vatinfo's",
    *   each 'vatinfo' being a keyed array with keys:
    *   - vattype
    *   - vatrate
@@ -448,6 +450,9 @@ class WebAPI {
   /**
    * Adds an invoice to Acumulus.
    *
+   * Before sending the invoice to Acumulus, a number of checks and completions
+   * are performed on the invoice.
+   *
    * @param array $invoice
    *   The invoice to add.
    * @param string $orderId
@@ -468,22 +473,34 @@ class WebAPI {
    * for more information on the contents of the returned array.
    */
   public function invoiceAdd(array $invoice, $orderId = '') {
+    $response = array(
+      'errors' => array(),
+      'warnings' => array(),
+      'status' => static::Status_Success,
+    );
+
+    // Complete the invoice with configured default values.
     $invoice = $this->completeInvoice($invoice);
 
-    // Correct countrycode (if in rest of world).
+    // Check and correct the invoice where necessary and possible.
     $invoice = $this->correctCountryCode($invoice);
-
-    // Email as pdf (if set so, call before calling fictitiousClient()).
     $invoice = $this->emailAsPdf($invoice, $orderId);
-
-    // Change to fictitious client (if set so).
     $invoice = $this->fictitiousClient($invoice);
+    $invoice = $this->validateVatRates($invoice, $orderId, $response);
+    $invoice = $this->validateInvoice($invoice, $orderId, $response);
 
-    // Validate order (client side).
-    $response = $this->validateInvoice($invoice, $orderId);
+    // Send order.
     if (empty($response['errors'])) {
-      // Send order.
+      // Keep warnings.
+      $warnings = $response['warnings'];
       $response = $this->webAPICommunicator->callApiFunction("invoices/invoice_add", $invoice);
+      if (!empty($warnings)) {
+        // Add local warnings and set status if it not worse then warnings.
+        $response['warnings'] += $warnings;
+        if (!isset($response['status']) || ($response['status'] !== static::Status_Errors && $response['status'] !== static::Status_Exception)) {
+          $response['status'] = static::Status_Warnings;
+        }
+      }
     }
 
     return $response;
@@ -560,7 +577,10 @@ class WebAPI {
    *   Location code
    */
   public function getLocationCode($countryCode) {
-    if ($this->isNl($countryCode)) {
+    if (empty($countryCode)) {
+      $result = static::LocationCode_None;
+    }
+    else if ($this->isNl($countryCode)) {
       $result = static::LocationCode_NL;
     }
     elseif ($this->isEu($countryCode)) {
@@ -571,6 +591,7 @@ class WebAPI {
     }
     return $result;
   }
+
   /**
    * Completes lines with free items (price = 0) by giving them the tax rate
    * that appears the most in the other lines.
@@ -665,7 +686,7 @@ class WebAPI {
     if ($this->isEu($customer['countrycode']) && !empty($customer['vatnumber'])) {
       $vatIs0 = TRUE;
       foreach ($invoicePart['line'] as $line) {
-        $vatIs0 = $vatIs0 && $line['vatrate'] == 0;
+        $vatIs0 = $vatIs0 && ($line['vatrate'] == 0 || $line['vatrate'] == -1);
       }
       if ($vatIs0) {
         $invoice['customer']['invoice']['vattype'] = static::VatType_EuReversed;
@@ -1036,17 +1057,16 @@ class WebAPI {
    * - 19% and 21% VAT: those are not both allowed in 1 order.
    *
    * @param array $invoice
+   *   The invoice to validate.
    * @param string $orderId
+   *   The order id of the invoice to use in error messages.
+   * @param array $response
+   *   The response structure where errors and warnings can be added.
    *
    * @return array
+   *   The invoice, possibly modified.
    */
-  protected function validateInvoice(array &$invoice, $orderId) {
-    $response = array(
-      'errors' => array(),
-      'warnings' => array(),
-      'status' => static::Status_Success,
-    );
-
+  protected function validateInvoice(array $invoice, $orderId, array &$response) {
     // Check email address.
     if (empty($invoice['customer']['email'])) {
       unset($invoice['customer']['email']);
@@ -1062,15 +1082,161 @@ class WebAPI {
       }
     }
     if ($has19 && $has21) {
-      $result['errors'][] = array(
+      $response['errors'][] = array(
         'code' => 'Order',
         'codetag' => !empty($invoice['customer']['invoice']['number']) ? $invoice['customer']['invoice']['number'] : $orderId,
         'message' => $this->config->t('message_error_vat19and21'),
       );
-      $result['status'] = static::Status_Errors;
+      $response['status'] = static::Status_Errors;
     }
 
-    return $response;
+    return $invoice;
+  }
+
+  /**
+   * Validates and corrects the VAT rates in the invoice.
+   *
+   * Validation is performed using the vat info lookup API call:
+   * - Dutch vat rates on the given order date.
+   * - Foreign vat rates for invoices of vattype = 6.
+   *
+   * Correction is done when there are vat rates that are near to the incorrect
+   * vat rate, this should correct rounding errors.
+   *
+   * @param array $invoice
+   *   The invoice to validate.
+   * @param string $orderId
+   *   The order id of the invoice to use in error messages.
+   * @param array $response
+   *   The response structure where errors and warnings can be added.
+   *
+   * @return array
+   *   The invoice, possibly modified.
+   */
+  protected function validateVatRates(array $invoice, $orderId, array &$response) {
+    // Determine which vat rates to get.
+    $date = !empty($invoice['customer']['invoice']['issuedate']) ? $invoice['customer']['invoice']['issuedate'] : date('Y-m-d');
+    $countryCode = '';
+    $vatType = $invoice['customer']['invoice']['vattype'];
+    switch ($vatType) {
+      case static::VatType_National;
+      case static::VatType_MarginScheme:
+        // We expect Dutch vat rates, even if the client is abroad.
+        $countryCode = 'nl';
+        break;
+      case static::VatType_ForeignVat:
+        // We expect foreign vat rates, but the country code should be set.
+        $countryCode = isset($invoice['customer']['countrycode']) ? $invoice['customer']['countrycode'] : '';
+        break;
+      case static::VatType_NationalReversed:
+      case static::VatType_EuReversed:
+      case static::VatType_RestOfWorld:
+        // We only expect 0 or -1 as vat rates.
+      default:
+        break;
+    }
+
+    // Get allowed vat rates for this invoice.
+    // Always allow 0 and -1.
+    $allowedVatRates = array(
+      array('vattype' => 'vat free', 'vatrate' => -1),
+      array('vattype' => 'no vat', 'vatrate' => 0),
+    );
+    if (!empty($countryCode)) {
+      $vatInfo = $this->getVatInfo($countryCode, $date);
+      if (isset($vatInfo['vatinfo'])) {
+        $allowedVatRates = array_merge($allowedVatRates, $vatInfo['vatinfo']);
+      }
+    }
+
+    // Check that all vat rates are correct or, if not, try to correct them.
+    foreach ($invoice['customer']['invoice']['line'] as &$line) {
+      if (isset($line['vatrate']) && !$this->isAllowedVatRate($line['vatrate'], $allowedVatRates)) {
+        $correctedVatRate = $this->getNearVatRate($line['vatrate'], $allowedVatRates);
+        if ($correctedVatRate !== null) {
+          // Add message: incorrect vat rate, corrected to near vat rate.
+          $response['warnings'][] = array(
+            'code' => 'Order',
+            'codetag' => !empty($invoice['customer']['invoice']['number']) ? $invoice['customer']['invoice']['number'] : $orderId,
+            'message' => sprintf($this->config->t('message_warning_incorrect_vat_corrected'), $line['vatrate'], $correctedVatRate),
+          );
+          if (!isset($response['status']) || ($response['status'] !== static::Status_Errors && $response['status'] !== static::Status_Exception)) {
+            $response['status'] = static::Status_Warnings;
+          }
+          $line['vatrate'] = $correctedVatRate;
+        }
+        else {
+          // Add message: incorrect vat rate, could not correct.
+          $response['warnings'][] = array(
+            'code' => 'Order',
+            'codetag' => !empty($invoice['customer']['invoice']['number']) ? $invoice['customer']['invoice']['number'] : $orderId,
+            'message' => sprintf($this->config->t('message_warning_incorrect_vat_not_corrected'), $line['vatrate']),
+          );
+          if (!isset($response['status']) || ($response['status'] !== static::Status_Errors && $response['status'] !== static::Status_Exception)) {
+            $response['status'] = static::Status_Warnings;
+          }
+        }
+      }
+    }
+    return $invoice;
+  }
+
+  /**
+   * Tries to return a vat rate form a list of allowed vat rates that is within
+   * 1 percent point of a given vat rate.
+   *
+   * If there are 0 or more than 1 "near" vat rates, null is returned.
+   *
+   * @param float|string $vatRate
+   * @param array $allowedVatRates
+   *
+   * @return float|string|null
+   *   The (single) near vat rate or null if there is no or more than 1 near vat
+   *   rate. The float value may actually be returned as a string.
+   */
+  protected function getNearVatRate($vatRate, array $allowedVatRates) {
+    $nearestVatRate = null;
+    foreach ($allowedVatRates as $allowedVatRate) {
+      if ($this->floatsAreEqual($vatRate, $allowedVatRate['vatrate'], 1.0)) {
+        if ($nearestVatRate === null) {
+          // We found a near vat rate: use it.
+          $nearestVatRate = $allowedVatRate['vatrate'];
+        }
+        else if ($this->floatsAreEqual($nearestVatRate, $allowedVatRate['vatrate'])) {
+          // We found a 2nd near vat rate (that is different): do not correct.
+          $nearestVatRate = null;
+          break;
+        }
+      }
+    }
+    return $nearestVatRate;
+  }
+
+  /**
+   * @param float|string $vatRate
+   * @param array $allowedVatRates
+   *
+   * @return bool
+   *
+   */
+  protected function isAllowedVatRate($vatRate, array $allowedVatRates) {
+    foreach ($allowedVatRates as $allowedVatRate) {
+      if ($this->floatsAreEqual($vatRate, $allowedVatRate['vatrate'])) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * @param float $f1
+   * @param float $f2
+   * @param float $maxDiff
+   *
+   * @return bool
+   */
+  protected function floatsAreEqual($f1, $f2, $maxDiff = 0.005) {
+    return abs((float) $f2 - (float) $f1) <= $maxDiff;
   }
 
 }

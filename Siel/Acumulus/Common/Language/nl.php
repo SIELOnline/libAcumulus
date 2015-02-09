@@ -29,9 +29,6 @@ $_['message_validate_email_3'] = 'Het veld BCC is geen valide e-mailadres, vul e
 $_['message_validate_email_4'] = 'Het veld Afzender is geen valide e-mailadres, vul een correct e-mailadres in.';
 $_['message_validate_conflicting_options'] = 'Als u geen klantgegevens naar Acumulus verstuurt, kunt u Acumulus geen PDF factuur laten versturen. Pas één van beide opties aan.';
 
-// @deprecated
-$_['message_error_vat19and21'] = 'Deze order heeft zowel 19% als 21% BTW percentages. U dient deze factuur handmatig aan te maken in Acumulus.';
-$_['message_warning_incorrect_vat'] = 'De Acumulus koppeling was niet in staat om de BTW bedragen op de factuur correct te herleiden. U dient daarom deze factuur handmatig te controleren in Acumulus!';
 $_['message_warning_incorrect_vat_corrected'] = 'De factuur bevat een incorrect BTW tarief van %1$0.1f%%. Dit is gecorrigeerd naar %2$0.1f%%. Controleer deze factuur handmatig in Acumulus!';
 $_['message_warning_incorrect_vat_not_corrected'] = 'De factuur bevat een incorrect BTW tarief van %0.1f%%. Dit viel niet te corrigeren naar een geldig BTW tarief. Corrigeer deze factuur handmatig in Acumulus!';
 

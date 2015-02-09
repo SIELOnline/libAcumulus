@@ -29,8 +29,6 @@ $_['message_validate_email_3'] = 'The field BCC is not a valid e-mail address, p
 $_['message_validate_email_4'] = 'The field Sender is not a valid e-mail address, please fill in a valid e-mail address.';
 $_['message_validate_conflicting_options'] = 'If you don\'t send customer data to Acumulus, Acumulus cannot send PDF invoices. Change one of the options.';
 
-$_['message_error_vat19and21'] = 'This order has both 19% and 21% VAT rates. You will have to manually enter this order into Acumulus.';
-$_['message_warning_incorrect_vat'] = 'The Acumulus module was not able to correctly determine the VAT amounts on the invoice. You should check and correct this invoice manually in Acumulus!';
 $_['message_warning_incorrect_vat_corrected'] = 'The invoice specified an incorrect VAT rate of %1$0.1f%%. This has been corrected to %2$0.1f%%. Check this invoice in Acumulus!';
 $_['message_warning_incorrect_vat_not_corrected'] = 'The invoice specified an incorrect VAT rate of %0.1f%%. It was not possible to correct this to a valid VAT rate. Correct this invoice manually in Acumulus!';
 

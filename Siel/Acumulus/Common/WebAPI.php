@@ -484,10 +484,10 @@ class WebAPI {
 
     // Check and correct the invoice where necessary and possible.
     $invoice = $this->correctCountryCode($invoice);
-    $invoice = $this->emailAsPdf($invoice, $orderId);
+    $invoice = $this->addEmailAsPdf($invoice, $orderId);
     $invoice = $this->fictitiousClient($invoice);
     $invoice = $this->validateVatRates($invoice, $orderId, $response);
-    $invoice = $this->validateInvoice($invoice, $orderId, $response);
+    $invoice = $this->validateEmail($invoice);
 
     // Send order.
     if (empty($response['errors'])) {
@@ -999,7 +999,7 @@ class WebAPI {
    *
    * @return array
    */
-  protected function emailAsPdf(array $invoice, $orderId) {
+  protected function addEmailAsPdf(array $invoice, $orderId) {
     $emailAsPdfSettings = $this->config->getEmailAsPdfSettings();
     if ($emailAsPdfSettings['emailAsPdf'] && !empty($invoice['customer']['email'])) {
       $invoice['customer']['invoice']['emailaspdf'] = array(
@@ -1050,44 +1050,20 @@ class WebAPI {
   }
 
   /**
-   * Validates the invoice.
+   * Validates the email address of the invoice.
    *
-   * Checks that are performed:
-   * - email address may not be empty, may be left out though.
-   * - 19% and 21% VAT: those are not both allowed in 1 order.
+   * The email address may not be empty but may be left out though.
    *
    * @param array $invoice
    *   The invoice to validate.
-   * @param string $orderId
-   *   The order id of the invoice to use in error messages.
-   * @param array $response
-   *   The response structure where errors and warnings can be added.
    *
    * @return array
    *   The invoice, possibly modified.
    */
-  protected function validateInvoice(array $invoice, $orderId, array &$response) {
+  protected function validateEmail(array $invoice) {
     // Check email address.
     if (empty($invoice['customer']['email'])) {
       unset($invoice['customer']['email']);
-    }
-
-    // Check if both 19% and 21% vat rates occur.
-    $has19 = FALSE;
-    $has21 = FALSE;
-    foreach ($invoice['customer']['invoice']['line'] as $line) {
-      if (isset($line['vatrate'])) {
-        $has19 = $has19 && $line['vatrate'] == 19;
-        $has21 = $has21 && $line['vatrate'] == 21;
-      }
-    }
-    if ($has19 && $has21) {
-      $response['errors'][] = array(
-        'code' => 'Order',
-        'codetag' => !empty($invoice['customer']['invoice']['number']) ? $invoice['customer']['invoice']['number'] : $orderId,
-        'message' => $this->config->t('message_error_vat19and21'),
-      );
-      $response['status'] = static::Status_Errors;
     }
 
     return $invoice;

@@ -6,8 +6,7 @@
 namespace Siel\Acumulus\Common;
 
 /**
- * ConfigInterface defines an interface to store and retrieve configuration
- * values.
+ * Defines an interface to store and retrieve configuration values.
  *
  * Configuration is stored in the host environment (i.e. the web shop), this
  * interface abstracts from how a specific web shop does so.

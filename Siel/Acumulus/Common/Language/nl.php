@@ -55,7 +55,7 @@ $_['message_received'] = 'Ontvangen bericht';
 
 $_['message_no_invoice'] = 'niet aangemaakt';
 
-$_['order_id'] = 'Ordernummer';
+$_['order_id'] = 'Bestelnummer';
 $_['shipping_costs'] = 'Verzendkosten';
 $_['payment_costs'] = 'Betalingskosten';
 $_['discount'] = 'Korting';
@@ -73,7 +73,7 @@ $_['mail_subject'] = 'Fouten of waarschuwingen bij verzenden factuur naar Acumul
 $_['mail_text'] = <<<LONGSTRING
 Geachte heer/mevrouw,
 
-Bij het verzenden van een order naar Acumulus zijn er foutmeldingen of
+Bij het verzenden van een bestelling naar Acumulus zijn er foutmeldingen of
 waarschuwingen terug gestuurd.
 
 Als de verzendstatus gelijk aan "2 {status_2_text}" is,
@@ -86,9 +86,9 @@ Als de verzendstatus "1 {status_1_text}" of
 U dient de factuur dan handmatig aan te maken in Acumulus of deze aan te passen
 en nogmaals te versturen.
 
-Verzendstatus:    {status} {status_text}.
-(Webshop)Order:   {order_id}
-(Webshop)Factuur: {invoice_id}
+Verzendstatus:       {status} {status_text}.
+(Webshop)Bestelling: {order_id}
+(Webshop)Factuur:    {invoice_id}
 
 Berichten:
 {messages}
@@ -100,7 +100,7 @@ LONGSTRING;
 $_['mail_html'] = <<<LONGSTRING
 <p>Geachte heer/mevrouw,</p>
 
-<p>Bij het verzenden van een order naar Acumulus zijn er foutmeldingen of
+<p>Bij het verzenden van een bestelling naar Acumulus zijn er foutmeldingen of
 waarschuwingen terug gestuurd.</p>
 <p>Als de verzendstatus gelijk aan "2 {status_2_text}" is,
 zijn er alleen waarschuwingen. Het versturen is dan wel gelukt en is er een
@@ -112,7 +112,7 @@ U dient de factuur dan handmatig aan te maken in Acumulus of deze aan te passen
 en nogmaals te versturen.</p>
 <table>
   <tr><td>Verzendstatus:</td><td>{status} {status_text}.</td></tr>
-  <tr><td>(Webshop)Order:</td><td>{order_id}</td></tr>
+  <tr><td>(Webshop)Bestelling:</td><td>{order_id}</td></tr>
   <tr><td>(Webshop)Factuur:</td><td>{invoice_id}</td></tr>
 </table>
 <p>Berichten:<br>
@@ -133,13 +133,13 @@ $_['invoiceSettingsHeader'] = 'Uw factuurinstellingen';
 $_['option_empty'] = 'Maak uw keuze';
 
 $_['field_invoiceNrSource'] = 'Factuurnummer';
-$_['option_invoiceNrSource_1'] = 'Gebruik het factuurnummer van uw webwinkel. Let op: als er nog geen factuur aan een order gekoppeld is, zal het bestelnummer gebruikt worden!';
+$_['option_invoiceNrSource_1'] = 'Gebruik het factuurnummer van uw webwinkel. Let op: als er nog geen factuur aan een bestelling gekoppeld is, zal het bestelnummer gebruikt worden!';
 $_['option_invoiceNrSource_2'] = 'Gebruik het bestelnummer van uw webwinkel.';
 $_['option_invoiceNrSource_3'] = 'Laat Acumulus het factuurnummer bepalen.';
 $_['desc_invoiceNrSource'] = 'U kunt hier kiezen welk nummer Acumulus als factuurnummer moet gebruiken.';
 
 $_['field_dateToUse'] = 'Factuurdatum';
-$_['option_dateToUse_1'] = 'Gebruik de aanmaakdatum van de factuur. Let op: als er nog geen factuur aan uw order gekoppeld is, zal de aanmaakdatum van de bestelling gebruikt worden!';
+$_['option_dateToUse_1'] = 'Gebruik de aanmaakdatum van de factuur. Let op: als er nog geen factuur aan uw bestelling gekoppeld is, zal de aanmaakdatum van de bestelling gebruikt worden!';
 $_['option_dateToUse_2'] = 'Gebruik de aanmaakdatum van de bestelling.';
 $_['option_dateToUse_3'] = 'Gebruik de datum van het overzetten.';
 $_['desc_dateToUse'] = 'U kunt hier kiezen welke datum de factuur in Acumulus moet krijgen.';
@@ -157,27 +157,27 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
 $_['field_defaultCustomerType'] = 'Importeer klanten als';
 
 $_['field_defaultAccountNumber'] = 'Bankrekeningnummer';
-$_['desc_defaultAccountNumber'] = 'Maakt u binnen Acumulus gebruik van meerdere rekeningen en wilt u alle orders uit uw webwinkel op een specifieke rekening binnen laten komen, kies dan hier het bankrekeningnummer.';
+$_['desc_defaultAccountNumber'] = 'Maakt u binnen Acumulus gebruik van meerdere rekeningen en wilt u alle bestellingen uit uw webwinkel op een specifieke rekening binnen laten komen, kies dan hier het bankrekeningnummer.';
 
 $_['field_defaultCostCenter'] = 'Kostenplaats';
-$_['desc_defaultCostCenter'] = 'Maakt u binnen Acumulus gebruik van meerdere kostenplaatsen en wilt u alle orders uit uw webwinkel op een specifieke kostenplaats binnen laten komen, kies dan hier de kostenplaats.';
+$_['desc_defaultCostCenter'] = 'Maakt u binnen Acumulus gebruik van meerdere kostenplaatsen en wilt u alle bestellingen uit uw webwinkel op een specifieke kostenplaats binnen laten komen, kies dan hier de kostenplaats.';
 
 $_['field_defaultInvoiceTemplate'] = 'Factuur-sjabloon (niet betaald)';
 $_['field_defaultInvoicePaidTemplate'] = 'Factuur-sjabloon (betaald)';
 $_['option_same_template'] = 'Zelfde sjabloon als voor niet betaald';
-$_['desc_defaultInvoiceTemplates'] = 'Maakt u binnen Acumulus gebruik van meerdere factuur-sjablonen en wilt u alle orders uit uw webwinkel op een specifieke factuursjabloon printen, kies dan hier de factuur-sjablonen voor niet betaalde respectievelijk betaalde orders.';
+$_['desc_defaultInvoiceTemplates'] = 'Maakt u binnen Acumulus gebruik van meerdere factuur-sjablonen en wilt u alle bestellingen uit uw webwinkel op een specifieke factuursjabloon printen, kies dan hier de factuur-sjablonen voor niet betaalde respectievelijk betaalde bestellingen.';
 
 $_['field_triggerOrderEvent'] = 'Moment van versturen';
-$_['option_triggerOrderEvent_1'] = 'Als een order de hieronder door u gekozen status bereikt.';
-$_['option_triggerOrderEvent_2'] = 'Als de factuur wordt aangemaakt voor deze order.';
-$_['desc_triggerOrderEvent'] = 'U kunt hier kiezen op welk moment de factuur wordt verstuurd. Deze koppeling gebruikt alleen gegevens van de order, dus u kunt elke status kiezen. De factuur hoeft dus nog niet aangemaakt te zijn.';
+$_['option_triggerOrderEvent_1'] = 'Als een bestelling de hieronder door u gekozen status bereikt.';
+$_['option_triggerOrderEvent_2'] = 'Als de factuur wordt aangemaakt voor deze bestelling.';
+$_['desc_triggerOrderEvent'] = 'U kunt hier kiezen op welk moment de factuur wordt verstuurd. Deze koppeling gebruikt alleen gegevens van de bestelling, dus u kunt elke status kiezen. De factuur hoeft dus nog niet aangemaakt te zijn.';
 
 $_['option_empty_triggerOrderStatus'] = 'Niet automatisch overzetten';
-$_['field_triggerOrderStatus'] = 'Orderstatus';
-$_['desc_triggerOrderStatus'] = 'U kunt hier kiezen bij welke orderstatus facturen worden overgezet naar Acumulus. Als u voor "Niet automatisch overzetten" kiest, doet deze module niets.';
+$_['field_triggerOrderStatus'] = 'Bestelstatus';
+$_['desc_triggerOrderStatus'] = 'U kunt hier kiezen bij welke bestelstatus facturen worden overgezet naar Acumulus. Als u voor "Niet automatisch overzetten" kiest, moet u de facturen zelf overzetten m.b.v. het batchformulier.';
 
 $_['emailAsPdfSettingsHeader'] = 'PDF Factuur';
-$_['desc_emailAsPdfInformation'] = 'Bij het versturen van ordergegevens naar Acumulus, kunt u Acumulus een PDF factuur laten versturen naar uw klant. Deze wordt direct verstuurd naar het door de klant opgegeven emailadres.';
+$_['desc_emailAsPdfInformation'] = 'Bij het versturen van bestellinggegevens naar Acumulus, kunt u Acumulus een PDF factuur laten versturen naar uw klant. Deze wordt direct verstuurd naar het door de klant opgegeven emailadres.';
 
 $_['field_emailAsPdf'] = 'Optie inschakelen';
 $_['option_emailAsPdf'] = 'Verstuur de factuur als PDF vanuit Acumulus.';
@@ -190,7 +190,7 @@ $_['field_emailBcc'] = 'BCC';
 $_['desc_emailBcc'] = 'Additionele emailadressen om de factuur naar toe te sturen, bv. het emailadres van uw eigen administratie-afdeling. Als u dit leeg laat wordt de factuur alleen naar de klant verstuurd.';
 
 $_['field_subject'] = 'Onderwerp';
-$_['desc_subject'] = 'Het onderwerp van de email. Als u dit leeg laat wordt "Factuur [factuurnummer] Order [bestelnummer]" gebruikt. U kunt [#b] gebruiken om het bestelnummer in de onderwerpregel te plaatsen en [#f] voor het factuurnummer (van de webshop, niet van Acumulus).';
+$_['desc_subject'] = 'Het onderwerp van de email. Als u dit leeg laat wordt "Factuur [factuurnummer] Bestelling [bestelnummer]" gebruikt. U kunt [#b] gebruiken om het bestelnummer in de onderwerpregel te plaatsen en [#f] voor het factuurnummer (van de webshop, niet van Acumulus).';
 
 $_['versionInformationHeader'] = 'Informatie over deze module';
 $_['desc_versionInformation'] = 'Vermeldt aub deze gegevens bij een supportverzoek.';
@@ -202,19 +202,49 @@ $_['option_debug_3'] = 'Verzend geen berichten naar Acumulus, verstuur alleen ee
 $_['option_debug_4'] = 'Verzend berichten naar Acumulus maar Acumulus zal alleen de invoer controleren op fouten en waarschuwingen en geen veranderingen opslaan.';
 $_['desc_debug'] = 'U kunt hier een support mode kiezen. Kies voor de eerste optie tenzij u i.v.m. een supportverzoek bent geïnstrueerd om iets anders te kiezen.';
 
-// Send manual form
+// Send manual form.
 $_['page_title_manual'] = 'Verstuur factuur handmatig';
 $_['manualSelectIdHeader'] = 'Specificeer de opnieuw te verzenden factuur';
-$_['field_manual_order'] = 'Order #';
+$_['field_manual_order'] = 'Bestel #';
 $_['field_manual_invoice'] = 'Factuur #';
 $_['field_manual_creditmemo'] = 'Creditmemo #';
 $_['manual_form_desc'] = '<strong>LET OP: Het gebruik van dit formulier is op eigen risico.</strong> Acumulus voert geen controle op dubbel inzenden uit. Door het (nogmaals) handmatig versturen van facturen kan uw administatie ontregeld raken. Gebruik dit formulier daarom alleen als u i.v.m. een supportverzoek bent geïnstrueerd om dit te doen en dan het liefst alleen als voor de "support en debug" mode de 3e optie is gekozen (zie het instellingen scherm).';
-$_['manual_order_sent'] = "Order '%s' verzonden";
-$_['manual_order_not_found'] = "Order '%s' niet gevonden";
+$_['manual_order_sent'] = "Bestelling '%s' verzonden";
+$_['manual_order_not_found'] = "Bestelling '%s' niet gevonden";
 $_['manual_invoice_sent'] = "Factuur '%s' verzonden";
 $_['manual_invoice_not_found'] = "Factuur '%s' niet gevonden";
 $_['manual_creditmemo_sent'] = "Creditmemo '%s' verzonden";
 $_['manual_creditmemo_not_found'] = "Credit memo '%s' niet gevonden";
+
+// Send batch form.
+$_['batchSendTitle'] = 'Verzend facturen naar Acumulus';
+$_['batchSendHeader'] = 'Batchgewijs verzenden van facturen naar Acumulus';
+$_['field_order_id_from'] = 'Bestel # van';
+$_['field_order_id_to'] = 'Bestel # tot';
+$_['desc_order_id_from_to'] = 'Vul de reeks bestelnummers in die u naar Acumulus wilt verzenden. Als u slechts 1 bestelling wilt verzenden hoeft u alleen het \'Bestel # van\' in te vullen. Laat beide velden leeg als u op datum wilt verzenden.';
+$_['field_date_from'] = 'Datum van';
+$_['field_date_to'] = 'Datum tot';
+$_['desc_date_from_to'] = 'Vul de periode in waarvan u de bestellingen naar Acumulus wilt verzenden. De selectie vindt plaats op bais van de datum van de meest recente wijziging aan de bestelling. Als u slechts de bestellingen van 1 dag wilt verzenden hoeft u alleen de \'Datum van\' in te vullen. Laat beide velden leeg als u op bestelnummer wilt verzenden.';
+$_['field_options'] = 'Verzenden forceren';
+$_['option_force_send'] = 'Forceer verzenden';
+$_['desc_options'] = 'Bestellingen die binnen de reeks vallen maar al naar Acumulus verstuurd zijn, worden standaard niet verzonden. Door deze optie aan te vinken forceert u het nogmaals versturen van deze bestellingen.';
+$_['batchLogHeader'] = 'Resultaten';
+$_['batchInfoHeader'] = 'Uitgebreide informatie';
+
+$_['message_validate_batch_id_or_date'] = 'U dient of een reeks van bestelnummers of een reeks van datums in te vullen.';
+$_['message_validate_batch_id_and_date'] = 'U kunt niet en een reeks van bestelnummers en een reeks van datums invullen.';
+$_['message_validate_batch_bad_date_from'] = 'U dient een correcte \'Datum van\' in te vullen (formaat jjjj-mm-dd).';
+$_['message_validate_batch_bad_date_to'] = 'U dient een correcte \'Datum tot\' in te vullen (formaat jjjj-mm-dd).';
+$_['message_validate_batch_bad_date_range'] = '\'Datum tot\' dient na \'Datum van\' te liggen.';
+$_['message_validate_batch_bad_order_range'] = '\'Bestel # tot\' dient groter te zijn dan \'Bestel # van\'.';
+
+$_['message_batch_send_1_success'] = 'Factuur voor bestelling %s succesvol verzonden.';
+$_['message_batch_send_1_error'] = 'Fout bij het versturen van de factuur voor bestelling %s.';
+$_['message_batch_send_1_not_found'] = 'Bestelling %s overgeslagen omdat deze niet (meer) bestaat.';
+$_['message_batch_send_1_skipped'] = 'Factuur voor bestelling %s overgeslagen omdat deze al verstuurd is.';
+
+$_['message_batch_success'] = 'De facturen zijn succesvol verzonden.';
+$_['message_batch_error'] = 'Er zijn fouten opgetreden bij het versturen van de facturen.';
 
 // Uninstall form
 $_['uninstallHeader'] = 'Bevestig verwijderen';

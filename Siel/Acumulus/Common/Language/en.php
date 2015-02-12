@@ -205,13 +205,43 @@ $_['manualSelectIdHeader'] = 'Specify the invoice to send';
 $_['field_manual_order'] = 'Order #';
 $_['field_manual_invoice'] = 'Invoice #';
 $_['field_manual_creditmemo'] = 'Creditmemo #';
-$_['manual_form_desc'] = '<strong>ATTENTION: Use this form at your own risk.</strong> Acumulus does not check if invoices are sent twice. By sending an invoce manually (a 2nd time), your administration can become incorrect. use this form only if isntructed tod os o by support staff and even then only when the 3rd option has been chosen for the "Support and debug" mode on the settings screen.';
+$_['manual_form_desc'] = '<strong>ATTENTION: Use this form at your own risk.</strong> Acumulus does not check if invoices are sent twice. By sending an invoice manually (a 2nd time), your administration can become incorrect. use this form only if instructed to do so by support staff and even then only when the 3rd option has been chosen for the "Support and debug" mode on the settings screen.';
 $_['manual_order_sent'] = "Order '%s' has been sent";
 $_['manual_order_not_found'] = "Order '%s' not found";
-$_['manual_invoice_sent'] = "Factuur '%s' has been sent";
-$_['manual_invoice_not_found'] = "Factuur '%s' not found";
+$_['manual_invoice_sent'] = "Invoice '%s' has been sent";
+$_['manual_invoice_not_found'] = "Invoice '%s' not found";
 $_['manual_creditmemo_sent'] = "Creditmemo '%s' has been sent";
 $_['manual_creditmemo_not_found'] = "Credit memo '%s' not found";
+
+// Send batch form.
+$_['batchSendTitle'] = 'Send invoices to Acumulus';
+$_['batchSendHeader'] = 'Send a batch of invoices to Acumulus';
+$_['field_order_id_from'] = 'Order # from';
+$_['field_order_id_to'] = 'Order # to';
+$_['desc_order_id_from_to'] = 'Enter the range of order ids you want to send to Acumulus. If you want to send 1 order, you only have to fill in the \'Order # from\' field. Leave empty if you want to send by date.';
+$_['field_date_from'] = 'Date from';
+$_['field_date_to'] = 'Date to';
+$_['desc_date_from_to'] = 'Enter the period over which you want to send orders to Acumulus. If you want to send the orders of 1 day, only fill in the \'Date from\' field. Leave empty if you want to send by order id.';
+$_['field_options'] = 'Force sending';
+$_['option_force_send'] = 'Force sending';
+$_['desc_options'] = 'Orders that fall within the range but are already sent to Acumulus will normally not be sent again. By checking this option these orders will be sent again.';
+$_['batchLogHeader'] = 'Results';
+$_['batchInfoHeader'] = 'Additional information';
+
+$_['message_validate_batch_id_or_date'] = 'Fill in a range of order numbers or a range of dates, not both.';
+$_['message_validate_batch_id_and_date'] = 'Either fill in a range of order numbers OR a range of dates, not both.';
+$_['message_validate_batch_bad_date_from'] = 'Incorrect \'Date from\' (expected format: yyyy-mm-dd).';
+$_['message_validate_batch_bad_date_to'] = 'Incorrect \'Date to\' (expected format: yyyy-mm-dd).';
+$_['message_validate_batch_bad_date_range'] = '\'Datum tot\' dient na \'Datum van\' te liggen.';
+$_['message_validate_batch_bad_order_range'] = '\'Order # to\' shold to be greater than \'Order # from\'.';
+
+$_['message_batch_send_1_success'] = 'Successfully sent invoice for order %s.';
+$_['message_batch_send_1_error'] = 'Error while sending invoice for order %s.';
+$_['message_batch_send_1_not_found'] = 'Skipped order %s (it does not/no longer exist).';
+$_['message_batch_send_1_skipped'] = 'Skipped invoice for order %s (already sent).';
+
+$_['message_batch_success'] = 'The invoices were sent successfully.';
+$_['message_batch_error'] = 'Errors during sending the invoices.';
 
 // Uninstall form
 $_['uninstallHeader'] = 'Confirm uninstall';

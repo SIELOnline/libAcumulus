@@ -240,7 +240,9 @@ class WebAPI {
    * @return bool
    */
   public function isEu($countryCode) {
-    // http://epp.eurostat.ec.europa.eu/statistics_explained/index.php/Glossary:Country_codes
+    // Sources:
+    // - http://publications.europa.eu/code/pdf/370000en.htm
+    // - http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
     // EFTA countries are not part of this list because regarding invoicing they
     // are considered to be outside of the EU.
     $euCountryCodes = array(
@@ -251,9 +253,11 @@ class WebAPI {
       'DE',
       'EE',
       'IE',
-      'EL',
+      'EL', // Greece according to the EU
       'ES',
       'FR',
+      'GB', // Great Britain/United Kingdom according to ISO.
+      'GR', // Greece according to the ISO
       'HR',
       'IT',
       'CY',
@@ -271,7 +275,7 @@ class WebAPI {
       'SK',
       'FI',
       'SE',
-      'UK',
+      'UK', // United kingdom, Great Britain according to the EU
     );
     return in_array(strtoupper($countryCode), $euCountryCodes);
   }
@@ -702,19 +706,24 @@ class WebAPI {
   }
 
   /**
-   * Correct country codes if outside th EU.
+   * Corrects the country code if necessary:
+   * - If outside the EU, empty and move to the city field. This should be
+   *   changed on the server, but for now we "correct" it here.
+   * - Change UK to GB
+   * - Change GR to EL. For now. In the future, when changed/corrected on the
+   *   server, this should be reversed.
    *
-   * For countries outside the EU, the countycode should be empty and the
-   * country name should be added to the city instead.
+   * For countries outside the EU, the countrycode field should be empty and the
+   * country name should be added (in captitals) to the city instead.
    *
    * See https://apidoc.sielsystems.nl/content/invoice-add, tags city and
    * countrycode:
-   * city non mandatory
-   *   City and optional country in capitals (Amsterdam NETHERLANDS).
-   * countrycode non mandatory
-   *   Use international standard country code (ISO 3166-1) for countries in EU
-   *   only (NL, DE etc). Defaults to NL when an empty or incorrect country code
-   *   is supplied. Leave blank for countries outside EU-zone.
+   *   city (non mandatory)
+   *     City and optional country in capitals (Amsterdam NETHERLANDS).
+   *   countrycode (non mandatory)
+   *     Use international standard country code (ISO 3166-1) for countries in
+   *     EU only (NL, DE etc). Defaults to NL when an empty or incorrect country
+   *     code is supplied. Leave blank for countries outside EU-zone.
    *
    * This should be server side, but for now it is done client side.
    *
@@ -723,11 +732,17 @@ class WebAPI {
    * @return array
    */
   protected function correctCountryCode(array $invoice) {
-    if (isset($invoice['customer']['locationcode']) && $invoice['customer']['locationcode'] === static::LocationCode_RestOfWorld) {
-      if (!empty($invoice['customer']['countrycode'])) {
+    if (!empty($invoice['customer']['countrycode'])) {
+      if ($invoice['customer']['countrycode'] === 'GR') {
+        $invoice['customer']['countrycode'] = 'EL';
+      }
+      if ($invoice['customer']['countrycode'] === 'UK') {
+        $invoice['customer']['countrycode'] = 'GB';
+      }
+      if (isset($invoice['customer']['locationcode']) && $invoice['customer']['locationcode'] === static::LocationCode_RestOfWorld) {
         // Move countrycode to city.
         $country = $this->getCountryName($invoice['customer']['countrycode']);
-        if (stripos($invoice['customer']['city'], $country) === FALSE) {
+        if (stripos($invoice['customer']['city'], $country) === false) {
           $invoice['customer']['city'] .= ' ' . strtoupper($country);
         }
         unset($invoice['customer']['countrycode']);
@@ -818,6 +833,7 @@ class WebAPI {
       'GH' => 'Ghana',
       'GI' => 'Gibraltar',
       'GD' => 'Grenada',
+      'EL' => 'Griekenland',
       'GR' => 'Griekenland',
       'GL' => 'Groenland',
       'GP' => 'Guadeloupe',
@@ -975,6 +991,7 @@ class WebAPI {
       'AE' => 'Verenigde Arabische Emiraten',
       'US' => 'Verenigde Staten',
       'GB' => 'Verenigd Koninkrijk',
+      'UK' => 'Verenigd Koninkrijk',
       'VN' => 'Vietnam',
       'WF' => 'Wallis en Futuna',
       'EH' => 'Westelijke Sahara',

@@ -184,7 +184,7 @@ $_['option_emailAsPdf'] = 'Verstuur de factuur als PDF vanuit Acumulus.';
 $_['desc_emailAsPdf'] = 'Als u deze optie aanvinkt, kunt u de overige opties gebruiken om de emailverzending aan uw wensen aan te passen. Het bericht in de email body kunt u niet hier instellen, dat kunt u in Acumulus doen onder "Beheer - Factuur-sjablonen".';
 
 $_['field_emailFrom'] = 'Afzender';
-$_['desc_emailFrom'] = 'Het email adres dat als afzender gebruikt moet worden. Als u dit leeg laat wordt het emailadres van uw Acumulus account gebruikt.';
+$_['desc_emailFrom'] = 'Het email adres dat als afzender gebruikt moet worden. Als u dit leeg laat wordt het emailadres uit het Acumulus sjabloon gebruikt. Wij adviseren dit veld leeg te laten.';
 
 $_['field_emailBcc'] = 'BCC';
 $_['desc_emailBcc'] = 'Additionele emailadressen om de factuur naar toe te sturen, bv. het emailadres van uw eigen administratie-afdeling. Als u dit leeg laat wordt de factuur alleen naar de klant verstuurd.';

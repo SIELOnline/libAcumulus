@@ -1019,16 +1019,15 @@ class WebAPI {
   protected function addEmailAsPdf(array $invoice, $orderId) {
     $emailAsPdfSettings = $this->config->getEmailAsPdfSettings();
     if ($emailAsPdfSettings['emailAsPdf'] && !empty($invoice['customer']['email'])) {
-      $invoice['customer']['invoice']['emailaspdf'] = array(
-        'emailto' => $invoice['customer']['email'],
-        'emailbcc' => $emailAsPdfSettings['emailBcc'],
-        'emailfrom' => $emailAsPdfSettings['emailFrom'],
-        'subject' => strtr($emailAsPdfSettings['subject'], array(
-          '[#b]' => $orderId,
-          '[#f]' => isset($invoice['customer']['invoice']['number']) ? $invoice['customer']['invoice']['number'] : '',
-        )),
-        'confirmreading' => $emailAsPdfSettings['confirmReading'] ? static::ConfirmReading_Yes : static::ConfirmReading_No,
-      );
+      $invoice['customer']['invoice']['emailaspdf'] = array();
+      $invoice['customer']['invoice']['emailaspdf']['emailto'] = $invoice['customer']['email'];
+      $this->addDefault($invoice['customer']['invoice']['emailaspdf'], 'emailbcc', $emailAsPdfSettings['emailBcc']);
+      $this->addDefault($invoice['customer']['invoice']['emailaspdf'], 'emailfrom', $emailAsPdfSettings['emailFrom']);
+      $this->addDefault($invoice['customer']['invoice']['emailaspdf'], 'subject', strtr($emailAsPdfSettings['subject'], array(
+        '[#b]' => $orderId,
+        '[#f]' => isset($invoice['customer']['invoice']['number']) ? $invoice['customer']['invoice']['number'] : '',
+      )));
+      $invoice['customer']['invoice']['emailaspdf']['confirmreading'] = $emailAsPdfSettings['confirmReading'] ? static::ConfirmReading_Yes : static::ConfirmReading_No;
     }
     return $invoice;
   }

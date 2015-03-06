@@ -63,7 +63,7 @@ abstract class BaseConfig implements ConfigInterface{
       // Default 'email invoice as pdf' settings.
       'emailAsPdf' => false,
       'emailBcc' => '',  // Empty: no bcc.
-      'emailFrom' => '', // Empty: default shop address.
+      'emailFrom' => '', // Empty: default from Acumulus template.
       'subject' => '', // Empty: default from Acumulus.
       'confirmReading' => false, // No UI for this setting.
     );

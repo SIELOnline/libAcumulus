@@ -359,9 +359,11 @@ class WebAPICommunication {
    * @param string $function
    */
   protected function setCurlError($ch, $function) {
+    $cv = curl_version();
+    $version = "curl: {$cv['version']}; ssl: {$cv['ssl_version']}; zlib: {$cv['libz_version']};";
     $this->errors[] = array(
       'code' => $ch ? curl_errno($ch) : 0,
-      'codetag' => $function,
+      'codetag' => "$function ($version)",
       'message' => $ch ? curl_error($ch) : '',
     );
     curl_close($ch);
@@ -416,9 +418,10 @@ class WebAPICommunication {
         $message = 'Unknown error';
         break;
     }
+    $version = phpversion('json');
     $this->errors[] = array(
       'code' => $code,
-      'codetag' => '',
+      'codetag' => "(json: $version)",
       'message' => $message,
     );
   }

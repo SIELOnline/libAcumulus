@@ -733,8 +733,8 @@ class WebAPI {
    */
   protected function correctCountryCode(array $invoice) {
     if (!empty($invoice['customer']['countrycode'])) {
-      if ($invoice['customer']['countrycode'] === 'GR') {
-        $invoice['customer']['countrycode'] = 'EL';
+      if ($invoice['customer']['countrycode'] === 'EL') {
+        $invoice['customer']['countrycode'] = 'GR';
       }
       if ($invoice['customer']['countrycode'] === 'UK') {
         $invoice['customer']['countrycode'] = 'GB';

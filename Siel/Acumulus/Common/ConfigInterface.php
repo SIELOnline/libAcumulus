@@ -59,6 +59,10 @@ interface ConfigInterface {
    *   - moduleVersion
    *   - shopName
    *   - shopVersion
+   *   - phpVersion
+   *   - os
+   *   - curlVersion
+   *   - jsonVersion
    */
   public function getEnvironment();
 

@@ -14,7 +14,7 @@ abstract class BaseConfig implements ConfigInterface{
    *
    * @var string
    */
-  public static $library_version = '3.8.1-beta1';
+  public static $library_version = '3.8.1-beta2';
 
   /** @var bool */
   protected $isLoaded;
@@ -152,11 +152,16 @@ abstract class BaseConfig implements ConfigInterface{
    * @inheritdoc
    */
   public function getEnvironment() {
+    $curlVersion = curl_version();
     return array(
       'libraryVersion' => $this->get('libraryVersion'),
       'moduleVersion' => $this->get('moduleVersion'),
       'shopName' => $this->get('shopName'),
       'shopVersion' => $this->get('shopVersion'),
+      'phpVersion' => phpversion(),
+      'os' => php_uname(),
+      'curlVersion' => "{$curlVersion['version']} (ssl: {$curlVersion['ssl_version']}; zlib: {$curlVersion['libz_version']})",
+      'jsonVersion' => phpversion('json'),
     );
   }
 

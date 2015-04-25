@@ -185,20 +185,25 @@ class WebAPICommunication {
       $resultBase['trace']['response'] = $response;
 
       $result = false;
-      $alsoTryAsXml = false;
-      if ($this->config->getOutputFormat() === 'json') {
-        $result = json_decode($response, true);
-        if ($result === null) {
-          $this->setJsonError();
-          // Even if we pass <format>json<.format> we might receive an XML
-          // response in case the XML was rejected before or during parsing.
-          $alsoTryAsXml = true;
+      // When the API is gone we might receive an error message in an html page.
+      if ($this->isHtmlResponse($response)) {
+        $this->setHtmlReceivedError($response);
+      }
+      else {
+        $alsoTryAsXml = FALSE;
+        if ($this->config->getOutputFormat() === 'json') {
+          $result = json_decode($response, TRUE);
+          if ($result === NULL) {
+            $this->setJsonError();
+            // Even if we pass <format>json<.format> we might receive an XML
+            // response in case the XML was rejected before or during parsing.
+            $alsoTryAsXml = TRUE;
+          }
+        }
+        if ($this->config->getOutputFormat() === 'xml' || $alsoTryAsXml) {
+          $result = $this->convertToArray($response);
         }
       }
-      if ($this->config->getOutputFormat() === 'xml' || $alsoTryAsXml) {
-        $result = $this->convertToArray($response);
-      }
-
       if (is_array($result)) {
         $resultBase += $result;
       }
@@ -252,6 +257,18 @@ class WebAPICommunication {
     }
 
     return $response;
+  }
+
+  /**
+   * @param string $response
+   *
+   * @return bool
+   *   True if the response is html, false otherwise.
+   */
+  protected function isHtmlResponse($response) {
+    return strtolower(substr($response, 0, strlen('<!doctype html'))) === '<!doctype html'
+    || strtolower(substr($response, 0, strlen('<html'))) === '<html'
+    || strtolower(substr($response, 0, strlen('<body'))) === '<body';
   }
 
   /**
@@ -425,4 +442,29 @@ class WebAPICommunication {
       'message' => $message,
     );
   }
+
+  /**
+   * Adds an error message to the result.
+   *
+   * @param string $response
+   *    String containing an html document.
+   */
+  protected function setHtmlReceivedError($response) {
+    libxml_use_internal_errors(true);
+    $doc = new DOMDocument('1.0', 'utf-8');
+    $doc->loadHTML($response);
+    $body = $doc->getElementsByTagName('body');
+    if ($body->length > 0) {
+      $body = $body->item(0)->textContent;
+    }
+    else {
+      $body = '';
+    }
+    $this->errors[] = array(
+      'code' => 'HTML response received',
+      'codetag' => '',
+      'message' => $body,
+    );
+  }
+
 }

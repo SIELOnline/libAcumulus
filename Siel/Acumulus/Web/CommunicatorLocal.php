@@ -1,20 +1,14 @@
 <?php
-/**
- * @file Definition of Siel\Acumulus\WebAPICommunicationLocal.
- */
-
-namespace Siel\Acumulus\Common;
-
-use Siel\Acumulus\Common\WebAPICommunication;
+namespace Siel\Acumulus\Web;
 
 /**
- * WebAPICommunicationLocal is a class derived from WebAPICommunication that can
- * be used for testing purposes. It does not actually send the message to
- * Acumulus and fakes a response.
+ * CommunicationLocal is a class derived from Communication that can be used for
+ * testing purposes. It does not actually send the message to Acumulus and fakes
+ * a response.
  *
  * @package Siel\Acumulus
  */
-class WebAPICommunicationLocal extends WebAPICommunication {
+class CommunicatorLocal extends Communicator {
   /**
    * @inheritdoc
    */

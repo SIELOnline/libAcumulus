@@ -1,9 +1,5 @@
 <?php
-/**
- * @file Definition of Siel\Acumulus\Common\WebAPICommunication.
- */
-
-namespace Siel\Acumulus\Common;
+namespace Siel\Acumulus\Web;
 
 use DOMDocument;
 use DOMElement;
@@ -11,20 +7,19 @@ use Exception;
 use LibXMLError;
 
 /**
- * WebAPICommunication implements the conversion, communication and error
- * handling part of the Acumulus WebAPI class.
+ * Communication implements the communication with the Acumulus WebAPI.
+ *
+ * It offers:
+ * - Conversion between array and XML.
+ * - Conversion from Json to array.
+ * - (https) Communication with the Acumulus webservice using the curl library.
+ * - Good error handling during communication.
  *
  * @package Siel\Acumulus
  */
-class WebAPICommunication {
-  const Status_Success = 0;
-  const Status_Errors = 1;
-  const Status_Warnings = 2;
-  const Status_Exception = 3;
-  const TestMode_Normal = 0;
-  const TestMode_Test = 1;
+class Communicator {
 
-  /** @var \Siel\Acumulus\Common\ConfigInterface */
+  /** @var \Siel\Acumulus\Web\ConfigInterface */
   protected $config;
 
   /** @var array */
@@ -35,6 +30,31 @@ class WebAPICommunication {
 
   public function __construct(ConfigInterface $config) {
     $this->config = $config;
+  }
+
+  /**
+   * Checks and, if necessary, corrects the status.
+   *
+   * If local errors or warnings were added, the status may be incorrectly
+   * indicating success. This method checks for this and corrects the status.
+   *
+   * @param array $response
+   *   A response structure with, at least, fields 'errors', 'warnings' and
+   *   'status'.
+   */
+  public function checkStatus(array &$response) {
+    // - Check if status is consistent (local errors and warnings should alter
+    //   the status as well.
+    if (!empty($response['errors'])) {
+      if ($response['status'] != ConfigInterface::Status_Exception) {
+        $response['status'] = ConfigInterface::Status_Errors;
+      }
+    }
+    else if (!empty($response['warnings'])) {
+      if ($response['status'] != ConfigInterface::Status_Exception && $response['status'] != ConfigInterface::Status_Errors) {
+        $response['status'] = ConfigInterface::Status_Warnings;
+      }
+    }
   }
 
   /**
@@ -65,24 +85,23 @@ class WebAPICommunication {
       // - contract part
       // - format part
       // - environment part
-      $environment = $this->config->getEnvironment();
+      $env = $this->config->getEnvironment();
       $message = array_merge(array(
         'contract' => $this->config->getCredentials(),
         'format' => $this->config->getOutputFormat(),
-        'testmode' => $this->config->getDebug() == ConfigInterface::Debug_TestMode ? static::TestMode_Test : static::TestMode_Normal ,
+        'testmode' => $this->config->getDebug() == ConfigInterface::Debug_TestMode ? ConfigInterface::TestMode_Test : ConfigInterface::TestMode_Normal,
         'connector' => array(
-          'application' => "{$environment['shopName']} {$environment['shopVersion']}",
-          'webkoppel' => "Acumulus {$environment['moduleVersion']}",
+          'application' => "{$env['shopName']} {$env['shopVersion']}",
+          'webkoppel' => "Acumulus {$env['moduleVersion']}",
           'development' => 'SIEL - Buro RaDer',
-          'remark' => "Library {$environment['libraryVersion']}",
+          'remark' => "Library {$env['libraryVersion']} - PHP {$env['phpVersion']}",
           'sourceuri' => 'https://www.siel.nl/',
         ),
       ), $message);
 
       // Send message, receive response.
       $response = $this->sendApiMessage($uri, $message);
-    }
-    catch (Exception $e) {
+    } catch (Exception $e) {
       $this->errors[] = array(
         'code' => $e->getCode(),
         'codetag' => "File: {$e->getFile()}, Line: {$e->getLine()}",
@@ -134,19 +153,10 @@ class WebAPICommunication {
     // - Add status if not set. if no status is present the call failed, so we
     //   set the status to 1.
     if (!isset($response['status'])) {
-      $response['status'] = static::Status_Errors;
+      $response['status'] = ConfigInterface::Status_Errors;
     }
 
-    // - Check if status is consistent (local errors and warnings should alter
-    //   the status as well.
-    if ($response['status'] == static::Status_Success) {
-      if (!empty($response['warnings'])) {
-        $response['status'] = static::Status_Warnings;
-      }
-      if (!empty($response['errors'])) {
-        $response['status'] = static::Status_Errors;
-      }
-    }
+    $this->checkStatus($response);
 
     return $response;
   }
@@ -190,20 +200,21 @@ class WebAPICommunication {
         $this->setHtmlReceivedError($response);
       }
       else {
-        $alsoTryAsXml = FALSE;
+        $alsoTryAsXml = false;
         if ($this->config->getOutputFormat() === 'json') {
-          $result = json_decode($response, TRUE);
-          if ($result === NULL) {
+          $result = json_decode($response, true);
+          if ($result === null) {
             $this->setJsonError();
-            // Even if we pass <format>json<.format> we might receive an XML
+            // Even if we pass <format>json</format> we might receive an XML
             // response in case the XML was rejected before or during parsing.
-            $alsoTryAsXml = TRUE;
+            $alsoTryAsXml = true;
           }
         }
         if ($this->config->getOutputFormat() === 'xml' || $alsoTryAsXml) {
           $result = $this->convertToArray($response);
         }
       }
+
       if (is_array($result)) {
         $resultBase += $result;
       }
@@ -321,7 +332,7 @@ class WebAPICommunication {
     $dom->formatOutput = true;
 
     $dom = $this->convertToDom($values, $dom);
-    $dom->normalizeDocument ();
+    $dom->normalizeDocument();
     $result = $dom->saveXML();
 
     return $result;
@@ -370,24 +381,23 @@ class WebAPICommunication {
   }
 
   /**
-   * Helper method to add a curl error message to the result.
+   * Adds a curl error message to the result.
    *
    * @param resource|bool $ch
    * @param string $function
    */
   protected function setCurlError($ch, $function) {
-    $cv = curl_version();
-    $version = "curl: {$cv['version']}; ssl: {$cv['ssl_version']}; zlib: {$cv['libz_version']};";
+    $env = $this->config->getEnvironment();
     $this->errors[] = array(
       'code' => $ch ? curl_errno($ch) : 0,
-      'codetag' => "$function ($version)",
+      'codetag' => "$function (Curl: {$env['curlVersion']})",
       'message' => $ch ? curl_error($ch) : '',
     );
     curl_close($ch);
   }
 
   /**
-   * Helper method to add libxml error messages to the result.
+   * Adds a libxml error messages to the result.
    *
    * @param LibXMLError[] $errors
    */
@@ -408,7 +418,7 @@ class WebAPICommunication {
   }
 
   /**
-   * Helper method to add a json error message to the result.
+   * Adds a json error message to the result.
    */
   protected function setJsonError() {
     $code = json_last_error();
@@ -435,10 +445,10 @@ class WebAPICommunication {
         $message = 'Unknown error';
         break;
     }
-    $version = phpversion('json');
+    $env = $this->config->getEnvironment();
     $this->errors[] = array(
       'code' => $code,
-      'codetag' => "(json: $version)",
+      'codetag' => "(json: {$env['jsonVersion']})",
       'message' => $message,
     );
   }

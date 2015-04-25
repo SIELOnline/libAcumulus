@@ -1,8 +1,4 @@
 <?php
-/**
- * @file Contains Siel\Acumulus\Test\Test.
- */
-
 namespace Siel\Acumulus\Test;
 
 use Siel\Acumulus\Common\WebAPI;

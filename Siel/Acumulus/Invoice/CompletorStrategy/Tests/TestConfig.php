@@ -1,16 +1,17 @@
 <?php
-namespace Siel\Acumulus\Test;
+/**
+ * @file Contains Siel\Acumulus\Test\TestConfig.
+ */
 
-use Siel\Acumulus\Common\BaseConfig;
-use Siel\Acumulus\Common\ConfigInterface;
-use Siel\Acumulus\Common\WebAPI;
+namespace Siel\Acumulus\OpenCart\RepairTaxes\Test;
+
+use Siel\Acumulus\Shop\Config;
+use Siel\Acumulus\Web\ConfigInterface;
 
 /**
  * TestConfig defines a configuration object for test purposes.
- *
- * @package Siel\AcumulusTest
  */
-class TestConfig extends BaseConfig {
+class TestConfig extends Config {
   /**
    * @inheritdoc
    */
@@ -24,7 +25,6 @@ class TestConfig extends BaseConfig {
       'apiVersion' => 'stable',
       //'apiVersion' => 'dev',
       //'apiVersion' => '1.22',
-      //'debug' => ConfigInterface::Debug_None,
       'debug' => ConfigInterface::Debug_TestMode,
     ));
   }

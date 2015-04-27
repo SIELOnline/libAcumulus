@@ -81,43 +81,6 @@ class Service {
   }
 
   /**
-   * Checks if the requirements for the environment are met.
-   *
-   * @return array
-   *   A possibly empty array with messages regarding missing requirements.
-   */
-  public function checkRequirements() {
-    $result = array();
-
-    // PHP 5.3 is a requirement as well because we use namespaces. But as the
-    // parser will already have failed fatally before we get here, it makes no
-    // sense to check here.
-    if (!extension_loaded('curl')) {
-      $result['errors'][] = array(
-        'code' => 'curl',
-        'codetag' => '',
-        'message' => $this->t('message_error_req_curl'),
-      );
-    }
-    if ($this->config->getOutputFormat() === 'xml' && !extension_loaded('simplexml')) {
-      $result['errors'][] = array(
-        'code' => 'SimpleXML',
-        'codetag' => '',
-        'message' => $this->t('message_error_req_xml'),
-      );
-    }
-    if (!extension_loaded('dom')) {
-      $result['errors'][] = array(
-        'code' => 'DOM',
-        'codetag' => '',
-        'message' => $this->t('message_error_req_dom'),
-      );
-    }
-
-    return $result;
-  }
-
-  /**
    * If the result contains any errors or warnings, a list of verbose messages
    * is returned.
    *

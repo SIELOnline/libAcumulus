@@ -9,9 +9,6 @@ use Siel\Acumulus\Helpers\TranslationCollection;
 class Translations extends TranslationCollection {
 
   protected $nl = array(
-    'message_error_req_curl' => 'The CURL PHP extension needs to be activated on your server for this module to work.',
-    'message_error_req_xml'  => 'The SimpleXML extension needs to be activated on your server for this module to be able to work with the XML format.',
-    'message_error_req_dom'  => 'The DOM PHP extension needs to be activated on your server for this module to work.',
     'message_error'          => 'Fout',
     'message_warning'        => 'Waarschuwing',
     'message_info_for_user'  => 'De informatie hieronder wordt alleen getoond om eventuele support te vergemakkelijken. U kunt deze informatie negeren.',
@@ -25,9 +22,6 @@ class Translations extends TranslationCollection {
   );
 
   protected $en = array(
-    'message_error_req_curl' => 'Voor het gebruik van deze module dient de CURL PHP extensie actief te zijn op uw server.',
-    'message_error_req_xml'  => 'Voor het gebruik van deze module met het output format XML, dient de SimpleXML PHP extensie actief te zijn op uw server.',
-    'message_error_req_dom'  => 'Voor het gebruik van deze module dient de DOM PHP extensie actief te zijn op uw server.',
     'message_error'          => 'Error',
     'message_warning'        => 'Warning',
     'message_info_for_user'  => 'The information below is only shown to facilitate support. You may ignore these messages.',

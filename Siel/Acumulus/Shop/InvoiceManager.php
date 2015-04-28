@@ -172,8 +172,8 @@ abstract class InvoiceManager {
       $result  = $service->invoiceAdd($invoice);
       $result = $service->mergeLocalMessages($result, $localMessages);
 
-      // Store entry id and token.
-      if (!empty($result['invoice'])) {
+      // Check if an entryid was created and store entry id and token.
+      if (!empty($result['invoice']['entryid'])) {
         $this->getAcumulusEntryModel()->save($invoiceSource, $result['invoice']['entryid'], $result['invoice']['token']);
       }
 

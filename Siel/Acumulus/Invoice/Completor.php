@@ -148,9 +148,6 @@ class Completor {
         if (stripos($this->invoice['customer']['city'], $country) === false) {
           $this->invoice['customer']['city'] .= ' ' . strtoupper($country);
         }
-        if (isset($this->invoice['customer']['locationcode']) && $this->invoice['customer']['locationcode'] === ConfigInterface::LocationCode_RestOfWorld) {
-          unset($this->invoice['customer']['countrycode']);
-        }
       }
     }
   }

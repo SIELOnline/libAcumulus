@@ -24,7 +24,8 @@ interface ConfigStoreInterface {
    *   An array of keys that are expected to be loaded.
    *
    * @return array
-   *   An array with the configuration values keyed by their name.
+   *   An array with the raw (not necessarily casted) configuration values keyed
+   *   by their name.
    */
   public function load(array $keys);
 

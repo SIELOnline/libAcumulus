@@ -137,7 +137,7 @@ abstract class InvoiceManager {
         case WebConfigInterface::Status_Warnings:
           $message = 'message_batch_send_1_warnings';
           break;
-        case WebConfigInterface::Status_NotSend:
+        case WebConfigInterface::Status_NotSent:
         default:
           $message = 'message_batch_send_1_skipped';
           break;
@@ -145,6 +145,48 @@ abstract class InvoiceManager {
       $log[$invoiceSource->getId()] = sprintf($this->t($message), $invoiceSource->getType(), $invoiceSource->getReference());
     }
     return $success;
+  }
+
+  /**
+   * Processes an invoice source status change event.
+   *
+   * @param \Siel\Acumulus\Invoice\Source $invoiceSource
+   *   The source whom status changed.
+   * @param $newStatus
+   *   The new status of the invoice source. May be null in which case a
+   *   comparison based on status is not performed.
+   *
+   * @return int
+   *   Status
+   */
+  public function sourceStatusChange(Source $invoiceSource, $newStatus = NULL) {
+    $this->config->getLog()->debug('InvoiceManager::sourceStatusChange(%s %d, %s)', $invoiceSource->getType(), $invoiceSource->getId(), $newStatus === NULL ? 'NULL' : (string) $newStatus);
+    $result = WebConfigInterface::Status_NotSent;
+    $shopSettings = $this->config->getShopSettings();
+    if ($shopSettings['triggerInvoiceSendEvent'] == Config::TriggerInvoiceSendEvent_OrderStatus
+      && ($newStatus === NULL || $newStatus == $shopSettings['triggerOrderStatus'])) {
+      $result = $this->send($invoiceSource, FALSE);
+    }
+    return $result;
+  }
+
+  /**
+   * Processes an invoice create event.
+   *
+   * @param \Siel\Acumulus\Invoice\Source $invoiceSource
+   *   The source for which a shop invoice was created.
+   *
+   * @return int
+   *   Status
+   */
+  public function invoiceCreate(Source $invoiceSource) {
+    $this->config->getLog()->debug('InvoiceManager::invoiceCreate(%s %d)', $invoiceSource->getType(), $invoiceSource->getId());
+    $result = WebConfigInterface::Status_NotSent;
+    $shopSettings = $this->config->getShopSettings();
+    if ($shopSettings['triggerInvoiceSendEvent'] == Config::TriggerInvoiceSendEvent_InvoiceCreate) {
+      $result = $this->send($invoiceSource, FALSE);
+    }
+    return $result;
   }
 
   /**
@@ -159,33 +201,48 @@ abstract class InvoiceManager {
    * @return int
    *   Status.
    */
-  public function send($invoiceSource, $forceSend = false) {
+  public function send(Source $invoiceSource, $forceSend = false) {
+    $result = WebConfigInterface::Status_NotSent;
     if ($forceSend || !$this->getAcumulusEntryModel()->getByInvoiceSource($invoiceSource)) {
       $invoice = $this->getCreator()->create($invoiceSource);
       $this->triggerInvoiceCreated($invoice, $invoiceSource);
 
-      $localMessages = array();
-      $invoice = $this->getCompletor()->complete($invoice, $invoiceSource, $localMessages);
-      $this->triggerInvoiceCompleted($invoice, $invoiceSource);
+      if ($invoice !== NULL) {
+        $localMessages = array();
+        $invoice = $this->getCompletor()->complete($invoice, $invoiceSource, $localMessages);
+        $this->triggerInvoiceCompleted($invoice, $invoiceSource);
 
-      $service = $this->config->getService();
-      $result  = $service->invoiceAdd($invoice);
-      $result = $service->mergeLocalMessages($result, $localMessages);
+        if ($invoice !== NULL) {
+          $service = $this->config->getService();
+          $result = $service->invoiceAdd($invoice);
+          $result = $service->mergeLocalMessages($result, $localMessages);
 
-      // Check if an entryid was created and store entry id and token.
-      if (!empty($result['invoice']['entryid'])) {
-        $this->getAcumulusEntryModel()->save($invoiceSource, $result['invoice']['entryid'], $result['invoice']['token']);
+          // Check if an entryid was created and store entry id and token.
+          if (!empty($result['invoice']['entryid'])) {
+            $this->getAcumulusEntryModel()->save($invoiceSource, $result['invoice']['entryid'], $result['invoice']['token']);
+          }
+
+          // Send a mail if there are messages.
+          $messages = $service->resultToMessages($result);
+          if (!empty($messages)) {
+            $this->config->getLog()->debug('InvoiceManager::send(%s %d, %s) result: %s', $invoiceSource->getType(), $invoiceSource->getId(), $forceSend ? 'true' : 'false', $messages);
+            $this->mailInvoiceAddResult($result, $messages, $invoiceSource);
+          }
+
+          $result = $result['status'];
+        }
+        else {
+          $this->config->getLog()->debug('InvoiceManager::send(%s %d, %s): invoiceCompleted prevented sending', $invoiceSource->getType(), $invoiceSource->getId(), $forceSend ? 'true' : 'false');
+        }
       }
-
-      // Send a mail if there are messages.
-      $messages = $service->resultToMessages($result);
-      if (!empty($messages)) {
-        $this->mailInvoiceAddResult($result, $messages, $invoiceSource);
+      else {
+        $this->config->getLog()->debug('InvoiceManager::send(%s %d, %s): invoiceCreated prevented sending', $invoiceSource->getType(), $invoiceSource->getId(), $forceSend ? 'true' : 'false');
       }
-
-      return $result['status'];
     }
-    return WebConfigInterface::Status_NotSend;
+    else {
+      $this->config->getLog()->debug('InvoiceManager::send(%s %d, %s): not sent', $invoiceSource->getType(), $invoiceSource->getId(), $forceSend ? 'true' : 'false');
+    }
+    return $result;
   }
 
   /**
@@ -194,13 +251,16 @@ abstract class InvoiceManager {
    * The mail is sent to the shop administrator (emailonerror setting).
    *
    * @param array $result
-   * @param array $messages
+   * @param string[] $messages
    * @param \Siel\Acumulus\Invoice\Source $invoiceSource
    *
    * @return bool
    *   Success.
    */
-  abstract protected function mailInvoiceAddResult(array $result, array $messages, $invoiceSource);
+  protected function mailInvoiceAddResult(array $result, array $messages, $invoiceSource) {
+    $mailer = $this->getMailer();
+    return $mailer->sendInvoiceAddMailResult($result, $messages, $invoiceSource->getType(), $invoiceSource->getReference());
+  }
 
   /**
    * @return \Siel\Acumulus\Invoice\Completor

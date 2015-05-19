@@ -22,10 +22,10 @@ abstract class ConfigForm extends Form {
   protected $contactTypes;
 
   /**
+   * Constructor.
+   *
    * @param Config $config
    * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
-   *
-   * @internal param \ControllerModuleAcumulus $module
    */
   public function __construct(Config $config, TranslatorInterface $translator) {
     parent::__construct($translator);
@@ -479,10 +479,12 @@ abstract class ConfigForm extends Form {
   }
 
   /**
+   * Converts a picklist response into an options list.
+   *
    * @param array $picklist
    *   The picklist result structure.
    * @param string $key
-   *   The key in hte picklist result structure under which the actual results
+   *   The key in the picklist result structure under which the actual results
    *   can be found.
    * @param string|null $emptyValue
    *   The value to use for an empty selection.
@@ -510,6 +512,14 @@ abstract class ConfigForm extends Form {
     return $result;
   }
 
+  /**
+   * Returns an option list of all orders statuses, including an empty choice,
+   *
+   * Do not override this method but implement getShopOrderStatuses() instead.
+   *
+   * @return array
+   *   An options array of all order statuses.
+   */
   protected function getOrderStatusesList() {
     $result = array();
 
@@ -517,12 +527,24 @@ abstract class ConfigForm extends Form {
     $result += $this->getShopOrderStatuses();
 
     return $result;
-
-
   }
 
+  /**
+   * Returns a list of order statuses.
+   *
+   * @return array
+   *   An array of $value => $label pairs for all order statuses.
+   */
   abstract protected function getShopOrderStatuses();
 
+  /**
+   * Returns whether the $key is a checkbox value.
+   *
+   * @param string $key
+   *
+   * @return bool
+   *   True if $key is a checkbox, false otherwise.
+   */
   protected function isCheckboxKey($key) {
     $checkboxKeys = array();
     if (isset($_POST['dateToUse'])) {

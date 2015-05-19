@@ -249,6 +249,9 @@ abstract class CompletorStrategyBase {
    *   The vat amount for the completed line.
    */
   protected function completeLine($line2Complete, $vatRate) {
+    if (!isset($line2Complete['quantity'])) {
+      $line2Complete['quantity'] = 1;
+    }
     $line2Complete['vatrate'] = $vatRate;
     if (isset($line2Complete['unitprice'])) {
       $line2Complete['vatamount'] = ($line2Complete['vatrate'] / 100.0) * $line2Complete['unitprice'];

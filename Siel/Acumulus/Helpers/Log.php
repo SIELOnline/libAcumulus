@@ -1,8 +1,6 @@
 <?php
 namespace Siel\Acumulus\Helpers;
 
-use Siel\Acumulus\Web\ConfigInterface;
-
 /**
  * @class \Siel\Acumulus\Helpers\Log.
  */
@@ -18,17 +16,23 @@ class Log {
   static protected $instance = null;
 
   /**
-   * Returns an instance of the log class (or web shop specific child class).
+   * Log creator.
    *
    * @param int $logLevel
    *   One of the Log level constants from this class.
-   *
-   * @return Log
    */
-  public static function getInstance($logLevel) {
+  public static function createInstance($logLevel) {
     if (static::$instance === null) {
       static::$instance = new static($logLevel);
     }
+  }
+
+  /**
+   * Returns an instance of the log class (or web shop specific child class).
+   *
+   * @return Log
+   */
+  public static function getInstance() {
     return static::$instance;
   }
 
@@ -43,15 +47,6 @@ class Log {
    */
   protected function __construct($logLevel) {
     $this->logLevel = $logLevel;
-  }
-
-  /**
-   * Log creator.
-   *
-   * @param \Siel\Acumulus\Web\ConfigInterface $config
-   *   One of the Log level constants from this class.
-   */
-  protected static function createInstance(ConfigInterface $config) {
   }
 
   /**

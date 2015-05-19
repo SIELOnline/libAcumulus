@@ -92,7 +92,7 @@ class Service {
    *   'trace'. If this parameter is true the trace should be added to the
    *   messages to be returned as well.
    *
-   * @return array
+   * @return string[]
    *   An array with textual messages that can be used to inform the user.
    */
   public function resultToMessages(array $result, $addTraceMessages = true) {
@@ -132,7 +132,7 @@ class Service {
   /**
    * Converts an array of messages to a string that can be used in a text mail.
    *
-   * @param array $messages
+   * @param string[] $messages
    *
    * @return string
    */
@@ -143,7 +143,7 @@ class Service {
   /**
    * Converts an array of messages to a string that can be used in an html mail.
    *
-   * @param array $messages
+   * @param string[] $messages
    *
    * @return string
    */

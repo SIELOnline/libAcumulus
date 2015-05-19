@@ -1,8 +1,7 @@
 <?php
-namespace Siel\Acumulus\VirtueMart;
+namespace Siel\Acumulus\Shop\VirtueMart;
 
 use Siel\Acumulus\Invoice\Source as BaseSource;
-use VmConfig;
 use VmModel;
 
 /**
@@ -11,25 +10,22 @@ use VmModel;
 class Source extends BaseSource {
 
   // More specifically typed properties.
-  /** @var int */
-  protected $id;
-
   /** @var array */
   protected $source;
 
   /**
-   * {@inheritdoc}
+   * Loads an Order source for the set id.
    */
-  protected function setSource() {
+  protected function setSourceOrder() {
     /** @var \VirtueMartModelOrders $orders */
     $orders = VmModel::getModel('orders');
     $this->source = $orders->getOrder($this->id);
   }
 
   /**
-   * {@inheritdoc}
+   * Sets the id based on the loaded Order.
    */
-  protected function setId() {
+  protected function setIdOrder() {
     $this->id = $this->source['details']['BT']->virtuemart_order_id;
   }
 

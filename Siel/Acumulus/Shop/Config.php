@@ -173,7 +173,8 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
    * Saves the configuration to the actual configuration provider.
    *
    * @param array $values
-   *   A keyed array that contains the values to store.
+   *   A keyed array that contains the values to store, this may be a subset of
+   *   the possible keys.
    *
    * @return bool
    *   Success.

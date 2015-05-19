@@ -1,5 +1,5 @@
 <?php
-namespace Siel\Acumulus\VirtueMart;
+namespace Siel\Acumulus\Shop\VirtueMart;
 
 use Siel\Acumulus\Invoice\ConfigInterface as InvoiceConfigInterface;
 use Siel\Acumulus\Shop\ConfigInterface;
@@ -180,8 +180,8 @@ class Creator extends BaseCreator {
   /**
    * {@inheritdoc}
    *
-   * This override does provide all the values meta-invoiceamountinc and
-   * meta-invoicevatamount, as they may be needed by the Completor.
+   * This override provides the values meta-invoiceamountinc and
+   * meta-invoicevatamount as they may be needed by the Completor.
    */
   protected function getInvoiceTotals() {
     return array(
@@ -208,19 +208,19 @@ class Creator extends BaseCreator {
   protected function getItemLine(stdClass $item) {
     // @todo: next release: can margin scheme be used in VM?
     $result = array();
-    $productEx = (float) $item->product_discountedPriceWithoutTax;
-    $productInc = (float) $item->product_final_price;
-    $productTax = (float) $item->product_tax;
+    $productPriceEx = (float) $item->product_discountedPriceWithoutTax;
+    $productPriceInc = (float) $item->product_final_price;
+    $productVat = (float) $item->product_tax;
     $calcRule = $this->getCalcRule('VatTax', $item->virtuemart_order_item_id);
     if (!empty($calcRule->calc_value)) {
       $vatRate = (float) $calcRule->calc_value;
-      $debugVatRateSource = static::VatRateSource_Exact;
+      $metaVatRateSource = static::VatRateSource_Exact;
     }
     else {
-      if (!$this->floatsAreEqual($productEx, 0.0)) {
-        $vatRateRange = $this->getDivisionRange($productTax, $productEx, 0.0001, 0.0001);
+      if (!$this->floatsAreEqual($productPriceEx, 0.0)) {
+        $vatRateRange = $this->getDivisionRange($productVat, $productPriceEx, 0.0001, 0.0001);
         $vatRate = 100 * $vatRateRange['calculated'];
-        $debugVatRateSource = static::VatRateSource_Calculated;
+        $metaVatRateSource = static::VatRateSource_Calculated;
         $result = array(
           'meta-vatrate-min' => $vatRateRange['min'],
           'meta-vatrate-max' => $vatRateRange['max'],
@@ -230,19 +230,19 @@ class Creator extends BaseCreator {
         // Free products should get a "normal" tax rate. We leave that to the
         // completor to determine.
         $vatRate = null;
-        $debugVatRateSource = static::VatRateSource_Completor;
+        $metaVatRateSource = static::VatRateSource_Completor;
       }
 
     }
     $result = array(
       'itemnumber' => $item->order_item_sku,
       'product' => $item->order_item_name,
-      'unitprice' => $productEx,
-      'unitpriceinc' => $productInc,
+      'unitprice' => $productPriceEx,
+      'unitpriceinc' => $productPriceInc,
       'vatrate' => $vatRate,
-      'vatamount' => $productTax,
+      'vatamount' => $productVat,
       'quantity' => $item->product_quantity,
-      'meta-vatrate-source' => $debugVatRateSource,
+      'meta-vatrate-source' => $metaVatRateSource,
     ) + $result;
 
     return $result;
@@ -258,19 +258,19 @@ class Creator extends BaseCreator {
     // will be represented as the string '0.00' which is not considered empty.
     if (!empty($this->order['details']['BT']->order_shipment)) {
       $shippingEx = (float) $this->order['details']['BT']->order_shipment;
-      $shippingTax = (float) $this->order['details']['BT']->order_shipment_tax;
+      $shippingVat = (float) $this->order['details']['BT']->order_shipment_tax;
 
       $calcRule = $this->getCalcRule('shipment');
       if (!empty($calcRule->calc_value)) {
         $vatRate = (float) $calcRule->calc_value;
-        $debugVatRateSource = static::VatRateSource_Exact;
+        $metaVatRateSource = static::VatRateSource_Exact;
         $description = $this->t('shipping_costs');
       }
       else {
         if (!$this->floatsAreEqual($shippingEx, 0.0)) {
-          $vatRateRange = $this->getDivisionRange($shippingTax, $shippingEx, 0.0001, 0.01);
+          $vatRateRange = $this->getDivisionRange($shippingVat, $shippingEx, 0.0001, 0.01);
           $vatRate = 100 * $vatRateRange['calculated'];
-          $debugVatRateSource = static::VatRateSource_Calculated;
+          $metaVatRateSource = static::VatRateSource_Calculated;
           $description = $this->t('shipping_costs');
           $result = array(
             'meta-vatrate-min' => $vatRateRange['min'],
@@ -281,7 +281,7 @@ class Creator extends BaseCreator {
           // Free shipping should get a "normal" tax rate. We leave that to the
           // completor to determine.
           $vatRate = null;
-          $debugVatRateSource = static::VatRateSource_Completor;
+          $metaVatRateSource = static::VatRateSource_Completor;
           $description = $this->t('free_shipping');
         }
       }
@@ -289,9 +289,9 @@ class Creator extends BaseCreator {
         'product' => $description,
         'unitprice' => $shippingEx,
         'vatrate' => $vatRate,
-        'vatamount' => $shippingTax,
+        'vatamount' => $shippingVat,
         'quantity' => 1,
-        'meta-vatrate-source' => $debugVatRateSource,
+        'meta-vatrate-source' => $metaVatRateSource,
       ) + $result;
     }
     return $result;
@@ -413,17 +413,17 @@ class Creator extends BaseCreator {
     if (!empty($this->order['details']['BT']->order_payment)) {
       $paymentEx = (float) $this->order['details']['BT']->order_payment;
       if (!$this->floatsAreEqual($paymentEx, 0.0)) {
-        $paymentTax = (float) $this->order['details']['BT']->order_payment_tax;
+        $paymentVat = (float) $this->order['details']['BT']->order_payment_tax;
 
         $calcRule = $this->getCalcRule('payment');
         if (!empty($calcRule->calc_value)) {
           $vatRate = (float) $calcRule->calc_value;
-          $debugVatRateSource = static::VatRateSource_Exact;
+          $metaVatRateSource = static::VatRateSource_Exact;
         }
         else {
-          $vatRateRange = $this->getDivisionRange($paymentTax, $paymentEx, 0.0001, 0.01);
+          $vatRateRange = $this->getDivisionRange($paymentVat, $paymentEx, 0.0001, 0.01);
           $vatRate = 100.0 * $vatRateRange['calculated'];
-          $debugVatRateSource = static::VatRateSource_Calculated;
+          $metaVatRateSource = static::VatRateSource_Calculated;
           $result = array(
             'meta-vatrate-min' => $vatRateRange['min'],
             'meta-vatrate-max' => $vatRateRange['max'],
@@ -434,9 +434,9 @@ class Creator extends BaseCreator {
           'product' => $this->t('payment_costs'),
           'unitprice' => $paymentEx,
           'vatrate' => $vatRate,
-          'vatamount' => $paymentTax,
+          'vatamount' => $paymentVat,
           'quantity' => 1,
-          'meta-vatrate-source' => $debugVatRateSource,
+          'meta-vatrate-source' => $metaVatRateSource,
         ) + $result;
       }
     }

@@ -74,9 +74,9 @@ abstract class AcumulusEntryModel {
    *   Success.
    */
   public function save($invoiceSource, $entryId, $token) {
-    $record = $this->getByInvoiceSource($invoiceSource);
     $now = $this->sqlNow();
-    if (empty($record)) {
+    $record = $this->getByInvoiceSource($invoiceSource);
+    if ($record == NULL) {
       $this->insert($invoiceSource, $entryId, $token, $now);
     }
     else {
@@ -85,9 +85,10 @@ abstract class AcumulusEntryModel {
   }
 
   /**
-   * Returns the current time as a string valid to be used as a sql timestamp.
+   * Returns the current time in a format that the actual database layer accepts
+   * as a timestamp.
    *
-   * @return string
+   * @return int|string
    */
   abstract protected function sqlNow();
 

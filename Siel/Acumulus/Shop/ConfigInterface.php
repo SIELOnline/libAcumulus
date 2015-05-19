@@ -31,6 +31,6 @@ interface ConfigInterface {
    *   - triggerInvoiceSendEvent
    *   - triggerOrderStatus
    */
-  public function getShopSettings();
+  public function getShopSettings() ;
 
 }

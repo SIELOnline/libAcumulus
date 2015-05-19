@@ -2,7 +2,46 @@
 namespace Siel\Acumulus\Helpers;
 
 /**
- * Provides basic config form handling.
+ * Provides basic form handling.
+ *
+ * Most webshop and CMS software provide their own sort of form API. To be able
+ * to generalize or abstract our form handling, this class defines our own
+ * minimal form API. This allows us to define our form handing in a cross
+ * webshop compatible way. The webshop/CMs specific part should then define a
+ * wrapper/mapper to the webshop specific way of form handling.
+ *
+ * This base Form class defines a way to:
+ * - Define the form elements.
+ * - Render the form, including their values.
+ * - Process a form submission:
+ *   - Recognise form submission.
+ *   - Perform form (submission) validation.
+ *   - Execute a task on valid form submission.
+ *   - Show success and/or error messages.
+ *
+ * Usage:
+ * This code is typically performed by a controller that processes the request:
+ * <code>
+ *   $form = new ChildForm();
+ *   $form->process();
+ *   // process any messages ... may also be in the view
+ * </code>
+ *
+ * This code is typically performed by a view and should be used when the CMS or
+ * webshop does not really provide a form rendering engine:
+ * <code>
+ *   // Displays the form.
+ *   // Get the element definitions: a recursive array.
+ *   $formFields = $form->getFields();
+ *   // Add the values to the elements.
+ *   $formFields = $form->addValues($formFields);
+ *   // Render the html for the form.
+ *   $formRenderer = new FormRenderer();
+ *   $formRenderer->fields($formFields))
+ * </code>
+ *
+ * This code is to be used when the CMS or webshop does provide its own form
+ * handling and processing.
  */
 abstract class Form {
 

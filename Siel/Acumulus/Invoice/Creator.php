@@ -649,6 +649,30 @@ abstract class Creator {
   }
 
   /**
+   * Wrapper around getDivisionRange() that returns the values under the key
+   * names as the Completor expects them.
+   *
+   * @param float $numerator
+   * @param float $denominator
+   * @param float $precisionNumerator
+   * @param float $precisionDenominator
+   *
+   * @return array
+   *   Array with keys vatrate, meta-vatrate-min, meta-vatrate-max, and
+   *   meta-vatrate-source.
+   */
+  protected function getVatRangeTags($numerator, $denominator, $precisionNumerator = 0.01, $precisionDenominator = 0.01) {
+    $range = $this->getDivisionRange($numerator, $denominator, $precisionNumerator, $precisionDenominator);
+    return array(
+      'vatrate' => 100.0 * $range['calculated'],
+      'vatamount' => $numerator,
+      'meta-vatrate-min' => $range['min'],
+      'meta-vatrate-max' => $range['max'],
+      'meta-vatrate-source' => static::VatRateSource_Calculated,
+    );
+  }
+
+  /**
    * Helper method to do a float comparison.
    *
    * @param float $f1

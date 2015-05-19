@@ -1,11 +1,11 @@
 <?php
-namespace Siel\Acumulus\VirtueMart;
+namespace Siel\Acumulus\Shop\VirtueMart;
 
 use JLog;
 use \Siel\Acumulus\Helpers\Log as BaseLog;
 
 /**
- * Class \Siel\Acumulus\VirtueMart\Log
+ * Extends the base log class to log any library logging to the Joomla log.
  */
 class Log extends BaseLog {
 
@@ -20,7 +20,7 @@ class Log extends BaseLog {
   }
 
   /**
-   * Returns a textual representation of the severity.
+   * Returns the joomla equivalent of the severity.
    *
    * @param int $severity
    *   One of the constants of the base Log class.
@@ -41,6 +41,5 @@ class Log extends BaseLog {
         return JLog::DEBUG;
     }
   }
-
 
 }

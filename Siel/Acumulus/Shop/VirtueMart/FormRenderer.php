@@ -1,5 +1,5 @@
 <?php
-namespace Siel\Acumulus\VirtueMart;
+namespace Siel\Acumulus\Shop\VirtueMart;
 
 use \Siel\Acumulus\Helpers\FormRenderer as BaseFormRenderer;
 

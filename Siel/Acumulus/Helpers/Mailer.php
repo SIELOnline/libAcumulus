@@ -50,7 +50,7 @@ abstract class Mailer {
    * The mail is sent to the shop administrator (emailonerror setting).
    *
    * @param array $result
-   * @param array $messages
+   * @param string[] $messages
    * @param string $invoiceSourceType
    * @param string $invoiceSourceReference
    *
@@ -140,7 +140,7 @@ abstract class Mailer {
    * Returns the mail body as text and as html.
    *
    * @param array $result
-   * @param array $messages
+   * @param string[] $messages
    * @param string $invoiceSourceType
    * @param string $invoiceSourceReference
    *

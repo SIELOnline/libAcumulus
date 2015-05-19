@@ -16,6 +16,7 @@ class Fail extends CompletorStrategyBase {
    */
   public function execute() {
     $this->description = "Fail";
+    $this->completedLines = $this->lines2Complete;
     return true;
   }
 

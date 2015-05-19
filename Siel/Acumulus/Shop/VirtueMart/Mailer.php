@@ -1,12 +1,11 @@
 <?php
-namespace Siel\Acumulus\VirtueMart;
+namespace Siel\Acumulus\Shop\VirtueMart;
 
 use JFactory;
 use Siel\Acumulus\Helpers\Mailer as BaseMailer;
 
 /**
- * Helper class to send a mail with the results of sending an invoice to
- * Acumulus.
+ * Extends the base mailer class to send a mail using the Joomla mail features.
  */
 class Mailer extends BaseMailer {
 

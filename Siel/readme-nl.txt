@@ -1,0 +1,33 @@
+Acumulus web service API library
+===============================
+
+@author: Buro Rader (http://www.burorader.com/).
+@support: TODO. zie het Acumulus forum.
+
+Inleiding
+---------
+Deze Acumulus web service API library is bedoeld om het ontwikkelen van client
+side code die communiceert met de Acumulus API te vereenvoudigen. De library is
+in eerste instantie ontwikkeld voor gebruik door de koppelingen voor de webshop
+software van Magento, PrestaShop, OpenCart, VirtueMart en WooCommerce, maar is
+dusdanig opgezet dat ook andere koppelingen er hun voordeel mee kunnen doen.
+
+Dit is dus een cross-CMS/webshop library. Daarom kan de code in deze library
+niet voldoen aan specifieke richtlijnen voor een specifieke webshop of CMS. Denk
+hierbij aan:
+- Coding standards.
+- Organisatie en naamgeving.
+- Vertaling door gebruikmaking van webshop specifieke vertaalfunctionaliteit.
+- Webshop specifieke "Best practises".
+
+Licentie
+--------
+Als deze library u apart ter beschikking is gesteld, is dit onder de GNU GENERAL
+PUBLIC LICENSE versie 3. De Engelstalige en enige officiële tekst hiervan kunt u
+vinden op http://www.gnu.org/licenses/gpl.html. Een niet bindende
+Nederlandstalige vertaling hiervan vindt u op
+http://bartbeuving.files.wordpress.com/2008/07/gpl-v3-nl-101.pdf.
+
+Als deze library u als onderdeel van een koppeling ter beschikking is gesteld,
+geldt de licentie van de koppeling ook voor deze library.
+

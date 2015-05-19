@@ -455,7 +455,11 @@ class CompletorInvoiceLines {
 
     // For now hardcoded, but this can be turned into a discovery.
     $namespace = '\Siel\Acumulus\Invoice\CompletorStrategy';
+    $result[] = "$namespace\\SplitKnownDiscountLine";
     $result[] = "$namespace\\ApplySameVatRate";
+    $result[] = "$namespace\\SplitLine";
+    $result[] = "$namespace\\TryAllVatRatePermutations";
+    $result[] = "$namespace\\Fail";
 
     return $result;
   }

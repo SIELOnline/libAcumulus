@@ -1,5 +1,5 @@
 <?php
-namespace Siel\Acumulus\VirtueMart;
+namespace Siel\Acumulus\Shop\VirtueMart;
 
 use JSession;
 use Siel\Acumulus\Shop\BatchForm as BaseBatchForm;

@@ -10,14 +10,14 @@ namespace Siel\Acumulus\Invoice;
  */
 abstract class Source {
   // Invoice source type constants.
-  const Other = 'other';
-  const Order = 'order';
-  const CreditNote = 'credit note';
+  const Other = 'Other';
+  const Order = 'Order';
+  const CreditNote = 'CreditNote';
 
   /** @var string */
   protected $type;
 
-  /** @var string */
+  /** @var int */
   protected $id;
 
   /** @var array|object */
@@ -25,17 +25,17 @@ abstract class Source {
 
   /**
    * @param string $type
-   * @param string|array|object $idOrSource
+   * @param int|string|array|object $idOrSource
    */
   public function __construct($type, $idOrSource) {
-    $this->type   = $type;
+    $this->type = $type;
     if (is_scalar($idOrSource)) {
       $this->id = $idOrSource;
       $this->setSource();
     }
     else {
       $this->source = $idOrSource;
-      $this->id = $this->setId();
+      $this->setId();
     }
   }
 
@@ -49,7 +49,9 @@ abstract class Source {
   /**
    * Sets the source based on type and id.
    */
-  abstract protected function setSource();
+  protected function setSource() {
+    return $this->callTypeSpecificMethod(__METHOD__);
+  }
 
   /**
    * @return array|object
@@ -61,12 +63,14 @@ abstract class Source {
   /**
    * Sets the id based on type and source.
    */
-  abstract protected function setId();
+  protected function setId() {
+    return $this->callTypeSpecificMethod(__METHOD__);
+  }
 
   /**
    * Returns the internal id of this invoice source.
    *
-   * @return string|int
+   * @return int|string
    *   The internal id.
    */
   public function getId() {
@@ -86,4 +90,15 @@ abstract class Source {
     return $this->getId();
   }
 
+  /**
+   * Calls a method that typically depends on the type of invoice source.
+   *
+   * @param string $method
+   *
+   * @return void|mixed
+   */
+  protected function callTypeSpecificMethod($method) {
+    $method .= $this->getType();
+    return $this->$method();
+  }
 }

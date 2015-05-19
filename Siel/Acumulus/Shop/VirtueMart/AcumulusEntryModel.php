@@ -1,5 +1,5 @@
 <?php
-namespace Siel\Acumulus\VirtueMart;
+namespace Siel\Acumulus\Shop\VirtueMart;
 
 use DateTimeZone;
 use JDate;
@@ -50,7 +50,7 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel {
     $table->source_id = $invoiceSource->getId();
     $table->created = $created;
     $table->updated = $created;
-    $table->store();
+    return $table->store();
   }
 
   /**
@@ -63,8 +63,9 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel {
     $table->source_type = $record['source_type'];
     $table->source_id = $record['source_id'];
     $table->updated = $updated;
-    $table->store(false);
+    return $table->store(false);
   }
+
   /**
    * {@inheritdoc}
    */
@@ -78,7 +79,7 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel {
   /**
    * {@inheritdoc}
    *
-   * Joomla has separate install scripts, so nothing has tobe done here.
+   * Joomla has separate install scripts, so nothing has to be done here.
    */
   function install() {
     return false;
@@ -87,7 +88,7 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel {
   /**
    * {@inheritdoc}
    *
-   * Joomla has separate install scripts, so nothing has tobe done here.
+   * Joomla has separate install scripts, so nothing has to be done here.
    */
   public function uninstall() {
     return false;

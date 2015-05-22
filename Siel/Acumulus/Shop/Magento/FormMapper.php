@@ -9,17 +9,23 @@ use Varien_Data_Form_Abstract;
  */
 class FormMapper {
 
+  /** @var bool */
+  protected $hasRadios = FALSE;
+
   /**
    * Maps a set of field definitions.
    *
    * @param \Varien_Data_Form_Abstract $form
    * @param array[] $fields
-   *
-   * @return \Varien_Data_Form_Abstract
    */
   public function map(Varien_Data_Form_Abstract $form, array $fields) {
     $this->fields($form, $fields);
-    return $form;
+    if ($this->hasRadios) {
+      $form->addField('radio-styling',
+        'note',
+        array('text' => '<style> input[type=radio] { float: left; clear: both; margin-top: 0.2em;} .value label.inline {float: left !important; max-width: 95%; padding-left: 1em;} .note {clear: both;}</style>'),
+        '^');
+    }
   }
 
   /**
@@ -29,9 +35,9 @@ class FormMapper {
    * @param array[] $fields
    */
   public function fields($parent, array $fields) {
-    foreach ($fields as $name => $field) {
+    foreach ($fields as $id => $field) {
       if (!isset($field['name'])) {
-        $field['name'] = $name;
+        $field['name'] = $id;
       }
       $this->field($parent, $field);
     }
@@ -70,6 +76,7 @@ class FormMapper {
         break;
       case 'radio':
         $type = 'radios';
+        $this->hasRadios = TRUE;
         break;
       case 'checkbox':
         $type = 'checkboxes';
@@ -114,7 +121,6 @@ class FormMapper {
   protected function getMagentoProperty($key, $value, $type) {
     switch ($key) {
       // Fields to ignore:
-      case 'name':
       case 'type':
       case 'fields':
         $result = array();
@@ -124,11 +130,19 @@ class FormMapper {
       case 'label':
         $result = array($key => $value);
         break;
+      case 'name':
+        if ($type === 'checkbox') {
+          // Make it an array for PHP POST processing, in case there are
+          // multiple checkboxes.
+          $value .= '[]';
+        }
+        $result = array($key => $value);
+        break;
       case 'description':
         $result = array('after_element_html' => '<p class="note">' . $value . '</p>');
         break;
       case 'value':
-        if ($type === 'note') {
+        if ($type === 'markup') {
           $result = array('text' => $value);
         }
         else { // $type === 'hidden'
@@ -136,8 +150,8 @@ class FormMapper {
         }
         break;
       case 'attributes':
-        // In magento yo add pure html attributes at the same level as the
-        // "field attributes" tha are for Magento.
+        // In magento you add pure html attributes at the same level as the
+        // "field attributes" that are for Magento.
         $result = $value;
         if (!empty($value['required'])) {
           if (isset($result['class'])) {
@@ -146,14 +160,20 @@ class FormMapper {
           else {
             $result['class'] = '';
           }
-          $result['class'] .= 'required-entry';
+          if ($type === 'radio') {
+            unset($result['required']);
+            $result['class'] .= 'validate-one-required-by-name';
+          }
+          else {
+            $result['class'] .= 'required-entry';
+          }
         }
         break;
       case 'options':
-        $result = array('options' => $this->getMagentoOptions($value));
+        $result = array('values' => $this->getMagentoOptions($value));
         break;
       default:
-        Log::getInstance()->warning(__CLASS__ . '::' . __METHOD__ . "Unknown key '$key'");
+        Log::getInstance()->warning(__METHOD__ . "Unknown key '$key'");
         $result = array($key => $value);
         break;
     }

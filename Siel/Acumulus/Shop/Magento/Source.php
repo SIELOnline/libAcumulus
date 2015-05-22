@@ -42,7 +42,7 @@ class Source extends BaseSource {
    * {@inheritdoc}
    */
   public function getReference() {
-    return $this->callTypeSpecificMethod(__METHOD__);
+    return $this->callTypeSpecificMethod(__FUNCTION__);
   }
 
   /**

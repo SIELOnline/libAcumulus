@@ -40,9 +40,9 @@ use Siel\Acumulus\Web\Service;
  *   - completor: to be filled in by the completor.
  *   - strategy: to be filled in by a tax divide strategy. This may lead to
  *      this line being split into multiple lines.
- * - (*)lineprice: the total price for this line excluding VAT.
- * - (*)linepriceinc: the total price for this line including VAT.
- * - (*)linevatamount: the amount of VAT for the whole line.
+ * - (*)meta-lineprice: the total price for this line excluding VAT.
+ * - (*)meta-linepriceinc: the total price for this line including VAT.
+ * - meta-linevatamount: the amount of VAT for the whole line.
  * (*) = these are not yet used.
  *
  * @package Siel\Acumulus
@@ -146,7 +146,7 @@ class CompletorInvoiceLines {
   protected function completeInvoiceLines() {
     $this->initPossibleVatTypes();
     $this->initPossibleVatRates();
-    $this->reduceVatTypesByVatRatesBySource(Creator::VatRateSource_Exact);
+    $this->reduceVatTypesByVatRatesBySource(array(Creator::VatRateSource_Exact, Creator::VatRateSource_Exact0));
     $this->correctCalculatedVatRates();
     $this->reduceVatTypesByVatRatesBySource(static::VatRateSource_Calculated_Corrected);
     $this->addVatRateTo0PriceLines();
@@ -260,16 +260,20 @@ class CompletorInvoiceLines {
    *
    * Example: NL: 6 and 21; FR 6 and 20: we find 6 and 20 => vat type = foreign.
    *
-   * @param string $vatRateSource
+   * @param string|string[] $vatRateSource
    */
   protected function reduceVatTypesByVatRatesBySource($vatRateSource) {
     if (count($this->possibleVatTypes) > 1) {
+      if (is_string($vatRateSource)) {
+        $vatRateSource = array($vatRateSource);
+      }
+
       // We keep track of vat types found per appearing vat rate.
       // The intersection of these sets should result in the new, hopefully
       // smaller list, of possible vat types.
       $foundVatTypes = array();
       foreach ($this->invoiceLines as &$line) {
-        if (!empty($line['meta-vatrate-source']) && $line['meta-vatrate-source'] === $vatRateSource
+        if (!empty($line['meta-vatrate-source']) && in_array($line['meta-vatrate-source'], $vatRateSource)
           // We ignore "0" vat rates (0 and -1).
           && isset($line['vatrate']) && $line['vatrate'] > 0) {
           // Check if we already processed this vat rate for another line.
@@ -346,17 +350,19 @@ class CompletorInvoiceLines {
   protected function correctVatRateByRange(array $line) {
     $matchedVatRates = array();
     foreach ($this->possibleVatRates as $vatRate) {
-      if ($vatRate >= $line['meta-vatrate-min'] && $vatRate <= $line['meta-vatrate-max']) {
-        $matchedVatRate[] = $vatRate;
+      if ($vatRate['vatrate'] >= $line['meta-vatrate-min'] && $vatRate['vatrate'] <= $line['meta-vatrate-max']) {
+        $matchedVatRates[] = $vatRate;
       }
     }
 
     if (count($matchedVatRates) === 1) {
-      $line['vatrate'] = $matchedVatRates[0];
+      $line['vatrate'] = $matchedVatRates[0]['vatrate'];
       $line['meta-vatrate-source'] = static::VatRateSource_Calculated_Corrected;
     }
     else {
-      $line['meta-vatrate-matches'] = $matchedVatRates;
+      $line['meta-vatrate-matches'] = count($matchedVatRates) === 0 ? 'none' : array_reduce($matchedVatRates, function($carry, $item) {
+          return $carry . ($carry === '' ? '' : ',') . $item['vatrate'] . '(' . $item['vattype'] . ')';
+        }, '');
     }
     return $line;
   }
@@ -412,8 +418,11 @@ class CompletorInvoiceLines {
    */
   protected function completeStrategyLines() {
     if ($this->invoiceHasStrategyLine()) {
-      $this->invoice['customer']['invoice']['meta-completor-strategy-input'] = sprintf('strategy input(%s)',
-        str_replace(array("\n", "\r", '  '), array('', '' , ' '), var_export($this->possibleVatRates, true)));
+      $input = array_reduce($this->possibleVatRates, function($carry, $item) {
+          return $carry . (empty($carry) ? '' : ',') . '[' . $item['vatrate'] . '%,' . $item['vattype'] .']';
+        },
+        '');
+      $this->invoice['customer']['invoice']['meta-completor-strategy-input'] = "strategy input($input)";
 
       $strategies = $this->getStrategyClasses();
       foreach ($strategies as $strategyClass) {

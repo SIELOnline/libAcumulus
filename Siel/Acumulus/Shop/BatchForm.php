@@ -3,6 +3,7 @@ namespace Siel\Acumulus\Shop;
 
 use Siel\Acumulus\Helpers\Form;
 use Siel\Acumulus\Helpers\TranslatorInterface;
+use Siel\Acumulus\Invoice\Translations as InvoiceTranslations;
 
 /**
  * Provides batch form handling.
@@ -23,12 +24,24 @@ abstract class BatchForm extends Form {
   public function __construct(Config $config, TranslatorInterface $translator, InvoiceManager $invoiceManager) {
     parent::__construct($translator);
 
+    require_once(dirname(__FILE__) . '/../Invoice/Translations.php');
+    $translations = new InvoiceTranslations();
+    $this->translator->add($translations);
+
     require_once(dirname(__FILE__) . '/BatchFormTranslations.php');
     $translations = new BatchFormTranslations();
     $this->translator->add($translations);
 
     $this->log = array();
     $this->invoiceManager = $invoiceManager;
+  }
+
+  protected function getDefaultFormValues() {
+    $result = parent::getDefaultFormValues();
+    if (!empty($this->log)) {
+      $result['log'] = implode("\n", $this->log);
+    }
+    return $result;
   }
 
   protected function validate() {
@@ -98,7 +111,14 @@ abstract class BatchForm extends Form {
       $to = $this->getFormValue('date_to') ? $this->getFormValue('date_to') : $from;
       $invoiceSources = $this->invoiceManager->getInvoiceSourcesByDateRange($type, $from, $to);
     }
-    return $this->invoiceManager->sendMultiple($invoiceSources, (bool) $this->getFormValue('force_send'), $this->log);
+    if (count($invoiceSources) === 0) {
+      $this->log[$type] = sprintf($this->t('message_form_empty_range'), $this->t($type));
+      $result = TRUE;
+    }
+    else {
+      $result = $this->invoiceManager->sendMultiple($invoiceSources, (bool) $this->getFormValue('force_send'), $this->log);
+    }
+    return $result;
   }
 
   /**
@@ -118,19 +138,21 @@ abstract class BatchForm extends Form {
     else {
       $options = array();
       foreach ($invoiceSourceTypes as $invoiceSourceType) {
-        $options[$invoiceSourceType] = $this->t($invoiceSourceType);
+        $options[$invoiceSourceType] = ucfirst($this->t($invoiceSourceType));
       }
       $invoiceSourceTypeField = array(
         'type' => 'radio',
         'label' => $this->t('field_invoice_source_type'),
         'options' => $options,
-        'required' => true,
+        'attributes' => array(
+          'required' => true,
+        ),
       );
     }
     // 1st fieldset: Batch options.
     $fields['batchFieldsHeader'] = array(
       'type' => 'fieldset',
-      'label' => $this->t('batchFieldsHeader'),
+      'legend' => $this->t('batchFieldsHeader'),
       'fields' => array(
         'invoice_source_type' => $invoiceSourceTypeField,
         'invoice_source_reference_from' => array(
@@ -164,17 +186,19 @@ abstract class BatchForm extends Form {
 
     // 2nd fieldset: Batch log.
     if (!empty($this->log)) {
+      $logText = implode("\n", $this->log);
+      $this->formValues['log'] = $logText;
       $fields['batchLogHeader'] = array(
         'type' => 'fieldset',
-        'label' => $this->t('batchLogHeader'),
+        'legend' => $this->t('batchLogHeader'),
         'fields' => array(
           'log' => array(
             'type' => 'textarea',
-            'value' => join("\n", $this->log),
+            'value' => $logText,
             'attributes' => array(
               'readonly' => TRUE,
               'rows' => min(10, count($this->log)),
-              'style' => 'box-sizing: border-box; width: 100%;',
+              'style' => 'box-sizing: border-box; width: 100%; min-width: 32em;',
             ),
           ),
         ),
@@ -184,7 +208,7 @@ abstract class BatchForm extends Form {
     // 3rd fieldset: Batch info.
     $fields['batchInfoHeader'] = array(
       'type' => 'fieldset',
-      'label' => $this->t('batchInfoHeader'),
+      'legend' => $this->t('batchInfoHeader'),
       'fields' => array(
         'info' => array(
           'type' => 'markup',

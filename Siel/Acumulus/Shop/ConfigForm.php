@@ -40,9 +40,7 @@ abstract class ConfigForm extends Form {
   /**
    * {@inheritdoc}
    *
-   * This is the union of the values as are stored in the config and any
-   * submitted erroneous values. On valid form submission, the form values will
-   * be saved to the config, so no need to merge them into the result.
+   * This is the set of values as are stored in the config.
    */
   protected function getDefaultFormValues() {
     return $this->acumulusConfig->getCredentials() + $this->acumulusConfig->getShopSettings() + $this->acumulusConfig->getInvoiceSettings() + $this->acumulusConfig->getEmailAsPdfSettings() + array('debug' => $this->acumulusConfig->getDebug());
@@ -54,11 +52,12 @@ abstract class ConfigForm extends Form {
    * The results are restricted to the known config keys.
    */
   protected function setSubmittedValues() {
+    $postedValues = $this->getPostedValues();
     foreach ($this->acumulusConfig->getKeys() as $key) {
-      if (!$this->addIfIsset($this->submittedValues, $key, $_POST)) {
-        // Add unset checkboxes.
+      if (!$this->addIfIsset($this->submittedValues, $key, $postedValues)) {
+        // Add unchecked checkboxes.
         if ($this->isCheckboxKey($key)) {
-          $this->submittedValues[$key] = "";
+          $this->submittedValues[$key] = '';
         }
       }
     }
@@ -124,7 +123,7 @@ abstract class ConfigForm extends Form {
     // 1st fieldset: Acumulus account settings.
     $fields['accountSettingsHeader'] = array(
       'type' => 'fieldset',
-      'label' => $this->t('accountSettingsHeader'),
+      'legend' => $this->t('accountSettingsHeader'),
       // Account fields.
       'fields' => array(
         'contractcode' => array(
@@ -169,7 +168,7 @@ abstract class ConfigForm extends Form {
     // 2nd fieldset: message or invoice sending related fields.
     $fields['invoiceSettingsHeader'] = array(
       'type' => 'fieldset',
-      'label' => $this->t('invoiceSettingsHeader'),
+      'legend' => $this->t('invoiceSettingsHeader'),
     );
     if (!$accountOk) {
       $fields['invoiceSettingsHeader']['fields'] = array (
@@ -296,7 +295,7 @@ abstract class ConfigForm extends Form {
     if ($accountOk) {
       $fields['emailAsPdfSettingsHeader'] = array(
         'type' => 'fieldset',
-        'label' => $this->t('emailAsPdfSettingsHeader'),
+        'legend' => $this->t('emailAsPdfSettingsHeader'),
         'fields' => array (
           'emailAsPdf' => array(
             'type' => 'checkbox',
@@ -340,7 +339,7 @@ abstract class ConfigForm extends Form {
     $env = $this->acumulusConfig->getEnvironment();
     $fields['versionInformationHeader'] = array(
       'type' => 'fieldset',
-      'label' => $this->t('versionInformationHeader'),
+      'legend' => $this->t('versionInformationHeader'),
       'fields' => array (
         'debug' => array(
           'type' => 'radio',
@@ -352,7 +351,9 @@ abstract class ConfigForm extends Form {
             WebConfigInterface::Debug_TestMode => $this->t('option_debug_4'),
             WebConfigInterface::Debug_StayLocal => $this->t('option_debug_3'),
           ),
-          'required' => true,
+          'attributes' => array(
+            'required' => true,
+          ),
         ),
         'logLevel' => array(
           'type' => 'radio',
@@ -365,7 +366,9 @@ abstract class ConfigForm extends Form {
             Log::Notice => $this->t('option_logLevel_3'),
             Log::Debug => $this->t('option_logLevel_4'),
           ),
-          'required' => true,
+          'attributes' => array(
+            'required' => true,
+          ),
         ),
         'versionInformation' => array(
           'type' => 'markup',
@@ -530,28 +533,19 @@ abstract class ConfigForm extends Form {
   }
 
   /**
-   * Returns a list of order statuses.
-   *
-   * @return array
-   *   An array of $value => $label pairs for all order statuses.
+   * {@inheritdoc}
    */
   abstract protected function getShopOrderStatuses();
 
   /**
-   * Returns whether the $key is a checkbox value.
-   *
-   * @param string $key
-   *
-   * @return bool
-   *   True if $key is a checkbox, false otherwise.
+   * {@inheritdoc}
    */
-  protected function isCheckboxKey($key) {
-    $checkboxKeys = array();
-    if (isset($_POST['dateToUse'])) {
-      // We are processing a fully populated form submission.
-      $checkboxKeys = array('sendCustomer', 'overwriteIfExists', 'emailAsPdf');
-    }
-    return in_array($key, $checkboxKeys);
+  protected function getCheckboxKeys() {
+    return array(
+      'sendCustomer' => 'clientData',
+      'overwriteIfExists' => 'clientData',
+      'emailAsPdf' => 'emailAsPdf'
+    );
   }
 
 }

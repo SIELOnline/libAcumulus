@@ -99,7 +99,7 @@ class FormRenderer {
     $output = '';
     $output .= $this->getWrapper('fieldset', $field['attributes']);
     $output .= $this->getWrapper('legend', $field['attributes']);
-    $output .= $field['label'];
+    $output .= $field['legend'];
     $output .= $this->getWrapperEnd('legend');
     if (!empty($field['description'])) {
       $output .= $this->description($field['description']);
@@ -563,7 +563,7 @@ class FormRenderer {
     $attributeString = '';
     foreach ($attributes as $key => $value) {
       if (is_array($value)) {
-        $value = join(' ', $value);
+        $value = implode(' ', $value);
       }
       // Skip attributes that are not to be set (required, disabled, ...).
       if ($value !== false ) {

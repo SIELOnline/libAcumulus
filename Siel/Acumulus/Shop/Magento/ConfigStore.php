@@ -50,6 +50,7 @@ class ConfigStore implements ConfigStoreInterface {
       }
     }
     Mage::getConfig()->reinit();
+    return TRUE;
   }
 
 }

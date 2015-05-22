@@ -11,10 +11,10 @@ class Translations extends TranslationCollection {
 
   protected $nl = array(
     // Batch log messages.
-    'message_batch_send_1_success' => 'Factuur voor %1$s %2$s succesvol verzonden.',
+    'message_batch_send_1_success' => 'Factuur voor %1$s %2$s is succesvol verzonden.',
     'message_batch_send_1_errors' => 'Fout bij het versturen van de factuur voor %1$s %2$s.',
     'message_batch_send_1_warnings' => 'Waarschuwingen bij het versturen van de factuur voor %1$s %2$s.',
-    'message_batch_send_1_skipped' => 'Factuur voor %1$s %2$s overgeslagen omdat deze al verstuurd is.',
+    'message_batch_send_1_skipped' => 'Factuur voor %1$s %2$s is overgeslagen omdat deze al verstuurd is.',
 
   );
 

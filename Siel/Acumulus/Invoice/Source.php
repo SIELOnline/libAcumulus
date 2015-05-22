@@ -50,7 +50,7 @@ abstract class Source {
    * Sets the source based on type and id.
    */
   protected function setSource() {
-    return $this->callTypeSpecificMethod(__METHOD__);
+    return $this->callTypeSpecificMethod(__FUNCTION__);
   }
 
   /**
@@ -64,7 +64,7 @@ abstract class Source {
    * Sets the id based on type and source.
    */
   protected function setId() {
-    return $this->callTypeSpecificMethod(__METHOD__);
+    return $this->callTypeSpecificMethod(__FUNCTION__);
   }
 
   /**

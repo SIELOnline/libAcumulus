@@ -29,6 +29,7 @@ use Siel\Acumulus\Shop\ConfigInterface as ShopConfigInterface;
 abstract class Creator {
 
   const VatRateSource_Exact = 'exact';
+  const VatRateSource_Exact0 = 'exact-0';
   const VatRateSource_Calculated = 'calculated';
   const VatRateSource_Completor = 'completor';
   const VatRateSource_Strategy = 'strategy';
@@ -363,9 +364,9 @@ abstract class Creator {
    *     precision of the numbers used to calculate the vat rate.
    * - meta-strategy-split: boolean that indicates if this line may be split
    *     into multiple lines to divide vat.
-   * - (*)lineprice: the total price for this line excluding VAT.
-   * - (*)linepriceinc: the total price for this line including VAT.
-   * - (*)linevatamount: the amount of VAT for the whole line.
+   * - (*)meta-lineprice: the total price for this line excluding VAT.
+   * - (*)meta-linepriceinc: the total price for this line including VAT.
+   * - meta-linevatamount: the amount of VAT for the whole line.
    * (*) = these are not yet used.
    *
    * These keys can be used to complete missing values or to assist in
@@ -610,7 +611,7 @@ abstract class Creator {
 
   /**
    * Returns the range within which the result of the division should fall given
-   * the precision for the 2 numbers to divide.
+   * the precision range for the 2 numbers to divide.
    *
    * @param float $numerator
    * @param float $denominator
@@ -652,6 +653,8 @@ abstract class Creator {
    * Wrapper around getDivisionRange() that returns the values under the key
    * names as the Completor expects them.
    *
+   * If $numerator = 0 the vatrate will be set to 0 and treat as being exact.
+   *
    * @param float $numerator
    * @param float $denominator
    * @param float $precisionNumerator
@@ -662,14 +665,23 @@ abstract class Creator {
    *   meta-vatrate-source.
    */
   protected function getVatRangeTags($numerator, $denominator, $precisionNumerator = 0.01, $precisionDenominator = 0.01) {
-    $range = $this->getDivisionRange($numerator, $denominator, $precisionNumerator, $precisionDenominator);
-    return array(
-      'vatrate' => 100.0 * $range['calculated'],
-      'vatamount' => $numerator,
-      'meta-vatrate-min' => $range['min'],
-      'meta-vatrate-max' => $range['max'],
-      'meta-vatrate-source' => static::VatRateSource_Calculated,
-    );
+    if ($this->floatsAreEqual($numerator, 0.0, 0.0001)) {
+      return array(
+        'vatrate' => 0,
+        'vatamount' => $numerator,
+        'meta-vatrate-source' => static::VatRateSource_Exact0,
+      );
+    }
+    else {
+      $range = $this->getDivisionRange($numerator, $denominator, $precisionNumerator, $precisionDenominator);
+      return array(
+        'vatrate' => 100.0 * $range['calculated'],
+        'vatamount' => $numerator,
+        'meta-vatrate-min' => 100.0 * $range['min'],
+        'meta-vatrate-max' => 100.0 * $range['max'],
+        'meta-vatrate-source' => static::VatRateSource_Calculated,
+      );
+    }
   }
 
   /**
@@ -685,6 +697,36 @@ abstract class Creator {
    */
   protected function floatsAreEqual($f1, $f2, $maxDiff = 0.005) {
     return abs($f2 - $f1) < $maxDiff;
+  }
+
+  /**
+   * indicates if a float is to be considered a non-zero amount.
+   *
+   * This is a wrapper around floatsAreEqual() for the most used situation where
+   * an amount is checked for not being 0.0.
+   *
+   * @param $f1
+   * @param float $maxDiff
+   *
+   * @return bool
+   */
+  protected function isAmount($f1, $maxDiff = 0.001) {
+    return !$this->floatsAreEqual($f1, 0.0, $maxDiff);
+  }
+
+  /**
+   * indicates if a float is to be considered zero.
+   *
+   * This is a wrapper around floatsAreEqual() for the often used case where
+   * an amount is checked for being 0.0.
+   *
+   * @param $f1
+   * @param float $maxDiff
+   *
+   * @return bool
+   */
+  protected function isZero($f1, $maxDiff = 0.001) {
+    return $this->floatsAreEqual($f1, 0.0, $maxDiff);
   }
 
 }

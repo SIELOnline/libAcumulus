@@ -137,7 +137,7 @@ class Service {
    * @return string
    */
   public function messagesToText(array $messages) {
-    return '* ' . join("\n\n* ", $messages) . "\n\n";
+    return '* ' . implode("\n\n* ", $messages) . "\n\n";
   }
 
   /**
@@ -152,7 +152,7 @@ class Service {
     foreach ($messages as $message) {
       $messages_html[] = nl2br(htmlspecialchars($message, ENT_NOQUOTES));
     }
-    return '<ul><li>' . join("</li><li>", $messages_html) . '</li></ul>';
+    return '<ul><li>' . implode("</li><li>", $messages_html) . '</li></ul>';
   }
 
   /**

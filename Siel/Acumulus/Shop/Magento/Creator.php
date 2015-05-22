@@ -12,10 +12,8 @@ use Mage_Sales_Model_Order_Item;
 use Mage_Sales_Model_Order_Payment;
 use Mage_Tax_Model_Config;
 use Siel\Acumulus\Invoice\ConfigInterface as InvoiceConfigInterface;
-use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Shop\ConfigInterface;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
-use stdClass;
 
 /**
  * Allows to create arrays in the Acumulus invoice structure from a Magento
@@ -111,7 +109,7 @@ class Creator extends BaseCreator {
    */
   protected function getInvoiceNumber($invoiceNumberSource) {
     $result = $this->source->getReference();
-    if ($invoiceNumberSource == ConfigInterface::InvoiceNrSource_ShopInvoice && $this->source->getType() === Source::Order) {
+    if ($invoiceNumberSource == ConfigInterface::InvoiceNrSource_ShopInvoice && $this->source->getType() === Source::Order && $this->shopInvoice !== NULL) {
       $result = $this->shopInvoice->getIncrementId();
     }
     return $result;
@@ -124,7 +122,7 @@ class Creator extends BaseCreator {
     // createdAt returns yyyy-mm-dd hh:mm:ss, take date part.
     $result = substr($this->source->getSource()->getCreatedAt(), 0, strlen('yyyy-mm-dd'));
     // A credit note is its own invoice
-    if ($dateToUse == ConfigInterface::InvoiceDate_InvoiceCreate && $this->source->getType() === Source::Order) {
+    if ($dateToUse == ConfigInterface::InvoiceDate_InvoiceCreate && $this->source->getType() === Source::Order && $this->shopInvoice !== NULL) {
       $result = substr($this->shopInvoice->getCreatedAt(), 0, strlen('yyyy-mm-dd'));
     }
     return $result;
@@ -134,11 +132,11 @@ class Creator extends BaseCreator {
    * {@inheritdoc}
    */
   protected function getPaymentState() {
-    return $this->callTypeSpecificMethod(__METHOD__);
+    return $this->callTypeSpecificMethod(__FUNCTION__);
   }
 
   protected function getPaymentStateOrder() {
-    return $this->floatsAreEqual($this->order->getBaseTotalDue(), 0.0)
+    return $this->isZero($this->order->getBaseTotalDue())
       ? InvoiceConfigInterface::PaymentStatus_Paid
       : InvoiceConfigInterface::PaymentStatus_Due;
   }
@@ -153,7 +151,7 @@ class Creator extends BaseCreator {
    * {@inheritdoc}
    */
   protected function getPaymentDate() {
-    return $this->callTypeSpecificMethod(__METHOD__);
+    return $this->callTypeSpecificMethod(__FUNCTION__);
   }
 
   protected function getPaymentDateOrder() {
@@ -190,7 +188,7 @@ class Creator extends BaseCreator {
    * {@inheritdoc}
    */
   protected function getItemLines() {
-    return $this->callTypeSpecificMethod(__METHOD__);
+    return $this->callTypeSpecificMethod(__FUNCTION__);
   }
 
   /**
@@ -211,11 +209,11 @@ class Creator extends BaseCreator {
   protected function getItemLinesCreditNote() {
     $result = array();
     // Items may be composed, so start with all "visible" items.
-    foreach ($this->order->getAllItems() as $item) {
+    foreach ($this->creditNote->getAllItems() as $item) {
       // Only items for which row total is set, are refunded
       /** @var Mage_Sales_Model_Order_Creditmemo_Item $item */
       if ((float) $item->getRowTotal() > 0.0) {
-        $result[] = array_merge($result, $this->getItemLineCreditNote($item));
+        $result[] = $this->getItemLineCreditNote($item);
       }
     }
     return $result;
@@ -235,11 +233,14 @@ class Creator extends BaseCreator {
     $vatRate = (float) $item->getTaxPercent();
     $metaVatRateSource = static::VatRateSource_Exact;
     $productPriceInc = (float) $item->getPriceInclTax();
-    // For higher precision of the unit price, we use the prices as entered by the admin.
+    // For higher precision of the unit price, we use the prices as entered by
+    // the admin.
     $productPriceEx = $this->productPricesIncludeTax() ? (float) $productPriceInc / (100 + $vatRate) * 100 : (float) $item->getPrice();
-    // @todo: check if this is line or single item level.
-    // @todo: check if hidden vat should be part of it.
-    $productVat = (float) $item->getTaxAmount() + (float) $item->getHiddenTaxAmount();
+    // Tax amount = VAT over discounted product price.
+    // Hidden tax amount = VAT over discount.
+    // But as discounts get their own lines and the product lines are showing
+    // the normal (not discounted) price we add these 2.
+    $lineVat = (float) $item->getTaxAmount() + (float) $item->getHiddenTaxAmount();
 
     // Simple products (products without children): add as 1 line.
     $this->addIfNotEmpty($result, 'itemnumber', $item->getSku());
@@ -248,18 +249,17 @@ class Creator extends BaseCreator {
       'unitprice' => $productPriceEx,
       'unitpriceinc' => $productPriceInc,
       'vatrate' => $vatRate,
-      'linevatamount' => $productVat,
+      'meta-linevatamount' => $lineVat,
       'quantity' => $item->getQtyOrdered(),
       'meta-vatrate-source' => $metaVatRateSource,
     );
-    if (!$this->floatsAreEqual($item->getDiscountAmount(), 0.0)) {
-      // @todo: is this necessary, if so: document + strategy
-      $result['meta-linediscountamount'] = -$item->getDiscountAmount();
+    if ($this->isAmount($item->getDiscountAmount())) {
+      // Store discount on this item to be able to get correct discount lines.
+      $result['meta-linediscountamountinc'] = -$item->getDiscountAmount();
     }
 
     // Also add child lines for composed products, a.o. to be able to print a
     // packing slip in Acumulus.
-    // @todo: when to use separate lines, when to just add it to the product tag or even replace it?
     foreach($item->getChildrenItems() as $child) {
       $childLine = $this->getItemLineOrder($child);
       $childLines = array_merge($childLines, $childLine);
@@ -267,15 +267,17 @@ class Creator extends BaseCreator {
 
     // If:
     // - there is exactly 1 child line
-    // - for the same product, item number, and quantity
+    // - for the same item number, and quantity
     // - with no price info on the child
     // We seem to be processing a configurable product that for some reason
-    // appears twice:
-    // - do not add the child.
+    // appears twice: do not add the child, but copy the product description to
+    // the result as it contains more chose option descriptions.
+    // @todo: refine this: when to add just 1 line, when multiple lines.
     if (count($childLines) === 1
-      && $result['product'] === $childLines[0]['product']
       && $result['itemnumber'] === $childLines[0]['itemnumber']
+      && $childLines[0]['unitprice'] == 0
       && $result['quantity'] === $childLines[0]['quantity']) {
+      $result['product'] = $childLines[0]['product'];
       $childLines = array();
     }
     // keep price info on bundle level or child level?
@@ -325,7 +327,6 @@ class Creator extends BaseCreator {
 
     $result = array_merge(array($result), $childLines);
     return $result;
-
   }
 
   /**
@@ -338,11 +339,10 @@ class Creator extends BaseCreator {
   protected function getItemLineCreditNote(Mage_Sales_Model_Order_Creditmemo_Item $item) {
     $result = array();
 
-    // @todo: check if hidden vat should be part of it.
-    $productVat = (float) $item->getTaxAmount() + (float) $item->getHiddenTaxAmount();
-    $productPriceEx = (float) $item->getPrice();
-    if ($productPriceEx != 0) {
-      $result += $this->getVatRangeTags($productVat, $item->getQty() * $item->getPrice(), 0.02, $item->getQty() * 0.01);
+    $lineVat = -((float) $item->getTaxAmount() + (float) $item->getHiddenTaxAmount());
+    $productPriceEx = -((float) $item->getPrice());
+    if ($this->isAmount($productPriceEx)) {
+      $result += $this->getVatRangeTags($lineVat / $item->getQty(), $productPriceEx, 0.02, 0.02);
     }
     else {
       // Free products should get a "normal" tax rate. We leave that to the
@@ -357,20 +357,19 @@ class Creator extends BaseCreator {
     $this->addIfNotEmpty($result, 'itemnumber', $item->getSku());
     $result += array(
       'product' => $item->getName(),
-      'unitprice' => -$productPriceEx,
-      'linevatamount' => -$productVat,
+      'unitprice' => $productPriceEx,
+      'meta-linevatamount' => $lineVat,
       'quantity' => $item->getQty(),
     );
-    if (!$this->floatsAreEqual($item->getDiscountAmount(), 0.0)) {
-      // @todo: is this necessary, if so: document + strategy.
+    if ($this->isAmount($item->getDiscountAmount())) {
       // Credit note: discounts are cancelled, thus amount is positive.
-      $result['meta-linediscountamount'] = $item->getDiscountAmount();
+      $result['meta-linediscountamountinc'] = $item->getDiscountAmount();
     }
     if ($this->productPricesIncludeTax()) {
-      $productPriceInc = (float) $item->getPriceInclTax();
-      $result['unitpriceinc'] = -$productPriceInc;
+      $productPriceInc = -((float) $item->getPriceInclTax());
+      $result['unitpriceinc'] = $productPriceInc;
     }
-    return array($result);
+    return $result;
   }
 
   /**
@@ -385,24 +384,42 @@ class Creator extends BaseCreator {
     // - getShippingTaxAmount():      VAT on shipping costs incl discount
     // - getShippingDiscountAmount(): discount on shipping incl VAT
     $magentoSource = $this->source->getSource();
-    if (!$this->floatsAreEqual($magentoSource->getShippingAmount(), 0.0)) {
+    if ($this->isAmount($magentoSource->getShippingAmount())) {
       // We have 2 ways of calculating the vat rate: first one is based on tax
       // amount and normal shipping costs corrected with any discount (as the
       // tax amount is including any discount):
       // $vatRate1 = $magentoSource->getShippingTaxAmount() / ($magentoSource->getShippingInclTax() - $magentoSource->getShippingDiscountAmount() - $magentoSource->getShippingTaxAmount());
       // However, we will use the 2nd way as that seems to be more precise and,
-      // if so, generally leads to a smaller range:
+      // thus generally leads to a smaller range:
       // Get range based on normal shipping costs incl and excl VAT.
       $shippingVat = $this->getSign() * $magentoSource->getShippingTaxAmount();
-      $shippingInc = $this->getSign() * ($magentoSource->getShippingInclTax() - $magentoSource->getShippingDiscountAmount());
-      $shippingEx = $shippingInc - $shippingVat;
-      $result += $this->getVatRangeTags($shippingVat, $shippingEx, 0.01, 0.03);
+      if ($this->source->getType() === Source::Order && $this->isAmount($magentoSource->getShippingDiscountAmount())) {
+        $shippingInc = $this->getSign() * ($magentoSource->getShippingInclTax() - $magentoSource->getShippingDiscountAmount());
+        $shippingEx = $shippingInc - $shippingVat;
+      }
+      else {
+        $shippingInc = $this->getSign() * $magentoSource->getShippingInclTax();
+        $shippingEx = $this->getSign() * $magentoSource->getShippingAmount();
+      }
+
+      // !Magento bug!
+      // In credit memos, the ShippingTaxAmount may differ from the difference
+      // between the shipping costs including VAT and excluding VAT. As that
+      // difference seems to lead to "correct" VAT rates, we use that as the
+      // VAT amount.
+      if (!$this->floatsAreEqual($shippingVat, $shippingInc - $shippingEx, 0.01)) {
+        $result['meta-magento-bug'] = sprintf('ShippingTaxAmount = %f', $shippingVat);
+        $shippingVat = $shippingInc - $shippingEx;
+      }
+      // !End of Magento bug!
+
+      $result += $this->getVatRangeTags($shippingVat, $shippingEx, 0.02, 0.04);
       $result += array(
         'unitprice' => $shippingEx,
         'unitpriceinc' => $shippingInc,
       );
-      if (!$this->floatsAreEqual($magentoSource->getShippingDiscountAmount(), 0.0)) {
-        $result['meta-linediscountamount'] = $this->getSign() * -$magentoSource->getShippingDiscountAmount();
+      if ($this->isAmount($magentoSource->getShippingDiscountAmount())) {
+        $result['meta-linediscountamountinc'] = $this->getSign() * -$magentoSource->getShippingDiscountAmount();
       }
     }
     // Only add a free shipping line on an order, not on a credit note: free
@@ -418,7 +435,7 @@ class Creator extends BaseCreator {
     }
 
     // Include discount in the unit price.
-    $shippingDescription = $magentoSource->getShippingDescription();
+    $shippingDescription = $this->order->getShippingDescription();
     $result += array(
       'itemnumber' => '',
       'product' => !empty($shippingDescription) ? $shippingDescription : $this->t('shipping_costs'),
@@ -433,7 +450,7 @@ class Creator extends BaseCreator {
    */
   protected function getDiscountLines() {
     $result = array();
-    if (!$this->floatsAreEqual($this->source->getSource()->getDiscountAmount(), 0.0)) {
+    if ($this->isAmount($this->source->getSource()->getDiscountAmount())) {
       $result = array(
         'itemnumber' => '',
         'product' => $this->getDiscountDescription(),
@@ -444,13 +461,13 @@ class Creator extends BaseCreator {
       );
       // Product prices incl. VAT => discount amount is also incl. VAT
       if ($this->productPricesIncludeTax()) {
-        $result['unitpriceinc'] = $this->source->getSource()->getDiscountAmount();
+        $result['unitpriceinc'] = $this->getSign() * $this->source->getSource()->getDiscountAmount();
       }
       else {
-        $result['unitprice'] = $this->source->getSource()->getDiscountAmount();
+        $result['unitprice'] = $this->getSign() * $this->source->getSource()->getDiscountAmount();
       }
     }
-    return $result;
+    return array($result);
   }
 
   /**
@@ -461,7 +478,7 @@ class Creator extends BaseCreator {
   protected function getManualLines() {
     $result = array();
 
-    if (isset($this->creditNote) && (float) $this->creditNote->getAdjustment() != 0.0) {
+    if (isset($this->creditNote) && $this->isAmount($this->creditNote->getAdjustment())) {
       $line['product'] = $this->t('refund_adjustment');
       $line['unitprice'] = -$this->creditNote->getAdjustment();
       $line['quantity'] = 1;
@@ -487,7 +504,7 @@ class Creator extends BaseCreator {
   protected function getPaymentFeeLine() {
     $result = array();
     $paymentFeeAmount = $this->getSign() * (float) $this->source->getSource()->getPaymentchargeAmount();
-    if (!$this->floatsAreEqual($paymentFeeAmount, 0.0)) {
+    if ($this->isAmount($paymentFeeAmount)) {
       $paymentFeeTax = $this->getSign() * $this->source->getSource()->getPaymentchargeTaxAmount();
       if ($this->productPricesIncludeTax()) {
         // Product prices incl. VAT => payment charges are also incl. VAT.
@@ -552,7 +569,7 @@ class Creator extends BaseCreator {
    */
   protected function callTypeSpecificMethod($method, $args = array()) {
     $method .= $this->source->getType();
-    return call_user_func_array(array($this, $this->$method()), $args);
+    return call_user_func_array(array($this, $method), $args);
   }
 
 }

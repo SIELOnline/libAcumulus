@@ -14,7 +14,7 @@ class TryAllVatRatePermutations extends CompletorStrategyBase {
    *   This strategy should be tried before the split strategy as that one will
    *   easily succeed.
    */
-  static public $tryOrder = 5;
+  static public $tryOrder = 25;
 
   /** @var float[] */
   protected $vatRates;

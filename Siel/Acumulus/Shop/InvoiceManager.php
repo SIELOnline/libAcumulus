@@ -116,7 +116,6 @@ abstract class InvoiceManager {
    */
   public function sendMultiple(array $invoiceSources, $forceSend, array &$log) {
     $success = true;
-    $entryModel = $this->getAcumulusEntryModel();
     $time_limit = ini_get('max_execution_time');
     /** @var Source $invoiceSource */
     foreach ($invoiceSources as $invoiceSource) {
@@ -142,7 +141,7 @@ abstract class InvoiceManager {
           $message = 'message_batch_send_1_skipped';
           break;
       }
-      $log[$invoiceSource->getId()] = sprintf($this->t($message), $invoiceSource->getType(), $invoiceSource->getReference());
+      $log[$invoiceSource->getId()] = sprintf($this->t($message), $this->t($invoiceSource->getType()), $invoiceSource->getReference());
     }
     return $success;
   }
@@ -152,19 +151,21 @@ abstract class InvoiceManager {
    *
    * @param \Siel\Acumulus\Invoice\Source $invoiceSource
    *   The source whom status changed.
-   * @param $newStatus
-   *   The new status of the invoice source. May be null in which case a
-   *   comparison based on status is not performed.
+   * @param mixed $newStatus
+   *   The new status of the invoice source. May be left out in which case a
+   *   comparison based on trigger event and status is not performed. This is
+   *   used to send credit notes to acumulus.
    *
    * @return int
-   *   Status
+   *   Status.
    */
-  public function sourceStatusChange(Source $invoiceSource, $newStatus = NULL) {
-    $this->config->getLog()->debug('InvoiceManager::sourceStatusChange(%s %d, %s)', $invoiceSource->getType(), $invoiceSource->getId(), $newStatus === NULL ? 'NULL' : (string) $newStatus);
+  public function sourceStatusChange(Source $invoiceSource, $newStatus = FALSE) {
+    $this->config->getLog()->debug('InvoiceManager::sourceStatusChange(%s %d, %s)', $invoiceSource->getType(), $invoiceSource->getId(), $newStatus === NULL ? 'null' : $newStatus === FALSE ? 'false' : (string) $newStatus);
     $result = WebConfigInterface::Status_NotSent;
     $shopSettings = $this->config->getShopSettings();
-    if ($shopSettings['triggerInvoiceSendEvent'] == Config::TriggerInvoiceSendEvent_OrderStatus
-      && ($newStatus === NULL || $newStatus == $shopSettings['triggerOrderStatus'])) {
+    if (($shopSettings['triggerInvoiceSendEvent'] == Config::TriggerInvoiceSendEvent_OrderStatus
+         && $newStatus == $shopSettings['triggerOrderStatus'])
+        || $newStatus === FALSE) {
       $result = $this->send($invoiceSource, FALSE);
     }
     return $result;

@@ -77,7 +77,7 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
    * {@inheritdoc}
    */
   public function getLog() {
-    return $this->getInstance('Log', array($this->getLogLevel()));
+    return Log::getInstance();
   }
 
   /**
@@ -119,7 +119,7 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
    * {@inheritdoc}
    */
   public function getManager() {
-    return $this->getInstance('Manager', array($this, $this->translator));
+    return $this->getInstance('InvoiceManager', array($this, $this->translator));
   }
 
   /**
@@ -402,6 +402,9 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
     if (isset($this->values['debug'])) {
       $this->values['debug'] = (int) $this->values['debug'];
     }
+    if (isset($this->values['logLevel'])) {
+      $this->values['logLevel'] = (int) $this->values['logLevel'];
+    }
   }
 
   /**
@@ -436,6 +439,7 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
       'triggerOrderStatus',
       'useMargin',
       'debug',
+      'logLevel',
     );
   }
 

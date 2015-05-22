@@ -140,6 +140,7 @@ abstract class Form {
       if (!empty($this->submittedValues)) {
         $this->formValues = array_merge($this->formValues, $this->submittedValues);
       }
+
       $this->formValuesSet = true;
     }
  }
@@ -155,6 +156,7 @@ abstract class Form {
    *  An array of values keyed by the form field names.
    */
   public function getFormValues() {
+    $this->setFormValues();
     return $this->formValues;
   }
 
@@ -370,7 +372,47 @@ abstract class Form {
    *   Whether the given key defines a checkbox field.
    */
   protected function isCheckboxKey($key) {
-    return false;
+    return array_key_exists($key, $this->getCheckboxKeys());
+  }
+
+  /**
+   * Returns a list of the checkbox names for this form.
+   *
+   * This base implementation returns an empty array. Override this method if
+   * your form has checkbox fields.
+   *
+   * @return array
+   *   An array with as keys the checkbox names of this form and as values the
+   *   checkbox collection name the checkbox belongs to.
+   */
+  protected function getCheckboxKeys() {
+    return array();
+  }
+
+  /**
+   * Returns a flat array of the posted values.
+   *
+   * As especially checkbox handling differs per web shop, often resulting in an
+   * array of checkbox values, this method returns a flattened version of the
+   * posted values.
+   *
+   * @return array
+   */
+  protected function getPostedValues() {
+    $result = $_POST;
+
+    foreach ($this->getCheckboxKeys() as $checkboxName => $collectionName) {
+      if (isset($result[$collectionName]) && is_array($result[$collectionName])) {
+        // Extract the checked values.
+        $checkedValues = array_combine(array_values($result[$collectionName]), array_fill(0, count($result[$collectionName]), 1));
+        // Replace the array value with the checked values, unset first as the
+        // keys for the collection and (1 of the) checkboxes may be the same.
+        unset($result[$collectionName]);
+        $result += $checkedValues;
+      }
+    }
+
+    return $result;
   }
 
 }

@@ -42,7 +42,7 @@ factuur niet opgeslagen wordt.</strong></p>
 risico. Door het nogmaals handmatig versturen van facturen kan uw administratie
 ontregeld raken.</strong></p>
 <p>Het versturen van orders gaat net als het automatisch versturen:</p>
-<ul>
+<ul style="list-style: inside disc;">
 <li>De factuur wordt op exact dezelfde wijze aangemaakt als bij het automatisch
 versturen.</li>
 <li>Als er facturen zijn die fouten bevatten ontvangt u een mail per factuur.
@@ -55,11 +55,14 @@ uitgevoerd.</li>
 Het werkt in zijn huidige vorm, maar als u de behoefte heeft om de reeks van
 facturen op een andere manier te willen aangeven, laat dit ons dan weten.</p>
 <p>Standaard worden facuren die al naar Acumulus verzonden zijn, niet opnieuw
-verstuurd.
-Maar dit geldt alleen voor facturen die sinds de installatie van de versie met
-uitgiftedatum begin september 2014 van deze koppeling verstuurd zijn.
-In oudere versies werd nog niet bijgehouden voor welke orders en credit nota's
-al een factuur verzonden was.</p>
+verstuurd. Dit kunt u forceren door die optie aan te vinken, maar let op: in
+Acumulus wordt dit als een nieuwe factuur gezien. U dient zelf uw boekhouding te
+ontdubbelen.
+Merk ook nog op dat deze beveiliging alleen werkt voor facturen die sinds de
+installatie van de versie met uitgiftedatum begin september 2014 van deze
+koppeling verstuurd zijn.
+In oudere versies werd nog niet bijgehouden voor welke orders en creditnota's al
+een factuur verzonden was.</p>
 LONGSTRING
     ,
 
@@ -72,6 +75,7 @@ LONGSTRING
     'message_validate_batch_bad_date_range' => '\'Datum tot\' dient na \'Datum van\' te liggen.',
     'message_validate_batch_bad_order_range' => '\'# tot\' dient groter te zijn dan \'# van\'.',
 
+    'message_form_empty_range' => 'De door u opgegeven reeks bevat geen enkele %1$s.',
     'message_form_success' => 'De facturen zijn succesvol verzonden. Zie het resultatenoverzicht voor eventuele opmerkingen en waarschuwingen.',
     'message_form_error' => 'Er zijn fouten opgetreden bij het versturen van de facturen. Zie het resultatenoverzicht voor meer informatie over de fouten.',
 
@@ -108,6 +112,7 @@ LONGSTRING
     'message_validate_batch_bad_date_range' => '\'Date to\' should be after \'Date from\'.',
     'message_validate_batch_bad_order_range' => '\'# to\' should to be greater than \'# from\'.',
 
+    'message_form_empty_range' => 'The range you defined does not contain any %1$s.',
     'message_form_success' => 'The invoices were sent successfully. See the results overview for any remarks or warnings.',
     'message_form_error' => 'Errors during sending the invoices. See the results overview for more information on the errors.',
 

@@ -105,7 +105,7 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
     'desc_subject' => 'Het onderwerp van de email. Als u dit leeg laat wordt "Factuur [factuurnummer] Bestelling [bestelnummer]" gebruikt. U kunt [#b] gebruiken om het bestelnummer in de onderwerpregel te plaatsen en [#f] voor het factuurnummer (van de webshop, niet van Acumulus).',
 
     'versionInformationHeader' => 'Informatie over deze module',
-    'desc_versionInformation' => 'Vermeldt aub deze gegevens bij een supportverzoek.',
+    'desc_versionInformation' => 'Vermeld aub deze gegevens bij een supportverzoek.',
 
     'field_debug' => 'Support en debug',
     'option_debug_1' => 'Verzend berichten naar Acumulus en ontvang alleen een mail bij fouten of waarschuwingen.',

@@ -123,17 +123,19 @@ abstract class CompletorStrategyBase {
     foreach ($this->invoice['customer']['invoice']['line'] as $line) {
       if (isset($line['vatrate'])) {
         $amount = $line['unitprice'] * $line['quantity'];
-        $vatamount = $line['vatrate'] / 100.0 * $amount;
-        if (isset($this->vatBreakdown[$line['vatrate']])) {
-          $breakdown = &$this->vatBreakdown[$line['vatrate']];
-          $breakdown['vatamount'] += $vatamount;
+        $vatAmount = $line['vatrate'] / 100.0 * $amount;
+        $vatRate = sprintf('%.3f', $line['vatrate']);
+        // Add amount to existing vatrate line or
+        if (isset($this->vatBreakdown[$vatRate])) {
+          $breakdown = &$this->vatBreakdown[$vatRate];
+          $breakdown['vatamount'] += $vatAmount;
           $breakdown['amount'] += $amount;
           $breakdown['count']++;
         }
         else {
-          $this->vatBreakdown[$line['vatrate']] = array(
-            'vatrate' => $line['vatrate'],
-            'vatamount' => $vatamount,
+          $this->vatBreakdown[$vatRate] = array(
+            'vatrate' => $vatRate,
+            'vatamount' => $vatAmount,
             'amount' => $amount,
             'count' => 1,
           );
@@ -248,7 +250,7 @@ abstract class CompletorStrategyBase {
    * @return float
    *   The vat amount for the completed line.
    */
-  protected function completeLine($line2Complete, $vatRate) {
+  protected function completeLine(&$line2Complete, $vatRate) {
     if (!isset($line2Complete['quantity'])) {
       $line2Complete['quantity'] = 1;
     }

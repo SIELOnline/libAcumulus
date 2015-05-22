@@ -87,20 +87,20 @@ class SplitLine extends CompletorStrategyBase {
     $this->splitLines = array();
     $this->otherLines = array();
     $this->otherLinesAmount = 0.0;
-    foreach ($this->lines2Complete as $line) {
-      if (isset($line2Complete['meta-strategy-split']) && $line2Complete['meta-strategy-split']) {
-        $this->splitLines[] = $line;
+    foreach ($this->lines2Complete as $line2Complete) {
+      if (!empty($line2Complete['meta-strategy-split'])) {
+        $this->splitLines[] = $line2Complete;
       }
       else {
-        $this->otherLines[] = $line;
-        $this->otherLinesAmount += $line['unitprice'] * $line['quantity'];
+        $this->otherLines[] = $line2Complete;
+        $this->otherLinesAmount += $line2Complete['unitprice'] * $line2Complete['quantity'];
       }
     }
 
     $this->nonStrategyAmount  = 0.0;
-    foreach ($this->invoice['customer']['invoice']['line'] as $line) {
-      if ($line['meta-vatrate-source'] !== Creator::VatRateSource_Strategy) {
-        $this->nonStrategyAmount += $line['unitprice'] * $line['quantity'];
+    foreach ($this->invoice['customer']['invoice']['line'] as $line2Complete) {
+      if ($line2Complete['meta-vatrate-source'] !== Creator::VatRateSource_Strategy) {
+        $this->nonStrategyAmount += $line2Complete['unitprice'] * $line2Complete['quantity'];
       }
     }
     $this->splitLinesAmount = $this->invoiceAmount - $this->nonStrategyAmount - $this->otherLinesAmount;

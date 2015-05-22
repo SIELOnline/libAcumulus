@@ -226,22 +226,26 @@ abstract class InvoiceManager {
           // Send a mail if there are messages.
           $messages = $service->resultToMessages($result);
           if (!empty($messages)) {
-            $this->config->getLog()->debug('InvoiceManager::send(%s %d, %s) result: %s', $invoiceSource->getType(), $invoiceSource->getId(), $forceSend ? 'true' : 'false', $messages);
+            $this->config->getLog()->debug('InvoiceManager::send(%s %d, %s) result: %s',
+              $invoiceSource->getType(), $invoiceSource->getId(), $forceSend ? 'true' : 'false', $service->messagesToText($messages));
             $this->mailInvoiceAddResult($result, $messages, $invoiceSource);
           }
 
           $result = $result['status'];
         }
         else {
-          $this->config->getLog()->debug('InvoiceManager::send(%s %d, %s): invoiceCompleted prevented sending', $invoiceSource->getType(), $invoiceSource->getId(), $forceSend ? 'true' : 'false');
+          $this->config->getLog()->debug('InvoiceManager::send(%s %d, %s): invoiceCompleted prevented sending',
+            $invoiceSource->getType(), $invoiceSource->getId(), $forceSend ? 'true' : 'false');
         }
       }
       else {
-        $this->config->getLog()->debug('InvoiceManager::send(%s %d, %s): invoiceCreated prevented sending', $invoiceSource->getType(), $invoiceSource->getId(), $forceSend ? 'true' : 'false');
+        $this->config->getLog()->debug('InvoiceManager::send(%s %d, %s): invoiceCreated prevented sending',
+          $invoiceSource->getType(), $invoiceSource->getId(), $forceSend ? 'true' : 'false');
       }
     }
     else {
-      $this->config->getLog()->debug('InvoiceManager::send(%s %d, %s): not sent', $invoiceSource->getType(), $invoiceSource->getId(), $forceSend ? 'true' : 'false');
+      $this->config->getLog()->debug('InvoiceManager::send(%s %d, %s): not sent',
+        $invoiceSource->getType(), $invoiceSource->getId(), $forceSend ? 'true' : 'false');
     }
     return $result;
   }

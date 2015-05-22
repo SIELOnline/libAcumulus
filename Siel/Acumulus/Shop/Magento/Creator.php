@@ -59,7 +59,7 @@ class Creator extends BaseCreator {
         $this->order = $this->creditNote->getOrder();
         break;
       default:
-        $this->config->getLog()->log(Log::Error, 'Creator::setSource(): unknown source type %s', array($this->source->getType()));
+        $this->config->getLog()->error('Creator::setSource(): unknown source type %s', $this->source->getType());
         break;
     }
     $this->shopInvoices = $this->order->getInvoiceCollection();

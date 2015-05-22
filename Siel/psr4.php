@@ -11,9 +11,10 @@
  */
 namespace Siel;
 
+// Prepend this autoloader: it will not throw, nor warn, while the shop specific
+// autoloader might do so.
 spl_autoload_register(function($class) {
     if (strpos($class, __NAMESPACE__) === 0) {
       @include(__DIR__ . DIRECTORY_SEPARATOR . str_replace('\\', DIRECTORY_SEPARATOR, substr($class, strlen(__NAMESPACE__))) . '.php');
     }
-  }
-);
+  }, FALSE, TRUE);

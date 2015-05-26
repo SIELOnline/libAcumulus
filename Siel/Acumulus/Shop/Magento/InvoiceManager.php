@@ -15,7 +15,7 @@ class InvoiceManager extends BaseInvoiceManager {
    * @return \Mage_Sales_Model_Abstract
    */
   protected function getInvoiceSourceTypeModel($invoiceSourceType) {
-    return $invoiceSourceType == source::Order ? Mage::getModel('sales/order') : Mage::getModel('sales/order_creditmemo');
+    return $invoiceSourceType == Source::Order ? Mage::getModel('sales/order') : Mage::getModel('sales/order_creditmemo');
   }
 
   /**

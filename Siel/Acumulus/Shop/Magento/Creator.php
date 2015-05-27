@@ -451,7 +451,7 @@ class Creator extends BaseCreator {
   protected function getDiscountLines() {
     $result = array();
     if ($this->isAmount($this->source->getSource()->getDiscountAmount())) {
-      $result = array(
+      $line = array(
         'itemnumber' => '',
         'product' => $this->getDiscountDescription(),
         'vatrate' => NULL,
@@ -461,13 +461,14 @@ class Creator extends BaseCreator {
       );
       // Product prices incl. VAT => discount amount is also incl. VAT
       if ($this->productPricesIncludeTax()) {
-        $result['unitpriceinc'] = $this->getSign() * $this->source->getSource()->getDiscountAmount();
+        $line['unitpriceinc'] = $this->getSign() * $this->source->getSource()->getDiscountAmount();
       }
       else {
-        $result['unitprice'] = $this->getSign() * $this->source->getSource()->getDiscountAmount();
+        $line['unitprice'] = $this->getSign() * $this->source->getSource()->getDiscountAmount();
       }
+      $result[] = $line;
     }
-    return array($result);
+    return $result;
   }
 
   /**

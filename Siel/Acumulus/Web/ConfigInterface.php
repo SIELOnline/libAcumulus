@@ -9,22 +9,23 @@ namespace Siel\Acumulus\Web;
  * interface abstracts from how a specific web shop does so.
  */
 interface ConfigInterface {
-  const libraryVersion = '4.0.0-alpha5';
+  const libraryVersion = '4.0.0-alpha6';
 
-  // Web service related constants.
+  // Web service configuration related constants.
   const Status_NotSent = -1;
   const Status_Success = 0;
   const Status_Errors = 1;
   const Status_Warnings = 2;
   const Status_Exception = 3;
 
-  const TestMode_Normal = 0;
-  const TestMode_Test = 1;
-
   const Debug_None = 1;
   const Debug_SendAndLog = 2;
   const Debug_TestMode = 4;
   const Debug_StayLocal = 3;
+
+  // Web service API constants.
+  const TestMode_Normal = 0;
+  const TestMode_Test = 1;
 
   // Web service related defaults.
   const baseUri = 'https://api.sielsystems.nl/acumulus';

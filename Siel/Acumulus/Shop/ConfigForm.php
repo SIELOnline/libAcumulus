@@ -279,6 +279,14 @@ abstract class ConfigForm extends Form {
           'description' => $this->t('desc_defaultInvoiceTemplates'),
           'options' => $this->picklistToOptions($invoiceTemplates, 'invoicetemplates', 0, $this->t('option_same_template')),
         ),
+        'removeEmptyShipping' => array(
+          'type' => 'checkbox',
+          'label' => $this->t('field_removeEmptyShipping'),
+          'description' => $this->t('desc_removeEmptyShipping'),
+          'options' => array(
+            'removeEmptyShipping' => $this->t('option_removeEmptyShipping'),
+          ),
+        ),
         'triggerInvoiceSendEvent' => $triggerInvoiceSendEventField,
       );
       if (array_key_exists(ConfigInterface::TriggerInvoiceSendEvent_OrderStatus, $triggerInvoiceSendEventOptions)) {
@@ -544,7 +552,8 @@ abstract class ConfigForm extends Form {
     return array(
       'sendCustomer' => 'clientData',
       'overwriteIfExists' => 'clientData',
-      'emailAsPdf' => 'emailAsPdf'
+      'removeEmptyShipping' => 'removeEmptyShipping',
+      'emailAsPdf' => 'emailAsPdf',
     );
   }
 

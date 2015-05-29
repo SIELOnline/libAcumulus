@@ -79,6 +79,11 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
     'option_same_template' => 'Zelfde sjabloon als voor niet betaald',
     'desc_defaultInvoiceTemplates' => 'Maakt u binnen Acumulus gebruik van meerdere factuur-sjablonen en wilt u alle bestellingen uit uw webwinkel op een specifieke factuursjabloon printen, kies dan hier de factuur-sjablonen voor niet betaalde respectievelijk betaalde bestellingen.',
 
+    'field_removeEmptyShipping' => 'Verzendkosten',
+    'option_removeEmptyShipping' => 'Verstuur geen "gratis verzending" of "zelf afhalen" regels.',
+    'desc_removeEmptyShipping' => 'Omdat Acumulus pakbonnen kan printen, verstuurt deze extensie normaal gesproken altijd een factuurregel met de verzendkosten/methode, zelfs met gratis verzending of zelf afhalen.
+Vink deze optie aan als u geen regel op uw factuur of pakbon wil voor gratis verzending of zelf afhalen.',
+
     'field_triggerInvoiceSendEvent' => 'Moment van versturen',
     'option_triggerInvoiceSendEvent_0' => 'Niet automatisch versturen.',
     'option_triggerInvoiceSendEvent_1' => 'Als een bestelling de hieronder door u gekozen status bereikt.',
@@ -194,6 +199,11 @@ If you unchecked the first option, the second option only applies to business cl
     'field_defaultInvoicePaidTemplate' => 'Invoice template (paid)',
     'option_same_template' => 'Same template as for due',
     'desc_defaultInvoiceTemplates' => 'Select the invoice templates to print your web shop orders with due respectively paid orders.',
+
+    'field_removeEmptyShipping' => 'Shipping costs',
+    'option_removeEmptyShipping' => 'Do not send free shipping or in store pick-up lines on invoices.',
+    'desc_removeEmptyShipping' => 'To allow Acumulus to print packing slips, this extension normally always sends a shipping line, even with free shipping or in store pickup.
+If you don\'t want this, check this option.',
 
     'field_triggerInvoiceSendEvent' => 'Send the invoice to Acumulus',
     'option_triggerInvoiceSendEvent_0' => 'Do not send automatically.',

@@ -9,15 +9,18 @@ namespace Siel\Acumulus\Invoice;
  * interface abstracts from how a specific web shop does so.
  */
 interface ConfigInterface {
-  // Invoice related constants.
+  // Invoice API related constants.
   const PaymentStatus_Due = 1;
   const PaymentStatus_Paid = 2;
+
+  const Concept_No = 0;
+  const Concept_Yes = 1;
 
   const OverwriteIfExists_No = 0;
   const OverwriteIfExists_Yes = 1;
 
-  const Concept_No = 0;
-  const Concept_Yes = 1;
+  const ConfirmReading_No = 0;
+  const ConfirmReading_Yes = 1;
 
   const LocationCode_None = 0;
   const LocationCode_NL = 1;
@@ -30,9 +33,6 @@ interface ConfigInterface {
   const VatType_RestOfWorld = 4;
   const VatType_MarginScheme = 5;
   const VatType_ForeignVat = 6;
-
-  const ConfirmReading_No = 0;
-  const ConfirmReading_Yes = 1;
 
   /**
    * Returns the set of settings related to adding an invoice.
@@ -47,6 +47,7 @@ interface ConfigInterface {
    *   - defaultCostCenter
    *   - defaultInvoiceTemplate
    *   - defaultInvoicePaidTemplate
+   *   - removeEmptyShipping
    *   - useMargin
    */
   public function getInvoiceSettings();

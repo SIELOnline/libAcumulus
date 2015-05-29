@@ -43,6 +43,7 @@ use Siel\Acumulus\Web\Service;
  * - (*)meta-lineprice: the total price for this line excluding VAT.
  * - (*)meta-linepriceinc: the total price for this line including VAT.
  * - meta-linevatamount: the amount of VAT for the whole line.
+ * - meta-line-type: the type of line (order, shipping, discount, etc.)
  * (*) = these are not yet used.
  *
  * @package Siel\Acumulus

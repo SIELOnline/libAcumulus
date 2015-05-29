@@ -34,6 +34,13 @@ abstract class Creator {
   const VatRateSource_Completor = 'completor';
   const VatRateSource_Strategy = 'strategy';
 
+  const LineType_Shipping = 'shipping';
+  const LineType_PaymentFee = 'payment';
+  const LineType_GiftWrapping = 'gift';
+  const LineType_Manual = 'manual';
+  const LineType_Order = 'product';
+  const LineType_Discount = 'discount';
+
   /** @var \Siel\Acumulus\Shop\Config */
   protected $config;
 
@@ -367,6 +374,7 @@ abstract class Creator {
    * - (*)meta-lineprice: the total price for this line excluding VAT.
    * - (*)meta-linepriceinc: the total price for this line including VAT.
    * - meta-linevatamount: the amount of VAT for the whole line.
+   * - meta-line-type: the type of line (order, shipping, discount, etc.)
    * (*) = these are not yet used.
    *
    * These keys can be used to complete missing values or to assist in
@@ -400,9 +408,15 @@ abstract class Creator {
    */
   protected function getInvoiceLines() {
     $itemLines = $this->getItemLines();
+    $itemLines = $this->addLineType($itemLines, static::LineType_Order);
+
     $manualLines = $this->getManualLines();
+    $manualLines = $this->addLineType($manualLines, static::LineType_Manual);
+
     $feeLines = $this->getFeeLines();
+
     $discountLines = $this->getDiscountLines();
+    $discountLines = $this->addLineType($discountLines, static::LineType_Discount);
 
     $result = array_merge($itemLines, $manualLines, $feeLines, $discountLines);
     return $result;
@@ -438,16 +452,19 @@ abstract class Creator {
 
     $line = $this->getGiftWrappingLine();
     if ($line) {
+      $line['meta-line-type'] = static::LineType_GiftWrapping;
       $result[] = $line;
     }
 
     $line = $this->getShippingLine();
     if ($line) {
+      $line['meta-line-type'] = 'shipping';
       $result[] = $line;
     }
 
     $line = $this->getPaymentFeeLine();
     if ($line) {
+      $line['meta-line-type'] = static::LineType_PaymentFee;
       $result[] = $line;
     }
 
@@ -607,6 +624,22 @@ abstract class Creator {
       return true;
     }
     return false;
+  }
+
+  /**
+   * Adds a meta-line-type tag to the lines.
+   *
+   * @param array $itemLines
+   * @param string $lineType
+   *
+   * @return array
+   *
+   */
+  protected function addLineType(array $itemLines, $lineType) {
+    foreach ($itemLines as &$itemLine) {
+      $itemLine['meta-line-type'] = $lineType;
+    }
+    return $itemLines;
   }
 
   /**

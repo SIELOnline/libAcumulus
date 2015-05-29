@@ -325,6 +325,7 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
       'defaultCostCenter' => $this->get('defaultCostCenter'),
       'defaultInvoiceTemplate' => $this->get('defaultInvoiceTemplate'),
       'defaultInvoicePaidTemplate' => $this->get('defaultInvoicePaidTemplate'),
+      'removeEmptyShipping' => $this->get('removeEmptyShipping'),
       'useMargin' => $this->get('useMargin'),
     );
   }
@@ -390,6 +391,9 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
     if (isset($this->values['defaultInvoicePaidTemplate'])) {
       $this->values['defaultInvoicePaidTemplate'] = (int) $this->values['defaultInvoicePaidTemplate'];
     }
+    if (isset($this->values['removeEmptyShipping'])) {
+      $this->values['removeEmptyShipping'] = (bool) $this->values['removeEmptyShipping'];
+    }
     if (isset($this->values['triggerInvoiceSendEvent'])) {
       $this->values['triggerInvoiceSendEvent'] = (int) $this->values['triggerInvoiceSendEvent'];
     }
@@ -437,6 +441,7 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
       'dateToUse',
       'triggerInvoiceSendEvent',
       'triggerOrderStatus',
+      'removeEmptyShipping',
       'useMargin',
       'debug',
       'logLevel',
@@ -465,6 +470,7 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
       'overwriteIfExists'          => true,
       'genericCustomerEmail'       => 'consumer@' . $hostName,
       'defaultInvoicePaidTemplate' => 0,
+      'removeEmptyShipping'        => false,
 
       // Default 'email invoice as pdf' settings.
       'emailAsPdf'                 => false,

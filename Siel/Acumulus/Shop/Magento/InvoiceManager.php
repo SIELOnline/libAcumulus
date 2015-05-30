@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\Shop\Magento;
 
+use DateTime;
 use Mage;
 use \Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
 use Varien_Object;
@@ -39,7 +40,9 @@ class InvoiceManager extends BaseInvoiceManager {
   /**
    * {@inheritdoc}
    */
-  public function getInvoiceSourcesByDateRange($invoiceSourceType, $dateFrom, $dateTo) {
+  public function getInvoiceSourcesByDateRange($invoiceSourceType, DateTime $dateFrom, DateTime $dateTo) {
+    $dateFrom = $this->getIsoDate($dateFrom);
+    $dateTo = $this->getIsoDate($dateTo);
     $field = 'updated_at';
     $condition = array('from' => $dateFrom, 'to' => $dateTo);
     return $this->getByCondition($invoiceSourceType, $field, $condition);

@@ -2,6 +2,7 @@
 namespace Siel\Acumulus\Shop\VirtueMart;
 
 use JSession;
+use JText;
 use Siel\Acumulus\Shop\BatchForm as BaseBatchForm;
 
 /**
@@ -17,6 +18,14 @@ class BatchForm extends BaseBatchForm {
    */
   protected function systemValidate() {
     return JSession::checkToken();
+  }
+
+  public function getDateFormat() {
+    return JText::_('DATE_FORMAT_LC4');
+  }
+
+  public function getShopDateFormat() {
+    return str_replace(array('Y', 'm', 'd'), array('%Y', '%m', '%d'), $this->getDateFormat());
   }
 
 }

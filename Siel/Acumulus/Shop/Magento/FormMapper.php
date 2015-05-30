@@ -1,6 +1,8 @@
 <?php
 namespace Siel\Acumulus\Shop\Magento;
 
+use Mage;
+use Mage_Core_Model_Locale;
 use Varien_Data_Form_Abstract;
 
 /**
@@ -122,12 +124,18 @@ class FormMapper {
     switch ($key) {
       // Fields to ignore:
       case 'type':
+        $result = array();
+        if ($value === 'date') {
+          $result['image'] = Mage::getDesign()->getSkinUrl('images/grid-cal.gif');
+        }
+        break;
       case 'fields':
         $result = array();
         break;
       // Fields to return unchanged:
       case 'legend':
       case 'label':
+      case 'format':
         $result = array($key => $value);
         break;
       case 'name':

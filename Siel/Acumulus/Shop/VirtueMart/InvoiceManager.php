@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\Shop\VirtueMart;
 
+use DateTime;
 use DateTimeZone;
 use JDate;
 use JFactory;
@@ -54,8 +55,12 @@ class InvoiceManager extends BaseInvoiceManager {
 
   /**
    * {@inheritdoc}
+   *
+   * @todo: date settings and formats in VM.
    */
-  public function getInvoiceSourcesByDateRange($invoiceSourceType, $dateFrom, $dateTo) {
+  public function getInvoiceSourcesByDateRange($invoiceSourceType, DateTime $dateFrom, DateTime $dateTo) {
+    $dateFrom = $this->getIsoDate($dateFrom);
+    $dateTo = $this->getIsoDate($dateTo);
     $query = sprintf("select virtuemart_order_id
 			from #__virtuemart_orders
 			where modified_on between '%s' and '%s'",

@@ -6,6 +6,9 @@ namespace Siel\Acumulus\Helpers;
  */
 class FormRenderer {
 
+  /** @var \Siel\Acumulus\Helpers\Form */
+  protected $form;
+
   /** @var bool */
   protected $html5 = true;
 
@@ -62,6 +65,15 @@ class FormRenderer {
 
   /** @var string */
   protected $requiredMarkup = '<span class="required">*</span>';
+
+  /**
+   * FormRenderer constructor.
+   *
+   * @param \Siel\Acumulus\Helpers\Form $form
+   */
+  public function __construct(Form $form) {
+    $this->form = $form;
+  }
 
   public function fields(array $fields) {
     $output = '';

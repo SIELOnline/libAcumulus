@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\Shop;
 
+use DateTime;
 use Siel\Acumulus\Helpers\TranslatorInterface;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Web\ConfigInterface as WebConfigInterface;
@@ -94,15 +95,13 @@ abstract class InvoiceManager {
    * Returns a list of existing invoice sources for the given date range.
    *
    * @param string $invoiceSourceType
-   * @param string $dateFrom
-   *   Date in yyyy-mm-dd format.
-   * @param string $dateTo
-   *   Date in yyyy-mm-dd format.
+   * @param DateTime $dateFrom
+   * @param DateTime $dateTo
    *
    * @return \Siel\Acumulus\Invoice\Source[]
    *   An array of invoice sources of the given source type.
    */
-  abstract public function getInvoiceSourcesByDateRange($invoiceSourceType, $dateFrom, $dateTo);
+  abstract public function getInvoiceSourcesByDateRange($invoiceSourceType, DateTime $dateFrom, DateTime $dateTo);
 
   /**
    * Sends multiple invoices to Acumulus.
@@ -339,4 +338,7 @@ abstract class InvoiceManager {
     // Default implementation: no event
   }
 
+  protected function getIsoDate(DateTime $date) {
+    return $date->format('Y-m-d');
+  }
 }

@@ -1,11 +1,28 @@
 <?php
 namespace Siel\Acumulus\Shop\Magento;
 
+use Mage;
+use Mage_Core_Model_Locale;
 use Siel\Acumulus\Shop\BatchForm as BaseBatchForm;
 
 /**
  * Provides the Batch send form handling for the Magento Acumulus module.
  */
 class BatchForm extends BaseBatchForm {
+
+  /**
+   * {@inheritdoc}
+   *
+   * This override returns the default date format as set in the Magento config.
+   */
+  protected function getDateFormat() {
+    $result = $this->getShopDateFormat();
+    $result = str_replace(array('yyyy', 'MM', 'dd'), array('Y', 'm', 'd'), $result);
+    return $result;
+  }
+
+  protected function getShopDateFormat() {
+    return Mage::app()->getLocale()->getDateFormat(Mage_Core_Model_Locale::FORMAT_TYPE_SHORT);
+  }
 
 }

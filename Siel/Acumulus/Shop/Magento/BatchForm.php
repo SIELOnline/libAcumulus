@@ -15,13 +15,13 @@ class BatchForm extends BaseBatchForm {
    *
    * This override returns the default date format as set in the Magento config.
    */
-  protected function getDateFormat() {
+  public function getDateFormat() {
     $result = $this->getShopDateFormat();
     $result = str_replace(array('yyyy', 'MM', 'dd'), array('Y', 'm', 'd'), $result);
     return $result;
   }
 
-  protected function getShopDateFormat() {
+  public function getShopDateFormat() {
     return Mage::app()->getLocale()->getDateFormat(Mage_Core_Model_Locale::FORMAT_TYPE_SHORT);
   }
 

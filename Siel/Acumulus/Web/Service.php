@@ -52,16 +52,13 @@ class Service {
     $this->config = $config;
 
     $this->translator = $translator;
-    require_once(dirname(__FILE__) . '/Translations.php');
     $webServiceTranslations = new Translations();
     $this->translator->add($webServiceTranslations);
 
     if ($this->config->getDebug() == ConfigInterface::Debug_StayLocal) {
-      require_once(dirname(__FILE__) . '/CommunicatorLocal.php');
       $this->communicator = new CommunicatorLocal($config);
     }
     else {
-      require_once(dirname(__FILE__) . '/Communicator.php');
       $this->communicator = new Communicator($config);
     }
   }

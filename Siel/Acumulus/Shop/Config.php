@@ -52,7 +52,6 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
     $this->configStore = $configStore;
 
     $this->translator = $translator;
-    require_once(dirname(__FILE__) . '/Translations.php');
     $invoiceHelperTranslations = new Translations();
     $this->translator->add($invoiceHelperTranslations);
 

@@ -25,7 +25,6 @@ abstract class Mailer {
     $this->service = $service;
 
     $this->translator = $translator;
-    require_once(dirname(__FILE__) . '/Translations.php');
     $translations = new Translations();
     $this->translator->add($translations);
   }

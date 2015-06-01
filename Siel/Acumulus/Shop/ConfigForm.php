@@ -30,7 +30,6 @@ abstract class ConfigForm extends Form {
   public function __construct(Config $config, TranslatorInterface $translator) {
     parent::__construct($translator);
 
-    require_once(dirname(__FILE__) . '/ConfigFormTranslations.php');
     $translations = new ConfigFormTranslations();
     $this->translator->add($translations);
 

@@ -93,7 +93,6 @@ class CompletorInvoiceLines {
     $this->config = $config;
 
     $this->translator = $translator;
-    require_once(dirname(__FILE__) . '/Translations.php');
     $invoiceHelperTranslations = new Translations();
     $this->translator->add($invoiceHelperTranslations);
 

@@ -25,11 +25,9 @@ abstract class BatchForm extends Form {
   public function __construct(Config $config, TranslatorInterface $translator, InvoiceManager $invoiceManager) {
     parent::__construct($translator);
 
-    require_once(dirname(__FILE__) . '/../Invoice/Translations.php');
     $translations = new InvoiceTranslations();
     $this->translator->add($translations);
 
-    require_once(dirname(__FILE__) . '/BatchFormTranslations.php');
     $translations = new BatchFormTranslations();
     $this->translator->add($translations);
 

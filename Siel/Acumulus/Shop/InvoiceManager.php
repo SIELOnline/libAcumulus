@@ -28,7 +28,6 @@ abstract class InvoiceManager {
     $this->config = $config;
 
     $this->translator = $translator;
-    require_once(dirname(__FILE__) . '/Translations.php');
     $translations = new Translations();
     $this->translator->add($translations);
   }

@@ -204,17 +204,21 @@ abstract class InvoiceManager {
     $result = WebConfigInterface::Status_NotSent;
     if ($forceSend || !$this->getAcumulusEntryModel()->getByInvoiceSource($invoiceSource)) {
       $invoice = $this->getCreator()->create($invoiceSource);
+
       $this->triggerInvoiceCreated($invoice, $invoiceSource);
 
       if ($invoice !== NULL) {
         $localMessages = array();
         $invoice = $this->getCompletor()->complete($invoice, $invoiceSource, $localMessages);
+
         $this->triggerInvoiceCompleted($invoice, $invoiceSource);
 
         if ($invoice !== NULL) {
           $service = $this->config->getService();
           $result = $service->invoiceAdd($invoice);
           $result = $service->mergeLocalMessages($result, $localMessages);
+
+          $this->triggerInvoiceSent($invoice, $invoiceSource, $result);
 
           // Check if an entryid was created and store entry id and token.
           if (!empty($result['invoice']['entryid'])) {
@@ -260,7 +264,7 @@ abstract class InvoiceManager {
    * @return bool
    *   Success.
    */
-  protected function mailInvoiceAddResult(array $result, array $messages, $invoiceSource) {
+  protected function mailInvoiceAddResult(array $result, array $messages, Source $invoiceSource) {
     $mailer = $this->getMailer();
     return $mailer->sendInvoiceAddMailResult($result, $messages, $invoiceSource->getType(), $invoiceSource->getReference());
   }
@@ -317,8 +321,8 @@ abstract class InvoiceManager {
    * @param Source $invoiceSource
    *   The source object (order, credit note) for which the invoice was created.
    */
-  protected function triggerInvoiceCreated(&$invoice, $invoiceSource) {
-    // Default implementation: no event
+  protected function triggerInvoiceCreated(array &$invoice, Source $invoiceSource) {
+    // Default implementation: no event.
   }
 
   /**
@@ -333,8 +337,43 @@ abstract class InvoiceManager {
    * @param Source $invoiceSource
    *   The source object (order, credit note) for which the invoice was created.
    */
-  protected function triggerInvoiceCompleted(&$invoice, $invoiceSource) {
-    // Default implementation: no event
+  protected function triggerInvoiceCompleted(array &$invoice, Source $invoiceSource) {
+    // Default implementation: no event.
+  }
+
+  /**
+   * Triggers an event that an invoice for Acumulus has been created and
+   * completed and is ready to be sent.
+   *
+   * This allows to inject custom behavior to alter the invoice just before
+   * sending.
+   *
+   * @param array $invoice
+   *   The invoice that has been created and completed.
+   * @param Source $invoiceSource
+   *   The source object (order, credit note) for which the invoice was created.
+   * @param array $result
+   *   The result as sent back by Acumulus. This array contains the following
+   *   keys:
+   *   - invoice: array
+   *     - invoicenumber: string
+   *     - token: string
+   *     - entryid: string
+   *   - errors: array
+   *     - error: array
+   *       - code: string
+   *       - codetag: string
+   *       - message: string
+   *     - counterrors: int
+   *   - warnings: array
+   *     - warning: array
+   *       - code: string
+   *       - codetag: string
+   *       - message: string
+   *     - countwarnings: int
+   */
+  protected function triggerInvoiceSent(array $invoice, Source $invoiceSource, array $result) {
+    // Default implementation: no event.
   }
 
   protected function getIsoDate(DateTime $date) {

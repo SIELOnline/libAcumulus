@@ -3,8 +3,8 @@ namespace Siel\Acumulus\Shop\Magento;
 
 use DateTime;
 use Mage;
-use \Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
 use Varien_Object;
+use \Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
 
 class InvoiceManager extends BaseInvoiceManager {
 
@@ -78,7 +78,7 @@ class InvoiceManager extends BaseInvoiceManager {
    *
    * This Magento override dispatches the 'acumulus_invoice_created' event.
    */
-  protected function triggerInvoiceCreated(&$invoice, $invoiceSource) {
+  protected function triggerInvoiceCreated(array &$invoice, Source $invoiceSource) {
     $transportObject = new Varien_Object(array('invoice' => $invoice));
     Mage::dispatchEvent('acumulus_invoice_created', array('transport_object' => $transportObject, 'source' => $invoiceSource));
   }
@@ -88,9 +88,18 @@ class InvoiceManager extends BaseInvoiceManager {
    *
    * This Magento override dispatches the 'acumulus_invoice_completed' event.
    */
-  protected function triggerInvoiceCompleted(&$invoice, $invoiceSource) {
+  protected function triggerInvoiceCompleted(array &$invoice, Source $invoiceSource) {
     $transportObject = new Varien_Object(array('invoice' => $invoice));
     Mage::dispatchEvent('acumulus_invoice_completed', array('transport_object' => $transportObject, 'source' => $invoiceSource));
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * This Magento override dispatches the 'acumulus_invoice_sent' event.
+   */
+  protected function triggerInvoiceSent(array $invoice, Source $invoiceSource, array $result) {
+    Mage::dispatchEvent('acumulus_invoice_sent', array('invoice' => $invoice, 'source' => $invoiceSource, 'result' => $result));
   }
 
 }

@@ -377,6 +377,6 @@ abstract class InvoiceManager {
   }
 
   protected function getIsoDate(DateTime $date) {
-    return $date->format('Y-m-d');
+    return $date->format('Y-m-d H:i:s');
   }
 }

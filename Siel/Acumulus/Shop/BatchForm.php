@@ -72,21 +72,20 @@ abstract class BatchForm extends Form {
     else /*if (!empty($this->submittedValues['date_to'])) */ {
       // Range of dates has been filled in.
       // We ignore any order # to value.
-      $checkRange = true;
       $dateFormat = $this->getDateFormat();
       if (!DateTime::createFromFormat($dateFormat, $this->submittedValues['date_from'])) {
         // Date from not a valid date.
         $this->errorMessages['date_from'] = sprintf($this->t('message_validate_batch_bad_date_from'), $this->getShopDateFormat());
-        $checkRange = false;
       }
-      if ($this->submittedValues['date_to'] !== $this->submittedValues['date_from'] && !DateTime::createFromFormat($dateFormat, $this->submittedValues['date_to'])) {
-        // Date to not a valid date.
-        $this->errorMessages['date_to'] = sprintf($this->t('message_validate_batch_bad_date_to'), $this->getShopDateFormat());
-        $checkRange = false;
-      }
-      if ($checkRange && $this->submittedValues['date_to'] < $this->submittedValues['date_from']) {
-        // date to is smaller than date from
-         $this->errorMessages['date_to'] = $this->t('message_validate_batch_bad_date_range');
+      if ($this->submittedValues['date_to']) {
+        if(!DateTime::createFromFormat($dateFormat, $this->submittedValues['date_to'])) {
+          // Date to not a valid date.
+          $this->errorMessages['date_to'] = sprintf($this->t('message_validate_batch_bad_date_to'), $this->getShopDateFormat());
+        }
+        else if ($this->submittedValues['date_to'] < $this->submittedValues['date_from']) {
+          // date to is smaller than date from
+          $this->errorMessages['date_to'] = $this->t('message_validate_batch_bad_date_range');
+        }
       }
     }
   }
@@ -109,7 +108,9 @@ abstract class BatchForm extends Form {
       // Retrieve by order date.
       $dateFormat = $this->getDateFormat();
       $from =  DateTime::createFromFormat($dateFormat, $this->getFormValue('date_from'));
-      $to = $this->getFormValue('date_to') ? DateTime::createFromFormat($dateFormat, $this->getFormValue('date_from')) : $from;
+      $from->setTime(0, 0, 0);
+      $to = $this->getFormValue('date_to') ? DateTime::createFromFormat($dateFormat, $this->getFormValue('date_from')) : clone $from;
+      $to->setTime(23, 59, 59);
       $invoiceSources = $this->invoiceManager->getInvoiceSourcesByDateRange($type, $from, $to);
     }
     if (count($invoiceSources) === 0) {

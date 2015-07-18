@@ -109,7 +109,7 @@ abstract class BatchForm extends Form {
       $dateFormat = $this->getDateFormat();
       $from =  DateTime::createFromFormat($dateFormat, $this->getFormValue('date_from'));
       $from->setTime(0, 0, 0);
-      $to = $this->getFormValue('date_to') ? DateTime::createFromFormat($dateFormat, $this->getFormValue('date_from')) : clone $from;
+      $to = $this->getFormValue('date_to') ? DateTime::createFromFormat($dateFormat, $this->getFormValue('date_to')) : clone $from;
       $to->setTime(23, 59, 59);
       $invoiceSources = $this->invoiceManager->getInvoiceSourcesByDateRange($type, $from, $to);
     }

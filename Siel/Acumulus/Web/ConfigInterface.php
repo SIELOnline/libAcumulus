@@ -9,7 +9,7 @@ namespace Siel\Acumulus\Web;
  * interface abstracts from how a specific web shop does so.
  */
 interface ConfigInterface {
-  const libraryVersion = '4.0.0-beta1';
+  const libraryVersion = '4.0.0-beta2';
 
   // Web service configuration related constants.
   const Status_NotSent = -1;
@@ -107,7 +107,9 @@ interface ConfigInterface {
    */
   public function getEnvironment();
 
-  /**
+  /*
+   *  @todo: what is this?
+   *
    * Allows the host environment to supply a log sink.
    *
    * Strictly speaking,this is no configuration thing, but as doing it this way,
@@ -116,5 +118,10 @@ interface ConfigInterface {
    *
    * @param string $message
    */
+
+  /**
+   * @return \Siel\Acumulus\Helpers\Log
+   */
+  public function getLog();
 
 }

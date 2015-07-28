@@ -259,11 +259,15 @@ class Communicator {
 
     // Send and receive over the curl connection.
     $response = curl_exec($ch);
+
+    $sPost = is_string($post) ? $post : print_r($post, true);
     if (!$response) {
+      $this->config->getLog()->debug('sendHttpPost(uri="%s", post="%s"), failure"', $uri, $sPost);
       $this->setCurlError($ch, 'curl_exec()');
     }
     else {
       // Close the connection (this operation cannot fail).
+      $this->config->getLog()->debug('sendHttpPost(uri="%s", post="%s"), response="%s"', $uri, $sPost, $response);
       curl_close($ch);
     }
 

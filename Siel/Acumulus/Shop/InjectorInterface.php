@@ -12,11 +12,6 @@ namespace Siel\Acumulus\Shop;
 interface InjectorInterface {
 
   /**
-   * @return \Siel\Acumulus\Helpers\Log
-   */
-  public function getLog();
-
-  /**
    * @return \Siel\Acumulus\Web\Service
    */
   public function getService();

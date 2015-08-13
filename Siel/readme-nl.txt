@@ -8,7 +8,7 @@ Inleiding
 ---------
 Deze Acumulus web service API library is bedoeld om het ontwikkelen van client
 side code die communiceert met de Acumulus API te vereenvoudigen. De library is
-in eerste instantie ontwikkeld voor gebruik door de koppelingen voor de webshop
+in eerste instantie ontwikkelt voor gebruik door de koppelingen voor de webshop
 software van Magento, PrestaShop, OpenCart, VirtueMart en WooCommerce, maar is
 dusdanig opgezet dat ook andere koppelingen er hun voordeel mee kunnen doen.
 

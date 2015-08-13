@@ -26,7 +26,7 @@ class Log extends BaseLog {
    *   One of the constants of the base Log class.
    *
    * @return int
-   *   the Magento equivalent of the severity.
+   *   The Magento equivalent of the severity.
    */
   protected function getMagentoSeverity($severity) {
     switch ($severity) {

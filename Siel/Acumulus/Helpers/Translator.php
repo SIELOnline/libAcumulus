@@ -32,9 +32,7 @@ class Translator implements TranslatorInterface {
   }
 
   /**
-   * Returns the current (2 character) language (code).
-   *
-   * @return string
+   * @inheritdoc
    */
   public function getLanguage() {
     return $this->language;

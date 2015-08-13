@@ -314,12 +314,21 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
   /**
    * @inheritdoc
    */
-  public function getInvoiceSettings() {
+  public function getCustomerSettings() {
     return array(
       'defaultCustomerType' => $this->get('defaultCustomerType'),
       'sendCustomer' => $this->get('sendCustomer'),
       'genericCustomerEmail' => $this->get('genericCustomerEmail'),
       'overwriteIfExists' => $this->get('overwriteIfExists'),
+      'salutation' => $this->get('salutation'),
+    );
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function getInvoiceSettings() {
+    return array(
       'defaultAccountNumber' => $this->get('defaultAccountNumber'),
       'defaultCostCenter' => $this->get('defaultCostCenter'),
       'defaultInvoiceTemplate' => $this->get('defaultInvoiceTemplate'),
@@ -425,6 +434,7 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
       'sendCustomer',
       'genericCustomerEmail',
       'overwriteIfExists',
+      'salutation',
       'defaultAccountNumber',
       'defaultCostCenter',
       'invoiceNrSource',
@@ -464,10 +474,13 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
       'debug'                      => ServiceConfigInterface::Debug_None,
       'logLevel'                   => Log::Error,
 
-      // Default invoice settings.
+      // Default customer settings.
       'sendCustomer'               => true,
-      'overwriteIfExists'          => true,
       'genericCustomerEmail'       => 'consumer@' . $hostName,
+      'overwriteIfExists'          => true,
+      'salutation'                 => '',
+
+      // Default invoice settings.
       'defaultInvoicePaidTemplate' => 0,
       'removeEmptyShipping'        => false,
 

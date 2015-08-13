@@ -112,6 +112,7 @@ abstract class Creator {
     $this->invoice['customer']['invoice'] = $this->getInvoice();
     $this->addInvoiceDefaults();
     $this->invoice['customer']['invoice']['line'] = $this->getInvoiceLines();
+    $this->addEmailAsPdf();
     return $this->invoice;
   }
 
@@ -131,7 +132,6 @@ abstract class Creator {
    * - address2
    * - postalcode
    * - city
-   * - locationcode: not needed, will be filled by the Completor
    * - countrycode
    * - vatnumber
    * - telephone
@@ -151,24 +151,64 @@ abstract class Creator {
    * shop specific data.
    */
   protected function addCustomerDefaults() {
-    $invoiceSettings = $this->config->getInvoiceSettings();
-    $this->addDefault($this->invoice['customer'], 'locationcode', $this->getLocationCode($this->invoice['customer']['countrycode']));
-    $this->addDefault($this->invoice['customer'], 'overwriteifexists', $invoiceSettings['overwriteIfExists'] ? ConfigInterface::OverwriteIfExists_Yes : ConfigInterface::OverwriteIfExists_No);
-    $this->addDefault($this->invoice['customer'], 'type', $invoiceSettings['defaultCustomerType']);
+    $customerSettings = $this->config->getCustomerSettings();
+    $this->addDefault($this->invoice['customer'], 'overwriteifexists', $customerSettings['overwriteIfExists'] ? ConfigInterface::OverwriteIfExists_Yes : ConfigInterface::OverwriteIfExists_No);
+    $this->addDefault($this->invoice['customer'], 'type', $customerSettings['defaultCustomerType']);
+    if (!empty($customerSettings['salutation'])) {
+      $this->invoice['customer']['salutation'] = $this->getSalutation($customerSettings['salutation']);
+    }
     $this->convertEuCountryCode();
   }
 
   /**
-   * Wrapper around Countries::getLocationCode().
+   * Returns the salutation based on the (customer) setting for the salutation.
    *
-   * @param string $countryCode
-   *   ISO 3166-1 alpha-2 country code.
+   * This base implementation will do token expansion by searching for tokens
+   * and calling the getProperty() method for each token found. So, normally it
+   * won't be necessary to override this method, whereas overriding getProperty
+   * will be more likely.
    *
-   * @return int
-   *   Location code.
+   * @param string $salutation
+   *
+   * @return string
+   *   The salutation for the customer of this order.
    */
-  protected function getLocationCode($countryCode) {
-    return $this->countries->getLocationCode($countryCode);
+  protected function getSalutation($salutation) {
+    $salutation = preg_replace_callback('#([~#]+)#', array($this, 'getProperty'), $salutation);
+    return $salutation;
+  }
+
+  /**
+   * Looks up a property in the web shop specific order object/array.
+   *
+   * This base implementation only looks up in the order object or array, but
+   * that may be insufficient if the customer data is in a separate object or
+   * array.
+   *
+   * Looking up in an object is done by calling the method "get{Property}".
+   *
+   * Override if you need to explicitly access referred objects or arrays,
+   * probably the customer object/array.
+   *
+   * @param string $property
+   *
+   * @return string
+   *   The value for the property of the given name.
+   */
+  protected function getProperty($property) {
+    $order = $this->source->getSource();
+    if (is_array($order)) {
+      $value = isset($order[$property])
+        ? $order[$property]
+        : '';
+    }
+    else {
+      $method = 'get' . ucfirst($property);
+      $value =  method_exists($order, '__get') || method_exists($order, $method)
+        ? $order->$method()
+        : '';
+    }
+    return $value;
   }
 
   /**
@@ -261,7 +301,6 @@ abstract class Creator {
     else {
       $this->addDefault($this->invoice['customer']['invoice'], 'template', $invoiceSettings['defaultInvoiceTemplate']);
     }
-    $this->addEmailAsPdf();
   }
 
   /**
@@ -523,6 +562,7 @@ abstract class Creator {
         '[#f]' => isset($this->invoice['customer']['invoice']['number']) ? $this->invoice['customer']['invoice']['number'] : '',
       )));
       $invoice['customer']['invoice']['emailaspdf']['confirmreading'] = $emailAsPdfSettings['confirmReading'] ? ConfigInterface::ConfirmReading_Yes : ConfigInterface::ConfirmReading_No;
+
       $this->invoice['customer']['invoice']['emailaspdf'] = $emailasPdf;
     }
   }

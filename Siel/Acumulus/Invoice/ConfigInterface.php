@@ -22,11 +22,6 @@ interface ConfigInterface {
   const ConfirmReading_No = 0;
   const ConfirmReading_Yes = 1;
 
-  const LocationCode_None = 0;
-  const LocationCode_NL = 1;
-  const LocationCode_EU = 2;
-  const LocationCode_RestOfWorld = 3;
-
   const VatType_National = 1;
   const VatType_NationalReversed = 2;
   const VatType_EuReversed = 3;
@@ -43,6 +38,14 @@ interface ConfigInterface {
    *   - sendCustomer
    *   - genericCustomerEmail
    *   - overwriteIfExists
+   */
+  public function getCustomerSettings();
+
+  /**
+   * Returns the set of settings related to adding an invoice.
+   *
+   * @return array
+   *   A keyed array with the keys:
    *   - defaultAccountNumber
    *   - defaultCostCenter
    *   - defaultInvoiceTemplate

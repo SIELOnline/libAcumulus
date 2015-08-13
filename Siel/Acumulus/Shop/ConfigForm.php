@@ -42,7 +42,7 @@ abstract class ConfigForm extends Form {
    * This is the set of values as are stored in the config.
    */
   protected function getDefaultFormValues() {
-    return $this->acumulusConfig->getCredentials() + $this->acumulusConfig->getShopSettings() + $this->acumulusConfig->getInvoiceSettings() + $this->acumulusConfig->getEmailAsPdfSettings() + array('debug' => $this->acumulusConfig->getDebug());
+    return $this->acumulusConfig->getCredentials() + $this->acumulusConfig->getShopSettings() + $this->acumulusConfig->getCustomerSettings() + $this->acumulusConfig->getInvoiceSettings() + $this->acumulusConfig->getEmailAsPdfSettings() + array('debug' => $this->acumulusConfig->getDebug());
   }
 
   /**
@@ -245,6 +245,14 @@ abstract class ConfigForm extends Form {
           'type' => 'select',
           'label' => $this->t('field_defaultCustomerType'),
           'options' => $this->picklistToOptions($this->contactTypes, 'contacttypes', 0, $this->t('option_empty')),
+        ),
+        'salutation' => array(
+          'type' => 'text',
+          'label' => $this->t('field_salutation'),
+          'description' => $this->t('desc_salutation'),
+          'attributes' => array(
+            'size' => 30,
+          ),
         ),
         'clientData' => array(
           'type' => 'checkbox',

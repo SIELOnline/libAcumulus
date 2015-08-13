@@ -9,37 +9,6 @@ use Siel\Acumulus\Invoice\ConfigInterface;
 class Countries {
 
   /**
-   * Returns the Acumulus location code for a given country code.
-   *
-   * See https://apidoc.sielsystems.nl/content/invoice-add for more information
-   * about the location code.
-   *
-   * This function will be deprecated once the locationcode has been removed
-   * from the API.
-   *
-   * @param string $countryCode
-   *   ISO 3166-1 alpha-2 country code.
-   *
-   * @return int
-   *   Location code.
-   */
-  public function getLocationCode($countryCode) {
-    if (empty($countryCode)) {
-      $result = ConfigInterface::LocationCode_None;
-    }
-    else if ($this->isNl($countryCode)) {
-      $result = ConfigInterface::LocationCode_NL;
-    }
-    elseif ($this->isEu($countryCode)) {
-      $result = ConfigInterface::LocationCode_EU;
-    }
-    else {
-      $result = ConfigInterface::LocationCode_RestOfWorld;
-    }
-    return $result;
-  }
-
-  /**
    * Returns whether the country is the Netherlands.
    *
    * For now only the alpha-2 codes are allowed. Other notations might be added

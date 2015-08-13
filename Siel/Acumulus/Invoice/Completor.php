@@ -149,26 +149,31 @@ class Completor {
    * This should be server side, but for now it is done client side.
    */
   protected function correctCityAndCountryCode() {
-    if (!empty($this->invoice['customer']['countrycode'])) {
-      if (isset($this->invoice['customer']['locationcode']) && $this->invoice['customer']['locationcode'] !== ConfigInterface::LocationCode_NL) {
-        // Add country name to city.
-        $country = $this->getCountryName($this->invoice['customer']['countrycode']);
-        if (stripos($this->invoice['customer']['city'], $country) === false) {
-          $this->invoice['customer']['city'] .= ' ' . strtoupper($country);
-        }
+    if (!$this->isNl()) {
+      // Add country name to city.
+      $country = $this->getCountryName();
+      if (stripos($this->invoice['customer']['city'], $country) === false) {
+        $this->invoice['customer']['city'] .= ' ' . strtoupper($country);
       }
     }
   }
 
   /**
-   * Wrapper around Countries::getCountryName().
+   * Wrapper around Countries::isNl().
    *
-   * @param string $countryCode
+   * @return bool
+   */
+  protected function isNl() {
+    return empty($this->invoice['customer']['countrycode']) || $this->countries->isNl($this->invoice['customer']['countrycode']);
+  }
+
+  /**
+   * Wrapper around Countries::getCountryName().
    *
    * @return string
    */
-  protected function getCountryName($countryCode) {
-    return $this->countries->getCountryName($countryCode);
+  protected function getCountryName() {
+    return $this->countries->getCountryName(!empty($this->invoice['customer']['countrycode']) ? $this->invoice['customer']['countrycode'] : 'nl');
   }
 
   /**
@@ -176,8 +181,8 @@ class Completor {
    * consumers.
    */
   protected function fictitiousClient() {
-    $invoiceSettings = $this->config->getInvoiceSettings();
-    if (!$invoiceSettings['sendCustomer'] && empty($this->invoice['customer']['companyname1']) && empty($this->invoice['customer']['vatnumber'])) {
+    $customerSettings = $this->config->getCustomerSettings();
+    if (!$customerSettings['sendCustomer'] && empty($this->invoice['customer']['companyname1']) && empty($this->invoice['customer']['vatnumber'])) {
       unset($this->invoice['customer']['type']);
       unset($this->invoice['customer']['companyname1']);
       unset($this->invoice['customer']['companyname2']);
@@ -187,14 +192,13 @@ class Completor {
       unset($this->invoice['customer']['address2']);
       unset($this->invoice['customer']['postalcode']);
       unset($this->invoice['customer']['city']);
-      unset($this->invoice['customer']['locationcode']);
       unset($this->invoice['customer']['countrycode']);
       unset($this->invoice['customer']['vatnumber']);
       unset($this->invoice['customer']['telephone']);
       unset($this->invoice['customer']['fax']);
       unset($this->invoice['customer']['bankaccountnumber']);
       unset($this->invoice['customer']['mark']);
-      $this->invoice['customer']['email'] = $invoiceSettings['genericCustomerEmail'];
+      $this->invoice['customer']['email'] = $customerSettings['genericCustomerEmail'];
       $this->invoice['customer']['overwriteifexists'] = 0;
     }
   }

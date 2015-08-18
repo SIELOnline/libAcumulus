@@ -19,6 +19,17 @@ namespace Siel\Acumulus\Shop;
  */
 abstract class AcumulusEntryModel {
 
+  /** @var \Siel\Acumulus\Shop\Config */
+  protected $config;
+
+  /**
+   * @param Config $config
+   */
+  public function __construct(Config $config) {
+    $this->config = $config;
+  }
+
+
   /**
    * Returns the Acumulus entry record for the given entry id.
    *
@@ -102,8 +113,9 @@ abstract class AcumulusEntryModel {
    * @param $token
    *   The Acumulus token to be used to access the invoice for this order via
    *   the Acumulus API.
-   * @param string $created
-   *   The current time, to be used for the created and updated field.
+   * @param int|string $created
+   *   The creation time (= current time), in the format as the actual database
+   *   layer expects for a timestamp.
    *
    * @return bool
    *   Success.
@@ -119,8 +131,9 @@ abstract class AcumulusEntryModel {
    *   The new Acumulus entry id for the invoice source.
    * @param string $token
    *   The new Acumulus token for the invoice source.
-   * @param string $updated
-   *   The current time, to be used for the updated field.
+   * @param int|string $updated
+   *   The update time (= current time), in the format as the actual database
+   *   layer expects for a timestamp.
    *
    * @return bool
    *   Success.

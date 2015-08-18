@@ -81,7 +81,7 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel {
    * Magento has separate install scripts, so nothing has to be done here.
    */
   function install() {
-    return false;
+    return true;
   }
 
   /**
@@ -90,7 +90,7 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel {
    * Magento has separate install scripts, so nothing has to be done here.
    */
   public function uninstall() {
-    return false;
+    return true;
   }
 
 }

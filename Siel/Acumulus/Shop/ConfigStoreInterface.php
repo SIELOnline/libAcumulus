@@ -25,7 +25,9 @@ interface ConfigStoreInterface {
    *
    * @return array
    *   An array with the raw (not necessarily casted) configuration values keyed
-   *   by their name.
+   *   by their name. Note that these values will overwrite the default values,
+   *   so no NULL values should be returned, though other "empty" values (false,
+   *   0) may be returned.
    */
   public function load(array $keys);
 
@@ -33,7 +35,8 @@ interface ConfigStoreInterface {
    * Stores the values to the actual configuration provider.
    *
    * @param array $values
-   *   A keyed array that contains the values to store.
+   *   A keyed array that contains the values to store. Note that values may be
+   *   "empty", eg 0 or false. Only NULL values may be ignored
    *
    * @return bool
    *   Success.

@@ -42,8 +42,8 @@ class InvoiceManager extends BaseInvoiceManager {
    * {@inheritdoc}
    */
   public function getInvoiceSourcesByDateRange($invoiceSourceType, DateTime $dateFrom, DateTime $dateTo) {
-    $dateFrom = $this->getIsoDate($dateFrom);
-    $dateTo = $this->getIsoDate($dateTo);
+    $dateFrom = $this->getSqlDate($dateFrom);
+    $dateTo = $this->getSqlDate($dateTo);
     $field = 'updated_at';
     $condition = array('from' => $dateFrom, 'to' => $dateTo);
     return $this->getByCondition($invoiceSourceType, $field, $condition);

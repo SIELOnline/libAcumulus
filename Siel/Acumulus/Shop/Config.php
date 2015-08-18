@@ -90,7 +90,7 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
    * {@inheritdoc}
    */
   public function getSource($invoiceSourceType, $invoiceSourceId) {
-    return $this->getInstance('Source', array($invoiceSourceType, $invoiceSourceId));
+    return $this->getInstance('Source', 'Invoice', array($invoiceSourceType, $invoiceSourceId));
   }
 
   /**
@@ -104,28 +104,28 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
    * {@inheritdoc}
    */
   public function getCreator() {
-    return $this->getInstance('Creator', array($this, $this->translator));
+    return $this->getInstance('Creator', 'Invoice', array($this, $this->translator));
   }
 
   /**
    * {@inheritdoc}
    */
   public function getMailer() {
-    return $this->getInstance('Mailer', array($this, $this->translator, $this->service));
+    return $this->getInstance('Mailer', 'Helpers', array($this, $this->translator, $this->service));
   }
 
   /**
    * {@inheritdoc}
    */
   public function getManager() {
-    return $this->getInstance('InvoiceManager', array($this, $this->translator));
+    return $this->getInstance('InvoiceManager', 'Shop', array($this, $this->translator));
   }
 
   /**
    * {@inheritdoc}
    */
   public function getAcumulusEntryModel() {
-    return $this->getInstance('AcumulusEntryModel');
+    return $this->getInstance('AcumulusEntryModel', 'Shop', array($this));
   }
 
   /**
@@ -137,23 +137,36 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
    * @param string $class
    *   The name of the class without namespace. The namespace is taken from the
    *   configStore object.
+   * @param string $subNamespace
+   *   The sub namespace (within the shop namespace) in which the class resides.
    * @param array $constructorArgs
    *
    * @return object
    */
-  protected function getInstance($class, array $constructorArgs = array()) {
+  protected function getInstance($class, $subNamespace, array $constructorArgs = array()) {
     if (!isset($this->instances[$class])) {
-      $class = $this->getShopNamespace() . '\\' . $class;
+      $class = $this->getShopNamespace() . '\\' . $subNamespace . '\\' . $class;
       $reflector = new ReflectionClass($class);
       $this->instances[$class] = $reflector->newInstanceArgs($constructorArgs);
     }
     return $this->instances[$class];
   }
 
+  /**
+   * Returns the namespace for the current shop.
+   *
+   * @return string
+   *   The namespace for the current shop.
+   */
   protected function getShopNamespace() {
+    // Get class of ConfigStore object.
     $class = get_class($this->configStore);
+    // Get namespace part of that.
     $namespaceEnd = strrpos($class, '\\');
-    return substr($class, 0, (int) $namespaceEnd);
+    $namespace = substr($class, 0, (int) $namespaceEnd);
+    // Remove '\Shop' part at end.
+    $namespace = substr($namespace, 0, -strlen('\\Shop'));
+    return $namespace;
   }
 
   /**
@@ -166,7 +179,6 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
       $this->isLoaded = true;
     }
   }
-
 
   /**
    * Saves the configuration to the actual configuration provider.

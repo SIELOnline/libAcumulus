@@ -113,13 +113,19 @@ abstract class InvoiceManager {
    *   Success.
    */
   public function sendMultiple(array $invoiceSources, $forceSend, array &$log) {
+    $errorLogged = false;
     $success = true;
     $time_limit = ini_get('max_execution_time');
     /** @var Source $invoiceSource */
     foreach ($invoiceSources as $invoiceSource) {
       // Try to keep the script running, but note that other systems involved,
       // think the (Apache) web server, may have their own time-out.
-      set_time_limit($time_limit);
+      // Use @ to prevent messages like "Warning: set_time_limit(): Cannot set
+      //   max execution time limit due to system policy in ...".
+      if (!@set_time_limit($time_limit) && !$errorLogged) {
+        $this->config->getLog('InvoiceManager::sendMultiple(): could not set time limit.');
+        $errorLogged = true;
+      }
 
       $status = $this->send($invoiceSource, $forceSend);
       switch ($status) {
@@ -311,10 +317,10 @@ abstract class InvoiceManager {
 
   /**
    * Triggers an event that an invoice for Acumulus has been created and is
-   * ready to be sent.
+   * ready to be completed and sent.
    *
    * This allows to inject custom behavior to alter the invoice just before
-   * sending.
+   * completing and sending.
    *
    * @param array $invoice
    *   The invoice that has been created.
@@ -342,16 +348,14 @@ abstract class InvoiceManager {
   }
 
   /**
-   * Triggers an event that an invoice for Acumulus has been created and
-   * completed and is ready to be sent.
+   * Triggers an event after an invoice for Acumulus has been sent.
    *
-   * This allows to inject custom behavior to alter the invoice just before
-   * sending.
+   * This allows to inject custom behavior to react to invoice sending.
    *
    * @param array $invoice
-   *   The invoice that has been created and completed.
+   *   The invoice that has been sent.
    * @param Source $invoiceSource
-   *   The source object (order, credit note) for which the invoice was created.
+   *   The source object (order, credit note) for which the invoice was sent.
    * @param array $result
    *   The result as sent back by Acumulus. This array contains the following
    *   keys:
@@ -376,7 +380,18 @@ abstract class InvoiceManager {
     // Default implementation: no event.
   }
 
-  protected function getIsoDate(DateTime $date) {
+  /**
+   * Returns the given DateTime in a format that the actual database layer
+   * accepts for comparison in a SELECT query.
+   *
+   * This default implementation returns the DateTime as a string in ISO format
+   * (yyyy-mm-dd hh:mm:ss).
+   *
+   * @param \DateTime $date
+   *
+   * @return int|string
+   */
+  protected function getSqlDate(DateTime $date) {
     return $date->format('Y-m-d H:i:s');
   }
 }

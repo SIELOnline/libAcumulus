@@ -1,5 +1,5 @@
 <?php
-namespace Siel\Acumulus\Shop\VirtueMart;
+namespace Siel\Acumulus\VirtueMart\Shop;
 
 use JSession;
 use JText;
@@ -27,9 +27,9 @@ class ConfigForm extends BaseConfigForm {
    * {@inheritdoc}
    */
   protected function getShopOrderStatuses() {
-    /** @var \VirtueMartModelOrderstatus $orderstatusModel */
-    $orderstatusModel = VmModel::getModel('orderstatus');
-    $orderStates = $orderstatusModel->getOrderStatusNames();
+    /** @var \VirtueMartModelOrderstatus $orderStatusModel */
+    $orderStatusModel = VmModel::getModel('orderstatus');
+    $orderStates = $orderStatusModel->getOrderStatusNames();
     foreach ($orderStates as $code => &$value) {
       $value = \JText::_($value['order_status_name']);
     }

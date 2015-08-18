@@ -1,5 +1,5 @@
 <?php
-namespace Siel\Acumulus\Shop\VirtueMart;
+namespace Siel\Acumulus\VirtueMart\Helpers;
 
 use JFactory;
 use Siel\Acumulus\Helpers\Mailer as BaseMailer;

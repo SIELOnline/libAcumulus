@@ -1,5 +1,5 @@
 <?php
-namespace Siel\Acumulus\Shop\VirtueMart;
+namespace Siel\Acumulus\VirtueMart\Shop;
 
 use JSession;
 use JText;

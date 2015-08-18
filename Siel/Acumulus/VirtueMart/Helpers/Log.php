@@ -1,5 +1,5 @@
 <?php
-namespace Siel\Acumulus\Shop\VirtueMart;
+namespace Siel\Acumulus\VirtueMart\Helpers;
 
 use JLog;
 use \Siel\Acumulus\Helpers\Log as BaseLog;

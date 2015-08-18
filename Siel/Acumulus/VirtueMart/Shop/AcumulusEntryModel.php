@@ -1,5 +1,5 @@
 <?php
-namespace Siel\Acumulus\Shop\VirtueMart;
+namespace Siel\Acumulus\VirtueMart\Shop;
 
 use DateTimeZone;
 use JDate;
@@ -20,6 +20,9 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel {
    */
   protected function newTable() {
     $this->table = JTable::getInstance('AcumulusEntry', 'AcumulusTable');
+    if ($this->table === false) {
+      $this->config->getLog()->error('AcumulusEntryModel::newTable(): table not created');
+    }
     return $this->table;
   }
 
@@ -43,6 +46,7 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel {
    * {@inheritdoc}
    */
   protected function insert($invoiceSource, $entryId, $token, $created) {
+    // Start with new table class to not overwrite any loaded record.
     $table = $this->newTable();
     $table->entry_id = $entryId;
     $table->token = $token;
@@ -57,6 +61,7 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel {
    * {@inheritdoc}
    */
   protected function update($record, $entryId, $token, $updated) {
+    // Continue with existing table class with already loaded record.
     $table = $this->table;
     $table->entry_id = $entryId;
     $table->token = $token;

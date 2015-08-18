@@ -1,10 +1,9 @@
 <?php
-namespace Siel\Acumulus\Shop\VirtueMart;
+namespace Siel\Acumulus\VirtueMart\Helpers;
 
 use JHtml;
 use Siel\Acumulus\Helpers\Form;
 use \Siel\Acumulus\Helpers\FormRenderer as BaseFormRenderer;
-use vmJsApi;
 
 /**
  * Class FormRenderer

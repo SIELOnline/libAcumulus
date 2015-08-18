@@ -1,5 +1,5 @@
 <?php
-namespace Siel\Acumulus\Shop\VirtueMart;
+namespace Siel\Acumulus\VirtueMart\Invoice;
 
 use Siel\Acumulus\Invoice\ConfigInterface as InvoiceConfigInterface;
 use Siel\Acumulus\Shop\ConfigInterface;
@@ -41,7 +41,7 @@ class Creator extends BaseCreator {
   protected $shopInvoice = array();
 
   /** @var stdClass
-   *  Array with keys:
+   *  Object with properties:
    *  [...]: virtuemart_vmusers table record columns
    *  [shopper_groups]: array of stdClass virtuemart_vmuser_shoppergroups table records
    *  [JUser]: JUser object
@@ -119,6 +119,20 @@ class Creator extends BaseCreator {
     $this->addIfSetAndNotEmpty($result, 'email', $this->order['details']['BT'], 'email');
 
     return $result;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getProperty($property) {
+    $value = $this->order['details']['BT']->$property;
+    if (empty($value)) {
+      $value = $this->user->$property;
+    }
+    if (empty($value)) {
+      $value = $this->user->userInfo[$this->userBtUid]->$property;
+    }
+    return $value;
   }
 
   /**

@@ -165,8 +165,8 @@ abstract class Creator {
    *
    * This base implementation will do token expansion by searching for tokens
    * and calling the getProperty() method for each token found. So, normally it
-   * won't be necessary to override this method, whereas overriding getProperty
-   * will be more likely.
+   * won't be necessary to override this method, as overriding getProperty will
+   * be more likely.
    *
    * @param string $salutation
    *
@@ -174,8 +174,24 @@ abstract class Creator {
    *   The salutation for the customer of this order.
    */
   protected function getSalutation($salutation) {
-    $salutation = preg_replace_callback('#([~#]+)#', array($this, 'getProperty'), $salutation);
+    $salutation = preg_replace_callback('/#([^#]+)#/', array($this, 'salutationMatch'), $salutation);
     return $salutation;
+  }
+
+  /**
+   * Callback for the preg_replace_callback call in Creator::getSalutation().
+   *
+   * This base implementation call the getProperty() method with the part of the
+   * match between the #s, so, normally it won't be necessary to override this
+   * method, as overriding getProperty will be more likely.
+   *
+   * @param array $matches
+   *
+   * @return string
+   *   The salutation for the customer of this order.
+   */
+  protected function salutationMatch($matches) {
+    return $this->getProperty($matches[1]);
   }
 
   /**

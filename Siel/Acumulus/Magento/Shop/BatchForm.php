@@ -1,5 +1,5 @@
 <?php
-namespace Siel\Acumulus\Shop\Magento;
+namespace Siel\Acumulus\Magento\Shop;
 
 use Mage;
 use Mage_Core_Model_Locale;

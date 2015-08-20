@@ -1,8 +1,7 @@
 <?php
-namespace Siel\Acumulus\Shop\Magento;
+namespace Siel\Acumulus\Magento\Helpers;
 
 use Mage;
-use Mage_Core_Model_Locale;
 use Varien_Data_Form_Abstract;
 
 /**

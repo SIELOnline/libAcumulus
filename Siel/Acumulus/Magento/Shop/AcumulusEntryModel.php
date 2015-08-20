@@ -1,8 +1,9 @@
 <?php
-namespace Siel\Acumulus\Shop\Magento;
+namespace Siel\Acumulus\Magento\Shop;
 
 use Mage;
 use Siel\Acumulus\Shop\AcumulusEntryModel as BaseAcumulusEntryModel;
+use Siel\Acumulus\Shop\Config;
 use Siel_Acumulus_Model_Entry;
 
 /**
@@ -16,7 +17,8 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel {
   /**
    * AcumulusEntryModel constructor.
    */
-  public function __construct() {
+  public function __construct(Config $config) {
+    parent::__construct($config);
     $this->model = Mage::getModel('acumulus/entry');
   }
 

@@ -1,8 +1,9 @@
 <?php
-namespace Siel\Acumulus\Shop\Magento;
+namespace Siel\Acumulus\Magento\Shop;
 
 use DateTime;
 use Mage;
+use Siel\Acumulus\Magento\Invoice\Source;
 use Varien_Object;
 use \Siel\Acumulus\Invoice\Source as BaseSource;
 use \Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
@@ -57,7 +58,7 @@ class InvoiceManager extends BaseInvoiceManager {
    * @param string|string[] $field
    * @param int|string|array $condition
    *
-   * @return \Siel\Acumulus\Shop\Magento\Source[]
+   * @return \Siel\Acumulus\Magento\Invoice\Source[]
    *   A non keyed array with invoice Sources.
    */
   protected function getByCondition($invoiceSourceType, $field, $condition) {

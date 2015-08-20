@@ -1,5 +1,5 @@
 <?php
-namespace Siel\Acumulus\Shop\Magento;
+namespace Siel\Acumulus\Magento\Helpers;
 
 use Mage;
 use \Siel\Acumulus\Helpers\Log as BaseLog;

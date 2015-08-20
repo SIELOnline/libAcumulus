@@ -1,5 +1,5 @@
 <?php
-namespace Siel\Acumulus\Shop\Magento;
+namespace Siel\Acumulus\Magento\Invoice;
 
 use Mage;
 use Mage_Sales_Model_Order;

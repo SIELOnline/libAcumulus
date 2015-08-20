@@ -1,5 +1,5 @@
 <?php
-namespace Siel\Acumulus\Shop\Magento;
+namespace Siel\Acumulus\Magento\Helpers;
 
 use Mage;
 use Mage_Core_Model_Email_Template;

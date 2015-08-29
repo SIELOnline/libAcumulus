@@ -21,7 +21,7 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel {
    * {@inheritdoc}
    */
   public function getByEntryId($entryId) {
-    $result = null;
+    $result = false;
     $metaQuery = array(
       'posts_per_page' => 1,
       'meta_key' => static::KEY_ENTRY_ID,
@@ -33,7 +33,7 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel {
       $post = reset($posts);
       $result = get_post_meta($post->id);
     }
-    return $result ? $result : null;
+    return $result !== false ? $result : null;
   }
 
   /**

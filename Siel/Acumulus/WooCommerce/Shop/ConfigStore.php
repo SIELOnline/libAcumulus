@@ -14,17 +14,12 @@ class ConfigStore implements ConfigStoreInterface {
   public function getShopEnvironment() {
     global $wp_version, $woocommerce;
     $environment = array(
-      'moduleVersion' => 'lazy-load',
+      // Lazy load is no longer needed (as in L3) as this method will only be
+      // called when the config gets actually queried.
+      'moduleVersion' => \Acumulus::create()->getVersionNumber(),
       'shopName' => 'WooCommerce',
       'shopVersion' => (isset($woocommerce) ? $woocommerce->version : 'unknown') . ' (WordPress: ' . $wp_version . ')',
     );
-
-    // @todo:'this code should get its place:
-//    if ($key === 'moduleVersion' && $this->values[$key] === 'lazy-load') {
-//      $this->values[$key] = \Acumulus::create()->getVersionNumber();
-//    }
-
-
     return $environment;
   }
 

@@ -3,6 +3,7 @@ namespace Siel\Acumulus\PrestaShop\Shop;
 
 use Db;
 use Siel\Acumulus\Shop\AcumulusEntryModel as BaseAcumulusEntryModel;
+use Siel\Acumulus\Shop\Config;
 
 /**
  * Implements the PrestaShop specific acumulus entry model class.
@@ -17,9 +18,10 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel {
   protected $tableName;
 
   /**
-   * Constructor
+   * @param Config $config
    */
-  function __construct() {
+  public function __construct(Config $config) {
+    parent::__construct($config);
     $this->tableName = _DB_PREFIX_ . 'acumulus_entry';
   }
 
@@ -27,7 +29,7 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel {
    * {@inheritdoc}
    */
   public function getByEntryId($entryId) {
-    $result = Db::getInstance()->executeS(sprintf("SELECT * FROM %s WHERE id_entry = %u", $this->tableName, $entryId));
+    $result = Db::getInstance()->executeS(sprintf("SELECT * FROM `%s` WHERE id_entry = %u", $this->tableName, $entryId));
     return count($result) === 1 ? reset($result) : null;
   }
 
@@ -35,7 +37,7 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel {
    * {@inheritdoc}
    */
   public function getByInvoiceSourceId($invoiceSourceType, $invoiceSourceId) {
-    $result = Db::getInstance()->executeS(sprintf("SELECT * FROM %s WHERE id_type = '%s' AND id_order = %u", $this->tableName, $invoiceSourceType, $invoiceSourceId));
+    $result = Db::getInstance()->executeS(sprintf("SELECT * FROM `%s` WHERE id_type = '%s' AND id_order = %u", $this->tableName, $invoiceSourceType, $invoiceSourceId));
     return count($result) === 1 ? reset($result) : null;
   }
 
@@ -45,7 +47,7 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel {
   protected function insert($invoiceSource, $entryId, $token, $created) {
     $shopId = $invoiceSource->getSource()->id_shop;
     $shopGroupId = $invoiceSource->getSource()->id_shop_group;
-    return Db::getInstance()->execute(sprintf("INSERT INTO %s (id_shop, id_shop_group, id_entry, token, id_order, updated) VALUES (%u, %u, %u, '%s', %u, '%s')",
+    return Db::getInstance()->execute(sprintf("INSERT INTO `%s` (id_shop, id_shop_group, id_entry, token, id_order, updated) VALUES (%u, %u, %u, '%s', %u, '%s')",
       $this->tableName, $shopId, $shopGroupId, $entryId, $token, $invoiceSource->getId(), $created));
   }
 
@@ -53,7 +55,7 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel {
    * {@inheritdoc}
    */
   protected function update($record, $entryId, $token, $updated) {
-    return Db::getInstance()->execute(sprintf("UPDATE %s SET id_shop = %u, id_shop_group = %u, id_entry = %u, token = '%s', id_order = %u, updated = '%s' WHERE id = %u",
+    return Db::getInstance()->execute(sprintf("UPDATE `%s` SET id_shop = %u, id_shop_group = %u, id_entry = %u, token = '%s', id_order = %u, updated = '%s' WHERE id = %u",
       $this->tableName, $record['id_shop'], $record['id_shop_group'], $entryId, $token, $record['id_order'], $updated, $record['id']));
   }
 

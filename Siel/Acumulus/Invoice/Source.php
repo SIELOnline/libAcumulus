@@ -24,6 +24,25 @@ abstract class Source {
   protected $source;
 
   /**
+   * Creates a lis of Source objects for the given ids of the given type.
+   *
+   * @param string $invoiceSourceType
+   *   1 of the invoice source type constants.
+   * @param int[] $invoiceSourceIds
+   *   A list of invoice source ids.
+   *
+   * @return Source[]
+   *   A list of Source objects for the given ids of the given type.
+   */
+  static public function invoiceSourceIdsToSources($invoiceSourceType, array $invoiceSourceIds) {
+    $results = array();
+    foreach ($invoiceSourceIds as $invoiceSourceId) {
+      $results[] = new static($invoiceSourceType, $invoiceSourceId);
+    }
+    return $results;
+  }
+
+  /**
    * @param string $type
    * @param int|string|array|object $idOrSource
    */

@@ -1,7 +1,6 @@
 <?php
 namespace Siel\Acumulus\Invoice;
 
-use Siel\Acumulus\Helpers\Countries;
 use Siel\Acumulus\Helpers\TranslatorInterface;
 use Siel\Acumulus\Web\Service;
 
@@ -35,9 +34,6 @@ class Completor {
   /** @var \Siel\Acumulus\Helpers\TranslatorInterface */
   protected $translator;
 
-  /** @var \Siel\Acumulus\Helpers\Countries */
-  protected $countries;
-
   /** @var array */
   protected $messages;
 
@@ -63,8 +59,6 @@ class Completor {
     $this->translator = $translator;
     $invoiceHelperTranslations = new Translations();
     $this->translator->add($invoiceHelperTranslations);
-
-    $this->countries = new Countries();
 
     if ($this->invoiceLineCompletor === null) {
       $this->invoiceLineCompletor = new CompletorInvoiceLines($config, $translator, $service);
@@ -117,7 +111,6 @@ class Completor {
    * specific data.
    */
   protected function completeInvoice() {
-    $this->correctCityAndCountryCode();
     $this->fictitiousClient();
     $this->validateEmail();
   }
@@ -128,52 +121,6 @@ class Completor {
    */
   protected function completeInvoiceAfterLineCompletion() {
     $this->removeEmptyShipping();
-  }
-
-  /**
-   * Corrects the city and country code if necessary:
-   * - If outside the EU, empty the country code
-   * - if outside the Netherlands, add the country name to the city field.
-   *
-   * This should be changed on the server, but for now we "correct" it here.
-   *
-   * See https://apidoc.sielsystems.nl/content/invoice-add, tags city and
-   * countrycode:
-   *   city (non mandatory)
-   *     City and optional country in capitals (Amsterdam NETHERLANDS).
-   *   countrycode (non mandatory)
-   *     Use international standard country code (ISO 3166-1) for countries in
-   *     EU only (NL, DE etc). Defaults to NL when an empty or incorrect country
-   *     code is supplied. Leave blank for countries outside EU-zone.
-   *
-   * This should be server side, but for now it is done client side.
-   */
-  protected function correctCityAndCountryCode() {
-    if (!$this->isNl()) {
-      // Add country name to city.
-      $country = $this->getCountryName();
-      if (stripos($this->invoice['customer']['city'], $country) === false) {
-        $this->invoice['customer']['city'] .= ' ' . strtoupper($country);
-      }
-    }
-  }
-
-  /**
-   * Wrapper around Countries::isNl().
-   *
-   * @return bool
-   */
-  protected function isNl() {
-    return empty($this->invoice['customer']['countrycode']) || $this->countries->isNl($this->invoice['customer']['countrycode']);
-  }
-
-  /**
-   * Wrapper around Countries::getCountryName().
-   *
-   * @return string
-   */
-  protected function getCountryName() {
-    return $this->countries->getCountryName(!empty($this->invoice['customer']['countrycode']) ? $this->invoice['customer']['countrycode'] : 'nl');
   }
 
   /**

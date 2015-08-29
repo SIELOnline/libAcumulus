@@ -105,7 +105,8 @@ class Countries {
    *   ISO country code (2 characters).
    *
    * @return string
-   *   The (dutch) name of the country.
+   *   The (dutch) name of the country or the empty string if the code could not
+   *   be looked up.
    */
   public function getCountryName($countryCode) {
     $countryNames = array(
@@ -359,7 +360,7 @@ class Countries {
       'SE' => 'Zweden',
       'CH' => 'Zwitserland',
     );
-    return isset($countryNames[$countryCode]) ? $countryNames[$countryCode] : $countryCode;
+    return isset($countryNames[$countryCode]) ? $countryNames[$countryCode] : '';
   }
 
 }

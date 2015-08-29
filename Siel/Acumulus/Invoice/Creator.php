@@ -158,6 +158,9 @@ abstract class Creator {
       $this->invoice['customer']['salutation'] = $this->getSalutation($customerSettings['salutation']);
     }
     $this->convertEuCountryCode();
+    if (!empty($this->invoice['customer']['countrycode'])) {
+      $this->addDefault($this->invoice['customer'], 'country', $this->countries->getCountryName($this->invoice['customer']['countrycode']));
+    }
   }
 
   /**

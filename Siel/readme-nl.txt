@@ -23,10 +23,11 @@ hierbij aan:
 Licentie
 --------
 Als deze library u apart ter beschikking is gesteld, is dit onder de GNU GENERAL
-PUBLIC LICENSE versie 3. De Engelstalige en enige officiële tekst hiervan kunt u
+PUBLIC LICENSE versie 3. De Engelstalige en enige officiÃ«le tekst hiervan kunt u
 vinden op http://www.gnu.org/licenses/gpl.html. Een niet bindende
 Nederlandstalige vertaling hiervan vindt u op
-http://bartbeuving.files.wordpress.com/2008/07/gpl-v3-nl-101.pdf.
+http://bartbeuving.files.wordpress.com/2008/07/gpl-v3-nl-101.pdf. Beide teksten
+zijn ook meegeleverd met deze module.
 
 Als deze library u als onderdeel van een koppeling ter beschikking is gesteld,
 geldt de licentie van de koppeling ook voor deze library.

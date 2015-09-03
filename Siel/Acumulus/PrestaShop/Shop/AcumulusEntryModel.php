@@ -3,7 +3,6 @@ namespace Siel\Acumulus\PrestaShop\Shop;
 
 use Db;
 use Siel\Acumulus\Shop\AcumulusEntryModel as BaseAcumulusEntryModel;
-use Siel\Acumulus\Shop\Config;
 
 /**
  * Implements the PrestaShop specific acumulus entry model class.
@@ -18,10 +17,9 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel {
   protected $tableName;
 
   /**
-   * @param Config $config
+   * AcumulusEntryModel constructor.
    */
-  public function __construct(Config $config) {
-    parent::__construct($config);
+  public function __construct() {
     $this->tableName = _DB_PREFIX_ . 'acumulus_entry';
   }
 

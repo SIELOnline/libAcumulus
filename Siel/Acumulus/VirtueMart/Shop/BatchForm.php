@@ -20,10 +20,16 @@ class BatchForm extends BaseBatchForm {
     return JSession::checkToken();
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getDateFormat() {
     return JText::_('DATE_FORMAT_LC4');
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getShopDateFormat() {
     return str_replace(array('Y', 'm', 'd'), array('%Y', '%m', '%d'), $this->getDateFormat());
   }

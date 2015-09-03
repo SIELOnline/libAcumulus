@@ -2,7 +2,6 @@
 namespace Siel\Acumulus\Shop;
 
 use DateTime;
-use Siel\Acumulus\Helpers\TranslatorInterface;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Web\ConfigInterface as WebConfigInterface;
 
@@ -14,22 +13,17 @@ abstract class InvoiceManager {
   /** @var \Siel\Acumulus\Shop\Config */
   protected $config;
 
-  /** @var \Siel\Acumulus\Helpers\TranslatorInterface */
-  protected $translator;
-
   /** @var \Siel\Acumulus\Invoice\Completor */
   protected $completor;
 
   /**
    * @param Config $config
-   * @param TranslatorInterface $translator
    */
-  public function __construct(Config $config, TranslatorInterface $translator) {
+  public function __construct(Config $config) {
     $this->config = $config;
 
-    $this->translator = $translator;
     $translations = new Translations();
-    $this->translator->add($translations);
+    $config->getTranslator()->add($translations);
   }
 
   /**
@@ -43,7 +37,7 @@ abstract class InvoiceManager {
    *   could be found.
    */
   protected function t($key) {
-    return $this->translator->get($key);
+    return $this->config->getTranslator()->get($key);
   }
 
   /**
@@ -123,7 +117,7 @@ abstract class InvoiceManager {
       // Use @ to prevent messages like "Warning: set_time_limit(): Cannot set
       //   max execution time limit due to system policy in ...".
       if (!@set_time_limit($time_limit) && !$errorLogged) {
-        $this->config->getLog('InvoiceManager::sendMultiple(): could not set time limit.');
+        $this->config->getLog()->notice('InvoiceManager::sendMultiple(): could not set time limit.');
         $errorLogged = true;
       }
 

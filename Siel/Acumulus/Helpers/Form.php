@@ -28,7 +28,7 @@ namespace Siel\Acumulus\Helpers;
  * </code>
  *
  * This code is typically performed by a view and should be used when the CMS or
- * webshop does not really provide a form rendering engine:
+ * webshop does not really provide a form object:
  * <code>
  *   // Displays the form.
  *   // Get the element definitions: a recursive array.
@@ -42,11 +42,26 @@ namespace Siel\Acumulus\Helpers;
  *
  * This code is to be used when the CMS or webshop does provide its own form
  * handling and processing.
+ * <code>
+ *   // Create shop specific Form object
+ *   $shopForm = new ShopForm()
+ *   // Map the elements and settings of the Acumulus Form to the shop form.
+ *   $formMapper = new FormMapper();
+ *   $formMapper->map($shopForm, $form);
+ *   // Continue with the shop form by setting the form values ...
+ *   $shopForm->setValues($form->GetValues)
+ *   // and rendering it.
+ *   $shopForm->render()
+ *
+ * </code>
  */
 abstract class Form {
 
   /** @var \Siel\Acumulus\Helpers\TranslatorInterface */
   protected $translator;
+
+  /** @var array[] */
+  protected $fields;
 
   /** @var bool */
   protected $formValuesSet;
@@ -72,6 +87,7 @@ abstract class Form {
     $this->formValuesSet = false;
 
     $this->translator = $translator;
+    $this->fields = array();
   }
 
   /**
@@ -181,15 +197,27 @@ abstract class Form {
    * OpenCart have a form helper/renderer to render individual fields including
    * their value attribute instead of binding values ot a form and rendering the
    * form.
+   */
+  public function addValues() {
+    $this->fields = $this->addValuesInternal($this->getFields());
+  }
+
+  /**
+   * Adds the form values to the field definitions.
+   *
+   * This method will not have a use on every web shop, but, e.g. VirtueMart and
+   * OpenCart have a form helper/renderer to render individual fields including
+   * their value attribute instead of binding values ot a form and rendering the
+   * form.
    *
    * @param array[] $fields
    *
    * @return array[]
    */
-  public function addValues(array $fields) {
+  protected function addValuesInternal(array $fields) {
     foreach ($fields as $name => &$field) {
       if ($field['type'] === 'fieldset') {
-        $field['fields'] = $this->addValues($field['fields']);
+        $field['fields'] = $this->addValuesInternal($field['fields']);
       }
       else if ($field['type'] === 'checkbox') {
         // Value is a list of checked options.
@@ -289,9 +317,6 @@ abstract class Form {
    * specific validation.
    */
   protected function validate() {
-    if (method_exists($this, 'systemValidate')) {
-      $this->systemValidate();
-    }
   }
 
   /**
@@ -317,15 +342,16 @@ abstract class Form {
    * This is a recursive, keyed array defining each form field. The key defines
    * the name of the form field, to be used for the name, and possibly id,
    * attribute. The values are a keyed array, that can have the following keys:
-   * - type: (required, string) fieldset, text, password, markup, etc.
+   * - type: (required, string) fieldset, text, email, password, date, textarea,
+   *     select, radio, checkbox, markup.
    * - label: (string) human readable label.
    * - description: (string) human readable help text.
    * - value: (string) the value for the form field.
-   * - required: (bool, defaults to false) whether the field is required.
-   * - attributes: (array) keyed array with other attributes to be rendered.
-   *   Possible keys include:
+   * - attributes: (array) keyed array with other - possibly html5 - attributes
+   *   to be rendered. Possible keys include:
    *   - size
    *   - class
+   *   - required: (bool) whether the field is required.
    * - fields: (array) If the type = 'fieldset', this value defines the fields
    *   (and possibly sub fieldsets) of the fieldset.
    * - options: (array) If the type = checkbox, select or radio, this value
@@ -335,7 +361,19 @@ abstract class Form {
    * @return array[]
    *   The definition of the form.
    */
-  abstract public function getFields();
+  public function getFields() {
+    if (empty($this->fields)) {
+      $this->fields = $this->getFieldDefinitions();
+    }
+    return $this->fields;
+  }
+
+  /**
+   * Internal version of getFields();
+   *
+   * @return array[]
+   */
+  abstract protected function getFieldDefinitions();
 
   /**
    * Helper method to copy a value from one array to another array.

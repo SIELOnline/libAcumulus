@@ -51,11 +51,18 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
     $this->values = array();
     $this->configStore = $configStore;
 
+    $this->getLog()->setLogLevel($this->getLogLevel());
+
     $this->translator = $translator;
     $invoiceHelperTranslations = new Translations();
     $this->translator->add($invoiceHelperTranslations);
 
-    $this->service = new Service($this, $this->translator);
+    $this->service = new Service($this, $this->getTranslator());
+
+  }
+
+  public function getTranslator() {
+    return $this->translator;
   }
 
   /**
@@ -69,7 +76,7 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
    *   could be found.
    */
   protected function t($key) {
-    return $this->translator->get($key);
+    return $this->getTranslator()->get($key);
   }
 
   /**
@@ -97,35 +104,35 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
    * {@inheritdoc}
    */
   public function getCompletor() {
-    return new Completor($this, $this->translator, $this->service);
+    return new Completor($this, $this->getTranslator(), $this->service);
   }
 
   /**
    * {@inheritdoc}
    */
   public function getCreator() {
-    return $this->getInstance('Creator', 'Invoice', array($this, $this->translator));
+    return $this->getInstance('Creator', 'Invoice', array($this, $this->getTranslator()));
   }
 
   /**
    * {@inheritdoc}
    */
   public function getMailer() {
-    return $this->getInstance('Mailer', 'Helpers', array($this, $this->translator, $this->service));
+    return $this->getInstance('Mailer', 'Helpers', array($this, $this->getTranslator(), $this->service));
   }
 
   /**
    * {@inheritdoc}
    */
   public function getManager() {
-    return $this->getInstance('InvoiceManager', 'Shop', array($this, $this->translator));
+    return $this->getInstance('InvoiceManager', 'Shop', array($this));
   }
 
   /**
    * {@inheritdoc}
    */
   public function getAcumulusEntryModel() {
-    return $this->getInstance('AcumulusEntryModel', 'Shop', array($this));
+    return $this->getInstance('AcumulusEntryModel', 'Shop');
   }
 
   /**

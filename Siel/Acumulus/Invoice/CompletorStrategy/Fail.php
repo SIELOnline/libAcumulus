@@ -4,7 +4,7 @@ namespace Siel\Acumulus\Invoice\CompletorStrategy;
 use Siel\Acumulus\Invoice\CompletorStrategyBase;
 
 /**
- * @class FailStrategy implements a complete strategy that always fails.
+ * FailStrategy implements a complete strategy that always fails.
  */
 class Fail extends CompletorStrategyBase {
 

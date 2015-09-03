@@ -46,6 +46,9 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel {
 
   /**
    * {@inheritdoc}
+   *
+   * This override uses the WordPress meta data API to store the acumulus entry
+   * data with the order.
    */
   public function save($invoiceSource, $entryId, $token) {
     $now = $this->sqlNow();

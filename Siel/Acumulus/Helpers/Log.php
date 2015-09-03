@@ -2,7 +2,7 @@
 namespace Siel\Acumulus\Helpers;
 
 /**
- * @class \Siel\Acumulus\Helpers\Log.
+ * Defines a logger class.
  */
 class Log {
 
@@ -17,13 +17,10 @@ class Log {
 
   /**
    * Log creator.
-   *
-   * @param int $logLevel
-   *   One of the Log level constants from this class.
    */
-  public static function createInstance($logLevel) {
+  public static function createInstance() {
     if (static::$instance === null) {
-      static::$instance = new static($logLevel);
+      static::$instance = new static();
     }
   }
 
@@ -41,11 +38,28 @@ class Log {
 
   /**
    * Log constructor.
+   */
+  protected function __construct() {
+    // Start with logging everything. Soon after the creation of this log object
+    // the log level should be set based on the configuration.
+    $this->logLevel = static::Debug;
+  }
+
+  /**
+   * Gets the actual log level.
+   *
+   * @return int
+   */
+  public function getLogLevel() {
+    return $this->logLevel;
+  }
+
+  /**
+   * Sets the log level, eg. based on configuration.
    *
    * @param int $logLevel
-   *   One of the Log level constants from this class.
    */
-  protected function __construct($logLevel) {
+  public function setLogLevel($logLevel) {
     $this->logLevel = $logLevel;
   }
 

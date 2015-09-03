@@ -2,7 +2,7 @@
 namespace Siel\Acumulus\Helpers;
 
 /**
- * @class Requirements
+ * Defines and checks the requirements for this library.
  */
 class Requirements {
 

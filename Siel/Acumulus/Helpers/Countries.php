@@ -1,8 +1,6 @@
 <?php
 namespace Siel\Acumulus\Helpers;
 
-use Siel\Acumulus\Invoice\ConfigInterface;
-
 /**
  * Class Countries
  */

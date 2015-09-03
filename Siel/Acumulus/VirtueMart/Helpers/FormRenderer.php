@@ -2,22 +2,17 @@
 namespace Siel\Acumulus\VirtueMart\Helpers;
 
 use JHtml;
-use Siel\Acumulus\Helpers\Form;
 use \Siel\Acumulus\Helpers\FormRenderer as BaseFormRenderer;
 
 /**
- * Class FormRenderer
+ * Class FormRenderer renders a form in the Joomla/VirtueMart standards.
  */
 class FormRenderer extends BaseFormRenderer {
 
   /**
    * Constructor.
-   *
-   * @param Form $form
    */
-  public function __construct(Form $form) {
-    parent::__construct($form);
-
+  public function __construct() {
     // Default Joomla template seems to use xhtml.
     $this->html5 = false;
     $this->fieldsetWrapperClass = 'adminform';

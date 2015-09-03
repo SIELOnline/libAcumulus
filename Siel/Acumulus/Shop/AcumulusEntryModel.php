@@ -19,17 +19,6 @@ namespace Siel\Acumulus\Shop;
  */
 abstract class AcumulusEntryModel {
 
-  /** @var \Siel\Acumulus\Shop\Config */
-  protected $config;
-
-  /**
-   * @param Config $config
-   */
-  public function __construct(Config $config) {
-    $this->config = $config;
-  }
-
-
   /**
    * Returns the Acumulus entry record for the given entry id.
    *
@@ -72,6 +61,12 @@ abstract class AcumulusEntryModel {
 
   /**
    * Saves the Acumulus entry for the given order in the web shop's database.
+   *
+   * This default implementation calls getByInvoiceSource() to determine whether
+   * to subsequently call insert() or update().
+   *
+   * So normally, a child class should implement insert() and update() and not
+   * override this method.
    *
    * @param \Siel\Acumulus\Invoice\Source $invoiceSource
    *   The source object (order, credit note) for which the invoice was created.

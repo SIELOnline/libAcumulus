@@ -2,7 +2,7 @@
 namespace Siel\Acumulus\Helpers;
 
 /**
- * Class BaseTranslator
+ * Translator provides a simple way of translating texts.
  */
 class Translator implements TranslatorInterface {
 

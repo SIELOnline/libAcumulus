@@ -8,6 +8,17 @@ use Siel\Acumulus\Invoice\Translations as InvoiceTranslations;
 
 /**
  * Provides batch form handling.
+ *
+ * Shop specific overrides should - of course - implement the abstract method:
+ * - none
+ * Should typically override:
+ * - none
+ * And may optionally (have to) override:
+ * - systemValidate()
+ * - getDateFormat
+ * - getShopDateFormat()
+ * - isSubmitted()
+ * - setSubmittedValues()
  */
 abstract class BatchForm extends Form {
 
@@ -18,11 +29,10 @@ abstract class BatchForm extends Form {
   protected $log;
 
   /**
-   * @param Config $config
    * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
    * @param \Siel\Acumulus\Shop\InvoiceManager $invoiceManager
    */
-  public function __construct(Config $config, TranslatorInterface $translator, InvoiceManager $invoiceManager) {
+  public function __construct(TranslatorInterface $translator, InvoiceManager $invoiceManager) {
     parent::__construct($translator);
 
     $translations = new InvoiceTranslations();
@@ -126,7 +136,7 @@ abstract class BatchForm extends Form {
   /**
    * {@inheritdoc}
    */
-  public function getFields() {
+  public function getFieldDefinitions() {
     $fields = array();
 
     $invoiceSourceTypes = $this->invoiceManager->getSupportedInvoiceSourceTypes();

@@ -2,7 +2,7 @@
 namespace Siel\Acumulus\Invoice;
 
 /**
- * @class CompletorStrategyBase is the base class for all strategies that might
+ * CompletorStrategyBase is the base class for all strategies that might
  * be able to complete invoice lines by applying a strategy to divide a
  * remaining vat amount over lines without a vat rate yet.
  */

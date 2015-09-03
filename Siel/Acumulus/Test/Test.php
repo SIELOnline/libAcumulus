@@ -1,13 +1,15 @@
 <?php
 namespace Siel\Acumulus\Test;
 
-use Siel\Acumulus\Common\WebAPI;
+use Siel\Acumulus\Web\Service;
+
+
 
 /**
  * Test defines a Class for test purposes.
  */
 class Test {
-  /** @var WebAPI */
+  /** @var Service */
   protected $webApi;
 
   public function __construct() {
@@ -15,7 +17,7 @@ class Test {
 
   public function run() {
 
-    $this->webApi = new WebAPI(new TestConfig('nl'));
+    $this->webApi = new Service(new TestConfig('nl'));
     $results = '';
 
     $results .= "Test getPicklistAccounts:\n";

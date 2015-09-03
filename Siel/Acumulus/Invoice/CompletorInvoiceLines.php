@@ -6,9 +6,8 @@ use Siel\Acumulus\Helpers\TranslatorInterface;
 use Siel\Acumulus\Web\Service;
 
 /**
- * @class
  * The invoice lines completor class provides functionality to correct and
- * complete invoices lines before sending them to Acumulus.
+ * complete invoice lines before sending them to Acumulus.
  *
  * This class:
  * - Validates (and correct rounding errors of) vat rates using the VAT rate

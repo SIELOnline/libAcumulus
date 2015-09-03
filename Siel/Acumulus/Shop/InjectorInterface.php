@@ -12,6 +12,11 @@ namespace Siel\Acumulus\Shop;
 interface InjectorInterface {
 
   /**
+   * @return \Siel\Acumulus\Helpers\TranslatorInterface
+   */
+  public function getTranslator();
+
+  /**
    * @return \Siel\Acumulus\Web\Service
    */
   public function getService();

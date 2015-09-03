@@ -6,6 +6,7 @@ use JDate;
 use JFactory;
 use JTable;
 use Siel\Acumulus\Shop\AcumulusEntryModel as BaseAcumulusEntryModel;
+use Siel\Acumulus\VirtueMart\Helpers\Log;
 
 /**
  * Implements the VirtueMart specific acumulus entry model class.
@@ -21,7 +22,7 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel {
   protected function newTable() {
     $this->table = JTable::getInstance('AcumulusEntry', 'AcumulusTable');
     if ($this->table === false) {
-      $this->config->getLog()->error('AcumulusEntryModel::newTable(): table not created');
+      Log::getInstance()->error('AcumulusEntryModel::newTable(): table not created');
     }
     return $this->table;
   }

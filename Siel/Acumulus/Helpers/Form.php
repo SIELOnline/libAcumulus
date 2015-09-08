@@ -31,13 +31,12 @@ namespace Siel\Acumulus\Helpers;
  * webshop does not really provide a form object:
  * <code>
  *   // Displays the form.
- *   // Get the element definitions: a recursive array.
- *   $formFields = $form->getFields();
- *   // Add the values to the elements.
- *   $formFields = $form->addValues($formFields);
+ *   // Create the form and add the values to the elements.
+ *   $form = new ChildForm();
+ *   $formFields = $form->addValues();
  *   // Render the html for the form.
  *   $formRenderer = new FormRenderer();
- *   $formRenderer->fields($formFields))
+ *   $formRenderer->render($form)
  * </code>
  *
  * This code is to be used when the CMS or webshop does provide its own form
@@ -148,11 +147,13 @@ abstract class Form {
   /**
    * Sets the form values to use.
    *
-   * This is typically the union of the default values and any submitted values.
+   * This is typically the union of the default values, field values and any
+   * submitted values.
    */
   protected function setFormValues() {
     if (!$this->formValuesSet) {
       $this->formValues = $this->getDefaultFormValues();
+      $this->formValues = array_merge($this->formValues, $this->getFieldValues($this->getFields()));
       if (!empty($this->submittedValues)) {
         $this->formValues = array_merge($this->formValues, $this->submittedValues);
       }
@@ -242,7 +243,7 @@ abstract class Form {
   }
 
   /**
-   * Returns a set of default values for the fom fields.
+   * Returns a set of default values for the form fields.
    *
    * This default implementation returns an empty array, i.e. all form fields
    * are empty, not selected, or unchecked.
@@ -252,6 +253,29 @@ abstract class Form {
    */
   protected function getDefaultFormValues() {
     return array();
+  }
+
+  /**
+   * Returns the set of values directly assigned to the field definitions.
+   *
+   * These take precedence over default values
+   *
+   * @param array[] $fields
+   *
+   * @return array An array of values keyed by the form field names.
+   * An array of values keyed by the form field names.
+   */
+  protected function getFieldValues($fields) {
+    $result = array();
+    foreach ($fields as $id => $field) {
+      if (isset($field['value'])) {
+        $result[$id] = $field['value'];
+      }
+      if ($field['type'] === 'fieldset') {
+        $result = array_merge($result, $this->getFieldValues($field['fields']));
+      }
+    }
+    return $result;
   }
 
   /**
@@ -440,6 +464,7 @@ abstract class Form {
     $result = $_POST;
 
     foreach ($this->getCheckboxKeys() as $checkboxName => $collectionName) {
+      // Check if checkboxes are handled as an array of checkboxes.
       if (isset($result[$collectionName]) && is_array($result[$collectionName])) {
         // Extract the checked values.
         $checkedValues = array_combine(array_values($result[$collectionName]), array_fill(0, count($result[$collectionName]), 1));
@@ -447,6 +472,11 @@ abstract class Form {
         // keys for the collection and (1 of the) checkboxes may be the same.
         unset($result[$collectionName]);
         $result += $checkedValues;
+      }
+      // Check if checkbox keys are prepended with their collection name.
+      else if (isset($result["{$collectionName}_{$checkboxName}"])) {
+        $result[$checkboxName] = $result["{$collectionName}_{$checkboxName}"];
+        unset($result["{$collectionName}_{$checkboxName}"]);
       }
     }
 

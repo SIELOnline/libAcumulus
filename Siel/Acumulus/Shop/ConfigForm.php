@@ -53,7 +53,7 @@ abstract class ConfigForm extends Form {
    * This is the set of values as are stored in the config.
    */
   protected function getDefaultFormValues() {
-    return $this->acumulusConfig->getCredentials() + $this->acumulusConfig->getShopSettings() + $this->acumulusConfig->getCustomerSettings() + $this->acumulusConfig->getInvoiceSettings() + $this->acumulusConfig->getEmailAsPdfSettings() + array('debug' => $this->acumulusConfig->getDebug());
+    return $this->acumulusConfig->getCredentials() + $this->acumulusConfig->getShopSettings() + $this->acumulusConfig->getCustomerSettings() + $this->acumulusConfig->getInvoiceSettings() + $this->acumulusConfig->getEmailAsPdfSettings() + $this->acumulusConfig->getOtherSettings();
   }
 
   /**
@@ -398,7 +398,7 @@ abstract class ConfigForm extends Form {
         ),
         'versionInformation' => array(
           'type' => 'markup',
-          'value' => "<p>Application: Acumulus module {$env['moduleVersion']}; API: {$env['libraryVersion']}; Shop {$env['shopName']} {$env['shopVersion']};<br>" .
+          'value' => "<p>Application: Acumulus module {$env['moduleVersion']}; API: {$env['libraryVersion']}; Shop: {$env['shopName']} {$env['shopVersion']};<br>" .
                      "Environment: PHP {$env['phpVersion']}; Curl: {$env['curlVersion']}; JSON: {$env['jsonVersion']}; OS: {$env['os']}.</p>",
         ),
         'versionInformationDesc' => array(

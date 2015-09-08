@@ -4,9 +4,15 @@ namespace Siel\Acumulus\PrestaShop\Helpers;
 use Siel\Acumulus\Helpers\Form;
 
 /**
- * FormMapper maps an Acumulus form definition to a PrestaShop form definition.
+ * FormMapper15 maps an Acumulus settings form definition to a PrestaShop 1.5
+ * form definition.
+ *
+ * @deprecated
  */
-class FormMapper {
+class FormMapper15 {
+
+  /** @var array[] */
+  protected $fields_form;
 
   /**
    * Maps a set of field definitions.
@@ -16,69 +22,45 @@ class FormMapper {
    * @return array[]
    */
   public function map(Form $form) {
-    return $this->fields($form->getFields());
+    $this->fields_form = array();
+    $this->fields($form->getFields());
+    return $this->fields_form;
   }
 
   /**
    * Maps a set of field definitions.
    *
    * @param array[] $fields
-   *
-   * @return array[]
    */
   protected function fields(array $fields) {
-    $result = array();
     foreach ($fields as $id => $field) {
       if (!isset($field['name'])) {
         $field['name'] = $id;
       }
-      $result[$id] = $this->field($field);
+      $this->field($field);
     }
-    return $result;
   }
 
   /**
-   * Maps a single field definition, possibly a fieldset.
+   * Maps a single field definition.
    *
    * @param array $field
    *   Field(set) definition.
-   *
-   * @return array
    */
   protected function field(array $field) {
     if ($field['type'] === 'fieldset') {
-      $result = $this->fieldset($field);
+      // Fieldsets are not possible in PrestaShop. Add the "legend" as a free
+      // field and subsequently add all fields at the same level.
+      $this->fields_form[] = $this->element($field);
+      $this->fields($field['fields']);
     }
     else {
-      $result = $this->element($field);
+      $this->fields_form[] = $this->element($field);
     }
-    return $result;
   }
 
   /**
-   * Returns a mapped fieldset.
    *
-   * @param array $field
-   *
-   * @return array[]
-   */
-  protected function fieldset(array $field) {
-    $result = array(
-      'form' => array(
-        'legend' => array(
-          'title' => $field['legend'],
-        ),
-        'input' => $this->fields($field['fields']),
-      ),
-    );
-    if (isset($field['icon'])) {
-      $result['form']['legend']['icon'] = $field['icon'];
-    }
-    return $result;
-  }
-
-  /**
-   * Returns a mapped simple element.
    *
    * @param array $field
    *
@@ -88,7 +70,7 @@ class FormMapper {
   protected function element(array $field) {
     $result = array(
       'type' => $this->getPrestaShopType($field['type']),
-      'label' => isset($field['label']) ? $field['label'] : '',
+      'label' => $field['label'],
       'name' => $field['name'],
       'required' => isset($field['attributes']['required']) ? $field['attributes']['required'] : false,
     );
@@ -99,8 +81,10 @@ class FormMapper {
     if (isset($field['description'])) {
       $result['desc'] = $field['description'];
     }
-
-    if ($field['type'] === 'radio') {
+    if ($field['type'] === 'fieldset') {
+      $result['label'] = '<h2>' . $field['legend'] . '</h2>';
+    }
+    else if ($field['type'] === 'radio') {
       $result['values'] = $this->getPrestaShopValues($field['name'], $field['options']);
     }
     else if ($field['type'] === 'checkbox') {

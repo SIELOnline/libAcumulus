@@ -10,6 +10,9 @@ use Siel\Acumulus\Shop\ConfigForm as BaseConfigForm;
  */
 class ConfigForm extends BaseConfigForm {
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setFormValues() {
     parent::setFormValues();
 

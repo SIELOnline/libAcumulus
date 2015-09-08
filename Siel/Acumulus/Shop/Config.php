@@ -17,8 +17,14 @@ use Siel\Acumulus\Web\Service;
  * This class implements all <...ConfigInterface>s and makes, via a ConfigStore,
  * use of the shop specific configuration functionality to store this
  * configuration in a persistent way.
+ *
+ * This class als implements the injector interface to allow other classes to
+ * easily get the correct derived classes of the base classes.
  */
 class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigInterface, InjectorInterface {
+
+  /** @var array[]|null */
+  protected $keyInfo = NULL;
 
   /** @var \Siel\Acumulus\Shop\ConfigStoreInterface */
   protected $configStore;
@@ -183,7 +189,7 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
     if (!$this->isLoaded) {
       $this->values = array_merge($this->getDefaults(), $this->configStore->load($this->getKeys()));
       $this->castValues();
-      $this->isLoaded = true;
+      $this->isLoaded = TRUE;
     }
   }
 
@@ -199,7 +205,7 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
    */
   public function save(array $values) {
     $result = $this->configStore->save($values);
-    $this->isLoaded = false;
+    $this->isLoaded = FALSE;
     // Sync internal values.
     $this->load();
     return $result;
@@ -218,7 +224,7 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
    */
   protected function get($key) {
     $this->load();
-    return isset($this->values[$key]) ? $this->values[$key] : null;
+    return isset($this->values[$key]) ? $this->values[$key] : NULL;
   }
 
   /**
@@ -236,7 +242,7 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
    */
   protected function set($key, $value) {
     $this->load();
-    $oldValue = isset($this->values[$key]) ? $this->values[$key] : null;
+    $oldValue = isset($this->values[$key]) ? $this->values[$key] : NULL;
     $this->values[$key] = $value;
     return $oldValue;
   }
@@ -283,17 +289,7 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
    * @inheritdoc
    */
   public function getEnvironment() {
-    $curlVersion = curl_version();
-    return array(
-      'libraryVersion' => $this->get('libraryVersion'),
-      'moduleVersion' => $this->get('moduleVersion'),
-      'shopName' => $this->get('shopName'),
-      'shopVersion' => $this->get('shopVersion'),
-      'phpVersion' => phpversion(),
-      'os' => php_uname(),
-      'curlVersion' => "{$curlVersion['version']} (ssl: {$curlVersion['ssl_version']}; zlib: {$curlVersion['libz_version']})",
-      'jsonVersion' => phpversion('json'),
-    );
+    return $this->getSettingsByGroup('environment');
   }
 
   /**
@@ -321,120 +317,94 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
    * @inheritdoc
    */
   public function getCredentials() {
-    return array(
-      'contractcode' => $this->get('contractcode'),
-      'username' => $this->get('username'),
-      'password' => $this->get('password'),
-      'emailonerror' => $this->get('emailonerror'),
-      'emailonwarning' => $this->get('emailonerror'), // No separate key for now.
-    );
+    $result = $this->getSettingsByGroup('credentials');
+    // No separate key for now.
+    $result['emailonwarning'] = $result['emailonerror'];
+    return $result;
   }
 
   /**
    * @inheritdoc
    */
   public function getCustomerSettings() {
-    return array(
-      'defaultCustomerType' => $this->get('defaultCustomerType'),
-      'sendCustomer' => $this->get('sendCustomer'),
-      'genericCustomerEmail' => $this->get('genericCustomerEmail'),
-      'overwriteIfExists' => $this->get('overwriteIfExists'),
-      'salutation' => $this->get('salutation'),
-    );
+    return $this->getSettingsByGroup('customer');
   }
 
   /**
    * @inheritdoc
    */
   public function getInvoiceSettings() {
-    return array(
-      'defaultAccountNumber' => $this->get('defaultAccountNumber'),
-      'defaultCostCenter' => $this->get('defaultCostCenter'),
-      'defaultInvoiceTemplate' => $this->get('defaultInvoiceTemplate'),
-      'defaultInvoicePaidTemplate' => $this->get('defaultInvoicePaidTemplate'),
-      'removeEmptyShipping' => $this->get('removeEmptyShipping'),
-      'useMargin' => $this->get('useMargin'),
-    );
+    return $this->getSettingsByGroup('invoice');
   }
 
   /**
    * @inheritdoc
    */
   public function getEmailAsPdfSettings() {
-    return array(
-      'emailAsPdf' => $this->get('emailAsPdf'),
-      'emailBcc' => $this->get('emailBcc'),
-      'emailFrom' => $this->get('emailFrom'),
-      'subject' => $this->get('subject'),
-      'confirmReading' => $this->get('confirmReading'),
-    );
+    return $this->getSettingsByGroup('emailaspdf');
   }
 
   /**
    * @inheritdoc
    */
   public function getShopSettings() {
-    return array(
-      'invoiceNrSource' => $this->get('invoiceNrSource'),
-      'dateToUse' => $this->get('dateToUse'),
-      'triggerInvoiceSendEvent' => $this->get('triggerInvoiceSendEvent'),
-      'triggerOrderStatus' => $this->get('triggerOrderStatus'),
-    );
+    return $this->getSettingsByGroup('shop');
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function getOtherSettings() {
+    return $this->getSettingsByGroup('other');
+  }
+
+  /**
+   * Get all settings belonging to the same group.
+   *
+   * @param string $group
+   *
+   * @return array
+   *   An array of settings.
+   */
+  protected function getSettingsByGroup($group) {
+    $result = array();
+    foreach ($this->getKeyInfo() as $key => $keyInfo) {
+      if ($keyInfo['group'] === $group) {
+        $result[$key] = $this->get($key);
+      }
+    }
+    return $result;
   }
 
   /**
    * Casts the values to their correct types.
    *
-   * Values that come from a submitted form are all strings. The same might hold
-   * for the config store of a web shop. However, internally we work with
+   * Values that come from a submitted form are all strings. Values that come
+   * from the config store might be NULL. However, internally we work with
    * booleans or integers. So after reading from the config store or form, we
    * cast the values to their expected types.
    */
   protected function castValues() {
-    if (isset($this->values['invoiceNrSource'])) {
-      $this->values['invoiceNrSource'] = (int) $this->values['invoiceNrSource'];
-    }
-    if (isset($this->values['dateToUse'])) {
-      $this->values['dateToUse'] = (int) $this->values['dateToUse'];
-    }
-    if (isset($this->values['sendCustomer'])) {
-      $this->values['sendCustomer'] = (bool) $this->values['sendCustomer'];
-    }
-    if (isset($this->values['overwriteIfExists'])) {
-      $this->values['overwriteIfExists'] = (bool) $this->values['overwriteIfExists'];
-    }
-    if (isset($this->values['defaultCustomerType'])) {
-      $this->values['defaultCustomerType'] = (int) $this->values['defaultCustomerType'];
-    }
-    if (isset($this->values['defaultAccountNumber'])) {
-      $this->values['defaultAccountNumber'] = (int) $this->values['defaultAccountNumber'];
-    }
-    if (isset($this->values['defaultCostCenter'])) {
-      $this->values['defaultCostCenter'] = (int) $this->values['defaultCostCenter'];
-    }
-    if (isset($this->values['defaultInvoiceTemplate'])) {
-      $this->values['defaultInvoiceTemplate'] = (int) $this->values['defaultInvoiceTemplate'];
-    }
-    if (isset($this->values['defaultInvoicePaidTemplate'])) {
-      $this->values['defaultInvoicePaidTemplate'] = (int) $this->values['defaultInvoicePaidTemplate'];
-    }
-    if (isset($this->values['removeEmptyShipping'])) {
-      $this->values['removeEmptyShipping'] = (bool) $this->values['removeEmptyShipping'];
-    }
-    if (isset($this->values['triggerInvoiceSendEvent'])) {
-      $this->values['triggerInvoiceSendEvent'] = (int) $this->values['triggerInvoiceSendEvent'];
-    }
-    if (isset($this->values['emailAsPdf'])) {
-      $this->values['emailAsPdf'] = (bool) $this->values['emailAsPdf'];
-    }
-    if (isset($this->values['confirmReading'])) {
-      $this->values['confirmReading'] = (bool) $this->values['confirmReading'];
-    }
-    if (isset($this->values['debug'])) {
-      $this->values['debug'] = (int) $this->values['debug'];
-    }
-    if (isset($this->values['logLevel'])) {
-      $this->values['logLevel'] = (int) $this->values['logLevel'];
+    foreach ($this->getKeyInfo() as $key => $keyInfo) {
+      if (array_key_exists($key, $this->values)) {
+        switch ($keyInfo['type']) {
+          case 'string':
+            if (!is_string($this->values[$key])) {
+              $this->values[$key] = (string) $this->values[$key];
+            }
+            break;
+          case 'int':
+            if (!is_int($this->values[$key])) {
+              $this->values[$key] = (int) $this->values[$key];
+            }
+            break;
+          case 'bool':
+            if (!is_bool($this->values[$key])) {
+              $this->values[$key] = (bool) $this->values[$key];
+            }
+            break;
+        }
+      }
     }
   }
 
@@ -444,36 +414,11 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
    * @return array
    */
   public function getKeys() {
-    return array(
-      'contractcode',
-      'username',
-      'password',
-      'emailonerror',
-      'defaultCustomerType',
-      'sendCustomer',
-      'genericCustomerEmail',
-      'overwriteIfExists',
-      'salutation',
-      'defaultAccountNumber',
-      'defaultCostCenter',
-      'invoiceNrSource',
-      'dateToUse',
-      'defaultInvoiceTemplate',
-      'defaultInvoicePaidTemplate',
-      'emailAsPdf',
-      'emailBcc',
-      'emailFrom',
-      'subject',
-      'confirmReading',
-      'invoiceNrSource',
-      'dateToUse',
-      'triggerInvoiceSendEvent',
-      'triggerOrderStatus',
-      'removeEmptyShipping',
-      'useMargin',
-      'debug',
-      'logLevel',
-    );
+    $result = $this->getKeyInfo();
+    array_filter($result, function ($item) {
+      return $item['group'] != 'environment';
+    });
+    return array_keys($result);
   }
 
   /**
@@ -482,43 +427,11 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
    * @return array
    */
   protected function getDefaults() {
-    $hostName = $this->getHostName();
-
-    $defaults = array(
-      // Web service configuration settings.
-      'baseUri'                    => ServiceConfigInterface::baseUri,
-      'apiVersion'                 => ServiceConfigInterface::apiVersion,
-      'libraryVersion'             => ServiceConfigInterface::libraryVersion,
-      'outputFormat'               => ServiceConfigInterface::outputFormat,
-      'debug'                      => ServiceConfigInterface::Debug_None,
-      'logLevel'                   => Log::Error,
-
-      // Default customer settings.
-      'sendCustomer'               => true,
-      'genericCustomerEmail'       => 'consumer@' . $hostName,
-      'overwriteIfExists'          => true,
-      'salutation'                 => '',
-
-      // Default invoice settings.
-      'defaultInvoicePaidTemplate' => 0,
-      'removeEmptyShipping'        => false,
-
-      // Default 'email invoice as pdf' settings.
-      'emailAsPdf'                 => false,
-      'emailBcc'                   => '',  // Empty: no bcc.
-      'emailFrom'                  => '', // Empty: default from Acumulus template
-      'subject'                    => '', // Empty: default from Acumulus.
-      'confirmReading'             => false, // No UI for this setting.
-
-      // Default shop settings.
-      'useMargin'                  => false,
-      'invoiceNrSource'            => ConfigInterface::InvoiceNrSource_ShopInvoice,
-      'dateToUse'                  => ConfigInterface::InvoiceDate_InvoiceCreate,
-      'triggerInvoiceSendEvent'    => ConfigInterface::TriggerInvoiceSendEvent_None,
-    );
-    $shopDefaults = $this->configStore->getShopEnvironment();
-
-    return array_merge($defaults, $shopDefaults);
+    $result = $this->getKeyInfo();
+    $result = array_map(function ($item) {
+      return $item['default'];
+    }, $result);
+    return $result;
   }
 
   /**
@@ -541,4 +454,208 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
     return $hostName;
   }
 
+  /**
+   * Returns information (group and type) about the keys that are stored in the
+   * store config.
+   *
+   * @return array
+   *   A keyed array with information (group and type) about the keys that are
+   *   stored in the store config.
+   */
+  protected function getKeyInfo() {
+    if ($this->keyInfo === NULL) {
+      $hostName = $this->getHostName();
+      $curlVersion = curl_version();
+      $shopDefaults = $this->configStore->getShopEnvironment();
+
+      $this->keyInfo = array(
+        'baseUri' => array(
+          'group' => 'environment',
+          'type' => 'string',
+          'default' => ServiceConfigInterface::baseUri,
+        ),
+        'apiVersion' => array(
+          'group' => 'environment',
+          'type' => 'string',
+          'default' => ServiceConfigInterface::apiVersion,
+        ),
+        'outputFormat' => array(
+          'group' => 'environment',
+          'type' => 'string',
+          'default' => ServiceConfigInterface::outputFormat,
+        ),
+        'libraryVersion' => array(
+          'group' => 'environment',
+          'type' => 'string',
+          'default' => ServiceConfigInterface::libraryVersion,
+        ),
+        'moduleVersion' => array(
+          'group' => 'environment',
+          'type' => 'string',
+          'default' => $shopDefaults['moduleVersion'],
+        ),
+        'shopName' => array(
+          'group' => 'environment',
+          'type' => 'string',
+          'default' => $shopDefaults['shopName'],
+        ),
+        'shopVersion' => array(
+          'group' => 'environment',
+          'type' => 'string',
+          'default' => $shopDefaults['shopVersion'],
+        ),
+        'phpVersion' => array(
+          'group' => 'environment',
+          'type' => 'string',
+          'default' => phpversion(),
+        ),
+        'os' => array(
+          'group' => 'environment',
+          'type' => 'string',
+          'default' => php_uname(),
+        ),
+        'curlVersion' => array(
+          'group' => 'environment',
+          'type' => 'string',
+          'default' => "{$curlVersion['version']} (ssl: {$curlVersion['ssl_version']}; zlib: {$curlVersion['libz_version']})",
+        ),
+        'jsonVersion' => array(
+          'group' => 'environment',
+          'type' => 'string',
+          'default' => phpversion('json'),
+        ),
+        'contractcode' => array(
+          'group' => 'credentials',
+          'type' => 'string',
+          'default' => 0,
+        ),
+        'username' => array(
+          'group' => 'credentials',
+          'type' => 'string',
+          'default' => 0,
+        ),
+        'password' => array(
+          'group' => 'credentials',
+          'type' => 'string',
+          'default' => 0,
+        ),
+        'emailonerror' => array(
+          'group' => 'credentials',
+          'type' => 'string',
+          'default' => 0,
+        ),
+        'defaultCustomerType' => array(
+          'group' => 'customer',
+          'type' => 'int',
+          'default' => 0,
+        ),
+        'sendCustomer' => array(
+          'group' => 'customer',
+          'type' => 'bool',
+          'default' => TRUE,
+        ),
+        'genericCustomerEmail' => array(
+          'group' => 'customer',
+          'type' => 'string',
+          'default' => 'consumer@' . $hostName,
+        ),
+        'overwriteIfExists' => array(
+          'group' => 'customer',
+          'type' => 'bool',
+          'default' => TRUE
+        ),
+        'salutation' => array(
+          'group' => 'customer',
+          'type' => 'string',
+          'default' => '',
+        ),
+        'defaultAccountNumber' => array(
+          'group' => 'invoice',
+          'type' => 'int',
+          'default' => 0,
+        ),
+        'defaultCostCenter' => array(
+          'group' => 'invoice',
+          'type' => 'int',
+          'default' => 0,
+        ),
+        'defaultInvoiceTemplate' => array(
+          'group' => 'invoice',
+          'type' => 'int',
+          'default' => 0,
+        ),
+        'defaultInvoicePaidTemplate' => array(
+          'group' => 'invoice',
+          'type' => 'int',
+          'default' => 0,
+        ),
+        'removeEmptyShipping' => array(
+          'group' => 'invoice',
+          'type' => 'bool',
+          'default' => FALSE,
+        ),
+        'useMargin' => array(
+          'group' => 'invoice',
+          'type' => 'bool',
+          'default' => FALSE,
+        ),
+        'invoiceNrSource' => array(
+          'group' => 'shop',
+          'type' => 'int',
+          'default' => ConfigInterface::InvoiceNrSource_ShopInvoice,
+        ),
+        'dateToUse' => array(
+          'group' => 'shop',
+          'type' => 'int',
+          'default' => ConfigInterface::InvoiceDate_InvoiceCreate,
+        ),
+        'triggerInvoiceSendEvent' => array(
+          'group' => 'shop',
+          'type' => 'int',
+          'default' => ConfigInterface::TriggerInvoiceSendEvent_None,
+        ),
+        'triggerOrderStatus' => array(
+          'group' => 'shop',
+          'type' => 'int',
+          'default' => 0,
+        ),
+        'emailAsPdf' => array(
+          'group' => 'emailaspdf',
+          'type' => 'bool',
+          'default' => FALSE,
+        ),
+        'emailBcc' => array(
+          'group' => 'emailaspdf',
+          'type' => 'string',
+          'default' => '',
+        ),
+        'emailFrom' => array(
+          'group' => 'emailaspdf',
+          'type' => 'string',
+          'default' => '',
+        ),
+        'subject' => array(
+          'group' => 'emailaspdf',
+          'type' => 'string',
+          'default' => '',
+        ),
+        'confirmReading' => array(
+          'group' => 'emailaspdf',
+          'type' => 'bool',
+          'default' => FALSE,
+        ),
+        'debug' => array(
+          'group' => 'other',
+          'type' => 'int',
+          'default' => ServiceConfigInterface::Debug_None,
+        ),
+        'logLevel' => array(
+          'group' => 'other',
+          'type' => 'int',
+          'default' => Log::Error,
+        ),
+      );
+    }
+    return $this->keyInfo;
+  }
 }

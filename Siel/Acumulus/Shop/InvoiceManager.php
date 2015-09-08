@@ -155,7 +155,7 @@ abstract class InvoiceManager {
    *   used to send credit notes to acumulus.
    *
    * @return int
-   *   Status.
+   *   Status, one of the WebConfigInterface::Status_ constants
    */
   public function sourceStatusChange(Source $invoiceSource, $newStatus = FALSE) {
     $this->config->getLog()->debug('InvoiceManager::sourceStatusChange(%s %d, %s)', $invoiceSource->getType(), $invoiceSource->getId(), $newStatus === NULL ? 'null' : $newStatus === FALSE ? 'false' : (string) $newStatus);

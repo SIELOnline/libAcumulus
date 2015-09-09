@@ -29,7 +29,7 @@ class ConfigStore implements ConfigStoreInterface {
   public function load(array $keys) {
     $result = array();
     // Load the values from the web shop specific configuration.
-    $configurationValues = get_option('woocommerce_acumulus');
+    $configurationValues = get_option('acumulus');
     if (is_array($configurationValues)) {
       foreach ($keys as $key) {
         // Do not overwrite defaults if no value is set.
@@ -51,7 +51,7 @@ class ConfigStore implements ConfigStoreInterface {
         $configurationValues[$key] = $value;
       }
     }
-    return update_option('woocommerce_acumulus', $configurationValues);
+    return update_option('acumulus', $configurationValues);
   }
 
 }

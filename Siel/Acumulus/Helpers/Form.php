@@ -84,6 +84,7 @@ abstract class Form {
     $this->successMessages = array();
     $this->errorMessages = array();
     $this->formValuesSet = false;
+    $this->submittedValues = array();
 
     $this->translator = $translator;
     $this->fields = array();
@@ -147,16 +148,16 @@ abstract class Form {
   /**
    * Sets the form values to use.
    *
-   * This is typically the union of the default values, field values and any
-   * submitted values.
+   * This is typically the union of the default values, any submitted values,
+   * and explicitly set field values.
    */
   protected function setFormValues() {
     if (!$this->formValuesSet) {
       $this->formValues = $this->getDefaultFormValues();
-      $this->formValues = array_merge($this->formValues, $this->getFieldValues($this->getFields()));
       if (!empty($this->submittedValues)) {
         $this->formValues = array_merge($this->formValues, $this->submittedValues);
       }
+      $this->formValues = array_merge($this->formValues, $this->getFieldValues($this->getFields()));
 
       $this->formValuesSet = true;
     }
@@ -196,7 +197,7 @@ abstract class Form {
    *
    * This method will not have a use on every web shop, but, e.g. VirtueMart and
    * OpenCart have a form helper/renderer to render individual fields including
-   * their value attribute instead of binding values ot a form and rendering the
+   * their value attribute instead of binding values to a form and rendering the
    * form.
    */
   public function addValues() {
@@ -206,10 +207,8 @@ abstract class Form {
   /**
    * Adds the form values to the field definitions.
    *
-   * This method will not have a use on every web shop, but, e.g. VirtueMart and
-   * OpenCart have a form helper/renderer to render individual fields including
-   * their value attribute instead of binding values ot a form and rendering the
-   * form.
+   * This internal version of addValues() passes the fields as a parameter to
+   * allow to recursively process field sets.
    *
    * @param array[] $fields
    *
@@ -232,7 +231,7 @@ abstract class Form {
       }
       else {
         // Explicitly set values (in the 'value' key) take precedence over
-        // submitted values, who in turn take precedence over default values
+        // submitted values, which in turn take precedence over default values
         // (gathered via geDefaultFormValues()).
         if (!isset($field['value'])) {
           $field['value'] = $this->getFormValue($name);

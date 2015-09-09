@@ -63,10 +63,13 @@ abstract class ConfigForm extends Form {
    */
   protected function setSubmittedValues() {
     $postedValues = $this->getPostedValues();
+    // Check if the full form was displayed or only the account details.
+    $fullForm = array_key_exists('salutation', $postedValues);
     foreach ($this->acumulusConfig->getKeys() as $key) {
       if (!$this->addIfIsset($this->submittedValues, $key, $postedValues)) {
-        // Add unchecked checkboxes.
-        if ($this->isCheckboxKey($key)) {
+        // Add unchecked checkboxes, but only if the full form was displayed as
+        // all checkboxes on this form appear in the full form only.
+        if ($fullForm && $this->isCheckboxKey($key)) {
           $this->submittedValues[$key] = '';
         }
       }
@@ -322,6 +325,7 @@ abstract class ConfigForm extends Form {
       $fields['emailAsPdfSettingsHeader'] = array(
         'type' => 'fieldset',
         'legend' => $this->t('emailAsPdfSettingsHeader'),
+        'description' => $this->t('desc_emailAsPdfInformation'),
         'fields' => array (
           'emailAsPdf' => array(
             'type' => 'checkbox',
@@ -496,7 +500,7 @@ abstract class ConfigForm extends Form {
   protected function getOrderStatusesList() {
     $result = array();
 
-    $result[0] = $this->t('option_empty_triggerOrderStatus');
+    $result['0'] = $this->t('option_empty_triggerOrderStatus');
     $result += $this->getShopOrderStatuses();
 
     return $result;

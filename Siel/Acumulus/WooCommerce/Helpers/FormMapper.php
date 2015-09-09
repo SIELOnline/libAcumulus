@@ -20,11 +20,15 @@ class FormMapper {
    * Maps a set of field definitions.
    *
    * @param Form $form
+   *
+   * @return \Siel\Acumulus\WooCommerce\Helpers\FormRenderer
    */
   public function map(Form $form) {
     $this->formRenderer = new FormRenderer($form);
-    $this->page ='woocommerce_acumulus';
+    $this->page ='acumulus';
+    $form->addValues();
     $this->fields($form->getFields(), '');
+    return $this->formRenderer;
   }
 
   /**
@@ -36,6 +40,7 @@ class FormMapper {
    */
   protected function fields(array $fields, $section) {
     foreach ($fields as $id => $field) {
+      $field['id'] = $id;
       if (!isset($field['name'])) {
         $field['name'] = $id;
       }
@@ -56,7 +61,7 @@ class FormMapper {
       $field['attributes'] = array();
     }
     if ($field['type'] === 'fieldset') {
-      add_settings_section($field['id'], $field['label'], null, $this->page);
+      add_settings_section($field['id'], $field['legend'], null, $this->page);
       $this->fields($field['fields'], $field['id']);
     }
     else {

@@ -527,22 +527,22 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
         'contractcode' => array(
           'group' => 'credentials',
           'type' => 'string',
-          'default' => 0,
+          'default' => '',
         ),
         'username' => array(
           'group' => 'credentials',
           'type' => 'string',
-          'default' => 0,
+          'default' => '',
         ),
         'password' => array(
           'group' => 'credentials',
           'type' => 'string',
-          'default' => 0,
+          'default' => '',
         ),
         'emailonerror' => array(
           'group' => 'credentials',
           'type' => 'string',
-          'default' => 0,
+          'default' => '',
         ),
         'defaultCustomerType' => array(
           'group' => 'customer',
@@ -616,7 +616,7 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
         ),
         'triggerOrderStatus' => array(
           'group' => 'shop',
-          'type' => 'int',
+          'type' => 'string',
           'default' => 0,
         ),
         'emailAsPdf' => array(

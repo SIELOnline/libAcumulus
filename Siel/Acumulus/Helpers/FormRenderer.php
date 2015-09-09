@@ -34,6 +34,12 @@ class FormRenderer {
   protected $labelWrapperClass = '';
 
   /** @var string */
+  protected $markupWrapperTag = 'div';
+
+  /** @var string */
+  protected $markupWrapperClass = 'message';
+
+  /** @var string */
   protected $inputWrapperTag = '';
 
   /** @var string */
@@ -46,10 +52,22 @@ class FormRenderer {
   protected $radioWrapperClass = 'radio';
 
   /** @var string */
+  protected $radio1WrapperTag = '';
+
+  /** @var string */
+  protected $radio1WrapperClass = '';
+
+  /** @var string */
   protected $checkboxWrapperTag = 'div';
 
   /** @var string */
   protected $checkboxWrapperClass = 'checkbox';
+
+  /** @var string */
+  protected $checkbox1WrapperTag = '';
+
+  /** @var string */
+  protected $checkbox1WrapperClass = '';
 
   /** @var string */
   protected $multiLabelTag = 'span';
@@ -100,7 +118,7 @@ class FormRenderer {
         $output .= $this->renderFieldset($field);
         break;
       case 'markup':
-        $output .= $field['value'];
+        $output .= $this->renderMarkup($field);
         break;
       default:
         $output .= $this->renderField($field);
@@ -185,7 +203,7 @@ class FormRenderer {
   }
 
   /**
-   *
+   * Renders a form field itself, ie without label and description.
    *
    * @param string $type
    * @param string $name
@@ -194,7 +212,6 @@ class FormRenderer {
    * @param array $options
    *
    * @return string
-   *
    */
   protected function renderElement($type, $name, $value, array $attributes = array(), $options = array()) {
     switch ($type) {
@@ -203,7 +220,7 @@ class FormRenderer {
       case 'select':
       case 'radio':
       case 'checkbox':
-        return $this->$type($name, $options, $value, $attributes);
+        return $this->$type($name, $value, $options, $attributes);
       default:
         return $this->input($type, $name, $value, $attributes);
     }
@@ -420,8 +437,7 @@ class FormRenderer {
     // Options.
     foreach ($options as $value => $text) {
       $optionAttributes = array('value' => $value);
-      // Do not match 0 as value with null as selected, but do match 0 and '0'.
-      if ($selected !== null && $value == $selected) {
+      if ($this->compareValues($selected, $value)) {
         $optionAttributes['selected'] = 'selected';
       }
       $output .= '<option' . $this->renderAttributes($optionAttributes) . '>' . htmlspecialchars($text, ENT_NOQUOTES, 'UTF-8') . '</option>';
@@ -471,12 +487,13 @@ class FormRenderer {
     foreach ($options as $value => $text) {
       $radioAttributes = $this->getRadioAttributes($name, $value);
       $radioAttributes = $this->addAttribute($radioAttributes, 'required', $required);
-      // Do not match 0 as value with null as selected, but do match 0 and '0'.
-      if ($selected !== null && $value == $selected) {
+      if ($this->compareValues($selected, $value)) {
         $radioAttributes['checked'] = true;
       }
+      $output .= $this->getWrapper('radio1');
       $output .= '<input' . $this->renderAttributes($radioAttributes) . '>';
       $output .= $this->renderLabel($text, $radioAttributes['id'], array(), false);
+      $output .= $this->getWrapperEnd('radio1');
     }
 
     // End tag.
@@ -487,7 +504,8 @@ class FormRenderer {
   }
 
   /**
-   * Renders a list of checkboxes (input tag with type="checkbox") enclosed in a div.
+   * Renders a list of checkboxes (input tag with type="checkbox") enclosed in a
+   * div.
    *
    * @param string $name
    *   The name attribute for all the checkboxes, required. When rendering
@@ -520,14 +538,32 @@ class FormRenderer {
       if (in_array($value, $selected)) {
         $checkboxAttributes['checked'] = true;
       }
+      $output .= $this->getWrapper('checkbox1');
       $output .= '<input' . $this->renderAttributes($checkboxAttributes) . '>';
       $output .= $this->renderLabel($text, $checkboxAttributes['id'], array(), false);
+      $output .= $this->getWrapperend('checkbox1');
     }
 
     // End tag.
     $output .= $this->getWrapperEnd('checkbox');
     $output .= $this->getWrapperEnd('input');
 
+    return $output;
+  }
+
+  /**
+   * Renders a markup (free format output) element.
+   *
+   * @param array $field
+   *
+   * @return string
+   *   The rendered markup.
+   */
+  protected function renderMarkup(array $field) {
+    $output = '';
+    $output .= $this->getWrapper('markup');
+    $output .= $field['value'];
+    $output .= $this->getWrapperEnd('markup');
     return $output;
   }
 
@@ -681,6 +717,19 @@ class FormRenderer {
       'id' => "{$name}_{$value}",
       'value' => $value);
     return $radioAttributes;
+  }
+
+  /**
+   * Compares an option and a value to see if this option should be "selected".
+   *
+   * @param string|int $option
+   * @param string|int $value
+   *
+   * @return bool
+   *   If this option equals the value.
+   */
+  protected function compareValues($option, $value) {
+    return (string) $value === (string) $option;
   }
 
 }

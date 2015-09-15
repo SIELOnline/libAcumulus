@@ -2,6 +2,7 @@
 namespace Siel\Acumulus\Invoice;
 
 use Siel\Acumulus\Helpers\Countries;
+use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Helpers\TranslatorInterface;
 use Siel\Acumulus\Shop\Config;
 use Siel\Acumulus\Shop\ConfigInterface as ShopConfigInterface;
@@ -40,6 +41,7 @@ abstract class Creator {
   const LineType_Manual = 'manual';
   const LineType_Order = 'product';
   const LineType_Discount = 'discount';
+  const LineType_Other = 'other';
 
   /** @var \Siel\Acumulus\Shop\Config */
   protected $config;
@@ -460,7 +462,7 @@ abstract class Creator {
    * getGiftWrappingLine(), getShippingLine(), getPaymentFeeLine(),
    * and getDiscountLines().
    *
-   * @return array
+   * @return array[]
    *   A non keyed array with all invoice lines.
    */
   protected function getInvoiceLines() {
@@ -482,7 +484,7 @@ abstract class Creator {
   /**
    * Returns the item/product lines of the order.
    *
-   * @return array
+   * @return array[]
    *  Array of item line arrays.
    */
   abstract protected function getItemLines();
@@ -494,14 +496,14 @@ abstract class Creator {
    * notes.
    *
    * @return array
-   *  An array of manual line arrays.
+   *  An array of manual line arrays, may be empty.
    */
   abstract protected function getManualLines();
 
   /**
    * Returns all the fee lines for the order.
    *
-   * @return array
+   * @return array[]
    *  An array of fee line arrays
    */
   protected function getFeeLines() {
@@ -561,7 +563,7 @@ abstract class Creator {
   /**
    * Returns any applied discounts and partial payments.
    *
-   * @return array
+   * @return array[]
    *   An array of discount line arrays.
    */
   abstract protected function getDiscountLines();
@@ -701,50 +703,20 @@ abstract class Creator {
   }
 
   /**
-   * Returns the range within which the result of the division should fall given
-   * the precision range for the 2 numbers to divide.
+   * Returns the range in which the vat rate will lie.
    *
-   * @param float $numerator
-   * @param float $denominator
-   * @param float $precisionNumerator
-   * @param float $precisionDenominator
+   * If a webshop does not store the vat rates used in the order, we must
+   * calculate them using a (product) price and the vat on it. But as webshops
+   * often store these numbers rounded to cents, the vat rate calculation
+   * becomes imprecise. Therefore we compute the range in which it will lie and
+   * will let the Completor do a comparison with the actual vat rates that an
+   * order can have (one of the Dutch or, for electronic services, other EU
+   * country VAT rates).
    *
-   * @return array
-   *   Array of floats with keys min, max and calculated.
-   */
-  protected function getDivisionRange($numerator, $denominator, $precisionNumerator = 0.01, $precisionDenominator = 0.01) {
-    // The actual value can be half the precision lower or higher.
-    $numeratorHalfRange = $precisionNumerator / 2.0;
-    $denominatorHalfRange = $precisionDenominator / 2.0;
-
-    // The min values should be closer to 0 then the value.
-    // The max values should be further from 0 then the value.
-    if ($numerator < 0.0) {
-      $numeratorHalfRange = -$numeratorHalfRange;
-    }
-    $minNumerator = $numerator - $numeratorHalfRange;
-    $maxNumerator = $numerator + $numeratorHalfRange;
-
-    if ($denominator < 0.0) {
-      $denominatorHalfRange = -$denominatorHalfRange;
-    }
-    $minDenominator = $denominator - $denominatorHalfRange;
-    $maxDenominator = $denominator + $denominatorHalfRange;
-
-    // We get the min value of the division by dividing the minimum numerator by
-    // the maximum denominator and vice versa.
-    $min = $minNumerator / $maxDenominator;
-    $max = $maxNumerator / $minDenominator;
-    $calculated = $numerator / $denominator;
-
-    return array('min' => $min, 'calculated' => $calculated, 'max' => $max);
-  }
-
-  /**
-   * Wrapper around getDivisionRange() that returns the values under the key
-   * names as the Completor expects them.
-   *
-   * If $numerator = 0 the vatrate will be set to 0 and treat as being exact.
+   * - If $denominator = 0 the vatrate will be set to NULL and the Completor may
+   *   try to get this line listed under the correct vat rate.
+   * - If $numerator = 0 the vatrate will be set to 0 and be treated as if it
+   *   is an exact vat rate, not a vat range
    *
    * @param float $numerator
    * @param float $denominator
@@ -756,7 +728,13 @@ abstract class Creator {
    *   meta-vatrate-source.
    */
   protected function getVatRangeTags($numerator, $denominator, $precisionNumerator = 0.01, $precisionDenominator = 0.01) {
-    if ($this->floatsAreEqual($numerator, 0.0, 0.0001)) {
+    if (Number::isZero($denominator, 0.0001)) {
+      return array(
+        'vatrate' => NULL,
+        'meta-vatrate-source' => static::VatRateSource_Completor,
+      );
+    }
+    if (Number::isZero($numerator, 0.0001)) {
       return array(
         'vatrate' => 0,
         'vatamount' => $numerator,
@@ -764,7 +742,7 @@ abstract class Creator {
       );
     }
     else {
-      $range = $this->getDivisionRange($numerator, $denominator, $precisionNumerator, $precisionDenominator);
+      $range = Number::getDivisionRange($numerator, $denominator, $precisionNumerator, $precisionDenominator);
       return array(
         'vatrate' => 100.0 * $range['calculated'],
         'vatamount' => $numerator,
@@ -776,48 +754,27 @@ abstract class Creator {
   }
 
   /**
-   * Helper method to do a float comparison.
+   * Returns the sign to use for amounts that are always defined as a positive
+   * number, also on credit notes.
    *
-   * @param float $f1
-   * @param float $f2
-   * @param float $maxDiff
-   *
-   * @return bool
-   *   True if the the floats are "equal", i.e. do not differ more than the
-   *   specified maximum difference.
+   * @return float
+   *   1 for orders, -1 for credit notes.
    */
-  protected function floatsAreEqual($f1, $f2, $maxDiff = 0.005) {
-    return abs($f2 - $f1) < $maxDiff;
+  protected function getSign() {
+    return (float) ($this->source->getType() === Source::Order ? 1 : -1);
   }
 
   /**
-   * indicates if a float is to be considered a non-zero amount.
+   * Calls a method that typically depends on the type of invoice source.
    *
-   * This is a wrapper around floatsAreEqual() for the most used situation where
-   * an amount is checked for not being 0.0.
+   * @param string $method
+   * @param array $args
    *
-   * @param $f1
-   * @param float $maxDiff
-   *
-   * @return bool
+   * @return mixed|void
    */
-  protected function isAmount($f1, $maxDiff = 0.001) {
-    return !$this->floatsAreEqual($f1, 0.0, $maxDiff);
-  }
-
-  /**
-   * indicates if a float is to be considered zero.
-   *
-   * This is a wrapper around floatsAreEqual() for the often used case where
-   * an amount is checked for being 0.0.
-   *
-   * @param $f1
-   * @param float $maxDiff
-   *
-   * @return bool
-   */
-  protected function isZero($f1, $maxDiff = 0.001) {
-    return $this->floatsAreEqual($f1, 0.0, $maxDiff);
+  protected function callTypeSpecificMethod($method, $args = array()) {
+    $method .= $this->source->getType();
+    return call_user_func_array(array($this, $method), $args);
   }
 
 }

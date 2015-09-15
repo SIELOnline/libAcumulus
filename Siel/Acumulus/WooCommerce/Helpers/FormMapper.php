@@ -20,12 +20,13 @@ class FormMapper {
    * Maps a set of field definitions.
    *
    * @param Form $form
+   * @param string $page
    *
    * @return \Siel\Acumulus\WooCommerce\Helpers\FormRenderer
    */
-  public function map(Form $form) {
-    $this->formRenderer = new FormRenderer($form);
-    $this->page ='acumulus';
+  public function map(Form $form, $page) {
+    $this->formRenderer = new FormRendererSettings();
+    $this->page = $page;
     $form->addValues();
     $this->fields($form->getFields(), '');
     return $this->formRenderer;
@@ -61,7 +62,8 @@ class FormMapper {
       $field['attributes'] = array();
     }
     if ($field['type'] === 'fieldset') {
-      add_settings_section($field['id'], $field['legend'], null, $this->page);
+      // @toso: use an anonymous function with use to pass $field ...
+      add_settings_section($field['id'], $field['legend'], array($this->formRenderer, 'renderFieldset'), $this->page);
       $this->fields($field['fields'], $field['id']);
     }
     else {

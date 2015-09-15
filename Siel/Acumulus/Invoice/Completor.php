@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\Invoice;
 
+use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Helpers\TranslatorInterface;
 use Siel\Acumulus\Web\Service;
 
@@ -170,54 +171,9 @@ class Completor {
     if ($invoiceSettings['removeEmptyShipping']) {
       $this->invoice['customer']['invoice']['line'] = array_filter($this->invoice['customer']['invoice']['line'],
         function ($line) {
-          return $line['meta-line-type'] !== Creator::LineType_Shipping || $this->isAmount($line['unitpice']);
+          return $line['meta-line-type'] !== Creator::LineType_Shipping || !Number::isZero($line['unitpice']);
         });
     }
-  }
-
-  /**
-   * Helper method to do a float comparison.
-   *
-   * @param float $f1
-   * @param float $f2
-   * @param float $maxDiff
-   *
-   * @return bool
-   *   True if the the floats are "equal", i.e. do not differ more than the
-   *   specified maximum difference.
-   */
-  protected function floatsAreEqual($f1, $f2, $maxDiff = 0.005) {
-    return abs($f2 - $f1) < $maxDiff;
-  }
-
-  /**
-   * indicates if a float is to be considered a non-zero amount.
-   *
-   * This is a wrapper around floatsAreEqual() for the most used situation where
-   * an amount is checked for not being 0.0.
-   *
-   * @param $f1
-   * @param float $maxDiff
-   *
-   * @return bool
-   */
-  protected function isAmount($f1, $maxDiff = 0.001) {
-    return !$this->floatsAreEqual($f1, 0.0, $maxDiff);
-  }
-
-  /**
-   * indicates if a float is to be considered zero.
-   *
-   * This is a wrapper around floatsAreEqual() for the often used case where
-   * an amount is checked for being 0.0.
-   *
-   * @param $f1
-   * @param float $maxDiff
-   *
-   * @return bool
-   */
-  protected function isZero($f1, $maxDiff = 0.001) {
-    return $this->floatsAreEqual($f1, 0.0, $maxDiff);
   }
 
 }

@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\Invoice\CompletorStrategy;
 
+use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\CompletorInvoiceLines;
 use Siel\Acumulus\Invoice\CompletorStrategyBase;
 use Siel\Acumulus\Invoice\Creator;
@@ -90,8 +91,8 @@ class SplitKnownDiscountLine extends CompletorStrategyBase {
   protected function checkPreconditions() {
     $result = FALSE;
     if (isset($this->splitLine)) {
-      if ((isset($this->splitLine['unitprice']) && $this->floatsAreEqual($this->splitLine['unitprice'], $this->knownDiscountAmountInc - $this->knownDiscountVatAmount))
-        || (isset($this->splitLine['unitpriceinc']) && $this->floatsAreEqual($this->splitLine['unitpriceinc'], $this->knownDiscountAmountInc))) {
+      if ((isset($this->splitLine['unitprice']) && Number::floatsAreEqual($this->splitLine['unitprice'], $this->knownDiscountAmountInc - $this->knownDiscountVatAmount))
+        || (isset($this->splitLine['unitpriceinc']) && Number::floatsAreEqual($this->splitLine['unitpriceinc'], $this->knownDiscountAmountInc))) {
         $result = TRUE;
       }
       // !Magento bug!

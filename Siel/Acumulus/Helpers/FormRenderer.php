@@ -127,6 +127,14 @@ class FormRenderer {
     return $output;
   }
 
+  /**
+   * Renders a fieldset.
+   *
+   * @param array $field
+   *
+   * @return string
+   *   The rendered fieldset.
+   */
   protected function renderFieldset($field) {
     $output = '';
     $output .= $this->fieldsetBegin($field);
@@ -134,6 +142,7 @@ class FormRenderer {
     $output .= $this->fieldsetEnd($field);
     return $output;
   }
+
   /**
    * Outputs the beginning of a fieldset.
    *

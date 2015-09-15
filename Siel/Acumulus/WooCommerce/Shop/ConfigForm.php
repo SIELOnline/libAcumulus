@@ -11,27 +11,6 @@ use Siel\Acumulus\Shop\ConfigInterface;
 class ConfigForm extends BaseConfigForm {
 
   /**
-   * Returns the submitted values after validation.
-   *
-   * This WordPress specific method is specifically for how WordPress handles
-   * settings forms: it saves the values itself but let's the form only do the
-   * validation.
-   *
-   * As a side effect, validation errors are set as error messages.
-   *
-   * @return array
-   *   Array of submitted values.
-   */
-  public function getSubmittedValues() {
-    $this->setSubmittedValues();
-    $this->validate();
-    foreach ($this->getErrorMessages() as $key => $message) {
-      add_settings_error("woocommerce-acumulus[$key]", 'settings', $message, 'error');
-    }
-    return $this->submittedValues;
-  }
-
-  /**
    * {@inheritdoc}
    */
   protected function getShopOrderStatuses() {

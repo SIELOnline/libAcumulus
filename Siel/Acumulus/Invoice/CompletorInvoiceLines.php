@@ -2,6 +2,7 @@
 namespace Siel\Acumulus\Invoice;
 
 use Siel\Acumulus\Helpers\Countries;
+use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Helpers\TranslatorInterface;
 use Siel\Acumulus\Web\Service;
 
@@ -383,7 +384,7 @@ class CompletorInvoiceLines {
     }
 
     foreach ($this->invoiceLines as &$line) {
-      if ($line['meta-vatrate-source'] === Creator::VatRateSource_Completor && $line['vatrate'] === null && $this->floatsAreEqual($line['vatamount'], 0.0)) {
+      if ($line['meta-vatrate-source'] === Creator::VatRateSource_Completor && $line['vatrate'] === null && Number::isZero($line['vatamount'])) {
         $line['vatrate'] = $maxVatRate;
       }
     }
@@ -500,11 +501,11 @@ class CompletorInvoiceLines {
   protected function invoiceHasLineWithVat() {
     $isLineWithVat = false;
     foreach ($this->invoiceLines as $line) {
-      if (!empty($line['vatrate']) && !$this->floatsAreEqual($line['vatrate'], 0.0) && !$this->floatsAreEqual($line['vatrate'], -1.0)) {
+      if (!empty($line['vatrate']) && !Number::isZero($line['vatrate']) && !Number::floatsAreEqual($line['vatrate'], -1.0)) {
         $isLineWithVat = true;
         break;
       }
-      if (!empty($line['vatamount']) && !$this->floatsAreEqual($line['vatamount'], 0.0)) {
+      if (!empty($line['vatamount']) && !Number::isZero($line['vatamount'])) {
         $isLineWithVat = true;
         break;
       }
@@ -596,17 +597,6 @@ class CompletorInvoiceLines {
    */
   protected function isCompany() {
     return !empty($this->invoice['customer']['vatnumber']);
-  }
-
-  /**
-   * @param float $f1
-   * @param float $f2
-   * @param float $maxDiff
-   *
-   * @return bool
-   */
-  protected function floatsAreEqual($f1, $f2, $maxDiff = 0.005) {
-    return abs((float) $f2 - (float) $f1) <= $maxDiff;
   }
 
 }

@@ -266,14 +266,4 @@ abstract class CompletorStrategyBase {
     return $line2Complete['vatamount'] * $line2Complete['quantity'];
   }
 
-  /**
-   * @param float $f1
-   * @param float $f2
-   * @param float $maxDiff
-   *
-   * @return bool
-   */
-  protected function floatsAreEqual($f1, $f2, $maxDiff = 0.02) {
-    return abs($f2 - $f1) < $maxDiff;
-  }
 }

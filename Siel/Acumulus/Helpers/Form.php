@@ -132,7 +132,7 @@ abstract class Form {
    *
    * @return bool
    */
-  protected function isSubmitted() {
+  public function isSubmitted() {
     return $_SERVER['REQUEST_METHOD'] === 'POST';
   }
 
@@ -141,7 +141,7 @@ abstract class Form {
    *
    * @return bool
    */
-  protected function isValid() {
+  public function isValid() {
     return empty($this->errorMessages);
   }
 
@@ -290,10 +290,16 @@ abstract class Form {
   /**
    * Processes the form.
    *
-   * @return bool
-   *   True if there was no form submission or a successful submission.
+   * @param bool $executeIfValid
+   *   Whether this method should execute the intended action after successful
+   *   validation. Some web shops (WooCommerce) sometimes do their own form
+   *   handling (setting pages) and we should only do the validation and setting
+   *   admin notices as necessary.
+   *
+   * @return bool True if there was no form submission or a successful submission.
+   * True if there was no form submission or a successful submission.
    */
-  public function process() {
+  public function process($executeIfValid = true) {
     $this->formValues = array();
     $this->submittedValues = array();
 
@@ -301,7 +307,7 @@ abstract class Form {
     if ($this->isSubmitted() && $this->systemValidate()) {
       $this->setSubmittedValues();
       $this->validate();
-      if ($this->isValid()) {
+      if ($executeIfValid && $this->isValid()) {
         if ($this->execute()) {
           $message = $this->t('message_form_success');
           if ($message !== 'message_form_success') {

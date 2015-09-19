@@ -28,10 +28,9 @@ class InvoiceManager extends BaseInvoiceManager {
     // We use our own query here as defining a range of pots ids based on a
     // between does not seem to be possible with the query syntax.
     global $wpdb;
-    $table = $wpdb->posts;
     $key = 'ID';
-    $invoiceSourceIds = $wpdb->get_col($wpdb->prepare("SELECT `%s` FROM `%s` WHERE `%s` BETWEEN %u AND %u AND `post_type` = '%s'",
-      $key, $table, $key, $InvoiceSourceIdFrom, $InvoiceSourceIdTo, $this->sourceTypeToShopType($invoiceSourceType)));
+    $invoiceSourceIds = $wpdb->get_col($wpdb->prepare("SELECT `$key` FROM `{$wpdb->posts}` WHERE `$key` BETWEEN %u AND %u AND `post_type` = %s",
+      $InvoiceSourceIdFrom, $InvoiceSourceIdTo, $this->sourceTypeToShopType($invoiceSourceType)));
     return Source::invoiceSourceIdsToSources($invoiceSourceType, $invoiceSourceIds);
   }
 

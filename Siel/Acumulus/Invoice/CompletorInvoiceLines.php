@@ -376,7 +376,7 @@ class CompletorInvoiceLines {
     $vatRates = $this->getAppearingVatRates();
 
     // Get the highest vat rate.
-    $maxVatRate = -1;
+    $maxVatRate = -1.0;
     foreach ($vatRates as $vatRate => $frequency) {
       if ((float) $vatRate > $maxVatRate) {
         $maxVatRate = (float) $vatRate;
@@ -384,7 +384,7 @@ class CompletorInvoiceLines {
     }
 
     foreach ($this->invoiceLines as &$line) {
-      if ($line['meta-vatrate-source'] === Creator::VatRateSource_Completor && $line['vatrate'] === null && Number::isZero($line['vatamount'])) {
+      if ($line['meta-vatrate-source'] === Creator::VatRateSource_Completor && $line['vatrate'] === null && Number::isZero($line['unitprice'])) {
         $line['vatrate'] = $maxVatRate;
       }
     }

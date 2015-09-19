@@ -130,6 +130,9 @@ abstract class BatchForm extends Form {
     else {
       $result = $this->invoiceManager->sendMultiple($invoiceSources, (bool) $this->getFormValue('force_send'), $this->log);
     }
+    // Set formValue for log in case form values are already queried.
+    $logText = implode("\n", $this->log);
+    $this->formValues['log'] = $logText;
     return $result;
   }
 
@@ -199,16 +202,14 @@ abstract class BatchForm extends Form {
     );
 
     // 2nd fieldset: Batch log.
-    if (!empty($this->log)) {
-      $logText = implode("\n", $this->log);
-      $this->formValues['log'] = $logText;
+    if ($this->isSubmitted() && !empty($this->submittedValues) && $this->isValid()) {
+      // Set formValue for log as value in case form values are not yet queried.
       $fields['batchLogHeader'] = array(
         'type' => 'fieldset',
         'legend' => $this->t('batchLogHeader'),
         'fields' => array(
           'log' => array(
             'type' => 'textarea',
-            'value' => $logText,
             'attributes' => array(
               'readonly' => TRUE,
               'rows' => min(10, count($this->log)),
@@ -217,6 +218,11 @@ abstract class BatchForm extends Form {
           ),
         ),
       );
+      if (!empty($this->log)) {
+        $logText = implode("\n", $this->log);
+        $this->formValues['log'] = $logText;
+        $fields['batchLogHeader']['fields']['log']['value'] = $logText;
+      }
     }
 
     // 3rd fieldset: Batch info.

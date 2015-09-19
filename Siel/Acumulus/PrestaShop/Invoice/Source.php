@@ -2,6 +2,7 @@
 namespace Siel\Acumulus\PrestaShop\Invoice;
 
 use Order;
+use OrderSlip;
 use Siel\Acumulus\Invoice\Source as BaseSource;
 
 /**
@@ -10,7 +11,7 @@ use Siel\Acumulus\Invoice\Source as BaseSource;
 class Source extends BaseSource {
 
   // More specifically typed properties.
-  /** @var \Order */
+  /** @var Order|OrderSLip */
   protected $source;
 
   /**
@@ -18,6 +19,14 @@ class Source extends BaseSource {
    */
   protected function setSourceOrder() {
     $this->source = new Order($this->id);
+  }
+
+  /**
+   * @todo: remove after development
+   * @return Order|OrderSlip
+   */
+  public function getSource() {
+    return parent::getSource();
   }
 
   /**

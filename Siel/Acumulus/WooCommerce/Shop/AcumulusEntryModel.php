@@ -41,7 +41,7 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel {
    */
   public function getByInvoiceSourceId($invoiceSourceType, $invoiceSourceId) {
     $result = get_post_meta($invoiceSourceId);
-    return $result !== false ? $result : null;
+    return isset($result[static::KEY_ENTRY_ID]) ? $result : null;
   }
 
   /**

@@ -267,13 +267,12 @@ class Creator extends BaseCreator {
           'vatrate' => (float) $calcRule->calc_value,
           'meta-vatrate-source' => static::VatRateSource_Exact,
         );
-        $description = $this->t('shipping_costs');
       }
       else {
         $vatInfo = $this->getVatRangeTags($shippingVat, $shippingEx, 0.0001, 0.01);
       }
       $result = array(
-          'product' => $description,
+          'product' => $this->t('shipping_costs'),
           'unitprice' => $shippingEx,
           'quantity' => 1,
           'vatamount' => $shippingVat,
@@ -368,26 +367,6 @@ class Creator extends BaseCreator {
     );
 
     return $result;
-  }
-
-  /**
-   * {@inheritdoc}
-   *
-   * This override returns an empty array: VirtueMart does not know manual
-   * lines.
-   */
-  protected function getManualLines() {
-    return array();
-  }
-
-  /**
-   * {@inheritdoc}
-   *
-   * This override returns an empty array: VirtueMart does not know gift
-   * wrapping lines.
-   */
-  protected function getGiftWrappingLine() {
-    return array();
   }
 
   /**

@@ -232,7 +232,7 @@ abstract class Form {
       else {
         // Explicitly set values (in the 'value' key) take precedence over
         // submitted values, which in turn take precedence over default values
-        // (gathered via geDefaultFormValues()).
+        // (gathered via getDefaultFormValues()).
         if (!isset($field['value'])) {
           $field['value'] = $this->getFormValue($name);
         }

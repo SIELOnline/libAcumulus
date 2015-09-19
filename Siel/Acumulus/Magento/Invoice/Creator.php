@@ -59,9 +59,6 @@ class Creator extends BaseCreator {
         $this->creditNote = $this->source->getSource();
         $this->order = $this->creditNote->getOrder();
         break;
-      default:
-        $this->config->getLog()->error('Creator::setSource(): unknown source type %s', $this->source->getType());
-        break;
     }
     $this->shopInvoices = $this->order->getInvoiceCollection();
     $this->shopInvoice = count($this->shopInvoices) > 0 ? $this->shopInvoices->getFirstItem() : null;
@@ -122,18 +119,11 @@ class Creator extends BaseCreator {
   protected function getInvoiceDate($dateToUse) {
     // createdAt returns yyyy-mm-dd hh:mm:ss, take date part.
     $result = substr($this->source->getSource()->getCreatedAt(), 0, strlen('yyyy-mm-dd'));
-    // A credit note is its own invoice
+    // A credit note is to be considered an invoice on its own.
     if ($dateToUse == ConfigInterface::InvoiceDate_InvoiceCreate && $this->source->getType() === Source::Order && $this->shopInvoice !== NULL) {
       $result = substr($this->shopInvoice->getCreatedAt(), 0, strlen('yyyy-mm-dd'));
     }
     return $result;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function getPaymentState() {
-    return $this->callTypeSpecificMethod(__FUNCTION__);
   }
 
   protected function getPaymentStateOrder() {
@@ -146,13 +136,6 @@ class Creator extends BaseCreator {
     return $this->creditNote->getState() == Mage_Sales_Model_Order_Creditmemo::STATE_REFUNDED
       ? InvoiceConfigInterface::PaymentStatus_Paid
       : InvoiceConfigInterface::PaymentStatus_Due;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function getPaymentDate() {
-    return $this->callTypeSpecificMethod(__FUNCTION__);
   }
 
   protected function getPaymentDateOrder() {
@@ -183,13 +166,6 @@ class Creator extends BaseCreator {
       'meta-invoiceamountinc' => $sign * $this->source->getSource()->getBaseGrandTotal(),
       'meta-invoicevatamount' => $sign * $this->source->getSource()->getBaseTaxAmount(),
     );
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function getItemLines() {
-    return $this->callTypeSpecificMethod(__FUNCTION__);
   }
 
   /**
@@ -386,14 +362,15 @@ class Creator extends BaseCreator {
       // However, we will use the 2nd way as that seems to be more precise and,
       // thus generally leads to a smaller range:
       // Get range based on normal shipping costs incl and excl VAT.
-      $shippingVat = $this->getSign() * $magentoSource->getShippingTaxAmount();
+      $sign = $this->getSign();
+      $shippingVat = $sign * $magentoSource->getShippingTaxAmount();
       if ($this->source->getType() === Source::Order && !Number::isZero($magentoSource->getShippingDiscountAmount())) {
-        $shippingInc = $this->getSign() * ($magentoSource->getShippingInclTax() - $magentoSource->getShippingDiscountAmount());
+        $shippingInc = $sign * ($magentoSource->getShippingInclTax() - $magentoSource->getShippingDiscountAmount());
         $shippingEx = $shippingInc - $shippingVat;
       }
       else {
-        $shippingInc = $this->getSign() * $magentoSource->getShippingInclTax();
-        $shippingEx = $this->getSign() * $magentoSource->getShippingAmount();
+        $shippingInc = $sign * $magentoSource->getShippingInclTax();
+        $shippingEx = $sign * $magentoSource->getShippingAmount();
       }
 
       // !Magento bug!
@@ -413,7 +390,7 @@ class Creator extends BaseCreator {
         'unitpriceinc' => $shippingInc,
       );
       if (!Number::isZero($magentoSource->getShippingDiscountAmount())) {
-        $result['meta-linediscountamountinc'] = $this->getSign() * -$magentoSource->getShippingDiscountAmount();
+        $result['meta-linediscountamountinc'] = $sign * -$magentoSource->getShippingDiscountAmount();
       }
     }
     // Only add a free shipping line on an order, not on a credit note: free
@@ -481,16 +458,6 @@ class Creator extends BaseCreator {
       $result[] = $line;
     }
     return $result;
-  }
-
-  /**
-   * {@inheritdoc}
-   *
-   * This override returns an empty array: Magento does not know gift wrapping
-   * lines.
-   */
-  protected function getGiftWrappingLine() {
-    return array();
   }
 
   /**

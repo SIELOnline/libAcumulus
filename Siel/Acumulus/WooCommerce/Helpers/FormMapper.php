@@ -25,7 +25,7 @@ class FormMapper {
    * @return \Siel\Acumulus\WooCommerce\Helpers\FormRenderer
    */
   public function map(Form $form, $page) {
-    $this->formRenderer = new FormRendererSettings();
+    $this->formRenderer = new FormRenderer();
     $this->page = $page;
     $form->addValues();
     $this->fields($form->getFields(), '');

@@ -40,9 +40,6 @@ class Creator extends BaseCreator {
         $this->order = $this->source->getSource();
         $this->creditOrder = $this->order->getOrder();
         break;
-      default:
-        $this->config->getLog()->error('Creator::setSource(): unknown source type %s', $this->source->getType());
-        break;
     }
   }
 
@@ -117,9 +114,11 @@ class Creator extends BaseCreator {
    * meta-invoicevatamount.
    */
   protected function getInvoiceTotals() {
-    $sign = $this->source->getType() === Source::CreditNote ? -1.0 : 1.0;
+    // @todo: check sign.
+    // @todo: check with display_total_ex_tax/display_cart_ex_tax = true
+    // @todo: check with price_include_tax = false (wc_prices_include_tax())
+    $sign = $this->getSign();
     return array(
-      // @todo: check if this method returns the amount in or ex
       'meta-invoiceamountinc' => $sign * $this->order->get_total(),
       'meta-invoicevatamount' => $sign * $this->order->get_total_tax(),
     );
@@ -149,12 +148,17 @@ class Creator extends BaseCreator {
 
     $product = wc_get_product($item['variation_id'] ? $item['variation_id'] : $item['product_id']);
     // get_item_total returns cost per item after discount, ex vat (2nd param).
+    // @todo: check/add sign for refunds
+    // Precision: one of the prices is entered by the administrator and thus can
+    // be considered exact. The computed one is not rounded, so we can assume
+    // a very high precision for all values here,
     $productPriceEx = $order->get_item_total($item, FALSE, FALSE);
     $productPriceInc = $order->get_item_total($item, TRUE, FALSE);
     // get_item_tax returns tax per item after discount.
     $productVat = $order->get_item_tax($item, FALSE);
 
     $this->addIfNotEmpty($result, 'itemnumber', $product->get_sku());
+    $result['product'] = $item['name'];
 
     // WooCommerce does not support the margin scheme. So in a standard install
     // this method will always return false. But if this method happens to
@@ -164,150 +168,23 @@ class Creator extends BaseCreator {
       // Margin scheme:
       // - Do not put VAT on invoice: send price incl VAT as unitprice.
       // - But still send the VAT rate to Acumulus.
-      $productPriceEx += $productVat;
       // Costprice > 0 is the trigger for Acumulus to use the margin scheme.
-      $result['costprice'] = $item['cost_price'];
-    }
-    $result['quantity'] = number_format($item['qty'], 2, '.', '');
-
-    $result += array(
-      'product' => $item['name'],
-      'unitprice' => $productPriceEx,
-      'unitpriceinc' => $productPriceInc,
-      'vatamount' => $productVat,
-      'quantity' => $item['qty'],
-    );
-    // @todo: check precision.
-    $result += $this->getVatRangeTags($productVat, $productPriceEx);
-
-    return $result;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function getShippingLine() {
-    $shippingEx = $this->order->get_total_shipping();
-    $shippingVat = $this->order->get_shipping_tax();
-    if (!Number::isZero($shippingEx)) {
-      $description = $this->t('shipping_costs');
+      $result += array(
+        'unitprice' => $productPriceInc,
+        'costprice' => $item['cost_price'],
+      );
     }
     else {
-      $description = $this->t('free_shipping');
+      $result += array(
+        'unitprice' => $productPriceEx,
+        'unitpriceinc' => $productPriceInc,
+        'vatamount' => $productVat,
+      );
     }
 
-    // @todo: check precision.
-    $result = array(
-        'product' => $description,
-        'unitprice' => $shippingEx,
-        'quantity' => 1,
-        'vatamount' => $shippingVat,
-      ) + $this->getVatRangeTags($shippingVat, $shippingEx);
+    $result['quantity'] = $item['qty'];
+    $result += $this->getVatRangeTags($productVat, $productPriceEx, 0.0001, 0.0001);
 
-    return $result;
-  }
-
-  /**
-   * {@inheritdoc}
-   *
-   * In woocommerce, discounts are implemented with coupons. Multiple coupons
-   * can be used per order. Coupons can:
-   * - have a fixed amount or a percentage.
-   * - be applied to the whole cart or only be used for a set of products.
-   * - be applied before or after tax.
-   */
-  protected function getDiscountLines() {
-    $result = array();
-
-    // Add a line for all coupons applied.
-    $usedCoupons = $this->order->get_used_coupons();
-    foreach ($usedCoupons as $code) {
-      $coupon = new WC_Coupon($code);
-      $result[] = $this->getDiscountLine($this->order, $coupon);
-    }
-
-    return $result;
-  }
-
-  /**
-   * In WooCommerce discounts can be set as "apply before tax" or "apply after
-   * tax":
-   * - The discounts before tax are applied to the product lines themselves, so
-   *   they don't have to appear in a separate discount line. However, for
-   *   reasons of clarity a 0-amount line will be added to the invoice, so one
-   *   can easily see which coupons are used for an order.
-   * - The coupons that are applied after tax are to be seen as gift vouchers
-   *   and should be added as a (partial) payment for the order. This means that
-   *   they don't have vat.
-   *
-   * @param WC_Abstract_Order $order
-   * @param WC_Coupon $coupon
-   *
-   * @return array
-   */
-  protected function getDiscountLine(WC_Abstract_Order $order, WC_Coupon $coupon) {
-    $discountAmount = $order->get_total_discount();
-
-    // Get a description for the value of this coupon.
-    if (in_array($coupon->type, array('fixed_product', 'fixed_cart'))) {
-      $couponValue = "€{$coupon->amount}";
-    }
-    else {
-      $couponValue = "{$coupon->amount}%";
-    }
-
-    if ($coupon->apply_before_tax()) {
-      // Discounts are already applied, add a descriptive line with 0 amount.
-      // The VAT rate this 0 amount should be categorized under should be
-      // determined by the completor.
-      $description = $this->t('discount_code');
-      $amount = 0;
-      $vatrate = NULL;
-      $metaVatrateSource = static::VatRateSource_Strategy;
-      if (in_array($coupon->type, array('fixed_product', 'fixed_cart'))) {
-        if ((float) $discountAmount < $coupon->coupon_amount) {
-          $used = $this->t('gebruikt');
-          $couponValue .= " (€$discountAmount $used)";
-        }
-      }
-    }
-    else {
-      // Treat as partial payment.
-      $description = $this->t('coupon_code');
-      if (in_array($coupon->type, array('fixed_product', 'fixed_cart'))) {
-        if ((float) $discountAmount < $coupon->coupon_amount) {
-          $amount = $discountAmount;
-        }
-        else {
-          $amount = $coupon->coupon_amount;
-        }
-      }
-      else {
-        $this->config->getLog()->warning('Coupon %s is applied after tax and is thus to be seen as a gift voucher (partial payment) but has a discount percentage instead of a fixed value.', $coupon->code);
-        $amount = $discountAmount;
-      }
-      $vatrate = -1;
-      $metaVatrateSource = static::VatRateSource_Exact0;
-    }
-    $description .= " {$coupon->code}: $couponValue";
-
-    return array(
-      'itemnumber' => '',
-      'product' => $description,
-      'unitprice' => -$amount,
-      'vatrate' => $vatrate,
-      'meta-vatrate-source' => $metaVatrateSource,
-      'quantity' => 1,
-    );
-  }
-
-  /**
-   * {@inheritdoc}
-   *
-   * This implementation returns an empty result.
-   */
-  protected function getManualLines() {
-    $result = array();
     return $result;
   }
 
@@ -318,6 +195,7 @@ class Creator extends BaseCreator {
    * add these general fees (type unknown to us)
    */
   protected function getFeeLines() {
+    // @todo: check for refunds.
     $result = parent::getFeeLines();
 
     foreach ($this->order->get_fees() as $feeLine) {
@@ -337,6 +215,7 @@ class Creator extends BaseCreator {
     $feeEx = $line['line_total'];
     $feeVat = $line['line_tax'];
 
+    // @todo: check precision
     $result = array(
         'itemnumber' => $this->t('fee_code'),
         'product' => $this->t($line['name']),
@@ -350,23 +229,96 @@ class Creator extends BaseCreator {
 
   /**
    * {@inheritdoc}
-   *
-   * This override returns an empty array: WooCommerce does not know gift
-   * wrapping lines, i.e. it does not define a fee line specifically for this
-   * fee type.
    */
-  protected function getGiftWrappingLine() {
-    return array();
+  protected function getShippingLine() {
+    // @todo: check for refunds.
+    // Precision: shipping costs are entered ex VAT, so that may be rounded to
+    // the cent by the administrator. The computed costs inc VAT is rounded to
+    // the cent as well, so both
+    $shippingEx = $this->order->get_total_shipping();
+    $shippingVat = $this->order->get_shipping_tax();
+    if (!Number::isZero($shippingEx)) {
+      $description = $this->t('shipping_costs');
+    }
+    else {
+      $description = $this->t('free_shipping');
+    }
+
+    $result = array(
+        'product' => $description,
+        'unitprice' => $shippingEx,
+        'quantity' => 1,
+        'vatamount' => $shippingVat,
+      ) + $this->getVatRangeTags($shippingVat, $shippingEx);
+
+    return $result;
   }
 
   /**
    * {@inheritdoc}
-   *
-   * This override returns an empty array: WooCommerce does not know payment fee
-   * lines, i.e. it does not define a fee line specifically for this fee type.
    */
-  protected function getPaymentFeeLine() {
-    return array();
+  protected function getDiscountLines() {
+    // @todo: check for refunds.
+    $result = array();
+
+    // Add a line for all coupons applied.
+    $usedCoupons = $this->order->get_used_coupons();
+    foreach ($usedCoupons as $code) {
+      $coupon = new WC_Coupon($code);
+      $result[] = $this->getDiscountLine($this->order, $coupon);
+    }
+
+    return $result;
+  }
+
+  /**
+   * Returns 1 order discount line for 1 coupon usage.
+   *
+   * In woocommerce, discounts are implemented with coupons. Multiple coupons
+   * can be used per order. Coupons can:
+   * - have a fixed amount or a percentage.
+   * - be applied to the whole cart or only be used for a set of products.
+   *
+   * Hooray:
+   * As of WooCommerce 2.3, coupons can no longer be set as "apply after tax":
+   * https://woocommerce.wordpress.com/2014/12/12/upcoming-coupon-changes-in-woocommerce-2-3/
+   * WC_Coupon::apply_before_tax() now always returns true (and thus might be
+   * deprecated and removed in the future): do no longer use.
+   *
+   * @param WC_Abstract_Order $order
+   * @param WC_Coupon $coupon
+   *
+   * @return array
+   */
+  protected function getDiscountLine(WC_Abstract_Order $order, WC_Coupon $coupon) {
+    //@todo: test amount used < coupon amount
+    $discountAmount = $order->get_total_discount();
+
+    // Get a description for the value of this coupon.
+    if (in_array($coupon->discount_type, array('fixed_product', 'fixed_cart'))) {
+      $couponValue = '€'. number_format($coupon->coupon_amount, 2, ',', '.');
+    }
+    else {
+      $couponValue = "{$coupon->coupon_amount}%";
+    }
+
+    // Discounts are already applied, add a descriptive line with 0 amount.
+    // The VAT rate this 0 amount should be categorized under should be
+    // determined by the completor.
+    $description = $this->t('discount_code');
+    $amount = 0;
+    $vatrate = NULL;
+    $metaVatrateSource = static::VatRateSource_Completor;
+    $description .= " {$coupon->code}: $couponValue";
+
+    return array(
+      'itemnumber' => '',
+      'product' => $description,
+      'unitprice' => -$amount,
+      'vatrate' => $vatrate,
+      'meta-vatrate-source' => $metaVatrateSource,
+      'quantity' => 1,
+    );
   }
 
 }

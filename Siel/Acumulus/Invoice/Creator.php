@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\Invoice;
 
+use Exception;
 use Siel\Acumulus\Helpers\Countries;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Helpers\TranslatorInterface;
@@ -95,6 +96,10 @@ abstract class Creator {
    */
   protected function setSource($source) {
     $this->source = $source;
+    if (!in_array($source->getType(), array(Source::Order, Source::CreditNote))) {
+      $this->config->getLog()->error('Creator::setSource(): unknown source type %s', $this->source->getType());
+    };
+
   }
 
   /**
@@ -214,20 +219,45 @@ abstract class Creator {
    * @param string $property
    *
    * @return string
-   *   The value for the property of the given name.
+   *   The value for the property of the given name or the empty string if not
+   *   available.
    */
   protected function getProperty($property) {
+    $value = '';
     $order = $this->source->getSource();
     if (is_array($order)) {
-      $value = isset($order[$property])
-        ? $order[$property]
-        : '';
+      if (isset($order[$property])) {
+        $value = $order[$property];
+      }
     }
     else {
-      $method = 'get' . ucfirst($property);
-      $value =  method_exists($order, '__get') || method_exists($order, $method)
-        ? $order->$method()
-        : '';
+      if (isset($order->$property)) {
+        $value = $order->$property;
+      }
+      else if (is_callable(array($order, $property))) {
+        $value = $order->$property();
+      }
+      else {
+        $method = 'get' . ucfirst($property);
+        if (is_callable(array($order, $method))) {
+          $value = $order->$method();
+        }
+        else if (method_exists($order, '__get')) {
+          @$value = $order->$property;
+        }
+        else if (method_exists($order, '__call')) {
+          try {
+            $value = $order->$property();
+          }
+          catch (Exception $e) {}
+          if (empty($value)) {
+            try {
+              $value = $order->$method();
+            }
+            catch (Exception $e) {}
+          }
+        }
+      }
     }
     return $value;
   }
@@ -280,9 +310,9 @@ abstract class Creator {
 
     $invoiceSettings = $this->config->getShopSettings();
 
-    $invoiceNrSource = $invoiceSettings['invoiceNrSource'];
-    if ($invoiceNrSource != ShopConfigInterface::InvoiceNrSource_Acumulus) {
-      $result['number'] = $this->getInvoiceNumber($invoiceNrSource);
+    $sourceToUse = $invoiceSettings['invoiceNrSource'];
+    if ($sourceToUse != ShopConfigInterface::InvoiceNrSource_Acumulus) {
+      $result['number'] = $this->getInvoiceNumber($sourceToUse);
     }
 
     $dateToUse = $invoiceSettings['dateToUse'];
@@ -347,7 +377,9 @@ abstract class Creator {
    * @return string
    *   Date to send to Acumulus as the invoice date: yyyy-mm-dd.
    */
-  abstract protected function getInvoiceDate($dateToUse);
+  protected function getInvoiceDate($dateToUse) {
+    return $this->callSourceTypeSpecificMethod(__FUNCTION__, func_get_args());
+  }
 
   /**
    * Returns whether the order has been paid or not.
@@ -356,7 +388,9 @@ abstract class Creator {
    *   \Siel\Acumulus\Invoice\ConfigInterface::PaymentStatus_Paid or
    *   \Siel\Acumulus\Invoice\ConfigInterface::PaymentStatus_Due
    */
-  abstract protected function getPaymentState();
+  protected function getPaymentState() {
+    return $this->callSourceTypeSpecificMethod(__FUNCTION__, func_get_args());
+  }
 
   /**
    * Returns the payment date.
@@ -368,7 +402,9 @@ abstract class Creator {
    * @return string|null
    *   The payment date (yyyy-mm-dd) or null if the order has not been paid yet.
    */
-  abstract protected function getPaymentDate();
+  protected function getPaymentDate() {
+    return $this->callSourceTypeSpecificMethod(__FUNCTION__, func_get_args());
+  }
 
   /**
    * Returns the description for this invoice.
@@ -487,7 +523,9 @@ abstract class Creator {
    * @return array[]
    *  Array of item line arrays.
    */
-  abstract protected function getItemLines();
+  protected function getItemLines() {
+    return $this->callSourceTypeSpecificMethod(__FUNCTION__, func_get_args());
+  }
 
   /**
    * Returns any manual lines.
@@ -498,7 +536,9 @@ abstract class Creator {
    * @return array
    *  An array of manual line arrays, may be empty.
    */
-  abstract protected function getManualLines();
+  protected function getManualLines() {
+    return array();
+  }
 
   /**
    * Returns all the fee lines for the order.
@@ -539,7 +579,9 @@ abstract class Creator {
    * @return array
    *   A line array, empty if there is no gift wrapping fee line.
    */
-  abstract protected function getGiftWrappingLine();
+  protected function getGiftWrappingLine() {
+    return array();
+  }
 
   /**
    * Returns the shipping costs line.
@@ -550,15 +592,21 @@ abstract class Creator {
    * @return array
    *   A line array, empty if there is no shipping fee line.
    */
-  abstract protected function getShippingLine();
+  protected function getShippingLine() {
+    return $this->callSourceTypeSpecificMethod(__FUNCTION__, func_get_args());
+  }
 
   /**
    * Returns the payment fee line.
    *
+   * This base implementation returns an empty array: no payment fee line.
+   *
    * @return array
    *   A line array, empty if there is no payment fee line.
    */
-  abstract protected function getPaymentFeeLine();
+  protected function getPaymentFeeLine() {
+    return array();
+  }
 
   /**
    * Returns any applied discounts and partial payments.
@@ -566,7 +614,9 @@ abstract class Creator {
    * @return array[]
    *   An array of discount line arrays.
    */
-  abstract protected function getDiscountLines();
+  protected function getDiscountLines() {
+    return $this->callSourceTypeSpecificMethod(__FUNCTION__, func_get_args());
+  }
 
   /**
    * Adds an emailaspdf section if enabled.
@@ -761,18 +811,25 @@ abstract class Creator {
    *   1 for orders, -1 for credit notes.
    */
   protected function getSign() {
-    return (float) ($this->source->getType() === Source::Order ? 1 : -1);
+    return (float) ($this->source->getType() === Source::CreditNote ? -1 : 1);
   }
 
   /**
-   * Calls a method that typically depends on the type of invoice source.
+   * Calls a method constructed of the method name and the source type.
+   *
+   * If the implementation/override of a method depends on the type of invoice
+   * source it might be better to implement 1 method per source type. This
+   * method calls such a method assuming it is named {method}{source-type}.
+   * Example: getLineItem($line) would be very different for an order versus a
+   * credit note: do not override the base method but implement 2 new methods
+   * getLineItemOrder($line) and getLineItemCreditNote($line).
    *
    * @param string $method
    * @param array $args
    *
    * @return mixed|void
    */
-  protected function callTypeSpecificMethod($method, $args = array()) {
+  protected function callSourceTypeSpecificMethod($method, $args = array()) {
     $method .= $this->source->getType();
     return call_user_func_array(array($this, $method), $args);
   }

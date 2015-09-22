@@ -53,11 +53,11 @@ abstract class Creator {
   /** @var \Siel\Acumulus\Helpers\Countries */
   protected $countries;
 
-  /** @var array */
+  /** @var array Resulting Acumulus invoice*/
   protected $invoice = array();
 
   /** @var Source */
-  protected $source;
+  protected $invoiceSource;
 
   /**
    * Constructor.
@@ -92,12 +92,12 @@ abstract class Creator {
   /**
    * Sets the source to create the invoice for.
    *
-   * @param Source $source
+   * @param Source $invoiceSource
    */
-  protected function setSource($source) {
-    $this->source = $source;
-    if (!in_array($source->getType(), array(Source::Order, Source::CreditNote))) {
-      $this->config->getLog()->error('Creator::setSource(): unknown source type %s', $this->source->getType());
+  protected function setInvoiceSource($invoiceSource) {
+    $this->invoiceSource = $invoiceSource;
+    if (!in_array($invoiceSource->getType(), array(Source::Order, Source::CreditNote))) {
+      $this->config->getLog()->error('Creator::setSource(): unknown source type %s', $this->invoiceSource->getType());
     };
 
   }
@@ -112,7 +112,7 @@ abstract class Creator {
    *   The acumulus invoice for this order.
    */
   public function create($source) {
-    $this->setSource($source);
+    $this->setInvoiceSource($source);
     $this->invoice = array();
     $this->invoice['customer'] = $this->getCustomer();
     $this->addCustomerDefaults();
@@ -201,30 +201,47 @@ abstract class Creator {
    *   The salutation for the customer of this order.
    */
   protected function salutationMatch($matches) {
-    return $this->getProperty($matches[1]);
+    return $this->searchProperty($matches[1]);
+  }
+
+  /**
+   * Searches for a property in the various shop specific arrays and/or objects.
+   *
+   * This base implementation only looks up in the shop source object or array,
+   * but that may be insufficient if the customer data is in a separate object
+   * or array.
+   *
+   * @param string $property
+   *
+   * @return string
+   *
+   */
+  protected function searchProperty($property) {
+    return $this->getProperty($property, $this->invoiceSource->getSource());
   }
 
   /**
    * Looks up a property in the web shop specific order object/array.
    *
-   * This base implementation only looks up in the order object or array, but
-   * that may be insufficient if the customer data is in a separate object or
-   * array.
+   * This default implementation looks for the property in the following ways:
+   * If the passed parameter is an array:
+   * - looking up the property as key.
+   * If the passed parameter is an object:
+   * - Looking up the property by name (as existing property or via __get).
+   * - Calling the get{Property} getter.
+   * - Calling the {property}() method (as existing method or via __call).
    *
-   * Looking up in an object is done by calling the method "get{Property}".
-   *
-   * Override if you need to explicitly access referred objects or arrays,
-   * probably the customer object/array.
+   * Override if the property name or getter method is constructed differently.
    *
    * @param string $property
+   * @param object|array $order
    *
    * @return string
    *   The value for the property of the given name or the empty string if not
    *   available.
    */
-  protected function getProperty($property) {
+  protected function getProperty($property, $order) {
     $value = '';
-    $order = $this->source->getSource();
     if (is_array($order)) {
       if (isset($order[$property])) {
         $value = $order[$property];
@@ -248,13 +265,13 @@ abstract class Creator {
         else if (method_exists($order, '__call')) {
           try {
             $value = $order->$property();
+          } catch (Exception $e) {
           }
-          catch (Exception $e) {}
           if (empty($value)) {
             try {
               $value = $order->$method();
+            } catch (Exception $e) {
             }
-            catch (Exception $e) {}
           }
         }
       }
@@ -373,7 +390,7 @@ abstract class Creator {
    * @param int $dateToUse
    *   \Siel\Acumulus\Shop\ConfigInterface\InvoiceDate_InvoiceCreate or
    *   \Siel\Acumulus\Shop\ConfigInterface\InvoiceDate_OrderCreate
-
+   *
    * @return string
    *   Date to send to Acumulus as the invoice date: yyyy-mm-dd.
    */
@@ -415,7 +432,7 @@ abstract class Creator {
    *   Description ofr this invoice
    */
   protected function getDescription() {
-    return ucfirst($this->t($this->source->getType())) . ' ' . $this->source->getReference();
+    return ucfirst($this->t($this->invoiceSource->getType())) . ' ' . $this->invoiceSource->getReference();
   }
 
   /**
@@ -629,7 +646,7 @@ abstract class Creator {
       $this->addDefault($emailasPdf, 'emailbcc', $emailAsPdfSettings['emailBcc']);
       $this->addDefault($emailasPdf, 'emailfrom', $emailAsPdfSettings['emailFrom']);
       $this->addDefault($emailasPdf, 'subject', strtr($emailAsPdfSettings['subject'], array(
-        '[#b]' => $this->source->getReference(),
+        '[#b]' => $this->invoiceSource->getReference(),
         '[#f]' => isset($this->invoice['customer']['invoice']['number']) ? $this->invoice['customer']['invoice']['number'] : '',
       )));
       $invoice['customer']['invoice']['emailaspdf']['confirmreading'] = $emailAsPdfSettings['confirmReading'] ? ConfigInterface::ConfirmReading_Yes : ConfigInterface::ConfirmReading_No;
@@ -811,7 +828,7 @@ abstract class Creator {
    *   1 for orders, -1 for credit notes.
    */
   protected function getSign() {
-    return (float) ($this->source->getType() === Source::CreditNote ? -1 : 1);
+    return (float) ($this->invoiceSource->getType() === Source::CreditNote ? -1 : 1);
   }
 
   /**
@@ -830,7 +847,7 @@ abstract class Creator {
    * @return mixed|void
    */
   protected function callSourceTypeSpecificMethod($method, $args = array()) {
-    $method .= $this->source->getType();
+    $method .= $this->invoiceSource->getType();
     return call_user_func_array(array($this, $method), $args);
   }
 

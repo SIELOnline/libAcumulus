@@ -47,20 +47,14 @@ class FormRenderer extends BaseFormRenderer {
   /**
    * @inheritdoc
    *
-   * This override gets called directly by the WordPress function
-   * do_settings_section() which passes in an array with only the id and title
-   * (and this callback). This override:
-   * - Only renders the description as WordPress already renders the fieldset
-   *   title and such.
-   * - Instead of returning the output, it echo's the output.
+   * This override only renders the description as WordPress already renders the
+   * fieldset title and the fields.
    */
-  public function renderFieldset($section) {
+  protected function renderFieldset(array $field) {
     $output = '';
-    $field = $this->getFieldById($this->form->getFields(), $section['id']);
     if (!empty($field['description'])) {
       $output .= $this->renderDescription($field['description']);
     }
-    echo $output;
     return $output;
   }
 

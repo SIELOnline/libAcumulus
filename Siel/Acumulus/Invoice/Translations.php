@@ -13,6 +13,8 @@ class Translations extends TranslationCollection {
     Source::CreditNote => 'creditnota',
     Source::Other => 'overig',
 
+    'inc_vat' => 'incl. BTW',
+    'ex_vat' => 'excl. BTW',
     'shipping_costs' => 'Verzendkosten',
     'free_shipping' => 'Gratis verzending',
     'payment_costs' => 'Betalingskosten',
@@ -35,6 +37,8 @@ class Translations extends TranslationCollection {
     Source::CreditNote => 'credit note',
     Source::Other => 'other',
 
+    'inc_vat' => 'incl. VAT',
+    'ex_vat' => 'ex. VAT',
     'shipping_costs' => 'Shipping costs',
     'free_shipping' => 'Free shipping',
     'payment_costs' => 'Payment fee',

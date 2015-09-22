@@ -60,9 +60,9 @@ class Creator extends BaseCreator {
    * This override also initializes VM specific properties related to the
    * source.
    */
-  protected function setSource($source) {
-    parent::setSource($source);
-    $this->order = $this->source->getSource();
+  protected function setInvoiceSource($source) {
+    parent::setInvoiceSource($source);
+    $this->order = $this->invoiceSource->getSource();
     $this->orderModel = VmModel::getModel('orders');
     /** @var \TableInvoices $invoiceTable */
     if ($invoiceTable = $this->orderModel->getTable('invoices')->load($this->order['details']['BT']->virtuemart_order_id, 'virtuemart_order_id')) {
@@ -141,7 +141,7 @@ class Creator extends BaseCreator {
    * {@inheritdoc}
    */
   protected function getInvoiceNumber($invoiceNumberSource) {
-    $result = $this->source->getReference();
+    $result = $this->invoiceSource->getReference();
     if ($invoiceNumberSource == ConfigInterface::InvoiceNrSource_ShopInvoice && !empty($this->shopInvoice['invoice_number'])) {
       $result = $this->shopInvoice['invoice_number'];
     }
@@ -163,7 +163,7 @@ class Creator extends BaseCreator {
    * {@inheritdoc}
    */
   protected function getPaymentState() {
-    $order = $this->source->getSource();
+    $order = $this->invoiceSource->getSource();
     return in_array($order['details']['BT']->order_status, $this->getPaidStates())
       ? InvoiceConfigInterface::PaymentStatus_Paid
       : InvoiceConfigInterface::PaymentStatus_Due;

@@ -2,7 +2,6 @@
 namespace Siel\Acumulus\WooCommerce\Invoice;
 
 use Siel\Acumulus\Invoice\Source as BaseSource;
-use WP_Post;
 
 /**
  * Wraps a WooCommerce order in an invoice source object.
@@ -19,20 +18,9 @@ class Source extends BaseSource {
   protected $source;
 
   /**
-   * @param string $type
-   * @param int|string|\WP_Post|\WC_Order $idOrSource
+   * Loads an Order or refund source for the set id.
    */
-  public function __construct($type, $idOrSource) {
-    if ($idOrSource instanceof WP_Post) {
-      $idOrSource = $idOrSource->ID;
-    }
-    parent::__construct($type, $idOrSource);
-  }
-
-  /**
-   * Loads an Order source for the set id.
-   */
-  protected function setSourceOrder() {
+  protected function setSource() {
     $this->source = WC()->order_factory->get_order($this->id);
   }
 
@@ -47,6 +35,10 @@ class Source extends BaseSource {
    * {@inheritdoc}
    */
   public function getReference() {
+    // Method get_order_number() is used for when other plugins are installed
+    // that add an order number that differs from the ID. Known plugins that do
+    // so: woocommerce-sequential-order-numbers(-pro) and
+    // wc-sequential-order-numbers.
     return $this->source->get_order_number();
   }
 

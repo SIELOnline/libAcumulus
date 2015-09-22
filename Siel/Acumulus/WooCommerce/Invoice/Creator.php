@@ -6,7 +6,7 @@ use Siel\Acumulus\Invoice\ConfigInterface;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use WC_Abstract_Order;
 use WC_Coupon;
-use WC_Order_Refund;
+use WC_Order;
 
 /**
  * Allows to create arrays in the Acumulus invoice structure from a WordPress
@@ -16,13 +16,13 @@ class Creator extends BaseCreator {
 
   // More specifically typed property.
   /** @var Source */
-  protected $source;
+  protected $invoiceSource;
 
-  /** @var WC_Abstract_Order */
+  /** @var WC_Abstract_Order The order or refund that is sent to Acumulus. */
+  protected $shopSource;
+
+  /** @var WC_Order The order self or the order that got refunded. */
   protected $order;
-
-  /** @var WC_Order_Refund */
-  protected $creditOrder;
 
   /**
    * {@inheritdoc}
@@ -30,15 +30,16 @@ class Creator extends BaseCreator {
    * This override also initializes WooCommerce specific properties related to
    * the source.
    */
-  protected function setSource($source) {
-    parent::setSource($source);
-    switch ($this->source->getType()) {
+  protected function setInvoiceSource($invoiceSource) {
+    parent::setInvoiceSource($invoiceSource);
+    switch ($this->invoiceSource->getType()) {
       case Source::Order:
-        $this->order = $this->source->getSource();
+        $this->shopSource = $this->invoiceSource->getSource();
+        $this->order = $this->shopSource;
         break;
       case Source::CreditNote:
-        $this->order = $this->source->getSource();
-        $this->creditOrder = $this->order->getOrder();
+        $this->shopSource = $this->invoiceSource->getSource();
+        $this->order = new WC_Order($this->shopSource->post->post_parent);
         break;
     }
   }
@@ -49,7 +50,6 @@ class Creator extends BaseCreator {
   protected function getCustomer() {
     $result = array();
 
-    /** @var WC_Abstract_Order $order */
     $order = $this->order;
 
     $this->addIfNotEmpty($result, 'contactyourid', $order->customer_user);
@@ -63,7 +63,13 @@ class Creator extends BaseCreator {
     if (isset($order->billing_country)) {
       $result['countrycode'] = $order->billing_country;
     }
+    // The EU VAT Number plugin allows customers to indicate their VAT number as
+    // to apply for the reversed VAT scheme. The vat number is stored under the
+    // '_vat_number' meta key, though older versions did so under the
+    // 'VAT Number' key.
+    // See http://docs.woothemes.com/document/eu-vat-number-2/
     $this->addIfNotEmpty($result, 'vatnumber', get_post_meta($order->id, 'VAT Number', TRUE));
+    $this->addIfNotEmpty($result, 'vatnumber', get_post_meta($order->id, 'vat_number', TRUE));
     $this->addIfNotEmpty($result, 'telephone', $order->billing_phone);
     $result['email'] = $order->billing_email;
 
@@ -72,26 +78,63 @@ class Creator extends BaseCreator {
 
   /**
    * {@inheritdoc}
+   *
+   * For refunds, this override also searches in the order that gets refunded.
+   */
+  protected function searchProperty($property) {
+    $value = parent::searchProperty($property);
+    if (empty($value) && $this->invoiceSource->getType() === Source::CreditNote) {
+      // Also try the order that gets refunded.
+      $value = $this->getProperty($property, $this->order);
+    }
+    return $value;
+  }
+
+  /**
+   * {@inheritdoc}
    */
   protected function getInvoiceNumber($invoiceNumberSource) {
-    $result = $this->source->getReference();
-    return $result;
+    return $this->invoiceSource->getReference();
   }
 
   /**
-   * {@inheritdoc}
+   * Returns the date to use as invoice date for the order.
+   *
+   * param int $dateToUse
+   *   \Siel\Acumulus\Shop\ConfigInterface\InvoiceDate_InvoiceCreate or
+   *   \Siel\Acumulus\Shop\ConfigInterface\InvoiceDate_OrderCreate
+   *
+   * @return string
+   *   Date to send to Acumulus as the invoice date: yyyy-mm-dd.
    */
-  protected function getInvoiceDate($dateToUse) {
+  protected function getInvoiceDateOrder(/*$dateToUse*/) {
     // createdAt returns yyyy-mm-dd hh:mm:ss, take date part.
-    $result = date('Y-m-d', strtotime($this->order->order_date));
-    return $result;
+    return substr($this->shopSource->order_date, 0, strlen('2000-01-01'));
   }
 
   /**
-   * {@inheritdoc}
+   * Returns the date to use as invoice date for the order refund.
+   *
+   * param int $dateToUse
+   *   \Siel\Acumulus\Shop\ConfigInterface\InvoiceDate_InvoiceCreate or
+   *   \Siel\Acumulus\Shop\ConfigInterface\InvoiceDate_OrderCreate
+   *
+   * @return string
+   *   Date to send to Acumulus as the invoice date: yyyy-mm-dd.
    */
-  protected function getPaymentState() {
-    if (empty($this->order->paid_date) || $this->order->needs_payment()) {
+  protected function getInvoiceDateCreditNote(/*$dateToUse*/) {
+    return substr($this->shopSource->post->post_date, 0, strlen('2000-01-01'));
+  }
+
+  /**
+   * Returns whether the order has been paid or not.
+   *
+   * @return int
+   *   \Siel\Acumulus\Invoice\ConfigInterface::PaymentStatus_Paid or
+   *   \Siel\Acumulus\Invoice\ConfigInterface::PaymentStatus_Due
+   */
+  protected function getPaymentStateOrder() {
+    if (empty($this->shopSource->paid_date) || $this->shopSource->needs_payment()) {
       $result = ConfigInterface::PaymentStatus_Due;
     }
     else {
@@ -101,10 +144,39 @@ class Creator extends BaseCreator {
   }
 
   /**
-   * {@inheritdoc}
+   * Returns whether the order refund has been paid or not.
+   *
+   * For now we assume that a refund is paid back on creation.
+   *
+   * @return int
+   *   \Siel\Acumulus\Invoice\ConfigInterface::PaymentStatus_Paid or
+   *   \Siel\Acumulus\Invoice\ConfigInterface::PaymentStatus_Due
    */
-  protected function getPaymentDate() {
-    return date('Y-m-d', strtotime($this->order->paid_date));
+  protected function getPaymentStateCreditNote() {
+    $result = ConfigInterface::PaymentStatus_Paid;
+    return $result;
+  }
+
+  /**
+   * Returns the payment date of the order.
+   *
+   * @return string
+   *   The payment date of the order (yyyy-mm-dd).
+   */
+  protected function getPaymentDateOrder() {
+    return substr($this->shopSource->paid_date, 0, strlen('2000-01-01'));
+  }
+
+  /**
+   * Returns the payment date of the order refund.
+   *
+   * We take the last modified date as pay date.
+   *
+   * @return string
+   *   The payment date of the order refund (yyyy-mm-dd).
+   */
+  protected function getPaymentDateCreditNote() {
+    return substr($this->shopSource->post->post_modified, 0, strlen('2000-01-01'));
   }
 
   /**
@@ -114,13 +186,9 @@ class Creator extends BaseCreator {
    * meta-invoicevatamount.
    */
   protected function getInvoiceTotals() {
-    // @todo: check sign.
-    // @todo: check with display_total_ex_tax/display_cart_ex_tax = true
-    // @todo: check with price_include_tax = false (wc_prices_include_tax())
-    $sign = $this->getSign();
     return array(
-      'meta-invoiceamountinc' => $sign * $this->order->get_total(),
-      'meta-invoicevatamount' => $sign * $this->order->get_total_tax(),
+      'meta-invoiceamountinc' => $this->shopSource->get_total(),
+      'meta-invoicevatamount' => $this->shopSource->get_total_tax(),
     );
   }
 
@@ -129,8 +197,8 @@ class Creator extends BaseCreator {
    */
   protected function getItemLines() {
     $result = array();
-    foreach ($this->order->get_items() as $line) {
-      $result[] = $this->getItemLine($line, $this->order);
+    foreach ($this->shopSource->get_items() as $line) {
+      $result[] = $this->getItemLine($line, $this->shopSource);
     }
     return $result;
   }
@@ -146,12 +214,10 @@ class Creator extends BaseCreator {
   protected function getItemLine(array $item, WC_Abstract_Order $order) {
     $result = array();
 
-    $product = wc_get_product($item['variation_id'] ? $item['variation_id'] : $item['product_id']);
-    // get_item_total returns cost per item after discount, ex vat (2nd param).
-    // @todo: check/add sign for refunds
-    // Precision: one of the prices is entered by the administrator and thus can
-    // be considered exact. The computed one is not rounded, so we can assume
-    // a very high precision for all values here,
+    $isVariation = !empty($item['variation_id']);
+    $product = wc_get_product($isVariation ? $item['variation_id'] : $item['product_id']);
+    // get_item_total() returns cost per item after discount and ex vat (2nd
+    // param).
     $productPriceEx = $order->get_item_total($item, FALSE, FALSE);
     $productPriceInc = $order->get_item_total($item, TRUE, FALSE);
     // get_item_tax returns tax per item after discount.
@@ -159,6 +225,9 @@ class Creator extends BaseCreator {
 
     $this->addIfNotEmpty($result, 'itemnumber', $product->get_sku());
     $result['product'] = $item['name'];
+    if ($isVariation) {
+      $result['product'] .= ' (' . wc_get_formatted_variation($product->variation_data, TRUE) . ')';
+    }
 
     // WooCommerce does not support the margin scheme. So in a standard install
     // this method will always return false. But if this method happens to
@@ -183,6 +252,9 @@ class Creator extends BaseCreator {
     }
 
     $result['quantity'] = $item['qty'];
+    // Precision: one of the prices is entered by the administrator and thus can
+    // be considered exact. The computed one is not rounded, so we can assume a
+    // very high precision for all values here.
     $result += $this->getVatRangeTags($productVat, $productPriceEx, 0.0001, 0.0001);
 
     return $result;
@@ -195,10 +267,12 @@ class Creator extends BaseCreator {
    * add these general fees (type unknown to us)
    */
   protected function getFeeLines() {
-    // @todo: check for refunds.
     $result = parent::getFeeLines();
 
-    foreach ($this->order->get_fees() as $feeLine) {
+    // So far, all amounts found on refunds are negative, so we probably don't
+    // need to correct the sign on these lines either: but this has not been
+    // tested yet!.
+    foreach ($this->shopSource->get_fees() as $feeLine) {
       $line = $this->getFeeLine($feeLine);
       $line['meta-line-type'] = static::LineType_Other;
       $result[] = $line;
@@ -215,7 +289,6 @@ class Creator extends BaseCreator {
     $feeEx = $line['line_total'];
     $feeVat = $line['line_tax'];
 
-    // @todo: check precision
     $result = array(
         'itemnumber' => $this->t('fee_code'),
         'product' => $this->t($line['name']),
@@ -231,12 +304,11 @@ class Creator extends BaseCreator {
    * {@inheritdoc}
    */
   protected function getShippingLine() {
-    // @todo: check for refunds.
     // Precision: shipping costs are entered ex VAT, so that may be rounded to
     // the cent by the administrator. The computed costs inc VAT is rounded to
-    // the cent as well, so both
-    $shippingEx = $this->order->get_total_shipping();
-    $shippingVat = $this->order->get_shipping_tax();
+    // the cent as well, so both are to be considered precise to the cent.
+    $shippingEx = $this->shopSource->get_total_shipping();
+    $shippingVat = $this->shopSource->get_shipping_tax();
     if (!Number::isZero($shippingEx)) {
       $description = $this->t('shipping_costs');
     }
@@ -258,14 +330,14 @@ class Creator extends BaseCreator {
    * {@inheritdoc}
    */
   protected function getDiscountLines() {
-    // @todo: check for refunds.
     $result = array();
 
-    // Add a line for all coupons applied.
+    // Add a line for all coupons applied. Coupons are only stored on the order,
+    // not on refunds, so use the order property.
     $usedCoupons = $this->order->get_used_coupons();
     foreach ($usedCoupons as $code) {
       $coupon = new WC_Coupon($code);
-      $result[] = $this->getDiscountLine($this->order, $coupon);
+      $result[] = $this->getDiscountLine($coupon);
     }
 
     return $result;
@@ -285,31 +357,40 @@ class Creator extends BaseCreator {
    * WC_Coupon::apply_before_tax() now always returns true (and thus might be
    * deprecated and removed in the future): do no longer use.
    *
-   * @param WC_Abstract_Order $order
    * @param WC_Coupon $coupon
    *
    * @return array
    */
-  protected function getDiscountLine(WC_Abstract_Order $order, WC_Coupon $coupon) {
-    //@todo: test amount used < coupon amount
-    $discountAmount = $order->get_total_discount();
-
+  protected function getDiscountLine(WC_Coupon $coupon) {
     // Get a description for the value of this coupon.
+    // Entered discount amounts follow the wc_prices_include_tax() setting. Use
+    // that info in the description.
+    $description = sprintf('%s %s: ', $this->t('discount_code'), $coupon->code);
     if (in_array($coupon->discount_type, array('fixed_product', 'fixed_cart'))) {
-      $couponValue = '€'. number_format($coupon->coupon_amount, 2, ',', '.');
+      $amount = $this->getSign() * $coupon->coupon_amount;
+      if (!Number::isZero($amount)) {
+        $description .= sprintf('€%.2f (%s)', $amount, wc_prices_include_tax() ? $this->t('inc_vat') : $this->t('ex_vat'));
+      }
+      if ($coupon->enable_free_shipping()) {
+        if (!Number::isZero($amount)) {
+          $description .= ' + ';
+        }
+        $description .= $this->t('free_shipping');
+      }
     }
     else {
-      $couponValue = "{$coupon->coupon_amount}%";
+      $description = sprintf('%f%%', $coupon->coupon_amount);
+      if ($coupon->enable_free_shipping()) {
+        $description .= ' + ' . $this->t('free_shipping');
+      }
     }
 
     // Discounts are already applied, add a descriptive line with 0 amount.
-    // The VAT rate this 0 amount should be categorized under should be
-    // determined by the completor.
-    $description = $this->t('discount_code');
+    // The VAT rate to categorize this line under should be determined by the
+    // completor.
     $amount = 0;
     $vatrate = NULL;
     $metaVatrateSource = static::VatRateSource_Completor;
-    $description .= " {$coupon->code}: $couponValue";
 
     return array(
       'itemnumber' => '',

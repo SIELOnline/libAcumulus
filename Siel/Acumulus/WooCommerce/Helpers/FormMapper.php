@@ -45,6 +45,12 @@ class FormMapper {
       if (!isset($field['name'])) {
         $field['name'] = $id;
       }
+      if (!isset($field['attributes'])) {
+        $field['attributes'] = array();
+      }
+      if (!isset($field['label'])) {
+        $field['label'] = '';
+      }
       $this->field($field, $section);
     }
   }
@@ -58,12 +64,11 @@ class FormMapper {
    *   The section this item (if it is a field) should be added to.
    */
   protected function field(array $field, $section) {
-    if (!isset($field['attributes'])) {
-      $field['attributes'] = array();
-    }
     if ($field['type'] === 'fieldset') {
-      // @toso: use an anonymous function with use to pass $field ...
-      add_settings_section($field['id'], $field['legend'], array($this->formRenderer, 'renderFieldset'), $this->page);
+      $renderer = $this->formRenderer;
+      add_settings_section($field['id'], $field['legend'], function () use ($renderer, $field) {
+        $renderer->field($field);
+      }, $this->page);
       $this->fields($field['fields'], $field['id']);
     }
     else {

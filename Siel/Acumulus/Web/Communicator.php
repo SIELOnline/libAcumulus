@@ -89,7 +89,7 @@ class Communicator {
       $message = array_merge(array(
         'contract' => $this->config->getCredentials(),
         'format' => $this->config->getOutputFormat(),
-        'testmode' => $this->config->getDebug() == ConfigInterface::Debug_TestMode ? ConfigInterface::TestMode_Test : ConfigInterface::TestMode_Normal,
+        'testmode' => $this->config->getDebug() === ConfigInterface::Debug_TestMode ? ConfigInterface::TestMode_Test : ConfigInterface::TestMode_Normal,
         'connector' => array(
           'application' => "{$env['shopName']} {$env['shopVersion']}",
           'webkoppel' => "Acumulus {$env['moduleVersion']}",

@@ -36,22 +36,58 @@ class InvoiceManager extends BaseInvoiceManager {
 
   /**
    * {@inheritdoc}
+   *
+   * We support:
+   * - "WooCommerce Sequential Order Numbers (Pro)", see
+   *   https://wordpress.org/plugins/woocommerce-sequential-order-numbers/ and
+   *   http://docs.woothemes.com/document/sequential-order-numbers/.
+   * - "WC Sequential Order Numbers", see
+   *   https://wordpress.org/plugins/wc-sequential-order-numbers/ and
+   *   http://plugins.dualcube.com/product/wc-sequential-order-numbers/.
+   *
+   * If you know of other plugins, please let us know.
    */
   public function getInvoiceSourcesByReferenceRange($invoiceSourceType, $InvoiceSourceReferenceFrom, $InvoiceSourceReferenceTo) {
     // To be able to define the query we need to know under which meta key the
-    // order number/reference is stored. We support the "WooCommerce Sequential
-    // Order Numbers (Pro)" plugins. If you know of other plugins that use
-    // another key, please let us know.
-    // @todo: test this with the free version.
-    if (is_plugin_active('woocommerce-sequential-order-numbers') || is_plugin_active('woocommerce-sequential-order-numbers-pro')) {
+    // order number/reference is stored.
+    // - WooCommerce Sequential Order Numbers (Pro) uses the key order_number.
+    // - WC Sequential Order Numbers uses the keys order_number_formatted and
+    //   order_number.
+    // Both only work with orders, not refunds.
+    if ((is_plugin_active('woocommerce-sequential-order-numbers/woocommerce-sequential-order-numbers.php') || is_plugin_active('woocommerce-sequential-order-numbers-pro/woocommerce-sequential-order-numbers-pro.php')) && $invoiceSourceType === Source::Order) {
       // Search for the order by the order number as assigned by the plugin.
       $args = array(
         'numberposts' => -1,
         'post_type'  => $this->sourceTypeToShopType($invoiceSourceType),
         'post_status' => 'publish',
+        'fields'      => 'ids',
         'meta_query' => array(
           array(
-            'key' => 'order_number',
+            'key' => '_order_number',
+            'value' => array($InvoiceSourceReferenceFrom, $InvoiceSourceReferenceTo),
+            'compare' => 'BETWEEN',
+          ),
+        ),
+      );
+      $query = new WP_Query($args);
+      $posts = $query->get_posts();
+      sort($posts);
+      return Source::invoiceSourceIdsToSources($invoiceSourceType, $posts);
+    }
+    else if (is_plugin_active('wc-sequential-order-numbers/Sequential_Order_Numbers.php') && $invoiceSourceType === Source::Order) {
+      // This plugin has not been tested yet. It will probably give problems as
+      // on installing it does not add the used meta keys retrospectively. So
+      // I think this will only work for orders added after installation of this
+      // plugin. But then, that is a bit the nature of the idea of sequential
+      // order numbers: it should be used as of the beginning...
+      $args = array(
+        'numberposts' => -1,
+        'post_type'  => $this->sourceTypeToShopType($invoiceSourceType),
+        'post_status' => 'publish',
+        'fields'      => 'ids',
+        'meta_query' => array(
+          array(
+            'key' => '_order_number_formatted',
             'value' => array($InvoiceSourceReferenceFrom, $InvoiceSourceReferenceTo),
             'compare' => 'BETWEEN',
           ),

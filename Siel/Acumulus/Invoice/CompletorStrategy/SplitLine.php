@@ -32,7 +32,7 @@ use Siel\Acumulus\Invoice\Creator;
  * implements this, we start with the maximum rate (this is used by most shops)
  * followed by the minimum rate but only if it is the key component.
  *
- * Possible improvements (@todo):
+ * Possible improvements:
  * - Instead of restricting us to vat rates that already appear on the invoice,
  *   we could also look at the possible vat rates that are part of the vat type
  *   for the invoice (given that the vat type has 2 vat rates).

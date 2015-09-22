@@ -152,7 +152,7 @@ abstract class InvoiceManager {
    * @param mixed $newStatus
    *   The new status of the invoice source. May be left out in which case a
    *   comparison based on trigger event and status is not performed. This is
-   *   used to send credit notes to acumulus.
+   *   normally used to send credit notes to acumulus.
    *
    * @return int
    *   Status, one of the WebConfigInterface::Status_ constants

@@ -21,7 +21,7 @@ class Creator extends BaseCreator {
 
   // More specifically typed property.
   /** @var Source */
-  protected $source;
+  protected $invoiceSource;
 
   /** @var Order */
   protected $order;
@@ -35,14 +35,14 @@ class Creator extends BaseCreator {
    * This override also initializes WooCommerce specific properties related to
    * the source.
    */
-  protected function setSource($source) {
-    parent::setSource($source);
-    switch ($this->source->getType()) {
+  protected function setInvoiceSource($invoiceSource) {
+    parent::setInvoiceSource($invoiceSource);
+    switch ($this->invoiceSource->getType()) {
       case Source::Order:
-        $this->order = $this->source->getSource();
+        $this->order = $this->invoiceSource->getSource();
         break;
       case Source::CreditNote:
-        $this->creditSlip = $this->source->getSource();
+        $this->creditSlip = $this->invoiceSource->getSource();
         $this->order = new Order($this->creditSlip->id_order);
         break;
     }
@@ -52,7 +52,7 @@ class Creator extends BaseCreator {
    * {@inheritdoc}
    */
   protected function getCustomer() {
-    $customer = new Customer($this->source->getSource()->id_customer);
+    $customer = new Customer($this->invoiceSource->getSource()->id_customer);
     $invoiceAddress = new Address($this->order->id_address_invoice);
 
     $result = array();
@@ -81,8 +81,8 @@ class Creator extends BaseCreator {
    * {@inheritdoc}
    */
   protected function getInvoiceNumber($invoiceNumberSource) {
-    $result = $this->source->getReference();
-    if ($invoiceNumberSource === ShopConfigInterface::InvoiceNrSource_ShopInvoice && $this->source->getType() === Source::Order && !empty($this->order->invoice_number)) {
+    $result = $this->invoiceSource->getReference();
+    if ($invoiceNumberSource === ShopConfigInterface::InvoiceNrSource_ShopInvoice && $this->invoiceSource->getType() === Source::Order && !empty($this->order->invoice_number)) {
       $result = Configuration::get('PS_INVOICE_PREFIX', (int) $this->order->id_lang, NULL, $this->order->id_shop) . sprintf('%06d', $this->order->invoice_number);
     }
     return $result;
@@ -92,10 +92,10 @@ class Creator extends BaseCreator {
    * {@inheritdoc}
    */
   protected function getInvoiceDate($dateToUse) {
-    $result = date('Y-m-d', strtotime($this->source->getSource()->date_add));
+    $result = date('Y-m-d', strtotime($this->invoiceSource->getSource()->date_add));
     // Invoice_date is filled with "0000-00-00 00:00:00", so use invoice
     // number instead to check for empty.
-    if ($dateToUse == ShopConfigInterface::InvoiceDate_InvoiceCreate && $this->source->getType() === Source::Order && !empty($this->order->invoice_number)) {
+    if ($dateToUse == ShopConfigInterface::InvoiceDate_InvoiceCreate && $this->invoiceSource->getType() === Source::Order && !empty($this->order->invoice_number)) {
       $result = date('Y-m-d', strtotime($this->order->invoice_date));
     }
     return $result;
@@ -105,7 +105,7 @@ class Creator extends BaseCreator {
    * {@inheritdoc}
    */
   protected function getPaymentState() {
-    if (($this->source->getType() === Source::Order && $this->order->hasBeenPaid()) || $this->source->getType() === Source::CreditNote) {
+    if (($this->invoiceSource->getType() === Source::Order && $this->order->hasBeenPaid()) || $this->invoiceSource->getType() === Source::CreditNote) {
       // Assumption: credit slips are always in a paid state.
       $result = ConfigInterface::PaymentStatus_Paid;
     }
@@ -119,7 +119,7 @@ class Creator extends BaseCreator {
    * {@inheritdoc}
    */
   protected function getPaymentDate() {
-    if ($this->source->getType() === Source::Order) {
+    if ($this->invoiceSource->getType() === Source::Order) {
       $paymentDate = NULL;
       foreach ($this->order->getOrderPaymentCollection() as $payment) {
         /** @var OrderPayment $payment */
@@ -145,7 +145,7 @@ class Creator extends BaseCreator {
   protected function getInvoiceTotals() {
     // @todo: test (a.o. sign of numbers in db).
     $sign = $this->getSign();
-    if ($this->source->getType() === Source::Order) {
+    if ($this->invoiceSource->getType() === Source::Order) {
       $amount = $this->order->getTotalProductsWithoutTaxes()
         + $this->order->total_shipping_tax_excl
         + $this->order->total_wrapping_tax_excl
@@ -173,9 +173,9 @@ class Creator extends BaseCreator {
    */
   protected function getItemLines() {
     $result = array();
-    $lines = $this->source->getType() === Source::Order
+    $lines = $this->invoiceSource->getType() === Source::Order
       ? $this->order->getProductsDetail()
-      : $this->creditSlip->getOrdersSlipProducts($this->source->getId(), $this->order);
+      : $this->creditSlip->getOrdersSlipProducts($this->invoiceSource->getId(), $this->order);
     foreach ($lines as $line) {
       $result[] = $this->getItemLine($line);
     }
@@ -233,10 +233,10 @@ class Creator extends BaseCreator {
   protected function getShippingLine() {
     $result = array();
 
-    if (!Number::isZero($this->source->getSource()->total_shipping_tax_incl)) {
+    if (!Number::isZero($this->invoiceSource->getSource()->total_shipping_tax_incl)) {
       // @todo: check necessity of sign.
-      $shippingEx = $this->getSign() * $this->source->getSource()->total_shipping_tax_excl;
-      $shippingInc = $this->getSign() * $this->source->getSource()->total_shipping_tax_incl;
+      $shippingEx = $this->getSign() * $this->invoiceSource->getSource()->total_shipping_tax_excl;
+      $shippingInc = $this->getSign() * $this->invoiceSource->getSource()->total_shipping_tax_incl;
       $shippingVat = $shippingInc - $shippingEx;
       $result = array(
           'product' => $this->t('shipping_costs'),
@@ -307,7 +307,7 @@ class Creator extends BaseCreator {
    */
   protected function getGiftWrappingLine() {
     $result = array();
-    if ($this->source->getType() === Source::Order && $this->order->gift && !Number::isZero($this->order->total_wrapping_tax_incl)) {
+    if ($this->invoiceSource->getType() === Source::Order && $this->order->gift && !Number::isZero($this->order->total_wrapping_tax_incl)) {
       $wrappingEx = $this->order->total_wrapping_tax_excl;
       $wrappingInc = $this->order->total_wrapping_tax_incl;
       $wrappingVat = $wrappingInc - $wrappingEx;

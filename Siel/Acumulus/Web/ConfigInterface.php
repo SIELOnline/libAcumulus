@@ -107,18 +107,6 @@ interface ConfigInterface {
    */
   public function getEnvironment();
 
-  /*
-   *  @todo: what is this?
-   *
-   * Allows the host environment to supply a log sink.
-   *
-   * Strictly speaking,this is no configuration thing, but as doing it this way,
-   * allows the host environment to define the log sink (file, db table, etc),
-   * it gives some flexibility to the communication part.
-   *
-   * @param string $message
-   */
-
   /**
    * @return \Siel\Acumulus\Helpers\Log
    */

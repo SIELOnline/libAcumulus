@@ -48,15 +48,15 @@ class Creator extends BaseCreator {
    * This override also initializes Magento specific properties related to the
    * source.
    */
-  protected function setSource($source) {
-    parent::setSource($source);
-    switch ($this->source->getType()) {
+  protected function setInvoiceSource($source) {
+    parent::setInvoiceSource($source);
+    switch ($this->invoiceSource->getType()) {
       case Source::Order:
-        $this->order = $this->source->getSource();
+        $this->order = $this->invoiceSource->getSource();
         $this->creditNote = NULL;
         break;
       case Source::CreditNote:
-        $this->creditNote = $this->source->getSource();
+        $this->creditNote = $this->invoiceSource->getSource();
         $this->order = $this->creditNote->getOrder();
         break;
     }
@@ -106,8 +106,8 @@ class Creator extends BaseCreator {
    * {@inheritdoc}
    */
   protected function getInvoiceNumber($invoiceNumberSource) {
-    $result = $this->source->getReference();
-    if ($invoiceNumberSource == ConfigInterface::InvoiceNrSource_ShopInvoice && $this->source->getType() === Source::Order && $this->shopInvoice !== NULL) {
+    $result = $this->invoiceSource->getReference();
+    if ($invoiceNumberSource == ConfigInterface::InvoiceNrSource_ShopInvoice && $this->invoiceSource->getType() === Source::Order && $this->shopInvoice !== NULL) {
       $result = $this->shopInvoice->getIncrementId();
     }
     return $result;
@@ -118,9 +118,9 @@ class Creator extends BaseCreator {
    */
   protected function getInvoiceDate($dateToUse) {
     // createdAt returns yyyy-mm-dd hh:mm:ss, take date part.
-    $result = substr($this->source->getSource()->getCreatedAt(), 0, strlen('yyyy-mm-dd'));
+    $result = substr($this->invoiceSource->getSource()->getCreatedAt(), 0, strlen('yyyy-mm-dd'));
     // A credit note is to be considered an invoice on its own.
-    if ($dateToUse == ConfigInterface::InvoiceDate_InvoiceCreate && $this->source->getType() === Source::Order && $this->shopInvoice !== NULL) {
+    if ($dateToUse == ConfigInterface::InvoiceDate_InvoiceCreate && $this->invoiceSource->getType() === Source::Order && $this->shopInvoice !== NULL) {
       $result = substr($this->shopInvoice->getCreatedAt(), 0, strlen('yyyy-mm-dd'));
     }
     return $result;
@@ -161,10 +161,10 @@ class Creator extends BaseCreator {
    * meta-invoicevatamount.
    */
   protected function getInvoiceTotals() {
-    $sign = $this->source->getType() === Source::CreditNote ? -1.0 : 1.0;
+    $sign = $this->invoiceSource->getType() === Source::CreditNote ? -1.0 : 1.0;
     return array(
-      'meta-invoiceamountinc' => $sign * $this->source->getSource()->getBaseGrandTotal(),
-      'meta-invoicevatamount' => $sign * $this->source->getSource()->getBaseTaxAmount(),
+      'meta-invoiceamountinc' => $sign * $this->invoiceSource->getSource()->getBaseGrandTotal(),
+      'meta-invoicevatamount' => $sign * $this->invoiceSource->getSource()->getBaseTaxAmount(),
     );
   }
 
@@ -353,7 +353,7 @@ class Creator extends BaseCreator {
     // - getShippingInclTax():        shipping costs incl VAT excl any discount
     // - getShippingTaxAmount():      VAT on shipping costs incl discount
     // - getShippingDiscountAmount(): discount on shipping incl VAT
-    $magentoSource = $this->source->getSource();
+    $magentoSource = $this->invoiceSource->getSource();
     if (!Number::isZero($magentoSource->getShippingAmount())) {
       // We have 2 ways of calculating the vat rate: first one is based on tax
       // amount and normal shipping costs corrected with any discount (as the
@@ -364,7 +364,7 @@ class Creator extends BaseCreator {
       // Get range based on normal shipping costs incl and excl VAT.
       $sign = $this->getSign();
       $shippingVat = $sign * $magentoSource->getShippingTaxAmount();
-      if ($this->source->getType() === Source::Order && !Number::isZero($magentoSource->getShippingDiscountAmount())) {
+      if ($this->invoiceSource->getType() === Source::Order && !Number::isZero($magentoSource->getShippingDiscountAmount())) {
         $shippingInc = $sign * ($magentoSource->getShippingInclTax() - $magentoSource->getShippingDiscountAmount());
         $shippingEx = $shippingInc - $shippingVat;
       }
@@ -395,7 +395,7 @@ class Creator extends BaseCreator {
     }
     // Only add a free shipping line on an order, not on a credit note: free
     // shipping is never refunded...
-    else if ($this->source->getType() === Source::Order) {
+    else if ($this->invoiceSource->getType() === Source::Order) {
       // Free shipping should get a "normal" tax rate. We leave that to the
       // completor to determine.
       $result += array(
@@ -421,7 +421,7 @@ class Creator extends BaseCreator {
    */
   protected function getDiscountLines() {
     $result = array();
-    if (!Number::isZero($this->source->getSource()->getDiscountAmount())) {
+    if (!Number::isZero($this->invoiceSource->getSource()->getDiscountAmount())) {
       $line = array(
         'itemnumber' => '',
         'product' => $this->getDiscountDescription(),
@@ -432,10 +432,10 @@ class Creator extends BaseCreator {
       );
       // Product prices incl. VAT => discount amount is also incl. VAT
       if ($this->productPricesIncludeTax()) {
-        $line['unitpriceinc'] = $this->getSign() * $this->source->getSource()->getDiscountAmount();
+        $line['unitpriceinc'] = $this->getSign() * $this->invoiceSource->getSource()->getDiscountAmount();
       }
       else {
-        $line['unitprice'] = $this->getSign() * $this->source->getSource()->getDiscountAmount();
+        $line['unitprice'] = $this->getSign() * $this->invoiceSource->getSource()->getDiscountAmount();
       }
       $result[] = $line;
     }
@@ -465,9 +465,9 @@ class Creator extends BaseCreator {
    */
   protected function getPaymentFeeLine() {
     $result = array();
-    $paymentFeeAmount = $this->getSign() * (float) $this->source->getSource()->getPaymentchargeAmount();
+    $paymentFeeAmount = $this->getSign() * (float) $this->invoiceSource->getSource()->getPaymentchargeAmount();
     if (!Number::isZero($paymentFeeAmount)) {
-      $paymentFeeTax = $this->getSign() * $this->source->getSource()->getPaymentchargeTaxAmount();
+      $paymentFeeTax = $this->getSign() * $this->invoiceSource->getSource()->getPaymentchargeTaxAmount();
       if ($this->productPricesIncludeTax()) {
         // Product prices incl. VAT => payment charges are also incl. VAT.
         $paymentFeeAmount -= $paymentFeeTax;

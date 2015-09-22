@@ -135,7 +135,7 @@ class FormRenderer {
    * @return string
    *   The rendered fieldset.
    */
-  protected function renderFieldset($field) {
+  protected function renderFieldset(array $field) {
     $output = '';
     $output .= $this->fieldsetBegin($field);
     $output .= $this->fields($field['fields']);
@@ -183,7 +183,7 @@ class FormRenderer {
    * @return string
    *   Html for this form field.
    */
-  protected function renderField($field) {
+  protected function renderField(array $field) {
     $type = $field['type'];
     $name = $field['name'];
     $label = isset($field['label']) ? $field['label'] : '';
@@ -222,7 +222,7 @@ class FormRenderer {
    *
    * @return string
    */
-  protected function renderElement($type, $name, $value, array $attributes = array(), $options = array()) {
+  protected function renderElement($type, $name, $value, array $attributes = array(), array $options = array()) {
     switch ($type) {
       case 'textarea':
         return $this->textarea($name, $value, $attributes);

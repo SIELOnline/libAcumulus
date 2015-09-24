@@ -52,6 +52,7 @@ class Creator extends BaseCreator {
    * {@inheritdoc}
    */
   protected function getCustomer() {
+    // @todo: test this for credit slips.
     $customer = new Customer($this->invoiceSource->getSource()->id_customer);
     $invoiceAddress = new Address($this->order->id_address_invoice);
 
@@ -77,10 +78,25 @@ class Creator extends BaseCreator {
     return $result;
   }
 
+  protected function searchProperty($property) {
+    $invoiceAddress = new Address($this->order->id_address_invoice);
+    $value = $this->getProperty($property, $invoiceAddress);
+    if (empty($value)) {
+      $customer = new Customer($this->invoiceSource->getSource()->id_customer);
+      $value = $this->getProperty($property, $customer);
+    }
+    if (empty($value)) {
+      $value = parent::searchProperty($property);
+    }
+    return $value;
+  }
+
+
   /**
    * {@inheritdoc}
    */
   protected function getInvoiceNumber($invoiceNumberSource) {
+    // @todo: test this for credit slips
     $result = $this->invoiceSource->getReference();
     if ($invoiceNumberSource === ShopConfigInterface::InvoiceNrSource_ShopInvoice && $this->invoiceSource->getType() === Source::Order && !empty($this->order->invoice_number)) {
       $result = Configuration::get('PS_INVOICE_PREFIX', (int) $this->order->id_lang, NULL, $this->order->id_shop) . sprintf('%06d', $this->order->invoice_number);
@@ -92,11 +108,12 @@ class Creator extends BaseCreator {
    * {@inheritdoc}
    */
   protected function getInvoiceDate($dateToUse) {
-    $result = date('Y-m-d', strtotime($this->invoiceSource->getSource()->date_add));
+    // @todo: test this for credit slips
+    $result = substr($this->invoiceSource->getSource()->date_add, 0, strlen('2000-01-01'));
     // Invoice_date is filled with "0000-00-00 00:00:00", so use invoice
     // number instead to check for empty.
     if ($dateToUse == ShopConfigInterface::InvoiceDate_InvoiceCreate && $this->invoiceSource->getType() === Source::Order && !empty($this->order->invoice_number)) {
-      $result = date('Y-m-d', strtotime($this->order->invoice_date));
+      $result = substr($this->order->invoice_date, 0, strlen('2000-01-01'));
     }
     return $result;
   }
@@ -105,8 +122,9 @@ class Creator extends BaseCreator {
    * {@inheritdoc}
    */
   protected function getPaymentState() {
+    // @todo: test this for credit slips
+    // Assumption: credit slips are always in a paid state.
     if (($this->invoiceSource->getType() === Source::Order && $this->order->hasBeenPaid()) || $this->invoiceSource->getType() === Source::CreditNote) {
-      // Assumption: credit slips are always in a paid state.
       $result = ConfigInterface::PaymentStatus_Paid;
     }
     else {
@@ -119,6 +137,7 @@ class Creator extends BaseCreator {
    * {@inheritdoc}
    */
   protected function getPaymentDate() {
+    // @todo: test this for credit slips
     if ($this->invoiceSource->getType() === Source::Order) {
       $paymentDate = NULL;
       foreach ($this->order->getOrderPaymentCollection() as $payment) {
@@ -129,10 +148,11 @@ class Creator extends BaseCreator {
       }
     }
     else {
-      $paymentDate = $this->creditSlip->date_add;
+      // Assumption: last modified date is date of actual reimbursement.
+      $paymentDate = $this->creditSlip->date_upd;
     }
 
-    $result = $paymentDate ? date('Y-m-d', strtotime($paymentDate)) : NULL;
+    $result = $paymentDate ? substr($paymentDate, 0, strlen('2000-01-01')) : NULL;
     return $result;
   }
 
@@ -143,7 +163,7 @@ class Creator extends BaseCreator {
    * meta-invoiceamount.
    */
   protected function getInvoiceTotals() {
-    // @todo: test (a.o. sign of numbers in db).
+    // @todo: test this for credit slips
     $sign = $this->getSign();
     if ($this->invoiceSource->getType() === Source::Order) {
       $amount = $this->order->getTotalProductsWithoutTaxes()
@@ -173,11 +193,38 @@ class Creator extends BaseCreator {
    */
   protected function getItemLines() {
     $result = array();
-    $lines = $this->invoiceSource->getType() === Source::Order
-      ? $this->order->getProductsDetail()
-      : $this->creditSlip->getOrdersSlipProducts($this->invoiceSource->getId(), $this->order);
+    if ($this->invoiceSource->getType() === Source::Order) {
+      $lines = $this->mergeProductLines($this->order->getProductsDetail(), $this->order->getOrderDetailTaxes());
+    }
+    else {
+      $lines = $this->creditSlip->getOrdersSlipProducts($this->invoiceSource->getId(), $this->order);
+    }
+
     foreach ($lines as $line) {
       $result[] = $this->getItemLine($line);
+    }
+    return $result;
+  }
+
+  /**
+   * Merges the product and tax details arrays.
+   *
+   * @param array $productLines
+   * @param array $taxLines
+   *
+   * @return array
+   */
+  public function mergeProductLines(array $productLines, array $taxLines) {
+    $result = array();
+    // Key the product lines on id_order_detail, so we can easily add the tax
+    // lines in the 2nd loop.
+    foreach ($productLines as $productLine) {
+      $result[$productLine['id_order_detail']] = $productLine;
+    }
+    // Add the tax lines without overwriting existing entries (though in a
+    // consistent db the same keys should contain the same values).
+    foreach ($taxLines as $taxLine) {
+      $result[$taxLine['id_order_detail']] += $taxLine;
     }
     return $result;
   }
@@ -186,18 +233,19 @@ class Creator extends BaseCreator {
    * Returns 1 item line, both for an order or credit slip.
    *
    * @param array $item
-   *   An OrderDetail array, merged (and overwritten) with an OrderSlipDetail
-   *   array if we are processing a credit slip.
+   *   An array of an OrderDetail line combined with a tax detail line.
+   *   @todo: describe orderslip detail
    *
    * @return array
    */
   protected function getItemLine(array $item) {
-    // @todo: test (a.o. sign of numbers in db).
+    // @todo: test this for credit slips
     $result = array();
     $sign = $this->getSign();
 
     $this->addIfNotEmpty($result, 'itemnumber', $item['product_upc']);
     $this->addIfNotEmpty($result, 'itemnumber', $item['product_ean13']);
+    $this->addIfNotEmpty($result, 'itemnumber', $item['product_supplier_reference']);
     $this->addIfNotEmpty($result, 'itemnumber', $item['product_reference']);
     $result['product'] = $item['product_name'];
 
@@ -205,23 +253,25 @@ class Creator extends BaseCreator {
     // this method will always return false. But if this method happens to
     // return true anyway (customisation, hook), the costprice will trigger
     // vattype = 5 for Acumulus.
-    if ($this->allowMarginScheme() && !empty($item['wholesale_price'])) {
+    if ($this->allowMarginScheme() && !empty($item['purchase_supplier_price'])) {
       // Margin scheme:
       // - Do not put VAT on invoice: send price incl VAT as unitprice.
       // - But still send the VAT rate to Acumulus.
       $result['unitprice'] = $sign * $item['unit_price_tax_incl'];
       // Costprice > 0 is the trigger for Acumulus to use the margin scheme.
-      $result['costprice'] = $sign * $item['wholesale_price'];
+      $result['costprice'] = $sign * $item['purchase_supplier_price'];
     }
     else {
       // Unit price is without VAT, so use product_price, not product_price_wt.
       $result['unitprice'] = $sign * $item['unit_price_tax_excl'];
-      $result['unitpriceinc'] = $sign * $item['unit_price_tax_excl'];
+      $result['unitpriceinc'] = $sign * $item['unit_price_tax_incl'];
       $result['meta-lineprice'] = $sign * $item['total_price_tax_excl'];
       $result['meta-linepriceinc'] = $sign * $item['total_price_tax_incl'];
     }
     $result['quantity'] = $item['product_quantity'];
-    $result['vatrate'] = $item['tax_rate'];
+    $result['vatamount'] = $item['unit_amount'];
+    $result['meta-linevatamount'] = $item['total_amount'];
+    $result['vatrate'] = $item['rate'];
     $result['meta-vatrate-source'] = Creator::VatRateSource_Exact;
 
     return $result;
@@ -231,10 +281,11 @@ class Creator extends BaseCreator {
    * {@inheritdoc}
    */
   protected function getShippingLine() {
+    // @todo: test this for credit slips
     $result = array();
 
+    // @todo: can we add a free shipping line? (but distinguish from shop pick up (probably id_carrier = 1, or better id_carrier with name = "0"
     if (!Number::isZero($this->invoiceSource->getSource()->total_shipping_tax_incl)) {
-      // @todo: check necessity of sign.
       $shippingEx = $this->getSign() * $this->invoiceSource->getSource()->total_shipping_tax_excl;
       $shippingInc = $this->getSign() * $this->invoiceSource->getSource()->total_shipping_tax_incl;
       $shippingVat = $shippingInc - $shippingEx;
@@ -243,7 +294,6 @@ class Creator extends BaseCreator {
           'unitprice' => $shippingEx,
           'unitpriceinc' => $shippingInc,
           'quantity' => 1,
-          // @todo: check precision.
         ) + $this->getVatRangeTags($shippingVat, $shippingEx, 0.02);
     }
 
@@ -256,6 +306,7 @@ class Creator extends BaseCreator {
    * @return array[]
    */
   protected function getDiscountLinesOrder() {
+    // @todo: test this
     $result = array();
 
     foreach ($this->order->getCartRules() as $line) {
@@ -276,16 +327,20 @@ class Creator extends BaseCreator {
    * @return array
    */
   protected function getDiscountLineOrder(array $line) {
-    $discountInc = $line['value'];
-    $discountEx = $line['value_tax_excl'];
+    // @todo: test this for credit slips
+    $discountInc = -$line['value'];
+    $discountEx = -$line['value_tax_excl'];
     $discountVat = $discountInc - $discountEx;
     return array(
       'itemnumber' => $line['id_cart_rule'],
       'product' => $this->t('discount_code') . ' ' . $line['name'],
-      'unitprice' => -$discountEx,
-      'unitpriceinc' => -$discountInc,
+      'unitprice' => $discountEx,
+      'unitpriceinc' => $discountInc,
       'quantity' => 1,
-      // @todo: check precision.
+      // Assuming that the fixed discount amount was entered:
+      // - including VAT, the precision would be 0.01, 0.01.
+      // - excluding VAT, the precision would be 0.01, 0
+      // However, for a % discount, it will be: 0.02, 0.01, so use this.
     ) + $this->getVatRangeTags($discountVat, $discountEx, 0.02);
   }
 
@@ -306,6 +361,7 @@ class Creator extends BaseCreator {
    * fee type.
    */
   protected function getGiftWrappingLine() {
+    // @todo: test this for credit slips
     $result = array();
     if ($this->invoiceSource->getType() === Source::Order && $this->order->gift && !Number::isZero($this->order->total_wrapping_tax_incl)) {
       $wrappingEx = $this->order->total_wrapping_tax_excl;
@@ -315,7 +371,6 @@ class Creator extends BaseCreator {
         'product' => $this->t('gift_wrapping'),
         'unitprice' => $wrappingEx,
         'quantity' => 1,
-          // @todo: check precision.
         ) + $this->getVatRangeTags($wrappingVat, $wrappingEx, 0.02);
     }
     return $result;

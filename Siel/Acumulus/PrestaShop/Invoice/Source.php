@@ -15,10 +15,10 @@ class Source extends BaseSource {
   protected $source;
 
   /**
-   * Loads an Order source for the set id.
+   * {@inheritdoc}
    */
-  protected function setSourceOrder() {
-    $this->source = new Order($this->id);
+  protected function setSource() {
+    $this->source = $this->getType() === Source::Order ? new Order($this->id) : new OrderSlip($this->id);
   }
 
   /**
@@ -30,9 +30,19 @@ class Source extends BaseSource {
   }
 
   /**
+   * {@inheritdoc}
+   *
+   * This override returns the order reference or order slip id.
+   */
+  public function getReference() {
+    return $this->getType() === Source::Order ? $this->source->reference : parent::getReference();
+  }
+
+
+  /**
    * Sets the id based on the loaded Order.
    */
-  protected function setIdOrder() {
+  protected function setId() {
     $this->id = $this->source->id;
   }
 

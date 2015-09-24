@@ -30,7 +30,7 @@ class ConfigForm extends BaseConfigForm {
     $this->moduleName = $moduleName;
   }
 
-  protected function isSubmitted() {
+  public function isSubmitted() {
     return Tools::isSubmit('submit' . $this->moduleName);
   }
 

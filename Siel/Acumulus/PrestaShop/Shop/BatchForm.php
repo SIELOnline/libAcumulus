@@ -9,7 +9,7 @@ use Tools;
  */
 class BatchForm extends BaseBatchForm {
 
-  protected function isSubmitted() {
+  public function isSubmitted() {
     return Tools::isSubmit('submitAdd');
   }
 

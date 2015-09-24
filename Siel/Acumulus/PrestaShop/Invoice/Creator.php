@@ -14,8 +14,14 @@ use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\Shop\ConfigInterface as ShopConfigInterface;
 
 /**
- * Allows to create arrays in the Acumulus invoice structure from a WordPress
- * order or order refund.
+ * Allows to create arrays in the Acumulus invoice structure from a PrestaShop
+ * order or order slip.
+ *
+ * Note:
+ * - If needed, PrestaShop allows us to get tax rates by querying the tax table
+ *   because as soon as an existing tax rate gets updated it will get a new id,
+ *   so old order details still point to a tax record with the tax rate as was
+ *   used at the moment the order was placed.
  */
 class Creator extends BaseCreator {
 
@@ -176,10 +182,12 @@ class Creator extends BaseCreator {
         - $this->order->total_discounts_tax_incl;
     }
     else {
-      $amount = $this->creditSlip->getFieldByLang('total_products_tax_excl')
-        + $this->creditSlip->getFieldByLang('total_shipping_tax_excl');
-      $amountInc = $this->creditSlip->getFieldByLang('total_products_tax_incl')
-        + $this->creditSlip->getFieldByLang('total_shipping_tax_incl');
+      /** @noinspection PhpUndefinedFieldInspection */
+      $amount = $this->creditSlip->total_products_tax_excl
+        + $this->creditSlip->total_shipping_tax_excl;
+      /** @noinspection PhpUndefinedFieldInspection */
+      $amountInc = $this->creditSlip->total_products_tax_incl
+        + $this->creditSlip->total_shipping_tax_incl;
     }
 
     return array(
@@ -269,10 +277,17 @@ class Creator extends BaseCreator {
       $result['meta-linepriceinc'] = $sign * $item['total_price_tax_incl'];
     }
     $result['quantity'] = $item['product_quantity'];
-    $result['vatamount'] = $item['unit_amount'];
-    $result['meta-linevatamount'] = $item['total_amount'];
-    $result['vatrate'] = $item['rate'];
-    $result['meta-vatrate-source'] = Creator::VatRateSource_Exact;
+    if ($this->invoiceSource->getType() === Source::Order) {
+      // These 3 fields are only defined in order_detail_tax, the table
+      // order_slip_detail_tax seems to remain empty in PS1.6.1.0.
+      $result['vatamount'] = $item['unit_amount'];
+      $result['meta-linevatamount'] = $item['total_amount'];
+      $result['vatrate'] = $item['rate'];
+      $result['meta-vatrate-source'] = Creator::VatRateSource_Exact;
+    }
+    else {
+      $result += $this->getVatRangeTags(-$item['unit_price_tax_incl'] + $item['unit_price_tax_excl'], -$item['unit_price_tax_excl'], 0.02);
+    }
 
     return $result;
   }

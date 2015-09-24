@@ -1,6 +1,9 @@
 <?php
 namespace Siel\Acumulus\PrestaShop\Invoice;
 
+use Configuration;
+use Context;
+use Db;
 use Order;
 use OrderSlip;
 use Siel\Acumulus\Invoice\Source as BaseSource;
@@ -18,7 +21,24 @@ class Source extends BaseSource {
    * {@inheritdoc}
    */
   protected function setSource() {
-    $this->source = $this->getType() === Source::Order ? new Order($this->id) : new OrderSlip($this->id);
+    if ($this->getType() === Source::Order) {
+      $this->source = new Order($this->id);
+    }
+    else {
+      $this->source = new OrderSlip($this->id);
+      // OrderSlip does store but not load the values total_products_tax_excl,
+      // total_shipping_tax_excl, total_products_tax_incl, and
+      // total_shipping_tax_incl. As we need them, we load them ourselves.
+      $row = Db::getInstance()->executeS(sprintf("SELECT * FROM `%s` WHERE `%s` = %u",
+        _DB_PREFIX_ . OrderSlip::$definition['table'], OrderSlip::$definition['primary'], $this->id));
+      // Get 1st (and only) result.
+      $row = reset($row);
+      foreach ($row as $key => $value) {
+        if (!isset($this->source->{$key})) {
+          $this->source->{$key} = $value;
+        }
+      }
+    }
   }
 
   /**
@@ -35,9 +55,10 @@ class Source extends BaseSource {
    * This override returns the order reference or order slip id.
    */
   public function getReference() {
-    return $this->getType() === Source::Order ? $this->source->reference : parent::getReference();
+    return $this->getType() === Source::Order
+      ? $this->source->reference
+      : Configuration::get('PS_CREDIT_SLIP_PREFIX', Context::getContext()->language->id) . sprintf('%06d', $this->source->id);
   }
-
 
   /**
    * Sets the id based on the loaded Order.

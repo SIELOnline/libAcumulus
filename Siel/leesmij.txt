@@ -48,3 +48,5 @@ todo's:
 - Class "webshop capabilities" die een aantal methods die een webshop-specifieke
   lijst terugkeren centraliseert (is er een credit note, is er een invoice)
 - Class "Shop invoice" (wrapper zoals "Invoice Source").
+- Margin scheme zal niet samen gaan met gebruik van getVatRangeTags(). Refactor
+  dit.

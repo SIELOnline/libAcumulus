@@ -148,6 +148,7 @@ abstract class Form {
   /**
    * Sets the form values to use.
    *
+   * @todo: make this simpler and rock solid: - no more values in definition? - getKeys =: key => '', ...
    * This is typically the union of the default values, any submitted values,
    * and explicitly set field values.
    */

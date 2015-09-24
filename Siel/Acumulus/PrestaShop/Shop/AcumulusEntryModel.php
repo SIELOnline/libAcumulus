@@ -2,6 +2,7 @@
 namespace Siel\Acumulus\PrestaShop\Shop;
 
 use Db;
+use Siel\Acumulus\PrestaShop\Invoice\Source;
 use Siel\Acumulus\Shop\AcumulusEntryModel as BaseAcumulusEntryModel;
 
 /**
@@ -43,8 +44,14 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel {
    * {@inheritdoc}
    */
   protected function insert($invoiceSource, $entryId, $token, $created) {
-    $shopId = $invoiceSource->getSource()->id_shop;
-    $shopGroupId = $invoiceSource->getSource()->id_shop_group;
+    if ($invoiceSource->getType() === Source::Order) {
+      $shopId = $invoiceSource->getSource()->id_shop;
+      $shopGroupId = $invoiceSource->getSource()->id_shop_group;
+    }
+    else {
+      $shopId = 0;
+      $shopGroupId = 0;
+    }
     return Db::getInstance()->execute(sprintf("INSERT INTO `%s` (id_shop, id_shop_group, id_entry, token, id_order, updated) VALUES (%u, %u, %u, '%s', %u, '%s')",
       $this->tableName, $shopId, $shopGroupId, $entryId, $token, $invoiceSource->getId(), $created));
   }

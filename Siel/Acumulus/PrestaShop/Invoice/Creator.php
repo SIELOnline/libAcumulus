@@ -17,11 +17,14 @@ use Siel\Acumulus\Shop\ConfigInterface as ShopConfigInterface;
  * Allows to create arrays in the Acumulus invoice structure from a PrestaShop
  * order or order slip.
  *
- * Note:
+ * Notes:
  * - If needed, PrestaShop allows us to get tax rates by querying the tax table
  *   because as soon as an existing tax rate gets updated it will get a new id,
  *   so old order details still point to a tax record with the tax rate as was
  *   used at the moment the order was placed.
+ * - Fixed in 1.6.1.1: bug in partial refund, not executed the hook
+ *   actionOrderSlipAdd #PSCSX-6287. So before 1.6.1.1, partial refunds will not
+ *   be automatically sent to Acumulus.
  */
 class Creator extends BaseCreator {
 
@@ -58,7 +61,6 @@ class Creator extends BaseCreator {
    * {@inheritdoc}
    */
   protected function getCustomer() {
-    // @todo: test this for credit slips.
     $customer = new Customer($this->invoiceSource->getSource()->id_customer);
     $invoiceAddress = new Address($this->order->id_address_invoice);
 
@@ -102,7 +104,6 @@ class Creator extends BaseCreator {
    * {@inheritdoc}
    */
   protected function getInvoiceNumber($invoiceNumberSource) {
-    // @todo: test this for credit slips
     $result = $this->invoiceSource->getReference();
     if ($invoiceNumberSource === ShopConfigInterface::InvoiceNrSource_ShopInvoice && $this->invoiceSource->getType() === Source::Order && !empty($this->order->invoice_number)) {
       $result = Configuration::get('PS_INVOICE_PREFIX', (int) $this->order->id_lang, NULL, $this->order->id_shop) . sprintf('%06d', $this->order->invoice_number);
@@ -114,7 +115,6 @@ class Creator extends BaseCreator {
    * {@inheritdoc}
    */
   protected function getInvoiceDate($dateToUse) {
-    // @todo: test this for credit slips
     $result = substr($this->invoiceSource->getSource()->date_add, 0, strlen('2000-01-01'));
     // Invoice_date is filled with "0000-00-00 00:00:00", so use invoice
     // number instead to check for empty.
@@ -128,7 +128,6 @@ class Creator extends BaseCreator {
    * {@inheritdoc}
    */
   protected function getPaymentState() {
-    // @todo: test this for credit slips
     // Assumption: credit slips are always in a paid state.
     if (($this->invoiceSource->getType() === Source::Order && $this->order->hasBeenPaid()) || $this->invoiceSource->getType() === Source::CreditNote) {
       $result = ConfigInterface::PaymentStatus_Paid;
@@ -143,7 +142,6 @@ class Creator extends BaseCreator {
    * {@inheritdoc}
    */
   protected function getPaymentDate() {
-    // @todo: test this for credit slips
     if ($this->invoiceSource->getType() === Source::Order) {
       $paymentDate = NULL;
       foreach ($this->order->getOrderPaymentCollection() as $payment) {
@@ -169,7 +167,6 @@ class Creator extends BaseCreator {
    * meta-invoiceamount.
    */
   protected function getInvoiceTotals() {
-    // @todo: test this for credit slips
     $sign = $this->getSign();
     if ($this->invoiceSource->getType() === Source::Order) {
       $amount = $this->order->getTotalProductsWithoutTaxes()
@@ -241,13 +238,12 @@ class Creator extends BaseCreator {
    * Returns 1 item line, both for an order or credit slip.
    *
    * @param array $item
-   *   An array of an OrderDetail line combined with a tax detail line.
-   *   @todo: describe orderslip detail
+   *   An array of an OrderDetail line combined with a tax detail line OR
+   *   an array with an OrderSlipDetail line.
    *
    * @return array
    */
   protected function getItemLine(array $item) {
-    // @todo: test this for credit slips
     $result = array();
     $sign = $this->getSign();
 
@@ -296,13 +292,13 @@ class Creator extends BaseCreator {
    * {@inheritdoc}
    */
   protected function getShippingLine() {
-    // @todo: test this for credit slips
     $result = array();
+    $sign = $this->getSign();
 
     // @todo: can we add a free shipping line? (but distinguish from shop pick up (probably id_carrier = 1, or better id_carrier with name = "0"
     if (!Number::isZero($this->invoiceSource->getSource()->total_shipping_tax_incl)) {
-      $shippingEx = $this->getSign() * $this->invoiceSource->getSource()->total_shipping_tax_excl;
-      $shippingInc = $this->getSign() * $this->invoiceSource->getSource()->total_shipping_tax_incl;
+      $shippingEx = $sign * $this->invoiceSource->getSource()->total_shipping_tax_excl;
+      $shippingInc = $sign * $this->invoiceSource->getSource()->total_shipping_tax_incl;
       $shippingVat = $shippingInc - $shippingEx;
       $result = array(
           'product' => $this->t('shipping_costs'),
@@ -316,12 +312,33 @@ class Creator extends BaseCreator {
   }
 
   /**
+   * {@inheritdoc}
+   *
+   * This override returns can return an invoice line for orders. Credit slips
+   * cannot have a wrapping line.
+   */
+  protected function getGiftWrappingLine() {
+    $result = array();
+    if ($this->invoiceSource->getType() === Source::Order && $this->order->gift && !Number::isZero($this->order->total_wrapping_tax_incl)) {
+      $wrappingEx = $this->order->total_wrapping_tax_excl;
+      $wrappingInc = $this->order->total_wrapping_tax_incl;
+      $wrappingVat = $wrappingInc - $wrappingEx;
+      $result = array(
+          'product' => $this->t('gift_wrapping'),
+          'unitprice' => $wrappingEx,
+          'unitpriceinc' => $wrappingInc,
+          'quantity' => 1,
+        ) + $this->getVatRangeTags($wrappingVat, $wrappingEx, 0.02);
+    }
+    return $result;
+  }
+
+  /**
    * In a Prestashop order the discount lines are specified in Order cart rules
    *
    * @return array[]
    */
   protected function getDiscountLinesOrder() {
-    // @todo: test this
     $result = array();
 
     foreach ($this->order->getCartRules() as $line) {
@@ -342,9 +359,9 @@ class Creator extends BaseCreator {
    * @return array
    */
   protected function getDiscountLineOrder(array $line) {
-    // @todo: test this for credit slips
-    $discountInc = -$line['value'];
-    $discountEx = -$line['value_tax_excl'];
+    $sign = $this->getSign();
+    $discountInc = -$sign * $line['value'];
+    $discountEx = -$sign * $line['value_tax_excl'];
     $discountVat = $discountInc - $discountEx;
     return array(
       'itemnumber' => $line['id_cart_rule'],
@@ -352,6 +369,10 @@ class Creator extends BaseCreator {
       'unitprice' => $discountEx,
       'unitpriceinc' => $discountInc,
       'quantity' => 1,
+      // If no match is found, this line may be split.
+      'meta-strategy-split' => TRUE,
+      'meta-lineprice' => $discountEx,
+      'meta-linepriceinc' => $discountInc,
       // Assuming that the fixed discount amount was entered:
       // - including VAT, the precision would be 0.01, 0.01.
       // - excluding VAT, the precision would be 0.01, 0
@@ -360,35 +381,108 @@ class Creator extends BaseCreator {
   }
 
   /**
-   * In a Prestashop credit slip, the discounts are not visible anymore.
+   * In a Prestashop credit slip, the discounts are not visible anymore, but
+   * can be computed by looking at the difference between the value of
+   * total_products_tax_incl and the sum of the OrderSlipDetail amounts.
    *
    * @return array[]
    */
   protected function getDiscountLinesCreditNote() {
+    // Get total amount credited.
+    /** @noinspection PhpUndefinedFieldInspection */
+    $creditSlipAmountInc = $this->creditSlip->total_products_tax_incl;
+
+    // Get sum of product lines.
+    $lines = $this->creditSlip->getOrdersSlipProducts($this->invoiceSource->getId(), $this->order);
+    $detailsAmountInc = array_reduce($lines, function ($sum, $item) {
+        $sum += $item['total_price_tax_incl'];
+        return $sum;
+      }, 0.0);
+
+    // We assume that if the total is smaller than the sum, a discount given on
+    // the original order has now been subtracted from the amount credited.
+    if (!Number::floatsAreEqual($creditSlipAmountInc, $detailsAmountInc, 0.05)
+        && $creditSlipAmountInc < $detailsAmountInc) {
+      // PS Error: total_products_tax_excl is not adjusted (whereas
+      // total_products_tax_incl is) when a discount is subtracted from the
+      // amount to be credited.
+      // So we cannot calculate the discount ex VAT ourselves.
+      // What we can try is the following: Get the order cart rules to see if
+      // 1 or all of those match the discount amount here.
+      $discountAmountInc = $detailsAmountInc - $creditSlipAmountInc;
+      $totalOrderDiscount = 0.0;
+      // Note: The sign of then entries in $orderDiscounts will be correct.
+      $orderDiscounts = $this->getDiscountLinesOrder();
+
+      foreach ($orderDiscounts as $key => $orderDiscount) {
+        if (Number::floatsAreEqual($orderDiscount['unitpriceinc'], $discountAmountInc)) {
+          // Return this single line.
+          $from = $to = $key;
+          break;
+        }
+        $totalOrderDiscount += $orderDiscount['unitpriceinc'];
+        if (Number::floatsAreEqual($totalOrderDiscount, $discountAmountInc)) {
+          // Return all lines up to here.
+          $from = 0;
+          $to = $key;
+          break;
+        }
+      }
+
+
+      if (isset($from) && isset($to)) {
+        return array_slice($orderDiscounts, $from, $to - $from + 1);
+      }
+      //else {
+        // We could not match a discount with the difference between the total
+        // amount credited and the sum of the products returned. A manual line
+        // will correct the invoice.
+      //}
+    }
     return array();
   }
 
   /**
    * {@inheritdoc}
    *
-   * This override returns an empty array: WooCommerce does not know gift
-   * wrapping lines, i.e. it does not define a fee line specifically for this
-   * fee type.
+   * This override corrects a credit invoice if the amount does not match the
+   * sum of the lines so far. This can happen if an amount was entered manually,
+   * or if discount(s) applied during sale were subtracted from the credit
+   * amount but we could not find which discounts this were.
    */
-  protected function getGiftWrappingLine() {
-    // @todo: test this for credit slips
-    $result = array();
-    if ($this->invoiceSource->getType() === Source::Order && $this->order->gift && !Number::isZero($this->order->total_wrapping_tax_incl)) {
-      $wrappingEx = $this->order->total_wrapping_tax_excl;
-      $wrappingInc = $this->order->total_wrapping_tax_incl;
-      $wrappingVat = $wrappingInc - $wrappingEx;
-      $result = array(
-        'product' => $this->t('gift_wrapping'),
-        'unitprice' => $wrappingEx,
-        'quantity' => 1,
-        ) + $this->getVatRangeTags($wrappingVat, $wrappingEx, 0.02);
+  protected function getManualLines() {
+    if ($this->invoiceSource->getType() === Source::CreditNote) {
+      // Only Credit notes can have a manual line. They get one if the total
+      // amount does not match the sum of the lines added so far.
+      // Notes:
+      // - amount is excl vat if not manually entered.
+      // - amount is incl vat if manually entered (assuming administrators enter
+      //   amounts incl tax, and this is what gets listed on the credit PDF.
+      // - shipping_cost_amount is excl vat.
+      // So this is never going  to work!!!
+      // @todo: can we get differences incl and excl tax?
+      $amount = -$this->creditSlip->amount - $this->creditSlip->shipping_cost_amount;
+      $linesAmount = array_reduce($this->invoice['customer']['invoice']['line'], function ($sum, $item) {
+        if (isset($item['meta-linepriceinc'])) {
+          $sum += $item['meta-linepriceinc'];
+        }
+        else /* if (isset ($item['unitpriceinc'])) */ {
+          $sum += $item['quantity'] * $item['unitpriceinc'];
+        }
+        return $sum;
+      }, 0.0);
+      if (!Number::floatsAreEqual($amount, $linesAmount)) {
+        $line = array (
+          'product' => $this->t('refund_adjustment'),
+          'quantity' => 1,
+          'unitpriceinc' => $amount - $linesAmount,
+          'unitprice' => $amount - $linesAmount,
+          'vatrate' => 0
+        );
+        return array($line);
+      }
     }
-    return $result;
+    return parent::getManualLines();
   }
 
 }

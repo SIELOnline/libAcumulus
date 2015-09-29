@@ -13,6 +13,7 @@ class Translations extends TranslationCollection {
     Source::CreditNote => 'creditnota',
     Source::Other => 'overig',
 
+    'vat' => 'BTW',
     'inc_vat' => 'incl. BTW',
     'ex_vat' => 'excl. BTW',
     'shipping_costs' => 'Verzendkosten',
@@ -25,7 +26,7 @@ class Translations extends TranslationCollection {
     'gift_wrapping' => 'Cadeauverpakking',
     'fee' => 'Behandelkosten',
     'refund' => 'Terugbetaling',
-    'refund_adjustment' => 'Aanpassing kredietbedrag',
+    'refund_adjustment' => 'Aanpassing teruggaafbedrag',
 
     'message_warning_no_vat' => 'De factuur bevat geen BTW, maar kan niet van het type "verlegde BTW" zijn, noch is de klant buiten de EU gevestigd.',
     'message_warning_incorrect_vat_corrected' => 'De factuur bevat een incorrect BTW tarief van %1$0.1f%%. Dit is gecorrigeerd naar %2$0.1f%%. Controleer deze factuur handmatig in Acumulus!',
@@ -37,6 +38,7 @@ class Translations extends TranslationCollection {
     Source::CreditNote => 'credit note',
     Source::Other => 'other',
 
+    'vat' => 'VAT',
     'inc_vat' => 'incl. VAT',
     'ex_vat' => 'ex. VAT',
     'shipping_costs' => 'Shipping costs',

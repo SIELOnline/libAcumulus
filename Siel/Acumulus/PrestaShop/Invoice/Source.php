@@ -26,18 +26,7 @@ class Source extends BaseSource {
     }
     else {
       $this->source = new OrderSlip($this->id);
-      // OrderSlip does store but not load the values total_products_tax_excl,
-      // total_shipping_tax_excl, total_products_tax_incl, and
-      // total_shipping_tax_incl. As we need them, we load them ourselves.
-      $row = Db::getInstance()->executeS(sprintf("SELECT * FROM `%s` WHERE `%s` = %u",
-        _DB_PREFIX_ . OrderSlip::$definition['table'], OrderSlip::$definition['primary'], $this->id));
-      // Get 1st (and only) result.
-      $row = reset($row);
-      foreach ($row as $key => $value) {
-        if (!isset($this->source->{$key})) {
-          $this->source->{$key} = $value;
-        }
-      }
+      $this->addProperties();
     }
   }
 
@@ -65,6 +54,26 @@ class Source extends BaseSource {
    */
   protected function setId() {
     $this->id = $this->source->id;
+    $this->addProperties();
+  }
+
+  /**
+   * OrderSlip does store but not load the values total_products_tax_excl,
+   * total_shipping_tax_excl, total_products_tax_incl, and
+   * total_shipping_tax_incl. As we need them, we load them ourselves.
+   *
+   * @throws \PrestaShopDatabaseException
+   */
+  protected function addProperties() {
+    $row = Db::getInstance()->executeS(sprintf("SELECT * FROM `%s` WHERE `%s` = %u",
+      _DB_PREFIX_ . OrderSlip::$definition['table'], OrderSlip::$definition['primary'], $this->id));
+    // Get 1st (and only) result.
+    $row = reset($row);
+    foreach ($row as $key => $value) {
+      if (!isset($this->source->{$key})) {
+        $this->source->{$key} = $value;
+      }
+    }
   }
 
 }

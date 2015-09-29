@@ -451,10 +451,12 @@ class Creator extends BaseCreator {
     $result = array();
 
     if (isset($this->creditNote) && !Number::isZero($this->creditNote->getAdjustment())) {
-      $line['product'] = $this->t('refund_adjustment');
-      $line['unitprice'] = -$this->creditNote->getAdjustment();
-      $line['quantity'] = 1;
-      $line['vatrate'] = 0;
+      $line = array (
+        'product' => $this->t('refund_adjustment'),
+        'unitprice' => -$this->creditNote->getAdjustment(),
+        'quantity' => 1,
+        'vatrate' => 0
+      );
       $result[] = $line;
     }
     return $result;

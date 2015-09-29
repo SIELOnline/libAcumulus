@@ -11,6 +11,9 @@ use Siel\Acumulus\Invoice\CompletorStrategyBase;
  * It also tries a vat rate of 0%. If that works, the system might be
  * misconfigured or we have prepaid vouchers, but as we have to follow the
  * system anyway, we will return it as is.
+ *
+ * Current known usages:
+ * - ???
  */
 class ApplySameVatRate extends CompletorStrategyBase {
 

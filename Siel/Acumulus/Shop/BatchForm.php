@@ -243,4 +243,14 @@ abstract class BatchForm extends Form {
     return $fields;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  protected function getCheckboxKeys() {
+    return array(
+      'force_send' => 'force_send',
+    );
+  }
+
+
 }

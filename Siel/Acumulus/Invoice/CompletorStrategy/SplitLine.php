@@ -14,8 +14,8 @@ use Siel\Acumulus\Invoice\Creator;
  * - lines2Complete contains at least 1 line that may be split.
  * - Exactly 2 vat rates that appear in the invoice, otherwise we can't compute
  *   1 division.
- * - This strategy should be executed after the tryAllPermutations, so we may
- *   assume that we *have to* split to arrive at a solution.
+ * - This strategy should be executed after the tryAllVatRatePermutations, so we
+ *   may assume that we *have to* split to arrive at a solution.
  *
  * Strategy:
  * Other non completed lines, typically shipping and other fees, are all given
@@ -46,6 +46,9 @@ use Siel\Acumulus\Invoice\Creator;
  * - Instead of restricting us to appearing or possible vat rates we could try
  *   to assume that 1 line is a prepaid voucher and therefore vat free, and
  *   split just the other line(s).
+ *
+ * Current known usages:
+ * - ???
  */
 class SplitLine extends CompletorStrategyBase {
 
@@ -185,11 +188,10 @@ class SplitLine extends CompletorStrategyBase {
    * @return bool
    *   Success.
    */
-  private function divideAmountOver2VatRates($splitVatAmount, $lowVatRate, $highVatRate) {
+  protected function divideAmountOver2VatRates($splitVatAmount, $lowVatRate, $highVatRate) {
     // Divide the amount over the 2 vat rates, such that the sum of the divided
     // amounts and the sum of the vat amounts equals the total amount and vat.
-    $highAmount = ($splitVatAmount - $this->splitLinesAmount * $lowVatRate) / ($highVatRate - $lowVatRate);
-    $lowAmount = $this->splitLinesAmount - $highAmount;
+    list($lowAmount, $highAmount) = $this->splitAmountOver2VatRates($this->splitLinesAmount, $splitVatAmount, $lowVatRate, $highVatRate);
 
     // Dividing was possible if both amounts have the same sign.
     if (($highAmount < -0.005 && $lowAmount < -0.005 && $this->splitLinesAmount < -0.005)
@@ -199,7 +201,7 @@ class SplitLine extends CompletorStrategyBase {
       $lowPercentage = $lowAmount / $this->splitLinesAmount;
       foreach ($this->splitLines as $line) {
         $splitLine = $line;
-        $splitLine['title'] .= ' ' . $highVatRate . '% BTW';
+        $splitLine['product'] .= ' ' . $highVatRate . '% ' . $this->t('vat');
         if (isset($splitLine['unitprice'])) {
           $splitLine['unitprice'] = $highPercentage * $splitLine['unitprice'];
         }
@@ -209,7 +211,7 @@ class SplitLine extends CompletorStrategyBase {
         $this->completeLine($splitLine, $highVatRate);
 
         $splitLine = $line;
-        $splitLine['title'] .= ' ' . $lowVatRate . '% BTW';
+        $splitLine['product'] .= ' ' . $lowVatRate . '% ' . $this->t('vat');
         if (isset($splitLine['unitprice'])) {
           $splitLine['unitprice'] = $lowPercentage * $splitLine['unitprice'];
         }

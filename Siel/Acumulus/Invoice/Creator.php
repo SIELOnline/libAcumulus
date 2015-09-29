@@ -119,6 +119,7 @@ abstract class Creator {
     $this->invoice['customer']['invoice'] = $this->getInvoice();
     $this->addInvoiceDefaults();
     $this->invoice['customer']['invoice']['line'] = $this->getInvoiceLines();
+    $this->invoice['customer']['invoice']['line'] = array_merge($this->invoice['customer']['invoice']['line'], $this->getManualLinesInternal());
     $this->addEmailAsPdf();
     return $this->invoice;
   }
@@ -522,15 +523,12 @@ abstract class Creator {
     $itemLines = $this->getItemLines();
     $itemLines = $this->addLineType($itemLines, static::LineType_Order);
 
-    $manualLines = $this->getManualLines();
-    $manualLines = $this->addLineType($manualLines, static::LineType_Manual);
-
     $feeLines = $this->getFeeLines();
 
     $discountLines = $this->getDiscountLines();
     $discountLines = $this->addLineType($discountLines, static::LineType_Discount);
 
-    $result = array_merge($itemLines, $manualLines, $feeLines, $discountLines);
+    $result = array_merge($itemLines, $feeLines, $discountLines);
     return $result;
   }
 
@@ -542,19 +540,6 @@ abstract class Creator {
    */
   protected function getItemLines() {
     return $this->callSourceTypeSpecificMethod(__FUNCTION__, func_get_args());
-  }
-
-  /**
-   * Returns any manual lines.
-   *
-   * Normally there are no manual lines, but Magento does support it for credit
-   * notes.
-   *
-   * @return array
-   *  An array of manual line arrays, may be empty.
-   */
-  protected function getManualLines() {
-    return array();
   }
 
   /**
@@ -633,6 +618,34 @@ abstract class Creator {
    */
   protected function getDiscountLines() {
     return $this->callSourceTypeSpecificMethod(__FUNCTION__, func_get_args());
+  }
+
+  /**
+   * Internal wrapper around getManualLines to add the line type to the results.
+   *
+   * @return array[]
+   *  An array of manual line arrays, may be empty.
+   */
+  private function getManualLinesInternal() {
+    $manualLines = $this->getManualLines();
+    $manualLines = $this->addLineType($manualLines, static::LineType_Manual);
+    return $manualLines;
+  }
+
+  /**
+   * Returns any manual lines.
+   *
+   * Manual lines may appear on credit notes to overrule amounts as calculated
+   * by the system. E.g. discounts applied on items should be taken into
+   * account when refunding (while the system did not or does not know if the
+   * discount also applied to that product), shipping costs may be returned
+   * except for the handling costs, etc.
+   *
+   * @return array[]
+   *  An array of manual line arrays, may be empty.
+   */
+  protected function getManualLines() {
+    return array();
   }
 
   /**

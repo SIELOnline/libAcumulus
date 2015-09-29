@@ -7,6 +7,9 @@ use Siel\Acumulus\Invoice\CompletorStrategyBase;
 /**
  * Class TryAllTaxRatePermutations implements a vat completor strategy by trying
  * all possible permutations of the vat rates for all possible vat types.
+ *
+ * Current known usages:
+ * - ???
  */
 class TryAllVatRatePermutations extends CompletorStrategyBase {
 

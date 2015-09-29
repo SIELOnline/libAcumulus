@@ -285,7 +285,7 @@ abstract class Form {
    * sanitation.
    */
   protected function setSubmittedValues() {
-    $this->submittedValues = $_POST;
+    $this->submittedValues = $this->getPostedValues();
   }
 
   /**

@@ -1,12 +1,17 @@
 <?php
 namespace Siel\Acumulus\Invoice;
 
+use Siel\Acumulus\Helpers\TranslatorInterface;
+
 /**
  * CompletorStrategyBase is the base class for all strategies that might
  * be able to complete invoice lines by applying a strategy to divide a
  * remaining vat amount over lines without a vat rate yet.
  */
 abstract class CompletorStrategyBase {
+
+  /** @var \Siel\Acumulus\Helpers\TranslatorInterface */
+  protected $translator;
 
   /** @var int Indication of the order of execution of the strategy. */
   static $tryOrder = 50;
@@ -19,6 +24,9 @@ abstract class CompletorStrategyBase {
 
   /** @var array[] */
   protected $possibleVatRates;
+
+  /** @var int[] */
+  protected $linesCompleted;
 
   /** @var array[] */
   protected $lines2Complete;
@@ -42,17 +50,32 @@ abstract class CompletorStrategyBase {
   protected $vatBreakdown;
 
   /**
+   * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
    * @param array $invoice
    * @param array $possibleVatTypes
    * @param array $possibleVatRates
    */
-  public function __construct(array $invoice, array $possibleVatTypes, array $possibleVatRates) {
+  public function __construct(TranslatorInterface $translator, array $invoice, array $possibleVatTypes, array $possibleVatRates) {
     $this->invoice = $invoice;
     $this->possibleVatTypes = $possibleVatTypes;
     $this->possibleVatRates = $possibleVatRates;
     $this->initAmounts();
     $this->initLines2Complete();
     $this->initVatBreakdown();
+  }
+
+  /**
+   * Helper method to translate strings.
+   *
+   * @param string $key
+   *  The key to get a translation for.
+   *
+   * @return string
+   *   The translation for the given key or the key itself if no translation
+   *   could be found.
+   */
+  protected function t($key) {
+    return $this->translator->get($key);
   }
 
   /**
@@ -65,7 +88,21 @@ abstract class CompletorStrategyBase {
   }
 
   /**
-   * Returns the completed lines, should only be called after success.
+   * Returns the keys of the lines that are completed (and thus should be
+   * replaced by the completed lines).
+   *
+   * Should only be called after success.
+   *
+   * @return int[]
+   */
+  public function getLinesCompleted() {
+    return $this->linesCompleted;
+  }
+
+  /**
+   * Returns the completed lines (that should replace the lines completed).
+   *
+   * Should only be called after success.
    *
    * @return array[]
    */
@@ -106,9 +143,11 @@ abstract class CompletorStrategyBase {
    * Initializes $this->lines2Complete with all strategy lines.
    */
   protected function initLines2Complete() {
+    $this->linesCompleted = array();
     $this->lines2Complete = array();
-    foreach ($this->invoice['customer']['invoice']['line'] as $line) {
+    foreach ($this->invoice['customer']['invoice']['line'] as $key => $line) {
       if ($line['meta-vatrate-source'] === Creator::VatRateSource_Strategy) {
+        $this->linesCompleted[] = $key;
         $this->lines2Complete[] = $line;
       }
     }
@@ -121,11 +160,11 @@ abstract class CompletorStrategyBase {
   protected function initVatBreakdown() {
     $this->vatBreakdown = array();
     foreach ($this->invoice['customer']['invoice']['line'] as $line) {
-      if (isset($line['vatrate'])) {
+      if ($line['meta-vatrate-source'] !== Creator::VatRateSource_Strategy && isset($line['vatrate'])) {
         $amount = $line['unitprice'] * $line['quantity'];
         $vatAmount = $line['vatrate'] / 100.0 * $amount;
         $vatRate = sprintf('%.3f', $line['vatrate']);
-        // Add amount to existing vatrate line or
+        // Add amount to existing vatrate line or create a new line.
         if (isset($this->vatBreakdown[$vatRate])) {
           $breakdown = &$this->vatBreakdown[$vatRate];
           $breakdown['vatamount'] += $vatAmount;
@@ -264,6 +303,24 @@ abstract class CompletorStrategyBase {
     }
     $this->completedLines[] = $line2Complete;
     return $line2Complete['vatamount'] * $line2Complete['quantity'];
+  }
+
+  /**
+   * Splits $amount 9ex VAT) in 2 amounts, such that if the first amount is
+   * taxed with the $lowVatRate and the 2nd amount is taxed with the
+   * $highVatRate, the sum of the 2 vat amounts add up to the given vat amount.
+   *
+   * @param float $amount
+   * @param float $vatAmount
+   * @param float $lowVatRate
+   * @param float $highVatRate
+   *
+   * @return float[]
+   */
+  protected function splitAmountOver2VatRates($amount, $vatAmount, $lowVatRate, $highVatRate) {
+    $highAmount = ($vatAmount - $amount * $lowVatRate) / ($highVatRate - $lowVatRate);
+    $lowAmount = $amount - $highAmount;
+    return array($lowAmount, $highAmount);
   }
 
 }

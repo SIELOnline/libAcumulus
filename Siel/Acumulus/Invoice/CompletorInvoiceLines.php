@@ -37,9 +37,11 @@ use Siel\Acumulus\Web\Service;
  *   - exact: should be an existing VAT rate.
  *   - calculated: should be close to an existing VAT rate, but may contain a
  *       rounding error.
- *   - completor: to be filled in by the completor.
+ *   - completor: zero price lines to be filled in by the completor with the
+ *     most used VAT rate. these are like free shipping or discounts that are
+ *     only there for info (discounts already processed in the product prices).
  *   - strategy: to be filled in by a tax divide strategy. This may lead to
- *      this line being split into multiple lines.
+ *     the line being split into multiple lines.
  * - (*)meta-lineprice: the total price for this line excluding VAT.
  * - (*)meta-linepriceinc: the total price for this line including VAT.
  * - meta-linevatamount: the amount of VAT for the whole line.
@@ -363,6 +365,10 @@ class CompletorInvoiceLines {
       $line['meta-vatrate-matches'] = count($matchedVatRates) === 0 ? 'none' : array_reduce($matchedVatRates, function($carry, $item) {
           return $carry . ($carry === '' ? '' : ',') . $item['vatrate'] . '(' . $item['vattype'] . ')';
         }, '');
+      if (!empty($line['meta-strategy-split'])) {
+        // Give the strategy phase a chance to correct this line.
+        $line['meta-vatrate-source'] = Creator::VatRateSource_Strategy;
+      }
     }
     return $line;
   }
@@ -427,18 +433,27 @@ class CompletorInvoiceLines {
       $strategies = $this->getStrategyClasses();
       foreach ($strategies as $strategyClass) {
         /** @var CompletorStrategyBase $strategy  */
-        $strategy = new $strategyClass($this->invoice, $this->possibleVatTypes, $this->possibleVatRates);
+        $strategy = new $strategyClass($this->translator, $this->invoice, $this->possibleVatTypes, $this->possibleVatRates);
         if ($strategy->apply()) {
-          $this->replaceLines2Complete($strategy->getCompletedLines());
-          $this->invoice['customer']['invoice']['meta-completor-strategy-used'] = $strategy->getDescription();
-          break;
+          $this->replaceLines2Complete($strategy->getLinesCompleted() , $strategy->getCompletedLines());
+          if (empty($this->invoice['customer']['invoice']['meta-completor-strategy-used'])) {
+            $this->invoice['customer']['invoice']['meta-completor-strategy-used'] = $strategy->getDescription();
+          }
+          else {
+            $this->invoice['customer']['invoice']['meta-completor-strategy-used'] .= '; ' . $strategy->getDescription();
+          }
+          // Allow for partial solutions: a strategy may correct only some of
+          // the strategy lines and leave the rest up to other strategies.
+          if (!$this->invoiceHasStrategyLine()) {
+            break;
+          }
         }
       }
     }
   }
 
   /**
-   * Returns whether the invoice has lines that are tobe completed using a tax
+   * Returns whether the invoice has lines that are to be completed using a tax
    * divide strategy.
    *
    * @return bool
@@ -446,7 +461,8 @@ class CompletorInvoiceLines {
   protected function invoiceHasStrategyLine() {
     $result = false;
     foreach ($this->invoiceLines as $line) {
-      if ($line['meta-vatrate-source'] === Creator::VatRateSource_Strategy) {
+      if ($line['meta-vatrate-source'] === Creator::VatRateSource_Strategy
+          || (!empty($line['meta-strategy-split']) && isset($line['meta-vatrate-matches']))) {
         $result = true;
         break;
       }
@@ -464,6 +480,7 @@ class CompletorInvoiceLines {
 
     // For now hardcoded, but this can be turned into a discovery.
     $namespace = '\Siel\Acumulus\Invoice\CompletorStrategy';
+    $result[] = "$namespace\\SplitNonMatchingLine";
     $result[] = "$namespace\\SplitKnownDiscountLine";
     $result[] = "$namespace\\ApplySameVatRate";
     $result[] = "$namespace\\SplitLine";
@@ -474,16 +491,21 @@ class CompletorInvoiceLines {
   }
 
   /**
-   * Replaces all strategy lines with the given completed lines.
+   * Replaces all completed strategy lines with the given completed lines.
    *
+   * @param int[] $linesCompleted
    * @param array[] $completedLines
    *   An array of completed invoice lines to replace the strategy lines with.
    */
-  protected function replaceLines2Complete(array $completedLines) {
-    // Remove all old strategy lines.
-    $this->invoice['customer']['invoice']['line'] = array_filter($this->invoice['customer']['invoice']['line'], function($line) {
-      return $line['meta-vatrate-source'] !== Creator::VatRateSource_Strategy;
-    });
+  protected function replaceLines2Complete(array $linesCompleted, array $completedLines) {
+    // Remove old strategy lines that are now completed.
+    $lines = array();
+    foreach ($this->invoice['customer']['invoice']['line'] as $key => $line) {
+      if (in_array($key, $linesCompleted)) {
+        $lines[] = $line;
+      }
+    }
+    $this->invoice['customer']['invoice']['line'] = $lines;
 
     // And merge in the new completed ones.
     $this->invoice['customer']['invoice']['line'] = array_merge($this->invoice['customer']['invoice']['line'],

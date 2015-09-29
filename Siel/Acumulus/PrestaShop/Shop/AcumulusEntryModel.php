@@ -36,7 +36,7 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel {
    * {@inheritdoc}
    */
   public function getByInvoiceSourceId($invoiceSourceType, $invoiceSourceId) {
-    $result = Db::getInstance()->executeS(sprintf("SELECT * FROM `%s` WHERE id_type = '%s' AND id_order = %u", $this->tableName, $invoiceSourceType, $invoiceSourceId));
+    $result = Db::getInstance()->executeS(sprintf("SELECT * FROM `%s` WHERE source_type = '%s' AND source_id = %u", $this->tableName, $invoiceSourceType, $invoiceSourceId));
     return count($result) === 1 ? reset($result) : null;
   }
 
@@ -52,16 +52,16 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel {
       $shopId = 0;
       $shopGroupId = 0;
     }
-    return Db::getInstance()->execute(sprintf("INSERT INTO `%s` (id_shop, id_shop_group, id_entry, token, id_order, updated) VALUES (%u, %u, %u, '%s', %u, '%s')",
-      $this->tableName, $shopId, $shopGroupId, $entryId, $token, $invoiceSource->getId(), $created));
+    return Db::getInstance()->execute(sprintf("INSERT INTO `%s` (id_shop, id_shop_group, id_entry, token, source_type, source_id, updated) VALUES (%u, %u, %u, '%s', '%s', %u, '%s')",
+      $this->tableName, $shopId, $shopGroupId, $entryId, $token, $invoiceSource->getType(), $invoiceSource->getId(), $created));
   }
 
   /**
    * {@inheritdoc}
    */
   protected function update($record, $entryId, $token, $updated) {
-    return Db::getInstance()->execute(sprintf("UPDATE `%s` SET id_shop = %u, id_shop_group = %u, id_entry = %u, token = '%s', id_order = %u, updated = '%s' WHERE id = %u",
-      $this->tableName, $record['id_shop'], $record['id_shop_group'], $entryId, $token, $record['id_order'], $updated, $record['id']));
+    return Db::getInstance()->execute(sprintf("UPDATE `%s` SET id_shop = %u, id_shop_group = %u, id_entry = %u, token = '%s', source_type = '%s', source_id = %u, updated = '%s' WHERE id = %u",
+      $this->tableName, $record['id_shop'], $record['id_shop_group'], $entryId, $token, $record['source_type'], $record['source_id'], $updated, $record['id']));
   }
 
   /**
@@ -76,18 +76,18 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel {
    */
   function install() {
     return Db::getInstance()->execute("CREATE TABLE IF NOT EXISTS `{$this->tableName}` (
-      `id` int(11) NOT NULL AUTO_INCREMENT,
-			`id_shop` INTEGER UNSIGNED NOT NULL DEFAULT '1',
-			`id_shop_group` INTEGER UNSIGNED NOT NULL DEFAULT '1',
-      `id_entry` int(11) NOT NULL,
+      `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			`id_shop` int(11) UNSIGNED NOT NULL DEFAULT '1',
+			`id_shop_group` int(11) UNSIGNED NOT NULL DEFAULT '1',
+      `id_entry` int(11) UNSIGNED NOT NULL,
       `token` char(32) NOT NULL,
-      `id_type` varchar(32) NOT NULL,
-      `id_order` int(11) NOT NULL,
+      `source_type` varchar(32) NOT NULL,
+      `source_id` int(11) UNSIGNED NOT NULL,
       `created` timestamp DEFAULT CURRENT_TIMESTAMP,
       `updated` timestamp NOT NULL,
       PRIMARY KEY (`id`),
-      UNIQUE INDEX `idx_entry_id` (`id_entry`),
-      UNIQUE INDEX `idx_order_id` (`id_order`)
+      UNIQUE INDEX `acumulus_idx_entry_id` (`id_entry`),
+      UNIQUE INDEX `acumulus_idx_source` (`source_id`, `source_type`)
     )");
   }
 

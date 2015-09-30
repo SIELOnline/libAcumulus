@@ -2,6 +2,7 @@
 namespace Siel\Acumulus\PrestaShop\Invoice;
 
 use Address;
+use Carrier;
 use Configuration;
 use Country;
 use Customer;
@@ -292,20 +293,30 @@ class Creator extends BaseCreator {
    * {@inheritdoc}
    */
   protected function getShippingLine() {
-    $result = array();
     $sign = $this->getSign();
+    $shippingEx = $sign * $this->invoiceSource->getSource()->total_shipping_tax_excl;
+    $shippingInc = $sign * $this->invoiceSource->getSource()->total_shipping_tax_incl;
+    $shippingVat = $shippingInc - $shippingEx;
 
-    // @todo: can we add a free shipping line? (but distinguish from shop pick up (probably id_carrier = 1, or better id_carrier with name = "0"
-    if (!Number::isZero($this->invoiceSource->getSource()->total_shipping_tax_incl)) {
-      $shippingEx = $sign * $this->invoiceSource->getSource()->total_shipping_tax_excl;
-      $shippingInc = $sign * $this->invoiceSource->getSource()->total_shipping_tax_incl;
-      $shippingVat = $shippingInc - $shippingEx;
+    if (!Number::isZero($shippingInc)) {
       $result = array(
           'product' => $this->t('shipping_costs'),
           'unitprice' => $shippingEx,
           'unitpriceinc' => $shippingInc,
           'quantity' => 1,
         ) + $this->getVatRangeTags($shippingVat, $shippingEx, 0.02);
+    }
+    else {
+      $carrier = new Carrier($this->order->id_carrier);
+      $description = $carrier->id_reference == 1 ? $this->t('pickup') : $this->t('free_shipping');
+      $result = array(
+        'product' => $description,
+        'unitprice' => 0,
+        'quantity' => 1,
+        'vatamount' => 0,
+        'vatrate' => NULL,
+        'meta-vatrate-source' => Creator::VatRateSource_Completor,
+      );
     }
 
     return $result;
@@ -395,14 +406,15 @@ class Creator extends BaseCreator {
     // Get sum of product lines.
     $lines = $this->creditSlip->getOrdersSlipProducts($this->invoiceSource->getId(), $this->order);
     $detailsAmountInc = array_reduce($lines, function ($sum, $item) {
-        $sum += $item['total_price_tax_incl'];
-        return $sum;
-      }, 0.0);
+      $sum += $item['total_price_tax_incl'];
+      return $sum;
+    }, 0.0);
 
     // We assume that if the total is smaller than the sum, a discount given on
     // the original order has now been subtracted from the amount credited.
     if (!Number::floatsAreEqual($creditSlipAmountInc, $detailsAmountInc, 0.05)
-        && $creditSlipAmountInc < $detailsAmountInc) {
+      && $creditSlipAmountInc < $detailsAmountInc
+    ) {
       // PS Error: total_products_tax_excl is not adjusted (whereas
       // total_products_tax_incl is) when a discount is subtracted from the
       // amount to be credited.
@@ -429,14 +441,13 @@ class Creator extends BaseCreator {
         }
       }
 
-
       if (isset($from) && isset($to)) {
         return array_slice($orderDiscounts, $from, $to - $from + 1);
       }
       //else {
-        // We could not match a discount with the difference between the total
-        // amount credited and the sum of the products returned. A manual line
-        // will correct the invoice.
+      // We could not match a discount with the difference between the total
+      // amount credited and the sum of the products returned. A manual line
+      // will correct the invoice.
       //}
     }
     return array();
@@ -460,16 +471,17 @@ class Creator extends BaseCreator {
       //   amounts incl tax, and this is what gets listed on the credit PDF.
       // - shipping_cost_amount is excl vat.
       // So this is never going  to work!!!
-      // @todo: can we get differences incl and excl tax?
+      // @todo: can we get the tax amount/rate over the manually entered refund?
       $amount = -$this->creditSlip->amount - $this->creditSlip->shipping_cost_amount;
       $linesAmount = $this->getLinesTotal();
       if (!Number::floatsAreEqual($amount, $linesAmount)) {
-        $line = array (
+        $line = array(
           'product' => $this->t('refund_adjustment'),
           'quantity' => 1,
           'unitpriceinc' => $amount - $linesAmount,
           'unitprice' => $amount - $linesAmount,
-          'vatrate' => 0
+          'vatrate' => 0,
+          'meta-vatrate-source' => Creator::VatRateSource_Exact,
         );
         return array($line);
       }

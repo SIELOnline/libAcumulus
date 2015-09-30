@@ -148,13 +148,13 @@ abstract class Form {
   /**
    * Sets the form values to use.
    *
-   * @todo: make this simpler and rock solid: - no more values in definition? - getKeys =: key => '', ...
    * This is typically the union of the default values, any submitted values,
    * and explicitly set field values.
    */
   protected function setFormValues() {
     if (!$this->formValuesSet) {
-      $this->formValues = $this->getDefaultFormValues();
+      $this->formValues = array_fill_keys($this->getKeys(), '');
+      $this->formValues = array_merge($this->formValues, $this->getDefaultFormValues());
       if (!empty($this->submittedValues)) {
         $this->formValues = array_merge($this->formValues, $this->submittedValues);
       }
@@ -194,6 +194,18 @@ abstract class Form {
   }
 
   /**
+   * Sets the value for a specific form field.
+   *
+   * @param string $name
+   *   The name of the form field.
+   * @param mixed $value
+   *   The value for the form field.
+   */
+  protected function setFormValue($name, $value) {
+    $this->formValues[$name] = $value;
+  }
+
+  /**
    * Adds the form values to the field definitions.
    *
    * This method will not have a use on every web shop, but, e.g. VirtueMart and
@@ -202,7 +214,7 @@ abstract class Form {
    * form.
    */
   public function addValues() {
-    $this->fields = $this->addValuesInternal($this->getFields());
+    $this->fields = $this->addValuesToFields($this->getFields());
   }
 
   /**
@@ -215,10 +227,10 @@ abstract class Form {
    *
    * @return array[]
    */
-  protected function addValuesInternal(array $fields) {
+  protected function addValuesToFields(array $fields) {
     foreach ($fields as $name => &$field) {
       if ($field['type'] === 'fieldset') {
-        $field['fields'] = $this->addValuesInternal($field['fields']);
+        $field['fields'] = $this->addValuesToFields($field['fields']);
       }
       else if ($field['type'] === 'checkbox') {
         // Value is a list of checked options.
@@ -388,6 +400,8 @@ abstract class Form {
    *   contains the options as a keyed array, the keys being the value to
    *   submit if that choice is selected and the value being the label to show.
    *
+   * Do NOT override this method, instead override getFieldDefinitions().
+   *
    * @return array[]
    *   The definition of the form.
    */
@@ -401,9 +415,44 @@ abstract class Form {
   /**
    * Internal version of getFields();
    *
+   * Internal method, do not call directly.
+   * DO override this method not getFields().
+   *
    * @return array[]
+   *   The definition of the form.
    */
   abstract protected function getFieldDefinitions();
+
+  /**
+   * Returns a list of field ids/keys appearing in the form.
+   *
+   * @return array
+   *   Array of key names appearing in the form, keyed by these names.
+   */
+  protected function getKeys() {
+    return $this->getFieldKeys($this->getFields());
+  }
+
+  /**
+   * Returns the keys of the fields in the given array.
+   *
+   * Internal method, do not call directly.
+   *
+   * @param array[] $fields
+   *
+   * @return array
+   *   Array of key names, keyed by these names.
+   */
+  protected function getFieldKeys(array $fields) {
+    $result = array();
+    foreach ($fields as $key => $field) {
+      $result[$key] = $key;
+      if ($field['type'] === 'fieldset') {
+        $result += $this->getFieldKeys($field['fields']);
+      }
+    }
+    return $result;
+  }
 
   /**
    * Helper method to copy a value from one array to another array.

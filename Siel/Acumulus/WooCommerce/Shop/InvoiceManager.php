@@ -57,10 +57,6 @@ class InvoiceManager extends BaseInvoiceManager {
     if ((is_plugin_active('woocommerce-sequential-order-numbers/woocommerce-sequential-order-numbers.php') || is_plugin_active('woocommerce-sequential-order-numbers-pro/woocommerce-sequential-order-numbers-pro.php')) && $invoiceSourceType === Source::Order) {
       // Search for the order by the order number as assigned by the plugin.
       $args = array(
-        'numberposts' => -1,
-        'post_type'  => $this->sourceTypeToShopType($invoiceSourceType),
-        'post_status' => 'publish',
-        'fields'      => 'ids',
         'meta_query' => array(
           array(
             'key' => '_order_number',
@@ -69,10 +65,7 @@ class InvoiceManager extends BaseInvoiceManager {
           ),
         ),
       );
-      $query = new WP_Query($args);
-      $posts = $query->get_posts();
-      sort($posts);
-      return Source::invoiceSourceIdsToSources($invoiceSourceType, $posts);
+      return $this->query2Sources($args, $invoiceSourceType);
     }
     else if (is_plugin_active('wc-sequential-order-numbers/Sequential_Order_Numbers.php') && $invoiceSourceType === Source::Order) {
       // This plugin has not been tested yet. It will probably give problems as
@@ -81,10 +74,6 @@ class InvoiceManager extends BaseInvoiceManager {
       // plugin. But then, that is a bit the nature of the idea of sequential
       // order numbers: it should be used as of the beginning...
       $args = array(
-        'numberposts' => -1,
-        'post_type'  => $this->sourceTypeToShopType($invoiceSourceType),
-        'post_status' => 'publish',
-        'fields'      => 'ids',
         'meta_query' => array(
           array(
             'key' => '_order_number_formatted',
@@ -93,9 +82,7 @@ class InvoiceManager extends BaseInvoiceManager {
           ),
         ),
       );
-      $query = new WP_Query($args);
-      $posts = $query->get_posts();
-      return Source::invoiceSourceIdsToSources($invoiceSourceType, $posts);
+      return $this->query2Sources($args, $invoiceSourceType);
     }
     return parent::getInvoiceSourcesByReferenceRange($invoiceSourceType, $InvoiceSourceReferenceFrom, $InvoiceSourceReferenceTo);
   }
@@ -105,29 +92,24 @@ class InvoiceManager extends BaseInvoiceManager {
    */
   public function getInvoiceSourcesByDateRange($invoiceSourceType, DateTime $dateFrom, DateTime $dateTo) {
     $args = array(
-      'numberposts' => -1,
-      'post_type'  => $this->sourceTypeToShopType($invoiceSourceType),
-      'post_status' => 'publish',
       'date_query' => array(
         array(
           'column' => 'post_modified',
-          'after'    => array(
-            'year'  => $dateFrom->format('Y'),
+          'after' => array(
+            'year' => $dateFrom->format('Y'),
             'month' => $dateFrom->format('m'),
-            'day'   => $dateFrom->format('d'),
+            'day' => $dateFrom->format('d'),
           ),
-          'before'    => array(
-            'year'  => $dateTo->format('Y'),
+          'before' => array(
+            'year' => $dateTo->format('Y'),
             'month' => $dateTo->format('m'),
-            'day'   => $dateTo->format('d'),
+            'day' => $dateTo->format('d'),
           ),
-          'inclusive' => true,
+          'inclusive' => TRUE,
         ),
       ),
     );
-    $query = new WP_Query($args);
-    $posts = $query->get_posts();
-    return Source::invoiceSourceIdsToSources($invoiceSourceType, $posts);
+    return $this->query2Sources($args, $invoiceSourceType);
   }
 
   /**
@@ -155,6 +137,31 @@ class InvoiceManager extends BaseInvoiceManager {
    */
   protected function triggerInvoiceSent(array $invoice, BaseSource $invoiceSource, array $result) {
     do_action('acumulus_invoice_sent', $invoice, $invoiceSource, $result);
+  }
+
+  /**
+   * Helper method to get a list of Source given a set of query arguments.
+   *
+   * @param array $args
+   * @param string $invoiceSourceType
+   * @param bool $sort
+   *
+   * @return Source[]
+   */
+  protected function query2Sources(array $args, $invoiceSourceType, $sort = TRUE) {
+    // Add default arguments.
+    $args = $args + array(
+        'fields' => 'ids',
+        'numberposts' => -1,
+        'post_type' => $this->sourceTypeToShopType($invoiceSourceType),
+        'post_status' => array_keys(wc_get_order_statuses()),
+      );
+    $query = new WP_Query($args);
+    $ids = $query->get_posts();
+    if ($sort) {
+      sort($ids);
+    }
+    return Source::invoiceSourceIdsToSources($invoiceSourceType, $ids);
   }
 
 }

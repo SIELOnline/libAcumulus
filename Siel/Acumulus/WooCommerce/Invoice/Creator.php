@@ -421,19 +421,21 @@ class Creator extends BaseCreator {
    * {@inheritdoc}
    *
    * This override corrects a credit invoice if the amount does not match the
-   * sum of the lines so far. This can happen if an amount was entered manually,
+   * sum of the lines so far. This can happen if an amount was entered manually.
    */
   protected function getManualLines() {
     if ($this->invoiceSource->getType() === Source::CreditNote) {
       $amount = (float) $this->shopSource->order_total;
       $linesAmount = $this->getLinesTotal();
       if (!Number::floatsAreEqual($amount, $linesAmount)) {
+        // @todo: can we get the tax amount/rate over the manually entered refund?
         $line = array (
           'product' => $this->t('refund_adjustment'),
           'quantity' => 1,
           'unitpriceinc' => $amount - $linesAmount,
           'unitprice' => $amount - $linesAmount,
-          'vatrate' => 0
+          'vatrate' => 0,
+          'meta-vatrate-source' => Creator::VatRateSource_Exact,
         );
         return array($line);
       }

@@ -62,24 +62,24 @@ abstract class BatchForm extends Form {
       $this->errorMessages['invoice_source_type'] = $this->t('message_validate_batch_source_type_invalid');
     }
 
-    if (empty($this->submittedValues['invoice_source_reference_from']) && empty($this->submittedValues['date_from'])) {
+    if ($this->submittedValues['invoice_source_reference_from'] === '' && $this->submittedValues['date_from'] === '') {
       // Either a range of order id's or a range of dates should be entered.
       $this->errorMessages['invoice_source_reference_from'] = $this->t(count($invoiceSourceTypes) === 1 ? 'message_validate_batch_reference_or_date_1' : 'message_validate_batch_reference_or_date_2');
     }
-    else if (!empty($this->submittedValues['invoice_source_reference_from']) && !empty($this->submittedValues['date_from'])) {
+    else if ($this->submittedValues['invoice_source_reference_from'] !== '' && $this->submittedValues['date_from'] !== '') {
       // Not both ranges should be entered.
-       $this->errorMessages['date_from'] = $this->t(count($invoiceSourceTypes) === 1 ? 'message_validate_batch_reference_and_date_1' : 'message_validate_batch_reference_and_date_2');
+      $this->errorMessages['date_from'] = $this->t(count($invoiceSourceTypes) === 1 ? 'message_validate_batch_reference_and_date_1' : 'message_validate_batch_reference_and_date_2');
     }
-    else if (!empty($this->submittedValues['invoice_source_reference_from'])) {
+    else if ($this->submittedValues['invoice_source_reference_from'] !== '') {
       // Date from is empty, we go for a range of order ids.
       // (We ignore any date to value.)
       // Single id or range of ids?
-      if (!empty($this->submittedValues['invoice_source_reference_to']) && $this->submittedValues['invoice_source_reference_to'] < $this->submittedValues['invoice_source_reference_from']) {
+      if ($this->submittedValues['invoice_source_reference_to'] !== '' && $this->submittedValues['invoice_source_reference_to'] < $this->submittedValues['invoice_source_reference_from']) {
         // order id to is smaller than order id from.
-         $this->errorMessages['invoice_source_reference_to'] = $this->t('message_validate_batch_bad_order_range');
+        $this->errorMessages['invoice_source_reference_to'] = $this->t('message_validate_batch_bad_order_range');
       }
     }
-    else /*if (!empty($this->submittedValues['date_to'])) */ {
+    else /*if ($this->submittedValues['date_to'] !== '') */ {
       // Range of dates has been filled in.
       // We ignore any order # to value.
       $dateFormat = $this->getDateFormat();
@@ -88,7 +88,7 @@ abstract class BatchForm extends Form {
         $this->errorMessages['date_from'] = sprintf($this->t('message_validate_batch_bad_date_from'), $this->getShopDateFormat());
       }
       if ($this->submittedValues['date_to']) {
-        if(!DateTime::createFromFormat($dateFormat, $this->submittedValues['date_to'])) {
+        if (!DateTime::createFromFormat($dateFormat, $this->submittedValues['date_to'])) {
           // Date to not a valid date.
           $this->errorMessages['date_to'] = sprintf($this->t('message_validate_batch_bad_date_to'), $this->getShopDateFormat());
         }
@@ -108,7 +108,7 @@ abstract class BatchForm extends Form {
    */
   protected function execute() {
     $type = $this->getFormValue('invoice_source_type');
-    if ($this->getFormValue('invoice_source_reference_from')) {
+    if ($this->getFormValue('invoice_source_reference_from') !== '') {
       // Retrieve by order reference range.
       $from = $this->getFormValue('invoice_source_reference_from');
       $to = $this->getFormValue('invoice_source_reference_to') ? $this->getFormValue('invoice_source_reference_to') : $from;
@@ -117,7 +117,7 @@ abstract class BatchForm extends Form {
     else {
       // Retrieve by order date.
       $dateFormat = $this->getDateFormat();
-      $from =  DateTime::createFromFormat($dateFormat, $this->getFormValue('date_from'));
+      $from = DateTime::createFromFormat($dateFormat, $this->getFormValue('date_from'));
       $from->setTime(0, 0, 0);
       $to = $this->getFormValue('date_to') ? DateTime::createFromFormat($dateFormat, $this->getFormValue('date_to')) : clone $from;
       $to->setTime(23, 59, 59);
@@ -132,7 +132,7 @@ abstract class BatchForm extends Form {
     }
     // Set formValue for log in case form values are already queried.
     $logText = implode("\n", $this->log);
-    $this->formValues['log'] = $logText;
+    $this->setFormValue('log', $logText);
     return $result;
   }
 
@@ -160,7 +160,7 @@ abstract class BatchForm extends Form {
         'label' => $this->t('field_invoice_source_type'),
         'options' => $options,
         'attributes' => array(
-          'required' => true,
+          'required' => TRUE,
         ),
       );
     }
@@ -234,7 +234,7 @@ abstract class BatchForm extends Form {
           'type' => 'markup',
           'value' => $this->t('batch_info'),
           'attributes' => array(
-            'readonly' => true,
+            'readonly' => TRUE,
           ),
         ),
       ),
@@ -251,6 +251,5 @@ abstract class BatchForm extends Form {
       'force_send' => 'force_send',
     );
   }
-
 
 }

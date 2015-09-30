@@ -462,15 +462,7 @@ class Creator extends BaseCreator {
       // So this is never going  to work!!!
       // @todo: can we get differences incl and excl tax?
       $amount = -$this->creditSlip->amount - $this->creditSlip->shipping_cost_amount;
-      $linesAmount = array_reduce($this->invoice['customer']['invoice']['line'], function ($sum, $item) {
-        if (isset($item['meta-linepriceinc'])) {
-          $sum += $item['meta-linepriceinc'];
-        }
-        else /* if (isset ($item['unitpriceinc'])) */ {
-          $sum += $item['quantity'] * $item['unitpriceinc'];
-        }
-        return $sum;
-      }, 0.0);
+      $linesAmount = $this->getLinesTotal();
       if (!Number::floatsAreEqual($amount, $linesAmount)) {
         $line = array (
           'product' => $this->t('refund_adjustment'),

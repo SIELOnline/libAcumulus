@@ -198,7 +198,10 @@ class Creator extends BaseCreator {
   protected function getItemLines() {
     $result = array();
     foreach ($this->shopSource->get_items() as $line) {
-      $result[] = $this->getItemLine($line, $this->shopSource);
+      $itemLine = $this->getItemLine($line, $this->shopSource);
+      if ($itemLine) {
+        $result[] = $itemLine;
+      }
     }
     return $result;
   }
@@ -210,9 +213,16 @@ class Creator extends BaseCreator {
    * @param WC_Abstract_Order $order
    *
    * @return array
+   *   May be empty if the line should not be sent (e.g. qty = 0 on a refund).
    */
   protected function getItemLine(array $item, WC_Abstract_Order $order) {
     $result = array();
+
+    // Qty = 0 happens on refunds: products that are not returned are still
+    // listed but have qty = 0.
+    if (Number::isZero($item['qty'])) {
+      return $result;
+    }
 
     $isVariation = !empty($item['variation_id']);
     $product = wc_get_product($isVariation ? $item['variation_id'] : $item['product_id']);
@@ -255,7 +265,7 @@ class Creator extends BaseCreator {
     // Precision: one of the prices is entered by the administrator and thus can
     // be considered exact. The computed one is not rounded, so we can assume a
     // very high precision for all values here.
-    $result += $this->getVatRangeTags($productVat, $productPriceEx, 0.0001, 0.0001);
+    $result += $this->getVatRangeTags($productVat, $productPriceEx, 0.001, 0.001);
 
     return $result;
   }
@@ -313,6 +323,11 @@ class Creator extends BaseCreator {
       $description = $this->t('shipping_costs');
     }
     else {
+      // We do not need to indicate that free shipping is not refunded on an
+      // order refund.
+      if ($this->invoiceSource->getType() == Source::CreditNote) {
+        return array();
+      }
       $description = $this->t('free_shipping');
     }
 
@@ -379,7 +394,7 @@ class Creator extends BaseCreator {
       }
     }
     else {
-      $description = sprintf('%f%%', $coupon->coupon_amount);
+      $description .= $coupon->coupon_amount . '%';
       if ($coupon->enable_free_shipping()) {
         $description .= ' + ' . $this->t('free_shipping');
       }
@@ -393,7 +408,7 @@ class Creator extends BaseCreator {
     $metaVatrateSource = static::VatRateSource_Completor;
 
     return array(
-      'itemnumber' => '',
+      'itemnumber' => $coupon->code,
       'product' => $description,
       'unitprice' => -$amount,
       'vatrate' => $vatrate,
@@ -401,5 +416,30 @@ class Creator extends BaseCreator {
       'quantity' => 1,
     );
   }
+
+  /**
+   * {@inheritdoc}
+   *
+   * This override corrects a credit invoice if the amount does not match the
+   * sum of the lines so far. This can happen if an amount was entered manually,
+   */
+  protected function getManualLines() {
+    if ($this->invoiceSource->getType() === Source::CreditNote) {
+      $amount = (float) $this->shopSource->order_total;
+      $linesAmount = $this->getLinesTotal();
+      if (!Number::floatsAreEqual($amount, $linesAmount)) {
+        $line = array (
+          'product' => $this->t('refund_adjustment'),
+          'quantity' => 1,
+          'unitpriceinc' => $amount - $linesAmount,
+          'unitprice' => $amount - $linesAmount,
+          'vatrate' => 0
+        );
+        return array($line);
+      }
+    }
+    return parent::getManualLines();
+  }
+
 
 }

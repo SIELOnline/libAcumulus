@@ -834,6 +834,24 @@ abstract class Creator {
   }
 
   /**
+   * Returns the total amount for all (current) invoice lines.
+   *
+   * @return float
+   */
+  protected function getLinesTotal() {
+    $linesAmount = 0.0;
+    foreach ($this->invoice['customer']['invoice']['line'] as $line) {
+      if (isset($line['meta-linepriceinc'])) {
+        $linesAmount += $line['meta-linepriceinc'];
+      }
+      else /* if (isset ($item['unitpriceinc'])) */ {
+        $linesAmount += $line['quantity'] * $line['unitpriceinc'];
+      }
+    }
+    return $linesAmount;
+  }
+
+  /**
    * Returns the sign to use for amounts that are always defined as a positive
    * number, also on credit notes.
    *

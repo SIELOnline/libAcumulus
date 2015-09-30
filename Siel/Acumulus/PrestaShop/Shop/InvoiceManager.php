@@ -65,13 +65,15 @@ class InvoiceManager extends BaseInvoiceManager {
    * {@inheritdoc}
    */
   public function getInvoiceSourcesByDateRange($invoiceSourceType, DateTime $dateFrom, DateTime $dateTo) {
+    $dateFrom = $dateFrom->format('c');
+    $dateTo = $dateTo->format('c');
     switch ($invoiceSourceType) {
       case Source::Order:
         $ids = Order::getOrdersIdByDate($dateFrom, $dateTo);
-        return Source::invoiceSourceIdsToSources($invoiceSourceType, $this->getIds($ids, 'id_order'));
+        return Source::invoiceSourceIdsToSources($invoiceSourceType, $ids);
       case Source::CreditNote:
         $ids = OrderSlip::getSlipsIdByDate($dateFrom, $dateTo);
-        return Source::invoiceSourceIdsToSources($invoiceSourceType, $this->getIds($ids, 'id_order_slip'));
+        return Source::invoiceSourceIdsToSources($invoiceSourceType, $ids);
     }
     return array();
   }

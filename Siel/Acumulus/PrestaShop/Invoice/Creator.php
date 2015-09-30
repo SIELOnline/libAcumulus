@@ -274,9 +274,10 @@ class Creator extends BaseCreator {
       $result['meta-linepriceinc'] = $sign * $item['total_price_tax_incl'];
     }
     $result['quantity'] = $item['product_quantity'];
-    if ($this->invoiceSource->getType() === Source::Order) {
-      // These 3 fields are only defined in order_detail_tax, the table
-      // order_slip_detail_tax seems to remain empty in PS1.6.1.0.
+    // These 3 fields are only defined for orders, as the table
+    // order_slip_detail_tax seems to remain empty in PS1.6.1.1. But as the
+    // join may be empty, we just check if the fields are available.
+    if (isset($item['rate'])) {
       $result['vatamount'] = $item['unit_amount'];
       $result['meta-linevatamount'] = $item['total_amount'];
       $result['vatrate'] = $item['rate'];
@@ -312,6 +313,7 @@ class Creator extends BaseCreator {
       $result = array(
         'product' => $description,
         'unitprice' => 0,
+        'unitpriceinc' => 0,
         'quantity' => 1,
         'vatamount' => 0,
         'vatrate' => NULL,
@@ -477,9 +479,9 @@ class Creator extends BaseCreator {
       if (!Number::floatsAreEqual($amount, $linesAmount)) {
         $line = array(
           'product' => $this->t('refund_adjustment'),
-          'quantity' => 1,
-          'unitpriceinc' => $amount - $linesAmount,
           'unitprice' => $amount - $linesAmount,
+          'unitpriceinc' => $amount - $linesAmount,
+          'quantity' => 1,
           'vatrate' => 0,
           'meta-vatrate-source' => Creator::VatRateSource_Exact,
         );

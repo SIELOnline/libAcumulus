@@ -166,9 +166,8 @@ abstract class Creator {
       $this->invoice['customer']['salutation'] = $this->getSalutation($customerSettings['salutation']);
     }
     $this->convertEuCountryCode();
-    if (!empty($this->invoice['customer']['countrycode'])) {
-      $this->addDefault($this->invoice['customer'], 'country', $this->countries->getCountryName($this->invoice['customer']['countrycode']));
-    }
+    $this->addDefault($this->invoice['customer'], 'countrycode', 'nl');
+    $this->addDefault($this->invoice['customer'], 'country', $this->countries->getCountryName($this->invoice['customer']['countrycode']));
   }
 
   /**
@@ -290,9 +289,7 @@ abstract class Creator {
    * This could/should be server side, but for now it is done client side.
    */
   protected function convertEuCountryCode() {
-    if (!empty($this->invoice['customer']['countrycode'])) {
-      $this->invoice['customer']['countrycode'] = $this->countries->convertEuCountryCode($this->invoice['customer']['countrycode']);
-    }
+    $this->invoice['customer']['countrycode'] = $this->countries->convertEuCountryCode($this->invoice['customer']['countrycode']);
   }
 
   /**

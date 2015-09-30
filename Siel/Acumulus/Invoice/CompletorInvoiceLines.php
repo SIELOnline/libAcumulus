@@ -239,7 +239,7 @@ class CompletorInvoiceLines {
           $vatTypeVatRates = array(-1);
           break;
         case ConfigInterface::VatType_ForeignVat:
-          $vatTypeVatRates = $this->getVatRates();
+          $vatTypeVatRates = $this->getVatRates($this->invoice['customer']['countrycode']);
           break;
       }
       $vatTypeVatRates = array_map(function($vatRate) use ($vatType) {
@@ -536,31 +536,24 @@ class CompletorInvoiceLines {
   }
 
   /**
-   * Helper method to get vat info for the current invoice rom the Acumulus API.
+   * Helper method to get vat info for the current invoice from the Acumulus API.
    *
-   * The vat rates at the invoice date are retrieved.
+   * The vat rates as they were at the invoice date are retrieved.
    *
    * @param string $countryCode
-   *   The country to fetch the vat rates for. If empty, the vat rates for the
-   *   clients country are taken.
+   *   The country to fetch the vat rates for.
    *
    * @return array
    *
    * @see \Siel\Acumulus\Web\Service::getVatInfo().
    */
-  protected function getVatRates($countryCode = '') {
-    $result = array();
-    if (!empty($countryCode) || !empty($this->invoice['customer']['countrycode'])) {
-      if (empty($countryCode)) {
-        $countryCode = $this->invoice['customer']['countrycode'];
-      }
-      $date = $this->getInvoiceDate();
-      $vatInfo = $this->acumulusWebService->getVatInfo($countryCode, $date);
-      // PHP5.5: array_column($vatInfo['vatinfo'], 'vatrate');
-      $result = array_map(function ($vatInfo1) {
-        return $vatInfo1['vatrate'];
-      }, $vatInfo['vatinfo']);
-    }
+  protected function getVatRates($countryCode) {
+    $date = $this->getInvoiceDate();
+    $vatInfo = $this->acumulusWebService->getVatInfo($countryCode, $date);
+    // PHP5.5: array_column($vatInfo['vatinfo'], 'vatrate');
+    $result = array_map(function ($vatInfo1) {
+      return $vatInfo1['vatrate'];
+    }, $vatInfo['vatinfo']);
     return $result;
   }
 

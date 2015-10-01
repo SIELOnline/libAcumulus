@@ -213,7 +213,7 @@ abstract class BatchForm extends Form {
             'attributes' => array(
               'readonly' => TRUE,
               'rows' => min(10, count($this->log)),
-              'style' => 'box-sizing: border-box; width: 100%; min-width: 32em;',
+              'style' => 'box-sizing: border-box; width: 100%; min-width: 48em;',
             ),
           ),
         ),

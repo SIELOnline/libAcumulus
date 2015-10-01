@@ -53,7 +53,7 @@ abstract class Creator {
   /** @var \Siel\Acumulus\Helpers\Countries */
   protected $countries;
 
-  /** @var array Resulting Acumulus invoice*/
+  /** @var array Resulting Acumulus invoice */
   protected $invoice = array();
 
   /** @var Source */
@@ -234,43 +234,45 @@ abstract class Creator {
    * Override if the property name or getter method is constructed differently.
    *
    * @param string $property
-   * @param object|array $order
+   * @param object|array $object
    *
    * @return string
    *   The value for the property of the given name or the empty string if not
    *   available.
    */
-  protected function getProperty($property, $order) {
+  protected function getProperty($property, $object) {
     $value = '';
-    if (is_array($order)) {
-      if (isset($order[$property])) {
-        $value = $order[$property];
+    if (is_array($object)) {
+      if (isset($object[$property])) {
+        $value = $object[$property];
       }
     }
     else {
-      if (isset($order->$property)) {
-        $value = $order->$property;
+      if (isset($object->$property)) {
+        $value = $object->$property;
       }
-      else if (is_callable(array($order, $property))) {
-        $value = $order->$property();
+      else if (method_exists($object, $property)) {
+        $value = $object->$property();
       }
       else {
         $method = 'get' . ucfirst($property);
-        if (is_callable(array($order, $method))) {
-          $value = $order->$method();
+        if (method_exists($object, $method)) {
+          $value = $object->$method();
         }
-        else if (method_exists($order, '__get')) {
-          @$value = $order->$property;
+        else if (method_exists($object, '__get')) {
+          @$value = $object->$property;
         }
-        else if (method_exists($order, '__call')) {
+        else if (method_exists($object, '__call')) {
           try {
-            $value = $order->$property();
-          } catch (Exception $e) {
+            $value = @$object->$property();
+          }
+          catch (Exception $e) {
           }
           if (empty($value)) {
             try {
-              $value = $order->$method();
-            } catch (Exception $e) {
+              $value = $object->$method();
+            }
+            catch (Exception $e) {
             }
           }
         }
@@ -345,7 +347,7 @@ abstract class Creator {
 
     $result = array_merge($result, $this->getInvoiceTotals());
 
-    return  $result;
+    return $result;
   }
 
   /**
@@ -692,16 +694,16 @@ abstract class Creator {
     if (is_array($source)) {
       if (!empty($source[$sourceKey])) {
         $targetArray[$targetKey] = $source[$sourceKey];
-        return true;
+        return TRUE;
       }
     }
     else {
       if (!empty($source->$sourceKey)) {
         $targetArray[$targetKey] = $source->$sourceKey;
-        return true;
+        return TRUE;
       }
     }
-    return false;
+    return FALSE;
   }
 
   /**
@@ -717,9 +719,9 @@ abstract class Creator {
   protected function addIfNotEmpty(array &$array, $key, $value) {
     if (!empty($value)) {
       $array[$key] = $value;
-      return true;
+      return TRUE;
     }
-    return false;
+    return FALSE;
   }
 
   /**
@@ -737,11 +739,11 @@ abstract class Creator {
   protected function addEmpty(array &$array, $key, $value, $default = '') {
     if (!empty($value)) {
       $array[$key] = $value;
-      return true;
+      return TRUE;
     }
     else {
       $array[$key] = $default;
-      return false;
+      return FALSE;
     }
   }
 
@@ -758,9 +760,9 @@ abstract class Creator {
   protected function addDefault(array &$array, $key, $value) {
     if (empty($array[$key]) && !empty($value)) {
       $array[$key] = $value;
-      return true;
+      return TRUE;
     }
-    return false;
+    return FALSE;
   }
 
   /**

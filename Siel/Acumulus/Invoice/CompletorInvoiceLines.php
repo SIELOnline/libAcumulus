@@ -53,6 +53,7 @@ use Siel\Acumulus\Web\Service;
 class CompletorInvoiceLines {
 
   const VatRateSource_Calculated_Corrected = 'calculated-corrected';
+  const VatRateSource_Strategy_Completed = 'strategy-completed';
 
   /** @var \Siel\Acumulus\Invoice\ConfigInterface */
   protected $config;
@@ -435,7 +436,7 @@ class CompletorInvoiceLines {
         /** @var CompletorStrategyBase $strategy  */
         $strategy = new $strategyClass($this->translator, $this->invoice, $this->possibleVatTypes, $this->possibleVatRates);
         if ($strategy->apply()) {
-          $this->replaceLines2Complete($strategy->getLinesCompleted() , $strategy->getCompletedLines());
+          $this->replaceLinesCompleted($strategy->getLinesCompleted() , $strategy->getCompletedLines());
           if (empty($this->invoice['customer']['invoice']['meta-completor-strategy-used'])) {
             $this->invoice['customer']['invoice']['meta-completor-strategy-used'] = $strategy->getDescription();
           }
@@ -497,19 +498,22 @@ class CompletorInvoiceLines {
    * @param array[] $completedLines
    *   An array of completed invoice lines to replace the strategy lines with.
    */
-  protected function replaceLines2Complete(array $linesCompleted, array $completedLines) {
+  protected function replaceLinesCompleted(array $linesCompleted, array $completedLines) {
     // Remove old strategy lines that are now completed.
     $lines = array();
     foreach ($this->invoice['customer']['invoice']['line'] as $key => $line) {
-      if (in_array($key, $linesCompleted)) {
+      if (!in_array($key, $linesCompleted)) {
         $lines[] = $line;
       }
     }
-    $this->invoice['customer']['invoice']['line'] = $lines;
 
     // And merge in the new completed ones.
-    $this->invoice['customer']['invoice']['line'] = array_merge($this->invoice['customer']['invoice']['line'],
-      $completedLines);
+    foreach ($completedLines as &$completedLine) {
+      if ($completedLine['meta-vatrate-source'] === Creator::VatRateSource_Strategy) {
+        $completedLine['meta-vatrate-source'] = static::VatRateSource_Strategy_Completed;
+      }
+    }
+    $this->invoice['customer']['invoice']['line'] = array_merge($lines, $completedLines);
   }
 
   /**

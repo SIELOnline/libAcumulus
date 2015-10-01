@@ -87,6 +87,9 @@ class Creator extends BaseCreator {
     return $result;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function searchProperty($property) {
     $invoiceAddress = new Address($this->order->id_address_invoice);
     $value = $this->getProperty($property, $invoiceAddress);
@@ -99,7 +102,6 @@ class Creator extends BaseCreator {
     }
     return $value;
   }
-
 
   /**
    * {@inheritdoc}

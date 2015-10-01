@@ -9,7 +9,6 @@ use Mage_Sales_Model_Order_Creditmemo;
 use Mage_Sales_Model_Order_Creditmemo_Item;
 use Mage_Sales_Model_Order_Invoice;
 use Mage_Sales_Model_Order_Item;
-use Mage_Sales_Model_Order_Payment;
 use Mage_Tax_Model_Config;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\ConfigInterface as InvoiceConfigInterface;
@@ -77,6 +76,7 @@ class Creator extends BaseCreator {
       /** @var Mage_Customer_Model_Customer $customer */
       $customer = Mage::getModel('customer/customer')->load($order->getCustomerId());
       $result['contactyourid'] = $customer->getId();
+      /** @noinspection PhpUndefinedMethodInspection */
       $this->addIfNotEmpty($result, 'contactyourid', $customer->getIncrementId());
     }
 
@@ -94,12 +94,29 @@ class Creator extends BaseCreator {
     // Magento has 2 VAT numbers:
     // http://magento.stackexchange.com/questions/42164/there-are-2-vat-fields-in-onepage-checkout-which-one-should-i-be-using
     $this->addIfNotEmpty($result, 'vatnumber', $order->getCustomerTaxvat());
+    /** @noinspection PhpUndefinedMethodInspection */
     $this->addIfNotEmpty($result, 'vatnumber', $invoiceAddress->getVatId());
     $this->addIfNotEmpty($result, 'telephone', $invoiceAddress->getTelephone());
     $this->addIfNotEmpty($result, 'fax', $invoiceAddress->getFax());
     $result['email'] = $invoiceAddress->getEmail();
 
     return $result;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function searchProperty($property) {
+    $invoiceAddress = $this->invoiceSource->getSource()->getBillingAddress();
+    $value = $this->getProperty($property, $invoiceAddress);
+    if (empty($value)) {
+      $customer = Mage::getModel('customer/customer')->load($this->invoiceSource->getSource()->getCustomerId());
+      $value = $this->getProperty($property, $customer);
+    }
+    if (empty($value)) {
+      $value = parent::searchProperty($property);
+    }
+    return $value;
   }
 
   /**
@@ -141,13 +158,20 @@ class Creator extends BaseCreator {
   protected function getPaymentDateOrder() {
     // Take date of last payment as payment date.
     $paymentDate = null;
-    foreach($this->order->getAllPayments() as $payment) {
-      /** @var Mage_Sales_Model_Order_Payment $payment */
-      if (!$paymentDate || substr($payment->getUpdatedAt(), 0, strlen('yyyy-mm-dd')) > $paymentDate) {
-        $paymentDate = substr($payment->getUpdatedAt(), 0, strlen('yyyy-mm-dd'));
+    foreach($this->order->getStatusHistoryCollection() as $statusChange) {
+      /** @var \Mage_Sales_Model_Order_Status_History $statusChange */
+      if (!$paymentDate || $this->isPaidStatus($statusChange->getStatus())) {
+        $createdAt = substr($statusChange->getCreatedAt(), 0, strlen('yyyy-mm-dd'));
+        if (!$paymentDate || $createdAt < $paymentDate) {
+          $paymentDate = $createdAt;
+        }
       }
     }
     return $paymentDate;
+  }
+
+  protected function isPaidStatus($status) {
+    return in_array($status, array('processing', 'closed', 'complete'));
   }
 
   protected function getPaymentDateCreditNote() {
@@ -346,7 +370,12 @@ class Creator extends BaseCreator {
    * {@inheritdoc}
    */
   protected function getShippingLine() {
-    $result = array();
+    $shippingDescription = $this->order->getShippingDescription();
+    $result = array(
+      'itemnumber' => '',
+      'product' => !empty($shippingDescription) ? $shippingDescription : $this->t('shipping_costs'),
+      'quantity' => 1,
+    );
 
     // What do the following methods return:
     // - getShippingAmount():         shipping costs excl VAT excl any discount
@@ -365,6 +394,7 @@ class Creator extends BaseCreator {
       $sign = $this->getSign();
       $shippingVat = $sign * $magentoSource->getShippingTaxAmount();
       if ($this->invoiceSource->getType() === Source::Order && !Number::isZero($magentoSource->getShippingDiscountAmount())) {
+        // Include discount in the unit price.
         $shippingInc = $sign * ($magentoSource->getShippingInclTax() - $magentoSource->getShippingDiscountAmount());
         $shippingEx = $shippingInc - $shippingVat;
       }
@@ -384,11 +414,11 @@ class Creator extends BaseCreator {
       }
       // !End of Magento bug!
 
-      $result += $this->getVatRangeTags($shippingVat, $shippingEx, 0.02, 0.04);
       $result += array(
         'unitprice' => $shippingEx,
         'unitpriceinc' => $shippingInc,
       );
+      $result += $this->getVatRangeTags($shippingVat, $shippingEx, 0.02, 0.04);
       if (!Number::isZero($magentoSource->getShippingDiscountAmount())) {
         $result['meta-linediscountamountinc'] = $sign * -$magentoSource->getShippingDiscountAmount();
       }
@@ -399,20 +429,11 @@ class Creator extends BaseCreator {
       // Free shipping should get a "normal" tax rate. We leave that to the
       // completor to determine.
       $result += array(
+        'unitprice' => 0,
         'vatrate' => NULL,
         'meta-vatrate-source' => static::VatRateSource_Completor,
-        'unitprice' => 0,
       );
     }
-
-    // Include discount in the unit price.
-    $shippingDescription = $this->order->getShippingDescription();
-    $result += array(
-      'itemnumber' => '',
-      'product' => !empty($shippingDescription) ? $shippingDescription : $this->t('shipping_costs'),
-      'quantity' => 1,
-    );
-
     return $result;
   }
 

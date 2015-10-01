@@ -126,13 +126,13 @@ class Creator extends BaseCreator {
   /**
    * {@inheritdoc}
    */
-  protected function getProperty($property) {
-    $value = @$this->order['details']['BT']->$property;
+  protected function searchProperty($property) {
+    $value = @$this->getProperty($property, $this->order['details']['BT']);
     if (empty($value)) {
-      $value = @$this->user->$property;
+      $value = @$this->getProperty($property, $this->user);
     }
     if (empty($value)) {
-      $value = @$this->user->userInfo[$this->userBtUid]->$property;
+      $value = @$this->getProperty($property, $this->user->userInfo[$this->userBtUid]);
     }
     return $value;
   }

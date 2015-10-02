@@ -5,6 +5,7 @@ use JSession;
 use JText;
 use Siel\Acumulus\Shop\ConfigForm as BaseConfigForm;
 use Siel\Acumulus\Shop\ConfigInterface;
+use VirtueMartModelOrderstatus;
 use VmModel;
 
 /**
@@ -27,8 +28,9 @@ class ConfigForm extends BaseConfigForm {
    * {@inheritdoc}
    */
   protected function getShopOrderStatuses() {
-    /** @var \VirtueMartModelOrderstatus $orderStatusModel */
+    /** @var VirtueMartModelOrderstatus $orderStatusModel */
     $orderStatusModel = VmModel::getModel('orderstatus');
+    /** @var array $orderStates Method getOrderStatusNames() has an incorrect @return type ... */
     $orderStates = $orderStatusModel->getOrderStatusNames();
     foreach ($orderStates as $code => &$value) {
       $value = \JText::_($value['order_status_name']);

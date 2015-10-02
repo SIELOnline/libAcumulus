@@ -30,6 +30,7 @@ class CommunicatorLocal extends Communicator {
 			}');
     }
     else {
+      /** @noinspection HtmlUnknownTag */
       $response = '<myxml>
         <errors>
           <count_errors>0</count_errors>

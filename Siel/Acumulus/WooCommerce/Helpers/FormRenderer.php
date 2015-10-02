@@ -35,8 +35,9 @@ class FormRenderer extends BaseFormRenderer {
   /**
    * @inheritdoc
    *
-   * This override echo's the output besides returning it as WordPress is in
-   * outputting mode when this method gets called.
+   * This override makes access public and echo's the output besides returning
+   * it as WordPress is in field by field outputting mode when this method gets
+   * called.
    */
   public function field(array $field) {
     $output = parent::field($field);

@@ -57,7 +57,7 @@ class ConfigFormTranslations extends TranslationCollection {
     'desc_dateToUse' => 'U kunt hier kiezen welke datum de factuur in Acumulus moet krijgen.',
 
     'field_salutation' => 'Aanhef',
-    'desc_salutation' => 'U kunt hier de aanhef specificeren zoals u die op de Acumulus factuur wilt hebben. U kunt #property# gebruiken om een waarde uit de order of klantgegevens te gebruiken, b.v. "Beste #firstName#,".',
+    'desc_salutation' => 'U kunt hier de aanhef specificeren zoals u die op de Acumulus factuur wilt hebben. U kunt [#property] gebruiken om een waarde uit de order of klantgegevens te gebruiken, b.v. "Beste [#firstName],".',
 
     'field_clientData' => 'Klantadresgegevens',
     'option_sendCustomer' => 'Uw (niet zakelijke) klanten automatisch aan uw relaties in Acumulus toevoegen.',
@@ -181,7 +181,7 @@ Vink deze optie aan als u geen regel op uw factuur of pakbon wil voor gratis ver
     'desc_dateToUse' => 'Select which date to use for the invoice in Acumulus.',
 
     'field_salutation' => 'Salutations',
-    'desc_salutation' => 'Specify the salutations for the Acumulus invoice. You can use #property# to get a property value out of the order or customer values, e.g. "Dear #firstName#,".',
+    'desc_salutation' => 'Specify the salutations for the Acumulus invoice. You can use [#property] to get a property value out of the order or customer values, e.g. "Dear [#firstName],".',
 
     'field_clientData' => 'Customer address data',
     'option_sendCustomer' => 'Send consumer client records to Acumulus.',

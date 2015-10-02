@@ -97,7 +97,14 @@ class FormRenderer {
     return $this->fields($this->form->getFields());
   }
 
-  public function fields(array $fields) {
+  /**
+   * Renders a set of field definitions.
+   *
+   * @param array[] $fields
+   *
+   * @return string
+   */
+  protected function fields(array $fields) {
     $output = '';
     foreach ($fields as $name => $field) {
       if (!isset($field['name'])) {
@@ -108,7 +115,14 @@ class FormRenderer {
     return $output;
   }
 
-  public function field(array $field) {
+  /**
+   * Renders 1 field definition (which may be a fieldset with multiple fields).
+   *
+   * @param array $field
+   *
+   * @return string
+   */
+  protected function field(array $field) {
     $output = '';
     if (!isset($field['attributes'])) {
       $field['attributes'] = array();
@@ -315,7 +329,7 @@ class FormRenderer {
    * @return string
    *   The rendered text field.
    */
-  public function input($type, $name, $value = '', array $attributes = array()) {
+  protected function input($type, $name, $value = '', array $attributes = array()) {
     $output = '';
 
     // Tag around input element.
@@ -350,7 +364,7 @@ class FormRenderer {
    * @return string
    *   The rendered textarea field.
    */
-  public function textarea($name, $value = '', array $attributes = array()) {
+  protected function textarea($name, $value = '', array $attributes = array()) {
     $output = '';
 
     // Tag around input element.
@@ -387,7 +401,7 @@ class FormRenderer {
    *
    * @deprecated
    */
-  public function text($name, $value = '', array $attributes = array()) {
+  protected function text($name, $value = '', array $attributes = array()) {
     return $this->input('text', $name, $value, $attributes);
   }
 
@@ -409,7 +423,7 @@ class FormRenderer {
    *
    * @deprecated
    */
-  public function password($name, $value = '', array $attributes = array()) {
+  protected function password($name, $value = '', array $attributes = array()) {
     return $this->input('password', $name, $value, $attributes);
   }
 
@@ -433,7 +447,7 @@ class FormRenderer {
    * @return string The rendered select element.
    * The rendered select element.
    */
-  public function select($name, $selected, array $options, array $attributes = array()) {
+  protected function select($name, $selected, array $options, array $attributes = array()) {
     $output = '';
 
     // Tag around select element: same as for an input element.
@@ -480,7 +494,7 @@ class FormRenderer {
    * @return string The rendered radio buttons.
    * The rendered radio buttons.
    */
-  public function radio($name, $selected, array $options, array $attributes = array()) {
+  protected function radio($name, $selected, array $options, array $attributes = array()) {
     $output = '';
 
     // Handling of required attribute: may appear on on all radio buttons with
@@ -533,7 +547,7 @@ class FormRenderer {
    * @return string The rendered checkboxes.
    * The rendered checkboxes.
    */
-  public function checkbox($name, array $selected, array $options, array $attributes = array()) {
+  protected function checkbox($name, array $selected, array $options, array $attributes = array()) {
     $output = '';
 
     // Div tag.

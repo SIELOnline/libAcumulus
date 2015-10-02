@@ -184,7 +184,7 @@ abstract class Creator {
    *   The salutation for the customer of this order.
    */
   protected function getSalutation($salutation) {
-    $salutation = preg_replace_callback('/#([^#]+)#/', array($this, 'salutationMatch'), $salutation);
+    $salutation = preg_replace_callback('/\[#([^]]+)]/', array($this, 'salutationMatch'), $salutation);
     return $salutation;
   }
 

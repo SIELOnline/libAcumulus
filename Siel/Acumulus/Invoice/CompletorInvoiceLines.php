@@ -308,12 +308,24 @@ class CompletorInvoiceLines {
           // We can reduce the number of possible vat types and thus also the
           // number of possible vat rates.
           $this->possibleVatTypes = array_values($remainingVatTypes);
-          $this->possibleVatRates = array_filter($this->possibleVatRates, function ($vatRateInfo) {
-            return in_array($vatRateInfo['vattype'], $this->possibleVatTypes);
-          });
+          $this->possibleVatRates = array_filter($this->possibleVatRates, array($this, 'filterVatRatesByPossibleVatTypes'));
         }
       }
     }
+  }
+
+  /**
+   * Checks whether a vat arte info array belongs to one of the still possible
+   * vat types.
+   *
+   * As of PHP 5.4 this can be made an anonymous function (using: use ($this)).
+   *
+   * @param array $vatRateInfo
+   *
+   * @return bool
+   */
+  protected function filterVatRatesByPossibleVatTypes(array $vatRateInfo) {
+    return in_array($vatRateInfo['vattype'], $this->possibleVatTypes);
   }
 
   protected function completeVatType() {

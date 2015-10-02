@@ -1,10 +1,7 @@
 <?php
 namespace Siel\Acumulus\Invoice\CompletorStrategy;
 
-use Siel\Acumulus\Helpers\Number;
-use Siel\Acumulus\Invoice\CompletorInvoiceLines;
 use Siel\Acumulus\Invoice\CompletorStrategyBase;
-use Siel\Acumulus\Invoice\Creator;
 
 /**
  * Class SplitNonMatchingLine implements a vat completor strategy by recognizing
@@ -86,9 +83,11 @@ class SplitNonMatchingLine extends CompletorStrategyBase {
   }
 
   /**
+   * @param array $line
+   *
    * @return bool
    */
-  protected function splitNonMatchingLine($line) {
+  protected function splitNonMatchingLine(array $line) {
     list($lowAmount, $highAmount) = $this->splitAmountOver2VatRates($line['meta-lineprice'],
       $line['meta-linepriceinc'] - $line['meta-lineprice'],
       $this->minVatRate['vatrate'] / 100.0,

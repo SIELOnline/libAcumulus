@@ -79,7 +79,9 @@ class ConfigForm extends BaseConfigForm {
    *
    * This override removes the 'Use invoice sent' option as PS does not have
    * an event on creating/sending the invoice.
-   * @todo: check this.
+   * @todo: PS has the 'actionSetInvoice' event, can we use that?
+   * This event fires when the order state changes to a state that allows an
+   * invoice and on manually creating one via the adminOrdersController page.
    */
   protected function getTriggerInvoiceSendEventOptions() {
     $result = parent::getTriggerInvoiceSendEventOptions();

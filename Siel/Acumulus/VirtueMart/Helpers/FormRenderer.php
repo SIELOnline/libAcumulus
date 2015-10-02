@@ -29,10 +29,8 @@ class FormRenderer extends BaseFormRenderer {
   public function input($type, $name, $value = '', array $attributes = array()) {
     $output = '';
     if ($type === 'date') {
-      // @todo: can we use vmJsApi::jDate?
       $output .= $this->getWrapper('input');
       $output .= JHTML::calendar($value, $name, $name, $this->form->getShopDateFormat()/*, $attributes*/);
-      //$output .= vmJsApi::jDate($value, $name, $name);
       $output .= $this->getWrapperEnd('input');
     }
     else {

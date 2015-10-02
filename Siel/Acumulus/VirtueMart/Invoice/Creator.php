@@ -222,7 +222,6 @@ class Creator extends BaseCreator {
    * @return array
    */
   protected function getItemLine(stdClass $item) {
-    // @todo: next release: can margin scheme be used in VM?
     $productPriceEx = (float) $item->product_discountedPriceWithoutTax;
     $productPriceInc = (float) $item->product_final_price;
     $productVat = (float) $item->product_tax;

@@ -120,7 +120,7 @@ class Creator extends BaseCreator {
   protected function getInvoiceDate($dateToUse) {
     $result = substr($this->invoiceSource->getSource()->date_add, 0, strlen('2000-01-01'));
     // Invoice_date is filled with "0000-00-00 00:00:00", so use invoice
-    // number instead to check for empty.
+    // number instead to check for existence of the invoice.
     if ($dateToUse == ShopConfigInterface::InvoiceDate_InvoiceCreate && $this->invoiceSource->getType() === Source::Order && !empty($this->order->invoice_number)) {
       $result = substr($this->order->invoice_date, 0, strlen('2000-01-01'));
     }

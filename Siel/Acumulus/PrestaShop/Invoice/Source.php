@@ -31,12 +31,12 @@ class Source extends BaseSource {
   }
 
   /**
-   * @todo: remove after development
+   * More specifically typed override. uncomment when developing.
    * @return Order|OrderSlip
    */
-  public function getSource() {
-    return parent::getSource();
-  }
+//  public function getSource() {
+//    return parent::getSource();
+//  }
 
   /**
    * {@inheritdoc}

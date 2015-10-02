@@ -843,8 +843,11 @@ abstract class Creator {
       if (isset($line['meta-linepriceinc'])) {
         $linesAmount += $line['meta-linepriceinc'];
       }
-      else /* if (isset ($item['unitpriceinc'])) */ {
+      else if (isset($line['unitpriceinc'])) {
         $linesAmount += $line['quantity'] * $line['unitpriceinc'];
+      }
+      else /* if (isset($line['unitprice']) && isset($line['vatrate'])) */ {
+        $linesAmount += $line['quantity'] * $line['unitprice'] * ((100 + $line['vatrate']) / 100);
       }
     }
     return $linesAmount;

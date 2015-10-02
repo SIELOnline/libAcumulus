@@ -59,14 +59,14 @@ class FormRenderer extends BaseFormRenderer {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    *
    * This override:
    * - Skips the rendering of the wrapper and label as WordPress does that
    *   itself.
    * - Echo's the output as WordPress is in outputting mode here.
    */
-  protected function renderField($field) {
+  protected function renderField(array $field) {
     $type = $field['type'];
     $name = $field['name'];
     $value = isset($field['value']) ? $field['value'] : '';

@@ -62,6 +62,7 @@ class InvoiceManager extends BaseInvoiceManager {
             'key' => '_order_number',
             'value' => array($InvoiceSourceReferenceFrom, $InvoiceSourceReferenceTo),
             'compare' => 'BETWEEN',
+            'type' => 'NUMERIC',
           ),
         ),
       );

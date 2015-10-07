@@ -50,17 +50,11 @@ class Service {
    */
   public function __construct(ConfigInterface $config, TranslatorInterface $translator) {
     $this->config = $config;
+    $this->communicator = NULL;
 
     $this->translator = $translator;
     $webServiceTranslations = new Translations();
     $this->translator->add($webServiceTranslations);
-
-    if ($this->config->getDebug() == ConfigInterface::Debug_StayLocal) {
-      $this->communicator = new CommunicatorLocal($config);
-    }
-    else {
-      $this->communicator = new Communicator($config);
-    }
   }
 
   /**
@@ -75,6 +69,23 @@ class Service {
    */
   protected function t($key) {
     return $this->translator->get($key);
+  }
+
+  /**
+   * Lazy loads the communicator.
+   *
+   * @return Communicator
+   */
+  protected function getCommunicator() {
+    if ($this->communicator === NULL) {
+      if ($this->config->getDebug() == ConfigInterface::Debug_StayLocal) {
+        $this->communicator = new CommunicatorLocal($this->config);
+      }
+      else {
+        $this->communicator = new Communicator($this->config);
+      }
+    }
+    return $this->communicator;
   }
 
   /**
@@ -288,7 +299,7 @@ class Service {
    */
   protected function getPicklist($picklist) {
     $plural = $picklist . 's';
-    $response = $this->communicator->callApiFunction("picklists/picklist_$plural", array());
+    $response = $this->getCommunicator()->callApiFunction("picklists/picklist_$plural", array());
     // Simplify result: remove indirection.
     if (!empty($response[$plural][$picklist])) {
       $response[$plural] = $response[$plural][$picklist];
@@ -328,7 +339,7 @@ class Service {
       'vatdate' => $date,
       'vatcountry' => $countryCode,
     );
-    $response = $this->communicator->callApiFunction("lookups/lookup_vatinfo", $message);
+    $response = $this->getCommunicator()->callApiFunction("lookups/lookup_vatinfo", $message);
     // Simplify result: remove indirection.
     if (!empty($response['vatinfo']['vat'])) {
       $response['vatinfo'] = $response['vatinfo']['vat'];
@@ -364,7 +375,7 @@ class Service {
    * for more information on the contents of the returned array.
    */
   public function invoiceAdd(array $invoice) {
-    return $this->communicator->callApiFunction("invoices/invoice_add", $invoice);
+    return $this->getCommunicator()->callApiFunction("invoices/invoice_add", $invoice);
   }
 
   /**
@@ -383,7 +394,7 @@ class Service {
     if (!empty($localMessages['warnings'])) {
       $result['warnings'] = array_merge($result['warnings'], $localMessages['warnings']);
     }
-    $this->communicator->checkStatus($result);
+    $this->getCommunicator()->checkStatus($result);
     return $result;
   }
 

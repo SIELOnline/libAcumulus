@@ -1,6 +1,8 @@
 <?php
 namespace Siel\Acumulus\Helpers;
 
+use Siel\Acumulus\Web\ConfigInterface;
+
 /**
  * Defines a logger class.
  */
@@ -11,6 +13,7 @@ class Log {
   const Warning = 2;
   const Notice = 3;
   const Debug = 4;
+  const NotYetSet = 5;
 
   /** @var Log */
   static protected $instance = null;
@@ -36,13 +39,24 @@ class Log {
   /** @var int */
   protected $logLevel;
 
+  /** @var ConfigInterface */
+  protected $config;
+
   /**
    * Log constructor.
    */
   protected function __construct() {
     // Start with logging everything. Soon after the creation of this log object
     // the log level should be set based on the configuration.
-    $this->logLevel = static::Debug;
+    $this->logLevel = static::NotYetSet;
+    $this->config = NULL;
+  }
+
+  /**
+   * @param ConfigInterface $config
+   */
+  public function setConfig($config) {
+    $this->config = $config;
   }
 
   /**
@@ -51,6 +65,11 @@ class Log {
    * @return int
    */
   public function getLogLevel() {
+    // To support lazy load of the config, the log level is not yet set until
+    // actually needed.
+    if ($this->logLevel === static::NotYetSet && $this->config !== NULL) {
+      $this->logLevel = $this->config->getLogLevel();
+    }
     return $this->logLevel;
   }
 
@@ -106,7 +125,7 @@ class Log {
       $message = vsprintf($message, $args);
     }
     $message = sprintf('Acumulus: %s', $message);
-    if ($this->logLevel >= $severity) {
+    if ($this->getLogLevel() >= $severity) {
       $this->write($message, $severity);
     }
     return $message;

@@ -2,6 +2,8 @@
 namespace Siel\Acumulus\WooCommerce\Shop;
 
 use Siel\Acumulus\Shop\AcumulusEntryModel as BaseAcumulusEntryModel;
+use Siel\Acumulus\WooCommerce\Helpers\Log;
+use Siel\Acumulus\WooCommerce\Invoice\Source;
 
 /**
  * Implements the WooCommerce/WordPress specific acumulus entry model class.
@@ -13,9 +15,30 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel {
 
   const KEY_ENTRY_ID = '_acumulus_entry_id';
   const KEY_TOKEN = '_acumulus_token';
+  // Note this meta key is not actually stored as the post_type can give us the
+  // same information.
   const KEY_TYPE = '_acumulus_type';
   const KEY_CREATED = '_acumulus_created';
   const KEY_UPDATED = '_acumulus_updated';
+
+  /**
+   * Helper method that converts a WP/WC post type to a source type constant.
+   *
+   * @param string $shopType
+   *
+   * @return string
+   */
+  protected function shopTypeToSourceType($shopType) {
+    switch ($shopType) {
+      case 'shop_order':
+        return Source::Order;
+      case 'shop_order_refund':
+        return Source::CreditNote;
+      default:
+        Log::getInstance()->error('InvoiceManager::shopTypeToSourceType(%s): unknown', $shopType);
+        return '';
+    }
+  }
 
   /**
    * {@inheritdoc}
@@ -32,6 +55,7 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel {
     if (!empty($posts)) {
       $post = reset($posts);
       $result = get_post_meta($post->id);
+      $result[static::KEY_TYPE] = $this->shopTypeToSourceType($post->post_type);
     }
     return $result !== false ? $result : null;
   }
@@ -40,8 +64,13 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel {
    * {@inheritdoc}
    */
   public function getByInvoiceSourceId($invoiceSourceType, $invoiceSourceId) {
-    $result = get_post_meta($invoiceSourceId);
-    return isset($result[static::KEY_ENTRY_ID]) ? $result : null;
+    $result = NULL;
+    $post = get_post($invoiceSourceId);
+    if (!empty($post->post_type) && $this->shopTypeToSourceType($post->post_type) === $invoiceSourceType) {
+      $result = get_post_meta($invoiceSourceId);
+      $result[static::KEY_TYPE] = $invoiceSourceType;
+    }
+    return $result;
   }
 
   /**
@@ -57,7 +86,6 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel {
     //$exists = add_post_meta($orderId, '_acumulus_created', $now, true) === FALSE;
     return update_post_meta($orderId, static::KEY_ENTRY_ID, $entryId) !== FALSE
       && update_post_meta($orderId, static::KEY_TOKEN, $token) !== FALSE
-      && update_post_meta($orderId, static::KEY_TYPE, $invoiceSource->getType(), true) !== FALSE
       && update_post_meta($orderId, static::KEY_UPDATED, $now) !== FALSE;
   }
 

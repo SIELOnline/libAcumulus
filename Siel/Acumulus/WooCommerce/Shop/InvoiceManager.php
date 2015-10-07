@@ -9,6 +9,13 @@ use WP_Query;
 
 class InvoiceManager extends BaseInvoiceManager {
 
+  /**
+   * Helper method that converts our source type constants to a WP/WC post type.
+   *
+   * @param string $invoiceSourceType
+   *
+   * @return string
+   */
   protected function sourceTypeToShopType($invoiceSourceType) {
     switch ($invoiceSourceType) {
       case Source::Order:

@@ -57,7 +57,9 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
     $this->values = array();
     $this->configStore = $configStore;
 
-    $this->getLog()->setLogLevel($this->getLogLevel());
+    // To support lazy load, we do not query the config for the log level, but
+    // instead we let the log query us when needed.
+    $this->getLog()->setConfig($this);
 
     $this->translator = $translator;
     $invoiceHelperTranslations = new Translations();

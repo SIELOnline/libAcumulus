@@ -68,7 +68,14 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel {
     $post = get_post($invoiceSourceId);
     if (!empty($post->post_type) && $this->shopTypeToSourceType($post->post_type) === $invoiceSourceType) {
       $result = get_post_meta($invoiceSourceId);
-      $result[static::KEY_TYPE] = $invoiceSourceType;
+      if (isset($result[static::KEY_ENTRY_ID])) {
+        // Acumulus meta data found: add invoice type as that is not stored in
+        // the meta data.
+        $result[static::KEY_TYPE] = $invoiceSourceType;
+      }
+      else {
+        $result = NULL;
+      }
     }
     return $result;
   }

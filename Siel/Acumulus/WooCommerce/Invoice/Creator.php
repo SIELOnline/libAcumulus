@@ -7,6 +7,7 @@ use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use WC_Abstract_Order;
 use WC_Coupon;
 use WC_Order;
+use WC_Product;
 
 /**
  * Allows to create arrays in the Acumulus invoice structure from a WordPress
@@ -233,10 +234,12 @@ class Creator extends BaseCreator {
     // get_item_tax returns tax per item after discount.
     $productVat = $order->get_item_tax($item, FALSE);
 
-    $this->addIfNotEmpty($result, 'itemnumber', $product->get_sku());
     $result['product'] = $item['name'];
-    if ($isVariation) {
-      $result['product'] .= ' (' . wc_get_formatted_variation($product->variation_data, TRUE) . ')';
+    if ($product instanceof WC_Product) {
+      $this->addIfNotEmpty($result, 'itemnumber', $product->get_sku());
+      if ($isVariation) {
+        $result['product'] .= ' (' . wc_get_formatted_variation($product->variation_data, TRUE) . ')';
+      }
     }
 
     // WooCommerce does not support the margin scheme. So in a standard install

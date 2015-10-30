@@ -311,11 +311,17 @@ abstract class ConfigForm extends Form {
         'triggerInvoiceSendEvent' => $triggerInvoiceSendEventField,
       );
       if (array_key_exists(ConfigInterface::TriggerInvoiceSendEvent_OrderStatus, $triggerInvoiceSendEventOptions)) {
+        $options = $this->getOrderStatusesList();
         $fields['invoiceSettingsHeader']['fields']['triggerOrderStatus'] = array(
+          'name' => 'triggerOrderStatus[]',
           'type' => 'select',
           'label' => $this->t('field_triggerOrderStatus'),
           'description' => $this->t('desc_triggerOrderStatus'),
-          'options' => $this->getOrderStatusesList(),
+          'options' => $options,
+          'attributes' => array(
+            'multiple' => TRUE,
+            'size' => min(count($options), 8),
+          ),
         );
       }
     }

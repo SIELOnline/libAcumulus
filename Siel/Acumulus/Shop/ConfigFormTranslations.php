@@ -94,7 +94,7 @@ Vink deze optie aan als u geen regel op uw factuur of pakbon wil voor gratis ver
     'desc_triggerInvoiceSendEvent' => 'U kunt hier kiezen op welk moment de factuur wordt verstuurd. Als u voor "Niet automatisch overzetten" kiest, moet u de facturen zelf overzetten m.b.v. het batchformulier.',
     'option_empty_triggerOrderStatus' => 'Niet automatisch versturen',
     'field_triggerOrderStatus' => 'Bestelstatus',
-    'desc_triggerOrderStatus' => 'U kunt hier kiezen bij welke bestelstatus facturen worden overgezet naar Acumulus. Deze koppeling gebruikt alleen gegevens van de bestelling, dus u kunt elke status kiezen. De factuur hoeft dus nog niet aangemaakt te zijn.',
+    'desc_triggerOrderStatus' => 'U kunt hier kiezen bij welke bestelstatussen facturen worden overgezet naar Acumulus. Als u meerdere statussen kiest wordt een order overgezet zodra deze één van de gekozen statussen bereikt. Een order wordt maximaal 1 keer overgezet. Deze koppeling gebruikt alleen gegevens van de bestelling, dus u kunt elke status kiezen. De factuur hoeft dus nog niet aangemaakt te zijn.',
 
     'emailAsPdfSettingsHeader' => 'PDF Factuur',
     'desc_emailAsPdfInformation' => 'Bij het versturen van bestellinggegevens naar Acumulus, kunt u Acumulus een PDF factuur laten versturen naar uw klant. Deze wordt direct verstuurd naar het door de klant opgegeven emailadres.',
@@ -219,7 +219,7 @@ If you don\'t want this, check this option.',
 
     'option_empty_triggerOrderStatus' => 'Do not send automatically',
     'field_triggerOrderStatus' => 'Order state',
-    'desc_triggerOrderStatus' => 'Select the order state at which orders will be sent to Acumulus. This extension only uses order data. so you may select any status. The invoice does not already have to be created.',
+    'desc_triggerOrderStatus' => 'Select the order states at which orders will be sent to Acumulus. If you select multiple states, an order will be sent as soon as one of the selected states is reached. An order will only be sent once. This extension only uses order data. so you may select any status. The invoice does not already have to be created.',
 
     'emailAsPdfSettingsHeader' => 'PDF Invoice',
     'desc_emailAsPdfInformation' => 'On sending the order details to Acumulus, Acumulus can send a PDF invoice to your customer. The mail will be sent to the clients\' email address.',

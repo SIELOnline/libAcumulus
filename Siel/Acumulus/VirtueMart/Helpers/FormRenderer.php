@@ -26,15 +26,18 @@ class FormRenderer extends BaseFormRenderer {
     $this->descriptionClass = 'controls';
   }
 
-  public function input($type, $name, $value = '', array $attributes = array()) {
+  /**
+   * {@inheritdoc}
+   */
+  public function input($type, $id, $name, $value = '', array $attributes = array()) {
     $output = '';
     if ($type === 'date') {
       $output .= $this->getWrapper('input');
-      $output .= JHTML::calendar($value, $name, $name, $this->form->getShopDateFormat()/*, $attributes*/);
+      $output .= JHTML::calendar($value, $name, $id, $this->form->getShopDateFormat()/*, $attributes*/);
       $output .= $this->getWrapperEnd('input');
     }
     else {
-      $output .= parent::input($type, $name, $value, $attributes);
+      $output .= parent::input($type, $id, $name, $value, $attributes);
     }
     return $output;
   }

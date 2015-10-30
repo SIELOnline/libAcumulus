@@ -405,6 +405,11 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
               $this->values[$key] = (bool) $this->values[$key];
             }
             break;
+          case 'array':
+            if (!is_array($this->values[$key])) {
+              $this->values[$key] = array($this->values[$key]);
+            }
+            break;
         }
       }
     }
@@ -618,8 +623,8 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
         ),
         'triggerOrderStatus' => array(
           'group' => 'shop',
-          'type' => 'string',
-          'default' => 0,
+          'type' => 'array',
+          'default' => array(),
         ),
         'emailAsPdf' => array(
           'group' => 'emailaspdf',

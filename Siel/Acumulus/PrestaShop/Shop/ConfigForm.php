@@ -30,8 +30,25 @@ class ConfigForm extends BaseConfigForm {
     $this->moduleName = $moduleName;
   }
 
+  /**
+   * {@inheritdoc}
+   *
+   * This override uses the PS way of checking if a form is submitted.
+   */
   public function isSubmitted() {
     return Tools::isSubmit('submit' . $this->moduleName);
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * This override ensures that array values are passed with the correct key
+   * to the PS form renderer.
+   */
+  public function getFormValues() {
+    $result = parent::getFormValues();
+    $result['triggerOrderStatus[]'] = $result['triggerOrderStatus'];
+    return $result;
   }
 
   /**

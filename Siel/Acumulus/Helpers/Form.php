@@ -518,6 +518,7 @@ abstract class Form {
   protected function getPostedValues() {
     $result = $_POST;
 
+    // Handle checkboxes.
     foreach ($this->getCheckboxKeys() as $checkboxName => $collectionName) {
       // Check if checkboxes are handled as an array of checkboxes.
       if (isset($result[$collectionName]) && is_array($result[$collectionName])) {

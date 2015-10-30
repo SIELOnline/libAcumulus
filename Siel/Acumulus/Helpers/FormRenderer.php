@@ -106,9 +106,12 @@ class FormRenderer {
    */
   protected function fields(array $fields) {
     $output = '';
-    foreach ($fields as $name => $field) {
+    foreach ($fields as $id => $field) {
+      if (!isset($field['id'])) {
+        $field['id'] = $id;
+      }
       if (!isset($field['name'])) {
-        $field['name'] = $name;
+        $field['name'] = $id;
       }
       $output .= $this->field($field);
     }
@@ -199,6 +202,7 @@ class FormRenderer {
    */
   protected function renderField(array $field) {
     $type = $field['type'];
+    $id = $field['id'];
     $name = $field['name'];
     $label = isset($field['label']) ? $field['label'] : '';
     $value = isset($field['value']) ? $field['value'] : '';
@@ -215,9 +219,9 @@ class FormRenderer {
 
     if ($type !== 'hidden') {
       $output .= $this->getWrapper('element');
-      $output .= $this->renderLabel($label, $type !== 'radio' && $type !== 'checkbox' ? $name : NULL, $labelAttributes);
+      $output .= $this->renderLabel($label, $type !== 'radio' && $type !== 'checkbox' ? $id : NULL, $labelAttributes);
     }
-    $output .= $this->renderElement($type, $name, $value, $attributes, $options);
+    $output .= $this->renderElement($type, $id, $name, $value, $attributes, $options);
     if ($type !== 'hidden') {
       $output .= $this->renderDescription($description);
       $output .= $this->getWrapperEnd('element');
@@ -229,6 +233,7 @@ class FormRenderer {
    * Renders a form field itself, ie without label and description.
    *
    * @param string $type
+   * @param string $id
    * @param string $name
    * @param string|int $value
    * @param array $attributes
@@ -236,16 +241,16 @@ class FormRenderer {
    *
    * @return string
    */
-  protected function renderElement($type, $name, $value, array $attributes = array(), array $options = array()) {
+  protected function renderElement($type, $id, $name, $value, array $attributes = array(), array $options = array()) {
     switch ($type) {
       case 'textarea':
-        return $this->textarea($name, $value, $attributes);
+        return $this->textarea($id, $name, $value, $attributes);
       case 'select':
       case 'radio':
       case 'checkbox':
-        return $this->$type($name, $value, $options, $attributes);
+        return $this->$type($id, $name, $value, $options, $attributes);
       default:
-        return $this->input($type, $name, $value, $attributes);
+        return $this->input($type, $id, $name, $value, $attributes);
     }
   }
 
@@ -315,6 +320,8 @@ class FormRenderer {
    *
    * @param string $type
    *   The input type, required.
+   * @param string $id
+   *   The id attribute of the text field, required.
    * @param string $name
    *   The name attribute of the text field, required.
    * @param string $value
@@ -329,14 +336,14 @@ class FormRenderer {
    * @return string
    *   The rendered text field.
    */
-  protected function input($type, $name, $value = '', array $attributes = array()) {
+  protected function input($type, $id, $name, $value = '', array $attributes = array()) {
     $output = '';
 
     // Tag around input element.
     $output .= $this->getWrapper('input');
 
     $attributes = $this->addAttribute($attributes, 'type', $type);
-    $attributes = $this->addAttribute($attributes, 'id', $name);
+    $attributes = $this->addAttribute($attributes, 'id', $id);
     $attributes = $this->addAttribute($attributes, 'name', $name);
     $attributes = $this->addAttribute($attributes, 'value', $value);
     $output .= '<input' . $this->renderAttributes($attributes) . '/>';
@@ -350,6 +357,8 @@ class FormRenderer {
   /**
    * Renders a textarea field.
    *
+   * @param string $id
+   *   The id attribute of the text field, required.
    * @param string $name
    *   The name attribute of the text field, required.
    * @param string $value
@@ -361,16 +370,16 @@ class FormRenderer {
    *   array it is rendered as a joined string of the values separated by a
    *   space (e.g. multiple classes).
    *
-   * @return string
-   *   The rendered textarea field.
+   * @return string The rendered textarea field.
+   * The rendered textarea field.
    */
-  protected function textarea($name, $value = '', array $attributes = array()) {
+  protected function textarea($id, $name, $value = '', array $attributes = array()) {
     $output = '';
 
     // Tag around input element.
     $output .= $this->getWrapper('input');
 
-    $attributes = $this->addAttribute($attributes, 'id', $name);
+    $attributes = $this->addAttribute($attributes, 'id', $id);
     $attributes = $this->addAttribute($attributes, 'name', $name);
     $output .= '<textarea' . $this->renderAttributes($attributes) . '>';
     $output .=  htmlspecialchars($value, ENT_NOQUOTES, 'UTF-8');
@@ -385,6 +394,8 @@ class FormRenderer {
   /**
    * Renders a text field (input tag with type="text").
    *
+   * @param string $id
+   *   The id attribute of the text field, required.
    * @param string $name
    *   The name attribute of the text field, required.
    * @param string $value
@@ -401,13 +412,15 @@ class FormRenderer {
    *
    * @deprecated
    */
-  protected function text($name, $value = '', array $attributes = array()) {
-    return $this->input('text', $name, $value, $attributes);
+  protected function text($id, $name, $value = '', array $attributes = array()) {
+    return $this->input('text', $id, $name, $value, $attributes);
   }
 
   /**
    * Renders a password field (input tag with type="password").
    *
+   * @param string $id
+   *   The id attribute of the password field, required.
    * @param string $name
    *   The name attribute of the password field, required.
    * @param string $value
@@ -423,13 +436,15 @@ class FormRenderer {
    *
    * @deprecated
    */
-  protected function password($name, $value = '', array $attributes = array()) {
-    return $this->input('password', $name, $value, $attributes);
+  protected function password($id, $name, $value = '', array $attributes = array()) {
+    return $this->input('password', $id, $name, $value, $attributes);
   }
 
   /**
    * Renders a select element.
    *
+   * @param string $id
+   *   The id attribute of the select, required.
    * @param string $name
    *   The name attribute of the select, required.
    * @param mixed|null $selected
@@ -447,21 +462,21 @@ class FormRenderer {
    * @return string The rendered select element.
    * The rendered select element.
    */
-  protected function select($name, $selected, array $options, array $attributes = array()) {
+  protected function select($id, $name, $selected, array $options, array $attributes = array()) {
     $output = '';
 
     // Tag around select element: same as for an input element.
     $output .= $this->getWrapper('input');
 
     // Select tag.
-    $attributes = array_merge(array('name' => $name, 'id' => $name), $attributes);
+    $attributes = array_merge(array('id' => $id, 'name' => $name), $attributes);
     $output .= '<select' . $this->renderAttributes($attributes) . '>';
 
     // Options.
     foreach ($options as $value => $text) {
       $optionAttributes = array('value' => $value);
       if ($this->compareValues($selected, $value)) {
-        $optionAttributes['selected'] = 'selected';
+        $optionAttributes['selected'] = TRUE;
       }
       $output .= '<option' . $this->renderAttributes($optionAttributes) . '>' . htmlspecialchars($text, ENT_NOQUOTES, 'UTF-8') . '</option>';
     }
@@ -477,6 +492,8 @@ class FormRenderer {
   /**
    * Renders a list of radio buttons (input tag with type="radio").
    *
+   * @param string $id
+   *   The id attribute for all the radio buttons, required.
    * @param string $name
    *   The name attribute for all the radio buttons, required.
    * @param mixed|null $selected
@@ -494,7 +511,7 @@ class FormRenderer {
    * @return string The rendered radio buttons.
    * The rendered radio buttons.
    */
-  protected function radio($name, $selected, array $options, array $attributes = array()) {
+  protected function radio($id, $name, $selected, array $options, array $attributes = array()) {
     $output = '';
 
     // Handling of required attribute: may appear on on all radio buttons with
@@ -508,7 +525,7 @@ class FormRenderer {
 
     // Radio buttons.
     foreach ($options as $value => $text) {
-      $radioAttributes = $this->getRadioAttributes($name, $value);
+      $radioAttributes = $this->getRadioAttributes($id, $name, $value);
       $radioAttributes = $this->addAttribute($radioAttributes, 'required', $required);
       if ($this->compareValues($selected, $value)) {
         $radioAttributes['checked'] = true;
@@ -530,6 +547,8 @@ class FormRenderer {
    * Renders a list of checkboxes (input tag with type="checkbox") enclosed in a
    * div.
    *
+   * @param string $id
+   *   The id prefix attribute for the checkboxes, required.
    * @param string $name
    *   The name attribute for all the checkboxes, required. When rendering
    *   multiple checkboxes, use a name that ends with [] for easy PHP processing.
@@ -547,7 +566,7 @@ class FormRenderer {
    * @return string The rendered checkboxes.
    * The rendered checkboxes.
    */
-  protected function checkbox($name, array $selected, array $options, array $attributes = array()) {
+  protected function checkbox($id, $name, array $selected, array $options, array $attributes = array()) {
     $output = '';
 
     // Div tag.
@@ -557,7 +576,7 @@ class FormRenderer {
 
     // Checkboxes.
     foreach ($options as $value => $text) {
-      $checkboxAttributes = $this->getCheckboxAttributes($name, $value);
+      $checkboxAttributes = $this->getCheckboxAttributes($id, $name, $value);
       if (in_array($value, $selected)) {
         $checkboxAttributes['checked'] = true;
       }
@@ -712,32 +731,34 @@ class FormRenderer {
   }
 
   /**
+   * @param string $id
    * @param string $name
    * @param string $value
    *
    * @return array
    */
-  protected function getCheckboxAttributes($name, $value) {
+  protected function getCheckboxAttributes(/** @noinspection PhpUnusedParameterInspection */ $id, $name, $value) {
     $checkboxAttributes = array(
       'type' => 'checkbox',
-      'name' => $value,
       'id' => "{$name}_{$value}",
+      'name' => $value,
       'value' => 1,
     );
     return $checkboxAttributes;
   }
 
   /**
+   * @param string $id
    * @param string $name
    * @param string $value
    *
    * @return array
    */
-  protected function getRadioAttributes($name, $value) {
+  protected function getRadioAttributes($id, $name, $value) {
     $radioAttributes = array(
       'type' => 'radio',
+      'id' => "{$id}_{$value}",
       'name' => $name,
-      'id' => "{$name}_{$value}",
       'value' => $value);
     return $radioAttributes;
   }
@@ -745,14 +766,14 @@ class FormRenderer {
   /**
    * Compares an option and a value to see if this option should be "selected".
    *
-   * @param string|int $option
-   * @param string|int $value
+   * @param string|int|array $value
+   * @param string|int $optionValue
    *
    * @return bool
    *   If this option equals the value.
    */
-  protected function compareValues($option, $value) {
-    return (string) $value === (string) $option;
+  protected function compareValues($value, $optionValue) {
+    return is_array($value) ? in_array((string) $optionValue, $value) : (string) $optionValue === (string) $value;
   }
 
 }

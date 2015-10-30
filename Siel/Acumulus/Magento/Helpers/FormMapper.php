@@ -37,6 +37,9 @@ class FormMapper {
    */
   public function fields($parent, array $fields) {
     foreach ($fields as $id => $field) {
+      if (!isset($field['id'])) {
+        $field['id'] = $id;
+      }
       if (!isset($field['name'])) {
         $field['name'] = $id;
       }
@@ -54,7 +57,7 @@ class FormMapper {
     if (!isset($field['attributes'])) {
       $field['attributes'] = array();
     }
-    $element = $parent->addField($field['name'], $this->getMagentoType($field['type']), $this->getMagentoElementSettings($field));
+    $element = $parent->addField($field['id'], $this->getMagentoType($field), $this->getMagentoElementSettings($field));
     if ($field['type'] === 'fieldset') {
       $this->fields($element, $field['fields']);
     }
@@ -63,12 +66,12 @@ class FormMapper {
   /**
    * Returns the Magento form element type for the given Acumulus type string.
    *
-   * @param string $type
+   * @param array $field
    *
    * @return string
    */
-  protected function getMagentoType($type) {
-    switch ($type) {
+  protected function getMagentoType(array $field) {
+    switch ($field['type']) {
       case 'email':
         $type = 'text';
         break;
@@ -81,6 +84,12 @@ class FormMapper {
         break;
       case 'checkbox':
         $type = 'checkboxes';
+        break;
+      case 'select':
+        $type = empty($field['attributes']['multiple']) ? 'select' : 'multiselect';
+        break;
+      default:
+        $type = $field['type'];
         break;
     }
     return $type;
@@ -128,6 +137,7 @@ class FormMapper {
           $result['image'] = Mage::getDesign()->getSkinUrl('images/grid-cal.gif');
         }
         break;
+      case 'id':
       case 'fields':
         $result = array();
         break;

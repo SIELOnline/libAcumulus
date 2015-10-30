@@ -35,6 +35,12 @@ class ConfigStore implements ConfigStoreInterface {
       $value = Configuration::get($dbKey);
       // Do not overwrite defaults if no value is stored.
       if ($value !== false) {
+        if (is_string($value) && strpos($value, '{') !== FALSE) {
+          $unserialized = @unserialize($value);
+          if ($unserialized !== FALSE) {
+            $value = $unserialized;
+          }
+        }
         $result[$key] = $value;
       }
     }
@@ -49,7 +55,13 @@ class ConfigStore implements ConfigStoreInterface {
     foreach ($values as $key => $value) {
       if ($value !== null) {
         $dbKey = substr(static::CONFIG_KEY . $key, 0, 32);
-        $result = Configuration::updateValue($dbKey, is_bool($value) ? ($value ? 1 : 0) : $value) && $result;
+        if (is_bool($value)) {
+          $value = $value ? 1 : 0;
+        }
+        elseif (is_array($value)) {
+          $value = serialize($value);
+        }
+        $result = Configuration::updateValue($dbKey, $value) && $result;
       }
     }
     return $result;

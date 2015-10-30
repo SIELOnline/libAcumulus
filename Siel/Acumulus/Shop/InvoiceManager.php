@@ -162,7 +162,7 @@ abstract class InvoiceManager {
     $result = WebConfigInterface::Status_NotSent;
     $shopSettings = $this->config->getShopSettings();
     if (($shopSettings['triggerInvoiceSendEvent'] == Config::TriggerInvoiceSendEvent_OrderStatus
-         && $newStatus == $shopSettings['triggerOrderStatus'])
+         && in_array($newStatus, $shopSettings['triggerOrderStatus']))
         || $newStatus === FALSE) {
       $result = $this->send($invoiceSource, FALSE);
     }

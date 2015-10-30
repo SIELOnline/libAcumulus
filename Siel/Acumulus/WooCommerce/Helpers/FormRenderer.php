@@ -69,6 +69,7 @@ class FormRenderer extends BaseFormRenderer {
    */
   protected function renderField(array $field) {
     $type = $field['type'];
+    $id = $field['id'];
     $name = $field['name'];
     $value = isset($field['value']) ? $field['value'] : '';
     $attributes = $field['attributes'];
@@ -77,7 +78,7 @@ class FormRenderer extends BaseFormRenderer {
 
     $output = '';
 
-    $output .= $this->renderElement($type, $name, $value, $attributes, $options);
+    $output .= $this->renderElement($type, $id, $name, $value, $attributes, $options);
     if ($type !== 'hidden') {
       $output .= $this->renderDescription($description);
     }

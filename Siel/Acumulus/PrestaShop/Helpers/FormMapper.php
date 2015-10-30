@@ -29,6 +29,9 @@ class FormMapper {
   protected function fields(array $fields) {
     $result = array();
     foreach ($fields as $id => $field) {
+      if (!isset($field['id'])) {
+        $field['id'] = $id;
+      }
       if (!isset($field['name'])) {
         $field['name'] = $id;
       }
@@ -91,6 +94,7 @@ class FormMapper {
       'label' => isset($field['label']) ? $field['label'] : '',
       'name' => $field['name'],
       'required' => isset($field['attributes']['required']) ? $field['attributes']['required'] : false,
+      'multiple' => isset($field['attributes']['multiple']) ? $field['attributes']['multiple'] : false,
     );
 
     if (isset($field['attributes'])) {
@@ -108,6 +112,9 @@ class FormMapper {
     }
     else if ($field['type'] === 'select') {
       $result['options'] = $this->getPrestaShopOptions($field['options']);
+      if ($result['multiple']) {
+        $result['size'] = $field['attributes']['size'];
+      }
     }
 
     return $result;

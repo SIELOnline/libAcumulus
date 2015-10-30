@@ -135,13 +135,7 @@ class Creator extends BaseCreator {
    *   \Siel\Acumulus\Invoice\ConfigInterface::PaymentStatus_Due
    */
   protected function getPaymentStateOrder() {
-    if (empty($this->shopSource->paid_date) || $this->shopSource->needs_payment()) {
-      $result = ConfigInterface::PaymentStatus_Due;
-    }
-    else {
-      $result = ConfigInterface::PaymentStatus_Paid;
-    }
-    return $result;
+    return $this->shopSource->needs_payment() ? ConfigInterface::PaymentStatus_Due : ConfigInterface::PaymentStatus_Paid;
   }
 
   /**
@@ -154,8 +148,7 @@ class Creator extends BaseCreator {
    *   \Siel\Acumulus\Invoice\ConfigInterface::PaymentStatus_Due
    */
   protected function getPaymentStateCreditNote() {
-    $result = ConfigInterface::PaymentStatus_Paid;
-    return $result;
+    return ConfigInterface::PaymentStatus_Paid;
   }
 
   /**

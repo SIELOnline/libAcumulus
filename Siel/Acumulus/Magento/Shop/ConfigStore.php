@@ -34,6 +34,12 @@ class ConfigStore implements ConfigStoreInterface {
       $value = Mage::getStoreConfig($this->configKey . $key);
       // Do not overwrite defaults if no value is set.
       if (isset($value)) {
+        if (is_string($value) && strpos($value, '{') !== FALSE) {
+          $unserialized = @unserialize($value);
+          if ($unserialized !== FALSE) {
+            $value = $unserialized;
+          }
+        }
         $result[$key] = $value;
       }
     }
@@ -46,6 +52,12 @@ class ConfigStore implements ConfigStoreInterface {
   public function save(array $values) {
     foreach ($values as $key => $value) {
       if ($value !== NULL) {
+        if (is_bool($value)) {
+          $value = $value ? 1 : 0;
+        }
+        elseif (is_array($value)) {
+          $value = serialize($value);
+        }
         Mage::getModel('core/config')->saveConfig($this->configKey . $key, $value);
       }
     }

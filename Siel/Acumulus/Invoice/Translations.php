@@ -29,7 +29,7 @@ class Translations extends TranslationCollection {
     'refund' => 'Terugbetaling',
     'refund_adjustment' => 'Aanpassing teruggaafbedrag',
 
-    'message_warning_no_vat' => 'De factuur bevat geen BTW, maar kan niet van het type "verlegde BTW" zijn, noch is de klant buiten de EU gevestigd.',
+    'message_warning_no_vat' => 'De factuur bevat geen BTW en er kan niet bepaald worden welk BTW-type vam toepassing is.',
     'message_warning_incorrect_vat_corrected' => 'De factuur bevat een incorrect BTW tarief van %1$0.1f%%. Dit is gecorrigeerd naar %2$0.1f%%. Controleer deze factuur handmatig in Acumulus!',
     'message_warning_incorrect_vat_not_corrected' => 'De factuur bevat een incorrect BTW tarief van %0.1f%%. Dit viel niet te corrigeren naar een geldig BTW tarief. Corrigeer deze factuur handmatig in Acumulus!',
   );
@@ -55,7 +55,7 @@ class Translations extends TranslationCollection {
     'refund' => 'Refund',
     'refund_adjustment' => 'Refund adjustment',
 
-    'message_warning_no_vat' => 'The invoice has no VAT, but cannot be of the "reversed VAT" type nor is the client located outside the EU.',
+    'message_warning_no_vat' => 'The invoice has no VAT and it is not possible to determine the VAT type.',
     'message_warning_incorrect_vat_corrected' => 'The invoice specified an incorrect VAT rate of %1$0.1f%%. This has been corrected to %2$0.1f%%. Check this invoice in Acumulus!',
     'message_warning_incorrect_vat_not_corrected' => 'The invoice specified an incorrect VAT rate of %0.1f%%. It was not possible to correct this to a valid VAT rate. Correct this invoice manually in Acumulus!',
   );

@@ -175,11 +175,18 @@ class CompletorInvoiceLines {
     else {
       if (!$this->invoiceHasLineWithVat()) {
         // National/EU reversed vat or no vat (rest of world).
-        if ($this->isNl() && $this->isCompany()) {
-          $possibleVatTypes[] = ConfigInterface::VatType_NationalReversed;
+        if ($this->isNl()) {
+          // National: some products (e.g. education) are free of VAT.
+          $possibleVatTypes[] = ConfigInterface::VatType_National;
+          if ($this->isCompany()) {
+            $possibleVatTypes[] = ConfigInterface::VatType_NationalReversed;
+          }
         }
-        else if ($this->isEu() && $this->isCompany()) {
-          $possibleVatTypes[] = ConfigInterface::VatType_EuReversed;
+        else if ($this->isEu()) {
+          if ($this->isCompany()) {
+            $possibleVatTypes[] = ConfigInterface::VatType_EuReversed;
+          }
+          $possibleVatTypes[] = ConfigInterface::VatType_National;
         }
         else if ($this->isOutsideEu()) {
           $possibleVatTypes[] = ConfigInterface::VatType_RestOfWorld;

@@ -135,8 +135,16 @@ abstract class InvoiceManager {
           $message = 'message_batch_send_1_warnings';
           break;
         case WebConfigInterface::Status_NotSent:
-        default:
           $message = 'message_batch_send_1_skipped';
+          break;
+        case WebConfigInterface::Status_SendingPrevented_InvoiceCreated:
+          $message = 'message_batch_send_1_prevented_invoiceCreated';
+          break;
+        case WebConfigInterface::Status_SendingPrevented_InvoiceCompleted:
+          $message = 'message_batch_send_1_prevented_invoiceCompleted';
+          break;
+        default:
+          $message = "Status unknown $status (sending invoice for %1\$s %2\$s)";
           break;
       }
       $log[$invoiceSource->getId()] = sprintf($this->t($message), $this->t($invoiceSource->getType()), $invoiceSource->getReference());
@@ -236,11 +244,13 @@ abstract class InvoiceManager {
           $result = $result['status'];
         }
         else {
+          $result =  WebConfigInterface::Status_SendingPrevented_InvoiceCompleted;
           $this->config->getLog()->debug('InvoiceManager::send(%s %d, %s): invoiceCompleted prevented sending',
             $invoiceSource->getType(), $invoiceSource->getId(), $forceSend ? 'true' : 'false');
         }
       }
       else {
+        $result =  WebConfigInterface::Status_SendingPrevented_InvoiceCreated;
         $this->config->getLog()->debug('InvoiceManager::send(%s %d, %s): invoiceCreated prevented sending',
           $invoiceSource->getType(), $invoiceSource->getId(), $forceSend ? 'true' : 'false');
       }

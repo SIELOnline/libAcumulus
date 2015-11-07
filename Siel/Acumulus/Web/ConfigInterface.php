@@ -17,6 +17,8 @@ interface ConfigInterface {
   const Status_Errors = 1;
   const Status_Warnings = 2;
   const Status_Exception = 3;
+  const Status_SendingPrevented_InvoiceCreated = 4;
+  const Status_SendingPrevented_InvoiceCompleted = 5;
 
   const Debug_None = 1;
   const Debug_SendAndLog = 2;

@@ -9,7 +9,7 @@ namespace Siel\Acumulus\Web;
  * interface abstracts from how a specific web shop does so.
  */
 interface ConfigInterface {
-  const libraryVersion = '4.1.1';
+  const libraryVersion = '4.1.2';
 
   // Web service configuration related constants.
   const Status_NotSent = -1;

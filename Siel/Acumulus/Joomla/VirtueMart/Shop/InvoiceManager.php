@@ -1,15 +1,19 @@
 <?php
-namespace Siel\Acumulus\VirtueMart\Shop;
+namespace Siel\Acumulus\Joomla\VirtueMart\Shop;
 
 use DateTime;
-use DateTimeZone;
-use JDate;
-use JFactory;
 use \Siel\Acumulus\Invoice\Source as BaseSource;
-use \Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
-use Siel\Acumulus\VirtueMart\Invoice\Source;
+use \Siel\Acumulus\Joomla\Shop\InvoiceManager as BaseInvoiceManager;
+use Siel\Acumulus\Joomla\VirtueMart\Invoice\Source;
 
 class InvoiceManager extends BaseInvoiceManager {
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getSourceById($invoiceSourceType, $sourceId) {
+    return new Source($invoiceSourceType, $sourceId);
+  }
 
   /**
    * {@inheritdoc}
@@ -34,7 +38,7 @@ class InvoiceManager extends BaseInvoiceManager {
 			from #__virtuemart_orders
 			where virtuemart_order_id between %d and %d",
       $InvoiceSourceIdFrom, $InvoiceSourceIdTo);
-    return $this->getByQuery($invoiceSourceType, $query);
+    return $this->getSourcesByQuery($invoiceSourceType, $query);
   }
 
   /**
@@ -52,7 +56,7 @@ class InvoiceManager extends BaseInvoiceManager {
       $this->getDb()->escape($InvoiceSourceReferenceFrom),
       $this->getDb()->escape($InvoiceSourceReferenceTo)
     );
-    return $this->getByQuery($invoiceSourceType, $query);
+    return $this->getSourcesByQuery($invoiceSourceType, $query);
   }
 
   /**
@@ -65,63 +69,7 @@ class InvoiceManager extends BaseInvoiceManager {
 			from #__virtuemart_orders
 			where modified_on between '%s' and '%s'",
       $this->toSql($dateFrom), $this->toSql($dateTo));
-    return $this->getByQuery($invoiceSourceType, $query);
-  }
-
-  /**
-   * Helper method that executes a query to retrieve a list of invoice source
-   * ids and returns a list of invoice sources for these ids.
-   *
-   * @param string $invoiceSourceType
-   * @param string $query
-   *
-   * @return \Siel\Acumulus\VirtueMart\Invoice\Source[]
-   *   A non keyed array with invoice Sources.
-   */
-  protected function getByQuery($invoiceSourceType, $query) {
-    $sourceIds = $this->loadColumn($query);
-    $results = array();
-    foreach ($sourceIds as $sourceId) {
-      $results[] = new Source($invoiceSourceType, $sourceId);
-    }
-    return $results;
-  }
-
-  /**
-   * Helper method to execute a query and return the 1st column from the
-   * results.
-   *
-   * @param string $query
-   *
-   * @return int[]
-   *   A non keyed array with the values of the 1st results of the query result.
-   */
-  protected function loadColumn($query) {
-    return $this->getDb()->setQuery($query)->loadColumn();
-  }
-
-  /**
-   * Helper method to get the db object.
-   *
-   * @return \JDatabaseDriver
-   */
-  protected function getDb() {
-    return JFactory::getDBO();
-  }
-
-  /**
-   * Helper method that returns a date in the correct and escaped sql format.
-   *
-   * @param string $date
-   *   Date in yyyy-mm-dd format.
-   *
-   * @return string
-   */
-  protected function toSql($date) {
-    $tz = new DateTimeZone(JFactory::getApplication()->get('offset'));
-    $date = new JDate($date);
-    $date->setTimezone($tz);
-    return $date->toSql(TRUE);
+    return $this->getSourcesByQuery($invoiceSourceType, $query);
   }
 
   protected function triggerInvoiceCreated(array &$invoice, BaseSource $invoiceSource) {
@@ -136,5 +84,4 @@ class InvoiceManager extends BaseInvoiceManager {
   protected function triggerInvoiceSent(array $invoice, BaseSource $invoiceSource, array $result) {
     parent::triggerInvoiceSent($invoice, $invoiceSource, $result);
   }
-
 }

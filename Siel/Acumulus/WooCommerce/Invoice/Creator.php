@@ -218,8 +218,6 @@ class Creator extends BaseCreator {
       return $result;
     }
 
-    $isVariation = !empty($item['variation_id']);
-    $product = wc_get_product($isVariation ? $item['variation_id'] : $item['product_id']);
     // get_item_total() returns cost per item after discount and ex vat (2nd
     // param).
     $productPriceEx = $order->get_item_total($item, FALSE, FALSE);
@@ -228,6 +226,9 @@ class Creator extends BaseCreator {
     $productVat = $order->get_item_tax($item, FALSE);
 
     $result['product'] = $item['name'];
+    $isVariation = !empty($item['variation_id']);
+    $product = wc_get_product($isVariation ? $item['variation_id'] : $item['product_id']);
+    // $product can be NULL if the product has been deleted.
     if ($product instanceof WC_Product) {
       $this->addIfNotEmpty($result, 'itemnumber', $product->get_sku());
       if ($isVariation) {

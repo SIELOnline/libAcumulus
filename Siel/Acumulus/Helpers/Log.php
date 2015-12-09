@@ -19,15 +19,6 @@ class Log {
   static protected $instance = null;
 
   /**
-   * Log creator.
-   */
-  public static function createInstance() {
-    if (static::$instance === null) {
-      static::$instance = new static();
-    }
-  }
-
-  /**
    * Returns an instance of the log class (or web shop specific child class).
    *
    * @return Log
@@ -44,19 +35,15 @@ class Log {
 
   /**
    * Log constructor.
+   *
+   * @param ConfigInterface $config
    */
-  protected function __construct() {
+  public function __construct($config) {
     // Start with logging everything. Soon after the creation of this log object
     // the log level should be set based on the configuration.
     $this->logLevel = static::NotYetSet;
-    $this->config = NULL;
-  }
-
-  /**
-   * @param ConfigInterface $config
-   */
-  public function setConfig($config) {
     $this->config = $config;
+    static::$instance = $this;
   }
 
   /**

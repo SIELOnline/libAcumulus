@@ -3,11 +3,9 @@ namespace Siel\Acumulus\Shop;
 
 use ReflectionClass;
 use Siel\Acumulus\Helpers\Log;
-use Siel\Acumulus\Helpers\TranslatorInterface;
 use Siel\Acumulus\Invoice\Completor;
 use Siel\Acumulus\Invoice\ConfigInterface as InvoiceConfigInterface;
 use Siel\Acumulus\Web\ConfigInterface as ServiceConfigInterface;
-use Siel\Acumulus\Web\Service;
 
 /**
  * Gives common code in this package uniform access to the settings for this
@@ -24,19 +22,7 @@ use Siel\Acumulus\Web\Service;
 class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigInterface, InjectorInterface {
 
   /** @var array[]|null */
-  protected $keyInfo = NULL;
-
-  /** @var \Siel\Acumulus\Shop\ConfigStoreInterface */
-  protected $configStore;
-
-  /** @var \Siel\Acumulus\Helpers\Log */
-  protected $log;
-
-  /** @var \Siel\Acumulus\Web\Service */
-  protected $service;
-
-  /** @var \Siel\Acumulus\Helpers\TranslatorInterface */
-  protected $translator;
+  protected $keyInfo;
 
   /** @var bool */
   protected $isLoaded;
@@ -47,30 +33,25 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
   /** @var array */
   protected $instances;
 
+  /** @var string The namespace for the current shop. */
+  protected $shopNamespace;
+
+  /** @var string The language to display texts in. */
+  protected $language;
+
   /**
    * Constructor.
    *
-   * @param \Siel\Acumulus\Shop\ConfigStoreInterface $configStore
-   * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
+   * @param string $shopNamespace
+   * @param string $language
    */
-  public function __construct(ConfigStoreInterface $configStore, TranslatorInterface $translator) {
+  public function __construct($shopNamespace, $language) {
+    $this->keyInfo = NULL;
+    $this->isLoaded = FALSE;
     $this->values = array();
-    $this->configStore = $configStore;
-
-    // To support lazy load, we do not query the config for the log level, but
-    // instead we let the log query us when needed.
-    $this->getLog()->setConfig($this);
-
-    $this->translator = $translator;
-    $invoiceHelperTranslations = new Translations();
-    $this->translator->add($invoiceHelperTranslations);
-
-    $this->service = new Service($this, $this->getTranslator());
-
-  }
-
-  public function getTranslator() {
-    return $this->translator;
+    $this->instances = array();
+    $this->shopNamespace = '\\Siel\\Acumulus\\' . $shopNamespace;
+    $this->language = $language;
   }
 
   /**
@@ -90,15 +71,22 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
   /**
    * {@inheritdoc}
    */
+  public function getTranslator() {
+    return $this->getInstance('Translator', 'Helpers', array($this->language));
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getLog() {
-    return Log::getInstance();
+    return $this->getInstance('Log', 'Helpers', array($this));
   }
 
   /**
    * {@inheritdoc}
    */
   public function getService() {
-    return $this->service;
+    return $this->getInstance('Service', 'Web', array($this, $this->getTranslator()));
   }
 
   /**
@@ -112,7 +100,7 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
    * {@inheritdoc}
    */
   public function getCompletor() {
-    return new Completor($this, $this->getTranslator(), $this->service);
+    return new Completor($this, $this->getTranslator(), $this->getService());
   }
 
   /**
@@ -126,7 +114,14 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
    * {@inheritdoc}
    */
   public function getMailer() {
-    return $this->getInstance('Mailer', 'Helpers', array($this, $this->getTranslator(), $this->service));
+    return $this->getInstance('Mailer', 'Helpers', array($this, $this->getTranslator(), $this->getService()));
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getConfigStore() {
+    return $this->getInstance('ConfigStore', 'Shop');
   }
 
   /**
@@ -157,31 +152,44 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
    * @param array $constructorArgs
    *
    * @return object
+   *
+   * @throws \ReflectionException
    */
   protected function getInstance($class, $subNamespace, array $constructorArgs = array()) {
     if (!isset($this->instances[$class])) {
-      $class = $this->getShopNamespace() . '\\' . $subNamespace . '\\' . $class;
-      $reflector = new ReflectionClass($class);
+      $fqClass = $this->shopNamespace . '\\' . $subNamespace . '\\' . $class;
+      if (!class_exists($fqClass)) {
+        $cmsNamespace = $this->getCmsNamespace();
+        if (!empty($cmsNamespace)) {
+          $fqClass = $cmsNamespace . '\\' . $subNamespace . '\\' . $class;
+        }
+        if (!class_exists($fqClass)) {
+          $fqClass = '\\Siel\Acumulus\\' . $subNamespace . '\\' . $class;
+        }
+      }
+      // Use ReflectionClass to pass the array of arguments as argument list.
+      $reflector = new ReflectionClass($fqClass);
       $this->instances[$class] = $reflector->newInstanceArgs($constructorArgs);
     }
     return $this->instances[$class];
   }
 
   /**
-   * Returns the namespace for the current shop.
+   * Returns the namespace for the current cms.
    *
    * @return string
-   *   The namespace for the current shop.
+   *   The namespace for the current cms or the empty string if the current shop
+   *   is not contained in a CMS namespace.
    */
-  protected function getShopNamespace() {
-    // Get class of ConfigStore object.
-    $class = get_class($this->configStore);
-    // Get namespace part of that.
-    $namespaceEnd = strrpos($class, '\\');
-    $namespace = substr($class, 0, (int) $namespaceEnd);
-    // Remove '\Shop' part at end.
-    $namespace = substr($namespace, 0, -strlen('\\Shop'));
-    return $namespace;
+  protected function getCmsNamespace() {
+    // Get parent namespace of the shop namespace.
+    $cmsNamespaceEnd = strrpos($this->shopNamespace, '\\');
+    $cmsNamespace = substr($this->shopNamespace, 0, (int) $cmsNamespaceEnd);
+    // But if that is Acumulus there's no CMS namespace.
+    if (substr($cmsNamespace, -strlen('\\Acumulus')) === '\\Acumulus') {
+      $cmsNamespace = '';
+    }
+    return $cmsNamespace;
   }
 
   /**
@@ -189,7 +197,7 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
    */
   protected function load() {
     if (!$this->isLoaded) {
-      $this->values = array_merge($this->getDefaults(), $this->configStore->load($this->getKeys()));
+      $this->values = array_merge($this->getDefaults(), $this->getConfigStore()->load($this->getKeys()));
       $this->castValues();
       $this->isLoaded = TRUE;
     }
@@ -206,7 +214,7 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
    *   Success.
    */
   public function save(array $values) {
-    $result = $this->configStore->save($values);
+    $result = $this->getConfigStore()->save($values);
     $this->isLoaded = FALSE;
     // Sync internal values.
     $this->load();
@@ -473,7 +481,7 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
     if ($this->keyInfo === NULL) {
       $hostName = $this->getHostName();
       $curlVersion = curl_version();
-      $shopDefaults = $this->configStore->getShopEnvironment();
+      $shopDefaults = $this->getConfigStore()->getShopEnvironment();
 
       $this->keyInfo = array(
         'baseUri' => array(

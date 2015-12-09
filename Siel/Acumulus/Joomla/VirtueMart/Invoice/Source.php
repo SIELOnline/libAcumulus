@@ -1,5 +1,5 @@
 <?php
-namespace Siel\Acumulus\VirtueMart\Invoice;
+namespace Siel\Acumulus\Joomla\VirtueMart\Invoice;
 
 use Siel\Acumulus\Invoice\Source as BaseSource;
 use VmModel;

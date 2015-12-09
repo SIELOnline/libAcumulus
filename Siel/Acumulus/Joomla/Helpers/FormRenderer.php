@@ -1,5 +1,5 @@
 <?php
-namespace Siel\Acumulus\VirtueMart\Helpers;
+namespace Siel\Acumulus\Joomla\Helpers;
 
 use JHtml;
 use \Siel\Acumulus\Helpers\FormRenderer as BaseFormRenderer;

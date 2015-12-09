@@ -1,12 +1,12 @@
 <?php
-namespace Siel\Acumulus\VirtueMart\Shop;
+namespace Siel\Acumulus\Joomla\Shop;
 
 use DateTimeZone;
 use JDate;
 use JFactory;
 use JTable;
 use Siel\Acumulus\Shop\AcumulusEntryModel as BaseAcumulusEntryModel;
-use Siel\Acumulus\VirtueMart\Helpers\Log;
+use Siel\Acumulus\Joomla\Helpers\Log;
 
 /**
  * Implements the VirtueMart specific acumulus entry model class.

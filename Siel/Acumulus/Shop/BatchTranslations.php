@@ -7,7 +7,7 @@ use Siel\Acumulus\Helpers\TranslationCollection;
  * Contains translations for classes in the \Siel\Acumulus\Shop namespace:
  * - InvoiceManager
  */
-class Translations extends TranslationCollection {
+class BatchTranslations extends TranslationCollection {
 
   protected $nl = array(
     // Batch log messages.

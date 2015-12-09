@@ -1,9 +1,8 @@
 <?php
-namespace Siel\Acumulus\VirtueMart\Shop;
+namespace Siel\Acumulus\Joomla\VirtueMart\Shop;
 
-use JSession;
 use JText;
-use Siel\Acumulus\Shop\ConfigForm as BaseConfigForm;
+use Siel\Acumulus\Joomla\Shop\ConfigForm as BaseConfigForm;
 use Siel\Acumulus\Shop\ConfigInterface;
 use VirtueMartModelOrderstatus;
 use VmModel;
@@ -13,16 +12,6 @@ use VmModel;
  * VirtueMart Acumulus module.
  */
 class ConfigForm extends BaseConfigForm {
-
-  /**
-   * {@inheritdoc}
-   *
-   * This override checks the Joomla form token:
-   * https://docs.joomla.org/How_to_add_CSRF_anti-spoofing_to_forms
-   */
-  protected function systemValidate() {
-    return JSession::checkToken();
-  }
 
   /**
    * {@inheritdoc}

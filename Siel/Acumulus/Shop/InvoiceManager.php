@@ -22,7 +22,7 @@ abstract class InvoiceManager {
   public function __construct(Config $config) {
     $this->config = $config;
 
-    $translations = new Translations();
+    $translations = new BatchTranslations();
     $config->getTranslator()->add($translations);
   }
 
@@ -107,6 +107,7 @@ abstract class InvoiceManager {
    *   Success.
    */
   public function sendMultiple(array $invoiceSources, $forceSend, array &$log) {
+    $this->config->getTranslator()->add( new BatchTranslations());
     $errorLogged = false;
     $success = true;
     $time_limit = ini_get('max_execution_time');

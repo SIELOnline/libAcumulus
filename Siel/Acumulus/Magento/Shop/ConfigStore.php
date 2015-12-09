@@ -15,6 +15,7 @@ class ConfigStore implements ConfigStoreInterface {
    * {@inheritdoc}
    */
   public function getShopEnvironment() {
+    /** @noinspection PhpUndefinedFieldInspection */
     $environment = array(
       'moduleVersion' => Mage::getConfig()->getModuleConfig("Siel_Acumulus")->version,
       'shopName' => 'Magento',
@@ -58,7 +59,9 @@ class ConfigStore implements ConfigStoreInterface {
         elseif (is_array($value)) {
           $value = serialize($value);
         }
-        Mage::getModel('core/config')->saveConfig($this->configKey . $key, $value);
+        /** @var \Mage_Core_Model_Config $configModel */
+        $configModel = Mage::getModel('core/config');
+        $configModel->saveConfig($this->configKey . $key, $value);
       }
     }
     Mage::getConfig()->reinit();

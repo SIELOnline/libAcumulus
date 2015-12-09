@@ -51,6 +51,11 @@ interface InjectorInterface {
   public function getMailer();
 
   /**
+   * @return \Siel\Acumulus\Shop\ConfigStoreInterface
+   */
+  public function getConfigStore();
+
+  /**
    * @return \Siel\Acumulus\Shop\InvoiceManager
    */
   public function getManager();

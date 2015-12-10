@@ -21,6 +21,9 @@ use Siel\Acumulus\Web\ConfigInterface as ServiceConfigInterface;
  */
 class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigInterface, InjectorInterface {
 
+  /** @const string */
+  const baseNamespace = '\\Siel\\Acumulus';
+
   /** @var array[]|null */
   protected $keyInfo;
 
@@ -50,7 +53,7 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
     $this->isLoaded = FALSE;
     $this->values = array();
     $this->instances = array();
-    $this->shopNamespace = '\\Siel\\Acumulus\\' . $shopNamespace;
+    $this->shopNamespace = static::baseNamespace . '\\' . $shopNamespace;
     $this->language = $language;
   }
 
@@ -157,21 +160,32 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
    */
   protected function getInstance($class, $subNamespace, array $constructorArgs = array()) {
     if (!isset($this->instances[$class])) {
-      $fqClass = $this->shopNamespace . '\\' . $subNamespace . '\\' . $class;
-      if (!class_exists($fqClass)) {
+      // Try shop namespace.
+      $fqClass = $this->tryNsInstance($class, $subNamespace, $this->shopNamespace);
+
+      // Try CMS namespace if it exists.
+      if (empty($fqClass)) {
         $cmsNamespace = $this->getCmsNamespace();
         if (!empty($cmsNamespace)) {
-          $fqClass = $cmsNamespace . '\\' . $subNamespace . '\\' . $class;
-        }
-        if (!class_exists($fqClass)) {
-          $fqClass = '\\Siel\Acumulus\\' . $subNamespace . '\\' . $class;
+          $fqClass = $this->tryNsInstance($class, $subNamespace, $cmsNamespace);
         }
       }
+
+      // Try base namespace.
+      if (empty($fqClass)) {
+        $fqClass = $this->tryNsInstance($class, $subNamespace, static::baseNamespace);
+      }
+
       // Use ReflectionClass to pass the array of arguments as argument list.
       $reflector = new ReflectionClass($fqClass);
       $this->instances[$class] = $reflector->newInstanceArgs($constructorArgs);
     }
     return $this->instances[$class];
+  }
+
+  protected function tryNsInstance($class, $subNamespace, $namespace) {
+    $fqClass = $namespace . '\\' . $subNamespace . '\\' . $class;
+    return class_exists($fqClass) ? $fqClass : '';
   }
 
   /**

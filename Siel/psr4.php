@@ -17,6 +17,6 @@ spl_autoload_register(function($class) {
     if (strpos($class, __NAMESPACE__ . '\\') === 0) {
       $fileName = __DIR__ . str_replace('\\', DIRECTORY_SEPARATOR, substr($class, strlen(__NAMESPACE__))) . '.php';
       /** @noinspection PhpIncludeInspection */
-      include($fileName);
+      @include($fileName);
     }
   }, FALSE, TRUE);

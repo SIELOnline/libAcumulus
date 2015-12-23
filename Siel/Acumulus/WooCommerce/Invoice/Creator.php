@@ -187,6 +187,36 @@ class Creator extends BaseCreator {
   }
 
   /**
+   * @inheritDoc
+   *
+   * This override corrects a credit invoice if the amount does not match the
+   * sum of the lines so far. This can happen if an amount was entered manually.
+   */
+  protected function getInvoiceLines() {
+    $result = parent::getInvoiceLines();
+
+    if ($this->invoiceSource->getType() === Source::CreditNote) {
+      $amount = (float) $this->shopSource->order_total;
+      $linesAmount = $this->getLinesTotal($result);
+      if (!Number::floatsAreEqual($amount, $linesAmount)) {
+        // @todo: can we get a tax amount/rate over the manually entered refund?
+        $line = array (
+          'product' => $this->t('refund_adjustment'),
+          'quantity' => 1,
+          'unitpriceinc' => $amount - $linesAmount,
+          'unitprice' => $amount - $linesAmount,
+          'vatrate' => 0,
+          'meta-vatrate-source' => Creator::VatRateSource_Exact0,
+          'meta-line-type' => static::LineType_Manual,
+        );
+        $result[] = $line;
+      }
+    }
+
+    return $result;
+  }
+
+  /**
    * {@inheritdoc}
    */
   protected function getItemLines() {
@@ -212,7 +242,7 @@ class Creator extends BaseCreator {
   protected function getItemLine(array $item, WC_Abstract_Order $order) {
     $result = array();
 
-    // Qty = 0 happens on refunds: products that are not returned are still
+    // Qty = 0 can happen on refunds: products that are not returned are still
     // listed but have qty = 0.
     if (Number::isZero($item['qty'])) {
       return $result;
@@ -413,32 +443,5 @@ class Creator extends BaseCreator {
       'quantity' => 1,
     );
   }
-
-  /**
-   * {@inheritdoc}
-   *
-   * This override corrects a credit invoice if the amount does not match the
-   * sum of the lines so far. This can happen if an amount was entered manually.
-   */
-  protected function getManualLines() {
-    if ($this->invoiceSource->getType() === Source::CreditNote) {
-      $amount = (float) $this->shopSource->order_total;
-      $linesAmount = $this->getLinesTotal();
-      if (!Number::floatsAreEqual($amount, $linesAmount)) {
-        // @todo: can we get the tax amount/rate over the manually entered refund?
-        $line = array (
-          'product' => $this->t('refund_adjustment'),
-          'quantity' => 1,
-          'unitpriceinc' => $amount - $linesAmount,
-          'unitprice' => $amount - $linesAmount,
-          'vatrate' => 0,
-          'meta-vatrate-source' => Creator::VatRateSource_Exact,
-        );
-        return array($line);
-      }
-    }
-    return parent::getManualLines();
-  }
-
 
 }

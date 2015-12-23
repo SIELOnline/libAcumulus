@@ -119,7 +119,6 @@ abstract class Creator {
     $this->invoice['customer']['invoice'] = $this->getInvoice();
     $this->addInvoiceDefaults();
     $this->invoice['customer']['invoice']['line'] = $this->getInvoiceLines();
-    $this->invoice['customer']['invoice']['line'] = array_merge($this->invoice['customer']['invoice']['line'], $this->getManualLinesInternal());
     $this->addEmailAsPdf();
     return $this->invoice;
   }
@@ -527,7 +526,10 @@ abstract class Creator {
     $discountLines = $this->getDiscountLines();
     $discountLines = $this->addLineType($discountLines, static::LineType_Discount);
 
-    $result = array_merge($itemLines, $feeLines, $discountLines);
+    $manualLines = $this->getManualLines();
+    $manualLines = $this->addLineType($manualLines, static::LineType_Manual);
+
+    $result = array_merge($itemLines, $feeLines, $discountLines, $manualLines);
     return $result;
   }
 
@@ -617,18 +619,6 @@ abstract class Creator {
    */
   protected function getDiscountLines() {
     return $this->callSourceTypeSpecificMethod(__FUNCTION__, func_get_args());
-  }
-
-  /**
-   * Internal wrapper around getManualLines to add the line type to the results.
-   *
-   * @return array[]
-   *  An array of manual line arrays, may be empty.
-   */
-  private function getManualLinesInternal() {
-    $manualLines = $this->getManualLines();
-    $manualLines = $this->addLineType($manualLines, static::LineType_Manual);
-    return $manualLines;
   }
 
   /**
@@ -833,13 +823,16 @@ abstract class Creator {
   }
 
   /**
-   * Returns the total amount for all (current) invoice lines.
+   * Returns the total amount for the given invoice lines.
+   *
+   * @param array[] $lines
+   *   An array of invoice lines
    *
    * @return float
    */
-  protected function getLinesTotal() {
+  protected function getLinesTotal(array $lines) {
     $linesAmount = 0.0;
-    foreach ($this->invoice['customer']['invoice']['line'] as $line) {
+    foreach ($lines as $line) {
       if (isset($line['meta-linepriceinc'])) {
         $linesAmount += $line['meta-linepriceinc'];
       }

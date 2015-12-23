@@ -238,6 +238,46 @@ class Creator extends BaseCreator {
   }
 
   /**
+   * @inheritDoc
+   *
+   * This override corrects a credit invoice if the amount does not match the
+   * sum of the lines so far. This can happen if an amount was entered manually,
+   * or if discount(s) applied during sale were subtracted from the credit
+   * amount but we could not find which discounts this were.
+   */
+  protected function getInvoiceLines() {
+    $result = parent::getInvoiceLines();
+
+    if ($this->invoiceSource->getType() === Source::CreditNote) {
+      // Only Credit notes can have a manual line. They get one if the total
+      // amount does not match the sum of the lines added so far.
+      // Notes:
+      // - amount is excl vat if not manually entered.
+      // - amount is incl vat if manually entered (assuming administrators enter
+      //   amounts incl tax, and this is what gets listed on the credit PDF.
+      // - shipping_cost_amount is excl vat.
+      // So this is never going  to work!!!
+      // @todo: can we get a tax amount/rate over the manually entered refund?
+      $amount = -$this->creditSlip->amount - $this->creditSlip->shipping_cost_amount;
+      $linesAmount = $this->getLinesTotal($result);
+      if (!Number::floatsAreEqual($amount, $linesAmount)) {
+        $line = array(
+          'product' => $this->t('refund_adjustment'),
+          'unitprice' => $amount - $linesAmount,
+          'unitpriceinc' => $amount - $linesAmount,
+          'quantity' => 1,
+          'vatrate' => 0,
+          'meta-vatrate-source' => Creator::VatRateSource_Exact,
+          'meta-line-type' => static::LineType_Manual,
+        );
+        $result[] = $line;
+      }
+    }
+
+    return $result;
+  }
+
+  /**
    * Returns 1 item line, both for an order or credit slip.
    *
    * @param array $item
@@ -455,42 +495,6 @@ class Creator extends BaseCreator {
       //}
     }
     return array();
-  }
-
-  /**
-   * {@inheritdoc}
-   *
-   * This override corrects a credit invoice if the amount does not match the
-   * sum of the lines so far. This can happen if an amount was entered manually,
-   * or if discount(s) applied during sale were subtracted from the credit
-   * amount but we could not find which discounts this were.
-   */
-  protected function getManualLines() {
-    if ($this->invoiceSource->getType() === Source::CreditNote) {
-      // Only Credit notes can have a manual line. They get one if the total
-      // amount does not match the sum of the lines added so far.
-      // Notes:
-      // - amount is excl vat if not manually entered.
-      // - amount is incl vat if manually entered (assuming administrators enter
-      //   amounts incl tax, and this is what gets listed on the credit PDF.
-      // - shipping_cost_amount is excl vat.
-      // So this is never going  to work!!!
-      // @todo: can we get the tax amount/rate over the manually entered refund?
-      $amount = -$this->creditSlip->amount - $this->creditSlip->shipping_cost_amount;
-      $linesAmount = $this->getLinesTotal();
-      if (!Number::floatsAreEqual($amount, $linesAmount)) {
-        $line = array(
-          'product' => $this->t('refund_adjustment'),
-          'unitprice' => $amount - $linesAmount,
-          'unitpriceinc' => $amount - $linesAmount,
-          'quantity' => 1,
-          'vatrate' => 0,
-          'meta-vatrate-source' => Creator::VatRateSource_Exact,
-        );
-        return array($line);
-      }
-    }
-    return parent::getManualLines();
   }
 
 }

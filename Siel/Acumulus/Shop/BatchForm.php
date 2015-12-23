@@ -212,7 +212,7 @@ abstract class BatchForm extends Form {
             'type' => 'textarea',
             'attributes' => array(
               'readonly' => TRUE,
-              'rows' => min(10, count($this->log)),
+              'rows' => max(5, min(10, count($this->log))),
               'style' => 'box-sizing: border-box; width: 100%; min-width: 48em;',
             ),
           ),

@@ -104,7 +104,6 @@ class Creator extends BaseCreator {
     if (!empty($this->order['details']['BT']->first_name)) {
       $result['fullname'] = $this->order['details']['BT']->first_name . ' ' . $result['fullname'];
     }
-    $this->addIfSetAndNotEmpty($result, 'salutation', $this->order['details']['BT'], 'title');
     $this->addIfSetAndNotEmpty($result, 'address1', $this->order['details']['BT'], 'address_1');
     $this->addIfSetAndNotEmpty($result, 'address2', $this->order['details']['BT'], 'address_2');
     $this->addIfSetAndNotEmpty($result, 'postalcode', $this->order['details']['BT'], 'zip');

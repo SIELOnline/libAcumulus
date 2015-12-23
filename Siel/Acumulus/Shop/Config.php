@@ -95,8 +95,8 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
   /**
    * {@inheritdoc}
    */
-  public function getSource($invoiceSourceType, $invoiceSourceId) {
-    return $this->getInstance('Source', 'Invoice', array($invoiceSourceType, $invoiceSourceId));
+  public function getSource($invoiceSourceType, $invoiceSourceOrId) {
+    return $this->getInstance('Source', 'Invoice', array($invoiceSourceType, $invoiceSourceOrId));
   }
 
   /**

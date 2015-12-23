@@ -26,14 +26,14 @@ interface InjectorInterface {
    * parameters.
    *
    * @param string $invoiceSourceType
-   *   The type of the invoice source to get.
-   * @param string $invoiceSourceId
-   *   The id of the invoice source to get.
+   *   The type of the invoice source to create.
+   * @param string $invoiceSourceOrId
+   *   The invoice source itself or its id to create a Source wrapper for.
    *
    * @return \Siel\Acumulus\Invoice\Source
    *   A wrapper object around a shop specific invoice source object.
    */
-  public function getSource($invoiceSourceType, $invoiceSourceId);
+  public function getSource($invoiceSourceType, $invoiceSourceOrId);
 
   /**
    * @return \Siel\Acumulus\Invoice\Completor

@@ -19,7 +19,7 @@ class ConfigForm extends BaseConfigForm {
   protected function getShopOrderStatuses() {
     /** @var VirtueMartModelOrderstatus $orderStatusModel */
     $orderStatusModel = VmModel::getModel('orderstatus');
-    /** @var array $orderStates Method getOrderStatusNames() has an incorrect @return type ... */
+    /** @var array[] $orderStates Method getOrderStatusNames() has an incorrect @return type ... */
     $orderStates = $orderStatusModel->getOrderStatusNames();
     foreach ($orderStates as $code => &$value) {
       $value = \JText::_($value['order_status_name']);
@@ -32,9 +32,7 @@ class ConfigForm extends BaseConfigForm {
    */
   protected function getTriggerInvoiceSendEventOptions() {
     $result = parent::getTriggerInvoiceSendEventOptions();
-    // For now we don't support automatic sending.
-    // @todo: find out if and how to implement automatic sending. This is for a future release.
-    unset($result[ConfigInterface::TriggerInvoiceSendEvent_OrderStatus]);
+    // @todo: find out if there's something like an invoice create event.
     unset($result[ConfigInterface::TriggerInvoiceSendEvent_InvoiceCreate]);
     return $result;
   }

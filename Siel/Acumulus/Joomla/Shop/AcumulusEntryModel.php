@@ -31,16 +31,18 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel {
    * {@inheritdoc}
    */
   public function getByEntryId($entryId) {
-    $result = $this->newTable()->load(array('entry_id' => $entryId), true);
-    return $result;
+    $table = $this->newTable();
+    $result = $table->load(array('entry_id' => $entryId), true);
+    return $result ? $table : null;
   }
 
   /**
    * {@inheritdoc}
    */
   public function getByInvoiceSourceId($invoiceSourceType, $invoiceSourceId) {
-    $result = $this->newTable()->load(array('source_type' => $invoiceSourceType, 'source_id' => $invoiceSourceId), true);
-    return $result;
+    $table = $this->newTable();
+    $result = $table->load(array('source_type' => $invoiceSourceType, 'source_id' => $invoiceSourceId), true);
+    return $result ? $table : null;
   }
 
   /**

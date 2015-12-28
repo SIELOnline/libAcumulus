@@ -13,18 +13,15 @@ use Siel\Acumulus\Joomla\Helpers\Log;
  */
 class AcumulusEntryModel extends BaseAcumulusEntryModel {
 
-  /** @var \AcumulusTableAcumulusEntry */
-  protected $table;
-
   /**
    * @return \AcumulusTableAcumulusEntry
    */
   protected function newTable() {
-    $this->table = JTable::getInstance('AcumulusEntry', 'AcumulusTable');
-    if ($this->table === false) {
+    $table = JTable::getInstance('AcumulusEntry', 'AcumulusTable');
+    if ($table === false) {
       Log::getInstance()->error('AcumulusEntryModel::newTable(): table not created');
     }
-    return $this->table;
+    return $table;
   }
 
   /**
@@ -64,12 +61,10 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel {
    * {@inheritdoc}
    */
   protected function update($record, $entryId, $token, $updated) {
-    // Continue with existing table class with already loaded record.
-    $table = $this->table;
+    // Continue with existing table object with already loaded record.
+    $table = $record;
     $table->entry_id = $entryId;
     $table->token = $token;
-    $table->source_type = $record['source_type'];
-    $table->source_id = $record['source_id'];
     $table->updated = $updated;
     return $table->store(false);
   }

@@ -29,7 +29,15 @@ class ConfigStore implements ConfigStoreInterface {
     $moduleVersion = $componentInfo['version'];
 
     $id = $extension->find(array('element' => 'com_virtuemart'));
-    $extension->load($id);
+    if ($extension->load($id)) {
+      $shopName = 'VirtueMart';
+    }
+    else {
+      $id = $extension->find(array('element' => 'com_hikashop'));
+      if ($extension->load($id)) {
+        $shopName = 'HikaShop';
+      }
+    }
     $componentInfo = json_decode($extension->manifest_cache, true);
     $shopVersion = $componentInfo['version'];
 
@@ -37,7 +45,7 @@ class ConfigStore implements ConfigStoreInterface {
 
     $environment = array(
       'moduleVersion' => $moduleVersion,
-      'shopName' => 'VirtueMart',
+      'shopName' => $shopName,
       'shopVersion' => "$shopVersion (CMS: Joomla $joomlaVersion)",
     );
 

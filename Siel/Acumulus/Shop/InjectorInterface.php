@@ -27,7 +27,7 @@ interface InjectorInterface {
    *
    * @param string $invoiceSourceType
    *   The type of the invoice source to create.
-   * @param string $invoiceSourceOrId
+   * @param string|object|array $invoiceSourceOrId
    *   The invoice source itself or its id to create a Source wrapper for.
    *
    * @return \Siel\Acumulus\Invoice\Source

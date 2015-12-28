@@ -97,6 +97,36 @@ abstract class InvoiceManager {
   abstract public function getInvoiceSourcesByDateRange($invoiceSourceType, DateTime $dateFrom, DateTime $dateTo);
 
   /**
+   * Creates a set of sources given their ids.
+   *
+   * @param string $invoiceSourceType
+   * @param int[] $sourceIds
+   *
+   * @return \Siel\Acumulus\Invoice\Source[]
+   *   A non keyed array with invoice Sources.
+   */
+  public function getSourcesByIds($invoiceSourceType, $sourceIds) {
+    $results = array();
+    foreach ($sourceIds as $sourceId) {
+      $results[] = $this->getSourceById($invoiceSourceType, $sourceId);
+    }
+    return $results;
+  }
+
+  /**
+   * Creates a source given its type and id.
+   *
+   * @param string $invoiceSourceType
+   * @param int $sourceId
+   *
+   * @return \Siel\Acumulus\Invoice\Source
+   *   An invoice Source.
+   */
+  protected function getSourceById($invoiceSourceType, $sourceId) {
+    return $this->config->getSource($invoiceSourceType, $sourceId);
+  }
+
+  /**
    * Sends multiple invoices to Acumulus.
    *
    * @param \Siel\Acumulus\Invoice\Source[] $invoiceSources

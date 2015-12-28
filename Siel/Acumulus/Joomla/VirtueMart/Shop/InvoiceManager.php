@@ -2,18 +2,10 @@
 namespace Siel\Acumulus\Joomla\VirtueMart\Shop;
 
 use DateTime;
-use \Siel\Acumulus\Invoice\Source as BaseSource;
+use \Siel\Acumulus\Invoice\Source as Source;
 use \Siel\Acumulus\Joomla\Shop\InvoiceManager as BaseInvoiceManager;
-use Siel\Acumulus\Joomla\VirtueMart\Invoice\Source;
 
 class InvoiceManager extends BaseInvoiceManager {
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function getSourceById($invoiceSourceType, $sourceId) {
-    return new Source($invoiceSourceType, $sourceId);
-  }
 
   /**
    * {@inheritdoc}
@@ -72,16 +64,4 @@ class InvoiceManager extends BaseInvoiceManager {
     return $this->getSourcesByQuery($invoiceSourceType, $query);
   }
 
-  protected function triggerInvoiceCreated(array &$invoice, BaseSource $invoiceSource) {
-    // @todo: find out about VM events.
-    parent::triggerInvoiceCreated($invoice, $invoiceSource);
-  }
-
-  protected function triggerInvoiceCompleted(array &$invoice, BaseSource $invoiceSource) {
-    parent::triggerInvoiceCompleted($invoice, $invoiceSource);
-  }
-
-  protected function triggerInvoiceSent(array $invoice, BaseSource $invoiceSource, array $result) {
-    parent::triggerInvoiceSent($invoice, $invoiceSource, $result);
-  }
 }

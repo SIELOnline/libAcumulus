@@ -38,7 +38,7 @@ class InvoiceManager extends BaseInvoiceManager {
     $key = 'ID';
     $invoiceSourceIds = $wpdb->get_col($wpdb->prepare("SELECT `$key` FROM `{$wpdb->posts}` WHERE `$key` BETWEEN %u AND %u AND `post_type` = %s",
       $InvoiceSourceIdFrom, $InvoiceSourceIdTo, $this->sourceTypeToShopType($invoiceSourceType)));
-    return Source::invoiceSourceIdsToSources($invoiceSourceType, $invoiceSourceIds);
+    return $this->getSourcesByIds($invoiceSourceType, $invoiceSourceIds);
   }
 
   /**
@@ -169,7 +169,7 @@ class InvoiceManager extends BaseInvoiceManager {
     if ($sort) {
       sort($ids);
     }
-    return Source::invoiceSourceIdsToSources($invoiceSourceType, $ids);
+    return $this->getSourcesByIds($invoiceSourceType, $ids);
   }
 
 }

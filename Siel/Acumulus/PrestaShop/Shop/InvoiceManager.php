@@ -36,11 +36,11 @@ class InvoiceManager extends BaseInvoiceManager {
       case Source::Order:
         $key = Order::$definition['primary'];
         $ids = Db::getInstance()->executeS(sprintf("SELECT `%s` FROM `%s` WHERE `%s` BETWEEN %u AND %u", $key, $this->orderTableName, $key, $InvoiceSourceIdFrom, $InvoiceSourceIdTo));
-        return Source::invoiceSourceIdsToSources($invoiceSourceType, $this->getIds($ids, 'id_order'));
+        return $this->getSourcesByIds($invoiceSourceType, $this->getIds($ids, 'id_order'));
       case Source::CreditNote:
         $key = OrderSlip::$definition['primary'];
         $ids = Db::getInstance()->executeS(sprintf("SELECT `%s` FROM `%s` WHERE `%s` BETWEEN %u AND %u", $key, $this->orderSlipTableName, $key, $InvoiceSourceIdFrom, $InvoiceSourceIdTo));
-        return Source::invoiceSourceIdsToSources($invoiceSourceType, $this->getIds($ids, 'id_order_slip'));
+        return $this->getSourcesByIds($invoiceSourceType, $this->getIds($ids, 'id_order_slip'));
     }
     return array();
   }
@@ -54,7 +54,7 @@ class InvoiceManager extends BaseInvoiceManager {
         $key = Order::$definition['primary'];
         $reference = 'reference';
         $ids = Db::getInstance()->executeS(sprintf("SELECT `%s` FROM `%s` WHERE `%s` BETWEEN '%s' AND '%s'", $key, $this->orderTableName, $reference, pSQL($InvoiceSourceReferenceFrom), pSQL($InvoiceSourceReferenceTo)));
-        return Source::invoiceSourceIdsToSources($invoiceSourceType, $this->getIds($ids, 'id_order'));
+        return $this->getSourcesByIds($invoiceSourceType, $this->getIds($ids, 'id_order'));
       case Source::CreditNote:
         return $this->getInvoiceSourcesByIdRange($invoiceSourceType, $InvoiceSourceReferenceFrom, $InvoiceSourceReferenceTo);
     }
@@ -70,10 +70,10 @@ class InvoiceManager extends BaseInvoiceManager {
     switch ($invoiceSourceType) {
       case Source::Order:
         $ids = Order::getOrdersIdByDate($dateFrom, $dateTo);
-        return Source::invoiceSourceIdsToSources($invoiceSourceType, $ids);
+        return $this->getSourcesByIds($invoiceSourceType, $ids);
       case Source::CreditNote:
         $ids = OrderSlip::getSlipsIdByDate($dateFrom, $dateTo);
-        return Source::invoiceSourceIdsToSources($invoiceSourceType, $ids);
+        return $this->getSourcesByIds($invoiceSourceType, $ids);
     }
     return array();
   }

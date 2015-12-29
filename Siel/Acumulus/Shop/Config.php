@@ -142,6 +142,25 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function getForm($type) {
+    $arguments = array($this->getTranslator());
+    switch (strtolower($type)) {
+      case 'config':
+        $arguments[] = $this;
+        break;
+      case 'batch':
+        $arguments[] = $this->getManager();
+        break;
+      default:
+        $this->getLog()->error('Config::getForm(%s): unknown form type', $type);
+        break;
+    }
+    return $this->getInstance(ucfirst($type) . 'Form', 'Shop', $arguments);
+  }
+
+  /**
    * Returns an instance of the given class.
    *
    * The class is taken from the same namespace as the configStore property.
@@ -687,4 +706,5 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
     }
     return $this->keyInfo;
   }
+
 }

@@ -65,4 +65,14 @@ interface InjectorInterface {
    */
   public function getAcumulusEntryModel();
 
+  /**
+   * @param string $type
+   *   The type of form requested.
+   *
+   * @return \Siel\Acumulus\Helpers\Form
+   *
+   * @todo: start using this in all plugins.
+   */
+  public function getForm($type);
+
 }

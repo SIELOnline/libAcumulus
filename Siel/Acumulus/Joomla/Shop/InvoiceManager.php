@@ -9,6 +9,12 @@ use JPluginHelper;
 use \Siel\Acumulus\Invoice\Source as Source;
 use \Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
 
+/**
+ * {@inheritdoc}
+ *
+ * This override provides Joomla specific db helper methods and defines
+ * and dispatches Joomla events for the events defined by our library.
+ */
 abstract class InvoiceManager extends BaseInvoiceManager {
 
   /**

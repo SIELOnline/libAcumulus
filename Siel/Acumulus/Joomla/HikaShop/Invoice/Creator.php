@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\Joomla\HikaShop\Invoice;
 
+use hikashopConfigClass;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\ConfigInterface as InvoiceConfigInterface;
 use Siel\Acumulus\Shop\ConfigInterface;
@@ -35,34 +36,38 @@ class Creator extends BaseCreator {
   protected function getCustomer() {
     $result = array();
 
+    $billingAddress = $this->order->billing_address;
     // @todo: complete and check
     $this->addIfNotEmpty($result, 'contactyourid', $this->order->order_user_id);
-    $this->addIfNotEmpty($result, 'companyname1', 'company');
+    $this->addIfNotEmpty($result, 'companyname1', $billingAddress->address_company);
     $result['companyname2'] = '';
     if (!empty($result['companyname1'])) {
-      // @todo: there's also a (paid) EU VAT checker extension that probably does not use the field 'tax_exemption_number'.
-      $this->addIfNotEmpty($result, 'vatnumber', 'tax_exemption_number');
+      // @todo: check if this is the vat mnumber
+      $this->addIfNotEmpty($result, 'vatnumber', $billingAddress->address_vat);
     }
-    $result['fullname'] = $this->order->last_name;
-    if (!empty($this->order->middle_name)) {
-      $result['fullname'] = $this->order->middle_name . ' ' . $result['fullname'];
+    $result['fullname'] = $billingAddress->address_lastname;
+    if (!empty($billingAddress->address_middle_name)) {
+      $result['fullname'] = $billingAddress->address_middle_name . ' ' . $result['fullname'];
     }
-    if (!empty($this->order->first_name)) {
-      $result['fullname'] = $this->order->first_name . ' ' . $result['fullname'];
+    if (!empty($billingAddress->address_firstname)) {
+      $result['fullname'] = $billingAddress->address_firstname . ' ' . $result['fullname'];
     }
-    $this->addIfNotEmpty($result, 'address1', 'address_1');
-    $this->addIfNotEmpty($result, 'address2', 'address_2');
-    $this->addIfNotEmpty($result, 'postalcode', 'zip');
-    $this->addIfNotEmpty($result, 'city', 'city');
-    if (!empty($this->order->country_id)) {
-//      $countryModel = VmModel::getModel('country');
-//      $country = $countryModel->getData($this->order['details']['BT']->virtuemart_country_id);
-//      $this->addIfNotEmpty($result, 'countrycode', $country->country_2_code);
+    if (empty($result['fullname'])) {
+
+      $this->addIfNotEmpty($result, 'fullname', $this->order->customer->name);
     }
-    $this->addIfNotEmpty($result, 'telephone', 'phone_2');
-    $this->addIfNotEmpty($result, 'telephone', 'phone_1');
-    $this->addIfNotEmpty($result, 'fax', 'fax');
-    $this->addIfNotEmpty($result, 'email', 'email');
+    $this->addIfNotEmpty($result, 'address1', $billingAddress->address_street1);
+    $this->addIfNotEmpty($result, 'address2', $billingAddress->address_street2);
+    $this->addIfNotEmpty($result, 'postalcode', $billingAddress->address_post_code);
+    $this->addIfNotEmpty($result, 'city', $billingAddress->address_city);
+    $this->addIfNotEmpty($result, 'countrycode', $billingAddress->address_country_code_2);
+    // Preference for 1st phone number.
+    $this->addIfNotEmpty($result, 'telephone', $billingAddress->address_telephone2);
+    $this->addIfNotEmpty($result, 'telephone', $billingAddress->address_telephone);
+    $this->addIfNotEmpty($result, 'fax', $billingAddress->address_fax);
+    // Preference for the user email, not the registration email.
+    $this->addIfNotEmpty($result, 'email', $this->order->customer->email);
+    $this->addIfNotEmpty($result, 'email', $this->order->customer->user_email);
 
     return $result;
   }
@@ -71,11 +76,14 @@ class Creator extends BaseCreator {
    * {@inheritdoc}
    */
   protected function searchProperty($property) {
+    // @todo: check
     $value = @$this->getProperty($property, $this->order);
-    // @todo
-//    if (empty($value)) {
-//      $value = @$this->getProperty($property, $this->user);
-//    }
+    if (empty($value)) {
+      $value = @$this->getProperty($property, $this->order->billing_address);
+      if (empty($value)) {
+        $value = @$this->getProperty($property, $this->order->customer);
+      }
+    }
     return $value;
   }
 
@@ -107,20 +115,28 @@ class Creator extends BaseCreator {
    * {@inheritdoc}
    */
   protected function getPaymentState() {
-    // @todo
-//    $order = $this->invoiceSource->getSource();
-//    return in_array($order['details']['BT']->order_status, $this->getPaidStates())
-    return true
-      ? InvoiceConfigInterface::PaymentStatus_Paid
-      : InvoiceConfigInterface::PaymentStatus_Due;
+    // @todo: check
+    /** @var hikashopConfigClass $config */
+    $config = hikashop_config();
+    $unpaidStatuses = explode(',',$config->get('order_unpaid_statuses','created'));
+    return in_array($this->order->order_status, $unpaidStatuses)
+      ? InvoiceConfigInterface::PaymentStatus_Due
+      : InvoiceConfigInterface::PaymentStatus_Paid;
   }
 
   /**
    * {@inheritdoc}
    */
   protected function getPaymentDate() {
+    // @todo: check
+    // Scan through the history and look for last non empty history_payment_id.
+    // History order is by history_created DESC.
     $date = NULL;
-    // @todo
+    foreach ($this->order->history as $history) {
+      if (!empty($history->history_payment_id)) {
+        $date = $history->history_created;
+      }
+    }
     return $date ? date('Y-m-d', $date) : $date;
   }
 
@@ -131,10 +147,14 @@ class Creator extends BaseCreator {
    * meta-invoicevatamount as they may be needed by the Completor.
    */
   protected function getInvoiceTotals() {
+    // @todo: check
+    $vatAmount = 0.0;
+    foreach ($this->order->order_taxinfo as $taxInfo) {
+      $vatAmount += $taxInfo->tax_amount;
+    }
     return array(
       'meta-invoiceamountinc' => $this->order->order_full_price,
-      // @todo: this is an array.
-      //'meta-invoicevatamount' => $this->order->order_taxinfo,
+      'meta-invoicevatamount' => $vatAmount,
     );
   }
 
@@ -142,7 +162,7 @@ class Creator extends BaseCreator {
    * {@inheritdoc}
    */
   protected function getItemLines() {
-    // @todo
+    // @todo check
     //$result = array_map(array($this, 'getItemLine'), $this->order['items']);
     $result = array();
     return $result;

@@ -19,7 +19,7 @@ class Source extends BaseSource {
   protected function setSourceOrder() {
     /** @var hikashopOrderClass $class */
     $class = hikashop_get('class.order');
-    $this->source = $class->get($this->id);
+    $this->source = $class->loadFullOrder($this->id, TRUE, FALSE);
   }
 
   /**

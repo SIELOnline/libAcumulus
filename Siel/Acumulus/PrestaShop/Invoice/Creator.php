@@ -202,7 +202,10 @@ class Creator extends BaseCreator {
   protected function getItemLines() {
     $result = array();
     if ($this->invoiceSource->getType() === Source::Order) {
-      $lines = $this->mergeProductLines($this->order->getProductsDetail(), $this->order->getOrderDetailTaxes());
+      // Note: getOrderDetailTaxes() is new in 1.6.1.0.
+      $lines = method_exists($this->order, 'getOrderDetailTaxes')
+        ? $this->mergeProductLines($this->order->getProductsDetail(), $this->order->getOrderDetailTaxes())
+        : $this->order->getProductsDetail();
     }
     else {
       $lines = $this->creditSlip->getOrdersSlipProducts($this->invoiceSource->getId(), $this->order);
@@ -316,9 +319,8 @@ class Creator extends BaseCreator {
       $result['meta-linepriceinc'] = $sign * $item['total_price_tax_incl'];
     }
     $result['quantity'] = $item['product_quantity'];
-    // These 3 fields are only defined for orders, as the table
-    // order_slip_detail_tax seems to remain empty in PS1.6.1.1. But as the
-    // join may be empty, we just check if the fields are available.
+    // These 3 fields are only defined for orders and were not filled in or
+    // before PS1.6.1.1. So, we have to check if the fields are available.
     if (isset($item['rate'])) {
       $result['vatamount'] = $item['unit_amount'];
       $result['meta-linevatamount'] = $item['total_amount'];

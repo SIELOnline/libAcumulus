@@ -55,7 +55,6 @@ class Creator extends BaseCreator {
 
     $this->addIfNotEmpty($result, 'contactyourid', $order->customer_user);
     $this->addEmpty($result, 'companyname1', $order->billing_company);
-    $result['companyname2'] = '';
     $result['fullname'] = $order->billing_first_name . ' ' . $order->billing_last_name;
     $this->addEmpty($result, 'address1', $order->billing_address_1);
     $this->addEmpty($result, 'address2', $order->billing_address_2);

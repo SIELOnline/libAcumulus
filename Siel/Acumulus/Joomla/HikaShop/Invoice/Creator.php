@@ -36,35 +36,40 @@ class Creator extends BaseCreator {
   protected function getCustomer() {
     $result = array();
 
-    $billingAddress = $this->order->billing_address;
-    // @todo: complete and check
     $this->addIfNotEmpty($result, 'contactyourid', $this->order->order_user_id);
-    $this->addIfNotEmpty($result, 'companyname1', $billingAddress->address_company);
-    $result['companyname2'] = '';
-    if (!empty($result['companyname1'])) {
-      // @todo: check if this is the vat mnumber
-      $this->addIfNotEmpty($result, 'vatnumber', $billingAddress->address_vat);
-    }
-    $result['fullname'] = $billingAddress->address_lastname;
-    if (!empty($billingAddress->address_middle_name)) {
-      $result['fullname'] = $billingAddress->address_middle_name . ' ' . $result['fullname'];
-    }
-    if (!empty($billingAddress->address_firstname)) {
-      $result['fullname'] = $billingAddress->address_firstname . ' ' . $result['fullname'];
-    }
-    if (empty($result['fullname'])) {
 
+    // @todo: check
+    $billingAddress = $this->order->billing_address;
+    if (!empty($billingAddress)) {
+      $this->addIfNotEmpty($result, 'companyname1', $billingAddress->address_company);
+      if (!empty($result['companyname1'])) {
+        // @todo: check if this is the vat mnumber
+        $this->addIfNotEmpty($result, 'vatnumber', $billingAddress->address_vat);
+      }
+      $result['fullname'] = $billingAddress->address_lastname;
+      if (!empty($billingAddress->address_middle_name)) {
+        $result['fullname'] = $billingAddress->address_middle_name . ' ' . $result['fullname'];
+      }
+      if (!empty($billingAddress->address_firstname)) {
+        $result['fullname'] = $billingAddress->address_firstname . ' ' . $result['fullname'];
+      }
+      if (empty($result['fullname'])) {
+        $this->addIfNotEmpty($result, 'fullname', $this->order->customer->name);
+      }
+      $this->addIfNotEmpty($result, 'address1', $billingAddress->address_street);
+      $this->addIfNotEmpty($result, 'address2', $billingAddress->address_street2);
+      $this->addIfNotEmpty($result, 'postalcode', $billingAddress->address_post_code);
+      $this->addIfNotEmpty($result, 'city', $billingAddress->address_city);
+      $this->addIfNotEmpty($result, 'countrycode', $billingAddress->address_country_code_2);
+      // Preference for 1st phone number.
+      $this->addIfNotEmpty($result, 'telephone', $billingAddress->address_telephone2);
+      $this->addIfNotEmpty($result, 'telephone', $billingAddress->address_telephone);
+      $this->addIfNotEmpty($result, 'fax', $billingAddress->address_fax);
+    }
+    else {
       $this->addIfNotEmpty($result, 'fullname', $this->order->customer->name);
     }
-    $this->addIfNotEmpty($result, 'address1', $billingAddress->address_street1);
-    $this->addIfNotEmpty($result, 'address2', $billingAddress->address_street2);
-    $this->addIfNotEmpty($result, 'postalcode', $billingAddress->address_post_code);
-    $this->addIfNotEmpty($result, 'city', $billingAddress->address_city);
-    $this->addIfNotEmpty($result, 'countrycode', $billingAddress->address_country_code_2);
-    // Preference for 1st phone number.
-    $this->addIfNotEmpty($result, 'telephone', $billingAddress->address_telephone2);
-    $this->addIfNotEmpty($result, 'telephone', $billingAddress->address_telephone);
-    $this->addIfNotEmpty($result, 'fax', $billingAddress->address_fax);
+
     // Preference for the user email, not the registration email.
     $this->addIfNotEmpty($result, 'email', $this->order->customer->email);
     $this->addIfNotEmpty($result, 'email', $this->order->customer->user_email);
@@ -149,8 +154,11 @@ class Creator extends BaseCreator {
   protected function getInvoiceTotals() {
     // @todo: check
     $vatAmount = 0.0;
-    foreach ($this->order->order_taxinfo as $taxInfo) {
-      $vatAmount += $taxInfo->tax_amount;
+    // No order_taxinfo => no tax (?) => vatamount = 0.
+    if (!empty($this->order->order_taxinfo)) {
+      foreach ($this->order->order_taxinfo as $taxInfo) {
+        $vatAmount += $taxInfo->tax_amount;
+      }
     }
     return array(
       'meta-invoiceamountinc' => $this->order->order_full_price,
@@ -162,9 +170,7 @@ class Creator extends BaseCreator {
    * {@inheritdoc}
    */
   protected function getItemLines() {
-    // @todo check
-    //$result = array_map(array($this, 'getItemLine'), $this->order['items']);
-    $result = array();
+    $result = array_map(array($this, 'getItemLine'), $this->order->products);
     return $result;
   }
 
@@ -176,29 +182,36 @@ class Creator extends BaseCreator {
    * @return array
    */
   protected function getItemLine(stdClass $item) {
-    // @todo
-    $productPriceEx = (float) $item->product_discountedPriceWithoutTax;
-    $productPriceInc = (float) $item->product_final_price;
-    $productVat = (float) $item->product_tax;
+    // @todo: check
+    $productPriceEx = (float) $item->order_product_price;
+    $productVat = (float) $item->order_product_tax;
 
-    $calcRule = NULL;
-    if (!empty($calcRule->calc_value)) {
+    // @todo: check if this info remains correct when rates are changed.
+    if (is_array($item->order_product_tax_info) && count($item->order_product_tax_info) === 1) {
+      $productVatInfo = reset($item->order_product_tax_info);
+      if (!empty($productVatInfo->tax_rate)) {
+        $vatRate = $productVatInfo->tax_rate;
+      }
+    }
+    if (isset($vatRate)) {
       $vatInfo = array(
-        'vatrate' => (float) $calcRule->calc_value,
+        'vatrate' => 100.0 * $vatRate,
         'meta-vatrate-source' => static::VatRateSource_Exact,
       );
     }
     else {
       $vatInfo = $this->getVatRangeTags($productVat, $productPriceEx, 0.0001, 0.0001);
     }
+    // @todo: options/variations: $item->order_product_options?
     $result = array(
-        'itemnumber' => $item->order_item_sku,
-        'product' => $item->order_item_name,
-        'unitprice' => $productPriceEx,
-        'unitpriceinc' => $productPriceInc,
-        'quantity' => $item->product_quantity,
-        'vatamount' => $productVat,
-      ) + $vatInfo;
+      'itemnumber' => $item->order_product_code,
+      'product' => $item->order_product_name,
+      'unitprice' => $productPriceEx,
+      'lineprice' => $item->order_product_total_price_no_vat,
+      'linepriceinc' => $item->order_product_total_price,
+      'quantity' => $item->order_product_quantity,
+      'vatamount' => $productVat,
+    ) + $vatInfo;
 
     return $result;
   }
@@ -207,32 +220,27 @@ class Creator extends BaseCreator {
    * {@inheritdoc}
    */
   protected function getShippingLine() {
-    // @todo
+    // @todo: check
     $result = array();
-//    // We are checking on empty, assuming that a null value will be used to
-//    // indicate no shipping at all (downloadable product) and that free shipping
-//    // will be represented as the string '0.00' which is not considered empty.
-//    if (!empty($this->order['details']['BT']->order_shipment)) {
-//      $shippingEx = (float) $this->order['details']['BT']->order_shipment;
-//      $shippingVat = (float) $this->order['details']['BT']->order_shipment_tax;
-//
-//      $calcRule = $this->getCalcRule('shipment');
-//      if (!empty($calcRule->calc_value)) {
-//        $vatInfo = array(
-//          'vatrate' => (float) $calcRule->calc_value,
-//          'meta-vatrate-source' => static::VatRateSource_Exact,
-//        );
-//      }
-//      else {
-//        $vatInfo = $this->getVatRangeTags($shippingVat, $shippingEx, 0.0001, 0.01);
-//      }
-//      $result = array(
-//          'product' => $this->t('shipping_costs'),
-//          'unitprice' => $shippingEx,
-//          'quantity' => 1,
-//          'vatamount' => $shippingVat,
-//        ) + $vatInfo;
-//    }
+    // Check if there is a shipping id attached to the order.
+    if (!empty($this->order->order_shipping_id)) {
+      // Check for free shipping on a credit note.
+      if (!Number::isZero($this->order->order_shipping_price) || $this->invoiceSource->getType() !== Source::CreditNote) {
+        $shippingInc = (float) $this->order->order_shipping_price;
+        $shippingVat = (float) $this->order->order_shipping_tax;
+        $shippingEx = $shippingInc - $shippingVat;
+        $vatInfo = $this->getVatRangeTags($shippingVat, $shippingEx, 0.0001, 0.0002);
+        $description = $this->t('shipping_costs');
+
+        $result = array(
+            'product' => $description,
+            'unitprice' => $shippingEx,
+            'unitpriceinc' => $shippingInc,
+            'quantity' => 1,
+            'vatamount' => $shippingVat,
+          ) + $vatInfo;
+      }
+    }
     return $result;
   }
 
@@ -240,76 +248,27 @@ class Creator extends BaseCreator {
    * {@inheritdoc}
    */
   protected function getDiscountLines() {
-    // @todo
+    // @todo test
+    // @todo check if multiple discounts can be applied.
     $result = array();
 
-    // We do have several discount related fields in the order details:
-    // - order_billDiscountAmount
-    // - order_discountAmount
-    // - coupon_discount
-    // - order_discount
-    // However, these fields seem to be totals based on applied non-tax
-    // calculation rules. So it is better to add a line per calc rule with a
-    // negative amount: this gives us descriptions of the discounts as well.
-//    $result = array_merge($result, array_map(array($this, 'getCalcRuleDiscountLine'),
-//      array_filter($this->order['calc_rules'], array($this, 'isDiscountCalcRule'))));
-//
-//    // Coupon codes are not stored in a calc rules, so handle them separately.
-//    if (!Number::isZero($this->order['details']['BT']->coupon_discount)) {
-//      $result[] = $this->getCouponCodeDiscountLine();
-//    }
+    if (!Number::isZero($this->order->order_discount_price)) {
+      $discountInc = (float) $this->order->order_discount_price;
+      $discountVat = (float) $this->order->order_discount_tax;
+      $discountEx = $discountInc - $discountVat;
+      $vatInfo = $this->getVatRangeTags($discountVat, $discountEx, 0.0001, 0.0002);
+      $description = empty($this->order->order_discount_code)
+        ? $this->t('discount')
+        : $this->t('discount_code') . ' ' . $this->order->order_discount_code;
 
-    return $result;
-  }
-
-  /*
-   * Returns a discount item line for the discount calculation rule.
-   *
-   * The returned line will only contain a discount amount including tax.
-   * The completor will have to divide this amount over vat rates that are used
-   * in this invoice.
-   *
-   * @param \stdClass $calcRule
-   *
-   * @return array
-   *   An item line for the invoice.
-   */
-//  protected function getCalcRuleDiscountLine(stdClass $calcRule) {
-//    $result = array(
-//      'product' => $calcRule->calc_rule_name,
-//      'unitprice' => NULL,
-//      'unitpriceinc' => $calcRule->calc_amount,
-//      'vatrate' => NULL,
-//      'quantity' => 1,
-//      'meta-vatrate-source' => static::VatRateSource_Strategy,
-//      'meta-strategy-split' => TRUE,
-//    );
-//
-//    return $result;
-//  }
-
-  /**
-   *  Returns an item line for the coupon code discount on this order.
-   *
-   * The returned line will only contain a discount amount including tax.
-   * The completor will have to divide this amount over vat rates that are used
-   * in this invoice.
-   *
-   * @return array
-   *   An item line array.
-   */
-  protected function getCouponCodeDiscountLine() {
-    // @todo
-    $result = array(
-      'product' => $this->t('coupon_code') . ' ' . $this->order->discount_code,
-      'unitprice' => NULL,
-      'unitpriceinc' => $this->order->order_discount_price,
-      'vatamount' => $this->order->order_discount_tax,
-      'vatrate' => NULL,
-      'quantity' => 1,
-      'meta-vatrate-source' => static::VatRateSource_Strategy,
-      'meta-strategy-split' => TRUE,
-    );
+      $result = array(
+          'product' => $description,
+          'unitprice' => $discountEx,
+          'unitpriceinc' => $discountInc,
+          'quantity' => 1,
+          'vatamount' => $discountVat,
+        ) + $vatInfo;
+    }
 
     return $result;
   }
@@ -318,31 +277,22 @@ class Creator extends BaseCreator {
    * {@inheritdoc}
    */
   protected function getPaymentFeeLine() {
+    // @todo check (return on refund?)
     $result = array();
     if (!Number::isZero($this->order->order_payment_price)) {
-      // @todo
-//      $paymentEx = (float) $this->order['details']['BT']->order_payment;
-//      if (!Number::isZero($paymentEx)) {
-//        $paymentVat = (float) $this->order['details']['BT']->order_payment_tax;
-//
-//        $calcRule = $this->getCalcRule('payment');
-//        if (!empty($calcRule->calc_value)) {
-//          $vatInfo = array(
-//            'vatrate' => (float) $calcRule->calc_value,
-//            'meta-vatrate-source' => static::VatRateSource_Exact,
-//          );
-//        }
-//        else {
-//          $vatInfo = $this->getVatRangeTags($paymentVat, $paymentEx, 0.0001, 0.01);
-//        }
-//
-//        $result = array(
-//            'product' => $this->t('payment_costs'),
-//            'unitprice' => $paymentEx,
-//            'quantity' => 1,
-//            'vatamount' => $paymentVat,
-//          ) + $vatInfo;
-//      }
+      $paymentInc = (float) $this->order->order_payment_price;
+      $paymentVat = (float) $this->order->order_payment_tax;
+      $paymentEx = $paymentInc - $paymentVat;
+      $vatInfo = $this->getVatRangeTags($paymentVat, $paymentEx, 0.0001, 0.0002);
+      $description = $this->t('payment_costs');
+
+      $result = array(
+          'product' => $description,
+          'unitprice' => $paymentEx,
+          'unitpriceinc' => $paymentInc,
+          'quantity' => 1,
+          'vatamount' => $paymentVat,
+        ) + $vatInfo;
     }
     return $result;
   }

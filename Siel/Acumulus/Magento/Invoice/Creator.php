@@ -82,7 +82,6 @@ class Creator extends BaseCreator {
 
     $invoiceAddress = $order->getBillingAddress();
     $this->addEmpty($result, 'companyname1', $invoiceAddress->getCompany());
-    $result['companyname2'] = '';
     $result['fullname'] = $invoiceAddress->getFirstname() . ' ' . $invoiceAddress->getLastname();
     $this->addEmpty($result, 'address1', $invoiceAddress->getStreet(1));
     $this->addEmpty($result, 'address2', $invoiceAddress->getStreet(2));

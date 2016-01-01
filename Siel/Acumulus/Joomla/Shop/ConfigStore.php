@@ -2,6 +2,7 @@
 namespace Siel\Acumulus\Joomla\Shop;
 
 use JComponentHelper;
+use JFactory;
 use JLoader;
 use JModelLegacy;
 use JTable;
@@ -28,16 +29,14 @@ class ConfigStore implements ConfigStoreInterface {
     $componentInfo = json_decode($extension->manifest_cache, true);
     $moduleVersion = $componentInfo['version'];
 
-    $id = $extension->find(array('element' => 'com_virtuemart'));
-    if ($extension->load($id)) {
+    if ($this->isEnabled('com_virtuemart')) {
       $shopName = 'VirtueMart';
     }
-    else {
-      $id = $extension->find(array('element' => 'com_hikashop'));
-      if ($extension->load($id)) {
-        $shopName = 'HikaShop';
-      }
+    else /*if ($this->isEnabled('com_hikashop'))*/ {
+      $shopName = 'HikaShop';
     }
+    $id = $extension->find(array('element' => 'com_' . strtolower($shopName)));
+    $extension->load($id);
     $componentInfo = json_decode($extension->manifest_cache, true);
     $shopVersion = $componentInfo['version'];
 
@@ -50,6 +49,25 @@ class ConfigStore implements ConfigStoreInterface {
     );
 
     return $environment;
+  }
+
+  /**
+   * Checks if a component is installed and enabled.
+   *
+   * Note that JComponentHelper::isEnabled shows a warning if the component is
+   * not installed, which we don't want.
+   *
+   * @param string $component
+   *   The element/name of the extension.
+   *
+   * @return bool
+   *   True if the extension is installed and enabled, false otherwise
+   */
+  protected function isEnabled($component) {
+    $db = JFactory::getDbo();
+    $db->setQuery(sprintf("SELECT enabled FROM #__extensions WHERE element = '%s'", $db->escape($component)));
+    $enabled = $db->loadResult();
+    return $enabled == 1;
   }
 
   /**

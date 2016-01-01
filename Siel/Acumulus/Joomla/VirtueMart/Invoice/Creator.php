@@ -92,7 +92,6 @@ class Creator extends BaseCreator {
 
     $this->addIfSetAndNotEmpty($result, 'contactyourid', $this->order['details']['BT'], 'virtuemart_user_id');
     $this->addIfSetAndNotEmpty($result, 'companyname1', $this->order['details']['BT'], 'company');
-    $result['companyname2'] = '';
     if (!empty($result['companyname1']) && !empty($this->userBtUid)) {
       // @todo: there's also a (paid) EU VAT checker extension that probably does not use the field 'tax_exemption_number'.
       $this->addIfSetAndNotEmpty($result, 'vatnumber', $this->user->userInfo[$this->userBtUid], 'tax_exemption_number');

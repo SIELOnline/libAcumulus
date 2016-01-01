@@ -96,7 +96,7 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
    * {@inheritdoc}
    */
   public function getSource($invoiceSourceType, $invoiceSourceOrId) {
-    return $this->getInstance('Source', 'Invoice', array($invoiceSourceType, $invoiceSourceOrId));
+    return $this->getInstance('Source', 'Invoice', array($invoiceSourceType, $invoiceSourceOrId), TRUE);
   }
 
   /**
@@ -172,13 +172,16 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
    * @param string $subNamespace
    *   The sub namespace (within the shop namespace) in which the class resides.
    * @param array $constructorArgs
+   *   An array of arguments to pass to the constructor, may be an empty array.
+   * @param bool $newInstance
+   *   Whether to create a new instance or reuse an already existing instance
    *
    * @return object
    *
    * @throws \ReflectionException
    */
-  protected function getInstance($class, $subNamespace, array $constructorArgs = array()) {
-    if (!isset($this->instances[$class])) {
+  protected function getInstance($class, $subNamespace, array $constructorArgs = array(), $newInstance = FALSE) {
+    if (!isset($this->instances[$class]) || $newInstance) {
       // Try shop namespace.
       $fqClass = $this->tryNsInstance($class, $subNamespace, $this->shopNamespace);
 

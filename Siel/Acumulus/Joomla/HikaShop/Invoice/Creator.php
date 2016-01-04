@@ -38,12 +38,11 @@ class Creator extends BaseCreator {
 
     $this->addIfNotEmpty($result, 'contactyourid', $this->order->order_user_id);
 
-    // @todo: check
     $billingAddress = $this->order->billing_address;
     if (!empty($billingAddress)) {
+      // @todo: hoe kan een klant dit (en vat#) invullen?
       $this->addIfNotEmpty($result, 'companyname1', $billingAddress->address_company);
       if (!empty($result['companyname1'])) {
-        // @todo: check if this is the vat mnumber
         $this->addIfNotEmpty($result, 'vatnumber', $billingAddress->address_vat);
       }
       $result['fullname'] = $billingAddress->address_lastname;
@@ -81,7 +80,6 @@ class Creator extends BaseCreator {
    * {@inheritdoc}
    */
   protected function searchProperty($property) {
-    // @todo: check
     $value = @$this->getProperty($property, $this->order);
     if (empty($value)) {
       $value = @$this->getProperty($property, $this->order->billing_address);
@@ -96,7 +94,6 @@ class Creator extends BaseCreator {
    * {@inheritdoc}
    */
   protected function getInvoiceNumber($invoiceNumberSource) {
-    // @todo: check
     $result = $this->invoiceSource->getReference();
     if ($invoiceNumberSource == ConfigInterface::InvoiceNrSource_ShopInvoice && !empty($this->order->order_invoice_number)) {
       $result = $this->order->order_invoice_number;
@@ -108,7 +105,6 @@ class Creator extends BaseCreator {
    * {@inheritdoc}
    */
   protected function getInvoiceDate($dateToUse) {
-    // @todo: check
     $result = date('Y-m-d', $this->order->order_created);
     if ($dateToUse == ConfigInterface::InvoiceDate_InvoiceCreate && !empty($this->order->order_invoice_created)) {
       $result = date('Y-m-d', $this->order->order_invoice_created);
@@ -120,7 +116,6 @@ class Creator extends BaseCreator {
    * {@inheritdoc}
    */
   protected function getPaymentState() {
-    // @todo: check
     /** @var hikashopConfigClass $config */
     $config = hikashop_config();
     $unpaidStatuses = explode(',',$config->get('order_unpaid_statuses','created'));
@@ -133,13 +128,25 @@ class Creator extends BaseCreator {
    * {@inheritdoc}
    */
   protected function getPaymentDate() {
-    // @todo: check
-    // Scan through the history and look for last non empty history_payment_id.
-    // History order is by history_created DESC.
+    // Scan through the history and look for a non empty history_payment_id.
+    // The order of this array is by history_created DESC, we take the one that
+    // is furthest away in time.
     $date = NULL;
     foreach ($this->order->history as $history) {
       if (!empty($history->history_payment_id)) {
         $date = $history->history_created;
+      }
+    }
+    if (!$date) {
+      // Scan through the history and look for a non unpaid order status.
+      // We take the one that is furthest away in time.
+      /** @var hikashopConfigClass $config */
+      $config = hikashop_config();
+      $unpaidStatuses = explode(',',$config->get('order_unpaid_statuses','created'));
+      foreach ($this->order->history as $history) {
+        if (!empty($history->history_new_status) && !in_array($history->history_new_status, $unpaidStatuses)) {
+          $date = $history->history_created;
+        }
       }
     }
     return $date ? date('Y-m-d', $date) : $date;
@@ -152,7 +159,6 @@ class Creator extends BaseCreator {
    * meta-invoicevatamount as they may be needed by the Completor.
    */
   protected function getInvoiceTotals() {
-    // @todo: check
     $vatAmount = 0.0;
     // No order_taxinfo => no tax (?) => vatamount = 0.
     if (!empty($this->order->order_taxinfo)) {
@@ -182,11 +188,11 @@ class Creator extends BaseCreator {
    * @return array
    */
   protected function getItemLine(stdClass $item) {
-    // @todo: check
     $productPriceEx = (float) $item->order_product_price;
     $productVat = (float) $item->order_product_tax;
 
-    // @todo: check if this info remains correct when rates are changed.
+    // Note that this info remains correct when rates are changed as upon order
+    // creation this info is stored in the order_product table.
     if (is_array($item->order_product_tax_info) && count($item->order_product_tax_info) === 1) {
       $productVatInfo = reset($item->order_product_tax_info);
       if (!empty($productVatInfo->tax_rate)) {
@@ -220,7 +226,6 @@ class Creator extends BaseCreator {
    * {@inheritdoc}
    */
   protected function getShippingLine() {
-    // @todo: check
     $result = array();
     // Check if there is a shipping id attached to the order.
     if (!empty($this->order->order_shipping_id)) {
@@ -248,8 +253,6 @@ class Creator extends BaseCreator {
    * {@inheritdoc}
    */
   protected function getDiscountLines() {
-    // @todo test
-    // @todo check if multiple discounts can be applied.
     $result = array();
 
     if (!Number::isZero($this->order->order_discount_price)) {
@@ -261,12 +264,12 @@ class Creator extends BaseCreator {
         ? $this->t('discount')
         : $this->t('discount_code') . ' ' . $this->order->order_discount_code;
 
-      $result = array(
+      $result[] = array(
           'product' => $description,
-          'unitprice' => $discountEx,
-          'unitpriceinc' => $discountInc,
+          'unitprice' => -$discountEx,
+          'unitpriceinc' => -$discountInc,
           'quantity' => 1,
-          'vatamount' => $discountVat,
+          'vatamount' => -$discountVat,
         ) + $vatInfo;
     }
 

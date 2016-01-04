@@ -31,7 +31,8 @@ class ConfigForm extends BaseConfigForm {
    */
   protected function getTriggerInvoiceSendEventOptions() {
     $result = parent::getTriggerInvoiceSendEventOptions();
-    // @todo: find out if there's something like an invoice create event.
+    // HikaShop does not have separate invoice entities, let alone a create
+    // event for that.
     unset($result[ConfigInterface::TriggerInvoiceSendEvent_InvoiceCreate]);
     return $result;
   }

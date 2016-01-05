@@ -2,7 +2,6 @@
 namespace Siel\Acumulus\Joomla\Shop;
 
 use JComponentHelper;
-use JFactory;
 use JLoader;
 use JModelLegacy;
 use JTable;
@@ -17,6 +16,19 @@ class ConfigStore implements ConfigStoreInterface {
   /** @var array */
   protected $savedValues = array();
 
+  /** @var string */
+  protected $shopName;
+
+  /**
+   * ConfigStore constructor.
+   *
+   * @param string $shopNamespace
+   */
+  public function __construct($shopNamespace) {
+    $this->shopName = stripos($shopNamespace, 'virtuemart') !== FALSE ? 'VirtueMart' : 'HikaShop';
+  }
+
+
   /**
    * {@inheritdoc}
    */
@@ -24,19 +36,15 @@ class ConfigStore implements ConfigStoreInterface {
     /** @var JTableExtension $extension */
     $extension = JTable::getInstance('extension');
 
-    $id = $extension->find(array('element' => 'com_acumulus'));
+    $id = $extension->find(array('element' => 'com_acumulus', 'type' => 'component'));
     $extension->load($id);
+    /** @noinspection PhpUndefinedFieldInspection */
     $componentInfo = json_decode($extension->manifest_cache, true);
     $moduleVersion = $componentInfo['version'];
 
-    if ($this->isEnabled('com_virtuemart')) {
-      $shopName = 'VirtueMart';
-    }
-    else /*if ($this->isEnabled('com_hikashop'))*/ {
-      $shopName = 'HikaShop';
-    }
-    $id = $extension->find(array('element' => 'com_' . strtolower($shopName)));
+    $id = $extension->find(array('element' => 'com_' . strtolower($this->shopName), 'type' => 'component'));
     $extension->load($id);
+    /** @noinspection PhpUndefinedFieldInspection */
     $componentInfo = json_decode($extension->manifest_cache, true);
     $shopVersion = $componentInfo['version'];
 
@@ -44,30 +52,11 @@ class ConfigStore implements ConfigStoreInterface {
 
     $environment = array(
       'moduleVersion' => $moduleVersion,
-      'shopName' => $shopName,
+      'shopName' => $this->shopName,
       'shopVersion' => "$shopVersion (CMS: Joomla $joomlaVersion)",
     );
 
     return $environment;
-  }
-
-  /**
-   * Checks if a component is installed and enabled.
-   *
-   * Note that JComponentHelper::isEnabled shows a warning if the component is
-   * not installed, which we don't want.
-   *
-   * @param string $component
-   *   The element/name of the extension.
-   *
-   * @return bool
-   *   True if the extension is installed and enabled, false otherwise
-   */
-  protected function isEnabled($component) {
-    $db = JFactory::getDbo();
-    $db->setQuery(sprintf("SELECT enabled FROM #__extensions WHERE element = '%s'", $db->escape($component)));
-    $enabled = $db->loadResult();
-    return $enabled == 1;
   }
 
   /**

@@ -124,7 +124,7 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
    * {@inheritdoc}
    */
   public function getConfigStore() {
-    return $this->getInstance('ConfigStore', 'Shop');
+    return $this->getInstance('ConfigStore', 'Shop', array($this->shopNamespace));
   }
 
   /**

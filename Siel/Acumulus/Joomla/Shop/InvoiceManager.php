@@ -77,7 +77,7 @@ abstract class InvoiceManager extends BaseInvoiceManager {
   protected function triggerInvoiceCreated(array &$invoice, Source $invoiceSource) {
     JPluginHelper::importPlugin('acumulus');
     $results = JEventDispatcher::getInstance()->trigger('onAcumulusInvoiceCreated', array(&$invoice, $invoiceSource));
-    if (!empty(array_filter($results, function($value) { return $value === FALSE; }))) {
+    if (!array_filter($results, function($value) { return $value === FALSE; })) {
       $invoice = NULL;
     }
   }
@@ -90,7 +90,7 @@ abstract class InvoiceManager extends BaseInvoiceManager {
   protected function triggerInvoiceCompleted(array &$invoice, Source $invoiceSource) {
     JPluginHelper::importPlugin('acumulus');
     $results = JEventDispatcher::getInstance()->trigger('onAcumulusInvoiceCompleted', array(&$invoice, $invoiceSource));
-    if (!empty(array_filter($results, function($value) { return $value === FALSE; }))) {
+    if (!array_filter($results, function($value) { return $value === FALSE; })) {
       $invoice = NULL;
     }
   }

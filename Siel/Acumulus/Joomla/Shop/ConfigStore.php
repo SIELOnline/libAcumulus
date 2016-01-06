@@ -6,28 +6,15 @@ use JLoader;
 use JModelLegacy;
 use JTable;
 use JTableExtension;
-use Siel\Acumulus\Shop\ConfigStoreInterface;
+use Siel\Acumulus\Shop\ConfigStore as BaseConfigStore;
 
 /**
  * Implements the connection to the Joomla config component.
  */
-class ConfigStore implements ConfigStoreInterface {
+class ConfigStore extends BaSeConfigStore {
 
   /** @var array */
   protected $savedValues = array();
-
-  /** @var string */
-  protected $shopName;
-
-  /**
-   * ConfigStore constructor.
-   *
-   * @param string $shopNamespace
-   */
-  public function __construct($shopNamespace) {
-    $this->shopName = stripos($shopNamespace, 'virtuemart') !== FALSE ? 'VirtueMart' : 'HikaShop';
-  }
-
 
   /**
    * {@inheritdoc}

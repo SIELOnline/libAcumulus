@@ -2,12 +2,12 @@
 namespace Siel\Acumulus\Magento\Shop;
 
 use Mage;
-use Siel\Acumulus\Shop\ConfigStoreInterface;
+use Siel\Acumulus\Shop\ConfigStore as BaseConfigStore;
 
 /**
  * Implements the connection to the Magento config component.
  */
-class ConfigStore implements ConfigStoreInterface {
+class ConfigStore extends BaSeConfigStore {
 
   protected $configKey = 'siel_acumulus/';
 
@@ -18,7 +18,7 @@ class ConfigStore implements ConfigStoreInterface {
     /** @noinspection PhpUndefinedFieldInspection */
     $environment = array(
       'moduleVersion' => Mage::getConfig()->getModuleConfig("Siel_Acumulus")->version,
-      'shopName' => 'Magento',
+      'shopName' => $this->shopName,
       'shopVersion' => Mage::getVersion(),
     );
 

@@ -1,12 +1,12 @@
 <?php
 namespace Siel\Acumulus\WooCommerce\Shop;
 
-use Siel\Acumulus\Shop\ConfigStoreInterface;
+use Siel\Acumulus\Shop\ConfigStore as BaseConfigStore;
 
 /**
  * Implements the connection to the WordPress config component.
  */
-class ConfigStore implements ConfigStoreInterface {
+class ConfigStore extends BaSeConfigStore {
 
   /**
    * {@inheritdoc}
@@ -17,7 +17,7 @@ class ConfigStore implements ConfigStoreInterface {
       // Lazy load is no longer needed (as in L3) as this method will only be
       // called when the config gets actually queried.
       'moduleVersion' => \Acumulus::create()->getVersionNumber(),
-      'shopName' => 'WooCommerce',
+      'shopName' => $this->shopName,
       'shopVersion' => (isset($woocommerce) ? $woocommerce->version : 'unknown') . ' (WordPress: ' . $wp_version . ')',
     );
     return $environment;

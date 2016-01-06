@@ -3,12 +3,12 @@ namespace Siel\Acumulus\PrestaShop\Shop;
 
 use Acumulus;
 use Configuration;
-use Siel\Acumulus\Shop\ConfigStoreInterface;
+use Siel\Acumulus\Shop\ConfigStore as BaseConfigStore;
 
 /**
  * Implements the connection to the PrestaShop config component.
  */
-class ConfigStore implements ConfigStoreInterface {
+class ConfigStore extends BaSeConfigStore {
 
   const CONFIG_KEY = 'ACUMULUS_';
 
@@ -18,7 +18,7 @@ class ConfigStore implements ConfigStoreInterface {
   public function getShopEnvironment() {
     $environment = array(
       'moduleVersion' => Acumulus::$module_version,
-      'shopName' => 'PrestaShop',
+      'shopName' => $this->shopName,
       'shopVersion' => _PS_VERSION_,
     );
     return $environment;

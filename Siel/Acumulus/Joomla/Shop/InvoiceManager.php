@@ -29,7 +29,7 @@ abstract class InvoiceManager extends BaseInvoiceManager {
    */
   protected function getSourcesByQuery($invoiceSourceType, $query) {
     $sourceIds = $this->loadColumn($query);
-    return $this->getSourcesByIds($invoiceSourceType, $sourceIds);
+    return $this->getSourcesByIdsOrSources($invoiceSourceType, $sourceIds);
   }
 
   /**

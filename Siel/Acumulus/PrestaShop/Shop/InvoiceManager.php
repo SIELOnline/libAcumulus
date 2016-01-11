@@ -7,7 +7,7 @@ use Hook;
 use Order;
 use OrderSlip;
 use \Siel\Acumulus\Invoice\Source as BaseSource;
-use Siel\Acumulus\PrestaShop\Invoice\Source;
+use Siel\Acumulus\PrestaShop\Invoice\Source; // @todo: still needed?
 use Siel\Acumulus\Shop\Config;
 use \Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
 
@@ -36,11 +36,11 @@ class InvoiceManager extends BaseInvoiceManager {
       case Source::Order:
         $key = Order::$definition['primary'];
         $ids = Db::getInstance()->executeS(sprintf("SELECT `%s` FROM `%s` WHERE `%s` BETWEEN %u AND %u", $key, $this->orderTableName, $key, $InvoiceSourceIdFrom, $InvoiceSourceIdTo));
-        return $this->getSourcesByIds($invoiceSourceType, $this->getIds($ids, 'id_order'));
+        return $this->getSourcesByIdsOrSources($invoiceSourceType, $this->getCol($ids, $key));
       case Source::CreditNote:
         $key = OrderSlip::$definition['primary'];
         $ids = Db::getInstance()->executeS(sprintf("SELECT `%s` FROM `%s` WHERE `%s` BETWEEN %u AND %u", $key, $this->orderSlipTableName, $key, $InvoiceSourceIdFrom, $InvoiceSourceIdTo));
-        return $this->getSourcesByIds($invoiceSourceType, $this->getIds($ids, 'id_order_slip'));
+        return $this->getSourcesByIdsOrSources($invoiceSourceType, $this->getCol($ids, $key));
     }
     return array();
   }
@@ -54,7 +54,7 @@ class InvoiceManager extends BaseInvoiceManager {
         $key = Order::$definition['primary'];
         $reference = 'reference';
         $ids = Db::getInstance()->executeS(sprintf("SELECT `%s` FROM `%s` WHERE `%s` BETWEEN '%s' AND '%s'", $key, $this->orderTableName, $reference, pSQL($InvoiceSourceReferenceFrom), pSQL($InvoiceSourceReferenceTo)));
-        return $this->getSourcesByIds($invoiceSourceType, $this->getIds($ids, 'id_order'));
+        return $this->getSourcesByIdsOrSources($invoiceSourceType, $this->getCol($ids, $key));
       case Source::CreditNote:
         return $this->getInvoiceSourcesByIdRange($invoiceSourceType, $InvoiceSourceReferenceFrom, $InvoiceSourceReferenceTo);
     }
@@ -70,10 +70,10 @@ class InvoiceManager extends BaseInvoiceManager {
     switch ($invoiceSourceType) {
       case Source::Order:
         $ids = Order::getOrdersIdByDate($dateFrom, $dateTo);
-        return $this->getSourcesByIds($invoiceSourceType, $ids);
+        return $this->getSourcesByIdsOrSources($invoiceSourceType, $ids);
       case Source::CreditNote:
         $ids = OrderSlip::getSlipsIdByDate($dateFrom, $dateTo);
-        return $this->getSourcesByIds($invoiceSourceType, $ids);
+        return $this->getSourcesByIdsOrSources($invoiceSourceType, $ids);
     }
     return array();
   }
@@ -102,22 +102,8 @@ class InvoiceManager extends BaseInvoiceManager {
    * This PrestaShop override executes the 'actionAcumulusInvoiceSent' hook.
    */
   protected function triggerInvoiceSent(array $invoice, BaseSource $invoiceSource, array $result) {
+    // @todo: not by ref + also pass result.
     Hook::exec('actionAcumulusInvoiceSent', array('invoice' => &$invoice, 'source' => $invoiceSource), null, true);
   }
 
-  /**
-   * Helper method to retrieve the values from 1 column of a query result.
-   *
-   * @param array $dbResult
-   * @param string $key
-   *
-   * @return int[]
-   */
-  protected function getIds(array $dbResult, $key) {
-    $results = array();
-    foreach ($dbResult as $order) {
-      $results[] = (int) $order[$key];
-    }
-    return $results;
-  }
 }

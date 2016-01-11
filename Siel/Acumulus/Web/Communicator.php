@@ -193,22 +193,23 @@ class Communicator {
 
     if ($response) {
       $resultBase['trace']['response'] = $response;
-      $this->config->getLog()->debug('sendApiMessage(uri="%s", message="%s"), response="%s"', $uri, $resultBase['trace']['request'], $resultBase['trace']['response']);
+      $this->config->getLog()->debug('sendApiMessage(uri="%s", message="%s"), response="%s"',
+        $uri, $resultBase['trace']['request'], $resultBase['trace']['response']);
 
-      $result = false;
+      $result = FALSE;
       // When the API is gone we might receive an error message in an html page.
       if ($this->isHtmlResponse($response)) {
         $this->setHtmlReceivedError($response);
       }
       else {
-        $alsoTryAsXml = false;
+        $alsoTryAsXml = FALSE;
         if ($this->config->getOutputFormat() === 'json') {
-          $result = json_decode($response, true);
-          if ($result === null) {
+          $result = json_decode($response, TRUE);
+          if ($result === NULL) {
             $this->setJsonError();
             // Even if we pass <format>json</format> we might receive an XML
             // response in case the XML was rejected before or during parsing.
-            $alsoTryAsXml = true;
+            $alsoTryAsXml = TRUE;
           }
         }
         if ($this->config->getOutputFormat() === 'xml' || $alsoTryAsXml) {
@@ -221,7 +222,8 @@ class Communicator {
       }
     }
     else {
-      $this->config->getLog()->debug('sendApiMessage(uri="%s", message="%s"): failure', $uri, $resultBase['trace']['request']);
+      $this->config->getLog()->debug('sendApiMessage(uri="%s", message="%s"): failure',
+        $uri, $resultBase['trace']['request']);
     }
 
     return $resultBase;
@@ -238,7 +240,7 @@ class Communicator {
    *  The response body from the HTTP response or false in case of errors.
    */
   protected function sendHttpPost($uri, $post) {
-    $response = false;
+    $response = FALSE;
 
     // Open a curl connection.
     $ch = curl_init();
@@ -250,9 +252,9 @@ class Communicator {
     // Configure the curl connection.
     $options = array(
       CURLOPT_URL => $uri,
-      CURLOPT_RETURNTRANSFER => true,
-      CURLOPT_SSL_VERIFYPEER => false,
-      CURLOPT_POST => true,
+      CURLOPT_RETURNTRANSFER => TRUE,
+      CURLOPT_SSL_VERIFYPEER => FALSE,
+      CURLOPT_POST => TRUE,
       CURLOPT_POSTFIELDS => $post,
       //CURLOPT_PROXY => '127.0.0.1:8888', // Uncomment to debug with Fiddler.
     );
@@ -300,19 +302,19 @@ class Communicator {
     // - create a simplexml object
     // - convert that to json
     // - convert json to array
-    libxml_use_internal_errors(true);
+    libxml_use_internal_errors(TRUE);
     if (!($result = simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA))) {
       $this->setLibxmlErrors(libxml_get_errors());
-      return false;
+      return FALSE;
     }
 
     if (!($result = json_encode($result))) {
       $this->setJsonError();
-      return false;
+      return FALSE;
     }
-    if (($result = json_decode($result, true)) === null) {
+    if (($result = json_decode($result, TRUE)) === NULL) {
       $this->setJsonError();
-      return false;
+      return FALSE;
     }
 
     return $result;
@@ -332,8 +334,8 @@ class Communicator {
    */
   protected function convertToXml(array $values) {
     $dom = new DOMDocument('1.0', 'utf-8');
-    $dom->xmlStandalone = true;
-    $dom->formatOutput = true;
+    $dom->xmlStandalone = TRUE;
+    $dom->formatOutput = TRUE;
 
     $dom = $this->convertToDom($values, $dom);
     $dom->normalizeDocument();
@@ -354,7 +356,8 @@ class Communicator {
    */
   protected function convertToDom($values, $element) {
     /** @var DOMDocument $document */
-    static $document = null;
+    static $document = NULL;
+    $isFirstElement = TRUE;
 
     if ($element instanceof DOMDocument) {
       $document = $element;
@@ -362,8 +365,9 @@ class Communicator {
     if (is_array($values)) {
       foreach ($values as $key => $value) {
         if (is_int($key)) {
-          if ($key === 0) {
+          if ($isFirstElement) {
             $node = $element;
+            $isFirstElement = FALSE;
           }
           else {
             $node = $document->createElement($element->tagName);
@@ -464,7 +468,7 @@ class Communicator {
    *    String containing an html document.
    */
   protected function setHtmlReceivedError($response) {
-    libxml_use_internal_errors(true);
+    libxml_use_internal_errors(TRUE);
     $doc = new DOMDocument('1.0', 'utf-8');
     $doc->loadHTML($response);
     $body = $doc->getElementsByTagName('body');

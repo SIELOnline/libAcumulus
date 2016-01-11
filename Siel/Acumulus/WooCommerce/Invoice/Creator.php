@@ -326,7 +326,6 @@ class Creator extends BaseCreator {
     $feeVat = $line['line_tax'];
 
     $result = array(
-        'itemnumber' => $this->t('fee_code'),
         'product' => $this->t($line['name']),
         'unitprice' => $feeEx,
         'quantity' => 1,

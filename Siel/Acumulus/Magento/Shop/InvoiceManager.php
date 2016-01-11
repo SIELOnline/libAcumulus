@@ -68,11 +68,8 @@ class InvoiceManager extends BaseInvoiceManager {
       ->addFieldToFilter($field, $condition)
       ->getItems();
 
-    $results = array();
-    foreach ($items as $item) {
-      $results[] = new Source($invoiceSourceType, $item);
-    }
-    return $results;
+    // @todo: replace with getSourcesByIds
+    return $this->getSourcesByIdsOrSources($invoiceSourceType, $items);
   }
 
   /**

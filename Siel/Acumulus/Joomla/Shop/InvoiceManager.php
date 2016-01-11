@@ -6,8 +6,8 @@ use JDate;
 use JEventDispatcher;
 use JFactory;
 use JPluginHelper;
-use \Siel\Acumulus\Invoice\Source as Source;
-use \Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
+use Siel\Acumulus\Invoice\Source as Source;
+use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
 
 /**
  * {@inheritdoc}

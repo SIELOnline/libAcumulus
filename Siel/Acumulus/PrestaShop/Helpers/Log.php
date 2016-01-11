@@ -2,7 +2,7 @@
 namespace Siel\Acumulus\PrestaShop\Helpers;
 
 use PrestaShopLogger;
-use \Siel\Acumulus\Helpers\Log as BaseLog;
+use Siel\Acumulus\Helpers\Log as BaseLog;
 
 /**
  * Extends the base log class to log any library logging to the PrestaShop log.

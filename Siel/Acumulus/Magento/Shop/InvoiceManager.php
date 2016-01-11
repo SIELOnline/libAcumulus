@@ -5,8 +5,8 @@ use DateTime;
 use Mage;
 use Siel\Acumulus\Magento\Invoice\Source;
 use Varien_Object;
-use \Siel\Acumulus\Invoice\Source as BaseSource;
-use \Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
+use Siel\Acumulus\Invoice\Source as BaseSource;
+use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
 
 class InvoiceManager extends BaseInvoiceManager {
 

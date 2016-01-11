@@ -187,7 +187,7 @@ abstract class InvoiceManager {
    * Processes an invoice source status change event.
    *
    * @param \Siel\Acumulus\Invoice\Source $invoiceSource
-   *   The source whom status changed.
+   *   The source whose status changed.
    * @param mixed $newStatus
    *   The new status of the invoice source. May be left out in which case a
    *   comparison based on trigger event and status is not performed. This is
@@ -200,9 +200,10 @@ abstract class InvoiceManager {
     $this->config->getLog()->debug('InvoiceManager::sourceStatusChange(%s %d, %s)', $invoiceSource->getType(), $invoiceSource->getId(), $newStatus === NULL ? 'null' : $newStatus === FALSE ? 'false' : (string) $newStatus);
     $result = WebConfigInterface::Status_NotSent;
     $shopSettings = $this->config->getShopSettings();
-    if (($shopSettings['triggerInvoiceSendEvent'] == Config::TriggerInvoiceSendEvent_OrderStatus
-         && in_array($newStatus, $shopSettings['triggerOrderStatus']))
-        || $newStatus === FALSE) {
+    if ($newStatus === FALSE
+        || ($shopSettings['triggerInvoiceSendEvent'] == Config::TriggerInvoiceSendEvent_OrderStatus
+            && in_array($newStatus, $shopSettings['triggerOrderStatus']))
+    ) {
       $result = $this->send($invoiceSource, FALSE);
     }
     return $result;

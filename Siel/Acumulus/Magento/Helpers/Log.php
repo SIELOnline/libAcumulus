@@ -2,7 +2,7 @@
 namespace Siel\Acumulus\Magento\Helpers;
 
 use Mage;
-use \Siel\Acumulus\Helpers\Log as BaseLog;
+use Siel\Acumulus\Helpers\Log as BaseLog;
 use Zend_Log;
 
 /**

@@ -2,9 +2,9 @@
 namespace Siel\Acumulus\WooCommerce\Shop;
 
 use DateTime;
-use \Siel\Acumulus\Invoice\Source as BaseSource;
-use \Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
-use \Siel\Acumulus\WooCommerce\Invoice\Source;
+use Siel\Acumulus\Invoice\Source as BaseSource;
+use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
+use Siel\Acumulus\WooCommerce\Invoice\Source;
 use WP_Query;
 
 class InvoiceManager extends BaseInvoiceManager {

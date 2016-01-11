@@ -2,12 +2,21 @@
 namespace Siel\Acumulus\Joomla\Helpers;
 
 use JLog;
-use \Siel\Acumulus\Helpers\Log as BaseLog;
+use Siel\Acumulus\Helpers\Log as BaseLog;
+use Siel\Acumulus\Web\ConfigInterface;
 
 /**
  * Extends the base log class to log any library logging to the Joomla log.
  */
 class Log extends BaseLog {
+
+  public function __construct(ConfigInterface $config) {
+    parent::__construct($config);
+    JLog::addLogger(array('text_file' => 'acumulus.log.php'),
+      JLog::ALL,
+      array('com_acumulus')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -16,7 +25,7 @@ class Log extends BaseLog {
    */
   protected function write($message, $severity) {
     jimport('joomla.log.log');
-    JLog::add($message, $this->getJoomlaSeverity($severity));
+    JLog::add($message, $this->getJoomlaSeverity($severity), 'com_acumulus');
   }
 
   /**

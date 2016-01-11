@@ -2,8 +2,8 @@
 namespace Siel\Acumulus\Joomla\VirtueMart\Shop;
 
 use DateTime;
-use \Siel\Acumulus\Invoice\Source as Source;
-use \Siel\Acumulus\Joomla\Shop\InvoiceManager as BaseInvoiceManager;
+use Siel\Acumulus\Invoice\Source as Source;
+use Siel\Acumulus\Joomla\Shop\InvoiceManager as BaseInvoiceManager;
 
 /**
  * {@inheritdoc}

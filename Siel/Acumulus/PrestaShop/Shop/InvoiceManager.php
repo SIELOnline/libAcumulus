@@ -6,10 +6,10 @@ use Db;
 use Hook;
 use Order;
 use OrderSlip;
-use \Siel\Acumulus\Invoice\Source as BaseSource;
+use Siel\Acumulus\Invoice\Source as BaseSource;
 use Siel\Acumulus\PrestaShop\Invoice\Source; // @todo: still needed?
 use Siel\Acumulus\Shop\Config;
-use \Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
+use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
 
 class InvoiceManager extends BaseInvoiceManager {
 

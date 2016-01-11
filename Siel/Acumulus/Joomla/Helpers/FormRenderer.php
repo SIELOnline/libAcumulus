@@ -2,7 +2,7 @@
 namespace Siel\Acumulus\Joomla\Helpers;
 
 use JHtml;
-use \Siel\Acumulus\Helpers\FormRenderer as BaseFormRenderer;
+use Siel\Acumulus\Helpers\FormRenderer as BaseFormRenderer;
 
 /**
  * Class FormRenderer renders a form in the Joomla/VirtueMart standards.

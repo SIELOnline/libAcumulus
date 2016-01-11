@@ -127,7 +127,7 @@ Vink deze optie aan als u geen regel op uw factuur of pakbon wil voor gratis ver
     'option_logLevel_1' => 'Log alleen foutmeldingen.',
     'option_logLevel_2' => 'Log foutmeldingen en waarschuwingen.',
     'option_logLevel_3' => 'Log foutmeldingen, waarschuwingen en mededelingen.',
-    'option_logLevel_4' => 'Log foutmeldingen, waarschuwingen, mededelingen en debugberichten.',
+    'option_logLevel_4' => 'Log foutmeldingen, waarschuwingen, mededelingen en communicatieberichten.',
     'desc_logLevel' => 'U kunt hier een logniveau kiezen. Kies voor de 1e of 2e optie tenzij u i.v.m. een supportverzoek bent geïnstrueerd om iets anders te kiezen.',
 
   );
@@ -252,7 +252,7 @@ If you don\'t want this, check this option.',
     'option_logLevel_1' => 'Only log error messages.',
     'option_logLevel_2' => 'Log error messages and warnings.',
     'option_logLevel_3' => 'Log error messages, warnings and notices.',
-    'option_logLevel_4' => 'Log error messages, warnings, notices and debug messages.',
+    'option_logLevel_4' => 'Log error messages, warnings, notices and communication messages.',
     'desc_logLevel' => 'Select a log level. Choose for the 1st or 2nd option unless otherwise instructed by support staff.',
 
   );

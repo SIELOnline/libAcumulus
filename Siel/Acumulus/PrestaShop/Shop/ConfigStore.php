@@ -51,6 +51,8 @@ class ConfigStore extends BaSeConfigStore {
    * {@inheritdoc}
    */
   public function save(array $values) {
+    parent::save($values);
+
     $result = true;
     foreach ($values as $key => $value) {
       if ($value !== null) {

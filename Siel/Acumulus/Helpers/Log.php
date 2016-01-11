@@ -108,11 +108,11 @@ class Log {
    *   The full formatted message whether it got logged or not.
    */
   public function log($severity, $message, array $args = array()) {
-    if (count($args) > 0) {
-      $message = vsprintf($message, $args);
-    }
-    $message = sprintf('Acumulus: %s', $message);
     if ($this->getLogLevel() >= $severity) {
+      if (count($args) > 0) {
+        $message = vsprintf($message, $args);
+      }
+      $message = sprintf('Acumulus: %s', $message);
       $this->write($message, $severity);
     }
     return $message;

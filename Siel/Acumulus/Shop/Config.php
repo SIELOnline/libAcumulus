@@ -55,6 +55,7 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
     $this->instances = array();
     $this->shopNamespace = static::baseNamespace . '\\' . $shopNamespace;
     $this->language = $language;
+    $this->getLog();
   }
 
   /**

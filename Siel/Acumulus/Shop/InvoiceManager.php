@@ -148,7 +148,7 @@ abstract class InvoiceManager {
       // Use @ to prevent messages like "Warning: set_time_limit(): Cannot set
       //   max execution time limit due to system policy in ...".
       if (!@set_time_limit($time_limit) && !$errorLogged) {
-        $this->config->getLog()->notice('InvoiceManager::sendMultiple(): could not set time limit.');
+        $this->config->getLog()->warning('InvoiceManager::sendMultiple(): could not set time limit.');
         $errorLogged = true;
       }
 
@@ -197,7 +197,7 @@ abstract class InvoiceManager {
    *   Status, one of the WebConfigInterface::Status_ constants.
    */
   public function sourceStatusChange(Source $invoiceSource, $newStatus = FALSE) {
-    $this->config->getLog()->debug('InvoiceManager::sourceStatusChange(%s %d, %s)', $invoiceSource->getType(), $invoiceSource->getId(), $newStatus === NULL ? 'null' : $newStatus === FALSE ? 'false' : (string) $newStatus);
+    $this->config->getLog()->info('InvoiceManager::sourceStatusChange(%s %d, %s)', $invoiceSource->getType(), $invoiceSource->getId(), $newStatus === NULL ? 'null' : $newStatus === FALSE ? 'false' : (string) $newStatus);
     $result = WebConfigInterface::Status_NotSent;
     $shopSettings = $this->config->getShopSettings();
     if ($newStatus === FALSE
@@ -205,6 +205,15 @@ abstract class InvoiceManager {
             && in_array($newStatus, $shopSettings['triggerOrderStatus']))
     ) {
       $result = $this->send($invoiceSource, FALSE);
+    }
+    else {
+      $this->config->getLog()->notice('InvoiceManager::sourceStatusChange(%s %d, %s): not sending triggerEvent = %d, triggerOrderStatus = [%s]',
+        $invoiceSource->getType(),
+        $invoiceSource->getId(),
+        $newStatus === NULL ? 'null' : $newStatus === FALSE ? 'false' : (string) $newStatus,
+        $shopSettings['triggerInvoiceSendEvent'],
+        is_array($shopSettings['triggerOrderStatus']) ? implode(',', $shopSettings['triggerOrderStatus']) : 'no array'
+      );
     }
     return $result;
   }
@@ -219,7 +228,7 @@ abstract class InvoiceManager {
    *   Status
    */
   public function invoiceCreate(Source $invoiceSource) {
-    $this->config->getLog()->debug('InvoiceManager::invoiceCreate(%s %d)', $invoiceSource->getType(), $invoiceSource->getId());
+    $this->config->getLog()->notice('InvoiceManager::invoiceCreate(%s %d)', $invoiceSource->getType(), $invoiceSource->getId());
     $result = WebConfigInterface::Status_NotSent;
     $shopSettings = $this->config->getShopSettings();
     if ($shopSettings['triggerInvoiceSendEvent'] == Config::TriggerInvoiceSendEvent_InvoiceCreate) {
@@ -268,7 +277,7 @@ abstract class InvoiceManager {
           // Send a mail if there are messages.
           $messages = $service->resultToMessages($result);
           if (!empty($messages)) {
-            $this->config->getLog()->debug('InvoiceManager::send(%s %d, %s) result: %s',
+            $this->config->getLog()->notice('InvoiceManager::send(%s %d, %s) result: %s',
               $invoiceSource->getType(), $invoiceSource->getId(), $forceSend ? 'true' : 'false', $service->messagesToText($messages));
             $this->mailInvoiceAddResult($result, $messages, $invoiceSource);
           }
@@ -277,18 +286,18 @@ abstract class InvoiceManager {
         }
         else {
           $result =  WebConfigInterface::Status_SendingPrevented_InvoiceCompleted;
-          $this->config->getLog()->debug('InvoiceManager::send(%s %d, %s): invoiceCompleted prevented sending',
+          $this->config->getLog()->notice('InvoiceManager::send(%s %d, %s): invoiceCompleted prevented sending',
             $invoiceSource->getType(), $invoiceSource->getId(), $forceSend ? 'true' : 'false');
         }
       }
       else {
         $result =  WebConfigInterface::Status_SendingPrevented_InvoiceCreated;
-        $this->config->getLog()->debug('InvoiceManager::send(%s %d, %s): invoiceCreated prevented sending',
+        $this->config->getLog()->notice('InvoiceManager::send(%s %d, %s): invoiceCreated prevented sending',
           $invoiceSource->getType(), $invoiceSource->getId(), $forceSend ? 'true' : 'false');
       }
     }
     else {
-      $this->config->getLog()->debug('InvoiceManager::send(%s %d, %s): not sent',
+      $this->config->getLog()->notice('InvoiceManager::send(%s %d, %s): not sent',
         $invoiceSource->getType(), $invoiceSource->getId(), $forceSend ? 'true' : 'false');
     }
     return $result;

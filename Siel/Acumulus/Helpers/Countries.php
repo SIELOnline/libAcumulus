@@ -46,7 +46,6 @@ class Countries {
       'DE',
       'EE',
       'IE',
-      'EL', // Greece according to the EU
       'ES',
       'FR',
       'GB', // Great Britain/United Kingdom according to ISO.
@@ -68,7 +67,6 @@ class Countries {
       'SK',
       'FI',
       'SE',
-      'UK', // Great Britain/United Kingdom according to the EU
     );
     return in_array(strtoupper($countryCode), $euCountryCodes);
   }

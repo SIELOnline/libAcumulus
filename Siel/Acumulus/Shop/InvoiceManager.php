@@ -197,7 +197,7 @@ abstract class InvoiceManager {
    *   Status, one of the WebConfigInterface::Status_ constants.
    */
   public function sourceStatusChange(Source $invoiceSource, $newStatus = FALSE) {
-    $this->config->getLog()->info('InvoiceManager::sourceStatusChange(%s %d, %s)', $invoiceSource->getType(), $invoiceSource->getId(), $newStatus === NULL ? 'null' : $newStatus === FALSE ? 'false' : (string) $newStatus);
+    $this->config->getLog()->notice('InvoiceManager::sourceStatusChange(%s %d, %s)', $invoiceSource->getType(), $invoiceSource->getId(), $newStatus === NULL ? 'null' : $newStatus === FALSE ? 'false' : (string) $newStatus);
     $result = WebConfigInterface::Status_NotSent;
     $shopSettings = $this->config->getShopSettings();
     if ($newStatus === FALSE

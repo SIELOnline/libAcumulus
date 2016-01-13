@@ -364,6 +364,10 @@ class CompletorInvoiceLines {
    * The check is done on comparing allowed vat rates with the meta-vatrate-min
    * and meta-vatrate-max values. If only 1 match is found that will be used.
    *
+   * If multiple matches are found with all equal rates - e.g. Dutch and Belgium
+   * 21% - the vat rate will be corrected, but the VAT Type will remain
+   * undecided.
+   *
    * @param array $line
    *   A line with a calculated vat rate.
    * @return array
@@ -385,12 +389,49 @@ class CompletorInvoiceLines {
       $line['meta-vatrate-matches'] = count($matchedVatRates) === 0 ? 'none' : array_reduce($matchedVatRates, function($carry, $item) {
           return $carry . ($carry === '' ? '' : ',') . $item['vatrate'] . '(' . $item['vattype'] . ')';
         }, '');
-      if (!empty($line['meta-strategy-split'])) {
+      $vatRate = $this->getUniqueVatRate($matchedVatRates);
+      if ($vatRate !== FALSE) {
+        $line['vatrate'] = $vatRate;
+        $line['meta-vatrate-source'] = static::VatRateSource_Calculated_Corrected;
+      }
+      else if (!empty($line['meta-strategy-split'])) {
         // Give the strategy phase a chance to correct this line.
         $line['meta-vatrate-source'] = Creator::VatRateSource_Strategy;
       }
     }
     return $line;
+  }
+
+  /**
+   * Determines if all (matched) vat rates are equal.
+   *
+   * @param array $matchedVatRates
+   *
+   * @return float|FALSE
+   *   If all vat rates are equal that vat rate, false otherwise.
+   */
+  protected function getUniqueVatRate(array $matchedVatRates) {
+    $result = array_reduce($matchedVatRates, function ($carry, $matchedVatRate) {
+      if ($carry === NULL) {
+        // 1st item: return its vat rate.
+        return $matchedVatRate['vatrate'];
+      }
+      else if ($carry == $matchedVatRate['vatrate']) {
+        // Note that in PHP: '21' == '21.0000' returns true.
+        // Vat rate equals all previous vat rates: return that vat rate.
+        return $carry;
+      }
+      else {
+        // Vat rate does not match previous vat rates or carry is already false,
+        // return false.
+        return FALSE;
+      }
+    }, NULL);
+    if ($result === NULL) {
+      // Empty matchedVatRates.
+      $result = FALSE;
+    }
+    return $result;
   }
 
   /**

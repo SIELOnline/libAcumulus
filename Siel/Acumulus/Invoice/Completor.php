@@ -154,12 +154,34 @@ class Completor {
   /**
    * Validates the email address of the invoice.
    *
-   * The email address may not be empty but may be left out though.
+   * - The email address may not be empty but may be left out though.
+   * - Multiple, comma separated, email addresses are not allowed.
+   * - Display names (My Name <my.name@example.com>) are not allowed.
    */
   protected function validateEmail() {
     // Check email address.
     if (empty($this->invoice['customer']['email'])) {
       unset($this->invoice['customer']['email']);
+    }
+    else {
+      $email = $this->invoice['customer']['email'];
+      $at = strpos($email, '@');
+      // Comma (,) used as separator?
+      $comma = strpos($email, ',', $at);
+      if ($at < $comma) {
+        $email = trim(substr($email, 0, $comma));
+      }
+      // Semicolon (;) used as separator?
+      $semicolon = strpos($email, ';', $at);
+      if ($at < $semicolon) {
+        $email = trim(substr($email, 0, $semicolon));
+      }
+
+      // Display name used in single remaining address?
+      if (preg_match('/^(.+?)<([^>]+)>$/', $email, $matches)) {
+        $email = trim($matches[2]);
+      }
+      $this->invoice['customer']['email'] = $email;
     }
   }
 

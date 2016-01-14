@@ -13,14 +13,6 @@ interface ConfigInterface {
   const TriggerInvoiceSendEvent_OrderStatus = 1;
   const TriggerInvoiceSendEvent_InvoiceCreate = 2;
 
-  const InvoiceNrSource_ShopInvoice = 1;
-  const InvoiceNrSource_ShopOrder = 2;
-  const InvoiceNrSource_Acumulus = 3;
-
-  const InvoiceDate_InvoiceCreate = 1;
-  const InvoiceDate_OrderCreate = 2;
-  const InvoiceDate_Transfer = 3;
-
   /**
    * Returns the set of settings related to adding an invoice.
    *

@@ -3,8 +3,7 @@ namespace Siel\Acumulus\Joomla\HikaShop\Invoice;
 
 use hikashopConfigClass;
 use Siel\Acumulus\Helpers\Number;
-use Siel\Acumulus\Invoice\ConfigInterface as InvoiceConfigInterface;
-use Siel\Acumulus\Shop\ConfigInterface;
+use Siel\Acumulus\Invoice\ConfigInterface;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use stdClass;
 
@@ -120,8 +119,8 @@ class Creator extends BaseCreator {
     $config = hikashop_config();
     $unpaidStatuses = explode(',',$config->get('order_unpaid_statuses','created'));
     return in_array($this->order->order_status, $unpaidStatuses)
-      ? InvoiceConfigInterface::PaymentStatus_Due
-      : InvoiceConfigInterface::PaymentStatus_Paid;
+      ? ConfigInterface::PaymentStatus_Due
+      : ConfigInterface::PaymentStatus_Paid;
   }
 
   /**

@@ -11,8 +11,7 @@ use Mage_Sales_Model_Order_Invoice;
 use Mage_Sales_Model_Order_Item;
 use Mage_Tax_Model_Config;
 use Siel\Acumulus\Helpers\Number;
-use Siel\Acumulus\Invoice\ConfigInterface as InvoiceConfigInterface;
-use Siel\Acumulus\Shop\ConfigInterface;
+use Siel\Acumulus\Invoice\ConfigInterface;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 
 /**
@@ -144,14 +143,14 @@ class Creator extends BaseCreator {
 
   protected function getPaymentStateOrder() {
     return Number::isZero($this->order->getBaseTotalDue())
-      ? InvoiceConfigInterface::PaymentStatus_Paid
-      : InvoiceConfigInterface::PaymentStatus_Due;
+      ? ConfigInterface::PaymentStatus_Paid
+      : ConfigInterface::PaymentStatus_Due;
   }
 
   protected function getPaymentStateCreditNote() {
     return $this->creditNote->getState() == Mage_Sales_Model_Order_Creditmemo::STATE_REFUNDED
-      ? InvoiceConfigInterface::PaymentStatus_Paid
-      : InvoiceConfigInterface::PaymentStatus_Due;
+      ? ConfigInterface::PaymentStatus_Paid
+      : ConfigInterface::PaymentStatus_Due;
   }
 
   protected function getPaymentDateOrder() {

@@ -621,6 +621,11 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
           'type' => 'string',
           'default' => '',
         ),
+        'digitalServices' => array(
+          'group' => 'invoice',
+          'type' => 'int',
+          'default' => InvoiceConfigInterface::DigitalServices_Unknown,
+        ),
         'defaultAccountNumber' => array(
           'group' => 'invoice',
           'type' => 'int',
@@ -654,12 +659,12 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
         'invoiceNrSource' => array(
           'group' => 'shop',
           'type' => 'int',
-          'default' => ConfigInterface::InvoiceNrSource_ShopInvoice,
+          'default' => InvoiceConfigInterface::InvoiceNrSource_ShopInvoice,
         ),
         'dateToUse' => array(
           'group' => 'shop',
           'type' => 'int',
-          'default' => ConfigInterface::InvoiceDate_InvoiceCreate,
+          'default' => InvoiceConfigInterface::InvoiceDate_InvoiceCreate,
         ),
         'triggerInvoiceSendEvent' => array(
           'group' => 'shop',

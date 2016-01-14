@@ -268,7 +268,9 @@ class FormRenderer {
 
     // Help text.
     if (!empty($text)) {
-      $output .= "<$tag class=\"{$this->descriptionClass}\">" . htmlspecialchars($text, ENT_NOQUOTES, 'UTF-8') . "</$tag>";
+      // Allow for links in the help text, so no filtering anymore.
+      //$output .= "<$tag class=\"{$this->descriptionClass}\">" . htmlspecialchars($text, ENT_NOQUOTES, 'UTF-8') . "</$tag>";
+      $output .= "<$tag class=\"{$this->descriptionClass}\">$text</$tag>";
     }
 
     return $output;

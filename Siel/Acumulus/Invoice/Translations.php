@@ -17,7 +17,7 @@ class Translations extends TranslationCollection {
     'inc_vat' => 'incl. BTW',
     'ex_vat' => 'excl. BTW',
     'shipping_costs' => 'Verzendkosten',
-    // @todo: try to better distinguish free shipping and pikup: for now only WC, HS PS do so
+    // @todo: try to better distinguish free shipping and pickup: for now only WC, HS PS do so
     'free_shipping' => 'Gratis verzending',
     'pickup' => 'Afhalen',
     'payment_costs' => 'Betalingskosten',
@@ -30,9 +30,9 @@ class Translations extends TranslationCollection {
     'refund' => 'Terugbetaling',
     'refund_adjustment' => 'Aanpassing teruggaafbedrag',
 
-    'message_warning_no_vat' => 'De factuur bevat geen BTW en er kan niet bepaald worden welk BTW-type vam toepassing is.',
-    'message_warning_incorrect_vat_corrected' => 'De factuur bevat een incorrect BTW tarief van %1$0.1f%%. Dit is gecorrigeerd naar %2$0.1f%%. Controleer deze factuur handmatig in Acumulus!',
-    'message_warning_incorrect_vat_not_corrected' => 'De factuur bevat een incorrect BTW tarief van %0.1f%%. Dit viel niet te corrigeren naar een geldig BTW tarief. Corrigeer deze factuur handmatig in Acumulus!',
+    'message_warning_no_vat' => 'De factuur bevat geen BTW en er kan niet bepaald worden welk BTW-type van toepassing is. De factuur is als concept opgeslagen. Corrigeer de factuur in Acumulus en controleer uw BTW instellingen.',
+    'message_warning_no_vattype' => 'Door een fout in uw instellingen of BTW tarieven, kan het BTW-type van de factuur niet bepaald worden. De factuur is als concept opgeslagen. Corrigeer of completeer de factuur in Acumulus.',
+    'message_warning_multiple_vattype' => 'De factuur kan meerdere BTW-types hebben. De factuur is als concept opgeslagen. Completeer de factuur in Acumulus met het juiste BTW type.',
   );
 
   protected $en = array(
@@ -56,9 +56,9 @@ class Translations extends TranslationCollection {
     'refund' => 'Refund',
     'refund_adjustment' => 'Refund adjustment',
 
-    'message_warning_no_vat' => 'The invoice has no VAT and it is not possible to determine the VAT type.',
-    'message_warning_incorrect_vat_corrected' => 'The invoice specified an incorrect VAT rate of %1$0.1f%%. This has been corrected to %2$0.1f%%. Check this invoice in Acumulus!',
-    'message_warning_incorrect_vat_not_corrected' => 'The invoice specified an incorrect VAT rate of %0.1f%%. It was not possible to correct this to a valid VAT rate. Correct this invoice manually in Acumulus!',
+    'message_warning_no_vat' => 'The invoice has no VAT and it is not possible to determine the VAT type. The invoice has been saved as concept. Correct the invoice in acumulus and check your VAT settings.',
+    'message_warning_no_vattype' => 'Due to an error in your settings, we cannot determine the VAT type for the invoice. The invoice has been saved as concept. Correct or complete the invoice in Acumulus.',
+    'message_warning_multiple_vattype' => 'The invoice can have multiple VAT types. The invoice has been saved as concept. Complete the invoice in Acumulus with the correct VAT type.',
   );
 
 }

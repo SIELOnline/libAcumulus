@@ -44,6 +44,14 @@ class ConfigFormTranslations extends TranslationCollection {
     'invoiceSettingsHeader' => 'Uw factuurinstellingen',
     'option_empty' => 'Maak uw keuze',
 
+    'field_digitalServices' => 'Verkoopt u digitale diensten?',
+    'option_digitalServices_1' => 'Zowel digitale diensten als normale producten.',
+    'option_digitalServices_2' => 'Alleen producten die altijd onder het NL tarief vallen.',
+    'option_digitalServices_3' => 'Alleen digitale diensten die onder deze regeling vallen.',
+    'desc_digitalServices' => 'Geef aan of u in uw winkel digitale diensten aanbiedt waarbij u buitenlandse BTW tarieven moet hanteren voor EU klanten.
+Zie <a href="http://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/btw_berekenen_bij_diensten/wijziging_in_digitale_diensten_vanaf_2015/wijziging_in_digitale_diensten_vanaf_2015">Belastingdienst: diensten naar andere EU landen</a>.
+Met behulp van deze instelling kan de koppeling beter het type factuur bepalen; controles uitvoeren; en BTW tarieven, voor zover berekend op basis van afgeronde bedragen, terugrekenen.',
+
     'field_invoiceNrSource' => 'Factuurnummer',
     'option_invoiceNrSource_1' => 'Gebruik het factuurnummer van uw webwinkel. Let op: als er nog geen factuur aan een bestelling gekoppeld is, zal het bestelnummer gebruikt worden!',
     'option_invoiceNrSource_2' => 'Gebruik het bestelnummer van uw webwinkel.',
@@ -167,6 +175,14 @@ Vink deze optie aan als u geen regel op uw factuur of pakbon wil voor gratis ver
 
     'invoiceSettingsHeader' => 'Your invoice settings',
     'option_empty' => 'Select one',
+
+    'field_digitalServices' => 'Do you sell digital services?',
+    'option_digitalServices_1' => 'Both digitals services and normal products.',
+    'option_digitalServices_2' => 'Only products that are subject to dutch VAT.',
+    'option_digitalServices_3' => 'Only digital services subject to the regulations concerning using foreign VAT rates.',
+    'desc_digitalServices' => 'Select whether your store offers digital services that are subject to foreign VAT for clients in other EU countries.
+See <a href="http://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/btw_berekenen_bij_diensten/wijziging_in_digitale_diensten_vanaf_2015/wijziging_in_digitale_diensten_vanaf_2015">Dutch tax office: services to other EU countries (in dutch)</a>.
+Using this setting this plugin can better determine the invoice type; perform some validations; and extract exact VAT rates where they are calculated using rounded amounts.',
 
     'field_invoiceNrSource' => 'Invoice number',
     'option_invoiceNrSource_1' => 'Use the web shop invoice number. Note: if no invoice has been created for the order yet, the order number will be used!',

@@ -101,8 +101,8 @@ class Creator extends BaseCreator {
    * Returns the date to use as invoice date for the order.
    *
    * param int $dateToUse
-   *   \Siel\Acumulus\Shop\ConfigInterface\InvoiceDate_InvoiceCreate or
-   *   \Siel\Acumulus\Shop\ConfigInterface\InvoiceDate_OrderCreate
+   *   \Siel\Acumulus\Invoice\ConfigInterface\InvoiceDate_InvoiceCreate or
+   *   \Siel\Acumulus\Invoice\ConfigInterface\InvoiceDate_OrderCreate
    *
    * @return string
    *   Date to send to Acumulus as the invoice date: yyyy-mm-dd.
@@ -116,8 +116,8 @@ class Creator extends BaseCreator {
    * Returns the date to use as invoice date for the order refund.
    *
    * param int $dateToUse
-   *   \Siel\Acumulus\Shop\ConfigInterface\InvoiceDate_InvoiceCreate or
-   *   \Siel\Acumulus\Shop\ConfigInterface\InvoiceDate_OrderCreate
+   *   \Siel\Acumulus\Invoice\ConfigInterface\InvoiceDate_InvoiceCreate or
+   *   \Siel\Acumulus\Invoice\ConfigInterface\InvoiceDate_OrderCreate
    *
    * @return string
    *   Date to send to Acumulus as the invoice date: yyyy-mm-dd.

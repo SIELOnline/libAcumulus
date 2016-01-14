@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\WooCommerce\Shop;
 
+use Siel\Acumulus\Invoice\ConfigInterface as InvoiceConfigInterface;
 use Siel\Acumulus\Shop\ConfigForm as BaseConfigForm;
 use Siel\Acumulus\Shop\ConfigInterface;
 
@@ -32,7 +33,7 @@ class ConfigForm extends BaseConfigForm {
    */
   protected function getInvoiceNrSourceOptions() {
     $result = parent::getInvoiceNrSourceOptions();
-    unset($result[ConfigInterface::InvoiceNrSource_ShopInvoice]);
+    unset($result[InvoiceConfigInterface::InvoiceNrSource_ShopInvoice]);
     return $result;
   }
 
@@ -44,7 +45,7 @@ class ConfigForm extends BaseConfigForm {
    */
   protected function getDateToUseOptions() {
     $result = parent::getDateToUseOptions();
-    unset($result[ConfigInterface::InvoiceDate_InvoiceCreate]);
+    unset($result[InvoiceConfigInterface::InvoiceDate_InvoiceCreate]);
     return $result;
   }
 

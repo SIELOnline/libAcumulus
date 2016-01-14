@@ -16,11 +16,24 @@ interface ConfigInterface {
   const Concept_No = 0;
   const Concept_Yes = 1;
 
+  const InvoiceNrSource_ShopInvoice = 1;
+  const InvoiceNrSource_ShopOrder = 2;
+  const InvoiceNrSource_Acumulus = 3;
+
+  const InvoiceDate_InvoiceCreate = 1;
+  const InvoiceDate_OrderCreate = 2;
+  const InvoiceDate_Transfer = 3;
+
   const OverwriteIfExists_No = 0;
   const OverwriteIfExists_Yes = 1;
 
   const ConfirmReading_No = 0;
   const ConfirmReading_Yes = 1;
+
+  const DigitalServices_Unknown = 0;
+  const DigitalServices_Both = 1;
+  const DigitalServices_No = 2;
+  const DigitalServices_Only = 3;
 
   const VatType_National = 1;
   const VatType_NationalReversed = 2;
@@ -30,7 +43,7 @@ interface ConfigInterface {
   const VatType_ForeignVat = 6;
 
   /**
-   * Returns the set of settings related to adding an invoice.
+   * Returns the set of settings related to the customer part of an invoice.
    *
    * @return array
    *   A keyed array with the keys:
@@ -42,10 +55,11 @@ interface ConfigInterface {
   public function getCustomerSettings();
 
   /**
-   * Returns the set of settings related to adding an invoice.
+   * Returns the set of settings related to the invoice part of an invoice.
    *
    * @return array
    *   A keyed array with the keys:
+   *   - digitalServices
    *   - defaultAccountNumber
    *   - defaultCostCenter
    *   - defaultInvoiceTemplate

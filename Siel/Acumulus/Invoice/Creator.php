@@ -6,7 +6,6 @@ use Siel\Acumulus\Helpers\Countries;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Helpers\TranslatorInterface;
 use Siel\Acumulus\Shop\Config;
-use Siel\Acumulus\Shop\ConfigInterface as ShopConfigInterface;
 
 /**
  * Allows to create arrays in the Acumulus invoice structure from a web shop
@@ -327,12 +326,12 @@ abstract class Creator {
     $invoiceSettings = $this->config->getShopSettings();
 
     $sourceToUse = $invoiceSettings['invoiceNrSource'];
-    if ($sourceToUse != ShopConfigInterface::InvoiceNrSource_Acumulus) {
+    if ($sourceToUse != ConfigInterface::InvoiceNrSource_Acumulus) {
       $result['number'] = $this->getInvoiceNumber($sourceToUse);
     }
 
     $dateToUse = $invoiceSettings['dateToUse'];
-    if ($dateToUse != ShopConfigInterface::InvoiceDate_Transfer) {
+    if ($dateToUse != ConfigInterface::InvoiceDate_Transfer) {
       $result['issuedate'] = $this->getInvoiceDate($dateToUse);
     }
 
@@ -374,8 +373,8 @@ abstract class Creator {
    * Returns the number to use as invoice number.
    *
    * @param int $invoiceNumberSource
-   *   \Siel\Acumulus\Shop\ConfigInterface\InvoiceNrSource_ShopInvoice or
-   *   \Siel\Acumulus\Shop\ConfigInterface\InvoiceNrSource_ShopOrder.
+   *   \Siel\Acumulus\Invoice\ConfigInterface\InvoiceNrSource_ShopInvoice or
+   *   \Siel\Acumulus\Invoice\ConfigInterface\InvoiceNrSource_ShopOrder.
    *
    * @return string
    *   The number to use as "invoice number" on the invoice, may contain a
@@ -387,8 +386,8 @@ abstract class Creator {
    * Returns the date to use as invoice date.
    *
    * @param int $dateToUse
-   *   \Siel\Acumulus\Shop\ConfigInterface\InvoiceDate_InvoiceCreate or
-   *   \Siel\Acumulus\Shop\ConfigInterface\InvoiceDate_OrderCreate
+   *   \Siel\Acumulus\Invoice\ConfigInterface\InvoiceDate_InvoiceCreate or
+   *   \Siel\Acumulus\Invoice\ConfigInterface\InvoiceDate_OrderCreate
    *
    * @return string
    *   Date to send to Acumulus as the invoice date: yyyy-mm-dd.

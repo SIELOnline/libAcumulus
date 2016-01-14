@@ -2,8 +2,7 @@
 namespace Siel\Acumulus\Joomla\VirtueMart\Invoice;
 
 use Siel\Acumulus\Helpers\Number;
-use Siel\Acumulus\Invoice\ConfigInterface as InvoiceConfigInterface;
-use Siel\Acumulus\Shop\ConfigInterface;
+use Siel\Acumulus\Invoice\ConfigInterface;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use stdClass;
 use VmModel;
@@ -163,8 +162,8 @@ class Creator extends BaseCreator {
   protected function getPaymentState() {
     $order = $this->invoiceSource->getSource();
     return in_array($order['details']['BT']->order_status, $this->getPaidStates())
-      ? InvoiceConfigInterface::PaymentStatus_Paid
-      : InvoiceConfigInterface::PaymentStatus_Due;
+      ? ConfigInterface::PaymentStatus_Paid
+      : ConfigInterface::PaymentStatus_Due;
   }
 
   /**

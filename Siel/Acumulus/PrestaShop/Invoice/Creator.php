@@ -12,7 +12,6 @@ use OrderSlip;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\ConfigInterface;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
-use Siel\Acumulus\Shop\ConfigInterface as ShopConfigInterface;
 
 /**
  * Allows to create arrays in the Acumulus invoice structure from a PrestaShop
@@ -107,7 +106,7 @@ class Creator extends BaseCreator {
    */
   protected function getInvoiceNumber($invoiceNumberSource) {
     $result = $this->invoiceSource->getReference();
-    if ($invoiceNumberSource === ShopConfigInterface::InvoiceNrSource_ShopInvoice && $this->invoiceSource->getType() === Source::Order && !empty($this->order->invoice_number)) {
+    if ($invoiceNumberSource === ConfigInterface::InvoiceNrSource_ShopInvoice && $this->invoiceSource->getType() === Source::Order && !empty($this->order->invoice_number)) {
       $result = Configuration::get('PS_INVOICE_PREFIX', (int) $this->order->id_lang, NULL, $this->order->id_shop) . sprintf('%06d', $this->order->invoice_number);
     }
     return $result;
@@ -120,7 +119,7 @@ class Creator extends BaseCreator {
     $result = substr($this->invoiceSource->getSource()->date_add, 0, strlen('2000-01-01'));
     // Invoice_date is filled with "0000-00-00 00:00:00", so use invoice
     // number instead to check for existence of the invoice.
-    if ($dateToUse == ShopConfigInterface::InvoiceDate_InvoiceCreate && $this->invoiceSource->getType() === Source::Order && !empty($this->order->invoice_number)) {
+    if ($dateToUse == ConfigInterface::InvoiceDate_InvoiceCreate && $this->invoiceSource->getType() === Source::Order && !empty($this->order->invoice_number)) {
       $result = substr($this->order->invoice_date, 0, strlen('2000-01-01'));
     }
     return $result;

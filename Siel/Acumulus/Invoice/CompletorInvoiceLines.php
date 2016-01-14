@@ -79,8 +79,22 @@ class CompletorInvoiceLines {
   /** @var Source */
   protected $source;
 
-  /** @var int[] */
+  /**
+   * @var int[]
+   *   The list of possible vat types, initially filled with possible vat types
+   *   based on client country, invoiceHasLineWithVat(), is_company(), and the
+   *   digital services setting. Bu then reduced by VAT rates we fnd on the
+   *   order lines.
+   */
   protected $possibleVatTypes;
+
+  /**
+   * @var int[]
+   *   The original list of possible vat types, see above, but not reduced.
+   *   Is used for logging when no vat type remains possible after checking all
+   *   order lines.
+   */
+  protected $originalPossibleVatTypes;
 
   /** @var array[] */
   protected $possibleVatRates;
@@ -167,6 +181,9 @@ class CompletorInvoiceLines {
    */
   protected function initPossibleVatTypes() {
     $possibleVatTypes = array();
+    $invoiceSettings = $this->config->getInvoiceSettings();
+    $digitalServices = $invoiceSettings['digitalServices'];
+
     if (!empty($this->invoice['customer']['invoice']['vattype'])) {
       // If shop specific code or an event handler has already set the vat type,
       // we obey so.
@@ -176,8 +193,11 @@ class CompletorInvoiceLines {
       if (!$this->invoiceHasLineWithVat()) {
         // National/EU reversed vat or no vat (rest of world).
         if ($this->isNl()) {
-          // National: some products (e.g. education) are free of VAT.
-          $possibleVatTypes[] = ConfigInterface::VatType_National;
+          // National: some products (e.g. education) are free of VAT, but
+          // digital services are not part of these.
+          if ($digitalServices !== ConfigInterface::DigitalServices_Only) {
+            $possibleVatTypes[] = ConfigInterface::VatType_National;
+          }
           if ($this->isCompany()) {
             $possibleVatTypes[] = ConfigInterface::VatType_NationalReversed;
           }
@@ -186,34 +206,53 @@ class CompletorInvoiceLines {
           if ($this->isCompany()) {
             $possibleVatTypes[] = ConfigInterface::VatType_EuReversed;
           }
-          $possibleVatTypes[] = ConfigInterface::VatType_National;
+          if ($digitalServices !== ConfigInterface::DigitalServices_Only) {
+            $possibleVatTypes[] = ConfigInterface::VatType_National;
+          }
         }
         else if ($this->isOutsideEu()) {
           $possibleVatTypes[] = ConfigInterface::VatType_RestOfWorld;
         }
-        else {
+
+        if (empty($possibleVatTypes)) {
           // Warning + fall back.
           $this->messages['warnings'][] = array(
-            'code' => 'Order',
-            'codetag' => $this->getInvoiceReference(),
+            'code' => '',
+            'codetag' => '',
             'message' => $this->t('message_warning_no_vat'),
           );
           $possibleVatTypes[] = ConfigInterface::VatType_National;
           $possibleVatTypes[] = ConfigInterface::VatType_EuReversed;
           $possibleVatTypes[] = ConfigInterface::VatType_NationalReversed;
+          $this->invoice['customer']['invoice']['concept'] = ConfigInterface::Concept_Yes;
         }
       }
       else {
         // NL or EU Foreign vat.
-        $possibleVatTypes[] = ConfigInterface::VatType_National;
-        if ($this->isEu() && $this->getInvoiceDate() >= '2015-01-01') {
-          // As of 2015, electronic services should be taxed with the rates of
-          // the clients' country.
-          $possibleVatTypes[] = ConfigInterface::VatType_ForeignVat;
+        if ($digitalServices === ConfigInterface::DigitalServices_No) {
+          // No electronic services are sold: can only be dutch VAT.
+          $possibleVatTypes[] = ConfigInterface::VatType_National;
+        }
+        else {
+          if ($this->isEu() && $this->getInvoiceDate() >= '2015-01-01') {
+            if ($digitalServices !== ConfigInterface::DigitalServices_Only) {
+              // Also normal goods are sold, so dutch VAT still possible.
+              $possibleVatTypes[] = ConfigInterface::VatType_National;
+            }
+            // As of 2015, electronic services should be taxed with the rates of
+            // the clients' country. And they might be sold in the shop.
+            $possibleVatTypes[] = ConfigInterface::VatType_ForeignVat;
+          }
+          else {
+            // Not Eu or before 2015-01-01: special regulations for electronic
+            // services were not yet active: dutch VAT only.
+            $possibleVatTypes[] = ConfigInterface::VatType_National;
+          }
         }
       }
     }
     $this->possibleVatTypes = $possibleVatTypes;
+    $this->originalPossibleVatTypes = $possibleVatTypes;
   }
 
   /**
@@ -336,12 +375,32 @@ class CompletorInvoiceLines {
   }
 
   protected function completeVatType() {
+    // If shop specific code or an event handler has already set the vat type,
+    // we don't change it.
     if (empty($this->invoice['customer']['invoice']['vattype'])) {
-      // Pick the first and hopefully only vat type.
-      $this->invoice['customer']['invoice']['vattype'] = reset($this->possibleVatTypes);
-      // But add meta info when there are still multiple possibilities.
-      if (count($this->possibleVatTypes) > 1) {
-        $this->invoice['customer']['invoice']['meta-vattypes-possible'] = implode(',', $this->possibleVatTypes);
+      if (!empty($this->possibleVatTypes)) {
+        // Pick the first and hopefully only vat type.
+        $this->invoice['customer']['invoice']['vattype'] = reset($this->possibleVatTypes);
+        // But add meta info when there are still multiple possibilities.
+        if (count($this->possibleVatTypes) > 1) {
+          $this->messages['warnings'][] = array(
+            'code' => '',
+            'codetag' => '',
+            'message' => $this->t('message_warning_multiple_vattype'),
+          );
+          $this->invoice['customer']['invoice']['meta-vattypes-possible'] = implode(',', $this->possibleVatTypes);
+          $this->invoice['customer']['invoice']['concept'] = ConfigInterface::Concept_Yes;
+        }
+      }
+      else {
+        $this->messages['warnings'][] = array(
+          'code' => '',
+          'codetag' => '',
+          'message' => $this->t('message_warning_no_vattype'),
+        );
+        $this->invoice['customer']['invoice']['vattype'] = reset($this->originalPossibleVatTypes);
+        $this->invoice['customer']['invoice']['meta-vattypes-possible'] = implode(',', $this->originalPossibleVatTypes);
+        $this->invoice['customer']['invoice']['concept'] = ConfigInterface::Concept_Yes;
       }
     }
   }
@@ -381,23 +440,21 @@ class CompletorInvoiceLines {
       }
     }
 
-    if (count($matchedVatRates) === 1) {
-      $line['vatrate'] = $matchedVatRates[0]['vatrate'];
-      $line['meta-vatrate-source'] = static::VatRateSource_Calculated_Corrected;
-    }
-    else {
-      $line['meta-vatrate-matches'] = count($matchedVatRates) === 0 ? 'none' : array_reduce($matchedVatRates, function($carry, $item) {
-          return $carry . ($carry === '' ? '' : ',') . $item['vatrate'] . '(' . $item['vattype'] . ')';
-        }, '');
-      $vatRate = $this->getUniqueVatRate($matchedVatRates);
-      if ($vatRate !== FALSE) {
-        $line['vatrate'] = $vatRate;
-        $line['meta-vatrate-source'] = static::VatRateSource_Calculated_Corrected;
-      }
-      else if (!empty($line['meta-strategy-split'])) {
+    $vatRate = $this->getUniqueVatRate($matchedVatRates);
+    if ($vatRate === NULL || $vatRate === FALSE) {
+      $line['meta-vatrate-matches'] = $vatRate === NULL
+        ? 'none'
+        : array_reduce($matchedVatRates, function ($carry, $item) {
+            return $carry . ($carry === '' ? '' : ',') . $item['vatrate'] . '(' . $item['vattype'] . ')';
+          }, '');
+      if (!empty($line['meta-strategy-split'])) {
         // Give the strategy phase a chance to correct this line.
         $line['meta-vatrate-source'] = Creator::VatRateSource_Strategy;
       }
+    }
+    else {
+      $line['vatrate'] = $vatRate;
+      $line['meta-vatrate-source'] = static::VatRateSource_Calculated_Corrected;
     }
     return $line;
   }
@@ -407,8 +464,9 @@ class CompletorInvoiceLines {
    *
    * @param array $matchedVatRates
    *
-   * @return float|FALSE
-   *   If all vat rates are equal that vat rate, false otherwise.
+   * @return float|FALSE|NULL
+   *   If all vat rates are equal that vat rate, null if $matchedVatRates is
+   *   empty, false otherwise (multiple but different vat rates).
    */
   protected function getUniqueVatRate(array $matchedVatRates) {
     $result = array_reduce($matchedVatRates, function ($carry, $matchedVatRate) {
@@ -417,7 +475,7 @@ class CompletorInvoiceLines {
         return $matchedVatRate['vatrate'];
       }
       else if ($carry == $matchedVatRate['vatrate']) {
-        // Note that in PHP: '21' == '21.0000' returns true.
+        // Note that in PHP: '21' == '21.0000' returns true. So using == works.
         // Vat rate equals all previous vat rates: return that vat rate.
         return $carry;
       }
@@ -427,10 +485,6 @@ class CompletorInvoiceLines {
         return FALSE;
       }
     }, NULL);
-    if ($result === NULL) {
-      // Empty matchedVatRates.
-      $result = FALSE;
-    }
     return $result;
   }
 

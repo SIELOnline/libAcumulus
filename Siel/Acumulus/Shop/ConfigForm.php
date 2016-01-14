@@ -4,6 +4,7 @@ namespace Siel\Acumulus\Shop;
 use Siel\Acumulus\Helpers\Form;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\TranslatorInterface;
+use Siel\Acumulus\Invoice\ConfigInterface as InvoiceConfigInterface;
 use Siel\Acumulus\Web\ConfigInterface as WebConfigInterface;
 
 /**
@@ -253,6 +254,15 @@ abstract class ConfigForm extends Form {
       }
 
       $fields['invoiceSettingsHeader']['fields'] = array (
+        'digitalServices' => array(
+          'type' => 'radio',
+          'label' => $this->t('field_digitalServices'),
+          'description' => $this->t('desc_digitalServices'),
+          'options' => $this->getDigitalServicesOptions(),
+          'attributes' => array(
+            'required' => true,
+          ),
+        ),
         'invoiceNrSource' => $invoiceNrSourceField,
         'dateToUse' => $dateToUseField,
         'defaultCustomerType' => array(
@@ -537,9 +547,9 @@ abstract class ConfigForm extends Form {
    */
   protected function getInvoiceNrSourceOptions() {
     return array(
-      ConfigInterface::InvoiceNrSource_ShopInvoice => $this->t('option_invoiceNrSource_1'),
-      ConfigInterface::InvoiceNrSource_ShopOrder => $this->t('option_invoiceNrSource_2'),
-      ConfigInterface::InvoiceNrSource_Acumulus => $this->t('option_invoiceNrSource_3'),
+      InvoiceConfigInterface::InvoiceNrSource_ShopInvoice => $this->t('option_invoiceNrSource_1'),
+      InvoiceConfigInterface::InvoiceNrSource_ShopOrder => $this->t('option_invoiceNrSource_2'),
+      InvoiceConfigInterface::InvoiceNrSource_Acumulus => $this->t('option_invoiceNrSource_3'),
     );
   }
 
@@ -559,9 +569,9 @@ abstract class ConfigForm extends Form {
    */
   protected function getDateToUseOptions() {
     return array(
-      ConfigInterface::InvoiceDate_InvoiceCreate => $this->t('option_dateToUse_1'),
-      ConfigInterface::InvoiceDate_OrderCreate => $this->t('option_dateToUse_2'),
-      ConfigInterface::InvoiceDate_Transfer => $this->t('option_dateToUse_3'),
+      InvoiceConfigInterface::InvoiceDate_InvoiceCreate => $this->t('option_dateToUse_1'),
+      InvoiceConfigInterface::InvoiceDate_OrderCreate => $this->t('option_dateToUse_2'),
+      InvoiceConfigInterface::InvoiceDate_Transfer => $this->t('option_dateToUse_3'),
     );
   }
 
@@ -586,6 +596,21 @@ abstract class ConfigForm extends Form {
       ConfigInterface::TriggerInvoiceSendEvent_None => $this->t('option_triggerInvoiceSendEvent_0'),
       ConfigInterface::TriggerInvoiceSendEvent_OrderStatus => $this->t('option_triggerInvoiceSendEvent_1'),
       ConfigInterface::TriggerInvoiceSendEvent_InvoiceCreate => $this->t('option_triggerInvoiceSendEvent_2'),
+    );
+  }
+
+  /**
+   * Returns a list of options for the digital services field.
+   *
+   * @return array
+   *   An array keyed by the option values and having translated descriptions as
+   *   values.
+   */
+  protected function getDigitalServicesOptions() {
+    return array(
+      InvoiceConfigInterface::DigitalServices_Both => $this->t('option_digitalServices_1'),
+      InvoiceConfigInterface::DigitalServices_No => $this->t('option_digitalServices_2'),
+      InvoiceConfigInterface::DigitalServices_Only => $this->t('option_digitalServices_3'),
     );
   }
 

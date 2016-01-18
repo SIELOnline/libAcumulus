@@ -75,4 +75,11 @@ interface InjectorInterface {
    */
   public function getForm($type);
 
+  /**
+   * @return \Siel\Acumulus\Helpers\FormRenderer
+   *
+   * @todo: start using this in all plugins.
+   */
+  public function getFormRenderer();
+
 }

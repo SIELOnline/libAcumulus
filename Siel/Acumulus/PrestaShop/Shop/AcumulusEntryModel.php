@@ -60,8 +60,8 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel {
    * {@inheritdoc}
    */
   protected function update($record, $entryId, $token, $updated) {
-    return Db::getInstance()->execute(sprintf("UPDATE `%s` SET id_shop = %u, id_shop_group = %u, id_entry = %u, token = '%s', source_type = '%s', source_id = %u, updated = '%s' WHERE id = %u",
-      $this->tableName, $record['id_shop'], $record['id_shop_group'], $entryId, $token, $record['source_type'], $record['source_id'], $updated, $record['id']));
+    return Db::getInstance()->execute(sprintf("UPDATE `%s` SET id_entry = %u, token = '%s', updated = '%s' WHERE id = %u",
+      $this->tableName, $entryId, $token, $updated, $record['id']));
   }
 
   /**
@@ -74,7 +74,7 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel {
   /**
    * {@inheritdoc}
    */
-  function install() {
+  public function install() {
     return Db::getInstance()->execute("CREATE TABLE IF NOT EXISTS `{$this->tableName}` (
       `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
 			`id_shop` int(11) UNSIGNED NOT NULL DEFAULT '1',

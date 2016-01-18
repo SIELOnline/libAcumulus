@@ -80,7 +80,7 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel {
    *
    * Magento has separate install scripts, so nothing has to be done here.
    */
-  function install() {
+  public function install() {
     return true;
   }
 

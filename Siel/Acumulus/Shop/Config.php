@@ -162,6 +162,13 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function getFormRenderer() {
+    return $this->getInstance('FormRenderer', 'Helpers');
+  }
+
+  /**
    * Returns an instance of the given class.
    *
    * The class is taken from the same namespace as the configStore property.

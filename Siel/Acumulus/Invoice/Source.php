@@ -40,7 +40,10 @@ abstract class Source {
   }
 
   /**
+   * Returns the type of the wrapped source.
+   *
    * @return string
+   *   One of the Source constants Source::Order or Source::CreditNote.
    */
   public function getType() {
     return $this->type;
@@ -54,6 +57,8 @@ abstract class Source {
   }
 
   /**
+   * Returns the source for an invoice, either an order or a credit note object.
+   *
    * @return array|object
    */
   public function getSource() {

@@ -84,7 +84,7 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel {
    *
    * Joomla has separate install scripts, so nothing has to be done here.
    */
-  function install() {
+  public function install() {
     return false;
   }
 

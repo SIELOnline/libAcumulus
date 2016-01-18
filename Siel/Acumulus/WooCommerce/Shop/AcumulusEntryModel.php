@@ -123,7 +123,7 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel {
    * We use the WordPress metadata API which is readily available, so nothing
    * has to be done here.
    */
-  function install() {
+  public function install() {
     return true;
   }
 

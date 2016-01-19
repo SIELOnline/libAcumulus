@@ -21,7 +21,7 @@ class ConfigForm extends BaseConfigForm {
 
     $orderStatuses = array();
     foreach ($statuses as $state) {
-      $orderStatuses[$state->category_namekey] = $state->translation;
+      $orderStatuses[$state->category_name] = $state->translation;
     }
     return $orderStatuses;
   }

@@ -53,6 +53,7 @@ use Siel\Acumulus\Web\Service;
 class CompletorInvoiceLines {
 
   const VatRateSource_Calculated_Corrected = 'calculated-corrected';
+  const VatRateSource_Completor_Completed = 'completor-completed';
   const VatRateSource_Strategy_Completed = 'strategy-completed';
 
   /** @var \Siel\Acumulus\Invoice\ConfigInterface */
@@ -163,12 +164,9 @@ class CompletorInvoiceLines {
   protected function completeInvoiceLines() {
     $this->initPossibleVatTypes();
     $this->initPossibleVatRates();
-    $this->reduceVatTypesByVatRatesBySource(array(Creator::VatRateSource_Exact, Creator::VatRateSource_Exact0));
     $this->correctCalculatedVatRates();
-    $this->reduceVatTypesByVatRatesBySource(static::VatRateSource_Calculated_Corrected);
     $this->addVatRateTo0PriceLines();
     $this->completeStrategyLines();
-    $this->reduceVatTypesByVatRatesBySource(Creator::VatRateSource_Strategy);
   }
 
   /**
@@ -244,7 +242,7 @@ class CompletorInvoiceLines {
             $possibleVatTypes[] = ConfigInterface::VatType_ForeignVat;
           }
           else {
-            // Not Eu or before 2015-01-01: special regulations for electronic
+            // Not EU or before 2015-01-01: special regulations for electronic
             // services were not yet active: dutch VAT only.
             $possibleVatTypes[] = ConfigInterface::VatType_National;
           }
@@ -298,70 +296,7 @@ class CompletorInvoiceLines {
   }
 
   /**
-   * Tries to reduce the number of possible vat types, and thereby also the
-   * number of possible vat rates, by comparing the 'exact' vat rates in the
-   * invoice lines to the possible vat rates per vat type. If that results in 1
-   * vat type, that will be the vat type for the invoice.
-   *
-   * It can still result in multiple vat types if these vat types share equal
-   * vat rates. Therefore, if we find a vat rate that only exists for 1 vat type
-   * we should arrive at that vat type.
-   *
-   * Example: NL: 6 and 21; FR 6 and 20: we find 6 and 20 => vat type = foreign.
-   *
-   * @param string|string[] $vatRateSource
-   */
-  protected function reduceVatTypesByVatRatesBySource($vatRateSource) {
-    if (count($this->possibleVatTypes) > 1) {
-      if (is_string($vatRateSource)) {
-        $vatRateSource = array($vatRateSource);
-      }
-
-      // We keep track of vat types found per appearing vat rate.
-      // The intersection of these sets should result in the new, hopefully
-      // smaller list, of possible vat types.
-      $foundVatTypes = array();
-      foreach ($this->invoiceLines as &$line) {
-        if (!empty($line['meta-vatrate-source']) && in_array($line['meta-vatrate-source'], $vatRateSource)
-          // We ignore "0" vat rates (0 and -1).
-          && isset($line['vatrate']) && $line['vatrate'] > 0) {
-          // Check if we already processed this vat rate for another line.
-          if (!isset($foundVatTypes[$line['vatrate']])) {
-            $foundVatTypes[$line['vatrate']] = array();
-            foreach ($this->possibleVatRates as $vatRateInfo) {
-              if ($vatRateInfo['vatrate'] == $line['vatrate']) {
-                $foundVatTypes[$line['vatrate']][$vatRateInfo['vattype']] = $vatRateInfo['vattype'];
-              }
-            }
-          }
-        }
-      }
-
-      // Now get the intersection of non-empty sub arrays (an empty sub array
-      // denotes an invalid vat rate and should not prevent this method from
-      // doing its work).
-      // Remove empty sub arrays.
-      array_filter($foundVatTypes);
-      if (count($foundVatTypes) >= 1) {
-        // Compute the intersection.
-        $remainingVatTypes = reset($foundVatTypes);
-        while ($foundVatType = (next($foundVatTypes)) !== false) {
-          /** @var array $foundVatType */
-          $remainingVatTypes = array_intersect($remainingVatTypes, $foundVatType);
-        }
-
-        if (count($remainingVatTypes) > 0 && count($remainingVatTypes) < count($this->possibleVatTypes)) {
-          // We can reduce the number of possible vat types and thus also the
-          // number of possible vat rates.
-          $this->possibleVatTypes = array_values($remainingVatTypes);
-          $this->possibleVatRates = array_filter($this->possibleVatRates, array($this, 'filterVatRatesByPossibleVatTypes'));
-        }
-      }
-    }
-  }
-
-  /**
-   * Checks whether a vat arte info array belongs to one of the still possible
+   * Checks whether a vat rate info array belongs to one of the still possible
    * vat types.
    *
    * As of PHP 5.4 this can be made an anonymous function (using: use ($this)).
@@ -378,21 +313,9 @@ class CompletorInvoiceLines {
     // If shop specific code or an event handler has already set the vat type,
     // we don't change it.
     if (empty($this->invoice['customer']['invoice']['vattype'])) {
-      if (!empty($this->possibleVatTypes)) {
-        // Pick the first and hopefully only vat type.
-        $this->invoice['customer']['invoice']['vattype'] = reset($this->possibleVatTypes);
-        // But add meta info when there are still multiple possibilities.
-        if (count($this->possibleVatTypes) > 1) {
-          $this->messages['warnings'][] = array(
-            'code' => '',
-            'codetag' => '',
-            'message' => $this->t('message_warning_multiple_vattype'),
-          );
-          $this->invoice['customer']['invoice']['meta-vattypes-possible'] = implode(',', $this->possibleVatTypes);
-          $this->invoice['customer']['invoice']['concept'] = ConfigInterface::Concept_Yes;
-        }
-      }
-      else {
+
+      $possibleVatTypes = $this->getPossibleVatTypesByCorrectVatRates();
+      if (empty($possibleVatTypes)) {
         $this->messages['warnings'][] = array(
           'code' => '',
           'codetag' => '',
@@ -402,11 +325,126 @@ class CompletorInvoiceLines {
         $this->invoice['customer']['invoice']['meta-vattypes-possible'] = implode(',', $this->originalPossibleVatTypes);
         $this->invoice['customer']['invoice']['concept'] = ConfigInterface::Concept_Yes;
       }
+      else if (count($possibleVatTypes) === 1) {
+        // Pick the first and only vat type.
+        $this->invoice['customer']['invoice']['vattype'] = reset($possibleVatTypes);
+      }
+      else {
+        // Get the intersection of possible vat types per line.
+        $vatTypesOnAllLines = $this->getVatTypesAppearingOnAllLines();
+        if (empty($vatTypesOnAllLines)) {
+          // We must split.
+          $message = 'message_warning_multiple_vattype_must_split';
+          // Pick the first and hopefully correct vat type.
+          $this->invoice['customer']['invoice']['vattype'] = reset($possibleVatTypes);
+        }
+        else {
+          // We may have to split.
+          $message = 'message_warning_multiple_vattype_may_split';
+          // Pick the first vat type that appears on all lines.
+          $this->invoice['customer']['invoice']['vattype'] = reset($vatTypesOnAllLines);
+        }
+
+        // But add meta info.
+        $this->messages['warnings'][] = array(
+          'code' => '',
+          'codetag' => '',
+          'message' => $this->t($message),
+        );
+        $this->invoice['customer']['invoice']['concept'] = ConfigInterface::Concept_Yes;
+        $this->invoice['customer']['invoice']['meta-vattypes-possible'] = implode(',', $possibleVatTypes);
+      }
     }
   }
 
   /**
-   * Trie to correct 'calculated' vat rates for rounding errors by matching them
+   * Returns a list of possible vat types based on possible vat types for all
+   * lines with a "correct" vat rate.
+   *
+   * If that results in 1 vat type, that will be the vat type for the invoice,
+   * otherwise a warning will be issued.
+   *
+   * This method may return multiple vat types because:
+   * - If vat types share equal vat rates we cannot make a choice (e.g. NL and
+   *   BE high VAT rates are equal).
+   * - If the invoice ought to be split into multiple invoices because multiple
+   *   vat regimes apply (digital services and normal goods) (e.g. both the FR
+   *   20% high rate and the NL 21% high rate appear on the invoice).
+   *
+   * @return int[]
+   *   List of possible vat type for this invoice (keyed by the vat types).
+   */
+  protected function getPossibleVatTypesByCorrectVatRates() {
+    // We only want to process correct vat rates.
+    $correctVatRateSources = array(
+      Creator::VatRateSource_Exact,
+      Creator::VatRateSource_Exact0,
+      static::VatRateSource_Calculated_Corrected,
+      static::VatRateSource_Completor_Completed,
+      static::VatRateSource_Strategy_Completed
+    );
+    // Define vat types that do know a zero rate.
+    $zeroRateVatTypes = array(
+      ConfigInterface::VatType_National,
+      ConfigInterface::VatType_NationalReversed,
+      ConfigInterface::VatType_EuReversed,
+      ConfigInterface::VatType_RestOfWorld
+    );
+
+    // We keep track of vat types found per appearing vat rate.
+    // The intersection of these sets should result in the new, hopefully
+    // smaller list, of possible vat types.
+    $invoiceVatTypes = array();
+    foreach ($this->invoiceLines as &$line) {
+      if (!empty($line['meta-vatrate-source']) && in_array($line['meta-vatrate-source'], $correctVatRateSources)) {
+        // We ignore "0" vat rates (0 and -1).
+        if ($line['vatrate'] > 0) {
+          $lineVatTypes = array();
+          foreach ($this->possibleVatRates as $vatRateInfo) {
+            if ($vatRateInfo['vatrate'] == $line['vatrate']) {
+              // Ensure that the values remain unique by keying them.
+              $invoiceVatTypes[$vatRateInfo['vattype']] = $vatRateInfo['vattype'];
+              $lineVatTypes[$vatRateInfo['vattype']] = $vatRateInfo['vattype'];
+            }
+          }
+        }
+        else {
+          // Reduce the possible vat types to those that do know a zero rate.
+          $lineVatTypes = array_intersect($this->possibleVatTypes, $zeroRateVatTypes);
+          foreach ($lineVatTypes AS $lineVatType) {
+            $invoiceVatTypes[$lineVatType] = $lineVatType;
+          }
+        }
+        $line['meta-vattypes-possible'] = implode(',', $lineVatTypes);
+      }
+    }
+
+    return $invoiceVatTypes;
+  }
+
+
+  /**
+   * Returns a list of vat types that are possible for all lines of the invoice.
+   *
+   * @return int[]
+   */
+  protected function getVatTypesAppearingOnAllLines() {
+    $result = NULL;
+    foreach ($this->invoiceLines as $line) {
+      $lineVatTypes = explode(',', $line['meta-vattypes-possible']);
+      if ($result === NULL) {
+        // 1st line.
+        $result = $lineVatTypes;
+      }
+      else {
+        $result = array_intersect($result, $lineVatTypes);
+      }
+    }
+    return $result;
+  }
+
+  /**
+   * Try to correct 'calculated' vat rates for rounding errors by matching them
    * with possible vatRates
    */
   protected function correctCalculatedVatRates() {
@@ -507,6 +545,7 @@ class CompletorInvoiceLines {
     foreach ($this->invoiceLines as &$line) {
       if ($line['meta-vatrate-source'] === Creator::VatRateSource_Completor && $line['vatrate'] === null && Number::isZero($line['unitprice'])) {
         $line['vatrate'] = $maxVatRate;
+        $line['meta-vatrate-source'] = static::VatRateSource_Completor_Completed;
       }
     }
   }
@@ -661,7 +700,8 @@ class CompletorInvoiceLines {
    * @param string $countryCode
    *   The country to fetch the vat rates for.
    *
-   * @return array
+   * @return float[]
+   *   Actual type will be string[].
    *
    * @see \Siel\Acumulus\Web\Service::getVatInfo().
    */
@@ -669,9 +709,9 @@ class CompletorInvoiceLines {
     $date = $this->getInvoiceDate();
     $vatInfo = $this->acumulusWebService->getVatInfo($countryCode, $date);
     // PHP5.5: array_column($vatInfo['vatinfo'], 'vatrate');
-    $result = array_map(function ($vatInfo1) {
+    $result = array_unique(array_map(function ($vatInfo1) {
       return $vatInfo1['vatrate'];
-    }, $vatInfo['vatinfo']);
+    }, $vatInfo['vatinfo']));
     return $result;
   }
 

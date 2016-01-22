@@ -86,15 +86,15 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel {
    * {@inheritdoc}
    */
   public function install() {
-    $tableExists = $this->getDb()->query("show tables like `{$this->tableName}`");
-    $tableExists = !empty($tableExists->num_rows);
+    $queryResult = $this->getDb()->query("show tables like '{$this->tableName}'");
+    $tableExists = !empty($queryResult->num_rows);
     if (!$tableExists) {
       // Table does not exist: create it.
       return $this->createTable();
     }
     else {
       // Table does exist: but in old or current data model?
-      $columnExists = $this->getDb()->query("show field from `{$this->tableName}` like `source_type`");
+      $columnExists = $this->getDb()->query("show columns from `{$this->tableName}` like 'source_type'");
       $columnExists = !empty($columnExists->num_rows);
       if (!$columnExists) {
         // Table exists but in old data model: alter table

@@ -309,8 +309,8 @@ abstract class Form {
    *   handling (setting pages) and we should only do the validation and setting
    *   admin notices as necessary.
    *
-   * @return bool True if there was no form submission or a successful submission.
-   * True if there was no form submission or a successful submission.
+   * @return bool
+   *   True if there was no form submission or a successful submission.
    */
   public function process($executeIfValid = true) {
     $this->formValues = array();

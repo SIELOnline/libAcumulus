@@ -27,21 +27,9 @@ class ConfigForm extends BaseConfigForm {
 
   /**
    * {@inheritdoc}
-   *
-   * This override ensures that array values are passed with the correct key
-   * to the PS form renderer.
-   */
-  public function getFormValues() {
-    $result = parent::getFormValues();
-//    $result['triggerOrderStatus[]'] = $result['triggerOrderStatus'];
-    return $result;
-  }
-
-  /**
-   * {@inheritdoc}
    */
   protected function getShopOrderStatuses() {
-    Registry::getInstance()->load->model('localisation/order/status');
+    Registry::getInstance()->load->model('localisation/order_status');
     $states = Registry::getInstance()->model_localisation_order_status->getOrderStatuses();
     $result = array();
     foreach ($states as $state) {

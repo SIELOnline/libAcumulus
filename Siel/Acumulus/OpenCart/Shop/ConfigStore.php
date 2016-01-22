@@ -17,6 +17,7 @@ class ConfigStore extends BaSeConfigStore {
    */
   public function getShopEnvironment() {
     $environment = array(
+      // Module has same version as library.
       'moduleVersion' => ServiceConfigInterface::libraryVersion,
       'shopName' => $this->shopName,
       'shopVersion' => VERSION,
@@ -27,7 +28,7 @@ class ConfigStore extends BaSeConfigStore {
   /**
    * @return \ModelSettingSetting
    */
-  public function getSettings() {
+  protected function getSettings() {
     Registry::getInstance()->load->model('setting/setting');
     return Registry::getInstance()->model_setting_setting;
   }
@@ -54,10 +55,13 @@ class ConfigStore extends BaSeConfigStore {
   public function save(array $values) {
     parent::save($values);
 
-    $configurationValues = $this->getSettings()->getSetting('acumulus_siel');
-    $configurationValues = isset($configurationValues['acumulus_siel_module']) ? $configurationValues['acumulus_siel_module'] : array();
-    $storeValues = array_merge($configurationValues, $values);
-    return $this->getSettings()->editSetting('acumulus_siel', array('acumulus_siel_module' => $storeValues));
+    $setting = $this->getSettings()->getSetting('acumulus_siel');
+    if (!isset($setting['acumulus_siel_module'])) {
+      $setting['acumulus_siel_module'] = array();
+    }
+    $setting['acumulus_siel_module'] = array_merge($setting['acumulus_siel_module'], $values);
+    $this->getSettings()->editSetting('acumulus_siel', $setting);
+    return TRUE;
   }
 
 }

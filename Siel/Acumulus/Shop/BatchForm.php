@@ -123,13 +123,16 @@ abstract class BatchForm extends Form {
       $to->setTime(23, 59, 59);
       $invoiceSources = $this->invoiceManager->getInvoiceSourcesByDateRange($type, $from, $to);
     }
+
     if (count($invoiceSources) === 0) {
       $this->log[$type] = sprintf($this->t('message_form_empty_range'), $this->t($type));
+      $this->setFormValue('result', $this->log[$type]);
       $result = TRUE;
     }
     else {
       $result = $this->invoiceManager->sendMultiple($invoiceSources, (bool) $this->getFormValue('force_send'), $this->log);
     }
+
     // Set formValue for log in case form values are already queried.
     $logText = implode("\n", $this->log);
     $this->setFormValue('log', $logText);

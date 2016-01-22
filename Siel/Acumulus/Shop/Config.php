@@ -658,10 +658,27 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
           'type' => 'bool',
           'default' => FALSE,
         ),
+        // @todo: add to UI if shop does support it (PS?, WC?).
         'useMargin' => array(
           'group' => 'invoice',
           'type' => 'bool',
           'default' => FALSE,
+        ),
+        // @todo: add these 3 to UI for shops where this is used (OC2, could others use this?).
+        'optionsAllOn1Line' => array(
+          'group' => 'invoice',
+          'type' => 'int',
+          'default' => 2,
+        ),
+        'optionsAllOnOwnLine' => array(
+          'group' => 'invoice',
+          'type' => 'int',
+          'default' => 4,
+        ),
+        'optionsMaxLength' => array(
+          'group' => 'invoice',
+          'type' => 'int',
+          'default' => 120,
         ),
         'invoiceNrSource' => array(
           'group' => 'shop',

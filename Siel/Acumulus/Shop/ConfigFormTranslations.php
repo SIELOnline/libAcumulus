@@ -46,11 +46,11 @@ class ConfigFormTranslations extends TranslationCollection {
 
     'field_digitalServices' => 'Verkoopt u digitale diensten?',
     'option_digitalServices_1' => 'Zowel digitale diensten als normale producten.',
-    'option_digitalServices_2' => 'Alleen producten die altijd onder het NL tarief vallen.',
-    'option_digitalServices_3' => 'Alleen digitale diensten die onder deze regeling vallen.',
-    'desc_digitalServices' => 'Geef aan of u in uw winkel digitale diensten aanbiedt waarbij u buitenlandse BTW tarieven moet hanteren voor EU klanten.
+    'option_digitalServices_2' => 'Alleen producten die onder Nederlandse BTW vallen.',
+    'option_digitalServices_3' => 'Alleen digitale diensten die met buitenlandse BTW belast moeten worden voor buitenlandse klanten.',
+    'desc_digitalServices' => 'Geef aan of u in uw winkel digitale diensten aanbiedt waarbij u buitenlandse BTW moet hanteren voor EU klanten.
 Zie <a href="http://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/btw_berekenen_bij_diensten/wijziging_in_digitale_diensten_vanaf_2015/wijziging_in_digitale_diensten_vanaf_2015">Belastingdienst: diensten naar andere EU landen</a>.
-Met behulp van deze instelling kan de koppeling beter het type factuur bepalen; controles uitvoeren; en BTW tarieven, voor zover berekend op basis van afgeronde bedragen, terugrekenen.',
+Met behulp van deze instelling kan de koppeling beter: het type factuur bepalen; controles uitvoeren; en BTW tarieven, voor zover berekend op basis van afgeronde bedragen, terugrekenen.',
 
     'field_invoiceNrSource' => 'Factuurnummer',
     'option_invoiceNrSource_1' => 'Gebruik het factuurnummer van uw webwinkel. Let op: als er nog geen factuur aan een bestelling gekoppeld is, zal het bestelnummer gebruikt worden!',

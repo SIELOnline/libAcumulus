@@ -41,6 +41,7 @@ abstract class Creator {
   const LineType_Manual = 'manual';
   const LineType_Order = 'product';
   const LineType_Discount = 'discount';
+  const LineType_Voucher = 'voucher';
   const LineType_Other = 'other';
 
   /** @var \Siel\Acumulus\Shop\Config */
@@ -338,7 +339,7 @@ abstract class Creator {
     // Payment status and date.
     $result['paymentstatus'] = $this->getPaymentState();
     if ($result['paymentstatus'] === ConfigInterface::PaymentStatus_Paid) {
-      $result['paymentdate'] = $this->getPaymentDate();
+      $this->addIfNotEmpty($result, 'paymentdate', $this->getPaymentDate());
     }
 
     $result['description'] = $this->getDescription();
@@ -559,7 +560,7 @@ abstract class Creator {
 
     $line = $this->getShippingLine();
     if ($line) {
-      $line['meta-line-type'] = 'shipping';
+      $line['meta-line-type'] = static::LineType_Shipping;
       $result[] = $line;
     }
 
@@ -570,7 +571,6 @@ abstract class Creator {
     }
 
     return $result;
-
   }
 
   /**

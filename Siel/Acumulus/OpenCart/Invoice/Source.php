@@ -17,9 +17,17 @@ class Source extends BaseSource {
    * {@inheritdoc}
    */
   protected function setSource() {
-    Registry::getInstance()->load->model('checkout/order');
-    Registry::getInstance()->model_checkout_order->getOrder($this->id);
-    throw new \RuntimeException('An OpenCart Source can only be created by passing in an order array.');
+    if (strrpos(DIR_APPLICATION, '/catalog/') === strlen(DIR_APPLICATION) - strlen('/catalog/')) {
+      // We are in the catalog section, use the order model of account.
+      Registry::getInstance()->load->model('checkout/order');
+      $orderModel = Registry::getInstance()->model_checkout_order;
+    }
+    else {
+      // We are in the admin section, use the order model of sale.
+      Registry::getInstance()->load->model('sale/order');
+      $orderModel = Registry::getInstance()->model_sale_order;
+    }
+    $this->source = $orderModel->getOrder($this->id);
   }
 
   /**

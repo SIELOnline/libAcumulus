@@ -12,6 +12,7 @@ namespace Siel\Acumulus\OpenCart\Helpers;
  * @property \ModelAccountOrder model_account_order
  * @property \ModelCatalogProduct model_catalog_product
  * @property \ModelCheckoutOrder model_checkout_order
+ * @property \ModelSaleOrder model_sale_order
  * @property \ModelLocalisationOrderStatus model_localisation_order_status
  * @property \ModelSettingSetting model_setting_setting
  */

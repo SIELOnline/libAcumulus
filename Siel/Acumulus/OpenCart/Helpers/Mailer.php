@@ -35,9 +35,7 @@ class Mailer extends BaseMailer {
     $mail->setSubject($this->getSubject($result));
     $content = $this->getBody($result, $messages, $invoiceSourceType, $invoiceSourceReference);
     $mail->setText($content['text']);
-    // Error in OpenCart 2 mail? It does an html_entity_decode() on the
-    // content!!! To counteract, we do a 2nd call to htmlspecialchars()...
-    $mail->setHtml(htmlspecialchars($content['html'], ENT_NOQUOTES));
+    $mail->setHtml($content['html']);
 
     $mail->send();
   }

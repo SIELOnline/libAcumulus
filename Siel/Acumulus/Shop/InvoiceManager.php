@@ -195,6 +195,8 @@ abstract class InvoiceManager {
    *
    * @return int
    *   Status, one of the WebConfigInterface::Status_ constants.
+   *
+   * @todo: can we add a getStatus() to Source, so we don't have to pass the status separately?
    */
   public function sourceStatusChange(Source $invoiceSource, $newStatus = FALSE) {
     $this->config->getLog()->notice('InvoiceManager::sourceStatusChange(%s %d, %s)', $invoiceSource->getType(), $invoiceSource->getId(), $newStatus === NULL ? 'null' : $newStatus === FALSE ? 'false' : (string) $newStatus);

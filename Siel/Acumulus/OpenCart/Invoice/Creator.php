@@ -6,26 +6,17 @@ use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
 
 /**
- * Allows to create arrays in the Acumulus invoice structure from a PrestaShop
- * order or order slip.
- *
- * Notes:
- * - If needed, PrestaShop allows us to get tax rates by querying the tax table
- *   because as soon as an existing tax rate gets updated it will get a new id,
- *   so old order details still point to a tax record with the tax rate as was
- *   used at the moment the order was placed.
- * - Fixed in 1.6.1.1: bug in partial refund, not executed the hook
- *   actionOrderSlipAdd #PSCSX-6287. So before 1.6.1.1, partial refunds will not
- *   be automatically sent to Acumulus.
+ * Allows to create arrays in the Acumulus invoice structure from an OpenCart
+ * order.
  */
 class Creator extends BaseCreator {
 
   // More specifically typed property.
-  /** @var Source */
-  protected $invoiceSource;
-
   /** @var array */
   protected $order;
+
+  /** @var array[] List of order total records. */
+  protected $orderTotals;
 
   /**
    * {@inheritdoc}
@@ -36,9 +27,9 @@ class Creator extends BaseCreator {
   protected function setInvoiceSource($invoiceSource) {
     parent::setInvoiceSource($invoiceSource);
 
-    // Load some models we are going to use.
-    Registry::getInstance()->load->model('account/order');
+    // Load some models and properties we are going to use.
     Registry::getInstance()->load->model('catalog/product');
+    $this->orderTotals = NULL;
 
     switch ($this->invoiceSource->getType()) {
       case Source::Order:
@@ -138,9 +129,11 @@ class Creator extends BaseCreator {
       'meta-invoicevatamount' => 0.0,
       'meta-invoicevat' => array(),
     );
-    foreach (Registry::getInstance()->model_account_order->getOrderTotals($this->order['order_id']) as $totalLine) {
+
+    $orderTotals = $this->getOrderTotals();
+    foreach ($orderTotals as $totalLine) {
       if ($totalLine['code'] === 'tax') {
-        $result['meta-invoicevat'][$totalLine['title']] = $totalLine['value'];
+        $result['meta-invoicevat'][] = $totalLine['title'] . ': '. $totalLine['value'];
         $result['meta-invoicevatamount'] += $totalLine['value'];
       }
     }
@@ -166,9 +159,9 @@ class Creator extends BaseCreator {
   protected function getItemLines() {
     $result = array();
 
-    $orderProducts = Registry::getInstance()->model_account_order->getOrderProducts($this->invoiceSource->getId());
+    $orderProducts = $this->getOrderModel()->getOrderProducts($this->invoiceSource->getId());
     foreach ($orderProducts as $line) {
-      $result[] = array_merge($result, $this->getItemLine($line));
+      $result = array_merge($result, $this->getItemLine($line));
     }
 
     return $result;
@@ -208,7 +201,7 @@ class Creator extends BaseCreator {
     // Options (variants).
     $optionsLines = array();
     $optionsTexts = array();
-    $options =  Registry::getInstance()->model_account_order->getOrderOptions($item['order_id'], $item['order_product_id']);
+    $options = $this->getOrderModel()->getOrderOptions($item['order_id'], $item['order_product_id']);
     foreach ($options as $option) {
       $optionsTexts[] = "{$option['name']}: {$option['value']}";
     }
@@ -253,7 +246,8 @@ class Creator extends BaseCreator {
   protected function getTotalLines() {
     $result = array();
 
-    foreach (Registry::getInstance()->model_account_order->getOrderTotals($this->order['order_id']) as $totalLine) {
+    $totalLines = $this->getOrderTotals();
+    foreach ($totalLines as $totalLine) {
       switch ($totalLine['code']) {
         case 'sub_total':
           // Sub total of all product lines: ignore.
@@ -319,6 +313,42 @@ class Creator extends BaseCreator {
     );
 
     return $result;
+  }
+
+  /**
+   *
+   *
+   *
+   * @return mixed
+   *
+   */
+  protected function getOrderTotals() {
+    if (!$this->orderTotals) {
+      $orderModel = $this->getOrderModel();
+      $this->orderTotals = $orderModel->getOrderTotals($this->order['order_id']);
+    }
+    return $this->orderTotals;
+  }
+
+  /**
+   *
+   *
+   *
+   * @return \ModelAccountOrder|\ModelSaleOrder
+   *
+   */
+  protected function getOrderModel() {
+    if (strrpos(DIR_APPLICATION, '/catalog/') === strlen(DIR_APPLICATION) - strlen('/catalog/')) {
+      // We are in the catalog section, use the account/order model.
+      Registry::getInstance()->load->model('account/order');
+      $orderModel = Registry::getInstance()->model_account_order;
+    }
+    else {
+      // We are in the admin section, use the sale/order model.
+      Registry::getInstance()->load->model('sale/order');
+      $orderModel = Registry::getInstance()->model_sale_order;
+    }
+    return $orderModel;
   }
 
 }

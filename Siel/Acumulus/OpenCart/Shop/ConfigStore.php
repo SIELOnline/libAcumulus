@@ -53,7 +53,7 @@ class ConfigStore extends BaSeConfigStore {
    * {@inheritdoc}
    */
   public function save(array $values) {
-    parent::save($values);
+    $values = $this->saveCommon($values);
 
     $setting = $this->getSettings()->getSetting('acumulus_siel');
     if (!isset($setting['acumulus_siel_module'])) {

@@ -45,7 +45,7 @@ class ConfigStore extends BaSeConfigStore {
    * {@inheritdoc}
    */
   public function save(array $values) {
-    parent::save($values);
+    $values = $this->saveCommon($values);
 
     $configurationValues = array();
     foreach ($values as $key => $value) {

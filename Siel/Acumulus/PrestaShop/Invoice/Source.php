@@ -34,9 +34,9 @@ class Source extends BaseSource {
    * More specifically typed override. uncomment when developing.
    * @return Order|OrderSlip
    */
-//  public function getSource() {
-//    return parent::getSource();
-//  }
+  public function getSource() {
+    return parent::getSource();
+  }
 
   /**
    * {@inheritdoc}
@@ -54,7 +54,27 @@ class Source extends BaseSource {
    */
   protected function setId() {
     $this->id = $this->source->id;
-    $this->addProperties();
+    if ($this->getType() === Source::CreditNote) {
+      $this->addProperties();
+    }
+  }
+
+  /**
+   * Returns the status of this order.
+   *
+   * @return int
+   */
+  protected function getStatusOrder() {
+    return $this->source->current_state;
+  }
+
+  /**
+   * Returns the status of this credit note.
+   *
+   * @return null
+   */
+  protected function getStatusCreditNote() {
+    return NULL;
   }
 
   /**
@@ -70,8 +90,8 @@ class Source extends BaseSource {
     // Get 1st (and only) result.
     $row = reset($row);
     foreach ($row as $key => $value) {
-      if (!isset($this->source->{$key})) {
-        $this->source->{$key} = $value;
+      if (!isset($this->source->$key)) {
+        $this->source->$key = $value;
       }
     }
   }

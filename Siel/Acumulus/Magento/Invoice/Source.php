@@ -71,4 +71,26 @@ class Source extends BaseSource {
     return 'CM' . $this->source->getIncrementId();
   }
 
+  /**
+   * Returns the status of this order.
+   *
+   * @return string
+   */
+  protected function getStatusOrder() {
+    return $this->source->getStatus();
+  }
+
+  /**
+   * Returns the status of this order.
+   *
+   * @return int
+   *   1 of
+   *   Mage_Sales_Model_Order_Creditmemo::STATE_OPEN        = 1;
+   *   Mage_Sales_Model_Order_Creditmemo::STATE_REFUNDED    = 2;
+   *   Mage_Sales_Model_Order_Creditmemo::STATE_CANCELED    = 3;
+   */
+  protected function getStatusCreditNote() {
+    return $this->source->getState();
+  }
+
 }

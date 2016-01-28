@@ -42,4 +42,13 @@ class Source extends BaseSource {
     return $this->source->get_order_number();
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return string
+   */
+  public function getStatus() {
+    return $this->source->get_status();
+  }
+
 }

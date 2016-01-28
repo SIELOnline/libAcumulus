@@ -45,4 +45,13 @@ class Source extends BaseSource {
     $this->id = $this->source['order_id'];
   }
 
+  /**
+   * {@inheritdoc}
+   *
+   * @return int
+   */
+  public function getStatus() {
+    return $this->source['order_status_id'];
+  }
+
 }

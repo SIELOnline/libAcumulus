@@ -51,6 +51,9 @@ abstract class Source {
 
   /**
    * Sets the source based on type and id.
+   *
+   * Should either be overridden or both setSourceOrder() and
+   * setSourceCreditNote() should be implemented.
    */
   protected function setSource() {
     return $this->callTypeSpecificMethod(__FUNCTION__);
@@ -67,6 +70,9 @@ abstract class Source {
 
   /**
    * Sets the id based on type and source.
+   *
+   * Should either be overridden or both setIdOrder() and
+   * setIdCreditNote() should be implemented.
    */
   protected function setId() {
     return $this->callTypeSpecificMethod(__FUNCTION__);
@@ -96,6 +102,19 @@ abstract class Source {
   }
 
   /**
+   * Returns the status for this invoice source.
+   *
+   * Should either be overridden or both getStatusOrder() and
+   * getStatusCreditNote() should be implemented.
+   *
+   * @return mixed
+   *   The status for this invoice source.
+   */
+  public function getStatus() {
+    return $this->callTypeSpecificMethod(__FUNCTION__);
+  }
+
+  /**
    * Calls a method that typically depends on the type of invoice source.
    *
    * @param string $method
@@ -106,4 +125,5 @@ abstract class Source {
     $method .= $this->getType();
     return $this->$method();
   }
+
 }

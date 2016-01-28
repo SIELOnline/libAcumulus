@@ -36,4 +36,14 @@ class Source extends BaseSource {
     return $this->source['details']['BT']->order_number;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @return string
+   *   A single character indicating the order status.
+   */
+  public function getStatus() {
+    return $this->source['details']['order_status'];
+  }
+
 }

@@ -31,14 +31,6 @@ class Source extends BaseSource {
   }
 
   /**
-   * More specifically typed override. uncomment when developing.
-   * @return array
-   */
-  public function getSource() {
-    return parent::getSource();
-  }
-
-  /**
    * Sets the id based on the loaded Order.
    */
   protected function setId() {

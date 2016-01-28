@@ -31,14 +31,6 @@ class Source extends BaseSource {
   }
 
   /**
-   * More specifically typed override. uncomment when developing.
-   * @return Order|OrderSlip
-   */
-  public function getSource() {
-    return parent::getSource();
-  }
-
-  /**
    * {@inheritdoc}
    *
    * This override returns the order reference or order slip id.

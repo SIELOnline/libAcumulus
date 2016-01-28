@@ -16,14 +16,6 @@ class Source extends BaseSource {
   protected $source;
 
   /**
-   * More specifically typed override. uncomment when developing.
-   * @return Mage_Sales_Model_Order|Mage_Sales_Model_Order_Creditmemo
-   */
-  public function getSource() {
-    return parent::getSource();
-  }
-
-  /**
    * Loads an Order source for the set id.
    */
   protected function setSourceOrder() {

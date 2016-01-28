@@ -43,6 +43,7 @@ abstract class Creator {
   const LineType_Discount = 'discount';
   const LineType_Voucher = 'voucher';
   const LineType_Other = 'other';
+  const LineType_Corrector = 'corrector';
 
   /** @var \Siel\Acumulus\Shop\Config */
   protected $config;
@@ -310,9 +311,11 @@ abstract class Creator {
    *
    * Additional keys (not recognised by the API but used by the Completor or
    * for support and debugging purposes):
-   * - meta-invoiceamount: the total invoice amount excluding VAT.
-   * - meta-invoiceamountinc: the total invoice amount including VAT.
-   * - meta-invoicevatamount: the total vat amount for the invoice.
+   * - meta-invoice-amount: the total invoice amount excluding VAT.
+   * - meta-invoice-amountinc: the total invoice amount including VAT.
+   * - meta-invoice-vatamount: the total vat amount for the invoice.
+   * - meta-lines-amount: the total invoice amount excluding VAT.
+   * - meta-lines-vatamount: the total vat amount for the invoice.
    *
    * Extending classes should normally not have to override this method, but
    * should instead implement getInvoiceNumber(), getInvoiceDate(),
@@ -428,7 +431,7 @@ abstract class Creator {
    * This default implementation returns something like "Order 123".
    *
    * @return string
-   *   Description ofr this invoice
+   *   Description of this invoice
    */
   protected function getDescription() {
     return ucfirst($this->t($this->invoiceSource->getType())) . ' ' . $this->invoiceSource->getReference();
@@ -445,9 +448,10 @@ abstract class Creator {
    *
    * @return array
    *   An array with the following possible keys:
-   *   - meta-invoiceamount: the total invoice amount excluding VAT.
-   *   - meta-invoiceamountinc: the total invoice amount including VAT.
-   *   - meta-invoicevatamount: the total vat amount for the invoice.
+   *   - meta-invoice-amount: the total invoice amount excluding VAT.
+   *   - meta-invoice-amountinc: the total invoice amount including VAT.
+   *   - meta-invoice-vatamount: the total vat amount for the invoice.
+   *   - meta-invoice-vat: a vat breakdown per vat rate.
    */
   protected function getInvoiceTotals() {
     return array();
@@ -482,9 +486,9 @@ abstract class Creator {
    *     precision of the numbers used to calculate the vat rate.
    * - meta-strategy-split: boolean that indicates if this line may be split
    *     into multiple lines to divide vat.
-   * - (*)meta-lineprice: the total price for this line excluding VAT.
-   * - (*)meta-linepriceinc: the total price for this line including VAT.
-   * - meta-linevatamount: the amount of VAT for the whole line.
+   * - meta-lineprice: the total price for this line excluding VAT.
+   * - meta-linepriceinc: the total price for this line including VAT.
+   * - meta-line-vatamount: the amount of VAT for the whole line.
    * - meta-line-type: the type of line (order, shipping, discount, etc.)
    * (*) = these are not yet used.
    *
@@ -795,7 +799,7 @@ abstract class Creator {
    *   Array with keys vatrate, meta-vatrate-min, meta-vatrate-max, and
    *   meta-vatrate-source.
    */
-  protected function getVatRangeTags($numerator, $denominator, $precisionNumerator = 0.01, $precisionDenominator = 0.01) {
+  public static function getVatRangeTags($numerator, $denominator, $precisionNumerator = 0.01, $precisionDenominator = 0.01) {
     if (Number::isZero($denominator, 0.0001)) {
       return array(
         'vatrate' => NULL,
@@ -832,14 +836,14 @@ abstract class Creator {
   protected function getLinesTotal(array $lines) {
     $linesAmount = 0.0;
     foreach ($lines as $line) {
-      if (isset($line['meta-linepriceinc'])) {
-        $linesAmount += $line['meta-linepriceinc'];
+      if (isset($line['meta-line-priceinc'])) {
+        $linesAmount += $line['meta-line-priceinc'];
       }
       else if (isset($line['unitpriceinc'])) {
         $linesAmount += $line['quantity'] * $line['unitpriceinc'];
       }
       else /* if (isset($line['unitprice']) && isset($line['vatrate'])) */ {
-        $linesAmount += $line['quantity'] * $line['unitprice'] * ((100 + $line['vatrate']) / 100);
+        $linesAmount += $line['quantity'] * $line['unitprice'] * ((100.0 + $line['vatrate']) / 100.0);
       }
     }
     return $linesAmount;

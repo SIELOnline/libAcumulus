@@ -164,8 +164,8 @@ class Creator extends BaseCreator {
   /**
    * {@inheritdoc}
    *
-   * This override provides the values meta-invoiceamountinc and
-   * meta-invoiceamount.
+   * This override provides the values meta-invoice-amountinc and
+   * meta-invoice-amount.
    */
   protected function getInvoiceTotals() {
     $sign = $this->getSign();
@@ -189,8 +189,8 @@ class Creator extends BaseCreator {
     }
 
     return array(
-      'meta-invoiceamountinc' => $sign * $amountInc,
-      'meta-invoiceamount' => $sign * $amount,
+      'meta-invoice-amountinc' => $sign * $amountInc,
+      'meta-invoice-amount' => $sign * $amount,
     );
   }
 
@@ -313,15 +313,15 @@ class Creator extends BaseCreator {
       // Unit price is without VAT, so use product_price, not product_price_wt.
       $result['unitprice'] = $sign * $item['unit_price_tax_excl'];
       $result['unitpriceinc'] = $sign * $item['unit_price_tax_incl'];
-      $result['meta-lineprice'] = $sign * $item['total_price_tax_excl'];
-      $result['meta-linepriceinc'] = $sign * $item['total_price_tax_incl'];
+      $result['meta-line-price'] = $sign * $item['total_price_tax_excl'];
+      $result['meta-line-priceinc'] = $sign * $item['total_price_tax_incl'];
     }
     $result['quantity'] = $item['product_quantity'];
     // These 3 fields are only defined for orders and were not filled in or
     // before PS1.6.1.1. So, we have to check if the fields are available.
     if (isset($item['rate'])) {
       $result['vatamount'] = $item['unit_amount'];
-      $result['meta-linevatamount'] = $item['total_amount'];
+      $result['meta-line-vatamount'] = $item['total_amount'];
       $result['vatrate'] = $item['rate'];
       $result['meta-vatrate-source'] = Creator::VatRateSource_Exact;
     }
@@ -426,8 +426,8 @@ class Creator extends BaseCreator {
       'quantity' => 1,
       // If no match is found, this line may be split.
       'meta-strategy-split' => TRUE,
-      'meta-lineprice' => $discountEx,
-      'meta-linepriceinc' => $discountInc,
+      'meta-line-price' => $discountEx,
+      'meta-line-priceinc' => $discountInc,
       // Assuming that the fixed discount amount was entered:
       // - including VAT, the precision would be 0.01, 0.01.
       // - excluding VAT, the precision would be 0.01, 0

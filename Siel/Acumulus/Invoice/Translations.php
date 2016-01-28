@@ -29,6 +29,8 @@ class Translations extends TranslationCollection {
     'fee' => 'Behandelkosten',
     'refund' => 'Terugbetaling',
     'refund_adjustment' => 'Aanpassing teruggaafbedrag',
+    'fee_adjustment' => 'Kosten (soort onbekend)',
+    'discount_adjustment' => 'Handmatige korting',
 
     'message_warning_no_vat' => 'De factuur bevat geen BTW en er kan niet bepaald worden welk BTW-type van toepassing is. De factuur is als concept opgeslagen. Corrigeer de factuur in Acumulus en controleer uw BTW instellingen.',
     'message_warning_no_vattype' => 'Door een fout in uw instellingen of BTW tarieven, kan het BTW-type van de factuur niet bepaald worden. De factuur is als concept opgeslagen. Corrigeer of completeer de factuur in Acumulus.',
@@ -56,6 +58,8 @@ class Translations extends TranslationCollection {
     'fee' => 'Order treatment costs',
     'refund' => 'Refund',
     'refund_adjustment' => 'Refund adjustment',
+    'fee_adjustment' => 'Fee (unknown type)',
+    'discount_adjustment' => 'Manual discount',
 
     'message_warning_no_vat' => 'The invoice has no VAT and it is not possible to determine the VAT type. The invoice has been saved as concept. Correct the invoice in acumulus and check your VAT settings.',
     'message_warning_no_vattype' => 'Due to an error in your settings, we cannot determine the VAT type for the invoice. The invoice has been saved as concept. Correct or complete the invoice in Acumulus.',

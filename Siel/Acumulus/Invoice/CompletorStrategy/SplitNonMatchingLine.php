@@ -88,14 +88,14 @@ class SplitNonMatchingLine extends CompletorStrategyBase {
    * @return bool
    */
   protected function splitNonMatchingLine(array $line) {
-    list($lowAmount, $highAmount) = $this->splitAmountOver2VatRates($line['meta-lineprice'],
-      $line['meta-linepriceinc'] - $line['meta-lineprice'],
+    list($lowAmount, $highAmount) = $this->splitAmountOver2VatRates($line['meta-line-price'],
+      $line['meta-line-priceinc'] - $line['meta-line-price'],
       $this->minVatRate['vatrate'] / 100.0,
       $this->maxVatRate['vatrate'] / 100.0);
 
     // Dividing was possible if both amounts have the same sign.
-    if (($highAmount < -0.005 && $lowAmount < -0.005 && $line['meta-lineprice'] < -0.005)
-      || ($highAmount > 0.005 && $lowAmount > 0.005 && $line['meta-lineprice'] > 0.005)
+    if (($highAmount < -0.005 && $lowAmount < -0.005 && $line['meta-line-price'] < -0.005)
+      || ($highAmount > 0.005 && $lowAmount > 0.005 && $line['meta-line-price'] > 0.005)
     ) {
       $splitLine = $line;
       $splitLine['product'] .= sprintf(' (%s%% %s)', $this->maxVatRate['vatrate'], $this->t('vat'));

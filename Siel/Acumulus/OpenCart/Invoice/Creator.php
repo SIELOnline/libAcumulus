@@ -120,21 +120,21 @@ class Creator extends BaseCreator {
   /**
    * {@inheritdoc}
    *
-   * This override provides the values meta-invoiceamountinc,
-   * meta-invoicevatamount and a vat breakdown in meta-invoicevat.
+   * This override provides the values meta-invoice-amountinc,
+   * meta-invoice-vatamount and a vat breakdown in meta-invoice-vat.
    */
   protected function getInvoiceTotals() {
     $result = array(
-      'meta-invoiceamountinc' => $this->order['total'],
-      'meta-invoicevatamount' => 0.0,
-      'meta-invoicevat' => array(),
+      'meta-invoice-amountinc' => $this->order['total'],
+      'meta-invoice-vatamount' => 0.0,
+      'meta-invoice-vat' => array(),
     );
 
     $orderTotals = $this->getOrderTotals();
     foreach ($orderTotals as $totalLine) {
       if ($totalLine['code'] === 'tax') {
-        $result['meta-invoicevat'][] = $totalLine['title'] . ': '. $totalLine['value'];
-        $result['meta-invoicevatamount'] += $totalLine['value'];
+        $result['meta-invoice-vat'][] = $totalLine['title'] . ': '. $totalLine['value'];
+        $result['meta-invoice-vatamount'] += $totalLine['value'];
       }
     }
     return $result;

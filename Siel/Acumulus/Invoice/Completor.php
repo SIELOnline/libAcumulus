@@ -112,6 +112,7 @@ class Completor {
    * specific data.
    */
   protected function completeInvoice() {
+    $this->addMissingAmountLine();
     $this->fictitiousClient();
     $this->validateEmail();
   }
@@ -122,6 +123,108 @@ class Completor {
    */
   protected function completeInvoiceAfterLineCompletion() {
     $this->removeEmptyShipping();
+  }
+
+  /**
+   * Adds an invoice line if the total amount (meta-invoice-amount) is not
+   * matching the total amount of the lines.
+   *
+   * This can happen if we missed a fee (e.g. stored in custom fields) or manual
+   * adjustment
+   */
+  protected function addMissingAmountLine() {
+    $this->addInvoiceLinesTotals();
+    $amount = !empty($this->invoice['customer']['invoice']['meta-invoice-amount'])
+      ? $this->invoice['customer']['invoice']['meta-invoice-amount']
+      : $this->invoice['customer']['invoice']['meta-invoice-amountinc'] - $this->invoice['customer']['invoice']['meta-invoice-vatamount'];
+    $vatAmount = !empty($this->invoice['customer']['invoice']['meta-invoice-vatamount'])
+      ? $this->invoice['customer']['invoice']['meta-invoice-vatamount']
+      : $this->invoice['customer']['invoice']['meta-invoice-amountinc'] - $amount;
+    $missingAmount = $amount - $this->invoice['customer']['invoice']['meta-lines-amount'];
+    if (!Number::isZero($missingAmount, 0.05)) {
+      $missingVatAmount = $vatAmount - $this->invoice['customer']['invoice']['meta-lines-vatamount'];
+      if ($this->source->getType() === Source::CreditNote) {
+        $product = $this->t('refund_adjustment');
+      }
+      else if ($missingAmount < 0.0) {
+        $product = $this->t('discount_adjustment');
+      }
+      else {
+        $product = $this->t('fee_adjustment');
+      }
+      $countLines = count($this->invoice['customer']['invoice']['line']);
+      $line = array(
+        'product' => $product,
+        'quantity' => 1,
+        'unitprice' => $missingAmount,
+        'vatamount' => $missingVatAmount,
+      ) + Creator::getVatRangeTags($missingVatAmount, $missingAmount, $countLines * 0.02, $countLines * 0.02)
+        + array(
+        'meta-line-type' => Creator::LineType_Corrector,
+      );
+      $this->invoice['customer']['invoice']['line'][] = $line;
+    }
+  }
+
+  /**
+   * Calculates the total amount and vat amount for the invoice lines and adds
+   * these to the fields meta-lines-amount and meta-lines-vatamount.
+   */
+  protected function addInvoiceLinesTotals() {
+    $useDiscountVat = FALSE;
+    $linesAmount = 0.0;
+    $linesVatAmount = 0.0;
+    $discountVatAmount = 0.0;
+    foreach ($this->invoice['customer']['invoice']['line'] as $line) {
+      if (isset($line['unitprice'])) {
+        $linesAmount += $line['quantity'] * $line['unitprice'];
+      }
+      else if (isset($line['meta-line-price'])) {
+        $linesAmount += $line['meta-line-price'];
+      }
+      else if (isset($line['unitpriceinc']) && isset($line['vatamount'])) {
+        $linesAmount += $line['quantity'] * ($line['unitpriceinc'] - $line['vatamount']);
+      }
+      else if ($line['meta-line-type'] === Creator::LineType_Discount) {
+        // We are adding a vat inclusive price: correct later with the total of
+        // the meta-line-discount-vatamount values.
+        $linesAmount += $line['quantity'] * $line['unitpriceinc'];
+        $useDiscountVat = TRUE;
+      }
+
+      if (isset($line['meta-line-vatamount'])) {
+        $linesVatAmount += $line['meta-line-vatamount'];
+      }
+      else if (isset($line['vatamount'])) {
+        $linesVatAmount += $line['quantity'] * $line['vatamount'];
+      }
+      else if (isset($line['unitprice']) && isset($line['vatrate'])) {
+        $linesVatAmount += $line['quantity'] * $line['unitprice'] * ($line['vatrate'] / 100);
+      }
+      else {
+        // We are missing the vat amount on this line but it should equal the
+        // meta-line-discount-vatamount values we are also totalling. Correct
+        // later.
+      }
+
+      // On Magento we need the discount tax amounts on the separate lines to
+      // correct the totals as at this point the discount line will not have
+      // the unitprice set nor the vatamount/vatrate.
+      if (isset($line['meta-line-discount-vatamount'])) {
+        // We do use meta-line-discount-vatamount here as vatrate may still be
+        // equally imprecise at this point.
+        $discountVatAmount += $line['meta-line-discount-vatamount'];
+      }
+    }
+
+    if ($useDiscountVat) {
+      // For a (Magento) discount line we have added the inc price: correct with
+      // collected discount taxes on other lines
+      $linesAmount -= $discountVatAmount;
+      $linesVatAmount += $discountVatAmount;
+    }
+    $this->invoice['customer']['invoice']['meta-lines-amount'] = $linesAmount;
+    $this->invoice['customer']['invoice']['meta-lines-vatamount'] = $linesVatAmount;
   }
 
   /**

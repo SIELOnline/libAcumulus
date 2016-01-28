@@ -44,7 +44,7 @@ use Siel\Acumulus\Web\Service;
  *     the line being split into multiple lines.
  * - (*)meta-lineprice: the total price for this line excluding VAT.
  * - (*)meta-linepriceinc: the total price for this line including VAT.
- * - meta-linevatamount: the amount of VAT for the whole line.
+ * - meta-line-vatamount: the amount of VAT for the whole line.
  * - meta-line-type: the type of line (order, shipping, discount, etc.)
  * (*) = these are not yet used.
  *

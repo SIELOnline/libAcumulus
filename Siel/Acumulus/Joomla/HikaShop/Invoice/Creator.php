@@ -154,8 +154,8 @@ class Creator extends BaseCreator {
   /**
    * {@inheritdoc}
    *
-   * This override provides the values meta-invoiceamountinc and
-   * meta-invoicevatamount as they may be needed by the Completor.
+   * This override provides the values meta-invoice-amountinc and
+   * meta-invoice-vatamount as they may be needed by the Completor.
    */
   protected function getInvoiceTotals() {
     $vatAmount = 0.0;
@@ -166,8 +166,8 @@ class Creator extends BaseCreator {
       }
     }
     return array(
-      'meta-invoiceamountinc' => $this->order->order_full_price,
-      'meta-invoicevatamount' => $vatAmount,
+      'meta-invoice-amountinc' => $this->order->order_full_price,
+      'meta-invoice-vatamount' => $vatAmount,
     );
   }
 

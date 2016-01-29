@@ -296,7 +296,7 @@ class Completor {
     if ($invoiceSettings['removeEmptyShipping']) {
       $this->invoice['customer']['invoice']['line'] = array_filter($this->invoice['customer']['invoice']['line'],
         function ($line) {
-          return $line['meta-line-type'] !== Creator::LineType_Shipping || !Number::isZero($line['unitpice']);
+          return $line['meta-line-type'] !== Creator::LineType_Shipping || !Number::isZero($line['unitprice']);
         });
     }
   }

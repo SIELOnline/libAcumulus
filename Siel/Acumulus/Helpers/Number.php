@@ -59,7 +59,7 @@ class Number {
    *   specified maximum difference.
    */
   static public function floatsAreEqual($f1, $f2, $maxDiff = 0.005) {
-    return abs($f2 - $f1) < $maxDiff;
+    return abs((float) $f2 - (float) $f1) < $maxDiff;
   }
 
   /**

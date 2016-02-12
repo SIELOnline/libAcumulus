@@ -254,7 +254,6 @@ class Creator extends BaseCreator {
     if (!Number::isZero($item->getDiscountAmount())) {
       // Store discount on this item to be able to get correct discount lines.
       $result['meta-line-discount-amountinc'] = -$item->getDiscountAmount();
-      $result['meta-line-discount-vatamount'] = -$item->getDiscountAmount() / (100.0 + $vatRate) * $vatRate;
     }
 
     // Also add child lines for composed products, a.o. to be able to print a
@@ -370,7 +369,6 @@ class Creator extends BaseCreator {
     if (!Number::isZero($item->getDiscountAmount())) {
       // Credit note: discounts are cancelled, thus amount is positive.
       $result['meta-line-discount-amountinc'] = $item->getDiscountAmount();
-      $result['meta-line-discount-vatamount'] = $item->getDiscountAmount() / (100.0 + $result['vatrate']) * $result['vatrate'];
     }
 
     return $result;
@@ -415,15 +413,13 @@ class Creator extends BaseCreator {
       // getShippingDiscountAmount() only exists on Orders.
       if ($this->invoiceSource->getType() === Source::Order && !Number::isZero($magentoSource->getShippingDiscountAmount())) {
         $result['meta-line-discount-amountinc'] = -$sign * $magentoSource->getShippingDiscountAmount();
-        $result['meta-line-discount-vatamount'] = -$sign * $magentoSource->getShippingDiscountAmount() / (100.0 + $result['vatrate']) * $result['vatrate'];
       }
       else if ($this->invoiceSource->getType() === Source::CreditNote && !Number::floatsAreEqual($shippingVat, $magentoSource->getShippingTaxAmount(), 0.02)) {
-        // On credit notes, the advertised shipping tax amount ...
+        // On credit notes, the shipping discount amount is not stored but can
+        // be deduced via the shipping discount tax amount and the shipping vat
+        // rate. To get a more precise 'meta-line-discount-amountinc', we
+        // compute that in the completor when we have corrected the vatrate.
         $result['meta-line-discount-vatamount'] = $sign * ($shippingVat - $sign * $magentoSource->getShippingTaxAmount());
-        $range = Number::getDivisionRange($result['meta-line-discount-vatamount'] * (100.0 + $result['vatrate']), $result['vatrate'], 0.03 * (100 + $result['meta-vatrate-max']), $result['meta-vatrate-max'] - $result['meta-vatrate-min']);
-        $result['meta-line-discount-amountinc'] = $range['calculated'];
-        $result['meta-line-discount-amountinc-min'] = $range['min'];
-        $result['meta-line-discount-amountinc-max'] = $range['max'];
       }
     }
 

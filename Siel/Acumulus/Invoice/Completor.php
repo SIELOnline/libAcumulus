@@ -367,7 +367,9 @@ class Completor {
   protected function completeLineMetaData() {
     $invoiceLines = &$this->invoice['customer']['invoice']['line'];
     foreach($invoiceLines as &$line) {
-      $calculatedFields = isset($line['meta-calculated-fields']) ? array($line['meta-calculated-fields']) : array();
+      $calculatedFields = isset($line['meta-calculated-fields'])
+        ? (is_array($line['meta-calculated-fields']) ? $line['meta-calculated-fields'] : explode(',', $line['meta-calculated-fields']))
+        : array();
 
       if (in_array($line['meta-vatrate-source'], static::CorrectVatRateSources)) {
         if (!isset($line['unitprice'])) {
@@ -399,7 +401,6 @@ class Completor {
     $linesAmount = 0.0;
     $linesAmountInc = 0.0;
     $linesVatAmount = 0.0;
-    $discountVatAmount = 0.0;
     $this->incompleteValues = array();
 
     $invoiceLines = $this->invoice['customer']['invoice']['line'];
@@ -433,42 +434,11 @@ class Completor {
       else {
         $this->incompleteValues['meta-lines-vatamount'] = 'meta-lines-vatamount';
       }
-
-//      if (isset($line['unitprice'])) {
-//        $linesAmount += $line['quantity'] * $line['unitprice'];
-//      }
-//      else if (isset($line['meta-line-price'])) {
-//        $linesAmount += $line['meta-line-price'];
-//      }
-//      else if (isset($line['unitpriceinc']) && isset($line['vatamount'])) {
-//        $linesAmount += $line['quantity'] * ($line['unitpriceinc'] - $line['vatamount']);
-//      }
-//      else if ($line['meta-line-type'] === Creator::LineType_Discount) {
-//        // We are adding a vat inclusive price: correct later with the total of
-//        // the meta-line-discount-vatamount values.
-//        $linesAmount += $line['quantity'] * $line['unitpriceinc'];
-//      }
-
-        // Magento: We are missing the vat amount on this line but it should
-        // equal the meta-line-discount-vatamount values we are also totalling.
-        // Correct later.
-
-      // Magento: we need the discount tax amounts on the separate lines to
-      // correct the totals as at this point the discount line will not have
-      // the unitprice set nor the vatamount/vatrate.
-      if (isset($line['meta-line-discount-vatamount'])) {
-        // We do use meta-line-discount-vatamount here as vatrate may still be
-        // equally imprecise at this point.
-        $discountVatAmount += $line['meta-line-discount-vatamount'];
-      }
     }
 
     $this->invoice['customer']['invoice']['meta-lines-amount'] = $linesAmount;
     $this->invoice['customer']['invoice']['meta-lines-amountinc'] = $linesAmountInc;
     $this->invoice['customer']['invoice']['meta-lines-vatamount'] = $linesVatAmount;
-    if ($discountVatAmount > 0) {
-      $this->invoice['customer']['invoice']['meta-lines-discount-vatamount'] = $discountVatAmount;
-    }
     if (!empty($this->incompleteValues)) {
       sort($this->incompleteValues);
       $this->invoice['customer']['invoice']['meta-lines-incomplete'] = implode(',', $this->incompleteValues);

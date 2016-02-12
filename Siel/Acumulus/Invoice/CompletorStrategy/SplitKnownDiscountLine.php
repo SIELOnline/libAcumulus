@@ -4,14 +4,12 @@ namespace Siel\Acumulus\Invoice\CompletorStrategy;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Completor;
 use Siel\Acumulus\Invoice\CompletorStrategyBase;
-use Siel\Acumulus\Invoice\Creator;
-use Siel\Acumulus\Invoice\Source;
 
 /**
  * Class SplitKnownDiscountLine implements a vat completor strategy by using the
- * 'meta-line-discount-amountinc' tag to split a discount line over several lines
- * with different vat rates as it may be considered as the total discount over
- * multiple products that may have different vat rates.
+ * 'meta-line-discount-amountinc' tags to split a discount line over several
+ * lines with different vat rates as it may be considered as the total discount
+ * over multiple products that may have different vat rates.
  *
  * Preconditions:
  * - lines2Complete contains 1 line that may be split.
@@ -71,12 +69,8 @@ class SplitKnownDiscountLine extends CompletorStrategyBase {
     $this->knownDiscountAmountInc = 0.0;
     $this->knownDiscountVatAmount = 0.0;
     foreach ($this->invoice['customer']['invoice']['line'] as $line) {
-      if (isset($line['meta-line-discount-amountinc'])
-        && in_array($line['meta-vatrate-source'], array(Creator::VatRateSource_Exact, Creator::VatRateSource_Exact0, Completor::VatRateSource_Calculated_Corrected))) {
+      if (isset($line['meta-line-discount-amountinc']) && in_array($line['meta-vatrate-source'], Completor::CorrectVatRateSources)) {
         $this->knownDiscountAmountInc += $line['meta-line-discount-amountinc'];
-        // We do not use $line['meta-line-discount-vatamount'] here as that may
-        // be imprecise because it may have been calculated before the vatrate
-        // was corrected.
         $this->knownDiscountVatAmount += $line['meta-line-discount-amountinc'] / (100.0 + $line['vatrate']) * $line['vatrate'];
         $vatRate = sprintf('%.3f', $line['vatrate']);
         if (isset($this->discountsPerVatRate[$vatRate])) {
@@ -99,26 +93,6 @@ class SplitKnownDiscountLine extends CompletorStrategyBase {
         || (isset($this->splitLine['unitpriceinc']) && Number::floatsAreEqual($this->splitLine['unitpriceinc'], $this->knownDiscountAmountInc))) {
         $result = TRUE;
       }
-      // !Magento bug!
-      // In credit memos, the DiscountAmount may differ from the summed discount
-      // amounts per line, a.o. because refunded shipping costs do not advertise
-      // any discount amount. Thus if the above comparison fails, we change the
-      // discount line by "correcting" the discount amount.
-      else if (defined('MAGENTO_ROOT') && $this->source->getType() == Source::CreditNote) {
-        $metaMagentoBug = array();
-        if (isset($this->splitLine['unitprice'])) {
-          $metaMagentoBug[] = sprintf('DiscountAmountEx = %f', $this->splitLine['unitprice']);
-          $this->splitLine['unitprice'] = $this->knownDiscountAmountInc - $this->knownDiscountVatAmount;
-          $result = TRUE;
-        }
-        if (isset($this->splitLine['unitpriceinc'])) {
-          $metaMagentoBug[] = sprintf('DiscountAmountInc = %f', $this->splitLine['unitpriceinc']);
-          $this->splitLine['unitpriceinc'] = $this->knownDiscountAmountInc;
-          $result = TRUE;
-        }
-        $this->splitLine['meta-magento-bug'] = implode(',', $metaMagentoBug);
-      }
-      // !End of Magento bug!
     }
     return $result;
   }

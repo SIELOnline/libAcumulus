@@ -2,7 +2,7 @@
 namespace Siel\Acumulus\Invoice\CompletorStrategy;
 
 use Siel\Acumulus\Helpers\Number;
-use Siel\Acumulus\Invoice\CompletorInvoiceLines;
+use Siel\Acumulus\Invoice\Completor;
 use Siel\Acumulus\Invoice\CompletorStrategyBase;
 use Siel\Acumulus\Invoice\Creator;
 use Siel\Acumulus\Invoice\Source;
@@ -72,7 +72,7 @@ class SplitKnownDiscountLine extends CompletorStrategyBase {
     $this->knownDiscountVatAmount = 0.0;
     foreach ($this->invoice['customer']['invoice']['line'] as $line) {
       if (isset($line['meta-line-discount-amountinc'])
-        && in_array($line['meta-vatrate-source'], array(Creator::VatRateSource_Exact, Creator::VatRateSource_Exact0, CompletorInvoiceLines::VatRateSource_Calculated_Corrected))) {
+        && in_array($line['meta-vatrate-source'], array(Creator::VatRateSource_Exact, Creator::VatRateSource_Exact0, Completor::VatRateSource_Calculated_Corrected))) {
         $this->knownDiscountAmountInc += $line['meta-line-discount-amountinc'];
         // We do not use $line['meta-line-discount-vatamount'] here as that may
         // be imprecise because it may have been calculated before the vatrate

@@ -425,7 +425,7 @@ class Completor {
       }
 
       if (isset($line['meta-line-vatamount'])) {
-        $linesAmountInc += $line['meta-line-vatamount'];
+        $linesVatAmount += $line['meta-line-vatamount'];
       }
       else if (isset($line['vatamount'])) {
         $linesVatAmount += $line['quantity'] * $line['vatamount'];
@@ -585,10 +585,10 @@ class Completor {
           $invoice['meta-missing-amount'][] = "Ex: $missingAmount";
         }
         if (isset($missingAmountInc)) {
-          $invoice['meta-missing-amount'][] = "Ex: $missingAmountInc";
+          $invoice['meta-missing-amount'][] = "Inc: $missingAmountInc";
         }
         if (isset($missingVatAmount)) {
-          $invoice['meta-missing-amount'][] = "Ex: $missingVatAmount";
+          $invoice['meta-missing-amount'][] = "VAT: $missingVatAmount";
         }
         $invoice['meta-missing-amount'] = implode(', ', $invoice['meta-missing-amount']);
       }

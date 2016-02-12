@@ -119,6 +119,7 @@ abstract class Creator {
     $this->addCustomerDefaults();
     $this->invoice['customer']['invoice'] = $this->getInvoice();
     $this->addInvoiceDefaults();
+    $this->addInvoiceTotals();
     $this->invoice['customer']['invoice']['line'] = $this->getInvoiceLines();
     $this->addEmailAsPdf();
     return $this->invoice;
@@ -347,8 +348,6 @@ abstract class Creator {
 
     $result['description'] = $this->getDescription();
 
-    $result = array_merge($result, $this->getInvoiceTotals());
-
     return $result;
   }
 
@@ -358,18 +357,19 @@ abstract class Creator {
    */
   protected function addInvoiceDefaults() {
     $invoiceSettings = $this->config->getInvoiceSettings();
-    $this->addDefault($this->invoice['customer']['invoice'], 'concept', ConfigInterface::Concept_No);
-    $this->addDefault($this->invoice['customer']['invoice'], 'accountnumber', $invoiceSettings['defaultAccountNumber']);
-    $this->addDefault($this->invoice['customer']['invoice'], 'costcenter', $invoiceSettings['defaultCostCenter']);
-    if (isset($this->invoice['customer']['invoice']['paymentstatus'])
-      && $this->invoice['customer']['invoice']['paymentstatus'] == ConfigInterface::PaymentStatus_Paid
+    $invoice = &$this->invoice['customer']['invoice'];
+    $this->addDefault($invoice, 'concept', ConfigInterface::Concept_No);
+    $this->addDefault($invoice, 'accountnumber', $invoiceSettings['defaultAccountNumber']);
+    $this->addDefault($invoice, 'costcenter', $invoiceSettings['defaultCostCenter']);
+    if (isset($invoice['paymentstatus'])
+      && $invoice['paymentstatus'] == ConfigInterface::PaymentStatus_Paid
       // 0 = empty = use same invoice template as for non paid invoices
       && $invoiceSettings['defaultInvoicePaidTemplate'] != 0
     ) {
-      $this->addDefault($this->invoice['customer']['invoice'], 'template', $invoiceSettings['defaultInvoicePaidTemplate']);
+      $this->addDefault($invoice, 'template', $invoiceSettings['defaultInvoicePaidTemplate']);
     }
     else {
-      $this->addDefault($this->invoice['customer']['invoice'], 'template', $invoiceSettings['defaultInvoiceTemplate']);
+      $this->addDefault($invoice, 'template', $invoiceSettings['defaultInvoiceTemplate']);
     }
   }
 
@@ -438,6 +438,14 @@ abstract class Creator {
   }
 
   /**
+   * Adds metadata about invoice totals to the invoice.
+   */
+  protected function addInvoiceTotals() {
+    $this->invoice['customer']['invoice'] += $this->getInvoiceTotals();
+    $this->completeInvoiceTotals();
+  }
+
+  /**
    * Returns an array with the totals fields.
    *
    * All total fields are optional but may be used or even expected by the
@@ -453,8 +461,28 @@ abstract class Creator {
    *   - meta-invoice-vatamount: the total vat amount for the invoice.
    *   - meta-invoice-vat: a vat breakdown per vat rate.
    */
-  protected function getInvoiceTotals() {
-    return array();
+  abstract protected function getInvoiceTotals();
+
+  /**
+   * Completes the set of invoice totals as set by getInvoiceTotals.
+   *
+   * Most shops only provide 2 out of these 3 in their data, so we calculate the
+   * 3rd.
+   */
+  protected function completeInvoiceTotals() {
+    $invoice = &$this->invoice['customer']['invoice'];
+    if (!isset($invoice['meta-invoice-amount'])) {
+      $invoice['meta-invoice-amount'] = $invoice['meta-invoice-amountinc'] - $invoice['meta-invoice-vatamount'];
+      $invoice['meta-invoice-calculated'] = 'meta-invoice-amount';
+    }
+    if (!isset($invoice['meta-invoice-amountinc'])) {
+      $invoice['meta-invoice-amountinc'] = $invoice['meta-invoice-amount'] + $invoice['meta-invoice-vatamount'];
+      $invoice['meta-invoice-calculated'] = 'meta-invoice-amountinc';
+    }
+    if (!isset($invoice['meta-invoice-vatamount'])) {
+      $invoice['meta-invoice-vatamount'] = $invoice['meta-invoice-amountinc'] - $invoice['meta-invoice-amount'];
+      $invoice['meta-invoice-calculated'] = 'meta-invoice-vatamount';
+    }
   }
 
   /**
@@ -486,8 +514,8 @@ abstract class Creator {
    *     precision of the numbers used to calculate the vat rate.
    * - meta-strategy-split: boolean that indicates if this line may be split
    *     into multiple lines to divide vat.
-   * - meta-lineprice: the total price for this line excluding VAT.
-   * - meta-linepriceinc: the total price for this line including VAT.
+   * - meta-line-price: the total price for this line excluding VAT.
+   * - meta-line-priceinc: the total price for this line including VAT.
    * - meta-line-vatamount: the amount of VAT for the whole line.
    * - meta-line-type: the type of line (order, shipping, discount, etc.)
    * (*) = these are not yet used.
@@ -509,8 +537,8 @@ abstract class Creator {
    * - If meta-vatrate-source = strategy: vat rate should be null and either
    *   unitprice or unitpriceinc should be filled wit a non-0 amount (typically
    *   a negative amount as this is mostly used for spreading discounts over tax
-   *   rates). Moreover, on the invoice level meta-invoiceamount and
-   *   meta-invoicevatamount should be filled in. The completor will use a tax
+   *   rates). Moreover, on the invoice level meta-invoice-amount and
+   *   meta-invoice-vatamount should be filled in. The completor will use a tax
    *   divide strategy to arrive at valid values for the missing fields.
    *
    * Extending classes should normally not have to override this method, but
@@ -823,30 +851,6 @@ abstract class Creator {
         'meta-vatrate-source' => static::VatRateSource_Calculated,
       );
     }
-  }
-
-  /**
-   * Returns the total amount for the given invoice lines.
-   *
-   * @param array[] $lines
-   *   An array of invoice lines
-   *
-   * @return float
-   */
-  protected function getLinesTotal(array $lines) {
-    $linesAmount = 0.0;
-    foreach ($lines as $line) {
-      if (isset($line['meta-line-priceinc'])) {
-        $linesAmount += $line['meta-line-priceinc'];
-      }
-      else if (isset($line['unitpriceinc'])) {
-        $linesAmount += $line['quantity'] * $line['unitpriceinc'];
-      }
-      else /* if (isset($line['unitprice']) && isset($line['vatrate'])) */ {
-        $linesAmount += $line['quantity'] * $line['unitprice'] * ((100.0 + $line['vatrate']) / 100.0);
-      }
-    }
-    return $linesAmount;
   }
 
   /**

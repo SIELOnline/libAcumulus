@@ -16,7 +16,7 @@ class Creator extends BaseCreator {
   protected $order;
 
   /** @var array[] List of order total records. */
-  protected $orderTotals;
+  protected $orderTotalLines;
 
   /**
    * {@inheritdoc}
@@ -29,7 +29,7 @@ class Creator extends BaseCreator {
 
     // Load some models and properties we are going to use.
     Registry::getInstance()->load->model('catalog/product');
-    $this->orderTotals = NULL;
+    $this->orderTotalLines = NULL;
 
     switch ($this->invoiceSource->getType()) {
       case Source::Order:
@@ -130,7 +130,7 @@ class Creator extends BaseCreator {
       'meta-invoice-vat' => array(),
     );
 
-    $orderTotals = $this->getOrderTotals();
+    $orderTotals = $this->getOrderTotalLines();
     foreach ($orderTotals as $totalLine) {
       if ($totalLine['code'] === 'tax') {
         $result['meta-invoice-vat'][] = $totalLine['title'] . ': '. $totalLine['value'];
@@ -221,6 +221,7 @@ class Creator extends BaseCreator {
           $optionsLines[] = array(
               'product' => " - $optionsText",
               'unitprice' => 0,
+              // @todo: is an option/variant/composant always quantity 1?
               'quantity' => 1,
             ) + $vatInfo;
         }
@@ -246,7 +247,7 @@ class Creator extends BaseCreator {
   protected function getTotalLines() {
     $result = array();
 
-    $totalLines = $this->getOrderTotals();
+    $totalLines = $this->getOrderTotalLines();
     foreach ($totalLines as $totalLine) {
       switch ($totalLine['code']) {
         case 'sub_total':
@@ -295,22 +296,31 @@ class Creator extends BaseCreator {
    * @return array
    */
   protected function getTotalLine(array $line) {
-    $isCoupon = $line['code'] === 'coupun';
-    $isVoucher = $line['code'] === 'voucher';
     $result = array(
       'product' => $line['title'],
       // Let's hope that this is the value ex vat...
       'unitprice' => $line['value'],
       'quantity' => 1,
-      // A voucher is to be seen as a partial payment, thus no tax.
-      'vatrate' => $isVoucher ? -1 : NULL,
-      // Non voucher lines have tax but the amount is unknown, let a strategy
-      // repair it.
-      'meta-vatrate-source' => $isVoucher ? Creator::VatRateSource_Exact0 : Creator::VatRateSource_Strategy,
-      // Coupons may have to be split over various taxes, but shipping and other
-      // fees not.
-      'meta-strategy-split' => $isCoupon,
     );
+
+    if ($line['code'] === 'voucher') {
+      // A voucher is to be seen as a partial payment, thus no tax.
+      $result += array(
+        'vatrate' => -1,
+        'meta-vatrate-source' => Creator::VatRateSource_Exact0,
+      );
+    }
+    else {
+      // Other lines do not have a discoverable vatrate, let a strategy try to
+      // compute it.
+      $result += array(
+        'vatrate' => NULL,
+        'meta-vatrate-source' => Creator::VatRateSource_Strategy,
+        // Coupons may have to be split over various taxes, but shipping and
+        // other fees not.
+        'meta-strategy-split' => $line['code'] === 'coupun',
+      );
+    }
 
     return $result;
   }
@@ -322,12 +332,12 @@ class Creator extends BaseCreator {
    * @return mixed
    *
    */
-  protected function getOrderTotals() {
-    if (!$this->orderTotals) {
+  protected function getOrderTotalLines() {
+    if (!$this->orderTotalLines) {
       $orderModel = $this->getOrderModel();
-      $this->orderTotals = $orderModel->getOrderTotals($this->order['order_id']);
+      $this->orderTotalLines = $orderModel->getOrderTotals($this->order['order_id']);
     }
-    return $this->orderTotals;
+    return $this->orderTotalLines;
   }
 
   /**

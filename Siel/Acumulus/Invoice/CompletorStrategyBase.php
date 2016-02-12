@@ -49,16 +49,22 @@ abstract class CompletorStrategyBase {
   /** @var array[] */
   protected $vatBreakdown;
 
+  /** @var \Siel\Acumulus\Invoice\Source */
+  protected $source;
+
   /**
    * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
    * @param array $invoice
    * @param array $possibleVatTypes
    * @param array $possibleVatRates
+   * @param \Siel\Acumulus\Invoice\Source $source
    */
-  public function __construct(TranslatorInterface $translator, array $invoice, array $possibleVatTypes, array $possibleVatRates) {
+  public function __construct(TranslatorInterface $translator, array $invoice, array $possibleVatTypes, array $possibleVatRates, Source $source) {
+    $this->translator = $translator;
     $this->invoice = $invoice;
     $this->possibleVatTypes = $possibleVatTypes;
     $this->possibleVatRates = $possibleVatRates;
+    $this->source = $source;
     $this->initAmounts();
     $this->initLines2Complete();
     $this->initVatBreakdown();
@@ -114,13 +120,13 @@ abstract class CompletorStrategyBase {
    * Initializes the amount properties.
    *
    * to be able to calculate the amounts, at least 2 of the 3 meta amounts
-   * meta-invoicevatamount, meta-invoiceamountinc, or meta-invoiceamount must
+   * meta-invoice-vatamount, meta-invoice-amountinc, or meta-invoice-amount must
    * be known.
    */
   protected function initAmounts() {
     $invoicePart = &$this->invoice['customer']['invoice'];
-    $this->vatAmount = isset($invoicePart['meta-invoicevatamount']) ? $invoicePart['meta-invoicevatamount'] : $invoicePart['meta-invoiceamountinc'] - $invoicePart['meta-invoiceamount'];
-    $this->invoiceAmount = isset($invoicePart['meta-invoiceamount']) ? $invoicePart['meta-invoiceamount'] : $invoicePart['meta-invoiceamountinc'] - $invoicePart['meta-invoicevatamount'];
+    $this->vatAmount = isset($invoicePart['meta-invoice-vatamount']) ? $invoicePart['meta-invoice-vatamount'] : $invoicePart['meta-invoice-amountinc'] - $invoicePart['meta-invoice-amount'];
+    $this->invoiceAmount = isset($invoicePart['meta-invoice-amount']) ? $invoicePart['meta-invoice-amount'] : $invoicePart['meta-invoice-amountinc'] - $invoicePart['meta-invoice-vatamount'];
 
     // The vat amount to divide over the non completed lines is the total vat
     // amount of the invoice minus all known vat amounts per line.

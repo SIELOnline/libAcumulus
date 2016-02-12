@@ -186,36 +186,6 @@ class Creator extends BaseCreator {
   }
 
   /**
-   * @inheritDoc
-   *
-   * This override corrects a credit invoice if the amount does not match the
-   * sum of the lines so far. This can happen if an amount was entered manually.
-   */
-  protected function getInvoiceLines() {
-    $result = parent::getInvoiceLines();
-
-    if ($this->invoiceSource->getType() === Source::CreditNote) {
-      $amount = (float) $this->shopSource->order_total;
-      $linesAmount = $this->getLinesTotal($result);
-      if (!Number::floatsAreEqual($amount, $linesAmount)) {
-        // @todo: can we get a tax amount/rate over the manually entered refund?
-        $line = array (
-          'product' => $this->t('refund_adjustment'),
-          'quantity' => 1,
-          'unitpriceinc' => $amount - $linesAmount,
-          'unitprice' => $amount - $linesAmount,
-          'vatrate' => 0,
-          'meta-vatrate-source' => Creator::VatRateSource_Exact0,
-          'meta-line-type' => static::LineType_Manual,
-        );
-        $result[] = $line;
-      }
-    }
-
-    return $result;
-  }
-
-  /**
    * {@inheritdoc}
    */
   protected function getItemLines() {
@@ -428,17 +398,15 @@ class Creator extends BaseCreator {
     // Discounts are already applied, add a descriptive line with 0 amount.
     // The VAT rate to categorize this line under should be determined by the
     // completor.
-    $amount = 0;
-    $vatrate = NULL;
-    $metaVatrateSource = static::VatRateSource_Completor;
-
     return array(
       'itemnumber' => $coupon->code,
       'product' => $description,
-      'unitprice' => -$amount,
-      'vatrate' => $vatrate,
-      'meta-vatrate-source' => $metaVatrateSource,
+      'unitprice' => 0,
+      'unitpriceinc' => 0,
       'quantity' => 1,
+      'vatrate' => NULL,
+      'vatamount' => 0,
+      'meta-vatrate-source' => static::VatRateSource_Completor,
     );
   }
 

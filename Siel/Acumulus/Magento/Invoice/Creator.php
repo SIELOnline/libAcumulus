@@ -230,7 +230,6 @@ class Creator extends BaseCreator {
     $childLines = array();
 
     $vatRate = (float) $item->getTaxPercent();
-    $metaVatRateSource = static::VatRateSource_Exact;
     $productPriceInc = (float) $item->getPriceInclTax();
     // For higher precision of the unit price, we use the prices as entered by
     // the admin.
@@ -250,7 +249,7 @@ class Creator extends BaseCreator {
       'vatrate' => $vatRate,
       'meta-line-vatamount' => $lineVat,
       'quantity' => $item->getQtyOrdered(),
-      'meta-vatrate-source' => $metaVatRateSource,
+      'meta-vatrate-source' => static::VatRateSource_Exact,
     );
     if (!Number::isZero($item->getDiscountAmount())) {
       // Store discount on this item to be able to get correct discount lines.
@@ -365,6 +364,7 @@ class Creator extends BaseCreator {
     }
     else {
       $result += $this->getVatRangeTags($lineVat / $item->getQty(), $productPriceEx, 0.02, 0.02);
+      $result['meta-calculated-fields'] = 'vatamount';
     }
 
     if (!Number::isZero($item->getDiscountAmount())) {
@@ -392,6 +392,7 @@ class Creator extends BaseCreator {
     // - getShippingInclTax():        shipping costs incl VAT excl any discount
     // - getShippingTaxAmount():      VAT on shipping costs incl discount
     // - getShippingDiscountAmount(): discount on shipping incl VAT
+    /** @var Mage_Sales_Model_Order|Mage_Sales_Model_Order_Creditmemo $magentoSource */
     $magentoSource = $this->invoiceSource->getSource();
     if (!Number::isZero($magentoSource->getShippingAmount())) {
       // We have 2 ways of calculating the vat rate: first one is based on tax
@@ -409,10 +410,20 @@ class Creator extends BaseCreator {
           'unitprice' => $shippingEx,
           'unitpriceinc' => $shippingInc,
         ) + $this->getVatRangeTags($shippingVat, $shippingEx, 0.02, 0.01);
+      $result['meta-calculated-fields'] = 'vatamount';
 
-      if (!Number::isZero($magentoSource->getShippingDiscountAmount())) {
-        $result['meta-line-discount-amountinc'] = $sign * -$magentoSource->getShippingDiscountAmount();
-        $result['meta-line-discount-vatamount'] = $sign * -$magentoSource->getShippingDiscountAmount() / (100 + $result['vatrate']) * $result['vatrate'];
+      // getShippingDiscountAmount() only exists on Orders.
+      if ($this->invoiceSource->getType() === Source::Order && !Number::isZero($magentoSource->getShippingDiscountAmount())) {
+        $result['meta-line-discount-amountinc'] = -$sign * $magentoSource->getShippingDiscountAmount();
+        $result['meta-line-discount-vatamount'] = -$sign * $magentoSource->getShippingDiscountAmount() / (100.0 + $result['vatrate']) * $result['vatrate'];
+      }
+      else if ($this->invoiceSource->getType() === Source::CreditNote && !Number::floatsAreEqual($shippingVat, $magentoSource->getShippingTaxAmount(), 0.02)) {
+        // On credit notes, the advertised shipping tax amount ...
+        $result['meta-line-discount-vatamount'] = $sign * ($shippingVat - $sign * $magentoSource->getShippingTaxAmount());
+        $range = Number::getDivisionRange($result['meta-line-discount-vatamount'] * (100.0 + $result['vatrate']), $result['vatrate'], 0.03 * (100 + $result['meta-vatrate-max']), $result['meta-vatrate-max'] - $result['meta-vatrate-min']);
+        $result['meta-line-discount-amountinc'] = $range['calculated'];
+        $result['meta-line-discount-amountinc-min'] = $range['min'];
+        $result['meta-line-discount-amountinc-max'] = $range['max'];
       }
     }
 

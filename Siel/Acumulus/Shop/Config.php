@@ -658,6 +658,12 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
           'type' => 'bool',
           'default' => FALSE,
         ),
+        // @todo: add to UI?
+        'addMissingAmountLine' => array(
+          'group' => 'invoice',
+          'type' => 'bool',
+          'default' => TRUE,
+        ),
         // @todo: add to UI if shop does support it (PS?, WC?).
         'useMargin' => array(
           'group' => 'invoice',

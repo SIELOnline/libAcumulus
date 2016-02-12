@@ -11,8 +11,20 @@ use VmModel;
  * Allows to create arrays in the Acumulus invoice structure from a VirtueMart
  * order
  *
- * Note: the VMInvoice extension offers credit notes, but for now we do not
- *   support this.
+ * Notes:
+ * - Calculation rules used, e.g, to give a certain customer group, a discount
+ *   (fixed amount or percentage) should always have "price modifier before tax"
+ *   or "price modifier before tax per bill" for the Type of Arithmetic
+ *   Operation. Otherwise the VAT computations won't comply with Dutch
+ *   regulations.
+ * - "price modifier before tax per bill" will show normal product prices with a
+ *   separate discount line indicating the name of the discount rule.
+ * - "price modifier before tax per bill" will show discounted product prices
+ *   without a separate discount line and thus also no mention of the applied
+ *   discount. In general this option will be a bit more accurate, but IMO that
+ *   does not weigh up against the loss of information on the invoice.
+ * - The VMInvoice extension offers credit notes, but for now we do not support
+ *   this.
  */
 class Creator extends BaseCreator {
 
@@ -233,6 +245,7 @@ class Creator extends BaseCreator {
     else {
       $vatInfo = $this->getVatRangeTags($productVat, $productPriceEx, 0.0001, 0.0001);
     }
+
     $result = array(
         'itemnumber' => $item->order_item_sku,
         'product' => $item->order_item_name,
@@ -267,6 +280,7 @@ class Creator extends BaseCreator {
       else {
         $vatInfo = $this->getVatRangeTags($shippingVat, $shippingEx, 0.0001, 0.01);
       }
+
       $result = array(
           'product' => $this->t('shipping_costs'),
           'unitprice' => $shippingEx,
@@ -331,7 +345,7 @@ class Creator extends BaseCreator {
     $result = array(
       'product' => $calcRule->calc_rule_name,
       'unitprice' => NULL,
-      'unitpriceinc' => $calcRule->calc_amount,
+      'unitpriceinc' => (float) $calcRule->calc_amount,
       'vatrate' => NULL,
       'quantity' => 1,
       'meta-vatrate-source' => static::VatRateSource_Strategy,
@@ -344,20 +358,17 @@ class Creator extends BaseCreator {
   /**
    *  Returns an item line for the coupon code discount on this order.
    *
-   * The returned line will only contain a discount amount including tax.
-   * The completor will have to divide this amount over vat rates that are used
-   * in this invoice.
-   *
    * @return array
    *   An item line array.
    */
   protected function getCouponCodeDiscountLine() {
+    // @todo: standardize coupon lines: use itemnumber?, use shop specific names?, etc.
     $result = array(
-      'product' => $this->t('coupon_code') . ' ' . $this->order['details']['BT']->coupon_code,
-      'unitprice' => NULL,
-      'unitpriceinc' => $this->order['details']['BT']->coupon_discount,
-      'vatrate' => NULL,
+      'itemnumber' => $this->order['details']['BT']->coupon_code,
+      'product' => $this->t('discount'),
       'quantity' => 1,
+      'unitpriceinc' => (float) $this->order['details']['BT']->coupon_discount,
+      'vatrate' => NULL,
       'meta-vatrate-source' => static::VatRateSource_Strategy,
       'meta-strategy-split' => TRUE,
     );

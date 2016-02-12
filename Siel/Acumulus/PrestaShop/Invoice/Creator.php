@@ -25,6 +25,17 @@ use Siel\Acumulus\Invoice\Creator as BaseCreator;
  * - Fixed in 1.6.1.1: bug in partial refund, not executed the hook
  *   actionOrderSlipAdd #PSCSX-6287. So before 1.6.1.1, partial refunds will not
  *   be automatically sent to Acumulus.
+ * - Credit notes can get a correction line. They get one if the total amount
+ *   does not match the sum of the lines added so far. This can happen if an
+ *   amount was entered manually, or if discount(s) applied during the sale were
+ *   subtracted from the credit amount but we could not find which discounts
+ *   this were. However:
+ *   - amount is excl vat if not manually entered.
+ *   - amount is incl vat if manually entered (assuming administrators enter
+ *     amounts incl tax, and this is what gets listed on the credit PDF.
+ *   - shipping_cost_amount is excl vat.
+ *   So this is never going  to work in all situations!!!
+ *  @todo: So, can we get a tax amount/rate over the manually entered refund?
  */
 class Creator extends BaseCreator {
 
@@ -180,6 +191,9 @@ class Creator extends BaseCreator {
         - $this->order->total_discounts_tax_incl;
     }
     else {
+      // On credit notes, the amount ex VAT will not have been corrected for
+      // discounts that are subtracted from the refund. This will be corrected
+      // later in getDiscountLinesCreditNote().
       /** @noinspection PhpUndefinedFieldInspection */
       $amount = $this->creditSlip->total_products_tax_excl
         + $this->creditSlip->total_shipping_tax_excl;
@@ -239,46 +253,6 @@ class Creator extends BaseCreator {
   }
 
   /**
-   * @inheritDoc
-   *
-   * This override corrects a credit invoice if the amount does not match the
-   * sum of the lines so far. This can happen if an amount was entered manually,
-   * or if discount(s) applied during sale were subtracted from the credit
-   * amount but we could not find which discounts this were.
-   */
-  protected function getInvoiceLines() {
-    $result = parent::getInvoiceLines();
-
-    if ($this->invoiceSource->getType() === Source::CreditNote) {
-      // Only Credit notes can have a manual line. They get one if the total
-      // amount does not match the sum of the lines added so far.
-      // Notes:
-      // - amount is excl vat if not manually entered.
-      // - amount is incl vat if manually entered (assuming administrators enter
-      //   amounts incl tax, and this is what gets listed on the credit PDF.
-      // - shipping_cost_amount is excl vat.
-      // So this is never going  to work!!!
-      // @todo: can we get a tax amount/rate over the manually entered refund?
-      $amount = -$this->creditSlip->amount - $this->creditSlip->shipping_cost_amount;
-      $linesAmount = $this->getLinesTotal($result);
-      if (!Number::floatsAreEqual($amount, $linesAmount)) {
-        $line = array(
-          'product' => $this->t('refund_adjustment'),
-          'unitprice' => $amount - $linesAmount,
-          'unitpriceinc' => $amount - $linesAmount,
-          'quantity' => 1,
-          'vatrate' => 0,
-          'meta-vatrate-source' => Creator::VatRateSource_Exact,
-          'meta-line-type' => static::LineType_Manual,
-        );
-        $result[] = $line;
-      }
-    }
-
-    return $result;
-  }
-
-  /**
    * Returns 1 item line, both for an order or credit slip.
    *
    * @param array $item
@@ -326,7 +300,8 @@ class Creator extends BaseCreator {
       $result['meta-vatrate-source'] = Creator::VatRateSource_Exact;
     }
     else {
-      $result += $this->getVatRangeTags(-$item['unit_price_tax_incl'] + $item['unit_price_tax_excl'], -$item['unit_price_tax_excl'], 0.02);
+      $result += $this->getVatRangeTags($sign * ($item['unit_price_tax_incl'] - $item['unit_price_tax_excl']), $sign * $item['unit_price_tax_excl'], 0.02);
+      $result['meta-calculated-fields'] = 'vatamount';
     }
 
     return $result;
@@ -348,6 +323,7 @@ class Creator extends BaseCreator {
           'unitpriceinc' => $shippingInc,
           'quantity' => 1,
         ) + $this->getVatRangeTags($shippingVat, $shippingEx, 0.02);
+      $result['meta-calculated-fields'] = 'vatamount';
     }
     else {
       $carrier = new Carrier($this->order->id_carrier);
@@ -384,6 +360,7 @@ class Creator extends BaseCreator {
           'unitpriceinc' => $wrappingInc,
           'quantity' => 1,
         ) + $this->getVatRangeTags($wrappingVat, $wrappingEx, 0.02);
+      $result['meta-calculated-fields'] = 'vatamount';
     }
     return $result;
   }
@@ -418,7 +395,7 @@ class Creator extends BaseCreator {
     $discountInc = -$sign * $line['value'];
     $discountEx = -$sign * $line['value_tax_excl'];
     $discountVat = $discountInc - $discountEx;
-    return array(
+    $result = array(
       'itemnumber' => $line['id_cart_rule'],
       'product' => $this->t('discount_code') . ' ' . $line['name'],
       'unitprice' => $discountEx,
@@ -433,6 +410,9 @@ class Creator extends BaseCreator {
       // - excluding VAT, the precision would be 0.01, 0
       // However, for a % discount, it will be: 0.02, 0.01, so use this.
     ) + $this->getVatRangeTags($discountVat, $discountEx, 0.02);
+    $result['meta-calculated-fields'] = 'vatamount';
+
+    return $result;
   }
 
   /**
@@ -443,6 +423,8 @@ class Creator extends BaseCreator {
    * @return array[]
    */
   protected function getDiscountLinesCreditNote() {
+    $result = array();
+
     // Get total amount credited.
     /** @noinspection PhpUndefinedFieldInspection */
     $creditSlipAmountInc = $this->creditSlip->total_products_tax_incl;
@@ -466,8 +448,8 @@ class Creator extends BaseCreator {
       // What we can try is the following: Get the order cart rules to see if
       // 1 or all of those match the discount amount here.
       $discountAmountInc = $detailsAmountInc - $creditSlipAmountInc;
-      $totalOrderDiscount = 0.0;
-      // Note: The sign of then entries in $orderDiscounts will be correct.
+      $totalOrderDiscountInc = 0.0;
+      // Note: The sign of the entries in $orderDiscounts will be correct.
       $orderDiscounts = $this->getDiscountLinesOrder();
 
       foreach ($orderDiscounts as $key => $orderDiscount) {
@@ -476,8 +458,8 @@ class Creator extends BaseCreator {
           $from = $to = $key;
           break;
         }
-        $totalOrderDiscount += $orderDiscount['unitpriceinc'];
-        if (Number::floatsAreEqual($totalOrderDiscount, $discountAmountInc)) {
+        $totalOrderDiscountInc += $orderDiscount['unitpriceinc'];
+        if (Number::floatsAreEqual($totalOrderDiscountInc, $discountAmountInc)) {
           // Return all lines up to here.
           $from = 0;
           $to = $key;
@@ -486,7 +468,13 @@ class Creator extends BaseCreator {
       }
 
       if (isset($from) && isset($to)) {
-        return array_slice($orderDiscounts, $from, $to - $from + 1);
+        $result = array_slice($orderDiscounts, $from, $to - $from + 1);
+        // Correct meta-invoice-amount.
+        $totalOrderDiscountEx = array_reduce($result, function ($sum, $item) {
+          $sum += $item['quantity'] * $item['unitprice'];
+          return $sum;
+        }, 0.0);
+        $this->invoice['customer']['invoice']['meta-invoice-amount'] += $totalOrderDiscountEx;
       }
       //else {
       // We could not match a discount with the difference between the total
@@ -494,7 +482,7 @@ class Creator extends BaseCreator {
       // will correct the invoice.
       //}
     }
-    return array();
+    return $result;
   }
 
 }

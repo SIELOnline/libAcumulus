@@ -5,6 +5,7 @@ use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\CompletorInvoiceLines;
 use Siel\Acumulus\Invoice\CompletorStrategyBase;
 use Siel\Acumulus\Invoice\Creator;
+use Siel\Acumulus\Invoice\Source;
 
 /**
  * Class SplitKnownDiscountLine implements a vat completor strategy by using the
@@ -103,23 +104,19 @@ class SplitKnownDiscountLine extends CompletorStrategyBase {
       // amounts per line, a.o. because refunded shipping costs do not advertise
       // any discount amount. Thus if the above comparison fails, we change the
       // discount line by "correcting" the discount amount.
-      else if (defined('MAGENTO_ROOT') && substr($this->invoice['customer']['invoice']['number'], 0, strlen('CM')) === 'CM') {
+      else if (defined('MAGENTO_ROOT') && $this->source->getType() == Source::CreditNote) {
+        $metaMagentoBug = array();
         if (isset($this->splitLine['unitprice'])) {
-          $this->splitLine['meta-magento-bug'] = sprintf('DiscountAmountEx = %f', $this->splitLine['unitprice']);
+          $metaMagentoBug[] = sprintf('DiscountAmountEx = %f', $this->splitLine['unitprice']);
           $this->splitLine['unitprice'] = $this->knownDiscountAmountInc - $this->knownDiscountVatAmount;
           $result = TRUE;
         }
-        if (isset($this->splitLine['unitprice']) || isset($this->splitLine['unitpriceinc'])) {
-          if (isset($this->splitLine['meta-magento-bug'])) {
-            $this->splitLine['meta-magento-bug'] .= ',';
-          }
-          else {
-            $this->splitLine['meta-magento-bug'] = '';
-          }
-          $this->splitLine['meta-magento-bug'] .= sprintf('DiscountAmount = %f', $this->splitLine['unitpriceinc']);
+        if (isset($this->splitLine['unitpriceinc'])) {
+          $metaMagentoBug[] = sprintf('DiscountAmountInc = %f', $this->splitLine['unitpriceinc']);
           $this->splitLine['unitpriceinc'] = $this->knownDiscountAmountInc;
           $result = TRUE;
         }
+        $this->splitLine['meta-magento-bug'] = implode(',', $metaMagentoBug);
       }
       // !End of Magento bug!
     }
@@ -142,6 +139,7 @@ class SplitKnownDiscountLine extends CompletorStrategyBase {
     foreach ($this->discountsPerVatRate as $vatRate => $discountAmountInc) {
       $line = $this->splitLine;
       $line['product'] = "{$line['product']} ($vatRate%)";
+      $line['unitpriceinc'] = $discountAmountInc;
       $this->completeLine($line, $vatRate);
     }
     return TRUE;

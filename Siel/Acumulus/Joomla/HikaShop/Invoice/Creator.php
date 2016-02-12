@@ -212,8 +212,8 @@ class Creator extends BaseCreator {
       'itemnumber' => $item->order_product_code,
       'product' => $item->order_product_name,
       'unitprice' => $productPriceEx,
-      'lineprice' => $item->order_product_total_price_no_vat,
-      'linepriceinc' => $item->order_product_total_price,
+      'meta-line-price' => $item->order_product_total_price_no_vat,
+      'meta-line-priceinc' => $item->order_product_total_price,
       'quantity' => $item->order_product_quantity,
       'vatamount' => $productVat,
     ) + $vatInfo;
@@ -238,7 +238,6 @@ class Creator extends BaseCreator {
 
         $result = array(
             'product' => $description,
-            'unitprice' => $shippingEx,
             'unitpriceinc' => $shippingInc,
             'quantity' => 1,
             'vatamount' => $shippingVat,
@@ -265,7 +264,6 @@ class Creator extends BaseCreator {
 
       $result[] = array(
           'product' => $description,
-          'unitprice' => -$discountEx,
           'unitpriceinc' => -$discountInc,
           'quantity' => 1,
           'vatamount' => -$discountVat,
@@ -290,7 +288,6 @@ class Creator extends BaseCreator {
 
       $result = array(
           'product' => $description,
-          'unitprice' => $paymentEx,
           'unitpriceinc' => $paymentInc,
           'quantity' => 1,
           'vatamount' => $paymentVat,

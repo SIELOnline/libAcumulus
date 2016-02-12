@@ -53,7 +53,8 @@ class ApplySameVatRate extends CompletorStrategyBase {
     }
 
     // If the vat totals are equal, the strategy worked.
-    return Number::floatsAreEqual($vatAmount, $this->vat2Divide);
+    // We allow for a reasonable margin, as rounding errors may add up.
+    return Number::floatsAreEqual($vatAmount, $this->vat2Divide, 0.04);
   }
 
 }

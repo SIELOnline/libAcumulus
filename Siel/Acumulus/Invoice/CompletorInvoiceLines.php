@@ -121,6 +121,8 @@ class CompletorInvoiceLines {
   /**
    * Checks and corrects a 'calculated' vat rate to an allowed vat rate.
    *
+   * The meta-vatrate-source must be Creator::VatRateSource_Calculated.
+   *
    * The check is done on comparing allowed vat rates with the meta-vatrate-min
    * and meta-vatrate-max values. If only 1 match is found that will be used.
    *

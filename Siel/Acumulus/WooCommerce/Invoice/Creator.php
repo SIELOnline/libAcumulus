@@ -25,6 +25,9 @@ class Creator extends BaseCreator {
   /** @var WC_Order The order self or the order that got refunded. */
   protected $order;
 
+  /** @var bool Whether the order has (non empty) item lines. */
+  protected $hasItemLines;
+
   /**
    * {@inheritdoc}
    *
@@ -191,11 +194,13 @@ class Creator extends BaseCreator {
   protected function getItemLines() {
     $result = array();
     foreach ($this->shopSource->get_items() as $line) {
-      $itemLine = $this->getItemLine($line, $this->shopSource);
+      $itemLine = $this->getItemLine($line);
       if ($itemLine) {
         $result[] = $itemLine;
       }
     }
+
+    $this->hasItemLines = count($result) > 0;
     return $result;
   }
 
@@ -203,12 +208,11 @@ class Creator extends BaseCreator {
    * Returns 1 item line.
    *
    * @param array $item
-   * @param WC_Abstract_Order $order
    *
    * @return array
    *   May be empty if the line should not be sent (e.g. qty = 0 on a refund).
    */
-  protected function getItemLine(array $item, WC_Abstract_Order $order) {
+  protected function getItemLine(array $item) {
     $result = array();
 
     // Qty = 0 can happen on refunds: products that are not returned are still
@@ -217,12 +221,12 @@ class Creator extends BaseCreator {
       return $result;
     }
 
-    // get_item_total() returns cost per item after discount and ex vat (2nd
+      // get_item_total() returns cost per item after discount and ex vat (2nd
     // param).
-    $productPriceEx = $order->get_item_total($item, FALSE, FALSE);
-    $productPriceInc = $order->get_item_total($item, TRUE, FALSE);
+    $productPriceEx = $this->shopSource->get_item_total($item, FALSE, FALSE);
+    $productPriceInc = $this->shopSource->get_item_total($item, TRUE, FALSE);
     // get_item_tax returns tax per item after discount.
-    $productVat = $order->get_item_tax($item, FALSE);
+    $productVat = $this->shopSource->get_item_tax($item, FALSE);
 
     $result['product'] = $item['name'];
     $isVariation = !empty($item['variation_id']);
@@ -342,14 +346,18 @@ class Creator extends BaseCreator {
   protected function getDiscountLines() {
     $result = array();
 
-    // Add a line for all coupons applied. Coupons are only stored on the order,
-    // not on refunds, so use the order property.
-    $usedCoupons = $this->order->get_used_coupons();
-    foreach ($usedCoupons as $code) {
-      $coupon = new WC_Coupon($code);
-      $result[] = $this->getDiscountLine($coupon);
+    // For refunds without any articles (probably just a manual refund) we don't
+    // need to know what discounts were applied on the original order. So skip
+    // get_used_coupons() on refunds without articles.
+    if ($this->invoiceSource->getType() !== Source::CreditNote || $this->hasItemLines) {
+      // Add a line for all coupons applied. Coupons are only stored on the order,
+      // not on refunds, so use the order property.
+      $usedCoupons = $this->order->get_used_coupons();
+      foreach ($usedCoupons as $code) {
+        $coupon = new WC_Coupon($code);
+        $result[] = $this->getDiscountLine($coupon);
+      }
     }
-
     return $result;
   }
 

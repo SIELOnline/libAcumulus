@@ -562,7 +562,10 @@ class Completor {
             'meta-line-type' => Creator::LineType_Corrector,
           );
         // Correct and add this line.
-        $invoice['line'][] = $this->invoiceLineCompletor->correctVatRateByRange($line);
+        if ($line['meta-vatrate-source'] === Creator::VatRateSource_Calculated) {
+          $line = $this->invoiceLineCompletor->correctVatRateByRange($line);
+        }
+        $invoice['line'][] = $line;
       }
       else {
         // Add some diagnostic info to the message sent.

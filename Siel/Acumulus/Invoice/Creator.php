@@ -43,7 +43,7 @@ abstract class Creator {
   const LineType_Discount = 'discount';
   const LineType_Voucher = 'voucher';
   const LineType_Other = 'other';
-  const LineType_Corrector = 'corrector';
+  const LineType_Corrector = 'missing-amount-corrector';
 
   /** @var \Siel\Acumulus\Shop\Config */
   protected $config;

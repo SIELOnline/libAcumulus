@@ -186,25 +186,23 @@ abstract class InvoiceManager {
   /**
    * Processes an invoice source status change event.
    *
+   * For now we don't look at the status for credit notes: they are always sent.
+   *
    * @param \Siel\Acumulus\Invoice\Source $invoiceSource
    *   The source whose status changed.
-   * @param mixed $newStatus
-   *   The new status of the invoice source. May be left out in which case a
-   *   comparison based on trigger event and status is not performed. This is
-   *   normally used to send credit notes to acumulus.
    *
    * @return int
    *   Status, one of the WebConfigInterface::Status_ constants.
-   *
-   * @todo: can we add a getStatus() to Source, so we don't have to pass the status separately?
    */
-  public function sourceStatusChange(Source $invoiceSource, $newStatus = FALSE) {
-    $this->config->getLog()->notice('InvoiceManager::sourceStatusChange(%s %d, %s)', $invoiceSource->getType(), $invoiceSource->getId(), $newStatus === NULL ? 'null' : $newStatus === FALSE ? 'false' : (string) $newStatus);
+  public function sourceStatusChange(Source $invoiceSource) {
+    $status = $invoiceSource->getStatus();
+    $statusString = $status === NULL ? 'null' : (string) $status;
+    $this->config->getLog()->notice('InvoiceManager::sourceStatusChange(%s %d, %s)', $invoiceSource->getType(), $invoiceSource->getId(), $statusString);
     $result = WebConfigInterface::Status_NotSent;
     $shopSettings = $this->config->getShopSettings();
-    if ($newStatus === FALSE
+    if ($invoiceSource->getType() === Source::CreditNote
         || ($shopSettings['triggerInvoiceSendEvent'] == Config::TriggerInvoiceSendEvent_OrderStatus
-            && in_array($newStatus, $shopSettings['triggerOrderStatus']))
+            && in_array($status, $shopSettings['triggerOrderStatus']))
     ) {
       $result = $this->send($invoiceSource, FALSE);
     }
@@ -212,7 +210,7 @@ abstract class InvoiceManager {
       $this->config->getLog()->notice('InvoiceManager::sourceStatusChange(%s %d, %s): not sending triggerEvent = %d, triggerOrderStatus = [%s]',
         $invoiceSource->getType(),
         $invoiceSource->getId(),
-        $newStatus === NULL ? 'null' : $newStatus === FALSE ? 'false' : (string) $newStatus,
+        $statusString,
         $shopSettings['triggerInvoiceSendEvent'],
         is_array($shopSettings['triggerOrderStatus']) ? implode(',', $shopSettings['triggerOrderStatus']) : 'no array'
       );
@@ -253,14 +251,14 @@ abstract class InvoiceManager {
    */
   public function send(Source $invoiceSource, $forceSend = false) {
     $result = WebConfigInterface::Status_NotSent;
-    if ($forceSend || !$this->getAcumulusEntryModel()->getByInvoiceSource($invoiceSource)) {
-      $invoice = $this->getCreator()->create($invoiceSource);
+    if ($forceSend || !$this->config->getAcumulusEntryModel()->getByInvoiceSource($invoiceSource)) {
+      $invoice = $this->config->getCreator()->create($invoiceSource);
 
       $this->triggerInvoiceCreated($invoice, $invoiceSource);
 
       if ($invoice !== NULL) {
         $localMessages = array();
-        $invoice = $this->getCompletor()->complete($invoice, $invoiceSource, $localMessages);
+        $invoice = $this->config->getCompletor()->complete($invoice, $invoiceSource, $localMessages);
 
         $this->triggerInvoiceCompleted($invoice, $invoiceSource);
 
@@ -273,7 +271,7 @@ abstract class InvoiceManager {
 
           // Check if an entryid was created and store entry id and token.
           if (!empty($result['invoice']['entryid'])) {
-            $this->getAcumulusEntryModel()->save($invoiceSource, $result['invoice']['entryid'], $result['invoice']['token']);
+            $this->config->getAcumulusEntryModel()->save($invoiceSource, $result['invoice']['entryid'], $result['invoice']['token']);
           }
 
           // Send a mail if there are messages.
@@ -318,48 +316,7 @@ abstract class InvoiceManager {
    *   Success.
    */
   protected function mailInvoiceAddResult(array $result, array $messages, Source $invoiceSource) {
-    $mailer = $this->getMailer();
-    return $mailer->sendInvoiceAddMailResult($result, $messages, $invoiceSource->getType(), $invoiceSource->getReference());
-  }
-
-  /**
-   * @return \Siel\Acumulus\Invoice\Completor
-   */
-  protected function getCompletor() {
-    return $this->config->getCompletor();
-  }
-
-  /**
-   * @param string $invoiceSourceType
-   *   The type of the invoice source.
-   * @param string $invoiceSourceId
-   *   The id of the invoice source to get.
-   *
-   * @return \Siel\Acumulus\Invoice\Source
-   */
-  protected function getSource($invoiceSourceType, $invoiceSourceId) {
-    return $this->config->getSource($invoiceSourceType, $invoiceSourceId);
-  }
-
-  /**
-   * @return \Siel\Acumulus\Invoice\Creator
-   */
-  protected function getCreator() {
-    return $this->config->getCreator();
-  }
-
-  /**
-   * @return \Siel\Acumulus\Helpers\Mailer
-   */
-  protected function getMailer() {
-    return $this->config->getMailer();
-  }
-
-  /**
-   * @return \Siel\Acumulus\Shop\AcumulusEntryModel
-   */
-  protected function getAcumulusEntryModel() {
-    return $this->config->getAcumulusEntryModel();
+    return $this->config->getMailer()->sendInvoiceAddMailResult($result, $messages, $invoiceSource->getType(), $invoiceSource->getReference());
   }
 
   /**

@@ -43,7 +43,7 @@ class Source extends BaseSource {
    *   A single character indicating the order status.
    */
   public function getStatus() {
-    return $this->source['details']['order_status'];
+    return $this->source['details']['BT']->order_status;
   }
 
 }

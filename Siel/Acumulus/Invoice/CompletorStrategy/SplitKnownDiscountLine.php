@@ -26,6 +26,9 @@ use Siel\Acumulus\Invoice\CompletorStrategyBase;
  *
  * Current usages:
  * - Magento
+ * - @todo PrestaShop (if no discount on shipping and other fees this might work
+ *    but will only be needed when we actually have multiple vat rates, otherwise
+ *    it is a simple corrector.
  */
 class SplitKnownDiscountLine extends CompletorStrategyBase {
 

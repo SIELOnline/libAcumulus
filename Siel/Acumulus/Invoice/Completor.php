@@ -386,6 +386,11 @@ class Completor {
           $calculatedFields[] = 'vatamount';
         }
 
+        if (isset($line['meta-line-discount-vatamount']) && !isset($line['meta-line-discount-amountinc'])) {
+          $line['meta-line-discount-amountinc'] = $line['meta-line-discount-vatamount'] / $line['vatrate'] * (100 + $line['vatrate']);
+          $calculatedFields[] = 'meta-line-discount-amountinc';
+        }
+
         if (!empty($calculatedFields)) {
           $line['meta-calculated-fields'] = implode(',', $calculatedFields);
         }

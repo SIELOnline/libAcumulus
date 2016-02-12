@@ -291,18 +291,22 @@ class Creator extends BaseCreator {
       $result['meta-line-priceinc'] = $sign * $item['total_price_tax_incl'];
     }
     $result['quantity'] = $item['product_quantity'];
-    // These 3 fields are only defined for orders and were not filled in or
-    // before PS1.6.1.1. So, we have to check if the fields are available.
+    // The field 'rate' comes from order->getOrderDetailTaxes() and is only
+    // defined for orders and were not filled in or before PS1.6.1.1. So, check
+    // if the field is available.
+    // The fields 'unit_amount' and 'total_amount' (table order_detail_tax) are
+    // based on the discounted product price and thus cannot be used.
     if (isset($item['rate'])) {
-      $result['vatamount'] = $item['unit_amount'];
-      $result['meta-line-vatamount'] = $item['total_amount'];
       $result['vatrate'] = $item['rate'];
       $result['meta-vatrate-source'] = Creator::VatRateSource_Exact;
+      if (!Number::floatsAreEqual($item['unit_amount'], $result['unitpriceinc'] - $result['unitprice'])) {
+        $result['meta-line-discount-vatamount'] = $item['unit_amount'] - ($result['unitpriceinc'] - $result['unitprice']);
+      }
     }
     else {
       $result += $this->getVatRangeTags($sign * ($item['unit_price_tax_incl'] - $item['unit_price_tax_excl']), $sign * $item['unit_price_tax_excl'], 0.02);
-      $result['meta-calculated-fields'] = 'vatamount';
     }
+    $result['meta-calculated-fields'] = 'vatamount';
 
     return $result;
   }
@@ -403,8 +407,6 @@ class Creator extends BaseCreator {
       'quantity' => 1,
       // If no match is found, this line may be split.
       'meta-strategy-split' => TRUE,
-      'meta-line-price' => $discountEx,
-      'meta-line-priceinc' => $discountInc,
       // Assuming that the fixed discount amount was entered:
       // - including VAT, the precision would be 0.01, 0.01.
       // - excluding VAT, the precision would be 0.01, 0

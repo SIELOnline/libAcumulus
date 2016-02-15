@@ -72,7 +72,7 @@ class SplitKnownDiscountLine extends CompletorStrategyBase {
     $this->knownDiscountAmountInc = 0.0;
     $this->knownDiscountVatAmount = 0.0;
     foreach ($this->invoice['customer']['invoice']['line'] as $line) {
-      if (isset($line['meta-line-discount-amountinc']) && in_array($line['meta-vatrate-source'], Completor::CorrectVatRateSources)) {
+      if (isset($line['meta-line-discount-amountinc']) && in_array($line['meta-vatrate-source'], Completor::$CorrectVatRateSources)) {
         $this->knownDiscountAmountInc += $line['meta-line-discount-amountinc'];
         $this->knownDiscountVatAmount += $line['meta-line-discount-amountinc'] / (100.0 + $line['vatrate']) * $line['vatrate'];
         $vatRate = sprintf('%.3f', $line['vatrate']);

@@ -354,7 +354,8 @@ class Creator extends BaseCreator {
       $result['unitpriceinc'] = $productPriceInc;
     }
 
-    if (!empty($item->getOrderItemId())) {
+    $orderItemId = $item->getOrderItemId();
+    if (!empty($orderItemId)) {
       $orderItem = $item->getOrderItem();
       $result += array(
         'vatrate' => $orderItem->getTaxPercent(),

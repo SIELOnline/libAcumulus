@@ -97,7 +97,7 @@ class CompletorInvoiceLines {
             $line['unitprice'] = $line['unitpriceinc'] - $line['vatamount'];
             $calculatedFields[] = 'unitprice';
           }
-          else if (isset($line['vatrate']) && in_array($line['meta-vatrate-source'], Completor::CorrectVatRateSources)) {
+          else if (isset($line['vatrate']) && in_array($line['meta-vatrate-source'], Completor::$CorrectVatRateSources)) {
             $line['unitprice'] = $line['unitpriceinc'] / (100.0 + $line['vatrate']) * 100.0;
             $calculatedFields[] = 'unitprice';
           }
@@ -268,7 +268,7 @@ class CompletorInvoiceLines {
         ? (is_array($line['meta-calculated-fields']) ? $line['meta-calculated-fields'] : explode(',', $line['meta-calculated-fields']))
         : array();
 
-      if (in_array($line['meta-vatrate-source'], Completor::CorrectVatRateSources)) {
+      if (in_array($line['meta-vatrate-source'], Completor::$CorrectVatRateSources)) {
         if (!isset($line['unitpriceinc'])) {
           $line['unitpriceinc'] = $line['unitprice'] / 100.0 * (100.0 + $line['vatrate']);
           $calculatedFields[] = 'unitpriceinc';

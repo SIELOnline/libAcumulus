@@ -585,7 +585,7 @@ class FormRenderer {
       $output .= $this->getWrapper('checkbox1');
       $output .= '<input' . $this->renderAttributes($checkboxAttributes) . '>';
       $output .= $this->renderLabel($text, $checkboxAttributes['id'], array(), false);
-      $output .= $this->getWrapperend('checkbox1');
+      $output .= $this->getWrapperEnd('checkbox1');
     }
 
     // End tag.

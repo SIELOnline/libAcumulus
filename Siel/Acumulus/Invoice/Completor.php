@@ -30,7 +30,7 @@ class Completor {
   const VatRateSource_Completor_Completed = 'completor-completed';
   const VatRateSource_Strategy_Completed = 'strategy-completed';
 
-  const CorrectVatRateSources = array(
+  static $CorrectVatRateSources = array(
       Creator::VatRateSource_Exact,
       Creator::VatRateSource_Exact0,
       self::VatRateSource_Calculated_Corrected,
@@ -625,7 +625,7 @@ class Completor {
     // smaller list, of possible vat types.
     $invoiceVatTypes = array();
     foreach ($this->invoice['customer']['invoice']['line'] as &$line) {
-      if (in_array($line['meta-vatrate-source'], static::CorrectVatRateSources)) {
+      if (in_array($line['meta-vatrate-source'], static::$CorrectVatRateSources)) {
         // We ignore "0" vat rates (0 and -1).
         if ($line['vatrate'] > 0) {
           $lineVatTypes = array();

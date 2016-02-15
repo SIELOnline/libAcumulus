@@ -11,20 +11,16 @@ use Siel\Acumulus\Web\Service;
  * invoices before sending them to Acumulus.
  *
  * This class:
- * - Add defaults to shop independent invoice fields, based on the invoice
- *   configuration or other fields.
- * - Adds vat rates to 0 price lines (with a 0 price and thus 0 vat, not all
- *   web shops can fill in a vat rate).
- * - Adds the vat type based on inspection of the customer and invoice fields.
- * - Corrects the country code if it is a country code outside the EU. (This is
- *   a "glitch" in the API that expects the country code to be empty for non-EU
- *   countries.)
- * - Adds email as pdf fields based on the Invoice configuration values.
  * - Changes the customer into a fictitious client if set so in the config.
- * - Validates (and correct rounding errors of) vat rates using the VAT rate
- *   lookup webservice call.
  * - Validates the email address: the webservice does not allow an empty email
  *   address (but does allow a non provided email address).
+ * - Adds line totals. These are compared with what the shop advertises as order
+ *   totals to see if an amount might be missing.
+ * - Adds the vat type based on inspection of the completed invoice.
+ * - Removes an empty shipping line if set to do so in the config.
+ *
+ * - Calls the invoice line completor.
+ * - Calls the strategy line completor.
  *
  * @package Siel\Acumulus
  */
@@ -150,14 +146,14 @@ class Completor {
     $this->invoice = $this->invoiceLineCompletor->complete($this->invoice, $this->possibleVatTypes, $this->possibleVatRates);
 
     // Check if we are missing an amount and, if so, add a line for it.
-    $this->completeLineMetaData();
     $this->completeLineTotals();
     $areTotalsEqual = $this->areTotalsEqual();
     if (!$areTotalsEqual) {
       $this->addMissingAmountLine($areTotalsEqual);
     }
 
-    // Complete lines that have to be completed based on the whole invoice.
+    // Complete strategy lines: those lines that have to be completed based on
+    // the whole invoice.
     $this->invoice = $this->strategyLineCompletor->complete($this->invoice, $this->source, $this->possibleVatTypes, $this->possibleVatRates);
 
     // Fill in the VAT type, adding a warning if possible vat types are possible.
@@ -353,48 +349,6 @@ class Completor {
         $email = trim($matches[2]);
       }
       $this->invoice['customer']['email'] = $email;
-    }
-  }
-
-  /**
-   * Completes each (non-strategy) line with missing (meta) info.
-   *
-   * All non strategy lines have at least (unitprice or unitpriceinc) and
-   * vatrate filled in and should by now have correct(ed) VAT rates. Complete:
-   * - unitprice or unitpriceinc if missing
-   * - vatamount
-   */
-  protected function completeLineMetaData() {
-    $invoiceLines = &$this->invoice['customer']['invoice']['line'];
-    foreach($invoiceLines as &$line) {
-      $calculatedFields = isset($line['meta-calculated-fields'])
-        ? (is_array($line['meta-calculated-fields']) ? $line['meta-calculated-fields'] : explode(',', $line['meta-calculated-fields']))
-        : array();
-
-      if (in_array($line['meta-vatrate-source'], static::CorrectVatRateSources)) {
-        if (!isset($line['unitprice'])) {
-          $line['unitprice'] = $line['unitpriceinc'] / (100.0 + $line['vatrate']) * 100.0;
-          $calculatedFields[] = 'unitprice';
-        }
-        if (!isset($line['unitpriceinc'])) {
-          $line['unitpriceinc'] = $line['unitprice'] / 100.0 * (100.0 + $line['vatrate']);
-          $calculatedFields[] = 'unitpriceinc';
-        }
-
-        if (!isset($line['vatamount'])) {
-          $line['vatamount'] = $line['vatrate'] / 100.0 * $line['unitprice'];
-          $calculatedFields[] = 'vatamount';
-        }
-
-        if (isset($line['meta-line-discount-vatamount']) && !isset($line['meta-line-discount-amountinc'])) {
-          $line['meta-line-discount-amountinc'] = $line['meta-line-discount-vatamount'] / $line['vatrate'] * (100 + $line['vatrate']);
-          $calculatedFields[] = 'meta-line-discount-amountinc';
-        }
-
-        if (!empty($calculatedFields)) {
-          $line['meta-calculated-fields'] = implode(',', $calculatedFields);
-        }
-      }
     }
   }
 

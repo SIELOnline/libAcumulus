@@ -40,7 +40,7 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel {
    */
   public function getByInvoiceSourceId($invoiceSourceType, $invoiceSourceId) {
     $result = $this->getDb()->query(sprintf("SELECT * FROM `%s` WHERE source_type = '%s' AND source_id = %u", $this->tableName, $invoiceSourceType, $invoiceSourceId));
-    return empty($result->row) ? $result->row : NULL;
+    return !empty($result->row) ? $result->row : NULL;
   }
 
   /**

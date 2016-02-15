@@ -33,7 +33,7 @@ class FormRenderer extends BaseFormRenderer {
     $output = '';
     if ($type === 'date') {
       $output .= $this->getWrapper('input');
-      $output .= JHTML::calendar($value, $name, $id, $this->form->getShopDateFormat()/*, $attributes*/);
+      $output .= JHtml::calendar($value, $name, $id, $this->form->getShopDateFormat()/*, $attributes*/);
       $output .= $this->getWrapperEnd('input');
     }
     else {

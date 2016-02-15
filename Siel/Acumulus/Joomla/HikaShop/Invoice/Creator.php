@@ -10,6 +10,18 @@ use stdClass;
 /**
  * Allows to create arrays in the Acumulus invoice structure from a HikaShop
  * order
+ *
+ * Notes:
+ * - HikaShop knows discounts in the form of coupons or unrestricted discounts.
+ *   Coupons can be without vat (to be seen as partial payment, which was
+ *   probably not meant, thus incorrect) or with a fixed vat rate, independent
+ *   from the products in the cart, thus also incorrect.
+ * - When a cart with a coupon contains products with another vat rate, the
+ *   shown vat amount breakdown is incorrect. The Acumulus invoice will be
+ *   correct, but may differ from the shop invoice, though the overall amount
+ *   tends to be equal. It is the meta data in the invoice (as sent to Acumulus)
+ *   that shows the differences.
+ *   that shows the differences.
  */
 class Creator extends BaseCreator {
 
@@ -155,13 +167,13 @@ class Creator extends BaseCreator {
    * {@inheritdoc}
    *
    * This override provides the values meta-invoice-amountinc and
-   * meta-invoice-vatamount as they may be needed by the Completor.
+   * meta-invoice-vatamount.
    */
   protected function getInvoiceTotals() {
     $vatAmount = 0.0;
     // No order_taxinfo => no tax (?) => vatamount = 0.
-    if (!empty($this->order->order_taxinfo)) {
-      foreach ($this->order->order_taxinfo as $taxInfo) {
+    if (!empty($this->order->order_tax_info)) {
+      foreach ($this->order->order_tax_info as $taxInfo) {
         $vatAmount += $taxInfo->tax_amount;
       }
     }

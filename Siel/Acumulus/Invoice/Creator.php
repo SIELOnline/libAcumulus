@@ -834,7 +834,7 @@ abstract class Creator {
         'meta-vatrate-source' => static::VatRateSource_Completor,
       );
     }
-    if (Number::isZero($numerator, 0.0001)) {
+    else if (Number::isZero($numerator, 0.0001)) {
       return array(
         'vatrate' => 0,
         'vatamount' => $numerator,

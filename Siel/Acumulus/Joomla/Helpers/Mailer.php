@@ -15,7 +15,7 @@ class Mailer extends BaseMailer {
   public function sendInvoiceAddMailResult(array $result, array $messages, $invoiceSourceType, $invoiceSourceReference) {
     $app = JFactory::getApplication();
     $mailer = JFactory::getMailer();
-    $mailer->isHTML(TRUE);
+    $mailer->isHtml(TRUE);
 
     $mailer->setSender(array($app->get('mailfrom'), $this->getFromName()));
     $mailer->addRecipient($this->getToAddress());

@@ -1,7 +1,6 @@
 <?php
 namespace Siel\Acumulus\Joomla\HikaShop\Shop;
 
-use JText;
 use Siel\Acumulus\Joomla\Shop\ConfigForm as BaseConfigForm;
 use Siel\Acumulus\Shop\ConfigInterface;
 

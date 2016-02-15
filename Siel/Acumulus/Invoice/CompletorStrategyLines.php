@@ -4,46 +4,11 @@ namespace Siel\Acumulus\Invoice;
 use Siel\Acumulus\Helpers\TranslatorInterface;
 
 /**
- * The invoice lines completor class provides functionality to correct and
+ * The strategy lines completor class provides functionality to correct and
  * complete invoice lines before sending them to Acumulus.
  *
  * This class:
- * - Validates (and correct rounding errors of) vat rates using the VAT rate
- *   lookup webservice call.
- * - Adds vat rates to 0 price lines (with a 0 price and thus 0 vat, not all
- *   web shops can fill in a vat rate).
- * - Adds vat rates to lines that need a strategy to compute their vat rates
- * - Adds other missing but required fields on the invoice lines. For now,
- *   unitprice can be missing (the line will have the unitpriceinc value and
- *   with the vatrate computed, we can also calculate the unitprice).
- * - Adds the vat type based on inspection of the completed invoice.
- *
- * Each invoice lines has 1 or more of the following keys:
- * -itemnumber
- * -product
- * -unitprice
- * -vatrate
- * -quantity
- * -costprice: optional, only for margin products
- *
- * Additional keys, not recognised by the API, but used by this completor to
- * complete the invoice lines:
- * - unitpriceinc: the price of the item per unit including VAT.
- * - vatamount: the amount of vat per unit.
- * - meta-vatrate-source: the source for the vatrate value. Can be one of:
- *   - exact: should be an existing VAT rate.
- *   - calculated: should be close to an existing VAT rate, but may contain a
- *       rounding error.
- *   - completor: zero price lines to be filled in by the completor with the
- *     most used VAT rate. these are like free shipping or discounts that are
- *     only there for info (discounts already processed in the product prices).
- *   - strategy: to be filled in by a tax divide strategy. This may lead to
- *     the line being split into multiple lines.
- * - (*)meta-line-price: the total price for this line excluding VAT.
- * - (*)meta-line-priceinc: the total price for this line including VAT.
- * - meta-line-vatamount: the amount of VAT for the whole line.
- * - meta-line-type: the type of line (order, shipping, discount, etc.)
- * (*) = these are not yet used.
+ * - Adds vat rates to lines that need a strategy to compute their vat rates.
  *
  * @package Siel\Acumulus
  */

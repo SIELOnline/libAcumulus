@@ -8,42 +8,11 @@ use Siel\Acumulus\Helpers\Number;
  * complete invoice lines before sending them to Acumulus.
  *
  * This class:
+ * - Adds required but missing fields on the invoice lines.
  * - Validates (and correct rounding errors of) vat rates using the VAT rate
  *   lookup webservice call.
  * - Adds vat rates to 0 price lines (with a 0 price and thus 0 vat, not all
  *   web shops can fill in a vat rate).
- * - Adds vat rates to lines that need a strategy to compute their vat rates
- * - Adds other missing but required fields on the invoice lines. For now,
- *   unitprice can be missing (the line will have the unitpriceinc value and
- *   with the vatrate computed, we can also calculate the unitprice).
- * - Adds the vat type based on inspection of the completed invoice.
- *
- * Each invoice lines has 1 or more of the following keys:
- * -itemnumber
- * -product
- * -unitprice
- * -vatrate
- * -quantity
- * -costprice: optional, only for margin products
- *
- * Additional keys, not recognised by the API, but used by this completor to
- * complete the invoice lines:
- * - unitpriceinc: the price of the item per unit including VAT.
- * - vatamount: the amount of vat per unit.
- * - meta-vatrate-source: the source for the vatrate value. Can be one of:
- *   - exact: should be an existing VAT rate.
- *   - calculated: should be close to an existing VAT rate, but may contain a
- *       rounding error.
- *   - completor: zero price lines to be filled in by the completor with the
- *     most used VAT rate. these are like free shipping or discounts that are
- *     only there for info (discounts already processed in the product prices).
- *   - strategy: to be filled in by a tax divide strategy. This may lead to
- *     the line being split into multiple lines.
- * - (*)meta-line-price: the total price for this line excluding VAT.
- * - (*)meta-line-priceinc: the total price for this line including VAT.
- * - meta-line-vatamount: the amount of VAT for the whole line.
- * - meta-line-type: the type of line (order, shipping, discount, etc.)
- * (*) = these are not yet used.
  *
  * @package Siel\Acumulus
  */
@@ -102,8 +71,43 @@ class CompletorInvoiceLines {
    * Completes the invoice lines.
    */
   protected function completeInvoiceLines() {
+    $this->completeLineRequiredData();
     $this->correctCalculatedVatRates();
     $this->addVatRateTo0PriceLines();
+    $this->completeLineMetaData();
+  }
+
+  /**
+   * Completes the fields that are required by the rest of this completor phase.
+   *
+   * The creator filled in the fields that are directly available from the
+   * shops' data store. This method completes (if not filled in):
+   * - unitprice.
+   */
+  protected function completeLineRequiredData() {
+    $invoiceLines = &$this->invoice['customer']['invoice']['line'];
+    foreach($invoiceLines as &$line) {
+      $calculatedFields = isset($line['meta-calculated-fields'])
+        ? (is_array($line['meta-calculated-fields']) ? $line['meta-calculated-fields'] : explode(',', $line['meta-calculated-fields']))
+        : array();
+
+      if (!isset($line['unitprice'])) {
+        if (isset($line['unitpriceinc'])) {
+          if (isset($line['vatamount'])) {
+            $line['unitprice'] = $line['unitpriceinc'] - $line['vatamount'];
+            $calculatedFields[] = 'unitprice';
+          }
+          else if (isset($line['vatrate']) && in_array($line['meta-vatrate-source'], Completor::CorrectVatRateSources)) {
+            $line['unitprice'] = $line['unitpriceinc'] / (100.0 + $line['vatrate']) * 100.0;
+            $calculatedFields[] = 'unitprice';
+          }
+        }
+      }
+
+      if (!empty($calculatedFields)) {
+        $line['meta-calculated-fields'] = implode(',', $calculatedFields);
+      }
+    }
   }
 
   /**
@@ -232,7 +236,7 @@ class CompletorInvoiceLines {
   protected function getAppearingVatRates() {
     $vatRates = array();
     foreach ($this->invoiceLines as $line) {
-      if ($line['vatrate'] !== NULL) {
+      if (isset($line['vatrate'])) {
         if (isset($vatRates[$line['vatrate']])) {
           $vatRates[$line['vatrate']]++;
         }
@@ -242,6 +246,49 @@ class CompletorInvoiceLines {
       }
     }
     return $vatRates;
+  }
+
+  /**
+   * Completes each (non-strategy) line with missing (meta) info.
+   *
+   * All non strategy lines have unitprice and vatrate filled in and should by
+   * now have correct(ed) VAT rates. In some shops these non strategy lines may
+   * have a meta-line-discount-vatamount or meta-line-discount-amountinc field,
+   * that can be used with the SplitKnownDiscountLine strategy. Complete (if
+   * missing):
+   * - unitpriceinc
+   * - vatamount
+   * - meta-line-discount-amountinc (if meta-line-discount-vatamount is
+   *   available).
+   */
+  protected function completeLineMetaData() {
+    $invoiceLines = &$this->invoice['customer']['invoice']['line'];
+    foreach($invoiceLines as &$line) {
+      $calculatedFields = isset($line['meta-calculated-fields'])
+        ? (is_array($line['meta-calculated-fields']) ? $line['meta-calculated-fields'] : explode(',', $line['meta-calculated-fields']))
+        : array();
+
+      if (in_array($line['meta-vatrate-source'], Completor::CorrectVatRateSources)) {
+        if (!isset($line['unitpriceinc'])) {
+          $line['unitpriceinc'] = $line['unitprice'] / 100.0 * (100.0 + $line['vatrate']);
+          $calculatedFields[] = 'unitpriceinc';
+        }
+
+        if (!isset($line['vatamount'])) {
+          $line['vatamount'] = $line['vatrate'] / 100.0 * $line['unitprice'];
+          $calculatedFields[] = 'vatamount';
+        }
+
+        if (isset($line['meta-line-discount-vatamount']) && !isset($line['meta-line-discount-amountinc'])) {
+          $line['meta-line-discount-amountinc'] = $line['meta-line-discount-vatamount'] / $line['vatrate'] * (100 + $line['vatrate']);
+          $calculatedFields[] = 'meta-line-discount-amountinc';
+        }
+
+        if (!empty($calculatedFields)) {
+          $line['meta-calculated-fields'] = implode(',', $calculatedFields);
+        }
+      }
+    }
   }
 
 }

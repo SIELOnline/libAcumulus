@@ -51,7 +51,7 @@ abstract class InvoiceManager extends BaseInvoiceManager {
    * @return \JDatabaseDriver
    */
   protected function getDb() {
-    return JFactory::getDBO();
+    return JFactory::getDbo();
   }
 
   /**

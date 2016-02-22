@@ -14,15 +14,13 @@ interface ConfigInterface {
   const TriggerInvoiceSendEvent_InvoiceCreate = 2;
 
   /**
-   * Returns the set of settings related to adding an invoice.
+   * Returns the set of settings related to reacting to shop events.
    *
    * @return array
    *   A keyed array with the keys:
-   *   - invoiceNrSource
-   *   - dateToUse
    *   - triggerInvoiceSendEvent
    *   - triggerOrderStatus
    */
-  public function getShopSettings() ;
+  public function getShopEventSettings() ;
 
 }

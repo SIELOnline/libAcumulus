@@ -52,6 +52,13 @@ class ConfigFormTranslations extends TranslationCollection {
 Zie <a href="http://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/btw_berekenen_bij_diensten/wijziging_in_digitale_diensten_vanaf_2015/wijziging_in_digitale_diensten_vanaf_2015">Belastingdienst: diensten naar andere EU landen</a>.
 Met behulp van deze instelling kan de koppeling beter: het type factuur bepalen; controles uitvoeren; en BTW tarieven, voor zover berekend op basis van afgeronde bedragen, terugrekenen.',
 
+    'field_vatFreeProducts' => 'Verkoopt u van BTW vrijgestelde producten of diensten?',
+    'option_vatFreeProducts_1' => 'Zowel BTW vrije als aan BTW onderhevige producten en/of diensten.',
+    'option_vatFreeProducts_2' => 'Alleen aan BTW onderhevige producten en/of diensten.',
+    'option_vatFreeProducts_3' => 'Alleen producten of diensten die van BTW vrijgesteld zijn.',
+    'desc_vatFreeProducts' => 'Geef aan of u in uw winkel producten en/of diensten aanbiedt die vrijgesteld zin van BTW, bv onderwijs.
+Met behulp van deze instelling kan de koppeling beter het type factuur bepalen en controles uitvoeren.',
+
     'field_invoiceNrSource' => 'Factuurnummer',
     'option_invoiceNrSource_1' => 'Gebruik het factuurnummer van uw webwinkel. Let op: als er nog geen factuur aan een bestelling gekoppeld is, zal het bestelnummer gebruikt worden!',
     'option_invoiceNrSource_2' => 'Gebruik het bestelnummer van uw webwinkel.',
@@ -183,6 +190,13 @@ Vink deze optie aan als u geen regel op uw factuur of pakbon wil voor gratis ver
     'desc_digitalServices' => 'Select whether your store offers digital services that are subject to foreign VAT for clients in other EU countries.
 See <a href="http://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/btw_berekenen_bij_diensten/wijziging_in_digitale_diensten_vanaf_2015/wijziging_in_digitale_diensten_vanaf_2015">Dutch tax office: services to other EU countries (in dutch)</a>.
 Using this setting this plugin can better determine the invoice type; perform some validations; and extract exact VAT rates where they are calculated using rounded amounts.',
+
+    'field_vatFreeProducts' => 'Do you sell  VAT free products or services?',
+    'option_vatFreeProducts_1' => 'Both VAT free and VAT liable products or services.',
+    'option_vatFreeProducts_2' => 'Only products or services that are VAT liable.',
+    'option_vatFreeProducts_3' => 'Only VAT free products or services.',
+    'desc_vatFreeProducts' => 'GSelect whether your store offers products or services that are VAT free, e.g. education.
+Using this setting this plugin can better determine the invoice type and perform some validations.',
 
     'field_invoiceNrSource' => 'Invoice number',
     'option_invoiceNrSource_1' => 'Use the web shop invoice number. Note: if no invoice has been created for the order yet, the order number will be used!',

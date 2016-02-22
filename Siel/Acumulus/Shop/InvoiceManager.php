@@ -199,10 +199,10 @@ abstract class InvoiceManager {
     $statusString = $status === NULL ? 'null' : (string) $status;
     $this->config->getLog()->notice('InvoiceManager::sourceStatusChange(%s %d, %s)', $invoiceSource->getType(), $invoiceSource->getId(), $statusString);
     $result = WebConfigInterface::Status_NotSent;
-    $shopSettings = $this->config->getShopSettings();
+    $shopEventSettings = $this->config->getShopEventSettings();
     if ($invoiceSource->getType() === Source::CreditNote
-        || ($shopSettings['triggerInvoiceSendEvent'] == Config::TriggerInvoiceSendEvent_OrderStatus
-            && in_array($status, $shopSettings['triggerOrderStatus']))
+        || ($shopEventSettings['triggerInvoiceSendEvent'] == Config::TriggerInvoiceSendEvent_OrderStatus
+            && in_array($status, $shopEventSettings['triggerOrderStatus']))
     ) {
       $result = $this->send($invoiceSource, FALSE);
     }
@@ -211,8 +211,8 @@ abstract class InvoiceManager {
         $invoiceSource->getType(),
         $invoiceSource->getId(),
         $statusString,
-        $shopSettings['triggerInvoiceSendEvent'],
-        is_array($shopSettings['triggerOrderStatus']) ? implode(',', $shopSettings['triggerOrderStatus']) : 'no array'
+        $shopEventSettings['triggerInvoiceSendEvent'],
+        is_array($shopEventSettings['triggerOrderStatus']) ? implode(',', $shopEventSettings['triggerOrderStatus']) : 'no array'
       );
     }
     return $result;
@@ -230,8 +230,8 @@ abstract class InvoiceManager {
   public function invoiceCreate(Source $invoiceSource) {
     $this->config->getLog()->notice('InvoiceManager::invoiceCreate(%s %d)', $invoiceSource->getType(), $invoiceSource->getId());
     $result = WebConfigInterface::Status_NotSent;
-    $shopSettings = $this->config->getShopSettings();
-    if ($shopSettings['triggerInvoiceSendEvent'] == Config::TriggerInvoiceSendEvent_InvoiceCreate) {
+    $shopEventSettings = $this->config->getShopEventSettings();
+    if ($shopEventSettings['triggerInvoiceSendEvent'] == Config::TriggerInvoiceSendEvent_InvoiceCreate) {
       $result = $this->send($invoiceSource, FALSE);
     }
     return $result;

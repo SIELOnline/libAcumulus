@@ -176,8 +176,9 @@ class Completor {
    */
   protected function initPossibleVatTypes() {
     $possibleVatTypes = array();
-    $invoiceSettings = $this->config->getInvoiceSettings();
-    $digitalServices = $invoiceSettings['digitalServices'];
+    $shopSettings = $this->config->getShopSettings();
+    $digitalServices = $shopSettings['digitalServices'];
+    $vatFreeProducts = $shopSettings['vatFreeProducts'];
 
     if (!empty($this->invoice['customer']['invoice']['vattype'])) {
       // If shop specific code or an event handler has already set the vat type,
@@ -186,22 +187,27 @@ class Completor {
     }
     else {
       if (!$this->invoiceHasLineWithVat()) {
-        // National/EU reversed vat or no vat (rest of world).
+        // No VAT at all: National/EU reversed vat, only vat free products, or
+        // no vat (rest of world).
         if ($this->isNl()) {
-          // National: some products (e.g. education) are free of VAT, but
-          // digital services are not part of these.
-          if ($digitalServices !== ConfigInterface::DigitalServices_Only) {
+          // Can it be VAT free products (e.g. education)? Digital services are
+          // never VAT free, nor are there any if set so.
+          if ($digitalServices !== ConfigInterface::DigitalServices_Only && $vatFreeProducts !== ConfigInterface::VatFreeProducts_No) {
             $possibleVatTypes[] = ConfigInterface::VatType_National;
           }
+          // National reversed VAT: not really supported, but it is possible.
           if ($this->isCompany()) {
             $possibleVatTypes[] = ConfigInterface::VatType_NationalReversed;
           }
         }
         else if ($this->isEu()) {
+          // U reversed VAT.
           if ($this->isCompany()) {
             $possibleVatTypes[] = ConfigInterface::VatType_EuReversed;
           }
-          if ($digitalServices !== ConfigInterface::DigitalServices_Only) {
+          // Can it be VAT free products (e.g. education)? Digital services are
+          // never VAT free, nor are there any if set so.
+          if ($digitalServices !== ConfigInterface::DigitalServices_Only && $vatFreeProducts !== ConfigInterface::VatFreeProducts_No) {
             $possibleVatTypes[] = ConfigInterface::VatType_National;
           }
         }
@@ -688,7 +694,7 @@ class Completor {
   /**
    * Returns whether the invoice has at least 1 line with a non-0 vat rate.
    *
-   * 0 (VAt free/reversed VAT) and -1 (no VAT) are valid 0-vat rates.
+   * 0 (VAT free/reversed VAT) and -1 (no VAT) are valid 0-vat rates.
    * As vatrate may be null, the vatamount value is also checked.
    *
    * @return bool
@@ -696,11 +702,13 @@ class Completor {
   protected function invoiceHasLineWithVat() {
     $isLineWithVat = false;
     foreach ($this->invoice['customer']['invoice']['line'] as $line) {
-      if (!empty($line['vatrate']) && !Number::isZero($line['vatrate']) && !Number::floatsAreEqual($line['vatrate'], -1.0)) {
-        $isLineWithVat = true;
-        break;
+      if (!empty($line['vatrate'])) {
+        if (!Number::isZero($line['vatrate']) && !Number::floatsAreEqual($line['vatrate'], -1.0)) {
+          $isLineWithVat = TRUE;
+          break;
+        }
       }
-      if (!empty($line['vatamount']) && !Number::isZero($line['vatamount'])) {
+      else if (!empty($line['vatamount']) && !Number::isZero($line['vatamount'])) {
         $isLineWithVat = true;
         break;
       }

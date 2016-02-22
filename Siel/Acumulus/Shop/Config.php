@@ -408,6 +408,13 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
   /**
    * @inheritdoc
    */
+  public function getShopEventSettings() {
+    return $this->getSettingsByGroup('event');
+  }
+
+  /**
+   * @inheritdoc
+   */
   public function getOtherSettings() {
     return $this->getSettingsByGroup('other');
   }
@@ -628,11 +635,6 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
           'type' => 'string',
           'default' => '',
         ),
-        'digitalServices' => array(
-          'group' => 'invoice',
-          'type' => 'int',
-          'default' => InvoiceConfigInterface::DigitalServices_Unknown,
-        ),
         'defaultAccountNumber' => array(
           'group' => 'invoice',
           'type' => 'int',
@@ -686,6 +688,16 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
           'type' => 'int',
           'default' => 120,
         ),
+        'digitalServices' => array(
+          'group' => 'shop',
+          'type' => 'int',
+          'default' => InvoiceConfigInterface::DigitalServices_Unknown,
+        ),
+        'vatFreeProducts' => array(
+          'group' => 'shop',
+          'type' => 'int',
+          'default' => InvoiceConfigInterface::VatFreeProducts_Unknown,
+        ),
         'invoiceNrSource' => array(
           'group' => 'shop',
           'type' => 'int',
@@ -697,12 +709,12 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
           'default' => InvoiceConfigInterface::InvoiceDate_InvoiceCreate,
         ),
         'triggerInvoiceSendEvent' => array(
-          'group' => 'shop',
+          'group' => 'event',
           'type' => 'int',
           'default' => ConfigInterface::TriggerInvoiceSendEvent_None,
         ),
         'triggerOrderStatus' => array(
-          'group' => 'shop',
+          'group' => 'event',
           'type' => 'array',
           'default' => array(),
         ),

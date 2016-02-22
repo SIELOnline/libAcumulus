@@ -35,6 +35,11 @@ interface ConfigInterface {
   const DigitalServices_No = 2;
   const DigitalServices_Only = 3;
 
+  const VatFreeProducts_Unknown = 0;
+  const VatFreeProducts_Both = 1;
+  const VatFreeProducts_No = 2;
+  const VatFreeProducts_Only = 3;
+
   const VatType_National = 1;
   const VatType_NationalReversed = 2;
   const VatType_EuReversed = 3;
@@ -68,6 +73,18 @@ interface ConfigInterface {
    *   - useMargin
    */
   public function getInvoiceSettings();
+
+
+  /**
+   * Returns the set of settings related to the shop characteristics that
+   * influence the invoice creation and completion
+   *
+   * @return array
+   *   A keyed array with the keys:
+   *   - invoiceNrSource
+   *   - dateToUse
+   */
+  public function getShopSettings() ;
 
   /**
    * Returns the set of settings related to sending an email.

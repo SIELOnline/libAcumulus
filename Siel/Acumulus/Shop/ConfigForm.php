@@ -263,6 +263,15 @@ abstract class ConfigForm extends Form {
             'required' => true,
           ),
         ),
+        'vatFreeProducts' => array(
+          'type' => 'radio',
+          'label' => $this->t('field_vatFreeProducts'),
+          'description' => $this->t('desc_vatFreeProducts'),
+          'options' => $this->getVatFreeProductsOptions(),
+          'attributes' => array(
+            'required' => true,
+          ),
+        ),
         'invoiceNrSource' => $invoiceNrSourceField,
         'dateToUse' => $dateToUseField,
         'defaultCustomerType' => array(
@@ -611,6 +620,21 @@ abstract class ConfigForm extends Form {
       InvoiceConfigInterface::DigitalServices_Both => $this->t('option_digitalServices_1'),
       InvoiceConfigInterface::DigitalServices_No => $this->t('option_digitalServices_2'),
       InvoiceConfigInterface::DigitalServices_Only => $this->t('option_digitalServices_3'),
+    );
+  }
+
+  /**
+   * Returns a list of options for the vat free products field.
+   *
+   * @return array
+   *   An array keyed by the option values and having translated descriptions as
+   *   values.
+   */
+  protected function getVatFreeProductsOptions() {
+    return array(
+      InvoiceConfigInterface::VatFreeProducts_Both => $this->t('option_vatFreeProducts_1'),
+      InvoiceConfigInterface::VatFreeProducts_No => $this->t('option_vatFreeProducts_2'),
+      InvoiceConfigInterface::VatFreeProducts_Only => $this->t('option_vatFreeProducts_3'),
     );
   }
 

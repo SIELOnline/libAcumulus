@@ -45,7 +45,7 @@ abstract class Creator {
   const LineType_Other = 'other';
   const LineType_Corrector = 'missing-amount-corrector';
 
-  /** @var \Siel\Acumulus\Shop\Config */
+  /** @var \Siel\Acumulus\Invoice\ConfigInterface */
   protected $config;
 
   /** @var \Siel\Acumulus\Helpers\TranslatorInterface */
@@ -63,10 +63,10 @@ abstract class Creator {
   /**
    * Constructor.
    *
-   * @param \Siel\Acumulus\Shop\Config $config
+   * @param \Siel\Acumulus\Invoice\ConfigInterface $config
    * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
    */
-  public function __construct(Config $config, TranslatorInterface $translator) {
+  public function __construct(ConfigInterface $config, TranslatorInterface $translator) {
     $this->config = $config;
 
     $this->translator = $translator;
@@ -328,14 +328,14 @@ abstract class Creator {
   protected function getInvoice() {
     $result = array();
 
-    $invoiceSettings = $this->config->getShopSettings();
+    $shopSettings = $this->config->getShopSettings();
 
-    $sourceToUse = $invoiceSettings['invoiceNrSource'];
+    $sourceToUse = $shopSettings['invoiceNrSource'];
     if ($sourceToUse != ConfigInterface::InvoiceNrSource_Acumulus) {
       $result['number'] = $this->getInvoiceNumber($sourceToUse);
     }
 
-    $dateToUse = $invoiceSettings['dateToUse'];
+    $dateToUse = $shopSettings['dateToUse'];
     if ($dateToUse != ConfigInterface::InvoiceDate_Transfer) {
       $result['issuedate'] = $this->getInvoiceDate($dateToUse);
     }

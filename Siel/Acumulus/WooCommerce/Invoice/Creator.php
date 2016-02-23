@@ -193,7 +193,9 @@ class Creator extends BaseCreator {
    */
   protected function getItemLines() {
     $result = array();
-    foreach ($this->shopSource->get_items() as $line) {
+    $lines = $this->shopSource->get_items(apply_filters('woocommerce_admin_order_item_types', 'line_item'));
+    foreach ($lines as $order_item_id => $line) {
+      $line['order_item_id'] = $order_item_id;
       $itemLine = $this->getItemLine($line);
       if ($itemLine) {
         $result[] = $itemLine;
@@ -230,12 +232,13 @@ class Creator extends BaseCreator {
 
     $result['product'] = $item['name'];
     $isVariation = !empty($item['variation_id']);
-    $product = wc_get_product($isVariation ? $item['variation_id'] : $item['product_id']);
+    $product = $this->shopSource->get_product_from_item($item);
     // $product can be NULL if the product has been deleted.
     if ($product instanceof WC_Product) {
       $this->addIfNotEmpty($result, 'itemnumber', $product->get_sku());
       if ($isVariation) {
-        $result['product'] .= ' (' . wc_get_formatted_variation($product->variation_data, TRUE) . ')';
+        $variation = $this->getVariantDescription($item, $product);
+        $result['product'] .= " ($variation)";
       }
     }
 
@@ -270,6 +273,53 @@ class Creator extends BaseCreator {
     return $result;
   }
 
+  /**
+   * Returns a description for this variant.
+   *
+   * @param array $item
+   * @param \WC_Product $product
+   *
+   * @return string
+   *   The description for this variant, a string in the form:
+   *   (variant: value, variant: value, ...)
+   */
+  protected function getVariantDescription(array $item, \WC_Product $product) {
+    $result = array();
+
+    if ($metadata = $this->shopSource->has_meta($item['order_item_id'])) {
+      // Define hidden core fields.
+      $hiddenOrderItemMeta = apply_filters('woocommerce_hidden_order_itemmeta', array(
+        '_qty',
+        '_tax_class',
+        '_product_id',
+        '_variation_id',
+        '_line_subtotal',
+        '_line_subtotal_tax',
+        '_line_total',
+        '_line_tax',
+      ));
+      foreach ($metadata as $meta) {
+        // Skip hidden core fields and serialized data (also hidden core fields).
+        if (in_array($meta['meta_key'], $hiddenOrderItemMeta) || is_serialized($meta['meta_value'])) {
+          continue;
+        }
+
+        // Get attribute data.
+        if (taxonomy_exists(wc_sanitize_taxonomy_name($meta['meta_key']))) {
+          $term = get_term_by('slug', $meta['meta_value'], wc_sanitize_taxonomy_name($meta['meta_key']));
+          $meta['meta_key'] = wc_attribute_label(wc_sanitize_taxonomy_name($meta['meta_key']));
+          $meta['meta_value'] = isset($term->name) ? $term->name : $meta['meta_value'];
+        }
+        else {
+          $meta['meta_key'] = apply_filters('woocommerce_attribute_label', wc_attribute_label($meta['meta_key'], $product), $meta['meta_key']);
+        }
+
+        $result[] = $meta['meta_key'] . ': ' . rawurldecode($meta['meta_value']);
+      }
+    }
+
+    return implode(', ', $result);
+  }
   /**
    * @inheritdoc
    *

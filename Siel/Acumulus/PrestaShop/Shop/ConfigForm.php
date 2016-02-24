@@ -23,11 +23,10 @@ class ConfigForm extends BaseConfigForm {
    *
    * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
    * @param \Siel\Acumulus\Shop\Config $config
-   * @param string $moduleName
    */
-  public function __construct(TranslatorInterface $translator, Config $config, $moduleName) {
+  public function __construct(TranslatorInterface $translator, Config $config) {
     parent::__construct($translator, $config);
-    $this->moduleName = $moduleName;
+    $this->moduleName = 'acumulus';
   }
 
   /**

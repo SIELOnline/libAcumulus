@@ -11,133 +11,140 @@ use Siel\Acumulus\WooCommerce\Invoice\Source;
  * In WordPress this data is stored as metadata. As such, the "records" returned
  * here are an array of all metadata values, thus not filtered by Acumulus keys.
  */
-class AcumulusEntryModel extends BaseAcumulusEntryModel {
+class AcumulusEntryModel extends BaseAcumulusEntryModel
+{
+    const KEY_ENTRY_ID = '_acumulus_entry_id';
+    const KEY_TOKEN = '_acumulus_token';
+    // Note this meta key is not actually stored as the post_type can give us the
+    // same information.
+    const KEY_TYPE = '_acumulus_type';
+    const KEY_CREATED = '_acumulus_created';
+    const KEY_UPDATED = '_acumulus_updated';
 
-  const KEY_ENTRY_ID = '_acumulus_entry_id';
-  const KEY_TOKEN = '_acumulus_token';
-  // Note this meta key is not actually stored as the post_type can give us the
-  // same information.
-  const KEY_TYPE = '_acumulus_type';
-  const KEY_CREATED = '_acumulus_created';
-  const KEY_UPDATED = '_acumulus_updated';
-
-  /**
-   * Helper method that converts a WP/WC post type to a source type constant.
-   *
-   * @param string $shopType
-   *
-   * @return string
-   */
-  protected function shopTypeToSourceType($shopType) {
-    switch ($shopType) {
-      case 'shop_order':
-        return Source::Order;
-      case 'shop_order_refund':
-        return Source::CreditNote;
-      default:
-        Log::getInstance()->error('InvoiceManager::shopTypeToSourceType(%s): unknown', $shopType);
-        return '';
+    /**
+     * Helper method that converts a WP/WC post type to a source type constant.
+     *
+     * @param string $shopType
+     *
+     * @return string
+     */
+    protected function shopTypeToSourceType($shopType)
+    {
+        switch ($shopType) {
+            case 'shop_order':
+                return Source::Order;
+            case 'shop_order_refund':
+                return Source::CreditNote;
+            default:
+                Log::getInstance()->error('InvoiceManager::shopTypeToSourceType(%s): unknown', $shopType);
+                return '';
+        }
     }
-  }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getByEntryId($entryId) {
-    $result = false;
-    $metaQuery = array(
-      'posts_per_page' => 1,
-      'meta_key' => static::KEY_ENTRY_ID,
-      'meta_value' => $entryId,
-      'meta_compare' => '='
-    );
-    $posts = query_posts($metaQuery);
-    if (!empty($posts)) {
-      $post = reset($posts);
-      $result = get_post_meta($post->id);
-      $result[static::KEY_TYPE] = $this->shopTypeToSourceType($post->post_type);
+    /**
+     * {@inheritdoc}
+     */
+    public function getByEntryId($entryId)
+    {
+        $result = false;
+        $metaQuery = array(
+            'posts_per_page' => 1,
+            'meta_key' => static::KEY_ENTRY_ID,
+            'meta_value' => $entryId,
+            'meta_compare' => '=',
+        );
+        $posts = query_posts($metaQuery);
+        if (!empty($posts)) {
+            $post = reset($posts);
+            $result = get_post_meta($post->id);
+            $result[static::KEY_TYPE] = $this->shopTypeToSourceType($post->post_type);
+        }
+        return $result !== false ? $result : null;
     }
-    return $result !== false ? $result : null;
-  }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getByInvoiceSourceId($invoiceSourceType, $invoiceSourceId) {
-    $result = NULL;
-    $post = get_post($invoiceSourceId);
-    if (!empty($post->post_type) && $this->shopTypeToSourceType($post->post_type) === $invoiceSourceType) {
-      $result = get_post_meta($invoiceSourceId);
-      if (isset($result[static::KEY_ENTRY_ID])) {
-        // Acumulus meta data found: add invoice type as that is not stored in
-        // the meta data.
-        $result[static::KEY_TYPE] = $invoiceSourceType;
-      }
-      else {
-        $result = NULL;
-      }
+    /**
+     * {@inheritdoc}
+     */
+    public function getByInvoiceSourceId($invoiceSourceType, $invoiceSourceId)
+    {
+        $result = null;
+        $post = get_post($invoiceSourceId);
+        if (!empty($post->post_type) && $this->shopTypeToSourceType($post->post_type) === $invoiceSourceType) {
+            $result = get_post_meta($invoiceSourceId);
+            if (isset($result[static::KEY_ENTRY_ID])) {
+                // Acumulus meta data found: add invoice type as that is not stored in
+                // the meta data.
+                $result[static::KEY_TYPE] = $invoiceSourceType;
+            } else {
+                $result = null;
+            }
+        }
+        return $result;
     }
-    return $result;
-  }
 
-  /**
-   * {@inheritdoc}
-   *
-   * This override uses the WordPress meta data API to store the acumulus entry
-   * data with the order.
-   */
-  public function save($invoiceSource, $entryId, $token) {
-    $now = $this->sqlNow();
-    $orderId = $invoiceSource->getId();
-    add_post_meta($orderId, static::KEY_CREATED, $now, true);
-    //$exists = add_post_meta($orderId, '_acumulus_created', $now, true) === FALSE;
-    return update_post_meta($orderId, static::KEY_ENTRY_ID, $entryId) !== FALSE
-      && update_post_meta($orderId, static::KEY_TOKEN, $token) !== FALSE
-      && update_post_meta($orderId, static::KEY_UPDATED, $now) !== FALSE;
-  }
+    /**
+     * {@inheritdoc}
+     *
+     * This override uses the WordPress meta data API to store the acumulus entry
+     * data with the order.
+     */
+    public function save($invoiceSource, $entryId, $token)
+    {
+        $now = $this->sqlNow();
+        $orderId = $invoiceSource->getId();
+        add_post_meta($orderId, static::KEY_CREATED, $now, true);
+        //$exists = add_post_meta($orderId, '_acumulus_created', $now, true) === FALSE;
+        return update_post_meta($orderId, static::KEY_ENTRY_ID, $entryId) !== false
+        && update_post_meta($orderId, static::KEY_TOKEN, $token) !== false
+        && update_post_meta($orderId, static::KEY_UPDATED, $now) !== false;
+    }
 
-  /**
-   * {@inheritdoc}
-   */
-  protected function insert($invoiceSource, $entryId, $token, $created) {
-    throw new \BadMethodCallException(__METHOD__ . ' not implemented');
-  }
+    /**
+     * {@inheritdoc}
+     */
+    protected function insert($invoiceSource, $entryId, $token, $created)
+    {
+        throw new \BadMethodCallException(__METHOD__ . ' not implemented');
+    }
 
-  /**
-   * {@inheritdoc}
-   */
-  protected function update($record, $entryId, $token, $updated) {
-    throw new \BadMethodCallException(__METHOD__ . ' not implemented');
-  }
+    /**
+     * {@inheritdoc}
+     */
+    protected function update($record, $entryId, $token, $updated)
+    {
+        throw new \BadMethodCallException(__METHOD__ . ' not implemented');
+    }
 
-  /**
-   * {@inheritdoc}
-   */
-  protected function sqlNow() {
-    return current_time('timestamp', true);
-  }
+    /**
+     * {@inheritdoc}
+     */
+    protected function sqlNow()
+    {
+        return current_time('timestamp', true);
+    }
 
-  /**
-   * {@inheritdoc}
-   *
-   * We use the WordPress metadata API which is readily available, so nothing
-   * has to be done here.
-   */
-  public function install() {
-    return true;
-  }
+    /**
+     * {@inheritdoc}
+     *
+     * We use the WordPress metadata API which is readily available, so nothing
+     * has to be done here.
+     */
+    public function install()
+    {
+        return true;
+    }
 
-  /**
-   * {@inheritdoc}
-   *
-   * We use the WordPress metadata API which is readily available, so nothing
-   * has to be done here.
-   */
-  public function uninstall() {
-    // We do not delete all Acumulus metadata, not even via a confirmation page.
-    // If we would want to do so, we can use this code:
-    // delete_post_meta_by_key('_acumulus_entry_id'); // for other keys as well.
-    return true;
-  }
-
+    /**
+     * {@inheritdoc}
+     *
+     * We use the WordPress metadata API which is readily available, so nothing
+     * has to be done here.
+     */
+    public function uninstall()
+    {
+        // We do not delete all Acumulus metadata, not even via a confirmation page.
+        // If we would want to do so, we can use this code:
+        // delete_post_meta_by_key('_acumulus_entry_id'); // for other keys as well.
+        return true;
+    }
 }

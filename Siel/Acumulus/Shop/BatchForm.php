@@ -20,7 +20,7 @@ use Siel\Acumulus\Invoice\Translations as InvoiceTranslations;
  * - isSubmitted()
  * - setSubmittedValues()
  */
-abstract class BatchForm extends Form
+class BatchForm extends Form
 {
     /** @var \Siel\Acumulus\Shop\InvoiceManager */
     protected $invoiceManager;

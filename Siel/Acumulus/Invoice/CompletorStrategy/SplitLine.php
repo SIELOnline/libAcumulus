@@ -50,180 +50,184 @@ use Siel\Acumulus\Invoice\Creator;
  * Current known usages:
  * - ???
  */
-class SplitLine extends CompletorStrategyBase {
+class SplitLine extends CompletorStrategyBase
+{
+    /**
+     * @var int
+     *   This strategy should be tried last before the fail strategy as there
+     *   are chances of returning a wrong true result.
+     */
+    static public $tryOrder = 10;
 
-  /**
-   * @var int
-   *   This strategy should be tried last before the fail strategy as there
-   *   are chances of returning a wrong true result.
-   */
-  static public $tryOrder = 10;
+    /** @var array[] */
+    protected $splitLines;
 
-  /** @var array[] */
-  protected $splitLines;
+    /** @var float */
+    protected $splitLinesAmount;
 
-  /** @var float */
-  protected $splitLinesAmount;
+    /** @var array[] */
+    protected $otherLines;
 
-  /** @var array[] */
-  protected $otherLines;
+    /** @var float */
+    protected $otherLinesAmount;
 
-  /** @var float */
-  protected $otherLinesAmount;
+    /** @var float */
+    protected $nonStrategyAmount;
 
-  /** @var float */
-  protected $nonStrategyAmount;
+    /** @var array */
+    protected $minVatRate;
 
-  /** @var array */
-  protected $minVatRate;
+    /** @var array */
+    protected $maxVatRate;
 
-  /** @var array */
-  protected $maxVatRate;
+    /** @var array */
+    protected $keyComponent;
 
-  /** @var array */
-  protected $keyComponent;
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function init() {
-    $this->splitLines = array();
-    $this->otherLines = array();
-    $this->otherLinesAmount = 0.0;
-    foreach ($this->lines2Complete as $line2Complete) {
-      if (!empty($line2Complete['meta-strategy-split'])) {
-        $this->splitLines[] = $line2Complete;
-      }
-      else {
-        $this->otherLines[] = $line2Complete;
-        $this->otherLinesAmount += $line2Complete['unitprice'] * $line2Complete['quantity'];
-      }
-    }
-
-    $this->nonStrategyAmount  = 0.0;
-    foreach ($this->invoice['customer']['invoice']['line'] as $line2Complete) {
-      if ($line2Complete['meta-vatrate-source'] !== Creator::VatRateSource_Strategy) {
-        $this->nonStrategyAmount += $line2Complete['unitprice'] * $line2Complete['quantity'];
-      }
-    }
-    $this->splitLinesAmount = $this->invoiceAmount - $this->nonStrategyAmount - $this->otherLinesAmount;
-
-    $this->minVatRate = $this->getVatBreakDownMinRate();
-    $this->maxVatRate = $this->getVatBreakDownMaxRate();
-    $this->keyComponent = $this->getVatBreakDownMaxAmount();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function checkPreconditions() {
-    return count($this->vatBreakdown) === 2 && count($this->splitLines) >= 1;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function execute() {
-    if ($this->tryVatRate($this->maxVatRate['vatrate'])) {
-      return true;
-    }
-    if ($this->maxVatRate !== $this->keyComponent) {
-      if ($this->tryVatRate($this->keyComponent['vatrate'])) {
-        return true;
-      }
-    }
-
-    // Try a rate of 0% for all other lines.
-    //return $this->tryVatRate(0, $minRate, $maxRate);
-    return false;
-  }
-
-  /**
-   *
-   *
-   * @param float $vatRateForOtherLines
-   *
-   * @return bool
-   *
-   */
-  protected function tryVatRate($vatRateForOtherLines) {
-    $this->description = "SplitLine($vatRateForOtherLines, {$this->minVatRate['vatrate']}, {$this->maxVatRate['vatrate']})";
-    $this->completedLines = array();
-    $otherVatAmount = 0.0;
-    foreach ($this->otherLines as $otherLine2Complete) {
-      $otherVatAmount += $this->completeLine($otherLine2Complete, $vatRateForOtherLines);
-    }
-    return $this->divideAmountOver2VatRates($this->vat2Divide - $otherVatAmount,
-      (float) $this->minVatRate['vatrate'] / 100.0,
-      (float) $this->maxVatRate['vatrate'] / 100.0);
-  }
-
-  /**
-   * Tries to split $this->splitLinesAmount over 2 lines with $lowVatRate and
-   * $highVatRate such that the vat amount for those 2 lines equals the
-   * Given an amount and a vat over that amount, split that amount over 2 given
-   * vat rates such that the total vat amount remains equal.
-   *
-   * Example €15,- with €2.40 vat and vat rates of 21% and 6% results in €10,-
-   * at 21% vat and €5,- at 6% vat.
-   *
-   * The math:
-   * 1) highAmount + LowAmount = Amount
-   * 2) highRate * highAmount + lowRate * lowAmount = VatAmount
-   *
-   * This results in:
-   * 1) highAmount = (vatAmount - Amount * lowRate) / (highRate - lowRate)
-   * 2) lowAmount = Amount - highAmount
-   *
-   * This may be considered successful if the sign of all 3 amounts is the same
-   * and both low and high amount are not 0 (this is a split strategy, not
-   * splitting but using 1 vat rate is tried by another strategy).
-   *
-   * @param float $splitVatAmount
-   * @param float $lowVatRate
-   *   number between 0 and $highRate.
-   * @param float $highVatRate
-   *   number between $lowRate and 1.
-   *
-   * @return bool
-   *   Success.
-   */
-  protected function divideAmountOver2VatRates($splitVatAmount, $lowVatRate, $highVatRate) {
-    // Divide the amount over the 2 vat rates, such that the sum of the divided
-    // amounts and the sum of the vat amounts equals the total amount and vat.
-    list($lowAmount, $highAmount) = $this->splitAmountOver2VatRates($this->splitLinesAmount, $splitVatAmount, $lowVatRate, $highVatRate);
-
-    // Dividing was possible if both amounts have the same sign.
-    if (($highAmount < -0.005 && $lowAmount < -0.005 && $this->splitLinesAmount < -0.005)
-      || ($highAmount > 0.005 && $lowAmount > 0.005 && $this->splitLinesAmount > 0.005)) {
-      // We split all lines by the same percentage.
-      $highPercentage = $highAmount / $this->splitLinesAmount;
-      $lowPercentage = $lowAmount / $this->splitLinesAmount;
-      foreach ($this->splitLines as $line) {
-        $splitLine = $line;
-        $splitLine['product'] .= ' ' . $highVatRate . '% ' . $this->t('vat');
-        if (isset($splitLine['unitprice'])) {
-          $splitLine['unitprice'] = $highPercentage * $splitLine['unitprice'];
+    /**
+     * {@inheritdoc}
+     */
+    protected function init()
+    {
+        $this->splitLines = array();
+        $this->otherLines = array();
+        $this->otherLinesAmount = 0.0;
+        foreach ($this->lines2Complete as $line2Complete) {
+            if (!empty($line2Complete['meta-strategy-split'])) {
+                $this->splitLines[] = $line2Complete;
+            } else {
+                $this->otherLines[] = $line2Complete;
+                $this->otherLinesAmount += $line2Complete['unitprice'] * $line2Complete['quantity'];
+            }
         }
-        if (isset($splitLine['unitpriceinc'])) {
-          $splitLine['unitpriceinc'] = $highPercentage * $splitLine['unitpriceinc'];
-        }
-        $this->completeLine($splitLine, $highVatRate);
 
-        $splitLine = $line;
-        $splitLine['product'] .= ' ' . $lowVatRate . '% ' . $this->t('vat');
-        if (isset($splitLine['unitprice'])) {
-          $splitLine['unitprice'] = $lowPercentage * $splitLine['unitprice'];
+        $this->nonStrategyAmount = 0.0;
+        foreach ($this->invoice['customer']['invoice']['line'] as $line2Complete) {
+            if ($line2Complete['meta-vatrate-source'] !== Creator::VatRateSource_Strategy) {
+                $this->nonStrategyAmount += $line2Complete['unitprice'] * $line2Complete['quantity'];
+            }
         }
-        if (isset($splitLine['unitpriceinc'])) {
-          $splitLine['unitpriceinc'] = $lowPercentage * $splitLine['unitpriceinc'];
-        }
-        $this->completeLine($splitLine, $lowVatRate);
-      }
-      return true;
+        $this->splitLinesAmount = $this->invoiceAmount - $this->nonStrategyAmount - $this->otherLinesAmount;
+
+        $this->minVatRate = $this->getVatBreakDownMinRate();
+        $this->maxVatRate = $this->getVatBreakDownMaxRate();
+        $this->keyComponent = $this->getVatBreakDownMaxAmount();
     }
 
-    return false;
-  }
+    /**
+     * {@inheritdoc}
+     */
+    protected function checkPreconditions()
+    {
+        return count($this->vatBreakdown) === 2 && count($this->splitLines) >= 1;
+    }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function execute()
+    {
+        if ($this->tryVatRate($this->maxVatRate['vatrate'])) {
+            return true;
+        }
+        if ($this->maxVatRate !== $this->keyComponent) {
+            if ($this->tryVatRate($this->keyComponent['vatrate'])) {
+                return true;
+            }
+        }
+
+        // Try a rate of 0% for all other lines.
+        //return $this->tryVatRate(0, $minRate, $maxRate);
+        return false;
+    }
+
+    /**
+     *
+     *
+     * @param float $vatRateForOtherLines
+     *
+     * @return bool
+     *
+     */
+    protected function tryVatRate($vatRateForOtherLines)
+    {
+        $this->description = "SplitLine($vatRateForOtherLines, {$this->minVatRate['vatrate']}, {$this->maxVatRate['vatrate']})";
+        $this->completedLines = array();
+        $otherVatAmount = 0.0;
+        foreach ($this->otherLines as $otherLine2Complete) {
+            $otherVatAmount += $this->completeLine($otherLine2Complete, $vatRateForOtherLines);
+        }
+        return $this->divideAmountOver2VatRates($this->vat2Divide - $otherVatAmount,
+            (float) $this->minVatRate['vatrate'] / 100.0,
+            (float) $this->maxVatRate['vatrate'] / 100.0);
+    }
+
+    /**
+     * Tries to split $this->splitLinesAmount over 2 lines with $lowVatRate and
+     * $highVatRate such that the vat amount for those 2 lines equals the
+     * Given an amount and a vat over that amount, split that amount over 2 given
+     * vat rates such that the total vat amount remains equal.
+     *
+     * Example €15,- with €2.40 vat and vat rates of 21% and 6% results in €10,-
+     * at 21% vat and €5,- at 6% vat.
+     *
+     * The math:
+     * 1) highAmount + LowAmount = Amount
+     * 2) highRate * highAmount + lowRate * lowAmount = VatAmount
+     *
+     * This results in:
+     * 1) highAmount = (vatAmount - Amount * lowRate) / (highRate - lowRate)
+     * 2) lowAmount = Amount - highAmount
+     *
+     * This may be considered successful if the sign of all 3 amounts is the same
+     * and both low and high amount are not 0 (this is a split strategy, not
+     * splitting but using 1 vat rate is tried by another strategy).
+     *
+     * @param float $splitVatAmount
+     * @param float $lowVatRate
+     *   number between 0 and $highRate.
+     * @param float $highVatRate
+     *   number between $lowRate and 1.
+     *
+     * @return bool
+     *   Success.
+     */
+    protected function divideAmountOver2VatRates($splitVatAmount, $lowVatRate, $highVatRate)
+    {
+        // Divide the amount over the 2 vat rates, such that the sum of the divided
+        // amounts and the sum of the vat amounts equals the total amount and vat.
+        list($lowAmount, $highAmount) = $this->splitAmountOver2VatRates($this->splitLinesAmount, $splitVatAmount, $lowVatRate, $highVatRate);
+
+        // Dividing was possible if both amounts have the same sign.
+        if (($highAmount < -0.005 && $lowAmount < -0.005 && $this->splitLinesAmount < -0.005)
+            || ($highAmount > 0.005 && $lowAmount > 0.005 && $this->splitLinesAmount > 0.005)
+        ) {
+            // We split all lines by the same percentage.
+            $highPercentage = $highAmount / $this->splitLinesAmount;
+            $lowPercentage = $lowAmount / $this->splitLinesAmount;
+            foreach ($this->splitLines as $line) {
+                $splitLine = $line;
+                $splitLine['product'] .= ' ' . $highVatRate . '% ' . $this->t('vat');
+                if (isset($splitLine['unitprice'])) {
+                    $splitLine['unitprice'] = $highPercentage * $splitLine['unitprice'];
+                }
+                if (isset($splitLine['unitpriceinc'])) {
+                    $splitLine['unitpriceinc'] = $highPercentage * $splitLine['unitpriceinc'];
+                }
+                $this->completeLine($splitLine, $highVatRate);
+
+                $splitLine = $line;
+                $splitLine['product'] .= ' ' . $lowVatRate . '% ' . $this->t('vat');
+                if (isset($splitLine['unitprice'])) {
+                    $splitLine['unitprice'] = $lowPercentage * $splitLine['unitprice'];
+                }
+                if (isset($splitLine['unitpriceinc'])) {
+                    $splitLine['unitpriceinc'] = $lowPercentage * $splitLine['unitpriceinc'];
+                }
+                $this->completeLine($splitLine, $lowVatRate);
+            }
+            return true;
+        }
+
+        return false;
+    }
 }

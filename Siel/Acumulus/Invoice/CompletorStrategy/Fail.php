@@ -7,7 +7,6 @@ use Siel\Acumulus\Invoice\CompletorStrategyBase;
  * FailStrategy implements a complete strategy that always fails.
  */
 class Fail extends CompletorStrategyBase {
-
   /** @var int This strategy should be executed last. */
   static public $tryOrder = PHP_INT_MAX;
 
@@ -19,5 +18,4 @@ class Fail extends CompletorStrategyBase {
     $this->completedLines = $this->lines2Complete;
     return true;
   }
-
 }

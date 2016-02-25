@@ -33,84 +33,87 @@ use Siel\Acumulus\Invoice\CompletorStrategyBase;
  * Current known usages:
  * - PrestaShop (discount lines)
  */
-class SplitNonMatchingLine extends CompletorStrategyBase {
+class SplitNonMatchingLine extends CompletorStrategyBase
+{
+    /**
+     * @var int
+     *   This strategy should be tried last before the fail strategy as there
+     *   are chances of returning a wrong true result.
+     */
+    static public $tryOrder = 1;
 
-  /**
-   * @var int
-   *   This strategy should be tried last before the fail strategy as there
-   *   are chances of returning a wrong true result.
-   */
-  static public $tryOrder = 1;
+    /** @var array */
+    protected $minVatRate;
 
-  /** @var array */
-  protected $minVatRate;
+    /** @var array */
+    protected $maxVatRate;
 
-  /** @var array */
-  protected $maxVatRate;
+    /**
+     * {@inheritdoc}
+     */
+    protected function init()
+    {
+        $this->linesCompleted = array();
+    }
 
-  /**
-   * {@inheritdoc}
-   */
-  protected function init() {
-    $this->linesCompleted = array();
-  }
+    /**
+     * {@inheritdoc}
+     */
+    protected function checkPreconditions()
+    {
+        $result = count($this->vatBreakdown) === 2;
+        return $result;
+    }
 
-  /**
-   * {@inheritdoc}
-   */
-  protected function checkPreconditions() {
-    $result = count($this->vatBreakdown) === 2;
-    return $result;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function execute() {
-    $this->minVatRate = $this->getVatBreakDownMinRate();
-    $this->maxVatRate = $this->getVatBreakDownMaxRate();
-    $this->description = sprintf('"SplitNonMatchingLine(%s, %s)', $this->minVatRate['vatrate'], $this->maxVatRate['vatrate']);
-    $result = FALSE;
-    foreach ($this->lines2Complete as $key => $line2Complete) {
-      if (!empty($line2Complete['meta-strategy-split']) && !empty($line2Complete['meta-vatrate-matches'])) {
-        if ($this->splitNonMatchingLine($line2Complete)) {
-          $result = TRUE;
-          $this->linesCompleted[] = $key;
+    /**
+     * {@inheritdoc}
+     */
+    public function execute()
+    {
+        $this->minVatRate = $this->getVatBreakDownMinRate();
+        $this->maxVatRate = $this->getVatBreakDownMaxRate();
+        $this->description = sprintf('"SplitNonMatchingLine(%s, %s)', $this->minVatRate['vatrate'], $this->maxVatRate['vatrate']);
+        $result = false;
+        foreach ($this->lines2Complete as $key => $line2Complete) {
+            if (!empty($line2Complete['meta-strategy-split']) && !empty($line2Complete['meta-vatrate-matches'])) {
+                if ($this->splitNonMatchingLine($line2Complete)) {
+                    $result = true;
+                    $this->linesCompleted[] = $key;
+                }
+            }
         }
-      }
+        return $result;
     }
-    return $result;
-  }
 
-  /**
-   * @param array $line
-   *
-   * @return bool
-   */
-  protected function splitNonMatchingLine(array $line) {
-    list($lowAmount, $highAmount) = $this->splitAmountOver2VatRates($line['meta-line-price'],
-      $line['meta-line-priceinc'] - $line['meta-line-price'],
-      $this->minVatRate['vatrate'] / 100.0,
-      $this->maxVatRate['vatrate'] / 100.0);
+    /**
+     * @param array $line
+     *
+     * @return bool
+     */
+    protected function splitNonMatchingLine(array $line)
+    {
+        list($lowAmount, $highAmount) = $this->splitAmountOver2VatRates($line['meta-line-price'],
+            $line['meta-line-priceinc'] - $line['meta-line-price'],
+            $this->minVatRate['vatrate'] / 100.0,
+            $this->maxVatRate['vatrate'] / 100.0);
 
-    // Dividing was possible if both amounts have the same sign.
-    if (($highAmount < -0.005 && $lowAmount < -0.005 && $line['meta-line-price'] < -0.005)
-      || ($highAmount > 0.005 && $lowAmount > 0.005 && $line['meta-line-price'] > 0.005)
-    ) {
-      $splitLine = $line;
-      $splitLine['product'] .= sprintf(' (%s%% %s)', $this->maxVatRate['vatrate'], $this->t('vat'));
-      $splitLine['unitprice'] = $highAmount;
-      unset($splitLine['unitpriceinc']);
-      $this->completeLine($splitLine, $this->maxVatRate['vatrate']);
+        // Dividing was possible if both amounts have the same sign.
+        if (($highAmount < -0.005 && $lowAmount < -0.005 && $line['meta-line-price'] < -0.005)
+            || ($highAmount > 0.005 && $lowAmount > 0.005 && $line['meta-line-price'] > 0.005)
+        ) {
+            $splitLine = $line;
+            $splitLine['product'] .= sprintf(' (%s%% %s)', $this->maxVatRate['vatrate'], $this->t('vat'));
+            $splitLine['unitprice'] = $highAmount;
+            unset($splitLine['unitpriceinc']);
+            $this->completeLine($splitLine, $this->maxVatRate['vatrate']);
 
-      $splitLine = $line;
-      $splitLine['product'] .= sprintf(' (%s%% %s)', $this->minVatRate['vatrate'], $this->t('vat'));
-      $splitLine['unitprice'] = $lowAmount;
-      unset($splitLine['unitpriceinc']);
-      $this->completeLine($splitLine, $this->minVatRate['vatrate']);
-      return TRUE;
+            $splitLine = $line;
+            $splitLine['product'] .= sprintf(' (%s%% %s)', $this->minVatRate['vatrate'], $this->t('vat'));
+            $splitLine['unitprice'] = $lowAmount;
+            unset($splitLine['unitpriceinc']);
+            $this->completeLine($splitLine, $this->minVatRate['vatrate']);
+            return true;
+        }
+        return false;
     }
-    return FALSE;
-  }
-
 }

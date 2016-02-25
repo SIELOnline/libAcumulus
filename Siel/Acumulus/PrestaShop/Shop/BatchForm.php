@@ -7,37 +7,39 @@ use Tools;
 /**
  * Provides the Batch send form handling for the VirtueMart Acumulus module.
  */
-class BatchForm extends BaseBatchForm {
-
-  public function isSubmitted() {
-    return Tools::isSubmit('submitAdd');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setFormValues() {
-    parent::setFormValues();
-
-    // Prepend (checked) checkboxes with their collection name.
-    foreach ($this->getCheckboxKeys() as $checkboxName => $collectionName) {
-      if (isset($this->formValues[$checkboxName])) {
-        $this->formValues["{$collectionName}_{$checkboxName}"] = $this->formValues[$checkboxName];
-      }
+class BatchForm extends BaseBatchForm
+{
+    public function isSubmitted()
+    {
+        return Tools::isSubmit('submitAdd');
     }
-  }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getFieldDefinitions() {
-    $result = parent::getFieldDefinitions();
-    $result['batchFieldsHeader']['icon'] = 'icon-envelope-alt';
-    if (isset($result['batchLogHeader'])) {
-      $result['batchLogHeader']['icon'] = 'icon-list';
+    /**
+     * {@inheritdoc}
+     */
+    protected function setFormValues()
+    {
+        parent::setFormValues();
+
+        // Prepend (checked) checkboxes with their collection name.
+        foreach ($this->getCheckboxKeys() as $checkboxName => $collectionName) {
+            if (isset($this->formValues[$checkboxName])) {
+                $this->formValues["{$collectionName}_{$checkboxName}"] = $this->formValues[$checkboxName];
+            }
+        }
     }
-    $result['batchInfoHeader']['icon'] = 'icon-info-circle';
-    return $result;
-  }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getFieldDefinitions()
+    {
+        $result = parent::getFieldDefinitions();
+        $result['batchFieldsHeader']['icon'] = 'icon-envelope-alt';
+        if (isset($result['batchLogHeader'])) {
+            $result['batchLogHeader']['icon'] = 'icon-list';
+        }
+        $result['batchInfoHeader']['icon'] = 'icon-info-circle';
+        return $result;
+    }
 }

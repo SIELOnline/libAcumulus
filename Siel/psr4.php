@@ -13,10 +13,16 @@ namespace Siel;
 
 // Prepend this autoloader: it will not throw, nor warn, while the shop specific
 // autoloader might do so.
-spl_autoload_register(function($class) {
-    if (strpos($class, __NAMESPACE__ . '\\') === 0) {
-      $fileName = __DIR__ . str_replace('\\', DIRECTORY_SEPARATOR, substr($class, strlen(__NAMESPACE__))) . '.php';
-      /** @noinspection PhpIncludeInspection */
-      @include($fileName);
-    }
-  }, FALSE, TRUE);
+spl_autoload_register(
+    function ($class) {
+        if (strpos($class, __NAMESPACE__ . '\\') === 0) {
+            $fileName = __DIR__ . str_replace('\\', DIRECTORY_SEPARATOR, substr($class, strlen(__NAMESPACE__))) . '.php';
+            // Checking if the file exists prevent warnings in OpenCart1 where
+            // using just @include(...) did not help prevent them.
+            if (is_readable($fileName)) {
+                include($fileName);
+            }
+        }
+    },
+    false,
+    true);

@@ -5,7 +5,7 @@ use Siel\Acumulus\Invoice\Source as BaseSource;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
 
 /**
- * Wraps an OpenCart 2 order in an invoice source object.
+ * Wraps an OpenCart order in an invoice source object.
  */
 class Source extends BaseSource
 {
@@ -18,16 +18,7 @@ class Source extends BaseSource
      */
     protected function setSource()
     {
-        if (strrpos(DIR_APPLICATION, '/catalog/') === strlen(DIR_APPLICATION) - strlen('/catalog/')) {
-            // We are in the catalog section, use the order model of account.
-            Registry::getInstance()->load->model('checkout/order');
-            $orderModel = Registry::getInstance()->model_checkout_order;
-        } else {
-            // We are in the admin section, use the order model of sale.
-            Registry::getInstance()->load->model('sale/order');
-            $orderModel = Registry::getInstance()->model_sale_order;
-        }
-        $this->source = $orderModel->getOrder($this->id);
+        $this->source = Registry::getInstance()->getOrderModel()->getOrder($this->id);
     }
 
     /**

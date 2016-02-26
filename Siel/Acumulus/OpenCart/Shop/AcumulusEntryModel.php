@@ -14,9 +14,6 @@ use Siel\Acumulus\Shop\AcumulusEntryModel as BaseAcumulusEntryModel;
  */
 class AcumulusEntryModel extends BaseAcumulusEntryModel
 {
-    /** @var \DB\MySQLi */
-    private $db;
-
     /** @var string */
     protected $tableName;
 
@@ -69,11 +66,13 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
         return (bool) $this->getDb()->query(sprintf("UPDATE `%s` SET entry_id = %u, token = '%s', updated = '%s' WHERE id = %u",
             $this->tableName, $entryId, $token, $updated, $record['id']));
     }
-
+    
+    /** @noinspection PhpUndefinedNamespaceInspection */
+    /** @noinspection PhpUndefinedClassInspection */
     /**
      * Helper method to get the db object.
      *
-     * @return \DB\MySQLi
+     * @return \DBMySQLi|\DB\MySQLi
      */
     protected function getDb()
     {

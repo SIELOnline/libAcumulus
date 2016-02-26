@@ -1,13 +1,17 @@
 <?php
 namespace Siel\Acumulus\OpenCart\Helpers;
 
+/** @noinspection PhpUndefinedNamespaceInspection */
+/** @noinspection PhpUndefinedClassInspection */
 /**
- * Class Registry
+ * Registry is a wrapper around the registry instance which is not directly
+ * accessible as the single instance is passed to each constructor in the
+ * OpenCart classes.
  *
  * @property \Config config
- * @property \Loader load
- * @property \DB\MySQLi db
+ * @property \DBMySQLi|\DB\MySQLi db
  * @property \Event event
+ * @property \Loader load
  * @property \Request request
  * @property \ModelAccountOrder model_account_order
  * @property \ModelCatalogProduct model_catalog_product
@@ -18,20 +22,33 @@ namespace Siel\Acumulus\OpenCart\Helpers;
  */
 class Registry
 {
-    /** @var Registry */
+    /** @var \Siel\Acumulus\OpenCart\Helpers\Registry */
     protected static $instance;
 
     /** @var \Registry */
     protected $registry;
+
+    /** @noinspection PhpUndefinedClassInspection */
+    /** @var \ModelAccountOrder|\ModelSaleOrder */
+    protected $orderModel;
 
     /**
      * Sets the OC Registry.
      *
      * @param \Registry $registry
      */
-    public static function setRegistry($registry)
-    {
+    public static function setRegistry(/** @noinspection PhpUnusedParameterInspection */ \Registry $registry) {
         static::$instance = new Registry($registry);
+    }
+
+    /**
+     * Returns the Registry instance.
+     *
+     * @return \Siel\Acumulus\OpenCart\Helpers\Registry
+     */
+    public static function getInstance()
+    {
+        return static::$instance;
     }
 
     /**
@@ -42,17 +59,7 @@ class Registry
     public function __construct(\Registry $registry)
     {
         $this->registry = $registry;
-    }
-
-
-    /**
-     * Returns the Registry instance.
-     *
-     * @return Registry
-     */
-    public static function getInstance()
-    {
-        return static::$instance;
+        $this->orderModel = null;
     }
 
     public function __get($key)
@@ -63,5 +70,21 @@ class Registry
     public function __set($key, $value)
     {
         $this->registry->set($key, $value);
+    }
+
+    public function getOrderModel()
+    {
+        if ($this->orderModel === null) {
+            if (strrpos(DIR_APPLICATION, '/catalog/') === strlen(DIR_APPLICATION) - strlen('/catalog/')) {
+                // We are in the catalog section, use the account/order model.
+                $this->load->model('account/order');
+                $this->orderModel = $this->model_account_order;
+            } else {
+                // We are in the admin section, use the sale/order model.
+                Registry::getInstance()->load->model('sale/order');
+                $this->orderModel = Registry::getInstance()->model_sale_order;
+            }
+        }
+        return $this->orderModel;
     }
 }

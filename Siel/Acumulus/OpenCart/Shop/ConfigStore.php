@@ -26,6 +26,7 @@ class ConfigStore extends BaSeConfigStore
         return $environment;
     }
 
+    /** @noinspection PhpUndefinedClassInspection */
     /**
      * @return \ModelSettingSetting
      */

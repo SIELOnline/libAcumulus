@@ -2,7 +2,6 @@
 namespace Siel\Acumulus\OpenCart\Shop;
 
 use DateTime;
-use Siel\Acumulus\Invoice\Source as BaseSource;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
 use Siel\Acumulus\PrestaShop\Invoice\Source;
 use Siel\Acumulus\Shop\Config;
@@ -12,9 +11,6 @@ class InvoiceManager extends BaseInvoiceManager
 {
     /** @var array */
     protected $tableInfo;
-
-    /** @var \DB\MySQLi */
-    private $db;
 
     /** @var string */
     protected $orderTableName;
@@ -40,10 +36,12 @@ class InvoiceManager extends BaseInvoiceManager
         );
     }
 
+    /** @noinspection PhpUndefinedNamespaceInspection */
+    /** @noinspection PhpUndefinedClassInspection */
     /**
      * Helper method to get the db object.
      *
-     * @return \DB\MySQLi
+     * @return \DBMySQLi|\DB\MySQLi
      */
     protected function getDb()
     {
@@ -75,46 +73,5 @@ class InvoiceManager extends BaseInvoiceManager
         $query = sprintf("SELECT `%s` FROM `%s` WHERE `%s` BETWEEN '%s' AND '%s'", $key, $table, $dateField, $dateFrom, $dateTo);
         $result = $this->getDb()->query($query);
         return $this->getSourcesByIdsOrSources($invoiceSourceType, $this->getCol($result->rows, $key));
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * This PrestaShop override executes the 'actionAcumulusInvoiceCreated' hook.
-     */
-    protected function triggerInvoiceCreated(array &$invoice, BaseSource $invoiceSource)
-    {
-        $args = array('invoice' => &$invoice, 'source' => $invoiceSource);
-        $this->getEvent()->trigger('acumulus.invoice.created', $args);
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * This PrestaShop override executes the 'actionAcumulusInvoiceCompleted' hook.
-     */
-    protected function triggerInvoiceCompleted(array &$invoice, BaseSource $invoiceSource)
-    {
-        $args = array('invoice' => &$invoice, 'source' => $invoiceSource);
-        $this->getEvent()->trigger('acumulus.invoice.completed', $args);
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * This PrestaShop override executes the 'actionAcumulusInvoiceSent' hook.
-     */
-    protected function triggerInvoiceSent(array $invoice, BaseSource $invoiceSource, array $result)
-    {
-        $args = array('invoice' => $invoice, 'source' => $invoiceSource, 'result' => $result);
-        $this->getEvent()->trigger('acumulus.invoice.completed', $args);
-    }
-
-    /**
-     * @return \Event
-     */
-    private function getEvent()
-    {
-        return Registry::getInstance()->event;
     }
 }

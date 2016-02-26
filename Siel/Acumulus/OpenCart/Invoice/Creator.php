@@ -351,24 +351,12 @@ class Creator extends BaseCreator
         return $this->orderTotalLines;
     }
 
+    /** @noinspection PhpUndefinedClassInspection */
     /**
-     *
-     *
-     *
      * @return \ModelAccountOrder|\ModelSaleOrder
-     *
      */
     protected function getOrderModel()
     {
-        if (strrpos(DIR_APPLICATION, '/catalog/') === strlen(DIR_APPLICATION) - strlen('/catalog/')) {
-            // We are in the catalog section, use the account/order model.
-            Registry::getInstance()->load->model('account/order');
-            $orderModel = Registry::getInstance()->model_account_order;
-        } else {
-            // We are in the admin section, use the sale/order model.
-            Registry::getInstance()->load->model('sale/order');
-            $orderModel = Registry::getInstance()->model_sale_order;
-        }
-        return $orderModel;
+        return Registry::getInstance()->getOrderModel();
     }
 }

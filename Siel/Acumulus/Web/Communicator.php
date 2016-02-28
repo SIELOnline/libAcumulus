@@ -379,7 +379,7 @@ class Communicator
                 $this->convertToDom($value, $node);
             }
         } else {
-            $element->appendChild($document->createTextNode($values));
+            $element->appendChild($document->createTextNode(is_bool($values) ? ($values ? 'true' : 'false') : $values));
         }
 
         return $element;

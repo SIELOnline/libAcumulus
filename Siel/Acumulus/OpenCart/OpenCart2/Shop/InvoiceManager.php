@@ -10,7 +10,7 @@ class InvoiceManager extends BaseInvoiceManager
     /**
      * {@inheritdoc}
      *
-     * This PrestaShop override executes the 'actionAcumulusInvoiceCreated' hook.
+     * This OpenCart 2 override triggers the 'acumulus.invoice.created' event.
      */
     protected function triggerInvoiceCreated(array &$invoice, BaseSource $invoiceSource)
     {
@@ -21,7 +21,7 @@ class InvoiceManager extends BaseInvoiceManager
     /**
      * {@inheritdoc}
      *
-     * This PrestaShop override executes the 'actionAcumulusInvoiceCompleted' hook.
+     * This OpenCart 2 override triggers the 'acumulus.invoice.completed' event.
      */
     protected function triggerInvoiceCompleted(array &$invoice, BaseSource $invoiceSource)
     {
@@ -32,12 +32,12 @@ class InvoiceManager extends BaseInvoiceManager
     /**
      * {@inheritdoc}
      *
-     * This PrestaShop override executes the 'actionAcumulusInvoiceSent' hook.
+     * This OpenCart 2 override triggers the 'acumulus.invoice.sent' event.
      */
     protected function triggerInvoiceSent(array $invoice, BaseSource $invoiceSource, array $result)
     {
         $args = array('invoice' => $invoice, 'source' => $invoiceSource, 'result' => $result);
-        $this->getEvent()->trigger('acumulus.invoice.completed', $args);
+        $this->getEvent()->trigger('acumulus.invoice.sent', $args);
     }
 
     /**

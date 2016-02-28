@@ -15,7 +15,7 @@ class Creator extends BaseCreator
     /** @var array */
     protected $order;
 
-    /** @var array[] List of order total records. */
+    /** @var array[] List of OpenCart order total records. */
     protected $orderTotalLines;
 
     /**
@@ -52,7 +52,6 @@ class Creator extends BaseCreator
         $this->addIfSetAndNotEmpty($result, 'contactyourid', $order, 'customer_id');
         $this->addEmpty($result, 'companyname1', $order['payment_company']);
         if (!empty($result['companyname1'])) {
-            // This is not a column in any table.
             // @todo: Are there VAT number extensions?
             $this->addIfSetAndNotEmpty($result, 'vatnumber', $order, 'payment_tax_id');
         }
@@ -70,16 +69,6 @@ class Creator extends BaseCreator
         $result['email'] = $order['email'];
 
         return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function searchProperty($property)
-    {
-        // @todo: $this->order is the only array to search?
-        $value = parent::searchProperty($property);
-        return $value;
     }
 
     /**
@@ -110,7 +99,7 @@ class Creator extends BaseCreator
      */
     protected function getPaymentState()
     {
-        // @todo: Can we get the payment status (introduce setting based on order state?).
+        // @todo: Can we determine this based on payment_method and payment_code?
         $result = ConfigInterface::PaymentStatus_Paid;
         return $result;
     }
@@ -120,6 +109,7 @@ class Creator extends BaseCreator
      */
     protected function getPaymentDate()
     {
+        // @todo: Can we determine this based on history (and optionally payment_method and payment_code)?
         // Will default to the issue date.
         return null;
     }
@@ -231,7 +221,9 @@ class Creator extends BaseCreator
                     $optionsLines[] = array(
                             'product' => " - $optionsText",
                             'unitprice' => 0,
-                            // @todo: is an option/variant/composant always quantity 1?
+                            // Table order_option does not have a quantity
+                            // field, so composite products are apparently not
+                            // covered.
                             'quantity' => 1,
                         ) + $vatInfo;
                 }
@@ -297,7 +289,6 @@ class Creator extends BaseCreator
         return $result;
     }
 
-
     /**
      * Returns a line based on a "order total line".
      *
@@ -328,7 +319,7 @@ class Creator extends BaseCreator
                 'meta-vatrate-source' => Creator::VatRateSource_Strategy,
                 // Coupons may have to be split over various taxes, but shipping and
                 // other fees not.
-                'meta-strategy-split' => $line['code'] === 'coupun',
+                'meta-strategy-split' => $line['code'] === 'coupon',
             );
         }
 
@@ -336,11 +327,10 @@ class Creator extends BaseCreator
     }
 
     /**
+     * Returns a list of OpenCart order total records. These are shipment,
+     * other fee, tax, and discount lines.
      *
-     *
-     *
-     * @return mixed
-     *
+     * @return array[]
      */
     protected function getOrderTotalLines()
     {

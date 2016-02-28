@@ -1,10 +1,10 @@
 <?php
-namespace Siel\Acumulus\OpenCart\Helpers;
+namespace Siel\Acumulus\OpenCart\OpenCart2\Helpers;
 
 use Siel\Acumulus\Helpers\FormRenderer as BaseFormRenderer;
 
 /**
- * FormMapper maps an Acumulus form definition to a OpenCart form definition.
+ * FormMapper maps an Acumulus form definition to a OpenCart 2 form definition.
  */
 class FormRenderer extends BaseFormRenderer
 {

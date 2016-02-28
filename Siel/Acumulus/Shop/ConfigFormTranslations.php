@@ -195,7 +195,7 @@ Using this setting this plugin can better determine the invoice type; perform so
         'option_vatFreeProducts_1' => 'Both VAT free and VAT liable products or services.',
         'option_vatFreeProducts_2' => 'Only products or services that are VAT liable.',
         'option_vatFreeProducts_3' => 'Only VAT free products or services.',
-        'desc_vatFreeProducts' => 'GSelect whether your store offers products or services that are VAT free, e.g. education.
+        'desc_vatFreeProducts' => 'Select whether your store offers products or services that are VAT free, e.g. education.
 Using this setting this plugin can better determine the invoice type and perform some validations.',
 
         'field_invoiceNrSource' => 'Invoice number',

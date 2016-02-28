@@ -9,17 +9,20 @@ use Siel\Acumulus\Helpers\FormRenderer as BaseFormRenderer;
  */
 class FormRenderer extends BaseFormRenderer
 {
-    protected $radioWrapperTag = 'ul';
-    protected $radioWrapperClass = '';
-
-    protected $radio1WrapperTag = 'li';
-    protected $radio1WrapperClass = '';
-
-    protected $checkboxWrapperTag = 'ul';
-    protected $checkboxWrapperClass = '';
-
-    protected $checkbox1WrapperTag = 'li';
-    protected $checkbox1WrapperClass = '';
+    /**
+     * Constructor.
+     */
+    public function __construct()
+    {
+        $this->radioWrapperTag = 'ul';
+        $this->radioWrapperClass = '';
+        $this->radio1WrapperTag = 'li';
+        $this->radio1WrapperClass = '';
+        $this->checkboxWrapperTag = 'ul';
+        $this->checkboxWrapperClass = '';
+        $this->checkbox1WrapperTag = 'li';
+        $this->checkbox1WrapperClass = '';
+    }
 
     /**
      * @inheritdoc

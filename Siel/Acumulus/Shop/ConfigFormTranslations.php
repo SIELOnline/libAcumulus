@@ -12,9 +12,6 @@ class ConfigFormTranslations extends TranslationCollection
         'config_form_title' => 'Acumulus | Instellingen',
         'config_form_header' => 'Acumulus instellingen',
 
-        'button_save' => 'Opslaan',
-        'button_cancel' => 'Annuleren',
-
         'message_validate_contractcode_0' => 'Het veld Contractcode is verplicht, vul de contractcode in die u ook gebruikt om in te loggen op Acumulus.',
         'message_validate_contractcode_1' => 'Het veld Contractcode is een numeriek veld, vul de contractcode in die u ook gebruikt om in te loggen op Acumulus.',
         'message_validate_username_0' => 'Het veld Gebruikersnaam is verplicht, vul de gebruikersnaam in die u ook gebruikt om in te loggen op Acumulus.',
@@ -56,7 +53,7 @@ Met behulp van deze instelling kan de koppeling beter: het type factuur bepalen;
         'option_vatFreeProducts_1' => 'Zowel BTW vrije als aan BTW onderhevige producten en/of diensten.',
         'option_vatFreeProducts_2' => 'Alleen aan BTW onderhevige producten en/of diensten.',
         'option_vatFreeProducts_3' => 'Alleen producten of diensten die van BTW vrijgesteld zijn.',
-        'desc_vatFreeProducts' => 'Geef aan of u in uw winkel producten en/of diensten aanbiedt die vrijgesteld zin van BTW, bv onderwijs.
+        'desc_vatFreeProducts' => 'Geef aan of u in uw winkel producten en/of diensten aanbiedt die vrijgesteld zijn van BTW, bv. onderwijs.
 Met behulp van deze instelling kan de koppeling beter het type factuur bepalen en controles uitvoeren.',
 
         'field_invoiceNrSource' => 'Factuurnummer',

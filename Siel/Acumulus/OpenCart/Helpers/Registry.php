@@ -10,12 +10,18 @@ namespace Siel\Acumulus\OpenCart\Helpers;
  *
  * @property \Config config
  * @property \DBMySQLi|\DB\MySQLi db
+ * @property \Document document
  * @property \Event event
+ * @property \Language language
  * @property \Loader load
  * @property \Request request
+ * @property \Response response
+ * @property \Session session
+ * @property \Url url
  * @property \ModelAccountOrder model_account_order
  * @property \ModelCatalogProduct model_catalog_product
  * @property \ModelCheckoutOrder model_checkout_order
+ * @property \ModelExtensionEvent model_extension_event
  * @property \ModelSaleOrder model_sale_order
  * @property \ModelLocalisationOrderStatus model_localisation_order_status
  * @property \ModelSettingSetting model_setting_setting
@@ -37,7 +43,7 @@ class Registry
      *
      * @param \Registry $registry
      */
-    public static function setRegistry(/** @noinspection PhpUnusedParameterInspection */ \Registry $registry) {
+    public static function setRegistry(\Registry $registry) {
         static::$instance = new Registry($registry);
     }
 

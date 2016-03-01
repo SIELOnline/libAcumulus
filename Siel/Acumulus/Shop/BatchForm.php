@@ -98,7 +98,6 @@ class BatchForm extends Form
         }
     }
 
-
     /**
      * {@inheritdoc}
      *

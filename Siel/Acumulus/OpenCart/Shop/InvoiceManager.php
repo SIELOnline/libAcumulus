@@ -36,6 +36,15 @@ class InvoiceManager extends BaseInvoiceManager
         );
     }
 
+    public function getSupportedInvoiceSourceTypes()
+    {
+        return array(
+            Source::Order,
+            //Source::CreditNote,
+        );
+    }
+
+
     /** @noinspection PhpUndefinedNamespaceInspection */
     /** @noinspection PhpUndefinedClassInspection */
     /**

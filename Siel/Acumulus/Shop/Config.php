@@ -222,8 +222,13 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
             }
 
             // Use ReflectionClass to pass the array of arguments as argument list.
-            $reflector = new ReflectionClass($fqClass);
-            $this->instances[$class] = $reflector->newInstanceArgs($constructorArgs);
+            if (empty($constructorArgs)) {
+                $this->instances[$class] = new $fqClass();
+            }
+            else {
+                $reflector = new ReflectionClass($fqClass);
+                $this->instances[$class] = $reflector->newInstanceArgs($constructorArgs);
+            }
         }
         return $this->instances[$class];
     }

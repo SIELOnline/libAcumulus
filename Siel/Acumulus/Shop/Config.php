@@ -221,8 +221,10 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
                 $fqClass = $this->tryNsInstance($class, $subNamespace, static::baseNamespace);
             }
 
-            // Use ReflectionClass to pass the array of arguments as argument list.
+            // Use ReflectionClass to pass an argument list.
             if (empty($constructorArgs)) {
+                // PHP5.3: exception when class has no constructor and
+                // newInstanceArgs() is called.
                 $this->instances[$class] = new $fqClass();
             }
             else {

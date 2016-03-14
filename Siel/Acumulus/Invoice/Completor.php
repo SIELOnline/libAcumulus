@@ -552,41 +552,44 @@ class Completor
         if (empty($this->invoice['customer']['invoice']['vattype'])) {
 
             $possibleVatTypes = $this->getPossibleVatTypesByCorrectVatRates();
+            $metaPossibleVatTypes = $this->possibleVatTypes;
             if (empty($possibleVatTypes)) {
-                $this->messages['warnings'][] = array(
-                    'code' => '',
-                    'codetag' => '',
-                    'message' => $this->t('message_warning_no_vattype'),
-                );
+                // Pick the first vat type that we thought was possible, but ...
                 $this->invoice['customer']['invoice']['vattype'] = reset($this->possibleVatTypes);
-                $this->invoice['customer']['invoice']['meta-vattypes-possible'] = implode(',', $this->possibleVatTypes);
-                $this->invoice['customer']['invoice']['concept'] = ConfigInterface::Concept_Yes;
+                // We must check as no vat type allows the actual vat rates.
+                $message = 'message_warning_no_vattype';
             } else if (count($possibleVatTypes) === 1) {
-                // Pick the first and only vat type.
+                // Pick the first and only (and therefore correct) vat type.
                 $this->invoice['customer']['invoice']['vattype'] = reset($possibleVatTypes);
+                $message = '';
             } else {
                 // Get the intersection of possible vat types per line.
                 $vatTypesOnAllLines = $this->getVatTypesAppearingOnAllLines();
                 if (empty($vatTypesOnAllLines)) {
+                    // Pick the first and hopefully a correct vat type, but ...
+                    $metaPossibleVatTypes = $possibleVatTypes;
+                    $this->invoice['customer']['invoice']['vattype'] = reset($possibleVatTypes);
                     // We must split.
                     $message = 'message_warning_multiple_vattype_must_split';
-                    // Pick the first and hopefully correct vat type, but ...
-                    $this->invoice['customer']['invoice']['vattype'] = reset($possibleVatTypes);
                 } else {
+                    // Pick the first vat type that appears on all lines, but ...
+                    $metaPossibleVatTypes = $vatTypesOnAllLines;
+                    $this->invoice['customer']['invoice']['vattype'] = reset($vatTypesOnAllLines);
                     // We may have to split.
                     $message = 'message_warning_multiple_vattype_may_split';
-                    // Pick the first vat type that appears on all lines, but ...
-                    $this->invoice['customer']['invoice']['vattype'] = reset($vatTypesOnAllLines);
                 }
 
-                // But add a message and meta info.
+            }
+
+            if (!empty($message)) {
+                // Make the invoice a concept, so it can be changed in Acumulus and add message and meta info.
                 $this->messages['warnings'][] = array(
                     'code' => '',
                     'codetag' => '',
                     'message' => $this->t($message),
                 );
                 $this->invoice['customer']['invoice']['concept'] = ConfigInterface::Concept_Yes;
-                $this->invoice['customer']['invoice']['meta-vattypes-possible'] = implode(',', $possibleVatTypes);
+                $this->invoice['customer']['invoice']['meta-vattypes-possible'] = implode(',', $metaPossibleVatTypes);
             }
         }
     }
@@ -659,12 +662,14 @@ class Completor
     {
         $result = null;
         foreach ($this->invoice['customer']['invoice']['line'] as $line) {
-            $lineVatTypes = explode(',', $line['meta-vattypes-possible']);
-            if ($result === null) {
-                // 1st line.
-                $result = $lineVatTypes;
-            } else {
-                $result = array_intersect($result, $lineVatTypes);
+            if (isset($line['meta-vattypes-possible'])) {
+                $lineVatTypes = explode(',', $line['meta-vattypes-possible']);
+                if ($result === null) {
+                    // 1st line.
+                    $result = $lineVatTypes;
+                } else {
+                    $result = array_intersect($result, $lineVatTypes);
+                }
             }
         }
         return $result;

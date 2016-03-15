@@ -238,7 +238,10 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
     protected function tryNsInstance($class, $subNamespace, $namespace)
     {
         $fqClass = $namespace . '\\' . $subNamespace . '\\' . $class;
-        return class_exists($fqClass) ? $fqClass : '';
+        $fileName = __DIR__ . DIRECTORY_SEPARATOR . '..' . str_replace('\\', DIRECTORY_SEPARATOR, substr($fqClass, strlen('/Siel/Acumulus'))) . '.php';
+        // Checking if the file exists prevent warnings in Magento whose own
+        // autoloader logs warnings when a class cannot be loaded.
+        return is_readable($fileName) && class_exists($fqClass) ? $fqClass : '';
     }
 
     /**

@@ -9,20 +9,13 @@ use Siel\Acumulus\Helpers\Mailer as BaseMailer;
  */
 class Mailer extends BaseMailer
 {
-    /** @var string */
-    protected $templateDir;
-
-    /** @var string */
-    protected $templateName;
-
     /**
      * {@inheritdoc}
      */
-    public function sendInvoiceAddMailResult(array $result, array $messages, $invoiceSourceType, $invoiceSourceReference)
+    public function sendMail($from, $fromName, $to, $subject, $bodyText, $bodyHtml)
     {
         $config = Registry::getInstance()->config;
         $mail = new Mail();
-
         $mail->protocol = $config->get('config_mail_protocol') ? $config->get('config_mail_protocol') : 'mail';
         $mail->parameter = $config->get('config_mail_parameter');
         $mail->hostname = $config->get('config_smtp_host');
@@ -30,14 +23,23 @@ class Mailer extends BaseMailer
         $mail->password = $config->get('config_smtp_password');
         $mail->port = $config->get('config_smtp_port');
         $mail->timeout = $config->get('config_smtp_timeout');
-        $mail->setTo($this->getToAddress());
-        $mail->setFrom($config->get('config_email'));
-        $mail->setSender($this->getFromName());
-        $mail->setSubject($this->getSubject($result));
-        $content = $this->getBody($result, $messages, $invoiceSourceType, $invoiceSourceReference);
-        $mail->setText($content['text']);
-        $mail->setHtml($content['html']);
-
+        $mail->setTo($to);
+        $mail->setFrom($from);
+        $mail->setSender($fromName);
+        $mail->setSubject($subject);
+        $mail->setText($bodyText);
+        $mail->setHtml($bodyHtml);
         $mail->send();
+        return true;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getFrom()
+    {
+        $config = Registry::getInstance()->config;
+        return $config->get('config_email');
+    }
+
 }

@@ -20,54 +20,58 @@ class Mailer extends BaseMailer
     /**
      * {@inheritdoc}
      */
-    public function sendInvoiceAddMailResult(array $result, array $messages, $invoiceSourceType, $invoiceSourceReference)
+    public function sendMail($from, $fromName, $to, $subject, $bodyText, $bodyHtml)
     {
         $this->templateDir = dirname(__FILE__) . '/mails/';
         $this->templateName = 'message';
-        $body = $this->getBody($result, $messages, $invoiceSourceType, $invoiceSourceReference);
-        $this->writeTemplateFile($body);
+        $this->writeTemplateFiles($bodyText, $bodyHtml);
 
         $languageId = Language::getIdByIso($this->translator->getLanguage());
-        $title = $this->getSubject($result);
         $templateVars = array();
-        $toEmail = $this->getToAddress();
-        $toName = Configuration::get('PS_SHOP_NAME');
-        $from = Configuration::get('PS_SHOP_EMAIL');
-        $fromName = Configuration::get('PS_SHOP_NAME');
 
-        $result = Mail::Send($languageId, $this->templateName, $title, $templateVars, $toEmail, $toName, $from, $fromName, null, null, $this->templateDir);
+        $result = Mail::Send($languageId, $this->templateName, $subject, $templateVars, $to, '', $from, $fromName, null, null, $this->templateDir);
 
         // Clear the template files as they contain privacy sensitive data.
-        $this->writeTemplateFiles(array('body' => '', 'text' => ''));
+        $this->writeTemplateFiles('', '');
 
+        if ($result === true) {
+            $result = 'Emails are deactivated: $configuration[\'PS_MAIL_METHOD\'] == 3';
+        }
+        else if(is_int($result)) {
+            // If PS returns an int, that indicates the number of successful recipients, see Swift::send().
+            $result = true;
+        }
         return $result;
     }
 
     /**
-     * Writes the mail bodies (html and text) to template files as used by the
-     * PrestaShop mailer.
-     *
-     * @param array $body
+     * {@inheritdoc}
      */
-    protected function writeTemplateFile(array $body)
+    protected function getFrom()
     {
-        $languageIso = $this->translator->getLanguage();
-        $templateBaseName = $this->templateDir . $languageIso . '/' . $this->templateName;
-        file_put_contents($templateBaseName . '.html', !empty($body['html']) ? $body['html'] : '');
-        file_put_contents($templateBaseName . '.txt', !empty($body['text']) ? $body['text'] : '');
+        return Configuration::get('PS_SHOP_EMAIL');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getFromName()
+    {
+        return Configuration::get('PS_SHOP_NAME');
     }
 
     /**
      * Writes the mail bodies (html and text) to template files as used by the
      * PrestaShop mailer.
      *
-     * @param array $body
+     * @param string $bodyText
+     * @param string $bodyHtml
      */
-    protected function writeTemplateFiles(array $body)
+    protected function writeTemplateFiles($bodyText, $bodyHtml)
     {
         $languageIso = $this->translator->getLanguage();
         $templateBaseName = $this->templateDir . $languageIso . '/' . $this->templateName;
-        file_put_contents($templateBaseName . '.html', !empty($body['html']) ? $body['html'] : '');
-        file_put_contents($templateBaseName . '.txt', !empty($body['text']) ? $body['text'] : '');
+        file_put_contents($templateBaseName . '.html', !empty($bodyHtml) ? $bodyHtml : '');
+        file_put_contents($templateBaseName . '.txt', !empty($bodyText) ? $bodyText : '');
     }
 }

@@ -13,15 +13,31 @@ class Mailer extends BaseMailer
     /**
      * {@inheritdoc}
      */
-    public function sendInvoiceAddMailResult(array $result, array $messages, $invoiceSourceType, $invoiceSourceReference)
+    public function sendMail($from, $fromName, $to, $subject, $bodyText, $bodyHtml)
     {
         /** @var Mage_Core_Model_Email_Template $emailTemplate */
         $emailTemplate = Mage::getModel('core/email_template');
-        $emailTemplate->setSenderEmail(Mage::getStoreConfig('trans_email/ident_general/email'));
-        $emailTemplate->setSenderName($this->getFromName());
-        $emailTemplate->setTemplateSubject($this->getSubject($result));
-        $body = $this->getBody($result, $messages, $invoiceSourceType, $invoiceSourceReference);
-        $emailTemplate->setTemplateText($body['html']);
-        return $emailTemplate->send($this->getToAddress(), Mage::getStoreConfig('trans_email/ident_general/name'));
+        $emailTemplate->setSenderEmail($from);
+        $emailTemplate->setSenderName($fromName);
+        $emailTemplate->setTemplateSubject($subject);
+        $emailTemplate->setTemplateText($bodyHtml);
+        return $emailTemplate->send($to);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getFrom()
+    {
+        return Mage::getStoreConfig('trans_email/ident_general/email');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getFromName()
+    {
+        $result = Mage::getStoreConfig('general/store_information/name');
+        return $result ? $result : parent::getFromName();
     }
 }

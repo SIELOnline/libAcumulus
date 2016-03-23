@@ -11,22 +11,28 @@ class Mailer extends BaseMailer
     /**
      * {@inheritdoc}
      */
-    public function sendInvoiceAddMailResult(array $result, array $messages, $invoiceSourceType, $invoiceSourceReference)
+    public function sendMail($from, $fromName, $to, $subject, $bodyText, $bodyHtml)
     {
-        $to = $this->getToAddress();
-
-        $subject = $this->getSubject($result);
-
-        $fromEmail = get_bloginfo('admin_email');
-        $fromName = get_bloginfo('name');
         $headers = array(
-            "from: $fromName <$fromEmail>",
+            "from: $fromName <$from>",
             'Content-Type: text/html; charset=UTF-8',
         );
+        return wp_mail($to, $subject, $bodyHtml, $headers);
+    }
 
-        $body = $this->getBody($result, $messages, $invoiceSourceType, $invoiceSourceReference);
-        $html = $body['html'];
+    /**
+     * {@inheritdoc}
+     */
+    protected function getFrom()
+    {
+        return get_bloginfo('admin_email');
+    }
 
-        return wp_mail($to, $subject, $html, $headers);
+    /**
+     * {@inheritdoc}
+     */
+    protected function getFromName()
+    {
+        return get_bloginfo('name');
     }
 }

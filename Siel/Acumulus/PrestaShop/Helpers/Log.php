@@ -1,7 +1,8 @@
 <?php
 namespace Siel\Acumulus\PrestaShop\Helpers;
 
-use PrestaShopLogger;
+use AbstractLogger;
+use FileLogger;
 use Siel\Acumulus\Helpers\Log as BaseLog;
 
 /**
@@ -9,6 +10,9 @@ use Siel\Acumulus\Helpers\Log as BaseLog;
  */
 class Log extends BaseLog
 {
+    /** @var \AbstractLogger */
+    protected $logger = null;
+
     /**
      * {@inheritdoc}
      *
@@ -16,7 +20,8 @@ class Log extends BaseLog
      */
     protected function write($message, $severity)
     {
-        PrestaShopLogger::addLog($message, $this->getPrestaShopSeverity($severity));
+        $logger = $this->getLogger();
+        $logger->log($message, $this->getPrestaShopSeverity($severity));
     }
 
     /**
@@ -32,14 +37,23 @@ class Log extends BaseLog
     {
         switch ($severity) {
             case Log::Error:
-                return 3;
+                return AbstractLogger::ERROR;
             case Log::Warning:
-                return 2;
+                return AbstractLogger::WARNING;
             case Log::Notice:
-                return 1;
+                return AbstractLogger::INFO;
             case Log::Debug:
             default:
-                return 1;
+                return AbstractLogger::DEBUG;
         }
+    }
+
+    protected function getLogger()
+    {
+        if ($this->logger === null) {
+            $this->logger = new FileLogger();
+            $this->logger->setFilename(_PS_ROOT_DIR_ . '/log/' . 'acumulus.log');
+        }
+        return $this->logger; 
     }
 }

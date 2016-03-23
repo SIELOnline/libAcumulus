@@ -59,7 +59,55 @@ abstract class Mailer
      * @return bool
      *   Success.
      */
-    abstract public function sendInvoiceAddMailResult(array $result, array $messages, $invoiceSourceType, $invoiceSourceReference);
+    public function sendInvoiceAddMailResult(array $result, array $messages, $invoiceSourceType, $invoiceSourceReference)
+    {
+        $from = $this->getFrom();
+        $fromName = $this->getFromName();
+        $to = $this->getTo();
+        $subject = $this->getSubject($result);
+        $content = $this->getBody($result, $messages, $invoiceSourceType, $invoiceSourceReference);
+        
+        Log::getInstance()->notice('Mailer::sendMail("%s", "%s", "%s", "%s") with body = %s', $from, $fromName, $to, $subject, $content['text']);
+
+        $result = $this->sendMail($from, $fromName, $to, $subject, $content['text'], $content['html']);
+        if ($result !== true) {
+            if ($result === false) {
+                $result = 'false';
+            }
+            else  if ($result === null) {
+                $result = 'null';
+            }
+            else  if (!is_string($result)) {
+                $result = print_r($result, true);
+            }
+            Log::getInstance()->error('Mailer::sendInvoiceAddMailResult(): failed: %s', $result);
+        }
+        else {
+            Log::getInstance()->notice('Mailer::sendInvoiceAddMailResult(): success');
+        }
+    }
+
+    /**
+     * Sends an email.
+     *
+     * @param string $from
+     * @param string $fromName
+     * @param string $to
+     * @param string $subject
+     * @param string $bodyText
+     * @param string $bodyHtml
+     *
+     * @return mixed
+     *   Success (true); error message, error object or just false otherwise.
+     */
+    abstract public function sendMail($from, $fromName, $to, $subject, $bodyText, $bodyHtml);
+
+    /**
+     * Returns the mail from address.
+     *
+     * @return string
+     */
+    abstract protected function getFrom();
 
     /**
      * Returns the mail from name.
@@ -76,7 +124,7 @@ abstract class Mailer
      *
      * @return string
      */
-    protected function getToAddress()
+    protected function getTo()
     {
         $credentials = $this->config->getCredentials();
         if (isset($credentials['emailonerror'])) {

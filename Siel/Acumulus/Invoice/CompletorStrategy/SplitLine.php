@@ -49,6 +49,10 @@ use Siel\Acumulus\Invoice\Creator;
  *
  * Current known usages:
  * - ???
+ * @todo: deprecated?
+ * In the current versions, all lines that may be split will have a
+ * meta-strategy-split entry, so SplitNonMatchingLine orSplitKnownDiscountLine
+ * should do this trick.
  */
 class SplitLine extends CompletorStrategyBase
 {
@@ -57,7 +61,7 @@ class SplitLine extends CompletorStrategyBase
      *   This strategy should be tried last before the fail strategy as there
      *   are chances of returning a wrong true result.
      */
-    static public $tryOrder = 10;
+    static public $tryOrder = 100;
 
     /** @var array[] */
     protected $splitLines;

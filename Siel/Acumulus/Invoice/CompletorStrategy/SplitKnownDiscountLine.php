@@ -37,7 +37,7 @@ class SplitKnownDiscountLine extends CompletorStrategyBase
      *   This strategy should be tried last before the fail strategy as there
      *   are chances of returning a wrong true result.
      */
-    static public $tryOrder = 1;
+    static public $tryOrder = 2;
 
     /** @var array[] */
     protected $splitLines;

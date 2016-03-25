@@ -139,8 +139,8 @@ class CompletorInvoiceLines
      * undecided.
      *
      * This method is public to allow a 2nd call to just this method for a single
-     * line added after a 1st round of correcting. Do not use unless
-     * $this->possibleVAtRates has been initialized
+     * line (a missing amount line) added after a 1st round of correcting. Do not
+     * use unless $this->possibleVatRates has been initialized.
      *
      * @param array $line
      *   A line with a calculated vat rate.
@@ -159,16 +159,18 @@ class CompletorInvoiceLines
 
         $vatRate = $this->getUniqueVatRate($matchedVatRates);
         if ($vatRate === null || $vatRate === false) {
-            // We remove the calculated vatrate
-            // @todo: pick closest or pick just 1?
+            // We remove the calculated vatrate.
             unset($line['vatrate']);
             $line['meta-vatrate-matches'] = $vatRate === null
                 ? 'none'
                 : array_reduce($matchedVatRates, function ($carry, $item) {
                     return $carry . ($carry === '' ? '' : ',') . $item['vatrate'] . '(' . $item['vattype'] . ')';
                 }, '');
+
+            // If this line may be split, we make it a strategy line (even though
+            // 2 out of the 3 fields ex, inc, and vat are known). This way the
+            // strategy phase gets a chance to correct this line.
             if (!empty($line['meta-strategy-split'])) {
-                // Give the strategy phase a chance to correct this line.
                 $line['meta-vatrate-source'] = Creator::VatRateSource_Strategy;
             }
         } else {

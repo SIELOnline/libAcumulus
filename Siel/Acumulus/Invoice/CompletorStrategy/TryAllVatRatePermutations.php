@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\Invoice\CompletorStrategy;
 
+use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\CompletorStrategyBase;
 
@@ -33,8 +34,9 @@ class TryAllVatRatePermutations extends CompletorStrategyBase
     {
         $this->countLines = count($this->lines2Complete);
 
-        // Try without and with a 0 tax rate (prepaid vouchers have 0 vat rate, so
-        // discount lines may have 0 vat rate).
+        // Try without and with a 0 tax rate:
+        // - Prepaid vouchers have 0 vat rate, so discount lines may have 0 vat rate.
+        // - Shops can be configured to incorrectly not calculate tax over some costs
         foreach (array(false, true) as $include0) {
             foreach ($this->possibleVatTypes as $vatType) {
                 $this->setVatRates($vatType, $include0);
@@ -105,6 +107,8 @@ class TryAllVatRatePermutations extends CompletorStrategyBase
             $vatAmount += $this->completeLine($line2Complete, $permutation[$i]);
             $i++;
         }
+
+        Log::getInstance()->notice("TryAllVatRatePermutations::try1Permutation([%s]) results in %f", implode(', ', $permutation), $vatAmount);
 
         // The strategy worked if the vat totals equals the vat to divide.
         return Number::floatsAreEqual($vatAmount, $this->vat2Divide);

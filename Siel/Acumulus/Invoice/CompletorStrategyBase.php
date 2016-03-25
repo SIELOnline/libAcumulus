@@ -25,6 +25,7 @@ abstract class CompletorStrategyBase
     /** @var array[] */
     protected $possibleVatRates;
 
+    // @todo: store these keys as key in $completedLines?
     /** @var int[] */
     protected $linesCompleted;
 
@@ -91,9 +92,27 @@ abstract class CompletorStrategyBase
      *
      * @return string
      */
+    public function getName()
+    {
+        return get_class($this);
+    }
+
+    /**
+     * Returns the (parameterised) description of the latest tried strategy.
+     *
+     * @return string
+     */
     public function getDescription()
     {
         return $this->description;
+    }
+
+    /**
+     * @return float
+     */
+    public function getVat2Divide()
+    {
+        return $this->vat2Divide;
     }
 
     /**

@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\Invoice\CompletorStrategy;
 
+use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\CompletorStrategyBase;
 
@@ -18,7 +19,7 @@ use Siel\Acumulus\Invoice\CompletorStrategyBase;
 class ApplySameVatRate extends CompletorStrategyBase
 {
     /** @var int This strategy should be tried (as one of the) first. */
-    static public $tryOrder = 0;
+    static public $tryOrder = 3;
 
     /**
      * {@inheritdoc}
@@ -54,6 +55,7 @@ class ApplySameVatRate extends CompletorStrategyBase
             $vatAmount += $this->completeLine($line2Complete, $vatRate);
         }
 
+        Log::getInstance()->notice("ApplySameVatRate::tryVatRate($vatRate) results in %f", $vatAmount);
         // If the vat totals are equal, the strategy worked.
         // We allow for a reasonable margin, as rounding errors may add up.
         return Number::floatsAreEqual($vatAmount, $this->vat2Divide, 0.04);

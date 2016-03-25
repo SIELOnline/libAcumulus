@@ -30,7 +30,7 @@ use Siel\Acumulus\Invoice\CompletorStrategyBase;
  * These lines are split in such a way over the 2 allowed vat rates, that the
  * values in the completed lines add up to the values in the line to be split.
  *
- * Current known usages:
+ * Current (known) usages:
  * - PrestaShop (discount lines)
  */
 class SplitNonMatchingLine extends CompletorStrategyBase

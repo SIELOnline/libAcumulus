@@ -39,13 +39,13 @@ LONGSTRING
     ,
         'mail_text_debug' => <<<LONGSTRING
 Onderstaande factuur is succesvol naar Acumulus verstuurd. Normaal gesproken
-krijgt u daar geen bercht van, maar omdat u dit zo heeft ingesteld krijgt u
+krijgt u daar geen bericht van, maar omdat u dit zo heeft ingesteld krijgt u
 hier nu toch bericht van.
 LONGSTRING
     ,
         'mail_html_debug' => <<<LONGSTRING
 <p>Onderstaande factuur is succesvol naar Acumulus verstuurd. Normaal gesproken
-krijgt u daar geen bercht van, maar omdat u dit zo heeft ingesteld krijgt u
+krijgt u daar geen bericht van, maar omdat u dit zo heeft ingesteld krijgt u
 hier nu toch bericht van.</p>
 LONGSTRING
     ,

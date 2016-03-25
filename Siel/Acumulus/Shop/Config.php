@@ -269,8 +269,7 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
     protected function load()
     {
         if (!$this->isLoaded) {
-            $this->values = array_merge($this->getDefaults(), $this->getConfigStore()->load($this->getKeys()));
-            $this->castValues();
+            $this->values = $this->castValues(array_merge($this->getDefaults(), $this->getConfigStore()->load($this->getKeys())));
             $this->isLoaded = true;
         }
     }
@@ -287,6 +286,7 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
      */
     public function save(array $values)
     {
+        $values = $this->castValues($values);
         $result = $this->getConfigStore()->save($values);
         $this->isLoaded = false;
         // Sync internal values.
@@ -491,35 +491,41 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
      * from the config store might be NULL. However, internally we work with
      * booleans or integers. So after reading from the config store or form, we
      * cast the values to their expected types.
+     *
+     * @param array $values
+     *
+     * @return array
+     *   Array with casted values.
      */
-    protected function castValues()
+    protected function castValues(array $values)
     {
         foreach ($this->getKeyInfo() as $key => $keyInfo) {
-            if (array_key_exists($key, $this->values)) {
+            if (array_key_exists($key, $values)) {
                 switch ($keyInfo['type']) {
                     case 'string':
-                        if (!is_string($this->values[$key])) {
-                            $this->values[$key] = (string) $this->values[$key];
+                        if (!is_string($values[$key])) {
+                            $values[$key] = (string) $values[$key];
                         }
                         break;
                     case 'int':
-                        if (!is_int($this->values[$key])) {
-                            $this->values[$key] = (int) $this->values[$key];
+                        if (!is_int($values[$key])) {
+                            $values[$key] = (int) $values[$key];
                         }
                         break;
                     case 'bool':
-                        if (!is_bool($this->values[$key])) {
-                            $this->values[$key] = (bool) $this->values[$key];
+                        if (!is_bool($values[$key])) {
+                            $values[$key] = (bool) $values[$key];
                         }
                         break;
                     case 'array':
-                        if (!is_array($this->values[$key])) {
-                            $this->values[$key] = array($this->values[$key]);
+                        if (!is_array($values[$key])) {
+                            $values[$key] = array($values[$key]);
                         }
                         break;
                 }
             }
         }
+        return $values;
     }
 
     /**

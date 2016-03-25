@@ -55,7 +55,7 @@ class ConfigStore extends BaSeConfigStore
         $result = array();
         $params = JComponentHelper::getParams('com_acumulus');
         foreach ($keys as $key) {
-            $value = $params->get($key, null);;
+            $value = $params->get($key, null);
             if (isset($value)) {
                 $result[$key] = $value;
             }

@@ -148,7 +148,6 @@ class CompletorStrategyLines
         $result[] = "$namespace\\ApplySameVatRate";
         $result[] = "$namespace\\TryAllVatRatePermutations";
         $result[] = "$namespace\\SplitLine";
-        $result[] = "$namespace\\Fail";
 
         return $result;
     }

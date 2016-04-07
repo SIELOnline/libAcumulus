@@ -155,15 +155,15 @@ class Completor
             $this->addMissingAmountLine($areTotalsEqual);
         }
 
-        // Complete strategy lines: those lines that have to be completed based on
-        // the whole invoice.
+        // Complete strategy lines: those lines that have to be completed based
+        // on the whole invoice.
         $this->invoice = $this->strategyLineCompletor->complete($this->invoice, $this->source, $this->possibleVatTypes, $this->possibleVatRates);
 
-        // Fill in the VAT type, adding a warning if possible vat types are possible.
+        // Fill in the VAT type and warn if multiple vat types are possible.
         $this->completeVatType();
 
-        // Completes the invoice with settings or behaviour that might depend on the
-        // fact that the invoice lines have been completed.
+        // Completes the invoice with settings or behaviour that might depend on
+        // the fact that the invoice lines have been completed.
         $this->removeEmptyShipping();
 
         return $this->invoice;

@@ -82,19 +82,19 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
     public function install()
     {
         return Db::getInstance()->execute("CREATE TABLE IF NOT EXISTS `{$this->tableName}` (
-      `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-			`id_shop` int(11) UNSIGNED NOT NULL DEFAULT '1',
-			`id_shop_group` int(11) UNSIGNED NOT NULL DEFAULT '1',
-      `id_entry` int(11) UNSIGNED NOT NULL,
-      `token` char(32) NOT NULL,
-      `source_type` varchar(32) NOT NULL,
-      `source_id` int(11) UNSIGNED NOT NULL,
-      `created` timestamp DEFAULT CURRENT_TIMESTAMP,
-      `updated` timestamp NOT NULL,
-      PRIMARY KEY (`id`),
-      UNIQUE INDEX `acumulus_idx_entry_id` (`id_entry`),
-      UNIQUE INDEX `acumulus_idx_source` (`source_id`, `source_type`)
-    )");
+        `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+        `id_shop` int(11) UNSIGNED NOT NULL DEFAULT '1',
+        `id_shop_group` int(11) UNSIGNED NOT NULL DEFAULT '1',
+        `id_entry` int(11) UNSIGNED DEFAULT NULL,
+        `token` char(32) DEFAULT NULL,
+        `source_type` varchar(32) NOT NULL,
+        `source_id` int(11) UNSIGNED NOT NULL,
+        `created` timestamp DEFAULT CURRENT_TIMESTAMP,
+        `updated` timestamp NOT NULL,
+        PRIMARY KEY (`id`),
+        UNIQUE INDEX `acumulus_idx_entry_id` (`id_entry`),
+        UNIQUE INDEX `acumulus_idx_source` (`source_id`, `source_type`)
+        )");
     }
 
     /**

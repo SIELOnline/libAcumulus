@@ -15,7 +15,7 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
 {
     const KEY_ENTRY_ID = '_acumulus_entry_id';
     const KEY_TOKEN = '_acumulus_token';
-    // Note this meta key is not actually stored as the post_type can give us the
+    // Note: this meta key is not actually stored as the post_type gives us the
     // same information.
     const KEY_TYPE = '_acumulus_type';
     const KEY_CREATED = '_acumulus_created';
@@ -71,7 +71,7 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
         $post = get_post($invoiceSourceId);
         if (!empty($post->post_type) && $this->shopTypeToSourceType($post->post_type) === $invoiceSourceType) {
             $result = get_post_meta($invoiceSourceId);
-            if (isset($result[static::KEY_ENTRY_ID])) {
+            if (array_key_exists(static::KEY_ENTRY_ID, $result)) {
                 // Acumulus meta data found: add invoice type as that is not stored in
                 // the meta data.
                 $result[static::KEY_TYPE] = $invoiceSourceType;

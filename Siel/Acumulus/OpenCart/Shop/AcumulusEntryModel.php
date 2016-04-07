@@ -114,9 +114,9 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
                 // Orders only, credit slips were not supported in that version.
                 // Nor did we support multi store shops (though a join could add that).
                 $result = $result && $this->getDb()->query("insert into `{$this->tableName}`
-          (entry_id, token, source_type, source_id, created, updated)
-          select entry_id, token, 'Order' as source_type, order_id as source_id, created, updated
-          from `$oldTableName``;");
+                    (entry_id, token, source_type, source_id, created, updated)
+                    select entry_id, token, 'Order' as source_type, order_id as source_id, created, updated
+                    from `$oldTableName``;");
 
                 // Delete old table.
                 $result = $result && $this->getDb()->query("DROP TABLE `$oldTableName`");
@@ -138,26 +138,39 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
     }
 
     /**
-     *
-     *
-     *
      * @return bool
-     *
      */
     protected function createTable()
     {
         return (bool) $this->getDb()->query("CREATE TABLE IF NOT EXISTS `{$this->tableName}` (
-        `id` int(11) NOT NULL AUTO_INCREMENT,
-        `store_id` int(11) NOT NULL DEFAULT '0',
-        `entry_id` int(11) NOT NULL,
-        `token` char(32) NOT NULL,
-        `source_type` varchar(32) NOT NULL,
-        `source_id` int(11) NOT NULL,
-        `created` timestamp DEFAULT CURRENT_TIMESTAMP,
-        `updated` timestamp NOT NULL,
-        PRIMARY KEY (`id`),
-        UNIQUE INDEX `acumulus_idx_entry_id` (`entry_id`),
-        UNIQUE INDEX `acumulus_idx_source` (`source_id`, `source_type`)
-      )");
+            `id` int(11) NOT NULL AUTO_INCREMENT,
+            `store_id` int(11) NOT NULL DEFAULT '0',
+            `entry_id` int(11) DEFAULT NULL,
+            `token` char(32) DEFAULT NULL,
+            `source_type` varchar(32) NOT NULL,
+            `source_id` int(11) NOT NULL,
+            `created` timestamp DEFAULT CURRENT_TIMESTAMP,
+            `updated` timestamp NOT NULL,
+            PRIMARY KEY (`id`),
+            UNIQUE INDEX `acumulus_idx_entry_id` (`entry_id`),
+            UNIQUE INDEX `acumulus_idx_source` (`source_id`, `source_type`)
+            )");
+    }
+
+    /**
+     * Updates the table to the correct version.
+     *
+     * @param string $version
+     *
+     * @return bool
+     */
+    public function upgrade($version)
+    {
+        if ($version === '4.4.0') {
+            return (bool)$this->getDb()->query("ALTER TABLE `{$this->tableName}`
+                CHANGE COLUMN `entry_id` `entry_id` INT(11) NULL DEFAULT NULL,
+                CHANGE COLUMN `token` `token` CHAR(32) NULL DEFAULT NULL");
+        }
+        return true;
     }
 }

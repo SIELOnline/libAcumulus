@@ -265,8 +265,8 @@ class OcHelper
         $currentDataModelVersion = isset($setting['acumulus_siel_datamodel_version']) ? $setting['acumulus_siel_datamodel_version'] : '';
 
         if ($currentDataModelVersion === '' || version_compare($currentDataModelVersion, '4.0', '<')) {
-            // Check requirements  (we assume this has been done successfully before
-            // if the data model is at the latest version.
+            // Check requirements (we assume this has been done successfully
+            // before if the data model is at the latest version).
             $requirements = new Requirements();
             $messages = $requirements->check();
             foreach ($messages as $message) {
@@ -277,9 +277,17 @@ class OcHelper
             }
 
             // Install tables.
-            $result = $this->acumulusConfig->getAcumulusEntryModel()->install();
-            $setting['acumulus_siel_datamodel_version'] = '4.0';
-            $this->registry->model_setting_setting->editSetting('acumulus_siel', $setting);
+            if ($result = $this->acumulusConfig->getAcumulusEntryModel()->install()) {
+                $setting['acumulus_siel_datamodel_version'] = '4.0';
+                $this->registry->model_setting_setting->editSetting('acumulus_siel', $setting);
+            }
+        }
+        else if (version_compare($currentDataModelVersion, '4.4', '<')) {
+            // Update table columns.
+            if ($result = $this->acumulusConfig->getAcumulusEntryModel()->upgrade('4.4.0')) {
+                $setting['acumulus_siel_datamodel_version'] = '4.4';
+                $this->registry->model_setting_setting->editSetting('acumulus_siel', $setting);
+            }
         }
 
         return $result;

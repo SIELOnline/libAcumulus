@@ -142,6 +142,19 @@ abstract class AcumulusEntryModel
     abstract public function install();
 
     /**
+     * Upgrade the datamodel to the given version. Only called when the module
+     * got updated.
+     * 
+     * @param string $version
+     *
+     * @return bool
+     */
+    public function upgrade(/** @noinspection PhpUnusedParameterInspection */ $version)
+    {
+        return true;
+    }
+
+    /**
      * @return bool
      */
     abstract public function uninstall();

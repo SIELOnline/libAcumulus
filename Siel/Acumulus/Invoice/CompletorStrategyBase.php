@@ -10,6 +10,9 @@ use Siel\Acumulus\Helpers\TranslatorInterface;
  */
 abstract class CompletorStrategyBase
 {
+    /** @var \Siel\Acumulus\Invoice\ConfigInterface */
+    protected $config;
+
     /** @var \Siel\Acumulus\Helpers\TranslatorInterface */
     protected $translator;
 
@@ -54,14 +57,16 @@ abstract class CompletorStrategyBase
     protected $source;
 
     /**
+     * @param \Siel\Acumulus\Invoice\ConfigInterface $config
      * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
      * @param array $invoice
      * @param array $possibleVatTypes
      * @param array $possibleVatRates
      * @param \Siel\Acumulus\Invoice\Source $source
      */
-    public function __construct(TranslatorInterface $translator, array $invoice, array $possibleVatTypes, array $possibleVatRates, Source $source)
+    public function __construct(ConfigInterface $config, TranslatorInterface $translator, array $invoice, array $possibleVatTypes, array $possibleVatRates, Source $source)
     {
+        $this->config = $config;
         $this->translator = $translator;
         $this->invoice = $invoice;
         $this->possibleVatTypes = $possibleVatTypes;

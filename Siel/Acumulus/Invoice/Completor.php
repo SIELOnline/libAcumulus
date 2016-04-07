@@ -98,7 +98,7 @@ class Completor
         $this->countries = new Countries();
 
         $this->invoiceLineCompletor = new CompletorInvoiceLines();
-        $this->strategyLineCompletor = new CompletorStrategyLines($translator);
+        $this->strategyLineCompletor = new CompletorStrategyLines($config, $translator);
     }
 
     /**

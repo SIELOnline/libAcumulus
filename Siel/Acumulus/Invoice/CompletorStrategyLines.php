@@ -14,6 +14,9 @@ use Siel\Acumulus\Helpers\TranslatorInterface;
  */
 class CompletorStrategyLines
 {
+    /** @var \Siel\Acumulus\Invoice\ConfigInterface */
+    protected $config;
+
     /** @var \Siel\Acumulus\Helpers\TranslatorInterface */
     protected $translator;
 
@@ -41,10 +44,12 @@ class CompletorStrategyLines
     /**
      * Constructor.
      *
+     * @param \Siel\Acumulus\Invoice\ConfigInterface $config
      * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
      */
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(ConfigInterface $config, TranslatorInterface $translator)
     {
+        $this->config = $config;
         $this->translator = $translator;
     }
 
@@ -92,7 +97,7 @@ class CompletorStrategyLines
             $strategies = $this->getStrategyClasses();
             foreach ($strategies as $strategyClass) {
                 /** @var CompletorStrategyBase $strategy */
-                $strategy = new $strategyClass($this->translator, $this->invoice, $this->possibleVatTypes, $this->possibleVatRates, $this->source);
+                $strategy = new $strategyClass($this->config, $this->translator, $this->invoice, $this->possibleVatTypes, $this->possibleVatRates, $this->source);
                 if ($isFirst) {
                     $this->invoice['customer']['invoice']['meta-completor-strategy-input'] .= ', vat2Divide: ' . $strategy->getVat2Divide();
                     $isFirst = false;

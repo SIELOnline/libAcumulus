@@ -36,7 +36,7 @@ class TryAllVatRatePermutations extends CompletorStrategyBase
 
         // Try without and with a 0 tax rate:
         // - Prepaid vouchers have 0 vat rate, so discount lines may have 0 vat rate.
-        // - Shops can be configured to incorrectly not calculate tax over some costs
+        // - Shops can be configured to incorrectly not calculate tax over some costs.
         foreach (array(false, true) as $include0) {
             foreach ($this->possibleVatTypes as $vatType) {
                 $this->setVatRates($vatType, $include0);
@@ -82,8 +82,8 @@ class TryAllVatRatePermutations extends CompletorStrategyBase
             // Complete this permutation recursively before we can try it.
             $permutationIndex = count($permutation);
             // Try all tax rates for the current line.
-            foreach ($this->vatRates as $taxRate => $amount) {
-                $permutation[$permutationIndex] = $taxRate;
+            foreach ($this->vatRates as $vatRate) {
+                $permutation[$permutationIndex] = $vatRate;
                 if ($this->tryAllPermutations($permutation)) {
                     return true;
                 }

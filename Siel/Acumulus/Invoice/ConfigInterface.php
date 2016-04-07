@@ -82,6 +82,8 @@ interface ConfigInterface
      *
      * @return array
      *   A keyed array with the keys:
+     *   - digitalServices
+     *   - vatFreeProducts
      *   - invoiceNrSource
      *   - dateToUse
      */

@@ -103,7 +103,7 @@ class CompletorStrategyLines
                     $isFirst = false;
                 }
                 if ($strategy->apply()) {
-                    $this->replaceLinesCompleted($strategy->getLinesCompleted(), $strategy->getCompletedLines(), $strategy->getName());
+                    $this->replaceLinesCompleted($strategy->getLinesCompleted(), $strategy->getReplacingLines(), $strategy->getName());
                     if (empty($this->invoice['customer']['invoice']['meta-completor-strategy-used'])) {
                         $this->invoice['customer']['invoice']['meta-completor-strategy-used'] = $strategy->getDescription();
                     } else {
@@ -148,11 +148,10 @@ class CompletorStrategyLines
 
         // For now hardcoded, but this can be turned into a discovery.
         $namespace = '\Siel\Acumulus\Invoice\CompletorStrategy';
-        $result[] = "$namespace\\SplitNonMatchingLine";
         $result[] = "$namespace\\SplitKnownDiscountLine";
+        $result[] = "$namespace\\SplitNonMatchingLine";
         $result[] = "$namespace\\ApplySameVatRate";
         $result[] = "$namespace\\TryAllVatRatePermutations";
-        $result[] = "$namespace\\SplitLine";
 
         return $result;
     }

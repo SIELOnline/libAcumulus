@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\Invoice;
 
+use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\TranslatorInterface;
 
 /**
@@ -28,15 +29,27 @@ abstract class CompletorStrategyBase
     /** @var array[] */
     protected $possibleVatRates;
 
-    // @todo: store these keys as key in $completedLines?
-    /** @var int[] */
+    /**
+     * The indices of the completed lines. As a line2complete may be split over
+     * multiple new lines we must store the indices separately.
+     *
+     * @var int[]
+     */
     protected $linesCompleted;
 
-    /** @var array[] */
+    /**
+     * The lines that are to be completed by the strategy.
+     *
+     * @var array[]
+     */
     protected $lines2Complete;
 
-    /** @var array[] */
-    protected $completedLines;
+    /**
+     * The lines that replace (some of) the $lines2Complete.
+     *
+     * @var array[]
+     */
+    protected $replacingLines;
 
     /** @var float */
     protected $vat2Divide;
@@ -93,13 +106,15 @@ abstract class CompletorStrategyBase
     }
 
     /**
-     * Returns the (parameterised) description of the latest tried strategy.
+     * Returns the non namespaced name of the current strategy.
      *
      * @return string
      */
     public function getName()
     {
-        return get_class($this);
+        $nsClass = get_class($this);
+        $nsClass = substr($nsClass, strrpos($nsClass, '\\') + 1);
+        return $nsClass;
     }
 
     /**
@@ -122,7 +137,7 @@ abstract class CompletorStrategyBase
 
     /**
      * Returns the keys of the lines that are completed (and thus should be
-     * replaced by the completed lines).
+     * replaced by the replacing lines).
      *
      * Should only be called after success.
      *
@@ -134,15 +149,15 @@ abstract class CompletorStrategyBase
     }
 
     /**
-     * Returns the completed lines (that should replace the lines completed).
+     * Returns the lines that should replace the lines completed.
      *
      * Should only be called after success.
      *
      * @return array[]
      */
-    public function getCompletedLines()
+    public function getReplacingLines()
     {
-        return $this->completedLines;
+        return $this->replacingLines;
     }
 
     /**
@@ -184,7 +199,7 @@ abstract class CompletorStrategyBase
         foreach ($this->invoice['customer']['invoice']['line'] as $key => $line) {
             if ($line['meta-vatrate-source'] === Creator::VatRateSource_Strategy) {
                 $this->linesCompleted[] = $key;
-                $this->lines2Complete[] = $line;
+                $this->lines2Complete[$key] = $line;
             }
         }
     }
@@ -209,7 +224,7 @@ abstract class CompletorStrategyBase
                     $breakdown['count']++;
                 } else {
                     $this->vatBreakdown[$vatRate] = array(
-                        'vatrate' => $vatRate,
+                        'vatrate' => (float) $vatRate,
                         'vatamount' => $vatAmount,
                         'amount' => $amount,
                         'count' => 1,
@@ -223,7 +238,7 @@ abstract class CompletorStrategyBase
      * Returns the minimum vat rate on the invoice.
      *
      * @return array
-     *   A vat rate overview (array with vatrate, vatamount, amount, count).
+     *   A vat rate overview: array with keys vatrate, vatamount, amount, count.
      */
     protected function getVatBreakDownMinRate()
     {
@@ -240,7 +255,7 @@ abstract class CompletorStrategyBase
      * Returns the maximum vat rate on the invoice.
      *
      * @return array
-     *   A vat rate overview (array with vatrate, vatamount, amount, count).
+     *   A vat rate overview: array with keys vatrate, vatamount, amount, count.
      */
     protected function getVatBreakDownMaxRate()
     {
@@ -257,7 +272,7 @@ abstract class CompletorStrategyBase
      * Returns the key component vat rate on the invoice (NL: hoofdbestanddeel).
      *
      * @return array
-     *   A vat rate overview (array with vatrate, vatamount, amount, count).
+     *   A vat rate overview: array with keys vatrate, vatamount, amount, count.
      */
     protected function getVatBreakDownMaxAmount()
     {
@@ -278,9 +293,15 @@ abstract class CompletorStrategyBase
      */
     public function apply()
     {
-        $this->completedLines = array();
+        $this->replacingLines = array();
         $this->init();
-        return $this->checkPreconditions() && $this->execute();
+        if ($this->checkPreconditions()) {
+            return $this->execute();
+        }
+        else {
+            Log::getInstance()->notice("%s::checkPreconditions() returned false", $this->getName());
+            return FALSE;
+        }
     }
 
     /**
@@ -343,24 +364,28 @@ abstract class CompletorStrategyBase
             $line2Complete['vatamount'] = ($line2Complete['vatrate'] / (100.0 + $line2Complete['vatrate'])) * $line2Complete['unitpriceinc'];
             $line2Complete['unitprice'] = $line2Complete['unitpriceinc'] - $line2Complete['vatamount'];
         }
-        $this->completedLines[] = $line2Complete;
+        $this->replacingLines[] = $line2Complete;
         return $line2Complete['vatamount'] * $line2Complete['quantity'];
     }
 
     /**
-     * Splits $amount 9ex VAT) in 2 amounts, such that if the first amount is
+     * Splits $amount (ex VAT) in 2 amounts, such that if the first amount is
      * taxed with the $lowVatRate and the 2nd amount is taxed with the
      * $highVatRate, the sum of the 2 vat amounts add up to the given vat amount.
      *
      * @param float $amount
      * @param float $vatAmount
      * @param float $lowVatRate
+     *   Percentage between 0 and 100.
      * @param float $highVatRate
+     *   Percentage between 0 and 100.
      *
      * @return float[]
      */
     protected function splitAmountOver2VatRates($amount, $vatAmount, $lowVatRate, $highVatRate)
     {
+        $lowVatRate /= 100;
+        $highVatRate /= 100;
         $highAmount = ($vatAmount - $amount * $lowVatRate) / ($highVatRate - $lowVatRate);
         $lowAmount = $amount - $highAmount;
         return array($lowAmount, $highAmount);

@@ -18,8 +18,12 @@ use Siel\Acumulus\Invoice\CompletorStrategyBase;
  */
 class ApplySameVatRate extends CompletorStrategyBase
 {
-    /** @var int This strategy should be tried (as one of the) first. */
-    static public $tryOrder = 3;
+    /**
+     * This strategy should be tried first after the split strategies.
+     *
+     * @var int
+     */
+    static public $tryOrder = 30;
 
     /**
      * {@inheritdoc}
@@ -49,7 +53,7 @@ class ApplySameVatRate extends CompletorStrategyBase
     protected function tryVatRate($vatRate)
     {
         $this->description = "ApplySameVatRate($vatRate)";
-        $this->completedLines = array();
+        $this->replacingLines = array();
         $vatAmount = 0.0;
         foreach ($this->lines2Complete as $line2Complete) {
             $vatAmount += $this->completeLine($line2Complete, $vatRate);

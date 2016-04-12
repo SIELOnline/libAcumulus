@@ -15,11 +15,12 @@ use Siel\Acumulus\Invoice\CompletorStrategyBase;
 class TryAllVatRatePermutations extends CompletorStrategyBase
 {
     /**
+     * This strategy should be tried last after lines that may be split and
+     * could be split, have been split.
+     *
      * @var int
-     *   This strategy should be tried before the split strategy as that one will
-     *   easily succeed.
      */
-    static public $tryOrder = 25;
+    static public $tryOrder = 50;
 
     /** @var float[] */
     protected $vatRates;
@@ -100,7 +101,7 @@ class TryAllVatRatePermutations extends CompletorStrategyBase
     protected function try1Permutation(array $permutation)
     {
         $this->description = 'TryAllVatRatePermutations(' . implode(', ', $permutation) . ')';
-        $this->completedLines = array();
+        $this->replacingLines = array();
         $vatAmount = 0.0;
         $i = 0;
         foreach ($this->lines2Complete as $line2Complete) {

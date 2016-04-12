@@ -158,14 +158,21 @@ class CompletorInvoiceLines
         }
 
         $vatRate = $this->getUniqueVatRate($matchedVatRates);
-        if ($vatRate === null || $vatRate === false) {
+        if ($vatRate !== null && $vatRate !== false) {
+            // We have a single match: fill it in as the vat rate for this line.
+            $line['vatrate'] = $vatRate;
+            $line['meta-vatrate-source'] = Completor::VatRateSource_Calculated_Corrected;
+        } else {
             // We remove the calculated vatrate.
             unset($line['vatrate']);
-            $line['meta-vatrate-matches'] = $vatRate === null
-                ? 'none'
-                : array_reduce($matchedVatRates, function ($carry, $item) {
-                    return $carry . ($carry === '' ? '' : ',') . $item['vatrate'] . '(' . $item['vattype'] . ')';
-                }, '');
+            if ($vatRate === null) {
+                $line['meta-vatrate-matches'] = 'none';
+            } else {
+                $line['meta-vatrate-matches'] = array_reduce($matchedVatRates,
+                  function ($carry, $item) {
+                      return $carry . ($carry === '' ? '' : ',') . $item['vatrate'] . '(' . $item['vattype'] . ')';
+                  }, '');
+            }
 
             // If this line may be split, we make it a strategy line (even though
             // 2 out of the 3 fields ex, inc, and vat are known). This way the
@@ -173,9 +180,6 @@ class CompletorInvoiceLines
             if (!empty($line['meta-strategy-split'])) {
                 $line['meta-vatrate-source'] = Creator::VatRateSource_Strategy;
             }
-        } else {
-            $line['vatrate'] = $vatRate;
-            $line['meta-vatrate-source'] = Completor::VatRateSource_Calculated_Corrected;
         }
         return $line;
     }
@@ -267,6 +271,10 @@ class CompletorInvoiceLines
      * - vatamount
      * - meta-line-discount-amountinc (if meta-line-discount-vatamount is
      *   available).
+     * For strategy lines that may be split with the non matching line strategy,
+     * we need to know the line totals. Complete (if missing):
+     * - meta-line-price
+     * - meta-line-priceinc
      */
     protected function completeLineMetaData()
     {
@@ -294,6 +302,16 @@ class CompletorInvoiceLines
 
                 if (!empty($calculatedFields)) {
                     $line['meta-calculated-fields'] = implode(',', $calculatedFields);
+                }
+            }
+            else if ($line['meta-vatrate-source'] == Creator::VatRateSource_Strategy && !empty($line['meta-strategy-split'])) {
+                if (isset($line['unitprice']) && isset($line['unitpriceinc'])) {
+                    if (!isset($line['meta-line-price'])) {
+                        $line['meta-line-price'] = $line['unitprice'] * $line['quantity'];
+                    }
+                    if (!isset($line['meta-line-priceinc'])) {
+                        $line['meta-line-priceinc'] = $line['unitpriceinc'] * $line['quantity'];
+                    }
                 }
             }
         }

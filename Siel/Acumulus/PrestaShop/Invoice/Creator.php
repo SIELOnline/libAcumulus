@@ -299,7 +299,7 @@ class Creator extends BaseCreator
         }
         $result['quantity'] = $item['product_quantity'];
         // The field 'rate' comes from order->getOrderDetailTaxes() and is only
-        // defined for orders and were not filled in or before PS1.6.1.1. So, check
+        // defined for orders and were not filled in before PS1.6.1.1. So, check
         // if the field is available.
         // The fields 'unit_amount' and 'total_amount' (table order_detail_tax) are
         // based on the discounted product price and thus cannot be used.

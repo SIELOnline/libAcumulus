@@ -12,7 +12,8 @@ use Siel\Acumulus\Invoice\CompletorStrategyBase;
  *
  * Preconditions:
  * - Exactly 2 VAT rates must be used in other lines.
- * - lines2Complete may contain multiple lines that may be split.
+ * - lines2Complete may contain multiple lines that may be split: tag
+ *   meta-strategy-split is set to true.
  *
  * Note:
  * - This strategy should be executed early as it is an almost sure win and is
@@ -24,9 +25,9 @@ use Siel\Acumulus\Invoice\CompletorStrategyBase;
  *   only lines that are marked with the value meta-strategy-split are
  *   corrected.
  * - Each line2complete must have at least 2 of the values vatamount, unitprice,
- *   or unitpriceinc, such that it can be divided on its own.
- * - They have gone through the correction pass, but no single matching VAT rate
- *   was found, so the value meta-vatrate-matches is set.
+ *   or unitpriceinc, meaning that it can be divided on its own!
+ * - They have gone through the correction phase, but no matching VAT rate was
+ *   found, so the value meta-vatrate-matches is set to 'none'.
  * These lines are split in such a way over the 2 allowed vat rates, that the
  * values in the completed lines add up to the values in the line to be split.
  *
@@ -36,11 +37,14 @@ use Siel\Acumulus\Invoice\CompletorStrategyBase;
 class SplitNonMatchingLine extends CompletorStrategyBase
 {
     /**
+     * Split strategies should be tried first, as they can deliver partial
+     * solutions in a controlled way. Controlled in the sense that it will only
+     * be applied to lines where it can and should be applied. So no chance of
+     * returning a false positive.
+     *
      * @var int
-     *   This strategy should be tried last before the fail strategy as there
-     *   are chances of returning a wrong true result.
      */
-    static public $tryOrder = 1;
+    static public $tryOrder = 20;
 
     /** @var array */
     protected $minVatRate;
@@ -72,10 +76,11 @@ class SplitNonMatchingLine extends CompletorStrategyBase
     {
         $this->minVatRate = $this->getVatBreakDownMinRate();
         $this->maxVatRate = $this->getVatBreakDownMaxRate();
-        $this->description = sprintf('"SplitNonMatchingLine(%s, %s)', $this->minVatRate['vatrate'], $this->maxVatRate['vatrate']);
+        $this->description = sprintf('"SplitNonMatchingLine(%f, %f)', $this->minVatRate['vatrate'], $this->maxVatRate['vatrate']);
         $result = false;
         foreach ($this->lines2Complete as $key => $line2Complete) {
-            if (!empty($line2Complete['meta-strategy-split']) && !empty($line2Complete['meta-vatrate-matches'])) {
+            if (!empty($line2Complete['meta-strategy-split']) && isset($line2Complete['meta-vatrate-matches']) && $line2Complete['meta-vatrate-matches'] === 'none') {
+                // Line may be split and line does not have a matching vat rate
                 if ($this->splitNonMatchingLine($line2Complete)) {
                     $result = true;
                     $this->linesCompleted[] = $key;
@@ -94,21 +99,21 @@ class SplitNonMatchingLine extends CompletorStrategyBase
     {
         list($lowAmount, $highAmount) = $this->splitAmountOver2VatRates($line['meta-line-price'],
             $line['meta-line-priceinc'] - $line['meta-line-price'],
-            $this->minVatRate['vatrate'] / 100.0,
-            $this->maxVatRate['vatrate'] / 100.0);
+            $this->minVatRate['vatrate'],
+            $this->maxVatRate['vatrate']);
 
         // Dividing was possible if both amounts have the same sign.
         if (($highAmount < -0.005 && $lowAmount < -0.005 && $line['meta-line-price'] < -0.005)
             || ($highAmount > 0.005 && $lowAmount > 0.005 && $line['meta-line-price'] > 0.005)
         ) {
             $splitLine = $line;
-            $splitLine['product'] .= sprintf(' (%s%% %s)', $this->maxVatRate['vatrate'], $this->t('vat'));
+            $splitLine['product'] .= sprintf(' (%f%% %s)', $this->maxVatRate['vatrate'], $this->t('vat'));
             $splitLine['unitprice'] = $highAmount;
             unset($splitLine['unitpriceinc']);
             $this->completeLine($splitLine, $this->maxVatRate['vatrate']);
 
             $splitLine = $line;
-            $splitLine['product'] .= sprintf(' (%s%% %s)', $this->minVatRate['vatrate'], $this->t('vat'));
+            $splitLine['product'] .= sprintf(' (%f%% %s)', $this->minVatRate['vatrate'], $this->t('vat'));
             $splitLine['unitprice'] = $lowAmount;
             unset($splitLine['unitpriceinc']);
             $this->completeLine($splitLine, $this->minVatRate['vatrate']);

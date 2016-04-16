@@ -18,7 +18,7 @@ class Source extends BaseSource
      */
     protected function setSource()
     {
-        $this->source = Registry::getInstance()->getOrderModel()->getOrder($this->id);
+        $this->source = Registry::getInstance()->getOrder($this->id);
     }
 
     /**

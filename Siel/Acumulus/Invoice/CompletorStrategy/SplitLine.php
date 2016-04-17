@@ -49,9 +49,10 @@ use Siel\Acumulus\Invoice\Creator;
  *
  * Current known usages:
  * - ???
- * @todo: deprecated?
+ * @todo: deprecated or are thre situations where other fee lines also do not
+ *  have a vatrate.
  * In the current versions, all lines that may be split will have a
- * meta-strategy-split entry, so SplitNonMatchingLine orSplitKnownDiscountLine
+ * meta-strategy-split entry, so SplitNonMatchingLine or SplitKnownDiscountLine
  * should do this trick.
  */
 class SplitLine extends CompletorStrategyBase

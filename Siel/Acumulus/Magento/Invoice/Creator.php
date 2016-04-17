@@ -376,7 +376,7 @@ class Creator extends BaseCreator
             );
         } else {
             $result += $this->getVatRangeTags($lineVat / $item->getQty(), $productPriceEx, 0.02, 0.02);
-            $result['meta-calculated-fields'] = 'vatamount';
+            $result['meta-calculated-fields'][] = 'vatamount';
         }
 
         if (!Number::isZero($item->getDiscountAmount())) {
@@ -422,7 +422,7 @@ class Creator extends BaseCreator
                     'unitprice' => $shippingEx,
                     'unitpriceinc' => $shippingInc,
                 ) + $this->getVatRangeTags($shippingVat, $shippingEx, 0.02, 0.01);
-            $result['meta-calculated-fields'] = 'vatamount';
+            $result['meta-calculated-fields'][] = 'vatamount';
 
             // getShippingDiscountAmount() only exists on Orders.
             if ($this->invoiceSource->getType() === Source::Order && !Number::isZero($magentoSource->getShippingDiscountAmount())) {

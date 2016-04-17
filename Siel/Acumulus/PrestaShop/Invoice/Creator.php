@@ -312,7 +312,7 @@ class Creator extends BaseCreator
         } else {
             $result += $this->getVatRangeTags($sign * ($item['unit_price_tax_incl'] - $item['unit_price_tax_excl']), $sign * $item['unit_price_tax_excl'], 0.02);
         }
-        $result['meta-calculated-fields'] = 'vatamount';
+        $result['meta-calculated-fields'][] = 'vatamount';
 
         return $result;
     }
@@ -334,7 +334,7 @@ class Creator extends BaseCreator
                     'unitpriceinc' => $shippingInc,
                     'quantity' => 1,
                 ) + $this->getVatRangeTags($shippingVat, $shippingEx, 0.02);
-            $result['meta-calculated-fields'] = 'vatamount';
+            $result['meta-calculated-fields'][] = 'vatamount';
         } else {
             $carrier = new Carrier($this->order->id_carrier);
             $description = $carrier->id_reference == 1 ? $this->t('pickup') : $this->t('free_shipping');
@@ -371,7 +371,7 @@ class Creator extends BaseCreator
                     'unitpriceinc' => $wrappingInc,
                     'quantity' => 1,
                 ) + $this->getVatRangeTags($wrappingVat, $wrappingEx, 0.02);
-            $result['meta-calculated-fields'] = 'vatamount';
+            $result['meta-calculated-fields'][] = 'vatamount';
         }
         return $result;
     }
@@ -421,7 +421,7 @@ class Creator extends BaseCreator
                 // - excluding VAT, the precision would be 0.01, 0
                 // However, for a % discount, it will be: 0.02, 0.01, so use this.
             ) + $this->getVatRangeTags($discountVat, $discountEx, 0.02);
-        $result['meta-calculated-fields'] = 'vatamount';
+        $result['meta-calculated-fields'][] = 'vatamount';
 
         return $result;
     }

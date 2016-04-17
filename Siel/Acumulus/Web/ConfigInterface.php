@@ -10,7 +10,7 @@ namespace Siel\Acumulus\Web;
  */
 interface ConfigInterface
 {
-    const libraryVersion = '4.4.2';
+    const libraryVersion = '4.4.3';
 
     // Web service configuration related constants.
     const Status_NotSent = -1;

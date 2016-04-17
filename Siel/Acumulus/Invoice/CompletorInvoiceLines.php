@@ -91,24 +91,16 @@ class CompletorInvoiceLines
     {
         $invoiceLines = &$this->invoice['customer']['invoice']['line'];
         foreach ($invoiceLines as &$line) {
-            $calculatedFields = isset($line['meta-calculated-fields'])
-                ? (is_array($line['meta-calculated-fields']) ? $line['meta-calculated-fields'] : explode(',', $line['meta-calculated-fields']))
-                : array();
-
             if (!isset($line['unitprice'])) {
                 if (isset($line['unitpriceinc'])) {
                     if (isset($line['vatamount'])) {
                         $line['unitprice'] = $line['unitpriceinc'] - $line['vatamount'];
-                        $calculatedFields[] = 'unitprice';
+                        $line['meta-calculated-fields'][] = 'unitprice';
                     } else if (isset($line['vatrate']) && in_array($line['meta-vatrate-source'], Completor::$CorrectVatRateSources)) {
                         $line['unitprice'] = $line['unitpriceinc'] / (100.0 + $line['vatrate']) * 100.0;
-                        $calculatedFields[] = 'unitprice';
+                        $line['meta-calculated-fields'][] = 'unitprice';
                     }
                 }
-            }
-
-            if (!empty($calculatedFields)) {
-                $line['meta-calculated-fields'] = implode(',', $calculatedFields);
             }
         }
     }
@@ -280,28 +272,20 @@ class CompletorInvoiceLines
     {
         $invoiceLines = &$this->invoice['customer']['invoice']['line'];
         foreach ($invoiceLines as &$line) {
-            $calculatedFields = isset($line['meta-calculated-fields'])
-                ? (is_array($line['meta-calculated-fields']) ? $line['meta-calculated-fields'] : explode(',', $line['meta-calculated-fields']))
-                : array();
-
             if (in_array($line['meta-vatrate-source'], Completor::$CorrectVatRateSources)) {
                 if (!isset($line['unitpriceinc'])) {
                     $line['unitpriceinc'] = $line['unitprice'] / 100.0 * (100.0 + $line['vatrate']);
-                    $calculatedFields[] = 'unitpriceinc';
+                    $line['meta-calculated-fields'][] = 'unitpriceinc';
                 }
 
                 if (!isset($line['vatamount'])) {
                     $line['vatamount'] = $line['vatrate'] / 100.0 * $line['unitprice'];
-                    $calculatedFields[] = 'vatamount';
+                    $line['meta-calculated-fields'][] = 'vatamount';
                 }
 
                 if (isset($line['meta-line-discount-vatamount']) && !isset($line['meta-line-discount-amountinc'])) {
                     $line['meta-line-discount-amountinc'] = $line['meta-line-discount-vatamount'] / $line['vatrate'] * (100 + $line['vatrate']);
-                    $calculatedFields[] = 'meta-line-discount-amountinc';
-                }
-
-                if (!empty($calculatedFields)) {
-                    $line['meta-calculated-fields'] = implode(',', $calculatedFields);
+                    $line['meta-calculated-fields'][] = 'meta-line-discount-amountinc';
                 }
             }
             else if ($line['meta-vatrate-source'] == Creator::VatRateSource_Strategy && !empty($line['meta-strategy-split'])) {
@@ -313,6 +297,10 @@ class CompletorInvoiceLines
                         $line['meta-line-priceinc'] = $line['unitpriceinc'] * $line['quantity'];
                     }
                 }
+            }
+
+            if (isset($line['meta-calculated-fields'])) {
+                $line['meta-calculated-fields'] = implode(',', array_unique($line['meta-calculated-fields']));
             }
         }
     }

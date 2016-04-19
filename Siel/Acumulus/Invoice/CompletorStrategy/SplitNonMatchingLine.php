@@ -2,6 +2,7 @@
 namespace Siel\Acumulus\Invoice\CompletorStrategy;
 
 use Siel\Acumulus\Invoice\CompletorStrategyBase;
+use Siel\Acumulus\Invoice\ConfigInterface;
 
 /**
  * Class SplitNonMatchingLine implements a vat completor strategy by recognizing
@@ -11,13 +12,16 @@ use Siel\Acumulus\Invoice\CompletorStrategyBase;
  * products that have different vat rates.
  *
  * Preconditions:
- * - Exactly 2 VAT rates must be used in other lines.
+ * - Exactly 2 VAT rates must be used in other lines (*).
  * - lines2Complete may contain multiple lines that may be split: tag
  *   meta-strategy-split is set to true.
  *
  * Note:
  * - This strategy should be executed early as it is an almost sure win and is
  *   used as a partial solution for only some of the strategy lines.
+ * - (*) In 1 case we had an order with 3 rates, 1 of them being 0 on a €0,01
+ *   discount line. So, if the shop only sells VAT liable products, we actually
+ *   look at the number of positive vat rates and ignore any 0 vat rate.
  *
  * Strategy:
  * Only lines that satisfy the following conditions are corrected:
@@ -66,6 +70,20 @@ class SplitNonMatchingLine extends CompletorStrategyBase
     protected function checkPreconditions()
     {
         $result = count($this->vatBreakdown) === 2;
+        if (!$result) {
+            $shopSettings = $this->config->getShopSettings();
+            if ($shopSettings['vatFreeProducts'] === ConfigInterface::VatFreeProducts_No) {
+                // If there are only 2 positive vat rates that will do as well.
+                // See note above in class doc.
+                $positiveVatRates = 0;
+                foreach ($this->vatBreakdown as $vatRate => $vatInfo) {
+                    if ((float)$vatRate > 0) {
+                        $positiveVatRates++;
+                    }
+                }
+                $result = $positiveVatRates === 2;
+            }
+        }
         return $result;
     }
 
@@ -80,7 +98,7 @@ class SplitNonMatchingLine extends CompletorStrategyBase
         $result = false;
         foreach ($this->lines2Complete as $key => $line2Complete) {
             if (!empty($line2Complete['meta-strategy-split']) && isset($line2Complete['meta-vatrate-matches']) && $line2Complete['meta-vatrate-matches'] === 'none') {
-                // Line may be split and line does not have a matching vat rate
+                // Line may be split and line does not have a matching vat rate.
                 if ($this->splitNonMatchingLine($line2Complete)) {
                     $result = true;
                     $this->linesCompleted[] = $key;

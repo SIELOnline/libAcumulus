@@ -392,60 +392,65 @@ class Creator extends BaseCreator
      */
     protected function getShippingLine()
     {
-        $shippingDescription = $this->order->getShippingDescription();
-        $result = array(
-            'itemnumber' => '',
-            'product' => !empty($shippingDescription) ? $shippingDescription : $this->t('shipping_costs'),
-            'quantity' => 1,
-        );
-
-        // What do the following methods return:
-        // - getShippingAmount():         shipping costs excl VAT excl any discount
-        // - getShippingInclTax():        shipping costs incl VAT excl any discount
-        // - getShippingTaxAmount():      VAT on shipping costs incl discount
-        // - getShippingDiscountAmount(): discount on shipping incl VAT
+        $result = array();
         /** @var Mage_Sales_Model_Order|Mage_Sales_Model_Order_Creditmemo $magentoSource */
         $magentoSource = $this->invoiceSource->getSource();
-        if (!Number::isZero($magentoSource->getShippingAmount())) {
-            // We have 2 ways of calculating the vat rate: first one is based on tax
-            // amount and normal shipping costs corrected with any discount (as the
-            // tax amount is including any discount):
-            // $vatRate1 = $magentoSource->getShippingTaxAmount() / ($magentoSource->getShippingInclTax() - $magentoSource->getShippingDiscountAmount() - $magentoSource->getShippingTaxAmount());
-            // However, we will use the 2nd way as that seems to be more precise and,
-            // thus generally leads to a smaller range:
-            // Get range based on normal shipping costs incl and excl VAT.
-            $sign = $this->getSign();
-            $shippingInc = $sign * $magentoSource->getShippingInclTax();
-            $shippingEx = $sign * $magentoSource->getShippingAmount();
-            $shippingVat = $shippingInc - $shippingEx;
+        // Only add a free shipping line on an order, not on a credit note:
+        // free shipping is never refunded...
+        if ($this->invoiceSource->getType() === Source::Order || !Number::isZero($magentoSource->getShippingAmount())) {
+            $shippingDescription = $this->order->getShippingDescription();
             $result += array(
-                    'unitprice' => $shippingEx,
-                    'unitpriceinc' => $shippingInc,
-                ) + $this->getVatRangeTags($shippingVat, $shippingEx, 0.02, 0.01);
-            $result['meta-calculated-fields'][] = 'vatamount';
-
-            // getShippingDiscountAmount() only exists on Orders.
-            if ($this->invoiceSource->getType() === Source::Order && !Number::isZero($magentoSource->getShippingDiscountAmount())) {
-                $result['meta-line-discount-amountinc'] = -$sign * $magentoSource->getShippingDiscountAmount();
-            } else if ($this->invoiceSource->getType() === Source::CreditNote && !Number::floatsAreEqual($shippingVat, $magentoSource->getShippingTaxAmount(), 0.02)) {
-                // On credit notes, the shipping discount amount is not stored but can
-                // be deduced via the shipping discount tax amount and the shipping vat
-                // rate. To get a more precise 'meta-line-discount-amountinc', we
-                // compute that in the completor when we have corrected the vatrate.
-                $result['meta-line-discount-vatamount'] = $sign * ($shippingVat - $sign * $magentoSource->getShippingTaxAmount());
-            }
-        }
-
-        // Only add a free shipping line on an order, not on a credit note: free
-        // shipping is never refunded...
-        else if ($this->invoiceSource->getType() === Source::Order) {
-            // Free shipping should get a "normal" tax rate. We leave that to the
-            // completor to determine.
-            $result += array(
-                'unitprice' => 0,
-                'vatrate' => null,
-                'meta-vatrate-source' => static::VatRateSource_Completor,
+                'itemnumber' => '',
+                'product' => !empty($shippingDescription) ? $shippingDescription : $this->t('shipping_costs'),
+                'quantity' => 1,
             );
+
+            // What do the following methods return:
+            // - getShippingAmount():         shipping costs excl VAT excl any discount
+            // - getShippingInclTax():        shipping costs incl VAT excl any discount
+            // - getShippingTaxAmount():      VAT on shipping costs incl discount
+            // - getShippingDiscountAmount(): discount on shipping incl VAT
+            /** @var Mage_Sales_Model_Order|Mage_Sales_Model_Order_Creditmemo $magentoSource */
+            $magentoSource = $this->invoiceSource->getSource();
+            if (!Number::isZero($magentoSource->getShippingAmount())) {
+                // We have 2 ways of calculating the vat rate: first one is based on tax
+                // amount and normal shipping costs corrected with any discount (as the
+                // tax amount is including any discount):
+                // $vatRate1 = $magentoSource->getShippingTaxAmount() / ($magentoSource->getShippingInclTax() - $magentoSource->getShippingDiscountAmount() - $magentoSource->getShippingTaxAmount());
+                // However, we will use the 2nd way as that seems to be more precise and,
+                // thus generally leads to a smaller range:
+                // Get range based on normal shipping costs incl and excl VAT.
+                $sign = $this->getSign();
+                $shippingInc = $sign * $magentoSource->getShippingInclTax();
+                $shippingEx = $sign * $magentoSource->getShippingAmount();
+                $shippingVat = $shippingInc - $shippingEx;
+                $result += array(
+                        'unitprice' => $shippingEx,
+                        'unitpriceinc' => $shippingInc,
+                    ) + $this->getVatRangeTags($shippingVat, $shippingEx, 0.02,
+                        0.01);
+                $result['meta-calculated-fields'][] = 'vatamount';
+
+                // getShippingDiscountAmount() only exists on Orders.
+                if ($this->invoiceSource->getType() === Source::Order && !Number::isZero($magentoSource->getShippingDiscountAmount())) {
+                    $result['meta-line-discount-amountinc'] = -$sign * $magentoSource->getShippingDiscountAmount();
+                } else if ($this->invoiceSource->getType() === Source::CreditNote
+                    && !Number::floatsAreEqual($shippingVat, $magentoSource->getShippingTaxAmount(), 0.02)) {
+                    // On credit notes, the shipping discount amount is not stored but can
+                    // be deduced via the shipping discount tax amount and the shipping vat
+                    // rate. To get a more precise 'meta-line-discount-amountinc', we
+                    // compute that in the completor when we have corrected the vatrate.
+                    $result['meta-line-discount-vatamount'] = $sign * ($shippingVat - $sign * $magentoSource->getShippingTaxAmount());
+                }
+            } else {
+                // Free shipping should get a "normal" tax rate. We leave that
+                // to the completor to determine.
+                $result += array(
+                    'unitprice' => 0,
+                    'vatrate' => null,
+                    'meta-vatrate-source' => static::VatRateSource_Completor,
+                );
+            }
         }
         return $result;
     }

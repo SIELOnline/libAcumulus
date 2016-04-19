@@ -20,7 +20,11 @@ abstract class CompletorStrategyBase
     /** @var int Indication of the order of execution of the strategy. */
     static $tryOrder = 50;
 
-    /** @var array[] */
+    /**
+     * The invoice according to the Acumulus API definition.
+     *
+     * @var array[]
+     */
     protected $invoice;
 
     /** @var array[] */
@@ -47,6 +51,9 @@ abstract class CompletorStrategyBase
     /**
      * The lines that replace (some of) the $lines2Complete.
      *
+     * $linesCompleted indicates which lines in $lines2Complete are completed
+     * and are to be replaced by the $replacingLines.
+     *
      * @var array[]
      */
     protected $replacingLines;
@@ -63,7 +70,19 @@ abstract class CompletorStrategyBase
     /** @var string */
     protected $description = 'Not yet set';
 
-    /** @var array[] */
+    /**
+     * An overview of the vat broken down into separate vat rates.
+     * 
+     * Each entry is keyed by íts vatrate (%.3f formatted to get correct
+     * comparisons on equality) and contains an array with the following
+     * information:
+     * - 'vatrate' => the vatrate,
+     * - 'vatamount' => vat amount on all lines having this vat rate.
+     * - 'amount' => amount (ex vat) of all lines having this vat rate,
+     * - 'count' => number of lines having this vat rate.
+     * 
+     * @var array[]
+     */
     protected $vatBreakdown;
 
     /** @var \Siel\Acumulus\Invoice\Source */
@@ -133,6 +152,14 @@ abstract class CompletorStrategyBase
     public function getVat2Divide()
     {
         return $this->vat2Divide;
+    }
+
+    /**
+     * @return array
+     */
+    public function getVatBreakdown()
+    {
+        return $this->vatBreakdown;
     }
 
     /**
@@ -306,6 +333,8 @@ abstract class CompletorStrategyBase
 
     /**
      * Strategy dependent initialization.
+     *
+     * This base implementation does nothing.
      */
     protected function init()
     {
@@ -352,7 +381,7 @@ abstract class CompletorStrategyBase
      * @return float
      *   The vat amount for the completed line.
      */
-    protected function completeLine(&$line2Complete, $vatRate)
+    protected function completeLine($line2Complete, $vatRate)
     {
         if (!isset($line2Complete['quantity'])) {
             $line2Complete['quantity'] = 1;

@@ -86,12 +86,7 @@ class CompletorStrategyLines
     protected function completeStrategyLines()
     {
         if ($this->invoiceHasStrategyLine()) {
-            $input = array_reduce($this->possibleVatRates,
-                function ($carry, $item) {
-                    return $carry . (empty($carry) ? '' : ',') . '[' . $item['vatrate'] . '%,' . $item['vattype'] . ']';
-                },
-                '');
-            $this->invoice['customer']['invoice']['meta-completor-strategy-input'] = "strategy input: vat rates($input)";
+            $this->invoice['customer']['invoice']['meta-completor-strategy-input']['vat-rates'] = str_replace(array("\r", "\n", "\t"), '', var_export($this->possibleVatRates, true));
 
             $isFirst = true;
             $strategies = $this->getStrategyClasses();
@@ -99,7 +94,8 @@ class CompletorStrategyLines
                 /** @var CompletorStrategyBase $strategy */
                 $strategy = new $strategyClass($this->config, $this->translator, $this->invoice, $this->possibleVatTypes, $this->possibleVatRates, $this->source);
                 if ($isFirst) {
-                    $this->invoice['customer']['invoice']['meta-completor-strategy-input'] .= ', vat2Divide: ' . $strategy->getVat2Divide();
+                    $this->invoice['customer']['invoice']['meta-completor-strategy-input']['vat-2-divide'] = $strategy->getVat2Divide();
+                    $this->invoice['customer']['invoice']['meta-completor-strategy-input']['vat-breakdown'] = str_replace(array("\r", "\n", "\t"), '', var_export($strategy->getVatBreakdown(), true));
                     $isFirst = false;
                 }
                 if ($strategy->apply()) {

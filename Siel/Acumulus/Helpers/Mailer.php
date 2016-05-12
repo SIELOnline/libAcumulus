@@ -77,6 +77,9 @@ abstract class Mailer
             else  if ($result === null) {
                 $result = 'null';
             }
+            else  if ($result instanceof \Exception) {
+                $result = $result->getMessage();
+            }
             else  if (!is_string($result)) {
                 $result = print_r($result, true);
             }

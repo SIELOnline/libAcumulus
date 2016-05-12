@@ -51,9 +51,9 @@ class Log extends BaseLog
     protected function getLogger()
     {
         if ($this->logger === null) {
-            $this->logger = new FileLogger();
+            $this->logger = new FileLogger(AbstractLogger::DEBUG);
             $this->logger->setFilename(_PS_ROOT_DIR_ . '/log/' . 'acumulus.log');
         }
-        return $this->logger; 
+        return $this->logger;
     }
 }

@@ -119,7 +119,6 @@ class Log
             if (count($args) > 0) {
                 $message = vsprintf($message, $args);
             }
-            $message = sprintf('Acumulus: %s', $message);
             $this->write($message, $severity);
         }
         return $message;
@@ -204,7 +203,7 @@ class Log
      */
     protected function write($message, $severity)
     {
-        $message = sprintf('%s - %s', $this->getSeverityString($severity), $message);
+        $message = sprintf('Acumulus: %s - %s', $this->getSeverityString($severity), $message);
         error_log($message);
     }
 }

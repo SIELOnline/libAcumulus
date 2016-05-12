@@ -17,6 +17,7 @@ class Log extends BaseLog
      */
     protected function write($message, $severity)
     {
+        $message = sprintf('Acumulus: %s', $message);
         Mage::log($message, $this->getMagentoSeverity($severity));
     }
 

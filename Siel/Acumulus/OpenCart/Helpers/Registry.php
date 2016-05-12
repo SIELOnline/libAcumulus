@@ -62,7 +62,7 @@ class Registry
      *
      * @param \Registry $registry
      */
-    public function __construct(\Registry $registry)
+    protected function __construct(\Registry $registry)
     {
         $this->registry = $registry;
         $this->orderModel = null;

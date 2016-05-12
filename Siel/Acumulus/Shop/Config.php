@@ -47,6 +47,7 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
      *
      * @param string $shopNamespace
      * @param string $language
+     *   A language or locale code, e.g. nl, nl-NL, or en-UK.
      */
     public function __construct($shopNamespace, $language)
     {
@@ -55,7 +56,7 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
         $this->values = array();
         $this->instances = array();
         $this->shopNamespace = static::baseNamespace . '\\' . $shopNamespace;
-        $this->language = $language;
+        $this->language = substr($language, 0, 2);
         $this->getLog();
     }
 

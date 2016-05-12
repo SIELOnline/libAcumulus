@@ -395,7 +395,7 @@ class Communicator
     {
         $env = $this->config->getEnvironment();
         $this->errors[] = array(
-            'code' => $ch ? curl_errno($ch) : 0,
+            'code' => $ch ? curl_errno($ch) : 'no-ch',
             'codetag' => "$function (Curl: {$env['curlVersion']})",
             'message' => $ch ? curl_error($ch) : '',
         );

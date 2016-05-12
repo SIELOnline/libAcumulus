@@ -193,10 +193,10 @@ abstract class InvoiceManager
     /**
      * Processes an invoice source status change event.
      *
-     * For now we don't look at the status for credit notes: they are always sent.
+     * For now we don't look at credit note states, they are always sent.
      *
      * @param \Siel\Acumulus\Invoice\Source $invoiceSource
-     *   The source whose status changed.
+     *   The source whose status has changed.
      *
      * @return int
      *   Status, one of the WebConfigInterface::Status_ constants.
@@ -267,7 +267,7 @@ abstract class InvoiceManager
             // Trigger the InvoiceCreated event.
             $this->triggerInvoiceCreated($invoice, $invoiceSource);
 
-            // If the invoice is not set to null, we continue by completing it. 
+            // If the invoice is not set to null, we continue by completing it.
             if ($invoice !== null) {
                 $localMessages = array();
                 $invoice = $this->config->getCompletor()->complete($invoice, $invoiceSource, $localMessages);
@@ -275,7 +275,7 @@ abstract class InvoiceManager
                 // Trigger the InvoiceCompleted event.
                 $this->triggerInvoiceCompleted($invoice, $invoiceSource);
 
-                // If the invoice is not set to null, we continue by sending it. 
+                // If the invoice is not set to null, we continue by sending it.
                 if ($invoice !== null) {
                     $service = $this->config->getService();
                     $result = $service->invoiceAdd($invoice);
@@ -290,7 +290,7 @@ abstract class InvoiceManager
                     }
                     else {
                         // If the invoice was sent as a concept, no entryid will
-                        // be returned: check for errors and the concept status 
+                        // be returned: check for errors and the concept status
                         if (empty($result['errors']) && $invoice['customer']['invoice']['concept'] == Config::Concept_Yes) {
                             $this->config->getAcumulusEntryModel()->save($invoiceSource, null, null);
                         }

@@ -412,12 +412,12 @@ class Creator extends BaseCreator
     {
         $result = array();
 
-        // For refunds without any articles (probably just a manual refund) we don't
-        // need to know what discounts were applied on the original order. So skip
-        // get_used_coupons() on refunds without articles.
+        // For refunds without any articles (probably just a manual refund) we
+        // don't need to know what discounts were applied on the original order.
+        // So skip get_used_coupons() on refunds without articles.
         if ($this->invoiceSource->getType() !== Source::CreditNote || $this->hasItemLines) {
-            // Add a line for all coupons applied. Coupons are only stored on the order,
-            // not on refunds, so use the order property.
+            // Add a line for all coupons applied. Coupons are only stored on
+            // the order, not on refunds, so use the order property.
             $usedCoupons = $this->order->get_used_coupons();
             foreach ($usedCoupons as $code) {
                 $coupon = new WC_Coupon($code);
@@ -430,10 +430,14 @@ class Creator extends BaseCreator
     /**
      * Returns 1 order discount line for 1 coupon usage.
      *
-     * In woocommerce, discounts are implemented with coupons. Multiple coupons
+     * In WooCommerce, discounts are implemented with coupons. Multiple coupons
      * can be used per order. Coupons can:
      * - have a fixed amount or a percentage.
      * - be applied to the whole cart or only be used for a set of products.
+     *
+     * Discounts are already applied, add a descriptive line with 0 amount. The
+     * VAT rate to categorize this line under should be determined by the
+     * completor.
      *
      * Hooray:
      * As of WooCommerce 2.3, coupons can no longer be set as "apply after tax":
@@ -448,8 +452,8 @@ class Creator extends BaseCreator
     protected function getDiscountLine(WC_Coupon $coupon)
     {
         // Get a description for the value of this coupon.
-        // Entered discount amounts follow the wc_prices_include_tax() setting. Use
-        // that info in the description.
+        // Entered discount amounts follow the wc_prices_include_tax() setting.
+        // Use that info in the description.
         $description = sprintf('%s %s: ', $this->t('discount_code'), $coupon->code);
         if (in_array($coupon->discount_type, array('fixed_product', 'fixed_cart'))) {
             $amount = $this->getSign() * $coupon->coupon_amount;
@@ -469,9 +473,6 @@ class Creator extends BaseCreator
             }
         }
 
-        // Discounts are already applied, add a descriptive line with 0 amount.
-        // The VAT rate to categorize this line under should be determined by the
-        // completor.
         return array(
             'itemnumber' => $coupon->code,
             'product' => $description,

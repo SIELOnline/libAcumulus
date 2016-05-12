@@ -12,6 +12,9 @@ class ConfigFormTranslations extends TranslationCollection
         'config_form_title' => 'Acumulus | Instellingen',
         'config_form_header' => 'Acumulus instellingen',
 
+        'button_save' => 'Opslaan',
+        'button_cancel' => 'Terug',
+
         'message_validate_contractcode_0' => 'Het veld Contractcode is verplicht, vul de contractcode in die u ook gebruikt om in te loggen op Acumulus.',
         'message_validate_contractcode_1' => 'Het veld Contractcode is een numeriek veld, vul de contractcode in die u ook gebruikt om in te loggen op Acumulus.',
         'message_validate_username_0' => 'Het veld Gebruikersnaam is verplicht, vul de gebruikersnaam in die u ook gebruikt om in te loggen op Acumulus.',
@@ -149,7 +152,7 @@ Vink deze optie aan als u geen regel op uw factuur of pakbon wil voor gratis ver
         'config_form_header' => 'Acumulus settings',
 
         'button_save' => 'Save',
-        'button_cancel' => 'Cancel',
+        'button_cancel' => 'Back',
 
         'message_validate_contractcode_0' => 'The field Contract code is required, please fill in the contract code you use to log in to Acumulus.',
         'message_validate_contractcode_1' => 'The field Contract code is a numeric field, please fill in the contract code you use to log in to Acumulus.',

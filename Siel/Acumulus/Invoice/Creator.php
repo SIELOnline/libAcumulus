@@ -345,7 +345,7 @@ abstract class Creator
         }
 
         // Payment method, status and date.
-        $this->addPaymentMethod();
+        $this->addIfNotEmpty($result, 'meta-payment-method', $this->getPaymentMethod());
         $result['paymentstatus'] = $this->getPaymentState();
         if ($result['paymentstatus'] === ConfigInterface::PaymentStatus_Paid) {
             $this->addIfNotEmpty($result, 'paymentdate', $this->getPaymentDate());
@@ -427,11 +427,17 @@ abstract class Creator
     /**
      * Adds the payment method used to the meta-payment-method key.
      *
-     * This default implementation adds an empty payment method.
+     * This default implementation returns an empty payment method.
+     *
+     * If no payment method is stored for credit notes, it is expected to be the
+     * same as for its order, as this will normally indeed be the case.
+     *
+     * @return int|string|null
+     *   A value identifying the payment method or null if unknown.
      */
-    protected function addPaymentMethod()
+    protected function getPaymentMethod()
     {
-        $this->invoice['customer']['invoice']['meta-payment-method'] = null;
+        return null;
     }
 
     /**

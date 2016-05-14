@@ -140,6 +140,28 @@ class Creator extends BaseCreator
         return $result;
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * This override returns the internal method name of the chosen payment
+     * method.
+     */
+    protected function getPaymentMethod()
+    {
+        try {
+            return $this->order->getPayment()->getMethod();
+        }
+        catch (\Exception $e) {}
+        return parent::getPaymentMethod();
+    }
+
+    /**
+     * Returns whether the order has been paid or not.
+     *
+     * @return int
+     *   \Siel\Acumulus\Invoice\ConfigInterface::PaymentStatus_Paid or
+     *   \Siel\Acumulus\Invoice\ConfigInterface::PaymentStatus_Due
+     */
     protected function getPaymentStateOrder()
     {
         return Number::isZero($this->order->getBaseTotalDue())
@@ -147,6 +169,13 @@ class Creator extends BaseCreator
             : ConfigInterface::PaymentStatus_Due;
     }
 
+    /**
+     * Returns whether the credit memo has been paid or not.
+     *
+     * @return int
+     *   \Siel\Acumulus\Invoice\ConfigInterface::PaymentStatus_Paid or
+     *   \Siel\Acumulus\Invoice\ConfigInterface::PaymentStatus_Due
+     */
     protected function getPaymentStateCreditNote()
     {
         return $this->creditNote->getState() == Creditmemo::STATE_REFUNDED
@@ -154,6 +183,12 @@ class Creator extends BaseCreator
             : ConfigInterface::PaymentStatus_Due;
     }
 
+    /**
+     * Returns the payment date for the order.
+     *
+     * @return string|null
+     *   The payment date (yyyy-mm-dd) or null if the order has not been paid yet.
+     */
     protected function getPaymentDateOrder()
     {
         // Take date of last payment as payment date.
@@ -170,11 +205,24 @@ class Creator extends BaseCreator
         return $paymentDate;
     }
 
+    /**
+     * Returns whether the order is in a state that makes it to be considered paid.
+     *
+     * @param string $status
+     *
+     * @return bool
+     */
     protected function isPaidStatus($status)
     {
         return in_array($status, array('processing', 'closed', 'complete'));
     }
 
+    /**
+     * Returns the payment date for the credit memo.
+     *
+     * @return string|null
+     *   The payment date (yyyy-mm-dd) or null if the order has not been paid yet.
+     */
     protected function getPaymentDateCreditNote()
     {
         return substr($this->creditNote->getCreatedAt(), 0, strlen('yyyy-mm-dd'));

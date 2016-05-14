@@ -129,6 +129,19 @@ class Creator extends BaseCreator
 
     /**
      * {@inheritdoc}
+     *
+     * This override returns the name of the payment module.
+     */
+    protected function getPaymentMethod()
+    {
+        if (isset($this->order->order_payment_method)) {
+            return $this->order->order_payment_method;
+        }
+        return parent::getPaymentMethod();
+    }
+
+    /**
+     * {@inheritdoc}
      */
     protected function getPaymentState()
     {

@@ -15,10 +15,6 @@ use WC_Product;
  */
 class Creator extends BaseCreator
 {
-    // More specifically typed property.
-    /** @var Source */
-    protected $invoiceSource;
-
     /** @var WC_Abstract_Order The order or refund that is sent to Acumulus. */
     protected $shopSource;
 
@@ -37,13 +33,12 @@ class Creator extends BaseCreator
     protected function setInvoiceSource($invoiceSource)
     {
         parent::setInvoiceSource($invoiceSource);
+        $this->shopSource = $this->invoiceSource->getSource();
         switch ($this->invoiceSource->getType()) {
             case Source::Order:
-                $this->shopSource = $this->invoiceSource->getSource();
                 $this->order = $this->shopSource;
                 break;
             case Source::CreditNote:
-                $this->shopSource = $this->invoiceSource->getSource();
                 $this->order = new WC_Order($this->shopSource->post->post_parent);
                 break;
         }
@@ -133,6 +128,19 @@ class Creator extends BaseCreator
     protected function getInvoiceDateCreditNote(/*$dateToUse*/)
     {
         return substr($this->shopSource->post->post_date, 0, strlen('2000-01-01'));
+    }
+
+    /**
+     * {@inheritdoc}
+     * 
+     * This override returns the id of a WC_Payment_Gateway.
+     */
+    protected function getPaymentMethod()
+    {
+        if (isset($this->shopSource->payment_method)) {
+            return $this->shopSource->payment_method;
+        }
+        return parent::getPaymentMethod();
     }
 
     /**

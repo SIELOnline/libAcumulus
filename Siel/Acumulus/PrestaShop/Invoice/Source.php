@@ -13,10 +13,6 @@ use Siel\Acumulus\Invoice\Source as BaseSource;
  */
 class Source extends BaseSource
 {
-    // More specifically typed properties.
-    /** @var Order|OrderSLip */
-    protected $source;
-
     /**
      * {@inheritdoc}
      */

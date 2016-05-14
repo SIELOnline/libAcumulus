@@ -175,6 +175,21 @@ class Creator extends BaseCreator
 
     /**
      * {@inheritdoc}
+     *
+     * This override returns the virtuemart_paymentmethod_id.
+     */
+    protected function getPaymentMethod()
+    {
+        $order = $this->invoiceSource->getSource();
+        // @todo: test this: correct sub-array?
+        if (isset($order['details']['BT']->virtuemart_paymentmethod_id)) {
+            return $order['details']['BT']->virtuemart_paymentmethod_id;
+        }
+        return parent::getPaymentMethod();
+    }
+
+    /**
+     * {@inheritdoc}
      */
     protected function getPaymentState()
     {

@@ -96,10 +96,23 @@ class Creator extends BaseCreator
 
     /**
      * {@inheritdoc}
+     *
+     * This override returns the code of the selected payment method.
+     */
+    protected function getPaymentMethod()
+    {
+        if (isset($this->order['payment_code'])) {
+            return $this->order['payment_code'];
+        }
+        return parent::getPaymentMethod();
+    }
+
+    /**
+     * {@inheritdoc}
      */
     protected function getPaymentState()
     {
-        // @todo: Can we determine this based on payment_method and payment_code?
+        // @todo: Can we determine this based on payment_code?
         $result = ConfigInterface::PaymentStatus_Paid;
         return $result;
     }
@@ -109,7 +122,7 @@ class Creator extends BaseCreator
      */
     protected function getPaymentDate()
     {
-        // @todo: Can we determine this based on history (and optionally payment_method and payment_code)?
+        // @todo: Can we determine this based on history (and optionally payment_code)?
         // Will default to the issue date.
         return null;
     }

@@ -40,9 +40,8 @@ use Siel\Acumulus\Invoice\Creator as BaseCreator;
  */
 class Creator extends BaseCreator
 {
-    // More specifically typed property.
-    /** @var Source */
-    protected $invoiceSource;
+    /** @var Order|OrderSlip The order or refund that is sent to Acumulus. */
+    protected $shopSource;
 
     /** @var Order */
     protected $order;
@@ -140,6 +139,19 @@ class Creator extends BaseCreator
             $result = substr($this->order->invoice_date, 0, strlen('2000-01-01'));
         }
         return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * This override returns the name of the payment module.
+     */
+    protected function getPaymentMethod()
+    {
+        if (isset($this->order->module)) {
+            return $this->order->module;
+        }
+        return parent::getPaymentMethod();
     }
 
     /**

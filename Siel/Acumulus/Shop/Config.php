@@ -713,12 +713,24 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
                     'type' => 'int',
                     'default' => 0,
                 ),
+                // @todo: add UI.
+                'paymentMethodAccountNumber' => array(
+                    'group' => 'invoice',
+                    'type' => 'array',
+                    'default' => array(),
+                ),
+                // @todo: add UI.
+                'paymentMethodCostCenter' => array(
+                    'group' => 'invoice',
+                    'type' => 'array',
+                    'default' => array(),
+                ),
                 'removeEmptyShipping' => array(
                     'group' => 'invoice',
                     'type' => 'bool',
                     'default' => false,
                 ),
-                // @todo: add to UI?
+                // @todo: add to advanced UI?
                 'addMissingAmountLine' => array(
                     'group' => 'invoice',
                     'type' => 'bool',
@@ -730,7 +742,7 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
                     'type' => 'bool',
                     'default' => false,
                 ),
-                // @todo: add these 3 to UI for shops where this is used (OC2, could others use this?).
+                // @todo: add these 3 to advanced UI for shops where this is used (OC2, could others use this?).
                 'optionsAllOn1Line' => array(
                     'group' => 'invoice',
                     'type' => 'int',

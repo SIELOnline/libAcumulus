@@ -70,6 +70,8 @@ interface ConfigInterface
      *   - defaultCostCenter
      *   - defaultInvoiceTemplate
      *   - defaultInvoicePaidTemplate
+     *   - paymentMethodAccountNumber
+     *   - paymentMethodCostCenter
      *   - removeEmptyShipping
      *   - useMargin
      */

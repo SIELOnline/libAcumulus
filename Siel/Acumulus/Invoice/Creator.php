@@ -120,6 +120,7 @@ abstract class Creator
         $this->invoice['customer'] = $this->getCustomer();
         $this->addCustomerDefaults();
         $this->invoice['customer']['invoice'] = $this->getInvoice();
+        $this->addPaymentMethodBasedDefaults();
         $this->addInvoiceDefaults();
         $this->addInvoiceTotals();
         $this->invoice['customer']['invoice']['line'] = $this->getInvoiceLines();
@@ -311,8 +312,9 @@ abstract class Creator
      * - description
      * - template: not needed, will be filled by the Completor
      *
-     * Additional keys (not recognised by the API but used by the Completor or
-     * for support and debugging purposes):
+     * Additional keys (not recognised by the API but used later on by the
+     * Creator or Completor or for support and debugging purposes):
+     * - meta-payment-method: an id of the payment method used.
      * - meta-invoice-amount: the total invoice amount excluding VAT.
      * - meta-invoice-amountinc: the total invoice amount including VAT.
      * - meta-invoice-vatamount: the total vat amount for the invoice.
@@ -342,7 +344,8 @@ abstract class Creator
             $result['issuedate'] = $this->getInvoiceDate($dateToUse);
         }
 
-        // Payment status and date.
+        // Payment method, status and date.
+        $this->addPaymentMethod();
         $result['paymentstatus'] = $this->getPaymentState();
         if ($result['paymentstatus'] === ConfigInterface::PaymentStatus_Paid) {
             $this->addIfNotEmpty($result, 'paymentdate', $this->getPaymentDate());
@@ -351,6 +354,24 @@ abstract class Creator
         $result['description'] = $this->getDescription();
 
         return $result;
+    }
+
+    /**
+     * Completes the invoice part with values based on the payment method.
+     */
+    protected function addPaymentMethodBasedDefaults()
+    {
+        $invoice = &$this->invoice['customer']['invoice'];
+        if (!empty($invoice['meta-payment-method'])) {
+            $paymentMethod = $invoice['meta-payment-method'];
+            $invoiceSettings = $this->config->getInvoiceSettings();
+            if (!empty($invoiceSettings['paymentMethodAccountNumber'][$paymentMethod])) {
+                $invoice['accountnumber'] = $invoiceSettings['paymentMethodAccountNumber'][$paymentMethod];
+            }
+            if (!empty($invoiceSettings['paymentMethodCostCenter'][$paymentMethod])) {
+                $invoice['costcenter'] = $invoiceSettings['paymentMethodCostCenter'][$paymentMethod];
+            }
+        }
     }
 
     /**
@@ -401,6 +422,16 @@ abstract class Creator
     protected function getInvoiceDate($dateToUse)
     {
         return $this->callSourceTypeSpecificMethod(__FUNCTION__, func_get_args());
+    }
+
+    /**
+     * Adds the payment method used to the meta-payment-method key.
+     *
+     * This default implementation adds an empty payment method.
+     */
+    protected function addPaymentMethod()
+    {
+        $this->invoice['customer']['invoice']['meta-payment-method'] = null;
     }
 
     /**

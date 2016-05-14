@@ -75,8 +75,8 @@ class ConfigForm extends BaseConfigForm
     {
         $result = parent::getFieldDefinitions();
         $result['accountSettingsHeader']['icon'] = 'icon-user';
-        if (isset($result['invoiceSettingsHeader'])) {
-            $result['invoiceSettingsHeader']['icon'] = 'icon-AdminParentPreferences';
+        $result['invoiceSettingsHeader']['icon'] = 'icon-AdminParentPreferences';
+        if (isset($result['emailAsPdfSettingsHeader'])) {
             $result['emailAsPdfSettingsHeader']['icon'] = 'icon-file-pdf-o';
         }
         $result['versionInformationHeader']['icon'] = 'icon-info-circle';

@@ -296,18 +296,30 @@ abstract class ConfigForm extends Form
                         'overwriteIfExists' => $this->t('option_overwriteIfExists'),
                     ),
                 ),
-                'defaultAccountNumber' => array(
-                    'type' => 'select',
-                    'label' => $this->t('field_defaultAccountNumber'),
-                    'description' => $this->t('desc_defaultAccountNumber'),
-                    'options' => $this->picklistToOptions($this->acumulusConfig->getService()->getPicklistAccounts(), 'accounts', 0, $this->t('option_empty')),
-                ),
-                'defaultCostCenter' => array(
-                    'type' => 'select',
-                    'label' => $this->t('field_defaultCostCenter'),
-                    'description' => $this->t('desc_defaultCostCenter'),
-                    'options' => $this->picklistToOptions($this->acumulusConfig->getService()->getPicklistCostCenters(), 'costcenters', 0, $this->t('option_empty')),
-                ),
+            );
+
+            // Account numbers: default + per payment method.
+            $paymentMethods = $this->getPaymentMethods();
+            $accountNumberOptions = $this->picklistToOptions($this->acumulusConfig->getService()->getPicklistAccounts(),'accounts', 0, $this->t('option_empty'));
+            $fields['invoiceSettingsHeader']['fields']['defaultAccountNumber'] = array(
+                'type' => 'select',
+                'label' => $this->t('field_defaultAccountNumber'),
+                'description' => $this->t('desc_defaultAccountNumber'),
+                'options' => $accountNumberOptions,
+            );
+            $this->getPaymentMethodsFieldset($fields['invoiceSettingsHeader']['fields'], $paymentMethods, 'paymentMethodAccountNumber', $accountNumberOptions);
+
+            // Cost centers: default + per payment method.
+            $constCenterOptions = $this->picklistToOptions($this->acumulusConfig->getService()->getPicklistCostCenters(),'costcenters', 0, $this->t('option_empty'));
+            $fields['invoiceSettingsHeader']['fields']['defaultCostCenter'] = array(
+                'type' => 'select',
+                'label' => $this->t('field_defaultCostCenter'),
+                'description' => $this->t('desc_defaultCostCenter'),
+                'options' => $constCenterOptions,
+            );
+            $this->getPaymentMethodsFieldset($fields['invoiceSettingsHeader']['fields'], $paymentMethods, 'paymentMethodCostCenter', $constCenterOptions);
+
+            $fields['invoiceSettingsHeader']['fields'] += array(
                 'defaultInvoiceTemplate' => array(
                     'type' => 'select',
                     'label' => $this->t('field_defaultInvoiceTemplate'),
@@ -329,6 +341,7 @@ abstract class ConfigForm extends Form
                 ),
                 'triggerInvoiceSendEvent' => $triggerInvoiceSendEventField,
             );
+
             if (array_key_exists(ConfigInterface::TriggerInvoiceSendEvent_OrderStatus, $triggerInvoiceSendEventOptions)) {
                 $options = $this->getOrderStatusesList();
                 $fields['invoiceSettingsHeader']['fields']['triggerOrderStatus'] = array(
@@ -541,6 +554,62 @@ abstract class ConfigForm extends Form
      *   the dropdown item and the value being the label for the dropdown item.
      */
     abstract protected function getShopOrderStatuses();
+
+
+    /**
+     * Returns an option list of active payment methods.
+     *
+     * The default implementation returns an empty array, ie no support (yet)
+     * for payment method based settings.
+     *
+     * @return array
+     *   An array of active payment methods. with the key being the ID (internal
+     *   name) for the dropdown item and the value being the label for the
+     *   dropdown item.
+     */
+    protected function getPaymentMethods()
+    {
+        $result = array();
+
+        // Test:
+//        $result['banktransfer'] = 'Bankoverschrijving';
+//        $result['paypal'] = 'PayPal';
+
+        return $result;
+    }
+
+    /**
+     * Returns a fieldset with a select per payment method.
+     *
+     * @param array $fields
+     *   The fields array to add the fieldset to.
+     * @param array $paymentMethods
+     *   Array of payment methods (id => label)
+     * @param string $key
+     *   Prefix of the keys to use for the different ids.
+     * @param array $options
+     *   Options for all the selects.
+     */
+    protected function getPaymentMethodsFieldset(array &$fields, array $paymentMethods, $key, array $options) {
+        if (!empty($paymentMethods)) {
+            $fieldset = array(
+                'type' => 'fieldset',
+                'legend' => $this->t("{$key}Fieldset"),
+                'description' => $this->t("desc_{$key}Fieldset"),
+                'fields' => array(),
+            );
+
+            $options[0] = $this->t('option_use_default');
+            foreach ($paymentMethods as $paymentMethodId => $paymentMethodLabel) {
+                $fieldset['fields']["{$key}[{$paymentMethodId}]"] = array(
+                    'type' => 'select',
+                    'label' => $paymentMethodLabel,
+                    'options' => $options,
+                );
+            }
+            $fields["{$key}Fieldset"] = $fieldset;
+        }
+    }
 
     /**
      * Returns a list of valid sources that can be used as invoice number.

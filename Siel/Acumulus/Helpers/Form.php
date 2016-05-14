@@ -161,7 +161,23 @@ abstract class Form
     {
         if (!$this->formValuesSet) {
             $this->formValues = array_fill_keys($this->getKeys(), '');
-            $this->formValues = array_merge($this->formValues, $this->getDefaultFormValues());
+            // Merge the default form values into the form values, but do so
+            // with some special array handling.
+            $defaultFormValues = $this->getDefaultFormValues();
+            foreach ($defaultFormValues as $key => $defaultFormValue) {
+                // We start with a simple addition or overwrite.
+                $this->formValues[$key] = $defaultFormValue;
+                // distribute keyed arrays over separate values if existing.
+                if (is_array($defaultFormValue)) {
+                    foreach ($defaultFormValue as $valueKey => $valueValue) {
+                        $fullKey = "{$key}[{$valueKey}]";
+                        if (array_key_exists($fullKey, $this->formValues)) {
+                            $this->formValues[$fullKey] = $valueValue;
+                        }
+                    }
+                }
+            }
+            $this->formValues = array_merge($this->formValues, $defaultFormValues);
             if (!empty($this->submittedValues)) {
                 $this->formValues = array_merge($this->formValues, $this->submittedValues);
             }

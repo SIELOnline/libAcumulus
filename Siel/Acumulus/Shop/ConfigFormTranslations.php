@@ -43,6 +43,7 @@ class ConfigFormTranslations extends TranslationCollection
 
         'invoiceSettingsHeader' => 'Uw factuurinstellingen',
         'option_empty' => 'Maak uw keuze',
+        'option_use_default' => 'Gebruik standaard',
 
         'field_digitalServices' => 'Verkoopt u digitale diensten?',
         'option_digitalServices_1' => 'Zowel digitale diensten als normale producten.',
@@ -86,11 +87,15 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
 
         'field_defaultCustomerType' => 'Importeer klanten als',
 
-        'field_defaultAccountNumber' => 'Bankrekeningnummer',
-        'desc_defaultAccountNumber' => 'Maakt u binnen Acumulus gebruik van meerdere rekeningen en wilt u alle bestellingen uit uw webwinkel op een specifieke rekening binnen laten komen, kies dan hier het bankrekeningnummer.',
+        'field_defaultAccountNumber' => 'Standaard rekening',
+        'desc_defaultAccountNumber' => 'Kies de rekening waarop u standaard de facturen van deze winkel wilt boeken.',
+        'paymentMethodAccountNumberFieldset' => 'Rekening per betaalmethode',
+        'desc_paymentMethodAccountNumberFieldset' => 'Hieronder kunt u per actieve betaalmethode een rekening opgeven. De standaard rekening hierboven wordt gebruikt voor betaalmethoden waarvoor u geen specifieke rekening opgeeft.',
 
-        'field_defaultCostCenter' => 'Kostenplaats',
-        'desc_defaultCostCenter' => 'Maakt u binnen Acumulus gebruik van meerdere kostenplaatsen en wilt u alle bestellingen uit uw webwinkel op een specifieke kostenplaats binnen laten komen, kies dan hier de kostenplaats.',
+        'field_defaultCostCenter' => 'Standaard kostenplaats',
+        'desc_defaultCostCenter' => 'Kies de kostenplaats waarop u standaard de facturen van deze winkel wilt boeken.',
+        'paymentMethodCostCenterFieldset' => 'Kostenplaats per betaalmethode',
+        'desc_paymentMethodCostCenterFieldset' => 'Hieronder kunt u per actieve betaalmethode een kostenplaats opgeven. De standaard kostenplaats hierboven wordt gebruikt voor betaalmethoden waarvoor u geen specifieke kostenplaats opgeeft.',
 
         'field_defaultInvoiceTemplate' => 'Factuur-sjabloon (niet betaald)',
         'field_defaultInvoicePaidTemplate' => 'Factuur-sjabloon (betaald)',
@@ -182,6 +187,7 @@ Vink deze optie aan als u geen regel op uw factuur of pakbon wil voor gratis ver
 
         'invoiceSettingsHeader' => 'Your invoice settings',
         'option_empty' => 'Select one',
+        'option_use_default' => 'Use default',
 
         'field_digitalServices' => 'Do you sell digital services?',
         'option_digitalServices_1' => 'Both digitals services and normal products.',
@@ -225,11 +231,15 @@ If you unchecked the first option, the second option only applies to business cl
 
         'field_defaultCustomerType' => 'Create customers as',
 
-        'field_defaultAccountNumber' => 'Bank account number',
-        'desc_defaultAccountNumber' => 'Select the (bank) account number at which you want to receive all your order payments.',
+        'field_defaultAccountNumber' => 'Default account',
+        'desc_defaultAccountNumber' => 'Select the default account to which you want to book this shop\'s invoices.',
+        'paymentMethodAccountNumberFieldset' => 'Account per payment method',
+        'desc_paymentMethodAccountNumberFieldset' => 'Below you can enter an account to use per (active) payment method. The default above serves as fallback for payment methods for which you do not specify an account.',
 
-        'field_defaultCostCenter' => 'Cost center',
-        'desc_defaultCostCenter' => 'Select the cost center to assign your orders to.',
+        'field_defaultCostCenter' => 'Default cost center',
+        'desc_defaultCostCenter' => 'Select the cost center to to which you want to book this shop\'s invoices.',
+        'paymentMethodCostCenterFieldset' => 'Cost center per payment method',
+        'desc_paymentMethodCostCenterFieldset' => 'Below you can enter a cost center to use per (active) payment method.  The default above serves as fallback for payment methods for which you do not specify a cost center.',
 
         'field_defaultInvoiceTemplate' => 'Invoice template (due)',
         'field_defaultInvoicePaidTemplate' => 'Invoice template (paid)',

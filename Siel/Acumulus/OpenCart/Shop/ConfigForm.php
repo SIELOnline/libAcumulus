@@ -56,4 +56,22 @@ class ConfigForm extends BaseConfigForm
         unset($result[ConfigInterface::TriggerInvoiceSendEvent_InvoiceCreate]);
         return $result;
     }
+
+    /**
+     * Turns the list into a translated list of options for a select.
+     *
+     * @param array $extensions
+     *
+     * @return array
+     *   an array with the extensions as key and their translated name as value.
+     */
+    protected function paymentMethodToOptions(array $extensions)
+    {
+        $results = array();
+        foreach ($extensions as $extension) {
+            Registry::getInstance()->language->load('payment/' . $extension);
+            $results[$extension] = Registry::getInstance()->language->get('heading_title');
+        }
+        return $results;
+    }
 }

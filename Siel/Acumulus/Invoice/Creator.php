@@ -861,6 +861,34 @@ abstract class Creator
     }
 
     /**
+     * Adds vat and vat range related tags to the invoice line.
+     *
+     * These tags include:
+     * - vatrate: a vat rate based on dividing the vatamoumt by the unitprice
+     * - vatamount (? = optional): if not already filled in.
+     * - meta-vatrate-min (?): the minimum vat rate given the maximum rounding
+     *     errors for the vatamount and the unitprice.
+     * - meta-vatrate-max (?): the maximum vat rate given the maximum rounding
+     *     errors for the vatamount and the unitprice.
+     * - meta-vatrate-source: VatRateSource_Completor, VatRateSource_Exact0, or
+     *     VatRateSource_Calculated.
+
+     *
+     * @param array $line
+     * @param float $precisionNumerator
+     * @param float $precisionDenominator
+     */
+    protected function addVatRangeTags(array &$line, $precisionNumerator = 0.01, $precisionDenominator = 0.01)
+    {
+        $numerator = isset($line['vatamount']) ? $line['vatamount'] : $line['unitpriceinc'] - $line['unitprice'];
+        $denominator = $line['unitprice'];
+        if (isset($line['costprice'])) {
+            $denominator -= $line['costprice'];
+        }
+        $line += $this->getVatRangeTags($numerator, $denominator, $precisionNumerator, $precisionDenominator);
+    }
+
+    /**
      * Returns the range in which the vat rate will lie.
      *
      * If a webshop does not store the vat rates used in the order, we must

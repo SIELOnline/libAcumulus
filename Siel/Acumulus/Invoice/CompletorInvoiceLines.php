@@ -95,11 +95,21 @@ class CompletorInvoiceLines
                 if (isset($line['unitpriceinc'])) {
                     if (isset($line['vatamount'])) {
                         $line['unitprice'] = $line['unitpriceinc'] - $line['vatamount'];
-                        $line['meta-calculated-fields'][] = 'unitprice';
                     } else if (isset($line['vatrate']) && in_array($line['meta-vatrate-source'], Completor::$CorrectVatRateSources)) {
-                        $line['unitprice'] = $line['unitpriceinc'] / (100.0 + $line['vatrate']) * 100.0;
-                        $line['meta-calculated-fields'][] = 'unitprice';
+                        if (isset($line['costprice'])) {
+                            $margin = $line['unitpriceinc'] - $line['costprice'];
+                            if ($margin > 0) {
+                                // Calculate VAT over margin part only.
+                                $line['unitprice'] = $line['costprice'] + $margin / (100.0 + $line['vatrate']) * 100.0;
+                            } else {
+                                // VAT = 0 with no or a negative margin.
+                                $line['unitprice'] = $line['unitpriceinc'];
+                            }
+                        } else {
+                            $line['unitprice'] = $line['unitpriceinc'] / (100.0 + $line['vatrate']) * 100.0;
+                        }
                     }
+                    $line['meta-calculated-fields'][] = 'unitprice';
                 }
             }
         }

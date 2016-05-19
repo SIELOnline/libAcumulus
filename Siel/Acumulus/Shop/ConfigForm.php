@@ -16,6 +16,7 @@ use Siel\Acumulus\Web\ConfigInterface as WebConfigInterface;
  * - getInvoiceNrSourceOptions()
  * - getDateToUseOptions()
  * - getTriggerInvoiceSendEventOptions()
+ * - getPaymentMethods()
  * And may optionally (have to) override:
  * - systemValidate()
  * - isSubmitted()

@@ -77,6 +77,12 @@ class FormMapper
                 'input' => $this->fields($field['fields']),
             ),
         );
+
+        // Add description at the start of the fieldset as an html element.
+        if (isset($field['description'])) {
+            array_unshift($result['form']['input'], array('type' => 'html', 'html_content' => $field['description']));
+        }
+        // Add icon to legend.
         if (isset($field['icon'])) {
             $result['form']['legend']['icon'] = $field['icon'];
         }

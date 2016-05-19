@@ -45,4 +45,29 @@ class ConfigForm extends BaseConfigForm
         }
         return $result;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getPaymentMethods()
+    {
+        $result = array();
+        /** @var \Magento\Payment\Helper\Data $paymentHelper */
+        $paymentHelper = Registry::getInstance()->get('Magento\Payment\Helper\Data');
+        $paymentMethods = $paymentHelper->getPaymentMethods();
+        foreach ($paymentMethods as $code => $paymentMethodData) {
+            if (!empty($paymentMethodData['active'])) {
+                if ((isset($data['title']))) {
+                    $title = $data['title'];
+                } else if ($paymentHelper->getMethodInstance($code)) {
+                    $title = $paymentHelper->getMethodInstance($code)->getConfigData('title');
+                }
+                if (empty($title)) {
+                    $title = $code;
+                }
+                $result[$code] = $title;
+            }
+        }
+        return $result;
+    }
 }

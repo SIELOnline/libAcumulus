@@ -38,4 +38,16 @@ class ConfigForm extends BaseConfigForm
         unset($result[ConfigInterface::TriggerInvoiceSendEvent_InvoiceCreate]);
         return $result;
     }
+
+    protected function getPaymentMethods()
+    {
+        $result = array();
+        /** @var \VirtueMartModelPaymentmethod $model */
+        $model = VmModel::getModel('paymentmethod');
+        $paymentMethods = $model->getPayments(true);
+        foreach ($paymentMethods as $paymentMethod) {
+            $result[$paymentMethod->virtuemart_paymentmethod_id] = $paymentMethod->payment_name;
+        }
+        return $result;
+    }
 }

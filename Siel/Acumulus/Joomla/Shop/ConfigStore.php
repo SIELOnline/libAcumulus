@@ -57,6 +57,10 @@ class ConfigStore extends BaSeConfigStore
         foreach ($keys as $key) {
             $value = $params->get($key, null);
             if (isset($value)) {
+                // Keyed arrays are saved as objects, convert back to an array.
+                if (is_object($value)) {
+                    $value = (array) $value;
+                }
                 $result[$key] = $value;
             }
             // Overwrite with values saved during this request.

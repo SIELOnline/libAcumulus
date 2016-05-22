@@ -80,27 +80,17 @@ class ConfigForm extends BaseConfigForm
         // Add icons.
         $result['accountSettingsHeader']['icon'] = 'icon-user';
         $result['invoiceSettingsHeader']['icon'] = 'icon-AdminParentPreferences';
+        if (isset($result['paymentMethodAccountNumberFieldset'])) {
+            $result['paymentMethodAccountNumberFieldset']['icon'] = 'icon-credit-card';
+        }
+        if (isset($result['paymentMethodCostCenterFieldset'])) {
+            $result['paymentMethodCostCenterFieldset']['icon'] = 'icon-credit-card';
+        }
         if (isset($result['emailAsPdfSettingsHeader'])) {
             $result['emailAsPdfSettingsHeader']['icon'] = 'icon-file-pdf-o';
         }
         $result['versionInformationHeader']['icon'] = 'icon-info-circle';
 
-        // Flatten fieldsets in invoice settings by inserting them after that
-        // fieldset.
-        $fields = &$result['invoiceSettingsHeader']['fields'];
-        $id = 'paymentMethodAccountNumberFieldset';
-        if (isset($fields[$id])) {
-            $insert[$id] = $fields[$id];
-            $insert[$id]['icon'] = 'icon-credit-card';
-            unset($fields[$id]);
-
-            $id = 'paymentMethodCostCenterFieldset';
-            $insert[$id] = $fields[$id];
-            $insert[$id]['icon'] = 'icon-credit-card';
-            unset($fields[$id]);
-
-            array_splice($result, 2, 0, $insert);
-        }
         return $result;
     }
 

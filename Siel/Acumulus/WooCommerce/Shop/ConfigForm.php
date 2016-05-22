@@ -64,4 +64,19 @@ class ConfigForm extends BaseConfigForm
         unset($result[ConfigInterface::TriggerInvoiceSendEvent_InvoiceCreate]);
         return $result;
     }
+
+    /**
+     * @inheritDoc
+     */
+    protected function getPaymentMethods()
+    {
+        $result = array();
+        $paymentGateways = WC()->payment_gateways->payment_gateways();
+        foreach ($paymentGateways as $id => $paymentGateway) {
+            if (isset($paymentGateway->enabled) && $paymentGateway->enabled === 'yes') {
+                $result[$id] = $paymentGateway->title;
+            }
+        }
+        return $result;
+    }
 }

@@ -713,13 +713,11 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
                     'type' => 'int',
                     'default' => 0,
                 ),
-                // @todo: add UI.
                 'paymentMethodAccountNumber' => array(
                     'group' => 'invoice',
                     'type' => 'array',
                     'default' => array(),
                 ),
-                // @todo: add UI.
                 'paymentMethodCostCenter' => array(
                     'group' => 'invoice',
                     'type' => 'array',

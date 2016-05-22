@@ -235,12 +235,23 @@ abstract class ConfigForm extends Form
                 );
             }
 
+            $accountNumberOptions = $this->picklistToOptions($this->acumulusConfig->getService()->getPicklistAccounts(),'accounts', 0, $this->t('option_empty'));
+            $constCenterOptions = $this->picklistToOptions($this->acumulusConfig->getService()->getPicklistCostCenters(),'costcenters', 0, $this->t('option_empty'));
+
             $triggerInvoiceSendEventOptions = $this->getTriggerInvoiceSendEventOptions();
-            if (count($triggerInvoiceSendEventOptions) === 1) {
+            if (count($triggerInvoiceSendEventOptions) === 1 ||
+                (count($triggerInvoiceSendEventOptions) === 2 &&
+                 array_key_exists(ConfigInterface::TriggerInvoiceSendEvent_None, $triggerInvoiceSendEventOptions) &&
+                 array_key_exists(ConfigInterface::TriggerInvoiceSendEvent_OrderStatus,$triggerInvoiceSendEventOptions))
+            ) {
                 // Make it a hidden field.
+                $value = reset($triggerInvoiceSendEventOptions);
+                while ($value === ConfigInterface::TriggerInvoiceSendEvent_None) {
+                    $value = next($triggerInvoiceSendEventOptions);
+                }
                 $triggerInvoiceSendEventField = array(
                     'type' => 'hidden',
-                    'value' => reset($triggerInvoiceSendEventOptions),
+                    'value' => $value,
                 );
             } else {
                 $triggerInvoiceSendEventField = array(
@@ -297,30 +308,18 @@ abstract class ConfigForm extends Form
                         'overwriteIfExists' => $this->t('option_overwriteIfExists'),
                     ),
                 ),
-            );
-
-            // Account numbers: default + per payment method.
-            $paymentMethods = $this->getPaymentMethods();
-            $accountNumberOptions = $this->picklistToOptions($this->acumulusConfig->getService()->getPicklistAccounts(),'accounts', 0, $this->t('option_empty'));
-            $fields['invoiceSettingsHeader']['fields']['defaultAccountNumber'] = array(
-                'type' => 'select',
-                'label' => $this->t('field_defaultAccountNumber'),
-                'description' => $this->t('desc_defaultAccountNumber'),
-                'options' => $accountNumberOptions,
-            );
-            $this->getPaymentMethodsFieldset($fields['invoiceSettingsHeader']['fields'], $paymentMethods, 'paymentMethodAccountNumber', $accountNumberOptions);
-
-            // Cost centers: default + per payment method.
-            $constCenterOptions = $this->picklistToOptions($this->acumulusConfig->getService()->getPicklistCostCenters(),'costcenters', 0, $this->t('option_empty'));
-            $fields['invoiceSettingsHeader']['fields']['defaultCostCenter'] = array(
-                'type' => 'select',
-                'label' => $this->t('field_defaultCostCenter'),
-                'description' => $this->t('desc_defaultCostCenter'),
-                'options' => $constCenterOptions,
-            );
-            $this->getPaymentMethodsFieldset($fields['invoiceSettingsHeader']['fields'], $paymentMethods, 'paymentMethodCostCenter', $constCenterOptions);
-
-            $fields['invoiceSettingsHeader']['fields'] += array(
+                'defaultAccountNumber' => array(
+                    'type' => 'select',
+                    'label' => $this->t('field_defaultAccountNumber'),
+                    'description' => $this->t('desc_defaultAccountNumber'),
+                    'options' => $accountNumberOptions,
+                ),
+                'defaultCostCenter' => array(
+                    'type' => 'select',
+                    'label' => $this->t('field_defaultCostCenter'),
+                    'description' => $this->t('desc_defaultCostCenter'),
+                    'options' => $constCenterOptions,
+                ),
                 'defaultInvoiceTemplate' => array(
                     'type' => 'select',
                     'label' => $this->t('field_defaultInvoiceTemplate'),
@@ -357,10 +356,15 @@ abstract class ConfigForm extends Form
                     ),
                 );
             }
-        }
 
-        // 3rd fieldset: email as PDF settings.
-        if ($accountOk) {
+            // 3rd and 4th fieldset. Settings per active payment method.
+            $paymentMethods = $this->getPaymentMethods();
+            if (!empty($paymentMethods)) {
+                $fields["paymentMethodAccountNumberFieldset"] = $this->getPaymentMethodsFieldset($paymentMethods, 'paymentMethodAccountNumber', $accountNumberOptions);
+                $fields["paymentMethodCostCenterFieldset"] = $this->getPaymentMethodsFieldset($paymentMethods, 'paymentMethodCostCenter', $constCenterOptions);
+            }
+
+            // 5th fieldset: email as PDF settings.
             $fields['emailAsPdfSettingsHeader'] = array(
                 'type' => 'fieldset',
                 'legend' => $this->t('emailAsPdfSettingsHeader'),
@@ -403,7 +407,7 @@ abstract class ConfigForm extends Form
             );
         }
 
-        // 4th fieldset: Acumulus version information.
+        // 6th fieldset: Acumulus version information.
         $env = $this->acumulusConfig->getEnvironment();
         $fields['versionInformationHeader'] = array(
             'type' => 'fieldset',
@@ -582,34 +586,33 @@ abstract class ConfigForm extends Form
     /**
      * Returns a fieldset with a select per payment method.
      *
-     * @param array $fields
-     *   The fields array to add the fieldset to.
      * @param array $paymentMethods
      *   Array of payment methods (id => label)
      * @param string $key
      *   Prefix of the keys to use for the different ids.
      * @param array $options
      *   Options for all the selects.
+     *
+     * @return array
+     *   The fieldset definition.
      */
-    protected function getPaymentMethodsFieldset(array &$fields, array $paymentMethods, $key, array $options) {
-        if (!empty($paymentMethods)) {
-            $fieldset = array(
-                'type' => 'fieldset',
-                'legend' => $this->t("{$key}Fieldset"),
-                'description' => $this->t("desc_{$key}Fieldset"),
-                'fields' => array(),
-            );
+    protected function getPaymentMethodsFieldset(array $paymentMethods, $key, array $options) {
+        $fieldset = array(
+            'type' => 'fieldset',
+            'legend' => $this->t("{$key}Fieldset"),
+            'description' => $this->t("desc_{$key}Fieldset"),
+            'fields' => array(),
+        );
 
-            $options[0] = $this->t('option_use_default');
-            foreach ($paymentMethods as $paymentMethodId => $paymentMethodLabel) {
-                $fieldset['fields']["{$key}[{$paymentMethodId}]"] = array(
-                    'type' => 'select',
-                    'label' => $paymentMethodLabel,
-                    'options' => $options,
-                );
-            }
-            $fields["{$key}Fieldset"] = $fieldset;
+        $options[0] = $this->t('option_use_default');
+        foreach ($paymentMethods as $paymentMethodId => $paymentMethodLabel) {
+            $fieldset['fields']["{$key}[{$paymentMethodId}]"] = array(
+                'type' => 'select',
+                'label' => $paymentMethodLabel,
+                'options' => $options,
+            );
         }
+        return $fieldset;
     }
 
     /**

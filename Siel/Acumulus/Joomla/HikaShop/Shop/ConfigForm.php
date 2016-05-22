@@ -37,4 +37,18 @@ class ConfigForm extends BaseConfigForm
         unset($result[ConfigInterface::TriggerInvoiceSendEvent_InvoiceCreate]);
         return $result;
     }
+
+    protected function getPaymentMethods()
+    {
+        $result = array();
+        /** @var \hikashopPluginsClass $pluginClass */
+        $pluginClass = hikashop_get('class.plugins');
+        $paymentPlugins = $pluginClass->getMethods('payment');
+        foreach ($paymentPlugins as $paymentPlugin) {
+            if (!empty($paymentPlugin->enabled)) {
+                $result[$paymentPlugin->payment_type] = $paymentPlugin->payment_name;
+            }
+        }
+        return $result;
+    }
 }

@@ -61,7 +61,14 @@ class FormMapper
             $field['attributes'] = array();
         }
         $element = $parent->addField($field['id'], $this->getMagentoType($field), $this->getMagentoElementSettings($field));
+
         if ($field['type'] === 'fieldset') {
+            // Add description at the start of the fieldset as a note element.
+            if (isset($field['description'])) {
+                $element->addField($field['id'] . '-note', 'note', array('text' => '<p class="note">' . $field['description'] . '</p>'));
+            }
+
+            // Add fields of fieldset.
             $this->fields($element, $field['fields']);
         }
     }
@@ -162,7 +169,8 @@ class FormMapper
                 $result = array($key => $value);
                 break;
             case 'description':
-                $result = array('after_element_html' => '<p class="note">' . $value . '</p>');
+                // Description of fieldset is handled elsewhere.
+                $result = $type !== 'fieldset' ? array('after_element_html' => '<p class="note">' . $value . '</p>') : array();
                 break;
             case 'value':
                 if ($type === 'markup') {

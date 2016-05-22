@@ -9,9 +9,6 @@ use Magento\Framework\Data\Form\AbstractForm;
  */
 class FormMapper
 {
-    /** @var bool */
-    protected $hasRadios = false;
-
     /**
      * Maps a set of field definitions.
      *
@@ -21,12 +18,6 @@ class FormMapper
     public function map(AbstractForm $form, array $fields)
     {
         $this->fields($form, $fields);
-//        if ($this->hasRadios) {
-//            $form->addField('radio-styling',
-//                'note',
-//                array('text' => '<style> input[type=radio] { float: left; clear: both; margin-top: 0.2em;} .value label.inline {float: left !important; max-width: 95%; padding-left: 1em;} .note {clear: both;}</style>'),
-//                '^');
-//        }
     }
 
     /**
@@ -60,7 +51,14 @@ class FormMapper
             $field['attributes'] = array();
         }
         $element = $parent->addField($field['id'], $this->getMagentoType($field), $this->getMagentoElementSettings($field));
+
         if ($field['type'] === 'fieldset') {
+            // Add description at the start of the fieldset as a note element.
+            if (isset($field['description'])) {
+                $element->addField($field['id'] . '-note', 'note', array('text' => '<p class="note">' . $field['description'] . '</p>'));
+            }
+
+            // Add fields of fieldset.
             $this->fields($element, $field['fields']);
         }
     }
@@ -83,7 +81,6 @@ class FormMapper
                 break;
             case 'radio':
                 $type = 'radios';
-                $this->hasRadios = true;
                 break;
             case 'checkbox':
                 $type = 'checkboxes';
@@ -138,9 +135,6 @@ class FormMapper
             // Fields to ignore:
             case 'type':
                 $result = array();
-//                if ($value === 'date') {
-//                    $result['image'] = Mage::getDesign()->getSkinUrl('images/grid-cal.gif');
-//                }
                 break;
             case 'id':
             case 'fields':
@@ -161,7 +155,8 @@ class FormMapper
                 $result = array($key => $value);
                 break;
             case 'description':
-                $result = array('after_element_html' => '<p class="note">' . $value . '</p>');
+                // The description of a fieldset is handled elsewhere.
+                $result = $type !== 'fieldset' ? array('after_element_html' => '<p class="note">' . $value . '</p>') : array();
                 break;
             case 'value':
                 if ($type === 'markup') {

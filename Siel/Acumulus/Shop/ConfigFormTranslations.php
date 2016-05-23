@@ -190,7 +190,7 @@ Vink deze optie aan als u geen regel op uw factuur of pakbon wil voor gratis ver
         'option_use_default' => 'Use default',
 
         'field_digitalServices' => 'Do you sell digital services?',
-        'option_digitalServices_1' => 'Both digitals services and normal products.',
+        'option_digitalServices_1' => 'Both digital services and normal products.',
         'option_digitalServices_2' => 'Only products that are subject to dutch VAT.',
         'option_digitalServices_3' => 'Only digital services subject to the regulations concerning using foreign VAT rates.',
         'desc_digitalServices' => 'Select whether your store offers digital services that are subject to foreign VAT for clients in other EU countries.

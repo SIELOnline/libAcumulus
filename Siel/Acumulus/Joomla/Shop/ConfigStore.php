@@ -59,7 +59,13 @@ class ConfigStore extends BaSeConfigStore
             if (isset($value)) {
                 // Keyed arrays are saved as objects, convert back to an array.
                 if (is_object($value)) {
-                    $value = (array) $value;
+                    // http://php.net/manual/en/language.types.array.php:
+                    // If an object is converted to an array, the result is an
+                    // array whose elements are the object's properties. The
+                    // keys are the member variable names, with a few notable
+                    // exceptions: integer properties are unaccessible.!
+                    // So we use this strange looking but working conversion.
+                    $value = json_decode(json_encode($value), true);
                 }
                 $result[$key] = $value;
             }

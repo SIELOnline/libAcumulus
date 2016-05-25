@@ -66,8 +66,8 @@ abstract class Mailer
         $to = $this->getTo();
         $subject = $this->getSubject($result);
         $content = $this->getBody($result, $messages, $invoiceSourceType, $invoiceSourceReference);
-        
-        Log::getInstance()->notice('Mailer::sendMail("%s", "%s", "%s", "%s") with body = %s', $from, $fromName, $to, $subject, $content['text']);
+
+        Log::getInstance()->info('Mailer::sendMail("%s", "%s", "%s", "%s") with body = %s', $from, $fromName, $to, $subject, $content['text']);
 
         $result = $this->sendMail($from, $fromName, $to, $subject, $content['text'], $content['html']);
         if ($result !== true) {
@@ -86,7 +86,7 @@ abstract class Mailer
             Log::getInstance()->error('Mailer::sendInvoiceAddMailResult(): failed: %s', $result);
         }
         else {
-            Log::getInstance()->notice('Mailer::sendInvoiceAddMailResult(): success');
+            Log::getInstance()->info('Mailer::sendInvoiceAddMailResult(): success');
         }
     }
 

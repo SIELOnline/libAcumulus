@@ -13,8 +13,9 @@ class Log
     const Error = 1;
     const Warning = 2;
     const Notice = 3;
-    const Debug = 4;
-    const NotYetSet = 5;
+    const Info = 4;
+    const Debug = 5;
+    const NotYetSet = 6;
 
     /** @var Log */
     static protected $instance = null;
@@ -32,6 +33,9 @@ class Log
     /** @var int */
     protected $logLevel;
 
+    /** @var string */
+    protected $libraryVersion;
+
     /** @var ConfigInterface */
     protected $config;
 
@@ -46,6 +50,7 @@ class Log
         // the log level should be set based on the configuration.
         $this->logLevel = static::NotYetSet;
         $this->config = $config;
+        $this->libraryVersion = 'version not yet set';
         static::$instance = $this;
     }
 
@@ -60,6 +65,8 @@ class Log
         // actually needed.
         if ($this->logLevel === static::NotYetSet && $this->config !== null) {
             $this->logLevel = $this->config->getLogLevel();
+            $environment = $this->config->getEnvironment();
+            $this->libraryVersion = $environment['libraryVersion'];
         }
         return $this->logLevel;
     }
@@ -92,6 +99,8 @@ class Log
                 return 'Warning';
             case Log::Notice:
                 return 'Notice';
+            case Log::Info:
+                return 'Info';
             case Log::Debug:
             default:
                 return 'Debug';
@@ -99,8 +108,10 @@ class Log
     }
 
     /**
-     * Formats and logs the message if the severity equals or is worse than the
-     * current log level.
+     * Formats and logs the message if the log level indicates so.
+     *
+     * Errors and Warnings are always logged, other levels only if the log level
+     * is set to do so.
      *
      * Formatting involves:
      * - calling vsprintf() if $args is not empty
@@ -115,7 +126,7 @@ class Log
      */
     public function log($severity, $message, array $args = array())
     {
-        if ($this->getLogLevel() >= $severity) {
+        if ($severity <= max($this->getLogLevel(), Log::Warning)) {
             if (count($args) > 0) {
                 $message = vsprintf($message, $args);
             }
@@ -156,6 +167,23 @@ class Log
         $args = func_get_args();
         array_shift($args);
         return $this->log(Log::Notice, $message, $args);
+    }
+
+    /**
+     * Logs an informational message.
+     *
+     * @param string $message,...
+     *   The message to log, optionally followed by arguments. If there are
+     *   arguments the $message is passed through vsprintf().
+     *
+     * @return string
+     *   The full formatted message whether it got logged or not.
+     */
+    public function info($message)
+    {
+        $args = func_get_args();
+        array_shift($args);
+        return $this->log(Log::Info, $message, $args);
     }
 
     /**
@@ -203,7 +231,7 @@ class Log
      */
     protected function write($message, $severity)
     {
-        $message = sprintf('Acumulus: %s - %s', $this->getSeverityString($severity), $message);
+        $message = sprintf('Acumulus %s: %s - %s', $this->libraryVersion, $this->getSeverityString($severity), $message);
         error_log($message);
     }
 }

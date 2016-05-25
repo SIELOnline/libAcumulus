@@ -185,16 +185,16 @@ class Completor
         $vatFreeProducts = $shopSettings['vatFreeProducts'];
 
         if (!empty($this->invoice['customer']['invoice']['vattype'])) {
-            // If shop specific code or an event handler has already set the vat type,
-            // we obey so.
+            // If shop specific code or an event handler has already set the vat
+            // type, we obey so.
             $possibleVatTypes[] = $this->invoice['customer']['invoice']['vattype'];
         } else {
             if (!$this->invoiceHasLineWithVat()) {
-                // No VAT at all: National/EU reversed vat, only vat free products, or
-                // no vat (rest of world).
+                // No VAT at all: National/EU reversed vat, only vat free
+                // products, or no vat (rest of world).
                 if ($this->isNl()) {
-                    // Can it be VAT free products (e.g. education)? Digital services are
-                    // never VAT free, nor are there any if set so.
+                    // Can it be VAT free products (e.g. education)? Digital
+                    // services are never VAT free, nor are there any if set so.
                     if ($digitalServices !== ConfigInterface::DigitalServices_Only && $vatFreeProducts !== ConfigInterface::VatFreeProducts_No) {
                         $possibleVatTypes[] = ConfigInterface::VatType_National;
                     }
@@ -207,8 +207,8 @@ class Completor
                     if ($this->isCompany()) {
                         $possibleVatTypes[] = ConfigInterface::VatType_EuReversed;
                     }
-                    // Can it be VAT free products (e.g. education)? Digital services are
-                    // never VAT free, nor are there any if set so.
+                    // Can it be VAT free products (e.g. education)? Digital
+                    // services are never VAT free, nor are there any if set so.
                     if ($digitalServices !== ConfigInterface::DigitalServices_Only && $vatFreeProducts !== ConfigInterface::VatFreeProducts_No) {
                         $possibleVatTypes[] = ConfigInterface::VatType_National;
                     }
@@ -715,15 +715,17 @@ class Completor
     }
 
     /**
-     * Helper method to get vat info for the current invoice from the Acumulus API.
+     * Helper method to get the vat rates for the current invoice.
      *
-     * The vat rates as they were at the invoice date are retrieved.
+     * - This method contacts the Acumulus server.
+     * - The vat rates returned reflect those as they were at the invoice date.
+     * - No zero vat rates are returned.
      *
      * @param string $countryCode
      *   The country to fetch the vat rates for.
      *
      * @return float[]
-     *   Actual type will be string[].
+     *   Actual type will be string[] containing strings representing floats.
      *
      * @see \Siel\Acumulus\Web\Service::getVatInfo().
      */

@@ -12,7 +12,7 @@ class Log extends BaseLog
     /**
      * {@inheritdoc}
      *
-     * This override checks for WP_DEBUG first.
+     * This override logs to the WooCommerce logger facility.
      */
     protected function write($message, $severity)
     {

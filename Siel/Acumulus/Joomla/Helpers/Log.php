@@ -48,6 +48,8 @@ class Log extends BaseLog
                 return JLog::WARNING;
             case Log::Notice:
                 return JLog::NOTICE;
+            case Log::Info:
+                return JLog::INFO; // @todo:check this in joomla project.
             case Log::Debug:
             default:
                 return JLog::DEBUG;

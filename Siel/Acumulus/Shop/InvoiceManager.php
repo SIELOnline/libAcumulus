@@ -296,11 +296,11 @@ abstract class InvoiceManager
                         }
                     }
 
-                    // Send a mail if there are messages.
+                    // Log the result and send a mail if there are messages.
                     $messages = $service->resultToMessages($result);
+                    $this->config->getLog()->info('InvoiceManager::send(%s %d, %s)[%s] result: %s',
+                        $invoiceSource->getType(), $invoiceSource->getId(), $forceSend ? 'true' : 'false', $testMode ? 'true' : 'false', $service->messagesToText($messages));
                     if (!empty($messages)) {
-                        $this->config->getLog()->notice('InvoiceManager::send(%s %d, %s)[%s] result: %s',
-                            $invoiceSource->getType(), $invoiceSource->getId(), $forceSend ? 'true' : 'false', $testMode ? 'true' : 'false', $service->messagesToText($messages));
                         $this->mailInvoiceAddResult($result, $messages, $invoiceSource);
                     }
 

@@ -55,6 +55,8 @@ class Log extends BaseLog
                 return Logger::WARNING;
             case Log::Notice:
                 return Logger::NOTICE;
+            case Log::Info:
+                return Logger::INFO;
             case Log::Debug:
             default:
                 return Logger::DEBUG;

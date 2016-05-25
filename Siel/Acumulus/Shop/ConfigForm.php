@@ -420,8 +420,7 @@ abstract class ConfigForm extends Form
                     'options' => array(
                         WebConfigInterface::Debug_None => $this->t('option_debug_1'),
                         WebConfigInterface::Debug_SendAndLog => $this->t('option_debug_2'),
-                        WebConfigInterface::Debug_TestMode => $this->t('option_debug_4'),
-                        WebConfigInterface::Debug_StayLocal => $this->t('option_debug_3'),
+                        WebConfigInterface::Debug_TestMode => $this->t('option_debug_3'),
                     ),
                     'attributes' => array(
                         'required' => true,

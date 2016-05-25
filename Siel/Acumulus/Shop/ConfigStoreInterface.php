@@ -18,6 +18,13 @@ interface ConfigStoreInterface
     public function getShopEnvironment();
 
     /**
+     * Returns an array with shop specific configuration defaults.
+     *
+     * @return array
+     */
+    public function getShopDefaults();
+
+    /**
      * Loads the configuration from the actual configuration provider.
      *
      * @param array $keys

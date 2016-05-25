@@ -23,6 +23,17 @@ abstract class ConfigStore implements ConfigStoreInterface
     }
 
     /**
+     * {@inheritdoc}
+     *
+     * This base implementation returns an empty array: no shop specific default
+     * overrides.
+     */
+    public function getShopDefaults()
+    {
+        return array();
+    }
+
+    /**
      * Performs common save tasks.
      *
      * @param array $values

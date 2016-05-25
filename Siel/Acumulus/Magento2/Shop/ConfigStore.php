@@ -3,6 +3,7 @@ namespace Siel\Acumulus\Magento2\Shop;
 
 use Magento\Framework\AppInterface;
 use Siel\Acumulus\Magento2\Helpers\Registry;
+use Siel\Acumulus\Shop\ConfigInterface;
 use Siel\Acumulus\Shop\ConfigStore as BaseConfigStore;
 
 /**
@@ -25,6 +26,18 @@ class ConfigStore extends BaSeConfigStore
         );
 
         return $environment;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * For Magento, the default trigger event is the invoice creation event.
+     */
+    public function getShopDefaults()
+    {
+        return array(
+            'triggerInvoiceSendEvent' => ConfigInterface::TriggerInvoiceSendEvent_InvoiceCreate,
+        );
     }
 
     /**

@@ -3,7 +3,6 @@ namespace Siel\Acumulus\Shop;
 
 use ReflectionClass;
 use Siel\Acumulus\Helpers\Log;
-use Siel\Acumulus\Invoice\Completor;
 use Siel\Acumulus\Invoice\ConfigInterface as InvoiceConfigInterface;
 use Siel\Acumulus\Web\ConfigInterface as ServiceConfigInterface;
 
@@ -39,6 +38,9 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
     /** @var string The namespace for the current shop. */
     protected $shopNamespace;
 
+    /** @var string The namespace for customisations on top of the current shop. */
+    protected $customNamespace;
+
     /** @var string The language to display texts in. */
     protected $language;
 
@@ -56,6 +58,8 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
         $this->values = array();
         $this->instances = array();
         $this->shopNamespace = static::baseNamespace . '\\' . $shopNamespace;
+        global $sielAcumulusCustomNamespace;
+        $this->customNamespace = !empty($sielAcumulusCustomNamespace) ? $sielAcumulusCustomNamespace : '';
         $this->language = substr($language, 0, 2);
         $this->getLog();
     }
@@ -73,6 +77,16 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
     protected function t($key)
     {
         return $this->getTranslator()->get($key);
+    }
+
+    /**
+     * Sets a custom namespace for customisations on top of the current shop.
+     *
+     * @param string $customNamespace
+     */
+    public function setCustomNamespace($customNamespace)
+    {
+        $this->customNamespace = $customNamespace;
     }
 
     /**
@@ -112,7 +126,7 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
      */
     public function getCompletor()
     {
-        return new Completor($this, $this->getTranslator(), $this->getService());
+        return $this->getInstance('Completor', 'Invoice', array($this, $this->getTranslator(), $this->getService()));
     }
 
     /**
@@ -206,8 +220,15 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
     protected function getInstance($class, $subNamespace, array $constructorArgs = array(), $newInstance = false)
     {
         if (!isset($this->instances[$class]) || $newInstance) {
+            // Try custom namespace.
+            if (!empty($this->customNamespace)) {
+                $fqClass = $this->tryNsInstance($class, $subNamespace, $this->customNamespace);
+            }
+
             // Try shop namespace.
-            $fqClass = $this->tryNsInstance($class, $subNamespace, $this->shopNamespace);
+            if (empty($fqClass)) {
+                $fqClass = $this->tryNsInstance($class, $subNamespace, $this->shopNamespace);
+            }
 
             // Try CMS namespace if it exists.
             if (empty($fqClass)) {
@@ -779,7 +800,7 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
                 'triggerInvoiceSendEvent' => array(
                     'group' => 'event',
                     'type' => 'int',
-                    'default' => ConfigInterface::TriggerInvoiceSendEvent_None,
+                    'default' => ConfigInterface::TriggerInvoiceSendEvent_OrderStatus,
                 ),
                 'triggerOrderStatus' => array(
                     'group' => 'event',
@@ -819,7 +840,7 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
                 'logLevel' => array(
                     'group' => 'other',
                     'type' => 'int',
-                    'default' => Log::Error,
+                    'default' => Log::Notice,
                 ),
             );
         }

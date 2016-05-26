@@ -41,7 +41,7 @@ class Log extends BaseLog
             case Log::Warning:
                 return AbstractLogger::WARNING;
             case Log::Notice:
-            case Log::Info: // @todo: check this in PS project.
+            case Log::Info:
                 return AbstractLogger::INFO;
             case Log::Debug:
             default:

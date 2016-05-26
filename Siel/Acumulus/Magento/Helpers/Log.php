@@ -40,7 +40,7 @@ class Log extends BaseLog
             case Log::Notice:
                 return Zend_Log::NOTICE;
             case Log::Info:
-                return Zend_Log::INFO; // @todo: check this in Magento project.
+                return Zend_Log::INFO;
             case Log::Debug:
             default:
                 return Zend_Log::DEBUG;

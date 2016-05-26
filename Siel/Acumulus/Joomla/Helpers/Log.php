@@ -49,7 +49,7 @@ class Log extends BaseLog
             case Log::Notice:
                 return JLog::NOTICE;
             case Log::Info:
-                return JLog::INFO; // @todo:check this in joomla project.
+                return JLog::INFO;
             case Log::Debug:
             default:
                 return JLog::DEBUG;

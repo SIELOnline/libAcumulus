@@ -294,6 +294,7 @@ class Creator extends BaseCreator
         // Hidden tax amount = VAT over discount.
         // But as discounts get their own lines and the product lines are showing
         // the normal (not discounted) price we add these 2.
+        // @todo: what happened with hiddenTaxAmount()?
         $lineVat = (float) $item->getTaxAmount() + (float) $item->getHiddenTaxAmount();
 
         // Simple products (products without children): add as 1 line.

@@ -22,6 +22,9 @@ use Siel\Acumulus\Invoice\Translations as InvoiceTranslations;
  */
 class BatchForm extends Form
 {
+    /** @var \Siel\Acumulus\Shop\ShopCapabilitiesInterface */
+    protected $shopCapabilities;
+
     /** @var \Siel\Acumulus\Shop\InvoiceManager */
     protected $invoiceManager;
 
@@ -30,9 +33,10 @@ class BatchForm extends Form
 
     /**
      * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
+     * @param ShopCapabilitiesInterface $shopCapabilities
      * @param \Siel\Acumulus\Shop\InvoiceManager $invoiceManager
      */
-    public function __construct(TranslatorInterface $translator, InvoiceManager $invoiceManager)
+    public function __construct(TranslatorInterface $translator, ShopCapabilitiesInterface $shopCapabilities, InvoiceManager $invoiceManager)
     {
         parent::__construct($translator);
 
@@ -43,6 +47,7 @@ class BatchForm extends Form
         $this->translator->add($translations);
 
         $this->log = array();
+        $this->shopCapabilities = $shopCapabilities;
         $this->invoiceManager = $invoiceManager;
     }
 
@@ -57,7 +62,7 @@ class BatchForm extends Form
 
     protected function validate()
     {
-        $invoiceSourceTypes = $this->invoiceManager->getSupportedInvoiceSourceTypes();
+        $invoiceSourceTypes = $this->shopCapabilities->getSupportedInvoiceSourceTypes();
         if (empty($this->submittedValues['invoice_source_type'])) {
             $this->errorMessages['invoice_source_type'] = $this->t('message_validate_batch_source_type_required');
         } else if (!in_array($this->submittedValues['invoice_source_type'], $invoiceSourceTypes)) {
@@ -142,7 +147,7 @@ class BatchForm extends Form
     {
         $fields = array();
 
-        $invoiceSourceTypes = $this->invoiceManager->getSupportedInvoiceSourceTypes();
+        $invoiceSourceTypes = $this->shopCapabilities->getSupportedInvoiceSourceTypes();
         if (count($invoiceSourceTypes) === 1) {
             // Make it a hidden field.
             $invoiceSourceTypeField = array(

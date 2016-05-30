@@ -6,7 +6,7 @@ use Siel\Acumulus\Shop\ConfigStore as BaseConfigStore;
 use Siel\Acumulus\Web\ConfigInterface as ServiceConfigInterface;
 
 /**
- * Implements the connection to the PrestaShop config component.
+ * Implements the connection to the OpenCart config component.
  */
 class ConfigStore extends BaSeConfigStore
 {

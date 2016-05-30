@@ -56,6 +56,11 @@ interface InjectorInterface
     public function getConfigStore();
 
     /**
+     * @return \Siel\Acumulus\Shop\ShopCapabilitiesInterface
+     */
+    public function getShopCapabilities();
+
+    /**
      * @return \Siel\Acumulus\Shop\InvoiceManager
      */
     public function getManager();

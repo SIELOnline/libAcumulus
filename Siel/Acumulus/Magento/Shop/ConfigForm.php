@@ -1,7 +1,6 @@
 <?php
 namespace Siel\Acumulus\Magento\Shop;
 
-use Mage;
 use Siel\Acumulus\Shop\ConfigForm as BaseConfigForm;
 
 /**
@@ -28,43 +27,5 @@ class ConfigForm extends BaseConfigForm
                 }
             }
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getShopOrderStatuses()
-    {
-        $items = Mage::getModel('sales/order_status')->getResourceCollection()->getData();
-        $result = array();
-        foreach ($items as $item) {
-            $result[reset($item)] = next($item);
-        }
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getPaymentMethods()
-    {
-        $result = array();
-        /** @var \Mage_Payment_Helper_Data $paymentHelper */
-        $paymentHelper = Mage::helper("payment");
-        $paymentMethods = $paymentHelper->getPaymentMethods();
-        foreach ($paymentMethods as $code => $paymentMethodData) {
-            if (!empty($paymentMethodData['active'])) {
-                if ((isset($data['title']))) {
-                    $title = $data['title'];
-                } else if ($paymentHelper->getMethodInstance($code)) {
-                    $title = $paymentHelper->getMethodInstance($code)->getConfigData('title');
-                }
-                if (empty($title)) {
-                    $title = $code;
-                }
-                $result[$code] = $title;
-            }
-        }
-        return $result;
     }
 }

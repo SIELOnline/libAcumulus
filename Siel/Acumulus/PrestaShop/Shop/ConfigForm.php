@@ -1,14 +1,11 @@
 <?php
 namespace Siel\Acumulus\PrestaShop\Shop;
 
-use Context;
-use Module;
-use OrderState;
-use PaymentModule;
 use Siel\Acumulus\Helpers\TranslatorInterface;
 use Siel\Acumulus\Shop\Config;
 use Siel\Acumulus\Shop\ConfigForm as BaseConfigForm;
-use Siel\Acumulus\Shop\ConfigInterface;
+use Siel\Acumulus\Shop\ShopCapabilitiesInterface;
+use Siel\Acumulus\Web\Service;
 use Tools;
 
 /**
@@ -24,11 +21,13 @@ class ConfigForm extends BaseConfigForm
      * ConfigForm constructor.
      *
      * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
+     * @param \Siel\Acumulus\Shop\ShopCapabilitiesInterface $shopCapabilities
+     * @param \Siel\Acumulus\Web\Service $service
      * @param \Siel\Acumulus\Shop\Config $config
      */
-    public function __construct(TranslatorInterface $translator, Config $config)
+    public function __construct(TranslatorInterface $translator, ShopCapabilitiesInterface $shopCapabilities, Config $config, Service $service)
     {
-        parent::__construct($translator, $config);
+        parent::__construct($translator, $shopCapabilities, $config, $service);
         $this->moduleName = 'acumulus';
     }
 
@@ -91,51 +90,6 @@ class ConfigForm extends BaseConfigForm
         }
         $result['versionInformationHeader']['icon'] = 'icon-info-circle';
 
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getShopOrderStatuses()
-    {
-        $states = OrderState::getOrderStates((int) Context::getContext()->language->id);
-        $result = array();
-        foreach ($states as $state) {
-            $result[$state['id_order_state']] = $state['name'];
-        }
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * This override removes the 'Use invoice sent' option as PS does not have
-     * an event on creating/sending the invoice.
-     *
-     * @todo: PS has the 'actionSetInvoice' event, can we use that?
-     * This event fires when the order state changes to a state that allows an
-     * invoice and on manually creating one via the adminOrdersController page.
-     */
-    protected function getTriggerInvoiceSendEventOptions()
-    {
-        $result = parent::getTriggerInvoiceSendEventOptions();
-        unset($result[ConfigInterface::TriggerInvoiceSendEvent_InvoiceCreate]);
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getPaymentMethods()
-    {
-        $paymentModules = PaymentModule::getInstalledPaymentModules();
-        $result = array();
-        foreach($paymentModules as $paymentModule)
-        {
-            $module = Module::getInstanceById($paymentModule['id_module']);
-            $result[$module->name] = $module->displayName;
-        }
         return $result;
     }
 }

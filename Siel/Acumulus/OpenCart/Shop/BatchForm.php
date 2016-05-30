@@ -5,7 +5,7 @@ use Siel\Acumulus\OpenCart\Helpers\Registry;
 use Siel\Acumulus\Shop\BatchForm as BaseBatchForm;
 
 /**
- * Provides the Batch send form handling for the VirtueMart Acumulus module.
+ * Provides the Batch send form handling for the OpenCart Acumulus module.
  */
 class BatchForm extends BaseBatchForm
 {

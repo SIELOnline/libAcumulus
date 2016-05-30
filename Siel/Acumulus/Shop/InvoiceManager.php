@@ -43,23 +43,6 @@ abstract class InvoiceManager
     }
 
     /**
-     * Returns a list of invoice source types supported by this shop.
-     *
-     * The default implementation returns order and credit note. Override if the
-     * specific shop supports other types or does not support credit notes.
-     *
-     * @return string[]
-     *   The list of supported invoice source types.
-     */
-    public function getSupportedInvoiceSourceTypes()
-    {
-        return array(
-            Source::Order,
-            Source::CreditNote,
-        );
-    }
-
-    /**
      * Returns a list of existing invoice sources for the given id range.
      *
      * @param string $invoiceSourceType

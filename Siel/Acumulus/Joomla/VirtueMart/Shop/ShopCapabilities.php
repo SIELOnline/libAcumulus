@@ -1,22 +1,34 @@
 <?php
-namespace Siel\Acumulus\Joomla\VirtueMart\Shop;
+namespace Siel\Acumulus\VirtueMart\Shop;
 
-use JText;
-use Siel\Acumulus\Joomla\Shop\ConfigForm as BaseConfigForm;
+use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Shop\ConfigInterface;
+use Siel\Acumulus\Shop\ShopCapabilities as ShopCapabilitiesBase;
 use VirtueMartModelOrderstatus;
 use VmModel;
 
 /**
- * Class ConfigForm processes and builds the settings form page for the
- * VirtueMart Acumulus module.
+ * Defines the VirtueMart webshop specific capabilities.
  */
-class ConfigForm extends BaseConfigForm
+class ShopCapabilities extends ShopCapabilitiesBase
 {
     /**
      * {@inheritdoc}
+     *
+     * This default implementation returns order and credit note. Override if
+     * the specific shop supports other types or does not support credit notes.
      */
-    protected function getShopOrderStatuses()
+    public function getSupportedInvoiceSourceTypes()
+    {
+        $result = parent::getSupportedInvoiceSourceTypes();
+        unset($result[Source::CreditNote]);
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getShopOrderStatuses()
     {
         /** @var VirtueMartModelOrderstatus $orderStatusModel */
         $orderStatusModel = VmModel::getModel('orderstatus');
@@ -30,16 +42,23 @@ class ConfigForm extends BaseConfigForm
 
     /**
      * {@inheritdoc}
+     *
+     * This override removes the 'Use invoice sent' option as OpenCart does not
+     * have an event on creating/sending the invoice.
+     *
+     * @todo: find out if there's something like an invoice create event.
      */
-    protected function getTriggerInvoiceSendEventOptions()
+    public function getTriggerInvoiceSendEventOptions()
     {
         $result = parent::getTriggerInvoiceSendEventOptions();
-        // @todo: find out if there's something like an invoice create event.
         unset($result[ConfigInterface::TriggerInvoiceSendEvent_InvoiceCreate]);
         return $result;
     }
 
-    protected function getPaymentMethods()
+    /**
+     * {@inheritdoc}
+     */
+    public function getPaymentMethods()
     {
         $result = array();
         /** @var \VirtueMartModelPaymentmethod $model */

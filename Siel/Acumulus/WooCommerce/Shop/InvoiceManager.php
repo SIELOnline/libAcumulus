@@ -34,8 +34,9 @@ class InvoiceManager extends BaseInvoiceManager
      */
     public function getInvoiceSourcesByIdRange($invoiceSourceType, $InvoiceSourceIdFrom, $InvoiceSourceIdTo)
     {
-        // We use our own query here as defining a range of pots ids based on a
+        // We use our own query here as defining a range of post ids based on a
         // between does not seem to be possible with the query syntax.
+        /** @var \wpdb $wpdb */
         global $wpdb;
         $key = 'ID';
         $invoiceSourceIds = $wpdb->get_col($wpdb->prepare("SELECT `$key` FROM `{$wpdb->posts}` WHERE `$key` BETWEEN %u AND %u AND `post_type` = %s",

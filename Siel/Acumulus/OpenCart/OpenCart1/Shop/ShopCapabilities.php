@@ -2,18 +2,17 @@
 namespace Siel\Acumulus\OpenCart\OpenCart1\Shop;
 
 use Siel\Acumulus\OpenCart\Helpers\Registry;
-use Siel\Acumulus\OpenCart\Shop\ConfigForm as BaseConfigForm;
+use Siel\Acumulus\OpenCart\Shop\ShopCapabilities as ShopCapabilitiesBase;
 
 /**
- * Class ConfigForm processes and builds the settings form page for the
- * PrestaShop Acumulus module.
+ * Defines the OpenCart 1 specific capabilities that differ from OpenCart 2.
  */
-class ConfigForm extends BaseConfigForm
+class ShopCapabilities extends ShopCapabilitiesBase
 {
     /**
      * {@inheritdoc}
      */
-    protected function getPaymentMethods()
+    public function getPaymentMethods()
     {
         Registry::getInstance()->load->model('setting/extension');
         $extensions = Registry::getInstance()->model_setting_extension->getInstalled('payment');

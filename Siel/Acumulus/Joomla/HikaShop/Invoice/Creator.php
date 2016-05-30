@@ -21,7 +21,6 @@ use stdClass;
  *   correct, but may differ from the shop invoice, though the overall amount
  *   tends to be equal. It is the meta data in the invoice (as sent to Acumulus)
  *   that shows the differences.
- *   that shows the differences.
  */
 class Creator extends BaseCreator
 {
@@ -33,7 +32,7 @@ class Creator extends BaseCreator
     /**
      * {@inheritdoc}
      *
-     * This override also initializes VM specific properties related to the
+     * This override also initializes HS specific properties related to the
      * source.
      */
     protected function setInvoiceSource($source)

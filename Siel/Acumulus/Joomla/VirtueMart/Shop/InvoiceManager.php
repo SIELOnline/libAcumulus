@@ -14,22 +14,6 @@ class InvoiceManager extends BaseInvoiceManager
 {
     /**
      * {@inheritdoc}
-     *
-     * @todo: this override only returns order as supported invoice source type.
-     *
-     * Note: the VMInvoice extension seems to offer credit notes, but for now we
-     *   do not support them.
-     */
-    public function getSupportedInvoiceSourceTypes()
-    {
-        return array(
-            Source::Order,
-            //Source::CreditNote,
-        );
-    }
-
-    /**
-     * {@inheritdoc}
      */
     public function getInvoiceSourcesByIdRange($invoiceSourceType, $InvoiceSourceIdFrom, $InvoiceSourceIdTo)
     {

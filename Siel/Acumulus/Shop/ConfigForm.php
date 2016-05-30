@@ -6,26 +6,26 @@ use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\TranslatorInterface;
 use Siel\Acumulus\Invoice\ConfigInterface as InvoiceConfigInterface;
 use Siel\Acumulus\Web\ConfigInterface as WebConfigInterface;
+use Siel\Acumulus\Web\Service;
 
 /**
  * Provides basic config form handling.
  *
- * Shop specific overrides should - of course - implement the abstract method:
- * - getShopOrderStatuses()
- * Should typically override:
- * - getInvoiceNrSourceOptions()
- * - getDateToUseOptions()
- * - getTriggerInvoiceSendEventOptions()
- * - getPaymentMethods()
- * And may optionally (have to) override:
+ * Shop specific may optionally (have to) override:
  * - systemValidate()
  * - isSubmitted()
  * - setSubmittedValues()
  */
 abstract class ConfigForm extends Form
 {
+    /** @var \Siel\Acumulus\Shop\ShopCapabilitiesInterface */
+    protected $shopCapabilities;
+
     /** @var \Siel\Acumulus\Shop\Config */
     protected $acumulusConfig;
+
+    /** @var \Siel\Acumulus\Web\Service*/
+    protected $service;
 
     /**
      * @var array
@@ -38,9 +38,11 @@ abstract class ConfigForm extends Form
      * Constructor.
      *
      * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
+     * @param ShopCapabilitiesInterface $shopCapabilities
+     * @param \Siel\Acumulus\Web\Service $service
      * @param Config $config
      */
-    public function __construct(TranslatorInterface $translator, Config $config)
+    public function __construct(TranslatorInterface $translator, ShopCapabilitiesInterface $shopCapabilities, Config $config, Service $service)
     {
         parent::__construct($translator);
 
@@ -48,6 +50,8 @@ abstract class ConfigForm extends Form
         $this->translator->add($translations);
 
         $this->acumulusConfig = $config;
+        $this->shopCapabilities = $shopCapabilities;
+        $this->service = $service;
     }
 
     /**
@@ -197,7 +201,7 @@ abstract class ConfigForm extends Form
                 ),
             );
         } else {
-            $invoiceNrSourceOptions = $this->getInvoiceNrSourceOptions();
+            $invoiceNrSourceOptions = $this->shopCapabilities->getInvoiceNrSourceOptions();
             if (count($invoiceNrSourceOptions) === 1) {
                 // Make it a hidden field.
                 $invoiceNrSourceField = array(
@@ -216,7 +220,7 @@ abstract class ConfigForm extends Form
                 );
             }
 
-            $dateToUseOptions = $this->getDateToUseOptions();
+            $dateToUseOptions = $this->shopCapabilities->getDateToUseOptions();
             if (count($dateToUseOptions) === 1) {
                 // Make it a hidden field.
                 $dateToUseField = array(
@@ -235,10 +239,10 @@ abstract class ConfigForm extends Form
                 );
             }
 
-            $accountNumberOptions = $this->picklistToOptions($this->acumulusConfig->getService()->getPicklistAccounts(),'accounts', 0, $this->t('option_empty'));
-            $constCenterOptions = $this->picklistToOptions($this->acumulusConfig->getService()->getPicklistCostCenters(),'costcenters', 0, $this->t('option_empty'));
+            $accountNumberOptions = $this->picklistToOptions($this->service->getPicklistAccounts(),'accounts', 0, $this->t('option_empty'));
+            $constCenterOptions = $this->picklistToOptions($this->service->getPicklistCostCenters(),'costcenters', 0, $this->t('option_empty'));
 
-            $triggerInvoiceSendEventOptions = $this->getTriggerInvoiceSendEventOptions();
+            $triggerInvoiceSendEventOptions = $this->shopCapabilities->getTriggerInvoiceSendEventOptions();
             if (count($triggerInvoiceSendEventOptions) === 1 ||
                 (count($triggerInvoiceSendEventOptions) === 2 &&
                  array_key_exists(ConfigInterface::TriggerInvoiceSendEvent_None, $triggerInvoiceSendEventOptions) &&
@@ -323,7 +327,7 @@ abstract class ConfigForm extends Form
                 'defaultInvoiceTemplate' => array(
                     'type' => 'select',
                     'label' => $this->t('field_defaultInvoiceTemplate'),
-                    'options' => $this->picklistToOptions($invoiceTemplates = $this->acumulusConfig->getService()->getPicklistInvoiceTemplates(), 'invoicetemplates', 0, $this->t('option_empty')),
+                    'options' => $this->picklistToOptions($invoiceTemplates = $this->service->getPicklistInvoiceTemplates(), 'invoicetemplates', 0, $this->t('option_empty')),
                 ),
                 'defaultInvoicePaidTemplate' => array(
                     'type' => 'select',
@@ -358,7 +362,7 @@ abstract class ConfigForm extends Form
             }
 
             // 3rd and 4th fieldset. Settings per active payment method.
-            $paymentMethods = $this->getPaymentMethods();
+            $paymentMethods = $this->shopCapabilities->getPaymentMethods();
             if (!empty($paymentMethods)) {
                 $fields["paymentMethodAccountNumberFieldset"] = $this->getPaymentMethodsFieldset($paymentMethods, 'paymentMethodAccountNumber', $accountNumberOptions);
                 $fields["paymentMethodCostCenterFieldset"] = $this->getPaymentMethodsFieldset($paymentMethods, 'paymentMethodCostCenter', $constCenterOptions);
@@ -472,10 +476,10 @@ abstract class ConfigForm extends Form
         $this->contactTypes = null;
         $credentials = $this->acumulusConfig->getCredentials();
         if (!empty($credentials['contractcode']) && !empty($credentials['username']) && !empty($credentials['password'])) {
-            $this->contactTypes = $this->acumulusConfig->getService()->getPicklistContactTypes();
+            $this->contactTypes = $this->service->getPicklistContactTypes();
             if (!empty($this->contactTypes['errors'])) {
                 $message = $this->t($this->contactTypes['errors'][0]['code'] == 401 ? 'message_error_auth' : 'message_error_comm');
-                $this->errorMessages += $this->acumulusConfig->getService()->resultToMessages($this->contactTypes, false);
+                $this->errorMessages += $this->service->resultToMessages($this->contactTypes, false);
             }
         } else {
             // First fill in your account details.
@@ -535,8 +539,6 @@ abstract class ConfigForm extends Form
     /**
      * Returns an option list of all order statuses including an empty choice.
      *
-     * Do not override this method but implement getShopOrderStatuses() instead.
-     *
      * @return array
      *   An options array of all order statuses.
      */
@@ -545,39 +547,7 @@ abstract class ConfigForm extends Form
         $result = array();
 
         $result['0'] = $this->t('option_empty_triggerOrderStatus');
-        $result += $this->getShopOrderStatuses();
-
-        return $result;
-    }
-
-    /**
-     * Returns an option list of all shop order statuses.
-     *
-     * @return array
-     *   An array of all shop order statuses, with the key being the ID for
-     *   the dropdown item and the value being the label for the dropdown item.
-     */
-    abstract protected function getShopOrderStatuses();
-
-
-    /**
-     * Returns an option list of active payment methods.
-     *
-     * The default implementation returns an empty array, ie no support (yet)
-     * for payment method based settings.
-     *
-     * @return array
-     *   An array of active payment methods. with the key being the ID (internal
-     *   name) for the dropdown item and the value being the label for the
-     *   dropdown item.
-     */
-    protected function getPaymentMethods()
-    {
-        $result = array();
-
-        // Test:
-//        $result['banktransfer'] = 'Bankoverschrijving';
-//        $result['paypal'] = 'PayPal';
+        $result += $this->shopCapabilities->getShopOrderStatuses();
 
         return $result;
     }
@@ -612,77 +582,6 @@ abstract class ConfigForm extends Form
             );
         }
         return $fieldset;
-    }
-
-    /**
-     * Returns a list of valid sources that can be used as invoice number.
-     *
-     * This may differ per shop as not all shops support invoices as a separate
-     * entity.
-     *
-     * Overrides should typically return a subset of the constants defined in this
-     * base implementation, but including at least
-     * ConfigInterface::InvoiceNrSource_Acumulus.
-     *
-     * @return array
-     *   An array keyed by the option values and having translated descriptions as
-     *   values.
-     */
-    protected function getInvoiceNrSourceOptions()
-    {
-        return array(
-            InvoiceConfigInterface::InvoiceNrSource_ShopInvoice => $this->t('option_invoiceNrSource_1'),
-            InvoiceConfigInterface::InvoiceNrSource_ShopOrder => $this->t('option_invoiceNrSource_2'),
-            InvoiceConfigInterface::InvoiceNrSource_Acumulus => $this->t('option_invoiceNrSource_3'),
-        );
-    }
-
-    /**
-     * Returns a list of valid date sources that can be used as invoice date.
-     *
-     * This may differ per shop as not all shops support invoices as a separate
-     * entity.
-     *
-     * Overrides should typically return a subset of the constants defined in this
-     * base implementation, but including at least
-     * ConfigInterface::InvoiceDate_Transfer.
-     *
-     * @return array
-     *   An array keyed by the option values and having translated descriptions as
-     *   values.
-     */
-    protected function getDateToUseOptions()
-    {
-        return array(
-            InvoiceConfigInterface::InvoiceDate_InvoiceCreate => $this->t('option_dateToUse_1'),
-            InvoiceConfigInterface::InvoiceDate_OrderCreate => $this->t('option_dateToUse_2'),
-            InvoiceConfigInterface::InvoiceDate_Transfer => $this->t('option_dateToUse_3'),
-        );
-    }
-
-    /**
-     * Returns a list of events that can trigger the automatic sending of an
-     * invoice.
-     *
-     * This may differ per shop as not all shops define events for all moments
-     * that can be used to trigger the sending of an invoice.
-     *
-     * Overrides should typically return a subset of the constants defined in this
-     * base implementation. The return array may be empty or only contain
-     * ConfigInterface::TriggerInvoiceSendEvent_None, to indicate that no
-     * automatic sending is possible (shop does not define any event like model).
-     *
-     * @return array
-     *   An array keyed by the option values and having translated descriptions as
-     *   values.
-     */
-    protected function getTriggerInvoiceSendEventOptions()
-    {
-        return array(
-            ConfigInterface::TriggerInvoiceSendEvent_None => $this->t('option_triggerInvoiceSendEvent_0'),
-            ConfigInterface::TriggerInvoiceSendEvent_OrderStatus => $this->t('option_triggerInvoiceSendEvent_1'),
-            ConfigInterface::TriggerInvoiceSendEvent_InvoiceCreate => $this->t('option_triggerInvoiceSendEvent_2'),
-        );
     }
 
     /**

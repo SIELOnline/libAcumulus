@@ -156,6 +156,14 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
     /**
      * {@inheritdoc}
      */
+    public function getShopCapabilities()
+    {
+        return $this->getInstance('ShopCapabilities', 'Shop', array($this->getTranslator()));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getManager()
     {
         return $this->getInstance('InvoiceManager', 'Shop', array($this));
@@ -174,10 +182,14 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
      */
     public function getForm($type)
     {
-        $arguments = array($this->getTranslator());
+        $arguments = array(
+            $this->getTranslator(),
+            $this->getShopCapabilities(),
+        );
         switch (strtolower($type)) {
             case 'config':
                 $arguments[] = $this;
+                $arguments[] = $this->getService();
                 break;
             case 'batch':
                 $arguments[] = $this->getManager();

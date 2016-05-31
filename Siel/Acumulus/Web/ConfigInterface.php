@@ -24,6 +24,7 @@ interface ConfigInterface
     const Debug_None = 1;
     const Debug_SendAndLog = 2;
     const Debug_TestMode = 3;
+    /** @deprecated No longer used */
     const Debug_StayLocal = 4;
 
     // Web service API constants.

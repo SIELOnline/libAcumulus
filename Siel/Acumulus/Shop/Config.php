@@ -312,8 +312,8 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
      * Saves the configuration to the actual configuration provider.
      *
      * @param array $values
-     *   A keyed array that contains the values to store, this may be a subset of
-     *   the possible keys.
+     *   A keyed array that contains the values to store, this may be a subset
+     *   of the possible keys.
      *
      * @return bool
      *   Success.
@@ -857,5 +857,69 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
             );
         }
         return $this->keyInfo;
+    }
+
+    /**
+     * Upgrade the datamodel to the given version.
+     *
+     * This method is only called when the module gets updated.
+     *
+     * @param string $newVersion
+     *   The new version of the module.
+     * @param string $currentVersion
+     *   The current version of the module (if it can be retrieved).
+     *
+     * @return bool
+     *   Success.
+     */
+    public function upgrade($newVersion, $currentVersion = '')
+    {
+        // 4.5.0 Changes: execute when this is 4.5.0 or when we know that the
+        // current version was before and the new version is after.
+        if ($newVersion === '4.5.0' || ($currentVersion !== '' && version_compare($currentVersion, '4.5.0', '<') && version_compare($newVersion, '4.5.0', '>='))) {
+            // Keep track of settings that should be updated.
+            $newSettings = array();
+            // 1) triggerInvoiceSendEvent is no longer accessible if there's no
+            // choice anyway. Many people forgot to set it, that's why it is
+            // removed, but that means that we have to set it, if not set.
+            if ($this->get('triggerInvoiceSendEvent') == ConfigInterface::TriggerInvoiceSendEvent_None) {
+                $triggerOptions = $this->getShopCapabilities()->getTriggerInvoiceSendEventOptions();
+                if (count($triggerOptions) === 2 && array_key_exists(ConfigInterface::TriggerInvoiceSendEvent_None, $triggerOptions)) {
+                    $newSettings['triggerInvoiceSendEvent'] = reset($triggerOptions);
+                    while ($newSettings['triggerInvoiceSendEvent'] === ConfigInterface::TriggerInvoiceSendEvent_None) {
+                        $newSettings['triggerInvoiceSendEvent'] = next($triggerOptions);
+                    }
+                }
+            }
+
+            // 2) Log level: added level info and set log level to notice if
+            // it currently is error or warning.
+            switch ($this->get('logLevel')) {
+                case Log::Error:
+                case Log::Warning:
+                    // This is often not giving enough information, so we set it
+                    // to Notice by default.
+                    $newSettings['logLevel'] = Log::Notice;
+                    break;
+                case Log::Info:
+                    // Info was inserted, so this is the former debug level.
+                    $newSettings['logLevel'] = Log::Debug;
+                    break;
+            }
+
+            // 3) Debug mode: the values of test mode and stay local are
+            // switched, Stay local is no longer used. so both these 2 values
+            // become the new test mode.
+            switch ($this->get('debug')) {
+                case ServiceConfigInterface::Debug_StayLocal:
+                    $newSettings['logLevel'] = ServiceConfigInterface::Debug_TestMode;
+                    break;
+            }
+
+            if (!empty($newSettings)) {
+                $this->save($newSettings);
+            }
+        }
+        return true;
     }
 }

@@ -435,11 +435,9 @@ abstract class ConfigForm extends Form
                     'label' => $this->t('field_logLevel'),
                     'description' => $this->t('desc_logLevel'),
                     'options' => array(
-                        Log::None => $this->t('option_logLevel_0'),
-                        Log::Error => $this->t('option_logLevel_1'),
-                        Log::Warning => $this->t('option_logLevel_2'),
                         Log::Notice => $this->t('option_logLevel_3'),
-                        Log::Debug => $this->t('option_logLevel_4'),
+                        Log::Info => $this->t('option_logLevel_4'),
+                        Log::Debug => $this->t('option_logLevel_5'),
                     ),
                     'attributes' => array(
                         'required' => true,

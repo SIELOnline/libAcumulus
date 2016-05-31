@@ -143,12 +143,10 @@ Vink deze optie aan als u geen regel op uw factuur of pakbon wil voor gratis ver
         'desc_debug' => 'U kunt hier een verzend modus kiezen. Kies voor de eerste optie tenzij u i.v.m. een supportverzoek bent geïnstrueerd om iets anders te kiezen.',
 
         'field_logLevel' => 'Logniveau',
-        'option_logLevel_2' => 'Log foutmeldingen en waarschuwingen.',
         'option_logLevel_3' => 'Log foutmeldingen, waarschuwingen en operationele mededelingen.',
         'option_logLevel_4' => 'Log foutmeldingen, waarschuwingen en operationele en informatieve mededelingen.',
-        'option_logLevel_5' => 'Log foutmeldingen, waarschuwingen, mededelingen en communicatieberichten.',
-        'desc_logLevel' => 'U kunt hier een logniveau kiezen. Kies voor de 2e optie tenzij u i.v.m. een supportverzoek bent geïnstrueerd om iets anders te kiezen.',
-
+        'option_logLevel_5' => 'Log foutmeldingen, waarschuwingen, mededelingen, en communicatieberichten.',
+        'desc_logLevel' => 'U kunt hier een logniveau kiezen. Kies voor de 1e of 2e optie tenzij u i.v.m. een supportverzoek bent geïnstrueerd om iets anders te kiezen.',
     );
 
     protected $en = array(
@@ -287,11 +285,9 @@ If you don\'t want this, check this option.',
         'desc_debug' => 'Select a debug mode. Choose for the 1st option unless otherwise instructed by support staff.',
 
         'field_logLevel' => 'Log level',
-        'option_logLevel_2' => 'Log error messages and warnings.',
         'option_logLevel_3' => 'Log error messages, warnings, and operational notices.',
         'option_logLevel_4' => 'Log error messages, warnings, and operational and informational notices.',
-        'option_logLevel_5' => 'Log error messages, warnings, notices and communication messages.',
+        'option_logLevel_5' => 'Log error messages, warnings, notices, and communication messages.',
         'desc_logLevel' => 'Select a log level. Choose for the 1st or 2nd option unless otherwise instructed by support staff.',
-
     );
 }

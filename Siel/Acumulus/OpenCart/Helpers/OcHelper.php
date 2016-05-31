@@ -314,14 +314,31 @@ class OcHelper
     /**
      * Upgrades the data and settings for this module if needed.
      *
-     * The install now checks for the data model and can do an upgrade instead of
-     * a clean install.
+     * The install now checks for the data model and can do an upgrade instead
+     * of a clean install.
      *
      * @return bool
      *   Whether the upgrade was successful.
      */
     protected function doUpgrade()
     {
-        return $this->doInstall();
+        $this->init();
+
+        //Install/update datamodel first. 
+        $result = $this->doInstall();
+
+        $this->registry->load->model('setting/setting');
+        $setting = $this->registry->model_setting_setting->getSetting('acumulus_siel');
+        $currentDataModelVersion = isset($setting['acumulus_siel_datamodel_version']) ? $setting['acumulus_siel_datamodel_version'] : '';
+
+        if (version_compare($currentDataModelVersion, '4.5', '<')) {
+            // Update config settings.
+            if ($result = $this->acumulusConfig->upgrade('4.5.0')) {
+                $setting['acumulus_siel_datamodel_version'] = '4.5';
+                $this->registry->model_setting_setting->editSetting('acumulus_siel', $setting);
+            }
+        }
+
+        return $result;
     }
 }

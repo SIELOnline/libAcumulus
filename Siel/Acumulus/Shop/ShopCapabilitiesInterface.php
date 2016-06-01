@@ -16,7 +16,8 @@ interface ShopCapabilitiesInterface
      * specific shop supports other types or does not support credit notes.
      *
      * @return string[]
-     *   The list of supported invoice source types.
+     *   The list of supported invoice source types. The keys are the internal
+     *   const, the values are translated labels.
      */
     public function getSupportedInvoiceSourceTypes();
 

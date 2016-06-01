@@ -65,7 +65,7 @@ class BatchForm extends Form
         $invoiceSourceTypes = $this->shopCapabilities->getSupportedInvoiceSourceTypes();
         if (empty($this->submittedValues['invoice_source_type'])) {
             $this->errorMessages['invoice_source_type'] = $this->t('message_validate_batch_source_type_required');
-        } else if (!in_array($this->submittedValues['invoice_source_type'], $invoiceSourceTypes)) {
+        } else if (!array_key_exists($this->submittedValues['invoice_source_type'], $invoiceSourceTypes)) {
             $this->errorMessages['invoice_source_type'] = $this->t('message_validate_batch_source_type_invalid');
         }
 
@@ -152,17 +152,13 @@ class BatchForm extends Form
             // Make it a hidden field.
             $invoiceSourceTypeField = array(
                 'type' => 'hidden',
-                'value' => reset($invoiceSourceTypes),
+                'value' => key($invoiceSourceTypes),
             );
         } else {
-            $options = array();
-            foreach ($invoiceSourceTypes as $invoiceSourceType) {
-                $options[$invoiceSourceType] = ucfirst($this->t($invoiceSourceType));
-            }
             $invoiceSourceTypeField = array(
                 'type' => 'radio',
                 'label' => $this->t('field_invoice_source_type'),
-                'options' => $options,
+                'options' => $invoiceSourceTypes,
                 'attributes' => array(
                     'required' => true,
                 ),

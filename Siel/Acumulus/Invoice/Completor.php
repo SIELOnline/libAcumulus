@@ -158,9 +158,37 @@ class Completor
         // Complete strategy lines: those lines that have to be completed based
         // on the whole invoice.
         $this->invoice = $this->strategyLineCompletor->complete($this->invoice, $this->source, $this->possibleVatTypes, $this->possibleVatRates);
+        // Check if the strategy phase was successful.
+        if ($this->strategyLineCompletor->invoiceHasStrategyLine()) {
+            // We did not manage to correct all strategy lines: warn and set the
+            // invoice to concept.
+            $this->messages['warnings'][] = array(
+                'code' => '',
+                'codetag' => '',
+                'message' => $this->t('message_warning_strategies_failed'),
+            );
+            $this->invoice['customer']['invoice']['concept'] = ConfigInterface::Concept_Yes;
+        }
 
-        // Fill in the VAT type and warn if multiple vat types are possible.
+        // Determine the VAT type and warn if multiple vat types are possible.
         $this->completeVatType();
+        // If the invoice has margin products, all invoice lines have to follow
+        // the margin scheme, i.e. have a costprice and a unitprice incl. VAT.
+        $this->correctMarginInvoice();
+        // Another check: do we have lines without VAT while the settings
+        // prohibit this.
+        if ($this->invoiceHasLineWithoutVat()) {
+            $shopSettings = $this->config->getShopSettings();
+            $vatFreeProducts = $shopSettings['vatFreeProducts'];
+            if ($vatFreeProducts ===  ConfigInterface::VatFreeProducts_No) {
+                $this->messages['warnings'][] = array(
+                    'code' => '',
+                    'codetag' => '',
+                    'message' => $this->t('message_warning_line_without_vat'),
+                );
+                $this->invoice['customer']['invoice']['concept'] = ConfigInterface::Concept_Yes;
+            }
+        }
 
         // Completes the invoice with settings or behaviour that might depend on
         // the fact that the invoice lines have been completed.
@@ -174,6 +202,7 @@ class Completor
      *
      * The list of possible vat types depends on:
      * - whether there are lines with vat or if all lines appear vat free.
+     * - whether there is at least 1 line with a costprice.
      * - the country of the client.
      * - optionally, the date of the invoice.
      */
@@ -188,8 +217,30 @@ class Completor
             // If shop specific code or an event handler has already set the vat
             // type, we obey so.
             $possibleVatTypes[] = $this->invoice['customer']['invoice']['vattype'];
+        } elseif ($this->invoiceHasLineWithCostPrice()) {
+            $possibleVatTypes[] = ConfigInterface::VatType_MarginScheme;
         } else {
-            if (!$this->invoiceHasLineWithVat()) {
+            if ($this->invoiceHasLineWithVat()) {
+                // NL or EU Foreign vat.
+                if ($digitalServices === ConfigInterface::DigitalServices_No) {
+                    // No electronic services are sold: can only be dutch VAT.
+                    $possibleVatTypes[] = ConfigInterface::VatType_National;
+                } else {
+                    if ($this->isEu() && $this->getInvoiceDate() >= '2015-01-01') {
+                        if ($digitalServices !== ConfigInterface::DigitalServices_Only) {
+                            // Also normal goods are sold, so dutch VAT still possible.
+                            $possibleVatTypes[] = ConfigInterface::VatType_National;
+                        }
+                        // As of 2015, electronic services should be taxed with the rates of
+                        // the clients' country. And they might be sold in the shop.
+                        $possibleVatTypes[] = ConfigInterface::VatType_ForeignVat;
+                    } else {
+                        // Not EU or before 2015-01-01: special regulations for electronic
+                        // services were not yet active: dutch VAT only.
+                        $possibleVatTypes[] = ConfigInterface::VatType_National;
+                    }
+                }
+            } else {
                 // No VAT at all: National/EU reversed vat, only vat free
                 // products, or no vat (rest of world).
                 if ($this->isNl()) {
@@ -227,26 +278,6 @@ class Completor
                     $possibleVatTypes[] = ConfigInterface::VatType_EuReversed;
                     $possibleVatTypes[] = ConfigInterface::VatType_NationalReversed;
                     $this->invoice['customer']['invoice']['concept'] = ConfigInterface::Concept_Yes;
-                }
-            } else {
-                // NL or EU Foreign vat.
-                if ($digitalServices === ConfigInterface::DigitalServices_No) {
-                    // No electronic services are sold: can only be dutch VAT.
-                    $possibleVatTypes[] = ConfigInterface::VatType_National;
-                } else {
-                    if ($this->isEu() && $this->getInvoiceDate() >= '2015-01-01') {
-                        if ($digitalServices !== ConfigInterface::DigitalServices_Only) {
-                            // Also normal goods are sold, so dutch VAT still possible.
-                            $possibleVatTypes[] = ConfigInterface::VatType_National;
-                        }
-                        // As of 2015, electronic services should be taxed with the rates of
-                        // the clients' country. And they might be sold in the shop.
-                        $possibleVatTypes[] = ConfigInterface::VatType_ForeignVat;
-                    } else {
-                        // Not EU or before 2015-01-01: special regulations for electronic
-                        // services were not yet active: dutch VAT only.
-                        $possibleVatTypes[] = ConfigInterface::VatType_National;
-                    }
                 }
             }
         }
@@ -525,25 +556,26 @@ class Completor
     }
 
     /**
-     * Fills the vattype field of the invoice.
+     * Determines the vattype of the invoice.
      *
      * This method (and class) is aware of:
      * - The setting digitalServices.
      * - The country of the client.
      * - Whether the client is a company.
      * - The actual VAT rates on the day of the order.
+     * - Whether there are margin products in the order.
      *
      * So to start with, any list of (possible) vat types is based on the above.
      * Furthermore this method is aware of:
      * - The fact that orders do not have to be split over different vat types,
-     *   but that invoices should be split if both national and foreign VAT rates
-     *   appear on the order.
-     * - The fact that the vat type may be indeterminable if EU countries have VAT
-     *   rates in common with NL and the settings indicate that this shop sells
-     *   products in both vat type categories.
+     *   but that invoices should be split if both national and foreign VAT
+     *   rates appear on the order.
+     * - The fact that the vat type may be indeterminable if EU countries have
+     *   VAT rates in common with NL and the settings indicate that this shop
+     *   sells products in both vat type categories.
      *
-     * If multiple vat types are possible, the invoice is sent as concept, so that
-     * it may be edited in Acumulus.
+     * If multiple vat types are possible, the invoice is sent as concept, so
+     * that it may be corrected in Acumulus.
      */
     protected function completeVatType()
     {
@@ -676,6 +708,44 @@ class Completor
     }
 
     /**
+     * Corrects an invoice if it is a margin scheme invoice.
+     *
+     * If an invoice is of the margin scheme type, all lines have to follow the
+     * margin scheme rules. These rules are:
+     * - Each line must have a costprice, but that cost price may be 0.
+     * - The unitprice should now contain the price including VAT (requirement
+     *   of the web service API).
+     * Thus if there are e.g. shipping lines or other fee lines, they have to be
+     * converted to the margin scheme (costprice tag and change of unitprice).
+     */
+    protected function correctMarginInvoice() {
+        if (isset($this->invoice['customer']['invoice']['vattype']) && $this->invoice['customer']['invoice']['vattype'] == ConfigInterface::VatType_MarginScheme) {
+            foreach ($this->invoice['customer']['invoice']['line'] as &$line) {
+                // We assume that margin lines already have a correct unitprice,
+                // so we only convert the other lines.
+                if (!isset($line['costprice'])) {
+                    // "Normal" line: convert to margin scheme.
+                    $line['costprice'] = 0.0;
+                    // Add "marker" tag for this correction.
+                    $line['meta-unitprice-old'] = $line['unitprice'];
+                    // Change unitprice tag to include VAT.
+                    if (isset($line['unitpriceinc'])) {
+                        $line['unitprice'] = $line['unitpriceinc'];
+                    } elseif (isset($line['vatamount'])) {
+                        $line['unitprice'] += $line['vatamount'];
+                    } elseif (isset($line['vatrate'])) {
+                        $line['unitprice'] *= (1 + $line['vatrate']/100.0);
+                    } //else {
+                        // Impossible to correct the unitprice. Probably all
+                        // strategies failed, so the invoice should already
+                        // have a warning.
+                    //}
+                }
+            }
+        }
+    }
+
+    /**
      * Removes an empty shipping line (if so configured).
      */
     protected function removeEmptyShipping()
@@ -699,19 +769,58 @@ class Completor
      */
     protected function invoiceHasLineWithVat()
     {
-        $isLineWithVat = false;
+        $hasLineWithVat = false;
         foreach ($this->invoice['customer']['invoice']['line'] as $line) {
             if (!empty($line['vatrate'])) {
                 if (!Number::isZero($line['vatrate']) && !Number::floatsAreEqual($line['vatrate'], -1.0)) {
-                    $isLineWithVat = true;
+                    $hasLineWithVat = true;
                     break;
                 }
             } else if (!empty($line['vatamount']) && !Number::isZero($line['vatamount'])) {
-                $isLineWithVat = true;
+                $hasLineWithVat = true;
                 break;
             }
         }
-        return $isLineWithVat;
+        return $hasLineWithVat;
+    }
+
+    /**
+     * Returns whether the invoice has at least 1 line with a 0 vat rate.
+     *
+     * 0 (VAT free/reversed VAT) and -1 (no VAT) are valid 0-vat rates.
+     * As vatrate may be null, the vatamount value is also checked.
+     *
+     * @return bool
+     */
+    protected function invoiceHasLineWithoutVat()
+    {
+        $lineHasNoVat = false;
+        foreach ($this->invoice['customer']['invoice']['line'] as $line) {
+            if (isset($line['vatrate'])) {
+                if (Number::isZero($line['vatrate']) || Number::floatsAreEqual($line['vatrate'], -1.0)) {
+                    $lineHasNoVat = true;
+                    break;
+                }
+            }
+        }
+        return $lineHasNoVat;
+    }
+
+    /**
+     * Returns whether the invoice has at least 1 line with a costprice set.
+     *
+     * @return bool
+     */
+    protected function invoiceHasLineWithCostPrice()
+    {
+        $hasLineWithCostPrice = false;
+        foreach ($this->invoice['customer']['invoice']['line'] as $line) {
+            if (isset($line['costprice'])) {
+                $hasLineWithCostPrice = true;
+                break;
+            }
+        }
+        return $hasLineWithCostPrice;
     }
 
     /**

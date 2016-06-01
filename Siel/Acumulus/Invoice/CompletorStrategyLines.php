@@ -121,7 +121,7 @@ class CompletorStrategyLines
      *
      * @return bool
      */
-    protected function invoiceHasStrategyLine()
+    public function invoiceHasStrategyLine()
     {
         $result = false;
         foreach ($this->invoiceLines as $line) {

@@ -787,19 +787,25 @@ class Completor
     /**
      * Returns whether the invoice has at least 1 line with a 0 vat rate.
      *
-     * 0 (VAT free/reversed VAT) and -1 (no VAT) are valid 0-vat rates.
-     * As vatrate may be null, the vatamount value is also checked.
+     * 0 (VAT free/reversed VAT) and -1 (no VAT) are 0-vat rates.
+     *
+     * @param bool $includeDiscountLines
+     *   Discount lines representing a partial payment should be VAT free and
+     *   should not always trigger a return value of true. This parameter can be
+     *   used to indicate what to do with VAT free discount lines.
      *
      * @return bool
      */
-    protected function invoiceHasLineWithoutVat()
+    protected function invoiceHasLineWithoutVat($includeDiscountLines = false)
     {
         $lineHasNoVat = false;
         foreach ($this->invoice['customer']['invoice']['line'] as $line) {
             if (isset($line['vatrate'])) {
                 if (Number::isZero($line['vatrate']) || Number::floatsAreEqual($line['vatrate'], -1.0)) {
-                    $lineHasNoVat = true;
-                    break;
+                    if ($line['meta-line-type'] !== Creator::LineType_Discount || $includeDiscountLines) {
+                        $lineHasNoVat = true;
+                        break;
+                    }
                 }
             }
         }

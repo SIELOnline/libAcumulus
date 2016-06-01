@@ -1,5 +1,5 @@
 <?php
-namespace Siel\Acumulus\HikaShop\Shop;
+namespace Siel\Acumulus\Joomla\HikaShop\Shop;
 
 use Siel\Acumulus\Invoice\ConfigInterface as InvoiceConfigInterface;
 use Siel\Acumulus\Invoice\Source;

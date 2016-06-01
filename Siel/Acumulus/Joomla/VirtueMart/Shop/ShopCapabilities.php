@@ -1,5 +1,5 @@
 <?php
-namespace Siel\Acumulus\VirtueMart\Shop;
+namespace Siel\Acumulus\Joomla\VirtueMart\Shop;
 
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Shop\ConfigInterface;

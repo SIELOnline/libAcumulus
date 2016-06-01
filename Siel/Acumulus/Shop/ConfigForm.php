@@ -16,7 +16,7 @@ use Siel\Acumulus\Web\Service;
  * - isSubmitted()
  * - setSubmittedValues()
  */
-abstract class ConfigForm extends Form
+class ConfigForm extends Form
 {
     /** @var \Siel\Acumulus\Shop\ShopCapabilitiesInterface */
     protected $shopCapabilities;

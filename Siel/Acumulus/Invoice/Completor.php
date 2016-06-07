@@ -721,26 +721,30 @@ class Completor
     protected function correctMarginInvoice() {
         if (isset($this->invoice['customer']['invoice']['vattype']) && $this->invoice['customer']['invoice']['vattype'] == ConfigInterface::VatType_MarginScheme) {
             foreach ($this->invoice['customer']['invoice']['line'] as &$line) {
-                // We assume that margin lines already have a correct unitprice,
-                // so we only convert the other lines.
+                // For margin invoices, Acumulus expects the unitprice to be the
+                // sales price, ie the price the client pays. So we set
+                // unitprice to unitpriceinc.
+                // Non margin lines may "officially" not appear on margin
+                // invoices, so we turn them into margin lines by adding a
+                // costprice of 0 and also setting unitprice to unitpriceinc.
                 if (!isset($line['costprice'])) {
-                    // "Normal" line: convert to margin scheme.
+                    // "Normal" line: set costprice as 0.
                     $line['costprice'] = 0.0;
-                    // Add "marker" tag for this correction.
-                    $line['meta-unitprice-old'] = $line['unitprice'];
-                    // Change unitprice tag to include VAT.
-                    if (isset($line['unitpriceinc'])) {
-                        $line['unitprice'] = $line['unitpriceinc'];
-                    } elseif (isset($line['vatamount'])) {
-                        $line['unitprice'] += $line['vatamount'];
-                    } elseif (isset($line['vatrate'])) {
-                        $line['unitprice'] *= (1 + $line['vatrate']/100.0);
-                    } //else {
-                        // Impossible to correct the unitprice. Probably all
-                        // strategies failed, so the invoice should already
-                        // have a warning.
-                    //}
                 }
+                // Add "marker" tag (for debug purposes) for this correction.
+                $line['meta-unitprice-old'] = $line['unitprice'];
+                // Change unitprice tag to include VAT.
+                if (isset($line['unitpriceinc'])) {
+                    $line['unitprice'] = $line['unitpriceinc'];
+                } elseif (isset($line['vatamount'])) {
+                    $line['unitprice'] += $line['vatamount'];
+                } elseif (isset($line['vatrate'])) {
+                    $line['unitprice'] += $line['vatrate']/100.0 * ($line['unitprice'] - $line['costprice']);
+                } //else {
+                    // Impossible to correct the unitprice. Probably all
+                    // strategies failed, so the invoice should already
+                    // have a warning.
+                //}
             }
         }
     }

@@ -64,7 +64,7 @@ class Translations extends TranslationCollection
         'discount_adjustment' => 'Manual discount',
 
         'message_warning_no_vat' => 'The invoice has no VAT and it is not possible to determine the invoice type (https://wiki.acumulus.nl/index.php?page=127). The invoice has been saved as concept. Correct the invoice in acumulus and check your VAT settings.',
-        'message_warning_no_vattype' => 'Due to an error in your settings or VAT rates, we cannot determine the invoice type for the invoice (https://wiki.acumulus.nl/index.php?page=127). The invoice has been saved as concept. Correct the invoice in Acumulus.',
+        'message_warning_no_vattype' => 'Due to an error in your settings or VAT rates, we could not determine the invoice type for the invoice (https://wiki.acumulus.nl/index.php?page=127). The invoice has been saved as concept. Correct the invoice in Acumulus.',
         'message_warning_line_without_vat' => 'One of your invoice lines has no VAT while you configured that you sell "Only products or services that are VAT liable.". The invoice has been saved as concept. Correct the invoice in Acumulus and check your settings.',
         'message_warning_strategies_failed' => 'Due to an error in your settings or VAT rates, we could not complete all invoice lines correctly. The invoice has been saved as concept. Correct the invoice in Acumulus.',
         'message_warning_multiple_vattype_must_split' => 'The invoice has multiple invoice types (https://wiki.acumulus.nl/index.php?page=127). The invoice has been saved as concept. Split the invoice in Acumulus and divide the invoice lines over both invoices based on the VAT type the line belongs to.',

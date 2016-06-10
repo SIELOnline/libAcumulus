@@ -4,6 +4,7 @@ namespace Siel\Acumulus\Invoice;
 use Siel\Acumulus\Helpers\Countries;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Helpers\TranslatorInterface;
+use Siel\Acumulus\Shop\Config;
 use Siel\Acumulus\Web\Service;
 
 /**
@@ -175,9 +176,11 @@ class Completor
         // If the invoice has margin products, all invoice lines have to follow
         // the margin scheme, i.e. have a costprice and a unitprice incl. VAT.
         $this->correctMarginInvoice();
-        // Another check: do we have lines without VAT while the settings
-        // prohibit this.
-        if ($this->invoiceHasLineWithoutVat()) {
+        // Another check: do we have lines without VAT while the vat type and
+        // settings prohibit this.
+        if (in_array($this->invoice['customer']['invoice']['vattype'], array(Config::VatType_National, Config::VatType_ForeignVat, Config::VatType_MarginScheme))
+            && $this->invoiceHasLineWithoutVat())
+        {
             $shopSettings = $this->config->getShopSettings();
             $vatFreeProducts = $shopSettings['vatFreeProducts'];
             if ($vatFreeProducts ===  ConfigInterface::VatFreeProducts_No) {

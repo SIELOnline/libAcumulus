@@ -876,7 +876,7 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
     {
         // 4.5.0 Changes: execute when this is 4.5.0 or when we know that the
         // current version was before and the new version is after.
-        if ($newVersion === '4.5.0' || ($currentVersion !== '' && version_compare($currentVersion, '4.5.0', '<') && version_compare($newVersion, '4.5.0', '>='))) {
+        if ($newVersion === '4.5.0' || $newVersion === '4.5.2' || ($currentVersion !== '' && version_compare($currentVersion, '4.5.2', '<') && version_compare($newVersion, '4.5.2', '>='))) {
             // Keep track of settings that should be updated.
             $newSettings = array();
             // 1) triggerInvoiceSendEvent is no longer accessible if there's no
@@ -885,10 +885,10 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
             if ($this->get('triggerInvoiceSendEvent') == ConfigInterface::TriggerInvoiceSendEvent_None) {
                 $triggerOptions = $this->getShopCapabilities()->getTriggerInvoiceSendEventOptions();
                 if (count($triggerOptions) === 2 && array_key_exists(ConfigInterface::TriggerInvoiceSendEvent_None, $triggerOptions)) {
-                    $newSettings['triggerInvoiceSendEvent'] = reset($triggerOptions);
-                    while ($newSettings['triggerInvoiceSendEvent'] === ConfigInterface::TriggerInvoiceSendEvent_None) {
-                        $newSettings['triggerInvoiceSendEvent'] = next($triggerOptions);
+                    while (key($triggerOptions) === ConfigInterface::TriggerInvoiceSendEvent_None) {
+                        next($triggerOptions);
                     }
+                    $newSettings['triggerInvoiceSendEvent'] = key($triggerOptions);
                 }
             }
 

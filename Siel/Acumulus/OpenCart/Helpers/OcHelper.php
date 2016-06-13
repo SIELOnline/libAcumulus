@@ -324,17 +324,19 @@ class OcHelper
     {
         $this->init();
 
-        //Install/update datamodel first. 
+        //Install/update datamodel first.
         $result = $this->doInstall();
 
         $this->registry->load->model('setting/setting');
         $setting = $this->registry->model_setting_setting->getSetting('acumulus_siel');
         $currentDataModelVersion = isset($setting['acumulus_siel_datamodel_version']) ? $setting['acumulus_siel_datamodel_version'] : '';
 
-        if (version_compare($currentDataModelVersion, '4.5', '<')) {
+        if (version_compare($currentDataModelVersion, '4.5.2', '<')) {
             // Update config settings.
-            if ($result = $this->acumulusConfig->upgrade('4.5.0')) {
-                $setting['acumulus_siel_datamodel_version'] = '4.5';
+            if ($result = $this->acumulusConfig->upgrade('4.5.2')) {
+                // Refresh settings.
+                $setting = $this->registry->model_setting_setting->getSetting('acumulus_siel');
+                $setting['acumulus_siel_datamodel_version'] = '4.5.2';
                 $this->registry->model_setting_setting->editSetting('acumulus_siel', $setting);
             }
         }

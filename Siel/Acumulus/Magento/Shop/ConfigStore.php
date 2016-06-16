@@ -29,13 +29,13 @@ class ConfigStore extends BaSeConfigStore
 
     /**
      * {@inheritdoc}
-     * 
+     *
      * For Magento, the default trigger event is the invoice creation event.
      */
     public function getShopDefaults()
     {
         return array(
-            'triggerInvoiceSendEvent' => ConfigInterface::TriggerInvoiceSendEvent_InvoiceCreate,  
+            'triggerInvoiceEvent' => ConfigInterface::TriggerInvoiceEvent_None,
         );
     }
 
@@ -67,8 +67,6 @@ class ConfigStore extends BaSeConfigStore
      */
     public function save(array $values)
     {
-        $values = $this->saveCommon($values);
-
         foreach ($values as $key => $value) {
             if ($value !== null) {
                 if (is_bool($value)) {

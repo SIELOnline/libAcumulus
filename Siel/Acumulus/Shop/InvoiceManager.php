@@ -191,17 +191,13 @@ abstract class InvoiceManager
         $this->config->getLog()->notice('InvoiceManager::sourceStatusChange(%s %d, %s)', $invoiceSource->getType(), $invoiceSource->getId(), $statusString);
         $result = WebConfigInterface::Status_NotSent;
         $shopEventSettings = $this->config->getShopEventSettings();
-        if ($invoiceSource->getType() === Source::CreditNote
-            || ($shopEventSettings['triggerInvoiceSendEvent'] == Config::TriggerInvoiceSendEvent_OrderStatus
-                && in_array($status, $shopEventSettings['triggerOrderStatus']))
-        ) {
+        if ($invoiceSource->getType() === Source::CreditNote || in_array($status, $shopEventSettings['triggerOrderStatus'])) {
             $result = $this->send($invoiceSource, false);
         } else {
-            $this->config->getLog()->notice('InvoiceManager::sourceStatusChange(%s %d, %s): not sending triggerEvent = %d, triggerOrderStatus = [%s]',
+            $this->config->getLog()->notice('InvoiceManager::sourceStatusChange(%s %d, %s): not sending, triggerOrderStatus = [%s]',
                 $invoiceSource->getType(),
                 $invoiceSource->getId(),
                 $statusString,
-                $shopEventSettings['triggerInvoiceSendEvent'],
                 is_array($shopEventSettings['triggerOrderStatus']) ? implode(',', $shopEventSettings['triggerOrderStatus']) : 'no array'
             );
         }
@@ -222,7 +218,30 @@ abstract class InvoiceManager
         $this->config->getLog()->notice('InvoiceManager::invoiceCreate(%s %d)', $invoiceSource->getType(), $invoiceSource->getId());
         $result = WebConfigInterface::Status_NotSent;
         $shopEventSettings = $this->config->getShopEventSettings();
-        if ($shopEventSettings['triggerInvoiceSendEvent'] == Config::TriggerInvoiceSendEvent_InvoiceCreate) {
+        if ($shopEventSettings['triggerInvoiceEvent'] == Config::TriggerInvoiceEvent_Create) {
+            $result = $this->send($invoiceSource, false);
+        }
+        return $result;
+    }
+
+    /**
+     * Processes a shop invoice send event.
+     *
+     * This is the invoice created by the shop and that is now sent/mailed to
+     * the customer.
+     *
+     * @param \Siel\Acumulus\Invoice\Source $invoiceSource
+     *   The source for which a shop invoice was created.
+     *
+     * @return int
+     *   Status
+     */
+    public function invoiceSend(Source $invoiceSource)
+    {
+        $this->config->getLog()->notice('InvoiceManager::invoiceSend(%s %d)', $invoiceSource->getType(), $invoiceSource->getId());
+        $result = WebConfigInterface::Status_NotSent;
+        $shopEventSettings = $this->config->getShopEventSettings();
+        if ($shopEventSettings['triggerInvoiceEvent'] == Config::TriggerInvoiceEvent_Send) {
             $result = $this->send($invoiceSource, false);
         }
         return $result;

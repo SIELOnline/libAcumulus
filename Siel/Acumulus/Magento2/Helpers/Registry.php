@@ -56,7 +56,7 @@ class Registry
     }
 
     /**
-     * Creates a new model of the given type.
+     * Creates a new object of the given type.
      *
      * @param string $type
      *
@@ -69,7 +69,7 @@ class Registry
     }
 
     /**
-     * Retrieve cached object instance
+     * Retrieves a cached object instance or creates a new instance.
      *
      * @param string $type
      *

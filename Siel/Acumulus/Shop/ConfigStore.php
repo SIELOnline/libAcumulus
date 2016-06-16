@@ -32,26 +32,4 @@ abstract class ConfigStore implements ConfigStoreInterface
     {
         return array();
     }
-
-    /**
-     * Performs common save tasks.
-     *
-     * @param array $values
-     *
-     * @return array
-     */
-    protected function saveCommon(array $values)
-    {
-        $copy = $values;
-        if (!empty($copy['password'])) {
-            $copy['password'] = 'REMOVED FOR SECURITY';
-        }
-        Log::getInstance()->notice('ConfigStore::save(): saving %s', serialize($copy));
-
-        // Remove password if not sent along.
-        if (array_key_exists('password', $values) && empty($values['password'])) {
-            unset($values['password']);
-        }
-        return $values;
-    }
 }

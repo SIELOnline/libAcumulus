@@ -82,8 +82,6 @@ class ConfigStore extends BaSeConfigStore
      */
     public function save(array $values)
     {
-        $values = $this->saveCommon($values);
-
         // When the values are loaded in the same request, the new values are not
         // retrieved: store a copy of them here to merge them when loading.
         $this->savedValues = $values;

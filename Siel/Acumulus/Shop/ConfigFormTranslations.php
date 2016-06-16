@@ -107,14 +107,15 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'desc_removeEmptyShipping' => 'Omdat Acumulus pakbonnen kan printen, verstuurt deze extensie normaal gesproken altijd een factuurregel met de verzendkosten/methode, zelfs met gratis verzending of zelf afhalen.
 Vink deze optie aan als u geen regel op uw factuur of pakbon wil voor gratis verzending of zelf afhalen.',
 
-        'field_triggerInvoiceSendEvent' => 'Moment van versturen',
-        'option_triggerInvoiceSendEvent_0' => 'Niet automatisch versturen.',
-        'option_triggerInvoiceSendEvent_1' => 'Als een bestelling de hieronder door u gekozen status bereikt.',
-        'option_triggerInvoiceSendEvent_2' => 'Als de factuur wordt aangemaakt voor deze bestelling.',
-        'desc_triggerInvoiceSendEvent' => 'U kunt hier kiezen op welk moment de factuur wordt verstuurd. Als u voor "Niet automatisch overzetten" kiest, moet u de facturen zelf overzetten m.b.v. het batchformulier.',
+        'field_triggerOrderStatus' => 'Bestelstatus(sen)',
+        'desc_triggerOrderStatus' => 'U kunt hier kiezen of en bij welke bestelstatussen facturen worden verstuurd naar Acumulus. Als u meerdere statussen kiest wordt de factuur naar Acumulus verstuurd zodra de bestelling één van de gekozen statussen bereikt. Een factuur wordt slechts 1 keer naar Acumulus verstuurd. Deze koppeling gebruikt alleen gegevens van de bestelling, dus u kunt elke status kiezen. De webwinkelfactuur hoeft dus nog niet aangemaakt te zijn. Als u voor "Niet automatisch versturen" kiest, kunt u de facturen zelf overzetten m.b.v. het batchformulier.',
         'option_empty_triggerOrderStatus' => 'Niet automatisch versturen',
-        'field_triggerOrderStatus' => 'Bestelstatus',
-        'desc_triggerOrderStatus' => 'U kunt hier kiezen bij welke bestelstatussen facturen worden overgezet naar Acumulus. Als u meerdere statussen kiest wordt een order overgezet zodra deze één van de gekozen statussen bereikt. Een order wordt maximaal 1 keer overgezet. Deze koppeling gebruikt alleen gegevens van de bestelling, dus u kunt elke status kiezen. De factuur hoeft dus nog niet aangemaakt te zijn.',
+
+        'field_triggerInvoiceEvent' => 'Webshopfactuur status',
+        'option_triggerInvoiceEvent_0' => 'Niet automatisch versturen.',
+        'option_triggerInvoiceEvent_1' => 'Als een factuur van de webwinkel aangemaakt wordt.',
+        'option_triggerInvoiceEvent_2' => 'Als een factuur van de webwinkel naar de klant verzonden wordt.',
+        'desc_triggerInvoiceEvent' => 'U kunt hier kiezen of en bij welke webwinkelfactuur-gebeurtenissen de factuur naar Acumulus wordt verstuurd. Als u voor "Niet automatisch versturen" kiest, kunt u de facturen zelf overzetten m.b.v. het batchformulier of op basis van één of meerdere bestelstatussen.',
 
         'emailAsPdfSettingsHeader' => 'PDF Factuur',
         'desc_emailAsPdfInformation' => 'Bij het versturen van bestellinggegevens naar Acumulus, kunt u Acumulus een PDF factuur laten versturen naar uw klant. Deze wordt direct verstuurd naar het door de klant opgegeven emailadres.',
@@ -248,15 +249,15 @@ If you unchecked the first option, the second option only applies to business cl
         'desc_removeEmptyShipping' => 'To allow Acumulus to print packing slips, this extension normally always sends a shipping line, even with free shipping or in store pickup.
 If you don\'t want this, check this option.',
 
-        'field_triggerInvoiceSendEvent' => 'Send the invoice to Acumulus',
-        'option_triggerInvoiceSendEvent_0' => 'Do not send automatically.',
-        'option_triggerInvoiceSendEvent_1' => 'When an order reaches the state as defined below.',
-        'option_triggerInvoiceSendEvent_2' => 'When the invoice gets created for this order.',
-        'desc_triggerInvoiceSendEvent' => 'Select when to send the invoice to Acumulus. If you select "Do not send automatically" you will have to use the send batch form.',
+        'field_triggerOrderStatus' => 'Order state(s)',
+        'desc_triggerOrderStatus' => 'Select if and with which order states to send the invoice to Acumulus. If you select multiple states, the invoice will only be sent once as soon as one of the selected states is reached. This extension only uses order data, so you may select any status, the webshop invoice does not already have to be created. If you select "Do not send automatically" you will have to use the send batch form.',
+        'option_empty_triggerOrderStatus' => 'Do not send automatically ',
 
-        'option_empty_triggerOrderStatus' => 'Do not send automatically',
-        'field_triggerOrderStatus' => 'Order state',
-        'desc_triggerOrderStatus' => 'Select the order states at which orders will be sent to Acumulus. If you select multiple states, an order will be sent as soon as one of the selected states is reached. An order will only be sent once. This extension only uses order data. so you may select any status. The invoice does not already have to be created.',
+        'field_triggerInvoiceEvent' => 'Webshop invoice state',
+        'option_triggerInvoiceEvent_0' => 'Do not send automatically',
+        'option_triggerInvoiceEvent_1' => 'When the webshop invoice gets created.',
+        'option_triggerInvoiceEvent_2' => 'When the webshop invoice gets sent to the customer.',
+        'desc_triggerInvoiceEvent' => 'Select if and on which webshop invoice event to send the invoice to Acumulus. If you select "Do not send automatically" you can use the send batch form, or you can set one or more order states above to trigger the sending of the invoice.',
 
         'emailAsPdfSettingsHeader' => 'PDF Invoice',
         'desc_emailAsPdfInformation' => 'On sending the order details to Acumulus, Acumulus can send a PDF invoice to your customer. The mail will be sent to the clients\' email address.',

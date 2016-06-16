@@ -5,6 +5,7 @@ use Siel\Acumulus\Helpers\Requirements;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Shop\Config as ShopConfig;
 use Siel\Acumulus\Shop\ModuleTranslations;
+use Siel\Acumulus\Web\ConfigInterface;
 
 /**
  * OcHelper contains functionality shared between the OC1 and OC2 controllers
@@ -330,13 +331,14 @@ class OcHelper
         $this->registry->load->model('setting/setting');
         $setting = $this->registry->model_setting_setting->getSetting('acumulus_siel');
         $currentDataModelVersion = isset($setting['acumulus_siel_datamodel_version']) ? $setting['acumulus_siel_datamodel_version'] : '';
+        $apiVersion = ConfigInterface::libraryVersion;
 
-        if (version_compare($currentDataModelVersion, '4.5.2', '<')) {
+        if (version_compare($currentDataModelVersion, $apiVersion, '<')) {
             // Update config settings.
-            if ($result = $this->acumulusConfig->upgrade('4.5.2')) {
+            if ($result = $this->acumulusConfig->upgrade($currentDataModelVersion)) {
                 // Refresh settings.
                 $setting = $this->registry->model_setting_setting->getSetting('acumulus_siel');
-                $setting['acumulus_siel_datamodel_version'] = '4.5.2';
+                $setting['acumulus_siel_datamodel_version'] = $apiVersion;
                 $this->registry->model_setting_setting->editSetting('acumulus_siel', $setting);
             }
         }

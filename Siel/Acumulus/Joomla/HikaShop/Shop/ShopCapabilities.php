@@ -42,19 +42,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      *
-     * HikaShop does not have separate invoice entities. (Though an HS order
-     * does have an order_invoice_number property).
-     */
-    public function getTriggerInvoiceSendEventOptions()
-    {
-        $result = parent::getTriggerInvoiceSendEventOptions();
-        unset($result[ConfigInterface::TriggerInvoiceSendEvent_InvoiceCreate]);
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
      * This override removes the 'Use shop invoice number' option as HikaShop
      * does not have invoices.
      */

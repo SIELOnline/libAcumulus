@@ -42,21 +42,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
 
     /**
      * {@inheritdoc}
-     *
-     * This override removes the 'Use invoice sent' option as OpenCart does not
-     * have an event on creating/sending the invoice.
-     *
-     * @todo: find out if there's something like an invoice create event.
-     */
-    public function getTriggerInvoiceSendEventOptions()
-    {
-        $result = parent::getTriggerInvoiceSendEventOptions();
-        unset($result[ConfigInterface::TriggerInvoiceSendEvent_InvoiceCreate]);
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
      */
     public function getPaymentMethods()
     {

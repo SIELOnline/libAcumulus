@@ -57,19 +57,11 @@ abstract class ShopCapabilities implements ShopCapabilitiesInterface
 
     /**
      * {@inheritdoc}
-     *
-     * Overrides should typically return a subset of the constants defined in
-     * this base implementation. The return array may be empty or only contain
-     * ConfigInterface::TriggerInvoiceSendEvent_None, to indicate that no
-     * automatic sending is possible (shop does not define any event like
-     * feature).
      */
-    public function getTriggerInvoiceSendEventOptions()
+    public function getInvoiceTriggerEvents()
     {
         return array(
-            ConfigInterface::TriggerInvoiceSendEvent_None => $this->t('option_triggerInvoiceSendEvent_0'),
-            ConfigInterface::TriggerInvoiceSendEvent_OrderStatus => $this->t('option_triggerInvoiceSendEvent_1'),
-            ConfigInterface::TriggerInvoiceSendEvent_InvoiceCreate => $this->t('option_triggerInvoiceSendEvent_2'),
+            ConfigInterface::TriggerInvoiceEvent_None => $this->t('option_triggerInvoiceEvent_0'),
         );
     }
 

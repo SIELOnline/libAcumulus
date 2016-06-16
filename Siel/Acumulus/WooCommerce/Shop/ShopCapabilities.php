@@ -51,19 +51,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
 
     /**
      * {@inheritdoc}
-     *
-     * This override removes the 'Use invoice sent' option as WC does not have
-     * separate invoices, let alone an event on sending it.
-     */
-    public function getTriggerInvoiceSendEventOptions()
-    {
-        $result = parent::getTriggerInvoiceSendEventOptions();
-        unset($result[ConfigInterface::TriggerInvoiceSendEvent_InvoiceCreate]);
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
      */
     public function getPaymentMethods()
     {

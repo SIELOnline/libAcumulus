@@ -239,35 +239,25 @@ class ConfigForm extends Form
                 );
             }
 
-            $accountNumberOptions = $this->picklistToOptions($this->service->getPicklistAccounts(),'accounts', 0, $this->t('option_empty'));
-            $constCenterOptions = $this->picklistToOptions($this->service->getPicklistCostCenters(),'costcenters', 0, $this->t('option_empty'));
-
-            $triggerInvoiceSendEventOptions = $this->shopCapabilities->getTriggerInvoiceSendEventOptions();
-            if (count($triggerInvoiceSendEventOptions) === 1 ||
-                (count($triggerInvoiceSendEventOptions) === 2 &&
-                 array_key_exists(ConfigInterface::TriggerInvoiceSendEvent_None, $triggerInvoiceSendEventOptions) &&
-                 array_key_exists(ConfigInterface::TriggerInvoiceSendEvent_OrderStatus,$triggerInvoiceSendEventOptions))
-            ) {
+            $invoiceTriggerEventOptions = $this->shopCapabilities->getInvoiceTriggerEvents();
+            if (count($invoiceTriggerEventOptions) === 1) {
                 // Make it a hidden field.
-                $value = reset($triggerInvoiceSendEventOptions);
-                while ($value === ConfigInterface::TriggerInvoiceSendEvent_None) {
-                    $value = next($triggerInvoiceSendEventOptions);
-                }
-                $triggerInvoiceSendEventField = array(
+                $invoiceTriggerEventField = array(
                     'type' => 'hidden',
-                    'value' => $value,
+                    'value' => reset($invoiceTriggerEventOptions),
                 );
             } else {
-                $triggerInvoiceSendEventField = array(
-                    'type' => 'radio',
-                    'label' => $this->t('field_triggerInvoiceSendEvent'),
-                    'description' => $this->t($this->t('desc_triggerInvoiceSendEvent')),
-                    'options' => $triggerInvoiceSendEventOptions,
-                    'attributes' => array(
-                        'required' => true,
-                    ),
+                $invoiceTriggerEventField = array(
+                    'type' => 'select',
+                    'label' => $this->t('field_triggerInvoiceEvent'),
+                    'description' => $this->t($this->t('desc_triggerInvoiceEvent')),
+                    'options' => $invoiceTriggerEventOptions,
                 );
             }
+
+            $accountNumberOptions = $this->picklistToOptions($this->service->getPicklistAccounts(),'accounts', 0, $this->t('option_empty'));
+            $constCenterOptions = $this->picklistToOptions($this->service->getPicklistCostCenters(),'costcenters', 0, $this->t('option_empty'));
+            $orderStatuses = $this->getOrderStatusesList();
 
             $fields['invoiceSettingsHeader']['fields'] = array(
                 'digitalServices' => array(
@@ -343,23 +333,19 @@ class ConfigForm extends Form
                         'removeEmptyShipping' => $this->t('option_removeEmptyShipping'),
                     ),
                 ),
-                'triggerInvoiceSendEvent' => $triggerInvoiceSendEventField,
-            );
-
-            if (array_key_exists(ConfigInterface::TriggerInvoiceSendEvent_OrderStatus, $triggerInvoiceSendEventOptions)) {
-                $options = $this->getOrderStatusesList();
-                $fields['invoiceSettingsHeader']['fields']['triggerOrderStatus'] = array(
+                'triggerOrderStatus' => array(
                     'name' => 'triggerOrderStatus[]',
                     'type' => 'select',
                     'label' => $this->t('field_triggerOrderStatus'),
                     'description' => $this->t('desc_triggerOrderStatus'),
-                    'options' => $options,
+                    'options' => $orderStatuses,
                     'attributes' => array(
                         'multiple' => true,
-                        'size' => min(count($options), 8),
+                        'size' => min(count($orderStatuses), 8),
                     ),
-                );
-            }
+                ),
+                'triggerInvoiceEvent' => $invoiceTriggerEventField,
+            );
 
             // 3rd and 4th fieldset. Settings per active payment method.
             $paymentMethods = $this->shopCapabilities->getPaymentMethods();

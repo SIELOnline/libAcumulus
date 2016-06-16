@@ -31,23 +31,17 @@ interface ShopCapabilitiesInterface
     public function getShopOrderStatuses();
 
     /**
-     * Returns a list of events that can trigger the automatic sending of an
-     * invoice.
+     * Returns an option list of all shop invoice related events.
      *
-     * This may differ per shop as not all shops define events for all moments
-     * that can be used to trigger the sending of an invoice.
-     *
-     * Overrides should typically return a subset of the constants defined in
-     * this base implementation. The return array may be empty or only contain
-     * ConfigInterface::TriggerInvoiceSendEvent_None, to indicate that no
-     * automatic sending is possible (shop does not define any event like
-     * model).
+     * This list represents the shop initiated events that may trigger the
+     * sending of the invoice to Acumulus.
      *
      * @return array
-     *   An array keyed by the option values and having translated descriptions
-     *   as values.
+     *   An array of all shop invoice related events, with the key being the ID
+     *   for the dropdown item (a ConfigInterface::TriggerInvoiceEvent_...
+     *   const) and the value being the label for the dropdown item.
      */
-    public function getTriggerInvoiceSendEventOptions();
+    public function getInvoiceTriggerEvents();
 
     /**
      * Returns a list of valid sources that can be used as invoice number.

@@ -54,8 +54,6 @@ class ConfigStore extends BaSeConfigStore
      */
     public function save(array $values)
     {
-        $values = $this->saveCommon($values);
-
         $result = true;
         foreach ($values as $key => $value) {
             if ($value !== null) {

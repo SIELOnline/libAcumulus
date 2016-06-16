@@ -10,17 +10,17 @@ namespace Siel\Acumulus\Shop;
 interface ConfigInterface
 {
     // Web shop configuration related constants.
-    const TriggerInvoiceSendEvent_None = 0;
-    const TriggerInvoiceSendEvent_OrderStatus = 1;
-    const TriggerInvoiceSendEvent_InvoiceCreate = 2;
+    const TriggerInvoiceEvent_None = 0;
+    const TriggerInvoiceEvent_Create = 1;
+    const TriggerInvoiceEvent_Send = 2;
 
     /**
      * Returns the set of settings related to reacting to shop events.
      *
      * @return array
      *   A keyed array with the keys:
-     *   - triggerInvoiceSendEvent
      *   - triggerOrderStatus
+     *   - triggerInvoiceEvent
      */
     public function getShopEventSettings();
 }

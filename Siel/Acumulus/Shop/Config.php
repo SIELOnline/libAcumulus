@@ -320,6 +320,24 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
      */
     public function save(array $values)
     {
+        // Log values in a notice but without the password.
+        $copy = $values;
+        if (!empty($copy['password'])) {
+            $copy['password'] = 'REMOVED FOR SECURITY';
+        }
+        Log::getInstance()->notice('ConfigStore::save(): saving %s', serialize($copy));
+
+        // Remove password if not sent along. We have had some reports that
+        // passwords were gone missing, perhaps some shops do not send the value
+        // of password fields to the client???
+        if (array_key_exists('password', $values) && empty($values['password'])) {
+            unset($values['password']);
+        }
+
+        // As not all values need to be passed and some config stores store all
+        // values in 1 record, we first load all stored values, then save the
+        // merged set of (casted) values.
+        $values += $this->getConfigStore()->load($this->getKeys());
         $values = $this->castValues($values);
         $result = $this->getConfigStore()->save($values);
         $this->isLoaded = false;
@@ -809,15 +827,15 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
                     'type' => 'int',
                     'default' => InvoiceConfigInterface::InvoiceDate_InvoiceCreate,
                 ),
-                'triggerInvoiceSendEvent' => array(
-                    'group' => 'event',
-                    'type' => 'int',
-                    'default' => ConfigInterface::TriggerInvoiceSendEvent_OrderStatus,
-                ),
                 'triggerOrderStatus' => array(
                     'group' => 'event',
                     'type' => 'array',
                     'default' => array(),
+                ),
+                'triggerInvoiceEvent' => array(
+                    'group' => 'event',
+                    'type' => 'int',
+                    'default' => ConfigInterface::TriggerInvoiceEvent_None,
                 ),
                 'emailAsPdf' => array(
                     'group' => 'emailaspdf',
@@ -864,35 +882,22 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
      *
      * This method is only called when the module gets updated.
      *
-     * @param string $newVersion
-     *   The new version of the module.
      * @param string $currentVersion
-     *   The current version of the module (if it can be retrieved).
+     *   The current version of the module.
      *
      * @return bool
      *   Success.
      */
-    public function upgrade($newVersion, $currentVersion = '')
+    public function upgrade($currentVersion)
     {
-        // 4.5.0 Changes: execute when this is 4.5.0 or when we know that the
-        // current version was before and the new version is after.
-        if ($newVersion === '4.5.0' || $newVersion === '4.5.2' || ($currentVersion !== '' && version_compare($currentVersion, '4.5.2', '<') && version_compare($newVersion, '4.5.2', '>='))) {
+        $result = true;
+
+        // 4.5.0 upgrade.
+        if (version_compare($currentVersion, '4.5.0', '<')) {
             // Keep track of settings that should be updated.
             $newSettings = array();
-            // 1) triggerInvoiceSendEvent is no longer accessible if there's no
-            // choice anyway. Many people forgot to set it, that's why it is
-            // removed, but that means that we have to set it, if not set.
-            if ($this->get('triggerInvoiceSendEvent') == ConfigInterface::TriggerInvoiceSendEvent_None) {
-                $triggerOptions = $this->getShopCapabilities()->getTriggerInvoiceSendEventOptions();
-                if (count($triggerOptions) === 2 && array_key_exists(ConfigInterface::TriggerInvoiceSendEvent_None, $triggerOptions)) {
-                    while (key($triggerOptions) === ConfigInterface::TriggerInvoiceSendEvent_None) {
-                        next($triggerOptions);
-                    }
-                    $newSettings['triggerInvoiceSendEvent'] = key($triggerOptions);
-                }
-            }
 
-            // 2) Log level: added level info and set log level to notice if
+            // 1) Log level: added level info and set log level to notice if
             // it currently is error or warning.
             switch ($this->get('logLevel')) {
                 case Log::Error:
@@ -907,19 +912,38 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
                     break;
             }
 
-            // 3) Debug mode: the values of test mode and stay local are
+            // 2) Debug mode: the values of test mode and stay local are
             // switched, Stay local is no longer used. so both these 2 values
             // become the new test mode.
             switch ($this->get('debug')) {
-                case ServiceConfigInterface::Debug_StayLocal:
+                case 4: // Value for deprecated ServiceConfigInterface::Debug_StayLocal.
                     $newSettings['logLevel'] = ServiceConfigInterface::Debug_TestMode;
                     break;
             }
 
             if (!empty($newSettings)) {
-                $this->save($newSettings);
+                $result = $this->save($newSettings) && $result;
             }
         }
-        return true;
+
+        // 4.5.3 upgrade:
+        // - setting triggerInvoiceSendEvent removed.
+        // - setting triggerInvoiceEvent introduced.
+        if (version_compare($currentVersion, '4.5.3', '<')) {
+            // Get current values.
+            $values = $this->castValues($this->getConfigStore()->load($this->getKeys()));
+
+            if ($this->get('triggerInvoiceSendEvent') == 2) {
+                $values['triggerInvoiceEvent'] = ConfigInterface::TriggerInvoiceEvent_Create;
+            }
+            else {
+                $values['triggerInvoiceEvent'] = ConfigInterface::TriggerInvoiceEvent_None;
+            }
+            unset($values['triggerInvoiceSendEvent']);
+
+            $result = $this->getConfigStore()->save($values) && $result;
+        }
+
+        return $result;
     }
 }

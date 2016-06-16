@@ -9,6 +9,7 @@ use Siel\Acumulus\Helpers\TranslationCollection;
 class Translations extends TranslationCollection
 {
     protected $nl = array(
+
         'message_error' => 'Fout',
         'message_warning' => 'Waarschuwing',
         'message_info_for_user' => 'De informatie hieronder wordt alleen getoond om eventuele support te vergemakkelijken. U kunt deze informatie negeren.',

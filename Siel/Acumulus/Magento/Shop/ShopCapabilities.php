@@ -2,6 +2,7 @@
 namespace Siel\Acumulus\Magento\Shop;
 
 use Mage;
+use Siel\Acumulus\Shop\ConfigInterface;
 use Siel\Acumulus\Shop\ShopCapabilities as ShopCapabilitiesBase;
 
 /**
@@ -19,6 +20,16 @@ class ShopCapabilities extends ShopCapabilitiesBase
         foreach ($items as $item) {
             $result[reset($item)] = next($item);
         }
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getInvoiceTriggerEvents()
+    {
+        $result = parent::getInvoiceTriggerEvents();
+        $result[ConfigInterface::TriggerInvoiceEvent_Create] = $this->t('option_triggerInvoiceEvent_1');
         return $result;
     }
 

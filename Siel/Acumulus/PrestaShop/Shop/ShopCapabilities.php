@@ -28,23 +28,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
 
     /**
      * {@inheritdoc}
-     *
-     * This override removes the 'Use invoice sent' option as PS does not have
-     * an event on creating/sending the invoice.
-     *
-     * @todo: PS has the 'actionSetInvoice' event, can we use that?
-     * This event fires when the order state changes to a state that allows an
-     * invoice and on manually creating one via the adminOrdersController page.
-     */
-    public function getTriggerInvoiceSendEventOptions()
-    {
-        $result = parent::getTriggerInvoiceSendEventOptions();
-        unset($result[ConfigInterface::TriggerInvoiceSendEvent_InvoiceCreate]);
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
      */
     public function getPaymentMethods()
     {

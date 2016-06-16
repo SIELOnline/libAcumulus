@@ -36,7 +36,7 @@ class ConfigStore extends BaSeConfigStore
     public function getShopDefaults()
     {
         return array(
-            'triggerInvoiceSendEvent' => ConfigInterface::TriggerInvoiceSendEvent_InvoiceCreate,
+            'triggerInvoiceEvent' => ConfigInterface::TriggerInvoiceEvent_None,
         );
     }
 
@@ -70,7 +70,6 @@ class ConfigStore extends BaSeConfigStore
     public function save(array $values)
     {
         $resourceConfig = $this->getResourceConfig();
-        $values = $this->saveCommon($values);
         foreach ($values as $key => $value) {
             if ($value !== null) {
                 if (is_bool($value)) {

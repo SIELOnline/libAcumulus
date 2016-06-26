@@ -13,6 +13,7 @@ class Translations extends TranslationCollection
         Source::CreditNote => 'creditnota',
         Source::Other => 'overig',
 
+        'for' => 'voor',
         'vat' => 'BTW',
         'inc_vat' => 'incl. BTW',
         'ex_vat' => 'excl. BTW',
@@ -45,6 +46,7 @@ class Translations extends TranslationCollection
         Source::CreditNote => 'credit note',
         Source::Other => 'other',
 
+        'for' => 'for',
         'vat' => 'VAT',
         'inc_vat' => 'incl. VAT',
         'ex_vat' => 'ex. VAT',

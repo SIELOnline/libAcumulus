@@ -132,7 +132,7 @@ class Creator extends BaseCreator
 
     /**
      * {@inheritdoc}
-     * 
+     *
      * This override returns the id of a WC_Payment_Gateway.
      */
     protected function getPaymentMethod()
@@ -191,6 +191,21 @@ class Creator extends BaseCreator
     protected function getPaymentDateCreditNote()
     {
         return substr($this->shopSource->post->post_modified, 0, strlen('2000-01-01'));
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * This implementation refers to the original order for refunds.
+     */
+    protected function getDescription()
+    {
+        $result = parent::getDescription();
+        if ($this->invoiceSource->getType() === Source::CreditNote) {
+            $parent = $this->config->getSource(Source::Order, $this->order);
+            $result .= ' ' . $this->t('for') . ' ' . $this->t($parent->getType()) . ' ' . $parent->getReference();
+        }
+        return $result;
     }
 
     /**

@@ -90,4 +90,12 @@ class Source extends BaseSource
     {
         return $this->source->getState();
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getOriginalOrder()
+    {
+        return new Source(Source::Order, $this->source->getOrder());
+    }
 }

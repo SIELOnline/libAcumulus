@@ -88,4 +88,12 @@ class Source extends BaseSource
             }
         }
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getOriginalOrder()
+    {
+        return new Source(Source::Order, $this->source->id_order);
+    }
 }

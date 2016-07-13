@@ -123,6 +123,36 @@ abstract class Source
     }
 
     /**
+     * Returns the original invoice source for this invoice source.
+     *
+     * The base implementation returns the result of getOriginalOrder() for
+     * credit notes and null for non credit notes. Normally, a shop should not
+     * override this method but override getOriginalOrder() instead.
+     *
+     * @return Source|null
+     *   If the invoice source is a credit note, the original order is returned,
+     *   otherwise null.
+     */
+    public function getOriginalSource()
+    {
+        return $this->type === Source::CreditNote ? $this->getOriginalOrder(): null;
+    }
+
+    /**
+     * Returns the original order for this credit note.
+     *
+     * The base implementation returns null. Override if the shop supports
+     * credit notes.
+     *
+     * @return Source|null
+     *   The original order for this credit note, or null if unknown.
+     */
+    protected function getOriginalOrder()
+    {
+        return null;
+    }
+
+    /**
      * Calls a method that typically depends on the type of invoice source.
      *
      * @param string $method

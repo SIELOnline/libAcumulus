@@ -477,7 +477,12 @@ abstract class Creator
      */
     protected function getDescription()
     {
-        return ucfirst($this->t($this->invoiceSource->getType())) . ' ' . $this->invoiceSource->getReference();
+        $result = ucfirst($this->t($this->invoiceSource->getType())) . ' ' . $this->invoiceSource->getReference();
+        if ($this->invoiceSource->getOriginalSource() !== null) {
+            $parent = $this->invoiceSource->getOriginalSource();
+            $result .= ' ' . $this->t('for') . ' ' . $this->t($parent->getType()) . ' ' . $parent->getReference();
+        }
+        return $result;
     }
 
     /**

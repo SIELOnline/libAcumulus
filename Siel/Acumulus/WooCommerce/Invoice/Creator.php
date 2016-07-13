@@ -196,21 +196,6 @@ class Creator extends BaseCreator
     /**
      * {@inheritdoc}
      *
-     * This implementation refers to the original order for refunds.
-     */
-    protected function getDescription()
-    {
-        $result = parent::getDescription();
-        if ($this->invoiceSource->getType() === Source::CreditNote) {
-            $parent = $this->config->getSource(Source::Order, $this->order);
-            $result .= ' ' . $this->t('for') . ' ' . $this->t($parent->getType()) . ' ' . $parent->getReference();
-        }
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
      * This override provides the values meta-invoice-amountinc and
      * meta-invoice-vatamount.
      */

@@ -133,8 +133,8 @@ class Creator extends BaseCreator
      */
     protected function getPaymentMethod()
     {
-        if (isset($this->order->order_payment_method)) {
-            return $this->order->order_payment_method;
+        if (isset($this->order->order_payment_id)) {
+            return $this->order->order_payment_id;
         }
         return parent::getPaymentMethod();
     }

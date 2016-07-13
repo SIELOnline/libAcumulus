@@ -3,7 +3,7 @@ namespace Siel\Acumulus\Joomla\HikaShop\Shop;
 
 use Siel\Acumulus\Invoice\ConfigInterface as InvoiceConfigInterface;
 use Siel\Acumulus\Invoice\Source;
-use Siel\Acumulus\Shop\ConfigInterface;
+use Siel\Acumulus\Joomla\Helpers\Log;
 use Siel\Acumulus\Shop\ShopCapabilities as ShopCapabilitiesBase;
 
 /**
@@ -62,8 +62,8 @@ class ShopCapabilities extends ShopCapabilitiesBase
         $pluginClass = hikashop_get('class.plugins');
         $paymentPlugins = $pluginClass->getMethods('payment');
         foreach ($paymentPlugins as $paymentPlugin) {
-            if (!empty($paymentPlugin->enabled)) {
-                $result[$paymentPlugin->payment_type] = $paymentPlugin->payment_name;
+            if (!empty($paymentPlugin->enabled) && !empty($paymentPlugin->payment_published)) {
+                $result[$paymentPlugin->payment_id] = $paymentPlugin->payment_name;
             }
         }
         return $result;

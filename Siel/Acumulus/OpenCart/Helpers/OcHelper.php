@@ -148,23 +148,24 @@ class OcHelper
      */
     public function confirmUninstall()
     {
-        $this->displayFormCommon('uninstall');
-
-        // Are we confirming, or should we show the confirm message?
-        if ($this->registry->request->server['REQUEST_METHOD'] === 'POST') {
+        // @todo: implement uninstall form
+//        $this->displayFormCommon('uninstall');
+//
+//        // Are we confirming, or should we show the confirm message?
+//        if ($this->registry->request->server['REQUEST_METHOD'] === 'POST') {
             $this->doUninstall();
             $this->registry->response->redirect($this->registry->url->link('extension/module', 'token=' . $this->registry->session->data['token'],
                 'SSL'));
-        }
-
-        // Add an intermediate level to the breadcrumb.
-        $this->data['breadcrumbs'][] = array(
-            'text' => $this->t('modules'),
-            'href' => $this->registry->url->link('extension/module', 'token=' . $this->registry->session->data['token'], 'SSL'),
-            'separator' => ' :: '
-        );
-
-        $this->renderFormCommon('confirmUninstall', 'button_confirm_uninstall');
+//        }
+//
+//        // Add an intermediate level to the breadcrumb.
+//        $this->data['breadcrumbs'][] = array(
+//            'text' => $this->t('modules'),
+//            'href' => $this->registry->url->link('extension/module', 'token=' . $this->registry->session->data['token'], 'SSL'),
+//            'separator' => ' :: '
+//        );
+//
+//        $this->renderFormCommon('confirmUninstall', 'button_confirm_uninstall');
     }
 
     /**

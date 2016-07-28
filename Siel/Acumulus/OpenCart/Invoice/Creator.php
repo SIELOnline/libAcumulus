@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\OpenCart\Invoice;
 
+use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\ConfigInterface;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
@@ -323,6 +324,13 @@ class Creator extends BaseCreator
             $result += array(
                 'vatrate' => -1,
                 'meta-vatrate-source' => Creator::VatRateSource_Exact0,
+            );
+        } else if (Number::isZero($line['value'])) {
+            // 0-cost lines - e.g. free shipping - also don't have a tax amount,
+            // let the completor add the highest appearing vat rate.
+            $result += array(
+                'vatrate' => null,
+                'meta-vatrate-source' => Creator::VatRateSource_Completor,
             );
         } else {
             // Other lines do not have a discoverable vatrate, let a strategy try to

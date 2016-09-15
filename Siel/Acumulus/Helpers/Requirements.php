@@ -28,7 +28,7 @@ class Requirements
             $result['message_error_req_xml'] = 'The SimpleXML extension needs to be activated on your server for the Acumulus module to be able to work with the XML format.';
         }
         if (!extension_loaded('dom')) {
-            $result['message_error_req_dom'] = 'The DOM PHP extension needs to be activated on your server for the Acumulus mpdule to work.';
+            $result['message_error_req_dom'] = 'The DOM PHP extension needs to be activated on your server for the Acumulus module to work.';
         }
 
         return $result;

@@ -43,8 +43,18 @@ class Registry
     {
         /** @var \Magento\Framework\App\Bootstrap */
         global $bootstrap;
+
+        // @todo!!!: $bootstrap is niet altijd geinitialiseerd (bv bij een cmdline update).
+        if ($bootstrap) {
+            $localBootstrap = $bootstrap;
+        }
+        else {
+            $pos = strpos(__DIR__, str_replace('/', DIRECTORY_SEPARATOR, '/app/code/Siel/Acumulus/Magento2/Helpers'));
+            $root = substr(__DIR__, 0, $pos);
+            $localBootstrap = \Magento\Framework\App\Bootstrap::create($root, $_SERVER);
+        }
         /** @var \Magento\Framework\ObjectManagerInterface */
-        $this->objectManager = $bootstrap->getObjectManager();
+        $this->objectManager = $localBootstrap->getObjectManager();
     }
 
     /**

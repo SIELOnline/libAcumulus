@@ -807,7 +807,7 @@ abstract class Creator
     }
 
     /**
-     * Helper method to add a value to an array even if it is not set.
+     * Helper method to add a value to an array even if it is empty.
      *
      * @param array $array
      * @param string $key

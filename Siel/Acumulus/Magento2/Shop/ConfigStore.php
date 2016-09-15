@@ -1,7 +1,7 @@
 <?php
 namespace Siel\Acumulus\Magento2\Shop;
 
-use Magento\Framework\AppInterface;
+use Magento\Framework\App\ObjectManager;
 use Siel\Acumulus\Magento2\Helpers\Registry;
 use Siel\Acumulus\Shop\ConfigInterface;
 use Siel\Acumulus\Shop\ConfigStore as BaseConfigStore;
@@ -18,11 +18,15 @@ class ConfigStore extends BaSeConfigStore
      */
     public function getShopEnvironment()
     {
+        /** @var \Magento\Framework\App\ProductMetadataInterface $productMetadata */
+        $productMetadata = ObjectManager::getInstance()->get('Magento\Framework\App\ProductMetadataInterface');
+        $version = $productMetadata->getVersion();
+
         $moduleResource = Registry::getInstance()->getModuleResource();
         $environment = array(
             'moduleVersion' => $moduleResource->getDbVersion('Siel_AcumulusMa2'),
             'shopName' => $this->shopName,
-            'shopVersion' => AppInterface::VERSION,
+            'shopVersion' => $version,
         );
 
         return $environment;
@@ -32,6 +36,7 @@ class ConfigStore extends BaSeConfigStore
      * {@inheritdoc}
      *
      * For Magento, the default trigger event is the invoice creation event.
+     * @todo: the code does not seem to match this comment ...
      */
     public function getShopDefaults()
     {

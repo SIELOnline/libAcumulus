@@ -18,6 +18,7 @@ class Log extends BaseLog
     protected function write($message, $severity)
     {
         $message = sprintf('Acumulus: %s', $message);
+        // @todo: check if this always gets logged and use own file.
         Mage::log($message, $this->getMagentoSeverity($severity));
     }
 

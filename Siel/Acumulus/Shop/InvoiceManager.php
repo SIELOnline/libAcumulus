@@ -292,7 +292,9 @@ abstract class InvoiceManager
                     }
                     else {
                         // If the invoice was sent as a concept, no entryid will
-                        // be returned: check for errors and the concept status
+                        // be returned but we still want to prevent sending it
+                        // again: check for the concept status and the absence
+                        // of errors.
                         if (empty($result['errors']) && $invoice['customer']['invoice']['concept'] == Config::Concept_Yes) {
                             $this->config->getAcumulusEntryModel()->save($invoiceSource, null, null);
                         }

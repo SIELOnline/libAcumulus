@@ -59,7 +59,7 @@ class OcHelper extends BaseOcHelper
         $result = parent::doInstall();
 
         // Install events
-        if (empty($this->data['error_warnings'])) {
+        if (empty($this->data['error_messages'])) {
             $this->installEvents();
         }
 
@@ -79,9 +79,8 @@ class OcHelper extends BaseOcHelper
     protected function installEvents()
     {
         $this->uninstallEvents();
-        $this->registry->model_extension_event->addEvent('acumulus', 'post.order.add', 'module/acumulus/eventOrderUpdate');
-        $this->registry->model_extension_event->addEvent('acumulus', 'post.order.history.add',
-            'module/acumulus/eventOrderUpdate');
+        $this->registry->model_extension_event->addEvent('acumulus', 'catalog/model/checkout/order/addOrder/after', 'module/acumulus/eventOrderUpdate');
+        $this->registry->model_extension_event->addEvent('acumulus', 'catalog/model/checkout/order/addOrderHistory/after', 'module/acumulus/eventOrderUpdate');
     }
 
     /**

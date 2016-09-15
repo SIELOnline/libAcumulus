@@ -39,6 +39,7 @@ class OcHelper
         Registry::setRegistry($registry);
         $this->registry = Registry::getInstance();
         $this->shopNamespace = $shopNamespace;
+        $this->data = array();
     }
 
     protected function addError($message)
@@ -266,6 +267,8 @@ class OcHelper
         $setting = $this->registry->model_setting_setting->getSetting('acumulus_siel');
         $currentDataModelVersion = isset($setting['acumulus_siel_datamodel_version']) ? $setting['acumulus_siel_datamodel_version'] : '';
 
+        Log::getInstance()->info('%s: current version = %s', __METHOD__, $currentDataModelVersion);
+
         if ($currentDataModelVersion === '' || version_compare($currentDataModelVersion, '4.0', '<')) {
             // Check requirements (we assume this has been done successfully
             // before if the data model is at the latest version).
@@ -273,6 +276,7 @@ class OcHelper
             $messages = $requirements->check();
             foreach ($messages as $message) {
                 $this->addError($message['message']);
+                Log::getInstance()->error($message['message']);
             }
             if (!empty($messages)) {
                 return false;
@@ -287,6 +291,7 @@ class OcHelper
         else if (version_compare($currentDataModelVersion, '4.4', '<')) {
             // Update table columns.
             if ($result = $this->acumulusConfig->getAcumulusEntryModel()->upgrade('4.4.0')) {
+                // @todo: set to ConfigInterface::libraryVersion ? (as in doUpgrade()?)
                 $setting['acumulus_siel_datamodel_version'] = '4.4';
                 $this->registry->model_setting_setting->editSetting('acumulus_siel', $setting);
             }
@@ -333,6 +338,8 @@ class OcHelper
         $setting = $this->registry->model_setting_setting->getSetting('acumulus_siel');
         $currentDataModelVersion = isset($setting['acumulus_siel_datamodel_version']) ? $setting['acumulus_siel_datamodel_version'] : '';
         $apiVersion = ConfigInterface::libraryVersion;
+
+        Log::getInstance()->info('%s: installed version = %s, API = %s', __METHOD__, $currentDataModelVersion, $apiVersion);
 
         if (version_compare($currentDataModelVersion, $apiVersion, '<')) {
             // Update config settings.

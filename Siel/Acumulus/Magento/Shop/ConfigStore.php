@@ -31,6 +31,7 @@ class ConfigStore extends BaSeConfigStore
      * {@inheritdoc}
      *
      * For Magento, the default trigger event is the invoice creation event.
+     * @todo: the code does not seem to match this comment ...
      */
     public function getShopDefaults()
     {

@@ -137,8 +137,8 @@ Vink deze optie aan als u geen regel op uw factuur of pakbon wil voor gratis ver
         'desc_versionInformation' => 'Vermeld aub deze gegevens bij een supportverzoek.',
 
         'field_debug' => 'Factuur verzendmodus',
-        'option_debug_1' => 'Ontvang alleen een mail bij fouten of waarschuwingen tijdens het vezenden van een factuur naar Acumulus.',
-        'option_debug_2' => 'Ontvang altijd een mail met de resultaten bij het vezenden van een factuur naar Acumulus.',
+        'option_debug_1' => 'Ontvang alleen een mail bij fouten of waarschuwingen tijdens het verzenden van een factuur naar Acumulus.',
+        'option_debug_2' => 'Ontvang altijd een mail met de resultaten bij het verzenden van een factuur naar Acumulus.',
         'option_debug_3' => 'Verstuur facturen in test modus naar Acumulus. Acumulus zal alleen de factuur controleren op fouten en waarschuwingen maar zal deze niet opslaan.',
         'option_debug_4' => 'Verzend berichten naar Acumulus maar ontvang wel een mail met het bericht zoals dat vestuurd zou zijn.',
         'desc_debug' => 'U kunt hier een verzend modus kiezen. Kies voor de eerste optie tenzij u i.v.m. een supportverzoek bent geïnstrueerd om iets anders te kiezen.',

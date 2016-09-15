@@ -617,8 +617,10 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
      */
     public function getHostName()
     {
-        $hostName = parse_url($_SERVER['REQUEST_URI'], PHP_URL_HOST);
-        if ($hostName) {
+        if (!empty($_SERVER['REQUEST_URI'])) {
+            $hostName = parse_url($_SERVER['REQUEST_URI'], PHP_URL_HOST);
+        }
+        if (!empty($hostName)) {
             if ($pos = strpos($hostName, 'www.') !== false) {
                 $hostName = substr($hostName, $pos + strlen('www.'));
             }

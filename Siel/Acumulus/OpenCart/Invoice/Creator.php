@@ -230,16 +230,19 @@ class Creator extends BaseCreator
                 // All options on 1 item.
                 $result['product'] .= ' (' . implode(', ', $optionsTexts) . ')';
             } else {
-                // All options on their own item.
+                // All options on their own line.
+                // VAT info should not contain a 0 vatamount.
+                $optionsVatInfo = $vatInfo;
+                $optionsVatInfo['vatamount'] = 0;
                 foreach ($optionsTexts as $optionsText) {
                     $optionsLines[] = array(
-                            'product' => " - $optionsText",
-                            'unitprice' => 0,
-                            // Table order_option does not have a quantity
-                            // field, so composite products are apparently not
-                            // covered.
-                            'quantity' => 1,
-                        ) + $vatInfo;
+                        'product' => " - $optionsText",
+                        'unitprice' => 0,
+                        // Table order_option does not have a quantity field, so
+                        // composite products with multiple same sub product
+                        // are apparently not covered.
+                        'quantity' => 1,
+                      ) + $optionsVatInfo;
                 }
             }
         }

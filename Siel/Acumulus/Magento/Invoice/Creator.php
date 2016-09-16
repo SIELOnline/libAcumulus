@@ -330,8 +330,8 @@ class Creator extends BaseCreator
         // - for the same item number, and quantity
         // - with no price info on the child
         // We seem to be processing a configurable product that for some reason
-        // appears twice: do not add the child, but copy the product description to
-        // the result as it contains more option descriptions.
+        // appears twice: do not add the child, but copy the product description
+        // to the result as it contains more option descriptions.
         // @todo: refine this: when to add just 1 line, when multiple lines (see OC)
         if (count($childLines) === 1
             && $result['itemnumber'] === $childLines[0]['itemnumber']
@@ -348,6 +348,11 @@ class Creator extends BaseCreator
                 // info from all child lines (to prevent accounting amounts twice).
                 foreach ($childLines as &$childLine) {
                     $childLine['unitprice'] = 0;
+                    $childLine['unitpriceinc'] = 0;
+                    $childLine['meta-line-vatamount'] = 0;
+                    if (isset($childLine['meta-line-discount-amountinc'])) {
+                        unset($childLine['meta-line-discount-amountinc']);
+                    }
                     $childLine['vatrate'] = $result['vatrate'];
                 }
             } else {
@@ -372,12 +377,22 @@ class Creator extends BaseCreator
                     // accounting amounts twice.
                     foreach ($childLines as &$childLine) {
                         $childLine['unitprice'] = 0;
+                        $childLine['unitpriceinc'] = 0;
+                        $childLine['meta-line-vatamount'] = 0;
+                        if (isset($childLine['meta-line-discount-amountinc'])) {
+                            unset($childLine['meta-line-discount-amountinc']);
+                        }
                         $childLine['vatrate'] = $result['vatrate'];
                     }
                 } else {
                     // All price and vat info is/remains on the child lines.
                     // Make sure no price and vat info is left on the bundle line.
                     $result['unitprice'] = 0;
+                    $result['unitpriceinc'] = 0;
+                    $result['meta-line-vatamount'] = 0;
+                    if (isset($result['meta-line-discount-amountinc'])) {
+                        unset($result['meta-line-discount-amountinc']);
+                    }
                     $result['vatrate'] = -1;
                 }
             }

@@ -223,8 +223,8 @@ class Creator extends BaseCreator
         $productPriceEx = (float) $item->order_product_price;
         $productVat = (float) $item->order_product_tax;
 
-        // Note that this info remains correct when rates are changed as upon order
-        // creation this info is stored in the order_product table.
+        // Note that this info remains correct when rates are changed as upon
+        // order creation this info is stored in the order_product table.
         if (is_array($item->order_product_tax_info) && count($item->order_product_tax_info) === 1) {
             $productVatInfo = reset($item->order_product_tax_info);
             if (!empty($productVatInfo->tax_rate)) {

@@ -339,10 +339,16 @@ class Creator extends BaseCreator
         // keep price info on bundle level or child level?
         if (count($childLines) > 0) {
             if ($item->getPriceInclTax() > 0.0 && ($item->getTaxPercent() > 0 || $item->getTaxAmount() == 0.0)) {
-                // If the bundle line contains valid price and tax info, we remove that
-                // info from all child lines (to prevent accounting amounts twice).
+                // If the bundle line contains valid price and tax info, we
+                // remove that info from all child lines to prevent accounting
+                // amounts twice.
                 foreach ($childLines as &$childLine) {
                     $childLine['unitprice'] = 0;
+                    $childLine['unitpriceinc'] = 0;
+                    $childLine['meta-line-vatamount'] = 0;
+                    if (isset($childLine['meta-line-discount-amountinc'])) {
+                        unset($childLine['meta-line-discount-amountinc']);
+                    }
                     $childLine['vatrate'] = $result['vatrate'];
                 }
             } else {
@@ -362,17 +368,27 @@ class Creator extends BaseCreator
                 }
 
                 if ($vatRate !== null && $vatRate == $result['vatrate'] && $productPriceEx != 0.0) {
-                    // Bundle has price info and same vat as ALL children: use price and
-                    // vat info from bundle line and remove it from child lines to prevent
-                    // accounting amounts twice.
+                    // Bundle has price info and same vat as ALL children: use
+                    // price and vat info from bundle line and remove it from
+                    // child lines to prevent accounting amounts twice.
                     foreach ($childLines as &$childLine) {
                         $childLine['unitprice'] = 0;
+                        $childLine['unitpriceinc'] = 0;
+                        $childLine['meta-line-vatamount'] = 0;
+                        if (isset($childLine['meta-line-discount-amountinc'])) {
+                            unset($childLine['meta-line-discount-amountinc']);
+                        }
                         $childLine['vatrate'] = $result['vatrate'];
                     }
                 } else {
-                    // All price and vat info is/remains on the child lines.
-                    // Make sure no price and vat info is left on the bundle line.
+                    // All price and vat info remains on the child lines. Make
+                    // sure no price and vat info is left on the bundle line.
                     $result['unitprice'] = 0;
+                    $result['unitpriceinc'] = 0;
+                    $result['meta-line-vatamount'] = 0;
+                    if (isset($result['meta-line-discount-amountinc'])) {
+                        unset($result['meta-line-discount-amountinc']);
+                    }
                     $result['vatrate'] = -1;
                 }
             }

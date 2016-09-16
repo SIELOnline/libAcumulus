@@ -8,13 +8,13 @@ use Siel\Acumulus\Helpers\Number;
  * complete invoice lines before sending them to Acumulus.
  *
  * This class:
- * - Adds required but missing fields on the invoice lines.
  * - Validates (and correct rounding errors of) vat rates using the VAT rate
  *   lookup webservice call.
+ * - Adds required but missing fields on the invoice lines.
  * - Adds vat rates to 0 price lines (with a 0 price and thus 0 vat, not all
  *   web shops can fill in a vat rate).
- *
- * @package Siel\Acumulus
+ * - Completes meta data that may be used in the strategy phase or just for
+ *   support purposes.
  */
 class CompletorInvoiceLines
 {
@@ -26,10 +26,10 @@ class CompletorInvoiceLines
 
     /**
      * @var int[]
-     *   The list of possible vat types, initially filled with possible vat types
-     *   based on client country, invoiceHasLineWithVat(), is_company(), and the
-     *   digital services setting. But then reduced by VAT rates we find on the
-     *   order lines.
+     *   The list of possible vat types, initially filled with possible vat
+     *   types based on client country, invoiceHasLineWithVat(), is_company(),
+     *   and the digital services setting. But then reduced by VAT rates we find
+     *   on the order lines.
      */
     protected $possibleVatTypes;
 
@@ -51,11 +51,9 @@ class CompletorInvoiceLines
      *   The invoice to complete.
      * @param int[] $possibleVatTypes
      * @param array[] $possibleVatRates
-     *   A response structure where errors and warnings can be added. Any local
-     *   messages will be added to arrays under the keys 'errors' and 'warnings'.
      *
-     * @return array The completed invoice.
-     * The completed invoice.
+     * @return array
+     *   The completed invoice.
      */
     public function complete(array $invoice, array $possibleVatTypes, array $possibleVatRates)
     {
@@ -74,14 +72,16 @@ class CompletorInvoiceLines
      */
     protected function completeInvoiceLines()
     {
-        $this->completeLineRequiredData();
+        // correctCalculatedVatRates() only uses vatrate, meta-vatrate-min, and
+        // meta-vatrate-max, so may be called before completeLineRequiredData().
         $this->correctCalculatedVatRates();
+        $this->completeLineRequiredData();
         $this->addVatRateTo0PriceLines();
         $this->completeLineMetaData();
     }
 
     /**
-     * Completes the fields that are required by the rest of this completor phase.
+     * Completes fields that are required by the rest of this completor phase.
      *
      * The creator filled in the fields that are directly available from the
      * shops' data store. This method completes (if not filled in):
@@ -93,9 +93,7 @@ class CompletorInvoiceLines
         foreach ($invoiceLines as &$line) {
             if (!isset($line['unitprice'])) {
                 if (isset($line['unitpriceinc'])) {
-                    if (isset($line['vatamount'])) {
-                        $line['unitprice'] = $line['unitpriceinc'] - $line['vatamount'];
-                    } else if (isset($line['vatrate']) && in_array($line['meta-vatrate-source'], Completor::$CorrectVatRateSources)) {
+                    if (isset($line['vatrate']) && in_array($line['meta-vatrate-source'], Completor::$CorrectVatRateSources)) {
                         if (isset($line['costprice'])) {
                             $margin = $line['unitpriceinc'] - $line['costprice'];
                             if ($margin > 0) {
@@ -109,6 +107,13 @@ class CompletorInvoiceLines
                             $line['unitprice'] = $line['unitpriceinc'] / (100.0 + $line['vatrate']) * 100.0;
                         }
                     }
+                    else if (isset($line['vatamount'])) {
+                        $line['unitprice'] = $line['unitpriceinc'] - $line['vatamount'];
+                    }
+                    else {
+                        // We cannot fill in unitprice reliably, so better to
+                        // leave it empty to get a clear error message.
+                    }
                     $line['meta-calculated-fields'][] = 'unitprice';
                 }
             }
@@ -116,8 +121,10 @@ class CompletorInvoiceLines
     }
 
     /**
-     * Try to correct 'calculated' vat rates for rounding errors by matching them
-     * with possible vatRates
+     * Corrects 'calculated' vat rates.
+     *
+     * Tries to correct 'calculated' vat rates for rounding errors by matching
+     * them with possible vatRates obtained from the vat lookup service.
      */
     protected function correctCalculatedVatRates()
     {
@@ -133,16 +140,18 @@ class CompletorInvoiceLines
      *
      * The meta-vatrate-source must be Creator::VatRateSource_Calculated.
      *
-     * The check is done on comparing allowed vat rates with the meta-vatrate-min
-     * and meta-vatrate-max values. If only 1 match is found that will be used.
+     * The check is done on comparing allowed vat rates with the
+     * meta-vatrate-min and meta-vatrate-max values. If only 1 match is found
+     * that will be used.
      *
-     * If multiple matches are found with all equal rates - e.g. Dutch and Belgium
-     * 21% - the vat rate will be corrected, but the VAT Type will remain
-     * undecided.
+     * If multiple matches are found with all equal rates - e.g. Dutch and
+     * Belgium 21% - the vat rate will be corrected, but the VAT Type will
+     * remain undecided.
      *
-     * This method is public to allow a 2nd call to just this method for a single
-     * line (a missing amount line) added after a 1st round of correcting. Do not
-     * use unless $this->possibleVatRates has been initialized.
+     * This method is public to allow a 2nd call to just this method for a
+     * single line (a missing amount line) added after a 1st round of
+     * correcting. Do not use unless $this->possibleVatRates has been
+     * initialized.
      *
      * @param array $line
      *   A line with a calculated vat rate.
@@ -153,9 +162,9 @@ class CompletorInvoiceLines
     public function correctVatRateByRange(array $line)
     {
         $matchedVatRates = array();
-        foreach ($this->possibleVatRates as $vatRate) {
-            if ($vatRate['vatrate'] >= $line['meta-vatrate-min'] && $vatRate['vatrate'] <= $line['meta-vatrate-max']) {
-                $matchedVatRates[] = $vatRate;
+        foreach ($this->possibleVatRates as $vatRateInfo) {
+            if ($vatRateInfo['vatrate'] >= $line['meta-vatrate-min'] && $vatRateInfo['vatrate'] <= $line['meta-vatrate-max']) {
+                $matchedVatRates[] = $vatRateInfo;
             }
         }
 
@@ -176,9 +185,9 @@ class CompletorInvoiceLines
                   }, '');
             }
 
-            // If this line may be split, we make it a strategy line (even though
-            // 2 out of the 3 fields ex, inc, and vat are known). This way the
-            // strategy phase gets a chance to correct this line.
+            // If this line may be split, we make it a strategy line (even
+            // though 2 out of the 3 fields ex, inc, and vat are known). This
+            // way the strategy phase gets a chance to correct this line.
             if (!empty($line['meta-strategy-split'])) {
                 $line['meta-vatrate-source'] = Creator::VatRateSource_Strategy;
             }
@@ -202,12 +211,13 @@ class CompletorInvoiceLines
                 // 1st item: return its vat rate.
                 return $matchedVatRate['vatrate'];
             } else if ($carry == $matchedVatRate['vatrate']) {
-                // Note that in PHP: '21' == '21.0000' returns true. So using == works.
-                // Vat rate equals all previous vat rates: return that vat rate.
+                // Note that in PHP: '21' == '21.0000' returns true. So using ==
+                // works. Vat rate equals all previous vat rates: return that
+                // vat rate.
                 return $carry;
             } else {
-                // Vat rate does not match previous vat rates or carry is already false,
-                // return false.
+                // Vat rate does not match previous vat rates or carry is
+                // already false: return false.
                 return false;
             }
         }, null);
@@ -215,8 +225,8 @@ class CompletorInvoiceLines
     }
 
     /**
-     * Completes lines with free items (price = 0) by giving them the maximum tax
-     * rate that appears in the other lines.
+     * Completes lines with free items (price = 0) by giving them the maximum
+     * tax rate that appears in the other lines.
      */
     protected function addVatRateTo0PriceLines()
     {
@@ -243,8 +253,8 @@ class CompletorInvoiceLines
      * Returns a list of vat rates that actually appear in the invoice.
      *
      * @return array
-     *  An array with the vat rates as key and the number of times they appear in
-     *  the invoice lines as value.
+     *   An array with the vat rates as key and the number of times they appear
+     *   in the invoice lines as value.
      */
     protected function getAppearingVatRates()
     {
@@ -265,10 +275,10 @@ class CompletorInvoiceLines
      * Completes each (non-strategy) line with missing (meta) info.
      *
      * All non strategy lines have unitprice and vatrate filled in and should by
-     * now have correct(ed) VAT rates. In some shops these non strategy lines may
-     * have a meta-line-discount-vatamount or meta-line-discount-amountinc field,
-     * that can be used with the SplitKnownDiscountLine strategy. Complete (if
-     * missing):
+     * now have correct(ed) VAT rates. In some shops these non strategy lines
+     * may have a meta-line-discount-vatamount or meta-line-discount-amountinc
+     * field, that can be used with the SplitKnownDiscountLine strategy.
+     * Complete (if missing):
      * - unitpriceinc
      * - vatamount
      * - meta-line-discount-amountinc (if meta-line-discount-vatamount is

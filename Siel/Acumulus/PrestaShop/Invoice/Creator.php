@@ -340,12 +340,16 @@ class Creator extends BaseCreator
         $shippingVat = $shippingInc - $shippingEx;
 
         if (!Number::isZero($shippingInc)) {
+            // $shippingEx is not very precise (0.01) and often leads to 1 cent
+            // off invoices in Acumulus. So we let the completor phase fill this
+            // in based on $shippingInc and the (hopefully corrected) vatrate.
             $result = array(
-                    'product' => $this->t('shipping_costs'),
-                    'unitprice' => $shippingEx,
-                    'unitpriceinc' => $shippingInc,
-                    'quantity' => 1,
-                ) + $this->getVatRangeTags($shippingVat, $shippingEx, 0.02);
+                'product' => $this->t('shipping_costs'),
+                //'unitprice' => $shippingEx,
+                'unitpriceinc' => $shippingInc,
+                'quantity' => 1,
+              ) + $this->getVatRangeTags($shippingVat, $shippingEx, 0.02);
+            $result['meta-calculated-fields'][] = 'unitprice';
             $result['meta-calculated-fields'][] = 'vatamount';
         } else {
             $carrier = new Carrier($this->order->id_carrier);

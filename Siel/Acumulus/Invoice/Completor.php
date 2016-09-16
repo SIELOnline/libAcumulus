@@ -36,6 +36,7 @@ class Completor
         Creator::VatRateSource_Exact0,
         self::VatRateSource_Calculated_Corrected,
         self::VatRateSource_Completor_Completed,
+        self::VatRateSource_Strategy_Completed,
     );
 
     /** @var \Siel\Acumulus\Invoice\ConfigInterface */

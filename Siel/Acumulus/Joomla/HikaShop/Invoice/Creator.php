@@ -267,10 +267,9 @@ class Creator extends BaseCreator
                 $shippingVat = (float) $this->order->order_shipping_tax;
                 $shippingEx = $shippingInc - $shippingVat;
                 $vatInfo = $this->getVatRangeTags($shippingVat, $shippingEx, 0.0001, 0.0002);
-                $description = $this->t('shipping_costs');
 
                 $result = array(
-                        'product' => $description,
+                        'product' => $this->getShippingMethodName(),
                         'unitpriceinc' => $shippingInc,
                         'quantity' => 1,
                         'vatamount' => $shippingVat,
@@ -278,6 +277,20 @@ class Creator extends BaseCreator
             }
         }
         return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getShippingMethodName()
+    {
+        /** @var \hikashopShippingClass $class */
+        $class = hikashop_get('class.shipping');
+        $shipping = $class->get($this->order->order_shipping_id);
+        if (!empty($shipping->shipping_name)) {
+            return $shipping->shipping_name;
+        }
+        return parent::getShippingMethodName();
     }
 
     /**

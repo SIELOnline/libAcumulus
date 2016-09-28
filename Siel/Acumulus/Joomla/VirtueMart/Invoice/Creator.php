@@ -77,6 +77,7 @@ class Creator extends BaseCreator
         $this->order = $this->invoiceSource->getSource();
         $this->orderModel = VmModel::getModel('orders');
         /** @var \TableInvoices $invoiceTable */
+        // @todo: wrong 2nd parameter?
         if ($invoiceTable = $this->orderModel->getTable('invoices')->load($this->order['details']['BT']->virtuemart_order_id, 'virtuemart_order_id')) {
             $this->shopInvoice = $invoiceTable->getProperties();
         }
@@ -307,13 +308,27 @@ class Creator extends BaseCreator
             }
 
             $result = array(
-                    'product' => $this->t('shipping_costs'),
+                    'product' => $this->getShippingMethodName(),
                     'unitprice' => $shippingEx,
                     'quantity' => 1,
                     'vatamount' => $shippingVat,
                 ) + $vatInfo;
         }
         return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getShippingMethodName()
+    {
+        /** @var \VirtueMartModelShipmentmethod $shipmentMethodsModel */
+        $shipmentMethodsModel = VmModel::getModel('shipmentmethod');
+        $shipmentMethod = $shipmentMethodsModel->getShipment($this->order['details']['BT']->virtuemart_shipmentmethod_id);
+        if (!empty($shipmentMethod) && isset($shipmentMethod->shipment_name)) {
+            return $shipmentMethod->shipment_name;
+        }
+        return parent::getShippingMethodName();
     }
 
     /**

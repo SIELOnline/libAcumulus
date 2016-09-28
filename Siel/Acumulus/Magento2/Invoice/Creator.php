@@ -457,10 +457,9 @@ class Creator extends BaseCreator
         // Only add a free shipping line on an order, not on a credit note:
         // free shipping is never refunded...
         if ($this->invoiceSource->getType() === Source::Order || !Number::isZero($magentoSource->getShippingAmount())) {
-            $shippingDescription = $this->order->getShippingDescription();
             $result += array(
                 'itemnumber' => '',
-                'product' => !empty($shippingDescription) ? $shippingDescription : $this->t('shipping_costs'),
+                'product' => $this->getShippingMethodName(),
                 'quantity' => 1,
             );
 
@@ -512,6 +511,18 @@ class Creator extends BaseCreator
             }
         }
         return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getShippingMethodName()
+    {
+        $name = $this->order->getShippingDescription();
+        if (!empty($name)) {
+            return $name;
+        }
+        return parent::getShippingMethodName();
     }
 
     /**

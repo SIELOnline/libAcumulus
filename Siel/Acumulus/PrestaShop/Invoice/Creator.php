@@ -313,8 +313,8 @@ class Creator extends BaseCreator
         // The field 'rate' comes from order->getOrderDetailTaxes() and is only
         // defined for orders and were not filled in before PS1.6.1.1. So, check
         // if the field is available.
-        // The fields 'unit_amount' and 'total_amount' (table order_detail_tax) are
-        // based on the discounted product price and thus cannot be used.
+        // The fields 'unit_amount' and 'total_amount' (table order_detail_tax)
+        // are based on the discounted product price and thus cannot be used.
         if (isset($item['rate'])) {
             $result['vatrate'] = $item['rate'];
             $result['meta-vatrate-source'] = Creator::VatRateSource_Exact;
@@ -335,6 +335,7 @@ class Creator extends BaseCreator
     protected function getShippingLine()
     {
         $sign = $this->getSign();
+        $carrier = new Carrier($this->order->id_carrier);
         $shippingEx = $sign * $this->invoiceSource->getSource()->total_shipping_tax_excl;
         $shippingInc = $sign * $this->invoiceSource->getSource()->total_shipping_tax_incl;
         $shippingVat = $shippingInc - $shippingEx;
@@ -344,7 +345,7 @@ class Creator extends BaseCreator
             // off invoices in Acumulus. So we let the completor phase fill this
             // in based on $shippingInc and the (hopefully corrected) vatrate.
             $result = array(
-                'product' => $this->t('shipping_costs'),
+                'product' => $carrier->name,
                 //'unitprice' => $shippingEx,
                 'unitpriceinc' => $shippingInc,
                 'quantity' => 1,
@@ -352,10 +353,8 @@ class Creator extends BaseCreator
             $result['meta-calculated-fields'][] = 'unitprice';
             $result['meta-calculated-fields'][] = 'vatamount';
         } else {
-            $carrier = new Carrier($this->order->id_carrier);
-            $description = $carrier->id_reference == 1 ? $this->t('pickup') : $this->t('free_shipping');
             $result = array(
-                'product' => $description,
+                'product' => $carrier->name,
                 'unitprice' => 0,
                 'unitpriceinc' => 0,
                 'quantity' => 1,

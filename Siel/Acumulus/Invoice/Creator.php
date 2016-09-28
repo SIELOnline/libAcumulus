@@ -686,6 +686,22 @@ abstract class Creator
     }
 
     /**
+     * Returns the shipment method name.
+     *
+     * This method should be overridden by webshops if they can provide a more
+     * detailed name of the shipping method used.
+     *
+     * This base implementation returns the translated "Shipping costs" string.
+     *
+     * @return string
+     *   The name of the shipping method used for the current order.
+     */
+    protected function getShippingMethodName()
+    {
+        return $this->t('shipping_costs');
+    }
+
+    /**
      * Returns the payment fee line.
      *
      * This base implementation returns an empty array: no payment fee line.

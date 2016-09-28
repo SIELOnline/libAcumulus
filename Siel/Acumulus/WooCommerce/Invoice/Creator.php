@@ -387,30 +387,41 @@ class Creator extends BaseCreator
      */
     protected function getShippingLine()
     {
-        // Precision: shipping costs are entered ex VAT, so that may be rounded to
-        // the cent by the administrator. The computed costs inc VAT is rounded to
-        // the cent as well, so both are to be considered precise to the cent.
-        $shippingEx = $this->shopSource->get_total_shipping();
-        $shippingVat = $this->shopSource->get_shipping_tax();
-        if (!Number::isZero($shippingEx)) {
-            $description = $this->t('shipping_costs');
-        } else {
-            // We do not need to indicate that free shipping is not refunded on an
-            // order refund.
-            if ($this->invoiceSource->getType() == Source::CreditNote) {
-                return array();
-            }
-            $description = $this->t('free_shipping');
+        // Check if a shipping line item exists for this order.
+        $lines = $this->shopSource->get_items(apply_filters('woocommerce_admin_order_item_types', 'shipping'));
+        if (empty($lines)) {
+            return array();
         }
 
+        // Precision: shipping costs are entered ex VAT, so that may be rounded
+        // to the cent by the administrator. The computed costs inc VAT is
+        // rounded to the cent as well, so both are to be considered precise
+        // to the cent.
+        $shippingEx = $this->shopSource->get_total_shipping();
+        $shippingVat = $this->shopSource->get_shipping_tax();
+
         $result = array(
-                'product' => $description,
+                'product' => $this->getShippingMethodName(),
                 'unitprice' => $shippingEx,
                 'quantity' => 1,
                 'vatamount' => $shippingVat,
             ) + $this->getVatRangeTags($shippingVat, $shippingEx);
 
         return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getShippingMethodName()
+    {
+        // Check if a shipping line item exists for this order.
+        $lines = $this->shopSource->get_items(apply_filters('woocommerce_admin_order_item_types', 'shipping'));
+        if (!empty($lines)) {
+            $line = reset($lines);
+            return $line['name'];
+        }
+        return parent::getShippingMethodName();
     }
 
     /**

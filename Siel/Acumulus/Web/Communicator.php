@@ -42,7 +42,7 @@ class Communicator
      *   A response structure with, at least, fields 'errors', 'warnings' and
      *   'status'.
      */
-    public function checkStatus(array &$response)
+    public function correctStatusForLocalMessages(array &$response)
     {
         // - Check if status is consistent (local errors and warnings should alter
         //   the status as well.
@@ -153,7 +153,7 @@ class Communicator
             $response['status'] = ConfigInterface::Status_Errors;
         }
 
-        $this->checkStatus($response);
+        $this->correctStatusForLocalMessages($response);
 
         return $response;
     }

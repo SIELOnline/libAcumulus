@@ -27,7 +27,9 @@ class BatchFormTranslations extends TranslationCollection
         'desc_date_from_to' => 'Vul de periode in waarvan u de facuren naar Acumulus wilt verzenden (verwacht formaat %1$s). De selectie vindt plaats op basis van de datum van de meest recente wijziging aan de bestelling of creditnota. Als u slechts de facturen van 1 dag wilt verzenden hoeft u alleen de \'Datum van\' in te vullen. Laat beide velden leeg als u op nummer wilt verzenden.',
         'field_options' => 'Opties',
         'option_force_send' => 'Forceer verzenden',
-        'desc_batch_options' => 'Facturen die binnen de reeks vallen maar al naar Acumulus verstuurd zijn, worden standaard niet verzonden. Door deze optie aan te vinken forceert u het nogmaals versturen van deze facturen.',
+        'option_dry_run' => 'Laat alleen de lijst van facturen zien die verstuurd zouden worden, zonder daadwerkelijk te versturen.',
+        'desc_batch_options' => '<p>Facturen die binnen de reeks vallen maar al naar Acumulus verstuurd zijn, worden standaard niet verzonden. Door de 1e optie aan te vinken forceert u het nogmaals versturen van deze facturen.</p>
+                                 <p>De filters die u hierboven opgeeft kunnen in bepaalde gevallen voor verrassingen zorgen. Door de 2e optie te selecteren krijgt u in het resultatenoverzicht een lijst te zien van facuren die verstuurd zouden worden, zonder dat het versturen daadwerkelijk plaats vindt. Let op: de berichten zullen zijn geschreven alsof het versturen wel plaats heeft gevonden!</p>',
         'batchLogHeader' => 'Resultaten',
         'batchInfoHeader' => 'Uitgebreide informatie',
         'batch_info' => <<<LONGSTRING
@@ -79,7 +81,9 @@ LONGSTRING
         'message_validate_batch_bad_date_range' => '\'Datum tot\' dient na \'Datum van\' te liggen.',
         'message_validate_batch_bad_order_range' => '\'# tot\' dient groter te zijn dan \'# van\'.',
 
-        'message_form_empty_range' => 'De door u opgegeven reeks bevat geen enkele %1$s.',
+        'message_form_range_reference' => 'Reeks: %1$s van %2$s tot %3$s.',
+        'message_form_range_date' => 'Reeks: %1$s tussen %2$s en %3$s.',
+        'message_form_range_empty' => 'De door u opgegeven reeks bevat geen enkele %1$s.',
         'message_form_success' => 'De facturen zijn succesvol verzonden. Zie het resultatenoverzicht voor eventuele opmerkingen en waarschuwingen.',
         'message_form_error' => 'Er zijn fouten opgetreden bij het versturen van de facturen. Zie het resultatenoverzicht voor meer informatie over de fouten.',
 
@@ -104,7 +108,9 @@ LONGSTRING
         'desc_date_from_to' => 'Enter the period over which you want to send invoices to Acumulus (expected format: %1$s). If you want to send the invoices of 1 day, only fill in the \'Date from\' field. Leave empty if you want to send by id.',
         'field_options' => 'Options',
         'option_force_send' => 'Force sending',
-        'desc_batch_options' => 'Invoices that fall within the range but are already sent to Acumulus will normally not be sent again. By checking this option these orders will be sent again.',
+        'option_dry_run' => 'Dry run.',
+        'desc_batch_options' => '<p>Invoices that fall within the range but are already sent to Acumulus will normally not be sent again. By checking the 1st option, these orders will be sent again.</p>
+                                 <p>In some cases, the filters you define here can lead to surprises. By cheking the 2nd option you will get a list of invoices that would be sent, without actually being sent. Beware that the messages are written as if the sending did took place!</p>',
         'batchLogHeader' => 'Results',
         'batchInfoHeader' => 'Additional information',
 
@@ -119,7 +125,7 @@ LONGSTRING
         'message_validate_batch_bad_date_range' => '\'Date to\' should be after \'Date from\'.',
         'message_validate_batch_bad_order_range' => '\'# to\' should to be greater than \'# from\'.',
 
-        'message_form_empty_range' => 'The range you defined does not contain any %1$s.',
+        'message_form_range_empty' => 'The range you defined does not contain any %1$s.',
         'message_form_success' => 'The invoices were sent successfully. See the results overview for any remarks or warnings.',
         'message_form_error' => 'Errors during sending the invoices. See the results overview for more information on the errors.',
 

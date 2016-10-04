@@ -35,15 +35,18 @@ class InvoiceManager extends BaseInvoiceManager
      * introduce sequential order numbers, E.g:
      * http://extensions.joomla.org/profile/extension/extension-specific/virtuemart-extensions/human-readable-order-numbers
      */
-    public function getInvoiceSourcesByReferenceRange($invoiceSourceType, $InvoiceSourceReferenceFrom, $InvoiceSourceReferenceTo)
+    public function getInvoiceSourcesByReferenceRange($invoiceSourceType, $invoiceSourceReferenceFrom, $invoiceSourceReferenceTo)
     {
         if ($invoiceSourceType === Source::Order) {
-            $query = sprintf("select virtuemart_order_id
-			from #__virtuemart_orders
-			where order_number between '%s' and '%s'",
-                $this->getDb()->escape($InvoiceSourceReferenceFrom),
-                $this->getDb()->escape($InvoiceSourceReferenceTo)
-            );
+            if (is_numeric($invoiceSourceReferenceFrom) &&  is_numeric($invoiceSourceReferenceTo)) {
+                $from = sprintf('%d', $invoiceSourceReferenceFrom);
+                $to = sprintf('%d', $invoiceSourceReferenceTo);
+            }
+            else {
+                $from = sprintf("'%s'", $this->getDb()->escape($invoiceSourceReferenceFrom));
+                $to = sprintf("'%s'", $this->getDb()->escape($invoiceSourceReferenceTo));
+            }
+            $query = sprintf('select virtuemart_order_id from #__virtuemart_orders where order_number between %s and %s', $from, $to);
             return $this->getSourcesByQuery($invoiceSourceType, $query);
         }
         return array();

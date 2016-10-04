@@ -16,6 +16,9 @@ abstract class InvoiceManager
     /** @var \Siel\Acumulus\Invoice\Completor */
     protected $completor;
 
+    /** @var string */
+    protected $message;
+
     /**
      * @param Config $config
      */
@@ -23,8 +26,10 @@ abstract class InvoiceManager
     {
         $this->config = $config;
 
-        $translations = new BatchTranslations();
+        $translations = new InvoiceSendTranslations();
         $config->getTranslator()->add($translations);
+
+        $this->message = '';
     }
 
     /**
@@ -60,15 +65,15 @@ abstract class InvoiceManager
      * Should be overridden when the reference is not the internal id.
      *
      * @param string $invoiceSourceType
-     * @param string $InvoiceSourceReferenceFrom
-     * @param string $InvoiceSourceReferenceTo
+     * @param string $invoiceSourceReferenceFrom
+     * @param string $invoiceSourceReferenceTo
      *
      * @return \Siel\Acumulus\Invoice\Source[]
      *   An array of invoice sources of the given source type.
      */
-    public function getInvoiceSourcesByReferenceRange($invoiceSourceType, $InvoiceSourceReferenceFrom, $InvoiceSourceReferenceTo)
+    public function getInvoiceSourcesByReferenceRange($invoiceSourceType, $invoiceSourceReferenceFrom, $invoiceSourceReferenceTo)
     {
-        return $this->getInvoiceSourcesByIdRange($invoiceSourceType, $InvoiceSourceReferenceFrom, $InvoiceSourceReferenceTo);
+        return $this->getInvoiceSourcesByIdRange($invoiceSourceType, $invoiceSourceReferenceFrom, $invoiceSourceReferenceTo);
     }
 
     /**
@@ -120,55 +125,36 @@ abstract class InvoiceManager
      *
      * @param \Siel\Acumulus\Invoice\Source[] $invoiceSources
      * @param bool $forceSend
+     *   If true, force sending the invoices even if an invoice has already been
+     *   sent for a given invoice source.
+     * @param bool $dryRun
+     *   If true, return the reason/status only but do not actually send the
+     *   invoice, nor mail the result or store the result.
      * @param string[] $log
      *
      * @return bool
      *   Success.
      */
-    public function sendMultiple(array $invoiceSources, $forceSend, array &$log)
+    public function sendMultiple(array $invoiceSources, $forceSend, $dryRun, array &$log)
     {
-        $this->config->getTranslator()->add(new BatchTranslations());
+        $this->config->getTranslator()->add(new InvoiceSendTranslations());
         $errorLogged = false;
         $success = true;
         $time_limit = ini_get('max_execution_time');
         /** @var Source $invoiceSource */
         foreach ($invoiceSources as $invoiceSource) {
-            // Try to keep the script running, but note that other systems involved,
-            // think the (Apache) web server, may have their own time-out.
-            // Use @ to prevent messages like "Warning: set_time_limit(): Cannot set
-            //   max execution time limit due to system policy in ...".
+            // Try to keep the script running, but note that other systems
+            // involved, like the (Apache) web server, may have their own
+            // time-out. Use @ to prevent messages like "Warning:
+            // set_time_limit(): Cannot set max execution time limit due to
+            // system policy in ...".
             if (!@set_time_limit($time_limit) && !$errorLogged) {
                 $this->config->getLog()->warning('InvoiceManager::sendMultiple(): could not set time limit.');
                 $errorLogged = true;
             }
 
-            $status = $this->send($invoiceSource, $forceSend);
-            switch ($status) {
-                case WebConfigInterface::Status_Success:
-                    $message = 'message_batch_send_1_success';
-                    break;
-                case WebConfigInterface::Status_Errors:
-                case WebConfigInterface::Status_Exception:
-                    $message = 'message_batch_send_1_errors';
-                    $success = false;
-                    break;
-                case WebConfigInterface::Status_Warnings:
-                    $message = 'message_batch_send_1_warnings';
-                    break;
-                case WebConfigInterface::Status_NotSent:
-                    $message = 'message_batch_send_1_skipped';
-                    break;
-                case WebConfigInterface::Status_SendingPrevented_InvoiceCreated:
-                    $message = 'message_batch_send_1_prevented_invoiceCreated';
-                    break;
-                case WebConfigInterface::Status_SendingPrevented_InvoiceCompleted:
-                    $message = 'message_batch_send_1_prevented_invoiceCompleted';
-                    break;
-                default:
-                    $message = "Status unknown $status (sending invoice for %1\$s %2\$s)";
-                    break;
-            }
-            $log[$invoiceSource->getId()] = sprintf($this->t($message), $this->t($invoiceSource->getType()), $invoiceSource->getReference());
+            $this->send($invoiceSource, $forceSend, $dryRun);
+            $log[$invoiceSource->getId()] = $this->message;
         }
         return $success;
     }
@@ -182,24 +168,21 @@ abstract class InvoiceManager
      *   The source whose status has changed.
      *
      * @return int
-     *   Status, one of the WebConfigInterface::Status_ constants.
+     *   Status, 1 of the WebConfigInterface::Status_... constants.
      */
     public function sourceStatusChange(Source $invoiceSource)
     {
         $status = $invoiceSource->getStatus();
-        $statusString = $status === null ? 'null' : (string) $status;
-        $this->config->getLog()->notice('InvoiceManager::sourceStatusChange(%s %d, %s)', $invoiceSource->getType(), $invoiceSource->getId(), $statusString);
-        $result = WebConfigInterface::Status_NotSent;
         $shopEventSettings = $this->config->getShopEventSettings();
         if ($invoiceSource->getType() === Source::CreditNote || in_array($status, $shopEventSettings['triggerOrderStatus'])) {
             $result = $this->send($invoiceSource, false);
         } else {
-            $this->config->getLog()->notice('InvoiceManager::sourceStatusChange(%s %d, %s): not sending, triggerOrderStatus = [%s]',
-                $invoiceSource->getType(),
-                $invoiceSource->getId(),
-                $statusString,
-                is_array($shopEventSettings['triggerOrderStatus']) ? implode(',', $shopEventSettings['triggerOrderStatus']) : 'no array'
+            $result = ConfigInterface::Invoice_NotSent_WrongStatus;
+            $messages = array(
+              sprintf('%s not in [%s]', $status, implode(',', $shopEventSettings['triggerOrderStatus']))
             );
+            $logMessage = $this->getInvoiceSendResultMessage($invoiceSource, $result, $messages);
+            $this->config->getLog()->notice('InvoiceManager::sourceStatusChange(): %s', $logMessage);
         }
         return $result;
     }
@@ -211,15 +194,17 @@ abstract class InvoiceManager
      *   The source for which a shop invoice was created.
      *
      * @return int
-     *   Status
+     *   Status, 1 of the WebConfigInterface::Status_... constants.
      */
     public function invoiceCreate(Source $invoiceSource)
     {
-        $this->config->getLog()->notice('InvoiceManager::invoiceCreate(%s %d)', $invoiceSource->getType(), $invoiceSource->getId());
-        $result = WebConfigInterface::Status_NotSent;
         $shopEventSettings = $this->config->getShopEventSettings();
         if ($shopEventSettings['triggerInvoiceEvent'] == Config::TriggerInvoiceEvent_Create) {
             $result = $this->send($invoiceSource, false);
+        } else {
+            $result = ConfigInterface::Invoice_NotSent_TriggerInvoiceCreateNotEnabled;
+            $logMessage = $this->getInvoiceSendResultMessage($invoiceSource, $result);
+            $this->config->getLog()->notice('InvoiceManager::invoiceCreate(): %s', $logMessage);
         }
         return $result;
     }
@@ -234,15 +219,17 @@ abstract class InvoiceManager
      *   The source for which a shop invoice was created.
      *
      * @return int
-     *   Status
+     *   Status, 1 of the WebConfigInterface::Status_... constants.
      */
     public function invoiceSend(Source $invoiceSource)
     {
-        $this->config->getLog()->notice('InvoiceManager::invoiceSend(%s %d)', $invoiceSource->getType(), $invoiceSource->getId());
-        $result = WebConfigInterface::Status_NotSent;
         $shopEventSettings = $this->config->getShopEventSettings();
         if ($shopEventSettings['triggerInvoiceEvent'] == Config::TriggerInvoiceEvent_Send) {
             $result = $this->send($invoiceSource, false);
+        } else {
+            $result = ConfigInterface::Invoice_NotSent_TriggerInvoiceSentNotEnabled;
+            $logMessage = $this->getInvoiceSendResultMessage($invoiceSource, $result);
+            $this->config->getLog()->notice('InvoiceManager::invoiceSend(): %s', $logMessage);
         }
         return $result;
     }
@@ -251,19 +238,32 @@ abstract class InvoiceManager
      * Creates and sends an invoice to Acumulus for an order.
      *
      * @param \Siel\Acumulus\Invoice\Source $invoiceSource
-     *   The source object (order, credit note) for which the invoice was created.
+     *   The source object (order, credit note) for which the invoice was
+     *   created.
      * @param bool $forceSend
-     *   force sending the invoice even if an invoice has already been sent for
-     *   the given order.
+     *   If true, force sending the invoice even if an invoice has already been
+     *   sent for the given invoice source.
+     * @param bool $dryRun
+     *   If true, return the reason/status only but do not actually send the
+     *   invoice, nor mail the result or store the result.
      *
      * @return int
-     *   Status.
+     *   Status, 1 of the WebConfigInterface::Status_... constants.
      */
-    public function send(Source $invoiceSource, $forceSend = false)
+    public function send(Source $invoiceSource, $forceSend = false, $dryRun = false)
     {
-        $result = WebConfigInterface::Status_NotSent;
-        $testMode = in_array($this->config->getDebug(), array(Config::Debug_TestMode, Config::Debug_StayLocal));
-        if ($testMode || $forceSend || !$this->config->getAcumulusEntryModel()->getByInvoiceSource($invoiceSource)) {
+        $messages = array();
+        if ($this->config->getDebug() == Config::Debug_TestMode) {
+            $status = ConfigInterface::Invoice_Sent_TestMode;
+        } else if (!$this->config->getAcumulusEntryModel()->getByInvoiceSource($invoiceSource)) {
+            $status = ConfigInterface::Invoice_Sent_New;
+        } else if ($forceSend) {
+            $status = ConfigInterface::Invoice_Sent_Forced;
+        } else {
+            $status = ConfigInterface::Invoice_NotSent_AlreadySent;
+        }
+
+        if ($status !== ConfigInterface::Invoice_NotSent_AlreadySent) {
             $invoice = $this->config->getCreator()->create($invoiceSource);
 
             // Trigger the InvoiceCreated event.
@@ -279,51 +279,153 @@ abstract class InvoiceManager
 
                 // If the invoice is not set to null, we continue by sending it.
                 if ($invoice !== null) {
-                    $service = $this->config->getService();
-                    $result = $service->invoiceAdd($invoice);
-                    $result = $service->mergeLocalMessages($result, $localMessages);
-
-                    // Trigger the InvoiceSent event.
-                    $this->triggerInvoiceSent($invoice, $invoiceSource, $result);
-
-                    // Check if an entryid was created and store entry id and token.
-                    if (!empty($result['invoice']['entryid'])) {
-                        $this->config->getAcumulusEntryModel()->save($invoiceSource, $result['invoice']['entryid'], $result['invoice']['token']);
+                    if (!$dryRun) {
+                        $result = $this->doSend($invoice, $invoiceSource, $localMessages);
+                        $messages = $this->config->getService()->resultToMessages($result);
+                        $status |= $result['status'];
                     }
-                    else {
-                        // If the invoice was sent as a concept, no entryid will
-                        // be returned but we still want to prevent sending it
-                        // again: check for the concept status, the absence of
-                        // errors and non test-mode.
-                        if (empty($result['errors']) && $invoice['customer']['invoice']['concept'] == Config::Concept_Yes && !$testMode) {
-                            $this->config->getAcumulusEntryModel()->save($invoiceSource, null, null);
-                        }
-                    }
-
-                    // Log the result and send a mail if there are messages.
-                    $messages = $service->resultToMessages($result);
-                    $this->config->getLog()->info('InvoiceManager::send(%s %d, %s)[%s] result: %s',
-                        $invoiceSource->getType(), $invoiceSource->getId(), $forceSend ? 'true' : 'false', $testMode ? 'true' : 'false', $service->messagesToText($messages));
-                    if (!empty($messages)) {
-                        $this->mailInvoiceAddResult($result, $messages, $invoiceSource);
-                    }
-
-                    $result = $result['status'];
                 } else {
-                    $result = WebConfigInterface::Status_SendingPrevented_InvoiceCompleted;
-                    $this->config->getLog()->notice('InvoiceManager::send(%s %d, %s)[%s]: invoiceCompleted prevented sending',
-                        $invoiceSource->getType(), $invoiceSource->getId(), $forceSend ? 'true' : 'false', $testMode ? 'true' : 'false');
+                    $status = ConfigInterface::Invoice_NotSent_EventInvoiceCompleted;
                 }
             } else {
-                $result = WebConfigInterface::Status_SendingPrevented_InvoiceCreated;
-                $this->config->getLog()->notice('InvoiceManager::send(%s %d, %s)[%s]: invoiceCreated prevented sending',
-                    $invoiceSource->getType(), $invoiceSource->getId(), $forceSend ? 'true' : 'false', $testMode ? 'true' : 'false');
+                $status = ConfigInterface::Invoice_NotSent_EventInvoiceCreated;
             }
-        } else {
-            $this->config->getLog()->notice('InvoiceManager::send(%s %d, %s)[%s]: not sent',
-                $invoiceSource->getType(), $invoiceSource->getId(), $forceSend ? 'true' : 'false', $testMode ? 'true' : 'false');
         }
+
+        $logMessage = $this->getInvoiceSendResultMessage($invoiceSource, $status, $messages);
+        if (!$dryRun) {
+            $this->config->getLog()->notice('InvoiceManager::send(): %s', $logMessage);
+        }
+
+        return $status;
+    }
+
+    /**
+     * Unconditionally sends the invoice.
+     *
+     * After sending the invoice:
+     * - The invoice sent event gets triggered
+     * - A successful result gets saved to the acumulus entries table.
+     * - A mail with the results may be sent.
+     *
+     * @param \Siel\Acumulus\Invoice\Source $invoiceSource
+     * @param array $invoice
+     * @param array $localMessages
+     *
+     * @return array
+     *   The result structure of the invoice add API call merged with any local
+     *   messages.
+     */
+    protected function doSend(array $invoice, Source $invoiceSource, array $localMessages) {
+        $service = $this->config->getService();
+        $result = $service->invoiceAdd($invoice);
+        $result = $service->mergeLocalMessages($result, $localMessages);
+
+        // Trigger the InvoiceSent event.
+        $this->triggerInvoiceSent($invoice, $invoiceSource, $result);
+
+        // Check if an entryid was created and store entry id and token.
+        if (!empty($result['invoice']['entryid'])) {
+            $this->config->getAcumulusEntryModel()->save($invoiceSource, $result['invoice']['entryid'], $result['invoice']['token']);
+        } else {
+            // If the invoice was sent as a concept, no entryid will be returned
+            // but we still want to prevent sending it again: check for the
+            // concept status, the absence of errors and non test-mode.
+            $testMode = $this->config->getDebug() == Config::Debug_TestMode;
+            $isConcept = $invoice['customer']['invoice']['concept'] == Config::Concept_Yes;
+            if (empty($result['errors']) && $isConcept && !$testMode) {
+                $this->config->getAcumulusEntryModel()->save($invoiceSource, null, null);
+            }
+        }
+
+        // Send a mail if there are messages.
+        $messages = $service->resultToMessages($result);
+        if (!empty($messages)) {
+            $this->mailInvoiceAddResult($result, $messages, $invoiceSource);
+        }
+
         return $result;
+    }
+
+    /**
+     * Returns a translated message of the result of the send() method.
+     *
+     * @param \Siel\Acumulus\Invoice\Source $invoiceSource
+     * @param $status
+     * @param array $messages
+     *
+     * @return string
+     *   A translated sentence describing the action taken, the reason for
+     *   taking that action, and its results if an invoice was sent, of a call
+     *   to the InvoiceManager::send() method.
+     */
+    protected function getInvoiceSendResultMessage(Source $invoiceSource, $status, array $messages = array())
+    {
+        $sent = $status & ConfigInterface::Invoice_NotSent === 0;
+        if ($sent) {
+            $action = $this->t('message_sent');
+        } else {
+            $action = $this->t('message_not_sent');
+        }
+
+        $reason = $this->getSendReason($status & (ConfigInterface::Invoice_Sent_Mask | ConfigInterface::Invoice_NotSent_Mask));
+        $message = sprintf($this->t('message_invoice_send'), $this->t($invoiceSource->getType()), $invoiceSource->getReference(), $action, $reason);
+
+        if ($sent) {
+            $service = $this->config->getService();
+            $result = ' ' . $service->getStatusText($status & WebConfigInterface::Status_Mask);
+            $messages = rtrim(' ' . $service->messagesToText($messages));
+            $message .= $result . $messages;
+        }
+
+        // Also store the message for later retrieval by batch send
+        $this->message = $message;
+
+        return $message;
+    }
+
+    /**
+     * Returns the translated reason of (not) sending the invoice.
+     *
+     * @param int $status
+     *   The result status.
+     *
+     * @return string
+     *   The translated reason of (not) sending the invoice.
+     */
+    protected function getSendReason($status) {
+        switch ($status) {
+            case ConfigInterface::Invoice_NotSent_WrongStatus:
+                $message = 'message_not_sent_wrongStatus';
+                break;
+            case ConfigInterface::Invoice_NotSent_AlreadySent:
+                $message = 'message_not_sent_alreadySent';
+                break;
+            case ConfigInterface::Invoice_NotSent_EventInvoiceCreated:
+                $message = 'message_not_sent_prevented_invoiceCreated';
+                break;
+            case ConfigInterface::Invoice_NotSent_EventInvoiceCompleted:
+                $message = 'message_not_sent_prevented_invoiceCompleted';
+                break;
+            case ConfigInterface::Invoice_NotSent_TriggerInvoiceCreateNotEnabled:
+                $message = 'message_not_sent_not_enabled_triggerInvoiceCreate';
+                break;
+            case ConfigInterface::Invoice_NotSent_TriggerInvoiceSentNotEnabled:
+                $message = 'message_not_sent_not_enabled_triggerInvoiceSent';
+                break;
+            case ConfigInterface::Invoice_Sent_TestMode:
+                $message = 'message_sent_testMode';
+                break;
+            case ConfigInterface::Invoice_Sent_New:
+                $message = 'message_sent_new';
+                break;
+            case ConfigInterface::Invoice_Sent_Forced:
+                $message = 'message_sent_forced';
+                break;
+            default:
+                return sprintf($this->t('message_reason_unknown'), $status);
+        }
+        return $this->t($message);
     }
 
     /**

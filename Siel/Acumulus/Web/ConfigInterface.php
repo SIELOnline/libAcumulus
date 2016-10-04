@@ -13,19 +13,15 @@ interface ConfigInterface
     const libraryVersion = '4.5.7';
 
     // Web service configuration related constants.
-    const Status_NotSent = -1;
     const Status_Success = 0;
-    const Status_Errors = 1;
-    const Status_Warnings = 2;
-    const Status_Exception = 3;
-    const Status_SendingPrevented_InvoiceCreated = 4;
-    const Status_SendingPrevented_InvoiceCompleted = 5;
+    const Status_Warnings = 1;
+    const Status_Errors = 2;
+    const Status_Exception = 4;
+    const Status_Mask = 7;
 
     const Debug_None = 1;
     const Debug_SendAndLog = 2;
     const Debug_TestMode = 3;
-    /** @deprecated No longer used */
-    const Debug_StayLocal = 4;
 
     // Web service API constants.
     const TestMode_Normal = 0;

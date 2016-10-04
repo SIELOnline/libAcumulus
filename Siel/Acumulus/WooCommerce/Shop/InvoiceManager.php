@@ -57,45 +57,63 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * If you know of other plugins, please let us know.
      */
-    public function getInvoiceSourcesByReferenceRange($invoiceSourceType, $InvoiceSourceReferenceFrom, $InvoiceSourceReferenceTo)
+    public function getInvoiceSourcesByReferenceRange($invoiceSourceType, $invoiceSourceReferenceFrom, $invoiceSourceReferenceTo)
     {
-        // To be able to define the query we need to know under which meta key the
-        // order number/reference is stored.
-        // - WooCommerce Sequential Order Numbers (Pro) uses the key order_number.
-        // - WC Sequential Order Numbers uses the keys order_number_formatted and
-        //   order_number.
+        // To be able to define the query we need to know under which meta key
+        // the order number/reference is stored.
+        // - WooCommerce Sequential Order Numbers uses _order_number.
+        // - WooCommerce Sequential Order Numbers Pro uses _order_number or
+        //   _order_number_formatted.
+        // - WC Sequential Order Numbers uses _order_number or
+        //   _order_number_formatted.
         // Both only work with orders, not refunds.
-        if ((is_plugin_active('woocommerce-sequential-order-numbers/woocommerce-sequential-order-numbers.php') || is_plugin_active('woocommerce-sequential-order-numbers-pro/woocommerce-sequential-order-numbers-pro.php')) && $invoiceSourceType === Source::Order) {
-            // Search for the order by the order number as assigned by the plugin.
-            $args = array(
-                'meta_query' => array(
+        if ($invoiceSourceType === Source::Order) {
+            if (is_plugin_active('woocommerce-sequential-order-numbers/woocommerce-sequential-order-numbers.php')) {
+                // Search by the order number as assigned by the plugin.
+                $args = array(
+                  'meta_query' => array(
                     array(
-                        'key' => '_order_number',
-                        'value' => array($InvoiceSourceReferenceFrom, $InvoiceSourceReferenceTo),
-                        'compare' => 'BETWEEN',
-                        'type' => 'NUMERIC',
+                      'key' => '_order_number',
+                      'value' => array(
+                        $invoiceSourceReferenceFrom,
+                        $invoiceSourceReferenceTo
+                      ),
+                      'compare' => 'BETWEEN',
+                      'type' => 'UNSIGNED',
                     ),
-                ),
-            );
-            return $this->query2Sources($args, $invoiceSourceType);
-        } else if (is_plugin_active('wc-sequential-order-numbers/Sequential_Order_Numbers.php') && $invoiceSourceType === Source::Order) {
-            // This plugin has not been tested yet. It will probably give problems as
-            // on installing it does not add the used meta keys retrospectively. So
-            // I think this will only work for orders added after installation of this
-            // plugin. But then, that is a bit the nature of the idea of sequential
-            // order numbers: it should be used as of the beginning...
-            $args = array(
-                'meta_query' => array(
+                  ),
+                );
+                return $this->query2Sources($args, $invoiceSourceType);
+            } else if (is_plugin_active('woocommerce-sequential-order-numbers-pro/woocommerce-sequential-order-numbers.php')
+              || is_plugin_active('wc-sequential-order-numbers/Sequential_Order_Numbers.php')) {
+                // Search by the order number as assigned by the plugin. Note
+                // that these plugins allow for text prefixes and suffixes,
+                // therefore, we allow for a lexicographical or a purely numeric
+                // comparison.
+                if (is_numeric($invoiceSourceReferenceFrom) && is_numeric($invoiceSourceReferenceTo)) {
+                    $key = '_order_number';
+                    $type = 'UNSIGNED';
+                } else {
+                    $key = '_order_number_formatted';
+                    $type = 'CHAR';
+                }
+                $args = array(
+                  'meta_query' => array(
                     array(
-                        'key' => '_order_number_formatted',
-                        'value' => array($InvoiceSourceReferenceFrom, $InvoiceSourceReferenceTo),
-                        'compare' => 'BETWEEN',
+                      'key' => $key,
+                      'value' => array(
+                        $invoiceSourceReferenceFrom,
+                        $invoiceSourceReferenceTo
+                      ),
+                      'compare' => 'BETWEEN',
+                      'type' => $type,
                     ),
-                ),
-            );
-            return $this->query2Sources($args, $invoiceSourceType);
+                  ),
+                );
+                return $this->query2Sources($args, $invoiceSourceType);
+            }
         }
-        return parent::getInvoiceSourcesByReferenceRange($invoiceSourceType, $InvoiceSourceReferenceFrom, $InvoiceSourceReferenceTo);
+        return parent::getInvoiceSourcesByReferenceRange($invoiceSourceType, $invoiceSourceReferenceFrom, $invoiceSourceReferenceTo);
     }
 
     /**
@@ -161,7 +179,7 @@ class InvoiceManager extends BaseInvoiceManager
      * @param string $invoiceSourceType
      * @param bool $sort
      *
-     * @return Source[]
+     * @return \Siel\Acumulus\Invoice\Source[]
      */
     protected function query2Sources(array $args, $invoiceSourceType, $sort = true)
     {

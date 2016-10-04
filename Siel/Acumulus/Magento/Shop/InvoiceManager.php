@@ -1,4 +1,5 @@
 <?php
+<?php
 namespace Siel\Acumulus\Magento\Shop;
 
 use DateTime;
@@ -35,10 +36,10 @@ class InvoiceManager extends BaseInvoiceManager
     /**
      * {@inheritdoc}
      */
-    public function getInvoiceSourcesByReferenceRange($invoiceSourceType, $InvoiceSourceReferenceFrom, $InvoiceSourceReferenceTo)
+    public function getInvoiceSourcesByReferenceRange($invoiceSourceType, $invoiceSourceReferenceFrom, $invoiceSourceReferenceTo)
     {
         $field = 'increment_id';
-        $condition = array('from' => $InvoiceSourceReferenceFrom, 'to' => $InvoiceSourceReferenceTo);
+        $condition = array('from' => $invoiceSourceReferenceFrom, 'to' => $invoiceSourceReferenceTo);
         return $this->getByCondition($invoiceSourceType, $field, $condition);
     }
 

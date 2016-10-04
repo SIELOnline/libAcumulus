@@ -13,6 +13,10 @@ class Translations extends TranslationCollection
         Source::CreditNote => 'creditnota',
         Source::Other => 'overig',
 
+        'plural_Order'  => 'bestellingen',
+        'plural_CreditNote' => 'creditnota\'s',
+        'plural_Other' => 'overige',
+
         'for' => 'voor',
         'vat' => 'BTW',
         'inc_vat' => 'incl. BTW',
@@ -45,6 +49,10 @@ class Translations extends TranslationCollection
         Source::Order => 'order',
         Source::CreditNote => 'credit note',
         Source::Other => 'other',
+
+        'plural_Order'  => 'orders',
+        'plural_CreditNote' => 'creditnotes',
+        'plural_Other' => 'other',
 
         'for' => 'for',
         'vat' => 'VAT',

@@ -35,14 +35,14 @@ class InvoiceManager extends BaseInvoiceManager
      * introduce sequential order numbers in which case this query should be
      * adapted.
      */
-    public function getInvoiceSourcesByReferenceRange($invoiceSourceType, $InvoiceSourceReferenceFrom, $InvoiceSourceReferenceTo)
+    public function getInvoiceSourcesByReferenceRange($invoiceSourceType, $invoiceSourceReferenceFrom, $invoiceSourceReferenceTo)
     {
         if ($invoiceSourceType === Source::Order) {
             $query = sprintf("select order_id
 			from #__hikashop_order
 			where order_number between '%s' and '%s'",
-                $this->getDb()->escape($InvoiceSourceReferenceFrom),
-                $this->getDb()->escape($InvoiceSourceReferenceTo)
+                $this->getDb()->escape($invoiceSourceReferenceFrom),
+                $this->getDb()->escape($invoiceSourceReferenceTo)
             );
             return $this->getSourcesByQuery($invoiceSourceType, $query);
         }

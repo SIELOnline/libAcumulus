@@ -15,11 +15,11 @@ class Translations extends TranslationCollection
         'message_info_for_user' => 'De informatie hieronder wordt alleen getoond om eventuele support te vergemakkelijken. U kunt deze informatie negeren.',
         'message_sent' => 'Verzonden bericht',
         'message_received' => 'Ontvangen bericht',
-        'message_response_0' => 'Succes. Zonder waarschuwingen',
-        'message_response_1' => 'Mislukt. Fouten gevonden',
-        'message_response_2' => 'Succes. Met waarschuwingen',
-        'message_response_3' => 'Fout. Neem contact op met Acumulus',
-        'message_response_x' => 'Onbekende status code',
+        'message_response_0' => 'Succes, zonder waarschuwingen.',
+        'message_response_1' => 'Mislukt, fouten gevonden.',
+        'message_response_2' => 'Succes, met waarschuwingen.',
+        'message_response_3' => 'Fout, neem contact op met Acumulus.',
+        'message_response_x' => 'Onbekende status code.',
     );
 
     protected $en = array(
@@ -28,10 +28,10 @@ class Translations extends TranslationCollection
         'message_info_for_user' => 'The information below is only shown to facilitate support. You may ignore these messages.',
         'message_sent' => 'Message sent',
         'message_received' => 'Message received',
-        'message_response_0' => 'Success. Without warnings',
-        'message_response_1' => 'Failed. Errors found',
-        'message_response_2' => 'Success. With any warnings',
-        'message_response_3' => 'Exception. Please contact Acumulus technical support',
-        'message_response_x' => 'Unknown status code',
+        'message_response_0' => 'Success, without warnings.',
+        'message_response_1' => 'Failed, errors found.',
+        'message_response_2' => 'Success, with warnings.',
+        'message_response_3' => 'Exception, please contact Acumulus technical support.',
+        'message_response_x' => 'Unknown status code.',
     );
 }

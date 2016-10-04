@@ -79,7 +79,7 @@ class Service
     protected function getCommunicator()
     {
         if ($this->communicator === null) {
-            if ($this->config->getDebug() == ConfigInterface::Debug_StayLocal) {
+            if ($this->config->getDebug() == 4 /*ConfigInterface::Debug_StayLocal*/) {
                 $this->communicator = new CommunicatorLocal($this->config);
             } else {
                 $this->communicator = new Communicator($this->config);
@@ -406,7 +406,7 @@ class Service
         if (!empty($localMessages['warnings'])) {
             $result['warnings'] = array_merge($result['warnings'], $localMessages['warnings']);
         }
-        $this->getCommunicator()->checkStatus($result);
+        $this->getCommunicator()->correctStatusForLocalMessages($result);
         return $result;
     }
 }

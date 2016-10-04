@@ -115,7 +115,8 @@ class BatchForm extends Form
             // Retrieve by order reference range.
             $from = $this->getFormValue('invoice_source_reference_from');
             $to = $this->getFormValue('invoice_source_reference_to') ? $this->getFormValue('invoice_source_reference_to') : $from;
-            $invoiceSources = $this->invoiceManager->getInvoiceSourcesByReferenceRange($type, $from, $to);
+            $this->log['range'] = sprintf($this->t('message_form_range_reference'), $type, $from, $to);
+            $invoiceSources = $this->invoiceManager->getInvoiceSourcesByReferenceRange($this->t("plural_$type"), $from, $to);
         } else {
             // Retrieve by order date.
             $dateFormat = $this->getDateFormat();
@@ -123,15 +124,16 @@ class BatchForm extends Form
             $from->setTime(0, 0, 0);
             $to = $this->getFormValue('date_to') ? DateTime::createFromFormat($dateFormat, $this->getFormValue('date_to')) : clone $from;
             $to->setTime(23, 59, 59);
+            $this->log['range'] = sprintf($this->t('message_form_range_date'), $this->t("plural_$type"), $from->format(($dateFormat)), $to->format($dateFormat));
             $invoiceSources = $this->invoiceManager->getInvoiceSourcesByDateRange($type, $from, $to);
         }
 
         if (count($invoiceSources) === 0) {
-            $this->log[$type] = sprintf($this->t('message_form_empty_range'), $this->t($type));
+            $this->log[$type] = sprintf($this->t('message_form_range_empty'), $this->t($type));
             $this->setFormValue('result', $this->log[$type]);
             $result = true;
         } else {
-            $result = $this->invoiceManager->sendMultiple($invoiceSources, (bool) $this->getFormValue('force_send'), $this->log);
+            $result = $this->invoiceManager->sendMultiple($invoiceSources, (bool) $this->getFormValue('force_send'),  (bool) $this->getFormValue('dry_run'), $this->log);
         }
 
         // Set formValue for log in case form values are already queried.
@@ -190,12 +192,13 @@ class BatchForm extends Form
                     'description' => sprintf($this->t('desc_date_from_to'), $this->getShopDateFormat()),
                     'format' => $this->getShopDateFormat(),
                 ),
-                'force_send' => array(
+                'options' => array(
                     'type' => 'checkbox',
                     'label' => $this->t('field_options'),
                     'description' => $this->t('desc_batch_options'),
                     'options' => array(
                         'force_send' => $this->t('option_force_send'),
+                        'dry_run' => $this->t('option_dry_run'),
                     ),
                 ),
             ),

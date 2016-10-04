@@ -126,7 +126,23 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
      */
     public function getCompletor()
     {
-        return $this->getInstance('Completor', 'Invoice', array($this, $this->getTranslator(), $this->getService()));
+        return $this->getInstance('Completor', 'Invoice', array($this->getCompletorInvoiceLines(), $this->getCompletorStrategyLines(), $this, $this->getTranslator(), $this->getService()));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCompletorInvoiceLines()
+    {
+        return $this->getInstance('CompletorInvoiceLines', 'Invoice', array($this));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCompletorStrategyLines()
+    {
+        return $this->getInstance('CompletorStrategyLines', 'Invoice', array($this, $this->getTranslator()));
     }
 
     /**

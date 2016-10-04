@@ -175,21 +175,21 @@ class Creator extends BaseCreator
 
         $orderProducts = $this->getOrderModel()->getOrderProducts($this->invoiceSource->getId());
         foreach ($orderProducts as $line) {
-            $result = array_merge($result, $this->getItemLine($line));
+            $result[] = $this->getItemLine($line);
         }
 
         return $result;
     }
 
     /**
-     * Returns the item line(s) for 1 product line.
+     * Returns the item line for 1 product line.
      *
-     * This method may return multiple lines if there are many options.
-     * These additional lines will be informative, their price will be 0.
+     * This method may return child lines if there are options/variants.
+     * These lines will be informative, their price will be 0.
      *
      * @param array $item
      *
-     * @return array[]
+     * @return array
      */
     protected function getItemLine(array $item)
     {
@@ -214,45 +214,29 @@ class Creator extends BaseCreator
         $vatInfo = $this->getVatRangeTags($productVat, $productPriceEx);
 
         // Options (variants).
-        $optionsLines = array();
-        $optionsTexts = array();
         $options = $this->getOrderModel()->getOrderOptions($item['order_id'], $item['order_product_id']);
-        foreach ($options as $option) {
-            $optionsTexts[] = "{$option['name']}: {$option['value']}";
-        }
-        if (count($options) > 0) {
-            $optionsText = ' (' . implode(', ', $optionsTexts) . ')';
-
-            $invoiceSettings = $this->config->getInvoiceSettings();
-            if (count($options) <= $invoiceSettings['optionsAllOn1Line']
-                || (count($options) < $invoiceSettings['optionsAllOnOwnLine'] && strlen($optionsText) <= $invoiceSettings['optionsMaxLength'])
-            ) {
-                // All options on 1 item.
-                $result['product'] .= ' (' . implode(', ', $optionsTexts) . ')';
-            } else {
-                // All options on their own line.
-                // VAT info should not contain a 0 vatamount.
-                $optionsVatInfo = $vatInfo;
-                $optionsVatInfo['vatamount'] = 0;
-                foreach ($optionsTexts as $optionsText) {
-                    $optionsLines[] = array(
-                        'product' => " - $optionsText",
-                        'unitprice' => 0,
-                        // Table order_option does not have a quantity field, so
-                        // composite products with multiple same sub product
-                        // are apparently not covered.
-                        'quantity' => 1,
-                      ) + $optionsVatInfo;
-                }
+        if (!empty($options)) {
+            // Add options as children.
+            $result[Creator::Line_Children] = array();
+            $optionsVatInfo = $vatInfo;
+            $optionsVatInfo['vatamount'] = 0;
+            foreach ($options as $option) {
+                $result[Creator::Line_Children][] = array(
+                    'product' => "{$option['name']}: {$option['value']}",
+                    'unitprice' => 0,
+                      // Table order_option does not have a quantity field, so
+                      // composite products with multiple same sub product
+                      // are apparently not covered.
+                    'quantity' => 1,
+                  ) + $optionsVatInfo;
             }
         }
-
         $result['unitprice'] = $productPriceEx;
         $result['quantity'] = $item['quantity'];
         $result += $vatInfo;
         $result['vatamount'] = $productVat;
 
-        return array_merge(array($result), $optionsLines);
+        return $result;
     }
 
     /**

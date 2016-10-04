@@ -84,11 +84,13 @@ class Completor
     /**
      * Constructor.
      *
+     * @param \Siel\Acumulus\Invoice\CompletorInvoiceLines $completorInvoiceLines
+     * @param \Siel\Acumulus\Invoice\CompletorStrategyLines $completorStrategyLines
      * @param \Siel\Acumulus\Invoice\ConfigInterface $config
      * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
      * @param \Siel\Acumulus\Web\Service $service
      */
-    public function __construct(ConfigInterface $config, TranslatorInterface $translator, Service $service)
+    public function __construct(CompletorInvoiceLines $completorInvoiceLines, CompletorStrategyLines $completorStrategyLines, ConfigInterface $config, TranslatorInterface $translator, Service $service)
     {
         $this->config = $config;
 
@@ -99,8 +101,8 @@ class Completor
         $this->service = $service;
         $this->countries = new Countries();
 
-        $this->invoiceLineCompletor = new CompletorInvoiceLines();
-        $this->strategyLineCompletor = new CompletorStrategyLines($config, $translator);
+        $this->invoiceLineCompletor = $completorInvoiceLines;
+        $this->strategyLineCompletor = $completorStrategyLines;
     }
 
     /**
@@ -291,16 +293,15 @@ class Completor
     /**
      * Initializes the list of possible vat rates.
      *
-     * The possible vat rats depend on:
+     * The possible vat rates depend on:
      * - the possible vat types.
      * - optionally, the date of the invoice.
      * - optionally, the country of the client.
      *
-     * @return array
-     *   Array with possible vat rates. a vat rate being an array with keys
-     *   vatrate and vattype. This to be able to retrieve to which vat type a vat
-     *   rate belongs and to allow for the same vat rate to be valid for multiple
-     *   vat types.
+     * On finishing, $this->possibleVatRates will contain an array with possible
+     * vat rates. A vat rate being an array with keys vatrate and vattype. This
+     * to be able to retrieve to which vat type a vat rate belongs and to allow
+     * for the same vat rate to be valid for multiple vat types.
      */
     protected function initPossibleVatRates()
     {

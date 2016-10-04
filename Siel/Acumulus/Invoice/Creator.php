@@ -7,9 +7,11 @@ use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Helpers\TranslatorInterface;
 
 /**
+ * Creator creates a raw invoice similar to the Acumulus invoice structure.
+ *
  * Allows to create arrays in the Acumulus invoice structure from a web shop
- * order or credit note. This array can than be sent to Acumulus using the
- * Invoice:Add Acumulus API call.
+ * order or credit note. This array can than be completed and sent to Acumulus
+ * using the Invoice:Add Acumulus API call.
  *
  * See https://apidoc.sielsystems.nl/content/invoice-add for the structure. In
  * addition to the scheme as defined over there, additional keys or values are
@@ -43,6 +45,8 @@ abstract class Creator
     const LineType_Voucher = 'voucher';
     const LineType_Other = 'other';
     const LineType_Corrector = 'missing-amount-corrector';
+
+    const Line_Children = 'children';
 
     /** @var \Siel\Acumulus\Shop\Config */
     protected $config;
@@ -133,8 +137,8 @@ abstract class Creator
      *
      * The following keys are allowed/expected by the API:
      * - type: not needed, will be filled by the Completor
-     * - contactid: not expected: Acumulus id for this customer, in the absence of
-     *     this value, the API uses
+     * - contactid: not required: Acumulus id for this customer, in the absence
+     *     of this value, the API uses the email address as identifying value.
      * - contactyourid: shop customer id
      * - companyname1
      * - companyname2
@@ -320,6 +324,11 @@ abstract class Creator
      * - meta-invoice-vatamount: the total vat amount for the invoice.
      * - meta-lines-amount: the total invoice amount excluding VAT.
      * - meta-lines-vatamount: the total vat amount for the invoice.
+     * - meta-parent-index: defines an id (1-based index)) for a parent line.
+     * - meta-children: indicates how many child lines the line has.
+     * - meta-children-merged: indicates how many child lines the line had.
+     * - meta-parent: indicates that a line is a child of the given parent line.
+     *   children.
      *
      * Extending classes should normally not have to override this method, but
      * should instead implement getInvoiceNumber(), getInvoiceDate(),

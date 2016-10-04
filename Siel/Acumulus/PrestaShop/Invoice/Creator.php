@@ -291,19 +291,19 @@ class Creator extends BaseCreator
         $this->addIfNotEmpty($result, 'itemnumber', $item['product_reference']);
         $result['product'] = $item['product_name'];
 
-        // Prestashop does not support the margin scheme. So in a standard install
-        // this method will always return false. But if this method happens to
-        // return true anyway (customisation, hook), the costprice will trigger
-        // vattype = 5 for Acumulus.
+        // Prestashop does not support the margin scheme. So in a standard
+        // install this method will always return false. But if this method
+        // happens to return true anyway (customisation, hook), the costprice
+        // will trigger vattype = 5 for Acumulus.
         if ($this->allowMarginScheme() && !empty($item['purchase_supplier_price'])) {
             // Margin scheme:
             // - Do not put VAT on invoice: send price incl VAT as unitprice.
             // - But still send the VAT rate to Acumulus.
             $result['unitprice'] = $sign * $item['unit_price_tax_incl'];
-            // Costprice > 0 is the trigger for Acumulus to use the margin scheme.
+            // Costprice > 0 triggers the margin scheme in Acumulus.
             $result['costprice'] = $sign * $item['purchase_supplier_price'];
         } else {
-            // Unit price is without VAT, so use product_price, not product_price_wt.
+            // Unit price is without VAT: use product_price.
             $result['unitprice'] = $sign * $item['unit_price_tax_excl'];
             $result['unitpriceinc'] = $sign * $item['unit_price_tax_incl'];
             $result['meta-line-price'] = $sign * $item['total_price_tax_excl'];

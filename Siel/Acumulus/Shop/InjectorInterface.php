@@ -41,6 +41,16 @@ interface InjectorInterface
     public function getCompletor();
 
     /**
+     * @return \Siel\Acumulus\Invoice\CompletorInvoiceLines
+     */
+    public function getCompletorInvoiceLines();
+
+    /**
+     * @return \Siel\Acumulus\Invoice\CompletorStrategyLines
+     */
+    public function getCompletorStrategyLines();
+
+    /**
      * @return \Siel\Acumulus\Invoice\Creator
      */
     public function getCreator();

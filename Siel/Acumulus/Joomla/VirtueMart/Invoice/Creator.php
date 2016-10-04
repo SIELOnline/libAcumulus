@@ -1,10 +1,12 @@
 <?php
 namespace Siel\Acumulus\Joomla\VirtueMart\Invoice;
 
+use DOMDocument;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\ConfigInterface;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use stdClass;
+use VirtueMartModelCustomfields;
 use VmModel;
 
 /**
@@ -55,8 +57,8 @@ class Creator extends BaseCreator
     /** @var stdClass
      *  Object with properties:
      *  [...]: virtuemart_vmusers table record columns
-     *  [shopper_groups]: array of stdClass virtuemart_vmuser_shoppergroups table
-     * records
+     *  [shopper_groups]: array of stdClass virtuemart_vmuser_shoppergroups
+     * table records
      *  [JUser]: JUser object
      *  [userInfo]: array of stdClass virtuemart_userinfos table records
      */
@@ -217,7 +219,8 @@ class Creator extends BaseCreator
     }
 
     /**
-     * Returns a list of order states that indicate that the order has been paid.
+     * Returns a list of order states that indicate that the order has been
+     * paid.
      *
      * @return array
      */
@@ -280,6 +283,57 @@ class Creator extends BaseCreator
                 'quantity' => $item->product_quantity,
                 'vatamount' => $productVat,
             ) + $vatInfo;
+
+        // Add variant info.
+        $children = $this->getVariantLines($item, $result['quantity'], $vatInfo);
+        if (!empty($children)) {
+            $result[Creator::Line_Children] = $children;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Returns an array of lines that describes this variant.
+     *
+     * @param stdClass $item
+     * @param int $parentQuantity
+     * @param array $vatRangeTags
+     *
+     * @return array[]
+     *   An array of lines that describes this variant.
+     */
+    protected function getVariantLines(stdClass $item, $parentQuantity, $vatRangeTags)
+    {
+        $result = array();
+
+        // It is not possible (other then by copying a lot of awful code) to get
+        // a list of separate attribute and value values. So we stick with
+        // calling some code that prints the attributes on an order and
+        // "disassemble" that code...
+        if (!class_exists('VirtueMartModelCustomfields')) {
+            require(VMPATH_ADMIN.DS . 'models' . DS . 'customfields.php');
+        }
+        $product_attribute = VirtueMartModelCustomfields::CustomsFieldOrderDisplay($item, 'FE');
+        if (!empty($product_attribute)) {
+            $document = new DOMDocument();
+            $document->loadHTML($product_attribute);
+            $spans = $document->getElementsByTagName('span');
+            /** @var \DOMElement $span */
+            foreach ($spans as $span) {
+                // There tends to be a span around the list of spans containing
+                // the actual text, ignore it and only process the lowest level
+                // spans.
+                if ($span->getElementsByTagName('span')->length === 0) {
+                    $text[] = $span->textContent;
+                    $result[] = array(
+                        'product' => $span->textContent,
+                        'unitprice' => 0,
+                        'quantity' => $parentQuantity,
+                      ) + $vatRangeTags;
+                }
+            }
+        }
 
         return $result;
     }

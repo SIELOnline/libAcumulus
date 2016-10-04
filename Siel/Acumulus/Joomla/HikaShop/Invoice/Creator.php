@@ -239,16 +239,59 @@ class Creator extends BaseCreator
         } else {
             $vatInfo = $this->getVatRangeTags($productVat, $productPriceEx, 0.0001, 0.0001);
         }
-        // @todo: options/variations: $item->order_product_options?
+
+        // Remove html with variant info from product name, we'll add that later
+        // on using children lines.
+        $orderProductName = $item->order_product_name;
+        if (($pos = strpos($orderProductName, '<span')) !== false) {
+            $orderProductName = substr($orderProductName, 0, $pos);
+        }
         $result = array(
                 'itemnumber' => $item->order_product_code,
-                'product' => $item->order_product_name,
+                'product' => $orderProductName,
                 'unitprice' => $productPriceEx,
                 'meta-line-price' => $item->order_product_total_price_no_vat,
                 'meta-line-priceinc' => $item->order_product_total_price,
                 'quantity' => $item->order_product_quantity,
                 'vatamount' => $productVat,
             ) + $vatInfo;
+
+        // Add variant info.
+        if (!empty($item->order_product_options)) {
+            $children = $this->getVariantLines($item, $result['quantity'], $vatInfo);
+            if (!empty($children)) {
+                $result[Creator::Line_Children] = $children;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Returns an array of lines that describes this variant.
+     *
+     * @param stdClass $item
+     * @param int $parentQuantity
+     * @param array $vatRangeTags
+     *
+     * @return array[]
+     *   An array of lines that describes this variant.
+     */
+    protected function getVariantLines(stdClass $item, $parentQuantity, $vatRangeTags)
+    {
+        $result = array();
+
+        foreach ($item->order_product_options as $key => $value) {
+            // Skip numeric keys that have a StdClass as value.
+            if (!is_numeric($key) && is_string($value)) {
+                // Add variant.
+                $result[] = array(
+                    'product' => $key . ': ' . $value,
+                    'unitprice' => 0,
+                    'quantity' => $parentQuantity,
+                ) + $vatRangeTags;
+            }
+        }
 
         return $result;
     }

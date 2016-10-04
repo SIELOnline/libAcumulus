@@ -25,11 +25,8 @@ class InvoiceManager extends BaseInvoiceManager
     /**
      * {@inheritdoc}
      */
-    public function getInvoiceSourcesByIdRange(
-        $invoiceSourceType,
-        $InvoiceSourceIdFrom,
-        $InvoiceSourceIdTo
-    ) {
+    public function getInvoiceSourcesByIdRange($invoiceSourceType, $InvoiceSourceIdFrom, $InvoiceSourceIdTo)
+    {
         $field = 'entity_id';
         $condition = array(
             'from' => $InvoiceSourceIdFrom,
@@ -41,15 +38,12 @@ class InvoiceManager extends BaseInvoiceManager
     /**
      * {@inheritdoc}
      */
-    public function getInvoiceSourcesByReferenceRange(
-        $invoiceSourceType,
-        $InvoiceSourceReferenceFrom,
-        $InvoiceSourceReferenceTo
-    ) {
+    public function getInvoiceSourcesByReferenceRange($invoiceSourceType, $invoiceSourceReferenceFrom, $invoiceSourceReferenceTo)
+    {
         $field = 'increment_id';
         $condition = array(
-            'from' => $InvoiceSourceReferenceFrom,
-            'to' => $InvoiceSourceReferenceTo,
+            'from' => $invoiceSourceReferenceFrom,
+            'to' => $invoiceSourceReferenceTo,
         );
         return $this->getByCondition($invoiceSourceType, $field, $condition);
     }
@@ -57,11 +51,7 @@ class InvoiceManager extends BaseInvoiceManager
     /**
      * {@inheritdoc}
      */
-    public function getInvoiceSourcesByDateRange(
-        $invoiceSourceType,
-        DateTime $dateFrom,
-        DateTime $dateTo
-    ) {
+    public function getInvoiceSourcesByDateRange($invoiceSourceType, DateTime $dateFrom, DateTime $dateTo) {
         $dateFrom = $this->getSqlDate($dateFrom);
         $dateTo = $this->getSqlDate($dateTo);
         $field = 'updated_at';
@@ -99,10 +89,7 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * This Magento override dispatches the 'acumulus_invoice_created' event.
      */
-    protected function triggerInvoiceCreated(
-        array &$invoice,
-        Source $invoiceSource
-    ) {
+    protected function triggerInvoiceCreated(array &$invoice, Source $invoiceSource) {
         $this->dispatchEvent('acumulus_invoice_created', array(
                 'invoice' => &$invoice,
                 'source' => $invoiceSource,
@@ -115,10 +102,8 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * This Magento override dispatches the 'acumulus_invoice_completed' event.
      */
-    protected function triggerInvoiceCompleted(
-        array &$invoice,
-        Source $invoiceSource
-    ) {
+    protected function triggerInvoiceCompleted(array &$invoice, Source $invoiceSource)
+    {
         $this->dispatchEvent('acumulus_invoice_completed', array(
             'invoice' => &$invoice,
             'source' => $invoiceSource,
@@ -130,11 +115,7 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * This Magento override dispatches the 'acumulus_invoice_sent' event.
      */
-    protected function triggerInvoiceSent(
-        array $invoice,
-        Source $invoiceSource,
-        array $result
-    ) {
+    protected function triggerInvoiceSent(array $invoice, Source $invoiceSource, array $result) {
         $this->dispatchEvent('acumulus_invoice_sent', array(
             'invoice' => $invoice,
             'source' => $invoiceSource,

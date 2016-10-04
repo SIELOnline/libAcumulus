@@ -238,11 +238,18 @@ class Creator extends BaseCreator
     {
         $result = array();
 
-        // Qty = 0 can happen on refunds: products that are not returned are still
-        // listed but have qty = 0.
+        // Qty = 0 can happen on refunds: products that are not returned are
+        // still listed but have qty = 0.
         if (Number::isZero($item['qty'])) {
             return $result;
         }
+
+        // $product can be NULL if the product has been deleted.
+        $product = $this->shopSource->get_product_from_item($item);
+        if ($product instanceof WC_Product) {
+            $this->addIfNotEmpty($result, 'itemnumber', $product->get_sku());
+        }
+        $result['product'] = $item['name'];
 
         // get_item_total() returns cost per item after discount and ex vat (2nd
         // param).
@@ -251,27 +258,15 @@ class Creator extends BaseCreator
         // get_item_tax returns tax per item after discount.
         $productVat = $this->shopSource->get_item_tax($item, false);
 
-        $result['product'] = $item['name'];
-        $isVariation = !empty($item['variation_id']);
-        $product = $this->shopSource->get_product_from_item($item);
-        // $product can be NULL if the product has been deleted.
-        if ($product instanceof WC_Product) {
-            $this->addIfNotEmpty($result, 'itemnumber', $product->get_sku());
-            if ($isVariation) {
-                $variation = $this->getVariantDescription($item, $product);
-                $result['product'] .= " ($variation)";
-            }
-        }
-
-        // WooCommerce does not support the margin scheme. So in a standard install
-        // this method will always return false. But if this method happens to
-        // return true anyway (customisation, hook), the costprice tag will trigger
-        // vattype = 5 for Acumulus.
+        // WooCommerce does not support the margin scheme. So in a standard
+        // install this method will always return false. But if this method
+        // happens to return true anyway (customisation, hook), the costprice
+        // tag will trigger vattype = 5 for Acumulus.
         if ($this->allowMarginScheme() && !empty($item['cost_price'])) {
             // Margin scheme:
             // - Do not put VAT on invoice: send price incl VAT as unitprice.
             // - But still send the VAT rate to Acumulus.
-            // Costprice > 0 is the trigger for Acumulus to use the margin scheme.
+            // Costprice > 0 triggers the margin scheme in Acumulus.
             $result += array(
                 'unitprice' => $productPriceInc,
                 'costprice' => $item['cost_price'],
@@ -285,25 +280,32 @@ class Creator extends BaseCreator
         }
 
         $result['quantity'] = $item['qty'];
-        // Precision: one of the prices is entered by the administrator and thus can
-        // be considered exact. The computed one is not rounded, so we can assume a
-        // very high precision for all values here.
-        $result += $this->getVatRangeTags($productVat, $productPriceEx, 0.001, 0.001);
+        // Precision: one of the prices is entered by the administrator and thus
+        // can be considered exact. The computed one is not rounded, so we can
+        // assume a very high precision for all values here.
+        $vatRangeTags = $this->getVatRangeTags($productVat, $productPriceEx, 0.001, 0.001);
+        $result += $vatRangeTags;
+
+        if ($product instanceof WC_Product && !empty($item['variation_id'])) {
+            $result[Creator::Line_Children] = $this->getVariantLines($item, $product, $result['quantity'], $vatRangeTags);
+        }
 
         return $result;
     }
 
     /**
-     * Returns a description for this variant.
+     * Returns an array of lines that describes this variant.
      *
      * @param array $item
      * @param \WC_Product $product
+     * @param int $parentQuantity
+     * @param array $vatRangeTags
      *
-     * @return string
-     *   The description for this variant, a string in the form:
-     *   (variant: value, variant: value, ...)
+     * @return array[]
+     *   An array of lines that describes this variant.
+    *
      */
-    protected function getVariantDescription(array $item, \WC_Product $product)
+    protected function getVariantLines(array $item, \WC_Product $product, $parentQuantity, $vatRangeTags)
     {
         $result = array();
 
@@ -320,7 +322,8 @@ class Creator extends BaseCreator
                 '_line_tax',
             ));
             foreach ($metadata as $meta) {
-                // Skip hidden core fields and serialized data (also hidden core fields).
+                // Skip hidden core fields and serialized data (also hidden core
+                // fields).
                 if (in_array($meta['meta_key'], $hiddenOrderItemMeta) || is_serialized($meta['meta_value'])) {
                     continue;
                 }
@@ -334,11 +337,15 @@ class Creator extends BaseCreator
                     $meta['meta_key'] = apply_filters('woocommerce_attribute_label', wc_attribute_label($meta['meta_key'], $product), $meta['meta_key']);
                 }
 
-                $result[] = $meta['meta_key'] . ': ' . rawurldecode($meta['meta_value']);
+                $result[] = array(
+                  'product' => $meta['meta_key'] . ': ' . rawurldecode($meta['meta_value']),
+                  'unitprice' => 0,
+                  'quantity' => $parentQuantity,
+                ) + $vatRangeTags;
             }
         }
 
-        return implode(', ', $result);
+        return $result;
     }
 
     /**

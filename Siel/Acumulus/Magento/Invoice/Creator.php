@@ -280,7 +280,7 @@ class Creator extends BaseCreator
     }
 
     /**
-     * Returns 1 or more item lines for 1 main product line.
+     * Returns an item line for 1 main product line.
      *
      * @param Mage_Sales_Model_Order_Item $item
      *
@@ -289,17 +289,16 @@ class Creator extends BaseCreator
     protected function getItemLineOrder(Mage_Sales_Model_Order_Item $item)
     {
         $result = array();
-        $childLines = array();
 
         $vatRate = (float) $item->getTaxPercent();
         $productPriceInc = (float) $item->getPriceInclTax();
-        // For higher precision of the unit price, we use the prices as entered by
-        // the admin.
+        // For higher precision of the unit price, we use the prices as entered
+        // by the admin.
         $productPriceEx = $this->productPricesIncludeTax() ? (float) $productPriceInc / (100.0 + $vatRate) * 100.0 : (float) $item->getPrice();
         // Tax amount = VAT over discounted product price.
         // Hidden tax amount = VAT over discount.
-        // But as discounts get their own lines and the product lines are showing
-        // the normal (not discounted) price we add these 2.
+        // But as discounts get their own lines and the product lines are
+        // showing the normal (not discounted) price we add these 2.
         $lineVat = (float) $item->getTaxAmount() + (float) $item->getHiddenTaxAmount();
 
         // Simple products (products without children): add as 1 line.
@@ -314,91 +313,21 @@ class Creator extends BaseCreator
             'meta-vatrate-source' => static::VatRateSource_Exact,
         );
         if (!Number::isZero($item->getDiscountAmount())) {
-            // Store discount on this item to be able to get correct discount lines.
+            // Store discount on this item to be able to get correct discount
+            // lines later on in the completion phase.
             $result['meta-line-discount-amountinc'] = -$item->getDiscountAmount();
         }
 
-        // Also add child lines for composed products, a.o. to be able to print a
+        // Add child lines for composed products, a.o. to be able to print a
         // packing slip in Acumulus.
-        foreach ($item->getChildrenItems() as $child) {
-            $childLine = $this->getItemLineOrder($child);
-            $childLines = array_merge($childLines, $childLine);
-        }
-
-        // If:
-        // - there is exactly 1 child line
-        // - for the same item number, and quantity
-        // - with no price info on the child
-        // We seem to be processing a configurable product that for some reason
-        // appears twice: do not add the child, but copy the product description
-        // to the result as it contains more option descriptions.
-        // @todo: refine this: when to add just 1 line, when multiple lines (see OC)
-        if (count($childLines) === 1
-            && $result['itemnumber'] === $childLines[0]['itemnumber']
-            && $childLines[0]['unitprice'] == 0
-            && $result['quantity'] === $childLines[0]['quantity']
-        ) {
-            $result['product'] = $childLines[0]['product'];
-            $childLines = array();
-        }
-        // keep price info on bundle level or child level?
-        if (count($childLines) > 0) {
-            if ($item->getPriceInclTax() > 0.0 && ($item->getTaxPercent() > 0 || $item->getTaxAmount() == 0.0)) {
-                // If the bundle line contains valid price and tax info, we remove that
-                // info from all child lines (to prevent accounting amounts twice).
-                foreach ($childLines as &$childLine) {
-                    $childLine['unitprice'] = 0;
-                    $childLine['unitpriceinc'] = 0;
-                    $childLine['meta-line-vatamount'] = 0;
-                    if (isset($childLine['meta-line-discount-amountinc'])) {
-                        unset($childLine['meta-line-discount-amountinc']);
-                    }
-                    $childLine['vatrate'] = $result['vatrate'];
-                }
-            } else {
-                // Do all children have the same vat?
-                $vatRate = null;
-                foreach ($childLines as $childLine) {
-                    // Check if this is not an empty price/vat line.
-                    if ($childLine['unitprice'] != 0 && $childLine['vatrate'] !== -1) {
-                        // Same vat?
-                        if ($vatRate === null || $childLine['vatrate'] === $vatRate) {
-                            $vatRate = $childLine['vatrate'];
-                        } else {
-                            $vatRate = null;
-                            break;
-                        }
-                    }
-                }
-
-                if ($vatRate !== null && $vatRate == $result['vatrate'] && $productPriceEx != 0.0) {
-                    // Bundle has price info and same vat as ALL children: use price and
-                    // vat info from bundle line and remove it from child lines to prevent
-                    // accounting amounts twice.
-                    foreach ($childLines as &$childLine) {
-                        $childLine['unitprice'] = 0;
-                        $childLine['unitpriceinc'] = 0;
-                        $childLine['meta-line-vatamount'] = 0;
-                        if (isset($childLine['meta-line-discount-amountinc'])) {
-                            unset($childLine['meta-line-discount-amountinc']);
-                        }
-                        $childLine['vatrate'] = $result['vatrate'];
-                    }
-                } else {
-                    // All price and vat info is/remains on the child lines.
-                    // Make sure no price and vat info is left on the bundle line.
-                    $result['unitprice'] = 0;
-                    $result['unitpriceinc'] = 0;
-                    $result['meta-line-vatamount'] = 0;
-                    if (isset($result['meta-line-discount-amountinc'])) {
-                        unset($result['meta-line-discount-amountinc']);
-                    }
-                    $result['vatrate'] = -1;
-                }
+        $childrenItems = $item->getChildrenItems();
+        if (!empty($childrenItems)) {
+            $result[Creator::Line_Children] = array();
+            foreach ($childrenItems as $child) {
+                $result[Creator::Line_Children][] = $this->getItemLineOrder($child);
             }
         }
 
-        $result = array_merge(array($result), $childLines);
         return $result;
     }
 

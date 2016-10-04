@@ -91,7 +91,13 @@ class InvoiceManager extends BaseInvoiceManager
                 // therefore, we allow for a lexicographical or a purely numeric
                 // comparison.
                 if (is_numeric($invoiceSourceReferenceFrom) && is_numeric($invoiceSourceReferenceTo)) {
-                    $key = '_order_number';
+                    if (strlen($invoiceSourceReferenceFrom) < 6 && strlen($invoiceSourceReferenceTo) < 6) {
+                        // We assume non formatted search arguments.
+                        $key = '_order_number';
+                    } else {
+                        // Formatted numeric search arguments: e.g. yyyynnnn
+                        $key = '_order_number_formatted';
+                    }
                     $type = 'UNSIGNED';
                 } else {
                     $key = '_order_number_formatted';

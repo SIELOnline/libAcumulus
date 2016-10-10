@@ -84,4 +84,18 @@ interface ShopCapabilitiesInterface
      *   dropdown item.
      */
     public function getPaymentMethods();
+
+    /**
+     * Returns a link to the config form page.
+     *
+     * If the webshop adds a session token or something like that to
+     * administrative links, the returned link will contain so as well.
+     *
+     * @param string $formType
+     *   The form to get the link to.
+     *
+     * @return string
+     *   The link to the requested form page.
+     */
+    public function getLink($formType);
 }

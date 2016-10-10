@@ -136,6 +136,15 @@ class OcHelper
     /**
      * Controller action: show/process the settings form for this module.
      */
+    public function advancedConfig()
+    {
+        $this->displayFormCommon('advanced');
+        $this->renderFormCommon('advanced', 'button_save');
+    }
+
+    /**
+     * Controller action: show/process the settings form for this module.
+     */
     public function batch()
     {
         $this->displayFormCommon('batch');

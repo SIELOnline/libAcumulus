@@ -12,7 +12,7 @@ use Tools;
  * Class ConfigForm processes and builds the settings form page for the
  * PrestaShop Acumulus module.
  */
-class ConfigForm extends BaseConfigForm
+class AdvancedConfigForm extends BaseConfigForm
 {
     /** @var string */
     protected $moduleName;

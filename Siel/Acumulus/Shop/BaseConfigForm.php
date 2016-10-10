@@ -72,7 +72,7 @@ abstract class BaseConfigForm extends Form
     }
 
     /**
-     * Checks if the account settings are known and correct.
+     * Checks if the account settings are correct.
      *
      * This is done by trying to download the contact types picklist.
      *
@@ -82,20 +82,31 @@ abstract class BaseConfigForm extends Form
     protected function checkAccountSettings()
     {
         // Check if we can retrieve a picklist. This indicates if the account
-        // settings are known and correct.
+        // settings are correct.
         $message = '';
         $this->contactTypes = null;
         $credentials = $this->acumulusConfig->getCredentials();
         if (!empty($credentials['contractcode']) && !empty($credentials['username']) && !empty($credentials['password'])) {
             $this->contactTypes = $this->service->getPicklistContactTypes();
             if (!empty($this->contactTypes['errors'])) {
-                $message = $this->t($this->contactTypes['errors'][0]['code'] == 401 ? 'message_error_auth' : 'message_error_comm');
+                if ($this->contactTypes['errors'][0]['code'] == 401) {
+                    $message = 'message_error_auth';
+                } else {
+                    $message = 'message_error_comm';
+                }
                 $this->errorMessages += $this->service->resultToMessages($this->contactTypes, false);
             }
         } else {
             // First fill in your account details.
-            $message = $this->t('message_auth_unknown');
+            $message = 'message_auth_unknown';
         }
+
+        // Translate and format message.
+        if (!empty($message)) {
+            $formType = $this->isAdvancedConfigForm() ? 'advanced' : 'config';
+            $message = sprintf($this->t($message), $this->t("message_error_arg1_$formType"), $this->t("message_error_arg2_$formType"));
+        }
+
         return $message;
     }
 
@@ -150,4 +161,14 @@ abstract class BaseConfigForm extends Form
         return $result;
     }
 
+    /**
+     * Returns whether this form instance is an advanced config form.
+     *
+     * @return bool
+     *   True if this form instance is an advanced config form.
+     */
+    protected function isAdvancedConfigForm()
+    {
+        return $this instanceof AdvancedConfigForm;
+    }
 }

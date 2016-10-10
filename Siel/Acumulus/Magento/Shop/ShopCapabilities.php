@@ -57,4 +57,19 @@ class ShopCapabilities extends ShopCapabilitiesBase
         }
         return $result;
     }
+
+    public function getLink($formType)
+    {
+        /** @var \Mage_Adminhtml_helper_data $helper */
+        $helper = Mage::helper('adminhtml');
+        switch ($formType) {
+            case 'config':
+                return $helper->getUrl('adminhtml/acumulus/config');
+            case 'advanced':
+                return $helper->getUrl('adminhtml/acumulus/advanced');
+            case 'batch':
+                return $helper->getUrl('adminhtml/acumulus/batch');
+        }
+        return parent::getLink($formType);
+    }
 }

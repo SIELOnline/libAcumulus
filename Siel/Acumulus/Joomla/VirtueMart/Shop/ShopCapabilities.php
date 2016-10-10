@@ -2,8 +2,7 @@
 namespace Siel\Acumulus\Joomla\VirtueMart\Shop;
 
 use Siel\Acumulus\Invoice\Source;
-use Siel\Acumulus\Shop\ConfigInterface;
-use Siel\Acumulus\Shop\ShopCapabilities as ShopCapabilitiesBase;
+use Siel\Acumulus\Joomla\Shop\ShopCapabilities as ShopCapabilitiesBase;
 use VirtueMartModelOrderstatus;
 use VmModel;
 

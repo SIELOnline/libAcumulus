@@ -2,7 +2,6 @@
 namespace Siel\Acumulus\WooCommerce\Shop;
 
 use Siel\Acumulus\Invoice\ConfigInterface as InvoiceConfigInterface;
-use Siel\Acumulus\Shop\ConfigInterface;
 use Siel\Acumulus\Shop\ShopCapabilities as ShopCapabilitiesBase;
 
 /**
@@ -63,4 +62,20 @@ class ShopCapabilities extends ShopCapabilitiesBase
         }
         return $result;
     }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getLink($formType)
+  {
+      switch ($formType) {
+          case 'config':
+              return admin_url('options-general.php?page=acumulus');
+          case 'advanced':
+              return admin_url('options-general.php?page=acumulus_advanced_config');
+          case 'batch':
+              return admin_url('admin.php?page=acumulus_batch');
+      }
+      return parent::getLink($formType);
+  }
 }

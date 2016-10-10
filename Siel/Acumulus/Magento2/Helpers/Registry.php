@@ -90,11 +90,11 @@ class Registry
     }
 
     /**
-     * @return \Magento\Framework\App\Config\ScopeConfigInterface
+     * @return \Magento\Framework\UrlInterface
      */
-    private function getScopeConfig()
+    public function getUrlInterface()
     {
-        return $this->get('\Magento\Framework\App\Config\ScopeConfigInterface');
+        return $this->get('\Magento\Backend\Model\UrlInterface');
     }
 
     /**

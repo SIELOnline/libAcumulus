@@ -16,6 +16,22 @@ use Siel\Acumulus\Web\ConfigInterface as WebConfigInterface;
 class ConfigForm extends BaseConfigForm
 {
     /**
+     * Array of key => value pairs that can be used in a select and that
+     * represent all costcenters defined in Acumulus for the given account.
+     *
+     * @var array
+     */
+    protected $costCenterOptions;
+
+    /**
+     * Array of key => value pairs that can be used in a select and that
+     * represent all accounts defined in Acumulus for the given account.
+     *
+     * @var array
+     */
+    protected $accountNumberOptions;
+
+    /**
      * {@inheritdoc}
      *
      * The results are restricted to the known config keys.
@@ -90,48 +106,13 @@ class ConfigForm extends BaseConfigForm
         $fields['accountSettingsHeader'] = array(
             'type' => 'fieldset',
             'legend' => $this->t('accountSettingsHeader'),
-            // Account fields.
-            'fields' => array(
-                'contractcode' => array(
-                    'type' => 'text',
-                    'label' => $this->t('field_code'),
-                    'attributes' => array(
-                        'required' => true,
-                        'size' => 20,
-                    ),
-                ),
-                'username' => array(
-                    'type' => 'text',
-                    'label' => $this->t('field_username'),
-                    'attributes' => array(
-                        'required' => true,
-                        'size' => 20,
-                    ),
-                ),
-                'password' => array(
-                    'type' => 'password',
-                    'label' => $this->t('field_password'),
-                    'attributes' => array(
-                        'required' => true,
-                        'size' => 20,
-                    ),
-                ),
-                'emailonerror' => array(
-                    'type' => 'email',
-                    'label' => $this->t('field_email'),
-                    'description' => $this->t('desc_email'),
-                    'attributes' => array(
-                        'required' => true,
-                        'size' => 20,
-                    ),
-                ),
-            ),
+            'fields' => $this->getAccountFields()
         );
 
         $message = $this->checkAccountSettings();
         $accountOk = empty($message);
 
-        // 2nd fieldset: message or invoice sending related fields.
+        // 2nd fieldset: message or invoice related fields.
         $fields['invoiceSettingsHeader'] = array(
             'type' => 'fieldset',
             'legend' => $this->t('invoiceSettingsHeader'),
@@ -144,157 +125,13 @@ class ConfigForm extends BaseConfigForm
                 ),
             );
         } else {
-            $invoiceNrSourceOptions = $this->shopCapabilities->getInvoiceNrSourceOptions();
-            if (count($invoiceNrSourceOptions) === 1) {
-                // Make it a hidden field.
-                $invoiceNrSourceField = array(
-                    'type' => 'hidden',
-                    'value' => reset($invoiceNrSourceOptions),
-                );
-            } else {
-                $invoiceNrSourceField = array(
-                    'type' => 'radio',
-                    'label' => $this->t('field_invoiceNrSource'),
-                    'description' => $this->t('desc_invoiceNrSource'),
-                    'options' => $invoiceNrSourceOptions,
-                    'attributes' => array(
-                        'required' => true,
-                    ),
-                );
-            }
-
-            $dateToUseOptions = $this->shopCapabilities->getDateToUseOptions();
-            if (count($dateToUseOptions) === 1) {
-                // Make it a hidden field.
-                $dateToUseField = array(
-                    'type' => 'hidden',
-                    'value' => reset($dateToUseOptions),
-                );
-            } else {
-                $dateToUseField = array(
-                    'type' => 'radio',
-                    'label' => $this->t('field_dateToUse'),
-                    'description' => $this->t($this->t('desc_dateToUse')),
-                    'options' => $dateToUseOptions,
-                    'attributes' => array(
-                        'required' => true,
-                    ),
-                );
-            }
-
-            $invoiceTriggerEventOptions = $this->shopCapabilities->getInvoiceTriggerEvents();
-            if (count($invoiceTriggerEventOptions) === 1) {
-                // Make it a hidden field.
-                $invoiceTriggerEventField = array(
-                    'type' => 'hidden',
-                    'value' => reset($invoiceTriggerEventOptions),
-                );
-            } else {
-                $invoiceTriggerEventField = array(
-                    'type' => 'select',
-                    'label' => $this->t('field_triggerInvoiceEvent'),
-                    'description' => $this->t($this->t('desc_triggerInvoiceEvent')),
-                    'options' => $invoiceTriggerEventOptions,
-                );
-            }
-
-            $accountNumberOptions = $this->picklistToOptions($this->service->getPicklistAccounts(),'accounts', 0, $this->t('option_empty'));
-            $constCenterOptions = $this->picklistToOptions($this->service->getPicklistCostCenters(),'costcenters', 0, $this->t('option_empty'));
-            $orderStatuses = $this->getOrderStatusesList();
-
-            $fields['invoiceSettingsHeader']['fields'] = array(
-                'digitalServices' => array(
-                    'type' => 'radio',
-                    'label' => $this->t('field_digitalServices'),
-                    'description' => $this->t('desc_digitalServices'),
-                    'options' => $this->getDigitalServicesOptions(),
-                    'attributes' => array(
-                        'required' => true,
-                    ),
-                ),
-                'vatFreeProducts' => array(
-                    'type' => 'radio',
-                    'label' => $this->t('field_vatFreeProducts'),
-                    'description' => $this->t('desc_vatFreeProducts'),
-                    'options' => $this->getVatFreeProductsOptions(),
-                    'attributes' => array(
-                        'required' => true,
-                    ),
-                ),
-                'invoiceNrSource' => $invoiceNrSourceField,
-                'dateToUse' => $dateToUseField,
-                'defaultCustomerType' => array(
-                    'type' => 'select',
-                    'label' => $this->t('field_defaultCustomerType'),
-                    'options' => $this->picklistToOptions($this->contactTypes, 'contacttypes', 0, $this->t('option_empty')),
-                ),
-                'salutation' => array(
-                    'type' => 'text',
-                    'label' => $this->t('field_salutation'),
-                    'description' => $this->t('desc_salutation'),
-                    'attributes' => array(
-                        'size' => 30,
-                    ),
-                ),
-                'clientData' => array(
-                    'type' => 'checkbox',
-                    'label' => $this->t('field_clientData'),
-                    'description' => $this->t('desc_clientData'),
-                    'options' => array(
-                        'sendCustomer' => $this->t('option_sendCustomer'),
-                        'overwriteIfExists' => $this->t('option_overwriteIfExists'),
-                    ),
-                ),
-                'defaultAccountNumber' => array(
-                    'type' => 'select',
-                    'label' => $this->t('field_defaultAccountNumber'),
-                    'description' => $this->t('desc_defaultAccountNumber'),
-                    'options' => $accountNumberOptions,
-                ),
-                'defaultCostCenter' => array(
-                    'type' => 'select',
-                    'label' => $this->t('field_defaultCostCenter'),
-                    'description' => $this->t('desc_defaultCostCenter'),
-                    'options' => $constCenterOptions,
-                ),
-                'defaultInvoiceTemplate' => array(
-                    'type' => 'select',
-                    'label' => $this->t('field_defaultInvoiceTemplate'),
-                    'options' => $this->picklistToOptions($invoiceTemplates = $this->service->getPicklistInvoiceTemplates(), 'invoicetemplates', 0, $this->t('option_empty')),
-                ),
-                'defaultInvoicePaidTemplate' => array(
-                    'type' => 'select',
-                    'label' => $this->t('field_defaultInvoicePaidTemplate'),
-                    'description' => $this->t('desc_defaultInvoiceTemplates'),
-                    'options' => $this->picklistToOptions($invoiceTemplates, 'invoicetemplates', 0, $this->t('option_same_template')),
-                ),
-                'removeEmptyShipping' => array(
-                    'type' => 'checkbox',
-                    'label' => $this->t('field_removeEmptyShipping'),
-                    'description' => $this->t('desc_removeEmptyShipping'),
-                    'options' => array(
-                        'removeEmptyShipping' => $this->t('option_removeEmptyShipping'),
-                    ),
-                ),
-                'triggerOrderStatus' => array(
-                    'name' => 'triggerOrderStatus[]',
-                    'type' => 'select',
-                    'label' => $this->t('field_triggerOrderStatus'),
-                    'description' => $this->t('desc_triggerOrderStatus'),
-                    'options' => $orderStatuses,
-                    'attributes' => array(
-                        'multiple' => true,
-                        'size' => min(count($orderStatuses), 8),
-                    ),
-                ),
-                'triggerInvoiceEvent' => $invoiceTriggerEventField,
-            );
+            $fields['invoiceSettingsHeader']['fields'] = $this->getInvoiceFields();
 
             // 3rd and 4th fieldset. Settings per active payment method.
             $paymentMethods = $this->shopCapabilities->getPaymentMethods();
             if (!empty($paymentMethods)) {
-                $fields["paymentMethodAccountNumberFieldset"] = $this->getPaymentMethodsFieldset($paymentMethods, 'paymentMethodAccountNumber', $accountNumberOptions);
-                $fields["paymentMethodCostCenterFieldset"] = $this->getPaymentMethodsFieldset($paymentMethods, 'paymentMethodCostCenter', $constCenterOptions);
+                $fields["paymentMethodAccountNumberFieldset"] = $this->getPaymentMethodsFieldset($paymentMethods, 'paymentMethodAccountNumber', $this->accountNumberOptions);
+                $fields["paymentMethodCostCenterFieldset"] = $this->getPaymentMethodsFieldset($paymentMethods, 'paymentMethodCostCenter', $this->costCenterOptions);
             }
 
             // 5th fieldset: email as PDF settings.
@@ -302,101 +139,376 @@ class ConfigForm extends BaseConfigForm
                 'type' => 'fieldset',
                 'legend' => $this->t('emailAsPdfSettingsHeader'),
                 'description' => $this->t('desc_emailAsPdfInformation'),
-                'fields' => array(
-                    'emailAsPdf' => array(
-                        'type' => 'checkbox',
-                        'label' => $this->t('field_emailAsPdf'),
-                        'description' => $this->t('desc_emailAsPdf'),
-                        'options' => array(
-                            'emailAsPdf' => $this->t('option_emailAsPdf'),
-                        ),
-                    ),
-                    'emailFrom' => array(
-                        'type' => 'email',
-                        'label' => $this->t('field_emailFrom'),
-                        'description' => $this->t('desc_emailFrom'),
-                        'attributes' => array(
-                            'size' => 30,
-                        ),
-                    ),
-                    'emailBcc' => array(
-                        'type' => 'email',
-                        'label' => $this->t('field_emailBcc'),
-                        'description' => $this->t('desc_emailBcc'),
-                        'attributes' => array(
-                            'multiple' => true,
-                            'size' => 30,
-                        ),
-                    ),
-                    'subject' => array(
-                        'type' => 'text',
-                        'label' => $this->t('field_subject'),
-                        'description' => $this->t('desc_subject'),
-                        'attributes' => array(
-                            'size' => 60,
-                        ),
-                    ),
-                ),
+                'fields' => $this->getEmailAsPdfFields(),
             );
         }
 
         // 6th fieldset: Acumulus version information.
-        $env = $this->acumulusConfig->getEnvironment();
         $fields['versionInformationHeader'] = array(
             'type' => 'fieldset',
             'legend' => $this->t('versionInformationHeader'),
-            'fields' => array(
-                'debug' => array(
-                    'type' => 'radio',
-                    'label' => $this->t('field_debug'),
-                    'description' => $this->t('desc_debug'),
-                    'options' => array(
-                        WebConfigInterface::Debug_None => $this->t('option_debug_1'),
-                        WebConfigInterface::Debug_SendAndLog => $this->t('option_debug_2'),
-                        WebConfigInterface::Debug_TestMode => $this->t('option_debug_3'),
-                    ),
-                    'attributes' => array(
-                        'required' => true,
-                    ),
-                ),
-                'logLevel' => array(
-                    'type' => 'radio',
-                    'label' => $this->t('field_logLevel'),
-                    'description' => $this->t('desc_logLevel'),
-                    'options' => array(
-                        Log::Notice => $this->t('option_logLevel_3'),
-                        Log::Info => $this->t('option_logLevel_4'),
-                        Log::Debug => $this->t('option_logLevel_5'),
-                    ),
-                    'attributes' => array(
-                        'required' => true,
-                    ),
-                ),
-                'versionInformation' => array(
-                    'type' => 'markup',
-                    'value' => "<p>Application: Acumulus module {$env['moduleVersion']}; Library: {$env['libraryVersion']}; Shop: {$env['shopName']} {$env['shopVersion']};<br>" .
-                        "Environment: PHP {$env['phpVersion']}; Curl: {$env['curlVersion']}; JSON: {$env['jsonVersion']}; OS: {$env['os']}.</p>",
-                ),
-                'versionInformationDesc' => array(
-                    'type' => 'markup',
-                    'value' => $this->t('desc_versionInformation'),
-                ),
-            ),
+            'fields' => $this->getPluginFields(),
+        );
+
+        // 7th fieldset: Link to advanced config form.
+        $fields['advancedConfigHeader'] = array(
+            'type' => 'fieldset',
+            'legend' => $this->t('advanced_form_header'),
+            'fields' => $this->getAdvancedConfigLinkFields(),
         );
 
         return $fields;
     }
 
     /**
-     * {@inheritdoc}
+     * Returns the set of account related fields.
+     *
+     * The fields returned:
+     * - contractcode
+     * - username
+     * - password
+     * - emailonerror
+     *
+     * @return array[]
+     *   The set of account related fields.
      */
-    protected function getCheckboxKeys()
+    protected function getAccountFields()
     {
         return array(
-            'sendCustomer' => 'clientData',
-            'overwriteIfExists' => 'clientData',
-            'removeEmptyShipping' => 'removeEmptyShipping',
-            'emailAsPdf' => 'emailAsPdf',
+            'contractcode' => array(
+                'type' => 'text',
+                'label' => $this->t('field_code'),
+                'attributes' => array(
+                    'required' => true,
+                    'size' => 20,
+                ),
+            ),
+            'username' => array(
+                'type' => 'text',
+                'label' => $this->t('field_username'),
+                'attributes' => array(
+                    'required' => true,
+                    'size' => 20,
+                ),
+            ),
+            'password' => array(
+                'type' => 'password',
+                'label' => $this->t('field_password'),
+                'attributes' => array(
+                    'required' => true,
+                    'size' => 20,
+                ),
+            ),
+            'emailonerror' => array(
+                'type' => 'email',
+                'label' => $this->t('field_email'),
+                'description' => $this->t('desc_email'),
+                'attributes' => array(
+                    'required' => true,
+                    'size' => 20,
+                ),
+            ),
+        );
+    }
+
+    /**
+     * Returns the set of invoice related fields.
+     *
+     * The fields returned:
+     * - digitalServices
+     * - vatFreeProducts
+     * - dateToUse
+     * - defaultCustomerType
+     * - salutation
+     * - clientData
+     * - defaultAccountNumber
+     * - defaultCostCenter
+     * - defaultInvoiceTemplate
+     * - defaultInvoicePaidTemplate
+     * - removeEmptyShipping
+     * - triggerOrderStatus
+     * - triggerInvoiceEvent
+     *
+     * @return array[]
+     *   The set of invoice related fields.
+     */
+    protected function getInvoiceFields()
+    {
+        $invoiceNrSourceOptions = $this->shopCapabilities->getInvoiceNrSourceOptions();
+        if (count($invoiceNrSourceOptions) === 1) {
+            // Make it a hidden field.
+            $invoiceNrSourceField = array(
+                'type' => 'hidden',
+                'value' => reset($invoiceNrSourceOptions),
+            );
+        } else {
+            $invoiceNrSourceField = array(
+                'type' => 'radio',
+                'label' => $this->t('field_invoiceNrSource'),
+                'description' => $this->t('desc_invoiceNrSource'),
+                'options' => $invoiceNrSourceOptions,
+                'attributes' => array(
+                    'required' => true,
+                ),
+            );
+        }
+
+        $dateToUseOptions = $this->shopCapabilities->getDateToUseOptions();
+        if (count($dateToUseOptions) === 1) {
+            // Make it a hidden field.
+            $dateToUseField = array(
+                'type' => 'hidden',
+                'value' => reset($dateToUseOptions),
+            );
+        } else {
+            $dateToUseField = array(
+                'type' => 'radio',
+                'label' => $this->t('field_dateToUse'),
+                'description' => $this->t($this->t('desc_dateToUse')),
+                'options' => $dateToUseOptions,
+                'attributes' => array(
+                    'required' => true,
+                ),
+            );
+        }
+
+        $invoiceTriggerEventOptions = $this->shopCapabilities->getInvoiceTriggerEvents();
+        if (count($invoiceTriggerEventOptions) === 1) {
+            // Make it a hidden field.
+            $invoiceTriggerEventField = array(
+                'type' => 'hidden',
+                'value' => reset($invoiceTriggerEventOptions),
+            );
+        } else {
+            $invoiceTriggerEventField = array(
+                'type' => 'select',
+                'label' => $this->t('field_triggerInvoiceEvent'),
+                'description' => $this->t($this->t('desc_triggerInvoiceEvent')),
+                'options' => $invoiceTriggerEventOptions,
+            );
+        }
+
+        $this->accountNumberOptions = $this->picklistToOptions($this->service->getPicklistAccounts(), 'accounts', 0, $this->t('option_empty'));
+        $this->costCenterOptions = $this->picklistToOptions($this->service->getPicklistCostCenters(), 'costcenters', 0, $this->t('option_empty'));
+        $orderStatuses = $this->getOrderStatusesList();
+
+        $fields = array(
+            'digitalServices' => array(
+                'type' => 'radio',
+                'label' => $this->t('field_digitalServices'),
+                'description' => $this->t('desc_digitalServices'),
+                'options' => $this->getDigitalServicesOptions(),
+                'attributes' => array(
+                    'required' => true,
+                ),
+            ),
+            'vatFreeProducts' => array(
+                'type' => 'radio',
+                'label' => $this->t('field_vatFreeProducts'),
+                'description' => $this->t('desc_vatFreeProducts'),
+                'options' => $this->getVatFreeProductsOptions(),
+                'attributes' => array(
+                    'required' => true,
+                ),
+            ),
+            'invoiceNrSource' => $invoiceNrSourceField,
+            'dateToUse' => $dateToUseField,
+            'defaultCustomerType' => array(
+                'type' => 'select',
+                'label' => $this->t('field_defaultCustomerType'),
+                'options' => $this->picklistToOptions($this->contactTypes, 'contacttypes', 0, $this->t('option_empty')),
+            ),
+            'salutation' => array(
+                'type' => 'text',
+                'label' => $this->t('field_salutation'),
+                'description' => $this->t('desc_salutation'),
+                'attributes' => array(
+                    'size' => 30,
+                ),
+            ),
+            'clientData' => array(
+                'type' => 'checkbox',
+                'label' => $this->t('field_clientData'),
+                'description' => $this->t('desc_clientData'),
+                'options' => array(
+                    'sendCustomer' => $this->t('option_sendCustomer'),
+                    'overwriteIfExists' => $this->t('option_overwriteIfExists'),
+                ),
+            ),
+            'defaultAccountNumber' => array(
+                'type' => 'select',
+                'label' => $this->t('field_defaultAccountNumber'),
+                'description' => $this->t('desc_defaultAccountNumber'),
+                'options' => $this->accountNumberOptions,
+            ),
+            'defaultCostCenter' => array(
+                'type' => 'select',
+                'label' => $this->t('field_defaultCostCenter'),
+                'description' => $this->t('desc_defaultCostCenter'),
+                'options' => $this->costCenterOptions,
+            ),
+            'defaultInvoiceTemplate' => array(
+                'type' => 'select',
+                'label' => $this->t('field_defaultInvoiceTemplate'),
+                'options' => $this->picklistToOptions($invoiceTemplates = $this->service->getPicklistInvoiceTemplates(), 'invoicetemplates', 0, $this->t('option_empty')),
+            ),
+            'defaultInvoicePaidTemplate' => array(
+                'type' => 'select',
+                'label' => $this->t('field_defaultInvoicePaidTemplate'),
+                'description' => $this->t('desc_defaultInvoiceTemplates'),
+                'options' => $this->picklistToOptions($invoiceTemplates,
+                    'invoicetemplates', 0, $this->t('option_same_template')),
+            ),
+            'removeEmptyShipping' => array(
+                'type' => 'checkbox',
+                'label' => $this->t('field_removeEmptyShipping'),
+                'description' => $this->t('desc_removeEmptyShipping'),
+                'options' => array(
+                    'removeEmptyShipping' => $this->t('option_removeEmptyShipping'),
+                ),
+            ),
+            'triggerOrderStatus' => array(
+                'name' => 'triggerOrderStatus[]',
+                'type' => 'select',
+                'label' => $this->t('field_triggerOrderStatus'),
+                'description' => $this->t('desc_triggerOrderStatus'),
+                'options' => $orderStatuses,
+                'attributes' => array(
+                    'multiple' => true,
+                    'size' => min(count($orderStatuses), 8),
+                ),
+            ),
+            'triggerInvoiceEvent' => $invoiceTriggerEventField,
+        );
+        return $fields;
+    }
+
+    /**
+     * Returns the set of 'email invoice as PDF' related fields.
+     *
+     * The fields returned:
+     * - emailAsPdf
+     * - emailFrom
+     * - emailBcc
+     * - subject
+     *
+     * @return array[]
+     *   The set of 'email invoice as PDF' related fields.
+     */
+    protected function getEmailAsPdfFields()
+    {
+        return array(
+            'emailAsPdf' => array(
+                'type' => 'checkbox',
+                'label' => $this->t('field_emailAsPdf'),
+                'description' => $this->t('desc_emailAsPdf'),
+                'options' => array(
+                    'emailAsPdf' => $this->t('option_emailAsPdf'),
+                ),
+            ),
+            'emailFrom' => array(
+                'type' => 'email',
+                'label' => $this->t('field_emailFrom'),
+                'description' => $this->t('desc_emailFrom'),
+                'attributes' => array(
+                    'size' => 30,
+                ),
+            ),
+            'emailBcc' => array(
+                'type' => 'email',
+                'label' => $this->t('field_emailBcc'),
+                'description' => $this->t('desc_emailBcc'),
+                'attributes' => array(
+                    'multiple' => true,
+                    'size' => 30,
+                ),
+            ),
+            'subject' => array(
+                'type' => 'text',
+                'label' => $this->t('field_subject'),
+                'description' => $this->t('desc_subject'),
+                'attributes' => array(
+                    'size' => 60,
+                ),
+            ),
+        );
+    }
+
+    /**
+     * Returns the set of plugin related fields.
+     *
+     * The fields returned:
+     * - debug
+     * - logLevel
+     * - versionInformation
+     * - versionInformationDesc
+     *
+     * @return array[]
+     *   The set of plugin related fields.
+     */
+    protected function getPluginFields()
+    {
+        $env = $this->acumulusConfig->getEnvironment();
+        return array(
+            'debug' => array(
+                'type' => 'radio',
+                'label' => $this->t('field_debug'),
+                'description' => $this->t('desc_debug'),
+                'options' => array(
+                    WebConfigInterface::Debug_None => $this->t('option_debug_1'),
+                    WebConfigInterface::Debug_SendAndLog => $this->t('option_debug_2'),
+                    WebConfigInterface::Debug_TestMode => $this->t('option_debug_3'),
+                ),
+                'attributes' => array(
+                    'required' => true,
+                ),
+            ),
+            'logLevel' => array(
+                'type' => 'radio',
+                'label' => $this->t('field_logLevel'),
+                'description' => $this->t('desc_logLevel'),
+                'options' => array(
+                    Log::Notice => $this->t('option_logLevel_3'),
+                    Log::Info => $this->t('option_logLevel_4'),
+                    Log::Debug => $this->t('option_logLevel_5'),
+                ),
+                'attributes' => array(
+                    'required' => true,
+                ),
+            ),
+            'versionInformation' => array(
+                'type' => 'markup',
+                'value' => "<p>Application: Acumulus module {$env['moduleVersion']}; Library: {$env['libraryVersion']}; Shop: {$env['shopName']} {$env['shopVersion']};<br>" .
+                    "Environment: PHP {$env['phpVersion']}; Curl: {$env['curlVersion']}; JSON: {$env['jsonVersion']}; OS: {$env['os']}.</p>",
+            ),
+            'versionInformationDesc' => array(
+                'type' => 'markup',
+                'value' => $this->t('desc_versionInformation'),
+            ),
+        );
+    }
+
+    /**
+     * Returns the set of fields introducing the advanced config forms.
+     *
+     * The fields returned:
+     * - tellAboutAdvancedSettings
+     * - advancedSettingsLink
+     *
+     * @return array[]
+     *   The set of fields introducing the advanced config form.
+     */
+    protected function getAdvancedConfigLinkFields()
+    {
+        return array(
+            'tellAboutAdvancedSettings' => array(
+                'type' => 'markup',
+                'value' => sprintf($this->t('desc_advancedSettings'), $this->t('advanced_form_link_text'), $this->t('menu_advancedSettings')),
+            ),
+            'advancedSettingsLink' => array(
+                'type' => 'markup',
+                'value' => sprintf($this->t('button_link'), $this->t('advanced_form_link_text'), $this->shopCapabilities->getLink('advanced')),
+            ),
         );
     }
 
@@ -430,6 +542,19 @@ class ConfigForm extends BaseConfigForm
             );
         }
         return $fieldset;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getCheckboxKeys()
+    {
+        return array(
+            'sendCustomer' => 'clientData',
+            'overwriteIfExists' => 'clientData',
+            'removeEmptyShipping' => 'removeEmptyShipping',
+            'emailAsPdf' => 'emailAsPdf',
+        );
     }
 
     /**

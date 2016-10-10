@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\Shop;
 
+use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\TranslatorInterface;
 use Siel\Acumulus\Invoice\ConfigInterface as InvoiceConfigInterface;
 use Siel\Acumulus\Invoice\Source;
@@ -53,11 +54,6 @@ abstract class ShopCapabilities implements ShopCapabilitiesInterface
     /**
      * {@inheritdoc}
      */
-    abstract public function getShopOrderStatuses();
-
-    /**
-     * {@inheritdoc}
-     */
     public function getInvoiceTriggerEvents()
     {
         return array(
@@ -96,8 +92,13 @@ abstract class ShopCapabilities implements ShopCapabilitiesInterface
         );
     }
 
+
     /**
      * {@inheritdoc}
      */
-    abstract public function getPaymentMethods();
+    public function getLink($formType)
+    {
+        Log::getInstance()->error('ShopCapabilities::getLink("%s"): not defined for or unknown form type', $formType);
+        return '#';
+    }
 }

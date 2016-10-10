@@ -11,7 +11,13 @@ class ConfigFormTranslations extends TranslationCollection
     protected $nl = array(
         'config_form_title' => 'Acumulus | Instellingen',
         'config_form_header' => 'Acumulus instellingen',
+        'config_form_link_text' => 'Acumulus basisinstellingen',
 
+        'advanced_form_title' => 'Acumulus | Geavanceerde Instellingen',
+        'advanced_form_header' => 'Acumulus geavanceerde instellingen',
+        'advanced_form_link_text' => 'Acumulus geavanceerde instellingen',
+
+        'button_link' => '<a href="%2$s">%1$s</a>',
         'button_save' => 'Opslaan',
         'button_cancel' => 'Terug',
 
@@ -30,9 +36,14 @@ class ConfigFormTranslations extends TranslationCollection
         'message_form_error' => 'Er is een fout opgetreden bij het opslaan van de instellingen',
         'message_uninstall' => 'Wilt u de configuratie-instellingen verwijderen?',
 
-        'message_error_auth' => 'Uw Acumulus account gegevens zijn onjuist. Zodra u de correcte gevens hebt ingevuld, worden hier de overige instellingen getoond.',
-        'message_error_comm' => 'Er is een fout opgetreden bij het ophalen van uw gegevens van Acumulus. Probeer het later nog eens. Zodra de verbinding hersteld is worden hier de overige instellingen getoond.',
-        'message_auth_unknown' => 'Zodra u uw Acumulus accountgegevens hebt ingevuld, worden hier de overige instellingen getoond.',
+        'message_error_header' => 'Fout in uw Acumulus accountgegevens',
+        'message_error_auth' => 'Uw Acumulus accountgegevens zijn onjuist. Zodra u %2$s de correcte gevens hebt ingevuld, worden hier de %1$s instellingen getoond.',
+        'message_error_comm' => 'Er is een fout opgetreden bij het ophalen van uw gegevens van Acumulus. Probeer het later nog eens. Zodra de verbinding hersteld is worden %1$s de overige instellingen getoond.',
+        'message_auth_unknown' => 'Zodra u %2$s uw Acumulus accountgegevens hebt ingevuld, worden %1$s de overige instellingen getoond.',
+        'message_error_arg1_config' => 'overige',
+        'message_error_arg1_advanced' => 'geavanceerde',
+        'message_error_arg2_config' => 'hier',
+        'message_error_arg2_advanced' => 'in het "Acumulus basisinstellingenformulier"',
 
         'accountSettingsHeader' => 'Uw Acumulus account',
         'field_code' => 'Contractcode',
@@ -133,9 +144,6 @@ Vink deze optie aan als u geen regel op uw factuur of pakbon wil voor gratis ver
         'field_subject' => 'Onderwerp',
         'desc_subject' => 'Het onderwerp van de email. Als u dit leeg laat wordt "Factuur [factuurnummer] Bestelling [bestelnummer]" gebruikt. U kunt [#b] gebruiken om het bestelnummer in de onderwerpregel te plaatsen en [#f] voor het factuurnummer (van de webshop, niet van Acumulus).',
 
-        'versionInformationHeader' => 'Informatie over deze module',
-        'desc_versionInformation' => 'Vermeld aub deze gegevens bij een supportverzoek.',
-
         'field_debug' => 'Factuur verzendmodus',
         'option_debug_1' => 'Ontvang alleen een mail bij fouten of waarschuwingen tijdens het verzenden van een factuur naar Acumulus.',
         'option_debug_2' => 'Ontvang altijd een mail met de resultaten bij het verzenden van een factuur naar Acumulus.',
@@ -148,11 +156,23 @@ Vink deze optie aan als u geen regel op uw factuur of pakbon wil voor gratis ver
         'option_logLevel_4' => 'Log foutmeldingen, waarschuwingen en operationele en informatieve mededelingen.',
         'option_logLevel_5' => 'Log foutmeldingen, waarschuwingen, mededelingen, en communicatieberichten.',
         'desc_logLevel' => 'U kunt hier een logniveau kiezen. Kies voor de 1e of 2e optie tenzij u i.v.m. een supportverzoek bent geïnstrueerd om iets anders te kiezen.',
+
+        'versionInformationHeader' => 'Informatie over deze module',
+        'desc_versionInformation' => 'Vermeld aub deze gegevens bij een supportverzoek.',
+
+        'desc_advancedSettings' => 'Deze plugin kent veel instellingen en daarom bevat deze pagina niet alle instellingen. Een aantal minder gebruikte instellingen vindt u in het "%1$s" onder "%2$s". Nadat u hier de gegevens hebt ingevuld en opgeslagen, kunt u het andere formulier bezoeken:',
+        'menu_advancedSettings' => 'Instellingen → Acumulus geavanceerde instellingen',
+
+        'desc_basicSettings' => 'Dit is het formulier met geavanceerde, ofwel minder gebruikte, instellingen. De basisinstellingen vindt u in het "%1$s" onder "%2$s", of via de button hieronder. Let op: als u op deze button klikt worden de op deze pagina ingevulde of gewijzigde gegevens NIET opgeslagen!',
+        'menu_basicSettings' => 'Instellingen → Acumulus',
     );
 
     protected $en = array(
         'config_form_title' => 'Acumulus | Settings',
         'config_form_header' => 'Acumulus settings',
+
+        'advanced_form_title' => 'Acumulus | Advanced settings',
+        'advanced_form_header' => 'Acumulus advanced settings',
 
         'button_save' => 'Save',
         'button_cancel' => 'Back',
@@ -172,9 +192,14 @@ Vink deze optie aan als u geen regel op uw factuur of pakbon wil voor gratis ver
         'message_form_error' => 'an error occurred wile saving the settings.',
         'message_uninstall' => 'Are you sure to delete the configuration settings?',
 
-        'message_error_auth' => 'Your Acumulus connection settings are incorrect. Please check them. After you have entered the correct connection settings the other settings will be shown as well.',
-        'message_error_comm' => 'The module encountered an error retrieving your Acumulus configuration. Please try again. When the connection is restored the other settings will be shown as well.',
-        'message_auth_unknown' => 'When your Acumulus connection settings are filled in, the other settings will be shown as well.',
+        'message_error_header' => 'Error in your Acumulus connection settings',
+        'message_error_auth' => 'Your Acumulus connection settings are incorrect. Please check them. After you have entered the correct connection settings %2$s, the %1$s settings will be shown.',
+        'message_error_comm' => 'The module encountered an error retrieving your Acumulus configuration. Please try again. When the connection is restored the %1$s settings will be shown as well.',
+        'message_auth_unknown' => 'When you have filled in your Acumulus connection settings %2$s, the %1$s settings will be shown as well.',
+        'message_error_arg1_config' => 'other',
+        'message_error_arg1_advanced' => 'advanced',
+        'message_error_arg2_config' => 'here',
+        'message_error_arg2_advanced' => 'in the "Acumulus basic settings form"',
 
         'accountSettingsHeader' => 'Your Acumulus connection settings',
         'field_code' => 'Contract code',
@@ -275,9 +300,6 @@ If you don\'t want this, check this option.',
         'field_subject' => 'Subject',
         'desc_subject' => 'The subject line of the email. If you leave this empty "Invoice [invoice#] Order [order#]" will be used. You can use [#b] to place the order number in the subject and [#f] for the invoice number (from the webshop, not Acumulus).',
 
-        'versionInformationHeader' => 'Module information',
-        'desc_versionInformation' => 'Please mention this information with any support request.',
-
         'field_debug' => 'Invoice send mode',
         'option_debug_1' => 'Only receive a mail when there are errors or warnings on sending an invoice to Acumulus.',
         'option_debug_2' => 'Always receive a mail with the results on sending an invoice to Acumulus.',
@@ -290,5 +312,14 @@ If you don\'t want this, check this option.',
         'option_logLevel_4' => 'Log error messages, warnings, and operational and informational notices.',
         'option_logLevel_5' => 'Log error messages, warnings, notices, and communication messages.',
         'desc_logLevel' => 'Select a log level. Choose for the 1st or 2nd option unless otherwise instructed by support staff.',
+
+        'versionInformationHeader' => 'Module information',
+        'desc_versionInformation' => 'Please mention this information with any support request.',
+
+        'desc_advancedSettings' => 'This plugin is highly configurable and therefore this form does not contain all settings. You can find the other settings in the "Acumulus advanced settings form" under "%s". Once you have completed and saved the settings over here, you can visit that form to fill in the advanced settings.',
+        'menu_advancedSettings' => 'Settings → Acumulus advanced settings',
+
+        'desc_basicSettings' => 'This is the form with advanced, i.e. less commonly used, settings. You can find the basic settingss in the "Acumulus settings form" under "%s", or via the button below. Note: if you click on this button, changes you made to this page will NOT be saved!',
+        'menu_basicSettings' => 'Settings → Acumulus',
     );
 }

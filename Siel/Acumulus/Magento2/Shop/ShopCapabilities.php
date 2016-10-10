@@ -59,4 +59,18 @@ class ShopCapabilities extends ShopCapabilitiesBase
         }
         return $result;
     }
+
+    public function getLink($formType)
+    {
+        $registry = Registry::getInstance();
+        switch ($formType) {
+            case 'config':
+                return $registry->getUrlInterface()->getUrl('acumulus/config');
+            case 'advanced':
+                return $registry->getUrlInterface()->getUrl('acumulus/config/advanced');
+            case 'batch':
+                return $registry->getUrlInterface()->getUrl('acumulus/batch');
+        }
+        return parent::getLink($formType);
+    }
 }

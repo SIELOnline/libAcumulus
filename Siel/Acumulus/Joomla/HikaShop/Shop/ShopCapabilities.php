@@ -3,8 +3,7 @@ namespace Siel\Acumulus\Joomla\HikaShop\Shop;
 
 use Siel\Acumulus\Invoice\ConfigInterface as InvoiceConfigInterface;
 use Siel\Acumulus\Invoice\Source;
-use Siel\Acumulus\Joomla\Helpers\Log;
-use Siel\Acumulus\Shop\ShopCapabilities as ShopCapabilitiesBase;
+use Siel\Acumulus\Joomla\Shop\ShopCapabilities as ShopCapabilitiesBase;
 
 /**
  * Defines the HikaShop webshop specific capabilities.

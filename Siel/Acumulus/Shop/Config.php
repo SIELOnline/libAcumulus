@@ -3,6 +3,7 @@ namespace Siel\Acumulus\Shop;
 
 use ReflectionClass;
 use Siel\Acumulus\Helpers\Log;
+use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Invoice\ConfigInterface as InvoiceConfigInterface;
 use Siel\Acumulus\Web\ConfigInterface as ServiceConfigInterface;
 
@@ -94,7 +95,18 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
      */
     public function getTranslator()
     {
-        return $this->getInstance('Translator', 'Helpers', array($this->language));
+        static $moduleSpecificTranslationsAdded = false;
+
+        /** @var Translator $translator */
+        $translator = $this->getInstance('Translator', 'Helpers', array($this->language));
+        if (!$moduleSpecificTranslationsAdded) {
+            try {
+                $translations = $this->getInstance('ModuleSpecificTranslations', 'helpers');
+                $translator->add($translations);
+            } catch (\ReflectionException $e) {}
+            $moduleSpecificTranslationsAdded = true;
+        }
+        return $translator;
     }
 
     /**
@@ -198,6 +210,7 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
      */
     public function getForm($type)
     {
+        $class = ucfirst($type);
         $arguments = array(
             $this->getTranslator(),
             $this->getShopCapabilities(),
@@ -207,14 +220,16 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
                 $arguments[] = $this;
                 $arguments[] = $this->getService();
                 break;
+            case 'advanced':
+                $class = 'AdvancedConfig';
+                $arguments[] = $this;
+                $arguments[] = $this->getService();
+                break;
             case 'batch':
                 $arguments[] = $this->getManager();
                 break;
-            default:
-                $this->getLog()->error('Config::getForm(%s): unknown form type', $type);
-                break;
         }
-        return $this->getInstance(ucfirst($type) . 'Form', 'Shop', $arguments);
+        return $this->getInstance($class . 'Form', 'Shop', $arguments);
     }
 
     /**
@@ -271,15 +286,18 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
                 $fqClass = $this->tryNsInstance($class, $subNamespace, static::baseNamespace);
             }
 
-            // Use ReflectionClass to pass an argument list.
-            if (empty($constructorArgs)) {
-                // PHP5.3: exception when class has no constructor and
-                // newInstanceArgs() is called.
-                $this->instances[$class] = new $fqClass();
-            }
-            else {
+            if (!empty($constructorArgs)) {
+                // Use ReflectionClass to pass an argument list.
                 $reflector = new ReflectionClass($fqClass);
                 $this->instances[$class] = $reflector->newInstanceArgs($constructorArgs);
+            }
+            else {
+                // PHP5.3: exception when class has no constructor and
+                // newInstanceArgs() is called.
+                if (empty($fqClass)) {
+                    throw new \ReflectionException("Class $class not found in namespace $subNamespace");
+                }
+                $this->instances[$class] = new $fqClass();
             }
         }
         return $this->instances[$class];
@@ -289,7 +307,7 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
     {
         $fqClass = $namespace . '\\' . $subNamespace . '\\' . $class;
         $fileName = __DIR__ . DIRECTORY_SEPARATOR . '..' . str_replace('\\', DIRECTORY_SEPARATOR, substr($fqClass, strlen('/Siel/Acumulus'))) . '.php';
-        // Checking if the file exists prevent warnings in Magento whose own
+        // Checking if the file exists prevents warnings in Magento whose own
         // autoloader logs warnings when a class cannot be loaded.
         return is_readable($fileName) && class_exists($fqClass) ? $fqClass : '';
     }

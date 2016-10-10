@@ -23,11 +23,11 @@ class TranslationCollection
     public function get($language)
     {
         $result = array();
-        if (isset($this->nl)) {
-            $result = array_merge($result, $this->nl);
-        }
         if (isset($this->{$language})) {
-            $result = array_merge($result, $this->{$language});
+            $result = $this->{$language};
+        }
+        if ($language !== 'nl' && isset($this->nl)) {
+            $result += $this->nl;
         }
         return $result;
     }

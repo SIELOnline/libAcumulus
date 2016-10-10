@@ -30,7 +30,7 @@ class Translator implements TranslatorInterface
      */
     public function add(TranslationCollection $translationCollection)
     {
-        $this->translations = array_merge($this->translations, $translationCollection->get($this->getLanguage()));
+        $this->translations += $translationCollection->get($this->getLanguage());
     }
 
     /**

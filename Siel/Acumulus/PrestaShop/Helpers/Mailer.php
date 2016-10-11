@@ -22,7 +22,7 @@ class Mailer extends BaseMailer
      */
     public function sendMail($from, $fromName, $to, $subject, $bodyText, $bodyHtml)
     {
-        $this->templateDir = dirname(__FILE__) . '/mails/';
+        $this->templateDir = __DIR__ . '/mails/';
         $this->templateName = 'message';
         $this->writeTemplateFiles($bodyText, $bodyHtml);
 

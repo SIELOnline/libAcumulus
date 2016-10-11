@@ -3,7 +3,7 @@ namespace Siel\Acumulus\PrestaShop\Shop;
 
 use Siel\Acumulus\Helpers\TranslatorInterface;
 use Siel\Acumulus\Shop\Config;
-use Siel\Acumulus\Shop\ConfigForm as BaseConfigForm;
+use Siel\Acumulus\Shop\AdvancedConfigForm as BaseAdvancedConfigForm;
 use Siel\Acumulus\Shop\ShopCapabilitiesInterface;
 use Siel\Acumulus\Web\Service;
 use Tools;
@@ -12,7 +12,7 @@ use Tools;
  * Class ConfigForm processes and builds the settings form page for the
  * PrestaShop Acumulus module.
  */
-class AdvancedConfigForm extends BaseConfigForm
+class AdvancedConfigForm extends BaseAdvancedConfigForm
 {
     /** @var string */
     protected $moduleName;
@@ -77,8 +77,13 @@ class AdvancedConfigForm extends BaseConfigForm
         $result = parent::getFieldDefinitions();
 
         // Add icons.
-        $result['accountSettingsHeader']['icon'] = 'icon-user';
-        $result['invoiceSettingsHeader']['icon'] = 'icon-AdminParentPreferences';
+        if (isset($result['accountSettingsHeader'])) {
+            $result['accountSettingsHeader']['icon'] = 'icon-user';
+        }
+        $result['configHeader']['icon'] = 'icon-cogs';
+        if (isset($result['invoiceSettingsHeader'])) {
+            $result['invoiceSettingsHeader']['icon'] = 'icon-AdminParentPreferences';
+        }
         if (isset($result['paymentMethodAccountNumberFieldset'])) {
             $result['paymentMethodAccountNumberFieldset']['icon'] = 'icon-credit-card';
         }
@@ -88,8 +93,9 @@ class AdvancedConfigForm extends BaseConfigForm
         if (isset($result['emailAsPdfSettingsHeader'])) {
             $result['emailAsPdfSettingsHeader']['icon'] = 'icon-file-pdf-o';
         }
-        $result['versionInformationHeader']['icon'] = 'icon-info-circle';
-        $result['advancedConfigHeader']['icon'] = 'icon-cogs';
+        if (isset($result['versionInformationHeader'])) {
+            $result['versionInformationHeader']['icon'] = 'icon-info-circle';
+        }
 
         return $result;
     }

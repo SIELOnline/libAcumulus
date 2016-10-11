@@ -316,10 +316,10 @@ If you don\'t want this, check this option.',
         'versionInformationHeader' => 'Module information',
         'desc_versionInformation' => 'Please mention this information with any support request.',
 
-        'desc_advancedSettings' => 'This plugin is highly configurable and therefore this form does not contain all settings. You can find the other settings in the "Acumulus advanced settings form" under "%s". Once you have completed and saved the settings over here, you can visit that form to fill in the advanced settings.',
+        'desc_advancedSettings' => 'This plugin is highly configurable and therefore this form does not contain all settings. You can find the other settings in the "%1$s" under "%2$s". Once you have completed and saved the settings over here, you can visit that form to fill in the advanced settings.',
         'menu_advancedSettings' => 'Settings → Acumulus advanced settings',
 
-        'desc_basicSettings' => 'This is the form with advanced, i.e. less commonly used, settings. You can find the basic settingss in the "Acumulus settings form" under "%s", or via the button below. Note: if you click on this button, changes you made to this page will NOT be saved!',
+        'desc_basicSettings' => 'This is the form with advanced, i.e. less commonly used, settings. You can find the basic settings in the "%1$s" under "%2$s", or via the button below. Note: if you click on this button, changes you made to this page will NOT be saved!',
         'menu_basicSettings' => 'Settings → Acumulus',
     );
 }

@@ -35,7 +35,7 @@ class BatchForm extends BaseBatchForm
     public function getFieldDefinitions()
     {
         $result = parent::getFieldDefinitions();
-        $result['batchFieldsHeader']['icon'] = 'icon-envelope-alt';
+        $result['batchFieldsHeader']['icon'] = 'icon-exchange';
         if (isset($result['batchLogHeader'])) {
             $result['batchLogHeader']['icon'] = 'icon-list';
         }

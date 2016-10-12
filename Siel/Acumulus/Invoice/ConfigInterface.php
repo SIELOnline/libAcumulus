@@ -25,6 +25,9 @@ interface ConfigInterface
     const InvoiceDate_OrderCreate = 2;
     const InvoiceDate_Transfer = 3;
 
+    const ContactStatus_Disabled = 0;
+    const ContactStatus_Active = 1;
+
     const OverwriteIfExists_No = 0;
     const OverwriteIfExists_Yes = 1;
 

@@ -780,6 +780,11 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
                     'type' => 'string',
                     'default' => '',
                 ),
+                'contactStatus' => array(
+                    'group' => 'customer',
+                    'type' => 'int',
+                    'default' => InvoiceConfigInterface::ContactStatus_Active,
+                ),
                 'defaultAccountNumber' => array(
                     'group' => 'invoice',
                     'type' => 'int',

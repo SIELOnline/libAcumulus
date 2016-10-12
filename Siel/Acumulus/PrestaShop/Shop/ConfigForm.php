@@ -77,8 +77,18 @@ class ConfigForm extends BaseConfigForm
         $result = parent::getFieldDefinitions();
 
         // Add icons.
-        $result['accountSettingsHeader']['icon'] = 'icon-user';
-        $result['invoiceSettingsHeader']['icon'] = 'icon-AdminParentPreferences';
+        if (isset($result['accountSettingsHeader'])) {
+            $result['accountSettingsHeader']['icon'] = 'icon-user';
+        }
+        if (isset($result['shopSettingsHeader'])) {
+            $result['shopSettingsHeader']['icon'] = 'icon-shopping-cart';
+        }
+        if (isset($result['triggerSettingsHeader'])) {
+            $result['triggerSettingsHeader']['icon'] = 'icon-exchange';
+        }
+        if (isset($result['invoiceSettingsHeader'])) {
+            $result['invoiceSettingsHeader']['icon'] = 'icon-list-alt';
+        }
         if (isset($result['paymentMethodAccountNumberFieldset'])) {
             $result['paymentMethodAccountNumberFieldset']['icon'] = 'icon-credit-card';
         }
@@ -88,8 +98,15 @@ class ConfigForm extends BaseConfigForm
         if (isset($result['emailAsPdfSettingsHeader'])) {
             $result['emailAsPdfSettingsHeader']['icon'] = 'icon-file-pdf-o';
         }
-        $result['versionInformationHeader']['icon'] = 'icon-info-circle';
-        $result['advancedConfigHeader']['icon'] = 'icon-cogs';
+        if (isset($result['pluginSettingsHeader'])) {
+            $result['pluginSettingsHeader']['icon'] = 'icon-puzzle-piece';
+        }
+        if (isset($result['versionInformationHeader'])) {
+            $result['versionInformationHeader']['icon'] = 'icon-info-circle';
+        }
+        if (isset($result['advancedConfigHeader'])) {
+            $result['advancedConfigHeader']['icon'] = 'icon-cogs';
+        }
 
         return $result;
     }

@@ -54,7 +54,7 @@ abstract class ShopCapabilities implements ShopCapabilitiesInterface
     /**
      * {@inheritdoc}
      */
-    public function getInvoiceTriggerEvents()
+    public function getTriggerInvoiceEventOptions()
     {
         return array(
             ConfigInterface::TriggerInvoiceEvent_None => $this->t('option_triggerInvoiceEvent_0'),

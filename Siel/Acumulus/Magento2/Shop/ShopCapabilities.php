@@ -28,9 +28,9 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getInvoiceTriggerEvents()
+    public function getTriggerInvoiceEventOptions()
     {
-        $result = parent::getInvoiceTriggerEvents();
+        $result = parent::getTriggerInvoiceEventOptions();
         $result[ConfigInterface::TriggerInvoiceEvent_Create] = $this->t('option_triggerInvoiceEvent_1');
         return $result;
     }

@@ -140,6 +140,7 @@ abstract class Creator
      * - contactid: not required: Acumulus id for this customer, in the absence
      *     of this value, the API uses the email address as identifying value.
      * - contactyourid: shop customer id
+     * - contactstatus
      * - companyname1
      * - companyname2
      * - fullname
@@ -148,6 +149,7 @@ abstract class Creator
      * - address2
      * - postalcode
      * - city
+     * - country
      * - countrycode
      * - vatnumber
      * - telephone
@@ -169,14 +171,15 @@ abstract class Creator
     protected function addCustomerDefaults()
     {
         $customerSettings = $this->config->getCustomerSettings();
-        $this->addDefault($this->invoice['customer'], 'overwriteifexists', $customerSettings['overwriteIfExists'] ? ConfigInterface::OverwriteIfExists_Yes : ConfigInterface::OverwriteIfExists_No);
         $this->addDefault($this->invoice['customer'], 'type', $customerSettings['defaultCustomerType']);
+        $this->addDefaultEmpty($this->invoice['customer'], 'contactstatus', $customerSettings['contactStatus']);
         if (!empty($customerSettings['salutation'])) {
             $this->invoice['customer']['salutation'] = $this->getSalutation($customerSettings['salutation']);
         }
         $this->addDefault($this->invoice['customer'], 'countrycode', 'nl');
         $this->convertEuCountryCode();
         $this->addDefault($this->invoice['customer'], 'country', $this->countries->getCountryName($this->invoice['customer']['countrycode']));
+        $this->addDefaultEmpty($this->invoice['customer'], 'overwriteifexists', $customerSettings['overwriteIfExists'] ? ConfigInterface::OverwriteIfExists_Yes : ConfigInterface::OverwriteIfExists_No);
     }
 
     /**
@@ -391,7 +394,7 @@ abstract class Creator
     {
         $invoiceSettings = $this->config->getInvoiceSettings();
         $invoice = &$this->invoice['customer']['invoice'];
-        $this->addDefault($invoice, 'concept', ConfigInterface::Concept_No);
+        $this->addDefaultEmpty($invoice, 'concept', ConfigInterface::Concept_No);
         $this->addDefault($invoice, 'accountnumber', $invoiceSettings['defaultAccountNumber']);
         $this->addDefault($invoice, 'costcenter', $invoiceSettings['defaultCostCenter']);
         if (isset($invoice['paymentstatus'])
@@ -855,7 +858,9 @@ abstract class Creator
     }
 
     /**
-     * Helper method to add a default (without overwriting) value to an array.
+     * Helper method to add a default value to an array.
+     *
+     * This method will not overwrite existing values.
      *
      * @param array $array
      * @param string $key
@@ -867,6 +872,27 @@ abstract class Creator
     protected function addDefault(array &$array, $key, $value)
     {
         if (empty($array[$key]) && !empty($value)) {
+            $array[$key] = $value;
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Helper method to add a possibly empty default value to an array.
+     *
+     * This method will not overwrite existing values.
+     *
+     * @param array $array
+     * @param string $key
+     * @param mixed $value
+     *
+     * @return bool
+     *   Whether the default was added.
+     */
+    protected function addDefaultEmpty(array &$array, $key, $value)
+    {
+        if (!isset($array[$key])) {
             $array[$key] = $value;
             return true;
         }

@@ -48,9 +48,17 @@ class ConfigStore extends BaSeConfigStore
      */
     public function save(array $values)
     {
-        $configurationValues = array();
+        // With 2 forms for the settings, not all settings will be saved at the
+        // same moment.
+        // - Read all currently stored settings.
+        // - Overwrite existing settings.
+        // - Add settings that had not yet a value.
+        // - Remove settings that do no longer have a custom value.
+        $configurationValues = get_option('acumulus');
         foreach ($values as $key => $value) {
-            if ($value !== null) {
+            if ($value === null) {
+                unset($configurationValues[$key]);
+            } else {
                 $configurationValues[$key] = $value;
             }
         }

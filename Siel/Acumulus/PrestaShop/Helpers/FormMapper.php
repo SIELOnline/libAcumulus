@@ -80,7 +80,7 @@ class FormMapper
 
         // Add description at the start of the fieldset as an html element.
         if (isset($field['description'])) {
-            array_unshift($result['form']['input'], array('type' => 'html', 'name' => $field['name'] . '_description', 'html_content' => $field['description']));
+            array_unshift($result['form']['input'], array('type' => 'html', 'name' => $field['name'] . '_description', 'html_content' => '<div class="help-block">' . $field['description'] . '</div>'));
         }
 
         // Add icon to legend.

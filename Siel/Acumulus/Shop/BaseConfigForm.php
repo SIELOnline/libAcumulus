@@ -111,6 +111,76 @@ abstract class BaseConfigForm extends Form
     }
 
     /**
+     * Returns version information.
+     *
+     * The fields returned:
+     * - versionInformation
+     * - versionInformationDesc
+     *
+     * @return array[]
+     *   The set of version related informational fields.
+     */
+    protected function getVersionInformation()
+    {
+        $env = $this->acumulusConfig->getEnvironment();
+        return array(
+            'versionInformation' => array(
+                'type' => 'markup',
+                'value' => "<p>Application: Acumulus module {$env['moduleVersion']}; Library: {$env['libraryVersion']}; Shop: {$env['shopName']} {$env['shopVersion']};<br>" .
+                    "Environment: PHP {$env['phpVersion']}; Curl: {$env['curlVersion']}; JSON: {$env['jsonVersion']}; OS: {$env['os']}.</p>",
+            ),
+            'versionInformationDesc' => array(
+                'type' => 'markup',
+                'value' => $this->t('desc_versionInformation'),
+            ),
+        );
+    }
+
+    /**
+     * Creates a hidden or an option field
+     *
+     * If there is only 1 option, a hidden value with a fixed value will be
+     * created, an option field that gives the user th choice otherwise.
+     *
+     * @param string $name
+     *   The field name.
+     * @param string $type
+     *   The field type: radio or select.
+     * @param array|null $options
+     *   An array with value =>label pairs that can be used as an option set.
+     *   If null, a similarly as $name named method on $this->shopCapabilities
+     *   wil be called to get the options.
+     *
+     * @return array
+     *   A form field definition.
+     */
+    protected function getOptionsOrHiddenField($name, $type, array $options = null)
+    {
+        if ($options === null) {
+            $methodName = 'get' . ucfirst($name) . 'Options';
+            $options = $this->shopCapabilities->$methodName();
+        }
+        if (count($options) === 1) {
+            // Make it a hidden field.
+            $field = array(
+                'type' => 'hidden',
+                'value' => reset($options),
+            );
+        } else {
+            $field = array(
+                'type' => $type,
+                'label' => $this->t("field_$name"),
+                'description' => $this->t($this->t("desc_$name")),
+                'options' => $options,
+                'attributes' => array(
+                    'required' => $type === 'radio',
+                ),
+            );
+        }
+        return $field;
+    }
+
+    /**
      * Converts a picklist response into an options list.
      *
      * @param array $picklist
@@ -155,6 +225,7 @@ abstract class BaseConfigForm extends Form
     {
         $result = array();
 
+        // @todo: moet 0 er wel bij als dit een multiple select is?
         $result['0'] = $this->t('option_empty_triggerOrderStatus');
         $result += $this->shopCapabilities->getShopOrderStatuses();
 

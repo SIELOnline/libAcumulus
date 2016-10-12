@@ -41,7 +41,7 @@ interface ShopCapabilitiesInterface
      *   for the dropdown item (a ConfigInterface::TriggerInvoiceEvent_...
      *   const) and the value being the label for the dropdown item.
      */
-    public function getInvoiceTriggerEvents();
+    public function getTriggerInvoiceEventOptions();
 
     /**
      * Returns a list of valid sources that can be used as invoice number.

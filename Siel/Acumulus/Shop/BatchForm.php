@@ -115,8 +115,8 @@ class BatchForm extends Form
             // Retrieve by order reference range.
             $from = $this->getFormValue('invoice_source_reference_from');
             $to = $this->getFormValue('invoice_source_reference_to') ? $this->getFormValue('invoice_source_reference_to') : $from;
-            $this->log['range'] = sprintf($this->t('message_form_range_reference'), $type, $from, $to);
-            $invoiceSources = $this->invoiceManager->getInvoiceSourcesByReferenceRange($this->t("plural_$type"), $from, $to);
+            $this->log['range'] = sprintf($this->t('message_form_range_reference'), $this->t("plural_$type"), $from, $to);
+            $invoiceSources = $this->invoiceManager->getInvoiceSourcesByReferenceRange($type, $from, $to);
         } else {
             // Retrieve by order date.
             $dateFormat = $this->getDateFormat();

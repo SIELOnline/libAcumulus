@@ -80,15 +80,14 @@ class AdvancedConfigForm extends BaseAdvancedConfigForm
         if (isset($result['accountSettingsHeader'])) {
             $result['accountSettingsHeader']['icon'] = 'icon-user';
         }
-        $result['configHeader']['icon'] = 'icon-cogs';
+        if (isset($result['configHeader'])) {
+            $result['configHeader']['icon'] = 'icon-cogs';
+        }
+        if (isset($result['relationSettingsHeader'])) {
+            $result['relationSettingsHeader']['icon'] = 'icon-users';
+        }
         if (isset($result['invoiceSettingsHeader'])) {
-            $result['invoiceSettingsHeader']['icon'] = 'icon-AdminParentPreferences';
-        }
-        if (isset($result['paymentMethodAccountNumberFieldset'])) {
-            $result['paymentMethodAccountNumberFieldset']['icon'] = 'icon-credit-card';
-        }
-        if (isset($result['paymentMethodCostCenterFieldset'])) {
-            $result['paymentMethodCostCenterFieldset']['icon'] = 'icon-credit-card';
+            $result['invoiceSettingsHeader']['icon'] = 'icon-list-alt';
         }
         if (isset($result['emailAsPdfSettingsHeader'])) {
             $result['emailAsPdfSettingsHeader']['icon'] = 'icon-file-pdf-o';

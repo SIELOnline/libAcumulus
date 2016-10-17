@@ -81,23 +81,15 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
     {
         $results = array();
         foreach ($extensions as $extension) {
-            Registry::getInstance()->language->load('payment/' . $extension);
+            $settings = $this->config->getEnvironment();
+            $file = 'payment/' . $extension;
+            if (version_compare($settings['shopVersion'], '2.3', '>=')) {
+                $file = 'extension/' . $file;
+            }
+            Registry::getInstance()->language->load($file);
             $results[$extension] = Registry::getInstance()->language->get('heading_title');
         }
         return $results;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getPaymentMethods()
-    {
-        Registry::getInstance()->load->model('extension/extension');
-        $extensions = Registry::getInstance()->model_extension_extension->getInstalled('payment');
-        $extensions = array_filter($extensions, function($extension) {
-            return (bool) Registry::getInstance()->config->get($extension . '_status');
-        });
-        return $this->paymentMethodToOptions($extensions);
     }
 
     /**

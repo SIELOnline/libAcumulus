@@ -186,7 +186,7 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
      */
     public function getShopCapabilities()
     {
-        return $this->getInstance('ShopCapabilities', 'Shop', array($this->getTranslator()));
+        return $this->getInstance('ShopCapabilities', 'Shop', array($this->getTranslator(), $this));
     }
 
     /**

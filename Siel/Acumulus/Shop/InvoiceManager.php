@@ -13,9 +13,6 @@ abstract class InvoiceManager
     /** @var \Siel\Acumulus\Shop\Config */
     protected $config;
 
-    /** @var \Siel\Acumulus\Invoice\Completor */
-    protected $completor;
-
     /** @var string */
     protected $message;
 

@@ -21,7 +21,7 @@ class FormRenderer extends BaseFormRenderer
         $this->labelWrapperClass = 'form-group';
         $this->inputWrapperClass = 'form-control';
         $this->multiLabelClass = 'control-label';
-        $this->descriptionClass = 'description';
+        $this->descriptionClass = 'col-sm-offset-2 description';
     }
 
     protected function renderField(array $field)

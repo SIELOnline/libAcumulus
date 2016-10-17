@@ -45,7 +45,7 @@ class OcHelper extends BaseOcHelper
         parent::renderFormCommon($task, $button);
 
         // Send the output.
-        $this->registry->response->setOutput($this->registry->load->view('module/acumulus-form.tpl', $this->data));
+        $this->registry->response->setOutput($this->registry->load->view('module/acumulus_form.tpl', $this->data));
     }
 
     /**

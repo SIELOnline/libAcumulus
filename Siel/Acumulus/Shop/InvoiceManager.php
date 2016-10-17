@@ -178,9 +178,7 @@ abstract class InvoiceManager
             $result = $this->send($invoiceSource, false);
         } else {
             $result = ConfigInterface::Invoice_NotSent_WrongStatus;
-            $messages = array(
-              sprintf('%s not in [%s]', $status, implode(',', $shopEventSettings['triggerOrderStatus']))
-            );
+            $messages = array(sprintf('%s not in [%s]', $status, implode(',', $shopEventSettings['triggerOrderStatus'])));
             $logMessage = $this->getInvoiceSendResultMessage($invoiceSource, $result, $messages);
             $this->config->getLog()->notice('InvoiceManager::sourceStatusChange(): %s', $logMessage);
         }

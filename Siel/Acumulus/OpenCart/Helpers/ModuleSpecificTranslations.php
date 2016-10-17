@@ -9,7 +9,7 @@ use Siel\Acumulus\Helpers\TranslationCollection;
 class ModuleSpecificTranslations extends TranslationCollection
 {
     protected $nl = array(
-        'button_link' => '<a href="%2$s" class="btn btn-primary"><i class="fa fa-cog"></i> %1$s</a>',
+        'button_link' => '<a href="%2$s" class="button btn btn-primary"><i class="fa fa-cog"></i> %1$s</a>',
 
         'desc_advancedSettings' => 'Deze plugin kent veel instellingen en daarom bevat deze pagina niet alle instellingen. Een aantal minder gebruikte instellingen vindt u in het "%1$s". Nadat u hier de gegevens hebt ingevuld en opgeslagen, kunt u het andere formulier bezoeken:',
         'menu_basicSettings' => 'Extensies → Modules → Acumulus → Wijzigen',

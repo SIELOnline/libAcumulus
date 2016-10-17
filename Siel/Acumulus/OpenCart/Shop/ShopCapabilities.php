@@ -81,12 +81,7 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
     {
         $results = array();
         foreach ($extensions as $extension) {
-            $settings = $this->config->getEnvironment();
-            $file = 'payment/' . $extension;
-            if (version_compare($settings['shopVersion'], '2.3', '>=')) {
-                $file = 'extension/' . $file;
-            }
-            Registry::getInstance()->language->load($file);
+            Registry::getInstance()->language->load('payment/' . $extension);
             $results[$extension] = Registry::getInstance()->language->get('heading_title');
         }
         return $results;

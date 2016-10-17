@@ -11,20 +11,15 @@ use Siel\Acumulus\Invoice\Source;
  */
 abstract class ShopCapabilities implements ShopCapabilitiesInterface
 {
-    /** @var \Siel\Acumulus\Shop\Config */
-    protected $config;
-
     /** @var \Siel\Acumulus\Helpers\TranslatorInterface */
     protected $translator;
 
     /**
      * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
-     * @param \Siel\Acumulus\Shop\Config $config
      */
-    public function __construct(TranslatorInterface $translator , Config $config)
+    public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
-        $this->config = $config;
     }
 
     /**

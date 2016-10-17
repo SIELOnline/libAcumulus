@@ -22,7 +22,7 @@ use Siel\Acumulus\Web\ConfigInterface as ServiceConfigInterface;
 class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigInterface, InjectorInterface
 {
     /** @const string */
-    const baseNamespace = '\\Siel\\Acumulus';
+    const baseNamespace = '\\Siel\\Acumulus\\';
 
     /** @var array[]|null */
     protected $keyInfo;
@@ -58,7 +58,7 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
         $this->isLoaded = false;
         $this->values = array();
         $this->instances = array();
-        $this->shopNamespace = static::baseNamespace . '\\' . $shopNamespace;
+        $this->shopNamespace = static::baseNamespace . $shopNamespace;
         global $sielAcumulusCustomNamespace;
         $this->customNamespace = !empty($sielAcumulusCustomNamespace) ? $sielAcumulusCustomNamespace : '';
         $this->language = substr($language, 0, 2);
@@ -103,7 +103,7 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
             try {
                 $translations = $this->getInstance('ModuleSpecificTranslations', 'helpers');
                 $translator->add($translations);
-            } catch (\ReflectionException $e) {}
+            } catch (\InvalidArgumentException $e) {}
             $moduleSpecificTranslationsAdded = true;
         }
         return $translator;
@@ -186,7 +186,7 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
      */
     public function getShopCapabilities()
     {
-        return $this->getInstance('ShopCapabilities', 'Shop', array($this->getTranslator(), $this));
+        return $this->getInstance('ShopCapabilities', 'Shop', array($this->getTranslator()));
     }
 
     /**
@@ -258,6 +258,7 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
      *
      * @return object
      *
+     * @throws \InvalidArgumentException
      * @throws \ReflectionException
      */
     protected function getInstance($class, $subNamespace, array $constructorArgs = array(), $newInstance = false)
@@ -268,36 +269,27 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
                 $fqClass = $this->tryNsInstance($class, $subNamespace, $this->customNamespace);
             }
 
-            // Try shop namespace.
-            if (empty($fqClass)) {
-                $fqClass = $this->tryNsInstance($class, $subNamespace, $this->shopNamespace);
+            // Try the shop namespace and any parent namespaces.
+            $namespaces = explode('\\', $this->shopNamespace);
+            while (empty($fqClass) && !empty($namespaces)) {
+                $namespace = implode('\\', $namespaces);
+                $fqClass = $this->tryNsInstance($class, $subNamespace, $namespace);
+                array_pop($namespaces);
             }
 
-            // Try CMS namespace if it exists.
             if (empty($fqClass)) {
-                $cmsNamespace = $this->getCmsNamespace();
-                if (!empty($cmsNamespace)) {
-                    $fqClass = $this->tryNsInstance($class, $subNamespace, $cmsNamespace);
-                }
+                throw new \InvalidArgumentException("Class $class not found in namespace $subNamespace");
             }
 
-            // Try base namespace.
-            if (empty($fqClass)) {
-                $fqClass = $this->tryNsInstance($class, $subNamespace, static::baseNamespace);
-            }
-
-            if (!empty($constructorArgs)) {
-                // Use ReflectionClass to pass an argument list.
+            // Create a new instance.
+            // As PHP5.3 produces a fatal error when a class has no constructor
+            // and newInstanceArgs() is called, we have to differentiate between
+            // no arguments and arguments.
+            if (empty($constructorArgs)) {
+                $this->instances[$class] = new $fqClass();
+            } else {
                 $reflector = new ReflectionClass($fqClass);
                 $this->instances[$class] = $reflector->newInstanceArgs($constructorArgs);
-            }
-            else {
-                // PHP5.3: exception when class has no constructor and
-                // newInstanceArgs() is called.
-                if (empty($fqClass)) {
-                    throw new \ReflectionException("Class $class not found in namespace $subNamespace");
-                }
-                $this->instances[$class] = new $fqClass();
             }
         }
         return $this->instances[$class];

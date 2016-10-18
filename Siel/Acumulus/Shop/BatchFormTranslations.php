@@ -9,8 +9,9 @@ use Siel\Acumulus\Helpers\TranslationCollection;
 class BatchFormTranslations extends TranslationCollection
 {
     protected $nl = array(
-        'batch_form_title' => 'Acumulus | Batch verzending',
+        'batch_form_title' => 'Acumulus | Batchverzending',
         'batch_form_header' => 'Verzend facturen naar Acumulus',
+        'batch_form_link_text' => 'Acumulus batchverzending',
 
         'button_save' => 'Verzenden',
         'button_send' => 'Verzenden',
@@ -91,7 +92,8 @@ LONGSTRING
 
     protected $en = array(
         'batch_form_title' => 'Acumulus | Send batch',
-        'batch_form_header' => 'Send invoices to Acumulus',
+        'batch_form_header' => 'Send a batch of invoices to Acumulus',
+        'batch_form_link_text' => 'Acumulus batch',
 
         'button_save' => 'Send',
         'button_send' => 'Send',

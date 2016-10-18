@@ -28,7 +28,10 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
     protected $keyInfo;
 
     /** @var bool */
-    protected $isLoaded;
+    protected $isConfigurationLoaded;
+
+    /** @var bool */
+    protected $moduleSpecificTranslationsAdded = false;
 
     /** @var array */
     protected $values;
@@ -55,7 +58,7 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
     public function __construct($shopNamespace, $language)
     {
         $this->keyInfo = null;
-        $this->isLoaded = false;
+        $this->isConfigurationLoaded = false;
         $this->values = array();
         $this->instances = array();
         $this->shopNamespace = static::baseNamespace . $shopNamespace;
@@ -95,16 +98,14 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
      */
     public function getTranslator()
     {
-        static $moduleSpecificTranslationsAdded = false;
-
         /** @var Translator $translator */
         $translator = $this->getInstance('Translator', 'Helpers', array($this->language));
-        if (!$moduleSpecificTranslationsAdded) {
+        if (!$this->moduleSpecificTranslationsAdded) {
             try {
                 $translations = $this->getInstance('ModuleSpecificTranslations', 'helpers');
                 $translator->add($translations);
             } catch (\InvalidArgumentException $e) {}
-            $moduleSpecificTranslationsAdded = true;
+            $this->moduleSpecificTranslationsAdded = true;
         }
         return $translator;
     }
@@ -328,9 +329,9 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
      */
     protected function load()
     {
-        if (!$this->isLoaded) {
+        if (!$this->isConfigurationLoaded) {
             $this->values = $this->castValues(array_merge($this->getDefaults(), $this->getConfigStore()->load($this->getKeys())));
-            $this->isLoaded = true;
+            $this->isConfigurationLoaded = true;
         }
     }
 
@@ -366,7 +367,7 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
         $values += $this->getConfigStore()->load($this->getKeys());
         $values = $this->castValues($values);
         $result = $this->getConfigStore()->save($values);
-        $this->isLoaded = false;
+        $this->isConfigurationLoaded = false;
         // Sync internal values.
         $this->load();
         return $result;

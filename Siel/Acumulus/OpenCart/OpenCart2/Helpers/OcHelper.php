@@ -20,6 +20,36 @@ class OcHelper extends BaseOcHelper
     }
 
     /**
+     * Adds our menu-items to the admin menu.
+     *
+     * @param array $menus
+     *   The menus part of the data as will be passed to the view.
+     */
+    public function eventViewColumnLeft(&$menus) {
+        $this->init();
+        foreach ($menus as &$menu) {
+            if ($menu['id'] === 'menu-sale') {
+                $menu['children'][] = array(
+                    'name' => 'Acumulus',
+                    'href' => '',
+                    'children' => array(
+                        array(
+                            'name' => $this->t('batch_form_link_text'),
+                            'href' => $this->acumulusConfig->getShopCapabilities()->getLink('batch'),
+                            'children' => array(),
+                        ),
+                        array(
+                            'name' => $this->t('advanced_form_link_text'),
+                            'href' => $this->acumulusConfig->getShopCapabilities()->getLink('advanced'),
+                            'children' => array(),
+                        ),
+                    ),
+                );
+            }
+        }
+    }
+
+    /**
      * Performs the common tasks when displaying a form.
      *
      * @param string $task
@@ -71,7 +101,8 @@ class OcHelper extends BaseOcHelper
      *
      * This will add them to the table 'event' from where they are registered on
      * the start of each request. The controller actions can be found in the
-     * catalog controller.
+     * catalog controller for the catalog events and the amdin controller for
+     * the admin events.
      *
      * To support updating, this will also be called by the index function.
      * Therefore we will first remove any existing events from our module.
@@ -81,6 +112,7 @@ class OcHelper extends BaseOcHelper
         $this->uninstallEvents();
         $this->registry->model_extension_event->addEvent('acumulus', 'catalog/model/checkout/order/addOrder/after', 'module/acumulus/eventOrderUpdate');
         $this->registry->model_extension_event->addEvent('acumulus', 'catalog/model/checkout/order/addOrderHistory/after', 'module/acumulus/eventOrderUpdate');
+        $this->registry->model_extension_event->addEvent('acumulus', 'admin/view/common/column_left/before', 'module/acumulus/eventViewColumnLeft');
     }
 
     /**

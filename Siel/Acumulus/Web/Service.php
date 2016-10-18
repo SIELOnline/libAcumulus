@@ -147,7 +147,7 @@ class Service
      */
     public function messagesToText(array $messages)
     {
-        return '* ' . implode("\n\n* ", $messages) . "\n\n";
+        return !empty($messages) ? '* ' . implode("\n\n* ", $messages) . "\n\n" : '';
     }
 
     /**

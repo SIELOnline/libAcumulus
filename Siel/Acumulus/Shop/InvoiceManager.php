@@ -356,21 +356,17 @@ abstract class InvoiceManager
      */
     protected function getInvoiceSendResultMessage(Source $invoiceSource, $status, array $messages = array())
     {
-        $sent = $status & ConfigInterface::Invoice_NotSent === 0;
-        if ($sent) {
-            $action = $this->t('message_sent');
-        } else {
-            $action = $this->t('message_not_sent');
-        }
-
+        $sent = ($status & ConfigInterface::Invoice_NotSent) === 0;
+        $action = $this->t($sent ? 'message_sent' : 'message_not_sent');
         $reason = $this->getSendReason($status & (ConfigInterface::Invoice_Sent_Mask | ConfigInterface::Invoice_NotSent_Mask));
         $message = sprintf($this->t('message_invoice_send'), $this->t($invoiceSource->getType()), $invoiceSource->getReference(), $action, $reason);
 
         if ($sent) {
             $service = $this->config->getService();
-            $result = ' ' . $service->getStatusText($status & WebConfigInterface::Status_Mask);
-            $messages = rtrim(' ' . $service->messagesToText($messages));
-            $message .= $result . $messages;
+            $message .= ' ' . $service->getStatusText($status & WebConfigInterface::Status_Mask);
+            if (!empty($messages)) {
+                $message .= ' ' . $service->messagesToText($messages);
+            }
         }
 
         // Also store the message for later retrieval by batch send

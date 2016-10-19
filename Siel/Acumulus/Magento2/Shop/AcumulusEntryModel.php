@@ -6,7 +6,7 @@ use Siel\Acumulus\Shop\AcumulusEntryModel as BaseAcumulusEntryModel;
 
 /**
  * Implements the Magento 2 specific acumulus entry model class.
- * 
+ *
  * This class is a bridge between the Acumulus library and the way that Magento
  * 2 models are modelled.
  */
@@ -20,8 +20,7 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
      */
     public function __construct()
     {
-        $this->model = Registry::getInstance()
-                               ->get('Siel\AcumulusMa2\Model\Entry');
+        $this->model = Registry::getInstance()->get('Siel\AcumulusMa2\Model\Entry');
     }
 
     /**
@@ -37,7 +36,12 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
      */
     public function getByEntryId($entryId)
     {
-        return $this->getModel()->load($entryId, 'entry_id');
+        /** @var \Siel\AcumulusMa2\Model\Entry[] $result */
+        $result = $this->getModel()->getResourceCollection()
+           ->addFieldToFilter('entry_id', $entryId)
+           ->getItems();
+        $result = count($result) === 0 ? null : (count($result) === 1 ? reset($result) : $result);
+        return $result;
     }
 
     /**

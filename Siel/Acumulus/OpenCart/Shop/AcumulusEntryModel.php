@@ -30,8 +30,10 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
      */
     public function getByEntryId($entryId)
     {
-        $result = $this->getDb()->query(sprintf('SELECT * FROM %s WHERE entry_id = %u', $this->tableName, $entryId));
-        return empty($result->row) ? $result->row : null;
+        $operator = $entryId === null ? 'is' : '=';
+        $entryId = $entryId === null ? 'NULL' : (string) (int) $entryId;
+        $result = $this->getDb()->query("SELECT * FROM {$this->tableName} WHERE entry_id $operator $entryId");
+        return empty($result->rows) ? null : (count($result->rows) === 1 ? $result->row : $result->rows);
     }
 
     /**
@@ -39,8 +41,8 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
      */
     public function getByInvoiceSourceId($invoiceSourceType, $invoiceSourceId)
     {
-        $result = $this->getDb()->query(sprintf("SELECT * FROM `%s` WHERE source_type = '%s' AND source_id = %u", $this->tableName, $invoiceSourceType, $invoiceSourceId));
-        return !empty($result->row) ? $result->row : null;
+        $result = $this->getDb()->query("SELECT * FROM `{$this->tableName}` WHERE source_type = '$invoiceSourceType' AND source_id = $invoiceSourceId");
+        return empty($result->rows) ? null : $result->row;
     }
 
     /**
@@ -54,8 +56,11 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
         } else {
             $storeId = 0;
         }
-        return (bool) $this->getDb()->query(sprintf("INSERT INTO `%s` (store_id, entry_id, token, source_type, source_id, updated) VALUES (%d, %d, '%s', '%s', %d, '%s')",
-            $this->tableName, $storeId, $entryId, $token, $invoiceSource->getType(), $invoiceSource->getId(), $created));
+        $entryId = $entryId === null ? 'NULL' : (string) (int) $entryId;
+        $token = $token === null ? 'NULL' : "'" . $this->getDb()->escape($token) . "'";
+        $invoiceSourceType = $invoiceSource->getType();
+        $invoiceSourceId = $invoiceSource->getId();
+        return (bool) $this->getDb()->query("INSERT INTO `{$this->tableName}` (store_id, entry_id, token, source_type, source_id, updated) VALUES ($storeId, $entryId, $token, '$invoiceSourceType', $invoiceSourceId, '$created')");
     }
 
     /**
@@ -63,10 +68,11 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
      */
     protected function update($record, $entryId, $token, $updated)
     {
-        return (bool) $this->getDb()->query(sprintf("UPDATE `%s` SET entry_id = %u, token = '%s', updated = '%s' WHERE id = %u",
-            $this->tableName, $entryId, $token, $updated, $record['id']));
+        $entryId = $entryId === null ? 'NULL' : (string) (int) $entryId;
+        $token = $token === null ? 'NULL' : "'" . $this->getDb()->escape($token) . "'";
+        return (bool) $this->getDb()->query("UPDATE `{$this->tableName}` SET entry_id = $entryId, token = $token, updated = '$updated' WHERE id = {$record['id']}");
     }
-    
+
     /** @noinspection PhpUndefinedNamespaceInspection */
     /** @noinspection PhpUndefinedClassInspection */
     /**

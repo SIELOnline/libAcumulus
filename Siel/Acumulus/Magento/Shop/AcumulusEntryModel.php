@@ -34,7 +34,12 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
      */
     public function getByEntryId($entryId)
     {
-        return $this->getModel()->load($entryId, 'entry_id');
+        /** @var Siel_Acumulus_Model_Entry[] $result */
+        $result = $this->getModel()->getResourceCollection()
+           ->addFieldToFilter('entry_id', $entryId)
+           ->getItems();
+        $result = count($result) === 0 ? null : (count($result) === 1 ? reset($result) : $result);
+        return $result;
     }
 
     /**
@@ -44,9 +49,9 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
     {
         /** @var Siel_Acumulus_Model_Entry $result */
         $result = $this->getModel()->getResourceCollection()
-                       ->addFieldToFilter('source_type', $invoiceSourceType)
-                       ->addFieldToFilter('source_id', $invoiceSourceId)
-                       ->getFirstItem();
+           ->addFieldToFilter('source_type', $invoiceSourceType)
+           ->addFieldToFilter('source_id', $invoiceSourceId)
+           ->getFirstItem();
         return $result->getSourceId() == $invoiceSourceId ? $result : null;
     }
 
@@ -56,11 +61,11 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
     protected function insert($invoiceSource, $entryId, $token, $created)
     {
         return $this->getModel()
-                    ->setEntryId($entryId)
-                    ->setToken($token)
-                    ->setSourceType($invoiceSource->getType())
-                    ->setSourceId($invoiceSource->getId())
-                    ->save();
+            ->setEntryId($entryId)
+            ->setToken($token)
+            ->setSourceType($invoiceSource->getType())
+            ->setSourceId($invoiceSource->getId())
+            ->save();
     }
 
     /**

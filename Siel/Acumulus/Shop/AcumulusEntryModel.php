@@ -2,12 +2,14 @@
 namespace Siel\Acumulus\Shop;
 
 /**
- * Represents acumulus entry records that ties orders or credit notes from the
- * web shop to entries in Acumulus.
+ * Represents acumulus entry records.
+ *
+ * These records tie orders or credit notes from the web shop to entries in
+ * Acumulus.
  *
  * Acumulus identifies entries by their entry id (boekstuknummer in het
  * Nederlands). To access an entry via the API, one must also supply a token
- * that is generated based on the contents of the entry. This entry id and token
+ * that is generated based on the contents of the entry. The entry id and token
  * are stored together with an id for the order or credit note from the web
  * shop.
  *
@@ -22,10 +24,11 @@ abstract class AcumulusEntryModel
     /**
      * Returns the Acumulus entry record for the given entry id.
      *
-     * @param string $entryId
-     *   the entry id to look up.
+     * @param int|null $entryId
+     *   The entry id to look up. If $entryId === null, multiple records may be
+     *   found, in which case a numerically indexed array will be returned.
      *
-     * @return array|object|null
+     * @return array|object|null|array[]|object[]
      *   Acumulus entry record for the given entry id or null if the entry id is
      *   unknown.
      */
@@ -35,11 +38,11 @@ abstract class AcumulusEntryModel
      * Returns the Acumulus entry record for the given invoice source.
      *
      * @param \Siel\Acumulus\Invoice\Source $invoiceSource
-     *   The source object (order, credit note) for which the invoice was created.
+     *   The source object for which the invoice was created.
      *
      * @return array|object|null
-     *   Acumulus entry record for the given invoice source or null if no invoice
-     *   has yet been created in Acumulus for this invoice source.
+     *   Acumulus entry record for the given invoice source or null if no
+     *   invoice has yet been created in Acumulus for this invoice source.
      */
     public function getByInvoiceSource($invoiceSource)
     {
@@ -55,25 +58,25 @@ abstract class AcumulusEntryModel
      *   The id of the invoice source for which the invoice was created.
      *
      * @return array|object|null
-     *   Acumulus entry record for the given invoice source or null if no invoice
-     *   has yet been created in Acumulus for this invoice source.
+     *   Acumulus entry record for the given invoice source or null if no
+     *   invoice has yet been created in Acumulus for this invoice source.
      */
     abstract public function getByInvoiceSourceId($invoiceSourceType, $invoiceSourceId);
 
     /**
      * Saves the Acumulus entry for the given order in the web shop's database.
      *
-     * This default implementation calls getByInvoiceSource() to determine whether
-     * to subsequently call insert() or update().
+     * This default implementation calls getByInvoiceSource() to determine
+     * whether to subsequently call insert() or update().
      *
      * So normally, a child class should implement insert() and update() and not
      * override this method.
      *
      * @param \Siel\Acumulus\Invoice\Source $invoiceSource
-     *   The source object (order, credit note) for which the invoice was created.
-     * @param $entryId
+     *   The source object for which the invoice was created.
+     * @param int|null $entryId
      *   The Acumulus entry Id assigned to the invoice for this order.
-     * @param $token
+     * @param string|null $token
      *   The Acumulus token to be used to access the invoice for this order via
      *   the Acumulus API.
      *
@@ -85,17 +88,17 @@ abstract class AcumulusEntryModel
         $now = $this->sqlNow();
         $record = $this->getByInvoiceSource($invoiceSource);
         if ($record == null) {
-            $this->insert($invoiceSource, $entryId, $token, $now);
+            return $this->insert($invoiceSource, $entryId, $token, $now);
         } else {
-            $this->update($record, $entryId, $token, $now);
+            return $this->update($record, $entryId, $token, $now);
         }
     }
 
     /**
-     * Returns the current time in a format that the actual database layer accepts
-     * as a timestamp.
+     * Returns the current time in a format accepted by the actual db layer.
      *
      * @return int|string
+     *   Timestamp
      */
     abstract protected function sqlNow();
 
@@ -103,15 +106,15 @@ abstract class AcumulusEntryModel
      * Inserts an Acumulus entry for the given order in the web shop's database.
      *
      * @param \Siel\Acumulus\Invoice\Source $invoiceSource
-     *   The source object (order, credit note) for which the invoice was created.
-     * @param $entryId
+     *   The source object for which the invoice was created.
+     * @param int|null $entryId
      *   The Acumulus entry Id assigned to the invoice for this order.
-     * @param $token
+     * @param string|null $token
      *   The Acumulus token to be used to access the invoice for this order via
      *   the Acumulus API.
      * @param int|string $created
-     *   The creation time (= current time), in the format as the actual database
-     *   layer expects for a timestamp.
+     *   The creation time (= current time), in the format as the actual
+     *   database layer expects for a timestamp.
      *
      * @return bool
      *   Success.
@@ -123,9 +126,9 @@ abstract class AcumulusEntryModel
      *
      * @param array|object $record
      *   The existing record for the invoice source to be updated.
-     * @param string $entryId
+     * @param int|null $entryId
      *   The new Acumulus entry id for the invoice source.
-     * @param string $token
+     * @param string|null $token
      *   The new Acumulus token for the invoice source.
      * @param int|string $updated
      *   The update time (= current time), in the format as the actual database
@@ -144,10 +147,11 @@ abstract class AcumulusEntryModel
     /**
      * Upgrade the datamodel to the given version. Only called when the module
      * got updated.
-     * 
+     *
      * @param string $version
      *
      * @return bool
+     *   Success.
      */
     public function upgrade(/** @noinspection PhpUnusedParameterInspection */ $version)
     {
@@ -156,6 +160,7 @@ abstract class AcumulusEntryModel
 
     /**
      * @return bool
+     *   Success.
      */
     abstract public function uninstall();
 }

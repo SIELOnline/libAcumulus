@@ -46,7 +46,6 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
      */
     public function getByEntryId($entryId)
     {
-        $result = false;
         $metaQuery = array(
             'posts_per_page' => 1,
             'meta_key' => static::KEY_ENTRY_ID,
@@ -55,11 +54,19 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
         );
         $posts = query_posts($metaQuery);
         if (!empty($posts)) {
-            $post = reset($posts);
-            $result = get_post_meta($post->id);
-            $result[static::KEY_TYPE] = $this->shopTypeToSourceType($post->post_type);
+            $result = array();
+            foreach ($posts as $post) {
+                $result1 = get_post_meta($post->id);
+                $result1[static::KEY_TYPE] = $this->shopTypeToSourceType($post->post_type);
+                $result[] = $result1;
+            }
+            if (count($result) === 1) {
+                $result = reset($result);
+            }
+        } else {
+            $result = null;
         }
-        return $result !== false ? $result : null;
+        return $result;
     }
 
     /**

@@ -31,8 +31,8 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
     public function getByEntryId($entryId)
     {
         $table = $this->newTable();
-        $result = $table->load(array('entry_id' => $entryId), true);
-        return $result ? $table : null;
+        $result = $table->loadMultiple(array('entry_id' => $entryId));
+        return count($result) === 0 ? null : (count($result) === 1 ? reset($result) : $result);
     }
 
     /**

@@ -30,8 +30,10 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
      */
     public function getByEntryId($entryId)
     {
-        $result = Db::getInstance()->executeS(sprintf("SELECT * FROM `%s` WHERE id_entry = %u", $this->tableName, $entryId));
-        return count($result) === 1 ? reset($result) : null;
+        $operator = $entryId === null ? 'is' : '=';
+        $entryId = $entryId === null ? 'NULL' : (string) (int) $entryId;
+        $result = Db::getInstance()->executeS("SELECT * FROM `{$this->tableName}` WHERE id_entry $operator $entryId");
+        return empty($result) ? null : (count($result) === 1 ? reset($result) : $result);
     }
 
     /**
@@ -39,7 +41,7 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
      */
     public function getByInvoiceSourceId($invoiceSourceType, $invoiceSourceId)
     {
-        $result = Db::getInstance()->executeS(sprintf("SELECT * FROM `%s` WHERE source_type = '%s' AND source_id = %u", $this->tableName, $invoiceSourceType, $invoiceSourceId));
+        $result = Db::getInstance()->executeS("SELECT * FROM `{$this->tableName}` WHERE source_type = '$invoiceSourceType' AND source_id = $invoiceSourceId");
         return count($result) === 1 ? reset($result) : null;
     }
 
@@ -55,8 +57,11 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
             $shopId = 0;
             $shopGroupId = 0;
         }
-        return Db::getInstance()->execute(sprintf("INSERT INTO `%s` (id_shop, id_shop_group, id_entry, token, source_type, source_id, updated) VALUES (%u, %u, %u, '%s', '%s', %u, '%s')",
-            $this->tableName, $shopId, $shopGroupId, $entryId, $token, $invoiceSource->getType(), $invoiceSource->getId(), $created));
+        $entryId = $entryId === null ? 'NULL' : (string) (int) $entryId;
+        $token = $token === null ? 'NULL' : "'" . Db::getInstance()->escape($token) . "'";
+        $invoiceSourceType = $invoiceSource->getType();
+        $invoiceSourceId = $invoiceSource->getId();
+        return Db::getInstance()->execute("INSERT INTO `{$this->tableName}` (id_shop, id_shop_group, id_entry, token, source_type, source_id, updated) VALUES $shopId, $shopGroupId, $entryId, $token, '$invoiceSourceType', $invoiceSourceId, '$created')");
     }
 
     /**
@@ -64,8 +69,9 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
      */
     protected function update($record, $entryId, $token, $updated)
     {
-        return Db::getInstance()->execute(sprintf("UPDATE `%s` SET id_entry = %u, token = '%s', updated = '%s' WHERE id = %u",
-            $this->tableName, $entryId, $token, $updated, $record['id']));
+        $entryId = $entryId === null ? 'NULL' : (string) (int) $entryId;
+        $token = $token === null ? 'NULL' : "'" . Db::getInstance()->escape($token) . "'";
+        return Db::getInstance()->execute("UPDATE `{$this->tableName}` SET id_entry = $entryId, token = $token, updated = '$updated' WHERE id = {$record['id']}");
     }
 
     /**

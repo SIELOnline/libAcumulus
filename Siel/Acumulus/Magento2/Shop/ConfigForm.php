@@ -29,18 +29,4 @@ class ConfigForm extends BaseConfigForm
             }
         }
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getFieldDefinitions()
-    {
-        $result = parent::getFieldDefinitions();
-
-        // Set "required" to false for the log setting as it leads to some
-        // strange styling behavior.
-        $result['versionInformationHeader']['fields']['logLevel']['attributes']['required'] = false;
-
-        return $result;
-    }
 }

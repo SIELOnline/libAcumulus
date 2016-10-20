@@ -73,13 +73,26 @@ class ConfigForm extends BaseConfigForm
             $this->errorMessages['contractcode'] = $this->t('message_validate_contractcode_0');
         } elseif (!is_numeric($this->submittedValues['contractcode'])) {
             $this->errorMessages['contractcode'] = $this->t('message_validate_contractcode_1');
+        } else {
+            // Prevent errors where a copy & paste of the contractcode from the
+            // welcome mail includes spaces or tabs before or after the code.
+            $this->submittedValues['contractcode'] = trim($this->submittedValues['contractcode']);
         }
+
         if (empty($this->submittedValues['username'])) {
             $this->errorMessages['username'] = $this->t('message_validate_username_0');
+        } elseif ($this->submittedValues['username'] !== trim($this->submittedValues['username'])) {
+            $this->warningMessages['username'] = $this->t('message_validate_username_1');
         }
+
         if (empty($this->submittedValues['password'])) {
             $this->errorMessages['password'] = $this->t('message_validate_password_0');
+        } elseif ($this->submittedValues['password'] !== trim($this->submittedValues['password'])) {
+            $this->warningMessages['password'] = $this->t('message_validate_password_1');
+        } elseif (strpbrk($this->submittedValues['password'], '`\'"#%&;<>\\') !== false) {
+            $this->warningMessages['password'] = $this->t('message_validate_password_2');
         }
+
         if (empty($this->submittedValues['emailonerror'])) {
             $this->errorMessages['emailonerror'] = $this->t('message_validate_email_1');
         } else if (!preg_match($regexpEmail, $this->submittedValues['emailonerror'])) {
@@ -97,6 +110,7 @@ class ConfigForm extends BaseConfigForm
         if (!empty($this->submittedValues['emailFrom']) && !preg_match($regexpEmail, $this->submittedValues['emailFrom'])) {
             $this->errorMessages['emailFrom'] = $this->t('message_validate_email_4');
         }
+        // @todo: how to handle this one, now they are on separate forms?
         if (isset($this->submittedValues['emailAsPdf']) && (bool) $this->submittedValues['emailAsPdf'] && (!array_key_exists('sendCustomer', $this->submittedValues) || !(bool) $this->submittedValues['sendCustomer'])) {
             $this->errorMessages['conflicting_options'] = $this->t('message_validate_conflicting_options');
         }
@@ -513,9 +527,6 @@ class ConfigForm extends BaseConfigForm
     protected function getCheckboxKeys()
     {
         return array(
-            'sendCustomer' => 'clientData',
-            'overwriteIfExists' => 'clientData',
-            'removeEmptyShipping' => 'removeEmptyShipping',
             'emailAsPdf' => 'emailAsPdf',
         );
     }

@@ -51,6 +51,15 @@ class OcHelper
         }
     }
 
+    protected function addWarning($message)
+    {
+        if (is_array($message)) {
+            $this->data['warning_messages'] = array_merge($this->data['warning_messages'], $message);
+        } else {
+            $this->data['warning_messages'][] = $message;
+        }
+    }
+
     protected function addSuccess($message)
     {
         $this->data['success_messages'][] = $message;
@@ -203,6 +212,7 @@ class OcHelper
         $this->registry->document->addStyle('view/stylesheet/acumulus.css');
 
         $this->data['success_messages'] = array();
+        $this->data['warning_messages'] = array();
         $this->data['error_messages'] = array();
 
         // Set the page title.
@@ -234,6 +244,9 @@ class OcHelper
         // Show messages.
         foreach ($this->form->getSuccessMessages() as $message) {
             $this->addSuccess($message);
+        }
+        foreach ($this->form->getWarningMessages() as $message) {
+            $this->addWarning($this->t($message));
         }
         foreach ($this->form->getErrorMessages() as $message) {
             $this->addError($this->t($message));

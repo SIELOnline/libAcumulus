@@ -74,6 +74,9 @@ abstract class Form
     /** @var string[] Any success messages. */
     protected $successMessages;
 
+    /** @var string[] Any warning messages. */
+    protected $warningMessages;
+
     /** @var string[] Any error messages. */
     protected $errorMessages;
 
@@ -83,6 +86,7 @@ abstract class Form
     public function __construct(TranslatorInterface $translator)
     {
         $this->successMessages = array();
+        $this->warningMessages = array();
         $this->errorMessages = array();
         $this->formValuesSet = false;
         $this->submittedValues = array();
@@ -107,9 +111,14 @@ abstract class Form
     }
 
     /**
-     * To be used by web shop specific form handling to display a success message.
+     * Returns the success messages.
+     *
+     * To be used by web shop specific form handling to display success
+     * messages.
      *
      * @return string[]
+     *   Possibly empty list of success messages, will normally contain 0 or 1
+     *   messages
      */
     public function getSuccessMessages()
     {
@@ -117,14 +126,31 @@ abstract class Form
     }
 
     /**
+     * Returns the warning messages.
+     *
+     * To be used by web shop specific form handling to display validation
+     * warnings.
+     *
+     * @return string[]
+     *   An array of translated messages. In case of validation warnings they
+     *   are keyed by the name of the form field.
+     */
+    public function getWarningMessages()
+    {
+        return $this->warningMessages;
+    }
+
+    /**
+     * Returns the error messages.
+     *
      * To be used by web shop specific form handling to display validation and
      * connection error messages.
      *
      * An empty result indicates successful validation.
      *
      * @return string[]
-     *   An array of translated messages. In case of validation errors they are
-     *   keyed by the name of the invalid form field.
+     *   An array of translated messages. In case of validation errors they
+     *   are keyed by the name of the invalid form field.
      */
     public function getErrorMessages()
     {

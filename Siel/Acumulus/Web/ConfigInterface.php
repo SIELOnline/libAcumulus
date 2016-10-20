@@ -13,6 +13,8 @@ interface ConfigInterface
     const libraryVersion = '4.6.0-alpha1';
 
     // Web service configuration related constants.
+    // Send status: bits 1, 2 and 3. Can be combined with an Invoice_Sent_...
+    // const.
     const Status_Success = 0;
     const Status_Warnings = 1;
     const Status_Errors = 2;

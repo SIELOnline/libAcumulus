@@ -2,6 +2,7 @@
 namespace Siel\Acumulus\Shop;
 
 use DateTime;
+use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Web\ConfigInterface as WebConfigInterface;
 
@@ -263,30 +264,37 @@ abstract class InvoiceManager
         if ($status !== ConfigInterface::Invoice_NotSent_AlreadySent) {
             $invoice = $this->config->getCreator()->create($invoiceSource);
 
-            // Trigger the InvoiceCreated event.
-            $this->triggerInvoiceCreated($invoice, $invoiceSource);
+            // Do not send 0-amount invoices, if set so.
+            $shopEventSettings = $this->config->getShopEventSettings();
+            if ($shopEventSettings['sendEmptyInvoice'] || !$this->isEmptyInvoice($invoice)) {
+                // Trigger the InvoiceCreated event.
+                $this->triggerInvoiceCreated($invoice, $invoiceSource);
 
-            // If the invoice is not set to null, we continue by completing it.
-            if ($invoice !== null) {
-                $localMessages = array();
-                $invoice = $this->config->getCompletor()->complete($invoice, $invoiceSource, $localMessages);
+                // If the invoice is not set to null, we continue by completing it.
+                if ($invoice !== NULL) {
+                    $localMessages = array();
+                    $invoice = $this->config->getCompletor()->complete($invoice, $invoiceSource, $localMessages);
 
-                // Trigger the InvoiceCompleted event.
-                $this->triggerInvoiceCompleted($invoice, $invoiceSource);
+                    // Trigger the InvoiceCompleted event.
+                    $this->triggerInvoiceCompleted($invoice, $invoiceSource);
 
-                // If the invoice is not set to null, we continue by sending it.
-                if ($invoice !== null) {
-                    if (!$dryRun) {
-                        $result = $this->doSend($invoice, $invoiceSource, $localMessages);
-                        $messages = $this->config->getService()->resultToMessages($result);
-                        $status |= $result['status'];
+                    // If the invoice is not set to null, we continue by sending it.
+                    if ($invoice !== NULL) {
+                        if (!$dryRun) {
+                            $result = $this->doSend($invoice, $invoiceSource, $localMessages);
+                            $messages = $this->config->getService()->resultToMessages($result);
+                            $status |= $result['status'];
+                        }
+                    } else {
+                        $status = ConfigInterface::Invoice_NotSent_EventInvoiceCompleted;
                     }
                 } else {
-                    $status = ConfigInterface::Invoice_NotSent_EventInvoiceCompleted;
+                    $status = ConfigInterface::Invoice_NotSent_EventInvoiceCreated;
                 }
             } else {
-                $status = ConfigInterface::Invoice_NotSent_EventInvoiceCreated;
+                $status = ConfigInterface::Invoice_NotSent_EmptyInvoice;
             }
+
         }
 
         $logMessage = $this->getInvoiceSendResultMessage($invoiceSource, $status, $messages);
@@ -401,6 +409,9 @@ abstract class InvoiceManager
             case ConfigInterface::Invoice_NotSent_EventInvoiceCompleted:
                 $message = 'message_not_sent_prevented_invoiceCompleted';
                 break;
+            case ConfigInterface::Invoice_NotSent_EmptyInvoice:
+                $message = 'message_not_sent_empty_invoice';
+                break;
             case ConfigInterface::Invoice_NotSent_TriggerInvoiceCreateNotEnabled:
                 $message = 'message_not_sent_not_enabled_triggerInvoiceCreate';
                 break;
@@ -437,6 +448,19 @@ abstract class InvoiceManager
     protected function mailInvoiceAddResult(array $result, array $messages, Source $invoiceSource)
     {
         return $this->config->getMailer()->sendInvoiceAddMailResult($result, $messages, $invoiceSource->getType(), $invoiceSource->getReference());
+    }
+
+    /**
+     * Returns whether an invoice is empty (free products only)
+     *
+     * @param array $invoice
+     *
+     * @return bool
+     *   True if the invoice amount is €0,-.
+     */
+    protected function isEmptyInvoice(array $invoice)
+    {
+        return Number::isZero($invoice['customer']['invoice']['meta-invoice-amountinc']);
     }
 
     /**

@@ -737,16 +737,10 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
                     'type' => 'array',
                     'default' => array(),
                 ),
-                'sendEmptyInvoice' => array(
+                'sendEmptyShipping' => array(
                     'group' => 'invoice',
                     'type' => 'bool',
                     'default' => true,
-                ),
-                // @todo: rename to send... with reversed meaning?
-                'removeEmptyShipping' => array(
-                    'group' => 'invoice',
-                    'type' => 'bool',
-                    'default' => false,
                 ),
                 // @todo: add to advanced UI?
                 'addMissingAmountLine' => array(
@@ -805,6 +799,11 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
                     'group' => 'event',
                     'type' => 'int',
                     'default' => ConfigInterface::TriggerInvoiceEvent_None,
+                ),
+                'sendEmptyInvoice' => array(
+                    'group' => 'event',
+                    'type' => 'bool',
+                    'default' => true,
                 ),
                 'emailAsPdf' => array(
                     'group' => 'emailaspdf',
@@ -899,6 +898,18 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
                 $values['triggerInvoiceEvent'] = ConfigInterface::TriggerInvoiceEvent_None;
             }
             unset($values['triggerInvoiceSendEvent']);
+
+            $result = $this->getConfigStore()->save($values) && $result;
+        }
+
+        // 4.6.0 upgrade:
+        // - setting removeEmptyShipping inverted.
+        if (version_compare($currentVersion, '4.6.0', '<')) {
+            // Get current values.
+            $values = $this->castValues($this->getConfigStore()->load($this->getKeys()));
+
+            $values['sendEmptyShipping'] = !$this->get('removeEmptyShipping');
+            unset($values['removeEmptyShipping']);
 
             $result = $this->getConfigStore()->save($values) && $result;
         }

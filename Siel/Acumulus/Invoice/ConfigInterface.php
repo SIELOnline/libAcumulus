@@ -74,8 +74,7 @@ interface ConfigInterface
      *   - defaultInvoicePaidTemplate
      *   - paymentMethodAccountNumber
      *   - paymentMethodCostCenter
-     *   - sendEmptyInvoice
-     *   - removeEmptyShipping
+     *   - sendEmptyShipping
      *   - useMargin
      *   - optionsAllOn1Line
      *   - optionsAllOnOwnLine

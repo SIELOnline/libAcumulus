@@ -338,7 +338,6 @@ class ConfigForm extends BaseConfigForm
      * - defaultCostCenter
      * - defaultInvoiceTemplate
      * - defaultInvoicePaidTemplate
-     * - removeEmptyShipping
      *
      * @return array[]
      *   The set of invoice related fields.

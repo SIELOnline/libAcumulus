@@ -143,10 +143,10 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'option_same_template' => 'Zelfde sjabloon als voor niet betaald',
         'desc_defaultInvoiceTemplate' => 'Maakt u binnen Acumulus gebruik van meerdere factuur-sjablonen en wilt u de facturen uit uw webwinkel met een specifieke factuursjabloon printen, kies dan hier de factuur-sjablonen voor niet betaalde respectievelijk betaalde bestellingen.',
 
-        'field_removeEmptyShipping' => 'Verzendkosten',
-        'option_removeEmptyShipping' => 'Verstuur geen "gratis verzending" of "zelf afhalen" regels.',
-        'desc_removeEmptyShipping' => 'Omdat Acumulus pakbonnen kan printen, verstuurt deze extensie normaal gesproken altijd een factuurregel met de verzendkosten/methode, zelfs met gratis verzending of zelf afhalen.
-Vink deze optie aan als u geen regel op uw factuur of pakbon wil voor gratis verzending of zelf afhalen.',
+        'field_sendWhat' => 'Verstuur',
+        'option_sendEmptyInvoice' => 'Verstuur 0-bedrag facturen.',
+        'option_sendEmptyShipping' => 'Verstuur "gratis verzending" of "zelf afhalen" regels.',
+        'desc_sendWhat' => 'Met de eerste optie geeft u aan of u 0-bedrag facturen naar Acumulus wilt versturen. Om het overzicht compleet te houden en om geen gaten in de factuurnummering te krijgen staat deze optie normaal gesproken aan. De 2e optie beperkt zicht tot het wel of niet versturen van een gratis verzending of afhelen regel binnen een factuur. Omdat Acumulus pakbonnen kan printen waar de verzendmethode op moet staan, staat deze optie normaal gesproken aan.',
 
         // Settings per payment method.
         'paymentMethodAccountNumberFieldset' => 'Rekening per betaalmethode',
@@ -278,7 +278,7 @@ Using this setting this plugin can better determine the invoice type and perform
         'option_empty_triggerOrderStatus' => 'Do not send automatically ',
 
         'field_triggerInvoiceEvent' => 'Webshop invoice state',
-        'option_triggerInvoiceEvent_0' => 'Do not send automatically',
+        'option_triggerInvoiceEvent_0' => 'Do not send automatically.',
         'option_triggerInvoiceEvent_1' => 'When the webshop invoice gets created.',
         'option_triggerInvoiceEvent_2' => 'When the webshop invoice gets sent to the customer.',
         'desc_triggerInvoiceEvent' => 'Select if and on which webshop invoice event to send the invoice to Acumulus. If you select "Do not send automatically" you can use the send batch form, or you can set one or more order states above to trigger the sending of the invoice.',
@@ -335,10 +335,10 @@ If you unchecked the first option, the second option only applies to business cl
         'option_same_template' => 'Same template as for due',
         'desc_defaultInvoiceTemplate' => 'Select the invoice templates to use when generating your Acumulus invoices for due respectively paid orders.',
 
-        'field_removeEmptyShipping' => 'Shipping costs',
-        'option_removeEmptyShipping' => 'Do not send free shipping or in store pick-up lines on invoices.',
-        'desc_removeEmptyShipping' => 'To allow Acumulus to print packing slips, this extension normally always sends a shipping line, even with free shipping or in store pickup.
-If you don\'t want this, check this option.',
+        'field_sendWhat' => 'Send',
+        'option_sendEmptyInvoice' => 'Send 0-amount invoices.',
+        'option_sendEmptyShipping' => 'Send "free shipping" or "in store pick-up" lines.',
+        'desc_sendWhat' => 'YThe 1st option indicates if 0-amount invoices should be sent to Acumulus. You should normally enable this option to keep the invoice collection complete and prevent missing invoice numbers. The 2nd option determines whether to send free shipping or in store pickup lines. Yous hould normally enable this option as Acumulus can print packing slips.',
 
         // Settings per payment method.
         'paymentMethodAccountNumberFieldset' => 'Account per payment method',

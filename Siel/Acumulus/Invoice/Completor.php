@@ -760,7 +760,7 @@ class Completor
     protected function removeEmptyShipping()
     {
         $invoiceSettings = $this->config->getInvoiceSettings();
-        if ($invoiceSettings['removeEmptyShipping']) {
+        if (!$invoiceSettings['sendEmptyShipping']) {
             $this->invoice['customer']['invoice']['line'] = array_filter($this->invoice['customer']['invoice']['line'],
                 function ($line) {
                     return $line['meta-line-type'] !== Creator::LineType_Shipping || !Number::isZero($line['unitprice']);

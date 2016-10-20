@@ -187,7 +187,8 @@ class AdvancedConfigForm extends BaseConfigForm
      * Returns the set of invoice related fields.
      *
      * The fields returned:
-     * - removeEmptyShipping
+     * - sendEmptyInvoice
+     * - sendEmptyShipping
      *
      * @return array[]
      *   The set of invoice related fields.
@@ -195,12 +196,13 @@ class AdvancedConfigForm extends BaseConfigForm
     protected function getInvoiceFields()
     {
         $fields = array(
-            'removeEmptyShipping' => array(
+            'sendWhat' => array(
                 'type' => 'checkbox',
-                'label' => $this->t('field_removeEmptyShipping'),
-                'description' => $this->t('desc_removeEmptyShipping'),
+                'label' => $this->t('field_sendWhat'),
+                'description' => $this->t('desc_sendWhat'),
                 'options' => array(
-                    'removeEmptyShipping' => $this->t('option_removeEmptyShipping'),
+                    'sendEmptyInvoice' => $this->t('option_sendEmptyInvoice'),
+                    'sendEmptyShipping' => $this->t('option_sendEmptyShipping'),
                 ),
             ),
         );
@@ -266,7 +268,8 @@ class AdvancedConfigForm extends BaseConfigForm
         return array(
             'sendCustomer' => 'clientData',
             'overwriteIfExists' => 'clientData',
-            'removeEmptyShipping' => 'removeEmptyShipping',
+            'sendEmptyInvoice' => 'sendWhat',
+            'sendEmptyShipping' => 'sendWhat',
         );
     }
 

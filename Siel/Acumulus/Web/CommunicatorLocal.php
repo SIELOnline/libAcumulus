@@ -13,7 +13,8 @@ class CommunicatorLocal extends Communicator
      */
     protected function sendHttpPost($uri, $post)
     {
-        if ($this->config->getOutputFormat() === 'json') {
+        $pluginSettings = $this->config->getPluginSettings();
+        if ($pluginSettings['outputFormat'] === 'json') {
             $response = '{
 				"errors": {
 					"count_errors": "0"

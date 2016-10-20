@@ -18,7 +18,7 @@ abstract class BaseConfigForm extends Form
     /** @var \Siel\Acumulus\Shop\ShopCapabilitiesInterface */
     protected $shopCapabilities;
 
-    /** @var \Siel\Acumulus\Shop\Config */
+    /** @var \Siel\Acumulus\Shop\ConfigInterface */
     protected $acumulusConfig;
 
     /** @var \Siel\Acumulus\Web\Service*/
@@ -36,10 +36,10 @@ abstract class BaseConfigForm extends Form
      *
      * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
      * @param ShopCapabilitiesInterface $shopCapabilities
+     * @param ConfigInterface $config
      * @param \Siel\Acumulus\Web\Service $service
-     * @param Config $config
      */
-    public function __construct(TranslatorInterface $translator, ShopCapabilitiesInterface $shopCapabilities, Config $config, Service $service)
+    public function __construct(TranslatorInterface $translator, ShopCapabilitiesInterface $shopCapabilities, ConfigInterface $config, Service $service)
     {
         parent::__construct($translator);
 
@@ -58,7 +58,7 @@ abstract class BaseConfigForm extends Form
      */
     protected function getDefaultFormValues()
     {
-        return $this->acumulusConfig->getCredentials() + $this->acumulusConfig->getShopSettings() + $this->acumulusConfig->getShopEventSettings() + $this->acumulusConfig->getCustomerSettings() + $this->acumulusConfig->getInvoiceSettings() + $this->acumulusConfig->getEmailAsPdfSettings() + $this->acumulusConfig->getOtherSettings();
+        return $this->acumulusConfig->getCredentials() + $this->acumulusConfig->getShopSettings() + $this->acumulusConfig->getShopEventSettings() + $this->acumulusConfig->getCustomerSettings() + $this->acumulusConfig->getInvoiceSettings() + $this->acumulusConfig->getEmailAsPdfSettings() + $this->acumulusConfig->getPluginSettings();
     }
 
     /**

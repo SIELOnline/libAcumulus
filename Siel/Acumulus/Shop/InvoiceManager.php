@@ -10,16 +10,16 @@ use Siel\Acumulus\Web\ConfigInterface as WebConfigInterface;
  */
 abstract class InvoiceManager
 {
-    /** @var \Siel\Acumulus\Shop\Config */
+    /** @var \Siel\Acumulus\Shop\ConfigInterface */
     protected $config;
 
     /** @var string */
     protected $message;
 
     /**
-     * @param Config $config
+     * @param ConfigInterface $config
      */
-    public function __construct(Config $config)
+    public function __construct(ConfigInterface $config)
     {
         $this->config = $config;
 
@@ -247,8 +247,10 @@ abstract class InvoiceManager
      */
     public function send(Source $invoiceSource, $forceSend = false, $dryRun = false)
     {
+        $pluginSettings = $this->config->getPluginSettings();
+        $testMode = $pluginSettings['debug'] == Config::Debug_TestMode;
         $messages = array();
-        if ($this->config->getDebug() == Config::Debug_TestMode) {
+        if ($testMode) {
             $status = ConfigInterface::Invoice_Sent_TestMode;
         } else if (!$this->config->getAcumulusEntryModel()->getByInvoiceSource($invoiceSource)) {
             $status = ConfigInterface::Invoice_Sent_New;
@@ -326,7 +328,8 @@ abstract class InvoiceManager
             // If the invoice was sent as a concept, no entryid will be returned
             // but we still want to prevent sending it again: check for the
             // concept status, the absence of errors and non test-mode.
-            $testMode = $this->config->getDebug() == Config::Debug_TestMode;
+            $pluginSettings = $this->config->getPluginSettings();
+            $testMode = $pluginSettings['debug'] == Config::Debug_TestMode;
             $isConcept = $invoice['customer']['invoice']['concept'] == Config::Concept_Yes;
             if (empty($result['errors']) && $isConcept && !$testMode) {
                 $this->config->getAcumulusEntryModel()->save($invoiceSource, null, null);

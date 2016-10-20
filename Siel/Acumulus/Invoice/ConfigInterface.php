@@ -68,18 +68,20 @@ interface ConfigInterface
      *
      * @return array
      *   A keyed array with the keys:
-     *   - digitalServices
      *   - defaultAccountNumber
      *   - defaultCostCenter
      *   - defaultInvoiceTemplate
      *   - defaultInvoicePaidTemplate
      *   - paymentMethodAccountNumber
      *   - paymentMethodCostCenter
+     *   - sendEmptyInvoice
      *   - removeEmptyShipping
      *   - useMargin
+     *   - optionsAllOn1Line
+     *   - optionsAllOnOwnLine
+     *   - optionsMaxLength
      */
     public function getInvoiceSettings();
-
 
     /**
      * Returns the set of settings related to the shop characteristics that

@@ -64,7 +64,8 @@ class Log
         // To support lazy load of the config, the log level is not yet set until
         // actually needed.
         if ($this->logLevel === static::NotYetSet && $this->config !== null) {
-            $this->logLevel = $this->config->getLogLevel();
+            $pluginSettings = $this->config->getPluginSettings();
+            $this->logLevel = $pluginSettings['logLevel'];
             $environment = $this->config->getEnvironment();
             $this->libraryVersion = $environment['libraryVersion'];
         }

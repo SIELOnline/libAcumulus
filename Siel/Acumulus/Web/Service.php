@@ -79,7 +79,8 @@ class Service
     protected function getCommunicator()
     {
         if ($this->communicator === null) {
-            if ($this->config->getDebug() == 4 /*ConfigInterface::Debug_StayLocal*/) {
+            $pluginSettings = $this->config->getPluginSettings();
+            if ($pluginSettings['debug'] == 4 /*ConfigInterface::Debug_StayLocal*/) {
                 $this->communicator = new CommunicatorLocal($this->config);
             } else {
                 $this->communicator = new Communicator($this->config);
@@ -123,7 +124,8 @@ class Service
             $messages[] = $this->t('message_warning') . ' ' . $message;
         }
 
-        if ($addTraceMessages && (!empty($messages) || $this->config->getDebug() != ConfigInterface::Debug_None)) {
+        $pluginSettings = $this->config->getPluginSettings();
+        if ($addTraceMessages && (!empty($messages) || $pluginSettings['debug'] != ConfigInterface::Debug_None)) {
             if (isset($result['trace'])) {
                 $messages[] = $this->t('message_info_for_user');
                 if (isset($result['trace']['request'])) {

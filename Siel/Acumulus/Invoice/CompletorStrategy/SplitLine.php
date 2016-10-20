@@ -49,7 +49,7 @@ use Siel\Acumulus\Invoice\Creator;
  *
  * Current known usages:
  * - ???
- * @todo: deprecated or are thre situations where other fee lines also do not
+ * @todo: deprecated or are there situations where other fee lines also do not
  *  have a vatrate.
  * In the current versions, all lines that may be split will have a
  * meta-strategy-split entry, so SplitNonMatchingLine or SplitKnownDiscountLine
@@ -156,7 +156,7 @@ class SplitLine extends CompletorStrategyBase
     protected function tryVatRate($vatRateForOtherLines)
     {
         $this->description = "SplitLine($vatRateForOtherLines, {$this->minVatRate['vatrate']}, {$this->maxVatRate['vatrate']})";
-        $this->completedLines = array();
+        $this->replacingLines = array();
         $otherVatAmount = 0.0;
         foreach ($this->otherLines as $otherLine2Complete) {
             $otherVatAmount += $this->completeLine($otherLine2Complete, $vatRateForOtherLines);

@@ -1,8 +1,6 @@
 <?php
 namespace Siel\Acumulus\Shop;
 
-use Siel\Acumulus\Helpers\Log;
-
 /**
  * Defines an interface to access the shop specific's config store.
  */

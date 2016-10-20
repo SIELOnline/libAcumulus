@@ -12,6 +12,13 @@ namespace Siel\Acumulus\Shop;
 interface InjectorInterface
 {
     /**
+     * Sets a custom namespace for customisations on top of the current shop.
+     *
+     * @param string $customNamespace
+     */
+    public function setCustomNamespace($customNamespace);
+
+    /**
      * @return \Siel\Acumulus\Helpers\TranslatorInterface
      */
     public function getTranslator();

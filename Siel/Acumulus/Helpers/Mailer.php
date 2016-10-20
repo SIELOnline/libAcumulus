@@ -72,22 +72,27 @@ abstract class Mailer
         $result = $this->sendMail($from, $fromName, $to, $subject, $content['text'], $content['html']);
         if ($result !== true) {
             if ($result === false) {
-                $result = 'false';
+                $message = 'false';
             }
             else  if ($result === null) {
-                $result = 'null';
+                $message = 'null';
             }
             else  if ($result instanceof \Exception) {
-                $result = $result->getMessage();
+                $message = $result->getMessage();
             }
             else  if (!is_string($result)) {
-                $result = print_r($result, true);
+                $message = print_r($result, true);
             }
-            Log::getInstance()->error('Mailer::sendInvoiceAddMailResult(): failed: %s', $result);
+            else {
+                $message = $result;
+            }
+            Log::getInstance()->error('Mailer::sendInvoiceAddMailResult(): failed: %s', $message);
         }
         else {
             Log::getInstance()->info('Mailer::sendInvoiceAddMailResult(): success');
         }
+
+        return $result === true;
     }
 
     /**
@@ -133,10 +138,7 @@ abstract class Mailer
         if (isset($credentials['emailonerror'])) {
             return $credentials['emailonerror'];
         }
-        if (method_exists($this->config, 'getHostName')) {
-            return 'webshop@' . $this->config->getHostName();
-        }
-        return 'you@example.com';
+        return 'webshop@' . $this->config->getHostName();
     }
 
     /**

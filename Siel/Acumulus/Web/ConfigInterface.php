@@ -34,49 +34,13 @@ interface ConfigInterface
     const outputFormat = 'json';
 
     /**
-     * Returns the URI of the Acumulus API to connect with.
+     * The hostname of the current server.
      *
-     * This method returns the base URI, without version indicator and API call.
-     *
-     * @return string
-     *   The URI of the Acumulus API.
-     */
-    public function getBaseUri();
-
-    /**
-     * Returns the version of the Acumulus API to use.
-     *
-     * A version number may be part of the URI, so this value implicitly also
-     *  defines the API version to communicate with.
+     * Used for a default email address.
      *
      * @return string
-     *   The version of the Acumulus API to use.
      */
-    public function getApiVersion();
-
-    /**
-     * Indicates the debug mode of the web services communicator.
-     *
-     * @return int
-     *   One of the ConfigInterface::Debug_... constants.
-     */
-    public function getDebug();
-
-    /**
-     * Returns the current log level for log messages from this module.
-     *
-     * @return int
-     *   One of the Log::... constants.
-     */
-    public function getLogLevel();
-
-    /**
-     * Returns the format the output from the Acumulus API should be in.
-     *
-     * @return string
-     *   xml or json.
-     */
-    public function getOutputFormat();
+    public function getHostName();
 
     /**
      * Returns the contract credentials to authenticate with the Acumulus API.
@@ -96,6 +60,8 @@ interface ConfigInterface
      *
      * @return array
      *   A keyed array with information about the environment of this library:
+     *   - baseUri
+     *   - apiVersion
      *   - libraryVersion
      *   - moduleVersion
      *   - shopName
@@ -106,6 +72,17 @@ interface ConfigInterface
      *   - jsonVersion
      */
     public function getEnvironment();
+
+    /**
+     * Returns the set of settings related to reacting to shop events.
+     *
+     * @return array
+     *   A keyed array with the keys:
+     *   - debug
+     *   - logLevel
+     *   - outputFormat
+     */
+    public function getPluginSettings();
 
     /**
      * @return \Siel\Acumulus\Helpers\Log

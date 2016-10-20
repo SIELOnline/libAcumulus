@@ -1,13 +1,16 @@
 <?php
 namespace Siel\Acumulus\Shop;
 
+use Siel\Acumulus\Invoice\ConfigInterface as InvoiceConfigInterface;
+use Siel\Acumulus\Web\ConfigInterface as WebConfigInterface;
+
 /**
  * Defines an interface to retrieve shop specific configuration settings.
  *
  * Configuration is stored in the host environment, normally a web shop.
  * This interface abstracts from how a specific web shop does so.
  */
-interface ConfigInterface
+interface ConfigInterface extends InvoiceConfigInterface, WebConfigInterface, InjectorInterface
 {
     // Invoice send handling related constants.
     const Invoice_NotSent = 0x8;
@@ -27,6 +30,25 @@ interface ConfigInterface
     const TriggerInvoiceEvent_None = 0;
     const TriggerInvoiceEvent_Create = 1;
     const TriggerInvoiceEvent_Send = 2;
+
+    /**
+     * Saves the configuration to the actual configuration provider.
+     *
+     * @param array $values
+     *   A keyed array that contains the values to store, this may be a subset
+     *   of the possible keys.
+     *
+     * @return bool
+     *   Success.
+     */
+    public function save(array $values);
+
+    /**
+     * Returns a list of keys that are stored in the shop specific config store.
+     *
+     * @return array
+     */
+    public function getKeys();
 
     /**
      * Returns the set of settings related to reacting to shop events.

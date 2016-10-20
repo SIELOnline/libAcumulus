@@ -84,9 +84,7 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
     }
 
     /**
-     * Sets a custom namespace for customisations on top of the current shop.
-     *
-     * @param string $customNamespace
+     * {@inheritdoc}
      */
     public function setCustomNamespace($customNamespace)
     {
@@ -336,14 +334,7 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
     }
 
     /**
-     * Saves the configuration to the actual configuration provider.
-     *
-     * @param array $values
-     *   A keyed array that contains the values to store, this may be a subset
-     *   of the possible keys.
-     *
-     * @return bool
-     *   Success.
+     * {@inheritdoc}
      */
     public function save(array $values)
     {
@@ -412,77 +403,11 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
     }
 
     /**
-     * Sets the value for the debug setting.
-     *
-     * @param int $debug
-     *
-     * @return int
-     *   The old value.
-     */
-    public function setDebug($debug)
-    {
-        return $this->set('debug', (int) $debug);
-    }
-
-    /**
-     * Sets the log level.
-     *
-     * @param int $logLevel
-     *
-     * @return int
-     *   The old value.
-     */
-    public function setLogLevel($logLevel)
-    {
-        return $this->set('logLevel', (int) $logLevel);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getBaseUri()
-    {
-        return $this->get('baseUri');
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getApiVersion()
-    {
-        return $this->get('apiVersion');
-    }
-
-    /**
      * @inheritdoc
      */
     public function getEnvironment()
     {
         return $this->getSettingsByGroup('environment');
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getDebug()
-    {
-        return $this->get('debug');
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getLogLevel()
-    {
-        return $this->get('logLevel');
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getOutputFormat()
-    {
-        return $this->get('outputFormat');
     }
 
     /**
@@ -494,6 +419,22 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
         // No separate key for now.
         $result['emailonwarning'] = $result['emailonerror'];
         return $result;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getShopEventSettings()
+    {
+        return $this->getSettingsByGroup('event');
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getPluginSettings()
+    {
+        return $this->getSettingsByGroup('plugin');
     }
 
     /**
@@ -515,14 +456,6 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
     /**
      * @inheritdoc
      */
-    public function getEmailAsPdfSettings()
-    {
-        return $this->getSettingsByGroup('emailaspdf');
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function getShopSettings()
     {
         return $this->getSettingsByGroup('shop');
@@ -531,17 +464,9 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
     /**
      * @inheritdoc
      */
-    public function getShopEventSettings()
+    public function getEmailAsPdfSettings()
     {
-        return $this->getSettingsByGroup('event');
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getOtherSettings()
-    {
-        return $this->getSettingsByGroup('other');
+        return $this->getSettingsByGroup('emailaspdf');
     }
 
     /**
@@ -608,15 +533,13 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
     }
 
     /**
-     * Returns a list of keys that are stored in the shop specific config store.
-     *
-     * @return array
+     * {@inheritdoc}
      */
     public function getKeys()
     {
         $result = $this->getKeyInfo();
         array_filter($result, function ($item) {
-            return $item['group'] != 'environment';
+            return $item['group'] !== 'environment';
         });
         return array_keys($result);
     }
@@ -636,11 +559,7 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
     }
 
     /**
-     * The hostname of the current server.
-     *
-     * Used for a default email address.
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getHostName()
     {
@@ -670,7 +589,7 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
         if ($this->keyInfo === null) {
             $hostName = $this->getHostName();
             $curlVersion = curl_version();
-            $shopDefaults = $this->getConfigStore()->getShopEnvironment();
+            $environment = $this->getConfigStore()->getShopEnvironment();
 
             $this->keyInfo = array(
                 'baseUri' => array(
@@ -683,11 +602,6 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
                     'type' => 'string',
                     'default' => ServiceConfigInterface::apiVersion,
                 ),
-                'outputFormat' => array(
-                    'group' => 'environment',
-                    'type' => 'string',
-                    'default' => ServiceConfigInterface::outputFormat,
-                ),
                 'libraryVersion' => array(
                     'group' => 'environment',
                     'type' => 'string',
@@ -696,17 +610,17 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
                 'moduleVersion' => array(
                     'group' => 'environment',
                     'type' => 'string',
-                    'default' => $shopDefaults['moduleVersion'],
+                    'default' => $environment['moduleVersion'],
                 ),
                 'shopName' => array(
                     'group' => 'environment',
                     'type' => 'string',
-                    'default' => $shopDefaults['shopName'],
+                    'default' => $environment['shopName'],
                 ),
                 'shopVersion' => array(
                     'group' => 'environment',
                     'type' => 'string',
-                    'default' => $shopDefaults['shopVersion'],
+                    'default' => $environment['shopVersion'],
                 ),
                 'phpVersion' => array(
                     'group' => 'environment',
@@ -727,6 +641,21 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
                     'group' => 'environment',
                     'type' => 'string',
                     'default' => phpversion('json'),
+                ),
+                'debug' => array(
+                    'group' => 'plugin',
+                    'type' => 'int',
+                    'default' => ServiceConfigInterface::Debug_None,
+                ),
+                'logLevel' => array(
+                    'group' => 'plugin',
+                    'type' => 'int',
+                    'default' => Log::Notice,
+                ),
+                'outputFormat' => array(
+                    'group' => 'plugin',
+                    'type' => 'string',
+                    'default' => ServiceConfigInterface::outputFormat,
                 ),
                 'contractcode' => array(
                     'group' => 'credentials',
@@ -808,6 +737,12 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
                     'type' => 'array',
                     'default' => array(),
                 ),
+                'sendEmptyInvoice' => array(
+                    'group' => 'invoice',
+                    'type' => 'bool',
+                    'default' => true,
+                ),
+                // @todo: rename to send... with reversed meaning?
                 'removeEmptyShipping' => array(
                     'group' => 'invoice',
                     'type' => 'bool',
@@ -895,16 +830,6 @@ class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigIn
                     'group' => 'emailaspdf',
                     'type' => 'bool',
                     'default' => false,
-                ),
-                'debug' => array(
-                    'group' => 'other',
-                    'type' => 'int',
-                    'default' => ServiceConfigInterface::Debug_None,
-                ),
-                'logLevel' => array(
-                    'group' => 'other',
-                    'type' => 'int',
-                    'default' => Log::Notice,
                 ),
             );
         }

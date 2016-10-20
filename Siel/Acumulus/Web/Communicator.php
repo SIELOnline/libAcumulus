@@ -79,23 +79,25 @@ class Communicator
         $this->errors = array();
 
         try {
+            $environment = $this->config->getEnvironment();
+            $pluginSettings = $this->config->getPluginSettings();
+
             // Compose URI.
-            $uri = $this->config->getBaseUri() . '/' . $this->config->getApiVersion() . '/' . $apiFunction . '.php';
+            $uri = $environment['baseUri'] . '/' . $environment['apiVersion'] . '/' . $apiFunction . '.php';
 
             // Complete message with values common to all API calls:
             // - contract part
             // - format part
             // - environment part
-            $env = $this->config->getEnvironment();
             $message = array_merge(array(
                 'contract' => $this->config->getCredentials(),
-                'format' => $this->config->getOutputFormat(),
-                'testmode' => $this->config->getDebug() === ConfigInterface::Debug_TestMode ? ConfigInterface::TestMode_Test : ConfigInterface::TestMode_Normal,
+                'format' => $pluginSettings['outputFormat'],
+                'testmode' => $pluginSettings['debug'] === ConfigInterface::Debug_TestMode ? ConfigInterface::TestMode_Test : ConfigInterface::TestMode_Normal,
                 'connector' => array(
-                    'application' => "{$env['shopName']} {$env['shopVersion']}",
-                    'webkoppel' => "Acumulus {$env['moduleVersion']}",
+                    'application' => "{$environment['shopName']} {$environment['shopVersion']}",
+                    'webkoppel' => "Acumulus {$environment['moduleVersion']}",
                     'development' => 'SIEL - Buro RaDer',
-                    'remark' => "Library {$env['libraryVersion']} - PHP {$env['phpVersion']}",
+                    'remark' => "Library {$environment['libraryVersion']} - PHP {$environment['phpVersion']}",
                     'sourceuri' => 'https://www.siel.nl/',
                 ),
             ), $message);
@@ -199,8 +201,9 @@ class Communicator
             if ($this->isHtmlResponse($response)) {
                 $this->setHtmlReceivedError($response);
             } else {
+                $pluginSettings = $this->config->getPluginSettings();
                 $alsoTryAsXml = false;
-                if ($this->config->getOutputFormat() === 'json') {
+                if ($pluginSettings['outputFormat'] === 'json') {
                     $result = json_decode($response, true);
                     if ($result === null) {
                         $this->setJsonError();
@@ -209,7 +212,7 @@ class Communicator
                         $alsoTryAsXml = true;
                     }
                 }
-                if ($this->config->getOutputFormat() === 'xml' || $alsoTryAsXml) {
+                if ($pluginSettings['outputFormat'] === 'xml' || $alsoTryAsXml) {
                     $result = $this->convertToArray($response);
                 }
             }

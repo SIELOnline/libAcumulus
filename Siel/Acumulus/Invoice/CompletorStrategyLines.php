@@ -30,11 +30,11 @@ class CompletorStrategyLines
     protected $source;
 
     /**
+     * The list of possible vat types, initially filled with possible vat types
+     * type based on client country, invoiceHasLineWithVat(), is_company(), and
+     * the digital services setting.
+     *
      * @var int[]
-     *   The list of possible vat types, initially filled with possible vat types
-     *   based on client country, invoiceHasLineWithVat(), is_company(), and the
-     *   digital services setting. But then reduced by VAT rates we find on the
-     *   order lines.
      */
     protected $possibleVatTypes;
 

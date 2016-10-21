@@ -28,6 +28,7 @@ use Siel\Acumulus\Web\Service;
 class Completor
 {
     const VatRateSource_Calculated_Corrected = 'calculated-corrected';
+    const VatRateSource_Looked_Up = 'completor-looked-up';
     const VatRateSource_Completor_Completed = 'completor-completed';
     const VatRateSource_Strategy_Completed = 'strategy-completed';
 
@@ -35,6 +36,7 @@ class Completor
         Creator::VatRateSource_Exact,
         Creator::VatRateSource_Exact0,
         self::VatRateSource_Calculated_Corrected,
+        self::VatRateSource_Looked_Up,
         self::VatRateSource_Completor_Completed,
         self::VatRateSource_Strategy_Completed,
     );
@@ -251,16 +253,17 @@ class Completor
                 // products, or no vat (rest of world).
                 if ($this->isNl()) {
                     // Can it be VAT free products (e.g. education)? Digital
-                    // services are never VAT free, nor are there any if set so.
+                    // services are never VAT free, nor are there any VAT free
+                    // products if set so.
                     if ($digitalServices !== ConfigInterface::DigitalServices_Only && $vatFreeProducts !== ConfigInterface::VatFreeProducts_No) {
                         $possibleVatTypes[] = ConfigInterface::VatType_National;
                     }
-                    // National reversed VAT: not really supported, but it is possible.
+                    // National reversed VAT: not really supported but possible.
                     if ($this->isCompany()) {
                         $possibleVatTypes[] = ConfigInterface::VatType_NationalReversed;
                     }
                 } else if ($this->isEu()) {
-                    // U reversed VAT.
+                    // EU reversed VAT.
                     if ($this->isCompany()) {
                         $possibleVatTypes[] = ConfigInterface::VatType_EuReversed;
                     }
@@ -275,14 +278,17 @@ class Completor
 
                 if (empty($possibleVatTypes)) {
                     // Warning + fall back.
-                    $this->messages['warnings'][] = array(
-                        'code' => '',
-                        'codetag' => '',
-                        'message' => $this->t('message_warning_no_vat'),
-                    );
+                    // for now I disabled the warning as it appeared on
+                    // 0-amount invoices that could be corrected after all, plus
+                    // that it often (always) appeared in combination with other
+                    // warnings.
+//                    $this->messages['warnings'][] = array(
+//                        'code' => '',
+//                        'codetag' => '',
+//                        'message' => $this->t('message_warning_no_vat'),
+//                    );
                     $possibleVatTypes[] = ConfigInterface::VatType_National;
-                    $possibleVatTypes[] = ConfigInterface::VatType_EuReversed;
-                    $possibleVatTypes[] = ConfigInterface::VatType_NationalReversed;
+                    $possibleVatTypes[] = $this->isNl() ? ConfigInterface::VatType_NationalReversed : ConfigInterface::VatType_EuReversed;
                     $this->invoice['customer']['invoice']['concept'] = ConfigInterface::Concept_Yes;
                 }
             }
@@ -363,7 +369,8 @@ class Completor
     /**
      * Validates the email address of the invoice.
      *
-     * - The email address may not be empty but may be left out though.
+     * - The email address may not be empty but may be left out though in which
+     *   case a new relation will be created.
      * - Multiple, comma separated, email addresses are not allowed.
      * - Display names (My Name <my.name@example.com>) are not allowed.
      */

@@ -22,11 +22,11 @@ class CompletorInvoiceLines
     protected $invoiceLines;
 
     /**
+     * The list of possible vat types, initially filled with possible vat types
+     * type based on client country, invoiceHasLineWithVat(), is_company(), and
+     * the digital services setting.
+     *
      * @var int[]
-     *   The list of possible vat types, initially filled with possible vat
-     *   types based on client country, invoiceHasLineWithVat(), is_company(),
-     *   and the digital services setting. But then reduced by VAT rates we find
-     *   on the order lines.
      */
     protected $possibleVatTypes;
 
@@ -144,7 +144,7 @@ class CompletorInvoiceLines
      *
      * @param array $parent
      * @param array[] $children
-     *   A(n) (flattened) array of child invoice lines.
+     *   A flattened array of child invoice lines.
      *
      * @return bool
      *   True if the lines should remain separate, false otherwise.
@@ -152,6 +152,9 @@ class CompletorInvoiceLines
     protected function keepSeparateLines(array $parent, array $children)
     {
         $invoiceSettings = $this->config->getInvoiceSettings();
+        // @todo: we actually need completed lines to get a reliable count of
+        // @todo: vat rates. so we should flatten after completing... (making
+        // @todo: the  completor methods recursive ...).
         $vatRates = $this->getAppearingVatRates($children);
         if (count($vatRates) > 1) {
             $separateLines = true;
@@ -253,6 +256,7 @@ class CompletorInvoiceLines
         // meta-vatrate-max, so may be called before completeLineRequiredData().
         $this->correctCalculatedVatRates();
         $this->completeLineRequiredData();
+        $this->addVatRateToLookupLines();
         $this->addVatRateTo0PriceLines();
         $this->completeLineMetaData();
     }
@@ -269,7 +273,9 @@ class CompletorInvoiceLines
         foreach ($this->invoiceLines as &$line) {
             if (!isset($line['unitprice'])) {
                 if (isset($line['unitpriceinc'])) {
-                    if (isset($line['vatrate']) && in_array($line['meta-vatrate-source'], Completor::$CorrectVatRateSources)) {
+                    if (Number::isZero($line['unitpriceinc'])) {
+                        $line['unitprice'] = 0;
+                    } else if (isset($line['vatrate']) && in_array($line['meta-vatrate-source'], Completor::$CorrectVatRateSources)) {
                         if (isset($line['costprice'])) {
                             $margin = $line['unitpriceinc'] - $line['costprice'];
                             if ($margin > 0) {
@@ -282,11 +288,9 @@ class CompletorInvoiceLines
                         } else {
                             $line['unitprice'] = $line['unitpriceinc'] / (100.0 + $line['vatrate']) * 100.0;
                         }
-                    }
-                    else if (isset($line['vatamount'])) {
+                    } else if (isset($line['vatamount'])) {
                         $line['unitprice'] = $line['unitpriceinc'] - $line['vatamount'];
-                    }
-                    else {
+                    } else {
                         // We cannot fill in unitprice reliably, so better to
                         // leave it empty to get a clear error message.
                     }
@@ -401,6 +405,30 @@ class CompletorInvoiceLines
     }
 
     /**
+     * Completes lines that have meta-lookup-... data.
+     *
+     * Meta-lookup-vatrate data is added by the Creators using vat rates,
+     * classes, or whatever the shop uses to model vat, form the products.
+     * However as this data might have changed between the date of the order and
+     * now, we cannot fully rely om it and use it only as an (almost) last
+     * resort.
+     */
+    protected function addVatRateToLookupLines()
+    {
+        foreach ($this->invoiceLines as &$line) {
+            if ($line['meta-vatrate-source'] === Creator::VatRateSource_Completor && $line['vatrate'] === null && Number::isZero($line['unitprice'])) {
+                if (!empty($line['meta-lookup-vatrate']) && $this->isPossibleVatRate($line['meta-lookup-vatrate'])) {
+                    // The vat rate looked up on the product is a possible vat
+                    // rate, so apparently that vat rate did not change between
+                    // the date of the order and now: take that one.
+                    $line['vatrate'] = $line['meta-lookup-vatrate'];
+                    $line['meta-vatrate-source'] = Completor::VatRateSource_Looked_Up;
+                }
+            }
+        }
+    }
+
+    /**
      * Completes lines with free items (price = 0) by giving them the maximum
      * tax rate that appears in the other lines.
      */
@@ -409,18 +437,30 @@ class CompletorInvoiceLines
         // Get appearing vat rates and their frequency.
         $vatRates = $this->getAppearingVatRates($this->invoiceLines);
 
-        // Get the highest vat rate.
-        $maxVatRate = -1.0;
-        foreach ($vatRates as $vatRate => $frequency) {
-            if ((float) $vatRate > $maxVatRate) {
-                $maxVatRate = (float) $vatRate;
+        if (!empty($vatRates)) {
+            // Get the highest appearing vat rate. We could get the most often
+            // appearing vat rate, but IMO the highest vat rate will be more
+            // likely to be correct.
+            $maxVatRate = -1.0;
+            foreach ($vatRates as $vatRate => $frequency) {
+                if ((float) $vatRate > $maxVatRate) {
+                    $maxVatRate = (float) $vatRate;
+                }
             }
+        } else {
+            // No lines at all with a valid vat range: leave the 0 lines to a
+            // strategy (if we don't have looked up vat rates).
+            $maxVatRate = null;
         }
 
         foreach ($this->invoiceLines as &$line) {
             if ($line['meta-vatrate-source'] === Creator::VatRateSource_Completor && $line['vatrate'] === null && Number::isZero($line['unitprice'])) {
-                $line['vatrate'] = $maxVatRate;
-                $line['meta-vatrate-source'] = Completor::VatRateSource_Completor_Completed;
+                if ($maxVatRate !== null) {
+                    $line['vatrate'] = $maxVatRate;
+                    $line['meta-vatrate-source'] = Completor::VatRateSource_Completor_Completed;
+                } else {
+                    $line['meta-vatrate-source'] = Creator::VatRateSource_Strategy;
+                }
             }
         }
     }
@@ -430,9 +470,9 @@ class CompletorInvoiceLines
      *
      * @param array[] $lines
      *
-     * @return array An array with the vat rates as key and the number of times they appear
-     * An array with the vat rates as key and the number of times they appear
-     * in the invoice lines as value.
+     * @return array
+     *   An array with the vat rates as key and the number of times they appear
+     *   in the invoice lines as value.
      */
     protected function getAppearingVatRates(array $lines)
     {
@@ -447,6 +487,26 @@ class CompletorInvoiceLines
             }
         }
         return $vatRates;
+    }
+
+    /**
+     * Returns whether the given vat rate is a possible vat rate.
+     *
+     * @param float $vatRate
+     *   The vat rate to lookup. May also be passed in as a string or int.
+     *
+     * @return bool
+     *   True if the given $vatRate is a possible vat rate.
+     */
+    protected function isPossibleVatRate($vatRate) {
+        $result = false;
+        foreach ($this->possibleVatRates as $vatRateInfo) {
+            if (Number::floatsAreEqual($vatRate, $vatRateInfo['vatrate'])) {
+                $result = TRUE;
+                break;
+            }
+        }
+        return $result;
     }
 
     /**

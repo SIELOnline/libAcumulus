@@ -42,7 +42,7 @@ class ConfigFormTranslations extends TranslationCollection
 
         'message_error_header' => 'Fout in uw Acumulus accountgegevens',
         'message_error_auth' => 'Uw Acumulus accountgegevens zijn onjuist. Zodra u %2$s de correcte gevens hebt ingevuld, worden hier de %1$s instellingen getoond.',
-        'message_error_comm' => 'Er is een fout opgetreden bij het ophalen van uw gegevens van Acumulus. Probeer het later nog eens. Zodra de verbinding hersteld is worden %1$s de overige instellingen getoond.',
+        'message_error_comm' => 'Er is een fout opgetreden bij het ophalen van uw gegevens van Acumulus. Probeer het later nog eens. Zodra de verbinding hersteld is worden hier de %1$s instellingen getoond.',
         'message_auth_unknown' => 'Zodra u %2$s uw Acumulus accountgegevens hebt ingevuld, worden %1$s de overige instellingen getoond.',
         'message_error_arg1_config' => 'overige',
         'message_error_arg1_advanced' => 'geavanceerde',

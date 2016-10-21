@@ -19,7 +19,7 @@ use Siel\Acumulus\Web\ConfigInterface as ServiceConfigInterface;
  * This class als implements the injector interface to allow other classes to
  * easily get the correct derived classes of the base classes.
  */
-class Config implements ConfigInterface, InvoiceConfigInterface, ServiceConfigInterface, InjectorInterface
+class Config implements ConfigInterface
 {
     /** @const string */
     const baseNamespace = '\\Siel\\Acumulus\\';

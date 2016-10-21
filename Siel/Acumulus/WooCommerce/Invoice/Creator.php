@@ -8,6 +8,7 @@ use WC_Abstract_Order;
 use WC_Coupon;
 use WC_Order;
 use WC_Product;
+use WC_Tax;
 
 /**
  * Allows to create arrays in the Acumulus invoice structure from a WordPress
@@ -246,8 +247,17 @@ class Creator extends BaseCreator
 
         // $product can be NULL if the product has been deleted.
         $product = $this->shopSource->get_product_from_item($item);
+        $vatLookupTags = array();
         if ($product instanceof WC_Product) {
             $this->addIfNotEmpty($result, 'itemnumber', $product->get_sku());
+            $tax_rates = WC_Tax::get_rates($product->get_tax_class());
+            if (count($tax_rates) === 1) {
+                $tax_rate = reset($tax_rates);
+                $vatLookupTags = array(
+                    'meta-lookup-vatrate' => $tax_rate['rate'],
+                    'meta-lookup-vatrate-label' => $tax_rate['label'],
+                );
+            }
         }
         $result['product'] = $item['name'];
 
@@ -279,15 +289,15 @@ class Creator extends BaseCreator
             );
         }
 
-        $result['quantity'] = $item['qty'];
         // Precision: one of the prices is entered by the administrator and thus
         // can be considered exact. The computed one is not rounded, so we can
         // assume a very high precision for all values here.
         $vatRangeTags = $this->getVatRangeTags($productVat, $productPriceEx, 0.001, 0.001);
-        $result += $vatRangeTags;
+        $parentTags = array('quantity' => $item['qty']) + $vatRangeTags + $vatLookupTags;
+        $result += $parentTags;
 
         if ($product instanceof WC_Product && !empty($item['variation_id'])) {
-            $result[Creator::Line_Children] = $this->getVariantLines($item, $product, $result['quantity'], $vatRangeTags);
+            $result[Creator::Line_Children] = $this->getVariantLines($item, $product, $parentTags);
         }
 
         return $result;
@@ -298,14 +308,14 @@ class Creator extends BaseCreator
      *
      * @param array $item
      * @param \WC_Product $product
-     * @param int $parentQuantity
-     * @param array $vatRangeTags
+     * @param array $parentTags
+     *   An array of tags from the parent product to add to the child lines.
      *
      * @return array[]
      *   An array of lines that describes this variant.
     *
      */
-    protected function getVariantLines(array $item, \WC_Product $product, $parentQuantity, $vatRangeTags)
+    protected function getVariantLines(array $item, \WC_Product $product, $parentTags)
     {
         $result = array();
 
@@ -340,8 +350,7 @@ class Creator extends BaseCreator
                 $result[] = array(
                   'product' => $meta['meta_key'] . ': ' . rawurldecode($meta['meta_value']),
                   'unitprice' => 0,
-                  'quantity' => $parentQuantity,
-                ) + $vatRangeTags;
+                ) + $parentTags;
             }
         }
 
@@ -358,9 +367,9 @@ class Creator extends BaseCreator
     {
         $result = parent::getFeeLines();
 
-        // So far, all amounts found on refunds are negative, so we probably don't
-        // need to correct the sign on these lines either: but this has not been
-        // tested yet!.
+        // So far, all amounts found on refunds are negative, so we probably
+        // don't need to correct the sign on these lines either: but this has
+        // not been tested yet!.
         foreach ($this->shopSource->get_fees() as $feeLine) {
             $line = $this->getFeeLine($feeLine);
             $line['meta-line-type'] = static::LineType_Other;
@@ -400,6 +409,41 @@ class Creator extends BaseCreator
             return array();
         }
 
+        // Get the first (and hopefully single) shipping line to look up the tax
+        // rate.
+        $vatLookupTags = array();
+        $line = reset($lines);
+        if (count($lines) === 1) {
+            $taxes = !empty($line['taxes']) ? maybe_unserialize($line['taxes']) : array();
+            if (count($taxes) === 1) {
+                // @todo: $tax contains amount: can we use that?
+                //$tax = reset($taxes);
+                $vatLookupTags = array(
+                    // Will contain a % at the end of the string.
+                    'meta-lookup-vatrate' => substr(WC_Tax::get_rate_percent(key($taxes)), 0, -1),
+                    'meta-lookup-vatrate-label' => WC_Tax::get_rate_label(key($taxes)),
+                );
+            } else {
+                // Apparently we have free shipping (or a misconfigured shipment
+                // method). Use a fall-back: WooCommerce only knows 1 tax rate
+                // for all shipping methods, stored in config:
+                $shipping_tax_class = get_option('woocommerce_shipping_tax_class');
+                if ( $shipping_tax_class === 'standard') {
+                    $shipping_tax_class = '';
+                }
+                if (is_string($shipping_tax_class)) {
+                    $tax_rates = WC_Tax::get_rates($shipping_tax_class);
+                    if (count($tax_rates) === 1) {
+                        $tax_rate = reset($tax_rates);
+                        $vatLookupTags = array(
+                            'meta-lookup-vatrate' => $tax_rate['rate'],
+                            'meta-lookup-vatrate-label' => $tax_rate['label'],
+                        );
+                    }
+                }
+            }
+        }
+
         // Precision: shipping costs are entered ex VAT, so that may be rounded
         // to the cent by the administrator. The computed costs inc VAT is
         // rounded to the cent as well, so both are to be considered precise
@@ -408,11 +452,13 @@ class Creator extends BaseCreator
         $shippingVat = $this->shopSource->get_shipping_tax();
 
         $result = array(
-                'product' => $this->getShippingMethodName(),
+                'product' => $line['name'],
                 'unitprice' => $shippingEx,
                 'quantity' => 1,
                 'vatamount' => $shippingVat,
-            ) + $this->getVatRangeTags($shippingVat, $shippingEx);
+            )
+            + $this->getVatRangeTags($shippingVat, $shippingEx)
+            + $vatLookupTags;
 
         return $result;
     }

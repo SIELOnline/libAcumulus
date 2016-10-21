@@ -655,6 +655,7 @@ abstract class Creator
             $result[] = $line;
         }
 
+        // @todo: allow to get multiple shipping lines.
         $line = $this->getShippingLine();
         if ($line) {
             $line['meta-line-type'] = static::LineType_Shipping;

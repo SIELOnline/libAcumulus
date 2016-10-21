@@ -434,7 +434,8 @@ class Creator extends BaseCreator
                 // Assuming that the fixed discount amount was entered:
                 // - including VAT, the precision would be 0.01, 0.01.
                 // - excluding VAT, the precision would be 0.01, 0
-                // However, for a % discount, it will be: 0.02, 0.01, so use this.
+                // However, for a %, it will be: 0.02, 0.01, so use 0.02.
+                // @todo: can we determine so?
             ) + $this->getVatRangeTags($discountVat, $discountEx, 0.02);
         $result['meta-calculated-fields'][] = 'vatamount';
 

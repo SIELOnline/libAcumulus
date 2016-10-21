@@ -320,13 +320,13 @@ class Creator extends BaseCreator
                 'meta-vatrate-source' => Creator::VatRateSource_Completor,
             );
         } else {
-            // Other lines do not have a discoverable vatrate, let a strategy try to
-            // compute it.
+            // Other lines do not have a discoverable vatrate, let a strategy
+            // try to compute it.
             $result += array(
                 'vatrate' => null,
                 'meta-vatrate-source' => Creator::VatRateSource_Strategy,
-                // Coupons may have to be split over various taxes, but shipping and
-                // other fees not.
+                // Coupons may have to be split over various taxes, but shipping
+                // and other fees not.
                 'meta-strategy-split' => $line['code'] === 'coupon',
             );
         }

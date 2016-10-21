@@ -345,8 +345,9 @@ class Creator extends BaseCreator
     {
         $result = array();
         // We are checking on empty, assuming that a null value will be used to
-        // indicate no shipping at all (downloadable product) and that free shipping
-        // will be represented as the string '0.00' which is not considered empty.
+        // indicate no shipping at all (downloadable product) and that free
+        // shipping will be represented as the string '0.00' which is not
+        // considered empty.
         if (!empty($this->order['details']['BT']->order_shipment)) {
             $shippingEx = (float) $this->order['details']['BT']->order_shipment;
             $shippingVat = (float) $this->order['details']['BT']->order_shipment_tax;

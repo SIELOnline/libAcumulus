@@ -79,30 +79,12 @@ class Communicator
         $this->errors = array();
 
         try {
-            $environment = $this->config->getEnvironment();
-            $pluginSettings = $this->config->getPluginSettings();
-
-            // Compose URI.
-            $uri = $environment['baseUri'] . '/' . $environment['apiVersion'] . '/' . $apiFunction . '.php';
-
-            // Complete message with values common to all API calls:
-            // - contract part
-            // - format part
-            // - environment part
-            $message = array_merge(array(
-                'contract' => $this->config->getCredentials(),
-                'format' => $pluginSettings['outputFormat'],
-                'testmode' => $pluginSettings['debug'] === ConfigInterface::Debug_TestMode ? ConfigInterface::TestMode_Test : ConfigInterface::TestMode_Normal,
-                'connector' => array(
-                    'application' => "{$environment['shopName']} {$environment['shopVersion']}",
-                    'webkoppel' => "Acumulus {$environment['moduleVersion']}",
-                    'development' => 'SIEL - Buro RaDer',
-                    'remark' => "Library {$environment['libraryVersion']} - PHP {$environment['phpVersion']}",
-                    'sourceuri' => 'https://www.siel.nl/',
-                ),
-            ), $message);
+            $commonMessagePart = $this->getCommonPart();
+            $message = array_merge($commonMessagePart, $message);
 
             // Send message, receive response.
+            $environment = $this->config->getEnvironment();
+            $uri = $environment['baseUri'] . '/' . $environment['apiVersion'] . '/' . $apiFunction . '.php';
             $response = $this->sendApiMessage($uri, $message);
         } catch (Exception $e) {
             $this->errors[] = array(
@@ -158,6 +140,41 @@ class Communicator
         $this->correctStatusForLocalMessages($response);
 
         return $response;
+    }
+
+    /**
+     * Returns the common part of each API message.
+     *
+     * The common part consists of the following tags:
+     * - contract
+     * - format
+     * - testmode
+     * - connector
+     *
+     * @return array
+     *   The common part of each API message.
+     */
+    protected function getCommonPart() {
+        $environment = $this->config->getEnvironment();
+        $pluginSettings = $this->config->getPluginSettings();
+
+        // Complete message with values common to all API calls:
+        // - contract part
+        // - format part
+        // - environment part
+        $commonMessagePart = array(
+            'contract' => $this->config->getCredentials(),
+            'format' => $pluginSettings['outputFormat'],
+            'testmode' => $pluginSettings['debug'] === ConfigInterface::Debug_TestMode ? ConfigInterface::TestMode_Test : ConfigInterface::TestMode_Normal,
+            'connector' => array(
+                'application' => "{$environment['shopName']} {$environment['shopVersion']}",
+                'webkoppel' => "Acumulus {$environment['moduleVersion']}",
+                'development' => 'SIEL - Buro RaDer',
+                'remark' => "Library {$environment['libraryVersion']} - PHP {$environment['phpVersion']}",
+                'sourceuri' => 'https://www.siel.nl/',
+            ),
+        );
+        return $commonMessagePart;
     }
 
     /**
@@ -486,5 +503,4 @@ class Communicator
             'message' => $body,
         );
     }
-
 }

@@ -893,8 +893,7 @@ class Config implements ConfigInterface
 
             if ($this->get('triggerInvoiceSendEvent') == 2) {
                 $values['triggerInvoiceEvent'] = ConfigInterface::TriggerInvoiceEvent_Create;
-            }
-            else {
+            } else {
                 $values['triggerInvoiceEvent'] = ConfigInterface::TriggerInvoiceEvent_None;
             }
             unset($values['triggerInvoiceSendEvent']);

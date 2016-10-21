@@ -262,7 +262,7 @@ class Completor
                     if ($this->isCompany()) {
                         $possibleVatTypes[] = ConfigInterface::VatType_NationalReversed;
                     }
-                } else if ($this->isEu()) {
+                } elseif ($this->isEu()) {
                     // EU reversed VAT.
                     if ($this->isCompany()) {
                         $possibleVatTypes[] = ConfigInterface::VatType_EuReversed;
@@ -272,7 +272,7 @@ class Completor
                     if ($digitalServices !== ConfigInterface::DigitalServices_Only && $vatFreeProducts !== ConfigInterface::VatFreeProducts_No) {
                         $possibleVatTypes[] = ConfigInterface::VatType_National;
                     }
-                } else if ($this->isOutsideEu()) {
+                } elseif ($this->isOutsideEu()) {
                     $possibleVatTypes[] = ConfigInterface::VatType_RestOfWorld;
                 }
 
@@ -416,7 +416,7 @@ class Completor
         foreach ($invoiceLines as $line) {
             if (isset($line['meta-line-price'])) {
                 $linesAmount += $line['meta-line-price'];
-            } else if (isset($line['unitprice'])) {
+            } elseif (isset($line['unitprice'])) {
                 $linesAmount += $line['quantity'] * $line['unitprice'];
             } else {
                 $this->incompleteValues['meta-lines-amount'] = 'meta-lines-amount';
@@ -424,7 +424,7 @@ class Completor
 
             if (isset($line['meta-line-priceinc'])) {
                 $linesAmountInc += $line['meta-line-priceinc'];
-            } else if (isset($line['unitpriceinc'])) {
+            } elseif (isset($line['unitpriceinc'])) {
                 $linesAmountInc += $line['quantity'] * $line['unitpriceinc'];
             } else {
                 $this->incompleteValues['meta-lines-amountinc'] = 'meta-lines-amountinc';
@@ -432,7 +432,7 @@ class Completor
 
             if (isset($line['meta-line-vatamount'])) {
                 $linesVatAmount += $line['meta-line-vatamount'];
-            } else if (isset($line['vatamount'])) {
+            } elseif (isset($line['vatamount'])) {
                 $linesVatAmount += $line['quantity'] * $line['vatamount'];
             } else {
                 $this->incompleteValues['meta-lines-vatamount'] = 'meta-lines-vatamount';
@@ -520,7 +520,7 @@ class Completor
             if ($settings['addMissingAmountLine']) {
                 if ($this->source->getType() === Source::CreditNote) {
                     $product = $this->t('refund_adjustment');
-                } else if ($missingAmount < 0.0) {
+                } elseif ($missingAmount < 0.0) {
                     $product = $this->t('discount_adjustment');
                 } else {
                     $product = $this->t('fee_adjustment');
@@ -602,7 +602,7 @@ class Completor
                 $this->invoice['customer']['invoice']['vattype'] = reset($this->possibleVatTypes);
                 // We must check as no vat type allows the actual vat rates.
                 $message = 'message_warning_no_vattype';
-            } else if (count($possibleVatTypes) === 1) {
+            } elseif (count($possibleVatTypes) === 1) {
                 // Pick the first and only (and therefore correct) vat type.
                 $this->invoice['customer']['invoice']['vattype'] = reset($possibleVatTypes);
                 $message = '';
@@ -792,7 +792,7 @@ class Completor
                     $hasLineWithVat = true;
                     break;
                 }
-            } else if (!empty($line['vatamount']) && !Number::isZero($line['vatamount'])) {
+            } elseif (!empty($line['vatamount']) && !Number::isZero($line['vatamount'])) {
                 $hasLineWithVat = true;
                 break;
             }

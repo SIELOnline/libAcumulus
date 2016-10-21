@@ -65,17 +65,17 @@ class BatchForm extends Form
         $invoiceSourceTypes = $this->shopCapabilities->getSupportedInvoiceSourceTypes();
         if (empty($this->submittedValues['invoice_source_type'])) {
             $this->errorMessages['invoice_source_type'] = $this->t('message_validate_batch_source_type_required');
-        } else if (!array_key_exists($this->submittedValues['invoice_source_type'], $invoiceSourceTypes)) {
+        } elseif (!array_key_exists($this->submittedValues['invoice_source_type'], $invoiceSourceTypes)) {
             $this->errorMessages['invoice_source_type'] = $this->t('message_validate_batch_source_type_invalid');
         }
 
         if ($this->submittedValues['invoice_source_reference_from'] === '' && $this->submittedValues['date_from'] === '') {
             // Either a range of order id's or a range of dates should be entered.
             $this->errorMessages['invoice_source_reference_from'] = $this->t(count($invoiceSourceTypes) === 1 ? 'message_validate_batch_reference_or_date_1' : 'message_validate_batch_reference_or_date_2');
-        } else if ($this->submittedValues['invoice_source_reference_from'] !== '' && $this->submittedValues['date_from'] !== '') {
+        } elseif ($this->submittedValues['invoice_source_reference_from'] !== '' && $this->submittedValues['date_from'] !== '') {
             // Not both ranges should be entered.
             $this->errorMessages['date_from'] = $this->t(count($invoiceSourceTypes) === 1 ? 'message_validate_batch_reference_and_date_1' : 'message_validate_batch_reference_and_date_2');
-        } else if ($this->submittedValues['invoice_source_reference_from'] !== '') {
+        } elseif ($this->submittedValues['invoice_source_reference_from'] !== '') {
             // Date from is empty, we go for a range of order ids.
             // (We ignore any date to value.)
             // Single id or range of ids?
@@ -95,7 +95,7 @@ class BatchForm extends Form
                 if (!DateTime::createFromFormat($dateFormat, $this->submittedValues['date_to'])) {
                     // Date to not a valid date.
                     $this->errorMessages['date_to'] = sprintf($this->t('message_validate_batch_bad_date_to'), $this->getShopDateFormat());
-                } else if ($this->submittedValues['date_to'] < $this->submittedValues['date_from']) {
+                } elseif ($this->submittedValues['date_to'] < $this->submittedValues['date_from']) {
                     // date to is smaller than date from
                     $this->errorMessages['date_to'] = $this->t('message_validate_batch_bad_date_range');
                 }

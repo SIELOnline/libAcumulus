@@ -265,15 +265,15 @@ abstract class Creator
         } else {
             if (isset($object->$property)) {
                 $value = $object->$property;
-            } else if (method_exists($object, $property)) {
+            } elseif (method_exists($object, $property)) {
                 $value = $object->$property();
             } else {
                 $method = 'get' . ucfirst($property);
                 if (method_exists($object, $method)) {
                     $value = $object->$method();
-                } else if (method_exists($object, '__get')) {
+                } elseif (method_exists($object, '__get')) {
                     @$value = $object->$property;
-                } else if (method_exists($object, '__call')) {
+                } elseif (method_exists($object, '__call')) {
                     try {
                         $value = @$object->$property();
                     } catch (Exception $e) {
@@ -977,7 +977,7 @@ abstract class Creator
                 'vatrate' => null,
                 'meta-vatrate-source' => static::VatRateSource_Completor,
             );
-        } else if (Number::isZero($numerator, 0.0001)) {
+        } elseif (Number::isZero($numerator, 0.0001)) {
             return array(
                 'vatrate' => 0,
                 'vatamount' => $numerator,

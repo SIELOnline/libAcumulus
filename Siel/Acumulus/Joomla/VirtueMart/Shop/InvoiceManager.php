@@ -41,8 +41,7 @@ class InvoiceManager extends BaseInvoiceManager
             if (is_numeric($invoiceSourceReferenceFrom) &&  is_numeric($invoiceSourceReferenceTo)) {
                 $from = sprintf('%d', $invoiceSourceReferenceFrom);
                 $to = sprintf('%d', $invoiceSourceReferenceTo);
-            }
-            else {
+            } else {
                 $from = sprintf("'%s'", $this->getDb()->escape($invoiceSourceReferenceFrom));
                 $to = sprintf("'%s'", $this->getDb()->escape($invoiceSourceReferenceTo));
             }

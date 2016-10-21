@@ -117,9 +117,9 @@ class FormMapper
 
         if ($field['type'] === 'radio') {
             $result['values'] = $this->getPrestaShopValues($field['name'], $field['options']);
-        } else if ($field['type'] === 'checkbox') {
+        } elseif ($field['type'] === 'checkbox') {
             $result['values'] = $this->getPrestaShopOptions($field['options']);
-        } else if ($field['type'] === 'select') {
+        } elseif ($field['type'] === 'select') {
             $result['options'] = $this->getPrestaShopOptions($field['options']);
             if ($result['multiple']) {
                 $result['size'] = $field['attributes']['size'];

@@ -253,9 +253,9 @@ abstract class InvoiceManager
         $messages = array();
         if ($testMode) {
             $status = ConfigInterface::Invoice_Sent_TestMode;
-        } else if (!$this->config->getAcumulusEntryModel()->getByInvoiceSource($invoiceSource)) {
+        } elseif (!$this->config->getAcumulusEntryModel()->getByInvoiceSource($invoiceSource)) {
             $status = ConfigInterface::Invoice_Sent_New;
-        } else if ($forceSend) {
+        } elseif ($forceSend) {
             $status = ConfigInterface::Invoice_Sent_Forced;
         } else {
             $status = ConfigInterface::Invoice_NotSent_AlreadySent;

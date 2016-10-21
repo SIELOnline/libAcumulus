@@ -312,7 +312,7 @@ class Creator extends BaseCreator
                 'vatrate' => -1,
                 'meta-vatrate-source' => Creator::VatRateSource_Exact0,
             );
-        } else if (Number::isZero($line['value'])) {
+        } elseif (Number::isZero($line['value'])) {
             // 0-cost lines - e.g. free shipping - also don't have a tax amount,
             // let the completor add the highest appearing vat rate.
             $result += array(

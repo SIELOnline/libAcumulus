@@ -309,8 +309,7 @@ class OcHelper
                 $setting['acumulus_siel_datamodel_version'] = '4.0';
                 $this->registry->model_setting_setting->editSetting('acumulus_siel', $setting);
             }
-        }
-        else if (version_compare($currentDataModelVersion, '4.4', '<')) {
+        } elseif (version_compare($currentDataModelVersion, '4.4', '<')) {
             // Update table columns.
             if ($result = $this->acumulusConfig->getAcumulusEntryModel()->upgrade('4.4.0')) {
                 // @todo: set to ConfigInterface::libraryVersion ? (as in doUpgrade()?)

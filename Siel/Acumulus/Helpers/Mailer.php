@@ -73,22 +73,17 @@ abstract class Mailer
         if ($result !== true) {
             if ($result === false) {
                 $message = 'false';
-            }
-            else  if ($result === null) {
+            } else  if ($result === null) {
                 $message = 'null';
-            }
-            else  if ($result instanceof \Exception) {
+            } else  if ($result instanceof \Exception) {
                 $message = $result->getMessage();
-            }
-            else  if (!is_string($result)) {
+            } else  if (!is_string($result)) {
                 $message = print_r($result, true);
-            }
-            else {
+            } else {
                 $message = $result;
             }
             Log::getInstance()->error('Mailer::sendInvoiceAddMailResult(): failed: %s', $message);
-        }
-        else {
+        } else {
             Log::getInstance()->info('Mailer::sendInvoiceAddMailResult(): success');
         }
 

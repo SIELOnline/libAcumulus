@@ -72,7 +72,7 @@ abstract class CompletorStrategyBase
 
     /**
      * An overview of the vat broken down into separate vat rates.
-     * 
+     *
      * Each entry is keyed by íts vatrate (%.3f formatted to get correct
      * comparisons on equality) and contains an array with the following
      * information:
@@ -80,7 +80,7 @@ abstract class CompletorStrategyBase
      * - 'vatamount' => vat amount on all lines having this vat rate.
      * - 'amount' => amount (ex vat) of all lines having this vat rate,
      * - 'count' => number of lines having this vat rate.
-     * 
+     *
      * @var array[]
      */
     protected $vatBreakdown;
@@ -324,8 +324,7 @@ abstract class CompletorStrategyBase
         $this->init();
         if ($this->checkPreconditions()) {
             return $this->execute();
-        }
-        else {
+        } else {
             Log::getInstance()->notice("%s::checkPreconditions() returned false", $this->getName());
             return FALSE;
         }

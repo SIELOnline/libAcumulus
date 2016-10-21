@@ -95,7 +95,7 @@ class ConfigForm extends BaseConfigForm
 
         if (empty($this->submittedValues['emailonerror'])) {
             $this->errorMessages['emailonerror'] = $this->t('message_validate_email_1');
-        } else if (!preg_match($regexpEmail, $this->submittedValues['emailonerror'])) {
+        } elseif (!preg_match($regexpEmail, $this->submittedValues['emailonerror'])) {
             $this->errorMessages['emailonerror'] = $this->t('message_validate_email_0');
         }
     }

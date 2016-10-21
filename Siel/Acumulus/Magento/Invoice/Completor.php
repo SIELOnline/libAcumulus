@@ -37,7 +37,7 @@ class Completor extends BaseCompletor
                 if ($line['meta-line-type'] === Creator::LineType_Discount) {
                     if (isset($line['meta-line-priceinc'])) {
                         $discountLineAmountInc += $line['meta-line-priceinc'];
-                    } else if (isset($line['unitpriceinc'])) {
+                    } elseif (isset($line['unitpriceinc'])) {
                         $discountLineAmountInc += $line['quantity'] * $line['unitpriceinc'];
                     }
                 }

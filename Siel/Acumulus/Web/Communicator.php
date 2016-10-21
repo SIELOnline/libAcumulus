@@ -50,7 +50,7 @@ class Communicator
             if ($response['status'] != ConfigInterface::Status_Exception) {
                 $response['status'] = ConfigInterface::Status_Errors;
             }
-        } else if (!empty($response['warnings'])) {
+        } elseif (!empty($response['warnings'])) {
             if ($response['status'] != ConfigInterface::Status_Exception && $response['status'] != ConfigInterface::Status_Errors) {
                 $response['status'] = ConfigInterface::Status_Warnings;
             }
@@ -103,7 +103,7 @@ class Communicator
             if (!is_array(reset($response['errors']))) {
                 $response['errors'] = array($response['errors']);
             }
-        } else if (!isset($response['errors'])) {
+        } elseif (!isset($response['errors'])) {
             $response['errors'] = array();
         } else {
             unset($response['errors']['count_errors']);
@@ -115,7 +115,7 @@ class Communicator
             if (!is_array(reset($response['warnings']))) {
                 $response['warnings'] = array($response['warnings']);
             }
-        } else if (!isset($response['warnings'])) {
+        } elseif (!isset($response['warnings'])) {
             $response['warnings'] = array();
         } else {
             unset($response['warnings']['count_warnings']);

@@ -425,7 +425,7 @@ class Creator extends BaseCreator
                 // getShippingDiscountAmount() only exists on Orders.
                 if ($this->invoiceSource->getType() === Source::Order && !Number::isZero($magentoSource->getShippingDiscountAmount())) {
                     $result['meta-line-discount-amountinc'] = -$sign * $magentoSource->getShippingDiscountAmount();
-                } else if ($this->invoiceSource->getType() === Source::CreditNote
+                } elseif ($this->invoiceSource->getType() === Source::CreditNote
                     && !Number::floatsAreEqual($shippingVat, $magentoSource->getShippingTaxAmount(), 0.02)) {
                     // On credit notes, the shipping discount amount is not stored but can
                     // be deduced via the shipping discount tax amount and the shipping vat
@@ -512,7 +512,7 @@ class Creator extends BaseCreator
     {
         if ($this->order->getDiscountDescription()) {
             $description = $this->t('discount_code') . ' ' . $this->order->getDiscountDescription();
-        } else if ($this->order->getCouponCode()) {
+        } elseif ($this->order->getCouponCode()) {
             $description = $this->t('discount_code') . ' ' . $this->order->getCouponCode();
         } else {
             $description = $this->t('discount');

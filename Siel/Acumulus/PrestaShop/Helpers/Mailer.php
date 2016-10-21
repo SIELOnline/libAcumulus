@@ -36,8 +36,7 @@ class Mailer extends BaseMailer
 
         if ($result === true) {
             $result = 'Emails are deactivated: $configuration[\'PS_MAIL_METHOD\'] == 3';
-        }
-        else if(is_int($result)) {
+        } elseif(is_int($result)) {
             // If PS returns an int, that indicates the number of successful recipients, see Swift::send().
             $result = true;
         }

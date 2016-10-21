@@ -285,7 +285,7 @@ abstract class Form
         foreach ($fields as $name => &$field) {
             if ($field['type'] === 'fieldset') {
                 $field['fields'] = $this->addValuesToFields($field['fields']);
-            } else if ($field['type'] === 'checkbox') {
+            } elseif ($field['type'] === 'checkbox') {
                 // Value is a list of checked options.
                 $value = array();
                 foreach ($field['options'] as $optionName => $optionLabel) {
@@ -584,17 +584,20 @@ abstract class Form
 
         // Handle checkboxes.
         foreach ($this->getCheckboxKeys() as $checkboxName => $collectionName) {
-            // Check if checkboxes are handled as an array of checkboxes.
             if (isset($result[$collectionName]) && is_array($result[$collectionName])) {
+                // Checkboxes are handled as an array of checkboxes.
                 // Extract the checked values.
                 $checkedValues = array_combine(array_values($result[$collectionName]), array_fill(0, count($result[$collectionName]), 1));
-                // Replace the array value with the checked values, unset first as the
-                // keys for the collection and (1 of the) checkboxes may be the same.
+                // Replace the array value with the checked values, unset first
+                // as the keys for the collection and (1 of the) checkboxes may
+                // be the same.
                 unset($result[$collectionName]);
                 $result += $checkedValues;
-            } // Check if checkbox keys are prepended with their collection name.
-            else if (isset($result["{$collectionName}_{$checkboxName}"])) {
+            } elseif (isset($result["{$collectionName}_{$checkboxName}"])) {
+                // Checkbox keys are prepended with their collection name.
+                // Add value for key without collection name.
                 $result[$checkboxName] = $result["{$collectionName}_{$checkboxName}"];
+                // And unset for key with collection name.
                 unset($result["{$collectionName}_{$checkboxName}"]);
             }
         }

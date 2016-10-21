@@ -84,7 +84,7 @@ class InvoiceManager extends BaseInvoiceManager
                   ),
                 );
                 return $this->query2Sources($args, $invoiceSourceType);
-            } else if (is_plugin_active('woocommerce-sequential-order-numbers-pro/woocommerce-sequential-order-numbers.php')
+            } elseif (is_plugin_active('woocommerce-sequential-order-numbers-pro/woocommerce-sequential-order-numbers.php')
               || is_plugin_active('wc-sequential-order-numbers/Sequential_Order_Numbers.php')) {
                 // Search by the order number as assigned by the plugin. Note
                 // that these plugins allow for text prefixes and suffixes,

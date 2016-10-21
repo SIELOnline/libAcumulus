@@ -110,8 +110,7 @@ class CompletorInvoiceLines
                             $child['meta-parent'] = $parentIndex;
                         }
                     }
-                }
-                else {
+                } else {
                     $line['product'] = $this->getMergedLinesText($line, $children);
                     $line['meta-children-merged'] = count($children);
                     $children = null;
@@ -158,9 +157,9 @@ class CompletorInvoiceLines
         $vatRates = $this->getAppearingVatRates($children);
         if (count($vatRates) > 1) {
             $separateLines = true;
-        } else if (count($children) <= $invoiceSettings['optionsAllOn1Line']) {
+        } elseif (count($children) <= $invoiceSettings['optionsAllOn1Line']) {
             $separateLines = false;
-        } else if (count($children) >= $invoiceSettings['optionsAllOnOwnLine']) {
+        } elseif (count($children) >= $invoiceSettings['optionsAllOnOwnLine']) {
             $separateLines = true;
         } else {
             $childrenText = $this->getMergedLinesText($parent, $children);
@@ -275,7 +274,7 @@ class CompletorInvoiceLines
                 if (isset($line['unitpriceinc'])) {
                     if (Number::isZero($line['unitpriceinc'])) {
                         $line['unitprice'] = 0;
-                    } else if (isset($line['vatrate']) && in_array($line['meta-vatrate-source'], Completor::$CorrectVatRateSources)) {
+                    } elseif (isset($line['vatrate']) && in_array($line['meta-vatrate-source'], Completor::$CorrectVatRateSources)) {
                         if (isset($line['costprice'])) {
                             $margin = $line['unitpriceinc'] - $line['costprice'];
                             if ($margin > 0) {
@@ -288,7 +287,7 @@ class CompletorInvoiceLines
                         } else {
                             $line['unitprice'] = $line['unitpriceinc'] / (100.0 + $line['vatrate']) * 100.0;
                         }
-                    } else if (isset($line['vatamount'])) {
+                    } elseif (isset($line['vatamount'])) {
                         $line['unitprice'] = $line['unitpriceinc'] - $line['vatamount'];
                     } else {
                         // We cannot fill in unitprice reliably, so better to
@@ -390,7 +389,7 @@ class CompletorInvoiceLines
             if ($carry === null) {
                 // 1st item: return its vat rate.
                 return $matchedVatRate['vatrate'];
-            } else if ($carry == $matchedVatRate['vatrate']) {
+            } elseif ($carry == $matchedVatRate['vatrate']) {
                 // Note that in PHP: '21' == '21.0000' returns true. So using ==
                 // works. Vat rate equals all previous vat rates: return that
                 // vat rate.
@@ -544,8 +543,7 @@ class CompletorInvoiceLines
                     $line['meta-line-discount-amountinc'] = $line['meta-line-discount-vatamount'] / $line['vatrate'] * (100 + $line['vatrate']);
                     $line['meta-calculated-fields'][] = 'meta-line-discount-amountinc';
                 }
-            }
-            else if ($line['meta-vatrate-source'] == Creator::VatRateSource_Strategy && !empty($line['meta-strategy-split'])) {
+            } elseif ($line['meta-vatrate-source'] == Creator::VatRateSource_Strategy && !empty($line['meta-strategy-split'])) {
                 if (isset($line['unitprice']) && isset($line['unitpriceinc'])) {
                     if (!isset($line['meta-line-price'])) {
                         $line['meta-line-price'] = $line['unitprice'] * $line['quantity'];

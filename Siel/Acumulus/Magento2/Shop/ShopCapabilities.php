@@ -48,7 +48,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
             if (!empty($paymentMethodData['active'])) {
                 if ((isset($data['title']))) {
                     $title = $data['title'];
-                } else if ($paymentHelper->getMethodInstance($code)) {
+                } elseif ($paymentHelper->getMethodInstance($code)) {
                     $title = $paymentHelper->getMethodInstance($code)->getConfigData('title');
                 }
                 if (empty($title)) {

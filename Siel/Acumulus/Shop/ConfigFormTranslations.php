@@ -22,18 +22,7 @@ class ConfigFormTranslations extends TranslationCollection
         'button_save' => 'Opslaan',
         'button_cancel' => 'Terug',
 
-        'message_validate_contractcode_0' => 'Het veld Contractcode is verplicht, vul de contractcode in die u ook gebruikt om in te loggen op Acumulus.',
-        'message_validate_contractcode_1' => 'Het veld Contractcode is een numeriek veld, vul de contractcode in die u ook gebruikt om in te loggen op Acumulus.',
-        'message_validate_username_0' => 'Het veld Gebruikersnaam is verplicht, vul de gebruikersnaam in die u ook gebruikt om in te loggen op Acumulus.',
-        'message_validate_username_1' => 'Het veld Gebruikersnaam bevat spaties aan het begin of eind. Dit is toegestaan, maar weet u zeker dat dit de bedoeling is?',
-        'message_validate_password_0' => 'Het veld Wachtwoord is verplicht, vul het wachtwoord in dat u ook gebruikt om in te loggen op Acumulus.',
-        'message_validate_password_1' => 'Het veld Wachtwoord bevat spaties aan het begin of eind. Dit is toegestaan, maar weet u zeker dat dit de bedoeling is?',
-        'message_validate_password_2' => 'Het veld Wachtwoord bevat tekens die Acumulus verbiedt (`\'"#%&;<>\\). Weet u zeker dat u het juiste wachtwoord heeft ingetypt?',
-        'message_validate_email_0' => 'Het veld Email is geen valide e-mailadres, vul uw eigen e-mailadres in.',
-        'message_validate_email_1' => 'Het veld Email is verplicht, vul uw eigen e-mailadres in.',
         'message_validate_email_2' => 'Het veld (fictieve klant) Email is geen valide e-mailadres, vul een correct e-mailadres in.',
-        'message_validate_email_3' => 'Het veld BCC is geen valide e-mailadres, vul een correct e-mailadres in.',
-        'message_validate_email_4' => 'Het veld Afzender is geen valide e-mailadres, vul een correct e-mailadres in.',
         'message_validate_conflicting_options' => 'Als u geen klantgegevens naar Acumulus verstuurt, kunt u Acumulus geen PDF factuur laten versturen. Pas één van beide opties aan.',
 
         'message_form_success' => 'De instellingen zijn opgeslagen.',
@@ -58,6 +47,15 @@ class ConfigFormTranslations extends TranslationCollection
         'field_password' => 'Wachtwoord',
         'field_email' => 'E-mail',
         'desc_email' => 'Het e-mailadres waarop u geïnformeerd wordt over fouten die zijn opgetreden tijdens het versturen van facturen. Omdat deze module niet kan weten of het vanuit een beheerdersscherm is aangeroepen, zal het geen berichten op het scherm plaatsen. Daarom is het invullen van een e-mailadres verplicht.',
+        'message_validate_contractcode_0' => 'Het veld Contractcode is verplicht, vul de contractcode in die u ook gebruikt om in te loggen op Acumulus.',
+        'message_validate_contractcode_1' => 'Het veld Contractcode is een numeriek veld, vul de contractcode in die u ook gebruikt om in te loggen op Acumulus.',
+        'message_validate_username_0' => 'Het veld Gebruikersnaam is verplicht, vul de gebruikersnaam in die u ook gebruikt om in te loggen op Acumulus.',
+        'message_validate_username_1' => 'Het veld Gebruikersnaam bevat spaties aan het begin of eind. Dit is toegestaan, maar weet u zeker dat dit de bedoeling is?',
+        'message_validate_password_0' => 'Het veld Wachtwoord is verplicht, vul het wachtwoord in dat u ook gebruikt om in te loggen op Acumulus.',
+        'message_validate_password_1' => 'Het veld Wachtwoord bevat spaties aan het begin of eind. Dit is toegestaan, maar weet u zeker dat dit de bedoeling is?',
+        'message_validate_password_2' => 'Het veld Wachtwoord bevat tekens die Acumulus verbiedt (`\'"#%&;<>\\). Weet u zeker dat u het juiste wachtwoord heeft ingetypt?',
+        'message_validate_email_0' => 'Het veld Email is geen valide e-mailadres, vul uw eigen e-mailadres in.',
+        'message_validate_email_1' => 'Het veld Email is verplicht, vul uw eigen e-mailadres in.',
 
         // Shop settings.
         'shopSettingsHeader' => 'Over uw winkel',
@@ -143,6 +141,21 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'option_same_template' => 'Zelfde sjabloon als voor niet betaald',
         'desc_defaultInvoiceTemplate' => 'Maakt u binnen Acumulus gebruik van meerdere factuur-sjablonen en wilt u de facturen uit uw webwinkel met een specifieke factuursjabloon printen, kies dan hier de factuur-sjablonen voor niet betaalde respectievelijk betaalde bestellingen.',
 
+        'option_do_not_use' => 'Deze instelling negeren',
+        'option_always' => 'Altijd',
+        'field_optionsAllOn1Line' => 'Maximum aantal opties bij hoofdproduct',
+        'field_optionsAllOnOwnLine' => 'Minimum aantal opties voor aparate regels',
+        'field_optionsMaxLength' => 'Maximale lengte van omschrijving',
+        'desc_optionsMaxLength' => 'Als een product opties of varianten heeft, of is samengesteld, kunnen deze opties op dezelfde regel als het product komen of op aparte regels daaronder. 
+            Met bovenstaande 3 instellingen kunt u aangeven wanneer voor alles op dezelfde regel en wanneer voor meerdere regels gekozen wordt.
+            Als het aantal opties van het product gelijk is aan of minder is dan de 1e waarde komt alles op 1 regel.
+            Als het aantal opties gelijk is aan of groter is dan de 2e waarde komen alle opties op hun eigen regel.
+            Als het aantal opties tussen deze 2 waardes in ligt wordt de keuze gemaakt op basis van de lengte van de omschrijvingen van alle opties bij elkaar.
+            NB: als het een samengesteld product betreft en de prijsinformatie is alleen aanwezig op de subproducten, of de subproducten hebben verschillende BTW tarieven, dan komen alle subproducten op hun eigen regel, ongeacht bovenstaande instellingen.',
+        'message_validate_options_0' => 'The fields "Maximum no. of options on main product" and "Minimum no. of options for separate lines" cannot both be set to "Always".',
+        'message_validate_options_1' => 'The field "Minimum no. of options for separate lines" should be greater than or equal to "Maximum no. of options on main product".',
+        'message_validate_options_2' => 'The field "Maximum length of description" should be a number.',
+
         'field_sendWhat' => 'Verstuur',
         'option_sendEmptyInvoice' => 'Verstuur 0-bedrag facturen.',
         'option_sendEmptyShipping' => 'Verstuur "gratis verzending" of "zelf afhalen" regels.',
@@ -165,12 +178,14 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
 
         'field_emailFrom' => 'Afzender',
         'desc_emailFrom' => 'Het email adres dat als afzender gebruikt moet worden. Als u dit leeg laat wordt het emailadres uit het Acumulus sjabloon gebruikt. Wij adviseren dit veld leeg te laten.',
+        'message_validate_email_4' => 'Het veld Afzender is geen valide e-mailadres, vul een correct e-mailadres in.',
 
         'field_subject' => 'Onderwerp',
         'desc_subject' => 'Het onderwerp van de email. Als u dit leeg laat wordt "Factuur [factuurnummer] Bestelling [bestelnummer]" gebruikt. U kunt [#b] gebruiken om het bestelnummer in de onderwerpregel te plaatsen en [#f] voor het factuurnummer (van de webshop, niet van Acumulus).',
 
         'field_emailBcc' => 'BCC',
         'desc_emailBcc' => 'Additionele emailadressen om de factuur naar toe te sturen, bv. het emailadres van uw eigen administratie-afdeling. Als u dit leeg laat wordt de factuur alleen naar de klant verstuurd.',
+        'message_validate_email_3' => 'Het veld BCC is geen valide e-mailadres, vul een correct e-mailadres in.',
 
         // Plugin settings.
         'pluginSettingsHeader' => 'Plugin instellingen',
@@ -213,18 +228,7 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'button_save' => 'Save',
         'button_cancel' => 'Back',
 
-        'message_validate_contractcode_0' => 'The field Contract code is required, please fill in the contract code you use to log in to Acumulus.',
-        'message_validate_contractcode_1' => 'The field Contract code is a numeric field, please fill in the contract code you use to log in to Acumulus.',
-        'message_validate_username_0' => 'The field User name is required, please fill in the user name you use to log in to Acumulus.',
-        'message_validate_username_1' => 'The field User name contains spaces at the start or end. This is allowed but are you sure that you meant to do so?',
-        'message_validate_password_0' => 'The field Password is required, please fill in the password you use to log in to Acumulus.',
-        'message_validate_password_1' => 'The field Password contains spaces at the start or end. This is allowed but are you sure that you meant to do so?',
-        'message_validate_password_2' => 'The field Password contains a character that is forbidden by Acumulus (`\'"#%&;<>\\). Are you sure that you typed the correct password?',
-        'message_validate_email_0' => 'The field Email is not a valid e-mail address, please fill in your own e-mail address.',
-        'message_validate_email_1' => 'The field Email is required, please fill in your own e-mail address.',
         'message_validate_email_2' => 'The field (fictitious customer) Email is not a valid e-mail address, please fill in a correct e-mail address.',
-        'message_validate_email_3' => 'The field BCC is not a valid e-mail address, please fill in a valid e-mail address.',
-        'message_validate_email_4' => 'The field Sender is not a valid e-mail address, please fill in a valid e-mail address.',
         'message_validate_conflicting_options' => 'If you don\'t send customer data to Acumulus, Acumulus cannot send PDF invoices. Change one of the options.',
 
         'message_form_success' => 'The settings are saved.',
@@ -249,6 +253,15 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'field_password' => 'Password',
         'field_email' => 'E-mail',
         'desc_email' => 'The e-mail address at which you will be informed about any errors that occur during invoice sending. As this module cannot know if it is called from an interactive administrator screen, it will not display any messages in the user interface. Therefore you have to fill in an e-mail address.',
+        'message_validate_contractcode_0' => 'The field Contract code is required, please fill in the contract code you use to log in to Acumulus.',
+        'message_validate_contractcode_1' => 'The field Contract code is a numeric field, please fill in the contract code you use to log in to Acumulus.',
+        'message_validate_username_0' => 'The field User name is required, please fill in the user name you use to log in to Acumulus.',
+        'message_validate_username_1' => 'The field User name contains spaces at the start or end. This is allowed but are you sure that you meant to do so?',
+        'message_validate_password_0' => 'The field Password is required, please fill in the password you use to log in to Acumulus.',
+        'message_validate_password_1' => 'The field Password contains spaces at the start or end. This is allowed but are you sure that you meant to do so?',
+        'message_validate_password_2' => 'The field Password contains a character that is forbidden by Acumulus (`\'"#%&;<>\\). Are you sure that you typed the correct password?',
+        'message_validate_email_0' => 'The field Email is not a valid e-mail address, please fill in your own e-mail address.',
+        'message_validate_email_1' => 'The field Email is required, please fill in your own e-mail address.',
 
         // Shop settings.
         'shopSettingsHeader' => 'About your shop',
@@ -335,6 +348,22 @@ If you unchecked the first option, the second option only applies to business cl
         'option_same_template' => 'Same template as for due',
         'desc_defaultInvoiceTemplate' => 'Select the invoice templates to use when generating your Acumulus invoices for due respectively paid orders.',
 
+        'option_do_not_use' => 'Ignore this setting',
+        'option_never' => 'Never',
+        'option_always' => 'Always',
+        'field_optionsAllOn1Line' => 'Maximum no. of options on main product',
+        'field_optionsAllOnOwnLine' => 'Minimum no. of options for separate lines',
+        'field_optionsMaxLength' => 'Maximum length of description',
+        'desc_optionsMaxLength' => 'If a product has optrions or variants, or is composed, the options can be placed on the same line as the main product or on their own lines.
+            These 3 settings allow you to decide when it will be all on 1 line or when all on their own line.
+            If the no. of options equals or is less than the 1st value, everything will be placed on the main line.
+            If the no. of options equals or is greater than the 2nd value, every option will be placed on its own line.
+            If the no. of options lies between these 2 values The decision will be made based on the total length of all option descriptions together.
+            NB: if this is a composed product en the price information is only available on the sub products, or the sub products have different vat rates, all sub products will always be placed on their own line',
+        'message_validate_options_0' => 'The fields "Maximum no. of options on main product" and "Minimum no. of options for separate lines" cannot both be set to "Always".',
+        'message_validate_options_1' => 'The field "Minimum no. of options for separate lines" should be greater than or equal to "Maximum no. of options on main product".',
+        'message_validate_options_2' => 'The field "Maximum length of description" should be a number.',
+
         'field_sendWhat' => 'Send',
         'option_sendEmptyInvoice' => 'Send 0-amount invoices.',
         'option_sendEmptyShipping' => 'Send "free shipping" or "in store pick-up" lines.',
@@ -357,12 +386,14 @@ If you unchecked the first option, the second option only applies to business cl
 
         'field_emailFrom' => 'Sender',
         'desc_emailFrom' => 'The email address to use as sender. If you leave this empty, the email address of the Acumulus template will be used. We advice you to leave this empty.',
+        'message_validate_email_4' => 'The field Sender is not a valid e-mail address, please fill in a valid e-mail address.',
 
         'field_subject' => 'Subject',
         'desc_subject' => 'The subject line of the email. If you leave this empty "Invoice [invoice#] Order [order#]" will be used. You can use [#b] to place the order number in the subject and [#f] for the invoice number (from the webshop, not Acumulus).',
 
         'field_emailBcc' => 'BCC',
         'desc_emailBcc' => 'Additional email addresses to send the invoice to, e.g. the email address of your own administration department. If you leave this empty the invoice email will only be sent to your client.',
+        'message_validate_email_3' => 'The field BCC is not a valid e-mail address, please fill in a valid e-mail address.',
 
         // Plugin settings.
         'pluginSettingsHeader' => 'Plugin settings',

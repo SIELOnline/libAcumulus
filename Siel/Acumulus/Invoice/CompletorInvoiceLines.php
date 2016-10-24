@@ -122,7 +122,7 @@ class CompletorInvoiceLines
             // Add the line and its children, if any.
             $result[] = $line;
             if (!empty($children)) {
-                $result += $children;
+                $result = array_merge($result, $children);
             }
         }
 
@@ -151,7 +151,7 @@ class CompletorInvoiceLines
     protected function keepSeparateLines(array $parent, array $children)
     {
         $invoiceSettings = $this->config->getInvoiceSettings();
-        // @todo: we actually need completed lines to get a reliable count of
+        // @todo: we actually need corrected lines to get a reliable count of
         // @todo: vat rates. so we should flatten after completing... (making
         // @todo: the  completor methods recursive ...).
         $vatRates = $this->getAppearingVatRates($children);
@@ -163,7 +163,7 @@ class CompletorInvoiceLines
             $separateLines = true;
         } else {
             $childrenText = $this->getMergedLinesText($parent, $children);
-            $separateLines = strlen($childrenText) <= $invoiceSettings['optionsMaxLength'];
+            $separateLines = strlen($childrenText) > $invoiceSettings['optionsMaxLength'];
         }
         return $separateLines;
     }

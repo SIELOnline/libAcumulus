@@ -287,7 +287,6 @@ class Creator extends BaseCreator
             $result += array(
                 'unitprice' => $productPriceEx,
                 'unitpriceinc' => $productPriceInc,
-                'vatamount' => $productVat,
             );
         }
 
@@ -298,6 +297,8 @@ class Creator extends BaseCreator
         $parentTags = array('quantity' => $item['qty']) + $vatRangeTags + $vatLookupTags;
         $result += $parentTags;
 
+        // Add variants/options, but set vatamount to 0 on the child lines.
+        $parentTags['vatamount'] = 0;
         if ($product instanceof WC_Product && !empty($item['variation_id'])) {
             $result[Creator::Line_Children] = $this->getVariantLines($item, $product, $parentTags);
         } elseif (is_plugin_active('woocommerce-tm-extra-product-options/tm-woo-extra-product-options.php') && !empty($line['tmcartepo_data'])) {

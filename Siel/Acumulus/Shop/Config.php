@@ -762,7 +762,6 @@ class Config implements ConfigInterface
                     'type' => 'bool',
                     'default' => false,
                 ),
-                // @todo: add these 3 to advanced UI for shops where this is used (OC2, could others use this?).
                 'optionsAllOn1Line' => array(
                     'group' => 'invoice',
                     'type' => 'int',
@@ -776,7 +775,7 @@ class Config implements ConfigInterface
                 'optionsMaxLength' => array(
                     'group' => 'invoice',
                     'type' => 'int',
-                    'default' => 120,
+                    'default' => 80,
                 ),
                 'digitalServices' => array(
                     'group' => 'shop',

@@ -41,6 +41,7 @@ class AdvancedConfigForm extends BaseConfigForm
     protected function validate()
     {
         $this->validateRelationFields();
+        $this->validateInvoiceFields();
         $this->validateEmailAsPdfFields();
     }
 
@@ -57,6 +58,23 @@ class AdvancedConfigForm extends BaseConfigForm
 //        if (!empty($this->submittedValues['genericCustomerEmail']) && !preg_match($regexpEmail, $this->submittedValues['genericCustomerEmail'])) {
 //            $this->errorMessages['genericCustomerEmail'] = $this->t('message_validate_email_2');
 //        }
+    }
+
+    /**
+     * Validates fields in the "Invoice" settings fieldset.
+     */
+    protected function validateInvoiceFields()
+    {
+        if ($this->submittedValues['optionsAllOn1Line'] == PHP_INT_MAX && $this->submittedValues['optionsAllOnOwnLine'] == 1) {
+            $this->errorMessages['optionsAllOnOwnLine'] = $this->t('message_validate_options_0');
+        }
+        if ($this->submittedValues['optionsAllOn1Line'] > $this->submittedValues['optionsAllOnOwnLine'] && $this->submittedValues['optionsAllOnOwnLine'] > 1) {
+            $this->errorMessages['optionsAllOnOwnLine'] = $this->t('message_validate_options_1');
+        }
+
+        if (isset($this->submittedValues['optionsMaxLength']) && !ctype_digit($this->submittedValues['optionsMaxLength'])) {
+            $this->errorMessages['optionsMaxLength'] = $this->t('message_validate_options_2');
+        }
     }
 
     /**
@@ -196,6 +214,30 @@ class AdvancedConfigForm extends BaseConfigForm
     protected function getInvoiceFields()
     {
         $fields = array(
+            'optionsAllOn1Line' => array(
+                'type' => 'select',
+                'label' => $this->t('field_optionsAllOn1Line'),
+                'options' => array(
+                    0 => $this->t('option_do_not_use'),
+                    PHP_INT_MAX => $this->t('option_always'),
+                ) + array_combine(range(1, 10), range(1, 10)),
+            ),
+            'optionsAllOnOwnLine' => array(
+                'type' => 'select',
+                'label' => $this->t('field_optionsAllOnOwnLine'),
+                'options' => array(
+                    PHP_INT_MAX => $this->t('option_do_not_use'),
+                    1 => $this->t('option_always'),
+                ) + array_combine(range(2, 10), range(2, 10)),
+            ),
+            'optionsMaxLength' => array(
+                'type' => 'number',
+                'label' => $this->t('field_optionsMaxLength'),
+                'description' => $this->t('desc_optionsMaxLength'),
+                'attributes' => array(
+                    'min' => 1,
+                ),
+            ),
             'sendWhat' => array(
                 'type' => 'checkbox',
                 'label' => $this->t('field_sendWhat'),

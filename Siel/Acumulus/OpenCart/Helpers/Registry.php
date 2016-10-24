@@ -24,6 +24,8 @@ namespace Siel\Acumulus\OpenCart\Helpers;
  * @property \ModelExtensionEvent model_extension_event
  * @property \ModelSaleOrder model_sale_order
  * @property \ModelLocalisationOrderStatus model_localisation_order_status
+ * @property \ModelLocalisationTaxClass model_localisation_tax_class
+ * @property \ModelLocalisationTaxRate model_localisation_tax_rate
  * @property \ModelSettingSetting model_setting_setting
  * @property \ModelSettingExtension model_setting_extension
  * @property \ModelExtensionExtension model_extension_extension

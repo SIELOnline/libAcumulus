@@ -31,6 +31,8 @@ class Creator extends BaseCreator
 
         // Load some models and properties we are going to use.
         Registry::getInstance()->load->model('catalog/product');
+        Registry::getInstance()->load->model('localisation/tax_class');
+        Registry::getInstance()->load->model('localisation/tax_rate');
         $this->orderTotalLines = null;
 
         switch ($this->invoiceSource->getType()) {
@@ -209,9 +211,30 @@ class Creator extends BaseCreator
             $result['product'] .= ' (' . $item['model'] . ')';
         }
 
+        // Get vat range info from item line.
         $productPriceEx = $item['price'];
         $productVat = $item['tax'];
         $vatInfo = $this->getVatRangeTags($productVat, $productPriceEx);
+
+        // Try to look up the vat rate via product.
+        $taxClassId = $product['tax_class_id'];
+        $taxRules = Registry::getInstance()->model_localisation_tax_class->getTaxRules($taxClassId);
+        // We are not going to drill down geo zones, so if we got only 1 rate,
+        // or all rates are the same, we use that, otherwise we don't use it.
+        $vatRates = array();
+        $label = '';
+        foreach ($taxRules as $taxRule) {
+            $taxRate = Registry::getInstance()->model_localisation_tax_rate->getTaxRate($taxRule['tax_rate_id']);
+            $vatRates[$taxRate['rate']] = $taxRate['rate'];
+            if (empty($label)) {
+                $label = $taxRate['name'];
+            }
+        }
+        if (count($vatRates) === 1) {
+            $vatInfo['meta-lookup-vatrate'] = reset($vatRates);
+            // Take the last name
+            $vatInfo['meta-lookup-vatrate-label'] = $label;
+        }
 
         // Options (variants).
         $options = $this->getOrderModel()->getOrderOptions($item['order_id'], $item['order_product_id']);
@@ -312,23 +335,32 @@ class Creator extends BaseCreator
                 'vatrate' => -1,
                 'meta-vatrate-source' => Creator::VatRateSource_Exact0,
             );
-        } elseif (Number::isZero($line['value'])) {
-            // 0-cost lines - e.g. free shipping - also don't have a tax amount,
-            // let the completor add the highest appearing vat rate.
-            $result += array(
-                'vatrate' => null,
-                'meta-vatrate-source' => Creator::VatRateSource_Completor,
-            );
-        } else {
-            // Other lines do not have a discoverable vatrate, let a strategy
-            // try to compute it.
+        } elseif ($line['code'] === 'coupon') {
+            // Coupons may have to be split over various taxes.
             $result += array(
                 'vatrate' => null,
                 'meta-vatrate-source' => Creator::VatRateSource_Strategy,
-                // Coupons may have to be split over various taxes, but shipping
-                // and other fees not.
                 'meta-strategy-split' => $line['code'] === 'coupon',
             );
+        } else {
+            // Try to get a vat rate
+            $vatRateLookupMetaData = $this->getVatRateLookupByTotalLineType($line['code']);
+            if (Number::isZero($line['value'])) {
+                // 0-cost lines - e.g. free shipping - also don't have a tax amount,
+                // let the completor add the highest appearing vat rate.
+                $result += array(
+                    'vatrate' => null,
+                    'meta-vatrate-source' => Creator::VatRateSource_Completor,
+                ) + $vatRateLookupMetaData;
+            } else {
+                // Other lines do not have a discoverable vatrate, let a strategy
+                // try to compute it.
+                $result += array(
+                    'vatrate' => null,
+                    'meta-vatrate-source' => Creator::VatRateSource_Strategy,
+                    'meta-strategy-split' => false,
+                ) + $vatRateLookupMetaData;
+            }
         }
 
         return $result;
@@ -356,5 +388,31 @@ class Creator extends BaseCreator
     protected function getOrderModel()
     {
         return Registry::getInstance()->getOrderModel();
+    }
+
+    /**
+     * Tries to lookup and return vat rate meta data for the given line type.
+     *
+     * This is quite hard. The total line (table order_total) contains a code
+     * (= line type) and title field, the latter being a translated and possibly
+     * formatted descriptive string of the shipping or handling method applied,
+     * e.g. Europa  (Weight: 3.00kg). It is (almost) impossible to trace this
+     * back to a shipping or handling method. So instead we retrieve all tax
+     * class ids for the given type, collect all tax rates for those, and hope
+     * that this results in only 1 tax rate.
+     *
+     * @param string $code
+     *   The total line type: shipping, handling, ... (no other known types).
+     *
+     * @return array
+     *   A, possibly empty, array with vat rate lookup meta data. Empty if no or
+     *   multiple tax rates were found.
+     */
+    protected function getVatRateLookupByTotalLineType($code)
+    {
+        $result = array();
+        $prefix = DB_PREFIX;
+        $sql = "SELECT `code`, `key`, `value` FROM {$prefix}setting, {$prefix}extension where `type` = '$code' and `key` = concat(`code`, '_tax_class_id')";
+        return $result;
     }
 }

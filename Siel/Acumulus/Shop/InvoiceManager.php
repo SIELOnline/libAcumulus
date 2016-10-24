@@ -282,7 +282,6 @@ abstract class InvoiceManager
                     if ($invoice !== NULL) {
                         if (!$dryRun) {
                             $result = $this->doSend($invoice, $invoiceSource, $localMessages);
-                            $messages = $this->config->getService()->resultToMessages($result);
                             $status |= $result['status'];
                         }
                     } else {
@@ -309,9 +308,9 @@ abstract class InvoiceManager
      * Unconditionally sends the invoice.
      *
      * After sending the invoice:
-     * - The invoice sent event gets triggered
      * - A successful result gets saved to the acumulus entries table.
      * - A mail with the results may be sent.
+     * - The invoice sent event gets triggered
      *
      * @param \Siel\Acumulus\Invoice\Source $invoiceSource
      * @param array $invoice
@@ -322,12 +321,7 @@ abstract class InvoiceManager
      *   messages.
      */
     protected function doSend(array $invoice, Source $invoiceSource, array $localMessages) {
-        $service = $this->config->getService();
-        $result = $service->invoiceAdd($invoice);
-        $result = $service->mergeLocalMessages($result, $localMessages);
-
-        // Trigger the InvoiceSent event.
-        $this->triggerInvoiceSent($invoice, $invoiceSource, $result);
+        $result = $this->config->getService()->invoiceAdd($invoice);
 
         // Check if an entryid was created and store entry id and token.
         if (!empty($result['invoice']['entryid'])) {
@@ -344,12 +338,46 @@ abstract class InvoiceManager
             }
         }
 
+        // Merge in local messages before making the result known to the world.
+        $result = $this->mergeLocalMessages($result, $localMessages);
+
         // Send a mail if there are messages.
-        $messages = $service->resultToMessages($result);
+        $messages = $this->config->getService()->resultToMessages($result);
         if (!empty($messages)) {
             $this->mailInvoiceAddResult($result, $messages, $invoiceSource);
         }
 
+        // Trigger the InvoiceSent event.
+        $this->triggerInvoiceSent($invoice, $invoiceSource, $result);
+
+        return $result;
+    }
+
+    /**
+     * Merges any local messages into the result structure and adapts the status
+     * to correctly reflect local warnings and errors as well.
+     *
+     * @todo: extract this into a messages/result class.
+     *
+     * @param array $result
+     * @param array $localMessages
+     *
+     * @return array
+     */
+    public function mergeLocalMessages(array $result, array $localMessages)
+    {
+        if (!empty($localMessages['errors'])) {
+            $result['errors'] = array_merge($result['errors'], $localMessages['errors']);
+            if ($result['status'] < ConfigInterface::Status_Errors) {
+                $result['status'] = ConfigInterface::Status_Errors;
+            }
+        }
+        if (!empty($localMessages['warnings'])) {
+            $result['warnings'] = array_merge($result['warnings'], $localMessages['warnings']);
+            if ($result['status'] < ConfigInterface::Status_Warnings) {
+                $result['status'] = ConfigInterface::Status_Warnings;
+            }
+        }
         return $result;
     }
 
@@ -375,12 +403,12 @@ abstract class InvoiceManager
         if ($sent) {
             $service = $this->config->getService();
             $message .= ' ' . $service->getStatusText($status & WebConfigInterface::Status_Mask);
-            if (!empty($messages)) {
+            if ((($status & WebConfigInterface::Status_Mask) !== WebConfigInterface::Status_Success) && !empty($messages)) {
                 $message .= ' ' . $service->messagesToText($messages);
             }
         }
 
-        // Also store the message for later retrieval by batch send
+        // Also store the message for later retrieval by batch send.
         $this->message = $message;
 
         return $message;

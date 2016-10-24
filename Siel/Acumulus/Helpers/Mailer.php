@@ -10,6 +10,9 @@ use Siel\Acumulus\Web\Service;
  */
 abstract class Mailer
 {
+    /** @var \Siel\Acumulus\Web\ConfigInterface */
+    protected $config;
+
     /** @var \Siel\Acumulus\Helpers\TranslatorInterface */
     protected $translator;
 

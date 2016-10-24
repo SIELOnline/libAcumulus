@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\Shop;
 
+
 /**
  * InjectorInterface defines an interface to retrieve:
  * - Instances of web shop specific overrides of the base classes and interfaces
@@ -27,6 +28,11 @@ interface InjectorInterface
      * @return \Siel\Acumulus\Web\Service
      */
     public function getService();
+
+    /**
+     * @return \Siel\Acumulus\Web\CommunicatorInterface
+     */
+    public function getCommunicator();
 
     /**
      * Creates a wrapper object for a source object identified by the given

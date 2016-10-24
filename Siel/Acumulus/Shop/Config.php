@@ -121,7 +121,15 @@ class Config implements ConfigInterface
      */
     public function getService()
     {
-        return $this->getInstance('Service', 'Web', array($this, $this->getTranslator()));
+        return $this->getInstance('Service', 'Web', array($this->getCommunicator(), $this, $this->getTranslator()));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCommunicator()
+    {
+        return $this->getInstance('Communicator', 'Web', array($this));
     }
 
     /**

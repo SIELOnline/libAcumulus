@@ -37,19 +37,20 @@ class Service
     /** @var \Siel\Acumulus\Helpers\TranslatorInterface */
     protected $translator;
 
-    /** @var \Siel\Acumulus\Web\Communicator */
+    /** @var CommunicatorInterface */
     protected $communicator;
 
     /**
      * Constructor.
      *
+     * @param CommunicatorInterface $communicator
      * @param \Siel\Acumulus\Web\ConfigInterface $config
      * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
      */
-    public function __construct(ConfigInterface $config, TranslatorInterface $translator)
+    public function __construct(CommunicatorInterface $communicator, ConfigInterface $config, TranslatorInterface $translator)
     {
         $this->config = $config;
-        $this->communicator = null;
+        $this->communicator = $communicator;
 
         $this->translator = $translator;
         $webServiceTranslations = new Translations();
@@ -72,26 +73,10 @@ class Service
     }
 
     /**
-     * Lazy loads the communicator.
-     *
-     * @return Communicator
-     */
-    protected function getCommunicator()
-    {
-        if ($this->communicator === null) {
-            $pluginSettings = $this->config->getPluginSettings();
-            if ($pluginSettings['debug'] == 4 /*ConfigInterface::Debug_StayLocal*/) {
-                $this->communicator = new CommunicatorLocal($this->config);
-            } else {
-                $this->communicator = new Communicator($this->config);
-            }
-        }
-        return $this->communicator;
-    }
-
-    /**
      * If the result contains any errors or warnings, a list of verbose messages
      * is returned.
+     *
+     * @todo: extract this into a messages/result class.
      *
      * @param array $result
      *   A keyed array that contains the results, but also any messages in the
@@ -143,6 +128,8 @@ class Service
     /**
      * Converts an array of messages to a string that can be used in a text mail.
      *
+     * @todo: extract this into a messages/result class.
+     *
      * @param string[] $messages
      *
      * @return string
@@ -154,6 +141,8 @@ class Service
 
     /**
      * Converts an array of messages to a string that can be used in an html mail.
+     *
+     * @todo: extract this into a messages/result class.
      *
      * @param string[] $messages
      *
@@ -169,6 +158,10 @@ class Service
     }
 
     /**
+     * Returns a textual representation of the status.
+     *
+     * @todo: extract this into a messages/result class.
+     *
      * @param int $status
      *
      * @return string
@@ -312,7 +305,7 @@ class Service
     protected function getPicklist($picklist)
     {
         $plural = $picklist . 's';
-        $response = $this->getCommunicator()->callApiFunction("picklists/picklist_$plural", array());
+        $response = $this->communicator->callApiFunction("picklists/picklist_$plural", array());
         // Simplify result: remove indirection.
         if (!empty($response[$plural][$picklist])) {
             $response[$plural] = $response[$plural][$picklist];
@@ -352,7 +345,7 @@ class Service
             'vatdate' => $date,
             'vatcountry' => $countryCode,
         );
-        $response = $this->getCommunicator()->callApiFunction("lookups/lookup_vatinfo", $message);
+        $response = $this->communicator->callApiFunction("lookups/lookup_vatinfo", $message);
         // Simplify result: remove indirection.
         if (!empty($response['vatinfo']['vat'])) {
             $response['vatinfo'] = $response['vatinfo']['vat'];
@@ -388,27 +381,6 @@ class Service
      */
     public function invoiceAdd(array $invoice)
     {
-        return $this->getCommunicator()->callApiFunction("invoices/invoice_add", $invoice);
-    }
-
-    /**
-     * Merges any local messages into the result structure and adapts the status
-     * to correctly reflect local warnings and errors as well.
-     *
-     * @param array $result
-     * @param array $localMessages
-     *
-     * @return array
-     */
-    public function mergeLocalMessages(array $result, array $localMessages)
-    {
-        if (!empty($localMessages['errors'])) {
-            $result['errors'] = array_merge($result['errors'], $localMessages['errors']);
-        }
-        if (!empty($localMessages['warnings'])) {
-            $result['warnings'] = array_merge($result['warnings'], $localMessages['warnings']);
-        }
-        $this->getCommunicator()->correctStatusForLocalMessages($result);
-        return $result;
+        return $this->communicator->callApiFunction("invoices/invoice_add", $invoice);
     }
 }

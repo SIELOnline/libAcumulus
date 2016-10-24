@@ -15,9 +15,8 @@ use LibXMLError;
  * - (https) Communication with the Acumulus webservice using the curl library.
  * - Good error handling during communication.
  */
-class Communicator
+class Communicator implements CommunicatorInterface
 {
-
     /** @var \Siel\Acumulus\Web\ConfigInterface */
     protected $config;
 
@@ -30,31 +29,6 @@ class Communicator
     public function __construct(ConfigInterface $config)
     {
         $this->config = $config;
-    }
-
-    /**
-     * Checks and, if necessary, corrects the status.
-     *
-     * If local errors or warnings were added, the status may be incorrectly
-     * indicating success. This method checks for this and corrects the status.
-     *
-     * @param array $response
-     *   A response structure with, at least, fields 'errors', 'warnings' and
-     *   'status'.
-     */
-    public function correctStatusForLocalMessages(array &$response)
-    {
-        // - Check if status is consistent (local errors and warnings should alter
-        //   the status as well.
-        if (!empty($response['errors'])) {
-            if ($response['status'] != ConfigInterface::Status_Exception) {
-                $response['status'] = ConfigInterface::Status_Errors;
-            }
-        } elseif (!empty($response['warnings'])) {
-            if ($response['status'] != ConfigInterface::Status_Exception && $response['status'] != ConfigInterface::Status_Errors) {
-                $response['status'] = ConfigInterface::Status_Warnings;
-            }
-        }
     }
 
     /**
@@ -93,13 +67,20 @@ class Communicator
                 'message' => $e->getMessage(),
             );
             $response = array();
+            $response['status'] = ConfigInterface::Status_Exception;
         }
 
         // Process response.
-        // - Simplify errors and warnings parts: remove indirection and count.
+        // If no status is present the call failed: set the status to Error.
+        if (!isset($response['status'])) {
+            $response['status'] = ConfigInterface::Status_Errors;
+        }
+
+        // Simplify errors and warnings parts: remove indirection and count.
         if (!empty($response['errors']['error'])) {
             $response['errors'] = $response['errors']['error'];
-            // If there was exactly 1 error, it wasn't put in an array of errors.
+            // If there was exactly 1 error, it wasn't put in an array of
+            // errors.
             if (!is_array(reset($response['errors']))) {
                 $response['errors'] = array($response['errors']);
             }
@@ -111,7 +92,8 @@ class Communicator
 
         if (!empty($response['warnings']['warning'])) {
             $response['warnings'] = $response['warnings']['warning'];
-            // If there was exactly 1 warning, it wasn't put in an array of warnings.
+            // If there was exactly 1 warning, it wasn't put in an array of
+            // warnings.
             if (!is_array(reset($response['warnings']))) {
                 $response['warnings'] = array($response['warnings']);
             }
@@ -121,23 +103,23 @@ class Communicator
             unset($response['warnings']['count_warnings']);
         }
 
-        // - Add local errors and warnings.
+        // Add local communication level errors and warnings and change the
+        // status if necessary.
+        // @todo: extract this into a messages/result class.
         if (!empty($this->errors)) {
             // Internal error(s), return those as well.
             $response['errors'] = array_merge($this->errors, $response['errors']);
+            if ($response['status'] < ConfigInterface::Status_Errors) {
+                $response['status'] = ConfigInterface::Status_Errors;
+            }
         }
         if (!empty($this->warnings)) {
             // Internal warning(s), return those as well.
             $response['warnings'] = array_merge($this->warnings, $response['warnings']);
+            if ($response['status'] < ConfigInterface::Status_Warnings) {
+                $response['status'] = ConfigInterface::Status_Warnings;
+            }
         }
-
-        // - Add status if not set. if no status is present the call failed, so we
-        //   set the status to 1.
-        if (!isset($response['status'])) {
-            $response['status'] = ConfigInterface::Status_Errors;
-        }
-
-        $this->correctStatusForLocalMessages($response);
 
         return $response;
     }
@@ -194,7 +176,7 @@ class Communicator
      *
      * @return array
      *   The response as specified on
-     *   https://apidoc.sielsystems.nl/content/warning-error-and-status-response-section-most-api-calls.
+     *   https://apidoc.sielsystems.nl/content/global-legend.
      */
     protected function sendApiMessage($uri, array $message)
     {
@@ -214,7 +196,7 @@ class Communicator
                 $uri, $resultBase['trace']['request'], $resultBase['trace']['response']);
 
             $result = false;
-            // When the API is gone we might receive an error message in an html page.
+            // When the API is gone we might receive an html error message page.
             if ($this->isHtmlResponse($response)) {
                 $this->setHtmlReceivedError($response);
             } else {
@@ -224,8 +206,9 @@ class Communicator
                     $result = json_decode($response, true);
                     if ($result === null) {
                         $this->setJsonError();
-                        // Even if we pass <format>json</format> we might receive an XML
-                        // response in case the XML was rejected before or during parsing.
+                        // Even if we pass <format>json</format> we might
+                        // receive an XML response in case the XML was rejected
+                        // before or during parsing.
                         $alsoTryAsXml = true;
                     }
                 }
@@ -249,8 +232,8 @@ class Communicator
      * @param string $uri
      *   The uri to send the HTTP request to.
      * @param array|string $post
-     *   An array of values to be placed in the POST body or an url-encoded string
-     *   that contains all the POST values
+     *   An array of values to be placed in the POST body or an url-encoded
+     *   string that contains all the POST values
      *
      * @return string|false
      *  The response body from the HTTP response or false in case of errors.
@@ -341,8 +324,8 @@ class Communicator
     /**
      * Converts a keyed, optionally multi-level, array to XML.
      *
-     * Each key is converted to a tag, no attributes are used. Numeric sub-arrays
-     * are repeated using the same key.
+     * Each key is converted to a tag, no attributes are used. Numeric
+     * sub-arrays are repeated using the same key.
      *
      * @param array $values
      *   The array to convert to XML.

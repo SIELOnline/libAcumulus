@@ -25,9 +25,10 @@ abstract class BaseConfigForm extends Form
     protected $service;
 
     /**
+     * Contact types picklist result, used to test the connection, storing it in
+     * this property prevents another webservice call.
+     *
      * @var array
-     *   Contact types picklist result, used to test the connection, storing it
-     *   in this property prevents another webservice call.
      */
     protected $contactTypes;
 

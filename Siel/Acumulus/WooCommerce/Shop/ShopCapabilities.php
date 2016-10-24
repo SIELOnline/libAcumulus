@@ -72,7 +72,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
           case 'config':
               return admin_url('options-general.php?page=acumulus');
           case 'advanced':
-              return admin_url('options-general.php?page=acumulus_advanced_config');
+              return admin_url('options-general.php?page=acumulus_advanced');
           case 'batch':
               return admin_url('admin.php?page=acumulus_batch');
       }

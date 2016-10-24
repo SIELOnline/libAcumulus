@@ -231,6 +231,8 @@ class Creator extends BaseCreator
      * Returns 1 item line.
      *
      * @param array $item
+     *   An array representing an order item line, meta values are already
+     *   available under their own names and as an array under key 'item_meta'.
      *
      * @return array
      *   May be empty if the line should not be sent (e.g. qty = 0 on a refund).
@@ -298,6 +300,8 @@ class Creator extends BaseCreator
 
         if ($product instanceof WC_Product && !empty($item['variation_id'])) {
             $result[Creator::Line_Children] = $this->getVariantLines($item, $product, $parentTags);
+        } elseif (is_plugin_active('woocommerce-tm-extra-product-options/tm-woo-extra-product-options.php') && !empty($line['tmcartepo_data'])) {
+            $result[Creator::Line_Children] = $this->getExtraProductOptionsLines($item, $parentTags);
         }
 
         return $result;
@@ -306,6 +310,8 @@ class Creator extends BaseCreator
     /**
      * Returns an array of lines that describes this variant.
      *
+     * This method supports the default WooCommerce variant functionality.
+     *
      * @param array $item
      * @param \WC_Product $product
      * @param array $parentTags
@@ -313,9 +319,8 @@ class Creator extends BaseCreator
      *
      * @return array[]
      *   An array of lines that describes this variant.
-    *
      */
-    protected function getVariantLines(array $item, \WC_Product $product, $parentTags)
+    protected function getVariantLines(array $item, \WC_Product $product, array $parentTags)
     {
         $result = array();
 
@@ -348,10 +353,46 @@ class Creator extends BaseCreator
                 }
 
                 $result[] = array(
-                  'product' => $meta['meta_key'] . ': ' . rawurldecode($meta['meta_value']),
-                  'unitprice' => 0,
-                ) + $parentTags;
+                        'product' => $meta['meta_key'] . ': ' . rawurldecode($meta['meta_value']),
+                        'unitprice' => 0,
+                    ) + $parentTags;
             }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Returns an array of lines that describes this variant.
+     *
+     * This method supports the WooCommerce Extra Product Options plugin. This
+     * plugin places its data in the meta data under keys that start wth tm_epo
+     * or tmcartepo. We need the the tncartepo_data value as that contains the
+     * options.
+     *
+     * @param array $item
+     *   The item line
+     * @param array $parentTags
+     *   An array of tags from the parent product to add to the child lines.
+     *
+     * @return array[]
+     *   An array of lines that describes this variant.
+    *
+     */
+    protected function getExtraProductOptionsLines(array $item, array $parentTags)
+    {
+        $result = array();
+
+        $options = unserialize($item['tmcartepo_data']);
+        foreach ($options as $option) {
+            // Get option name and choice.
+            $label = $option['name'];
+            $choice = $option['value'];
+            // @todo: price, quantity, vat rate?
+            $result[] = array(
+                    'product' => $label . ': ' . $choice,
+                    'unitprice' => 0,
+                ) + $parentTags;
         }
 
         return $result;
@@ -409,8 +450,9 @@ class Creator extends BaseCreator
             return array();
         }
 
-        // Get the first (and hopefully single) shipping line to look up the tax
-        // rate.
+        // If we have only 1 line, we use it to lookup the tax rate. If we have
+        // multiple lines we use the first line for the name.
+        // @todo: allow for multiple shipping lines.
         $vatLookupTags = array();
         $line = reset($lines);
         if (count($lines) === 1) {
@@ -444,10 +486,11 @@ class Creator extends BaseCreator
             }
         }
 
-        // Precision: shipping costs are entered ex VAT, so that may be rounded
-        // to the cent by the administrator. The computed costs inc VAT is
-        // rounded to the cent as well, so both are to be considered precise
-        // to the cent.
+        // Precision: shipping costs are entered ex VAT, so that may be very
+        // precise, but it will be rounded to the cent by WC. The VAT is as
+        // precise as a float can be and is based on the shipping cost as
+        // entered by the admin.
+        // @todo: to avoid rounding errors, can we get the non-formatted amount?
         $shippingEx = $this->shopSource->get_total_shipping();
         $shippingVat = $this->shopSource->get_shipping_tax();
 
@@ -457,7 +500,7 @@ class Creator extends BaseCreator
                 'quantity' => 1,
                 'vatamount' => $shippingVat,
             )
-            + $this->getVatRangeTags($shippingVat, $shippingEx)
+            + $this->getVatRangeTags($shippingVat, $shippingEx, 0.0001)
             + $vatLookupTags;
 
         return $result;
@@ -526,25 +569,30 @@ class Creator extends BaseCreator
         // Get a description for the value of this coupon.
         // Entered discount amounts follow the wc_prices_include_tax() setting.
         // Use that info in the description.
-        $description = sprintf('%s %s: ', $this->t('discount_code'), $coupon->code);
-        if (in_array($coupon->discount_type, array('fixed_product', 'fixed_cart'))) {
-            $amount = $this->getSign() * $coupon->coupon_amount;
-            if (!Number::isZero($amount)) {
-                $description .= sprintf('€%.2f (%s)', $amount, wc_prices_include_tax() ? $this->t('inc_vat') : $this->t('ex_vat'));
-            }
-            if ($coupon->enable_free_shipping()) {
+        if ($coupon->exists) {
+            $description = sprintf('%s %s: ', $this->t('discount_code'), $coupon->code);
+            if (in_array($coupon->discount_type, array('fixed_product', 'fixed_cart'))) {
+                $amount = $this->getSign() * $coupon->coupon_amount;
                 if (!Number::isZero($amount)) {
-                    $description .= ' + ';
+                    $description .= sprintf('€%.2f (%s)', $amount, wc_prices_include_tax() ? $this->t('inc_vat') : $this->t('ex_vat'));
                 }
-                $description .= $this->t('free_shipping');
+                if ($coupon->enable_free_shipping()) {
+                    if (!Number::isZero($amount)) {
+                        $description .= ' + ';
+                    }
+                    $description .= $this->t('free_shipping');
+                }
+            } else {
+                // Value may be entered with or without % sign at the end.
+                // Remove it by converting to a float.
+                $description .= ((float) $coupon->coupon_amount) . '%';
+                if ($coupon->enable_free_shipping()) {
+                    $description .= ' + ' . $this->t('free_shipping');
+                }
             }
         } else {
-            $description .= $coupon->coupon_amount . '%';
-            if ($coupon->enable_free_shipping()) {
-                $description .= ' + ' . $this->t('free_shipping');
-            }
+            $description = '';
         }
-
         return array(
             'itemnumber' => $coupon->code,
             'product' => $description,

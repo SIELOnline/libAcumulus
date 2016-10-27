@@ -251,7 +251,7 @@ class Creator extends BaseCreator
         $result = array();
         // Items may be composed, so start with all "visible" items.
         foreach ($this->order->getAllVisibleItems() as $item) {
-            $result = array_merge($result, $this->getItemLineOrder($item));
+            $result[] = $this->getItemLineOrder($item);
         }
         return $result;
     }

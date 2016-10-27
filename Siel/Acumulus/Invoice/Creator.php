@@ -903,7 +903,7 @@ abstract class Creator
     /**
      * Adds a meta-line-type tag to the lines.
      *
-     * @param array $itemLines
+     * @param array[] $itemLines
      * @param string $lineType
      *
      * @return array

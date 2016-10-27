@@ -265,7 +265,7 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
 
         // Shop settings.
         'shopSettingsHeader' => 'About your shop',
-        'desc_shopSettings' => 'With these settings, this plugin is better able to: determine the <a href="https://wiki.acumulus.nl/index.php?page=127" target="_blank">imvoice type</a>; perform some sanity checks; and to compute VAT rates.',
+        'desc_shopSettings' => 'With these settings, this plugin is better able to: determine the <a href="https://wiki.acumulus.nl/index.php?page=127" target="_blank">invoice type</a>; perform some sanity checks; and to compute VAT rates.',
 
         'field_digitalServices' => 'Do you sell digital services?',
         'option_digitalServices_1' => 'Both digital services and normal products.',
@@ -284,7 +284,7 @@ Using this setting this plugin can better determine the invoice type and perform
 
         // Trigger settings.
         'triggerSettingsHeader' => 'When to have your invoices sent to Acumulus.',
-        'desc_triggerSettings' => 'This(these) setting(s) determine(s) at what instants the invoice for an order should be snet to Acumulus. If you select multiple instants, the invoice wil be sent as soon as the order reaches one of the selected statuses. Note that an invoice will only be sent once to Acumulus. This extension only uses order data, so you may select any status, the webshop invoice does not already have to be created,unless you want to use the webshop\'s invoice date and number as invoice date and number for the Acumulus invoice. If you select "Do not send automatically" you will have to use the <a href="%s">Acumulus batch send form</a>.',
+        'desc_triggerSettings' => 'This(these) setting(s) determine(s) at what instants the invoice for an order should be sent to Acumulus. If you select multiple instants, the invoice wil be sent as soon as the order reaches one of the selected statuses. Note that an invoice will only be sent once to Acumulus. This extension only uses order data, so you may select any status, the webshop invoice does not already have to be created,unless you want to use the webshop\'s invoice date and number as invoice date and number for the Acumulus invoice. If you select "Do not send automatically" you will have to use the <a href="%s">Acumulus batch send form</a>.',
 
         'field_triggerOrderStatus' => 'Order state(s)',
         'desc_triggerOrderStatus' => 'Select if and with which order states to send the invoice to Acumulus. If you select multiple states, the invoice will only be sent once as soon as one of the selected states is reached. This extension only uses order data, so you may select any status, the webshop invoice does not already have to be created. If you select "Do not send automatically" you will have to use the send batch form.',
@@ -354,7 +354,7 @@ If you unchecked the first option, the second option only applies to business cl
         'field_optionsAllOn1Line' => 'Maximum no. of options on main product',
         'field_optionsAllOnOwnLine' => 'Minimum no. of options for separate lines',
         'field_optionsMaxLength' => 'Maximum length of description',
-        'desc_optionsMaxLength' => 'If a product has optrions or variants, or is composed, the options can be placed on the same line as the main product or on their own lines.
+        'desc_optionsMaxLength' => 'If a product has options or variants, or is composed, the options can be placed on the same line as the main product or on their own lines.
             These 3 settings allow you to decide when it will be all on 1 line or when all on their own line.
             If the no. of options equals or is less than the 1st value, everything will be placed on the main line.
             If the no. of options equals or is greater than the 2nd value, every option will be placed on its own line.
@@ -367,7 +367,7 @@ If you unchecked the first option, the second option only applies to business cl
         'field_sendWhat' => 'Send',
         'option_sendEmptyInvoice' => 'Send 0-amount invoices.',
         'option_sendEmptyShipping' => 'Send "free shipping" or "in store pick-up" lines.',
-        'desc_sendWhat' => 'YThe 1st option indicates if 0-amount invoices should be sent to Acumulus. You should normally enable this option to keep the invoice collection complete and prevent missing invoice numbers. The 2nd option determines whether to send free shipping or in store pickup lines. Yous hould normally enable this option as Acumulus can print packing slips.',
+        'desc_sendWhat' => 'The 1st option indicates if 0-amount invoices should be sent to Acumulus. You should normally enable this option to keep the invoice collection complete and prevent missing invoice numbers. The 2nd option determines whether to send free shipping or in store pickup lines. You should normally enable this option as Acumulus can print packing slips.',
 
         // Settings per payment method.
         'paymentMethodAccountNumberFieldset' => 'Account per payment method',

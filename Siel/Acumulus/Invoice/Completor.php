@@ -346,22 +346,14 @@ class Completor
     {
         $customerSettings = $this->config->getCustomerSettings();
         if (!$customerSettings['sendCustomer'] && empty($this->invoice['customer']['companyname1']) && empty($this->invoice['customer']['vatnumber'])) {
-            unset($this->invoice['customer']['type']);
-            unset($this->invoice['customer']['companyname1']);
-            unset($this->invoice['customer']['companyname2']);
-            unset($this->invoice['customer']['fullname']);
-            unset($this->invoice['customer']['salutation']);
-            unset($this->invoice['customer']['address1']);
-            unset($this->invoice['customer']['address2']);
-            unset($this->invoice['customer']['postalcode']);
-            unset($this->invoice['customer']['city']);
-            unset($this->invoice['customer']['countrycode']);
-            unset($this->invoice['customer']['vatnumber']);
-            unset($this->invoice['customer']['telephone']);
-            unset($this->invoice['customer']['fax']);
-            unset($this->invoice['customer']['bankaccountnumber']);
-            unset($this->invoice['customer']['mark']);
+            $keysToKeep = array('invoice');
+            foreach ($this->invoice['customer'] as $key => $value) {
+                if (!in_array($key, $keysToKeep)) {
+                    unset($this->invoice['customer'][$key]);
+                }
+            }
             $this->invoice['customer']['email'] = $customerSettings['genericCustomerEmail'];
+            $this->invoice['customer']['contactstatus'] = ConfigInterface::ContactStatus_Disabled;
             $this->invoice['customer']['overwriteifexists'] = 0;
         }
     }

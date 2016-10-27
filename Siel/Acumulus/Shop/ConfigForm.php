@@ -320,7 +320,7 @@ class ConfigForm extends BaseConfigForm
                 ),
             ),
             // @todo: multi-select? if we change this to multi select, none should no longer be an option.
-            'triggerInvoiceEvent' => $this->getOptionsOrHiddenField('triggerInvoiceEvent', 'radio'),
+            'triggerInvoiceEvent' => $this->getOptionsOrHiddenField('triggerInvoiceEvent', 'radio', false),
         );
         return $fields;
     }

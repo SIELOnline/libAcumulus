@@ -74,6 +74,7 @@ class FormMapper
     {
         switch ($field['type']) {
             case 'email':
+            case 'number':
                 $type = 'text';
                 break;
             case 'markup':

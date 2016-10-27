@@ -55,6 +55,6 @@ class BatchForm extends BaseBatchForm
      */
     protected function getTimezone()
     {
-        return Registry::getInstance()->getObjectManager()->get('\Magento\Framework\Stdlib\DateTime\TimezoneInterface');
+        return Registry::getInstance()->getObjectManager()->get('Magento\Framework\Stdlib\DateTime\TimezoneInterface');
     }
 }

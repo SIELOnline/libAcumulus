@@ -147,6 +147,8 @@ abstract class BaseConfigForm extends Form
      *   The field name.
      * @param string $type
      *   The field type: radio or select.
+     * @param bool $required
+     *   Whether the required attribute should be rendered.
      * @param array|null $options
      *   An array with value =>label pairs that can be used as an option set.
      *   If null, a similarly as $name named method on $this->shopCapabilities
@@ -155,7 +157,7 @@ abstract class BaseConfigForm extends Form
      * @return array
      *   A form field definition.
      */
-    protected function getOptionsOrHiddenField($name, $type, array $options = null)
+    protected function getOptionsOrHiddenField($name, $type, $required = true, array $options = null)
     {
         if ($options === null) {
             $methodName = 'get' . ucfirst($name) . 'Options';
@@ -174,7 +176,7 @@ abstract class BaseConfigForm extends Form
                 'description' => $this->t($this->t("desc_$name")),
                 'options' => $options,
                 'attributes' => array(
-                    'required' => $type === 'radio',
+                    'required' => $required,
                 ),
             );
         }

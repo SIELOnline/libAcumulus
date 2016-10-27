@@ -914,8 +914,10 @@ class Config implements ConfigInterface
             // Get current values.
             $values = $this->castValues($this->getConfigStore()->load($this->getKeys()));
 
-            $values['sendEmptyShipping'] = !$this->get('removeEmptyShipping');
-            unset($values['removeEmptyShipping']);
+            if ($this->get('removeEmptyShipping') !== null) {
+                $values['sendEmptyShipping'] = !$this->get('removeEmptyShipping');
+                unset($values['removeEmptyShipping']);
+            }
 
             $result = $this->getConfigStore()->save($values) && $result;
         }

@@ -19,8 +19,14 @@ class ConfigStore extends BaSeConfigStore
     public function getShopEnvironment()
     {
         /** @var \Magento\Framework\App\ProductMetadataInterface $productMetadata */
-        $productMetadata = ObjectManager::getInstance()->get('Magento\Framework\App\ProductMetadataInterface');
-        $version = $productMetadata->getVersion();
+        $productMetadata = Registry::getInstance()->get('Magento\Framework\App\ProductMetadataInterface');
+        try {
+            $version = $productMetadata->getVersion();
+        } catch (\Exception $e) {
+            // In CLI mode (php bin/magento ...) getVersion() throws an
+            // exception.
+            $version = 'UNKNOWN';
+        }
 
         $moduleResource = Registry::getInstance()->getModuleResource();
         $environment = array(
@@ -87,7 +93,7 @@ class ConfigStore extends BaSeConfigStore
         }
 
         /** @var \Magento\Framework\App\Cache\Frontend\Pool $cacheFrontendPool */
-        $cacheFrontendPool = Registry::getInstance()->get('\Magento\Framework\App\Cache\Frontend\Pool');
+        $cacheFrontendPool = Registry::getInstance()->get('Magento\Framework\App\Cache\Frontend\Pool');
         $cacheFrontendPool->get('default')->clean();
         return true;
     }

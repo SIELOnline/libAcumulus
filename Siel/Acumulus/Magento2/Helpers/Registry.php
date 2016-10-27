@@ -93,7 +93,7 @@ class Registry
      */
     public function getUrlInterface()
     {
-        return $this->get('\Magento\Backend\Model\UrlInterface');
+        return $this->get('Magento\Backend\Model\UrlInterface');
     }
 
     /**
@@ -101,7 +101,7 @@ class Registry
      */
     public function getResourceConfig()
     {
-        return $this->get('\Magento\Config\Model\ResourceModel\Config');
+        return $this->get('Magento\Config\Model\ResourceModel\Config');
     }
 
     /**
@@ -117,7 +117,7 @@ class Registry
      */
     public function getModuleResource()
     {
-        return $this->get('\Magento\Framework\Module\ResourceInterface');
+        return $this->get('Magento\Framework\Module\ResourceInterface');
     }
 
     /**
@@ -127,7 +127,7 @@ class Registry
     public function getLocale()
     {
         /** @var \Magento\Framework\Locale\ResolverInterface $resolver */
-        $resolver = $this->objectManager->get('Magento\Framework\Locale\ResolverInterface');
+        $resolver = $this->get('Magento\Framework\Locale\ResolverInterface');
         return $resolver->getLocale();
     }
 }

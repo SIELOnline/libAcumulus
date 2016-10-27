@@ -173,7 +173,7 @@ abstract class InvoiceManager
         $status = $invoiceSource->getStatus();
         $shopEventSettings = $this->config->getShopEventSettings();
         if ($invoiceSource->getType() === Source::CreditNote || in_array($status, $shopEventSettings['triggerOrderStatus'])) {
-            $result = $this->send($invoiceSource, false);
+            $result = $this->send($invoiceSource);
         } else {
             $result = ConfigInterface::Invoice_NotSent_WrongStatus;
             $messages = array(sprintf('%s not in [%s]', $status, implode(',', $shopEventSettings['triggerOrderStatus'])));
@@ -272,6 +272,10 @@ abstract class InvoiceManager
 
                 // If the invoice is not set to null, we continue by completing it.
                 if ($invoice !== NULL) {
+                    // @todo: $localMessages seems like a code smell to me, but needs to be mailed, so passed on: can/should we place that in the invoice or invoiceSource?
+                    // @todo: do not send if $localMessages contains errors.
+                    // @todo: The $this->message mess is a code smell.
+                    // @todo: $status does not receive a proper status on $dryRun: fix
                     $localMessages = array();
                     $invoice = $this->config->getCompletor()->complete($invoice, $invoiceSource, $localMessages);
 

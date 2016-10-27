@@ -54,7 +54,7 @@ LONGSTRING
 
 (Webshop){invoice_source_type}: {invoice_source_reference}
 (Acumulus) factuur:  {acumulus_invoice_id}
-Verzendstatus:       {status} {status_message}.
+Verzendstatus:       {status} {status_message}
 
 Berichten:
 {messages_text}
@@ -68,7 +68,7 @@ LONGSTRING
 <table>
   <tr><td>(Webshop){invoice_source_type}:</td><td>{invoice_source_reference}</td></tr>
   <tr><td>(Acumulus) factuur:</td><td>{acumulus_invoice_id}</td></tr>
-  <tr><td>Verzendstatus:</td><td>{status} {status_message}.</td></tr>
+  <tr><td>Verzendstatus:</td><td>{status} {status_message}</td></tr>
 </table>
 <p>Berichten:<br>
 {messages_html}</p>
@@ -126,7 +126,7 @@ LONGSTRING
 
 (Webshop){invoice_source_type}:    {invoice_source_reference}
 (Acumulus) invoice: {acumulus_invoice_id}
-Send status:        {status} {status_message}.
+Send status:        {status} {status_message}
 
 Messages:
 {messages_text}
@@ -140,7 +140,7 @@ LONGSTRING
 <table>
   <tr><td>(Webshop){invoice_source_type}:</td><td>{invoice_source_reference}</td></tr>
   <tr><td>(Acumulus) invoice:</td><td>{acumulus_invoice_id}</td></tr>
-  <tr><td>Send status:</td><td>{status} {status_message}.</td></tr>
+  <tr><td>Send status:</td><td>{status} {status_message}</td></tr>
 </table>
 <p>Messages:<br>
 {messages_html}</p>

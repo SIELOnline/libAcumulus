@@ -1,5 +1,4 @@
 <?php
-<?php
 namespace Siel\Acumulus\Magento\Shop;
 
 use DateTime;

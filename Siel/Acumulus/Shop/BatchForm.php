@@ -252,7 +252,8 @@ class BatchForm extends Form
     protected function getCheckboxKeys()
     {
         return array(
-            'force_send' => 'force_send',
+            'force_send' => 'options',
+            'dry_run' => 'options',
         );
     }
 }

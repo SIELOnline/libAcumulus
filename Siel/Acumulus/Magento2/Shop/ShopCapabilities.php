@@ -45,12 +45,9 @@ class ShopCapabilities extends ShopCapabilitiesBase
         $paymentHelper = Registry::getInstance()->get('Magento\Payment\Helper\Data');
         $paymentMethods = $paymentHelper->getPaymentMethods();
         foreach ($paymentMethods as $code => $paymentMethodData) {
-            if (!empty($paymentMethodData['active'])) {
-                if ((isset($data['title']))) {
-                    $title = $data['title'];
-                } elseif ($paymentHelper->getMethodInstance($code)) {
-                    $title = $paymentHelper->getMethodInstance($code)->getConfigData('title');
-                }
+            $instance = $paymentHelper->getMethodInstance($code);
+            if ($instance->isActive()) {
+                $title = $instance->getConfigData('title');
                 if (empty($title)) {
                     $title = $code;
                 }

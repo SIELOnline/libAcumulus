@@ -217,24 +217,7 @@ class Creator extends BaseCreator
         $vatInfo = $this->getVatRangeTags($productVat, $productPriceEx);
 
         // Try to look up the vat rate via product.
-        $taxClassId = $product['tax_class_id'];
-        $taxRules = Registry::getInstance()->model_localisation_tax_class->getTaxRules($taxClassId);
-        // We are not going to drill down geo zones, so if we got only 1 rate,
-        // or all rates are the same, we use that, otherwise we don't use it.
-        $vatRates = array();
-        $label = '';
-        foreach ($taxRules as $taxRule) {
-            $taxRate = Registry::getInstance()->model_localisation_tax_rate->getTaxRate($taxRule['tax_rate_id']);
-            $vatRates[$taxRate['rate']] = $taxRate['rate'];
-            if (empty($label)) {
-                $label = $taxRate['name'];
-            }
-        }
-        if (count($vatRates) === 1) {
-            $vatInfo['meta-lookup-vatrate'] = reset($vatRates);
-            // Take the last name
-            $vatInfo['meta-lookup-vatrate-label'] = $label;
-        }
+        $vatInfo += $this->getVatRateLookupMetadata($product['tax_class_id']);
 
         // Options (variants).
         $options = $this->getOrderModel()->getOrderOptions($item['order_id'], $item['order_product_id']);
@@ -263,11 +246,42 @@ class Creator extends BaseCreator
     }
 
     /**
+     * Looks up and returns, if only 1 rate was found, vat rate metadata.
      *
+     * @param int $taxClassId
+     *   The tax class to look up the vat rate for.
      *
+     * @return array
+     *   Either an array with keys 'meta-lookup-vatrate' and
+     *  'meta-lookup-vatrate-label' or an empty array.
+     */
+    protected function getVatRateLookupMetadata($taxClassId) {
+        $result = array();
+        $taxRules = Registry::getInstance()->model_localisation_tax_class->getTaxRules($taxClassId);
+        // We are not going to drill down geo zones, so if we got only 1 rate,
+        // or all rates are the same, we use that, otherwise we don't use it.
+        $vatRates = array();
+        $label = '';
+        foreach ($taxRules as $taxRule) {
+            $taxRate = Registry::getInstance()->model_localisation_tax_rate->getTaxRate($taxRule['tax_rate_id']);
+            $vatRates[$taxRate['rate']] = $taxRate['rate'];
+            if (empty($label)) {
+                $label = $taxRate['name'];
+            }
+        }
+        if (count($vatRates) === 1) {
+            $result['meta-lookup-vatrate'] = reset($vatRates);
+            // Take the last name
+            $result['meta-lookup-vatrate-label'] = $label;
+        }
+        return $result;
+    }
+
+    /**
+     * Returns all total lines: shipping,handling, discount, ...
      *
      * @return array[]
-     *
+     *   An array of invoice lines.
      */
     protected function getTotalLines()
     {
@@ -412,7 +426,22 @@ class Creator extends BaseCreator
     {
         $result = array();
         $prefix = DB_PREFIX;
-        $sql = "SELECT `code`, `key`, `value` FROM {$prefix}setting, {$prefix}extension where `type` = '$code' and `key` = concat(`code`, '_tax_class_id')";
+        $query = "SELECT distinct `value` FROM {$prefix}setting, {$prefix}extension where `type` = '$code' and `key` = concat(`{$prefix}extension`.`code`, '_tax_class_id')";
+        $records = Registry::getInstance()->db->query($query);
+        foreach ($records->rows as $row) {
+            $taxClassId = reset($row);
+            $vatRateMetadata = $this->getVatRateLookupMetadata($taxClassId);
+            if (empty($vatRateMetadata)) {
+                // Different vat rates within same tax class: return no result.
+                return array();
+            } elseif (empty($result)) {
+                // First row: set result
+                $result = $vatRateMetadata;
+            } elseif (!Number::floatsAreEqual($vatRateMetadata['meta-lookup-vatrate'], $result['meta-lookup-vatrate'])) {
+                // Different rates between tax classes: return no result.
+                return array();
+            } // else: rates are the same: continue.
+        }
         return $result;
     }
 }

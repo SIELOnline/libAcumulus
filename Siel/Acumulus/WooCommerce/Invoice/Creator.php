@@ -252,14 +252,7 @@ class Creator extends BaseCreator
         $vatLookupTags = array();
         if ($product instanceof WC_Product) {
             $this->addIfNotEmpty($result, 'itemnumber', $product->get_sku());
-            $tax_rates = WC_Tax::get_rates($product->get_tax_class());
-            if (count($tax_rates) === 1) {
-                $tax_rate = reset($tax_rates);
-                $vatLookupTags = array(
-                    'meta-lookup-vatrate' => $tax_rate['rate'],
-                    'meta-lookup-vatrate-label' => $tax_rate['label'],
-                );
-            }
+            $vatLookupTags = $this->getVatRateLookupMetadata($product->get_tax_class());
         }
         $result['product'] = $item['name'];
 
@@ -305,6 +298,28 @@ class Creator extends BaseCreator
             $result[Creator::Line_Children] = $this->getExtraProductOptionsLines($item, $parentTags);
         }
 
+        return $result;
+    }
+
+    /**
+     * Looks up and returns, if only 1 rate was found, vat rate metadata.
+     *
+     * @param string $taxClass
+     *
+     * @return array
+     *   Either an array with keys 'meta-lookup-vatrate' and
+     *  'meta-lookup-vatrate-label' or an empty array. 
+     */
+    protected function getVatRateLookupMetadata($taxClass) {
+        $result = array();
+        $taxRates = WC_Tax::get_rates($taxClass);
+        if (count($taxRates) === 1) {
+            $taxRate = reset($taxRates);
+            $result = array(
+                'meta-lookup-vatrate' => $taxRate['rate'],
+                'meta-lookup-vatrate-label' => $taxRate['label'],
+            );
+        }
         return $result;
     }
 

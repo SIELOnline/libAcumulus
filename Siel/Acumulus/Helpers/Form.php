@@ -560,6 +560,8 @@ abstract class Form
      * This base implementation returns an empty array. Override this method if
      * your form has checkbox fields.
      *
+     * @todo: can we do this in a generic way by traversing the fields?
+     *
      * @return array
      *   An array with as keys the checkbox names of this form and as values the
      *   checkbox collection name the checkbox belongs to.

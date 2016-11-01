@@ -60,6 +60,6 @@ class Source extends BaseSource
      */
     protected function getOriginalOrder()
     {
-        return new Source(Source::Order, $this->source->order);
+        return new Source(Source::Order, $this->source->post->post_parent);
     }
 }

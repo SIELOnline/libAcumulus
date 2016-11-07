@@ -294,7 +294,7 @@ class Creator extends BaseCreator
         $parentTags['vatamount'] = 0;
         if ($product instanceof WC_Product && !empty($item['variation_id'])) {
             $result[Creator::Line_Children] = $this->getVariantLines($item, $product, $parentTags);
-        } elseif (is_plugin_active('woocommerce-tm-extra-product-options/tm-woo-extra-product-options.php') && !empty($line['tmcartepo_data'])) {
+        } elseif (is_plugin_active('woocommerce-tm-extra-product-options/tm-woo-extra-product-options.php') && !empty($item['tmcartepo_data'])) {
             $result[Creator::Line_Children] = $this->getExtraProductOptionsLines($item, $parentTags);
         }
 
@@ -308,7 +308,7 @@ class Creator extends BaseCreator
      *
      * @return array
      *   Either an array with keys 'meta-lookup-vatrate' and
-     *  'meta-lookup-vatrate-label' or an empty array. 
+     *  'meta-lookup-vatrate-label' or an empty array.
      */
     protected function getVatRateLookupMetadata($taxClass) {
         $result = array();
@@ -336,7 +336,7 @@ class Creator extends BaseCreator
      * @return array[]
      *   An array of lines that describes this variant.
      */
-    protected function getVariantLines(array $item, \WC_Product $product, array $parentTags)
+    protected function getVariantLines(array $item, WC_Product $product, array $parentTags)
     {
         $result = array();
 

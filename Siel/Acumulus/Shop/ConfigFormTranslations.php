@@ -141,20 +141,22 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'option_same_template' => 'Zelfde sjabloon als voor niet betaald',
         'desc_defaultInvoiceTemplate' => 'Maakt u binnen Acumulus gebruik van meerdere factuur-sjablonen en wilt u de facturen uit uw webwinkel met een specifieke factuursjabloon printen, kies dan hier de factuur-sjablonen voor niet betaalde respectievelijk betaalde bestellingen.',
 
+        // Options settings.
+        'optionsSettingsHeader' => 'Opties of varianten',
+        'desc_optionsSettingsHeader' => 'Als een product opties of varianten heeft, kunnen deze opties op dezelfde regel als het product komen of op aparte regels daaronder. 
+            Met onderstaande instellingen kunt u aangeven wanneer voor alles op dezelfde regel gekozen wordt en wanneer voor meerdere regels.',
+        'desc_composedProducts' => 'NB: als het een samengesteld product betreft en de prijsinformatie is alleen aanwezig op de subproducten, of de subproducten hebben verschillende BTW tarieven, dan komen alle subproducten op hun eigen regel, ongeacht deze instellingen.',
         'option_do_not_use' => 'Deze instelling negeren',
         'option_always' => 'Altijd',
-        'field_optionsAllOn1Line' => 'Maximum aantal opties bij hoofdproduct',
-        'field_optionsAllOnOwnLine' => 'Minimum aantal opties voor aparate regels',
-        'field_optionsMaxLength' => 'Maximale lengte van omschrijving',
-        'desc_optionsMaxLength' => 'Als een product opties of varianten heeft, of is samengesteld, kunnen deze opties op dezelfde regel als het product komen of op aparte regels daaronder. 
-            Met bovenstaande 3 instellingen kunt u aangeven wanneer voor alles op dezelfde regel en wanneer voor meerdere regels gekozen wordt.
-            Als het aantal opties van het product gelijk is aan of minder is dan de 1e waarde komt alles op 1 regel.
-            Als het aantal opties gelijk is aan of groter is dan de 2e waarde komen alle opties op hun eigen regel.
-            Als het aantal opties tussen deze 2 waardes in ligt wordt de keuze gemaakt op basis van de lengte van de omschrijvingen van alle opties bij elkaar.
-            NB: als het een samengesteld product betreft en de prijsinformatie is alleen aanwezig op de subproducten, of de subproducten hebben verschillende BTW tarieven, dan komen alle subproducten op hun eigen regel, ongeacht bovenstaande instellingen.',
-        'message_validate_options_0' => 'The fields "Maximum no. of options on main product" and "Minimum no. of options for separate lines" cannot both be set to "Always".',
-        'message_validate_options_1' => 'The field "Minimum no. of options for separate lines" should be greater than or equal to "Maximum no. of options on main product".',
-        'message_validate_options_2' => 'The field "Maximum length of description" should be a number.',
+        'field_optionsAllOn1Line' => 'T/m dit aantal opties bij hoofdproduct',
+        'desc_optionsAllOn1Line' => 'Als het aantal opties van het product gelijk is aan of minder is dan deze waarde komen de opties altijd bij het hoofdproduct, ongeacht de maximale lengte die u hieronder kunt opgeven.',
+        'field_optionsAllOnOwnLine' => 'Vanaf dit aantal opties op aparte regels',
+        'desc_optionsAllOnOwnLine' => 'Als het aantal opties gelijk is aan of groter is dan deze waarde komen alle opties altjd op hun eigen regel, ongeacht de maximale lengte die u hieronder kunt opgeven.',
+        'field_optionsMaxLength' => 'Lengte omschrijving',
+        'desc_optionsMaxLength' => 'Als het aantal opties tussen bovenstaande 2 waardes ligt, bepaalt de totale lengte (in aantal letters) van de omschrijvingen van de opties of deze het bij hoofdproduct geplaatst worden of toch op aparte regels.',
+        'message_validate_options_0' => 'De velden "T/m dit aantal opties bij hoofdproduct" en "Vanaf dit aantal opties op aparte regels" kunnen niet allebei op "Altijd" staan.',
+        'message_validate_options_1' => 'Het veld "Vanaf dit aantal opties op aparte regels" dient groter dan het veld "T/m dit aantal opties bij hoofdproduct" te zijn.',
+        'message_validate_options_2' => 'Het veld "Lengte omschrijving" dient een getal te zijn.',
 
         'field_sendWhat' => 'Verstuur',
         'option_sendEmptyInvoice' => 'Verstuur 0-bedrag facturen.',
@@ -348,21 +350,22 @@ If you unchecked the first option, the second option only applies to business cl
         'option_same_template' => 'Same template as for due',
         'desc_defaultInvoiceTemplate' => 'Select the invoice templates to use when generating your Acumulus invoices for due respectively paid orders.',
 
+        // Options settings.
+        'optionsSettingsHeader' => 'Options or variants',
+        'desc_optionsSettingsHeader' => 'For products that have options or variants, the options can be placed on the same line as the product or on separate lines below.
+            These settings allow you to decide when to use only 1 line and when to use separate lines.',
+        'desc_composedProducts' => 'BTW: if this is a composed product en the price information is only available on the sub products, or the sub products have different vat rates, all sub products will always be placed on their own line.',
         'option_do_not_use' => 'Ignore this setting',
-        'option_never' => 'Never',
         'option_always' => 'Always',
-        'field_optionsAllOn1Line' => 'Maximum no. of options on main product',
-        'field_optionsAllOnOwnLine' => 'Minimum no. of options for separate lines',
-        'field_optionsMaxLength' => 'Maximum length of description',
-        'desc_optionsMaxLength' => 'If a product has options or variants, or is composed, the options can be placed on the same line as the main product or on their own lines.
-            These 3 settings allow you to decide when it will be all on 1 line or when all on their own line.
-            If the no. of options equals or is less than the 1st value, everything will be placed on the main line.
-            If the no. of options equals or is greater than the 2nd value, every option will be placed on its own line.
-            If the no. of options lies between these 2 values The decision will be made based on the total length of all option descriptions together.
-            NB: if this is a composed product en the price information is only available on the sub products, or the sub products have different vat rates, all sub products will always be placed on their own line',
-        'message_validate_options_0' => 'The fields "Maximum no. of options on main product" and "Minimum no. of options for separate lines" cannot both be set to "Always".',
-        'message_validate_options_1' => 'The field "Minimum no. of options for separate lines" should be greater than or equal to "Maximum no. of options on main product".',
-        'message_validate_options_2' => 'The field "Maximum length of description" should be a number.',
+        'field_optionsAllOn1Line' => 'Up to this no. of options on main product',
+        'desc_optionsAllOn1Line' => 'If the number of options is less than or equal to this value, they will always be placed on the main product, regardless the length setting below.',
+        'field_optionsAllOnOwnLine' => 'As of this no. of options on separate lines',
+        'desc_optionsAllOnOwnLine' => 'If the number of options is more than or equal to this value, they will always be placed on their own lines, regardless the length setting below.',
+        'field_optionsMaxLength' => 'Length of description',
+        'desc_optionsMaxLength' => 'If the no. of options lies between the above 2 values, the total length (in characters) of the descriptions of the options determines whether they will be placed on the main product or on their own lines.',
+        'message_validate_options_0' => 'The fields "Up to this no. of options on main product" and "As of this no. of options on separate lines" cannot both be set to "Always".',
+        'message_validate_options_1' => 'The field "As of this no. of options on separate lines" should be greater than or equal to "Up to this no. of options on main product".',
+        'message_validate_options_2' => 'The field "Length of description" should be a number.',
 
         'field_sendWhat' => 'Send',
         'option_sendEmptyInvoice' => 'Send 0-amount invoices.',

@@ -41,7 +41,7 @@ class AdvancedConfigForm extends BaseConfigForm
     protected function validate()
     {
         $this->validateRelationFields();
-        $this->validateInvoiceFields();
+        $this->validateOptionsFields();
         $this->validateEmailAsPdfFields();
     }
 
@@ -63,7 +63,7 @@ class AdvancedConfigForm extends BaseConfigForm
     /**
      * Validates fields in the "Invoice" settings fieldset.
      */
-    protected function validateInvoiceFields()
+    protected function validateOptionsFields()
     {
         if ($this->submittedValues['optionsAllOn1Line'] == PHP_INT_MAX && $this->submittedValues['optionsAllOnOwnLine'] == 1) {
             $this->errorMessages['optionsAllOnOwnLine'] = $this->t('message_validate_options_0');
@@ -136,6 +136,12 @@ class AdvancedConfigForm extends BaseConfigForm
                     'type' => 'fieldset',
                     'legend' => $this->t('invoiceSettingsHeader'),
                     'fields' => $this->getInvoiceFields(),
+                ),
+                'optionsSettingsHeader' => array(
+                    'type' => 'fieldset',
+                    'legend' => $this->t('optionsSettingsHeader'),
+                    'description' => $this->t('desc_optionsSettingsHeader'),
+                    'fields' => $this->getOptionsFields(),
                 ),
                 'emailAsPdfSettingsHeader' => array(
                     'type' => 'fieldset',
@@ -214,6 +220,33 @@ class AdvancedConfigForm extends BaseConfigForm
     protected function getInvoiceFields()
     {
         $fields = array(
+            'sendWhat' => array(
+                'type' => 'checkbox',
+                'label' => $this->t('field_sendWhat'),
+                'description' => $this->t('desc_sendWhat'),
+                'options' => array(
+                    'sendEmptyInvoice' => $this->t('option_sendEmptyInvoice'),
+                    'sendEmptyShipping' => $this->t('option_sendEmptyShipping'),
+                ),
+            ),
+        );
+        return $fields;
+    }
+
+    /**
+     * Returns the set of options related fields.
+     *
+     * The fields returned:
+     * - optionsAllOn1Line
+     * - optionsAllOnOwnLine
+     * - optionsMaxLength
+     *
+     * @return array[]
+     *   The set of options related fields.
+     */
+    protected function getOptionsFields()
+    {
+        $fields = array(
             'optionsAllOn1Line' => array(
                 'type' => 'select',
                 'label' => $this->t('field_optionsAllOn1Line'),
@@ -236,15 +269,6 @@ class AdvancedConfigForm extends BaseConfigForm
                 'description' => $this->t('desc_optionsMaxLength'),
                 'attributes' => array(
                     'min' => 1,
-                ),
-            ),
-            'sendWhat' => array(
-                'type' => 'checkbox',
-                'label' => $this->t('field_sendWhat'),
-                'description' => $this->t('desc_sendWhat'),
-                'options' => array(
-                    'sendEmptyInvoice' => $this->t('option_sendEmptyInvoice'),
-                    'sendEmptyShipping' => $this->t('option_sendEmptyShipping'),
                 ),
             ),
         );

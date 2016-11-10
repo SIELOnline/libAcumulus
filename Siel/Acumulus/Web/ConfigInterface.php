@@ -10,7 +10,7 @@ namespace Siel\Acumulus\Web;
  */
 interface ConfigInterface
 {
-    const libraryVersion = '4.6.0';
+    const libraryVersion = '4.6.2';
 
     // Web service configuration related constants.
     // Send status: bits 1, 2 and 3. Can be combined with an Invoice_Sent_...

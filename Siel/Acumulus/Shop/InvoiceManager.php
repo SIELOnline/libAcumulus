@@ -196,7 +196,7 @@ abstract class InvoiceManager
     {
         $shopEventSettings = $this->config->getShopEventSettings();
         if ($shopEventSettings['triggerInvoiceEvent'] == Config::TriggerInvoiceEvent_Create) {
-            $result = $this->send($invoiceSource, false);
+            $result = $this->send($invoiceSource);
         } else {
             $result = ConfigInterface::Invoice_NotSent_TriggerInvoiceCreateNotEnabled;
             $logMessage = $this->getInvoiceSendResultMessage($invoiceSource, $result);
@@ -221,7 +221,7 @@ abstract class InvoiceManager
     {
         $shopEventSettings = $this->config->getShopEventSettings();
         if ($shopEventSettings['triggerInvoiceEvent'] == Config::TriggerInvoiceEvent_Send) {
-            $result = $this->send($invoiceSource, false);
+            $result = $this->send($invoiceSource);
         } else {
             $result = ConfigInterface::Invoice_NotSent_TriggerInvoiceSentNotEnabled;
             $logMessage = $this->getInvoiceSendResultMessage($invoiceSource, $result);

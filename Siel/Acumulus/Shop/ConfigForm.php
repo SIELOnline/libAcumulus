@@ -110,9 +110,9 @@ class ConfigForm extends BaseConfigForm
         if (!empty($this->submittedValues['emailFrom']) && !preg_match($regexpEmail, $this->submittedValues['emailFrom'])) {
             $this->errorMessages['emailFrom'] = $this->t('message_validate_email_4');
         }
-        // @todo: how to handle this one, now they are on separate forms?
-        if (isset($this->submittedValues['emailAsPdf']) && (bool) $this->submittedValues['emailAsPdf'] && (!array_key_exists('sendCustomer', $this->submittedValues) || !(bool) $this->submittedValues['sendCustomer'])) {
-            $this->errorMessages['conflicting_options'] = $this->t('message_validate_conflicting_options');
+        $settings = $this->acumulusConfig->getCustomerSettings();
+        if (isset($this->submittedValues['emailAsPdf']) && (bool) $this->submittedValues['emailAsPdf'] && !$settings['sendCustomer']) {
+            $this->warningMessages  ['conflicting_options'] = $this->t('message_validate_conflicting_options');
         }
     }
 

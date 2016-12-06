@@ -50,14 +50,10 @@ class AdvancedConfigForm extends BaseConfigForm
      */
     protected function validateRelationFields()
     {
-//        $regexpEmail = '/^[^@<>,; "\']+@([^.@ ,;]+\.)+[^.@ ,;]+$/';
-
-        if (isset($this->submittedValues['emailAsPdf']) && (bool) $this->submittedValues['emailAsPdf'] && (!array_key_exists('sendCustomer', $this->submittedValues) || !(bool) $this->submittedValues['sendCustomer'])) {
-            $this->errorMessages['conflicting_options'] = $this->t('message_validate_conflicting_options');
+        $settings = $this->acumulusConfig->getEmailAsPdfSettings();
+        if ((!array_key_exists('sendCustomer', $this->submittedValues) || !(bool) $this->submittedValues['sendCustomer']) && $settings['emailAsPdf']) {
+            $this->warningMessages['conflicting_options'] = $this->t('message_validate_conflicting_options');
         }
-//        if (!empty($this->submittedValues['genericCustomerEmail']) && !preg_match($regexpEmail, $this->submittedValues['genericCustomerEmail'])) {
-//            $this->errorMessages['genericCustomerEmail'] = $this->t('message_validate_email_2');
-//        }
     }
 
     /**

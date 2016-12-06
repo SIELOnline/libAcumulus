@@ -31,8 +31,6 @@ class Creator extends BaseCreator
 
         // Load some models and properties we are going to use.
         Registry::getInstance()->load->model('catalog/product');
-        Registry::getInstance()->load->model('localisation/tax_class');
-        Registry::getInstance()->load->model('localisation/tax_rate');
         $this->orderTotalLines = null;
 
         switch ($this->invoiceSource->getType()) {
@@ -257,7 +255,6 @@ class Creator extends BaseCreator
      */
     protected function getVatRateLookupMetadata($taxClassId) {
         $result = array();
-        Registry::getInstance()->load->model('localisation/tax_class');
         $taxRules = $this->getTaxRules($taxClassId);
         // We are not going to drill down geo zones, so if we got only 1 rate,
         // or all rates are the same, we use that, otherwise we don't use it.

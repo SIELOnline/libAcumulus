@@ -511,7 +511,7 @@ class Creator extends BaseCreator
         $shippingVat = $this->shopSource->get_shipping_tax();
 
         $result = array(
-                'product' => $line['name'],
+                'product' => $this->getShippingMethodName(),
                 'unitprice' => $shippingEx,
                 'quantity' => 1,
                 'vatamount' => $shippingVat,

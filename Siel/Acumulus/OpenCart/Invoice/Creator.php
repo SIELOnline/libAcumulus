@@ -257,25 +257,61 @@ class Creator extends BaseCreator
      */
     protected function getVatRateLookupMetadata($taxClassId) {
         $result = array();
-        $taxRules = Registry::getInstance()->model_localisation_tax_class->getTaxRules($taxClassId);
+        Registry::getInstance()->load->model('localisation/tax_class');
+        $taxRules = $this->getTaxRules($taxClassId);
         // We are not going to drill down geo zones, so if we got only 1 rate,
         // or all rates are the same, we use that, otherwise we don't use it.
         $vatRates = array();
         $label = '';
         foreach ($taxRules as $taxRule) {
-            $taxRate = Registry::getInstance()->model_localisation_tax_rate->getTaxRate($taxRule['tax_rate_id']);
-            $vatRates[$taxRate['rate']] = $taxRate['rate'];
-            if (empty($label)) {
-                $label = $taxRate['name'];
+            $taxRate = $this->getTaxRate($taxRule['tax_rate_id']);
+            if (!empty($taxRate)) {
+                $vatRates[$taxRate['rate']] = $taxRate['rate'];
+                if (empty($label)) {
+                    $label = $taxRate['name'];
+                }
             }
         }
         if (count($vatRates) === 1) {
             $result['meta-lookup-vatrate'] = reset($vatRates);
-            // Take the last name
+            // Take the first name (if there were more tax rates).
             $result['meta-lookup-vatrate-label'] = $label;
         }
         return $result;
     }
+
+    /**
+     * Copy of ModelLocalisationTaxClass::getTaxRules().
+     *
+     * The above mentioned model cannot be used on the catalog side, so I just
+     * copied the code.
+     *
+     * @param int $tax_class_id
+     *
+     * @return array[]
+     *
+     */
+    protected function getTaxRules($tax_class_id) {
+        $query = Registry::getInstance()->db->query("SELECT * FROM " . DB_PREFIX . "tax_rule WHERE tax_class_id = '" . (int) $tax_class_id . "'");
+        return $query->rows;
+    }
+
+    /**
+     * Copy of ModelLocalisationTaxRate::getTaxRate().
+     *
+     * The above mentioned model cannot be used on the catalog side, so I just
+     * copied the code.
+     *
+     * @param int $tax_rate_id
+     *
+     * @return array
+     *
+     */
+    protected function getTaxRate($tax_rate_id) {
+        $query = Registry::getInstance()->db->query("SELECT tr.tax_rate_id, tr.name AS name, tr.rate, tr.type, tr.geo_zone_id, gz.name AS geo_zone, tr.date_added, tr.date_modified FROM " . DB_PREFIX . "tax_rate tr LEFT JOIN " . DB_PREFIX . "geo_zone gz ON (tr.geo_zone_id = gz.geo_zone_id) WHERE tr.tax_rate_id = '" . (int) $tax_rate_id . "'");
+        return $query->row;
+    }
+
 
     /**
      * Returns all total lines: shipping,handling, discount, ...

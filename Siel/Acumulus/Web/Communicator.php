@@ -67,14 +67,17 @@ class Communicator implements CommunicatorInterface
                 'message' => $e->getMessage(),
             );
             $response = array();
-            $response['status'] = ConfigInterface::Status_Exception;
+            $response['status'] = ConfigInterface::Api_Exception;
         }
 
-        // Process response.
+        // Process response:
         // If no status is present the call failed: set the status to Error.
         if (!isset($response['status'])) {
-            $response['status'] = ConfigInterface::Status_Errors;
+            $response['status'] = ConfigInterface::Api_Errors;
         }
+
+        // Change status to internal status (bits and increasing severity).
+        $response['status'] = $this->ApiStatus2InternalStatus($response['status']);
 
         // Simplify errors and warnings parts: remove indirection and count.
         if (!empty($response['errors']['error'])) {
@@ -386,6 +389,29 @@ class Communicator implements CommunicatorInterface
         }
 
         return $element;
+    }
+
+    /**
+     * Returns the corresponding internal status.
+     *
+     * @param $status
+     *   The status as returned by the API.
+     *
+     * @return int
+     *   The corresponding internal status.
+     */
+    protected function ApiStatus2InternalStatus($status) {
+        switch ($status) {
+            case ConfigInterface::Api_Success:
+                return ConfigInterface::Status_Success;
+            case ConfigInterface::Api_Errors:
+                return ConfigInterface::Status_Errors;
+            case ConfigInterface::Api_Warnings:
+                return ConfigInterface::Status_Warnings;
+            case ConfigInterface::Api_Exception:
+            default:
+                return ConfigInterface::Status_Exception;
+        }
     }
 
     /**

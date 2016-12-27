@@ -12,6 +12,11 @@ interface ConfigInterface
 {
     const libraryVersion = '4.6.6';
 
+    const Api_Success = 0;
+    const Api_Warnings = 2;
+    const Api_Errors = 1;
+    const Api_Exception = 3;
+
     // Web service configuration related constants.
     // Send status: bits 1, 2 and 3. Can be combined with an Invoice_Sent_...
     // const. Not necessarily a single bit per value, but the order should be by

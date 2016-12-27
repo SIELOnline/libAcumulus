@@ -170,15 +170,15 @@ class Service
     {
         switch ($status) {
             case ConfigInterface::Status_Success:
-                return $this->t('message_response_0');
+                return $this->t('message_response_success');
             case ConfigInterface::Status_Errors:
-                return $this->t('message_response_1');
+                return $this->t('message_response_errors');
             case ConfigInterface::Status_Warnings:
-                return $this->t('message_response_2');
+                return $this->t('message_response_warnings');
             case ConfigInterface::Status_Exception:
-                return $this->t('message_response_3');
+                return $this->t('message_response_exception');
             default:
-                return $this->t('message_response_x') . $status;
+                return $this->t('message_response_unknown') . $status;
         }
     }
 

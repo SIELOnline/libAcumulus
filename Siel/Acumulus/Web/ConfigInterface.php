@@ -10,7 +10,7 @@ namespace Siel\Acumulus\Web;
  */
 interface ConfigInterface
 {
-    const libraryVersion = '4.6.6';
+    const libraryVersion = '4.6.7';
 
     const Api_Success = 0;
     const Api_Warnings = 2;

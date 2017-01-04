@@ -42,25 +42,8 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      *
-     * This override removes the 'Use shop invoice number' option as OpenCart
-     * does not have invoices.
-     *
-     * @todo: What does OC actually have? (or: is the above correct)
-     */
-    public function getInvoiceNrSourceOptions()
-    {
-        $result = parent::getInvoiceNrSourceOptions();
-        unset($result[InvoiceConfigInterface::InvoiceNrSource_ShopInvoice]);
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * This override removes the 'Use shop invoice number' option as OpenCart
-     * does not have invoices.
-     *
-     * @todo: What does OC actually have? (or: is the above correct)
+     * This override removes the 'Use shop invoice date' option as OpenCart
+     * does not store the creation date of the invoice.
      */
     public function getDateToUseOptions()
     {

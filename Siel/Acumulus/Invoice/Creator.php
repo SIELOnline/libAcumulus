@@ -397,6 +397,8 @@ abstract class Creator
         $this->addDefaultEmpty($invoice, 'concept', ConfigInterface::Concept_No);
         $this->addDefault($invoice, 'accountnumber', $invoiceSettings['defaultAccountNumber']);
         $this->addDefault($invoice, 'costcenter', $invoiceSettings['defaultCostCenter']);
+        // @todo: should this be done after the first event handler
+        // (invoice_created) has been triggered?
         if (isset($invoice['paymentstatus'])
             && $invoice['paymentstatus'] == ConfigInterface::PaymentStatus_Paid
             // 0 = empty = use same invoice template as for non paid invoices

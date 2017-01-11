@@ -211,7 +211,22 @@ abstract class BaseConfigForm extends Form
             $picklist = $picklist[$key];
         }
         array_walk($picklist, function ($value) use (&$result) {
-            list($optionValue, $optionText) = array_values($value);
+            $optionValue = reset($value);
+            if (count($value) === 1) {
+                $optionText = $optionValue;
+            }
+            else {
+                $optionText = next($value);
+                $optionalText = next($value);
+                if (!empty($optionalText)) {
+                    if (empty($optionText)) {
+                        $optionText = $optionalText;
+                    }
+                    else {
+                        $optionText .= ' (' . $optionalText . ')';
+                    }
+                }
+            }
             $result[$optionValue] = $optionText;
         });
 

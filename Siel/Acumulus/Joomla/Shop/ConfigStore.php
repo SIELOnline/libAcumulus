@@ -90,14 +90,20 @@ class ConfigStore extends BaSeConfigStore
         /** @var \stdClass|array $component */
         $component = JComponentHelper::getComponent('com_acumulus');
         $component = (array) $component;
+        if (is_object($component['params'])) {
+            /** @var \Joomla\Registry\Registry $params */
+            $params = $component['params'];
+            $data = $params->toArray();
+        }
 
         foreach ($values as $key => $value) {
             if ($value === null) {
-                unset($component['params']['data'][$key]);
+                unset($data[$key]);
             } else {
-                $component['params']['data'][$key] = $value;
+                $data[$key] = $value;
             }
         }
+        $component['params'] = $data;
 
         // Use save method of com_config component model.
         JLoader::registerPrefix('Config', JPATH_ROOT . '/components/com_config');

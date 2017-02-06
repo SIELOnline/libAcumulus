@@ -12,7 +12,26 @@ use Siel\Acumulus\Shop\ShopCapabilities as ShopCapabilitiesBase;
  */
 class ShopCapabilities extends ShopCapabilitiesBase
 {
-    /**
+  /**
+   * {@inheritdoc}
+   */
+  public function getShopDefaults()
+  {
+      return array(
+          'contactYourId' => '[id]', // Customer
+          'companyName1' => '[company]', // InvoiceAddress
+          'fullName' => '[first_name] [last_name]', // InvoiceAddress
+          'address1' => '[address1]', // InvoiceAddress
+          'address2' => '[address2]', // InvoiceAddress
+          'postalCode' => '[postcode]', // InvoiceAddress
+          'city' => '[city]', // InvoiceAddress
+          'vatNumber' => '[vat_number]', // InvoiceAddress
+          'telephone' => '[phone|phone_mobile]', // InvoiceAddress
+          'email' => '[email]', // Customer
+      );
+  }
+
+  /**
      * {@inheritdoc}
      */
     public function getShopOrderStatuses()

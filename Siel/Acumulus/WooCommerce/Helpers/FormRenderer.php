@@ -37,7 +37,7 @@ class FormRenderer extends BaseFormRenderer
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc]
      *
      * This override makes access public and echo's the output besides returning
      * it as WordPress is in field by field outputting mode when this method
@@ -51,17 +51,15 @@ class FormRenderer extends BaseFormRenderer
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      *
-     * This override only renders the description as WordPress already renders
-     * the fieldset title and the fields.
+     * This override renders nothing as WordPress already renders the fieldset
+     * title and the fields and the descirption will be rendered as a field as
+     * well.
      */
     protected function renderFieldset(array $field)
     {
         $output = '';
-        if (!empty($field['description'])) {
-            $output .= $this->renderDescription($field['description']);
-        }
         return $output;
     }
 

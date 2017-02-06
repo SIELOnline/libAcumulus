@@ -72,7 +72,17 @@ class FormMapper
             add_settings_section($field['id'], $field['legend'], function () use ($renderer, $field) {
                 $renderer->field($field);
             }, $this->page);
-            $this->fields($field['fields'], $field['id']);
+            $fields = $field['fields'];
+            if (!empty($field['description'])) {
+                $descriptionField = array(
+                    'type' =>'markup',
+                    'label' => '<span class="fieldset-description-label">🛈</span>',
+                    'id' => $field['id'] . '-description',
+                    'value' => "<div class='fieldset-description'>{$field['description']}</div>",
+                );
+                array_unshift($fields, $descriptionField);
+            }
+            $this->fields($fields, $field['id']);
         } else {
             $required = !empty($field['attributes']['required']) ? static::required : '';
             add_settings_field($field['id'], $field['label'] . $required, array($this->formRenderer, 'field'), $this->page, $section, $field);

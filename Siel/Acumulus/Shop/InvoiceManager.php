@@ -483,12 +483,12 @@ abstract class InvoiceManager
     }
 
     /**
-     * Returns whether an invoice is empty (free products only)
+     * Returns whether an invoice is empty (free products only).
      *
      * @param array $invoice
      *
      * @return bool
-     *   True if the invoice amount is €0,-.
+     *   True if the invoice amount (inc. VAT) is €0,-.
      */
     protected function isEmptyInvoice(array $invoice)
     {

@@ -13,6 +13,26 @@ class ShopCapabilities extends ShopCapabilitiesBase
 {
     /**
      * {@inheritdoc}
+     */
+    public function getShopDefaults()
+    {
+        return array(
+            'contactYourId' => '[virtuemart_user_id]', // Order BT
+            'companyName1' => '[company]', // Order BT
+            'fullName' => '[first_name+middle_name+last_name]', // Order BT
+            'address1' => '[address_1]', // Order BT
+            'address2' => '[address_2]', // Order BT
+            'postalCode' => '[zip]', // Order BT
+            'city' => '[city]', // Order BT
+            'vatNumber' => '[tax_exemption_number]', // Order BT
+            'telephone' => '[phone_1|phone_2]', // Order BT
+            'fax' => '[fax]', // Order BT
+            'email' => '[email]', // Order BT
+        );
+    }
+
+    /**
+     * {@inheritdoc}
      *
      * This default implementation returns order and credit note. Override if
      * the specific shop supports other types or does not support credit notes.

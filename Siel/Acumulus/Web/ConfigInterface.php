@@ -10,7 +10,7 @@ namespace Siel\Acumulus\Web;
  */
 interface ConfigInterface
 {
-    const libraryVersion = '4.6.7';
+    const libraryVersion = '4.7.0-alpha1';
 
     const Api_Success = 0;
     const Api_Warnings = 2;
@@ -94,6 +94,8 @@ interface ConfigInterface
 
     /**
      * @return \Siel\Acumulus\Helpers\Log
+     *
+     * @todo: move to InjectorInterface?
      */
     public function getLog();
 }

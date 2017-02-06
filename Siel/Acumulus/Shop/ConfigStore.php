@@ -19,15 +19,4 @@ abstract class ConfigStore implements ConfigStoreInterface
         $pos = strrpos($shopNamespace, '\\');
         $this->shopName = $pos !== false ? substr($shopNamespace, $pos + 1) : $shopNamespace;
     }
-
-    /**
-     * {@inheritdoc}
-     *
-     * This base implementation returns an empty array: no shop specific default
-     * overrides.
-     */
-    public function getShopDefaults()
-    {
-        return array();
-    }
 }

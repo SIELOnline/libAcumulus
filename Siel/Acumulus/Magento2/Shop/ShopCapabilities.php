@@ -13,6 +13,27 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
+    public function getShopDefaults()
+    {
+        return array(
+            'contactYourId' => '[customer::incrementId|customer::id]', // \Mage\Customer\Model\Customer
+            'companyName1' => '[company]', // \Magento\Sales\Model\Order\Address
+            'fullName' => '[name]', // \Magento\Sales\Model\Order\Address
+            'address1' => '[implodeStreetValue]', // \Magento\Sales\Model\Order\Address
+            'postalCode' => '[postcode]', // \Magento\Sales\Model\Order\Address
+            'city' => '[city]', // \Magento\Sales\Model\Order\Address
+            // Magento has 2 VAT numbers:
+            // http://magento.stackexchange.com/questions/42164/there-are-2-vat-fields-in-onepage-checkout-which-one-should-i-be-using
+            'vatNumber' => '[vatId|customerTaxvat]', // \Magento\Sales\Model\Order
+            'telephone' => '[telephone]', // \Magento\Sales\Model\Order\Address
+            'fax' => '[fax]', // \Magento\Sales\Model\Order\Address
+            'email' => '[email]', // \Magento\Sales\Model\Order\Address
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getShopOrderStatuses()
     {
         /** @var \Magento\Sales\Model\Order\Status $model */

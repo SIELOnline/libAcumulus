@@ -45,31 +45,9 @@ class Creator extends BaseCreator
     /**
      * {@inheritdoc}
      */
-    protected function getCustomer()
+    protected function getCountryCode()
     {
-        $order = $this->order;
-        $result = array();
-
-        $this->addIfSetAndNotEmpty($result, 'contactyourid', $order, 'customer_id');
-        $this->addEmpty($result, 'companyname1', $order['payment_company']);
-        if (!empty($result['companyname1'])) {
-            // @todo: Are there VAT number extensions?
-            $this->addIfSetAndNotEmpty($result, 'vatnumber', $order, 'payment_tax_id');
-        }
-        $result['fullname'] = $order['firstname'] . ' ' . $order['lastname'];
-        $this->addEmpty($result, 'address1', $order['payment_address_1']);
-        $this->addEmpty($result, 'address2', $order['payment_address_2']);
-        $this->addEmpty($result, 'postalcode', $order['payment_postcode']);
-        $this->addEmpty($result, 'city', $order['payment_city']);
-        if (!empty($order['payment_iso_code_2'])) {
-            $result['countrycode'] = $order['payment_iso_code_2'];
-        }
-        $this->addIfSetAndNotEmpty($result, 'country', $order, 'payment_country');
-        $this->addIfSetAndNotEmpty($result, 'telephone', $order, 'telephone');
-        $this->addIfSetAndNotEmpty($result, 'fax', $order, 'fax');
-        $result['email'] = $order['email'];
-
-        return $result;
+        return !empty($this->order['payment_iso_code_2']) ? $this->order['payment_iso_code_2'] : '';
     }
 
     /**

@@ -345,7 +345,7 @@ class Completor
     protected function fictitiousClient()
     {
         $customerSettings = $this->config->getCustomerSettings();
-        if (!$customerSettings['sendCustomer'] && empty($this->invoice['customer']['companyname1']) && empty($this->invoice['customer']['vatnumber'])) {
+        if (!$customerSettings['sendCustomer'] && !$this->isCompany()) {
             $keysToKeep = array('invoice');
             foreach ($this->invoice['customer'] as $key => $value) {
                 if (!in_array($key, $keysToKeep)) {
@@ -911,6 +911,6 @@ class Completor
      */
     protected function isCompany()
     {
-        return !empty($this->invoice['customer']['vatnumber']);
+        return !empty($this->invoice['customer']['companyname1']) && !empty($this->invoice['customer']['vatnumber']);
     }
 }

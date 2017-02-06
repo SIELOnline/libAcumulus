@@ -46,9 +46,7 @@ class Source extends BaseSource
     }
 
     /**
-     * {@inheritDoc}
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getStatus()
     {

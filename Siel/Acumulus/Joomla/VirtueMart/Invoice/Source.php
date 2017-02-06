@@ -40,7 +40,7 @@ class Source extends BaseSource
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      *
      * @return string
      *   A single character indicating the order status.

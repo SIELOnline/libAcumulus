@@ -100,6 +100,7 @@ class Config implements ConfigInterface
         $translator = $this->getInstance('Translator', 'Helpers', array($this->language));
         if (!$this->moduleSpecificTranslationsAdded) {
             try {
+                /** @var \Siel\Acumulus\Helpers\TranslationCollection $translations */
                 $translations = $this->getInstance('ModuleSpecificTranslations', 'helpers');
                 $translator->add($translations);
             } catch (\InvalidArgumentException $e) {}
@@ -114,6 +115,57 @@ class Config implements ConfigInterface
     public function getLog()
     {
         return $this->getInstance('Log', 'Helpers', array($this));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMailer()
+    {
+        return $this->getInstance('Mailer', 'Helpers', array($this, $this->getTranslator(), $this->getService()));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getToken()
+    {
+        return $this->getInstance('Token', 'Helpers');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getForm($type)
+    {
+        $class = ucfirst($type);
+        $arguments = array(
+            $this->getTranslator(),
+            $this->getShopCapabilities(),
+        );
+        switch (strtolower($type)) {
+            case 'config':
+                $arguments[] = $this;
+                $arguments[] = $this->getService();
+                break;
+            case 'advanced':
+                $class = 'AdvancedConfig';
+                $arguments[] = $this;
+                $arguments[] = $this->getService();
+                break;
+            case 'batch':
+                $arguments[] = $this->getManager();
+                break;
+        }
+        return $this->getInstance($class . 'Form', 'Shop', $arguments);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFormRenderer()
+    {
+        return $this->getInstance('FormRenderer', 'Helpers');
     }
 
     /**
@@ -175,14 +227,6 @@ class Config implements ConfigInterface
     /**
      * {@inheritdoc}
      */
-    public function getMailer()
-    {
-        return $this->getInstance('Mailer', 'Helpers', array($this, $this->getTranslator(), $this->getService()));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getConfigStore()
     {
         return $this->getInstance('ConfigStore', 'Shop', array($this->shopNamespace));
@@ -210,41 +254,6 @@ class Config implements ConfigInterface
     public function getAcumulusEntryModel()
     {
         return $this->getInstance('AcumulusEntryModel', 'Shop');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getForm($type)
-    {
-        $class = ucfirst($type);
-        $arguments = array(
-            $this->getTranslator(),
-            $this->getShopCapabilities(),
-        );
-        switch (strtolower($type)) {
-            case 'config':
-                $arguments[] = $this;
-                $arguments[] = $this->getService();
-                break;
-            case 'advanced':
-                $class = 'AdvancedConfig';
-                $arguments[] = $this;
-                $arguments[] = $this->getService();
-                break;
-            case 'batch':
-                $arguments[] = $this->getManager();
-                break;
-        }
-        return $this->getInstance($class . 'Form', 'Shop', $arguments);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getFormRenderer()
-    {
-        return $this->getInstance('FormRenderer', 'Helpers');
     }
 
     /**
@@ -336,7 +345,7 @@ class Config implements ConfigInterface
     protected function load()
     {
         if (!$this->isConfigurationLoaded) {
-            $this->values = $this->castValues(array_merge($this->getDefaults(), $this->getConfigStore()->load($this->getKeys())));
+            $this->values = $this->castValues(array_merge($this->getDefaults(), $this->getShopDefaults(), $this->getConfigStore()->load($this->getKeys())));
             $this->isConfigurationLoaded = true;
         }
     }
@@ -567,6 +576,16 @@ class Config implements ConfigInterface
     }
 
     /**
+     * Returns a set of default values that are specific for the shop.
+     *
+     * @return array
+     */
+    protected function getShopDefaults()
+    {
+        return $this->getShopCapabilities()->getShopDefaults();
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getHostName()
@@ -700,12 +719,7 @@ class Config implements ConfigInterface
                     'type' => 'string',
                     'default' => 'consumer@' . $hostName,
                 ),
-                'overwriteIfExists' => array(
-                    'group' => 'customer',
-                    'type' => 'bool',
-                    'default' => true,
-                ),
-                'salutation' => array(
+                'contactYourId' => array(
                     'group' => 'customer',
                     'type' => 'string',
                     'default' => '',
@@ -714,6 +728,76 @@ class Config implements ConfigInterface
                     'group' => 'customer',
                     'type' => 'int',
                     'default' => InvoiceConfigInterface::ContactStatus_Active,
+                ),
+                'companyName1' => array(
+                    'group' => 'customer',
+                    'type' => 'string',
+                    'default' => '',
+                ),
+                'companyName2' => array(
+                    'group' => 'customer',
+                    'type' => 'string',
+                    'default' => '',
+                ),
+                'fullName' => array(
+                    'group' => 'customer',
+                    'type' => 'string',
+                    'default' => '',
+                ),
+                'salutation' => array(
+                    'group' => 'customer',
+                    'type' => 'string',
+                    'default' => '',
+                ),
+                'address1' => array(
+                    'group' => 'customer',
+                    'type' => 'string',
+                    'default' => '',
+                ),
+                'address2' => array(
+                    'group' => 'customer',
+                    'type' => 'string',
+                    'default' => '',
+                ),
+                'postalCode' => array(
+                    'group' => 'customer',
+                    'type' => 'string',
+                    'default' => '',
+                ),
+                'city' => array(
+                    'group' => 'customer',
+                    'type' => 'string',
+                    'default' => '',
+                ),
+                'vatNumber' => array(
+                    'group' => 'customer',
+                    'type' => 'string',
+                    'default' => '',
+                ),
+                'telephone' => array(
+                    'group' => 'customer',
+                    'type' => 'string',
+                    'default' => '',
+                ),
+                'fax' => array(
+                    'group' => 'customer',
+                    'type' => 'string',
+                    'default' => '',
+                ),
+                'email' => array(
+                    'group' => 'customer',
+                    'type' => 'string',
+                    'default' => '',
+                ),
+                'overwriteIfExists' => array(
+                    'group' => 'customer',
+                    'type' => 'bool',
+                    'default' => true,
+                ),
+                'mark' => array(
+                    'group' => 'customer',
+                    'type' => 'string',
+                    'default' => '',
                 ),
                 'defaultAccountNumber' => array(
                     'group' => 'invoice',

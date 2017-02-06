@@ -13,6 +13,26 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
 {
     /**
      * {@inheritdoc}
+     */
+    public function getShopDefaults()
+    {
+        return array(
+            'contactYourId' => '[customer_id]', // Order
+            'companyName1' => '[payment_company]', // Order
+            'fullName' => '[firstname+lastname]', // Order
+            'address1' => '[payment_address_1]', // Order
+            'address2' => '[payment_address_2]', // Order
+            'postalCode' => '[payment_postcode]', // Order
+            'city' => '[payment_city]', // Order
+            'vatNumber' => '[payment_tax_id]', // Order
+            'telephone' => '[telephone]', // Order
+            'fax' => '[fax]', // Order
+            'email' => '[email]', // Order
+        );
+    }
+
+    /**
+     * {@inheritdoc}
      *
      * This default implementation returns order and credit note. Override if
      * the specific shop supports other types or does not support credit notes.

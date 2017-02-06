@@ -9,6 +9,8 @@ interface ConfigStoreInterface
     /**
      * Returns an array with shop specific environment settings.
      *
+     * @todo: move to shop capabilities?
+     *
      * @return array
      *   An array with keys:
      *   - moduleVersion
@@ -16,13 +18,6 @@ interface ConfigStoreInterface
      *   - shopVersion
      */
     public function getShopEnvironment();
-
-    /**
-     * Returns an array with shop specific configuration defaults.
-     *
-     * @return array
-     */
-    public function getShopDefaults();
 
     /**
      * Loads the configuration from the actual configuration provider.

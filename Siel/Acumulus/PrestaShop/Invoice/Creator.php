@@ -73,47 +73,20 @@ class Creator extends BaseCreator
     /**
      * {@inheritdoc}
      */
-    protected function getCustomer()
+    protected function setPropertySources()
     {
-        $customer = new Customer($this->invoiceSource->getSource()->id_customer);
-        $invoiceAddress = new Address($this->order->id_address_invoice);
-
-        $result = array();
-
-        $this->addIfNotEmpty($result, 'contactyourid', $customer->id);
-        $this->addEmpty($result, 'companyname1', $invoiceAddress->company);
-        $result['fullname'] = $invoiceAddress->firstname . ' ' . $invoiceAddress->lastname;
-        $this->addEmpty($result, 'address1', $invoiceAddress->address1);
-        $this->addEmpty($result, 'address2', $invoiceAddress->address2);
-        $this->addEmpty($result, 'postalcode', $invoiceAddress->postcode);
-        $this->addEmpty($result, 'city', $invoiceAddress->city);
-        if ($invoiceAddress->id_country) {
-            $result['countrycode'] = Country::getIsoById($invoiceAddress->id_country);
-        }
-        $this->addIfNotEmpty($result, 'vatnumber', $invoiceAddress->vat_number);
-        // Add either mobile or phone number to 'telephone'.
-        $this->addIfNotEmpty($result, 'telephone', $invoiceAddress->phone);
-        $this->addIfNotEmpty($result, 'telephone', $invoiceAddress->phone_mobile);
-        $result['email'] = $customer->email;
-
-        return $result;
+        parent::setPropertySources();
+        $this->propertySources['address'] = new Address($this->order->id_address_invoice);
+        $this->propertySources['customer'] = new Customer($this->invoiceSource->getSource()->id_customer);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function searchProperty($property)
+    protected function getCountryCode()
     {
         $invoiceAddress = new Address($this->order->id_address_invoice);
-        $value = $this->getProperty($property, $invoiceAddress);
-        if (empty($value)) {
-            $customer = new Customer($this->invoiceSource->getSource()->id_customer);
-            $value = $this->getProperty($property, $customer);
-        }
-        if (empty($value)) {
-            $value = parent::searchProperty($property);
-        }
-        return $value;
+        return !empty($invoiceAddress->id_country) ? Country::getIsoById($invoiceAddress->id_country) : '';
     }
 
     /**

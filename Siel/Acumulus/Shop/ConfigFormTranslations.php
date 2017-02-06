@@ -88,6 +88,30 @@ Zie <a href="http://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastin
         'option_triggerInvoiceEvent_2' => 'Als een factuur van de webwinkel naar de klant verzonden wordt.',
         'desc_triggerInvoiceEvent' => 'U kunt hier kiezen of en bij welke webwinkelfactuur-gebeurtenissen de factuur naar Acumulus wordt verstuurd. Als u voor "Niet automatisch versturen" kiest, kunt u de facturen zelf overzetten m.b.v. het batchformulier of op basis van één of meerdere bestelstatussen.',
 
+        // Tokens
+        'tokenHelpHeader' => 'Tokens',
+        'desc_tokens' => '<p>Op deze pagina staan een aantal velden die "tokens" mogen bevatten.
+Dit wil zeggen dat ze naast vrije tekst ook gegevens van de bestelling, de klant of het klantadres kunnen bevatten.
+Tokens worden ingegeven door de naam van de eigenschap van de bestelling tussen vierkante haken, dwz. [ en ], te plaatsen.
+De eigenschappen die uw webshop kent worden hieronder opgesomd.</p>
+<p>Om speciale situaties aan te kunnen, mogen tokens op verschillende manieren samengevoegd worden:</p>
+<ol class="property-list">
+<dt>[property]:</dt><dd>Eenvoudigste vorm, vervang door de waarde van deze eigenschap.</dd>
+<dt>[property1|property2|...]:</dt><dd>Vervang door de waarde van property1 of als deze geen waarde heeft door die van property2, en zo verder. BV: handig om of het mobiele of het vaste telefoonnummer mee te sturen.</dd>
+<dt>[property1+property2+...]:</dt><dd>Vervang door de waarde van property1 en die van property2 en plaats tussen de properties een spatie, maar alleen als de properties niet leeg zijn.BV: handig om de volledige naam, opgebouwd uit voornaam, tussenvoegsel en achternaam, te versturen zonder dat er meerdere spaties in terecht komen.</dd>
+<dt>[object::property]:</dt><dd>Vervang alleen door de eigenschap als die in het opgegeven object voorkomt (zie de lijst hieronder). Gebruik dit om verwarring te voorkomen als meerdere objecten een eigenschap met dezelfde naam hebben (bv id).</dd>
+</ol>
+',
+        'msg_token' => 'Dit veld mag tokens bevatten.',
+        'see_class' => 'zie de class %1$s',
+        'see_file' => 'zie het bestand %1$s',
+        'see_class_file' => 'zie de class %1$s in het bestand %2$s',
+        'see_table' => 'zie de tabel %1$s',
+        'see_class_more' => 'zie de class %1$s voor mogelijk andere properties en methods zonder argumenten die als token gebruikt kunnen worden',
+        'see_table_more' => 'zie de tabel %1$s voor mogelijk andere velden die als token gebruikt kunnen worden',
+        'see_above' => 'zie hierboven.',
+        'original_order_for_refund' => 'Oorspronkelijke bestelling, alleen beschikbaar bij refunds',
+
         // Relation management settings.
         'relationSettingsHeader' => 'Relatiebeheer',
         'desc_relationSettingsHeader' => 'Met elke factuur die naar Acumulus verstuurd word, worden ook de klantgegevens meegestuurd. Hier kunt u instellen hoe dit precies dient te gebeuren.',
@@ -99,9 +123,11 @@ Zie <a href="http://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastin
         'option_contactStatus_Active' => 'Ja',
         'option_contactStatus_Disabled' => 'Nee',
 
+        'field_contactYourId' => 'Klantreferentie v/d webshop',
+        'desc_contactYourId' => 'Als u van een relatie in Acumulus de webshopgegevens wilt opzoeken is het handig als Acumulus het voor de webshop unieke klantnummer ook heeft. Met behulp van dit veld wordt deze referentie in Acumulus opgeslagen. Deze kan ook op factuursjablonen gebruikt worden.',
+
         'field_salutation' => 'Volledige aanhef',
-        // @todo: extract token use into separate fieldset and provide a list of tokens.
-        'desc_salutation' => 'U kunt hier de aanhef specificeren zoals u die wilt gebruiken als u communiceert met deze klant. U kunt [#property] gebruiken om een waarde uit de order of klantgegevens te gebruiken, b.v. "Beste [#firstName],".',
+        'desc_salutation' => 'U kunt hier de aanhef specificeren zoals u die wilt gebruiken als u communiceert met deze klant.',
 
         'field_clientData' => 'Klantadresgegevens',
         'option_sendCustomer' => 'Uw (niet zakelijke) klanten automatisch aan uw relaties in Acumulus toevoegen.',

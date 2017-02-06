@@ -59,7 +59,21 @@ interface ConfigInterface
      *   - defaultCustomerType
      *   - sendCustomer
      *   - genericCustomerEmail
+     *   - contactYourId
+     *   - contactStatus
+     *   - companyName1
+     *   - companyName2
+     *   - fullName
+     *   - address1
+     *   - address2
+     *   - postalCode
+     *   - city
+     *   - vatNumber
+     *   - telephone
+     *   - fax
+     *   - email
      *   - overwriteIfExists
+     *   - mark
      */
     public function getCustomerSettings();
 

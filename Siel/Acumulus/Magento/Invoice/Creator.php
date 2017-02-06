@@ -66,58 +66,19 @@ class Creator extends BaseCreator
     /**
      * {@inheritdoc}
      */
-    protected function getCustomer()
+    protected function setPropertySources()
     {
-        $result = array();
-
-        /** @var Mage_Sales_Model_Order|Mage_Sales_Model_Order_Creditmemo $order */
-        $order = $this->creditNote !== null ? $this->creditNote : $this->order;
-
-        if ($order->getCustomerId()) {
-            /** @var Mage_Customer_Model_Customer $customer */
-            $customer = Mage::getModel('customer/customer')->load($order->getCustomerId());
-            $result['contactyourid'] = $customer->getId();
-            /** @noinspection PhpUndefinedMethodInspection */
-            $this->addIfNotEmpty($result, 'contactyourid', $customer->getIncrementId());
-        }
-
-        $invoiceAddress = $order->getBillingAddress();
-        $this->addEmpty($result, 'companyname1', $invoiceAddress->getCompany());
-        $result['fullname'] = $invoiceAddress->getFirstname() . ' ' . $invoiceAddress->getLastname();
-        $this->addEmpty($result, 'address1', $invoiceAddress->getStreet(1));
-        $this->addEmpty($result, 'address2', $invoiceAddress->getStreet(2));
-        $this->addEmpty($result, 'postalcode', $invoiceAddress->getPostcode());
-        $this->addEmpty($result, 'city', $invoiceAddress->getCity());
-        if ($invoiceAddress->getCountryId()) {
-            $result['countrycode'] = $invoiceAddress->getCountry();
-        }
-        // Magento has 2 VAT numbers:
-        // http://magento.stackexchange.com/questions/42164/there-are-2-vat-fields-in-onepage-checkout-which-one-should-i-be-using
-        $this->addIfNotEmpty($result, 'vatnumber', $order->getCustomerTaxvat());
-        /** @noinspection PhpUndefinedMethodInspection */
-        $this->addIfNotEmpty($result, 'vatnumber', $invoiceAddress->getVatId());
-        $this->addIfNotEmpty($result, 'telephone', $invoiceAddress->getTelephone());
-        $this->addIfNotEmpty($result, 'fax', $invoiceAddress->getFax());
-        $result['email'] = $invoiceAddress->getEmail();
-
-        return $result;
+        parent::setPropertySources();
+        $this->propertySources['billingAddress'] = $this->invoiceSource->getSource()->getBillingAddress();
+        $this->propertySources['customer'] = Mage::getModel('customer/customer')->load($this->invoiceSource->getSource()->getCustomerId());
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function searchProperty($property)
+    protected function getCountryCode()
     {
-        $invoiceAddress = $this->invoiceSource->getSource()->getBillingAddress();
-        $value = $this->getProperty($property, $invoiceAddress);
-        if (empty($value)) {
-            $customer = Mage::getModel('customer/customer')->load($this->invoiceSource->getSource()->getCustomerId());
-            $value = $this->getProperty($property, $customer);
-        }
-        if (empty($value)) {
-            $value = parent::searchProperty($property);
-        }
-        return $value;
+        return $this->invoiceSource->getSource()->getBillingAddress()->getCountry();
     }
 
     /**

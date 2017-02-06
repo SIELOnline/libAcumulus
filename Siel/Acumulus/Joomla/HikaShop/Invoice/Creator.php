@@ -44,62 +44,21 @@ class Creator extends BaseCreator
     /**
      * {@inheritdoc}
      */
-    protected function getCustomer()
+    protected function setPropertySources()
     {
-        $result = array();
-
-        $this->addIfNotEmpty($result, 'contactyourid', $this->order->order_user_id);
-
-        $billingAddress = $this->order->billing_address;
-        if (!empty($billingAddress)) {
-            // @todo: hoe kan een klant dit (en vat#) invullen?
-            $this->addIfNotEmpty($result, 'companyname1', $billingAddress->address_company);
-            if (!empty($result['companyname1'])) {
-                $this->addIfNotEmpty($result, 'vatnumber', $billingAddress->address_vat);
-            }
-            $result['fullname'] = $billingAddress->address_lastname;
-            if (!empty($billingAddress->address_middle_name)) {
-                $result['fullname'] = $billingAddress->address_middle_name . ' ' . $result['fullname'];
-            }
-            if (!empty($billingAddress->address_firstname)) {
-                $result['fullname'] = $billingAddress->address_firstname . ' ' . $result['fullname'];
-            }
-            if (empty($result['fullname'])) {
-                $this->addIfNotEmpty($result, 'fullname', $this->order->customer->name);
-            }
-            $this->addIfNotEmpty($result, 'address1', $billingAddress->address_street);
-            $this->addIfNotEmpty($result, 'address2', $billingAddress->address_street2);
-            $this->addIfNotEmpty($result, 'postalcode', $billingAddress->address_post_code);
-            $this->addIfNotEmpty($result, 'city', $billingAddress->address_city);
-            $this->addIfNotEmpty($result, 'countrycode', $billingAddress->address_country_code_2);
-            // Preference for 1st phone number.
-            $this->addIfNotEmpty($result, 'telephone', $billingAddress->address_telephone2);
-            $this->addIfNotEmpty($result, 'telephone', $billingAddress->address_telephone);
-            $this->addIfNotEmpty($result, 'fax', $billingAddress->address_fax);
-        } else {
-            $this->addIfNotEmpty($result, 'fullname', $this->order->customer->name);
+        parent::setPropertySources();
+        if (!empty($this->order->billing_address)) {
+            $this->propertySources['billing_address'] = $this->order->billing_address;
         }
-
-        // Preference for the user email, not the registration email.
-        $this->addIfNotEmpty($result, 'email', $this->order->customer->email);
-        $this->addIfNotEmpty($result, 'email', $this->order->customer->user_email);
-
-        return $result;
+        $this->propertySources['customer'] = $this->order->customer;
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function searchProperty($property)
+    protected function getCountryCode()
     {
-        $value = @$this->getProperty($property, $this->order);
-        if (empty($value)) {
-            $value = @$this->getProperty($property, $this->order->billing_address);
-            if (empty($value)) {
-                $value = @$this->getProperty($property, $this->order->customer);
-            }
-        }
-        return $value;
+        return !empty($this->order->billing_address->address_country_code_2) ? $this->order->billing_address->address_country_code_2 : '';
     }
 
     /**

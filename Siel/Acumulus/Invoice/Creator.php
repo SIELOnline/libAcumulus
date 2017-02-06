@@ -1,9 +1,9 @@
 <?php
 namespace Siel\Acumulus\Invoice;
 
-use Exception;
 use Siel\Acumulus\Helpers\Countries;
 use Siel\Acumulus\Helpers\Number;
+use Siel\Acumulus\Helpers\Token;
 use Siel\Acumulus\Helpers\TranslatorInterface;
 
 /**
@@ -64,6 +64,13 @@ abstract class Creator
     protected $invoiceSource;
 
     /**
+     * The list of sources to search for properties.
+     *
+     * @var array
+     */
+    protected $propertySources;
+
+    /**
      * Constructor.
      *
      * @param \Siel\Acumulus\Invoice\ConfigInterface $config
@@ -109,6 +116,16 @@ abstract class Creator
     }
 
     /**
+     * Sets the list of sources to search for a property when expanding tokens.
+     */
+    protected function setPropertySources()
+    {
+        $this->propertySources = array(
+            'source' => $this->invoiceSource->getSource()
+        );
+    }
+
+    /**
      * Creates an Acumulus invoice from an order or credit note.
      *
      * @param Source $source
@@ -120,9 +137,9 @@ abstract class Creator
     public function create($source)
     {
         $this->setInvoiceSource($source);
+        $this->setPropertySources();
         $this->invoice = array();
         $this->invoice['customer'] = $this->getCustomer();
-        $this->addCustomerDefaults();
         $this->invoice['customer']['invoice'] = $this->getInvoice();
         $this->addPaymentMethodBasedDefaults();
         $this->addInvoiceDefaults();
@@ -156,153 +173,60 @@ abstract class Creator
      * - fax
      * - email: used to identify clients.
      * - overwriteifexists: not needed, will be filled by the Completor
-     * - bankaccountnumber
+     * - bankaccountnumber: not used for now: no webshop software stores this.
      * - mark
      *
      * @return array
      *   A keyed array with the customer data.
      */
-    abstract protected function getCustomer();
-
-    /**
-     * Completes the customer part with default settings that do not depend on
-     * shop specific data.
-     */
-    protected function addCustomerDefaults()
+    protected function getCustomer()
     {
+        $customer = array();
         $customerSettings = $this->config->getCustomerSettings();
-        $this->addDefault($this->invoice['customer'], 'type', $customerSettings['defaultCustomerType']);
-        $this->addDefaultEmpty($this->invoice['customer'], 'contactstatus', $customerSettings['contactStatus']);
-        if (!empty($customerSettings['salutation'])) {
-            $this->invoice['customer']['salutation'] = $this->getSalutation($customerSettings['salutation']);
-        }
-        $this->addDefault($this->invoice['customer'], 'countrycode', 'nl');
-        $this->convertEuCountryCode();
-        $this->addDefault($this->invoice['customer'], 'country', $this->countries->getCountryName($this->invoice['customer']['countrycode']));
-        $this->addDefaultEmpty($this->invoice['customer'], 'overwriteifexists', $customerSettings['overwriteIfExists'] ? ConfigInterface::OverwriteIfExists_Yes : ConfigInterface::OverwriteIfExists_No);
+        $this->addDefault($customer, 'type', $customerSettings['defaultCustomerType']);
+        $this->addTokenDefault($customer, 'contactyourid', $customerSettings['contactYourId']);
+        $this->addDefaultEmpty($customer, 'contactstatus', $customerSettings['contactStatus']);
+        $this->addTokenDefault($customer, 'companyname1', $customerSettings['companyName1']);
+        $this->addTokenDefault($customer, 'companyname2', $customerSettings['companyName2']);
+        $this->addTokenDefault($customer, 'vatnumber', $customerSettings['vatNumber']);
+        $this->addTokenDefault($customer, 'fullname', $customerSettings['fullName']);
+        $this->addTokenDefault($customer, 'salutation', $customerSettings['salutation']);
+        $this->addTokenDefault($customer, 'address1', $customerSettings['address1']);
+        $this->addTokenDefault($customer, 'address2', $customerSettings['address2']);
+        $this->addTokenDefault($customer, 'postalcode', $customerSettings['postalCode']);
+        $this->addTokenDefault($customer, 'city', $customerSettings['city']);
+        $customer['countrycode'] = $this->countries->convertEuCountryCode($this->getCountryCode());
+        $this->addDefault($customer, 'country', $this->countries->getCountryName($customer['countrycode']));
+        $this->addTokenDefault($customer, 'telephone', $customerSettings['telephone']);
+        $this->addTokenDefault($customer, 'fax', $customerSettings['fax']);
+        $this->addTokenDefault($customer, 'email', $customerSettings['email']);
+        $this->addDefaultEmpty($customer, 'overwriteifexists', $customerSettings['overwriteIfExists'] ? ConfigInterface::OverwriteIfExists_Yes : ConfigInterface::OverwriteIfExists_No);
+        $this->addTokenDefault($customer, 'mark', $customerSettings['mark']);
+        return $customer;
     }
 
     /**
-     * Returns the salutation based on the (customer) setting for the salutation.
+     * Wrapper method around Token::expand().
      *
-     * This base implementation will do token expansion by searching for tokens
-     * and calling the getProperty() method for each token found. So, normally it
-     * won't be necessary to override this method, as overriding getProperty will
-     * be more likely.
-     *
-     * @param string $salutation
+     * @param string $pattern
      *
      * @return string
-     *   The salutation for the customer of this order.
+     *   The pattern with tokens expanded with their actual value.
      */
-    protected function getSalutation($salutation)
+    protected function getTokenizedValue($pattern)
     {
-        $salutation = preg_replace_callback('/\[#([^]]+)]/', array($this, 'salutationMatch'), $salutation);
-        return $salutation;
+        $token = new Token();
+        return $token->expand($pattern, $this->propertySources);
     }
 
     /**
-     * Callback for the preg_replace_callback call in Creator::getSalutation().
-     *
-     * This base implementation call the getProperty() method with the part of the
-     * match between the #s, so, normally it won't be necessary to override this
-     * method, as overriding getProperty will be more likely.
-     *
-     * @param array $matches
+     * Returns the country code for the order.
      *
      * @return string
-     *   The salutation for the customer of this order.
+     *   The 2 letter country code for the current order or the empty string if
+     *   not set.
      */
-    protected function salutationMatch($matches)
-    {
-        return $this->searchProperty($matches[1]);
-    }
-
-    /**
-     * Searches for a property in the various shop specific arrays and/or objects.
-     *
-     * This base implementation only looks up in the shop source object or array,
-     * but that may be insufficient if the customer data is in a separate object
-     * or array.
-     *
-     * @param string $property
-     *
-     * @return string
-     *
-     */
-    protected function searchProperty($property)
-    {
-        return $this->getProperty($property, $this->invoiceSource->getSource());
-    }
-
-    /**
-     * Looks up a property in the web shop specific order object/array.
-     *
-     * This default implementation looks for the property in the following ways:
-     * If the passed parameter is an array:
-     * - looking up the property as key.
-     * If the passed parameter is an object:
-     * - Looking up the property by name (as existing property or via __get).
-     * - Calling the get{Property} getter.
-     * - Calling the {property}() method (as existing method or via __call).
-     *
-     * Override if the property name or getter method is constructed differently.
-     *
-     * @param string $property
-     * @param object|array $object
-     *
-     * @return string
-     *   The value for the property of the given name or the empty string if not
-     *   available.
-     */
-    protected function getProperty($property, $object)
-    {
-        $value = '';
-        if (is_array($object)) {
-            if (isset($object[$property])) {
-                $value = $object[$property];
-            }
-        } else {
-            if (isset($object->$property)) {
-                $value = $object->$property;
-            } elseif (method_exists($object, $property)) {
-                $value = $object->$property();
-            } else {
-                $method = 'get' . ucfirst($property);
-                if (method_exists($object, $method)) {
-                    $value = $object->$method();
-                } elseif (method_exists($object, '__get')) {
-                    @$value = $object->$property;
-                } elseif (method_exists($object, '__call')) {
-                    try {
-                        $value = @$object->$property();
-                    } catch (Exception $e) {
-                    }
-                    if (empty($value)) {
-                        try {
-                            $value = $object->$method();
-                        } catch (Exception $e) {
-                        }
-                    }
-                }
-            }
-        }
-        return $value;
-    }
-
-    /**
-     * Wrapper around Countries::convertEuCountryCod().
-     *
-     * Converts EU country codes to their ISO equivalent:
-     * - Change UK to GB
-     * - Change EL to GR.
-     *
-     * This could/should be server side, but for now it is done client side.
-     */
-    protected function convertEuCountryCode()
-    {
-        $this->invoice['customer']['countrycode'] = $this->countries->convertEuCountryCode($this->invoice['customer']['countrycode']);
-    }
+    abstract protected function getCountryCode();
 
     /**
      * Returns the 'invoice' part of the invoice add structure.
@@ -790,6 +714,31 @@ abstract class Creator
     }
 
     /**
+     * Helper method to add a non-empty possibly tokenized value to an array.
+     *
+     * This method will not overwrite existing values.
+     *
+     * @param array $array
+     * @param string $key
+     * @param string $token
+     *   String value that may contain token definitions.
+     *
+     * @return bool
+     *   Whether the default was added.
+     */
+    protected function addTokenDefault(array &$array, $key, $token)
+    {
+        if (empty($array[$key]) && !empty($token)) {
+            $value = $this->getTokenizedValue($token);
+            if (!empty($value)) {
+                $array[$key] = $value;
+                return TRUE;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Helper method to add a value from an array or object only if it is set and
      * not empty.
      *
@@ -861,7 +810,7 @@ abstract class Creator
     }
 
     /**
-     * Helper method to add a default value to an array.
+     * Helper method to add a default non-empty value to an array.
      *
      * This method will not overwrite existing values.
      *

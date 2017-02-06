@@ -122,6 +122,12 @@ class AdvancedConfigForm extends BaseConfigForm
 
         if ($accountOk) {
             $fields += array(
+                'tokenHelpHeader' => array(
+                    'type' => 'details',
+                    'legend' => $this->t('tokenHelpHeader'),
+                    'description' => $this->t('desc_tokens'),
+                    'fields' => $this->getTokenFields(),
+                ),
                 'relationSettingsHeader' => array(
                     'type' => 'fieldset',
                     'legend' => $this->t('relationSettingsHeader'),
@@ -157,6 +163,90 @@ class AdvancedConfigForm extends BaseConfigForm
     }
 
     /**
+     *
+     *
+     *
+     * @return array
+     *   The set of possible tokens per object
+     */
+    protected function getTokenFields() {
+        return $this->tokenInfo2Fields($this->shopCapabilities->getTokenInfo());
+    }
+
+    /**
+     * Returns a set of token info fields based on the shop specific token info.
+     *
+     * @param string[][][] $tokenInfo
+     *
+     * @return array
+     *   Form fields.
+     */
+    protected function tokenInfo2Fields(array $tokenInfo)
+    {
+        $fields = array();
+        foreach ($tokenInfo as $variableName => $variableInfo) {
+            $fields[] = $this->get1TokenField($variableName, $variableInfo);
+        }
+        return $fields;
+    }
+
+    /**
+     * Returns a set of token info fields based on the shop specific token info.
+     *
+     * @param string $variableName
+     * @param string[][] $variableInfo
+     *
+     * @return array Form fields.
+     * Form fields.
+     */
+    protected function get1TokenField($variableName, array $variableInfo)
+    {
+        $value = "<p class='property-name'><strong>$variableName</strong>";
+
+        if (!empty($variableInfo['more-info'])) {
+            $value .= ' ' . $variableInfo['more-info'];
+        }
+        elseif (!empty($variableInfo['class'])) {
+            if (!empty($variableInfo['file'])) {
+                $value .= ' (' . sprintf($this->t('see_class_file'), $variableInfo['class'], $variableInfo['file']) . ')';
+            }
+            else {
+                $value .= ' (' . sprintf($this->t('see_class'), $variableInfo['class']) . ')';
+            }
+        }
+        elseif (!empty($variableInfo['table'])) {
+            $value .= ' (' . sprintf($this->t('see_table'), $variableInfo['table']) . ')';
+        }
+        elseif (!empty($variableInfo['file'])) {
+            $value .= ' (' . sprintf($this->t('see_file'), $variableInfo['file']) . ')';
+        }
+
+        $value .= ':</p>';
+
+        if (!empty($variableInfo['properties'])) {
+            $value .= '<ul class="property-list">';
+            foreach ($variableInfo['properties'] as $property) {
+                $value .= "<li>$property</li>";
+            }
+
+            if (!empty($variableInfo['properties-more'])) {
+                if (!empty($variableInfo['class'])) {
+                    $value .= '<li>' . sprintf($this->t('see_class_more'), $variableInfo['class']) . '</li>';
+                }
+                elseif (!empty($variableInfo['table'])) {
+                    $value .= '<li>' . sprintf($this->t('see_table_more'), $variableInfo['table']) . '</li>';
+                }
+            }
+            $value .= '</ul>';
+        }
+
+        return array(
+            'type'=> 'markup',
+            'value' => $value,
+        );
+    }
+
+    /**
      * Returns the set of relation management fields.
      *
      * The fields returned:
@@ -171,6 +261,15 @@ class AdvancedConfigForm extends BaseConfigForm
     protected function getRelationFields()
     {
         $fields = array(
+            'clientData' => array(
+                'type' => 'checkbox',
+                'label' => $this->t('field_clientData'),
+                'description' => $this->t('desc_clientData'),
+                'options' => array(
+                    'sendCustomer' => $this->t('option_sendCustomer'),
+                    'overwriteIfExists' => $this->t('option_overwriteIfExists'),
+                ),
+            ),
             'defaultCustomerType' => array(
                 'type' => 'select',
                 'label' => $this->t('field_defaultCustomerType'),
@@ -182,21 +281,20 @@ class AdvancedConfigForm extends BaseConfigForm
                 'description' => $this->t('desc_contactStatus'),
                 'options' => $this->getContactStatusOptions(),
             ),
+            'contactYourId' => array(
+                'type' => 'text',
+                'label' => $this->t('field_contactYourId'),
+                'description' => $this->t('desc_contactYourId') . ' ' . $this->t('msg_token'),
+                'attributes' => array(
+                    'size' => 30,
+                ),
+            ),
             'salutation' => array(
                 'type' => 'text',
                 'label' => $this->t('field_salutation'),
                 'description' => $this->t('desc_salutation'),
                 'attributes' => array(
                     'size' => 30,
-                ),
-            ),
-            'clientData' => array(
-                'type' => 'checkbox',
-                'label' => $this->t('field_clientData'),
-                'description' => $this->t('desc_clientData'),
-                'options' => array(
-                    'sendCustomer' => $this->t('option_sendCustomer'),
-                    'overwriteIfExists' => $this->t('option_overwriteIfExists'),
                 ),
             ),
         );

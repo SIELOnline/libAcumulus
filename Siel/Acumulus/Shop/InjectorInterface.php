@@ -25,6 +25,33 @@ interface InjectorInterface
     public function getTranslator();
 
     /**
+     * @return \Siel\Acumulus\Helpers\Mailer
+     */
+    public function getMailer();
+
+    /**
+     * @return \Siel\Acumulus\Helpers\Token
+     */
+    public function getToken();
+
+    /**
+     * @param string $type
+     *   The type of form requested.
+     *
+     * @return \Siel\Acumulus\Helpers\Form
+     *
+     * @todo: start using this in all plugins.
+     */
+    public function getForm($type);
+
+    /**
+     * @return \Siel\Acumulus\Helpers\FormRenderer
+     *
+     * @todo: start using this in all plugins.
+     */
+    public function getFormRenderer();
+
+    /**
      * @return \Siel\Acumulus\Web\Service
      */
     public function getService();
@@ -69,11 +96,6 @@ interface InjectorInterface
     public function getCreator();
 
     /**
-     * @return \Siel\Acumulus\Helpers\Mailer
-     */
-    public function getMailer();
-
-    /**
      * @return \Siel\Acumulus\Shop\ConfigStoreInterface
      */
     public function getConfigStore();
@@ -92,21 +114,4 @@ interface InjectorInterface
      * @return \Siel\Acumulus\Shop\AcumulusEntryModel
      */
     public function getAcumulusEntryModel();
-
-    /**
-     * @param string $type
-     *   The type of form requested.
-     *
-     * @return \Siel\Acumulus\Helpers\Form
-     *
-     * @todo: start using this in all plugins.
-     */
-    public function getForm($type);
-
-    /**
-     * @return \Siel\Acumulus\Helpers\FormRenderer
-     *
-     * @todo: start using this in all plugins.
-     */
-    public function getFormRenderer();
 }

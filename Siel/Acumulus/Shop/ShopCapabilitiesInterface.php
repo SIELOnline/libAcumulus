@@ -10,6 +10,21 @@ namespace Siel\Acumulus\Shop;
 interface ShopCapabilitiesInterface
 {
     /**
+     * Returns a list with the shop specific tokens.
+     *
+     * @return string[][]
+     *   An array with arrays of tokens keyed by the object name.
+     */
+    public function getTokenInfo();
+
+    /**
+     * Returns an array with shop specific configuration defaults.
+     *
+     * @return array
+     */
+    public function getShopDefaults();
+
+    /**
      * Returns a list of invoice source types supported by this shop.
      *
      * The default implementation returns order and credit note. Override if the

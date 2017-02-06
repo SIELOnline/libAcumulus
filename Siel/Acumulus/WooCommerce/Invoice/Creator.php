@@ -48,48 +48,58 @@ class Creator extends BaseCreator
     /**
      * {@inheritdoc}
      */
-    protected function getCustomer()
+    protected function setPropertySources()
     {
-        $result = array();
-
-        $order = $this->order;
-
-        $this->addIfNotEmpty($result, 'contactyourid', $order->customer_user);
-        $this->addEmpty($result, 'companyname1', $order->billing_company);
-        $result['fullname'] = $order->billing_first_name . ' ' . $order->billing_last_name;
-        $this->addEmpty($result, 'address1', $order->billing_address_1);
-        $this->addEmpty($result, 'address2', $order->billing_address_2);
-        $this->addEmpty($result, 'postalcode', $order->billing_postcode);
-        $this->addEmpty($result, 'city', $order->billing_city);
-        if (isset($order->billing_country)) {
-            $result['countrycode'] = $order->billing_country;
+        parent::setPropertySources();
+        $this->propertySources['meta'] = array($this, 'getSourceMeta');
+        if ($this->invoiceSource->getType() === Source::CreditNote) {
+            $this->propertySources['order'] = $this->order;
+            $this->propertySources['order_meta'] = array($this, 'getOrderMeta');
         }
-        // The EU VAT Number plugin allows customers to indicate their VAT number as
-        // to apply for the reversed VAT scheme. The vat number is stored under the
-        // '_vat_number' meta key, though older versions did so under the
-        // 'VAT Number' key.
-        // See http://docs.woothemes.com/document/eu-vat-number-2/
-        $this->addIfNotEmpty($result, 'vatnumber', get_post_meta($order->id, 'VAT Number', true));
-        $this->addIfNotEmpty($result, 'vatnumber', get_post_meta($order->id, 'vat_number', true));
-        $this->addIfNotEmpty($result, 'telephone', $order->billing_phone);
-        $result['email'] = $order->billing_email;
+    }
 
-        return $result;
+    /**
+     * Token callback to access the post meta when resolving tokens.
+     *
+     * @param string $property
+     *
+     * @return null|string
+     *   The value for the meta data with the given name, null if not available.
+     */
+    public function getSourceMeta($property) {
+        $value = get_post_meta($this->invoiceSource->getSource()->id, $property, true);
+        // get_post_meta() can return false or ''.
+        if (empty($value)) {
+            // Not found: indicate so by returning null.
+            $value = null;
+        }
+        return $value;
+    }
+
+    /**
+     * Token callback to access the order post meta when resolving tokens.
+     *
+     * @param string $property
+     *
+     * @return null|string
+     *   The value for the meta data with the given name, null if not available.
+     */
+    public function getOrderMeta($property) {
+        $value = get_post_meta($this->order->id, $property, true);
+        // get_post_meta() can return false or ''.
+        if (empty($value)) {
+            // Not found: indicate so by returning null.
+            $value = null;
+        }
+        return $value;
     }
 
     /**
      * {@inheritdoc}
-     *
-     * For refunds, this override also searches in the order that gets refunded.
      */
-    protected function searchProperty($property)
+    protected function getCountryCode()
     {
-        $value = parent::searchProperty($property);
-        if (empty($value) && $this->invoiceSource->getType() === Source::CreditNote) {
-            // Also try the order that gets refunded.
-            $value = $this->getProperty($property, $this->order);
-        }
-        return $value;
+        return isset($this->order->billing_country) ? $this->order->billing_country : '';
     }
 
     /**

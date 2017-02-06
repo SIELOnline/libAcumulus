@@ -13,6 +13,28 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
+    public function getShopDefaults()
+    {
+        return array(
+            'contactYourId' => '[customer::incrementId|customer::id]', // Mage_Customer_Model_Customer
+            'companyName1' => '[company]', // Mage_Sales_Model_Order_Address
+            'fullName' => '[firstName+lastName]', // Mage_Sales_Model_Order_Address
+            'address1' => '[street1]', // Mage_Sales_Model_Order_Address
+            'address2' => '[street2]', // Mage_Sales_Model_Order_Address
+            'postalCode' => '[postcode]', // Mage_Sales_Model_Order_Address
+            'city' => '[city]', // Mage_Sales_Model_Order_Address
+            // Magento has 2 VAT numbers:
+            // http://magento.stackexchange.com/questions/42164/there-are-2-vat-fields-in-onepage-checkout-which-one-should-i-be-using
+            'vatNumber' => '[vatId|customerTaxvat]', // Mage_Sales_Model_Order
+            'telephone' => '[telephone]', // Mage_Sales_Model_Order_Address
+            'fax' => '[fax]', // Mage_Sales_Model_Order_Address
+            'email' => '[email]', // Mage_Sales_Model_Order_Address
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getShopOrderStatuses()
     {
         $items = Mage::getModel('sales/order_status')->getResourceCollection()->getData();

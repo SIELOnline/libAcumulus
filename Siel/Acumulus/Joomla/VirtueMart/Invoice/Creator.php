@@ -102,54 +102,26 @@ class Creator extends BaseCreator
     /**
      * {@inheritdoc}
      */
-    protected function getCustomer()
+    protected function setPropertySources()
     {
-        $result = array();
-
-        $this->addIfSetAndNotEmpty($result, 'contactyourid', $this->order['details']['BT'], 'virtuemart_user_id');
-        $this->addIfSetAndNotEmpty($result, 'companyname1', $this->order['details']['BT'], 'company');
-        if (!empty($result['companyname1']) && !empty($this->userBtUid)) {
-            // @todo: there's also a (paid) EU VAT checker extension that probably does not use the field 'tax_exemption_number'.
-            $this->addIfSetAndNotEmpty($result, 'vatnumber', $this->user->userInfo[$this->userBtUid], 'tax_exemption_number');
-        }
-        $result['fullname'] = $this->order['details']['BT']->last_name;
-        if (!empty($this->order['details']['BT']->middle_name)) {
-            $result['fullname'] = $this->order['details']['BT']->middle_name . ' ' . $result['fullname'];
-        }
-        if (!empty($this->order['details']['BT']->first_name)) {
-            $result['fullname'] = $this->order['details']['BT']->first_name . ' ' . $result['fullname'];
-        }
-        $this->addIfSetAndNotEmpty($result, 'address1', $this->order['details']['BT'], 'address_1');
-        $this->addIfSetAndNotEmpty($result, 'address2', $this->order['details']['BT'], 'address_2');
-        $this->addIfSetAndNotEmpty($result, 'postalcode', $this->order['details']['BT'], 'zip');
-        $this->addIfSetAndNotEmpty($result, 'city', $this->order['details']['BT'], 'city');
-        if (!empty($this->order['details']['BT']->virtuemart_country_id)) {
-            /** @var \VirtueMartModelCountry $countryModel */
-            $countryModel = VmModel::getModel('country');
-            $country = $countryModel->getData($this->order['details']['BT']->virtuemart_country_id);
-            $this->addIfSetAndNotEmpty($result, 'countrycode', $country, 'country_2_code');
-        }
-        $this->addIfSetAndNotEmpty($result, 'telephone', $this->order['details']['BT'], 'phone_2');
-        $this->addIfSetAndNotEmpty($result, 'telephone', $this->order['details']['BT'], 'phone_1');
-        $this->addIfSetAndNotEmpty($result, 'fax', $this->order['details']['BT'], 'fax');
-        $this->addIfSetAndNotEmpty($result, 'email', $this->order['details']['BT'], 'email');
-
-        return $result;
+        parent::setPropertySources();
+        $this->propertySources['BT'] = $this->order['details']['BT'];
+        $this->propertySources['user'] = $this->user;
+        $this->propertySources['userInfo'] = $this->user->userInfo[$this->userBtUid];
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function searchProperty($property)
+    protected function getCountryCode()
     {
-        $value = @$this->getProperty($property, $this->order['details']['BT']);
-        if (empty($value)) {
-            $value = @$this->getProperty($property, $this->user);
+        if (!empty($this->order['details']['BT']->virtuemart_country_id)) {
+            /** @var \VirtueMartModelCountry $countryModel */
+            $countryModel = VmModel::getModel('country');
+            $country = $countryModel->getData($this->order['details']['BT']->virtuemart_country_id);
+            return $country->country_2_code;
         }
-        if (empty($value)) {
-            $value = @$this->getProperty($property, $this->user->userInfo[$this->userBtUid]);
-        }
-        return $value;
+        return '';
     }
 
     /**

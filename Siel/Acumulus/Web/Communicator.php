@@ -170,7 +170,7 @@ class Communicator implements CommunicatorInterface
      * - communication with the Acumulus WebAPI service
      * - converting the answer to an array
      * are returned as an 'error' in the 'errors' part of the return value.
-     *
+     * @todo: throw an exception instead of setting an error.
      *
      * @param string $uri
      *   The URI of the Acumulus WebAPI call to send the message to.
@@ -232,6 +232,11 @@ class Communicator implements CommunicatorInterface
     }
 
     /**
+     * Sends the contents of $post to the given $uri.
+     *
+     * @todo: throw an exception on communication errors to better distinguish
+     *    communication errors and API errors (invoice could not be saved).
+     *
      * @param string $uri
      *   The uri to send the HTTP request to.
      * @param array|string $post

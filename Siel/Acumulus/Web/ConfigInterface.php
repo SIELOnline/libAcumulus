@@ -12,6 +12,9 @@ interface ConfigInterface
 {
     const libraryVersion = '4.7.0-alpha1';
 
+    // API result codes, internally I want an increasing order of worseness, so
+    // these constants are not used internally but mapped to the status_...
+    // constants below.
     const Api_Success = 0;
     const Api_Warnings = 2;
     const Api_Errors = 1;

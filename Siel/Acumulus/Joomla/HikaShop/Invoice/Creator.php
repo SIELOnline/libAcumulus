@@ -50,6 +50,9 @@ class Creator extends BaseCreator
         if (!empty($this->order->billing_address)) {
             $this->propertySources['billing_address'] = $this->order->billing_address;
         }
+        if (!empty($this->order->shipping_address)) {
+            $this->propertySources['shipping_address'] = $this->order->shipping_address;
+        }
         $this->propertySources['customer'] = $this->order->customer;
     }
 

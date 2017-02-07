@@ -262,11 +262,14 @@ class AdvancedConfigForm extends BaseConfigForm
                 $tableLast = array_pop($table);
                 $tableBeforeLast = array_pop($table);
                 array_push($table, $tableBeforeLast . ' ' . $this->t('and') . ' ' . $tableLast);
+                $result = sprintf($this->t($keyPlural), implode(', ', $table));
             }
-            $result = sprintf($this->t('see_tables'), implode(', ', $table));
+            else {
+                $result = sprintf($this->t($keySingle), reset($table));
+            }
         }
         else {
-            $result = sprintf($this->t('see_table'), $table);
+            $result = sprintf($this->t($keySingle), $table);
         }
         return $result;
     }

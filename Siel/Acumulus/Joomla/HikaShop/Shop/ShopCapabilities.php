@@ -13,6 +13,110 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
+    public function getTokenInfo() {
+        return array(
+            'source' => array(
+                'table' => array('hikashop_order'),
+                'properties' => array(
+                    'order_id',
+                    'order_billing_address_id',
+                    'order_shipping_address_id',
+                    'order_user_id',
+                    'order_status',
+                    'order_type',
+                    'order_number',
+                    'order_created',
+                    'order_modified',
+                    'order_invoice_id',
+                    'order_invoice_number',
+                    'order_invoice_created',
+                    'order_currency_id',
+                    'order_currency_info',
+                    'order_full_price',
+                    'order_discount_code',
+                    'order_discount_price',
+                    'order_discount_tax',
+                    'order_payment_id',
+                    'order_payment_method',
+                    'order_payment_price',
+                    'order_payment_tax',
+                    'order_shipping_id',
+                    'order_shipping_method',
+                    'order_shipping_price',
+                    'order_shipping_tax',
+                    'order_partner_id',
+                    'order_partner_price',
+                    'order_partner_paid',
+                    'order_partner_currency_id',
+                    'order_ip',
+                    'order_site_id',
+                    'comment',
+                    'deliverydate',
+                    'order_lang',
+                    'order_token',
+                ),
+                'properties-more' => true,
+            ),
+            'billing_address' => array(
+                'table' => 'hikashop_address',
+                'properties' => array(
+                    'address_id',
+                    'address_user_id',
+                    'address_title',
+                    'address_firstname',
+                    'address_middle_name',
+                    'address_lastname',
+                    'address_company',
+                    'address_street',
+                    'address_street2',
+                    'address_post_code',
+                    'address_city',
+                    'address_telephone',
+                    'address_telephone2',
+                    'address_fax',
+                    'address_state',
+                    'address_country',
+                    'address_published',
+                    'address_vat',
+                    'address_default',
+                    'address_type',
+                ),
+                'properties-more' => false,
+            ),
+            'shipping_address' => array(
+                'more-info' => $this->t('see_billing_address'),
+                'table' => 'hikashop_address',
+                'properties' => array(
+                    $this->t('see_above'),
+                ),
+                'properties-more' => false,
+            ),
+            'customer' => array(
+                'table' => 'hikashop_customer',
+                'properties' => array(
+                    'user_id',
+                    'user_cms_id',
+                    'user_email',
+                    'user_partner_email',
+                    'user_params',
+                    'user_partner_id',
+                    'user_partner_price',
+                    'user_partner_paid',
+                    'user_created_ip',
+                    'user_unpaid_amount',
+                    'user_partner_currency_id',
+                    'user_created',
+                    'user_currency_id',
+                    'user_partner_activated',
+                ),
+                'properties-more' => false,
+            ),
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getShopDefaults()
     {
         return array(
@@ -26,7 +130,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
             'city' => '[address_city]', // billing_address
             'vatNumber' => '[address_vat]', // billing_address
             'telephone' => '[address_telephone|address_telephone2]', // billing_address
-            'fax' => '[address_telephone|address_fax]', // billing_address
+            'fax' => '[address_telephone2|address_fax]', // billing_address
             'email' => '[user_email|email]', // customer
         );
     }

@@ -250,8 +250,8 @@ class ConfigForm extends BaseConfigForm
             ),
             'emailonerror' => array(
                 'type' => 'email',
-                'label' => $this->t('field_email'),
-                'description' => $this->t('desc_email'),
+                'label' => $this->t('field_emailonerror'),
+                'description' => $this->t('desc_emailonerror'),
                 'attributes' => array(
                     'required' => true,
                     'size' => 20,

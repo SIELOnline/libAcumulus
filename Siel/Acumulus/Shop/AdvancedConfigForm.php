@@ -123,7 +123,7 @@ class AdvancedConfigForm extends BaseConfigForm
         if ($accountOk) {
             $fields += array(
                 'tokenHelpHeader' => array(
-                    'type' => 'details',
+                    'type' => 'fieldset',
                     'legend' => $this->t('tokenHelpHeader'),
                     'description' => $this->t('desc_tokens'),
                     'fields' => $this->getTokenFields(),
@@ -215,7 +215,7 @@ class AdvancedConfigForm extends BaseConfigForm
             }
         }
         elseif (!empty($variableInfo['table'])) {
-            $value .= ' (' . sprintf($this->t('see_table'), $variableInfo['table']) . ')';
+            $value .= ' (' . $this->seeTable('see_table', 'see_tables', $variableInfo['table']) . ')';
         }
         elseif (!empty($variableInfo['file'])) {
             $value .= ' (' . sprintf($this->t('see_file'), $variableInfo['file']) . ')';
@@ -234,7 +234,7 @@ class AdvancedConfigForm extends BaseConfigForm
                     $value .= '<li>' . sprintf($this->t('see_class_more'), $variableInfo['class']) . '</li>';
                 }
                 elseif (!empty($variableInfo['table'])) {
-                    $value .= '<li>' . sprintf($this->t('see_table_more'), $variableInfo['table']) . '</li>';
+                    $value .= '<li>' . $this->seeTable('see_table_more', 'see_tables_more', $variableInfo['table']) . '</li>';
                 }
             }
             $value .= '</ul>';
@@ -244,6 +244,31 @@ class AdvancedConfigForm extends BaseConfigForm
             'type'=> 'markup',
             'value' => $value,
         );
+    }
+
+    /**
+     * Converts the contents of table to a human readable string.
+     *
+     * @param string $keySingle
+     * @param string $keyPlural
+     * @param string|array $table
+     *
+     * @return string
+     */
+    protected function seeTable($keySingle, $keyPlural, $table)
+    {
+        if (is_array($table)) {
+            if (count($table) > 1) {
+                $tableLast = array_pop($table);
+                $tableBeforeLast = array_pop($table);
+                array_push($table, $tableBeforeLast . ' ' . $this->t('and') . ' ' . $tableLast);
+            }
+            $result = sprintf($this->t('see_tables'), implode(', ', $table));
+        }
+        else {
+            $result = sprintf($this->t('see_table'), $table);
+        }
+        return $result;
     }
 
     /**
@@ -289,10 +314,96 @@ class AdvancedConfigForm extends BaseConfigForm
                     'size' => 30,
                 ),
             ),
+            'companyName1' => array(
+                'type' => 'text',
+                'label' => $this->t('field_companyName1'),
+                'attributes' => array(
+                    'size' => 30,
+                ),
+            ),
+            'companyName2' => array(
+                'type' => 'text',
+                'label' => $this->t('field_companyName2'),
+                'description' => $this->t('msg_tokens'),
+                'attributes' => array(
+                    'size' => 30,
+                ),
+            ),
+            'vatNumber' => array(
+                'type' => 'text',
+                'label' => $this->t('field_vatNumber'),
+                'description' => $this->t('desc_vatNumber') . ' ' . $this->t('msg_token'),
+                'attributes' => array(
+                    'size' => 30,
+                ),
+            ),
+            'fullName' => array(
+                'type' => 'text',
+                'label' => $this->t('field_fullName'),
+                'description' => $this->t('desc_fullName') . ' ' . $this->t('msg_token'),
+                'attributes' => array(
+                    'size' => 60,
+                ),
+            ),
             'salutation' => array(
                 'type' => 'text',
                 'label' => $this->t('field_salutation'),
-                'description' => $this->t('desc_salutation'),
+                'description' => $this->t('desc_salutation') . ' ' . $this->t('msg_token'),
+                'attributes' => array(
+                    'size' => 30,
+                ),
+            ),
+            'address1' => array(
+                'type' => 'text',
+                'label' => $this->t('field_address1'),
+                'attributes' => array(
+                    'size' => 30,
+                ),
+            ),
+            'address2' => array(
+                'type' => 'text',
+                'label' => $this->t('field_address2'),
+                'description' => $this->t('desc_address') . ' ' . $this->t('msg_tokens'),
+                'attributes' => array(
+                    'size' => 30,
+                ),
+            ),
+            'postalCode' => array(
+                'type' => 'text',
+                'label' => $this->t('field_postalCode'),
+                'description' => $this->t('msg_token'),
+                'attributes' => array(
+                    'size' => 30,
+                ),
+            ),
+            'city' => array(
+                'type' => 'text',
+                'label' => $this->t('field_city'),
+                'description' => $this->t('msg_token'),
+                'attributes' => array(
+                    'size' => 30,
+                ),
+            ),
+            'telephone' => array(
+                'type' => 'text',
+                'label' => $this->t('field_telephone'),
+                'description' => $this->t('desc_telephone') . ' ' . $this->t('msg_token'),
+                'attributes' => array(
+                    'size' => 30,
+                ),
+            ),
+            'fax' => array(
+                'type' => 'text',
+                'label' => $this->t('field_fax'),
+                'description' => $this->t('desc_fax') . ' ' . $this->t('msg_token'),
+                'attributes' => array(
+                    'size' => 30,
+                ),
+            ),
+            'email' => array(
+                'type' => 'email',
+                'label' => $this->t('field_email'),
+                'description' => $this->t('msg_token'),
                 'attributes' => array(
                     'size' => 30,
                 ),

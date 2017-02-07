@@ -45,8 +45,9 @@ class ConfigFormTranslations extends TranslationCollection
         'field_code' => 'Contractcode',
         'field_username' => 'Gebruikersnaam',
         'field_password' => 'Wachtwoord',
-        'field_email' => 'E-mail',
-        'desc_email' => 'Het e-mailadres waarop u geïnformeerd wordt over fouten die zijn opgetreden tijdens het versturen van facturen. Omdat deze module niet kan weten of het vanuit een beheerdersscherm is aangeroepen, zal het geen berichten op het scherm plaatsen. Daarom is het invullen van een e-mailadres verplicht.',
+        'field_emailonerror' => 'E-mail',
+        'desc_emailonerror' => 'Het e-mailadres waarop u geïnformeerd wordt over fouten die zijn opgetreden tijdens het versturen van facturen. Omdat deze module niet kan weten of het vanuit een beheerdersscherm is aangeroepen, zal het geen berichten op het scherm plaatsen. Daarom is het invullen van een e-mailadres verplicht.',
+
         'message_validate_contractcode_0' => 'Het veld Contractcode is verplicht, vul de contractcode in die u ook gebruikt om in te loggen op Acumulus.',
         'message_validate_contractcode_1' => 'Het veld Contractcode is een numeriek veld, vul de contractcode in die u ook gebruikt om in te loggen op Acumulus.',
         'message_validate_username_0' => 'Het veld Gebruikersnaam is verplicht, vul de gebruikersnaam in die u ook gebruikt om in te loggen op Acumulus.',
@@ -101,20 +102,26 @@ De eigenschappen die uw webshop kent worden hieronder opgesomd.</p>
 <dt>[property1+property2+...]:</dt><dd>Vervang door de waarde van property1 en die van property2 en plaats tussen de properties een spatie, maar alleen als de properties niet leeg zijn.BV: handig om de volledige naam, opgebouwd uit voornaam, tussenvoegsel en achternaam, te versturen zonder dat er meerdere spaties in terecht komen.</dd>
 <dt>[object::property]:</dt><dd>Vervang alleen door de eigenschap als die in het opgegeven object voorkomt (zie de lijst hieronder). Gebruik dit om verwarring te voorkomen als meerdere objecten een eigenschap met dezelfde naam hebben (bv id).</dd>
 </ol>
+<p><strong>Let op:</strong> in de meeste situaties zal de standaardwaarde goed zijn. Pas deze velden alleen aan in speciale omstandigheden.</p>
 ',
         'msg_token' => 'Dit veld mag tokens bevatten.',
+        'msg_tokens' => 'Deze velden mogen tokens bevatten.',
         'see_class' => 'zie de class %1$s',
         'see_file' => 'zie het bestand %1$s',
         'see_class_file' => 'zie de class %1$s in het bestand %2$s',
         'see_table' => 'zie de tabel %1$s',
+        'see_tables' => 'zie de tabellen %1$s',
+        'and' => 'en',
         'see_class_more' => 'zie de class %1$s voor mogelijk andere properties en methods zonder argumenten die als token gebruikt kunnen worden',
         'see_table_more' => 'zie de tabel %1$s voor mogelijk andere velden die als token gebruikt kunnen worden',
+        'see_tables_more' => 'zie de tabellen %1$s voor mogelijk andere velden die als token gebruikt kunnen worden',
         'see_above' => 'zie hierboven.',
-        'original_order_for_refund' => 'Oorspronkelijke bestelling, alleen beschikbaar bij refunds',
+        'original_order_for_refund' => 'Oorspronkelijke bestelling, alleen beschikbaar bij credit nota\'s',
+        'refund_only' => 'alleen bij een credit nota',
 
         // Relation management settings.
         'relationSettingsHeader' => 'Relatiebeheer',
-        'desc_relationSettingsHeader' => 'Met elke factuur die naar Acumulus verstuurd word, worden ook de klantgegevens meegestuurd. Hier kunt u instellen hoe dit precies dient te gebeuren.',
+        'desc_relationSettingsHeader' => 'Met elke factuur die naar Acumulus verstuurd word, worden ook de klantgegevens meegestuurd. Hier kunt u instellen hoe dit precies dient te gebeuren. De meeste velden hieronder kunnen opgenomen worden in uw factuursjablonen. Darom is het handig om er hier controle over te hebben over wat er in die velden komt te staan.',
 
         'field_defaultCustomerType' => 'Importeer klanten als',
 
@@ -126,8 +133,29 @@ De eigenschappen die uw webshop kent worden hieronder opgesomd.</p>
         'field_contactYourId' => 'Klantreferentie v/d webshop',
         'desc_contactYourId' => 'Als u van een relatie in Acumulus de webshopgegevens wilt opzoeken is het handig als Acumulus het voor de webshop unieke klantnummer ook heeft. Met behulp van dit veld wordt deze referentie in Acumulus opgeslagen. Deze kan ook op factuursjablonen gebruikt worden.',
 
+        'field_companyName1' => 'Bedrijfsnaam 1',
+        'field_companyName2' => 'Bedrijfsnaam 2',
+
+        'field_vatNumber' => 'BTW-nummer',
+        'desc_vatNumber' => 'Om een factuur met verlegde BTW aan te kunnen maken dient zowel de bedrijfsnaam als het intracommunautaire BTW-nummer bekend te zijn.',
+
+        'field_fullName' => 'Volledige naam',
+        'desc_fullName' => 'De volledige naam, meestal opgebouwd uit de voornaam, achternaam en evt. een tussenvoegsel.',
+
         'field_salutation' => 'Volledige aanhef',
         'desc_salutation' => 'U kunt hier de aanhef specificeren zoals u die wilt gebruiken als u communiceert met deze klant.',
+
+        'field_address1' => 'Adresregel 1',
+        'field_address2' => 'Adresregel 2',
+        'desc_address' => 'Vul hier het adresgedeelte in, zijnde straatnaam, huisnummer en evt. gebouw of appartementsaanduiding binnen het huisnummer. Met postcode plugins kan deze informatie verspreid zijn over meerdere velden in de webshop.',
+
+        'field_postalCode' => 'Postcode',
+        'field_city' => 'Plaatsnaam',
+        'field_telephone' => 'Telefoon',
+        'desc_telephone' => 'Het telefoonnummer dat u in Acumulus wilt opslaan. Acumulus kan maar 1 nummer opslaan. Dus als uw webshop wel een vast en mobiel nummer opslaat, dient u te kiezen welk nummer uw voorkeur heeft. Gebruik het | teken voor als de klant maar 1 nummer heeft ingevuld.',
+        'field_fax' => 'Fax',
+        'desc_fax' => 'De meeste webshops slaan geen fax nummer meer op. U kunt dit veld dan evt. gebruiken om een vast EN een mobiel nummer in Acumulus op te slaan (als uw webshop die wel allebei opslaat).',
+        'field_email' => 'Email',
 
         'field_clientData' => 'Klantadresgegevens',
         'option_sendCustomer' => 'Uw (niet zakelijke) klanten automatisch aan uw relaties in Acumulus toevoegen.',

@@ -14,6 +14,110 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
+    public function getTokenInfo() {
+        return array(
+            'BT' => array(
+                'table' => array('virtuemart_orders', 'virtuemart_order_userinfos'),
+                'properties' => array(
+                    // Table virtuemart_orders.
+                    'virtuemart_order_id',
+                    'virtuemart_vendor_id',
+                    'order_number',
+                    'customer_number',
+                    'order_total',
+                    'order_salesPrice',
+                    'order_billTaxAmount',
+                    'order_billTax',
+                    'order_billDiscountAmount',
+                    'order_discountAmount',
+                    'order_subtotal',
+                    'order_tax',
+                    'order_shipment',
+                    'order_shipment_tax',
+                    'order_payment',
+                    'order_payment_tax',
+                    'coupon_discount',
+                    'coupon_code',
+                    'order_discount',
+                    'order_currency',
+                    'order_status',
+                    // 1 field from table virtuemart_orderstates.
+                    'order_status_name',
+                    'user_currency_id',
+                    'user_currency_rate',
+                    'payment_currency_id',
+                    'payment_currency_rate',
+                    'virtuemart_paymentmethod_id',
+                    'virtuemart_shipmentmethod_id',
+                    'delivery_date',
+                    'order_language',
+                    'ip_address',
+                    // Table virtuemart_order_userinfos.
+                    'virtuemart_order_userinfo_id',
+                    'virtuemart_order_id',
+                    'virtuemart_user_id',
+                    'address_type',
+                    'address_type_name',
+                    'company',
+                    'title',
+                    'last_name',
+                    'first_name',
+                    'middle_name',
+                    'phone_1',
+                    'phone_2',
+                    'fax',
+                    'address_1',
+                    'address_2',
+                    'city',
+                    'virtuemart_state_id',
+                    'virtuemart_country_id',
+                    'zip',
+                    'email',
+                    'agreed',
+                    'tos',
+                    'customer_note',
+                    // 1 constructed field.
+                    'order_name',
+                    'phone_1',
+                    'phone_2',
+                    'fax',
+                    'address_1',
+                    'address_2',
+                    'city',
+                    'virtuemart_state_id',
+                    'virtuemart_country_id',
+                    'zip',
+                    'agreed',
+                    'tos',
+                    'customer_note',
+                    // 1 added field from virtuemart_userinfos.
+                    'tax_exemption_number',
+                ),
+                'properties-more' => true,
+            ),
+            'ST' => array(
+                'more-info' => $this->t('see_bt'),
+                'properties' => array(
+                    $this->t('see_above'),
+                ),
+                'properties-more' => false,
+            ),
+            'shopInvoice' => array(
+                'table' => 'virtuemart_invoices',
+                'properties' => array(
+                    'virtuemart_invoice_id',
+                    'invoice_number',
+                    'order_status',
+                    'xhtml',
+                ),
+                'properties-more' => TRUE,
+            ),
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getShopDefaults()
     {
         return array(

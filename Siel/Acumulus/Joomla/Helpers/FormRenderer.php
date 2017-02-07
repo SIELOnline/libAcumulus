@@ -25,6 +25,7 @@ class FormRenderer extends BaseFormRenderer
         $this->inputWrapperClass = 'controls';
         $this->multiLabelClass = 'control-label';
         $this->descriptionClass = 'controls';
+        $this->markupWrapperClass = 'controls';
     }
 
     /**

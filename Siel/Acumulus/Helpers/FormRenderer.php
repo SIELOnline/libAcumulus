@@ -137,17 +137,7 @@ class FormRenderer
         if (!isset($field['attributes'])) {
             $field['attributes'] = array();
         }
-        switch ($field['type']) {
-            case 'fieldset':
-                $output .= $this->renderFieldset($field);
-                break;
-            case 'markup':
-                $output .= $this->renderMarkup($field);
-                break;
-            default:
-                $output .= $this->renderField($field);
-                break;
-        }
+        $output .= $field['type'] === 'fieldset' ? $this->renderFieldset($field) : $this->renderField($field);
         return $output;
     }
 
@@ -263,6 +253,8 @@ class FormRenderer
             case 'radio':
             case 'checkbox':
                 return $this->$type($id, $name, $value, $options, $attributes);
+            case 'markup':
+                return $this->markup($id, $name, $value, $attributes);
             default:
                 return $this->input($type, $id, $name, $value, $attributes);
         }
@@ -621,10 +613,41 @@ class FormRenderer
     /**
      * Renders a markup (free format output) element.
      *
+     * @param string $id
+     *   The id attribute of the markup field.
+     * @param string $name
+     *   The name attribute of the markup field.
+     * @param string $value
+     *   The markup to render.
+     * @param array $attributes
+     *   Any additional attributes to render for this field. The array is a
+     *   keyed array, the keys being the attribute names, the values being the
+     *   value of that attribute. If that value is an array it is rendered as a
+     *   joined string of the values separated by a space (e.g. multiple
+     *   classes).
+     *
+     * @return string
+     *   The rendered markup.
+     */
+    protected function markup($id, $name, $value, array $attributes = array())
+    {
+        $attributes = array_merge(array('id' => $id, 'name' => $name), $attributes);
+        $output = '';
+        $output .= $this->getWrapper('markup', $attributes);
+        $output .= $value;
+        $output .= $this->getWrapperEnd('markup');
+        return $output;
+    }
+
+    /**
+     * Renders a markup (free format output) element.
+     *
      * @param array $field
      *
      * @return string
      *   The rendered markup.
+     *
+     * @deprecated Use flow via renderField => markup
      */
     protected function renderMarkup(array $field)
     {
@@ -688,7 +711,7 @@ class FormRenderer
                 $value = implode(' ', $value);
             }
             // Skip attributes that are not to be set (required, disabled, ...).
-            if ($value !== false) {
+            if ($value !== false && $value !== '') {
                 $attributeString .= ' ' . htmlspecialchars($key, ENT_NOQUOTES, 'UTF-8');
                 // HTML5: do not add a value to boolean attributes.
                 // HTML4: add the name of the key as value for the attribute.

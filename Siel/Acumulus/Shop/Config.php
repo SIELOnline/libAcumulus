@@ -345,7 +345,7 @@ class Config implements ConfigInterface
     protected function load()
     {
         if (!$this->isConfigurationLoaded) {
-            $this->values = $this->castValues(array_merge($this->getDefaults(), $this->getShopDefaults(), $this->getConfigStore()->load($this->getKeys())));
+            $this->values = $this->castValues(array_merge($this->getDefaults(), $this->getConfigStore()->load($this->getKeys())));
             $this->isConfigurationLoaded = true;
         }
     }
@@ -566,7 +566,23 @@ class Config implements ConfigInterface
      *
      * @return array
      */
-    protected function getDefaults()
+    public function getDefaults()
+    {
+        $result = $this->getKeyInfo();
+        $result = array_map(function ($item) {
+            return $item['default'];
+        }, $result);
+        return array_merge($this->getConfigDefaults(), $this->getShopDefaults());
+    }
+
+    /**
+     * Returns a set of default values for the various config settings.
+     *
+     * Not to be used in isolation, use geDefaults() instead.
+     *
+     * @return array
+     */
+    protected function getConfigDefaults()
     {
         $result = $this->getKeyInfo();
         $result = array_map(function ($item) {
@@ -577,6 +593,8 @@ class Config implements ConfigInterface
 
     /**
      * Returns a set of default values that are specific for the shop.
+     *
+     * Not to be used in isolation, use geDefaults() instead.
      *
      * @return array
      */

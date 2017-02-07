@@ -51,8 +51,8 @@ class ShopCapabilities extends ShopCapabilitiesBase
             'customer_user_agent',
         );
         $refund = array(
-            'reason (refund only)',
-            'date (refund only)',
+            'reason (' . $this->t('refund_only') . ')',
+            'date (' . $this->t('refund_only') . ')',
         );
         $meta = array(
             'vat_number (With EU VAT plugin only)',
@@ -75,7 +75,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 'properties' => array(
                     $this->t('see_above'),
                 ),
-                'properties-more' => true,
+                'properties-more' => false,
             ),
             'order_meta' => array(
                 'more-info' => $this->t('meta_original_order_for_refund'),
@@ -83,7 +83,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 'properties' => array(
                     $this->t('see_above'),
                 ),
-                'properties-more' => true,
+                'properties-more' => false,
             ),
         );
     }
@@ -106,7 +106,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
             // number is stored under the '_vat_number' meta key, though older
             // versions did so under the 'VAT Number' key.
             // See http://docs.woothemes.com/document/eu-vat-number-2/
-            'vatNumber' => '[VAT Number|vat_number]', // Post neta
+            'vatNumber' => '[vat_number|VAT Number]', // Post neta
             'telephone' => '[billing_phone]', // WC_Abstact_order
             'email' => '[billing_email]', // WC_Abstact_order
         );

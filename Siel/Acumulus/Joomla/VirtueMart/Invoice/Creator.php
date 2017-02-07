@@ -34,11 +34,10 @@ class Creator extends BaseCreator
     protected $orderModel;
 
     /**
-     * @var array
      * Array with keys:
      * [details]
      *   [BT]: stdClass (BillTo details)
-     *   [ST]: stdClass (ShipTo details, if available)
+     *   [ST]: stdClass (ShipTo details) (if available, copy of BT otherwise)
      * [history]
      *   [0]: stdClass (virtuemart_order_histories table record)
      *   ...
@@ -48,24 +47,21 @@ class Creator extends BaseCreator
      * [calc_rules]
      *   [0]: stdClass (virtuemart_order_calc_rules table record)
      *   ...
+     *
+     * @var array
      */
     protected $order;
 
-    /** @var array */
+    /**
+     * Array with fields from the virtuemart_invoices table:
+     * - virtuemart_invoice_id
+     * - invoice_number
+     * - order_status
+     * - xhtml
+     * - + others
+     *
+     * @var array */
     protected $shopInvoice = array();
-
-    /** @var stdClass
-     *  Object with properties:
-     *  [...]: virtuemart_vmusers table record columns
-     *  [shopper_groups]: array of stdClass virtuemart_vmuser_shoppergroups
-     * table records
-     *  [JUser]: JUser object
-     *  [userInfo]: array of stdClass virtuemart_userinfos table records
-     */
-    protected $user;
-
-    /** @var int */
-    protected $userBtUid;
 
     /**
      * {@inheritdoc}
@@ -78,22 +74,21 @@ class Creator extends BaseCreator
         parent::setInvoiceSource($source);
         $this->order = $this->invoiceSource->getSource();
         $this->orderModel = VmModel::getModel('orders');
-        /** @var \TableInvoices $invoiceTable */
-        // @todo: wrong 2nd parameter?
-        if ($invoiceTable = $this->orderModel->getTable('invoices')->load($this->order['details']['BT']->virtuemart_order_id, 'virtuemart_order_id')) {
-            $this->shopInvoice = $invoiceTable->getProperties();
+        /** @var \TableInvoices $invoicesTable */
+        $invoicesTable = $this->orderModel->getTable('invoices');
+        if ($invoice = $invoicesTable->load($this->order['details']['BT']->virtuemart_order_id, 'virtuemart_order_id')) {
+            $this->shopInvoice = $invoice->getProperties();
         }
+
         if (!empty($this->order['details']['BT']->virtuemart_user_id)) {
             /** @var \VirtueMartModelUser $userModel */
             $userModel = VmModel::getModel('user');
             $userModel->setId($this->order['details']['BT']->virtuemart_user_id);
-            $this->user = $userModel->getUser();
-            $this->userBtUid = null;
+            $user = $userModel->getUser();
 
-            foreach ($this->user->userInfo as $uid => $userInfo) {
+            foreach ($user->userInfo as $userInfo) {
                 if ($userInfo->address_type === 'BT') {
-                    $this->userBtUid = $uid;
-                    break;
+                    $this->order['details']['BT']->tax_exemption_number = $userInfo->tax_exemption_number;
                 }
             }
         }
@@ -104,10 +99,11 @@ class Creator extends BaseCreator
      */
     protected function setPropertySources()
     {
-        parent::setPropertySources();
+        // We do not call parent::setPropertySources() as the source array does
+        // not contain scalar properties itself (only sub arrays).
         $this->propertySources['BT'] = $this->order['details']['BT'];
-        $this->propertySources['user'] = $this->user;
-        $this->propertySources['userInfo'] = $this->user->userInfo[$this->userBtUid];
+        $this->propertySources['ST'] = $this->order['details']['ST'];
+        $this->propertySources['shopInvoice'] = $this->shopInvoice;
     }
 
     /**

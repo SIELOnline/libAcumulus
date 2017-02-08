@@ -76,7 +76,8 @@ class Creator extends BaseCreator
     protected function setPropertySources()
     {
         parent::setPropertySources();
-        $this->propertySources['address'] = new Address($this->order->id_address_invoice);
+        $this->propertySources['address_invoice'] = new Address($this->order->id_address_invoice);
+        $this->propertySources['address_delivery'] = new Address($this->order->id_address_delivery);
         $this->propertySources['customer'] = new Customer($this->invoiceSource->getSource()->id_customer);
     }
 

@@ -83,11 +83,17 @@ class AdvancedConfigForm extends BaseAdvancedConfigForm
         if (isset($result['configHeader'])) {
             $result['configHeader']['icon'] = 'icon-cogs';
         }
+        if (isset($result['tokenHelpHeader'])) {
+            $result['tokenHelpHeader']['icon'] = 'icon-question-circle';
+        }
         if (isset($result['relationSettingsHeader'])) {
             $result['relationSettingsHeader']['icon'] = 'icon-users';
         }
         if (isset($result['invoiceSettingsHeader'])) {
             $result['invoiceSettingsHeader']['icon'] = 'icon-list-alt';
+        }
+        if (isset($result['optionsSettingsHeader'])) {
+            $result['optionsSettingsHeader']['icon'] = 'icon-indent';
         }
         if (isset($result['emailAsPdfSettingsHeader'])) {
             $result['emailAsPdfSettingsHeader']['icon'] = 'icon-file-pdf-o';

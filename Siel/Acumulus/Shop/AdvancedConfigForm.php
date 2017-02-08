@@ -185,7 +185,7 @@ class AdvancedConfigForm extends BaseConfigForm
     {
         $fields = array();
         foreach ($tokenInfo as $variableName => $variableInfo) {
-            $fields[] = $this->get1TokenField($variableName, $variableInfo);
+            $fields["token-$variableName"] = $this->get1TokenField($variableName, $variableInfo);
         }
         return $fields;
     }
@@ -353,7 +353,7 @@ class AdvancedConfigForm extends BaseConfigForm
                 'label' => $this->t('field_salutation'),
                 'description' => $this->t('desc_salutation') . ' ' . $this->t('msg_token'),
                 'attributes' => array(
-                    'size' => 30,
+                    'size' => 60,
                 ),
             ),
             'address1' => array(

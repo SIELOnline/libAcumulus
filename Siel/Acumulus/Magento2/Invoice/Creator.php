@@ -65,6 +65,7 @@ class Creator extends BaseCreator
     {
         parent::setPropertySources();
         $this->propertySources['billingAddress'] = $this->invoiceSource->getSource()->getBillingAddress();
+        $this->propertySources['shippingAddress'] = $this->invoiceSource->getSource()->getShippingAddress();
         $this->propertySources['customer'] = Registry::getInstance()->create('Magento\Customer\Model\Customer')->load($this->invoiceSource->getSource()->getCustomerId());
     }
 

@@ -208,17 +208,17 @@ class AdvancedConfigForm extends BaseConfigForm
         }
         elseif (!empty($variableInfo['class'])) {
             if (!empty($variableInfo['file'])) {
-                $value .= ' (' . sprintf($this->t('see_class_file'), $variableInfo['class'], $variableInfo['file']) . ')';
+                $value .= ' (' . $this->see2Lists('see_class_file', 'see_classes_files', $variableInfo['class'], $variableInfo['file']) . ')';
             }
             else {
-                $value .= ' (' . sprintf($this->t('see_class'), $variableInfo['class']) . ')';
+                $value .= ' (' . $this->seeList('see_class', 'see_classes', $variableInfo['class']) . ')';
             }
         }
         elseif (!empty($variableInfo['table'])) {
-            $value .= ' (' . $this->seeTable('see_table', 'see_tables', $variableInfo['table']) . ')';
+            $value .= ' (' . $this->seeList('see_table', 'see_tables', $variableInfo['table']) . ')';
         }
         elseif (!empty($variableInfo['file'])) {
-            $value .= ' (' . sprintf($this->t('see_file'), $variableInfo['file']) . ')';
+            $value .= ' (' . $this->seeList('see_file', 'see_files', $variableInfo['file']) . ')';
         }
 
         $value .= ':</p>';
@@ -231,10 +231,10 @@ class AdvancedConfigForm extends BaseConfigForm
 
             if (!empty($variableInfo['properties-more'])) {
                 if (!empty($variableInfo['class'])) {
-                    $value .= '<li>' . sprintf($this->t('see_class_more'), $variableInfo['class']) . '</li>';
+                    $value .= '<li>' . $this->seeList('see_class_more', 'see_classes_more', $variableInfo['class']). '</li>';
                 }
                 elseif (!empty($variableInfo['table'])) {
-                    $value .= '<li>' . $this->seeTable('see_table_more', 'see_tables_more', $variableInfo['table']) . '</li>';
+                    $value .= '<li>' . $this->seeList('see_table_more', 'see_tables_more', $variableInfo['table']) . '</li>';
                 }
             }
             $value .= '</ul>';
@@ -247,31 +247,57 @@ class AdvancedConfigForm extends BaseConfigForm
     }
 
     /**
-     * Converts the contents of table to a human readable string.
+     * Converts the contents of $list1 and $list2 to a human readable string.
      *
      * @param string $keySingle
      * @param string $keyPlural
-     * @param string|array $table
+     * @param string|string[] $list1
+     * @param string|string[] $list2
      *
      * @return string
      */
-    protected function seeTable($keySingle, $keyPlural, $table)
+    protected function see2Lists($keySingle, $keyPlural, $list1, $list2)
     {
-        if (is_array($table)) {
-            if (count($table) > 1) {
-                $tableLast = array_pop($table);
-                $tableBeforeLast = array_pop($table);
-                array_push($table, $tableBeforeLast . ' ' . $this->t('and') . ' ' . $tableLast);
-                $result = sprintf($this->t($keyPlural), implode(', ', $table));
+        $sList1 = $this->listToString($list1);
+        $sList2 = $this->listToString($list2);
+        $key = is_array($list1) && count($list1) > 1 ? $keyPlural : $keySingle;
+        return sprintf($this->t($key), $sList1, $sList2);
+    }
+
+    /**
+     * Converts the contents of $list to a human readable string.
+     *
+     * @param string $keySingle
+     * @param string $keyPlural
+     * @param string|string[] $list
+     *
+     * @return string
+     */
+    protected function seeList($keySingle, $keyPlural, $list)
+    {
+        $sList = $this->listToString($list);
+        $key = is_array($list) && count($list) > 1 ? $keyPlural : $keySingle;
+        return sprintf($this->t($key), $sList);
+    }
+
+    /**
+     * Returns $list as a grammatically correct and nice string.
+     *
+     * @param string|string[] $list
+     *
+     * @return string
+     */
+    protected function listToString($list) {
+        if (is_array($list)) {
+            if (count($list) > 1) {
+                $listLast = array_pop($list);
+                $listBeforeLast = array_pop($list);
+                array_push($list, $listBeforeLast . ' ' . $this->t('and') . ' ' . $listLast);
             }
-            else {
-                $result = sprintf($this->t($keySingle), reset($table));
-            }
+        } else {
+            $list = array($list);
         }
-        else {
-            $result = sprintf($this->t($keySingle), $table);
-        }
-        return $result;
+        return implode(', ', $list);
     }
 
     /**

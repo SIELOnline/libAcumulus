@@ -13,6 +13,8 @@ class ModuleSpecificTranslations extends TranslationCollection
 
         'menu_advancedSettings' => 'Acumulus → Acumulus geavanceerde instellingen',
         'menu_basicSettings' => 'Acumulus → Acumulus instellingen',
+
+        'see_billing_address' => 'Verzendadresgegevens, bevat dezelfde eigenschappen als het "billingAddress" object hierboven',
     );
 
     protected $en = array(

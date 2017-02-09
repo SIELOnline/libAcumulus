@@ -959,69 +959,125 @@ class Config implements ConfigInterface
     {
         $result = true;
 
-        // 4.5.0 upgrade.
         if (version_compare($currentVersion, '4.5.0', '<')) {
-            // Keep track of settings that should be updated.
-            $newSettings = array();
-
-            // 1) Log level: added level info and set log level to notice if
-            // it currently is error or warning.
-            switch ($this->get('logLevel')) {
-                case Log::Error:
-                case Log::Warning:
-                    // This is often not giving enough information, so we set it
-                    // to Notice by default.
-                    $newSettings['logLevel'] = Log::Notice;
-                    break;
-                case Log::Info:
-                    // Info was inserted, so this is the former debug level.
-                    $newSettings['logLevel'] = Log::Debug;
-                    break;
-            }
-
-            // 2) Debug mode: the values of test mode and stay local are
-            // switched, Stay local is no longer used. so both these 2 values
-            // become the new test mode.
-            switch ($this->get('debug')) {
-                case 4: // Value for deprecated ServiceConfigInterface::Debug_StayLocal.
-                    $newSettings['logLevel'] = ServiceConfigInterface::Debug_TestMode;
-                    break;
-            }
-
-            if (!empty($newSettings)) {
-                $result = $this->save($newSettings) && $result;
-            }
+            $result = $this->upgrade450();
         }
 
-        // 4.5.3 upgrade:
-        // - setting triggerInvoiceSendEvent removed.
-        // - setting triggerInvoiceEvent introduced.
         if (version_compare($currentVersion, '4.5.3', '<')) {
-            // Get current values.
-            $values = $this->castValues($this->getConfigStore()->load($this->getKeys()));
-
-            if ($this->get('triggerInvoiceSendEvent') == 2) {
-                $values['triggerInvoiceEvent'] = ConfigInterface::TriggerInvoiceEvent_Create;
-            } else {
-                $values['triggerInvoiceEvent'] = ConfigInterface::TriggerInvoiceEvent_None;
-            }
-            unset($values['triggerInvoiceSendEvent']);
-
-            $result = $this->getConfigStore()->save($values) && $result;
+            $result = $this->upgrade453() && $result;
         }
 
-        // 4.6.0 upgrade:
-        // - setting removeEmptyShipping inverted.
         if (version_compare($currentVersion, '4.6.0', '<')) {
-            // Get current values.
-            $values = $this->castValues($this->getConfigStore()->load($this->getKeys()));
+            $result = $this->upgrade460() && $result;
+        }
 
-            if ($this->get('removeEmptyShipping') !== null) {
-                $values['sendEmptyShipping'] = !$this->get('removeEmptyShipping');
-                unset($values['removeEmptyShipping']);
-            }
+        if (version_compare($currentVersion, '4.7.0', '<')) {
+            $result = $this->upgrade470() && $result;
+        }
 
-            $result = $this->getConfigStore()->save($values) && $result;
+        return $result;
+    }
+
+    /**
+     * 4.5.0 upgrade.
+     *
+     * - Log level: added level info and set log level to notice if it currently
+     *   is error or warning.
+     * - Debug mode: the values of test mode and stay local are switched. Stay
+     *   local is no longer used, so both these 2 values become the new test
+     *   mode.
+     *
+     * @return bool
+     */
+    protected function upgrade450()
+    {
+        $result = true;
+        // Keep track of settings that should be updated.
+        $newSettings = array();
+
+        // 1) Log level.
+        switch ($this->get('logLevel')) {
+            case Log::Error:
+            case Log::Warning:
+                // This is often not giving enough information, so we set it
+                // to Notice by default.
+                $newSettings['logLevel'] = Log::Notice;
+                break;
+            case Log::Info:
+                // Info was inserted, so this is the former debug level.
+                $newSettings['logLevel'] = Log::Debug;
+                break;
+        }
+
+        // 2) Debug mode.
+        switch ($this->get('debug')) {
+            case 4: // Value for deprecated ServiceConfigInterface::Debug_StayLocal.
+                $newSettings['logLevel'] = ServiceConfigInterface::Debug_TestMode;
+                break;
+        }
+
+        if (!empty($newSettings)) {
+            $result = $this->save($newSettings);
+        }
+        return $result;
+    }
+
+    /**
+     * 4.5.3 upgrade.
+     *
+     * - setting triggerInvoiceSendEvent removed.
+     * - setting triggerInvoiceEvent introduced.
+     *
+     * @return bool
+     */
+    protected function upgrade453()
+    {
+        // Get current values.
+        $values = $this->castValues($this->getConfigStore()->load($this->getKeys()));
+        if ($this->get('triggerInvoiceSendEvent') == 2) {
+            $values['triggerInvoiceEvent'] = ConfigInterface::TriggerInvoiceEvent_Create;
+        } else {
+            $values['triggerInvoiceEvent'] = ConfigInterface::TriggerInvoiceEvent_None;
+        }
+        unset($values['triggerInvoiceSendEvent']);
+
+        return $this->getConfigStore()->save($values);
+    }
+
+    /**
+     * 4.6.0 upgrade.
+     *
+     * - setting removeEmptyShipping inverted.
+     *
+     * @return bool
+     */
+    protected function upgrade460()
+    {
+        // Get current values.
+        $values = $this->castValues($this->getConfigStore()->load($this->getKeys()));
+        if ($this->get('removeEmptyShipping') !== NULL) {
+            $values['sendEmptyShipping'] = !$this->get('removeEmptyShipping');
+            unset($values['removeEmptyShipping']);
+        }
+
+        return $this->getConfigStore()->save($values);
+    }
+
+    /**
+     * 4.7.0 upgrade.
+     *
+     * - salutation could already use token, but with old syntax: remove # after [.
+     *
+     * @return bool
+     */
+    protected function upgrade470()
+    {
+        $result = true;
+        // Get current values.
+        $values = $this->castValues($this->getConfigStore()->load($this->getKeys()));
+        if (!empty($values['salutation']) && strpos($values['salutation'], '[#') !== false) {
+            $values['salutation'] = str_replace('[#', '[', $values['salutation']);
+            $result = $this->getConfigStore()->save($values);
         }
 
         return $result;

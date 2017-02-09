@@ -24,4 +24,15 @@ class FormRenderer extends BaseFormRenderer
         $this->multiLabelClass = 'label';
         $this->descriptionClass = 'desc';
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function fieldsetBegin(array $field) {
+        $oldDescriptionClass = $this->descriptionClass;
+        $this->descriptionClass = 'fieldset-desc desc';
+        $result = parent::fieldsetBegin($field);
+        $this->descriptionClass = $oldDescriptionClass;
+        return $result;
+    }
 }

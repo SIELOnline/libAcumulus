@@ -136,7 +136,8 @@ abstract class Mailer
         if (isset($credentials['emailonerror'])) {
             return $credentials['emailonerror'];
         }
-        return 'webshop@' . $this->config->getHostName();
+        $env = $this->config->getEnvironment();
+        return 'webshop@' . $env['hostName'];
     }
 
     /**

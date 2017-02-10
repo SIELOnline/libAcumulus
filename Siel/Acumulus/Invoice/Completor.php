@@ -361,16 +361,24 @@ class Completor
     /**
      * Validates the email address of the invoice.
      *
-     * - The email address may not be empty but may be left out though in which
-     *   case a new relation will be created.
      * - Multiple, comma separated, email addresses are not allowed.
      * - Display names (My Name <my.name@example.com>) are not allowed.
+     * - The email address may not be empty but may be left out though in which
+     *   case a new relation will be created. To prevent both, we use a fake
+     *   address and we will set a warning.
      */
     protected function validateEmail()
     {
         // Check email address.
         if (empty($this->invoice['customer']['email'])) {
-            unset($this->invoice['customer']['email']);
+            $customerSettings = $this->config->getCustomerSettings();
+            $this->invoice['customer']['email'] = $customerSettings['emailIfAbsent'];
+            $this->messages['warnings'][] = array(
+                'code' => '',
+                'codetag' => '',
+                'message' => $this->t('message_warning_no_email'),
+            );
+
         } else {
             $email = $this->invoice['customer']['email'];
             $at = strpos($email, '@');

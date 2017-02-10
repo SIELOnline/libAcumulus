@@ -45,15 +45,6 @@ interface ConfigInterface
     const outputFormat = 'json';
 
     /**
-     * The hostname of the current server.
-     *
-     * Used for a default email address.
-     *
-     * @return string
-     */
-    public function getHostName();
-
-    /**
      * Returns the contract credentials to authenticate with the Acumulus API.
      *
      * @return array
@@ -77,6 +68,7 @@ interface ConfigInterface
      *   - moduleVersion
      *   - shopName
      *   - shopVersion
+     *   - hostName
      *   - phpVersion
      *   - os
      *   - curlVersion

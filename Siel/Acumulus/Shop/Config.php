@@ -606,7 +606,7 @@ class Config implements ConfigInterface
     /**
      * {@inheritdoc}
      */
-    public function getHostName()
+    protected function getHostName()
     {
         if (!empty($_SERVER['REQUEST_URI'])) {
             $hostName = parse_url($_SERVER['REQUEST_URI'], PHP_URL_HOST);
@@ -632,10 +632,9 @@ class Config implements ConfigInterface
     protected function getKeyInfo()
     {
         if ($this->keyInfo === null) {
-            $hostName = $this->getHostName();
             $curlVersion = curl_version();
             $environment = $this->getConfigStore()->getShopEnvironment();
-
+            $shopName = str_replace(array(' ', '@', '(', ')', '[', ']', '\\', ':', ';', '"', '<', '>', ','), '', $environment['shopName']);
             $this->keyInfo = array(
                 'baseUri' => array(
                     'group' => 'environment',
@@ -666,6 +665,11 @@ class Config implements ConfigInterface
                     'group' => 'environment',
                     'type' => 'string',
                     'default' => $environment['shopVersion'],
+                ),
+                'hostName' => array(
+                    'group' => 'environment',
+                    'type' => 'string',
+                    'default' => $this->getHostName(),
                 ),
                 'phpVersion' => array(
                     'group' => 'environment',
@@ -735,7 +739,16 @@ class Config implements ConfigInterface
                 'genericCustomerEmail' => array(
                     'group' => 'customer',
                     'type' => 'string',
-                    'default' => 'consumer@' . $hostName,
+                    'default' => "consumer.$shopName@nul.sielsystems.nl",
+                ),
+                // As utf8 is now commonly accepted, it is a bit difficult to
+                // express the set of characters that are allowed, so we remove
+                // characters not allowed.
+                // See http://stackoverflow.com/a/2049537/1475662: @ ()[]\:;"<>,
+                'emailIfAbsent' => array(
+                    'group' => 'customer',
+                    'type' => 'string',
+                    'default' => $shopName . '@nul.sielsystems.nl',
                 ),
                 'contactYourId' => array(
                     'group' => 'customer',

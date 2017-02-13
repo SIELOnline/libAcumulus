@@ -90,22 +90,22 @@ Zie <a href="http://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastin
         'desc_triggerInvoiceEvent' => 'U kunt hier kiezen of en bij welke webwinkelfactuur-gebeurtenissen de factuur naar Acumulus wordt verstuurd. Als u voor "Niet automatisch versturen" kiest, kunt u de facturen zelf overzetten m.b.v. het batchformulier of op basis van één of meerdere bestelstatussen.',
 
         // Tokens
-        'tokenHelpHeader' => 'Tokens',
-        'desc_tokens' => '<p>Op deze pagina staan een aantal velden die "tokens" mogen bevatten.
+        'tokenHelpHeader' => 'Veldverwijzingen',
+        'desc_tokens' => '<p>Op deze pagina staan een aantal velden die "veldverwijzingen" mogen bevatten.
 Dit wil zeggen dat ze naast vrije tekst ook gegevens van de bestelling, de klant of het klantadres kunnen bevatten.
-Tokens worden ingegeven door de naam van de eigenschap van de bestelling tussen vierkante haken, dwz. [ en ], te plaatsen.
+Veldverwijzingen worden ingegeven door de naam van de eigenschap van de bestelling tussen vierkante haken, dwz. [ en ], te plaatsen.
 De eigenschappen die uw webshop kent worden hieronder opgesomd.</p>
-<p>Om speciale situaties aan te kunnen, mogen tokens op verschillende manieren samengevoegd worden:</p>
+<p>Om speciale situaties aan te kunnen, mogen veldverwijzingen op verschillende manieren samengevoegd worden:</p>
 <ol class="property-list">
 <dt>[property]:</dt><dd>Eenvoudigste vorm, vervang door de waarde van deze eigenschap.</dd>
 <dt>[property1|property2|...]:</dt><dd>Vervang door de waarde van property1 of als deze geen waarde heeft door die van property2, en zo verder. BV: handig om of het mobiele of het vaste telefoonnummer mee te sturen.</dd>
 <dt>[property1+property2+...]:</dt><dd>Vervang door de waarde van property1 en die van property2 en plaats tussen de properties een spatie, maar alleen als de properties niet leeg zijn.BV: handig om de volledige naam, opgebouwd uit voornaam, tussenvoegsel en achternaam, te versturen zonder dat er meerdere spaties in terecht komen.</dd>
 <dt>[object::property]:</dt><dd>Vervang alleen door de eigenschap als die in het opgegeven object voorkomt (zie de lijst hieronder). Gebruik dit om verwarring te voorkomen als meerdere objecten een eigenschap met dezelfde naam hebben (bv id).</dd>
 </ol>
-<p><strong>Let op:</strong> in de meeste situaties zal de standaardwaarde goed zijn. Pas deze velden alleen aan in speciale omstandigheden.</p>
+<p><strong>Let op:</strong> in de meeste situaties zal de standaardwaarde goed zijn. Pas deze velden alleen aan in speciale omstandigheden en als u weet wat u doet.</p>
 ',
-        'msg_token' => 'Dit veld mag tokens bevatten.',
-        'msg_tokens' => 'Deze velden mogen tokens bevatten.',
+        'msg_token' => 'Dit veld mag veldverwijzingen bevatten.',
+        'msg_tokens' => 'Deze velden mogen veldverwijzingen bevatten.',
         'see_class' => 'zie de class %1$s',
         'see_classes' => 'zie de classes %1$s',
         'see_file' => 'zie het bestand %1$s',
@@ -115,17 +115,17 @@ De eigenschappen die uw webshop kent worden hieronder opgesomd.</p>
         'see_table' => 'zie de tabel %1$s',
         'see_tables' => 'zie de tabellen %1$s',
         'and' => 'en',
-        'see_class_more' => 'zie de class %1$s voor mogelijke andere properties en methods (zonder argumenten en die een scalaire waarde teruggeven) die als token gebruikt kunnen worden',
-        'see_classes_more' => 'zie de classes %1$s voor mogelijke andere properties en methods (zonder argumenten en die een scalaire waarde teruggeven) die als token gebruikt kunnen worden',
+        'see_class_more' => 'zie de class %1$s voor mogelijke andere properties en methods (zonder argumenten en die een scalaire waarde teruggeven) die als veldverwijzing gebruikt kunnen worden',
+        'see_classes_more' => 'zie de classes %1$s voor mogelijke andere properties en methods (zonder argumenten en die een scalaire waarde teruggeven) die als veldverwijzing gebruikt kunnen worden',
         'see_table_more' => 'zie de tabel %1$s voor mogelijke andere velden die als token gebruikt kunnen worden',
-        'see_tables_more' => 'zie de tabellen %1$s voor mogelijke andere velden die als token gebruikt kunnen worden',
+        'see_tables_more' => 'zie de tabellen %1$s voor mogelijke andere velden die als veldverwijzing gebruikt kunnen worden',
         'see_above' => 'zie hierboven.',
         'original_order_for_refund' => 'Oorspronkelijke bestelling, alleen beschikbaar bij credit nota\'s',
         'refund_only' => 'alleen bij een credit nota',
 
         // Relation management settings.
         'relationSettingsHeader' => 'Relatiebeheer',
-        'desc_relationSettingsHeader' => 'Met elke factuur die naar Acumulus verstuurd word, worden ook de klantgegevens meegestuurd. Hier kunt u instellen hoe dit precies dient te gebeuren. De meeste velden hieronder kunnen opgenomen worden in uw factuursjablonen. Darom is het handig om er hier controle over te hebben over wat er in die velden komt te staan.',
+        'desc_relationSettingsHeader' => 'Met elke factuur die naar Acumulus verstuurd word, worden ook de klantgegevens meegestuurd. Hier kunt u instellen hoe dit precies dient te gebeuren. De meeste velden hieronder kunnen opgenomen worden in uw factuursjablonen. Daarom is het handig om er hier controle over te hebben over wat er in die velden komt te staan.',
 
         'field_defaultCustomerType' => 'Importeer klanten als',
 
@@ -314,8 +314,8 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'field_code' => 'Contract code',
         'field_username' => 'User name',
         'field_password' => 'Password',
-        'field_email' => 'E-mail',
-        'desc_email' => 'The e-mail address at which you will be informed about any errors that occur during invoice sending. As this module cannot know if it is called from an interactive administrator screen, it will not display any messages in the user interface. Therefore you have to fill in an e-mail address.',
+        'field_emailonerror' => 'E-mail',
+        'desc_emailonerror' => 'The e-mail address at which you will be informed about any errors that occur during invoice sending. As this module cannot know if it is called from an interactive administrator screen, it will not display any messages in the user interface. Therefore you have to fill in an e-mail address.',
         'message_validate_contractcode_0' => 'The field Contract code is required, please fill in the contract code you use to log in to Acumulus.',
         'message_validate_contractcode_1' => 'The field Contract code is a numeric field, please fill in the contract code you use to log in to Acumulus.',
         'message_validate_username_0' => 'The field User name is required, please fill in the user name you use to log in to Acumulus.',
@@ -359,9 +359,44 @@ Using this setting this plugin can better determine the invoice type and perform
         'option_triggerInvoiceEvent_2' => 'When the webshop invoice gets sent to the customer.',
         'desc_triggerInvoiceEvent' => 'Select if and on which webshop invoice event to send the invoice to Acumulus. If you select "Do not send automatically" you can use the send batch form, or you can set one or more order states above to trigger the sending of the invoice.',
 
+
+        // Tokens
+        'tokenHelpHeader' => 'Field references',
+        'desc_tokens' => '<p>This form contains a number of fields that may contain "field references".
+This means that besides free literal text, these fields can contain data from the order, customer and customer address.
+Field references are denoted by placing the name of the property between square brackets, ie. [ and ].
+The properties known by your web shop are listed below.</p>
+<p>To handle some special situations, field references can be combined as follows:</p>
+<ol class="property-list">
+<dt>[property]:</dt><dd>Simplest form, replace by the value of the property.</dd>
+<dt>[property1|property2|...]:</dt><dd>Replace by the value of property1, or if that does not have a value by that of property2, etc. Example: useful to get either the mobile OR land line number.</dd>
+<dt>[property1+property2+...]:</dt><dd>Replace by the value of property1 and that of property2 with 1 space between it, but only if both values are not empty. Example: useful to get the full name, constructed of first, middle and last name.</dd>
+<dt>[object::property]:</dt><dd>Replace by the value of the property but only if that property is part of the geiven object (see list below). Use this to get the correct value if multiple objects have a property with the same name (e.g. id).</dd>
+</ol>
+<p><strong>Attention:</strong> in most situations the default value will do fine! Only change these fields in special situations and when you know what you are doing.</p>
+',
+        'msg_token' => 'This field may contain field references.',
+        'msg_tokens' => 'These fields may contain field references.',
+        'see_class' => 'See class %1$s',
+        'see_classes' => 'See the classes %1$s',
+        'see_file' => 'See file %1$s',
+        'see_files' => 'See the files %1$s',
+        'see_class_file' => 'See the class %1$s in file %2$s',
+        'see_classes_files' => 'See the classes %1$s in the files %2$s',
+        'see_table' => 'See table %1$s',
+        'see_tables' => 'See the tables %1$s',
+        'and' => 'and',
+        'see_class_more' => 'See the class %1$s for possible other properties and methods (without arguments and returning a scalar value) that can be used as field reference',
+        'see_classes_more' => 'See the classes %1$s for possible other properties and methods (without arguments and returning a scalar value) that can be used as field reference',
+        'see_table_more' => 'See the table %1$s for possible other fields that can be used as field reference',
+        'see_tables_more' => 'See the tables %1$s for possible other fields that can be used as field reference',
+        'see_above' => 'See above.',
+        'original_order_for_refund' => 'Original order, only available with refunds',
+        'refund_only' => 'only for refunds',
+
         // Relation management settings.
         'relationSettingsHeader' => 'Relation management',
-        'desc_relationSettingsHeader' => 'With each invoice sent to Acumulus, its client data is sent as well. With these settings you can influence how this is done.',
+        'desc_relationSettingsHeader' => 'With each invoice sent to Acumulus, its client data is sent as well. With these settings you can influence how this is done. Most fields below can be added to your invoice templates. That is why you can control its contents here.',
 
         'field_defaultCustomerType' => 'Create customers as',
 
@@ -370,8 +405,34 @@ Using this setting this plugin can better determine the invoice type and perform
         'option_contactStatus_Active' => 'Yes',
         'option_contactStatus_Disabled' => 'No',
 
+        'field_contactYourId' => 'Web shop customer reference',
+        'desc_contactYourId' => 'If you want to search the customer data of the webshop for a relation in Acumulus, it can be handy to have its unique reference as used by your webhop ready in Acumulus. Use this field to define which field the web shop uses as customer reference.',
+        'field_companyName1' => 'Company name 1',
+        'field_companyName2' => 'Company name 2',
+
+        'field_vatNumber' => 'VAT number',
+        'desc_vatNumber' => 'To create a reversed VAT invoice, Acumulus must know the company name and EU VAT number. So be sure to ask for it and store it in your webshop, so it can be sent to Acumulus.',
+
+        'field_fullName' => 'Full name',
+        'desc_fullName' => 'The full name, normally constructed using the first, middle and last name and any pre or suffix. What and how this is stored, depends on the web shop you use.',
+
         'field_salutation' => 'Full salutations',
-        'desc_salutation' => 'Specify the salutations you want to use when communicating with this client. You can use [#property] to get a property value out of the order or customer values, e.g. "Dear [#firstName],".',
+        'desc_salutation' => 'Specify the salutations you want to use when communicating with this client.',
+
+        'field_address1' => 'Address 1',
+        'field_address2' => 'Address 2',
+        'desc_address' => 'Enter the address parts as stored in your webshop. E.g. postal code plugins can use a separate field (often address 2) to store the house number separately from the street name.',
+
+        'field_postalCode' => 'Postal code',
+        'field_city' => 'City',
+        'field_telephone' => 'Phone',
+        'desc_telephone' => 'The phone numnber you want ot store in Acumulus. Acumulus only stores 1 phone number. So if your web shop stores both a land line and mobile number you will have to choose which one you prefer to store in Acumulus. Use the | character to list alternative phone number fields, so you get a phone number regardless in which field it was filled in.',
+        'field_fax' => 'Fax',
+        'desc_fax' => 'Most web shops do not store a fax number. So leave empty or "use" it to store both mobile and land line mumber (if your web shop does store both).',
+        'field_email' => 'Email',
+
+        'field_mark' => 'Mark',
+        'desc_mark' => 'Use this field to send any additional information about your customer, e.g. its BSN. This field fills the "kenmerk" on page 2 of the Acumulus relation management dialog.',
 
         'field_clientData' => 'Customer address data',
         'option_sendCustomer' => 'Send consumer client records to Acumulus.',

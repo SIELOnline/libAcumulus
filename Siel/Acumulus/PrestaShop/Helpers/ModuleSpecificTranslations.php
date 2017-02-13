@@ -20,5 +20,7 @@ class ModuleSpecificTranslations extends TranslationCollection
     protected $en = array(
         'menu_advancedSettings' => 'Advanced Parameters → Acumulus advanced settings',
         'menu_basicSettings' => 'Settings → Acumulus → Configure',
+
+        'see_billing_address' => 'Shipping address, contains the same properties as the "address_invoice" object above',
     );
 }

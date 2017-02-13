@@ -97,15 +97,15 @@ class CompletorInvoiceLines
                 // Determine whether to add as a single line or add them
                 // separately.
                 if ($this->keepSeparateLines($line, $children)) {
-                    // Keep them separate but allow for some webshop specific
-                    // corrections and add some meta data to relate them.
+                    // Keep them separate but allow for some web shop specific
+                    // corrections; indent product descriptions; sanitize VAT
+                    // rates and add some meta data to relate them.
                     $this->correctInfoBetweenParentAndChildren($line, $children);
                     if (!empty($children)) {
                         $parentIndex = count($result);
                         $line['meta-parent-index'] = $parentIndex;
                         $line['meta-children'] = count($children);
                         foreach ($children as &$child) {
-                            // Indent product descriptions.
                             $child['product'] = ' - ' . $child['product'];
                             $child['meta-parent'] = $parentIndex;
                         }
@@ -205,21 +205,40 @@ class CompletorInvoiceLines
     }
 
     /**
-     * Removes any price info from all children.
+     * Removes price info from all children but copy vat info from parent.
      *
-     * This prevents that amounts appear twice on the invoice.
+     * This prevents that amounts appear twice on the invoice. This can only be
+     * done if all children have the same vat rate as the parent, otherwise the
+     * price (and vat) info should be on the children and not on the parent
      *
+     * @param array $parent
+     *   The parent line
      * @param array[] $children
      *   The child lines.
      *
      * @return array[]
      *   The children with price info removed.
      */
-    protected function removePriceInfoFromChildren(array $children)
+    protected function removePriceInfoFromChildren(array $parent, array $children)
     {
         foreach ($children as &$child) {
             $child['unitprice'] = 0;
             $child['unitpriceinc'] = 0;
+            $child['vatamount'] = 0;
+            $child['vatrate'] = $parent['vatrate'];
+            $child['meta-vatrate-source'] = $parent['meta-vatrate-source'];
+            if (isset($parent['meta-vatrate-min'])) {
+                $child['meta-vatrate-min'] = $parent['meta-vatrate-min'];
+            }
+            else {
+                unset($child['meta-vatrate-min']);
+            }
+            if (isset($parent['meta-vatrate-max'])) {
+                $child['meta-vatrate-max'] = $parent['meta-vatrate-max'];
+            }
+            else {
+                unset($child['meta-vatrate-max']);
+            }
             $child['meta-line-vatamount'] = 0;
             unset($child['meta-line-discount-amountinc']);
         }

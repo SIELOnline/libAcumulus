@@ -16,8 +16,8 @@ It is currently used by the extensions for the webshop software of HikaShop,
 Magento, PrestaShop, OpenCart, VirtueMart and WooCommerce, but was built to be
 easily usable with other webshop/CMS software systems as well.
 
-Note to extension reviewers
----------------------------
+Note to extension/plugin/module reviewers
+-----------------------------------------
 This is thus a cross webshop/CMS library and can therefore not comply with
 specific coding standards and guidelines that are often required to get listed
 on specific CMS or webshop extension directories.

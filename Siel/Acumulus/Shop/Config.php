@@ -634,6 +634,10 @@ class Config implements ConfigInterface
         if ($this->keyInfo === null) {
             $curlVersion = curl_version();
             $environment = $this->getConfigStore()->getShopEnvironment();
+            // As utf8 is now commonly accepted, it is a bit difficult to
+            // express the set of characters that are allowed for email
+            // addresses, so we remove characters not allowed.
+            // See http://stackoverflow.com/a/2049537/1475662: @ ()[]\:;"<>,
             $shopName = str_replace(array(' ', '@', '(', ')', '[', ']', '\\', ':', ';', '"', '<', '>', ','), '', $environment['shopName']);
             $this->keyInfo = array(
                 'baseUri' => array(
@@ -741,10 +745,6 @@ class Config implements ConfigInterface
                     'type' => 'string',
                     'default' => "consumer.$shopName@nul.sielsystems.nl",
                 ),
-                // As utf8 is now commonly accepted, it is a bit difficult to
-                // express the set of characters that are allowed, so we remove
-                // characters not allowed.
-                // See http://stackoverflow.com/a/2049537/1475662: @ ()[]\:;"<>,
                 'emailIfAbsent' => array(
                     'group' => 'customer',
                     'type' => 'string',

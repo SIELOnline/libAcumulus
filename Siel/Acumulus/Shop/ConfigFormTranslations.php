@@ -161,6 +161,9 @@ De eigenschappen die uw webshop kent worden hieronder opgesomd.</p>
         'desc_fax' => 'De meeste webshops slaan geen fax nummer meer op. U kunt dit veld dan evt. gebruiken om een vast EN een mobiel nummer in Acumulus op te slaan (als uw webshop die wel allebei opslaat).',
         'field_email' => 'Email',
 
+        'field_mark' => 'Kenmerk',
+        'desc_mark' => 'U knt hier extra informatie over de klant versturen, bv het BSN. Dit veld komt overeen met het veld "kenmerk" op blad 2 van het relatiebeheer.',
+
         'field_clientData' => 'Klantadresgegevens',
         'option_sendCustomer' => 'Uw (niet zakelijke) klanten automatisch aan uw relaties in Acumulus toevoegen.',
         'option_overwriteIfExists' => 'Overschrijf bestaande adresgegevens.',

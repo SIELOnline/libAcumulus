@@ -430,9 +430,17 @@ class AdvancedConfigForm extends BaseConfigForm
                 ),
             ),
             'email' => array(
-                'type' => 'email',
+                'type' => 'text',
                 'label' => $this->t('field_email'),
                 'description' => $this->t('msg_token'),
+                'attributes' => array(
+                    'size' => 30,
+                ),
+            ),
+            'mark' => array(
+                'type' => 'text',
+                'label' => $this->t('field_mark'),
+                'description' => $this->t('desc_mark') . ' ' . $this->t('msg_token'),
                 'attributes' => array(
                     'size' => 30,
                 ),

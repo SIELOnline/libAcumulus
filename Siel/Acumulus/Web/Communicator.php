@@ -205,18 +205,24 @@ class Communicator implements CommunicatorInterface
             } else {
                 $pluginSettings = $this->config->getPluginSettings();
                 $alsoTryAsXml = false;
+                $setJsonError = false;
                 if ($pluginSettings['outputFormat'] === 'json') {
                     $result = json_decode($response, true);
                     if ($result === null) {
-                        $this->setJsonError();
                         // Even if we pass <format>json</format> we might
                         // receive an XML response in case the XML was rejected
-                        // before or during parsing.
+                        // before or during parsing. So we do not set a json
+                        // error now, but try to decode the response as XML
+                        // first.
                         $alsoTryAsXml = true;
+                        $setJsonError = true;
                     }
                 }
                 if ($pluginSettings['outputFormat'] === 'xml' || $alsoTryAsXml) {
                     $result = $this->convertToArray($response);
+                    if (!$result && $setJsonError) {
+                        $this->setJsonError();
+                    }
                 }
             }
 

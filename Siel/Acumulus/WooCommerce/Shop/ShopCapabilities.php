@@ -96,7 +96,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
         return array(
             'contactYourId' => '[customer_user]', // WC_Abstact_order
             'companyName1' => '[billing_company]', // WC_Abstact_order
-            'fullName' => '[billing_first_name] [billing_last_name]', // WC_Abstact_order
+            'fullName' => '[billing_first_name+billing_last_name]', // WC_Abstact_order
             'address1' => '[billing_address_1]', // WC_Abstact_order
             'address2' => '[billing_address_2]', // WC_Abstact_order
             'postalCode' => '[billing_postcode]', // WC_Abstact_order

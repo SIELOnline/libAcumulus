@@ -5,6 +5,9 @@ use Siel\Acumulus\Shop\ConfigStore as BaseConfigStore;
 
 /**
  * Implements the connection to the WordPress config component.
+ *
+ * @todo: the save method is not used as WP stores the values itself.
+ * It seems to work but all values, including (translated) markup, is stored.
  */
 class ConfigStore extends BaSeConfigStore
 {
@@ -53,10 +56,11 @@ class ConfigStore extends BaSeConfigStore
         // - Read all currently stored settings.
         // - Overwrite existing settings.
         // - Add settings that had not yet a value.
-        // - Remove settings that do no longer have a custom value.
+        // - Remove settings that do not (or no longer) have a custom value.
+        $defaults = $this->acumulusConfig->getDefaults();
         $configurationValues = get_option('acumulus');
         foreach ($values as $key => $value) {
-            if ($value === null) {
+            if ((isset($defaults[$key]) && $defaults[$key] === $value) || $value === null) {
                 unset($configurationValues[$key]);
             } else {
                 $configurationValues[$key] = $value;

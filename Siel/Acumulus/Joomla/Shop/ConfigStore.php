@@ -63,7 +63,7 @@ class ConfigStore extends BaSeConfigStore
                     // If an object is converted to an array, the result is an
                     // array whose elements are the object's properties. The
                     // keys are the member variable names, with a few notable
-                    // exceptions: integer properties are unaccessible.!
+                    // exceptions: integer properties are not accessible!
                     // So we use this strange looking but working conversion.
                     $value = json_decode(json_encode($value), true);
                 }
@@ -96,8 +96,9 @@ class ConfigStore extends BaSeConfigStore
             $data = $params->toArray();
         }
 
+        $defaults = $this->acumulusConfig->getDefaults();
         foreach ($values as $key => $value) {
-            if ($value === null) {
+            if ((isset($defaults[$key]) && $defaults[$key] === $value) || $value === null) {
                 unset($data[$key]);
             } else {
                 $data[$key] = $value;

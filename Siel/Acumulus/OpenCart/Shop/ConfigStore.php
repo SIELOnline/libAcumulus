@@ -68,8 +68,10 @@ class ConfigStore extends BaSeConfigStore
         if (!isset($setting['acumulus_siel_module'])) {
             $setting['acumulus_siel_module'] = array();
         }
+
+        $defaults = $this->acumulusConfig->getDefaults();
         foreach ($values as $key => $value) {
-            if ($value === null) {
+            if ((isset($defaults[$key]) && $defaults[$key] === $value) || $value === null) {
                 unset($setting['acumulus_siel_module'][$key]);
             } else {
                 $setting['acumulus_siel_module'][$key] = $value;

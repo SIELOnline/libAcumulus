@@ -68,8 +68,11 @@ class ConfigStore extends BaSeConfigStore
     public function save(array $values)
     {
         $resourceConfig = $this->getResourceConfig();
+        $defaults = $this->acumulusConfig->getDefaults();
         foreach ($values as $key => $value) {
-            if ($value !== null) {
+            if ((isset($defaults[$key]) && $defaults[$key] === $value) || $value === null) {
+                $resourceConfig->deleteConfig($this->configKey . $key, 'default', 0);
+            } else {
                 if (is_bool($value)) {
                     $value = $value ? 1 : 0;
                 } elseif (is_array($value)) {

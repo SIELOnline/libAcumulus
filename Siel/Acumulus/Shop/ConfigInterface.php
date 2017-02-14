@@ -56,6 +56,13 @@ interface ConfigInterface extends InvoiceConfigInterface, WebConfigInterface, In
     public function getKeys();
 
     /**
+     * Returns a list of defaults for the config keys.
+     *
+     * @return array
+     */
+    public function getDefaults();
+
+    /**
      * Returns the set of settings related to reacting to shop events.
      *
      * @return array

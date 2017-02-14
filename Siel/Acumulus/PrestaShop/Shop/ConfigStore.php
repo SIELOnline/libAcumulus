@@ -55,9 +55,12 @@ class ConfigStore extends BaSeConfigStore
     public function save(array $values)
     {
         $result = true;
+        $defaults = $this->acumulusConfig->getDefaults();
         foreach ($values as $key => $value) {
-            if ($value !== null) {
-                $dbKey = substr(static::CONFIG_KEY . $key, 0, 32);
+            $dbKey = substr(static::CONFIG_KEY . $key, 0, 32);
+            if ((isset($defaults[$key]) && $defaults[$key] === $value) || $value === null) {
+              $result = Configuration::deleteByName($dbKey) && $result;
+            } else {
                 if (is_bool($value)) {
                     $value = $value ? '1' : '0';
                 } elseif (is_array($value)) {

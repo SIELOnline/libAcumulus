@@ -229,7 +229,7 @@ class Config implements ConfigInterface
      */
     public function getConfigStore()
     {
-        return $this->getInstance('ConfigStore', 'Shop', array($this->shopNamespace));
+        return $this->getInstance('ConfigStore', 'Shop', array($this, $this->shopNamespace));
     }
 
     /**
@@ -369,10 +369,6 @@ class Config implements ConfigInterface
             unset($values['password']);
         }
 
-        // As not all values need to be passed and some config stores store all
-        // values in 1 record, we first load all stored values, then save the
-        // merged set of (casted) values.
-        $values += $this->getConfigStore()->load($this->getKeys());
         $values = $this->castValues($values);
         $result = $this->getConfigStore()->save($values);
         $this->isConfigurationLoaded = false;
@@ -568,10 +564,6 @@ class Config implements ConfigInterface
      */
     public function getDefaults()
     {
-        $result = $this->getKeyInfo();
-        $result = array_map(function ($item) {
-            return $item['default'];
-        }, $result);
         return array_merge($this->getConfigDefaults(), $this->getShopDefaults());
     }
 
@@ -1068,7 +1060,7 @@ class Config implements ConfigInterface
     {
         // Get current values.
         $values = $this->castValues($this->getConfigStore()->load($this->getKeys()));
-        if ($this->get('removeEmptyShipping') !== NULL) {
+        if ($this->get('removeEmptyShipping') !== null) {
             $values['sendEmptyShipping'] = !$this->get('removeEmptyShipping');
             unset($values['removeEmptyShipping']);
         }

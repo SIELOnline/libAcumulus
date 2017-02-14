@@ -55,15 +55,18 @@ class ConfigStore extends BaSeConfigStore
      */
     public function save(array $values)
     {
+        /** @var \Mage_Core_Model_Config $configModel */
+        $configModel = Mage::getModel('core/config');
+        $defaults = $this->acumulusConfig->getDefaults();
         foreach ($values as $key => $value) {
-            if ($value !== null) {
+            if ((isset($defaults[$key]) && $defaults[$key] === $value) || $value === null) {
+                $configModel->deleteConfig($this->configKey . $key);
+            } else {
                 if (is_bool($value)) {
                     $value = $value ? 1 : 0;
                 } elseif (is_array($value)) {
                     $value = serialize($value);
                 }
-                /** @var \Mage_Core_Model_Config $configModel */
-                $configModel = Mage::getModel('core/config');
                 $configModel->saveConfig($this->configKey . $key, $value);
             }
         }

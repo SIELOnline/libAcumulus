@@ -189,7 +189,7 @@ class Token {
         $value = null;
 
         $args = array();
-        if (preg_match('/(.+)\((.+)\)/', $property, $matches)) {
+        if (preg_match('/(.+)\((.*)\)/', $property, $matches)) {
             $property = $matches[1];
             $args = explode(',', $matches[2]);
         }

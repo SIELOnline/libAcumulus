@@ -257,6 +257,8 @@ class Creator extends BaseCreator
             return $result;
         }
 
+        $sign  = $this->invoiceSource->getType() === source::CreditNote ? -1 : 1;
+
         // $product can be NULL if the product has been deleted.
         $product = $this->shopSource->get_product_from_item($item);
         $vatLookupTags = array();
@@ -297,7 +299,8 @@ class Creator extends BaseCreator
         // can be considered exact. The computed one is not rounded, so we can
         // assume a very high precision for all values here.
         $vatRangeTags = $this->getVatRangeTags($productVat, $productPriceEx, 0.001, 0.001);
-        $parentTags = array('quantity' => $item['qty']) + $vatRangeTags + $vatLookupTags;
+        // Quantity is negative on refunds
+        $parentTags = array('quantity' => $sign * $item['qty']) + $vatRangeTags + $vatLookupTags;
         $result += $parentTags;
 
         // Add variants/options, but set vatamount to 0 on the child lines.
@@ -513,12 +516,14 @@ class Creator extends BaseCreator
         }
 
         // Precision: shipping costs are entered ex VAT, so that may be very
-        // precise, but it will be rounded to the cent by WC. The VAT is as
-        // precise as a float can be and is based on the shipping cost as
-        // entered by the admin.
+        // precise, but it will be rounded to the cent by WC. For orders, the
+        // VAT is as precise as a float can be and is based on the shipping cost
+        // as entered by the admin. However, for refunds it is also rounded to
+        // the cent.
         // @todo: to avoid rounding errors, can we get the non-formatted amount?
         $shippingEx = $this->shopSource->get_total_shipping();
         $shippingVat = $this->shopSource->get_shipping_tax();
+        $precisionNumerator = $this->invoiceSource->getType() === Source::CreditNote ? 0.01 : 0.0001;
 
         $result = array(
                 'product' => $this->getShippingMethodName(),
@@ -526,7 +531,7 @@ class Creator extends BaseCreator
                 'quantity' => 1,
                 'vatamount' => $shippingVat,
             )
-            + $this->getVatRangeTags($shippingVat, $shippingEx, 0.0001)
+            + $this->getVatRangeTags($shippingVat, $shippingEx, $precisionNumerator, 0.01)
             + $vatLookupTags;
 
         return $result;

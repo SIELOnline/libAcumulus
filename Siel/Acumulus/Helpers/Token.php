@@ -187,9 +187,16 @@ class Token {
     protected function getProperty($property, $variable)
     {
         $value = null;
+
+        $args = array();
+        if (preg_match('/(.+)\((.+)\)/', $property, $matches)) {
+            $property = $matches[1];
+            $args = explode(',', $matches[2]);
+        }
         if (is_array($variable)) {
             if (is_callable($variable)) {
-                $value = call_user_func($variable, $property);
+                array_unshift($args, $property);
+                $value = call_user_func_array($variable, $args);
             }
             elseif (isset($variable[$property])) {
                 $value = $variable[$property];
@@ -198,27 +205,35 @@ class Token {
             if (isset($variable->$property)) {
                 $value = $variable->$property;
             } elseif (method_exists($variable, $property)) {
-                $value = $variable->$property();
+                $value = call_user_func_array(array($variable, $property), $args);
             } else {
                 $method = 'get' . ucfirst($property);
                 if (method_exists($variable, $method)) {
-                    $value = $variable->$method();
+                    $value = call_user_func_array(array($variable, $method), $args);
                 } elseif (method_exists($variable, '__get')) {
                     @$value = $variable->$property;
                 } elseif (method_exists($variable, '__call')) {
                     try {
-                        $value = @$variable->$property();
+                        $value = @call_user_func_array(array($variable, $property), $args);
                     } catch (Exception $e) {
                     }
                     if (empty($value)) {
                         try {
-                            $value = $variable->$method();
+                            $value = call_user_func_array(array($variable, $method), $args);
                         } catch (Exception $e) {
                         }
                     }
                 }
             }
         }
+
+        // Some web shops can return an array of values: try to convert to a
+        // string by imploding it (hoping the values are all scalar).
+        // Known uses: Magento2 street value: array of street lines.
+        if (is_array($value)) {
+            $value = implode(" ", $value);
+        }
+
         return $value;
     }
 }

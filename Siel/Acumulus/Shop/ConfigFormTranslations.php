@@ -98,9 +98,10 @@ De eigenschappen die uw webshop kent worden hieronder opgesomd.</p>
 <p>Om speciale situaties aan te kunnen, mogen veldverwijzingen op verschillende manieren samengevoegd worden:</p>
 <ol class="property-list">
 <dt>[property]:</dt><dd>Eenvoudigste vorm, vervang door de waarde van deze eigenschap.</dd>
+<dt>[property(arguments)]:</dt><dd>Vervang door de waarde die de method property teruggeeft. Als property een method is wordt "arguments" (een komma-gescheiden reeks van argumenten zonder quotes om tekenreeksen heen) meegegeven bij het aanroepen van method.</dd>
+<dt>[object::property]:</dt><dd>Vervang alleen door de eigenschap als die in het opgegeven object voorkomt (zie de lijst hieronder). Gebruik dit om verwarring te voorkomen als meerdere objecten een eigenschap met dezelfde naam hebben (bv id).</dd>
 <dt>[property1|property2|...]:</dt><dd>Vervang door de waarde van property1 of als deze geen waarde heeft door die van property2, en zo verder. BV: handig om of het mobiele of het vaste telefoonnummer mee te sturen.</dd>
 <dt>[property1+property2+...]:</dt><dd>Vervang door de waarde van property1 en die van property2 en plaats tussen de properties een spatie, maar alleen als de properties niet leeg zijn.BV: handig om de volledige naam, opgebouwd uit voornaam, tussenvoegsel en achternaam, te versturen zonder dat er meerdere spaties in terecht komen.</dd>
-<dt>[object::property]:</dt><dd>Vervang alleen door de eigenschap als die in het opgegeven object voorkomt (zie de lijst hieronder). Gebruik dit om verwarring te voorkomen als meerdere objecten een eigenschap met dezelfde naam hebben (bv id).</dd>
 </ol>
 <p><strong>Let op:</strong> in de meeste situaties zal de standaardwaarde goed zijn. Pas deze velden alleen aan in speciale omstandigheden en als u weet wat u doet.</p>
 ',
@@ -369,9 +370,10 @@ The properties known by your web shop are listed below.</p>
 <p>To handle some special situations, field references can be combined as follows:</p>
 <ol class="property-list">
 <dt>[property]:</dt><dd>Simplest form, replace by the value of the property.</dd>
+<dt>[property(arguments)]:</dt><dd>Vervang door de waarde die de method property teruggeeft. Als property een method is wordt "arguments" (een komma-gescheiden reeks van argumenten zonder quotes om tekenreeksen heen) meegegeven bij het aanroepen van de method.</dd>
+<dt>[object::property]:</dt><dd>Replace by the value of the property but only if that property is part of the geiven object (see list below). Use this to get the correct value if multiple objects have a property with the same name (e.g. id).</dd>
 <dt>[property1|property2|...]:</dt><dd>Replace by the value of property1, or if that does not have a value by that of property2, etc. Example: useful to get either the mobile OR land line number.</dd>
 <dt>[property1+property2+...]:</dt><dd>Replace by the value of property1 and that of property2 with 1 space between it, but only if both values are not empty. Example: useful to get the full name, constructed of first, middle and last name.</dd>
-<dt>[object::property]:</dt><dd>Replace by the value of the property but only if that property is part of the geiven object (see list below). Use this to get the correct value if multiple objects have a property with the same name (e.g. id).</dd>
 </ol>
 <p><strong>Attention:</strong> in most situations the default value will do fine! Only change these fields in special situations and when you know what you are doing.</p>
 ',

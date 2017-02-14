@@ -297,7 +297,8 @@ class ShopCapabilities extends ShopCapabilitiesBase
             'contactYourId' => '[customer::incrementId|customer::entityId]', // \Mage\Customer\Model\Customer
             'companyName1' => '[company]', // \Magento\Sales\Model\Order\Address
             'fullName' => '[name]', // \Magento\Sales\Model\Order\Address
-            'address1' => '[implodeStreetValue]', // \Magento\Sales\Model\Order\Address
+            'address1' => '[streetLine(1)]', // \Magento\Sales\Model\Order\Address
+            'address2' => '[streetLine(2)]', // \Magento\Sales\Model\Order\Address
             'postalCode' => '[postcode]', // \Magento\Sales\Model\Order\Address
             'city' => '[city]', // \Magento\Sales\Model\Order\Address
             // Magento has 2 VAT numbers:

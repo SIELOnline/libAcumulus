@@ -854,18 +854,23 @@ abstract class Creator
     /**
      * Adds a meta-line-type tag to the lines.
      *
-     * @param array[] $itemLines
+     * @param array[] $lines
      * @param string $lineType
      *
      * @return array
      *
      */
-    protected function addLineType(array $itemLines, $lineType)
+    protected function addLineType(array $lines, $lineType)
     {
-        foreach ($itemLines as &$itemLine) {
-            $itemLine['meta-line-type'] = $lineType;
+        foreach ($lines as &$line) {
+            $line['meta-line-type'] = $lineType;
+            if (isset($line[Creator::Line_Children])) {
+                foreach ($line[Creator::Line_Children] as &$childLine) {
+                    $childLine['meta-line-type'] = $lineType;
+                }
+            }
         }
-        return $itemLines;
+        return $lines;
     }
 
     /**

@@ -152,8 +152,8 @@ class CompletorInvoiceLines
     {
         $invoiceSettings = $this->config->getInvoiceSettings();
         // @todo: we actually need corrected lines to get a reliable count of
-        // @todo: vat rates. so we should flatten after completing... (making
-        // @todo: the  completor methods recursive ...).
+        // @todo: vat rates. so we should flatten after completing... (so we
+        // @todo: should make all the  completor methods recursive ...).
         $vatRates = $this->getAppearingVatRates($children);
         if (count($vatRates) > 1) {
             $separateLines = true;
@@ -205,14 +205,17 @@ class CompletorInvoiceLines
     }
 
     /**
-     * Removes price info from all children but copy vat info from parent.
+     * Removes price info from all children.
      *
      * This prevents that amounts appear twice on the invoice. This can only be
      * done if all children have the same vat rate as the parent, otherwise the
      * price (and vat) info should be on the children and not on the parent
      *
+     * Note: in Magento children could have 0 as vatrate, so we copy vat info
+     * from the parent to the children.
+     *
      * @param array $parent
-     *   The parent line
+     *   The parent line.
      * @param array[] $children
      *   The child lines.
      *
@@ -240,7 +243,11 @@ class CompletorInvoiceLines
                 unset($child['meta-vatrate-max']);
             }
             $child['meta-line-vatamount'] = 0;
+            unset($child['meta-line-price']);
+            unset($child['meta-line-priceinc']);
+            unset($child['meta-line-vatamount']);
             unset($child['meta-line-discount-amountinc']);
+            unset($child['meta-line-discount-vatamount']);
         }
         return $children;
     }
@@ -252,16 +259,41 @@ class CompletorInvoiceLines
      *
      * @param array $parent
      *   The parent line.
+     * @param array[] $children
+     *   The child lines.
      *
      * @return array
      *   The parent line with price info removed.
      */
-    protected function removePriceInfoFromParent(array &$parent)
+    protected function removePriceInfoFromParent(array $parent, array $children)
     {
         $parent['unitprice'] = 0;
         $parent['unitpriceinc'] = 0;
+        $parent['vatamount'] = 0;
+        // Copy vat rate info from a child when the parent has no vat rate info.
+        if (empty($parent['vatrate']) || Number::isZero($parent['vatrate'])) {
+            $parent['vatrate'] = $this->getMaxAppearingVatRate($children, $index);
+            $parent['meta-vatrate-source'] = $children[$index]['meta-vatrate-source'];
+            if (isset($children[$index]['meta-vatrate-min'])) {
+                $parent['meta-vatrate-min'] = $children[$index]['meta-vatrate-min'];
+            }
+            else {
+                unset($parent['meta-vatrate-min']);
+            }
+            if (isset($children[$index]['meta-vatrate-max'])) {
+                $parent['meta-vatrate-max'] = $children[$index]['meta-vatrate-max'];
+            }
+            else {
+                unset($parent['meta-vatrate-max']);
+            }
+        }
         $parent['meta-line-vatamount'] = 0;
+
+        unset($parent['meta-line-price']);
+        unset($parent['meta-line-priceinc']);
+        unset($parent['meta-line-vatamount']);
         unset($parent['meta-line-discount-amountinc']);
+        unset($parent['meta-line-discount-vatamount']);
         return $parent;
     }
 
@@ -452,24 +484,10 @@ class CompletorInvoiceLines
      */
     protected function addVatRateTo0PriceLines()
     {
-        // Get appearing vat rates and their frequency.
-        $vatRates = $this->getAppearingVatRates($this->invoiceLines);
-
-        if (!empty($vatRates)) {
-            // Get the highest appearing vat rate. We could get the most often
-            // appearing vat rate, but IMO the highest vat rate will be more
-            // likely to be correct.
-            $maxVatRate = -1.0;
-            foreach ($vatRates as $vatRate => $frequency) {
-                if ((float) $vatRate > $maxVatRate) {
-                    $maxVatRate = (float) $vatRate;
-                }
-            }
-        } else {
-            // No lines at all with a valid vat range: leave the 0 lines to a
-            // strategy (if we don't have looked up vat rates).
-            $maxVatRate = null;
-        }
+        // Get the highest appearing vat rate. We could get the most often
+        // appearing vat rate, but IMO the highest vat rate will be more likely
+        // to be correct.
+        $maxVatRate = $this->getMaxAppearingVatRate($this->invoiceLines);
 
         foreach ($this->invoiceLines as &$line) {
             if ($line['meta-vatrate-source'] === Creator::VatRateSource_Completor && $line['vatrate'] === null && Number::isZero($line['unitprice'])) {
@@ -505,6 +523,29 @@ class CompletorInvoiceLines
             }
         }
         return $vatRates;
+    }
+
+    /**
+     * Returns the maximum vat rate that appears in the given set of lines.
+     *
+     * @param array[] $lines
+     *   The lines to search.
+     * @param int $index
+     *   If passed, the index of the max vat rate is returned via this parameter.
+     *
+     * @return float|null
+     *   The maximum vat rate in the given set of lines.
+     */
+    protected function getMaxAppearingVatRate(array $lines, &$index = 0) {
+        $index = null;
+        $maxVatRate = -1.0;
+        foreach ($lines as $key => $line) {
+            if (!empty($line['vatrate']) && (float) $line['vatrate'] > $maxVatRate) {
+                $index = $key;
+                $maxVatRate = (float) $line['vatrate'];
+            }
+        }
+        return $maxVatRate;
     }
 
     /**

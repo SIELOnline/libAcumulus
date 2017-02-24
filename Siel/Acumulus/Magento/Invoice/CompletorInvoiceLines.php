@@ -44,7 +44,7 @@ class CompletorInvoiceLines extends BaseCompletorInvoiceLines
             $childrenVatRate = reset($vatRates);
             if ((Number::isZero($childrenVatRate) || $childrenVatRate == $parent['vatrate'])) {
                 if (!Number::isZero($parent['unitprice'])) {
-                    $useParentInfo = TRUE;
+                    $useParentInfo = true;
                 }
             }
         }

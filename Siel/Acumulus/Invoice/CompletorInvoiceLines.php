@@ -92,29 +92,35 @@ class CompletorInvoiceLines
             // If it has children, flatten them and determine how to add them.
             if (array_key_exists(Creator::Line_Children, $line)) {
                 $children = $this->flattenInvoiceLines($line[Creator::Line_Children]);
+                // Remove children from parent.
+                unset($line[Creator::Line_Children]);
                 // Determine whether to add as a single line or add them
                 // separately.
                 if ($this->keepSeparateLines($line, $children)) {
-                    // Keep them separate but allow for some web shop specific
-                    // corrections; indent product descriptions; sanitize VAT
-                    // rates and add some meta data to relate them.
+                    // Keep them separate but perform the following actions:
+                    // - Allow for some web shop specific corrections.
+                    // - Add meta data to relate parent and children.
+                    // - Indent product descriptions.
                     $this->correctInfoBetweenParentAndChildren($line, $children);
                     if (!empty($children)) {
                         $parentIndex = count($result);
                         $line['meta-parent-index'] = $parentIndex;
                         $line['meta-children'] = count($children);
                         foreach ($children as &$child) {
-                            $child['product'] = ' - ' . $child['product'];
+                            $child['product'] = $this->indentDescription($child['product']);
                             $child['meta-parent'] = $parentIndex;
                         }
                     }
                 } else {
-                    $line['product'] = $this->getMergedLinesText($line, $children);
+                    // Merge the children into the parent product:
+                    // - Allow for some web shop specific corrections.
+                    // - Add meta data about removed children.
+                    // - Add text from children, eg. chosen variants, to parent.
+                    $line = $this->collectInfoFromChildren($line, $children);
                     $line['meta-children-merged'] = count($children);
+                    // Delete children as their info is merged into the parent.
                     $children = null;
                 }
-                // Remove children now that they have been flattened or merged.
-                unset($line[Creator::Line_Children]);
             }
 
             // Add the line and its children, if any.
@@ -131,11 +137,11 @@ class CompletorInvoiceLines
      * Determines whether to keep the children on separate lines.
      *
      * This base implementation decides based on:
+     * - Whether all lines have the same VAT rate (different VAT rates => keep)
      * - The settings for:
      *   * optionsAllOn1Line
      *   * optionsAllOnOwnLine
      *   * optionsMaxLength
-     * - Whether all lines have the same VAT rate (different VAT rates => keep)
      *
      * Override if you want other logic to decide on.
      *
@@ -151,6 +157,7 @@ class CompletorInvoiceLines
         $invoiceSettings = $this->config->getInvoiceSettings();
         $vatRates = $this->getAppearingVatRates($children);
         if (count($vatRates) > 1) {
+            // We MUST keep them separate to retain correct vat info.
             $separateLines = true;
         } elseif (count($children) <= $invoiceSettings['optionsAllOn1Line']) {
             $separateLines = false;
@@ -190,13 +197,39 @@ class CompletorInvoiceLines
      *
      * Examples;
      * - remove double amounts, e.g. parent amount = sum of children amounts and
-     *   these amounts appear both on the parent on its children.
+     *   these amounts appear both on the parent and on its children.
      *
      * @param array $parent
      * @param array[] $children
      */
     protected function correctInfoBetweenParentAndChildren(array &$parent, array &$children)
     {
+    }
+
+    /**
+     * Allows to collect info from the child lines and add it to the parent.
+     *
+     * This method will only be called when the child lines will be merged into
+     * the parent line.
+     *
+     * This base implementation merges the product descriptions from the child
+     * lines into the parent product description. Web shops may add their own
+     * (additional) info collecting by overriding this method.
+     *
+     * Examples;
+     * - There are amounts on the children but as they are going to be merged
+     *   into the parent they would get lost.
+     *
+     * @param array $parent
+     * @param array[] $children
+     *
+     * @return array
+     *   The parent line extened with the collected info.
+     */
+    protected function collectInfoFromChildren(array $parent, array $children)
+    {
+        $parent['product'] = $this->getMergedLinesText($parent, $children);
+        return $parent;
     }
 
     /**
@@ -288,6 +321,24 @@ class CompletorInvoiceLines
         unset($parent['meta-line-discount-amountinc']);
         unset($parent['meta-line-discount-vatamount']);
         return $parent;
+    }
+
+    /**
+     * Indents a product description (to indicate that it is part of a bundle).
+     *
+     * @param string $description
+     *   The description to indent.
+     *
+     * @return string
+     *   The indented product description.
+     */
+    protected function indentDescription($description) {
+        if (preg_match('/^ *- /', $description)) {
+            $description = '  ' . $description;
+        } else {
+            $description = ' - ' . $description;
+        }
+        return $description;
     }
 
     /**

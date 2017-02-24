@@ -76,8 +76,8 @@ class Token {
      *   typically the class name (with a lower cased 1st character) or the
      *   variable name typically used in the shop software.
      *
-     * @return string The pattern with tokens expanded with their actual value.
-     * The pattern with tokens expanded with their actual value.
+     * @return string
+     *   The pattern with tokens expanded with their actual value.
      */
     public function expand($pattern, array $variables)
     {
@@ -109,7 +109,7 @@ class Token {
      *   The property specification to expand.
      *
      * @return string
-     *   The value of the property,if found, the empty string otherwise.
+     *   The value of the property, if found, the empty string otherwise.
      */
     protected function searchPropertySpec($propertySpec)
     {
@@ -120,6 +120,9 @@ class Token {
             foreach ($propertyConcatenation as $property) {
                 $propertyValue = $this->searchProperty($property);
                 if (!empty($propertyValue)) {
+                    if ($value === null) {
+                        $value = '';
+                    }
                     if (!empty($value)) {
                         $value .= ' ';
                     }
@@ -130,7 +133,12 @@ class Token {
                 break;
             }
         }
-        return !is_null($value) ? $value : '';
+
+        if ($value === null) {
+            Log::getInstance()->info("Token::searchProperty('%s'): not found", $propertySpec);
+        }
+
+        return $value !== null ? $value : '';
     }
 
     /**
@@ -155,7 +163,7 @@ class Token {
         foreach ($this->variables as $key => $variable) {
             if (empty($variableName) || $key === $variableName) {
                 $value = $this->getProperty($property, $variable);
-                if (!is_null($value)) {
+                if ($value !== null) {
                     break;
                 }
             }

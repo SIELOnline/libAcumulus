@@ -1,9 +1,6 @@
 <?php
 namespace Siel\Acumulus\Magento\Invoice;
 
-use Mage;
-use Mage_Sales_Model_Order;
-use Mage_Sales_Model_Order_Creditmemo;
 use Siel\Acumulus\Invoice\Source as BaseSource;
 
 /**
@@ -12,26 +9,8 @@ use Siel\Acumulus\Invoice\Source as BaseSource;
 class Source extends BaseSource
 {
     // More specifically typed properties.
-    /** @var Mage_Sales_Model_Order|Mage_Sales_Model_Order_Creditmemo */
+    /** @var \Mage_Sales_Model_Order|\Mage_Sales_Model_Order_Creditmemo|\Magento\Sales\Model\Order|\Magento\Sales\Model\Order\Creditmemo */
     protected $source;
-
-    /**
-     * Loads an Order source for the set id.
-     */
-    protected function setSourceOrder()
-    {
-        $this->source = Mage::getModel('sales/order');
-        $this->source->load($this->id);
-    }
-
-    /**
-     * Loads a Credit memo source for the set id.
-     */
-    protected function setSourceCreditNote()
-    {
-        $this->source = Mage::getModel('sales/order_creditmemo');
-        $this->source->load($this->id);
-    }
 
     /**
      * {@inheritdoc}
@@ -84,9 +63,15 @@ class Source extends BaseSource
      *
      * @return int
      *   1 of
-     *   Mage_Sales_Model_Order_Creditmemo::STATE_OPEN        = 1;
-     *   Mage_Sales_Model_Order_Creditmemo::STATE_REFUNDED    = 2;
-     *   Mage_Sales_Model_Order_Creditmemo::STATE_CANCELED    = 3;
+     *   In Magento 1:
+     *   Mage_Sales_Model_Order_Creditmemo::STATE_OPEN         = 1;
+     *   Mage_Sales_Model_Order_Creditmemo::STATE_REFUNDED     = 2;
+     *   Mage_Sales_Model_Order_Creditmemo::STATE_CANCELED     = 3;
+     *   or in Magento 2:
+     *   \Magento\Sales\Model\Order\Creditmemo::STATE_OPEN     = 1;
+     *   \Magento\Sales\Model\Order\Creditmemo::STATE_REFUNDED = 2;
+     *   \Magento\Sales\Model\Order\Creditmemo::STATE_CANCELED = 3;
+
      */
     protected function getStatusCreditNote()
     {

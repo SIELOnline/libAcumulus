@@ -51,8 +51,8 @@ class CompletorInvoiceLines extends BaseCompletorInvoiceLines
         if ($useParentInfo) {
             $children = $this->removePriceInfoFromChildren($parent, $children);
         } else {
-            // All price and vat info remains on the child lines. Make
-            // sure no price and vat info is left on the bundle line.
+            // All price and vat info remains on the child lines. Make sure that
+            // no price info is left on the bundle line.
             $parent = $this->removePriceInfoFromParent($parent, $children);
         }
     }
@@ -72,7 +72,7 @@ class CompletorInvoiceLines extends BaseCompletorInvoiceLines
      * @param array[] $children
      *
      * @return bool
-     *   Whether a single child line is actually the same as its parent.
+     *   True if the single child line is actually the same as its parent.
      */
     protected function isChildSameAsParent(array $parent, array $children)
     {

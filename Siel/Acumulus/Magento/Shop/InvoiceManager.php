@@ -1,34 +1,21 @@
 <?php
 namespace Siel\Acumulus\Magento\Shop;
 
-use DateTime;
-use Mage;
-use Siel\Acumulus\Magento\Invoice\Source;
-use Varien_Object;
-use Siel\Acumulus\Invoice\Source as BaseSource;
+use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
 
-class InvoiceManager extends BaseInvoiceManager
+abstract class InvoiceManager extends BaseInvoiceManager
 {
-    /**
-     * Returns a Magento model for the given source type.
-     *
-     * @param $invoiceSourceType
-     *
-     * @return \Mage_Sales_Model_Abstract
-     */
-    protected function getInvoiceSourceTypeModel($invoiceSourceType)
-    {
-        return $invoiceSourceType == Source::Order ? Mage::getModel('sales/order') : Mage::getModel('sales/order_creditmemo');
-    }
-
     /**
      * {@inheritdoc}
      */
     public function getInvoiceSourcesByIdRange($invoiceSourceType, $InvoiceSourceIdFrom, $InvoiceSourceIdTo)
     {
         $field = 'entity_id';
-        $condition = array('from' => $InvoiceSourceIdFrom, 'to' => $InvoiceSourceIdTo);
+        $condition = array(
+            'from' => $InvoiceSourceIdFrom,
+            'to' => $InvoiceSourceIdTo,
+        );
         return $this->getByCondition($invoiceSourceType, $field, $condition);
     }
 
@@ -38,14 +25,17 @@ class InvoiceManager extends BaseInvoiceManager
     public function getInvoiceSourcesByReferenceRange($invoiceSourceType, $invoiceSourceReferenceFrom, $invoiceSourceReferenceTo)
     {
         $field = 'increment_id';
-        $condition = array('from' => $invoiceSourceReferenceFrom, 'to' => $invoiceSourceReferenceTo);
+        $condition = array(
+            'from' => $invoiceSourceReferenceFrom,
+            'to' => $invoiceSourceReferenceTo,
+        );
         return $this->getByCondition($invoiceSourceType, $field, $condition);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getInvoiceSourcesByDateRange($invoiceSourceType, DateTime $dateFrom, DateTime $dateTo)
+    public function getInvoiceSourcesByDateRange($invoiceSourceType, \DateTime $dateFrom, \DateTime $dateTo)
     {
         $dateFrom = $this->getSqlDate($dateFrom);
         $dateTo = $this->getSqlDate($dateTo);
@@ -62,13 +52,15 @@ class InvoiceManager extends BaseInvoiceManager
      * @param string|string[] $field
      * @param int|string|array $condition
      *
-     * @return \Siel\Acumulus\Magento\Invoice\Source[]
+     * @return \Siel\Acumulus\Invoice\Source[]
      *   A non keyed array with invoice Sources.
      */
     protected function getByCondition($invoiceSourceType, $field, $condition)
     {
-        /** @var \Mage_Core_Model_Resource_Db_Collection_Abstract $collection */
-        $collection = $this->getInvoiceSourceTypeModel($invoiceSourceType)->getResourceCollection();
+        /** @var \Mage_Core_Model_Resource_Db_Collection_Abstract|\Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection $collection */
+        $collection = $this
+            ->getInvoiceSourceTypeModel($invoiceSourceType)
+            ->getResourceCollection();
         $items = $collection
             ->addFieldToFilter($field, $condition)
             ->getItems();
@@ -78,14 +70,22 @@ class InvoiceManager extends BaseInvoiceManager
     }
 
     /**
+     * Returns a Magento model for the given source type.
+     *
+     * @param $invoiceSourceType
+     *
+     * @return \Mage_Sales_Model_Abstract|\Magento\Sales\Model\AbstractModel
+     */
+    abstract protected function getInvoiceSourceTypeModel($invoiceSourceType);
+
+    /**
      * {@inheritdoc}
      *
      * This Magento override dispatches the 'acumulus_invoice_created' event.
      */
-    protected function triggerInvoiceCreated(array &$invoice, BaseSource $invoiceSource)
+    protected function triggerInvoiceCreated(array &$invoice, Source $invoiceSource)
     {
-        $transportObject = new Varien_Object(array('invoice' => $invoice));
-        Mage::dispatchEvent('acumulus_invoice_created', array('transport_object' => $transportObject, 'source' => $invoiceSource));
+        $this->dispatchEvent('acumulus_invoice_created', array('source' => $invoiceSource), array('invoice' => &$invoice));
     }
 
     /**
@@ -93,10 +93,9 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * This Magento override dispatches the 'acumulus_invoice_completed' event.
      */
-    protected function triggerInvoiceCompleted(array &$invoice, BaseSource $invoiceSource)
+    protected function triggerInvoiceCompleted(array &$invoice, Source $invoiceSource)
     {
-        $transportObject = new Varien_Object(array('invoice' => $invoice));
-        Mage::dispatchEvent('acumulus_invoice_completed', array('transport_object' => $transportObject, 'source' => $invoiceSource));
+        $this->dispatchEvent('acumulus_invoice_completed', array('source' => $invoiceSource), array('invoice' => &$invoice));
     }
 
     /**
@@ -104,8 +103,22 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * This Magento override dispatches the 'acumulus_invoice_sent' event.
      */
-    protected function triggerInvoiceSent(array $invoice, BaseSource $invoiceSource, array $result)
+    protected function triggerInvoiceSent(array $invoice, Source $invoiceSource, array $result)
     {
-        Mage::dispatchEvent('acumulus_invoice_sent', array('invoice' => $invoice, 'source' => $invoiceSource, 'result' => $result));
+        $this->dispatchEvent('acumulus_invoice_sent', array('invoice' => $invoice, 'source' => $invoiceSource, 'result' => $result));
     }
+
+    /**
+     * Dispatches an event.
+     *
+     * @param string $name
+     *   The name of the event.
+     * @param array $parameters
+     *   The parameters to the event that cannot be changed.
+     * @param array? $refParameters
+     *   The parameters to the event that can be changed.
+     *
+     * @return void
+     */
+    abstract protected function dispatchEvent($name, array $parameters, array $refParameters = null);
 }

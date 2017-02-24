@@ -1,5 +1,5 @@
 <?php
-namespace Siel\Acumulus\Magento2\Helpers;
+namespace Siel\Acumulus\Magento\Magento2\Helpers;
 
 use Siel\Acumulus\Helpers\TranslationCollection;
 

@@ -1,5 +1,5 @@
 <?php
-namespace Siel\Acumulus\Magento2\Helpers\Logger;
+namespace Siel\Acumulus\Magento\Magento2\Helpers\Logger;
 
 use Magento\Framework\Logger\Handler\Base;
 

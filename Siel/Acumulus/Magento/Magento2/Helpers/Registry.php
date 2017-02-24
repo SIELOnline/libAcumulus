@@ -1,7 +1,7 @@
 <?php
-namespace Siel\Acumulus\Magento2\Helpers;
+namespace Siel\Acumulus\Magento\Magento2\Helpers;
 
-use Magento\Framework\App\ObjectManager;
+use Magento\Framework\App\Bootstrap;
 
 /**
  * Registry is a wrapper around the Magento2 ObjectManager to get
@@ -9,7 +9,7 @@ use Magento\Framework\App\ObjectManager;
 class Registry
 {
     /**
-     * @var \Siel\Acumulus\Magento2\Helpers\Registry
+     * @var \Siel\Acumulus\Magento\Magento2\Helpers\Registry
      */
     protected static $instance;
 
@@ -26,7 +26,7 @@ class Registry
     /**
      * Returns the Registry instance.
      *
-     * @return \Siel\Acumulus\Magento2\Helpers\Registry
+     * @return \Siel\Acumulus\Magento\Magento2\Helpers\Registry
      */
     public static function getInstance()
     {
@@ -44,13 +44,12 @@ class Registry
         /** @var \Magento\Framework\App\Bootstrap */
         global $bootstrap;
 
-        // @todo!!!: $bootstrap is niet altijd geinitialiseerd (bv bij een cmdline update).
         if ($bootstrap) {
             $localBootstrap = $bootstrap;
         } else {
             $pos = strpos(__DIR__, str_replace('/', DIRECTORY_SEPARATOR, '/app/code/Siel/Acumulus/Magento2/Helpers'));
             $root = substr(__DIR__, 0, $pos);
-            $localBootstrap = \Magento\Framework\App\Bootstrap::create($root, $_SERVER);
+            $localBootstrap = Bootstrap::create($root, $_SERVER);
         }
         /** @var \Magento\Framework\ObjectManagerInterface */
         $this->objectManager = $localBootstrap->getObjectManager();

@@ -1,16 +1,12 @@
 <?php
-namespace Siel\Acumulus\Magento2\Invoice;
+namespace Siel\Acumulus\Magento\Magento1\Invoice;
 
-use \Magento\Sales\Model\Order\Item as OrderItem;
-use Magento\Sales\Model\Order\Creditmemo;
-use Magento\Sales\Model\Order\Creditmemo\Item as CreditmemoItem;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\ConfigInterface;
-use Siel\Acumulus\Invoice\Creator as BaseCreator;
-use Siel\Acumulus\Magento2\Helpers\Registry;
+use Siel\Acumulus\Magento\Invoice\Creator as BaseCreator;
 
 /**
- * Allows to create arrays in the Acumulus invoice structure from a Magento 2
+ * Allows to create arrays in the Acumulus invoice structure from a Magento
  * order or credit memo.
  *
  * @todo: multi currency: use base values (default store currency) or values
@@ -23,40 +19,17 @@ use Siel\Acumulus\Magento2\Helpers\Registry;
  */
 class Creator extends BaseCreator
 {
-    /** @var \Magento\Sales\Model\Order */
+    /** @var \Mage_Sales_Model_Order */
     protected $order;
 
-    /** @var \Magento\Sales\Model\Order\Creditmemo */
+    /** @var \Mage_Sales_Model_Order_Creditmemo */
     protected $creditNote;
 
-    /** @var \Magento\Sales\Model\ResourceModel\Order\Invoice\Collection */
+    /** @var \Mage_Core_Model_Resource_Db_Collection_Abstract */
     protected $shopInvoices;
 
-    /** @var \Magento\Sales\Model\Order\Invoice */
+    /** @var \Mage_Sales_Model_Order_Invoice */
     protected $shopInvoice;
-
-    /**
-     * {@inheritdoc}
-     *
-     * This override also initializes Magento specific properties related to the
-     * source.
-     */
-    protected function setInvoiceSource($source)
-    {
-        parent::setInvoiceSource($source);
-        switch ($this->invoiceSource->getType()) {
-            case Source::Order:
-                $this->order = $this->invoiceSource->getSource();
-                $this->creditNote = null;
-                break;
-            case Source::CreditNote:
-                $this->creditNote = $this->invoiceSource->getSource();
-                $this->order = $this->creditNote->getOrder();
-                break;
-        }
-        $this->shopInvoices = $this->order->getInvoiceCollection();
-        $this->shopInvoice = count($this->shopInvoices) > 0 ? $this->shopInvoices->getFirstItem() : null;
-    }
 
     /**
      * {@inheritdoc}
@@ -66,7 +39,7 @@ class Creator extends BaseCreator
         parent::setPropertySources();
         $this->propertySources['billingAddress'] = $this->invoiceSource->getSource()->getBillingAddress();
         $this->propertySources['shippingAddress'] = $this->invoiceSource->getSource()->getShippingAddress();
-        $this->propertySources['customer'] = Registry::getInstance()->create('Magento\Customer\Model\Customer')->load($this->invoiceSource->getSource()->getCustomerId());
+        $this->propertySources['customer'] = \Mage::getModel('customer/customer')->load($this->invoiceSource->getSource()->getCustomerId());
     }
 
     /**
@@ -74,62 +47,7 @@ class Creator extends BaseCreator
      */
     protected function getCountryCode()
     {
-        return $this->invoiceSource->getSource()->getBillingAddress()->getCountryId();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getInvoiceNumber($invoiceNumberSource)
-    {
-        $result = $this->invoiceSource->getReference();
-        if ($invoiceNumberSource == ConfigInterface::InvoiceNrSource_ShopInvoice && $this->invoiceSource->getType() === Source::Order && $this->shopInvoice !== null) {
-            $result = $this->shopInvoice->getIncrementId();
-        }
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getInvoiceDate($dateToUse)
-    {
-        // createdAt returns yyyy-mm-dd hh:mm:ss, take date part.
-        $result = substr($this->invoiceSource->getSource()->getCreatedAt(), 0, strlen('yyyy-mm-dd'));
-        // A credit note is to be considered an invoice on its own.
-        if ($dateToUse == ConfigInterface::InvoiceDate_InvoiceCreate && $this->invoiceSource->getType() === Source::Order && $this->shopInvoice !== null) {
-            $result = substr($this->shopInvoice->getCreatedAt(), 0, strlen('yyyy-mm-dd'));
-        }
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * This override returns the internal method name of the chosen payment
-     * method.
-     */
-    protected function getPaymentMethod()
-    {
-        try {
-            return $this->order->getPayment()->getMethod();
-        }
-        catch (\Exception $e) {}
-        return parent::getPaymentMethod();
-    }
-
-    /**
-     * Returns whether the order has been paid or not.
-     *
-     * @return int
-     *   \Siel\Acumulus\Invoice\ConfigInterface::PaymentStatus_Paid or
-     *   \Siel\Acumulus\Invoice\ConfigInterface::PaymentStatus_Due
-     */
-    protected function getPaymentStateOrder()
-    {
-        return Number::isZero($this->order->getBaseTotalDue())
-            ? ConfigInterface::PaymentStatus_Paid
-            : ConfigInterface::PaymentStatus_Due;
+        return $this->invoiceSource->getSource()->getBillingAddress()->getCountry();
     }
 
     /**
@@ -141,7 +59,7 @@ class Creator extends BaseCreator
      */
     protected function getPaymentStateCreditNote()
     {
-        return $this->creditNote->getState() == Creditmemo::STATE_REFUNDED
+        return $this->creditNote->getState() == \Mage_Sales_Model_Order_Creditmemo::STATE_REFUNDED
             ? ConfigInterface::PaymentStatus_Paid
             : ConfigInterface::PaymentStatus_Due;
     }
@@ -157,7 +75,7 @@ class Creator extends BaseCreator
         // Take date of last payment as payment date.
         $paymentDate = null;
         foreach ($this->order->getStatusHistoryCollection() as $statusChange) {
-            /** @var \Magento\Sales\Model\Order\Status\History $statusChange */
+            /** @var \Mage_Sales_Model_Order_Status_History $statusChange */
             if (!$paymentDate || $this->isPaidStatus($statusChange->getStatus())) {
                 $createdAt = substr($statusChange->getCreatedAt(), 0, strlen('yyyy-mm-dd'));
                 if (!$paymentDate || $createdAt < $paymentDate) {
@@ -169,57 +87,6 @@ class Creator extends BaseCreator
     }
 
     /**
-     * Returns whether the order is in a state that makes it to be considered paid.
-     *
-     * @param string $status
-     *
-     * @return bool
-     */
-    protected function isPaidStatus($status)
-    {
-        return in_array($status, array('processing', 'closed', 'complete'));
-    }
-
-    /**
-     * Returns the payment date for the credit memo.
-     *
-     * @return string|null
-     *   The payment date (yyyy-mm-dd) or null if the order has not been paid yet.
-     */
-    protected function getPaymentDateCreditNote()
-    {
-        return substr($this->creditNote->getCreatedAt(), 0, strlen('yyyy-mm-dd'));
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * This override provides the values meta-invoice-amountinc and
-     * meta-invoice-vatamount.
-     */
-    protected function getInvoiceTotals()
-    {
-        $sign = $this->invoiceSource->getType() === Source::CreditNote ? -1.0 : 1.0;
-        return array(
-            'meta-invoice-amountinc' => $sign * $this->invoiceSource->getSource()->getBaseGrandTotal(),
-            'meta-invoice-vatamount' => $sign * $this->invoiceSource->getSource()->getBaseTaxAmount(),
-        );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getItemLinesOrder()
-    {
-        $result = array();
-        // Items may be composed, so start with all "visible" items.
-        foreach ($this->order->getAllVisibleItems() as $item) {
-            $result[] = $this->getItemLineOrder($item);
-        }
-        return $result;
-    }
-
-    /**
      * {@inheritdoc}
      */
     protected function getItemLinesCreditNote()
@@ -228,7 +95,7 @@ class Creator extends BaseCreator
         // Items may be composed, so start with all "visible" items.
         foreach ($this->creditNote->getAllItems() as $item) {
             // Only items for which row total is set, are refunded
-            /** @var CreditmemoItem $item */
+            /** @var \Mage_Sales_Model_Order_Creditmemo_Item $item */
             if (!Number::isZero($item->getRowTotal())) {
                 $result[] = $this->getItemLineCreditNote($item);
             }
@@ -237,13 +104,13 @@ class Creator extends BaseCreator
     }
 
     /**
-     * Returns an item line for 1 main product line.
+     * {@inheritdoc}
      *
-     * @param \Magento\Sales\Model\Order\Item $item
+     * @param \Mage_Sales_Model_Order_Item $item
      *
      * @return array
      */
-    protected function getItemLineOrder(OrderItem $item)
+    protected function getItemLineOrder($item)
     {
         $result = array();
 
@@ -256,7 +123,7 @@ class Creator extends BaseCreator
         // Hidden tax amount = VAT over discount.
         // But as discounts get their own lines and the product lines are
         // showing the normal (not discounted) price we add these 2.
-        $lineVat = (float) $item->getTaxAmount() + (float) $item->getDiscountTaxCompensationAmount();
+        $lineVat = (float) $item->getTaxAmount() + (float) $item->getHiddenTaxAmount();
 
         // Simple products (products without children): add as 1 line.
         $this->addIfNotEmpty($result, 'itemnumber', $item->getSku());
@@ -291,15 +158,15 @@ class Creator extends BaseCreator
     /**
      * Returns 1 item line for 1 credit line.
      *
-     * @param CreditmemoItem $item
+     * @param \Mage_Sales_Model_Order_Creditmemo_Item $item
      *
      * @return array
      */
-    protected function getItemLineCreditNote(CreditmemoItem $item)
+    protected function getItemLineCreditNote(\Mage_Sales_Model_Order_Creditmemo_Item $item)
     {
         $result = array();
 
-        $lineVat = -((float) $item->getTaxAmount() + (float) $item->getDiscountTaxCompensationAmount());
+        $lineVat = -((float) $item->getTaxAmount() + (float) $item->getHiddenTaxAmount());
         $productPriceEx = -((float) $item->getPrice());
 
         // On a credit note we only have single lines, no compound lines.
@@ -342,7 +209,7 @@ class Creator extends BaseCreator
     protected function getShippingLine()
     {
         $result = array();
-        /** @var \Magento\Sales\Model\Order|\Magento\Sales\Model\Order\Creditmemo $magentoSource */
+        /** @var \Mage_Sales_Model_Order|\Mage_Sales_Model_Order_Creditmemo $magentoSource */
         $magentoSource = $this->invoiceSource->getSource();
         // Only add a free shipping line on an order, not on a credit note:
         // free shipping is never refunded...
@@ -358,8 +225,6 @@ class Creator extends BaseCreator
             // - getShippingInclTax():        shipping costs incl VAT excl any discount
             // - getShippingTaxAmount():      VAT on shipping costs incl discount
             // - getShippingDiscountAmount(): discount on shipping incl VAT
-            /** @var \Magento\Sales\Model\Order|\Magento\Sales\Model\Order\Creditmemo $magentoSource */
-            $magentoSource = $this->invoiceSource->getSource();
             if (!Number::isZero($magentoSource->getShippingAmount())) {
                 // We have 2 ways of calculating the vat rate: first one is based on tax
                 // amount and normal shipping costs corrected with any discount (as the
@@ -406,87 +271,10 @@ class Creator extends BaseCreator
     /**
      * {@inheritdoc}
      */
-    protected function getShippingMethodName()
-    {
-        $name = $this->order->getShippingDescription();
-        if (!empty($name)) {
-            return $name;
-        }
-        return parent::getShippingMethodName();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getDiscountLines()
-    {
-        $result = array();
-        if (!Number::isZero($this->invoiceSource->getSource()->getDiscountAmount())) {
-            $line = array(
-                'itemnumber' => '',
-                'product' => $this->getDiscountDescription(),
-                'vatrate' => null,
-                'meta-vatrate-source' => static::VatRateSource_Strategy,
-                'meta-strategy-split' => true,
-                'quantity' => 1,
-            );
-            // Product prices incl. VAT => discount amount is also incl. VAT
-            if ($this->productPricesIncludeTax()) {
-                $line['unitpriceinc'] = $this->getSign() * $this->invoiceSource->getSource()->getDiscountAmount();
-            } else {
-                $line['unitprice'] = $this->getSign() * $this->invoiceSource->getSource()->getDiscountAmount();
-            }
-            $result[] = $line;
-        }
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * This implementation may return a manual line for a credit memo.
-     */
-    protected function getManualLines()
-    {
-        $result = array();
-
-        if (isset($this->creditNote) && !Number::isZero($this->creditNote->getAdjustment())) {
-            $line = array(
-                'product' => $this->t('refund_adjustment'),
-                'unitprice' => -$this->creditNote->getAdjustment(),
-                'quantity' => 1,
-                'vatrate' => 0,
-            );
-            $result[] = $line;
-        }
-        return $result;
-    }
-
-    /**
-     * @return string
-     */
-    protected function getDiscountDescription()
-    {
-        if ($this->order->getDiscountDescription()) {
-            $description = $this->t('discount_code') . ' ' . $this->order->getDiscountDescription();
-        } elseif ($this->order->getCouponCode()) {
-            $description = $this->t('discount_code') . ' ' . $this->order->getCouponCode();
-        } else {
-            $description = $this->t('discount');
-        }
-        return $description;
-    }
-
-    /**
-     * Returns if the prices for the products are entered with or without tax.
-     *
-     * @return bool
-     *   Whether the prices for the products are entered with or without tax.
-     */
     protected function productPricesIncludeTax()
     {
-        /** @var \Magento\Tax\Model\Config $taxConfig */
-        $taxConfig = Registry::getInstance()->create('Magento\Tax\Model\Config');
+        /** @var \Mage_Tax_Model_Config $taxConfig */
+        $taxConfig = \Mage::getModel('tax/config');
         return $taxConfig->priceIncludesTax();
     }
 }

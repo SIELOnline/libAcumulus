@@ -976,7 +976,7 @@ abstract class Creator
      * @param string $method
      * @param array $args
      *
-     * @return mixed|void
+     * @return mixed
      */
     protected function callSourceTypeSpecificMethod($method, $args = array())
     {

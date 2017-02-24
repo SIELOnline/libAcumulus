@@ -19,7 +19,8 @@ class ConfigForm extends BaseConfigForm
         // Group (checked) checkboxes into their collections.
         foreach ($this->getCheckboxKeys() as $checkboxName => $collectionName) {
             if (!empty($this->formValues[$checkboxName])) {
-                // Handle the case where $collectionName and $checkboxName are the same.
+                // Handle the case where $collectionName and $checkboxName are
+                // the same.
                 if (array_key_exists($collectionName, $this->formValues) && is_array($this->formValues[$collectionName])) {
                     $this->formValues[$collectionName][] = $checkboxName;
                 } else {

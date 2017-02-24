@@ -1,9 +1,9 @@
 <?php
-namespace Siel\Acumulus\Magento2\Helpers;
+namespace Siel\Acumulus\Magento\Magento2\Helpers;
 
 use Magento\Framework\Filesystem\Driver\File;
 use Monolog\Logger;
-use Siel\Acumulus\Magento2\Helpers\Logger\Handler;
+use Siel\Acumulus\Magento\Magento2\Helpers\Logger\Handler;
 use Siel\Acumulus\Helpers\Log as BaseLog;
 
 /**

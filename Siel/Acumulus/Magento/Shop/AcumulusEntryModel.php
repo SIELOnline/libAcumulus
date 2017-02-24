@@ -1,28 +1,21 @@
 <?php
 namespace Siel\Acumulus\Magento\Shop;
 
-use Mage;
 use Siel\Acumulus\Shop\AcumulusEntryModel as BaseAcumulusEntryModel;
-use Siel_Acumulus_Model_Entry;
 
 /**
  * Implements the Magento specific acumulus entry model class.
+ *
+ * This class is a bridge between the Acumulus library and the way that Magento
+ * models are modelled.
  */
 class AcumulusEntryModel extends BaseAcumulusEntryModel
 {
-    /** @var Siel_Acumulus_Model_Entry */
+    /** @var \Siel_Acumulus_Model_Entry|\Siel\AcumulusMa2\Model\Entry */
     protected $model;
 
     /**
-     * AcumulusEntryModel constructor.
-     */
-    public function __construct()
-    {
-        $this->model = Mage::getModel('acumulus/entry');
-    }
-
-    /**
-     * @return Siel_Acumulus_Model_Entry
+     * @return \Siel_Acumulus_Model_Entry|\Siel\AcumulusMa2\Model\Entry
      */
     protected function getModel()
     {
@@ -34,8 +27,10 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
      */
     public function getByEntryId($entryId)
     {
-        /** @var Siel_Acumulus_Model_Entry[] $result */
-        $result = $this->getModel()->getResourceCollection()
+        /** @var \Siel_Acumulus_Model_Entry[]|\Siel\AcumulusMa2\Model\Entry[] $result */
+        $result = $this
+           ->getModel()
+           ->getResourceCollection()
            ->addFieldToFilter('entry_id', $entryId)
            ->getItems();
         $result = count($result) === 0 ? null : (count($result) === 1 ? reset($result) : $result);
@@ -47,11 +42,13 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
      */
     public function getByInvoiceSourceId($invoiceSourceType, $invoiceSourceId)
     {
-        /** @var Siel_Acumulus_Model_Entry $result */
-        $result = $this->getModel()->getResourceCollection()
-           ->addFieldToFilter('source_type', $invoiceSourceType)
-           ->addFieldToFilter('source_id', $invoiceSourceId)
-           ->getFirstItem();
+        /** @var \Siel_Acumulus_Model_Entry|\Siel\AcumulusMa2\Model\Entry $result */
+        $result = $this
+            ->getModel()
+            ->getResourceCollection()
+            ->addFieldToFilter('source_type', $invoiceSourceType)
+            ->addFieldToFilter('source_id', $invoiceSourceId)
+            ->getFirstItem();
         return $result->getSourceId() == $invoiceSourceId ? $result : null;
     }
 
@@ -60,7 +57,9 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
      */
     protected function insert($invoiceSource, $entryId, $token, $created)
     {
-        return $this->getModel()
+        /** @noinspection PhpDeprecationInspection http://magento.stackexchange.com/questions/114929/deprecated-save-and-load-methods-in-abstract-model */
+        return $this
+            ->getModel()
             ->setEntryId($entryId)
             ->setToken($token)
             ->setSourceType($invoiceSource->getType())
@@ -100,7 +99,7 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
     /**
      * {@inheritdoc}
      *
-     * Magento has separate install scripts, so nothing has to be done here.
+     * Magento has separate uninstall scripts, so nothing has to be done here.
      */
     public function uninstall()
     {

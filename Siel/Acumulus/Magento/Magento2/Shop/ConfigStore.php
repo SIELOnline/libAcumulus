@@ -1,9 +1,7 @@
 <?php
-namespace Siel\Acumulus\Magento2\Shop;
+namespace Siel\Acumulus\Magento\Magento2\Shop;
 
-use Magento\Framework\App\ObjectManager;
-use Siel\Acumulus\Magento2\Helpers\Registry;
-use Siel\Acumulus\Shop\ConfigInterface;
+use Siel\Acumulus\Magento\Magento2\Helpers\Registry;
 use Siel\Acumulus\Shop\ConfigStore as BaseConfigStore;
 
 /**

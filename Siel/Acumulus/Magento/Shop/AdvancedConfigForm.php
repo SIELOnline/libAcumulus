@@ -1,13 +1,13 @@
 <?php
 namespace Siel\Acumulus\Magento\Shop;
 
-use Siel\Acumulus\Shop\AdvancedConfigForm as BaseConfigForm;
+use Siel\Acumulus\Shop\AdvancedConfigForm as BaseAdvancedConfigForm;
 
 /**
- * Class AdvancedConfigForm processes and builds the settings form page for the
- * Magento Acumulus module.
+ * Class AdvancedConfigForm processes and builds the advanced settings form page
+ * for the Magento Acumulus module.
  */
-class AdvancedConfigForm extends BaseConfigForm
+class AdvancedConfigForm extends BaseAdvancedConfigForm
 {
     /**
      * {@inheritdoc}
@@ -19,7 +19,8 @@ class AdvancedConfigForm extends BaseConfigForm
         // Group (checked) checkboxes into their collections.
         foreach ($this->getCheckboxKeys() as $checkboxName => $collectionName) {
             if (!empty($this->formValues[$checkboxName])) {
-                // Handle the case where $collectionName and $checkboxName are the same.
+                // Handle the case where $collectionName and $checkboxName are
+                // the same.
                 if (array_key_exists($collectionName, $this->formValues) && is_array($this->formValues[$collectionName])) {
                     $this->formValues[$collectionName][] = $checkboxName;
                 } else {

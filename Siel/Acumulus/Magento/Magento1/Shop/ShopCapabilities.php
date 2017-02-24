@@ -1,5 +1,5 @@
 <?php
-namespace Siel\Acumulus\Magento\Shop;
+namespace Siel\Acumulus\Magento\Magento1\Shop;
 
 use Mage;
 use Siel\Acumulus\Shop\ConfigInterface;

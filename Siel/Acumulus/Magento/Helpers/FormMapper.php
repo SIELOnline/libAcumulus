@@ -1,8 +1,7 @@
 <?php
 namespace Siel\Acumulus\Magento\Helpers;
 
-use Mage;
-use Varien_Data_Form_Abstract;
+use Siel\Acumulus\Helpers\Log;
 
 /**
  * Class FormMapper maps an Acumulus form definition to a Magento form
@@ -10,30 +9,21 @@ use Varien_Data_Form_Abstract;
  */
 class FormMapper
 {
-    /** @var bool */
-    protected $hasRadios = false;
-
     /**
      * Maps a set of field definitions.
      *
-     * @param \Varien_Data_Form_Abstract $form
+     * @param \Varien_Data_Form_Abstract|\Magento\Framework\Data\Form\AbstractForm $form
      * @param array[] $fields
      */
-    public function map(Varien_Data_Form_Abstract $form, array $fields)
+    public function map($form, array $fields)
     {
         $this->fields($form, $fields);
-        if ($this->hasRadios) {
-            $form->addField('radio-styling',
-                'note',
-                array('text' => '<style> input[type=radio] { float: left; clear: both; margin-top: 0.2em;} .value label.inline {float: left !important; max-width: 95%; padding-left: 1em;} .note {clear: both;}</style>'),
-                '^');
-        }
     }
 
     /**
      * Maps a set of field definitions.
      *
-     * @param \Varien_Data_Form_Abstract $parent
+     * @param \Varien_Data_Form_Abstract|\Magento\Framework\Data\Form\AbstractForm $parent
      * @param array[] $fields
      */
     public function fields($parent, array $fields)
@@ -52,7 +42,7 @@ class FormMapper
     /**
      * Maps a single field definition.
      *
-     * @param \Varien_Data_Form_Abstract $parent
+     * @param \Varien_Data_Form_Abstract|\Magento\Framework\Data\Form\AbstractForm $parent
      * @param array $field
      */
     public function field($parent, array $field)
@@ -92,7 +82,6 @@ class FormMapper
                 break;
             case 'radio':
                 $type = 'radios';
-                $this->hasRadios = true;
                 break;
             case 'checkbox':
                 $type = 'checkboxes';
@@ -139,18 +128,13 @@ class FormMapper
      *
      * @return array
      *   The Magento setting. This will typically contain 1 element, but in some
-     *   cases, 1 Acumulus field setting may result in multiple Magento settings.
+     *   cases 1 Acumulus field setting may result in multiple Magento settings.
      */
     protected function getMagentoProperty($key, $value, $type)
     {
         switch ($key) {
             // Fields to ignore:
             case 'type':
-                $result = array();
-                if ($value === 'date') {
-                    $result['image'] = Mage::getDesign()->getSkinUrl('images/grid-cal.gif');
-                }
-                break;
             case 'id':
             case 'fields':
                 $result = array();
@@ -163,14 +147,14 @@ class FormMapper
                 break;
             case 'name':
                 if ($type === 'checkbox') {
-                    // Make it an array for PHP POST processing, in case there are
-                    // multiple checkboxes.
+                    // Make it an array for PHP POST processing, in case there
+                    // are multiple checkboxes.
                     $value .= '[]';
                 }
                 $result = array($key => $value);
                 break;
             case 'description':
-                // Description of fieldset is handled elsewhere.
+                // The description of a fieldset is handled elsewhere.
                 $result = $type !== 'fieldset' ? array('after_element_html' => '<p class="note">' . $value . '</p>') : array();
                 break;
             case 'value':
@@ -181,8 +165,8 @@ class FormMapper
                 }
                 break;
             case 'attributes':
-                // In magento you add pure html attributes at the same level as the
-                // "field attributes" that are for Magento.
+                // In magento you add pure html attributes at the same level as
+                // the "field attributes" that are for Magento.
                 $result = $value;
                 if (!empty($value['required'])) {
                     if (isset($result['class'])) {

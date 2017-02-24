@@ -18,9 +18,6 @@ use Siel\Acumulus\Helpers\Number;
  */
 class CompletorInvoiceLines
 {
-    /** @var array[] */
-    protected $invoiceLines;
-
     /**
      * The list of possible vat types, initially filled with possible vat types
      * type based on client country, invoiceHasLineWithVat(), is_company(), and
@@ -63,9 +60,9 @@ class CompletorInvoiceLines
         $this->possibleVatTypes = $possibleVatTypes;
         $this->possibleVatRates = $possibleVatRates;
 
+        $invoice['customer']['invoice']['line'] = $this->completeInvoiceLinesRecursive($invoice['customer']['invoice']['line']);
         $invoice['customer']['invoice']['line'] = $this->flattenInvoiceLines($invoice['customer']['invoice']['line']);
-        $this->invoiceLines = &$invoice['customer']['invoice']['line'];
-        $this->completeInvoiceLines();
+        $invoice['customer']['invoice']['line'] = $this->completeInvoiceLines($invoice['customer']['invoice']['line']);
 
         return $invoice;
     }
@@ -81,9 +78,10 @@ class CompletorInvoiceLines
      * also be corrected by this method.
      *
      * @param array[] $lines
-     *   The lines to flatten
+     *   The lines to flatten.
      *
-     * @return array
+     * @return array[]
+     *   The flattened lines.
      */
     protected function flattenInvoiceLines(array $lines)
     {
@@ -151,9 +149,6 @@ class CompletorInvoiceLines
     protected function keepSeparateLines(array $parent, array $children)
     {
         $invoiceSettings = $this->config->getInvoiceSettings();
-        // @todo: we actually need corrected lines to get a reliable count of
-        // @todo: vat rates. so we should flatten after completing... (so we
-        // @todo: should make all the  completor methods recursive ...).
         $vatRates = $this->getAppearingVatRates($children);
         if (count($vatRates) > 1) {
             $separateLines = true;
@@ -276,14 +271,12 @@ class CompletorInvoiceLines
             $parent['meta-vatrate-source'] = $children[$index]['meta-vatrate-source'];
             if (isset($children[$index]['meta-vatrate-min'])) {
                 $parent['meta-vatrate-min'] = $children[$index]['meta-vatrate-min'];
-            }
-            else {
+            } else {
                 unset($parent['meta-vatrate-min']);
             }
             if (isset($children[$index]['meta-vatrate-max'])) {
                 $parent['meta-vatrate-max'] = $children[$index]['meta-vatrate-max'];
-            }
-            else {
+            } else {
                 unset($parent['meta-vatrate-max']);
             }
         }
@@ -298,17 +291,43 @@ class CompletorInvoiceLines
     }
 
     /**
-     * Completes the invoice lines.
+     * Completes the invoice lines before they have been flattened.
+     *
+     * This means that the lines have to be walked recursively.
+     *
+     * The actions that can be done this way are those who operate on a line in
+     * isolation and thus do not need totals, maxs or things like that.
+     *
+     * @param array[] $lines
+     *   The lines to complete recursively.
+     *
+     * @return array[]
+     *   The completed lines.
      */
-    protected function completeInvoiceLines()
+    protected function completeInvoiceLinesRecursive(array $lines)
     {
         // correctCalculatedVatRates() only uses vatrate, meta-vatrate-min, and
         // meta-vatrate-max, so may be called before completeLineRequiredData().
-        $this->correctCalculatedVatRates();
-        $this->completeLineRequiredData();
-        $this->addVatRateToLookupLines();
-        $this->addVatRateTo0PriceLines();
-        $this->completeLineMetaData();
+        $lines = $this->correctCalculatedVatRates($lines);
+        $lines = $this->completeLineRequiredData($lines);
+        $lines = $this->addVatRateToLookupLines($lines);
+        return $lines;
+    }
+
+    /**
+     * Completes the invoice lines after they have been flattened.
+     *
+     * @param array[] $lines
+     *   The lines to complete.
+     *
+     * @return array[]
+     *   The completed lines.
+     */
+    protected function completeInvoiceLines(array $lines)
+    {
+        $lines = $this->addVatRateTo0PriceLines($lines);
+        $lines = $this->completeLineMetaData($lines);
+        return $lines;
     }
 
     /**
@@ -317,10 +336,16 @@ class CompletorInvoiceLines
      * The creator filled in the fields that are directly available from the
      * shops' data store. This method completes (if not filled in):
      * - unitprice.
+     *
+     * @param array[] $lines
+     *   The lines to complete with required data.
+     *
+     * @return array[]
+     *   The completed lines.
      */
-    protected function completeLineRequiredData()
+    protected function completeLineRequiredData(array $lines)
     {
-        foreach ($this->invoiceLines as &$line) {
+        foreach ($lines as &$line) {
             if (!isset($line['unitprice'])) {
                 if (isset($line['unitpriceinc'])) {
                     if (Number::isZero($line['unitpriceinc'])) {
@@ -346,8 +371,15 @@ class CompletorInvoiceLines
                     }
                     $line['meta-calculated-fields'][] = 'unitprice';
                 }
+                if (!empty($line[Creator::Line_Children])) {
+                    $line[Creator::Line_Children] = $this->correctCalculatedVatRates($line[Creator::Line_Children]);
+                }
+            }
+            if (!empty($line[Creator::Line_Children])) {
+                $line[Creator::Line_Children] = $this->completeLineRequiredData($line[Creator::Line_Children]);
             }
         }
+        return $lines;
     }
 
     /**
@@ -355,14 +387,24 @@ class CompletorInvoiceLines
      *
      * Tries to correct 'calculated' vat rates for rounding errors by matching
      * them with possible vatRates obtained from the vat lookup service.
+     *
+     * @param array[] $lines
+     *   The lines to correct.
+     *
+     * @return array[]
+     *   The corrected lines.
      */
-    protected function correctCalculatedVatRates()
+    protected function correctCalculatedVatRates(array $lines)
     {
-        foreach ($this->invoiceLines as &$line) {
+        foreach ($lines as &$line) {
             if (!empty($line['meta-vatrate-source']) && $line['meta-vatrate-source'] === Creator::VatRateSource_Calculated) {
                 $line = $this->correctVatRateByRange($line);
             }
+            if (!empty($line[Creator::Line_Children])) {
+                $line[Creator::Line_Children] = $this->correctCalculatedVatRates($line[Creator::Line_Children]);
+            }
         }
+        return $lines;
     }
 
     /**
@@ -457,15 +499,20 @@ class CompletorInvoiceLines
     /**
      * Completes lines that have meta-lookup-... data.
      *
-     * Meta-lookup-vatrate data is added by the Creators using vat rates,
-     * classes, or whatever the shop uses to model vat, form the products.
-     * However as this data might have changed between the date of the order and
-     * now, we cannot fully rely om it and use it only as an (almost) last
-     * resort.
+     * Meta-lookup-vatrate data is added by the Creators using vat rates from
+     * the products. However as VAT rates may have changed between the date of
+     * the order and now, we cannot fully rely on it and use it only as an
+     * (almost) last resort.
+     *
+     * @param array[] $lines
+     *   The lines to correct using lookup data.
+     *
+     * @return array[]
+     *   The corrected lines.
      */
-    protected function addVatRateToLookupLines()
+    protected function addVatRateToLookupLines(array $lines)
     {
-        foreach ($this->invoiceLines as &$line) {
+        foreach ($lines as &$line) {
             if ($line['meta-vatrate-source'] === Creator::VatRateSource_Completor && $line['vatrate'] === null && Number::isZero($line['unitprice'])) {
                 if (!empty($line['meta-lookup-vatrate']) && $this->isPossibleVatRate($line['meta-lookup-vatrate'])) {
                     // The vat rate looked up on the product is a possible vat
@@ -475,21 +522,31 @@ class CompletorInvoiceLines
                     $line['meta-vatrate-source'] = Completor::VatRateSource_Looked_Up;
                 }
             }
+            if (!empty($line[Creator::Line_Children])) {
+                $line[Creator::Line_Children] = $this->addVatRateToLookupLines($line[Creator::Line_Children]);
+            }
         }
+        return $lines;
     }
 
     /**
      * Completes lines with free items (price = 0) by giving them the maximum
      * tax rate that appears in the other lines.
+     *
+     * @param array[] $lines
+     *   The lines to correct by adding vat rates to lines with 0 prices.
+     *
+     * @return array[]
+     *   The corrected lines.
      */
-    protected function addVatRateTo0PriceLines()
+    protected function addVatRateTo0PriceLines(array $lines)
     {
         // Get the highest appearing vat rate. We could get the most often
         // appearing vat rate, but IMO the highest vat rate will be more likely
         // to be correct.
-        $maxVatRate = $this->getMaxAppearingVatRate($this->invoiceLines);
+        $maxVatRate = $this->getMaxAppearingVatRate($lines);
 
-        foreach ($this->invoiceLines as &$line) {
+        foreach ($lines as &$line) {
             if ($line['meta-vatrate-source'] === Creator::VatRateSource_Completor && $line['vatrate'] === null && Number::isZero($line['unitprice'])) {
                 if ($maxVatRate !== null) {
                     $line['vatrate'] = $maxVatRate;
@@ -499,6 +556,7 @@ class CompletorInvoiceLines
                 }
             }
         }
+        return $lines;
     }
 
     /**
@@ -515,10 +573,11 @@ class CompletorInvoiceLines
         $vatRates = array();
         foreach ($lines as $line) {
             if (isset($line['vatrate'])) {
-                if (isset($vatRates[$line['vatrate']])) {
-                    $vatRates[$line['vatrate']]++;
+                $vatRate = sprintf('%.1f', $line['vatrate']);
+                if (isset($vatRates[$vatRate])) {
+                    $vatRates[$vatRate]++;
                 } else {
-                    $vatRates[$line['vatrate']] = 1;
+                    $vatRates[$vatRate] = 1;
                 }
             }
         }
@@ -540,7 +599,7 @@ class CompletorInvoiceLines
         $index = null;
         $maxVatRate = -1.0;
         foreach ($lines as $key => $line) {
-            if (!empty($line['vatrate']) && (float) $line['vatrate'] > $maxVatRate) {
+            if (isset($line['vatrate']) && (float) $line['vatrate'] > $maxVatRate) {
                 $index = $key;
                 $maxVatRate = (float) $line['vatrate'];
             }
@@ -584,21 +643,25 @@ class CompletorInvoiceLines
      * we need to know the line totals. Complete (if missing):
      * - meta-line-price
      * - meta-line-priceinc
+     *
+     * @param array[] $lines
+     *   The lines to complete with meta data.
+     *
+     * @return array[]
+     *   The completed lines.
      */
-    protected function completeLineMetaData()
+    protected function completeLineMetaData(array $lines)
     {
-        foreach ($this->invoiceLines as &$line) {
+        foreach ($lines as &$line) {
             if (in_array($line['meta-vatrate-source'], Completor::$CorrectVatRateSources)) {
                 if (!isset($line['unitpriceinc'])) {
                     $line['unitpriceinc'] = $line['unitprice'] / 100.0 * (100.0 + $line['vatrate']);
                     $line['meta-calculated-fields'][] = 'unitpriceinc';
                 }
-
                 if (!isset($line['vatamount'])) {
                     $line['vatamount'] = $line['vatrate'] / 100.0 * $line['unitprice'];
                     $line['meta-calculated-fields'][] = 'vatamount';
                 }
-
                 if (isset($line['meta-line-discount-vatamount']) && !isset($line['meta-line-discount-amountinc'])) {
                     $line['meta-line-discount-amountinc'] = $line['meta-line-discount-vatamount'] / $line['vatrate'] * (100 + $line['vatrate']);
                     $line['meta-calculated-fields'][] = 'meta-line-discount-amountinc';
@@ -618,5 +681,6 @@ class CompletorInvoiceLines
                 $line['meta-calculated-fields'] = implode(',', array_unique($line['meta-calculated-fields']));
             }
         }
+        return $lines;
     }
 }

@@ -197,7 +197,7 @@ class Config implements ConfigInterface
      */
     public function getCompletor()
     {
-        return $this->getInstance('Completor', 'Invoice', array($this->getCompletorInvoiceLines(), $this->getCompletorStrategyLines(), $this, $this->getTranslator(), $this->getService()));
+        return $this->getInstance('Completor', 'Invoice', array($this, $this->getCompletorInvoiceLines(), $this->getCompletorStrategyLines(), $this->getTranslator(), $this->getService()));
     }
 
     /**
@@ -205,7 +205,15 @@ class Config implements ConfigInterface
      */
     public function getCompletorInvoiceLines()
     {
-        return $this->getInstance('CompletorInvoiceLines', 'Invoice', array($this));
+        return $this->getInstance('CompletorInvoiceLines', 'Invoice', array($this, $this->getFlattenerInvoiceLines()));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFlattenerInvoiceLines()
+    {
+        return $this->getInstance('FlattenerInvoiceLines', 'Invoice', array($this));
     }
 
     /**

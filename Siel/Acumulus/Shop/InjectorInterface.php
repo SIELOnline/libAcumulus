@@ -86,6 +86,11 @@ interface InjectorInterface
     public function getCompletorInvoiceLines();
 
     /**
+     * @return \Siel\Acumulus\Invoice\FlattenerInvoiceLines
+     */
+    public function getFlattenerInvoiceLines();
+
+    /**
      * @return \Siel\Acumulus\Invoice\CompletorStrategyLines
      */
     public function getCompletorStrategyLines();

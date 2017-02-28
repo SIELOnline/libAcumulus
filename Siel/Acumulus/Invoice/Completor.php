@@ -31,14 +31,22 @@ class Completor
     const VatRateSource_Looked_Up = 'completor-looked-up';
     const VatRateSource_Completor_Completed = 'completor-completed';
     const VatRateSource_Strategy_Completed = 'strategy-completed';
+    const VatRateSource_Copied = 'copied';
 
-    static $CorrectVatRateSources = array(
+    /**
+     * A list of vat rate sources that indicate that the vat rate can be
+     * considered correct.
+     *
+     * @var array
+     */
+    protected static $CorrectVatRateSources = array(
         Creator::VatRateSource_Exact,
         Creator::VatRateSource_Exact0,
         self::VatRateSource_Calculated_Corrected,
         self::VatRateSource_Looked_Up,
         self::VatRateSource_Completor_Completed,
         self::VatRateSource_Strategy_Completed,
+        self::VatRateSource_Copied,
     );
 
     /** @var \Siel\Acumulus\Invoice\ConfigInterface */
@@ -63,11 +71,12 @@ class Completor
     protected $source;
 
     /**
+     * The list of possible vat types, initially filled with possible vat types
+     * based on client country, invoiceHasLineWithVat(), is_company(), and the
+     * digital services setting. But then reduced by VAT rates we find on the
+     * order lines.
+     *
      * @var int[]
-     *   The list of possible vat types, initially filled with possible vat types
-     *   based on client country, invoiceHasLineWithVat(), is_company(), and the
-     *   digital services setting. But then reduced by VAT rates we find on the
-     *   order lines.
      */
     protected $possibleVatTypes;
 
@@ -86,13 +95,13 @@ class Completor
     /**
      * Constructor.
      *
+     * @param \Siel\Acumulus\Invoice\ConfigInterface $config
      * @param \Siel\Acumulus\Invoice\CompletorInvoiceLines $completorInvoiceLines
      * @param \Siel\Acumulus\Invoice\CompletorStrategyLines $completorStrategyLines
-     * @param \Siel\Acumulus\Invoice\ConfigInterface $config
      * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
      * @param \Siel\Acumulus\Web\Service $service
      */
-    public function __construct(CompletorInvoiceLines $completorInvoiceLines, CompletorStrategyLines $completorStrategyLines, ConfigInterface $config, TranslatorInterface $translator, Service $service)
+    public function __construct(ConfigInterface $config, CompletorInvoiceLines $completorInvoiceLines, CompletorStrategyLines $completorStrategyLines, TranslatorInterface $translator, Service $service)
     {
         $this->config = $config;
 
@@ -120,6 +129,21 @@ class Completor
     protected function t($key)
     {
         return $this->translator->get($key);
+    }
+
+    /**
+     * Returns if the vat rate is correct, given its source.
+     *
+     * @param string $source
+     *   The vat rate source.
+     *
+     * @return bool
+     *   True if the given vat rate source indicates that the vat rate is
+     *   correct, false otherwise.
+     */
+    public static function isCorrectVatRate($source)
+    {
+        return in_array($source, self::$CorrectVatRateSources);
     }
 
     /**
@@ -671,7 +695,7 @@ class Completor
         // smaller list, of possible vat types.
         $invoiceVatTypes = array();
         foreach ($this->invoice['customer']['invoice']['line'] as &$line) {
-            if (in_array($line['meta-vatrate-source'], static::$CorrectVatRateSources)) {
+            if ($this->isCorrectVatRate($line['meta-vatrate-source'])) {
                 // We ignore "0" vat rates (0 and -1).
                 if ($line['vatrate'] > 0) {
                     $lineVatTypes = array();

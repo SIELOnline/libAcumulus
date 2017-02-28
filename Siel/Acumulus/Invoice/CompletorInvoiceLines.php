@@ -33,14 +33,19 @@ class CompletorInvoiceLines
     /** @var \Siel\Acumulus\Invoice\ConfigInterface  */
     protected $config;
 
+    /** @var \Siel\Acumulus\Invoice\FlattenerInvoiceLines */
+    protected $invoiceLineFlattener = null;
+
     /**
      * Constructor.
      *
      * @param \Siel\Acumulus\Invoice\ConfigInterface $config
+     * @param \Siel\Acumulus\Invoice\FlattenerInvoiceLines $invoiceLinesFlattener
      */
-    public function __construct(ConfigInterface $config)
+    public function __construct(ConfigInterface $config, FlattenerInvoiceLines $invoiceLinesFlattener)
     {
         $this->config = $config;
+        $this->invoiceLineFlattener = $invoiceLinesFlattener;
     }
 
     /**
@@ -61,284 +66,10 @@ class CompletorInvoiceLines
         $this->possibleVatRates = $possibleVatRates;
 
         $invoice['customer']['invoice']['line'] = $this->completeInvoiceLinesRecursive($invoice['customer']['invoice']['line']);
-        $invoice['customer']['invoice']['line'] = $this->flattenInvoiceLines($invoice['customer']['invoice']['line']);
+        $invoice['customer']['invoice']['line'] = $this->invoiceLineFlattener->complete($invoice['customer']['invoice']['line']);
         $invoice['customer']['invoice']['line'] = $this->completeInvoiceLines($invoice['customer']['invoice']['line']);
 
         return $invoice;
-    }
-
-    /**
-     * Flattens the invoice lines for variants or composed products.
-     *
-     * Invoice lines may recursively contain other invoice lines to indicate
-     * that a product has variant lines or is a composed product (if supported
-     * by the webshop).
-     *
-     * With composed or variant child lines, amounts may appear twice. This will
-     * also be corrected by this method.
-     *
-     * @param array[] $lines
-     *   The lines to flatten.
-     *
-     * @return array[]
-     *   The flattened lines.
-     */
-    protected function flattenInvoiceLines(array $lines)
-    {
-        $result = array();
-
-        foreach ($lines as $line) {
-            $children = null;
-            // If it has children, flatten them and determine how to add them.
-            if (array_key_exists(Creator::Line_Children, $line)) {
-                $children = $this->flattenInvoiceLines($line[Creator::Line_Children]);
-                // Remove children from parent.
-                unset($line[Creator::Line_Children]);
-                // Determine whether to add as a single line or add them
-                // separately.
-                if ($this->keepSeparateLines($line, $children)) {
-                    // Keep them separate but perform the following actions:
-                    // - Allow for some web shop specific corrections.
-                    // - Add meta data to relate parent and children.
-                    // - Indent product descriptions.
-                    $this->correctInfoBetweenParentAndChildren($line, $children);
-                    if (!empty($children)) {
-                        $parentIndex = count($result);
-                        $line['meta-parent-index'] = $parentIndex;
-                        $line['meta-children'] = count($children);
-                        foreach ($children as &$child) {
-                            $child['product'] = $this->indentDescription($child['product']);
-                            $child['meta-parent'] = $parentIndex;
-                        }
-                    }
-                } else {
-                    // Merge the children into the parent product:
-                    // - Allow for some web shop specific corrections.
-                    // - Add meta data about removed children.
-                    // - Add text from children, eg. chosen variants, to parent.
-                    $line = $this->collectInfoFromChildren($line, $children);
-                    $line['meta-children-merged'] = count($children);
-                    // Delete children as their info is merged into the parent.
-                    $children = null;
-                }
-            }
-
-            // Add the line and its children, if any.
-            $result[] = $line;
-            if (!empty($children)) {
-                $result = array_merge($result, $children);
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * Determines whether to keep the children on separate lines.
-     *
-     * This base implementation decides based on:
-     * - Whether all lines have the same VAT rate (different VAT rates => keep)
-     * - The settings for:
-     *   * optionsAllOn1Line
-     *   * optionsAllOnOwnLine
-     *   * optionsMaxLength
-     *
-     * Override if you want other logic to decide on.
-     *
-     * @param array $parent
-     * @param array[] $children
-     *   A flattened array of child invoice lines.
-     *
-     * @return bool
-     *   True if the lines should remain separate, false otherwise.
-     */
-    protected function keepSeparateLines(array $parent, array $children)
-    {
-        $invoiceSettings = $this->config->getInvoiceSettings();
-        $vatRates = $this->getAppearingVatRates($children);
-        if (count($vatRates) > 1) {
-            // We MUST keep them separate to retain correct vat info.
-            $separateLines = true;
-        } elseif (count($children) <= $invoiceSettings['optionsAllOn1Line']) {
-            $separateLines = false;
-        } elseif (count($children) >= $invoiceSettings['optionsAllOnOwnLine']) {
-            $separateLines = true;
-        } else {
-            $childrenText = $this->getMergedLinesText($parent, $children);
-            $separateLines = strlen($childrenText) > $invoiceSettings['optionsMaxLength'];
-        }
-        return $separateLines;
-    }
-
-    /**
-     * Returns a 'product' field for the merged lines.
-     *
-     * @param array $parent
-     * @param array[] $children
-     *
-     * @return string
-     *   The concatenated product texts.
-     */
-    protected function getMergedLinesText(array $parent, array $children)
-    {
-        $childrenTexts = array();
-        foreach ($children as $child) {
-            $childrenTexts[] = $child['product'];
-        }
-        $childrenText = ' (' . implode(', ', $childrenTexts) . ')';
-        return $parent['product'] .  $childrenText;
-    }
-
-    /**
-     * Allows to correct or remove info between or from parent and child lines.
-     *
-     * This base implementation does not do any correction. Web shops may add
-     * their own by overriding this method.
-     *
-     * Examples;
-     * - remove double amounts, e.g. parent amount = sum of children amounts and
-     *   these amounts appear both on the parent and on its children.
-     *
-     * @param array $parent
-     * @param array[] $children
-     */
-    protected function correctInfoBetweenParentAndChildren(array &$parent, array &$children)
-    {
-    }
-
-    /**
-     * Allows to collect info from the child lines and add it to the parent.
-     *
-     * This method will only be called when the child lines will be merged into
-     * the parent line.
-     *
-     * This base implementation merges the product descriptions from the child
-     * lines into the parent product description. Web shops may add their own
-     * (additional) info collecting by overriding this method.
-     *
-     * Examples;
-     * - There are amounts on the children but as they are going to be merged
-     *   into the parent they would get lost.
-     *
-     * @param array $parent
-     * @param array[] $children
-     *
-     * @return array
-     *   The parent line extened with the collected info.
-     */
-    protected function collectInfoFromChildren(array $parent, array $children)
-    {
-        $parent['product'] = $this->getMergedLinesText($parent, $children);
-        return $parent;
-    }
-
-    /**
-     * Removes price info from all children.
-     *
-     * This prevents that amounts appear twice on the invoice. This can only be
-     * done if all children have the same vat rate as the parent, otherwise the
-     * price (and vat) info should be on the children and not on the parent
-     *
-     * Note: in Magento children could have 0 as vatrate, so we copy vat info
-     * from the parent to the children.
-     *
-     * @param array $parent
-     *   The parent line.
-     * @param array[] $children
-     *   The child lines.
-     *
-     * @return array[]
-     *   The children with price info removed.
-     */
-    protected function removePriceInfoFromChildren(array $parent, array $children)
-    {
-        foreach ($children as &$child) {
-            $child['unitprice'] = 0;
-            $child['unitpriceinc'] = 0;
-            $child['vatamount'] = 0;
-            $child['vatrate'] = $parent['vatrate'];
-            $child['meta-vatrate-source'] = $parent['meta-vatrate-source'];
-            if (isset($parent['meta-vatrate-min'])) {
-                $child['meta-vatrate-min'] = $parent['meta-vatrate-min'];
-            }
-            else {
-                unset($child['meta-vatrate-min']);
-            }
-            if (isset($parent['meta-vatrate-max'])) {
-                $child['meta-vatrate-max'] = $parent['meta-vatrate-max'];
-            }
-            else {
-                unset($child['meta-vatrate-max']);
-            }
-            $child['meta-line-vatamount'] = 0;
-            unset($child['meta-line-price']);
-            unset($child['meta-line-priceinc']);
-            unset($child['meta-line-vatamount']);
-            unset($child['meta-line-discount-amountinc']);
-            unset($child['meta-line-discount-vatamount']);
-        }
-        return $children;
-    }
-
-    /**
-     * Removes price info from the parent.
-     *
-     * This prevents that amounts appear twice on the invoice.
-     *
-     * @param array $parent
-     *   The parent line.
-     * @param array[] $children
-     *   The child lines.
-     *
-     * @return array
-     *   The parent line with price info removed.
-     */
-    protected function removePriceInfoFromParent(array $parent, array $children)
-    {
-        $parent['unitprice'] = 0;
-        $parent['unitpriceinc'] = 0;
-        $parent['vatamount'] = 0;
-        // Copy vat rate info from a child when the parent has no vat rate info.
-        if (empty($parent['vatrate']) || Number::isZero($parent['vatrate'])) {
-            $parent['vatrate'] = $this->getMaxAppearingVatRate($children, $index);
-            $parent['meta-vatrate-source'] = $children[$index]['meta-vatrate-source'];
-            if (isset($children[$index]['meta-vatrate-min'])) {
-                $parent['meta-vatrate-min'] = $children[$index]['meta-vatrate-min'];
-            } else {
-                unset($parent['meta-vatrate-min']);
-            }
-            if (isset($children[$index]['meta-vatrate-max'])) {
-                $parent['meta-vatrate-max'] = $children[$index]['meta-vatrate-max'];
-            } else {
-                unset($parent['meta-vatrate-max']);
-            }
-        }
-        $parent['meta-line-vatamount'] = 0;
-
-        unset($parent['meta-line-price']);
-        unset($parent['meta-line-priceinc']);
-        unset($parent['meta-line-vatamount']);
-        unset($parent['meta-line-discount-amountinc']);
-        unset($parent['meta-line-discount-vatamount']);
-        return $parent;
-    }
-
-    /**
-     * Indents a product description (to indicate that it is part of a bundle).
-     *
-     * @param string $description
-     *   The description to indent.
-     *
-     * @return string
-     *   The indented product description.
-     */
-    protected function indentDescription($description) {
-        if (preg_match('/^ *- /', $description)) {
-            $description = '  ' . $description;
-        } else {
-            $description = ' - ' . $description;
-        }
-        return $description;
     }
 
     /**
@@ -350,10 +81,10 @@ class CompletorInvoiceLines
      * isolation and thus do not need totals, maxs or things like that.
      *
      * @param array[] $lines
-     *   The lines to complete recursively.
+     *   The invoice lines to complete recursively.
      *
      * @return array[]
-     *   The completed lines.
+     *   The completed invoice lines.
      */
     protected function completeInvoiceLinesRecursive(array $lines)
     {
@@ -369,10 +100,10 @@ class CompletorInvoiceLines
      * Completes the invoice lines after they have been flattened.
      *
      * @param array[] $lines
-     *   The lines to complete.
+     *   The invoice lines to complete.
      *
      * @return array[]
-     *   The completed lines.
+     *   The completed invoice lines.
      */
     protected function completeInvoiceLines(array $lines)
     {
@@ -389,10 +120,10 @@ class CompletorInvoiceLines
      * - unitprice.
      *
      * @param array[] $lines
-     *   The lines to complete with required data.
+     *   The invoice lines to complete with required data.
      *
      * @return array[]
-     *   The completed lines.
+     *   The completed invoice lines.
      */
     protected function completeLineRequiredData(array $lines)
     {
@@ -401,7 +132,7 @@ class CompletorInvoiceLines
                 if (isset($line['unitpriceinc'])) {
                     if (Number::isZero($line['unitpriceinc'])) {
                         $line['unitprice'] = 0;
-                    } elseif (isset($line['vatrate']) && in_array($line['meta-vatrate-source'], Completor::$CorrectVatRateSources)) {
+                    } elseif (isset($line['vatrate']) && Completor::isCorrectVatRate($line['meta-vatrate-source'])) {
                         if (isset($line['costprice'])) {
                             $margin = $line['unitpriceinc'] - $line['costprice'];
                             if ($margin > 0) {
@@ -440,10 +171,10 @@ class CompletorInvoiceLines
      * them with possible vatRates obtained from the vat lookup service.
      *
      * @param array[] $lines
-     *   The lines to correct.
+     *   The invoice lines to correct.
      *
      * @return array[]
-     *   The corrected lines.
+     *   The corrected invoice lines.
      */
     protected function correctCalculatedVatRates(array $lines)
     {
@@ -477,10 +208,10 @@ class CompletorInvoiceLines
      * initialized.
      *
      * @param array $line
-     *   A line with a calculated vat rate.
+     *   An invoice line with a calculated vat rate.
      *
      * @return array
-     *   The line with a corrected vat rate.
+     *   The invoice line with a corrected vat rate.
      */
     public function correctVatRateByRange(array $line)
     {
@@ -550,16 +281,16 @@ class CompletorInvoiceLines
     /**
      * Completes lines that have meta-lookup-... data.
      *
-     * Meta-lookup-vatrate data is added by the Creators using vat rates from
-     * the products. However as VAT rates may have changed between the date of
-     * the order and now, we cannot fully rely on it and use it only as an
-     * (almost) last resort.
+     * Meta-lookup-vatrate data is added by the Creator class using vat rates
+     * from the products. However as VAT rates may have changed between the date
+     * of the order and now, we cannot fully rely on it and use it only as a
+     * last resort.
      *
      * @param array[] $lines
-     *   The lines to correct using lookup data.
+     *   The invoice lines to correct using lookup data.
      *
      * @return array[]
-     *   The corrected lines.
+     *   The corrected invoice lines.
      */
     protected function addVatRateToLookupLines(array $lines)
     {
@@ -585,10 +316,10 @@ class CompletorInvoiceLines
      * tax rate that appears in the other lines.
      *
      * @param array[] $lines
-     *   The lines to correct by adding vat rates to lines with 0 prices.
+     *   The invoice lines to correct by adding a vat rate to 0 amounts.
      *
      * @return array[]
-     *   The corrected lines.
+     *   The corrected invoice lines.
      */
     protected function addVatRateTo0PriceLines(array $lines)
     {
@@ -611,42 +342,17 @@ class CompletorInvoiceLines
     }
 
     /**
-     * Returns a list of vat rates that actually appear in the given lines.
-     *
-     * @param array[] $lines
-     *
-     * @return array
-     *   An array with the vat rates as key and the number of times they appear
-     *   in the invoice lines as value.
-     */
-    protected function getAppearingVatRates(array $lines)
-    {
-        $vatRates = array();
-        foreach ($lines as $line) {
-            if (isset($line['vatrate'])) {
-                $vatRate = sprintf('%.1f', $line['vatrate']);
-                if (isset($vatRates[$vatRate])) {
-                    $vatRates[$vatRate]++;
-                } else {
-                    $vatRates[$vatRate] = 1;
-                }
-            }
-        }
-        return $vatRates;
-    }
-
-    /**
      * Returns the maximum vat rate that appears in the given set of lines.
      *
      * @param array[] $lines
-     *   The lines to search.
+     *   The invoice lines to search.
      * @param int $index
      *   If passed, the index of the max vat rate is returned via this parameter.
      *
      * @return float|null
      *   The maximum vat rate in the given set of lines.
      */
-    protected function getMaxAppearingVatRate(array $lines, &$index = 0) {
+    public static function getMaxAppearingVatRate(array $lines, &$index = 0) {
         $index = null;
         $maxVatRate = -1.0;
         foreach ($lines as $key => $line) {
@@ -679,32 +385,37 @@ class CompletorInvoiceLines
     }
 
     /**
-     * Completes each (non-strategy) line with missing (meta) info.
+     * Completes each (non-strategy) invoice line with missing (meta) info.
      *
-     * All non strategy lines have unitprice and vatrate filled in and should by
-     * now have correct(ed) VAT rates. In some shops these non strategy lines
-     * may have a meta-line-discount-vatamount or meta-line-discount-amountinc
-     * field, that can be used with the SplitKnownDiscountLine strategy.
+     * All non strategy invoice lines have unitprice and vatrate filled in and
+     * should by now have correct(ed) VAT rates. In some shops these non
+     * strategy invoice lines may have a meta-line-discount-vatamount or
+     * meta-line-discount-amountinc field, that can be used with the
+     * SplitKnownDiscountLine strategy.
+     *
      * Complete (if missing):
      * - unitpriceinc
      * - vatamount
      * - meta-line-discount-amountinc (if meta-line-discount-vatamount is
      *   available).
-     * For strategy lines that may be split with the non matching line strategy,
-     * we need to know the line totals. Complete (if missing):
+     *
+     * For strategy invoice lines that may be split with the SplitNonMatching
+     * line  strategy, we need to know the line totals.
+     *
+     * Complete (if missing):
      * - meta-line-price
      * - meta-line-priceinc
      *
      * @param array[] $lines
-     *   The lines to complete with meta data.
+     *   The invoice lines to complete with meta data.
      *
      * @return array[]
-     *   The completed lines.
+     *   The completed invoice lines.
      */
     protected function completeLineMetaData(array $lines)
     {
         foreach ($lines as &$line) {
-            if (in_array($line['meta-vatrate-source'], Completor::$CorrectVatRateSources)) {
+            if (Completor::isCorrectVatRate($line['meta-vatrate-source'])) {
                 if (!isset($line['unitpriceinc'])) {
                     $line['unitpriceinc'] = $line['unitprice'] / 100.0 * (100.0 + $line['vatrate']);
                     $line['meta-calculated-fields'][] = 'unitpriceinc';

@@ -2,12 +2,12 @@
 namespace Siel\Acumulus\Magento\Invoice;
 
 use Siel\Acumulus\Helpers\Number;
-use Siel\Acumulus\Invoice\CompletorInvoiceLines as BaseCompletorInvoiceLines;
+use Siel\Acumulus\Invoice\FlattenerInvoiceLines as BaseFlattenerInvoiceLines;
 
 /**
  * Class CompletorInvoiceLines completes the invoice lines.
  */
-class CompletorInvoiceLines extends BaseCompletorInvoiceLines
+class FlattenerInvoiceLines extends BaseFlattenerInvoiceLines
 {
     /**
      * {@inheritdoc}
@@ -29,31 +29,42 @@ class CompletorInvoiceLines extends BaseCompletorInvoiceLines
         return parent::getMergedLinesText($parent, $children);
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * This Magento override decides whether to keep the info on the parent or
+     * the children based on:
+     * If:
+     * - All children have the same VAT rate AND
+     * - This vat rate is the same as the parent VAT rate or is empty AND
+     * - That the parent has price info.
+     * We keep the info on the parent and remove it from the children to prevent
+     * accounting amounts twice.
+     */
     protected function correctInfoBetweenParentAndChildren(array &$parent, array &$children)
     {
-        $useParentInfo = false;
+        parent::correctInfoBetweenParentAndChildren($parent, $children);
 
-        // Check if:
-        // - All children have the same VAT rate AND
-        // - AND this vat rate is the same as the parent VAT rate or is empty
-        // - AND that the bundle has price info
-        // If so, we keep the info on the parent and remove it from the child
-        // lines to prevent accounting amounts twice.
+        $useParentInfo = false;
         $vatRates = $this->getAppearingVatRates($children);
         if (count($vatRates) === 1) {
-            $childrenVatRate = reset($vatRates);
+            reset($vatRates);
+            $childrenVatRate = key($vatRates);
             if ((Number::isZero($childrenVatRate) || $childrenVatRate == $parent['vatrate'])) {
                 if (!Number::isZero($parent['unitprice'])) {
                     $useParentInfo = true;
                 }
             }
         }
+
         if ($useParentInfo) {
-            $children = $this->removePriceInfoFromChildren($parent, $children);
+            // All price and vat info remains on the parent line. Make sure that
+            // no price info is left on the child invoice lines.
+            $this->keepChildrenAndPriceOnParentOnly($parent, $children);
         } else {
-            // All price and vat info remains on the child lines. Make sure that
-            // no price info is left on the bundle line.
-            $parent = $this->removePriceInfoFromParent($parent, $children);
+            // All price and vat info remains on the child invoice lines. Make
+            // sure that no price info is left on the parent invoice line.
+            $this->keepChildrenAndPriceOnChildrenOnly($parent, $children);
         }
     }
 

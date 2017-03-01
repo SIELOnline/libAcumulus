@@ -182,7 +182,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
             'shippingInclTax',
             'baseShippingInclTax',
         );
-        return array(
+        return parent::getTokenInfo() + array(
             'source' => array(
                 'class' => array('Mage_Sales_Model_Order', 'Mage_Sales_Model_Order_CreditMemo'),
                 'file' => array('app/code/core/Mage/Sales/Model/Order.php', 'app/code/core/Mage/Sales/Model/Order/Creditmemo.php'),

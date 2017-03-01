@@ -57,7 +57,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
         $meta = array(
             'vat_number (With EU VAT plugin only)',
         );
-        return array(
+        return parent::getTokenInfo() + array(
             'source' => array(
                 'class' => 'WC_Abstract_Order',
                 'file' => 'wp-content/plugins/woocommerce/includes/abstracts/abstract-wc-order.php',
@@ -94,6 +94,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function getShopDefaults()
     {
         return array(
+            // Customer defaults.
             'contactYourId' => '[customer_user]', // WC_Abstact_order
             'companyName1' => '[billing_company]', // WC_Abstact_order
             'fullName' => '[billing_first_name+billing_last_name]', // WC_Abstact_order

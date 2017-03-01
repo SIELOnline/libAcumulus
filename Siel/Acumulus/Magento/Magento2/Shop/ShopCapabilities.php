@@ -207,7 +207,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
             'comments',
             'extensionAttributes',
         );
-        return array(
+        return parent::getTokenInfo() + array(
             'source' => array(
                 'class' => array('\Magento\Sales\Model\Order', '\Magento\Sales\Model\Order\CreditMemo'),
                 'file' => array('vendor/magento/module-sales/Model/Order.php', 'vendor/magento/module-sales/Model/Order/Creditmemo.php'),

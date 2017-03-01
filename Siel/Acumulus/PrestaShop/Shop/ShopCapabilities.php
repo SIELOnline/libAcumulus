@@ -17,7 +17,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     public function getTokenInfo()
     {
-        return array(
+        return parent::getTokenInfo() + array(
             'source' => array(
                 'class' => 'Order',
                 'file' => 'classes/Order.php',

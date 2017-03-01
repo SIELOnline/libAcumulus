@@ -38,6 +38,33 @@ abstract class ShopCapabilities implements ShopCapabilitiesInterface
     }
 
     /**
+     * @inheritDoc
+     */
+    public function getTokenInfo()
+    {
+        return array(
+            'invoiceSource' => array(
+                'class' => '\Siel\Acumulus\Invoice\Source',
+                'properties' => array(
+                    'type (' . $this->t(Source::Order) . ' ' . $this->t('or') . ' ' . $this->t(Source::CreditNote) . ')',
+                    'id (' . $this->t('internal_id') . ')',
+                    'reference (' . $this->t('external_id') . ')',
+                    'status (' . $this->t('internal_not_label') . ')',
+                ),
+                'properties-more' => false,
+            ),
+            'originalInvoiceSource' => array(
+                'more-info' => ucfirst($this->t('refund_only')) . '!',
+                'properties' => array(
+                    $this->t('see_above'),
+                ),
+                'properties-more' => false,
+            ),
+        );
+    }
+
+
+    /**
      * {@inheritdoc}
      *
      * This default implementation returns order and credit note. Override if

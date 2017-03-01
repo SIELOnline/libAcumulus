@@ -156,7 +156,7 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
             'date_added',
             'date_modified',
         );
-        return array(
+        return parent::getTokenInfo() + array(
             'source' => array(
                 'table' => '',
                 'file' => 'catalog/model/checkout/order.php',

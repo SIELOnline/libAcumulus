@@ -17,7 +17,7 @@ class FlattenerInvoiceLines
     /** @var \Siel\Acumulus\Invoice\ConfigInterface  */
     protected $config;
 
-    protected $index = 1;
+    protected $parentIndex = 1;
 
     /**
      * Constructor.
@@ -185,11 +185,13 @@ class FlattenerInvoiceLines
     protected function correctInfoBetweenParentAndChildren(array &$parent, array &$children)
     {
         if (!empty($children)) {
+            $parent['meta-parent'] = $this->parentIndex;
             $parent['meta-children'] = count($children);
             foreach ($children as &$child) {
                 $child['product'] = $this->indentDescription($child['product']);
-                $child['meta-parent-index'] = $this->index++;
+                $child['meta-parent-index'] = $this->parentIndex;
             }
+            $this->parentIndex++;
         }
     }
 

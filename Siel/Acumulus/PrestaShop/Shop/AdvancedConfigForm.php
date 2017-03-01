@@ -38,7 +38,7 @@ class AdvancedConfigForm extends BaseAdvancedConfigForm
      */
     public function isSubmitted()
     {
-        return Tools::isSubmit('submit' . $this->moduleName);
+        return Tools::isSubmit('submitAdd');
     }
 
     /**

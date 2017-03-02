@@ -129,7 +129,7 @@ class Token {
                     $value .= $propertyValue;
                 }
             }
-            if (!empty($value)) {
+            if ($value !== null && $value !== '') {
                 break;
             }
         }
@@ -147,8 +147,8 @@ class Token {
      * @param string $property
      *
      * @return null|string
-     *   The value of the property, may be the empty string, or null if the
-     *   property was not found (or equals null).
+     *   The value of the property, may be the empty string or null if the
+     *   property was not found (or really equals null or the empty string).
      */
     protected function searchProperty($property) {
         $value = null;
@@ -163,7 +163,7 @@ class Token {
         foreach ($this->variables as $key => $variable) {
             if (empty($variableName) || $key === $variableName) {
                 $value = $this->getProperty($property, $variable);
-                if ($value !== null) {
+                if ($value !== null && $value !== '') {
                     break;
                 }
             }
@@ -190,7 +190,9 @@ class Token {
      * @param object|array $variable
      *
      * @return null|string
-     *   The value for the property of the given name or null if not available.
+     *   The value for the property of the given name, or null or the empty
+     *   string if not available (or the property really equals null or he empty
+     *   string).
      */
     protected function getProperty($property, $variable)
     {
@@ -225,7 +227,7 @@ class Token {
                         $value = @call_user_func_array(array($variable, $property), $args);
                     } catch (Exception $e) {
                     }
-                    if (empty($value)) {
+                    if ($value !== null && $value !== '') {
                         try {
                             $value = call_user_func_array(array($variable, $method), $args);
                         } catch (Exception $e) {

@@ -54,7 +54,7 @@ class FormRenderer extends BaseFormRenderer
      * {@inheritdoc}
      *
      * This override renders nothing as WordPress already renders the fieldset
-     * title and the fields and the descirption will be rendered as a field as
+     * title and the fields and the description will be rendered as a field as
      * well.
      */
     protected function renderFieldset(array $field)

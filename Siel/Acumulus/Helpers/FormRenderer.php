@@ -712,14 +712,14 @@ class FormRenderer
             }
             // Skip attributes that are not to be set (required, disabled, ...).
             if ($value !== false && $value !== '') {
-                $attributeString .= ' ' . htmlspecialchars($key, ENT_NOQUOTES, 'UTF-8');
+                $attributeString .= ' ' . htmlspecialchars($key, ENT_QUOTES, 'UTF-8');
                 // HTML5: do not add a value to boolean attributes.
                 // HTML4: add the name of the key as value for the attribute.
                 if (!$this->html5 && $value === true) {
                     $value = $key;
                 }
                 if ($value !== true) {
-                    $attributeString .= '="' . htmlspecialchars($value, ENT_NOQUOTES, 'UTF-8') . '"';
+                    $attributeString .= '="' . htmlspecialchars($value, ENT_COMPAT, 'UTF-8') . '"';
                 }
             }
         }

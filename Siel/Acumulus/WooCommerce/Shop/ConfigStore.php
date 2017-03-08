@@ -34,7 +34,8 @@ class ConfigStore extends BaSeConfigStore
     {
         $result = array();
         // Load the values from the web shop specific configuration.
-        $configurationValues = get_option('acumulus');
+        // WP does add its own magic_quotes (see wp_magic_quotes()), we undo it.
+        $configurationValues = stripslashes_deep(get_option('acumulus'));
         if (is_array($configurationValues)) {
             foreach ($keys as $key) {
                 // Do not overwrite defaults if no value is set.
@@ -48,6 +49,8 @@ class ConfigStore extends BaSeConfigStore
 
     /**
      * {@inheritdoc}
+     *
+     * @todo: his gets never called.When it gets called: use stripslashes here?!
      */
     public function save(array $values)
     {

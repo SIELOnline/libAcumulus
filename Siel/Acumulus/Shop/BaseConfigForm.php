@@ -59,7 +59,14 @@ abstract class BaseConfigForm extends Form
      */
     protected function getDefaultFormValues()
     {
-        return $this->acumulusConfig->getCredentials() + $this->acumulusConfig->getShopSettings() + $this->acumulusConfig->getShopEventSettings() + $this->acumulusConfig->getCustomerSettings() + $this->acumulusConfig->getInvoiceSettings() + $this->acumulusConfig->getEmailAsPdfSettings() + $this->acumulusConfig->getPluginSettings();
+        $defaultValues = $this->acumulusConfig->getCredentials() + $this->acumulusConfig->getShopSettings() + $this->acumulusConfig->getShopEventSettings() + $this->acumulusConfig->getCustomerSettings() + $this->acumulusConfig->getInvoiceSettings() + $this->acumulusConfig->getEmailAsPdfSettings() + $this->acumulusConfig->getPluginSettings();
+        if (!empty($defaultValues['descriptionText'])) {
+            $defaultValues['descriptionText'] = str_replace('\n', "\n", $defaultValues['descriptionText']);
+        }
+        if (!empty($defaultValues['invoiceNotes'])) {
+            $defaultValues['invoiceNotes'] = str_replace(array('\n', '\t'), array("\n", "\t"), $defaultValues['invoiceNotes']);
+        }
+        return $defaultValues;
     }
 
     /**
@@ -69,7 +76,14 @@ abstract class BaseConfigForm extends Form
      */
     protected function execute()
     {
-        return $this->acumulusConfig->save($this->submittedValues);
+        $submittedValues = $this->submittedValues;
+        if (!empty($submittedValues['descriptionText'])) {
+            $submittedValues['descriptionText'] = str_replace(array("\r\n", "\r", "\n"), '\n', $submittedValues['descriptionText']);
+        }
+        if (!empty($submittedValues['invoiceNotes'])) {
+            $submittedValues['invoiceNotes'] = str_replace(array("\r\n", "\r", "\n", "\t"), array('\n', '\n', '\n', '\t'), $submittedValues['invoiceNotes']);
+        }
+        return $this->acumulusConfig->save($submittedValues);
     }
 
     /**

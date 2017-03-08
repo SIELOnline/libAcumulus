@@ -121,7 +121,8 @@ abstract class Creator
     protected function setPropertySources()
     {
         $this->propertySources = array(
-            'source' => $this->invoiceSource->getSource()
+            'invoiceSource' => $this->invoiceSource,
+            'source' => $this->invoiceSource->getSource(),
         );
     }
 
@@ -141,9 +142,6 @@ abstract class Creator
         $this->invoice = array();
         $this->invoice['customer'] = $this->getCustomer();
         $this->invoice['customer']['invoice'] = $this->getInvoice();
-        $this->addPaymentMethodBasedDefaults();
-        $this->addInvoiceDefaults();
-        $this->addInvoiceTotals();
         $this->invoice['customer']['invoice']['line'] = $this->getInvoiceLines();
         $this->addEmailAsPdf();
         return $this->invoice;
@@ -232,16 +230,19 @@ abstract class Creator
      * Returns the 'invoice' part of the invoice add structure.
      *
      * The following keys are allowed/expected by the API:
-     * - concept: not needed, will be filled by the Completor
+     * - concept: may be overridden by the Completor to make it a concept.
+     * - [concepttype] : not (yet) used.
      * - number
      * - vattype: not needed, will be filled by the Completor
      * - issuedate
-     * - costcenter: not needed, will be filled by the Completor
-     * - accountnumber: not needed, will be filled by the Completor
+     * - costcenter
+     * - accountnumber
      * - paymentstatus
      * - paymentdate
      * - description
-     * - template: not needed, will be filled by the Completor
+     * - descriptiontext
+     * - template
+     * - invoicenotes
      *
      * Additional keys (not recognised by the API but used later on by the
      * Creator or Completor or for support and debugging purposes):
@@ -254,7 +255,8 @@ abstract class Creator
      * - meta-parent-index: defines an id (1-based index)) for a parent line.
      * - meta-children: indicates how many child lines the line has.
      * - meta-children-merged: indicates how many child lines the line had.
-     * - meta-parent: indicates that a line is a child of the given parent line.
+     * - meta-parent: indicates that a line is a child of parent line with the
+     *   given value as meta-parent-index.
      *   children.
      *
      * Extending classes should normally not have to override this method, but
@@ -266,41 +268,28 @@ abstract class Creator
      */
     protected function getInvoice()
     {
-        $result = array();
+        $invoice = array();
 
         $shopSettings = $this->config->getShopSettings();
+        $invoiceSettings = $this->config->getInvoiceSettings();
 
+        // Invoice type.
+        // @todo: check that this is overwritten when needed.
+        $this->addDefaultEmpty($invoice, 'concept', ConfigInterface::Concept_No);
+
+        // Invoice number and date.
         $sourceToUse = $shopSettings['invoiceNrSource'];
         if ($sourceToUse != ConfigInterface::InvoiceNrSource_Acumulus) {
-            $result['number'] = $this->getInvoiceNumber($sourceToUse);
+            $invoice['number'] = $this->getInvoiceNumber($sourceToUse);
         }
-
         $dateToUse = $shopSettings['dateToUse'];
         if ($dateToUse != ConfigInterface::InvoiceDate_Transfer) {
-            $result['issuedate'] = $this->getInvoiceDate($dateToUse);
+            $invoice['issuedate'] = $this->getInvoiceDate($dateToUse);
         }
 
-        // Payment method, status and date.
-        $this->addIfNotEmpty($result, 'meta-payment-method', $this->getPaymentMethod());
-        $result['paymentstatus'] = $this->getPaymentState();
-        if ($result['paymentstatus'] === ConfigInterface::PaymentStatus_Paid) {
-            $this->addIfNotEmpty($result, 'paymentdate', $this->getPaymentDate());
-        }
-
-        $result['description'] = $this->getDescription();
-
-        return $result;
-    }
-
-    /**
-     * Completes the invoice part with values based on the payment method.
-     */
-    protected function addPaymentMethodBasedDefaults()
-    {
-        $invoice = &$this->invoice['customer']['invoice'];
-        if (!empty($invoice['meta-payment-method'])) {
-            $paymentMethod = $invoice['meta-payment-method'];
-            $invoiceSettings = $this->config->getInvoiceSettings();
+        // Bookkeeping (account number, cost center).
+        $paymentMethod = $this->getPaymentMethod();
+        if (!empty($paymentMethod)) {
             if (!empty($invoiceSettings['paymentMethodAccountNumber'][$paymentMethod])) {
                 $invoice['accountnumber'] = $invoiceSettings['paymentMethodAccountNumber'][$paymentMethod];
             }
@@ -308,30 +297,47 @@ abstract class Creator
                 $invoice['costcenter'] = $invoiceSettings['paymentMethodCostCenter'][$paymentMethod];
             }
         }
-    }
-
-    /**
-     * Completes the invoice part with default settings that do not depend on
-     * shop specific data.
-     */
-    protected function addInvoiceDefaults()
-    {
-        $invoiceSettings = $this->config->getInvoiceSettings();
-        $invoice = &$this->invoice['customer']['invoice'];
-        $this->addDefaultEmpty($invoice, 'concept', ConfigInterface::Concept_No);
-        $this->addDefault($invoice, 'accountnumber', $invoiceSettings['defaultAccountNumber']);
         $this->addDefault($invoice, 'costcenter', $invoiceSettings['defaultCostCenter']);
-        // @todo: should this be done after the first event handler
-        // (invoice_created) has been triggered?
+        $this->addDefault($invoice, 'accountnumber', $invoiceSettings['defaultAccountNumber']);
+
+        // Payment info.
+        $invoice['paymentstatus'] = $this->getPaymentState();
+        if ($invoice['paymentstatus'] === ConfigInterface::PaymentStatus_Paid) {
+            $this->addIfNotEmpty($invoice, 'paymentdate', $this->getPaymentDate());
+        }
+
+        // Additional descriptive info.
+        $this->addTokenDefault($invoice, 'description', $invoiceSettings['description']);
+        $this->addTokenDefault($invoice, 'descriptiontext', $invoiceSettings['descriptionText']);
+        // Change newlines to the literal \n, tabs are not supported.
+        if (!empty($invoice['descriptiontext'])) {
+            $invoice['descriptiontext'] = str_replace(array("\r\n", "\r", "\n"), '\n', $invoice['descriptiontext']);
+        }
+
+        // Acumulus invoice template to use.
+        // @todo: should this be done after the first event handler (invoice_created) has been triggered?
         if (isset($invoice['paymentstatus'])
             && $invoice['paymentstatus'] == ConfigInterface::PaymentStatus_Paid
-            // 0 = empty = use same invoice template as for non paid invoices
+            // 0 = empty = use same invoice template as for non paid invoices.
             && $invoiceSettings['defaultInvoicePaidTemplate'] != 0
         ) {
             $this->addDefault($invoice, 'template', $invoiceSettings['defaultInvoicePaidTemplate']);
         } else {
             $this->addDefault($invoice, 'template', $invoiceSettings['defaultInvoiceTemplate']);
         }
+
+        // Invoice notes.
+        $this->addTokenDefault($invoice, 'invoicenotes', $invoiceSettings['invoiceNotes']);
+        // Change newlines to the literal \n and tabs to \t.
+        if (!empty($invoice['invoicenotes'])) {
+            $invoice['invoicenotes'] = str_replace(array("\r\n", "\r", "\n", "\t"), array('\n', '\n', '\n', '\t'), $invoice['invoicenotes']);
+        }
+
+        // Meta data.
+        $this->addIfNotEmpty($invoice, 'meta-payment-method', $paymentMethod);
+        $invoice += $this->addInvoiceTotals($invoice);
+
+        return $invoice;
     }
 
     /**
@@ -425,11 +431,18 @@ abstract class Creator
 
     /**
      * Adds metadata about invoice totals to the invoice.
+     *
+     * @param array $invoice
+     *   The imnvice to complete with totals meta data.
+     *
+     * @return array
+     *   The invoice completed with invoice totals meta data.
      */
-    protected function addInvoiceTotals()
+    protected function addInvoiceTotals(array $invoice)
     {
-        $this->invoice['customer']['invoice'] += $this->getInvoiceTotals();
-        $this->completeInvoiceTotals();
+        $invoice += $this->getInvoiceTotals();
+        $invoice = $this->completeInvoiceTotals($invoice);
+        return $invoice;
     }
 
     /**
@@ -455,10 +468,15 @@ abstract class Creator
      *
      * Most shops only provide 2 out of these 3 in their data, so we calculate the
      * 3rd.
+     *
+     * @param array $invoice
+     *   The invoice to complete with missing totals.
+     *
+     * @return array
+     *   The invoice with completed invoice totals.
      */
-    protected function completeInvoiceTotals()
+    protected function completeInvoiceTotals(array $invoice)
     {
-        $invoice = &$this->invoice['customer']['invoice'];
         if (!isset($invoice['meta-invoice-amount'])) {
             $invoice['meta-invoice-amount'] = $invoice['meta-invoice-amountinc'] - $invoice['meta-invoice-vatamount'];
             $invoice['meta-invoice-calculated'] = 'meta-invoice-amount';
@@ -471,6 +489,7 @@ abstract class Creator
             $invoice['meta-invoice-vatamount'] = $invoice['meta-invoice-amountinc'] - $invoice['meta-invoice-amount'];
             $invoice['meta-invoice-calculated'] = 'meta-invoice-vatamount';
         }
+        return $invoice;
     }
 
     /**

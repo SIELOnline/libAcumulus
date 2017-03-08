@@ -99,8 +99,10 @@ class Creator extends BaseCreator
      */
     protected function setPropertySources()
     {
-        // We do not call parent::setPropertySources() as the source array does
-        // not contain scalar properties itself (only sub arrays).
+        // As the source array does not contain scalar properties itself, only
+        // sub arrays, we remove it as a property source.
+        parent::setPropertySources();
+        unset($this->propertySources['source']);
         $this->propertySources['BT'] = $this->order['details']['BT'];
         $this->propertySources['ST'] = $this->order['details']['ST'];
         $this->propertySources['shopInvoice'] = $this->shopInvoice;

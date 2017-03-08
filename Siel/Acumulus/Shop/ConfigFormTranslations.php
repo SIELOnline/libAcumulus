@@ -101,7 +101,9 @@ De eigenschappen die uw webshop kent worden hieronder opgesomd.</p>
 <dt>[property(arguments)]:</dt><dd>Vervang door de waarde die de method property teruggeeft. Als property een method is wordt "arguments" (een komma-gescheiden reeks van argumenten zonder quotes om tekenreeksen heen) meegegeven bij het aanroepen van de method.</dd>
 <dt>[object::property]:</dt><dd>Vervang alleen door de eigenschap als die in het opgegeven object voorkomt (zie de lijst hieronder). Gebruik dit om verwarring te voorkomen als meerdere objecten een eigenschap met dezelfde naam hebben (bv id).</dd>
 <dt>[property1|property2|...]:</dt><dd>Vervang door de waarde van property1 of als deze geen waarde heeft door die van property2, en zo verder. BV: handig om of het mobiele of het vaste telefoonnummer mee te sturen.</dd>
-<dt>[property1+property2+...]:</dt><dd>Vervang door de waarde van property1 en die van property2 en plaats tussen de properties een spatie, maar alleen als de properties niet leeg zijn.BV: handig om de volledige naam, opgebouwd uit voornaam, tussenvoegsel en achternaam, te versturen zonder dat er meerdere spaties in terecht komen.</dd>
+<dt>[property1+property2+...]:</dt><dd>Vervang door de waarde van property1 en die van property2 en plaats tussen de properties een spatie, maar alleen als de properties niet leeg zijn. BV: handig om de volledige naam, opgebouwd uit voornaam, tussenvoegsel en achternaam, te versturen zonder dat er meerdere spaties in terecht komen.</dd>
+<dt>[property1&property2&...]:</dt><dd>Vervang door de waarde van property1 en die van property2 maar plaats geen spatie tussen de properties.</dd>
+<dt>["letterlijke tekst"]:</dt><dd>Vervang door de letterlijke tekst (zonder quotes) maar alleen als het samengevoegd wordt, middels een + of &, met een andere eigenschap die niet leeg is.</dd>
 </ol>
 <p><strong>Let op:</strong> in de meeste situaties zal de standaardwaarde goed zijn. Pas deze velden alleen aan in speciale omstandigheden en als u weet wat u doet.</p>
 ',
@@ -116,6 +118,7 @@ De eigenschappen die uw webshop kent worden hieronder opgesomd.</p>
         'see_table' => 'zie de tabel %1$s',
         'see_tables' => 'zie de tabellen %1$s',
         'and' => 'en',
+        'or' => 'of',
         'see_class_more' => 'zie de class %1$s voor mogelijke andere properties en methods die als veldverwijzing gebruikt kunnen worden',
         'see_classes_more' => 'zie de classes %1$s voor mogelijke andere properties en methods die als veldverwijzing gebruikt kunnen worden',
         'see_table_more' => 'zie de tabel %1$s voor mogelijke andere velden die als token gebruikt kunnen worden',
@@ -123,6 +126,9 @@ De eigenschappen die uw webshop kent worden hieronder opgesomd.</p>
         'see_above' => 'zie hierboven.',
         'original_order_for_refund' => 'Oorspronkelijke bestelling, alleen beschikbaar bij credit nota\'s',
         'refund_only' => 'alleen bij een credit nota',
+        'internal_id' => 'intern ID, ook wel technische sleutel genoemd',
+        'external_id' => 'de voor iedereen zichtbare referentie',
+        'internal_not_label' => 'waarde zoals die wordt opgeslagen in de database, geen (vertaald) label',
 
         // Relation management settings.
         'relationSettingsHeader' => 'Relatiebeheer',
@@ -202,6 +208,13 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'field_defaultInvoicePaidTemplate' => 'Factuur-sjabloon (betaald)',
         'option_same_template' => 'Zelfde sjabloon als voor niet betaald',
         'desc_defaultInvoiceTemplate' => 'Maakt u binnen Acumulus gebruik van meerdere factuur-sjablonen en wilt u de facturen uit uw webwinkel met een specifieke factuursjabloon printen, kies dan hier de factuur-sjablonen voor niet betaalde respectievelijk betaalde bestellingen.',
+
+        'field_description' => 'Toelichting',
+        'desc_description' => 'Toelichting op de factuur. Deze inhoud kan in Acumulus op een factuursjabloon getoond worden mbv de veldverwijzing [toelichting].',
+        'field_descriptionText' => 'Uitgebreide toelichting',
+        'desc_descriptionText' => 'Meerregelige toelichting op de factuur. Deze inhoud kan in Acumulus op een factuursjabloon getoond worden mbv de veldverwijzing [toelichting].',
+        'field_invoiceNotes' => 'Notities',
+        'desc_invoiceNotes' => 'Notities die u aan de factuur wilt toevoegen en die voor intern gebruik zijn bedoeld. Deze worden niet getoond op de factuursjabloon, in emails naar de klant, of op de pakbon.',
 
         // Options settings.
         'optionsSettingsHeader' => 'Opties of varianten',
@@ -374,6 +387,8 @@ The properties known by your web shop are listed below.</p>
 <dt>[object::property]:</dt><dd>Replace by the value of the property but only if that property is part of the given object (see list below). Use this to get the correct value if multiple objects have a property with the same name (e.g. id).</dd>
 <dt>[property1|property2|...]:</dt><dd>Replace by the value of property1, or if that does not have a value by that of property2, etc. Example: useful to get either the mobile OR land line number.</dd>
 <dt>[property1+property2+...]:</dt><dd>Replace by the value of property1 and that of property2 with 1 space between it, but only if both values are not empty. Example: useful to get the full name, constructed of first, middle and last name.</dd>
+<dt>[property1&property2&...]:</dt><dd>Replace by the value of property1 and that of property2 but with no space between it.</dd>
+<dt>["literal text"]:</dt><dd>Replace by the literal text (without quotes) but only if it is combined, using + or &, with another non-empty property.</dd>
 </ol>
 <p><strong>Attention:</strong> in most situations the default value will do fine! Only change these fields in special situations and when you know what you are doing.</p>
 ',
@@ -388,6 +403,7 @@ The properties known by your web shop are listed below.</p>
         'see_table' => 'See table %1$s',
         'see_tables' => 'See the tables %1$s',
         'and' => 'and',
+        'or' => 'or',
         'see_class_more' => 'See the class %1$s for possible other properties and methods that can be used as field reference',
         'see_classes_more' => 'See the classes %1$s for possible other properties and methods that can be used as field reference',
         'see_table_more' => 'See the table %1$s for possible other fields that can be used as field reference',
@@ -395,6 +411,9 @@ The properties known by your web shop are listed below.</p>
         'see_above' => 'See above.',
         'original_order_for_refund' => 'Original order, only available with refunds',
         'refund_only' => 'only for refunds',
+        'internal_id' => 'internal ID, the so-called technical key',
+        'external_id' => 'A reference used in external communication',
+        'internal_not_label' => 'value as stored in the database, not a (translated) label',
 
         // Relation management settings.
         'relationSettingsHeader' => 'Relation management',
@@ -473,6 +492,13 @@ If you unchecked the first option, the second option only applies to business cl
         'field_defaultInvoicePaidTemplate' => 'Invoice template (paid)',
         'option_same_template' => 'Same template as for due',
         'desc_defaultInvoiceTemplate' => 'Select the invoice templates to use when generating your Acumulus invoices for due respectively paid orders.',
+
+        'field_description' => 'Description',
+        'desc_description' => 'Invoice description. In Acumulus, you can use the contents of this field in invoice templates using the field reference [toelichting].',
+        'field_descriptionText' => 'Extended description',
+        'desc_descriptionText' => 'Multi line invoice description. In Acumulus, you can use the contents of this field in invoice templates using the field reference [toelichting].',
+        'field_invoiceNotes' => 'Notes',
+        'desc_invoiceNotes' => 'Internal notes that you want to add to the invoice. These notes will not be shown on invoice templates, emails to the client, or on the packing slip.',
 
         // Options settings.
         'optionsSettingsHeader' => 'Options or variants',

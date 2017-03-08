@@ -37,6 +37,7 @@ class Translations extends TranslationCollection
         'fee_adjustment' => 'Kosten (soort onbekend)',
         'discount_adjustment' => 'Handmatige korting',
 
+        // @todo: concept invoices do not send mail. Tell user if emailAsPdf is set.
         'message_warning_no_email' => 'De factuur bevat geen emailadres van de klant. Hierdoor kan er geen relatie in Acumulus aangemaakt of bijgewerkt worden. U kunt zelf in Acumulus een andere relatie aan deze factuur koppelen.',
         'message_warning_no_vat' => 'De factuur bevat geen BTW en er kan niet bepaald worden welk factuurtype (https://wiki.acumulus.nl/index.php?page=127) van toepassing is. Daarom is de factuur als concept opgeslagen. Corrigeer de factuur in Acumulus en controleer uw BTW instellingen.',
         'message_warning_no_vattype' => 'Door een fout in uw instellingen of BTW tarieven, kan het factuurtype (https://wiki.acumulus.nl/index.php?page=127) niet bepaald worden. Daarom is de factuur als concept opgeslagen. Corrigeer de factuur in Acumulus.',

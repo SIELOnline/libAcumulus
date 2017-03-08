@@ -340,14 +340,14 @@ class AdvancedConfigForm extends BaseConfigForm
                 'label' => $this->t('field_contactYourId'),
                 'description' => $this->t('desc_contactYourId') . ' ' . $this->t('msg_token'),
                 'attributes' => array(
-                    'size' => 30,
+                    'size' => 60,
                 ),
             ),
             'companyName1' => array(
                 'type' => 'text',
                 'label' => $this->t('field_companyName1'),
                 'attributes' => array(
-                    'size' => 30,
+                    'size' => 60,
                 ),
             ),
             'companyName2' => array(
@@ -355,7 +355,7 @@ class AdvancedConfigForm extends BaseConfigForm
                 'label' => $this->t('field_companyName2'),
                 'description' => $this->t('msg_tokens'),
                 'attributes' => array(
-                    'size' => 30,
+                    'size' => 60,
                 ),
             ),
             'vatNumber' => array(
@@ -363,7 +363,7 @@ class AdvancedConfigForm extends BaseConfigForm
                 'label' => $this->t('field_vatNumber'),
                 'description' => $this->t('desc_vatNumber') . ' ' . $this->t('msg_token'),
                 'attributes' => array(
-                    'size' => 30,
+                    'size' => 60,
                 ),
             ),
             'fullName' => array(
@@ -386,7 +386,7 @@ class AdvancedConfigForm extends BaseConfigForm
                 'type' => 'text',
                 'label' => $this->t('field_address1'),
                 'attributes' => array(
-                    'size' => 30,
+                    'size' => 60,
                 ),
             ),
             'address2' => array(
@@ -394,7 +394,7 @@ class AdvancedConfigForm extends BaseConfigForm
                 'label' => $this->t('field_address2'),
                 'description' => $this->t('desc_address') . ' ' . $this->t('msg_tokens'),
                 'attributes' => array(
-                    'size' => 30,
+                    'size' => 60,
                 ),
             ),
             'postalCode' => array(
@@ -402,7 +402,7 @@ class AdvancedConfigForm extends BaseConfigForm
                 'label' => $this->t('field_postalCode'),
                 'description' => $this->t('msg_token'),
                 'attributes' => array(
-                    'size' => 30,
+                    'size' => 60,
                 ),
             ),
             'city' => array(
@@ -410,7 +410,7 @@ class AdvancedConfigForm extends BaseConfigForm
                 'label' => $this->t('field_city'),
                 'description' => $this->t('msg_token'),
                 'attributes' => array(
-                    'size' => 30,
+                    'size' => 60,
                 ),
             ),
             'telephone' => array(
@@ -418,7 +418,7 @@ class AdvancedConfigForm extends BaseConfigForm
                 'label' => $this->t('field_telephone'),
                 'description' => $this->t('desc_telephone') . ' ' . $this->t('msg_token'),
                 'attributes' => array(
-                    'size' => 30,
+                    'size' => 60,
                 ),
             ),
             'fax' => array(
@@ -426,7 +426,7 @@ class AdvancedConfigForm extends BaseConfigForm
                 'label' => $this->t('field_fax'),
                 'description' => $this->t('desc_fax') . ' ' . $this->t('msg_token'),
                 'attributes' => array(
-                    'size' => 30,
+                    'size' => 60,
                 ),
             ),
             'email' => array(
@@ -434,7 +434,7 @@ class AdvancedConfigForm extends BaseConfigForm
                 'label' => $this->t('field_email'),
                 'description' => $this->t('msg_token'),
                 'attributes' => array(
-                    'size' => 30,
+                    'size' => 60,
                 ),
             ),
             'mark' => array(
@@ -442,7 +442,7 @@ class AdvancedConfigForm extends BaseConfigForm
                 'label' => $this->t('field_mark'),
                 'description' => $this->t('desc_mark') . ' ' . $this->t('msg_token'),
                 'attributes' => array(
-                    'size' => 30,
+                    'size' => 60,
                 ),
             ),
         );
@@ -469,6 +469,34 @@ class AdvancedConfigForm extends BaseConfigForm
                 'options' => array(
                     'sendEmptyInvoice' => $this->t('option_sendEmptyInvoice'),
                     'sendEmptyShipping' => $this->t('option_sendEmptyShipping'),
+                ),
+            ),
+            'description' => array(
+                'type' => 'text',
+                'label' => $this->t('field_description'),
+                'description' => $this->t('desc_description'),
+                'attributes' => array(
+                    'size' => 60,
+                ),
+            ),
+            'descriptionText' => array(
+                'type' => 'textarea',
+                'label' => $this->t('field_descriptionText'),
+                'description' => $this->t('desc_descriptionText'),
+                'attributes' => array(
+                    'size' => 60,
+                    'rows' => 6,
+                    'style' => 'box-sizing: border-box; width: 100%; min-width: 24em;',
+                ),
+            ),
+            'invoiceNotes' => array(
+                'type' => 'textarea',
+                'label' => $this->t('field_invoiceNotes'),
+                'description' => $this->t('desc_invoiceNotes'),
+                'attributes' => array(
+                    'size' => 60,
+                    'rows' => 6,
+                    'style' => 'box-sizing: border-box; width: 100%; min-width: 24em;',
                 ),
             ),
         );

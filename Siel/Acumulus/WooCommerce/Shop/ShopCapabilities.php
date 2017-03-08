@@ -103,11 +103,11 @@ class ShopCapabilities extends ShopCapabilitiesBase
             'postalCode' => '[billing_postcode]', // WC_Abstact_order
             'city' => '[billing_city]', // WC_Abstact_order
             // The EU VAT Number plugin allows customers to indicate their VAT
-            // number with which they can apply for the reversed VAT scheme. The vat
-            // number is stored under the '_vat_number' meta key, though older
-            // versions did so under the 'VAT Number' key.
+            // number with which they can apply for the reversed VAT scheme. The
+            // vat number is stored under the '_vat_number' meta key, though
+            // older versions did so under the 'VAT Number' key.
             // See http://docs.woothemes.com/document/eu-vat-number-2/
-            'vatNumber' => '[vat_number|VAT Number]', // Post neta
+            'vatNumber' => '[vat_number|VAT Number]', // Post meta
             'telephone' => '[billing_phone]', // WC_Abstact_order
             'email' => '[billing_email]', // WC_Abstact_order
         );

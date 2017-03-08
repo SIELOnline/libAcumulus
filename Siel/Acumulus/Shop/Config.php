@@ -892,6 +892,22 @@ class Config implements ConfigInterface
                     'type' => 'int',
                     'default' => 80,
                 ),
+                'description' => array(
+                    'group' => 'invoice',
+                    'type' => 'string',
+                    // @todo: add option to optinally (eg. when a given property source is available) add literal text.
+                    'default' => '[invoiceSource::type] [invoiceSource::reference]',
+                ),
+                'descriptionText' => array(
+                    'group' => 'invoice',
+                    'type' => 'string',
+                    'default' => '',
+                ),
+                'invoiceNotes' => array(
+                    'group' => 'invoice',
+                    'type' => 'string',
+                    'default' => '',
+                ),
                 'digitalServices' => array(
                     'group' => 'shop',
                     'type' => 'int',

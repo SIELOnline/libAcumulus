@@ -122,7 +122,7 @@ class Creator extends BaseCreator
      */
     protected function getInvoiceDateOrder(/*$dateToUse*/)
     {
-        // createdAt returns yyyy-mm-dd hh:mm:ss, take date part.
+        // order_date (= post_date) returns yyyy-mm-dd hh:mm:ss, take date part.
         return substr($this->shopSource->order_date, 0, strlen('2000-01-01'));
     }
 
@@ -622,7 +622,7 @@ class Creator extends BaseCreator
                 }
             }
         } else {
-            $description = '';
+            $description = $this->t('discount_code');
         }
         return array(
             'itemnumber' => $coupon->code,

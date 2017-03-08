@@ -19,8 +19,10 @@ use Exception;
  *
  * token = '[' property-specification ']'
  * property-specification = property-alternative('|'property-alternative)?
- * property-alternative = full-property-name('+'full-property-name)?
- * full-property-name = (variable-name'::)?property-name
+ * property-alternative = space-separated-property('+'space-separated-property)?
+ * space-separated-property = full-property-name('&'full-property-name)?
+ * full-property-name = (variable-name'::)?property-name|literal-text
+ * literal-text = "text"
  *
  * Alternatives are expanded left to right until a property alternative is found
  * that is not empty.
@@ -33,11 +35,19 @@ use Exception;
  * the + gets replaced with a space if and only if the property directly
  * following it, is not empty.
  *
+ * Properties that are joined with a & in between them, are all expanded and
+ * concatenated directly, thus not with a space between them like with a +.
+ *
+ * Literal text that is joined with "real" properties using & or + only gets
+ * returned when at least 1 of the "real" properties has a non-empty value.
+ *
  * @example:
- *   $propertySpec1 = first+middle+last;
+ *   $propertySpec1 = [first+middle+last];
+ *   $propertySpec2 = [first&"."&last"&"@myshop.com"];
  *   $propertySpec2 = [first] [middle] [last];
  *   first = 'John'; middle = ''; last = 'Doe';
  *   Result1: 'John Doe'
+ *   Result2: 'John.Doe@myshop.com'
  *   Result2: 'John  Doe'
  *
  * A full property name may contain the variable name (followed by :: to
@@ -116,20 +126,32 @@ class Token {
         $value = null;
         $propertyAlternatives = explode('|', $propertySpec);
         foreach ($propertyAlternatives as $propertyAlternative) {
-            $propertyConcatenation = explode('+', $propertyAlternative);
-            foreach ($propertyConcatenation as $property) {
-                $propertyValue = $this->searchProperty($property);
-                if (!empty($propertyValue)) {
-                    if ($value === null) {
-                        $value = '';
+            $spaceSeparatedProperties = explode('+', $propertyAlternative);
+            $spaceSeparatedValues = array();
+            $hasRealPropertyValue = false;
+            foreach ($spaceSeparatedProperties as $spaceSeparatedProperty) {
+                $nonSeparatedProperties = explode('&', $spaceSeparatedProperty);
+                $nonSeparatedValues = array();
+                foreach ($nonSeparatedProperties as $nonSeparatedProperty) {
+                    if (substr($nonSeparatedProperty, 0, 1) === '"' && substr($nonSeparatedProperty, -1, 1) === '"') {
+                        $value = substr($nonSeparatedProperty, 1, -1);
+                    } else {
+                        $value = $this->searchProperty($nonSeparatedProperty);
+                        if (!empty($value)) {
+                            $hasRealPropertyValue = true;
+                        }
                     }
                     if (!empty($value)) {
-                        $value .= ' ';
+                        $nonSeparatedValues[] = $value;
                     }
-                    $value .= $propertyValue;
+                }
+                if (!empty($nonSeparatedValues)) {
+                    $spaceSeparatedValues[] = implode('',$nonSeparatedValues);
                 }
             }
-            if ($value !== null && $value !== '') {
+            if (!empty($spaceSeparatedValues) && $hasRealPropertyValue) {
+                $value = implode(' ', $spaceSeparatedValues);
+                // Stop as soon as an alternative resulted in a non-empty value.
                 break;
             }
         }

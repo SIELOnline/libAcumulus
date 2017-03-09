@@ -400,7 +400,7 @@ abstract class InvoiceManager
     protected function getInvoiceSendResultMessage(Source $invoiceSource, $status, array $messages = array())
     {
         $sent = ($status & ConfigInterface::Invoice_NotSent) === 0;
-        $action = $this->t($sent ? 'message_sent' : 'message_not_sent');
+        $action = $this->t($sent ? 'action_sent' : 'action_not_sent');
         $reason = $this->getSendReason($status & (ConfigInterface::Invoice_Sent_Mask | ConfigInterface::Invoice_NotSent_Mask));
         $message = sprintf($this->t('message_invoice_send'), $this->t($invoiceSource->getType()), $invoiceSource->getReference(), $action, $reason);
 
@@ -430,37 +430,37 @@ abstract class InvoiceManager
     protected function getSendReason($status) {
         switch ($status) {
             case ConfigInterface::Invoice_NotSent_WrongStatus:
-                $message = 'message_not_sent_wrongStatus';
+                $message = 'reason_not_sent_wrongStatus';
                 break;
             case ConfigInterface::Invoice_NotSent_AlreadySent:
-                $message = 'message_not_sent_alreadySent';
+                $message = 'reason_not_sent_alreadySent';
                 break;
             case ConfigInterface::Invoice_NotSent_EventInvoiceCreated:
-                $message = 'message_not_sent_prevented_invoiceCreated';
+                $message = 'reason_not_sent_prevented_invoiceCreated';
                 break;
             case ConfigInterface::Invoice_NotSent_EventInvoiceCompleted:
-                $message = 'message_not_sent_prevented_invoiceCompleted';
+                $message = 'reason_not_sent_prevented_invoiceCompleted';
                 break;
             case ConfigInterface::Invoice_NotSent_EmptyInvoice:
-                $message = 'message_not_sent_empty_invoice';
+                $message = 'reason_not_sent_empty_invoice';
                 break;
             case ConfigInterface::Invoice_NotSent_TriggerInvoiceCreateNotEnabled:
-                $message = 'message_not_sent_not_enabled_triggerInvoiceCreate';
+                $message = 'reason_not_sent_not_enabled_triggerInvoiceCreate';
                 break;
             case ConfigInterface::Invoice_NotSent_TriggerInvoiceSentNotEnabled:
-                $message = 'message_not_sent_not_enabled_triggerInvoiceSent';
+                $message = 'reason_not_sent_not_enabled_triggerInvoiceSent';
                 break;
             case ConfigInterface::Invoice_Sent_TestMode:
-                $message = 'message_sent_testMode';
+                $message = 'reason_sent_testMode';
                 break;
             case ConfigInterface::Invoice_Sent_New:
-                $message = 'message_sent_new';
+                $message = 'reason_sent_new';
                 break;
             case ConfigInterface::Invoice_Sent_Forced:
-                $message = 'message_sent_forced';
+                $message = 'reason_sent_forced';
                 break;
             default:
-                return sprintf($this->t('message_reason_unknown'), $status);
+                return sprintf($this->t('reason_unknown'), $status);
         }
         return $this->t($message);
     }

@@ -5,9 +5,6 @@ use Siel\Acumulus\Shop\ConfigStore as BaseConfigStore;
 
 /**
  * Implements the connection to the WordPress config component.
- *
- * @todo: the save method is not used as WP stores the values itself.
- * It seems to work but all values, including (translated) markup, is stored.
  */
 class ConfigStore extends BaSeConfigStore
 {
@@ -33,9 +30,7 @@ class ConfigStore extends BaSeConfigStore
     public function load(array $keys)
     {
         $result = array();
-        // Load the values from the web shop specific configuration.
-        // WP does add its own magic_quotes (see wp_magic_quotes()), we undo it.
-        $configurationValues = stripslashes_deep(get_option('acumulus'));
+        $configurationValues = get_option('acumulus');
         if (is_array($configurationValues)) {
             foreach ($keys as $key) {
                 // Do not overwrite defaults if no value is set.
@@ -49,8 +44,6 @@ class ConfigStore extends BaSeConfigStore
 
     /**
      * {@inheritdoc}
-     *
-     * @todo: his gets never called.When it gets called: use stripslashes here?!
      */
     public function save(array $values)
     {

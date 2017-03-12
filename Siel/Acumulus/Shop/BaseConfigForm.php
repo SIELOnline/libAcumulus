@@ -12,6 +12,7 @@ use Siel\Acumulus\Web\Service;
  * - systemValidate()
  * - isSubmitted()
  * - setSubmittedValues()
+ * - getPostedValues()
  */
 abstract class BaseConfigForm extends Form
 {
@@ -55,17 +56,33 @@ abstract class BaseConfigForm extends Form
     /**
      * {@inheritdoc}
      *
+     * The results are restricted to the known config keys.
+     */
+    protected function setSubmittedValues()
+    {
+        $postedValues = $this->getPostedValues();
+        // Check if the full form was displayed or only the account details.
+        $fullForm = array_key_exists('salutation', $postedValues);
+        foreach ($this->acumulusConfig->getKeys() as $key) {
+            if (!$this->addIfIsset($this->submittedValues, $key, $postedValues)) {
+                // Add unchecked checkboxes, but only if the full form was
+                // displayed as all checkboxes on this form appear in the full
+                // form only.
+                if ($fullForm && $this->isCheckboxKey($key)) {
+                    $this->submittedValues[$key] = '';
+                }
+            }
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     *
      * This is the set of values as are stored in the config.
      */
     protected function getDefaultFormValues()
     {
         $defaultValues = $this->acumulusConfig->getCredentials() + $this->acumulusConfig->getShopSettings() + $this->acumulusConfig->getShopEventSettings() + $this->acumulusConfig->getCustomerSettings() + $this->acumulusConfig->getInvoiceSettings() + $this->acumulusConfig->getEmailAsPdfSettings() + $this->acumulusConfig->getPluginSettings();
-        if (!empty($defaultValues['descriptionText'])) {
-            $defaultValues['descriptionText'] = str_replace('\n', "\n", $defaultValues['descriptionText']);
-        }
-        if (!empty($defaultValues['invoiceNotes'])) {
-            $defaultValues['invoiceNotes'] = str_replace(array('\n', '\t'), array("\n", "\t"), $defaultValues['invoiceNotes']);
-        }
         return $defaultValues;
     }
 
@@ -77,12 +94,6 @@ abstract class BaseConfigForm extends Form
     protected function execute()
     {
         $submittedValues = $this->submittedValues;
-        if (!empty($submittedValues['descriptionText'])) {
-            $submittedValues['descriptionText'] = str_replace(array("\r\n", "\r", "\n"), '\n', $submittedValues['descriptionText']);
-        }
-        if (!empty($submittedValues['invoiceNotes'])) {
-            $submittedValues['invoiceNotes'] = str_replace(array("\r\n", "\r", "\n", "\t"), array('\n', '\n', '\n', '\t'), $submittedValues['invoiceNotes']);
-        }
         return $this->acumulusConfig->save($submittedValues);
     }
 

@@ -56,6 +56,9 @@ namespace Siel\Acumulus\Helpers;
  */
 abstract class Form
 {
+    /** @var string */
+    protected $type;
+
     /** @var \Siel\Acumulus\Helpers\TranslatorInterface */
     protected $translator;
 
@@ -93,6 +96,12 @@ abstract class Form
 
         $this->translator = $translator;
         $this->fields = array();
+
+        $class = get_class($this);
+        $pos = strrpos($class, '\\');
+        $class = $pos !== false ? substr($class, $pos + 1) : $class;
+        $classParts = preg_split('/([[:upper:]][[:lower:]]+)/', $class, null, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
+        $this->type = strtolower(is_array($classParts) && !empty($classParts) ? reset($classParts) : $class);
     }
 
     /**
@@ -126,6 +135,22 @@ abstract class Form
     }
 
     /**
+     * Adds a success message.
+     *
+     * To be used by web shop specific form handling to add a message to the
+     * list of messages to display.
+     *
+     * @param string $message
+     *
+     * @return $this
+     */
+    public function addSuccessMessage($message)
+    {
+        $this->successMessages[] = $message;
+        return $this;
+    }
+
+    /**
      * Returns the warning messages.
      *
      * To be used by web shop specific form handling to display validation
@@ -141,6 +166,22 @@ abstract class Form
     }
 
     /**
+     * Adds a warning message.
+     *
+     * To be used by web shop specific form handling to add a message to the
+     * list of messages to display.
+     *
+     * @param string $message
+     *
+     * @return $this
+     */
+    public function addWarningMessage($message)
+    {
+        $this->warningMessages[] = $message;
+        return $this;
+    }
+
+  /**
      * Returns the error messages.
      *
      * To be used by web shop specific form handling to display validation and
@@ -155,6 +196,22 @@ abstract class Form
     public function getErrorMessages()
     {
         return $this->errorMessages;
+    }
+
+  /**
+   * Adds an error message.
+   *
+   * To be used by web shop specific form handling to add a message to the list
+   * of messages to display.
+   *
+   * @param string $message
+   *
+   * @return $this
+   */
+    public function addErrorMessage($message)
+    {
+        $this->errorMessages[] = $message;
+        return $this;
     }
 
     /**
@@ -378,15 +435,17 @@ abstract class Form
             $this->validate();
             if ($executeIfValid && $this->isValid()) {
                 if ($this->execute()) {
-                    $message = $this->t('message_form_success');
-                    if ($message !== 'message_form_success') {
-                        $this->successMessages[] = $message;
+                    $message = $this->t("message_form_{$this->type}_success");
+                    if ($message === 'message_form_{$this->type}_success') {
+                        $message = $this->t('message_form_success');
                     }
+                    $this->successMessages[] = $message;
                 } else {
-                    $message = $this->t('message_form_error');
-                    if ($message !== 'message_form_error') {
-                        $this->errorMessages[] = $message;
+                    $message = $this->t('message_form_{$this->type}_error');
+                    if ($message === 'message_form_{$this->type}_error') {
+                        $message = $this->t('message_form_error');
                     }
+                    $this->errorMessages[] = $message;
                 }
             }
         }

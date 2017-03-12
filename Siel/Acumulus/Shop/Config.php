@@ -895,7 +895,6 @@ class Config implements ConfigInterface
                 'description' => array(
                     'group' => 'invoice',
                     'type' => 'string',
-                    // @todo: add option to optinally (eg. when a given property source is available) add literal text.
                     'default' => '[invoiceSource::type] [invoiceSource::reference]',
                 ),
                 'descriptionText' => array(

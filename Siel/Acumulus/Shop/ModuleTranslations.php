@@ -28,6 +28,7 @@ class ModuleTranslations extends TranslationCollection
         'button_cancel' => 'Annuleren',
         'button_send' => 'Verzenden',
         'message_config_saved' => 'De instellingen zijn opgeslagen.',
+        'message_update_failed' => 'De interne upgrade naar versie %s is mislukt. Als deze melding terug blijft komen, neem dan contact op met support.',
         'message_uninstall' => 'Wilt u de configuratie-instellingen verwijderen?',
 
         // Requirements.
@@ -54,6 +55,7 @@ class ModuleTranslations extends TranslationCollection
         'button_cancel' => 'Cancel',
         'button_send' => 'Send',
         'message_config_saved' => 'The settings are saved.',
+        'message_update_failed' => 'The internal upgrade to vesion %s failed. Please contact support, if this message keeps being displayed.',
         'message_uninstall' => 'Are you sure that you want to delete the configuration settings?',
 
         // Requirements.

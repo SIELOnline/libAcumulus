@@ -33,28 +33,6 @@ class ConfigForm extends BaseConfigForm
 
     /**
      * {@inheritdoc}
-     *
-     * The results are restricted to the known config keys.
-     */
-    protected function setSubmittedValues()
-    {
-        $postedValues = $this->getPostedValues();
-        // Check if the full form was displayed or only the account details.
-        $fullForm = array_key_exists('salutation', $postedValues);
-        foreach ($this->acumulusConfig->getKeys() as $key) {
-            if (!$this->addIfIsset($this->submittedValues, $key, $postedValues)) {
-                // Add unchecked checkboxes, but only if the full form was
-                // displayed as all checkboxes on this form appear in the full
-                // form only.
-                if ($fullForm && $this->isCheckboxKey($key)) {
-                    $this->submittedValues[$key] = '';
-                }
-            }
-        }
-    }
-
-    /**
-     * {@inheritdoc}
      */
     protected function validate()
     {

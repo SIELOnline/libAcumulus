@@ -85,8 +85,8 @@ LONGSTRING
         'message_form_range_reference' => 'Reeks: %1$s van %2$s tot %3$s.',
         'message_form_range_date' => 'Reeks: %1$s tussen %2$s en %3$s.',
         'message_form_range_empty' => 'De door u opgegeven reeks bevat geen enkele %1$s.',
-        'message_form_success' => 'De facturen zijn succesvol verzonden. Zie het resultatenoverzicht voor eventuele opmerkingen en waarschuwingen.',
-        'message_form_error' => 'Er zijn fouten opgetreden bij het versturen van de facturen. Zie het resultatenoverzicht voor meer informatie over de fouten.',
+        'message_form_batch_success' => 'De facturen zijn succesvol verzonden. Zie het resultatenoverzicht voor eventuele opmerkingen en waarschuwingen.',
+        'message_form_batch_error' => 'Er zijn fouten opgetreden bij het versturen van de facturen. Zie het resultatenoverzicht voor meer informatie over de fouten.',
 
     );
 

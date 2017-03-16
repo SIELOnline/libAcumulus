@@ -64,16 +64,21 @@ class FlattenerInvoiceLines
     {
         $result = array();
 
+        $invoiceSettings = $this->config->getInvoiceSettings();
         foreach ($lines as $line) {
             $children = null;
+            // Ignore children if we do not want to show them.
             // If it has children, flatten them and determine how to add them.
             if (array_key_exists(Creator::Line_Children, $line)) {
                 $children = $this->flattenInvoiceLines($line[Creator::Line_Children]);
                 // Remove children from parent.
                 unset($line[Creator::Line_Children]);
-                // Determine whether to add as a single line or add them as
-                // separate lines.
-                if ($this->keepSeparateLines($line, $children)) {
+                // Determine whether to add them at all and if so whether
+                // to add them as a single line or as separate lines.
+                if (!$invoiceSettings['optionsShow'] && $this->haveSameVatRate($children)) {
+                    $line['meta-children-not-shown'] = count($children);
+                    $children = null;
+                } else if ($this->keepSeparateLines($line, $children)) {
                     // Keep them separate but perform the following actions:
                     // - Allow for some web shop specific corrections.
                     // - Add meta data to relate parent and children.
@@ -86,7 +91,7 @@ class FlattenerInvoiceLines
                     // - Add text from children, eg. chosen variants, to parent.
                     $line = $this->collectInfoFromChildren($line, $children);
                     // Delete children as their info is merged into the parent.
-                    $children = null;
+                    $children = NULL;
                 }
             }
 
@@ -123,8 +128,7 @@ class FlattenerInvoiceLines
     protected function keepSeparateLines(array $parent, array $children)
     {
         $invoiceSettings = $this->config->getInvoiceSettings();
-        $vatRates = $this->getAppearingVatRates($children);
-        if (count($vatRates) > 1) {
+        if (!$this->haveSameVatRate($children)) {
             // We MUST keep them separate to retain correct vat info.
             $separateLines = true;
         } elseif (count($children) <= $invoiceSettings['optionsAllOn1Line']) {
@@ -510,5 +514,20 @@ class FlattenerInvoiceLines
             }
         }
         return $vatRates;
+    }
+
+    /**
+     * Returns whether the lines have different vat rates.
+     *
+     * @param array $lines
+     *   The lines to compare.
+     *
+     * @return bool
+     *   True if the lines have different vat rates.
+     */
+    protected function haveSameVatRate(array $lines)
+    {
+        $vatRates = $this->getAppearingVatRates($lines);
+        return count($vatRates) === 1;
     }
 }

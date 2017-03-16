@@ -495,6 +495,14 @@ class AdvancedConfigForm extends BaseConfigForm
     protected function getOptionsFields()
     {
         $fields = array(
+            'showOptions' => array(
+                'type' => 'checkbox',
+                'label' => $this->t('field_showOptions'),
+                'description' => $this->t('desc_showOptions'),
+                'options' => array(
+                    'optionsShow' => $this->t('option_optionsShow'),
+                ),
+            ),
             'optionsAllOn1Line' => array(
                 'type' => 'select',
                 'label' => $this->t('field_optionsAllOn1Line'),
@@ -584,6 +592,7 @@ class AdvancedConfigForm extends BaseConfigForm
             'overwriteIfExists' => 'clientData',
             'sendEmptyInvoice' => 'sendWhat',
             'sendEmptyShipping' => 'sendWhat',
+            'optionsShow' => 'showOptions',
         );
     }
 

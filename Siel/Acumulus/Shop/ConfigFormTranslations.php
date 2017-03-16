@@ -218,9 +218,11 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
 
         // Options settings.
         'optionsSettingsHeader' => 'Opties of varianten',
-        'desc_optionsSettingsHeader' => 'Als een product opties of varianten heeft, kunnen deze opties op dezelfde regel als het product komen of op aparte regels daaronder. 
-            Met onderstaande instellingen kunt u aangeven wanneer voor alles op dezelfde regel gekozen wordt en wanneer voor meerdere regels.',
-        'desc_composedProducts' => 'NB: als het een samengesteld product betreft en de prijsinformatie is alleen aanwezig op de subproducten, of de subproducten hebben verschillende BTW tarieven, dan komen alle subproducten op hun eigen regel, ongeacht deze instellingen.',
+        'desc_optionsSettingsHeader' => 'Een product kan opties of varianten hebben of kan samengesteld zijn. Deze opties of deelproducten kunnen op dezelfde regel als het product komen of op aparte regels daaronder. U kunt het tonen ervan ook helemaal uitzetten.',
+        'desc_composedProducts' => 'NB: als het een samengesteld product betreft en de subproducten hebben verschillende BTW tarieven, dan komen alle subproducten op hun eigen regel, ongeacht deze instellingen.',
+        'field_showOptions' => 'Tonen',
+        'desc_showOptions' => 'Als u opties, varianten of deelproducten helemaal niet op de factuur terug wilt zien, vink deze optie dan uit. Dit kan bv. handig zijn als u de varianten of deelproducten alleen voor uw voorraadbeheer gebruikt.',
+        'option_optionsShow' => 'Opties en deelproducten op de factuur tonen',
         'option_do_not_use' => 'Deze instelling negeren',
         'option_always' => 'Altijd',
         'field_optionsAllOn1Line' => 'T/m dit aantal opties bij hoofdproduct',
@@ -502,9 +504,11 @@ If you unchecked the first option, the second option only applies to business cl
 
         // Options settings.
         'optionsSettingsHeader' => 'Options or variants',
-        'desc_optionsSettingsHeader' => 'For products that have options or variants, the options can be placed on the same line as the product or on separate lines below.
-            These settings allow you to decide when to use only 1 line and when to use separate lines.',
-        'desc_composedProducts' => 'BTW: if this is a composed product en the price information is only available on the sub products, or the sub products have different vat rates, all sub products will always be placed on their own line.',
+        'desc_optionsSettingsHeader' => 'Products can have options or variants, or can be composed. These options or sub products can be placed on the same line as the main product or on separate lines below. Yo can also switch this off altogether.',
+        'desc_composedProducts' => 'BTW: if this is a composed product and the sub products have different vat rates, all sub products will always be placed on their own line and the settings below will be ignored.',
+        'field_showOptions' => 'Show',
+        'desc_showOptions' => 'Uncheck this option if you do not want to place options, variants or sub products on the invoice at all. E.g. this can occur when you use the variants or or sub products only for your own stock management.',
+        'option_optionsShow' => 'Show options and sub products on the invoice',
         'option_do_not_use' => 'Ignore this setting',
         'option_always' => 'Always',
         'field_optionsAllOn1Line' => 'Up to this no. of options on main product',

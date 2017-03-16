@@ -877,6 +877,11 @@ class Config implements ConfigInterface
                     'type' => 'bool',
                     'default' => false,
                 ),
+                'optionsShow' => array(
+                    'group' => 'invoice',
+                    'type' => 'bool',
+                    'default' => true,
+                ),
                 'optionsAllOn1Line' => array(
                     'group' => 'invoice',
                     'type' => 'int',

@@ -85,6 +85,54 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 ),
                 'properties-more' => false,
             ),
+            'item' => array(
+                'more-info' => $this->t('invoice_lines_only'),
+                'class' => 'WC_Abstract_Order::expand_item_meta()',
+                'file' => 'wp-content/plugins/woocommerce/includes/abstracts/abstract-wc-order.php',
+                'properties' => array(
+                    'name',
+                    'type',
+                    'qty',
+                    'tax_class',
+                    'product_id',
+                    'variation_id',
+                ),
+                'properties-more' => true,
+            ),
+            'product' => array(
+                'more-info' => $this->t('invoice_lines_only'),
+                'class' => 'WC_Product',
+                'file' => 'wp-content/plugins/woocommerce/includes/abstracts/abstract-wc-product.php',
+                'properties' => array(
+                    'title',
+                    'type',
+                    'width',
+                    'length',
+                    'height',
+                    'weight',
+                    'price',
+                    'regular_price',
+                    'sale_price',
+                    'product_image_gallery',
+                    'sku',
+                    'stock',
+                    'total_stock',
+                    'downloadable',
+                    'virtual',
+                    'sold_individually',
+                    'tax_status',
+                    'tax_class',
+                    'manage_stock',
+                    'stock_status',
+                    'backorders',
+                    'featured',
+                    'visibility',
+                    'variation_id',
+                    'shipping_class',
+                    'shipping_class_id',
+                ),
+                'properties-more' => true,
+            ),
         );
     }
 
@@ -110,6 +158,11 @@ class ShopCapabilities extends ShopCapabilitiesBase
             'vatNumber' => '[vat_number|VAT Number]', // Post meta
             'telephone' => '[billing_phone]', // WC_Abstact_order
             'email' => '[billing_email]', // WC_Abstact_order
+
+            // Invoice lines defaults.
+            'itemNumber' => '[sku]',
+            'productName' => '[name]',
+            'costPrice' => '[cost_price]',
         );
     }
 

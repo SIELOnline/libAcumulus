@@ -257,17 +257,21 @@ class Creator extends BaseCreator
             return $result;
         }
 
-        $sign  = $this->invoiceSource->getType() === source::CreditNote ? -1 : 1;
-
         // $product can be NULL if the product has been deleted.
         $product = $this->shopSource->get_product_from_item($item);
-        $vatLookupTags = array();
         if ($product instanceof WC_Product) {
-            $this->addIfNotEmpty($result, 'itemnumber', $product->get_sku());
-            $vatLookupTags = $this->getVatRateLookupMetadata($product->get_tax_class());
+            $this->addPropertySource('product', $product);
         }
-        $result['product'] = $item['name'];
+        $this->addPropertySource('item', $item);
 
+        $invoiceSettings = $this->config->getInvoiceSettings();
+        if ($product instanceof WC_Product) {
+            $this->addTokenDefault($result, 'itemnumber', $invoiceSettings['itemNumber']);
+        }
+        $this->addTokenDefault($result, 'product', $invoiceSettings['productName']);
+        $this->addTokenDefault($result, 'nature', $invoiceSettings['nature']);
+
+        $sign  = $this->invoiceSource->getType() === source::CreditNote ? -1 : 1;
         // get_item_total() returns cost per item after discount and ex vat (2nd
         // param).
         $productPriceEx = $this->shopSource->get_item_total($item, false, false);
@@ -284,10 +288,8 @@ class Creator extends BaseCreator
             // - Do not put VAT on invoice: send price incl VAT as unitprice.
             // - But still send the VAT rate to Acumulus.
             // Costprice > 0 triggers the margin scheme in Acumulus.
-            $result += array(
-                'unitprice' => $productPriceInc,
-                'costprice' => $item['cost_price'],
-            );
+            $result['unitprice'] = $productPriceInc;
+            $this->addTokenDefault($result, 'costprice', $invoiceSettings['costPrice']);
         } else {
             $result += array(
                 'unitprice' => $productPriceEx,
@@ -295,12 +297,15 @@ class Creator extends BaseCreator
             );
         }
 
+        // Quantity is negative on refunds
+        $parentTags = array('quantity' => $sign * $item['qty']);
         // Precision: one of the prices is entered by the administrator and thus
         // can be considered exact. The computed one is not rounded, so we can
         // assume a very high precision for all values here.
-        $vatRangeTags = $this->getVatRangeTags($productVat, $productPriceEx, 0.001, 0.001);
-        // Quantity is negative on refunds
-        $parentTags = array('quantity' => $sign * $item['qty']) + $vatRangeTags + $vatLookupTags;
+        $parentTags += $this->getVatRangeTags($productVat, $productPriceEx, 0.001, 0.001);
+        if ($product instanceof WC_Product) {
+            $parentTags += $this->getVatRateLookupMetadata($product->get_tax_class());
+        }
         $result += $parentTags;
 
         // Add variants/options, but set vatamount to 0 on the child lines.

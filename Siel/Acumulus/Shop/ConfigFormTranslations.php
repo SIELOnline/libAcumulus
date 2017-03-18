@@ -129,6 +129,7 @@ De eigenschappen die uw webshop kent worden hieronder opgesomd.</p>
         'internal_id' => 'intern ID, ook wel technische sleutel genoemd',
         'external_id' => 'de voor iedereen zichtbare referentie',
         'internal_not_label' => 'waarde zoals die wordt opgeslagen in de database, geen (vertaald) label',
+        'invoice_lines_only' => 'Alleen beschikbaar bij de factuurregels',
 
         // Relation management settings.
         'relationSettingsHeader' => 'Relatiebeheer',
@@ -216,12 +217,23 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'field_invoiceNotes' => 'Notities',
         'desc_invoiceNotes' => 'Notities die u aan de factuur wilt toevoegen en die voor intern gebruik zijn bedoeld. Deze worden niet getoond op de factuursjabloon, in emails naar de klant, of op de pakbon.',
 
+        // Invoice lines settings.
+        'invoiceLinesSettingsHeader' => 'Uw factuurregelinstellingen',
+        'field_itemNumber' => 'Artikelnummer',
+        'desc_itemNumber' => 'Het artikelnummer of code of SKU die u op de factuurregel wilt tonen. U kunt dit leeg laten als uw productnamen uniek genoeg zijn en u uw klanten niet wilt vermoeien met interne codes of SKUs.',
+        'field_productName' => 'Productnaam',
+        'desc_productName' => 'De productnaam of omschrijving die u op de factuurregel wilt tonen.',
+        'field_nature' => 'Soort product',
+        'desc_nature' => 'Kan 2 waardes krijgen: "Product" of  "service". Als u alleen maar producten of alleen maar services verkoopt via deze webwinkel, kunt u dit letterljik invullen. Als u zowel producten als services verkoopt en u slaat dit als een kenmerk op bij alle artikelen in uw catalogus, kunt u een veldverwijzing gebruiken naar dat kenmerk.',
+        'field_costPrice' => 'Kostprijs',
+        'desc_costPrice' => 'De kostprijs van een artikel. Dit wordt alleen gebruikt op margefacturen.',
+
         // Options settings.
         'optionsSettingsHeader' => 'Opties of varianten',
         'desc_optionsSettingsHeader' => 'Een product kan opties of varianten hebben of kan samengesteld zijn. Deze opties of deelproducten kunnen op dezelfde regel als het product komen of op aparte regels daaronder. U kunt het tonen ervan ook helemaal uitzetten.',
         'desc_composedProducts' => 'NB: als het een samengesteld product betreft en de subproducten hebben verschillende BTW tarieven, dan komen alle subproducten op hun eigen regel, ongeacht deze instellingen.',
         'field_showOptions' => 'Tonen',
-        'desc_showOptions' => 'Als u opties, varianten of deelproducten helemaal niet op de factuur terug wilt zien, vink deze optie dan uit. Dit kan bv. handig zijn als u de varianten of deelproducten alleen voor uw voorraadbeheer gebruikt.',
+        'desc_showOptions' => 'Als u opties, varianten of deelproducten helemaal niet op de factuur terug wilt zien, vink deze optie dan uit. Dit kan bv. handig zijn als u de varianten of deelproducten alleen voor uw voorraadbeheer gebruikt. Als u deze instelling uitzet, dan worden de onderstaande instellingen genegeerd.',
         'option_optionsShow' => 'Opties en deelproducten op de factuur tonen',
         'option_do_not_use' => 'Deze instelling negeren',
         'option_always' => 'Altijd',
@@ -416,6 +428,7 @@ The properties known by your web shop are listed below.</p>
         'internal_id' => 'internal ID, the so-called technical key',
         'external_id' => 'A reference used in external communication',
         'internal_not_label' => 'value as stored in the database, not a (translated) label',
+        'invoice_lines_only' => 'Only available with the invoice lines',
 
         // Relation management settings.
         'relationSettingsHeader' => 'Relation management',
@@ -502,12 +515,23 @@ If you unchecked the first option, the second option only applies to business cl
         'field_invoiceNotes' => 'Notes',
         'desc_invoiceNotes' => 'Internal notes that you want to add to the invoice. These notes will not be shown on invoice templates, emails to the client, or on the packing slip.',
 
+        // Invoice lines settings.
+        'invoiceLinesSettingsHeader' => 'Your invoice lines settings',
+        'field_itemNumber' => 'Article number',
+        'desc_itemNumber' => 'The article number, code or SKU you want to show on the invoice. You may leave this empty if your product names are sufficiently identifying and you don\'t want to bother your customer with internal codes or SKU\'s.',
+        'field_productName' => 'Product name',
+        'desc_productName' => 'The product name or description you want to show on the invoice.',
+        'field_nature' => 'Nature',
+        'desc_nature' => 'The nature of the  article sold. This cvan be either "Product" or "Service". If this shop only sells products or only services, you can fill that in here. If you sell both and you store this as a property for all articles in your catalog you can use a field reference to use that property.',
+        'field_costPrice' => 'Cost price',
+        'desc_costPrice' => 'The cost price of this article. This is only used om margin invoices.',
+
         // Options settings.
         'optionsSettingsHeader' => 'Options or variants',
-        'desc_optionsSettingsHeader' => 'Products can have options or variants, or can be composed. These options or sub products can be placed on the same line as the main product or on separate lines below. Yo can also switch this off altogether.',
+        'desc_optionsSettingsHeader' => 'Products can have options or variants, or can be composed. These options or sub products can be placed on the same line as the main product or on separate lines below. You can also switch this off altogether.',
         'desc_composedProducts' => 'BTW: if this is a composed product and the sub products have different vat rates, all sub products will always be placed on their own line and the settings below will be ignored.',
         'field_showOptions' => 'Show',
-        'desc_showOptions' => 'Uncheck this option if you do not want to place options, variants or sub products on the invoice at all. E.g. this can occur when you use the variants or or sub products only for your own stock management.',
+        'desc_showOptions' => 'Uncheck this setting if you do not want to place options, variants or sub products on the invoice at all. E.g. this can occur when you use the variants or or sub products only for your own stock management. If you uncheck this setting the following settings will be ignored.',
         'option_optionsShow' => 'Show options and sub products on the invoice',
         'option_do_not_use' => 'Ignore this setting',
         'option_always' => 'Always',

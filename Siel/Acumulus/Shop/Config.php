@@ -912,6 +912,26 @@ class Config implements ConfigInterface
                     'type' => 'string',
                     'default' => '',
                 ),
+                'itemNumber' => array(
+                    'group' => 'invoice',
+                    'type' => 'string',
+                    'default' => '',
+                ),
+                'productName' => array(
+                    'group' => 'invoice',
+                    'type' => 'string',
+                    'default' => '',
+                ),
+                'nature' => array(
+                    'group' => 'invoice',
+                    'type' => 'string',
+                    'default' => '',
+                ),
+                'costPrice' => array(
+                    'group' => 'invoice',
+                    'type' => 'string',
+                    'default' => '',
+                ),
                 'digitalServices' => array(
                     'group' => 'shop',
                     'type' => 'int',

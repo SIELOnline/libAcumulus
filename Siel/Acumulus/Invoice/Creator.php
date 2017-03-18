@@ -127,6 +127,33 @@ abstract class Creator
     }
 
     /**
+     * Adds an object as property source.
+     *
+     * The object is added to the start of the array. thus upon token expansion,
+     * it will be searched before other (already added) property sources.
+     *
+     * @param string $name
+     *   The name to use for the source
+     * @param object|array $property
+     *   The source object to add.
+     */
+    protected function addPropertySource($name, $property)
+    {
+        $this->propertySources = array($name => $property) + $this->propertySources;
+    }
+
+    /**
+     * Removes an object as property source.
+     *
+     * @param string $name
+     *   The name of the source to remove.
+     */
+    protected function removePropertySource($name)
+    {
+        unset($this->propertySources[$name]);
+    }
+
+    /**
      * Creates an Acumulus invoice from an order or credit note.
      *
      * @param Source $source

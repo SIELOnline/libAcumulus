@@ -204,6 +204,7 @@ class Token {
      * If the passed variable is an object:
      * - Looking up the property by name (as existing property or via __get).
      * - Calling the get{Property} getter.
+     * - Calling the get_{property} getter.
      * - Calling the {property}() method (as existing method or via __call).
      *
      * Override if the property name or getter method is constructed differently.
@@ -239,9 +240,12 @@ class Token {
             } elseif (method_exists($variable, $property)) {
                 $value = call_user_func_array(array($variable, $property), $args);
             } else {
-                $method = 'get' . ucfirst($property);
-                if (method_exists($variable, $method)) {
-                    $value = call_user_func_array(array($variable, $method), $args);
+                $method1 = 'get' . ucfirst($property);
+                $method2 = 'get_' . $property;
+                if (method_exists($variable, $method1)) {
+                    $value = call_user_func_array(array($variable, $method1), $args);
+                } elseif (method_exists($variable, $method2)) {
+                    $value = call_user_func_array(array($variable, $method2), $args);
                 } elseif (method_exists($variable, '__get')) {
                     @$value = $variable->$property;
                 } elseif (method_exists($variable, '__call')) {
@@ -251,7 +255,13 @@ class Token {
                     }
                     if ($value !== null && $value !== '') {
                         try {
-                            $value = call_user_func_array(array($variable, $method), $args);
+                            $value = call_user_func_array(array($variable, $method1), $args);
+                        } catch (Exception $e) {
+                        }
+                    }
+                    if ($value !== null && $value !== '') {
+                        try {
+                            $value = call_user_func_array(array($variable, $method2), $args);
                         } catch (Exception $e) {
                         }
                     }

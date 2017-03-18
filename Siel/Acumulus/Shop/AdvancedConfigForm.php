@@ -117,6 +117,11 @@ class AdvancedConfigForm extends BaseConfigForm
                     'legend' => $this->t('invoiceSettingsHeader'),
                     'fields' => $this->getInvoiceFields(),
                 ),
+                'invoiceLinesSettingsHeader' => array(
+                    'type' => 'fieldset',
+                    'legend' => $this->t('invoiceLinesSettingsHeader'),
+                    'fields' => $this->getInvoiceLinesFields(),
+                ),
                 'optionsSettingsHeader' => array(
                     'type' => 'fieldset',
                     'legend' => $this->t('optionsSettingsHeader'),
@@ -282,10 +287,24 @@ class AdvancedConfigForm extends BaseConfigForm
      * Returns the set of relation management fields.
      *
      * The fields returned:
+     * - sendCustomer
+     * - overwriteIfExists
      * - defaultCustomerType
      * - contactStatus
+     * - contactYourId
+     * - companyName1
+     * - companyName2
+     * - vatNumber
+     * - fullName
      * - salutation
-     * - clientData
+     * - address1
+     * - address2
+     * - postalCode
+     * - city
+     * - telephone
+     * - fax
+     * - email
+     * - mark
      *
      * @return array[]
      *   The set of relation management fields.
@@ -433,6 +452,9 @@ class AdvancedConfigForm extends BaseConfigForm
      * The fields returned:
      * - sendEmptyInvoice
      * - sendEmptyShipping
+     * - description
+     * - descriptionText
+     * - invoiceNotes
      *
      * @return array[]
      *   The set of invoice related fields.
@@ -475,6 +497,57 @@ class AdvancedConfigForm extends BaseConfigForm
                     'size' => 60,
                     'rows' => 6,
                     'style' => 'box-sizing: border-box; width: 100%; min-width: 24em;',
+                ),
+            ),
+        );
+        return $fields;
+    }
+
+    /**
+     * Returns the set of invoice line related fields.
+     *
+     * The fields returned:
+     * - itemNumber
+     * - productName
+     * - nature
+     * - costPrice
+     *
+     * @return array[]
+     *   The set of invoice line related fields.
+     */
+    protected function getInvoiceLinesFields()
+    {
+        $fields = array(
+            'itemNumber' => array(
+                'type' => 'text',
+                'label' => $this->t('field_itemNumber'),
+                'description' => $this->t('desc_itemNumber'),
+                'attributes' => array(
+                    'size' => 60,
+                ),
+            ),
+            'productName' => array(
+                'type' => 'text',
+                'label' => $this->t('field_productName'),
+                'description' => $this->t('desc_productName'),
+                'attributes' => array(
+                    'size' => 60,
+                ),
+            ),
+            'nature' => array(
+                'type' => 'text',
+                'label' => $this->t('field_nature'),
+                'description' => $this->t('desc_nature'),
+                'attributes' => array(
+                    'size' => 30,
+                ),
+            ),
+            'costPrice' => array(
+                'type' => 'text',
+                'label' => $this->t('field_costPrice'),
+                'description' => $this->t('desc_costPrice'),
+                'attributes' => array(
+                    'size' => 60,
                 ),
             ),
         );

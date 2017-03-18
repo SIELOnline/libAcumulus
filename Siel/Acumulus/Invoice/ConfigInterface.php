@@ -56,24 +56,25 @@ interface ConfigInterface
      *
      * @return array
      *   A keyed array with the keys:
-     *   - defaultCustomerType
      *   - sendCustomer
-     *   - genericCustomerEmail
-     *   - contactYourId
+     *   - overwriteIfExists
+     *   - defaultCustomerType
      *   - contactStatus
+     *   - contactYourId
      *   - companyName1
      *   - companyName2
+     *   - vatNumber
      *   - fullName
+     *   - salutation
      *   - address1
      *   - address2
      *   - postalCode
      *   - city
-     *   - vatNumber
      *   - telephone
      *   - fax
      *   - email
-     *   - overwriteIfExists
      *   - mark
+     *   - genericCustomerEmail
      */
     public function getCustomerSettings();
 
@@ -88,8 +89,13 @@ interface ConfigInterface
      *   - defaultInvoicePaidTemplate
      *   - paymentMethodAccountNumber
      *   - paymentMethodCostCenter
+     *   - sendEmptyInvoice
      *   - sendEmptyShipping
+     *   - description
+     *   - descriptionText
+     *   - invoiceNotes
      *   - useMargin
+     *   - optionsShow
      *   - optionsAllOn1Line
      *   - optionsAllOnOwnLine
      *   - optionsMaxLength

@@ -112,6 +112,31 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 ),
                 'properties-more' => TRUE,
             ),
+            'item' => array(
+                'table' => 'virtuemart_order_items',
+                'additional-info' => $this->t('invoice_lines_only'),
+                'properties' => array(
+                    'virtuemart_order_item_id',
+                    'virtuemart_vendor_id',
+                    'virtuemart_product_id',
+                    'order_item_sku',
+                    'order_item_name',
+                    'product_quantity',
+                    'product_item_price',
+                    'product_priceWithoutTax',
+                    'product_tax',
+                    'product_basePriceWithTax',
+                    'product_discountedPriceWithoutTax',
+                    'product_final_price',
+                    'product_subtotal_discount',
+                    'product_subtotal_with_tax',
+                    'order_item_currency',
+                    'order_status',
+                    'product_attribute',
+                    'delivery_date',
+                ),
+                'properties-more' => TRUE,
+            ),
         );
     }
 
@@ -132,6 +157,10 @@ class ShopCapabilities extends ShopCapabilitiesBase
             'telephone' => '[phone_1|phone_2]', // Order BT
             'fax' => '[fax]', // Order BT
             'email' => '[email]', // Order BT
+
+            // Invoice lines defaults.
+            'itemNumber' => '[order_item_sku]',
+            'productName' => '[order_item_name]',
         );
     }
 

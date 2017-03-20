@@ -231,6 +231,13 @@ class Creator extends BaseCreator
      */
     protected function getItemLine(stdClass $item)
     {
+        $result = array();
+        $this->addPropertySource('item', $item);
+        $invoiceSettings = $this->config->getInvoiceSettings();
+        $this->addTokenDefault($result, 'itemnumber', $invoiceSettings['itemNumber']);
+        $this->addTokenDefault($result, 'product', $invoiceSettings['productName']);
+        $this->addTokenDefault($result, 'nature', $invoiceSettings['nature']);
+
         $productPriceEx = (float) $item->product_discountedPriceWithoutTax;
         $productPriceInc = (float) $item->product_final_price;
         $productVat = (float) $item->product_tax;
@@ -245,9 +252,7 @@ class Creator extends BaseCreator
             $vatInfo = $this->getVatRangeTags($productVat, $productPriceEx, 0.0001, 0.0001);
         }
 
-        $result = array(
-                'itemnumber' => $item->order_item_sku,
-                'product' => $item->order_item_name,
+        $result += array(
                 'unitprice' => $productPriceEx,
                 'unitpriceinc' => $productPriceInc,
                 'quantity' => $item->product_quantity,
@@ -259,6 +264,8 @@ class Creator extends BaseCreator
         if (!empty($children)) {
             $result[Creator::Line_Children] = $children;
         }
+
+        $this->removePropertySource('item');
 
         return $result;
     }

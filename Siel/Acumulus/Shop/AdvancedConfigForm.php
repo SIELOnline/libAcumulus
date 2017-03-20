@@ -188,20 +188,22 @@ class AdvancedConfigForm extends BaseConfigForm
 
         if (!empty($variableInfo['more-info'])) {
             $value .= ' ' . $variableInfo['more-info'];
-        }
-        elseif (!empty($variableInfo['class'])) {
-            if (!empty($variableInfo['file'])) {
-                $value .= ' (' . $this->see2Lists('see_class_file', 'see_classes_files', $variableInfo['class'], $variableInfo['file']) . ')';
+        } else {
+            if (!empty($variableInfo['class'])) {
+                if (!empty($variableInfo['file'])) {
+                    $value .= ' (' . $this->see2Lists('see_class_file', 'see_classes_files', $variableInfo['class'], $variableInfo['file']) . ')';
+                } else {
+                    $value .= ' (' . $this->seeList('see_class', 'see_classes', $variableInfo['class']) . ')';
+                }
+            } elseif (!empty($variableInfo['table'])) {
+                $value .= ' (' . $this->seeList('see_table', 'see_tables', $variableInfo['table']) . ')';
+            } elseif (!empty($variableInfo['file'])) {
+                $value .= ' (' . $this->seeList('see_file', 'see_files', $variableInfo['file']) . ')';
             }
-            else {
-                $value .= ' (' . $this->seeList('see_class', 'see_classes', $variableInfo['class']) . ')';
+
+            if (!empty($variableInfo['additional-info'])) {
+                $value .= ' (' . $variableInfo['additional-info'] . ')';
             }
-        }
-        elseif (!empty($variableInfo['table'])) {
-            $value .= ' (' . $this->seeList('see_table', 'see_tables', $variableInfo['table']) . ')';
-        }
-        elseif (!empty($variableInfo['file'])) {
-            $value .= ' (' . $this->seeList('see_file', 'see_files', $variableInfo['file']) . ')';
         }
 
         $value .= ':</p>';
@@ -215,8 +217,7 @@ class AdvancedConfigForm extends BaseConfigForm
             if (!empty($variableInfo['properties-more'])) {
                 if (!empty($variableInfo['class'])) {
                     $value .= '<li>' . $this->seeList('see_class_more', 'see_classes_more', $variableInfo['class']). '</li>';
-                }
-                elseif (!empty($variableInfo['table'])) {
+                } elseif (!empty($variableInfo['table'])) {
                     $value .= '<li>' . $this->seeList('see_table_more', 'see_tables_more', $variableInfo['table']) . '</li>';
                 }
             }
@@ -474,7 +475,7 @@ class AdvancedConfigForm extends BaseConfigForm
             'description' => array(
                 'type' => 'text',
                 'label' => $this->t('field_description'),
-                'description' => $this->t('desc_description'),
+                'description' => $this->t('desc_description') . ' ' . $this->t('msg_token'),
                 'attributes' => array(
                     'size' => 60,
                 ),
@@ -482,7 +483,7 @@ class AdvancedConfigForm extends BaseConfigForm
             'descriptionText' => array(
                 'type' => 'textarea',
                 'label' => $this->t('field_descriptionText'),
-                'description' => $this->t('desc_descriptionText'),
+                'description' => $this->t('desc_descriptionText') . ' ' . $this->t('msg_token'),
                 'attributes' => array(
                     'size' => 60,
                     'rows' => 6,
@@ -492,7 +493,7 @@ class AdvancedConfigForm extends BaseConfigForm
             'invoiceNotes' => array(
                 'type' => 'textarea',
                 'label' => $this->t('field_invoiceNotes'),
-                'description' => $this->t('desc_invoiceNotes'),
+                'description' => $this->t('desc_invoiceNotes') . ' ' . $this->t('msg_token'),
                 'attributes' => array(
                     'size' => 60,
                     'rows' => 6,
@@ -521,7 +522,7 @@ class AdvancedConfigForm extends BaseConfigForm
             'itemNumber' => array(
                 'type' => 'text',
                 'label' => $this->t('field_itemNumber'),
-                'description' => $this->t('desc_itemNumber'),
+                'description' => $this->t('desc_itemNumber') . ' ' . $this->t('msg_token'),
                 'attributes' => array(
                     'size' => 60,
                 ),
@@ -529,7 +530,7 @@ class AdvancedConfigForm extends BaseConfigForm
             'productName' => array(
                 'type' => 'text',
                 'label' => $this->t('field_productName'),
-                'description' => $this->t('desc_productName'),
+                'description' => $this->t('desc_productName') . ' ' . $this->t('msg_token'),
                 'attributes' => array(
                     'size' => 60,
                 ),
@@ -545,7 +546,7 @@ class AdvancedConfigForm extends BaseConfigForm
             'costPrice' => array(
                 'type' => 'text',
                 'label' => $this->t('field_costPrice'),
-                'description' => $this->t('desc_costPrice'),
+                'description' => $this->t('desc_costPrice') . ' ' . $this->t('msg_token'),
                 'attributes' => array(
                     'size' => 60,
                 ),

@@ -316,6 +316,9 @@ class Creator extends BaseCreator
             $result[Creator::Line_Children] = $this->getExtraProductOptionsLines($item, $parentTags);
         }
 
+        $this->removePropertySource('product');
+        $this->removePropertySource('item');
+
         return $result;
     }
 

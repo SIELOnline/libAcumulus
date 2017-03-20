@@ -531,7 +531,7 @@ If you unchecked the first option, the second option only applies to business cl
         'desc_optionsSettingsHeader' => 'Products can have options or variants, or can be composed. These options or sub products can be placed on the same line as the main product or on separate lines below. You can also switch this off altogether.',
         'desc_composedProducts' => 'BTW: if this is a composed product and the sub products have different vat rates, all sub products will always be placed on their own line and the settings below will be ignored.',
         'field_showOptions' => 'Show',
-        'desc_showOptions' => 'Uncheck this setting if you do not want to place options, variants or sub products on the invoice at all. E.g. this can occur when you use the variants or or sub products only for your own stock management. If you uncheck this setting the following settings will be ignored.',
+        'desc_showOptions' => 'Uncheck this setting if you do not want to place options, variants or sub products on the invoice at all. E.g. this can occur when you use the variants or sub products only for your own stock management. If you uncheck this setting the following settings will be ignored.',
         'option_optionsShow' => 'Show options and sub products on the invoice',
         'option_do_not_use' => 'Ignore this setting',
         'option_always' => 'Always',

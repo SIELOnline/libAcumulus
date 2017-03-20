@@ -65,8 +65,8 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 'properties-more' => true,
             ),
             'meta' => array(
-                'more-info' => $this->t('see_post_meta'),
                 'table' => 'postmeta',
+                'additional-info' => $this->t('see_post_meta'),
                 'properties' => $meta,
                 'properties-more' => true,
             ),
@@ -78,17 +78,17 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 'properties-more' => false,
             ),
             'order_meta' => array(
-                'more-info' => $this->t('meta_original_order_for_refund'),
                 'table' => 'postmeta',
+                'additional-info' => $this->t('meta_original_order_for_refund'),
                 'properties' => array(
                     $this->t('see_above'),
                 ),
                 'properties-more' => false,
             ),
             'item' => array(
-                'more-info' => $this->t('invoice_lines_only'),
                 'class' => 'WC_Abstract_Order::expand_item_meta()',
                 'file' => 'wp-content/plugins/woocommerce/includes/abstracts/abstract-wc-order.php',
+                'additional-info' => $this->t('invoice_lines_only'),
                 'properties' => array(
                     'name',
                     'type',
@@ -100,9 +100,9 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 'properties-more' => true,
             ),
             'product' => array(
-                'more-info' => $this->t('invoice_lines_only'),
                 'class' => 'WC_Product',
                 'file' => 'wp-content/plugins/woocommerce/includes/abstracts/abstract-wc-product.php',
+                'additional-info' => $this->t('invoice_lines_only'),
                 'properties' => array(
                     'title',
                     'type',

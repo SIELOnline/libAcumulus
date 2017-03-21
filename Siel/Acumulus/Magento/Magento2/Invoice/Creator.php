@@ -117,6 +117,13 @@ class Creator extends BaseCreator
     {
         $result = array();
 
+        $this->addPropertySource('item', $item);
+
+        $invoiceSettings = $this->config->getInvoiceSettings();
+        $this->addTokenDefault($result, 'itemnumber', $invoiceSettings['itemNumber']);
+        $this->addTokenDefault($result, 'product', $invoiceSettings['productName']);
+        $this->addTokenDefault($result, 'nature', $invoiceSettings['nature']);
+
         $vatRate = (float) $item->getTaxPercent();
         $productPriceInc = (float) $item->getPriceInclTax();
         // For higher precision of the unit price, we use the prices as entered
@@ -129,9 +136,7 @@ class Creator extends BaseCreator
         $lineVat = (float) $item->getTaxAmount() + (float) $item->getDiscountTaxCompensationAmount();
 
         // Simple products (products without children): add as 1 line.
-        $this->addIfNotEmpty($result, 'itemnumber', $item->getSku());
         $result += array(
-            'product' => $item->getName(),
             'unitprice' => $productPriceEx,
             'unitpriceinc' => $productPriceInc,
             'vatrate' => $vatRate,
@@ -155,6 +160,8 @@ class Creator extends BaseCreator
             }
         }
 
+        $this->removePropertySource('item');
+
         return $result;
     }
 
@@ -169,13 +176,18 @@ class Creator extends BaseCreator
     {
         $result = array();
 
+        $this->addPropertySource('item', $item);
+
+        $invoiceSettings = $this->config->getInvoiceSettings();
+        $this->addTokenDefault($result, 'itemnumber', $invoiceSettings['itemNumber']);
+        $this->addTokenDefault($result, 'product', $invoiceSettings['productName']);
+        $this->addTokenDefault($result, 'nature', $invoiceSettings['nature']);
+
         $lineVat = -((float) $item->getTaxAmount() + (float) $item->getDiscountTaxCompensationAmount());
         $productPriceEx = -((float) $item->getPrice());
 
         // On a credit note we only have single lines, no compound lines.
-        $this->addIfNotEmpty($result, 'itemnumber', $item->getSku());
         $result += array(
-            'product' => $item->getName(),
             'unitprice' => $productPriceEx,
             'quantity' => $item->getQty(),
             'meta-line-vatamount' => $lineVat,
@@ -203,6 +215,8 @@ class Creator extends BaseCreator
             $result['meta-line-discount-amountinc'] = $item->getDiscountAmount();
         }
 
+        $this->removePropertySource('item');
+
         return $result;
     }
 
@@ -218,7 +232,6 @@ class Creator extends BaseCreator
         // free shipping is never refunded...
         if ($this->invoiceSource->getType() === Source::Order || !Number::isZero($magentoSource->getShippingAmount())) {
             $result += array(
-                'itemnumber' => '',
                 'product' => $this->getShippingMethodName(),
                 'quantity' => 1,
             );

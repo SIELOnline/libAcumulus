@@ -173,19 +173,17 @@ class Creator extends BaseCreator
     {
         $result = array();
 
+        // $product can be empty if the product has been deleted.
         $product = Registry::getInstance()->model_catalog_product->getProduct($item['product_id']);
-        $this->addIfSetAndNotEmpty($result, 'itemnumber', $product, 'mpn');
-        $this->addIfSetAndNotEmpty($result, 'itemnumber', $product, 'isbn');
-        $this->addIfSetAndNotEmpty($result, 'itemnumber', $product, 'jan');
-        $this->addIfSetAndNotEmpty($result, 'itemnumber', $product, 'ean');
-        $this->addIfSetAndNotEmpty($result, 'itemnumber', $product, 'upc');
-        $this->addIfSetAndNotEmpty($result, 'itemnumber', $product, 'sku');
-
-        // Product name, model, and option(s).
-        $result['product'] = $item['name'];
-        if (!empty($item['model'])) {
-            $result['product'] .= ' (' . $item['model'] . ')';
+        if (!empty($product)) {
+            $this->addPropertySource('product', $product);
         }
+        $this->addPropertySource('item', $item);
+
+        $invoiceSettings = $this->config->getInvoiceSettings();
+        $this->addTokenDefault($result, 'itemnumber', $invoiceSettings['itemNumber']);
+        $this->addTokenDefault($result, 'product', $invoiceSettings['productName']);
+        $this->addTokenDefault($result, 'nature', $invoiceSettings['nature']);
 
         // Get vat range info from item line.
         $productPriceEx = $item['price'];
@@ -194,6 +192,11 @@ class Creator extends BaseCreator
 
         // Try to look up the vat rate via product.
         $vatInfo += $this->getVatRateLookupMetadata($product['tax_class_id']);
+
+        $result['unitprice'] = $productPriceEx;
+        $result['quantity'] = $item['quantity'];
+        $result += $vatInfo;
+        $result['vatamount'] = $productVat;
 
         // Options (variants).
         $options = $this->getOrderModel()->getOrderOptions($item['order_id'], $item['order_product_id']);
@@ -208,15 +211,13 @@ class Creator extends BaseCreator
                     'unitprice' => 0,
                       // Table order_option does not have a quantity field, so
                       // composite products with multiple same sub product
-                      // are apparently not covered.
-                    'quantity' => 1,
+                      // are apparently not covered. Take quantity from parent.
+                    'quantity' => $item['quantity'],
                   ) + $optionsVatInfo;
             }
         }
-        $result['unitprice'] = $productPriceEx;
-        $result['quantity'] = $item['quantity'];
-        $result += $vatInfo;
-        $result['vatamount'] = $productVat;
+        $this->removePropertySource('product');
+        $this->removePropertySource('item');
 
         return $result;
     }

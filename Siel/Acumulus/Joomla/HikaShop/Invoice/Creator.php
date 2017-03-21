@@ -182,8 +182,28 @@ class Creator extends BaseCreator
      */
     protected function getItemLine(stdClass $item)
     {
+        $result = array();
+        $this->addPropertySource('item', $item);
+        $invoiceSettings = $this->config->getInvoiceSettings();
+        $this->addTokenDefault($result, 'itemnumber', $invoiceSettings['itemNumber']);
+        $this->addTokenDefault($result, 'product', $invoiceSettings['productName']);
+        // Remove html with variant info from product name, we'll add that later
+        // using children lines.
+        if (isset($result['product']) && ($pos = strpos($result['product'], '<span')) !== false) {
+            $result['product'] = substr($result['product'], 0, $pos);
+        }
+        $this->addTokenDefault($result, 'nature', $invoiceSettings['nature']);
+
         $productPriceEx = (float) $item->order_product_price;
         $productVat = (float) $item->order_product_tax;
+
+        $result += array(
+                'unitprice' => $productPriceEx,
+                'meta-line-price' => $item->order_product_total_price_no_vat,
+                'meta-line-priceinc' => $item->order_product_total_price,
+                'quantity' => $item->order_product_quantity,
+                'vatamount' => $productVat,
+            );
 
         // Note that this info remains correct when rates are changed as upon
         // order creation this info is stored in the order_product table.
@@ -201,22 +221,7 @@ class Creator extends BaseCreator
         } else {
             $vatInfo = $this->getVatRangeTags($productVat, $productPriceEx, 0.0001, 0.0001);
         }
-
-        // Remove html with variant info from product name, we'll add that later
-        // on using children lines.
-        $orderProductName = $item->order_product_name;
-        if (($pos = strpos($orderProductName, '<span')) !== false) {
-            $orderProductName = substr($orderProductName, 0, $pos);
-        }
-        $result = array(
-                'itemnumber' => $item->order_product_code,
-                'product' => $orderProductName,
-                'unitprice' => $productPriceEx,
-                'meta-line-price' => $item->order_product_total_price_no_vat,
-                'meta-line-priceinc' => $item->order_product_total_price,
-                'quantity' => $item->order_product_quantity,
-                'vatamount' => $productVat,
-            ) + $vatInfo;
+        $result += $vatInfo;
 
         // Add variant info.
         if (!empty($item->order_product_options)) {
@@ -225,6 +230,8 @@ class Creator extends BaseCreator
                 $result[Creator::Line_Children] = $children;
             }
         }
+
+        $this->removePropertySource('item');
 
         return $result;
     }

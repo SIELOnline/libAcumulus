@@ -84,8 +84,8 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 'properties-more' => false,
             ),
             'shipping_address' => array(
-                'more-info' => $this->t('see_billing_address'),
                 'table' => 'hikashop_address',
+                'additional-info' => $this->t('see_billing_address'),
                 'properties' => array(
                     $this->t('see_above'),
                 ),
@@ -111,6 +111,29 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 ),
                 'properties-more' => false,
             ),
+            'item' => array(
+                'table' => 'hikashop_order_product',
+                'additional-info' => $this->t('invoice_lines_only'),
+                'properties' => array(
+                    'product_id',
+                    'order_product_quantity',
+                    'order_product_name',
+                    'order_product_code',
+                    'order_product_price',
+                    'order_product_tax',
+                    'order_product_options',
+                    'order_product_option_parent_id',
+                    'order_product_tax_info',
+                    'order_product_wishlist_id',
+                    'order_product_wishlist_product_id',
+                    'order_product_shipping_id',
+                    'order_product_shipping_method',
+                    'order_product_shipping_price',
+                    'order_product_shipping_tax',
+                    'order_product_shipping_params'
+                ),
+                'properties-more' => true,
+            ),
         );
     }
 
@@ -132,6 +155,10 @@ class ShopCapabilities extends ShopCapabilitiesBase
             'telephone' => '[address_telephone|address_telephone2]', // billing_address
             'fax' => '[address_telephone2|address_fax]', // billing_address
             'email' => '[user_email|email]', // customer
+
+            // Invoice lines defaults.
+            'itemNumber' => '[order_product_code]',
+            'productName' => '[order_product_name]',
         );
     }
 

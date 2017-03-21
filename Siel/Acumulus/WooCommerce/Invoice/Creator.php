@@ -265,9 +265,7 @@ class Creator extends BaseCreator
         $this->addPropertySource('item', $item);
 
         $invoiceSettings = $this->config->getInvoiceSettings();
-        if ($product instanceof WC_Product) {
-            $this->addTokenDefault($result, 'itemnumber', $invoiceSettings['itemNumber']);
-        }
+        $this->addTokenDefault($result, 'itemnumber', $invoiceSettings['itemNumber']);
         $this->addTokenDefault($result, 'product', $invoiceSettings['productName']);
         $this->addTokenDefault($result, 'nature', $invoiceSettings['nature']);
 

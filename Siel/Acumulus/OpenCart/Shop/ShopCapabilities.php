@@ -158,10 +158,63 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
         );
         return parent::getTokenInfo() + array(
             'source' => array(
-                'table' => '',
                 'file' => 'catalog/model/checkout/order.php',
                 'properties' => array_intersect($catalogOrder, $adminOrder),
                 'properties-more' => true,
+            ),
+            'item' => array(
+                'table' => 'order_product',
+                'properties' => array(
+                    'order_product_id',
+                    'product_id',
+                    'name',
+                    'model',
+                    'quantity',
+                    'price',
+                    'total',
+                    'tax',
+                    'reward',
+                ),
+            ),
+            'product' => array(
+                'table' => array('product', 'product_description', 'url_alias'),
+                'properties' => array(
+                    'product_id',
+                    'model',
+                    'sku',
+                    'upc',
+                    'ean',
+                    'jan',
+                    'isbn',
+                    'mpn',
+                    'location',
+                    'quantity',
+                    'stock_status_id',
+                    'manufacturer_id',
+                    'shipping',
+                    'price',
+                    'points',
+                    'tax_class_id',
+                    'date_available',
+                    'weight',
+                    'weight_class_id',
+                    'length',
+                    'width',
+                    'height',
+                    'length_class_id',
+                    'subtract',
+                    'minimum',
+                    'status',
+                    'viewed',
+                    'language_id',
+                    'name',
+                    'description',
+                    'tag',
+                    'meta_title',
+                    'meta_description',
+                    'meta_keyword',
+                    'description',
+                ),
             ),
         );
     }
@@ -183,6 +236,10 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
             'telephone' => '[telephone]', // Order
             'fax' => '[fax]', // Order
             'email' => '[email]', // Order
+
+            // Invoice lines defaults.
+            'itemNumber' => '[sku|upc|ean|jan|isbn|mpn]',
+            'productName' => '[name+"("&model&")"]',
         );
     }
 

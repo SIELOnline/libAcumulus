@@ -256,14 +256,15 @@ class Creator extends BaseCreator
     protected function getItemLine(array $item)
     {
         $result = array();
+
+        $this->addPropertySource('item', $item);
+
+        $invoiceSettings = $this->config->getInvoiceSettings();
+        $this->addTokenDefault($result, 'itemnumber', $invoiceSettings['itemNumber']);
+        $this->addTokenDefault($result, 'product', $invoiceSettings['productName']);
+        $this->addTokenDefault($result, 'nature', $invoiceSettings['nature']);
+
         $sign = $this->getSign();
-
-        $this->addIfNotEmpty($result, 'itemnumber', $item['product_upc']);
-        $this->addIfNotEmpty($result, 'itemnumber', $item['product_ean13']);
-        $this->addIfNotEmpty($result, 'itemnumber', $item['product_supplier_reference']);
-        $this->addIfNotEmpty($result, 'itemnumber', $item['product_reference']);
-        $result['product'] = $item['product_name'];
-
         // Prestashop does not support the margin scheme. So in a standard
         // install this method will always return false. But if this method
         // happens to return true anyway (customisation, hook), the costprice
@@ -274,7 +275,7 @@ class Creator extends BaseCreator
             // - But still send the VAT rate to Acumulus.
             $result['unitprice'] = $sign * $item['unit_price_tax_incl'];
             // Costprice > 0 triggers the margin scheme in Acumulus.
-            $result['costprice'] = $sign * $item['purchase_supplier_price'];
+            $this->addTokenDefault($result, 'costprice', $invoiceSettings['costPrice']);
         } else {
             // Unit price is without VAT: use product_price.
             $result['unitprice'] = $sign * $item['unit_price_tax_excl'];
@@ -298,10 +299,12 @@ class Creator extends BaseCreator
             // Precision: 1 of the amounts, probably the prince incl tax, is
             // entered by the admin and can thus be considered exact. The other
             // is calculated by the system and not rounded and can thus be
-            // considered tohave a precision 0f 0.0001
+            // considered to have a precision better than 0.0001
             $result += $this->getVatRangeTags($sign * ($item['unit_price_tax_incl'] - $item['unit_price_tax_excl']), $sign * $item['unit_price_tax_excl'], 0.0001, 0.0001);
         }
         $result['meta-calculated-fields'][] = 'vatamount';
+
+        $this->removePropertySource('item');
 
         return $result;
     }

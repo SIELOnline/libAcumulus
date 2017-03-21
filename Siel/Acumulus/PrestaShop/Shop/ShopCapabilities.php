@@ -153,6 +153,52 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 ),
                 'properties-more' => true,
             ),
+            'item' => array(
+                'class' => 'OrderDetail',
+                'file' => 'classes/order/OrderDetail.php',
+                'properties' => array(
+                    'product_id',
+                    'product_attribute_id',
+                    'product_name',
+                    'product_quantity',
+                    'product_quantity_in_stock',
+                    'product_quantity_return',
+                    'product_quantity_refunded',
+                    'product_quantity_reinjected',
+                    'product_price',
+                    'reduction_percent',
+                    'reduction_amount',
+                    'reduction_amount_tax_incl',
+                    'reduction_amount_tax_excl',
+                    'group_reduction',
+                    'product_quantity_discount',
+                    'product_ean13',
+                    'product_upc',
+                    'product_reference',
+                    'product_supplier_reference',
+                    'product_weight',
+                    'tax_name',
+                    'tax_rate',
+                    'tax_computation_method',
+                    'id_tax_rules_group',
+                    'ecotax',
+                    'ecotax_tax_rate',
+                    'discount_quantity_applied',
+                    'download_hash',
+                    'download_nb',
+                    'download_deadline',
+                    'unit_price_tax_incl',
+                    'unit_price_tax_excl',
+                    'total_price_tax_incl',
+                    'total_price_tax_excl',
+                    'total_shipping_price_tax_excl',
+                    'total_shipping_price_tax_incl',
+                    'purchase_supplier_price',
+                    'original_product_price',
+                    'original_wholesale_price',
+                ),
+                'properties-more' => true,
+            ),
         );
     }
 
@@ -172,6 +218,11 @@ class ShopCapabilities extends ShopCapabilitiesBase
             'vatNumber' => '[vat_number]', // InvoiceAddress
             'telephone' => '[phone|phone_mobile]', // InvoiceAddress
             'email' => '[email]', // Customer
+
+            // Invoice lines defaults.
+            'itemNumber' => '[product_reference|product_supplier_reference|product_ean13|product_upc]',
+            'productName' => '[product_name]',
+            'costPrice' => '[purchase_supplier_price]',
         );
     }
 

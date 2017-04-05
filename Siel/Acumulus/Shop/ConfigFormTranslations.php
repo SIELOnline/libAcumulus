@@ -261,22 +261,26 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
 
         // Email as pdf settings.
         'emailAsPdfSettingsHeader' => 'PDF Factuur',
-        'desc_emailAsPdfSettings' => 'Bij het versturen van bestellinggegevens naar Acumulus, kunt u Acumulus een PDF factuur laten versturen naar uw klant. Deze wordt direct verstuurd naar het door de klant opgegeven emailadres.',
+        'desc_emailAsPdfSettings' => 'Bij het versturen van bestellinggegevens naar Acumulus, kunt u Acumulus een PDF factuur laten versturen naar uw klant. Deze wordt dan direct verstuurd naar het opgegeven emailadres.',
 
         'field_emailAsPdf' => 'Optie inschakelen',
         'option_emailAsPdf' => 'Verstuur de factuur als PDF vanuit Acumulus.',
         'desc_emailAsPdf' => 'Als u deze optie aanvinkt, kunt u de overige opties gebruiken om de emailverzending aan uw wensen aan te passen. Het bericht in de email body kunt u niet hier instellen, dat kunt u in Acumulus doen onder "Beheer - Factuur-sjablonen".',
 
+        'field_emailTo' => 'Aan',
+        'desc_emailTo' => 'Het email adres waar naartoe de factur verstuurd moet worden. Als u dit leeg laat wordt het emailadres uit de klantgegevens van de factuur gebruikt. Wij adviseren dit veld leeg te laten. U mag meerdere email adressen invullen, gescheiden door een komma (,) of een punt-komma (;).',
+        'message_validate_email_5' => 'Het veld Aan is geen valide e-mailadres, vul een correct e-mailadres in.',
+
+        'field_emailBcc' => 'BCC',
+        'desc_emailBcc' => 'Additioneel emailadres om de factuur naar toe te sturen, bv. het emailadres van uw eigen administratie-afdeling. Als u dit leeg laat wordt de factuur alleen naar de klant verstuurd. U mag meerdere email adressen invullen, gescheiden door een komma (,) of een punt-komma (;).',
+        'message_validate_email_3' => 'Het veld BCC is geen valide e-mailadres, vul een correct e-mailadres in.',
+
         'field_emailFrom' => 'Afzender',
-        'desc_emailFrom' => 'Het email adres dat als afzender gebruikt moet worden. Als u dit leeg laat wordt het emailadres uit het Acumulus sjabloon gebruikt. Wij adviseren dit veld leeg te laten.',
+        'desc_emailFrom' => 'Het email adres dat als afzender gebruikt moet worden. Als u dit leeg laat wordt het emailadres uit het Acumulus sjabloon gebruikt.',
         'message_validate_email_4' => 'Het veld Afzender is geen valide e-mailadres, vul een correct e-mailadres in.',
 
         'field_subject' => 'Onderwerp',
-        'desc_subject' => 'Het onderwerp van de email. Als u dit leeg laat wordt "Factuur [factuurnummer] Bestelling [bestelnummer]" gebruikt. U kunt [#b] gebruiken om het bestelnummer in de onderwerpregel te plaatsen en [#f] voor het factuurnummer (van de webshop, niet van Acumulus).',
-
-        'field_emailBcc' => 'BCC',
-        'desc_emailBcc' => 'Additionele emailadressen om de factuur naar toe te sturen, bv. het emailadres van uw eigen administratie-afdeling. Als u dit leeg laat wordt de factuur alleen naar de klant verstuurd.',
-        'message_validate_email_3' => 'Het veld BCC is geen valide e-mailadres, vul een correct e-mailadres in.',
+        'desc_subject' => 'Het onderwerp van de email. Als u dit leeg laat wordt "Factuur [nummer] [omschrijving]" gebruikt. Let op: als u Acumulus het factuurnummer laat bepalen, is het helaas niet mogelijk om naar het factuurnnummer te verwijzen.',
 
         // Plugin settings.
         'pluginSettingsHeader' => 'Plugin instellingen',
@@ -559,22 +563,26 @@ If you unchecked the first option, the second option only applies to business cl
 
         // Email as pdf settings.
         'emailAsPdfSettingsHeader' => 'PDF Invoice',
-        'desc_emailAsPdfSettings' => 'On sending the order details to Acumulus, Acumulus can send a PDF invoice to your customer. The mail will be sent to the clients\' email address.',
+        'desc_emailAsPdfSettings' => 'On sending the order details to Acumulus, Acumulus can send a PDF invoice to your customer. The mail will immediately be sent to the given email address.',
 
         'field_emailAsPdf' => 'Enable the feature',
         'option_emailAsPdf' => 'Have Acumulus send the invoice as PDF.',
-        'desc_emailAsPdf' => 'If you check this option, you can use the other options below to configure the emails to your preferences. However, to configure the text in them mail body, go to Acumulus to "Beheer - Factuur-sjablonen".',
+        'desc_emailAsPdf' => 'If you check this option, you can use the other options below to configure the emails to your preferences. However, to configure the text in the mail body, go to Acumulus to "Beheer - Factuur-sjablonen".',
 
-        'field_emailFrom' => 'Sender',
-        'desc_emailFrom' => 'The email address to use as sender. If you leave this empty, the email address of the Acumulus template will be used. We advice you to leave this empty.',
-        'message_validate_email_4' => 'The field Sender is not a valid e-mail address, please fill in a valid e-mail address.',
+        'field_emailTo' => 'To',
+        'desc_emailTo' => 'The email address to send the invopice to. If yo leave this empty the email address from the invoice\'s customer data will be used. We recommend you to leave this empty. You may enter multiple email addresses separated by a comma (,) or a semi-colon (;).',
+        'message_validate_email_5' => 'The field To is not a valid e-mail address, please fill in a valid e-mail address.',
 
         'field_subject' => 'Subject',
-        'desc_subject' => 'The subject line of the email. If you leave this empty "Invoice [invoice#] Order [order#]" will be used. You can use [#b] to place the order number in the subject and [#f] for the invoice number (from the webshop, not Acumulus).',
+        'desc_subject' => 'The subject line of the email. If you leave this empty "Invoice [number] [description]" will be used. Note: if you have Acumulus assign the invoice number, it is unfortunately not possible to refer to that invoice number in the subject.',
 
         'field_emailBcc' => 'BCC',
-        'desc_emailBcc' => 'Additional email addresses to send the invoice to, e.g. the email address of your own administration department. If you leave this empty the invoice email will only be sent to your client.',
+        'desc_emailBcc' => 'Additional email addresses to send the invoice to, e.g. the email address of your own administration department. If you leave this empty the invoice email will only be sent to your client. You may enter multiple email addresses separated by a comma (,) or a semi-colon (;).',
         'message_validate_email_3' => 'The field BCC is not a valid e-mail address, please fill in a valid e-mail address.',
+
+        'field_emailFrom' => 'Sender',
+        'desc_emailFrom' => 'The email address to use as sender. If you leave this empty, the email address of the Acumulus template will be used. We recommend you to leave this empty.',
+        'message_validate_email_4' => 'The field Sender is not a valid e-mail address, please fill in a valid e-mail address.',
 
         // Plugin settings.
         'pluginSettingsHeader' => 'Plugin settings',

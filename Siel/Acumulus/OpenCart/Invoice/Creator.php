@@ -52,29 +52,6 @@ class Creator extends BaseCreator
 
     /**
      * {@inheritdoc}
-     */
-    protected function getInvoiceNumber($invoiceNumberSource)
-    {
-        $result = $this->invoiceSource->getReference();
-        if ($invoiceNumberSource == ConfigInterface::InvoiceNrSource_ShopInvoice && !empty($this->order['invoice_no'])) {
-            $result = $this->order['invoice_prefix'] . $this->order['invoice_no'];
-        }
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getInvoiceDate($dateToUse)
-    {
-        $result = substr($this->order['date_added'], 0, strlen('2000-01-01'));
-        // There doesn't seem to be an invoice date: stick with order create date,
-        // also when $dateToUse === ConfigInterface::InvoiceDate_InvoiceCreate.
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
      *
      * This override returns the code of the selected payment method.
      */

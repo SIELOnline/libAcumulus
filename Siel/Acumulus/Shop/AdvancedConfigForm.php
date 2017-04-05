@@ -56,10 +56,26 @@ class AdvancedConfigForm extends BaseConfigForm
      */
     protected function validateEmailAsPdfFields()
     {
-        $regexpMultiEmail = '/^[^@<>,; "\']+@([^.@ ,;]+\.)+[^.@ ,;]+([,;][^@<>,; "\']+@([^.@ ,;]+\.)+[^.@ ,;]+)*$/';
+        // Check for valid email address if no token syntax is used.
+        $regexpEmail = '/^[^@<>,; "\']+@([^.@ ,;]+\.)+[^.@ ,;]+$/';
+        if (!empty($this->submittedValues['emailTo']) && strpos($this->submittedValues['emailTo'], '[') === false && !preg_match($regexpEmail, $this->submittedValues['emailTo'])) {
+            $this->errorMessages['emailTo'] = $this->t('message_validate_email_5');
+        }
 
-        if (!empty($this->submittedValues['emailBcc']) && !preg_match($regexpMultiEmail, $this->submittedValues['emailBcc'])) {
+        // Check for valid email addresses if no token syntax is used.
+        $regexpMultiEmail = '/^[^@<>,; "\']+@([^.@ ,;]+\.)+[^.@ ,;]+([,;][^@<>,; "\']+@([^.@ ,;]+\.)+[^.@ ,;]+)*$/';
+        if (!empty($this->submittedValues['emailBcc']) && strpos($this->submittedValues['emailBcc'], '[') === false && !preg_match($regexpMultiEmail, $this->submittedValues['emailBcc'])) {
             $this->errorMessages['emailBcc'] = $this->t('message_validate_email_3');
+        }
+
+        // Check for valid email address if no token syntax is used.
+        if (!empty($this->submittedValues['emailFrom']) && strpos($this->submittedValues['emailFrom'], '[') === false && !preg_match($regexpEmail, $this->submittedValues['emailFrom'])) {
+            $this->errorMessages['emailFrom'] = $this->t('message_validate_email_4');
+        }
+
+        $settings = $this->acumulusConfig->getCustomerSettings();
+        if (isset($this->submittedValues['emailAsPdf']) && (bool) $this->submittedValues['emailAsPdf'] && !$settings['sendCustomer']) {
+            $this->errorMessages  ['conflicting_options'] = $this->t('message_validate_conflicting_options');
         }
     }
 
@@ -620,17 +636,50 @@ class AdvancedConfigForm extends BaseConfigForm
     protected function getEmailAsPdfFields()
     {
         return array(
+            'emailAsPdf' => array(
+                'type' => 'checkbox',
+                'label' => $this->t('field_emailAsPdf'),
+                'description' => $this->t('desc_emailAsPdf'),
+                'options' => array(
+                    'emailAsPdf' => $this->t('option_emailAsPdf'),
+                ),
+            ),
+            'emailTo' => array(
+                'type' => 'email',
+                'label' => $this->t('field_emailTo'),
+                'description' => $this->t('desc_emailTo') . ' ' . $this->t('msg_token'),
+                'attributes' => array(
+                    'size' => 60,
+                ),
+            ),
             'emailBcc' => array(
                 'type' => 'email',
                 'label' => $this->t('field_emailBcc'),
-                'description' => $this->t('desc_emailBcc'),
+                'description' => $this->t('desc_emailBcc') . ' ' . $this->t('msg_token'),
                 'attributes' => array(
                     'multiple' => true,
-                    'size' => 30,
+                    'size' => 60,
+                ),
+            ),
+            'emailFrom' => array(
+                'type' => 'email',
+                'label' => $this->t('field_emailFrom'),
+                'description' => $this->t('desc_emailFrom') . ' ' . $this->t('msg_token'),
+                'attributes' => array(
+                    'size' => 60,
+                ),
+            ),
+            'subject' => array(
+                'type' => 'text',
+                'label' => $this->t('field_subject'),
+                'description' => $this->t('desc_subject') . ' ' . $this->t('msg_token'),
+                'attributes' => array(
+                    'size' => 60,
                 ),
             ),
         );
     }
+
 
     /**
      * Returns the set of fields introducing the advanced config forms.

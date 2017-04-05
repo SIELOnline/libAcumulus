@@ -56,32 +56,6 @@ abstract class Creator extends BaseCreator
 
     /**
      * {@inheritdoc}
-     */
-    protected function getInvoiceNumber($invoiceNumberSource)
-    {
-        $result = $this->invoiceSource->getReference();
-        if ($invoiceNumberSource == ConfigInterface::InvoiceNrSource_ShopInvoice && $this->invoiceSource->getType() === Source::Order && $this->shopInvoice !== null) {
-            $result = $this->shopInvoice->getIncrementId();
-        }
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getInvoiceDate($dateToUse)
-    {
-        // createdAt returns yyyy-mm-dd hh:mm:ss, take date part.
-        $result = substr($this->invoiceSource->getSource()->getCreatedAt(), 0, strlen('yyyy-mm-dd'));
-        // A credit note is to be considered an invoice on its own.
-        if ($dateToUse == ConfigInterface::InvoiceDate_InvoiceCreate && $this->invoiceSource->getType() === Source::Order && $this->shopInvoice !== null) {
-            $result = substr($this->shopInvoice->getCreatedAt(), 0, strlen('yyyy-mm-dd'));
-        }
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
      *
      * This override returns the internal method name of the chosen payment
      * method.

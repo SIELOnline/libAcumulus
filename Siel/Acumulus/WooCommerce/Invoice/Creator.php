@@ -104,45 +104,6 @@ class Creator extends BaseCreator
 
     /**
      * {@inheritdoc}
-     */
-    protected function getInvoiceNumber($invoiceNumberSource)
-    {
-        return $this->invoiceSource->getReference();
-    }
-
-    /**
-     * Returns the date to use as invoice date for the order.
-     *
-     * param int $dateToUse
-     *   \Siel\Acumulus\Invoice\ConfigInterface\InvoiceDate_InvoiceCreate or
-     *   \Siel\Acumulus\Invoice\ConfigInterface\InvoiceDate_OrderCreate
-     *
-     * @return string
-     *   Date to send to Acumulus as the invoice date: yyyy-mm-dd.
-     */
-    protected function getInvoiceDateOrder(/*$dateToUse*/)
-    {
-        // order_date (= post_date) returns yyyy-mm-dd hh:mm:ss, take date part.
-        return substr($this->shopSource->order_date, 0, strlen('2000-01-01'));
-    }
-
-    /**
-     * Returns the date to use as invoice date for the order refund.
-     *
-     * param int $dateToUse
-     *   \Siel\Acumulus\Invoice\ConfigInterface\InvoiceDate_InvoiceCreate or
-     *   \Siel\Acumulus\Invoice\ConfigInterface\InvoiceDate_OrderCreate
-     *
-     * @return string
-     *   Date to send to Acumulus as the invoice date: yyyy-mm-dd.
-     */
-    protected function getInvoiceDateCreditNote(/*$dateToUse*/)
-    {
-        return substr($this->shopSource->post->post_date, 0, strlen('2000-01-01'));
-    }
-
-    /**
-     * {@inheritdoc}
      *
      * This override returns the id of a WC_Payment_Gateway.
      */

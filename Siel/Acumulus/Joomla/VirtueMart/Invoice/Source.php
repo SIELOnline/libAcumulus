@@ -41,6 +41,14 @@ class Source extends BaseSource
 
     /**
      * {@inheritdoc}
+     */
+    public function getDate()
+    {
+        return date('Y-m-d', strtotime($this->source['details']['BT']->created_on));
+    }
+
+    /**
+     * {@inheritdoc}
      *
      * @return string
      *   A single character indicating the order status.
@@ -48,5 +56,34 @@ class Source extends BaseSource
     public function getStatus()
     {
         return $this->source['details']['BT']->order_status;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function setInvoice()
+    {
+        $orderModel = VmModel::getModel('orders');
+        /** @var \TableInvoices $invoicesTable */
+        $invoicesTable = $orderModel->getTable('invoices');
+        if ($invoice = $invoicesTable->load($this->source['details']['BT']->virtuemart_order_id, 'virtuemart_order_id')) {
+            $this->invoice = $invoice->getProperties();
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getInvoiceReference()
+    {
+        return !empty($this->invoice['invoice_number']) ? $this->invoice['invoice_number'] : parent::getInvoiceReference();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getInvoiceDate()
+    {
+        return !empty($this->invoice['created_on']) ? date('Y-m-d', strtotime($this->invoice['created_on'])) : parent::getInvoiceDate();
     }
 }

@@ -972,12 +972,17 @@ class Config implements ConfigInterface
                     'type' => 'bool',
                     'default' => false,
                 ),
-                'emailBcc' => array(
+                'emailFrom' => array(
+                  'group' => 'emailaspdf',
+                  'type' => 'string',
+                  'default' => '',
+                ),
+                'emailTo' => array(
                     'group' => 'emailaspdf',
                     'type' => 'string',
                     'default' => '',
                 ),
-                'emailFrom' => array(
+                'emailBcc' => array(
                     'group' => 'emailaspdf',
                     'type' => 'string',
                     'default' => '',
@@ -987,6 +992,8 @@ class Config implements ConfigInterface
                     'type' => 'string',
                     'default' => '',
                 ),
+                // For now, we do not make message configurable...
+                // For now we don't present the confirmReading option in the UI.
                 'confirmReading' => array(
                     'group' => 'emailaspdf',
                     'type' => 'bool',
@@ -1025,6 +1032,10 @@ class Config implements ConfigInterface
         }
 
         if (version_compare($currentVersion, '4.7.0', '<')) {
+            $result = $this->upgrade470() && $result;
+        }
+
+        if (version_compare($currentVersion, '4.7.3', '<')) {
             $result = $this->upgrade470() && $result;
         }
 
@@ -1126,10 +1137,33 @@ class Config implements ConfigInterface
     protected function upgrade470()
     {
         $result = true;
+
         // Get current values.
         $values = $this->castValues($this->getConfigStore()->load($this->getKeys()));
         if (!empty($values['salutation']) && strpos($values['salutation'], '[#') !== false) {
             $values['salutation'] = str_replace('[#', '[', $values['salutation']);
+            $result = $this->getConfigStore()->save($values);
+        }
+
+        return $result;
+    }
+
+    /**
+     * 4.7.3 upgrade.
+     *
+     * - subject could already use token, but with #b and #f replace by ???.
+     *
+     * @return bool
+     */
+    protected function upgrade473()
+    {
+        $result = true;
+
+        // Get current values.
+        $values = $this->castValues($this->getConfigStore()->load($this->getKeys()));
+        if (!empty($values['subject']) && strpos($values['subject'], '[#') !== false) {
+            str_replace('[#b]', '[invoiceSource::reference]', $values['subject']);
+            str_replace('[#f]', '[invoiceSource::invoiceNumber]', $values['subject']);
             $result = $this->getConfigStore()->save($values);
         }
 

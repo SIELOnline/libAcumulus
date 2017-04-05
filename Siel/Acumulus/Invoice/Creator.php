@@ -170,7 +170,10 @@ abstract class Creator
         $this->invoice['customer'] = $this->getCustomer();
         $this->invoice['customer']['invoice'] = $this->getInvoice();
         $this->invoice['customer']['invoice']['line'] = $this->getInvoiceLines();
-        $this->addEmailAsPdf();
+        $emailAsPdf = $this->getEmailAsPdf(!empty($this->invoice['customer']['email']) ? $this->invoice['customer']['email'] : '');
+        if (!empty($emailAsPdf)) {
+            $this->invoice['customer']['invoice']['emailaspdf'] = $emailAsPdf;
+        }
         return $this->invoice;
     }
 
@@ -375,10 +378,16 @@ abstract class Creator
      *   \Siel\Acumulus\Invoice\ConfigInterface\InvoiceNrSource_ShopOrder.
      *
      * @return string
-     *   The number to use as "invoice number" on the invoice, may contain a
-     *   prefix.
+     *   The number to use as invoice "number" on the Acumulus invoice, may
+     *   contain a prefix.
      */
-    abstract protected function getInvoiceNumber($invoiceNumberSource);
+    protected function getInvoiceNumber($invoiceNumberSource) {
+        $result = $this->invoiceSource->getInvoiceReference();
+        if ($invoiceNumberSource != ConfigInterface::InvoiceNrSource_ShopInvoice || empty($result)) {
+            $result = $this->invoiceSource->getReference();
+        }
+        return $result;
+    }
 
     /**
      * Returns the date to use as invoice date.
@@ -388,11 +397,15 @@ abstract class Creator
      *   \Siel\Acumulus\Invoice\ConfigInterface\InvoiceDate_OrderCreate
      *
      * @return string
-     *   Date to send to Acumulus as the invoice date: yyyy-mm-dd.
+     *   Date to use as invoice date on the Acumulus invoice: yyyy-mm-dd.
      */
     protected function getInvoiceDate($dateToUse)
     {
-        return $this->callSourceTypeSpecificMethod(__FUNCTION__, func_get_args());
+        $result = $this->invoiceSource->getInvoiceDate();
+        if ($dateToUse != ConfigInterface::InvoiceDate_OrderCreate || empty($result)) {
+            $result = $this->invoiceSource->getDate();
+        }
+        return $result;
     }
 
     /**
@@ -439,28 +452,10 @@ abstract class Creator
     }
 
     /**
-     * Returns the description for this invoice.
-     *
-     * This default implementation returns something like "Order 123".
-     *
-     * @return string
-     *   Description of this invoice
-     */
-    protected function getDescription()
-    {
-        $result = ucfirst($this->t($this->invoiceSource->getType())) . ' ' . $this->invoiceSource->getReference();
-        if ($this->invoiceSource->getOriginalSource() !== null) {
-            $parent = $this->invoiceSource->getOriginalSource();
-            $result .= ' ' . $this->t('for') . ' ' . $this->t($parent->getType()) . ' ' . $parent->getReference();
-        }
-        return $result;
-    }
-
-    /**
      * Adds metadata about invoice totals to the invoice.
      *
      * @param array $invoice
-     *   The imnvice to complete with totals meta data.
+     *   The invoice to complete with totals meta data.
      *
      * @return array
      *   The invoice completed with invoice totals meta data.
@@ -728,24 +723,29 @@ abstract class Creator
     }
 
     /**
-     * Adds an emailaspdf section if enabled.
+     * Constructs and returns the emailaspdf section (if enabled).
+     *
+     * @param string $fallbackEmailTo
+     *   An email address yto use as fallback when the emailTo setting is empty.
+     *
+     * @return array The emailAsPdf section, possibly empty.
+     * The emailAsPdf section, possibly empty.
      */
-    protected function addEmailAsPdf()
+    protected function getEmailAsPdf($fallbackEmailTo)
     {
+        $emailAsPdf = array();
         $emailAsPdfSettings = $this->config->getEmailAsPdfSettings();
-        if ($emailAsPdfSettings['emailAsPdf'] && !empty($this->invoice['customer']['email'])) {
-            $emailasPdf = array();
-            $emailasPdf['emailto'] = $this->invoice['customer']['email'];
-            $this->addDefault($emailasPdf, 'emailbcc', $emailAsPdfSettings['emailBcc']);
-            $this->addDefault($emailasPdf, 'emailfrom', $emailAsPdfSettings['emailFrom']);
-            $this->addDefault($emailasPdf, 'subject', strtr($emailAsPdfSettings['subject'], array(
-                '[#b]' => $this->invoiceSource->getReference(),
-                '[#f]' => isset($this->invoice['customer']['invoice']['number']) ? $this->invoice['customer']['invoice']['number'] : '',
-            )));
-            $invoice['customer']['invoice']['emailaspdf']['confirmreading'] = $emailAsPdfSettings['confirmReading'] ? ConfigInterface::ConfirmReading_Yes : ConfigInterface::ConfirmReading_No;
-
-            $this->invoice['customer']['invoice']['emailaspdf'] = $emailasPdf;
+        if ($emailAsPdfSettings['emailAsPdf']) {
+            $emailTo = !empty($emailAsPdfSettings['emailTo']) ? $this->getTokenizedValue($emailAsPdfSettings['emailTo']) : $fallbackEmailTo;
+            if (!empty($emailTo)) {
+                $emailAsPdf['emailto'] = $emailTo;
+                $this->addTokenDefault($emailAsPdf, 'emailbcc', $emailAsPdfSettings['emailBcc']);
+                $this->addTokenDefault($emailAsPdf, 'emailfrom', $emailAsPdfSettings['emailFrom']);
+                $this->addTokenDefault($emailAsPdf, 'subject', $emailAsPdfSettings['subject']);
+                $emailAsPdf['confirmreading'] = $emailAsPdfSettings['confirmReading'] ? ConfigInterface::ConfirmReading_Yes : ConfigInterface::ConfirmReading_No;
+            }
         }
+        return $emailAsPdf;
     }
 
     /**

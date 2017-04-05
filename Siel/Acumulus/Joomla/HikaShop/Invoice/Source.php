@@ -41,11 +41,35 @@ class Source extends BaseSource
 
     /**
      * {@inheritdoc}
+     */
+    public function getDate()
+    {
+        return date('Y-m-d', $this->source->order_created);
+    }
+
+    /**
+     * {@inheritdoc}
      *
      * @return string
      */
     public function getStatus()
     {
         return $this->source->order_status;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getInvoiceReference()
+    {
+        return !empty($this->source->order_invoice_number) ? $this->source->order_invoice_number : parent::getInvoiceReference();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getInvoiceDate()
+    {
+        return !empty($this->source->order_invoice_created) ? date('Y-m-d', $this->source->order_invoice_created) : parent::getInvoiceDate();
     }
 }

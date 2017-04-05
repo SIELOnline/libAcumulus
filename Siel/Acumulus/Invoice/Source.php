@@ -5,8 +5,9 @@ namespace Siel\Acumulus\Invoice;
 /**
  * Wraps a source for an invoice, typically an order or a credit note.
  *
- * By defining a wrapper around orders from a specific web shop we can more
- * easily (and in a type safe way) pass them around.
+ * By defining a wrapper around orders from a specific web shop we can:
+ * - define unified access to common properties (like reference, date, etc.).
+ * - pass them around in a type safe way.
  */
 abstract class Source
 {
@@ -24,6 +25,9 @@ abstract class Source
     /** @var array|object */
     protected $source;
 
+    /** @var array|object */
+    protected $invoice;
+
     /**
      * @param string $type
      * @param int|string|array|object $idOrSource
@@ -38,6 +42,7 @@ abstract class Source
             $this->source = $idOrSource;
             $this->setId();
         }
+        $this->setInvoice();
     }
 
     /**
@@ -63,9 +68,11 @@ abstract class Source
     }
 
     /**
-     * Returns the source for an invoice, either an order or a credit note object.
+     * Returns the web shop specific source for an invoice.
      *
      * @return array|object
+     *   the web sop specific source for an invoice, either an order or a credit
+     *   note object or array.
      */
     public function getSource()
     {
@@ -109,6 +116,16 @@ abstract class Source
     }
 
     /**
+     * Returns the order (or credit memo) date.
+     *
+     * @return string
+     *   The order (or credit memo) date: yyyy-mm-dd.
+     */
+    public function getDate() {
+        return $this->callTypeSpecificMethod(__FUNCTION__);
+    }
+
+    /**
      * Returns the status for this invoice source.
      *
      * Should either be overridden or both getStatusOrder() and
@@ -120,6 +137,67 @@ abstract class Source
     public function getStatus()
     {
         return $this->callTypeSpecificMethod(__FUNCTION__);
+    }
+
+    /**
+     * Loads and sets the web shop invoice linked ot this source.
+     */
+    protected function setInvoice() {
+        $this->invoice = null;
+    }
+
+    /**
+     * Returns the web shop invoice linked to this source.
+     *
+     * @return object|array|null
+     *   The web shop invoice linked to this source, or null if no (separate)
+     *   invoice is linked to this source.
+     */
+    protected function getInvoice()
+    {
+        return $this->invoice;
+    }
+
+    /**
+     * Returns the number of the web shop invoice linked to this source.
+     *
+     * @return int|string|null
+     *   The reference number of the (web shop) invoice linked to this source,
+     *   or null if no invoice is linked to this source.
+     */
+    public function getInvoiceReference()
+    {
+        return $this->callTypeSpecificMethod(__FUNCTION__);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getInvoiceReferenceCreditNote()
+    {
+        // A credit note is to be considered an invoice on its own.
+        return $this->getReference();
+    }
+
+    /**
+     * Returns the date of the web shop invoice linked to this source.
+     *
+     * @return string|null
+     *   Date of the (web shop) invoice linked to this source: yyyy-mm-dd, or
+     *   null if no web shop invoice is linked to this source.
+     */
+    public function getInvoiceDate()
+    {
+        return $this->callTypeSpecificMethod(__FUNCTION__);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getInvoiceDateCreditNote()
+    {
+        // A credit note is to be considered an invoice on its own.
+        return $this->getDate();
     }
 
     /**
@@ -153,15 +231,25 @@ abstract class Source
     }
 
     /**
-     * Calls a method that typically depends on the type of invoice source.
+     * Calls a "sub" method whose logic depends on the type of invoice source.
+     *
+     * This allows to separate logic for different source types into different
+     * methods.
+     *
+     * The method name is expected to be the original method name suffixed with
+     * the source type.
      *
      * @param string $method
+     *   The original method called.
      *
-     * @return void|mixed
+     * @return mixed
      */
     protected function callTypeSpecificMethod($method)
     {
         $method .= $this->getType();
-        return $this->$method();
+        if (method_exists($this, $method)) {
+            return $this->$method();
+        }
+        return null;
     }
 }

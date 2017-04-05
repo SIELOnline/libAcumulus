@@ -46,6 +46,22 @@ class Source extends BaseSource
     }
 
     /**
+     * @inheritDoc
+     */
+    public function getDateOrder()
+    {
+        return substr($this->getSource()->order_date, 0, strlen('2000-01-01'));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getDateCreditNote()
+    {
+        return substr($this->getSource()->post->post_date, 0, strlen('2000-01-01'));
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getStatus()

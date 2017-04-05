@@ -124,30 +124,6 @@ class Creator extends BaseCreator
 
     /**
      * {@inheritdoc}
-     */
-    protected function getInvoiceNumber($invoiceNumberSource)
-    {
-        $result = $this->invoiceSource->getReference();
-        if ($invoiceNumberSource == ConfigInterface::InvoiceNrSource_ShopInvoice && !empty($this->shopInvoice['invoice_number'])) {
-            $result = $this->shopInvoice['invoice_number'];
-        }
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getInvoiceDate($dateToUse)
-    {
-        $result = date('Y-m-d', strtotime($this->order['details']['BT']->created_on));
-        if ($dateToUse == ConfigInterface::InvoiceDate_InvoiceCreate && !empty($this->shopInvoice['created_on'])) {
-            $result = date('Y-m-d', strtotime($this->shopInvoice['created_on']));
-        }
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
      *
      * This override returns the virtuemart_paymentmethod_id.
      */

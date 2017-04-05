@@ -49,6 +49,15 @@ class Source extends BaseSource
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getDate()
+    {
+        // createdAt returns yyyy-mm-dd hh:mm:ss, take date part.
+        return substr($this->source->getCreatedAt(), 0, strlen('yyyy-mm-dd'));
+    }
+
+    /**
      * Returns the status of this order.
      *
      * @return string
@@ -76,6 +85,38 @@ class Source extends BaseSource
     protected function getStatusCreditNote()
     {
         return $this->source->getState();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setInvoice()
+    {
+        parent::setInvoice();
+        if ($this->getType() === Source::Order) {
+            /** @var \Mage_Core_Model_Resource_Db_Collection_Abstract|\Magento\Sales\Model\ResourceModel\Order\Invoice\Collection $shopInvoices */
+            $shopInvoices = $this->source->getInvoiceCollection();
+            if (count($shopInvoices) > 0) {
+                $this->invoice = $shopInvoices->getFirstItem();
+            }
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getInvoiceReferenceOrder()
+    {
+        // A credit note is to be considered an invoice on its own.
+        return $this->getInvoice() !== null ? $this->getInvoice()->getIncrementId() : null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getInvoiceDateOrder()
+    {
+        return $this->getInvoice() !== null ? substr($this->getInvoice()->getCreatedAt(), 0, strlen('2000-01-01')) : null;
     }
 
     /**

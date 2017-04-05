@@ -37,7 +37,6 @@ class ConfigForm extends BaseConfigForm
     protected function validate()
     {
         $this->validateAccountFields();
-        $this->validateEmailAsPdfFields();
     }
 
     /**
@@ -75,22 +74,6 @@ class ConfigForm extends BaseConfigForm
             $this->errorMessages['emailonerror'] = $this->t('message_validate_email_1');
         } elseif (!preg_match($regexpEmail, $this->submittedValues['emailonerror'])) {
             $this->errorMessages['emailonerror'] = $this->t('message_validate_email_0');
-        }
-    }
-
-    /**
-     * Validates fields in the "Email as pdf" settings fieldset.
-     */
-    protected function validateEmailAsPdfFields()
-    {
-        $regexpEmail = '/^[^@<>,; "\']+@([^.@ ,;]+\.)+[^.@ ,;]+$/';
-
-        if (!empty($this->submittedValues['emailFrom']) && !preg_match($regexpEmail, $this->submittedValues['emailFrom'])) {
-            $this->errorMessages['emailFrom'] = $this->t('message_validate_email_4');
-        }
-        $settings = $this->acumulusConfig->getCustomerSettings();
-        if (isset($this->submittedValues['emailAsPdf']) && (bool) $this->submittedValues['emailAsPdf'] && !$settings['sendCustomer']) {
-            $this->warningMessages  ['conflicting_options'] = $this->t('message_validate_conflicting_options');
         }
     }
 
@@ -157,13 +140,6 @@ class ConfigForm extends BaseConfigForm
                     'paymentMethodCostCenterFieldset' => $this->getPaymentMethodsFieldset($paymentMethods, 'paymentMethodCostCenter', $this->costCenterOptions),
                 );
             }
-
-            $fields['emailAsPdfSettingsHeader'] = array(
-                'type' => 'fieldset',
-                'legend' => $this->t('emailAsPdfSettingsHeader'),
-                'description' => $this->t('desc_emailAsPdfSettings'),
-                'fields' => $this->getEmailAsPdfFields(),
-            );
         }
 
         $fields += array(
@@ -354,48 +330,6 @@ class ConfigForm extends BaseConfigForm
             ),
         );
         return $fields;
-    }
-
-    /**
-     * Returns the set of 'email invoice as PDF' related fields.
-     *
-     * The fields returned:
-     * - emailAsPdf
-     * - emailFrom
-     * - emailBcc
-     * - subject
-     *
-     * @return array[]
-     *   The set of 'email invoice as PDF' related fields.
-     */
-    protected function getEmailAsPdfFields()
-    {
-        return array(
-            'emailAsPdf' => array(
-                'type' => 'checkbox',
-                'label' => $this->t('field_emailAsPdf'),
-                'description' => $this->t('desc_emailAsPdf'),
-                'options' => array(
-                    'emailAsPdf' => $this->t('option_emailAsPdf'),
-                ),
-            ),
-            'emailFrom' => array(
-                'type' => 'email',
-                'label' => $this->t('field_emailFrom'),
-                'description' => $this->t('desc_emailFrom'),
-                'attributes' => array(
-                    'size' => 30,
-                ),
-            ),
-            'subject' => array(
-                'type' => 'text',
-                'label' => $this->t('field_subject'),
-                'description' => $this->t('desc_subject'),
-                'attributes' => array(
-                    'size' => 60,
-                ),
-            ),
-        );
     }
 
     /**

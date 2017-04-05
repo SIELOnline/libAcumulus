@@ -13,6 +13,10 @@ use Siel\Acumulus\Invoice\Source as BaseSource;
  */
 class Source extends BaseSource
 {
+    // More specifically typed properties.
+    /** @var \Order|\OrderSlip */
+    protected $source;
+
     /**
      * {@inheritdoc}
      */
@@ -50,6 +54,14 @@ class Source extends BaseSource
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getDate()
+    {
+        return substr($this->source->date_add, 0, strlen('2000-01-01'));
+    }
+
+    /**
      * Returns the status of this order.
      *
      * @return int
@@ -70,6 +82,34 @@ class Source extends BaseSource
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getInvoiceReferenceOrder()
+    {
+        return !empty($this->source->invoice_number)
+            ? Configuration::get('PS_INVOICE_PREFIX', (int) $this->getSource()->id_lang, NULL, $this->getSource()->id_shop) . sprintf('%06d', $this->getSource()->invoice_number)
+            : null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getInvoiceDateOrder()
+    {
+        return !empty($this->getSource()->invoice_number)
+            ? substr($this->getSource()->invoice_date, 0, strlen('2000-01-01'))
+            : null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getOriginalOrder()
+    {
+        return new Source(Source::Order, $this->source->id_order);
+    }
+
+    /**
      * OrderSlip does store but not load the values total_products_tax_excl,
      * total_shipping_tax_excl, total_products_tax_incl, and
      * total_shipping_tax_incl. As we need them, we load them ourselves.
@@ -87,13 +127,5 @@ class Source extends BaseSource
                 $this->source->$key = $value;
             }
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getOriginalOrder()
-    {
-        return new Source(Source::Order, $this->source->id_order);
     }
 }

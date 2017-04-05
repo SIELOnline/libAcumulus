@@ -66,30 +66,6 @@ class Creator extends BaseCreator
 
     /**
      * {@inheritdoc}
-     */
-    protected function getInvoiceNumber($invoiceNumberSource)
-    {
-        $result = $this->invoiceSource->getReference();
-        if ($invoiceNumberSource == ConfigInterface::InvoiceNrSource_ShopInvoice && !empty($this->order->order_invoice_number)) {
-            $result = $this->order->order_invoice_number;
-        }
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getInvoiceDate($dateToUse)
-    {
-        $result = date('Y-m-d', $this->order->order_created);
-        if ($dateToUse == ConfigInterface::InvoiceDate_InvoiceCreate && !empty($this->order->order_invoice_created)) {
-            $result = date('Y-m-d', $this->order->order_invoice_created);
-        }
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
      *
      * This override returns the name of the payment module.
      */

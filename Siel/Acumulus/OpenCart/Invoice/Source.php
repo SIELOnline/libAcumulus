@@ -31,11 +31,31 @@ class Source extends BaseSource
 
     /**
      * {@inheritdoc}
+     */
+    public function getDate()
+    {
+        return substr($this->source['date_added'], 0, strlen('2000-01-01'));
+    }
+
+    /**
+     * {@inheritdoc}
      *
      * @return int
      */
     public function getStatus()
     {
         return $this->source['order_status_id'];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getInvoiceReference()
+    {
+        $result = null;
+        if (!empty($this->source['invoice_no'])) {
+            $result = $this->source['invoice_prefix'] . $this->source['invoice_no'];
+        }
+        return $result;
     }
 }

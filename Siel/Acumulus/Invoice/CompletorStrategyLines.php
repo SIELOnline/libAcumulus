@@ -86,7 +86,7 @@ class CompletorStrategyLines
     protected function completeStrategyLines()
     {
         if ($this->invoiceHasStrategyLine()) {
-            $this->invoice['customer']['invoice']['meta-completor-strategy-input']['vat-rates'] = str_replace(array("\r", "\n", "\t"), '', var_export($this->possibleVatRates, true));
+            $this->invoice['customer']['invoice']['meta-completor-strategy-input']['vat-rates'] = str_replace(array(' ', "\r", "\n", "\t"), '', var_export($this->possibleVatRates, true));
 
             $isFirst = true;
             $strategies = $this->getStrategyClasses();
@@ -95,7 +95,7 @@ class CompletorStrategyLines
                 $strategy = new $strategyClass($this->config, $this->translator, $this->invoice, $this->possibleVatTypes, $this->possibleVatRates, $this->source);
                 if ($isFirst) {
                     $this->invoice['customer']['invoice']['meta-completor-strategy-input']['vat-2-divide'] = $strategy->getVat2Divide();
-                    $this->invoice['customer']['invoice']['meta-completor-strategy-input']['vat-breakdown'] = str_replace(array("\r", "\n", "\t"), '', var_export($strategy->getVatBreakdown(), true));
+                    $this->invoice['customer']['invoice']['meta-completor-strategy-input']['vat-breakdown'] = str_replace(array(' ', "\r", "\n", "\t"), '', var_export($strategy->getVatBreakdown(), true));
                     $isFirst = false;
                 }
                 if ($strategy->apply()) {

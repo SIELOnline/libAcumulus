@@ -39,6 +39,7 @@ class InvoiceManager extends BaseInvoiceManager
         /** @var \wpdb $wpdb */
         global $wpdb;
         $key = 'ID';
+        /** @noinspection SqlResolve */
         $invoiceSourceIds = $wpdb->get_col($wpdb->prepare("SELECT `$key` FROM `{$wpdb->posts}` WHERE `$key` BETWEEN %u AND %u AND `post_type` = %s",
             $InvoiceSourceIdFrom, $InvoiceSourceIdTo, $this->sourceTypeToShopType($invoiceSourceType)));
         return $this->getSourcesByIdsOrSources($invoiceSourceType, $invoiceSourceIds);
@@ -76,7 +77,7 @@ class InvoiceManager extends BaseInvoiceManager
                       'key' => '_order_number',
                       'value' => array(
                         $invoiceSourceReferenceFrom,
-                        $invoiceSourceReferenceTo
+                        $invoiceSourceReferenceTo,
                       ),
                       'compare' => 'BETWEEN',
                       'type' => 'UNSIGNED',
@@ -109,7 +110,7 @@ class InvoiceManager extends BaseInvoiceManager
                       'key' => $key,
                       'value' => array(
                         $invoiceSourceReferenceFrom,
-                        $invoiceSourceReferenceTo
+                        $invoiceSourceReferenceTo,
                       ),
                       'compare' => 'BETWEEN',
                       'type' => $type,
@@ -189,6 +190,7 @@ class InvoiceManager extends BaseInvoiceManager
      */
     protected function query2Sources(array $args, $invoiceSourceType, $sort = true)
     {
+        $this->config->getLog()->info('WooCommerce\InvoiceManager::query2Sources: args = %s', str_replace(array(' ', "\r", "\n", "\t"), '', var_export($args, true)));
         // Add default arguments.
         $args = $args + array(
                 'fields' => 'ids',

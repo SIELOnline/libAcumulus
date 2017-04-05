@@ -139,7 +139,6 @@ abstract class InvoiceManager
         $errorLogged = false;
         $success = true;
         $time_limit = ini_get('max_execution_time');
-        /** @var Source $invoiceSource */
         foreach ($invoiceSources as $invoiceSource) {
             // Try to keep the script running, but note that other systems
             // involved, like the (Apache) web server, may have their own

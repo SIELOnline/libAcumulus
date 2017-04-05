@@ -89,7 +89,7 @@ class Registry
      */
     public function getOrder($orderId)
     {
-        if (strrpos(DIR_APPLICATION, '/catalog/') === strlen(DIR_APPLICATION) - strlen('/catalog/')) {
+        if (strrpos(str_replace('\\', '/', DIR_APPLICATION), '/catalog/') === strlen(DIR_APPLICATION) - strlen('/catalog/')) {
             // We are in the catalog section, use the checkout/order model as
             // ModelAccountOrder::getOrder() also checks on user_id!
             if ($this->model_checkout_order === null) {

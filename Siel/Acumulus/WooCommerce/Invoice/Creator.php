@@ -11,8 +11,7 @@ use WC_Product;
 use WC_Tax;
 
 /**
- * Allows to create arrays in the Acumulus invoice structure from a WordPress
- * order or order refund.
+ * Allows to create an Acumulus invoice from a WooCommerce order or refund.
  */
 class Creator extends BaseCreator
 {
@@ -85,7 +84,7 @@ class Creator extends BaseCreator
      *   The value for the meta data with the given name, null if not available.
      */
     public function getOrderMeta($property) {
-        $value = get_post_meta($this->order->id, $property, true);
+        $value = get_post_meta($this->order->get_id(), $property, true);
         // get_post_meta() can return false or ''.
         if (empty($value)) {
             // Not found: indicate so by returning null.
@@ -124,7 +123,7 @@ class Creator extends BaseCreator
      */
     protected function getPaymentStateOrder()
     {
-        return $this->shopSource->needs_payment() ? ConfigInterface::PaymentStatus_Due : ConfigInterface::PaymentStatus_Paid;
+        return $this->order->needs_payment() ? ConfigInterface::PaymentStatus_Due : ConfigInterface::PaymentStatus_Paid;
     }
 
     /**
@@ -201,14 +200,14 @@ class Creator extends BaseCreator
     /**
      * Returns 1 item line.
      *
-     * @param array $item
+     * @param array|\ArrayAccess $item
      *   An array representing an order item line, meta values are already
      *   available under their own names and as an array under key 'item_meta'.
      *
-     * @return array
-     *   May be empty if the line should not be sent (e.g. qty = 0 on a refund).
+     * @return array May be empty if the line should not be sent (e.g. qty = 0 on a refund).
+     * May be empty if the line should not be sent (e.g. qty = 0 on a refund).
      */
-    protected function getItemLine(array $item)
+    protected function getItemLine($item)
     {
         $result = array();
 
@@ -308,15 +307,15 @@ class Creator extends BaseCreator
      *
      * This method supports the default WooCommerce variant functionality.
      *
-     * @param array $item
+     * @param array|\ArrayAccess $item
      * @param \WC_Product $product
      * @param array $parentTags
      *   An array of tags from the parent product to add to the child lines.
      *
-     * @return array[]
-     *   An array of lines that describes this variant.
+     * @return \array[] An array of lines that describes this variant.
+     * An array of lines that describes this variant.
      */
-    protected function getVariantLines(array $item, WC_Product $product, array $parentTags)
+    protected function getVariantLines($item, WC_Product $product, array $parentTags)
     {
         $result = array();
 
@@ -366,16 +365,15 @@ class Creator extends BaseCreator
      * or tmcartepo. We need the the tncartepo_data value as that contains the
      * options.
      *
-     * @param array $item
+     * @param array|\ArrayAccess $item
      *   The item line
      * @param array $parentTags
      *   An array of tags from the parent product to add to the child lines.
      *
-     * @return array[]
-     *   An array of lines that describes this variant.
-    *
+     * @return \array[] An array of lines that describes this variant.
+     * An array of lines that describes this variant.
      */
-    protected function getExtraProductOptionsLines(array $item, array $parentTags)
+    protected function getExtraProductOptionsLines($item, array $parentTags)
     {
         $result = array();
 
@@ -415,12 +413,12 @@ class Creator extends BaseCreator
         return $result;
     }
 
-    /**
-     * @param array $line
-     *
-     * @return array
-     */
-    protected function getFeeLine(array $line)
+  /**
+   * @param array|\ArrayAccess $line
+   *
+   * @return array
+   */
+    protected function getFeeLine($line)
     {
         $feeEx = $line['line_total'];
         $feeVat = $line['line_tax'];

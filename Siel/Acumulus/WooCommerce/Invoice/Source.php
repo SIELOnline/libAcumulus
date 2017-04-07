@@ -30,7 +30,7 @@ class Source extends BaseSource
      */
     protected function setId()
     {
-        $this->id = $this->source->id;
+        $this->id = $this->source->get_id();
     }
 
     /**
@@ -42,7 +42,12 @@ class Source extends BaseSource
         // installed that add an order number that differs from the ID. Known
         // plugins that do so: woocommerce-sequential-order-numbers(-pro) and
         // wc-sequential-order-numbers.
-        return $this->source->get_order_number();
+        if ($this->getType() === Source::Order) {
+            /** @var \WC_Order $order */
+            $order = $this->source;
+            return $order->get_order_number();
+        }
+        return parent::getReference();
     }
 
     /**

@@ -436,13 +436,13 @@ abstract class Form
             if ($executeIfValid && $this->isValid()) {
                 if ($this->execute()) {
                     $message = $this->t("message_form_{$this->type}_success");
-                    if ($message === 'message_form_{$this->type}_success') {
+                    if ($message === "message_form_{$this->type}_success") {
                         $message = $this->t('message_form_success');
                     }
                     $this->successMessages[] = $message;
                 } else {
-                    $message = $this->t('message_form_{$this->type}_error');
-                    if ($message === 'message_form_{$this->type}_error') {
+                    $message = $this->t("message_form_{$this->type}_error");
+                    if ($message === "message_form_{$this->type}_error") {
                         $message = $this->t('message_form_error');
                     }
                     $this->errorMessages[] = $message;

@@ -152,8 +152,8 @@ abstract class BaseConfigForm extends Form
         return array(
             'versionInformation' => array(
                 'type' => 'markup',
-                'value' => "<p>Application: Acumulus module {$env['moduleVersion']}; Library: {$env['libraryVersion']}; Shop: {$env['shopName']} {$env['shopVersion']};< Server: {$env['hostName']}br>" .
-                    "Environment: PHP {$env['phpVersion']}; Curl: {$env['curlVersion']}; JSON: {$env['jsonVersion']}; OS: {$env['os']}.</p>",
+                'value' => "<p>Application: Acumulus module {$env['moduleVersion']}; Library: {$env['libraryVersion']}; Shop: {$env['shopName']} {$env['shopVersion']};<br>" .
+                    "Environment: PHP {$env['phpVersion']}; Curl: {$env['curlVersion']}; JSON: {$env['jsonVersion']}; OS: {$env['os']}  Server: {$env['hostName']}.</p>",
             ),
             'versionInformationDesc' => array(
                 'type' => 'markup',

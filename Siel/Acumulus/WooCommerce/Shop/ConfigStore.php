@@ -47,6 +47,7 @@ class ConfigStore extends BaSeConfigStore
      */
     public function save(array $values)
     {
+        $result = true;
         // With 2 forms for the settings, not all settings will be saved at the
         // same moment.
         // - Read all currently stored settings.
@@ -55,6 +56,7 @@ class ConfigStore extends BaSeConfigStore
         // - Remove settings that do not (or no longer) have a custom value.
         $defaults = $this->acumulusConfig->getDefaults();
         $configurationValues = get_option('acumulus');
+        $oldConfigurationValues = $configurationValues;
         foreach ($values as $key => $value) {
             if ((isset($defaults[$key]) && $defaults[$key] === $value) || $value === null) {
                 unset($configurationValues[$key]);
@@ -62,6 +64,11 @@ class ConfigStore extends BaSeConfigStore
                 $configurationValues[$key] = $value;
             }
         }
-        return update_option('acumulus', $configurationValues);
+
+        // Prevent error message when there are no changes:
+        if ($oldConfigurationValues != $configurationValues) {
+          $result = update_option('acumulus', $configurationValues);
+        }
+        return $result;
     }
 }

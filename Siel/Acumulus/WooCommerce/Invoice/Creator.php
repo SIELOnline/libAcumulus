@@ -25,6 +25,15 @@ class Creator extends BaseCreator
     protected $hasItemLines;
 
     /**
+     * Precision in WC3: one of the prices is entered by the administrator and
+     * thus can be considered exact. The computed one is rounded to the cent,
+     * so we can not assume a very high precision for all values here.
+     *
+     * @var float
+     */
+    protected $precision  = 0.01;
+
+    /**
      * {@inheritdoc}
      *
      * This override also initializes WooCommerce specific properties related to
@@ -257,10 +266,7 @@ class Creator extends BaseCreator
 
         // Quantity is negative on refunds
         $parentTags = array('quantity' => $sign * $item['qty']);
-        // Precision: one of the prices is entered by the administrator and thus
-        // can be considered exact. The computed one is not rounded, so we can
-        // assume a very high precision for all values here.
-        $parentTags += $this->getVatRangeTags($productVat, $productPriceEx, 0.001, 0.001);
+        $parentTags += $this->getVatRangeTags($productVat, $productPriceEx, $this->precision, $this->precision);
         if ($product instanceof WC_Product) {
             $parentTags += $this->getVatRateLookupMetadata($product->get_tax_class());
         }

@@ -12,6 +12,15 @@ use Siel\Acumulus\WooCommerce\Invoice\Creator as BaseCreator;
 class Creator extends BaseCreator
 {
     /**
+     * Precision in WC2: one of the prices is entered by the administrator and
+     * thus can be considered exact. The computed one is not rounded, so we can
+     * assume a very high precision for all values here.
+     *
+     * @var float
+     */
+    protected $precision  = 0.001;
+
+    /**
      * Token callback to access the order post meta when resolving tokens.
      *
      * @param string $property

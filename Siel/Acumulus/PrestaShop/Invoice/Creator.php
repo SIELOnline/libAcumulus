@@ -126,7 +126,7 @@ class Creator extends BaseCreator
             $paymentDate = null;
             foreach ($this->order->getOrderPaymentCollection() as $payment) {
                 /** @var OrderPayment $payment */
-                if ($payment->date_add && (!$paymentDate || $payment->date_add > $paymentDate)) {
+                if ($payment->date_add && ($paymentDate === null || $payment->date_add > $paymentDate)) {
                     $paymentDate = $payment->date_add;
                 }
             }
@@ -259,7 +259,7 @@ class Creator extends BaseCreator
         }
         $result['quantity'] = $item['product_quantity'];
         // The field 'rate' comes from order->getOrderDetailTaxes() and is only
-        // defined for orders and were not filled in before PS1.6.1.1. So, check
+        // defined for orders and was not filled in before PS1.6.1.1. So, check
         // if the field is available.
         // The fields 'unit_amount' and 'total_amount' (table order_detail_tax)
         // are based on the discounted product price and thus cannot be used.
@@ -300,7 +300,7 @@ class Creator extends BaseCreator
         $shippingVat = $shippingInc - $shippingEx;
 
         $result = array(
-            'product' => $carrier->name,
+            'product' => !empty($carrier->name) ? $carrier->name : $this->t('shipping_costs'),
             'unitprice' => $shippingInc / (100 + $vatRate) * 100,
             'unitpriceinc' => $shippingInc,
             'quantity' => 1,

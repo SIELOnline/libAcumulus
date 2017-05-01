@@ -355,7 +355,6 @@ class Communicator implements CommunicatorInterface
 
         $dom = $this->convertToDom($values, $dom);
         $result = $dom->saveXML();
-
         return $result;
     }
 

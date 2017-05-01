@@ -243,7 +243,7 @@ abstract class Creator
      */
     protected function getTokenizedValue($pattern)
     {
-        $token = new Token();
+        $token = $this->config->getToken();
         return $token->expand($pattern, $this->propertySources);
     }
 
@@ -409,7 +409,7 @@ abstract class Creator
     }
 
     /**
-     * Adds the payment method used to the meta-payment-method key.
+     * Returns the payment method used.
      *
      * This default implementation returns an empty payment method.
      *

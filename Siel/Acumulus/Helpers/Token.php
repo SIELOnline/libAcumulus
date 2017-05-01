@@ -87,7 +87,8 @@ class Token {
      *   variable name typically used in the shop software.
      *
      * @return string
-     *   The pattern with tokens expanded with their actual value.
+     *   The pattern with tokens expanded with their actual value. The return
+     *   value may be a scalar (numeric type) that can be converted to a string.
      */
     public function expand($pattern, array $variables)
     {
@@ -105,7 +106,8 @@ class Token {
      *   including the [ and ]., $matches[1] contains only the token name.
      *
      * @return string
-     *   The expanded value for this token.
+     *   The expanded value for this token. The return value may be a scalar
+     *   (numeric type) that can be converted to a string.
      */
     protected function tokenMatch($matches)
     {
@@ -119,7 +121,9 @@ class Token {
      *   The property specification to expand.
      *
      * @return string
-     *   The value of the property, if found, the empty string otherwise.
+     *   The value of the property, if found, the empty string otherwise. The
+     *   return value may be a scalar (numeric type) that can be converted to
+     *   a string.
      */
     protected function searchPropertySpec($propertySpec)
     {
@@ -170,7 +174,9 @@ class Token {
      *
      * @return null|string
      *   The value of the property, may be the empty string or null if the
-     *   property was not found (or really equals null or the empty string).
+     *   property was not found (or really equals null or the empty string). The
+     *   return value may be a scalar (numeric type) that can be converted to a
+     *   string.
      */
     protected function searchProperty($property) {
         $value = null;
@@ -184,7 +190,7 @@ class Token {
         }
         foreach ($this->variables as $key => $variable) {
             if (empty($variableName) || $key === $variableName) {
-                $value = $this->getProperty($property, $variable);
+                $value = $this->getProperty($variable, $property);
                 if ($value !== null && $value !== '') {
                     break;
                 }
@@ -209,15 +215,18 @@ class Token {
      *
      * Override if the property name or getter method is constructed differently.
      *
-     * @param string $property
      * @param object|array $variable
+     *   The object or array to extract the property from.
+     * @param string $property
+     *   The property to extract from the variable.
      *
      * @return null|string
      *   The value for the property of the given name, or null or the empty
-     *   string if not available (or the property really equals null or he empty
-     *   string).
+     *   string if not available (or the property really equals null or the
+     *   empty string). The return value may be a scalar (numeric type) that can
+     *   be converted to a string.
      */
-    protected function getProperty($property, $variable)
+    protected function getProperty($variable, $property)
     {
         $value = null;
 
@@ -235,37 +244,14 @@ class Token {
                 $value = $variable[$property];
             }
         } else {
-            if (isset($variable->$property)) {
-                $value = $variable->$property;
-            } elseif (method_exists($variable, $property)) {
-                $value = call_user_func_array(array($variable, $property), $args);
+            // It's an object: try to get the property.
+            // Safest way is via the get_object_vars() function.
+            $properties = get_object_vars($variable);
+            if (!empty($properties) && array_key_exists($property, $properties)) {
+                $value = $properties[$property];
             } else {
-                $method1 = 'get' . ucfirst($property);
-                $method2 = 'get_' . $property;
-                if (method_exists($variable, $method1)) {
-                    $value = call_user_func_array(array($variable, $method1), $args);
-                } elseif (method_exists($variable, $method2)) {
-                    $value = call_user_func_array(array($variable, $method2), $args);
-                } elseif (method_exists($variable, '__get')) {
-                    @$value = $variable->$property;
-                } elseif (method_exists($variable, '__call')) {
-                    try {
-                        $value = @call_user_func_array(array($variable, $property), $args);
-                    } catch (Exception $e) {
-                    }
-                    if ($value !== null && $value !== '') {
-                        try {
-                            $value = call_user_func_array(array($variable, $method1), $args);
-                        } catch (Exception $e) {
-                        }
-                    }
-                    if ($value !== null && $value !== '') {
-                        try {
-                            $value = call_user_func_array(array($variable, $method2), $args);
-                        } catch (Exception $e) {
-                        }
-                    }
-                }
+                // Try some other ways.
+                $value = $this->getObjectProperty($variable, $property, $args);
             }
         }
 
@@ -276,6 +262,72 @@ class Token {
             $value = implode(" ", $value);
         }
 
+        return $value;
+    }
+
+    /**
+     * Looks up a property in a web shop specific object.
+     *
+     * This part is extracted into as separate method so it can be overridden
+     * with webshop specific ways to access properties. The base implementation
+     * will probably get the property anyway,so override mainly to prevent
+     * notices or warnings.
+     *
+     * @param object $variable
+     *   The variable to search for the property.
+     * @param string $property
+     *   The property or function to get its value.
+     * @param array $args
+     *   Optional arguments to pass if it is a function.
+     *
+     * @return null|string
+     *   The value for the property of the given name, or null or the empty
+     *   string if not available (or the property really equals null or the
+     *   empty string). The return value may be a scalar (numeric type) that can
+     *   be converted to a string.
+     */
+    protected function getObjectProperty($variable, $property, array $args)
+    {
+        $value = null;
+        $method1 = $property;
+        $method2 = 'get' . ucfirst($property);
+        $method3 = 'get_' . $property;
+        if (method_exists($variable, $method1)) {
+            $value = call_user_func_array(array($variable, $method1), $args);
+        }
+        elseif (method_exists($variable, $method2)) {
+            $value = call_user_func_array(array($variable, $method2), $args);
+        }
+        elseif (method_exists($variable, $method3)) {
+            $value = call_user_func_array(array($variable, $method3), $args);
+        }
+        elseif (method_exists($variable, '__get')) {
+            @$value = $variable->$property;
+        }
+        elseif (method_exists($variable, '__call')) {
+            try {
+                $value = @call_user_func_array(array($variable, $property), $args);
+            } catch (Exception $e) {
+            }
+            if ($value === null || $value === '') {
+                try {
+                    $value = call_user_func_array(array($variable, $method1), $args);
+                } catch (Exception $e) {
+                }
+            }
+            if ($value === null || $value === '') {
+                try {
+                    $value = call_user_func_array(array($variable, $method2), $args);
+                } catch (Exception $e) {
+                }
+            }
+            if ($value === null || $value === '') {
+                try {
+                    $value = call_user_func_array(array($variable, $method3), $args);
+                } catch (Exception $e) {
+                }
+            }
+        }
         return $value;
     }
 }

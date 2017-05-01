@@ -53,25 +53,11 @@ class Source extends BaseSource
     /**
      * @inheritDoc
      */
-    public function getDateOrder()
+    public function getDate()
     {
-        return substr($this->getSource()->order_date, 0, strlen('2000-01-01'));
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getDateCreditNote()
-    {
-        return substr($this->getSource()->post->post_date, 0, strlen('2000-01-01'));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getStatus()
-    {
-        return $this->source->get_status();
+        /** @var \WC_Abstract_Order $order */
+        $order = $this->getSource();
+        return substr($order->get_date_created(), 0, strlen('2000-01-01'));
     }
 
     /**
@@ -79,6 +65,8 @@ class Source extends BaseSource
      */
     protected function getOriginalOrder()
     {
-        return new Source(Source::Order, $this->source->post->post_parent);
+        /** @var \WC_Order_Refund $refund */
+        $refund = $this->source;
+        return new Source(Source::Order, $refund->get_parent_id());
     }
 }

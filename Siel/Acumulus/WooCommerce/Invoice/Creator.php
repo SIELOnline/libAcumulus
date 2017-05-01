@@ -7,6 +7,7 @@ use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use WC_Abstract_Order;
 use WC_Coupon;
 use WC_Order;
+use WC_Order_Item_Product;
 use WC_Product;
 use WC_Tax;
 
@@ -48,7 +49,7 @@ class Creator extends BaseCreator
                 $this->order = $this->shopSource;
                 break;
             case Source::CreditNote:
-                $this->order = new WC_Order($this->shopSource->post->post_parent);
+                $this->order = new WC_Order($this->shopSource->get_parent_id());
                 break;
         }
     }
@@ -59,47 +60,9 @@ class Creator extends BaseCreator
     protected function setPropertySources()
     {
         parent::setPropertySources();
-        $this->propertySources['meta'] = array($this, 'getSourceMeta');
         if ($this->invoiceSource->getType() === Source::CreditNote) {
             $this->propertySources['order'] = $this->order;
-            $this->propertySources['order_meta'] = array($this, 'getOrderMeta');
         }
-    }
-
-    /**
-     * Token callback to access the post meta when resolving tokens.
-     *
-     * @param string $property
-     *
-     * @return null|string
-     *   The value for the meta data with the given name, null if not available.
-     */
-    public function getSourceMeta($property) {
-        $value = get_post_meta($this->invoiceSource->getSource()->id, $property, true);
-        // get_post_meta() can return false or ''.
-        if (empty($value)) {
-            // Not found: indicate so by returning null.
-            $value = null;
-        }
-        return $value;
-    }
-
-    /**
-     * Token callback to access the order post meta when resolving tokens.
-     *
-     * @param string $property
-     *
-     * @return null|string
-     *   The value for the meta data with the given name, null if not available.
-     */
-    public function getOrderMeta($property) {
-        $value = get_post_meta($this->order->get_id(), $property, true);
-        // get_post_meta() can return false or ''.
-        if (empty($value)) {
-            // Not found: indicate so by returning null.
-            $value = null;
-        }
-        return $value;
     }
 
     /**
@@ -107,7 +70,7 @@ class Creator extends BaseCreator
      */
     protected function getCountryCode()
     {
-        return isset($this->order->billing_country) ? $this->order->billing_country : '';
+        return $this->order->get_billing_country();
     }
 
     /**
@@ -115,12 +78,10 @@ class Creator extends BaseCreator
      *
      * This override returns the id of a WC_Payment_Gateway.
      */
-    protected function getPaymentMethod()
-    {
-        if (isset($this->shopSource->payment_method)) {
-            return $this->shopSource->payment_method;
-        }
-        return parent::getPaymentMethod();
+    protected function getPaymentMethod() {
+        // Payment method is not stored for credit notes, so it is expected to
+        // be the same as for its order.
+        return $this->order->get_payment_method();
     }
 
     /**
@@ -132,6 +93,7 @@ class Creator extends BaseCreator
      */
     protected function getPaymentStateOrder()
     {
+        // @todo: on-hold als niet betaald zien.
         return $this->order->needs_payment() ? ConfigInterface::PaymentStatus_Due : ConfigInterface::PaymentStatus_Paid;
     }
 
@@ -157,7 +119,9 @@ class Creator extends BaseCreator
      */
     protected function getPaymentDateOrder()
     {
-        return substr($this->shopSource->paid_date, 0, strlen('2000-01-01'));
+        // This returns a WC_DateTime but that class has a _toString() method.
+        $string = $this->order->get_date_paid();
+        return substr($string, 0, strlen('2000-01-01'));
     }
 
     /**
@@ -170,7 +134,9 @@ class Creator extends BaseCreator
      */
     protected function getPaymentDateCreditNote()
     {
-        return substr($this->shopSource->post->post_modified, 0, strlen('2000-01-01'));
+        // This returns a WC_DateTime but that class has a _toString() method.
+        $string = $this->shopSource->get_date_modified();
+        return substr($string, 0, strlen('2000-01-01'));
     }
 
     /**
@@ -193,10 +159,11 @@ class Creator extends BaseCreator
     protected function getItemLines()
     {
         $result = array();
+        /** @var WC_Order_Item_Product[] $lines */
         $lines = $this->shopSource->get_items(apply_filters('woocommerce_admin_order_item_types', 'line_item'));
-        foreach ($lines as $order_item_id => $line) {
-            $line['order_item_id'] = $order_item_id;
-            $itemLine = $this->getItemLine($line);
+        foreach ($lines as $line) {
+            $product = $line->get_product();
+            $itemLine = $this->getItemLine($line, $product);
             if ($itemLine) {
                 $result[] = $itemLine;
             }
@@ -209,25 +176,28 @@ class Creator extends BaseCreator
     /**
      * Returns 1 item line.
      *
-     * @param array|\ArrayAccess $item
+     * @param WC_Order_Item_Product $item
      *   An array representing an order item line, meta values are already
      *   available under their own names and as an array under key 'item_meta'.
+     * @param WC_Product|bool $product
+     *   The product that was sold on this line, may also be a bool according to
+     *   the WC3 php documentation. I guess it will be false if the product has
+     *   been deleted since.
      *
-     * @return array May be empty if the line should not be sent (e.g. qty = 0 on a refund).
-     * May be empty if the line should not be sent (e.g. qty = 0 on a refund).
+     * @return array
+     *   May be empty if the line should not be sent (e.g. qty = 0 on a refund).
      */
-    protected function getItemLine($item)
+    protected function getItemLine($item, $product)
     {
         $result = array();
 
         // Qty = 0 can happen on refunds: products that are not returned are
         // still listed but have qty = 0.
-        if (Number::isZero($item['qty'])) {
+        if (Number::isZero($item->get_quantity())) {
             return $result;
         }
 
         // $product can be NULL if the product has been deleted.
-        $product = $this->shopSource->get_product_from_item($item);
         if ($product instanceof WC_Product) {
             $this->addPropertySource('product', $product);
         }
@@ -250,13 +220,16 @@ class Creator extends BaseCreator
         // install this method will always return false. But if this method
         // happens to return true anyway (customisation, hook), the costprice
         // tag will trigger vattype = 5 for Acumulus.
-        if ($this->allowMarginScheme() && !empty($item['cost_price'])) {
-            // Margin scheme:
-            // - Do not put VAT on invoice: send price incl VAT as unitprice.
-            // - But still send the VAT rate to Acumulus.
-            // Costprice > 0 triggers the margin scheme in Acumulus.
-            $result['unitprice'] = $productPriceInc;
-            $this->addTokenDefault($result, 'costprice', $invoiceSettings['costPrice']);
+        if ($this->allowMarginScheme() && !empty($invoiceSettings['costPrice'])) {
+            $value = $this->getTokenizedValue($invoiceSettings['costPrice']);
+            if (!empty($value)) {
+                // Margin scheme:
+                // - Do not put VAT on invoice: send price incl VAT as unitprice.
+                // - But still send the VAT rate to Acumulus.
+                // Costprice > 0 triggers the margin scheme in Acumulus.
+                $result['unitprice'] = $productPriceInc;
+                $result['costprice'] = $value;
+            }
         } else {
             $result += array(
                 'unitprice' => $productPriceEx,
@@ -264,8 +237,8 @@ class Creator extends BaseCreator
             );
         }
 
-        // Quantity is negative on refunds
-        $parentTags = array('quantity' => $sign * $item['qty']);
+        // Quantity is negative on refunds, make it positive.
+        $parentTags = array('quantity' => $sign * $item->get_quantity());
         $parentTags += $this->getVatRangeTags($productVat, $productPriceEx, $this->precision, $this->precision);
         if ($product instanceof WC_Product) {
             $parentTags += $this->getVatRateLookupMetadata($product->get_tax_class());
@@ -273,10 +246,12 @@ class Creator extends BaseCreator
         $result += $parentTags;
 
         // Add variants/options, but set vatamount to 0 on the child lines.
+        // @todo: check how to access tmcartepo_data.
         $parentTags['vatamount'] = 0;
-        if ($product instanceof WC_Product && !empty($item['variation_id'])) {
+        $is_plugin_active = is_plugin_active('woocommerce-tm-extra-product-options/tm-woo-extra-product-options.php');
+        if ($product instanceof WC_Product && $item->get_variation_id()) {
             $result[Creator::Line_Children] = $this->getVariantLines($item, $product, $parentTags);
-        } elseif (is_plugin_active('woocommerce-tm-extra-product-options/tm-woo-extra-product-options.php') && !empty($item['tmcartepo_data'])) {
+        } elseif ($is_plugin_active && !empty($item['tmcartepo_data'])) {
             $result[Creator::Line_Children] = $this->getExtraProductOptionsLines($item, $parentTags);
         }
 
@@ -313,19 +288,25 @@ class Creator extends BaseCreator
      *
      * This method supports the default WooCommerce variant functionality.
      *
-     * @param array|\ArrayAccess $item
+     * @param \WC_Order_Item_Product $item
      * @param \WC_Product $product
      * @param array $parentTags
      *   An array of tags from the parent product to add to the child lines.
      *
-     * @return \array[] An array of lines that describes this variant.
-     * An array of lines that describes this variant.
+     * @return array[]
+     *   An array of lines that describes this variant.
      */
     protected function getVariantLines($item, WC_Product $product, array $parentTags)
     {
         $result = array();
 
-        if ($metadata = $this->shopSource->has_meta($item['order_item_id'])) {
+        /**
+         * Object with properties id, key, and value.
+         *
+         * @var object[] $metadata
+         */
+        $metadata = $item->get_meta_data();
+        if (!empty($metadata)) {
             // Define hidden core fields.
             $hiddenOrderItemMeta = apply_filters('woocommerce_hidden_order_itemmeta', array(
                 '_qty',
@@ -340,21 +321,23 @@ class Creator extends BaseCreator
             foreach ($metadata as $meta) {
                 // Skip hidden core fields and serialized data (also hidden core
                 // fields).
-                if (in_array($meta['meta_key'], $hiddenOrderItemMeta) || is_serialized($meta['meta_value'])) {
+                if (in_array($meta->key, $hiddenOrderItemMeta) || is_serialized($meta->value)) {
                     continue;
                 }
 
                 // Get attribute data.
-                if (taxonomy_exists(wc_sanitize_taxonomy_name($meta['meta_key']))) {
-                    $term = get_term_by('slug', $meta['meta_value'], wc_sanitize_taxonomy_name($meta['meta_key']));
-                    $meta['meta_key'] = wc_attribute_label(wc_sanitize_taxonomy_name($meta['meta_key']));
-                    $meta['meta_value'] = isset($term->name) ? $term->name : $meta['meta_value'];
-                } else {
-                    $meta['meta_key'] = apply_filters('woocommerce_attribute_label', wc_attribute_label($meta['meta_key'], $product), $meta['meta_key']);
+                if (taxonomy_exists(wc_sanitize_taxonomy_name($meta->key))) {
+                    $term = get_term_by('slug', $meta->value, wc_sanitize_taxonomy_name($meta->key));
+                    $variantLabel = wc_attribute_label(wc_sanitize_taxonomy_name($meta->key));
+                    $variantValue = isset($term->name) ? $term->name : $meta->value;
+                }
+                else {
+                    $variantLabel = apply_filters('woocommerce_attribute_label', wc_attribute_label($meta->key, $product), $meta->key);
+                    $variantValue = $meta->value;
                 }
 
                 $result[] = array(
-                        'product' => $meta['meta_key'] . ': ' . rawurldecode($meta['meta_value']),
+                        'product' => $variantLabel . ': ' . rawurldecode($variantValue),
                         'unitprice' => 0,
                     ) + $parentTags;
             }
@@ -383,6 +366,7 @@ class Creator extends BaseCreator
     {
         $result = array();
 
+        // @todo: convert to WC3 interface.
         $options = unserialize($item['tmcartepo_data']);
         foreach ($options as $option) {
             // Get option name and choice.
@@ -420,17 +404,17 @@ class Creator extends BaseCreator
     }
 
   /**
-   * @param array|\ArrayAccess $line
+   * @param \WC_Order_Item_Fee $line
    *
    * @return array
    */
     protected function getFeeLine($line)
     {
-        $feeEx = $line['line_total'];
-        $feeVat = $line['line_tax'];
+        $feeEx = $line->get_total();
+        $feeVat = $line->get_total_tax();
 
         $result = array(
-                'product' => $this->t($line['name']),
+                'product' => $this->t($line->get_name()),
                 'unitprice' => $feeEx,
                 'quantity' => 1,
                 'vatamount' => $feeVat,
@@ -445,6 +429,7 @@ class Creator extends BaseCreator
     protected function getShippingLine()
     {
         // Check if a shipping line item exists for this order.
+        /** @var \WC_Order_Item_Shipping[] $lines */
         $lines = $this->shopSource->get_items(apply_filters('woocommerce_admin_order_item_types', 'shipping'));
         if (empty($lines)) {
             return array();
@@ -456,7 +441,7 @@ class Creator extends BaseCreator
         $vatLookupTags = array();
         $line = reset($lines);
         if (count($lines) === 1) {
-            $taxes = !empty($line['taxes']) ? maybe_unserialize($line['taxes']) : array();
+            $taxes = $line->get_taxes() ? maybe_unserialize($line->get_taxes()) : array();
             if (count($taxes) === 1) {
                 // @todo: $tax contains amount: can we use that?
                 //$tax = reset($taxes);
@@ -480,21 +465,23 @@ class Creator extends BaseCreator
                         $vatLookupTags = array(
                             'meta-lookup-vatrate' => $tax_rate['rate'],
                             'meta-lookup-vatrate-label' => $tax_rate['label'],
+                            'meta-lookup-vatrate-source' => "get_option('woocommerce_shipping_tax_class')",
                         );
                     }
                 }
             }
         }
 
+        // @todo: this is WC2, what about WC3? For now setting precision to 0.01.
         // Precision: shipping costs are entered ex VAT, so that may be very
         // precise, but it will be rounded to the cent by WC. For orders, the
         // VAT is as precise as a float can be and is based on the shipping cost
         // as entered by the admin. However, for refunds it is also rounded to
         // the cent.
         // @todo: to avoid rounding errors, can we get the non-formatted amount?
-        $shippingEx = $this->shopSource->get_total_shipping();
+        $shippingEx = $this->shopSource->get_shipping_total();
         $shippingVat = $this->shopSource->get_shipping_tax();
-        $precisionNumerator = $this->invoiceSource->getType() === Source::CreditNote ? 0.01 : 0.0001;
+        $precisionNumerator = 0.01;
 
         $result = array(
                 'product' => $this->getShippingMethodName(),
@@ -514,10 +501,11 @@ class Creator extends BaseCreator
     protected function getShippingMethodName()
     {
         // Check if a shipping line item exists for this order.
+        /** @var \WC_Order_Item_Shipping[] $lines */
         $lines = $this->shopSource->get_items(apply_filters('woocommerce_admin_order_item_types', 'shipping'));
         if (!empty($lines)) {
             $line = reset($lines);
-            return $line['name'];
+            return $line->get_name();
         }
         return parent::getShippingMethodName();
     }
@@ -562,7 +550,7 @@ class Creator extends BaseCreator
      * WC_Coupon::apply_before_tax() now always returns true (and thus might be
      * deprecated and removed in the future): do no longer use.
      *
-     * @param WC_Coupon $coupon
+     * @param \WC_Coupon $coupon
      *
      * @return array
      */
@@ -571,14 +559,15 @@ class Creator extends BaseCreator
         // Get a description for the value of this coupon.
         // Entered discount amounts follow the wc_prices_include_tax() setting.
         // Use that info in the description.
-        if ($coupon->exists) {
-            $description = sprintf('%s %s: ', $this->t('discount_code'), $coupon->code);
-            if (in_array($coupon->discount_type, array('fixed_product', 'fixed_cart'))) {
-                $amount = $this->getSign() * $coupon->coupon_amount;
+        if ($coupon->get_id()) {
+            // Coupon still exists: extract info from coupon.
+            $description = sprintf('%s %s: ', $this->t('discount_code'), $coupon->get_code());
+            if (in_array($coupon->get_discount_type(), array('fixed_product', 'fixed_cart'))) {
+                $amount = $this->getSign() * $coupon->get_amount();
                 if (!Number::isZero($amount)) {
                     $description .= sprintf('€%.2f (%s)', $amount, wc_prices_include_tax() ? $this->t('inc_vat') : $this->t('ex_vat'));
                 }
-                if ($coupon->enable_free_shipping()) {
+                if ($coupon->get_free_shipping()) {
                     if (!Number::isZero($amount)) {
                         $description .= ' + ';
                     }
@@ -587,16 +576,17 @@ class Creator extends BaseCreator
             } else {
                 // Value may be entered with or without % sign at the end.
                 // Remove it by converting to a float.
-                $description .= ((float) $coupon->coupon_amount) . '%';
-                if ($coupon->enable_free_shipping()) {
+                $description .= ((float) $coupon->get_amount()) . '%';
+                if ($coupon->get_free_shipping()) {
                     $description .= ' + ' . $this->t('free_shipping');
                 }
             }
         } else {
+            // Coupon no longer exists: use generic name.
             $description = $this->t('discount_code');
         }
         return array(
-            'itemnumber' => $coupon->code,
+            'itemnumber' => $coupon->get_code(),
             'product' => $description,
             'unitprice' => 0,
             'unitpriceinc' => 0,

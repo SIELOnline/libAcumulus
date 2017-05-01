@@ -30,4 +30,30 @@ class Source extends BaseSource
         // wc-sequential-order-numbers.
         return $this->source->get_order_number();
     }
+
+    /**
+     * Returns the order (or credit memo) date.
+     *
+     * @return string
+     *   The order (or credit memo) date: yyyy-mm-dd.
+     */
+    public function getDate() {
+        return $this->callTypeSpecificMethod(__FUNCTION__);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getDateOrder()
+    {
+        return substr($this->getSource()->order_date, 0, strlen('2000-01-01'));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getDateCreditNote()
+    {
+        return substr($this->getSource()->post->post_date, 0, strlen('2000-01-01'));
+    }
 }

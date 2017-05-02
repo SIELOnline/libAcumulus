@@ -168,6 +168,8 @@ class Creator extends BaseCreator
             }
         }
 
+        $result = $this->groupBundles($result);
+
         $this->hasItemLines = count($result) > 0;
         return $result;
     }
@@ -243,6 +245,19 @@ class Creator extends BaseCreator
             $parentTags += $this->getVatRateLookupMetadata($product->get_tax_class());
         }
         $result += $parentTags;
+
+        // Add bundle meta data (woocommerce-bundle-products extension).
+        $bundleId = $item->get_meta('_bundle_cart_key');
+        if (!empty($bundleId)) {
+            // Bundle or bundled product.
+            $result['meta-bundle-id'] = $bundleId;
+        }
+        $bundledBy = $item->get_meta('_bundled_by');
+        if (!empty($bundledBy)) {
+            // Bundled products only.
+            $result['meta-bundle-parent'] = $bundledBy;
+            $result['meta-bundle-visible'] = $item->get_meta('bundled_item_hidden') !== 'yes';
+        }
 
         // Add variants/options, but set vatamount to 0 on the child lines.
         // @todo: check how to access tmcartepo_data.
@@ -379,6 +394,87 @@ class Creator extends BaseCreator
         }
 
         return $result;
+    }
+
+    /**
+     * Groups bundled products into the bundle product.
+     *
+     * This methods supports the woocommerce-product-bundles extension that
+     * stores the bundle products as separate item lines below the bundle line
+     * and uses the meta data described below to link them to each other. Our
+     * getItemLine() method has copied that meta data into the resulting items.
+     *
+     * This method hierarchically group bundled products into the bundle product
+     * and can do so multi-level.
+     *
+     * Bundle line meta data:
+     * - bundle_cart_key (hash) unique identifier.
+     * - bundled_items (hash[]) refers to the bundle_cart_key of the bundled
+     *     products.
+     *
+     * Bundled items meta data:
+     * - bundled_by (hash) refers to bundle_cart_key of the bundle line.
+     * - bundle_cart_key (hash) unique identifier.
+     * - bundled_item_hidden: 'yes'|'no' or absent (= 'no').
+     *
+     * @param array $itemLines
+     *
+     * @return array
+     *   The item line in the set of item lines that turns out to be the parent
+     *   of this item line, or null if the item line does not have a parent.
+     */
+    protected function groupBundles(array $itemLines)
+    {
+        $result = array();
+        foreach ($itemLines as &$itemLine) {
+            if (!empty($itemLine['meta-bundle-parent'])) {
+                // Find the parent, note that we expect bundle products to
+                // appear before their bundled products, so we can search in
+                // $result and have a reference to a line in $result returned!
+                $parent = &$this->getParentBundle($result, $itemLine['meta-bundle-parent']);
+                if ($parent !== null) {
+                    // Add the bundled product as a child to the bundle.
+                    $parent[Creator::Line_Children][] = $itemLine;
+                } else {
+                    // Oops: not found. Store a message in the line meta data
+                    // and keep it as a separate line.
+                    $itemLine['meta-bundle-parent'] .= ': not found';
+                    $result[] = $itemLine;
+                }
+            } else {
+                // Not a bundled product: just add it to the result.
+                $result[] = $itemLine;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Searches for, and returns by reference, the parent bundle line.
+     *
+     * @param array $lines
+     *   The lines to search for the parent bundle line.
+     * @param $parentId
+     *   The meta-bundle-id value to search for.
+     *
+     * @return array|null
+     *   The parent bundle line or null if not found.
+     */
+    protected function &getParentBundle(array &$lines, $parentId)
+    {
+        foreach ($lines as &$line) {
+            if (!empty($line['meta-bundle-id']) && $line['meta-bundle-id'] === $parentId) {
+                return $line;
+            } elseif (!empty($line[Creator::Line_Children])) {
+                // Recursively search for the parent bundle.
+                $parent = &$this->getParentBundle($line[Creator::Line_Children], $parentId);
+                if ($parent !== null) {
+                    return $parent;
+                }
+            }
+        }
+        // Not found.
+        return null;
     }
 
     /**

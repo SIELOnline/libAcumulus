@@ -93,7 +93,6 @@ class Creator extends BaseCreator
      */
     protected function getPaymentStateOrder()
     {
-        // @todo: on-hold als niet betaald zien.
         return $this->order->needs_payment() ? ConfigInterface::PaymentStatus_Due : ConfigInterface::PaymentStatus_Paid;
     }
 

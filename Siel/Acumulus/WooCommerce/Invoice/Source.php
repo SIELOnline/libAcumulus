@@ -55,9 +55,15 @@ class Source extends BaseSource
      */
     public function getDate()
     {
-        /** @var \WC_Abstract_Order $order */
-        $order = $this->getSource();
-        return substr($order->get_date_created(), 0, strlen('2000-01-01'));
+        return substr($this->source->get_date_created(), 0, strlen('2000-01-01'));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getStatus()
+    {
+        return $this->source->get_status();
     }
 
     /**

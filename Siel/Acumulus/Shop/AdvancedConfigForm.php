@@ -479,6 +479,19 @@ class AdvancedConfigForm extends BaseConfigForm
     protected function getInvoiceFields()
     {
         $fields = array(
+            'concept' => array(
+                'type' => 'radio',
+                'label' => $this->t('field_concept'),
+                'description' => $this->t('desc_concept'),
+                'options' => array(
+                    ConfigInterface::Concept_Plugin => $this->t('option_concept_2'),
+                    ConfigInterface::Concept_No => $this->t('option_concept_0'),
+                    ConfigInterface::Concept_Yes => $this->t('option_concept_1'),
+                ),
+                'attributes' => array(
+                    'required' => true,
+                ),
+            ),
             'sendWhat' => array(
                 'type' => 'checkbox',
                 'label' => $this->t('field_sendWhat'),

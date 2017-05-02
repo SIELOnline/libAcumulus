@@ -830,6 +830,11 @@ class Config implements ConfigInterface
                     'type' => 'string',
                     'default' => '',
                 ),
+                'concept' => array(
+                    'group' => 'invoice',
+                    'type' => 'int',
+                    'default' => ConfigInterface::Concept_Plugin,
+                ),
                 'defaultAccountNumber' => array(
                     'group' => 'invoice',
                     'type' => 'int',

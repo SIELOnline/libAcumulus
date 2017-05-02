@@ -304,8 +304,11 @@ abstract class Creator
         $invoiceSettings = $this->config->getInvoiceSettings();
 
         // Invoice type.
-        // @todo: check that this is overwritten when needed.
-        $this->addDefaultEmpty($invoice, 'concept', ConfigInterface::Concept_No);
+        $concept = $invoiceSettings['concept'];
+        if ($concept == ConfigInterface::Concept_Plugin) {
+            $concept = ConfigInterface::Concept_No;
+        }
+        $this->addDefaultEmpty($invoice, 'concept', $concept);
 
         // Invoice number and date.
         $sourceToUse = $shopSettings['invoiceNrSource'];

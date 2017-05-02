@@ -210,6 +210,12 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'option_same_template' => 'Zelfde sjabloon als voor niet betaald',
         'desc_defaultInvoiceTemplate' => 'Maakt u binnen Acumulus gebruik van meerdere factuur-sjablonen en wilt u de facturen uit uw webwinkel met een specifieke factuursjabloon printen, kies dan hier de factuur-sjablonen voor niet betaalde respectievelijk betaalde bestellingen.',
 
+        'field_concept' => 'Concept',
+        'desc_concept' => 'Gef aan hoe de factuur verstuurd moet worden. De 1e optie zal normaal gesproken voldoen. Echter, als u uw facturen altijd als concept wil versturen, kies dan de 3e optie. De 2e optie zou eigenlijk niet gekozen moeten worden, tenzij de waarschuwingen altijd onterecht blijken.',
+        'option_concept_2' => 'Als definitieve factuur versturen, tenzij er onregelmatigheden zijn geconstateerd. Kies deze optie tenzij u weet wat u doet.',
+        'option_concept_0' => 'Altijd als definitieve factuur versturen',
+        'option_concept_1' => 'Altijd als concept versturen',
+
         'field_description' => 'Toelichting',
         'desc_description' => 'Toelichting op de factuur. Deze inhoud kan in Acumulus op een factuursjabloon getoond worden mbv de veldverwijzing [toelichting].',
         'field_descriptionText' => 'Uitgebreide toelichting',
@@ -511,6 +517,12 @@ If you unchecked the first option, the second option only applies to business cl
         'field_defaultInvoicePaidTemplate' => 'Invoice template (paid)',
         'option_same_template' => 'Same template as for due',
         'desc_defaultInvoiceTemplate' => 'Select the invoice templates to use when generating your Acumulus invoices for due respectively paid orders.',
+
+        'field_concept' => 'Concept',
+        'desc_concept' => 'Indicate how to send the invoice to Acumulus. The 1st option will normally do fine, unless you want to send all your invoices as concept to Acumulus. The 2nd option should normally not be chosen, unless the warnings always turn out to be incorrect.',
+        'option_concept_2' => 'Send the invoice as final unless the plugin discovered irregularities. Choose this option unless you know what you are doing.',
+        'option_concept_0' => 'Always send as final',
+        'option_concept_1' => 'Always send as concept',
 
         'field_description' => 'Description',
         'desc_description' => 'Invoice description. In Acumulus, you can use the contents of this field in invoice templates using the field reference [toelichting].',

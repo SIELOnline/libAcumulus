@@ -16,6 +16,8 @@ interface ConfigInterface
 
     const Concept_No = 0;
     const Concept_Yes = 1;
+    // not an API constant.
+    const Concept_Plugin = 2;
 
     const InvoiceNrSource_ShopInvoice = 1;
     const InvoiceNrSource_ShopOrder = 2;

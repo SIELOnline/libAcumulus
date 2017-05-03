@@ -42,6 +42,7 @@ class InvoiceManager extends BaseInvoiceManager
         /** @noinspection SqlResolve */
         $invoiceSourceIds = $wpdb->get_col($wpdb->prepare("SELECT `$key` FROM `{$wpdb->posts}` WHERE `$key` BETWEEN %u AND %u AND `post_type` = %s",
             $InvoiceSourceIdFrom, $InvoiceSourceIdTo, $this->sourceTypeToShopType($invoiceSourceType)));
+        sort($invoiceSourceIds);
         return $this->getSourcesByIdsOrSources($invoiceSourceType, $invoiceSourceIds);
     }
 
@@ -194,7 +195,7 @@ class InvoiceManager extends BaseInvoiceManager
         // Add default arguments.
         $args = $args + array(
                 'fields' => 'ids',
-                'numberposts' => -1,
+                'posts_per_page' => -1,
                 'post_type' => $this->sourceTypeToShopType($invoiceSourceType),
                 'post_status' => array_keys(wc_get_order_statuses()),
             );

@@ -5,7 +5,7 @@ use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\FlattenerInvoiceLines as BaseFlattenerInvoiceLines;
 
 /**
- * Class CompletorInvoiceLines completes the invoice lines.
+ * Defines Magento specific invoice line flattener logic.
  */
 class FlattenerInvoiceLines extends BaseFlattenerInvoiceLines
 {

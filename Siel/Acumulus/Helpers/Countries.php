@@ -9,7 +9,7 @@ class Countries
     /**
      * Returns whether the country is the Netherlands.
      *
-     * For now only the alpha-2 codes are allowed. Other notations might be added
+     * For now only the alpha-2 codes are allowed. Other notations will be added
      * as soon we support a web shop with a different way of storing countries.
      *
      * @param string $countryCode
@@ -25,7 +25,7 @@ class Countries
     /**
      * Returns whether the country is a EU country outside the Netherlands.
      *
-     * For now only the alpha-2 codes are allowed. Other notations might be added
+     * For now only the alpha-2 codes are allowed. Other notations will be added
      * as soon we support a web shop with a different way of storing countries.
      *
      * @param string $countryCode
@@ -38,8 +38,8 @@ class Countries
         // Sources:
         // - http://publications.europa.eu/code/pdf/370000en.htm
         // - http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
-        // EFTA countries are not part of this list because regarding invoicing they
-        // are considered to be outside of the EU.
+        // EFTA countries are not part of this list because regarding invoicing
+        // they are considered to be outside of the EU.
         $euCountryCodes = array(
             'BE',
             'BG',
@@ -60,7 +60,7 @@ class Countries
             'LU',
             'HU',
             'MT',
-            //'NL', // In EU, but here we want "in EU but outside the Netherlands".
+            //'NL', In EU, but here we want "in EU but outside the Netherlands".
             'AT',
             'PL',
             'PT',
@@ -104,8 +104,8 @@ class Countries
      *   ISO country code (2 characters).
      *
      * @return string
-     *   The (dutch) name of the country or the empty string if the code could not
-     *   be looked up.
+     *   The (dutch) name of the country or the empty string if the code could
+     *   not be looked up.
      */
     public function getCountryName($countryCode)
     {

@@ -87,7 +87,7 @@ abstract class AcumulusEntryModel
     {
         $now = $this->sqlNow();
         $record = $this->getByInvoiceSource($invoiceSource);
-        if ($record == null) {
+        if ($record === null) {
             return $this->insert($invoiceSource, $entryId, $token, $now);
         } else {
             return $this->update($record, $entryId, $token, $now);

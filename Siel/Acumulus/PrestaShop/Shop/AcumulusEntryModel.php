@@ -61,7 +61,7 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
         $token = $token === null ? 'NULL' : "'" . Db::getInstance()->escape($token) . "'";
         $invoiceSourceType = $invoiceSource->getType();
         $invoiceSourceId = $invoiceSource->getId();
-        return Db::getInstance()->execute("INSERT INTO `{$this->tableName}` (id_shop, id_shop_group, id_entry, token, source_type, source_id, updated) VALUES $shopId, $shopGroupId, $entryId, $token, '$invoiceSourceType', $invoiceSourceId, '$created')");
+        return Db::getInstance()->execute("INSERT INTO `{$this->tableName}` (id_shop, id_shop_group, id_entry, token, source_type, source_id, updated) VALUES ($shopId, $shopGroupId, $entryId, $token, '$invoiceSourceType', $invoiceSourceId, '$created')");
     }
 
     /**

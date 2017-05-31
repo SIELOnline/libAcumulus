@@ -210,7 +210,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
         return array(
             'contactYourId' => '[id]', // Customer
             'companyName1' => '[company]', // InvoiceAddress
-            'fullName' => '[first_name] [last_name]', // InvoiceAddress
+            'fullName' => '[firstname+lastname]', // InvoiceAddress
             'address1' => '[address1]', // InvoiceAddress
             'address2' => '[address2]', // InvoiceAddress
             'postalCode' => '[postcode]', // InvoiceAddress

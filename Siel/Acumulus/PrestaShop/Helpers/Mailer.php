@@ -22,8 +22,8 @@ class Mailer extends BaseMailer
      */
     public function sendMail($from, $fromName, $to, $subject, $bodyText, $bodyHtml)
     {
-        $this->templateDir = __DIR__ . '/mails/';
-        $this->templateName = 'message';
+        $this->templateDir = _PS_ROOT_DIR_ . '/mails/';
+        $this->templateName = 'acumulus-message';
         $this->writeTemplateFiles($bodyText, $bodyHtml);
 
         $languageId = Language::getIdByIso($this->translator->getLanguage());

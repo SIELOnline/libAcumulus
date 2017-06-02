@@ -13,24 +13,21 @@ class FormMapper
     /** @var string */
     protected $page;
 
-    /** @var FormRenderer */
-    protected $formRenderer;
-
     /**
      * Maps a set of field definitions.
      *
      * @param Form $form
+     *   The form to map to a WordPress form.
      * @param string $page
-     *
-     * @return \Siel\Acumulus\WooCommerce\Helpers\FormRenderer
+     *   The slug-name of the settings page on which to show the section.
+     * @param callable $callback
+     *   The callback to actually render a field.
      */
-    public function map(Form $form, $page)
+    public function map(Form $form, $page, $callback)
     {
-        $this->formRenderer = new FormRenderer();
         $this->page = $page;
         $form->addValues();
-        $this->fields($form->getFields(), '');
-        return $this->formRenderer;
+        $this->fields($form->getFields(), '', $callback);
     }
 
     /**
@@ -39,8 +36,10 @@ class FormMapper
      * @param array[] $fields
      * @param string $section
      *   The page section to add the fields to.
+     * @param callable $callback
+     *   The callback to actually render a field.
      */
-    protected function fields(array $fields, $section)
+    protected function fields(array $fields, $section, $callback)
     {
         foreach ($fields as $id => $field) {
             $field['id'] = $id;
@@ -53,7 +52,7 @@ class FormMapper
             if (!isset($field['label'])) {
                 $field['label'] = '';
             }
-            $this->field($field, $section);
+            $this->field($field, $section, $callback);
         }
     }
 
@@ -64,13 +63,14 @@ class FormMapper
      *   Field(set) definition.
      * @param string $section
      *   The section this item (if it is a field) should be added to.
+     * @param callable $callback
+     *   The callback to actually render this field.
      */
-    protected function field(array $field, $section)
+    protected function field(array $field, $section, callable $callback)
     {
         if ($field['type'] === 'fieldset') {
-            $renderer = $this->formRenderer;
-            add_settings_section($field['id'], $field['legend'], function () use ($renderer, $field) {
-                $renderer->field($field);
+            add_settings_section($field['id'], $field['legend'], function () use ($callback, $field) {
+                $callback($field);
             }, $this->page);
             $fields = $field['fields'];
             if (!empty($field['description'])) {
@@ -82,10 +82,10 @@ class FormMapper
                 );
                 array_unshift($fields, $descriptionField);
             }
-            $this->fields($fields, $field['id']);
+            $this->fields($fields, $field['id'], $callback);
         } else {
             $required = !empty($field['attributes']['required']) ? static::required : '';
-            add_settings_field($field['id'], $field['label'] . $required, array($this->formRenderer, 'field'), $this->page, $section, $field);
+            add_settings_field($field['id'], $field['label'] . $required, $callback, $this->page, $section, $field);
         }
     }
 }

@@ -39,15 +39,11 @@ interface InjectorInterface
      *   The type of form requested.
      *
      * @return \Siel\Acumulus\Helpers\Form
-     *
-     * @todo: start using this in all plugins.
      */
     public function getForm($type);
 
     /**
      * @return \Siel\Acumulus\Helpers\FormRenderer
-     *
-     * @todo: start using this in all plugins.
      */
     public function getFormRenderer();
 

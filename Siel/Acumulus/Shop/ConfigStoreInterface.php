@@ -7,19 +7,6 @@ namespace Siel\Acumulus\Shop;
 interface ConfigStoreInterface
 {
     /**
-     * Returns an array with shop specific environment settings.
-     *
-     * @todo: move to shop capabilities?
-     *
-     * @return array
-     *   An array with keys:
-     *   - moduleVersion
-     *   - shopName
-     *   - shopVersion
-     */
-    public function getShopEnvironment();
-
-    /**
      * Loads the configuration from the actual configuration provider.
      *
      * @param array $keys

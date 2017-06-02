@@ -5,12 +5,27 @@ use Siel\Acumulus\Invoice\ConfigInterface as InvoiceConfigInterface;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
 use Siel\Acumulus\Shop\ShopCapabilities as ShopCapabilitiesBase;
+use Siel\Acumulus\Web\ConfigInterface as ServiceConfigInterface;
 
 /**
  * Defines the OpenCart 1 and 2 webshop specific capabilities.
  */
 abstract class ShopCapabilities extends ShopCapabilitiesBase
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function getShopEnvironment()
+    {
+        $environment = array(
+            // Module has same version as library.
+            'moduleVersion' => ServiceConfigInterface::libraryVersion,
+            'shopName' => $this->shopName,
+            'shopVersion' => VERSION,
+        );
+        return $environment;
+    }
+
     /**
      * {@inheritdoc}
      */

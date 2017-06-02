@@ -3,7 +3,6 @@ namespace Siel\Acumulus\OpenCart\Shop;
 
 use Siel\Acumulus\OpenCart\Helpers\Registry;
 use Siel\Acumulus\Shop\ConfigStore as BaseConfigStore;
-use Siel\Acumulus\Web\ConfigInterface as ServiceConfigInterface;
 
 /**
  * Implements the connection to the OpenCart config component.
@@ -11,20 +10,6 @@ use Siel\Acumulus\Web\ConfigInterface as ServiceConfigInterface;
 class ConfigStore extends BaSeConfigStore
 {
     const CONFIG_KEY = 'ACUMULUS_';
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getShopEnvironment()
-    {
-        $environment = array(
-            // Module has same version as library.
-            'moduleVersion' => ServiceConfigInterface::libraryVersion,
-            'shopName' => $this->shopName,
-            'shopVersion' => VERSION,
-        );
-        return $environment;
-    }
 
     /** @noinspection PhpUndefinedClassInspection */
     /**

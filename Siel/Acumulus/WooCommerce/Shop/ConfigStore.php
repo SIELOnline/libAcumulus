@@ -11,22 +11,6 @@ class ConfigStore extends BaSeConfigStore
     /**
      * {@inheritdoc}
      */
-    public function getShopEnvironment()
-    {
-        global $wp_version, $woocommerce;
-        $environment = array(
-            // Lazy load is no longer needed (as in L3) as this method will only be
-            // called when the config gets actually queried.
-            'moduleVersion' => \Acumulus::create()->getVersionNumber(),
-            'shopName' => $this->shopName,
-            'shopVersion' => (isset($woocommerce) ? $woocommerce->version : 'unknown') . ' (WordPress: ' . $wp_version . ')',
-        );
-        return $environment;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function load(array $keys)
     {
         $result = array();

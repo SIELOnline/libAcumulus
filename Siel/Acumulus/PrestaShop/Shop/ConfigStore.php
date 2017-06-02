@@ -1,7 +1,6 @@
 <?php
 namespace Siel\Acumulus\PrestaShop\Shop;
 
-use Acumulus;
 use Configuration;
 use Siel\Acumulus\Shop\ConfigStore as BaseConfigStore;
 
@@ -11,19 +10,6 @@ use Siel\Acumulus\Shop\ConfigStore as BaseConfigStore;
 class ConfigStore extends BaSeConfigStore
 {
     const CONFIG_KEY = 'ACUMULUS_';
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getShopEnvironment()
-    {
-        $environment = array(
-            'moduleVersion' => Acumulus::$module_version,
-            'shopName' => $this->shopName,
-            'shopVersion' => _PS_VERSION_,
-        );
-        return $environment;
-    }
 
     /**
      * {@inheritdoc}

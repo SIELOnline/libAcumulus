@@ -10,6 +10,17 @@ namespace Siel\Acumulus\Shop;
 interface ShopCapabilitiesInterface
 {
     /**
+     * Returns an array with shop specific environment settings.
+     *
+     * @return array
+     *   An array with keys:
+     *   - moduleVersion
+     *   - shopName
+     *   - shopVersion
+     */
+    public function getShopEnvironment();
+
+    /**
      * Returns a list with the shop specific tokens.
      *
      * @return string[][]

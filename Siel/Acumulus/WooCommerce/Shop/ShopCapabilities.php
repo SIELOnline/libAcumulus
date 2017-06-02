@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\WooCommerce\Shop;
 
+use Acumulus;
 use Siel\Acumulus\Invoice\ConfigInterface as InvoiceConfigInterface;
 use Siel\Acumulus\Shop\ShopCapabilities as ShopCapabilitiesBase;
 
@@ -9,6 +10,22 @@ use Siel\Acumulus\Shop\ShopCapabilities as ShopCapabilitiesBase;
  */
 class ShopCapabilities extends ShopCapabilitiesBase
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function getShopEnvironment()
+    {
+        global $wp_version, $woocommerce;
+        $environment = array(
+            // Lazy load is no longer needed (as in L3) as this method will only be
+            // called when the config gets actually queried.
+            'moduleVersion' => Acumulus::create()->getVersionNumber(),
+            'shopName' => $this->shopName,
+            'shopVersion' => (isset($woocommerce) ? $woocommerce->version : 'unknown') . ' (WordPress: ' . $wp_version . ')',
+        );
+        return $environment;
+    }
+
     /**
      * {@inheritdoc}
      */

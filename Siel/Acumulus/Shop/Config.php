@@ -237,7 +237,7 @@ class Config implements ConfigInterface
      */
     public function getConfigStore()
     {
-        return $this->getInstance('ConfigStore', 'Shop', array($this, $this->shopNamespace));
+        return $this->getInstance('ConfigStore', 'Shop', array($this));
     }
 
     /**
@@ -245,7 +245,7 @@ class Config implements ConfigInterface
      */
     public function getShopCapabilities()
     {
-        return $this->getInstance('ShopCapabilities', 'Shop', array($this->getTranslator()));
+        return $this->getInstance('ShopCapabilities', 'Shop', array($this->getTranslator(), $this->shopNamespace));
     }
 
     /**
@@ -633,7 +633,7 @@ class Config implements ConfigInterface
     {
         if ($this->keyInfo === null) {
             $curlVersion = curl_version();
-            $environment = $this->getConfigStore()->getShopEnvironment();
+            $environment = $this->getShopCapabilities()->getShopEnvironment();
             // As utf8 is now commonly accepted, it is a bit difficult to
             // express the set of characters that are allowed for email
             // addresses, so we remove characters not allowed.

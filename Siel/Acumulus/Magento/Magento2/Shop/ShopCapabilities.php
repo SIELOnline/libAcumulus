@@ -13,6 +13,31 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
+    public function getShopEnvironment()
+    {
+        /** @var \Magento\Framework\App\ProductMetadataInterface $productMetadata */
+        $productMetadata = Registry::getInstance()->get('Magento\Framework\App\ProductMetadataInterface');
+        try {
+            $version = $productMetadata->getVersion();
+        } catch (\Exception $e) {
+            // In CLI mode (php bin/magento ...) getVersion() throws an
+            // exception.
+            $version = 'UNKNOWN';
+        }
+
+        $moduleResource = Registry::getInstance()->getModuleResource();
+        $environment = array(
+            'moduleVersion' => $moduleResource->getDbVersion('Siel_AcumulusMa2'),
+            'shopName' => $this->shopName,
+            'shopVersion' => $version,
+        );
+
+        return $environment;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getTokenInfo()
     {
         $order = array(

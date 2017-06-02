@@ -14,21 +14,6 @@ class ConfigStore extends BaSeConfigStore
     /**
      * {@inheritdoc}
      */
-    public function getShopEnvironment()
-    {
-        /** @noinspection PhpUndefinedFieldInspection */
-        $environment = array(
-            'moduleVersion' => Mage::getConfig()->getModuleConfig("Siel_Acumulus")->version,
-            'shopName' => $this->shopName,
-            'shopVersion' => Mage::getVersion(),
-        );
-
-        return $environment;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function load(array $keys)
     {
         $result = array();

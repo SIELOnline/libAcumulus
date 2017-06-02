@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\PrestaShop\Shop;
 
+use Acumulus;
 use Context;
 use Module;
 use OrderState;
@@ -12,6 +13,19 @@ use Siel\Acumulus\Shop\ShopCapabilities as ShopCapabilitiesBase;
  */
 class ShopCapabilities extends ShopCapabilitiesBase
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function getShopEnvironment()
+    {
+        $environment = array(
+            'moduleVersion' => Acumulus::$module_version,
+            'shopName' => $this->shopName,
+            'shopVersion' => _PS_VERSION_,
+        );
+        return $environment;
+    }
+
     /**
      * {@inheritdoc}
      */

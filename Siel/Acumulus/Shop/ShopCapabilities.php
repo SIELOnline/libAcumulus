@@ -14,12 +14,18 @@ abstract class ShopCapabilities implements ShopCapabilitiesInterface
     /** @var \Siel\Acumulus\Helpers\TranslatorInterface */
     protected $translator;
 
+    /** @var string */
+    protected $shopName;
+
     /**
      * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
+     * @param string $shopNamespace
      */
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(TranslatorInterface $translator, $shopNamespace)
     {
         $this->translator = $translator;
+        $pos = strrpos($shopNamespace, '\\');
+        $this->shopName = $pos !== false ? substr($shopNamespace, $pos + 1) : $shopNamespace;
     }
 
     /**

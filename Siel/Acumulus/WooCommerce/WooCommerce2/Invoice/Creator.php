@@ -304,49 +304,39 @@ class Creator extends BaseCreator
      */
     protected function getShippingLine()
     {
-        // Check if a shipping line item exists for this order.
-        $lines = $this->shopSource->get_items(apply_filters('woocommerce_admin_order_item_types', 'shipping'));
-        if (empty($lines)) {
-            return array();
-        }
-
-        // If we have only 1 line, we use it to lookup the tax rate. If we have
-        // multiple lines we use the first line for the name.
+        $line = func_get_arg(0);
         $vatLookupTags = array();
-        $line = reset($lines);
-        if (count($lines) === 1) {
-            $taxes = !empty($line['taxes']) ? maybe_unserialize($line['taxes']) : array();
-            if (count($taxes) === 1) {
-                // @todo: $tax contains amount: can we use that?
-                //$tax = reset($taxes);
-                $vatLookupTags = array(
-                    // Will contain a % at the end of the string.
-                    'meta-lookup-vatrate' => substr(WC_Tax::get_rate_percent(key($taxes)), 0, -1),
-                    'meta-lookup-vatrate-label' => WC_Tax::get_rate_label(key($taxes)),
-                );
-            } else {
-                // Apparently we have free shipping (or a misconfigured shipment
-                // method). Use a fall-back: WooCommerce only knows 1 tax rate
-                // for all shipping methods, stored in config:
-                $shipping_tax_class = get_option('woocommerce_shipping_tax_class');
-                if ( $shipping_tax_class === 'standard') {
-                    $shipping_tax_class = '';
-                }
-                if (is_string($shipping_tax_class)) {
-                    $tax_rates = WC_Tax::get_rates($shipping_tax_class);
-                    if (count($tax_rates) === 1) {
-                        $tax_rate = reset($tax_rates);
-                        $vatLookupTags = array(
-                            'meta-lookup-vatrate' => $tax_rate['rate'],
-                            'meta-lookup-vatrate-label' => $tax_rate['label'],
-                            'meta-lookup-vatrate-source' => "get_option('woocommerce_shipping_tax_class')",
-                        );
-                    }
+        $taxes = !empty($line['taxes']) ? maybe_unserialize($line['taxes']) : array();
+        if (count($taxes) === 1) {
+            // @todo: $tax contains amount: can we use that?
+            //$tax = reset($taxes);
+            $vatLookupTags = array(
+                // Will contain a % at the end of the string.
+                'meta-lookup-vatrate' => substr(WC_Tax::get_rate_percent(key($taxes)), 0, -1),
+                'meta-lookup-vatrate-label' => WC_Tax::get_rate_label(key($taxes)),
+            );
+        } else {
+            // Apparently we have free shipping (or a misconfigured shipment
+            // method). Use a fall-back: WooCommerce only knows 1 tax rate
+            // for all shipping methods, stored in config:
+            $shipping_tax_class = get_option('woocommerce_shipping_tax_class');
+            if ( $shipping_tax_class === 'standard') {
+                $shipping_tax_class = '';
+            }
+            if (is_string($shipping_tax_class)) {
+                $tax_rates = WC_Tax::get_rates($shipping_tax_class);
+                if (count($tax_rates) === 1) {
+                    $tax_rate = reset($tax_rates);
+                    $vatLookupTags = array(
+                        'meta-lookup-vatrate' => $tax_rate['rate'],
+                        'meta-lookup-vatrate-label' => $tax_rate['label'],
+                        'meta-lookup-vatrate-source' => "get_option('woocommerce_shipping_tax_class')",
+                    );
                 }
             }
         }
 
-        // @todo: this is WC2, what about WC3? For now setting precision to 0.01.
+        // Note: this info is WC2 specific.
         // Precision: shipping costs are entered ex VAT, so that may be very
         // precise, but it will be rounded to the cent by WC. For orders, the
         // VAT is as precise as a float can be and is based on the shipping cost
@@ -355,8 +345,7 @@ class Creator extends BaseCreator
         // @todo: to avoid rounding errors, can we get the non-formatted amount?
         $shippingEx = $this->shopSource->get_total_shipping();
         $shippingVat = $this->shopSource->get_shipping_tax();
-//        $precisionNumerator = $this->invoiceSource->getType() === Source::CreditNote ? 0.01 : 0.0001;
-        $precisionNumerator = 0.01;
+        $precisionNumerator = $this->invoiceSource->getType() === Source::CreditNote ? 0.01 : 0.0001;
 
         $result = array(
                 'product' => $this->getShippingMethodName(),

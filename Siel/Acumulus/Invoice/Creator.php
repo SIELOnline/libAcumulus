@@ -3,7 +3,6 @@ namespace Siel\Acumulus\Invoice;
 
 use Siel\Acumulus\Helpers\Countries;
 use Siel\Acumulus\Helpers\Number;
-use Siel\Acumulus\Helpers\Token;
 use Siel\Acumulus\Helpers\TranslatorInterface;
 
 /**
@@ -231,20 +230,6 @@ abstract class Creator
         $this->addDefaultEmpty($customer, 'overwriteifexists', $customerSettings['overwriteIfExists'] ? ConfigInterface::OverwriteIfExists_Yes : ConfigInterface::OverwriteIfExists_No);
         $this->addTokenDefault($customer, 'mark', $customerSettings['mark']);
         return $customer;
-    }
-
-    /**
-     * Wrapper method around Token::expand().
-     *
-     * @param string $pattern
-     *
-     * @return string
-     *   The pattern with tokens expanded with their actual value.
-     */
-    protected function getTokenizedValue($pattern)
-    {
-        $token = $this->config->getToken();
-        return $token->expand($pattern, $this->propertySources);
     }
 
     /**
@@ -625,11 +610,10 @@ abstract class Creator
             $result[] = $line;
         }
 
-        // @todo: allow to get multiple shipping lines.
-        $line = $this->getShippingLine();
-        if ($line) {
-            $line['meta-line-type'] = static::LineType_Shipping;
-            $result[] = $line;
+        $shippingLines = $this->getShippingLines();
+        if ($shippingLines) {
+            $shippingLines = $this->addLineType($shippingLines, static::LineType_Manual);
+            $result = array_merge($result, $shippingLines);
         }
 
         $line = $this->getPaymentFeeLine();
@@ -655,6 +639,26 @@ abstract class Creator
     }
 
     /**
+     * Returns the shipping costs lines.
+     *
+     * This default implementation assumes there will be at most one shipping
+     * line and as such calls the getShippingLine() method. Override if the shop
+     * allows for multiple shipping lines
+     *
+     * @return array[]
+     *   An array of line arrays, empty if there are no shipping fee lines.
+     */
+    protected function getShippingLines()
+    {
+        $result = array();
+        $line = $this->getShippingLine();
+        if ($line) {
+            $result[] = $line;
+        }
+        return $result;
+    }
+
+    /**
      * Returns the shipping costs line.
      *
      * To be able to produce a packing slip, a shipping line should normally be
@@ -663,10 +667,7 @@ abstract class Creator
      * @return array
      *   A line array, empty if there is no shipping fee line.
      */
-    protected function getShippingLine()
-    {
-        return $this->callSourceTypeSpecificMethod(__FUNCTION__, func_get_args());
-    }
+    abstract protected function getShippingLine();
 
     /**
      * Returns the shipment method name.
@@ -785,6 +786,20 @@ abstract class Creator
             }
         }
         return false;
+    }
+
+    /**
+     * Wrapper method around Token::expand().
+     *
+     * @param string $pattern
+     *
+     * @return string
+     *   The pattern with tokens expanded with their actual value.
+     */
+    protected function getTokenizedValue($pattern)
+    {
+        $token = $this->config->getToken();
+        return $token->expand($pattern, $this->propertySources);
     }
 
     /**

@@ -1,0 +1,310 @@
+<?php
+namespace Siel\Acumulus\Helpers;
+
+use ReflectionClass;
+
+/**
+ * Container implements the ContainerInterface to allow other classes to
+ * easily get the correct derived classes of the base classes.
+ */
+class Container implements ContainerInterface
+{
+    /** @const string */
+    const baseNamespace = '\\Siel\\Acumulus\\';
+
+    /** @var string The namespace for the current shop. */
+    protected $shopNamespace;
+
+    /** @var string The namespace for customisations on top of the current shop. */
+    protected $customNamespace;
+
+    /** @var array */
+    protected $instances;
+
+    /** @var bool */
+    protected $moduleSpecificTranslationsAdded = false;
+
+    /** @var string The language to display texts in. */
+    protected $language;
+
+    /**
+     * Constructor.
+     *
+     * @param string $shopNamespace
+     * @param string $language
+     *   A language or locale code, e.g. nl, nl-NL, or en-UK.
+     */
+    public function __construct($shopNamespace, $language)
+    {
+        $this->instances = array();
+        $this->shopNamespace = static::baseNamespace . $shopNamespace;
+        global $sielAcumulusCustomNamespace;
+        $this->customNamespace = !empty($sielAcumulusCustomNamespace) ? $sielAcumulusCustomNamespace : '';
+        $this->language = substr($language, 0, 2);
+        $this->getLog();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setCustomNamespace($customNamespace)
+    {
+        $this->customNamespace = $customNamespace;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTranslator()
+    {
+        /** @var \Siel\Acumulus\Helpers\Translator $translator */
+        $translator = $this->getInstance('Translator', 'Helpers', array($this->language));
+        if (!$this->moduleSpecificTranslationsAdded) {
+            try {
+                /** @var \Siel\Acumulus\Helpers\TranslationCollection $translations */
+                $translations = $this->getInstance('ModuleSpecificTranslations', 'helpers');
+                $translator->add($translations);
+            } catch (\InvalidArgumentException $e) {}
+            $this->moduleSpecificTranslationsAdded = true;
+        }
+        return $translator;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getLog()
+    {
+        return $this->getInstance('Log', 'Helpers', array($this));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMailer()
+    {
+        return $this->getInstance('Mailer', 'Helpers', array($this, $this->getTranslator(), $this->getService()));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getToken()
+    {
+        return $this->getInstance('Token', 'Helpers');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFormRenderer()
+    {
+        return $this->getInstance('FormRenderer', 'Helpers');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getService()
+    {
+        return $this->getInstance('Service', 'Web', array($this->getCommunicator(), $this, $this->getTranslator()));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCommunicator()
+    {
+        return $this->getInstance('Communicator', 'Web', array($this));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSource($invoiceSourceType, $invoiceSourceOrId)
+    {
+        return $this->getInstance('Source', 'Invoice', array($invoiceSourceType, $invoiceSourceOrId), true);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCompletor()
+    {
+        return $this->getInstance('Completor', 'Invoice', array($this, $this->getCompletorInvoiceLines(), $this->getCompletorStrategyLines(), $this->getTranslator(), $this->getService()));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCompletorInvoiceLines()
+    {
+        return $this->getInstance('CompletorInvoiceLines', 'Invoice', array($this, $this->getFlattenerInvoiceLines()));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFlattenerInvoiceLines()
+    {
+        return $this->getInstance('FlattenerInvoiceLines', 'Invoice', array($this));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCompletorStrategyLines()
+    {
+        return $this->getInstance('CompletorStrategyLines', 'Invoice', array($this, $this->getTranslator()));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCreator()
+    {
+        return $this->getInstance('Creator', 'Invoice', array($this, $this->getTranslator()));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getConfigStore()
+    {
+        return $this->getInstance('ConfigStore', 'Shop', array($this));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getShopCapabilities()
+    {
+        return $this->getInstance('ShopCapabilities', 'Shop', array($this->getTranslator(), $this->shopNamespace));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getManager()
+    {
+        return $this->getInstance('InvoiceManager', 'Shop', array($this));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAcumulusEntryModel()
+    {
+        return $this->getInstance('AcumulusEntryModel', 'Shop');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getForm($type)
+    {
+        $class = ucfirst($type);
+        $arguments = array(
+            $this->getTranslator(),
+            $this->getShopCapabilities(),
+        );
+        switch (strtolower($type)) {
+            case 'config':
+                $arguments[] = $this;
+                $arguments[] = $this->getService();
+                break;
+            case 'advanced':
+                $class = 'AdvancedConfig';
+                $arguments[] = $this;
+                $arguments[] = $this->getService();
+                break;
+            case 'batch':
+                $arguments[] = $this->getManager();
+                break;
+        }
+        return $this->getInstance($class . 'Form', 'Shop', $arguments);
+    }
+
+    /**
+     * Returns an instance of the given class.
+     *
+     * The class is taken from the same namespace as the configStore property.
+     * Only 1 instance is created per class.
+     *
+     * @param string $class
+     *   The name of the class without namespace. The namespace is taken from the
+     *   configStore object.
+     * @param string $subNamespace
+     *   The sub namespace (within the shop namespace) in which the class resides.
+     * @param array $constructorArgs
+     *   An array of arguments to pass to the constructor, may be an empty array.
+     * @param bool $newInstance
+     *   Whether to create a new instance or reuse an already existing instance
+     *
+     * @return object
+     *
+     * @throws \InvalidArgumentException
+     * @throws \ReflectionException
+     */
+    protected function getInstance($class, $subNamespace, array $constructorArgs = array(), $newInstance = false)
+    {
+        if (!isset($this->instances[$class]) || $newInstance) {
+            // Try custom namespace.
+            if (!empty($this->customNamespace)) {
+                $fqClass = $this->tryNsInstance($class, $subNamespace, $this->customNamespace);
+            }
+
+            // Try the shop namespace and any parent namespaces.
+            $namespaces = explode('\\', $this->shopNamespace);
+            while (empty($fqClass) && !empty($namespaces)) {
+                $namespace = implode('\\', $namespaces);
+                $fqClass = $this->tryNsInstance($class, $subNamespace, $namespace);
+                array_pop($namespaces);
+            }
+
+            if (empty($fqClass)) {
+                throw new \InvalidArgumentException("Class $class not found in namespace $subNamespace");
+            }
+
+            // Create a new instance.
+            // As PHP5.3 produces a fatal error when a class has no constructor
+            // and newInstanceArgs() is called, we have to differentiate between
+            // no arguments and arguments.
+            if (empty($constructorArgs)) {
+                $this->instances[$class] = new $fqClass();
+            } else {
+                $reflector = new ReflectionClass($fqClass);
+                $this->instances[$class] = $reflector->newInstanceArgs($constructorArgs);
+            }
+        }
+        return $this->instances[$class];
+    }
+
+    protected function tryNsInstance($class, $subNamespace, $namespace)
+    {
+        $fqClass = $namespace . '\\' . $subNamespace . '\\' . $class;
+        $fileName = __DIR__ . DIRECTORY_SEPARATOR . '..' . str_replace('\\', DIRECTORY_SEPARATOR, substr($fqClass, strlen('/Siel/Acumulus'))) . '.php';
+        // Checking if the file exists prevents warnings in Magento whose own
+        // autoloader logs warnings when a class cannot be loaded.
+        return is_readable($fileName) && class_exists($fqClass) ? $fqClass : '';
+    }
+
+    /**
+     * Returns the namespace for the current cms.
+     *
+     * @return string
+     *   The namespace for the current cms or the empty string if the current shop
+     *   is not contained in a CMS namespace.
+     */
+    protected function getCmsNamespace()
+    {
+        // Get parent namespace of the shop namespace.
+        $cmsNamespaceEnd = strrpos($this->shopNamespace, '\\');
+        $cmsNamespace = substr($this->shopNamespace, 0, (int) $cmsNamespaceEnd);
+        // But if that is Acumulus there's no CMS namespace.
+        if (substr($cmsNamespace, -strlen('\\Acumulus')) === '\\Acumulus') {
+            $cmsNamespace = '';
+        }
+        return $cmsNamespace;
+    }
+}

@@ -37,7 +37,6 @@ class Translations extends TranslationCollection
         'fee_adjustment' => 'Kosten (soort onbekend)',
         'discount_adjustment' => 'Handmatige korting',
 
-        // @todo: concept invoices do not send mail. Tell user if emailAsPdf is set.
         'message_warning_no_email' => 'De factuur bevat geen emailadres van de klant. Hierdoor kan er geen relatie in Acumulus aangemaakt of bijgewerkt worden. U kunt zelf in Acumulus een andere relatie aan deze factuur koppelen.',
         'message_warning_no_vat' => 'De factuur bevat geen BTW en er kan niet bepaald worden welk factuurtype (https://wiki.acumulus.nl/index.php?page=127) van toepassing is. Daarom is de factuur als concept opgeslagen. Corrigeer de factuur in Acumulus en controleer uw BTW instellingen.',
         'message_warning_no_vattype' => 'Door een fout in uw instellingen of BTW tarieven, kan het factuurtype (https://wiki.acumulus.nl/index.php?page=127) niet bepaald worden. Daarom is de factuur als concept opgeslagen. Corrigeer de factuur in Acumulus.',
@@ -45,6 +44,7 @@ class Translations extends TranslationCollection
         'message_warning_strategies_failed' => 'Door een fout in uw instellingen of BTW tarieven, konden niet alle fatuurregels correct gecompleteerd worden. Daarom is de factuur als concept opgeslagen. Corrigeer de factuur in Acumulus.',
         'message_warning_multiple_vattype_must_split' => 'De factuur heeft meerdere factuurtypes (https://wiki.acumulus.nl/index.php?page=127). Daarom is de factuur als concept opgeslagen. Splits de factuur in Acumulus en verdeel de regels over beide facturen gebaseerd op het BTW type waar de regel onder valt.',
         'message_warning_multiple_vattype_may_split' => 'De factuur kan meerdere factuurtypes hebben (https://wiki.acumulus.nl/index.php?page=127). Daarom is de factuur als concept opgeslagen. Controleer het BTW type van de factuur in Acumulus en corrigeer deze indien nodig, of splits de factuur en verdeel de regels over beide facturen gebaseerd op het BTW type waar de regel onder valt.',
+        'message_warning_no_pdf' => 'Vanwege deze waarschuwing is er ook geen PDF factuur naar de klant verstuurd. U dient dit handmatig alsnog te doen.',
     );
 
     protected $en = array(
@@ -82,5 +82,6 @@ class Translations extends TranslationCollection
         'message_warning_strategies_failed' => 'Due to an error in your settings or VAT rates, we could not complete all invoice lines correctly. The invoice has been saved as concept. Correct the invoice in Acumulus.',
         'message_warning_multiple_vattype_must_split' => 'The invoice has multiple invoice types (https://wiki.acumulus.nl/index.php?page=127). The invoice has been saved as concept. Split the invoice in Acumulus and divide the invoice lines over both invoices based on the VAT type the line belongs to.',
         'message_warning_multiple_vattype_may_split' => 'The invoice can have multiple invoice types (https://wiki.acumulus.nl/index.php?page=127). The invoice has been saved as concept. Check the VAT type of the invoice in Acumulus and correct if necessary, or split the invoice and divide the invoice lines over both invoices based on the VAT type the line belongs to.',
+        'message_warning_no_pdf' => 'Because of this warning no invoice PDF has been sent. You will have to do so manually.',
     );
 }

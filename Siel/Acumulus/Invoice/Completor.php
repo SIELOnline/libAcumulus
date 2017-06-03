@@ -192,12 +192,7 @@ class Completor
         if ($this->strategyLineCompletor->invoiceHasStrategyLine()) {
             // We did not manage to correct all strategy lines: warn and set the
             // invoice to concept.
-            $this->messages['warnings'][] = array(
-                'code' => '',
-                'codetag' => '',
-                'message' => $this->t('message_warning_strategies_failed'),
-            );
-            $this->invoice['customer']['invoice']['concept'] = ConfigInterface::Concept_Yes;
+            $this->changeInvoiceToConcept('message_warning_strategies_failed');
         }
 
         // Determine the VAT type and warn if multiple vat types are possible.
@@ -212,13 +207,8 @@ class Completor
         {
             $shopSettings = $this->config->getShopSettings();
             $vatFreeProducts = $shopSettings['vatFreeProducts'];
-            if ($vatFreeProducts ===  ConfigInterface::VatFreeProducts_No) {
-                $this->messages['warnings'][] = array(
-                    'code' => '',
-                    'codetag' => '',
-                    'message' => $this->t('message_warning_line_without_vat'),
-                );
-                $this->invoice['customer']['invoice']['concept'] = ConfigInterface::Concept_Yes;
+            if ($vatFreeProducts === ConfigInterface::VatFreeProducts_No) {
+                $this->changeInvoiceToConcept('message_warning_line_without_vat');
             }
         }
 
@@ -306,14 +296,9 @@ class Completor
                     // 0-amount invoices that could be corrected after all, plus
                     // that it often (always) appeared in combination with other
                     // warnings.
-//                    $this->messages['warnings'][] = array(
-//                        'code' => '',
-//                        'codetag' => '',
-//                        'message' => $this->t('message_warning_no_vat'),
-//                    );
                     $possibleVatTypes[] = ConfigInterface::VatType_National;
                     $possibleVatTypes[] = $this->isNl() ? ConfigInterface::VatType_NationalReversed : ConfigInterface::VatType_EuReversed;
-                    $this->invoice['customer']['invoice']['concept'] = ConfigInterface::Concept_Yes;
+                    $this->changeInvoiceToConcept(''/*'message_warning_no_vat'*/);
                 }
             }
         }
@@ -650,13 +635,9 @@ class Completor
             }
 
             if (!empty($message)) {
-                // Make the invoice a concept, so it can be changed in Acumulus and add message and meta info.
-                $this->messages['warnings'][] = array(
-                    'code' => '',
-                    'codetag' => '',
-                    'message' => $this->t($message),
-                );
-                $this->invoice['customer']['invoice']['concept'] = ConfigInterface::Concept_Yes;
+                // Make the invoice a concept, so it can be changed in Acumulus
+                // and add message and meta info.
+                $this->changeInvoiceToConcept($message);
                 $this->invoice['customer']['invoice']['meta-vattypes-possible'] = implode(',', $metaPossibleVatTypes);
             }
         }
@@ -672,9 +653,10 @@ class Completor
      * This method may return multiple vat types because:
      * - If vat types share equal vat rates we cannot make a choice (e.g. NL and
      *   BE high VAT rates are equal).
-     * - If the invoice ought to be split into multiple invoices because multiple
-     *   vat regimes apply (digital services and normal goods) (e.g. both the FR
-     *   20% high rate and the NL 21% high rate appear on the invoice).
+     * - If the invoice ought to be split into multiple invoices because
+     *   multiple vat regimes apply (digital services and normal goods) (e.g.
+     *   both the FR 20% high rate and the NL 21% high rate appear on the
+     *   invoice).
      *
      * @return int[]
      *   List of possible vat type for this invoice (keyed by the vat types).
@@ -701,13 +683,13 @@ class Completor
                     $lineVatTypes = array();
                     foreach ($this->possibleVatRates as $vatRateInfo) {
                         if ($vatRateInfo['vatrate'] == $line['vatrate']) {
-                            // Ensure that the values remain unique by keying them.
+                            // Add the value also as key to ensure uniqueness.
                             $invoiceVatTypes[$vatRateInfo['vattype']] = $vatRateInfo['vattype'];
                             $lineVatTypes[$vatRateInfo['vattype']] = $vatRateInfo['vattype'];
                         }
                     }
                 } else {
-                    // Reduce the possible vat types to those that do know a zero rate.
+                    // Reduce the vat types to those that have a zero rate.
                     $lineVatTypes = array_intersect($this->possibleVatTypes, $zeroRateVatTypes);
                     foreach ($lineVatTypes AS $lineVatType) {
                         $invoiceVatTypes[$lineVatType] = $lineVatType;
@@ -944,5 +926,29 @@ class Completor
     protected function isCompany()
     {
         return !empty($this->invoice['customer']['companyname1']) && !empty($this->invoice['customer']['vatnumber']);
+    }
+
+    /**
+     * Makes the invoice a concept invoice and optionally adds a warning.
+     *
+     * @param string $messageKey
+     *   The key of the message to add as warning,  or the empty string if no
+     *   warning has to be added.
+     */
+    protected function changeInvoiceToConcept($messageKey)
+    {
+        if ($messageKey !== '') {
+            $message = $this->t($messageKey);
+            $emailAsPdfSettings = $this->config->getEmailAsPdfSettings();
+            if ($emailAsPdfSettings['emailAsPdf']) {
+                $message .= ' ' . $this->t('message_warning_no_pdf');
+            }
+            $this->messages['warnings'][] = array(
+                'code' => '',
+                'codetag' => '',
+                'message' => $message,
+            );
+        }
+        $this->invoice['customer']['invoice']['concept'] = ConfigInterface::Concept_Yes;
     }
 }

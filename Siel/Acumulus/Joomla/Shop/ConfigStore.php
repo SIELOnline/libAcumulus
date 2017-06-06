@@ -2,10 +2,7 @@
 namespace Siel\Acumulus\Joomla\Shop;
 
 use JComponentHelper;
-use JLoader;
-use JModelLegacy;
 use JTable;
-use JTableExtension;
 use Siel\Acumulus\Shop\ConfigStore as BaseConfigStore;
 
 /**
@@ -51,35 +48,46 @@ class ConfigStore extends BaSeConfigStore
      */
     public function save(array $values)
     {
-        // When the values are loaded in the same request, the new values are not
-        // retrieved: store a copy of them here to merge them when loading.
+        // When the values are loaded in the same request, the new values are
+        // not retrieved: store a copy of them here to merge them when loading.
         $this->savedValues = $values;
 
-        // Place the values in the component record.
-        /** @var \stdClass|array $component */
+        // Get the currently stored values.
         $component = JComponentHelper::getComponent('com_acumulus');
-        $component = (array) $component;
-        if (is_object($component['params'])) {
+        if (get_class($component) === 'JComponentRecord') {
+            // Joomla 3.7+
+            /** @var \JComponentRecord $component */
+            $data = $component->getParams()->toArray();
+            $id = $component->id;
+        } else {
+            // Joomla 3.6.x-
+            /** @var \stdClass|array $component */
+            $component = (array) $component;
             /** @var \Joomla\Registry\Registry $params */
             $params = $component['params'];
             $data = $params->toArray();
+            $id = $component['id'];
         }
 
+        // Update the values with the form values.
         $defaults = $this->acumulusConfig->getDefaults();
         foreach ($values as $key => $value) {
-            if ((isset($defaults[$key]) && $defaults[$key] === $value) || $value === null) {
+            if ((isset($defaults[$key]) && $defaults[$key] === $value) || $value === NULL) {
                 unset($data[$key]);
-            } else {
+            }
+            else {
                 $data[$key] = $value;
             }
         }
-        $component['params'] = $data;
 
-        // Use save method of com_config component model.
-        JLoader::registerPrefix('Config', JPATH_ROOT . '/components/com_config');
-        JModelLegacy::addIncludePath(JPATH_ADMINISTRATOR . DIRECTORY_SEPARATOR . 'components' . DIRECTORY_SEPARATOR . 'com_config' . DIRECTORY_SEPARATOR . 'model');
-        /** @var \ConfigModelComponent $model */
-        $model = JModelLegacy::getInstance('Component', 'ConfigModel', array('ignore_request' => true));
-        return $model->save($component);
+        // Store the values directly in the extension table.
+        $table = JTable::getInstance('extension');
+        $result = $table->load($id);
+        if ($result) {
+            // Data is stored as a json encoded array.
+            $table->set('params', json_encode($data));
+            $result = $table->store();
+        }
+        return $result;
     }
 }

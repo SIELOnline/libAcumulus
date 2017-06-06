@@ -1,6 +1,8 @@
 <?php
 namespace Siel\Acumulus\Shop;
 
+use Siel\Acumulus\Helpers\Log;
+
 /**
  * Represents acumulus entry records.
  *
@@ -21,6 +23,19 @@ namespace Siel\Acumulus\Shop;
  */
 abstract class AcumulusEntryModel
 {
+    /** @var \Siel\Acumulus\Helpers\Log */
+    protected $log;
+
+    /**
+     * AcumulusEntryModel constructor.
+     *
+     * @param \Siel\Acumulus\Helpers\Log $log
+     */
+    public function __construct(Log $log)
+    {
+        $this->log = $log;
+    }
+
     /**
      * Returns the Acumulus entry record for the given entry id.
      *

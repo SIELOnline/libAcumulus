@@ -5,6 +5,8 @@ use DOMDocument;
 use DOMElement;
 use Exception;
 use LibXMLError;
+use Siel\Acumulus\Shop\ConfigInterface as ShopConfigInterface;
+use Siel\Acumulus\Helpers\Log;
 
 /**
  * Communication implements the communication with the Acumulus WebAPI.
@@ -17,8 +19,11 @@ use LibXMLError;
  */
 class Communicator implements CommunicatorInterface
 {
-    /** @var \Siel\Acumulus\Web\ConfigInterface */
+    /** @var \Siel\Acumulus\Shop\ConfigInterface */
     protected $config;
+
+    /** @var \Siel\Acumulus\Helpers\Log */
+    protected $log;
 
     /** @var array */
     protected $warnings;
@@ -26,10 +31,17 @@ class Communicator implements CommunicatorInterface
     /** @var array */
     protected $errors;
 
-    public function __construct(ConfigInterface $config)
-    {
+    /**
+     * Communicator constructor.
+     *
+     * @param \Siel\Acumulus\Shop\ConfigInterface $config
+     * @param \Siel\Acumulus\Helpers\Log $log
+     */
+    public function __construct(ShopConfigInterface $config, Log $log) {
         $this->config = $config;
+        $this->log = $log;
     }
+
 
     /**
      * Sends a message to the given API function and returns the results.
@@ -195,7 +207,7 @@ class Communicator implements CommunicatorInterface
 
         if ($response) {
             $resultBase['trace']['response'] = $response;
-            $this->config->getLog()->debug('sendApiMessage(uri="%s", message="%s"), response="%s"',
+            $this->log->debug('sendApiMessage(uri="%s", message="%s"), response="%s"',
                 $uri, $resultBase['trace']['request'], $resultBase['trace']['response']);
 
             $result = false;
@@ -230,7 +242,7 @@ class Communicator implements CommunicatorInterface
                 $resultBase += $result;
             }
         } else {
-            $this->config->getLog()->debug('sendApiMessage(uri="%s", message="%s"): failure',
+            $this->log->debug('sendApiMessage(uri="%s", message="%s"): failure',
                 $uri, $resultBase['trace']['request']);
         }
 

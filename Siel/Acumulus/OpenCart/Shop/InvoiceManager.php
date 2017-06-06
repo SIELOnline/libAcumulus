@@ -2,6 +2,7 @@
 namespace Siel\Acumulus\OpenCart\Shop;
 
 use DateTime;
+use Siel\Acumulus\Helpers\ContainerInterface;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
 use Siel\Acumulus\PrestaShop\Invoice\Source;
 use Siel\Acumulus\Shop\Config;
@@ -21,9 +22,9 @@ class InvoiceManager extends BaseInvoiceManager
     /**
      * {@inheritdoc}
      */
-    public function __construct(Config $config)
+    public function __construct(ContainerInterface $container)
     {
-        parent::__construct($config);
+        parent::__construct($container);
         $this->tableInfo = array(
             Source::Order => array(
                 'table' => DB_PREFIX . 'order',

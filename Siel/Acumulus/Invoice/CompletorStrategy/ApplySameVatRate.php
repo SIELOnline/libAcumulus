@@ -59,7 +59,7 @@ class ApplySameVatRate extends CompletorStrategyBase
             $vatAmount += $this->completeLine($line2Complete, $vatRate);
         }
 
-        Log::getInstance()->notice("ApplySameVatRate::tryVatRate($vatRate) results in %f", $vatAmount);
+        $this->invoice['customer']['invoice']['meta-competor-strategy-' . $this->getName()] = "tryVatRate($vatRate): $vatAmount";
         // If the vat totals are equal, the strategy worked.
         // We allow for a reasonable margin, as rounding errors may add up.
         return Number::floatsAreEqual($vatAmount, $this->vat2Divide, 0.04);

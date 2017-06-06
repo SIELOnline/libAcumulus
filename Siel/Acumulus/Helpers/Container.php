@@ -41,7 +41,6 @@ class Container implements ContainerInterface
         global $sielAcumulusCustomNamespace;
         $this->customNamespace = !empty($sielAcumulusCustomNamespace) ? $sielAcumulusCustomNamespace : '';
         $this->language = substr($language, 0, 2);
-        $this->getLog();
     }
 
     /**
@@ -75,7 +74,15 @@ class Container implements ContainerInterface
      */
     public function getLog()
     {
-        return $this->getInstance('Log', 'Helpers', array($this));
+        return $this->getInstance('Log', 'Helpers');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRequirements()
+    {
+        return $this->getInstance('Requirements', 'Helpers');
     }
 
     /**
@@ -83,7 +90,7 @@ class Container implements ContainerInterface
      */
     public function getMailer()
     {
-        return $this->getInstance('Mailer', 'Helpers', array($this, $this->getTranslator(), $this->getService()));
+        return $this->getInstance('Mailer', 'Helpers', array($this->getConfig(), $this->getTranslator(), $this->getService(), $this->getLog()));
     }
 
     /**
@@ -91,7 +98,7 @@ class Container implements ContainerInterface
      */
     public function getToken()
     {
-        return $this->getInstance('Token', 'Helpers');
+        return $this->getInstance('Token', 'Helpers', array($this->getLog()));
     }
 
     /**
@@ -105,9 +112,17 @@ class Container implements ContainerInterface
     /**
      * {@inheritdoc}
      */
+    public function getFormMapper()
+    {
+        return $this->getInstance('FormMapper', 'Helpers', array($this->getLog()));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getService()
     {
-        return $this->getInstance('Service', 'Web', array($this->getCommunicator(), $this, $this->getTranslator()));
+        return $this->getInstance('Service', 'Web', array($this->getCommunicator(), $this->getConfig(), $this->getTranslator()));
     }
 
     /**
@@ -115,7 +130,7 @@ class Container implements ContainerInterface
      */
     public function getCommunicator()
     {
-        return $this->getInstance('Communicator', 'Web', array($this));
+        return $this->getInstance('Communicator', 'Web', array($this->getConfig(), $this->getLog()));
     }
 
     /**
@@ -131,7 +146,7 @@ class Container implements ContainerInterface
      */
     public function getCompletor()
     {
-        return $this->getInstance('Completor', 'Invoice', array($this, $this->getCompletorInvoiceLines(), $this->getCompletorStrategyLines(), $this->getTranslator(), $this->getService()));
+        return $this->getInstance('Completor', 'Invoice', array($this->getConfig(), $this->getCompletorInvoiceLines(), $this->getCompletorStrategyLines(), $this->getTranslator(), $this->getService()));
     }
 
     /**
@@ -139,7 +154,7 @@ class Container implements ContainerInterface
      */
     public function getCompletorInvoiceLines()
     {
-        return $this->getInstance('CompletorInvoiceLines', 'Invoice', array($this, $this->getFlattenerInvoiceLines()));
+        return $this->getInstance('CompletorInvoiceLines', 'Invoice', array($this->getConfig(), $this->getFlattenerInvoiceLines()));
     }
 
     /**
@@ -147,7 +162,7 @@ class Container implements ContainerInterface
      */
     public function getFlattenerInvoiceLines()
     {
-        return $this->getInstance('FlattenerInvoiceLines', 'Invoice', array($this));
+        return $this->getInstance('FlattenerInvoiceLines', 'Invoice', array($this->getConfig()));
     }
 
     /**
@@ -155,7 +170,7 @@ class Container implements ContainerInterface
      */
     public function getCompletorStrategyLines()
     {
-        return $this->getInstance('CompletorStrategyLines', 'Invoice', array($this, $this->getTranslator()));
+        return $this->getInstance('CompletorStrategyLines', 'Invoice', array($this->getConfig(), $this->getTranslator()));
     }
 
     /**
@@ -163,7 +178,29 @@ class Container implements ContainerInterface
      */
     public function getCreator()
     {
-        return $this->getInstance('Creator', 'Invoice', array($this, $this->getTranslator()));
+        return $this->getInstance('Creator', 'Invoice', array($this->getConfig(), $this->getToken(), $this->getTranslator(), $this->getLog()));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getConfig()
+    {
+        static $is1stTime = true;
+
+        $log = $this->getLog();
+        $configStore = $this->getConfigStore();
+        $result = $this->getInstance('Config', 'Shop', array($configStore, $this->getShopCapabilities(), $this->getTranslator(), $log));
+        if ($is1stTime) {
+            $configStore->setConfig($result);
+            $pluginSettings = $result->getPluginSettings();
+            $environment = $result->getEnvironment();
+            $log->setLogLevel($pluginSettings['logLevel']);
+            $log->setLibraryVersion($environment['libraryVersion']);
+            $configStore->setConfig($result);
+            $is1stTime = false;
+        }
+        return $result;
     }
 
     /**
@@ -171,7 +208,7 @@ class Container implements ContainerInterface
      */
     public function getConfigStore()
     {
-        return $this->getInstance('ConfigStore', 'Shop', array($this));
+        return $this->getInstance('ConfigStore', 'Shop');
     }
 
     /**
@@ -179,7 +216,7 @@ class Container implements ContainerInterface
      */
     public function getShopCapabilities()
     {
-        return $this->getInstance('ShopCapabilities', 'Shop', array($this->getTranslator(), $this->shopNamespace));
+        return $this->getInstance('ShopCapabilities', 'Shop', array($this->getTranslator(), $this->shopNamespace, $this->getLog()));
     }
 
     /**
@@ -195,7 +232,7 @@ class Container implements ContainerInterface
      */
     public function getAcumulusEntryModel()
     {
-        return $this->getInstance('AcumulusEntryModel', 'Shop');
+        return $this->getInstance('AcumulusEntryModel', 'Shop', array($this->getLog()));
     }
 
     /**
@@ -210,12 +247,12 @@ class Container implements ContainerInterface
         );
         switch (strtolower($type)) {
             case 'config':
-                $arguments[] = $this;
+                $arguments[] = $this->getConfig();
                 $arguments[] = $this->getService();
                 break;
             case 'advanced':
                 $class = 'AdvancedConfig';
-                $arguments[] = $this;
+                $arguments[] = $this->getConfig();
                 $arguments[] = $this->getService();
                 break;
             case 'batch':

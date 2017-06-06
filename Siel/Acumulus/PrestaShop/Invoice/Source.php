@@ -118,7 +118,7 @@ class Source extends BaseSource
      */
     protected function addProperties()
     {
-        $row = Db::getInstance()->executeS(sprintf("SELECT * FROM `%s` WHERE `%s` = %u",
+        $row = Db::getInstance()->executeS(sprintf('SELECT * FROM `%s` WHERE `%s` = %u',
             _DB_PREFIX_ . OrderSlip::$definition['table'], OrderSlip::$definition['primary'], $this->id));
         // Get 1st (and only) result.
         $row = reset($row);

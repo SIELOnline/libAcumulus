@@ -2,10 +2,12 @@
 namespace Siel\Acumulus\Joomla\Shop;
 
 use JRoute;
+use JTable;
+use JTableExtension;
 use Siel\Acumulus\Shop\ShopCapabilities as ShopCapabilitiesBase;
 
 /**
- * Defines Joiomla webshops specific capabilities.
+ * Defines Joomla webshops specific capabilities.
  */
 abstract class ShopCapabilities extends ShopCapabilitiesBase
 {

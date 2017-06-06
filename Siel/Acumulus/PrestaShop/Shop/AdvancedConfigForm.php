@@ -2,8 +2,8 @@
 namespace Siel\Acumulus\PrestaShop\Shop;
 
 use Siel\Acumulus\Helpers\TranslatorInterface;
-use Siel\Acumulus\Shop\Config;
 use Siel\Acumulus\Shop\AdvancedConfigForm as BaseAdvancedConfigForm;
+use Siel\Acumulus\Shop\ConfigInterface;
 use Siel\Acumulus\Shop\ShopCapabilitiesInterface;
 use Siel\Acumulus\Web\Service;
 use Tools;
@@ -23,9 +23,9 @@ class AdvancedConfigForm extends BaseAdvancedConfigForm
      * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
      * @param \Siel\Acumulus\Shop\ShopCapabilitiesInterface $shopCapabilities
      * @param \Siel\Acumulus\Web\Service $service
-     * @param \Siel\Acumulus\Shop\Config $config
+     * @param \Siel\Acumulus\Shop\ConfigInterface $config
      */
-    public function __construct(TranslatorInterface $translator, ShopCapabilitiesInterface $shopCapabilities, Config $config, Service $service)
+    public function __construct(TranslatorInterface $translator, ShopCapabilitiesInterface $shopCapabilities, ConfigInterface $config, Service $service)
     {
         parent::__construct($translator, $shopCapabilities, $config, $service);
         $this->moduleName = 'acumulus';

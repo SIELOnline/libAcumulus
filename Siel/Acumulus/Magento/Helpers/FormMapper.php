@@ -1,23 +1,41 @@
 <?php
 namespace Siel\Acumulus\Magento\Helpers;
 
+use Siel\Acumulus\Helpers\Form;
 use Siel\Acumulus\Helpers\Log;
+use Siel\Acumulus\Helpers\FormMapper as BaseFormMapper;
 
 /**
  * Class FormMapper maps an Acumulus form definition to a Magento form
  * definition.
  */
-class FormMapper
+class FormMapper extends BaseFormMapper
 {
+
     /**
-     * Maps a set of field definitions.
+     * The slug-name of the settings page on which to show the section.
      *
-     * @param \Varien_Data_Form_Abstract|\Magento\Framework\Data\Form\AbstractForm $form
-     * @param array[] $fields
+     * @var \Varien_Data_Form_Abstract|\Magento\Framework\Data\Form\AbstractForm
      */
-    public function map($form, array $fields)
+    protected $magentoForm;
+
+    /**
+     * @param \Magento\Framework\Data\Form\AbstractForm|\Varien_Data_Form_Abstract $magentoForm
+     *
+     * @return $this
+     */
+    public function setMagentoForm($magentoForm)
     {
-        $this->fields($form, $fields);
+        $this->magentoForm = $magentoForm;
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function map(Form $form)
+    {
+        $this->fields($this->magentoForm, $form->getFields());
     }
 
     /**
@@ -186,7 +204,7 @@ class FormMapper
                 $result = array('values' => $this->getMagentoOptions($value));
                 break;
             default:
-                Log::getInstance()->warning(__METHOD__ . "Unknown key '$key'");
+                $this->log->warning(__METHOD__ . "Unknown key '$key'");
                 $result = array($key => $value);
                 break;
         }

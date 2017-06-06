@@ -1,9 +1,9 @@
 <?php
 namespace Siel\Acumulus\OpenCart\Helpers;
 
+use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Requirements;
 use Siel\Acumulus\Invoice\Source;
-use Siel\Acumulus\Shop\Config as ShopConfig;
 use Siel\Acumulus\Shop\ModuleTranslations;
 use Siel\Acumulus\Web\ConfigInterface;
 
@@ -13,8 +13,8 @@ use Siel\Acumulus\Web\ConfigInterface;
  */
 class OcHelper
 {
-    /** @var \Siel\Acumulus\Shop\Config */
-    protected $acumulusConfig = null;
+    /** @var \Siel\Acumulus\Helpers\ContainerInterface */
+    protected $container = null;
 
     /** @var array */
     public $data;
@@ -74,13 +74,13 @@ class OcHelper
      */
     protected function init()
     {
-        if ($this->acumulusConfig === null) {
+        if ($this->container === null) {
             $languageCode = $this->registry->language->get('code');
             if (empty($languageCode)) {
                 $languageCode = 'nl';
             }
-            $this->acumulusConfig = new ShopConfig($this->shopNamespace, $languageCode);
-            $this->acumulusConfig->getTranslator()->add(new ModuleTranslations());
+            $this->container = new Container($this->shopNamespace, $languageCode);
+            $this->container->getTranslator()->add(new ModuleTranslations());
         }
     }
 
@@ -96,7 +96,7 @@ class OcHelper
      */
     protected function t($key)
     {
-        return $this->acumulusConfig->getTranslator()->get($key);
+        return $this->container->getTranslator()->get($key);
     }
 
     /**
@@ -194,8 +194,8 @@ class OcHelper
      */
     public function eventOrderUpdate($order_id) {
         $this->init();
-        $source = $this->acumulusConfig->getSource(Source::Order, $order_id);
-        $this->acumulusConfig->getManager()->sourceStatusChange($source);
+        $source = $this->container->getSource(Source::Order, $order_id);
+        $this->container->getManager()->sourceStatusChange($source);
     }
 
     /**
@@ -207,7 +207,7 @@ class OcHelper
     {
         $this->init();
 
-        $this->form = $this->acumulusConfig->getForm($task);
+        $this->form = $this->container->getForm($task);
 
         $this->registry->document->addStyle('view/stylesheet/acumulus.css');
 
@@ -253,7 +253,7 @@ class OcHelper
         }
 
         $this->data['form'] = $this->form;
-        $this->data['formRenderer'] = $this->acumulusConfig->getFormRenderer();
+        $this->data['formRenderer'] = $this->container->getFormRenderer();
 
         // Complete the breadcrumb with the current path.
         $link = 'module/acumulus';
@@ -289,7 +289,7 @@ class OcHelper
         $setting = $this->registry->model_setting_setting->getSetting('acumulus_siel');
         $currentDataModelVersion = isset($setting['acumulus_siel_datamodel_version']) ? $setting['acumulus_siel_datamodel_version'] : '';
 
-        Log::getInstance()->info('%s: current version = %s', __METHOD__, $currentDataModelVersion);
+        $this->container->getLog()->info('%s: current version = %s', __METHOD__, $currentDataModelVersion);
 
         if ($currentDataModelVersion === '' || version_compare($currentDataModelVersion, '4.0', '<')) {
             // Check requirements (we assume this has been done successfully
@@ -298,20 +298,20 @@ class OcHelper
             $messages = $requirements->check();
             foreach ($messages as $message) {
                 $this->addError($message['message']);
-                Log::getInstance()->error($message['message']);
+                $this->container->getLog()->error($message['message']);
             }
             if (!empty($messages)) {
                 return false;
             }
 
             // Install tables.
-            if ($result = $this->acumulusConfig->getAcumulusEntryModel()->install()) {
+            if ($result = $this->container->getAcumulusEntryModel()->install()) {
                 $setting['acumulus_siel_datamodel_version'] = '4.0';
                 $this->registry->model_setting_setting->editSetting('acumulus_siel', $setting);
             }
         } elseif (version_compare($currentDataModelVersion, '4.4', '<')) {
             // Update table columns.
-            if ($result = $this->acumulusConfig->getAcumulusEntryModel()->upgrade('4.4.0')) {
+            if ($result = $this->container->getAcumulusEntryModel()->upgrade('4.4.0')) {
                 // @todo: set to ConfigInterface::libraryVersion ? (as in doUpgrade()?)
                 $setting['acumulus_siel_datamodel_version'] = '4.4';
                 $this->registry->model_setting_setting->editSetting('acumulus_siel', $setting);
@@ -330,7 +330,7 @@ class OcHelper
     protected function doUninstall()
     {
         $this->init();
-        $this->acumulusConfig->getAcumulusEntryModel()->uninstall();
+        $this->container->getAcumulusEntryModel()->uninstall();
 
         // Delete all config values.
         $this->registry->load->model('setting/setting');
@@ -360,11 +360,11 @@ class OcHelper
         $currentDataModelVersion = isset($setting['acumulus_siel_datamodel_version']) ? $setting['acumulus_siel_datamodel_version'] : '';
         $apiVersion = ConfigInterface::libraryVersion;
 
-        Log::getInstance()->info('%s: installed version = %s, API = %s', __METHOD__, $currentDataModelVersion, $apiVersion);
+        $this->container->getLog()->info('%s: installed version = %s, API = %s', __METHOD__, $currentDataModelVersion, $apiVersion);
 
         if (version_compare($currentDataModelVersion, $apiVersion, '<')) {
             // Update config settings.
-            if ($result = $this->acumulusConfig->upgrade($currentDataModelVersion)) {
+            if ($result = $this->container->getConfig()->upgrade($currentDataModelVersion)) {
                 // Refresh settings.
                 $setting = $this->registry->model_setting_setting->getSetting('acumulus_siel');
                 $setting['acumulus_siel_datamodel_version'] = $apiVersion;

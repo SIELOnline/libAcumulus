@@ -1,9 +1,4 @@
 <?php
-/**
- * @file
- * Contains ${NAMESPACE}${NAME}.
- */
-
 namespace Siel\Acumulus\Shop;
 
 use Siel\Acumulus\Helpers\Form;
@@ -38,6 +33,7 @@ class ConfirmUninstallForm extends Form
     protected function execute()
     {
         // @todo: Implement execute() method.
+        return true;
     }
 
     /**

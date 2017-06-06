@@ -2,8 +2,7 @@
 namespace Siel\Acumulus\WooCommerce\Shop;
 
 use Siel\Acumulus\Shop\AcumulusEntryModel as BaseAcumulusEntryModel;
-use Siel\Acumulus\WooCommerce\Helpers\Log;
-use Siel\Acumulus\WooCommerce\Invoice\Source;
+use Siel\Acumulus\Invoice\Source;
 
 /**
  * Implements the WooCommerce/WordPress specific acumulus entry model class.
@@ -36,7 +35,7 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
             case 'shop_order_refund':
                 return Source::CreditNote;
             default:
-                Log::getInstance()->error('InvoiceManager::shopTypeToSourceType(%s): unknown', $shopType);
+                $this->log->error('InvoiceManager::shopTypeToSourceType(%s): unknown', $shopType);
                 return '';
         }
     }

@@ -10,7 +10,7 @@ use Siel\Acumulus\Web\ConfigInterface as WebConfigInterface;
  * Configuration is stored in the host environment, normally a web shop.
  * This interface abstracts from how a specific web shop does so.
  */
-interface ConfigInterface extends InvoiceConfigInterface, WebConfigInterface, InjectorInterface
+interface ConfigInterface extends InvoiceConfigInterface, WebConfigInterface
 {
     // Invoice send handling related constants. These can be combined with a
     // send Status_... const (bits 1 to 3).
@@ -72,4 +72,17 @@ interface ConfigInterface extends InvoiceConfigInterface, WebConfigInterface, In
      *   - sendEmptyInvoice
      */
     public function getShopEventSettings();
+
+    /**
+     * Upgrade the datamodel to the given version.
+     *
+     * This method is only called when the module gets updated.
+     *
+     * @param string $currentVersion
+     *   The current version of the module.
+     *
+     * @return bool
+     *   Success.
+     */
+    public function upgrade($currentVersion);
 }

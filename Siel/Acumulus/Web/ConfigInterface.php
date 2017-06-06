@@ -86,11 +86,4 @@ interface ConfigInterface
      *   - outputFormat
      */
     public function getPluginSettings();
-
-    /**
-     * @return \Siel\Acumulus\Helpers\Log
-     *
-     * @todo: move to InjectorInterface?
-     */
-    public function getLog();
 }

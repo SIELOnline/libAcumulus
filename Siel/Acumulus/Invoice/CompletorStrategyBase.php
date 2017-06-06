@@ -325,8 +325,8 @@ abstract class CompletorStrategyBase
         if ($this->checkPreconditions()) {
             return $this->execute();
         } else {
-            Log::getInstance()->notice("%s::checkPreconditions() returned false", $this->getName());
-            return FALSE;
+            $this->invoice['customer']['invoice']['meta-competor-strategy-preconditions-failed'] = $this->getName();
+            return false;
         }
     }
 

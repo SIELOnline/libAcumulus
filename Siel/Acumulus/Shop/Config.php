@@ -1,7 +1,6 @@
 <?php
 namespace Siel\Acumulus\Shop;
 
-use ReflectionClass;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Invoice\ConfigInterface as InvoiceConfigInterface;
@@ -21,8 +20,17 @@ use Siel\Acumulus\Web\ConfigInterface as ServiceConfigInterface;
  */
 class Config implements ConfigInterface
 {
-    /** @const string */
-    const baseNamespace = '\\Siel\\Acumulus\\';
+    /** @var \Siel\Acumulus\Shop\ConfigStoreInterface */
+    protected $configStore;
+
+    /** @var \Siel\Acumulus\Shop\ShopCapabilitiesInterface */
+    protected $shopCapabilities;
+
+    /** @var \Siel\Acumulus\Helpers\Translator */
+    protected $translator;
+
+    /** @var \Siel\Acumulus\Helpers\Log */
+    protected $log;
 
     /** @var array[]|null */
     protected $keyInfo;
@@ -30,42 +38,27 @@ class Config implements ConfigInterface
     /** @var bool */
     protected $isConfigurationLoaded;
 
-    /** @var bool */
-    protected $moduleSpecificTranslationsAdded = false;
-
     /** @var array */
     protected $values;
 
-    /** @var array */
-    protected $instances;
-
-    /** @var string The namespace for the current shop. */
-    protected $shopNamespace;
-
-    /** @var string The namespace for customisations on top of the current shop. */
-    protected $customNamespace;
-
-    /** @var string The language to display texts in. */
-    protected $language;
-
     /**
-     * Constructor.
+     * Config constructor.
      *
-     * @param string $shopNamespace
-     * @param string $language
-     *   A language or locale code, e.g. nl, nl-NL, or en-UK.
+     * @param \Siel\Acumulus\Shop\ConfigStoreInterface $configStore
+     * @param \Siel\Acumulus\Shop\ShopCapabilitiesInterface $shopCapabilities
+     * @param \Siel\Acumulus\Helpers\Translator $translator
+     * @param \Siel\Acumulus\Helpers\Log $log
      */
-    public function __construct($shopNamespace, $language)
+    public function __construct(ConfigStoreInterface $configStore, ShopCapabilitiesInterface $shopCapabilities, Translator $translator, Log $log)
     {
+        $this->configStore = $configStore;
+        $this->shopCapabilities = $shopCapabilities;
+        $this->translator = $translator;
+        $this->log = $log;
+
         $this->keyInfo = null;
         $this->isConfigurationLoaded = false;
         $this->values = array();
-        $this->instances = array();
-        $this->shopNamespace = static::baseNamespace . $shopNamespace;
-        global $sielAcumulusCustomNamespace;
-        $this->customNamespace = !empty($sielAcumulusCustomNamespace) ? $sielAcumulusCustomNamespace : '';
-        $this->language = substr($language, 0, 2);
-        $this->getLog();
     }
 
     /**
@@ -80,271 +73,27 @@ class Config implements ConfigInterface
      */
     protected function t($key)
     {
-        return $this->getTranslator()->get($key);
+        return $this->translator->get($key);
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function setCustomNamespace($customNamespace)
-    {
-        $this->customNamespace = $customNamespace;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getTranslator()
-    {
-        /** @var Translator $translator */
-        $translator = $this->getInstance('Translator', 'Helpers', array($this->language));
-        if (!$this->moduleSpecificTranslationsAdded) {
-            try {
-                /** @var \Siel\Acumulus\Helpers\TranslationCollection $translations */
-                $translations = $this->getInstance('ModuleSpecificTranslations', 'helpers');
-                $translator->add($translations);
-            } catch (\InvalidArgumentException $e) {}
-            $this->moduleSpecificTranslationsAdded = true;
-        }
-        return $translator;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getLog()
-    {
-        return $this->getInstance('Log', 'Helpers', array($this));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getMailer()
-    {
-        return $this->getInstance('Mailer', 'Helpers', array($this, $this->getTranslator(), $this->getService()));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getToken()
-    {
-        return $this->getInstance('Token', 'Helpers');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getForm($type)
-    {
-        $class = ucfirst($type);
-        $arguments = array(
-            $this->getTranslator(),
-            $this->getShopCapabilities(),
-        );
-        switch (strtolower($type)) {
-            case 'config':
-                $arguments[] = $this;
-                $arguments[] = $this->getService();
-                break;
-            case 'advanced':
-                $class = 'AdvancedConfig';
-                $arguments[] = $this;
-                $arguments[] = $this->getService();
-                break;
-            case 'batch':
-                $arguments[] = $this->getManager();
-                break;
-        }
-        return $this->getInstance($class . 'Form', 'Shop', $arguments);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getFormRenderer()
-    {
-        return $this->getInstance('FormRenderer', 'Helpers');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getService()
-    {
-        return $this->getInstance('Service', 'Web', array($this->getCommunicator(), $this, $this->getTranslator()));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getCommunicator()
-    {
-        return $this->getInstance('Communicator', 'Web', array($this));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getSource($invoiceSourceType, $invoiceSourceOrId)
-    {
-        return $this->getInstance('Source', 'Invoice', array($invoiceSourceType, $invoiceSourceOrId), true);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getCompletor()
-    {
-        return $this->getInstance('Completor', 'Invoice', array($this, $this->getCompletorInvoiceLines(), $this->getCompletorStrategyLines(), $this->getTranslator(), $this->getService()));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getCompletorInvoiceLines()
-    {
-        return $this->getInstance('CompletorInvoiceLines', 'Invoice', array($this, $this->getFlattenerInvoiceLines()));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getFlattenerInvoiceLines()
-    {
-        return $this->getInstance('FlattenerInvoiceLines', 'Invoice', array($this));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getCompletorStrategyLines()
-    {
-        return $this->getInstance('CompletorStrategyLines', 'Invoice', array($this, $this->getTranslator()));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getCreator()
-    {
-        return $this->getInstance('Creator', 'Invoice', array($this, $this->getTranslator()));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getConfigStore()
-    {
-        return $this->getInstance('ConfigStore', 'Shop', array($this));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getShopCapabilities()
-    {
-        return $this->getInstance('ShopCapabilities', 'Shop', array($this->getTranslator(), $this->shopNamespace));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getManager()
-    {
-        return $this->getInstance('InvoiceManager', 'Shop', array($this));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getAcumulusEntryModel()
-    {
-        return $this->getInstance('AcumulusEntryModel', 'Shop');
-    }
-
-    /**
-     * Returns an instance of the given class.
+     * Wrapper getter around the config store object.
      *
-     * The class is taken from the same namespace as the configStore property.
-     * Only 1 instance is created per class.
-     *
-     * @param string $class
-     *   The name of the class without namespace. The namespace is taken from the
-     *   configStore object.
-     * @param string $subNamespace
-     *   The sub namespace (within the shop namespace) in which the class resides.
-     * @param array $constructorArgs
-     *   An array of arguments to pass to the constructor, may be an empty array.
-     * @param bool $newInstance
-     *   Whether to create a new instance or reuse an already existing instance
-     *
-     * @return object
-     *
-     * @throws \InvalidArgumentException
-     * @throws \ReflectionException
+     * @return \Siel\Acumulus\Shop\ConfigStoreInterface
      */
-    protected function getInstance($class, $subNamespace, array $constructorArgs = array(), $newInstance = false)
+    protected function getConfigStore()
     {
-        if (!isset($this->instances[$class]) || $newInstance) {
-            // Try custom namespace.
-            if (!empty($this->customNamespace)) {
-                $fqClass = $this->tryNsInstance($class, $subNamespace, $this->customNamespace);
-            }
-
-            // Try the shop namespace and any parent namespaces.
-            $namespaces = explode('\\', $this->shopNamespace);
-            while (empty($fqClass) && !empty($namespaces)) {
-                $namespace = implode('\\', $namespaces);
-                $fqClass = $this->tryNsInstance($class, $subNamespace, $namespace);
-                array_pop($namespaces);
-            }
-
-            if (empty($fqClass)) {
-                throw new \InvalidArgumentException("Class $class not found in namespace $subNamespace");
-            }
-
-            // Create a new instance.
-            // As PHP5.3 produces a fatal error when a class has no constructor
-            // and newInstanceArgs() is called, we have to differentiate between
-            // no arguments and arguments.
-            if (empty($constructorArgs)) {
-                $this->instances[$class] = new $fqClass();
-            } else {
-                $reflector = new ReflectionClass($fqClass);
-                $this->instances[$class] = $reflector->newInstanceArgs($constructorArgs);
-            }
-        }
-        return $this->instances[$class];
-    }
-
-    protected function tryNsInstance($class, $subNamespace, $namespace)
-    {
-        $fqClass = $namespace . '\\' . $subNamespace . '\\' . $class;
-        $fileName = __DIR__ . DIRECTORY_SEPARATOR . '..' . str_replace('\\', DIRECTORY_SEPARATOR, substr($fqClass, strlen('/Siel/Acumulus'))) . '.php';
-        // Checking if the file exists prevents warnings in Magento whose own
-        // autoloader logs warnings when a class cannot be loaded.
-        return is_readable($fileName) && class_exists($fqClass) ? $fqClass : '';
+        return $this->configStore;
     }
 
     /**
-     * Returns the namespace for the current cms.
+     * Wrapper getter around the store capabilities object.
      *
-     * @return string
-     *   The namespace for the current cms or the empty string if the current shop
-     *   is not contained in a CMS namespace.
+     * @return \Siel\Acumulus\Shop\ShopCapabilitiesInterface
      */
-    protected function getCmsNamespace()
+    protected function getShopCapabilities()
     {
-        // Get parent namespace of the shop namespace.
-        $cmsNamespaceEnd = strrpos($this->shopNamespace, '\\');
-        $cmsNamespace = substr($this->shopNamespace, 0, (int) $cmsNamespaceEnd);
-        // But if that is Acumulus there's no CMS namespace.
-        if (substr($cmsNamespace, -strlen('\\Acumulus')) === '\\Acumulus') {
-            $cmsNamespace = '';
-        }
-        return $cmsNamespace;
+        return $this->shopCapabilities;
     }
 
     /**
@@ -368,7 +117,7 @@ class Config implements ConfigInterface
         if (!empty($copy['password'])) {
             $copy['password'] = 'REMOVED FOR SECURITY';
         }
-        Log::getInstance()->notice('ConfigStore::save(): saving %s', serialize($copy));
+        $this->log->notice('ConfigStore::save(): saving %s', serialize($copy));
 
         // Remove password if not sent along. We have had some reports that
         // passwords were gone missing, perhaps some shops do not send the value
@@ -1096,6 +845,8 @@ class Config implements ConfigInterface
      *
      * - setting triggerInvoiceSendEvent removed.
      * - setting triggerInvoiceEvent introduced.
+     *
+     * @todo: extract updates into own object.
      *
      * @return bool
      */

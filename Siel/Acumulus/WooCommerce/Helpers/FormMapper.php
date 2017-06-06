@@ -2,32 +2,59 @@
 namespace Siel\Acumulus\WooCommerce\Helpers;
 
 use Siel\Acumulus\Helpers\Form;
+use Siel\Acumulus\Helpers\FormMapper as BaseFormMapper;
 
 /**
  * FormMapper maps an Acumulus form definition to a WooCommerce form definition.
  */
-class FormMapper
+class FormMapper extends BaseFormMapper
 {
     const required = '<span class="required">*</span>';
 
-    /** @var string */
+    /**
+     * The slug-name of the settings page on which to show the section.
+     *
+     * @var string
+     */
     protected $page;
 
     /**
-     * Maps a set of field definitions.
+     * The callback to actually render a field.
      *
-     * @param Form $form
-     *   The form to map to a WordPress form.
-     * @param string $page
-     *   The slug-name of the settings page on which to show the section.
-     * @param callable $callback
-     *   The callback to actually render a field.
+     * @var callable
      */
-    public function map(Form $form, $page, $callback)
+    protected $callback;
+
+    /**
+     * @param string $page
+     *
+     * @return $this
+     */
+    public function setPage($page)
     {
         $this->page = $page;
+        return $this;
+    }
+
+    /**
+     * @param callable $callback
+     *
+     * @return $this
+     */
+    public function setCallback($callback)
+    {
+        $this->callback = $callback;
+        return $this;
+    }
+
+
+    /**
+     * {@inheritdoc}
+     */
+    public function map(Form $form)
+    {
         $form->addValues();
-        $this->fields($form->getFields(), '', $callback);
+        $this->fields($form->getFields(), '', $this->callback);
     }
 
     /**

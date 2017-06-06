@@ -10,11 +10,11 @@ abstract class ConfigStore implements ConfigStoreInterface
     protected $acumulusConfig;
 
     /**
-     * ConfigStore constructor.
+     * Config setter.
      *
      * @param \Siel\Acumulus\Shop\ConfigInterface $config
      */
-    public function __construct(ConfigInterface $config)
+    public function setConfig(ConfigInterface $config)
     {
         $this->acumulusConfig = $config;
     }

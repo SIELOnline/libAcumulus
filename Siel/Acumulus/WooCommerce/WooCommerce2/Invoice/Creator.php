@@ -101,6 +101,7 @@ class Creator extends BaseCreator
      */
     protected function getPaymentDateOrder()
     {
+        /** @noinspection PhpUndefinedFieldInspection */
         return substr($this->shopSource->paid_date, 0, strlen('2000-01-01'));
     }
 

@@ -19,13 +19,18 @@ abstract class Mailer
     /** @var \Siel\Acumulus\Web\Service */
     protected $service;
 
+    /** @var \Siel\Acumulus\Helpers\Log */
+    protected $log;
+
     /**
      * @param \Siel\Acumulus\Web\ConfigInterface $config
      * @param TranslatorInterface $translator
      * @param \Siel\Acumulus\Web\Service $service
+     * @param \Siel\Acumulus\Helpers\Log $log
      */
-    public function __construct(ConfigInterface $config, TranslatorInterface $translator, Service $service)
+    public function __construct(ConfigInterface $config, TranslatorInterface $translator, Service $service, Log $log)
     {
+        $this->log = $log;
         $this->config = $config;
         $this->service = $service;
 
@@ -70,7 +75,7 @@ abstract class Mailer
         $subject = $this->getSubject($result);
         $content = $this->getBody($result, $messages, $invoiceSourceType, $invoiceSourceReference);
 
-        Log::getInstance()->info('Mailer::sendMail("%s", "%s", "%s", "%s") with body = %s', $from, $fromName, $to, $subject, $content['text']);
+        $this->log->info('Mailer::sendMail("%s", "%s", "%s", "%s") with body = %s', $from, $fromName, $to, $subject, $content['text']);
 
         $result = $this->sendMail($from, $fromName, $to, $subject, $content['text'], $content['html']);
         if ($result !== true) {
@@ -85,9 +90,9 @@ abstract class Mailer
             } else {
                 $message = $result;
             }
-            Log::getInstance()->error('Mailer::sendInvoiceAddMailResult(): failed: %s', $message);
+            $this->log->error('Mailer::sendInvoiceAddMailResult(): failed: %s', $message);
         } else {
-            Log::getInstance()->info('Mailer::sendInvoiceAddMailResult(): success');
+            $this->log->info('Mailer::sendInvoiceAddMailResult(): success');
         }
 
         return $result === true;
@@ -170,7 +175,7 @@ abstract class Mailer
      *
      * @param array $result
      *
-     * @return string
+     * @return array
      */
     protected function getStatusSpecificBody(array $result)
     {

@@ -75,16 +75,4 @@ class Source extends BaseSource
         $refund = $this->source;
         return new Source(Source::Order, $refund->get_parent_id());
     }
-
-    /**
-     * @inheritDoc
-     */
-    protected function callTypeSpecificMethod($method)
-    {
-        // Prevent notice, see #74374
-        if ($method === 'getInvoiceDate') {
-            return null;
-        }
-        return parent::callTypeSpecificMethod($method);
-    }
 }

@@ -2,8 +2,6 @@
 
 namespace Siel\Acumulus\Invoice;
 
-use Siel\Acumulus\Helpers\Log;
-
 /**
  * Wraps a source for an invoice, typically an order or a credit note.
  *
@@ -251,8 +249,6 @@ abstract class Source
         $method .= $this->getType();
         if (method_exists($this, $method)) {
             return $this->$method();
-        } else {
-            Log::getInstance()->notice('%s: method does not exist: %s', __METHOD__, $method);
         }
         return null;
     }

@@ -109,8 +109,7 @@ class TryAllVatRatePermutations extends CompletorStrategyBase
             $i++;
         }
 
-        Log::getInstance()->notice("TryAllVatRatePermutations::try1Permutation([%s]) results in %f", implode(', ', $permutation), $vatAmount);
-
+        $this->invoice['customer']['invoice']['meta-competor-strategy-' . $this->getName()] = sprintf("try1Permutation([%s]): %f", implode(', ', $permutation), $vatAmount);
         // The strategy worked if the vat totals equals the vat to divide.
         return Number::floatsAreEqual($vatAmount, $this->vat2Divide);
     }

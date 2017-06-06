@@ -1,8 +1,6 @@
 <?php
 namespace Siel\Acumulus\Helpers;
 
-use Siel\Acumulus\Web\ConfigInterface;
-
 /**
  * Defines a logger class. This class is supposed to be overridden by shop
  * specific classes to integrate with the shop specific way of logging.
@@ -17,41 +15,21 @@ class Log
     const Debug = 5;
     const NotYetSet = 6;
 
-    /** @var Log */
-    static protected $instance = null;
-
-    /**
-     * Returns an instance of the log class (or web shop specific child class).
-     *
-     * @return Log
-     */
-    public static function getInstance()
-    {
-        return static::$instance;
-    }
-
     /** @var int */
     protected $logLevel;
 
     /** @var string */
     protected $libraryVersion;
 
-    /** @var ConfigInterface */
-    protected $config;
-
     /**
      * Log constructor.
-     *
-     * @param ConfigInterface $config
      */
-    public function __construct($config)
+    public function __construct()
     {
         // Start with logging everything. Soon after the creation of this log object
         // the log level should be set based on the configuration.
-        $this->logLevel = static::NotYetSet;
-        $this->config = $config;
-        $this->libraryVersion = 'version not yet set';
-        static::$instance = $this;
+        $this->setLogLevel(static::NotYetSet);
+        $this->setLibraryVersion('version not yet set');
     }
 
     /**
@@ -61,14 +39,6 @@ class Log
      */
     public function getLogLevel()
     {
-        // To support lazy load of the config, the log level is not yet set until
-        // actually needed.
-        if ($this->logLevel === static::NotYetSet && $this->config !== null) {
-            $pluginSettings = $this->config->getPluginSettings();
-            $this->logLevel = $pluginSettings['logLevel'];
-            $environment = $this->config->getEnvironment();
-            $this->libraryVersion = $environment['libraryVersion'];
-        }
         return $this->logLevel;
     }
 
@@ -81,6 +51,23 @@ class Log
     {
         $this->logLevel = $logLevel;
     }
+
+    /**
+     * @return string
+     */
+    public function getLibraryVersion()
+    {
+        return $this->libraryVersion;
+    }
+
+    /**
+     * @param string $libraryVersion
+     */
+    public function setLibraryVersion($libraryVersion)
+    {
+        $this->libraryVersion = $libraryVersion;
+    }
+
 
     /**
      * Returns a textual representation of the severity.

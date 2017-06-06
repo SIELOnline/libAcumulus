@@ -29,6 +29,11 @@ interface ContainerInterface
     public function getTranslator();
 
     /**
+     * @return \Siel\Acumulus\Helpers\Requirements
+     */
+    public function getRequirements();
+
+    /**
      * @return \Siel\Acumulus\Helpers\Mailer
      */
     public function getMailer();
@@ -50,6 +55,11 @@ interface ContainerInterface
      * @return \Siel\Acumulus\Helpers\FormRenderer
      */
     public function getFormRenderer();
+
+    /**
+     * @return \Siel\Acumulus\Helpers\FormMapper
+     */
+    public function getFormMapper();
 
     /**
      * @return \Siel\Acumulus\Web\Service
@@ -99,6 +109,11 @@ interface ContainerInterface
      * @return \Siel\Acumulus\Invoice\Creator
      */
     public function getCreator();
+
+    /**
+     * @return \Siel\Acumulus\Shop\ConfigInterface
+     */
+    public function getConfig();
 
     /**
      * @return \Siel\Acumulus\Shop\ConfigStoreInterface

@@ -17,12 +17,17 @@ abstract class ShopCapabilities implements ShopCapabilitiesInterface
     /** @var string */
     protected $shopName;
 
+    /** @var \Siel\Acumulus\Helpers\Log */
+    protected $log;
+
     /**
      * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
      * @param string $shopNamespace
+     * @param \Siel\Acumulus\Helpers\Log $log
      */
-    public function __construct(TranslatorInterface $translator, $shopNamespace)
+    public function __construct(TranslatorInterface $translator, $shopNamespace, Log $log)
     {
+        $this->log = $log;
         $this->translator = $translator;
         $pos = strrpos($shopNamespace, '\\');
         $this->shopName = $pos !== false ? substr($shopNamespace, $pos + 1) : $shopNamespace;
@@ -131,7 +136,7 @@ abstract class ShopCapabilities implements ShopCapabilitiesInterface
      */
     public function getLink($formType)
     {
-        Log::getInstance()->error('ShopCapabilities::getLink("%s"): not defined for or unknown form type', $formType);
+        $this->log->error('ShopCapabilities::getLink("%s"): not defined for or unknown form type', $formType);
         return '#';
     }
 }

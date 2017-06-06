@@ -2,6 +2,7 @@
 namespace Siel\Acumulus\Shop;
 
 use DateTime;
+use Siel\Acumulus\Helpers\ContainerInterface;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Web\ConfigInterface as WebConfigInterface;
@@ -11,21 +12,21 @@ use Siel\Acumulus\Web\ConfigInterface as WebConfigInterface;
  */
 abstract class InvoiceManager
 {
-    /** @var \Siel\Acumulus\Shop\ConfigInterface */
-    protected $config;
+    /** @var \Siel\Acumulus\Helpers\ContainerInterface */
+    protected $container;
 
     /** @var string */
     protected $message;
 
     /**
-     * @param ConfigInterface $config
+     * @param \Siel\Acumulus\Helpers\ContainerInterface $container
      */
-    public function __construct(ConfigInterface $config)
+    public function __construct(ContainerInterface $container)
     {
-        $this->config = $config;
+        $this->container = $container;
 
         $translations = new InvoiceSendTranslations();
-        $config->getTranslator()->add($translations);
+        $this->getTranslator()->add($translations);
 
         $this->message = '';
     }
@@ -42,7 +43,100 @@ abstract class InvoiceManager
      */
     protected function t($key)
     {
-        return $this->config->getTranslator()->get($key);
+        return $this->getTranslator()->get($key);
+    }
+
+    /**
+     * Returns a Translator instance.
+     *
+     * @return \Siel\Acumulus\Helpers\TranslatorInterface
+     */
+    protected function getTranslator()
+    {
+        return $this->container->getTranslator();
+    }
+
+    /**
+     * Returns a Logger instance.
+     *
+     * @return \Siel\Acumulus\Helpers\Log
+     */
+    protected function getLog()
+    {
+        return $this->container->getLog();
+    }
+
+    /**
+     * Returns a Config instance.
+     *
+     * @return \Siel\Acumulus\Shop\ConfigInterface
+     */
+    protected function getConfig()
+    {
+        return $this->container->getConfig();
+    }
+
+    /**
+     * Returns an AcumulusEntryModel instance.
+     *
+     * @return \Siel\Acumulus\Shop\AcumulusEntryModel
+     */
+    protected function getAcumulusEntryModel()
+    {
+        return $this->container->getAcumulusEntryModel();
+    }
+
+    /**
+     * Returns a Service instance.
+     *
+     * @return \Siel\Acumulus\Web\Service
+     */
+    protected function getService()
+    {
+        return $this->container->getService();
+    }
+
+    /**
+     * Returns a Mailer instance.
+     *
+     * @return \Siel\Acumulus\Helpers\Mailer
+     */
+    protected function getMailer()
+    {
+        return $this->container->getMailer();
+    }
+
+
+    /**
+     * Returns a new Source instance.
+     *
+     * @param string $invoiceSourceType
+     * @param int|object|array $idOrSource
+     *
+     * @return \Siel\Acumulus\Invoice\Source
+     */
+    protected function getSource($invoiceSourceType, $idOrSource)
+    {
+        return $this->container->getSource($invoiceSourceType, $idOrSource);
+    }
+    /**
+     * Returns a Creator instance.
+     *
+     * @return \Siel\Acumulus\Invoice\Creator
+     */
+    protected function getCreator()
+    {
+        return $this->container->getCreator();
+    }
+
+    /**
+     * Returns a Creator instance.
+     *
+     * @return \Siel\Acumulus\Invoice\Completor
+     */
+    protected function getCompletor()
+    {
+        return $this->container->getCompletor();
     }
 
     /**
@@ -115,7 +209,7 @@ abstract class InvoiceManager
      */
     protected function getSourceByIdOrSource($invoiceSourceType, $idOrSource)
     {
-        return $this->config->getSource($invoiceSourceType, $idOrSource);
+        return $this->getSource($invoiceSourceType, $idOrSource);
     }
 
     /**
@@ -135,7 +229,7 @@ abstract class InvoiceManager
      */
     public function sendMultiple(array $invoiceSources, $forceSend, $dryRun, array &$log)
     {
-        $this->config->getTranslator()->add(new InvoiceSendTranslations());
+        $this->getTranslator()->add(new InvoiceSendTranslations());
         $errorLogged = false;
         $success = true;
         $time_limit = ini_get('max_execution_time');
@@ -146,7 +240,7 @@ abstract class InvoiceManager
             // set_time_limit(): Cannot set max execution time limit due to
             // system policy in ...".
             if (!@set_time_limit($time_limit) && !$errorLogged) {
-                $this->config->getLog()->warning('InvoiceManager::sendMultiple(): could not set time limit.');
+                $this->getLog()->warning('InvoiceManager::sendMultiple(): could not set time limit.');
                 $errorLogged = true;
             }
 
@@ -170,14 +264,14 @@ abstract class InvoiceManager
     public function sourceStatusChange(Source $invoiceSource)
     {
         $status = $invoiceSource->getStatus();
-        $shopEventSettings = $this->config->getShopEventSettings();
+        $shopEventSettings = $this->getConfig()->getShopEventSettings();
         if ($invoiceSource->getType() === Source::CreditNote || in_array($status, $shopEventSettings['triggerOrderStatus'])) {
             $result = $this->send($invoiceSource);
         } else {
             $result = ConfigInterface::Invoice_NotSent_WrongStatus;
             $messages = array(sprintf('%s not in [%s]', $status, implode(',', $shopEventSettings['triggerOrderStatus'])));
             $logMessage = $this->getInvoiceSendResultMessage($invoiceSource, $result, $messages);
-            $this->config->getLog()->notice('InvoiceManager::sourceStatusChange(): %s', $logMessage);
+            $this->getLog()->notice('InvoiceManager::sourceStatusChange(): %s', $logMessage);
         }
         return $result;
     }
@@ -193,13 +287,13 @@ abstract class InvoiceManager
      */
     public function invoiceCreate(Source $invoiceSource)
     {
-        $shopEventSettings = $this->config->getShopEventSettings();
+        $shopEventSettings = $this->getConfig()->getShopEventSettings();
         if ($shopEventSettings['triggerInvoiceEvent'] == Config::TriggerInvoiceEvent_Create) {
             $result = $this->send($invoiceSource);
         } else {
             $result = ConfigInterface::Invoice_NotSent_TriggerInvoiceCreateNotEnabled;
             $logMessage = $this->getInvoiceSendResultMessage($invoiceSource, $result);
-            $this->config->getLog()->notice('InvoiceManager::invoiceCreate(): %s', $logMessage);
+            $this->getLog()->notice('InvoiceManager::invoiceCreate(): %s', $logMessage);
         }
         return $result;
     }
@@ -218,13 +312,13 @@ abstract class InvoiceManager
      */
     public function invoiceSend(Source $invoiceSource)
     {
-        $shopEventSettings = $this->config->getShopEventSettings();
+        $shopEventSettings = $this->getConfig()->getShopEventSettings();
         if ($shopEventSettings['triggerInvoiceEvent'] == Config::TriggerInvoiceEvent_Send) {
             $result = $this->send($invoiceSource);
         } else {
             $result = ConfigInterface::Invoice_NotSent_TriggerInvoiceSentNotEnabled;
             $logMessage = $this->getInvoiceSendResultMessage($invoiceSource, $result);
-            $this->config->getLog()->notice('InvoiceManager::invoiceSend(): %s', $logMessage);
+            $this->getLog()->notice('InvoiceManager::invoiceSend(): %s', $logMessage);
         }
         return $result;
     }
@@ -247,12 +341,12 @@ abstract class InvoiceManager
      */
     public function send(Source $invoiceSource, $forceSend = false, $dryRun = false)
     {
-        $pluginSettings = $this->config->getPluginSettings();
+        $pluginSettings = $this->getConfig()->getPluginSettings();
         $testMode = $pluginSettings['debug'] == Config::Debug_TestMode;
         $messages = array();
         if ($testMode) {
             $status = ConfigInterface::Invoice_Sent_TestMode;
-        } elseif (!$this->config->getAcumulusEntryModel()->getByInvoiceSource($invoiceSource)) {
+        } elseif (!$this->getAcumulusEntryModel()->getByInvoiceSource($invoiceSource)) {
             $status = ConfigInterface::Invoice_Sent_New;
         } elseif ($forceSend) {
             $status = ConfigInterface::Invoice_Sent_Forced;
@@ -261,10 +355,10 @@ abstract class InvoiceManager
         }
 
         if ($status !== ConfigInterface::Invoice_NotSent_AlreadySent) {
-            $invoice = $this->config->getCreator()->create($invoiceSource);
+            $invoice = $this->getCreator()->create($invoiceSource);
 
             // Do not send 0-amount invoices, if set so.
-            $shopEventSettings = $this->config->getShopEventSettings();
+            $shopEventSettings = $this->getConfig()->getShopEventSettings();
             if ($shopEventSettings['sendEmptyInvoice'] || !$this->isEmptyInvoice($invoice)) {
                 // Trigger the InvoiceCreated event.
                 $this->triggerInvoiceCreated($invoice, $invoiceSource);
@@ -276,7 +370,7 @@ abstract class InvoiceManager
                     // @todo: The $this->message mess is a code smell.
                     // @todo: $status does not receive a proper status on $dryRun: fix
                     $localMessages = array();
-                    $invoice = $this->config->getCompletor()->complete($invoice, $invoiceSource, $localMessages);
+                    $invoice = $this->getCompletor()->complete($invoice, $invoiceSource, $localMessages);
 
                     // Trigger the InvoiceCompleted event.
                     $this->triggerInvoiceCompleted($invoice, $invoiceSource);
@@ -301,7 +395,7 @@ abstract class InvoiceManager
 
         $logMessage = $this->getInvoiceSendResultMessage($invoiceSource, $status, $messages);
         if (!$dryRun) {
-            $this->config->getLog()->notice('InvoiceManager::send(): %s', $logMessage);
+            $this->getLog()->notice('InvoiceManager::send(): %s', $logMessage);
         }
 
         return $status;
@@ -324,20 +418,20 @@ abstract class InvoiceManager
      *   messages.
      */
     protected function doSend(array $invoice, Source $invoiceSource, array $localMessages) {
-        $result = $this->config->getService()->invoiceAdd($invoice);
+        $result = $this->getService()->invoiceAdd($invoice);
 
         // Check if an entryid was created and store entry id and token.
         if (!empty($result['invoice']['entryid'])) {
-            $this->config->getAcumulusEntryModel()->save($invoiceSource, $result['invoice']['entryid'], $result['invoice']['token']);
+            $this->getAcumulusEntryModel()->save($invoiceSource, $result['invoice']['entryid'], $result['invoice']['token']);
         } else {
             // If the invoice was sent as a concept, no entryid will be returned
             // but we still want to prevent sending it again: check for the
             // concept status, the absence of errors and non test-mode.
-            $pluginSettings = $this->config->getPluginSettings();
+            $pluginSettings = $this->getConfig()->getPluginSettings();
             $testMode = $pluginSettings['debug'] == Config::Debug_TestMode;
             $isConcept = $invoice['customer']['invoice']['concept'] == Config::Concept_Yes;
             if (empty($result['errors']) && $isConcept && !$testMode) {
-                $this->config->getAcumulusEntryModel()->save($invoiceSource, null, null);
+                $this->getAcumulusEntryModel()->save($invoiceSource, null, null);
             }
         }
 
@@ -345,7 +439,7 @@ abstract class InvoiceManager
         $result = $this->mergeLocalMessages($result, $localMessages);
 
         // Send a mail if there are messages.
-        $messages = $this->config->getService()->resultToMessages($result);
+        $messages = $this->getService()->resultToMessages($result);
         if (!empty($messages)) {
             $this->mailInvoiceAddResult($result, $messages, $invoiceSource);
         }
@@ -404,7 +498,7 @@ abstract class InvoiceManager
         $message = sprintf($this->t('message_invoice_send'), $this->t($invoiceSource->getType()), $invoiceSource->getReference(), $action, $reason);
 
         if ($sent) {
-            $service = $this->config->getService();
+            $service = $this->getService();
             $message .= ' ' . $service->getStatusText($status & WebConfigInterface::Status_Mask);
             if ((($status & WebConfigInterface::Status_Mask) !== WebConfigInterface::Status_Success) && !empty($messages)) {
                 $message .= ' ' . $service->messagesToText($messages);
@@ -478,7 +572,7 @@ abstract class InvoiceManager
      */
     protected function mailInvoiceAddResult(array $result, array $messages, Source $invoiceSource)
     {
-        return $this->config->getMailer()->sendInvoiceAddMailResult($result, $messages, $invoiceSource->getType(), $invoiceSource->getReference());
+        return $this->getMailer()->sendInvoiceAddMailResult($result, $messages, $invoiceSource->getType(), $invoiceSource->getReference());
     }
 
     /**

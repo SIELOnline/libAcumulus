@@ -35,12 +35,12 @@ class OcHelper extends BaseOcHelper
                     'children' => array(
                         array(
                             'name' => $this->t('batch_form_link_text'),
-                            'href' => $this->acumulusConfig->getShopCapabilities()->getLink('batch'),
+                            'href' => $this->container->getShopCapabilities()->getLink('batch'),
                             'children' => array(),
                         ),
                         array(
                             'name' => $this->t('advanced_form_link_text'),
-                            'href' => $this->acumulusConfig->getShopCapabilities()->getLink('advanced'),
+                            'href' => $this->container->getShopCapabilities()->getLink('advanced'),
                             'children' => array(),
                         ),
                     ),

@@ -37,7 +37,7 @@ class Mailer extends BaseMailer
             // Note: OC1 and OC2.0 use trigger_error() and thus in those
             // versions, errors will be logged in error.log. OC2.2+ throws
             // exceptions, so we will log it.
-            Log::getInstance()->error('%s: %s', __METHOD__, $e->getMessage());
+            $this->log->error('%s: %s', __METHOD__, $e->getMessage());
             $result = false;
         }
         return $result;

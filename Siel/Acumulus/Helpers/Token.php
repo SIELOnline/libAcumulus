@@ -73,6 +73,19 @@ class Token {
     /** @var array */
     protected $variables;
 
+    /** @var \Siel\Acumulus\Helpers\Log */
+    protected $log;
+
+    /**
+     * Constructor
+     *
+     * @param \Siel\Acumulus\Helpers\Log $log
+     */
+    public function __construct(Log $log)
+    {
+        $this->log = $log;
+    }
+
     /**
      * Expands a string that can contain token patterns.
      *
@@ -161,7 +174,7 @@ class Token {
         }
 
         if ($value === null) {
-            Log::getInstance()->info("Token::searchProperty('%s'): not found", $propertySpec);
+            $this->log->info("Token::searchProperty('%s'): not found", $propertySpec);
         }
 
         return $value !== null ? $value : '';

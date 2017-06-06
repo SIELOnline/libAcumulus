@@ -20,7 +20,7 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
     {
         $table = JTable::getInstance('AcumulusEntry', 'AcumulusTable');
         if ($table === false) {
-            Log::getInstance()->error('AcumulusEntryModel::newTable(): table not created');
+            $this->log->error('AcumulusEntryModel::newTable(): table not created');
         }
         return $table;
     }

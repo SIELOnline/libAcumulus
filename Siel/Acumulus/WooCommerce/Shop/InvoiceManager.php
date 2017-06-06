@@ -24,7 +24,7 @@ class InvoiceManager extends BaseInvoiceManager
             case Source::CreditNote:
                 return 'shop_order_refund';
             default:
-                $this->config->getLog()->error('InvoiceManager::sourceTypeToShopType(%s): unknown', $invoiceSourceType);
+                $this->getLog()->error('InvoiceManager::sourceTypeToShopType(%s): unknown', $invoiceSourceType);
                 return '';
         }
     }
@@ -191,7 +191,7 @@ class InvoiceManager extends BaseInvoiceManager
      */
     protected function query2Sources(array $args, $invoiceSourceType, $sort = true)
     {
-        $this->config->getLog()->info('WooCommerce\InvoiceManager::query2Sources: args = %s', str_replace(array(' ', "\r", "\n", "\t"), '', var_export($args, true)));
+        $this->getLog()->info('WooCommerce\InvoiceManager::query2Sources: args = %s', str_replace(array(' ', "\r", "\n", "\t"), '', var_export($args, true)));
         // Add default arguments.
         $args = $args + array(
                 'fields' => 'ids',

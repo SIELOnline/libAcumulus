@@ -64,7 +64,6 @@ class FlattenerInvoiceLines
     {
         $result = array();
 
-        $invoiceSettings = $this->config->getInvoiceSettings();
         foreach ($lines as $line) {
             $children = null;
             // Ignore children if we do not want to show them.

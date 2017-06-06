@@ -2,8 +2,11 @@
 namespace Siel\Acumulus\Invoice;
 
 use Siel\Acumulus\Helpers\Countries;
+use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Number;
+use Siel\Acumulus\Helpers\Token;
 use Siel\Acumulus\Helpers\TranslatorInterface;
+use Siel\Acumulus\Shop\Config;
 
 /**
  * Creator creates a raw invoice similar to the Acumulus invoice structure.
@@ -50,8 +53,14 @@ abstract class Creator
     /** @var \Siel\Acumulus\Shop\Config */
     protected $config;
 
+    /** @var \Siel\Acumulus\Helpers\Token */
+    protected $token;
+
     /** @var \Siel\Acumulus\Helpers\TranslatorInterface */
     protected $translator;
+
+    /** @var \Siel\Acumulus\Helpers\Log */
+    protected $log;
 
     /** @var \Siel\Acumulus\Helpers\Countries */
     protected $countries;
@@ -72,13 +81,16 @@ abstract class Creator
     /**
      * Constructor.
      *
-     * @param \Siel\Acumulus\Invoice\ConfigInterface $config
+     * @param \Siel\Acumulus\Helpers\ContainerInterface|\Siel\Acumulus\Shop\Config $config
+     * @param \Siel\Acumulus\Helpers\Token $token
      * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
+     * @param \Siel\Acumulus\Helpers\Log $log
      */
-    public function __construct(ConfigInterface $config, TranslatorInterface $translator)
+    public function __construct(Config $config, Token $token, TranslatorInterface $translator, Log $log)
     {
+        $this->log = $log;
         $this->config = $config;
-
+        $this->token = $token;
         $this->translator = $translator;
         $invoiceHelperTranslations = new Translations();
         $this->translator->add($invoiceHelperTranslations);
@@ -110,7 +122,7 @@ abstract class Creator
     {
         $this->invoiceSource = $invoiceSource;
         if (!in_array($invoiceSource->getType(), array(Source::Order, Source::CreditNote))) {
-            $this->config->getLog()->error('Creator::setSource(): unknown source type %s', $this->invoiceSource->getType());
+            $this->log->error('Creator::setSource(): unknown source type %s', $this->invoiceSource->getType());
         };
     }
 
@@ -798,8 +810,7 @@ abstract class Creator
      */
     protected function getTokenizedValue($pattern)
     {
-        $token = $this->config->getToken();
-        return $token->expand($pattern, $this->propertySources);
+        return $this->token->expand($pattern, $this->propertySources);
     }
 
     /**

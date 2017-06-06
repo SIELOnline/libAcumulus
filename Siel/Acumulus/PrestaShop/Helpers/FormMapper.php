@@ -2,11 +2,12 @@
 namespace Siel\Acumulus\PrestaShop\Helpers;
 
 use Siel\Acumulus\Helpers\Form;
+use Siel\Acumulus\Helpers\FormMapper as BaseFormMapper;
 
 /**
  * FormMapper maps an Acumulus form definition to a PrestaShop form definition.
  */
-class FormMapper
+class FormMapper extends BaseFormMapper
 {
     /**
      * Maps a set of field definitions.

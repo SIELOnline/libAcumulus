@@ -1,6 +1,8 @@
 <?php
 namespace Siel\Acumulus\Shop;
 
+use Siel\Acumulus\Config\ConfigInterface;
+use Siel\Acumulus\Config\ShopCapabilitiesInterface;
 use Siel\Acumulus\Helpers\Form;
 use Siel\Acumulus\Helpers\TranslatorInterface;
 use Siel\Acumulus\Web\Service;
@@ -16,10 +18,10 @@ use Siel\Acumulus\Web\Service;
  */
 abstract class BaseConfigForm extends Form
 {
-    /** @var \Siel\Acumulus\Shop\ShopCapabilitiesInterface */
+    /** @var \Siel\Acumulus\Config\ShopCapabilitiesInterface */
     protected $shopCapabilities;
 
-    /** @var \Siel\Acumulus\Shop\ConfigInterface */
+    /** @var \Siel\Acumulus\Config\ConfigInterface */
     protected $acumulusConfig;
 
     /** @var \Siel\Acumulus\Web\Service*/
@@ -37,8 +39,8 @@ abstract class BaseConfigForm extends Form
      * Constructor.
      *
      * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
-     * @param ShopCapabilitiesInterface $shopCapabilities
-     * @param ConfigInterface $config
+     * @param \Siel\Acumulus\Config\ShopCapabilitiesInterface $shopCapabilities
+     * @param \Siel\Acumulus\Config\ConfigInterface $config
      * @param \Siel\Acumulus\Web\Service $service
      */
     public function __construct(TranslatorInterface $translator, ShopCapabilitiesInterface $shopCapabilities, ConfigInterface $config, Service $service)

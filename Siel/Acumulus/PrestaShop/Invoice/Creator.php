@@ -9,8 +9,8 @@ use Customer;
 use Order;
 use OrderPayment;
 use OrderSlip;
+use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Helpers\Number;
-use Siel\Acumulus\Invoice\ConfigInterface;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use TaxManagerFactory;
 
@@ -484,8 +484,8 @@ class Creator extends BaseCreator
      * @param int $taxRulesGroupId
      *
      * @return array
-     *   Either an array with keys 'meta-lookup-vatrate' and
-     *  'meta-lookup-vatrate-label' or an empty array.
+     *   Either an array with keys 'meta-vatrate-lookup' and
+     *  'meta-vatrate-lookup-label' or an empty array.
      */
     protected function getVatRateLookupMetadata($addressId, $taxRulesGroupId) {
         try {
@@ -493,8 +493,8 @@ class Creator extends BaseCreator
             $tax_manager = TaxManagerFactory::getManager($address, $taxRulesGroupId);
             $tax_calculator = $tax_manager->getTaxCalculator();
             $result = array(
-                'meta-lookup-vatrate' => $tax_calculator->getTotalRate(),
-                'meta-lookup-vatrate-label' => $tax_calculator->getTaxesName(),
+                'meta-vatrate-lookup' => $tax_calculator->getTotalRate(),
+                'meta-vatrate-lookup-label' => $tax_calculator->getTaxesName(),
             );
         } catch (\Exception $e) {
             $result = array();

@@ -1,5 +1,5 @@
 <?php
-namespace Siel\Acumulus\Shop;
+namespace Siel\Acumulus\Config;
 
 /**
  * Defines an interface to access the shop specific's config store.
@@ -12,7 +12,7 @@ abstract class ConfigStore implements ConfigStoreInterface
     /**
      * Config setter.
      *
-     * @param \Siel\Acumulus\Shop\ConfigInterface $config
+     * @param \Siel\Acumulus\Config\ConfigInterface $config
      */
     public function setConfig(ConfigInterface $config)
     {

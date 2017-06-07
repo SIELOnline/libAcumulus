@@ -1,5 +1,5 @@
 <?php
-namespace Siel\Acumulus\Shop;
+namespace Siel\Acumulus\Config;
 
 /**
  * Defines an interface to access the shop specific's config store.

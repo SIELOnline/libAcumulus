@@ -1,8 +1,8 @@
 <?php
-namespace Siel\Acumulus\OpenCart\OpenCart2\OpenCart23\Shop;
+namespace Siel\Acumulus\OpenCart\OpenCart2\OpenCart23\Config;
 
 use Siel\Acumulus\OpenCart\Helpers\Registry;
-use Siel\Acumulus\OpenCart\OpenCart2\Shop\ShopCapabilities as ShopCapabilitiesBase;
+use Siel\Acumulus\OpenCart\OpenCart2\Config\ShopCapabilities as ShopCapabilitiesBase;
 
 /**
  * Defines the OpenCart 2.3(+) specific capabilities that differ from OpenCart 2

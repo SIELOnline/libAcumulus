@@ -1,11 +1,10 @@
 <?php
 namespace Siel\Acumulus\OpenCart\Helpers;
 
+use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Helpers\Container;
-use Siel\Acumulus\Helpers\Requirements;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Shop\ModuleTranslations;
-use Siel\Acumulus\Web\ConfigInterface;
 
 /**
  * OcHelper contains functionality shared between the OC1 and OC2 controllers
@@ -294,7 +293,7 @@ class OcHelper
         if ($currentDataModelVersion === '' || version_compare($currentDataModelVersion, '4.0', '<')) {
             // Check requirements (we assume this has been done successfully
             // before if the data model is at the latest version).
-            $requirements = new Requirements();
+            $requirements = $this->container->getRequirements();
             $messages = $requirements->check();
             foreach ($messages as $message) {
                 $this->addError($message['message']);

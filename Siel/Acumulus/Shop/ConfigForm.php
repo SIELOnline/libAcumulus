@@ -1,9 +1,8 @@
 <?php
 namespace Siel\Acumulus\Shop;
 
+use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Helpers\Log;
-use Siel\Acumulus\Invoice\ConfigInterface as InvoiceConfigInterface;
-use Siel\Acumulus\Web\ConfigInterface as WebConfigInterface;
 
 /**
  * Provides basic config form handling.
@@ -352,9 +351,9 @@ class ConfigForm extends BaseConfigForm
                 'label' => $this->t('field_debug'),
                 'description' => $this->t('desc_debug'),
                 'options' => array(
-                    WebConfigInterface::Debug_None => $this->t('option_debug_1'),
-                    WebConfigInterface::Debug_SendAndLog => $this->t('option_debug_2'),
-                    WebConfigInterface::Debug_TestMode => $this->t('option_debug_3'),
+                    ConfigInterface::Debug_None => $this->t('option_debug_1'),
+                    ConfigInterface::Debug_SendAndLog => $this->t('option_debug_2'),
+                    ConfigInterface::Debug_TestMode => $this->t('option_debug_3'),
                 ),
                 'attributes' => array(
                     'required' => true,
@@ -452,9 +451,9 @@ class ConfigForm extends BaseConfigForm
     protected function getDigitalServicesOptions()
     {
         return array(
-            InvoiceConfigInterface::DigitalServices_Both => $this->t('option_digitalServices_1'),
-            InvoiceConfigInterface::DigitalServices_No => $this->t('option_digitalServices_2'),
-            InvoiceConfigInterface::DigitalServices_Only => $this->t('option_digitalServices_3'),
+            ConfigInterface::DigitalServices_Both => $this->t('option_digitalServices_1'),
+            ConfigInterface::DigitalServices_No => $this->t('option_digitalServices_2'),
+            ConfigInterface::DigitalServices_Only => $this->t('option_digitalServices_3'),
         );
     }
 
@@ -468,9 +467,9 @@ class ConfigForm extends BaseConfigForm
     protected function getVatFreeProductsOptions()
     {
         return array(
-            InvoiceConfigInterface::VatFreeProducts_Both => $this->t('option_vatFreeProducts_1'),
-            InvoiceConfigInterface::VatFreeProducts_No => $this->t('option_vatFreeProducts_2'),
-            InvoiceConfigInterface::VatFreeProducts_Only => $this->t('option_vatFreeProducts_3'),
+            ConfigInterface::VatFreeProducts_Both => $this->t('option_vatFreeProducts_1'),
+            ConfigInterface::VatFreeProducts_No => $this->t('option_vatFreeProducts_2'),
+            ConfigInterface::VatFreeProducts_Only => $this->t('option_vatFreeProducts_3'),
         );
     }
 

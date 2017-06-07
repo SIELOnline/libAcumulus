@@ -1,7 +1,7 @@
 <?php
 namespace Siel\Acumulus\Helpers;
 
-use Siel\Acumulus\Web\ConfigInterface;
+use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Web\Service;
 
 /**
@@ -10,7 +10,7 @@ use Siel\Acumulus\Web\Service;
  */
 abstract class Mailer
 {
-    /** @var \Siel\Acumulus\Web\ConfigInterface */
+    /** @var \Siel\Acumulus\Config\ConfigInterface */
     protected $config;
 
     /** @var \Siel\Acumulus\Helpers\TranslatorInterface */
@@ -23,7 +23,7 @@ abstract class Mailer
     protected $log;
 
     /**
-     * @param \Siel\Acumulus\Web\ConfigInterface $config
+     * @param \Siel\Acumulus\Config\ConfigInterface $config
      * @param TranslatorInterface $translator
      * @param \Siel\Acumulus\Web\Service $service
      * @param \Siel\Acumulus\Helpers\Log $log

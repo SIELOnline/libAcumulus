@@ -1,8 +1,8 @@
 <?php
 namespace Siel\Acumulus\OpenCart\Invoice;
 
+use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Helpers\Number;
-use Siel\Acumulus\Invoice\ConfigInterface;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
 
@@ -206,8 +206,8 @@ class Creator extends BaseCreator
      *   The tax class to look up the vat rate for.
      *
      * @return array
-     *   Either an array with keys 'meta-lookup-vatrate' and
-     *  'meta-lookup-vatrate-label' or an empty array.
+     *   Either an array with keys 'meta-vatrate-lookup' and
+     *  'meta-vatrate-lookup-label' or an empty array.
      */
     protected function getVatRateLookupMetadata($taxClassId) {
         $result = array();
@@ -226,9 +226,9 @@ class Creator extends BaseCreator
             }
         }
         if (count($vatRates) === 1) {
-            $result['meta-lookup-vatrate'] = reset($vatRates);
+            $result['meta-vatrate-lookup'] = reset($vatRates);
             // Take the first name (if there were more tax rates).
-            $result['meta-lookup-vatrate-label'] = $label;
+            $result['meta-vatrate-lookup-label'] = $label;
         }
         return $result;
     }
@@ -426,11 +426,25 @@ class Creator extends BaseCreator
             } elseif (empty($result)) {
                 // First row: set result
                 $result = $vatRateMetadata;
-            } elseif (!Number::floatsAreEqual($vatRateMetadata['meta-lookup-vatrate'], $result['meta-lookup-vatrate'])) {
+            } elseif (!Number::floatsAreEqual($vatRateMetadata['meta-vatrate-lookup'], $result['meta-vatrate-lookup'])) {
                 // Different rates between tax classes: return no result.
                 return array();
             } // else: rates are the same: continue.
         }
         return $result;
+    }
+
+    /**
+     * Returns the shipping costs line.
+     *
+     * To be able to produce a packing slip, a shipping line should normally be
+     * added, even for free shipping.
+     *
+     * @return array
+     *   A line array, empty if there is no shipping fee line.
+     */
+    protected function getShippingLine()
+    {
+        throw new \RuntimeException(__METHOD__ . ' should never be called');
     }
 }

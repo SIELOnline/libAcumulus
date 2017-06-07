@@ -1,7 +1,7 @@
 <?php
 namespace Siel\Acumulus\Invoice;
 
-use Siel\Acumulus\Helpers\Log;
+use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Helpers\TranslatorInterface;
 
 /**
@@ -11,7 +11,7 @@ use Siel\Acumulus\Helpers\TranslatorInterface;
  */
 abstract class CompletorStrategyBase
 {
-    /** @var \Siel\Acumulus\Invoice\ConfigInterface */
+    /** @var \Siel\Acumulus\Config\ConfigInterface */
     protected $config;
 
     /** @var \Siel\Acumulus\Helpers\TranslatorInterface */
@@ -89,7 +89,7 @@ abstract class CompletorStrategyBase
     protected $source;
 
     /**
-     * @param \Siel\Acumulus\Invoice\ConfigInterface $config
+     * @param \Siel\Acumulus\Config\ConfigInterface $config
      * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
      * @param array $invoice
      * @param array $possibleVatTypes

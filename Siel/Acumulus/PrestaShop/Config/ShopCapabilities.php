@@ -1,12 +1,12 @@
 <?php
-namespace Siel\Acumulus\PrestaShop\Shop;
+namespace Siel\Acumulus\PrestaShop\Config;
 
 use Acumulus;
 use Context;
 use Module;
 use OrderState;
 use PaymentModule;
-use Siel\Acumulus\Shop\ShopCapabilities as ShopCapabilitiesBase;
+use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
 
 /**
  * Defines the PrestaShop webshop specific capabilities.

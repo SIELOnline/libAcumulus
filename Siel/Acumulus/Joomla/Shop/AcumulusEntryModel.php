@@ -6,7 +6,6 @@ use JDate;
 use JFactory;
 use JTable;
 use Siel\Acumulus\Shop\AcumulusEntryModel as BaseAcumulusEntryModel;
-use Siel\Acumulus\Joomla\Helpers\Log;
 
 /**
  * Implements the VirtueMart specific acumulus entry model class.

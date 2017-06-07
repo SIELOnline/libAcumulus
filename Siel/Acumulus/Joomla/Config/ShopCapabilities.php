@@ -1,10 +1,10 @@
 <?php
-namespace Siel\Acumulus\Joomla\Shop;
+namespace Siel\Acumulus\Joomla\Config;
 
 use JRoute;
 use JTable;
 use JTableExtension;
-use Siel\Acumulus\Shop\ShopCapabilities as ShopCapabilitiesBase;
+use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
 
 /**
  * Defines Joomla webshops specific capabilities.

@@ -1,9 +1,9 @@
 <?php
-namespace Siel\Acumulus\Joomla\Shop;
+namespace Siel\Acumulus\Joomla\Config;
 
 use JComponentHelper;
 use JTable;
-use Siel\Acumulus\Shop\ConfigStore as BaseConfigStore;
+use Siel\Acumulus\Config\ConfigStore as BaseConfigStore;
 
 /**
  * Implements the connection to the Joomla config component.

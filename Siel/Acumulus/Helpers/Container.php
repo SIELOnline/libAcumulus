@@ -190,7 +190,7 @@ class Container implements ContainerInterface
 
         $log = $this->getLog();
         $configStore = $this->getConfigStore();
-        $result = $this->getInstance('Config', 'Shop', array($configStore, $this->getShopCapabilities(), $this->getTranslator(), $log));
+        $result = $this->getInstance('Config', 'Config', array($configStore, $this->getShopCapabilities(), $this->getTranslator(), $log));
         if ($is1stTime) {
             $configStore->setConfig($result);
             $pluginSettings = $result->getPluginSettings();
@@ -208,7 +208,7 @@ class Container implements ContainerInterface
      */
     public function getConfigStore()
     {
-        return $this->getInstance('ConfigStore', 'Shop');
+        return $this->getInstance('ConfigStore', 'Config');
     }
 
     /**
@@ -216,7 +216,7 @@ class Container implements ContainerInterface
      */
     public function getShopCapabilities()
     {
-        return $this->getInstance('ShopCapabilities', 'Shop', array($this->getTranslator(), $this->shopNamespace, $this->getLog()));
+        return $this->getInstance('ShopCapabilities', 'Config', array($this->getTranslator(), $this->shopNamespace, $this->getLog()));
     }
 
     /**

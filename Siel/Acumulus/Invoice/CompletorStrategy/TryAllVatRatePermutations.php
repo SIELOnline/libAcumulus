@@ -1,7 +1,6 @@
 <?php
 namespace Siel\Acumulus\Invoice\CompletorStrategy;
 
-use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\CompletorStrategyBase;
 

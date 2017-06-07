@@ -1,7 +1,7 @@
 <?php
 namespace Siel\Acumulus\Shop;
 
-use Siel\Acumulus\Invoice\ConfigInterface as InvoiceConfigInterface;
+use Siel\Acumulus\Config\ConfigInterface;
 
 /**
  * Provides advanced config form handling.
@@ -735,8 +735,8 @@ class AdvancedConfigForm extends BaseConfigForm
     protected function getContactStatusOptions()
     {
         return array(
-            InvoiceConfigInterface::ContactStatus_Active => $this->t('option_contactStatus_Active'),
-            InvoiceConfigInterface::ContactStatus_Disabled => $this->t('option_contactStatus_Disabled'),
+            ConfigInterface::ContactStatus_Active => $this->t('option_contactStatus_Active'),
+            ConfigInterface::ContactStatus_Disabled => $this->t('option_contactStatus_Disabled'),
         );
     }
 }

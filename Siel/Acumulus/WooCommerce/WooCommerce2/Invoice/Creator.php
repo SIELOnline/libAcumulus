@@ -313,8 +313,9 @@ class Creator extends BaseCreator
             //$tax = reset($taxes);
             $vatLookupTags = array(
                 // Will contain a % at the end of the string.
-                'meta-lookup-vatrate' => substr(WC_Tax::get_rate_percent(key($taxes)), 0, -1),
-                'meta-lookup-vatrate-label' => WC_Tax::get_rate_label(key($taxes)),
+                'meta-vatrate-lookup' => substr(WC_Tax::get_rate_percent(key($taxes)), 0, -1),
+                'meta-vatrate-lookup-label' => WC_Tax::get_rate_label(key($taxes)),
+                'meta-vatrate-lookup-source' => '$line[\'taxes\']',
             );
         } else {
             // Apparently we have free shipping (or a misconfigured shipment
@@ -329,9 +330,9 @@ class Creator extends BaseCreator
                 if (count($tax_rates) === 1) {
                     $tax_rate = reset($tax_rates);
                     $vatLookupTags = array(
-                        'meta-lookup-vatrate' => $tax_rate['rate'],
-                        'meta-lookup-vatrate-label' => $tax_rate['label'],
-                        'meta-lookup-vatrate-source' => "get_option('woocommerce_shipping_tax_class')",
+                        'meta-vatrate-lookup' => $tax_rate['rate'],
+                        'meta-vatrate-lookup-label' => $tax_rate['label'],
+                        'meta-vatrate-lookup-source' => "get_option('woocommerce_shipping_tax_class')",
                     );
                 }
             }

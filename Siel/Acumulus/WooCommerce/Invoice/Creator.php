@@ -1,8 +1,8 @@
 <?php
 namespace Siel\Acumulus\WooCommerce\Invoice;
 
+use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Helpers\Number;
-use Siel\Acumulus\Invoice\ConfigInterface;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use WC_Abstract_Order;
 use WC_Coupon;
@@ -281,8 +281,8 @@ class Creator extends BaseCreator
      * @param string $taxClass
      *
      * @return array
-     *   Either an array with keys 'meta-lookup-vatrate' and
-     *  'meta-lookup-vatrate-label' or an empty array.
+     *   Either an array with keys 'meta-vatrate-lookup' and
+     *  'meta-vatrate-lookup-label' or an empty array.
      */
     protected function getVatRateLookupMetadata($taxClass) {
         $result = array();
@@ -290,8 +290,8 @@ class Creator extends BaseCreator
         if (count($taxRates) === 1) {
             $taxRate = reset($taxRates);
             $result = array(
-                'meta-lookup-vatrate' => $taxRate['rate'],
-                'meta-lookup-vatrate-label' => $taxRate['label'],
+                'meta-vatrate-lookup' => $taxRate['rate'],
+                'meta-vatrate-lookup-label' => $taxRate['label'],
             );
         }
         return $result;
@@ -550,8 +550,8 @@ class Creator extends BaseCreator
             //$tax = reset($taxes);
             $vatLookupTags = array(
                 // Will contain a % at the end of the string.
-                'meta-lookup-vatrate' => substr(WC_Tax::get_rate_percent(key($taxes)), 0, -1),
-                'meta-lookup-vatrate-label' => WC_Tax::get_rate_label(key($taxes)),
+                'meta-vatrate-lookup' => substr(WC_Tax::get_rate_percent(key($taxes)), 0, -1),
+                'meta-vatrate-lookup-label' => WC_Tax::get_rate_label(key($taxes)),
             );
         } else {
             // Apparently we have free shipping (or a misconfigured shipment
@@ -566,9 +566,9 @@ class Creator extends BaseCreator
                 if (count($tax_rates) === 1) {
                     $tax_rate = reset($tax_rates);
                     $vatLookupTags = array(
-                        'meta-lookup-vatrate' => $tax_rate['rate'],
-                        'meta-lookup-vatrate-label' => $tax_rate['label'],
-                        'meta-lookup-vatrate-source' => "get_option('woocommerce_shipping_tax_class')",
+                        'meta-vatrate-lookup' => $tax_rate['rate'],
+                        'meta-vatrate-lookup-label' => $tax_rate['label'],
+                        'meta-vatrate-lookup-source' => "get_option('woocommerce_shipping_tax_class')",
                     );
                 }
             }

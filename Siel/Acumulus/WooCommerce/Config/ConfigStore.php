@@ -1,7 +1,7 @@
 <?php
-namespace Siel\Acumulus\WooCommerce\Shop;
+namespace Siel\Acumulus\WooCommerce\Config;
 
-use Siel\Acumulus\Shop\ConfigStore as BaseConfigStore;
+use Siel\Acumulus\Config\ConfigStore as BaseConfigStore;
 
 /**
  * Implements the connection to the WordPress config component.

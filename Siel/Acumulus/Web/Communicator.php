@@ -5,7 +5,7 @@ use DOMDocument;
 use DOMElement;
 use Exception;
 use LibXMLError;
-use Siel\Acumulus\Shop\ConfigInterface as ShopConfigInterface;
+use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Helpers\Log;
 
 /**
@@ -19,7 +19,7 @@ use Siel\Acumulus\Helpers\Log;
  */
 class Communicator implements CommunicatorInterface
 {
-    /** @var \Siel\Acumulus\Shop\ConfigInterface */
+    /** @var \Siel\Acumulus\Config\ConfigInterface */
     protected $config;
 
     /** @var \Siel\Acumulus\Helpers\Log */
@@ -34,14 +34,13 @@ class Communicator implements CommunicatorInterface
     /**
      * Communicator constructor.
      *
-     * @param \Siel\Acumulus\Shop\ConfigInterface $config
+     * @param \Siel\Acumulus\Config\ConfigInterface $config
      * @param \Siel\Acumulus\Helpers\Log $log
      */
-    public function __construct(ShopConfigInterface $config, Log $log) {
+    public function __construct(ConfigInterface $config, Log $log) {
         $this->config = $config;
         $this->log = $log;
     }
-
 
     /**
      * Sends a message to the given API function and returns the results.

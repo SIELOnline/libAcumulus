@@ -2,7 +2,7 @@
 namespace Siel\Acumulus\Magento\Magento1\Invoice;
 
 use Siel\Acumulus\Helpers\Number;
-use Siel\Acumulus\Invoice\ConfigInterface;
+use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Magento\Invoice\Creator as BaseCreator;
 
 /**
@@ -121,35 +121,59 @@ class Creator extends BaseCreator
         $this->addTokenDefault($result, 'product', $invoiceSettings['productName']);
         $this->addTokenDefault($result, 'nature', $invoiceSettings['nature']);
 
-        $vatRate = (float) $item->getTaxPercent();
-        $productPriceInc = (float) $item->getPriceInclTax();
-        // For higher precision of the unit price, we use the prices as entered
+        // For higher precision of the unit price, we use the price as entered
         // by the admin.
-        $productPriceEx = $this->productPricesIncludeTax() ? (float) $productPriceInc / (100.0 + $vatRate) * 100.0 : (float) $item->getPrice();
+        if ($this->productPricesIncludeTax()) {
+            $tag = 'unitpriceinc';
+            $productPrice = (float) $item->getPriceInclTax();
+
+        } else {
+            $tag = 'unitprice';
+            $productPrice = (float) $item->getPrice();
+        }
+
         // Tax amount = VAT over discounted product price.
         // Hidden tax amount = VAT over discount.
+        // Tax percent = VAT % as specified in product settings, for the parent
+        // of bundled products this may be 0 and incorrect.
         // But as discounts get their own lines and the product lines are
         // showing the normal (not discounted) price we add these 2.
+        $vatRate = (float) $item->getTaxPercent();
         $lineVat = (float) $item->getTaxAmount() + (float) $item->getHiddenTaxAmount();
 
-        // Simple products (products without children): add as 1 line.
+        // Add price and quantity info.
         $result += array(
-            'unitprice' => $productPriceEx,
-            'unitpriceinc' => $productPriceInc,
-            'vatrate' => $vatRate,
-            'meta-line-vatamount' => $lineVat,
+            $tag => $productPrice,
             'quantity' => $item->getQtyOrdered(),
-            'meta-vatrate-source' => static::VatRateSource_Exact,
+            'meta-line-vatamount' => $lineVat,
         );
+
+        // Add VAT related info
+        $childrenItems = $item->getChildrenItems();
+        if (Number::isZero($vatRate) && !empty($childrenItems)) {
+            // 0 VAT rate on parent: this is (very very) probably not correct.
+            $result += array(
+                'vatrate' => null,
+                'meta-vatrate-source' => Creator::VatRateSource_Completor,
+                'meta-vatrate-lookup' => $vatRate,
+                'meta-vatrate-lookup-source' => '$item->getTaxPercent()',
+            );
+        } else {
+            // No 0 VAT or not a parent product: the vat rate is real.
+            $result += array(
+                'vatrate' => $vatRate,
+                'meta-vatrate-source' => Number::isZero($vatRate) ? Creator::VatRateSource_Exact0 : Creator::VatRateSource_Exact,
+            );
+        }
+
+        // Add discount related info.
         if (!Number::isZero($item->getDiscountAmount())) {
             // Store discount on this item to be able to get correct discount
             // lines later on in the completion phase.
             $result['meta-line-discount-amountinc'] = -$item->getDiscountAmount();
         }
 
-        // Add child lines for composed products, a.o. to be able to print a
-        // packing slip in Acumulus.
-        $childrenItems = $item->getChildrenItems();
+        // Add children lines for composed products.
         if (!empty($childrenItems)) {
             $result[Creator::Line_Children] = array();
             foreach ($childrenItems as $child) {

@@ -1,9 +1,9 @@
 <?php
-namespace Siel\Acumulus\WooCommerce\Shop;
+namespace Siel\Acumulus\WooCommerce\Config;
 
 use Acumulus;
-use Siel\Acumulus\Invoice\ConfigInterface as InvoiceConfigInterface;
-use Siel\Acumulus\Shop\ShopCapabilities as ShopCapabilitiesBase;
+use Siel\Acumulus\Config\ConfigInterface;
+use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
 
 /**
  * Defines the WooCommerce webshop specific capabilities.
@@ -205,7 +205,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function getInvoiceNrSourceOptions()
     {
         $result = parent::getInvoiceNrSourceOptions();
-        unset($result[InvoiceConfigInterface::InvoiceNrSource_ShopInvoice]);
+        unset($result[ConfigInterface::InvoiceNrSource_ShopInvoice]);
         return $result;
     }
 
@@ -218,7 +218,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function getDateToUseOptions()
     {
         $result = parent::getDateToUseOptions();
-        unset($result[InvoiceConfigInterface::InvoiceDate_InvoiceCreate]);
+        unset($result[ConfigInterface::InvoiceDate_InvoiceCreate]);
         return $result;
     }
 

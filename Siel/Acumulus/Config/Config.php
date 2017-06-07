@@ -1,10 +1,8 @@
 <?php
-namespace Siel\Acumulus\Shop;
+namespace Siel\Acumulus\Config;
 
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Translator;
-use Siel\Acumulus\Invoice\ConfigInterface as InvoiceConfigInterface;
-use Siel\Acumulus\Web\ConfigInterface as ServiceConfigInterface;
 
 /**
  * Gives common code in this package uniform access to the settings for this
@@ -20,10 +18,10 @@ use Siel\Acumulus\Web\ConfigInterface as ServiceConfigInterface;
  */
 class Config implements ConfigInterface
 {
-    /** @var \Siel\Acumulus\Shop\ConfigStoreInterface */
+    /** @var \Siel\Acumulus\Config\ConfigStoreInterface */
     protected $configStore;
 
-    /** @var \Siel\Acumulus\Shop\ShopCapabilitiesInterface */
+    /** @var \Siel\Acumulus\Config\ShopCapabilitiesInterface */
     protected $shopCapabilities;
 
     /** @var \Siel\Acumulus\Helpers\Translator */
@@ -44,8 +42,8 @@ class Config implements ConfigInterface
     /**
      * Config constructor.
      *
-     * @param \Siel\Acumulus\Shop\ConfigStoreInterface $configStore
-     * @param \Siel\Acumulus\Shop\ShopCapabilitiesInterface $shopCapabilities
+     * @param \Siel\Acumulus\Config\ConfigStoreInterface $configStore
+     * @param \Siel\Acumulus\Config\ShopCapabilitiesInterface $shopCapabilities
      * @param \Siel\Acumulus\Helpers\Translator $translator
      * @param \Siel\Acumulus\Helpers\Log $log
      */
@@ -79,7 +77,7 @@ class Config implements ConfigInterface
     /**
      * Wrapper getter around the config store object.
      *
-     * @return \Siel\Acumulus\Shop\ConfigStoreInterface
+     * @return \Siel\Acumulus\Config\ConfigStoreInterface
      */
     protected function getConfigStore()
     {
@@ -89,7 +87,7 @@ class Config implements ConfigInterface
     /**
      * Wrapper getter around the store capabilities object.
      *
-     * @return \Siel\Acumulus\Shop\ShopCapabilitiesInterface
+     * @return \Siel\Acumulus\Config\ShopCapabilitiesInterface
      */
     protected function getShopCapabilities()
     {
@@ -392,17 +390,17 @@ class Config implements ConfigInterface
                 'baseUri' => array(
                     'group' => 'environment',
                     'type' => 'string',
-                    'default' => ServiceConfigInterface::baseUri,
+                    'default' => ConfigInterface::baseUri,
                 ),
                 'apiVersion' => array(
                     'group' => 'environment',
                     'type' => 'string',
-                    'default' => ServiceConfigInterface::apiVersion,
+                    'default' => ConfigInterface::apiVersion,
                 ),
                 'libraryVersion' => array(
                     'group' => 'environment',
                     'type' => 'string',
-                    'default' => ServiceConfigInterface::libraryVersion,
+                    'default' => ConfigInterface::libraryVersion,
                 ),
                 'moduleVersion' => array(
                     'group' => 'environment',
@@ -447,7 +445,7 @@ class Config implements ConfigInterface
                 'debug' => array(
                     'group' => 'plugin',
                     'type' => 'int',
-                    'default' => ServiceConfigInterface::Debug_None,
+                    'default' => ConfigInterface::Debug_None,
                 ),
                 'logLevel' => array(
                     'group' => 'plugin',
@@ -457,7 +455,7 @@ class Config implements ConfigInterface
                 'outputFormat' => array(
                     'group' => 'plugin',
                     'type' => 'string',
-                    'default' => ServiceConfigInterface::outputFormat,
+                    'default' => ConfigInterface::outputFormat,
                 ),
                 'contractcode' => array(
                     'group' => 'credentials',
@@ -507,7 +505,7 @@ class Config implements ConfigInterface
                 'contactStatus' => array(
                     'group' => 'customer',
                     'type' => 'int',
-                    'default' => InvoiceConfigInterface::ContactStatus_Active,
+                    'default' => ConfigInterface::ContactStatus_Active,
                 ),
                 'companyName1' => array(
                     'group' => 'customer',
@@ -689,22 +687,22 @@ class Config implements ConfigInterface
                 'digitalServices' => array(
                     'group' => 'shop',
                     'type' => 'int',
-                    'default' => InvoiceConfigInterface::DigitalServices_Unknown,
+                    'default' => ConfigInterface::DigitalServices_Unknown,
                 ),
                 'vatFreeProducts' => array(
                     'group' => 'shop',
                     'type' => 'int',
-                    'default' => InvoiceConfigInterface::VatFreeProducts_Unknown,
+                    'default' => ConfigInterface::VatFreeProducts_Unknown,
                 ),
                 'invoiceNrSource' => array(
                     'group' => 'shop',
                     'type' => 'int',
-                    'default' => InvoiceConfigInterface::InvoiceNrSource_ShopInvoice,
+                    'default' => ConfigInterface::InvoiceNrSource_ShopInvoice,
                 ),
                 'dateToUse' => array(
                     'group' => 'shop',
                     'type' => 'int',
-                    'default' => InvoiceConfigInterface::InvoiceDate_InvoiceCreate,
+                    'default' => ConfigInterface::InvoiceDate_InvoiceCreate,
                 ),
                 'triggerOrderStatus' => array(
                     'group' => 'event',
@@ -830,7 +828,7 @@ class Config implements ConfigInterface
         // 2) Debug mode.
         switch ($this->get('debug')) {
             case 4: // Value for deprecated ServiceConfigInterface::Debug_StayLocal.
-                $newSettings['logLevel'] = ServiceConfigInterface::Debug_TestMode;
+                $newSettings['logLevel'] = ConfigInterface::Debug_TestMode;
                 break;
         }
 

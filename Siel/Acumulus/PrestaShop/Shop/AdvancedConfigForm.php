@@ -1,10 +1,10 @@
 <?php
 namespace Siel\Acumulus\PrestaShop\Shop;
 
+use Siel\Acumulus\Config\ConfigInterface;
+use Siel\Acumulus\Config\ShopCapabilitiesInterface;
 use Siel\Acumulus\Helpers\TranslatorInterface;
 use Siel\Acumulus\Shop\AdvancedConfigForm as BaseAdvancedConfigForm;
-use Siel\Acumulus\Shop\ConfigInterface;
-use Siel\Acumulus\Shop\ShopCapabilitiesInterface;
 use Siel\Acumulus\Web\Service;
 use Tools;
 
@@ -21,9 +21,9 @@ class AdvancedConfigForm extends BaseAdvancedConfigForm
      * ConfigForm constructor.
      *
      * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
-     * @param \Siel\Acumulus\Shop\ShopCapabilitiesInterface $shopCapabilities
+     * @param \Siel\Acumulus\Config\ShopCapabilitiesInterface $shopCapabilities
      * @param \Siel\Acumulus\Web\Service $service
-     * @param \Siel\Acumulus\Shop\ConfigInterface $config
+     * @param \Siel\Acumulus\Config\ConfigInterface $config
      */
     public function __construct(TranslatorInterface $translator, ShopCapabilitiesInterface $shopCapabilities, ConfigInterface $config, Service $service)
     {

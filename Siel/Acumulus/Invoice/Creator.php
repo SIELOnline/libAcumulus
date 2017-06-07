@@ -1,12 +1,13 @@
 <?php
 namespace Siel\Acumulus\Invoice;
 
+use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Helpers\Countries;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Helpers\Token;
 use Siel\Acumulus\Helpers\TranslatorInterface;
-use Siel\Acumulus\Shop\Config;
+use Siel\Acumulus\Config\Config;
 
 /**
  * Creator creates a raw invoice similar to the Acumulus invoice structure.
@@ -50,7 +51,7 @@ abstract class Creator
 
     const Line_Children = 'children';
 
-    /** @var \Siel\Acumulus\Shop\Config */
+    /** @var \Siel\Acumulus\Config\Config */
     protected $config;
 
     /** @var \Siel\Acumulus\Helpers\Token */
@@ -81,7 +82,7 @@ abstract class Creator
     /**
      * Constructor.
      *
-     * @param \Siel\Acumulus\Helpers\ContainerInterface|\Siel\Acumulus\Shop\Config $config
+     * @param \Siel\Acumulus\Helpers\ContainerInterface|\Siel\Acumulus\Config\Config $config
      * @param \Siel\Acumulus\Helpers\Token $token
      * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
      * @param \Siel\Acumulus\Helpers\Log $log

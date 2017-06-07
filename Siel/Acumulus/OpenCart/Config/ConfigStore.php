@@ -1,8 +1,8 @@
 <?php
-namespace Siel\Acumulus\OpenCart\Shop;
+namespace Siel\Acumulus\OpenCart\Config;
 
+use Siel\Acumulus\Config\ConfigStore as BaseConfigStore;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
-use Siel\Acumulus\Shop\ConfigStore as BaseConfigStore;
 
 /**
  * Implements the connection to the OpenCart config component.

@@ -9,13 +9,12 @@ class Requirements
     /**
      * Checks if the requirements for the environment are met.
      *
-     * @todo: remove static, add to container, access via container.
      * @return string[]
      *   An array with messages regarding missing requirements, empty if all
      *   requirements are met. The keys are the translations keys, the values are
      *   the English translations.
      */
-    static public function check()
+    public function check()
     {
         $result = array();
 

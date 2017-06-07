@@ -1,15 +1,15 @@
 <?php
-namespace Siel\Acumulus\Magento\Magento1\Shop;
+namespace Siel\Acumulus\PrestaShop\Config;
 
-use Mage;
-use Siel\Acumulus\Shop\ConfigStore as BaseConfigStore;
+use Configuration;
+use Siel\Acumulus\Config\ConfigStore as BaseConfigStore;
 
 /**
- * Implements the connection to the Magento config component.
+ * Implements the connection to the PrestaShop config component.
  */
 class ConfigStore extends BaSeConfigStore
 {
-    protected $configKey = 'siel_acumulus/';
+    const CONFIG_KEY = 'ACUMULUS_';
 
     /**
      * {@inheritdoc}
@@ -19,9 +19,10 @@ class ConfigStore extends BaSeConfigStore
         $result = array();
         // Load the values from the web shop specific configuration.
         foreach ($keys as $key) {
-            $value = Mage::getStoreConfig($this->configKey . $key);
-            // Do not overwrite defaults if no value is set.
-            if (isset($value)) {
+            $dbKey = substr(static::CONFIG_KEY . $key, 0, 32);
+            $value = Configuration::get($dbKey);
+            // Do not overwrite defaults if no value is stored.
+            if ($value !== false) {
                 if (is_string($value) && strpos($value, '{') !== false) {
                     $unserialized = @unserialize($value);
                     if ($unserialized !== false) {
@@ -39,22 +40,21 @@ class ConfigStore extends BaSeConfigStore
      */
     public function save(array $values)
     {
-        /** @var \Mage_Core_Model_Config $configModel */
-        $configModel = Mage::getModel('core/config');
+        $result = true;
         $defaults = $this->acumulusConfig->getDefaults();
         foreach ($values as $key => $value) {
+            $dbKey = substr(static::CONFIG_KEY . $key, 0, 32);
             if ((isset($defaults[$key]) && $defaults[$key] === $value) || $value === null) {
-                $configModel->deleteConfig($this->configKey . $key);
+              $result = Configuration::deleteByName($dbKey) && $result;
             } else {
                 if (is_bool($value)) {
-                    $value = $value ? 1 : 0;
+                    $value = $value ? '1' : '0';
                 } elseif (is_array($value)) {
                     $value = serialize($value);
                 }
-                $configModel->saveConfig($this->configKey . $key, $value);
+                $result = Configuration::updateValue($dbKey, $value) && $result;
             }
         }
-        Mage::getConfig()->reinit();
-        return true;
+        return $result;
     }
 }

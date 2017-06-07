@@ -1,8 +1,8 @@
 <?php
 namespace Siel\Acumulus\Invoice\CompletorStrategy;
 
+use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Invoice\CompletorStrategyBase;
-use Siel\Acumulus\Invoice\ConfigInterface;
 
 /**
  * Class SplitNonMatchingLine implements a vat completor strategy by recognizing

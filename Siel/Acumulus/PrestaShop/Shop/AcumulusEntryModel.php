@@ -2,6 +2,7 @@
 namespace Siel\Acumulus\PrestaShop\Shop;
 
 use Db;
+use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\PrestaShop\Invoice\Source;
 use Siel\Acumulus\Shop\AcumulusEntryModel as BaseAcumulusEntryModel;
 
@@ -19,9 +20,12 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
 
     /**
      * AcumulusEntryModel constructor.
+     *
+     * @param \Siel\Acumulus\Helpers\Log $log
      */
-    public function __construct()
+    public function __construct(Log $log)
     {
+        parent::__construct($log);
         $this->tableName = _DB_PREFIX_ . 'acumulus_entry';
     }
 

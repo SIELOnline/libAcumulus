@@ -5,7 +5,6 @@ use DateTime;
 use Siel\Acumulus\Helpers\ContainerInterface;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
 use Siel\Acumulus\PrestaShop\Invoice\Source;
-use Siel\Acumulus\Shop\Config;
 use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
 
 class InvoiceManager extends BaseInvoiceManager

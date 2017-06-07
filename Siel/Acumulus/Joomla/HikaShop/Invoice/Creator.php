@@ -3,7 +3,7 @@ namespace Siel\Acumulus\Joomla\HikaShop\Invoice;
 
 use hikashopConfigClass;
 use Siel\Acumulus\Helpers\Number;
-use Siel\Acumulus\Invoice\ConfigInterface;
+use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use stdClass;
 

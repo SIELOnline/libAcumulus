@@ -1,11 +1,10 @@
 <?php
-namespace Siel\Acumulus\OpenCart\Shop;
+namespace Siel\Acumulus\OpenCart\Config;
 
-use Siel\Acumulus\Invoice\ConfigInterface as InvoiceConfigInterface;
+use Siel\Acumulus\Config\ConfigInterface;
+use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
-use Siel\Acumulus\Shop\ShopCapabilities as ShopCapabilitiesBase;
-use Siel\Acumulus\Web\ConfigInterface as ServiceConfigInterface;
 
 /**
  * Defines the OpenCart 1 and 2 webshop specific capabilities.
@@ -19,7 +18,7 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
     {
         $environment = array(
             // Module has same version as library.
-            'moduleVersion' => ServiceConfigInterface::libraryVersion,
+            'moduleVersion' => ConfigInterface::libraryVersion,
             'shopName' => $this->shopName,
             'shopVersion' => VERSION,
         );
@@ -295,7 +294,7 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
     public function getDateToUseOptions()
     {
         $result = parent::getDateToUseOptions();
-        unset($result[InvoiceConfigInterface::InvoiceDate_InvoiceCreate]);
+        unset($result[ConfigInterface::InvoiceDate_InvoiceCreate]);
         return $result;
     }
 

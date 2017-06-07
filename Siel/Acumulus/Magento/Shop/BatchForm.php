@@ -1,7 +1,6 @@
 <?php
 namespace Siel\Acumulus\Magento\Shop;
 
-use Siel\Acumulus\Magento\Magento2\Helpers\Registry;
 use Siel\Acumulus\Shop\BatchForm as BaseBatchForm;
 
 /**

@@ -1,10 +1,11 @@
 <?php
 namespace Siel\Acumulus\Invoice;
 
+use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Helpers\Countries;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Helpers\TranslatorInterface;
-use Siel\Acumulus\Shop\Config;
+use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Web\Service;
 
 /**
@@ -49,7 +50,7 @@ class Completor
         self::VatRateSource_Copied,
     );
 
-    /** @var \Siel\Acumulus\Invoice\ConfigInterface */
+    /** @var \Siel\Acumulus\Config\ConfigInterface */
     protected $config;
 
     /** @var \Siel\Acumulus\Helpers\TranslatorInterface */
@@ -95,7 +96,7 @@ class Completor
     /**
      * Constructor.
      *
-     * @param \Siel\Acumulus\Invoice\ConfigInterface $config
+     * @param \Siel\Acumulus\Config\ConfigInterface $config
      * @param \Siel\Acumulus\Invoice\CompletorInvoiceLines $completorInvoiceLines
      * @param \Siel\Acumulus\Invoice\CompletorStrategyLines $completorStrategyLines
      * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator

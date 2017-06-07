@@ -1,9 +1,8 @@
 <?php
-namespace Siel\Acumulus\Shop;
+namespace Siel\Acumulus\Config;
 
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\TranslatorInterface;
-use Siel\Acumulus\Invoice\ConfigInterface as InvoiceConfigInterface;
 use Siel\Acumulus\Invoice\Source;
 
 /**
@@ -109,9 +108,9 @@ abstract class ShopCapabilities implements ShopCapabilitiesInterface
     public function getInvoiceNrSourceOptions()
     {
         return array(
-            InvoiceConfigInterface::InvoiceNrSource_ShopInvoice => $this->t('option_invoiceNrSource_1'),
-            InvoiceConfigInterface::InvoiceNrSource_ShopOrder => $this->t('option_invoiceNrSource_2'),
-            InvoiceConfigInterface::InvoiceNrSource_Acumulus => $this->t('option_invoiceNrSource_3'),
+            ConfigInterface::InvoiceNrSource_ShopInvoice => $this->t('option_invoiceNrSource_1'),
+            ConfigInterface::InvoiceNrSource_ShopOrder => $this->t('option_invoiceNrSource_2'),
+            ConfigInterface::InvoiceNrSource_Acumulus => $this->t('option_invoiceNrSource_3'),
         );
     }
 
@@ -124,9 +123,9 @@ abstract class ShopCapabilities implements ShopCapabilitiesInterface
     public function getDateToUseOptions()
     {
         return array(
-            InvoiceConfigInterface::InvoiceDate_InvoiceCreate => $this->t('option_dateToUse_1'),
-            InvoiceConfigInterface::InvoiceDate_OrderCreate => $this->t('option_dateToUse_2'),
-            InvoiceConfigInterface::InvoiceDate_Transfer => $this->t('option_dateToUse_3'),
+            ConfigInterface::InvoiceDate_InvoiceCreate => $this->t('option_dateToUse_1'),
+            ConfigInterface::InvoiceDate_OrderCreate => $this->t('option_dateToUse_2'),
+            ConfigInterface::InvoiceDate_Transfer => $this->t('option_dateToUse_3'),
         );
     }
 

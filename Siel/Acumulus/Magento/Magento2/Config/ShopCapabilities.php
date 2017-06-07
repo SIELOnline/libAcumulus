@@ -1,9 +1,9 @@
 <?php
-namespace Siel\Acumulus\Magento\Magento2\Shop;
+namespace Siel\Acumulus\Magento\Magento2\Config;
 
 use Siel\Acumulus\Magento\Magento2\Helpers\Registry;
-use Siel\Acumulus\Shop\ConfigInterface;
-use Siel\Acumulus\Shop\ShopCapabilities as ShopCapabilitiesBase;
+use Siel\Acumulus\Config\ConfigInterface;
+use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
 
 /**
  * Defines the Magento 2 webshop specific capabilities.

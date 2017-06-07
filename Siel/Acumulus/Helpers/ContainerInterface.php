@@ -111,17 +111,17 @@ interface ContainerInterface
     public function getCreator();
 
     /**
-     * @return \Siel\Acumulus\Shop\ConfigInterface
+     * @return \Siel\Acumulus\Config\ConfigInterface
      */
     public function getConfig();
 
     /**
-     * @return \Siel\Acumulus\Shop\ConfigStoreInterface
+     * @return \Siel\Acumulus\Config\ConfigStoreInterface
      */
     public function getConfigStore();
 
     /**
-     * @return \Siel\Acumulus\Shop\ShopCapabilitiesInterface
+     * @return \Siel\Acumulus\Config\ShopCapabilitiesInterface
      */
     public function getShopCapabilities();
 

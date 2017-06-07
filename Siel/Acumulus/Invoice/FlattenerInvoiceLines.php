@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\Invoice;
 
+use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Helpers\Number;
 
 /**
@@ -14,7 +15,7 @@ use Siel\Acumulus\Helpers\Number;
  */
 class FlattenerInvoiceLines
 {
-    /** @var \Siel\Acumulus\Invoice\ConfigInterface  */
+    /** @var \Siel\Acumulus\Config\ConfigInterface  */
     protected $config;
 
     protected $parentIndex = 1;
@@ -22,7 +23,7 @@ class FlattenerInvoiceLines
     /**
      * Constructor.
      *
-     * @param \Siel\Acumulus\Invoice\ConfigInterface $config
+     * @param \Siel\Acumulus\Config\ConfigInterface $config
      */
     public function __construct(ConfigInterface $config)
     {
@@ -368,7 +369,7 @@ class FlattenerInvoiceLines
                 $child['meta-vatrate-source'] = Completor::VatRateSource_Copied;
                 unset($child['meta-vatrate-min']);
                 unset($child['meta-vatrate-max']);
-                unset($child['meta-lookup-vatrate']);
+                unset($child['meta-vatrate-lookup']);
             } else {
                 $child['meta-vatrate-source'] = $parent['meta-vatrate-source'];
                 if (isset($parent['meta-vatrate-min'])) {
@@ -381,10 +382,10 @@ class FlattenerInvoiceLines
                 } else {
                     unset($child['meta-vatrate-max']);
                 }
-                if (isset($parent['meta-lookup-vatrate'])) {
-                    $child['meta-lookup-vatrate'] = $parent['meta-lookup-vatrate'];
+                if (isset($parent['meta-vatrate-lookup'])) {
+                    $child['meta-vatrate-lookup'] = $parent['meta-vatrate-lookup'];
                 } else {
-                    unset($child['meta-lookup-vatrate']);
+                    unset($child['meta-vatrate-lookup']);
                 }
             }
 

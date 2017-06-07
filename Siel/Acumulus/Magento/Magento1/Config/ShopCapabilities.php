@@ -1,9 +1,9 @@
 <?php
-namespace Siel\Acumulus\Magento\Magento1\Shop;
+namespace Siel\Acumulus\Magento\Magento1\Config;
 
 use Mage;
-use Siel\Acumulus\Shop\ConfigInterface;
-use Siel\Acumulus\Shop\ShopCapabilities as ShopCapabilitiesBase;
+use Siel\Acumulus\Config\ConfigInterface;
+use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
 
 /**
  * Defines the Magento 1 webshop specific capabilities.

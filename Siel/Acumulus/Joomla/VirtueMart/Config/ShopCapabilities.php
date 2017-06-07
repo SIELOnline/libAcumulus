@@ -1,8 +1,8 @@
 <?php
-namespace Siel\Acumulus\Joomla\VirtueMart\Shop;
+namespace Siel\Acumulus\Joomla\VirtueMart\Config;
 
 use Siel\Acumulus\Invoice\Source;
-use Siel\Acumulus\Joomla\Shop\ShopCapabilities as ShopCapabilitiesBase;
+use Siel\Acumulus\Joomla\Config\ShopCapabilities as ShopCapabilitiesBase;
 use VirtueMartModelOrderstatus;
 use VmModel;
 

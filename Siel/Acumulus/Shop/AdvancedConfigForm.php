@@ -719,19 +719,13 @@ class AdvancedConfigForm extends BaseConfigForm
     }
 
     /**
-     * {@inheritdoc}
+     * Returns the list of possible values for the contact status field.
+     *
+     * @return array
+     *   The list of possible values for the contact status field keyed by the
+     *   value to use in the API and translated labels as the values.
+     *
      */
-    protected function getCheckboxKeys()
-    {
-        return array(
-            'sendCustomer' => 'clientData',
-            'overwriteIfExists' => 'clientData',
-            'sendEmptyInvoice' => 'sendWhat',
-            'sendEmptyShipping' => 'sendWhat',
-            'optionsShow' => 'showOptions',
-        );
-    }
-
     protected function getContactStatusOptions()
     {
         return array(

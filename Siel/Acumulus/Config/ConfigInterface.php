@@ -9,7 +9,7 @@ namespace Siel\Acumulus\Config;
  */
 interface ConfigInterface
 {
-    const libraryVersion = '4.8.0-alpha1';
+    const libraryVersion = '4.8.0-alpha2';
 
     // API result codes, internally I want an increasing order of worseness, so
     // these constants are not used internally but mapped to the status_...

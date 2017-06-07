@@ -616,18 +616,36 @@ abstract class Form
     /**
      * Returns a list of the checkbox names for this form.
      *
-     * This base implementation returns an empty array. Override this method if
-     * your form has checkbox fields.
-     *
-     * @todo: can we do this in a generic way by traversing the fields?
-     *
      * @return array
      *   An array with as keys the checkbox names of this form and as values the
      *   checkbox collection name the checkbox belongs to.
      */
     protected function getCheckboxKeys()
     {
-        return array();
+        return $this->getCheckboxKeysByFields($this->getFields());
+    }
+
+    /**
+     * Returns a list of the checkbox names for these fields.
+     *
+     * @param array[] $fields
+     *   The fields(ets) to extract the checkboxes from.
+     *
+     * @return array
+     *   An array with as keys the checkbox names of this form and as values the
+     *   checkbox collection name the checkbox belongs to.
+     */
+    protected function getCheckboxKeysByFields(array $fields)
+    {
+        $result = array();
+        foreach ($fields as $name => $field) {
+            if ($field['type'] === 'checkbox') {
+                $result += array_combine(array_keys($field['options']), array_fill(0, count($field['options']), $name));
+            } elseif ($field['type'] === 'fieldset') {
+                $result += $this->getCheckboxKeysByFields($field['fields']);
+            }
+        }
+        return $result;
     }
 
     /**
@@ -644,7 +662,8 @@ abstract class Form
         $result = $_POST;
 
         // Handle checkboxes.
-        foreach ($this->getCheckboxKeys() as $checkboxName => $collectionName) {
+        $checkboxKeys = $this->getCheckboxKeys();
+        foreach ($checkboxKeys as $checkboxName => $collectionName) {
             if (isset($result[$collectionName]) && is_array($result[$collectionName])) {
                 // Checkboxes are handled as an array of checkboxes.
                 // Extract the checked values.

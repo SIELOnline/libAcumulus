@@ -432,16 +432,6 @@ class ConfigForm extends BaseConfigForm
     }
 
     /**
-     * {@inheritdoc}
-     */
-    protected function getCheckboxKeys()
-    {
-        return array(
-            'emailAsPdf' => 'emailAsPdf',
-        );
-    }
-
-    /**
      * Returns a list of options for the digital services field.
      *
      * @return array

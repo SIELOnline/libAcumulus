@@ -20,10 +20,15 @@ class Mailer extends BaseMailer
             $mail = new Mail();
             $mail->protocol = $config->get('config_mail_protocol') ? $config->get('config_mail_protocol') : 'mail';
             $mail->parameter = $config->get('config_mail_parameter');
+            /** @noinspection PhpUndefinedFieldInspection */
             $mail->hostname = $config->get('config_smtp_host');
+            /** @noinspection PhpUndefinedFieldInspection */
             $mail->username = $config->get('config_smtp_username');
+            /** @noinspection PhpUndefinedFieldInspection */
             $mail->password = $config->get('config_smtp_password');
+            /** @noinspection PhpUndefinedFieldInspection */
             $mail->port = $config->get('config_smtp_port');
+            /** @noinspection PhpUndefinedFieldInspection */
             $mail->timeout = $config->get('config_smtp_timeout');
             $mail->setTo($to);
             $mail->setFrom($from);

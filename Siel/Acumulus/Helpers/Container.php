@@ -34,13 +34,27 @@ class Container implements ContainerInterface
      * @param string $language
      *   A language or locale code, e.g. nl, nl-NL, or en-UK.
      */
-    public function __construct($shopNamespace, $language)
+    public function __construct($shopNamespace, $language = '')
     {
         $this->instances = array();
         $this->shopNamespace = static::baseNamespace . $shopNamespace;
         global $sielAcumulusCustomNamespace;
         $this->customNamespace = !empty($sielAcumulusCustomNamespace) ? $sielAcumulusCustomNamespace : '';
         $this->language = substr($language, 0, 2);
+    }
+
+    /**
+     * Sets the language code.
+     *
+     * @param string $language
+     *   A language or locale code, e.g. nl, nl-NL, or en-UK.
+     *
+     * @return $this
+     */
+    public function setLanguage($language)
+    {
+        $this->language = $language;
+        return $this;
     }
 
     /**
@@ -265,25 +279,31 @@ class Container implements ContainerInterface
     /**
      * Returns an instance of the given class.
      *
-     * The class is taken from the same namespace as the configStore property.
-     * Only 1 instance is created per class.
+     * The class is looked for in multiple namespaces, starting with the
+     * $customNameSpace properties, continuing with the $shopNamespace property
+     * and finally the base namespace (\Siel\Acumulus).
+     *
+     * Normally, only 1 instance is created per class but the $newInstance
+     * argument can be used to change this behavior.
      *
      * @param string $class
-     *   The name of the class without namespace. The namespace is taken from the
-     *   configStore object.
+     *   The name of the class without namespace. The class is searched for in
+     *   multiple namespaces, see above.
      * @param string $subNamespace
-     *   The sub namespace (within the shop namespace) in which the class resides.
+     *   The sub namespace (within the namespaces tried) in which the class
+     *   resides.
      * @param array $constructorArgs
-     *   An array of arguments to pass to the constructor, may be an empty array.
+     *   A list of arguments to pass to the constructor, may be an empty array.
      * @param bool $newInstance
-     *   Whether to create a new instance or reuse an already existing instance
+     *   Whether to create a new instance (true) or reuse an already existing
+     *   instance (false, default)
      *
      * @return object
      *
      * @throws \InvalidArgumentException
      * @throws \ReflectionException
      */
-    protected function getInstance($class, $subNamespace, array $constructorArgs = array(), $newInstance = false)
+    public function getInstance($class, $subNamespace, array $constructorArgs = array(), $newInstance = false)
     {
         if (!isset($this->instances[$class]) || $newInstance) {
             // Try custom namespace.

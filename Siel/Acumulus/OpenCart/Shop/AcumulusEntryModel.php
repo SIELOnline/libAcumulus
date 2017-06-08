@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\OpenCart\Shop;
 
+use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
 use Siel\Acumulus\Shop\AcumulusEntryModel as BaseAcumulusEntryModel;
@@ -19,9 +20,12 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
 
     /**
      * AcumulusEntryModel constructor.
+     *
+     * @param \Siel\Acumulus\Helpers\Log $log
      */
-    public function __construct()
+    public function __construct(Log $log)
     {
+        parent::__construct($log);
         $this->tableName = DB_PREFIX . 'acumulus_entry';
     }
 

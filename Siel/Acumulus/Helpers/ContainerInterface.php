@@ -12,6 +12,16 @@ namespace Siel\Acumulus\Helpers;
 interface ContainerInterface
 {
     /**
+     * Sets the language code.
+     *
+     * @param string $language
+     *   A language or locale code, e.g. nl, nl-NL, or en-UK.
+     *
+     * @return $this
+     */
+    public function setLanguage($language);
+
+    /**
      * Sets a custom namespace for customisations on top of the current shop.
      *
      * @param string $customNamespace
@@ -134,4 +144,36 @@ interface ContainerInterface
      * @return \Siel\Acumulus\Shop\AcumulusEntryModel
      */
     public function getAcumulusEntryModel();
+
+    /**
+     * Returns an instance of the given class.
+     *
+     * This method should normally be avoided, use the get{Class}() methods as
+     * they know (and hide) what arguments to inject into the constructor.
+     *
+     * The class is looked for in multiple namespaces, starting with the
+     * $customNameSpace properties, continuing with the $shopNamespace property
+     * and finally the base namespace (\Siel\Acumulus).
+     *
+     * Normally, only 1 instance is created per class but the $newInstance
+     * argument can be used to change this behavior.
+     *
+     * @param string $class
+     *   The name of the class without namespace. The class is searched for in
+     *   multiple namespaces, see above.
+     * @param string $subNamespace
+     *   The sub namespace (within the namespaces tried) in which the class
+     *   resides.
+     * @param array $constructorArgs
+     *   A list of arguments to pass to the constructor, may be an empty array.
+     * @param bool $newInstance
+     *   Whether to create a new instance (true) or reuse an already existing
+     *   instance (false, default)
+     *
+     * @return object
+     *
+     * @throws \InvalidArgumentException
+     * @throws \ReflectionException
+     */
+    public function getInstance($class, $subNamespace, array $constructorArgs = array(), $newInstance = false);
 }

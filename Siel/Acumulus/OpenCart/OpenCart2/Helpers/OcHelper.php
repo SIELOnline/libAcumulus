@@ -26,7 +26,6 @@ class OcHelper extends BaseOcHelper
      *   The menus part of the data as will be passed to the view.
      */
     public function eventViewColumnLeft(&$menus) {
-        $this->init();
         foreach ($menus as &$menu) {
             if ($menu['id'] === 'menu-sale') {
                 $menu['children'][] = array(

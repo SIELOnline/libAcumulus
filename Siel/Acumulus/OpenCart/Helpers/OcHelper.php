@@ -2,7 +2,7 @@
 namespace Siel\Acumulus\OpenCart\Helpers;
 
 use Siel\Acumulus\Config\ConfigInterface;
-use Siel\Acumulus\Helpers\Container;
+use Siel\Acumulus\Helpers\ContainerInterface;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Shop\ModuleTranslations;
 
@@ -18,27 +18,27 @@ class OcHelper
     /** @var array */
     public $data;
 
-    /** @var \Siel\Acumulus\Helpers\Form */
-    protected $form;
-
     /** @var \Registry */
     protected $registry;
-
-    /** @var string */
-    protected $shopNamespace;
 
     /**
      * OcHelper constructor.
      *
      * @param \Registry $registry
-     * @param string $shopNamespace
+     * @param \Siel\Acumulus\Helpers\ContainerInterface $container
      */
-    public function __construct(\Registry $registry, $shopNamespace)
+    public function __construct(\Registry $registry, ContainerInterface $container)
     {
         Registry::setRegistry($registry);
         $this->registry = Registry::getInstance();
-        $this->shopNamespace = $shopNamespace;
+        $this->container = $container;
         $this->data = array();
+
+        $languageCode = $this->registry->language->get('code');
+        if (empty($languageCode)) {
+            $languageCode = 'nl';
+        }
+        $this->container->setLanguage($languageCode)->getTranslator()->add(new ModuleTranslations());
     }
 
     protected function addError($message)
@@ -62,25 +62,6 @@ class OcHelper
     protected function addSuccess($message)
     {
         $this->data['success_messages'][] = $message;
-    }
-
-    /**
-     * Helper method that initializes some object properties:
-     * - language
-     * - model_Setting_Setting
-     * - webAPI
-     * - acumulusConfig
-     */
-    protected function init()
-    {
-        if ($this->container === null) {
-            $languageCode = $this->registry->language->get('code');
-            if (empty($languageCode)) {
-                $languageCode = 'nl';
-            }
-            $this->container = new Container($this->shopNamespace, $languageCode);
-            $this->container->getTranslator()->add(new ModuleTranslations());
-        }
     }
 
     /**
@@ -192,7 +173,6 @@ class OcHelper
      * @param int $order_id
      */
     public function eventOrderUpdate($order_id) {
-        $this->init();
         $source = $this->container->getSource(Source::Order, $order_id);
         $this->container->getManager()->sourceStatusChange($source);
     }
@@ -204,9 +184,8 @@ class OcHelper
      */
     protected function displayFormCommon($task)
     {
-        $this->init();
-
-        $this->form = $this->container->getForm($task);
+        // This will initialize the form translations.
+        $this->container->getForm($task);
 
         $this->registry->document->addStyle('view/stylesheet/acumulus.css');
 
@@ -238,20 +217,21 @@ class OcHelper
     protected function renderFormCommon($task, $button)
     {
         // Process the form if it was submitted and render it again.
-        $this->form->process();
+        $form = $this->container->getForm($task);
+        $form->process();
 
         // Show messages.
-        foreach ($this->form->getSuccessMessages() as $message) {
+        foreach ($form->getSuccessMessages() as $message) {
             $this->addSuccess($message);
         }
-        foreach ($this->form->getWarningMessages() as $message) {
+        foreach ($form->getWarningMessages() as $message) {
             $this->addWarning($this->t($message));
         }
-        foreach ($this->form->getErrorMessages() as $message) {
+        foreach ($form->getErrorMessages() as $message) {
             $this->addError($this->t($message));
         }
 
-        $this->data['form'] = $this->form;
+        $this->data['form'] = $form;
         $this->data['formRenderer'] = $this->container->getFormRenderer();
 
         // Complete the breadcrumb with the current path.
@@ -281,8 +261,6 @@ class OcHelper
      */
     protected function doInstall()
     {
-        $this->init();
-
         $result = true;
         $this->registry->load->model('setting/setting');
         $setting = $this->registry->model_setting_setting->getSetting('acumulus_siel');
@@ -311,7 +289,6 @@ class OcHelper
         } elseif (version_compare($currentDataModelVersion, '4.4', '<')) {
             // Update table columns.
             if ($result = $this->container->getAcumulusEntryModel()->upgrade('4.4.0')) {
-                // @todo: set to ConfigInterface::libraryVersion ? (as in doUpgrade()?)
                 $setting['acumulus_siel_datamodel_version'] = '4.4';
                 $this->registry->model_setting_setting->editSetting('acumulus_siel', $setting);
             }
@@ -328,7 +305,6 @@ class OcHelper
      */
     protected function doUninstall()
     {
-        $this->init();
         $this->container->getAcumulusEntryModel()->uninstall();
 
         // Delete all config values.
@@ -349,8 +325,6 @@ class OcHelper
      */
     protected function doUpgrade()
     {
-        $this->init();
-
         //Install/update datamodel first.
         $result = $this->doInstall();
 

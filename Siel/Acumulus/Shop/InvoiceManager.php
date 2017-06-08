@@ -2,6 +2,7 @@
 namespace Siel\Acumulus\Shop;
 
 use DateTime;
+use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Helpers\ContainerInterface;
 use Siel\Acumulus\Helpers\Number;
@@ -429,7 +430,7 @@ abstract class InvoiceManager
             // concept status, the absence of errors and non test-mode.
             $pluginSettings = $this->getConfig()->getPluginSettings();
             $testMode = $pluginSettings['debug'] == ConfigInterface::Debug_TestMode;
-            $isConcept = $invoice['customer']['invoice']['concept'] == ConfigInterface::Concept_Yes;
+            $isConcept = $invoice['customer']['invoice']['concept'] == Api::Concept_Yes;
             if (empty($result['errors']) && $isConcept && !$testMode) {
                 $this->getAcumulusEntryModel()->save($invoiceSource, null, null);
             }

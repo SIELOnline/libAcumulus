@@ -1,7 +1,7 @@
 <?php
 namespace Siel\Acumulus\OpenCart\Invoice;
 
-use Siel\Acumulus\Config\ConfigInterface;
+use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
@@ -69,7 +69,7 @@ class Creator extends BaseCreator
     protected function getPaymentState()
     {
         // @todo: Can we determine this based on payment_code?
-        $result = ConfigInterface::PaymentStatus_Paid;
+        $result = Api::PaymentStatus_Paid;
         return $result;
     }
 

@@ -1,8 +1,8 @@
 <?php
 namespace Siel\Acumulus\Magento\Magento1\Invoice;
 
+use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Number;
-use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Magento\Invoice\Creator as BaseCreator;
 
 /**
@@ -60,8 +60,8 @@ class Creator extends BaseCreator
     protected function getPaymentStateCreditNote()
     {
         return $this->creditNote->getState() == \Mage_Sales_Model_Order_Creditmemo::STATE_REFUNDED
-            ? ConfigInterface::PaymentStatus_Paid
-            : ConfigInterface::PaymentStatus_Due;
+            ? Api::PaymentStatus_Paid
+            : Api::PaymentStatus_Due;
     }
 
     /**

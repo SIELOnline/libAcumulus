@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\Invoice;
 
+use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Helpers\Countries;
 use Siel\Acumulus\Helpers\Log;
@@ -240,7 +241,7 @@ abstract class Creator
         $this->addTokenDefault($customer, 'telephone', $customerSettings['telephone']);
         $this->addTokenDefault($customer, 'fax', $customerSettings['fax']);
         $this->addTokenDefault($customer, 'email', $customerSettings['email']);
-        $this->addDefaultEmpty($customer, 'overwriteifexists', $customerSettings['overwriteIfExists'] ? ConfigInterface::OverwriteIfExists_Yes : ConfigInterface::OverwriteIfExists_No);
+        $this->addDefaultEmpty($customer, 'overwriteifexists', $customerSettings['overwriteIfExists'] ? Api::OverwriteIfExists_Yes : Api::OverwriteIfExists_No);
         $this->addTokenDefault($customer, 'mark', $customerSettings['mark']);
         return $customer;
     }
@@ -304,7 +305,7 @@ abstract class Creator
         // Invoice type.
         $concept = $invoiceSettings['concept'];
         if ($concept == ConfigInterface::Concept_Plugin) {
-            $concept = ConfigInterface::Concept_No;
+            $concept = Api::Concept_No;
         }
         $this->addDefaultEmpty($invoice, 'concept', $concept);
 
@@ -333,7 +334,7 @@ abstract class Creator
 
         // Payment info.
         $invoice['paymentstatus'] = $this->getPaymentState();
-        if ($invoice['paymentstatus'] === ConfigInterface::PaymentStatus_Paid) {
+        if ($invoice['paymentstatus'] === Api::PaymentStatus_Paid) {
             $this->addIfNotEmpty($invoice, 'paymentdate', $this->getPaymentDate());
         }
 
@@ -348,7 +349,7 @@ abstract class Creator
         // Acumulus invoice template to use.
         // @todo: should this be done after the first event handler (invoice_created) has been triggered?
         if (isset($invoice['paymentstatus'])
-            && $invoice['paymentstatus'] == ConfigInterface::PaymentStatus_Paid
+            && $invoice['paymentstatus'] == Api::PaymentStatus_Paid
             // 0 = empty = use same invoice template as for non paid invoices.
             && $invoiceSettings['defaultInvoicePaidTemplate'] != 0
         ) {
@@ -759,7 +760,7 @@ abstract class Creator
                 $this->addTokenDefault($emailAsPdf, 'emailbcc', $emailAsPdfSettings['emailBcc']);
                 $this->addTokenDefault($emailAsPdf, 'emailfrom', $emailAsPdfSettings['emailFrom']);
                 $this->addTokenDefault($emailAsPdf, 'subject', $emailAsPdfSettings['subject']);
-                $emailAsPdf['confirmreading'] = $emailAsPdfSettings['confirmReading'] ? ConfigInterface::ConfirmReading_Yes : ConfigInterface::ConfirmReading_No;
+                $emailAsPdf['confirmreading'] = $emailAsPdfSettings['confirmReading'] ? Api::ConfirmReading_Yes : Api::ConfirmReading_No;
             }
         }
         return $emailAsPdf;

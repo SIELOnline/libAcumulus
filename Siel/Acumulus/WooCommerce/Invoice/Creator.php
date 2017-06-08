@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\WooCommerce\Invoice;
 
+use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
@@ -93,7 +94,7 @@ class Creator extends BaseCreator
      */
     protected function getPaymentStateOrder()
     {
-        return $this->order->needs_payment() ? ConfigInterface::PaymentStatus_Due : ConfigInterface::PaymentStatus_Paid;
+        return $this->order->needs_payment() ? Api::PaymentStatus_Due : Api::PaymentStatus_Paid;
     }
 
     /**
@@ -107,7 +108,7 @@ class Creator extends BaseCreator
      */
     protected function getPaymentStateCreditNote()
     {
-        return ConfigInterface::PaymentStatus_Paid;
+        return Api::PaymentStatus_Paid;
     }
 
     /**

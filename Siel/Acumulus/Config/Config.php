@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\Config;
 
+use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Translator;
 
@@ -390,12 +391,12 @@ class Config implements ConfigInterface
                 'baseUri' => array(
                     'group' => 'environment',
                     'type' => 'string',
-                    'default' => ConfigInterface::baseUri,
+                    'default' => Api::baseUri,
                 ),
                 'apiVersion' => array(
                     'group' => 'environment',
                     'type' => 'string',
-                    'default' => ConfigInterface::apiVersion,
+                    'default' => Api::apiVersion,
                 ),
                 'libraryVersion' => array(
                     'group' => 'environment',
@@ -455,7 +456,7 @@ class Config implements ConfigInterface
                 'outputFormat' => array(
                     'group' => 'plugin',
                     'type' => 'string',
-                    'default' => ConfigInterface::outputFormat,
+                    'default' => Api::outputFormat,
                 ),
                 'contractcode' => array(
                     'group' => 'credentials',
@@ -505,7 +506,7 @@ class Config implements ConfigInterface
                 'contactStatus' => array(
                     'group' => 'customer',
                     'type' => 'int',
-                    'default' => ConfigInterface::ContactStatus_Active,
+                    'default' => Api::ContactStatus_Active,
                 ),
                 'companyName1' => array(
                     'group' => 'customer',

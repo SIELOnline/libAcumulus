@@ -11,14 +11,6 @@ interface ConfigInterface
 {
     const libraryVersion = '4.8.0-alpha2';
 
-    // API result codes, internally I want an increasing order of worseness, so
-    // these constants are not used internally but mapped to the status_...
-    // constants below.
-    const Api_Success = 0;
-    const Api_Warnings = 2;
-    const Api_Errors = 1;
-    const Api_Exception = 3;
-
     // Web service configuration related constants.
     // Send status: bits 1, 2 and 3. Can be combined with an Invoice_Sent_...
     // const. Not necessarily a single bit per value, but the order should be by
@@ -33,22 +25,6 @@ interface ConfigInterface
     const Debug_SendAndLog = 2;
     const Debug_TestMode = 3;
 
-    // Web service API constants.
-    const TestMode_Normal = 0;
-    const TestMode_Test = 1;
-
-    // Web service related defaults.
-    const baseUri = 'https://api.sielsystems.nl/acumulus';
-    //const baseUri = 'https://ng1.sielsystems.nl';
-    const apiVersion = 'stable';
-    const outputFormat = 'json';
-
-    // Invoice API related constants.
-    const PaymentStatus_Due = 1;
-    const PaymentStatus_Paid = 2;
-
-    const Concept_No = 0;
-    const Concept_Yes = 1;
     // not an API constant.
     const Concept_Plugin = 2;
 
@@ -60,15 +36,6 @@ interface ConfigInterface
     const InvoiceDate_OrderCreate = 2;
     const InvoiceDate_Transfer = 3;
 
-    const ContactStatus_Disabled = 0;
-    const ContactStatus_Active = 1;
-
-    const OverwriteIfExists_No = 0;
-    const OverwriteIfExists_Yes = 1;
-
-    const ConfirmReading_No = 0;
-    const ConfirmReading_Yes = 1;
-
     const DigitalServices_Unknown = 0;
     const DigitalServices_Both = 1;
     const DigitalServices_No = 2;
@@ -79,13 +46,7 @@ interface ConfigInterface
     const VatFreeProducts_No = 2;
     const VatFreeProducts_Only = 3;
 
-    const VatType_National = 1;
-    const VatType_NationalReversed = 2;
-    const VatType_EuReversed = 3;
-    const VatType_RestOfWorld = 4;
-    const VatType_MarginScheme = 5;
-    const VatType_ForeignVat = 6;
-
+    // @todo: Move to new message class or to InvoiceManager.
     // Invoice send handling related constants. These can be combined with a
     // send Status_... const (bits 1 to 3).
     // Not sent: bit 4 always set.

@@ -1,8 +1,8 @@
 <?php
 namespace Siel\Acumulus\Magento\Invoice;
 
+use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Number;
-use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 
 /**
@@ -79,8 +79,8 @@ abstract class Creator extends BaseCreator
     protected function getPaymentStateOrder()
     {
         return Number::isZero($this->order->getBaseTotalDue())
-            ? ConfigInterface::PaymentStatus_Paid
-            : ConfigInterface::PaymentStatus_Due;
+            ? Api::PaymentStatus_Paid
+            : Api::PaymentStatus_Due;
     }
 
     /**

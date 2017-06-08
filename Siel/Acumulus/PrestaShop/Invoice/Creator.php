@@ -9,7 +9,7 @@ use Customer;
 use Order;
 use OrderPayment;
 use OrderSlip;
-use Siel\Acumulus\Config\ConfigInterface;
+use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use TaxManagerFactory;
@@ -110,9 +110,9 @@ class Creator extends BaseCreator
     {
         // Assumption: credit slips are always in a paid state.
         if (($this->invoiceSource->getType() === Source::Order && $this->order->hasBeenPaid()) || $this->invoiceSource->getType() === Source::CreditNote) {
-            $result = ConfigInterface::PaymentStatus_Paid;
+            $result = Api::PaymentStatus_Paid;
         } else {
-            $result = ConfigInterface::PaymentStatus_Due;
+            $result = Api::PaymentStatus_Due;
         }
         return $result;
     }

@@ -5,6 +5,7 @@ use DOMDocument;
 use DOMElement;
 use Exception;
 use LibXMLError;
+use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Helpers\Log;
 
@@ -78,13 +79,13 @@ class Communicator implements CommunicatorInterface
                 'message' => $e->getMessage(),
             );
             $response = array();
-            $response['status'] = ConfigInterface::Api_Exception;
+            $response['status'] = Api::Exception;
         }
 
         // Process response:
         // If no status is present the call failed: set the status to Error.
         if (!isset($response['status'])) {
-            $response['status'] = ConfigInterface::Api_Errors;
+            $response['status'] = Api::Errors;
         }
 
         // Change status to internal status (bits and increasing severity).
@@ -161,7 +162,7 @@ class Communicator implements CommunicatorInterface
         $commonMessagePart = array(
             'contract' => $this->config->getCredentials(),
             'format' => $pluginSettings['outputFormat'],
-            'testmode' => $pluginSettings['debug'] === ConfigInterface::Debug_TestMode ? ConfigInterface::TestMode_Test : ConfigInterface::TestMode_Normal,
+            'testmode' => $pluginSettings['debug'] === ConfigInterface::Debug_TestMode ? Api::TestMode_Test : Api::TestMode_Normal,
             'connector' => array(
                 'application' => "{$environment['shopName']} {$environment['shopVersion']}",
                 'webkoppel' => "Acumulus {$environment['moduleVersion']}",
@@ -422,13 +423,13 @@ class Communicator implements CommunicatorInterface
      */
     protected function ApiStatus2InternalStatus($status) {
         switch ($status) {
-            case ConfigInterface::Api_Success:
+            case Api::Success:
                 return ConfigInterface::Status_Success;
-            case ConfigInterface::Api_Errors:
+            case Api::Errors:
                 return ConfigInterface::Status_Errors;
-            case ConfigInterface::Api_Warnings:
+            case Api::Warnings:
                 return ConfigInterface::Status_Warnings;
-            case ConfigInterface::Api_Exception:
+            case Api::Exception:
             default:
                 return ConfigInterface::Status_Exception;
         }

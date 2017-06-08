@@ -1,11 +1,11 @@
 <?php
 namespace Siel\Acumulus\Invoice;
 
+use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Helpers\Countries;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Helpers\TranslatorInterface;
-use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Web\Service;
 
 /**
@@ -203,7 +203,7 @@ class Completor
         $this->correctMarginInvoice();
         // Another check: do we have lines without VAT while the vat type and
         // settings prohibit this.
-        if (in_array($this->invoice['customer']['invoice']['vattype'], array(Config::VatType_National, Config::VatType_ForeignVat, Config::VatType_MarginScheme))
+        if (in_array($this->invoice['customer']['invoice']['vattype'], array(Api::VatType_National, Api::VatType_ForeignVat, Api::VatType_MarginScheme))
             && $this->invoiceHasLineWithoutVat())
         {
             $shopSettings = $this->config->getShopSettings();
@@ -241,26 +241,26 @@ class Completor
             // type, we obey so.
             $possibleVatTypes[] = $this->invoice['customer']['invoice']['vattype'];
         } elseif ($this->invoiceHasLineWithCostPrice()) {
-            $possibleVatTypes[] = ConfigInterface::VatType_MarginScheme;
+            $possibleVatTypes[] = Api::VatType_MarginScheme;
         } else {
             if ($this->invoiceHasLineWithVat()) {
                 // NL or EU Foreign vat.
                 if ($digitalServices === ConfigInterface::DigitalServices_No) {
                     // No electronic services are sold: can only be dutch VAT.
-                    $possibleVatTypes[] = ConfigInterface::VatType_National;
+                    $possibleVatTypes[] = Api::VatType_National;
                 } else {
                     if ($this->isEu() && $this->getInvoiceDate() >= '2015-01-01') {
                         if ($digitalServices !== ConfigInterface::DigitalServices_Only) {
                             // Also normal goods are sold, so dutch VAT still possible.
-                            $possibleVatTypes[] = ConfigInterface::VatType_National;
+                            $possibleVatTypes[] = Api::VatType_National;
                         }
                         // As of 2015, electronic services should be taxed with the rates of
                         // the clients' country. And they might be sold in the shop.
-                        $possibleVatTypes[] = ConfigInterface::VatType_ForeignVat;
+                        $possibleVatTypes[] = Api::VatType_ForeignVat;
                     } else {
                         // Not EU or before 2015-01-01: special regulations for electronic
                         // services were not yet active: dutch VAT only.
-                        $possibleVatTypes[] = ConfigInterface::VatType_National;
+                        $possibleVatTypes[] = Api::VatType_National;
                     }
                 }
             } else {
@@ -271,24 +271,24 @@ class Completor
                     // services are never VAT free, nor are there any VAT free
                     // products if set so.
                     if ($digitalServices !== ConfigInterface::DigitalServices_Only && $vatFreeProducts !== ConfigInterface::VatFreeProducts_No) {
-                        $possibleVatTypes[] = ConfigInterface::VatType_National;
+                        $possibleVatTypes[] = Api::VatType_National;
                     }
                     // National reversed VAT: not really supported but possible.
                     if ($this->isCompany()) {
-                        $possibleVatTypes[] = ConfigInterface::VatType_NationalReversed;
+                        $possibleVatTypes[] = Api::VatType_NationalReversed;
                     }
                 } elseif ($this->isEu()) {
                     // EU reversed VAT.
                     if ($this->isCompany()) {
-                        $possibleVatTypes[] = ConfigInterface::VatType_EuReversed;
+                        $possibleVatTypes[] = Api::VatType_EuReversed;
                     }
                     // Can it be VAT free products (e.g. education)? Digital
                     // services are never VAT free, nor are there any if set so.
                     if ($digitalServices !== ConfigInterface::DigitalServices_Only && $vatFreeProducts !== ConfigInterface::VatFreeProducts_No) {
-                        $possibleVatTypes[] = ConfigInterface::VatType_National;
+                        $possibleVatTypes[] = Api::VatType_National;
                     }
                 } elseif ($this->isOutsideEu()) {
-                    $possibleVatTypes[] = ConfigInterface::VatType_RestOfWorld;
+                    $possibleVatTypes[] = Api::VatType_RestOfWorld;
                 }
 
                 if (empty($possibleVatTypes)) {
@@ -297,8 +297,8 @@ class Completor
                     // 0-amount invoices that could be corrected after all, plus
                     // that it often (always) appeared in combination with other
                     // warnings.
-                    $possibleVatTypes[] = ConfigInterface::VatType_National;
-                    $possibleVatTypes[] = $this->isNl() ? ConfigInterface::VatType_NationalReversed : ConfigInterface::VatType_EuReversed;
+                    $possibleVatTypes[] = Api::VatType_National;
+                    $possibleVatTypes[] = $this->isNl() ? Api::VatType_NationalReversed : Api::VatType_EuReversed;
                     $this->changeInvoiceToConcept(''/*'message_warning_no_vat'*/);
                 }
             }
@@ -324,19 +324,19 @@ class Completor
         $possibleVatRates = array();
         foreach ($this->possibleVatTypes as $vatType) {
             switch ($vatType) {
-                case ConfigInterface::VatType_National:
-                case ConfigInterface::VatType_MarginScheme:
+                case Api::VatType_National:
+                case Api::VatType_MarginScheme:
                 default:
                     $vatTypeVatRates = $this->getVatRates('nl');
                     break;
-                case ConfigInterface::VatType_NationalReversed:
-                case ConfigInterface::VatType_EuReversed:
+                case Api::VatType_NationalReversed:
+                case Api::VatType_EuReversed:
                     $vatTypeVatRates = array(0);
                     break;
-                case ConfigInterface::VatType_RestOfWorld:
+                case Api::VatType_RestOfWorld:
                     $vatTypeVatRates = array(-1);
                     break;
-                case ConfigInterface::VatType_ForeignVat:
+                case Api::VatType_ForeignVat:
                     $vatTypeVatRates = $this->getVatRates($this->invoice['customer']['countrycode']);
                     break;
             }
@@ -363,7 +363,7 @@ class Completor
                 }
             }
             $this->invoice['customer']['email'] = $customerSettings['genericCustomerEmail'];
-            $this->invoice['customer']['contactstatus'] = ConfigInterface::ContactStatus_Disabled;
+            $this->invoice['customer']['contactstatus'] = Api::ContactStatus_Disabled;
             $this->invoice['customer']['overwriteifexists'] = 0;
         }
     }
@@ -667,10 +667,10 @@ class Completor
         // We only want to process correct vat rates.
         // Define vat types that do know a zero rate.
         $zeroRateVatTypes = array(
-            ConfigInterface::VatType_National,
-            ConfigInterface::VatType_NationalReversed,
-            ConfigInterface::VatType_EuReversed,
-            ConfigInterface::VatType_RestOfWorld,
+            Api::VatType_National,
+            Api::VatType_NationalReversed,
+            Api::VatType_EuReversed,
+            Api::VatType_RestOfWorld,
         );
 
         // We keep track of vat types found per appearing vat rate.
@@ -738,7 +738,7 @@ class Completor
      * converted to the margin scheme (costprice tag and change of unitprice).
      */
     protected function correctMarginInvoice() {
-        if (isset($this->invoice['customer']['invoice']['vattype']) && $this->invoice['customer']['invoice']['vattype'] == ConfigInterface::VatType_MarginScheme) {
+        if (isset($this->invoice['customer']['invoice']['vattype']) && $this->invoice['customer']['invoice']['vattype'] == Api::VatType_MarginScheme) {
             foreach ($this->invoice['customer']['invoice']['line'] as &$line) {
                 // For margin invoices, Acumulus expects the unitprice to be the
                 // sales price, ie the price the client pays. So we set
@@ -950,6 +950,6 @@ class Completor
                 'message' => $message,
             );
         }
-        $this->invoice['customer']['invoice']['concept'] = ConfigInterface::Concept_Yes;
+        $this->invoice['customer']['invoice']['concept'] = Api::Concept_Yes;
     }
 }

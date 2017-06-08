@@ -3,7 +3,7 @@ namespace Siel\Acumulus\Magento\Magento2\Invoice;
 
 use Magento\Sales\Model\Order\Creditmemo;
 use Magento\Sales\Model\Order\Creditmemo\Item as CreditmemoItem;
-use Siel\Acumulus\Config\ConfigInterface;
+use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Magento\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\Magento\Magento2\Helpers\Registry;
@@ -63,8 +63,8 @@ class Creator extends BaseCreator
     protected function getPaymentStateCreditNote()
     {
         return $this->creditNote->getState() == Creditmemo::STATE_REFUNDED
-            ? ConfigInterface::PaymentStatus_Paid
-            : ConfigInterface::PaymentStatus_Due;
+            ? Api::PaymentStatus_Paid
+            : Api::PaymentStatus_Due;
     }
 
     /**

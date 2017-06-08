@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\Shop;
 
+use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\ConfigInterface;
 
 /**
@@ -485,8 +486,8 @@ class AdvancedConfigForm extends BaseConfigForm
                 'description' => $this->t('desc_concept'),
                 'options' => array(
                     ConfigInterface::Concept_Plugin => $this->t('option_concept_2'),
-                    ConfigInterface::Concept_No => $this->t('option_concept_0'),
-                    ConfigInterface::Concept_Yes => $this->t('option_concept_1'),
+                    Api::Concept_No => $this->t('option_concept_0'),
+                    Api::Concept_Yes => $this->t('option_concept_1'),
                 ),
                 'attributes' => array(
                     'required' => true,
@@ -729,8 +730,8 @@ class AdvancedConfigForm extends BaseConfigForm
     protected function getContactStatusOptions()
     {
         return array(
-            ConfigInterface::ContactStatus_Active => $this->t('option_contactStatus_Active'),
-            ConfigInterface::ContactStatus_Disabled => $this->t('option_contactStatus_Disabled'),
+            Api::ContactStatus_Active => $this->t('option_contactStatus_Active'),
+            Api::ContactStatus_Disabled => $this->t('option_contactStatus_Disabled'),
         );
     }
 }

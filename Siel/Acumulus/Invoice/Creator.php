@@ -2,13 +2,13 @@
 namespace Siel\Acumulus\Invoice;
 
 use Siel\Acumulus\Api;
-use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Helpers\Countries;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Helpers\Token;
 use Siel\Acumulus\Helpers\TranslatorInterface;
 use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Plugin;
 
 /**
  * Creator creates a raw invoice similar to the Acumulus invoice structure.
@@ -304,18 +304,18 @@ abstract class Creator
 
         // Invoice type.
         $concept = $invoiceSettings['concept'];
-        if ($concept == ConfigInterface::Concept_Plugin) {
+        if ($concept == Plugin::Concept_Plugin) {
             $concept = Api::Concept_No;
         }
         $this->addDefaultEmpty($invoice, 'concept', $concept);
 
         // Invoice number and date.
         $sourceToUse = $shopSettings['invoiceNrSource'];
-        if ($sourceToUse != ConfigInterface::InvoiceNrSource_Acumulus) {
+        if ($sourceToUse != Plugin::InvoiceNrSource_Acumulus) {
             $invoice['number'] = $this->getInvoiceNumber($sourceToUse);
         }
         $dateToUse = $shopSettings['dateToUse'];
-        if ($dateToUse != ConfigInterface::InvoiceDate_Transfer) {
+        if ($dateToUse != Plugin::InvoiceDate_Transfer) {
             $invoice['issuedate'] = $this->getInvoiceDate($dateToUse);
         }
 
@@ -385,7 +385,7 @@ abstract class Creator
      */
     protected function getInvoiceNumber($invoiceNumberSource) {
         $result = $this->invoiceSource->getInvoiceReference();
-        if ($invoiceNumberSource != ConfigInterface::InvoiceNrSource_ShopInvoice || empty($result)) {
+        if ($invoiceNumberSource != Plugin::InvoiceNrSource_ShopInvoice || empty($result)) {
             $result = $this->invoiceSource->getReference();
         }
         return $result;
@@ -404,7 +404,7 @@ abstract class Creator
     protected function getInvoiceDate($dateToUse)
     {
         $result = $this->invoiceSource->getInvoiceDate();
-        if ($dateToUse != ConfigInterface::InvoiceDate_OrderCreate || empty($result)) {
+        if ($dateToUse != Plugin::InvoiceDate_OrderCreate || empty($result)) {
             $result = $this->invoiceSource->getDate();
         }
         return $result;
@@ -430,8 +430,8 @@ abstract class Creator
      * Returns whether the order has been paid or not.
      *
      * @return int
-     *   \Siel\Acumulus\Invoice\ConfigInterface::PaymentStatus_Paid or
-     *   \Siel\Acumulus\Invoice\ConfigInterface::PaymentStatus_Due
+     *   \Siel\Acumulus\Api::PaymentStatus_Paid or
+     *   \Siel\Acumulus\Api::PaymentStatus_Due
      */
     protected function getPaymentState()
     {

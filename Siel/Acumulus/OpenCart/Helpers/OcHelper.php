@@ -1,7 +1,7 @@
 <?php
 namespace Siel\Acumulus\OpenCart\Helpers;
 
-use Siel\Acumulus\Config\ConfigInterface;
+use Siel\Acumulus\Plugin;
 use Siel\Acumulus\Helpers\ContainerInterface;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Shop\ModuleTranslations;
@@ -331,7 +331,7 @@ class OcHelper
         $this->registry->load->model('setting/setting');
         $setting = $this->registry->model_setting_setting->getSetting('acumulus_siel');
         $currentDataModelVersion = isset($setting['acumulus_siel_datamodel_version']) ? $setting['acumulus_siel_datamodel_version'] : '';
-        $apiVersion = ConfigInterface::libraryVersion;
+        $apiVersion = Plugin::Version;
 
         $this->container->getLog()->info('%s: installed version = %s, API = %s', __METHOD__, $currentDataModelVersion, $apiVersion);
 

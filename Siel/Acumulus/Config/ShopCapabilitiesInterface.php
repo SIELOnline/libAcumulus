@@ -64,7 +64,7 @@ interface ShopCapabilitiesInterface
      *
      * @return array
      *   An array of all shop invoice related events, with the key being the ID
-     *   for the dropdown item (a ConfigInterface::TriggerInvoiceEvent_...
+     *   for the dropdown item (a Plugin::TriggerInvoiceEvent_...
      *   const) and the value being the label for the dropdown item.
      */
     public function getTriggerInvoiceEventOptions();
@@ -77,7 +77,7 @@ interface ShopCapabilitiesInterface
      *
      * Overrides should typically return a subset of the constants defined in
      * this base implementation, but including at least
-     * ConfigInterface::InvoiceNrSource_Acumulus.
+     * Plugin::InvoiceNrSource_Acumulus.
      *
      * @return array
      *   An array keyed by the option values and having translated descriptions
@@ -93,7 +93,7 @@ interface ShopCapabilitiesInterface
      *
      * Overrides should typically return a subset of the constants defined in
      * this base implementation, but including at least
-     * ConfigInterface::InvoiceDate_Transfer.
+     * Plugin::InvoiceDate_Transfer.
      *
      * @return array
      *   An array keyed by the option values and having translated descriptions

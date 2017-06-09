@@ -2,6 +2,7 @@
 namespace Siel\Acumulus\Config;
 
 use Siel\Acumulus\Api;
+use Siel\Acumulus\Plugin;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Translator;
 
@@ -401,7 +402,7 @@ class Config implements ConfigInterface
                 'libraryVersion' => array(
                     'group' => 'environment',
                     'type' => 'string',
-                    'default' => ConfigInterface::libraryVersion,
+                    'default' => Plugin::Version,
                 ),
                 'moduleVersion' => array(
                     'group' => 'environment',
@@ -446,7 +447,7 @@ class Config implements ConfigInterface
                 'debug' => array(
                     'group' => 'plugin',
                     'type' => 'int',
-                    'default' => ConfigInterface::Debug_None,
+                    'default' => Plugin::Debug_None,
                 ),
                 'logLevel' => array(
                     'group' => 'plugin',
@@ -581,7 +582,7 @@ class Config implements ConfigInterface
                 'concept' => array(
                     'group' => 'invoice',
                     'type' => 'int',
-                    'default' => ConfigInterface::Concept_Plugin,
+                    'default' => Plugin::Concept_Plugin,
                 ),
                 'defaultAccountNumber' => array(
                     'group' => 'invoice',
@@ -688,22 +689,22 @@ class Config implements ConfigInterface
                 'digitalServices' => array(
                     'group' => 'shop',
                     'type' => 'int',
-                    'default' => ConfigInterface::DigitalServices_Unknown,
+                    'default' => Plugin::DigitalServices_Unknown,
                 ),
                 'vatFreeProducts' => array(
                     'group' => 'shop',
                     'type' => 'int',
-                    'default' => ConfigInterface::VatFreeProducts_Unknown,
+                    'default' => Plugin::VatFreeProducts_Unknown,
                 ),
                 'invoiceNrSource' => array(
                     'group' => 'shop',
                     'type' => 'int',
-                    'default' => ConfigInterface::InvoiceNrSource_ShopInvoice,
+                    'default' => Plugin::InvoiceNrSource_ShopInvoice,
                 ),
                 'dateToUse' => array(
                     'group' => 'shop',
                     'type' => 'int',
-                    'default' => ConfigInterface::InvoiceDate_InvoiceCreate,
+                    'default' => Plugin::InvoiceDate_InvoiceCreate,
                 ),
                 'triggerOrderStatus' => array(
                     'group' => 'event',
@@ -713,7 +714,7 @@ class Config implements ConfigInterface
                 'triggerInvoiceEvent' => array(
                     'group' => 'event',
                     'type' => 'int',
-                    'default' => ConfigInterface::TriggerInvoiceEvent_None,
+                    'default' => Plugin::TriggerInvoiceEvent_None,
                 ),
                 'sendEmptyInvoice' => array(
                     'group' => 'event',
@@ -828,8 +829,8 @@ class Config implements ConfigInterface
 
         // 2) Debug mode.
         switch ($this->get('debug')) {
-            case 4: // Value for deprecated ServiceConfigInterface::Debug_StayLocal.
-                $newSettings['logLevel'] = ConfigInterface::Debug_TestMode;
+            case 4: // Value for deprecated ServiceConfigInterfacePlugin::Debug_StayLocal.
+                $newSettings['logLevel'] = Plugin::Debug_TestMode;
                 break;
         }
 
@@ -854,9 +855,9 @@ class Config implements ConfigInterface
         // Get current values.
         $values = $this->castValues($this->getConfigStore()->load($this->getKeys()));
         if ($this->get('triggerInvoiceSendEvent') == 2) {
-            $values['triggerInvoiceEvent'] = ConfigInterface::TriggerInvoiceEvent_Create;
+            $values['triggerInvoiceEvent'] = Plugin::TriggerInvoiceEvent_Create;
         } else {
-            $values['triggerInvoiceEvent'] = ConfigInterface::TriggerInvoiceEvent_None;
+            $values['triggerInvoiceEvent'] = Plugin::TriggerInvoiceEvent_None;
         }
         unset($values['triggerInvoiceSendEvent']);
 

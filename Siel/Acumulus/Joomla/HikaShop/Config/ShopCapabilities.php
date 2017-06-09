@@ -199,7 +199,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function getDateToUseOptions()
     {
         $result = parent::getDateToUseOptions();
-        unset($result[ConfigInterface::InvoiceDate_InvoiceCreate]);
+        unset($result[Plugin::InvoiceDate_InvoiceCreate]);
         return $result;
     }
 

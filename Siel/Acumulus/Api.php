@@ -2,16 +2,13 @@
 namespace Siel\Acumulus;
 
 /**
- * Defines an interface to retrieve shop specific configuration settings.
- *
- * Configuration is stored in the host environment, normally a web shop.
- * This interface abstracts from how a specific web shop does so.
+ * Api defines constants for the values defined by the Acumulus web api.
  */
 interface Api
 {
-    // API result codes, internally I want an increasing order of worseness, so
-    // these constants are not used internally but mapped to the status_...
-    // constants below.
+    // API result codes. Note that internally I want an increasing order of
+    // worseness, so these constants are not used internally but mapped to the
+    // Plugin::status_... constants.
     const Success = 0;
     const Warnings = 2;
     const Errors = 1;

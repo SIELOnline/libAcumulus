@@ -4,6 +4,7 @@ namespace Siel\Acumulus\Config;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\TranslatorInterface;
 use Siel\Acumulus\Invoice\Source;
+use Siel\Acumulus\Plugin;
 
 /**
  * Defines an interface to access the shop specific's capabilities.
@@ -94,38 +95,31 @@ abstract class ShopCapabilities implements ShopCapabilitiesInterface
     public function getTriggerInvoiceEventOptions()
     {
         return array(
-            ConfigInterface::TriggerInvoiceEvent_None => $this->t('option_triggerInvoiceEvent_0'),
+            Plugin::TriggerInvoiceEvent_None => $this->t('option_triggerInvoiceEvent_0'),
         );
     }
 
     /**
      * {@inheritdoc}
-     *
-     * Overrides should typically return a subset of the constants defined in
-     * this base implementation that should at least include
-     * ConfigInterface::InvoiceNrSource_Acumulus.
      */
     public function getInvoiceNrSourceOptions()
     {
         return array(
-            ConfigInterface::InvoiceNrSource_ShopInvoice => $this->t('option_invoiceNrSource_1'),
-            ConfigInterface::InvoiceNrSource_ShopOrder => $this->t('option_invoiceNrSource_2'),
-            ConfigInterface::InvoiceNrSource_Acumulus => $this->t('option_invoiceNrSource_3'),
+            Plugin::InvoiceNrSource_ShopInvoice => $this->t('option_invoiceNrSource_1'),
+            Plugin::InvoiceNrSource_ShopOrder => $this->t('option_invoiceNrSource_2'),
+            Plugin::InvoiceNrSource_Acumulus => $this->t('option_invoiceNrSource_3'),
         );
     }
 
     /**
      * {@inheritdoc}
-     *
-     * Overrides should typically return a subset of the constants defined in
-     * this base implementation that should at least include     * ConfigInterface::InvoiceDate_Transfer.
      */
     public function getDateToUseOptions()
     {
         return array(
-            ConfigInterface::InvoiceDate_InvoiceCreate => $this->t('option_dateToUse_1'),
-            ConfigInterface::InvoiceDate_OrderCreate => $this->t('option_dateToUse_2'),
-            ConfigInterface::InvoiceDate_Transfer => $this->t('option_dateToUse_3'),
+            Plugin::InvoiceDate_InvoiceCreate => $this->t('option_dateToUse_1'),
+            Plugin::InvoiceDate_OrderCreate => $this->t('option_dateToUse_2'),
+            Plugin::InvoiceDate_Transfer => $this->t('option_dateToUse_3'),
         );
     }
 

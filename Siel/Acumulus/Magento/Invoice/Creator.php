@@ -73,8 +73,8 @@ abstract class Creator extends BaseCreator
      * Returns whether the order has been paid or not.
      *
      * @return int
-     *   \Siel\Acumulus\Invoice\ConfigInterface::PaymentStatus_Paid or
-     *   \Siel\Acumulus\Invoice\ConfigInterface::PaymentStatus_Due
+     *   \Siel\Acumulus\Api::PaymentStatus_Paid or
+     *   \Siel\Acumulus\Api::PaymentStatus_Due
      */
     protected function getPaymentStateOrder()
     {

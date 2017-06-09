@@ -2,7 +2,6 @@
 namespace Siel\Acumulus\WooCommerce\Invoice;
 
 use Siel\Acumulus\Api;
-use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use WC_Abstract_Order;
@@ -89,8 +88,8 @@ class Creator extends BaseCreator
      * Returns whether the order has been paid or not.
      *
      * @return int
-     *   \Siel\Acumulus\Invoice\ConfigInterface::PaymentStatus_Paid or
-     *   \Siel\Acumulus\Invoice\ConfigInterface::PaymentStatus_Due
+     *   \Siel\Acumulus\Api::PaymentStatus_Paid or
+     *   \Siel\Acumulus\Api::PaymentStatus_Due
      */
     protected function getPaymentStateOrder()
     {
@@ -103,8 +102,8 @@ class Creator extends BaseCreator
      * For now we assume that a refund is paid back on creation.
      *
      * @return int
-     *   \Siel\Acumulus\Invoice\ConfigInterface::PaymentStatus_Paid or
-     *   \Siel\Acumulus\Invoice\ConfigInterface::PaymentStatus_Due
+     *   \Siel\Acumulus\Api::PaymentStatus_Paid or
+     *   \Siel\Acumulus\Api::PaymentStatus_Due
      */
     protected function getPaymentStateCreditNote()
     {

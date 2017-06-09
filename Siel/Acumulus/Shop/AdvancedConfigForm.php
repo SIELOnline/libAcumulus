@@ -2,7 +2,7 @@
 namespace Siel\Acumulus\Shop;
 
 use Siel\Acumulus\Api;
-use Siel\Acumulus\Config\ConfigInterface;
+use Siel\Acumulus\Plugin;
 
 /**
  * Provides advanced config form handling.
@@ -485,7 +485,7 @@ class AdvancedConfigForm extends BaseConfigForm
                 'label' => $this->t('field_concept'),
                 'description' => $this->t('desc_concept'),
                 'options' => array(
-                    ConfigInterface::Concept_Plugin => $this->t('option_concept_2'),
+                    Plugin::Concept_Plugin => $this->t('option_concept_2'),
                     Api::Concept_No => $this->t('option_concept_0'),
                     Api::Concept_Yes => $this->t('option_concept_1'),
                 ),

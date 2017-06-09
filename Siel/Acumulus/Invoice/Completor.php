@@ -2,6 +2,7 @@
 namespace Siel\Acumulus\Invoice;
 
 use Siel\Acumulus\Api;
+use Siel\Acumulus\Plugin;
 use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Helpers\Countries;
 use Siel\Acumulus\Helpers\Number;
@@ -208,7 +209,7 @@ class Completor
         {
             $shopSettings = $this->config->getShopSettings();
             $vatFreeProducts = $shopSettings['vatFreeProducts'];
-            if ($vatFreeProducts === ConfigInterface::VatFreeProducts_No) {
+            if ($vatFreeProducts === Plugin::VatFreeProducts_No) {
                 $this->changeInvoiceToConcept('message_warning_line_without_vat');
             }
         }
@@ -245,12 +246,12 @@ class Completor
         } else {
             if ($this->invoiceHasLineWithVat()) {
                 // NL or EU Foreign vat.
-                if ($digitalServices === ConfigInterface::DigitalServices_No) {
+                if ($digitalServices === Plugin::DigitalServices_No) {
                     // No electronic services are sold: can only be dutch VAT.
                     $possibleVatTypes[] = Api::VatType_National;
                 } else {
                     if ($this->isEu() && $this->getInvoiceDate() >= '2015-01-01') {
-                        if ($digitalServices !== ConfigInterface::DigitalServices_Only) {
+                        if ($digitalServices !== Plugin::DigitalServices_Only) {
                             // Also normal goods are sold, so dutch VAT still possible.
                             $possibleVatTypes[] = Api::VatType_National;
                         }
@@ -270,7 +271,7 @@ class Completor
                     // Can it be VAT free products (e.g. education)? Digital
                     // services are never VAT free, nor are there any VAT free
                     // products if set so.
-                    if ($digitalServices !== ConfigInterface::DigitalServices_Only && $vatFreeProducts !== ConfigInterface::VatFreeProducts_No) {
+                    if ($digitalServices !== Plugin::DigitalServices_Only && $vatFreeProducts !== Plugin::VatFreeProducts_No) {
                         $possibleVatTypes[] = Api::VatType_National;
                     }
                     // National reversed VAT: not really supported but possible.
@@ -284,7 +285,7 @@ class Completor
                     }
                     // Can it be VAT free products (e.g. education)? Digital
                     // services are never VAT free, nor are there any if set so.
-                    if ($digitalServices !== ConfigInterface::DigitalServices_Only && $vatFreeProducts !== ConfigInterface::VatFreeProducts_No) {
+                    if ($digitalServices !== Plugin::DigitalServices_Only && $vatFreeProducts !== Plugin::VatFreeProducts_No) {
                         $possibleVatTypes[] = Api::VatType_National;
                     }
                 } elseif ($this->isOutsideEu()) {

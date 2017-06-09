@@ -2,6 +2,7 @@
 namespace Siel\Acumulus\Helpers;
 
 use Siel\Acumulus\Config\ConfigInterface;
+use Siel\Acumulus\Plugin;
 use Siel\Acumulus\Web\Service;
 
 /**
@@ -157,12 +158,12 @@ abstract class Mailer
     protected function getSubject(array $result)
     {
         switch ($result['status']) {
-            case ConfigInterface::Status_Exception:
-            case ConfigInterface::Status_Errors:
+            case Plugin::Status_Exception:
+            case Plugin::Status_Errors:
                 return $this->t('mail_subject_errors');
-            case ConfigInterface::Status_Warnings:
+            case Plugin::Status_Warnings:
                 return $this->t('mail_subject_warnings');
-            case ConfigInterface::Status_Success:
+            case Plugin::Status_Success:
             default:
                 return $this->t('mail_subject_debug');
         }
@@ -181,16 +182,16 @@ abstract class Mailer
     {
         $texts = array();
         switch ($result['status']) {
-            case ConfigInterface::Status_Exception:
-            case ConfigInterface::Status_Errors:
+            case Plugin::Status_Exception:
+            case Plugin::Status_Errors:
                 $texts['text'] = $this->t('mail_text_errors');
                 $texts['html'] = $this->t('mail_html_errors');
                 break;
-            case ConfigInterface::Status_Warnings:
+            case Plugin::Status_Warnings:
                 $texts['text'] = $this->t('mail_text_warnings');
                 $texts['html'] = $this->t('mail_html_warnings');
                 break;
-            case ConfigInterface::Status_Success:
+            case Plugin::Status_Success:
             default:
                 $texts['text'] = $this->t('mail_text_debug');
                 $texts['html'] = $this->t('mail_html_debug');

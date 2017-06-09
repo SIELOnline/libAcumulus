@@ -982,12 +982,12 @@ abstract class Creator
      * Returns the range in which the vat rate will lie.
      *
      * If a webshop does not store the vat rates used in the order, we must
-     * calculate them using a (product) price and the vat on it. But as webshops
-     * often store these numbers rounded to cents, the vat rate calculation
-     * becomes imprecise. Therefore we compute the range in which it will lie and
-     * will let the Completor do a comparison with the actual vat rates that an
-     * order can have (one of the Dutch or, for electronic services, other EU
-     * country VAT rates).
+     * calculate them using a (product) price and the vat on it. But as web
+     * shops often store these numbers rounded to cents, the vat rate
+     * calculation becomes imprecise. Therefore we compute the range in which it
+     * will lie and will let the Completor do a comparison with the actual vat
+     * rates that an order can have (one of the Dutch or, for electronic
+     * services, other EU country VAT rates).
      *
      * - If $denominator = 0 the vatrate will be set to NULL and the Completor may
      *   try to get this line listed under the correct vat rate.
@@ -995,9 +995,15 @@ abstract class Creator
      *   is an exact vat rate, not a vat range
      *
      * @param float $numerator
+     *   The amount of VAT as received from the web shop.
      * @param float $denominator
+     *   The price of a product excluding VAT as received from the web shop.
      * @param float $precisionNumerator
+     *   The precision used when rounding the number. This means that the
+     *   original numerator will not differ more than half of this.
      * @param float $precisionDenominator
+     *   The precision used when rounding the number. This means that the
+     *   original denominator will not differ more than half of this.
      *
      * @return array
      *   Array with keys vatrate, meta-vatrate-min, meta-vatrate-max, and

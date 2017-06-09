@@ -13,7 +13,11 @@ class Number
      * @param float $numerator
      * @param float $denominator
      * @param float $precisionNumerator
+     *   The precision used when rounding the number. This means that the
+     *   original numerator will not differ more than half of this.
      * @param float $precisionDenominator
+     *   The precision used when rounding the number. This means that the
+     *   original denominator will not differ more than half of this.
      *
      * @return array
      *   Array of floats with keys min, max and calculated.

@@ -136,7 +136,7 @@ class CompletorInvoiceLines
     protected function completeLineRequiredData(array $lines)
     {
         foreach ($lines as &$line) {
-            // Easy gain first. Known usages: Magento (1?).
+            // Easy gain first. Known usages: Magento.
             if (!isset($line['vatamount']) && isset($line['meta-line-vatamount'])) {
                 $line['vatamount'] = $line['meta-line-vatamount'] / $line['quantity'];
                 $line['meta-calculated-fields'][] = 'vatamount';
@@ -189,9 +189,16 @@ class CompletorInvoiceLines
 
             if (!isset($line['vatrate'])) {
                 if (isset($line['vatamount']) && isset($line['unitprice'])) {
+                    // This may use the easy gain, so known usages: Magento.
                     // Set (overwrite the tag vatrate-source) vatrate and
                     // accompanying tags.
-                    $line = array_merge($line, Creator::getVatRangeTags($line['vatamount'], $line['unitprice']));
+                    $precision = 0.01;
+                    // If the amounts are the sum of amounts taken from
+                    // children products, the precision may be lower.
+                    if (!empty($line['meta-children-merged'])) {
+                        $precision *= $line['meta-children-merged'];
+                    }
+                    $line = array_merge($line, Creator::getVatRangeTags($line['vatamount'], $line['unitprice'], $precision, $precision));
                     $line['meta-calculated-fields'][] = 'vatrate';
                 }
             }

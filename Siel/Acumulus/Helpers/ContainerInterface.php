@@ -96,6 +96,14 @@ interface ContainerInterface
     public function getSource($invoiceSourceType, $invoiceSourceOrId);
 
     /**
+     * Creates a wrapper object for an Acumulus invoice and its accompanying data.
+     *
+     * @return \Siel\Acumulus\Invoice\Invoice
+     *   A wrapper object around an Acumulus invoice and its accompanying data.
+     */
+    public function getInvoice();
+
+    /**
      * @return \Siel\Acumulus\Invoice\Completor
      */
     public function getCompletor();

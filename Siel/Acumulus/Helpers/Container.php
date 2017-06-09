@@ -158,6 +158,14 @@ class Container implements ContainerInterface
     /**
      * {@inheritdoc}
      */
+    public function getInvoice()
+    {
+        return $this->getInstance('Invoice', 'Invoice', array(), true);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getCompletor()
     {
         return $this->getInstance('Completor', 'Invoice', array($this->getConfig(), $this->getCompletorInvoiceLines(), $this->getCompletorStrategyLines(), $this->getTranslator(), $this->getService()));

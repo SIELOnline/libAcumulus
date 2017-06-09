@@ -622,7 +622,9 @@ abstract class Form
      */
     protected function getCheckboxKeys()
     {
-        return $this->getCheckboxKeysByFields($this->getFields());
+        // Call getFieldDefinitions(), not getFields(), as that may prevent
+        // changes to e.g. fixed values at a later stage in form handling.
+        return $this->getCheckboxKeysByFields($this->getFieldDefinitions());
     }
 
     /**

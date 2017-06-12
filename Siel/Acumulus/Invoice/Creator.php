@@ -8,7 +8,7 @@ use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Helpers\Token;
 use Siel\Acumulus\Helpers\TranslatorInterface;
 use Siel\Acumulus\Config\Config;
-use Siel\Acumulus\Plugin;
+use Siel\Acumulus\PluginConfig;
 
 /**
  * Creator creates a raw invoice similar to the Acumulus invoice structure.
@@ -304,18 +304,18 @@ abstract class Creator
 
         // Invoice type.
         $concept = $invoiceSettings['concept'];
-        if ($concept == Plugin::Concept_Plugin) {
+        if ($concept == PluginConfig::Concept_Plugin) {
             $concept = Api::Concept_No;
         }
         $this->addDefaultEmpty($invoice, 'concept', $concept);
 
         // Invoice number and date.
         $sourceToUse = $shopSettings['invoiceNrSource'];
-        if ($sourceToUse != Plugin::InvoiceNrSource_Acumulus) {
+        if ($sourceToUse != PluginConfig::InvoiceNrSource_Acumulus) {
             $invoice['number'] = $this->getInvoiceNumber($sourceToUse);
         }
         $dateToUse = $shopSettings['dateToUse'];
-        if ($dateToUse != Plugin::InvoiceDate_Transfer) {
+        if ($dateToUse != PluginConfig::InvoiceDate_Transfer) {
             $invoice['issuedate'] = $this->getInvoiceDate($dateToUse);
         }
 
@@ -385,7 +385,7 @@ abstract class Creator
      */
     protected function getInvoiceNumber($invoiceNumberSource) {
         $result = $this->invoiceSource->getInvoiceReference();
-        if ($invoiceNumberSource != Plugin::InvoiceNrSource_ShopInvoice || empty($result)) {
+        if ($invoiceNumberSource != PluginConfig::InvoiceNrSource_ShopInvoice || empty($result)) {
             $result = $this->invoiceSource->getReference();
         }
         return $result;
@@ -404,7 +404,7 @@ abstract class Creator
     protected function getInvoiceDate($dateToUse)
     {
         $result = $this->invoiceSource->getInvoiceDate();
-        if ($dateToUse != Plugin::InvoiceDate_OrderCreate || empty($result)) {
+        if ($dateToUse != PluginConfig::InvoiceDate_OrderCreate || empty($result)) {
             $result = $this->invoiceSource->getDate();
         }
         return $result;

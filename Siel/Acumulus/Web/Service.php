@@ -3,7 +3,7 @@ namespace Siel\Acumulus\Web;
 
 use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Helpers\TranslatorInterface;
-use Siel\Acumulus\Plugin;
+use Siel\Acumulus\PluginConfig;
 
 /**
  * Provides an easy interface towards the different API calls of the Acumulus
@@ -112,7 +112,7 @@ class Service
         }
 
         $pluginSettings = $this->config->getPluginSettings();
-        if ($addTraceMessages && (!empty($messages) || $pluginSettings['debug'] != Plugin::Debug_None)) {
+        if ($addTraceMessages && (!empty($messages) || $pluginSettings['debug'] != PluginConfig::Debug_None)) {
             if (isset($result['trace'])) {
                 $messages[] = $this->t('message_info_for_user');
                 if (isset($result['trace']['request'])) {
@@ -171,13 +171,13 @@ class Service
     public function getStatusText($status)
     {
         switch ($status) {
-            case Plugin::Status_Success:
+            case PluginConfig::Status_Success:
                 return $this->t('message_response_success');
-            case Plugin::Status_Errors:
+            case PluginConfig::Status_Errors:
                 return $this->t('message_response_errors');
-            case Plugin::Status_Warnings:
+            case PluginConfig::Status_Warnings:
                 return $this->t('message_response_warnings');
-            case Plugin::Status_Exception:
+            case PluginConfig::Status_Exception:
                 return $this->t('message_response_exception');
             default:
                 return $this->t('message_response_unknown') . $status;

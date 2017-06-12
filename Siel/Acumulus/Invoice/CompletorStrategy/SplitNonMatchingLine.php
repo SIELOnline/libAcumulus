@@ -1,7 +1,7 @@
 <?php
 namespace Siel\Acumulus\Invoice\CompletorStrategy;
 
-use Siel\Acumulus\Plugin;
+use Siel\Acumulus\PluginConfig;
 use Siel\Acumulus\Invoice\CompletorStrategyBase;
 
 /**
@@ -72,7 +72,7 @@ class SplitNonMatchingLine extends CompletorStrategyBase
         $result = count($this->vatBreakdown) === 2;
         if (!$result) {
             $shopSettings = $this->config->getShopSettings();
-            if ($shopSettings['vatFreeProducts'] === Plugin::VatFreeProducts_No) {
+            if ($shopSettings['vatFreeProducts'] === PluginConfig::VatFreeProducts_No) {
                 // If there are only 2 positive vat rates that will do as well.
                 // See note above in class doc.
                 $positiveVatRates = 0;

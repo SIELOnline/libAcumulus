@@ -4,7 +4,7 @@ namespace Siel\Acumulus\Config;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\TranslatorInterface;
 use Siel\Acumulus\Invoice\Source;
-use Siel\Acumulus\Plugin;
+use Siel\Acumulus\PluginConfig;
 
 /**
  * Defines an interface to access the shop specific's capabilities.
@@ -95,7 +95,7 @@ abstract class ShopCapabilities implements ShopCapabilitiesInterface
     public function getTriggerInvoiceEventOptions()
     {
         return array(
-            Plugin::TriggerInvoiceEvent_None => $this->t('option_triggerInvoiceEvent_0'),
+            PluginConfig::TriggerInvoiceEvent_None => $this->t('option_triggerInvoiceEvent_0'),
         );
     }
 
@@ -105,9 +105,9 @@ abstract class ShopCapabilities implements ShopCapabilitiesInterface
     public function getInvoiceNrSourceOptions()
     {
         return array(
-            Plugin::InvoiceNrSource_ShopInvoice => $this->t('option_invoiceNrSource_1'),
-            Plugin::InvoiceNrSource_ShopOrder => $this->t('option_invoiceNrSource_2'),
-            Plugin::InvoiceNrSource_Acumulus => $this->t('option_invoiceNrSource_3'),
+            PluginConfig::InvoiceNrSource_ShopInvoice => $this->t('option_invoiceNrSource_1'),
+            PluginConfig::InvoiceNrSource_ShopOrder => $this->t('option_invoiceNrSource_2'),
+            PluginConfig::InvoiceNrSource_Acumulus => $this->t('option_invoiceNrSource_3'),
         );
     }
 
@@ -117,9 +117,9 @@ abstract class ShopCapabilities implements ShopCapabilitiesInterface
     public function getDateToUseOptions()
     {
         return array(
-            Plugin::InvoiceDate_InvoiceCreate => $this->t('option_dateToUse_1'),
-            Plugin::InvoiceDate_OrderCreate => $this->t('option_dateToUse_2'),
-            Plugin::InvoiceDate_Transfer => $this->t('option_dateToUse_3'),
+            PluginConfig::InvoiceDate_InvoiceCreate => $this->t('option_dateToUse_1'),
+            PluginConfig::InvoiceDate_OrderCreate => $this->t('option_dateToUse_2'),
+            PluginConfig::InvoiceDate_Transfer => $this->t('option_dateToUse_3'),
         );
     }
 

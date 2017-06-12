@@ -1,7 +1,7 @@
 <?php
 namespace Siel\Acumulus\OpenCart\Config;
 
-use Siel\Acumulus\Plugin;
+use Siel\Acumulus\PluginConfig;
 use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
 use Siel\Acumulus\Invoice\Source;
@@ -19,7 +19,7 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
     {
         $environment = array(
             // Module has same version as library.
-            'moduleVersion' => Plugin::Version,
+            'moduleVersion' => PluginConfig::Version,
             'shopName' => $this->shopName,
             'shopVersion' => VERSION,
         );
@@ -295,7 +295,7 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
     public function getDateToUseOptions()
     {
         $result = parent::getDateToUseOptions();
-        unset($result[Plugin::InvoiceDate_InvoiceCreate]);
+        unset($result[PluginConfig::InvoiceDate_InvoiceCreate]);
         return $result;
     }
 

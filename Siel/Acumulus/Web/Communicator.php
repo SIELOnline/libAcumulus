@@ -8,7 +8,7 @@ use LibXMLError;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Helpers\Log;
-use Siel\Acumulus\Plugin;
+use Siel\Acumulus\PluginConfig;
 
 /**
  * Communication implements the communication with the Acumulus WebAPI.
@@ -125,15 +125,15 @@ class Communicator implements CommunicatorInterface
         if (!empty($this->errors)) {
             // Internal error(s), return those as well.
             $response['errors'] = array_merge($this->errors, $response['errors']);
-            if ($response['status'] < Plugin::Status_Errors) {
-                $response['status'] = Plugin::Status_Errors;
+            if ($response['status'] < PluginConfig::Status_Errors) {
+                $response['status'] = PluginConfig::Status_Errors;
             }
         }
         if (!empty($this->warnings)) {
             // Internal warning(s), return those as well.
             $response['warnings'] = array_merge($this->warnings, $response['warnings']);
-            if ($response['status'] < Plugin::Status_Warnings) {
-                $response['status'] = Plugin::Status_Warnings;
+            if ($response['status'] < PluginConfig::Status_Warnings) {
+                $response['status'] = PluginConfig::Status_Warnings;
             }
         }
 
@@ -163,7 +163,7 @@ class Communicator implements CommunicatorInterface
         $commonMessagePart = array(
             'contract' => $this->config->getCredentials(),
             'format' => $pluginSettings['outputFormat'],
-            'testmode' => $pluginSettings['debug'] === Plugin::Debug_TestMode ? Api::TestMode_Test : Api::TestMode_Normal,
+            'testmode' => $pluginSettings['debug'] === PluginConfig::Debug_TestMode ? Api::TestMode_Test : Api::TestMode_Normal,
             'connector' => array(
                 'application' => "{$environment['shopName']} {$environment['shopVersion']}",
                 'webkoppel' => "Acumulus {$environment['moduleVersion']}",
@@ -425,14 +425,14 @@ class Communicator implements CommunicatorInterface
     protected function ApiStatus2InternalStatus($status) {
         switch ($status) {
             case Api::Success:
-                return Plugin::Status_Success;
+                return PluginConfig::Status_Success;
             case Api::Errors:
-                return Plugin::Status_Errors;
+                return PluginConfig::Status_Errors;
             case Api::Warnings:
-                return Plugin::Status_Warnings;
+                return PluginConfig::Status_Warnings;
             case Api::Exception:
             default:
-                return Plugin::Status_Exception;
+                return PluginConfig::Status_Exception;
         }
     }
 

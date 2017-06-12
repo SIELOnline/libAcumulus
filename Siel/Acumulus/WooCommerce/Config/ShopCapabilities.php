@@ -2,7 +2,7 @@
 namespace Siel\Acumulus\WooCommerce\Config;
 
 use Acumulus;
-use Siel\Acumulus\Plugin;
+use Siel\Acumulus\PluginConfig;
 use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
 
 /**
@@ -205,7 +205,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function getInvoiceNrSourceOptions()
     {
         $result = parent::getInvoiceNrSourceOptions();
-        unset($result[Plugin::InvoiceNrSource_ShopInvoice]);
+        unset($result[PluginConfig::InvoiceNrSource_ShopInvoice]);
         return $result;
     }
 
@@ -218,7 +218,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function getDateToUseOptions()
     {
         $result = parent::getDateToUseOptions();
-        unset($result[Plugin::InvoiceDate_InvoiceCreate]);
+        unset($result[PluginConfig::InvoiceDate_InvoiceCreate]);
         return $result;
     }
 

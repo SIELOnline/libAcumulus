@@ -6,7 +6,7 @@ namespace Siel\Acumulus;
  *
  * These constants are used as configuration settings or as result codes.
  */
-interface Plugin
+interface PluginConfig
 {
     const Version = '4.8.0-alpha3';
 

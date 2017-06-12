@@ -7,7 +7,7 @@ use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Helpers\ContainerInterface;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Source;
-use Siel\Acumulus\Plugin;
+use Siel\Acumulus\PluginConfig;
 
 /**
  * Provides functionality to manage invoices.
@@ -292,7 +292,7 @@ abstract class InvoiceManager
     public function invoiceCreate(Source $invoiceSource)
     {
         $shopEventSettings = $this->getConfig()->getShopEventSettings();
-        if ($shopEventSettings['triggerInvoiceEvent'] == Plugin::TriggerInvoiceEvent_Create) {
+        if ($shopEventSettings['triggerInvoiceEvent'] == PluginConfig::TriggerInvoiceEvent_Create) {
             $result = $this->send($invoiceSource);
         } else {
             $result = ConfigInterface::Invoice_NotSent_TriggerInvoiceCreateNotEnabled;
@@ -318,7 +318,7 @@ abstract class InvoiceManager
     public function invoiceSend(Source $invoiceSource)
     {
         $shopEventSettings = $this->getConfig()->getShopEventSettings();
-        if ($shopEventSettings['triggerInvoiceEvent'] == Plugin::TriggerInvoiceEvent_Send) {
+        if ($shopEventSettings['triggerInvoiceEvent'] == PluginConfig::TriggerInvoiceEvent_Send) {
             $result = $this->send($invoiceSource);
         } else {
             $result = ConfigInterface::Invoice_NotSent_TriggerInvoiceSentNotEnabled;
@@ -348,7 +348,7 @@ abstract class InvoiceManager
     public function send(Source $invoiceSource, $forceSend = false, $dryRun = false)
     {
         $pluginSettings = $this->getConfig()->getPluginSettings();
-        $testMode = $pluginSettings['debug'] == Plugin::Debug_TestMode;
+        $testMode = $pluginSettings['debug'] == PluginConfig::Debug_TestMode;
         $messages = array();
         if ($testMode) {
             $status = ConfigInterface::Invoice_Sent_TestMode;
@@ -434,7 +434,7 @@ abstract class InvoiceManager
             // but we still want to prevent sending it again: check for the
             // concept status, the absence of errors and non test-mode.
             $pluginSettings = $this->getConfig()->getPluginSettings();
-            $testMode = $pluginSettings['debug'] == Plugin::Debug_TestMode;
+            $testMode = $pluginSettings['debug'] == PluginConfig::Debug_TestMode;
             $isConcept = $invoice['customer']['invoice']['concept'] == Api::Concept_Yes;
             if (empty($result['errors']) && $isConcept && !$testMode) {
                 $this->getAcumulusEntryModel()->save($invoiceSource, null, null);
@@ -471,14 +471,14 @@ abstract class InvoiceManager
     {
         if (!empty($localMessages['errors'])) {
             $result['errors'] = array_merge($result['errors'], $localMessages['errors']);
-            if ($result['status'] < Plugin::Status_Errors) {
-                $result['status'] = Plugin::Status_Errors;
+            if ($result['status'] < PluginConfig::Status_Errors) {
+                $result['status'] = PluginConfig::Status_Errors;
             }
         }
         if (!empty($localMessages['warnings'])) {
             $result['warnings'] = array_merge($result['warnings'], $localMessages['warnings']);
-            if ($result['status'] < Plugin::Status_Warnings) {
-                $result['status'] = Plugin::Status_Warnings;
+            if ($result['status'] < PluginConfig::Status_Warnings) {
+                $result['status'] = PluginConfig::Status_Warnings;
             }
         }
         return $result;
@@ -505,8 +505,8 @@ abstract class InvoiceManager
 
         if ($sent) {
             $service = $this->getService();
-            $message .= ' ' . $service->getStatusText($status & Plugin::Status_Mask);
-            if ((($status & Plugin::Status_Mask) !== Plugin::Status_Success) && !empty($messages)) {
+            $message .= ' ' . $service->getStatusText($status & PluginConfig::Status_Mask);
+            if ((($status & PluginConfig::Status_Mask) !== PluginConfig::Status_Success) && !empty($messages)) {
                 $message .= ' ' . $service->messagesToText($messages);
             }
         }

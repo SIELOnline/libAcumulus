@@ -3,7 +3,7 @@ namespace Siel\Acumulus\Shop;
 
 use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Helpers\Log;
-use Siel\Acumulus\Plugin;
+use Siel\Acumulus\PluginConfig;
 
 /**
  * Provides basic config form handling.
@@ -352,9 +352,9 @@ class ConfigForm extends BaseConfigForm
                 'label' => $this->t('field_debug'),
                 'description' => $this->t('desc_debug'),
                 'options' => array(
-                    Plugin::Debug_None => $this->t('option_debug_1'),
-                    Plugin::Debug_SendAndLog => $this->t('option_debug_2'),
-                    Plugin::Debug_TestMode => $this->t('option_debug_3'),
+                    PluginConfig::Debug_None => $this->t('option_debug_1'),
+                    PluginConfig::Debug_SendAndLog => $this->t('option_debug_2'),
+                    PluginConfig::Debug_TestMode => $this->t('option_debug_3'),
                 ),
                 'attributes' => array(
                     'required' => true,
@@ -442,9 +442,9 @@ class ConfigForm extends BaseConfigForm
     protected function getDigitalServicesOptions()
     {
         return array(
-            Plugin::DigitalServices_Both => $this->t('option_digitalServices_1'),
-            Plugin::DigitalServices_No => $this->t('option_digitalServices_2'),
-            Plugin::DigitalServices_Only => $this->t('option_digitalServices_3'),
+            PluginConfig::DigitalServices_Both => $this->t('option_digitalServices_1'),
+            PluginConfig::DigitalServices_No => $this->t('option_digitalServices_2'),
+            PluginConfig::DigitalServices_Only => $this->t('option_digitalServices_3'),
         );
     }
 
@@ -458,9 +458,9 @@ class ConfigForm extends BaseConfigForm
     protected function getVatFreeProductsOptions()
     {
         return array(
-            Plugin::VatFreeProducts_Both => $this->t('option_vatFreeProducts_1'),
-            Plugin::VatFreeProducts_No => $this->t('option_vatFreeProducts_2'),
-            Plugin::VatFreeProducts_Only => $this->t('option_vatFreeProducts_3'),
+            PluginConfig::VatFreeProducts_Both => $this->t('option_vatFreeProducts_1'),
+            PluginConfig::VatFreeProducts_No => $this->t('option_vatFreeProducts_2'),
+            PluginConfig::VatFreeProducts_Only => $this->t('option_vatFreeProducts_3'),
         );
     }
 

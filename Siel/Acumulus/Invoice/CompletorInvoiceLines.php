@@ -195,8 +195,8 @@ class CompletorInvoiceLines
                     $precision = 0.01;
                     // If the amounts are the sum of amounts taken from
                     // children products, the precision may be lower.
-                    if (!empty($line['meta-children-merged'])) {
-                        $precision *= $line['meta-children-merged'];
+                    if (!empty($line[Creator::Line_Children])) {
+                        $precision *= count($line[Creator::Line_Children]);
                     }
                     $line = array_merge($line, Creator::getVatRangeTags($line['vatamount'], $line['unitprice'], $precision, $precision));
                     $line['meta-calculated-fields'][] = 'vatrate';

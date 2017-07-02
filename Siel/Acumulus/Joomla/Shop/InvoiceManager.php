@@ -8,6 +8,7 @@ use JFactory;
 use JPluginHelper;
 use Siel\Acumulus\Invoice\Source as Source;
 use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
+use Siel\Acumulus\Invoice\Result;
 
 /**
  * {@inheritdoc}
@@ -78,7 +79,7 @@ abstract class InvoiceManager extends BaseInvoiceManager
      *
      * This Joomla override dispatches the 'onAcumulusInvoiceCreated' event.
      */
-    protected function triggerInvoiceCreated(array &$invoice, Source $invoiceSource)
+    protected function triggerInvoiceCreated(array &$invoice, Result $localResult, Source $invoiceSource)
     {
         JPluginHelper::importPlugin('acumulus');
         $results = JEventDispatcher::getInstance()->trigger('onAcumulusInvoiceCreated', array(&$invoice, $invoiceSource));
@@ -95,10 +96,10 @@ abstract class InvoiceManager extends BaseInvoiceManager
      *
      * This Joomla override dispatches the 'onAcumulusInvoiceCompleted' event.
      */
-    protected function triggerInvoiceCompleted(array &$invoice, Source $invoiceSource)
+    protected function triggerInvoiceCompleted(array &$invoice, Result $localResult, Source $invoiceSource)
     {
         JPluginHelper::importPlugin('acumulus');
-        $results = JEventDispatcher::getInstance()->trigger('onAcumulusInvoiceCompleted', array(&$invoice, $invoiceSource));
+        $results = JEventDispatcher::getInstance()->trigger('onAcumulusInvoiceCompleted', array(&$invoice, $invoiceSource, $localResult));
         if (count(array_filter($results, function ($value) {
                 return $value === false;
             })) > 1
@@ -112,7 +113,7 @@ abstract class InvoiceManager extends BaseInvoiceManager
      *
      * This Joomla override dispatches the 'onAcumulusInvoiceSent' event.
      */
-    protected function triggerInvoiceSent(array $invoice, Source $invoiceSource, array $result)
+    protected function triggerInvoiceSent(array $invoice, Source $invoiceSource, Result $result)
     {
         JPluginHelper::importPlugin('acumulus');
         JEventDispatcher::getInstance()->trigger('onAcumulusInvoiceSent', array($invoice, $invoiceSource, $result));

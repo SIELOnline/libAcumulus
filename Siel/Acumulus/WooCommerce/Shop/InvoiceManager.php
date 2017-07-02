@@ -2,9 +2,9 @@
 namespace Siel\Acumulus\WooCommerce\Shop;
 
 use DateTime;
-use Siel\Acumulus\Invoice\Source as BaseSource;
+use Siel\Acumulus\Invoice\Source as Source;
 use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
-use Siel\Acumulus\WooCommerce\Invoice\Source;
+use Siel\Acumulus\Invoice\Result;
 use WP_Query;
 
 class InvoiceManager extends BaseInvoiceManager
@@ -155,7 +155,7 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * This WooCommerce override applies the 'acumulus_invoice_created' filter.
      */
-    protected function triggerInvoiceCreated(array &$invoice, BaseSource $invoiceSource)
+    protected function triggerInvoiceCreated(array &$invoice, Result $localResult, Source $invoiceSource)
     {
         $invoice = apply_filters('acumulus_invoice_created', $invoice, $invoiceSource);
     }
@@ -165,9 +165,9 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * This WooCommerce override applies the 'acumulus_invoice_completed' filter.
      */
-    protected function triggerInvoiceCompleted(array &$invoice, BaseSource $invoiceSource)
+    protected function triggerInvoiceCompleted(array &$invoice, Result $localResult, Source $invoiceSource)
     {
-        $invoice = apply_filters('acumulus_invoice_completed', $invoice, $invoiceSource);
+        $invoice = apply_filters('acumulus_invoice_completed', $invoice, $invoiceSource, $localResult);
     }
 
     /**
@@ -175,7 +175,7 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * This WooCommerce override executes the 'acumulus_invoice_sent' action.
      */
-    protected function triggerInvoiceSent(array $invoice, BaseSource $invoiceSource, array $result)
+    protected function triggerInvoiceSent(array $invoice, Source $invoiceSource, Result $result)
     {
         do_action('acumulus_invoice_sent', $invoice, $invoiceSource, $result);
     }

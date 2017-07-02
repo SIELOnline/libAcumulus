@@ -4,25 +4,15 @@ namespace Siel\Acumulus;
 /**
  * Plugin defines the version and other plugin related constants.
  *
- * These constants are used as configuration settings or as result codes.
+ * These constants are used as configuration settings.
  */
 interface PluginConfig
 {
     const Version = '4.8.0-alpha3';
 
-    // Web service configuration related constants.
-    // Send status: bits 1, 2 and 3. Can be combined with an Invoice_Sent_...
-    // const. Not necessarily a single bit per value, but the order should be by
-    // increasing worseness.
-    const Status_Success = 0;
-    const Status_Warnings = 1;
-    const Status_Errors = 2;
-    const Status_Exception = 4;
-    const Status_Mask = 7;
-
-    const Debug_None = 1;
-    const Debug_SendAndLog = 2;
-    const Debug_TestMode = 3;
+    const Send_SendAndMailOnError = 1;
+    const Send_SendAndMail = 2;
+    const Send_TestMode = 3;
 
     // not an API constant.
     const Concept_Plugin = 2;

@@ -148,8 +148,8 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
      */
     public function uninstall()
     {
-        // We do not delete all Acumulus metadata, not even via a confirmation page.
-        // If we would want to do so, we can use this code:
+        // We do not delete the Acumulus metadata, not even via a confirmation
+        // page. If we would want to do so, we can use this code:
         // delete_post_meta_by_key('_acumulus_entry_id'); // for other keys as well.
         return true;
     }

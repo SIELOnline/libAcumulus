@@ -294,8 +294,8 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'field_debug' => 'Factuur verzendmodus',
         'option_debug_1' => 'Ontvang alleen een mail bij fouten of waarschuwingen tijdens het verzenden van een factuur naar Acumulus.',
         'option_debug_2' => 'Ontvang altijd een mail met de resultaten bij het verzenden van een factuur naar Acumulus.',
-        'option_debug_3' => 'Verstuur facturen in test modus naar Acumulus. Acumulus zal alleen de factuur controleren op fouten en waarschuwingen maar zal deze niet opslaan.',
-        'option_debug_4' => 'Verzend berichten naar Acumulus maar ontvang wel een mail met het bericht zoals dat vestuurd zou zijn.',
+        'option_debug_3' => 'Verstuur facturen in testmodus naar Acumulus. Acumulus zal alleen de factuur controleren op fouten en waarschuwingen maar zal deze niet opslaan. U ontvangt alijd een mail met de resultaten.',
+        'option_debug_4' => 'Verzend berichten niet naar Acumulus maar ontvang wel een mail met het bericht zoals dat vestuurd zou zijn.',
         'desc_debug' => 'U kunt hier een verzend modus kiezen. Kies voor de eerste optie tenzij u i.v.m. een supportverzoek bent geïnstrueerd om iets anders te kiezen.',
 
         'field_logLevel' => 'Logniveau',
@@ -538,7 +538,7 @@ If you unchecked the first option, the second option only applies to business cl
         'field_productName' => 'Product name',
         'desc_productName' => 'The product name or description you want to show on the invoice.',
         'field_nature' => 'Nature',
-        'desc_nature' => 'The nature of the  article sold. This cvan be either "Product" or "Service". If this shop only sells products or only services, you can fill that in here. If you sell both and you store this as a property for all articles in your catalog you can use a field reference to use that property.',
+        'desc_nature' => 'The nature of the  article sold. This can be either "Product" or "Service". If this shop only sells products or only services, you can fill that in here. If you sell both and you store this as a property for all articles in your catalog you can use a field reference to use that property.',
         'field_costPrice' => 'Cost price',
         'desc_costPrice' => 'The cost price of this article. This is only used om margin invoices.',
 
@@ -602,7 +602,7 @@ If you unchecked the first option, the second option only applies to business cl
         'field_debug' => 'Invoice send mode',
         'option_debug_1' => 'Only receive a mail when there are errors or warnings on sending an invoice to Acumulus.',
         'option_debug_2' => 'Always receive a mail with the results on sending an invoice to Acumulus.',
-        'option_debug_3' => 'Send invoices to Acumulus in test mode. Acumulus will only check the input for errors and warnings but not store the invoice.',
+        'option_debug_3' => 'Send invoices to Acumulus in test mode. Acumulus will only check the input for errors and warnings but not store the invoice. You will always receive a mail with the results.',
         'option_debug_4' => 'Do not send messages to Acumulus, but receive a mail with the message as would have been sent.',
         'desc_debug' => 'Select a debug mode. Choose for the 1st option unless otherwise instructed by support staff.',
 

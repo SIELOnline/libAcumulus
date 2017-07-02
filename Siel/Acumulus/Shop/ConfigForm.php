@@ -1,7 +1,6 @@
 <?php
 namespace Siel\Acumulus\Shop;
 
-use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\PluginConfig;
 
@@ -298,8 +297,8 @@ class ConfigForm extends BaseConfigForm
      */
     protected function getInvoiceFields()
     {
-        $this->accountNumberOptions = $this->picklistToOptions($this->service->getPicklistAccounts(), 'accounts', 0, $this->t('option_empty'));
-        $this->costCenterOptions = $this->picklistToOptions($this->service->getPicklistCostCenters(), 'costcenters', 0, $this->t('option_empty'));
+        $this->accountNumberOptions = $this->picklistToOptions($this->service->getPicklistAccounts(), 0, $this->t('option_empty'));
+        $this->costCenterOptions = $this->picklistToOptions($this->service->getPicklistCostCenters(), 0, $this->t('option_empty'));
 
         $fields = array(
             'invoiceNrSource' => $this->getOptionsOrHiddenField('invoiceNrSource', 'radio'),
@@ -319,14 +318,13 @@ class ConfigForm extends BaseConfigForm
             'defaultInvoiceTemplate' => array(
                 'type' => 'select',
                 'label' => $this->t('field_defaultInvoiceTemplate'),
-                'options' => $this->picklistToOptions($invoiceTemplates = $this->service->getPicklistInvoiceTemplates(), 'invoicetemplates', 0, $this->t('option_empty')),
+                'options' => $this->picklistToOptions($invoiceTemplates = $this->service->getPicklistInvoiceTemplates(), 0, $this->t('option_empty')),
             ),
             'defaultInvoicePaidTemplate' => array(
                 'type' => 'select',
                 'label' => $this->t('field_defaultInvoicePaidTemplate'),
                 'description' => $this->t('desc_defaultInvoiceTemplate'),
-                'options' => $this->picklistToOptions($invoiceTemplates,
-                    'invoicetemplates', 0, $this->t('option_same_template')),
+                'options' => $this->picklistToOptions($invoiceTemplates, 0, $this->t('option_same_template')),
             ),
         );
         return $fields;
@@ -352,9 +350,9 @@ class ConfigForm extends BaseConfigForm
                 'label' => $this->t('field_debug'),
                 'description' => $this->t('desc_debug'),
                 'options' => array(
-                    PluginConfig::Debug_None => $this->t('option_debug_1'),
-                    PluginConfig::Debug_SendAndLog => $this->t('option_debug_2'),
-                    PluginConfig::Debug_TestMode => $this->t('option_debug_3'),
+                    PluginConfig::Send_SendAndMailOnError => $this->t('option_debug_1'),
+                    PluginConfig::Send_SendAndMail => $this->t('option_debug_2'),
+                    PluginConfig::Send_TestMode => $this->t('option_debug_3'),
                 ),
                 'attributes' => array(
                     'required' => true,

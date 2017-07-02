@@ -6,8 +6,8 @@ use Siel\Acumulus\WooCommerce\Invoice\Source as BaseSource;
 /**
  * Wraps a WooCommerce2 order in an invoice source object.
  *
- * This class only overrides methods that contain non BC compatible changes of
- * WooCommerce 3.
+ * This class only overrides methods that contain non BC compatible changes made
+ * in the parent class to make WooCommerce 3 work.
  */
 class Source extends BaseSource
 {

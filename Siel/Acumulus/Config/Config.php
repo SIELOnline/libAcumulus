@@ -447,7 +447,7 @@ class Config implements ConfigInterface
                 'debug' => array(
                     'group' => 'plugin',
                     'type' => 'int',
-                    'default' => PluginConfig::Debug_None,
+                    'default' => PluginConfig::Send_SendAndMailOnError,
                 ),
                 'logLevel' => array(
                     'group' => 'plugin',
@@ -830,7 +830,7 @@ class Config implements ConfigInterface
         // 2) Debug mode.
         switch ($this->get('debug')) {
             case 4: // Value for deprecated ServiceConfigInterfacePlugin::Debug_StayLocal.
-                $newSettings['logLevel'] = PluginConfig::Debug_TestMode;
+                $newSettings['logLevel'] = PluginConfig::Send_TestMode;
                 break;
         }
 

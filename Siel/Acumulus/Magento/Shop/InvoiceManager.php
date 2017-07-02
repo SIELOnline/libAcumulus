@@ -3,6 +3,7 @@ namespace Siel\Acumulus\Magento\Shop;
 
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
+use Siel\Acumulus\Invoice\Result;
 
 abstract class InvoiceManager extends BaseInvoiceManager
 {
@@ -83,7 +84,7 @@ abstract class InvoiceManager extends BaseInvoiceManager
      *
      * This Magento override dispatches the 'acumulus_invoice_created' event.
      */
-    protected function triggerInvoiceCreated(array &$invoice, Source $invoiceSource)
+    protected function triggerInvoiceCreated(array &$invoice, Result $localResult, Source $invoiceSource)
     {
         $this->dispatchEvent('acumulus_invoice_created', array('source' => $invoiceSource), array('invoice' => &$invoice));
     }
@@ -93,9 +94,9 @@ abstract class InvoiceManager extends BaseInvoiceManager
      *
      * This Magento override dispatches the 'acumulus_invoice_completed' event.
      */
-    protected function triggerInvoiceCompleted(array &$invoice, Source $invoiceSource)
+    protected function triggerInvoiceCompleted(array &$invoice, Result $localResult, Source $invoiceSource)
     {
-        $this->dispatchEvent('acumulus_invoice_completed', array('source' => $invoiceSource), array('invoice' => &$invoice));
+        $this->dispatchEvent('acumulus_invoice_completed', array('source' => $invoiceSource, 'localResult'=> $localResult), array('invoice' => &$invoice));
     }
 
     /**
@@ -103,7 +104,7 @@ abstract class InvoiceManager extends BaseInvoiceManager
      *
      * This Magento override dispatches the 'acumulus_invoice_sent' event.
      */
-    protected function triggerInvoiceSent(array $invoice, Source $invoiceSource, array $result)
+    protected function triggerInvoiceSent(array $invoice, Source $invoiceSource, Result $result)
     {
         $this->dispatchEvent('acumulus_invoice_sent', array('invoice' => $invoice, 'source' => $invoiceSource, 'result' => $result));
     }

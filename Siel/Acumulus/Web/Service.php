@@ -3,7 +3,6 @@ namespace Siel\Acumulus\Web;
 
 use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Helpers\TranslatorInterface;
-use Siel\Acumulus\PluginConfig;
 
 /**
  * Provides an easy interface towards the different API calls of the Acumulus
@@ -17,19 +16,7 @@ use Siel\Acumulus\PluginConfig;
  * - http://www.siel.nl/webkoppelingen/
  *
  * The Web API call wrappers return their information as a keyed array, which is
- * a simplified version of the call specific response structure and the exit
- * structure as described on
- * https://apidoc.sielsystems.nl/content/warning-error-and-status-response-section-most-api-calls.
- *
- * The general part is represented by the following keys in the result:
- * - status: int; 0 = success; 1 = Failed, Errors found; 2 = Success with
- *   warnings; 3 = Exception, Please contact Acumulus technical support.
- * - errors: an array of errors, an error is an array with the following keys:
- *   - code: int, see https://apidoc.sielsystems.nl/content/exit-and-warning-codes
- *   - codetag: string, a special code tag. Use this as a reference when
- *        communicating with Acumulus technical support.
- *   - message: string, a message describing the warning or error.
- * - warnings: an array of warning arrays, these have the same keys as an error.
+ * a simplified version of the call specific part of the response structure.
  */
 class Service
 {
@@ -75,250 +62,129 @@ class Service
     }
 
     /**
-     * If the result contains any errors or warnings, a list of verbose messages
-     * is returned.
-     *
-     * @todo: extract this into a messages/result class.
-     *
-     * @param array $result
-     *   A keyed array that contains the results, but also any messages in the
-     *   keys 'errors and 'warnings'.
-     * @param bool $addTraceMessages
-     *   $result may contain the actual request and response as sent in the key
-     *   'trace'. If this parameter is true the trace should be added to the
-     *   messages to be returned as well.
-     *
-     * @return string[]
-     *   An array with textual messages that can be used to inform the user.
-     */
-    public function resultToMessages(array $result, $addTraceMessages = true)
-    {
-        $messages = array();
-        foreach ($result['errors'] as $error) {
-            $message = "{$error['code']}: ";
-            $message .= $this->t($error['message']);
-            if ($error['codetag']) {
-                $message .= " ({$error['codetag']})";
-            }
-            $messages[] = $this->t('message_error') . ' ' . $message;
-        }
-        foreach ($result['warnings'] as $warning) {
-            $message = "{$warning['code']}: ";
-            $message .= $this->t($warning['message']);
-            if ($warning['codetag']) {
-                $message .= " ({$warning['codetag']})";
-            }
-            $messages[] = $this->t('message_warning') . ' ' . $message;
-        }
-
-        $pluginSettings = $this->config->getPluginSettings();
-        if ($addTraceMessages && (!empty($messages) || $pluginSettings['debug'] != PluginConfig::Debug_None)) {
-            if (isset($result['trace'])) {
-                $messages[] = $this->t('message_info_for_user');
-                if (isset($result['trace']['request'])) {
-                    $messages[] = $this->t('message_sent') . ":\n" . $result['trace']['request'];
-                }
-                if (isset($result['trace']['response'])) {
-                    $messages[] = $this->t('message_received') . ":\n" . $result['trace']['response'];
-                }
-            }
-        }
-
-        return $messages;
-    }
-
-    /**
-     * Converts an array of messages to a string that can be used in a text mail.
-     *
-     * @todo: extract this into a messages/result class.
-     *
-     * @param string[] $messages
-     *
-     * @return string
-     */
-    public function messagesToText(array $messages)
-    {
-        return !empty($messages) ? '* ' . implode("\n\n* ", $messages) . "\n\n" : '';
-    }
-
-    /**
-     * Converts an array of messages to a string that can be used in an html mail.
-     *
-     * @todo: extract this into a messages/result class.
-     *
-     * @param string[] $messages
-     *
-     * @return string
-     */
-    public function messagesToHtml(array $messages)
-    {
-        $messages_html = array();
-        foreach ($messages as $message) {
-            $messages_html[] = nl2br(htmlspecialchars($message, ENT_NOQUOTES));
-        }
-        return '<ul><li>' . implode("</li><li>", $messages_html) . '</li></ul>';
-    }
-
-    /**
-     * Returns a textual representation of the status.
-     *
-     * @todo: extract this into a messages/result class.
-     *
-     * @param int $status
-     *
-     * @return string
-     */
-    public function getStatusText($status)
-    {
-        switch ($status) {
-            case PluginConfig::Status_Success:
-                return $this->t('message_response_success');
-            case PluginConfig::Status_Errors:
-                return $this->t('message_response_errors');
-            case PluginConfig::Status_Warnings:
-                return $this->t('message_response_warnings');
-            case PluginConfig::Status_Exception:
-                return $this->t('message_response_exception');
-            default:
-                return $this->t('message_response_unknown') . $status;
-        }
-    }
-
-    /**
      * Retrieves a list of accounts.
      *
-     * @return array
-     *   Besides the general response structure, the actual result of this call is
-     *   returned under the key 'accounts' and consists of an array of 'accounts',
-     *   each 'account' being a keyed array with keys:
+     * @return \Siel\Acumulus\Web\Result
+     *   The result of the webservice call. The structured response will contain
+     *   a non-keyed array of "account" arrays, each "account" array being a
+     *   keyed array with keys:
      *   - accountid
      *   - accountnumber
      *   - accountdescription
      *
-     * See https://apidoc.sielsystems.nl/content/picklist-accounts-bankrekeningen.
+     * @see https://apidoc.sielsystems.nl/content/picklist-accounts-bankrekeningen
      */
     public function getPicklistAccounts()
     {
-        return $this->getPicklist('account');
+        return $this->getPicklist('accounts');
     }
 
     /**
      * Retrieves a list of contact types.
      *
-     * @return array
-     *   Besides the general response structure, the actual result of this call is
-     *   returned under the key 'contacttypes' and consists of an array of
-     *   'contacttypes', each 'contacttype' being a keyed array with keys:
+     * @return \Siel\Acumulus\Web\Result
+     *   The result of the webservice call. The structured response will contain
+     *   a non-keyed array of "contacttype" arrays, each "contacttype" array
+     *   being a keyed array with keys:
      *   - contacttypeid
      *   - contacttypename
      *
-     * See https://apidoc.sielsystems.nl/content/picklist-contacttypes-contactsoorten.
+     * @see https://apidoc.sielsystems.nl/content/picklist-contacttypes-contactsoorten
      */
     public function getPicklistContactTypes()
     {
-        return $this->getPicklist('contacttype');
+        return $this->getPicklist('contacttypes');
     }
 
     /**
      * Retrieves a list of cost centers.
      *
-     * @return array
-     *   Besides the general response structure, the actual result of this call is
-     *   returned under the key 'costcenters' and consists of an array of
-     *   'costcenters', each 'costcenter' being a keyed array with keys:
+     * @return \Siel\Acumulus\Web\Result
+     *   The result of the webservice call. The structured response will contain
+     *   a non-keyed array of "costcenter" arrays, each "costcenter" array being
+     *   a keyed array with keys:
      *   - costcenterid
      *   - costcentername
      *
-     * See https://apidoc.sielsystems.nl/content/picklist-costcenters-kostenplaatsen.
+     * @see https://apidoc.sielsystems.nl/content/picklist-costcenters-kostenplaatsen
      */
     public function getPicklistCostCenters()
     {
-        return $this->getPicklist('costcenter');
+        return $this->getPicklist('costcenters');
     }
 
     /**
      * Retrieves a list of cost headings.
      *
-     * @return array
-     *   Besides the general response structure, the actual result of this call is
-     *   returned under the key 'costheadings' and consists of an array of
-     *   'costheadings', each 'costheading' being a keyed array with keys:
+     * @return \Siel\Acumulus\Web\Result
+     *   The result of the webservice call. The structured response will contain
+     *   a non-keyed array of "costheading" arrays, each "costheading" array being
+     *   a keyed array with keys:
      *   - costheadingid
      *   - costheadingname
      *
-     * See https://apidoc.sielsystems.nl/content/picklist-costheadings-kostensoorten.
+     * @see https://apidoc.sielsystems.nl/content/picklist-costheadings-kostensoorten
      */
     public function getPicklistCostHeadings()
     {
-        return $this->getPicklist('costheading');
+        return $this->getPicklist('costheadings');
     }
 
     /**
      * Retrieves a list of cost types.
      *
-     * @return array
-     *   Besides the general response structure, the actual result of this call is
-     *   returned under the key 'invoicetemplates' and consists of an array of
-     *   'invoicetemplates', each 'invoicetemplate' being a keyed array with keys:
+     * @return \Siel\Acumulus\Web\Result
+     *   The result of the webservice call. The structured response will contain
+     *   a non-keyed array of "invoicetemplate" arrays, each "invoicetemplate"
+     *   array being a keyed array with keys:
      *   - invoicetemplateid
      *   - invoicetemplatename
      *
-     * See https://apidoc.sielsystems.nl/content/picklist-invoice-templates-factuursjablonen.
+     * @see https://apidoc.sielsystems.nl/content/picklist-invoice-templates-factuursjablonen
      */
     public function getPicklistInvoiceTemplates()
     {
-        return $this->getPicklist('invoicetemplate');
+        return $this->getPicklist('invoicetemplates');
     }
 
     /**
      * Retrieves a list of VAT types.
      *
-     * @return array
-     *   Besides the general response structure, the actual result of this call is
-     *   returned under the key 'vattypes' and consists of an array of 'vattypes',
-     *   each 'vattype' being a keyed array with keys:
+     * @return \Siel\Acumulus\Web\Result
+     *   The result of the webservice call. The structured response will contain
+     *   a non-keyed array of "vattype" arrays, each "vattype" array being a
+     *   keyed array with keys:
      *   - 'vattypeid'
      *   - 'vattypename'
      *
-     * See https://apidoc.sielsystems.nl/content/picklist-vattypes-btw-groepen.
+     * @see https://apidoc.sielsystems.nl/content/picklist-vattypes-btw-groepen
      */
     public function getPicklistVatTypes()
     {
-        return $this->getPicklist('vattype');
+        return $this->getPicklist('vattypes');
     }
 
     /**
      * A helper method to retrieve a given picklist.
      *
-     * The Acumulus API for picklists is so well standardized, that it is possible
-     * to use 1 general picklist retrieval function that can process all picklist
-     * types.
+     * The Acumulus API for picklists is so well standardized, that it is
+     * possible to use 1 general picklist retrieval function that can process
+     * all picklist types.
      *
      * @param string $picklist
-     *   The picklist to retrieve, specify in singular form: account, contacttype,
-     *   costcenter, etc.
+     *   The picklist to retrieve, specify in plural form: accounts,
+     *   contacttypes, costcenters, etc.
      *
-     * @return array
-     *   Besides the general response structure, the actual result of this call is
-     *   returned under the key $picklist in plural format (with an 's' attached)
-     *   and consists of an array of keyed arrays, each keyed array being 1 result
-     *   of the requested picklist.
+     * @return \Siel\Acumulus\Web\Result
+     *   The result of the webservice call. The structured response will contain
+     *   a non-keyed array of "picklist" arrays, each 'picklist' array being a
+     *   keyed array with keys that depend on the requested picklist.
      */
     protected function getPicklist($picklist)
     {
-        $plural = $picklist . 's';
-        $response = $this->communicator->callApiFunction("picklists/picklist_$plural", array());
-        // Simplify result: remove indirection.
-        if (!empty($response[$plural][$picklist])) {
-            $response[$plural] = $response[$plural][$picklist];
-            // If there was only 1 result, it wasn't put in an array.
-            if (!is_array(reset($response[$plural]))) {
-                $response[$plural] = array($response[$plural]);
-            }
-        } else {
-            $response[$plural] = array();
-        }
-        return $response;
+        // For picklists, the main result is found under the name of the
+        // picklist but in singular form, i.e. without the s at the end.
+        return $this->communicator->callApiFunction("picklists/picklist_$picklist", array())->setMainResponseKey($picklist, true);
     }
 
     /**
@@ -329,14 +195,15 @@ class Service
      * @param string $date
      *   ISO date string (yyyy-mm-dd) for the date to retrieve the VAT info for.
      *
-     * @return array
-     *   Besides the general response structure, the actual result of this call is
-     *   returned under the key 'vatinfo' and consists of an array of "vatinfo's",
-     *   each 'vatinfo' being a keyed array with keys:
+     * @return \Siel\Acumulus\Web\Result
+     *   The result of the webservice call. The structured response will contain
+     *   a non-keyed array of "vatinfo" arrays, each 'vatinfo' array being a
+     *   keyed array with keys:
      *   - vattype
      *   - vatrate
      *
-     * See https://apidoc.sielsystems.nl/content/lookup-vatinfo-btw-informatie.
+     * @see https://apidoc.sielsystems.nl/content/lookup-vatinfo-btw-informatie
+     *   for more information about the contents of the returned array.
      */
     public function getVatInfo($countryCode, $date = '')
     {
@@ -347,18 +214,7 @@ class Service
             'vatdate' => $date,
             'vatcountry' => $countryCode,
         );
-        $response = $this->communicator->callApiFunction("lookups/lookup_vatinfo", $message);
-        // Simplify result: remove indirection.
-        if (!empty($response['vatinfo']['vat'])) {
-            $response['vatinfo'] = $response['vatinfo']['vat'];
-            // If there was only 1 result, it wasn't put in an array.
-            if (!is_array(reset($response['vatinfo']))) {
-                $response['vatinfo'] = array($response['vatinfo']);
-            }
-        } else {
-            $response['vatinfo'] = array();
-        }
-        return $response;
+        return $this->communicator->callApiFunction("lookups/lookup_vatinfo", $message)->setMainResponseKey('vatinfo', true);
     }
 
     /**
@@ -366,23 +222,26 @@ class Service
      *
      * @param array $invoice
      *   The invoice to send.
+     * @param \Siel\Acumulus\Web\Result|null $result
+     *   It is possible to already create a Result object before calling the Web
+     *   Service to store local messages. By passing this Result object these
+     *   local messages will be merged with any remote messages in the returned
+     *   Result object.
      *
-     * @return array
-     *   Besides the general response structure, the actual result of this call is
-     *   returned under the following key:
-     *   - invoice: an array of information about the created invoice, being an
-     *     array with keys:
-     *     - invoicenumber
-     *     - token
-     *     - entryid
-     *   If the key invoice is present, it indicates success.
-     *
-     * See https://apidoc.sielsystems.nl/content/invoice-add.
-     * See https://apidoc.sielsystems.nl/content/warning-error-and-status-response-section-most-api-calls
-     * for more information on the contents of the returned array.
+     * @return \Siel\Acumulus\Web\Result The Result of the webservice call. A successful call will contain a
+     * The Result of the webservice call. A successful call will contain a
+     * response array with key:
+     * - invoice: an array of information about the created invoice, being an
+     * array with keys:
+     * - invoicenumber
+     * - token
+     * - entryid
+     * @todo: check usages of return value
+     * @see https://apidoc.sielsystems.nl/content/invoice-add for more
+     *   information about the contents of the returned array.
      */
-    public function invoiceAdd(array $invoice)
+    public function invoiceAdd(array $invoice, Result $result = null)
     {
-        return $this->communicator->callApiFunction("invoices/invoice_add", $invoice);
+        return $this->communicator->callApiFunction("invoices/invoice_add", $invoice, $result)->setMainResponseKey('invoice');
     }
 }

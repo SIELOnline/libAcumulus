@@ -104,7 +104,7 @@ class Container implements ContainerInterface
      */
     public function getMailer()
     {
-        return $this->getInstance('Mailer', 'Helpers', array($this->getConfig(), $this->getTranslator(), $this->getService(), $this->getLog()));
+        return $this->getInstance('Mailer', 'Helpers', array($this->getConfig(), $this->getTranslator(), $this->getLog()));
     }
 
     /**
@@ -144,7 +144,7 @@ class Container implements ContainerInterface
      */
     public function getCommunicator()
     {
-        return $this->getInstance('Communicator', 'Web', array($this->getConfig(), $this->getLog()));
+        return $this->getInstance('Communicator', 'Web', array($this->getConfig(), $this->getLog(), $this->getTranslator()));
     }
 
     /**

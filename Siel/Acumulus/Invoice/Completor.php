@@ -7,6 +7,7 @@ use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Helpers\Countries;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Helpers\TranslatorInterface;
+use Siel\Acumulus\Web\Result;
 use Siel\Acumulus\Web\Service;
 
 /**
@@ -63,8 +64,8 @@ class Completor
     /** @var \Siel\Acumulus\Helpers\Countries */
     protected $countries;
 
-    /** @var array */
-    protected $messages;
+    /** @var \Siel\Acumulus\Web\Result */
+    protected $result;
 
     /** @var array */
     protected $invoice;
@@ -156,28 +157,27 @@ class Completor
      *   The invoice to complete.
      * @param Source $source
      *   The source object for which this invoice was created.
-     * @param array $messages
-     *   A response structure where errors and warnings can be added. Any local
-     *   messages will be added to arrays under the keys 'errors' and 'warnings'.
+     * @param \Siel\Acumulus\Web\Result $result
+     *   A Result object where local errors and warnings can be added.
      *
      * @return array
      *   The completed invoice.
      */
-    public function complete(array $invoice, Source $source, array &$messages)
+    public function complete(array $invoice, Source $source, Result $result)
     {
         $this->invoice = $invoice;
         $this->source = $source;
-        $this->messages = &$messages;
-
-        $this->initPossibleVatTypes();
-        $this->initPossibleVatRates();
+        $this->result = $result;
 
         // Completes the invoice with default settings that do not depend on shop
         // specific data.
         $this->fictitiousClient();
         $this->validateEmail();
 
+
         // Complete lines as far as they can be completed om their own.
+        $this->initPossibleVatTypes();
+        $this->initPossibleVatRates();
         $this->invoice = $this->invoiceLineCompletor->complete($this->invoice, $this->possibleVatTypes, $this->possibleVatRates);
 
         // Check if we are missing an amount and, if so, add a line for it.
@@ -194,7 +194,7 @@ class Completor
         if ($this->strategyLineCompletor->invoiceHasStrategyLine()) {
             // We did not manage to correct all strategy lines: warn and set the
             // invoice to concept.
-            $this->changeInvoiceToConcept('message_warning_strategies_failed');
+            $this->changeInvoiceToConcept('message_warning_strategies_failed', 808);
         }
 
         // Determine the VAT type and warn if multiple vat types are possible.
@@ -210,7 +210,7 @@ class Completor
             $shopSettings = $this->config->getShopSettings();
             $vatFreeProducts = $shopSettings['vatFreeProducts'];
             if ($vatFreeProducts === PluginConfig::VatFreeProducts_No) {
-                $this->changeInvoiceToConcept('message_warning_line_without_vat');
+                $this->changeInvoiceToConcept('message_warning_line_without_vat', 802);
             }
         }
 
@@ -241,10 +241,10 @@ class Completor
             // If shop specific code or an event handler has already set the vat
             // type, we obey so.
             $possibleVatTypes[] = $this->invoice['customer']['invoice']['vattype'];
-        } elseif ($this->invoiceHasLineWithCostPrice()) {
+        } elseif ($this->invoiceHasLineWithCostPrice($this->invoice['customer']['invoice']['line'])) {
             $possibleVatTypes[] = Api::VatType_MarginScheme;
         } else {
-            if ($this->invoiceHasLineWithVat()) {
+            if ($this->invoiceHasLineWithVat($this->invoice['customer']['invoice']['line'])) {
                 // NL or EU Foreign vat.
                 if ($digitalServices === PluginConfig::DigitalServices_No) {
                     // No electronic services are sold: can only be dutch VAT.
@@ -300,7 +300,7 @@ class Completor
                     // warnings.
                     $possibleVatTypes[] = Api::VatType_National;
                     $possibleVatTypes[] = $this->isNl() ? Api::VatType_NationalReversed : Api::VatType_EuReversed;
-                    $this->changeInvoiceToConcept(''/*'message_warning_no_vat'*/);
+                    $this->changeInvoiceToConcept($this->result->hasMessages() ? '' : 'message_warning_no_vat', 803);
                 }
             }
         }
@@ -384,12 +384,7 @@ class Completor
         if (empty($this->invoice['customer']['email'])) {
             $customerSettings = $this->config->getCustomerSettings();
             $this->invoice['customer']['email'] = $customerSettings['emailIfAbsent'];
-            $this->messages['warnings'][] = array(
-                'code' => '',
-                'codetag' => '',
-                'message' => $this->t('message_warning_no_email'),
-            );
-
+            $this->result->addWarning(801,'', $this->t('message_warning_no_email'));
         } else {
             $email = $this->invoice['customer']['email'];
             $at = strpos($email, '@');
@@ -613,10 +608,12 @@ class Completor
                 $this->invoice['customer']['invoice']['vattype'] = reset($this->possibleVatTypes);
                 // We must check as no vat type allows the actual vat rates.
                 $message = 'message_warning_no_vattype';
+                $code = 804;
             } elseif (count($possibleVatTypes) === 1) {
                 // Pick the first and only (and therefore correct) vat type.
                 $this->invoice['customer']['invoice']['vattype'] = reset($possibleVatTypes);
                 $message = '';
+                $code = 805;
             } else {
                 // Get the intersection of possible vat types per line.
                 $vatTypesOnAllLines = $this->getVatTypesAppearingOnAllLines();
@@ -626,12 +623,14 @@ class Completor
                     $this->invoice['customer']['invoice']['vattype'] = reset($possibleVatTypes);
                     // We must split.
                     $message = 'message_warning_multiple_vattype_must_split';
+                    $code = 806;
                 } else {
                     // Pick the first vat type that appears on all lines, but ...
                     $metaPossibleVatTypes = $vatTypesOnAllLines;
                     $this->invoice['customer']['invoice']['vattype'] = reset($vatTypesOnAllLines);
                     // We may have to split.
                     $message = 'message_warning_multiple_vattype_may_split';
+                    $code = 807;
                 }
 
             }
@@ -639,7 +638,7 @@ class Completor
             if (!empty($message)) {
                 // Make the invoice a concept, so it can be changed in Acumulus
                 // and add message and meta info.
-                $this->changeInvoiceToConcept($message);
+                $this->changeInvoiceToConcept($message, $code);
                 $this->invoice['customer']['invoice']['meta-vattypes-possible'] = implode(',', $metaPossibleVatTypes);
             }
         }
@@ -789,18 +788,26 @@ class Completor
      * 0 (VAT free/reversed VAT) and -1 (no VAT) are valid 0-vat rates.
      * As vatrate may be null, the vatamount value is also checked.
      *
+     * @param array $lines
+     *
      * @return bool
      */
-    protected function invoiceHasLineWithVat()
+    protected function invoiceHasLineWithVat(array $lines)
     {
         $hasLineWithVat = false;
-        foreach ($this->invoice['customer']['invoice']['line'] as $line) {
+        foreach ($lines as $line) {
             if (!empty($line['vatrate'])) {
                 if (!Number::isZero($line['vatrate']) && !Number::floatsAreEqual($line['vatrate'], -1.0)) {
                     $hasLineWithVat = true;
                     break;
                 }
             } elseif (!empty($line['vatamount']) && !Number::isZero($line['vatamount'])) {
+                $hasLineWithVat = true;
+                break;
+            } elseif (!empty($line['meta-line-vatamount']) && !Number::isZero($line['meta-line-vatamount'])) {
+                $hasLineWithVat = true;
+                break;
+            } elseif (!empty($line[Creator::Line_Children]) && $this->invoiceHasLineWithVat($line[Creator::Line_Children])) {
                 $hasLineWithVat = true;
                 break;
             }
@@ -812,6 +819,8 @@ class Completor
      * Returns whether the invoice has at least 1 line with a 0 vat rate.
      *
      * 0 (VAT free/reversed VAT) and -1 (no VAT) are 0-vat rates.
+     *
+     * The invoice lines are expected to be flattened when we arrive here.
      *
      * @param bool $includeDiscountLines
      *   Discount lines representing a partial payment should be VAT free and
@@ -839,13 +848,18 @@ class Completor
     /**
      * Returns whether the invoice has at least 1 line with a costprice set.
      *
+     * @param array $lines
+     *
      * @return bool
      */
-    protected function invoiceHasLineWithCostPrice()
+    protected function invoiceHasLineWithCostPrice(array $lines)
     {
         $hasLineWithCostPrice = false;
-        foreach ($this->invoice['customer']['invoice']['line'] as $line) {
+        foreach ($lines as $line) {
             if (isset($line['costprice'])) {
+                $hasLineWithCostPrice = true;
+                break;
+            } elseif (!empty($line[Creator::Line_Children]) && $this->invoiceHasLineWithCostPrice($line[Creator::Line_Children])) {
                 $hasLineWithCostPrice = true;
                 break;
             }
@@ -871,11 +885,11 @@ class Completor
     protected function getVatRates($countryCode)
     {
         $date = $this->getInvoiceDate();
-        $vatInfo = $this->service->getVatInfo($countryCode, $date);
-        // PHP5.5: array_column($vatInfo['vatinfo'], 'vatrate');
+        $vatInfo = $this->service->getVatInfo($countryCode, $date)->getResponse();
+        // PHP5.5: array_column($vatInfo, 'vatrate');
         $result = array_unique(array_map(function ($vatInfo1) {
             return $vatInfo1['vatrate'];
-        }, $vatInfo['vatinfo']));
+        }, $vatInfo));
         return $result;
     }
 
@@ -936,8 +950,10 @@ class Completor
      * @param string $messageKey
      *   The key of the message to add as warning,  or the empty string if no
      *   warning has to be added.
+     * @param int $code
+     *   The code for this message.
      */
-    protected function changeInvoiceToConcept($messageKey)
+    protected function changeInvoiceToConcept($messageKey, $code)
     {
         if ($messageKey !== '') {
             $message = $this->t($messageKey);
@@ -945,11 +961,7 @@ class Completor
             if ($emailAsPdfSettings['emailAsPdf']) {
                 $message .= ' ' . $this->t('message_warning_no_pdf');
             }
-            $this->messages['warnings'][] = array(
-                'code' => '',
-                'codetag' => '',
-                'message' => $message,
-            );
+            $this->result->addWarning($code, '', $message);
         }
         $this->invoice['customer']['invoice']['concept'] = Api::Concept_Yes;
     }

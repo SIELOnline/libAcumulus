@@ -5,6 +5,7 @@ use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Config\ShopCapabilitiesInterface;
 use Siel\Acumulus\Helpers\Form;
 use Siel\Acumulus\Helpers\TranslatorInterface;
+use Siel\Acumulus\Web\Result;
 use Siel\Acumulus\Web\Service;
 
 /**
@@ -31,9 +32,9 @@ abstract class BaseConfigForm extends Form
      * Contact types picklist result, used to test the connection, storing it in
      * this property prevents another webservice call.
      *
-     * @var array
+     * @var \Siel\Acumulus\Web\Result
      */
-    protected $contactTypes;
+    protected $contactTypesResult;
 
     /**
      * Constructor.
@@ -112,17 +113,14 @@ abstract class BaseConfigForm extends Form
         // Check if we can retrieve a picklist. This indicates if the account
         // settings are correct.
         $message = '';
-        $this->contactTypes = null;
+        $this->contactTypesResult = null;
         $credentials = $this->acumulusConfig->getCredentials();
         if (!empty($credentials['contractcode']) && !empty($credentials['username']) && !empty($credentials['password'])) {
-            $this->contactTypes = $this->service->getPicklistContactTypes();
-            if (!empty($this->contactTypes['errors'])) {
-                if ($this->contactTypes['errors'][0]['code'] == 401) {
-                    $message = 'message_error_auth';
-                } else {
-                    $message = 'message_error_comm';
-                }
-                $this->errorMessages += $this->service->resultToMessages($this->contactTypes, false);
+            $this->contactTypesResult = $this->service->getPicklistContactTypes();
+            if ($this->contactTypesResult->hasError()) {
+                $message = $this->contactTypesResult->hasCode(401) ? 'message_error_auth' : 'message_error_comm';
+                $this->errorMessages = array_merge($this->errorMessages, $this->contactTypesResult->getErrors(Result::Format_PlainTextArray));
+                $this->warningMessages = array_merge($this->warningMessages, $this->contactTypesResult->getWarnings(Result::Format_PlainTextArray));
             }
         } else {
             // First fill in your account details.
@@ -211,51 +209,55 @@ abstract class BaseConfigForm extends Form
     }
 
     /**
-     * Converts a picklist response into an options list.
+     * Converts a picklist response into a set of options, e.g. for a dropdown.
      *
-     * @param array $picklist
+     * A picklist is a list of items that have the following structure:
+     * - Each picklist item contains an identifying value in the 1st entry.
+     * - Most picklist items contain a describing string in the 2nd entry.
+     * - Some picklist items contain an altenative/additional description in the
+     *   3rd entry.
+     *
+     * @param \Siel\Acumulus\Web\Result $picklist
      *   The picklist result structure.
-     * @param string $key
-     *   The key in the picklist result structure under which the actual results
-     *   can be found.
      * @param string|null $emptyValue
      *   The value to use for an empty selection.
      * @param string|null $emptyText
      *   The label to use for an empty selection.
      *
      * @return array
+     * @internal param string $key The key in the picklist result structure under which the actual results*   The key in the picklist result structure under which the actual results
+     *   can be found.
      */
-    protected function picklistToOptions(array $picklist, $key, $emptyValue = null, $emptyText = null)
+    protected function picklistToOptions(Result $picklist, $emptyValue = null, $emptyText = null)
     {
         $result = array();
 
+        // Empty value, if any, at top.
         if ($emptyValue !== null) {
             $result[$emptyValue] = $emptyText;
         }
-        if (!empty($key)) {
-            // Take the results under the key. This is to be able to follow the
-            // structure returned by the picklist services.
-            $picklist = $picklist[$key];
-        }
-        array_walk($picklist, function ($value) use (&$result) {
-            $optionValue = reset($value);
-            if (count($value) === 1) {
-                $optionText = $optionValue;
+
+        // Other values follow, we do not change the order.
+        $pickListItems = $picklist->getResponse();
+        foreach ($pickListItems as $picklistItem) {
+            $optionId = reset($picklistItem);
+            if (count($picklistItem) === 1) {
+                $optionText = $optionId;
             }
             else {
-                $optionText = next($value);
-                $optionalText = next($value);
-                if (!empty($optionalText)) {
+                $optionText = next($picklistItem);
+                if (count($picklistItem) > 2) {
+                    $optionalText = next($picklistItem);
                     if (empty($optionText)) {
                         $optionText = $optionalText;
                     }
-                    else {
+                    elseif (!empty($optionalText)) {
                         $optionText .= ' (' . $optionalText . ')';
                     }
                 }
             }
-            $result[$optionValue] = $optionText;
-        });
+            $result[$optionId] = $optionText;
+        };
 
         return $result;
     }

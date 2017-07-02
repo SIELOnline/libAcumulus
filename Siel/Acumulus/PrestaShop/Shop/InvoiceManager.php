@@ -8,8 +8,8 @@ use Order;
 use OrderSlip;
 use Siel\Acumulus\Helpers\ContainerInterface;
 use Siel\Acumulus\Invoice\Source;
-use Siel\Acumulus\Shop\Config;
 use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
+use Siel\Acumulus\Invoice\Result;
 
 class InvoiceManager extends BaseInvoiceManager
 {
@@ -87,7 +87,7 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * This PrestaShop override executes the 'actionAcumulusInvoiceCreated' hook.
      */
-    protected function triggerInvoiceCreated(array &$invoice, Source $invoiceSource)
+    protected function triggerInvoiceCreated(array &$invoice, Result $localResult, Source $invoiceSource)
     {
         Hook::exec('actionAcumulusInvoiceCreated', array('invoice' => &$invoice, 'source' => $invoiceSource), null, true);
     }
@@ -97,9 +97,9 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * This PrestaShop override executes the 'actionAcumulusInvoiceCompleted' hook.
      */
-    protected function triggerInvoiceCompleted(array &$invoice, Source $invoiceSource)
+    protected function triggerInvoiceCompleted(array &$invoice, Result $localResult, Source $invoiceSource)
     {
-        Hook::exec('actionAcumulusInvoiceCompleted', array('invoice' => &$invoice, 'source' => $invoiceSource), null, true);
+        Hook::exec('actionAcumulusInvoiceCompleted', array('invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult), null, true);
     }
 
     /**
@@ -107,7 +107,7 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * This PrestaShop override executes the 'actionAcumulusInvoiceSent' hook.
      */
-    protected function triggerInvoiceSent(array $invoice, Source $invoiceSource, array $result)
+    protected function triggerInvoiceSent(array $invoice, Source $invoiceSource, Result $localResult)
     {
         // @todo: not by ref + also pass result.
         Hook::exec('actionAcumulusInvoiceSent', array('invoice' => &$invoice, 'source' => $invoiceSource), null, true);

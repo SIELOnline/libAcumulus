@@ -342,7 +342,7 @@ class AdvancedConfigForm extends BaseConfigForm
             'defaultCustomerType' => array(
                 'type' => 'select',
                 'label' => $this->t('field_defaultCustomerType'),
-                'options' => $this->picklistToOptions($this->contactTypes, 'contacttypes', 0, $this->t('option_empty')),
+                'options' => $this->picklistToOptions($this->contactTypesResult, 0, $this->t('option_empty')),
             ),
             'contactStatus' => array(
                 'type' => 'radio',

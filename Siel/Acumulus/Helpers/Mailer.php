@@ -3,7 +3,7 @@ namespace Siel\Acumulus\Helpers;
 
 use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\PluginConfig;
-use Siel\Acumulus\Web\Service;
+use Siel\Acumulus\Web\Result;
 
 /**
  * Class Mailer allows to send mails. This class should be overridden per shop
@@ -17,23 +17,18 @@ abstract class Mailer
     /** @var \Siel\Acumulus\Helpers\TranslatorInterface */
     protected $translator;
 
-    /** @var \Siel\Acumulus\Web\Service */
-    protected $service;
-
     /** @var \Siel\Acumulus\Helpers\Log */
     protected $log;
 
     /**
      * @param \Siel\Acumulus\Config\ConfigInterface $config
      * @param TranslatorInterface $translator
-     * @param \Siel\Acumulus\Web\Service $service
      * @param \Siel\Acumulus\Helpers\Log $log
      */
-    public function __construct(ConfigInterface $config, TranslatorInterface $translator, Service $service, Log $log)
+    public function __construct(ConfigInterface $config, TranslatorInterface $translator, Log $log)
     {
         $this->log = $log;
         $this->config = $config;
-        $this->service = $service;
 
         $this->translator = $translator;
         $translations = new MailTranslations();
@@ -60,24 +55,22 @@ abstract class Mailer
      *
      * The mail is sent to the shop administrator (emailonerror setting).
      *
-     * @param array $result
-     * @param string[] $messages
+     * @param \Siel\Acumulus\Web\Result $invoiceSendResult
      * @param string $invoiceSourceType
      * @param string $invoiceSourceReference
      *
      * @return bool
      *   Success.
      */
-    public function sendInvoiceAddMailResult(array $result, array $messages, $invoiceSourceType, $invoiceSourceReference)
+    public function sendInvoiceAddMailResult(Result $invoiceSendResult, $invoiceSourceType, $invoiceSourceReference)
     {
         $from = $this->getFrom();
         $fromName = $this->getFromName();
         $to = $this->getTo();
-        $subject = $this->getSubject($result);
-        $content = $this->getBody($result, $messages, $invoiceSourceType, $invoiceSourceReference);
+        $subject = $this->getSubject($invoiceSendResult);
+        $content = $this->getBody($invoiceSendResult , $invoiceSourceType, $invoiceSourceReference);
 
-        $this->log->info('Mailer::sendMail("%s", "%s", "%s", "%s") with body = %s', $from, $fromName, $to, $subject, $content['text']);
-
+        $logMessage = sprintf('Mailer::sendMail("%s", "%s", "%s", "%s")', $from, $fromName, $to, $subject);
         $result = $this->sendMail($from, $fromName, $to, $subject, $content['text'], $content['html']);
         if ($result !== true) {
             if ($result === false) {
@@ -91,9 +84,9 @@ abstract class Mailer
             } else {
                 $message = $result;
             }
-            $this->log->error('Mailer::sendInvoiceAddMailResult(): failed: %s', $message);
+            $this->log->error('%s: failed: %s', $logMessage, $message);
         } else {
-            $this->log->info('Mailer::sendInvoiceAddMailResult(): success');
+            $this->log->info('%s: success', $logMessage);
         }
 
         return $result === true;
@@ -149,81 +142,232 @@ abstract class Mailer
     /**
      * Returns the subject for the mail.
      *
-     * The subject depends on the result status.
+     * The subject depends on:
+     * - the result status.
+     * - whether the invoice was sent in test mode
+     * - whether the invoice was sent as concept
+     * - the emailAsPdf setting
      *
-     * @param array $result
+     * @param \Siel\Acumulus\Web\Result $invoiceSendResult
      *
      * @return string
      */
-    protected function getSubject(array $result)
+    protected function getSubject(Result $invoiceSendResult)
     {
-        switch ($result['status']) {
-            case PluginConfig::Status_Exception:
-            case PluginConfig::Status_Errors:
-                return $this->t('mail_subject_errors');
-            case PluginConfig::Status_Warnings:
-                return $this->t('mail_subject_warnings');
-            case PluginConfig::Status_Success:
-            default:
-                return $this->t('mail_subject_debug');
+        $pluginSettings = $this->config->getPluginSettings();
+        $isTestMode = $pluginSettings['debug'] === PluginConfig::Send_TestMode;
+        $resultInvoice = $invoiceSendResult->getResponse();
+        $isConcept = !$invoiceSendResult->hasError() && empty($resultInvoice['entryid']);
+
+        $subjectBase = 'mail_subject';
+        if ($isTestMode) {
+            $subjectBase .= '_test_mode';
+        } elseif ($isConcept) {
+            $subjectBase .= '_concept';
         }
+        $subject = $this->t($subjectBase);
+
+        $subjectResult = 'mail_subject';
+        switch ($invoiceSendResult->getStatus()) {
+            case Result::Status_Exception:
+                $subjectResult .= '_exception';
+                break;
+            case Result::Status_Errors:
+                $subjectResult .= '_error';
+                break;
+            case Result::Status_Warnings:
+                $subjectResult .= '_warning';
+                break;
+            case Result::Status_Success:
+            default:
+                $subjectResult .= '_success';
+                break;
+        }
+        $subject .= ': ' . $this->t($subjectResult);
+
+        if ($isTestMode || $isConcept || $invoiceSendResult->hasError()) {
+            $emailAsPdfSettings = $this->config->getEmailAsPdfSettings();
+            if ($emailAsPdfSettings['emailAsPdf']) {
+                // Normally, Acumulus will send a pdf to the client, but due to
+                // 1 of the conditions above this was not done.
+                $subject .= ', ' . $this->t('mail_subject_no_pdf');
+            }
+        }
+
+        return $subject;
     }
 
     /**
-     * Returns the subject for the mail.
+     * Returns the body for the mail.
      *
-     * The subject depends on the result status.
+     * The body depends on:
+     * - the result status.
+     * - the value of isSent (in the result object)
+     * - whether the invoice was sent in test mode
+     * - whether the invoice was sent as concept
+     * - the emailAsPdf setting
      *
-     * @param array $result
+     * @param \Siel\Acumulus\Web\Result $invoiceSendResult
      *
-     * @return array
+     * @return string[]
      */
-    protected function getStatusSpecificBody(array $result)
+    protected function getStatusSpecificBody(Result $invoiceSendResult)
     {
-        $texts = array();
-        switch ($result['status']) {
-            case PluginConfig::Status_Exception:
-            case PluginConfig::Status_Errors:
-                $texts['text'] = $this->t('mail_text_errors');
-                $texts['html'] = $this->t('mail_html_errors');
+        $pluginSettings = $this->config->getPluginSettings();
+        $isTestMode = $pluginSettings['debug'] === PluginConfig::Send_TestMode;
+        $resultInvoice = $invoiceSendResult->getResponse();
+        // @todo: can be taken from invoice array if that qwould be part of the Result
+        $isConcept = !$invoiceSendResult->hasError() && empty($resultInvoice['entryid']);
+        $emailAsPdfSettings = $this->config->getEmailAsPdfSettings();
+        $isEmailAsPdf = (bool) $emailAsPdfSettings['emailAsPdf'];
+
+        // Collect the messages.
+        $sentences = array();
+        switch ($invoiceSendResult->getStatus()) {
+            case Result::Status_Exception:
+                $sentences[] = 'mail_body_exception';
+                $sentences[] = $invoiceSendResult->isSent() ? 'mail_body_exception_invoice_maybe_created' : 'mail_body_exception_invoice_not_created';
                 break;
-            case PluginConfig::Status_Warnings:
-                $texts['text'] = $this->t('mail_text_warnings');
-                $texts['html'] = $this->t('mail_html_warnings');
+            case Result::Status_Errors:
+                $sentences[] = 'mail_body_errors';
+                $sentences[] = 'mail_body_errors_not_created';
+                if ($isEmailAsPdf) {
+                    $sentences[] = 'mail_body_pdf_enabled';
+                    $sentences[] = 'mail_body_pdf_not_sent_errors';
+                }
                 break;
-            case PluginConfig::Status_Success:
+            case Result::Status_Warnings:
+                $sentences[] = 'mail_body_warnings';
+                if ($isTestMode) {
+                    $sentences[] = 'mail_body_testmode';
+                } elseif ($isConcept) {
+                    $sentences[] = 'mail_body_concept';
+                    if ($isEmailAsPdf) {
+                        $sentences[] = 'mail_body_pdf_enabled';
+                        $sentences[] = 'mail_body_pdf_not_sent_concept';
+                    }
+                } else {
+                    $sentences[] = 'mail_body_warnings_created';
+                }
+                break;
+            case Result::Status_Success:
             default:
-                $texts['text'] = $this->t('mail_text_debug');
-                $texts['html'] = $this->t('mail_html_debug');
+                $sentences[] = 'mail_body_success';
+                if ($isTestMode) {
+                    $sentences[] = 'mail_body_testmode';
+                } elseif ($isConcept) {
+                    $sentences[] = 'mail_body_concept';
+                    if ($isEmailAsPdf) {
+                        $sentences[] = 'mail_body_pdf_enabled';
+                        $sentences[] = 'mail_body_pdf_not_sent_concept';
+                    }
+                }
                 break;
         }
+
+        // Translate the messages.
+        foreach ($sentences as &$sentence) {
+            $sentence = $this->t($sentence);
+        }
+
+        // Collapse and format the sentences.
+        $sentences = implode(' ', $sentences);
+        $texts = array(
+            'text' => wordwrap($sentences, 70),
+            'html' => "<p>$sentences</p>",
+        );
         return $texts;
+    }
+
+    /**
+     * Returns the  messages along with some descriptive text.
+     *
+     * @param \Siel\Acumulus\Web\Result $result
+     *
+     * @return string[]
+     *   An array with a plain text (key='text') and an html string (key='html')
+     *   containing the messages with some descriptive text.
+     */
+    protected function getMessages(Result $result) {
+        $messages = array(
+            'text' => '',
+            'html' => '',
+        );
+
+        if ($result->hasMessages()) {
+            $header = $this->t('mail_messages_header');
+            $description = $this->t('mail_messages_desc');
+            $descriptionHtml = $this->t('mail_messages_desc_html');
+            $messagesText = $result->getMessages(Result::Format_FormattedText);
+            $messagesHtml = $result->getMessages(Result::Format_Html);
+            $messages = array(
+                'text' => "\n$header\n\n$messagesText\n\n$description\n",
+                'html' => "<details open><summary>$header</summary>$messagesHtml<p>$descriptionHtml</p></details>",
+            );
+        }
+        return $messages;
+    }
+
+    /**
+     * Returns the support messages along with some descriptive text.
+     *
+     * @param \Siel\Acumulus\Web\Result $result
+     *
+     * @return string[]
+     *   An array with a plain text (key='text') and an html string (key='html')
+     *   containing the support messages with some descriptive text.
+     */
+    protected function getSupportMessages(Result $result) {
+        $messages = array(
+            'text' => '',
+            'html' => '',
+        );
+
+        $pluginSettings = $this->config->getPluginSettings();
+        $addReqResp = $pluginSettings['debug'] === PluginConfig::Send_SendAndMailOnError ? Result::AddReqResp_WithOther : Result::AddReqResp_Always;
+        if ($addReqResp === Result::AddReqResp_Always || ($addReqResp === Result::AddReqResp_WithOther && $result->hasMessages())) {
+            if ($result->getRawRequest() !== NULL || $result->getRawResponse() !== NULL) {
+                $header = $this->t('mail_support_header');
+                $description = $this->t('mail_support_desc');
+                $supportMessagesText = $result->getRawRequestResponse(Result::Format_FormattedText);
+                $supportMessagesHtml = $result->getRawRequestResponse(Result::Format_Html);
+                $messages = array(
+                    'text' => "\n$header\n\n$description\n\n$supportMessagesText\n",
+                    'html' => "<details><summary>$header</summary><p>$description</p>$supportMessagesHtml</details>",
+                );
+            }
+        }
+        return $messages;
     }
 
     /**
      * Returns the mail body as text and as html.
      *
-     * @param array $result
-     * @param string[] $messages
+     * @param \Siel\Acumulus\Web\Result $result
      * @param string $invoiceSourceType
      * @param string $invoiceSourceReference
      *
-     * @return array
+     * @return string[]
      *   An array with keys text and html.
      */
-    protected function getBody(array $result, array $messages, $invoiceSourceType, $invoiceSourceReference)
+    protected function getBody(Result $result, $invoiceSourceType, $invoiceSourceReference)
     {
+        $resultInvoice = $result->getResponse();
         $bodyTexts = $this->getStatusSpecificBody($result);
+        $supportTexts = $this->getSupportMessages($result);
+        $messagesTexts = $this->getMessages($result);
         $replacements = array(
             '{invoice_source_type}' => $this->t($invoiceSourceType),
             '{invoice_source_reference}' => $invoiceSourceReference,
-            '{acumulus_invoice_id}' => isset($result['invoice']['invoicenumber']) ? $result['invoice']['invoicenumber'] : $this->t('message_no_invoice'),
-            '{status}' => $result['status'],
-            '{status_message}' => $this->service->getStatusText($result['status']),
+            '{acumulus_invoice_id}' => isset($resultInvoice['invoicenumber']) ? $resultInvoice['invoicenumber'] : $this->t('message_no_invoice'),
+            '{status}' => $result->getStatus(),
+            '{status_message}' => $result->getStatusText(),
             '{status_specific_text}' => $bodyTexts['text'],
             '{status_specific_html}' => $bodyTexts['html'],
-            '{messages_text}' => $this->service->messagesToText($messages),
-            '{messages_html}' => $this->service->messagesToHtml($messages),
+            '{messages_text}' => $messagesTexts['text'],
+            '{messages_html}' => $messagesTexts['html'],
+            '{support_messages_text}' => $supportTexts['text'],
+            '{support_messages_html}' => $supportTexts['html'],
         );
         $text = $this->t('mail_text');
         $text = strtr($text, $replacements);

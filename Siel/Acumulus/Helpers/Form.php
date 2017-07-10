@@ -628,7 +628,7 @@ abstract class Form
     }
 
     /**
-     * Returns a list of the checkbox names for these fields.
+     * Returns a list of the checkbox names for the given fields.
      *
      * @param array[] $fields
      *   The fields(ets) to extract the checkboxes from.

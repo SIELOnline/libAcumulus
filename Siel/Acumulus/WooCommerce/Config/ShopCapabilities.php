@@ -244,7 +244,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
   {
       switch ($formType) {
           case 'config':
-              return admin_url('options-general.php?page=acumulus');
+              return admin_url('options-general.php?page=acumulus_config');
           case 'advanced':
               return admin_url('options-general.php?page=acumulus_advanced');
           case 'batch':

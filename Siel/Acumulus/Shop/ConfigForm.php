@@ -431,6 +431,19 @@ class ConfigForm extends BaseConfigForm
     }
 
     /**
+     * @inheritDoc
+     *
+     * This override prevents calling the API just to get the field definitions,
+     * as this leads to strange errors and problems when changing the
+     * credentials themselves.
+     */
+    protected function getCheckboxKeys()
+    {
+        return array();
+    }
+
+
+    /**
      * Returns a list of options for the digital services field.
      *
      * @return array

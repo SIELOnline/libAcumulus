@@ -33,7 +33,8 @@ class Creator extends BaseCreator
      *
      * @var float
      */
-    protected $precision  = 0.01;
+    protected $pricePrecision  = 0.02;
+    protected $vatPrecision  = 0.01;
 
     /**
      * {@inheritdoc}
@@ -237,22 +238,22 @@ class Creator extends BaseCreator
                 // Costprice > 0 triggers the margin scheme in Acumulus.
                 $result += array(
                     'unitprice' => $productPriceInc,
-                    'meta-unitprice-precision' => $this->precision,
+                    'meta-unitprice-precision' => $this->pricePrecision,
                     'costprice' => $value,
-                    'meta-costprice-precision' => $this->precision,
+                    'meta-costprice-precision' => $this->pricePrecision,
                 );
             }
         } else {
             $result += array(
                 'unitprice' => $productPriceEx,
-                'meta-unitprice-precision' => $this->precision,
+                'meta-unitprice-precision' => $this->pricePrecision,
                 'unitpriceinc' => $productPriceInc,
-                'meta-unitpriceinc-precision' => $this->precision,
+                'meta-unitpriceinc-precision' => $this->pricePrecision,
             );
         }
 
         // Add tax info.
-        $result += $this->getVatRangeTags($productVat, $productPriceEx, $this->precision, $this->precision);
+        $result += $this->getVatRangeTags($productVat, $productPriceEx, $this->vatPrecision, $this->pricePrecision);
         if ($product instanceof WC_Product) {
             $result += $this->getVatRateLookupMetadataByTaxClass($product->get_tax_class());
         }

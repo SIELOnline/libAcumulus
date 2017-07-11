@@ -366,7 +366,7 @@ class FlattenerInvoiceLines
             $child['vatrate'] = $parent['vatrate'];
             $child['vatamount'] = 0;
             if (Completor::isCorrectVatRate($parent['meta-vatrate-source'])) {
-                $child['meta-vatrate-source'] = Completor::VatRateSource_Copied;
+                $child['meta-vatrate-source'] = Completor::VatRateSource_Copied_From_Parent;
                 unset($child['meta-vatrate-min']);
                 unset($child['meta-vatrate-max']);
                 unset($child['meta-vatrate-lookup']);
@@ -413,7 +413,7 @@ class FlattenerInvoiceLines
         // Copy vat rate info from a child when the parent has no vat rate info.
         if (empty($parent['vatrate']) || Number::isZero($parent['vatrate'])) {
             $parent['vatrate'] = CompletorInvoiceLines::getMaxAppearingVatRate($children, $index);
-            $parent['meta-vatrate-source'] = Completor::VatRateSource_Copied;
+            $parent['meta-vatrate-source'] = Completor::VatRateSource_Copied_From_Children;
             if (isset($children[$index]['meta-vatrate-min'])) {
                 $parent['meta-vatrate-min'] = $children[$index]['meta-vatrate-min'];
             } else {

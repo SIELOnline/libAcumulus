@@ -34,7 +34,8 @@ class Completor
     const VatRateSource_Looked_Up = 'completor-looked-up';
     const VatRateSource_Completor_Completed = 'completor-completed';
     const VatRateSource_Strategy_Completed = 'strategy-completed';
-    const VatRateSource_Copied = 'copied';
+    const VatRateSource_Copied_From_Children = 'copied-from-children';
+    const VatRateSource_Copied_From_Parent = 'copied-from-parent';
 
     /**
      * A list of vat rate sources that indicate that the vat rate can be
@@ -49,7 +50,8 @@ class Completor
         self::VatRateSource_Looked_Up,
         self::VatRateSource_Completor_Completed,
         self::VatRateSource_Strategy_Completed,
-        self::VatRateSource_Copied,
+        self::VatRateSource_Copied_From_Children,
+        self::VatRateSource_Copied_From_Parent,
     );
 
     /** @var \Siel\Acumulus\Config\ConfigInterface */

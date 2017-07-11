@@ -26,9 +26,10 @@ class Creator extends BaseCreator
     protected $hasItemLines;
 
     /**
-     * Precision in WC3: one of the prices is entered by the administrator and
-     * thus can be considered exact. The computed one is rounded to the cent,
-     * so we can not assume a very high precision for all values here.
+     * Product price precision in WC3: one of the prices is entered by the
+     * administrator and thus can be considered exact. The computed one is
+     * rounded to the cent, so we can not assume a very high precision for all
+     * values here.
      *
      * @var float
      */
@@ -209,7 +210,13 @@ class Creator extends BaseCreator
         $this->addTokenDefault($result, 'product', $invoiceSettings['productName']);
         $this->addTokenDefault($result, 'nature', $invoiceSettings['nature']);
 
+
+        // Add quantity: quantity is negative on refunds, make it positive.
         $sign  = $this->invoiceSource->getType() === source::CreditNote ? -1 : 1;
+        $commonTags = array('quantity' => $sign * $item->get_quantity());
+        $result += $commonTags;
+
+        // Add price info.
         // get_item_total() returns cost per item after discount and ex vat (2nd
         // param).
         $productPriceEx = $this->shopSource->get_item_total($item, false, false);
@@ -228,23 +235,27 @@ class Creator extends BaseCreator
                 // - Do not put VAT on invoice: send price incl VAT as unitprice.
                 // - But still send the VAT rate to Acumulus.
                 // Costprice > 0 triggers the margin scheme in Acumulus.
-                $result['unitprice'] = $productPriceInc;
-                $result['costprice'] = $value;
+                $result += array(
+                    'unitprice' => $productPriceInc,
+                    'meta-unitprice-precision' => $this->precision,
+                    'costprice' => $value,
+                    'meta-costprice-precision' => $this->precision,
+                );
             }
         } else {
             $result += array(
                 'unitprice' => $productPriceEx,
+                'meta-unitprice-precision' => $this->precision,
                 'unitpriceinc' => $productPriceInc,
+                'meta-unitpriceinc-precision' => $this->precision,
             );
         }
 
-        // Quantity is negative on refunds, make it positive.
-        $parentTags = array('quantity' => $sign * $item->get_quantity());
-        $parentTags += $this->getVatRangeTags($productVat, $productPriceEx, $this->precision, $this->precision);
+        // Add tax info.
+        $result += $this->getVatRangeTags($productVat, $productPriceEx, $this->precision, $this->precision);
         if ($product instanceof WC_Product) {
-            $parentTags += $this->getVatRateLookupMetadata($product->get_tax_class());
+            $result += $this->getVatRateLookupMetadataByTaxClass($product->get_tax_class());
         }
-        $result += $parentTags;
 
         // Add bundle meta data (woocommerce-bundle-products extension).
         $bundleId = $item->get_meta('_bundle_cart_key');
@@ -259,14 +270,16 @@ class Creator extends BaseCreator
             $result['meta-bundle-visible'] = $item->get_meta('bundled_item_hidden') !== 'yes';
         }
 
-        // Add variants/options, but set vatamount to 0 on the child lines.
-        // @todo: check how to access tmcartepo_data.
-        $parentTags['vatamount'] = 0;
-        $is_plugin_active = is_plugin_active('woocommerce-tm-extra-product-options/tm-woo-extra-product-options.php');
+        // Add variants/options.
+        $commonTags['meta-vatrate-surce'] = static::VatRateSource_Parent;
         if ($product instanceof WC_Product && $item->get_variation_id()) {
-            $result[Creator::Line_Children] = $this->getVariantLines($item, $product, $parentTags);
-        } elseif ($is_plugin_active && !empty($item['tmcartepo_data'])) {
-            $result[Creator::Line_Children] = $this->getExtraProductOptionsLines($item, $parentTags);
+            $result[Creator::Line_Children] = $this->getVariantLines($item, $product, $commonTags);
+        } elseif (!empty($item['tmcartepo_data'])) {
+            // If the plugin is no longer used, we may still have an order with
+            // products where the plugin was used. Moreover we don't use any
+            // function or method from the plugin, only its stored data, so we
+            // don'have to t check for it being active.
+            $result[Creator::Line_Children] = $this->getExtraProductOptionsLines($item, $commonTags);
         }
 
         $this->removePropertySource('product');
@@ -276,15 +289,23 @@ class Creator extends BaseCreator
     }
 
     /**
-     * Looks up and returns, if only 1 rate was found, vat rate metadata.
+     * Looks up and returns vat rate metadata for product lines.
+     *
+     * A product has a tax class. A tax class can have multiple tax rates,
+     * depending on the region of the customer. As we don't have that data here,
+     * this method will only return metadata if only 1 rate was found.
      *
      * @param string $taxClass
+     *   The tax class of the product.
      *
      * @return array
      *   Either an array with keys 'meta-vatrate-lookup' and
      *  'meta-vatrate-lookup-label' or an empty array.
      */
-    protected function getVatRateLookupMetadata($taxClass) {
+    protected function getVatRateLookupMetadataByTaxClass($taxClass) {
+        if ($taxClass === 'standard') {
+            $taxClass = '';
+        }
         $result = array();
         $taxRates = WC_Tax::get_rates($taxClass);
         if (count($taxRates) === 1) {
@@ -304,18 +325,18 @@ class Creator extends BaseCreator
      *
      * @param \WC_Order_Item_Product $item
      * @param \WC_Product $product
-     * @param array $parentTags
+     * @param array $commonTags
      *   An array of tags from the parent product to add to the child lines.
      *
      * @return array[]
      *   An array of lines that describes this variant.
      */
-    protected function getVariantLines($item, WC_Product $product, array $parentTags)
+    protected function getVariantLines($item, WC_Product $product, array $commonTags)
     {
         $result = array();
 
         /**
-         * Object with properties id, key, and value.
+         * An array of objects with properties id, key, and value.
          *
          * @var object[] $metadata
          */
@@ -353,7 +374,7 @@ class Creator extends BaseCreator
                 $result[] = array(
                         'product' => $variantLabel . ': ' . rawurldecode($variantValue),
                         'unitprice' => 0,
-                    ) + $parentTags;
+                    ) + $commonTags;
             }
         }
 
@@ -370,27 +391,25 @@ class Creator extends BaseCreator
      *
      * @param array|\ArrayAccess $item
      *   The item line
-     * @param array $parentTags
+     * @param array $commonTags
      *   An array of tags from the parent product to add to the child lines.
      *
-     * @return \array[] An array of lines that describes this variant.
-     * An array of lines that describes this variant.
+     * @return array[]
+     *   An array of lines that describes this variant.
      */
-    protected function getExtraProductOptionsLines($item, array $parentTags)
+    protected function getExtraProductOptionsLines($item, array $commonTags)
     {
         $result = array();
 
-        // @todo: convert to WC3 interface.
         $options = unserialize($item['tmcartepo_data']);
         foreach ($options as $option) {
             // Get option name and choice.
             $label = $option['name'];
             $choice = $option['value'];
-            // @todo: price, quantity, vat rate?
             $result[] = array(
                     'product' => $label . ': ' . $choice,
                     'unitprice' => 0,
-                ) + $parentTags;
+                ) + $commonTags;
         }
 
         return $result;
@@ -404,8 +423,8 @@ class Creator extends BaseCreator
      * and uses the meta data described below to link them to each other. Our
      * getItemLine() method has copied that meta data into the resulting items.
      *
-     * This method hierarchically group bundled products into the bundle product
-     * and can do so multi-level.
+     * This method hierarchically groups bundled products into the bundle
+     * product and can do so multi-level.
      *
      * Bundle line meta data:
      * - bundle_cart_key (hash) unique identifier.
@@ -511,8 +530,8 @@ class Creator extends BaseCreator
         $result = array(
                 'product' => $this->t($line->get_name()),
                 'unitprice' => $feeEx,
+                'meta-unitprice-precision' => 0.01,
                 'quantity' => 1,
-                'vatamount' => $feeVat,
             ) + $this->getVatRangeTags($feeVat, $feeEx);
 
         return $result;
@@ -543,36 +562,8 @@ class Creator extends BaseCreator
     {
         /** @var \WC_Order_Item_Shipping $shippingItem */
         $shippingItem = func_get_arg(0);
-        $vatLookupTags = array();
         $taxes = $shippingItem->get_taxes();
-        if (is_array($taxes) && count($taxes) === 1) {
-            // @todo: $tax contains amount: can we use that?
-            //$tax = reset($taxes);
-            $vatLookupTags = array(
-                // Will contain a % at the end of the string.
-                'meta-vatrate-lookup' => substr(WC_Tax::get_rate_percent(key($taxes)), 0, -1),
-                'meta-vatrate-lookup-label' => WC_Tax::get_rate_label(key($taxes)),
-            );
-        } else {
-            // Apparently we have free shipping (or a misconfigured shipment
-            // method). Use a fall-back: WooCommerce only knows 1 tax rate
-            // for all shipping methods, stored in config:
-            $shipping_tax_class = get_option('woocommerce_shipping_tax_class');
-            if ( $shipping_tax_class === 'standard') {
-                $shipping_tax_class = '';
-            }
-            if (is_string($shipping_tax_class)) {
-                $tax_rates = WC_Tax::get_rates($shipping_tax_class);
-                if (count($tax_rates) === 1) {
-                    $tax_rate = reset($tax_rates);
-                    $vatLookupTags = array(
-                        'meta-vatrate-lookup' => $tax_rate['rate'],
-                        'meta-vatrate-lookup-label' => $tax_rate['label'],
-                        'meta-vatrate-lookup-source' => "get_option('woocommerce_shipping_tax_class')",
-                    );
-                }
-            }
-        }
+        $vatLookupTags = $this->getShippingVatRateLookupMetadata($taxes);
 
         // Note: this info is WC3 specific.
         // Precision: shipping costs are entered ex VAT, so that may be very
@@ -580,16 +571,17 @@ class Creator extends BaseCreator
         // rounded to the cent.
         // @todo: to avoid rounding errors, can we get the non-formatted amount?
         $shippingEx = $this->shopSource->get_shipping_total();
+        $shippingExPrecision = 0.01;
         $shippingVat = $this->shopSource->get_shipping_tax();
-        $precisionNumerator = 0.01;
+        $vatPrecision = 0.01;
 
         $result = array(
                 'product' => $this->getShippingMethodName(),
                 'unitprice' => $shippingEx,
+                'meta-unitprice-precision' => $shippingExPrecision,
                 'quantity' => 1,
-                'vatamount' => $shippingVat,
             )
-            + $this->getVatRangeTags($shippingVat, $shippingEx, $precisionNumerator, 0.01)
+            + $this->getVatRangeTags($shippingVat, $shippingEx, $vatPrecision, $shippingExPrecision)
             + $vatLookupTags;
 
         return $result;
@@ -608,6 +600,52 @@ class Creator extends BaseCreator
             return $line->get_name();
         }
         return parent::getShippingMethodName();
+    }
+
+    /**
+     * Looks up and returns vat rate metadata for shipping lines.
+     *
+     * In WooCommerce, a shipping line can have multiple taxes. I am not sure if
+     * that is possible for Dutch web shops, but if a shipping line does have
+     * multiple taxes we fall back to the tax class setting for shipping
+     * methods, that can have multiple tax rates itself (@see
+     * getVatRateLookupMetadataByTaxClass()). Anyway, this method will only
+     * return metadata if only 1 rate was found.
+     *
+     * @param array|null $taxes
+     *   The taxes applied to a shipping line.
+     *
+     * @return array
+     *   Either an array with keys 'meta-vatrate-lookup',
+     *  'meta-vatrate-lookup-label', and 'meta-vatrate-lookup-source' or an
+     *   empty array.
+     */
+    protected function getShippingVatRateLookupMetadata($taxes)
+    {
+        $vatLookupTags = array();
+        if (is_array($taxes) && count($taxes) === 1) {
+            // @todo: $tax contains amount: can we use that?
+            //$tax = reset($taxes);
+            $vatLookupTags = array(
+                // Will contain a % at the end of the string.
+                'meta-vatrate-lookup' => substr(WC_Tax::get_rate_percent(key($taxes)), 0, -1),
+                'meta-vatrate-lookup-label' => WC_Tax::get_rate_label(key($taxes)),
+                'meta-vatrate-lookup-source' => 'shipping line taxes',
+            );
+        }
+        else {
+            // Apparently we have free shipping (or a misconfigured shipment
+            // method). Use a fall-back: WooCommerce only knows 1 tax rate
+            // for all shipping methods, stored in config:
+            $shipping_tax_class = get_option('woocommerce_shipping_tax_class');
+            if (is_string($shipping_tax_class)) {
+                $vatLookupTags = $this->getVatRateLookupMetadataByTaxClass($shipping_tax_class);
+                if (!empty($vatLookupTags) === 1) {
+                    $vatLookupTags ['meta-vatrate-lookup-source'] = "get_option('woocommerce_shipping_tax_class')";
+                }
+            }
+        }
+        return $vatLookupTags;
     }
 
     /**

@@ -12,35 +12,36 @@ class Number
      *
      * @param float $numerator
      * @param float $denominator
-     * @param float $precisionNumerator
+     * @param float $numeratorPrecision
      *   The precision used when rounding the number. This means that the
      *   original numerator will not differ more than half of this.
-     * @param float $precisionDenominator
+     * @param float $denominatorPrecision
      *   The precision used when rounding the number. This means that the
      *   original denominator will not differ more than half of this.
      *
      * @return array
      *   Array of floats with keys min, max and calculated.
      */
-    static public function getDivisionRange($numerator, $denominator, $precisionNumerator = 0.01, $precisionDenominator = 0.01)
+    static public function getDivisionRange($numerator, $denominator, $numeratorPrecision = 0.01, $denominatorPrecision = 0.01)
     {
         // The actual value can be half the precision lower or higher.
-        $numeratorHalfRange = $precisionNumerator / 2.0;
-        $denominatorHalfRange = $precisionDenominator / 2.0;
+        // To err on the save side, we take 60% of it (instead of 50%).
+        $numeratorHalfRange = 0.6 * (float) $numeratorPrecision;
+        $denominatorHalfRange = 0.6 * (float) $denominatorPrecision;
 
         // The min values should be closer to 0 then the value.
         // The max values should be further from 0 then the value.
         if ($numerator < 0.0) {
             $numeratorHalfRange = -$numeratorHalfRange;
         }
-        $minNumerator = $numerator - $numeratorHalfRange;
-        $maxNumerator = $numerator + $numeratorHalfRange;
+        $minNumerator = (float) $numerator - $numeratorHalfRange;
+        $maxNumerator = (float) $numerator + $numeratorHalfRange;
 
         if ($denominator < 0.0) {
             $denominatorHalfRange = -$denominatorHalfRange;
         }
-        $minDenominator = $denominator - $denominatorHalfRange;
-        $maxDenominator = $denominator + $denominatorHalfRange;
+        $minDenominator = (float) $denominator - $denominatorHalfRange;
+        $maxDenominator = (float) $denominator + $denominatorHalfRange;
 
         // We get the min value of the division by dividing the minimum numerator by
         // the maximum denominator and vice versa.

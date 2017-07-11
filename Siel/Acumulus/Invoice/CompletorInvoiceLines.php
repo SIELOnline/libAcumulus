@@ -98,7 +98,6 @@ class CompletorInvoiceLines
         // calculated VAT rates and thus can be corrected with
         // correctCalculatedVatRates(): call again.
         $lines = $this->correctCalculatedVatRates($lines);
-        $lines = $this->addVatRateToLookupLines($lines);
         return $lines;
     }
 
@@ -113,6 +112,7 @@ class CompletorInvoiceLines
      */
     protected function completeInvoiceLines(array $lines)
     {
+        $lines = $this->addVatRateToLookupLines($lines);
         $lines = $this->addVatRateTo0PriceLines($lines);
         $lines = $this->completeLineMetaData($lines);
         return $lines;
@@ -130,10 +130,12 @@ class CompletorInvoiceLines
      * @param array[] $lines
      *   The invoice lines to complete with required data.
      *
-     * @return array[]
-     *   The completed invoice lines.
+     * @param array|null $parent
+     *
+     * @return array[] The completed invoice lines.
+     * The completed invoice lines.
      */
-    protected function completeLineRequiredData(array $lines)
+    protected function completeLineRequiredData(array $lines, array $parent = null)
     {
         foreach ($lines as &$line) {
             // Easy gain first. Known usages: Magento.
@@ -179,16 +181,19 @@ class CompletorInvoiceLines
                          $line['unitpriceinc'] = $line['unitprice'] * (100.0 + $line['vatrate']) / 100.0;
                     } elseif (isset($line['vatamount'])) {
                         $line['unitpriceinc'] = $line['unitprice'] + $line['vatamount'];
-                    } else {
+                    } //else {
                         // We cannot fill in unitpriceinc reliably, so we leave
                         // it empty as it is metadata after all.
-                    }
+                    // }
                     $line['meta-calculated-fields'][] = 'unitpriceinc';
                 }
             }
 
             if (!isset($line['vatrate'])) {
-                if (isset($line['vatamount']) && isset($line['unitprice'])) {
+                if ($line['meta-vatrate-source'] === Creator::VatRateSource_Parent && $parent !== null && Completor::isCorrectVatRate($parent['meta-vatrate-source'])) {
+                    $line['vatrate'] = $parent['vatrate'];
+                    $line['meta-vatrate-source'] = Completor::VatRateSource_Copied_From_Parent;
+                } elseif (isset($line['vatamount']) && isset($line['unitprice'])) {
                     // This may use the easy gain, so known usages: Magento.
                     // Set (overwrite the tag vatrate-source) vatrate and
                     // accompanying tags.
@@ -205,7 +210,7 @@ class CompletorInvoiceLines
 
             // Recursively complete the required data.
             if (!empty($line[Creator::Line_Children])) {
-                $line[Creator::Line_Children] = $this->completeLineRequiredData($line[Creator::Line_Children]);
+                $line[Creator::Line_Children] = $this->completeLineRequiredData($line[Creator::Line_Children], $line);
             }
         }
         return $lines;
@@ -331,7 +336,7 @@ class CompletorInvoiceLines
      * Meta-vatrate-lookup data is added by the Creator class using vat rates
      * from the products. However as VAT rates may have changed between the date
      * of the order and now, we cannot fully rely on it and use it only as a
-     * last resort.
+     * last resort, thus after flattening
      *
      * @param array[] $lines
      *   The invoice lines to correct using lookup data.
@@ -350,9 +355,6 @@ class CompletorInvoiceLines
                     $line['vatrate'] = $line['meta-vatrate-lookup'];
                     $line['meta-vatrate-source'] = Completor::VatRateSource_Looked_Up;
                 }
-            }
-            if (!empty($line[Creator::Line_Children])) {
-                $line[Creator::Line_Children] = $this->addVatRateToLookupLines($line[Creator::Line_Children]);
             }
         }
         return $lines;

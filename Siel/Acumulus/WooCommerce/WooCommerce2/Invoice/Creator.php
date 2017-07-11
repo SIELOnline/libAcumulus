@@ -16,9 +16,9 @@ use WC_Tax;
 class Creator extends BaseCreator
 {
     /**
-     * Precision in WC2: one of the prices is entered by the administrator and
-     * thus can be considered exact. The computed one is not rounded, so we can
-     * assume a very high precision for all values here.
+     * Product price precision in WC2: one of the prices is entered by the
+     * administrator and thus can be considered exact. The computed one is not
+     * rounded, so we can assume a very high precision for all values here.
      *
      * @var float
      */
@@ -135,6 +135,8 @@ class Creator extends BaseCreator
             }
         }
 
+        $result = $this->groupBundles($result);
+
         $this->hasItemLines = count($result) > 0;
         return $result;
     }
@@ -174,7 +176,12 @@ class Creator extends BaseCreator
         $this->addTokenDefault($result, 'product', $invoiceSettings['productName']);
         $this->addTokenDefault($result, 'nature', $invoiceSettings['nature']);
 
+        // Add quantity: quantity is negative on refunds, make it positive.
         $sign  = $this->invoiceSource->getType() === source::CreditNote ? -1 : 1;
+        $commonTags = array('quantity' => $sign * $item['qty']);
+        $result += $commonTags;
+
+        // Add price info.
         // get_item_total() returns cost per item after discount and ex vat (2nd
         // param).
         $productPriceEx = $this->shopSource->get_item_total($item, false, false);
@@ -193,30 +200,51 @@ class Creator extends BaseCreator
                 // - Do not put VAT on invoice: send price incl VAT as unitprice.
                 // - But still send the VAT rate to Acumulus.
                 // Costprice > 0 triggers the margin scheme in Acumulus.
-                $result['unitprice'] = $productPriceInc;
-                $result['costprice'] = $value;
+                $result += array(
+                    'unitprice' => $productPriceInc,
+                    'meta-unitprice-precision' => $this->precision,
+                    'costprice' => $value,
+                    'meta-costprice-precision' => $this->precision,
+                );
             }
         } else {
             $result += array(
                 'unitprice' => $productPriceEx,
+                'meta-unitprice-precision' => $this->precision,
                 'unitpriceinc' => $productPriceInc,
+                'meta-unitpriceinc-precision' => $this->precision,
             );
         }
 
-        // Quantity is negative on refunds, make it positive.
-        $parentTags = array('quantity' => $sign * $item['qty']);
-        $parentTags += $this->getVatRangeTags($productVat, $productPriceEx, $this->precision, $this->precision);
+        // Add tax info.
+        $result += $this->getVatRangeTags($productVat, $productPriceEx, $this->precision, $this->precision);
         if ($product instanceof WC_Product) {
-            $parentTags += $this->getVatRateLookupMetadata($product->get_tax_class());
+            $result += $this->getVatRateLookupMetadataByTaxClass($product->get_tax_class());
         }
-        $result += $parentTags;
+
+        // Add bundle meta data (woocommerce-bundle-products extension).
+        $bundleId = $item['_bundle_cart_key'];
+        if (!empty($bundleId)) {
+            // Bundle or bundled product.
+            $result['meta-bundle-id'] = $bundleId;
+        }
+        $bundledBy = $item['_bundled_by'];
+        if (!empty($bundledBy)) {
+            // Bundled products only.
+            $result['meta-bundle-parent'] = $bundledBy;
+            $result['meta-bundle-visible'] = $item['bundled_item_hidden'] !== 'yes';
+        }
 
         // Add variants/options, but set vatamount to 0 on the child lines.
-        $parentTags['vatamount'] = 0;
+        $commonTags['meta-vatrate-surce'] = static::VatRateSource_Parent;
         if ($product instanceof WC_Product && !empty($item['variation_id'])) {
-            $result[Creator::Line_Children] = $this->getVariantLines($item, $product, $parentTags);
-        } elseif (is_plugin_active('woocommerce-tm-extra-product-options/tm-woo-extra-product-options.php') && !empty($item['tmcartepo_data'])) {
-            $result[Creator::Line_Children] = $this->getExtraProductOptionsLines($item, $parentTags);
+            $result[Creator::Line_Children] = $this->getVariantLines($item, $product, $commonTags);
+        } elseif (!empty($item['tmcartepo_data'])) {
+            // If the plugin is no longer used, we may still have an order with
+            // products where the plugin was used. Moreover we don't use any
+            // function or method from the plugin, only its stored data, so we
+            // don'have to t check for it being active.
+            $result[Creator::Line_Children] = $this->getExtraProductOptionsLines($item, $commonTags);
         }
 
         $this->removePropertySource('product');
@@ -232,13 +260,13 @@ class Creator extends BaseCreator
      *
      * @param array $item
      * @param \WC_Product $product
-     * @param array $parentTags
+     * @param array $commonTags
      *   An array of tags from the parent product to add to the child lines.
      *
      * @return \array[]
      *   An array of lines that describes this variant.
      */
-    protected function getVariantLines($item, WC_Product $product, array $parentTags)
+    protected function getVariantLines($item, WC_Product $product, array $commonTags)
     {
         $result = array();
 
@@ -273,7 +301,7 @@ class Creator extends BaseCreator
                 $result[] = array(
                         'product' => $meta['meta_key'] . ': ' . rawurldecode($meta['meta_value']),
                         'unitprice' => 0,
-                    ) + $parentTags;
+                    ) + $commonTags;
             }
         }
 
@@ -293,8 +321,8 @@ class Creator extends BaseCreator
         $result = array(
                 'product' => $this->t($line['name']),
                 'unitprice' => $feeEx,
+                'meta-unitprice-precision' => 0.01,
                 'quantity' => 1,
-                'vatamount' => $feeVat,
             ) + $this->getVatRangeTags($feeVat, $feeEx);
 
         return $result;
@@ -306,37 +334,8 @@ class Creator extends BaseCreator
     protected function getShippingLine()
     {
         $line = func_get_arg(0);
-        $vatLookupTags = array();
         $taxes = !empty($line['taxes']) ? maybe_unserialize($line['taxes']) : array();
-        if (count($taxes) === 1) {
-            // @todo: $tax contains amount: can we use that?
-            //$tax = reset($taxes);
-            $vatLookupTags = array(
-                // Will contain a % at the end of the string.
-                'meta-vatrate-lookup' => substr(WC_Tax::get_rate_percent(key($taxes)), 0, -1),
-                'meta-vatrate-lookup-label' => WC_Tax::get_rate_label(key($taxes)),
-                'meta-vatrate-lookup-source' => '$line[\'taxes\']',
-            );
-        } else {
-            // Apparently we have free shipping (or a misconfigured shipment
-            // method). Use a fall-back: WooCommerce only knows 1 tax rate
-            // for all shipping methods, stored in config:
-            $shipping_tax_class = get_option('woocommerce_shipping_tax_class');
-            if ( $shipping_tax_class === 'standard') {
-                $shipping_tax_class = '';
-            }
-            if (is_string($shipping_tax_class)) {
-                $tax_rates = WC_Tax::get_rates($shipping_tax_class);
-                if (count($tax_rates) === 1) {
-                    $tax_rate = reset($tax_rates);
-                    $vatLookupTags = array(
-                        'meta-vatrate-lookup' => $tax_rate['rate'],
-                        'meta-vatrate-lookup-label' => $tax_rate['label'],
-                        'meta-vatrate-lookup-source' => "get_option('woocommerce_shipping_tax_class')",
-                    );
-                }
-            }
-        }
+        $vatLookupTags = $this->getShippingVatRateLookupMetadata($taxes);
 
         // Note: this info is WC2 specific.
         // Precision: shipping costs are entered ex VAT, so that may be very
@@ -346,16 +345,17 @@ class Creator extends BaseCreator
         // the cent.
         // @todo: to avoid rounding errors, can we get the non-formatted amount?
         $shippingEx = $this->shopSource->get_total_shipping();
+        $shippingExPrecision = 0.01;
         $shippingVat = $this->shopSource->get_shipping_tax();
-        $precisionNumerator = $this->invoiceSource->getType() === Source::CreditNote ? 0.01 : 0.0001;
+        $vatPrecision = $this->invoiceSource->getType() === Source::CreditNote ? 0.01 : 0.0001;
 
         $result = array(
                 'product' => $this->getShippingMethodName(),
                 'unitprice' => $shippingEx,
+                'meta-unitprice-precision' => $shippingExPrecision,
                 'quantity' => 1,
-                'vatamount' => $shippingVat,
             )
-            + $this->getVatRangeTags($shippingVat, $shippingEx, $precisionNumerator, 0.01)
+            + $this->getVatRangeTags($shippingVat, $shippingEx, $vatPrecision, $shippingExPrecision)
             + $vatLookupTags;
 
         return $result;

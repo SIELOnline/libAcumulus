@@ -39,6 +39,7 @@ abstract class Creator
     const VatRateSource_Calculated = 'calculated';
     const VatRateSource_Completor = 'completor';
     const VatRateSource_Strategy = 'strategy';
+    const VatRateSource_Parent = 'parent';
 
     const LineType_Shipping = 'shipping';
     const LineType_PaymentFee = 'payment';
@@ -989,8 +990,8 @@ abstract class Creator
      * rates that an order can have (one of the Dutch or, for electronic
      * services, other EU country VAT rates).
      *
-     * - If $denominator = 0 the vatrate will be set to NULL and the Completor may
-     *   try to get this line listed under the correct vat rate.
+     * - If $denominator = 0 the vatrate will be set to NULL and the Completor
+     *   may try to get this line listed under the correct vat rate.
      * - If $numerator = 0 the vatrate will be set to 0 and be treated as if it
      *   is an exact vat rate, not a vat range
      *
@@ -998,10 +999,10 @@ abstract class Creator
      *   The amount of VAT as received from the web shop.
      * @param float $denominator
      *   The price of a product excluding VAT as received from the web shop.
-     * @param float $precisionNumerator
+     * @param float $numeratorPrecision
      *   The precision used when rounding the number. This means that the
      *   original numerator will not differ more than half of this.
-     * @param float $precisionDenominator
+     * @param float $denominatorPrecision
      *   The precision used when rounding the number. This means that the
      *   original denominator will not differ more than half of this.
      *
@@ -1009,7 +1010,7 @@ abstract class Creator
      *   Array with keys vatrate, meta-vatrate-min, meta-vatrate-max, and
      *   meta-vatrate-source.
      */
-    public static function getVatRangeTags($numerator, $denominator, $precisionNumerator = 0.01, $precisionDenominator = 0.01)
+    public static function getVatRangeTags($numerator, $denominator, $numeratorPrecision = 0.01, $denominatorPrecision = 0.01)
     {
         if (Number::isZero($denominator, 0.0001)) {
             return array(
@@ -1023,10 +1024,11 @@ abstract class Creator
                 'meta-vatrate-source' => static::VatRateSource_Exact0,
             );
         } else {
-            $range = Number::getDivisionRange($numerator, $denominator, $precisionNumerator, $precisionDenominator);
+            $range = Number::getDivisionRange($numerator, $denominator, $numeratorPrecision, $denominatorPrecision);
             return array(
-                'vatrate' => 100.0 * $range['calculated'],
                 'vatamount' => $numerator,
+                'meta-vatamount-precision' => $numeratorPrecision,
+                'vatrate' => 100.0 * $range['calculated'],
                 'meta-vatrate-min' => 100.0 * $range['min'],
                 'meta-vatrate-max' => 100.0 * $range['max'],
                 'meta-vatrate-source' => static::VatRateSource_Calculated,

@@ -4,6 +4,8 @@ namespace Siel\Acumulus\WooCommerce\Invoice;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
+use Siel\Acumulus\Meta;
+use Siel\Acumulus\Tag;
 use WC_Abstract_Order;
 use WC_Coupon;
 use WC_Order;
@@ -149,8 +151,8 @@ class Creator extends BaseCreator
     protected function getInvoiceTotals()
     {
         return array(
-            'meta-invoice-amountinc' => $this->shopSource->get_total(),
-            'meta-invoice-vatamount' => $this->shopSource->get_total_tax(),
+            Meta::InvoiceAmountInc => $this->shopSource->get_total(),
+            Meta::InvoiceVatAmount => $this->shopSource->get_total_tax(),
         );
     }
 
@@ -207,14 +209,14 @@ class Creator extends BaseCreator
         $this->addPropertySource('item', $item);
 
         $invoiceSettings = $this->config->getInvoiceSettings();
-        $this->addTokenDefault($result, 'itemnumber', $invoiceSettings['itemNumber']);
-        $this->addTokenDefault($result, 'product', $invoiceSettings['productName']);
-        $this->addTokenDefault($result, 'nature', $invoiceSettings['nature']);
+        $this->addTokenDefault($result, Tag::ItemNumber, $invoiceSettings['itemNumber']);
+        $this->addTokenDefault($result, Tag::Product, $invoiceSettings['productName']);
+        $this->addTokenDefault($result, Tag::Nature, $invoiceSettings['nature']);
 
 
         // Add quantity: quantity is negative on refunds, make it positive.
         $sign  = $this->invoiceSource->getType() === source::CreditNote ? -1 : 1;
-        $commonTags = array('quantity' => $sign * $item->get_quantity());
+        $commonTags = array(Tag::Quantity => $sign * $item->get_quantity());
         $result += $commonTags;
 
         // Add price info.
@@ -237,18 +239,18 @@ class Creator extends BaseCreator
                 // - But still send the VAT rate to Acumulus.
                 // Costprice > 0 triggers the margin scheme in Acumulus.
                 $result += array(
-                    'unitprice' => $productPriceInc,
-                    'meta-unitprice-precision' => $this->pricePrecision,
-                    'costprice' => $value,
-                    'meta-costprice-precision' => $this->pricePrecision,
+                    Tag::UnitPrice => $productPriceInc,
+                    Meta::PrecisionUnitPrice => $this->pricePrecision,
+                    Tag::CostPrice => $value,
+                    Meta::PrecisionCostPrice => $this->pricePrecision,
                 );
             }
         } else {
             $result += array(
-                'unitprice' => $productPriceEx,
-                'meta-unitprice-precision' => $this->pricePrecision,
-                'unitpriceinc' => $productPriceInc,
-                'meta-unitpriceinc-precision' => $this->pricePrecision,
+                Tag::UnitPrice => $productPriceEx,
+                Meta::PrecisionUnitPrice => $this->pricePrecision,
+                Meta::UnitPriceInc => $productPriceInc,
+                Meta::PrecisionUnitPriceInc => $this->pricePrecision,
             );
         }
 
@@ -262,25 +264,25 @@ class Creator extends BaseCreator
         $bundleId = $item->get_meta('_bundle_cart_key');
         if (!empty($bundleId)) {
             // Bundle or bundled product.
-            $result['meta-bundle-id'] = $bundleId;
+            $result[Meta::BundleId] = $bundleId;
         }
         $bundledBy = $item->get_meta('_bundled_by');
         if (!empty($bundledBy)) {
             // Bundled products only.
-            $result['meta-bundle-parent'] = $bundledBy;
-            $result['meta-bundle-visible'] = $item->get_meta('bundled_item_hidden') !== 'yes';
+            $result[Meta::BundleParentId] = $bundledBy;
+            $result[Meta::BundleVisible] = $item->get_meta('bundled_item_hidden') !== 'yes';
         }
 
         // Add variants/options.
-        $commonTags['meta-vatrate-surce'] = static::VatRateSource_Parent;
+        $commonTags[Meta::VatRateSource] = static::VatRateSource_Parent;
         if ($product instanceof WC_Product && $item->get_variation_id()) {
-            $result[Creator::Line_Children] = $this->getVariantLines($item, $product, $commonTags);
+            $result[Meta::ChildrenLines] = $this->getVariantLines($item, $product, $commonTags);
         } elseif (!empty($item['tmcartepo_data'])) {
             // If the plugin is no longer used, we may still have an order with
             // products where the plugin was used. Moreover we don't use any
             // function or method from the plugin, only its stored data, so we
             // don'have to t check for it being active.
-            $result[Creator::Line_Children] = $this->getExtraProductOptionsLines($item, $commonTags);
+            $result[Meta::ChildrenLines] = $this->getExtraProductOptionsLines($item, $commonTags);
         }
 
         $this->removePropertySource('product');
@@ -300,8 +302,8 @@ class Creator extends BaseCreator
      *   The tax class of the product.
      *
      * @return array
-     *   Either an array with keys 'meta-vatrate-lookup' and
-     *  'meta-vatrate-lookup-label' or an empty array.
+     *   Either an array with keys Meta::VatRateLookup and
+     *  Meta::VatRateLookupLabel or an empty array.
      */
     protected function getVatRateLookupMetadataByTaxClass($taxClass) {
         if ($taxClass === 'standard') {
@@ -312,8 +314,8 @@ class Creator extends BaseCreator
         if (count($taxRates) === 1) {
             $taxRate = reset($taxRates);
             $result = array(
-                'meta-vatrate-lookup' => $taxRate['rate'],
-                'meta-vatrate-lookup-label' => $taxRate['label'],
+                Meta::VatRateLookup => $taxRate['rate'],
+                Meta::VatRateLookupLabel => $taxRate['label'],
             );
         }
         return $result;
@@ -373,8 +375,8 @@ class Creator extends BaseCreator
                 }
 
                 $result[] = array(
-                        'product' => $variantLabel . ': ' . rawurldecode($variantValue),
-                        'unitprice' => 0,
+                        Tag::Product => $variantLabel . ': ' . rawurldecode($variantValue),
+                        Tag::UnitPrice => 0,
                     ) + $commonTags;
             }
         }
@@ -408,8 +410,8 @@ class Creator extends BaseCreator
             $label = $option['name'];
             $choice = $option['value'];
             $result[] = array(
-                    'product' => $label . ': ' . $choice,
-                    'unitprice' => 0,
+                    Tag::Product => $label . ': ' . $choice,
+                    Tag::UnitPrice => 0,
                 ) + $commonTags;
         }
 
@@ -447,18 +449,18 @@ class Creator extends BaseCreator
     {
         $result = array();
         foreach ($itemLines as &$itemLine) {
-            if (!empty($itemLine['meta-bundle-parent'])) {
+            if (!empty($itemLine[Meta::BundleParentId])) {
                 // Find the parent, note that we expect bundle products to
                 // appear before their bundled products, so we can search in
                 // $result and have a reference to a line in $result returned!
-                $parent = &$this->getParentBundle($result, $itemLine['meta-bundle-parent']);
+                $parent = &$this->getParentBundle($result, $itemLine[Meta::BundleParentId]);
                 if ($parent !== null) {
                     // Add the bundled product as a child to the bundle.
-                    $parent[Creator::Line_Children][] = $itemLine;
+                    $parent[Meta::ChildrenLines][] = $itemLine;
                 } else {
                     // Oops: not found. Store a message in the line meta data
                     // and keep it as a separate line.
-                    $itemLine['meta-bundle-parent'] .= ': not found';
+                    $itemLine[Meta::BundleParentId] .= ': not found';
                     $result[] = $itemLine;
                 }
             } else {
@@ -483,11 +485,11 @@ class Creator extends BaseCreator
     protected function &getParentBundle(array &$lines, $parentId)
     {
         foreach ($lines as &$line) {
-            if (!empty($line['meta-bundle-id']) && $line['meta-bundle-id'] === $parentId) {
+            if (!empty($line[Meta::BundleId]) && $line[Meta::BundleId] === $parentId) {
                 return $line;
-            } elseif (!empty($line[Creator::Line_Children])) {
+            } elseif (!empty($line[Meta::ChildrenLines])) {
                 // Recursively search for the parent bundle.
-                $parent = &$this->getParentBundle($line[Creator::Line_Children], $parentId);
+                $parent = &$this->getParentBundle($line[Meta::ChildrenLines], $parentId);
                 if ($parent !== null) {
                     return $parent;
                 }
@@ -512,7 +514,7 @@ class Creator extends BaseCreator
         // not been tested yet!.
         foreach ($this->shopSource->get_fees() as $feeLine) {
             $line = $this->getFeeLine($feeLine);
-            $line['meta-line-type'] = static::LineType_Other;
+            $line[Meta::LineType] = static::LineType_Other;
             $result[] = $line;
         }
         return $result;
@@ -529,10 +531,10 @@ class Creator extends BaseCreator
         $feeVat = $line->get_total_tax();
 
         $result = array(
-                'product' => $this->t($line->get_name()),
-                'unitprice' => $feeEx,
-                'meta-unitprice-precision' => 0.01,
-                'quantity' => 1,
+                Tag::Product => $this->t($line->get_name()),
+                Tag::UnitPrice => $feeEx,
+                Meta::PrecisionUnitPrice => 0.01,
+                Tag::Quantity => 1,
             ) + $this->getVatRangeTags($feeVat, $feeEx);
 
         return $result;
@@ -577,10 +579,10 @@ class Creator extends BaseCreator
         $vatPrecision = 0.01;
 
         $result = array(
-                'product' => $this->getShippingMethodName(),
-                'unitprice' => $shippingEx,
-                'meta-unitprice-precision' => $shippingExPrecision,
-                'quantity' => 1,
+                Tag::Product => $this->getShippingMethodName(),
+                Tag::UnitPrice => $shippingEx,
+                Meta::PrecisionUnitPrice => $shippingExPrecision,
+                Tag::Quantity => 1,
             )
             + $this->getVatRangeTags($shippingVat, $shippingEx, $vatPrecision, $shippingExPrecision)
             + $vatLookupTags;
@@ -617,8 +619,8 @@ class Creator extends BaseCreator
      *   The taxes applied to a shipping line.
      *
      * @return array
-     *   Either an array with keys 'meta-vatrate-lookup',
-     *  'meta-vatrate-lookup-label', and 'meta-vatrate-lookup-source' or an
+     *   Either an array with keys Meta::VatRateLookup,
+     *  Meta::VatRateLookupLabel, and Meta::VatRateLookupSource or an
      *   empty array.
      */
     protected function getShippingVatRateLookupMetadata($taxes)
@@ -629,9 +631,9 @@ class Creator extends BaseCreator
             //$tax = reset($taxes);
             $vatLookupTags = array(
                 // Will contain a % at the end of the string.
-                'meta-vatrate-lookup' => substr(WC_Tax::get_rate_percent(key($taxes)), 0, -1),
-                'meta-vatrate-lookup-label' => WC_Tax::get_rate_label(key($taxes)),
-                'meta-vatrate-lookup-source' => 'shipping line taxes',
+                Meta::VatRateLookup => substr(WC_Tax::get_rate_percent(key($taxes)), 0, -1),
+                Meta::VatRateLookupLabel => WC_Tax::get_rate_label(key($taxes)),
+                Meta::VatRateLookupSource => 'shipping line taxes',
             );
         }
         else {
@@ -642,7 +644,7 @@ class Creator extends BaseCreator
             if (is_string($shipping_tax_class)) {
                 $vatLookupTags = $this->getVatRateLookupMetadataByTaxClass($shipping_tax_class);
                 if (!empty($vatLookupTags) === 1) {
-                    $vatLookupTags ['meta-vatrate-lookup-source'] = "get_option('woocommerce_shipping_tax_class')";
+                    $vatLookupTags [Meta::VatRateLookupSource] = "get_option('woocommerce_shipping_tax_class')";
                 }
             }
         }
@@ -725,14 +727,14 @@ class Creator extends BaseCreator
             $description = $this->t('discount_code');
         }
         return array(
-            'itemnumber' => $coupon->get_code(),
-            'product' => $description,
-            'unitprice' => 0,
-            'unitpriceinc' => 0,
-            'quantity' => 1,
-            'vatrate' => null,
-            'vatamount' => 0,
-            'meta-vatrate-source' => static::VatRateSource_Completor,
+            Tag::ItemNumber => $coupon->get_code(),
+            Tag::Product => $description,
+            Tag::UnitPrice => 0,
+            Meta::UnitPriceInc => 0,
+            Tag::Quantity => 1,
+            Tag::VatRate => null,
+            Meta::VatAmount => 0,
+            Meta::VatRateSource => static::VatRateSource_Completor,
         );
     }
 }

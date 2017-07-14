@@ -2,13 +2,13 @@
 namespace Siel\Acumulus\Invoice;
 
 use Siel\Acumulus\Helpers\TranslatorInterface;
-use Siel\Acumulus\Web\Result as BaseResult;
+use Siel\Acumulus\Web\Result as WebResult;
 
 /**
  * Extends Result with properties and features specific to the InvoiceAdd web
  * service call.
  */
-class Result extends BaseResult
+class Result extends WebResult
 {
     // Invoice send handling related constants.
     // Reason for not sending: bits 5 to 8.

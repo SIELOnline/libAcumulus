@@ -216,7 +216,7 @@ abstract class Mailer
         $pluginSettings = $this->config->getPluginSettings();
         $isTestMode = $pluginSettings['debug'] === PluginConfig::Send_TestMode;
         $resultInvoice = $invoiceSendResult->getResponse();
-        // @todo: can be taken from invoice array if that qwould be part of the Result
+        // @todo: can be taken from invoice array if that would be part of the Result
         $isConcept = !$invoiceSendResult->hasError() && empty($resultInvoice['entryid']);
         $emailAsPdfSettings = $this->config->getEmailAsPdfSettings();
         $isEmailAsPdf = (bool) $emailAsPdfSettings['emailAsPdf'];

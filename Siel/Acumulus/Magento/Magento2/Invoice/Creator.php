@@ -7,6 +7,8 @@ use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Magento\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\Magento\Magento2\Helpers\Registry;
+use Siel\Acumulus\Meta;
+use Siel\Acumulus\Tag;
 
 /**
  * Allows to create arrays in the Acumulus invoice structure from a Magento 2
@@ -120,18 +122,18 @@ class Creator extends BaseCreator
         $this->addPropertySource('item', $item);
 
         $invoiceSettings = $this->config->getInvoiceSettings();
-        $this->addTokenDefault($result, 'itemnumber', $invoiceSettings['itemNumber']);
-        $this->addTokenDefault($result, 'product', $invoiceSettings['productName']);
-        $this->addTokenDefault($result, 'nature', $invoiceSettings['nature']);
+        $this->addTokenDefault($result, Tag::ItemNumber, $invoiceSettings['itemNumber']);
+        $this->addTokenDefault($result, Tag::Product, $invoiceSettings['productName']);
+        $this->addTokenDefault($result, Tag::Nature, $invoiceSettings['nature']);
 
         // For higher precision of the unit price, we use the price as entered
         // by the admin.
         if ($this->productPricesIncludeTax()) {
-            $tag = 'unitpriceinc';
+            $tag = Meta::UnitPriceInc;
             $productPrice = (float) $item->getPriceInclTax();
 
         } else {
-            $tag = 'unitprice';
+            $tag = Tag::UnitPrice;
             $productPrice = (float) $item->getPrice();
         }
 
@@ -147,8 +149,8 @@ class Creator extends BaseCreator
         // Add price and quantity info.
         $result += array(
             $tag => $productPrice,
-            'quantity' => $item->getQtyOrdered(),
-            'meta-line-vatamount' => $lineVat,
+            Tag::Quantity => $item->getQtyOrdered(),
+            Meta::LineVatAmount => $lineVat,
         );
 
         // Add VAT related info
@@ -156,16 +158,16 @@ class Creator extends BaseCreator
         if (Number::isZero($vatRate) && !empty($childrenItems)) {
             // 0 VAT rate on parent: this is (very very) probably not correct.
             $result += array(
-                'vatrate' => null,
-                'meta-vatrate-source' => Creator::VatRateSource_Completor,
-                'meta-vatrate-lookup' => $vatRate,
-                'meta-vatrate-lookup-source' => '$item->getTaxPercent()',
+                Tag::VatRate => null,
+                Meta::VatRateSource => Creator::VatRateSource_Completor,
+                Meta::VatRateLookup => $vatRate,
+                Meta::VatRateLookupSource => '$item->getTaxPercent()',
             );
         } else {
             // No 0 VAT or not a parent product: the vat rate is real.
             $result += array(
-                'vatrate' => $vatRate,
-                'meta-vatrate-source' => Number::isZero($vatRate) ? Creator::VatRateSource_Exact0 : Creator::VatRateSource_Exact,
+                Tag::VatRate => $vatRate,
+                Meta::VatRateSource => Number::isZero($vatRate) ? Creator::VatRateSource_Exact0 : Creator::VatRateSource_Exact,
             );
         }
 
@@ -173,15 +175,15 @@ class Creator extends BaseCreator
         if (!Number::isZero($item->getDiscountAmount())) {
             // Store discount on this item to be able to get correct discount
             // lines later on in the completion phase.
-            $result['meta-line-discount-amountinc'] = -$item->getDiscountAmount();
+            $result[Meta::LineDiscountAmountInc] = -$item->getDiscountAmount();
         }
 
         // Add children lines for composed products.
         $childrenItems = $item->getChildrenItems();
         if (!empty($childrenItems)) {
-            $result[Creator::Line_Children] = array();
+            $result[Meta::ChildrenLines] = array();
             foreach ($childrenItems as $child) {
-                $result[Creator::Line_Children][] = $this->getItemLineOrder($child);
+                $result[Meta::ChildrenLines][] = $this->getItemLineOrder($child);
             }
         }
 
@@ -204,40 +206,40 @@ class Creator extends BaseCreator
         $this->addPropertySource('item', $item);
 
         $invoiceSettings = $this->config->getInvoiceSettings();
-        $this->addTokenDefault($result, 'itemnumber', $invoiceSettings['itemNumber']);
-        $this->addTokenDefault($result, 'product', $invoiceSettings['productName']);
-        $this->addTokenDefault($result, 'nature', $invoiceSettings['nature']);
+        $this->addTokenDefault($result, Tag::ItemNumber, $invoiceSettings['itemNumber']);
+        $this->addTokenDefault($result, Tag::Product, $invoiceSettings['productName']);
+        $this->addTokenDefault($result, Tag::Nature, $invoiceSettings['nature']);
 
         $lineVat = -((float) $item->getTaxAmount() + (float) $item->getDiscountTaxCompensationAmount());
         $productPriceEx = -((float) $item->getPrice());
 
         // On a credit note we only have single lines, no compound lines.
         $result += array(
-            'unitprice' => $productPriceEx,
-            'quantity' => $item->getQty(),
-            'meta-line-vatamount' => $lineVat,
+            Tag::UnitPrice => $productPriceEx,
+            Tag::Quantity => $item->getQty(),
+            Meta::LineVatAmount => $lineVat,
         );
 
         if ($this->productPricesIncludeTax()) {
             $productPriceInc = -((float) $item->getPriceInclTax());
-            $result['unitpriceinc'] = $productPriceInc;
+            $result[Meta::UnitPriceInc] = $productPriceInc;
         }
 
         $orderItemId = $item->getOrderItemId();
         if (!empty($orderItemId)) {
             $orderItem = $item->getOrderItem();
             $result += array(
-                'vatrate' => $orderItem->getTaxPercent(),
-                'meta-vatrate-source' => static::VatRateSource_Exact,
+                Tag::VatRate => $orderItem->getTaxPercent(),
+                Meta::VatRateSource => static::VatRateSource_Exact,
             );
         } else {
             $result += $this->getVatRangeTags($lineVat / $item->getQty(), $productPriceEx, 0.02, 0.02);
-            $result['meta-calculated-fields'][] = 'vatamount';
+            $result[Meta::CalculatedFields][] = Meta::VatAmount;
         }
 
         if (!Number::isZero($item->getDiscountAmount())) {
             // Credit note: discounts are cancelled, thus amount is positive.
-            $result['meta-line-discount-amountinc'] = $item->getDiscountAmount();
+            $result[Meta::LineDiscountAmountInc] = $item->getDiscountAmount();
         }
 
         $this->removePropertySource('item');
@@ -257,8 +259,8 @@ class Creator extends BaseCreator
         // free shipping is never refunded...
         if ($this->invoiceSource->getType() === Source::Order || !Number::isZero($magentoSource->getShippingAmount())) {
             $result += array(
-                'product' => $this->getShippingMethodName(),
-                'quantity' => 1,
+                Tag::Product => $this->getShippingMethodName(),
+                Tag::Quantity => 1,
             );
 
             // What do the following methods return:
@@ -281,30 +283,30 @@ class Creator extends BaseCreator
                 $shippingEx = $sign * $magentoSource->getShippingAmount();
                 $shippingVat = $shippingInc - $shippingEx;
                 $result += array(
-                        'unitprice' => $shippingEx,
-                        'unitpriceinc' => $shippingInc,
+                        Tag::UnitPrice => $shippingEx,
+                        Meta::UnitPriceInc => $shippingInc,
                     ) + $this->getVatRangeTags($shippingVat, $shippingEx, 0.02,
                         0.01);
-                $result['meta-calculated-fields'][] = 'vatamount';
+                $result[Meta::CalculatedFields][] = Meta::VatAmount;
 
                 // getShippingDiscountAmount() only exists on Orders.
                 if ($this->invoiceSource->getType() === Source::Order && !Number::isZero($magentoSource->getShippingDiscountAmount())) {
-                    $result['meta-line-discount-amountinc'] = -$sign * $magentoSource->getShippingDiscountAmount();
+                    $result[Meta::LineDiscountAmountInc] = -$sign * $magentoSource->getShippingDiscountAmount();
                 } elseif ($this->invoiceSource->getType() === Source::CreditNote
                     && !Number::floatsAreEqual($shippingVat, $magentoSource->getShippingTaxAmount(), 0.02)) {
                     // On credit notes, the shipping discount amount is not stored but can
                     // be deduced via the shipping discount tax amount and the shipping vat
-                    // rate. To get a more precise 'meta-line-discount-amountinc', we
+                    // rate. To get a more precise Meta::LineDiscountAmountInc, we
                     // compute that in the completor when we have corrected the vatrate.
-                    $result['meta-line-discount-vatamount'] = $sign * ($shippingVat - $sign * $magentoSource->getShippingTaxAmount());
+                    $result[Meta::LineDiscountVatAmount] = $sign * ($shippingVat - $sign * $magentoSource->getShippingTaxAmount());
                 }
             } else {
                 // Free shipping should get a "normal" tax rate. We leave that
                 // to the completor to determine.
                 $result += array(
-                    'unitprice' => 0,
-                    'vatrate' => null,
-                    'meta-vatrate-source' => static::VatRateSource_Completor,
+                    Tag::UnitPrice => 0,
+                    Tag::VatRate => null,
+                    Meta::VatRateSource => static::VatRateSource_Completor,
                 );
             }
         }

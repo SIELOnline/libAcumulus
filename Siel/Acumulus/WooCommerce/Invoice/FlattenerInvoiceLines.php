@@ -3,6 +3,8 @@ namespace Siel\Acumulus\WooCommerce\Invoice;
 
 use Siel\Acumulus\Invoice\Completor;
 use Siel\Acumulus\Invoice\FlattenerInvoiceLines as BaseFlattenerInvoiceLines;
+use Siel\Acumulus\Meta;
+use Siel\Acumulus\Tag;
 
 /**
  * Defines WooCommerce specific invoice line flattener logic.
@@ -18,60 +20,60 @@ class FlattenerInvoiceLines extends BaseFlattenerInvoiceLines
      */
     protected function collectInfoFromChildren(array $parent, array $children)
     {
-        if (isset($parent['meta-bundle-id'])) {
+        if (isset($parent[Meta::BundleId])) {
             $childrenLineAmount = 0.0;
-            $childrenLinePrecision = 0.0;
-            $copyIncData = isset($parent['unitpriceinc']);
+            $childrenLineAmountPrecision = 0.0;
+            $copyIncData = isset($parent[Meta::UnitPriceInc]);
             $childrenLineAmountInc = 0.0;
-            $childrenLinePrecisionInc = 0.0;
+            $childrenLineAmountIncPrecision = 0.0;
             $childrenVatRate = null;
             foreach ($children as $child) {
                 // Collect price ex data.
-                $childrenLineAmount += $child['unitprice'] * $child['quantity'];
-                $childrenLinePrecision += $child['meta-unitprice-precision'] * $child['quantity'];
+                $childrenLineAmount += $child[Tag::UnitPrice] * $child[Tag::Quantity];
+                $childrenLineAmountPrecision += $child[Meta::PrecisionUnitPrice] * $child[Tag::Quantity];
 
                 // Collect price inc data.
-                if (isset($child['unitpriceinc'])) {
-                    $childrenLineAmountInc += $child['unitpriceinc'] * $child['quantity'];
-                    $childrenLinePrecisionInc += $child['meta-unitpriceinc-precision'] * $child['quantity'];
+                if (isset($child[Meta::UnitPriceInc])) {
+                    $childrenLineAmountInc += $child[Meta::UnitPriceInc] * $child[Tag::Quantity];
+                    $childrenLineAmountIncPrecision += $child[Meta::PrecisionUnitPrice] * $child[Tag::Quantity];
                 } else {
                     // Price inc data is missing on a child line: do not copy.
                     $copyIncData = false;
                 }
 
                 // Collect vat rate data.
-                if (empty($child['vatrate'])) {
+                if (empty($child[Tag::VatRate])) {
                     // no vatrate on 1 of the children: do not assume they are
                     // all the same.
                     $childrenVatRate = false;
                 } elseif ($childrenVatRate === null) {
                     // 1st vat rate encountered: set it to this vat rate.
-                    $childrenVatRate = $child['vatrate'];
-                } elseif ($childrenVatRate != $child['vatrate']) {
+                    $childrenVatRate = $child[Tag::VatRate];
+                } elseif ($childrenVatRate != $child[Tag::VatRate]) {
                     // Different vat rates on children: do not use.
                     $childrenVatRate = false;
                 }
             }
 
             // Adjust parent amount and precision with child data.
-            $parent['unitprice'] +=  $childrenLineAmount / $parent['quantity'];
-            $parent['meta-unitprice-precision'] +=  $childrenLinePrecision / $parent['quantity'];
-            $parent['meta-bundle-children-line-amount'] =  $childrenLineAmount;
-            $parent['meta-bundle-children-line-precision'] =  $childrenLinePrecision;
+            $parent[Tag::UnitPrice] +=  $childrenLineAmount / $parent[Tag::Quantity];
+            $parent[Meta::PrecisionUnitPrice] +=  $childrenLineAmountPrecision / $parent[Tag::Quantity];
+            $parent[Meta::BundleChildrenLineAmount] =  $childrenLineAmount;
+            $parent[Meta::PrecisionBundleChildrenLineAmount] =  $childrenLineAmountPrecision;
 
             // Adjust parent amount inc and precision with child data.
             if ($copyIncData) {
-                $parent['unitpriceinc'] += $childrenLineAmountInc / $parent['quantity'];
-                $parent['meta-unitpriceinc-precision'] += $childrenLinePrecisionInc / $parent['quantity'];
-                $parent['meta-bundle-children-line-amountinc'] = $childrenLineAmountInc;
-                $parent['meta-bundle-children-line-precision-inc'] = $childrenLinePrecisionInc;
+                $parent[Meta::UnitPriceInc] += $childrenLineAmountInc / $parent[Tag::Quantity];
+                $parent[Meta::PrecisionUnitPrice] += $childrenLineAmountIncPrecision / $parent[Tag::Quantity];
+                $parent[Meta::BundleChildrenLineAmountInc] = $childrenLineAmountInc;
+                $parent[Meta::PrecisionBundleChildrenLineAmountInc] = $childrenLineAmountIncPrecision;
             }
 
             // Copy vat rate of children to parent (if all children have the
             // same vat rate).
-            if (empty($parent['vatrate']) && !empty($childrenVatRate)) {
-                $parent['vatrate'] = $childrenVatRate;
-                $parent['meta-vatrate-source'] = Completor::VatRateSource_Copied_From_Children;
+            if (empty($parent[Tag::VatRate]) && !empty($childrenVatRate)) {
+                $parent[Tag::VatRate] = $childrenVatRate;
+                $parent[Meta::VatRateSource] = Completor::VatRateSource_Copied_From_Children;
             }
         }
         return parent::collectInfoFromChildren($parent, $children);

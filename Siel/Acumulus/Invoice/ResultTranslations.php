@@ -4,8 +4,7 @@ namespace Siel\Acumulus\Invoice;
 use Siel\Acumulus\Helpers\TranslationCollection;
 
 /**
- * Contains translations for classes in the \Siel\Acumulus\Shop namespace:
- * - InvoiceManager
+ * Contains translations for invoice send result logging.
  */
 class ResultTranslations extends TranslationCollection
 {

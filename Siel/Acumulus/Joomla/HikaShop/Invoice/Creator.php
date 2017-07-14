@@ -5,6 +5,8 @@ use hikashopConfigClass;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
+use Siel\Acumulus\Meta;
+use Siel\Acumulus\Tag;
 use stdClass;
 
 /**
@@ -135,8 +137,8 @@ class Creator extends BaseCreator
             }
         }
         return array(
-            'meta-invoice-amountinc' => $this->order->order_full_price,
-            'meta-invoice-vatamount' => $vatAmount,
+            Meta::InvoiceAmountInc => $this->order->order_full_price,
+            Meta::InvoiceVatAmount => $vatAmount,
         );
     }
 
@@ -161,24 +163,24 @@ class Creator extends BaseCreator
         $result = array();
         $this->addPropertySource('item', $item);
         $invoiceSettings = $this->config->getInvoiceSettings();
-        $this->addTokenDefault($result, 'itemnumber', $invoiceSettings['itemNumber']);
-        $this->addTokenDefault($result, 'product', $invoiceSettings['productName']);
+        $this->addTokenDefault($result, Tag::ItemNumber, $invoiceSettings['itemNumber']);
+        $this->addTokenDefault($result, Tag::Product, $invoiceSettings['productName']);
         // Remove html with variant info from product name, we'll add that later
         // using children lines.
-        if (isset($result['product']) && ($pos = strpos($result['product'], '<span')) !== false) {
-            $result['product'] = substr($result['product'], 0, $pos);
+        if (isset($result[Tag::Product]) && ($pos = strpos($result[Tag::Product], '<span')) !== false) {
+            $result[Tag::Product] = substr($result[Tag::Product], 0, $pos);
         }
-        $this->addTokenDefault($result, 'nature', $invoiceSettings['nature']);
+        $this->addTokenDefault($result,Tag::Nature, $invoiceSettings['nature']);
 
         $productPriceEx = (float) $item->order_product_price;
         $productVat = (float) $item->order_product_tax;
 
         $result += array(
-                'unitprice' => $productPriceEx,
-                'meta-line-price' => $item->order_product_total_price_no_vat,
-                'meta-line-priceinc' => $item->order_product_total_price,
-                'quantity' => $item->order_product_quantity,
-                'vatamount' => $productVat,
+                Tag::UnitPrice => $productPriceEx,
+                Meta::LineAmount => $item->order_product_total_price_no_vat,
+                Meta::LineAmountInc => $item->order_product_total_price,
+                Tag::Quantity => $item->order_product_quantity,
+                Meta::VatAmount => $productVat,
             );
 
         // Note that this info remains correct when rates are changed as upon
@@ -191,8 +193,8 @@ class Creator extends BaseCreator
         }
         if (isset($vatRate)) {
             $vatInfo = array(
-                'vatrate' => 100.0 * $vatRate,
-                'meta-vatrate-source' => static::VatRateSource_Exact,
+                Tag::VatRate => 100.0 * $vatRate,
+                Meta::VatRateSource => static::VatRateSource_Exact,
             );
         } else {
             $vatInfo = $this->getVatRangeTags($productVat, $productPriceEx, 0.0001, 0.0001);
@@ -201,9 +203,9 @@ class Creator extends BaseCreator
 
         // Add variant info.
         if (!empty($item->order_product_options)) {
-            $children = $this->getVariantLines($item, $result['quantity'], $vatInfo);
+            $children = $this->getVariantLines($item, $result[Tag::Quantity], $vatInfo);
             if (!empty($children)) {
-                $result[Creator::Line_Children] = $children;
+                $result[Meta::ChildrenLines] = $children;
             }
         }
 
@@ -231,9 +233,9 @@ class Creator extends BaseCreator
             if (!is_numeric($key) && is_string($value)) {
                 // Add variant.
                 $result[] = array(
-                    'product' => $key . ': ' . $value,
-                    'unitprice' => 0,
-                    'quantity' => $parentQuantity,
+                    Tag::Product => $key . ': ' . $value,
+                    Tag::UnitPrice => 0,
+                    Tag::Quantity => $parentQuantity,
                 ) + $vatRangeTags;
             }
         }
@@ -257,10 +259,10 @@ class Creator extends BaseCreator
                 $vatInfo = $this->getVatRangeTags($shippingVat, $shippingEx, 0.0001, 0.0002);
 
                 $result = array(
-                        'product' => $this->getShippingMethodName(),
-                        'unitpriceinc' => $shippingInc,
-                        'quantity' => 1,
-                        'vatamount' => $shippingVat,
+                        Tag::Product => $this->getShippingMethodName(),
+                        Meta::UnitPriceInc => $shippingInc,
+                        Tag::Quantity => 1,
+                        Meta::VatAmount => $shippingVat,
                     ) + $vatInfo;
             }
         }
@@ -298,10 +300,10 @@ class Creator extends BaseCreator
                 : $this->t('discount_code') . ' ' . $this->order->order_discount_code;
 
             $result[] = array(
-                    'product' => $description,
-                    'unitpriceinc' => -$discountInc,
-                    'quantity' => 1,
-                    'vatamount' => -$discountVat,
+                    Tag::Product => $description,
+                    Meta::UnitPriceInc => -$discountInc,
+                    Tag::Quantity => 1,
+                    Meta::VatAmount => -$discountVat,
                 ) + $vatInfo;
         }
 
@@ -323,10 +325,10 @@ class Creator extends BaseCreator
             $description = $this->t('payment_costs');
 
             $result = array(
-                    'product' => $description,
-                    'unitpriceinc' => $paymentInc,
-                    'quantity' => 1,
-                    'vatamount' => $paymentVat,
+                    Tag::Product => $description,
+                    Meta::UnitPriceInc => $paymentInc,
+                    Tag::Quantity => 1,
+                    Meta::VatAmount => $paymentVat,
                 ) + $vatInfo;
         }
         return $result;

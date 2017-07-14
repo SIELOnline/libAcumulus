@@ -8,6 +8,7 @@ use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Result;
 use Siel\Acumulus\Invoice\ResultTranslations;
 use Siel\Acumulus\Invoice\Source;
+use Siel\Acumulus\Meta;
 use Siel\Acumulus\PluginConfig;
 
 /**
@@ -472,7 +473,7 @@ abstract class InvoiceManager
      */
     protected function isEmptyInvoice(array $invoice)
     {
-        return Number::isZero($invoice['customer']['invoice']['meta-invoice-amountinc']);
+        return Number::isZero($invoice['customer']['invoice'][Meta::InvoiceAmountInc]);
     }
 
     /**

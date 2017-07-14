@@ -3,6 +3,8 @@ namespace Siel\Acumulus\Invoice\CompletorStrategy;
 
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\CompletorStrategyBase;
+use Siel\Acumulus\Meta;
+use Siel\Acumulus\Tag;
 
 /**
  * Class TryAllTaxRatePermutations implements a vat completor strategy by trying
@@ -59,8 +61,8 @@ class TryAllVatRatePermutations extends CompletorStrategyBase
     {
         $this->vatRates = array();
         foreach ($this->possibleVatRates as $vatRate) {
-            if ($vatRate['vattype'] === $vatType) {
-                $this->vatRates[] = $vatRate['vatrate'];
+            if ($vatRate[Tag::VatType] === $vatType) {
+                $this->vatRates[] = $vatRate[Tag::VatRate];
             }
         }
         if ($include0) {
@@ -108,7 +110,7 @@ class TryAllVatRatePermutations extends CompletorStrategyBase
             $i++;
         }
 
-        $this->invoice['customer']['invoice']['meta-competor-strategy-' . $this->getName()] = sprintf("try1Permutation([%s]): %f", implode(', ', $permutation), $vatAmount);
+        $this->invoice['customer']['invoice'][Meta::StrategyCompletor . $this->getName()] = sprintf("try1Permutation([%s]): %f", implode(', ', $permutation), $vatAmount);
         // The strategy worked if the vat totals equals the vat to divide.
         return Number::floatsAreEqual($vatAmount, $this->vat2Divide);
     }

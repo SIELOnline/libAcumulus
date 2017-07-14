@@ -3,6 +3,8 @@ namespace Siel\Acumulus\Invoice;
 
 use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Helpers\Number;
+use Siel\Acumulus\Meta;
+use Siel\Acumulus\Tag;
 
 /**
  * The invoice lines completor class provides functionality to correct and
@@ -139,78 +141,78 @@ class CompletorInvoiceLines
     {
         foreach ($lines as &$line) {
             // Easy gain first. Known usages: Magento.
-            if (!isset($line['vatamount']) && isset($line['meta-line-vatamount'])) {
-                $line['vatamount'] = $line['meta-line-vatamount'] / $line['quantity'];
-                $line['meta-calculated-fields'][] = 'vatamount';
+            if (!isset($line[Meta::VatAmount]) && isset($line[Meta::LineVatAmount])) {
+                $line[Meta::VatAmount] = $line[Meta::LineVatAmount] / $line[Tag::Quantity];
+                $line[Meta::CalculatedFields][] = Meta::VatAmount;
             }
 
-            if (!isset($line['unitprice'])) {
+            if (!isset($line[Tag::UnitPrice])) {
                 // With margin scheme, the unitprice should be known but may
                 // have ended up in the unitpriceinc.
-                if (isset($line['costprice'])) {
-                    if (isset($line['unitpriceinc'])) {
-                        $line['unitprice'] = $line['unitpriceinc'];
+                if (isset($line[Tag::CostPrice])) {
+                    if (isset($line[Meta::UnitPriceInc])) {
+                        $line[Tag::UnitPrice] = $line[Meta::UnitPriceInc];
                     }
-                } elseif (isset($line['unitpriceinc'])) {
-                    if (Number::isZero($line['unitpriceinc'])) {
+                } elseif (isset($line[Meta::UnitPriceInc])) {
+                    if (Number::isZero($line[Meta::UnitPriceInc])) {
                         // Free products are free with and without VAT.
-                        $line['unitprice'] = 0;
-                    } elseif (isset($line['vatrate']) && Completor::isCorrectVatRate($line['meta-vatrate-source'])) {
-                         $line['unitprice'] = $line['unitpriceinc'] / (100.0 + $line['vatrate']) * 100.0;
-                    } elseif (isset($line['vatamount'])) {
-                        $line['unitprice'] = $line['unitpriceinc'] - $line['vatamount'];
-                    } else {
+                        $line[Tag::UnitPrice] = 0;
+                    } elseif (isset($line[Tag::VatRate]) && Completor::isCorrectVatRate($line[Meta::VatRateSource])) {
+                         $line[Tag::UnitPrice] = $line[Meta::UnitPriceInc] / (100.0 + $line[Tag::VatRate]) * 100.0;
+                    } elseif (isset($line[Meta::VatAmount])) {
+                        $line[Tag::UnitPrice] = $line[Meta::UnitPriceInc] - $line[Meta::VatAmount];
+                    } //else {
                         // We cannot fill in unitprice reliably, so better to
                         // leave it empty and fail clearly.
-                    }
-                    $line['meta-calculated-fields'][] = 'unitprice';
+                    //}
+                    $line[Meta::CalculatedFields][] = Tag::UnitPrice;
                 }
             }
 
-            if (!isset($line['unitpriceinc'])) {
+            if (!isset($line[Meta::UnitPriceInc])) {
                 // With margin scheme, the unitpriceinc equals unitprice.
-                if (isset($line['costprice'])) {
-                    if (isset($line['unitprice'])) {
-                        $line['unitpriceinc'] = $line['unitprice'];
+                if (isset($line[Tag::CostPrice])) {
+                    if (isset($line[Tag::UnitPrice])) {
+                        $line[Meta::UnitPriceInc] = $line[Tag::UnitPrice];
                     }
-                } elseif (isset($line['unitprice'])) {
-                    if (Number::isZero($line['unitprice'])) {
+                } elseif (isset($line[Tag::UnitPrice])) {
+                    if (Number::isZero($line[Tag::UnitPrice])) {
                         // Free products are free with and without VAT.
-                        $line['unitpriceinc'] = 0;
-                    } elseif (isset($line['vatrate']) && Completor::isCorrectVatRate($line['meta-vatrate-source'])) {
-                         $line['unitpriceinc'] = $line['unitprice'] * (100.0 + $line['vatrate']) / 100.0;
-                    } elseif (isset($line['vatamount'])) {
-                        $line['unitpriceinc'] = $line['unitprice'] + $line['vatamount'];
+                        $line[Meta::UnitPriceInc] = 0;
+                    } elseif (isset($line[Tag::VatRate]) && Completor::isCorrectVatRate($line[Meta::VatRateSource])) {
+                         $line[Meta::UnitPriceInc] = $line[Tag::UnitPrice] * (100.0 + $line[Tag::VatRate]) / 100.0;
+                    } elseif (isset($line[Meta::VatAmount])) {
+                        $line[Meta::UnitPriceInc] = $line[Tag::UnitPrice] + $line[Meta::VatAmount];
                     } //else {
                         // We cannot fill in unitpriceinc reliably, so we leave
                         // it empty as it is metadata after all.
                     // }
-                    $line['meta-calculated-fields'][] = 'unitpriceinc';
+                    $line[Meta::CalculatedFields][] = Meta::UnitPriceInc;
                 }
             }
 
-            if (!isset($line['vatrate'])) {
-                if ($line['meta-vatrate-source'] === Creator::VatRateSource_Parent && $parent !== null && Completor::isCorrectVatRate($parent['meta-vatrate-source'])) {
-                    $line['vatrate'] = $parent['vatrate'];
-                    $line['meta-vatrate-source'] = Completor::VatRateSource_Copied_From_Parent;
-                } elseif (isset($line['vatamount']) && isset($line['unitprice'])) {
+            if (!isset($line[Tag::VatRate])) {
+                if ($line[Meta::VatRateSource] === Creator::VatRateSource_Parent && $parent !== null && Completor::isCorrectVatRate($parent[Meta::VatRateSource])) {
+                    $line[Tag::VatRate] = $parent[Tag::VatRate];
+                    $line[Meta::VatRateSource] = Completor::VatRateSource_Copied_From_Parent;
+                } elseif (isset($line[Meta::VatAmount]) && isset($line[Tag::UnitPrice])) {
                     // This may use the easy gain, so known usages: Magento.
                     // Set (overwrite the tag vatrate-source) vatrate and
                     // accompanying tags.
                     $precision = 0.01;
                     // If the amounts are the sum of amounts taken from
                     // children products, the precision may be lower.
-                    if (!empty($line[Creator::Line_Children])) {
-                        $precision *= count($line[Creator::Line_Children]);
+                    if (!empty($line[Meta::ChildrenLines])) {
+                        $precision *= count($line[Meta::ChildrenLines]);
                     }
-                    $line = array_merge($line, Creator::getVatRangeTags($line['vatamount'], $line['unitprice'], $precision, $precision));
-                    $line['meta-calculated-fields'][] = 'vatrate';
+                    $line = array_merge($line, Creator::getVatRangeTags($line[Meta::VatAmount], $line[Tag::UnitPrice], $precision, $precision));
+                    $line[Meta::CalculatedFields][] = Tag::VatRate;
                 }
             }
 
             // Recursively complete the required data.
-            if (!empty($line[Creator::Line_Children])) {
-                $line[Creator::Line_Children] = $this->completeLineRequiredData($line[Creator::Line_Children], $line);
+            if (!empty($line[Meta::ChildrenLines])) {
+                $line[Meta::ChildrenLines] = $this->completeLineRequiredData($line[Meta::ChildrenLines], $line);
             }
         }
         return $lines;
@@ -231,11 +233,11 @@ class CompletorInvoiceLines
     protected function correctCalculatedVatRates(array $lines)
     {
         foreach ($lines as &$line) {
-            if (!empty($line['meta-vatrate-source']) && $line['meta-vatrate-source'] === Creator::VatRateSource_Calculated) {
+            if (!empty($line[Meta::VatRateSource]) && $line[Meta::VatRateSource] === Creator::VatRateSource_Calculated) {
                 $line = $this->correctVatRateByRange($line);
             }
-            if (!empty($line[Creator::Line_Children])) {
-                $line[Creator::Line_Children] = $this->correctCalculatedVatRates($line[Creator::Line_Children]);
+            if (!empty($line[Meta::ChildrenLines])) {
+                $line[Meta::ChildrenLines] = $this->correctCalculatedVatRates($line[Meta::ChildrenLines]);
             }
         }
         return $lines;
@@ -269,7 +271,7 @@ class CompletorInvoiceLines
     {
         $matchedVatRates = array();
         foreach ($this->possibleVatRates as $vatRateInfo) {
-            if ($vatRateInfo['vatrate'] >= $line['meta-vatrate-min'] && $vatRateInfo['vatrate'] <= $line['meta-vatrate-max']) {
+            if ($vatRateInfo[Tag::VatRate] >= $line[Meta::VatRateMin] && $vatRateInfo[Tag::VatRate] <= $line[Meta::VatRateMax]) {
                 $matchedVatRates[] = $vatRateInfo;
             }
         }
@@ -277,25 +279,25 @@ class CompletorInvoiceLines
         $vatRate = $this->getUniqueVatRate($matchedVatRates);
         if ($vatRate !== null && $vatRate !== false) {
             // We have a single match: fill it in as the vat rate for this line.
-            $line['vatrate'] = $vatRate;
-            $line['meta-vatrate-source'] = Completor::VatRateSource_Calculated_Corrected;
+            $line[Tag::VatRate] = $vatRate;
+            $line[Meta::VatRateSource] = Completor::VatRateSource_Calculated_Corrected;
         } else {
             // We remove the calculated vatrate.
-            unset($line['vatrate']);
+            unset($line[Tag::VatRate]);
             if ($vatRate === null) {
-                $line['meta-vatrate-matches'] = 'none';
+                $line[Meta::VatRateMatches] = 'none';
             } else {
-                $line['meta-vatrate-matches'] = array_reduce($matchedVatRates,
+                $line[Meta::VatRateMatches] = array_reduce($matchedVatRates,
                   function ($carry, $item) {
-                      return $carry . ($carry === '' ? '' : ',') . $item['vatrate'] . '(' . $item['vattype'] . ')';
+                      return $carry . ($carry === '' ? '' : ',') . $item[Tag::VatRate] . '(' . $item[Tag::VatType] . ')';
                   }, '');
             }
 
             // If this line may be split, we make it a strategy line (even
             // though 2 out of the 3 fields ex, inc, and vat are known). This
             // way the strategy phase gets a chance to correct this line.
-            if (!empty($line['meta-strategy-split'])) {
-                $line['meta-vatrate-source'] = Creator::VatRateSource_Strategy;
+            if (!empty($line[Meta::StrategySplit])) {
+                $line[Meta::VatRateSource] = Creator::VatRateSource_Strategy;
             }
         }
         return $line;
@@ -315,8 +317,8 @@ class CompletorInvoiceLines
         $result = array_reduce($matchedVatRates, function ($carry, $matchedVatRate) {
             if ($carry === null) {
                 // 1st item: return its vat rate.
-                return $matchedVatRate['vatrate'];
-            } elseif ($carry == $matchedVatRate['vatrate']) {
+                return $matchedVatRate[Tag::VatRate];
+            } elseif ($carry == $matchedVatRate[Tag::VatRate]) {
                 // Note that in PHP: '21' == '21.0000' returns true. So using ==
                 // works. Vat rate equals all previous vat rates: return that
                 // vat rate.
@@ -347,13 +349,13 @@ class CompletorInvoiceLines
     protected function addVatRateToLookupLines(array $lines)
     {
         foreach ($lines as &$line) {
-            if ($line['meta-vatrate-source'] === Creator::VatRateSource_Completor && $line['vatrate'] === null && Number::isZero($line['unitprice'])) {
-                if (!empty($line['meta-vatrate-lookup']) && $this->isPossibleVatRate($line['meta-vatrate-lookup'])) {
+            if ($line[Meta::VatRateSource] === Creator::VatRateSource_Completor && $line[Tag::VatRate] === null && Number::isZero($line[Tag::UnitPrice])) {
+                if (!empty($line[Meta::VatRateLookup]) && $this->isPossibleVatRate($line[Meta::VatRateLookup])) {
                     // The vat rate looked up on the product is a possible vat
                     // rate, so apparently that vat rate did not change between
                     // the date of the order and now: take that one.
-                    $line['vatrate'] = $line['meta-vatrate-lookup'];
-                    $line['meta-vatrate-source'] = Completor::VatRateSource_Looked_Up;
+                    $line[Tag::VatRate] = $line[Meta::VatRateLookup];
+                    $line[Meta::VatRateSource] = Completor::VatRateSource_Looked_Up;
                 }
             }
         }
@@ -378,12 +380,12 @@ class CompletorInvoiceLines
         $maxVatRate = $this->getMaxAppearingVatRate($lines);
 
         foreach ($lines as &$line) {
-            if ($line['meta-vatrate-source'] === Creator::VatRateSource_Completor && $line['vatrate'] === null && Number::isZero($line['unitprice'])) {
+            if ($line[Meta::VatRateSource] === Creator::VatRateSource_Completor && $line[Tag::VatRate] === null && Number::isZero($line[Tag::UnitPrice])) {
                 if ($maxVatRate !== null) {
-                    $line['vatrate'] = $maxVatRate;
-                    $line['meta-vatrate-source'] = Completor::VatRateSource_Completor_Completed;
+                    $line[Tag::VatRate] = $maxVatRate;
+                    $line[Meta::VatRateSource] = Completor::VatRateSource_Completor_Completed;
                 } else {
-                    $line['meta-vatrate-source'] = Creator::VatRateSource_Strategy;
+                    $line[Meta::VatRateSource] = Creator::VatRateSource_Strategy;
                 }
             }
         }
@@ -405,9 +407,9 @@ class CompletorInvoiceLines
         $index = null;
         $maxVatRate = -1.0;
         foreach ($lines as $key => $line) {
-            if (isset($line['vatrate']) && (float) $line['vatrate'] > $maxVatRate) {
+            if (isset($line[Tag::VatRate]) && (float) $line[Tag::VatRate] > $maxVatRate) {
                 $index = $key;
-                $maxVatRate = (float) $line['vatrate'];
+                $maxVatRate = (float) $line[Tag::VatRate];
             }
         }
         return $maxVatRate;
@@ -425,7 +427,7 @@ class CompletorInvoiceLines
     protected function isPossibleVatRate($vatRate) {
         $result = false;
         foreach ($this->possibleVatRates as $vatRateInfo) {
-            if (Number::floatsAreEqual($vatRate, $vatRateInfo['vatrate'])) {
+            if (Number::floatsAreEqual($vatRate, $vatRateInfo[Tag::VatRate])) {
                 $result = TRUE;
                 break;
             }
@@ -464,32 +466,32 @@ class CompletorInvoiceLines
     protected function completeLineMetaData(array $lines)
     {
         foreach ($lines as &$line) {
-            if (Completor::isCorrectVatRate($line['meta-vatrate-source'])) {
-                if (!isset($line['unitpriceinc'])) {
-                    $line['unitpriceinc'] = $line['unitprice'] / 100.0 * (100.0 + $line['vatrate']);
-                    $line['meta-calculated-fields'][] = 'unitpriceinc';
+            if (Completor::isCorrectVatRate($line[Meta::VatRateSource])) {
+                if (!isset($line[Meta::UnitPriceInc])) {
+                    $line[Meta::UnitPriceInc] = $line[Tag::UnitPrice] / 100.0 * (100.0 + $line[Tag::VatRate]);
+                    $line[Meta::CalculatedFields][] = Meta::UnitPriceInc;
                 }
-                if (!isset($line['vatamount'])) {
-                    $line['vatamount'] = $line['vatrate'] / 100.0 * $line['unitprice'];
-                    $line['meta-calculated-fields'][] = 'vatamount';
+                if (!isset($line[Meta::VatAmount])) {
+                    $line[Meta::VatAmount] = $line[Tag::VatRate] / 100.0 * $line[Tag::UnitPrice];
+                    $line[Meta::CalculatedFields][] = Meta::VatAmount;
                 }
-                if (isset($line['meta-line-discount-vatamount']) && !isset($line['meta-line-discount-amountinc'])) {
-                    $line['meta-line-discount-amountinc'] = $line['meta-line-discount-vatamount'] / $line['vatrate'] * (100 + $line['vatrate']);
-                    $line['meta-calculated-fields'][] = 'meta-line-discount-amountinc';
+                if (isset($line[Meta::LineDiscountVatAmount]) && !isset($line[Meta::LineDiscountAmountInc])) {
+                    $line[Meta::LineDiscountAmountInc] = $line[Meta::LineDiscountVatAmount] / $line[Tag::VatRate] * (100 + $line[Tag::VatRate]);
+                    $line[Meta::CalculatedFields][] = Meta::LineDiscountAmountInc;
                 }
-            } elseif ($line['meta-vatrate-source'] == Creator::VatRateSource_Strategy && !empty($line['meta-strategy-split'])) {
-                if (isset($line['unitprice']) && isset($line['unitpriceinc'])) {
-                    if (!isset($line['meta-line-price'])) {
-                        $line['meta-line-price'] = $line['unitprice'] * $line['quantity'];
+            } elseif ($line[Meta::VatRateSource] == Creator::VatRateSource_Strategy && !empty($line[Meta::StrategySplit])) {
+                if (isset($line[Tag::UnitPrice]) && isset($line[Meta::UnitPriceInc])) {
+                    if (!isset($line[Meta::LineAmount])) {
+                        $line[Meta::LineAmount] = $line[Tag::UnitPrice] * $line[Tag::Quantity];
                     }
-                    if (!isset($line['meta-line-priceinc'])) {
-                        $line['meta-line-priceinc'] = $line['unitpriceinc'] * $line['quantity'];
+                    if (!isset($line[Meta::LineAmountInc])) {
+                        $line[Meta::LineAmountInc] = $line[Meta::UnitPriceInc] * $line[Tag::Quantity];
                     }
                 }
             }
 
-            if (isset($line['meta-calculated-fields'])) {
-                $line['meta-calculated-fields'] = implode(',', array_unique($line['meta-calculated-fields']));
+            if (isset($line[Meta::CalculatedFields])) {
+                $line[Meta::CalculatedFields] = implode(',', array_unique($line[Meta::CalculatedFields]));
             }
         }
         return $lines;

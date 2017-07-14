@@ -3,6 +3,8 @@ namespace Siel\Acumulus\Invoice;
 
 use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Helpers\Number;
+use Siel\Acumulus\Meta;
+use Siel\Acumulus\Tag;
 
 /**
  * The invoice lines flattener class provides functionality to flatten and
@@ -69,10 +71,10 @@ class FlattenerInvoiceLines
             $children = null;
             // Ignore children if we do not want to show them.
             // If it has children, flatten them and determine how to add them.
-            if (array_key_exists(Creator::Line_Children, $line)) {
-                $children = $this->flattenInvoiceLines($line[Creator::Line_Children]);
+            if (array_key_exists(Meta::ChildrenLines, $line)) {
+                $children = $this->flattenInvoiceLines($line[Meta::ChildrenLines]);
                 // Remove children from parent.
-                unset($line[Creator::Line_Children]);
+                unset($line[Meta::ChildrenLines]);
                 // Determine whether to add them at all and if so whether
                 // to add them as a single line or as separate lines.
                 if ($this->keepSeparateLines($line, $children)) {
@@ -158,10 +160,10 @@ class FlattenerInvoiceLines
     {
         $childrenTexts = array();
         foreach ($children as $child) {
-            $childrenTexts[] = $child['product'];
+            $childrenTexts[] = $child[Tag::Product];
         }
         $childrenText = ' (' . implode(', ', $childrenTexts) . ')';
-        return $parent['product'] .  $childrenText;
+        return $parent[Tag::Product] .  $childrenText;
     }
 
     /**
@@ -190,11 +192,11 @@ class FlattenerInvoiceLines
     protected function correctInfoBetweenParentAndChildren(array &$parent, array &$children)
     {
         if (!empty($children)) {
-            $parent['meta-parent'] = $this->parentIndex;
-            $parent['meta-children'] = count($children);
+            $parent[Meta::Parent] = $this->parentIndex;
+            $parent[Meta::NumberOfChildren] = count($children);
             foreach ($children as &$child) {
-                $child['product'] = $this->indentDescription($child['product']);
-                $child['meta-parent-index'] = $this->parentIndex;
+                $child[Tag::Product] = $this->indentDescription($child[Tag::Product]);
+                $child[Meta::ParentIndex] = $this->parentIndex;
             }
             $this->parentIndex++;
         }
@@ -233,10 +235,10 @@ class FlattenerInvoiceLines
     {
         $invoiceSettings = $this->config->getInvoiceSettings();
         if (!$invoiceSettings['optionsShow']) {
-            $parent['meta-children-not-shown'] = count($children);
+            $parent[Meta::ChildrenNotShown] = count($children);
         } else {
-            $parent['product'] = $this->getMergedLinesText($parent, $children);
-            $parent['meta-children-merged'] = count($children);
+            $parent[Tag::Product] = $this->getMergedLinesText($parent, $children);
+            $parent[Meta::ChildrenMerged] = count($children);
         }
         return $parent;
     }
@@ -317,7 +319,7 @@ class FlattenerInvoiceLines
      */
     protected function keepChildrenAndPriceOnParentAndChildren(array &$parent, array &$children)
     {
-        if (!Completor::isCorrectVatRate($parent['meta-vatrate-source']) || Number::isZero($parent['vatrate'])) {
+        if (!Completor::isCorrectVatRate($parent[Meta::VatRateSource]) || Number::isZero($parent[Tag::VatRate])) {
             $parent = $this->copyVatInfoToParent($parent, $children);
         }
         $parent = $this->removePriceInfoFromParent($parent);
@@ -363,34 +365,34 @@ class FlattenerInvoiceLines
     protected function copyVatInfoToChildren(array $parent, array $children)
     {
         foreach ($children as &$child) {
-            $child['vatrate'] = $parent['vatrate'];
-            $child['vatamount'] = 0;
-            if (Completor::isCorrectVatRate($parent['meta-vatrate-source'])) {
-                $child['meta-vatrate-source'] = Completor::VatRateSource_Copied_From_Parent;
-                unset($child['meta-vatrate-min']);
-                unset($child['meta-vatrate-max']);
-                unset($child['meta-vatrate-lookup']);
+            $child[Tag::VatRate] = $parent[Tag::VatRate];
+            $child[Meta::VatAmount] = 0;
+            if (Completor::isCorrectVatRate($parent[Meta::VatRateSource])) {
+                $child[Meta::VatRateSource] = Completor::VatRateSource_Copied_From_Parent;
+                unset($child[Meta::VatRateMin]);
+                unset($child[Meta::VatRateMax]);
+                unset($child[Meta::VatRateLookup]);
             } else {
-                $child['meta-vatrate-source'] = $parent['meta-vatrate-source'];
-                if (isset($parent['meta-vatrate-min'])) {
-                    $child['meta-vatrate-min'] = $parent['meta-vatrate-min'];
+                $child[Meta::VatRateSource] = $parent[Meta::VatRateSource];
+                if (isset($parent[Meta::VatRateMin])) {
+                    $child[Meta::VatRateMin] = $parent[Meta::VatRateMin];
                 } else {
-                    unset($child['meta-vatrate-min']);
+                    unset($child[Meta::VatRateMin]);
                 }
-                if (isset($parent['meta-vatrate-max'])) {
-                    $child['meta-vatrate-max'] = $parent['meta-vatrate-max'];
+                if (isset($parent[Meta::VatRateMax])) {
+                    $child[Meta::VatRateMax] = $parent[Meta::VatRateMax];
                 } else {
-                    unset($child['meta-vatrate-max']);
+                    unset($child[Meta::VatRateMax]);
                 }
-                if (isset($parent['meta-vatrate-lookup'])) {
-                    $child['meta-vatrate-lookup'] = $parent['meta-vatrate-lookup'];
+                if (isset($parent[Meta::VatRateLookup])) {
+                    $child[Meta::VatRateLookup] = $parent[Meta::VatRateLookup];
                 } else {
-                    unset($child['meta-vatrate-lookup']);
+                    unset($child[Meta::VatRateLookup]);
                 }
             }
 
-            $child['meta-line-vatamount'] = 0;
-            unset($child['meta-line-discount-vatamount']);
+            $child[Meta::LineVatAmount] = 0;
+            unset($child[Meta::LineDiscountVatAmount]);
         }
         return $children;
     }
@@ -409,24 +411,24 @@ class FlattenerInvoiceLines
      *   The parent invoice line with price info removed.
      */
     protected function copyVatInfoToParent(array $parent, array $children) {
-        $parent['vatamount'] = 0;
+        $parent[Meta::VatAmount] = 0;
         // Copy vat rate info from a child when the parent has no vat rate info.
-        if (empty($parent['vatrate']) || Number::isZero($parent['vatrate'])) {
-            $parent['vatrate'] = CompletorInvoiceLines::getMaxAppearingVatRate($children, $index);
-            $parent['meta-vatrate-source'] = Completor::VatRateSource_Copied_From_Children;
-            if (isset($children[$index]['meta-vatrate-min'])) {
-                $parent['meta-vatrate-min'] = $children[$index]['meta-vatrate-min'];
+        if (empty($parent[Tag::VatRate]) || Number::isZero($parent[Tag::VatRate])) {
+            $parent[Tag::VatRate] = CompletorInvoiceLines::getMaxAppearingVatRate($children, $index);
+            $parent[Meta::VatRateSource] = Completor::VatRateSource_Copied_From_Children;
+            if (isset($children[$index][Meta::VatRateMin])) {
+                $parent[Meta::VatRateMin] = $children[$index][Meta::VatRateMin];
             } else {
-                unset($parent['meta-vatrate-min']);
+                unset($parent[Meta::VatRateMin]);
             }
-            if (isset($children[$index]['meta-vatrate-max'])) {
-                $parent['meta-vatrate-max'] = $children[$index]['meta-vatrate-max'];
+            if (isset($children[$index][Meta::VatRateMax])) {
+                $parent[Meta::VatRateMax] = $children[$index][Meta::VatRateMax];
             } else {
-                unset($parent['meta-vatrate-max']);
+                unset($parent[Meta::VatRateMax]);
             }
         }
-        $parent['meta-line-vatamount'] = 0;
-        unset($parent['meta-line-discount-vatamount']);
+        $parent[Meta::LineVatAmount] = 0;
+        unset($parent[Meta::LineDiscountVatAmount]);
 
         return $parent;
     }
@@ -448,11 +450,11 @@ class FlattenerInvoiceLines
     protected function removePriceInfoFromChildren(array $children)
     {
         foreach ($children as &$child) {
-            $child['unitprice'] = 0;
-            $child['unitpriceinc'] = 0;
-            unset($child['meta-line-price']);
-            unset($child['meta-line-priceinc']);
-            unset($child['meta-line-discount-amountinc']);
+            $child[Tag::UnitPrice] = 0;
+            $child[Meta::UnitPriceInc] = 0;
+            unset($child[Meta::LineAmount]);
+            unset($child[Meta::LineAmountInc]);
+            unset($child[Meta::LineDiscountAmountInc]);
         }
         return $children;
     }
@@ -470,11 +472,11 @@ class FlattenerInvoiceLines
      */
     protected function removePriceInfoFromParent(array $parent)
     {
-        $parent['unitprice'] = 0;
-        $parent['unitpriceinc'] = 0;
-        unset($parent['meta-line-price']);
-        unset($parent['meta-line-priceinc']);
-        unset($parent['meta-line-discount-amountinc']);
+        $parent[Tag::UnitPrice] = 0;
+        $parent[Meta::UnitPriceInc] = 0;
+        unset($parent[Meta::LineAmount]);
+        unset($parent[Meta::LineAmountInc]);
+        unset($parent[Meta::LineDiscountAmountInc]);
         return $parent;
     }
 
@@ -510,8 +512,8 @@ class FlattenerInvoiceLines
     {
         $vatRates = array();
         foreach ($lines as $line) {
-            if (isset($line['vatrate'])) {
-                $vatRate = sprintf('%.1f', $line['vatrate']);
+            if (isset($line[Tag::VatRate])) {
+                $vatRate = sprintf('%.1f', $line[Tag::VatRate]);
                 if (isset($vatRates[$vatRate])) {
                     $vatRates[$vatRate]++;
                 } else {

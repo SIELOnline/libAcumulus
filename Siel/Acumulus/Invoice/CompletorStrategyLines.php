@@ -3,6 +3,7 @@ namespace Siel\Acumulus\Invoice;
 
 use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Helpers\TranslatorInterface;
+use Siel\Acumulus\Meta;
 
 /**
  * The strategy lines completor class provides functionality to correct and
@@ -87,7 +88,7 @@ class CompletorStrategyLines
     protected function completeStrategyLines()
     {
         if ($this->invoiceHasStrategyLine()) {
-            $this->invoice['customer']['invoice']['meta-completor-strategy-input']['vat-rates'] = str_replace(array(' ', "\r", "\n", "\t"), '', var_export($this->possibleVatRates, true));
+            $this->invoice['customer']['invoice'][Meta::StrategyCompletorInput]['vat-rates'] = str_replace(array(' ', "\r", "\n", "\t"), '', var_export($this->possibleVatRates, true));
 
             $isFirst = true;
             $strategies = $this->getStrategyClasses();
@@ -95,16 +96,16 @@ class CompletorStrategyLines
                 /** @var CompletorStrategyBase $strategy */
                 $strategy = new $strategyClass($this->config, $this->translator, $this->invoice, $this->possibleVatTypes, $this->possibleVatRates, $this->source);
                 if ($isFirst) {
-                    $this->invoice['customer']['invoice']['meta-completor-strategy-input']['vat-2-divide'] = $strategy->getVat2Divide();
-                    $this->invoice['customer']['invoice']['meta-completor-strategy-input']['vat-breakdown'] = str_replace(array(' ', "\r", "\n", "\t"), '', var_export($strategy->getVatBreakdown(), true));
+                    $this->invoice['customer']['invoice'][Meta::StrategyCompletorInput]['vat-2-divide'] = $strategy->getVat2Divide();
+                    $this->invoice['customer']['invoice'][Meta::StrategyCompletorInput]['vat-breakdown'] = str_replace(array(' ', "\r", "\n", "\t"), '', var_export($strategy->getVatBreakdown(), true));
                     $isFirst = false;
                 }
                 if ($strategy->apply()) {
                     $this->replaceLinesCompleted($strategy->getLinesCompleted(), $strategy->getReplacingLines(), $strategy->getName());
-                    if (empty($this->invoice['customer']['invoice']['meta-completor-strategy-used'])) {
-                        $this->invoice['customer']['invoice']['meta-completor-strategy-used'] = $strategy->getDescription();
+                    if (empty($this->invoice['customer']['invoice'][Meta::StrategyCompletorUsed])) {
+                        $this->invoice['customer']['invoice'][Meta::StrategyCompletorUsed] = $strategy->getDescription();
                     } else {
-                        $this->invoice['customer']['invoice']['meta-completor-strategy-used'] .= '; ' . $strategy->getDescription();
+                        $this->invoice['customer']['invoice'][Meta::StrategyCompletorUsed] .= '; ' . $strategy->getDescription();
                     }
                     // Allow for partial solutions: a strategy may correct only some of
                     // the strategy lines and leave the rest up to other strategies.
@@ -126,7 +127,7 @@ class CompletorStrategyLines
     {
         $result = false;
         foreach ($this->invoiceLines as $line) {
-            if ($line['meta-vatrate-source'] === Creator::VatRateSource_Strategy) {
+            if ($line[Meta::VatRateSource] === Creator::VatRateSource_Strategy) {
                 $result = true;
                 break;
             }
@@ -173,9 +174,9 @@ class CompletorStrategyLines
 
         // And merge in the new completed ones.
         foreach ($completedLines as &$completedLine) {
-            if ($completedLine['meta-vatrate-source'] === Creator::VatRateSource_Strategy) {
-                $completedLine['meta-vatrate-source'] = Completor::VatRateSource_Strategy_Completed;
-                $completedLine['meta-strategy-used'] = $strategyName;
+            if ($completedLine[Meta::VatRateSource] === Creator::VatRateSource_Strategy) {
+                $completedLine[Meta::VatRateSource] = Completor::VatRateSource_Strategy_Completed;
+                $completedLine[Meta::StrategyCompletorUsed] = $strategyName;
             }
         }
         $this->invoice['customer']['invoice']['line'] = array_merge($lines, $completedLines);

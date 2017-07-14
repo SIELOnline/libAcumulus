@@ -4,7 +4,9 @@ namespace Siel\Acumulus\OpenCart\Invoice;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
+use Siel\Acumulus\Meta;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
+use Siel\Acumulus\Tag;
 
 /**
  * Allows to create arrays in the Acumulus invoice structure from an OpenCart
@@ -92,16 +94,16 @@ class Creator extends BaseCreator
     protected function getInvoiceTotals()
     {
         $result = array(
-            'meta-invoice-amountinc' => $this->order['total'],
-            'meta-invoice-vatamount' => 0.0,
-            'meta-invoice-vat' => array(),
+            Meta::InvoiceAmountInc => $this->order['total'],
+            Meta::InvoiceVatAmount => 0.0,
+            Meta::InvoiceVat => array(),
         );
 
         $orderTotals = $this->getOrderTotalLines();
         foreach ($orderTotals as $totalLine) {
             if ($totalLine['code'] === 'tax') {
-                $result['meta-invoice-vat'][] = $totalLine['title'] . ': ' . $totalLine['value'];
-                $result['meta-invoice-vatamount'] += $totalLine['value'];
+                $result[Meta::InvoiceVat][] = $totalLine['title'] . ': ' . $totalLine['value'];
+                $result[Meta::InvoiceVatAmount] += $totalLine['value'];
             }
         }
         return $result;
@@ -158,9 +160,9 @@ class Creator extends BaseCreator
         $this->addPropertySource('item', $item);
 
         $invoiceSettings = $this->config->getInvoiceSettings();
-        $this->addTokenDefault($result, 'itemnumber', $invoiceSettings['itemNumber']);
-        $this->addTokenDefault($result, 'product', $invoiceSettings['productName']);
-        $this->addTokenDefault($result, 'nature', $invoiceSettings['nature']);
+        $this->addTokenDefault($result, Tag::ItemNumber, $invoiceSettings['itemNumber']);
+        $this->addTokenDefault($result, Tag::Product, $invoiceSettings['productName']);
+        $this->addTokenDefault($result, Tag::Nature, $invoiceSettings['nature']);
 
         // Get vat range info from item line.
         $productPriceEx = $item['price'];
@@ -170,26 +172,26 @@ class Creator extends BaseCreator
         // Try to look up the vat rate via product.
         $vatInfo += $this->getVatRateLookupMetadata($product['tax_class_id']);
 
-        $result['unitprice'] = $productPriceEx;
-        $result['quantity'] = $item['quantity'];
+        $result[Tag::UnitPrice] = $productPriceEx;
+        $result[Tag::Quantity] = $item['quantity'];
         $result += $vatInfo;
-        $result['vatamount'] = $productVat;
+        $result[Meta::VatAmount] = $productVat;
 
         // Options (variants).
         $options = $this->getOrderModel()->getOrderOptions($item['order_id'], $item['order_product_id']);
         if (!empty($options)) {
             // Add options as children.
-            $result[Creator::Line_Children] = array();
+            $result[Meta::ChildrenLines] = array();
             $optionsVatInfo = $vatInfo;
-            $optionsVatInfo['vatamount'] = 0;
+            $optionsVatInfo[Meta::VatAmount] = 0;
             foreach ($options as $option) {
-                $result[Creator::Line_Children][] = array(
-                    'product' => "{$option['name']}: {$option['value']}",
-                    'unitprice' => 0,
+                $result[Meta::ChildrenLines][] = array(
+                    Tag::Product => "{$option['name']}: {$option['value']}",
+                    Tag::UnitPrice => 0,
                       // Table order_option does not have a quantity field, so
                       // composite products with multiple same sub product
                       // are apparently not covered. Take quantity from parent.
-                    'quantity' => $item['quantity'],
+                    Tag::Quantity => $item['quantity'],
                   ) + $optionsVatInfo;
             }
         }
@@ -206,8 +208,8 @@ class Creator extends BaseCreator
      *   The tax class to look up the vat rate for.
      *
      * @return array
-     *   Either an array with keys 'meta-vatrate-lookup' and
-     *  'meta-vatrate-lookup-label' or an empty array.
+     *   Either an array with keys Meta::VatRateLookup and
+     *  Meta::VatRateLookupLabel or an empty array.
      */
     protected function getVatRateLookupMetadata($taxClassId) {
         $result = array();
@@ -226,9 +228,9 @@ class Creator extends BaseCreator
             }
         }
         if (count($vatRates) === 1) {
-            $result['meta-vatrate-lookup'] = reset($vatRates);
+            $result[Meta::VatRateLookup] = reset($vatRates);
             // Take the first name (if there were more tax rates).
-            $result['meta-vatrate-lookup-label'] = $label;
+            $result[Meta::VatRateLookupLabel] = $label;
         }
         return $result;
     }
@@ -285,11 +287,11 @@ class Creator extends BaseCreator
                     break;
                 case 'shipping':
                     $line = $this->getTotalLine($totalLine);
-                    $line['meta-line-type'] = static::LineType_Shipping;
+                    $line[Meta::LineType] = static::LineType_Shipping;
                     break;
                 case 'coupon':
                     $line = $this->getTotalLine($totalLine);
-                    $line['meta-line-type'] = static::LineType_Discount;
+                    $line[Meta::LineType] = static::LineType_Discount;
                     break;
                 case 'tax':
                     // Tax line: added to invoice level
@@ -297,7 +299,7 @@ class Creator extends BaseCreator
                     break;
                 case 'voucher':
                     $line = $this->getTotalLine($totalLine);
-                    $line['meta-line-type'] = static::LineType_Voucher;
+                    $line[Meta::LineType] = static::LineType_Voucher;
                     break;
                 case 'total':
                     // Overall total: ignore.
@@ -305,7 +307,7 @@ class Creator extends BaseCreator
                     break;
                 default:
                     $line = $this->getTotalLine($totalLine);
-                    $line['meta-line-type'] = static::LineType_Other;
+                    $line[Meta::LineType] = static::LineType_Other;
                     break;
             }
             if ($line) {
@@ -326,24 +328,24 @@ class Creator extends BaseCreator
     protected function getTotalLine(array $line)
     {
         $result = array(
-            'product' => $line['title'],
+            Tag::Product => $line['title'],
             // Let's hope that this is the value ex vat...
-            'unitprice' => $line['value'],
-            'quantity' => 1,
+            Tag::UnitPrice => $line['value'],
+            Tag::Quantity => 1,
         );
 
         if ($line['code'] === 'voucher') {
             // A voucher is to be seen as a partial payment, thus no tax.
             $result += array(
-                'vatrate' => -1,
-                'meta-vatrate-source' => Creator::VatRateSource_Exact0,
+                Tag::VatRate => -1,
+                Meta::VatRateSource => Creator::VatRateSource_Exact0,
             );
         } elseif ($line['code'] === 'coupon') {
             // Coupons may have to be split over various taxes.
             $result += array(
-                'vatrate' => null,
-                'meta-vatrate-source' => Creator::VatRateSource_Strategy,
-                'meta-strategy-split' => $line['code'] === 'coupon',
+                Tag::VatRate => null,
+                Meta::VatRateSource => Creator::VatRateSource_Strategy,
+                Meta::StrategySplit => $line['code'] === 'coupon',
             );
         } else {
             // Try to get a vat rate
@@ -352,16 +354,16 @@ class Creator extends BaseCreator
                 // 0-cost lines - e.g. free shipping - also don't have a tax amount,
                 // let the completor add the highest appearing vat rate.
                 $result += array(
-                    'vatrate' => null,
-                    'meta-vatrate-source' => Creator::VatRateSource_Completor,
+                    Tag::VatRate => null,
+                    Meta::VatRateSource => Creator::VatRateSource_Completor,
                 ) + $vatRateLookupMetaData;
             } else {
                 // Other lines do not have a discoverable vatrate, let a strategy
                 // try to compute it.
                 $result += array(
-                    'vatrate' => null,
-                    'meta-vatrate-source' => Creator::VatRateSource_Strategy,
-                    'meta-strategy-split' => false,
+                    Tag::VatRate => null,
+                    Meta::VatRateSource => Creator::VatRateSource_Strategy,
+                    Meta::StrategySplit => false,
                 ) + $vatRateLookupMetaData;
             }
         }
@@ -426,7 +428,7 @@ class Creator extends BaseCreator
             } elseif (empty($result)) {
                 // First row: set result
                 $result = $vatRateMetadata;
-            } elseif (!Number::floatsAreEqual($vatRateMetadata['meta-vatrate-lookup'], $result['meta-vatrate-lookup'])) {
+            } elseif (!Number::floatsAreEqual($vatRateMetadata[Meta::VatRateLookup], $result[Meta::VatRateLookup])) {
                 // Different rates between tax classes: return no result.
                 return array();
             } // else: rates are the same: continue.

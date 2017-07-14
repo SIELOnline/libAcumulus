@@ -4,6 +4,8 @@ namespace Siel\Acumulus\Magento\Invoice;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
+use Siel\Acumulus\Meta;
+use Siel\Acumulus\Tag;
 
 /**
  * Allows to create arrays in the Acumulus invoice structure from a Magento
@@ -116,8 +118,8 @@ abstract class Creator extends BaseCreator
     {
         $sign = $this->invoiceSource->getType() === Source::CreditNote ? -1.0 : 1.0;
         return array(
-            'meta-invoice-amountinc' => $sign * $this->invoiceSource->getSource()->getBaseGrandTotal(),
-            'meta-invoice-vatamount' => $sign * $this->invoiceSource->getSource()->getBaseTaxAmount(),
+            Meta::InvoiceAmountInc => $sign * $this->invoiceSource->getSource()->getBaseGrandTotal(),
+            Meta::InvoiceVatAmount => $sign * $this->invoiceSource->getSource()->getBaseTaxAmount(),
         );
     }
 
@@ -163,18 +165,18 @@ abstract class Creator extends BaseCreator
         $result = array();
         if (!Number::isZero($this->invoiceSource->getSource()->getDiscountAmount())) {
             $line = array(
-                'itemnumber' => '',
-                'product' => $this->getDiscountDescription(),
-                'vatrate' => null,
-                'meta-vatrate-source' => static::VatRateSource_Strategy,
-                'meta-strategy-split' => true,
-                'quantity' => 1,
+                Tag::ItemNumber => '',
+                Tag::Product => $this->getDiscountDescription(),
+                Tag::VatRate => null,
+                Meta::VatRateSource => static::VatRateSource_Strategy,
+                Meta::StrategySplit => true,
+                Tag::Quantity => 1,
             );
             // Product prices incl. VAT => discount amount is also incl. VAT
             if ($this->productPricesIncludeTax()) {
-                $line['unitpriceinc'] = $this->getSign() * $this->invoiceSource->getSource()->getDiscountAmount();
+                $line[Meta::UnitPriceInc] = $this->getSign() * $this->invoiceSource->getSource()->getDiscountAmount();
             } else {
-                $line['unitprice'] = $this->getSign() * $this->invoiceSource->getSource()->getDiscountAmount();
+                $line[Tag::UnitPrice] = $this->getSign() * $this->invoiceSource->getSource()->getDiscountAmount();
             }
             $result[] = $line;
         }
@@ -192,10 +194,10 @@ abstract class Creator extends BaseCreator
 
         if (isset($this->creditNote) && !Number::isZero($this->creditNote->getAdjustment())) {
             $line = array(
-                'product' => $this->t('refund_adjustment'),
-                'unitprice' => -$this->creditNote->getAdjustment(),
-                'quantity' => 1,
-                'vatrate' => 0,
+                Tag::Product => $this->t('refund_adjustment'),
+                Tag::UnitPrice => -$this->creditNote->getAdjustment(),
+                Tag::Quantity => 1,
+                Tag::VatRate => 0,
             );
             $result[] = $line;
         }

@@ -3,6 +3,8 @@ namespace Siel\Acumulus\Invoice;
 
 use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Helpers\TranslatorInterface;
+use Siel\Acumulus\Meta;
+use Siel\Acumulus\Tag;
 
 /**
  * CompletorStrategyBase is the base class for all strategies that might
@@ -197,20 +199,20 @@ abstract class CompletorStrategyBase
     protected function initAmounts()
     {
         $invoicePart = &$this->invoice['customer']['invoice'];
-        $this->vatAmount = isset($invoicePart['meta-invoice-vatamount']) ? $invoicePart['meta-invoice-vatamount'] : $invoicePart['meta-invoice-amountinc'] - $invoicePart['meta-invoice-amount'];
-        $this->invoiceAmount = isset($invoicePart['meta-invoice-amount']) ? $invoicePart['meta-invoice-amount'] : $invoicePart['meta-invoice-amountinc'] - $invoicePart['meta-invoice-vatamount'];
+        $this->vatAmount = isset($invoicePart[Meta::InvoiceVatAmount]) ? $invoicePart[Meta::InvoiceVatAmount] : $invoicePart[Meta::InvoiceAmountInc] - $invoicePart[Meta::InvoiceAmount];
+        $this->invoiceAmount = isset($invoicePart[Meta::InvoiceAmount]) ? $invoicePart[Meta::InvoiceAmount] : $invoicePart[Meta::InvoiceAmountInc] - $invoicePart[Meta::InvoiceVatAmount];
 
         // The vat amount to divide over the non completed lines is the total vat
         // amount of the invoice minus all known vat amounts per line.
         $this->vat2Divide = (float) $this->vatAmount;
         foreach ($invoicePart['line'] as $line) {
-            if ($line['meta-vatrate-source'] !== Creator::VatRateSource_Strategy) {
+            if ($line[Meta::VatRateSource] !== Creator::VatRateSource_Strategy) {
                 // Deduct the vat amount from this line: if set, deduct it directly,
                 // otherwise calculate the vat amount using the vat rate and unit price.
-                if (isset($line['vatamount'])) {
-                    $this->vat2Divide -= $line['vatamount'] * $line['quantity'];
+                if (isset($line[Meta::VatAmount])) {
+                    $this->vat2Divide -= $line[Meta::VatAmount] * $line[Tag::Quantity];
                 } else {
-                    $this->vat2Divide -= ($line['vatrate'] / 100.0) * $line['unitprice'] * $line['quantity'];
+                    $this->vat2Divide -= ($line[Tag::VatRate] / 100.0) * $line[Tag::UnitPrice] * $line[Tag::Quantity];
                 }
             }
         }
@@ -224,7 +226,7 @@ abstract class CompletorStrategyBase
         $this->linesCompleted = array();
         $this->lines2Complete = array();
         foreach ($this->invoice['customer']['invoice']['line'] as $key => $line) {
-            if ($line['meta-vatrate-source'] === Creator::VatRateSource_Strategy) {
+            if ($line[Meta::VatRateSource] === Creator::VatRateSource_Strategy) {
                 $this->linesCompleted[] = $key;
                 $this->lines2Complete[$key] = $line;
             }
@@ -239,20 +241,20 @@ abstract class CompletorStrategyBase
     {
         $this->vatBreakdown = array();
         foreach ($this->invoice['customer']['invoice']['line'] as $line) {
-            if ($line['meta-vatrate-source'] !== Creator::VatRateSource_Strategy && isset($line['vatrate'])) {
-                $amount = $line['unitprice'] * $line['quantity'];
-                $vatAmount = $line['vatrate'] / 100.0 * $amount;
-                $vatRate = sprintf('%.3f', $line['vatrate']);
+            if ($line[Meta::VatRateSource] !== Creator::VatRateSource_Strategy && isset($line[Tag::VatRate])) {
+                $amount = $line[Tag::UnitPrice] * $line[Tag::Quantity];
+                $vatAmount = $line[Tag::VatRate] / 100.0 * $amount;
+                $vatRate = sprintf('%.3f', $line[Tag::VatRate]);
                 // Add amount to existing vatrate line or create a new line.
                 if (isset($this->vatBreakdown[$vatRate])) {
                     $breakdown = &$this->vatBreakdown[$vatRate];
-                    $breakdown['vatamount'] += $vatAmount;
+                    $breakdown[Meta::VatAmount] += $vatAmount;
                     $breakdown['amount'] += $amount;
                     $breakdown['count']++;
                 } else {
                     $this->vatBreakdown[$vatRate] = array(
-                        'vatrate' => (float) $vatRate,
-                        'vatamount' => $vatAmount,
+                        Tag::VatRate => (float) $vatRate,
+                        Meta::VatAmount => $vatAmount,
                         'amount' => $amount,
                         'count' => 1,
                     );
@@ -269,9 +271,9 @@ abstract class CompletorStrategyBase
      */
     protected function getVatBreakDownMinRate()
     {
-        $result = array('vatrate' => PHP_INT_MAX);
+        $result = array(Tag::VatRate => PHP_INT_MAX);
         foreach ($this->vatBreakdown as $breakDown) {
-            if ($breakDown['vatrate'] < $result['vatrate']) {
+            if ($breakDown[Tag::VatRate] < $result[Tag::VatRate]) {
                 $result = $breakDown;
             }
         }
@@ -286,9 +288,9 @@ abstract class CompletorStrategyBase
      */
     protected function getVatBreakDownMaxRate()
     {
-        $result = array('vatrate' => -PHP_INT_MAX);
+        $result = array(Tag::VatRate => -PHP_INT_MAX);
         foreach ($this->vatBreakdown as $breakDown) {
-            if ($breakDown['vatrate'] > $result['vatrate']) {
+            if ($breakDown[Tag::VatRate] > $result[Tag::VatRate]) {
                 $result = $breakDown;
             }
         }
@@ -325,7 +327,7 @@ abstract class CompletorStrategyBase
         if ($this->checkPreconditions()) {
             return $this->execute();
         } else {
-            $this->invoice['customer']['invoice']['meta-competor-strategy-preconditions-failed'] = $this->getName();
+            $this->invoice['customer']['invoice'][Meta::StrategyCompletorPreconditionFailed] = $this->getName();
             return false;
         }
     }
@@ -382,18 +384,18 @@ abstract class CompletorStrategyBase
      */
     protected function completeLine($line2Complete, $vatRate)
     {
-        if (!isset($line2Complete['quantity'])) {
-            $line2Complete['quantity'] = 1;
+        if (!isset($line2Complete[Tag::Quantity])) {
+            $line2Complete[Tag::Quantity] = 1;
         }
-        $line2Complete['vatrate'] = $vatRate;
-        if (isset($line2Complete['unitprice'])) {
-            $line2Complete['vatamount'] = ($line2Complete['vatrate'] / 100.0) * $line2Complete['unitprice'];
-        } else { // isset($line2Complete['unitpriceinc'])
-            $line2Complete['vatamount'] = ($line2Complete['vatrate'] / (100.0 + $line2Complete['vatrate'])) * $line2Complete['unitpriceinc'];
-            $line2Complete['unitprice'] = $line2Complete['unitpriceinc'] - $line2Complete['vatamount'];
+        $line2Complete[Tag::VatRate] = $vatRate;
+        if (isset($line2Complete[Tag::UnitPrice])) {
+            $line2Complete[Meta::VatAmount] = ($line2Complete[Tag::VatRate] / 100.0) * $line2Complete[Tag::UnitPrice];
+        } else { // isset($line2Complete[Meta::UnitPriceInc])
+            $line2Complete[Meta::VatAmount] = ($line2Complete[Tag::VatRate] / (100.0 + $line2Complete[Tag::VatRate])) * $line2Complete[Meta::UnitPriceInc];
+            $line2Complete[Tag::UnitPrice] = $line2Complete[Meta::UnitPriceInc] - $line2Complete[Meta::VatAmount];
         }
         $this->replacingLines[] = $line2Complete;
-        return $line2Complete['vatamount'] * $line2Complete['quantity'];
+        return $line2Complete[Meta::VatAmount] * $line2Complete[Tag::Quantity];
     }
 
     /**

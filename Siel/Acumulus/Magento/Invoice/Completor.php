@@ -31,23 +31,23 @@ class Completor extends BaseCompletor
 
             $invoiceLines = $this->invoice['customer']['invoice']['line'];
             foreach ($invoiceLines as $line) {
-                if (isset($line['meta-line-discount-amountinc'])) {
-                    $discountAmountInc += $line['meta-line-discount-amountinc'];
+                if (isset($line[Meta::LineDiscountAmountInc])) {
+                    $discountAmountInc += $line[Meta::LineDiscountAmountInc];
                 }
 
-                if ($line['meta-line-type'] === Creator::LineType_Discount) {
-                    if (isset($line['meta-line-priceinc'])) {
-                        $discountLineAmountInc += $line['meta-line-priceinc'];
-                    } elseif (isset($line['unitpriceinc'])) {
-                        $discountLineAmountInc += $line['quantity'] * $line['unitpriceinc'];
+                if ($line[Meta::LineType] === Creator::LineType_Discount) {
+                    if (isset($line[Meta::LineAmountInc])) {
+                        $discountLineAmountInc += $line[Meta::LineAmountInc];
+                    } elseif (isset($line[Meta::UnitPriceInc])) {
+                        $discountLineAmountInc += $line[Tag::Quantity] * $line[Meta::UnitPriceInc];
                     }
                 }
             }
 
             if (!Number::floatsAreEqual($discountAmountInc, $discountLineAmountInc)) {
                 foreach ($invoiceLines as $line) {
-                    if ($line['meta-line-type'] === Creator::LineType_Shipping && isset($line['meta-line-discount-amountinc'])) {
-                        $line['meta-line-discount-amountinc'] += $discountLineAmountInc - $discountAmountInc;
+                    if ($line[Meta::LineType] === Creator::LineType_Shipping && isset($line[Meta::LineDiscountAmountInc])) {
+                        $line[Meta::LineDiscountAmountInc] += $discountLineAmountInc - $discountAmountInc;
                     }
                 }
             }

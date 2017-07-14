@@ -2,6 +2,8 @@
 namespace Siel\Acumulus\WooCommerce\WooCommerce2\Invoice;
 
 use Siel\Acumulus\Helpers\Number;
+use Siel\Acumulus\Meta;
+use Siel\Acumulus\Tag;
 use Siel\Acumulus\WooCommerce\Invoice\Creator as BaseCreator;
 use WC_Coupon;
 use WC_Product;
@@ -173,13 +175,13 @@ class Creator extends BaseCreator
         $this->addPropertySource('item', $item);
 
         $invoiceSettings = $this->config->getInvoiceSettings();
-        $this->addTokenDefault($result, 'itemnumber', $invoiceSettings['itemNumber']);
-        $this->addTokenDefault($result, 'product', $invoiceSettings['productName']);
-        $this->addTokenDefault($result, 'nature', $invoiceSettings['nature']);
+        $this->addTokenDefault($result, Tag::ItemNumber, $invoiceSettings['itemNumber']);
+        $this->addTokenDefault($result, Tag::Product, $invoiceSettings['productName']);
+        $this->addTokenDefault($result, Tag::Nature, $invoiceSettings['nature']);
 
         // Add quantity: quantity is negative on refunds, make it positive.
         $sign  = $this->invoiceSource->getType() === source::CreditNote ? -1 : 1;
-        $commonTags = array('quantity' => $sign * $item['qty']);
+        $commonTags = array(Tag::Quantity => $sign * $item['qty']);
         $result += $commonTags;
 
         // Add price info.
@@ -202,18 +204,18 @@ class Creator extends BaseCreator
                 // - But still send the VAT rate to Acumulus.
                 // Costprice > 0 triggers the margin scheme in Acumulus.
                 $result += array(
-                    'unitprice' => $productPriceInc,
-                    'meta-unitprice-precision' => $this->pricePrecision,
-                    'costprice' => $value,
-                    'meta-costprice-precision' => $this->pricePrecision,
+                    Tag::UnitPrice => $productPriceInc,
+                    Meta::PrecisionUnitPrice => $this->pricePrecision,
+                    Tag::CostPrice => $value,
+                    Meta::PrecisionCostPrice => $this->pricePrecision,
                 );
             }
         } else {
             $result += array(
-                'unitprice' => $productPriceEx,
-                'meta-unitprice-precision' => $this->pricePrecision,
-                'unitpriceinc' => $productPriceInc,
-                'meta-unitpriceinc-precision' => $this->pricePrecision,
+                Tag::UnitPrice => $productPriceEx,
+                Meta::PrecisionUnitPrice => $this->pricePrecision,
+                Meta::UnitPriceInc => $productPriceInc,
+                Meta::PrecisionUnitPriceInc => $this->pricePrecision,
             );
         }
 
@@ -227,25 +229,25 @@ class Creator extends BaseCreator
         $bundleId = $item['_bundle_cart_key'];
         if (!empty($bundleId)) {
             // Bundle or bundled product.
-            $result['meta-bundle-id'] = $bundleId;
+            $result[Meta::BundleId] = $bundleId;
         }
         $bundledBy = $item['_bundled_by'];
         if (!empty($bundledBy)) {
             // Bundled products only.
-            $result['meta-bundle-parent'] = $bundledBy;
-            $result['meta-bundle-visible'] = $item['bundled_item_hidden'] !== 'yes';
+            $result[Meta::BundleParentId] = $bundledBy;
+            $result[Meta::BundleVisible] = $item['bundled_item_hidden'] !== 'yes';
         }
 
-        // Add variants/options, but set vatamount to 0 on the child lines.
-        $commonTags['meta-vatrate-surce'] = static::VatRateSource_Parent;
+        // Add variants/options.
+        $commonTags[Meta::VatRateSource] = static::VatRateSource_Parent;
         if ($product instanceof WC_Product && !empty($item['variation_id'])) {
-            $result[Creator::Line_Children] = $this->getVariantLines($item, $product, $commonTags);
+            $result[Meta::ChildrenLines] = $this->getVariantLines($item, $product, $commonTags);
         } elseif (!empty($item['tmcartepo_data'])) {
             // If the plugin is no longer used, we may still have an order with
             // products where the plugin was used. Moreover we don't use any
             // function or method from the plugin, only its stored data, so we
             // don'have to t check for it being active.
-            $result[Creator::Line_Children] = $this->getExtraProductOptionsLines($item, $commonTags);
+            $result[Meta::ChildrenLines] = $this->getExtraProductOptionsLines($item, $commonTags);
         }
 
         $this->removePropertySource('product');
@@ -300,8 +302,8 @@ class Creator extends BaseCreator
                 }
 
                 $result[] = array(
-                        'product' => $meta['meta_key'] . ': ' . rawurldecode($meta['meta_value']),
-                        'unitprice' => 0,
+                        Tag::Product => $meta['meta_key'] . ': ' . rawurldecode($meta['meta_value']),
+                        Tag::UnitPrice => 0,
                     ) + $commonTags;
             }
         }
@@ -320,10 +322,10 @@ class Creator extends BaseCreator
         $feeVat = $line['line_tax'];
 
         $result = array(
-                'product' => $this->t($line['name']),
-                'unitprice' => $feeEx,
-                'meta-unitprice-precision' => 0.01,
-                'quantity' => 1,
+                Tag::Product => $this->t($line['name']),
+                Tag::UnitPrice => $feeEx,
+                Meta::PrecisionUnitPrice => 0.01,
+                Tag::Quantity => 1,
             ) + $this->getVatRangeTags($feeVat, $feeEx);
 
         return $result;
@@ -351,10 +353,10 @@ class Creator extends BaseCreator
         $vatPrecision = $this->invoiceSource->getType() === Source::CreditNote ? 0.01 : 0.0001;
 
         $result = array(
-                'product' => $this->getShippingMethodName(),
-                'unitprice' => $shippingEx,
-                'meta-unitprice-precision' => $shippingExPrecision,
-                'quantity' => 1,
+                Tag::Product => $this->getShippingMethodName(),
+                Tag::UnitPrice => $shippingEx,
+                Meta::PrecisionUnitPrice => $shippingExPrecision,
+                Tag::Quantity => 1,
             )
             + $this->getVatRangeTags($shippingVat, $shippingEx, $vatPrecision, $shippingExPrecision)
             + $vatLookupTags;
@@ -428,14 +430,14 @@ class Creator extends BaseCreator
             $description = $this->t('discount_code');
         }
         return array(
-            'itemnumber' => $coupon->code,
-            'product' => $description,
-            'unitprice' => 0,
-            'unitpriceinc' => 0,
-            'quantity' => 1,
-            'vatrate' => null,
-            'vatamount' => 0,
-            'meta-vatrate-source' => static::VatRateSource_Completor,
+            Tag::ItemNumber => $coupon->code,
+            Tag::Product => $description,
+            Tag::UnitPrice => 0,
+            Meta::UnitPriceInc => 0,
+            Tag::Quantity => 1,
+            Tag::VatRate => null,
+            Meta::VatAmount => 0,
+            Meta::VatRateSource => static::VatRateSource_Completor,
         );
     }
 }

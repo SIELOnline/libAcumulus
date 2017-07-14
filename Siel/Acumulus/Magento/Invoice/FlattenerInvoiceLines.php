@@ -3,6 +3,7 @@ namespace Siel\Acumulus\Magento\Invoice;
 
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\FlattenerInvoiceLines as BaseFlattenerInvoiceLines;
+use Siel\Acumulus\Tag;
 
 /**
  * Defines Magento specific invoice line flattener logic.
@@ -24,7 +25,7 @@ class FlattenerInvoiceLines extends BaseFlattenerInvoiceLines
     {
         if ($this->isChildSameAsParent($parent, $children)) {
             $child = reset($children);
-            return $child['product'];
+            return $child[Tag::Product];
         }
         return parent::getMergedLinesText($parent, $children);
     }
@@ -50,8 +51,8 @@ class FlattenerInvoiceLines extends BaseFlattenerInvoiceLines
         if (count($vatRates) === 1) {
             reset($vatRates);
             $childrenVatRate = key($vatRates);
-            if ((Number::isZero($childrenVatRate) || $childrenVatRate == $parent['vatrate'])) {
-                if (!Number::isZero($parent['unitprice'])) {
+            if ((Number::isZero($childrenVatRate) || $childrenVatRate == $parent[Tag::VatRate])) {
+                if (!Number::isZero($parent[Tag::UnitPrice])) {
                     $useParentInfo = true;
                 }
             }
@@ -89,9 +90,9 @@ class FlattenerInvoiceLines extends BaseFlattenerInvoiceLines
     {
         if (count($children) === 1) {
             $child = reset($children);
-            if ($parent['itemnumber'] === $child['itemnumber']
-              && $parent['quantity'] === $child['quantity']
-              && Number::isZero($child['unitprice'])
+            if ($parent[Tag::ItemNumber] === $child[Tag::ItemNumber]
+              && $parent[Tag::Quantity] === $child[Tag::Quantity]
+              && Number::isZero($child[Tag::UnitPrice])
             ) {
                 return true;
             }

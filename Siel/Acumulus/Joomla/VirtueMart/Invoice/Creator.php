@@ -5,6 +5,8 @@ use DOMDocument;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
+use Siel\Acumulus\Meta;
+use Siel\Acumulus\Tag;
 use stdClass;
 use VirtueMartModelCustomfields;
 use VmModel;
@@ -184,8 +186,8 @@ class Creator extends BaseCreator
     protected function getInvoiceTotals()
     {
         return array(
-            'meta-invoice-amountinc' => $this->order['details']['BT']->order_total,
-            'meta-invoice-vatamount' => $this->order['details']['BT']->order_billTaxAmount,
+            Meta::InvoiceAmountInc => $this->order['details']['BT']->order_total,
+            Meta::InvoiceVatAmount => $this->order['details']['BT']->order_billTaxAmount,
         );
     }
 
@@ -210,9 +212,9 @@ class Creator extends BaseCreator
         $result = array();
         $this->addPropertySource('item', $item);
         $invoiceSettings = $this->config->getInvoiceSettings();
-        $this->addTokenDefault($result, 'itemnumber', $invoiceSettings['itemNumber']);
-        $this->addTokenDefault($result, 'product', $invoiceSettings['productName']);
-        $this->addTokenDefault($result, 'nature', $invoiceSettings['nature']);
+        $this->addTokenDefault($result, Tag::ItemNumber, $invoiceSettings['itemNumber']);
+        $this->addTokenDefault($result, Tag::Product, $invoiceSettings['productName']);
+        $this->addTokenDefault($result, Tag::Nature, $invoiceSettings['nature']);
 
         $productPriceEx = (float) $item->product_discountedPriceWithoutTax;
         $productPriceInc = (float) $item->product_final_price;
@@ -221,24 +223,24 @@ class Creator extends BaseCreator
         $calcRule = $this->getCalcRule('VatTax', $item->virtuemart_order_item_id);
         if (!empty($calcRule->calc_value)) {
             $vatInfo = array(
-                'vatrate' => (float) $calcRule->calc_value,
-                'meta-vatrate-source' => static::VatRateSource_Exact,
+                Tag::VatRate => (float) $calcRule->calc_value,
+                Meta::VatRateSource => static::VatRateSource_Exact,
             );
         } else {
             $vatInfo = $this->getVatRangeTags($productVat, $productPriceEx, 0.0001, 0.0001);
         }
 
         $result += array(
-                'unitprice' => $productPriceEx,
-                'unitpriceinc' => $productPriceInc,
-                'quantity' => $item->product_quantity,
-                'vatamount' => $productVat,
+                Tag::UnitPrice => $productPriceEx,
+                Meta::UnitPriceInc => $productPriceInc,
+                Tag::Quantity => $item->product_quantity,
+                Meta::VatAmount => $productVat,
             ) + $vatInfo;
 
         // Add variant info.
-        $children = $this->getVariantLines($item, $result['quantity'], $vatInfo);
+        $children = $this->getVariantLines($item, $result[Tag::Quantity], $vatInfo);
         if (!empty($children)) {
-            $result[Creator::Line_Children] = $children;
+            $result[Meta::ChildrenLines] = $children;
         }
 
         $this->removePropertySource('item');
@@ -280,9 +282,9 @@ class Creator extends BaseCreator
                 if ($span->getElementsByTagName('span')->length === 0) {
                     $text[] = $span->textContent;
                     $result[] = array(
-                        'product' => $span->textContent,
-                        'unitprice' => 0,
-                        'quantity' => $parentQuantity,
+                        Tag::Product => $span->textContent,
+                        Tag::UnitPrice => 0,
+                        Tag::Quantity => $parentQuantity,
                       ) + $vatRangeTags;
                 }
             }
@@ -308,18 +310,18 @@ class Creator extends BaseCreator
             $calcRule = $this->getCalcRule('shipment');
             if (!empty($calcRule->calc_value)) {
                 $vatInfo = array(
-                    'vatrate' => (float) $calcRule->calc_value,
-                    'meta-vatrate-source' => static::VatRateSource_Exact,
+                    Tag::VatRate => (float) $calcRule->calc_value,
+                    Meta::VatRateSource => static::VatRateSource_Exact,
                 );
             } else {
                 $vatInfo = $this->getVatRangeTags($shippingVat, $shippingEx, 0.0001, 0.01);
             }
 
             $result = array(
-                    'product' => $this->getShippingMethodName(),
-                    'unitprice' => $shippingEx,
-                    'quantity' => 1,
-                    'vatamount' => $shippingVat,
+                    Tag::Product => $this->getShippingMethodName(),
+                    Tag::UnitPrice => $shippingEx,
+                    Tag::Quantity => 1,
+                    Meta::VatAmount => $shippingVat,
                 ) + $vatInfo;
         }
         return $result;
@@ -394,13 +396,13 @@ class Creator extends BaseCreator
     protected function getCalcRuleDiscountLine(stdClass $calcRule)
     {
         $result = array(
-            'product' => $calcRule->calc_rule_name,
-            'unitprice' => null,
-            'unitpriceinc' => (float) $calcRule->calc_amount,
-            'vatrate' => null,
-            'quantity' => 1,
-            'meta-vatrate-source' => static::VatRateSource_Strategy,
-            'meta-strategy-split' => true,
+            Tag::Product => $calcRule->calc_rule_name,
+            Tag::UnitPrice => null,
+            Meta::UnitPriceInc => (float) $calcRule->calc_amount,
+            Tag::VatRate => null,
+            Tag::Quantity => 1,
+            Meta::VatRateSource => static::VatRateSource_Strategy,
+            Meta::StrategySplit => true,
         );
 
         return $result;
@@ -416,13 +418,13 @@ class Creator extends BaseCreator
     {
         // @todo: standardize coupon lines: use itemnumber?, use shop specific names?, etc.
         $result = array(
-            'itemnumber' => $this->order['details']['BT']->coupon_code,
-            'product' => $this->t('discount'),
-            'quantity' => 1,
-            'unitpriceinc' => (float) $this->order['details']['BT']->coupon_discount,
-            'vatrate' => null,
-            'meta-vatrate-source' => static::VatRateSource_Strategy,
-            'meta-strategy-split' => true,
+            Tag::ItemNumber => $this->order['details']['BT']->coupon_code,
+            Tag::Product => $this->t('discount'),
+            Tag::Quantity => 1,
+            Meta::UnitPriceInc => (float) $this->order['details']['BT']->coupon_discount,
+            Tag::VatRate => null,
+            Meta::VatRateSource => static::VatRateSource_Strategy,
+            Meta::StrategySplit => true,
         );
 
         return $result;
@@ -442,18 +444,18 @@ class Creator extends BaseCreator
                 $calcRule = $this->getCalcRule('payment');
                 if (!empty($calcRule->calc_value)) {
                     $vatInfo = array(
-                        'vatrate' => (float) $calcRule->calc_value,
-                        'meta-vatrate-source' => static::VatRateSource_Exact,
+                        Tag::VatRate => (float) $calcRule->calc_value,
+                        Meta::VatRateSource => static::VatRateSource_Exact,
                     );
                 } else {
                     $vatInfo = $this->getVatRangeTags($paymentVat, $paymentEx, 0.0001, 0.01);
                 }
 
                 $result = array(
-                        'product' => $this->t('payment_costs'),
-                        'unitprice' => $paymentEx,
-                        'quantity' => 1,
-                        'vatamount' => $paymentVat,
+                        Tag::Product => $this->t('payment_costs'),
+                        Tag::UnitPrice => $paymentEx,
+                        Tag::Quantity => 1,
+                        Meta::VatAmount => $paymentVat,
                     ) + $vatInfo;
             }
         }

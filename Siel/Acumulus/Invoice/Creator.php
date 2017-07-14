@@ -8,7 +8,9 @@ use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Helpers\Token;
 use Siel\Acumulus\Helpers\TranslatorInterface;
 use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Meta;
 use Siel\Acumulus\PluginConfig;
+use Siel\Acumulus\Tag;
 
 /**
  * Creator creates a raw invoice similar to the Acumulus invoice structure.
@@ -50,8 +52,6 @@ abstract class Creator
     const LineType_Voucher = 'voucher';
     const LineType_Other = 'other';
     const LineType_Corrector = 'missing-amount-corrector';
-
-    const Line_Children = 'children';
 
     /** @var \Siel\Acumulus\Config\Config */
     protected $config;
@@ -287,7 +287,7 @@ abstract class Creator
      * - meta-children-merged: indicates how many child lines the line had.
      * - meta-parent: indicates that a line is a child of parent line with the
      *   given value as meta-parent-index.
-     *   children.
+     * - children: The children lines of a parent line.
      *
      * Extending classes should normally not have to override this method, but
      * should instead implement getInvoiceNumber(), getInvoiceDate(),
@@ -367,7 +367,7 @@ abstract class Creator
         }
 
         // Meta data.
-        $this->addIfNotEmpty($invoice, 'meta-payment-method', $paymentMethod);
+        $this->addIfNotEmpty($invoice, Meta::paymentMethod, $paymentMethod);
         $invoice += $this->addInvoiceTotals($invoice);
 
         return $invoice;
@@ -502,17 +502,17 @@ abstract class Creator
      */
     protected function completeInvoiceTotals(array $invoice)
     {
-        if (!isset($invoice['meta-invoice-amount'])) {
-            $invoice['meta-invoice-amount'] = $invoice['meta-invoice-amountinc'] - $invoice['meta-invoice-vatamount'];
-            $invoice['meta-invoice-calculated'] = 'meta-invoice-amount';
+        if (!isset($invoice[Meta::InvoiceAmount])) {
+            $invoice[Meta::InvoiceAmount] = $invoice[Meta::InvoiceAmountInc] - $invoice[Meta::InvoiceVatAmount];
+            $invoice[Meta::InvoiceCalculated ] = Meta::InvoiceAmount;
         }
-        if (!isset($invoice['meta-invoice-amountinc'])) {
-            $invoice['meta-invoice-amountinc'] = $invoice['meta-invoice-amount'] + $invoice['meta-invoice-vatamount'];
-            $invoice['meta-invoice-calculated'] = 'meta-invoice-amountinc';
+        if (!isset($invoice[Meta::InvoiceAmountInc])) {
+            $invoice[Meta::InvoiceAmountInc] = $invoice[Meta::InvoiceAmount] + $invoice[Meta::InvoiceVatAmount];
+            $invoice[Meta::InvoiceCalculated ] = Meta::InvoiceAmountInc;
         }
-        if (!isset($invoice['meta-invoice-vatamount'])) {
-            $invoice['meta-invoice-vatamount'] = $invoice['meta-invoice-amountinc'] - $invoice['meta-invoice-amount'];
-            $invoice['meta-invoice-calculated'] = 'meta-invoice-vatamount';
+        if (!isset($invoice[Meta::InvoiceVatAmount])) {
+            $invoice[Meta::InvoiceVatAmount] = $invoice[Meta::InvoiceAmountInc] - $invoice[Meta::InvoiceAmount];
+            $invoice[Meta::InvoiceCalculated ] = Meta::InvoiceVatAmount;
         }
         return $invoice;
     }
@@ -621,7 +621,7 @@ abstract class Creator
 
         $line = $this->getGiftWrappingLine();
         if ($line) {
-            $line['meta-line-type'] = static::LineType_GiftWrapping;
+            $line[Meta::LineType] = static::LineType_GiftWrapping;
             $result[] = $line;
         }
 
@@ -633,7 +633,7 @@ abstract class Creator
 
         $line = $this->getPaymentFeeLine();
         if ($line) {
-            $line['meta-line-type'] = static::LineType_PaymentFee;
+            $line[Meta::LineType] = static::LineType_PaymentFee;
             $result[] = $line;
         }
 
@@ -941,10 +941,10 @@ abstract class Creator
     protected function addLineType(array $lines, $lineType)
     {
         foreach ($lines as &$line) {
-            $line['meta-line-type'] = $lineType;
-            if (isset($line[Creator::Line_Children])) {
-                foreach ($line[Creator::Line_Children] as &$childLine) {
-                    $childLine['meta-line-type'] = $lineType;
+            $line[Meta::LineType] = $lineType;
+            if (isset($line[Meta::ChildrenLines])) {
+                foreach ($line[Meta::ChildrenLines] as &$childLine) {
+                    $childLine[Meta::LineType] = $lineType;
                 }
             }
         }
@@ -971,10 +971,10 @@ abstract class Creator
      */
     protected function addVatRangeTags(array &$line, $precisionNumerator = 0.01, $precisionDenominator = 0.01)
     {
-        $numerator = isset($line['vatamount']) ? $line['vatamount'] : $line['unitpriceinc'] - $line['unitprice'];
-        $denominator = $line['unitprice'];
-        if (isset($line['costprice'])) {
-            $denominator -= $line['costprice'];
+        $numerator = isset($line[Meta::VatAmount]) ? $line[Meta::VatAmount] : $line[Meta::UnitPriceInc] - $line[Tag::UnitPrice];
+        $denominator = $line[Tag::UnitPrice];
+        if (isset($line[Tag::CostPrice])) {
+            $denominator -= $line[Tag::CostPrice];
         }
         $line += $this->getVatRangeTags($numerator, $denominator, $precisionNumerator, $precisionDenominator);
     }
@@ -1014,24 +1014,24 @@ abstract class Creator
     {
         if (Number::isZero($denominator, 0.0001)) {
             return array(
-                'vatrate' => null,
-                'meta-vatrate-source' => static::VatRateSource_Completor,
+                Tag::VatRate => null,
+                Meta::VatRateSource => static::VatRateSource_Completor,
             );
         } elseif (Number::isZero($numerator, 0.0001)) {
             return array(
-                'vatrate' => 0,
-                'vatamount' => $numerator,
-                'meta-vatrate-source' => static::VatRateSource_Exact0,
+                Tag::VatRate => 0,
+                Meta::VatAmount => $numerator,
+                Meta::VatRateSource => static::VatRateSource_Exact0,
             );
         } else {
             $range = Number::getDivisionRange($numerator, $denominator, $numeratorPrecision, $denominatorPrecision);
             return array(
-                'vatamount' => $numerator,
-                'meta-vatamount-precision' => $numeratorPrecision,
-                'vatrate' => 100.0 * $range['calculated'],
-                'meta-vatrate-min' => 100.0 * $range['min'],
-                'meta-vatrate-max' => 100.0 * $range['max'],
-                'meta-vatrate-source' => static::VatRateSource_Calculated,
+                Meta::VatAmount => $numerator,
+                Meta::PrecisionVatAmount => $numeratorPrecision,
+                Tag::VatRate => 100.0 * $range['calculated'],
+                Meta::VatRateMin => 100.0 * $range['min'],
+                Meta::VatRateMax => 100.0 * $range['max'],
+                Meta::VatRateSource => static::VatRateSource_Calculated,
             );
         }
     }

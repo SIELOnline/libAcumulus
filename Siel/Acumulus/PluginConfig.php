@@ -8,7 +8,7 @@ namespace Siel\Acumulus;
  */
 interface PluginConfig
 {
-    const Version = '4.8.0-alpha3';
+    const Version = '4.8.0';
 
     const Send_SendAndMailOnError = 1;
     const Send_SendAndMail = 2;

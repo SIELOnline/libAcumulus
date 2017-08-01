@@ -278,7 +278,7 @@ class Creator extends BaseCreator
             // considered to have a precision better than 0.0001
             $result += $this->getVatRangeTags($sign * ($item['unit_price_tax_incl'] - $item['unit_price_tax_excl']), $sign * $item['unit_price_tax_excl'], 0.0001, 0.0001);
         }
-        $result[Meta::CalculatedFields][] = Meta::VatAmount;
+        $result[Meta::FieldsCalculated][] = Meta::VatAmount;
 
         $this->removePropertySource('item');
 
@@ -309,7 +309,7 @@ class Creator extends BaseCreator
             Tag::VatRate => $vatRate,
             Meta::VatAmount => $shippingVat,
             Meta::VatRateSource => static::VatRateSource_Exact,
-            Meta::CalculatedFields => array(Tag::UnitPrice, Meta::VatAmount),
+            Meta::FieldsCalculated => array(Tag::UnitPrice, Meta::VatAmount),
         );
 
         return $result;
@@ -350,7 +350,7 @@ class Creator extends BaseCreator
                     Tag::Quantity => 1,
                 ) + $this->getVatRangeTags($wrappingVat, $wrappingEx, 0.02)
                 + $vatLookupTags;
-            $result[Meta::CalculatedFields] = $metaCalculatedFields;
+            $result[Meta::FieldsCalculated] = $metaCalculatedFields;
         }
         return $result;
     }
@@ -402,7 +402,7 @@ class Creator extends BaseCreator
                 // However, for a %, it will be: 0.02, 0.01, so use 0.02.
                 // @todo: can we determine so?
             ) + $this->getVatRangeTags($discountVat, $discountEx, 0.02);
-        $result[Meta::CalculatedFields][] = Meta::VatAmount;
+        $result[Meta::FieldsCalculated][] = Meta::VatAmount;
 
         return $result;
     }

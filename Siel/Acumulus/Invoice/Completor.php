@@ -700,7 +700,7 @@ class Completor
                         $invoiceVatTypes[$lineVatType] = $lineVatType;
                     }
                 }
-                $line[Meta::CalculatedFields] = implode(',', $lineVatTypes);
+                $line[Meta::VatTypesPossible] = implode(',', $lineVatTypes);
             }
         }
 
@@ -717,8 +717,8 @@ class Completor
     {
         $result = null;
         foreach ($this->invoice['customer']['invoice']['line'] as $line) {
-            if (isset($line[Meta::CalculatedFields])) {
-                $lineVatTypes = explode(',', $line[Meta::CalculatedFields]);
+            if (isset($line[Meta::FieldsCalculated])) {
+                $lineVatTypes = explode(',', $line[Meta::FieldsCalculated]);
                 if ($result === null) {
                     // 1st line.
                     $result = $lineVatTypes;

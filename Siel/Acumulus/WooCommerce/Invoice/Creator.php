@@ -29,14 +29,17 @@ class Creator extends BaseCreator
 
     /**
      * Product price precision in WC3: one of the prices is entered by the
-     * administrator and thus can be considered exact. The computed one is
-     * rounded to the cent, so we can not assume a very high precision for all
+     * administrator but rounded to the cent by WC. The computed one is based
+     * on the subtraction/addition of 2 amounts rounded to the cent, so has a
+     * precision that may be a bit worse than 1 cent.
+     *
      * values here.
      *
      * @var float
      */
-    protected $pricePrecision  = 0.02;
-    protected $vatPrecision  = 0.01;
+    protected $precisionPriceEntered  = 0.01;
+    protected $precisionPriceCalculated  = 0.02;
+    protected $precisionVat  = 0.01;
 
     /**
      * {@inheritdoc}
@@ -227,6 +230,18 @@ class Creator extends BaseCreator
         // get_item_tax returns tax per item after discount.
         $productVat = $this->shopSource->get_item_tax($item, false);
 
+        // Get precision info.
+        if (wc_prices_include_tax()) {
+            $precisionEx = $this->precisionPriceCalculated;
+            $precisionInc = $this->precisionPriceEntered;
+            $recalculateUnitPrice = true;
+        }
+        else {
+            $precisionEx = $this->precisionPriceEntered;
+            $precisionInc = $this->precisionPriceCalculated;
+            $recalculateUnitPrice = false;
+        }
+
         // WooCommerce does not support the margin scheme. So in a standard
         // install this method will always return false. But if this method
         // happens to return true anyway (customisation, hook), the costprice
@@ -240,22 +255,24 @@ class Creator extends BaseCreator
                 // Costprice > 0 triggers the margin scheme in Acumulus.
                 $result += array(
                     Tag::UnitPrice => $productPriceInc,
-                    Meta::PrecisionUnitPrice => $this->pricePrecision,
+                    Meta::PrecisionUnitPrice => $this->precisionPriceEntered,
                     Tag::CostPrice => $value,
-                    Meta::PrecisionCostPrice => $this->pricePrecision,
+                    Meta::PrecisionCostPrice => $this->precisionPriceEntered,
                 );
             }
         } else {
             $result += array(
                 Tag::UnitPrice => $productPriceEx,
-                Meta::PrecisionUnitPrice => $this->pricePrecision,
+                Meta::PrecisionUnitPrice => $precisionEx,
                 Meta::UnitPriceInc => $productPriceInc,
-                Meta::PrecisionUnitPriceInc => $this->pricePrecision,
+                Meta::PrecisionUnitPriceInc => $precisionInc,
+                Meta::RecalculateUnitPrice => $recalculateUnitPrice,
             );
+
         }
 
         // Add tax info.
-        $result += $this->getVatRangeTags($productVat, $productPriceEx, $this->vatPrecision, $this->pricePrecision);
+        $result += $this->getVatRangeTags($productVat, $productPriceEx, $this->precisionVat, $precisionEx);
         if ($product instanceof WC_Product) {
             $result += $this->getVatRateLookupMetadataByTaxClass($product->get_tax_class());
         }
@@ -521,20 +538,20 @@ class Creator extends BaseCreator
     }
 
   /**
-   * @param \WC_Order_Item_Fee $line
+   * @param \WC_Order_Item_Fee $item
    *
    * @return array
    */
-    protected function getFeeLine($line)
+    protected function getFeeLine($item)
     {
-        $feeEx = $line->get_total();
-        $feeVat = $line->get_total_tax();
+        $feeEx = $this->shopSource->get_item_total($item, false, false);
+        $feeVat = $this->shopSource->get_item_tax($item, false);
 
         $result = array(
-                Tag::Product => $this->t($line->get_name()),
+                Tag::Product => $this->t($item->get_name()),
                 Tag::UnitPrice => $feeEx,
                 Meta::PrecisionUnitPrice => 0.01,
-                Tag::Quantity => 1,
+                Tag::Quantity => $item->get_quantity(),
             ) + $this->getVatRangeTags($feeVat, $feeEx);
 
         return $result;
@@ -563,46 +580,41 @@ class Creator extends BaseCreator
      */
     protected function getShippingLine()
     {
-        /** @var \WC_Order_Item_Shipping $shippingItem */
-        $shippingItem = func_get_arg(0);
-        $taxes = $shippingItem->get_taxes();
+        /** @var \WC_Order_Item_Shipping $item */
+        $item = func_get_arg(0);
+        $taxes = $item->get_taxes();
         $vatLookupTags = $this->getShippingVatRateLookupMetadata($taxes);
 
         // Note: this info is WC3 specific.
         // Precision: shipping costs are entered ex VAT, so that may be very
         // precise, but it will be rounded to the cent by WC. The VAT is also
         // rounded to the cent.
-        // @todo: to avoid rounding errors, can we get the non-formatted amount?
-        $shippingEx = $this->shopSource->get_shipping_total();
+        $shippingEx = $this->shopSource->get_item_total($item, false, false);
         $shippingExPrecision = 0.01;
-        $shippingVat = $this->shopSource->get_shipping_tax();
+
+        // To avoid rounding errors, we try to get the non-formatted amount
+        $methodId = $item->get_method_id();
+        if (substr($methodId, 0, strlen('legacy_')) === 'legacy_') {
+            $methodId = substr($methodId, strlen('legacy_'));
+        }
+        $options = get_option( 'woocommerce_' . $methodId . '_settings' );
+        if (isset($options['cost']) && Number::floatsAreEqual($options['cost'], $shippingEx)) {
+            $shippingEx = $options['cost'];
+            $shippingExPrecision = 0.001;
+        }
+        $shippingVat = $this->shopSource->get_item_tax($item, false);
         $vatPrecision = 0.01;
 
         $result = array(
-                Tag::Product => $this->getShippingMethodName(),
+                Tag::Product => $item->get_name(),
                 Tag::UnitPrice => $shippingEx,
                 Meta::PrecisionUnitPrice => $shippingExPrecision,
-                Tag::Quantity => 1,
+                Tag::Quantity => $item->get_quantity(),
             )
             + $this->getVatRangeTags($shippingVat, $shippingEx, $vatPrecision, $shippingExPrecision)
             + $vatLookupTags;
 
         return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getShippingMethodName()
-    {
-        // Check if a shipping line item exists for this order.
-        /** @var \WC_Order_Item_Shipping[] $lines */
-        $lines = $this->shopSource->get_items(apply_filters('woocommerce_admin_order_item_types', 'shipping'));
-        if (!empty($lines)) {
-            $line = reset($lines);
-            return $line->get_name();
-        }
-        return parent::getShippingMethodName();
     }
 
     /**
@@ -626,17 +638,23 @@ class Creator extends BaseCreator
     protected function getShippingVatRateLookupMetadata($taxes)
     {
         $vatLookupTags = array();
-        if (is_array($taxes) && count($taxes) === 1) {
-            // @todo: $tax contains amount: can we use that?
-            //$tax = reset($taxes);
-            $vatLookupTags = array(
-                // Will contain a % at the end of the string.
-                Meta::VatRateLookup => substr(WC_Tax::get_rate_percent(key($taxes)), 0, -1),
-                Meta::VatRateLookupLabel => WC_Tax::get_rate_label(key($taxes)),
-                Meta::VatRateLookupSource => 'shipping line taxes',
-            );
+        if (is_array($taxes)) {
+            // Since ??? $taxes is indirected by a key 'total' ...
+            if (!is_numeric(key($taxes))) {
+                $taxes = current($taxes);
+            }
+            if (is_array($taxes) && count($taxes) === 1) {
+                // @todo: $tax contains amount: can we use that?
+                //$tax = reset($taxes);
+                $vatLookupTags = array(
+                    // Will contain a % at the end of the string.
+                    Meta::VatRateLookup => substr(WC_Tax::get_rate_percent(key($taxes)), 0, -1),
+                    Meta::VatRateLookupLabel => WC_Tax::get_rate_label(key($taxes)),
+                    Meta::VatRateLookupSource => 'shipping line taxes',
+                );
+            }
         }
-        else {
+        if (empty($vatLookupTags)) {
             // Apparently we have free shipping (or a misconfigured shipment
             // method). Use a fall-back: WooCommerce only knows 1 tax rate
             // for all shipping methods, stored in config:

@@ -50,7 +50,7 @@ interface Tag
     const ItemNumber = 'itemnumber';
     const Product = 'product';
     const Nature = 'nature';
-    const UnitPrice = 'unitpriceinc';
+    const UnitPrice = 'unitprice';
     const VatRate = 'vatrate';
     const Quantity = 'quantity';
     const CostPrice = 'costprice';

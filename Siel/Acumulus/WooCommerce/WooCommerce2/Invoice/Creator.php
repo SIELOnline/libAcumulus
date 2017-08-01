@@ -24,8 +24,9 @@ class Creator extends BaseCreator
      *
      * @var float
      */
-    protected $pricePrecision  = 0.001;
-    protected $vatprecision  = 0.001;
+    protected $precisionPriceEntered  = 0.01;
+    protected $precisionPriceCalculated  = 0.001;
+    protected $precisionVat  = 0.001;
 
     /**
      * {@inheritdoc}
@@ -205,22 +206,22 @@ class Creator extends BaseCreator
                 // Costprice > 0 triggers the margin scheme in Acumulus.
                 $result += array(
                     Tag::UnitPrice => $productPriceInc,
-                    Meta::PrecisionUnitPrice => $this->pricePrecision,
+                    Meta::PrecisionUnitPrice => $this->precisionPriceCalculated,
                     Tag::CostPrice => $value,
-                    Meta::PrecisionCostPrice => $this->pricePrecision,
+                    Meta::PrecisionCostPrice => $this->precisionPriceCalculated,
                 );
             }
         } else {
             $result += array(
                 Tag::UnitPrice => $productPriceEx,
-                Meta::PrecisionUnitPrice => $this->pricePrecision,
+                Meta::PrecisionUnitPrice => $this->precisionPriceCalculated,
                 Meta::UnitPriceInc => $productPriceInc,
-                Meta::PrecisionUnitPriceInc => $this->pricePrecision,
+                Meta::PrecisionUnitPriceInc => $this->precisionPriceCalculated,
             );
         }
 
         // Add tax info.
-        $result += $this->getVatRangeTags($productVat, $productPriceEx, $this->vatprecision, $this->pricePrecision);
+        $result += $this->getVatRangeTags($productVat, $productPriceEx, $this->precisionVat, $this->precisionPriceCalculated);
         if ($product instanceof WC_Product) {
             $result += $this->getVatRateLookupMetadataByTaxClass($product->get_tax_class());
         }
@@ -312,17 +313,17 @@ class Creator extends BaseCreator
     }
 
     /**
-     * @param array $line
+     * @param array $item
      *
      * @return array
      */
-    protected function getFeeLine($line)
+    protected function getFeeLine($item)
     {
-        $feeEx = $line['line_total'];
-        $feeVat = $line['line_tax'];
+        $feeEx = $item['line_total'];
+        $feeVat = $item['line_tax'];
 
         $result = array(
-                Tag::Product => $this->t($line['name']),
+                Tag::Product => $this->t($item['name']),
                 Tag::UnitPrice => $feeEx,
                 Meta::PrecisionUnitPrice => 0.01,
                 Tag::Quantity => 1,
@@ -353,7 +354,7 @@ class Creator extends BaseCreator
         $vatPrecision = $this->invoiceSource->getType() === Source::CreditNote ? 0.01 : 0.0001;
 
         $result = array(
-                Tag::Product => $this->getShippingMethodName(),
+                Tag::Product => !empty($line['name']) ? $line['name'] : $this->getShippingMethodName(),
                 Tag::UnitPrice => $shippingEx,
                 Meta::PrecisionUnitPrice => $shippingExPrecision,
                 Tag::Quantity => 1,

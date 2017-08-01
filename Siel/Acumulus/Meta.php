@@ -13,7 +13,9 @@ interface Meta {
     const VatRateSource = 'meta-vatrate-source';
     const VatRateMin = 'meta-vatrate-min';
     const VatRateMax = 'meta-vatrate-max';
-    const CalculatedFields = 'mdeta-calculated-fields';
+    const FieldsCalculated = 'meta-fields-calculated';
+    const RecalculateUnitPrice = 'meta-unitprice-recalculate';
+    const RecalculatedUnitPrice = 'meta-unitprice-recalculated';
     const VatRateLookup = 'meta-vatrate-lookup';
     const VatRateLookupLabel = 'meta-vatrate-lookup-label';
     const VatRateLookupSource = 'meta-vatrate-lookup-source';

@@ -116,6 +116,7 @@ class CompletorInvoiceLines
     {
         $lines = $this->addVatRateToLookupLines($lines);
         $lines = $this->addVatRateTo0PriceLines($lines);
+        $lines = $this->recalculateLineData($lines);
         $lines = $this->completeLineMetaData($lines);
         return $lines;
     }
@@ -143,7 +144,7 @@ class CompletorInvoiceLines
             // Easy gain first. Known usages: Magento.
             if (!isset($line[Meta::VatAmount]) && isset($line[Meta::LineVatAmount])) {
                 $line[Meta::VatAmount] = $line[Meta::LineVatAmount] / $line[Tag::Quantity];
-                $line[Meta::CalculatedFields][] = Meta::VatAmount;
+                $line[Meta::FieldsCalculated][] = Meta::VatAmount;
             }
 
             if (!isset($line[Tag::UnitPrice])) {
@@ -165,7 +166,7 @@ class CompletorInvoiceLines
                         // We cannot fill in unitprice reliably, so better to
                         // leave it empty and fail clearly.
                     //}
-                    $line[Meta::CalculatedFields][] = Tag::UnitPrice;
+                    $line[Meta::FieldsCalculated][] = Tag::UnitPrice;
                 }
             }
 
@@ -187,7 +188,7 @@ class CompletorInvoiceLines
                         // We cannot fill in unitpriceinc reliably, so we leave
                         // it empty as it is metadata after all.
                     // }
-                    $line[Meta::CalculatedFields][] = Meta::UnitPriceInc;
+                    $line[Meta::FieldsCalculated][] = Meta::UnitPriceInc;
                 }
             }
 
@@ -206,7 +207,7 @@ class CompletorInvoiceLines
                         $precision *= count($line[Meta::ChildrenLines]);
                     }
                     $line = array_merge($line, Creator::getVatRangeTags($line[Meta::VatAmount], $line[Tag::UnitPrice], $precision, $precision));
-                    $line[Meta::CalculatedFields][] = Tag::VatRate;
+                    $line[Meta::FieldsCalculated][] = Tag::VatRate;
                 }
             }
 
@@ -403,7 +404,8 @@ class CompletorInvoiceLines
      * @return float|null
      *   The maximum vat rate in the given set of lines.
      */
-    public static function getMaxAppearingVatRate(array $lines, &$index = 0) {
+    public static function getMaxAppearingVatRate(array $lines, &$index = 0)
+    {
         $index = null;
         $maxVatRate = -1.0;
         foreach ($lines as $key => $line) {
@@ -424,7 +426,8 @@ class CompletorInvoiceLines
      * @return bool
      *   True if the given $vatRate is a possible vat rate.
      */
-    protected function isPossibleVatRate($vatRate) {
+    protected function isPossibleVatRate($vatRate)
+    {
         $result = false;
         foreach ($this->possibleVatRates as $vatRateInfo) {
             if (Number::floatsAreEqual($vatRate, $vatRateInfo[Tag::VatRate])) {
@@ -433,6 +436,38 @@ class CompletorInvoiceLines
             }
         }
         return $result;
+    }
+
+    /**
+     * Recalculates the unit price forl ines that indicate so.
+     *
+     * All non strategy invoice lines have unitprice and vatrate filled in and
+     * should by now have correct(ed) VAT rates. In some shops the unit price is
+     * imprecise because they are based on prices entered including vat and are
+     * returned rounded to the cent.
+     *
+     * To prevent differences between the Acumulus and shop invoice we recompute
+     * the unit price if:
+     * - vatrate is correct
+     * - meta-recalculate-unitprice is true
+     * - unitpriceinc is available
+     *
+     * @param array[] $lines
+     *   The invoice lines to recalculate.
+     *
+     * @return array[]
+     *   The recalculated invoice lines.
+     */
+    protected function recalculateLineData(array $lines)
+    {
+        foreach ($lines as &$line) {
+            if (!empty($line[Meta::RecalculateUnitPrice]) && Completor::isCorrectVatRate($line[Meta::VatRateSource]) && isset($line[Meta::UnitPriceInc])) {
+                $line[Meta::UnitPriceOld] = $line[Tag::UnitPrice];
+                $line[Tag::UnitPrice] = $line[Meta::UnitPriceInc] / (100 + $line[Tag::VatRate]) * 100;
+                $line[Meta::RecalculatedUnitPrice] = true;
+            }
+        }
+        return $lines;
     }
 
     /**
@@ -469,15 +504,15 @@ class CompletorInvoiceLines
             if (Completor::isCorrectVatRate($line[Meta::VatRateSource])) {
                 if (!isset($line[Meta::UnitPriceInc])) {
                     $line[Meta::UnitPriceInc] = $line[Tag::UnitPrice] / 100.0 * (100.0 + $line[Tag::VatRate]);
-                    $line[Meta::CalculatedFields][] = Meta::UnitPriceInc;
+                    $line[Meta::FieldsCalculated][] = Meta::UnitPriceInc;
                 }
                 if (!isset($line[Meta::VatAmount])) {
                     $line[Meta::VatAmount] = $line[Tag::VatRate] / 100.0 * $line[Tag::UnitPrice];
-                    $line[Meta::CalculatedFields][] = Meta::VatAmount;
+                    $line[Meta::FieldsCalculated][] = Meta::VatAmount;
                 }
                 if (isset($line[Meta::LineDiscountVatAmount]) && !isset($line[Meta::LineDiscountAmountInc])) {
                     $line[Meta::LineDiscountAmountInc] = $line[Meta::LineDiscountVatAmount] / $line[Tag::VatRate] * (100 + $line[Tag::VatRate]);
-                    $line[Meta::CalculatedFields][] = Meta::LineDiscountAmountInc;
+                    $line[Meta::FieldsCalculated][] = Meta::LineDiscountAmountInc;
                 }
             } elseif ($line[Meta::VatRateSource] == Creator::VatRateSource_Strategy && !empty($line[Meta::StrategySplit])) {
                 if (isset($line[Tag::UnitPrice]) && isset($line[Meta::UnitPriceInc])) {
@@ -490,8 +525,8 @@ class CompletorInvoiceLines
                 }
             }
 
-            if (isset($line[Meta::CalculatedFields])) {
-                $line[Meta::CalculatedFields] = implode(',', array_unique($line[Meta::CalculatedFields]));
+            if (isset($line[Meta::FieldsCalculated])) {
+                $line[Meta::FieldsCalculated] = implode(',', array_unique($line[Meta::FieldsCalculated]));
             }
         }
         return $lines;

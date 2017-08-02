@@ -379,8 +379,10 @@ class Creator extends BaseCreator
      * - value_tax_excl: total amount ex VAT
      *
      * @param array $line
+     *   A PrestaShop discount line (ie: a order_cart_rule record).
      *
      * @return array
+     *   An Acumulus order item line.
      */
     protected function getDiscountLineOrder(array $line)
     {

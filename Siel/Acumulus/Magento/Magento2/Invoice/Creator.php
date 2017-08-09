@@ -126,16 +126,18 @@ class Creator extends BaseCreator
         $this->addTokenDefault($result, Tag::Product, $invoiceSettings['productName']);
         $this->addTokenDefault($result, Tag::Nature, $invoiceSettings['nature']);
 
-        // For higher precision of the unit price, we use the price as entered
-        // by the admin.
-        if ($this->productPricesIncludeTax()) {
-            $tag = Meta::UnitPriceInc;
-            $productPrice = (float) $item->getPriceInclTax();
+        // For higher precision of the unit price, we will recalculate the price
+        // ex vat if product prices are entered inc vat by the admin.
+        $productPriceEx = (float) $item->getPrice();
+        $productPriceInc = (float) $item->getPriceInclTax();
 
-        } else {
-            $tag = Tag::UnitPrice;
-            $productPrice = (float) $item->getPrice();
-        }
+        // Add price and quantity info.
+        $result += array(
+            Tag::UnitPrice => $productPriceEx,
+            Meta::UnitPriceInc => $productPriceInc,
+            Meta::RecalculateUnitPrice => $this->productPricesIncludeTax(),
+            Tag::Quantity => $item->getQtyOrdered(),
+        );
 
         // Tax amount = VAT over discounted product price.
         // Hidden tax amount = VAT over discount.
@@ -146,14 +148,7 @@ class Creator extends BaseCreator
         $vatRate = (float) $item->getTaxPercent();
         $lineVat = (float) $item->getTaxAmount() + (float) $item->getDiscountTaxCompensationAmount();
 
-        // Add price and quantity info.
-        $result += array(
-            $tag => $productPrice,
-            Tag::Quantity => $item->getQtyOrdered(),
-            Meta::LineVatAmount => $lineVat,
-        );
-
-        // Add VAT related info
+        // Add VAT related info.
         $childrenItems = $item->getChildrenItems();
         if (Number::isZero($vatRate) && !empty($childrenItems)) {
             // 0 VAT rate on parent: this is (very very) probably not correct.
@@ -170,6 +165,9 @@ class Creator extends BaseCreator
                 Meta::VatRateSource => Number::isZero($vatRate) ? Creator::VatRateSource_Exact0 : Creator::VatRateSource_Exact,
             );
         }
+        $result += array(
+            Meta::LineVatAmount => $lineVat,
+        );
 
         // Add discount related info.
         if (!Number::isZero($item->getDiscountAmount())) {
@@ -210,21 +208,20 @@ class Creator extends BaseCreator
         $this->addTokenDefault($result, Tag::Product, $invoiceSettings['productName']);
         $this->addTokenDefault($result, Tag::Nature, $invoiceSettings['nature']);
 
-        $lineVat = -((float) $item->getTaxAmount() + (float) $item->getDiscountTaxCompensationAmount());
         $productPriceEx = -((float) $item->getPrice());
+        $productPriceInc = -((float) $item->getPriceInclTax());
+        $lineVat = -((float) $item->getTaxAmount() + (float) $item->getDiscountTaxCompensationAmount());
 
-        // On a credit note we only have single lines, no compound lines.
+        // Add price and quantity info.
         $result += array(
             Tag::UnitPrice => $productPriceEx,
+            Meta::UnitPriceInc => $productPriceInc,
+            Meta::RecalculateUnitPrice => $this->productPricesIncludeTax(),
             Tag::Quantity => $item->getQty(),
             Meta::LineVatAmount => $lineVat,
         );
 
-        if ($this->productPricesIncludeTax()) {
-            $productPriceInc = -((float) $item->getPriceInclTax());
-            $result[Meta::UnitPriceInc] = $productPriceInc;
-        }
-
+        // Add VAT related info.
         $orderItemId = $item->getOrderItemId();
         if (!empty($orderItemId)) {
             $orderItem = $item->getOrderItem();
@@ -233,14 +230,18 @@ class Creator extends BaseCreator
                 Meta::VatRateSource => static::VatRateSource_Exact,
             );
         } else {
-            $result += $this->getVatRangeTags($lineVat / $item->getQty(), $productPriceEx, 0.02, 0.02);
+            $result += $this->getVatRangeTags($lineVat / $item->getQty(), $productPriceEx, 0.02, $this->productPricesIncludeTax() ? 0.02 : 0.01);
             $result[Meta::FieldsCalculated][] = Meta::VatAmount;
         }
 
+        // Add discount related info.
         if (!Number::isZero($item->getDiscountAmount())) {
             // Credit note: discounts are cancelled, thus amount is positive.
             $result[Meta::LineDiscountAmountInc] = $item->getDiscountAmount();
         }
+
+        // On a credit note we only have single lines, no compound lines, thus
+        // no children.
 
         $this->removePropertySource('item');
 
@@ -264,20 +265,21 @@ class Creator extends BaseCreator
             );
 
             // What do the following methods return:
-            // - getShippingAmount():         shipping costs excl VAT excl any discount
-            // - getShippingInclTax():        shipping costs incl VAT excl any discount
-            // - getShippingTaxAmount():      VAT on shipping costs incl discount
-            // - getShippingDiscountAmount(): discount on shipping incl VAT
+            // - getShippingAmount(): shipping costs ex VAT ex any discount.
+            // - getShippingInclTax(): shipping costs inc VAT ex any discount.
+            // - getShippingTaxAmount(): VAT on shipping costs inc discount.
+            // - getShippingDiscountAmount(): discount on shipping inc VAT.
             /** @var \Magento\Sales\Model\Order|\Magento\Sales\Model\Order\Creditmemo $magentoSource */
             $magentoSource = $this->invoiceSource->getSource();
             if (!Number::isZero($magentoSource->getShippingAmount())) {
+                // @todo: how are shipping costs entered? inc or ex vat. Use this to recalculate?
                 // We have 2 ways of calculating the vat rate: first one is based on tax
                 // amount and normal shipping costs corrected with any discount (as the
                 // tax amount is including any discount):
                 // $vatRate1 = $magentoSource->getShippingTaxAmount() / ($magentoSource->getShippingInclTax() - $magentoSource->getShippingDiscountAmount() - $magentoSource->getShippingTaxAmount());
                 // However, we will use the 2nd way as that seems to be more precise and,
                 // thus generally leads to a smaller range:
-                // Get range based on normal shipping costs incl and excl VAT.
+                // Get range based on normal shipping costs inc and ex VAT.
                 $sign = $this->getSign();
                 $shippingInc = $sign * $magentoSource->getShippingInclTax();
                 $shippingEx = $sign * $magentoSource->getShippingAmount();
@@ -285,8 +287,7 @@ class Creator extends BaseCreator
                 $result += array(
                         Tag::UnitPrice => $shippingEx,
                         Meta::UnitPriceInc => $shippingInc,
-                    ) + $this->getVatRangeTags($shippingVat, $shippingEx, 0.02,
-                        0.01);
+                    ) + $this->getVatRangeTags($shippingVat, $shippingEx, 0.02,0.01);
                 $result[Meta::FieldsCalculated][] = Meta::VatAmount;
 
                 // getShippingDiscountAmount() only exists on Orders.

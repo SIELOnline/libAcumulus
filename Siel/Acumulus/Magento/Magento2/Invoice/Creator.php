@@ -177,7 +177,6 @@ class Creator extends BaseCreator
         }
 
         // Add children lines for composed products.
-        $childrenItems = $item->getChildrenItems();
         if (!empty($childrenItems)) {
             $result[Meta::ChildrenLines] = array();
             foreach ($childrenItems as $child) {
@@ -241,7 +240,7 @@ class Creator extends BaseCreator
         }
 
         // On a credit note we only have single lines, no compound lines, thus
-        // no children.
+        // no children that might have to be added.
 
         $this->removePropertySource('item');
 

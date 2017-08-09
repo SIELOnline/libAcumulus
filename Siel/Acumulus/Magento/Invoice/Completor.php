@@ -3,6 +3,8 @@ namespace Siel\Acumulus\Magento\Invoice;
 
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Completor as BaseCompletor;
+use Siel\Acumulus\Meta;
+use Siel\Acumulus\Tag;
 
 /**
  * Class Completor

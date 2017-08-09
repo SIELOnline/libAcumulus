@@ -2,8 +2,8 @@
 namespace Siel\Acumulus\Magento\Magento1\Config;
 
 use Mage;
-use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
+use Siel\Acumulus\PluginConfig;
 
 /**
  * Defines the Magento 1 webshop specific capabilities.
@@ -432,7 +432,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function getTriggerInvoiceEventOptions()
     {
         $result = parent::getTriggerInvoiceEventOptions();
-        $result[Plugin::TriggerInvoiceEvent_Create] = $this->t('option_triggerInvoiceEvent_1');
+        $result[PluginConfig::TriggerInvoiceEvent_Create] = $this->t('option_triggerInvoiceEvent_1');
         return $result;
     }
 
@@ -447,8 +447,8 @@ class ShopCapabilities extends ShopCapabilitiesBase
         $paymentMethods = $paymentHelper->getPaymentMethods();
         foreach ($paymentMethods as $code => $paymentMethodData) {
             if (!empty($paymentMethodData['active'])) {
-                if ((isset($data['title']))) {
-                    $title = $data['title'];
+                if ((isset($paymentMethodData['title']))) {
+                    $title = $paymentMethodData['title'];
                 } elseif ($paymentHelper->getMethodInstance($code)) {
                     $title = $paymentHelper->getMethodInstance($code)->getConfigData('title');
                 }

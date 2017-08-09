@@ -10,8 +10,11 @@ use Siel\Acumulus\Magento\Shop\AcumulusEntryModel as BaseAcumulusEntryModel;
  */
 class AcumulusEntryModel extends BaseAcumulusEntryModel
 {
+
     /**
      * AcumulusEntryModel constructor.
+     *
+     * @param \Siel\Acumulus\Helpers\Log $log
      */
     public function __construct(Log $log)
     {

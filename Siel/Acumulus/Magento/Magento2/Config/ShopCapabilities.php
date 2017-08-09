@@ -2,7 +2,6 @@
 namespace Siel\Acumulus\Magento\Magento2\Config;
 
 use Siel\Acumulus\Magento\Magento2\Helpers\Registry;
-use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
 use Siel\Acumulus\PluginConfig;
 

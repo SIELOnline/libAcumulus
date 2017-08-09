@@ -271,13 +271,12 @@ class Creator extends BaseCreator
             /** @var \Magento\Sales\Model\Order|\Magento\Sales\Model\Order\Creditmemo $magentoSource */
             $magentoSource = $this->invoiceSource->getSource();
             if (!Number::isZero($magentoSource->getShippingAmount())) {
-                // @todo: how are shipping costs entered? inc or ex vat. Use this to recalculate?
-                // We have 2 ways of calculating the vat rate: first one is based on tax
-                // amount and normal shipping costs corrected with any discount (as the
-                // tax amount is including any discount):
+                // We have 2 ways of calculating the vat rate: first one is
+                // based on tax amount and normal shipping costs corrected with
+                // any discount (as the tax amount is including any discount):
                 // $vatRate1 = $magentoSource->getShippingTaxAmount() / ($magentoSource->getShippingInclTax() - $magentoSource->getShippingDiscountAmount() - $magentoSource->getShippingTaxAmount());
-                // However, we will use the 2nd way as that seems to be more precise and,
-                // thus generally leads to a smaller range:
+                // However, we will use the 2nd way as that seems to be more
+                // precise and thus generally leads to a smaller range:
                 // Get range based on normal shipping costs inc and ex VAT.
                 $sign = $this->getSign();
                 $shippingInc = $sign * $magentoSource->getShippingInclTax();
@@ -286,7 +285,8 @@ class Creator extends BaseCreator
                 $result += array(
                         Tag::UnitPrice => $shippingEx,
                         Meta::UnitPriceInc => $shippingInc,
-                    ) + $this->getVatRangeTags($shippingVat, $shippingEx, 0.02,0.01);
+                        Meta::RecalculateUnitPrice => $this->shippingPricesIncludeTax(),
+                    ) + $this->getVatRangeTags($shippingVat, $shippingEx, 0.02,$this->shippingPricesIncludeTax() ? 0.02 : 0.01);
                 $result[Meta::FieldsCalculated][] = Meta::VatAmount;
 
                 // getShippingDiscountAmount() only exists on Orders.
@@ -294,10 +294,11 @@ class Creator extends BaseCreator
                     $result[Meta::LineDiscountAmountInc] = -$sign * $magentoSource->getShippingDiscountAmount();
                 } elseif ($this->invoiceSource->getType() === Source::CreditNote
                     && !Number::floatsAreEqual($shippingVat, $magentoSource->getShippingTaxAmount(), 0.02)) {
-                    // On credit notes, the shipping discount amount is not stored but can
-                    // be deduced via the shipping discount tax amount and the shipping vat
-                    // rate. To get a more precise Meta::LineDiscountAmountInc, we
-                    // compute that in the completor when we have corrected the vatrate.
+                    // On credit notes, the shipping discount amount is not
+                    // stored but can be deduced via the shipping discount tax
+                    // amount and the shipping vat rate. To get a more precise
+                    // Meta::LineDiscountAmountInc, we compute that in the
+                    // completor when we have corrected the vatrate.
                     $result[Meta::LineDiscountVatAmount] = $sign * ($shippingVat - $sign * $magentoSource->getShippingTaxAmount());
                 }
             } else {
@@ -321,5 +322,18 @@ class Creator extends BaseCreator
         /** @var \Magento\Tax\Model\Config $taxConfig */
         $taxConfig = Registry::getInstance()->create('Magento\Tax\Model\Config');
         return $taxConfig->priceIncludesTax();
+    }
+
+    /**
+     * Returns whether shipping prices include tax.
+     *
+     * @return bool
+     *   true if shipping prices include tax, false otherwise.
+     */
+    protected function shippingPricesIncludeTax()
+    {
+        /** @var \Magento\Tax\Model\Config $taxConfig */
+        $taxConfig = Registry::getInstance()->create('Magento\Tax\Model\Config');
+        return $taxConfig->shippingPriceIncludesTax();
     }
 }

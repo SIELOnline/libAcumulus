@@ -266,13 +266,12 @@ class Creator extends BaseCreator
             // - getShippingTaxAmount(): VAT on shipping costs inc discount.
             // - getShippingDiscountAmount(): discount on shipping inc VAT.
             if (!Number::isZero($magentoSource->getShippingAmount())) {
-                // @todo: how are shipping costs entered? inc or ex vat. Use this to recalculate?
-                // We have 2 ways of calculating the vat rate: first one is based on tax
-                // amount and normal shipping costs corrected with any discount (as the
-                // tax amount is including any discount):
+                // We have 2 ways of calculating the vat rate: first one is
+                // based on tax amount and normal shipping costs corrected with
+                // any discount (as the tax amount is including any discount):
                 // $vatRate1 = $magentoSource->getShippingTaxAmount() / ($magentoSource->getShippingInclTax() - $magentoSource->getShippingDiscountAmount() - $magentoSource->getShippingTaxAmount());
-                // However, we will use the 2nd way as that seems to be more precise and,
-                // thus generally leads to a smaller range:
+                // However, we will use the 2nd way as that seems to be more
+                // precise and thus generally leads to a smaller range:
                 // Get range based on normal shipping costs inc and ex VAT.
                 $sign = $this->getSign();
                 $shippingInc = $sign * $magentoSource->getShippingInclTax();
@@ -281,7 +280,8 @@ class Creator extends BaseCreator
                 $result += array(
                         Tag::UnitPrice => $shippingEx,
                         Meta::UnitPriceInc => $shippingInc,
-                    ) + $this->getVatRangeTags($shippingVat, $shippingEx, 0.02,0.01);
+                        Meta::RecalculateUnitPrice => $this->shippingPricesIncludeTax(),
+                    ) + $this->getVatRangeTags($shippingVat, $shippingEx, 0.02,$this->shippingPricesIncludeTax() ? 0.02 : 0.01);
                 $result[Meta::FieldsCalculated][] = Meta::VatAmount;
 
                 // getShippingDiscountAmount() only exists on Orders.
@@ -316,5 +316,18 @@ class Creator extends BaseCreator
         /** @var \Mage_Tax_Model_Config $taxConfig */
         $taxConfig = \Mage::getModel('tax/config');
         return $taxConfig->priceIncludesTax();
+    }
+
+    /**
+     * Returns whether shipping prices include tax.
+     *
+     * @return bool
+     *   true if shipping prices include tax, false otherwise.
+     */
+    protected function shippingPricesIncludeTax()
+    {
+        /** @var \Mage_Tax_Model_Config $taxConfig */
+        $taxConfig = \Mage::getModel('tax/config');
+        return $taxConfig->shippingPriceIncludesTax();
     }
 }

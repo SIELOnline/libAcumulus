@@ -717,8 +717,8 @@ class Completor
     {
         $result = null;
         foreach ($this->invoice['customer']['invoice']['line'] as $line) {
-            if (isset($line[Meta::FieldsCalculated])) {
-                $lineVatTypes = explode(',', $line[Meta::FieldsCalculated]);
+            if (isset($line[Meta::VatTypesPossible])) {
+                $lineVatTypes = explode(',', $line[Meta::VatTypesPossible]);
                 if ($result === null) {
                     // 1st line.
                     $result = $lineVatTypes;

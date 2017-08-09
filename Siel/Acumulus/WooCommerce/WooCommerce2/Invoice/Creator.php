@@ -403,15 +403,15 @@ class Creator extends BaseCreator
      */
     protected function getDiscountLine(WC_Coupon $coupon)
     {
-        // Get a description for the value of this coupon.
-        // Entered discount amounts follow the wc_prices_include_tax() setting.
-        // Use that info in the description.
+        // Get a description for the value of this coupon. Entered discount
+        // amounts follow the productPricesIncludeTax() setting. Use that info
+        // in the description.
         if ($coupon->exists) {
             $description = sprintf('%s %s: ', $this->t('discount_code'), $coupon->code);
             if (in_array($coupon->discount_type, array('fixed_product', 'fixed_cart'))) {
                 $amount = $this->getSign() * $coupon->coupon_amount;
                 if (!Number::isZero($amount)) {
-                    $description .= sprintf('€%.2f (%s)', $amount, wc_prices_include_tax() ? $this->t('inc_vat') : $this->t('ex_vat'));
+                    $description .= sprintf('€%.2f (%s)', $amount, $this->productPricesIncludeTax() ? $this->t('inc_vat') : $this->t('ex_vat'));
                 }
                 if ($coupon->enable_free_shipping()) {
                     if (!Number::isZero($amount)) {

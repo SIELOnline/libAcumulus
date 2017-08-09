@@ -231,7 +231,7 @@ class Creator extends BaseCreator
         $productVat = $this->shopSource->get_item_tax($item, false);
 
         // Get precision info.
-        if (wc_prices_include_tax()) {
+        if ($this->productPricesIncludeTax()) {
             $precisionEx = $this->precisionPriceCalculated;
             $precisionInc = $this->precisionPriceEntered;
             $recalculateUnitPrice = true;
@@ -715,16 +715,16 @@ class Creator extends BaseCreator
      */
     protected function getDiscountLine(WC_Coupon $coupon)
     {
-        // Get a description for the value of this coupon.
-        // Entered discount amounts follow the wc_prices_include_tax() setting.
-        // Use that info in the description.
+        // Get a description for the value of this coupon. Entered discount
+        // amounts follow the productPricesIncludeTax() setting. Use that info
+        // in the description.
         if ($coupon->get_id()) {
             // Coupon still exists: extract info from coupon.
             $description = sprintf('%s %s: ', $this->t('discount_code'), $coupon->get_code());
             if (in_array($coupon->get_discount_type(), array('fixed_product', 'fixed_cart'))) {
                 $amount = $this->getSign() * $coupon->get_amount();
                 if (!Number::isZero($amount)) {
-                    $description .= sprintf('€%.2f (%s)', $amount, wc_prices_include_tax() ? $this->t('inc_vat') : $this->t('ex_vat'));
+                    $description .= sprintf('€%.2f (%s)', $amount, $this->productPricesIncludeTax() ? $this->t('inc_vat') : $this->t('ex_vat'));
                 }
                 if ($coupon->get_free_shipping()) {
                     if (!Number::isZero($amount)) {
@@ -754,5 +754,16 @@ class Creator extends BaseCreator
             Meta::VatAmount => 0,
             Meta::VatRateSource => static::VatRateSource_Completor,
         );
+    }
+
+    /**
+     *
+     *
+     *
+     * @return bool
+     *
+     */
+    protected function productPricesIncludeTax() {
+        return wc_prices_include_tax();
     }
 }

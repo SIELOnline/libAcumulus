@@ -401,12 +401,11 @@ abstract class InvoiceManager
      *
      * After sending the invoice:
      * - A successful result gets saved to the acumulus entries table.
-     * - A mail with the results may be sent.
      * - The invoice sent event gets triggered
+     * - A mail with the results may be sent.
      *
      * @param \Siel\Acumulus\Invoice\Source $invoiceSource
      * @param array $invoice
-     * param array $localMessages
      * @param \Siel\Acumulus\Invoice\Result $result
      *
      * @return \Siel\Acumulus\Invoice\Result
@@ -433,11 +432,11 @@ abstract class InvoiceManager
             }
         }
 
-        // Send a mail if there are messages.
-        $this->mailInvoiceAddResult($result, $invoiceSource);
-
         // Trigger the InvoiceSent event.
         $this->triggerInvoiceSent($invoice, $invoiceSource, $result);
+
+        // Send a mail if there are messages.
+        $this->mailInvoiceAddResult($result, $invoiceSource);
 
         return $result;
     }

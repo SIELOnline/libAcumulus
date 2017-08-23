@@ -2,7 +2,6 @@
 namespace Siel\Acumulus\OpenCart\Config;
 
 use Siel\Acumulus\PluginConfig;
-use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
@@ -325,11 +324,11 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
         $registry = Registry::getInstance();
         switch ($formType) {
             case 'config':
-                return $registry->url->link('module/acumulus', 'token=' . $registry->session->data['token'], true);
+                return $registry->url->link(Registry::getInstance()->getLocation(), 'token=' . $registry->session->data['token'], true);
             case 'advanced':
-                return $registry->url->link('module/acumulus/advanced', 'token=' . $registry->session->data['token'], true);
+                return $registry->url->link(Registry::getInstance()->getLocation() . '/advanced', 'token=' . $registry->session->data['token'], true);
             case 'batch':
-                return $registry->url->link('module/acumulus/batch', 'token=' . $registry->session->data['token'], true);
+                return $registry->url->link(Registry::getInstance()->getLocation() . '/batch', 'token=' . $registry->session->data['token'], true);
         }
         return parent::getLink($formType);
     }

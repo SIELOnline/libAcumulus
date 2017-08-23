@@ -97,7 +97,7 @@ class OcHelper
      */
     public function uninstall()
     {
-        $this->registry->response->redirect($this->registry->url->link('module/acumulus/confirmUninstall', 'token=' . $this->registry->session->data['token'], 'SSL'));
+        $this->registry->response->redirect($this->registry->url->link($this->registry->getLocation() . '/confirmUninstall', 'token=' . $this->registry->session->data['token'], 'SSL'));
     }
 
     /**
@@ -153,8 +153,8 @@ class OcHelper
 //        // Are we confirming, or should we show the confirm message?
 //        if ($this->registry->request->server['REQUEST_METHOD'] === 'POST') {
             $this->doUninstall();
-            $this->registry->response->redirect($this->registry->url->link('extension/module', 'token=' . $this->registry->session->data['token'],
-                'SSL'));
+            $url = $this->registry->isOc23() ? 'extension/extension' : 'extension/module';
+            $this->registry->response->redirect($this->registry->url->link($url, 'token=' . $this->registry->session->data['token'],'SSL'));
 //        }
 //
 //        // Add an intermediate level to the breadcrumb.
@@ -235,7 +235,7 @@ class OcHelper
         $this->data['formRenderer'] = $this->container->getFormRenderer();
 
         // Complete the breadcrumb with the current path.
-        $link = 'module/acumulus';
+        $link = $this->registry->getLocation();
         if ($task !== 'config') {
             $link .= "/$task";
         }

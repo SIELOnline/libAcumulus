@@ -16,7 +16,7 @@ class InvoiceManager extends BaseInvoiceManager
     protected function triggerInvoiceCreated(array &$invoice, Result $localResult, Source $invoiceSource)
     {
         $args = array('invoice' => &$invoice, 'source' => $invoiceSource);
-        $this->getEvent()->trigger('acumulus.invoice.created', $args);
+        $this->getEvent()->trigger('model/' . Registry::getInstance()->getLocation() . '/invoiceCreated/after', $args);
     }
 
     /**
@@ -26,8 +26,8 @@ class InvoiceManager extends BaseInvoiceManager
      */
     protected function triggerInvoiceCompleted(array &$invoice, Result $localResult, Source $invoiceSource)
     {
-        $args = array('invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult);
-        $this->getEvent()->trigger('acumulus.invoice.completed', $args);
+        $args = array('invoice' => &$invoice, 'localResult' => $localResult, 'source' => $invoiceSource);
+        $this->getEvent()->trigger('model/' . Registry::getInstance()->getLocation() . '/invoiceSend/before', $args);
     }
 
     /**
@@ -38,7 +38,7 @@ class InvoiceManager extends BaseInvoiceManager
     protected function triggerInvoiceSent(array $invoice, Source $invoiceSource, Result $result)
     {
         $args = array('invoice' => $invoice, 'source' => $invoiceSource, 'result' => $result);
-        $this->getEvent()->trigger('acumulus.invoice.sent', $args);
+        $this->getEvent()->trigger('model/' . Registry::getInstance()->getLocation() . '/invoiceSend/after', $args);
     }
 
     /**

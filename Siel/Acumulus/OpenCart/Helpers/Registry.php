@@ -81,6 +81,29 @@ class Registry
     }
 
     /**
+     * Returns whether we are in version 2.3+ or lower.
+     *
+     * @return bool
+     *   True if the version is 2.3 or higher, false otherwise.
+     *
+     */
+    public function isOc23()
+    {
+        return version_compare(VERSION, '2.3', '>=');
+    }
+
+    /**
+     * Returns the location of the extension's files.
+     *
+     * @return string
+     *   The location of the extension's files.
+     */
+    public function getLocation()
+    {
+        return $this->isOc23() ? 'extension/module/acumulus' : 'module/acumulus';
+    }
+
+    /**
      * Returns the order.
      *
      * @param int $orderId

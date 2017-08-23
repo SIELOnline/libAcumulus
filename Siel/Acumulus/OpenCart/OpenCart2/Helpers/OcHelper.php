@@ -74,7 +74,7 @@ class OcHelper extends BaseOcHelper
         parent::renderFormCommon($task, $button);
 
         // Send the output.
-        $this->registry->response->setOutput($this->registry->load->view('module/acumulus_form.tpl', $this->data));
+        $this->registry->response->setOutput($this->registry->load->view($this->registry->getLocation() . '_form.tpl', $this->data));
     }
 
     /**
@@ -100,7 +100,7 @@ class OcHelper extends BaseOcHelper
      *
      * This will add them to the table 'event' from where they are registered on
      * the start of each request. The controller actions can be found in the
-     * catalog controller for the catalog events and the amdin controller for
+     * catalog controller for the catalog events and the admin controller for
      * the admin events.
      *
      * To support updating, this will also be called by the index function.
@@ -109,9 +109,9 @@ class OcHelper extends BaseOcHelper
     protected function installEvents()
     {
         $this->uninstallEvents();
-        $this->registry->model_extension_event->addEvent('acumulus', 'catalog/model/checkout/order/addOrder/after', 'module/acumulus/eventOrderUpdate');
-        $this->registry->model_extension_event->addEvent('acumulus', 'catalog/model/checkout/order/addOrderHistory/after', 'module/acumulus/eventOrderUpdate');
-        $this->registry->model_extension_event->addEvent('acumulus', 'admin/view/common/column_left/before', 'module/acumulus/eventViewColumnLeft');
+        $this->registry->model_extension_event->addEvent('acumulus', 'catalog/model/checkout/order/addOrder/after', $this->registry->getLocation() . '/eventOrderUpdate');
+        $this->registry->model_extension_event->addEvent('acumulus', 'catalog/model/checkout/order/addOrderHistory/after', $this->registry->getLocation() . '/eventOrderUpdate');
+        $this->registry->model_extension_event->addEvent('acumulus', 'admin/view/common/column_left/before', $this->registry->getLocation() . '/eventViewColumnLeft');
     }
 
     /**
@@ -122,5 +122,4 @@ class OcHelper extends BaseOcHelper
         $this->registry->load->model('extension/event');
         $this->registry->model_extension_event->deleteEvent('acumulus');
     }
-
 }

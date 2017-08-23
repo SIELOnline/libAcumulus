@@ -23,7 +23,7 @@ class OcHelper extends BaseOcHelper
     protected function installEvents()
     {
         $this->uninstallEvents();
-        $this->registry->model_extension_event->addEvent('acumulus', 'post.order.add', 'module/acumulus/eventOrderUpdate');
-        $this->registry->model_extension_event->addEvent('acumulus', 'post.order.history.add', 'module/acumulus/eventOrderUpdate');
+        $this->registry->model_extension_event->addEvent('acumulus', 'post.order.add', $this->registry->getLocation() . '/eventOrderUpdate');
+        $this->registry->model_extension_event->addEvent('acumulus', 'post.order.history.add', $this->registry->getLocation() . '/eventOrderUpdate');
     }
 }

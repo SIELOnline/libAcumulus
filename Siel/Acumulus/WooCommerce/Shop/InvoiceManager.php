@@ -155,9 +155,9 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * This WooCommerce override applies the 'acumulus_invoice_created' filter.
      */
-    protected function triggerInvoiceCreated(array &$invoice, Result $localResult, Source $invoiceSource)
+    protected function triggerInvoiceCreated(array &$invoice, Source $invoiceSource, Result $localResult)
     {
-        $invoice = apply_filters('acumulus_invoice_created', $invoice, $invoiceSource);
+        $invoice = apply_filters('acumulus_invoice_created', $invoice, $invoiceSource, $localResult);
     }
 
     /**
@@ -165,9 +165,9 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * This WooCommerce override applies the 'acumulus_invoice_completed' filter.
      */
-    protected function triggerInvoiceCompleted(array &$invoice, Result $localResult, Source $invoiceSource)
+    protected function triggerInvoiceSendBefore(array &$invoice, Source $invoiceSource, Result $localResult)
     {
-        $invoice = apply_filters('acumulus_invoice_completed', $invoice, $invoiceSource, $localResult);
+        $invoice = apply_filters('acumulus_invoice_send_before', $invoice, $invoiceSource, $localResult);
     }
 
     /**
@@ -175,9 +175,9 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * This WooCommerce override executes the 'acumulus_invoice_sent' action.
      */
-    protected function triggerInvoiceSent(array $invoice, Source $invoiceSource, Result $result)
+    protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, Result $result)
     {
-        do_action('acumulus_invoice_sent', $invoice, $invoiceSource, $result);
+        do_action('acumulus_invoice_send_after', $invoice, $invoiceSource, $result);
     }
 
     /**

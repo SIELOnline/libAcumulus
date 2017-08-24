@@ -84,9 +84,9 @@ abstract class InvoiceManager extends BaseInvoiceManager
      *
      * This Magento override dispatches the 'acumulus_invoice_created' event.
      */
-    protected function triggerInvoiceCreated(array &$invoice, Result $localResult, Source $invoiceSource)
+    protected function triggerInvoiceCreated(array &$invoice, Source $invoiceSource, Result $localResult)
     {
-        $this->dispatchEvent('acumulus_invoice_created', array('source' => $invoiceSource), array('invoice' => &$invoice));
+        $this->dispatchEvent('acumulus_invoice_created', array('source' => $invoiceSource, 'localResult' => $localResult), array('invoice' => &$invoice));
     }
 
     /**
@@ -94,9 +94,9 @@ abstract class InvoiceManager extends BaseInvoiceManager
      *
      * This Magento override dispatches the 'acumulus_invoice_completed' event.
      */
-    protected function triggerInvoiceCompleted(array &$invoice, Result $localResult, Source $invoiceSource)
+    protected function triggerInvoiceSendBefore(array &$invoice, Source $invoiceSource, Result $localResult)
     {
-        $this->dispatchEvent('acumulus_invoice_completed', array('source' => $invoiceSource, 'localResult'=> $localResult), array('invoice' => &$invoice));
+        $this->dispatchEvent('acumulus_invoice_send_before', array('source' => $invoiceSource, 'localResult' => $localResult), array('invoice' => &$invoice));
     }
 
     /**
@@ -104,9 +104,9 @@ abstract class InvoiceManager extends BaseInvoiceManager
      *
      * This Magento override dispatches the 'acumulus_invoice_sent' event.
      */
-    protected function triggerInvoiceSent(array $invoice, Source $invoiceSource, Result $result)
+    protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, Result $result)
     {
-        $this->dispatchEvent('acumulus_invoice_sent', array('invoice' => $invoice, 'source' => $invoiceSource, 'result' => $result));
+        $this->dispatchEvent('acumulus_invoice_send_after', array('invoice' => $invoice, 'source' => $invoiceSource, 'result' => $result));
     }
 
     /**

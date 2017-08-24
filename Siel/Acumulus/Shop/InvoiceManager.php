@@ -362,14 +362,14 @@ abstract class InvoiceManager
             $shopEventSettings = $this->getConfig()->getShopEventSettings();
             if ($shopEventSettings['sendEmptyInvoice'] || !$this->isEmptyInvoice($invoice)) {
                 // Trigger the InvoiceCreated event.
-                $this->triggerInvoiceCreated($invoice, $result, $invoiceSource);
+                $this->triggerInvoiceCreated($invoice, $invoiceSource, $result);
 
                 // If the invoice is not set to null, we continue by completing it.
                 if ($invoice !== null) {
                     $invoice = $this->getCompletor()->complete($invoice, $invoiceSource, $result);
 
                     // Trigger the InvoiceCompleted event.
-                    $this->triggerInvoiceCompleted($invoice, $result, $invoiceSource);
+                    $this->triggerInvoiceSendBefore($invoice, $invoiceSource, $result);
 
                     // If the invoice is not set to null, we continue by sending it.
                     if ($invoice !== null) {
@@ -433,7 +433,7 @@ abstract class InvoiceManager
         }
 
         // Trigger the InvoiceSent event.
-        $this->triggerInvoiceSent($invoice, $invoiceSource, $result);
+        $this->triggerInvoiceSendAfter($invoice, $invoiceSource, $result);
 
         // Send a mail if there are messages.
         $this->mailInvoiceAddResult($result, $invoiceSource);
@@ -496,7 +496,7 @@ abstract class InvoiceManager
      * @param Source $invoiceSource
      *   The source object (order, credit note) for which the invoice was created.
      */
-    protected function triggerInvoiceCreated(array &$invoice, Result $localResult, Source $invoiceSource)
+    protected function triggerInvoiceCreated(array &$invoice, Source $invoiceSource, Result $localResult)
     {
         // Default implementation: no event.
     }
@@ -515,7 +515,7 @@ abstract class InvoiceManager
      * @param \Siel\Acumulus\Invoice\Result $localResult
      *   Any locally generated messages.
      */
-    protected function triggerInvoiceCompleted(array &$invoice, Result $localResult, Source $invoiceSource)
+    protected function triggerInvoiceSendBefore(array &$invoice, Source $invoiceSource, Result $localResult)
     {
         // Default implementation: no event.
     }
@@ -532,7 +532,7 @@ abstract class InvoiceManager
      * @param \Siel\Acumulus\Invoice\Result $result
      *   The result as sent back by Acumulus.
      */
-    protected function triggerInvoiceSent(array $invoice, Source $invoiceSource, Result $result)
+    protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, Result $result)
     {
         // Default implementation: no event.
     }

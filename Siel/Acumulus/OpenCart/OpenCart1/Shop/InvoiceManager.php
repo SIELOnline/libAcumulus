@@ -14,7 +14,7 @@ class InvoiceManager extends BaseInvoiceManager
     /**
      * {@inheritdoc}
      */
-    protected function triggerInvoiceCreated(array &$invoice, Result $localResult, Source $invoiceSource)
+    protected function triggerInvoiceCreated(array &$invoice, Source $invoiceSource, Result $localResult)
     {
         // VQMOD: insert your 'acumulus.invoice.created' event code here.
         // END VQMOD: insert your 'acumulus.invoice.created' event code here.
@@ -23,7 +23,7 @@ class InvoiceManager extends BaseInvoiceManager
     /**
      * {@inheritdoc}
      */
-    protected function triggerInvoiceCompleted(array &$invoice, Result $localResult, Source $invoiceSource)
+    protected function triggerInvoiceSendBefore(array &$invoice, Source $invoiceSource, Result $localResult)
     {
         // VQMOD: insert your 'acumulus.invoice.completed' event code here.
         // END VQMOD: insert your 'acumulus.invoice.completed' event code here.
@@ -32,7 +32,7 @@ class InvoiceManager extends BaseInvoiceManager
     /**
      * {@inheritdoc}
      */
-    protected function triggerInvoiceSent(array $invoice, Source $invoiceSource, Result $result)
+    protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, Result $result)
     {
         // VQMOD: insert your 'acumulus.invoice.sent' event code here.
         // END VQMOD: insert your 'acumulus.invoice.sent' event code here.

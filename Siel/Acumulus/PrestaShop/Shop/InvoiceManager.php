@@ -87,9 +87,9 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * This PrestaShop override executes the 'actionAcumulusInvoiceCreated' hook.
      */
-    protected function triggerInvoiceCreated(array &$invoice, Result $localResult, Source $invoiceSource)
+    protected function triggerInvoiceCreated(array &$invoice, Source $invoiceSource, Result $localResult)
     {
-        Hook::exec('actionAcumulusInvoiceCreated', array('invoice' => &$invoice, 'localResult' => $localResult, 'source' => $invoiceSource), null, true);
+        Hook::exec('actionAcumulusInvoiceCreated', array('invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult), null, true);
     }
 
     /**
@@ -97,9 +97,9 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * This PrestaShop override executes the 'actionAcumulusInvoiceCompleted' hook.
      */
-    protected function triggerInvoiceCompleted(array &$invoice, Result $localResult, Source $invoiceSource)
+    protected function triggerInvoiceSendBefore(array &$invoice, Source $invoiceSource, Result $localResult)
     {
-        Hook::exec('actionAcumulusInvoiceCompleted', array('invoice' => &$invoice, 'localResult' => $localResult, 'source' => $invoiceSource), null, true);
+        Hook::exec('actionAcumulusInvoiceSendBefore', array('invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult), null, true);
     }
 
     /**
@@ -107,8 +107,8 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * This PrestaShop override executes the 'actionAcumulusInvoiceSent' hook.
      */
-    protected function triggerInvoiceSent(array $invoice, Source $invoiceSource, Result $result)
+    protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, Result $result)
     {
-        Hook::exec('actionAcumulusInvoiceSent', array('invoice' => $invoice, 'source' => $invoiceSource, 'result' => $result), null, true);
+        Hook::exec('actionAcumulusInvoiceSendAfter', array('invoice' => $invoice, 'source' => $invoiceSource, 'result' => $result), null, true);
     }
 }

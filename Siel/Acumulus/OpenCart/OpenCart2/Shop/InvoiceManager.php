@@ -13,9 +13,9 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * This OpenCart 2 override triggers the 'acumulus.invoice.created' event.
      */
-    protected function triggerInvoiceCreated(array &$invoice, Result $localResult, Source $invoiceSource)
+    protected function triggerInvoiceCreated(array &$invoice, Source $invoiceSource, Result $localResult)
     {
-        $args = array('invoice' => &$invoice, 'source' => $invoiceSource);
+        $args = array('invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult);
         $this->getEvent()->trigger('model/' . Registry::getInstance()->getLocation() . '/invoiceCreated/after', $args);
     }
 
@@ -24,9 +24,9 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * This OpenCart 2 override triggers the 'acumulus.invoice.completed' event.
      */
-    protected function triggerInvoiceCompleted(array &$invoice, Result $localResult, Source $invoiceSource)
+    protected function triggerInvoiceSendBefore(array &$invoice, Source $invoiceSource, Result $localResult)
     {
-        $args = array('invoice' => &$invoice, 'localResult' => $localResult, 'source' => $invoiceSource);
+        $args = array('invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult);
         $this->getEvent()->trigger('model/' . Registry::getInstance()->getLocation() . '/invoiceSend/before', $args);
     }
 
@@ -35,7 +35,7 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * This OpenCart 2 override triggers the 'acumulus.invoice.sent' event.
      */
-    protected function triggerInvoiceSent(array $invoice, Source $invoiceSource, Result $result)
+    protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, Result $result)
     {
         $args = array('invoice' => $invoice, 'source' => $invoiceSource, 'result' => $result);
         $this->getEvent()->trigger('model/' . Registry::getInstance()->getLocation() . '/invoiceSend/after', $args);

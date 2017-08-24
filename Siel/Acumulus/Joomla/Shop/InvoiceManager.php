@@ -79,10 +79,10 @@ abstract class InvoiceManager extends BaseInvoiceManager
      *
      * This Joomla override dispatches the 'onAcumulusInvoiceCreated' event.
      */
-    protected function triggerInvoiceCreated(array &$invoice, Result $localResult, Source $invoiceSource)
+    protected function triggerInvoiceCreated(array &$invoice, Source $invoiceSource, Result $localResult)
     {
         JPluginHelper::importPlugin('acumulus');
-        $results = JEventDispatcher::getInstance()->trigger('onAcumulusInvoiceCreated', array(&$invoice, $invoiceSource));
+        $results = JEventDispatcher::getInstance()->trigger('onAcumulusInvoiceCreated', array(&$invoice, $invoiceSource, $localResult));
         if (count(array_filter($results, function ($value) {
                 return $value === false;
             })) > 1
@@ -96,10 +96,10 @@ abstract class InvoiceManager extends BaseInvoiceManager
      *
      * This Joomla override dispatches the 'onAcumulusInvoiceCompleted' event.
      */
-    protected function triggerInvoiceCompleted(array &$invoice, Result $localResult, Source $invoiceSource)
+    protected function triggerInvoiceSendBefore(array &$invoice, Source $invoiceSource, Result $localResult)
     {
         JPluginHelper::importPlugin('acumulus');
-        $results = JEventDispatcher::getInstance()->trigger('onAcumulusInvoiceCompleted', array(&$invoice, $invoiceSource, $localResult));
+        $results = JEventDispatcher::getInstance()->trigger('onAcumulusInvoiceSendBefore', array(&$invoice, $invoiceSource, $localResult));
         if (count(array_filter($results, function ($value) {
                 return $value === false;
             })) > 1
@@ -113,9 +113,9 @@ abstract class InvoiceManager extends BaseInvoiceManager
      *
      * This Joomla override dispatches the 'onAcumulusInvoiceSent' event.
      */
-    protected function triggerInvoiceSent(array $invoice, Source $invoiceSource, Result $result)
+    protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, Result $result)
     {
         JPluginHelper::importPlugin('acumulus');
-        JEventDispatcher::getInstance()->trigger('onAcumulusInvoiceSent', array($invoice, $invoiceSource, $result));
+        JEventDispatcher::getInstance()->trigger('onAcumulusInvoiceSendAfter', array($invoice, $invoiceSource, $result));
     }
 }

@@ -162,8 +162,8 @@ class FormMapper extends BaseFormMapper
      * @param string $id
      * @param array $options
      *
-     * @return array A list of PrestaShop radio button options.
-     * A list of PrestaShop radio button options.
+     * @return array
+     *   A list of PrestaShop radio button options.
      */
     protected function getPrestaShopValues($id, array $options)
     {
@@ -184,8 +184,8 @@ class FormMapper extends BaseFormMapper
      *
      * @param array $options
      *
-     * @return array A list of PrestaShop radio button options.
-     * A list of PrestaShop radio button options.
+     * @return array
+     *   A list of PrestaShop radio button options.
      */
     protected function getPrestaShopOptions(array $options)
     {

@@ -385,8 +385,8 @@ abstract class Creator
      *   contain a prefix.
      */
     protected function getInvoiceNumber($invoiceNumberSource) {
-        $result = $this->invoiceSource->getInvoiceReference();
-        if ($invoiceNumberSource != PluginConfig::InvoiceNrSource_ShopInvoice || empty($result)) {
+        $result = $invoiceNumberSource === PluginConfig::InvoiceNrSource_ShopInvoice ? $this->invoiceSource->getInvoiceReference() : null;
+        if (empty($result)) {
             $result = $this->invoiceSource->getReference();
         }
         return $result;

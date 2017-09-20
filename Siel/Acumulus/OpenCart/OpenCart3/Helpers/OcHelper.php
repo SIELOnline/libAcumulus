@@ -1,5 +1,5 @@
 <?php
-namespace Siel\Acumulus\OpenCart\OpenCart2\Helpers;
+namespace Siel\Acumulus\OpenCart\OpenCart3\Helpers;
 
 use Siel\Acumulus\OpenCart\Helpers\OcHelper as BaseOcHelper;
 
@@ -74,7 +74,7 @@ class OcHelper extends BaseOcHelper
         parent::renderFormCommon($task, $button);
 
         // Send the output.
-        $this->registry->response->setOutput($this->registry->load->view($this->registry->getLocation() . '_form.tpl', $this->data));
+        $this->registry->response->setOutput($this->registry->load->view($this->registry->getLocation() . '_form', $this->data));
     }
 
     /**
@@ -109,9 +109,9 @@ class OcHelper extends BaseOcHelper
     protected function installEvents()
     {
         $this->uninstallEvents();
-        $this->registry->model_extension_event->addEvent('acumulus', 'catalog/model/checkout/order/addOrder/after', $this->registry->getLocation() . '/eventOrderUpdate');
-        $this->registry->model_extension_event->addEvent('acumulus', 'catalog/model/checkout/order/addOrderHistory/after', $this->registry->getLocation() . '/eventOrderUpdate');
-        $this->registry->model_extension_event->addEvent('acumulus', 'admin/view/common/column_left/before', $this->registry->getLocation() . '/eventViewColumnLeft');
+        $this->registry->model_setting_event->addEvent('acumulus', 'catalog/model/checkout/order/addOrder/after', $this->registry->getLocation() . '/eventOrderUpdate');
+        $this->registry->model_setting_event->addEvent('acumulus', 'catalog/model/checkout/order/addOrderHistory/after', $this->registry->getLocation() . '/eventOrderUpdate');
+        $this->registry->model_setting_event->addEvent('acumulus', 'admin/view/common/column_left/before', $this->registry->getLocation() . '/eventViewColumnLeft');
     }
 
     /**
@@ -119,7 +119,7 @@ class OcHelper extends BaseOcHelper
      */
     protected function uninstallEvents()
     {
-        $this->registry->load->model('extension/event');
-        $this->registry->model_extension_event->deleteEvent('acumulus');
+        $this->registry->load->model('setting/event');
+        $this->registry->model_setting_event->deleteEvent('acumulus');
     }
 }

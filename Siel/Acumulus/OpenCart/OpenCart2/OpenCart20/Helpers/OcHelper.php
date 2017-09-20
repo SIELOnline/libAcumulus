@@ -4,8 +4,8 @@ namespace Siel\Acumulus\OpenCart\OpenCart2\OpenCart20\Helpers;
 use Siel\Acumulus\OpenCart\OpenCart2\Helpers\OcHelper as BaseOcHelper;
 
 /**
- * OcHelper contains functionality shared between the OC1 and OC2 controllers
- * and models, for both admin and catalog.
+ * OcHelper contains functionality shared between the OC1, OC2 and OC3
+ * controllers and models, for both admin and catalog.
  */
 class OcHelper extends BaseOcHelper
 {

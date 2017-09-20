@@ -7,8 +7,8 @@ use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Shop\ModuleTranslations;
 
 /**
- * OcHelper contains functionality shared between the OC1 and OC2 controllers
- * and models, for both admin and catalog.
+ * OcHelper contains functionality shared between the OC1, OC2 and OC3
+ * controllers and models, for both admin and catalog.
  */
 class OcHelper
 {
@@ -18,7 +18,7 @@ class OcHelper
     /** @var array */
     public $data;
 
-    /** @var \Registry */
+    /** @var \Siel\Acumulus\OpenCart\Helpers\Registry */
     protected $registry;
 
     /**
@@ -97,7 +97,7 @@ class OcHelper
      */
     public function uninstall()
     {
-        $this->registry->response->redirect($this->registry->url->link($this->registry->getLocation() . '/confirmUninstall', 'token=' . $this->registry->session->data['token'], 'SSL'));
+        $this->registry->response->redirect($this->registry->getLink($this->registry->getLocation() . '/confirmUninstall'));
     }
 
     /**
@@ -115,7 +115,7 @@ class OcHelper
         // Add an intermediate level to the breadcrumb.
         $this->data['breadcrumbs'][] = array(
             'text' => $this->t('modules'),
-            'href' => Registry::getInstance()->url->link('extension/module', 'token=' . $this->registry->session->data['token'], 'SSL'),
+            'href' => Registry::getInstance()->getLink('extension/module'),
             'separator' => ' :: '
         );
 
@@ -154,13 +154,13 @@ class OcHelper
 //        if ($this->registry->request->server['REQUEST_METHOD'] === 'POST') {
             $this->doUninstall();
             $url = $this->registry->isOc23() ? 'extension/extension' : 'extension/module';
-            $this->registry->response->redirect($this->registry->url->link($url, 'token=' . $this->registry->session->data['token'],'SSL'));
+            $this->registry->response->redirect($this->registry->getLink($url));
 //        }
 //
 //        // Add an intermediate level to the breadcrumb.
 //        $this->data['breadcrumbs'][] = array(
 //            'text' => $this->t('modules'),
-//            'href' => $this->registry->url->link('extension/module', 'token=' . $this->registry->session->data['token'], 'SSL'),
+//            'href' => $this->registry->getLink('extension/module',),
 //            'separator' => ' :: '
 //        );
 //
@@ -203,7 +203,7 @@ class OcHelper
         $this->data['breadcrumbs'] = array();
         $this->data['breadcrumbs'][] = array(
             'text' => $this->t('text_home'),
-            'href' => $this->registry->url->link('common/dashboard', 'token=' . $this->registry->session->data['token'], 'SSL'),
+            'href' => $this->registry->getLink('common/dashboard'),
             'separator' => false
         );
     }
@@ -241,15 +241,15 @@ class OcHelper
         }
         $this->data['breadcrumbs'][] = array(
             'text' => $this->t("{$task}_form_header"),
-            'href' => $this->registry->url->link($link, 'token=' . $this->registry->session->data['token'], 'SSL'),
+            'href' => $this->registry->getLink($link),
             'separator' => ' :: '
         );
 
         // Set the action buttons (action + text).
-        $this->data['action'] = $this->registry->url->link($link, 'token=' . $this->registry->session->data['token'], 'SSL');
+        $this->data['action'] = $this->registry->getLink($link);
         $this->data['button_icon'] = $task === 'batch' ? 'fa-envelope-o' : ($task === 'uninstall' ? 'fa-delete' : 'fa-save');
         $this->data['button_save'] = $this->t($button);
-        $this->data['cancel'] = $this->registry->url->link('common/dashboard', 'token=' . $this->registry->session->data['token'], 'SSL');
+        $this->data['cancel'] = $this->registry->getLink('common/dashboard');
         $this->data['button_cancel'] = $task === 'uninstall' ? $this->t('button_cancel_uninstall') : $this->t('button_cancel');
     }
 

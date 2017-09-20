@@ -324,11 +324,11 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
         $registry = Registry::getInstance();
         switch ($formType) {
             case 'config':
-                return $registry->url->link(Registry::getInstance()->getLocation(), 'token=' . $registry->session->data['token'], true);
+                return $registry->getLink(Registry::getInstance()->getLocation());
             case 'advanced':
-                return $registry->url->link(Registry::getInstance()->getLocation() . '/advanced', 'token=' . $registry->session->data['token'], true);
+                return $registry->getLink(Registry::getInstance()->getLocation() . '/advanced');
             case 'batch':
-                return $registry->url->link(Registry::getInstance()->getLocation() . '/batch', 'token=' . $registry->session->data['token'], true);
+                return $registry->getLink(Registry::getInstance()->getLocation() . '/batch');
         }
         return parent::getLink($formType);
     }

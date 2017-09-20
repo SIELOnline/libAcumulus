@@ -81,7 +81,19 @@ class Registry
     }
 
     /**
-     * Returns whether we are in version 2.3+ or lower.
+     * Returns whether we are in main version 1.
+     *
+     * @return bool
+     *   True if the main version is 1, false otherwise.
+     *
+     */
+    public function isOc1()
+    {
+        return version_compare(VERSION, '2', '<');
+    }
+
+    /**
+     * Returns whether we are in version 2.3+.
      *
      * @return bool
      *   True if the version is 2.3 or higher, false otherwise.
@@ -90,6 +102,18 @@ class Registry
     public function isOc23()
     {
         return version_compare(VERSION, '2.3', '>=');
+    }
+
+    /**
+     * Returns whether we are in version 3+.
+     *
+     * @return bool
+     *   True if the version is 3 or higher, false otherwise.
+     *
+     */
+    public function isOc3()
+    {
+        return version_compare(VERSION, '3', '>=');
     }
 
     /**
@@ -152,5 +176,24 @@ class Registry
             }
         }
         return $this->orderModel;
+    }
+
+    /**
+     * Returns a link to the given route.
+     *
+     * @param string $route
+     *
+     * @return string
+     *   The link to the given route, including standard arguments.
+     */
+    public function getLink($route)
+    {
+        // Differences between the OC versions.
+        // - token in OC1 and 2, user_token in OC3.
+        $token = $this->isOc3() ? 'user_token' : 'token';
+        // - 3rd argument is $connection = 'SSL' in OC1, and is $secure = true
+        //   in OC2 and 3.
+        $secure = $this->isOc1() ? 'SSL' : true;
+        return $this->url->link($route, $token . '=' . $this->session->data[$token], $secure);
     }
 }

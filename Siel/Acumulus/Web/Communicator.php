@@ -211,6 +211,10 @@ class Communicator implements CommunicatorInterface
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => $post,
+            // Since 2017-09-19 the Acumulus web service only accepts TLS 1.2.
+            // Apparently, some libraries do support this version but do not use
+            // it by default, so we force it.
+            CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1_2,
             //CURLOPT_PROXY => '127.0.0.1:8888', // Uncomment to debug with Fiddler.
         );
         if (!curl_setopt_array($ch, $options)) {

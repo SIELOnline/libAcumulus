@@ -60,6 +60,8 @@ abstract class ShopCapabilities implements ShopCapabilitiesInterface
                     'type (' . $this->t(Source::Order) . ' ' . $this->t('or') . ' ' . $this->t(Source::CreditNote) . ')',
                     'id (' . $this->t('internal_id') . ')',
                     'reference (' . $this->t('external_id') . ')',
+                    'getInvoiceReference (' . $this->t('external_id') . ')',
+                    'getInvoiceDate',
                     'status (' . $this->t('internal_not_label') . ')',
                 ),
                 'properties-more' => false,

@@ -21,12 +21,9 @@ namespace Siel\Acumulus\OpenCart\Helpers;
  * @property \ModelAccountOrder model_account_order
  * @property \ModelCatalogProduct model_catalog_product
  * @property \ModelCheckoutOrder model_checkout_order
- * @property \ModelExtensionEvent model_extension_event
  * @property \ModelSaleOrder model_sale_order
  * @property \ModelLocalisationOrderStatus model_localisation_order_status
  * @property \ModelSettingSetting model_setting_setting
- * @property \ModelSettingExtension model_setting_extension
- * @property \ModelExtensionExtension model_extension_extension
  */
 class Registry
 {
@@ -39,6 +36,18 @@ class Registry
     /** @noinspection PhpUndefinedClassInspection */
     /** @var \ModelAccountOrder|\ModelSaleOrder */
     protected $orderModel;
+
+    /** @noinspection PhpUndefinedClassInspection */
+    /**
+     * @var \ModelSettingExtension|\ModelExtensionExtension
+     */
+    protected $extensionModel;
+
+    /** @noinspection PhpUndefinedClassInspection */
+    /**
+     * @var \ModelSettingEvent|\ModelExtensionEvent
+     */
+    protected $eventModel;
 
     /**
      * Sets the OC Registry.
@@ -133,6 +142,8 @@ class Registry
      * @param int $orderId
      *
      * @return array|false
+     *
+     * @throws \Exception
      */
     public function getOrder($orderId)
     {
@@ -161,6 +172,8 @@ class Registry
      * separate method getOrder() for that here.
      *
      * @return \ModelAccountOrder|\ModelSaleOrder
+     *
+     * @throws \Exception
      */
     public function getOrderModel()
     {
@@ -176,6 +189,54 @@ class Registry
             }
         }
         return $this->orderModel;
+    }
+
+    /** @noinspection PhpUndefinedClassInspection */
+    /**
+     * Returns the extension model that can be used to retrieve payment methods.
+     *
+     * @return \ModelSettingExtension|\ModelExtensionExtension
+     *
+     * @throws \Exception
+     */
+    public function getExtensionModel()
+    {
+        if ($this->extensionModel === null) {
+            if ($this->isOc1() || $this->isOc3()) {
+                $this->load->model('setting/extension');
+                /** @noinspection PhpUndefinedFieldInspection */
+                $this->extensionModel = $this->model_setting_extension;
+            } else {
+                $this->load->model('extension/extension');
+                /** @noinspection PhpUndefinedFieldInspection */
+                $this->extensionModel = $this->model_extension_extension;
+            }
+        }
+        return $this->extensionModel;
+    }
+
+    /** @noinspection PhpUndefinedClassInspection */
+    /**
+     * Returns the extension model that can be used to retrieve payment methods.
+     *
+     * @return \ModelSettingEvent|\ModelExtensionEvent
+     *
+     * @throws \Exception
+     */
+    public function getEventModel()
+    {
+        if ($this->eventModel === null) {
+            if ($this->isOc3()) {
+                $this->load->model('setting/event');
+                /** @noinspection PhpUndefinedFieldInspection */
+                $this->eventModel = $this->model_setting_event;
+            } else {
+                $this->load->model('extension/event');
+                /** @noinspection PhpUndefinedFieldInspection */
+                $this->eventModel = $this->model_extension_event;
+            }
+        }
+        return $this->eventModel;
     }
 
     /**

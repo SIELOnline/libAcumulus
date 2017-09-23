@@ -1,9 +1,9 @@
 <?php
 namespace Siel\Acumulus\OpenCart\OpenCart1\Shop;
 
+use Siel\Acumulus\Invoice\Result;
 use Siel\Acumulus\Invoice\Source as Source;
 use Siel\Acumulus\OpenCart\Shop\InvoiceManager as BaseInvoiceManager;
-use Siel\Acumulus\Invoice\Result;
 
 /**
  * This OpenCart 1 override allows you to insert your event handler code using

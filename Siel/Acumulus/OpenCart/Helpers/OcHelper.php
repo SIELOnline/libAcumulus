@@ -83,6 +83,8 @@ class OcHelper
      * Install controller action, called when the module is installed.
      *
      * @return bool
+     *
+     * @throws \Exception
      */
     public function install()
     {
@@ -94,14 +96,20 @@ class OcHelper
 
     /**
      * Uninstall function, called when the module is uninstalled by an admin.
+     *
+     * @throws \Exception
      */
     public function uninstall()
     {
+        // "Disable" (delete) events, regardless the confirmation answer.
+        $this->uninstallEvents();
         $this->registry->response->redirect($this->registry->getLink($this->registry->getLocation() . '/confirmUninstall'));
     }
 
     /**
      * Controller action: show/process the settings form for this module.
+     *
+     * @throws \Exception
      */
     public function config()
     {
@@ -144,6 +152,8 @@ class OcHelper
      * Explicit confirmation step to allow to retain the settings.
      *
      * The normal uninstall action will unconditionally delete all settings.
+     *
+     * @throws \Exception
      */
     public function confirmUninstall()
     {
@@ -153,7 +163,7 @@ class OcHelper
 //        // Are we confirming, or should we show the confirm message?
 //        if ($this->registry->request->server['REQUEST_METHOD'] === 'POST') {
             $this->doUninstall();
-            $url = $this->registry->isOc23() ? 'extension/extension' : 'extension/module';
+            $url = $this->registry->isOc3() ? 'marketplace/extension' : ($this->registry->isOc23() ? 'extension/extension' : 'extension/module');
             $this->registry->response->redirect($this->registry->getLink($url));
 //        }
 //
@@ -175,6 +185,35 @@ class OcHelper
     public function eventOrderUpdate($order_id) {
         $source = $this->container->getSource(Source::Order, $order_id);
         $this->container->getManager()->sourceStatusChange($source);
+    }
+
+    /**
+     * Adds our menu-items to the admin menu.
+     *
+     * @param array $menus
+     *   The menus part of the data as will be passed to the view.
+     */
+    public function eventViewColumnLeft(&$menus) {
+        foreach ($menus as &$menu) {
+            if ($menu['id'] === 'menu-sale') {
+                $menu['children'][] = array(
+                    'name' => 'Acumulus',
+                    'href' => '',
+                    'children' => array(
+                        array(
+                            'name' => $this->t('batch_form_link_text'),
+                            'href' => $this->container->getShopCapabilities()->getLink('batch'),
+                            'children' => array(),
+                        ),
+                        array(
+                            'name' => $this->t('advanced_form_link_text'),
+                            'href' => $this->container->getShopCapabilities()->getLink('advanced'),
+                            'children' => array(),
+                        ),
+                    ),
+                );
+            }
+        }
     }
 
     /**
@@ -206,6 +245,13 @@ class OcHelper
             'href' => $this->registry->getLink('common/dashboard'),
             'separator' => false
         );
+
+        // Render the common parts, in OC1 this is done elsewhere.
+        if (!Registry::getInstance()->isOc1()) {
+            $this->data['header'] = $this->registry->load->controller('common/header');
+            $this->data['column_left'] = $this->registry->load->controller('common/column_left');
+            $this->data['footer'] = $this->registry->load->controller('common/footer');
+        }
     }
 
     /**
@@ -251,6 +297,12 @@ class OcHelper
         $this->data['button_save'] = $this->t($button);
         $this->data['cancel'] = $this->registry->getLink('common/dashboard');
         $this->data['button_cancel'] = $task === 'uninstall' ? $this->t('button_cancel_uninstall') : $this->t('button_cancel');
+
+        // Send the output, in OC1 this is done elsewhere.
+        if (!Registry::getInstance()->isOc1()) {
+            $this->registry->response->setOutput($this->registry->load->view($this->registry->getLocation() . '_form', $this->data));
+        }
+
     }
 
     /**
@@ -258,6 +310,8 @@ class OcHelper
      *
      * @return bool
      *   Success.
+     *
+     * @throws \Exception
      */
     protected function doInstall()
     {
@@ -294,6 +348,11 @@ class OcHelper
             }
         }
 
+        // Install events
+        if (empty($this->data['error_messages'])) {
+            $this->installEvents();
+        }
+
         return $result;
     }
 
@@ -302,6 +361,8 @@ class OcHelper
      *
      * @return bool
      *   Whether the uninstall was successful.
+     *
+     * @throws \Exception
      */
     protected function doUninstall()
     {
@@ -322,6 +383,8 @@ class OcHelper
      *
      * @return bool
      *   Whether the upgrade was successful.
+     *
+     * @throws \Exception
      */
     protected function doUpgrade()
     {
@@ -346,5 +409,44 @@ class OcHelper
         }
 
         return $result;
+    }
+
+    /**
+     * Installs our events.
+     *
+     * This will add them to the table 'event' from where they are registered on
+     * the start of each request. The controller actions can be found in the
+     * catalog controller for the catalog events and the admin controller for
+     * the admin events.
+     *
+     * To support updating, this will also be called by the index function.
+     * Therefore we will first remove any existing events from our module.
+     *
+     * @throws \Exception
+     */
+    protected function installEvents()
+    {
+        if (!Registry::getInstance()->isOc1()) {
+            $this->uninstallEvents();
+            $location = $this->registry->getLocation();
+            $model = $this->registry->getEventModel();
+            $model->addEvent('acumulus','catalog/model/checkout/order/addOrder/after',$location . '/eventOrderUpdate');
+            $model->addEvent('acumulus','catalog/model/checkout/order/addOrderHistory/after',$location . '/eventOrderUpdate');
+            $model->addEvent('acumulus','admin/view/common/column_left/before',$location . '/eventViewColumnLeft');
+        }
+    }
+
+    /**
+     * Removes the Acumulus event handlers from the event table.
+     *
+     * @throws \Exception
+     */
+    protected function uninstallEvents()
+    {
+        if (Registry::getInstance()->isOc3()) {
+            $this->registry->getEventModel()->deleteEventByCode('acumulus');
+        } elseif (!Registry::getInstance()->isOc1()) {
+            $this->registry->getEventModel()->deleteEvent('acumulus');
+        }
     }
 }

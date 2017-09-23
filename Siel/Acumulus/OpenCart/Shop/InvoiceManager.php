@@ -3,8 +3,9 @@ namespace Siel\Acumulus\OpenCart\Shop;
 
 use DateTime;
 use Siel\Acumulus\Helpers\ContainerInterface;
+use Siel\Acumulus\Invoice\Result;
+use Siel\Acumulus\Invoice\Source as Source;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
-use Siel\Acumulus\PrestaShop\Invoice\Source;
 use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
 
 class InvoiceManager extends BaseInvoiceManager
@@ -73,5 +74,48 @@ class InvoiceManager extends BaseInvoiceManager
         $query = sprintf("SELECT `%s` FROM `%s` WHERE `%s` BETWEEN '%s' AND '%s'", $key, $table, $dateField, $dateFrom, $dateTo);
         $result = $this->getDb()->query($query);
         return $this->getSourcesByIdsOrSources($invoiceSourceType, $this->getCol($result->rows, $key));
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * This OpenCart override triggers the 'acumulus.invoice.created' event.
+     */
+    protected function triggerInvoiceCreated(array &$invoice, Source $invoiceSource, Result $localResult)
+    {
+        $args = array('invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult);
+        $this->getEvent()->trigger('model/' . Registry::getInstance()->getLocation() . '/invoiceCreated/after', $args);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * This OpenCart override triggers the 'acumulus.invoice.completed' event.
+     */
+    protected function triggerInvoiceSendBefore(array &$invoice, Source $invoiceSource, Result $localResult)
+    {
+        $args = array('invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult);
+        $this->getEvent()->trigger('model/' . Registry::getInstance()->getLocation() . '/invoiceSend/before', $args);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * This OpenCart override triggers the 'acumulus.invoice.sent' event.
+     */
+    protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, Result $result)
+    {
+        $args = array('invoice' => $invoice, 'source' => $invoiceSource, 'result' => $result);
+        $this->getEvent()->trigger('model/' . Registry::getInstance()->getLocation() . '/invoiceSend/after', $args);
+    }
+
+    /**
+     * Wrapper around the event class instance.
+     *
+     * @return \Event
+     */
+    private function getEvent()
+    {
+        return Registry::getInstance()->event;
     }
 }

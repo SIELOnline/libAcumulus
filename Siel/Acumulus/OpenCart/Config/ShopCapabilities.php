@@ -7,9 +7,9 @@ use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
 
 /**
- * Defines the OpenCart 1 and 2 webshop specific capabilities.
+ * Defines the OpenCart webshop specific capabilities.
  */
-abstract class ShopCapabilities extends ShopCapabilitiesBase
+class ShopCapabilities extends ShopCapabilitiesBase
 {
     /**
      * {@inheritdoc}
@@ -299,6 +299,22 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getPaymentMethods()
+    {
+        $prefix = Registry::getInstance()->isOc3() ? 'payment_' : '';
+        $enabled = array();
+        $extensions = Registry::getInstance()->getExtensionModel()->getInstalled('payment');
+        foreach ($extensions as $extension) {
+            if ((bool) Registry::getInstance()->config->get($prefix . $extension . '_status')) {
+                $enabled[] = $extension;
+            }
+        }
+        return $this->paymentMethodToOptions($enabled);
+    }
+
+    /**
      * Turns the list into a translated list of options for a select.
      *
      * @param array $extensions
@@ -309,8 +325,9 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
     protected function paymentMethodToOptions(array $extensions)
     {
         $results = array();
+        $directory = Registry::getInstance()->isOc23() ? 'extension/payment/' : 'payment/';
         foreach ($extensions as $extension) {
-            Registry::getInstance()->language->load('payment/' . $extension);
+            Registry::getInstance()->language->load($directory . $extension);
             $results[$extension] = Registry::getInstance()->language->get('heading_title');
         }
         return $results;

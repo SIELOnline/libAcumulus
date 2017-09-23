@@ -11,9 +11,10 @@ class ConfigStore extends BaSeConfigStore
 {
     const CONFIG_KEY = 'ACUMULUS_';
 
-    /** @noinspection PhpUndefinedClassInspection */
     /**
      * @return \ModelSettingSetting
+     *
+     * @throws \Exception
      */
     protected function getSettings()
     {

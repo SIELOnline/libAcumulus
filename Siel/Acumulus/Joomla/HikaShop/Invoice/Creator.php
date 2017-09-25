@@ -32,6 +32,20 @@ class Creator extends BaseCreator
     protected $order;
 
     /**
+     * Product price precision in WC3: one of the prices is entered by the
+     * administrator but rounded to the cent by WC. The computed one is based
+     * on the subtraction/addition of 2 amounts rounded to the cent, so has a
+     * precision that may be a bit worse than 1 cent.
+     *
+     * values here.
+     *
+     * @var float
+     */
+    protected $precisionPriceEntered  = 0.0001;
+    protected $precisionPriceCalculated  = 0.0002;
+    protected $precisionVat  = 0.0011;
+
+    /**
      * {@inheritdoc}
      *
      * This override also initializes HS specific properties related to the
@@ -256,12 +270,19 @@ class Creator extends BaseCreator
                 $shippingInc = (float) $this->order->order_shipping_price;
                 $shippingVat = (float) $this->order->order_shipping_tax;
                 $shippingEx = $shippingInc - $shippingVat;
-                $vatInfo = $this->getVatRangeTags($shippingVat, $shippingEx, 0.0001, 0.0002);
+                $precisionEx = $this->precisionPriceCalculated;
+                $precisionInc = $this->precisionPriceEntered;
+                $recalculateUnitPrice = true;
+                $vatInfo = $this->getVatRangeTags($shippingVat, $shippingEx, $this->precisionVat, $precisionEx);
 
                 $result = array(
                         Tag::Product => $this->getShippingMethodName(),
-                        Meta::UnitPriceInc => $shippingInc,
                         Tag::Quantity => 1,
+                        Tag::UnitPrice => $shippingEx,
+                        Meta::PrecisionUnitPrice => $precisionEx,
+                        Meta::UnitPriceInc => $shippingInc,
+                        Meta::PrecisionUnitPriceInc => $precisionInc,
+                        Meta::RecalculateUnitPrice => $recalculateUnitPrice,
                         Meta::VatAmount => $shippingVat,
                     ) + $vatInfo;
             }
@@ -295,6 +316,9 @@ class Creator extends BaseCreator
             $discountVat = (float) $this->order->order_discount_tax;
             $discountEx = $discountInc - $discountVat;
             $vatInfo = $this->getVatRangeTags($discountVat, $discountEx, 0.0001, 0.0002);
+            if ($vatInfo[Tag::VatRate] === null) {
+                $vatInfo[Meta::StrategySplit] = true;
+            }
             $description = empty($this->order->order_discount_code)
                 ? $this->t('discount')
                 : $this->t('discount_code') . ' ' . $this->order->order_discount_code;
@@ -321,13 +345,20 @@ class Creator extends BaseCreator
             $paymentInc = (float) $this->order->order_payment_price;
             $paymentVat = (float) $this->order->order_payment_tax;
             $paymentEx = $paymentInc - $paymentVat;
+            $precisionEx = $this->precisionPriceCalculated;
+            $precisionInc = $this->precisionPriceEntered;
+            $recalculateUnitPrice = true;
             $vatInfo = $this->getVatRangeTags($paymentVat, $paymentEx, 0.0001, 0.0002);
             $description = $this->t('payment_costs');
 
             $result = array(
                     Tag::Product => $description,
-                    Meta::UnitPriceInc => $paymentInc,
                     Tag::Quantity => 1,
+                    Tag::UnitPrice => $paymentEx,
+                    Meta::PrecisionUnitPrice => $precisionEx,
+                    Meta::UnitPriceInc => $paymentInc,
+                    Meta::PrecisionUnitPriceInc => $precisionInc,
+                    Meta::RecalculateUnitPrice => $recalculateUnitPrice,
                     Meta::VatAmount => $paymentVat,
                 ) + $vatInfo;
         }

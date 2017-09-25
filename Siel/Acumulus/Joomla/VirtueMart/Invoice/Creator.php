@@ -397,10 +397,10 @@ class Creator extends BaseCreator
     {
         $result = array(
             Tag::Product => $calcRule->calc_rule_name,
+            Tag::Quantity => 1,
             Tag::UnitPrice => null,
             Meta::UnitPriceInc => (float) $calcRule->calc_amount,
             Tag::VatRate => null,
-            Tag::Quantity => 1,
             Meta::VatRateSource => static::VatRateSource_Strategy,
             Meta::StrategySplit => true,
         );

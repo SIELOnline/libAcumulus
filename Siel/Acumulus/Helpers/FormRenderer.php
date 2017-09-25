@@ -10,6 +10,8 @@ namespace Siel\Acumulus\Helpers;
  */
 class FormRenderer
 {
+    const RequiredMarkup = '<span class="required">*</span>';
+
     /** @var bool */
     protected $html5 = true;
 
@@ -83,7 +85,7 @@ class FormRenderer
     protected $descriptionClass = 'description';
 
     /** @var string */
-    protected $requiredMarkup = '<span class="required">*</span>';
+    protected $requiredMarkup = self::RequiredMarkup;
 
     /** @var Form */
     protected $form;

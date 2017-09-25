@@ -285,31 +285,7 @@ class Container implements ContainerInterface
     }
 
     /**
-     * Returns an instance of the given class.
-     *
-     * The class is looked for in multiple namespaces, starting with the
-     * $customNameSpace properties, continuing with the $shopNamespace property
-     * and finally the base namespace (\Siel\Acumulus).
-     *
-     * Normally, only 1 instance is created per class but the $newInstance
-     * argument can be used to change this behavior.
-     *
-     * @param string $class
-     *   The name of the class without namespace. The class is searched for in
-     *   multiple namespaces, see above.
-     * @param string $subNamespace
-     *   The sub namespace (within the namespaces tried) in which the class
-     *   resides.
-     * @param array $constructorArgs
-     *   A list of arguments to pass to the constructor, may be an empty array.
-     * @param bool $newInstance
-     *   Whether to create a new instance (true) or reuse an already existing
-     *   instance (false, default)
-     *
-     * @return object
-     *
-     * @throws \InvalidArgumentException
-     * @throws \ReflectionException
+     * {@inheritdoc}
      */
     public function getInstance($class, $subNamespace, array $constructorArgs = array(), $newInstance = false)
     {
@@ -345,6 +321,20 @@ class Container implements ContainerInterface
         return $this->instances[$class];
     }
 
+    /**
+     * Tries to find a class in the given namespace.
+     *
+     * @param $class
+     *   The class to find.
+     * @param $subNamespace
+     *   The sub namespace to add to the namespace.
+     * @param $namespace
+     *   The namespace to search in.
+     *
+     * @return string
+     *   The full name of the class or the empty string if it does not exist in
+     *   the given namespace.
+     */
     protected function tryNsInstance($class, $subNamespace, $namespace)
     {
         $fqClass = $namespace . '\\' . $subNamespace . '\\' . $class;

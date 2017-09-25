@@ -2,7 +2,6 @@
 namespace Siel\Acumulus\OpenCart\OpenCart1\Helpers;
 
 use Siel\Acumulus\OpenCart\Helpers\FormRenderer as BaseFormRenderer;
-use Siel\Acumulus\OpenCart\Helpers\Registry;
 
 /**
  * FormRenderer renders an Acumulus form definition like an OpenCart 1 form.
@@ -20,6 +19,7 @@ class FormRenderer extends BaseFormRenderer
         $this->checkboxWrapperClass = 'form-element-checkboxes';
         $this->multiLabelClass = 'label';
         $this->descriptionClass = 'desc';
+        $this->requiredMarkup = static::RequiredMarkup;
     }
 
     /**
@@ -31,5 +31,15 @@ class FormRenderer extends BaseFormRenderer
         $result = parent::fieldsetBegin($field);
         $this->descriptionClass = $oldDescriptionClass;
         return $result;
+    }
+
+
+    /**
+     * {@inheritdoc}
+     *
+     * In OC1 required fields are handled differently, no action needed here.
+     */
+    protected function handleRequired(array $field)
+    {
     }
 }

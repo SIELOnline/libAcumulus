@@ -26,12 +26,13 @@ class OcHelper
      *
      * @param \Registry $registry
      * @param \Siel\Acumulus\Helpers\ContainerInterface $container
+     *
+     * @throws \ReflectionException
      */
     public function __construct(\Registry $registry, ContainerInterface $container)
     {
-        Registry::setRegistry($registry);
-        $this->registry = Registry::getInstance();
         $this->container = $container;
+        $this->registry = $this->container->getInstance('Registry', 'Helpers', array($registry));
         $this->data = array();
 
         $languageCode = $this->registry->language->get('code');
@@ -80,6 +81,17 @@ class OcHelper
     }
 
     /**
+     * Returns the location of the module.
+     *
+     * @return string
+     *   The location of the module.
+     */
+    public function getLocation()
+    {
+        return $this->registry->getLocation();
+    }
+
+    /**
      * Install controller action, called when the module is installed.
      *
      * @return bool
@@ -103,7 +115,7 @@ class OcHelper
     {
         // "Disable" (delete) events, regardless the confirmation answer.
         $this->uninstallEvents();
-        $this->registry->response->redirect($this->registry->getLink($this->registry->getLocation() . '/confirmUninstall'));
+        $this->registry->response->redirect($this->registry->getLink($this->getLocation() . '/confirmUninstall'));
     }
 
     /**
@@ -163,8 +175,7 @@ class OcHelper
 //        // Are we confirming, or should we show the confirm message?
 //        if ($this->registry->request->server['REQUEST_METHOD'] === 'POST') {
             $this->doUninstall();
-            $url = $this->registry->isOc3() ? 'marketplace/extension' : ($this->registry->isOc23() ? 'extension/extension' : 'extension/module');
-            $this->registry->response->redirect($this->registry->getLink($url));
+            $this->registry->response->redirect($this->registry->getLink($this->getRedirectUrl()));
 //        }
 //
 //        // Add an intermediate level to the breadcrumb.
@@ -175,6 +186,17 @@ class OcHelper
 //        );
 //
 //        $this->renderFormCommon('confirmUninstall', 'button_confirm_uninstall');
+    }
+
+    /**
+     * Returns the url to redirect to after the uninstall action completes.
+     *
+     * @return string
+     *   The url to redirect to after uninstall.
+     */
+    protected function getRedirectUrl()
+    {
+        return 'marketplace/extension';
     }
 
     /**
@@ -246,12 +268,17 @@ class OcHelper
             'separator' => false
         );
 
-        // Render the common parts, in OC1 this is done elsewhere.
-        if (!Registry::getInstance()->isOc1()) {
-            $this->data['header'] = $this->registry->load->controller('common/header');
-            $this->data['column_left'] = $this->registry->load->controller('common/column_left');
-            $this->data['footer'] = $this->registry->load->controller('common/footer');
-        }
+        $this->displayCommonParts();
+    }
+
+    /**
+     * Adds the common parts (header, footer, column(s) to the display.
+     */
+    protected function displayCommonParts()
+    {
+        $this->data['header'] = $this->registry->load->controller('common/header');
+        $this->data['column_left'] = $this->registry->load->controller('common/column_left');
+        $this->data['footer'] = $this->registry->load->controller('common/footer');
     }
 
     /**
@@ -281,7 +308,7 @@ class OcHelper
         $this->data['formRenderer'] = $this->container->getFormRenderer();
 
         // Complete the breadcrumb with the current path.
-        $link = $this->registry->getLocation();
+        $link = $this->getLocation();
         if ($task !== 'config') {
             $link .= "/$task";
         }
@@ -298,11 +325,16 @@ class OcHelper
         $this->data['cancel'] = $this->registry->getLink('common/dashboard');
         $this->data['button_cancel'] = $task === 'uninstall' ? $this->t('button_cancel_uninstall') : $this->t('button_cancel');
 
-        // Send the output, in OC1 this is done elsewhere.
-        if (!Registry::getInstance()->isOc1()) {
-            $this->registry->response->setOutput($this->registry->load->view($this->registry->getLocation() . '_form', $this->data));
-        }
+        $this->setOutput();
+    }
 
+    /**
+     * Outputs the form.
+     */
+    protected function setOutput()
+    {
+        // Send the output.
+        $this->registry->response->setOutput($this->registry->load->view($this->getLocation() . '_form', $this->data));
     }
 
     /**
@@ -426,14 +458,12 @@ class OcHelper
      */
     protected function installEvents()
     {
-        if (!Registry::getInstance()->isOc1()) {
-            $this->uninstallEvents();
-            $location = $this->registry->getLocation();
-            $model = $this->registry->getEventModel();
-            $model->addEvent('acumulus','catalog/model/checkout/order/addOrder/after',$location . '/eventOrderUpdate');
-            $model->addEvent('acumulus','catalog/model/checkout/order/addOrderHistory/after',$location . '/eventOrderUpdate');
-            $model->addEvent('acumulus','admin/view/common/column_left/before',$location . '/eventViewColumnLeft');
-        }
+        $this->uninstallEvents();
+        $location = $this->getLocation();
+        $model = $this->registry->getEventModel();
+        $model->addEvent('acumulus','catalog/model/checkout/order/addOrder/after',$location . '/eventOrderUpdate');
+        $model->addEvent('acumulus','catalog/model/checkout/order/addOrderHistory/after',$location . '/eventOrderUpdate');
+        $model->addEvent('acumulus','admin/view/common/column_left/before',$location . '/eventViewColumnLeft');
     }
 
     /**
@@ -443,10 +473,6 @@ class OcHelper
      */
     protected function uninstallEvents()
     {
-        if (Registry::getInstance()->isOc3()) {
-            $this->registry->getEventModel()->deleteEventByCode('acumulus');
-        } elseif (!Registry::getInstance()->isOc1()) {
-            $this->registry->getEventModel()->deleteEvent('acumulus');
-        }
+        $this->registry->getEventModel()->deleteEventByCode('acumulus');
     }
 }

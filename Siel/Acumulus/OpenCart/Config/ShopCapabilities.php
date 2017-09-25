@@ -325,7 +325,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     protected function paymentMethodToOptions(array $extensions)
     {
         $results = array();
-        $directory = Registry::getInstance()->isOc23() ? 'extension/payment/' : 'payment/';
+        $directory = !Registry::getInstance()->isOc1() ? 'extension/payment/' : 'payment/';
         foreach ($extensions as $extension) {
             Registry::getInstance()->language->load($directory . $extension);
             $results[$extension] = Registry::getInstance()->language->get('heading_title');
@@ -341,11 +341,11 @@ class ShopCapabilities extends ShopCapabilitiesBase
         $registry = Registry::getInstance();
         switch ($formType) {
             case 'config':
-                return $registry->getLink(Registry::getInstance()->getLocation());
+                return $registry->getLink($registry->getLocation());
             case 'advanced':
-                return $registry->getLink(Registry::getInstance()->getLocation() . '/advanced');
+                return $registry->getLink($registry->getLocation() . '/advanced');
             case 'batch':
-                return $registry->getLink(Registry::getInstance()->getLocation() . '/batch');
+                return $registry->getLink($registry->getLocation() . '/batch');
         }
         return parent::getLink($formType);
     }

@@ -31,16 +31,8 @@ class FormRenderer extends BaseFormRenderer
      */
     protected function renderField(array $field)
     {
-        // @todo: check if we have to correct this for OC1.
         $oldElementWrapperClass = $this->elementWrapperClass;
-        if (!empty($field['attributes']['required'])) {
-            if (empty($this->elementWrapperClass)) {
-                $this->elementWrapperClass = '';
-            } else {
-                $this->elementWrapperClass .= ' ';
-            }
-            $this->elementWrapperClass .= 'required';
-        }
+        $this->handleRequired($field);
         $result = parent::renderField($field);
         $this->elementWrapperClass = $oldElementWrapperClass;
         return $result;
@@ -51,10 +43,26 @@ class FormRenderer extends BaseFormRenderer
      */
     protected function addLabelAttributes(array $attributes, $id)
     {
-        // @todo: check if we have to correct this for OC1.
         $attributes = parent::addLabelAttributes($attributes, $id);
         $attributes = $this->addAttribute($attributes, 'class', 'col-sm-2');
         $attributes = $this->addAttribute($attributes, 'class', 'control-label');
         return $attributes;
+    }
+
+    /**
+     * Handles required fields.
+     *
+     * @param array $field
+     */
+    protected function handleRequired(array $field)
+    {
+        if (!empty($field['attributes']['required'])) {
+            if (empty($this->elementWrapperClass)) {
+                $this->elementWrapperClass = '';
+            } else {
+                $this->elementWrapperClass .= ' ';
+            }
+            $this->elementWrapperClass .= 'required';
+        }
     }
 }

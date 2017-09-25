@@ -52,10 +52,10 @@ class Registry
     /**
      * Sets the OC Registry.
      *
-     * @param \Registry $registry
+     * @param Registry $registry
      */
-    public static function setRegistry(\Registry $registry) {
-        static::$instance = new Registry($registry);
+    protected static function setInstance(Registry $registry) {
+        static::$instance = $registry;
     }
 
     /**
@@ -73,10 +73,13 @@ class Registry
      *
      * @param \Registry $registry
      */
-    protected function __construct(\Registry $registry)
+    public function __construct(\Registry $registry)
     {
         $this->registry = $registry;
         $this->orderModel = null;
+        $this->extensionModel = null;
+        $this->eventModel = null;
+        static::setInstance($this);
     }
 
     public function __get($key)
@@ -102,18 +105,6 @@ class Registry
     }
 
     /**
-     * Returns whether we are in version 2.3+.
-     *
-     * @return bool
-     *   True if the version is 2.3 or higher, false otherwise.
-     *
-     */
-    public function isOc23()
-    {
-        return version_compare(VERSION, '2.3', '>=');
-    }
-
-    /**
      * Returns whether we are in version 3+.
      *
      * @return bool
@@ -133,7 +124,7 @@ class Registry
      */
     public function getLocation()
     {
-        return $this->isOc23() ? 'extension/module/acumulus' : 'module/acumulus';
+        return 'extension/module/acumulus';
     }
 
     /**
@@ -202,15 +193,9 @@ class Registry
     public function getExtensionModel()
     {
         if ($this->extensionModel === null) {
-            if ($this->isOc1() || $this->isOc3()) {
-                $this->load->model('setting/extension');
-                /** @noinspection PhpUndefinedFieldInspection */
-                $this->extensionModel = $this->model_setting_extension;
-            } else {
-                $this->load->model('extension/extension');
-                /** @noinspection PhpUndefinedFieldInspection */
-                $this->extensionModel = $this->model_extension_extension;
-            }
+            $this->load->model('setting/extension');
+            /** @noinspection PhpUndefinedFieldInspection */
+            $this->extensionModel = $this->model_setting_extension;
         }
         return $this->extensionModel;
     }
@@ -226,15 +211,9 @@ class Registry
     public function getEventModel()
     {
         if ($this->eventModel === null) {
-            if ($this->isOc3()) {
-                $this->load->model('setting/event');
-                /** @noinspection PhpUndefinedFieldInspection */
-                $this->eventModel = $this->model_setting_event;
-            } else {
-                $this->load->model('extension/event');
-                /** @noinspection PhpUndefinedFieldInspection */
-                $this->eventModel = $this->model_extension_event;
-            }
+            $this->load->model('setting/event');
+            /** @noinspection PhpUndefinedFieldInspection */
+            $this->eventModel = $this->model_setting_event;
         }
         return $this->eventModel;
     }
@@ -249,12 +228,8 @@ class Registry
      */
     public function getLink($route)
     {
-        // Differences between the OC versions.
-        // - token in OC1 and 2, user_token in OC3.
-        $token = $this->isOc3() ? 'user_token' : 'token';
-        // - 3rd argument is $connection = 'SSL' in OC1, and is $secure = true
-        //   in OC2 and 3.
-        $secure = $this->isOc1() ? 'SSL' : true;
+        $token = 'user_token';
+        $secure = true;
         return $this->url->link($route, $token . '=' . $this->session->data[$token], $secure);
     }
 }

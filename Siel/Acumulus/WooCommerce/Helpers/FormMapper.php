@@ -9,7 +9,7 @@ use Siel\Acumulus\Helpers\FormMapper as BaseFormMapper;
  */
 class FormMapper extends BaseFormMapper
 {
-    const required = '<span class="required">*</span>';
+    const required = FormRenderer::RequiredMarkup;
 
     /**
      * The slug-name of the settings page on which to show the section.

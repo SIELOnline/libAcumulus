@@ -40,8 +40,10 @@ class InvoiceManager extends BaseInvoiceManager
         global $wpdb;
         $key = 'ID';
         /** @noinspection SqlResolve */
-        $invoiceSourceIds = $wpdb->get_col($wpdb->prepare("SELECT `$key` FROM `{$wpdb->posts}` WHERE `$key` BETWEEN %u AND %u AND `post_type` = %s",
-            $InvoiceSourceIdFrom, $InvoiceSourceIdTo, $this->sourceTypeToShopType($invoiceSourceType)));
+        $invoiceSourceIds = $wpdb->get_col($wpdb->prepare("SELECT `$key` FROM `{$wpdb->posts}` WHERE `$key` BETWEEN %d AND %d AND `post_type` = %s",
+            $InvoiceSourceIdFrom,
+            $InvoiceSourceIdTo,
+            $this->sourceTypeToShopType($invoiceSourceType)));
         sort($invoiceSourceIds);
         return $this->getSourcesByIdsOrSources($invoiceSourceType, $invoiceSourceIds);
     }

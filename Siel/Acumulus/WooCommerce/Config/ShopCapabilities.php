@@ -74,7 +74,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
         $meta = array(
             'vat_number (With EU VAT plugin only)',
         );
-        return parent::getTokenInfo() + array(
+        $result = array(
             'source' => array(
                 'class' => 'WC_Abstract_Order',
                 'file' => 'wp-content/plugins/woocommerce/includes/abstracts/abstract-wc-order.php',
@@ -151,6 +151,29 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 'properties-more' => true,
             ),
         );
+        if (function_exists('is_wc_booking_product')) {
+            $result['booking'] = array(
+                'class' => 'WC_Booking',
+                'file' => 'wp-content/plugins/woocommerce-bookings/includes/data-objects/class-wc-booking.php',
+                'additional-info' => $this->t('invoice_lines_only'),
+                'properties' => array(
+                    'id',
+                    'cost',
+                    'start_date',
+                    'end_date',
+                    'google_calendar_event_id',
+                    'person_counts',
+                    'persons',
+                    'persons_total',
+                    'resource_id',
+                    'product_id',
+                    'status',
+                    'is_all_day',
+                ),
+                'properties-more' => true,
+            );
+        }
+        return parent::getTokenInfo() + $result;
     }
 
     /**

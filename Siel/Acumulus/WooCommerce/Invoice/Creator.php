@@ -7,6 +7,8 @@ use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
 use WC_Abstract_Order;
+use WC_Booking;
+use WC_Booking_Data_Store;
 use WC_Coupon;
 use WC_Order;
 use WC_Order_Item_Product;
@@ -207,6 +209,19 @@ class Creator extends BaseCreator
 
         // $product can be NULL if the product has been deleted.
         if ($product instanceof WC_Product) {
+            // Support for the "WooCommerce Bookings" plugin. Bookings are
+            // stored in a separate entity, we add that as a separate property
+            // source, so its properties can be used.
+            if (function_exists('is_wc_booking_product') && is_wc_booking_product($product)) {
+                $booking_ids = WC_Booking_Data_Store::get_booking_ids_from_order_item_id( $item->get_id() );
+                if ($booking_ids) {
+                    // I cannot imagine multiple bookings belonging to the same
+                    // order line, but if that occurs, only the 1st booking will
+                    // be added as a property source.
+                    $booking = new WC_Booking(reset($booking_ids));
+                    $this->addPropertySource('booking', $booking);
+                }
+            }
             $this->addPropertySource('product', $product);
         }
         $this->addPropertySource('item', $item);
@@ -302,6 +317,7 @@ class Creator extends BaseCreator
             $result[Meta::ChildrenLines] = $this->getExtraProductOptionsLines($item, $commonTags);
         }
 
+        $this->removePropertySource('booking');
         $this->removePropertySource('product');
         $this->removePropertySource('item');
 

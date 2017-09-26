@@ -70,6 +70,9 @@ use Exception;
  *
  */
 class Token {
+    const TypeLiteral = 1;
+    const TypeProperty = 2;
+
     /** @var array */
     protected $variables;
 
@@ -145,31 +148,28 @@ class Token {
         foreach ($propertyAlternatives as $propertyAlternative) {
             $spaceSeparatedProperties = explode('+', $propertyAlternative);
             $spaceSeparatedValues = array();
-            $hasRealPropertyValue = false;
             foreach ($spaceSeparatedProperties as $spaceSeparatedProperty) {
                 $nonSeparatedProperties = explode('&', $spaceSeparatedProperty);
                 $nonSeparatedValues = array();
                 foreach ($nonSeparatedProperties as $nonSeparatedProperty) {
                     if (substr($nonSeparatedProperty, 0, 1) === '"' && substr($nonSeparatedProperty, -1, 1) === '"') {
-                        $value = substr($nonSeparatedProperty, 1, -1);
+                        $nonSeparatedValue = substr($nonSeparatedProperty, 1, -1);
+                        $valueType = self::TypeLiteral;
                     } else {
-                        $value = $this->searchProperty($nonSeparatedProperty);
-                        if (!empty($value)) {
-                            $hasRealPropertyValue = true;
-                        }
+                        $nonSeparatedValue = $this->searchProperty($nonSeparatedProperty);
+                        $valueType = self::TypeProperty;
                     }
-                    if (!empty($value)) {
-                        $nonSeparatedValues[] = $value;
-                    }
+                    $nonSeparatedValues[] = array('type' => $valueType, 'value' => $nonSeparatedValue);
                 }
-                if (!empty($nonSeparatedValues)) {
-                    $spaceSeparatedValues[] = implode('',$nonSeparatedValues);
-                }
+                $spaceSeparatedValues[] = $this->implodeValues('', $nonSeparatedValues);
             }
-            if (!empty($spaceSeparatedValues) && $hasRealPropertyValue) {
-                $value = implode(' ', $spaceSeparatedValues);
-                // Stop as soon as an alternative resulted in a non-empty value.
+            $value = $this->implodeValues(' ', $spaceSeparatedValues);
+            // Stop as soon as an alternative resulted in a non-empty value.
+            if (!empty($value['value'])) {
+                $value = $value['value'];
                 break;
+            } else {
+                $value = null;
             }
         }
 
@@ -342,5 +342,70 @@ class Token {
             }
         }
         return $value;
+    }
+
+    /**
+     * Concatenates a list of values using a glue between them.
+     *
+     * Literal strings are only used if they are followed by a non-empty
+     * property value. A literal string at the end is only used if the result so
+     * far is not empty.
+     *
+     * @param string $glue
+     * @param array[] $values
+     *   A list of type-value pairs.
+     *
+     * @return array
+     *   Returns a type-value pair containing as value a string representation
+     *   of all the values with the glue string between each value.
+     */
+    protected function implodeValues($glue, $values)
+    {
+        $result = '';
+        $hasProperty = false;
+        $previous = '';
+        foreach ($values as $value) {
+            if ($value['type'] === self::TypeLiteral) {
+                // Literal value: set aside and only add if next property value
+                // is not empty.
+                if (!empty($previous)) {
+                    // Multiple literals after each other: treat as 1 literal
+                    // but do glue them together.
+                    $previous .= $glue;
+                }
+                $previous .= $value['value'];
+            } else { // $value['type'] === self::TypeProperty
+                // Property value: if it is not empty, add any previous literal
+                // and the property value itself. If it is empty, discard any
+                // previous literal value.
+                if (!empty($value['value'])) {
+                    if (!empty($previous)) {
+                        if (!empty($result)) {
+                            $result .= $glue;
+                        }
+                        $result .= $previous;
+                    }
+                    if (!empty($result)) {
+                        $result .= $glue;
+                    }
+                    $result .= $value['value'];
+                }
+                // Discard any previous literal value, used or not.
+                $previous = '';
+                // Remember that this expression has at least 1 property
+                $hasProperty = true;
+            }
+        }
+
+        // Add a (set of) literal value(s) that came without property or if they
+        // came as last value(s) and the result so far is not empty.
+        if (!empty($previous) && (!$hasProperty || !empty($result))) {
+            if (!empty($result)) {
+                $result .= $glue;
+            }
+            $result .= $previous;
+        }
+
+        return array('type' => $hasProperty ? self::TypeProperty : self::TypeLiteral ,'value' => $result);
     }
 }

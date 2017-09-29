@@ -1,18 +1,16 @@
 <?php
 /**
- * @file This file registers an autoloader for the Siel namespace library.
+ * @file Registers an autoloader for the Siel\Acumulus namespace.
  *
  * As not all web shops support auto-loading based on namespaces or have other
- * glitches, eg. expecting lower cased file names, we define our own autoloader.
- * If the module cannot use the autoloader of the web shop, this file should be
- * loaded during bootstrapping of the module.
+ * glitches, eg. expecting lower cased file names, we define our own
+ * autoloader. If the module cannot use the autoloader of the web shop, this
+ * file should be loaded during bootstrapping of the module.
  *
  * Thanks to https://gist.github.com/mageekguy/8300961
  */
-namespace Siel;
+namespace Siel\Acumulus;
 
-// Prepend this autoloader: it will not throw, nor warn, while the shop specific
-// autoloader might do so.
 spl_autoload_register(
     function ($class) {
         if (strpos($class, __NAMESPACE__ . '\\') === 0) {
@@ -24,5 +22,8 @@ spl_autoload_register(
             }
         }
     },
+	// Do not throw an exception.
     false,
+    // Prepend this autoloader: it will not throw, nor warn, while the shop
+    // specific autoloader might do so.
     true);

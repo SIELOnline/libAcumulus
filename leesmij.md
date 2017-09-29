@@ -1,6 +1,7 @@
 Acumulus web service API library
 ================================
 
+@sponsor: SIEL (https://www.siel.nl/)
 @author: Buro RaDer (http://www.burorader.com/).
 @copyright: Buro RaDer
 @license: GPLv3
@@ -10,12 +11,13 @@ Inleiding
 ---------
 Deze Acumulus web service API library is bedoeld om het ontwikkelen van client
 side code die communiceert met de Acumulus API te vereenvoudigen. De library is
-in eerste instantie ontwikkelt voor gebruik door de koppelingen voor de webshop
-software van Magento, PrestaShop, OpenCart, VirtueMart en WooCommerce, maar is
-dusdanig opgezet dat ook andere koppelingen er hun voordeel mee kunnen doen.
+in eerste instantie ontwikkeld voor gebruik door de koppelingen voor de webshop
+software van HikaShop, Magento, OpenCart, PrestaShop, VirtueMart en WooCommerce,
+maar is dusdanig opgezet dat ook andere koppelingen er hun voordeel mee kunnen
+doen.
 
 Dit is dus een cross-CMS/webshop library. Daarom kan de code in deze library
-niet voldoen aan specifieke richtlijnen voor een specifieke webshop of CMS. Denk
+niet voldoen aan origramming guidelines voor een specifieke webshop of CMS. Denk
 hierbij aan:
 - Coding standards.
 - Organisatie en naamgeving.
@@ -36,8 +38,8 @@ geldt de licentie van de koppeling ook voor deze library.
 
 Ontwikkeling
 ------------
-Deze library is nog (volop) in ontwikkeling en zal:
- - waar nodig aangepast worden om met nog meer webshops om te kunnen gaan
+Deze library is in ontwikkeling en zal:
+ - waar nodig aangepast worden om met nog meer webshops om te kunnen gaan.
  - uitgebreid worden met nieuwe wensen.
  - waar mogelijk en zinvol nog verder geabstraheerd worden.
 
@@ -45,9 +47,3 @@ Backwards compatibility is daarbij een zorg maar geen absolute vereiste. Omdat
 de webshopkoppelingen met library uitgeleverd worden is dit voor gebruikers geen
 probleem. Voor ontwikkelaars die zelfstandig met deze library aan de slag zijn
 gegaan kan dit wel voor problemen zorgen.
-
-todo's:
-- Margin scheme zal niet samen gaan met gebruik van getVatRangeTags(). Refactor
-  dit.
-- Versturen credit notes via opties op config formulier regelen: (wel/niet
-  automatisch + moment van versturen),

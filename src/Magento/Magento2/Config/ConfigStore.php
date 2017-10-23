@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\Magento\Magento2\Config;
 
+use Magento\Framework\App\ObjectManager;
 use Siel\Acumulus\Magento\Magento2\Helpers\Registry;
 use Siel\Acumulus\Config\ConfigStore as BaseConfigStore;
 
@@ -55,9 +56,9 @@ class ConfigStore extends BaSeConfigStore
             }
         }
 
-        /** @var \Magento\Framework\App\Cache\Frontend\Pool $cacheFrontendPool */
-        $cacheFrontendPool = Registry::getInstance()->get('Magento\Framework\App\Cache\Frontend\Pool');
-        $cacheFrontendPool->get('default')->clean();
+        /** @var \Magento\Framework\App\Config $config */
+	    $config = ObjectManager::getInstance()->get(\Magento\Framework\App\Config::class);
+	    $config->clean();
         return true;
     }
 

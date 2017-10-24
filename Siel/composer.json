@@ -1,7 +1,7 @@
 {
     "name": "siel/acumulus-lib",
-    "description": "Siel Acumulus Web API library common for all web shops",
-    "version": "4.9.1",
+    "description": "Siel Acumulus Web API library, common for all web shops",
+    "version": "4.9.2",
     "license": [
         "GPL-3.0"
     ],

@@ -16,6 +16,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function getShopEnvironment()
     {
         global $wp_version, $woocommerce;
+        /** @var \WooCommerce $woocommerce */
         $environment = array(
             // Lazy load is no longer needed (as in L3) as this method will only be
             // called when the config gets actually queried.

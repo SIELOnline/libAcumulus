@@ -30,7 +30,7 @@ class BatchFormTranslations extends TranslationCollection
         'option_force_send' => 'Forceer verzenden',
         'option_dry_run' => 'Laat alleen de lijst van facturen zien die verstuurd zouden worden, zonder daadwerkelijk te versturen.',
         'desc_batch_options' => '<p>Facturen die binnen de reeks vallen maar al naar Acumulus verstuurd zijn, worden standaard niet verzonden. Door de 1e optie aan te vinken forceert u het nogmaals versturen van deze facturen.</p>
-                                 <p>De filters die u hierboven opgeeft kunnen in bepaalde gevallen voor verrassingen zorgen. Door de 2e optie te selecteren krijgt u in het resultatenoverzicht een lijst te zien van facuren die verstuurd zouden worden, zonder dat het versturen daadwerkelijk plaats vindt. Let op: de berichten zullen zijn geschreven alsof het versturen wel plaats heeft gevonden!</p>',
+                                 <p>De filters die u hierboven opgeeft kunnen in bepaalde gevallen voor verrassingen zorgen. Door de 2e optie te selecteren krijgt u in het resultatenoverzicht een lijst te zien van facuren die verstuurd zouden worden, zonder dat het versturen daadwerkelijk plaats vindt.</p>',
         'batchLogHeader' => 'Resultaten',
         'batchInfoHeader' => 'Uitgebreide informatie',
         'batch_info' => <<<LONGSTRING
@@ -112,7 +112,7 @@ LONGSTRING
         'option_force_send' => 'Force sending',
         'option_dry_run' => 'Dry run.',
         'desc_batch_options' => '<p>Invoices that fall within the range but are already sent to Acumulus will normally not be sent again. By checking the 1st option, these orders will be sent again.</p>
-                                 <p>In some cases, the filters you define here can lead to surprises. By cheking the 2nd option you will get a list of invoices that would be sent, without actually being sent. Beware that the messages are written as if the sending did took place!</p>',
+                                 <p>In some cases, the filters you define here can lead to surprises. By cheking the 2nd option you will get a list of invoices that would be sent, without actually being sent.</p>',
         'batchLogHeader' => 'Results',
         'batchInfoHeader' => 'Additional information',
 

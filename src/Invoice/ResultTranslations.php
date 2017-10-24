@@ -9,7 +9,7 @@ use Siel\Acumulus\Helpers\TranslationCollection;
 class ResultTranslations extends TranslationCollection
 {
     protected $nl = array(
-        'message_invoice_send' => '%1$s: %2$s is %3$s.',
+        'message_invoice_send' => '%1$s: %2$s is %3$s',
         'message_invoice_source' => 'Factuur voor %1$s %2$s',
         'message_invoice_reason' => '%1$s (reden: %2$s)',
         'action_unknown' => 'nog niet bekend',
@@ -31,7 +31,7 @@ class ResultTranslations extends TranslationCollection
     );
 
     protected $en = array(
-        'message_invoice_send' => '%1$s: %2$s was %3$s.',
+        'message_invoice_send' => '%1$s: %2$s was %3$s',
         'message_invoice_source' => 'Invoice for %1$s %2$s',
         'message_invoice_reason' => '%1$s (reason: %2$s)',
         'action_unknown' => 'yet unknown',

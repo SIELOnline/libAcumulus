@@ -235,7 +235,7 @@ class Result extends WebResult
                 $message .= ' ' . $this->getStatusText();
             }
             if ($this->hasMessages()) {
-                $message .= ' ' . $this->getMessages(Result::Format_FormattedText);
+                $message .= "\n" . $this->getMessages(Result::Format_FormattedText);
             }
             if ($addReqResp === Result::AddReqResp_Always || ($addReqResp === Result::AddReqResp_WithOther && $this->hasMessages())) {
                 $message .= ' ' . $this->getRawRequestResponse(Result::Format_FormattedText);

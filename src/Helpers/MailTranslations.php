@@ -96,8 +96,8 @@ LONGSTRING
         'mail_body_pdf_not_sent_concept' => 'Because the invoice was created as concept, this pdf has not been sent.',
 
         'mail_messages_header' => 'Messages:',
-        'mail_messages_desc' => 'At https://apidoc.sielsystems.nl/node/16 you can find more information regarding any error codes mentioned above.',
-        'mail_messages_desc_html' => '<p>At <a href="https://apidoc.sielsystems.nl/node/16">Acumulus - API documentation: exit and warning codes</a> you can find more information regarding any error codes mentioned above.</p>',
+        'mail_messages_desc' => 'At https://www.siel.nl/acumulus/koppelingen/API/Basic_Response/ you can find more information regarding error codes, warnings and responses.',
+        'mail_messages_desc_html' => '<p>At <a href="https://www.siel.nl/acumulus/koppelingen/API/Basic_Response/">Acumulus - Basic responses</a> you can find more information regarding error codes, warnings and responses.</p>',
 
         'mail_support_header' => 'Information for Acumulus support:',
         'mail_support_desc' => 'The information below is only shown to facilitate support, you may ignore it.',

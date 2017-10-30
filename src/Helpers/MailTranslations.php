@@ -38,8 +38,8 @@ class MailTranslations extends TranslationCollection
         'mail_body_pdf_not_sent_concept' => 'Omdat de factuur als concept is aangemaakt is deze pdf niet verstuurd.',
 
         'mail_messages_header' => 'Meldingen:',
-        'mail_messages_desc' => 'Meer informatie over eventueel vermeldde foutcodes kunt u vinden op https://apidoc.sielsystems.nl/node/16.',
-        'mail_messages_desc_html' => '<p>Meer informatie over eventueel vermeldde foutcodes kunt u vinden op <a href="https://apidoc.sielsystems.nl/node/16">Acumulus - API documentation: exit and warning codes</a>.</p>',
+        'mail_messages_desc' => 'Meer informatie over de terugkoppeling van de vermelde foutcodes kunt u vinden op https://www.siel.nl/acumulus/koppelingen/API/Basic_Response/',
+        'mail_messages_desc_html' => '<p>Meer informatie over de terugkoppeling van vermeldde foutcodes kunt u vinden op <a href="https://www.siel.nl/acumulus/koppelingen/API/Basic_Response/">Acumulus - Basic response</a>.</p>',
 
         'mail_support_header' => 'Informatie voor Acumulus support:',
         'mail_support_desc' => 'De informatie hieronder wordt alleen getoond om eventuele support te vergemakkelijken, u kunt deze informatie negeren.',

@@ -127,7 +127,7 @@ class Communicator implements CommunicatorInterface
      * @return \Siel\Acumulus\Web\Result
      *   The result of the web service call.
      *
-     * @see https://apidoc.sielsystems.nl/content/global-legend For the
+     * @see https://www.siel.nl/acumulus/koppelingen/API/Basic_Response/ For the
      *   structure of a response.
      */
     protected function sendApiMessage($uri, array $message, Result $result)

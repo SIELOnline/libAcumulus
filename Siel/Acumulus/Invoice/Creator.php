@@ -627,7 +627,7 @@ abstract class Creator
 
         $shippingLines = $this->getShippingLines();
         if ($shippingLines) {
-            $shippingLines = $this->addLineType($shippingLines, static::LineType_Manual);
+            $shippingLines = $this->addLineType($shippingLines, static::LineType_Shipping);
             $result = array_merge($result, $shippingLines);
         }
 

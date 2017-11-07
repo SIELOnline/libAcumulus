@@ -59,6 +59,9 @@ class Token extends BaseToken {
      */
     protected function getDataValue(array $data, $property)
     {
+	    if (stripos($property, 'vat') !== false) {
+		    $i = 3;
+	    }
         $value = null;
         if (array_key_exists($property, $data)) {
             // Found: return the value.
@@ -82,13 +85,16 @@ class Token extends BaseToken {
     /**
      * Extracts a value from a set of WooCommerce meta data objects.
      *
-     * WooCommerce meta data is stored in objects having properties id, key, and
-     * value.
+     * WooCommerce meta data is stored in objects having twice the set of
+     * properties id, key, and value, once in the property current_value and
+     * once in the property data.  If 1 of the properties id, key or value is
+     * retrieved, its value from the current_value set is returned.
      *
      * @param object[] $metaData
      *   The meta data set to search in.
      * @param string $property
-     *   The name of the property to search for.
+     *   The name of the property to search for. May be with or without a
+     *   leading underscore.
      *
      * @return null|string
      *   The value for the property of the given name, or null or the empty
@@ -98,9 +104,11 @@ class Token extends BaseToken {
      */
     protected function getMetaDataValue(array $metaData, $property)
     {
+	    $property = ltrim($property, '_');
         $value = null;
         foreach ($metaData as $metaItem) {
-            if ($property === $metaItem->key || $property === "_{$metaItem->key}") {
+        	$key = ltrim($metaItem->key, '_');
+            if ($property === $key) {
                 $value = $metaItem->value;
                 break;
             }

@@ -54,9 +54,9 @@ class ConfigStore extends BaSeConfigStore
 
         // Get the currently stored values.
         $component = JComponentHelper::getComponent('com_acumulus');
-        if (get_class($component) === 'JComponentRecord') {
-            // Joomla 3.7+
-            /** @var \JComponentRecord $component */
+        if (get_class($component) === 'Joomla\CMS\Component\ComponentRecord' || get_class($component) === 'JComponentRecord') {
+            // Joomla 3.7 (JComponentRecord) and 3.8+ (Joomla\CMS\Component\ComponentRecord)
+            /** @var \Joomla\CMS\Component\ComponentRecord|\JComponentRecord $component */
             $data = $component->getParams()->toArray();
             $id = $component->id;
         } else {

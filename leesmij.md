@@ -17,7 +17,7 @@ maar is dusdanig opgezet dat ook andere koppelingen er hun voordeel mee kunnen
 doen.
 
 Dit is dus een cross-CMS/webshop library. Daarom kan de code in deze library
-niet voldoen aan origramming guidelines voor een specifieke webshop of CMS. Denk
+niet voldoen aan programming guidelines voor een specifieke webshop of CMS. Denk
 hierbij aan:
 - Coding standards.
 - Organisatie en naamgeving.

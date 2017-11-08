@@ -58,14 +58,16 @@ abstract class InvoiceManager extends BaseInvoiceManager
         return JFactory::getDbo();
     }
 
-    /**
-     * Helper method that returns a date in the correct and escaped sql format.
-     *
-     * @param string $date
-     *   Date in yyyy-mm-dd format.
-     *
-     * @return string
-     */
+	/**
+	 * Helper method that returns a date in the correct and escaped sql format.
+	 *
+	 * @param string $date
+	 *   Date in yyyy-mm-dd format.
+	 *
+	 * @return string
+	 *
+	 * @throws \Exception
+	 */
     protected function toSql($date)
     {
         $tz = new DateTimeZone(JFactory::getApplication()->get('offset'));
@@ -85,7 +87,7 @@ abstract class InvoiceManager extends BaseInvoiceManager
         $results = JEventDispatcher::getInstance()->trigger('onAcumulusInvoiceCreated', array(&$invoice, $invoiceSource, $localResult));
         if (count(array_filter($results, function ($value) {
                 return $value === false;
-            })) > 1
+            })) >= 1
         ) {
             $invoice = null;
         }
@@ -102,7 +104,7 @@ abstract class InvoiceManager extends BaseInvoiceManager
         $results = JEventDispatcher::getInstance()->trigger('onAcumulusInvoiceSendBefore', array(&$invoice, $invoiceSource, $localResult));
         if (count(array_filter($results, function ($value) {
                 return $value === false;
-            })) > 1
+            })) >= 1
         ) {
             $invoice = null;
         }

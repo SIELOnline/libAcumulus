@@ -13,7 +13,7 @@ class Invoice
     /**
      * The invoice in Acumulus format.
      *
-     * @see https://apidoc.sielsystems.nl/content/invoice-add
+     * @see https://www.siel.nl/acumulus/API/Invoicing/Add_Invoice/
      *
      * @var array
      */
@@ -29,7 +29,7 @@ class Invoice
     /**
      * The status as returned by the web service.
      *
-     * @see https://www.siel.nl/acumulus/koppelingen/API/Basic_Response/
+     * @see https://www.siel.nl/acumulus/API/Basic_Response/
      *
      * @var int
      */

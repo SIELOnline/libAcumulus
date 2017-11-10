@@ -54,7 +54,7 @@ class Result {
     /**
      * The status as returned by the web service.
      *
-     * @see https://www.siel.nl/acumulus/koppelingen/API/Basic_Response/
+     * @see https://www.siel.nl/acumulus/API/Basic_Response/
      *
      * @var int
      */
@@ -532,7 +532,7 @@ class Result {
      *
      * @return $this
      *
-     * @see https://www.siel.nl/acumulus/koppelingen/API/Basic_Response/ For the
+     * @see https://www.siel.nl/acumulus/API/Basic_Response/ For the
      *   common part of a response.
      */
     public function setResponse(array $response)

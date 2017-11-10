@@ -19,7 +19,7 @@ use Siel\Acumulus\Tag;
  * order or credit note. This array can than be completed and sent to Acumulus
  * using the Invoice:Add Acumulus API call.
  *
- * See https://apidoc.sielsystems.nl/content/invoice-add for the structure. In
+ * See https://www.siel.nl/acumulus/API/Invoicing/Add_Invoice/ for the structure. In
  * addition to the scheme as defined over there, additional keys or values are
  * accepted:
  * - all keys starting with meta- are used for debugging purposes.

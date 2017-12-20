@@ -790,7 +790,11 @@ class Config implements ConfigInterface
         }
 
         if (version_compare($currentVersion, '4.7.3', '<')) {
-            $result = $this->upgrade470() && $result;
+            $result = $this->upgrade473() && $result;
+        }
+
+        if (version_compare($currentVersion, '4.8.5', '<')) {
+            $result = $this->upgrade496() && $result;
         }
 
         return $result;
@@ -907,7 +911,7 @@ class Config implements ConfigInterface
     /**
      * 4.7.3 upgrade.
      *
-     * - subject could already use token, but with #b and #f replace by ???.
+     * - subject could already use token, but with #b and #f replace by new token syntax.
      *
      * @return bool
      */
@@ -924,5 +928,17 @@ class Config implements ConfigInterface
         }
 
         return $result;
+    }
+
+    /**
+     * 4.9.6 upgrade.
+     *
+     * - 4.7.3 update was never called (due to a typo 4.7.0 update was called).
+     *
+     * @return bool
+     */
+    protected function upgrade496()
+    {
+        return $this->upgrade473();
     }
 }

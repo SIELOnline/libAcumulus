@@ -101,8 +101,8 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
         add_post_meta($orderId, static::KEY_CREATED, $now, true);
         //$exists = add_post_meta($orderId, '_acumulus_created', $now, true) === FALSE;
         return update_post_meta($orderId, static::KEY_ENTRY_ID, $entryId) !== false
-        && update_post_meta($orderId, static::KEY_TOKEN, $token) !== false
-        && update_post_meta($orderId, static::KEY_UPDATED, $now) !== false;
+            && update_post_meta($orderId, static::KEY_TOKEN, $token) !== false
+            && update_post_meta($orderId, static::KEY_UPDATED, $now) !== false;
     }
 
     /**

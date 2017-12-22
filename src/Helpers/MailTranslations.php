@@ -38,8 +38,8 @@ class MailTranslations extends TranslationCollection
         'mail_body_pdf_not_sent_concept' => 'Omdat de factuur als concept is aangemaakt is deze pdf niet verstuurd.',
 
         'mail_messages_header' => 'Meldingen:',
-        'mail_messages_desc' => 'Meer informatie over de terugkoppeling van de vermelde foutcodes kunt u vinden op https://www.siel.nl/acumulus/koppelingen/API/Basic_Response/',
-        'mail_messages_desc_html' => '<p>Meer informatie over de terugkoppeling van vermeldde foutcodes kunt u vinden op <a href="https://www.siel.nl/acumulus/koppelingen/API/Basic_Response/">Acumulus - Basic response</a>.</p>',
+        'mail_messages_desc' => 'Meer informatie over de terugkoppeling van de vermelde foutcodes kunt u vinden op https://www.siel.nl/acumulus/API/Basic_Response/',
+        'mail_messages_desc_html' => '<p>Meer informatie over de terugkoppeling van vermeldde foutcodes kunt u vinden op <a href="https://www.siel.nl/acumulus/API/Basic_Response/">Acumulus - Basic response</a>.</p>',
 
         'mail_support_header' => 'Informatie voor Acumulus support:',
         'mail_support_desc' => 'De informatie hieronder wordt alleen getoond om eventuele support te vergemakkelijken, u kunt deze informatie negeren.',
@@ -96,8 +96,8 @@ LONGSTRING
         'mail_body_pdf_not_sent_concept' => 'Because the invoice was created as concept, this pdf has not been sent.',
 
         'mail_messages_header' => 'Messages:',
-        'mail_messages_desc' => 'At https://www.siel.nl/acumulus/koppelingen/API/Basic_Response/ you can find more information regarding error codes, warnings and responses.',
-        'mail_messages_desc_html' => '<p>At <a href="https://www.siel.nl/acumulus/koppelingen/API/Basic_Response/">Acumulus - Basic responses</a> you can find more information regarding error codes, warnings and responses.</p>',
+        'mail_messages_desc' => 'At https://www.siel.nl/acumulus/API/Basic_Response/ you can find more information regarding error codes, warnings and responses.',
+        'mail_messages_desc_html' => '<p>At <a href="https://www.siel.nl/acumulus/API/Basic_Response/">Acumulus - Basic responses</a> you can find more information regarding error codes, warnings and responses.</p>',
 
         'mail_support_header' => 'Information for Acumulus support:',
         'mail_support_desc' => 'The information below is only shown to facilitate support, you may ignore it.',

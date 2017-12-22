@@ -1,11 +1,10 @@
 Acumulus web service API library
 ================================
 
-@sponsor: SIEL (https://www.siel.nl/)
-@author: Buro RaDer (http://www.burorader.com/).
-@copyright: Buro RaDer
-@license: GPLv3
-@support: https://forum.acumulus.nl/index.php?board=17.0
+@author: Buro RaDer http://www.burorader.com/  
+@copyright: SIEL BV https://www.siel.nl/acumulus/  
+@license: GPLv3  
+@support: https://forum.acumulus.nl/index.php?board=17.0  
 
 Inleiding
 ---------

@@ -12,8 +12,8 @@ use Siel\Acumulus\Helpers\TranslatorInterface;
  * specific interfaces can be more rapidly developed.
  *
  * More info:
- * - https://apidoc.sielsystems.nl/
- * - http://www.siel.nl/webkoppelingen/
+ * - https://www.siel.nl/acumulus/API/
+ * - http://www.siel.nl/acumulus/koppelingen/
  *
  * The Web API call wrappers return their information as a keyed array, which is
  * a simplified version of the call specific part of the response structure.
@@ -72,7 +72,7 @@ class Service
      *   - accountnumber
      *   - accountdescription
      *
-     * @see https://apidoc.sielsystems.nl/content/picklist-accounts-bankrekeningen
+     * @see https://www.siel.nl/acumulus/API/Accounts/List_Accounts/
      */
     public function getPicklistAccounts()
     {
@@ -89,7 +89,7 @@ class Service
      *   - contacttypeid
      *   - contacttypename
      *
-     * @see https://apidoc.sielsystems.nl/content/picklist-contacttypes-contactsoorten
+     * @see https://www.siel.nl/acumulus/API/Picklists/Contact_Types/
      */
     public function getPicklistContactTypes()
     {
@@ -106,7 +106,7 @@ class Service
      *   - costcenterid
      *   - costcentername
      *
-     * @see https://apidoc.sielsystems.nl/content/picklist-costcenters-kostenplaatsen
+     * @see https://www.siel.nl/acumulus/API/Picklists/Cost_Centers/
      */
     public function getPicklistCostCenters()
     {
@@ -123,7 +123,7 @@ class Service
      *   - costheadingid
      *   - costheadingname
      *
-     * @see https://apidoc.sielsystems.nl/content/picklist-costheadings-kostensoorten
+     * @see https://www.siel.nl/acumulus/API/Picklists/Cost_Headings/
      */
     public function getPicklistCostHeadings()
     {
@@ -131,7 +131,7 @@ class Service
     }
 
     /**
-     * Retrieves a list of cost types.
+     * Retrieves a list of invoice templates.
      *
      * @return \Siel\Acumulus\Web\Result
      *   The result of the webservice call. The structured response will contain
@@ -140,7 +140,7 @@ class Service
      *   - invoicetemplateid
      *   - invoicetemplatename
      *
-     * @see https://apidoc.sielsystems.nl/content/picklist-invoice-templates-factuursjablonen
+     * @see https://www.siel.nl/acumulus/API/Invoicing/Invoice_Templates/
      */
     public function getPicklistInvoiceTemplates()
     {
@@ -157,7 +157,7 @@ class Service
      *   - 'vattypeid'
      *   - 'vattypename'
      *
-     * @see https://apidoc.sielsystems.nl/content/picklist-vattypes-btw-groepen
+     * @see https://www.siel.nl/acumulus/API/Picklists/VAT_Types/
      */
     public function getPicklistVatTypes()
     {
@@ -202,7 +202,7 @@ class Service
      *   - vattype
      *   - vatrate
      *
-     * @see https://apidoc.sielsystems.nl/content/lookup-vatinfo-btw-informatie
+     * @see https://www.siel.nl/acumulus/API/Picklists/VAT_Info/
      *   for more information about the contents of the returned array.
      */
     public function getVatInfo($countryCode, $date = '')
@@ -237,7 +237,7 @@ class Service
      * - token
      * - entryid
      * @todo: check usages of return value
-     * @see https://apidoc.sielsystems.nl/content/invoice-add for more
+     * @see https://www.siel.nl/acumulus/API/Invoicing/Add_Invoice/ for more
      *   information about the contents of the returned array.
      */
     public function invoiceAdd(array $invoice, Result $result = null)

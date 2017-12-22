@@ -37,4 +37,17 @@ License
 This library is licensed under the GNU GPLv3 Open Source license. The english
 and only official text can be found on: http://www.gnu.org/licenses/gpl.html.
 A non-binding dutch version can be found on:
-http://bartbeuving.files.wordpress.com/2008/07/gpl-v3-nl-101.pdf.
+http://bartbeuving.files.wordpress.com/2008/07/gpl-v3-nl-101.pdf. Both texts
+are also delivered as part of this library.
+
+Development
+------------
+This library is still under development and will:
+ - where necessary be adapted to work with even more webshop packages.
+ - be extended with new features.
+ - where possible and useful further abstracted.
+
+In doing so, backwards compatibility is a consideration but not a must. Because
+the webshop plugins are delivered with this library this is no problem for the
+users, However, developers that are developing their own software on top of this
+library should carefully check new releases for backwards incompatibilities.

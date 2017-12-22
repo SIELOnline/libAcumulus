@@ -30,10 +30,7 @@ PUBLIC LICENSE versie 3. De Engelstalige en enige officiële tekst hiervan kunt 
 vinden op http://www.gnu.org/licenses/gpl.html. Een niet bindende
 Nederlandstalige vertaling hiervan vindt u op
 http://bartbeuving.files.wordpress.com/2008/07/gpl-v3-nl-101.pdf. Beide teksten
-zijn ook meegeleverd met deze module.
-
-Als deze library u als onderdeel van een koppeling ter beschikking is gesteld,
-geldt de licentie van de koppeling ook voor deze library.
+zijn ook meegeleverd met deze library.
 
 Ontwikkeling
 ------------

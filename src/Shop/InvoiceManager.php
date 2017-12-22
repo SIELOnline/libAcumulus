@@ -491,10 +491,10 @@ abstract class InvoiceManager
      *
      * @param array $invoice
      *   The invoice that has been created.
-     * @param \Siel\Acumulus\Invoice\Result $localResult
-     *   Any locally generated messages.
      * @param Source $invoiceSource
      *   The source object (order, credit note) for which the invoice was created.
+     * @param \Siel\Acumulus\Invoice\Result $localResult
+     *   Any locally generated messages.
      */
     protected function triggerInvoiceCreated(array &$invoice, Source $invoiceSource, Result $localResult)
     {

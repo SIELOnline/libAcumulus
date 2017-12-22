@@ -334,6 +334,7 @@ class Creator extends BaseCreator
             $metaCalculatedFields = array();
             $wrappingEx = $this->order->total_wrapping_tax_excl;
             $wrappingExLookedUp =  (float) Configuration::get('PS_GIFT_WRAPPING_PRICE');
+            // Increase precision if possible.
             if (Number::floatsAreEqual($wrappingEx, $wrappingExLookedUp, 0.005)) {
                 $wrappingEx = $wrappingExLookedUp;
                 $metaCalculatedFields[] = Tag::UnitPrice;
@@ -354,6 +355,39 @@ class Creator extends BaseCreator
         }
         return $result;
     }
+
+    /**
+     * {@inheritdoc}
+     *
+     * This override checks if the fields payment_fee and payment_fee_rate are
+     * set and, if so, uses them to add a payment fee line.
+     *
+     * These fields are set by the PayPal with a fee module but seem generic
+     * enough to also be used by other modules that allow for payment fees.
+     *
+     * @todo: note that these amounts are not added to the invoice totals.
+     */
+    protected function getPaymentFeeLine() {
+        if (!empty($this->order->payment_fee) && isset($this->order->payment_fee_rate)) {
+            $paymentInc = (float) $this->order->payment_fee;
+            $paymentVatRate = (float) $this->order->payment_fee_rate;
+            $paymentEx = $paymentInc / (100.0 + $paymentVatRate) * 100;
+            $paymentVat = $paymentInc - $paymentEx;
+            $result = array(
+              Tag::Product => $this->t('payment_costs'),
+              Tag::Quantity => 1,
+              Tag::UnitPrice => $paymentEx,
+              Meta::UnitPriceInc => $paymentInc,
+              Tag::VatRate => $paymentVatRate,
+              Meta::VatRateSource => static::VatRateSource_Exact,
+              Meta::VatAmount => $paymentVat,
+              Meta::FieldsCalculated => array(Tag::UnitPrice, Meta::VatAmount),
+            );
+            return $result;
+        }
+        return parent::getPaymentFeeLine();
+    }
+
 
     /**
      * In a Prestashop order the discount lines are specified in Order cart
@@ -489,7 +523,7 @@ class Creator extends BaseCreator
      *
      * @return array
      *   Either an array with keys Meta::VatRateLookup and
-     *  Meta::VatRateLookupLabel or an empty array.
+     *   Meta::VatRateLookupLabel or an empty array.
      */
     protected function getVatRateLookupMetadata($addressId, $taxRulesGroupId) {
         try {

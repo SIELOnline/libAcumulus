@@ -677,7 +677,7 @@ class Creator extends BaseCreator
             $shipping_tax_class = get_option('woocommerce_shipping_tax_class');
             if (is_string($shipping_tax_class)) {
                 $vatLookupTags = $this->getVatRateLookupMetadataByTaxClass($shipping_tax_class);
-                if (!empty($vatLookupTags) === 1) {
+                if (!empty($vatLookupTags)) {
                     $vatLookupTags [Meta::VatRateLookupSource] = "get_option('woocommerce_shipping_tax_class')";
                 }
             }

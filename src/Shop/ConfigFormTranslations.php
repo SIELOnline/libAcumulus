@@ -60,20 +60,20 @@ class ConfigFormTranslations extends TranslationCollection
 
         // Shop settings.
         'shopSettingsHeader' => 'Over uw winkel',
-        'desc_shopSettings' => 'Met behulp van deze instellingen kan de koppeling beter: het <a href="https://wiki.acumulus.nl/index.php?page=127" target="_blank">factuurtype</a> bepalen; controles uitvoeren; en BTW tarieven terugrekenen.',
+        'desc_shopSettings' => 'Met behulp van deze instellingen kan de koppeling beter: het <a href="https://wiki.acumulus.nl/index.php?page=127" target="_blank">factuurtype</a> bepalen; controles uitvoeren; en btw tarieven terugrekenen.',
 
         'field_digitalServices' => 'Verkoopt u digitale diensten?',
         'option_digitalServices_1' => 'Zowel digitale diensten als normale producten.',
-        'option_digitalServices_2' => 'Alleen producten die onder Nederlandse BTW vallen.',
-        'option_digitalServices_3' => 'Alleen digitale diensten die met buitenlandse BTW belast moeten worden voor buitenlandse klanten.',
-        'desc_digitalServices' => 'Geef aan of u in uw winkel digitale diensten aanbiedt waarbij u buitenlandse BTW moet hanteren voor EU klanten.
+        'option_digitalServices_2' => 'Alleen producten die onder Nederlandse btw vallen.',
+        'option_digitalServices_3' => 'Alleen digitale diensten die met buitenlandse btw belast moeten worden voor buitenlandse klanten.',
+        'desc_digitalServices' => 'Geef aan of u in uw winkel digitale diensten aanbiedt waarbij u buitenlandse btw moet hanteren voor EU klanten.
 Zie <a href="http://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/btw_berekenen_bij_diensten/wijziging_in_digitale_diensten_vanaf_2015/wijziging_in_digitale_diensten_vanaf_2015" target="_blank">Belastingdienst: diensten naar andere EU landen</a>.',
 
-        'field_vatFreeProducts' => 'Verkoopt u van BTW vrijgestelde producten of diensten?',
-        'option_vatFreeProducts_1' => 'Zowel BTW vrije als aan BTW onderhevige producten en/of diensten.',
-        'option_vatFreeProducts_2' => 'Alleen aan BTW onderhevige producten en/of diensten.',
-        'option_vatFreeProducts_3' => 'Alleen producten of diensten die van BTW vrijgesteld zijn.',
-        'desc_vatFreeProducts' => 'Geef aan of u in uw winkel producten en/of diensten aanbiedt die vrijgesteld zijn van BTW, bv. onderwijs.',
+        'field_vatFreeProducts' => 'Verkoopt u van btw vrijgestelde producten of diensten?',
+        'option_vatFreeProducts_1' => 'Zowel btw vrije als aan btw onderhevige producten en/of diensten.',
+        'option_vatFreeProducts_2' => 'Alleen aan btw onderhevige producten en/of diensten.',
+        'option_vatFreeProducts_3' => 'Alleen producten of diensten die van btw vrijgesteld zijn.',
+        'desc_vatFreeProducts' => 'Geef aan of u in uw winkel producten en/of diensten aanbiedt die vrijgesteld zijn van btw, bv. onderwijs.',
 
         // Trigger settings.
         'triggerSettingsHeader' => 'Wanneer wilt u uw facturen automatisch versturen naar Acumulus',
@@ -148,8 +148,8 @@ De eigenschappen die uw webshop kent worden hieronder opgesomd.</p>
         'field_companyName1' => 'Bedrijfsnaam 1',
         'field_companyName2' => 'Bedrijfsnaam 2',
 
-        'field_vatNumber' => 'BTW-nummer',
-        'desc_vatNumber' => 'Om een factuur met verlegde BTW aan te kunnen maken dient zowel de bedrijfsnaam als het intracommunautaire BTW-nummer bekend te zijn.',
+        'field_vatNumber' => 'btw-nummer',
+        'desc_vatNumber' => 'Om een factuur met verlegde btw aan te kunnen maken dient zowel de bedrijfsnaam als het intracommunautaire btw-nummer bekend te zijn.',
 
         'field_fullName' => 'Volledige naam',
         'desc_fullName' => 'De volledige naam, meestal opgebouwd uit de voornaam, achternaam en evt. een tussenvoegsel.',
@@ -211,7 +211,7 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'desc_defaultInvoiceTemplate' => 'Maakt u binnen Acumulus gebruik van meerdere factuur-sjablonen en wilt u de facturen uit uw webwinkel met een specifieke factuursjabloon printen, kies dan hier de factuur-sjablonen voor niet betaalde respectievelijk betaalde bestellingen.',
 
         'field_concept' => 'Concept',
-        'desc_concept' => 'Gef aan hoe de factuur verstuurd moet worden. De 1e optie zal normaal gesproken voldoen. Echter, als u uw facturen altijd als concept wil versturen, kies dan de 3e optie. De 2e optie zou eigenlijk niet gekozen moeten worden, tenzij de waarschuwingen altijd onterecht blijken.',
+        'desc_concept' => 'Geef aan hoe de factuur verstuurd moet worden. De 1e optie zal normaal gesproken voldoen. Echter, als u uw facturen altijd als concept wil versturen, kies dan de 3e optie. De 2e optie zou eigenlijk niet gekozen moeten worden, tenzij de waarschuwingen altijd onterecht blijken.',
         'option_concept_2' => 'Als definitieve factuur versturen, tenzij er onregelmatigheden zijn geconstateerd. Kies deze optie tenzij u weet wat u doet.',
         'option_concept_0' => 'Altijd als definitieve factuur versturen',
         'option_concept_1' => 'Altijd als concept versturen',
@@ -237,7 +237,7 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         // Options settings.
         'optionsSettingsHeader' => 'Opties of varianten',
         'desc_optionsSettingsHeader' => 'Een product kan opties of varianten hebben of kan samengesteld zijn. Deze opties of deelproducten kunnen op dezelfde regel als het product komen of op aparte regels daaronder. U kunt het tonen ervan ook helemaal uitzetten.',
-        'desc_composedProducts' => 'NB: als het een samengesteld product betreft en de subproducten hebben verschillende BTW tarieven, dan komen alle subproducten op hun eigen regel, ongeacht deze instellingen.',
+        'desc_composedProducts' => 'NB: als het een samengesteld product betreft en de subproducten hebben verschillende btw tarieven, dan komen alle subproducten op hun eigen regel, ongeacht deze instellingen.',
         'field_showOptions' => 'Tonen',
         'desc_showOptions' => 'Als u opties, varianten of deelproducten helemaal niet op de factuur terug wilt zien, vink deze optie dan uit. Dit kan bv. handig zijn als u de varianten of deelproducten alleen voor uw voorraadbeheer gebruikt. Als u deze instelling uitzet, dan worden de onderstaande instellingen genegeerd.',
         'option_optionsShow' => 'Opties en deelproducten op de factuur tonen',
@@ -545,7 +545,7 @@ If you unchecked the first option, the second option only applies to business cl
         // Options settings.
         'optionsSettingsHeader' => 'Options or variants',
         'desc_optionsSettingsHeader' => 'Products can have options or variants, or can be composed. These options or sub products can be placed on the same line as the main product or on separate lines below. You can also switch this off altogether.',
-        'desc_composedProducts' => 'BTW: if this is a composed product and the sub products have different vat rates, all sub products will always be placed on their own line and the settings below will be ignored.',
+        'desc_composedProducts' => 'btw: if this is a composed product and the sub products have different vat rates, all sub products will always be placed on their own line and the settings below will be ignored.',
         'field_showOptions' => 'Show',
         'desc_showOptions' => 'Uncheck this setting if you do not want to place options, variants or sub products on the invoice at all. E.g. this can occur when you use the variants or sub products only for your own stock management. If you uncheck this setting the following settings will be ignored.',
         'option_optionsShow' => 'Show options and sub products on the invoice',

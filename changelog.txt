@@ -17,12 +17,15 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies)
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
-5.0.0-beta1 (2017-12-??)
-------------------------
-- Merged all 4.x changes into this branch.
-- Added changelog.txt (this file) to the root of this library.
-- Own autoloader is no longer part of the library but will be copied to those
-  shops that still need it.
+5.0.0 (2017-12-26)
+------------------
+- ALL: Merged all 4.x changes up to 4.9.6 into this branch.
+- ALL: Added changelog.txt (this file) to the root of this library.
+- ALL: Own autoloader is no longer part of the library but will be copied to
+  those shops that still need it.
+- PS: PS is now on the 5.x structure
+- PS: Created example module to handle hooks defined by the Acumulus module.
+- PS: Tested and corrected hook triggering.
 
 5.0.0-alpha1 (2017-09-26)
 -------------------------

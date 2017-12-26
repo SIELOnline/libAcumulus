@@ -62,7 +62,7 @@ WC3 = WooCommerce 3 (WordPress)
 4.9.4 (2017-11-10)
 ------------------
 - JOO: Fout bij controleren of event handlers de verzending willen tegenhouden.
-- ALL: Verzendkostenregels kregen metna-line-type = manual ipv shipping.
+- ALL: Verzendkostenregels kregen meta-line-type = manual ipv shipping.
 - WC: Shipping tax class lookup voegt niet altijd meta-vatrate-lookup-source
   tag toe.
 

@@ -169,6 +169,7 @@ class Creator extends BaseCreator
                 + $this->creditSlip->total_shipping_tax_incl;
         }
 
+
         return array(
             Meta::InvoiceAmountInc => $sign * $amountInc,
             Meta::InvoiceAmount => $sign * $amount,
@@ -365,15 +366,19 @@ class Creator extends BaseCreator
      * These fields are set by the PayPal with a fee module but seem generic
      * enough to also be used by other modules that allow for payment fees.
      *
-     * @todo: note that these amounts are not added to the invoice totals.
+     * @todo: Does this also exist on the credit slip table?
      */
     protected function getPaymentFeeLine() {
-        if (!empty($this->order->payment_fee) && isset($this->order->payment_fee_rate)) {
-            $paymentInc = (float) $this->order->payment_fee;
+        /* @noinspection PhpUndefinedFieldInspection */
+        if ( !empty($this->order->payment_fee) && isset($this->order->payment_fee_rate)) {
+            $sign = $this->getSign();
+            /** @noinspection PhpUndefinedFieldInspection */
+            $paymentInc     = (float) $sign * $this->order->payment_fee;
+            /** @noinspection PhpUndefinedFieldInspection */
             $paymentVatRate = (float) $this->order->payment_fee_rate;
-            $paymentEx = $paymentInc / (100.0 + $paymentVatRate) * 100;
-            $paymentVat = $paymentInc - $paymentEx;
-            $result = array(
+            $paymentEx      = $paymentInc / (100.0 + $paymentVatRate) * 100;
+            $paymentVat     = $paymentInc - $paymentEx;
+            $result         = array(
               Tag::Product => $this->t('payment_costs'),
               Tag::Quantity => 1,
               Tag::UnitPrice => $paymentEx,
@@ -383,6 +388,11 @@ class Creator extends BaseCreator
               Meta::VatAmount => $paymentVat,
               Meta::FieldsCalculated => array(Tag::UnitPrice, Meta::VatAmount),
             );
+
+            // Add these amounts to the invoice totals.
+            // @see \Siel\Acumulus\PrestaShop\Invoice\Creator\getInvoiceTotals()
+            $this->invoice['customer']['invoice'][Meta::InvoiceAmountInc] += $paymentInc;
+            $this->invoice['customer']['invoice'][Meta::InvoiceAmount] += $paymentEx;
             return $result;
         }
         return parent::getPaymentFeeLine();

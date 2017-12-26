@@ -89,26 +89,26 @@ class InvoiceManager extends BaseInvoiceManager
      */
     protected function triggerInvoiceCreated(array &$invoice, Source $invoiceSource, Result $localResult)
     {
-        Hook::exec('actionAcumulusInvoiceCreated', array('invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult), null, true);
+        Hook::exec('actionAcumulusInvoiceCreated', array('invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult));
     }
 
     /**
      * {@inheritdoc}
      *
-     * This PrestaShop override executes the 'actionAcumulusInvoiceCompleted' hook.
+     * This PrestaShop override executes the 'actionAcumulusInvoiceSendBefore' hook.
      */
     protected function triggerInvoiceSendBefore(array &$invoice, Source $invoiceSource, Result $localResult)
     {
-        Hook::exec('actionAcumulusInvoiceSendBefore', array('invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult), null, true);
+        Hook::exec('actionAcumulusInvoiceSendBefore', array('invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult));
     }
 
     /**
      * {@inheritdoc}
      *
-     * This PrestaShop override executes the 'actionAcumulusInvoiceSent' hook.
+     * This PrestaShop override executes the 'actionAcumulusInvoiceSentAfter' hook.
      */
     protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, Result $result)
     {
-        Hook::exec('actionAcumulusInvoiceSendAfter', array('invoice' => $invoice, 'source' => $invoiceSource, 'result' => $result), null, true);
+        Hook::exec('actionAcumulusInvoiceSendAfter', array('invoice' => $invoice, 'source' => $invoiceSource, 'result' => $result));
     }
 }

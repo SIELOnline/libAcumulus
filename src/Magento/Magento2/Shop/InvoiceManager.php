@@ -1,4 +1,5 @@
 <?php
+
 namespace Siel\Acumulus\Magento\Magento2\Shop;
 
 use Siel\Acumulus\Invoice\Source as Source;
@@ -7,6 +8,11 @@ use Siel\Acumulus\Magento\Shop\InvoiceManager as BaseInvoiceManager;
 
 class InvoiceManager extends BaseInvoiceManager
 {
+    /**
+     * @var \Magento\Framework\DataObjectFactory
+     */
+    private $dataObjectFactory;
+
     /**
      * {@inheritdoc}
      *
@@ -22,15 +28,24 @@ class InvoiceManager extends BaseInvoiceManager
     }
 
     /**
+     * @return \Magento\Framework\DataObjectFactory
+     */
+    public function getDataObjectFactory()
+    {
+        if ($this->dataObjectFactory === null) {
+            $this->dataObjectFactory = Registry::getInstance()->get('\Magento\Framework\DataObjectFactory');
+        }
+        return $this->dataObjectFactory;
+    }
+
+
+    /**
      * {@inheritdoc}
      */
-    protected function dispatchEvent($name, array $parameters, array $refParameters = array())
+    protected function dispatchEvent($name, array $parameters, array $refParameters = [])
     {
-        foreach ($refParameters as $name => $parameter) {
-            $refParameters[$name] += $parameter;
-        }
         /** @var \Magento\Framework\Event\ManagerInterface $dispatcher */
         $dispatcher = Registry::getInstance()->get('Magento\Framework\Event\ManagerInterface');
-        $dispatcher->dispatch($name, $refParameters);
+        $dispatcher->dispatch($name, $parameters + $refParameters);
     }
 }

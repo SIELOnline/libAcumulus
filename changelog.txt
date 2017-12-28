@@ -19,6 +19,9 @@ WC3 = WooCommerce 3 (WordPress)
 
 5.0.? (201?-??-??)
 ------------------
+- MA2: MA2 is now on the 5.x structure.
+- MA2: Tested and corrected event triggering and its parameter passing.
+- MA2: Created an example module to handle events defined by the Acumulus module.
 - ALL: Verduidelijking v/d vraag "Verkoopt u btw-vrije producten".
 - Changes to readme.md and leesmij.md
 
@@ -29,7 +32,7 @@ WC3 = WooCommerce 3 (WordPress)
 - ALL: Own autoloader is no longer part of the library but will be copied to
   those shops that still need it.
 - PS: PS is now on the 5.x structure
-- PS: Created example module to handle hooks defined by the Acumulus module.
+- PS: Created an example module to handle hooks defined by the Acumulus module.
 - PS: Tested and corrected hook triggering.
 
 5.0.0-alpha1 (2017-09-26)

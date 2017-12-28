@@ -1,9 +1,9 @@
 <?php
 namespace Siel\Acumulus\Magento\Shop;
 
+use Siel\Acumulus\Invoice\Result;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
-use Siel\Acumulus\Invoice\Result;
 
 abstract class InvoiceManager extends BaseInvoiceManager
 {
@@ -55,6 +55,8 @@ abstract class InvoiceManager extends BaseInvoiceManager
      *
      * @return \Siel\Acumulus\Invoice\Source[]
      *   A non keyed array with invoice Sources.
+     *
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     protected function getByCondition($invoiceSourceType, $field, $condition)
     {

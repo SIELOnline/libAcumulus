@@ -366,16 +366,18 @@ class Creator extends BaseCreator
      * These fields are set by the PayPal with a fee module but seem generic
      * enough to also be used by other modules that allow for payment fees.
      *
-     * @todo: Does this also exist on the credit slip table?
+     * For now, only orders can have a payment fee, so $sign is superfluous,
+     * but if in future versions payment fees can appear on credit slips as well
+     * the code can already handle that.
      */
     protected function getPaymentFeeLine() {
         /* @noinspection PhpUndefinedFieldInspection */
-        if ( !empty($this->order->payment_fee) && isset($this->order->payment_fee_rate)) {
+        if (!empty($this->invoiceSource->getSource()->payment_fee) && isset($this->invoiceSource->getSource()->payment_fee_rate)) {
             $sign = $this->getSign();
             /** @noinspection PhpUndefinedFieldInspection */
-            $paymentInc     = (float) $sign * $this->order->payment_fee;
+            $paymentInc     = (float) $sign * $this->invoiceSource->getSource()->payment_fee;
             /** @noinspection PhpUndefinedFieldInspection */
-            $paymentVatRate = (float) $this->order->payment_fee_rate;
+            $paymentVatRate = (float) $this->invoiceSource->getSource()->payment_fee_rate;
             $paymentEx      = $paymentInc / (100.0 + $paymentVatRate) * 100;
             $paymentVat     = $paymentInc - $paymentEx;
             $result         = array(

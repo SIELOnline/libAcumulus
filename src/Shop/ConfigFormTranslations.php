@@ -73,7 +73,7 @@ Zie <a href="http://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastin
         'option_vatFreeProducts_1' => 'Zowel btw vrije als aan btw onderhevige producten en/of diensten.',
         'option_vatFreeProducts_2' => 'Alleen aan btw onderhevige producten en/of diensten.',
         'option_vatFreeProducts_3' => 'Alleen producten of diensten die van btw vrijgesteld zijn.',
-        'desc_vatFreeProducts' => 'Geef aan of u in uw winkel producten en/of diensten aanbiedt die vrijgesteld zijn van btw, bv. onderwijs.',
+        'desc_vatFreeProducts' => 'Geef aan of u in uw winkel producten en/of diensten aanbiedt die vrijgesteld zijn van btw, bv. onderwijs. LET OP: het gaat er om of het product of de dienst btw-vrij is, niet of u een btw-vrije factuur of een factuur met verlegde btw opstelt.',
 
         // Trigger settings.
         'triggerSettingsHeader' => 'Wanneer wilt u uw facturen automatisch versturen naar Acumulus',
@@ -373,15 +373,13 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'option_digitalServices_2' => 'Only products that are subject to dutch VAT.',
         'option_digitalServices_3' => 'Only digital services subject to the regulations concerning using foreign VAT rates.',
         'desc_digitalServices' => 'Select whether your store offers digital services that are subject to foreign VAT for clients in other EU countries.
-See <a href="http://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/btw_berekenen_bij_diensten/wijziging_in_digitale_diensten_vanaf_2015/wijziging_in_digitale_diensten_vanaf_2015">Dutch tax office: services to other EU countries (in dutch)</a>.
-Using this setting this plugin can better determine the invoice type; perform some validations; and extract exact VAT rates where they are calculated using rounded amounts.',
+See <a href="http://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/btw_berekenen_bij_diensten/wijziging_in_digitale_diensten_vanaf_2015/wijziging_in_digitale_diensten_vanaf_2015">Dutch tax office: services to other EU countries (in dutch)</a>.',
 
         'field_vatFreeProducts' => 'Do you sell  VAT free products or services?',
         'option_vatFreeProducts_1' => 'Both VAT free and VAT liable products or services.',
         'option_vatFreeProducts_2' => 'Only products or services that are VAT liable.',
         'option_vatFreeProducts_3' => 'Only VAT free products or services.',
-        'desc_vatFreeProducts' => 'Select whether your store offers products or services that are VAT free, e.g. education.
-Using this setting this plugin can better determine the invoice type and perform some validations.',
+        'desc_vatFreeProducts' => 'Select whether your store offers products or services that are VAT free, e.g. education. NOTE: this settings concerns whether the products or services you offer are inherently vat free, not whether you create vat free invoices or invoices with reversed vat.',
 
         // Trigger settings.
         'triggerSettingsHeader' => 'When to have your invoices sent to Acumulus.',

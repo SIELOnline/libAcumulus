@@ -17,6 +17,11 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies)
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
+5.0.? (201?-??-??)
+------------------
+- ALL: Verduidelijking v/d vraag "Verkoopt u btw-vrije producten".
+- Changes to readme.md and leesmij.md
+
 5.0.0 (2017-12-26)
 ------------------
 - ALL: Merged all 4.x changes up to 4.9.6 into this branch.

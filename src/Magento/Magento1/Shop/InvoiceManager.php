@@ -19,19 +19,10 @@ class InvoiceManager extends BaseInvoiceManager
     }
 
     /**
-     * Dispatches an event.
-     *
-     * @param string $name
-     * @param array $parameters
-     * @param array? $transportObjects
-     *
-     * @return void
+     * {@inheritdoc}
      */
-    protected function dispatchEvent($name, array $parameters, array $transportObjects = null)
+    protected function dispatchEvent($name, array $parameters)
     {
-        if (!empty($transportObjects)) {
-            $parameters['transport_object'] = new \Varien_Object($transportObjects);
-        }
-        \Mage::dispatchEvent('acumulus_invoice_sent', $parameters);
+        \Mage::dispatchEvent($name, $parameters);
     }
 }

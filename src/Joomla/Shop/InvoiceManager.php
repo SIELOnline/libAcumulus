@@ -96,7 +96,7 @@ abstract class InvoiceManager extends BaseInvoiceManager
     /**
      * {@inheritdoc}
      *
-     * This Joomla override dispatches the 'onAcumulusInvoiceCompleted' event.
+     * This Joomla override dispatches the 'onAcumulusInvoiceSendBefore' event.
      */
     protected function triggerInvoiceSendBefore(array &$invoice, Source $invoiceSource, Result $localResult)
     {

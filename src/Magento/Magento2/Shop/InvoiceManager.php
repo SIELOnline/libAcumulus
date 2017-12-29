@@ -38,14 +38,13 @@ class InvoiceManager extends BaseInvoiceManager
         return $this->dataObjectFactory;
     }
 
-
     /**
      * {@inheritdoc}
      */
-    protected function dispatchEvent($name, array $parameters, array $refParameters = [])
+    protected function dispatchEvent($name, array $parameters)
     {
         /** @var \Magento\Framework\Event\ManagerInterface $dispatcher */
         $dispatcher = Registry::getInstance()->get('Magento\Framework\Event\ManagerInterface');
-        $dispatcher->dispatch($name, $parameters + $refParameters);
+        $dispatcher->dispatch($name, $parameters);
     }
 }

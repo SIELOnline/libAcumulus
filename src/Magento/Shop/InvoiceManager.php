@@ -88,7 +88,7 @@ abstract class InvoiceManager extends BaseInvoiceManager
      */
     protected function triggerInvoiceCreated(array &$invoice, Source $invoiceSource, Result $localResult)
     {
-        $this->dispatchEvent('acumulus_invoice_created', array('source' => $invoiceSource, 'localResult' => $localResult), array('invoice' => &$invoice));
+        $this->dispatchEvent('acumulus_invoice_created', array('invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult));
     }
 
     /**
@@ -98,7 +98,7 @@ abstract class InvoiceManager extends BaseInvoiceManager
      */
     protected function triggerInvoiceSendBefore(array &$invoice, Source $invoiceSource, Result $localResult)
     {
-        $this->dispatchEvent('acumulus_invoice_send_before', array('source' => $invoiceSource, 'localResult' => $localResult), array('invoice' => &$invoice));
+        $this->dispatchEvent('acumulus_invoice_send_before', array('invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult));
     }
 
     /**
@@ -118,10 +118,8 @@ abstract class InvoiceManager extends BaseInvoiceManager
      *   The name of the event.
      * @param array $parameters
      *   The parameters to the event that cannot be changed.
-     * @param array? $refParameters
-     *   The parameters to the event that can be changed.
      *
      * @return void
      */
-    abstract protected function dispatchEvent($name, array $parameters, array $refParameters = null);
+    abstract protected function dispatchEvent($name, array $parameters);
 }

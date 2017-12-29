@@ -17,13 +17,13 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies)
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
-5.0.? (201?-??-??)
+5.0.1 (2017-12-29)
 ------------------
 - PS: PS: process fields payment_fee and payment_fee_rate on the invoice source,
   not on the original order.
-- MA2: MA2 is now on the 5.x structure.
-- MA2: Tested and corrected event triggering and its parameter passing.
-- MA2: Created an example module to handle events defined by the Acumulus module.
+- MA: MA1 and Ma2 are now on the 5.x structure.
+- MA: Tested and corrected event triggering and its parameter passing.
+- MA: Created example modules for MA1 and MA2 to handle events defined by the Acumulus module.
 - ALL: Verduidelijking v/d vraag "Verkoopt u btw-vrije producten".
 - Changes to readme.md and leesmij.md
 

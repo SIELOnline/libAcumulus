@@ -9,22 +9,41 @@ use ReflectionClass;
  */
 class Container implements ContainerInterface
 {
+    /**
+     * The base directory where the Acumulus library is located.
+     *
+     * @var string
+     */
+    protected $baseDir;
+
     /** @const string */
     const baseNamespace = '\\Siel\\Acumulus\\';
 
-    /** @var string The namespace for the current shop. */
+    /**
+     * The namespace for the current shop.
+     *
+     * @var string
+     */
     protected $shopNamespace;
 
-    /** @var string The namespace for customisations on top of the current shop. */
-    protected $customNamespace;
+    /**
+     * The namespace for customisations on top of the current shop.
+     *
+     * @var string
+     */
+    protected $customNamespace = '';
 
     /** @var array */
-    protected $instances;
+    protected $instances = array();
 
     /** @var bool */
     protected $moduleSpecificTranslationsAdded = false;
 
-    /** @var string The language to display texts in. */
+    /**
+     * The language to display texts in.
+     *
+     * @var string
+     */
     protected $language;
 
     /**
@@ -36,10 +55,10 @@ class Container implements ContainerInterface
      */
     public function __construct($shopNamespace, $language = '')
     {
-        $this->instances = array();
+        // Base directory of libAcumulus is parent directory of this file's
+        // directory.
+        $this->baseDir =  dirname(__DIR__);
         $this->shopNamespace = static::baseNamespace . $shopNamespace;
-        global $sielAcumulusCustomNamespace;
-        $this->customNamespace = !empty($sielAcumulusCustomNamespace) ? $sielAcumulusCustomNamespace : '';
         $this->language = substr($language, 0, 2);
     }
 
@@ -55,6 +74,22 @@ class Container implements ContainerInterface
     {
         $this->language = $language;
         return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * Known usages: Magento1.
+     * When Magento1 runs in compiled mode, the classes as are instantiated are
+     * in the includes/src directory, in a flattened structure.  However, to
+     * prevent errors or warnings, tryNsInstance will, before calling
+     * class_exists(), first look for the existence of the class file in the
+     * original directory structure. but that directory structure cannot be
+     * derived by using __DIR__.
+     */
+    public function setBaseDir($baseDir)
+    {
+        $this->baseDir = $baseDir;
     }
 
     /**
@@ -337,29 +372,44 @@ class Container implements ContainerInterface
      */
     protected function tryNsInstance($class, $subNamespace, $namespace)
     {
-        $fqClass = $namespace . '\\' . $subNamespace . '\\' . $class;
-        $fileName = __DIR__ . DIRECTORY_SEPARATOR . '..' . str_replace('\\', DIRECTORY_SEPARATOR, substr($fqClass, strlen('/Siel/Acumulus'))) . '.php';
+        $fqClass = $this->getFqClass($class, $subNamespace, $namespace);
+        $fileName = $this->getFileName($fqClass);
         // Checking if the file exists prevents warnings in Magento whose own
         // autoloader logs warnings when a class cannot be loaded.
         return is_readable($fileName) && class_exists($fqClass) ? $fqClass : '';
     }
 
     /**
-     * Returns the namespace for the current cms.
+     * Returns the fully qualified class name.
+     *
+     * @param string $class
+     *   The name of the class without any namespace part.
+     * @param string $subNamespace
+     *   The sub namespace where the class belongs to, e.g helpers, invoice or
+     *   shop.
+     * @param string $namespace
+     *   THe "base" namespace where the class belongs to
      *
      * @return string
-     *   The namespace for the current cms or the empty string if the current shop
-     *   is not contained in a CMS namespace.
+     *   The fully qualified class name based on the base namespace, sub
+     *   namespace and the class name.
      */
-    protected function getCmsNamespace()
+    protected function getFqClass($class, $subNamespace, $namespace)
     {
-        // Get parent namespace of the shop namespace.
-        $cmsNamespaceEnd = strrpos($this->shopNamespace, '\\');
-        $cmsNamespace = substr($this->shopNamespace, 0, (int) $cmsNamespaceEnd);
-        // But if that is Acumulus there's no CMS namespace.
-        if (substr($cmsNamespace, -strlen('\\Acumulus')) === '\\Acumulus') {
-            $cmsNamespace = '';
-        }
-        return $cmsNamespace;
+        return $namespace . '\\' . $subNamespace . '\\' . $class;
+    }
+
+    /**
+     * Returns the file name (including path) where the given class resides.
+     *
+     * @param string $fqClass
+     *   Fully qualified class name.
+     *
+     * @return string
+     *   The file name (including path) where the given class resides.
+     */
+    protected function getFileName($fqClass)
+    {
+        return $this->baseDir . DIRECTORY_SEPARATOR . str_replace('\\',DIRECTORY_SEPARATOR, substr($fqClass, strlen(static::baseNamespace))) . '.php';
     }
 }

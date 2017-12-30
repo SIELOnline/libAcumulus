@@ -22,6 +22,13 @@ interface ContainerInterface
     public function setLanguage($language);
 
     /**
+     * Sets the base directory of the Acumulus library.
+     *
+     * @param string $baseDir
+     */
+    public function setBaseDir($baseDir);
+
+    /**
      * Sets a custom namespace for customisations on top of the current shop.
      *
      * @param string $customNamespace

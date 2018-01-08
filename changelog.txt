@@ -17,10 +17,11 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies)
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
-5.0.1 (2017-12-30)
+5.0.1 (2018-01-08)
 ------------------
-- PS: PS: process fields payment_fee and payment_fee_rate on the invoice source,
-  not on the original order.
+- ALL: Optie testmodus staat nu ook op het batchverzendformulier.
+- PS: Process fields payment_fee and payment_fee_rate on the invoice source,
+  not on the original order (thus not on refunds).
 - MA1: Support Magento1 compiled mode.
 - MA: MA1 and Ma2 are now on the 5.x structure.
 - MA: Tested and corrected event triggering and its parameter passing.

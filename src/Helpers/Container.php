@@ -297,24 +297,26 @@ class Container implements ContainerInterface
      */
     public function getForm($type)
     {
-        $class = ucfirst($type);
         $arguments = array(
             $this->getTranslator(),
+            $this->getConfig(),
             $this->getShopCapabilities(),
         );
         switch (strtolower($type)) {
             case 'config':
-                $arguments[] = $this->getConfig();
+                $class = 'Config';
                 $arguments[] = $this->getService();
                 break;
             case 'advanced':
                 $class = 'AdvancedConfig';
-                $arguments[] = $this->getConfig();
                 $arguments[] = $this->getService();
                 break;
             case 'batch':
+                $class = 'Batch';
                 $arguments[] = $this->getManager();
                 break;
+            default;
+                throw new \InvalidArgumentException("Unknown form type $type");
         }
         return $this->getInstance($class . 'Form', 'Shop', $arguments);
     }

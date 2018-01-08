@@ -2,10 +2,12 @@
 namespace Siel\Acumulus\Shop;
 
 use DateTime;
+use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Config\ShopCapabilitiesInterface;
 use Siel\Acumulus\Helpers\Form;
 use Siel\Acumulus\Helpers\TranslatorInterface;
 use Siel\Acumulus\Invoice\Translations as InvoiceTranslations;
+use Siel\Acumulus\PluginConfig;
 
 /**
  * Provides batch form handling.
@@ -34,12 +36,13 @@ class BatchForm extends Form
 
     /**
      * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
+     * @param \Siel\Acumulus\Config\ConfigInterface $config
      * @param \Siel\Acumulus\Config\ShopCapabilitiesInterface $shopCapabilities
      * @param \Siel\Acumulus\Shop\InvoiceManager $invoiceManager
      */
-    public function __construct(TranslatorInterface $translator, ShopCapabilitiesInterface $shopCapabilities, InvoiceManager $invoiceManager)
+    public function __construct(TranslatorInterface $translator, ConfigInterface $config, ShopCapabilitiesInterface $shopCapabilities, InvoiceManager $invoiceManager)
     {
-        parent::__construct($translator);
+        parent::__construct($translator, $config, $shopCapabilities);
 
         $translations = new InvoiceTranslations();
         $this->translator->add($translations);
@@ -134,7 +137,11 @@ class BatchForm extends Form
             $this->setFormValue('result', $this->log[$type]);
             $result = true;
         } else {
-            $result = $this->invoiceManager->sendMultiple($invoiceSources, (bool) $this->getFormValue('force_send'),  (bool) $this->getFormValue('dry_run'), $this->log);
+            if ((bool) $this->getFormValue('send_test_mode')) {
+                // Overrule debug setting for this run.
+                $this->acumulusConfig->set('debug', PluginConfig::Send_TestMode);
+            }
+            $result = $this->invoiceManager->sendMultiple($invoiceSources, (bool) $this->getFormValue('force_send'), (bool) $this->getFormValue('dry_run'), $this->log);
         }
 
         // Set formValue for log in case form values are already queried.
@@ -199,6 +206,7 @@ class BatchForm extends Form
                     'description' => $this->t('desc_batch_options'),
                     'options' => array(
                         'force_send' => $this->t('option_force_send'),
+                        'send_test_mode' => $this->t('option_send_test_mode'),
                         'dry_run' => $this->t('option_dry_run'),
                     ),
                 ),

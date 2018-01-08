@@ -15,21 +15,7 @@ use Tools;
 class ConfigForm extends BaseConfigForm
 {
     /** @var string */
-    protected $moduleName;
-
-    /**
-     * ConfigForm constructor.
-     *
-     * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
-     * @param \Siel\Acumulus\Config\ShopCapabilitiesInterface $shopCapabilities
-     * @param \Siel\Acumulus\Web\Service $service
-     * @param \Siel\Acumulus\Config\ConfigInterface $config
-     */
-    public function __construct(TranslatorInterface $translator, ShopCapabilitiesInterface $shopCapabilities, ConfigInterface $config, Service $service)
-    {
-        parent::__construct($translator, $shopCapabilities, $config, $service);
-        $this->moduleName = 'acumulus';
-    }
+    protected $moduleName = 'acumulus';
 
     /**
      * {@inheritdoc}

@@ -167,6 +167,21 @@ interface ConfigInterface
     public function getDefaults();
 
     /**
+     * Sets the internal value of the specified configuration key.
+     *
+     * This value will not be stored, use save() for that.
+     *
+     * @param string $key
+     *   The configuration value to set.
+     * @param mixed $value
+     *   The new value for the configuration key.
+     *
+     * @return mixed
+     *   The old value.
+     */
+    public function set($key, $value);
+
+    /**
      * Upgrade the datamodel to the given version.
      *
      * This method is only called when the module gets updated.

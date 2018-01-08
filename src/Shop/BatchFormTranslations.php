@@ -28,9 +28,11 @@ class BatchFormTranslations extends TranslationCollection
         'desc_date_from_to' => 'Vul de periode in waarvan u de facuren naar Acumulus wilt verzenden (verwacht formaat %1$s). De selectie vindt plaats op basis van de datum van de meest recente wijziging aan de bestelling of creditnota. Als u slechts de facturen van 1 dag wilt verzenden hoeft u alleen de \'Datum van\' in te vullen. Laat beide velden leeg als u op nummer wilt verzenden.',
         'field_options' => 'Opties',
         'option_force_send' => 'Forceer verzenden',
+        'option_send_test_mode' => 'Verzend in testmodus',
         'option_dry_run' => 'Laat alleen de lijst van facturen zien die verstuurd zouden worden, zonder daadwerkelijk te versturen.',
         'desc_batch_options' => '<p>Facturen die binnen de reeks vallen maar al naar Acumulus verstuurd zijn, worden standaard niet verzonden. Door de 1e optie aan te vinken forceert u het nogmaals versturen van deze facturen.</p>
-                                 <p>De filters die u hierboven opgeeft kunnen in bepaalde gevallen voor verrassingen zorgen. Door de 2e optie te selecteren krijgt u in het resultatenoverzicht een lijst te zien van facuren die verstuurd zouden worden, zonder dat het versturen daadwerkelijk plaats vindt.</p>',
+                                 <p>Met de 2e optie worden de facturen in testmodus naar Acumulus verstuurd. Acumulus zal alleen de factuur controleren op fouten en waarschuwingen maar zal deze niet opslaan, zodat uw administratie niet in de war raakt. U ontvangt alijd een mail met de resultaten. Deze optie is gelijk aan de optie "Testmodus" van de instelling "Factuur verzendmodus" van het instellingenformulier, maar geldt alleen voor deze batchverzending. Gebruik deze optie om de mail die u ontvangt mee te kunnen sturen met een supportverzoek.</p>
+                                 <p>De filters die u hierboven opgeeft kunnen in bepaalde gevallen voor verrassingen zorgen. Door de laatste optie te selecteren krijgt u in het resultatenoverzicht een lijst te zien van facuren die verstuurd zouden worden, zonder dat het versturen daadwerkelijk plaats vindt.</p>',
         'batchLogHeader' => 'Resultaten',
         'batchInfoHeader' => 'Uitgebreide informatie',
         'batch_info' => <<<LONGSTRING
@@ -110,9 +112,11 @@ LONGSTRING
         'desc_date_from_to' => 'Enter the period over which you want to send invoices to Acumulus (expected format: %1$s). If you want to send the invoices of 1 day, only fill in the \'Date from\' field. Leave empty if you want to send by id.',
         'field_options' => 'Options',
         'option_force_send' => 'Force sending',
+        'option_send_test_mode' => 'Send in test mode',
         'option_dry_run' => 'Dry run.',
         'desc_batch_options' => '<p>Invoices that fall within the range but are already sent to Acumulus will normally not be sent again. By checking the 1st option, these orders will be sent again.</p>
-                                 <p>In some cases, the filters you define here can lead to surprises. By cheking the 2nd option you will get a list of invoices that would be sent, without actually being sent.</p>',
+                                 <p>With the 2nd option, invoices will be sent to Acumulus using the test mode. Acumulus will only check the input for errors and warnings but not store the invoice, so your administration will not be polluted. You will always receive a mail with the results. This option overrules the setting "Invoice send mode" on the configuration form. Use this option so you can forward the mail you receive with a support request.</p>
+                                 <p>In some cases, the filters you define here can lead to surprises. By cheking the last option you will get a list of invoices that would be sent, without actually being sent.</p>',
         'batchLogHeader' => 'Results',
         'batchInfoHeader' => 'Additional information',
 

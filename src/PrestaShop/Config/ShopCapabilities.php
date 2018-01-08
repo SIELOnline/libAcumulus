@@ -275,7 +275,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     {
         switch ($formType) {
             case 'config':
-                return Context::getContext()->link->getAdminLink('AdminModules', true) . '&module_name=acumulus&tab_module=billing_invoicing&configure=acumulus';
+                return Context::getContext()->link->getAdminLink('AdminModules', true, array(), array('configure' => 'acumulus'));
             case 'advanced':
                 return Context::getContext()->link->getAdminLink('AdminAcumulusAdvanced', true);
             case 'batch':

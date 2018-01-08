@@ -152,19 +152,9 @@ class Config implements ConfigInterface
     }
 
     /**
-     * Sets the internal value of the specified configuration key.
-     *
-     * This value will not be stored, use save() for that.
-     *
-     * @param string $key
-     *   The configuration value to set.
-     * @param mixed $value
-     *   The new value for the configuration key.
-     *
-     * @return mixed
-     *   The old value.
+     * @inheritdoc
      */
-    protected function set($key, $value)
+    public function set($key, $value)
     {
         $this->load();
         $oldValue = isset($this->values[$key]) ? $this->values[$key] : null;

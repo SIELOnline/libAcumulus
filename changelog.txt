@@ -19,11 +19,14 @@ WC3 = WooCommerce 3 (WordPress)
 
 5.0.1 (2018-01-08)
 ------------------
+- ALL: Own autoloader is back in the library, but kind of outside of it, at the
+  root folder. It was to much copy & paste after all, but the new version does
+  not execute automatically upon including.
 - ALL: Optie testmodus staat nu ook op het batchverzendformulier.
 - PS: Process fields payment_fee and payment_fee_rate on the invoice source,
   not on the original order (thus not on refunds).
 - MA1: Support Magento1 compiled mode.
-- MA: MA1 and Ma2 are now on the 5.x structure.
+- MA: MA1 and MA2 are now on the 5.x structure.
 - MA: Tested and corrected event triggering and its parameter passing.
 - MA: Created example modules for MA1 and MA2 to handle events defined by the Acumulus module.
 - ALL: Verduidelijking v/d vraag "Verkoopt u btw-vrije producten".

@@ -19,6 +19,8 @@ WC3 = WooCommerce 3 (WordPress)
 
 5.0.1 (2018-01-08)
 ------------------
+- HS, PS, VM: Je kunt in het batchverzendscherm nu (ipv referenties) ook id's van de
+  bestellingen gebruiken om de reeks te verzenden bestellingen aan te geven.
 - ALL: Own autoloader is back in the library, but at the root folder. It was to
   much copy & paste after all, but the new version does not execute
   automatically upon including.
@@ -772,6 +774,7 @@ HikaShop
 
 Magento 2
 ---------
+* 2.1.11
 * 2.1.2
 * 2.0.6
 * 2.0.4

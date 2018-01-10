@@ -16,6 +16,10 @@ class Translations extends TranslationCollection
         'plural_Order'  => 'bestellingen',
         'plural_CreditNote' => 'creditnota\'s',
         'plural_Other' => 'overige',
+        'plural_Order_ref'  => 'bestelling-referenties',
+        'plural_CreditNote_ref' => 'creditnotareferenties',
+        'plural_Order_id'  => 'bestellingnummers',
+        'plural_CreditNote_id' => 'creditnotanummers',
 
         'for' => 'voor',
         'vat' => 'btw',
@@ -55,6 +59,10 @@ class Translations extends TranslationCollection
         'plural_Order'  => 'orders',
         'plural_CreditNote' => 'creditnotes',
         'plural_Other' => 'other',
+        'plural_Order_ref'  => 'order references',
+        'plural_CreditNote_ref' => 'creditnote references',
+        'plural_Order_id'  => 'order numbers',
+        'plural_CreditNote_id' => 'creditnote numbers',
 
         'for' => 'for',
         'vat' => 'VAT',

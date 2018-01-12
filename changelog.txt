@@ -17,7 +17,11 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies)
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
-5.0.1 (2018-01-08)
+5.0.2 (2018-01-??)
+------------------
+- PS: Fout in ondersteuning voor paypal module (veld payment_fee).
+
+5.0.1 (2018-01-11)
 ------------------
 - HS, PS, VM: Je kunt in het batchverzendscherm nu (ipv referenties) ook id's van de
   bestellingen gebruiken om de reeks te verzenden bestellingen aan te geven.

@@ -37,7 +37,7 @@ use TaxManagerFactory;
  *   - amount is incl vat if manually entered (assuming administrators enter
  *     amounts incl tax, and this is what gets listed on the credit PDF.
  *   - shipping_cost_amount is excl vat.
- *   So this is never going  to work in all situations!!!
+ *   So this is never going to work in all situations!!!
  *
  * @todo: So, can we get a tax amount/rate over the manually entered refund?
  */
@@ -334,7 +334,7 @@ class Creator extends BaseCreator
             /** @var string[] $metaCalculatedFields */
             $metaCalculatedFields = array();
             $wrappingEx = $this->order->total_wrapping_tax_excl;
-            $wrappingExLookedUp =  (float) Configuration::get('PS_GIFT_WRAPPING_PRICE');
+            $wrappingExLookedUp = (float) Configuration::get('PS_GIFT_WRAPPING_PRICE');
             // Increase precision if possible.
             if (Number::floatsAreEqual($wrappingEx, $wrappingExLookedUp, 0.005)) {
                 $wrappingEx = $wrappingExLookedUp;
@@ -367,20 +367,23 @@ class Creator extends BaseCreator
      * enough to also be used by other modules that allow for payment fees.
      *
      * For now, only orders can have a payment fee, so $sign is superfluous,
-     * but if in future versions payment fees can appear on credit slips as well
+     * but if in future versions payment fees can appear on order slips as well
      * the code can already handle that.
      */
     protected function getPaymentFeeLine() {
         /* @noinspection PhpUndefinedFieldInspection */
-        if (!empty($this->invoiceSource->getSource()->payment_fee) && isset($this->invoiceSource->getSource()->payment_fee_rate)) {
+        if (isset($this->invoiceSource->getSource()->payment_fee)
+            && isset($this->invoiceSource->getSource()->payment_fee_rate)
+            && (float) $this->invoiceSource->getSource()->payment_fee !== 0.0)
+        {
             $sign = $this->getSign();
             /** @noinspection PhpUndefinedFieldInspection */
-            $paymentInc     = (float) $sign * $this->invoiceSource->getSource()->payment_fee;
+            $paymentInc = (float) $sign * $this->invoiceSource->getSource()->payment_fee;
             /** @noinspection PhpUndefinedFieldInspection */
             $paymentVatRate = (float) $this->invoiceSource->getSource()->payment_fee_rate;
-            $paymentEx      = $paymentInc / (100.0 + $paymentVatRate) * 100;
-            $paymentVat     = $paymentInc - $paymentEx;
-            $result         = array(
+            $paymentEx = $paymentInc / (100.0 + $paymentVatRate) * 100;
+            $paymentVat = $paymentInc - $paymentEx;
+            $result = array(
               Tag::Product => $this->t('payment_costs'),
               Tag::Quantity => 1,
               Tag::UnitPrice => $paymentEx,

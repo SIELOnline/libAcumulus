@@ -200,11 +200,65 @@ class OcHelper
     }
 
     /**
+     * Extracts the order id of the parameters as passed to the event handler.
+     *
+     * Event handling has undergone a lot of changes in OC, so where the order
+     * id can be found depends on the version. However we do not check the
+     * version itself but the (number and type of the) parameters passed in.
+     *
+     * Parameters for OC2.0:
+     * param int $order_id
+     *
+     * Parameters for OC 2.2:
+     * param string $route
+     * param mixed $output
+     * param int $order_id
+     * param int $order_status_id
+     * Parameters for OC 2.3+
+     * param string $route
+     *   checkout/order/addOrder or checkout/order/addOrderHistory.
+     * param array $args
+     *   Array with numeric indices containing the arguments as passed to the
+     *   model method.
+     *   When route = checkout/order/addOrder it contains: order (but without
+     *   order_id as that will be created and assigned by the method).
+     *   When route = checkout/order/addOrderHistory it contains: order_id,
+     *   order_status_id, comment, notify, override.
+     * param mixed $output
+     *   If passed by event checkout/order/addOrder it contains the order_id of
+     *   the just created order. It is null for checkout/order/addOrderHistory.
+     *
+     * @param array $args
+     *   The arguments passed to the event handler.
+     *
+     * @return int
+     *   The id of the order that triggered the event.
+     */
+    public function extractOrderId(array $args)
+    {
+        if (is_numeric($args[0])) {
+            // OC 2.0.
+            $order_id = $args[0];
+        } elseif (is_array($args[1])) {
+            // OC 2.3.
+            $route = $args[0];
+            $event_args = $args[1];
+            $output = $args[2];
+            $order_id = substr($route, -strlen('/addOrder')) ===  '/addOrder' ? $output : $event_args[0];
+        } else {
+            // OC 2.2.
+            $order_id = $args[2];
+        }
+        return $order_id;
+    }
+
+    /**
      * Event handler that executes on the creation or update of an order.
      *
      * @param int $order_id
      */
-    public function eventOrderUpdate($order_id) {
+    public function eventOrderUpdate($order_id)
+    {
         $source = $this->container->getSource(Source::Order, $order_id);
         $this->container->getManager()->sourceStatusChange($source);
     }
@@ -215,7 +269,8 @@ class OcHelper
      * @param array $menus
      *   The menus part of the data as will be passed to the view.
      */
-    public function eventViewColumnLeft(&$menus) {
+    public function eventViewColumnLeft(&$menus)
+    {
         foreach ($menus as &$menu) {
             if ($menu['id'] === 'menu-sale') {
                 $menu['children'][] = array(
@@ -454,6 +509,10 @@ class OcHelper
      * To support updating, this will also be called by the index function.
      * Therefore we will first remove any existing events from our module.
      *
+     * To support other plugins, notably quick_status_updater, we do not only
+     * look at the checkout/order events at the catalog side, but at all
+     * addOrder and addOrderHistory events.
+     *
      * @throws \Exception
      */
     protected function installEvents()
@@ -461,8 +520,10 @@ class OcHelper
         $this->uninstallEvents();
         $location = $this->getLocation();
         $model = $this->registry->getEventModel();
-        $model->addEvent('acumulus','catalog/model/checkout/order/addOrder/after',$location . '/eventOrderUpdate');
-        $model->addEvent('acumulus','catalog/model/checkout/order/addOrderHistory/after',$location . '/eventOrderUpdate');
+        $model->addEvent('acumulus','catalog/model/*/addOrder/after',$location . '/eventOrderUpdate');
+        $model->addEvent('acumulus','catalog/model/*/addOrderHistory/after',$location . '/eventOrderUpdate');
+        $model->addEvent('acumulus','admin/model/*/addOrder/after',$location . '/eventOrderUpdate');
+        $model->addEvent('acumulus','admin/model/*/addOrderHistory/after',$location . '/eventOrderUpdate');
         $model->addEvent('acumulus','admin/view/common/column_left/before',$location . '/eventViewColumnLeft');
     }
 

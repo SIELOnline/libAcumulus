@@ -232,18 +232,17 @@ class Creator extends BaseCreator
         $this->addTokenDefault($result, Tag::Nature, $invoiceSettings['nature']);
 
 
-        // Add quantity: quantity is negative on refunds, make it positive.
-        $sign  = $this->invoiceSource->getType() === source::CreditNote ? -1 : 1;
-        $commonTags = array(Tag::Quantity => $sign * $item->get_quantity());
+        // Add quantity: quantity is negative on refunds, the unit price will be
+        // positive.
+        $quantity = $item->get_quantity();
+        $commonTags = array(Tag::Quantity => $quantity);
         $result += $commonTags;
 
-        // Add price info.
-        // get_item_total() returns cost per item after discount and ex vat (2nd
-        // param).
-        $productPriceEx = $this->shopSource->get_item_total($item, false, false);
-        $productPriceInc = $this->shopSource->get_item_total($item, true, false);
-        // get_item_tax returns tax per item after discount.
-        $productVat = $this->shopSource->get_item_tax($item, false);
+        // Add price info. get_total() and get_total_tax() return line totals
+        // after discount (and will be negative on refunds).
+        $productPriceEx = $item->get_total() / $quantity;
+        $productVat = $item->get_total_tax() / $quantity;
+        $productPriceInc = $productPriceEx - $productVat;
 
         // Get precision info.
         if ($this->productPricesIncludeTax()) {
@@ -560,8 +559,9 @@ class Creator extends BaseCreator
    */
     protected function getFeeLine($item)
     {
-        $feeEx = $this->shopSource->get_item_total($item, false, false);
-        $feeVat = $this->shopSource->get_item_tax($item, false);
+        $quantity = $item->get_quantity();
+        $feeEx = $item->get_total() / $quantity;
+        $feeVat = $item->get_total_tax() / $quantity;
 
         $result = array(
                 Tag::Product => $this->t($item->get_name()),
@@ -605,7 +605,7 @@ class Creator extends BaseCreator
         // Precision: shipping costs are entered ex VAT, so that may be very
         // precise, but it will be rounded to the cent by WC. The VAT is also
         // rounded to the cent.
-        $shippingEx = $this->shopSource->get_item_total($item, false, false);
+        $shippingEx = $item->get_total();
         $shippingExPrecision = 0.01;
 
         // To avoid rounding errors, we try to get the non-formatted amount
@@ -618,17 +618,19 @@ class Creator extends BaseCreator
             $shippingEx = $options['cost'];
             $shippingExPrecision = 0.001;
         }
-        $shippingVat = $this->shopSource->get_item_tax($item, false);
+        $quantity = $item->get_quantity();
+        $shippingEx /= $quantity;
+        $shippingVat = $item->get_total_tax() / $quantity;
         $vatPrecision = 0.01;
 
         $result = array(
                 Tag::Product => $item->get_name(),
                 Tag::UnitPrice => $shippingEx,
                 Meta::PrecisionUnitPrice => $shippingExPrecision,
-                Tag::Quantity => $item->get_quantity(),
+                Tag::Quantity => $quantity,
             )
-            + $this->getVatRangeTags($shippingVat, $shippingEx, $vatPrecision, $shippingExPrecision)
-            + $vatLookupTags;
+                  + $this->getVatRangeTags($shippingVat, $shippingEx, $vatPrecision, $shippingExPrecision)
+                  + $vatLookupTags;
 
         return $result;
     }

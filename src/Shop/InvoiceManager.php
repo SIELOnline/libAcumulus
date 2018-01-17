@@ -585,7 +585,7 @@ abstract class InvoiceManager
     protected function getSendResultLogText(Source $invoiceSource, Result $result, $addReqResp = Result::AddReqResp_WithOther)
     {
         $invoiceSourceText = sprintf($this->t('message_invoice_source'),
-            $invoiceSource->getType(),
+            $this->t($invoiceSource->getType()),
             $invoiceSource->getReference()
         );
         $logMessage = sprintf($this->t('message_invoice_send'),

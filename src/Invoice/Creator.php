@@ -138,6 +138,10 @@ abstract class Creator
             'invoiceSource' => $this->invoiceSource,
             'source' => $this->invoiceSource->getSource(),
         );
+        if ($this->invoiceSource->getType() === Source::CreditNote) {
+            $this->propertySources['originalInvoiceSource'] = $this->invoiceSource->getOriginalSource();
+        }
+
     }
 
     /**

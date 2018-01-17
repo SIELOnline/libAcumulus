@@ -17,8 +17,12 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies)
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
-5.0.2 (2018-01-??)
+5.0.2 (2018-01-17)
 ------------------
+- ALL: originalInvoiceSource als bron van veldverwijzingen werkte niet.
+- OC23/OC3: Ondersteuning voor quick_status_updater module.
+- WC: WooCommerce bug #18357 is nu in onze eigen code opgelost zodat deze versie
+  van onze plugin met zowel oude als toekomstige WC versies goed werkt.
 - PS: Fout in ondersteuning voor paypal module (veld payment_fee).
 
 5.0.1 (2018-01-11)

@@ -305,6 +305,10 @@ class Communicator implements CommunicatorInterface
             if (!$result) {
                 throw new RuntimeException('DOMDocument::saveXML failed');
             }
+            // Backslashes get lost between here and the Acumulus API, but
+            // encoding them makes them get through. Solve here until the
+            // real error has been found and solved.
+            $result = str_replace('\\', '&#92;', $result);
             return $result;
         } catch (\DOMException $e) {
             // Convert a DOMException to a RuntimeException, so we only have to

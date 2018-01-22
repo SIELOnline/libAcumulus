@@ -72,7 +72,7 @@ class ConfigStore extends BaSeConfigStore
         // Update the values with the form values.
         $defaults = $this->acumulusConfig->getDefaults();
         foreach ($values as $key => $value) {
-            if ((isset($defaults[$key]) && $defaults[$key] === $value) || $value === NULL) {
+            if ((isset($defaults[$key]) && $defaults[$key] === $value) || $value === null) {
                 unset($data[$key]);
             }
             else {

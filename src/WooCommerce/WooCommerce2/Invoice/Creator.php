@@ -169,7 +169,7 @@ class Creator extends BaseCreator
             return $result;
         }
 
-        // $product can be NULL if the product has been deleted.
+        // $product can be null if the product has been deleted.
         if ($product instanceof WC_Product) {
             $this->addPropertySource('product', $product);
         }

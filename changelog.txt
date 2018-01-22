@@ -17,6 +17,10 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies)
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
+5.0.5 (2018-01-??)
+------------------
+- PSR-1: use true, false and null instead of TRUE, FALSE and NULL.
+
 5.0.4 (2018-01-22)
 ------------------
 - WC: Eigen oplossing voor WooCommerce bug #18357 ging de fout in.
@@ -547,7 +551,7 @@ WC3 = WooCommerce 3 (WordPress)
 ------------------
 - ALL: Als een factuur als concept verzonden wordt, stuurt Acumulus geen
   entry_id terug. Toch willen we ook hier een beveiliging tegen dubbel
-  versturen: sta NULL toe als waardes voor entry_id en token en sla dit ook op.
+  versturen: sta null toe als waardes voor entry_id en token en sla dit ook op.
 - ALL: Fout in TryallVatRatePermutations waardoor die nooit succesvol kan zijn.
 - ALL: (dummy) Fail strategie is niet meer nodig en daarom verwijderd.
 - ALL: Forceer verzenden wanneer de debuginstelling op testmodus of lokaal

@@ -207,7 +207,7 @@ class Creator extends BaseCreator
             return $result;
         }
 
-        // $product can be NULL if the product has been deleted.
+        // $product can be null if the product has been deleted.
         if ($product instanceof WC_Product) {
             // Support for the "WooCommerce Bookings" plugin. Bookings are
             // stored in a separate entity, we add that as a separate property

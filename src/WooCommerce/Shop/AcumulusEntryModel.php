@@ -99,7 +99,7 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
         $now = $this->sqlNow();
         $orderId = $invoiceSource->getId();
         add_post_meta($orderId, static::KEY_CREATED, $now, true);
-        //$exists = add_post_meta($orderId, '_acumulus_created', $now, true) === FALSE;
+        //$exists = add_post_meta($orderId, '_acumulus_created', $now, true) === false;
         return update_post_meta($orderId, static::KEY_ENTRY_ID, $entryId) !== false
             && update_post_meta($orderId, static::KEY_TOKEN, $token) !== false
             && update_post_meta($orderId, static::KEY_UPDATED, $now) !== false;

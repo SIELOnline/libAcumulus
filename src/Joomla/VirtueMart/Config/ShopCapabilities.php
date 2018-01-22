@@ -110,7 +110,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
                     'order_status',
                     'xhtml',
                 ),
-                'properties-more' => TRUE,
+                'properties-more' => true,
             ),
             'item' => array(
                 'table' => 'virtuemart_order_items',
@@ -135,7 +135,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
                     'product_attribute',
                     'delivery_date',
                 ),
-                'properties-more' => TRUE,
+                'properties-more' => true,
             ),
         );
     }

@@ -35,7 +35,7 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
     public function getByEntryId($entryId)
     {
         $operator = $entryId === null ? 'is' : '=';
-        $entryId = $entryId === null ? 'NULL' : (string) (int) $entryId;
+        $entryId = $entryId === null ? 'null' : (string) (int) $entryId;
         $result = $this->getDb()->query("SELECT * FROM {$this->tableName} WHERE entry_id $operator $entryId");
         return empty($result->rows) ? null : (count($result->rows) === 1 ? $result->row : $result->rows);
     }
@@ -60,8 +60,8 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
         } else {
             $storeId = 0;
         }
-        $entryId = $entryId === null ? 'NULL' : (string) (int) $entryId;
-        $token = $token === null ? 'NULL' : "'" . $this->getDb()->escape($token) . "'";
+        $entryId = $entryId === null ? 'null' : (string) (int) $entryId;
+        $token = $token === null ? 'null' : "'" . $this->getDb()->escape($token) . "'";
         $invoiceSourceType = $invoiceSource->getType();
         $invoiceSourceId = $invoiceSource->getId();
         return (bool) $this->getDb()->query("INSERT INTO `{$this->tableName}` (store_id, entry_id, token, source_type, source_id, updated) VALUES ($storeId, $entryId, $token, '$invoiceSourceType', $invoiceSourceId, '$created')");
@@ -72,8 +72,8 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
      */
     protected function update($record, $entryId, $token, $updated)
     {
-        $entryId = $entryId === null ? 'NULL' : (string) (int) $entryId;
-        $token = $token === null ? 'NULL' : "'" . $this->getDb()->escape($token) . "'";
+        $entryId = $entryId === null ? 'null' : (string) (int) $entryId;
+        $token = $token === null ? 'null' : "'" . $this->getDb()->escape($token) . "'";
         return (bool) $this->getDb()->query("UPDATE `{$this->tableName}` SET entry_id = $entryId, token = $token, updated = '$updated' WHERE id = {$record['id']}");
     }
 

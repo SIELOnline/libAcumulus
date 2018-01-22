@@ -326,7 +326,7 @@ abstract class Mailer
         $pluginSettings = $this->config->getPluginSettings();
         $addReqResp = $pluginSettings['debug'] === PluginConfig::Send_SendAndMailOnError ? Result::AddReqResp_WithOther : Result::AddReqResp_Always;
         if ($addReqResp === Result::AddReqResp_Always || ($addReqResp === Result::AddReqResp_WithOther && $result->hasMessages())) {
-            if ($result->getRawRequest() !== NULL || $result->getRawResponse() !== NULL) {
+            if ($result->getRawRequest() !== null || $result->getRawResponse() !== null) {
                 $header = $this->t('mail_support_header');
                 $description = $this->t('mail_support_desc');
                 $supportMessagesText = $result->getRawRequestResponse(Result::Format_FormattedText);

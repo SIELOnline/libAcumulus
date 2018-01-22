@@ -649,12 +649,12 @@ class Result {
     public function getRawRequestResponse($format)
     {
         $result = '';
-        if ($this->getRawRequest() !== NULL || $this->getRawResponse() !== NULL) {
+        if ($this->getRawRequest() !== null || $this->getRawResponse() !== null) {
             $messages = array();
-            if ($this->getRawRequest() !== NULL) {
+            if ($this->getRawRequest() !== null) {
                 $messages[] = $this->t('message_sent') . ":\n" . $this->getRawRequest();
             }
-            if ($this->getRawResponse() !== NULL) {
+            if ($this->getRawResponse() !== null) {
                 $messages[] = $this->t('message_received') . ":\n" . $this->getRawResponse();
             }
             $result .= $this->formatMessages($messages, $format);

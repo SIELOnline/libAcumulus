@@ -35,7 +35,7 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
     public function getByEntryId($entryId)
     {
         $operator = $entryId === null ? 'is' : '=';
-        $entryId = $entryId === null ? 'NULL' : (string) (int) $entryId;
+        $entryId = $entryId === null ? 'null' : (string) (int) $entryId;
         $result = Db::getInstance()->executeS("SELECT * FROM `{$this->tableName}` WHERE id_entry $operator $entryId");
         return empty($result) ? null : (count($result) === 1 ? reset($result) : $result);
     }
@@ -61,8 +61,8 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
             $shopId = 0;
             $shopGroupId = 0;
         }
-        $entryId = $entryId === null ? 'NULL' : (string) (int) $entryId;
-        $token = $token === null ? 'NULL' : "'" . Db::getInstance()->escape($token) . "'";
+        $entryId = $entryId === null ? 'null' : (string) (int) $entryId;
+        $token = $token === null ? 'null' : "'" . Db::getInstance()->escape($token) . "'";
         $invoiceSourceType = $invoiceSource->getType();
         $invoiceSourceId = $invoiceSource->getId();
         return Db::getInstance()->execute("INSERT INTO `{$this->tableName}` (id_shop, id_shop_group, id_entry, token, source_type, source_id, updated) VALUES ($shopId, $shopGroupId, $entryId, $token, '$invoiceSourceType', $invoiceSourceId, '$created')");
@@ -73,8 +73,8 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
      */
     protected function update($record, $entryId, $token, $updated)
     {
-        $entryId = $entryId === null ? 'NULL' : (string) (int) $entryId;
-        $token = $token === null ? 'NULL' : "'" . Db::getInstance()->escape($token) . "'";
+        $entryId = $entryId === null ? 'null' : (string) (int) $entryId;
+        $token = $token === null ? 'null' : "'" . Db::getInstance()->escape($token) . "'";
         return Db::getInstance()->execute("UPDATE `{$this->tableName}` SET id_entry = $entryId, token = $token, updated = '$updated' WHERE id = {$record['id']}");
     }
 

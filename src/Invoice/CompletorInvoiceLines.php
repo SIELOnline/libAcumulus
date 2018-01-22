@@ -309,7 +309,7 @@ class CompletorInvoiceLines
      *
      * @param array $matchedVatRates
      *
-     * @return float|FALSE|NULL
+     * @return float|false|null
      *   If all vat rates are equal that vat rate, null if $matchedVatRates is
      *   empty, false otherwise (multiple but different vat rates).
      */
@@ -431,7 +431,7 @@ class CompletorInvoiceLines
         $result = false;
         foreach ($this->possibleVatRates as $vatRateInfo) {
             if (Number::floatsAreEqual($vatRate, $vatRateInfo[Tag::VatRate])) {
-                $result = TRUE;
+                $result = true;
                 break;
             }
         }

@@ -801,7 +801,7 @@ abstract class Creator
             $value = $this->getTokenizedValue($token);
             if (!empty($value)) {
                 $array[$key] = $value;
-                return TRUE;
+                return true;
             }
         }
         return false;
@@ -994,7 +994,7 @@ abstract class Creator
      * rates that an order can have (one of the Dutch or, for electronic
      * services, other EU country VAT rates).
      *
-     * - If $denominator = 0 the vatrate will be set to NULL and the Completor
+     * - If $denominator = 0 the vatrate will be set to null and the Completor
      *   may try to get this line listed under the correct vat rate.
      * - If $numerator = 0 the vatrate will be set to 0 and be treated as if it
      *   is an exact vat rate, not a vat range

@@ -252,7 +252,7 @@ class Config implements ConfigInterface
      * Casts the values to their correct types.
      *
      * Values that come from a submitted form are all strings. Values that come
-     * from the config store might be NULL. However, internally we work with
+     * from the config store might be null. However, internally we work with
      * booleans or integers. So after reading from the config store or form, we
      * cast the values to their expected types.
      *

@@ -87,7 +87,7 @@ class Source extends BaseSource
     public function getInvoiceReferenceOrder()
     {
         return !empty($this->source->invoice_number)
-            ? Configuration::get('PS_INVOICE_PREFIX', (int) $this->getSource()->id_lang, NULL, $this->getSource()->id_shop) . sprintf('%06d', $this->getSource()->invoice_number)
+            ? Configuration::get('PS_INVOICE_PREFIX', (int) $this->getSource()->id_lang, null, $this->getSource()->id_shop) . sprintf('%06d', $this->getSource()->invoice_number)
             : null;
     }
 

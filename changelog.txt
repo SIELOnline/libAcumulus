@@ -17,12 +17,16 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies)
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
+5.0.4 (2018-01-22)
+------------------
+- WC: Eigen oplossing voor WooCommerce bug #18357 ging de fout in.
+
 5.0.3 (2018-01-19)
 ------------------
 - ALL: Backslashes worden niet goed verstuurd naar Acumulus waardoor met name
   Nieuwe regels en tabs niet werken in de velden beschrijving en notities.
 - WC: Oude folder libraries was nog niet verwijderd uit svn.
- 
+
 5.0.2 (2018-01-18)
 ------------------
 - ALL: originalInvoiceSource als bron van veldverwijzingen werkte niet.

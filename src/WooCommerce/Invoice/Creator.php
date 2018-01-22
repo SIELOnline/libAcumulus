@@ -242,7 +242,7 @@ class Creator extends BaseCreator
         // after discount (and will be negative on refunds).
         $productPriceEx = $item->get_total() / $quantity;
         $productVat = $item->get_total_tax() / $quantity;
-        $productPriceInc = $productPriceEx - $productVat;
+        $productPriceInc = $productPriceEx + $productVat;
 
         // Get precision info.
         if ($this->productPricesIncludeTax()) {

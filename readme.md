@@ -24,12 +24,12 @@ We ask for your understanding in these.
 
 This library uses:
 
-- The PSR-2 coding standards.
-- Phpdoc to fully document each and every part of the code.
-- Its own PSR-4 autoloader to circumvent the fact that many webshop/CMS systems
-  still live in the pre PSR4 autoloading era, meaning that if an autoloader
-  already exists it often won't work with the PSR4 standard.
-- Its own translation system to present this library in English and Dutch.
+ - The PSR-2 coding standards.
+ - Phpdoc to fully document each and every part of the code.
+ - When needed, its own PSR-4 autoloader to circumvent the fact that many
+   webshop/CMS systems still live in the pre PSR4 autoloading era, meaning that
+   if an autoloader already exists it often won't work with the PSR4 standard.
+ - Its own translation system to present this library in English and Dutch.
 
 License
 -------

@@ -267,7 +267,7 @@ class Creator extends BaseCreator
         // calling some code that prints the attributes on an order and
         // "disassemble" that code...
         if (!class_exists('VirtueMartModelCustomfields')) {
-            require(VMPATH_ADMIN.DS . 'models' . DS . 'customfields.php');
+            require(VMPATH_ADMIN. '/models/customfields.php');
         }
         $product_attribute = VirtueMartModelCustomfields::CustomsFieldOrderDisplay($item, 'FE');
         if (!empty($product_attribute)) {

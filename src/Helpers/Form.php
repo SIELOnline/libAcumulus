@@ -417,7 +417,7 @@ abstract class Form
     /**
      * Extracts the submitted values.
      *
-     * Override to restrict the $_POST values to expected values and to do any
+     * Override to restrict the POST values to expected values and to do any
      * sanitation.
      */
     protected function setSubmittedValues()

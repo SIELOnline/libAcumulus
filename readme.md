@@ -18,9 +18,9 @@ easily usable with other webshop/CMS software systems as well.
 
 Note to extension/plugin/module reviewers
 -----------------------------------------
-This is thus a cross webshop/CMS library and can therefore not comply with
-specific coding standards and guidelines for a given webshop or CMS package.
-We ask for your understanding in these.
+This is a cross webshop/CMS library and can therefore not comply with often
+conflicting coding standards and guidelines for a specific webshop or CMS
+package. We ask for your understanding in these.
 
 This library uses:
 
@@ -30,7 +30,23 @@ This library uses:
    webshop/CMS systems still live in the pre PSR4 autoloading era, meaning that
    if an autoloader already exists it often won't work with the PSR4 standard.
  - Its own translation system to present this library in English and Dutch.
+ - Its own form renderer/builder.
+ 
+This library may deviate from specific coding standards in a.o. these ways:
 
+ - Classes are placed in namespaces following the PSR4 structure and may
+   therefore need to register its own autoloader function and not use the
+   webshop/CMS specific one.
+ - Class constants are in StudlyCaps.
+ - Class properties are in camelCase.
+ - Form definitions are placed in the library and are also rendered/built in
+   the library, but do follow form guidelines specific to the webshop/CMS
+   package.
+ - Translation is done using an own included translation system and is only
+   done in Dutch and English. As the online SIEL Acumulus service only targets
+   people running a small business in the Netherlands this is not seen as a
+   limiting factor.
+   
 License
 -------
 This library is licensed under the GNU GPLv3 Open Source license. The english

@@ -184,6 +184,7 @@ abstract class InvoiceManager
      *
      * @param string $invoiceSourceType
      * @param array $idsOrSources
+     *   An array with shop specific orders or credit notes or just their ids.
      *
      * @return \Siel\Acumulus\Invoice\Source[]
      *   A non keyed array with invoice Sources.
@@ -202,6 +203,7 @@ abstract class InvoiceManager
      *
      * @param string $invoiceSourceType
      * @param int|array|object $idOrSource
+     *   A shop specific order or credit note or just its ids.
      *
      * @return \Siel\Acumulus\Invoice\Source
      *   An invoice Source.

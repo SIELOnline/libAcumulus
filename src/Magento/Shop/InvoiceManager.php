@@ -60,15 +60,13 @@ abstract class InvoiceManager extends BaseInvoiceManager
      */
     protected function getByCondition($invoiceSourceType, $field, $condition)
     {
-        /** @var \Mage_Core_Model_Resource_Db_Collection_Abstract|\Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection $collection */
-        $collection = $this
+        /** @var  \Varien_Object[]\Magento\Framework\DataObject[] $items */
+        $items = $this
             ->getInvoiceSourceTypeModel($invoiceSourceType)
-            ->getResourceCollection();
-        $items = $collection
+            ->getResourceCollection()
             ->addFieldToFilter($field, $condition)
             ->getItems();
 
-        // @todo: replace with getSourcesByIds
         return $this->getSourcesByIdsOrSources($invoiceSourceType, $items);
     }
 

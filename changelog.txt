@@ -19,7 +19,10 @@ WC3 = WooCommerce 3 (WordPress)
 
 5.0.6 (2018-02-??)
 ------------------
--
+- MA2: Ondersteuning toegevoegd voor betaalkosten via de paycheckout en sisow
+  betaalproviders.
+- ALL: Als een factuur niet verzonden wordt omdat het totaal 0 is, werdt
+ 'verzenden tegengehouden door het event "AcumulusInvoiceCreated' gelogd.
 
 5.0.5 (2018-01-25)
 ------------------

@@ -391,7 +391,7 @@ abstract class InvoiceManager
                     $result->setSendStatus(Result::NotSent_EventInvoiceCreated);
                 }
             } else {
-                $result->setSendStatus(Result::NotSent_EventInvoiceCreated);
+                $result->setSendStatus(Result::NotSent_EmptyInvoice);
             }
         }
 

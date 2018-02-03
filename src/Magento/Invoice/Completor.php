@@ -31,7 +31,7 @@ class Completor extends BaseCompletor
             $discountAmountInc = 0.0;
             $discountLineAmountInc = 0.0;
 
-            $invoiceLines = $this->invoice['customer']['invoice']['line'];
+            $invoiceLines = $this->invoice[Tag::Customer][Tag::Invoice][Tag::Line];
             foreach ($invoiceLines as $line) {
                 if (isset($line[Meta::LineDiscountAmountInc])) {
                     $discountAmountInc += $line[Meta::LineDiscountAmountInc];

@@ -5,6 +5,7 @@ use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Config\ShopCapabilitiesInterface;
 use Siel\Acumulus\Helpers\Form;
 use Siel\Acumulus\Helpers\TranslatorInterface;
+use Siel\Acumulus\Tag;
 use Siel\Acumulus\Web\Result;
 use Siel\Acumulus\Web\Service;
 
@@ -107,7 +108,7 @@ abstract class BaseConfigForm extends Form
         $message = '';
         $this->contactTypesResult = null;
         $credentials = $this->acumulusConfig->getCredentials();
-        if (!empty($credentials['contractcode']) && !empty($credentials['username']) && !empty($credentials['password'])) {
+        if (!empty($credentials[Tag::ContractCode]) && !empty($credentials[Tag::UserName]) && !empty($credentials[Tag::Password])) {
             $this->contactTypesResult = $this->service->getPicklistContactTypes();
             if ($this->contactTypesResult->hasError()) {
                 $message = $this->contactTypesResult->hasCode(401) ? 'message_error_auth' : 'message_error_comm';

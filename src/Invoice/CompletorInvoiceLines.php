@@ -68,9 +68,9 @@ class CompletorInvoiceLines
         $this->possibleVatTypes = $possibleVatTypes;
         $this->possibleVatRates = $possibleVatRates;
 
-        $invoice['customer']['invoice']['line'] = $this->completeInvoiceLinesRecursive($invoice['customer']['invoice']['line']);
-        $invoice['customer']['invoice']['line'] = $this->invoiceLineFlattener->complete($invoice['customer']['invoice']['line']);
-        $invoice['customer']['invoice']['line'] = $this->completeInvoiceLines($invoice['customer']['invoice']['line']);
+        $invoice[Tag::Customer][Tag::Invoice][Tag::Line] = $this->completeInvoiceLinesRecursive($invoice[Tag::Customer][Tag::Invoice][Tag::Line]);
+        $invoice[Tag::Customer][Tag::Invoice][Tag::Line] = $this->invoiceLineFlattener->complete($invoice[Tag::Customer][Tag::Invoice][Tag::Line]);
+        $invoice[Tag::Customer][Tag::Invoice][Tag::Line] = $this->completeInvoiceLines($invoice[Tag::Customer][Tag::Invoice][Tag::Line]);
 
         return $invoice;
     }

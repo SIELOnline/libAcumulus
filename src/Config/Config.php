@@ -5,6 +5,7 @@ use Siel\Acumulus\Api;
 use Siel\Acumulus\PluginConfig;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Translator;
+use Siel\Acumulus\Tag;
 
 /**
  * Gives common code in this package uniform access to the settings for this
@@ -114,16 +115,16 @@ class Config implements ConfigInterface
     {
         // Log values in a notice but without the password.
         $copy = $values;
-        if (!empty($copy['password'])) {
-            $copy['password'] = 'REMOVED FOR SECURITY';
+        if (!empty($copy[Tag::Password])) {
+            $copy[Tag::Password] = 'REMOVED FOR SECURITY';
         }
         $this->log->notice('ConfigStore::save(): saving %s', serialize($copy));
 
         // Remove password if not sent along. We have had some reports that
         // passwords were gone missing, perhaps some shops do not send the value
         // of password fields to the client???
-        if (array_key_exists('password', $values) && empty($values['password'])) {
-            unset($values['password']);
+        if (array_key_exists(Tag::Password, $values) && empty($values[Tag::Password])) {
+            unset($values[Tag::Password]);
         }
 
         $values = $this->castValues($values);
@@ -177,7 +178,7 @@ class Config implements ConfigInterface
     {
         $result = $this->getSettingsByGroup('credentials');
         // No separate key for now.
-        $result['emailonwarning'] = $result['emailonerror'];
+        $result[Tag::EmailOnWarning] = $result[Tag::EmailOnError];
         return $result;
     }
 
@@ -202,7 +203,7 @@ class Config implements ConfigInterface
      */
     public function getCustomerSettings()
     {
-        return $this->getSettingsByGroup('customer');
+        return $this->getSettingsByGroup(Tag::Customer);
     }
 
     /**
@@ -210,7 +211,7 @@ class Config implements ConfigInterface
      */
     public function getInvoiceSettings()
     {
-        return $this->getSettingsByGroup('invoice');
+        return $this->getSettingsByGroup(Tag::Invoice);
     }
 
     /**
@@ -226,7 +227,7 @@ class Config implements ConfigInterface
      */
     public function getEmailAsPdfSettings()
     {
-        return $this->getSettingsByGroup('emailaspdf');
+        return $this->getSettingsByGroup(Tag::EmailAsPdf);
     }
 
     /**
@@ -449,230 +450,230 @@ class Config implements ConfigInterface
                     'type' => 'string',
                     'default' => Api::outputFormat,
                 ),
-                'contractcode' => array(
+                Tag::ContractCode => array(
                     'group' => 'credentials',
                     'type' => 'string',
                     'default' => '',
                 ),
-                'username' => array(
+                Tag::UserName => array(
                     'group' => 'credentials',
                     'type' => 'string',
                     'default' => '',
                 ),
-                'password' => array(
+                Tag::Password => array(
                     'group' => 'credentials',
                     'type' => 'string',
                     'default' => '',
                 ),
-                'emailonerror' => array(
+                Tag::EmailOnError => array(
                     'group' => 'credentials',
                     'type' => 'string',
                     'default' => '',
                 ),
                 'defaultCustomerType' => array(
-                    'group' => 'customer',
+                    'group' => Tag::Customer,
                     'type' => 'int',
                     'default' => 0,
                 ),
                 'sendCustomer' => array(
-                    'group' => 'customer',
+                    'group' => Tag::Customer,
                     'type' => 'bool',
                     'default' => true,
                 ),
                 'genericCustomerEmail' => array(
-                    'group' => 'customer',
+                    'group' => Tag::Customer,
                     'type' => 'string',
                     'default' => "consumer.$shopName@nul.sielsystems.nl",
                 ),
                 'emailIfAbsent' => array(
-                    'group' => 'customer',
+                    'group' => Tag::Customer,
                     'type' => 'string',
                     'default' => $shopName . '@nul.sielsystems.nl',
                 ),
                 'contactYourId' => array(
-                    'group' => 'customer',
+                    'group' => Tag::Customer,
                     'type' => 'string',
                     'default' => '',
                 ),
                 'contactStatus' => array(
-                    'group' => 'customer',
+                    'group' => Tag::Customer,
                     'type' => 'int',
                     'default' => Api::ContactStatus_Active,
                 ),
                 'companyName1' => array(
-                    'group' => 'customer',
+                    'group' => Tag::Customer,
                     'type' => 'string',
                     'default' => '',
                 ),
                 'companyName2' => array(
-                    'group' => 'customer',
+                    'group' => Tag::Customer,
                     'type' => 'string',
                     'default' => '',
                 ),
                 'fullName' => array(
-                    'group' => 'customer',
+                    'group' => Tag::Customer,
                     'type' => 'string',
                     'default' => '',
                 ),
                 'salutation' => array(
-                    'group' => 'customer',
+                    'group' => Tag::Customer,
                     'type' => 'string',
                     'default' => '',
                 ),
                 'address1' => array(
-                    'group' => 'customer',
+                    'group' => Tag::Customer,
                     'type' => 'string',
                     'default' => '',
                 ),
                 'address2' => array(
-                    'group' => 'customer',
+                    'group' => Tag::Customer,
                     'type' => 'string',
                     'default' => '',
                 ),
                 'postalCode' => array(
-                    'group' => 'customer',
+                    'group' => Tag::Customer,
                     'type' => 'string',
                     'default' => '',
                 ),
                 'city' => array(
-                    'group' => 'customer',
+                    'group' => Tag::Customer,
                     'type' => 'string',
                     'default' => '',
                 ),
                 'vatNumber' => array(
-                    'group' => 'customer',
+                    'group' => Tag::Customer,
                     'type' => 'string',
                     'default' => '',
                 ),
                 'telephone' => array(
-                    'group' => 'customer',
+                    'group' => Tag::Customer,
                     'type' => 'string',
                     'default' => '',
                 ),
                 'fax' => array(
-                    'group' => 'customer',
+                    'group' => Tag::Customer,
                     'type' => 'string',
                     'default' => '',
                 ),
                 'email' => array(
-                    'group' => 'customer',
+                    'group' => Tag::Customer,
                     'type' => 'string',
                     'default' => '',
                 ),
                 'overwriteIfExists' => array(
-                    'group' => 'customer',
+                    'group' => Tag::Customer,
                     'type' => 'bool',
                     'default' => true,
                 ),
                 'mark' => array(
-                    'group' => 'customer',
+                    'group' => Tag::Customer,
                     'type' => 'string',
                     'default' => '',
                 ),
                 'concept' => array(
-                    'group' => 'invoice',
+                    'group' => Tag::Invoice,
                     'type' => 'int',
                     'default' => PluginConfig::Concept_Plugin,
                 ),
                 'defaultAccountNumber' => array(
-                    'group' => 'invoice',
+                    'group' => Tag::Invoice,
                     'type' => 'int',
                     'default' => 0,
                 ),
                 'defaultCostCenter' => array(
-                    'group' => 'invoice',
+                    'group' => Tag::Invoice,
                     'type' => 'int',
                     'default' => 0,
                 ),
                 'defaultInvoiceTemplate' => array(
-                    'group' => 'invoice',
+                    'group' => Tag::Invoice,
                     'type' => 'int',
                     'default' => 0,
                 ),
                 'defaultInvoicePaidTemplate' => array(
-                    'group' => 'invoice',
+                    'group' => Tag::Invoice,
                     'type' => 'int',
                     'default' => 0,
                 ),
                 'paymentMethodAccountNumber' => array(
-                    'group' => 'invoice',
+                    'group' => Tag::Invoice,
                     'type' => 'array',
                     'default' => array(),
                 ),
                 'paymentMethodCostCenter' => array(
-                    'group' => 'invoice',
+                    'group' => Tag::Invoice,
                     'type' => 'array',
                     'default' => array(),
                 ),
                 'sendEmptyShipping' => array(
-                    'group' => 'invoice',
+                    'group' => Tag::Invoice,
                     'type' => 'bool',
                     'default' => true,
                 ),
                 // @todo: add to advanced UI?
                 'addMissingAmountLine' => array(
-                    'group' => 'invoice',
+                    'group' => Tag::Invoice,
                     'type' => 'bool',
                     'default' => true,
                 ),
                 // @todo: add to UI if shop does support it (PS?, WC?).
                 'useMargin' => array(
-                    'group' => 'invoice',
+                    'group' => Tag::Invoice,
                     'type' => 'bool',
                     'default' => false,
                 ),
                 'optionsShow' => array(
-                    'group' => 'invoice',
+                    'group' => Tag::Invoice,
                     'type' => 'bool',
                     'default' => true,
                 ),
                 'optionsAllOn1Line' => array(
-                    'group' => 'invoice',
+                    'group' => Tag::Invoice,
                     'type' => 'int',
                     'default' => 2,
                 ),
                 'optionsAllOnOwnLine' => array(
-                    'group' => 'invoice',
+                    'group' => Tag::Invoice,
                     'type' => 'int',
                     'default' => 4,
                 ),
                 'optionsMaxLength' => array(
-                    'group' => 'invoice',
+                    'group' => Tag::Invoice,
                     'type' => 'int',
                     'default' => 80,
                 ),
                 'description' => array(
-                    'group' => 'invoice',
+                    'group' => Tag::Invoice,
                     'type' => 'string',
                     'default' => '[invoiceSource::type] [invoiceSource::reference]',
                 ),
                 'descriptionText' => array(
-                    'group' => 'invoice',
+                    'group' => Tag::Invoice,
                     'type' => 'string',
                     'default' => '',
                 ),
                 'invoiceNotes' => array(
-                    'group' => 'invoice',
+                    'group' => Tag::Invoice,
                     'type' => 'string',
                     'default' => '',
                 ),
                 'itemNumber' => array(
-                    'group' => 'invoice',
+                    'group' => Tag::Invoice,
                     'type' => 'string',
                     'default' => '',
                 ),
                 'productName' => array(
-                    'group' => 'invoice',
+                    'group' => Tag::Invoice,
                     'type' => 'string',
                     'default' => '',
                 ),
                 'nature' => array(
-                    'group' => 'invoice',
+                    'group' => Tag::Invoice,
                     'type' => 'string',
                     'default' => '',
                 ),
                 'costPrice' => array(
-                    'group' => 'invoice',
+                    'group' => Tag::Invoice,
                     'type' => 'string',
                     'default' => '',
                 ),
@@ -712,34 +713,34 @@ class Config implements ConfigInterface
                     'default' => true,
                 ),
                 'emailAsPdf' => array(
-                    'group' => 'emailaspdf',
+                    'group' => Tag::EmailAsPdf,
                     'type' => 'bool',
                     'default' => false,
                 ),
                 'emailFrom' => array(
-                  'group' => 'emailaspdf',
+                  'group' => Tag::EmailAsPdf,
                   'type' => 'string',
                   'default' => '',
                 ),
                 'emailTo' => array(
-                    'group' => 'emailaspdf',
+                    'group' => Tag::EmailAsPdf,
                     'type' => 'string',
                     'default' => '',
                 ),
                 'emailBcc' => array(
-                    'group' => 'emailaspdf',
+                    'group' => Tag::EmailAsPdf,
                     'type' => 'string',
                     'default' => '',
                 ),
                 'subject' => array(
-                    'group' => 'emailaspdf',
+                    'group' => Tag::EmailAsPdf,
                     'type' => 'string',
                     'default' => '',
                 ),
                 // For now, we do not make message configurable...
                 // For now we don't present the confirmReading option in the UI.
                 'confirmReading' => array(
-                    'group' => 'emailaspdf',
+                    'group' => Tag::EmailAsPdf,
                     'type' => 'bool',
                     'default' => false,
                 ),

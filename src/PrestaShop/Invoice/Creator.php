@@ -396,8 +396,8 @@ class Creator extends BaseCreator
 
             // Add these amounts to the invoice totals.
             // @see \Siel\Acumulus\PrestaShop\Invoice\Creator\getInvoiceTotals()
-            $this->invoice['customer']['invoice'][Meta::InvoiceAmountInc] += $paymentInc;
-            $this->invoice['customer']['invoice'][Meta::InvoiceAmount] += $paymentEx;
+            $this->invoice[Tag::Customer][Tag::Invoice][Meta::InvoiceAmountInc] += $paymentInc;
+            $this->invoice[Tag::Customer][Tag::Invoice][Meta::InvoiceAmount] += $paymentEx;
             return $result;
         }
         return parent::getPaymentFeeLine();
@@ -518,7 +518,7 @@ class Creator extends BaseCreator
                     $sum += $item[Tag::Quantity] * $item[Tag::UnitPrice];
                     return $sum;
                 }, 0.0);
-                $this->invoice['customer']['invoice'][Meta::InvoiceAmount] += $totalOrderDiscountEx;
+                $this->invoice[Tag::Customer][Tag::Invoice][Meta::InvoiceAmount] += $totalOrderDiscountEx;
             }
             //else {
             // We could not match a discount with the difference between the

@@ -185,12 +185,12 @@ abstract class Creator
         $this->setInvoiceSource($source);
         $this->setPropertySources();
         $this->invoice = array();
-        $this->invoice['customer'] = $this->getCustomer();
-        $this->invoice['customer']['invoice'] = $this->getInvoice();
-        $this->invoice['customer']['invoice']['line'] = $this->getInvoiceLines();
-        $emailAsPdf = $this->getEmailAsPdf(!empty($this->invoice['customer']['email']) ? $this->invoice['customer']['email'] : '');
+        $this->invoice[Tag::Customer] = $this->getCustomer();
+        $this->invoice[Tag::Customer][Tag::Invoice] = $this->getInvoice();
+        $this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] = $this->getInvoiceLines();
+        $emailAsPdf = $this->getEmailAsPdf(!empty($this->invoice[Tag::Customer]['email']) ? $this->invoice[Tag::Customer]['email'] : '');
         if (!empty($emailAsPdf)) {
-            $this->invoice['customer']['invoice']['emailaspdf'] = $emailAsPdf;
+            $this->invoice[Tag::Customer][Tag::Invoice]['emailaspdf'] = $emailAsPdf;
         }
         return $this->invoice;
     }
@@ -229,25 +229,25 @@ abstract class Creator
     {
         $customer = array();
         $customerSettings = $this->config->getCustomerSettings();
-        $this->addDefault($customer, 'type', $customerSettings['defaultCustomerType']);
-        $this->addTokenDefault($customer, 'contactyourid', $customerSettings['contactYourId']);
-        $this->addDefaultEmpty($customer, 'contactstatus', $customerSettings['contactStatus']);
-        $this->addTokenDefault($customer, 'companyname1', $customerSettings['companyName1']);
-        $this->addTokenDefault($customer, 'companyname2', $customerSettings['companyName2']);
-        $this->addTokenDefault($customer, 'vatnumber', $customerSettings['vatNumber']);
-        $this->addTokenDefault($customer, 'fullname', $customerSettings['fullName']);
-        $this->addTokenDefault($customer, 'salutation', $customerSettings['salutation']);
-        $this->addTokenDefault($customer, 'address1', $customerSettings['address1']);
-        $this->addTokenDefault($customer, 'address2', $customerSettings['address2']);
-        $this->addTokenDefault($customer, 'postalcode', $customerSettings['postalCode']);
-        $this->addTokenDefault($customer, 'city', $customerSettings['city']);
-        $customer['countrycode'] = $this->countries->convertEuCountryCode($this->getCountryCode());
-        $this->addDefault($customer, 'country', $this->countries->getCountryName($customer['countrycode']));
-        $this->addTokenDefault($customer, 'telephone', $customerSettings['telephone']);
-        $this->addTokenDefault($customer, 'fax', $customerSettings['fax']);
-        $this->addTokenDefault($customer, 'email', $customerSettings['email']);
-        $this->addDefaultEmpty($customer, 'overwriteifexists', $customerSettings['overwriteIfExists'] ? Api::OverwriteIfExists_Yes : Api::OverwriteIfExists_No);
-        $this->addTokenDefault($customer, 'mark', $customerSettings['mark']);
+        $this->addDefault($customer, Tag::Type, $customerSettings['defaultCustomerType']);
+        $this->addTokenDefault($customer, Tag::ContactYourId, $customerSettings['contactYourId']);
+        $this->addDefaultEmpty($customer, Tag::ContactStatus, $customerSettings['contactStatus']);
+        $this->addTokenDefault($customer, Tag::CompanyName1, $customerSettings['companyName1']);
+        $this->addTokenDefault($customer, Tag::CompanyName2, $customerSettings['companyName2']);
+        $this->addTokenDefault($customer, Tag::VatNumber, $customerSettings['vatNumber']);
+        $this->addTokenDefault($customer, Tag::FullName, $customerSettings['fullName']);
+        $this->addTokenDefault($customer, Tag::Salutation, $customerSettings['salutation']);
+        $this->addTokenDefault($customer, Tag::Address1, $customerSettings['address1']);
+        $this->addTokenDefault($customer, Tag::Address2, $customerSettings['address2']);
+        $this->addTokenDefault($customer, Tag::PostalCode, $customerSettings['postalCode']);
+        $this->addTokenDefault($customer, Tag::City, $customerSettings['city']);
+        $customer[Tag::CountryCode] = $this->countries->convertEuCountryCode($this->getCountryCode());
+        $this->addDefault($customer, Tag::Country, $this->countries->getCountryName($customer[Tag::CountryCode]));
+        $this->addTokenDefault($customer, Tag::Telephone, $customerSettings['telephone']);
+        $this->addTokenDefault($customer, Tag::Fax, $customerSettings['fax']);
+        $this->addTokenDefault($customer, Tag::Email, $customerSettings['email']);
+        $this->addDefaultEmpty($customer, Tag::OverwriteIfExists, $customerSettings['overwriteIfExists'] ? Api::OverwriteIfExists_Yes : Api::OverwriteIfExists_No);
+        $this->addTokenDefault($customer, Tag::Mark, $customerSettings['mark']);
         return $customer;
     }
 
@@ -312,62 +312,62 @@ abstract class Creator
         if ($concept == PluginConfig::Concept_Plugin) {
             $concept = Api::Concept_No;
         }
-        $this->addDefaultEmpty($invoice, 'concept', $concept);
+        $this->addDefaultEmpty($invoice, Tag::Concept, $concept);
 
         // Invoice number and date.
         $sourceToUse = $shopSettings['invoiceNrSource'];
         if ($sourceToUse != PluginConfig::InvoiceNrSource_Acumulus) {
-            $invoice['number'] = $this->getInvoiceNumber($sourceToUse);
+            $invoice[Tag::Number] = $this->getInvoiceNumber($sourceToUse);
         }
         $dateToUse = $shopSettings['dateToUse'];
         if ($dateToUse != PluginConfig::InvoiceDate_Transfer) {
-            $invoice['issuedate'] = $this->getInvoiceDate($dateToUse);
+            $invoice[Tag::IssueDate] = $this->getInvoiceDate($dateToUse);
         }
 
         // Bookkeeping (account number, cost center).
         $paymentMethod = $this->getPaymentMethod();
         if (!empty($paymentMethod)) {
             if (!empty($invoiceSettings['paymentMethodAccountNumber'][$paymentMethod])) {
-                $invoice['accountnumber'] = $invoiceSettings['paymentMethodAccountNumber'][$paymentMethod];
+                $invoice[Tag::AccountNumber] = $invoiceSettings['paymentMethodAccountNumber'][$paymentMethod];
             }
             if (!empty($invoiceSettings['paymentMethodCostCenter'][$paymentMethod])) {
-                $invoice['costcenter'] = $invoiceSettings['paymentMethodCostCenter'][$paymentMethod];
+                $invoice[Tag::CostCenter] = $invoiceSettings['paymentMethodCostCenter'][$paymentMethod];
             }
         }
-        $this->addDefault($invoice, 'costcenter', $invoiceSettings['defaultCostCenter']);
-        $this->addDefault($invoice, 'accountnumber', $invoiceSettings['defaultAccountNumber']);
+        $this->addDefault($invoice, Tag::CostCenter, $invoiceSettings['defaultCostCenter']);
+        $this->addDefault($invoice, Tag::AccountNumber, $invoiceSettings['defaultAccountNumber']);
 
         // Payment info.
-        $invoice['paymentstatus'] = $this->getPaymentState();
-        if ($invoice['paymentstatus'] === Api::PaymentStatus_Paid) {
-            $this->addIfNotEmpty($invoice, 'paymentdate', $this->getPaymentDate());
+        $invoice[Tag::PaymentStatus] = $this->getPaymentState();
+        if ($invoice[Tag::PaymentStatus] === Api::PaymentStatus_Paid) {
+            $this->addIfNotEmpty($invoice, Tag::PaymentDate, $this->getPaymentDate());
         }
 
         // Additional descriptive info.
-        $this->addTokenDefault($invoice, 'description', $invoiceSettings['description']);
-        $this->addTokenDefault($invoice, 'descriptiontext', $invoiceSettings['descriptionText']);
+        $this->addTokenDefault($invoice, Tag::Description, $invoiceSettings['description']);
+        $this->addTokenDefault($invoice, Tag::DescriptionText, $invoiceSettings['descriptionText']);
         // Change newlines to the literal \n, tabs are not supported.
-        if (!empty($invoice['descriptiontext'])) {
-            $invoice['descriptiontext'] = str_replace(array("\r\n", "\r", "\n"), '\n', $invoice['descriptiontext']);
+        if (!empty($invoice[Tag::DescriptionText])) {
+            $invoice[Tag::DescriptionText] = str_replace(array("\r\n", "\r", "\n"), '\n', $invoice[Tag::DescriptionText]);
         }
 
         // Acumulus invoice template to use.
         // @todo: should this be done after the first event handler (invoice_created) has been triggered?
-        if (isset($invoice['paymentstatus'])
-            && $invoice['paymentstatus'] == Api::PaymentStatus_Paid
+        if (isset($invoice[Tag::PaymentStatus])
+            && $invoice[Tag::PaymentStatus] == Api::PaymentStatus_Paid
             // 0 = empty = use same invoice template as for non paid invoices.
             && $invoiceSettings['defaultInvoicePaidTemplate'] != 0
         ) {
-            $this->addDefault($invoice, 'template', $invoiceSettings['defaultInvoicePaidTemplate']);
+            $this->addDefault($invoice, Tag::Template, $invoiceSettings['defaultInvoicePaidTemplate']);
         } else {
-            $this->addDefault($invoice, 'template', $invoiceSettings['defaultInvoiceTemplate']);
+            $this->addDefault($invoice, Tag::Template, $invoiceSettings['defaultInvoiceTemplate']);
         }
 
         // Invoice notes.
-        $this->addTokenDefault($invoice, 'invoicenotes', $invoiceSettings['invoiceNotes']);
+        $this->addTokenDefault($invoice, Tag::InvoiceNotes, $invoiceSettings['invoiceNotes']);
         // Change newlines to the literal \n and tabs to \t.
-        if (!empty($invoice['invoicenotes'])) {
-            $invoice['invoicenotes'] = str_replace(array("\r\n", "\r", "\n", "\t"), array('\n', '\n', '\n', '\t'), $invoice['invoicenotes']);
+        if (!empty($invoice[Tag::InvoiceNotes])) {
+            $invoice[Tag::InvoiceNotes] = str_replace(array("\r\n", "\r", "\n", "\t"), array('\n', '\n', '\n', '\t'), $invoice[Tag::InvoiceNotes]);
         }
 
         // Meta data.

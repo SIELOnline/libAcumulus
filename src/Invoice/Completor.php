@@ -2,12 +2,12 @@
 namespace Siel\Acumulus\Invoice;
 
 use Siel\Acumulus\Api;
-use Siel\Acumulus\Meta;
-use Siel\Acumulus\PluginConfig;
 use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Helpers\Countries;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Helpers\TranslatorInterface;
+use Siel\Acumulus\Meta;
+use Siel\Acumulus\PluginConfig;
 use Siel\Acumulus\Tag;
 use Siel\Acumulus\Web\Result as WebResult;
 use Siel\Acumulus\Web\Service;
@@ -208,7 +208,7 @@ class Completor
         $this->correctMarginInvoice();
         // Another check: do we have lines without VAT while the vat type and
         // settings prohibit this.
-        if (in_array($this->invoice['customer']['invoice'][Tag::VatType], array(Api::VatType_National, Api::VatType_ForeignVat, Api::VatType_MarginScheme))
+        if (in_array($this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType], array(Api::VatType_National, Api::VatType_ForeignVat, Api::VatType_MarginScheme))
             && $this->invoiceHasLineWithoutVat())
         {
             $shopSettings = $this->config->getShopSettings();
@@ -241,14 +241,14 @@ class Completor
         $digitalServices = $shopSettings['digitalServices'];
         $vatFreeProducts = $shopSettings['vatFreeProducts'];
 
-        if (!empty($this->invoice['customer']['invoice'][Tag::VatType])) {
+        if (!empty($this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType])) {
             // If shop specific code or an event handler has already set the vat
             // type, we obey so.
-            $possibleVatTypes[] = $this->invoice['customer']['invoice'][Tag::VatType];
-        } elseif ($this->invoiceHasLineWithCostPrice($this->invoice['customer']['invoice']['line'])) {
+            $possibleVatTypes[] = $this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType];
+        } elseif ($this->invoiceHasLineWithCostPrice($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line])) {
             $possibleVatTypes[] = Api::VatType_MarginScheme;
         } else {
-            if ($this->invoiceHasLineWithVat($this->invoice['customer']['invoice']['line'])) {
+            if ($this->invoiceHasLineWithVat($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line])) {
                 // NL or EU Foreign vat.
                 if ($digitalServices === PluginConfig::DigitalServices_No) {
                     // No electronic services are sold: can only be dutch VAT.
@@ -342,7 +342,7 @@ class Completor
                     $vatTypeVatRates = array(-1);
                     break;
                 case Api::VatType_ForeignVat:
-                    $vatTypeVatRates = $this->getVatRates($this->invoice['customer']['countrycode']);
+                    $vatTypeVatRates = $this->getVatRates($this->invoice[Tag::Customer][Tag::CountryCode]);
                     break;
             }
             $vatTypeVatRates = array_map(function ($vatRate) use ($vatType) {
@@ -361,15 +361,15 @@ class Completor
     {
         $customerSettings = $this->config->getCustomerSettings();
         if (!$customerSettings['sendCustomer'] && !$this->isCompany()) {
-            $keysToKeep = array('invoice');
-            foreach ($this->invoice['customer'] as $key => $value) {
+            $keysToKeep = array(Tag::Invoice);
+            foreach ($this->invoice[Tag::Customer] as $key => $value) {
                 if (!in_array($key, $keysToKeep)) {
-                    unset($this->invoice['customer'][$key]);
+                    unset($this->invoice[Tag::Customer][$key]);
                 }
             }
-            $this->invoice['customer']['email'] = $customerSettings['genericCustomerEmail'];
-            $this->invoice['customer']['contactstatus'] = Api::ContactStatus_Disabled;
-            $this->invoice['customer']['overwriteifexists'] = 0;
+            $this->invoice[Tag::Customer][Tag::Email] = $customerSettings['genericCustomerEmail'];
+            $this->invoice[Tag::Customer][Tag::ContactStatus] = Api::ContactStatus_Disabled;
+            $this->invoice[Tag::Customer][Tag::OverwriteIfExists] = 0;
         }
     }
 
@@ -385,12 +385,12 @@ class Completor
     protected function validateEmail()
     {
         // Check email address.
-        if (empty($this->invoice['customer']['email'])) {
+        if (empty($this->invoice[Tag::Customer][Tag::Email])) {
             $customerSettings = $this->config->getCustomerSettings();
-            $this->invoice['customer']['email'] = $customerSettings['emailIfAbsent'];
+            $this->invoice[Tag::Customer][Tag::Email] = $customerSettings['emailIfAbsent'];
             $this->result->addWarning(801,'', $this->t('message_warning_no_email'));
         } else {
-            $email = $this->invoice['customer']['email'];
+            $email = $this->invoice[Tag::Customer][Tag::Email];
             $at = strpos($email, '@');
             // Comma (,) used as separator?
             $comma = strpos($email, ',', $at);
@@ -407,7 +407,7 @@ class Completor
             if (preg_match('/^(.+?)<([^>]+)>$/', $email, $matches)) {
                 $email = trim($matches[2]);
             }
-            $this->invoice['customer']['email'] = $email;
+            $this->invoice[Tag::Customer][Tag::Email] = $email;
         }
     }
 
@@ -422,7 +422,7 @@ class Completor
         $linesVatAmount = 0.0;
         $this->incompleteValues = array();
 
-        $invoiceLines = $this->invoice['customer']['invoice']['line'];
+        $invoiceLines = $this->invoice[Tag::Customer][Tag::Invoice][Tag::Line];
         foreach ($invoiceLines as $line) {
             if (isset($line[Meta::LineAmount])) {
                 $linesAmount += $line[Meta::LineAmount];
@@ -449,12 +449,12 @@ class Completor
             }
         }
 
-        $this->invoice['customer']['invoice'][Meta::LinesAmount ] = $linesAmount;
-        $this->invoice['customer']['invoice'][Meta::LinesAmountInc] = $linesAmountInc;
-        $this->invoice['customer']['invoice'][Meta::LinesVatAmount] = $linesVatAmount;
+        $this->invoice[Tag::Customer][Tag::Invoice][Meta::LinesAmount ] = $linesAmount;
+        $this->invoice[Tag::Customer][Tag::Invoice][Meta::LinesAmountInc] = $linesAmountInc;
+        $this->invoice[Tag::Customer][Tag::Invoice][Meta::LinesVatAmount] = $linesVatAmount;
         if (!empty($this->incompleteValues)) {
             sort($this->incompleteValues);
-            $this->invoice['customer']['invoice'][Meta::LinesIncomplete] = implode(',', $this->incompleteValues);
+            $this->invoice[Tag::Customer][Tag::Invoice][Meta::LinesIncomplete] = implode(',', $this->incompleteValues);
         }
     }
 
@@ -472,7 +472,7 @@ class Completor
      */
     protected function areTotalsEqual()
     {
-        $invoice = $this->invoice['customer']['invoice'];
+        $invoice = $this->invoice[Tag::Customer][Tag::Invoice];
         if (!in_array(Meta::LinesAmount , $this->incompleteValues) && Number::floatsAreEqual($invoice[Meta::InvoiceAmount], $invoice[Meta::LinesAmount ], 0.05)) {
             return true;
         }
@@ -505,7 +505,7 @@ class Completor
      */
     protected function addMissingAmountLine($areTotalsEqualResult)
     {
-        $invoice = &$this->invoice['customer']['invoice'];
+        $invoice = &$this->invoice[Tag::Customer][Tag::Invoice];
         if (!in_array(Meta::LinesAmount , $this->incompleteValues)) {
             $missingAmount = $invoice[Meta::InvoiceAmount] - $invoice[Meta::LinesAmount ];
         }
@@ -535,7 +535,7 @@ class Completor
                 } else {
                     $product = $this->t('fee_adjustment');
                 }
-                $countLines = count($invoice['line']);
+                $countLines = count($invoice[Tag::Line]);
                 $line = array(
                         Tag::Product => $product,
                         Tag::Quantity => 1,
@@ -549,7 +549,7 @@ class Completor
                 if ($line[Meta::VatRateSource] === Creator::VatRateSource_Calculated) {
                     $line = $this->invoiceLineCompletor->correctVatRateByRange($line);
                 }
-                $invoice['line'][] = $line;
+                $invoice[Tag::Line][] = $line;
             } else {
                 // Add some diagnostic info to the message sent.
                 // @todo: this could/should be turned into a warning (after some testing).
@@ -603,19 +603,19 @@ class Completor
     {
         // If shop specific code or an event handler has already set the vat type,
         // we don't change it.
-        if (empty($this->invoice['customer']['invoice'][Tag::VatType])) {
+        if (empty($this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType])) {
 
             $possibleVatTypes = $this->getPossibleVatTypesByCorrectVatRates();
             $metaPossibleVatTypes = $this->possibleVatTypes;
             if (empty($possibleVatTypes)) {
                 // Pick the first vat type that we thought was possible, but ...
-                $this->invoice['customer']['invoice'][Tag::VatType] = reset($this->possibleVatTypes);
+                $this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType] = reset($this->possibleVatTypes);
                 // We must check as no vat type allows the actual vat rates.
                 $message = 'message_warning_no_vattype';
                 $code = 804;
             } elseif (count($possibleVatTypes) === 1) {
                 // Pick the first and only (and therefore correct) vat type.
-                $this->invoice['customer']['invoice'][Tag::VatType] = reset($possibleVatTypes);
+                $this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType] = reset($possibleVatTypes);
                 $message = '';
                 $code = 805;
             } else {
@@ -624,14 +624,14 @@ class Completor
                 if (empty($vatTypesOnAllLines)) {
                     // Pick the first and hopefully a correct vat type, but ...
                     $metaPossibleVatTypes = $possibleVatTypes;
-                    $this->invoice['customer']['invoice'][Tag::VatType] = reset($possibleVatTypes);
+                    $this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType] = reset($possibleVatTypes);
                     // We must split.
                     $message = 'message_warning_multiple_vattype_must_split';
                     $code = 806;
                 } else {
                     // Pick the first vat type that appears on all lines, but ...
                     $metaPossibleVatTypes = $vatTypesOnAllLines;
-                    $this->invoice['customer']['invoice'][Tag::VatType] = reset($vatTypesOnAllLines);
+                    $this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType] = reset($vatTypesOnAllLines);
                     // We may have to split.
                     $message = 'message_warning_multiple_vattype_may_split';
                     $code = 807;
@@ -643,7 +643,7 @@ class Completor
                 // Make the invoice a concept, so it can be changed in Acumulus
                 // and add message and meta info.
                 $this->changeInvoiceToConcept($message, $code);
-                $this->invoice['customer']['invoice'][Meta::VatTypesPossible] = implode(',', $metaPossibleVatTypes);
+                $this->invoice[Tag::Customer][Tag::Invoice][Meta::VatTypesPossible] = implode(',', $metaPossibleVatTypes);
             }
         }
     }
@@ -681,7 +681,7 @@ class Completor
         // The intersection of these sets should result in the new, hopefully
         // smaller list, of possible vat types.
         $invoiceVatTypes = array();
-        foreach ($this->invoice['customer']['invoice']['line'] as &$line) {
+        foreach ($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] as &$line) {
             if ($this->isCorrectVatRate($line[Meta::VatRateSource])) {
                 // We ignore "0" vat rates (0 and -1).
                 if ($line[Tag::VatRate] > 0) {
@@ -716,7 +716,7 @@ class Completor
     protected function getVatTypesAppearingOnAllLines()
     {
         $result = null;
-        foreach ($this->invoice['customer']['invoice']['line'] as $line) {
+        foreach ($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] as $line) {
             if (isset($line[Meta::VatTypesPossible])) {
                 $lineVatTypes = explode(',', $line[Meta::VatTypesPossible]);
                 if ($result === null) {
@@ -742,8 +742,8 @@ class Completor
      * converted to the margin scheme (costprice tag and change of unitprice).
      */
     protected function correctMarginInvoice() {
-        if (isset($this->invoice['customer']['invoice'][Tag::VatType]) && $this->invoice['customer']['invoice'][Tag::VatType] == Api::VatType_MarginScheme) {
-            foreach ($this->invoice['customer']['invoice']['line'] as &$line) {
+        if (isset($this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType]) && $this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType] == Api::VatType_MarginScheme) {
+            foreach ($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] as &$line) {
                 // For margin invoices, Acumulus expects the unitprice to be the
                 // sales price, ie the price the client pays. So we set
                 // unitprice to unitpriceinc.
@@ -779,7 +779,7 @@ class Completor
     {
         $invoiceSettings = $this->config->getInvoiceSettings();
         if (!$invoiceSettings['sendEmptyShipping']) {
-            $this->invoice['customer']['invoice']['line'] = array_filter($this->invoice['customer']['invoice']['line'],
+            $this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] = array_filter($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line],
                 function ($line) {
                     return $line[Meta::LineType] !== Creator::LineType_Shipping || !Number::isZero($line[Tag::UnitPrice]);
                 });
@@ -836,7 +836,7 @@ class Completor
     protected function invoiceHasLineWithoutVat($includeDiscountLines = false)
     {
         $lineHasNoVat = false;
-        foreach ($this->invoice['customer']['invoice']['line'] as $line) {
+        foreach ($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] as $line) {
             if (isset($line[Tag::VatRate])) {
                 if (Number::isZero($line[Tag::VatRate]) || Number::floatsAreEqual($line[Tag::VatRate], -1.0)) {
                     if ($line[Meta::LineType] !== Creator::LineType_Discount || $includeDiscountLines) {
@@ -904,7 +904,7 @@ class Completor
      */
     protected function getInvoiceDate()
     {
-        $date = !empty($this->invoice['customer']['invoice']['issuedate']) ? $this->invoice['customer']['invoice']['issuedate'] : date('Y-m-d');
+        $date = !empty($this->invoice[Tag::Customer][Tag::Invoice][Tag::IssueDate]) ? $this->invoice[Tag::Customer][Tag::Invoice][Tag::IssueDate] : date('Y-m-d');
         return $date;
     }
 
@@ -915,7 +915,7 @@ class Completor
      */
     protected function isNl()
     {
-        return $this->countries->isNl($this->invoice['customer']['countrycode']);
+        return $this->countries->isNl($this->invoice[Tag::Customer][Tag::CountryCode]);
     }
 
     /**
@@ -925,7 +925,7 @@ class Completor
      */
     protected function isEu()
     {
-        return $this->countries->isEu($this->invoice['customer']['countrycode']);
+        return $this->countries->isEu($this->invoice[Tag::Customer][Tag::CountryCode]);
     }
 
     /**
@@ -945,7 +945,7 @@ class Completor
      */
     protected function isCompany()
     {
-        return !empty($this->invoice['customer']['companyname1']) && !empty($this->invoice['customer']['vatnumber']);
+        return !empty($this->invoice[Tag::Customer][Tag::CompanyName1]) && !empty($this->invoice[Tag::Customer][Tag::VatNumber]);
     }
 
     /**
@@ -967,6 +967,6 @@ class Completor
             }
             $this->result->addWarning($code, '', $message);
         }
-        $this->invoice['customer']['invoice']['concept'] = Api::Concept_Yes;
+        $this->invoice[Tag::Customer][Tag::Invoice][Tag::Concept] = Api::Concept_Yes;
     }
 }

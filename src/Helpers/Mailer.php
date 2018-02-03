@@ -3,6 +3,7 @@ namespace Siel\Acumulus\Helpers;
 
 use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\PluginConfig;
+use Siel\Acumulus\Tag;
 use Siel\Acumulus\Web\Result;
 
 /**
@@ -132,8 +133,8 @@ abstract class Mailer
     protected function getTo()
     {
         $credentials = $this->config->getCredentials();
-        if (isset($credentials['emailonerror'])) {
-            return $credentials['emailonerror'];
+        if (isset($credentials[Tag::EmailOnError])) {
+            return $credentials[Tag::EmailOnError];
         }
         $env = $this->config->getEnvironment();
         return 'webshop@' . $env['hostName'];

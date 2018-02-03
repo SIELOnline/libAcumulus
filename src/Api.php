@@ -47,4 +47,9 @@ interface Api
     const VatType_RestOfWorld = 4;
     const VatType_MarginScheme = 5;
     const VatType_ForeignVat = 6;
+
+    const VatFree = -1;
+
+    const Nature_Product = 'Product';
+    const Nature_Service = 'Service';
 }

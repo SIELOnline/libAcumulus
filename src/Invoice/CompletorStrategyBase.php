@@ -198,14 +198,14 @@ abstract class CompletorStrategyBase
      */
     protected function initAmounts()
     {
-        $invoicePart = &$this->invoice['customer']['invoice'];
+        $invoicePart = &$this->invoice[Tag::Customer][Tag::Invoice];
         $this->vatAmount = isset($invoicePart[Meta::InvoiceVatAmount]) ? $invoicePart[Meta::InvoiceVatAmount] : $invoicePart[Meta::InvoiceAmountInc] - $invoicePart[Meta::InvoiceAmount];
         $this->invoiceAmount = isset($invoicePart[Meta::InvoiceAmount]) ? $invoicePart[Meta::InvoiceAmount] : $invoicePart[Meta::InvoiceAmountInc] - $invoicePart[Meta::InvoiceVatAmount];
 
         // The vat amount to divide over the non completed lines is the total vat
         // amount of the invoice minus all known vat amounts per line.
         $this->vat2Divide = (float) $this->vatAmount;
-        foreach ($invoicePart['line'] as $line) {
+        foreach ($invoicePart[Tag::Line] as $line) {
             if ($line[Meta::VatRateSource] !== Creator::VatRateSource_Strategy) {
                 // Deduct the vat amount from this line: if set, deduct it directly,
                 // otherwise calculate the vat amount using the vat rate and unit price.
@@ -225,7 +225,7 @@ abstract class CompletorStrategyBase
     {
         $this->linesCompleted = array();
         $this->lines2Complete = array();
-        foreach ($this->invoice['customer']['invoice']['line'] as $key => $line) {
+        foreach ($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] as $key => $line) {
             if ($line[Meta::VatRateSource] === Creator::VatRateSource_Strategy) {
                 $this->linesCompleted[] = $key;
                 $this->lines2Complete[$key] = $line;
@@ -240,7 +240,7 @@ abstract class CompletorStrategyBase
     protected function initVatBreakdown()
     {
         $this->vatBreakdown = array();
-        foreach ($this->invoice['customer']['invoice']['line'] as $line) {
+        foreach ($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] as $line) {
             if ($line[Meta::VatRateSource] !== Creator::VatRateSource_Strategy && isset($line[Tag::VatRate])) {
                 $amount = $line[Tag::UnitPrice] * $line[Tag::Quantity];
                 $vatAmount = $line[Tag::VatRate] / 100.0 * $amount;
@@ -327,7 +327,7 @@ abstract class CompletorStrategyBase
         if ($this->checkPreconditions()) {
             return $this->execute();
         } else {
-            $this->invoice['customer']['invoice'][Meta::StrategyCompletorPreconditionFailed] = $this->getName();
+            $this->invoice[Tag::Customer][Tag::Invoice][Meta::StrategyCompletorPreconditionFailed] = $this->getName();
             return false;
         }
     }

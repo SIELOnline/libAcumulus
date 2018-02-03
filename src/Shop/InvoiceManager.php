@@ -10,6 +10,7 @@ use Siel\Acumulus\Invoice\ResultTranslations;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\PluginConfig;
+use Siel\Acumulus\Tag;
 
 /**
  * Provides functionality to manage invoices.
@@ -428,7 +429,7 @@ abstract class InvoiceManager
             // concept status, the absence of errors and non test-mode.
             $pluginSettings = $this->getConfig()->getPluginSettings();
             $testMode = $pluginSettings['debug'] == PluginConfig::Send_TestMode;
-            $isConcept = $invoice['customer']['invoice']['concept'] == Api::Concept_Yes;
+            $isConcept = $invoice[Tag::Customer][Tag::Invoice]['concept'] == Api::Concept_Yes;
             if ($isConcept && !$result->hasError() && !$testMode) {
                 $this->getAcumulusEntryModel()->save($invoiceSource, null, null);
             }
@@ -474,7 +475,7 @@ abstract class InvoiceManager
      */
     protected function isEmptyInvoice(array $invoice)
     {
-        return Number::isZero($invoice['customer']['invoice'][Meta::InvoiceAmountInc]);
+        return Number::isZero($invoice[Tag::Customer][Tag::Invoice][Meta::InvoiceAmountInc]);
     }
 
     /**

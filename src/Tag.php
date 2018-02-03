@@ -6,11 +6,17 @@ namespace Siel\Acumulus;
  */
 interface Tag
 {
+    const Customer = 'customer';
+    const Invoice = 'invoice';
+    const Line = 'line';
+
+    const ContractCode = 'contractcode';
     const UserName = 'username';
     const Password = 'password';
     const EmailOnError = 'emailonerror';
     const EmailOnWarning = 'emailonwarning';
 
+    const Type = 'type';
     const ContactId = 'contactid';
     const ContactYourId = 'contactyourid';
     const ContactStatus = 'contactstatus';
@@ -55,6 +61,7 @@ interface Tag
     const Quantity = 'quantity';
     const CostPrice = 'costprice';
 
+    const EmailAsPdf = 'emailaspdf';
     const EmailTo = 'emailto';
     const EmailBcc = 'emailbcc';
     const EmailFrom = 'emailfrom';

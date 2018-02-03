@@ -3,6 +3,7 @@ namespace Siel\Acumulus\Shop;
 
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\PluginConfig;
+use Siel\Acumulus\Tag;
 
 /**
  * Provides basic config form handling.
@@ -45,34 +46,34 @@ class ConfigForm extends BaseConfigForm
     {
         $regexpEmail = '/^[^@<>,; "\']+@([^.@ ,;]+\.)+[^.@ ,;]+$/';
 
-        if (empty($this->submittedValues['contractcode'])) {
-            $this->errorMessages['contractcode'] = $this->t('message_validate_contractcode_0');
-        } elseif (!is_numeric($this->submittedValues['contractcode'])) {
-            $this->errorMessages['contractcode'] = $this->t('message_validate_contractcode_1');
+        if (empty($this->submittedValues[Tag::ContractCode])) {
+            $this->errorMessages[Tag::ContractCode] = $this->t('message_validate_contractcode_0');
+        } elseif (!is_numeric($this->submittedValues[Tag::ContractCode])) {
+            $this->errorMessages[Tag::ContractCode] = $this->t('message_validate_contractcode_1');
         } else {
             // Prevent errors where a copy & paste of the contractcode from the
             // welcome mail includes spaces or tabs before or after the code.
-            $this->submittedValues['contractcode'] = trim($this->submittedValues['contractcode']);
+            $this->submittedValues[Tag::ContractCode] = trim($this->submittedValues[Tag::ContractCode]);
         }
 
-        if (empty($this->submittedValues['username'])) {
-            $this->errorMessages['username'] = $this->t('message_validate_username_0');
-        } elseif ($this->submittedValues['username'] !== trim($this->submittedValues['username'])) {
-            $this->warningMessages['username'] = $this->t('message_validate_username_1');
+        if (empty($this->submittedValues[Tag::UserName])) {
+            $this->errorMessages[Tag::UserName] = $this->t('message_validate_username_0');
+        } elseif ($this->submittedValues[Tag::UserName] !== trim($this->submittedValues[Tag::UserName])) {
+            $this->warningMessages[Tag::UserName] = $this->t('message_validate_username_1');
         }
 
-        if (empty($this->submittedValues['password'])) {
-            $this->errorMessages['password'] = $this->t('message_validate_password_0');
-        } elseif ($this->submittedValues['password'] !== trim($this->submittedValues['password'])) {
-            $this->warningMessages['password'] = $this->t('message_validate_password_1');
-        } elseif (strpbrk($this->submittedValues['password'], '`\'"#%&;<>\\') !== false) {
-            $this->warningMessages['password'] = $this->t('message_validate_password_2');
+        if (empty($this->submittedValues[Tag::Password])) {
+            $this->errorMessages[Tag::Password] = $this->t('message_validate_password_0');
+        } elseif ($this->submittedValues[Tag::Password] !== trim($this->submittedValues[Tag::Password])) {
+            $this->warningMessages[Tag::Password] = $this->t('message_validate_password_1');
+        } elseif (strpbrk($this->submittedValues[Tag::Password], '`\'"#%&;<>\\') !== false) {
+            $this->warningMessages[Tag::Password] = $this->t('message_validate_password_2');
         }
 
-        if (empty($this->submittedValues['emailonerror'])) {
-            $this->errorMessages['emailonerror'] = $this->t('message_validate_email_1');
-        } elseif (!preg_match($regexpEmail, $this->submittedValues['emailonerror'])) {
-            $this->errorMessages['emailonerror'] = $this->t('message_validate_email_0');
+        if (empty($this->submittedValues[Tag::EmailOnError])) {
+            $this->errorMessages[Tag::EmailOnError] = $this->t('message_validate_email_1');
+        } elseif (!preg_match($regexpEmail, $this->submittedValues[Tag::EmailOnError])) {
+            $this->errorMessages[Tag::EmailOnError] = $this->t('message_validate_email_0');
         }
     }
 
@@ -177,7 +178,7 @@ class ConfigForm extends BaseConfigForm
     protected function getAccountFields()
     {
         return array(
-            'contractcode' => array(
+            Tag::ContractCode => array(
                 'type' => 'text',
                 'label' => $this->t('field_code'),
                 'attributes' => array(
@@ -185,7 +186,7 @@ class ConfigForm extends BaseConfigForm
                     'size' => 20,
                 ),
             ),
-            'username' => array(
+            Tag::UserName => array(
                 'type' => 'text',
                 'label' => $this->t('field_username'),
                 'attributes' => array(
@@ -193,7 +194,7 @@ class ConfigForm extends BaseConfigForm
                     'size' => 20,
                 ),
             ),
-            'password' => array(
+            Tag::Password => array(
                 'type' => 'password',
                 'label' => $this->t('field_password'),
                 'attributes' => array(
@@ -201,7 +202,7 @@ class ConfigForm extends BaseConfigForm
                     'size' => 20,
                 ),
             ),
-            'emailonerror' => array(
+            Tag::EmailOnError => array(
                 'type' => 'email',
                 'label' => $this->t('field_emailonerror'),
                 'description' => $this->t('desc_emailonerror'),

@@ -108,7 +108,7 @@ class SplitLine extends CompletorStrategyBase
         }
 
         $this->nonStrategyAmount = 0.0;
-        foreach ($this->invoice['customer']['invoice']['line'] as $line2Complete) {
+        foreach ($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] as $line2Complete) {
             if ($line2Complete[Meta::VatRateSource] !== Creator::VatRateSource_Strategy) {
                 $this->nonStrategyAmount += $line2Complete[Tag::UnitPrice] * $line2Complete[Tag::Quantity];
             }

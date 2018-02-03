@@ -4,6 +4,7 @@ namespace Siel\Acumulus\Invoice;
 use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Helpers\TranslatorInterface;
 use Siel\Acumulus\Meta;
+use Siel\Acumulus\Tag;
 
 /**
  * The strategy lines completor class provides functionality to correct and
@@ -72,7 +73,7 @@ class CompletorStrategyLines
     public function complete(array $invoice, Source $source, array $possibleVatTypes, array $possibleVatRates)
     {
         $this->invoice = $invoice;
-        $this->invoiceLines = &$this->invoice['customer']['invoice']['line'];
+        $this->invoiceLines = &$this->invoice[Tag::Customer][Tag::Invoice][Tag::Line];
         $this->source = $source;
         $this->possibleVatTypes = $possibleVatTypes;
         $this->possibleVatRates = $possibleVatRates;
@@ -88,7 +89,7 @@ class CompletorStrategyLines
     protected function completeStrategyLines()
     {
         if ($this->invoiceHasStrategyLine()) {
-            $this->invoice['customer']['invoice'][Meta::StrategyCompletorInput]['vat-rates'] = str_replace(array(' ', "\r", "\n", "\t"), '', var_export($this->possibleVatRates, true));
+            $this->invoice[Tag::Customer][Tag::Invoice][Meta::StrategyCompletorInput]['vat-rates'] = str_replace(array(' ', "\r", "\n", "\t"), '', var_export($this->possibleVatRates, true));
 
             $isFirst = true;
             $strategies = $this->getStrategyClasses();
@@ -96,16 +97,16 @@ class CompletorStrategyLines
                 /** @var CompletorStrategyBase $strategy */
                 $strategy = new $strategyClass($this->config, $this->translator, $this->invoice, $this->possibleVatTypes, $this->possibleVatRates, $this->source);
                 if ($isFirst) {
-                    $this->invoice['customer']['invoice'][Meta::StrategyCompletorInput]['vat-2-divide'] = $strategy->getVat2Divide();
-                    $this->invoice['customer']['invoice'][Meta::StrategyCompletorInput]['vat-breakdown'] = str_replace(array(' ', "\r", "\n", "\t"), '', var_export($strategy->getVatBreakdown(), true));
+                    $this->invoice[Tag::Customer][Tag::Invoice][Meta::StrategyCompletorInput]['vat-2-divide'] = $strategy->getVat2Divide();
+                    $this->invoice[Tag::Customer][Tag::Invoice][Meta::StrategyCompletorInput]['vat-breakdown'] = str_replace(array(' ', "\r", "\n", "\t"), '', var_export($strategy->getVatBreakdown(), true));
                     $isFirst = false;
                 }
                 if ($strategy->apply()) {
                     $this->replaceLinesCompleted($strategy->getLinesCompleted(), $strategy->getReplacingLines(), $strategy->getName());
-                    if (empty($this->invoice['customer']['invoice'][Meta::StrategyCompletorUsed])) {
-                        $this->invoice['customer']['invoice'][Meta::StrategyCompletorUsed] = $strategy->getDescription();
+                    if (empty($this->invoice[Tag::Customer][Tag::Invoice][Meta::StrategyCompletorUsed])) {
+                        $this->invoice[Tag::Customer][Tag::Invoice][Meta::StrategyCompletorUsed] = $strategy->getDescription();
                     } else {
-                        $this->invoice['customer']['invoice'][Meta::StrategyCompletorUsed] .= '; ' . $strategy->getDescription();
+                        $this->invoice[Tag::Customer][Tag::Invoice][Meta::StrategyCompletorUsed] .= '; ' . $strategy->getDescription();
                     }
                     // Allow for partial solutions: a strategy may correct only some of
                     // the strategy lines and leave the rest up to other strategies.
@@ -166,7 +167,7 @@ class CompletorStrategyLines
     {
         // Remove old strategy lines that are now completed.
         $lines = array();
-        foreach ($this->invoice['customer']['invoice']['line'] as $key => $line) {
+        foreach ($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] as $key => $line) {
             if (!in_array($key, $linesCompleted)) {
                 $lines[] = $line;
             }
@@ -179,6 +180,6 @@ class CompletorStrategyLines
                 $completedLine[Meta::StrategyCompletorUsed] = $strategyName;
             }
         }
-        $this->invoice['customer']['invoice']['line'] = array_merge($lines, $completedLines);
+        $this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] = array_merge($lines, $completedLines);
     }
 }

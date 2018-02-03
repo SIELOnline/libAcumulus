@@ -21,15 +21,12 @@ class Token extends BaseToken {
             $method3 = 'get_' . $property;
             if (method_exists($variable, $method1)) {
                 $value = call_user_func_array(array($variable , $method1), $args);
-            }
-            elseif (method_exists($variable, $method3)) {
+            } elseif (method_exists($variable, $method3)) {
                 $value = call_user_func_array(array($variable, $method3), $args);
-            }
-            else {
+            } else {
                 $value = $this->getDataValue($variable->get_data(), $property);
             }
-        }
-        else {
+        } else {
             $value = parent::getObjectProperty($variable, $property, $args);
         }
         return $value;

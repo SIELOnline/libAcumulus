@@ -309,8 +309,7 @@ class Result {
     {
         if (is_array($code)) {
             $this->errors[] = $code;
-        }
-        else {
+        } else {
             $this->errors[] = array(
                 'code' => $code,
                 'codetag' => $codeTag,
@@ -369,8 +368,7 @@ class Result {
     {
         if (is_array($code)) {
             $this->warnings[] = $code;
-        }
-        else {
+        } else {
             $this->warnings[] = array(
                 'code' => $code,
                 'codetag' => $codeTag,
@@ -481,8 +479,7 @@ class Result {
 
         if ($format === self::Format_Array) {
             $result = $messages;
-        }
-        else {
+        } else {
             $result = array();
             foreach ($messages as $message) {
                 if (is_array($message)) {
@@ -495,16 +492,14 @@ class Result {
                 }
                 if ($format === self::Format_FormattedText) {
                     $message = "* $message\n\n";
-                }
-                elseif ($format === self::Format_Html) {
+                } elseif ($format === self::Format_Html) {
                     $message = "<li>" . nl2br(htmlspecialchars($message, ENT_NOQUOTES)) . "</li>\n";
                 }
                 $result[] = $message;
             }
             if ($format === self::Format_FormattedText) {
                 $result = implode('', $result);
-            }
-            elseif ($format === self::Format_Html) {
+            } elseif ($format === self::Format_Html) {
                 $result = "<ul>\n" . implode('', $result) . "</ul>\n";
             }
         }

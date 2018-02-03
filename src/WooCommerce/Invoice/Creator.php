@@ -249,8 +249,7 @@ class Creator extends BaseCreator
             $precisionEx = $this->precisionPriceCalculated;
             $precisionInc = $this->precisionPriceEntered;
             $recalculateUnitPrice = true;
-        }
-        else {
+        } else {
             $precisionEx = $this->precisionPriceEntered;
             $precisionInc = $this->precisionPriceCalculated;
             $recalculateUnitPrice = false;
@@ -400,8 +399,7 @@ class Creator extends BaseCreator
                     $term = get_term_by('slug', $meta->value, wc_sanitize_taxonomy_name($meta->key));
                     $variantLabel = wc_attribute_label(wc_sanitize_taxonomy_name($meta->key));
                     $variantValue = isset($term->name) ? $term->name : $meta->value;
-                }
-                else {
+                } else {
                     $variantLabel = apply_filters('woocommerce_attribute_label', wc_attribute_label($meta->key, $product), $meta->key);
                     $variantValue = $meta->value;
                 }

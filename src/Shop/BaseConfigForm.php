@@ -236,15 +236,13 @@ abstract class BaseConfigForm extends Form
             $optionId = reset($picklistItem);
             if (count($picklistItem) === 1) {
                 $optionText = $optionId;
-            }
-            else {
+            } else {
                 $optionText = next($picklistItem);
                 if (count($picklistItem) > 2) {
                     $optionalText = next($picklistItem);
                     if (empty($optionText)) {
                         $optionText = $optionalText;
-                    }
-                    elseif (!empty($optionalText)) {
+                    } elseif (!empty($optionalText)) {
                         $optionText .= ' (' . $optionalText . ')';
                     }
                 }

@@ -519,11 +519,10 @@ class Creator extends BaseCreator
                     return $sum;
                 }, 0.0);
                 $this->invoice[Tag::Customer][Tag::Invoice][Meta::InvoiceAmount] += $totalOrderDiscountEx;
-            }
-            //else {
-            // We could not match a discount with the difference between the
-            // total amount credited and the sum of the products returned. A
-            // manual line will correct the invoice.
+            } //else {
+                // We could not match a discount with the difference between the
+                // total amount credited and the sum of the products returned. A
+                // manual line will correct the invoice.
             //}
         }
         return $result;

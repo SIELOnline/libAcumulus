@@ -74,8 +74,7 @@ class ConfigStore extends BaSeConfigStore
         foreach ($values as $key => $value) {
             if ((isset($defaults[$key]) && $defaults[$key] === $value) || $value === null) {
                 unset($data[$key]);
-            }
-            else {
+            } else {
                 $data[$key] = $value;
             }
         }

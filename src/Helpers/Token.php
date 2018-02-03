@@ -197,8 +197,7 @@ class Token {
         if (count($fullPropertyName) > 1) {
             $variableName = $fullPropertyName[0];
             $property = $fullPropertyName[1];
-        }
-        else {
+        } else {
             $variableName = '';
         }
         foreach ($this->variables as $key => $variable) {
@@ -252,8 +251,7 @@ class Token {
             if (is_callable($variable)) {
                 array_unshift($args, $property);
                 $value = call_user_func_array($variable, $args);
-            }
-            elseif (isset($variable[$property])) {
+            } elseif (isset($variable[$property])) {
                 $value = $variable[$property];
             }
         } else {
@@ -307,17 +305,13 @@ class Token {
         $method3 = 'get_' . $property;
         if (method_exists($variable, $method1)) {
             $value = call_user_func_array(array($variable, $method1), $args);
-        }
-        elseif (method_exists($variable, $method2)) {
+        } elseif (method_exists($variable, $method2)) {
             $value = call_user_func_array(array($variable, $method2), $args);
-        }
-        elseif (method_exists($variable, $method3)) {
+        } elseif (method_exists($variable, $method3)) {
             $value = call_user_func_array(array($variable, $method3), $args);
-        }
-        elseif (method_exists($variable, '__get')) {
+        } elseif (method_exists($variable, '__get')) {
             @$value = $variable->$property;
-        }
-        elseif (method_exists($variable, '__call')) {
+        } elseif (method_exists($variable, '__call')) {
             try {
                 $value = @call_user_func_array(array($variable, $property), $args);
             } catch (Exception $e) {

@@ -21,6 +21,7 @@ WC3 = WooCommerce 3 (WordPress)
 ------------------
 - MA2: Ondersteuning toegevoegd voor betaalkosten via de paycheckout en sisow
   betaalproviders.
+- ALL: Maak (waar mogelijk) onderscheid tussen 0% btw en btw-vrij.
 - ALL: Als een factuur niet verzonden wordt omdat het totaal 0 is, werdt
  'verzenden tegengehouden door het event "AcumulusInvoiceCreated' gelogd.
 

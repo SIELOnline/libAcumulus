@@ -207,14 +207,18 @@ class Completor
         // the margin scheme, i.e. have a costprice and a unitprice incl. VAT.
         $this->correctMarginInvoice();
         // Another check: do we have lines without VAT while the vat type and
-        // settings prohibit this.
+        // settings prohibit this?
+        // - if so: warn and set to concept.
+        // - if not: change vatrate = 0 to vatrate = -1 (vat-free)
         if (in_array($this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType], array(Api::VatType_National, Api::VatType_ForeignVat, Api::VatType_MarginScheme))
-            && $this->invoiceHasLineWithoutVat())
+            && $this->invoiceHasLineWith0VatRate())
         {
             $shopSettings = $this->config->getShopSettings();
             $vatFreeProducts = $shopSettings['vatFreeProducts'];
             if ($vatFreeProducts === PluginConfig::VatFreeProducts_No) {
                 $this->changeInvoiceToConcept('message_warning_line_without_vat', 802);
+            } else {
+                $this->change0VatToVatFree();
             }
         }
 
@@ -773,6 +777,42 @@ class Completor
     }
 
     /**
+     * Change 0% vat rates to vat free.
+     *
+     * Acumulus distinguishes between 0% vat (vatrate = 0) and vat free
+     * (vatrate = -1). 0% vat should be used with reversed vat invoices and
+     * for products invoiced outside the EU. Vat free should be used for vat
+     * free products and services (e.g. care, education) and services invoiced
+     * outside the EU.
+     *
+     * Note: To do this perfectly, we should be able to distinguish between services and products. Therefore the nature
+     * field should be filled in or the shop should only sell products or only services, but that is currently not a setting.
+     * If not, we act as if the line invoices a product.
+     * @todo: add new setting: only sell products, only sell services.
+     *
+     * Precondition: The shop does sell vat free products/services (or that
+     * setting was not filled in).
+     *
+     * @see https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/tarieven_en_vrijstellingen/
+     * @see https://wiki.acumulus.nl/index.php?page=facturen-naar-het-buitenland:
+     * vat type = 2, 3 (reversed vat), or 4 (products outside EU): vat = 0%.
+     * vat type = 1 (normal invoice), 5 (margin) or 6 (digital services outside
+     *   EU): vat = -1 (vat-free)
+     */
+    protected function change0VatToVatFree()
+    {
+        $vatTypesAllowingVatFree = array(Api::VatType_National, Api::VatType_ForeignVat, Api::VatType_MarginScheme);
+        $vatType = $this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType];
+        if (in_array($vatType, $vatTypesAllowingVatFree)) {
+            foreach ($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] as &$line) {
+                if ($this->lineHas0VatRate($line)) {
+                    $line[Tag::VatRate] = Api::VatFree;
+                }
+            }
+        }
+    }
+
+    /**
      * Removes an empty shipping line (if so configured).
      */
     protected function removeEmptyShipping()
@@ -820,9 +860,7 @@ class Completor
     }
 
     /**
-     * Returns whether the invoice has at least 1 line with a 0 vat rate.
-     *
-     * 0 (VAT free/reversed VAT) and -1 (no VAT) are 0-vat rates.
+     * Returns whether the invoice has at least 1 line with a 0% or vat free vat rate.
      *
      * The invoice lines are expected to be flattened when we arrive here.
      *
@@ -833,20 +871,31 @@ class Completor
      *
      * @return bool
      */
-    protected function invoiceHasLineWithoutVat($includeDiscountLines = false)
+    protected function invoiceHasLineWith0VatRate($includeDiscountLines = false)
     {
-        $lineHasNoVat = false;
+        $hasLineWith0Vat = false;
         foreach ($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] as $line) {
-            if (isset($line[Tag::VatRate])) {
-                if (Number::isZero($line[Tag::VatRate]) || Number::floatsAreEqual($line[Tag::VatRate], -1.0)) {
-                    if ($line[Meta::LineType] !== Creator::LineType_Discount || $includeDiscountLines) {
-                        $lineHasNoVat = true;
-                        break;
-                    }
-                }
+            if ($this->lineHas0VatRate($line) && ($line[Meta::LineType] !== Creator::LineType_Discount || $includeDiscountLines)) {
+                $hasLineWith0Vat = true;
+                break;
             }
         }
-        return $lineHasNoVat;
+        return $hasLineWith0Vat;
+    }
+
+    /**
+     * Returns whether the given line has a 0% or vat free vat rate.
+     *
+     * @param array $line
+     *   The invoice line.
+     *
+     * @return bool
+     *   True if the given line has a 0% or vat free vat rate, false otherwise.
+     */
+    protected function lineHas0VatRate(array $line)
+    {
+        return isset($line[Tag::VatRate]) &&
+               Number::isZero($line[Tag::VatRate]) || Number::floatsAreEqual($line[Tag::VatRate], -1.0);
     }
 
     /**

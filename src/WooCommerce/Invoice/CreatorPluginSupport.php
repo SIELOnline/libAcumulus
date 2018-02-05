@@ -86,7 +86,7 @@ class CreatorPluginSupport
     }
 
     /**
-     * Support for the "WooCommerce Bookings" plugin.
+     * Supports the "WooCommerce Bookings" plugin.
      *
      * Removes the property source.
      *
@@ -109,26 +109,147 @@ class CreatorPluginSupport
      */
     public function acumulusInvoiceCreated($invoice, BaseSource $invoiceSource, Result $localResult)
     {
-        //$invoice = $this->supportPlugin1($invoice, $invoiceSource, $localResult);
+        $invoice = $this->supportBundleProducts($invoice, $invoiceSource, $localResult);
         return $invoice;
     }
 
     /**
+     * Supports the "WooCommerce Bundle Products" plugin.
      *
+     * This method supports the woocommerce-product-bundles extension that
+     * stores the bundle products as separate item lines below the bundle line
+     * and uses the meta data described below to link them to each other.
+     *
+     * This method hierarchically groups bundled products into the bundle
+     * product and can do so multi-level.
+     *
+     * Meta data on bundle lines:
+     * - bundle_cart_key (hash) unique identifier.
+     * - bundled_items (hash[]) refers to the bundle_cart_key of the bundled
+     *     products.
+     *
+     * Meta data on bundled items:
+     * - bundled_by (hash) refers to bundle_cart_key of the bundle line.
+     * - bundle_cart_key (hash) unique identifier.
+     * - bundled_item_hidden: 'yes'|'no' or absent (= 'no').
+     *
+     * 1) In a 1st pass, we first add bundle meta data to each invoice line that
+     *    represents a bundle or bundled item.
+     * 2) In a 2nd pass, we group the bundled items as children into the parent
+     *    line.
      *
      * @param array|null $invoice
      * @param \Siel\Acumulus\Invoice\Source $invoiceSource
      * @param \Siel\Acumulus\Invoice\Result $localResult
      *
      * @return array|null
-     *
      */
-    protected function supportPlugin1($invoice, BaseSource $invoiceSource, Result $localResult)
+    protected function supportBundleProducts($invoice, BaseSource $invoiceSource, /** @noinspection PhpUnusedParameterInspection */ Result $localResult)
     {
-        // Here you can make changes to the raw invoice based on your specific
-        // situation, e.g. setting or correcting tax rates before the completor
-        // strategies execute.
+        /** @var \WC_Abstract_Order $shopSource */
+        $shopSource = $invoiceSource->getSource();
+        /** @var WC_Order_Item_Product[] $items */
+        $items = $shopSource->get_items(apply_filters('woocommerce_admin_order_item_types', 'line_item'));
+        foreach ($items as $item) {
+            $bundleId = $item->get_meta('_bundle_cart_key');
+            $bundledBy = $item->get_meta('_bundled_by');
+            if (!empty($bundleId) || !empty($bundledBy)) {
+                $line = &$this->getLineByMetaId($invoice[Tag::Customer][Tag::Invoice][Tag::Line], $item->get_id());
+                if ($line !== null) {
+                    // Add bundle meta data.
+                    if ( !empty($bundleId)) {
+                        // Bundle or bundled product.
+                        $line[Meta::BundleId] = $bundleId;
+                    }
+                    if ( !empty($bundledBy)) {
+                        // Bundled products only.
+                        $line[Meta::BundleParentId] = $bundledBy;
+                        $line[Meta::BundleVisible] = $item->get_meta('bundled_item_hidden') !== 'yes';
+                    }
+                }
+            }
+        }
+
+        $invoice[Tag::Customer][Tag::Invoice][Tag::Line] = $this->groupBundles($invoice[Tag::Customer][Tag::Invoice][Tag::Line]);
+
         return $invoice;
+    }
+
+    protected function &getLineByMetaId($lines, $id)
+    {
+        foreach ($lines as &$line) {
+            if ($line[Meta::Id] == $id) {
+                return $line;
+            }
+        }
+        // Not found: occurs with refunds and a quantity of 0.
+        return null;
+    }
+
+    /**
+     * Groups bundled products into the bundle product.
+     *
+     * @param array $itemLines
+     *   The set of invoice lines that may contain bundle lines and bundled
+     *   lines.
+     *
+     * @return array
+     *   The set of item lines but with the lines of bundled items
+     *   hierarchically placed in their bundle line.
+     */
+    protected function groupBundles(array $itemLines)
+    {
+        $result = array();
+        foreach ($itemLines as &$itemLine) {
+            if (!empty($itemLine[Meta::BundleParentId])) {
+                // Find the parent, note that we expect bundle products to
+                // appear before their bundled products, so we can search in
+                // $result and have a reference to a line in $result returned!
+                $parent = &$this->getParentBundle($result, $itemLine[Meta::BundleParentId]);
+                if ($parent !== null) {
+                    // Add the bundled product as a child to the bundle.
+                    $parent[Meta::ChildrenLines][] = $itemLine;
+                } else {
+                    // Oops: not found. Store a message in the line meta data
+                    // and keep it as a separate line.
+                    // @todo: add warning?
+                    $itemLine[Meta::BundleParentId] .= ': not found';
+                    $result[] = $itemLine;
+                }
+            } else {
+                // Not a bundled product: just add it to the result.
+                $result[] = $itemLine;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Searches for, and returns by reference, the parent bundle line.
+     *
+     * @param array $lines
+     *   The lines to search for the parent bundle line.
+     * @param $parentId
+     *   The meta-bundle-id value to search for.
+     *
+     * @return array|null
+     *   The parent bundle line or null if not found.
+     */
+    protected function &getParentBundle(array &$lines, $parentId)
+    {
+        foreach ($lines as &$line) {
+            if (!empty($line[Meta::BundleId]) && $line[Meta::BundleId] === $parentId) {
+                return $line;
+            } elseif (!empty($line[Meta::ChildrenLines])) {
+                // Recursively search for the parent bundle.
+                $parent = &$this->getParentBundle($line[Meta::ChildrenLines], $parentId);
+                if ($parent !== null) {
+                    return $parent;
+                }
+            }
+        }
+        // Not found.
+        return null;
     }
 
 }

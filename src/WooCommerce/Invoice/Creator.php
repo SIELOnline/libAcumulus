@@ -167,17 +167,15 @@ class Creator extends BaseCreator
     protected function getItemLines()
     {
         $result = array();
-        /** @var WC_Order_Item_Product[] $lines */
-        $lines = $this->shopSource->get_items(apply_filters('woocommerce_admin_order_item_types', 'line_item'));
-        foreach ($lines as $line) {
-            $product = $line->get_product();
-            $itemLine = $this->getItemLine($line, $product);
-            if ($itemLine) {
-                $result[] = $itemLine;
+        /** @var WC_Order_Item_Product[] $items */
+        $items = $this->shopSource->get_items(apply_filters('woocommerce_admin_order_item_types', 'line_item'));
+        foreach ($items as $item) {
+            $product = $item->get_product();
+            $line = $this->getItemLine($item, $product);
+            if ($line) {
+                $result[] = $line;
             }
         }
-
-        $result = $this->groupBundles($result);
 
         $this->hasItemLines = count($result) > 0;
         return $result;
@@ -219,6 +217,7 @@ class Creator extends BaseCreator
         $this->addTokenDefault($result, Tag::ItemNumber, $invoiceSettings['itemNumber']);
         $this->addTokenDefault($result, Tag::Product, $invoiceSettings['productName']);
         $this->addTokenDefault($result, Tag::Nature, $invoiceSettings['nature']);
+        $result[Meta::Id] = $item->get_id();
 
 
         // Add quantity: quantity is negative on refunds, the unit price will be
@@ -277,19 +276,6 @@ class Creator extends BaseCreator
         $result += $this->getVatRangeTags($productVat, $productPriceEx, $this->precisionVat, $precisionEx);
         if ($product instanceof WC_Product) {
             $result += $this->getVatRateLookupMetadataByTaxClass($product->get_tax_class());
-        }
-
-        // Add bundle meta data (woocommerce-bundle-products extension).
-        $bundleId = $item->get_meta('_bundle_cart_key');
-        if (!empty($bundleId)) {
-            // Bundle or bundled product.
-            $result[Meta::BundleId] = $bundleId;
-        }
-        $bundledBy = $item->get_meta('_bundled_by');
-        if (!empty($bundledBy)) {
-            // Bundled products only.
-            $result[Meta::BundleParentId] = $bundledBy;
-            $result[Meta::BundleVisible] = $item->get_meta('bundled_item_hidden') !== 'yes';
         }
 
         // Add variants/options.
@@ -436,87 +422,6 @@ class Creator extends BaseCreator
         }
 
         return $result;
-    }
-
-    /**
-     * Groups bundled products into the bundle product.
-     *
-     * This methods supports the woocommerce-product-bundles extension that
-     * stores the bundle products as separate item lines below the bundle line
-     * and uses the meta data described below to link them to each other. Our
-     * getItemLine() method has copied that meta data into the resulting items.
-     *
-     * This method hierarchically groups bundled products into the bundle
-     * product and can do so multi-level.
-     *
-     * Bundle line meta data:
-     * - bundle_cart_key (hash) unique identifier.
-     * - bundled_items (hash[]) refers to the bundle_cart_key of the bundled
-     *     products.
-     *
-     * Bundled items meta data:
-     * - bundled_by (hash) refers to bundle_cart_key of the bundle line.
-     * - bundle_cart_key (hash) unique identifier.
-     * - bundled_item_hidden: 'yes'|'no' or absent (= 'no').
-     *
-     * @param array $itemLines
-     *
-     * @return array
-     *   The item line in the set of item lines that turns out to be the parent
-     *   of this item line, or null if the item line does not have a parent.
-     */
-    protected function groupBundles(array $itemLines)
-    {
-        $result = array();
-        foreach ($itemLines as &$itemLine) {
-            if (!empty($itemLine[Meta::BundleParentId])) {
-                // Find the parent, note that we expect bundle products to
-                // appear before their bundled products, so we can search in
-                // $result and have a reference to a line in $result returned!
-                $parent = &$this->getParentBundle($result, $itemLine[Meta::BundleParentId]);
-                if ($parent !== null) {
-                    // Add the bundled product as a child to the bundle.
-                    $parent[Meta::ChildrenLines][] = $itemLine;
-                } else {
-                    // Oops: not found. Store a message in the line meta data
-                    // and keep it as a separate line.
-                    $itemLine[Meta::BundleParentId] .= ': not found';
-                    $result[] = $itemLine;
-                }
-            } else {
-                // Not a bundled product: just add it to the result.
-                $result[] = $itemLine;
-            }
-        }
-        return $result;
-    }
-
-    /**
-     * Searches for, and returns by reference, the parent bundle line.
-     *
-     * @param array $lines
-     *   The lines to search for the parent bundle line.
-     * @param $parentId
-     *   The meta-bundle-id value to search for.
-     *
-     * @return array|null
-     *   The parent bundle line or null if not found.
-     */
-    protected function &getParentBundle(array &$lines, $parentId)
-    {
-        foreach ($lines as &$line) {
-            if (!empty($line[Meta::BundleId]) && $line[Meta::BundleId] === $parentId) {
-                return $line;
-            } elseif (!empty($line[Meta::ChildrenLines])) {
-                // Recursively search for the parent bundle.
-                $parent = &$this->getParentBundle($line[Meta::ChildrenLines], $parentId);
-                if ($parent !== null) {
-                    return $parent;
-                }
-            }
-        }
-        // Not found.
-        return null;
     }
 
     /**

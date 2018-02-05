@@ -33,7 +33,6 @@ WC3 = WooCommerce 3 (WordPress)
   identifier, use "GPL-3.0-only" or "GPL-3.0-or-later" instead.
 - PSR-1: use true, false and null instead of TRUE, FALSE and NULL.
 
-
 5.0.4 (2018-01-22)
 ------------------
 - WC: Eigen oplossing voor WooCommerce bug #18357 ging de fout in.

@@ -6,7 +6,7 @@ namespace Siel\Acumulus;
  * Meta defines string constants for meta tags used in Acumulus API messages.
  */
 interface Meta {
-    // Vat related meta tags.
+    // Price and vat related meta tags.
     const UnitPriceInc = 'unitpriceinc';
     const UnitPriceOld = 'meta-unitprice-old';
     const VatAmount = 'vatamount';
@@ -47,7 +47,6 @@ interface Meta {
     const LinesAmountInc = 'meta-lines-amountinc';
     const LinesVatAmount = 'meta-lines-vatamount';
     const LinesIncomplete = 'meta-lines-incomplete';
-
     const MissingAmount = 'meta-missing-amount';
 
     // Parent - Children related meta tags.
@@ -67,6 +66,7 @@ interface Meta {
     const PrecisionBundleChildrenLineAmountInc = 'meta-bundle-children-line-amountinc-precision';
 
     // Other meta tags.
+    const Id = 'meta-id';
     const LineType = 'meta-line-type';
     const StrategySplit = 'meta-strategy-split';
     const StrategyCompletor = 'meta-strategy-completor-';

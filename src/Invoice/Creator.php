@@ -155,7 +155,7 @@ abstract class Creator
      * @param object|array $property
      *   The source object to add.
      */
-    protected function addPropertySource($name, $property)
+    public function addPropertySource($name, $property)
     {
         $this->propertySources = array($name => $property) + $this->propertySources;
     }
@@ -166,7 +166,7 @@ abstract class Creator
      * @param string $name
      *   The name of the source to remove.
      */
-    protected function removePropertySource($name)
+    public function removePropertySource($name)
     {
         unset($this->propertySources[$name]);
     }

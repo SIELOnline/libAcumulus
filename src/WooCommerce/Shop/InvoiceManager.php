@@ -165,7 +165,7 @@ class InvoiceManager extends BaseInvoiceManager
     /**
      * {@inheritdoc}
      *
-     * This WooCommerce override applies the 'acumulus_invoice_completed' filter.
+     * This WooCommerce override applies the 'acumulus_invoice_send_before' filter.
      */
     protected function triggerInvoiceSendBefore(array &$invoice, Source $invoiceSource, Result $localResult)
     {
@@ -175,7 +175,7 @@ class InvoiceManager extends BaseInvoiceManager
     /**
      * {@inheritdoc}
      *
-     * This WooCommerce override executes the 'acumulus_invoice_sent' action.
+     * This WooCommerce override executes the 'acumulus_invoice_send_after' action.
      */
     protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, Result $result)
     {

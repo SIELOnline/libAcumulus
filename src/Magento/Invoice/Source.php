@@ -124,6 +124,8 @@ class Source extends BaseSource
      */
     protected function getOriginalOrder()
     {
-        return new Source(Source::Order, $this->source->getOrder());
+        /** @var \Mage_Sales_Model_Order_Creditmemo|\Magento\Sales\Model\Order\Creditmemo $creditmemo */
+        $creditmemo = $this->source;
+        return $creditmemo->getOrder();
     }
 }

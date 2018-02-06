@@ -105,19 +105,26 @@ class Completor
      * @param \Siel\Acumulus\Config\ConfigInterface $config
      * @param \Siel\Acumulus\Invoice\CompletorInvoiceLines $completorInvoiceLines
      * @param \Siel\Acumulus\Invoice\CompletorStrategyLines $completorStrategyLines
+     * @param \Siel\Acumulus\Helpers\Countries $countries
      * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
      * @param \Siel\Acumulus\Web\Service $service
      */
-    public function __construct(ConfigInterface $config, CompletorInvoiceLines $completorInvoiceLines, CompletorStrategyLines $completorStrategyLines, TranslatorInterface $translator, Service $service)
-    {
+    public function __construct(
+        ConfigInterface $config,
+        CompletorInvoiceLines $completorInvoiceLines,
+        CompletorStrategyLines $completorStrategyLines,
+        Countries $countries,
+        TranslatorInterface $translator,
+        Service $service
+    ) {
         $this->config = $config;
 
         $this->translator = $translator;
         $invoiceHelperTranslations = new Translations();
         $this->translator->add($invoiceHelperTranslations);
 
+        $this->countries = $countries;
         $this->service = $service;
-        $this->countries = new Countries();
 
         $this->invoiceLineCompletor = $completorInvoiceLines;
         $this->strategyLineCompletor = $completorStrategyLines;

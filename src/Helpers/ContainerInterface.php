@@ -89,6 +89,11 @@ interface ContainerInterface
     public function getService();
 
     /**
+     * @return \Siel\Acumulus\Web\Result
+     */
+    public function getResult();
+
+    /**
      * @return \Siel\Acumulus\Web\CommunicatorInterface
      */
     public function getCommunicator();
@@ -114,6 +119,17 @@ interface ContainerInterface
      *   A wrapper object around an Acumulus invoice and its accompanying data.
      */
     public function getInvoice();
+
+    /**
+     * Returns a wrapper around an Acumulus invoice-add service result.
+     *
+     * @param string $trigger
+     *   A string indicating the situation where the result is requested.
+     *
+     * @return \Siel\Acumulus\Invoice\Result
+     *   A wrapper object around an Acumulus invoice-add service result.
+     */
+    public function getInvoiceResult($trigger);
 
     /**
      * @return \Siel\Acumulus\Invoice\Completor

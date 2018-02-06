@@ -130,13 +130,25 @@ abstract class InvoiceManager
     }
 
     /**
-     * Returns a Creator instance.
+     * Returns a Completor instance.
      *
      * @return \Siel\Acumulus\Invoice\Completor
      */
     protected function getCompletor()
     {
         return $this->container->getCompletor();
+    }
+
+    /**
+     * Returns a result instance.
+     *
+     * @param string $trigger
+     *
+     * @return \Siel\Acumulus\Invoice\Result
+     */
+    protected function getInvoiceResult($trigger)
+    {
+        return $this->container->getInvoiceResult($trigger);
     }
 
     /**
@@ -246,7 +258,7 @@ abstract class InvoiceManager
                 $errorLogged = true;
             }
 
-            $result = new Result($this->getTranslator(), 'InvoiceManager::sendMultiple()');
+            $result = $this->getInvoiceResult('InvoiceManager::sendMultiple()');
             $result = $this->send($invoiceSource, $result, $forceSend, $dryRun);
             $success = $success && !$result->hasError();
             $this->getLog()->notice($this->getSendResultLogText($invoiceSource, $result));
@@ -270,7 +282,7 @@ abstract class InvoiceManager
     {
         $status = $invoiceSource->getStatus();
         $shopEventSettings = $this->getConfig()->getShopEventSettings();
-        $result = new Result($this->getTranslator(), 'InvoiceManager::sourceStatusChange()');
+        $result = $this->getInvoiceResult('InvoiceManager::sourceStatusChange()');
         if ($invoiceSource->getType() === Source::CreditNote || in_array($status, $shopEventSettings['triggerOrderStatus'])) {
             $result = $this->send($invoiceSource, $result);
         } else {
@@ -291,7 +303,7 @@ abstract class InvoiceManager
      */
     public function invoiceCreate(Source $invoiceSource)
     {
-        $result = new Result($this->getTranslator(), 'InvoiceManager::invoiceCreate()');
+        $result = $this->getInvoiceResult('InvoiceManager::invoiceCreate()');
         $shopEventSettings = $this->getConfig()->getShopEventSettings();
         if ($shopEventSettings['triggerInvoiceEvent'] == PluginConfig::TriggerInvoiceEvent_Create) {
             $result = $this->send($invoiceSource, $result);
@@ -316,7 +328,7 @@ abstract class InvoiceManager
      */
     public function invoiceSend(Source $invoiceSource)
     {
-        $result = new Result($this->getTranslator(), 'InvoiceManager::invoiceSend()');
+        $result = $this->getInvoiceResult('InvoiceManager::invoiceSend()');
         $shopEventSettings = $this->getConfig()->getShopEventSettings();
         if ($shopEventSettings['triggerInvoiceEvent'] == PluginConfig::TriggerInvoiceEvent_Send) {
             $result = $this->send($invoiceSource, $result);

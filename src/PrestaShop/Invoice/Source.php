@@ -106,7 +106,9 @@ class Source extends BaseSource
      */
     protected function getOriginalOrder()
     {
-        return new Source(Source::Order, $this->source->id_order);
+        /** @var \OrderSlip $orderSlip */
+        $orderSlip = $this->source;
+        return $orderSlip->id_order;
     }
 
     /**

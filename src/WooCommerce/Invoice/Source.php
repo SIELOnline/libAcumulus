@@ -73,6 +73,6 @@ class Source extends BaseSource
     {
         /** @var \WC_Order_Refund $refund */
         $refund = $this->source;
-        return new Source(Source::Order, $refund->get_parent_id());
+        return $refund->get_parent_id();
     }
 }

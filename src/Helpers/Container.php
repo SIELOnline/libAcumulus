@@ -185,6 +185,14 @@ class Container implements ContainerInterface
     /**
      * {@inheritdoc}
      */
+    public function getResult()
+    {
+        return $this->getInstance('Result', 'Web', array($this->getTranslator()), true);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getCommunicator()
     {
         return $this->getInstance('Communicator', 'Web', array($this->getConfig(), $this->getLog(), $this->getTranslator()));
@@ -209,9 +217,17 @@ class Container implements ContainerInterface
     /**
      * {@inheritdoc}
      */
+    public function getInvoiceResult($trigger)
+    {
+        return $this->getInstance('Result', 'Invoice', array($this->getTranslator(), $trigger), true);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getCompletor()
     {
-        return $this->getInstance('Completor', 'Invoice', array($this->getConfig(), $this->getCompletorInvoiceLines(), $this->getCompletorStrategyLines(), $this->getTranslator(), $this->getService()));
+        return $this->getInstance('Completor', 'Invoice', array($this->getConfig(), $this->getCompletorInvoiceLines(), $this->getCompletorStrategyLines(), $this->getCountries(), $this->getTranslator(), $this->getService()));
     }
 
     /**

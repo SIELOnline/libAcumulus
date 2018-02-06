@@ -213,17 +213,23 @@ abstract class Source
      */
     public function getOriginalSource()
     {
-        return $this->type === Source::CreditNote ? $this->getOriginalOrder(): null;
+        $result = null;
+        $originalOrder = $this->getOriginalOrder();
+        if ($originalOrder !== null) {
+            $result = new static(Source::Order, $originalOrder);
+        }
+        return $result;
     }
 
     /**
-     * Returns the original order for this credit note.
+     * Returns the original order or order id for this credit note.
      *
      * The base implementation returns null. Override if the shop supports
      * credit notes.
      *
-     * @return Source|null
-     *   The original order for this credit note, or null if unknown.
+     * @return array|object|int|null
+     *   The original shop order or order id for this credit note, or null if
+     *   unknown.
      */
     protected function getOriginalOrder()
     {

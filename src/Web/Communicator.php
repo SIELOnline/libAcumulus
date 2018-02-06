@@ -7,6 +7,7 @@ use LibXMLError;
 use RuntimeException;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\ConfigInterface;
+use Siel\Acumulus\Helpers\ContainerInterface;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\TranslatorInterface;
 use Siel\Acumulus\PluginConfig;
@@ -28,6 +29,9 @@ class Communicator implements CommunicatorInterface
     /** @var \Siel\Acumulus\Helpers\Log */
     protected $log;
 
+    /** @var \Siel\Acumulus\Helpers\ContainerInterface */
+    protected $container;
+
     /** @var \Siel\Acumulus\Helpers\TranslatorInterface */
     protected $translator;
 
@@ -36,11 +40,13 @@ class Communicator implements CommunicatorInterface
      *
      * @param \Siel\Acumulus\Config\ConfigInterface $config
      * @param \Siel\Acumulus\Helpers\Log $log
+     * @param \Siel\Acumulus\Helpers\ContainerInterface $container
      * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
      */
-    public function __construct(ConfigInterface $config, Log $log, TranslatorInterface $translator) {
+    public function __construct(ConfigInterface $config, Log $log, ContainerInterface $container, TranslatorInterface $translator) {
         $this->config = $config;
         $this->log = $log;
+        $this->container = $container;
         $this->translator = $translator;
     }
 
@@ -50,7 +56,7 @@ class Communicator implements CommunicatorInterface
     public function callApiFunction($apiFunction, array $message, Result $result = null)
     {
         if ($result === null) {
-            $result = new Result($this->translator);
+            $result = $this->container->getResult();
         }
         $environment = $this->config->getEnvironment();
         $uri = $environment['baseUri'] . '/' . $environment['apiVersion'] . '/' . $apiFunction . '.php';

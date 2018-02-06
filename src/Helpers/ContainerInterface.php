@@ -51,6 +51,11 @@ interface ContainerInterface
     public function getRequirements();
 
     /**
+     * @return \Siel\Acumulus\Helpers\Countries
+     */
+    public function getCountries();
+
+    /**
      * @return \Siel\Acumulus\Helpers\Mailer
      */
     public function getMailer();

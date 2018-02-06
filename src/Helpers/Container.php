@@ -137,6 +137,14 @@ class Container implements ContainerInterface
     /**
      * {@inheritdoc}
      */
+    public function getCountries()
+    {
+        return $this->getInstance('Countries', 'Helpers');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getMailer()
     {
         return $this->getInstance('Mailer', 'Helpers', array($this->getConfig(), $this->getTranslator(), $this->getLog()));
@@ -235,7 +243,7 @@ class Container implements ContainerInterface
      */
     public function getCreator()
     {
-        return $this->getInstance('Creator', 'Invoice', array($this->getConfig(), $this->getToken(), $this->getTranslator(), $this->getLog()));
+        return $this->getInstance('Creator', 'Invoice', array($this->getConfig(), $this->getToken(), $this->getCountries(), $this, $this->getTranslator(), $this->getLog()));
     }
 
     /**

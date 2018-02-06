@@ -110,6 +110,7 @@ class CreatorPluginSupport
     public function acumulusInvoiceCreated($invoice, BaseSource $invoiceSource, Result $localResult)
     {
         $invoice = $this->supportBundleProducts($invoice, $invoiceSource, $localResult);
+        $invoice = $this->supportTMExtraProductOptions($invoice, $invoiceSource, $localResult);
         return $invoice;
     }
 
@@ -252,4 +253,74 @@ class CreatorPluginSupport
         return null;
     }
 
+    /**
+     * Supports the "WooCommerce TM Extra Product Options" plugin.
+     *
+     * This method supports the tm-woo-extra-product-options extension that
+     * places its data in the meta data under keys that start wth tm_epo or
+     * tmcartepo. We need the the tncartepo_data value as that contains the
+     * options.
+     *
+     * This method adds the option data as children to the invoice line.
+     *
+     * @param array|null $invoice
+     * @param \Siel\Acumulus\Invoice\Source $invoiceSource
+     * @param \Siel\Acumulus\Invoice\Result $localResult
+     *
+     * @return array|null
+     */
+    protected function supportTMExtraProductOptions($invoice, BaseSource $invoiceSource, /** @noinspection PhpUnusedParameterInspection */ Result $localResult)
+    {
+        /** @var \WC_Abstract_Order $shopSource */
+        $shopSource = $invoiceSource->getSource();
+        /** @var WC_Order_Item_Product[] $items */
+        $items = $shopSource->get_items(apply_filters('woocommerce_admin_order_item_types', 'line_item'));
+        foreach ($items as $item) {
+            // If the plugin is no longer used, we may still have an order with
+            // products where the plugin was used. Moreover we don't use any
+            // function or method from the plugin, only its stored data, so we
+            // don'have to check for it being active, just the data being there.
+            if (!empty($item['tmcartepo_data'])) {
+                $line = &$this->getLineByMetaId($invoice[Tag::Customer][Tag::Invoice][Tag::Line], $item->get_id());
+                if ($line !== null) {
+                    $commonTags = array(
+                        Tag::Quantity => $line[Tag::Quantity],
+                        Meta::VatRateSource => Creator::VatRateSource_Parent,
+                    );
+                    $result[Meta::ChildrenLines] = $this->getExtraProductOptionsLines($item, $commonTags);
+                }
+            }
+        }
+
+        return $invoice;
+    }
+
+    /**
+     * Returns an array of lines that describes this variant.
+     *
+     * @param array|\ArrayAccess $item
+     *   The item line
+     * @param array $commonTags
+     *   An array of tags from the parent product to add to the child lines.
+     *
+     * @return array[]
+     *   An array of lines that describes this variant.
+     */
+    protected function getExtraProductOptionsLines($item, array $commonTags)
+    {
+        $result = array();
+
+        $options = unserialize($item['tmcartepo_data']);
+        foreach ($options as $option) {
+            // Get option name and choice.
+            $label = $option['name'];
+            $choice = $option['value'];
+            $result[] = array(
+                            Tag::Product => $label . ': ' . $choice,
+                            Tag::UnitPrice => 0,
+                        ) + $commonTags;
+        }
+
+        return $result;
+    }
 }

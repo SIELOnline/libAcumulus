@@ -7,8 +7,6 @@ use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
 use WC_Abstract_Order;
-use WC_Booking;
-use WC_Booking_Data_Store;
 use WC_Coupon;
 use WC_Order;
 use WC_Order_Item_Product;
@@ -194,6 +192,8 @@ class Creator extends BaseCreator
      *
      * @return array
      *   May be empty if the line should not be sent (e.g. qty = 0 on a refund).
+     *
+     * @throws \ReflectionException
      */
     protected function getItemLine(WC_Order_Item_Product $item, $product)
     {
@@ -205,7 +205,7 @@ class Creator extends BaseCreator
             return $result;
         }
 
-        $creatorPluginSupport = new CreatorPluginSupport();
+        $creatorPluginSupport = $this->container->getInstance('CreatorPluginSupport', 'Invoice');
         $creatorPluginSupport->getItemLineBefore($this, $item, $product);
         // $product can be null if the product has been deleted.
         if ($product instanceof WC_Product) {
@@ -282,12 +282,6 @@ class Creator extends BaseCreator
         $commonTags[Meta::VatRateSource] = static::VatRateSource_Parent;
         if ($product instanceof WC_Product && $item->get_variation_id()) {
             $result[Meta::ChildrenLines] = $this->getVariantLines($item, $product, $commonTags);
-        } elseif (!empty($item['tmcartepo_data'])) {
-            // If the plugin is no longer used, we may still have an order with
-            // products where the plugin was used. Moreover we don't use any
-            // function or method from the plugin, only its stored data, so we
-            // don'have to t check for it being active.
-            $result[Meta::ChildrenLines] = $this->getExtraProductOptionsLines($item, $commonTags);
         }
 
         $this->removePropertySource('product');
@@ -385,40 +379,6 @@ class Creator extends BaseCreator
                         Tag::UnitPrice => 0,
                     ) + $commonTags;
             }
-        }
-
-        return $result;
-    }
-
-    /**
-     * Returns an array of lines that describes this variant.
-     *
-     * This method supports the WooCommerce Extra Product Options plugin. This
-     * plugin places its data in the meta data under keys that start wth tm_epo
-     * or tmcartepo. We need the the tncartepo_data value as that contains the
-     * options.
-     *
-     * @param array|\ArrayAccess $item
-     *   The item line
-     * @param array $commonTags
-     *   An array of tags from the parent product to add to the child lines.
-     *
-     * @return array[]
-     *   An array of lines that describes this variant.
-     */
-    protected function getExtraProductOptionsLines($item, array $commonTags)
-    {
-        $result = array();
-
-        $options = unserialize($item['tmcartepo_data']);
-        foreach ($options as $option) {
-            // Get option name and choice.
-            $label = $option['name'];
-            $choice = $option['value'];
-            $result[] = array(
-                    Tag::Product => $label . ': ' . $choice,
-                    Tag::UnitPrice => 0,
-                ) + $commonTags;
         }
 
         return $result;
@@ -633,7 +593,7 @@ class Creator extends BaseCreator
             // Coupon still exists: extract info from coupon.
             $description = sprintf('%s %s: ', $this->t('discount_code'), $coupon->get_code());
             if (in_array($coupon->get_discount_type(), array('fixed_product', 'fixed_cart'))) {
-                $amount = $this->getSign() * $coupon->get_amount();
+                $amount = $this->getSign() * (float) $coupon->get_amount();
                 if (!Number::isZero($amount)) {
                     $description .= sprintf('€%.2f (%s)', $amount, $this->productPricesIncludeTax() ? $this->t('inc_vat') : $this->t('ex_vat'));
                 }

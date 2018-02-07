@@ -347,7 +347,8 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
 
         // Account settings.
         'accountSettingsHeader' => 'Your Acumulus connection settings',
-        'desc_accountSettings' => 'Enter the details you received by email, or even better: create an additional user in Acumulus under "Beheer → Gebruikers → Gebruiker toevoegen" having "api - koppeling" as "Gebruikerstype". Such a user has less permissions and is thus more secure.',
+        //'desc_accountSettings' => 'Enter the details you received by email, or even better: create an additional user in Acumulus under "Beheer → Gebruikers → Gebruiker toevoegen" having "api - koppeling" as "Gebruikerstype". Such a user has less permissions and is thus more secure.',
+        'desc_accountSettings' => 'Enter the details you received by email, or even better: create an additional user in Acumulus under "Admin → Users → Add user" having "api - plugin" as "User type". Such a user has less permissions and is thus more secure.',
 
         'field_code' => 'Contract code',
         'field_username' => 'User name',

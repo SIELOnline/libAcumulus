@@ -119,6 +119,27 @@ LONGSTRING
                                  <p>In some cases, the filters you define here can lead to surprises. By cheking the last option you will get a list of invoices that would be sent, without actually being sent.</p>',
         'batchLogHeader' => 'Results',
         'batchInfoHeader' => 'Additional information',
+        'batch_info' => <<<LONGSTRING
+<p>You can use this form to send a numne rof oreders or credit notes at once.
+This is most useful when you just installed the plugin,because normally you
+should prefer automtic sending.</p>
+<p><strong>Performance: sending an invoce can take up to a few seconds,.
+Therefore you should not try to send to many invoices in 1 batch as that may
+lead to a time-out on your web server.</strong></p>
+<p><strong>NOTE: Using the 'Force sending' is at your own risk as this may
+corrupt your administration as invoices may get added a 2nd time.</strong></p>
+<p>Sending invoices is done as with automatic sending:</p>
+<ul style="list-style: inside disc;">
+<li>The invoice is created exactly the same way as with automatic sending.</li>
+<li>If an invoice for a given order or credit memo has already been sent, it
+will not be sent again, unless you checked the 'Force sending' checkbox.</li>
+<li>If an invoice contains a warning or an error you will receive an email per
+incorrect invoice.</li>
+<li>All regsitered event handlers that react to 1 of the Acumulus defined
+events are triggered for all invoices that are sent.</li>
+</ul>
+LONGSTRING
+    ,
 
         'message_validate_batch_source_type_required' => 'Please select an invoice type.',
         'message_validate_batch_source_type_invalid' => 'Please select an existing invoice type.',

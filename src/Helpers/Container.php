@@ -195,7 +195,7 @@ class Container implements ContainerInterface
      */
     public function getCommunicator()
     {
-        return $this->getInstance('Communicator', 'Web', array($this->getConfig(), $this->getLog(), $this->getTranslator()));
+        return $this->getInstance('Communicator', 'Web', array($this->getConfig(), $this->getLog(), $this, $this->getTranslator()));
     }
 
     /**

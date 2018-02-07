@@ -10,14 +10,6 @@ use Siel\Acumulus\Tag;
 /**
  * Allows to create arrays in the Acumulus invoice structure from a Magento
  * order or credit memo.
- *
- * @todo: multi currency: use base values (default store currency) or values
- *   without base in their names (selected store currency). Other fields
- *   involved:
- *   - base_currency_code
- *   - store_to_base_rate
- *   - store_to_order_rate
- *   - order_currency_code
  */
 abstract class Creator extends BaseCreator
 {
@@ -86,7 +78,11 @@ abstract class Creator extends BaseCreator
     }
 
     /**
-     * Returns whether the order is in a state that makes it to be considered paid.
+     * Returns whether the order is in a state that makes it considered paid.
+     *
+     * This method is NOT used to determine the paid status, but is used to
+     * determine the paid date by looking for these statuses in the
+     * StatusHistoryCollection.
      *
      * @param string $status
      *
@@ -116,10 +112,12 @@ abstract class Creator extends BaseCreator
      */
     protected function getInvoiceTotals()
     {
-        $sign = $this->invoiceSource->getType() === Source::CreditNote ? -1.0 : 1.0;
+        /** @var \Mage_Sales_Model_Order|\Magento\Sales\Model\Order|\Mage_Sales_Model_Order_Creditmemo|\Magento\Sales\Model\Order\Creditmemo $source */
+        $source = $this->invoiceSource->getSource();
+        $sign = $this->getSign();
         return array(
-            Meta::InvoiceAmountInc => $sign * $this->invoiceSource->getSource()->getBaseGrandTotal(),
-            Meta::InvoiceVatAmount => $sign * $this->invoiceSource->getSource()->getBaseTaxAmount(),
+            Meta::InvoiceAmountInc => $sign * $source->getBaseGrandTotal(),
+            Meta::InvoiceVatAmount => $sign * $source->getBaseTaxAmount(),
         );
     }
 
@@ -163,7 +161,10 @@ abstract class Creator extends BaseCreator
     protected function getDiscountLines()
     {
         $result = array();
-        if (!Number::isZero($this->invoiceSource->getSource()->getDiscountAmount())) {
+
+        /** @var \Mage_Sales_Model_Order|\Magento\Sales\Model\Order|\Mage_Sales_Model_Order_Creditmemo|\Magento\Sales\Model\Order\Creditmemo $source */
+        $source = $this->invoiceSource->getSource();
+        if (!Number::isZero($source->getBaseDiscountAmount())) {
             $line = array(
                 Tag::ItemNumber => '',
                 Tag::Product => $this->getDiscountDescription(),
@@ -174,9 +175,9 @@ abstract class Creator extends BaseCreator
             );
             // Product prices incl. VAT => discount amount is also incl. VAT
             if ($this->productPricesIncludeTax()) {
-                $line[Meta::UnitPriceInc] = $this->getSign() * $this->invoiceSource->getSource()->getDiscountAmount();
+                $line[Meta::UnitPriceInc] = $this->getSign() * $source->getBaseDiscountAmount();
             } else {
-                $line[Tag::UnitPrice] = $this->getSign() * $this->invoiceSource->getSource()->getDiscountAmount();
+                $line[Tag::UnitPrice] = $this->getSign() * $source->getBaseDiscountAmount();
             }
             $result[] = $line;
         }
@@ -192,10 +193,10 @@ abstract class Creator extends BaseCreator
     {
         $result = array();
 
-        if (isset($this->creditNote) && !Number::isZero($this->creditNote->getAdjustment())) {
+        if (isset($this->creditNote) && !Number::isZero($this->creditNote->getBaseAdjustment())) {
             $line = array(
                 Tag::Product => $this->t('refund_adjustment'),
-                Tag::UnitPrice => -$this->creditNote->getAdjustment(),
+                Tag::UnitPrice => -$this->creditNote->getBaseAdjustment(),
                 Tag::Quantity => 1,
                 Tag::VatRate => 0,
             );

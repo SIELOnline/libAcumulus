@@ -1055,7 +1055,7 @@ abstract class Creator
      */
     protected function getSign()
     {
-        return (float) ($this->invoiceSource->getType() === Source::CreditNote ? -1 : 1);
+        return (float) ($this->invoiceSource->getType() === Source::CreditNote ? -1.0 : 1.0);
     }
 
     /**

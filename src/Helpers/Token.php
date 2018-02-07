@@ -201,7 +201,7 @@ class Token {
             $variableName = '';
         }
         foreach ($this->variables as $key => $variable) {
-            if (empty($variableName) || $key === $variableName) {
+            if ($variable !== null && (empty($variableName) || $key === $variableName)) {
                 $value = $this->getProperty($variable, $property);
                 if ($value !== null && $value !== '') {
                     break;
@@ -254,7 +254,7 @@ class Token {
             } elseif (isset($variable[$property])) {
                 $value = $variable[$property];
             }
-        } else {
+        } elseif (is_object($variable)) {
             // It's an object: try to get the property.
             // Safest way is via the get_object_vars() function.
             $properties = get_object_vars($variable);

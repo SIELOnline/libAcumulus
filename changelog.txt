@@ -17,7 +17,7 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies)
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
-5.1.0 (2018-02-??)
+5.1.0 (2018-02-07)
 ------------------
 - MA2: Ondersteuning toegevoegd voor betaalkosten via de paycheckout en sisow
   betaalproviders.

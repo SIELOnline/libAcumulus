@@ -23,7 +23,7 @@ use Siel\Acumulus\Tag;
  * See https://www.siel.nl/acumulus/API/Invoicing/Add_Invoice/ for the structure. In
  * addition to the scheme as defined over there, additional keys or values are
  * accepted:
- * - all keys starting with meta- are used for debugging purposes.
+ * - all keys starting with meta- are used for completion or debugging purposes.
  * - other keys are used to complete and correct the invoice in the completor
  *   stage.
  * - (PHP) null values indicates the absence of a value that should be there but
@@ -194,9 +194,9 @@ abstract class Creator
         $this->invoice[Tag::Customer] = $this->getCustomer();
         $this->invoice[Tag::Customer][Tag::Invoice] = $this->getInvoice();
         $this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] = $this->getInvoiceLines();
-        $emailAsPdf = $this->getEmailAsPdf(!empty($this->invoice[Tag::Customer]['email']) ? $this->invoice[Tag::Customer]['email'] : '');
+        $emailAsPdf = $this->getEmailAsPdf(!empty($this->invoice[Tag::Customer][Tag::Email]) ? $this->invoice[Tag::Customer][Tag::Email] : '');
         if (!empty($emailAsPdf)) {
-            $this->invoice[Tag::Customer][Tag::Invoice]['emailaspdf'] = $emailAsPdf;
+            $this->invoice[Tag::Customer][Tag::Invoice][Tag::EmailAsPdf] = $emailAsPdf;
         }
         return $this->invoice;
     }

@@ -17,6 +17,10 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies)
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
+5.1.2 (2018-02-??)
+------------------
+- PS: FatalThrowableError: Access to undeclared static property: Acumulus::$module_version
+
 5.1.1 (2018-02-07)
 ------------------
 - ALL: Ernstige fout in Container bij creatie Communicator object.

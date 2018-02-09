@@ -6,7 +6,7 @@ namespace Siel\Acumulus;
  * Meta defines string constants for meta tags used in Acumulus API messages.
  */
 interface Meta {
-    // Price and vat related meta tags.
+    // Line: Price and vat related meta tags.
     const UnitPriceInc = 'unitpriceinc';
     const UnitPriceOld = 'meta-unitprice-old';
     const VatAmount = 'vatamount';
@@ -22,34 +22,41 @@ interface Meta {
     const VatRateMatches = 'meta-vatrate-matches';
     const VatTypesPossible = 'meta-vattypes-possible';
 
-    // Line amounts related meta tags.
+    // Line: Line amounts related meta tags.
     const LineAmount = 'meta-line-amount';
     const LineAmountInc = 'meta-line-amountinc';
     const LineVatAmount = 'meta-line-vatamount';
     const LineDiscountAmountInc = 'meta-line-discount-amountinc';
     const LineDiscountVatAmount = 'meta-line-discount-vatamount';
 
-    // Precision related meta tags.
+    // Line: Precision related meta tags.
     const PrecisionUnitPrice = 'meta-unitprice-precision';
     const PrecisionUnitPriceInc = 'meta-unitpriceinc-precision';
     const PrecisionCostPrice = 'meta-costprice-precision';
     const PrecisionVatAmount = 'meta-vatamount-precision';
 
-    // Invoice totals meta tags.
+    // Invoice: Invoice totals meta tags.
     const InvoiceAmount = 'meta-invoice-amount';
     const InvoiceAmountInc = 'meta-invoice-amountinc';
     const InvoiceVatAmount = 'meta-invoice-vatamount';
+    // Used in OC to specify the tax distribution.
     const InvoiceVat = 'meta-invoice-vat';
     const InvoiceCalculated = 'meta-invoice-calculated';
 
-    // Line totals meta tags.
+    // Invoice: Lines totals meta tags.
     const LinesAmount = 'meta-lines-amount';
     const LinesAmountInc = 'meta-lines-amountinc';
     const LinesVatAmount = 'meta-lines-vatamount';
     const LinesIncomplete = 'meta-lines-incomplete';
     const MissingAmount = 'meta-missing-amount';
 
-    // Parent - Children related meta tags.
+    // Invoice: Currency related meta tags.
+    // Currency code or number: ISO4217, ISO 3166-1
+    const Currency = 'meta-currency';
+    // Conversion rate from the used currency to euro (1 other currency = CurrencyRate euro)
+    const CurrencyRate = 'meta-currency-rate';
+
+    // Line: Parent - Children related meta tags.
     const ChildrenLines = 'children';
     const ParentIndex = 'meta-parent-index';
     const NumberOfChildren = 'meta-children';
@@ -57,6 +64,7 @@ interface Meta {
     const ChildrenMerged = 'meta-children-merged';
     const Parent = 'meta-parent';
 
+    // Line: WooCommerce bundle products plugin support.
     const BundleId = 'meta-bundle-id';
     const BundleParentId = 'meta-bundle-parent-id';
     const BundleVisible = 'meta-bundle-visible';
@@ -65,10 +73,11 @@ interface Meta {
     const BundleChildrenLineAmountInc = 'meta-bundle-children-line-amountinc';
     const PrecisionBundleChildrenLineAmountInc = 'meta-bundle-children-line-amountinc-precision';
 
-    // Other meta tags.
+    // Line: Other meta tags.
     const Id = 'meta-id';
     const LineType = 'meta-line-type';
     const StrategySplit = 'meta-strategy-split';
+    // Invoice: Other meta tags.
     const StrategyCompletor = 'meta-strategy-completor-';
     const StrategyCompletorInput = 'meta-strategy-completor-input';
     const StrategyCompletorUsed = 'meta-completor-strategy-used';

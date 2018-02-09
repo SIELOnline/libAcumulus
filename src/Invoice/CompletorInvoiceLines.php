@@ -36,6 +36,9 @@ class CompletorInvoiceLines
     /** @var \Siel\Acumulus\Config\ConfigInterface  */
     protected $config;
 
+    /** @var \Siel\Acumulus\Invoice\Completor */
+    protected $completor = null;
+
     /** @var \Siel\Acumulus\Invoice\FlattenerInvoiceLines */
     protected $invoiceLineFlattener = null;
 
@@ -49,6 +52,16 @@ class CompletorInvoiceLines
     {
         $this->config = $config;
         $this->invoiceLineFlattener = $invoiceLinesFlattener;
+    }
+
+    /**
+     * Sets the completor (that can be used to call some methods).
+     *
+     * @param \Siel\Acumulus\Invoice\Completor $completor
+     */
+    public function setCompletor(Completor $completor)
+    {
+        $this->completor = $completor;
     }
 
     /**
@@ -68,29 +81,36 @@ class CompletorInvoiceLines
         $this->possibleVatTypes = $possibleVatTypes;
         $this->possibleVatRates = $possibleVatRates;
 
-        $invoice[Tag::Customer][Tag::Invoice][Tag::Line] = $this->completeInvoiceLinesRecursive($invoice[Tag::Customer][Tag::Invoice][Tag::Line]);
-        $invoice[Tag::Customer][Tag::Invoice][Tag::Line] = $this->invoiceLineFlattener->complete($invoice[Tag::Customer][Tag::Invoice][Tag::Line]);
-        $invoice[Tag::Customer][Tag::Invoice][Tag::Line] = $this->completeInvoiceLines($invoice[Tag::Customer][Tag::Invoice][Tag::Line]);
+        $invoice = $this->completeInvoiceLinesRecursive($invoice);
+        $lines = $invoice[Tag::Customer][Tag::Invoice][Tag::Line];
+        $lines = $this->invoiceLineFlattener->complete($lines);
+        $lines = $this->completeInvoiceLines($lines);
+        $invoice[Tag::Customer][Tag::Invoice][Tag::Line] = $lines;
 
         return $invoice;
     }
 
     /**
-     * Completes the invoice lines before they have been flattened.
+     * Completes the invoice lines before they are flattened.
      *
      * This means that the lines have to be walked recursively.
      *
      * The actions that can be done this way are those who operate on a line in
      * isolation and thus do not need totals, maxs or things like that.
      *
-     * @param array[] $lines
-     *   The invoice lines to complete recursively.
+     * @param array[] $invoice
+     *   The invoice with the lines to complete recursively.
      *
      * @return array[]
-     *   The completed invoice lines.
+     *   The invoice with the completed invoice lines.
      */
-    protected function completeInvoiceLinesRecursive(array $lines)
+    protected function completeInvoiceLinesRecursive(array $invoice)
     {
+        $lines = $invoice[Tag::Customer][Tag::Invoice][Tag::Line];
+
+        if ($this->completor->hasOtherCurrency($invoice)) {
+            $lines = $this->convertToEuro($lines, $invoice[Tag::Customer][Tag::Invoice][Meta::CurrencyRate]);
+        }
         // correctCalculatedVatRates() only uses vatrate, meta-vatrate-min, and
         // meta-vatrate-max and may lead to more (required) data filled in, so
         // should be called before completeLineRequiredData().
@@ -100,7 +120,9 @@ class CompletorInvoiceLines
         // calculated VAT rates and thus can be corrected with
         // correctCalculatedVatRates(): call again.
         $lines = $this->correctCalculatedVatRates($lines);
-        return $lines;
+
+        $invoice[Tag::Customer][Tag::Invoice][Tag::Line] = $lines;
+        return $invoice;
     }
 
     /**
@@ -118,6 +140,41 @@ class CompletorInvoiceLines
         $lines = $this->addVatRateTo0PriceLines($lines);
         $lines = $this->recalculateLineData($lines);
         $lines = $this->completeLineMetaData($lines);
+        return $lines;
+    }
+
+    /**
+     * Converts amounts to euro if another currency was used.
+     *
+     * This method only converts amounts at the line level. The invoice level
+     * is handled by the completor and already has been converted.
+     *
+     * @param array[] $lines
+     *   The invoice lines to convert recursively.
+     * @param float $conversionRate
+     *
+     * @return array[]
+     *   The completed invoice lines.
+     */
+    protected function convertToEuro(array $lines, $conversionRate)
+    {
+        foreach ($lines as &$line) {
+            $this->completor->convertAmount($line, Tag::UnitPrice, $conversionRate);
+            // Cost price may well be in purchase currency, let's assume it already is in euros ...
+            //$this->completor->convertAmount($line, Tag::CostPrice, $conversionRate);
+            $this->completor->convertAmount($line, Meta::UnitPriceInc, $conversionRate);
+            $this->completor->convertAmount($line, Meta::VatAmount, $conversionRate);
+            $this->completor->convertAmount($line, Meta::LineAmount, $conversionRate);
+            $this->completor->convertAmount($line, Meta::LineAmountInc, $conversionRate);
+            $this->completor->convertAmount($line, Meta::LineVatAmount, $conversionRate);
+            $this->completor->convertAmount($line, Meta::LineDiscountAmountInc, $conversionRate);
+            $this->completor->convertAmount($line, Meta::LineDiscountVatAmount, $conversionRate);
+
+            // Recursively convert any amount.
+            if (!empty($line[Meta::ChildrenLines])) {
+                $line[Meta::ChildrenLines] = $this->convertToEuro($line[Meta::ChildrenLines], $conversionRate);
+            }
+        }
         return $lines;
     }
 

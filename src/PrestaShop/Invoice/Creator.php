@@ -5,6 +5,7 @@ use Address;
 use Carrier;
 use Configuration;
 use Country;
+use Currency;
 use Customer;
 use Order;
 use OrderPayment;
@@ -61,13 +62,14 @@ class Creator extends BaseCreator
     protected function setInvoiceSource($invoiceSource)
     {
         parent::setInvoiceSource($invoiceSource);
+        $this->shopSource = $this->invoiceSource->getSource();
         switch ($this->invoiceSource->getType()) {
             case Source::Order:
-                $this->order = $this->invoiceSource->getSource();
+                $this->order = $this->shopSource;
                 break;
             case Source::CreditNote:
-                $this->creditSlip = $this->invoiceSource->getSource();
-                $this->order = new Order($this->creditSlip->id_order);
+                $this->creditSlip = $this->shopSource;
+                $this->order = $this->invoiceSource->getOriginalSource();
                 break;
         }
     }
@@ -140,6 +142,19 @@ class Creator extends BaseCreator
         $result = $paymentDate ? substr($paymentDate, 0, strlen('2000-01-01')) : null;
         return $result;
     }
+
+    protected function addCurrency(array $invoice)
+    {
+        $currency = Currency::getCurrencyInstance($this->order->id_currency);
+        if ($currency->iso_code !== 'EUR') {
+            $invoice[Meta::Currency] = $currency->iso_code;
+            $invoice[Meta::CurrencyRate] = 1 / (float) $this->shopSource->conversion_rate;
+        } else {
+            $invoice = parent::addCurrency($invoice);
+        }
+        return $invoice;
+    }
+
 
     /**
      * {@inheritdoc}

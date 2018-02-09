@@ -285,19 +285,14 @@ abstract class Creator
      * - invoicenotes
      *
      * Additional keys (not recognised by the API but used later on by the
-     * Creator or Completor or for support and debugging purposes):
+     * Creator or Completor or for support and debugging purposes) (may not be
+     * complete, @see \Siel\Acumulus\Meta):
      * - meta-payment-method: an id of the payment method used.
      * - meta-invoice-amount: the total invoice amount excluding VAT.
      * - meta-invoice-amountinc: the total invoice amount including VAT.
      * - meta-invoice-vatamount: the total vat amount for the invoice.
      * - meta-lines-amount: the total invoice amount excluding VAT.
      * - meta-lines-vatamount: the total vat amount for the invoice.
-     * - meta-parent-index: defines an id (1-based index)) for a parent line.
-     * - meta-children: indicates how many child lines the line has.
-     * - meta-children-merged: indicates how many child lines the line had.
-     * - meta-parent: indicates that a line is a child of parent line with the
-     *   given value as meta-parent-index.
-     * - children: The children lines of a parent line.
      *
      * Extending classes should normally not have to override this method, but
      * should instead implement getInvoiceNumber(), getInvoiceDate(),
@@ -358,7 +353,7 @@ abstract class Creator
         }
 
         // Acumulus invoice template to use.
-        // @todo: should this be done after the first event handler (invoice_created) has been triggered?
+        // @todo: this should be done after the first event handler (invoice_created) has been triggered.
         if (isset($invoice[Tag::PaymentStatus])
             && $invoice[Tag::PaymentStatus] == Api::PaymentStatus_Paid
             // 0 = empty = use same invoice template as for non paid invoices.
@@ -377,6 +372,7 @@ abstract class Creator
         }
 
         // Meta data.
+        $invoice += $this->addCurrency($invoice);
         $this->addIfNotEmpty($invoice, Meta::paymentMethod, $paymentMethod);
         $invoice += $this->addInvoiceTotals($invoice);
 
@@ -465,6 +461,25 @@ abstract class Creator
     }
 
     /**
+     * Adds metadata about the used currency to the invoice.
+     *
+     * This default implementation assumes that the shop uses Euros only.
+     * Override if a shop may allow multiple currencies.
+     *
+     * @param array $invoice
+     *   The invoice (invoice part) to add the currency info to.
+     *
+     * @return array
+     *   The invoice completed with currency info.
+     */
+    protected function addCurrency(array $invoice)
+    {
+        $invoice[Meta::Currency] = 'EUR';
+        $invoice[Meta::CurrencyRate] = 1.0;
+        return $invoice;
+    }
+
+    /**
      * Adds metadata about invoice totals to the invoice.
      *
      * @param array $invoice
@@ -540,7 +555,8 @@ abstract class Creator
      * -costprice: optional, only for margin products
      *
      * Additional keys (not recognised by the API but used by the Completor or
-     * for support and debugging purposes):
+     * for support and debugging purposes) (may not be complete, @see
+     * \Siel\Acumulus\Meta).
      * - unitpriceinc: the price of the item per unit including VAT.
      * - vatamount: the amount of vat per unit.
      * - meta-vatrate-source: the source for the vatrate value. Can be one of:
@@ -560,7 +576,12 @@ abstract class Creator
      * - meta-line-priceinc: the total price for this line including VAT.
      * - meta-line-vatamount: the amount of VAT for the whole line.
      * - meta-line-type: the type of line (order, shipping, discount, etc.)
-     * (*) = these are not yet used.
+     * - meta-parent-index: defines an id (1-based index)) for a parent line.
+     * - meta-children: indicates how many child lines the line has.
+     * - meta-children-merged: indicates how many child lines the line had.
+     * - meta-parent: indicates that a line is a child of parent line with the
+     *   given value as meta-parent-index.
+     * - children: The children lines of a parent line.
      *
      * These keys can be used to complete missing values or to assist in
      * correcting rounding errors in values that are present.

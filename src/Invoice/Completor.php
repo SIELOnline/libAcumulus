@@ -91,7 +91,7 @@ class Completor
     protected $possibleVatRates;
 
     /** @var \Siel\Acumulus\Invoice\CompletorInvoiceLines */
-    protected $invoiceLineCompletor = null;
+    protected $LineCompletor = null;
 
     /** @var \Siel\Acumulus\Invoice\CompletorStrategyLines */
     protected $strategyLineCompletor = null;
@@ -126,7 +126,8 @@ class Completor
         $this->countries = $countries;
         $this->service = $service;
 
-        $this->invoiceLineCompletor = $completorInvoiceLines;
+        $this->LineCompletor = $completorInvoiceLines;
+        $this->LineCompletor->setCompletor($this);
         $this->strategyLineCompletor = $completorStrategyLines;
     }
 
@@ -143,21 +144,6 @@ class Completor
     protected function t($key)
     {
         return $this->translator->get($key);
-    }
-
-    /**
-     * Returns if the vat rate is correct, given its source.
-     *
-     * @param string $source
-     *   The vat rate source.
-     *
-     * @return bool
-     *   True if the given vat rate source indicates that the vat rate is
-     *   correct, false otherwise.
-     */
-    public static function isCorrectVatRate($source)
-    {
-        return in_array($source, self::$CorrectVatRateSources);
     }
 
     /**
@@ -189,7 +175,8 @@ class Completor
         // Complete lines as far as they can be completed om their own.
         $this->initPossibleVatTypes();
         $this->initPossibleVatRates();
-        $this->invoice = $this->invoiceLineCompletor->complete($this->invoice, $this->possibleVatTypes, $this->possibleVatRates);
+        $this->convertToEuro();
+        $this->invoice = $this->LineCompletor->complete($this->invoice, $this->possibleVatTypes, $this->possibleVatRates);
 
         // Check if we are missing an amount and, if so, add a line for it.
         $this->completeLineTotals();
@@ -216,7 +203,8 @@ class Completor
         // Another check: do we have lines without VAT while the vat type and
         // settings prohibit this?
         // - if so: warn and set to concept.
-        // - if not: change vatrate = 0 to vatrate = -1 (vat-free)
+        // - if not: correct vatrate = 0 to vatrate = -1 (vat-free) where
+        //    applicable.
         if (in_array($this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType], array(Api::VatType_National, Api::VatType_ForeignVat, Api::VatType_MarginScheme))
             && $this->invoiceHasLineWith0VatRate())
         {
@@ -225,7 +213,7 @@ class Completor
             if ($vatFreeProducts === PluginConfig::VatFreeProducts_No) {
                 $this->changeInvoiceToConcept('message_warning_line_without_vat', 802);
             } else {
-                $this->change0VatToVatFree();
+                $this->correct0VatToVatFree();
             }
         }
 
@@ -423,6 +411,26 @@ class Completor
     }
 
     /**
+     * Converts amounts to euro if another currency was used.
+     *
+     * This method only converts amounts at the invoice level. When this method is executed, only the
+     * invoice totals are set, the lines totals are not yet set.
+     *
+     * The line level is handled by the line completor and will be done before
+     * the lines totals are calculated.
+     */
+    protected function convertToEuro()
+    {
+        if ($this->hasOtherCurrency($this->invoice)) {
+            // Convert all amounts at the invoice level.
+            $invoice = &$this->invoice[Tag::Customer][Tag::Invoice];
+            $this->convertAmount($invoice, Meta::InvoiceAmount, $invoice[Meta::CurrencyRate]);
+            $this->convertAmount($invoice, Meta::InvoiceAmountInc, $invoice[Meta::CurrencyRate]);
+            $this->convertAmount($invoice, Meta::InvoiceVatAmount, $invoice[Meta::CurrencyRate]);
+        }
+    }
+
+    /**
      * Calculates the total amount and vat amount for the invoice lines and adds
      * these to the fields meta-lines-amount and meta-lines-vatamount.
      */
@@ -558,7 +566,7 @@ class Completor
                     );
                 // Correct and add this line.
                 if ($line[Meta::VatRateSource] === Creator::VatRateSource_Calculated) {
-                    $line = $this->invoiceLineCompletor->correctVatRateByRange($line);
+                    $line = $this->LineCompletor->correctVatRateByRange($line);
                 }
                 $invoice[Tag::Line][] = $line;
             } else {
@@ -806,7 +814,7 @@ class Completor
      * vat type = 1 (normal invoice), 5 (margin) or 6 (digital services outside
      *   EU): vat = -1 (vat-free)
      */
-    protected function change0VatToVatFree()
+    protected function correct0VatToVatFree()
     {
         $vatTypesAllowingVatFree = array(Api::VatType_National, Api::VatType_ForeignVat, Api::VatType_MarginScheme);
         $vatType = $this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType];
@@ -1002,6 +1010,54 @@ class Completor
     protected function isCompany()
     {
         return !empty($this->invoice[Tag::Customer][Tag::CompanyName1]) && !empty($this->invoice[Tag::Customer][Tag::VatNumber]);
+    }
+
+    /**
+     * Returns whether the invoice uses another currency.
+     *
+     * @param array $invoice
+     *
+     * @return bool
+     *   True if the invoice uses another currency, false otherwise.
+     */
+    public function hasOtherCurrency(array $invoice)
+    {
+        $invoice = $invoice[Tag::Customer][Tag::Invoice];
+        return !empty($invoice[Meta::Currency]) && !empty($invoice[Meta::CurrencyRate]) && (float) $invoice[Meta::CurrencyRate] != 1.0;
+    }
+
+    /**
+     * Helper method to convert an amount field to euros.
+     *
+     * @param array $array
+     * @param string $key
+     * @param float $conversionRate
+     *
+     * @return bool
+     *   Whether the amount was converted.
+     */
+    public function convertAmount(array &$array, $key, $conversionRate)
+    {
+        if (!empty($array[$key]) && !empty($conversionRate)) {
+            $array[$key] = (float) $array[$key] * (float) $conversionRate;
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Returns if the vat rate is correct, given its source.
+     *
+     * @param string $source
+     *   The vat rate source.
+     *
+     * @return bool
+     *   True if the given vat rate source indicates that the vat rate is
+     *   correct, false otherwise.
+     */
+    public static function isCorrectVatRate($source)
+    {
+        return in_array($source, self::$CorrectVatRateSources);
     }
 
     /**

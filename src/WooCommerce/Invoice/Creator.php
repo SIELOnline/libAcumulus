@@ -148,6 +148,25 @@ class Creator extends BaseCreator
     /**
      * {@inheritdoc}
      *
+     * WooCommerce does not support multiple currencies, so the amounts are
+     * always in the shop's default currency. Even if another plugin is used to
+     * present another currency to the customer, the amounts stored will
+     * (probably) still be in euro's. So, we will not have to convert the
+     * amounts and this meta info is thus purely informative.
+     */
+    protected function addCurrency()
+    {
+        $result = array(
+            Meta::Currency => 'EUR',
+            Meta::CurrencyRate => 1.0,
+            Meta::CurrencyDoConvert => false,
+        );
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
      * This override provides the values meta-invoice-amountinc and
      * meta-invoice-vatamount.
      */

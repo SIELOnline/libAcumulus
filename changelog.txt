@@ -24,7 +24,12 @@ WC3 = WooCommerce 3 (WordPress)
   toegevoegd worden.
 - ALL: Als de shop standaard currency geen euro is, maar de order wel, en de
   currency meta info is aanwezig, wordt de factuur ook geconverteerd nar euros.
-- OC: Ondersteuning voor andere currencies
+- WC: Ondersteuning voor andere currencies. Alleen meta info, WC ondersteunt
+  geen andere currencies.
+- MA: Ondersteuning voor andere currencies. Alleen meta-info, opslag is altijd
+  in base currency.
+- OC: Ondersteuning voor andere currencies. Alleen meta-info, opslag is altijd
+  in default currency.
 - PS: Ondersteuning voor andere currencies.
 - PS: FatalThrowableError: Access to undeclared static property: Acumulus::$module_version
 

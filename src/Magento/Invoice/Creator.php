@@ -104,6 +104,20 @@ abstract class Creator extends BaseCreator
         return substr($this->creditNote->getCreatedAt(), 0, strlen('yyyy-mm-dd'));
     }
 
+    protected function addCurrency()
+    {
+        /** @var \Mage_Sales_Model_Order|\Magento\Sales\Model\Order|\Mage_Sales_Model_Order_Creditmemo|\Magento\Sales\Model\Order\Creditmemo $source */
+        $source = $this->invoiceSource->getSource();
+        $result = array (
+            Meta::Currency => $source->getOrderCurrencyCode(),
+            Meta::CurrencyRate => (float) $source->getBaseToOrderRate(),
+            Meta::CurrencyDoConvert => false,
+        );
+        return $result;
+
+    }
+
+
     /**
      * {@inheritdoc}
      *

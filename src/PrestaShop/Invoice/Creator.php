@@ -143,18 +143,22 @@ class Creator extends BaseCreator
         return $result;
     }
 
-    protected function addCurrency(array $invoice)
+    /**
+     * {@inheritdoc}
+     *
+     * PrestaShop stores the internal currency id, so look up the currency
+     * object first then extract the ISO code for it.
+     */
+    protected function addCurrency()
     {
         $currency = Currency::getCurrencyInstance($this->order->id_currency);
-        if ($currency->iso_code !== 'EUR') {
-            $invoice[Meta::Currency] = $currency->iso_code;
-            $invoice[Meta::CurrencyRate] = 1 / (float) $this->shopSource->conversion_rate;
-        } else {
-            $invoice = parent::addCurrency($invoice);
-        }
-        return $invoice;
+        $result = array (
+            Meta::Currency => $currency->iso_code,
+            Meta::CurrencyRate => (float) $this->shopSource->conversion_rate,
+            Meta::CurrencyDoConvert => true,
+        );
+        return $result;
     }
-
 
     /**
      * {@inheritdoc}

@@ -421,12 +421,13 @@ class Completor
      */
     protected function convertToEuro()
     {
-        if ($this->hasOtherCurrency($this->invoice)) {
+        if ($this->shouldConvertCurrency($this->invoice)) {
             // Convert all amounts at the invoice level.
             $invoice = &$this->invoice[Tag::Customer][Tag::Invoice];
-            $this->convertAmount($invoice, Meta::InvoiceAmount, $invoice[Meta::CurrencyRate]);
-            $this->convertAmount($invoice, Meta::InvoiceAmountInc, $invoice[Meta::CurrencyRate]);
-            $this->convertAmount($invoice, Meta::InvoiceVatAmount, $invoice[Meta::CurrencyRate]);
+            $conversionRate = $invoice[Meta::CurrencyRate];
+            $this->convertAmount($invoice, Meta::InvoiceAmount, $conversionRate);
+            $this->convertAmount($invoice, Meta::InvoiceAmountInc, $conversionRate);
+            $this->convertAmount($invoice, Meta::InvoiceVatAmount, $conversionRate);
         }
     }
 
@@ -1013,17 +1014,46 @@ class Completor
     }
 
     /**
-     * Returns whether the invoice uses another currency.
+     * Returns whether the amounts in the invoice are in another currency.
+     *
+     * The amounts in te invoice are to be converted if:
+     * - All currency meta tags are set.
+     * - The "currency rate" does not equal 1.0, otherwise converting would
+     *   result in the same amounts.
+     * - The meta tag "do convert" equals "currency !== 'EUR'.
      *
      * @param array $invoice
+     *   The invoice (starting with the customer part).
      *
      * @return bool
      *   True if the invoice uses another currency, false otherwise.
      */
-    public function hasOtherCurrency(array $invoice)
+    public function shouldConvertCurrency(array &$invoice)
     {
-        $invoice = $invoice[Tag::Customer][Tag::Invoice];
-        return !empty($invoice[Meta::Currency]) && !empty($invoice[Meta::CurrencyRate]) && (float) $invoice[Meta::CurrencyRate] != 1.0;
+        $invoicePart = &$invoice[Tag::Customer][Tag::Invoice];
+        $shouldConvert = isset($invoicePart[Meta::Currency]) && isset($invoicePart[Meta::CurrencyRate]) && isset($invoicePart[Meta::CurrencyDoConvert]);
+        $shouldConvert = $shouldConvert && (float) $invoicePart[Meta::CurrencyRate] != 1.0;
+        if ($shouldConvert) {
+            if ($invoicePart[Meta::Currency] !== 'EUR') {
+                // Order/refund is not in euro's: convert if amounts are stored
+                // in the order's currency, not the shop's default currency
+                // (which should be EUR).
+                $shouldConvert = $invoicePart[Meta::CurrencyDoConvert];
+                $invoicePart[Meta::CurrencyRateInverted] = false;
+            } else {
+                // Order/refund is in euro's but that is not the shop's default:
+                // convert if the amounts are in the in the shop's default
+                // currency, not the order's currency (which is EUR).
+                $shouldConvert = !$invoicePart[Meta::CurrencyDoConvert];
+                // Invert the rate only once, even if this method may be called
+                // multiple times per invoice.
+                if (!isset($invoicePart[Meta::CurrencyRateInverted])) {
+                    $invoicePart[Meta::CurrencyRateInverted] = true;
+                    $invoicePart[Meta::CurrencyRate] = 1.0 / (float) $invoicePart[Meta::CurrencyRate];
+                }
+            }
+        }
+        return $shouldConvert;
     }
 
     /**
@@ -1039,7 +1069,7 @@ class Completor
     public function convertAmount(array &$array, $key, $conversionRate)
     {
         if (!empty($array[$key]) && !empty($conversionRate)) {
-            $array[$key] = (float) $array[$key] * (float) $conversionRate;
+            $array[$key] = (float) $array[$key] / (float) $conversionRate;
             return true;
         }
         return false;

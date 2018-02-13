@@ -96,6 +96,23 @@ class Creator extends BaseCreator
     /**
      * {@inheritdoc}
      *
+     * In OpenCart the amounts are in the shop's default currency, even if
+     * another currency was presented to the customer, so we will not have to
+     * convert the amounts and this meta info is thus purely informative.
+     */
+    protected function addCurrency()
+    {
+        $result = array(
+            Meta::Currency => $this->order['currency_code'],
+            Meta::CurrencyRate => (float) $this->order['currency_value'],
+            Meta::CurrencyDoConvert => false,
+        );
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
      * This override provides the values meta-invoice-amountinc,
      * meta-invoice-vatamount and a vat breakdown in meta-invoice-vat.
      */

@@ -53,8 +53,15 @@ interface Meta {
     // Invoice: Currency related meta tags.
     // Currency code or number: ISO4217, ISO 3166-1
     const Currency = 'meta-currency';
-    // Conversion rate from the used currency to euro (1 other currency = CurrencyRate euro)
+    // Conversion rate from the used currency to the shop's default currency
+    // (amount in shop currency = CurrencyRate * amount in other currency).
     const CurrencyRate = 'meta-currency-rate';
+    // Whether we should use the above meta info to convert amounts or if the
+    // amounts are already in the shop's default currency (which should be
+    // euro).
+    const CurrencyDoConvert = 'meta-currency-do-convert';
+    // Whether the currency rate should and has been inverted.
+    const CurrencyRateInverted = 'meta-currency-rate-inverted';
 
     // Line: Parent - Children related meta tags.
     const ChildrenLines = 'children';

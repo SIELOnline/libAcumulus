@@ -108,7 +108,7 @@ class CompletorInvoiceLines
     {
         $lines = $invoice[Tag::Customer][Tag::Invoice][Tag::Line];
 
-        if ($this->completor->hasOtherCurrency($invoice)) {
+        if ($this->completor->shouldConvertCurrency($invoice)) {
             $lines = $this->convertToEuro($lines, $invoice[Tag::Customer][Tag::Invoice][Meta::CurrencyRate]);
         }
         // correctCalculatedVatRates() only uses vatrate, meta-vatrate-min, and

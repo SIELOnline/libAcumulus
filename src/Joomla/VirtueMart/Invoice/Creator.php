@@ -75,6 +75,7 @@ class Creator extends BaseCreator
     {
         parent::setInvoiceSource($source);
         $this->order = $this->invoiceSource->getSource();
+        /** @var \VirtueMartModelOrders orderModel */
         $this->orderModel = VmModel::getModel('orders');
         /** @var \TableInvoices $invoicesTable */
         $invoicesTable = $this->orderModel->getTable('invoices');
@@ -131,10 +132,9 @@ class Creator extends BaseCreator
      */
     protected function getPaymentMethod()
     {
-        $order = $this->invoiceSource->getSource();
         // @todo: test this: correct sub-array?
-        if (isset($order['details']['BT']->virtuemart_paymentmethod_id)) {
-            return $order['details']['BT']->virtuemart_paymentmethod_id;
+        if (isset($this->order['details']['BT']->virtuemart_paymentmethod_id)) {
+            return $this->order['details']['BT']->virtuemart_paymentmethod_id;
         }
         return parent::getPaymentMethod();
     }
@@ -144,8 +144,7 @@ class Creator extends BaseCreator
      */
     protected function getPaymentState()
     {
-        $order = $this->invoiceSource->getSource();
-        return in_array($order['details']['BT']->order_status, $this->getPaidStates())
+        return in_array($this->order['details']['BT']->order_status, $this->getPaidStates())
             ? Api::PaymentStatus_Paid
             : Api::PaymentStatus_Due;
     }
@@ -175,6 +174,35 @@ class Creator extends BaseCreator
     protected function getPaidStates()
     {
         return array('C', 'S', 'R');
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * VirtueMart stores the currency info in the fields a serialzied object in the field
+     * order_currency_info, so unserialize to get the info.
+     *
+     * VirtueMart stores the internal currency id of the currency used by the
+     * customer in the field user_currency_id, so look up the currency object
+     * first then extract the ISO code for it.
+     *
+     * However, the amounts stored are in the shop's default currency, even if
+     * another currency was presented to the customer, so we will not have to
+     * convert the amounts and this meta info is thus purely informative.
+     */
+    protected function addCurrency()
+    {
+        // Load the currency.
+        /** @var \VirtueMartModelCurrency $currency_model */
+        $currency_model = VmModel::getModel('currency');
+        /** @var \TableCurrencies $currency */
+        $currency = $currency_model->getCurrency($this->order['details']['BT']->user_currency_id);
+        $result = array (
+            Meta::Currency => $currency->currency_code_3,
+            Meta::CurrencyRate => (float) $this->order['details']['BT']->user_currency_rate,
+            Meta::CurrencyDoConvert => false,
+        );
+        return $result;
     }
 
     /**

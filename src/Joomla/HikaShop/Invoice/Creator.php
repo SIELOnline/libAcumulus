@@ -138,7 +138,7 @@ class Creator extends BaseCreator
     /**
      * {@inheritdoc}
      *
-     * HikaShop stores the currency info in a serialzied object in the field
+     * HikaShop stores the currency info in a serialized object in the field
      * order_currency_info, so unserialize to get the info.
      *
      * If you do show but not publicise a currency, the currency info and

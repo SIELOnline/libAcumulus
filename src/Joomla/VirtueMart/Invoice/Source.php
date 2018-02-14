@@ -20,7 +20,7 @@ class Source extends BaseSource
     {
         /** @var \VirtueMartModelOrders $orders */
         $orders = VmModel::getModel('orders');
-        $this->source = $orders->getOrder($this->id);
+        $this->source = $orders->getMyOrderDetails($this->id);
     }
 
     /**

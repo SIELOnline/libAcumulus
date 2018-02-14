@@ -17,13 +17,16 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies)
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
-5.1.2 (2018-02-??)
+5.1.2 (2018-02-14)
 ------------------
 - ALL: currency meta informatie wordt nu gebruikt om bestellingen in andere
-  currencies te converteren naar euro's. Deze meta info moet nu per webshop nog
-  toegevoegd worden.
-- ALL: Als de shop standaard currency geen euro is, maar de order wel, en de
-  currency meta info is aanwezig, wordt de factuur ook geconverteerd nar euros.
+  currencies te converteren naar euro's. Dit werkt voor zover de shop de meta
+  info correct weet aan te leveren.
+- ALL: Als de standaard currency v/d shop geen euro is, maar de order wel, maar
+  bedragen worden opgeslagen in de standaard valuta wordt de factuur ook
+  geconverteerd naar euros.
+- VM: Ondersteuning voor andere currencies. Alleen meta-info, opslag is altijd
+  in base currency.
 - HS: Ondersteuning voor andere currencies. Er zit een fout in HS zelf als je
   een getoonde maar niet gepubliceerde valuta gebruikt: de verzendkosten worden
   dan fout getoond en opgeslagen.

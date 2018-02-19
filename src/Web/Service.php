@@ -246,21 +246,75 @@ class Service
     }
 
     /**
-     * Moves the entry in, or out the trashbin.
+     * Retrieves Entry (Boeking) Details.
      *
      * @param int $entryId
      *   The id of the entry.
-     * @param int $deleteStatus
-     *   The delete action to perform: 0 to undelete, 1 to delete.
      *
      * @return \Siel\Acumulus\Web\Result
      *   The result of the webservice call. The structured response will contain
      *   1 "entry" array, being a keyed array with keys:
      *   - entryid
-     *   - entryproc: new delete status)
+     *   - entrydate
+     *   - entrytype
+     *   - entrydescription
+     *   - entrynote
+     *   - fiscaltype
+     *   - vatreversecharge
+     *   - foreigneu
+     *   - foreignnoneu
+     *   - marginscheme
+     *   - contactid
+     *   - accountnumber
+     *   - costcenterid
+     *   - costtypeid
+     *   - invoicenumber
+     *   - invoicenote
+     *   - descriptiontext
+     *   - invoicelayoutid
+     *   - totalvalueexclvat
+     *   - totalvalue
+     *   - paymenttermdays
+     *   - paymentdate
+     *   - paymentstatus
+     *   - deleted
+     *  Possible errors:
+     *  - "XGYBSN000: Requested invoice for entry 95460785 not found": $entryId
+     *    does not exist.
+     *
+     * @see https://siel.nl/acumulus/API/Entry/Get_Entry_Details/
+     * for more information about this API call/
+     */
+    public function getEntry($entryId)
+    {
+        $message = array(
+            'entryid' => (int) $entryId,
+        );
+        return $this->communicator->callApiFunction("entry/entry_info", $message)->setMainResponseKey('entry');
+    }
+
+    /**
+     * Moves the entry in, or out the trashbin.
+     *
+     * @param int $entryId
+     *   The id of the entry.
+     * @param int $deleteStatus
+     *   The delete action to perform: one of the API::Entry_Delete or
+     *   API::Entry_UnDelete constants.
+     *
+     * @return \Siel\Acumulus\Web\Result
+     *   The result of the webservice call. The structured response will contain
+     *   1 "entry" array, being a keyed array with keys:
+     *   - entryid
+     *   - entryproc: (new delete status): 'removed' or 'undeleted'(@todo)
+     *  Possible errors:
+     *  - "XCM7ELO14: Invalid entrydeletestatus value supplied": $deleteStatus
+     *    is not one of the indicated constants.
+     *  - "P2XFELO12: Requested for entryid: $entryId not found or forbidden":
+     *    $entryId does not exist or already has requested status.
      *
      * @see https://siel.nl/acumulus/API/Entry/Set_Delete_Status/
-     *   for more information about the contents of the returned array.
+     * for more information about this API call/
      */
     public function setDeleteStatus($entryId, $deleteStatus)
     {

@@ -228,20 +228,46 @@ class Service
      *   local messages will be merged with any remote messages in the returned
      *   Result object.
      *
-     * @return \Siel\Acumulus\Web\Result The Result of the webservice call. A successful call will contain a
+     * @return \Siel\Acumulus\Web\Result
      * The Result of the webservice call. A successful call will contain a
      * response array with key:
      * - invoice: an array of information about the created invoice, being an
-     * array with keys:
-     * - invoicenumber
-     * - token
-     * - entryid
-     * @todo: check usages of return value
+     *   array with keys:
+     *   - invoicenumber
+     *   - token
+     *   - entryid
+     *
      * @see https://www.siel.nl/acumulus/API/Invoicing/Add_Invoice/ for more
      *   information about the contents of the returned array.
      */
     public function invoiceAdd(array $invoice, Result $result = null)
     {
         return $this->communicator->callApiFunction("invoices/invoice_add", $invoice, $result)->setMainResponseKey('invoice');
+    }
+
+    /**
+     * Moves the entry in, or out the trashbin.
+     *
+     * @param int $entryId
+     *   The id of the entry.
+     * @param int $deleteStatus
+     *   The delete action to perform: 0 to undelete, 1 to delete.
+     *
+     * @return \Siel\Acumulus\Web\Result
+     *   The result of the webservice call. The structured response will contain
+     *   1 "entry" array, being a keyed array with keys:
+     *   - entryid
+     *   - entryproc: new delete status)
+     *
+     * @see https://siel.nl/acumulus/API/Entry/Set_Delete_Status/
+     *   for more information about the contents of the returned array.
+     */
+    public function setDeleteStatus($entryId, $deleteStatus)
+    {
+        $message = array(
+            'entryid' => (int) $entryId,
+            'entrydeletestatus' => (int) $deleteStatus,
+        );
+        return $this->communicator->callApiFunction("entry/entry_deletestatus_set", $message)->setMainResponseKey('entry');
     }
 }

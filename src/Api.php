@@ -52,4 +52,7 @@ interface Api
 
     const Nature_Product = 'Product';
     const Nature_Service = 'Service';
+
+    const Entry_Delete = 1;
+    const Entry_UnDelete = 0;
 }

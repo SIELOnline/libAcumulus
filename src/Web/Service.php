@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\Web;
 
+use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Helpers\TranslatorInterface;
 
@@ -279,7 +280,7 @@ class Service
      *   - paymentstatus
      *   - deleted
      *  Possible errors:
-     *  - "XGYBSN000: Requested invoice for entry 95460785 not found": $entryId
+     *  - "XGYBSN000: Requested invoice for entry $entryId not found": $entryId
      *    does not exist.
      *
      * @see https://siel.nl/acumulus/API/Entry/Get_Entry_Details/
@@ -308,6 +309,8 @@ class Service
      *   - entryid
      *   - entryproc: (new delete status): 'removed' or 'undeleted'(@todo)
      *  Possible errors:
+     *  - "XCM7ELO12: Invalid entrydeletestatus value supplied": $deleteStatus
+     *    is not one of the indicated constants.
      *  - "XCM7ELO14: Invalid entrydeletestatus value supplied": $deleteStatus
      *    is not one of the indicated constants.
      *  - "P2XFELO12: Requested for entryid: $entryId not found or forbidden":
@@ -323,5 +326,72 @@ class Service
             'entrydeletestatus' => (int) $deleteStatus,
         );
         return $this->communicator->callApiFunction("entry/entry_deletestatus_set", $message)->setMainResponseKey('entry');
+    }
+
+    /**
+     * Retrieves the payment status for an invoice.
+     *
+     * @param string $token
+     *   The token for the invoice.
+     *
+     * @return \Siel\Acumulus\Web\Result
+     *   The result of the webservice call. The structured response will contain
+     *   1 "invoice" array, being a keyed array with keys:
+     *   - token
+     *   - paymentstatus
+     *   - paymentdate
+     *  Possible errors:
+     *  - "XGYTTNF04: Requested invoice for $token not found": $token
+     *    does not exist.
+     *
+     * @see https://siel.nl/acumulus/API/Entry/Get_Entry_Details/
+     * for more information about this API call/
+     */
+    public function getPaymentStatus($token)
+    {
+        $message = array(
+            'token' => (string) $token,
+        );
+        return $this->communicator->callApiFunction("invoices/invoice_paymentstatus_get", $message)->setMainResponseKey('invoice');
+    }
+
+    /**
+     * Sets the payment status for an invoice.
+     *
+     * @param string $token
+     *   The token for the invoice.
+     * @param int $paymentStatus
+     *   The new payment status, 1 of the API::PaymentStatus_Paid or
+     *   API::PaymentStatus_Due constants.
+     * @param string $paymentDate
+     *   ISO date string (yyyy-mm-dd) for the date to set as payment date, may
+     *   be empty for today or if the payment sattus is API::PaymentStatus_Due.
+     *
+     * @return \Siel\Acumulus\Web\Result
+     *   The result of the webservice call. The structured response will contain
+     *   1 "invoice" array, being a keyed array with keys:
+     *   - entryid
+     *   - token
+     *   - paymentstatus
+     *  Possible errors:
+     *  - "DATE590ZW: Missing mandatory paymentdate field. Unable to proceed.
+     *  - "DATE590ZW: Incorrect date range (2000-01-01 to 2099-12-31) or invalid date format (YYYY-MM-DD) used in paymentdate field. We received: $paymentDate. Unable to proceed.
+     *
+     * @see https://siel.nl/acumulus/API/Entry/Get_Entry_Details/
+     * for more information about this API call/
+     */
+    public function setPaymentStatus($token, $paymentStatus, $paymentDate = '')
+    {
+        if ($paymentStatus === API::PaymentStatus_Paid && empty($paymentDate)) {
+            $paymentDate = date('Y-m-d');
+        }
+        $message = array(
+            'token' => (string) $token,
+            'paymentstatus' => (int) $paymentStatus,
+        );
+        if (!empty($paymentDate)) {
+            $message['paymentdate'] = (string) $paymentDate;
+        }
+        return $this->communicator->callApiFunction("invoices/invoice_paymentstatus_set", $message)->setMainResponseKey('invoice');
     }
 }

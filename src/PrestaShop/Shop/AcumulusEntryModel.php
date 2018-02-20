@@ -15,6 +15,8 @@ use Siel\Acumulus\Shop\AcumulusEntryModel as BaseAcumulusEntryModel;
  */
 class AcumulusEntryModel extends BaseAcumulusEntryModel
 {
+    static public $keyEntryId = 'id_entry';
+
     /** @var string */
     protected $tableName;
 

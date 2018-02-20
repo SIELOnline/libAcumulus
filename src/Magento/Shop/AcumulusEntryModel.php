@@ -88,6 +88,15 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
 
     /**
      * {@inheritdoc}
+     */
+    public function getField($record, $field)
+    {
+        /** @var \Siel_Acumulus_model_Entry $record */
+        return $record->getData($field);
+    }
+
+    /**
+     * {@inheritdoc}
      *
      * Magento has separate install scripts, so nothing has to be done here.
      */

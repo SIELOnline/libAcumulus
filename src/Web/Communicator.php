@@ -53,13 +53,22 @@ class Communicator implements CommunicatorInterface
     /**
      * {@inheritdoc}
      */
+    public function getUri($apiFunction)
+    {
+        $environment = $this->config->getEnvironment();
+        $uri = $environment['baseUri'] . '/' . $environment['apiVersion'] . '/' . $apiFunction . '.php';
+        return $uri;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function callApiFunction($apiFunction, array $message, Result $result = null)
     {
         if ($result === null) {
             $result = $this->container->getResult();
         }
-        $environment = $this->config->getEnvironment();
-        $uri = $environment['baseUri'] . '/' . $environment['apiVersion'] . '/' . $apiFunction . '.php';
+        $uri = $this->getUri($apiFunction);
 
         try {
             $commonMessagePart = $this->getCommonPart();

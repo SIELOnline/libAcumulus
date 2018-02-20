@@ -55,4 +55,7 @@ interface Api
 
     const Entry_Delete = 1;
     const Entry_UnDelete = 0;
+
+    const Email_Normal = 0;
+    const Email_Reminder = 1;
 }

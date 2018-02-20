@@ -215,7 +215,7 @@ class Service
             'vatdate' => $date,
             'vatcountry' => $countryCode,
         );
-        return $this->communicator->callApiFunction("lookups/lookup_vatinfo", $message)->setMainResponseKey('vatinfo', true);
+        return $this->communicator->callApiFunction('lookups/lookup_vatinfo', $message)->setMainResponseKey('vatinfo', true);
     }
 
     /**
@@ -238,12 +238,12 @@ class Service
      *   - token
      *   - entryid
      *
-     * @see https://www.siel.nl/acumulus/API/Invoicing/Add_Invoice/ for more
-     *   information about the contents of the returned array.
+     * @see https://www.siel.nl/acumulus/API/Invoicing/Add_Invoice/
+     * for more information about this API call.
      */
     public function invoiceAdd(array $invoice, Result $result = null)
     {
-        return $this->communicator->callApiFunction("invoices/invoice_add", $invoice, $result)->setMainResponseKey('invoice');
+        return $this->communicator->callApiFunction('invoices/invoice_add', $invoice, $result)->setMainResponseKey('invoice');
     }
 
     /**
@@ -279,19 +279,19 @@ class Service
      *   - paymentdate
      *   - paymentstatus
      *   - deleted
-     *  Possible errors:
-     *  - "XGYBSN000: Requested invoice for entry $entryId not found": $entryId
-     *    does not exist.
+     *   Possible errors:
+     *   - "XGYBSN000: Requested invoice for entry $entryId not found": $entryId
+     *     does not exist.
      *
      * @see https://siel.nl/acumulus/API/Entry/Get_Entry_Details/
-     * for more information about this API call/
+     * for more information about this API call.
      */
     public function getEntry($entryId)
     {
         $message = array(
             'entryid' => (int) $entryId,
         );
-        return $this->communicator->callApiFunction("entry/entry_info", $message)->setMainResponseKey('entry');
+        return $this->communicator->callApiFunction('entry/entry_info', $message)->setMainResponseKey('entry');
     }
 
     /**
@@ -308,16 +308,16 @@ class Service
      *   1 "entry" array, being a keyed array with keys:
      *   - entryid
      *   - entryproc: (new delete status): 'removed' or 'undeleted'(@todo)
-     *  Possible errors:
-     *  - "XCM7ELO12: Invalid entrydeletestatus value supplied": $deleteStatus
-     *    is not one of the indicated constants.
-     *  - "XCM7ELO14: Invalid entrydeletestatus value supplied": $deleteStatus
-     *    is not one of the indicated constants.
-     *  - "P2XFELO12: Requested for entryid: $entryId not found or forbidden":
-     *    $entryId does not exist or already has requested status.
+     *   Possible errors:
+     *   - "XCM7ELO12: Invalid entrydeletestatus value supplied": $deleteStatus
+     *     is not one of the indicated constants.
+     *   - "XCM7ELO14: Invalid entrydeletestatus value supplied": $deleteStatus
+     *     is not one of the indicated constants.
+     *   - "P2XFELO12: Requested for entryid: $entryId not found or forbidden":
+     *     $entryId does not exist or already has requested status.
      *
      * @see https://siel.nl/acumulus/API/Entry/Set_Delete_Status/
-     * for more information about this API call/
+     * for more information about this API call.
      */
     public function setDeleteStatus($entryId, $deleteStatus)
     {
@@ -325,7 +325,7 @@ class Service
             'entryid' => (int) $entryId,
             'entrydeletestatus' => (int) $deleteStatus,
         );
-        return $this->communicator->callApiFunction("entry/entry_deletestatus_set", $message)->setMainResponseKey('entry');
+        return $this->communicator->callApiFunction('entry/entry_deletestatus_set', $message)->setMainResponseKey('entry');
     }
 
     /**
@@ -340,19 +340,19 @@ class Service
      *   - token
      *   - paymentstatus
      *   - paymentdate
-     *  Possible errors:
-     *  - "XGYTTNF04: Requested invoice for $token not found": $token
-     *    does not exist.
+     *   Possible errors:
+     *   - "XGYTTNF04: Requested invoice for $token not found": $token does not
+     *     exist.
      *
      * @see https://siel.nl/acumulus/API/Entry/Get_Entry_Details/
-     * for more information about this API call/
+     * for more information about this API call.
      */
     public function getPaymentStatus($token)
     {
         $message = array(
             'token' => (string) $token,
         );
-        return $this->communicator->callApiFunction("invoices/invoice_paymentstatus_get", $message)->setMainResponseKey('invoice');
+        return $this->communicator->callApiFunction('invoices/invoice_paymentstatus_get', $message)->setMainResponseKey('invoice');
     }
 
     /**
@@ -373,12 +373,14 @@ class Service
      *   - entryid
      *   - token
      *   - paymentstatus
-     *  Possible errors:
-     *  - "DATE590ZW: Missing mandatory paymentdate field. Unable to proceed.
-     *  - "DATE590ZW: Incorrect date range (2000-01-01 to 2099-12-31) or invalid date format (YYYY-MM-DD) used in paymentdate field. We received: $paymentDate. Unable to proceed.
+     *   Possible errors:
+     *   - "DATE590ZW: Missing mandatory paymentdate field. Unable to proceed."
+     *   - "DATE590ZW: Incorrect date range (2000-01-01 to 2099-12-31) or
+     *     invalid date format (YYYY-MM-DD) used in paymentdate field. We
+     *     received: $paymentDate. Unable to proceed."
      *
      * @see https://siel.nl/acumulus/API/Entry/Get_Entry_Details/
-     * for more information about this API call/
+     * for more information about this API call.
      */
     public function setPaymentStatus($token, $paymentStatus, $paymentDate = '')
     {
@@ -392,6 +394,105 @@ class Service
         if (!empty($paymentDate)) {
             $message['paymentdate'] = (string) $paymentDate;
         }
-        return $this->communicator->callApiFunction("invoices/invoice_paymentstatus_set", $message)->setMainResponseKey('invoice');
+        return $this->communicator->callApiFunction('invoices/invoice_paymentstatus_set', $message)->setMainResponseKey('invoice');
+    }
+
+    /**
+     * Sends out an invoice or reminder as PDF.
+     *
+     * @param string $token
+     *   The token for the invoice.
+     * @param int $invoiceType
+     *   One of the constants API::Email_Normal or API::Email_Reminder.
+     * @param array $emailAsPdf
+     *   An array with the fields:
+     *   - emailto
+     *   - emailbcc
+     *   - emailfrom
+     *   - subject
+     *   - message
+     *   - confirmreading
+     * @param string $invoiceNotes
+     *   Multiline field for additional remarks. Use \n for newlines and \t for
+     *   tabs. Contents is placed in notes/comments section of the invoice.
+     *   Content will not appear on the actual invoice or associated emails.
+     *
+     * @return \Siel\Acumulus\Web\Result
+     *   The result of the webservice call. The structured response will contain
+     *   1 "invoice" array, being a keyed array with keys:
+     *   - token
+     *   - invoicetype
+     *   Possible errors/warnings:
+     *   - "GK6FKHU52: Incorrect invoicetype value used (9) in invoicetype tag
+     *     as part of invoice section in the XML. Using default value of 0
+     *     normal."
+     *   - "TNFE4035G: Requested token not found or invalid token supplied.
+     *     Unable to proceed."
+     *
+     * @see https://siel.nl/acumulus/API/Invoicing/Email/
+     * for more information about this API call.
+     */
+    public function emailInvoiceAsPdf($token, $invoiceType, array $emailAsPdf, $invoiceNotes = '')
+    {
+        $message = array(
+            'token' => (string) $token,
+            'invoicetype' => (int) $invoiceType,
+            'emailaspdf' => $emailAsPdf,
+        );
+        if (!empty($invoiceNotes)) {
+            $message['invoicenotes'] = (string) $invoiceNotes;
+        }
+        return $this->communicator->callApiFunction('invoices/invoice_mail', $message)->setMainResponseKey('invoice');
+    }
+
+    /**
+     * Returns the uri to download the invoice PDF.
+     *
+     * @param string $token
+     *   The token for the invoice.
+     * @param bool $applyGraphics
+     *   False to prevent any embedded graphics from being applied to the
+     *   document, true otherwise.
+     *
+     * @return string
+     *   The uri to download the invoice PDF.
+     *   Possible errors (in download, not in return value):
+     *   - "PDFATNF04: Requested invoice for $token not found": $token does not
+     *     exist.
+     *
+     * @see https://siel.nl/acumulus/API/Invoicing/Get_PDF_Invoice/
+     * for more information about this API call.
+     */
+    public function getInvoicePdfUri($token, $applyGraphics = true)
+    {
+        $token = (string) $token;
+        $uri = $this->communicator->getUri('invoices/invoice_get_pdf');
+        $uri .= "?token=$token";
+        if (!$applyGraphics) {
+            $uri .= '&gfx=0';
+        }
+        return $uri;
+    }
+
+    /**
+     * Returns the uri to download the packing slip PDF.
+     *
+     * @param string $token
+     *   The token for the invoice to get the packing slip for.
+     *
+     * @return string
+     *   The uri to download the packing slip PDF.
+     *   Possible errors (in download, not in return value):
+     *   - "ZKFATNF04: Requested packing slip for $token not found or no longer available."
+     *
+     * @see https://siel.nl/acumulus/API/Delivery/Get_PDF_Packing_Slip/
+     * for more information about this API call.
+     */
+    public function getPackingSlipUri($token)
+    {
+        $token = (string) $token;
+        $uri = $this->communicator->getUri('delivery/packing_slip_get_pdf');
+        $uri .= "?token=$token";
+        return $uri;
     }
 }

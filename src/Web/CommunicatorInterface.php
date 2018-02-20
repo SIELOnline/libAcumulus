@@ -22,4 +22,14 @@ interface CommunicatorInterface {
      * A Result object containing the results.
      */
     public function callApiFunction($apiFunction, array $message, Result $result = null);
+
+    /**
+     * Returns the uri to the requested API call.
+     *
+     * @param string $apiFunction
+     *
+     * @return string
+     *   The uri to the requested API call.
+     */
+    public function getUri($apiFunction);
 }

@@ -17,6 +17,18 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies)
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
+5.2.0 (2018-02-??)
+------------------
+- ALL: A number of API calls have been added:
+  * Set Delete Status: https://siel.nl/acumulus/API/Entry/Set_Delete_Status/
+  * Get Entry (Boeking) Details: https://siel.nl/acumulus/API/Entry/Get_Entry_Details/
+  * Payment - Get status: https://siel.nl/acumulus/API/Invoicing/Payment_Get_Status/
+  * Payment - Set status: https://siel.nl/acumulus/API/Invoicing/Payment_Set_Status/
+  * Email invoice or reminder: https://siel.nl/acumulus/API/Invoicing/Email/
+  * Get PDF Invoice: https://siel.nl/acumulus/API/Invoicing/Get_PDF_Invoice/
+  * Get PDF Packing Slip: https://siel.nl/acumulus/API/Delivery/Get_PDF_Packing_Slip/
+  This allows us to add numerous features in upcoming releases.
+
 5.1.2 (2018-02-14)
 ------------------
 - ALL: currency meta informatie wordt nu gebruikt om bestellingen in andere

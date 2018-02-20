@@ -152,6 +152,20 @@ abstract class InvoiceManager
     }
 
     /**
+     * Indicates if we are in test mode.
+     *
+     * @return bool
+     *   True if we ar ein test mode, false otherwise
+     */
+    protected function isTestMode()
+    {
+        $pluginSettings = $this->getConfig()->getPluginSettings();
+        $testMode = $pluginSettings['debug'] == PluginConfig::Send_TestMode;
+        return $testMode;
+    }
+
+
+    /**
      * Returns a list of existing invoice sources for the given id range.
      *
      * @param string $invoiceSourceType
@@ -358,9 +372,7 @@ abstract class InvoiceManager
      */
     public function send(Source $invoiceSource, Result $result, $forceSend = false, $dryRun = false)
     {
-        $pluginSettings = $this->getConfig()->getPluginSettings();
-        $testMode = $pluginSettings['debug'] == PluginConfig::Send_TestMode;
-        if ($testMode) {
+        if ($this->isTestMode()) {
             $result->setSendStatus(Result::Sent_TestMode);
         } elseif (!$this->getAcumulusEntryModel()->getByInvoiceSource($invoiceSource)) {
             $result->setSendStatus(Result::Sent_New);
@@ -439,10 +451,8 @@ abstract class InvoiceManager
             // If the invoice was sent as a concept, no entryid will be returned
             // but we still want to prevent sending it again: check for the
             // concept status, the absence of errors and non test-mode.
-            $pluginSettings = $this->getConfig()->getPluginSettings();
-            $testMode = $pluginSettings['debug'] == PluginConfig::Send_TestMode;
             $isConcept = $invoice[Tag::Customer][Tag::Invoice]['concept'] == Api::Concept_Yes;
-            if ($isConcept && !$result->hasError() && !$testMode) {
+            if ($isConcept && !$result->hasError() && !$this->isTestMode()) {
                 $this->getAcumulusEntryModel()->save($invoiceSource, null, null);
             }
         }

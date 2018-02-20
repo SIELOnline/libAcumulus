@@ -21,10 +21,10 @@ WC3 = WooCommerce 3 (WordPress)
 ------------------
 - ALL: Als je vanaf nu een factuur opnieuw en geforceerd verstuurd, zal de oude
   boeking de "verwijderd" status krijgen. Je ontvangt hierover een mail.
-- ALL: toegang op veldniveau tot acumulus entry records
-- ALL: fouten en waarschuwingen van een ander API request (bv opvragen btw
-  tarieven of verwijderen oude entry) kunnen worden toegvoegd aan het overall
-  resultaat van de hoofdbewerking (waarschijnlijk add invoice).
+- ALL: fouten en waarschuwingen van een ander API request (vooralsnog opvragen
+  btw tarieven en verwijderen oude entry) worden toegvoegd aan het
+  overall resultaat van de hoofdbewerking (add invoice).
+- ALL: toegang op veldniveau tot acumulus entry records is nu beter geregeld.
 - ALL: A number of API calls have been added:
   * Set Delete Status: https://siel.nl/acumulus/API/Entry/Set_Delete_Status/
   * Get Entry (Boeking) Details: https://siel.nl/acumulus/API/Entry/Get_Entry_Details/

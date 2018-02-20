@@ -954,12 +954,16 @@ class Completor
     protected function getVatRates($countryCode)
     {
         $date = $this->getInvoiceDate();
-        $vatInfo = $this->service->getVatInfo($countryCode, $date)->getResponse();
+        $result = $this->service->getVatInfo($countryCode, $date);
+        if ($result->hasMessages()) {
+            $this->result->mergeMessages($result);
+        }
+        $vatInfo = $result->getResponse();
         // PHP5.5: array_column($vatInfo, Tag::VatRate);
-        $result = array_unique(array_map(function ($vatInfo1) {
+        $vatInfo = array_unique(array_map(function ($vatInfo1) {
             return $vatInfo1[Tag::VatRate];
         }, $vatInfo));
-        return $result;
+        return $vatInfo;
     }
 
     /**

@@ -575,7 +575,7 @@ class Result {
      * @return array
      *   The structured non-common part of the response as received from the
      *   Acumulus web service, i.e. the status, errors and warnings keys are
-     *   removed.
+     *   removed. In case of errors, this array may be empty.
      */
     public function getResponse()
     {

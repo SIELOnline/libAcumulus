@@ -443,17 +443,51 @@ abstract class InvoiceManager
         /** @var \Siel\Acumulus\Invoice\Result $result */
         $result = $this->getService()->invoiceAdd($invoice, $result);
 
+        // if we are going to overwrite an existing entry, we want to delete
+        // that from Acumulus upon success.
+        $deleteOldEntry = false;
+        $acumulusEntryModel = $this->getAcumulusEntryModel();
+        if ($result->getSendStatus() === Result::Sent_Forced) {
+            $oldEntry = $acumulusEntryModel->getByInvoiceSource($invoiceSource);
+        }
+
         // Check if an entryid was created and store entry id and token.
-        $acumulusInvoice = $result->getResponse();
-        if (!empty($acumulusInvoice['entryid'])) {
-            $this->getAcumulusEntryModel()->save($invoiceSource, $acumulusInvoice['entryid'], $acumulusInvoice['token']);
+        $newEntry = $result->getResponse();
+        if (!empty($newEntry['entryid'])) {
+            $deleteOldEntry = $acumulusEntryModel->save($invoiceSource, $newEntry['entryid'], $newEntry['token']);
         } else {
             // If the invoice was sent as a concept, no entryid will be returned
             // but we still want to prevent sending it again: check for the
             // concept status, the absence of errors and non test-mode.
             $isConcept = $invoice[Tag::Customer][Tag::Invoice]['concept'] == Api::Concept_Yes;
             if ($isConcept && !$result->hasError() && !$this->isTestMode()) {
-                $this->getAcumulusEntryModel()->save($invoiceSource, null, null);
+                $deleteOldEntry = $acumulusEntryModel->save($invoiceSource, null, null);
+            }
+        }
+
+        // Delete if there is an old entry and we successfully saved the new entry.
+        if ($deleteOldEntry && isset($oldEntry)) {
+            // But only if the old entry was not a concept as concepts cannot be deleted.
+            $entryId = $acumulusEntryModel->getField($oldEntry, $acumulusEntryModel::$keyEntryId);
+            if (!empty($entryId)) {
+                $deleteResult = $this->getService()->setDeleteStatus($entryId, API::Entry_Delete);
+                if ($deleteResult->hasMessages()) {
+                    // Add messages to result but not if the entry has already the
+                    // delete status or does not exist at all (anymore).
+                    if ($deleteResult->hasCodeTag('P2XFELO12')) {
+                        // Successfully deleted the ld entry: add a warning so this
+                        // info will be  mailed to the user.
+                        $result->addWarning(902, '',
+                            sprintf($this->t('message_warning_old_entry_not_deleted'), $this->t($invoiceSource->getType()), $entryId));
+                    } else {
+                        $result->mergeMessages($deleteResult, true);
+                    }
+                } else {
+                    // Successfully deleted the ld entry: add a warning so this
+                    // info will be  mailed to the user.
+                    $result->addWarning(901, '',
+                        sprintf($this->t('message_warning_old_entry_deleted'), $this->t($invoiceSource->getType()), $entryId));
+                }
             }
         }
 

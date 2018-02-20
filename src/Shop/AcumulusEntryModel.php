@@ -23,6 +23,15 @@ use Siel\Acumulus\Helpers\Log;
  */
 abstract class AcumulusEntryModel
 {
+    // Access to the fields, differs per webshop as we followed db naming
+    // conventions from the webshop.
+    static public $keyEntryId = 'entry_id';
+    static public $keyToken = 'token';
+    static public $keySourceType = 'source_type';
+    static public $keySourceId = 'source_id';
+    static public $keyCreated = 'created';
+    static public $keyUpdated = 'updated';
+
     /** @var \Siel\Acumulus\Helpers\Log */
     protected $log;
 
@@ -153,6 +162,45 @@ abstract class AcumulusEntryModel
      *   Success.
      */
     abstract protected function update($record, $entryId, $token, $updated);
+
+    /**
+     * Returns the value of the given field in the given acumulus entry record.
+     *
+     * As differnt webshops may use different field and property names in their
+     * tables and models, we abstracted accessing a field of a record into this
+     * method.
+     *
+     * @param array|object|null $record
+     *   The record to search through.
+     * @param string $field
+     *   The field to search for.
+     *
+     * @return mixed|null
+     *   The value of the given field in the given acumulus entry record.
+     */
+    public function getField($record, $field)
+    {
+        $value = null;
+        if (is_array($record)) {
+            if (array_key_exists($field, $record)) {
+                $value = $record[$field];
+            }
+        } elseif (is_object($record)) {
+            // It's an object: try to get the property.
+            // Safest way is via the get_object_vars() function.
+            $properties = get_object_vars($record);
+            if (!empty($properties) && array_key_exists($field, $properties)) {
+                $value = $properties[$field];
+            } elseif (method_exists($record, $field)) {
+                $value = call_user_func(array($record, $field));
+            } elseif (method_exists($record, '__get')) {
+                @$value = $record->$field;
+            } elseif (method_exists($record, '__call')) {
+                @$value = $record->$field();
+            }
+        }
+        return $value;
+    }
 
     /**
      * @return bool

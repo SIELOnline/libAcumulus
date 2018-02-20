@@ -12,13 +12,14 @@ use Siel\Acumulus\Invoice\Source;
  */
 class AcumulusEntryModel extends BaseAcumulusEntryModel
 {
-    const KEY_ENTRY_ID = '_acumulus_entry_id';
-    const KEY_TOKEN = '_acumulus_token';
-    // Note: this meta key is not actually stored as the post_type gives us the
-    // same information.
-    const KEY_TYPE = '_acumulus_type';
-    const KEY_CREATED = '_acumulus_created';
-    const KEY_UPDATED = '_acumulus_updated';
+    static public $keyEntryId = '_acumulus_entry_id';
+    static public $keyToken = '_acumulus_token';
+    // Note: these 2 meta keys are not actually stored as the post_id and
+    // post_type give us that information.
+    static public $keySourceId = '_acumulus_id';
+    static public $keySourceType = '_acumulus_type';
+    static public $keyCreated = '_acumulus_created';
+    static public $keyUpdated = '_acumulus_updated';
 
     /**
      * Helper method that converts a WP/WC post type to a source type constant.
@@ -47,7 +48,7 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
     {
         $metaQuery = array(
             'posts_per_page' => 1,
-            'meta_key' => static::KEY_ENTRY_ID,
+            'meta_key' => static::$keyEntryId,
             'meta_value' => $entryId,
             'meta_compare' => '=',
         );
@@ -56,7 +57,7 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
             $result = array();
             foreach ($posts as $post) {
                 $result1 = get_post_meta($post->id);
-                $result1[static::KEY_TYPE] = $this->shopTypeToSourceType($post->post_type);
+                $result1[static::$keySourceType] = $this->shopTypeToSourceType($post->post_type);
                 $result[] = $result1;
             }
             if (count($result) === 1) {
@@ -77,10 +78,11 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
         $post = get_post($invoiceSourceId);
         if (!empty($post->post_type) && $this->shopTypeToSourceType($post->post_type) === $invoiceSourceType) {
             $result = get_post_meta($invoiceSourceId);
-            if (array_key_exists(static::KEY_ENTRY_ID, $result)) {
-                // Acumulus meta data found: add invoice type as that is not stored in
+            if (array_key_exists(static::$keyEntryId, $result)) {
+                // Acumulus meta data found: add source id and type as these are not stored in
                 // the meta data.
-                $result[static::KEY_TYPE] = $invoiceSourceType;
+                $result[static::$keySourceId] = $invoiceSourceId;
+                $result[static::$keySourceType] = $invoiceSourceType;
             } else {
                 $result = null;
             }
@@ -98,11 +100,11 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
     {
         $now = $this->sqlNow();
         $orderId = $invoiceSource->getId();
-        add_post_meta($orderId, static::KEY_CREATED, $now, true);
+        add_post_meta($orderId, static::$keyCreated, $now, true);
         //$exists = add_post_meta($orderId, '_acumulus_created', $now, true) === false;
-        return update_post_meta($orderId, static::KEY_ENTRY_ID, $entryId) !== false
-            && update_post_meta($orderId, static::KEY_TOKEN, $token) !== false
-            && update_post_meta($orderId, static::KEY_UPDATED, $now) !== false;
+        return update_post_meta($orderId, static::$keyEntryId, $entryId) !== false
+            && update_post_meta($orderId, static::$keyToken, $token) !== false
+            && update_post_meta($orderId, static::$keyUpdated, $now) !== false;
     }
 
     /**
@@ -127,6 +129,18 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
     protected function sqlNow()
     {
         return current_time('timestamp', true);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getField($record, $field)
+    {
+        $result = parent::getField($record, $field);
+        if (is_array($result)) {
+            $result = reset($result);
+        }
+        return $result;
     }
 
     /**

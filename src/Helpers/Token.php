@@ -279,9 +279,9 @@ class Token {
     /**
      * Looks up a property in a web shop specific object.
      *
-     * This part is extracted into as separate method so it can be overridden
+     * This part is extracted into a separate method so it can be overridden
      * with webshop specific ways to access properties. The base implementation
-     * will probably get the property anyway,so override mainly to prevent
+     * will probably get the property anyway, so override mainly to prevent
      * notices or warnings.
      *
      * @param object $variable

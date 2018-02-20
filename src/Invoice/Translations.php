@@ -49,6 +49,8 @@ class Translations extends TranslationCollection
         'message_warning_multiple_vattype_must_split' => 'De factuur heeft meerdere factuurtypes (https://wiki.acumulus.nl/index.php?page=127). Daarom is de factuur als concept opgeslagen. Splits de factuur in Acumulus en verdeel de regels over beide facturen gebaseerd op het btw type waar de regel onder valt.',
         'message_warning_multiple_vattype_may_split' => 'De factuur kan meerdere factuurtypes hebben (https://wiki.acumulus.nl/index.php?page=127). Daarom is de factuur als concept opgeslagen. Controleer het btw type van de factuur in Acumulus en corrigeer deze indien nodig, of splits de factuur en verdeel de regels over beide facturen gebaseerd op het btw type waar de regel onder valt.',
         'message_warning_no_pdf' => 'Vanwege deze waarschuwing is er ook geen PDF factuur naar de klant verstuurd. U dient dit handmatig alsnog te doen.',
+        'message_warning_old_entry_deleted' => 'De factuur heeft een oudere boeking voor deze %1$s in Acumulus overschreven. Deze oudere boeking met boeknummer %2$d is in Acumulus naar de prullenbak verplaatst en is daar nu terug te vinden onder "Overzichten » Laatste boekingen » Verwijderde boekingen".',
+        'message_warning_old_entry_not_deleted' => 'De factuur heeft een oudere boeking voor deze %1$s in Acumulus overschreven. We hebben geprobeerd deze oudere boeking met boeknummer %2$d in Acumulus naar de prullenbak te verplaatsen, maar dit is niet gelukt omdat de oude factuur waarsachijnlijk al verwijderd was. Deze oude factuur kan misschien nog steeds teruggevonden worden onder "Overzichten » Laatste boekingen » Verwijderde boekingen".',
     );
 
     protected $en = array(
@@ -91,5 +93,7 @@ class Translations extends TranslationCollection
         'message_warning_multiple_vattype_must_split' => 'The invoice has multiple invoice types (https://wiki.acumulus.nl/index.php?page=127). The invoice has been saved as concept. Split the invoice in Acumulus and divide the invoice lines over both invoices based on the VAT type the line belongs to.',
         'message_warning_multiple_vattype_may_split' => 'The invoice can have multiple invoice types (https://wiki.acumulus.nl/index.php?page=127). The invoice has been saved as concept. Check the VAT type of the invoice in Acumulus and correct if necessary, or split the invoice and divide the invoice lines over both invoices based on the VAT type the line belongs to.',
         'message_warning_no_pdf' => 'Because of this warning no invoice PDF has been sent. You will have to do so manually.',
+        'message_warning_old_entry_deleted' => 'The invoice has overwritten an older invoice for this %1$s in Acumulus. In Acumulus, this older invoice with entry = %2$d has been moved to the waste bin and can be found under "Views » Latest entries » Deleted entries".',
+        'message_warning_old_entry_not_deleted' => 'The invoice has overwritten an older invoice for this %1$s in Acumulus. In Acumulus, we tried to move this older invoice to the waste bin but did not succeed probably because the older invoice has already been deleted. This older invoice with entry = %2$d may or may not still be found under "Views » Latest entries » Deleted entries".',
     );
 }

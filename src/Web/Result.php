@@ -287,8 +287,10 @@ class Result {
         if (array_key_exists('code', $errors)) {
             $errors = array($errors);
         }
-        $this->errors = array_merge($this->errors, $errors);
-        return $this->raiseStatus(self::Status_Errors);
+        foreach ($errors as $error) {
+            $this->addError($error);
+        }
+        return $this;
     }
 
     /**
@@ -308,9 +310,18 @@ class Result {
     public function addError($code, $codeTag = '', $message = '')
     {
         if (is_array($code)) {
-            $this->errors[] = $code;
-        } else {
+            $message = $code['message'];
+            $codeTag = $code['codetag'];
+            $code = $code['code'];
+        }
+        if (empty($codeTag)) {
             $this->errors[] = array(
+                'code' => '',
+                'codetag' => $codeTag,
+                'message' => $message
+            );
+        } elseif (!array_key_exists($codeTag, $this->errors)) {
+            $this->errors[$codeTag] = array(
                 'code' => $code,
                 'codetag' => $codeTag,
                 'message' => $message
@@ -346,8 +357,10 @@ class Result {
         if (array_key_exists('code', $warnings)) {
             $warnings = array($warnings);
         }
-        $this->warnings = array_merge($this->warnings, $warnings);
-        return $this->raiseStatus(self::Status_Warnings);
+        foreach ($warnings as $warning) {
+            $this->addWarning($warning);
+        }
+        return $this;
     }
 
     /**
@@ -367,15 +380,52 @@ class Result {
     public function addWarning($code, $codeTag = '', $message = '')
     {
         if (is_array($code)) {
-            $this->warnings[] = $code;
-        } else {
+            $message = $code['message'];
+            $codeTag = $code['codetag'];
+            $code = $code['code'];
+        }
+        if (empty($codeTag)) {
             $this->warnings[] = array(
+                'code' => $code,
+                'codetag' => $codeTag,
+                'message' => $message
+            );
+        } elseif (!array_key_exists($codeTag, $this->warnings)) {
+            $this->warnings[$codeTag] = array(
                 'code' => $code,
                 'codetag' => $codeTag,
                 'message' => $message
             );
         }
         return $this->raiseStatus(self::Status_Warnings);
+    }
+
+    /**
+     * Merges sets of exception, error and warning messages of 2 results.
+     *
+     * This allows to inform the user about errors and warnings that occurred
+     * during additional API calls, e.g. querying VAT rates or deleteing old
+     * entries.
+     *
+     * @param \Siel\Acumulus\Web\Result $other
+     *   The other result to add the messages from.
+     * @param bool $errorsAsWarnings
+     *   Whether errors should be merged as errors or as mere warnings because
+     *   the main result is not really influenced by these errors.
+     *
+     * @return $this
+     */
+    public function mergeMessages(Result $other, $errorsAsWarnings = false)
+    {
+        if ($this->getException() === null && $other->getException() !== null) {
+            $this->setException($other->getException());
+        }
+        if ($errorsAsWarnings) {
+            $this->addWarnings($other->getErrors());
+        } else {
+            $this->addErrors($other->getErrors());
+        }
+        return $this->addWarnings($other->getWarnings());
     }
 
     /**
@@ -429,6 +479,19 @@ class Result {
         }
 
         return false;
+    }
+
+    /**
+     * Returns whether the result contains a given codeTag.
+     *
+     * @param string $codeTag
+     *
+     * @return bool
+     *   True if the result contains a given codeTag, false otherwise.
+     */
+    public function hasCodeTag($codeTag)
+    {
+        return array_key_exists($codeTag, $this->errors) || array_key_exists($codeTag, $this->warnings);
     }
 
     /**

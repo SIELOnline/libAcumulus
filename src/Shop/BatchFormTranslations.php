@@ -30,7 +30,7 @@ class BatchFormTranslations extends TranslationCollection
         'option_force_send' => 'Forceer verzenden',
         'option_send_test_mode' => 'Verzend in testmodus',
         'option_dry_run' => 'Laat alleen de lijst van facturen zien die verstuurd zouden worden, zonder daadwerkelijk te versturen.',
-        'desc_batch_options' => '<p>Facturen die binnen de reeks vallen maar al naar Acumulus verstuurd zijn, worden standaard niet verzonden. Door de 1e optie aan te vinken forceert u het nogmaals versturen van deze facturen.</p>
+        'desc_batch_options' => '<p>Facturen die binnen de reeks vallen maar al naar Acumulus verstuurd zijn, worden standaard niet verzonden. Door de 1e optie aan te vinken forceert u het nogmaals versturen van deze facturen. Indien nog aanwezig, wordt de oude boeking in Acumulus naar de prullenbak verplaatst.</p>
                                  <p>Met de 2e optie worden de facturen in testmodus naar Acumulus verstuurd. Acumulus zal alleen de factuur controleren op fouten en waarschuwingen maar zal deze niet opslaan, zodat uw administratie niet in de war raakt. U ontvangt alijd een mail met de resultaten. Deze optie is gelijk aan de optie "Testmodus" van de instelling "Factuur verzendmodus" van het instellingenformulier, maar geldt alleen voor deze batchverzending. Gebruik deze optie om de mail die u ontvangt mee te kunnen sturen met een supportverzoek.</p>
                                  <p>De filters die u hierboven opgeeft kunnen in bepaalde gevallen voor verrassingen zorgen. Door de laatste optie te selecteren krijgt u in het resultatenoverzicht een lijst te zien van facturen die verstuurd zouden worden, zonder dat het versturen daadwerkelijk plaats vindt.</p>',
         'batchLogHeader' => 'Resultaten',
@@ -45,9 +45,6 @@ duren.
 Geef daarom niet teveel facturen in één keer op.
 U kunt dan een time-out krijgen, waardoor het resultaat van de laatst verstuurde
 factuur niet opgeslagen wordt.</strong></p>
-<p><strong>LET OP: Het gebruik van de optie 'Forceer verzenden' is op eigen
-risico. Door het nogmaals handmatig versturen van facturen kan uw administratie
-ontregeld raken.</strong></p>
 <p>Het versturen van orders gaat net als het automatisch versturen:</p>
 <ul style="list-style: inside disc;">
 <li>De factuur wordt op exact dezelfde wijze aangemaakt als bij het automatisch
@@ -114,7 +111,7 @@ LONGSTRING
         'option_force_send' => 'Force sending',
         'option_send_test_mode' => 'Send in test mode',
         'option_dry_run' => 'Dry run.',
-        'desc_batch_options' => '<p>Invoices that fall within the range but are already sent to Acumulus will normally not be sent again. By checking the 1st option, these orders will be sent again.</p>
+        'desc_batch_options' => '<p>Invoices that fall within the range but are already sent to Acumulus will normally not be sent again. By checking the 1st option, these orders will be sent again. If still available, the old entry will be moved to the waste bin in Acumulus.</p>
                                  <p>With the 2nd option, invoices will be sent to Acumulus using the test mode. Acumulus will only check the input for errors and warnings but not store the invoice, so your administration will not be polluted. You will always receive a mail with the results. This option overrules the setting "Invoice send mode" on the configuration form. Use this option so you can forward the mail you receive with a support request.</p>
                                  <p>In some cases, the filters you define here can lead to surprises. By cheking the last option you will get a list of invoices that would be sent, without actually being sent.</p>',
         'batchLogHeader' => 'Results',

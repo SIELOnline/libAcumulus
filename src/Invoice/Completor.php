@@ -39,6 +39,10 @@ class Completor
     const VatRateSource_Copied_From_Children = 'copied-from-children';
     const VatRateSource_Copied_From_Parent = 'copied-from-parent';
 
+    const Vat_HasVat = 1;
+    const Vat_Has0Vat = 2;
+    const Vat_Unknown = 4;
+
     /**
      * A list of vat rate sources that indicate that the vat rate can be
      * considered correct.
@@ -205,9 +209,10 @@ class Completor
         // - if so: warn and set to concept.
         // - if not: correct vatrate = 0 to vatrate = -1 (vat-free) where
         //    applicable.
-        if (in_array($this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType], array(Api::VatType_National, Api::VatType_ForeignVat, Api::VatType_MarginScheme))
-            && $this->invoiceHasLineWith0VatRate())
-        {
+        $vatSituation = $this->getVatSituation($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line], true);
+        $vatTypeAllowsPositiveVatRates = in_array($this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType],
+            array(Api::VatType_National, Api::VatType_ForeignVat, Api::VatType_MarginScheme));
+        if ($vatTypeAllowsPositiveVatRates && ($vatSituation & static::Vat_Has0Vat) !== 0) {
             $shopSettings = $this->config->getShopSettings();
             $vatFreeProducts = $shopSettings['vatFreeProducts'];
             if ($vatFreeProducts === PluginConfig::VatFreeProducts_No) {
@@ -247,7 +252,8 @@ class Completor
         } elseif ($this->invoiceHasLineWithCostPrice($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line])) {
             $possibleVatTypes[] = Api::VatType_MarginScheme;
         } else {
-            if ($this->invoiceHasLineWithVat($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line])) {
+            $vatSituation = $this->getVatSituation($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line], true);
+            if (($vatSituation & (static::Vat_HasVat | static::Vat_Unknown)) !== 0) {
                 // NL or EU Foreign vat.
                 if ($digitalServices === PluginConfig::DigitalServices_No) {
                     // No electronic services are sold: can only be dutch VAT.
@@ -267,8 +273,9 @@ class Completor
                         $possibleVatTypes[] = Api::VatType_National;
                     }
                 }
-            } else {
-                // No VAT at all: National/EU reversed vat, only vat free
+            }
+            if (($vatSituation & (static::Vat_Has0Vat | static::Vat_Unknown)) !== 0) {
+                // No VAT: National/EU reversed vat, only vat free
                 // products, or no vat (rest of world).
                 if ($this->isNl()) {
                     // Can it be VAT free products (e.g. education)? Digital
@@ -297,13 +304,9 @@ class Completor
 
                 if (empty($possibleVatTypes)) {
                     // Warning + fall back.
-                    // for now I disabled the warning as it appeared on
-                    // 0-amount invoices that could be corrected after all, plus
-                    // that it often (always) appeared in combination with other
-                    // warnings.
                     $possibleVatTypes[] = Api::VatType_National;
                     $possibleVatTypes[] = $this->isNl() ? Api::VatType_NationalReversed : Api::VatType_EuReversed;
-                    $this->changeInvoiceToConcept($this->result->hasMessages() ? '' : 'message_warning_no_vat', 803);
+                    $this->changeInvoiceToConcept('message_warning_no_vat', 803);
                 }
             }
         }
@@ -843,43 +846,12 @@ class Completor
     }
 
     /**
-     * Returns whether the invoice has at least 1 line with a non-0 vat rate.
-     *
-     * 0 (VAT free/reversed VAT) and -1 (no VAT) are valid 0-vat rates.
-     * As vatrate may be null, the vatamount value is also checked.
-     *
-     * @param array $lines
-     *
-     * @return bool
-     */
-    protected function invoiceHasLineWithVat(array $lines)
-    {
-        $hasLineWithVat = false;
-        foreach ($lines as $line) {
-            if (!empty($line[Tag::VatRate])) {
-                if (!Number::isZero($line[Tag::VatRate]) && !Number::floatsAreEqual($line[Tag::VatRate], -1.0)) {
-                    $hasLineWithVat = true;
-                    break;
-                }
-            } elseif (!empty($line[Meta::VatAmount]) && !Number::isZero($line[Meta::VatAmount])) {
-                $hasLineWithVat = true;
-                break;
-            } elseif (!empty($line[Meta::LineVatAmount]) && !Number::isZero($line[Meta::LineVatAmount])) {
-                $hasLineWithVat = true;
-                break;
-            } elseif (!empty($line[Meta::ChildrenLines]) && $this->invoiceHasLineWithVat($line[Meta::ChildrenLines])) {
-                $hasLineWithVat = true;
-                break;
-            }
-        }
-        return $hasLineWithVat;
-    }
-
-    /**
      * Returns whether the invoice has at least 1 line with a 0% or vat free vat rate.
      *
      * The invoice lines are expected to be flattened when we arrive here.
      *
+     * @param array $lines
+     *   The lines to determine the vat situation for.
      * @param bool $includeDiscountLines
      *   Discount lines representing a partial payment should be VAT free and
      *   should not always trigger a return value of true. This parameter can be
@@ -887,16 +859,65 @@ class Completor
      *
      * @return bool
      */
-    protected function invoiceHasLineWith0VatRate($includeDiscountLines = false)
+    protected function getVatSituation(array $lines, $includeDiscountLines = false)
     {
-        $hasLineWith0Vat = false;
-        foreach ($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] as $line) {
-            if ($this->lineHas0VatRate($line) && ($line[Meta::LineType] !== Creator::LineType_Discount || $includeDiscountLines)) {
-                $hasLineWith0Vat = true;
-                break;
+        $result = 0;
+        foreach ($lines as $line) {
+            if ($line[Meta::LineType] !== Creator::LineType_Discount || $includeDiscountLines) {
+                $result |= $this->getLineVatSituation($line);
+            }
+            if (!empty($line[Meta::ChildrenLines])) {
+                $result |= $this->getVatSituation($line[Meta::ChildrenLines], $includeDiscountLines);
             }
         }
-        return $hasLineWith0Vat;
+        return $result;
+    }
+
+    /**
+     * Returns the vat situation of the given line.
+     *
+     * @param array $line
+     *
+     * @return int
+     *   Either:
+     *   - static::Vat_HasVat: line has a positive vat rate.
+     *   - static::Vat_Has0Vat: line has a 0% or vat free vat rate.
+     *   - static::Vat_Unknown: it is unknown whether the line has vat or not.
+     *   The latter will be the case with free products and a webshop that does
+     *   not store vat rates with order lines.
+     */
+    protected function getLineVatSituation(array $line)
+    {
+        $result = static::Vat_Unknown;
+        if ($this->lineHasVatRate($line)) {
+            $result = static::Vat_HasVat;
+        }
+        if ($this->lineHas0VatRate($line)) {
+            $result = static::Vat_Has0Vat;
+        }
+        return $result;
+    }
+
+    /**
+     * Returns whether the line has a positive vat rate.
+     *
+     * @param array $line
+     *   The invoice line.
+     *
+     * @return bool
+     *   True if the line has a positive vat rate, false otherwise.
+     */
+    protected function lineHasVatRate(array $line)
+    {
+        $result = false;
+        if (isset($line[Tag::VatRate]) && (float) $line[Tag::VatRate] > 0.0) {
+            $result = true;
+        } elseif (isset($line[Meta::VatAmount]) && !Number::isZero($line[Meta::VatAmount])) {
+            $result = true;
+        } elseif (isset($line[Meta::LineVatAmount]) && !Number::isZero($line[Meta::LineVatAmount])) {
+            $result = true;
+        }
+        return $result;
     }
 
     /**
@@ -910,8 +931,11 @@ class Completor
      */
     protected function lineHas0VatRate(array $line)
     {
-        return isset($line[Tag::VatRate]) &&
-               Number::isZero($line[Tag::VatRate]) || Number::floatsAreEqual($line[Tag::VatRate], -1.0);
+        $result = false;
+        if (isset($line[Tag::VatRate]) && Number::isZero($line[Tag::VatRate]) || Number::floatsAreEqual($line[Tag::VatRate], -1.0)) {
+            $result = true;
+        }
+        return $result;
     }
 
     /**

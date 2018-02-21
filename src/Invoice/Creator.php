@@ -352,17 +352,11 @@ abstract class Creator
             $invoice[Tag::DescriptionText] = str_replace(array("\r\n", "\r", "\n"), '\n', $invoice[Tag::DescriptionText]);
         }
 
-        // Acumulus invoice template to use.
-        // @todo: this should be done after the first event handler (invoice_created) has been triggered.
-        if (isset($invoice[Tag::PaymentStatus])
-            && $invoice[Tag::PaymentStatus] == Api::PaymentStatus_Paid
-            // 0 = empty = use same invoice template as for non paid invoices.
-            && $invoiceSettings['defaultInvoicePaidTemplate'] != 0
-        ) {
-            $this->addDefault($invoice, Tag::Template, $invoiceSettings['defaultInvoicePaidTemplate']);
-        } else {
-            $this->addDefault($invoice, Tag::Template, $invoiceSettings['defaultInvoiceTemplate']);
-        }
+        // Acumulus invoice template to use: this depends on the payment status
+        // which in some shops is notoriously hard to get right. So, we postpone
+        // this to after the invoice_created event when the payment status may
+        // be assumed to be correct.
+        $invoice[Tag::Template] = '';
 
         // Invoice notes.
         $this->addTokenDefault($invoice, Tag::InvoiceNotes, $invoiceSettings['invoiceNotes']);

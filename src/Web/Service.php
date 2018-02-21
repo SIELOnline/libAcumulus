@@ -301,13 +301,14 @@ class Service
      *   The id of the entry.
      * @param int $deleteStatus
      *   The delete action to perform: one of the API::Entry_Delete or
-     *   API::Entry_UnDelete constants.
+     *   API::Entry_UnDelete constants. API::Entry_UnDelete does not work for
+     *   now.
      *
      * @return \Siel\Acumulus\Web\Result
      *   The result of the webservice call. The structured response will contain
      *   1 "entry" array, being a keyed array with keys:
      *   - entryid
-     *   - entryproc: (new delete status): 'removed' or 'undeleted'(@todo)
+     *   - entryproc: (description new state): 'removed' or '???'
      *   Possible errors:
      *   - "XCM7ELO12: Invalid entrydeletestatus value supplied": $deleteStatus
      *     is not one of the indicated constants.

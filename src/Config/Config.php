@@ -610,12 +610,6 @@ class Config implements ConfigInterface
                     'type' => 'bool',
                     'default' => true,
                 ),
-                // @todo: add to advanced UI?
-                'addMissingAmountLine' => array(
-                    'group' => Tag::Invoice,
-                    'type' => 'bool',
-                    'default' => true,
-                ),
                 // @todo: add to UI if shop does support it (PS?, WC?).
                 'useMargin' => array(
                     'group' => Tag::Invoice,

@@ -177,7 +177,7 @@ class Completor
         // specific data.
         $this->fictitiousClient();
         $this->validateEmail();
-
+        $this->invoiceTemplate();
 
         // Complete lines as far as they can be completed om their own.
         $this->initPossibleVatTypes();
@@ -413,6 +413,22 @@ class Completor
                 $email = trim($matches[2]);
             }
             $this->invoice[Tag::Customer][Tag::Email] = $email;
+        }
+    }
+
+    protected function invoiceTemplate()
+    {
+        $invoiceSettings = $this->config->getInvoiceSettings();
+
+        // Acumulus invoice template to use.
+        if (isset($this->invoice[Tag::Customer][Tag::Invoice][Tag::PaymentStatus])
+            && $this->invoice[Tag::Customer][Tag::Invoice][Tag::PaymentStatus] == Api::PaymentStatus_Paid
+            // 0 = empty = use same invoice template as for non paid invoices.
+            && $invoiceSettings['defaultInvoicePaidTemplate'] != 0
+        ) {
+            $this->addDefault($this->invoice[Tag::Customer][Tag::Invoice], Tag::Template, $invoiceSettings['defaultInvoicePaidTemplate']);
+        } else {
+            $this->addDefault($this->invoice[Tag::Customer][Tag::Invoice], Tag::Template, $invoiceSettings['defaultInvoiceTemplate']);
         }
     }
 
@@ -1179,5 +1195,26 @@ class Completor
             $this->result->addWarning($code, '', $message);
         }
         $this->invoice[Tag::Customer][Tag::Invoice][Tag::Concept] = Api::Concept_Yes;
+    }
+
+    /**
+     * Helper method to add a default non-empty value to an array.
+     *
+     * This method will not overwrite existing values.
+     *
+     * @param array $array
+     * @param string $key
+     * @param mixed $value
+     *
+     * @return bool
+     *   Whether the default was added.
+     */
+    protected function addDefault(array &$array, $key, $value)
+    {
+        if (empty($array[$key]) && !empty($value)) {
+            $array[$key] = $value;
+            return true;
+        }
+        return false;
     }
 }

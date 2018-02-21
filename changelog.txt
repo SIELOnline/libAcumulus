@@ -28,6 +28,9 @@ WC3 = WooCommerce 3 (WordPress)
 - ALL: Als je vanaf nu een factuur opnieuw en geforceerd verstuurd, zal de oude
   boeking de "verwijderd" status krijgen. Je ontvangt hierover een mail. Ook de
   waarschuwing bij geforceerd verzenden is aangepast.
+- ALL: Het te gebruiken factuursjabloon wordtnu pas bepaald na het invoice_created
+  event zodat het eventueel corrigeren van de betaalstatus in dat event doorwerkt
+  in de factuursjabloon keuze.
 - ALL: meerdere spelfouten uit de NL en EN vertalingen gehaald.
 - ALL: fouten en waarschuwingen van een ander API request (vooralsnog opvragen
   btw tarieven en verwijderen oude entry) worden toegvoegd aan het

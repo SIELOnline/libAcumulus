@@ -454,14 +454,14 @@ abstract class InvoiceManager
         // Check if an entryid was created and store entry id and token.
         $newEntry = $result->getResponse();
         if (!empty($newEntry['entryid'])) {
-            $deleteOldEntry = $acumulusEntryModel->save($invoiceSource, $newEntry['entryid'], $newEntry['token']);
+            $deleteOldEntry = (bool) $acumulusEntryModel->save($invoiceSource, $newEntry['entryid'], $newEntry['token']);
         } else {
             // If the invoice was sent as a concept, no entryid will be returned
             // but we still want to prevent sending it again: check for the
             // concept status, the absence of errors and non test-mode.
             $isConcept = $invoice[Tag::Customer][Tag::Invoice]['concept'] == Api::Concept_Yes;
             if ($isConcept && !$result->hasError() && !$this->isTestMode()) {
-                $deleteOldEntry = $acumulusEntryModel->save($invoiceSource, null, null);
+                $deleteOldEntry = (bool) $acumulusEntryModel->save($invoiceSource, null, null);
             }
         }
 

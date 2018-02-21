@@ -337,6 +337,7 @@ class Service
      * @return \Siel\Acumulus\Web\Result
      *   The result of the webservice call. The structured response will contain
      *   1 "invoice" array, being a keyed array with keys:
+     *   - entryid
      *   - token
      *   - paymentstatus
      *   - paymentdate
@@ -373,6 +374,7 @@ class Service
      *   - entryid
      *   - token
      *   - paymentstatus
+     *   - paymentdate
      *   Possible errors:
      *   - "DATE590ZW: Missing mandatory paymentdate field. Unable to proceed."
      *   - "DATE590ZW: Incorrect date range (2000-01-01 to 2099-12-31) or
@@ -384,16 +386,14 @@ class Service
      */
     public function setPaymentStatus($token, $paymentStatus, $paymentDate = '')
     {
-        if ($paymentStatus === API::PaymentStatus_Paid && empty($paymentDate)) {
+        if (empty($paymentDate)) {
             $paymentDate = date('Y-m-d');
         }
         $message = array(
             'token' => (string) $token,
             'paymentstatus' => (int) $paymentStatus,
+            'paymentdate' => (string) $paymentDate,
         );
-        if (!empty($paymentDate)) {
-            $message['paymentdate'] = (string) $paymentDate;
-        }
         return $this->communicator->callApiFunction('invoices/invoice_paymentstatus_set', $message)->setMainResponseKey('invoice');
     }
 

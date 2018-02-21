@@ -30,8 +30,8 @@ class MailTranslations extends TranslationCollection
         'mail_body_warnings_created' => 'De factuur is aangemaakt, maar u dient deze in Acumulus te controleren en zonodig te corrigeren.',
         'mail_body_success' => 'Onderstaande factuur is succesvol naar Acumulus verstuurd.',
 
-        'mail_body_testmode' => 'De factuur is in testmodus verstuurd en is dus niet aangemaakt.',
-        'mail_body_concept' => 'De factuur is als concept aangemaakt. Controleer de factuur in Acumulus, waarna u deze alsnog defintief kan maken. U vindt conceptfacturen onder "Overzichten - Conceptfacturen en offertes".',
+        'mail_body_testmode' => 'De factuur is in testmodus verstuurd en is dus niet aan uw boekhouding toegevoegd.',
+        'mail_body_concept' => 'De factuur is als concept aangemaakt. Controleer de factuur in Acumulus, waarna u deze alsnog definitief kan maken. U vindt conceptfacturen onder "Overzichten - Conceptfacturen en offertes".',
 
         'mail_body_pdf_enabled' => 'U laat Acumulus de factuur als pdf naar de klant versturen.',
         'mail_body_pdf_not_sent_errors' => 'Omdat de factuur fouten bevat en niet is aangemaakt is deze pdf niet verstuurd.',
@@ -73,7 +73,7 @@ LONGSTRING
         'mail_subject_concept' => 'Concept invoice sent to Acumulus',
         'mail_subject_test_mode' => 'Invoice sent to Acumulus in test mode',
 
-        'mail_subject_success' => 'succes',
+        'mail_subject_success' => 'success',
         'mail_subject_warning' => 'warning(s)',
         'mail_subject_error' => 'error(s)',
         'mail_subject_exception' => 'serious error',
@@ -86,10 +86,10 @@ LONGSTRING
         'mail_body_errors_not_created' => 'The invoice has not been created in Acumulus. Correct the invoice in your webshop before sending it again.',
         'mail_body_warnings' => 'Warnings on sending an invoice to Acumulus.',
         'mail_body_warnings_created' => 'The invoice has been created, but you have to check, and if necessary correct, it in Acumulus.',
-        'mail_body_success' => 'The invocie below has successfully been sent to Acumulus.',
+        'mail_body_success' => 'The invoice below has successfully been sent to Acumulus.',
 
-        'mail_body_testmode' => 'The invoice has been sent in test mode and thus has not been created.',
-        'mail_body_concept' => 'The invoice has been created as concept. Check the invoice in Acumulus before finalising it. you will find concept invoices at "Overzichten - Conceptfacturen en offertes".',
+        'mail_body_testmode' => 'The invoice has been sent in test mode and thus has not been added to your administration.',
+        'mail_body_concept' => 'The invoice has been created as concept. Check the invoice in Acumulus before finalising it. you will find concept invoices at "Lists - Concept invoices and quotations".',
 
         'mail_body_pdf_enabled' => 'you have Acumulus send the invoice as a pdf to the client.',
         'mail_body_pdf_not_sent_errors' => 'Because the invoice contains errors, this pdf has not been sent.',

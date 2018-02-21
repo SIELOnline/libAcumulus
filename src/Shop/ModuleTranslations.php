@@ -55,7 +55,7 @@ class ModuleTranslations extends TranslationCollection
         'button_cancel' => 'Cancel',
         'button_send' => 'Send',
         'message_config_saved' => 'The settings are saved.',
-        'message_update_failed' => 'The internal upgrade to vesion %s failed. Please contact support, if this message keeps being displayed.',
+        'message_update_failed' => 'The internal upgrade to version %s failed. Please contact support, if this message keeps being displayed.',
         'message_uninstall' => 'Are you sure that you want to delete the configuration settings?',
 
         // Requirements.

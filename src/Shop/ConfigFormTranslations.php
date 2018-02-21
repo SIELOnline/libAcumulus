@@ -46,7 +46,7 @@ class ConfigFormTranslations extends TranslationCollection
         'field_username' => 'Gebruikersnaam',
         'field_password' => 'Wachtwoord',
         'field_emailonerror' => 'E-mail',
-        'desc_emailonerror' => 'Het e-mailadres waarop u geïnformeerd wordt over fouten die zijn opgetreden tijdens het versturen van facturen. Omdat deze module niet kan weten of het vanuit een beheerdersscherm is aangeroepen, zal het geen berichten op het scherm plaatsen. Daarom is het invullen van een e-mailadres verplicht.',
+        'desc_emailonerror' => 'Het e-mailadres waarop u geïnformeerd wordt over fouten die zijn opgetreden tijdens het versturen van facturen. Omdat deze module niet kan weten of het vanuit een beheerscherm is aangeroepen, zal het geen berichten op het scherm plaatsen. Daarom is het invullen van een e-mailadres verplicht.',
 
         'message_validate_contractcode_0' => 'Het veld Contractcode is verplicht, vul de contractcode in die u ook gebruikt om in te loggen op Acumulus.',
         'message_validate_contractcode_1' => 'Het veld Contractcode is een numeriek veld, vul de contractcode in die u ook gebruikt om in te loggen op Acumulus.',
@@ -98,12 +98,12 @@ De eigenschappen die uw webshop kent worden hieronder opgesomd.</p>
 <p>Om speciale situaties aan te kunnen, mogen veldverwijzingen op verschillende manieren samengevoegd worden:</p>
 <ol class="property-list">
 <dt>[property]:</dt><dd>Eenvoudigste vorm, vervang door de waarde van deze eigenschap of method (zonder argumenten).</dd>
-<dt>[property(arguments)]:</dt><dd>Vervang door de waarde die de method property teruggeeft. Als property een method is wordt "arguments" (een komma-gescheiden reeks van argumenten zonder quotes om tekenreeksen heen) meegegeven bij het aanroepen van de method.</dd>
+<dt>[property(arguments)]:</dt><dd>Vervang door de waarde die de method property teruggeeft. Als property een method is wordt "arguments" (een komma-gescheiden reeks van argumenten zonder aanhalingstekens om tekenreeksen heen) meegegeven bij het aanroepen van de method.</dd>
 <dt>[object::property]:</dt><dd>Vervang alleen door de eigenschap als die in het opgegeven object voorkomt (zie de lijst hieronder). Gebruik dit om verwarring te voorkomen als meerdere objecten een eigenschap met dezelfde naam hebben (bv id).</dd>
 <dt>[property1|property2|...]:</dt><dd>Vervang door de waarde van property1 of als deze geen waarde heeft door die van property2, en zo verder. BV: handig om of het mobiele of het vaste telefoonnummer mee te sturen.</dd>
 <dt>[property1+property2+...]:</dt><dd>Vervang door de waarde van property1 en die van property2 en plaats tussen de properties een spatie, maar alleen als de properties niet leeg zijn. BV: handig om de volledige naam, opgebouwd uit voornaam, tussenvoegsel en achternaam, te versturen zonder dat er meerdere spaties in terecht komen.</dd>
 <dt>[property1&property2&...]:</dt><dd>Vervang door de waarde van property1 en die van property2 maar plaats geen spatie tussen de properties.</dd>
-<dt>["letterlijke tekst"]:</dt><dd>Vervang door de letterlijke tekst (zonder quotes) maar alleen als het samengevoegd wordt, middels een + of &, met een andere eigenschap die niet leeg is.</dd>
+<dt>["letterlijke tekst"]:</dt><dd>Vervang door de letterlijke tekst (zonder aanhalingstekens) maar alleen als het samengevoegd wordt, middels een + of &, met een andere eigenschap die niet leeg is.</dd>
 </ol>
 <p><strong>Let op:</strong> in de meeste situaties zal de standaardwaarde goed zijn. Pas deze velden alleen aan in speciale omstandigheden en als u weet wat u doet.</p>
 ',
@@ -121,7 +121,7 @@ De eigenschappen die uw webshop kent worden hieronder opgesomd.</p>
         'or' => 'of',
         'see_class_more' => 'zie de class %1$s voor mogelijke andere properties en methods die als veldverwijzing gebruikt kunnen worden',
         'see_classes_more' => 'zie de classes %1$s voor mogelijke andere properties en methods die als veldverwijzing gebruikt kunnen worden',
-        'see_table_more' => 'zie de tabel %1$s voor mogelijke andere velden die als token gebruikt kunnen worden',
+        'see_table_more' => 'zie de tabel %1$s voor mogelijke andere velden die als veldverwijzing gebruikt kunnen worden',
         'see_tables_more' => 'zie de tabellen %1$s voor mogelijke andere velden die als veldverwijzing gebruikt kunnen worden',
         'see_above' => 'zie hierboven.',
         'original_order_for_refund' => 'Oorspronkelijke bestelling, alleen beschikbaar bij credit nota\'s',
@@ -208,7 +208,7 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'field_defaultInvoiceTemplate' => 'Factuur-sjabloon (niet betaald)',
         'field_defaultInvoicePaidTemplate' => 'Factuur-sjabloon (betaald)',
         'option_same_template' => 'Zelfde sjabloon als voor niet betaald',
-        'desc_defaultInvoiceTemplate' => 'Maakt u binnen Acumulus gebruik van meerdere factuur-sjablonen en wilt u de facturen uit uw webwinkel met een specifieke factuursjabloon printen, kies dan hier de factuur-sjablonen voor niet betaalde respectievelijk betaalde bestellingen.',
+        'desc_defaultInvoiceTemplate' => 'Maakt u binnen Acumulus gebruik van meerdere factuur-sjablonen en wilt u de facturen uit uw webwinkel met een specifieke factuur-sjabloon printen, kies dan hier de factuur-sjablonen voor niet betaalde respectievelijk betaalde bestellingen.',
 
         'field_concept' => 'Concept',
         'desc_concept' => 'Geef aan hoe de factuur verstuurd moet worden. De 1e optie zal normaal gesproken voldoen. Echter, als u uw facturen altijd als concept wil versturen, kies dan de 3e optie. De 2e optie zou eigenlijk niet gekozen moeten worden, tenzij de waarschuwingen altijd onterecht blijken.',
@@ -539,7 +539,7 @@ If you unchecked the first option, the second option only applies to business cl
         'field_nature' => 'Nature',
         'desc_nature' => 'The nature of the  article sold. This can be either "Product" or "Service". If this shop only sells products or only services, you can fill that in here. If you sell both and you store this as a property for all articles in your catalog you can use a field reference to use that property.',
         'field_costPrice' => 'Cost price',
-        'desc_costPrice' => 'The cost price of this article. This is only used om margin invoices.',
+        'desc_costPrice' => 'The cost price of this article. This is only used on margin invoices.',
 
         // Options settings.
         'optionsSettingsHeader' => 'Options or variants',
@@ -578,10 +578,10 @@ If you unchecked the first option, the second option only applies to business cl
 
         'field_emailAsPdf' => 'Enable the feature',
         'option_emailAsPdf' => 'Have Acumulus send the invoice as PDF.',
-        'desc_emailAsPdf' => 'If you check this option, you can use the other options below to configure the emails to your preferences. However, to configure the text in the mail body, go to Acumulus to "Beheer - Factuur-sjablonen".',
+        'desc_emailAsPdf' => 'If you check this option, you can use the other options below to configure the emails to your preferences. However, to configure the text in the mail body, go to Acumulus to "Settings » Invoice templates".',
 
         'field_emailTo' => 'To',
-        'desc_emailTo' => 'The email address to send the invopice to. If yo leave this empty the email address from the invoice\'s customer data will be used. We recommend you to leave this empty. You may enter multiple email addresses separated by a comma (,) or a semi-colon (;).',
+        'desc_emailTo' => 'The email address to send the invoice to. If you leave this empty the email address from the invoice\'s customer data will be used. We recommend you to leave this empty. You may enter multiple email addresses separated by a comma (,) or a semi-colon (;).',
         'message_validate_email_5' => 'The field To is not a valid e-mail address, please fill in a valid e-mail address.',
 
         'field_subject' => 'Subject',

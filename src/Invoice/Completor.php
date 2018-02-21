@@ -103,6 +103,9 @@ class Completor
     /** @var array */
     protected $incompleteValues;
 
+    /** @var (string|int)[][] */
+    protected $lineTotalsStates;
+
     /**
      * Constructor.
      *
@@ -185,8 +188,8 @@ class Completor
         // Check if we are missing an amount and, if so, add a line for it.
         $this->completeLineTotals();
         $areTotalsEqual = $this->areTotalsEqual();
-        if (!$areTotalsEqual) {
-            $this->addMissingAmountLine($areTotalsEqual);
+        if ($areTotalsEqual === false) {
+            $this->addMissingAmountLine();
         }
 
         // Complete strategy lines: those lines that have to be completed based
@@ -443,7 +446,11 @@ class Completor
         $linesAmount = 0.0;
         $linesAmountInc = 0.0;
         $linesVatAmount = 0.0;
-        $this->incompleteValues = array();
+        $this->lineTotalsStates = array(
+            'incomplete' => array(),
+            'equal' => array(),
+            'differ' => array(),
+        );
 
         $invoiceLines = $this->invoice[Tag::Customer][Tag::Invoice][Tag::Line];
         foreach ($invoiceLines as $line) {
@@ -452,7 +459,7 @@ class Completor
             } elseif (isset($line[Tag::UnitPrice])) {
                 $linesAmount += $line[Tag::Quantity] * $line[Tag::UnitPrice];
             } else {
-                $this->incompleteValues[Meta::LinesAmount ] = Meta::LinesAmount ;
+                $this->lineTotalsStates['incomplete'][Meta::LinesAmount] = Meta::LinesAmount;
             }
 
             if (isset($line[Meta::LineAmountInc])) {
@@ -460,7 +467,7 @@ class Completor
             } elseif (isset($line[Meta::UnitPriceInc])) {
                 $linesAmountInc += $line[Tag::Quantity] * $line[Meta::UnitPriceInc];
             } else {
-                $this->incompleteValues[Meta::LinesAmountInc] = Meta::LinesAmountInc;
+                $this->lineTotalsStates['incomplete'][Meta::LinesAmountInc] = Meta::LinesAmountInc;
             }
 
             if (isset($line[Meta::LineVatAmount])) {
@@ -468,16 +475,16 @@ class Completor
             } elseif (isset($line[Meta::VatAmount])) {
                 $linesVatAmount += $line[Tag::Quantity] * $line[Meta::VatAmount];
             } else {
-                $this->incompleteValues[Meta::LinesVatAmount] = Meta::LinesVatAmount;
+                $this->lineTotalsStates['incomplete'][Meta::LinesVatAmount] = Meta::LinesVatAmount;
             }
         }
 
         $this->invoice[Tag::Customer][Tag::Invoice][Meta::LinesAmount ] = $linesAmount;
         $this->invoice[Tag::Customer][Tag::Invoice][Meta::LinesAmountInc] = $linesAmountInc;
         $this->invoice[Tag::Customer][Tag::Invoice][Meta::LinesVatAmount] = $linesVatAmount;
-        if (!empty($this->incompleteValues)) {
-            sort($this->incompleteValues);
-            $this->invoice[Tag::Customer][Tag::Invoice][Meta::LinesIncomplete] = implode(',', $this->incompleteValues);
+        if (!empty($this->lineTotalsStates['incomplete'])) {
+            sort($this->lineTotalsStates['incomplete']);
+            $this->invoice[Tag::Customer][Tag::Invoice][Meta::LinesIncomplete] = implode(',', $this->lineTotalsStates['incomplete']);
         }
     }
 
@@ -488,7 +495,6 @@ class Completor
      * (except for a 0 VAT amount (for reversed VAT invoices)). This because in
      * many cases 1 or 2 of the 3 values are either incomplete or incorrect.
      *
-     * @todo: if 1 is correct but other not, that would be an indication of an error: warn?
      * @return bool|null
      *   True if the totals are equal, false if not equal, null if undecided (all
      *   3 values are incomplete).
@@ -496,107 +502,138 @@ class Completor
     protected function areTotalsEqual()
     {
         $invoice = $this->invoice[Tag::Customer][Tag::Invoice];
-        if (!in_array(Meta::LinesAmount , $this->incompleteValues) && Number::floatsAreEqual($invoice[Meta::InvoiceAmount], $invoice[Meta::LinesAmount ], 0.05)) {
-            return true;
+        if (!in_array(Meta::LinesAmount, $this->lineTotalsStates['incomplete'])) {
+            if (Number::floatsAreEqual($invoice[Meta::InvoiceAmount], $invoice[Meta::LinesAmount], 0.05)) {
+                $this->lineTotalsStates['equal'][Meta::LinesAmount] = Meta::InvoiceAmount;
+            } else {
+                $this->lineTotalsStates['differ'][Meta::LinesAmount] = $invoice[Meta::InvoiceAmount] - $invoice[Meta::LinesAmount];
+            }
         }
-        if (!in_array(Meta::LinesAmountInc, $this->incompleteValues) && Number::floatsAreEqual($invoice[Meta::InvoiceAmountInc], $invoice[Meta::LinesAmountInc], 0.05)) {
-            return true;
+        if (!in_array(Meta::LinesAmountInc, $this->lineTotalsStates['incomplete'])) {
+            if (Number::floatsAreEqual($invoice[Meta::InvoiceAmountInc], $invoice[Meta::LinesAmountInc], 0.05)) {
+                $this->lineTotalsStates['equal'][Meta::LinesAmountInc] = Meta::InvoiceAmountInc;
+            } else {
+                $this->lineTotalsStates['differ'][Meta::LinesAmountInc] = $invoice[Meta::InvoiceAmountInc] - $invoice[Meta::LinesAmountInc];
+            }
         }
-        if (!in_array(Meta::LinesVatAmount, $this->incompleteValues)
-            && Number::floatsAreEqual($invoice[Meta::InvoiceVatAmount], $invoice[Meta::LinesVatAmount], 0.05)
-            && !Number::isZero($invoice[Meta::InvoiceVatAmount])
-        ) {
-            return true;
+        if (!in_array(Meta::LinesVatAmount, $this->lineTotalsStates['incomplete'])) {
+            if (Number::floatsAreEqual($invoice[Meta::InvoiceVatAmount], $invoice[Meta::LinesVatAmount], 0.05)) {
+                $this->lineTotalsStates['equal'][Meta::LinesVatAmount] = Meta::InvoiceVatAmount;
+            } else {
+                $this->lineTotalsStates['differ'][Meta::LinesVatAmount] = $invoice[Meta::InvoiceVatAmount] - $invoice[Meta::LinesVatAmount];
+            }
         }
-        return count($this->incompleteValues) === 3 ? null : false;
+
+        $equal = count($this->lineTotalsStates['equal']);
+        $differ = count($this->lineTotalsStates['differ']);
+
+        if ($differ > 0) {
+            $result = false;
+        } elseif ($equal > 0) {
+            // If only the vat amounts are equal, while the vat amount = 0, we
+            // cannot decide that the totals are equal because this appears to
+            // be a vat free/reversed vat invoice without any vatamount.
+            $result = $equal === 1 && array_key_exists(Meta::InvoiceVatAmount, $this->lineTotalsStates['differ']) && Number::isZero($invoice[Meta::LinesVatAmount])
+                ? null
+                : true;
+        } else {
+            // No equal amounts nor different amounts found: undecided.
+            $result = null;
+        }
+        return $result;
     }
 
     /**
-     * Adds an invoice line if the total amount (meta-invoice-amount) is not
-     * matching the total amount of the lines.
+     * Adds an invoice line if the order amount differs from the lines total.
      *
-     * This can happen if:
-     * - we missed a fee that is stored in custom fields
-     * - a manual adjustment
-     * - an error in the logic or data as provided by the webshop.
+     * Besides the line we also add a warning and change the invoice to a
+     * concept.
+     *
+     * The amounts can differ if e.g:
+     * - we missed a fee that is stored in custom fields of a not (yet)
+     *   supported 3rd party plugin
+     * - a manual adjustment that is not separately stored
+     * - an error in this plugin's logic
+     * - an error in the data as provided by the webshop
      *
      * However, we can only add this line if we have at least 2 complete values,
-     * that is, there are no strategy lines,
+     * that is, there are no strategy lines.
      *
-     * @param bool|null $areTotalsEqualResult
-     *   Result of areTotalsEqual() (false or null)
+     * PRECONDITION: areTotalsEqual() returned false;
      */
-    protected function addMissingAmountLine($areTotalsEqualResult)
+    protected function addMissingAmountLine()
     {
         $invoice = &$this->invoice[Tag::Customer][Tag::Invoice];
-        if (!in_array(Meta::LinesAmount , $this->incompleteValues)) {
-            $missingAmount = $invoice[Meta::InvoiceAmount] - $invoice[Meta::LinesAmount ];
-        }
-        if (!in_array(Meta::LinesAmountInc, $this->incompleteValues)) {
-            $missingAmountInc = $invoice[Meta::InvoiceAmountInc] - $invoice[Meta::LinesAmountInc];
-        }
-        if (!in_array(Meta::LinesVatAmount, $this->incompleteValues)) {
-            $missingVatAmount = $invoice[Meta::InvoiceVatAmount] - $invoice[Meta::LinesVatAmount];
-        }
 
-        if (count($this->incompleteValues) <= 1) {
-            if (!isset($missingAmount)) {
-                /** @noinspection PhpUndefinedVariableInspection */
-                $missingAmount = $missingAmountInc - $missingVatAmount;
+        $incomplete = count($this->lineTotalsStates['incomplete']);
+        if ($incomplete <= 1) {
+            // NOTE: $incomplete <= 1 IMPLIES $equal + $differ >= 2
+            // We want to use the differences in amount and vat amount. Check if
+            // they are available, if not compute them based on data that is
+            // available.
+            if (array_key_exists(Meta::LinesAmount, $this->lineTotalsStates['equal'])) {
+                $this->lineTotalsStates['differ'][Meta::LinesAmount] = 0;
             }
-            if (!isset($missingVatAmount)) {
-                /** @noinspection PhpUndefinedVariableInspection */
-                $missingVatAmount = $missingAmountInc - $missingAmount;
+            if (array_key_exists(Meta::LinesAmountInc, $this->lineTotalsStates['equal'])) {
+                $this->lineTotalsStates['differ'][Meta::LinesAmountInc] = 0;
+            }
+            if (array_key_exists(Meta::LinesVatAmount, $this->lineTotalsStates['equal'])) {
+                $this->lineTotalsStates['differ'][Meta::LinesVatAmount] = 0;
+            }
+            // NOW HOLDS: $differ >= 2
+            if (!array_key_exists(Meta::LinesAmount, $this->lineTotalsStates['differ'])) {
+                $this->lineTotalsStates['differ'][Meta::LinesAmount] = $this->lineTotalsStates['differ'][Meta::LinesAmountInc] - $this->lineTotalsStates['differ'][Meta::LinesVatAmount];
+            }
+            if (!array_key_exists(Meta::LinesVatAmount, $this->lineTotalsStates['differ'])) {
+                $this->lineTotalsStates['differ'][Meta::LinesVatAmount] = $this->lineTotalsStates['differ'][Meta::LinesAmountInc] - $this->lineTotalsStates['differ'][Meta::LinesAmount];
             }
 
-            $settings = $this->config->getInvoiceSettings();
-            if ($settings['addMissingAmountLine']) {
-                if ($this->source->getType() === Source::CreditNote) {
-                    $product = $this->t('refund_adjustment');
-                } elseif ($missingAmount < 0.0) {
-                    $product = $this->t('discount_adjustment');
-                } else {
-                    $product = $this->t('fee_adjustment');
-                }
-                $countLines = count($invoice[Tag::Line]);
-                $line = array(
-                        Tag::Product => $product,
-                        Tag::Quantity => 1,
-                        Tag::UnitPrice => $missingAmount,
-                        Meta::VatAmount => $missingVatAmount,
-                    ) + Creator::getVatRangeTags($missingVatAmount, $missingAmount, $countLines * 0.02, $countLines * 0.02)
-                    + array(
-                        Meta::LineType => Creator::LineType_Corrector,
-                    );
-                // Correct and add this line.
-                if ($line[Meta::VatRateSource] === Creator::VatRateSource_Calculated) {
-                    $line = $this->LineCompletor->correctVatRateByRange($line);
-                }
-                $invoice[Tag::Line][] = $line;
+            // Create line.
+            $missingAmount = $this->lineTotalsStates['differ'][Meta::LinesAmount];
+            $missingVatAmount = $this->lineTotalsStates['differ'][Meta::LinesVatAmount];
+            $countLines = count($invoice[Tag::Line]);
+            if ($this->source->getType() === Source::CreditNote) {
+                $product = $this->t('refund_adjustment');
+            } elseif ($this->lineTotalsStates['differ'][Meta::LinesAmount] < 0.0) {
+                $product = $this->t('discount_adjustment');
             } else {
-                // Add some diagnostic info to the message sent.
-                // @todo: this could/should be turned into a warning (after some testing).
-                /** @noinspection PhpUndefinedVariableInspection */
-                $invoice[Meta::MissingAmount] = "Ex: $missingAmount, Inc: $missingAmountInc, VAT: $missingVatAmount";
+                $product = $this->t('fee_adjustment');
             }
+
+            $line = array(
+                    Tag::Product => $product,
+                    Tag::Quantity => 1,
+                    Tag::UnitPrice => $missingAmount,
+                    Meta::VatAmount => $missingVatAmount,
+                ) + Creator::getVatRangeTags($missingVatAmount, $missingAmount, $countLines * 0.02, $countLines * 0.02)
+                    + array(
+                    Meta::LineType => Creator::LineType_Corrector,
+                );
+            // Correct and add this line (round of correcting has already been executed).
+            if ($line[Meta::VatRateSource] === Creator::VatRateSource_Calculated) {
+                $line = $this->LineCompletor->correctVatRateByRange($line);
+            }
+            $invoice[Tag::Line][] = $line;
+
+            // Add warning.
+            $this->changeInvoiceToConcept('message_warning_missing_amount_added', 809, $missingAmount, $missingVatAmount);
         } else {
-            if ($areTotalsEqualResult === false) {
-                // Due to lack of information, we cannot add a missing line, even though
-                // we know we are missing something ($areTotalsEqualResult is false, not
-                // null). Add some diagnostic info to the message sent.
-                // @todo: this could/should be turned into a warning (after some testing).
-                $invoice[Meta::MissingAmount] = array();
-                if (isset($missingAmount)) {
-                    $invoice[Meta::MissingAmount][] = "Ex: $missingAmount";
-                }
-                if (isset($missingAmountInc)) {
-                    $invoice[Meta::MissingAmount][] = "Inc: $missingAmountInc";
-                }
-                if (isset($missingVatAmount)) {
-                    $invoice[Meta::MissingAmount][] = "VAT: $missingVatAmount";
-                }
-                $invoice[Meta::MissingAmount] = implode(', ', $invoice[Meta::MissingAmount]);
+            // Due to lack of information, we cannot add a missing line, even though
+            // we know we are missing something: just add a warning.
+            if (array_key_exists(Meta::LinesAmount, $this->lineTotalsStates['differ'])) {
+                $missing = $this->lineTotalsStates['differ'][Meta::LinesAmount];
+                $missingField = $this->t('amount_ex');
             }
+            if (array_key_exists(Meta::LinesAmountInc, $this->lineTotalsStates['differ'])) {
+                $missing = $this->lineTotalsStates['differ'][Meta::LinesAmountInc];
+                $missingField = $this->t('amount_inc');
+            }
+            if (array_key_exists(Meta::LinesVatAmount, $this->lineTotalsStates['differ'])) {
+                $missing = $this->lineTotalsStates['differ'][Meta::LinesVatAmount];
+                $missingField = $this->t('amount_vat');
+            }
+            /** @noinspection PhpUndefinedVariableInspection */
+            $this->changeInvoiceToConcept('message_warning_missing_amount_not_added', 810, $missingField, $missing);
         }
     }
 
@@ -1131,6 +1168,10 @@ class Completor
     {
         if ($messageKey !== '') {
             $message = $this->t($messageKey);
+            if (func_num_args() > 2) {
+                $args = func_get_args();
+                $message = vsprintf($message, array_slice($args, 2));
+            }
             $emailAsPdfSettings = $this->config->getEmailAsPdfSettings();
             if ($emailAsPdfSettings['emailAsPdf']) {
                 $message .= ' ' . $this->t('message_warning_no_pdf');

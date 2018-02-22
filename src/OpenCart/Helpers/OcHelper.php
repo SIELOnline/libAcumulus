@@ -423,13 +423,13 @@ class OcHelper
             }
 
             // Install tables.
-            if ($result = $this->container->getAcumulusEntryModel()->install()) {
+            if ($result = $this->container->getAcumulusEntryManager()->install()) {
                 $setting['acumulus_siel_datamodel_version'] = '4.0';
                 $this->registry->model_setting_setting->editSetting('acumulus_siel', $setting);
             }
         } elseif (version_compare($currentDataModelVersion, '4.4', '<')) {
             // Update table columns.
-            if ($result = $this->container->getAcumulusEntryModel()->upgrade('4.4.0')) {
+            if ($result = $this->container->getAcumulusEntryManager()->upgrade('4.4.0')) {
                 $setting['acumulus_siel_datamodel_version'] = '4.4';
                 $this->registry->model_setting_setting->editSetting('acumulus_siel', $setting);
             }
@@ -453,7 +453,7 @@ class OcHelper
      */
     protected function doUninstall()
     {
-        $this->container->getAcumulusEntryModel()->uninstall();
+        $this->container->getAcumulusEntryManager()->uninstall();
 
         // Delete all config values.
         $this->registry->load->model('setting/setting');

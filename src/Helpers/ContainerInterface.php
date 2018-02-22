@@ -177,9 +177,9 @@ interface ContainerInterface
     public function getManager();
 
     /**
-     * @return \Siel\Acumulus\Shop\AcumulusEntryModel
+     * @return \Siel\Acumulus\Shop\AcumulusEntryManager
      */
-    public function getAcumulusEntryModel();
+    public function getAcumulusEntryManager();
 
     /**
      * Returns an instance of the given class.
@@ -209,7 +209,6 @@ interface ContainerInterface
      * @return object
      *
      * @throws \InvalidArgumentException
-     * @throws \ReflectionException
      */
     public function getInstance($class, $subNamespace, array $constructorArgs = array(), $newInstance = false);
 }

@@ -3,16 +3,16 @@ namespace Siel\Acumulus\Magento\Magento2\Shop;
 
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Magento\Magento2\Helpers\Registry;
-use Siel\Acumulus\Magento\Shop\AcumulusEntryModel as BaseAcumulusEntryModel;
+use Siel\Acumulus\Magento\Shop\AcumulusEntryManager as BaseAcumulusEntryManager;
 
 /**
  * Implements Magento 2 specific methods for the acumulus entry model class.
  */
-class AcumulusEntryModel extends BaseAcumulusEntryModel
+class AcumulusEntryManager extends BaseAcumulusEntryManager
 {
 
     /**
-     * AcumulusEntryModel constructor.
+     * AcumulusEntryManager constructor.
      *
      * @param \Siel\Acumulus\Helpers\Log $log
      */

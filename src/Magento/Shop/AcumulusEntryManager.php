@@ -1,7 +1,7 @@
 <?php
 namespace Siel\Acumulus\Magento\Shop;
 
-use Siel\Acumulus\Shop\AcumulusEntryModel as BaseAcumulusEntryModel;
+use Siel\Acumulus\Shop\AcumulusEntryManager as BaseAcumulusEntryManager;
 
 /**
  * Implements the Magento specific acumulus entry model class.
@@ -9,7 +9,7 @@ use Siel\Acumulus\Shop\AcumulusEntryModel as BaseAcumulusEntryModel;
  * This class is a bridge between the Acumulus library and the way that Magento
  * models are modelled.
  */
-class AcumulusEntryModel extends BaseAcumulusEntryModel
+class AcumulusEntryManager extends BaseAcumulusEntryManager
 {
     /** @var \Siel_Acumulus_Model_Entry|\Siel\AcumulusMa2\Model\Entry */
     protected $model;

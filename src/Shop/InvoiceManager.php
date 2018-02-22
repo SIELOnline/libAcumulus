@@ -77,13 +77,13 @@ abstract class InvoiceManager
     }
 
     /**
-     * Returns an AcumulusEntryModel instance.
+     * Returns an AcumulusEntryManager instance.
      *
-     * @return \Siel\Acumulus\Shop\AcumulusEntryModel
+     * @return \Siel\Acumulus\Shop\AcumulusEntryManager
      */
-    protected function getAcumulusEntryModel()
+    protected function getAcumulusEntryManager()
     {
-        return $this->container->getAcumulusEntryModel();
+        return $this->container->getAcumulusEntryManager();
     }
 
     /**
@@ -374,7 +374,7 @@ abstract class InvoiceManager
     {
         if ($this->isTestMode()) {
             $result->setSendStatus(Result::Sent_TestMode);
-        } elseif (!$this->getAcumulusEntryModel()->getByInvoiceSource($invoiceSource)) {
+        } elseif (!$this->getAcumulusEntryManager()->getByInvoiceSource($invoiceSource)) {
             $result->setSendStatus(Result::Sent_New);
         } elseif ($forceSend) {
             $result->setSendStatus(Result::Sent_Forced);
@@ -446,29 +446,29 @@ abstract class InvoiceManager
         // if we are going to overwrite an existing entry, we want to delete
         // that from Acumulus upon success.
         $deleteOldEntry = false;
-        $acumulusEntryModel = $this->getAcumulusEntryModel();
+        $acumulusEntryManager = $this->getAcumulusEntryManager();
         if ($result->getSendStatus() === Result::Sent_Forced) {
-            $oldEntry = $acumulusEntryModel->getByInvoiceSource($invoiceSource);
+            $oldEntry = $acumulusEntryManager->getByInvoiceSource($invoiceSource);
         }
 
         // Check if an entryid was created and store entry id and token.
         $newEntry = $result->getResponse();
         if (!empty($newEntry['entryid'])) {
-            $deleteOldEntry = (bool) $acumulusEntryModel->save($invoiceSource, $newEntry['entryid'], $newEntry['token']);
+            $deleteOldEntry = (bool) $acumulusEntryManager->save($invoiceSource, $newEntry['entryid'], $newEntry['token']);
         } else {
             // If the invoice was sent as a concept, no entryid will be returned
             // but we still want to prevent sending it again: check for the
             // concept status, the absence of errors and non test-mode.
             $isConcept = $invoice[Tag::Customer][Tag::Invoice]['concept'] == Api::Concept_Yes;
             if ($isConcept && !$result->hasError() && !$this->isTestMode()) {
-                $deleteOldEntry = (bool) $acumulusEntryModel->save($invoiceSource, null, null);
+                $deleteOldEntry = (bool) $acumulusEntryManager->save($invoiceSource, null, null);
             }
         }
 
         // Delete if there is an old entry and we successfully saved the new entry.
         if ($deleteOldEntry && isset($oldEntry)) {
             // But only if the old entry was not a concept as concepts cannot be deleted.
-            $entryId = $acumulusEntryModel->getField($oldEntry, $acumulusEntryModel::$keyEntryId);
+            $entryId = $acumulusEntryManager->getField($oldEntry, $acumulusEntryManager::$keyEntryId);
             if (!empty($entryId)) {
                 $deleteResult = $this->getService()->setDeleteStatus($entryId, API::Entry_Delete);
                 if ($deleteResult->hasMessages()) {

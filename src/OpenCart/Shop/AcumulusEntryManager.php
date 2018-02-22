@@ -4,7 +4,7 @@ namespace Siel\Acumulus\OpenCart\Shop;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
-use Siel\Acumulus\Shop\AcumulusEntryModel as BaseAcumulusEntryModel;
+use Siel\Acumulus\Shop\AcumulusEntryManager as BaseAcumulusEntryManager;
 
 /**
  * Implements the OpenCart specific acumulus entry model class.
@@ -13,13 +13,13 @@ use Siel\Acumulus\Shop\AcumulusEntryModel as BaseAcumulusEntryModel;
  * returned here are an array of all metadata values, thus not filtered by
  * Acumulus keys.
  */
-class AcumulusEntryModel extends BaseAcumulusEntryModel
+class AcumulusEntryManager extends BaseAcumulusEntryManager
 {
     /** @var string */
     protected $tableName;
 
     /**
-     * AcumulusEntryModel constructor.
+     * AcumulusEntryManager constructor.
      *
      * @param \Siel\Acumulus\Helpers\Log $log
      */

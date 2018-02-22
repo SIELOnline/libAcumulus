@@ -5,12 +5,12 @@ use DateTimeZone;
 use JDate;
 use JFactory;
 use JTable;
-use Siel\Acumulus\Shop\AcumulusEntryModel as BaseAcumulusEntryModel;
+use Siel\Acumulus\Shop\AcumulusEntryManager as BaseAcumulusEntryManager;
 
 /**
  * Implements the VirtueMart specific acumulus entry model class.
  */
-class AcumulusEntryModel extends BaseAcumulusEntryModel
+class AcumulusEntryManager extends BaseAcumulusEntryManager
 {
     /**
      * @return \AcumulusTableAcumulusEntry
@@ -19,7 +19,7 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
     {
         $table = JTable::getInstance('AcumulusEntry', 'AcumulusTable');
         if ($table === false) {
-            $this->log->error('AcumulusEntryModel::newTable(): table not created');
+            $this->log->error('AcumulusEntryManager::newTable(): table not created');
         }
         return $table;
     }

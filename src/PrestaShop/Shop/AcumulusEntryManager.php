@@ -4,7 +4,7 @@ namespace Siel\Acumulus\PrestaShop\Shop;
 use Db;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\PrestaShop\Invoice\Source;
-use Siel\Acumulus\Shop\AcumulusEntryModel as BaseAcumulusEntryModel;
+use Siel\Acumulus\Shop\AcumulusEntryManager as BaseAcumulusEntryManager;
 
 /**
  * Implements the PrestaShop specific acumulus entry model class.
@@ -13,7 +13,7 @@ use Siel\Acumulus\Shop\AcumulusEntryModel as BaseAcumulusEntryModel;
  * returned here are an array of all metadata values, thus not filtered by
  * Acumulus keys.
  */
-class AcumulusEntryModel extends BaseAcumulusEntryModel
+class AcumulusEntryManager extends BaseAcumulusEntryManager
 {
     static public $keyEntryId = 'id_entry';
 
@@ -21,7 +21,7 @@ class AcumulusEntryModel extends BaseAcumulusEntryModel
     protected $tableName;
 
     /**
-     * AcumulusEntryModel constructor.
+     * AcumulusEntryManager constructor.
      *
      * @param \Siel\Acumulus\Helpers\Log $log
      */

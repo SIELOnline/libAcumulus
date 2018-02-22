@@ -21,7 +21,7 @@ use Siel\Acumulus\Helpers\Log;
  * - Update payment status
  * - Resend Acumulus invoice PDF.
  */
-abstract class AcumulusEntryModel
+abstract class AcumulusEntryManager
 {
     // Access to the fields, differs per webshop as we followed db naming
     // conventions from the webshop.
@@ -36,7 +36,7 @@ abstract class AcumulusEntryModel
     protected $log;
 
     /**
-     * AcumulusEntryModel constructor.
+     * AcumulusEntryManager constructor.
      *
      * @param \Siel\Acumulus\Helpers\Log $log
      */

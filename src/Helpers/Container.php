@@ -311,9 +311,9 @@ class Container implements ContainerInterface
     /**
      * {@inheritdoc}
      */
-    public function getAcumulusEntryModel()
+    public function getAcumulusEntryManager()
     {
-        return $this->getInstance('AcumulusEntryModel', 'Shop', array($this->getLog()));
+        return $this->getInstance('AcumulusEntryManager', 'Shop', array($this->getLog()));
     }
 
     /**
@@ -375,6 +375,7 @@ class Container implements ContainerInterface
             if (empty($constructorArgs)) {
                 $this->instances[$class] = new $fqClass();
             } else {
+                /** @noinspection PhpUnhandledExceptionInspection */
                 $reflector = new ReflectionClass($fqClass);
                 $this->instances[$class] = $reflector->newInstanceArgs($constructorArgs);
             }

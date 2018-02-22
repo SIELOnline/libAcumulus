@@ -19,9 +19,10 @@ WC3 = WooCommerce 3 (WordPress)
 
 5.2.0 (2018-02-??)
 ------------------
+- ALL: Rename AcumulusEntryModel naar AcumulusEntryManager.
 - ALL: Als er een bedrag mist wordt er nu een waarschuwing en, indien mogelijk,
-  een correctieregel toegvoegd. Dit kan gbeuren als bv eenbetaalmodule die
-  (nog) niet door ons ondersteund wordt, een betaalfee toevoegt.
+  een correctieregel toegvoegd. Dit kan gebeuren als bv een betaalmodule die
+  (nog) niet door ons wordt ondersteund een betaalfee toevoegt.
 - ALL: een 0-factuur kon bij een aantal shops leiden tot een onterechte
   waarschuwing en dus een concept-factuur. Deze situatie wordt nu beter
   aangepakt waardoor de waarschuwing niet meer gegeven zal worden.

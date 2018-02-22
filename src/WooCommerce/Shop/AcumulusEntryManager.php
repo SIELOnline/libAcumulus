@@ -1,7 +1,7 @@
 <?php
 namespace Siel\Acumulus\WooCommerce\Shop;
 
-use Siel\Acumulus\Shop\AcumulusEntryModel as BaseAcumulusEntryModel;
+use Siel\Acumulus\Shop\AcumulusEntryManager as BaseAcumulusEntryManager;
 use Siel\Acumulus\Invoice\Source;
 
 /**
@@ -10,7 +10,7 @@ use Siel\Acumulus\Invoice\Source;
  * In WordPress this data is stored as metadata. As such, the "records" returned
  * here are an array of all metadata values, thus not filtered by Acumulus keys.
  */
-class AcumulusEntryModel extends BaseAcumulusEntryModel
+class AcumulusEntryManager extends BaseAcumulusEntryManager
 {
     static public $keyEntryId = '_acumulus_entry_id';
     static public $keyToken = '_acumulus_token';

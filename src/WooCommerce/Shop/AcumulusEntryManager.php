@@ -2,6 +2,7 @@
 namespace Siel\Acumulus\WooCommerce\Shop;
 
 use Siel\Acumulus\Shop\AcumulusEntryManager as BaseAcumulusEntryManager;
+use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
 use Siel\Acumulus\Invoice\Source;
 
 /**
@@ -53,20 +54,14 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
             'meta_compare' => '=',
         );
         $posts = query_posts($metaQuery);
-        if (!empty($posts)) {
-            $result = array();
-            foreach ($posts as $post) {
-                $result1 = get_post_meta($post->id);
-                $result1[static::$keySourceType] = $this->shopTypeToSourceType($post->post_type);
-                $result[] = $result1;
-            }
-            if (count($result) === 1) {
-                $result = reset($result);
-            }
-        } else {
-            $result = null;
+        $result = array();
+        foreach ($posts as $post) {
+            $result1 = get_post_meta($post->id);
+            $result1[static::$keySourceType] = $this->shopTypeToSourceType($post->post_type);
+            $result1[static::$keySourceId] = $post->id;
+            $result[] = $result1;
         }
-        return $result;
+        return $this->convertDbResultToAcumulusEntries($result);
     }
 
     /**
@@ -81,8 +76,9 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
             if (array_key_exists(static::$keyEntryId, $result)) {
                 // Acumulus meta data found: add source id and type as these are not stored in
                 // the meta data.
-                $result[static::$keySourceId] = $invoiceSourceId;
                 $result[static::$keySourceType] = $invoiceSourceType;
+                $result[static::$keySourceId] = $invoiceSourceId;
+                $result = $this->container->getAcumulusEntry($result);
             } else {
                 $result = null;
             }
@@ -118,7 +114,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    protected function update($record, $entryId, $token, $updated)
+    protected function update(BaseAcumulusEntry $record, $entryId, $token, $updated)
     {
         throw new \BadMethodCallException(__METHOD__ . ' not implemented');
     }
@@ -129,18 +125,6 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     protected function sqlNow()
     {
         return current_time('timestamp', true);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getField($record, $field)
-    {
-        $result = parent::getField($record, $field);
-        if (is_array($result)) {
-            $result = reset($result);
-        }
-        return $result;
     }
 
     /**

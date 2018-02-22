@@ -2,9 +2,11 @@
 namespace Siel\Acumulus\PrestaShop\Shop;
 
 use Db;
+use Siel\Acumulus\Helpers\ContainerInterface;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\PrestaShop\Invoice\Source;
 use Siel\Acumulus\Shop\AcumulusEntryManager as BaseAcumulusEntryManager;
+use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
 
 /**
  * Implements the PrestaShop specific acumulus entry model class.
@@ -15,19 +17,15 @@ use Siel\Acumulus\Shop\AcumulusEntryManager as BaseAcumulusEntryManager;
  */
 class AcumulusEntryManager extends BaseAcumulusEntryManager
 {
-    static public $keyEntryId = 'id_entry';
-
     /** @var string */
     protected $tableName;
 
     /**
-     * AcumulusEntryManager constructor.
-     *
-     * @param \Siel\Acumulus\Helpers\Log $log
+     * {@inheritdoc}
      */
-    public function __construct(Log $log)
+    public function __construct(ContainerInterface $container, Log $log)
     {
-        parent::__construct($log);
+        parent::__construct($container, $log);
         $this->tableName = _DB_PREFIX_ . 'acumulus_entry';
     }
 
@@ -38,8 +36,9 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     {
         $operator = $entryId === null ? 'is' : '=';
         $entryId = $entryId === null ? 'null' : (string) (int) $entryId;
+        /** @noinspection PhpUnhandledExceptionInspection */
         $result = Db::getInstance()->executeS("SELECT * FROM `{$this->tableName}` WHERE id_entry $operator $entryId");
-        return empty($result) ? null : (count($result) === 1 ? reset($result) : $result);
+        return $this->convertDbResultToAcumulusEntries($result);
     }
 
     /**
@@ -47,8 +46,9 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      */
     public function getByInvoiceSourceId($invoiceSourceType, $invoiceSourceId)
     {
+        /** @noinspection PhpUnhandledExceptionInspection */
         $result = Db::getInstance()->executeS("SELECT * FROM `{$this->tableName}` WHERE source_type = '$invoiceSourceType' AND source_id = $invoiceSourceId");
-        return count($result) === 1 ? reset($result) : null;
+        return $this->convertDbResultToAcumulusEntries($result);
     }
 
     /**
@@ -73,8 +73,9 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    protected function update($record, $entryId, $token, $updated)
+    protected function update(BaseAcumulusEntry $record, $entryId, $token, $updated)
     {
+        $record = $record->getRecord();
         $entryId = $entryId === null ? 'null' : (string) (int) $entryId;
         $token = $token === null ? 'null' : "'" . Db::getInstance()->escape($token) . "'";
         return Db::getInstance()->execute("UPDATE `{$this->tableName}` SET id_entry = $entryId, token = $token, updated = '$updated' WHERE id = {$record['id']}");

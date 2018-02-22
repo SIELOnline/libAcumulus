@@ -374,7 +374,7 @@ abstract class InvoiceManager
     {
         if ($this->isTestMode()) {
             $result->setSendStatus(Result::Sent_TestMode);
-        } elseif (!$this->getAcumulusEntryManager()->getByInvoiceSource($invoiceSource)) {
+        } elseif ($this->getAcumulusEntryManager()->getByInvoiceSource($invoiceSource) === null) {
             $result->setSendStatus(Result::Sent_New);
         } elseif ($forceSend) {
             $result->setSendStatus(Result::Sent_Forced);
@@ -468,7 +468,7 @@ abstract class InvoiceManager
         // Delete if there is an old entry and we successfully saved the new entry.
         if ($deleteOldEntry && isset($oldEntry)) {
             // But only if the old entry was not a concept as concepts cannot be deleted.
-            $entryId = $acumulusEntryManager->getField($oldEntry, $acumulusEntryManager::$keyEntryId);
+            $entryId = $oldEntry->getEntryId();
             if (!empty($entryId)) {
                 $deleteResult = $this->getService()->setDeleteStatus($entryId, API::Entry_Delete);
                 if ($deleteResult->hasMessages()) {
@@ -483,8 +483,9 @@ abstract class InvoiceManager
                         $result->mergeMessages($deleteResult, true);
                     }
                 } else {
-                    // Successfully deleted the ld entry: add a warning so this
+                    // Successfully deleted the old entry: add a warning so this
                     // info will be  mailed to the user.
+                    // @todo: add a notice message type and change this into a notice.
                     $result->addWarning(901, '',
                         sprintf($this->t('message_warning_old_entry_deleted'), $this->t($invoiceSource->getType()), $entryId));
                 }

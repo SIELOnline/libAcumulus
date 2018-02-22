@@ -182,6 +182,13 @@ interface ContainerInterface
     public function getAcumulusEntryManager();
 
     /**
+     * @param array|object $record
+     *
+     * @return \Siel\Acumulus\Shop\AcumulusEntryManager
+     */
+    public function getAcumulusEntry($record);
+
+    /**
      * Returns an instance of the given class.
      *
      * This method should normally be avoided, use the get{Class}() methods as

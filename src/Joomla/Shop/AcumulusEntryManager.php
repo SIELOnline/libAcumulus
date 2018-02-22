@@ -6,6 +6,7 @@ use JDate;
 use JFactory;
 use JTable;
 use Siel\Acumulus\Shop\AcumulusEntryManager as BaseAcumulusEntryManager;
+use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
 
 /**
  * Implements the VirtueMart specific acumulus entry model class.
@@ -17,6 +18,9 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      */
     protected function newTable()
     {
+        /**
+         * @var bool|\AcumulusTableAcumulusEntry $table
+         */
         $table = JTable::getInstance('AcumulusEntry', 'AcumulusTable');
         if ($table === false) {
             $this->log->error('AcumulusEntryManager::newTable(): table not created');
@@ -31,7 +35,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     {
         $table = $this->newTable();
         $result = $table->loadMultiple(array('entry_id' => $entryId));
-        return count($result) === 0 ? null : (count($result) === 1 ? reset($result) : $result);
+        return $this->convertDbResultToAcumulusEntries($result);
     }
 
     /**
@@ -41,7 +45,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     {
         $table = $this->newTable();
         $result = $table->load(array('source_type' => $invoiceSourceType, 'source_id' => $invoiceSourceId), true);
-        return $result ? $table : null;
+        return $result ? $this->convertDbResultToAcumulusEntries($table) : null;
     }
 
     /**
@@ -63,10 +67,11 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    protected function update($record, $entryId, $token, $updated)
+    protected function update(BaseAcumulusEntry $record, $entryId, $token, $updated)
     {
         // Continue with existing table object with already loaded record.
-        $table = $record;
+        /** @var \AcumulusTableAcumulusEntry $table */
+        $table = $record->getRecord();
         $table->entry_id = $entryId;
         $table->token = $token;
         $table->updated = $updated;
@@ -78,6 +83,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      */
     protected function sqlNow()
     {
+        /** @noinspection PhpUnhandledExceptionInspection */
         $tz = new DateTimeZone(JFactory::getApplication()->get('offset'));
         $date = new JDate();
         $date->setTimezone($tz);

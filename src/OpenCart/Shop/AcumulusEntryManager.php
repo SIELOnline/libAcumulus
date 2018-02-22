@@ -1,10 +1,12 @@
 <?php
 namespace Siel\Acumulus\OpenCart\Shop;
 
+use Siel\Acumulus\Helpers\ContainerInterface;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
 use Siel\Acumulus\Shop\AcumulusEntryManager as BaseAcumulusEntryManager;
+use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
 
 /**
  * Implements the OpenCart specific acumulus entry model class.
@@ -19,13 +21,11 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     protected $tableName;
 
     /**
-     * AcumulusEntryManager constructor.
-     *
-     * @param \Siel\Acumulus\Helpers\Log $log
+     * {@inheritdoc}
      */
-    public function __construct(Log $log)
+    public function __construct(ContainerInterface $container, Log $log)
     {
-        parent::__construct($log);
+        parent::__construct($container, $log);
         $this->tableName = DB_PREFIX . 'acumulus_entry';
     }
 
@@ -36,8 +36,9 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     {
         $operator = $entryId === null ? 'is' : '=';
         $entryId = $entryId === null ? 'null' : (string) (int) $entryId;
+        /** @noinspection PhpUnhandledExceptionInspection */
         $result = $this->getDb()->query("SELECT * FROM {$this->tableName} WHERE entry_id $operator $entryId");
-        return empty($result->rows) ? null : (count($result->rows) === 1 ? $result->row : $result->rows);
+        return $this->convertDbResultToAcumulusEntries($result->rows);
     }
 
     /**
@@ -45,8 +46,9 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      */
     public function getByInvoiceSourceId($invoiceSourceType, $invoiceSourceId)
     {
+        /** @noinspection PhpUnhandledExceptionInspection */
         $result = $this->getDb()->query("SELECT * FROM `{$this->tableName}` WHERE source_type = '$invoiceSourceType' AND source_id = $invoiceSourceId");
-        return empty($result->rows) ? null : $result->row;
+        return $this->convertDbResultToAcumulusEntries($result->rows);
     }
 
     /**
@@ -64,16 +66,19 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         $token = $token === null ? 'null' : "'" . $this->getDb()->escape($token) . "'";
         $invoiceSourceType = $invoiceSource->getType();
         $invoiceSourceId = $invoiceSource->getId();
+        /** @noinspection PhpUnhandledExceptionInspection */
         return (bool) $this->getDb()->query("INSERT INTO `{$this->tableName}` (store_id, entry_id, token, source_type, source_id, updated) VALUES ($storeId, $entryId, $token, '$invoiceSourceType', $invoiceSourceId, '$created')");
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function update($record, $entryId, $token, $updated)
+    protected function update(BaseAcumulusEntry $record, $entryId, $token, $updated)
     {
+        $record = $record->getRecord();
         $entryId = $entryId === null ? 'null' : (string) (int) $entryId;
         $token = $token === null ? 'null' : "'" . $this->getDb()->escape($token) . "'";
+        /** @noinspection PhpUnhandledExceptionInspection */
         return (bool) $this->getDb()->query("UPDATE `{$this->tableName}` SET entry_id = $entryId, token = $token, updated = '$updated' WHERE id = {$record['id']}");
     }
 
@@ -102,6 +107,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      */
     public function install()
     {
+        /** @noinspection PhpUnhandledExceptionInspection */
         $queryResult = $this->getDb()->query("show tables like '{$this->tableName}'");
         $tableExists = !empty($queryResult->num_rows);
         if (!$tableExists) {
@@ -109,12 +115,14 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
             return $this->createTable();
         } else {
             // Table does exist: but in old or current data model?
+            /** @noinspection PhpUnhandledExceptionInspection */
             $columnExists = $this->getDb()->query("show columns from `{$this->tableName}` like 'source_type'");
             $columnExists = !empty($columnExists->num_rows);
             if (!$columnExists) {
                 // Table exists but in old data model: alter table
                 // Rename currently existing table.
                 $oldTableName = $this->tableName . '_old';
+                /** @noinspection PhpUnhandledExceptionInspection */
                 $result = $this->getDb()->query("ALTER TABLE `{$this->tableName}` RENAME `$oldTableName`;");
 
                 // Create table in new data model.
@@ -123,12 +131,14 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
                 // Copy data from old to new table.
                 // Orders only, credit slips were not supported in that version.
                 // Nor did we support multi store shops (though a join could add that).
+                /** @noinspection PhpUnhandledExceptionInspection */
                 $result = $result && $this->getDb()->query("insert into `{$this->tableName}`
                     (entry_id, token, source_type, source_id, created, updated)
                     select entry_id, token, 'Order' as source_type, order_id as source_id, created, updated
                     from `$oldTableName``;");
 
                 // Delete old table.
+                /** @noinspection PhpUnhandledExceptionInspection */
                 $result = $result && $this->getDb()->query("DROP TABLE `$oldTableName`");
 
                 return $result;
@@ -144,6 +154,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      */
     public function uninstall()
     {
+        /** @noinspection PhpUnhandledExceptionInspection */
         return (bool) $this->getDb()->query("DROP TABLE `{$this->tableName}`");
     }
 
@@ -152,6 +163,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      */
     protected function createTable()
     {
+        /** @noinspection PhpUnhandledExceptionInspection */
         return (bool) $this->getDb()->query("CREATE TABLE IF NOT EXISTS `{$this->tableName}` (
             `id` int(11) NOT NULL AUTO_INCREMENT,
             `store_id` int(11) NOT NULL DEFAULT '0',
@@ -177,6 +189,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     public function upgrade($version)
     {
         if ($version === '4.4.0') {
+            /** @noinspection PhpUnhandledExceptionInspection */
             return (bool)$this->getDb()->query("ALTER TABLE `{$this->tableName}`
                 CHANGE COLUMN `entry_id` `entry_id` INT(11) NULL DEFAULT NULL,
                 CHANGE COLUMN `token` `token` CHAR(32) NULL DEFAULT NULL");

@@ -1,47 +1,34 @@
 <?php
 namespace Siel\Acumulus\Shop;
 
+use Siel\Acumulus\Helpers\ContainerInterface;
 use Siel\Acumulus\Helpers\Log;
 
 /**
- * Represents acumulus entry records.
+ * Manages AcumulusEntry records/objects.
  *
  * These records tie orders or credit notes from the web shop to entries in
  * Acumulus.
  *
- * Acumulus identifies entries by their entry id (boekstuknummer in het
- * Nederlands). To access an entry via the API, one must also supply a token
- * that is generated based on the contents of the entry. The entry id and token
- * are stored together with an id for the order or credit note from the web
- * shop.
- *
- * Usages (not (all of them are) yet implemented):
- * - Prevent that an invoice for a given order or credit note is sent twice.
- * - Show additional information on order list screens
- * - Update payment status
- * - Resend Acumulus invoice PDF.
+ * This manager class can perform the CRU(D) operations on the shop database.
  */
 abstract class AcumulusEntryManager
 {
-    // Access to the fields, differs per webshop as we followed db naming
-    // conventions from the webshop.
-    static public $keyEntryId = 'entry_id';
-    static public $keyToken = 'token';
-    static public $keySourceType = 'source_type';
-    static public $keySourceId = 'source_id';
-    static public $keyCreated = 'created';
-    static public $keyUpdated = 'updated';
-
     /** @var \Siel\Acumulus\Helpers\Log */
     protected $log;
+
+    /** @var \Siel\Acumulus\Helpers\ContainerInterface */
+    protected $container;
 
     /**
      * AcumulusEntryManager constructor.
      *
+     * @param \Siel\Acumulus\Helpers\ContainerInterface $container
      * @param \Siel\Acumulus\Helpers\Log $log
      */
-    public function __construct(Log $log)
+    public function __construct(ContainerInterface $container, Log $log)
     {
+        $this->container = $container;
         $this->log = $log;
     }
 
@@ -52,7 +39,7 @@ abstract class AcumulusEntryManager
      *   The entry id to look up. If $entryId === null, multiple records may be
      *   found, in which case a numerically indexed array will be returned.
      *
-     * @return array|object|null|array[]|object[]
+     * @return \Siel\Acumulus\Shop\AcumulusEntry|\Siel\Acumulus\Shop\AcumulusEntry[]|null
      *   Acumulus entry record for the given entry id or null if the entry id is
      *   unknown.
      */
@@ -64,7 +51,7 @@ abstract class AcumulusEntryManager
      * @param \Siel\Acumulus\Invoice\Source $invoiceSource
      *   The source object for which the invoice was created.
      *
-     * @return array|object|null
+     * @return \Siel\Acumulus\Shop\AcumulusEntry|null
      *   Acumulus entry record for the given invoice source or null if no
      *   invoice has yet been created in Acumulus for this invoice source.
      */
@@ -81,12 +68,40 @@ abstract class AcumulusEntryManager
      * @param string $invoiceSourceId
      *   The id of the invoice source for which the invoice was created.
      *
-     * @return array|object|null
+     * @return \Siel\Acumulus\Shop\AcumulusEntry|null
      *   Acumulus entry record for the given invoice source or null if no
      *   invoice has yet been created in Acumulus for this invoice source.
      */
     abstract public function getByInvoiceSourceId($invoiceSourceType, $invoiceSourceId);
 
+    /**
+     * Converts the results of a DB query to AcumulusEntries.
+     *
+     * @param object|array[]|object[] $result
+     *
+     * @return \Siel\Acumulus\Shop\AcumulusEntry|\Siel\Acumulus\Shop\AcumulusEntry[]|null
+     */
+    protected function convertDbResultToAcumulusEntries($result)
+    {
+        if (empty($result)) {
+            $result = null;
+        } elseif (is_object($result)) {
+            $result = $this->container->getAcumulusEntry($result);
+        } else {
+            // It's an array of results
+            if (count($result) === 0) {
+                $result = null;
+            } else {
+                foreach ($result as &$record) {
+                    $record = $this->container->getAcumulusEntry($record);
+                }
+                if (count($result) === 1) {
+                    $result = reset($result);
+                }
+            }
+        }
+        return $result;
+    }
     /**
      * Saves the Acumulus entry for the given order in the web shop's database.
      *
@@ -148,7 +163,7 @@ abstract class AcumulusEntryManager
     /**
      * Updates the Acumulus entry for the given invoice source.
      *
-     * @param array|object $record
+     * @param \Siel\Acumulus\Shop\AcumulusEntry $record
      *   The existing record for the invoice source to be updated.
      * @param int|null $entryId
      *   The new Acumulus entry id for the invoice source.
@@ -161,46 +176,7 @@ abstract class AcumulusEntryManager
      * @return bool
      *   Success.
      */
-    abstract protected function update($record, $entryId, $token, $updated);
-
-    /**
-     * Returns the value of the given field in the given acumulus entry record.
-     *
-     * As differnt webshops may use different field and property names in their
-     * tables and models, we abstracted accessing a field of a record into this
-     * method.
-     *
-     * @param array|object|null $record
-     *   The record to search through.
-     * @param string $field
-     *   The field to search for.
-     *
-     * @return mixed|null
-     *   The value of the given field in the given acumulus entry record.
-     */
-    public function getField($record, $field)
-    {
-        $value = null;
-        if (is_array($record)) {
-            if (array_key_exists($field, $record)) {
-                $value = $record[$field];
-            }
-        } elseif (is_object($record)) {
-            // It's an object: try to get the property.
-            // Safest way is via the get_object_vars() function.
-            $properties = get_object_vars($record);
-            if (!empty($properties) && array_key_exists($field, $properties)) {
-                $value = $properties[$field];
-            } elseif (method_exists($record, $field)) {
-                $value = call_user_func(array($record, $field));
-            } elseif (method_exists($record, '__get')) {
-                @$value = $record->$field;
-            } elseif (method_exists($record, '__call')) {
-                @$value = $record->$field();
-            }
-        }
-        return $value;
-    }
+    abstract protected function update(AcumulusEntry $record, $entryId, $token, $updated);
 
     /**
      * @return bool

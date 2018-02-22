@@ -313,7 +313,15 @@ class Container implements ContainerInterface
      */
     public function getAcumulusEntryManager()
     {
-        return $this->getInstance('AcumulusEntryManager', 'Shop', array($this->getLog()));
+        return $this->getInstance('AcumulusEntryManager', 'Shop', array($this, $this->getLog()));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAcumulusEntry($record)
+    {
+        return $this->getInstance('AcumulusEntry', 'Shop', array($record));
     }
 
     /**

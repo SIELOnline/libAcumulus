@@ -2,6 +2,7 @@
 namespace Siel\Acumulus\Magento\Shop;
 
 use Siel\Acumulus\Shop\AcumulusEntryManager as BaseAcumulusEntryManager;
+use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
 
 /**
  * Implements the Magento specific acumulus entry model class.
@@ -28,13 +29,13 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     public function getByEntryId($entryId)
     {
         /** @var \Siel_Acumulus_Model_Entry[]|\Siel\AcumulusMa2\Model\Entry[] $result */
+        /** @noinspection PhpUnhandledExceptionInspection */
         $result = $this
            ->getModel()
            ->getResourceCollection()
            ->addFieldToFilter('entry_id', $entryId)
            ->getItems();
-        $result = count($result) === 0 ? null : (count($result) === 1 ? reset($result) : $result);
-        return $result;
+        return $this->convertDbResultToAcumulusEntries($result);
     }
 
     /**
@@ -43,13 +44,14 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     public function getByInvoiceSourceId($invoiceSourceType, $invoiceSourceId)
     {
         /** @var \Siel_Acumulus_Model_Entry|\Siel\AcumulusMa2\Model\Entry $result */
+        /** @noinspection PhpUnhandledExceptionInspection */
         $result = $this
             ->getModel()
             ->getResourceCollection()
             ->addFieldToFilter('source_type', $invoiceSourceType)
             ->addFieldToFilter('source_id', $invoiceSourceId)
             ->getFirstItem();
-        return $result->getSourceId() == $invoiceSourceId ? $result : null;
+        return $this->convertDbResultToAcumulusEntries($result);
     }
 
     /**
@@ -58,6 +60,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     protected function insert($invoiceSource, $entryId, $token, $created)
     {
         /** @noinspection PhpDeprecationInspection http://magento.stackexchange.com/questions/114929/deprecated-save-and-load-methods-in-abstract-model */
+        /** @noinspection PhpUnhandledExceptionInspection */
         return $this
             ->getModel()
             ->setEntryId($entryId)
@@ -70,9 +73,13 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    protected function update($record, $entryId, $token, $updated)
+    protected function update(BaseAcumulusEntry $record, $entryId, $token, $updated)
     {
-        return $record
+        /** @var \Siel_Acumulus_Model_Entry|\Siel\AcumulusMa2\Model\Entry $entry */
+        $entry = $record->getRecord();
+        /** @noinspection PhpDeprecationInspection http://magento.stackexchange.com/questions/114929/deprecated-save-and-load-methods-in-abstract-model */
+        /** @noinspection PhpUnhandledExceptionInspection */
+        return $entry
             ->setEntryId($entryId)
             ->setToken($token)
             ->save();
@@ -84,15 +91,6 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     protected function sqlNow()
     {
         return time();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getField($record, $field)
-    {
-        /** @var \Siel_Acumulus_model_Entry $record */
-        return $record->getData($field);
     }
 
     /**

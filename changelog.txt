@@ -17,8 +17,9 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies)
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
-5.2.0 (2018-02-??)
+5.2.0 (2018-02-26)
 ------------------
+- PS: Log folder is in 1.7 /app/logs/ en niet meer /log/.
 - ALL: Als een factuur als concept wordt ogeslagen voeg dan een verwijzing naar
   waar deze te vinden toe aan de waarschuwingstekst.
 - ALL: Als er een bedrag mist wordt er nu een waarschuwing en, indien mogelijk,
@@ -902,6 +903,7 @@ OpenCart 1.x
 
 PrestaShop
 ----------
+* 1.7.2.5
 * 1.7.2.0
 * 1.7.1.1
 * 1.6.1.13

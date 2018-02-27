@@ -42,7 +42,7 @@ class BatchForm extends Form
      */
     public function __construct(TranslatorInterface $translator, ConfigInterface $config, ShopCapabilitiesInterface $shopCapabilities, InvoiceManager $invoiceManager)
     {
-        parent::__construct($translator, $config, $shopCapabilities);
+        parent::__construct($translator, $config);
 
         $translations = new InvoiceTranslations();
         $this->translator->add($translations);
@@ -55,6 +55,12 @@ class BatchForm extends Form
         $this->invoiceManager = $invoiceManager;
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * This override adds the log messages from the $log property to the log
+     * field.
+     */
     protected function getDefaultFormValues()
     {
         $result = parent::getDefaultFormValues();
@@ -64,6 +70,9 @@ class BatchForm extends Form
         return $result;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function validate()
     {
         $invoiceSourceTypes = $this->shopCapabilities->getSupportedInvoiceSourceTypes();

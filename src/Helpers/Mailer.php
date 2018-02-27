@@ -325,8 +325,10 @@ abstract class Mailer
         );
 
         $pluginSettings = $this->config->getPluginSettings();
+        // We add the request and response messages when set so or if there were
+        // warnings or severer messages, thus not with notices.
         $addReqResp = $pluginSettings['debug'] === PluginConfig::Send_SendAndMailOnError ? Result::AddReqResp_WithOther : Result::AddReqResp_Always;
-        if ($addReqResp === Result::AddReqResp_Always || ($addReqResp === Result::AddReqResp_WithOther && $result->hasMessages())) {
+        if ($addReqResp === Result::AddReqResp_Always || ($addReqResp === Result::AddReqResp_WithOther && $result->getStatus() >= Result::Status_Warnings)) {
             if ($result->getRawRequest() !== null || $result->getRawResponse() !== null) {
                 $header = $this->t('mail_support_header');
                 $description = $this->t('mail_support_desc');

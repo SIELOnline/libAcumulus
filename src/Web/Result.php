@@ -13,19 +13,22 @@ use Siel\Acumulus\Helpers\TranslatorInterface;
  * - exception, if one was thrown
  * - any error messages, local and/or remote
  * - any warnings, local and/or remote
+ * - any notices, local
  * - message sent, for logging purposes
  * - (raw) message received, for logging purposes
  * - result array
  */
 class Result {
     // Web service configuration related constants.
-    // Send status: bits 1, 2 and 3. Can be combined with an Invoice_Sent_...
-    // const. Not necessarily a single bit per value, but the order should be by
-    // increasing worseness.
+    // Send status: bits 1 to 4. Can be combined with a
+    // Invoice\Result::NotSent_... (bit 5 to 8) or Invoice\Result::Sent_...
+    // (bit 9) constant. Not necessarily a single bit per value, but the order
+    // should be by increasing worseness.
     const Status_Success = 0;
-    const Status_Warnings = 1;
-    const Status_Errors = 2;
-    const Status_Exception = 4;
+    const Status_Notices = 1;
+    const Status_Warnings = 2;
+    const Status_Errors = 4;
+    const Status_Exception = 8;
 
     // Format in which to return messages
     const Format_Array = 1;
@@ -82,6 +85,13 @@ class Result {
     protected $warnings;
 
     /**
+     * A - possibly empty - list of notice messages.
+     *
+     * @var array[]
+     */
+    protected $notices;
+
+    /**
      * The raw contents of the request as was sent to the web service.
      *
      * @var string|null
@@ -135,6 +145,7 @@ class Result {
         $this->exception = null;
         $this->errors = array();
         $this->warnings = array();
+        $this->notices = array();
         $this->rawRequest = null;
         $this->rawResponse = null;
         $this->response = array();
@@ -163,6 +174,7 @@ class Result {
 
     /**
      * @return int
+     *   1 of the Result::Status_... constants
      */
     public function getStatus()
     {
@@ -179,10 +191,12 @@ class Result {
         switch ($this->getStatus()) {
             case self::Status_Success:
                 return $this->t('message_response_success');
-            case self::Status_Errors:
-                return $this->t('message_response_errors');
+            case self::Status_Notices:
+                return $this->t('message_response_notices');
             case self::Status_Warnings:
                 return $this->t('message_response_warnings');
+            case self::Status_Errors:
+                return $this->t('message_response_errors');
             case self::Status_Exception:
                 return $this->t('message_response_exception');
             case null:
@@ -273,6 +287,30 @@ class Result {
     }
 
     /**
+     * Returns a - possibly empty - list of warning messages.
+     *
+     * @param int $format
+     *
+     * @return array[]|string[]|string
+     */
+    public function getWarnings($format = self::Format_Array)
+    {
+        return $this->formatMessages($this->warnings, $format, 'message_warning');
+    }
+
+    /**
+     * Returns a - possibly empty - list of notice messages.
+     *
+     * @param int $format
+     *
+     * @return array[]|string[]|string
+     */
+    public function getNotices($format = self::Format_Array)
+    {
+        return $this->formatMessages($this->notices, $format, 'message_notice');
+    }
+
+    /**
      * Adds multiple errors to the list of errors.
      *
      * A single error may be passed in as a 1-dimensional array.
@@ -283,63 +321,7 @@ class Result {
      */
     protected function addErrors(array $errors)
     {
-        // If there was exactly 1 error, it wasn't put in an array of errors.
-        if (array_key_exists('code', $errors)) {
-            $errors = array($errors);
-        }
-        foreach ($errors as $error) {
-            $this->addError($error);
-        }
-        return $this;
-    }
-
-    /**
-     * Adds an error to the list of errors.
-     *
-     * @param int|array $code
-     *   Error/warning code number. Usually of type 4xx, 5xx, 6xx or 7xx
-     *  (internal). It may also be an already completed error array.
-     * @param string $codeTag
-     *   Special code tag. Use this as a reference when communicating with
-     *   Acumulus technical support.
-     * @param string $message
-     *   A message describing the warning or error.
-     *
-     * @return $this
-     */
-    public function addError($code, $codeTag = '', $message = '')
-    {
-        if (is_array($code)) {
-            $message = $code['message'];
-            $codeTag = $code['codetag'];
-            $code = $code['code'];
-        }
-        if (empty($codeTag)) {
-            $this->errors[] = array(
-                'code' => '',
-                'codetag' => $codeTag,
-                'message' => $message
-            );
-        } elseif (!array_key_exists($codeTag, $this->errors)) {
-            $this->errors[$codeTag] = array(
-                'code' => $code,
-                'codetag' => $codeTag,
-                'message' => $message
-            );
-        }
-        return $this->raiseStatus(self::Status_Errors);
-    }
-
-    /**
-     * Returns a - possibly empty - list of warning messages.
-     *
-     * @param int $format
-     *
-     * @return array[]|string[]|string
-     */
-    public function getWarnings($format = self::Format_Array)
-    {
-        return $this->formatMessages($this->warnings, $format, 'message_warning');
+        return $this->addMessages('addError', $errors);
     }
 
     /**
@@ -353,31 +335,122 @@ class Result {
      */
     protected function addWarnings(array $warnings)
     {
-        // If there was exactly 1 warning, it wasn't put in an array of warnings.
-        if (array_key_exists('code', $warnings)) {
-            $warnings = array($warnings);
+        return $this->addMessages('addWarning', $warnings);
+    }
+
+    /**
+     * Adds multiple notices to the list of notices.
+     *
+     * A single notice may be passed in as a 1-dimensional array.
+     *
+     * @param array[] $notices
+     *
+     * @return $this
+     */
+    protected function addNotices(array $notices)
+    {
+        return $this->addMessages('addNotice', $notices);
+    }
+
+    /**
+     * Adds multiple warnings to the list of warnings.
+     *
+     * A single warning may be passed in as a 1-dimensional array.
+     *
+     * @param string $method
+     * @param array $messages
+     *
+     * @return $this
+     */
+    protected function addMessages($method, array $messages)
+    {
+        // If there was exactly 1 message, it wasn't put in an array of messages.
+        if (array_key_exists('code', $messages)) {
+            $messages = array($messages);
         }
-        foreach ($warnings as $warning) {
-            $this->addWarning($warning);
+        foreach ($messages as $message) {
+            call_user_func(array($this, $method), $message);
+            $this->addWarning($message);
         }
         return $this;
+    }
+
+    /**
+     * Adds an error to the list of errors.
+     *
+     * @param int|array $code
+     *   Error code number. Usually of type 4xx, 5xx, 6xx or 7xx (internal).
+     *   It may also be an already completed error array.
+     * @param string $codeTag
+     *   Special code tag. Use this as a reference when communicating with
+     *   Acumulus technical support.
+     * @param string $message
+     *   A message describing the error.
+     *
+     * @return $this
+     */
+    public function addError($code, $codeTag = '', $message = '')
+    {
+        return $this->addMessage($code, $codeTag, $message, $this->errors, self::Status_Errors);
     }
 
     /**
      * Adds a warning to the list of warnings.
      *
      * @param int $code
-     *   Error/warning code number. Usually of type 4xx, 5xx, 6xx or 7xx
-     *   (internal). It may also be an already completed warning array.
+     *   Warning code number. Usually of type 4xx, 5xx, 6xx or 7xx (internal).
+     *  It may also be an already completed warning array.
      * @param string $codeTag
      *   Special code tag. Use this as a reference when communicating with
      *   Acumulus technical support.
      * @param string $message
-     *   A message describing the warning or error.
+     *   A message describing the warning.
      *
      * @return $this
      */
     public function addWarning($code, $codeTag = '', $message = '')
+    {
+        return $this->addMessage($code, $codeTag, $message, $this->warnings, self::Status_Warnings);
+    }
+
+    /**
+     * Adds a notice to the list of notices.
+     *
+     * @param int $code
+     *   Notice code number. Usually of type 4xx, 5xx, 6xx or 7xx (internal).
+     *   It may also be an already completed notice array.
+     * @param string $codeTag
+     *   Special code tag. Use this as a reference when communicating with
+     *   Acumulus technical support.
+     * @param string $message
+     *   A message describing the notice.
+     *
+     * @return $this
+     */
+    public function addNotice($code, $codeTag = '', $message = '')
+    {
+        return $this->addMessage($code, $codeTag, $message, $this->notices, self::Status_Notices);
+    }
+
+    /**
+     * Adds a warning to the list of warnings.
+     *
+     * @param int $code
+     *   Error/warning/notice code number. Usually of type 4xx, 5xx, 6xx or 7xx
+     *   (internal). It may also be an already completed notice array.
+     * @param string $codeTag
+     *   Special code tag. Use this as a reference when communicating with
+     *   Acumulus technical support.
+     * @param string $message
+     *   A message describing the notice, warning or error.
+     * @param array $list
+     *   The list ot add the message to.
+     * @param int $level
+     *   The severity level to set the status to.
+     *
+     * @return $this
+     */
+    public function addMessage($code, $codeTag, $message, array &$list, $level)
     {
         if (is_array($code)) {
             $message = $code['message'];
@@ -385,19 +458,19 @@ class Result {
             $code = $code['code'];
         }
         if (empty($codeTag)) {
-            $this->warnings[] = array(
+            $list[] = array(
                 'code' => $code,
                 'codetag' => $codeTag,
                 'message' => $message
             );
-        } elseif (!array_key_exists($codeTag, $this->warnings)) {
-            $this->warnings[$codeTag] = array(
+        } elseif (!array_key_exists($codeTag, $list)) {
+            $list[$codeTag] = array(
                 'code' => $code,
                 'codetag' => $codeTag,
                 'message' => $message
             );
         }
-        return $this->raiseStatus(self::Status_Warnings);
+        return $this->raiseStatus($level);
     }
 
     /**
@@ -425,7 +498,7 @@ class Result {
         } else {
             $this->addErrors($other->getErrors());
         }
-        return $this->addWarnings($other->getWarnings());
+        return $this->addWarnings($other->getWarnings())->addNotices($other->getNotices());
     }
 
     /**
@@ -437,7 +510,7 @@ class Result {
      */
     public function hasMessages()
     {
-        return !empty($this->warnings) || !empty($this->errors) || !empty($this->exception);
+        return !empty($this->notices) || !empty($this->warnings) || !empty($this->errors) || !empty($this->exception);
     }
 
     /**
@@ -478,6 +551,12 @@ class Result {
             }
         }
 
+        foreach ($this->getNotices() as $message) {
+            if ($message['code'] == $code) {
+                return true;
+            }
+        }
+
         return false;
     }
 
@@ -491,7 +570,7 @@ class Result {
      */
     public function hasCodeTag($codeTag)
     {
-        return array_key_exists($codeTag, $this->errors) || array_key_exists($codeTag, $this->warnings);
+        return array_key_exists($codeTag, $this->errors) || array_key_exists($codeTag, $this->warnings) || array_key_exists($codeTag, $this->notices);
     }
 
     /**
@@ -523,6 +602,7 @@ class Result {
 
         $messages = array_merge($messages, $this->getErrors(self::Format_PlainTextArray));
         $messages = array_merge($messages, $this->getWarnings(self::Format_PlainTextArray));
+        $messages = array_merge($messages, $this->getNotices(self::Format_PlainTextArray));
 
         return $this->formatMessages($messages, $format);
     }

@@ -17,6 +17,11 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies)
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
+5.2.1 (2018-0?-??)
+------------------
+- ALL: voeg een berichttype "opmerking" toe zodat de melding over het
+  overschrijven van een bestaande factuur er minder ernstig uitziet.
+
 5.2.0 (2018-02-26)
 ------------------
 - PS: Log folder is in 1.7 /app/logs/ en niet meer /log/.

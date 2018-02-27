@@ -292,7 +292,7 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'pluginSettingsHeader' => 'Plugin instellingen',
 
         'field_debug' => 'Factuur verzendmodus',
-        'option_debug_1' => 'Ontvang alleen een mail bij fouten of waarschuwingen tijdens het verzenden van een factuur naar Acumulus.',
+        'option_debug_1' => 'Ontvang alleen een mail bij fouten, waarschuwingen, of opmerkingen tijdens het verzenden van een factuur naar Acumulus.',
         'option_debug_2' => 'Ontvang altijd een mail met de resultaten bij het verzenden van een factuur naar Acumulus.',
         'option_debug_3' => 'Verstuur facturen in testmodus naar Acumulus. Acumulus zal alleen de factuur controleren op fouten en waarschuwingen maar zal deze niet opslaan. U ontvangt alijd een mail met de resultaten.',
         'option_debug_4' => 'Verzend berichten niet naar Acumulus maar ontvang wel een mail met het bericht zoals dat vestuurd zou zijn.',
@@ -599,7 +599,7 @@ If you unchecked the first option, the second option only applies to business cl
         'pluginSettingsHeader' => 'Plugin settings',
 
         'field_debug' => 'Invoice send mode',
-        'option_debug_1' => 'Only receive a mail when there are errors or warnings on sending an invoice to Acumulus.',
+        'option_debug_1' => 'Only receive a mail when there were errors, warnings, or notices on sending an invoice to Acumulus.',
         'option_debug_2' => 'Always receive a mail with the results on sending an invoice to Acumulus.',
         'option_debug_3' => 'Send invoices to Acumulus in test mode. Acumulus will only check the input for errors and warnings but not store the invoice. You will always receive a mail with the results.',
         'option_debug_4' => 'Do not send messages to Acumulus, but receive a mail with the message as would have been sent.',

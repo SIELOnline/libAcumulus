@@ -485,8 +485,7 @@ abstract class InvoiceManager
                 } else {
                     // Successfully deleted the old entry: add a warning so this
                     // info will be  mailed to the user.
-                    // @todo: add a notice message type and change this into a notice.
-                    $result->addWarning(901, '',
+                    $result->addNotice(901, '',
                         sprintf($this->t('message_warning_old_entry_deleted'), $this->t($invoiceSource->getType()), $entryId));
                 }
             }

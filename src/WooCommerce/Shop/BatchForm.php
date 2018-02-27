@@ -10,7 +10,8 @@ use Siel\Acumulus\Shop\BatchForm as BaseBatchForm;
  * This wooCommerce specific extend overrides:
  * - getPostedValues()
  */
-class BatchForm extends BaseBatchForm {
+class BatchForm extends BaseBatchForm
+{
 
     /**
      * @inheritDoc

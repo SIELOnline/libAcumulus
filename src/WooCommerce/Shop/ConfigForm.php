@@ -10,8 +10,8 @@ use Siel\Acumulus\Shop\ConfigForm as BaseConfigForm;
  * This wooCommerce specific extend overrides:
  * - getPostedValues()
  */
-class ConfigForm extends BaseConfigForm {
-
+class ConfigForm extends BaseConfigForm
+{
     /**
      * @inheritDoc
      */

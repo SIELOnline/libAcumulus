@@ -69,7 +69,8 @@ use Exception;
  * - be handled by the magic __get or__call method.
  *
  */
-class Token {
+class Token
+{
     const TypeLiteral = 1;
     const TypeProperty = 2;
 

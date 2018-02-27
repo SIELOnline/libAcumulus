@@ -8,7 +8,8 @@ use WC_Data;
 /**
  * WC3 override of Token.
  */
-class Token extends BaseToken {
+class Token extends BaseToken
+{
     /**
      * {@inheritdoc}
      *

@@ -18,7 +18,8 @@ use Siel\Acumulus\Helpers\TranslatorInterface;
  * - (raw) message received, for logging purposes
  * - result array
  */
-class Result {
+class Result
+{
     // Web service configuration related constants.
     // Send status: bits 1 to 4. Can be combined with a
     // Invoice\Result::NotSent_... (bit 5 to 8) or Invoice\Result::Sent_...

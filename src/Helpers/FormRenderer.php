@@ -34,6 +34,18 @@ class FormRenderer
     protected $legendWrapperClass = '';
 
     /** @var string */
+    protected $fieldsetDescriptionWrapperTag = 'div';
+
+    /** @var string */
+    protected $fieldsetDescriptionWrapperClass = 'fieldset-description';
+
+    /** @var string */
+    protected $fieldsetContentWrapperTag = '';
+
+    /** @var string */
+    protected $fieldsetContentWrapperClass = 'fieldset-content';
+
+    /** @var string */
     protected $labelWrapperTag = '';
 
     /** @var string */
@@ -44,6 +56,12 @@ class FormRenderer
 
     /** @var string */
     protected $markupWrapperClass = 'message';
+
+    /** @var string */
+    protected $inputDescriptionWrapperTag = '';
+
+    /** @var string */
+    protected $inputDescriptionWrapperClass = '';
 
     /** @var string */
     protected $inputWrapperTag = '';
@@ -82,7 +100,16 @@ class FormRenderer
     protected $multiLabelClass = 'label';
 
     /** @var string */
-    protected $descriptionClass = 'description';
+    protected $descriptionWrapperTag = 'div';
+
+    /** @var string */
+    protected $descriptionWrapperClass = 'description';
+
+    /** @var bool */
+    protected $radioInputInLabel = false;
+
+    /** @var bool */
+    protected $checkboxInputInLabel = false;
 
     /** @var string */
     protected $requiredMarkup = self::RequiredMarkup;
@@ -174,8 +201,9 @@ class FormRenderer
         $output .= $this->getWrapper('legend', $field['attributes']);
         $output .= $field['legend'];
         $output .= $this->getWrapperEnd('legend');
+        $output .= $this->getWrapper('fieldsetContent');
         if (!empty($field['description'])) {
-            $output .= $this->renderDescription($field['description']);
+            $output .= $this->renderDescription($field['description'], true);
         }
         return $output;
     }
@@ -187,11 +215,10 @@ class FormRenderer
      *
      * @return string
      */
-    protected function fieldsetEnd(
-        /** @noinspection PhpUnusedParameterInspection */
-        array $field
-    ) {
+    protected function fieldsetEnd(/** @noinspection PhpUnusedParameterInspection */ array $field)
+    {
         $output = '';
+        $output .= $this->getWrapperEnd('fieldsetContent');
         $output .= $this->getWrapperEnd('fieldset');
         return $output;
     }
@@ -225,10 +252,12 @@ class FormRenderer
         if ($type !== 'hidden') {
             $output .= $this->getWrapper('element');
             $output .= $this->renderLabel($label, $type !== 'radio' && $type !== 'checkbox' ? $id : null, $labelAttributes);
+            $output .= $this->getWrapper('inputDescription');
         }
         $output .= $this->renderElement($type, $id, $name, $value, $attributes, $options);
         if ($type !== 'hidden') {
             $output .= $this->renderDescription($description);
+            $output .= $this->getWrapperEnd('inputDescription');
             $output .= $this->getWrapperEnd('element');
         }
         return $output;
@@ -266,20 +295,22 @@ class FormRenderer
      * Renders a descriptive help text.
      *
      * @param string $text
-     * @param string $tag
+     * @param bool $isFieldset
      *
      * @return string
      *   The rendered description.
      */
-    protected function renderDescription($text, $tag = 'div')
+    protected function renderDescription($text, $isFieldset = false)
     {
         $output = '';
 
         // Help text.
         if (!empty($text)) {
             // Allow for links in the help text, so no filtering anymore.
-            //$output .= "<$tag class=\"{$this->descriptionClass}\">" . htmlspecialchars($text, ENT_NOQUOTES, 'UTF-8') . "</$tag>";
-            $output .= "<$tag class=\"{$this->descriptionClass}\">$text</$tag>";
+            $wrapperType = $isFieldset ? 'fieldsetDescription' : 'description';
+            $output .= $this->getWrapper($wrapperType);
+            $output .= $text;
+            $output .= $this->getWrapperEnd($wrapperType);
         }
 
         return $output;
@@ -300,15 +331,17 @@ class FormRenderer
      *   joined string of the values separated by a space (e.g. multiple classes).
      * @param bool $wrapLabel
      *   Whether to wrap this label within the defined label wrapper tag.
+     * @param string $prefix
+     *   Prefix to prepend to the label text.
+     * @param string $postfix
+     *   Postfix to append to the label text.
      *
      * @return string The rendered label.
      *   The rendered label.
      */
-    protected function renderLabel($text, $id = null, array $attributes = array(), $wrapLabel = true)
+    protected function renderLabel($text, $id = null, array $attributes = array(), $wrapLabel = true, $prefix = '', $postfix = '')
     {
         $output = '';
-
-        $attributes = $this->addLabelAttributes($attributes, $id);
 
         // Tag around main labels.
         if ($wrapLabel) {
@@ -316,9 +349,10 @@ class FormRenderer
         }
 
         // Label.
-        $required = !empty($attributes['required']) ? $this->requiredMarkup : '';
+        $attributes = $this->addLabelAttributes($attributes, $id);
+        $postfix .= !empty($attributes['required']) ? $this->requiredMarkup : '';
         $tag = empty($id) ? $this->multiLabelTag : 'label';
-        $output .= '<' . $tag . $this->renderAttributes($attributes) . '>' . htmlspecialchars($text, ENT_NOQUOTES, 'UTF-8') . $required . '</' . $tag . '>';
+        $output .= '<' . $tag . $this->renderAttributes($attributes) . '>' . $prefix . htmlspecialchars($text, ENT_NOQUOTES, 'UTF-8') . $postfix . '</' . $tag . '>';
 
         // Tag around labels.
         if ($wrapLabel) {
@@ -548,9 +582,15 @@ class FormRenderer
             if ($this->compareValues($selected, $value)) {
                 $radioAttributes['checked'] = true;
             }
+
             $output .= $this->getWrapper('radio1');
-            $output .= '<input' . $this->renderAttributes($radioAttributes) . '>';
-            $output .= $this->renderLabel($text, $radioAttributes['id'], array(), false);
+            $radioInput = '<input' . $this->renderAttributes($radioAttributes) . '>';
+            if ($this->radioInputInLabel) {
+                $output .= $this->renderLabel($text, $radioAttributes['id'], array(), false, $radioInput);
+            } else {
+                $output .= $radioInput;
+                $output .= $this->renderLabel($text, $radioAttributes['id'], array(), false);
+            }
             $output .= $this->getWrapperEnd('radio1');
         }
 
@@ -600,8 +640,13 @@ class FormRenderer
                 $checkboxAttributes['checked'] = true;
             }
             $output .= $this->getWrapper('checkbox1');
-            $output .= '<input' . $this->renderAttributes($checkboxAttributes) . '>';
-            $output .= $this->renderLabel($text, $checkboxAttributes['id'], array(), false);
+            $checkboxInput = '<input' . $this->renderAttributes($checkboxAttributes) . '>';
+            if ($this->checkboxInputInLabel) {
+                $output .= $this->renderLabel($text, $checkboxAttributes['id'], array(), false, $checkboxInput);
+            } else {
+                $output .= $checkboxInput;
+                $output .= $this->renderLabel($text, $checkboxAttributes['id'], array(), false);
+            }
             $output .= $this->getWrapperEnd('checkbox1');
         }
 

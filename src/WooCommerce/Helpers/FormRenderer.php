@@ -14,103 +14,44 @@ class FormRenderer extends BaseFormRenderer
      */
     public function __construct()
     {
-        $this->radioWrapperTag = 'ul';
-        $this->radioWrapperClass = '';
-        $this->radio1WrapperTag = 'li';
-        $this->radio1WrapperClass = '';
-        $this->checkboxWrapperTag = 'ul';
-        $this->checkboxWrapperClass = '';
-        $this->checkbox1WrapperTag = 'li';
-        $this->checkbox1WrapperClass = '';
+        $this->radioWrapperTag = 'fieldset';
+        $this->checkboxWrapperTag = 'fieldset';
+        $this->fieldsetWrapperTag = '';
+        $this->legendWrapperTag = 'h2';
+        $this->fieldsetContentWrapperTag = 'table';
+        $this->fieldsetContentWrapperClass = 'form-table';
+        $this->elementWrapperTag = 'tr';
+        $this->labelWrapperTag = 'th';
+        $this->labelWrapperClass = 'titledesc';
+        $this->inputDescriptionWrapperTag = 'td';
+        $this->inputDescriptionWrapperClass = 'forminp';
+        $this->fieldsetDescriptionWrapperTag = 'td';
+
+        $this->radioInputInLabel = true;
+        $this->checkboxInputInLabel = true;
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      *
-     * This override does only set the form, as we need it later on to retrieve
-     * additional information about field sets.
+     * This override adds an informationicon aas label to descriptions at the
+     * fieldset level.
      */
-    public function render(Form $form)
+    protected function renderDescription($text, $isFieldset = false)
     {
-        $this->form = $form;
-        return '';
-    }
-
-    /**
-     * {@inheritdoc]
-     *
-     * This override makes access public and echo's the output besides returning
-     * it as WordPress is in field by field outputting mode when this method
-     * gets called.
-     */
-    public function field(array $field)
-    {
-        $output = parent::field($field);
-        echo $output;
-        return $output;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * This override renders nothing as WordPress already renders the fieldset
-     * title and the fields and the description will be rendered as a field as
-     * well.
-     */
-    protected function renderFieldset(array $field)
-    {
-        $output = '';
-        return $output;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * This override:
-     * - Skips the rendering of the wrapper and label as WordPress does that
-     *   itself.
-     * - Echo's the output as WordPress is in outputting mode here.
-     */
-    protected function renderField(array $field)
-    {
-        $type = $field['type'];
-        $id = $field['id'];
-        $name = $field['name'];
-        $value = isset($field['value']) ? $field['value'] : '';
-        $attributes = $field['attributes'];
-        $description = isset($field['description']) ? $field['description'] : '';
-        $options = isset($field['options']) ? $field['options'] : array();
-
-        $output = '';
-
-        $output .= $this->renderElement($type, $id, $name, $value, $attributes, $options);
-        if ($type !== 'hidden') {
-            $output .= $this->renderDescription($description);
+        if ($isFieldset && !empty($text)) {
+            $output = '';
+            $wrapperType = $isFieldset ? 'fieldsetDescription' : 'description';
+            $output .= $this->getWrapper('label', array('class' => 'fieldset-description-label'));
+            $output .= '🛈';
+            $output .= $this->getWrapperEnd('label');
+            $output .= $this->getWrapper($wrapperType);
+            $output .= $text;
+            $output .= $this->getWrapperEnd($wrapperType);
+        } else {
+            $output = parent::renderDescription($text, $isFieldset);
         }
-        return $output;
-    }
 
-    /**
-     * Recursively searches a field by its id.
-     *
-     * @param array[] $fields
-     * @param string $id
-     *
-     * @return array|null
-     */
-    protected function getFieldById($fields, $id)
-    {
-        if (array_key_exists($id, $fields)) {
-            return $fields[$id];
-        }
-        foreach ($fields as $id => $field) {
-            if (isset($field['fields'])) {
-                $result = $this->getFieldById($field['fields'], $id);
-                if ($result !== null) {
-                    return $result;
-                }
-            }
-        }
-        return null;
+        return $output;
     }
 }

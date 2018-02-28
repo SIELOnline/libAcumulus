@@ -23,7 +23,7 @@ abstract class BaseConfigForm extends Form
     /** @var \Siel\Acumulus\Config\ShopCapabilitiesInterface */
     protected $shopCapabilities;
 
-    /** @var \Siel\Acumulus\Web\Service*/
+    /** @var \Siel\Acumulus\Web\Service */
     protected $service;
 
     /**

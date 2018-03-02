@@ -651,12 +651,12 @@ class Result
     }
 
     /**
-     * Returns the structured non-common part of the received response.
+     * Returns the structured main response part of the received response.
      *
      * @return array
-     *   The structured non-common part of the response as received from the
-     *   Acumulus web service, i.e. the status, errors and warnings keys are
-     *   removed. In case of errors, this array may be empty.
+     *   The main response part of the response as received from the Acumulus
+     *   web service conmverted to a keyed array. The status, errors and
+     *   warnings are removed. In case of errors, this array may be empty.
      */
     public function getResponse()
     {

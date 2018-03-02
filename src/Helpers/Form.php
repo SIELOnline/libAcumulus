@@ -542,8 +542,8 @@ abstract class Form
     /**
      * Internal version of getFields();
      *
-     * Internal method, do not call directly.
-     * DO override this method not getFields().
+     * - Internal method, do not call directly but call getfields() instead.
+     * - Do override this method, not getFields().
      *
      * @return array[]
      *   The definition of the form.

@@ -57,6 +57,10 @@ class ConfigForm extends BaseConfigForm
 
     /**
      * {@inheritdoc}
+     *
+     * This override returns the config form. At the minimum, this includes the
+     * account settings. If these are OK, the other settings are included as
+     * well.
      */
     public function getFieldDefinitions()
     {

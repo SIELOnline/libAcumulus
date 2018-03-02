@@ -37,13 +37,7 @@ class ConfirmUninstallForm extends Form
     }
 
     /**
-     * Internal version of getFields();
-     *
-     * Internal method, do not call directly.
-     * DO override this method not getFields().
-     *
-     * @return array[]
-     *   The definition of the form.
+     * {@inheritdoc}
      */
     protected function getFieldDefinitions()
     {

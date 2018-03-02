@@ -265,6 +265,7 @@ class Service
      *   - foreigneu
      *   - foreignnoneu
      *   - marginscheme
+     *   - foreignvat
      *   - contactid
      *   - accountnumber
      *   - costcenterid

@@ -198,9 +198,11 @@ class FormRenderer
     {
         $output = '';
         $output .= $this->getWrapper('fieldset', $field['attributes']);
-        $output .= $this->getWrapper('legend', $field['attributes']);
-        $output .= $field['legend'];
-        $output .= $this->getWrapperEnd('legend');
+        if (!empty($field['legend'])) {
+            $output .= $this->getWrapper('legend', $field['attributes']);
+            $output .= $field['legend'];
+            $output .= $this->getWrapperEnd('legend');
+        }
         $output .= $this->getWrapper('fieldsetContent');
         if (!empty($field['description'])) {
             $output .= $this->renderDescription($field['description'], true);

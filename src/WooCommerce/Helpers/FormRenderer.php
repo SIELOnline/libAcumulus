@@ -1,7 +1,6 @@
 <?php
 namespace Siel\Acumulus\WooCommerce\Helpers;
 
-use Siel\Acumulus\Helpers\Form;
 use Siel\Acumulus\Helpers\FormRenderer as BaseFormRenderer;
 
 /**

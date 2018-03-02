@@ -5,7 +5,7 @@ namespace Siel\Acumulus\Helpers;
  * Provides form element rendering functionality. This basic implementation
  * renders the elements as wrapped html input elements. To comply with shop
  * specific styling, it is supposed to be overridden per shop that uses this
- * way of rendering. for now those are: HikaShop/VirtueMart (Joomla), OpenCart,
+ * way of rendering. For now those are: HikaShop/VirtueMart (Joomla), OpenCart,
  * and WooCommerce (WordPress).
  */
 class FormRenderer
@@ -138,7 +138,7 @@ class FormRenderer
      *
      * @return string
      */
-    protected function fields(array $fields)
+    public function fields(array $fields)
     {
         $output = '';
         foreach ($fields as $id => $field) {
@@ -157,10 +157,11 @@ class FormRenderer
      * Renders 1 field definition (which may be a fieldset with multiple fields).
      *
      * @param array $field
+     *   Array with the form field definition. the keys id and name are expected to be set.
      *
      * @return string
      */
-    protected function field(array $field)
+    public function field(array $field)
     {
         $output = '';
         if (!isset($field['attributes'])) {
@@ -236,8 +237,9 @@ class FormRenderer
     protected function renderField(array $field)
     {
         $type = $field['type'];
-        $id = $field['id'];
-        $name = $field['name'];
+        // Id and name may be empty/not set for markup fields only.
+        $id = isset($field['id']) ? $field['id'] : '';
+        $name = isset($field['name']) ? $field['name'] : '';
         $label = isset($field['label']) ? $field['label'] : '';
         $value = isset($field['value']) ? $field['value'] : '';
         $attributes = isset($field['attributes']) ? $field['attributes'] : array();
@@ -838,10 +840,8 @@ class FormRenderer
      *
      * @return array
      */
-    protected function getCheckboxAttributes(
-        /** @noinspection PhpUnusedParameterInspection */
-        $id, $name, $value
-    ) {
+    protected function getCheckboxAttributes(/** @noinspection PhpUnusedParameterInspection */$id, $name, $value)
+    {
         $checkboxAttributes = array(
             'type' => 'checkbox',
             'id' => "{$name}_{$value}",

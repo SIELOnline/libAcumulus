@@ -384,7 +384,8 @@ abstract class Creator
      *   The number to use as invoice "number" on the Acumulus invoice, may
      *   contain a prefix.
      */
-    protected function getInvoiceNumber($invoiceNumberSource) {
+    protected function getInvoiceNumber($invoiceNumberSource)
+    {
         $result = $invoiceNumberSource === PluginConfig::InvoiceNrSource_ShopInvoice ? $this->invoiceSource->getInvoiceReference() : null;
         if (empty($result)) {
             $result = $this->invoiceSource->getReference();

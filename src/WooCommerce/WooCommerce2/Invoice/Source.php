@@ -37,7 +37,8 @@ class Source extends BaseSource
      * @return string
      *   The order (or credit memo) date: yyyy-mm-dd.
      */
-    public function getDate() {
+    public function getDate()
+    {
         return $this->callTypeSpecificMethod(__FUNCTION__);
     }
 

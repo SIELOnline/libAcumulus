@@ -43,7 +43,8 @@ class Communicator implements CommunicatorInterface
      * @param \Siel\Acumulus\Helpers\ContainerInterface $container
      * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
      */
-    public function __construct(ConfigInterface $config, Log $log, ContainerInterface $container, TranslatorInterface $translator) {
+    public function __construct(ConfigInterface $config, Log $log, ContainerInterface $container, TranslatorInterface $translator)
+    {
         $this->config = $config;
         $this->log = $log;
         $this->container = $container;
@@ -96,7 +97,8 @@ class Communicator implements CommunicatorInterface
      * @return array
      *   The common part of each API message.
      */
-    protected function getCommonPart() {
+    protected function getCommonPart()
+    {
         $environment = $this->config->getEnvironment();
         $pluginSettings = $this->config->getPluginSettings();
 

@@ -28,7 +28,8 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getTokenInfo() {
+    public function getTokenInfo()
+    {
         $catalogOrder = array(
             'order_id',
             'invoice_no',

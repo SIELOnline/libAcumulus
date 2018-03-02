@@ -14,7 +14,8 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getTokenInfo() {
+    public function getTokenInfo()
+    {
         return parent::getTokenInfo() + array(
             'BT' => array(
                 'table' => array('virtuemart_orders', 'virtuemart_order_userinfos'),

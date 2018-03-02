@@ -389,7 +389,8 @@ class Creator extends BaseCreator
      * but if in future versions payment fees can appear on order slips as well
      * the code can already handle that.
      */
-    protected function getPaymentFeeLine() {
+    protected function getPaymentFeeLine()
+    {
         /* @noinspection PhpUndefinedFieldInspection */
         if (isset($this->invoiceSource->getSource()->payment_fee)
             && isset($this->invoiceSource->getSource()->payment_fee_rate)
@@ -558,7 +559,8 @@ class Creator extends BaseCreator
      *   Either an array with keys Meta::VatRateLookup and
      *   Meta::VatRateLookupLabel or an empty array.
      */
-    protected function getVatRateLookupMetadata($addressId, $taxRulesGroupId) {
+    protected function getVatRateLookupMetadata($addressId, $taxRulesGroupId)
+    {
         try {
             $address = new Address($addressId);
             $tax_manager = TaxManagerFactory::getManager($address, $taxRulesGroupId);

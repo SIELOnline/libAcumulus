@@ -192,7 +192,8 @@ class Token
      *   return value may be a scalar (numeric type) that can be converted to a
      *   string.
      */
-    protected function searchProperty($property) {
+    protected function searchProperty($property)
+    {
         $value = null;
         $fullPropertyName = explode('::', $property);
         if (count($fullPropertyName) > 1) {

@@ -25,7 +25,8 @@ class FormRenderer extends BaseFormRenderer
     /**
      * {@inheritdoc}
      */
-    protected function fieldsetBegin(array $field) {
+    protected function fieldsetBegin(array $field)
+    {
         $oldDescriptionClass = $this->descriptionClass;
         $this->descriptionClass = 'fieldset-desc desc';
         $result = parent::fieldsetBegin($field);

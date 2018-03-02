@@ -54,7 +54,8 @@ class Registry
      *
      * @param Registry $registry
      */
-    protected static function setInstance(Registry $registry) {
+    protected static function setInstance(Registry $registry)
+    {
         static::$instance = $registry;
     }
 

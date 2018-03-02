@@ -13,7 +13,8 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getTokenInfo() {
+    public function getTokenInfo()
+    {
         return parent::getTokenInfo() + array(
             'source' => array(
                 'table' => array('hikashop_order'),

@@ -410,7 +410,8 @@ class FlattenerInvoiceLines
      * @return array
      *   The parent invoice line with price info removed.
      */
-    protected function copyVatInfoToParent(array $parent, array $children) {
+    protected function copyVatInfoToParent(array $parent, array $children)
+    {
         $parent[Meta::VatAmount] = 0;
         // Copy vat rate info from a child when the parent has no vat rate info.
         if (empty($parent[Tag::VatRate]) || Number::isZero($parent[Tag::VatRate])) {
@@ -489,7 +490,8 @@ class FlattenerInvoiceLines
      * @return string
      *   The indented product description.
      */
-    protected function indentDescription($description) {
+    protected function indentDescription($description)
+    {
         if (preg_match('/^ *- /', $description)) {
             $description = '  ' . $description;
         } else {

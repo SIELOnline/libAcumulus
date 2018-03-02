@@ -121,7 +121,8 @@ abstract class Source
      * @return string
      *   The order (or credit memo) date: yyyy-mm-dd.
      */
-    public function getDate() {
+    public function getDate()
+    {
         return $this->callTypeSpecificMethod(__FUNCTION__);
     }
 
@@ -142,7 +143,8 @@ abstract class Source
     /**
      * Loads and sets the web shop invoice linked ot this source.
      */
-    protected function setInvoice() {
+    protected function setInvoice()
+    {
         $this->invoice = null;
     }
 

@@ -817,7 +817,8 @@ class Completor
      * Thus if there are e.g. shipping lines or other fee lines, they have to be
      * converted to the margin scheme (costprice tag and change of unitprice).
      */
-    protected function correctMarginInvoice() {
+    protected function correctMarginInvoice()
+    {
         if (isset($this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType]) && $this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType] == Api::VatType_MarginScheme) {
             foreach ($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] as &$line) {
                 // For margin invoices, Acumulus expects the unitprice to be the

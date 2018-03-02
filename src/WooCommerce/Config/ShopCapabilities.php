@@ -30,7 +30,8 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getTokenInfo() {
+    public function getTokenInfo()
+    {
         $order = array(
             'billing_first_name',
             'billing_last_name',

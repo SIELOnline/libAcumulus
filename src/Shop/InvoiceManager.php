@@ -439,7 +439,8 @@ abstract class InvoiceManager
      *   The result structure of the invoice add API call merged with any local
      *   messages.
      */
-    protected function doSend(array $invoice, Source $invoiceSource, Result $result) {
+    protected function doSend(array $invoice, Source $invoiceSource, Result $result)
+    {
         /** @var \Siel\Acumulus\Invoice\Result $result */
         $result = $this->getService()->invoiceAdd($invoice, $result);
 

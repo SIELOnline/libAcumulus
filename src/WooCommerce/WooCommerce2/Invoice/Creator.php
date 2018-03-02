@@ -48,7 +48,8 @@ class Creator extends BaseCreator
      * @return null|string
      *   The value for the meta data with the given name, null if not available.
      */
-    public function getSourceMeta($property) {
+    public function getSourceMeta($property)
+    {
         $value = get_post_meta($this->invoiceSource->getId(), $property, true);
         // get_post_meta() can return false or ''.
         if (empty($value)) {
@@ -66,7 +67,8 @@ class Creator extends BaseCreator
      * @return null|string
      *   The value for the meta data with the given name, null if not available.
      */
-    public function getOrderMeta($property) {
+    public function getOrderMeta($property)
+    {
         $value = get_post_meta($this->order->id, $property, true);
         // get_post_meta() can return false or ''.
         if (empty($value)) {

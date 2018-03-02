@@ -236,7 +236,8 @@ class Creator extends BaseCreator
      *   Either an array with keys Meta::VatRateLookup and
      *  Meta::VatRateLookupLabel or an empty array.
      */
-    protected function getVatRateLookupMetadata($taxClassId) {
+    protected function getVatRateLookupMetadata($taxClassId)
+    {
         $result = array();
         $taxRules = $this->getTaxRules($taxClassId);
         // We are not going to drill down geo zones, so if we got only 1 rate,
@@ -271,7 +272,8 @@ class Creator extends BaseCreator
      * @return array[]
      *
      */
-    protected function getTaxRules($tax_class_id) {
+    protected function getTaxRules($tax_class_id)
+    {
         $query = $this->getRegistry()->db->query("SELECT * FROM " . DB_PREFIX . "tax_rule WHERE tax_class_id = '" . (int) $tax_class_id . "'");
         return $query->rows;
     }
@@ -287,7 +289,8 @@ class Creator extends BaseCreator
      * @return array
      *
      */
-    protected function getTaxRate($tax_rate_id) {
+    protected function getTaxRate($tax_rate_id)
+    {
         $query = $this->getRegistry()->db->query("SELECT tr.tax_rate_id, tr.name AS name, tr.rate, tr.type, tr.geo_zone_id, gz.name AS geo_zone, tr.date_added, tr.date_modified FROM " . DB_PREFIX . "tax_rate tr LEFT JOIN " . DB_PREFIX . "geo_zone gz ON (tr.geo_zone_id = gz.geo_zone_id) WHERE tr.tax_rate_id = '" . (int) $tax_rate_id . "'");
         return $query->row;
     }
@@ -482,7 +485,8 @@ class Creator extends BaseCreator
      * @return \Siel\Acumulus\OpenCart\Helpers\Registry
      *
      */
-    protected function getRegistry() {
+    protected function getRegistry()
+    {
         return Registry::getInstance();
     }
 }

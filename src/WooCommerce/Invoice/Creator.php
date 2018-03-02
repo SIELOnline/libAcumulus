@@ -85,7 +85,8 @@ class Creator extends BaseCreator
      *
      * This override returns the id of a WC_Payment_Gateway.
      */
-    protected function getPaymentMethod() {
+    protected function getPaymentMethod()
+    {
         // Payment method is not stored for credit notes, so it is expected to
         // be the same as for its order.
         return $this->order->get_payment_method();
@@ -325,7 +326,8 @@ class Creator extends BaseCreator
      *   Either an array with keys Meta::VatRateLookup and
      *  Meta::VatRateLookupLabel or an empty array.
      */
-    protected function getVatRateLookupMetadataByTaxClass($taxClass) {
+    protected function getVatRateLookupMetadataByTaxClass($taxClass)
+    {
         if ($taxClass === 'standard') {
             $taxClass = '';
         }
@@ -653,7 +655,8 @@ class Creator extends BaseCreator
      * @return bool
      *
      */
-    protected function productPricesIncludeTax() {
+    protected function productPricesIncludeTax()
+    {
         return wc_prices_include_tax();
     }
 }

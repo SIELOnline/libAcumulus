@@ -289,7 +289,8 @@ abstract class Mailer
      *   An array with a plain text (key='text') and an html string (key='html')
      *   containing the messages with some descriptive text.
      */
-    protected function getMessages(Result $result) {
+    protected function getMessages(Result $result)
+    {
         $messages = array(
             'text' => '',
             'html' => '',
@@ -318,7 +319,8 @@ abstract class Mailer
      *   An array with a plain text (key='text') and an html string (key='html')
      *   containing the support messages with some descriptive text.
      */
-    protected function getSupportMessages(Result $result) {
+    protected function getSupportMessages(Result $result)
+    {
         $messages = array(
             'text' => '',
             'html' => '',

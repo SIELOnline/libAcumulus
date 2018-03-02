@@ -83,7 +83,8 @@ class Registry
      *
      * @return mixed
      */
-    public function get($type) {
+    public function get($type)
+    {
         return $this->objectManager->get($type);
     }
 

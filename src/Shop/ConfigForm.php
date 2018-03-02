@@ -412,7 +412,8 @@ class ConfigForm extends BaseConfigForm
      * @return array
      *   The fieldset definition.
      */
-    protected function getPaymentMethodsFieldset(array $paymentMethods, $key, array $options) {
+    protected function getPaymentMethodsFieldset(array $paymentMethods, $key, array $options)
+    {
         $fieldset = array(
             'type' => 'fieldset',
             'legend' => $this->t("{$key}Fieldset"),

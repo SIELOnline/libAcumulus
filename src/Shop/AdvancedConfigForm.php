@@ -170,7 +170,8 @@ class AdvancedConfigForm extends BaseConfigForm
      * @return array
      *   The set of possible tokens per object
      */
-    protected function getTokenFields() {
+    protected function getTokenFields()
+    {
         return $this->tokenInfo2Fields($this->shopCapabilities->getTokenInfo());
     }
 
@@ -289,7 +290,8 @@ class AdvancedConfigForm extends BaseConfigForm
      *
      * @return string
      */
-    protected function listToString($list) {
+    protected function listToString($list)
+    {
         if (is_array($list)) {
             if (count($list) > 1) {
                 $listLast = array_pop($list);

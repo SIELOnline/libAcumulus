@@ -321,7 +321,7 @@ class Container implements ContainerInterface
      */
     public function getAcumulusEntry($record)
     {
-        return $this->getInstance('AcumulusEntry', 'Shop', array($record));
+        return $this->getInstance('AcumulusEntry', 'Shop', array($record), true);
     }
 
     /**

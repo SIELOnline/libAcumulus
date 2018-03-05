@@ -516,7 +516,7 @@ abstract class Form
      * - description: (string) human readable help text.
      * - value: (string) the value for the form field.
      * - attributes: (array) keyed array with other - possibly html5 - attributes
-     *   to be rendered. Possible keys include:
+     *   to be rendered. Possible keys include e.g:
      *   - size
      *   - class
      *   - required: (bool) whether the field is required.

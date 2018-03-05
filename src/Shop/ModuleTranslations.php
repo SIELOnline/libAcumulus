@@ -16,6 +16,7 @@ class ModuleTranslations extends TranslationCollection
         'modules' => 'Modules',
         'page_title' => 'Acumulus instellingen',
         'advanced_page_title' => 'Acumulus geavanceerde instellingen',
+        'shop_order_title' => 'Factuur in Acumulus',
         'module_name' => 'Acumulus',
         'module_description' => 'Verstuurt uw facturen automatisch naar Acumulus',
         'text_home' => 'Home',

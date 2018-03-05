@@ -17,10 +17,17 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies)
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
-5.2.1 (2018-0?-??)
+5.2.1 (2018-03-??)
 ------------------
+- WC: Toon status van de boeking in Acumulus in het admnin shop order formulier.
+  dit is de eerste feature van de "dashboard" functionaliteit.
 - ALL: voeg een berichttype "opmerking" toe zodat de melding over het
   overschrijven van een bestaande factuur er minder ernstig uitziet.
+- ALL: Add Source::getRefunds() and rename Source::getOriginalInvoiceSource to
+  Source::getOrder().
+- ALL: Form rendering: Allow to use shop specific help texts, often in a hover
+  popup.
+- Error in Container::getAcumulusEntry().
 - WC: Change WordPress form rendering to accommodate the new Acumulus invoice
   overview form.
 

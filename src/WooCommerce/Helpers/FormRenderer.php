@@ -38,19 +38,24 @@ class FormRenderer extends BaseFormRenderer
      */
     protected function renderDescription($text, $isFieldset = false)
     {
-        if ($isFieldset && !empty($text)) {
-            $output = '';
-            $wrapperType = $isFieldset ? 'fieldsetDescription' : 'description';
-            $output .= $this->getWrapper('label', array('class' => 'fieldset-description-label'));
-            $output .= '🛈';
-            $output .= $this->getWrapperEnd('label');
-            $output .= $this->getWrapper($wrapperType);
-            $output .= $text;
-            $output .= $this->getWrapperEnd($wrapperType);
-        } else {
-            $output = parent::renderDescription($text, $isFieldset);
+        $output = '';
+        $wrapperType = $isFieldset ? 'fieldsetDescription' : 'description';
+        if (!empty($text)) {
+            if ($isFieldset) {
+                $output .= $this->getWrapper('label', array('class' => 'fieldset-description-label'));
+                $output .= '🛈';
+                $output .= $this->getWrapperEnd('label');
+                $output .= $this->getWrapper($wrapperType);
+                $output .= $text;
+                $output .= $this->getWrapperEnd($wrapperType);
+            } else {
+                if ($this->usePopupDescription) {
+                    $output .= wc_help_tip($text);
+                } else {
+                    $output .= parent::renderDescription($text, $isFieldset);
+                }
+            }
         }
-
         return $output;
     }
 }

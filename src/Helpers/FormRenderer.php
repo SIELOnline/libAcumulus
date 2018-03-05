@@ -114,8 +114,25 @@ class FormRenderer
     /** @var string */
     protected $requiredMarkup = self::RequiredMarkup;
 
+    /** @var bool */
+    protected $usePopupDescription = false;
+
     /** @var Form */
     protected $form;
+
+    /**
+     * Instructs the form renderer to use the webshop specific way to show help
+     * texts in some kind of a popup/hover note.
+     *
+     * @param bool $usePopupDescription
+     *
+     * @return $this
+     */
+    public function setUsePopupDescription($usePopupDescription)
+    {
+        $this->usePopupDescription = $usePopupDescription;
+        return $this;
+    }
 
     /**
      * Renders the form.

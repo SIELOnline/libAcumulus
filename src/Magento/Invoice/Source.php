@@ -122,10 +122,20 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    protected function getOriginalOrder()
+    protected function getShopOrder()
     {
         /** @var \Mage_Sales_Model_Order_Creditmemo|\Magento\Sales\Model\Order\Creditmemo $creditmemo */
         $creditmemo = $this->source;
         return $creditmemo->getOrder();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getShopCreditNotes()
+    {
+        /** @var \Mage_Sales_Model_Order|\Magento\Sales\Model\Order $order */
+        $order = $this->source;
+        return $order->getCreditmemosCollection();
     }
 }

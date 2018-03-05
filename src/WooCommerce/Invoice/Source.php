@@ -69,10 +69,20 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    protected function getOriginalOrder()
+    protected function getShopOrder()
     {
         /** @var \WC_Order_Refund $refund */
         $refund = $this->source;
         return $refund->get_parent_id();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getShopCreditNotes()
+    {
+        /** @var \WC_Order $order */
+        $order = $this->source;
+        return $order->get_refunds();
     }
 }

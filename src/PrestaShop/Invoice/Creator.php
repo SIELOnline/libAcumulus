@@ -69,7 +69,7 @@ class Creator extends BaseCreator
                 break;
             case Source::CreditNote:
                 $this->creditSlip = $this->shopSource;
-                $this->order = $this->invoiceSource->getOriginalSource();
+                $this->order = $this->invoiceSource->getOrder();
                 break;
         }
     }

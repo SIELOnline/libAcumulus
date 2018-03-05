@@ -216,9 +216,52 @@ abstract class Source
     public function getOriginalSource()
     {
         $result = null;
-        $originalOrder = $this->getOriginalOrder();
+        $originalOrder = $this->getShopOrder();
         if ($originalOrder !== null) {
             $result = new static(Source::Order, $originalOrder);
+        }
+        return $result;
+    }
+
+    /**
+     * Returns the order source for a credit note source.
+     *
+     * Do not override this method but override getShopOrder() instead.
+     *
+     * @return Source|null
+     *   If the invoice source is a credit note, its original order is returned,
+     *   null otherwise.
+     */
+    public function getOrder()
+    {
+        $result = null;
+        if ($this->getType() === Source::CreditNote) {
+            $shopOrder = $this->getShopOrder();
+            if ($shopOrder !== null) {
+                $result = new static(Source::Order, $shopOrder);
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Returns the set of credit note sources for an order source.
+     *
+     * Do not override this method but override getShopCreditNotes() instead.
+     *
+     * @return Source[]?
+     *   If the invoice source is an order, an array of refunds is returned,
+     *   null otherwise.
+     */
+    public function getCreditNotes()
+    {
+        $result = null;
+        if ($this->getType() === Source::Order) {
+            $result = array();
+            $shopCreditNotes = $this->getShopCreditNotes();
+            foreach ($shopCreditNotes as $shopCreditNote) {
+                $result[] = new static(Source::CreditNote, $shopCreditNote);
+            }
         }
         return $result;
     }
@@ -231,11 +274,26 @@ abstract class Source
      *
      * @return array|object|int|null
      *   The original shop order or order id for this credit note, or null if
-     *   unknown.
+     *   not supported.
      */
-    protected function getOriginalOrder()
+    protected function getShopOrder()
     {
         return null;
+    }
+
+    /**
+     * Returns the credit notes or credit note ids for this order.
+     *
+     * The base implementation returns null. Override if the shop supports
+     * credit notes.
+     *
+     * @return array[]|object[]|int[]|\Traversable null
+     *   The, possibly empty, set of refunds or refund-ids for this order, or
+     *   null if not supported.
+     */
+    protected function getShopCreditNotes()
+    {
+        return array();
     }
 
     /**

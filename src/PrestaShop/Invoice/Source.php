@@ -104,11 +104,21 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    protected function getOriginalOrder()
+    protected function getShopOrder()
     {
         /** @var \OrderSlip $orderSlip */
         $orderSlip = $this->source;
         return $orderSlip->id_order;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getShopCreditNotes()
+    {
+        /** @var \Order $order */
+        $order = $this->source;
+        return $order->getOrderSlipsCollection();
     }
 
     /**

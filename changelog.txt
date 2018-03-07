@@ -17,7 +17,13 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies)
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
-5.2.1 (2018-03-??)
+5.2.2 (2018-03-??)
+------------------
+- ALL: Replace FormRenderer::setUsePopupDescription() with more generic
+  FormRenderer:::setProperty().
+- All: Allow for label and label wrapper specific attributes in form fields.
+
+5.2.1 (2018-03-05)
 ------------------
 - WC: Toon status van de boeking in Acumulus in het admnin shop order formulier.
   dit is de eerste feature van de "dashboard" functionaliteit.

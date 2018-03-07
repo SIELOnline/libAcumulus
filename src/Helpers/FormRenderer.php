@@ -121,16 +121,20 @@ class FormRenderer
     protected $form;
 
     /**
-     * Instructs the form renderer to use the webshop specific way to show help
-     * texts in some kind of a popup/hover note.
+     * Sets the value of a property of this object.
      *
-     * @param bool $usePopupDescription
+     * The property must exist as property
+     *
+     * @param string $property
+     * @param mixed $value
      *
      * @return $this
      */
-    public function setUsePopupDescription($usePopupDescription)
+    public function setProperty($property, $value)
     {
-        $this->usePopupDescription = $usePopupDescription;
+        if (property_exists($this, $property) && !in_Array($property, array('form'))) {
+            $this->$property = $value;
+        }
         return $this;
     }
 
@@ -254,7 +258,7 @@ class FormRenderer
     protected function renderField(array $field)
     {
         $type = $field['type'];
-        // Id and name may be empty/not set for markup fields only.
+        // Id and name may be empty/not set for markup fields.
         $id = isset($field['id']) ? $field['id'] : '';
         $name = isset($field['name']) ? $field['name'] : '';
         $label = isset($field['label']) ? $field['label'] : '';
@@ -265,7 +269,12 @@ class FormRenderer
 
         $output = '';
 
+        // Split attributes over label and element.
         $labelAttributes = array();
+        if (!empty($attributes['label'])) {
+            $labelAttributes = $attributes['label'];
+            unset($attributes['label']);
+        }
         if (!empty($attributes['required'])) {
             $labelAttributes['required'] = $attributes['required'];
         }
@@ -364,9 +373,19 @@ class FormRenderer
     {
         $output = '';
 
+        // Split attributes over label and wrapper.
+        $wrapperAttributes = array();
+        if (!empty($attributes['wrapper'])) {
+            $wrapperAttributes = $attributes['wrapper'];
+            unset($attributes['wrapper']);
+        }
+        if (!empty($attributes['required'])) {
+            $wrapperAttributes['required'] = $attributes['required'];
+        }
+
         // Tag around main labels.
         if ($wrapLabel) {
-            $output .= $this->getWrapper('label', $attributes);
+            $output .= $this->getWrapper('label', $wrapperAttributes);
         }
 
         // Label.

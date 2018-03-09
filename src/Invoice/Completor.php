@@ -986,7 +986,7 @@ class Completor
     protected function lineHas0VatRate(array $line)
     {
         $result = false;
-        if (isset($line[Tag::VatRate]) && Number::isZero($line[Tag::VatRate]) || Number::floatsAreEqual($line[Tag::VatRate], -1.0)) {
+        if (isset($line[Tag::VatRate]) && (Number::isZero($line[Tag::VatRate]) || Number::floatsAreEqual($line[Tag::VatRate], -1.0))) {
             $result = true;
         }
         return $result;

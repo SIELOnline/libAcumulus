@@ -22,6 +22,7 @@ WC3 = WooCommerce 3 (WordPress)
 - ALL: Replace FormRenderer::setUsePopupDescription() with more generic
   FormRenderer:::setProperty().
 - All: Allow for label and label wrapper specific attributes in form fields.
+- All: Notice: Undefined index: vatrate in Completor.php on line 989.
 
 5.2.1 (2018-03-05)
 ------------------

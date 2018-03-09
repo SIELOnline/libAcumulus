@@ -1,12 +1,17 @@
 <?php
 namespace Siel\Acumulus\PrestaShop\Invoice;
 
+use Address;
 use Configuration;
 use Context;
+use Country;
+use Currency;
 use Db;
 use Order;
 use OrderSlip;
+use Siel\Acumulus\Api;
 use Siel\Acumulus\Invoice\Source as BaseSource;
+use Siel\Acumulus\Meta;
 
 /**
  * Wraps a PrestaShop order in an invoice source object.
@@ -23,8 +28,10 @@ class Source extends BaseSource
     protected function setSource()
     {
         if ($this->getType() === Source::Order) {
+            /** @noinspection PhpUnhandledExceptionInspection */
             $this->source = new Order($this->id);
         } else {
+            /** @noinspection PhpUnhandledExceptionInspection */
             $this->source = new OrderSlip($this->id);
             $this->addProperties();
         }
@@ -83,6 +90,119 @@ class Source extends BaseSource
 
     /**
      * {@inheritdoc}
+     *
+     * This override returns the name of the payment module.
+     */
+    public function getPaymentMethod()
+    {
+        /** @var \Order $order */
+        $order = $this->getOrder()->source;
+        if (isset($order->module)) {
+            return $order->module;
+        }
+        return parent::getPaymentMethod();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPaymentState()
+    {
+        // Assumption: credit slips are always in a paid state.
+        if (($this->getType() === Source::Order && $this->source->hasBeenPaid()) || $this->getType() === Source::CreditNote) {
+            $result = Api::PaymentStatus_Paid;
+        } else {
+            $result = Api::PaymentStatus_Due;
+        }
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPaymentDate()
+    {
+        if ($this->getType() === Source::Order) {
+            $paymentDate = null;
+            /** @var \Order $order */
+            $order = $this->getOrder()->source;
+            foreach ($order->getOrderPaymentCollection() as $payment) {
+                /** @var \OrderPayment $payment */
+                if ($payment->date_add && ($paymentDate === null || $payment->date_add > $paymentDate)) {
+                    $paymentDate = $payment->date_add;
+                }
+            }
+        } else {
+            // Assumption: last modified date is date of actual reimbursement.
+            $paymentDate = $this->source->date_upd;
+        }
+
+        $result = $paymentDate ? substr($paymentDate, 0, strlen('2000-01-01')) : null;
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCountryCode()
+    {
+        $invoiceAddress = new Address($this->getOrder()->source->id_address_invoice);
+        return !empty($invoiceAddress->id_country) ? Country::getIsoById($invoiceAddress->id_country) : '';
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * PrestaShop stores the internal currency id, so look up the currency
+     * object first then extract the ISO code for it.
+     */
+    public function getCurrency()
+    {
+        $currency = Currency::getCurrencyInstance($this->getOrder()->source->id_currency);
+        $result = array (
+            Meta::Currency => $currency->iso_code,
+            Meta::CurrencyRate => (float) $this->source->conversion_rate,
+            Meta::CurrencyDoConvert => true,
+        );
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * This override provides the values meta-invoice-amountinc and
+     * meta-invoice-amount.
+     */
+    public function getTotals()
+    {
+        $sign = $this->getSign();
+        if ($this->getType() === Source::Order) {
+            $amount = $this->source->getTotalProductsWithoutTaxes()
+                      + $this->source->total_shipping_tax_excl
+                      + $this->source->total_wrapping_tax_excl
+                      - $this->source->total_discounts_tax_excl;
+            $amountInc = $this->source->getTotalProductsWithTaxes()
+                         + $this->source->total_shipping_tax_incl
+                         + $this->source->total_wrapping_tax_incl
+                         - $this->source->total_discounts_tax_incl;
+        } else {
+            // On credit notes, the amount ex VAT will not have been corrected
+            // for discounts that are subtracted from the refund. This will be
+            // corrected later in getDiscountLinesCreditNote().
+            $amount = $this->source->total_products_tax_excl
+                      + $this->source->total_shipping_tax_excl;
+            $amountInc = $this->source->total_products_tax_incl
+                         + $this->source->total_shipping_tax_incl;
+        }
+
+        return array(
+            Meta::InvoiceAmountInc => $sign * $amountInc,
+            Meta::InvoiceAmount => $sign * $amount,
+        );
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getInvoiceReferenceOrder()
     {
@@ -104,7 +224,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    protected function getShopOrder()
+    protected function getShopOrderId()
     {
         /** @var \OrderSlip $orderSlip */
         $orderSlip = $this->source;
@@ -125,8 +245,6 @@ class Source extends BaseSource
      * OrderSlip does store but not load the values total_products_tax_excl,
      * total_shipping_tax_excl, total_products_tax_incl, and
      * total_shipping_tax_incl. As we need them, we load them ourselves.
-     *
-     * @throws \PrestaShopDatabaseException
      */
     protected function addProperties()
     {

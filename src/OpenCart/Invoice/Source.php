@@ -1,7 +1,9 @@
 <?php
 namespace Siel\Acumulus\OpenCart\Invoice;
 
+use Siel\Acumulus\Api;
 use Siel\Acumulus\Invoice\Source as BaseSource;
+use Siel\Acumulus\Meta;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
 
 /**
@@ -13,11 +15,15 @@ class Source extends BaseSource
     /** @var array */
     protected $source;
 
+    /** @var array[] List of OpenCart order total records. */
+    protected $orderTotalLines = null;
+
     /**
      * {@inheritdoc}
      */
     protected function setSource()
     {
+        /** @noinspection PhpUnhandledExceptionInspection */
         $this->source = Registry::getInstance()->getOrder($this->id);
     }
 
@@ -50,6 +56,114 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
+    public function getCountryCode()
+    {
+        return !empty($this->source['payment_iso_code_2']) ? $this->source['payment_iso_code_2'] : '';
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * This override returns the code of the selected payment method.
+     */
+    public function getPaymentMethod()
+    {
+        if (isset($this->source['payment_code'])) {
+            return $this->source['payment_code'];
+        }
+        return parent::getPaymentMethod();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPaymentState()
+    {
+        // The 'config_complete_status' setting contains a set of statuses that,
+        //  according to the help on the settings form:
+        // "The order status the customer's order must reach before they are
+        //  allowed to access their downloadable products and gift vouchers."
+        // This seems like the set of statuses where payment has been
+        // completed...
+        $orderStatuses = $this->getRegistry()->config->get('config_complete_status');
+
+        $result = in_array($this->source['order_status_id'], $orderStatuses) ? Api::PaymentStatus_Paid : Api::PaymentStatus_Due;
+        //        $result = Api::PaymentStatus_Paid;
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPaymentDate()
+    {
+        // @todo: Can we determine this based on history (and optionally payment_code)?
+        // Will default to the issue date.
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * In OpenCart the amounts are in the shop's default currency, even if
+     * another currency was presented to the customer, so we will not have to
+     * convert the amounts and this meta info is thus purely informative.
+     */
+    public function getCurrency()
+    {
+        $result = array(
+            Meta::Currency => $this->source['currency_code'],
+            Meta::CurrencyRate => (float) $this->source['currency_value'],
+            Meta::CurrencyDoConvert => false,
+        );
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * This override provides the values meta-invoice-amountinc,
+     * meta-invoice-vatamount and a vat breakdown in meta-invoice-vat.
+     */
+    public function getTotals()
+    {
+        $result = array(
+            Meta::InvoiceAmountInc => $this->source['total'],
+            Meta::InvoiceVatAmount => 0.0,
+            Meta::InvoiceVat => array(),
+        );
+
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $orderTotals = $this->getOrderTotalLines();
+        foreach ($orderTotals as $totalLine) {
+            if ($totalLine['code'] === 'tax') {
+                $result[Meta::InvoiceVat][] = $totalLine['title'] . ': ' . $totalLine['value'];
+                $result[Meta::InvoiceVatAmount] += $totalLine['value'];
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Returns a list of OpenCart order total records. These are shipment,
+     * other fee, tax, and discount lines.
+     *
+     * @return array[]
+     *
+     * @throws \Exception
+     */
+    public function getOrderTotalLines()
+    {
+        if (!$this->orderTotalLines) {
+            $orderModel = $this->getRegistry()->getOrderModel();
+            $this->orderTotalLines = $orderModel->getOrderTotals($this->source['order_id']);
+        }
+        return $this->orderTotalLines;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getInvoiceReference()
     {
         $result = null;
@@ -57,5 +171,16 @@ class Source extends BaseSource
             $result = $this->source['invoice_prefix'] . $this->source['invoice_no'];
         }
         return $result;
+    }
+
+    /**
+     * Wrapper method that returns the OpenCart registry class.
+     *
+     * @return \Siel\Acumulus\OpenCart\Helpers\Registry
+     *
+     */
+    protected function getRegistry()
+    {
+        return Registry::getInstance();
     }
 }

@@ -1,12 +1,15 @@
 <?php
 namespace Siel\Acumulus\Magento\Invoice;
 
+use Siel\Acumulus\Api;
+use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Source as BaseSource;
+use Siel\Acumulus\Meta;
 
 /**
  * Wraps a Magento order or credit memo in an invoice source object.
  */
-class Source extends BaseSource
+abstract class Source extends BaseSource
 {
     // More specifically typed properties.
     /** @var \Mage_Sales_Model_Order|\Mage_Sales_Model_Order_Creditmemo|\Magento\Sales\Model\Order|\Magento\Sales\Model\Order\Creditmemo */
@@ -89,6 +92,88 @@ class Source extends BaseSource
 
     /**
      * {@inheritdoc}
+     *
+     * This override returns the internal method name of the chosen payment
+     * method.
+     */
+    public function getPaymentMethod()
+    {
+        try {
+            return $this->getOrder()->source->getPayment()->getMethod();
+        }
+        catch (\Exception $e) {}
+        return parent::getPaymentMethod();
+    }
+
+    /**
+     * Returns whether the order has been paid or not.
+     *
+     * @return int
+     *   \Siel\Acumulus\Api::PaymentStatus_Paid or
+     *   \Siel\Acumulus\Api::PaymentStatus_Due
+     */
+    protected function getPaymentStateOrder()
+    {
+        return Number::isZero($this->source->getBaseTotalDue())
+            ? Api::PaymentStatus_Paid
+            : Api::PaymentStatus_Due;
+    }
+
+    /**
+     * Returns whether the order is in a state that makes it considered paid.
+     *
+     * This method is NOT used to determine the paid status, but is used to
+     * determine the paid date by looking for these statuses in the
+     * StatusHistoryCollection.
+     *
+     * @param string $status
+     *
+     * @return bool
+     */
+    protected function isPaidStatus($status)
+    {
+        return in_array($status, array('processing', 'closed', 'complete'));
+    }
+
+    /**
+     * Returns the payment date for the credit memo.
+     *
+     * @return string|null
+     *   The payment date (yyyy-mm-dd) or null if the order has not been paid yet.
+     */
+    protected function getPaymentDateCreditNote()
+    {
+        return substr($this->source->getCreatedAt(), 0, strlen('yyyy-mm-dd'));
+    }
+
+    public function getCurrency()
+    {
+        $result = array (
+            Meta::Currency => $this->source->getOrderCurrencyCode(),
+            Meta::CurrencyRate => (float) $this->source->getBaseToOrderRate(),
+            Meta::CurrencyDoConvert => false,
+        );
+        return $result;
+
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * This override provides the values meta-invoice-amountinc and
+     * meta-invoice-vatamount.
+     */
+    public function getTotals()
+    {
+        $sign = $this->getSign();
+        return array(
+            Meta::InvoiceAmountInc => $sign * $this->source->getBaseGrandTotal(),
+            Meta::InvoiceVatAmount => $sign * $this->source->getBaseTaxAmount(),
+        );
+    }
+
+    /**
+     * {@inheritdoc}
      */
     protected function setInvoice()
     {
@@ -122,11 +207,11 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    protected function getShopOrder()
+    protected function getShopOrderId()
     {
         /** @var \Mage_Sales_Model_Order_Creditmemo|\Magento\Sales\Model\Order\Creditmemo $creditmemo */
         $creditmemo = $this->source;
-        return $creditmemo->getOrder();
+        return $creditmemo->getOrderId();
     }
 
     /**

@@ -2,7 +2,6 @@
 namespace Siel\Acumulus\Joomla\VirtueMart\Invoice;
 
 use DOMDocument;
-use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\Meta;
@@ -114,114 +113,6 @@ class Creator extends BaseCreator
     /**
      * {@inheritdoc}
      */
-    protected function getCountryCode()
-    {
-        if (!empty($this->order['details']['BT']->virtuemart_country_id)) {
-            /** @var \VirtueMartModelCountry $countryModel */
-            $countryModel = VmModel::getModel('country');
-            $country = $countryModel->getData($this->order['details']['BT']->virtuemart_country_id);
-            return $country->country_2_code;
-        }
-        return '';
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * This override returns the virtuemart_paymentmethod_id.
-     */
-    protected function getPaymentMethod()
-    {
-        // @todo: test this: correct sub-array?
-        if (isset($this->order['details']['BT']->virtuemart_paymentmethod_id)) {
-            return $this->order['details']['BT']->virtuemart_paymentmethod_id;
-        }
-        return parent::getPaymentMethod();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getPaymentState()
-    {
-        return in_array($this->order['details']['BT']->order_status, $this->getPaidStates())
-            ? Api::PaymentStatus_Paid
-            : Api::PaymentStatus_Due;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getPaymentDate()
-    {
-        $date = null;
-        $previousStatus = '';
-        foreach ($this->order['history'] as $orderHistory) {
-            if (in_array($orderHistory->order_status_code, $this->getPaidStates()) && !in_array($previousStatus, $this->getPaidStates())) {
-                $date = $orderHistory->created_on;
-            }
-            $previousStatus = $orderHistory->order_status_code;
-        }
-        return $date ? date('Y-m-d', strtotime($date)) : $date;
-    }
-
-    /**
-     * Returns a list of order states that indicate that the order has been
-     * paid.
-     *
-     * @return array
-     */
-    protected function getPaidStates()
-    {
-        return array('C', 'S', 'R');
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * VirtueMart stores the currency info in the fields a serialzied object in the field
-     * order_currency_info, so unserialize to get the info.
-     *
-     * VirtueMart stores the internal currency id of the currency used by the
-     * customer in the field user_currency_id, so look up the currency object
-     * first then extract the ISO code for it.
-     *
-     * However, the amounts stored are in the shop's default currency, even if
-     * another currency was presented to the customer, so we will not have to
-     * convert the amounts and this meta info is thus purely informative.
-     */
-    protected function addCurrency()
-    {
-        // Load the currency.
-        /** @var \VirtueMartModelCurrency $currency_model */
-        $currency_model = VmModel::getModel('currency');
-        /** @var \TableCurrencies $currency */
-        $currency = $currency_model->getCurrency($this->order['details']['BT']->user_currency_id);
-        $result = array (
-            Meta::Currency => $currency->currency_code_3,
-            Meta::CurrencyRate => (float) $this->order['details']['BT']->user_currency_rate,
-            Meta::CurrencyDoConvert => false,
-        );
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * This override provides the values meta-invoice-amountinc and
-     * meta-invoice-vatamount as they may be needed by the Completor.
-     */
-    protected function getInvoiceTotals()
-    {
-        return array(
-            Meta::InvoiceAmountInc => $this->order['details']['BT']->order_total,
-            Meta::InvoiceVatAmount => $this->order['details']['BT']->order_billTaxAmount,
-        );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     protected function getItemLines()
     {
         $result = array_map(array($this, 'getItemLine'), $this->order['items']);
@@ -295,7 +186,8 @@ class Creator extends BaseCreator
         // calling some code that prints the attributes on an order and
         // "disassemble" that code...
         if (!class_exists('VirtueMartModelCustomfields')) {
-            require(VMPATH_ADMIN. '/models/customfields.php');
+            /** @noinspection PhpIncludeInspection */
+            require(VMPATH_ADMIN . '/models/customfields.php');
         }
         $product_attribute = VirtueMartModelCustomfields::CustomsFieldOrderDisplay($item, 'FE');
         if (!empty($product_attribute)) {

@@ -1,7 +1,9 @@
 <?php
 namespace Siel\Acumulus\WooCommerce\Invoice;
 
+use Siel\Acumulus\Api;
 use Siel\Acumulus\Invoice\Source as BaseSource;
+use Siel\Acumulus\Meta;
 
 /**
  * Wraps a WooCommerce order in an invoice source object.
@@ -14,7 +16,7 @@ use Siel\Acumulus\Invoice\Source as BaseSource;
 class Source extends BaseSource
 {
     // More specifically typed properties.
-    /** @var \WC_Abstract_Order */
+    /** @var \WC_Order|\WC_Order_Refund */
     protected $source;
 
     /**
@@ -68,8 +70,123 @@ class Source extends BaseSource
 
     /**
      * {@inheritdoc}
+     *
+     * This override returns the id of a WC_Payment_Gateway.
      */
-    protected function getShopOrder()
+    public function getPaymentMethod()
+    {
+        // Payment method is not stored for credit notes, so it is expected to
+        // be the same as for its order.
+        /** @var \WC_Order $order */
+        $order = $this->getOrder()->source;
+        return $order->get_payment_method();
+    }
+
+    /**
+     * Returns whether the order has been paid or not.
+     *
+     * @return int
+     *   \Siel\Acumulus\Api::PaymentStatus_Paid or
+     *   \Siel\Acumulus\Api::PaymentStatus_Due
+     */
+    protected function getPaymentStateOrder()
+    {
+        return $this->source->needs_payment() ? Api::PaymentStatus_Due : Api::PaymentStatus_Paid;
+    }
+
+    /**
+     * Returns whether the order refund has been paid or not.
+     *
+     * For now we assume that a refund is paid back on creation.
+     *
+     * @return int
+     *   \Siel\Acumulus\Api::PaymentStatus_Paid or
+     *   \Siel\Acumulus\Api::PaymentStatus_Due
+     */
+    protected function getPaymentStateCreditNote()
+    {
+        return Api::PaymentStatus_Paid;
+    }
+
+    /**
+     * Returns the payment date of the order.
+     *
+     * @return string
+     *   The payment date of the order (yyyy-mm-dd).
+     */
+    protected function getPaymentDateOrder()
+    {
+        // This returns a WC_DateTime but that class has a _toString() method.
+        $string = $this->source->get_date_paid();
+        return substr($string, 0, strlen('2000-01-01'));
+    }
+
+    /**
+     * Returns the payment date of the order refund.
+     *
+     * We take the last modified date as pay date.
+     *
+     * @return string
+     *   The payment date of the order refund (yyyy-mm-dd).
+     */
+    protected function getPaymentDateCreditNote()
+    {
+        // This returns a WC_DateTime but that class has a _toString() method.
+        $string = $this->source->get_date_modified();
+        return substr($string, 0, strlen('2000-01-01'));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCountryCode()
+    {
+        // Billing information is not stored for credit notes, so it is expected
+        // to be the same as for its order.
+        /** @var \WC_Order $order */
+        $order = $this->getOrder()->source;
+        return $order->get_billing_country();
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * WooCommerce does not support multiple currencies, so the amounts are
+     * always in the shop's default currency. Even if another plugin is used to
+     * present another currency to the customer, the amounts stored will
+     * (probably) still be in euro's. So, we will not have to convert the
+     * amounts and this meta info is thus purely informative.
+     */
+    public function getCurrency()
+    {
+        $result = array(
+            Meta::Currency => 'EUR',
+            Meta::CurrencyRate => 1.0,
+            Meta::CurrencyDoConvert => false,
+        );
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * This override provides the values meta-invoice-amountinc and
+     * meta-invoice-vatamount.
+     */
+    public function getTotals()
+    {
+        return array(
+            Meta::InvoiceAmountInc => $this->source->get_total(),
+            Meta::InvoiceVatAmount => $this->source->get_total_tax(),
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return \WC_Order|int
+     */
+    protected function getShopOrderId()
     {
         /** @var \WC_Order_Refund $refund */
         $refund = $this->source;

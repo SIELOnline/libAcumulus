@@ -1,8 +1,6 @@
 <?php
 namespace Siel\Acumulus\Joomla\HikaShop\Invoice;
 
-use hikashopConfigClass;
-use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\Meta;
@@ -32,12 +30,7 @@ class Creator extends BaseCreator
     protected $order;
 
     /**
-     * Product price precision in WC3: one of the prices is entered by the
-     * administrator but rounded to the cent by WC. The computed one is based
-     * on the subtraction/addition of 2 amounts rounded to the cent, so has a
-     * precision that may be a bit worse than 1 cent.
-     *
-     * values here.
+     * Product price precision in HS: TODO.
      *
      * @var float
      */
@@ -70,110 +63,6 @@ class Creator extends BaseCreator
             $this->propertySources['shipping_address'] = $this->order->shipping_address;
         }
         $this->propertySources['customer'] = $this->order->customer;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getCountryCode()
-    {
-        return !empty($this->order->billing_address->address_country_code_2) ? $this->order->billing_address->address_country_code_2 : '';
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * This override returns the name of the payment module.
-     */
-    protected function getPaymentMethod()
-    {
-        if (isset($this->order->order_payment_id)) {
-            return $this->order->order_payment_id;
-        }
-        return parent::getPaymentMethod();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getPaymentState()
-    {
-        /** @var hikashopConfigClass $config */
-        $config = hikashop_config();
-        $unpaidStatuses = explode(',', $config->get('order_unpaid_statuses', 'created'));
-        return in_array($this->order->order_status, $unpaidStatuses)
-            ? Api::PaymentStatus_Due
-            : Api::PaymentStatus_Paid;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getPaymentDate()
-    {
-        // Scan through the history and look for a non empty history_payment_id.
-        // The order of this array is by history_created DESC, we take the one that
-        // is furthest away in time.
-        $date = null;
-        foreach ($this->order->history as $history) {
-            if (!empty($history->history_payment_id)) {
-                $date = $history->history_created;
-            }
-        }
-        if (!$date) {
-            // Scan through the history and look for a non unpaid order status.
-            // We take the one that is furthest away in time.
-            /** @var hikashopConfigClass $config */
-            $config = hikashop_config();
-            $unpaidStatuses = explode(',', $config->get('order_unpaid_statuses', 'created'));
-            foreach ($this->order->history as $history) {
-                if (!empty($history->history_new_status) && !in_array($history->history_new_status, $unpaidStatuses)) {
-                    $date = $history->history_created;
-                }
-            }
-        }
-        return $date ? date('Y-m-d', $date) : $date;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * HikaShop stores the currency info in a serialized object in the field
-     * order_currency_info, so unserialize to get the info.
-     *
-     * If you do show but not publicise a currency, the currency info and
-     * amounts are stored as if the order was placed in the default currency.
-     */
-    protected function addCurrency()
-    {
-        $currency = unserialize($this->order->order_currency_info);
-        $result = array (
-            Meta::Currency => $currency->currency_code,
-            Meta::CurrencyRate => (float) $currency->currency_rate,
-            Meta::CurrencyDoConvert => true,
-        );
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * This override provides the values meta-invoice-amountinc and
-     * meta-invoice-vatamount.
-     */
-    protected function getInvoiceTotals()
-    {
-        $vatAmount = 0.0;
-        // No order_taxinfo => no tax (?) => vatamount = 0.
-        if (!empty($this->order->order_tax_info)) {
-            foreach ($this->order->order_tax_info as $taxInfo) {
-                $vatAmount += $taxInfo->tax_amount;
-            }
-        }
-        return array(
-            Meta::InvoiceAmountInc => $this->order->order_full_price,
-            Meta::InvoiceVatAmount => $vatAmount,
-        );
     }
 
     /**

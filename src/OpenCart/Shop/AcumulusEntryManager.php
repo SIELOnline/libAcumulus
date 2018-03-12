@@ -11,9 +11,18 @@ use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
 /**
  * Implements the OpenCart specific acumulus entry model class.
  *
- * In WooCommerce this data is stored as metadata. As such, the "records"
- * returned here are an array of all metadata values, thus not filtered by
- * Acumulus keys.
+ * SECURITY REMARKS
+ * ----------------
+ * In OpenCart saving and querying acumulus entries is done via self
+ * constructed queries, therefore this class takes care of sanitizing itself.
+ * - Numbers are cast to (int).
+ * - Strings are escaped using the escape() method of the DB driver class
+ *   (unless they are hard coded).
+ * Note that:
+ * - $invoiceSource, $created and $updated are set in calling code, and can
+ *   thus be considered trusted, but are still escaped.
+ * - $entryId and $token come from outside, from the Acumulus API, and must
+ *   thus be handled as untrusted.
  */
 class AcumulusEntryManager extends BaseAcumulusEntryManager
 {
@@ -44,8 +53,10 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    public function getByInvoiceSourceId($invoiceSourceType, $invoiceSourceId)
+    public function getByInvoiceSource(Source $invoiceSource)
     {
+        $invoiceSourceType = $this->getDb()->escape($invoiceSource->getType());
+        $invoiceSourceId = (int) $invoiceSource->getId();
         /** @noinspection PhpUnhandledExceptionInspection */
         $result = $this->getDb()->query("SELECT * FROM `{$this->tableName}` WHERE source_type = '$invoiceSourceType' AND source_id = $invoiceSourceId");
         return $this->convertDbResultToAcumulusEntries($result->rows);
@@ -54,18 +65,19 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    protected function insert($invoiceSource, $entryId, $token, $created)
+    protected function insert(Source $invoiceSource, $entryId, $token, $created)
     {
         if ($invoiceSource->getType() === Source::Order) {
-            $storeId = $invoiceSource->getSource();
-            $storeId = $storeId['store_id'];
+            $order = $invoiceSource->getSource();
+            $storeId = (int) $order['store_id'];
         } else {
             $storeId = 0;
         }
+        $invoiceSourceType = $this->getDb()->escape($invoiceSource->getType());
+        $invoiceSourceId = (int) $invoiceSource->getId();
         $entryId = $entryId === null ? 'null' : (string) (int) $entryId;
-        $token = $token === null ? 'null' : "'" . $this->getDb()->escape($token) . "'";
-        $invoiceSourceType = $invoiceSource->getType();
-        $invoiceSourceId = $invoiceSource->getId();
+        $token = $token === null ? 'null' : ("'" . $this->getDb()->escape($token) . "'");
+        $created = $this->getDb()->escape($created);
         /** @noinspection PhpUnhandledExceptionInspection */
         return (bool) $this->getDb()->query("INSERT INTO `{$this->tableName}` (store_id, entry_id, token, source_type, source_id, updated) VALUES ($storeId, $entryId, $token, '$invoiceSourceType', $invoiceSourceId, '$created')");
     }
@@ -76,10 +88,12 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     protected function update(BaseAcumulusEntry $record, $entryId, $token, $updated)
     {
         $record = $record->getRecord();
+        $recordId = (int) $record['id'];
         $entryId = $entryId === null ? 'null' : (string) (int) $entryId;
         $token = $token === null ? 'null' : "'" . $this->getDb()->escape($token) . "'";
+        $updated = $this->getDb()->escape($updated);
         /** @noinspection PhpUnhandledExceptionInspection */
-        return (bool) $this->getDb()->query("UPDATE `{$this->tableName}` SET entry_id = $entryId, token = $token, updated = '$updated' WHERE id = {$record['id']}");
+        return (bool) $this->getDb()->query("UPDATE `{$this->tableName}` SET entry_id = $entryId, token = $token, updated = '$updated' WHERE id = $recordId");
     }
 
     /** @noinspection PhpUndefinedNamespaceInspection */

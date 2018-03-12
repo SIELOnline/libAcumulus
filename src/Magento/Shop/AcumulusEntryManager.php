@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\Magento\Shop;
 
+use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Shop\AcumulusEntryManager as BaseAcumulusEntryManager;
 use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
 
@@ -9,6 +10,11 @@ use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
  *
  * This class is a bridge between the Acumulus library and the way that Magento
  * models are modelled.
+ *
+ * SECURITY REMARKS
+ * ----------------
+ * In Magento saving and querying acumulus entries is done via the Magento DB
+ * API which takes care of sanitizing.
  */
 class AcumulusEntryManager extends BaseAcumulusEntryManager
 {
@@ -41,15 +47,15 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    public function getByInvoiceSourceId($invoiceSourceType, $invoiceSourceId)
+    public function getByInvoiceSource(Source $invoiceSource)
     {
         /** @var \Siel_Acumulus_Model_Entry|\Siel\AcumulusMa2\Model\Entry $result */
         /** @noinspection PhpUnhandledExceptionInspection */
         $result = $this
             ->getModel()
             ->getResourceCollection()
-            ->addFieldToFilter('source_type', $invoiceSourceType)
-            ->addFieldToFilter('source_id', $invoiceSourceId)
+            ->addFieldToFilter('source_type', $invoiceSource->getType())
+            ->addFieldToFilter('source_id', $invoiceSource->getId())
             ->getFirstItem();
         return $this->convertDbResultToAcumulusEntries($result);
     }
@@ -57,7 +63,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    protected function insert($invoiceSource, $entryId, $token, $created)
+    protected function insert(Source $invoiceSource, $entryId, $token, $created)
     {
         /** @noinspection PhpDeprecationInspection http://magento.stackexchange.com/questions/114929/deprecated-save-and-load-methods-in-abstract-model */
         /** @noinspection PhpUnhandledExceptionInspection */

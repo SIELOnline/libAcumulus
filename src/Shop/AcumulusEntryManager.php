@@ -3,6 +3,7 @@ namespace Siel\Acumulus\Shop;
 
 use Siel\Acumulus\Helpers\ContainerInterface;
 use Siel\Acumulus\Helpers\Log;
+use Siel\Acumulus\Invoice\Source;
 
 /**
  * Manages AcumulusEntry records/objects.
@@ -55,24 +56,7 @@ abstract class AcumulusEntryManager
      *   Acumulus entry record for the given invoice source or null if no
      *   invoice has yet been created in Acumulus for this invoice source.
      */
-    public function getByInvoiceSource($invoiceSource)
-    {
-        return $this->getByInvoiceSourceId($invoiceSource->getType(), $invoiceSource->getId());
-    }
-
-    /**
-     * Returns the Acumulus entry record for the given invoice source.
-     *
-     * @param string $invoiceSourceType
-     *   The type of the invoice source
-     * @param string $invoiceSourceId
-     *   The id of the invoice source for which the invoice was created.
-     *
-     * @return \Siel\Acumulus\Shop\AcumulusEntry|null
-     *   Acumulus entry record for the given invoice source or null if no
-     *   invoice has yet been created in Acumulus for this invoice source.
-     */
-    abstract public function getByInvoiceSourceId($invoiceSourceType, $invoiceSourceId);
+    abstract public function getByInvoiceSource(Source $invoiceSource);
 
     /**
      * Converts the results of a DB query to AcumulusEntries.
@@ -158,7 +142,7 @@ abstract class AcumulusEntryManager
      * @return bool
      *   Success.
      */
-    abstract protected function insert($invoiceSource, $entryId, $token, $created);
+    abstract protected function insert(Source $invoiceSource, $entryId, $token, $created);
 
     /**
      * Updates the Acumulus entry for the given invoice source.

@@ -10,6 +10,12 @@ use Siel\Acumulus\Invoice\Source;
  *
  * In WordPress this data is stored as metadata. As such, the "records" returned
  * here are an array of all metadata values, thus not filtered by Acumulus keys.
+ *
+ * SECURITY REMARKS
+ * ----------------
+ * In WooCommerce/WordPress the acumulus entries are stored as post meta data,
+ * saving and querying is done via the WordPress API which takes care of
+ * sanitizing.
  */
 class AcumulusEntryManager extends BaseAcumulusEntryManager
 {
@@ -67,9 +73,11 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    public function getByInvoiceSourceId($invoiceSourceType, $invoiceSourceId)
+    public function getByInvoiceSource(Source $invoiceSource)
     {
         $result = null;
+        $invoiceSourceType = $invoiceSource->getType();
+        $invoiceSourceId = (int) $invoiceSource->getId();
         $post = get_post($invoiceSourceId);
         if (!empty($post->post_type) && $this->shopTypeToSourceType($post->post_type) === $invoiceSourceType) {
             $result = get_post_meta($invoiceSourceId);
@@ -106,7 +114,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    protected function insert($invoiceSource, $entryId, $token, $created)
+    protected function insert(Source $invoiceSource, $entryId, $token, $created)
     {
         throw new \BadMethodCallException(__METHOD__ . ' not implemented');
     }

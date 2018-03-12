@@ -18,22 +18,10 @@ class FormRenderer extends BaseFormRenderer
         $this->radioWrapperClass = 'form-element-radios';
         $this->checkboxWrapperClass = 'form-element-checkboxes';
         $this->multiLabelClass = 'label';
-        $this->descriptionClass = 'desc';
+        $this->descriptionWrapperClass = 'desc';
+        $this->fieldsetDescriptionWrapperClass = 'fieldset-desc desc';
         $this->requiredMarkup = static::RequiredMarkup;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function fieldsetBegin(array $field)
-    {
-        $oldDescriptionClass = $this->descriptionClass;
-        $this->descriptionClass = 'fieldset-desc desc';
-        $result = parent::fieldsetBegin($field);
-        $this->descriptionClass = $oldDescriptionClass;
-        return $result;
-    }
-
 
     /**
      * {@inheritdoc}

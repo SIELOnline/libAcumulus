@@ -151,7 +151,7 @@ class BatchForm extends Form
             $result = true;
         } else {
             if ((bool) $this->getFormValue('send_test_mode')) {
-                // Overrule debug setting for this run.
+                // Overrule debug setting for (the rest of) this run.
                 $this->acumulusConfig->set('debug', PluginConfig::Send_TestMode);
             }
             $result = $this->invoiceManager->sendMultiple($invoiceSources, (bool) $this->getFormValue('force_send'), (bool) $this->getFormValue('dry_run'), $this->log);

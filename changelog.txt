@@ -19,6 +19,9 @@ WC3 = WooCommerce 3 (WordPress)
 
 5.2.2 (2018-03-??)
 ------------------
+- ALL: security review: better code and document security measures taken. Some
+  additional escaping was added, mostly input coming from the Acumulus API, so
+  no real security risks were discovered.
 - WC: 2e versie van de "dashboard" functionaliteit.
 - ALL: Moved order/credit note related getting methods from Creator to Source.
 - ALL: Replace FormRenderer::setUsePopupDescription() with more generic

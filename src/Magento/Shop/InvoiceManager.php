@@ -5,6 +5,14 @@ use Siel\Acumulus\Invoice\Result;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
 
+/**
+ * Implements the Magento specific invoice manager.
+ *
+ * SECURITY REMARKS
+ * ----------------
+ * In Magento saving and querying orders or credit memos is done via the Magento
+ * DB API which takes care of sanitizing.
+ */
 abstract class InvoiceManager extends BaseInvoiceManager
 {
     /**

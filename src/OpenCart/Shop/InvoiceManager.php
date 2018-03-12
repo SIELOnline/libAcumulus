@@ -8,6 +8,18 @@ use Siel\Acumulus\Invoice\Source as Source;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
 use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
 
+/**
+ * Implements the OpenCart specific parts of the invoice manager.
+ *
+ * SECURITY REMARKS
+ * ----------------
+ * In OpenCart querying orders is done via self constructed queries. So, this
+ * class has to take care of sanitizing itself.
+ * - Numbers are cast by using numeric formatters (like %u, %d, %f) with
+ *   sprintf().
+ * - Strings are escaped using the escape() method on a db instance, unless they
+ *   are hard coded or internal variables.
+ */
 class InvoiceManager extends BaseInvoiceManager
 {
     /** @var array */
@@ -55,9 +67,15 @@ class InvoiceManager extends BaseInvoiceManager
     public function getInvoiceSourcesByIdRange($invoiceSourceType, $InvoiceSourceIdFrom, $InvoiceSourceIdTo)
     {
         $key = $this->tableInfo[$invoiceSourceType]['key'];
-        $table = $this->tableInfo[$invoiceSourceType]['table'];
-        $query = sprintf("SELECT `%s` FROM `%s` WHERE `%s` BETWEEN %u AND %u", $key, $table, $key, $InvoiceSourceIdFrom, $InvoiceSourceIdTo);
-        $result = $this->getDb()->query($query);
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $result = $this->getDb()->query(sprintf(
+            "SELECT `%s` FROM `%s` WHERE `%s` BETWEEN %u AND %u",
+            $key,
+            $this->tableInfo[$invoiceSourceType]['table'],
+            $key,
+            $InvoiceSourceIdFrom,
+            $InvoiceSourceIdTo
+        ));
         return $this->getSourcesByIdsOrSources($invoiceSourceType, $this->getCol($result->rows, $key));
     }
 
@@ -66,13 +84,15 @@ class InvoiceManager extends BaseInvoiceManager
      */
     public function getInvoiceSourcesByDateRange($invoiceSourceType, DateTime $dateFrom, DateTime $dateTo)
     {
-        $dateFrom = $this->getSqlDate($dateFrom);
-        $dateTo = $this->getSqlDate($dateTo);
-        $dateField = 'date_modified';
         $key = $this->tableInfo[$invoiceSourceType]['key'];
-        $table = $this->tableInfo[$invoiceSourceType]['table'];
-        $query = sprintf("SELECT `%s` FROM `%s` WHERE `%s` BETWEEN '%s' AND '%s'", $key, $table, $dateField, $dateFrom, $dateTo);
-        $result = $this->getDb()->query($query);
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $result = $this->getDb()->query(sprintf(
+            "SELECT `%s` FROM `%s` WHERE `date_modified` BETWEEN '%s' AND '%s'",
+            $key,
+            $this->tableInfo[$invoiceSourceType]['table'],
+            $this->getSqlDate($dateFrom),
+            $this->getSqlDate($dateTo)
+        ));
         return $this->getSourcesByIdsOrSources($invoiceSourceType, $this->getCol($result->rows, $key));
     }
 

@@ -985,7 +985,7 @@ abstract class Creator
      *
      * @return mixed
      */
-    protected function callSourceTyxpeSpecificMethod($method, $args = array())
+    protected function callSourceTypeSpecificMethod($method, $args = array())
     {
         $method .= $this->invoiceSource->getType();
         return call_user_func_array(array($this, $method), $args);

@@ -5,9 +5,7 @@ use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
-use WC_Abstract_Order;
 use WC_Coupon;
-use WC_Order;
 use WC_Order_Item_Product;
 use WC_Product;
 use WC_Tax;
@@ -17,11 +15,11 @@ use WC_Tax;
  */
 class Creator extends BaseCreator
 {
-    /** @var WC_Abstract_Order The order or refund that is sent to Acumulus. */
-    protected $shopSource;
-
-    /** @var WC_Order The order self or the order that got refunded. */
+    /** @var \WC_Order The order self or the order that got refunded. */
     protected $order;
+
+    /** @var \WC_Order_Refund the refund for an order. */
+    protected $refund;
 
     /** @var bool Whether the order has (non empty) item lines. */
     protected $hasItemLines;
@@ -32,12 +30,14 @@ class Creator extends BaseCreator
      * on the subtraction/addition of 2 amounts rounded to the cent, so has a
      * precision that may be a bit worse than 1 cent.
      *
-     * values here.
-     *
      * @var float
      */
     protected $precisionPriceEntered  = 0.01;
+
+    /** @var float */
     protected $precisionPriceCalculated  = 0.02;
+
+    /** @var float */
     protected $precisionVat  = 0.01;
 
     /**
@@ -49,13 +49,13 @@ class Creator extends BaseCreator
     protected function setInvoiceSource($invoiceSource)
     {
         parent::setInvoiceSource($invoiceSource);
-        $this->shopSource = $this->invoiceSource->getSource();
         switch ($this->invoiceSource->getType()) {
             case Source::Order:
-                $this->order = $this->shopSource;
+                $this->order = $this->invoiceSource->getSource();
                 break;
             case Source::CreditNote:
-                $this->order = new WC_Order($this->shopSource->get_parent_id());
+                $this->refund = $this->invoiceSource->getSource();
+                $this->order = $this->invoiceSource->getOrder()->getSource();
                 break;
         }
     }
@@ -78,7 +78,7 @@ class Creator extends BaseCreator
     {
         $result = array();
         /** @var WC_Order_Item_Product[] $items */
-        $items = $this->shopSource->get_items(apply_filters('woocommerce_admin_order_item_types', 'line_item'));
+        $items = $this->invoiceSource->getSource()->get_items(apply_filters('woocommerce_admin_order_item_types', 'line_item'));
         foreach ($items as $item) {
             $product = $item->get_product();
             /** @noinspection PhpUnhandledExceptionInspection */
@@ -309,7 +309,7 @@ class Creator extends BaseCreator
         // So far, all amounts found on refunds are negative, so we probably
         // don't need to correct the sign on these lines either: but this has
         // not been tested yet!.
-        foreach ($this->shopSource->get_fees() as $feeLine) {
+        foreach ($this->invoiceSource->getSource()->get_fees() as $feeLine) {
             $line = $this->getFeeLine($feeLine);
             $line[Meta::LineType] = static::LineType_Other;
             $result[] = $line;
@@ -346,7 +346,7 @@ class Creator extends BaseCreator
         $result = array();
         // Get the shipping lines for this order.
         /** @var \WC_Order_Item_Shipping[] $shippingItems */
-        $shippingItems = $this->shopSource->get_items(apply_filters('woocommerce_admin_order_item_types', 'shipping'));
+        $shippingItems = $this->invoiceSource->getSource()->get_items(apply_filters('woocommerce_admin_order_item_types', 'shipping'));
         foreach ($shippingItems as $shippingItem) {
             $shippingLine = $this->getShippingLine($shippingItem);
             if ($shippingLine) {

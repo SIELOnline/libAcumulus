@@ -40,9 +40,6 @@ use TaxManagerFactory;
  */
 class Creator extends BaseCreator
 {
-    /** @var Order|OrderSlip The order or refund that is sent to Acumulus. */
-    protected $shopSource;
-
     /** @var Order */
     protected $order;
 
@@ -58,14 +55,13 @@ class Creator extends BaseCreator
     protected function setInvoiceSource($invoiceSource)
     {
         parent::setInvoiceSource($invoiceSource);
-        $this->shopSource = $this->invoiceSource->getSource();
         switch ($this->invoiceSource->getType()) {
             case Source::Order:
-                $this->order = $this->shopSource;
+                $this->order = $this->invoiceSource->getSource();
                 break;
             case Source::CreditNote:
-                $this->creditSlip = $this->shopSource;
-                $this->order = $this->invoiceSource->getOrder();
+                $this->creditSlip = $this->invoiceSource->getSource();
+                $this->order = $this->invoiceSource->getOrder()->getSource();
                 break;
         }
     }
@@ -277,16 +273,15 @@ class Creator extends BaseCreator
      */
     protected function getPaymentFeeLine()
     {
-        /* @noinspection PhpUndefinedFieldInspection */
-        if (isset($this->invoiceSource->getSource()->payment_fee)
-            && isset($this->invoiceSource->getSource()->payment_fee_rate)
-            && (float) $this->invoiceSource->getSource()->payment_fee !== 0.0)
+        /** @var \Order|\OrderSlip $source */
+        $source = $this->invoiceSource->getSource();
+        if (isset($source->payment_fee)
+            && isset($source->payment_fee_rate)
+            && (float) $source->payment_fee !== 0.0)
         {
             $sign = $this->invoiceSource->getSign();
-            /** @noinspection PhpUndefinedFieldInspection */
-            $paymentInc = (float) $sign * $this->invoiceSource->getSource()->payment_fee;
-            /** @noinspection PhpUndefinedFieldInspection */
-            $paymentVatRate = (float) $this->invoiceSource->getSource()->payment_fee_rate;
+            $paymentInc = (float) $sign * $source->payment_fee;
+            $paymentVatRate = (float) $source->payment_fee_rate;
             $paymentEx = $paymentInc / (100.0 + $paymentVatRate) * 100;
             $paymentVat = $paymentInc - $paymentEx;
             $result = array(

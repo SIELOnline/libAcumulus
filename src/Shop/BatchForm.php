@@ -207,12 +207,14 @@ class BatchForm extends Form
                     'label' => $this->t('field_date_from'),
                     'format' => $this->getShopDateFormat(),
                 ),
+                // @todo: html date fields have their own format based on language settings?
                 'date_to' => array(
                     'type' => 'date',
                     'label' => $this->t('field_date_to'),
                     'description' => sprintf($this->t('desc_date_from_to'), $this->getShopDateFormat()),
                     'format' => $this->getShopDateFormat(),
                 ),
+                // @todo: make this a radio and rephrase: Do not overwrite if already sent, overwrite if already sent
                 'options' => array(
                     'type' => 'checkbox',
                     'label' => $this->t('field_options'),

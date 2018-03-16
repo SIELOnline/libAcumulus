@@ -7,7 +7,6 @@ use Siel\Acumulus\Tag;
 use Siel\Acumulus\WooCommerce\Invoice\Creator as BaseCreator;
 use WC_Coupon;
 use WC_Product;
-use WC_Tax;
 
 /**
  * Allows to create an Acumulus invoice from a WooCommerce2 order or refund.
@@ -81,52 +80,6 @@ class Creator extends BaseCreator
     /**
      * {@inheritdoc}
      */
-    protected function getCountryCode()
-    {
-        return isset($this->order->billing_country) ? $this->order->billing_country : '';
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * This override returns the id of a WC_Payment_Gateway.
-     */
-    protected function getPaymentMethod()
-    {
-        if (isset($this->shopSource->payment_method)) {
-            return $this->shopSource->payment_method;
-        }
-        return parent::getPaymentMethod();
-    }
-
-    /**
-     * Returns the payment date of the order.
-     *
-     * @return string
-     *   The payment date of the order (yyyy-mm-dd).
-     */
-    protected function getPaymentDateOrder()
-    {
-        /** @noinspection PhpUndefinedFieldInspection */
-        return substr($this->shopSource->paid_date, 0, strlen('2000-01-01'));
-    }
-
-    /**
-     * Returns the payment date of the order refund.
-     *
-     * We take the last modified date as pay date.
-     *
-     * @return string
-     *   The payment date of the order refund (yyyy-mm-dd).
-     */
-    protected function getPaymentDateCreditNote()
-    {
-        return substr($this->shopSource->post->post_modified, 0, strlen('2000-01-01'));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     protected function getItemLines()
     {
         $result = array();
@@ -140,8 +93,6 @@ class Creator extends BaseCreator
                 $result[] = $itemLine;
             }
         }
-
-        $result = $this->groupBundles($result);
 
         $this->hasItemLines = count($result) > 0;
         return $result;
@@ -228,29 +179,10 @@ class Creator extends BaseCreator
             $result += $this->getVatRateLookupMetadataByTaxClass($product->get_tax_class());
         }
 
-        // Add bundle meta data (woocommerce-bundle-products extension).
-        $bundleId = $item['_bundle_cart_key'];
-        if (!empty($bundleId)) {
-            // Bundle or bundled product.
-            $result[Meta::BundleId] = $bundleId;
-        }
-        $bundledBy = $item['_bundled_by'];
-        if (!empty($bundledBy)) {
-            // Bundled products only.
-            $result[Meta::BundleParentId] = $bundledBy;
-            $result[Meta::BundleVisible] = $item['bundled_item_hidden'] !== 'yes';
-        }
-
         // Add variants/options.
         $commonTags[Meta::VatRateSource] = static::VatRateSource_Parent;
         if ($product instanceof WC_Product && !empty($item['variation_id'])) {
             $result[Meta::ChildrenLines] = $this->getVariantLines($item, $product, $commonTags);
-        } elseif (!empty($item['tmcartepo_data'])) {
-            // If the plugin is no longer used, we may still have an order with
-            // products where the plugin was used. Moreover we don't use any
-            // function or method from the plugin, only its stored data, so we
-            // don'have to t check for it being active.
-            $result[Meta::ChildrenLines] = $this->getExtraProductOptionsLines($item, $commonTags);
         }
 
         $this->removePropertySource('product');
@@ -411,7 +343,7 @@ class Creator extends BaseCreator
         if ($coupon->exists) {
             $description = sprintf('%s %s: ', $this->t('discount_code'), $coupon->code);
             if (in_array($coupon->discount_type, array('fixed_product', 'fixed_cart'))) {
-                $amount = $this->getSign() * $coupon->coupon_amount;
+                $amount = $this->invoiceSource->getSign() * $coupon->coupon_amount;
                 if (!Number::isZero($amount)) {
                     $description .= sprintf('€%.2f (%s)', $amount, $this->productPricesIncludeTax() ? $this->t('inc_vat') : $this->t('ex_vat'));
                 }

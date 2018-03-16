@@ -116,6 +116,18 @@ abstract class Source
     }
 
     /**
+     * Returns the sign to use for amounts that are always defined as a positive
+     * number, also on credit notes.
+     *
+     * @return float
+     *   1 for orders, -1 for credit notes.
+     */
+    public function getSign()
+    {
+        return (float) ($this->getType() === Source::CreditNote ? -1.0 : 1.0);
+    }
+
+    /**
      * Returns the order (or credit memo) date.
      *
      * @return string
@@ -139,6 +151,91 @@ abstract class Source
     {
         return $this->callTypeSpecificMethod(__FUNCTION__);
     }
+
+    /**
+     * Returns the payment method used.
+     *
+     * This default implementation returns an empty payment method.
+     *
+     * If no payment method is stored for credit notes, it is expected to be the
+     * same as for its order, as this will normally indeed be the case.
+     *
+     * @return int|string|null
+     *   A value identifying the payment method or null if unknown.
+     */
+    public function getPaymentMethod()
+    {
+        return null;
+    }
+
+    /**
+     * Returns whether the order has been paid or not.
+     *
+     * @return int
+     *   \Siel\Acumulus\Api::PaymentStatus_Paid or
+     *   \Siel\Acumulus\Api::PaymentStatus_Due
+     */
+    public function getPaymentState()
+    {
+        return $this->callTypeSpecificMethod(__FUNCTION__);
+    }
+
+    /**
+     * Returns the payment date.
+     *
+     * The payment date is defined as the date on which the status changed from a
+     * non-paid state to a paid state. If there are multiple state changes, the
+     * last one is taken.
+     *
+     * @return string|null
+     *   The payment date (yyyy-mm-dd) or null if the order has not been paid yet.
+     */
+    public function getPaymentDate()
+    {
+        return $this->callTypeSpecificMethod(__FUNCTION__);
+    }
+
+    /**
+     * Returns the country code for the order.
+     *
+     * @return string
+     *   The 2 letter country code for the current order or the empty string if
+     *   not set.
+     */
+    abstract public function getCountryCode();
+
+    /**
+     * Returns metadata about the used currency on the invoice.
+     *
+     * The currency related meta tags are:
+     * - currency: the code of the currency used for this order/refund
+     * - currency-rate: the rate from the used currency to the shop's default
+     *   currency.
+     * - currency-do-convert: if the amounts are in the used currency or in the
+     *   default currency (MA, OC, WC).
+     *
+     * @return array
+     *   An array with the currency meta tags.
+     */
+    abstract public function getCurrency();
+
+    /**
+     * Returns an array with the totals fields.
+     *
+     * All total fields are optional but may be used or even expected by the
+     * Completor or are used for support and debugging purposes.
+     *
+     * This default implementation returns an empty array. Override to provide the
+     * values.
+     *
+     * @return array
+     *   An array with the following possible keys:
+     *   - meta-invoice-amount: the total invoice amount excluding VAT.
+     *   - meta-invoice-amountinc: the total invoice amount including VAT.
+     *   - meta-invoice-vatamount: the total vat amount for the invoice.
+     *   - meta-invoice-vat: a vat breakdown per vat rate.
+     */
+    abstract public function getTotals();
 
     /**
      * Loads and sets the web shop invoice linked ot this source.
@@ -203,45 +300,33 @@ abstract class Source
     }
 
     /**
-     * Returns the original invoice source for this invoice source.
-     *
-     * The base implementation returns the result of getOriginalOrder() for
-     * credit notes and null for non credit notes. Normally, a shop should not
-     * override this method but override getOriginalOrder() instead.
-     *
-     * @return Source|null
-     *   If the invoice source is a credit note, the original order is returned,
-     *   otherwise null.
-     */
-    public function getOriginalSource()
-    {
-        $result = null;
-        $originalOrder = $this->getShopOrder();
-        if ($originalOrder !== null) {
-            $result = new static(Source::Order, $originalOrder);
-        }
-        return $result;
-    }
-
-    /**
      * Returns the order source for a credit note source.
      *
      * Do not override this method but override getShopOrder() instead.
      *
-     * @return Source|null
+     * @return Source
      *   If the invoice source is a credit note, its original order is returned,
-     *   null otherwise.
+     *   otherwise, the invoice source is an order itself and $this is returned.
      */
     public function getOrder()
     {
-        $result = null;
-        if ($this->getType() === Source::CreditNote) {
-            $shopOrder = $this->getShopOrder();
-            if ($shopOrder !== null) {
-                $result = new static(Source::Order, $shopOrder);
-            }
-        }
-        return $result;
+        return $this->getType() === Source::CreditNote ? new static(Source::Order, $this->getShopOrderId()) : $this;
+    }
+
+    /**
+     * Returns the original order or order id for this credit note.
+     *
+     * The base implementation returns $this. Override if the shop supports
+     * credit notes and thus the result can be a different order.
+     *
+     * @return array|object|int
+     *   If the invoice source is a credit note, its original shop order is
+     *   returned, otherwise, the invoice source is an order, the shop order
+     *   itself is returned.
+     */
+    protected function getShopOrderId()
+    {
+        return $this->source;
     }
 
     /**
@@ -264,21 +349,6 @@ abstract class Source
             }
         }
         return $result;
-    }
-
-    /**
-     * Returns the original order or order id for this credit note.
-     *
-     * The base implementation returns null. Override if the shop supports
-     * credit notes.
-     *
-     * @return array|object|int|null
-     *   The original shop order or order id for this credit note, or null if
-     *   not supported.
-     */
-    protected function getShopOrder()
-    {
-        return null;
     }
 
     /**
@@ -307,14 +377,16 @@ abstract class Source
      *
      * @param string $method
      *   The original method called.
+     * @param array $args
+     *   The parameters to pass to the type specific method.
      *
      * @return mixed
      */
-    protected function callTypeSpecificMethod($method)
+    protected function callTypeSpecificMethod($method, $args = array())
     {
         $method .= $this->getType();
         if (method_exists($this, $method)) {
-            return $this->$method();
+            return call_user_func_array(array($this, $method), $args);
         }
         return null;
     }

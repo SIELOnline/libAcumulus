@@ -2,6 +2,7 @@
 namespace Siel\Acumulus\WooCommerce\WooCommerce2\Invoice;
 
 use Siel\Acumulus\WooCommerce\Invoice\Source as BaseSource;
+use Siel\Acumulus\Invoice\Source as GrandParentSource;
 
 /**
  * Wraps a WooCommerce2 order in an invoice source object.
@@ -47,7 +48,7 @@ class Source extends BaseSource
      */
     public function getDateOrder()
     {
-        return substr($this->getSource()->order_date, 0, strlen('2000-01-01'));
+        return substr($this->source->order_date, 0, strlen('2000-01-01'));
     }
 
     /**
@@ -55,6 +56,48 @@ class Source extends BaseSource
      */
     public function getDateCreditNote()
     {
-        return substr($this->getSource()->post->post_date, 0, strlen('2000-01-01'));
+        return substr($this->source->post->post_date, 0, strlen('2000-01-01'));
+    }
+
+    public function getPaymentMethod()
+    {
+        if (isset($this->source->payment_method)) {
+            return $this->source->payment_method;
+        }
+        return GrandParentSource::getPaymentMethod();
+    }
+
+
+    /**
+     * Returns the payment date of the order.
+     *
+     * @return string
+     *   The payment date of the order (yyyy-mm-dd).
+     */
+    protected function getPaymentDateOrder()
+    {
+        /** @noinspection PhpUndefinedFieldInspection */
+        return substr($this->source->paid_date, 0, strlen('2000-01-01'));
+    }
+
+    /**
+     * Returns the payment date of the order refund.
+     *
+     * We take the last modified date as pay date.
+     *
+     * @return string
+     *   The payment date of the order refund (yyyy-mm-dd).
+     */
+    protected function getPaymentDateCreditNote()
+    {
+        return substr($this->source->post->post_modified, 0, strlen('2000-01-01'));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCountryCode()
+    {
+        return isset($this->source->billing_country) ? $this->source->billing_country : '';
     }
 }

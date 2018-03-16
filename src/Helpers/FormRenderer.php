@@ -7,6 +7,21 @@ namespace Siel\Acumulus\Helpers;
  * specific styling, it is supposed to be overridden per shop that uses this
  * way of rendering. For now those are: HikaShop/VirtueMart (Joomla), OpenCart,
  * and WooCommerce (WordPress).
+ *
+ * SECURITY REMARKS
+ * ----------------
+ * - All values (inputs) and texts (between opening and closing tag) are passed
+ *   through htmlspecialchars().
+ * - The exceptions being:
+ *   * A label prefix and postfix that come from code and may contain html.
+ *     @see FormRenderer::renderLabel().
+ *   * markup is rendered as is as it may containhtml, therefore its name ...
+ *     @see FormRenderer::markup();
+ * - All tags come from object properties or are hard coded and thus present no
+ *   security risk but they are passed through htmlspecialchars() anyway. @see
+ *   FormRenderer::getOpenTag() and FormRenderer::getCloseTag().
+ * - All attributes, name and value are passed through htmlpecialchars(). @see
+ *   FormRenderer::renderAttributes().
  */
 class FormRenderer
 {
@@ -121,16 +136,20 @@ class FormRenderer
     protected $form;
 
     /**
-     * Instructs the form renderer to use the webshop specific way to show help
-     * texts in some kind of a popup/hover note.
+     * Sets the value of a property of this object.
      *
-     * @param bool $usePopupDescription
+     * The property must exist as property
+     *
+     * @param string $property
+     * @param mixed $value
      *
      * @return $this
      */
-    public function setUsePopupDescription($usePopupDescription)
+    public function setProperty($property, $value)
     {
-        $this->usePopupDescription = $usePopupDescription;
+        if (property_exists($this, $property) && !in_Array($property, array('form'))) {
+            $this->$property = $value;
+        }
         return $this;
     }
 
@@ -254,7 +273,7 @@ class FormRenderer
     protected function renderField(array $field)
     {
         $type = $field['type'];
-        // Id and name may be empty/not set for markup fields only.
+        // Id and name may be empty/not set for markup fields.
         $id = isset($field['id']) ? $field['id'] : '';
         $name = isset($field['name']) ? $field['name'] : '';
         $label = isset($field['label']) ? $field['label'] : '';
@@ -265,7 +284,12 @@ class FormRenderer
 
         $output = '';
 
+        // Split attributes over label and element.
         $labelAttributes = array();
+        if (!empty($attributes['label'])) {
+            $labelAttributes = $attributes['label'];
+            unset($attributes['label']);
+        }
         if (!empty($attributes['required'])) {
             $labelAttributes['required'] = $attributes['required'];
         }
@@ -353,9 +377,11 @@ class FormRenderer
      * @param bool $wrapLabel
      *   Whether to wrap this label within the defined label wrapper tag.
      * @param string $prefix
-     *   Prefix to prepend to the label text.
+     *   Prefix to prepend to the label text, may contain html, so don't escape.
+     *   Will come from code not users.
      * @param string $postfix
-     *   Postfix to append to the label text.
+     *   Postfix to append to the label text, may contain html, so don't escape.
+     *   Will come from code not users.
      *
      * @return string The rendered label.
      *   The rendered label.
@@ -364,16 +390,28 @@ class FormRenderer
     {
         $output = '';
 
+        // Split attributes over label and wrapper.
+        $wrapperAttributes = array();
+        if (!empty($attributes['wrapper'])) {
+            $wrapperAttributes = $attributes['wrapper'];
+            unset($attributes['wrapper']);
+        }
+        if (!empty($attributes['required'])) {
+            $wrapperAttributes['required'] = $attributes['required'];
+        }
+
         // Tag around main labels.
         if ($wrapLabel) {
-            $output .= $this->getWrapper('label', $attributes);
+            $output .= $this->getWrapper('label', $wrapperAttributes);
         }
 
         // Label.
         $attributes = $this->addLabelAttributes($attributes, $id);
         $postfix .= !empty($attributes['required']) ? $this->requiredMarkup : '';
         $tag = empty($id) ? $this->multiLabelTag : 'label';
-        $output .= '<' . $tag . $this->renderAttributes($attributes) . '>' . $prefix . htmlspecialchars($text, ENT_NOQUOTES, 'UTF-8') . $postfix . '</' . $tag . '>';
+        $output .= $this->getOpenTag($tag, $attributes);
+        $output .= $prefix . htmlspecialchars($text, ENT_NOQUOTES, 'UTF-8') . $postfix;
+        $output .= $this->getCloseTag($tag);
 
         // Tag around labels.
         if ($wrapLabel) {
@@ -414,7 +452,7 @@ class FormRenderer
         $attributes = $this->addAttribute($attributes, 'id', $id);
         $attributes = $this->addAttribute($attributes, 'name', $name);
         $attributes = $this->addAttribute($attributes, 'value', $value);
-        $output .= '<input' . $this->renderAttributes($attributes) . '/>';
+        $output .= $this->getOpenTag('input', $attributes, true);
 
         // Tag around input element.
         $output .= $this->getWrapperEnd('input');
@@ -450,9 +488,9 @@ class FormRenderer
 
         $attributes = $this->addAttribute($attributes, 'id', $id);
         $attributes = $this->addAttribute($attributes, 'name', $name);
-        $output .= '<textarea' . $this->renderAttributes($attributes) . '>';
+        $output .= $this->getOpenTag('textarea', $attributes);
         $output .= htmlspecialchars($value, ENT_NOQUOTES, 'UTF-8');
-        $output .= '</textarea>';
+        $output .= $this->getCloseTag('textarea');
 
         // Tag around input element.
         $output .= $this->getWrapperEnd('input');
@@ -542,7 +580,7 @@ class FormRenderer
 
         // Select tag.
         $attributes = array_merge(array('id' => $id, 'name' => $name), $attributes);
-        $output .= '<select' . $this->renderAttributes($attributes) . '>';
+        $output .= $this->getOpenTag('select', $attributes);
 
         // Options.
         foreach ($options as $value => $text) {
@@ -550,11 +588,13 @@ class FormRenderer
             if ($this->compareValues($selected, $value)) {
                 $optionAttributes['selected'] = true;
             }
-            $output .= '<option' . $this->renderAttributes($optionAttributes) . '>' . htmlspecialchars($text, ENT_NOQUOTES, 'UTF-8') . '</option>';
+            $output .= $this->getOpenTag('option', $optionAttributes);
+            $output .= htmlspecialchars($text, ENT_NOQUOTES, 'UTF-8');
+            $output .= $this->getCloseTag('option');
         }
 
         // End tag.
-        $output .= '</select>';
+        $output .= $this->getCloseTag('select');
         // Tag around select element.
         $output .= $this->getWrapperEnd('input');
 
@@ -605,7 +645,7 @@ class FormRenderer
             }
 
             $output .= $this->getWrapper('radio1');
-            $radioInput = '<input' . $this->renderAttributes($radioAttributes) . '>';
+            $radioInput = $this->getOpenTag('input', $radioAttributes);
             if ($this->radioInputInLabel) {
                 $output .= $this->renderLabel($text, $radioAttributes['id'], array(), false, $radioInput);
             } else {
@@ -661,7 +701,7 @@ class FormRenderer
                 $checkboxAttributes['checked'] = true;
             }
             $output .= $this->getWrapper('checkbox1');
-            $checkboxInput = '<input' . $this->renderAttributes($checkboxAttributes) . '>';
+            $checkboxInput = $this->getOpenTag('input', $checkboxAttributes);
             if ($this->checkboxInputInLabel) {
                 $output .= $this->renderLabel($text, $checkboxAttributes['id'], array(), false, $checkboxInput);
             } else {
@@ -686,7 +726,8 @@ class FormRenderer
      * @param string $name
      *   The name attribute of the markup field.
      * @param string $value
-     *   The markup to render.
+     *   The markup to render, may contain html, so don't escape. Will come from
+     *   code not users.
      * @param array $attributes
      *   Any additional attributes to render for this field. The array is a
      *   keyed array, the keys being the attribute names, the values being the
@@ -708,25 +749,6 @@ class FormRenderer
     }
 
     /**
-     * Renders a markup (free format output) element.
-     *
-     * @param array $field
-     *
-     * @return string
-     *   The rendered markup.
-     *
-     * @deprecated Use flow via renderField => markup
-     */
-    protected function renderMarkup(array $field)
-    {
-        $output = '';
-        $output .= $this->getWrapper('markup');
-        $output .= $field['value'];
-        $output .= $this->getWrapperEnd('markup');
-        return $output;
-    }
-
-    /**
      * @param string $type
      * @param array $attributes
      *
@@ -741,9 +763,7 @@ class FormRenderer
             if (!empty($this->$class)) {
                 $attributes = $this->addAttribute($attributes, 'class', $this->$class);
             }
-            $output .= "<{$this->$tag}";
-            $output .= $this->renderAttributes($attributes);
-            $output .= '>';
+            $output .= $this->getOpenTag($this->$tag, $attributes);
         }
         return $output;
     }
@@ -758,9 +778,42 @@ class FormRenderer
         $tag = "{$type}WrapperTag";
         $output = '';
         if (!empty($this->$tag)) {
-            $output .= "</{$this->$tag}>";
+            $output .= $this->getCloseTag($this->$tag);
         }
         return $output;
+    }
+
+    /**
+     * Returns a secured html open tag string.
+     *
+     * @param string $tag
+     *   The html tag.
+     * @param array $attributes
+     *   The attributes to render.
+     * @param bool $selfClosing
+     *   Whether the tag is self closing. Only in html4 this will add a /
+     *   character before the closing > character.
+     *
+     * @return string
+     *   The rendered open tag.
+     */
+    protected function getOpenTag($tag, array $attributes = array(), $selfClosing = false)
+    {
+        return '<' . htmlspecialchars($tag) . $this->renderAttributes($attributes) . ($selfClosing && !$this->html5 ? '/' : '') . '>';
+    }
+
+    /**
+     * Returns a secured html close tag string.
+     *
+     * @param string $tag
+     *   The html tag.
+     *
+     * @return string
+     *   The rendered closing tag.
+     */
+    protected function getCloseTag($tag)
+    {
+        return '</' . htmlspecialchars($tag) .'>';
     }
 
     /**

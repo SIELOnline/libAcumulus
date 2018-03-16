@@ -50,93 +50,6 @@ abstract class Creator extends BaseCreator
 
     /**
      * {@inheritdoc}
-     *
-     * This override returns the internal method name of the chosen payment
-     * method.
-     */
-    protected function getPaymentMethod()
-    {
-        try {
-            return $this->order->getPayment()->getMethod();
-        }
-        catch (\Exception $e) {}
-        return parent::getPaymentMethod();
-    }
-
-    /**
-     * Returns whether the order has been paid or not.
-     *
-     * @return int
-     *   \Siel\Acumulus\Api::PaymentStatus_Paid or
-     *   \Siel\Acumulus\Api::PaymentStatus_Due
-     */
-    protected function getPaymentStateOrder()
-    {
-        return Number::isZero($this->order->getBaseTotalDue())
-            ? Api::PaymentStatus_Paid
-            : Api::PaymentStatus_Due;
-    }
-
-    /**
-     * Returns whether the order is in a state that makes it considered paid.
-     *
-     * This method is NOT used to determine the paid status, but is used to
-     * determine the paid date by looking for these statuses in the
-     * StatusHistoryCollection.
-     *
-     * @param string $status
-     *
-     * @return bool
-     */
-    protected function isPaidStatus($status)
-    {
-        return in_array($status, array('processing', 'closed', 'complete'));
-    }
-
-    /**
-     * Returns the payment date for the credit memo.
-     *
-     * @return string|null
-     *   The payment date (yyyy-mm-dd) or null if the order has not been paid yet.
-     */
-    protected function getPaymentDateCreditNote()
-    {
-        return substr($this->creditNote->getCreatedAt(), 0, strlen('yyyy-mm-dd'));
-    }
-
-    protected function addCurrency()
-    {
-        /** @var \Mage_Sales_Model_Order|\Magento\Sales\Model\Order|\Mage_Sales_Model_Order_Creditmemo|\Magento\Sales\Model\Order\Creditmemo $source */
-        $source = $this->invoiceSource->getSource();
-        $result = array (
-            Meta::Currency => $source->getOrderCurrencyCode(),
-            Meta::CurrencyRate => (float) $source->getBaseToOrderRate(),
-            Meta::CurrencyDoConvert => false,
-        );
-        return $result;
-
-    }
-
-
-    /**
-     * {@inheritdoc}
-     *
-     * This override provides the values meta-invoice-amountinc and
-     * meta-invoice-vatamount.
-     */
-    protected function getInvoiceTotals()
-    {
-        /** @var \Mage_Sales_Model_Order|\Magento\Sales\Model\Order|\Mage_Sales_Model_Order_Creditmemo|\Magento\Sales\Model\Order\Creditmemo $source */
-        $source = $this->invoiceSource->getSource();
-        $sign = $this->getSign();
-        return array(
-            Meta::InvoiceAmountInc => $sign * $source->getBaseGrandTotal(),
-            Meta::InvoiceVatAmount => $sign * $source->getBaseTaxAmount(),
-        );
-    }
-
-    /**
-     * {@inheritdoc}
      */
     protected function getItemLinesOrder()
     {
@@ -189,9 +102,9 @@ abstract class Creator extends BaseCreator
             );
             // Product prices incl. VAT => discount amount is also incl. VAT
             if ($this->productPricesIncludeTax()) {
-                $line[Meta::UnitPriceInc] = $this->getSign() * $source->getBaseDiscountAmount();
+                $line[Meta::UnitPriceInc] = $this->invoiceSource->getSign() * $source->getBaseDiscountAmount();
             } else {
-                $line[Tag::UnitPrice] = $this->getSign() * $source->getBaseDiscountAmount();
+                $line[Tag::UnitPrice] = $this->invoiceSource->getSign() * $source->getBaseDiscountAmount();
             }
             $result[] = $line;
         }

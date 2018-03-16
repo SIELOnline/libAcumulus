@@ -7,6 +7,15 @@ use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
 use Siel\Acumulus\Invoice\Result;
 use WP_Query;
 
+/**
+ * Implements the WooCommerce specific parts of the invoice manager.
+ *
+ * SECURITY REMARKS
+ * ----------------
+ * In WooCommerce/WordPress querying orders is done via the WordPress
+ * WP_Query::get_posts() method or via self constructed queries. In the latter
+ * case we use the prepare() method of the wpdb isntance to sanitize arguments.
+ */
 class InvoiceManager extends BaseInvoiceManager
 {
     /**
@@ -40,10 +49,12 @@ class InvoiceManager extends BaseInvoiceManager
         global $wpdb;
         $key = 'ID';
         /** @noinspection SqlResolve */
-        $invoiceSourceIds = $wpdb->get_col($wpdb->prepare("SELECT `$key` FROM `{$wpdb->posts}` WHERE `$key` BETWEEN %d AND %d AND `post_type` = %s",
+        $invoiceSourceIds = $wpdb->get_col($wpdb->prepare(
+            "SELECT `$key` FROM `{$wpdb->posts}` WHERE `$key` BETWEEN %d AND %d AND `post_type` = %s",
             $InvoiceSourceIdFrom,
             $InvoiceSourceIdTo,
-            $this->sourceTypeToShopType($invoiceSourceType)));
+            $this->sourceTypeToShopType($invoiceSourceType)
+        ));
         sort($invoiceSourceIds);
         return $this->getSourcesByIdsOrSources($invoiceSourceType, $invoiceSourceIds);
     }

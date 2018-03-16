@@ -4,16 +4,26 @@ namespace Siel\Acumulus\PrestaShop\Shop;
 use Db;
 use Siel\Acumulus\Helpers\ContainerInterface;
 use Siel\Acumulus\Helpers\Log;
-use Siel\Acumulus\PrestaShop\Invoice\Source;
-use Siel\Acumulus\Shop\AcumulusEntryManager as BaseAcumulusEntryManager;
+use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
+use Siel\Acumulus\Shop\AcumulusEntryManager as BaseAcumulusEntryManager;
 
 /**
  * Implements the PrestaShop specific acumulus entry model class.
  *
- * In WooCommerce this data is stored as metadata. As such, the "records"
- * returned here are an array of all metadata values, thus not filtered by
- * Acumulus keys.
+ * SECURITY REMARKS
+ * ----------------
+ * In PrestaShop saving and querying acumulus entries is done via self
+ * constructed queries, therefore this class takes care of sanitizing itself.
+ * - Numbers are cast by using numeric formatters (like %u, %d, %f) with
+ *   sprintf().
+ * - Strings are escaped using pSQL(), unless they are hard coded or are
+ *   internal variables.
+ * Note that:
+ * - $invoiceSource, $created and $updated are set in calling code, and can
+ *   thus be considered trusted, but are still escaped or cast.
+ * - $entryId and $token come from outside, from the Acumulus API, and must
+ *   thus be handled as untrusted.
  */
 class AcumulusEntryManager extends BaseAcumulusEntryManager
 {
@@ -34,27 +44,35 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      */
     public function getByEntryId($entryId)
     {
-        $operator = $entryId === null ? 'is' : '=';
-        $entryId = $entryId === null ? 'null' : (string) (int) $entryId;
         /** @noinspection PhpUnhandledExceptionInspection */
-        $result = Db::getInstance()->executeS("SELECT * FROM `{$this->tableName}` WHERE id_entry $operator $entryId");
+        $result = $this->getDb()->executeS(sprintf(
+            "SELECT * FROM `%s` WHERE id_entry %s %s",
+            $this->tableName,
+            $entryId === null ? 'is' : '=',
+            $entryId === null ? 'null' : (string) (int) $entryId
+        ));
         return $this->convertDbResultToAcumulusEntries($result);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getByInvoiceSourceId($invoiceSourceType, $invoiceSourceId)
+    public function getByInvoiceSource(Source $invoiceSource)
     {
         /** @noinspection PhpUnhandledExceptionInspection */
-        $result = Db::getInstance()->executeS("SELECT * FROM `{$this->tableName}` WHERE source_type = '$invoiceSourceType' AND source_id = $invoiceSourceId");
+        $result = $this->getDb()->executeS(sprintf(
+            "SELECT * FROM `%s` WHERE source_type = '%s' AND source_id = %u",
+            $this->tableName,
+            pSql($invoiceSource->getType()),
+            $invoiceSource->getId()
+        ));
         return $this->convertDbResultToAcumulusEntries($result);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function insert($invoiceSource, $entryId, $token, $created)
+    protected function insert(Source $invoiceSource, $entryId, $token, $created)
     {
         if ($invoiceSource->getType() === Source::Order) {
             $shopId = $invoiceSource->getSource()->id_shop;
@@ -63,11 +81,17 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
             $shopId = 0;
             $shopGroupId = 0;
         }
-        $entryId = $entryId === null ? 'null' : (string) (int) $entryId;
-        $token = $token === null ? 'null' : "'" . Db::getInstance()->escape($token) . "'";
-        $invoiceSourceType = $invoiceSource->getType();
-        $invoiceSourceId = $invoiceSource->getId();
-        return Db::getInstance()->execute("INSERT INTO `{$this->tableName}` (id_shop, id_shop_group, id_entry, token, source_type, source_id, updated) VALUES ($shopId, $shopGroupId, $entryId, $token, '$invoiceSourceType', $invoiceSourceId, '$created')");
+        return $this->getDb()->execute(sprintf(
+            "INSERT INTO `%s` (id_shop, id_shop_group, id_entry, token, source_type, source_id, updated) VALUES (%u, %u, %u, %s, '%s', %u, '%s')",
+            $this->tableName,
+            $shopId,
+            $shopGroupId,
+            $entryId === null ? 'null' : (string) (int) $entryId,
+            $token === null ? 'null' : ("'" . pSql($token) . "'"),
+            pSql($invoiceSource->getType()),
+            $invoiceSource->getId(),
+            pSql($created)
+        ));
     }
 
     /**
@@ -76,9 +100,14 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     protected function update(BaseAcumulusEntry $record, $entryId, $token, $updated)
     {
         $record = $record->getRecord();
-        $entryId = $entryId === null ? 'null' : (string) (int) $entryId;
-        $token = $token === null ? 'null' : "'" . Db::getInstance()->escape($token) . "'";
-        return Db::getInstance()->execute("UPDATE `{$this->tableName}` SET id_entry = $entryId, token = $token, updated = '$updated' WHERE id = {$record['id']}");
+        return $this->getDb()->execute(sprintf(
+            "UPDATE `%s` SET id_entry = %s, token = %s, updated = '%s' WHERE id = %u",
+            $this->tableName,
+            $entryId === null ? 'null' : (string) (int) $entryId,
+            $token === null ? 'null' : ("'" . pSql($token) . "'"),
+            pSql($updated),
+            $record['id']
+        ));
     }
 
     /**
@@ -94,7 +123,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      */
     public function install()
     {
-        return Db::getInstance()->execute("CREATE TABLE IF NOT EXISTS `{$this->tableName}` (
+        return $this->getDb()->execute("CREATE TABLE IF NOT EXISTS `{$this->tableName}` (
         `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
         `id_shop` int(11) UNSIGNED NOT NULL DEFAULT '1',
         `id_shop_group` int(11) UNSIGNED NOT NULL DEFAULT '1',
@@ -115,6 +144,16 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      */
     public function uninstall()
     {
-        return Db::getInstance()->execute("DROP TABLE `{$this->tableName}`");
+        return $this->getDb()->execute("DROP TABLE `{$this->tableName}`");
+    }
+
+    /**
+     * Wrapper method around teh Db instance.
+     *
+     * @return \Db
+     */
+    protected function getDb()
+    {
+        return Db::getInstance();
     }
 }

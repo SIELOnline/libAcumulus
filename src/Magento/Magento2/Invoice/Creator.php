@@ -1,9 +1,7 @@
 <?php
 namespace Siel\Acumulus\Magento\Magento2\Invoice;
 
-use Magento\Sales\Model\Order\Creditmemo;
 use Magento\Sales\Model\Order\Creditmemo\Item as CreditmemoItem;
-use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Magento\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\Magento\Magento2\Helpers\Registry;
@@ -49,52 +47,6 @@ class Creator extends BaseCreator
         }
 
         $this->propertySources['customer'] = Registry::getInstance()->create('Magento\Customer\Model\Customer')->load($source->getCustomerId());
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getCountryCode()
-    {
-        /** @var \Magento\Sales\Model\Order|\Magento\Sales\Model\Order\Creditmemo $source */
-        $source = $this->invoiceSource->getSource();
-        return $source->getBillingAddress()->getCountryId();
-    }
-
-    /**
-     * Returns whether the credit memo has been paid or not.
-     *
-     * @return int
-     *   \Siel\Acumulus\Api::PaymentStatus_Paid or
-     *   \Siel\Acumulus\Api::PaymentStatus_Due
-     */
-    protected function getPaymentStateCreditNote()
-    {
-        return $this->creditNote->getState() == Creditmemo::STATE_REFUNDED
-            ? Api::PaymentStatus_Paid
-            : Api::PaymentStatus_Due;
-    }
-
-    /**
-     * Returns the payment date for the order.
-     *
-     * @return string|null
-     *   The payment date (yyyy-mm-dd) or null if the order has not been paid yet.
-     */
-    protected function getPaymentDateOrder()
-    {
-        // Take date of last payment as payment date.
-        $paymentDate = null;
-        foreach ($this->order->getStatusHistoryCollection() as $statusChange) {
-            /** @var \Magento\Sales\Model\Order\Status\History $statusChange */
-            if (!$paymentDate || $this->isPaidStatus($statusChange->getStatus())) {
-                $createdAt = substr($statusChange->getCreatedAt(), 0, strlen('yyyy-mm-dd'));
-                if (!$paymentDate || $createdAt < $paymentDate) {
-                    $paymentDate = $createdAt;
-                }
-            }
-        }
-        return $paymentDate;
     }
 
     /**

@@ -17,10 +17,22 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies)
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
-5.2.1 (2018-03-??)
+5.2.2 (2018-03-??)
+------------------
+- ALL: security review: better code and document security measures taken. Some
+  additional escaping was added, mostly input coming from the Acumulus API, so
+  no real security risks were discovered.
+- WC: 2e versie van de "dashboard" functionaliteit.
+- ALL: Moved order/credit note related getting methods from Creator to Source.
+- ALL: Replace FormRenderer::setUsePopupDescription() with more generic
+  FormRenderer:::setProperty().
+- All: Allow for label and label wrapper specific attributes in form fields.
+- All: Notice: Undefined index: vatrate in Completor.php on line 989.
+
+5.2.1 (2018-03-05)
 ------------------
 - WC: Toon status van de boeking in Acumulus in het admnin shop order formulier.
-  dit is de eerste feature van de "dashboard" functionaliteit.
+  dit is de eerste versie van de "dashboard" functionaliteit.
 - ALL: voeg een berichttype "opmerking" toe zodat de melding over het
   overschrijven van een bestaande factuur er minder ernstig uitziet.
 - ALL: Add Source::getRefunds() and rename Source::getOriginalInvoiceSource to

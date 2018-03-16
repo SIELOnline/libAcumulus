@@ -33,7 +33,7 @@ class FormRenderer extends BaseFormRenderer
     /**
      * @inheritDoc
      *
-     * This override adds an informationicon aas label to descriptions at the
+     * This override adds an information icon as label for descriptions at the
      * fieldset level.
      */
     protected function renderDescription($text, $isFieldset = false)

@@ -1,7 +1,6 @@
 <?php
 namespace Siel\Acumulus\OpenCart\Invoice;
 
-use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\Meta;
@@ -15,17 +14,19 @@ use Siel\Acumulus\Tag;
 class Creator extends BaseCreator
 {
     // More specifically typed property.
+    /** @var Source */
+    protected $invoiceSource;
+
     /** @var array */
     protected $order;
-
-    /** @var array[] List of OpenCart order total records. */
-    protected $orderTotalLines;
 
     /**
      * {@inheritdoc}
      *
      * This override also initializes WooCommerce specific properties related to
      * the source.
+     *
+     * @throws \Exception
      */
     protected function setInvoiceSource($invoiceSource)
     {
@@ -33,7 +34,6 @@ class Creator extends BaseCreator
 
         // Load some models and properties we are going to use.
         $this->getRegistry()->load->model('catalog/product');
-        $this->orderTotalLines = null;
 
         switch ($this->invoiceSource->getType()) {
             case Source::Order:
@@ -46,96 +46,8 @@ class Creator extends BaseCreator
 
     /**
      * {@inheritdoc}
-     */
-    protected function getCountryCode()
-    {
-        return !empty($this->order['payment_iso_code_2']) ? $this->order['payment_iso_code_2'] : '';
-    }
-
-    /**
-     * {@inheritdoc}
      *
-     * This override returns the code of the selected payment method.
-     */
-    protected function getPaymentMethod()
-    {
-        if (isset($this->order['payment_code'])) {
-            return $this->order['payment_code'];
-        }
-        return parent::getPaymentMethod();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getPaymentState()
-    {
-        // The 'config_complete_status' setting contains a set of statuses that,
-        //  according to the help on the settings form:
-        // "The order status the customer's order must reach before they are
-        //  allowed to access their downloadable products and gift vouchers."
-        // This seems like the set of statuses where payment has been
-        // completed...
-        $orderStatuses = $this->getRegistry()->config->get('config_complete_status');
-
-        $result = in_array($this->order['order_status_id'], $orderStatuses) ? Api::PaymentStatus_Paid : Api::PaymentStatus_Due;
-//        $result = Api::PaymentStatus_Paid;
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getPaymentDate()
-    {
-        // @todo: Can we determine this based on history (and optionally payment_code)?
-        // Will default to the issue date.
-        return null;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * In OpenCart the amounts are in the shop's default currency, even if
-     * another currency was presented to the customer, so we will not have to
-     * convert the amounts and this meta info is thus purely informative.
-     */
-    protected function addCurrency()
-    {
-        $result = array(
-            Meta::Currency => $this->order['currency_code'],
-            Meta::CurrencyRate => (float) $this->order['currency_value'],
-            Meta::CurrencyDoConvert => false,
-        );
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * This override provides the values meta-invoice-amountinc,
-     * meta-invoice-vatamount and a vat breakdown in meta-invoice-vat.
-     */
-    protected function getInvoiceTotals()
-    {
-        $result = array(
-            Meta::InvoiceAmountInc => $this->order['total'],
-            Meta::InvoiceVatAmount => 0.0,
-            Meta::InvoiceVat => array(),
-        );
-
-        $orderTotals = $this->getOrderTotalLines();
-        foreach ($orderTotals as $totalLine) {
-            if ($totalLine['code'] === 'tax') {
-                $result[Meta::InvoiceVat][] = $totalLine['title'] . ': ' . $totalLine['value'];
-                $result[Meta::InvoiceVatAmount] += $totalLine['value'];
-            }
-        }
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
+     * @throws \Exception
      */
     protected function getInvoiceLines()
     {
@@ -150,6 +62,8 @@ class Creator extends BaseCreator
 
     /**
      * {@inheritdoc}
+     *
+     * @throws \Exception
      */
     protected function getItemLines()
     {
@@ -172,6 +86,8 @@ class Creator extends BaseCreator
      * @param array $item
      *
      * @return array
+     *
+     * @throws \Exception
      */
     protected function getItemLine(array $item)
     {
@@ -235,6 +151,8 @@ class Creator extends BaseCreator
      * @return array
      *   Either an array with keys Meta::VatRateLookup and
      *  Meta::VatRateLookupLabel or an empty array.
+     *
+     * @throws \Exception
      */
     protected function getVatRateLookupMetadata($taxClassId)
     {
@@ -271,6 +189,7 @@ class Creator extends BaseCreator
      *
      * @return array[]
      *
+     * @throws \Exception
      */
     protected function getTaxRules($tax_class_id)
     {
@@ -288,6 +207,7 @@ class Creator extends BaseCreator
      *
      * @return array
      *
+     * @throws \Exception
      */
     protected function getTaxRate($tax_rate_id)
     {
@@ -301,12 +221,14 @@ class Creator extends BaseCreator
      *
      * @return array[]
      *   An array of invoice lines.
+     *
+     * @throws \Exception
      */
     protected function getTotalLines()
     {
         $result = array();
 
-        $totalLines = $this->getOrderTotalLines();
+        $totalLines = $this->invoiceSource->getOrderTotalLines();
         foreach ($totalLines as $totalLine) {
             switch ($totalLine['code']) {
                 case 'sub_total':
@@ -352,6 +274,8 @@ class Creator extends BaseCreator
      * @param array $line
      *
      * @return array
+     *
+     * @throws \Exception
      */
     protected function getTotalLine(array $line)
     {
@@ -400,26 +324,13 @@ class Creator extends BaseCreator
     }
 
     /**
-     * Returns a list of OpenCart order total records. These are shipment,
-     * other fee, tax, and discount lines.
-     *
-     * @return array[]
-     */
-    protected function getOrderTotalLines()
-    {
-        if (!$this->orderTotalLines) {
-            $orderModel = $this->getOrderModel();
-            $this->orderTotalLines = $orderModel->getOrderTotals($this->order['order_id']);
-        }
-        return $this->orderTotalLines;
-    }
-
-    /** @noinspection PhpUndefinedClassInspection */
-    /**
      * @return \ModelAccountOrder|\ModelSaleOrder
+     *
+     * @throws \Exception
      */
     protected function getOrderModel()
     {
+        /** @noinspection PhpUnhandledExceptionInspection */
         return $this->getRegistry()->getOrderModel();
     }
 
@@ -440,6 +351,8 @@ class Creator extends BaseCreator
      * @return array
      *   A, possibly empty, array with vat rate lookup meta data. Empty if no or
      *   multiple tax rates were found.
+     *
+     * @throws \Exception
      */
     protected function getVatRateLookupByTotalLineType($code)
     {
@@ -465,13 +378,7 @@ class Creator extends BaseCreator
     }
 
     /**
-     * Returns the shipping costs line.
-     *
-     * To be able to produce a packing slip, a shipping line should normally be
-     * added, even for free shipping.
-     *
-     * @return array
-     *   A line array, empty if there is no shipping fee line.
+     * {@inheritdoc}
      */
     protected function getShippingLine()
     {
@@ -479,8 +386,7 @@ class Creator extends BaseCreator
     }
 
     /**
-     *
-     *
+     * Wrapper method that returns the OpenCart registry class.
      *
      * @return \Siel\Acumulus\OpenCart\Helpers\Registry
      *

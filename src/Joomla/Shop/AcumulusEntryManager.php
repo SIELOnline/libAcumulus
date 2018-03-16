@@ -5,11 +5,17 @@ use DateTimeZone;
 use JDate;
 use JFactory;
 use JTable;
+use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Shop\AcumulusEntryManager as BaseAcumulusEntryManager;
 use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
 
 /**
  * Implements the VirtueMart specific acumulus entry model class.
+ *
+ * SECURITY REMARKS
+ * ----------------
+ * In Joomla (VirtueMart/HikaShop) saving and querying acumulus entries is done
+ * via the Joomla table classes which take care of sanitizing.
  */
 class AcumulusEntryManager extends BaseAcumulusEntryManager
 {
@@ -41,17 +47,17 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    public function getByInvoiceSourceId($invoiceSourceType, $invoiceSourceId)
+    public function getByInvoiceSource(Source $invoiceSource)
     {
         $table = $this->newTable();
-        $result = $table->load(array('source_type' => $invoiceSourceType, 'source_id' => $invoiceSourceId), true);
+        $result = $table->load(array('source_type' => $invoiceSource->getType(), 'source_id' => $invoiceSource->getId()), true);
         return $result ? $this->convertDbResultToAcumulusEntries($table) : null;
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function insert($invoiceSource, $entryId, $token, $created)
+    protected function insert(Source $invoiceSource, $entryId, $token, $created)
     {
         // Start with new table class to not overwrite any loaded record.
         $table = $this->newTable();

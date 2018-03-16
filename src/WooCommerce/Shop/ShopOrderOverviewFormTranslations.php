@@ -20,7 +20,7 @@ class ShopOrderOverviewFormTranslations extends TranslationCollection
 
         'send_now' => 'Nu verzenden',
         'send_again' => 'Opnieuw verzenden',
-        'undelete' => 'Herstel boeking',
+        'undelete' => 'Herstel verwijderde boeking',
 
         'unknown' => 'onbekend',
         'concept_description' => 'Helaas kan van een conceptfactuur niet meer informatie getoond worden, ook niet als u deze definitief gemaakt heeft.',
@@ -51,7 +51,7 @@ class ShopOrderOverviewFormTranslations extends TranslationCollection
         'documents' => 'Documenten',
         'invoice' => 'Factuur',
         'packing_slip' => 'Pakbon',
-        'open_as_pdf' => 'Factuur openen als pdf',
+        'open_as_pdf' => 'Acumulus %1$s openen als pdf',
     );
 
     protected $en = array(

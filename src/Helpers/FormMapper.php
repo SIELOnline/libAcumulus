@@ -8,6 +8,17 @@ namespace Siel\Acumulus\Helpers;
  * To comply with shop specific form building, it is supposed to be overridden
  * per shop that uses this way of form building. For now those are: Magento,
  * WordPress.
+ *
+ * SECURITY REMARKS
+ * ----------------
+ * - A FormMapper uses the web shop's or CMS's form sub system and as such it
+ *   may assume safe rendering is the responsibility of the CMS/web shop.
+ * - If however, the form sub system declines this responsibility, our form
+ *   mapper will have to sanitize texts, values, options and such  before
+ *   handing them over to the form sub system.
+ * - Currently supported web shops that offer a form sub system:
+ *   * Magento: sanitizes.
+ *   * PrestaShop: sanitizes.
  */
 abstract class FormMapper
 {

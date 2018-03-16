@@ -145,6 +145,7 @@ abstract class Creator
             'source' => $this->invoiceSource->getSource(),
         );
         if ($this->invoiceSource->getType() === Source::CreditNote) {
+            // @todo: rename in major/minor.
             $this->propertySources['originalInvoiceSource'] = $this->invoiceSource->getOrder();
         }
     }
@@ -246,7 +247,7 @@ abstract class Creator
         $this->addTokenDefault($customer, Tag::Address2, $customerSettings['address2']);
         $this->addTokenDefault($customer, Tag::PostalCode, $customerSettings['postalCode']);
         $this->addTokenDefault($customer, Tag::City, $customerSettings['city']);
-        $customer[Tag::CountryCode] = $this->countries->convertEuCountryCode($this->getCountryCode());
+        $customer[Tag::CountryCode] = $this->countries->convertEuCountryCode($this->invoiceSource->getCountryCode());
         $this->addDefault($customer, Tag::Country, $this->countries->getCountryName($customer[Tag::CountryCode]));
         $this->addTokenDefault($customer, Tag::Telephone, $customerSettings['telephone']);
         $this->addTokenDefault($customer, Tag::Fax, $customerSettings['fax']);
@@ -255,15 +256,6 @@ abstract class Creator
         $this->addTokenDefault($customer, Tag::Mark, $customerSettings['mark']);
         return $customer;
     }
-
-    /**
-     * Returns the country code for the order.
-     *
-     * @return string
-     *   The 2 letter country code for the current order or the empty string if
-     *   not set.
-     */
-    abstract protected function getCountryCode();
 
     /**
      * Returns the 'invoice' part of the invoice add structure.
@@ -325,7 +317,7 @@ abstract class Creator
         }
 
         // Bookkeeping (account number, cost center).
-        $paymentMethod = $this->getPaymentMethod();
+        $paymentMethod = $this->invoiceSource->getPaymentMethod();
         if (!empty($paymentMethod)) {
             if (!empty($invoiceSettings['paymentMethodAccountNumber'][$paymentMethod])) {
                 $invoice[Tag::AccountNumber] = $invoiceSettings['paymentMethodAccountNumber'][$paymentMethod];
@@ -338,9 +330,9 @@ abstract class Creator
         $this->addDefault($invoice, Tag::AccountNumber, $invoiceSettings['defaultAccountNumber']);
 
         // Payment info.
-        $invoice[Tag::PaymentStatus] = $this->getPaymentState();
+        $invoice[Tag::PaymentStatus] = $this->invoiceSource->getPaymentState();
         if ($invoice[Tag::PaymentStatus] === Api::PaymentStatus_Paid) {
-            $this->addIfNotEmpty($invoice, Tag::PaymentDate, $this->getPaymentDate());
+            $this->addIfNotEmpty($invoice, Tag::PaymentDate, $this->invoiceSource->getPaymentDate());
         }
 
         // Additional descriptive info.
@@ -365,7 +357,7 @@ abstract class Creator
         }
 
         // Meta data.
-        $invoice += $this->addCurrency();
+        $invoice += $this->invoiceSource->getCurrency();
         $this->addIfNotEmpty($invoice, Meta::paymentMethod, $paymentMethod);
         $invoice += $this->addInvoiceTotals();
 
@@ -412,64 +404,6 @@ abstract class Creator
     }
 
     /**
-     * Returns the payment method used.
-     *
-     * This default implementation returns an empty payment method.
-     *
-     * If no payment method is stored for credit notes, it is expected to be the
-     * same as for its order, as this will normally indeed be the case.
-     *
-     * @return int|string|null
-     *   A value identifying the payment method or null if unknown.
-     */
-    protected function getPaymentMethod()
-    {
-        return null;
-    }
-
-    /**
-     * Returns whether the order has been paid or not.
-     *
-     * @return int
-     *   \Siel\Acumulus\Api::PaymentStatus_Paid or
-     *   \Siel\Acumulus\Api::PaymentStatus_Due
-     */
-    protected function getPaymentState()
-    {
-        return $this->callSourceTypeSpecificMethod(__FUNCTION__, func_get_args());
-    }
-
-    /**
-     * Returns the payment date.
-     *
-     * The payment date is defined as the date on which the status changed from a
-     * non-paid state to a paid state. If there are multiple state changes, the
-     * last one is taken.
-     *
-     * @return string|null
-     *   The payment date (yyyy-mm-dd) or null if the order has not been paid yet.
-     */
-    protected function getPaymentDate()
-    {
-        return $this->callSourceTypeSpecificMethod(__FUNCTION__, func_get_args());
-    }
-
-    /**
-     * Returns metadata about the used currency on the invoice.
-     *
-     * The currency related meta tags are:
-     * - currency: the code of the currency used for this order/refund
-     * - currency-rate: the rate from the used currency to the shop's default
-     *   currency.
-     * - currency-do-convert: if the amounts are in the used currency or in the
-     *   default currency (MA, OC, WC).
-     *
-     * @return array
-     *   An array with the currency meta tags.
-     */
-    abstract protected function addCurrency();
-
-    /**
      * Returns metadata about the invoice totals.
      *
      * @return array
@@ -477,28 +411,10 @@ abstract class Creator
      */
     protected function addInvoiceTotals()
     {
-        $result = $this->getInvoiceTotals();
+        $result = $this->invoiceSource->getTotals();
         $result = $this->completeInvoiceTotals($result);
         return $result;
     }
-
-    /**
-     * Returns an array with the totals fields.
-     *
-     * All total fields are optional but may be used or even expected by the
-     * Completor or are used for support and debugging purposes.
-     *
-     * This default implementation returns an empty array. Override to provide the
-     * values.
-     *
-     * @return array
-     *   An array with the following possible keys:
-     *   - meta-invoice-amount: the total invoice amount excluding VAT.
-     *   - meta-invoice-amountinc: the total invoice amount including VAT.
-     *   - meta-invoice-vatamount: the total vat amount for the invoice.
-     *   - meta-invoice-vat: a vat breakdown per vat rate.
-     */
-    abstract protected function getInvoiceTotals();
 
     /**
      * Completes the set of invoice totals as set by getInvoiceTotals.
@@ -705,7 +621,7 @@ abstract class Creator
     /**
      * Returns the shipment method name.
      *
-     * This method should be overridden by webshops if they can provide a more
+     * This method should be overridden by web shops if they can provide a more
      * detailed name of the shipping method used.
      *
      * This base implementation returns the translated "Shipping costs" string.
@@ -1052,18 +968,6 @@ abstract class Creator
                 Meta::VatRateSource => static::VatRateSource_Calculated,
             );
         }
-    }
-
-    /**
-     * Returns the sign to use for amounts that are always defined as a positive
-     * number, also on credit notes.
-     *
-     * @return float
-     *   1 for orders, -1 for credit notes.
-     */
-    protected function getSign()
-    {
-        return (float) ($this->invoiceSource->getType() === Source::CreditNote ? -1.0 : 1.0);
     }
 
     /**

@@ -1,14 +1,11 @@
 <?php
 namespace Siel\Acumulus\WooCommerce\Invoice;
 
-use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
-use WC_Abstract_Order;
 use WC_Coupon;
-use WC_Order;
 use WC_Order_Item_Product;
 use WC_Product;
 use WC_Tax;
@@ -18,11 +15,11 @@ use WC_Tax;
  */
 class Creator extends BaseCreator
 {
-    /** @var WC_Abstract_Order The order or refund that is sent to Acumulus. */
-    protected $shopSource;
-
-    /** @var WC_Order The order self or the order that got refunded. */
+    /** @var \WC_Order The order self or the order that got refunded. */
     protected $order;
+
+    /** @var \WC_Order_Refund the refund for an order. */
+    protected $refund;
 
     /** @var bool Whether the order has (non empty) item lines. */
     protected $hasItemLines;
@@ -33,12 +30,14 @@ class Creator extends BaseCreator
      * on the subtraction/addition of 2 amounts rounded to the cent, so has a
      * precision that may be a bit worse than 1 cent.
      *
-     * values here.
-     *
      * @var float
      */
     protected $precisionPriceEntered  = 0.01;
+
+    /** @var float */
     protected $precisionPriceCalculated  = 0.02;
+
+    /** @var float */
     protected $precisionVat  = 0.01;
 
     /**
@@ -50,13 +49,13 @@ class Creator extends BaseCreator
     protected function setInvoiceSource($invoiceSource)
     {
         parent::setInvoiceSource($invoiceSource);
-        $this->shopSource = $this->invoiceSource->getSource();
         switch ($this->invoiceSource->getType()) {
             case Source::Order:
-                $this->order = $this->shopSource;
+                $this->order = $this->invoiceSource->getSource();
                 break;
             case Source::CreditNote:
-                $this->order = new WC_Order($this->shopSource->get_parent_id());
+                $this->refund = $this->invoiceSource->getSource();
+                $this->order = $this->invoiceSource->getOrder()->getSource();
                 break;
         }
     }
@@ -75,120 +74,14 @@ class Creator extends BaseCreator
     /**
      * {@inheritdoc}
      */
-    protected function getCountryCode()
-    {
-        return $this->order->get_billing_country();
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * This override returns the id of a WC_Payment_Gateway.
-     */
-    protected function getPaymentMethod()
-    {
-        // Payment method is not stored for credit notes, so it is expected to
-        // be the same as for its order.
-        return $this->order->get_payment_method();
-    }
-
-    /**
-     * Returns whether the order has been paid or not.
-     *
-     * @return int
-     *   \Siel\Acumulus\Api::PaymentStatus_Paid or
-     *   \Siel\Acumulus\Api::PaymentStatus_Due
-     */
-    protected function getPaymentStateOrder()
-    {
-        return $this->order->needs_payment() ? Api::PaymentStatus_Due : Api::PaymentStatus_Paid;
-    }
-
-    /**
-     * Returns whether the order refund has been paid or not.
-     *
-     * For now we assume that a refund is paid back on creation.
-     *
-     * @return int
-     *   \Siel\Acumulus\Api::PaymentStatus_Paid or
-     *   \Siel\Acumulus\Api::PaymentStatus_Due
-     */
-    protected function getPaymentStateCreditNote()
-    {
-        return Api::PaymentStatus_Paid;
-    }
-
-    /**
-     * Returns the payment date of the order.
-     *
-     * @return string
-     *   The payment date of the order (yyyy-mm-dd).
-     */
-    protected function getPaymentDateOrder()
-    {
-        // This returns a WC_DateTime but that class has a _toString() method.
-        $string = $this->order->get_date_paid();
-        return substr($string, 0, strlen('2000-01-01'));
-    }
-
-    /**
-     * Returns the payment date of the order refund.
-     *
-     * We take the last modified date as pay date.
-     *
-     * @return string
-     *   The payment date of the order refund (yyyy-mm-dd).
-     */
-    protected function getPaymentDateCreditNote()
-    {
-        // This returns a WC_DateTime but that class has a _toString() method.
-        $string = $this->shopSource->get_date_modified();
-        return substr($string, 0, strlen('2000-01-01'));
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * WooCommerce does not support multiple currencies, so the amounts are
-     * always in the shop's default currency. Even if another plugin is used to
-     * present another currency to the customer, the amounts stored will
-     * (probably) still be in euro's. So, we will not have to convert the
-     * amounts and this meta info is thus purely informative.
-     */
-    protected function addCurrency()
-    {
-        $result = array(
-            Meta::Currency => 'EUR',
-            Meta::CurrencyRate => 1.0,
-            Meta::CurrencyDoConvert => false,
-        );
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * This override provides the values meta-invoice-amountinc and
-     * meta-invoice-vatamount.
-     */
-    protected function getInvoiceTotals()
-    {
-        return array(
-            Meta::InvoiceAmountInc => $this->shopSource->get_total(),
-            Meta::InvoiceVatAmount => $this->shopSource->get_total_tax(),
-        );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     protected function getItemLines()
     {
         $result = array();
         /** @var WC_Order_Item_Product[] $items */
-        $items = $this->shopSource->get_items(apply_filters('woocommerce_admin_order_item_types', 'line_item'));
+        $items = $this->invoiceSource->getSource()->get_items(apply_filters('woocommerce_admin_order_item_types', 'line_item'));
         foreach ($items as $item) {
             $product = $item->get_product();
+            /** @noinspection PhpUnhandledExceptionInspection */
             $line = $this->getItemLine($item, $product);
             if ($line) {
                 $result[] = $line;
@@ -212,10 +105,8 @@ class Creator extends BaseCreator
      *
      * @return array
      *   May be empty if the line should not be sent (e.g. qty = 0 on a refund).
-     *
-     * @throws \ReflectionException
      */
-    protected function getItemLine(WC_Order_Item_Product $item, $product)
+    protected function getItemLine($item, $product)
     {
         $result = array();
 
@@ -418,7 +309,7 @@ class Creator extends BaseCreator
         // So far, all amounts found on refunds are negative, so we probably
         // don't need to correct the sign on these lines either: but this has
         // not been tested yet!.
-        foreach ($this->shopSource->get_fees() as $feeLine) {
+        foreach ($this->invoiceSource->getSource()->get_fees() as $feeLine) {
             $line = $this->getFeeLine($feeLine);
             $line[Meta::LineType] = static::LineType_Other;
             $result[] = $line;
@@ -455,7 +346,7 @@ class Creator extends BaseCreator
         $result = array();
         // Get the shipping lines for this order.
         /** @var \WC_Order_Item_Shipping[] $shippingItems */
-        $shippingItems = $this->shopSource->get_items(apply_filters('woocommerce_admin_order_item_types', 'shipping'));
+        $shippingItems = $this->invoiceSource->getSource()->get_items(apply_filters('woocommerce_admin_order_item_types', 'shipping'));
         foreach ($shippingItems as $shippingItem) {
             $shippingLine = $this->getShippingLine($shippingItem);
             if ($shippingLine) {
@@ -614,7 +505,7 @@ class Creator extends BaseCreator
             // Coupon still exists: extract info from coupon.
             $description = sprintf('%s %s: ', $this->t('discount_code'), $coupon->get_code());
             if (in_array($coupon->get_discount_type(), array('fixed_product', 'fixed_cart'))) {
-                $amount = $this->getSign() * (float) $coupon->get_amount();
+                $amount = $this->invoiceSource->getSign() * (float) $coupon->get_amount();
                 if (!Number::isZero($amount)) {
                     $description .= sprintf('€%.2f (%s)', $amount, $this->productPricesIncludeTax() ? $this->t('inc_vat') : $this->t('ex_vat'));
                 }

@@ -4,13 +4,9 @@ namespace Siel\Acumulus\PrestaShop\Invoice;
 use Address;
 use Carrier;
 use Configuration;
-use Country;
-use Currency;
 use Customer;
 use Order;
-use OrderPayment;
 use OrderSlip;
-use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\Meta;
@@ -44,9 +40,6 @@ use TaxManagerFactory;
  */
 class Creator extends BaseCreator
 {
-    /** @var Order|OrderSlip The order or refund that is sent to Acumulus. */
-    protected $shopSource;
-
     /** @var Order */
     protected $order;
 
@@ -62,14 +55,13 @@ class Creator extends BaseCreator
     protected function setInvoiceSource($invoiceSource)
     {
         parent::setInvoiceSource($invoiceSource);
-        $this->shopSource = $this->invoiceSource->getSource();
         switch ($this->invoiceSource->getType()) {
             case Source::Order:
-                $this->order = $this->shopSource;
+                $this->order = $this->invoiceSource->getSource();
                 break;
             case Source::CreditNote:
-                $this->creditSlip = $this->shopSource;
-                $this->order = $this->invoiceSource->getOrder();
+                $this->creditSlip = $this->invoiceSource->getSource();
+                $this->order = $this->invoiceSource->getOrder()->getSource();
                 break;
         }
     }
@@ -83,116 +75,6 @@ class Creator extends BaseCreator
         $this->propertySources['address_invoice'] = new Address($this->order->id_address_invoice);
         $this->propertySources['address_delivery'] = new Address($this->order->id_address_delivery);
         $this->propertySources['customer'] = new Customer($this->invoiceSource->getSource()->id_customer);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getCountryCode()
-    {
-        $invoiceAddress = new Address($this->order->id_address_invoice);
-        return !empty($invoiceAddress->id_country) ? Country::getIsoById($invoiceAddress->id_country) : '';
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * This override returns the name of the payment module.
-     */
-    protected function getPaymentMethod()
-    {
-        if (isset($this->order->module)) {
-            return $this->order->module;
-        }
-        return parent::getPaymentMethod();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getPaymentState()
-    {
-        // Assumption: credit slips are always in a paid state.
-        if (($this->invoiceSource->getType() === Source::Order && $this->order->hasBeenPaid()) || $this->invoiceSource->getType() === Source::CreditNote) {
-            $result = Api::PaymentStatus_Paid;
-        } else {
-            $result = Api::PaymentStatus_Due;
-        }
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getPaymentDate()
-    {
-        if ($this->invoiceSource->getType() === Source::Order) {
-            $paymentDate = null;
-            foreach ($this->order->getOrderPaymentCollection() as $payment) {
-                /** @var OrderPayment $payment */
-                if ($payment->date_add && ($paymentDate === null || $payment->date_add > $paymentDate)) {
-                    $paymentDate = $payment->date_add;
-                }
-            }
-        } else {
-            // Assumption: last modified date is date of actual reimbursement.
-            $paymentDate = $this->creditSlip->date_upd;
-        }
-
-        $result = $paymentDate ? substr($paymentDate, 0, strlen('2000-01-01')) : null;
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * PrestaShop stores the internal currency id, so look up the currency
-     * object first then extract the ISO code for it.
-     */
-    protected function addCurrency()
-    {
-        $currency = Currency::getCurrencyInstance($this->order->id_currency);
-        $result = array (
-            Meta::Currency => $currency->iso_code,
-            Meta::CurrencyRate => (float) $this->shopSource->conversion_rate,
-            Meta::CurrencyDoConvert => true,
-        );
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * This override provides the values meta-invoice-amountinc and
-     * meta-invoice-amount.
-     */
-    protected function getInvoiceTotals()
-    {
-        $sign = $this->getSign();
-        if ($this->invoiceSource->getType() === Source::Order) {
-            $amount = $this->order->getTotalProductsWithoutTaxes()
-                + $this->order->total_shipping_tax_excl
-                + $this->order->total_wrapping_tax_excl
-                - $this->order->total_discounts_tax_excl;
-            $amountInc = $this->order->getTotalProductsWithTaxes()
-                + $this->order->total_shipping_tax_incl
-                + $this->order->total_wrapping_tax_incl
-                - $this->order->total_discounts_tax_incl;
-        } else {
-            // On credit notes, the amount ex VAT will not have been corrected
-            // for discounts that are subtracted from the refund. This will be
-            // corrected later in getDiscountLinesCreditNote().
-            $amount = $this->creditSlip->total_products_tax_excl
-                + $this->creditSlip->total_shipping_tax_excl;
-            $amountInc = $this->creditSlip->total_products_tax_incl
-                + $this->creditSlip->total_shipping_tax_incl;
-        }
-
-
-        return array(
-            Meta::InvoiceAmountInc => $sign * $amountInc,
-            Meta::InvoiceAmount => $sign * $amount,
-        );
     }
 
     /**
@@ -260,7 +142,7 @@ class Creator extends BaseCreator
         $this->addTokenDefault($result, Tag::Product, $invoiceSettings['productName']);
         $this->addTokenDefault($result, Tag::Nature, $invoiceSettings['nature']);
 
-        $sign = $this->getSign();
+        $sign = $this->invoiceSource->getSign();
         // Prestashop does not support the margin scheme. So in a standard
         // install this method will always return false. But if this method
         // happens to return true anyway (customisation, hook), the costprice
@@ -310,7 +192,7 @@ class Creator extends BaseCreator
      */
     protected function getShippingLine()
     {
-        $sign = $this->getSign();
+        $sign = $this->invoiceSource->getSign();
         $carrier = new Carrier($this->order->id_carrier);
         // total_shipping_tax_excl is not very precise (rounded to the cent) and
         // often leads to 1 cent off invoices in Acumulus (assuming that the
@@ -391,16 +273,15 @@ class Creator extends BaseCreator
      */
     protected function getPaymentFeeLine()
     {
-        /* @noinspection PhpUndefinedFieldInspection */
-        if (isset($this->invoiceSource->getSource()->payment_fee)
-            && isset($this->invoiceSource->getSource()->payment_fee_rate)
-            && (float) $this->invoiceSource->getSource()->payment_fee !== 0.0)
+        /** @var \Order|\OrderSlip $source */
+        $source = $this->invoiceSource->getSource();
+        if (isset($source->payment_fee)
+            && isset($source->payment_fee_rate)
+            && (float) $source->payment_fee !== 0.0)
         {
-            $sign = $this->getSign();
-            /** @noinspection PhpUndefinedFieldInspection */
-            $paymentInc = (float) $sign * $this->invoiceSource->getSource()->payment_fee;
-            /** @noinspection PhpUndefinedFieldInspection */
-            $paymentVatRate = (float) $this->invoiceSource->getSource()->payment_fee_rate;
+            $sign = $this->invoiceSource->getSign();
+            $paymentInc = (float) $sign * $source->payment_fee;
+            $paymentVatRate = (float) $source->payment_fee_rate;
             $paymentEx = $paymentInc / (100.0 + $paymentVatRate) * 100;
             $paymentVat = $paymentInc - $paymentEx;
             $result = array(
@@ -455,7 +336,7 @@ class Creator extends BaseCreator
      */
     protected function getDiscountLineOrder(array $line)
     {
-        $sign = $this->getSign();
+        $sign = $this->invoiceSource->getSign();
         $discountInc = -$sign * $line['value'];
         $discountEx = -$sign * $line['value_tax_excl'];
         $discountVat = $discountInc - $discountEx;

@@ -17,7 +17,7 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies)
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
-5.2.2 (2018-03-??)
+5.2.2 (2018-03-16)
 ------------------
 - ALL: security review: better code and document security measures taken. Some
   additional escaping was added, mostly input coming from the Acumulus API, so

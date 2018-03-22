@@ -109,10 +109,10 @@ class FormRenderer
     protected $checkbox1WrapperClass = '';
 
     /** @var string */
-    protected $multiLabelTag = 'span';
+    protected $multiLabelTag = 'label';
 
     /** @var string */
-    protected $multiLabelClass = 'label';
+    protected $multiLabelClass = '';
 
     /** @var string */
     protected $descriptionWrapperTag = 'div';
@@ -296,7 +296,7 @@ class FormRenderer
 
         if ($type !== 'hidden') {
             $output .= $this->getWrapper('element');
-            $output .= $this->renderLabel($label, $type !== 'radio' && $type !== 'checkbox' ? $id : null, $labelAttributes);
+            $output .= $this->renderLabel($label, in_array($type, array('radio', 'checkbox', 'markup')) ? null : $id, $labelAttributes);
             $output .= $this->getWrapper('inputDescription');
         }
         $output .= $this->renderElement($type, $id, $name, $value, $attributes, $options);

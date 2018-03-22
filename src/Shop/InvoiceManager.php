@@ -610,7 +610,7 @@ abstract class InvoiceManager
      */
     protected function getSqlDate(DateTime $date)
     {
-        return $date->format('Y-m-d H:i:s');
+        return $date->format(PluginConfig::TimeStampFormat_Sql);
     }
 
     /**

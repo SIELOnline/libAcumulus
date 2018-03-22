@@ -29,8 +29,6 @@ class ShopOrderOverviewForm extends Form
     const Status_NonExisting = 'status_non_existing';
     const Status_CommunicationError = 'status_communication_error';
 
-    const DateFormat_Date = 'Y-m-d';
-
     /** @var \Siel\Acumulus\Web\Service */
     protected $service;
 
@@ -485,7 +483,7 @@ class ShopOrderOverviewForm extends Form
             $fields['payment_date'] = array(
                 'type' => 'date',
                 'label' => $this->t('payment_date'),
-                'default' => date('Y-m-d'),
+                'default' => date(API::DateFormat_Iso),
             );
             $fields['set_paid'] = array(
                 'type' => 'button',
@@ -590,7 +588,7 @@ class ShopOrderOverviewForm extends Form
 //        $isWindows = strncasecmp(PHP_OS, 'WIN', 3) === 0;
 //        setlocale(LC_TIME, $this->t($isWindows ? 'nld' : 'nl_NL'));
 //        $result = strftime(static::DateFormat_Date, $timestamp);
-        $result = date(static::DateFormat_Date, $timestamp);
+        $result = date(API::DateFormat_Iso, $timestamp);
 //        setlocale(LC_TIME, $currentLocale);
         return $result;
     }

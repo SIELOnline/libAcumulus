@@ -26,6 +26,7 @@ WC3 = WooCommerce 3 (WordPress)
   verwijderd. Die shops die nog geen html5 input type=date gebruiken, krijgen
   een (html5 attribuut) placeholder met het verwachte formaat dat
   gestandaardiseerd is op wat een date field verstuurt (yyyy-mm-dd).
+- Refactor: centralise date formats.
 
 5.2.2 (2018-03-16)
 ------------------

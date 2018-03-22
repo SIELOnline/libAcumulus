@@ -10,6 +10,13 @@ interface PluginConfig
 {
     const Version = '5.2.0';
 
+    /**
+     * @var string
+     *   Format to use with date() and DateTime formatting methods for
+     *   SQL timestamps.
+     */
+    const TimeStampFormat_Sql = 'Y-m-d H:i:s';
+
     const Send_SendAndMailOnError = 1;
     const Send_SendAndMail = 2;
     const Send_TestMode = 3;

@@ -1051,7 +1051,7 @@ class Completor
      */
     protected function getInvoiceDate()
     {
-        $date = !empty($this->invoice[Tag::Customer][Tag::Invoice][Tag::IssueDate]) ? $this->invoice[Tag::Customer][Tag::Invoice][Tag::IssueDate] : date('Y-m-d');
+        $date = !empty($this->invoice[Tag::Customer][Tag::Invoice][Tag::IssueDate]) ? $this->invoice[Tag::Customer][Tag::Invoice][Tag::IssueDate] : date(API::DateFormat_Iso);
         return $date;
     }
 

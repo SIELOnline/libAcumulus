@@ -6,6 +6,13 @@ namespace Siel\Acumulus;
  */
 interface Api
 {
+    /**
+     * @var string
+     *   Format to use with date() and DateTime formatting methods for the
+     *   ISO8601 date part.
+     */
+    const DateFormat_Iso = 'Y-m-d';
+
     // API result codes. Note that internally I want an increasing order of
     // worseness, so these constants are not used internally but mapped to the
     // Plugin::status_... constants.

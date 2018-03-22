@@ -46,7 +46,7 @@ class Source extends BaseSource
      */
     public function getDate()
     {
-        return date('Y-m-d', strtotime($this->source['details']['BT']->created_on));
+        return date(API::DateFormat_Iso, strtotime($this->source['details']['BT']->created_on));
     }
 
     /**
@@ -97,7 +97,7 @@ class Source extends BaseSource
             }
             $previousStatus = $orderHistory->order_status_code;
         }
-        return $date ? date('Y-m-d', strtotime($date)) : $date;
+        return $date ? date(API::DateFormat_Iso, strtotime($date)) : $date;
     }
 
     /**
@@ -194,6 +194,6 @@ class Source extends BaseSource
      */
     public function getInvoiceDate()
     {
-        return !empty($this->invoice['created_on']) ? date('Y-m-d', strtotime($this->invoice['created_on'])) : parent::getInvoiceDate();
+        return !empty($this->invoice['created_on']) ? date(API::DateFormat_Iso, strtotime($this->invoice['created_on'])) : parent::getInvoiceDate();
     }
 }

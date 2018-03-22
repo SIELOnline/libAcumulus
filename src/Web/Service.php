@@ -209,7 +209,7 @@ class Service
     public function getVatInfo($countryCode, $date = '')
     {
         if (empty($date)) {
-            $date = date('Y-m-d');
+            $date = date(API::DateFormat_Iso);
         }
         $message = array(
             'vatdate' => $date,
@@ -389,7 +389,7 @@ class Service
     public function setPaymentStatus($token, $paymentStatus, $paymentDate = '')
     {
         if (empty($paymentDate)) {
-            $paymentDate = date('Y-m-d');
+            $paymentDate = date(API::DateFormat_Iso);
         }
         $message = array(
             'token' => (string) $token,

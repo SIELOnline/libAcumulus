@@ -5,6 +5,7 @@ use Siel\Acumulus\Helpers\ContainerInterface;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
+use Siel\Acumulus\PluginConfig;
 use Siel\Acumulus\Shop\AcumulusEntryManager as BaseAcumulusEntryManager;
 use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
 
@@ -127,7 +128,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      */
     protected function sqlNow()
     {
-        return date('Y-m-d H:i:s');
+        return date(PluginConfig::TimeStampFormat_Sql);
     }
 
     /**

@@ -1,5 +1,5 @@
 <?php
-namespace Siel\Acumulus\Magento\Magento1\Helpers;
+namespace Siel\Acumulus\Magento\Magento2\Helpers;
 
 use Siel\Acumulus\Magento\Helpers\FormMapper as BaseFormMapper;
 
@@ -19,7 +19,7 @@ class FormMapper extends BaseFormMapper
 
         if ($key === 'type' && $value === 'date') {
             $result['format'] = static::DateFormat;
-            $result['image'] = \Mage::getDesign()->getSkinUrl('images/grid-cal.gif');
+            $result['date_format'] = static::DateFormat;
         }
         return $result;
     }

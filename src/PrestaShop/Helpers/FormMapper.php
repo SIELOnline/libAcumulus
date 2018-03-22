@@ -109,7 +109,7 @@ class FormMapper extends BaseFormMapper
             'multiple' => isset($field['attributes']['multiple']) ? $field['attributes']['multiple'] : false,
         );
 
-        if (isset($field['attributes'])) {
+        if (!empty($field['attributes'])) {
             $result['attributes'] = $field['attributes'];
         }
         if (isset($field['description'])) {

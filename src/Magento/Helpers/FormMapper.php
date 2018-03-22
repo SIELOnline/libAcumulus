@@ -13,6 +13,13 @@ class FormMapper extends BaseFormMapper
 {
 
     /**
+     * The date format as Magento uses it.
+     *
+     * @var string
+     */
+    const DateFormat = 'yyyy-MM-dd';
+
+    /**
      * The slug-name of the settings page on which to show the section.
      *
      * @var \Varien_Data_Form_Abstract|\Magento\Framework\Data\Form\AbstractForm
@@ -130,7 +137,6 @@ class FormMapper extends BaseFormMapper
         foreach ($field as $key => $value) {
             $config += $this->getMagentoProperty($key, $value, $field['type']);
         }
-
         return $config;
     }
 

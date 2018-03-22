@@ -697,31 +697,4 @@ abstract class Form
         return $result;
     }
 
-    /**
-     * Returns the expected date format using a format as accepted by
-     * DateTime::createFromFormat().
-     *
-     * This default implementation assumes that the shop uses the same format
-     * options as PHP.
-     *
-     * @return string
-     */
-    public function getDateFormat()
-    {
-        return $this->getShopDateFormat();
-    }
-
-    /**
-     * Returns the expected date format using a format as accepted by the shop's
-     * date handling functions.
-     *
-     * This default implementation assumes that the shop does not provide its own
-     * date handling formats and settings.
-     *
-     * @return string
-     */
-    public function getShopDateFormat()
-    {
-        return 'Y-m-d';
-    }
 }

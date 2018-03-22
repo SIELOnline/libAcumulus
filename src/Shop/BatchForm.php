@@ -25,6 +25,9 @@ use Siel\Acumulus\PluginConfig;
  */
 class BatchForm extends Form
 {
+
+    const DateFormat = 'Y-m-d';
+
     /** @var \Siel\Acumulus\Config\ShopCapabilitiesInterface */
     protected $shopCapabilities;
 
@@ -64,6 +67,7 @@ class BatchForm extends Form
     protected function getDefaultFormValues()
     {
         $result = parent::getDefaultFormValues();
+        $result['send_mode'] = 'send_normal';
         if (!empty($this->log)) {
             $result['log'] = implode("\n", $this->log);
         }
@@ -99,15 +103,14 @@ class BatchForm extends Form
         } else /*if ($this->submittedValues['date_to'] !== '') */ {
             // Range of dates has been filled in.
             // We ignore any order # to value.
-            $dateFormat = $this->getDateFormat();
-            if (!DateTime::createFromFormat($dateFormat, $this->submittedValues['date_from'])) {
+            if (!DateTime::createFromFormat(static::DateFormat, $this->submittedValues['date_from'])) {
                 // Date from not a valid date.
-                $this->errorMessages['date_from'] = sprintf($this->t('message_validate_batch_bad_date_from'), $this->getShopDateFormat());
+                $this->errorMessages['date_from'] = sprintf($this->t('message_validate_batch_bad_date_from'), $this->t('date_format'));
             }
             if ($this->submittedValues['date_to']) {
-                if (!DateTime::createFromFormat($dateFormat, $this->submittedValues['date_to'])) {
+                if (!DateTime::createFromFormat(static::DateFormat, $this->submittedValues['date_to'])) {
                     // Date to not a valid date.
-                    $this->errorMessages['date_to'] = sprintf($this->t('message_validate_batch_bad_date_to'), $this->getShopDateFormat());
+                    $this->errorMessages['date_to'] = sprintf($this->t('message_validate_batch_bad_date_to'), $this->t('date_format'));
                 } elseif ($this->submittedValues['date_to'] < $this->submittedValues['date_from']) {
                     // date to is smaller than date from
                     $this->errorMessages['date_to'] = $this->t('message_validate_batch_bad_date_range');
@@ -136,12 +139,11 @@ class BatchForm extends Form
             }
         } else {
             // Retrieve by order date.
-            $dateFormat = $this->getDateFormat();
-            $from = DateTime::createFromFormat($dateFormat, $this->getFormValue('date_from'));
+            $from = DateTime::createFromFormat(static::DateFormat, $this->getFormValue('date_from'));
             $from->setTime(0, 0, 0);
-            $to = $this->getFormValue('date_to') ? DateTime::createFromFormat($dateFormat, $this->getFormValue('date_to')) : clone $from;
+            $to = $this->getFormValue('date_to') ? DateTime::createFromFormat(static::DateFormat, $this->getFormValue('date_to')) : clone $from;
             $to->setTime(23, 59, 59);
-            $this->log['range'] = sprintf($this->t('message_form_range_date'), $this->t("plural_$type"), $from->format(($dateFormat)), $to->format($dateFormat));
+            $this->log['range'] = sprintf($this->t('message_form_range_date'), $this->t("plural_$type"), $from->format((static::DateFormat)), $to->format(static::DateFormat));
             $invoiceSources = $this->invoiceManager->getInvoiceSourcesByDateRange($type, $from, $to);
         }
 
@@ -150,11 +152,12 @@ class BatchForm extends Form
             $this->setFormValue('result', $this->log[$type]);
             $result = true;
         } else {
-            if ((bool) $this->getFormValue('send_test_mode')) {
+            $sendMode = $this->getFormValue('send_mode');
+            if ($sendMode === 'send_test_mode') {
                 // Overrule debug setting for (the rest of) this run.
                 $this->acumulusConfig->set('debug', PluginConfig::Send_TestMode);
             }
-            $result = $this->invoiceManager->sendMultiple($invoiceSources, (bool) $this->getFormValue('force_send'), (bool) $this->getFormValue('dry_run'), $this->log);
+            $result = $this->invoiceManager->sendMultiple($invoiceSources, $sendMode === 'send_force', (bool) $this->getFormValue('dry_run'), $this->log);
         }
 
         // Set formValue for log in case form values are already queried.
@@ -205,23 +208,36 @@ class BatchForm extends Form
                 'date_from' => array(
                     'type' => 'date',
                     'label' => $this->t('field_date_from'),
-                    'format' => $this->getShopDateFormat(),
+                    'attributes' => array(
+                        'placeholder' => $this->t('date_format'),
+                    ),
                 ),
-                // @todo: html date fields have their own format based on language settings?
                 'date_to' => array(
                     'type' => 'date',
                     'label' => $this->t('field_date_to'),
-                    'description' => sprintf($this->t('desc_date_from_to'), $this->getShopDateFormat()),
-                    'format' => $this->getShopDateFormat(),
+                    'attributes' => array(
+                        'placeholder' => $this->t('date_format'),
+                    ),
+                    'description' => $this->t('desc_date_from_to'),
                 ),
-                // @todo: make this a radio and rephrase: Do not overwrite if already sent, overwrite if already sent
-                'options' => array(
-                    'type' => 'checkbox',
-                    'label' => $this->t('field_options'),
-                    'description' => $this->t('desc_batch_options'),
+                'send_mode' => array(
+                    'type' => 'radio',
+                    'label' => $this->t('field_send_mode'),
+                    'description' => $this->t('desc_send_mode'),
+                    'attributes' => array(
+                        'required' => true,
+                    ),
                     'options' => array(
-                        'force_send' => $this->t('option_force_send'),
+                        'send_normal' => $this->t('option_send_normal'),
+                        'send_force' => $this->t('option_send_force'),
                         'send_test_mode' => $this->t('option_send_test_mode'),
+                    ),
+                ),
+                'dry_run' => array(
+                    'type' => 'checkbox',
+                    'label' => $this->t('field_dry_run'),
+                    'description' => $this->t('desc_dry_run'),
+                    'options' => array(
                         'dry_run' => $this->t('option_dry_run'),
                     ),
                 ),

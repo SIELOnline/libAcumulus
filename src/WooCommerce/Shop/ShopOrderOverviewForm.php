@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\WooCommerce\Shop;
 
+use DateTime;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Helpers\Form;
@@ -16,7 +17,10 @@ use Siel\Acumulus\Web\Service;
  * Class ShopOrderOverviewForm defines the shop order status oveview form.
  *
  * This form is mostly informative but may contain some buttons and a few fields
- * to update the invocie in Acumulus.
+ * to update the invoice in Acumulus.
+ *
+ * SECURITY REMARKS
+ * ----------------
  */
 class ShopOrderOverviewForm extends Form
 {
@@ -134,9 +138,13 @@ class ShopOrderOverviewForm extends Form
     protected function getFields1Source($localEntryInfo)
     {
         $statusInfo = $this->getStatus($localEntryInfo);
+        /** @var string $status */
         $status = $statusInfo['status'];
+        /** @var array $statusField */
         $statusField = $statusInfo['field'];
+        /** @var Result|null $result */
         $result = $statusInfo['result'];
+        /** @var array $entry */
         $entry = $statusInfo['entry'];
 
         $fields = array(
@@ -158,11 +166,9 @@ class ShopOrderOverviewForm extends Form
                 $additionalFields = $this->getNonExistingFields();
                 break;
             case static::Status_Deleted:
-                /** @noinspection PhpUndefinedVariableInspection */
                 $additionalFields = $this->getDeletedFields();
                 break;
             case static::Status_Sent:
-                /** @noinspection PhpUndefinedVariableInspection */
                 $additionalFields = $this->getEntryFields($localEntryInfo, $entry);
                 break;
             default:
@@ -180,16 +186,21 @@ class ShopOrderOverviewForm extends Form
     }
 
     /**
-     * Returns additional form fields to show when the Acumulus invoice has
-     * not yet been sent.
+     * Returns status related information
      *
      * @param \Siel\Acumulus\Shop\AcumulusEntry|null $localEntryInfo
      *
      * @return array
-     *   Array with status, result and entry.
+     *   Keyed array with keys:
+     *   - status (string): 1 of the ShopOrderOverviewForm::Status_ constants.
+     *   - result (\Siel\Acumulus\Web\Result?): Result of the getEntry API call.
+     *   - entry (array|null): the <entry> part of the getEntryAPI call.
+     *   - statusField (array): A form field array representing the status.
      */
     protected function getStatus($localEntryInfo)
     {
+        $result = null;
+        $entry = null;
         $arg1 = null;
         $arg2 = null;
         $description = null;
@@ -206,7 +217,7 @@ class ShopOrderOverviewForm extends Form
             }
             else {
                 $result = $this->service->getEntry($localEntryInfo->getEntryId());
-                $entry = $result->getResponse();
+                $entry = $this->sanitizeEntry($result->getResponse());
                 if ($result->hasCodeTag('XGYBSN000')) {
                     $status = static::Status_NonExisting;
                     $statusIndicator = 'error';
@@ -219,6 +230,8 @@ class ShopOrderOverviewForm extends Form
                     $arg2 = $entry['deleted'];
                 } else {
                     $status = static::Status_Sent;
+                    $arg1 = $entry['invoicenumber'];
+                    $arg2 = $entry['entrydate'];
                     $statusIndicator = 'success';
                 }
             }
@@ -238,8 +251,8 @@ class ShopOrderOverviewForm extends Form
 
         return array(
             'status' => $status,
-            'result' => isset($result) ? $result: null,
-            'entry' => isset($entry) ? $entry : null,
+            'result' => $result,
+            'entry' => $entry,
             'field' => $statusField,
         );
     }
@@ -557,14 +570,14 @@ class ShopOrderOverviewForm extends Form
     protected function getLinksField($token)
     {
         $invoiceUri = $this->service->getInvoicePdfUri($token);
-        /** @noinspection HtmlUnknownTarget */
         $invoiceText = $this->t('invoice');
         $invoicPdf = sprintf($this->t('open_as_pdf'), $invoiceText);
+        /** @noinspection HtmlUnknownTarget */
         $invoiceLink = sprintf('<a class="%4$s" href="%1$s" title="%3$s">%2$s</a>', $invoiceUri, $invoiceText, $invoicPdf, 'fa fa-file-pdf-o basic-icon fa-color-pdf pdf pdf-invoice');
         $packingSlipUri = $this->service->getPackingSlipUri($token);
-        /** @noinspection HtmlUnknownTarget */
         $packingSlipText = $this->t('packing_slip');
         $packingSlipPdf = sprintf($this->t('open_as_pdf'), $packingSlipText);
+        /** @noinspection HtmlUnknownTarget */
         $packingSlipLink = sprintf('<a class="%3$s" href="%1$s" title="%3$s">%2$s</a>', $packingSlipUri, $packingSlipText, $packingSlipPdf, 'fa fa-file-pdf-o basic-icon fa-color-pdf pdf pdf-packing-slip');
         $fields = array();
         $fields['links'] = array(
@@ -584,13 +597,7 @@ class ShopOrderOverviewForm extends Form
      */
     protected function getDate($timestamp)
     {
-//        $currentLocale = setlocale(LC_TIME, '0');
-//        $isWindows = strncasecmp(PHP_OS, 'WIN', 3) === 0;
-//        setlocale(LC_TIME, $this->t($isWindows ? 'nld' : 'nl_NL'));
-//        $result = strftime(static::DateFormat_Date, $timestamp);
-        $result = date(API::DateFormat_Iso, $timestamp);
-//        setlocale(LC_TIME, $currentLocale);
-        return $result;
+        return date(API::DateFormat_Iso, $timestamp);
     }
 
     /**
@@ -680,5 +687,118 @@ class ShopOrderOverviewForm extends Form
                 'class' => array($status, 'notice', 'notice-' . $status),
             ),
         );
+    }
+
+    protected function sanitizeEntry($entry)
+    {
+        if (!empty($entry)) {
+            /* keys in $entry array that are not yet used and not yet sanitized:
+             *   - entrytype
+             *   - entrydescription
+             *   - entrynote
+             *   - fiscaltype
+             *   - contactid
+             *   - accountnumber
+             *   - costcenterid
+             *   - costtypeid
+             *   - invoicenote
+             *   - descriptiontext
+             *   - invoicelayoutid
+             *   - token
+             *   - paymenttermdays
+             */
+            $result['entryid'] = $this->sanitizeEntryIntValue($entry, 'entryid');
+            $result['entrydate'] = $this->sanitizeEntryDateValue($entry, 'entrydate');
+            $result['vatreversecharge'] = $this->sanitizeEntryBoolValue($entry, 'vatreversecharge');
+            $result['foreigneu'] = $this->sanitizeEntryBoolValue($entry, 'foreigneu');
+            $result['foreignnoneu'] = $this->sanitizeEntryBoolValue($entry, 'foreignnoneu');
+            $result['marginscheme'] = $this->sanitizeEntryBoolValue($entry, 'marginscheme');
+            $result['foreignvat'] = $this->sanitizeEntryBoolValue($entry, 'foreignvat');
+            $result['invoicenumber'] = $this->sanitizeEntryIntValue($entry, 'invoicenumber');
+            $result['totalvalueexclvat'] = $this->sanitizeEntryFloatValue($entry, 'totalvalueexclvat');
+            $result['totalvalue'] = $this->sanitizeEntryFloatValue($entry, 'totalvalue');
+            $result['paymentdate'] = $this->sanitizeEntryDateValue($entry, 'paymentdate');
+            $result['deleted'] = $this->sanitizeEntryStringValue($entry, 'deleted');
+        } else {
+            $result = null;
+        }
+        return $result;
+    }
+
+    /**
+     * Returns a html safe version of a string in an entry record.
+     *
+     * @param array $entry
+     * @param string $key
+     *
+     * @return string
+     *   The html safe version of the value under this key or the empty string
+     *   if not set.
+     */
+    protected function sanitizeEntryStringValue(array $entry, $key)
+    {
+        return !empty($entry[$key]) ? htmlspecialchars($entry[$key], ENT_NOQUOTES) : '';
+    }
+
+    /**
+     * Returns a sanitized integer value of an entry record.
+     *
+     * @param array $entry
+     * @param string $key
+     *
+     * @return int
+     *   The int value of the value under this key.
+     */
+    protected function sanitizeEntryIntValue(array $entry, $key)
+    {
+        return !empty($entry[$key]) ? (int) $entry[$key] : 0;
+    }
+
+    /**
+     * Returns a sanitized float value of an entry record.
+     *
+     * @param array $entry
+     * @param string $key
+     *
+     * @return int
+     *   The float value of the value under this key.
+     */
+    protected function sanitizeEntryFloatValue(array $entry, $key)
+    {
+        return !empty($entry[$key]) ? (float) $entry[$key] : 0.0;
+    }
+
+    /**
+     * Returns a sanitized bool value of an entry record.
+     *
+     * @param array $entry
+     * @param string $key
+     *
+     * @return bool
+     *   The bool value of the value under this key. True values are represented
+     *   by 1, false values by 0.
+     */
+    protected function sanitizeEntryBoolValue(array $entry, $key)
+    {
+        return isset($entry[$key]) && $entry[$key] == 1;
+    }
+
+    /**
+     * Returns a sanitized date value of an entry record.
+     *
+     * @param array $entry
+     * @param string $key
+     *
+     * @return DateTime|null
+     *   The date value of the value under this key or null if the string
+     *   is not in the valid date format (yyyy-mm-dd)
+     */
+    protected function sanitizeEntryDateValue(array $entry, $key)
+    {
+        $date = null;
+        if (!empty($entry[$key])) {
+            $date = DateTime::createFromFormat(API::DateFormat_Iso, $entry[$key]);
+        }
+        return $date instanceof DateTime ? $date : null;
     }
 }

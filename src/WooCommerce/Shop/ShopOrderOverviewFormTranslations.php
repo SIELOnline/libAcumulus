@@ -11,11 +11,11 @@ class ShopOrderOverviewFormTranslations extends TranslationCollection
     protected $nl = array(
         'acumulus_invoice' => 'Factuur in Acumulus',
         ShopOrderOverviewForm::Status_NotSent => 'Nog niet verzonden.',
-        ShopOrderOverviewForm::Status_Sent => 'Verzonden op %1$s',
+        ShopOrderOverviewForm::Status_Sent => 'Factuur %1$s van %2$s',
         ShopOrderOverviewForm::Status_SentConcept => 'Op %1$s als concept verzonden.',
         ShopOrderOverviewForm::Status_Deleted => 'Verzonden op %1$s maar vervolgens op %2$s naar de prullenbak verplaatst.',
         ShopOrderOverviewForm::Status_NonExisting => 'Verzonden op %1$s maar niet meer bestaand in Acumulus, ook niet in de prullenbak.',
-        ShopOrderOverviewForm::Status_CommunicationError => 'Verzonden op %1$s maar door een communicatiefout met Acumulus kunnen we niet meer informatie tonen. Probeer het later nog eens.',
+        ShopOrderOverviewForm::Status_CommunicationError => 'Verzonden maar door een communicatiefout met Acumulus kunnen we niet meer informatie tonen. Probeer het later nog eens.',
         'status_unknown' => "Onbekende status '%s'",
 
         'send_now' => 'Nu verzenden',

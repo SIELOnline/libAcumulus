@@ -135,6 +135,9 @@ class FormRenderer
     /** @var Form */
     protected $form;
 
+    /** @var int */
+    protected $htmlSpecialCharsFlag;
+
     /**
      * Sets the value of a property of this object.
      *
@@ -162,6 +165,10 @@ class FormRenderer
      */
     public function render(Form $form)
     {
+        $this->htmlSpecialCharsFlag = ENT_NOQUOTES;
+        if (defined('ENT_HTML5')) {
+            $this->htmlSpecialCharsFlag |= $this->html5 ? ENT_HTML5 : ENT_HTML401;
+        }
         $this->form = $form;
         $this->form->addValues();
         return $this->fields($this->form->getFields());
@@ -410,7 +417,7 @@ class FormRenderer
         $postfix .= !empty($attributes['required']) ? $this->requiredMarkup : '';
         $tag = empty($id) ? $this->multiLabelTag : 'label';
         $output .= $this->getOpenTag($tag, $attributes);
-        $output .= $prefix . htmlspecialchars($text, ENT_NOQUOTES, 'UTF-8') . $postfix;
+        $output .= $prefix . htmlspecialchars($text, $this->htmlSpecialCharsFlag, 'UTF-8') . $postfix;
         $output .= $this->getCloseTag($tag);
 
         // Tag around labels.
@@ -489,7 +496,7 @@ class FormRenderer
         $attributes = $this->addAttribute($attributes, 'id', $id);
         $attributes = $this->addAttribute($attributes, 'name', $name);
         $output .= $this->getOpenTag('textarea', $attributes);
-        $output .= htmlspecialchars($value, ENT_NOQUOTES, 'UTF-8');
+        $output .= htmlspecialchars($value, $this->htmlSpecialCharsFlag, 'UTF-8');
         $output .= $this->getCloseTag('textarea');
 
         // Tag around input element.
@@ -589,7 +596,7 @@ class FormRenderer
                 $optionAttributes['selected'] = true;
             }
             $output .= $this->getOpenTag('option', $optionAttributes);
-            $output .= htmlspecialchars($text, ENT_NOQUOTES, 'UTF-8');
+            $output .= htmlspecialchars($text, $this->htmlSpecialCharsFlag, 'UTF-8');
             $output .= $this->getCloseTag('option');
         }
 
@@ -799,7 +806,7 @@ class FormRenderer
      */
     protected function getOpenTag($tag, array $attributes = array(), $selfClosing = false)
     {
-        return '<' . htmlspecialchars($tag) . $this->renderAttributes($attributes) . ($selfClosing && !$this->html5 ? '/' : '') . '>';
+        return '<' . htmlspecialchars($tag, ENT_QUOTES) . $this->renderAttributes($attributes) . ($selfClosing && !$this->html5 ? '/' : '') . '>';
     }
 
     /**
@@ -813,7 +820,7 @@ class FormRenderer
      */
     protected function getCloseTag($tag)
     {
-        return '</' . htmlspecialchars($tag) .'>';
+        return '</' . htmlspecialchars($tag, ENT_QUOTES) .'>';
     }
 
     /**

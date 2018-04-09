@@ -304,7 +304,8 @@ class Creator extends BaseCreator
             $vatRateLookupMetaData = $this->getVatRateLookupByTotalLineType($line['code']);
             if (Number::isZero($line['value'])) {
                 // 0-cost lines - e.g. free shipping - also don't have a tax amount,
-                // let the completor add the highest appearing vat rate.
+                // let the completor add the looked up vat rate or just the
+                // highest appearing vat rate.
                 $result += array(
                     Tag::VatRate => null,
                     Meta::VatRateSource => Creator::VatRateSource_Completor,

@@ -4,12 +4,108 @@ namespace Siel\Acumulus\Helpers;
 use ReflectionClass;
 
 /**
- * Container defines an interface to retrieve:
- * - Instances of web shop specific overrides of the base classes and interfaces
- *   that are defined in the common package.
- * - Singleton instances from other namespaces.
- * - Instances that require some injection arguments in their constructor, that
- *   the calling object can not pass.
+ * Container defines a dependency injector pattern for this library.
+ *
+ * Principles
+ * ----------
+ * * This library is built with the idea to extract common code into base
+ *   classes and have webshop specific classes extend those base classes with
+ *   webshop specific overrides and implementations of abstract methods.
+ * * Therefore, upon creating an instance, the most specialized class possible,
+ *   will be instantiated and returned. See below how this is done.
+ * * Container::getInstance() is the weakly typed instance getting method, but
+ *   for almost all known classes in this library, a strongly typed getter is
+ *   available as well. This getter also takes care of getting the constructor
+ *   arguments.
+ * * By default only a single instance is created and this instance is returned
+ *   on each subsequent request for an instance of that type. The strongly typed
+ *   getters do know when this behaviour is not wanted (mostly when specific
+ *   arguments have to be passed) and will create fresh instances in those
+ *   cases.
+ *
+ * Creating the container
+ * ----------------------
+ * Creating the container is normally done by code in the part adhering to your
+ * webshop's architecture, e.g. a controller or model. That code must pass the
+ * following arguments:
+ * * $shopNamespace: defines the namespace hierarchy where to look for
+ *   specialized classes. This is further explained below.
+ * * $language: the language to use with translating. As the container is able
+ *   to pass constructor arguments all by itself, it must know the current
+ *   language, as the {@see Translator} is often used as constructor argument
+ *   for other objects.
+ *
+ * How the container finds the class to instantiate
+ * ------------------------------------------------
+ * Finding the most specialized class is not done via configuration, as is
+ * normally done in container implementations, but via namespace hierarchy.
+ *
+ * Suppose you are writing code for a webshop named <MyWebShop>: place your
+ * classes in the namespace \Siel\Acumulus\<MyWebShop>.
+ *
+ * If you want to support multiple (major) versions of your webshop, you can add
+ * a "version level" to the namespace:
+ * \Siel\Acumulus\<MyWebShop>\<MyWebShop><version> (note <MyWebShop> is repeated
+ * as namespaces may not start with a digit). In this case you should place code
+ * common for all versions in classes under \Siel\Acumulus\<MyWebShop>, but code
+ * specific for a given version under
+ * \Siel\Acumulus\<MyWebShop>\<MyWebShop><version>.
+ *
+ * The Magento and WooCommerce namespaces are examples of this.
+ *
+ * If your webshop is embedded in a CMS and there are multiple webshop
+ * extensions for that CMS, you can add a "CMS level" to the namespace:
+ * \Siel\Acumulus\<MyCMS>\<MyWebShop>[\<MyWebShop><version>]. Classes at the CMS
+ * level should contain code common for the CMS, think of configuration storage,
+ * logging, mailing and database access.
+ *
+ * The Joomla namespace is an example of this. The WooCommerce namespace could
+ * be an example of this, but as currently no support for other WordPress shop
+ * extensions is foreseen, the WordPress namespace was not added to the
+ * hierarchy.
+ *
+ * At whatever level you are overriding classes from this library, you always
+ * have to place them in the same sub namespace as where they are placed in this
+ * library. That is, in 1 of the namespaces Config, Helpers, Invoice, or Shop.
+ * Note that there should be no need to override classes in Web.
+ *
+ * If you do no want to use \Siel\Acumulus as starting part of your namespace,
+ * you may replace Siel by your own vendor name and/or your department name, but
+ * it has to be followed by \Acumulus\<...>. Note that if you do so, you are
+ * responsible for ensuring that your classes are autoloaded.
+ *
+ * Whatever hierarchy you use, the container should be informed about it by
+ * passing it as the 1st constructor argument. Example:
+ * If 'MyVendorName\MyDepartmentName\Acumulus\MyCMS\MyWebshop\MyWebShop2' is
+ * passed as 1st constructor argument to the Container and the container is
+ * asked to return a {@see \Siel\Acumulus\Invoice\Creator}, it will look for
+ * the following classes:
+ * 1. \MyVendorName\MyDepartmentName\Acumulus\MyCMS\MyWebshop\MyWebShop2\Invoice\Creator
+ * 2. \MyVendorName\MyDepartmentName\Acumulus\MyCMS\MyWebshop\Invoice\Creator
+ * 3. \MyVendorName\MyDepartmentName\Acumulus\MyCMS\Invoice\Creator
+ * 4. \Siel\Acumulus\Invoice\Creator
+ *
+ * Customising the library
+ * -----------------------
+ * There might be cases where you are not implementing a new extension but are
+ * using an existing extension and just want to adapt some behaviour of this
+ * library to your specific situation.
+ *
+ * Most of these problems can be solved by reacting to one of the events
+ * triggered by the Acumulus module. but f that turns out to be impossible, you
+ * can define another level of namespace searching by calling
+ * {@see Container::setCustomNamespace()}. This will define 1 additional
+ * namespace to look for before the above list as defined by the $shopNamespace
+ * argument is traversed. Taking the above example, and if you would have set
+ * 'MyShop\Custom' as custom namespace, the container
+ * will first look for the class \MyShop\Custom\Invoice\Creator, before
+ * looking for the above list of classes.
+ *
+ * By defining a custom namespace and placing your custom code in that
+ * namespace, instead of changing the code in this library, it remains possible
+ * to update this library to a newer version without loosing your
+ * customisations. Note that, also in this case, you are responsible that this
+ * class gets autoloaded.
  */
 class Container
 {
@@ -21,7 +117,7 @@ class Container
     protected $baseDir;
 
     /** @const string */
-    const baseNamespace = '\\Siel\\Acumulus\\';
+    const baseNamespace = '\\Siel\\Acumulus';
 
     /**
      * The namespace for the current shop.
@@ -54,15 +150,22 @@ class Container
      * Constructor.
      *
      * @param string $shopNamespace
+     *   The most specialized namespace to start searching for extending
+     *   classes. This does not have to start with Siel\Acumulus and must not
+     *   start or end with a \.
      * @param string $language
      *   A language or locale code, e.g. nl, nl-NL, or en-UK.
      */
-    public function __construct($shopNamespace, $language = '')
+    public function __construct($shopNamespace, $language = 'nl')
     {
         // Base directory of libAcumulus is parent directory of this file's
         // directory.
         $this->baseDir =  dirname(__DIR__);
-        $this->shopNamespace = static::baseNamespace . $shopNamespace;
+        $this->shopNamespace = '';
+        if (strpos($shopNamespace, 'Acumulus') === false) {
+            $this->shopNamespace = static::baseNamespace;
+        }
+        $this->shopNamespace .= '\\' . $shopNamespace;
         $this->language = substr($language, 0, 2);
     }
 
@@ -102,6 +205,10 @@ class Container
      * Sets a custom namespace for customisations on top of the current shop.
      *
      * @param string $customNamespace
+     *   A custom namespace that will be searched for first, before traversing
+     *   the shopNamespace hierarchy in search for a requested class.
+     *   It should start with a \, but not end with it.
+     *
      */
     public function setCustomNamespace($customNamespace)
     {
@@ -451,12 +558,20 @@ class Container
                 $fqClass = $this->tryNsInstance($class, $subNamespace, $this->customNamespace);
             }
 
-            // Try the shop namespace and any parent namespaces.
+            // Try the namespace passed to the constructor and any parent
+            // namespaces, but stop at Acumulus.
             $namespaces = explode('\\', $this->shopNamespace);
             while (empty($fqClass) && !empty($namespaces)) {
-                $namespace = implode('\\', $namespaces);
+                if (end($namespaces) === 'Acumulus') {
+                    // Base level is always \Siel\Acumulus, even if
+                    // \MyVendorName\Acumulus\MyWebShop was set as shopNamespace.
+                    $namespace = static::baseNamespace;
+                    $namespaces = array();
+                } else {
+                    $namespace = implode('\\', $namespaces);
+                    array_pop($namespaces);
+                }
                 $fqClass = $this->tryNsInstance($class, $subNamespace, $namespace);
-                array_pop($namespaces);
             }
 
             if (empty($fqClass)) {
@@ -532,6 +647,6 @@ class Container
      */
     protected function getFileName($fqClass)
     {
-        return $this->baseDir . DIRECTORY_SEPARATOR . str_replace('\\',DIRECTORY_SEPARATOR, substr($fqClass, strlen(static::baseNamespace))) . '.php';
+        return $this->baseDir . str_replace('\\',DIRECTORY_SEPARATOR, substr($fqClass, strlen(static::baseNamespace))) . '.php';
     }
 }

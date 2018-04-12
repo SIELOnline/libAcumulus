@@ -2,7 +2,7 @@
 namespace Siel\Acumulus\OpenCart\Shop;
 
 use DateTime;
-use Siel\Acumulus\Helpers\ContainerInterface;
+use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Invoice\Result;
 use Siel\Acumulus\Invoice\Source as Source;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
@@ -34,7 +34,7 @@ class InvoiceManager extends BaseInvoiceManager
     /**
      * {@inheritdoc}
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(Container $container)
     {
         parent::__construct($container);
         $this->tableInfo = array(

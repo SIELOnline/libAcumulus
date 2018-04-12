@@ -21,7 +21,7 @@ use Siel\Acumulus\Tag;
  */
 class Config implements ConfigInterface
 {
-    /** @var \Siel\Acumulus\Config\ConfigStoreInterface */
+    /** @var \Siel\Acumulus\Config\ConfigStore */
     protected $configStore;
 
     /** @var \Siel\Acumulus\Config\ShopCapabilitiesInterface */
@@ -45,12 +45,12 @@ class Config implements ConfigInterface
     /**
      * Config constructor.
      *
-     * @param \Siel\Acumulus\Config\ConfigStoreInterface $configStore
+     * @param \Siel\Acumulus\Config\ConfigStore $configStore
      * @param \Siel\Acumulus\Config\ShopCapabilitiesInterface $shopCapabilities
      * @param \Siel\Acumulus\Helpers\Translator $translator
      * @param \Siel\Acumulus\Helpers\Log $log
      */
-    public function __construct(ConfigStoreInterface $configStore, ShopCapabilitiesInterface $shopCapabilities, Translator $translator, Log $log)
+    public function __construct(ConfigStore $configStore, ShopCapabilitiesInterface $shopCapabilities, Translator $translator, Log $log)
     {
         $this->configStore = $configStore;
         $this->shopCapabilities = $shopCapabilities;
@@ -80,7 +80,7 @@ class Config implements ConfigInterface
     /**
      * Wrapper getter around the config store object.
      *
-     * @return \Siel\Acumulus\Config\ConfigStoreInterface
+     * @return \Siel\Acumulus\Config\ConfigStore
      */
     protected function getConfigStore()
     {

@@ -3,7 +3,7 @@ namespace Siel\Acumulus\Shop;
 
 use DateTime;
 use Siel\Acumulus\Api;
-use Siel\Acumulus\Helpers\ContainerInterface;
+use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Result;
 use Siel\Acumulus\Invoice\ResultTranslations;
@@ -17,13 +17,13 @@ use Siel\Acumulus\Tag;
  */
 abstract class InvoiceManager
 {
-    /** @var \Siel\Acumulus\Helpers\ContainerInterface */
+    /** @var \Siel\Acumulus\Helpers\Container */
     protected $container;
 
     /**
-     * @param \Siel\Acumulus\Helpers\ContainerInterface $container
+     * @param \Siel\Acumulus\Helpers\Container $container
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(Container $container)
     {
         $this->container = $container;
 

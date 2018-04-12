@@ -4,10 +4,14 @@ namespace Siel\Acumulus\Helpers;
 use ReflectionClass;
 
 /**
- * Container implements the ContainerInterface to allow other classes to
- * easily get the correct derived classes of the base classes.
+ * Container defines an interface to retrieve:
+ * - Instances of web shop specific overrides of the base classes and interfaces
+ *   that are defined in the common package.
+ * - Singleton instances from other namespaces.
+ * - Instances that require some injection arguments in their constructor, that
+ *   the calling object can not pass.
  */
-class Container implements ContainerInterface
+class Container
 {
     /**
      * The base directory where the Acumulus library is located.
@@ -77,15 +81,17 @@ class Container implements ContainerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Sets the base directory of the Acumulus library.
      *
      * Known usages: Magento1.
      * When Magento1 runs in compiled mode, the classes as are instantiated are
-     * in the includes/src directory, in a flattened structure.  However, to
+     * in the includes/src directory, in a flattened structure. However, to
      * prevent errors or warnings, tryNsInstance will, before calling
      * class_exists(), first look for the existence of the class file in the
      * original directory structure. but that directory structure cannot be
      * derived by using __DIR__.
+     *
+     * @param string $baseDir
      */
     public function setBaseDir($baseDir)
     {
@@ -93,7 +99,9 @@ class Container implements ContainerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Sets a custom namespace for customisations on top of the current shop.
+     *
+     * @param string $customNamespace
      */
     public function setCustomNamespace($customNamespace)
     {
@@ -101,7 +109,7 @@ class Container implements ContainerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @return \Siel\Acumulus\Helpers\Translator
      */
     public function getTranslator()
     {
@@ -119,151 +127,178 @@ class Container implements ContainerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @return \Siel\Acumulus\Helpers\Log
      */
     public function getLog()
     {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('Log', 'Helpers');
     }
 
     /**
-     * {@inheritdoc}
+     * @return \Siel\Acumulus\Helpers\Requirements
      */
     public function getRequirements()
     {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('Requirements', 'Helpers');
     }
 
     /**
-     * {@inheritdoc}
+     * @return \Siel\Acumulus\Helpers\Countries
      */
     public function getCountries()
     {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('Countries', 'Helpers');
     }
 
     /**
-     * {@inheritdoc}
+     * @return \Siel\Acumulus\Helpers\Mailer
      */
     public function getMailer()
     {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('Mailer', 'Helpers', array($this->getConfig(), $this->getTranslator(), $this->getLog()));
     }
 
     /**
-     * {@inheritdoc}
+     * @return \Siel\Acumulus\Helpers\Token
      */
     public function getToken()
     {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('Token', 'Helpers', array($this->getLog()));
     }
 
     /**
-     * {@inheritdoc}
+     * @return \Siel\Acumulus\Helpers\FormRenderer
      */
     public function getFormRenderer()
     {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('FormRenderer', 'Helpers');
     }
 
     /**
-     * {@inheritdoc}
+     * @return \Siel\Acumulus\Helpers\FormMapper
      */
     public function getFormMapper()
     {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('FormMapper', 'Helpers', array($this->getLog()));
     }
 
     /**
-     * {@inheritdoc}
+     * @return \Siel\Acumulus\Web\Service
      */
     public function getService()
     {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('Service', 'Web', array($this->getCommunicator(), $this->getConfig(), $this->getTranslator()));
     }
 
     /**
-     * {@inheritdoc}
+     * Creates and returns a new \Siel\Acumulus\Web\Result instance.
+     *
+     * @return \Siel\Acumulus\Web\Result
      */
     public function getResult()
     {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('Result', 'Web', array($this->getTranslator()), true);
     }
 
     /**
-     * {@inheritdoc}
+     * @return \Siel\Acumulus\Web\CommunicatorInterface
      */
     public function getCommunicator()
     {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('Communicator', 'Web', array($this->getConfig(), $this->getLog(), $this, $this->getTranslator()));
     }
 
     /**
-     * {@inheritdoc}
+     * Creates a new wrapper object for the given invoice source.
+     *
+     * @param string $invoiceSourceType
+     *   The type of the invoice source to create.
+     * @param int|object|array $invoiceSourceOrId
+     *   The invoice source itself or its id to create a
+     *   \Siel\Acumulus\Invoice\Source instance for.
+     *
+     * @return \Siel\Acumulus\Invoice\Source
+     *   A wrapper object around a shop specific invoice source object.
      */
     public function getSource($invoiceSourceType, $invoiceSourceOrId)
     {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('Source', 'Invoice', array($invoiceSourceType, $invoiceSourceOrId), true);
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getInvoice()
-    {
-        return $this->getInstance('Invoice', 'Invoice', array(), true);
-    }
-
-    /**
-     * {@inheritdoc}
+     * Returns a new Acumulus invoice-add service result instance.
+     *
+     * @param string $trigger
+     *   A string indicating the situation that triggered the need to get a new
+     *   instance.
+     *
+     * @return \Siel\Acumulus\Invoice\Result
+     *   A wrapper object around an Acumulus invoice-add service result.
      */
     public function getInvoiceResult($trigger)
     {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('Result', 'Invoice', array($this->getTranslator(), $trigger), true);
     }
 
     /**
-     * {@inheritdoc}
+     * @return \Siel\Acumulus\Invoice\Completor
      */
     public function getCompletor()
     {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('Completor', 'Invoice', array($this->getConfig(), $this->getCompletorInvoiceLines(), $this->getCompletorStrategyLines(), $this->getCountries(), $this->getTranslator(), $this->getService()));
     }
 
     /**
-     * {@inheritdoc}
+     * @return \Siel\Acumulus\Invoice\CompletorInvoiceLines
      */
     public function getCompletorInvoiceLines()
     {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('CompletorInvoiceLines', 'Invoice', array($this->getConfig(), $this->getFlattenerInvoiceLines()));
     }
 
     /**
-     * {@inheritdoc}
+     * @return \Siel\Acumulus\Invoice\FlattenerInvoiceLines
      */
     public function getFlattenerInvoiceLines()
     {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('FlattenerInvoiceLines', 'Invoice', array($this->getConfig()));
     }
 
     /**
-     * {@inheritdoc}
+     * @return \Siel\Acumulus\Invoice\CompletorStrategyLines
      */
     public function getCompletorStrategyLines()
     {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('CompletorStrategyLines', 'Invoice', array($this->getConfig(), $this->getTranslator()));
     }
 
     /**
-     * {@inheritdoc}
+     * @return \Siel\Acumulus\Invoice\Creator
      */
     public function getCreator()
     {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('Creator', 'Invoice', array($this->getConfig(), $this->getToken(), $this->getCountries(), $this, $this->getTranslator(), $this->getLog()));
     }
 
     /**
-     * {@inheritdoc}
+     * @return \Siel\Acumulus\Config\ConfigInterface
      */
     public function getConfig()
     {
@@ -271,61 +306,78 @@ class Container implements ContainerInterface
 
         $log = $this->getLog();
         $configStore = $this->getConfigStore();
-        $result = $this->getInstance('Config', 'Config', array($configStore, $this->getShopCapabilities(), $this->getTranslator(), $log));
+
+        /** @var \Siel\Acumulus\Config\Config $config */
+        $config = $this->getInstance('Config', 'Config', array($configStore, $this->getShopCapabilities(), $this->getTranslator(), $log));
         if ($is1stTime) {
-            $configStore->setConfig($result);
-            $pluginSettings = $result->getPluginSettings();
-            $environment = $result->getEnvironment();
+            $configStore->setConfig($config);
+            $pluginSettings = $config->getPluginSettings();
+            $environment = $config->getEnvironment();
             $log->setLogLevel($pluginSettings['logLevel']);
             $log->setLibraryVersion($environment['libraryVersion']);
-            $configStore->setConfig($result);
+            $configStore->setConfig($config);
             $is1stTime = false;
         }
-        return $result;
+        return $config;
     }
 
     /**
-     * {@inheritdoc}
+     * @return \Siel\Acumulus\Config\ConfigStore
      */
     public function getConfigStore()
     {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('ConfigStore', 'Config');
     }
 
     /**
-     * {@inheritdoc}
+     * @return \Siel\Acumulus\Config\ShopCapabilitiesInterface
      */
     public function getShopCapabilities()
     {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('ShopCapabilities', 'Config', array($this->getTranslator(), $this->shopNamespace, $this->getLog()));
     }
 
     /**
-     * {@inheritdoc}
+     * @return \Siel\Acumulus\Shop\InvoiceManager
      */
     public function getManager()
     {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('InvoiceManager', 'Shop', array($this));
     }
 
     /**
-     * {@inheritdoc}
+     * @return \Siel\Acumulus\Shop\AcumulusEntryManager
      */
     public function getAcumulusEntryManager()
     {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('AcumulusEntryManager', 'Shop', array($this, $this->getLog()));
     }
 
     /**
-     * {@inheritdoc}
+     * Returns a new \Siel\Acumulus\Shop\AcumulusEntry instance.
+     *
+     * @param array|object $record
+     *   The Acumulus entry data to populate the object with.
+     *
+     * @return \Siel\Acumulus\Shop\AcumulusEntry
      */
     public function getAcumulusEntry($record)
     {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('AcumulusEntry', 'Shop', array($record), true);
     }
 
     /**
-     * {@inheritdoc}
+     * Returns a form instance of the given type.
+     *
+     * @param string $type
+     *   The type of form requested.
+     *
+     * @return \Siel\Acumulus\Helpers\Form
      */
     public function getForm($type)
     {
@@ -357,11 +409,39 @@ class Container implements ContainerInterface
             default;
                 throw new \InvalidArgumentException("Unknown form type $type");
         }
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance($class . 'Form', 'Shop', $arguments);
     }
 
+    /** @noinspection PhpDocMissingThrowsInspection */
     /**
-     * {@inheritdoc}
+     * Returns an instance of the given class.
+     *
+     * This method should normally be avoided, use the get{Class}() methods as
+     * they know (and hide) what arguments to inject into the constructor.
+     *
+     * The class is looked for in multiple namespaces, starting with the
+     * $customNameSpace properties, continuing with the $shopNamespace property
+     * and finally the base namespace (\Siel\Acumulus).
+     *
+     * Normally, only 1 instance is created per class but the $newInstance
+     * argument can be used to change this behavior.
+     *
+     * @param string $class
+     *   The name of the class without namespace. The class is searched for in
+     *   multiple namespaces, see above.
+     * @param string $subNamespace
+     *   The sub namespace (within the namespaces tried) in which the class
+     *   resides.
+     * @param array $constructorArgs
+     *   A list of arguments to pass to the constructor, may be an empty array.
+     * @param bool $newInstance
+     *   Whether to create a new instance (true) or reuse an already existing
+     *   instance (false, default)
+     *
+     * @return object
+     *
+     * @throws \InvalidArgumentException
      */
     public function getInstance($class, $subNamespace, array $constructorArgs = array(), $newInstance = false)
     {

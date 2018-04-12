@@ -1,7 +1,7 @@
 <?php
 namespace Siel\Acumulus\Shop;
 
-use Siel\Acumulus\Helpers\ContainerInterface;
+use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Invoice\Source;
 
@@ -18,16 +18,16 @@ abstract class AcumulusEntryManager
     /** @var \Siel\Acumulus\Helpers\Log */
     protected $log;
 
-    /** @var \Siel\Acumulus\Helpers\ContainerInterface */
+    /** @var \Siel\Acumulus\Helpers\Container */
     protected $container;
 
     /**
      * AcumulusEntryManager constructor.
      *
-     * @param \Siel\Acumulus\Helpers\ContainerInterface $container
+     * @param \Siel\Acumulus\Helpers\Container $container
      * @param \Siel\Acumulus\Helpers\Log $log
      */
-    public function __construct(ContainerInterface $container, Log $log)
+    public function __construct(Container $container, Log $log)
     {
         $this->container = $container;
         $this->log = $log;

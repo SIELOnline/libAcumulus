@@ -1,7 +1,7 @@
 <?php
 namespace Siel\Acumulus\OpenCart\Shop;
 
-use Siel\Acumulus\Helpers\ContainerInterface;
+use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
@@ -34,7 +34,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    public function __construct(ContainerInterface $container, Log $log)
+    public function __construct(Container $container, Log $log)
     {
         parent::__construct($container, $log);
         $this->tableName = DB_PREFIX . 'acumulus_entry';

@@ -2,7 +2,7 @@
 namespace Siel\Acumulus\Invoice;
 
 use Siel\Acumulus\Api;
-use Siel\Acumulus\Helpers\ContainerInterface;
+use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Countries;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Number;
@@ -69,7 +69,7 @@ abstract class Creator
     /** @var \Siel\Acumulus\Helpers\Countries */
     protected $countries;
 
-    /** @var \Siel\Acumulus\Helpers\ContainerInterface*/
+    /** @var \Siel\Acumulus\Helpers\Container*/
     protected $container;
 
     /** @var array Resulting Acumulus invoice */
@@ -91,11 +91,11 @@ abstract class Creator
      * @param \Siel\Acumulus\Config\Config $config
      * @param \Siel\Acumulus\Helpers\Token $token
      * @param \Siel\Acumulus\Helpers\Countries $countries
-     * @param \Siel\Acumulus\Helpers\ContainerInterface $container
+     * @param \Siel\Acumulus\Helpers\Container $container
      * @param \Siel\Acumulus\Helpers\Translator $translator
      * @param \Siel\Acumulus\Helpers\Log $log
      */
-    public function __construct(Config $config, Token $token, Countries $countries, ContainerInterface $container, Translator $translator, Log $log)
+    public function __construct(Config $config, Token $token, Countries $countries, Container $container, Translator $translator, Log $log)
     {
         $this->log = $log;
         $this->config = $config;

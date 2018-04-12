@@ -2,7 +2,7 @@
 namespace Siel\Acumulus\OpenCart\Helpers;
 
 use Siel\Acumulus\PluginConfig;
-use Siel\Acumulus\Helpers\ContainerInterface;
+use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Shop\ModuleTranslations;
 
@@ -12,7 +12,7 @@ use Siel\Acumulus\Shop\ModuleTranslations;
  */
 class OcHelper
 {
-    /** @var \Siel\Acumulus\Helpers\ContainerInterface */
+    /** @var \Siel\Acumulus\Helpers\Container */
     protected $container = null;
 
     /** @var array */
@@ -25,11 +25,11 @@ class OcHelper
      * OcHelper constructor.
      *
      * @param \Registry $registry
-     * @param \Siel\Acumulus\Helpers\ContainerInterface $container
+     * @param \Siel\Acumulus\Helpers\Container $container
      *
      * @throws \ReflectionException
      */
-    public function __construct(\Registry $registry, ContainerInterface $container)
+    public function __construct(\Registry $registry, Container $container)
     {
         $this->container = $container;
         $this->registry = $this->container->getInstance('Registry', 'Helpers', array($registry));

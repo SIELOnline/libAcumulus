@@ -1,7 +1,7 @@
 <?php
 namespace Siel\Acumulus\Invoice;
 
-use Siel\Acumulus\Config\ConfigInterface;
+use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
@@ -17,7 +17,7 @@ use Siel\Acumulus\Tag;
  */
 class CompletorStrategyLines
 {
-    /** @var \Siel\Acumulus\Config\ConfigInterface */
+    /** @var \Siel\Acumulus\Config\Config */
     protected $config;
 
     /** @var \Siel\Acumulus\Helpers\Translator */
@@ -47,10 +47,10 @@ class CompletorStrategyLines
     /**
      * Constructor.
      *
-     * @param \Siel\Acumulus\Config\ConfigInterface $config
+     * @param \Siel\Acumulus\Config\Config $config
      * @param \Siel\Acumulus\Helpers\Translator $translator
      */
-    public function __construct(ConfigInterface $config, Translator $translator)
+    public function __construct(Config $config, Translator $translator)
     {
         $this->config = $config;
         $this->translator = $translator;

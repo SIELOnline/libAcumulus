@@ -298,7 +298,7 @@ class Container
     }
 
     /**
-     * @return \Siel\Acumulus\Config\ConfigInterface
+     * @return \Siel\Acumulus\Config\Config
      */
     public function getConfig()
     {

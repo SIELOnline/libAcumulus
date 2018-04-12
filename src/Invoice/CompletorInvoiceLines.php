@@ -1,7 +1,7 @@
 <?php
 namespace Siel\Acumulus\Invoice;
 
-use Siel\Acumulus\Config\ConfigInterface;
+use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
@@ -33,7 +33,7 @@ class CompletorInvoiceLines
     /** @var array[] */
     protected $possibleVatRates;
 
-    /** @var \Siel\Acumulus\Config\ConfigInterface  */
+    /** @var \Siel\Acumulus\Config\Config  */
     protected $config;
 
     /** @var \Siel\Acumulus\Invoice\Completor */
@@ -45,10 +45,10 @@ class CompletorInvoiceLines
     /**
      * Constructor.
      *
-     * @param \Siel\Acumulus\Config\ConfigInterface $config
+     * @param \Siel\Acumulus\Config\Config $config
      * @param \Siel\Acumulus\Invoice\FlattenerInvoiceLines $invoiceLinesFlattener
      */
-    public function __construct(ConfigInterface $config, FlattenerInvoiceLines $invoiceLinesFlattener)
+    public function __construct(Config $config, FlattenerInvoiceLines $invoiceLinesFlattener)
     {
         $this->config = $config;
         $this->invoiceLineFlattener = $invoiceLinesFlattener;

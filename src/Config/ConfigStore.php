@@ -6,15 +6,15 @@ namespace Siel\Acumulus\Config;
  */
 abstract class ConfigStore
 {
-    /** @var ConfigInterface */
+    /** @var Config */
     protected $acumulusConfig;
 
     /**
      * Config setter.
      *
-     * @param \Siel\Acumulus\Config\ConfigInterface $config
+     * @param \Siel\Acumulus\Config\Config $config
      */
-    public function setConfig(ConfigInterface $config)
+    public function setConfig(Config $config)
     {
         $this->acumulusConfig = $config;
     }

@@ -1,7 +1,7 @@
 <?php
 namespace Siel\Acumulus\Helpers;
 
-use Siel\Acumulus\Config\ConfigInterface;
+use Siel\Acumulus\Config\Config;
 
 /**
  * Provides basic form handling.
@@ -67,7 +67,7 @@ abstract class Form
     /** @var \Siel\Acumulus\Config\ShopCapabilitiesInterface */
     protected $shopCapabilities;
 
-    /** @var \Siel\Acumulus\Config\ConfigInterface */
+    /** @var \Siel\Acumulus\Config\Config */
     protected $acumulusConfig;
 
     /** @var array[] */
@@ -93,9 +93,9 @@ abstract class Form
 
     /**
      * @param \Siel\Acumulus\Helpers\Translator $translator
-     * @param \Siel\Acumulus\Config\ConfigInterface $config
+     * @param \Siel\Acumulus\Config\Config $config
      */
-    public function __construct(Translator $translator, ConfigInterface $config)
+    public function __construct(Translator $translator, Config $config)
     {
         $this->successMessages = array();
         $this->warningMessages = array();

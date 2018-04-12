@@ -6,7 +6,7 @@ use DOMElement;
 use LibXMLError;
 use RuntimeException;
 use Siel\Acumulus\Api;
-use Siel\Acumulus\Config\ConfigInterface;
+use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Translator;
@@ -23,7 +23,7 @@ use Siel\Acumulus\PluginConfig;
  */
 class Communicator implements CommunicatorInterface
 {
-    /** @var \Siel\Acumulus\Config\ConfigInterface */
+    /** @var \Siel\Acumulus\Config\Config */
     protected $config;
 
     /** @var \Siel\Acumulus\Helpers\Log */
@@ -38,12 +38,12 @@ class Communicator implements CommunicatorInterface
     /**
      * Communicator constructor.
      *
-     * @param \Siel\Acumulus\Config\ConfigInterface $config
+     * @param \Siel\Acumulus\Config\Config $config
      * @param \Siel\Acumulus\Helpers\Log $log
      * @param \Siel\Acumulus\Helpers\Container $container
      * @param \Siel\Acumulus\Helpers\Translator $translator
      */
-    public function __construct(ConfigInterface $config, Log $log, Container $container, Translator $translator)
+    public function __construct(Config $config, Log $log, Container $container, Translator $translator)
     {
         $this->config = $config;
         $this->log = $log;

@@ -69,7 +69,7 @@ abstract class InvoiceManager
     /**
      * Returns a Config instance.
      *
-     * @return \Siel\Acumulus\Config\ConfigInterface
+     * @return \Siel\Acumulus\Config\Config
      */
     protected function getConfig()
     {

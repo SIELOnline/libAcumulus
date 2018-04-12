@@ -1,7 +1,7 @@
 <?php
 namespace Siel\Acumulus\Invoice;
 
-use Siel\Acumulus\Config\ConfigInterface;
+use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
@@ -17,7 +17,7 @@ use Siel\Acumulus\Tag;
  */
 class FlattenerInvoiceLines
 {
-    /** @var \Siel\Acumulus\Config\ConfigInterface  */
+    /** @var \Siel\Acumulus\Config\Config  */
     protected $config;
 
     protected $parentIndex = 1;
@@ -25,9 +25,9 @@ class FlattenerInvoiceLines
     /**
      * Constructor.
      *
-     * @param \Siel\Acumulus\Config\ConfigInterface $config
+     * @param \Siel\Acumulus\Config\Config $config
      */
-    public function __construct(ConfigInterface $config)
+    public function __construct(Config $config)
     {
         $this->config = $config;
     }

@@ -2,7 +2,7 @@
 namespace Siel\Acumulus\Invoice;
 
 use Siel\Acumulus\Api;
-use Siel\Acumulus\Config\ConfigInterface;
+use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Helpers\Countries;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Helpers\Translator;
@@ -60,7 +60,7 @@ class Completor
         self::VatRateSource_Copied_From_Parent,
     );
 
-    /** @var \Siel\Acumulus\Config\ConfigInterface */
+    /** @var \Siel\Acumulus\Config\Config */
     protected $config;
 
     /** @var \Siel\Acumulus\Helpers\Translator */
@@ -109,7 +109,7 @@ class Completor
     /**
      * Constructor.
      *
-     * @param \Siel\Acumulus\Config\ConfigInterface $config
+     * @param \Siel\Acumulus\Config\Config $config
      * @param \Siel\Acumulus\Invoice\CompletorInvoiceLines $completorInvoiceLines
      * @param \Siel\Acumulus\Invoice\CompletorStrategyLines $completorStrategyLines
      * @param \Siel\Acumulus\Helpers\Countries $countries
@@ -117,7 +117,7 @@ class Completor
      * @param \Siel\Acumulus\Web\Service $service
      */
     public function __construct(
-        ConfigInterface $config,
+        Config $config,
         CompletorInvoiceLines $completorInvoiceLines,
         CompletorStrategyLines $completorStrategyLines,
         Countries $countries,

@@ -8,6 +8,12 @@ use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Tag;
 
 /**
+ *    Defines an interface to retrieve shop specific configuration settings.
+ *
+ *    Configuration is stored in the host environment, normally a web shop.
+ *    This interface abstracts from how a specific web shop does so.
+ *
+ *
  * Gives common code in this package uniform access to the settings for this
  * extension, hiding all the web shop specific implementations of their config
  * store.
@@ -19,7 +25,7 @@ use Siel\Acumulus\Tag;
  * This class als implements the injector interface to allow other classes to
  * easily get the correct derived classes of the base classes.
  */
-class Config implements ConfigInterface
+class Config
 {
     /** @var \Siel\Acumulus\Config\ConfigStore */
     protected $configStore;
@@ -109,7 +115,14 @@ class Config implements ConfigInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Saves the configuration to the actual configuration provider.
+     *
+     * @param array $values
+     *   A keyed array that contains the values to store, this may be a subset
+     *   of the possible keys.
+     *
+     * @return bool
+     *   Success.
      */
     public function save(array $values)
     {
@@ -153,7 +166,17 @@ class Config implements ConfigInterface
     }
 
     /**
-     * @inheritdoc
+     * Sets the internal value of the specified configuration key.
+     *
+     * This value will not be stored, use save() for that.
+     *
+     * @param string $key
+     *   The configuration value to set.
+     * @param mixed $value
+     *   The new value for the configuration key.
+     *
+     * @return mixed
+     *   The old value.
      */
     public function set($key, $value)
     {
@@ -164,7 +187,21 @@ class Config implements ConfigInterface
     }
 
     /**
-     * @inheritdoc
+     * Returns information about the environment of this library.
+     *
+     * @return array
+     *   A keyed array with information about the environment of this library:
+     *   - baseUri
+     *   - apiVersion
+     *   - libraryVersion
+     *   - moduleVersion
+     *   - shopName
+     *   - shopVersion
+     *   - hostName
+     *   - phpVersion
+     *   - os
+     *   - curlVersion
+     *   - jsonVersion
      */
     public function getEnvironment()
     {
@@ -172,7 +209,15 @@ class Config implements ConfigInterface
     }
 
     /**
-     * @inheritdoc
+     * Returns the contract credentials to authenticate with the Acumulus API.
+     *
+     * @return array
+     *   A keyed array with the keys:
+     *   - contractcode
+     *   - username
+     *   - password
+     *   - emailonerror
+     *   - emailonwarning
      */
     public function getCredentials()
     {
@@ -183,15 +228,13 @@ class Config implements ConfigInterface
     }
 
     /**
-     * @inheritdoc
-     */
-    public function getShopEventSettings()
-    {
-        return $this->getSettingsByGroup('event');
-    }
-
-    /**
-     * @inheritdoc
+     * Returns the set of settings related to reacting to shop events.
+     *
+     * @return array
+     *   A keyed array with the keys:
+     *   - debug
+     *   - logLevel
+     *   - outputFormat
      */
     public function getPluginSettings()
     {
@@ -199,23 +242,30 @@ class Config implements ConfigInterface
     }
 
     /**
-     * @inheritdoc
+     * Returns the set of settings related to reacting to shop events.
+     *
+     * @return array
+     *   A keyed array with the keys:
+     *   - triggerOrderStatus
+     *   - triggerInvoiceEvent
+     *   - sendEmptyInvoice
      */
-    public function getCustomerSettings()
+    public function getShopEventSettings()
     {
-        return $this->getSettingsByGroup(Tag::Customer);
+        return $this->getSettingsByGroup('event');
     }
 
     /**
-     * @inheritdoc
-     */
-    public function getInvoiceSettings()
-    {
-        return $this->getSettingsByGroup(Tag::Invoice);
-    }
-
-    /**
-     * @inheritdoc
+     * Returns the set of settings related to the shop characteristics.
+     *
+     * These settings influence the invoice creation and completion tasks.
+     *
+     * @return array
+     *   A keyed array with the keys:
+     *   - digitalServices
+     *   - vatFreeProducts
+     *   - invoiceNrSource
+     *   - dateToUse
      */
     public function getShopSettings()
     {
@@ -223,7 +273,72 @@ class Config implements ConfigInterface
     }
 
     /**
-     * @inheritdoc
+     * Returns the set of settings related to the customer part of an invoice.
+     *
+     * @return array
+     *   A keyed array with the keys:
+     *   - sendCustomer
+     *   - overwriteIfExists
+     *   - defaultCustomerType
+     *   - contactStatus
+     *   - contactYourId
+     *   - companyName1
+     *   - companyName2
+     *   - vatNumber
+     *   - fullName
+     *   - salutation
+     *   - address1
+     *   - address2
+     *   - postalCode
+     *   - city
+     *   - telephone
+     *   - fax
+     *   - email
+     *   - mark
+     *   - genericCustomerEmail
+     */
+    public function getCustomerSettings()
+    {
+        return $this->getSettingsByGroup(Tag::Customer);
+    }
+
+    /**
+     * Returns the set of settings related to the invoice part of an invoice.
+     *
+     * @return array
+     *   A keyed array with the keys:
+     *   - defaultAccountNumber
+     *   - defaultCostCenter
+     *   - defaultInvoiceTemplate
+     *   - defaultInvoicePaidTemplate
+     *   - paymentMethodAccountNumber
+     *   - paymentMethodCostCenter
+     *   - sendEmptyInvoice
+     *   - sendEmptyShipping
+     *   - description
+     *   - descriptionText
+     *   - invoiceNotes
+     *   - useMargin
+     *   - optionsShow
+     *   - optionsAllOn1Line
+     *   - optionsAllOnOwnLine
+     *   - optionsMaxLength
+     */
+    public function getInvoiceSettings()
+    {
+        return $this->getSettingsByGroup(Tag::Invoice);
+    }
+
+    /**
+     * Returns the set of settings related to sending an email.
+     *
+     * @return array
+     *   A keyed array with the keys:
+     *   - emailAsPdf
+     *   - emailBcc
+     *   - emailFrom
+     *   - subject
+     *   - confirmReading
      */
     public function getEmailAsPdfSettings()
     {
@@ -294,7 +409,9 @@ class Config implements ConfigInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Returns a list of keys that are stored in the shop specific config store.
+     *
+     * @return array
      */
     public function getKeys()
     {
@@ -344,7 +461,13 @@ class Config implements ConfigInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Returns the hostname of the current request.
+     *
+     * The hostname is returned without www. so it can be used as domain name
+     * in constructing e-mail addresses.
+     *
+     * @return string
+     *   The hostname of the current request.
      */
     protected function getHostName()
     {

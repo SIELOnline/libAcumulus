@@ -1,7 +1,7 @@
 <?php
 namespace Siel\Acumulus\PrestaShop\Shop;
 
-use Siel\Acumulus\Config\ConfigInterface;
+use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\ShopCapabilitiesInterface;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Shop\AdvancedConfigForm as BaseAdvancedConfigForm;

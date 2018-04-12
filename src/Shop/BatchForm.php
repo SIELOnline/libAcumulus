@@ -3,7 +3,7 @@ namespace Siel\Acumulus\Shop;
 
 use DateTime;
 use Siel\Acumulus\Api;
-use Siel\Acumulus\Config\ConfigInterface;
+use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\ShopCapabilitiesInterface;
 use Siel\Acumulus\Helpers\Form;
 use Siel\Acumulus\Helpers\Translator;
@@ -37,11 +37,11 @@ class BatchForm extends Form
 
     /**
      * @param \Siel\Acumulus\Helpers\Translator $translator
-     * @param \Siel\Acumulus\Config\ConfigInterface $config
+     * @param \Siel\Acumulus\Config\Config $config
      * @param \Siel\Acumulus\Config\ShopCapabilitiesInterface $shopCapabilities
      * @param \Siel\Acumulus\Shop\InvoiceManager $invoiceManager
      */
-    public function __construct(Translator $translator, ConfigInterface $config, ShopCapabilitiesInterface $shopCapabilities, InvoiceManager $invoiceManager)
+    public function __construct(Translator $translator, Config $config, ShopCapabilitiesInterface $shopCapabilities, InvoiceManager $invoiceManager)
     {
         parent::__construct($translator, $config);
 

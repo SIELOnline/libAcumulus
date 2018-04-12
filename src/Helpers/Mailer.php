@@ -1,7 +1,7 @@
 <?php
 namespace Siel\Acumulus\Helpers;
 
-use Siel\Acumulus\Config\ConfigInterface;
+use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\PluginConfig;
 use Siel\Acumulus\Tag;
 use Siel\Acumulus\Web\Result;
@@ -12,7 +12,7 @@ use Siel\Acumulus\Web\Result;
  */
 abstract class Mailer
 {
-    /** @var \Siel\Acumulus\Config\ConfigInterface */
+    /** @var \Siel\Acumulus\Config\Config */
     protected $config;
 
     /** @var \Siel\Acumulus\Helpers\Translator */
@@ -22,11 +22,11 @@ abstract class Mailer
     protected $log;
 
     /**
-     * @param \Siel\Acumulus\Config\ConfigInterface $config
+     * @param \Siel\Acumulus\Config\Config $config
      * @param Translator $translator
      * @param \Siel\Acumulus\Helpers\Log $log
      */
-    public function __construct(ConfigInterface $config, Translator $translator, Log $log)
+    public function __construct(Config $config, Translator $translator, Log $log)
     {
         $this->log = $log;
         $this->config = $config;

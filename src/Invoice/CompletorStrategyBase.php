@@ -1,7 +1,7 @@
 <?php
 namespace Siel\Acumulus\Invoice;
 
-use Siel\Acumulus\Config\ConfigInterface;
+use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
@@ -13,7 +13,7 @@ use Siel\Acumulus\Tag;
  */
 abstract class CompletorStrategyBase
 {
-    /** @var \Siel\Acumulus\Config\ConfigInterface */
+    /** @var \Siel\Acumulus\Config\Config */
     protected $config;
 
     /** @var \Siel\Acumulus\Helpers\Translator */
@@ -91,14 +91,14 @@ abstract class CompletorStrategyBase
     protected $source;
 
     /**
-     * @param \Siel\Acumulus\Config\ConfigInterface $config
+     * @param \Siel\Acumulus\Config\Config $config
      * @param \Siel\Acumulus\Helpers\Translator $translator
      * @param array $invoice
      * @param array $possibleVatTypes
      * @param array $possibleVatRates
      * @param \Siel\Acumulus\Invoice\Source $source
      */
-    public function __construct(ConfigInterface $config, Translator $translator, array $invoice, array $possibleVatTypes, array $possibleVatRates, Source $source)
+    public function __construct(Config $config, Translator $translator, array $invoice, array $possibleVatTypes, array $possibleVatRates, Source $source)
     {
         $this->config = $config;
         $this->translator = $translator;

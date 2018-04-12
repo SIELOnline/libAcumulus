@@ -331,7 +331,7 @@ class Container
     }
 
     /**
-     * @return \Siel\Acumulus\Config\ShopCapabilitiesInterface
+     * @return \Siel\Acumulus\Config\ShopCapabilities
      */
     public function getShopCapabilities()
     {

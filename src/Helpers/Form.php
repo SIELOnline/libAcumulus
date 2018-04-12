@@ -64,7 +64,7 @@ abstract class Form
     /** @var \Siel\Acumulus\Helpers\Translator */
     protected $translator;
 
-    /** @var \Siel\Acumulus\Config\ShopCapabilitiesInterface */
+    /** @var \Siel\Acumulus\Config\ShopCapabilities */
     protected $shopCapabilities;
 
     /** @var \Siel\Acumulus\Config\Config */

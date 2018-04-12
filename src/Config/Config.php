@@ -30,7 +30,7 @@ class Config
     /** @var \Siel\Acumulus\Config\ConfigStore */
     protected $configStore;
 
-    /** @var \Siel\Acumulus\Config\ShopCapabilitiesInterface */
+    /** @var \Siel\Acumulus\Config\ShopCapabilities */
     protected $shopCapabilities;
 
     /** @var \Siel\Acumulus\Helpers\Translator */
@@ -52,11 +52,11 @@ class Config
      * Config constructor.
      *
      * @param \Siel\Acumulus\Config\ConfigStore $configStore
-     * @param \Siel\Acumulus\Config\ShopCapabilitiesInterface $shopCapabilities
+     * @param \Siel\Acumulus\Config\ShopCapabilities $shopCapabilities
      * @param \Siel\Acumulus\Helpers\Translator $translator
      * @param \Siel\Acumulus\Helpers\Log $log
      */
-    public function __construct(ConfigStore $configStore, ShopCapabilitiesInterface $shopCapabilities, Translator $translator, Log $log)
+    public function __construct(ConfigStore $configStore, ShopCapabilities $shopCapabilities, Translator $translator, Log $log)
     {
         $this->configStore = $configStore;
         $this->shopCapabilities = $shopCapabilities;
@@ -96,7 +96,7 @@ class Config
     /**
      * Wrapper getter around the store capabilities object.
      *
-     * @return \Siel\Acumulus\Config\ShopCapabilitiesInterface
+     * @return \Siel\Acumulus\Config\ShopCapabilities
      */
     protected function getShopCapabilities()
     {

@@ -2,7 +2,7 @@
 namespace Siel\Acumulus\PrestaShop\Shop;
 
 use Siel\Acumulus\Config\Config;
-use Siel\Acumulus\Config\ShopCapabilitiesInterface;
+use Siel\Acumulus\Config\ShopCapabilities;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Shop\ConfigForm as BaseConfigForm;
 use Siel\Acumulus\Web\Service;

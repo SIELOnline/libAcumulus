@@ -4,7 +4,7 @@ namespace Siel\Acumulus\Shop;
 use DateTime;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
-use Siel\Acumulus\Config\ShopCapabilitiesInterface;
+use Siel\Acumulus\Config\ShopCapabilities;
 use Siel\Acumulus\Helpers\Form;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Invoice\Translations as InvoiceTranslations;
@@ -26,7 +26,7 @@ use Siel\Acumulus\PluginConfig;
  */
 class BatchForm extends Form
 {
-    /** @var \Siel\Acumulus\Config\ShopCapabilitiesInterface */
+    /** @var \Siel\Acumulus\Config\ShopCapabilities */
     protected $shopCapabilities;
 
     /** @var \Siel\Acumulus\Shop\InvoiceManager */
@@ -38,10 +38,10 @@ class BatchForm extends Form
     /**
      * @param \Siel\Acumulus\Helpers\Translator $translator
      * @param \Siel\Acumulus\Config\Config $config
-     * @param \Siel\Acumulus\Config\ShopCapabilitiesInterface $shopCapabilities
+     * @param \Siel\Acumulus\Config\ShopCapabilities $shopCapabilities
      * @param \Siel\Acumulus\Shop\InvoiceManager $invoiceManager
      */
-    public function __construct(Translator $translator, Config $config, ShopCapabilitiesInterface $shopCapabilities, InvoiceManager $invoiceManager)
+    public function __construct(Translator $translator, Config $config, ShopCapabilities $shopCapabilities, InvoiceManager $invoiceManager)
     {
         parent::__construct($translator, $config);
 

@@ -5,7 +5,8 @@ namespace Siel\Acumulus;
 /**
  * Meta defines string constants for meta tags used in Acumulus API messages.
  */
-interface Meta {
+interface Meta
+{
     // Line: Price and vat related meta tags.
     const UnitPriceInc = 'unitpriceinc';
     const UnitPriceOld = 'meta-unitprice-old';
@@ -90,5 +91,4 @@ interface Meta {
     const StrategyCompletorUsed = 'meta-completor-strategy-used';
     const StrategyCompletorPreconditionFailed = 'meta-strategy-completor-precondition-failed';
     const paymentMethod = 'meta-payment-method';
-
 }

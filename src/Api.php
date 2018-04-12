@@ -7,9 +7,10 @@ namespace Siel\Acumulus;
 interface Api
 {
     /**
+     * Format to use with date() and DateTime formatting methods when a date is
+     * required in the API.
+     *
      * @var string
-     *   Format to use with date() and DateTime formatting methods for the
-     *   ISO8601 date part.
      */
     const DateFormat_Iso = 'Y-m-d';
 
@@ -21,10 +22,6 @@ interface Api
     const Errors = 1;
     const Exception = 3;
 
-    // Web service API constants.
-    const TestMode_Normal = 0;
-    const TestMode_Test = 1;
-
     // Web service related defaults.
     const baseUri = 'https://api.sielsystems.nl/acumulus';
     const testUri = 'https://ng1.sielsystems.nl';
@@ -32,7 +29,10 @@ interface Api
     const testApiVersion = '4.0.4';
     const outputFormat = 'json';
 
-    // Invoice API related constants.
+    // API related constants.
+    const TestMode_Normal = 0;
+    const TestMode_Test = 1;
+
     const PaymentStatus_Due = 1;
     const PaymentStatus_Paid = 2;
 

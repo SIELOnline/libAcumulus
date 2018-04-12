@@ -8,12 +8,22 @@ namespace Siel\Acumulus;
  */
 interface PluginConfig
 {
-    const Version = '5.2.0';
 
     /**
+     * Version of this library, used in reporting.
+     *
+     * Note that composer will use git tags to determine the version of this
+     * library.
+     *
      * @var string
-     *   Format to use with date() and DateTime formatting methods for
-     *   SQL timestamps.
+     */
+    const Version = '5.4.0';
+
+    /**
+     * Format to use with date() and DateTime formatting methods for SQL
+     * timestamps.
+     *
+     * @var string
      */
     const TimeStampFormat_Sql = 'Y-m-d H:i:s';
 
@@ -21,7 +31,7 @@ interface PluginConfig
     const Send_SendAndMail = 2;
     const Send_TestMode = 3;
 
-    // not an API constant.
+    // Not an API constant.
     const Concept_Plugin = 2;
 
     const InvoiceNrSource_ShopInvoice = 1;

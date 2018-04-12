@@ -27,17 +27,17 @@ class Service
     /** @var \Siel\Acumulus\Helpers\Translator */
     protected $translator;
 
-    /** @var CommunicatorInterface */
+    /** @var Communicator */
     protected $communicator;
 
     /**
      * Constructor.
      *
-     * @param CommunicatorInterface $communicator
+     * @param Communicator $communicator
      * @param \Siel\Acumulus\Config\Config $config
      * @param \Siel\Acumulus\Helpers\Translator $translator
      */
-    public function __construct(CommunicatorInterface $communicator, Config $config, Translator $translator)
+    public function __construct(Communicator $communicator, Config $config, Translator $translator)
     {
         $this->config = $config;
         $this->communicator = $communicator;

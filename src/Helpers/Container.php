@@ -210,7 +210,7 @@ class Container
     }
 
     /**
-     * @return \Siel\Acumulus\Web\CommunicatorInterface
+     * @return \Siel\Acumulus\Web\Communicator
      */
     public function getCommunicator()
     {

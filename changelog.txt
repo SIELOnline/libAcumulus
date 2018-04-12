@@ -29,6 +29,7 @@ WC3 = WooCommerce 3 (WordPress)
   - Removed ConfigStoreInterface
   - Removed ConfigInterface
   - Removed ShopCapabilitiesInterface
+  - Removed CommunicatorInterface
 
 5.3.0 (2018-04-09)
 ------------------

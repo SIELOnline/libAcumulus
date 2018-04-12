@@ -2,7 +2,7 @@
 namespace Siel\Acumulus\Shop;
 
 use Siel\Acumulus\Helpers\Form;
-use Siel\Acumulus\Helpers\TranslatorInterface;
+use Siel\Acumulus\Helpers\Translator;
 
 /**
  * Class ConfirmUninstallForm
@@ -12,9 +12,9 @@ class ConfirmUninstallForm extends Form
     /**
      * Constructor.
      *
-     * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
+     * @param \Siel\Acumulus\Helpers\Translator $translator
      */
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(Translator $translator)
     {
         parent::__construct($translator);
 

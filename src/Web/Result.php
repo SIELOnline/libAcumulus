@@ -3,7 +3,7 @@ namespace Siel\Acumulus\Web;
 
 use Exception;
 use Siel\Acumulus\Api;
-use Siel\Acumulus\Helpers\TranslatorInterface;
+use Siel\Acumulus\Helpers\Translator;
 
 /**
  * Class Result wraps an Acumulus web service result into an object.
@@ -42,7 +42,7 @@ class Result
     const AddReqResp_Always = 2;
     const AddReqResp_WithOther = 3;
 
-    /** @var \Siel\Acumulus\Helpers\TranslatorInterface */
+    /** @var \Siel\Acumulus\Helpers\Translator */
     protected $translator;
 
     /**
@@ -137,9 +137,9 @@ class Result
     /**
      * Result constructor.
      *
-     * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
+     * @param \Siel\Acumulus\Helpers\Translator $translator
      */
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(Translator $translator)
     {
         $this->status = null;
         $this->isSent = false;

@@ -7,7 +7,7 @@ use Siel\Acumulus\Helpers\Countries;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Helpers\Token;
-use Siel\Acumulus\Helpers\TranslatorInterface;
+use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\PluginConfig;
@@ -60,7 +60,7 @@ abstract class Creator
     /** @var \Siel\Acumulus\Helpers\Token */
     protected $token;
 
-    /** @var \Siel\Acumulus\Helpers\TranslatorInterface */
+    /** @var \Siel\Acumulus\Helpers\Translator */
     protected $translator;
 
     /** @var \Siel\Acumulus\Helpers\Log */
@@ -92,10 +92,10 @@ abstract class Creator
      * @param \Siel\Acumulus\Helpers\Token $token
      * @param \Siel\Acumulus\Helpers\Countries $countries
      * @param \Siel\Acumulus\Helpers\ContainerInterface $container
-     * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
+     * @param \Siel\Acumulus\Helpers\Translator $translator
      * @param \Siel\Acumulus\Helpers\Log $log
      */
-    public function __construct(Config $config, Token $token, Countries $countries, ContainerInterface $container, TranslatorInterface $translator, Log $log)
+    public function __construct(Config $config, Token $token, Countries $countries, ContainerInterface $container, Translator $translator, Log $log)
     {
         $this->log = $log;
         $this->config = $config;

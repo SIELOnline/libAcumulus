@@ -61,7 +61,7 @@ abstract class Form
     /** @var string */
     protected $type;
 
-    /** @var \Siel\Acumulus\Helpers\TranslatorInterface */
+    /** @var \Siel\Acumulus\Helpers\Translator */
     protected $translator;
 
     /** @var \Siel\Acumulus\Config\ShopCapabilitiesInterface */
@@ -92,10 +92,10 @@ abstract class Form
     protected $errorMessages;
 
     /**
-     * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
+     * @param \Siel\Acumulus\Helpers\Translator $translator
      * @param \Siel\Acumulus\Config\ConfigInterface $config
      */
-    public function __construct(TranslatorInterface $translator, ConfigInterface $config)
+    public function __construct(Translator $translator, ConfigInterface $config)
     {
         $this->successMessages = array();
         $this->warningMessages = array();

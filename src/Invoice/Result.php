@@ -1,7 +1,7 @@
 <?php
 namespace Siel\Acumulus\Invoice;
 
-use Siel\Acumulus\Helpers\TranslatorInterface;
+use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Web\Result as WebResult;
 
 /**
@@ -56,10 +56,10 @@ class Result extends WebResult
     /**
      * InvoiceSendResult constructor.
      *
-     * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
+     * @param \Siel\Acumulus\Helpers\Translator $translator
      * @param string $trigger
      */
-    public function __construct(TranslatorInterface $translator, $trigger)
+    public function __construct(Translator $translator, $trigger)
     {
         parent::__construct($translator);
         $this->trigger = $trigger;

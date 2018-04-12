@@ -4,7 +4,7 @@ namespace Siel\Acumulus\Shop;
 use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Config\ShopCapabilitiesInterface;
 use Siel\Acumulus\Helpers\Form;
-use Siel\Acumulus\Helpers\TranslatorInterface;
+use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Tag;
 use Siel\Acumulus\Web\Result;
 use Siel\Acumulus\Web\Service;
@@ -37,12 +37,12 @@ abstract class BaseConfigForm extends Form
     /**
      * Constructor.
      *
-     * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
+     * @param \Siel\Acumulus\Helpers\Translator $translator
      * @param \Siel\Acumulus\Config\ShopCapabilitiesInterface $shopCapabilities
      * @param \Siel\Acumulus\Config\ConfigInterface $config
      * @param \Siel\Acumulus\Web\Service $service
      */
-    public function __construct(TranslatorInterface $translator, ConfigInterface $config, ShopCapabilitiesInterface $shopCapabilities, Service $service)
+    public function __construct(Translator $translator, ConfigInterface $config, ShopCapabilitiesInterface $shopCapabilities, Service $service)
     {
         parent::__construct($translator, $config);
 

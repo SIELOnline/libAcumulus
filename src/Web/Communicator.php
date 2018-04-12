@@ -9,7 +9,7 @@ use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Helpers\ContainerInterface;
 use Siel\Acumulus\Helpers\Log;
-use Siel\Acumulus\Helpers\TranslatorInterface;
+use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\PluginConfig;
 
 /**
@@ -32,7 +32,7 @@ class Communicator implements CommunicatorInterface
     /** @var \Siel\Acumulus\Helpers\ContainerInterface */
     protected $container;
 
-    /** @var \Siel\Acumulus\Helpers\TranslatorInterface */
+    /** @var \Siel\Acumulus\Helpers\Translator */
     protected $translator;
 
     /**
@@ -41,9 +41,9 @@ class Communicator implements CommunicatorInterface
      * @param \Siel\Acumulus\Config\ConfigInterface $config
      * @param \Siel\Acumulus\Helpers\Log $log
      * @param \Siel\Acumulus\Helpers\ContainerInterface $container
-     * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
+     * @param \Siel\Acumulus\Helpers\Translator $translator
      */
-    public function __construct(ConfigInterface $config, Log $log, ContainerInterface $container, TranslatorInterface $translator)
+    public function __construct(ConfigInterface $config, Log $log, ContainerInterface $container, Translator $translator)
     {
         $this->config = $config;
         $this->log = $log;

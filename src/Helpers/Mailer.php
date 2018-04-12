@@ -15,7 +15,7 @@ abstract class Mailer
     /** @var \Siel\Acumulus\Config\ConfigInterface */
     protected $config;
 
-    /** @var \Siel\Acumulus\Helpers\TranslatorInterface */
+    /** @var \Siel\Acumulus\Helpers\Translator */
     protected $translator;
 
     /** @var \Siel\Acumulus\Helpers\Log */
@@ -23,10 +23,10 @@ abstract class Mailer
 
     /**
      * @param \Siel\Acumulus\Config\ConfigInterface $config
-     * @param TranslatorInterface $translator
+     * @param Translator $translator
      * @param \Siel\Acumulus\Helpers\Log $log
      */
-    public function __construct(ConfigInterface $config, TranslatorInterface $translator, Log $log)
+    public function __construct(ConfigInterface $config, Translator $translator, Log $log)
     {
         $this->log = $log;
         $this->config = $config;

@@ -3,7 +3,7 @@ namespace Siel\Acumulus\PrestaShop\Shop;
 
 use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Config\ShopCapabilitiesInterface;
-use Siel\Acumulus\Helpers\TranslatorInterface;
+use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Shop\ConfigForm as BaseConfigForm;
 use Siel\Acumulus\Web\Service;
 use Tools;

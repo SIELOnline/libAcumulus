@@ -2,7 +2,7 @@
 namespace Siel\Acumulus\Config;
 
 use Siel\Acumulus\Helpers\Log;
-use Siel\Acumulus\Helpers\TranslatorInterface;
+use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\PluginConfig;
 
@@ -11,7 +11,7 @@ use Siel\Acumulus\PluginConfig;
  */
 abstract class ShopCapabilities implements ShopCapabilitiesInterface
 {
-    /** @var \Siel\Acumulus\Helpers\TranslatorInterface */
+    /** @var \Siel\Acumulus\Helpers\Translator */
     protected $translator;
 
     /** @var string */
@@ -21,11 +21,11 @@ abstract class ShopCapabilities implements ShopCapabilitiesInterface
     protected $log;
 
     /**
-     * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
+     * @param \Siel\Acumulus\Helpers\Translator $translator
      * @param string $shopNamespace
      * @param \Siel\Acumulus\Helpers\Log $log
      */
-    public function __construct(TranslatorInterface $translator, $shopNamespace, Log $log)
+    public function __construct(Translator $translator, $shopNamespace, Log $log)
     {
         $this->log = $log;
         $this->translator = $translator;

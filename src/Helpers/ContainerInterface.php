@@ -41,7 +41,7 @@ interface ContainerInterface
     public function getLog();
 
     /**
-     * @return \Siel\Acumulus\Helpers\TranslatorInterface
+     * @return \Siel\Acumulus\Helpers\Translator
      */
     public function getTranslator();
 

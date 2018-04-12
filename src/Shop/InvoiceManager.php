@@ -49,7 +49,7 @@ abstract class InvoiceManager
     /**
      * Returns a Translator instance.
      *
-     * @return \Siel\Acumulus\Helpers\TranslatorInterface
+     * @return \Siel\Acumulus\Helpers\Translator
      */
     protected function getTranslator()
     {

@@ -5,7 +5,7 @@ use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\ConfigInterface;
 use Siel\Acumulus\Helpers\Countries;
 use Siel\Acumulus\Helpers\Number;
-use Siel\Acumulus\Helpers\TranslatorInterface;
+use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\PluginConfig;
 use Siel\Acumulus\Tag;
@@ -63,7 +63,7 @@ class Completor
     /** @var \Siel\Acumulus\Config\ConfigInterface */
     protected $config;
 
-    /** @var \Siel\Acumulus\Helpers\TranslatorInterface */
+    /** @var \Siel\Acumulus\Helpers\Translator */
     protected $translator;
 
     /** @var \Siel\Acumulus\Web\Service */
@@ -113,7 +113,7 @@ class Completor
      * @param \Siel\Acumulus\Invoice\CompletorInvoiceLines $completorInvoiceLines
      * @param \Siel\Acumulus\Invoice\CompletorStrategyLines $completorStrategyLines
      * @param \Siel\Acumulus\Helpers\Countries $countries
-     * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
+     * @param \Siel\Acumulus\Helpers\Translator $translator
      * @param \Siel\Acumulus\Web\Service $service
      */
     public function __construct(
@@ -121,7 +121,7 @@ class Completor
         CompletorInvoiceLines $completorInvoiceLines,
         CompletorStrategyLines $completorStrategyLines,
         Countries $countries,
-        TranslatorInterface $translator,
+        Translator $translator,
         Service $service
     ) {
         $this->config = $config;

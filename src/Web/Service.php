@@ -3,7 +3,7 @@ namespace Siel\Acumulus\Web;
 
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\ConfigInterface;
-use Siel\Acumulus\Helpers\TranslatorInterface;
+use Siel\Acumulus\Helpers\Translator;
 
 /**
  * Provides an easy interface towards the different API calls of the Acumulus
@@ -24,7 +24,7 @@ class Service
     /** @var \Siel\Acumulus\Config\ConfigInterface */
     protected $config;
 
-    /** @var \Siel\Acumulus\Helpers\TranslatorInterface */
+    /** @var \Siel\Acumulus\Helpers\Translator */
     protected $translator;
 
     /** @var CommunicatorInterface */
@@ -35,9 +35,9 @@ class Service
      *
      * @param CommunicatorInterface $communicator
      * @param \Siel\Acumulus\Config\ConfigInterface $config
-     * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
+     * @param \Siel\Acumulus\Helpers\Translator $translator
      */
-    public function __construct(CommunicatorInterface $communicator, ConfigInterface $config, TranslatorInterface $translator)
+    public function __construct(CommunicatorInterface $communicator, ConfigInterface $config, Translator $translator)
     {
         $this->config = $config;
         $this->communicator = $communicator;

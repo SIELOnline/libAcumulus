@@ -278,8 +278,8 @@ class AdvancedConfigForm extends BaseConfigForm
      */
     protected function seeList($keySingle, $keyPlural, $list)
     {
-        $sList = $this->listToString($list);
         $key = is_array($list) && count($list) > 1 ? $keyPlural : $keySingle;
+        $sList = $this->listToString($list);
         return sprintf($this->t($key), $sList);
     }
 

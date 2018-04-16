@@ -2,7 +2,9 @@
 namespace Siel\Acumulus\Joomla\Config;
 
 use JComponentHelper;
+use JFactory;
 use JTable;
+use JTableExtension;
 use Siel\Acumulus\Config\ConfigStore as BaseConfigStore;
 
 /**
@@ -10,13 +12,39 @@ use Siel\Acumulus\Config\ConfigStore as BaseConfigStore;
  */
 class ConfigStore extends BaSeConfigStore
 {
-    /** @var array */
-    protected $savedValues = array();
+    /**
+     * {@inheritdoc}
+     */
+    public function load()
+    {
+        $extensionTable = new JtableExtension(JFactory::getDbo());
+        $extensionTable->load(array('element' => 'com_acumulus'));
+        $values = $extensionTable->get('custom_data');
+        $values = !empty($values) ? json_decode($values, true) : array();
+
+        return $values;
+    }
 
     /**
      * {@inheritdoc}
      */
-    public function load(array $keys)
+    public function save(array $values)
+    {
+        $extensionTable = new JtableExtension(JFactory::getDbo());
+        $extensionTable->load(array('element' => 'com_acumulus'));
+        $extensionTable->set('custom_data', json_encode($values, JSON_FORCE_OBJECT));
+        $result = $extensionTable->store();
+        return $result;
+    }
+
+    /**
+     * {@deprecated} Only still here for use during update.
+     *
+     * @param array $keys
+     *
+     * @return array
+     */
+    public function loadOld(array $keys)
     {
         $result = array();
         $params = JComponentHelper::getParams('com_acumulus');
@@ -35,58 +63,15 @@ class ConfigStore extends BaSeConfigStore
                 }
                 $result[$key] = $value;
             }
-            // Overwrite with values saved during this request.
-            if (isset($this->savedValues[$key])) {
-                $result[$key] = $this->savedValues[$key];
-            }
-        }
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function save(array $values)
-    {
-        // When the values are loaded in the same request, the new values are
-        // not retrieved: store a copy of them here to merge them when loading.
-        $this->savedValues = $values;
-
-        // Get the currently stored values.
-        $component = JComponentHelper::getComponent('com_acumulus');
-        if (get_class($component) === 'Joomla\CMS\Component\ComponentRecord' || get_class($component) === 'JComponentRecord') {
-            // Joomla 3.7 (JComponentRecord) and 3.8+ (Joomla\CMS\Component\ComponentRecord)
-            /** @var \Joomla\CMS\Component\ComponentRecord|\JComponentRecord $component */
-            $data = $component->getParams()->toArray();
-            $id = $component->id;
-        } else {
-            // Joomla 3.6.x-
-            /** @var \stdClass|array $component */
-            $component = (array) $component;
-            /** @var \Joomla\Registry\Registry $params */
-            $params = $component['params'];
-            $data = $params->toArray();
-            $id = $component['id'];
         }
 
-        // Update the values with the form values.
-        $defaults = $this->acumulusConfig->getDefaults();
-        foreach ($values as $key => $value) {
-            if ((isset($defaults[$key]) && $defaults[$key] === $value) || $value === null) {
-                unset($data[$key]);
-            } else {
-                $data[$key] = $value;
-            }
-        }
+        // Delete the values, this will only be used one more time: during
+        // updating to 5.4.0.
+        $extensionTable = new JtableExtension(JFactory::getDbo());
+        $extensionTable->load(array('element' => 'com_acumulus'));
+        $extensionTable->set('params', '');
+        $extensionTable->store();
 
-        // Store the values directly in the extension table.
-        $table = JTable::getInstance('extension');
-        $result = $table->load($id);
-        if ($result) {
-            // Data is stored as a json encoded array.
-            $table->set('params', json_encode($data));
-            $result = $table->store();
-        }
         return $result;
     }
 }

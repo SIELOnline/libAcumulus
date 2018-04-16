@@ -26,8 +26,6 @@ class OcHelper
      *
      * @param \Registry $registry
      * @param \Siel\Acumulus\Helpers\Container $container
-     *
-     * @throws \ReflectionException
      */
     public function __construct(\Registry $registry, Container $container)
     {

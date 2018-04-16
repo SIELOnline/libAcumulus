@@ -16,7 +16,7 @@ interface Api
 
     // API result codes. Note that internally I want an increasing order of
     // worseness, so these constants are not used internally but mapped to the
-    // Plugin::status_... constants.
+    // PluginConfig::status_... constants.
     const Success = 0;
     const Warnings = 2;
     const Errors = 1;

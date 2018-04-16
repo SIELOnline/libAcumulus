@@ -2,43 +2,43 @@
 namespace Siel\Acumulus\Config;
 
 /**
- * Defines an way to access the webshop specific configuration provider.
+ * This class is the bridge between the library and the config subsystem.
+ *
+ * All CMS and webshop software offers some way of storing settings and
+ * libAcumulus uses this configuration subsystem of the host environment it is
+ * running in to store its own settings.
+ *
+ * Only values that are set and that differ from the default value are stored.
+ * As all settings are queried at once, it makes sense to store all libAcumulus
+ * settings in 1 record. Therefore, it is assumed that overriding classes that
+ * implement the load() and save() methods, {@see serialize()} and
+ * {@see unserialize()} the array and store it in 1 string setting. If the
+ * configuration subsystem already supports storing an array in 1 setting, do
+ * not (un)serialize yourself.
  */
 abstract class ConfigStore
 {
-    /** @var Config */
-    protected $acumulusConfig;
-
     /**
-     * Config setter.
+     * Name of the config key.
      *
-     * @param \Siel\Acumulus\Config\Config $config
+     * @var string
      */
-    public function setConfig(Config $config)
-    {
-        $this->acumulusConfig = $config;
-    }
+    protected $configKey = 'acumulus';
 
     /**
      * Loads the configuration from the actual configuration provider.
      *
-     * @param array $keys
-     *   An array of keys that are expected to be loaded.
-     *
      * @return array
-     *   An array with the raw (not necessarily casted) configuration values keyed
-     *   by their name. Note that these values will overwrite the default values,
-     *   so no null values should be returned, though other "empty" values (false,
-     *   0) may be returned.
+     *   An array with any stored configuration values keyed by their name.
      */
-    abstract public function load(array $keys);
+    abstract public function load();
 
     /**
      * Stores the values to the actual configuration provider.
      *
      * @param array $values
-     *   A keyed array that contains the values to store. Note that values may
-     *   be "empty", eg 0 or false. Only null values may be ignored.
+     *   A keyed array that contains the values to store. Not set and default
+     *   values are already removed from this array, so store as passed.
      *
      * @return bool
      *   Success.

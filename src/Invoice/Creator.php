@@ -145,7 +145,7 @@ abstract class Creator
             'source' => $this->invoiceSource->getSource(),
         );
         if ($this->invoiceSource->getType() === Source::CreditNote) {
-            // @todo: rename in major/minor.
+            // @todo: rename to 'order' in major/minor.
             $this->propertySources['originalInvoiceSource'] = $this->invoiceSource->getOrder();
         }
     }
@@ -368,8 +368,8 @@ abstract class Creator
      * Returns the number to use as invoice number.
      *
      * @param int $invoiceNumberSource
-     *   \Siel\Acumulus\Invoice\ConfigInterface\InvoiceNrSource_ShopInvoice or
-     *   \Siel\Acumulus\Invoice\ConfigInterface\InvoiceNrSource_ShopOrder.
+     *   \Siel\Acumulus\PluginConfig::InvoiceNrSource_ShopInvoice or
+     *   \Siel\Acumulus\PluginConfig::InvoiceNrSource_ShopOrder.
      *
      * @return string
      *   The number to use as invoice "number" on the Acumulus invoice, may
@@ -388,8 +388,8 @@ abstract class Creator
      * Returns the date to use as invoice date.
      *
      * @param int $dateToUse
-     *   \Siel\Acumulus\Invoice\ConfigInterface\InvoiceDate_InvoiceCreate or
-     *   \Siel\Acumulus\Invoice\ConfigInterface\InvoiceDate_OrderCreate
+     *   \Siel\Acumulus\PluginConfig::InvoiceDate_InvoiceCreate or
+     *   \Siel\Acumulus\PluginConfig::InvoiceDate_OrderCreate
      *
      * @return string
      *   Date to use as invoice date on the Acumulus invoice: yyyy-mm-dd.

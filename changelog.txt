@@ -19,6 +19,10 @@ WC3 = WooCommerce 3 (WordPress)
 
 5.4.0 (2018-04-??)
 ------------------
+- ALL: Note that due to the changes made in the code this version is NOT
+  backwards compatible for those who already built their extension on top of
+  this library.
+
 - ALL: Added extensive overview documentation aimed at developers that want to
   create a new extension on their own based on this library.
 - As a consequence of documenting this library from a developers view point,
@@ -30,6 +34,11 @@ WC3 = WooCommerce 3 (WordPress)
   - Removed ConfigInterface
   - Removed ShopCapabilitiesInterface
   - Removed CommunicatorInterface
+- As a consequence of documenting this library from a developers view point,
+  changes were made that simplify or reduce the amount of code that needs to be
+  written when developing a new extension:
+  - ConfigStore was simplified, it now only should store the one array value as
+    passed in.
 
 5.3.0 (2018-04-09)
 ------------------
@@ -985,6 +994,7 @@ VirtueMart
 
 WooCommerce
 -----------
+* 3.3.5 (WordPress: 4.9.5)
 * 3.2.6 (WordPress: 4.9.2)
 * 3.1.2 (WordPress: 4.8.2)
 * 3.1.2 (WordPress: 4.8)

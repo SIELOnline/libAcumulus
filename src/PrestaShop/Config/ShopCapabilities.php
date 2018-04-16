@@ -1,7 +1,6 @@
 <?php
 namespace Siel\Acumulus\PrestaShop\Config;
 
-use Acumulus;
 use Context;
 use Module;
 use OrderState;

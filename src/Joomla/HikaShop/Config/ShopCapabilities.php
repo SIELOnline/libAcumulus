@@ -149,7 +149,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
             // @todo: hoe kan een klant dit (en vat#) invullen?
             'fullName' => '[address_firstname+address_middle_name+address_lastname|name]', // billing_address, customer
             'address1' => '[address_street]', // billing_address
-            'address2' => '[address_Street2]', // billing_address
+            'address2' => '[address_street2]', // billing_address
             'postalCode' => '[address_post_code]', // billing_address
             'city' => '[address_city]', // billing_address
             'vatNumber' => '[address_vat]', // billing_address

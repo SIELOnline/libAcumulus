@@ -8,22 +8,13 @@ use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Tag;
 
 /**
- *    Defines an interface to retrieve shop specific configuration settings.
+ * Provides uniform access to the settings of libAcumulus.
  *
- *    Configuration is stored in the host environment, normally a web shop.
- *    This interface abstracts from how a specific web shop does so.
+ * Configuration is stored in the host environment bridged via the ConfigStore
+ * class.
  *
- *
- * Gives common code in this package uniform access to the settings for this
- * extension, hiding all the web shop specific implementations of their config
- * store.
- *
- * This class implements all <...ConfigInterface>s and makes, via a ConfigStore,
- * use of the shop specific configuration functionality to store this
- * configuration in a persistent way.
- *
- * This class als implements the injector interface to allow other classes to
- * easily get the correct derived classes of the base classes.
+ * This class also provides an {@see Config::update()) method to update the
+ * stored config values when changes in these are made between versions.
  */
 class Config
 {
@@ -109,7 +100,12 @@ class Config
     protected function load()
     {
         if (!$this->isConfigurationLoaded) {
-            $this->values = $this->castValues(array_merge($this->getDefaults(), $this->getConfigStore()->load($this->getKeys())));
+            $this->values = $this->getDefaults();
+            $values = $this->getConfigStore()->load();
+            if (is_array($values)) {
+                $this->values = array_merge($this->getDefaults(), $values);
+            }
+            $this->values = $this->castValues($this->values);
             $this->isConfigurationLoaded = true;
         }
     }
@@ -140,11 +136,88 @@ class Config
             unset($values[Tag::Password]);
         }
 
+        // With updates or as we have 2 setting screens, not all settings will
+        // be passed in: complete with other settings.
+        $this->load();
+        $values = array_merge($this->values, $values);
         $values = $this->castValues($values);
+        $values = $this->removeValuesNotToBeStored($values);
         $result = $this->getConfigStore()->save($values);
         $this->isConfigurationLoaded = false;
         // Sync internal values.
         $this->load();
+        return $result;
+    }
+
+    /**
+     * Casts the values to their correct types.
+     *
+     * Values that come from a submitted form are all strings. Values that come
+     * from the config store might be null. However, internally we work with
+     * booleans or integers. So after reading from the config store or form, we
+     * cast the values to their expected types.
+     *
+     * @param array $values
+     *
+     * @return array
+     *   Array with casted values.
+     */
+    protected function castValues(array $values)
+    {
+        $keyInfos = $this->getKeyInfo();
+        foreach ($keyInfos as $key => $keyInfo) {
+            if (array_key_exists($key, $values)) {
+                switch ($keyInfo['type']) {
+                    case 'string':
+                        if (!is_string($values[$key])) {
+                            $values[$key] = (string) $values[$key];
+                        }
+                        break;
+                    case 'int':
+                        if (!is_int($values[$key])) {
+                            $values[$key] = (int) $values[$key];
+                        }
+                        break;
+                    case 'bool':
+                        if (!is_bool($values[$key])) {
+                            $values[$key] = (bool) $values[$key];
+                        }
+                        break;
+                    case 'array':
+                        if (!is_array($values[$key])) {
+                            $values[$key] = array($values[$key]);
+                        }
+                        break;
+                }
+            }
+        }
+        return $values;
+    }
+
+    /**
+     * Removes configuration values that do not have to be stored.
+     *
+     * Values that do not have to be stored:
+     * - Values that are not set.
+     * - Values that equal their default value.
+     * - Keys that are unknown.
+     *
+     * @param array $values
+     *   The array to remove values from.
+     *
+     * @return array
+     *   The passed in set of values reduced to values that should be stored.
+     */
+    protected function removeValuesNotToBeStored(array $values)
+    {
+        $result = array();
+        $keys = $this->getKeys();
+        $defaults = $this->getDefaults();
+        foreach ($keys as $key) {
+            if (isset($values[$key]) && (!isset($defaults[$key]) || $values[$key] !== $defaults[$key])) {
+                $result[$key] = $values[$key];
+            }
+        }
         return $result;
     }
 
@@ -362,50 +435,6 @@ class Config
             }
         }
         return $result;
-    }
-
-    /**
-     * Casts the values to their correct types.
-     *
-     * Values that come from a submitted form are all strings. Values that come
-     * from the config store might be null. However, internally we work with
-     * booleans or integers. So after reading from the config store or form, we
-     * cast the values to their expected types.
-     *
-     * @param array $values
-     *
-     * @return array
-     *   Array with casted values.
-     */
-    protected function castValues(array $values)
-    {
-        foreach ($this->getKeyInfo() as $key => $keyInfo) {
-            if (array_key_exists($key, $values)) {
-                switch ($keyInfo['type']) {
-                    case 'string':
-                        if (!is_string($values[$key])) {
-                            $values[$key] = (string) $values[$key];
-                        }
-                        break;
-                    case 'int':
-                        if (!is_int($values[$key])) {
-                            $values[$key] = (int) $values[$key];
-                        }
-                        break;
-                    case 'bool':
-                        if (!is_bool($values[$key])) {
-                            $values[$key] = (bool) $values[$key];
-                        }
-                        break;
-                    case 'array':
-                        if (!is_array($values[$key])) {
-                            $values[$key] = array($values[$key]);
-                        }
-                        break;
-                }
-            }
-        }
-        return $values;
     }
 
     /**
@@ -905,6 +934,10 @@ class Config
             $result = $this->upgrade496() && $result;
         }
 
+        if (version_compare($currentVersion, '5.4.0', '<')) {
+            $result = $this->upgrade540() && $result;
+        }
+
         return $result;
     }
 
@@ -941,7 +974,7 @@ class Config
 
         // 2) Debug mode.
         switch ($this->get('debug')) {
-            case 4: // Value for deprecated ServiceConfigInterfacePlugin::Debug_StayLocal.
+            case 4: // Value for deprecated PluginConfig::Debug_StayLocal.
                 $newSettings['logLevel'] = PluginConfig::Send_TestMode;
                 break;
         }
@@ -958,22 +991,17 @@ class Config
      * - setting triggerInvoiceSendEvent removed.
      * - setting triggerInvoiceEvent introduced.
      *
-     * @todo: extract updates into own object.
-     *
      * @return bool
      */
     protected function upgrade453()
     {
-        // Get current values.
-        $values = $this->castValues($this->getConfigStore()->load($this->getKeys()));
         if ($this->get('triggerInvoiceSendEvent') == 2) {
             $values['triggerInvoiceEvent'] = PluginConfig::TriggerInvoiceEvent_Create;
         } else {
             $values['triggerInvoiceEvent'] = PluginConfig::TriggerInvoiceEvent_None;
         }
-        unset($values['triggerInvoiceSendEvent']);
 
-        return $this->getConfigStore()->save($values);
+        return $this->save($values);
     }
 
     /**
@@ -985,14 +1013,17 @@ class Config
      */
     protected function upgrade460()
     {
-        // Get current values.
-        $values = $this->castValues($this->getConfigStore()->load($this->getKeys()));
+        $result = true;
+        $newSettings = array();
+
         if ($this->get('removeEmptyShipping') !== null) {
             $values['sendEmptyShipping'] = !$this->get('removeEmptyShipping');
-            unset($values['removeEmptyShipping']);
         }
 
-        return $this->getConfigStore()->save($values);
+        if (!empty($newSettings)) {
+            $result = $this->save($newSettings);
+        }
+        return $result;
     }
 
     /**
@@ -1005,14 +1036,15 @@ class Config
     protected function upgrade470()
     {
         $result = true;
+        $newSettings = array();
 
-        // Get current values.
-        $values = $this->castValues($this->getConfigStore()->load($this->getKeys()));
-        if (!empty($values['salutation']) && strpos($values['salutation'], '[#') !== false) {
-            $values['salutation'] = str_replace('[#', '[', $values['salutation']);
-            $result = $this->getConfigStore()->save($values);
+        if (!empty($this->get('salutation')) && strpos($this->get('salutation'), '[#') !== false) {
+            $newSettings['salutation'] = str_replace('[#', '[', $this->get('salutation'));
         }
 
+        if (!empty($newSettings)) {
+            $result = $this->save($newSettings);
+        }
         return $result;
     }
 
@@ -1026,15 +1058,16 @@ class Config
     protected function upgrade473()
     {
         $result = true;
+        $newSettings = array();
 
-        // Get current values.
-        $values = $this->castValues($this->getConfigStore()->load($this->getKeys()));
-        if (!empty($values['subject']) && strpos($values['subject'], '[#') !== false) {
-            str_replace('[#b]', '[invoiceSource::reference]', $values['subject']);
-            str_replace('[#f]', '[invoiceSource::invoiceNumber]', $values['subject']);
-            $result = $this->getConfigStore()->save($values);
+        if (!empty($this->get('subject')) && strpos($this->get('subject'), '[#') !== false) {
+            str_replace('[#b]', '[invoiceSource::reference]', $this->get('subject'));
+            str_replace('[#f]', '[invoiceSource::invoiceNumber]', $this->get('subject'));
         }
 
+        if (!empty($newSettings)) {
+            $result = $this->save($newSettings);
+        }
         return $result;
     }
 
@@ -1048,5 +1081,26 @@ class Config
     protected function upgrade496()
     {
         return $this->upgrade473();
+    }
+
+    /**
+     * 5.4.0 upgrade.
+     *
+     * - ConfigStore->save should store all settings in 1 serialized value.
+     *
+     * @return bool
+     */
+    protected function upgrade540()
+    {
+        $result = true;
+
+        // ConfigStore::save should store all settings in 1 serialized value.
+        $configStore = $this->getConfigStore();
+        if (method_exists($configStore, 'loadOld')) {
+            $values = $configStore->loadOld($this->getKeys());
+            $result = $this->save($values);
+        }
+
+        return $result;
     }
 }

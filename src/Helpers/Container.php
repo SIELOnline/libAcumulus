@@ -412,17 +412,13 @@ class Container
         static $is1stTime = true;
 
         $log = $this->getLog();
-        $configStore = $this->getConfigStore();
-
         /** @var \Siel\Acumulus\Config\Config $config */
-        $config = $this->getInstance('Config', 'Config', array($configStore, $this->getShopCapabilities(), $this->getTranslator(), $log));
+        $config = $this->getInstance('Config', 'Config', array($this->getConfigStore(), $this->getShopCapabilities(), $this->getTranslator(), $log));
         if ($is1stTime) {
-            $configStore->setConfig($config);
             $pluginSettings = $config->getPluginSettings();
             $environment = $config->getEnvironment();
             $log->setLogLevel($pluginSettings['logLevel']);
             $log->setLibraryVersion($environment['libraryVersion']);
-            $configStore->setConfig($config);
             $is1stTime = false;
         }
         return $config;

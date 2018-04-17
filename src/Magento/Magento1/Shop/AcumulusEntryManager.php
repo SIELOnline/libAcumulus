@@ -17,5 +17,6 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     {
         parent::__construct($container, $log);
         $this->model = \Mage::getModel('acumulus/entry');
+        $this->resourceModel = \Mage::getResourceModel('acumulus/entry');
     }
 }

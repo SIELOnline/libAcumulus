@@ -235,7 +235,7 @@ class Creator extends BaseCreator
                 // However, we will use the 2nd way as that seems to be more
                 // precise and thus generally leads to a smaller range:
                 // Get range based on normal shipping costs inc and ex VAT.
-                $sign = $this->getSign();
+                $sign = $this->invoiceSource->getSign();
                 $shippingInc = $sign * $magentoSource->getBaseShippingInclTax();
                 $shippingEx = $sign * $magentoSource->getBaseShippingAmount();
                 $shippingVat = $shippingInc - $shippingEx;

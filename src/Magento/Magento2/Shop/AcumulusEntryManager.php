@@ -18,5 +18,6 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     {
         parent::__construct($container, $log);
         $this->model = Registry::getInstance()->get('Siel\AcumulusMa2\Model\Entry');
+        $this->resourceModel = Registry::getInstance()->get('Siel\AcumulusMa2\Model\ResourceModel\Entry');
     }
 }

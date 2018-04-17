@@ -54,13 +54,12 @@ factuur niet opgeslagen wordt.</strong></p>
 versturen.</li>
 <li>Als er facturen zijn die fouten bevatten ontvangt u een mail per factuur.
 </li>
-<li>Als u een event handler heeft geregistreerd voor het 'AcumulusInvoiceAdd"
-event (of hook of actie) wordt die voor alle facturen die verzonden gaan worden
-uitgevoerd.</li>
+<li>Alle door u geregistreerde event handlers die reageren op één van de door
+deze Acumulus module gedefinieerde events (of hook of actie) worden voor alle
+facturen die verzonden gaan worden uitgevoerd.</li>
 </ul>
-<p>Dit formulier bevindt zich in een experimentele status.
-Het werkt in zijn huidige vorm, maar als u de behoefte heeft om de reeks van
-facturen op een andere manier te willen aangeven, laat dit ons dan weten.</p>
+<p>Dit formulier werkt in zijn huidige vorm, maar er zijn vast nog wel
+verbeteringen aan te brengen. Dus als u ideeën heeft, laat het ons weten..</p>
 LONGSTRING
     ,
 
@@ -117,11 +116,9 @@ LONGSTRING
 <p>You can use this form to send a number of orders or credit notes at once.
 This is most useful when you just installed the plugin, because normally you
 should prefer automatic sending.</p>
-<p><strong>Performance: sending an invoice can take up to a few seconds,.
-Therefore you should not try to send to many invoices in 1 batch as that may
+<p><strong>Performance: sending an invoice can take up to a few seconds.
+Therefore, you should not try to send to many invoices in 1 batch as that may
 lead to a time-out on your web server.</strong></p>
-<p><strong>NOTE: Using the 'Force sending' is at your own risk as this may
-corrupt your administration as invoices may get added a 2nd time.</strong></p>
 <p>Sending invoices is done as with automatic sending:</p>
 <ul style="list-style: inside disc;">
 <li>The invoice is created exactly the same way as with automatic sending.</li>
@@ -132,6 +129,8 @@ incorrect invoice.</li>
 <li>All registered event handlers that react to 1 of the Acumulus defined
 events are triggered for all invoices that are sent.</li>
 </ul>
+<p>This form works as it is but we guess that improvements can be made.
+So, if you have any ideas, please let us know.</p>
 LONGSTRING
     ,
 

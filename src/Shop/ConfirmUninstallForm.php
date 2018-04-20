@@ -1,6 +1,8 @@
 <?php
 namespace Siel\Acumulus\Shop;
 
+use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Config\ShopCapabilities;
 use Siel\Acumulus\Helpers\Form;
 use Siel\Acumulus\Helpers\Translator;
 
@@ -9,14 +11,17 @@ use Siel\Acumulus\Helpers\Translator;
  */
 class ConfirmUninstallForm extends Form
 {
+
     /**
      * Constructor.
      *
+     * @param \Siel\Acumulus\Config\ShopCapabilities $shopCapabilities
+     * @param \Siel\Acumulus\Config\Config $config
      * @param \Siel\Acumulus\Helpers\Translator $translator
      */
-    public function __construct(Translator $translator)
+    public function __construct(ShopCapabilities $shopCapabilities, Config $config, Translator $translator)
     {
-        parent::__construct($translator);
+        parent::__construct($shopCapabilities, $config, $translator);
 
         $translations = new ConfirmUninstallFormTranslations();
         $this->translator->add($translations);

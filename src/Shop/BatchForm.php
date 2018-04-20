@@ -26,9 +26,6 @@ use Siel\Acumulus\PluginConfig;
  */
 class BatchForm extends Form
 {
-    /** @var \Siel\Acumulus\Config\ShopCapabilities */
-    protected $shopCapabilities;
-
     /** @var \Siel\Acumulus\Shop\InvoiceManager */
     protected $invoiceManager;
 
@@ -36,14 +33,14 @@ class BatchForm extends Form
     protected $log;
 
     /**
-     * @param \Siel\Acumulus\Helpers\Translator $translator
-     * @param \Siel\Acumulus\Config\Config $config
-     * @param \Siel\Acumulus\Config\ShopCapabilities $shopCapabilities
      * @param \Siel\Acumulus\Shop\InvoiceManager $invoiceManager
+     * @param \Siel\Acumulus\Config\ShopCapabilities $shopCapabilities
+     * @param \Siel\Acumulus\Config\Config $config
+     * @param \Siel\Acumulus\Helpers\Translator $translator
      */
-    public function __construct(Translator $translator, Config $config, ShopCapabilities $shopCapabilities, InvoiceManager $invoiceManager)
+    public function __construct(InvoiceManager $invoiceManager, ShopCapabilities $shopCapabilities, Config $config, Translator $translator)
     {
-        parent::__construct($translator, $config);
+        parent::__construct($shopCapabilities, $config, $translator);
 
         $translations = new InvoiceTranslations();
         $this->translator->add($translations);
@@ -52,7 +49,6 @@ class BatchForm extends Form
         $this->translator->add($translations);
 
         $this->log = array();
-        $this->shopCapabilities = $shopCapabilities;
         $this->invoiceManager = $invoiceManager;
     }
 

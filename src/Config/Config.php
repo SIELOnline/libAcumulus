@@ -1038,7 +1038,7 @@ class Config
         $result = true;
         $newSettings = array();
 
-        if (!empty($this->get('salutation')) && strpos($this->get('salutation'), '[#') !== false) {
+        if ($this->get('salutation') && strpos($this->get('salutation'), '[#') !== false) {
             $newSettings['salutation'] = str_replace('[#', '[', $this->get('salutation'));
         }
 
@@ -1060,7 +1060,7 @@ class Config
         $result = true;
         $newSettings = array();
 
-        if (!empty($this->get('subject')) && strpos($this->get('subject'), '[#') !== false) {
+        if ($this->get('subject') && strpos($this->get('subject'), '[#') !== false) {
             str_replace('[#b]', '[invoiceSource::reference]', $this->get('subject'));
             str_replace('[#f]', '[invoiceSource::invoiceNumber]', $this->get('subject'));
         }

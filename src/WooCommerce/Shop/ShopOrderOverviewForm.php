@@ -4,6 +4,7 @@ namespace Siel\Acumulus\WooCommerce\Shop;
 use DateTime;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Config\ShopCapabilities;
 use Siel\Acumulus\Helpers\Form;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Helpers\Translator;
@@ -42,15 +43,16 @@ class ShopOrderOverviewForm extends Form
     /** @var \Siel\Acumulus\Invoice\Source */
     protected $source;
 
-  /**
-   * @param \Siel\Acumulus\Helpers\Translator $translator
-   * @param \Siel\Acumulus\Config\Config $config
-   * @param \Siel\Acumulus\Web\Service $service
-   * @param \Siel\Acumulus\WooCommerce\Shop\AcumulusEntryManager $acumulusEntryManager
-   */
-    public function __construct(Translator $translator, Config $config, Service $service, AcumulusEntryManager $acumulusEntryManager)
+    /**
+     * @param \Siel\Acumulus\WooCommerce\Shop\AcumulusEntryManager $acumulusEntryManager
+     * @param \Siel\Acumulus\Web\Service $service
+     * @param \Siel\Acumulus\Config\ShopCapabilities $shopCapabilities
+     * @param \Siel\Acumulus\Config\Config $config
+     * @param \Siel\Acumulus\Helpers\Translator $translator
+     */
+    public function __construct(AcumulusEntryManager $acumulusEntryManager, Service $service, ShopCapabilities $shopCapabilities, Config $config, Translator $translator)
     {
-        parent::__construct($translator, $config);
+        parent::__construct($shopCapabilities, $config, $translator);
 
         $translations = new InvoiceTranslations();
         $this->translator->add($translations);
@@ -58,8 +60,8 @@ class ShopOrderOverviewForm extends Form
         $translations = new ShopOrderOverviewFormTranslations();
         $this->translator->add($translations);
 
-        $this->service = $service;
         $this->acumulusEntryManager = $acumulusEntryManager;
+        $this->service = $service;
         $this->source = null;
     }
 

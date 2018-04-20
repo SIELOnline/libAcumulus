@@ -484,34 +484,33 @@ class Container
      */
     public function getForm($type)
     {
-        $arguments = array(
-            $this->getTranslator(),
-            $this->getConfig(),
-        );
+        $arguments = array();
         switch (strtolower($type)) {
             case 'config':
                 $class = 'Config';
-                $arguments[] = $this->getShopCapabilities();
                 $arguments[] = $this->getService();
                 break;
             case 'advanced':
                 $class = 'AdvancedConfig';
-                $arguments[] = $this->getShopCapabilities();
                 $arguments[] = $this->getService();
                 break;
             case 'batch':
                 $class = 'Batch';
-                $arguments[] = $this->getShopCapabilities();
                 $arguments[] = $this->getManager();
                 break;
             case 'shop_order':
                 $class = 'ShopOrderOverview';
-                $arguments[] = $this->getService();
                 $arguments[] = $this->getAcumulusEntryManager();
+                $arguments[] = $this->getService();
                 break;
             default;
                 throw new \InvalidArgumentException("Unknown form type $type");
         }
+        $arguments = array_merge($arguments, array(
+            $this->getShopCapabilities(),
+            $this->getConfig(),
+            $this->getTranslator(),
+        ));
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance($class . 'Form', 'Shop', $arguments);
     }

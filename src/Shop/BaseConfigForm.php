@@ -20,9 +20,6 @@ use Siel\Acumulus\Web\Service;
  */
 abstract class BaseConfigForm extends Form
 {
-    /** @var \Siel\Acumulus\Config\ShopCapabilities */
-    protected $shopCapabilities;
-
     /** @var \Siel\Acumulus\Web\Service */
     protected $service;
 
@@ -37,19 +34,18 @@ abstract class BaseConfigForm extends Form
     /**
      * Constructor.
      *
-     * @param \Siel\Acumulus\Helpers\Translator $translator
+     * @param \Siel\Acumulus\Web\Service $service
      * @param \Siel\Acumulus\Config\ShopCapabilities $shopCapabilities
      * @param \Siel\Acumulus\Config\Config $config
-     * @param \Siel\Acumulus\Web\Service $service
+     * @param \Siel\Acumulus\Helpers\Translator $translator
      */
-    public function __construct(Translator $translator, Config $config, ShopCapabilities $shopCapabilities, Service $service)
+    public function __construct(Service $service, ShopCapabilities $shopCapabilities, Config $config, Translator $translator)
     {
-        parent::__construct($translator, $config);
+        parent::__construct($shopCapabilities, $config, $translator);
 
         $translations = new ConfigFormTranslations();
         $this->translator->add($translations);
 
-        $this->shopCapabilities = $shopCapabilities;
         $this->service = $service;
     }
 

@@ -22,6 +22,7 @@ class ConfigStore extends BaSeConfigStore
      */
     public function save(array $values)
     {
+        // @todo: no changes also returns false: differentiate between no changes and real errors.
         $result = update_option('acumulus', $values);
         return $result;
     }

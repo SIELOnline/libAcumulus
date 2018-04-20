@@ -2,6 +2,7 @@
 namespace Siel\Acumulus\Helpers;
 
 use ReflectionClass;
+use Siel\Acumulus\PluginConfig;
 
 /**
  * Container defines a dependency injector pattern for this library.
@@ -239,7 +240,7 @@ class Container
     public function getLog()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('Log', 'Helpers');
+        return $this->getInstance('Log', 'Helpers', array(PluginConfig::Version));
     }
 
     /**
@@ -416,9 +417,7 @@ class Container
         $config = $this->getInstance('Config', 'Config', array($this->getConfigStore(), $this->getShopCapabilities(), $this->getTranslator(), $log));
         if ($is1stTime) {
             $pluginSettings = $config->getPluginSettings();
-            $environment = $config->getEnvironment();
             $log->setLogLevel($pluginSettings['logLevel']);
-            $log->setLibraryVersion($environment['libraryVersion']);
             $is1stTime = false;
         }
         return $config;

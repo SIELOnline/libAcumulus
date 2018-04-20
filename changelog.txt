@@ -17,16 +17,27 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies)
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
+5.4.1 (2018-04-??)
+------------------
+- ALL: Version 5.4.0 has been released to solve some fatal errors for Magento.
+  This has been done while not all the documentation had been finished yet, so
+  more backwards incompatible changes (for developers) can be found in this
+  5.4.1 version.
+- As a consequence of documenting this library from a developers view point,
+  changes were made that simplify or reduce the amount of code that needs to be
+  written when developing a new extension:
+  - Order of constructor parameters changed to make it consistent among the
+    various classes.
+  - Now that (since long) the library version is a constant, it can be passed
+    to the constructor of Log, instead of setting it when the Config has been
+    created.
+
 5.4.0 (2018-04-17)
 ------------------
 Important notes
 - ALL: Note that due to the changes made in the code this version is NOT
-  backwards compatible for those who already built their extension on top of
-  this library.
-- ALL: Version 5.4.0 was released as it solves a fatal error for Magento 2,
-  while all the documentation was not yet finished, so more backwards
-  incompatible changes (for developers) may be expected in the 5.4.x version
-  range.
+  backwards compatible for developers who already built their extension on top
+  of this library.
 
 Changes
 - MA: main.CRITICAL: Exception message: SQLSTATE[23000]: Integrity constraint

@@ -2,6 +2,7 @@
 namespace Siel\Acumulus\Helpers;
 
 use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Config\ShopCapabilities;
 
 /**
  * Provides basic form handling.
@@ -9,17 +10,18 @@ use Siel\Acumulus\Config\Config;
  * Most webshop and CMS software provide their own sort of form API. To be able
  * to generalize or abstract our form handling, this class defines our own
  * minimal form API. This allows us to define our form handing in a cross
- * webshop compatible way. The webshop/CMs specific part should then define a
- * wrapper/mapper to the webshop specific way of form handling.
+ * webshop compatible way. The webshop/CMS specific part should then define a
+ * renderer/mapper to the webshop specific way of form handling.
  *
  * This base Form class defines a way to:
  * - Define the form elements.
- * - Render the form, including their values.
+ * - Render the form, including assigning values to form elements based on
+ *   POSTed values, configuration settings, and defaults.
  * - Process a form submission:
- *   - Recognise form submission.
- *   - Perform form (submission) validation.
- *   - Execute a task on valid form submission.
- *   - Show success and/or error messages.
+ *     * Recognise form submission form just rendering a form.
+ *     * Perform form (submission) validation.
+ *     * Execute a task on valid form submission.
+ *     * Show success and/or error messages.
  *
  * Usage:
  * This code is typically performed by a controller that processes the request:
@@ -42,7 +44,7 @@ use Siel\Acumulus\Config\Config;
  * </code>
  *
  * This code is to be used when the CMS or webshop does provide its own form
- * handling and processing.
+ * handling and processing:
  * <code>
  *   // Create shop specific Form object
  *   $shopForm = new ShopForm()
@@ -53,7 +55,6 @@ use Siel\Acumulus\Config\Config;
  *   $shopForm->setValues($form->GetValues)
  *   // and rendering it.
  *   $shopForm->render()
- *
  * </code>
  */
 abstract class Form
@@ -92,10 +93,11 @@ abstract class Form
     protected $errorMessages;
 
     /**
-     * @param \Siel\Acumulus\Helpers\Translator $translator
+     * @param \Siel\Acumulus\Config\ShopCapabilities $shopCapabilities
      * @param \Siel\Acumulus\Config\Config $config
+     * @param \Siel\Acumulus\Helpers\Translator $translator
      */
-    public function __construct(Translator $translator, Config $config)
+    public function __construct(ShopCapabilities $shopCapabilities, Config $config, Translator $translator)
     {
         $this->successMessages = array();
         $this->warningMessages = array();
@@ -103,6 +105,7 @@ abstract class Form
         $this->formValuesSet = false;
         $this->submittedValues = array();
 
+        $this->shopCapabilities = $shopCapabilities;
         $this->translator = $translator;
         $this->acumulusConfig = $config;
         $this->fields = array();
@@ -542,7 +545,7 @@ abstract class Form
     /**
      * Internal version of getFields();
      *
-     * - Internal method, do not call directly but call getfields() instead.
+     * - Internal method, do not call directly but call getFields() instead.
      * - Do override this method, not getFields().
      *
      * @return array[]

@@ -5,7 +5,7 @@ namespace Siel\Acumulus\Helpers;
  * Allows to log messages to a log.
  *
  * This base class will log to the PHP error file. It should be overridden per
- * webshop to integrate with the webshop specific way of logging.
+ * webshop to integrate with the webshop's specific way of logging.
  */
 class Log
 {

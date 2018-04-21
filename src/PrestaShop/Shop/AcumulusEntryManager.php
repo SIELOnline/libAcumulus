@@ -149,7 +149,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     }
 
     /**
-     * Wrapper method around teh Db instance.
+     * Wrapper method around the Db instance.
      *
      * @return \Db
      */

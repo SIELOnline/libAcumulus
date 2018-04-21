@@ -4,11 +4,18 @@ namespace Siel\Acumulus\Helpers;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\PluginConfig;
 use Siel\Acumulus\Tag;
-use Siel\Acumulus\Web\Result;
+use Siel\Acumulus\Invoice\Result;
 
 /**
- * Class Mailer allows to send mails. This class should be overridden per shop
- * to use the shop provided mailing features.
+ * Mailer allows to send mails.
+ *
+ * This abstract base class defines functionality to create a mail that
+ * communicates the result of sending invoice data to Acumulus (method
+ * Mailer::sendInvoiceAddMailResult). It must be overridden per webshop to
+ * define the bridge between this library and the webshop's specific mail
+ * subsystem.
+ *
+ * If you want to send other mails, just use the Mailer::sendMail() method.
  */
 abstract class Mailer
 {
@@ -28,8 +35,8 @@ abstract class Mailer
      */
     public function __construct(Config $config, Translator $translator, Log $log)
     {
-        $this->log = $log;
         $this->config = $config;
+        $this->log = $log;
 
         $this->translator = $translator;
         $translations = new MailTranslations();
@@ -52,11 +59,26 @@ abstract class Mailer
     }
 
     /**
+     * Sends an email.
+     *
+     * @param string $from
+     * @param string $fromName
+     * @param string $to
+     * @param string $subject
+     * @param string $bodyText
+     * @param string $bodyHtml
+     *
+     * @return mixed
+     *   Success (true); error message, error object or just false otherwise.
+     */
+    abstract public function sendMail($from, $fromName, $to, $subject, $bodyText, $bodyHtml);
+
+    /**
      * Sends an email with the results of a sent invoice.
      *
      * The mail is sent to the shop administrator (emailonerror setting).
      *
-     * @param \Siel\Acumulus\Web\Result $invoiceSendResult
+     * @param \Siel\Acumulus\Invoice\Result $invoiceSendResult
      * @param string $invoiceSourceType
      * @param string $invoiceSourceReference
      *
@@ -94,26 +116,17 @@ abstract class Mailer
     }
 
     /**
-     * Sends an email.
-     *
-     * @param string $from
-     * @param string $fromName
-     * @param string $to
-     * @param string $subject
-     * @param string $bodyText
-     * @param string $bodyHtml
-     *
-     * @return mixed
-     *   Success (true); error message, error object or just false otherwise.
-     */
-    abstract public function sendMail($from, $fromName, $to, $subject, $bodyText, $bodyHtml);
-
-    /**
      * Returns the mail from address.
+     *
+     * This base implementation returns 'webshop@<hostname>'.
      *
      * @return string
      */
-    abstract protected function getFrom();
+    protected function getFrom()
+    {
+        $env = $this->config->getEnvironment();
+        return 'webshop@' . $env['hostName'];
+    }
 
     /**
      * Returns the mail from name.
@@ -126,7 +139,10 @@ abstract class Mailer
     }
 
     /**
-     *  Returns the mail to address.
+     * Returns the mail to address.
+     *
+     * This base implementation returns the configured emailonerror address,
+     * which normally is exactly what we want.
      *
      * @return string
      */
@@ -145,11 +161,11 @@ abstract class Mailer
      *
      * The subject depends on:
      * - the result status.
-     * - whether the invoice was sent in test mode
-     * - whether the invoice was sent as concept
-     * - the emailAsPdf setting
+     * - whether the invoice was sent in test mode.
+     * - whether the invoice was sent as concept.
+     * - the emailAsPdf setting.
      *
-     * @param \Siel\Acumulus\Web\Result $invoiceSendResult
+     * @param \Siel\Acumulus\Invoice\Result $invoiceSendResult
      *
      * @return string
      */
@@ -199,6 +215,42 @@ abstract class Mailer
     }
 
     /**
+     * Returns the mail body as text and as html.
+     *
+     * @param \Siel\Acumulus\Invoice\Result $result
+     * @param string $invoiceSourceType
+     * @param string $invoiceSourceReference
+     *
+     * @return string[]
+     *   An array with keys text and html.
+     */
+    protected function getBody(Result $result, $invoiceSourceType, $invoiceSourceReference)
+    {
+        $resultInvoice = $result->getResponse();
+        $bodyTexts = $this->getStatusSpecificBody($result);
+        $supportTexts = $this->getSupportMessages($result);
+        $messagesTexts = $this->getMessages($result);
+        $replacements = array(
+            '{invoice_source_type}' => $this->t($invoiceSourceType),
+            '{invoice_source_reference}' => $invoiceSourceReference,
+            '{acumulus_invoice_id}' => isset($resultInvoice['invoicenumber']) ? $resultInvoice['invoicenumber'] : $this->t('message_no_invoice'),
+            '{status}' => $result->getStatus(),
+            '{status_message}' => $result->getStatusText(),
+            '{status_specific_text}' => $bodyTexts['text'],
+            '{status_specific_html}' => $bodyTexts['html'],
+            '{messages_text}' => $messagesTexts['text'],
+            '{messages_html}' => $messagesTexts['html'],
+            '{support_messages_text}' => $supportTexts['text'],
+            '{support_messages_html}' => $supportTexts['html'],
+        );
+        $text = $this->t('mail_text');
+        $text = strtr($text, $replacements);
+        $html = $this->t('mail_html');
+        $html = strtr($html, $replacements);
+        return array('text' => $text, 'html' => $html);
+    }
+
+    /**
      * Returns the body for the mail.
      *
      * The body depends on:
@@ -208,7 +260,7 @@ abstract class Mailer
      * - whether the invoice was sent as concept
      * - the emailAsPdf setting
      *
-     * @param \Siel\Acumulus\Web\Result $invoiceSendResult
+     * @param \Siel\Acumulus\Invoice\Result $invoiceSendResult
      *
      * @return string[]
      */
@@ -283,7 +335,7 @@ abstract class Mailer
     /**
      * Returns the  messages along with some descriptive text.
      *
-     * @param \Siel\Acumulus\Web\Result $result
+     * @param \Siel\Acumulus\Invoice\Result $result
      *
      * @return string[]
      *   An array with a plain text (key='text') and an html string (key='html')
@@ -313,7 +365,7 @@ abstract class Mailer
     /**
      * Returns the support messages along with some descriptive text.
      *
-     * @param \Siel\Acumulus\Web\Result $result
+     * @param \Siel\Acumulus\Invoice\Result $result
      *
      * @return string[]
      *   An array with a plain text (key='text') and an html string (key='html')
@@ -343,41 +395,5 @@ abstract class Mailer
             }
         }
         return $messages;
-    }
-
-    /**
-     * Returns the mail body as text and as html.
-     *
-     * @param \Siel\Acumulus\Web\Result $result
-     * @param string $invoiceSourceType
-     * @param string $invoiceSourceReference
-     *
-     * @return string[]
-     *   An array with keys text and html.
-     */
-    protected function getBody(Result $result, $invoiceSourceType, $invoiceSourceReference)
-    {
-        $resultInvoice = $result->getResponse();
-        $bodyTexts = $this->getStatusSpecificBody($result);
-        $supportTexts = $this->getSupportMessages($result);
-        $messagesTexts = $this->getMessages($result);
-        $replacements = array(
-            '{invoice_source_type}' => $this->t($invoiceSourceType),
-            '{invoice_source_reference}' => $invoiceSourceReference,
-            '{acumulus_invoice_id}' => isset($resultInvoice['invoicenumber']) ? $resultInvoice['invoicenumber'] : $this->t('message_no_invoice'),
-            '{status}' => $result->getStatus(),
-            '{status_message}' => $result->getStatusText(),
-            '{status_specific_text}' => $bodyTexts['text'],
-            '{status_specific_html}' => $bodyTexts['html'],
-            '{messages_text}' => $messagesTexts['text'],
-            '{messages_html}' => $messagesTexts['html'],
-            '{support_messages_text}' => $supportTexts['text'],
-            '{support_messages_html}' => $supportTexts['html'],
-        );
-        $text = $this->t('mail_text');
-        $text = strtr($text, $replacements);
-        $html = $this->t('mail_html');
-        $html = strtr($html, $replacements);
-        return array('text' => $text, 'html' => $html);
     }
 }

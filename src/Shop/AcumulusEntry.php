@@ -2,25 +2,26 @@
 namespace Siel\Acumulus\Shop;
 
 /**
- * Represents acumulus entry records.
- *
- * These records tie orders or credit notes from the web shop to entries in
- * Acumulus.
+ * Ties webshop orders or credit notes to entries in Acumulus.
  *
  * Acumulus identifies entries by their entry id (boekstuknummer in het
  * Nederlands) or, for a number of API calls, a token. Both the entry id and
  * token are stored together with information that identifies the shop invoice
- * source (order or credit note).
+ * source (order or credit note) and create and last updated timestamps. Most
+ * webshops also require/expect a single primary key (technical key) but that
+ * is irrelevant for this class.
  *
- * Usages (not (all of them are) yet implemented):
+ * Usages of this information (* = not (yet) implemented):
  * - Prevent that an invoice for a given order or credit note is sent twice.
- * - Show additional information on order list screens
- * - Update payment status
- * - Resend Acumulus invoice PDF.
+ * - Show additional information on order or order list screens (*).
+ * - Update payment status (*)
+ * - Resend Acumulus invoice PDF (*).
+ * At the moment of writing (april 2018), the 3 not yet implemented features are
+ * being added to the Acumulus WooCommerce plugin.
  */
 class AcumulusEntry
 {
-    // Access to the fields, differs per webshop as we followed db naming
+    // Access to the fields, differs per webshop as we follow db naming
     // conventions from the webshop.
     static protected $keyEntryId = 'entry_id';
     static protected $keyToken = 'token';
@@ -32,7 +33,7 @@ class AcumulusEntry
     /**
      * @var array|object
      *
-     * The data holder for the Acumulus entry
+     * The webshop specific data holder for the Acumulus entry.
      */
     protected $record;
 
@@ -40,6 +41,8 @@ class AcumulusEntry
      * AcumulusEntryManager constructor.
      *
      * @param array|object $record
+     *   A webshop specific record object or array that holds an Acumulus entry
+     *   record.
      */
     public function __construct($record)
     {
@@ -115,12 +118,12 @@ class AcumulusEntry
     }
 
     /**
-     * Returns the shop specfic record for this Acumulus entry.
+     * Returns the shop specific record for this Acumulus entry.
      *
      * This getter should only be used by the AcumulusEntryManager.
      *
      * @return array|object
-     *   The shop specfic record for this Acumulus entry.
+     *   The shop specific record for this Acumulus entry.
      */
     public function getRecord()
     {
@@ -130,7 +133,7 @@ class AcumulusEntry
     /**
      * Returns the value of the given field in the given acumulus entry record.
      *
-     * As differnt webshops may use different field and property names in their
+     * As different webshops may use different field and property names in their
      * tables and models, we abstracted accessing a field of a record into this
      * method.
      *
@@ -138,7 +141,7 @@ class AcumulusEntry
      *   The field to search for.
      *
      * @return mixed|null
-     *   The value of the given field in the given acumulus entry record.
+     *   The value of the given field in this acumulus entry record.
      */
     protected function get($field)
     {

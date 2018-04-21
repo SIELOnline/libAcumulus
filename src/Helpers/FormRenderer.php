@@ -10,18 +10,18 @@ namespace Siel\Acumulus\Helpers;
  *
  * SECURITY REMARKS
  * ----------------
- * - All values (inputs) and texts (between opening and closing tag) are passed
- *   through htmlspecialchars().
+ * - All values (inputs) and texts between opening and closing tags are passed
+ *   through {@see htmlspecialchars()}.
  * - The exceptions being:
- *   * A label prefix and postfix that come from code and may contain html.
- *     @see FormRenderer::renderLabel().
- *   * markup is rendered as is as it may containhtml, therefore its name ...
- *     @see FormRenderer::markup();
+ *     * A label prefix and postfix that come from code and may contain html.
+ *       See {@see FormRenderer::renderLabel()}.
+ *     * markup is rendered as is as it may contain html (therefore its name
+ *       markup ...). See {@see FormRenderer::markup()};
  * - All tags come from object properties or are hard coded and thus present no
- *   security risk but they are passed through htmlspecialchars() anyway. @see
- *   FormRenderer::getOpenTag() and FormRenderer::getCloseTag().
- * - All attributes, name and value are passed through htmlpecialchars(). @see
- *   FormRenderer::renderAttributes().
+ *   security risk but they are passed through htmlspecialchars() anyway. See
+ *   {@see FormRenderer::getOpenTag()} and {@see FormRenderer::getCloseTag()}.
+ * - All attributes, name and value are passed through htmlpecialchars(). See
+ *   {@see FormRenderer::renderAttributes()}.
  */
 class FormRenderer
 {

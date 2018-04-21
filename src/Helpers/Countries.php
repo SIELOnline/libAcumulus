@@ -3,6 +3,12 @@ namespace Siel\Acumulus\Helpers;
 
 /**
  * Class Countries defines country related features.
+ *
+ * These features include:
+ * * Country codes
+ * * Country names (in Dutch)
+ * * Fiscal EU countries
+ * * Conversion from EU country codes to ISO country codes.
  */
 class Countries
 {

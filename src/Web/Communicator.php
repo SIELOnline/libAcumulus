@@ -13,13 +13,14 @@ use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\PluginConfig;
 
 /**
- * Communication implements the communication with the Acumulus WebAPI.
+ * Communicator implements the communication with the Acumulus WebAPI.
  *
  * It offers:
  * - Conversion between array and XML.
  * - Conversion from Json to array.
- * - (https) Communication with the Acumulus webservice using the curl library.
- * - Good error handling during communication.
+ * - (https) Communication with the Acumulus webservice using the curl library:
+ *   setting up the connection, sending the request, receiving the response.
+ * - Good error handling.
  */
 class Communicator
 {

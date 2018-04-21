@@ -16,20 +16,21 @@ use Exception;
  * A property specification in its simplest form is just a property name, but to
  * cater for some special cases it can be made more complex. See the syntax
  * definition below:
- *
- * token = '[' property-specification ']'
- * property-specification = property-alternative('|'property-alternative)?
- * property-alternative = space-separated-property('+'space-separated-property)?
- * space-separated-property = full-property-name('&'full-property-name)?
- * full-property-name = (variable-name'::)?property-name|literal-text
- * literal-text = "text"
+ * - `token = '[' property-specification ']'`
+ * - `property-specification = property-alternative('|'property-alternative)?`
+ * - `property-alternative = space-separated-property('+'space-separated-property)?`
+ * - `space-separated-property = full-property-name('&'full-property-name)?`
+ * - `full-property-name = (variable-name'::)?property-name|literal-text`
+ * - `literal-text = "text"`
  *
  * Alternatives are expanded left to right until a property alternative is found
  * that is not empty.
  *
- * @example:
+ * Example 1:
+ * <pre>
  *   $propertySpec = sku|ean|isbn; sku = empty; ean = 'Hello'; isbn = 'World';
  *   Result: 'Hello"
+ * </pre>
  *
  * Properties that are joined with a + in between them, are all expanded, where
  * the + gets replaced with a space if and only if the property directly
@@ -39,35 +40,53 @@ use Exception;
  * concatenated directly, thus not with a space between them like with a +.
  *
  * Literal text that is joined with "real" properties using & or + only gets
- * returned when at least 1 of the "real" properties has a non-empty value.
+ * returned when at least 1 of the "real" properties have a non-empty value.
  *
- * @example:
+ * Example 2:
+ * <pre>
  *   $propertySpec1 = [first+middle+last];
- *   $propertySpec2 = [first&"."&last"&"@myshop.com"];
- *   $propertySpec2 = [first] [middle] [last];
+ *   $propertySpec2 = ["For"+first+middle+last];
+ *   $propertySpec3 = [first&middle&last];
+ *   $propertySpec4 = [first] [middle] [last];
  *   first = 'John'; middle = ''; last = 'Doe';
  *   Result1: 'John Doe'
- *   Result2: 'John.Doe@myshop.com'
- *   Result2: 'John  Doe'
+ *   Result2: 'For John Doe'
+ *   Result3: 'JohnDoe'
+ *   Result4: 'John  Doe'
+ * </pre>
  *
  * A full property name may contain the variable name (followed by :: to
  * distinguish it from the property name itself) to allow to specify which
  * object/variable should be taken when the property appears in multiple
  * objects/variables.
  *
- * @example:
+ * Example 3:
+ * <pre>
  *   variables = array(
  *     'order => Order(id = 3, date_created = 2016-02-03, ...),
  *     'customer' => Customer(id = 5, , date_created = 2016-01-01, name = 'Doe', ...),
  *    );
  *   pattern = '[id] [customer::date_created] [name]'
  *   result = '3 2016-01-01 Doe'
+ * </pre>
  *
- * A property name should be:
- * - the name of a (public) property,
- * - have a getter in the from getProperty()
- * - be handled by the magic __get or__call method.
+ * A property name should:
+ * - Be the name of a (public) property,
+ * - have a getter in the form getProperty() or get_property(),
+ * - or be handled by the magic __get or__call method.
  *
+ * A property name may also be:
+ * - A method name,
+ * - optionally followed by arguments between brackets, string arguments should
+ *   not be quoted.
+ *
+ * A variable is:
+ * - An array.
+ * - An object.
+ * - A Callable, in which case the callable is called with the property name
+ *   passed as argument.
+ * - The key or a variable may be used in a property definition to indicate
+ *   that the result may only come from that variable.
  */
 class Token
 {

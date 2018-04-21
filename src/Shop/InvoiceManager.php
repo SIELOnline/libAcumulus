@@ -14,6 +14,15 @@ use Siel\Acumulus\Tag;
 
 /**
  * Provides functionality to manage invoices.
+ *
+ * The features of this class include:
+ * - Retrieval of webshop invoice sources (orders or refunds).
+ * - Handle order state changes.
+ * - Handle refund creation or credit memo sending.
+ * - Handle batch sending
+ * - Create and send an invoice to Acumulus for a given invoice source,
+ *   including triggering our own events and processing the result.
+ *
  */
 abstract class InvoiceManager
 {

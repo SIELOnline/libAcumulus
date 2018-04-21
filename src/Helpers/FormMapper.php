@@ -2,23 +2,28 @@
 namespace Siel\Acumulus\Helpers;
 
 /**
- * Provides form element mapping functionality for those shops that provide
- * their own form building elements.This basic implementation only defines a
- * logger property.
+ * Provides form element mapping functionality.
+ *
+ * This library uses its own form definitions. Some webshops or CMSs provide
+ * their own form building elements. To get the form rendered, our own form
+ * definition needs to be mapped to a form object or array of the webshop/CMS
+ * form subsystem. This abstract base class only defines a logger property
+ * and an entry point to perform the mapping
+ *
  * To comply with shop specific form building, it is supposed to be overridden
  * per shop that uses this way of form building. For now those are: Magento,
- * WordPress.
+ * and PrestaShop.
  *
  * SECURITY REMARKS
  * ----------------
- * - A FormMapper uses the web shop's or CMS's form sub system and as such it
- *   may assume safe rendering is the responsibility of the CMS/web shop.
+ * - A FormMapper uses the webshop's or CMS's form sub system and as such it
+ *   may assume safe rendering is the responsibility of the CMS/webshop.
  * - If however, the form sub system declines this responsibility, our form
- *   mapper will have to sanitize texts, values, options and such  before
+ *   mapper will have to sanitize texts, values, options and such before
  *   handing them over to the form sub system.
- * - Currently supported web shops that offer a form sub system:
- *   * Magento: sanitizes.
- *   * PrestaShop: sanitizes.
+ * - Current webshops that offer a form sub system:
+ *     * Magento: sanitizes.
+ *     * PrestaShop: sanitizes.
  */
 abstract class FormMapper
 {
@@ -40,7 +45,7 @@ abstract class FormMapper
      *
      * @param \Siel\Acumulus\Helpers\Form $form
      *
-     * @return array[]|void
+     * @return mixed|void
      *   A set of objects that define the webshop specific form equivalent of
      *   the Acumulus form definition. May be void if the actual rendering takes
      *   place in the mapping phase.

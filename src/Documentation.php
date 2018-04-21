@@ -87,11 +87,12 @@
  *   Even though PHP5.3 is hardly used anymore, e.g. WordPress still validates on it when checking in code.
  * * We advice using PhpStorm. This IDE guards you against numerous errors that are simply to make in not strongly typed languages.
  * * Document all your code, especially parameter, return and variable types. This allows other developers and IDEs to better follow what is going on
- * * Use the inheritdoc tag where possible, only adding deviations form the base implementation.
+ * * Use the inheritdoc tag where possible, only adding documentation to describe what the override does different from the base implementation.
  *
  * * Set up a new namespace that will contain all classes that extend, implement and override the functionality of the libAcumulus classes.
  *   The namespace should preferably contain levels for the CMS (if the webshop resides in a CMS), the webshop, and, if needed, the major version of the webshop.
- *   Use the MyWebShop example code for a quick start and lots of advice on what and what not to do (todo).
+ *   See {@see \Siel\Acumulus\Helpers\Container} for a detailed explanation of the expected namespace structure and how that will be used by the container.
+ *   Use the MyWebShop example code for a quick start and lots of advice on what and what not to do. This example code explains in more detail (todo).
  * * Follow the detailed tips and advice from the MyWebShop example code to adapt it to the Webshop you are implementing the extension for.
  * * The code in the library contains almost no private members, allowing extension developers to override each and every part of the code as necessary.
  *   However, try to use this sparingly, following advice in the MyWebShop example code about which method to override and which not.

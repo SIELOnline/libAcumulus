@@ -21,11 +21,11 @@ abstract class ShopCapabilities
     protected $log;
 
     /**
-     * @param \Siel\Acumulus\Helpers\Translator $translator
      * @param string $shopNamespace
+     * @param \Siel\Acumulus\Helpers\Translator $translator
      * @param \Siel\Acumulus\Helpers\Log $log
      */
-    public function __construct(Translator $translator, $shopNamespace, Log $log)
+    public function __construct($shopNamespace, Translator $translator, Log $log)
     {
         $this->log = $log;
         $this->translator = $translator;

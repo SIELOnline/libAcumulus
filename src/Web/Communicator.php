@@ -39,17 +39,17 @@ class Communicator
     /**
      * Communicator constructor.
      *
-     * @param \Siel\Acumulus\Config\Config $config
-     * @param \Siel\Acumulus\Helpers\Log $log
      * @param \Siel\Acumulus\Helpers\Container $container
+     * @param \Siel\Acumulus\Config\Config $config
      * @param \Siel\Acumulus\Helpers\Translator $translator
+     * @param \Siel\Acumulus\Helpers\Log $log
      */
-    public function __construct(Config $config, Log $log, Container $container, Translator $translator)
+    public function __construct(Container $container, Config $config, Translator $translator, Log $log)
     {
-        $this->config = $config;
-        $this->log = $log;
         $this->container = $container;
+        $this->config = $config;
         $this->translator = $translator;
+        $this->log = $log;
     }
 
     /**

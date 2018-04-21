@@ -88,20 +88,20 @@ abstract class Creator
     /**
      * Constructor.
      *
-     * @param \Siel\Acumulus\Config\Config $config
      * @param \Siel\Acumulus\Helpers\Token $token
      * @param \Siel\Acumulus\Helpers\Countries $countries
      * @param \Siel\Acumulus\Helpers\Container $container
+     * @param \Siel\Acumulus\Config\Config $config
      * @param \Siel\Acumulus\Helpers\Translator $translator
      * @param \Siel\Acumulus\Helpers\Log $log
      */
-    public function __construct(Config $config, Token $token, Countries $countries, Container $container, Translator $translator, Log $log)
+    public function __construct(Token $token, Countries $countries, Container $container, Config $config, Translator $translator, Log $log)
     {
-        $this->log = $log;
-        $this->config = $config;
         $this->token = $token;
         $this->countries = $countries;
         $this->container = $container;
+        $this->config = $config;
+        $this->log = $log;
         $this->translator = $translator;
         $invoiceHelperTranslations = new Translations();
         $this->translator->add($invoiceHelperTranslations);

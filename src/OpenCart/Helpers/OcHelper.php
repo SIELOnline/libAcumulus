@@ -258,7 +258,7 @@ class OcHelper
     public function eventOrderUpdate($order_id)
     {
         $source = $this->container->getSource(Source::Order, $order_id);
-        $this->container->getManager()->sourceStatusChange($source);
+        $this->container->getInvoiceManager()->sourceStatusChange($source);
     }
 
     /**

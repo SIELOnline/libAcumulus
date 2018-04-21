@@ -56,10 +56,10 @@ class Result extends WebResult
     /**
      * InvoiceSendResult constructor.
      *
-     * @param \Siel\Acumulus\Helpers\Translator $translator
      * @param string $trigger
+     * @param \Siel\Acumulus\Helpers\Translator $translator
      */
-    public function __construct(Translator $translator, $trigger)
+    public function __construct($trigger, Translator $translator)
     {
         parent::__construct($translator);
         $this->trigger = $trigger;

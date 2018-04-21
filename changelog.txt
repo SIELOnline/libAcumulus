@@ -19,27 +19,31 @@ WC3 = WooCommerce 3 (WordPress)
 
 5.4.1 (2018-04-??)
 ------------------
+Important note:
 - ALL: Version 5.4.0 has been released to solve some fatal errors for Magento.
   This has been done while not all the documentation had been finished yet, so
-  more backwards incompatible changes (for developers) can be found in this
+  more backwards incompatible changes (for developers) will be found in this
   5.4.1 version.
+
+Changes:
 - As a consequence of documenting this library from a developers view point,
   changes were made that simplify or reduce the amount of code that needs to be
   written when developing a new extension:
   - Order of constructor parameters changed to make it consistent among the
-    various classes.
+    various classes. This should only affect the Container class in the
+    library.
+  - Container::getManager() renamed to Container::getInvoiceManager().
   - Now that (since long) the library version is a constant, it can be passed
     to the constructor of Log, instead of setting it when the Config has been
     created.
+- ALL: Continued adding extensive overview documentation aimed at developers
+  that want to create a new extension on their own based on this library.
+- As part of the developers documentation: added a MyWebShop namespace
+  containing "template" code that can be used when developing a new extension
+  based on this library.
 
 5.4.0 (2018-04-17)
 ------------------
-Important notes
-- ALL: Note that due to the changes made in the code this version is NOT
-  backwards compatible for developers who already built their extension on top
-  of this library.
-
-Changes
 - MA: main.CRITICAL: Exception message: SQLSTATE[23000]: Integrity constraint
   violation: 1062 Duplicate entry.
 - MA2: Fatal error: Call to undefined method Creator::getSign().
@@ -978,8 +982,8 @@ OpenCart 3.x
 OpenCart 2.x
 ------------
 * 2.3.0.2
-* 2.2.0.0
-* 2.1.0.1
+* 2.2.0.0 (t/m library versie 8.4.1)
+* 2.1.0.1 (t/m library versie 8.4.1)
 
 
 OpenCart 1.x

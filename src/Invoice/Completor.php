@@ -109,20 +109,20 @@ class Completor
     /**
      * Constructor.
      *
-     * @param \Siel\Acumulus\Config\Config $config
      * @param \Siel\Acumulus\Invoice\CompletorInvoiceLines $completorInvoiceLines
      * @param \Siel\Acumulus\Invoice\CompletorStrategyLines $completorStrategyLines
      * @param \Siel\Acumulus\Helpers\Countries $countries
-     * @param \Siel\Acumulus\Helpers\Translator $translator
      * @param \Siel\Acumulus\Web\Service $service
+     * @param \Siel\Acumulus\Config\Config $config
+     * @param \Siel\Acumulus\Helpers\Translator $translator
      */
     public function __construct(
-        Config $config,
         CompletorInvoiceLines $completorInvoiceLines,
         CompletorStrategyLines $completorStrategyLines,
         Countries $countries,
-        Translator $translator,
-        Service $service
+        Service $service,
+        Config $config,
+        Translator $translator
     ) {
         $this->config = $config;
 

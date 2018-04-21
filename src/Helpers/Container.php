@@ -323,7 +323,7 @@ class Container
     public function getCommunicator()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('Communicator', 'Web', array($this->getConfig(), $this->getLog(), $this, $this->getTranslator()));
+        return $this->getInstance('Communicator', 'Web', array($this, $this->getConfig(), $this->getTranslator(), $this->getLog()));
     }
 
     /**
@@ -357,7 +357,7 @@ class Container
     public function getInvoiceResult($trigger)
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('Result', 'Invoice', array($this->getTranslator(), $trigger), true);
+        return $this->getInstance('Result', 'Invoice', array($trigger, $this->getTranslator()), true);
     }
 
     /**
@@ -366,7 +366,7 @@ class Container
     public function getCompletor()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('Completor', 'Invoice', array($this->getConfig(), $this->getCompletorInvoiceLines(), $this->getCompletorStrategyLines(), $this->getCountries(), $this->getTranslator(), $this->getService()));
+        return $this->getInstance('Completor', 'Invoice', array($this->getCompletorInvoiceLines(), $this->getCompletorStrategyLines(), $this->getCountries(), $this->getService(), $this->getConfig(), $this->getTranslator()));
     }
 
     /**
@@ -375,7 +375,7 @@ class Container
     public function getCompletorInvoiceLines()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('CompletorInvoiceLines', 'Invoice', array($this->getConfig(), $this->getFlattenerInvoiceLines()));
+        return $this->getInstance('CompletorInvoiceLines', 'Invoice', array($this->getFlattenerInvoiceLines(), $this->getConfig()));
     }
 
     /**
@@ -402,7 +402,7 @@ class Container
     public function getCreator()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('Creator', 'Invoice', array($this->getConfig(), $this->getToken(), $this->getCountries(), $this, $this->getTranslator(), $this->getLog()));
+        return $this->getInstance('Creator', 'Invoice', array($this->getToken(), $this->getCountries(), $this, $this->getConfig(), $this->getTranslator(), $this->getLog()));
     }
 
     /**
@@ -438,13 +438,13 @@ class Container
     public function getShopCapabilities()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('ShopCapabilities', 'Config', array($this->getTranslator(), $this->shopNamespace, $this->getLog()));
+        return $this->getInstance('ShopCapabilities', 'Config', array($this->shopNamespace, $this->getTranslator(), $this->getLog()));
     }
 
     /**
      * @return \Siel\Acumulus\Shop\InvoiceManager
      */
-    public function getManager()
+    public function getInvoiceManager()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('InvoiceManager', 'Shop', array($this));
@@ -495,7 +495,7 @@ class Container
                 break;
             case 'batch':
                 $class = 'Batch';
-                $arguments[] = $this->getManager();
+                $arguments[] = $this->getInvoiceManager();
                 break;
             case 'shop_order':
                 $class = 'ShopOrderOverview';

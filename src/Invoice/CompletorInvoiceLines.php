@@ -45,13 +45,13 @@ class CompletorInvoiceLines
     /**
      * Constructor.
      *
-     * @param \Siel\Acumulus\Config\Config $config
      * @param \Siel\Acumulus\Invoice\FlattenerInvoiceLines $invoiceLinesFlattener
+     * @param \Siel\Acumulus\Config\Config $config
      */
-    public function __construct(Config $config, FlattenerInvoiceLines $invoiceLinesFlattener)
+    public function __construct(FlattenerInvoiceLines $invoiceLinesFlattener, Config $config)
     {
-        $this->config = $config;
         $this->invoiceLineFlattener = $invoiceLinesFlattener;
+        $this->config = $config;
     }
 
     /**

@@ -26,9 +26,13 @@ Important note:
   5.4.1 version.
 
 Changes:
-- As a consequence of documenting this library from a developers view point,
-  changes were made that simplify or reduce the amount of code that needs to be
-  written when developing a new extension:
+- ALL: Config form now also displays the exception message when an exception
+  was raised.
+- WC: update_option() also returns false when there are no changes. We want to
+  return true to prevent a user message "There was an error saving the config".
+- ALL: As a consequence of documenting this library from a developers view
+  point, non backwards compatible changes were made that simplify or reduce the
+  amount of code that needs to be written when developing a new extension:
   - Order of constructor parameters changed to make it consistent among the
     various classes. This should only affect the Container class in the
     library.
@@ -36,9 +40,11 @@ Changes:
   - Now that (since long) the library version is a constant, it can be passed
     to the constructor of Log, instead of setting it when the Config has been
     created.
+  - Form::addWarningMessage() renamed to Form::addWarningMessages().
+  - Form::addErrorMessage() renamed to Form::addErrorMessages().
 - ALL: Continued adding extensive overview documentation aimed at developers
   that want to create a new extension on their own based on this library.
-- As part of the developers documentation: added a MyWebShop namespace
+- ALL: As part of the developers documentation: added a MyWebShop namespace
   containing "template" code that can be used when developing a new extension
   based on this library.
 
@@ -49,18 +55,18 @@ Changes:
 - MA2: Fatal error: Call to undefined method Creator::getSign().
 - ALL: Added extensive overview documentation aimed at developers that want to
   create a new extension on their own based on this library.
-- As a consequence of documenting this library from a developers view point,
-  simplifications were made to the code by removing interfaces in favor of the
-  base class that implements that interface:
+- ALL: As a consequence of documenting this library from a developers view
+  point, simplifications were made to the code by removing interfaces in favor
+  of the base class that implements that interface:
   - Removed TranslatorInterface
   - Removed ContainerInterface
   - Removed ConfigStoreInterface
   - Removed ConfigInterface
   - Removed ShopCapabilitiesInterface
   - Removed CommunicatorInterface
-- As a consequence of documenting this library from a developers view point,
-  changes were made that simplify or reduce the amount of code that needs to be
-  written when developing a new extension:
+- ALL: As a consequence of documenting this library from a developers view
+  point, non backwards compatible changes were made that simplify or reduce the
+  amount of code that needs to be written when developing a new extension:
   - ConfigStore was simplified, it now only should store the one array value as
     passed in.
   - Order of constructor parameters changed to make it consistent among the

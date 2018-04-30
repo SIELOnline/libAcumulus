@@ -58,6 +58,7 @@ abstract class BaseConfigForm extends Form
     {
         $postedValues = $this->getPostedValues();
         // Check if the full form was displayed or only the account details.
+        // @todo: salutation is ConfigForm specific, not BaseConfigForm???
         $fullForm = array_key_exists('salutation', $postedValues);
         foreach ($this->acumulusConfig->getKeys() as $key) {
             if (!$this->addIfIsset($this->submittedValues, $key, $postedValues)) {
@@ -112,8 +113,9 @@ abstract class BaseConfigForm extends Form
             $this->contactTypesResult = $this->service->getPicklistContactTypes();
             if ($this->contactTypesResult->hasError()) {
                 $message = $this->contactTypesResult->hasCode(401) ? 'message_error_auth' : 'message_error_comm';
-                $this->errorMessages = array_merge($this->errorMessages, $this->contactTypesResult->getErrors(Result::Format_PlainTextArray));
-                $this->warningMessages = array_merge($this->warningMessages, $this->contactTypesResult->getWarnings(Result::Format_PlainTextArray));
+                $this->addErrorMessages($this->contactTypesResult->getExceptionMessage());
+                $this->addErrorMessages($this->contactTypesResult->getErrors(Result::Format_PlainTextArray));
+                $this->addWarningMessages($this->contactTypesResult->getWarnings(Result::Format_PlainTextArray));
             }
         } else {
             // First fill in your account details.

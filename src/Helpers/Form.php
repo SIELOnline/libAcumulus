@@ -83,13 +83,31 @@ abstract class Form
     /** @var string[] The values as filled in on form submission. */
     protected $submittedValues;
 
-    /** @var string[] Any success messages. */
+    /**
+     * Any success messages.
+     *
+     * @var string[]
+     */
     protected $successMessages;
 
-    /** @var string[] Any warning messages. */
+    /**
+     * Any warning messages.
+     *
+     * These messages may be keyed by the name of a form field. If so, the
+     * warning concerns the value of that field.
+     *
+     * @var string[]
+     */
     protected $warningMessages;
 
-    /** @var string[] Any error messages. */
+    /**
+     * Any error messages.
+     *
+     * These messages may be keyed by the name of a form field. If so, the
+     * error concerns the value of that field.
+     *
+     * @var string[]
+     */
     protected $errorMessages;
 
     /**
@@ -179,22 +197,31 @@ abstract class Form
     }
 
     /**
-     * Adds a warning message.
+     * Adds 1 or more warning messages.
      *
-     * To be used by web shop specific form handling to add a message to the
-     * list of messages to display.
+     * To be used by web shop specific form handling to add a message to the list
+     * of messages to display.
      *
-     * @param string $message
+     * @param string|string[] $message
+     *   A warning message or an array of warning messages. If empty, nothing
+     *   will be added.
      *
      * @return $this
      */
-    public function addWarningMessage($message)
+    public function addWarningMessages($message)
     {
-        $this->warningMessages[] = $message;
+        if (!empty($message)) {
+            if (is_array($message)) {
+                $this->warningMessages = array_merge($this->warningMessages, $message);
+
+            } else {
+                $this->warningMessages[] = $message;
+            }
+        }
         return $this;
     }
 
-  /**
+    /**
      * Returns the error messages.
      *
      * To be used by web shop specific form handling to display validation and
@@ -212,18 +239,27 @@ abstract class Form
     }
 
   /**
-   * Adds an error message.
+   * Adds 1 or more error messages.
    *
    * To be used by web shop specific form handling to add a message to the list
    * of messages to display.
    *
-   * @param string $message
+   * @param string|string[] $message
+   *   An error message or an array of error messages. If empty, nothing
+   *   will be added.
    *
    * @return $this
    */
-    public function addErrorMessage($message)
+    public function addErrorMessages($message)
     {
-        $this->errorMessages[] = $message;
+        if (!empty($message)) {
+            if (is_array($message)) {
+                $this->errorMessages = array_merge($this->errorMessages, $message);
+
+            } else {
+                $this->errorMessages[] = $message;
+            }
+        }
         return $this;
     }
 
@@ -452,13 +488,13 @@ abstract class Form
                     if ($message === "message_form_{$this->type}_success") {
                         $message = $this->t('message_form_success');
                     }
-                    $this->successMessages[] = $message;
+                    $this->addSuccessMessage($message);
                 } else {
                     $message = $this->t("message_form_{$this->type}_error");
                     if ($message === "message_form_{$this->type}_error") {
                         $message = $this->t('message_form_error');
                     }
-                    $this->errorMessages[] = $message;
+                    $this->addErrorMessages($message);
                 }
             }
         }

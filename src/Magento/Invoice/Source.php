@@ -207,7 +207,7 @@ abstract class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    protected function getShopOrderId()
+    protected function getShopOrderOrId()
     {
         /** @var \Mage_Sales_Model_Order_Creditmemo|\Magento\Sales\Model\Order\Creditmemo $creditmemo */
         $creditmemo = $this->source;
@@ -217,7 +217,7 @@ abstract class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    protected function getShopCreditNotes()
+    protected function getShopCreditNotesOrIds()
     {
         /** @var \Mage_Sales_Model_Order|\Magento\Sales\Model\Order $order */
         $order = $this->source;

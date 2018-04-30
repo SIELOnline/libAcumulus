@@ -10,6 +10,6 @@ use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
  */
 class AcumulusEntry extends BaseAcumulusEntry
 {
-    // @todo: remove, or adapt and add other differing column names.
+    // @todo: remove or adapt by defining all differing column names.
     static protected $keyEntryId = 'id_entry';
 }

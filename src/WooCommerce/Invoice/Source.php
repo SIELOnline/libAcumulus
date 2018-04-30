@@ -186,7 +186,7 @@ class Source extends BaseSource
      *
      * @return \WC_Order|int
      */
-    protected function getShopOrderId()
+    protected function getShopOrderOrId()
     {
         /** @var \WC_Order_Refund $refund */
         $refund = $this->source;
@@ -196,7 +196,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    protected function getShopCreditNotes()
+    protected function getShopCreditNotesOrIds()
     {
         /** @var \WC_Order $order */
         $order = $this->source;

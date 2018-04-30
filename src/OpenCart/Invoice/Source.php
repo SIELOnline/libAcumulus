@@ -130,14 +130,14 @@ class Source extends BaseSource
         $result = array(
             Meta::InvoiceAmountInc => $this->source['total'],
             Meta::InvoiceVatAmount => 0.0,
-            Meta::InvoiceVat => array(),
+            Meta::InvoiceVatBreakdown => array(),
         );
 
         /** @noinspection PhpUnhandledExceptionInspection */
         $orderTotals = $this->getOrderTotalLines();
         foreach ($orderTotals as $totalLine) {
             if ($totalLine['code'] === 'tax') {
-                $result[Meta::InvoiceVat][] = $totalLine['title'] . ': ' . $totalLine['value'];
+                $result[Meta::InvoiceVatBreakdown][] = $totalLine['title'] . ': ' . $totalLine['value'];
                 $result[Meta::InvoiceVatAmount] += $totalLine['value'];
             }
         }

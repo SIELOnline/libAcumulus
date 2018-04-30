@@ -9,7 +9,12 @@ use Siel\Acumulus\Invoice\Source;
  * Manages {@see AcumulusEntry} records/objects.
  *
  * This manager class performs CRU(D) operations on Acumulus entries in the
- * webshop database.
+ * webshop database. The features of this class include:
+ * - Retrieval of an Acumulus entry record for an invoice source (orders or
+ *   refunds).
+ * - Retrieval of an Acumulus entry record for a given entry id.
+ * - Save (insert or update) an Acumulus entry.
+ * - Install and uninstall the db table at module install resp. uninstall time.
  */
 abstract class AcumulusEntryManager
 {
@@ -84,6 +89,7 @@ abstract class AcumulusEntryManager
         }
         return $result;
     }
+
     /**
      * Saves the Acumulus entry for the given order in the web shop's database.
      *

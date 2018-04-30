@@ -179,7 +179,7 @@ class Completor
         $this->validateEmail();
         $this->invoiceTemplate();
 
-        // Complete lines as far as they can be completed om their own.
+        // Complete lines as far as they can be completed on their own.
         $this->initPossibleVatTypes();
         $this->initPossibleVatRates();
         $this->convertToEuro();

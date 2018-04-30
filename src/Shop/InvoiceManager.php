@@ -22,7 +22,6 @@ use Siel\Acumulus\Tag;
  * - Handle batch sending
  * - Create and send an invoice to Acumulus for a given invoice source,
  *   including triggering our own events and processing the result.
- *
  */
 abstract class InvoiceManager
 {

@@ -224,7 +224,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    protected function getShopOrderId()
+    protected function getShopOrderOrId()
     {
         /** @var \OrderSlip $orderSlip */
         $orderSlip = $this->source;
@@ -234,7 +234,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    protected function getShopCreditNotes()
+    protected function getShopCreditNotesOrIds()
     {
         /** @var \Order $order */
         $order = $this->source;

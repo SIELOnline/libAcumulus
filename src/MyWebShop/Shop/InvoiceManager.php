@@ -23,7 +23,7 @@ use Siel\Acumulus\Invoice\Result;
  *
  * SECURITY REMARKS
  * ----------------
- * @todo: document why this class is considered safe.
+ * @todo: document why this class is considered safe. Below is sample text from the PrestaShop module, so do not leave as is.
  * In MyWebShop, querying orders and order slips is done via available methods
  * on \Order or via self constructed queries. In the latter case, this class has
  * to take care of sanitizing itself.
@@ -74,7 +74,7 @@ class InvoiceManager extends BaseInvoiceManager
      */
     protected function triggerInvoiceCreated(array &$invoice, Source $invoiceSource, Result $localResult)
     {
-        // @todo: adapt to the way MyWebShop triggers events (and passes parameters to the event handlers).
+        // @todo: adapt to the way MyWebShop triggers events (and passes parameters (by value and reference) to the event handlers).
         Hook::exec('actionAcumulusInvoiceCreated', array('invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult));
     }
 
@@ -85,7 +85,7 @@ class InvoiceManager extends BaseInvoiceManager
      */
     protected function triggerInvoiceSendBefore(array &$invoice, Source $invoiceSource, Result $localResult)
     {
-        // @todo: adapt to the way MyWebShop triggers events (and passes parameters to the event handlers).
+        // @todo: adapt to the way MyWebShop triggers events (and passes parameters (by value and reference) to the event handlers).
         Hook::exec('actionAcumulusInvoiceSendBefore', array('invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult));
     }
 
@@ -96,7 +96,7 @@ class InvoiceManager extends BaseInvoiceManager
      */
     protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, Result $result)
     {
-        // @todo: adapt to the way MyWebShop triggers events (and passes parameters to the event handlers).
+        // @todo: adapt to the way MyWebShop triggers events (and passes parameters (by value) to the event handlers).
         Hook::exec('actionAcumulusInvoiceSendAfter', array('invoice' => $invoice, 'source' => $invoiceSource, 'result' => $result));
     }
 }

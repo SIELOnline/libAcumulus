@@ -4,72 +4,218 @@ namespace Siel\Acumulus;
 
 /**
  * Meta defines string constants for meta tags used in Acumulus API messages.
+ *
+ * Meta data can be added to the Acumulus invoice structure for reasons of
+ * support or to pass additional information from the creator phase to the
+ * completor phase. In the latter case, some of the meta data is required or
+ * is required in some cases, e.g. when a vat rate is missing.
+ *
+ * Meta tags start with 'meta-', with the exception of 'unitpriceinc' and
+ * 'vatamount', for which one could imagine that the Acumulus API would accept
+ * these instead of 'unitprice' and 'vatrate'. With either choice, Acumulus can
+ * correctly process the invoice line.
  */
 interface Meta
 {
     // Line: Price and vat related meta tags.
+    /**
+     * Creator->Completor/Strategy: Unit price inc vat (in addition to
+     * unitpriceinc).
+     */
     const UnitPriceInc = 'unitpriceinc';
-    const UnitPriceOld = 'meta-unitprice-old';
+    /**
+     * Creator -> Completor/Strategy: Amount of vat (per unit) (in addition to
+     * vatrate).
+     */
     const VatAmount = 'vatamount';
+    /**
+     * Creator -> Completor/Strategy: How we got the vatrate (which source, or
+     * how we computed it).
+     */
     const VatRateSource = 'meta-vatrate-source';
+    /**
+     * The minimum vatrate in case we have to compute it using 2 non-exact
+     * amounts.
+     */
     const VatRateMin = 'meta-vatrate-min';
+    /**
+     * The maximum vatrate in case we have to compute it using 2 non-exact
+     * amounts.
+     */
     const VatRateMax = 'meta-vatrate-max';
+    /**
+     * Debug: what fields have been calculated (as opposed to fetched from the
+     * webshop.
+     */
     const FieldsCalculated = 'meta-fields-calculated';
+    /**
+     * Instruction: whether to recalculate the unitprice when the exact vatrate
+     * is known.
+     */
     const RecalculateUnitPrice = 'meta-unitprice-recalculate';
+    /**
+     * Support: whether to the unitprice has been recalculated.
+     */
     const RecalculatedUnitPrice = 'meta-unitprice-recalculated';
+    /**
+     * Support: Unitprice as it was before being recalculated.
+     */
+    const UnitPriceOld = 'meta-unitprice-old';
+    /**
+     * Creator->Completor: (current) vat rate looked up from e.g. the product or
+     * shipping settings.
+     */
     const VatRateLookup = 'meta-vatrate-lookup';
+    /**
+     * Support: (current) name of the looked up vat rate.
+     */
     const VatRateLookupLabel = 'meta-vatrate-lookup-label';
+    /**
+     * Support: source of the looked up vat rate.
+     */
     const VatRateLookupSource = 'meta-vatrate-lookup-source';
+    /**
+     * Completor -> Strategy: Possible vat rates that lie in the VatRateMin to
+     * VatRateMax range.
+     */
     const VatRateMatches = 'meta-vatrate-matches';
+    /**
+     * Completor: Possible vat types for this line.
+     */
     const VatTypesPossible = 'meta-vattypes-possible';
 
     // Line: Line amounts related meta tags.
+    /**
+     * Support: line amount ex vat, equals quantity * unitprice, but can have a
+     * higher precision.
+     */
     const LineAmount = 'meta-line-amount';
+    /**
+     * Support: line amount inc vat, equals quantity * unitpriceinc, but can
+     * have a higher precision.
+     */
     const LineAmountInc = 'meta-line-amountinc';
+    /**
+     * Support: line vat amount, equals quantity * vatamount, but can have a
+     * higher precision.
+     */
     const LineVatAmount = 'meta-line-vatamount';
+    /**
+     * Creator->Strategy: the discount amount inc vat that was applied to this
+     * line (used by the SplitKnownDiscountLine strategy, Magento only).
+     */
     const LineDiscountAmountInc = 'meta-line-discount-amountinc';
+    /**
+     * Creator->Strategy: the discount vat amount that was applied to this line
+     * (used by the SplitKnownDiscountLine strategy, Magento only).
+     */
     const LineDiscountVatAmount = 'meta-line-discount-vatamount';
 
     // Line: Precision related meta tags.
+    /** Support: the precision of the unit price ex vat. */
     const PrecisionUnitPrice = 'meta-unitprice-precision';
+    /**
+     * Support: the precision of the unit price inc. vat.
+     */
     const PrecisionUnitPriceInc = 'meta-unitpriceinc-precision';
+    /**
+     * Support: the precision of the cost price.
+     */
     const PrecisionCostPrice = 'meta-costprice-precision';
+    /**
+     * Support: the precision of the vat amount.
+     */
     const PrecisionVatAmount = 'meta-vatamount-precision';
 
     // Invoice: Invoice totals meta tags.
+    /** Creator->Completor: the total amount ex vat of the invoice. */
     const InvoiceAmount = 'meta-invoice-amount';
+    /**
+     * Creator->Completor: the total amount inc vat of the invoice.
+     */
     const InvoiceAmountInc = 'meta-invoice-amountinc';
+    /**
+     * Creator->Completor: the total vat amount of the invoice.
+     */
     const InvoiceVatAmount = 'meta-invoice-vatamount';
-    // Used in OC to specify the tax distribution.
-    const InvoiceVat = 'meta-invoice-vat';
+    /**
+     * Support: Used by OC to specify the tax distribution.
+     */
+    const InvoiceVatBreakdown = 'meta-invoice-vat-breakdown';
+    /**
+     * Support: which of the above fields were computed (as opposed to fetched
+     * from the webshop).
+     */
     const InvoiceCalculated = 'meta-invoice-calculated';
 
     // Invoice: Lines totals meta tags.
+    /** Completor: the total amount ex vat of the invoice lines. */
     const LinesAmount = 'meta-lines-amount';
+    /**
+     * Completor: the total amount inc vat of the invoice lines.
+     */
     const LinesAmountInc = 'meta-lines-amountinc';
+    /**
+     * Completor: the total vat amount of the invoice lines.
+     */
     const LinesVatAmount = 'meta-lines-vatamount';
+    /**
+     * Completor: which of the line totals are incomplete because that amount is
+     * not (yet) known for all lines.
+     */
     const LinesIncomplete = 'meta-lines-incomplete';
-    const MissingAmount = 'meta-missing-amount';
 
     // Invoice: Currency related meta tags.
-    // Currency code or number: ISO4217, ISO 3166-1
+    /**
+     * Creator->Completor: Currency code or number: ISO4217, ISO 3166-1
+     */
     const Currency = 'meta-currency';
-    // Conversion rate from the used currency to the shop's default currency
-    // (amount in shop currency = CurrencyRate * amount in other currency).
+    /**
+     * Creator->Completor: Conversion rate from the used currency to the shop's
+     * default currency
+     * (amount in shop currency = CurrencyRate * amount in other currency).
+     */
     const CurrencyRate = 'meta-currency-rate';
-    // Whether we should use the above meta info to convert amounts or if the
-    // amounts are already in the shop's default currency (which should be
-    // euro).
+    /**
+     * Creator->Completor: Whether we should use the above meta info to convert
+     * amounts, or if the amounts are already in the shop's default currency
+     * (which should be euro) and this info is thus purely informational.
+     */
     const CurrencyDoConvert = 'meta-currency-do-convert';
-    // Whether the currency rate should and has been inverted.
+    /**
+     * Completor: Whether the currency rate should and has been inverted.
+     */
     const CurrencyRateInverted = 'meta-currency-rate-inverted';
 
     // Line: Parent - Children related meta tags.
-    const ChildrenLines = 'children';
+    /**
+     * Creator->Completor: the children lines.
+     */
+    const ChildrenLines = 'meta-children';
+    /**
+     * Support: the index of the parent line this child belonged to before
+     * flattening.
+     */
     const ParentIndex = 'meta-parent-index';
-    const NumberOfChildren = 'meta-children';
+    /**
+     * Support: the number of child lines this parent line had before
+     * flattening.
+     */
+    const NumberOfChildren = 'meta-children-count';
+    /**
+     * Support: the number of child lines this parent line had before
+     * flattening but which are no longer shown.
+     */
     const ChildrenNotShown = 'meta-children-not-shown';
+    /**
+     * Support: the number of child lines this parent line had before
+     * flattening and which are merged into it.
+     */
     const ChildrenMerged = 'meta-children-merged';
+    /**
+     * Support: the index of a parent, referred to by the meta info ParentIndex
+     * above.
+     */
     const Parent = 'meta-parent';
 
     // Line: WooCommerce bundle products plugin support.
@@ -82,13 +228,45 @@ interface Meta
     const PrecisionBundleChildrenLineAmountInc = 'meta-bundle-children-line-amountinc-precision';
 
     // Line: Other meta tags.
+    /**
+     * Creator->Event: the internal id of the order item line (WooCommerce
+     * only).
+     */
     const Id = 'meta-id';
+    /**
+     * Creator->Completor: the type of line: product, shipping, payment fee,
+     * discount line, etc.
+     */
     const LineType = 'meta-line-type';
+    /**
+     * Creator->Strategy: boolean that indicates if this line may be split into
+     * multiple lines to divide it over multiple vat rates during the strategy
+     * phase.
+     */
     const StrategySplit = 'meta-strategy-split';
+
     // Invoice: Other meta tags.
+    /**
+     * Support: prefix for an entry that describes the parameters used in 1 try
+     * of a strategy.
+     */
     const StrategyCompletor = 'meta-strategy-completor-';
+    /**
+     * Support: the input to the strategy phase.
+     */
     const StrategyCompletorInput = 'meta-strategy-completor-input';
+    /**
+     * Support: the name(s) of the strategy(ies) that were successful in
+     * completing this line.
+     */
     const StrategyCompletorUsed = 'meta-completor-strategy-used';
+    /**
+     * Support: the names of the strategies that were not tried because their
+     * preconditions failed.
+     */
     const StrategyCompletorPreconditionFailed = 'meta-strategy-completor-precondition-failed';
+    /**
+     * Support: the payment method used for this order or refund.
+     */
     const paymentMethod = 'meta-payment-method';
 }

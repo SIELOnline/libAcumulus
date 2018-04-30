@@ -257,14 +257,6 @@ class Result
     }
 
     /**
-     * @return \Exception|null
-     */
-    public function getException()
-    {
-        return $this->exception;
-    }
-
-    /**
      * @param \Exception $exception
      *
      * @return $this
@@ -273,6 +265,31 @@ class Result
     {
         $this->exception = $exception;
         return $this->raiseStatus(self::Status_Exception);
+    }
+
+    /**
+     * Returns the exception object, if an exception was set.
+     *
+     * @return \Exception|null
+     */
+    public function getException()
+    {
+        return $this->exception;
+    }
+
+    /**
+     * Returns the exception message, if an exception was set.
+     *
+     * @return string
+     */
+    public function getExceptionMessage()
+    {
+        $message = '';
+        if (($e = $this->getException()) !== null) {
+            $message = $e->getCode() . ': ' . $e->getMessage();
+            $message = $this->t('message_exception') . ' ' . $message;
+        }
+        return $message;
     }
 
     /**
@@ -595,12 +612,9 @@ class Result
         $messages = array();
 
         // Collect the messages.
-        if (($e = $this->getException()) !== null) {
-            $message = $e->getCode() . ': ';
-            $message .= $e->getMessage();
-            $messages[] = $this->t('message_exception') . ' ' . $message;
+        if (($message = $this->getExceptionMessage()) !== '') {
+            $messages[] = $message;
         }
-
         $messages = array_merge($messages, $this->getErrors(self::Format_PlainTextArray));
         $messages = array_merge($messages, $this->getWarnings(self::Format_PlainTextArray));
         $messages = array_merge($messages, $this->getNotices(self::Format_PlainTextArray));

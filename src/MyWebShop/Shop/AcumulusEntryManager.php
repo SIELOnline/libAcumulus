@@ -21,6 +21,21 @@ use Siel\Acumulus\Shop\AcumulusEntryManager as BaseAcumulusEntryManager;
  *   table. If MyWebshop expects you to define install and uninstall scripts
  *   in a separate well-defined place, do so over there and have these methods
  *   just return true.
+ *
+ * SECURITY REMARKS
+ * ----------------
+ * @todo: document why this class is considered safe. Below is sample text from the PrestaShop module, so do not leave as is.
+ * In MyWebShop saving and querying acumulus entries is done via self
+ * constructed queries, therefore this class takes care of sanitizing itself.
+ * - Numbers are cast by using numeric formatters (like %u, %d, %f) with
+ *   sprintf().
+ * - Strings are escaped using pSQL(), unless they are hard coded or are
+ *   internal variables.
+ * Note that:
+ * - $invoiceSource, $created and $updated are set in calling code, and can
+ *   thus be considered trusted, but are still escaped or cast.
+ * - $entryId and $token come from outside, from the Acumulus API, and must
+ *   thus be handled as untrusted.
  */
 class AcumulusEntryManager extends BaseAcumulusEntryManager
 {
@@ -54,7 +69,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      */
     protected function insert(Source $invoiceSource, $entryId, $token, $created)
     {
-        // @todo
+        // @todo: insert a new entry (note that save() takes care of distinguishing between insert and update).
     }
 
     /**
@@ -62,7 +77,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      */
     protected function update(BaseAcumulusEntry $record, $entryId, $token, $updated)
     {
-        // @todo
+        // @todo: update an existing entry (note that save() takes care of distinguishing between insert and update).
     }
 
     /**
@@ -78,7 +93,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      */
     public function install()
     {
-        // @todo: adapt to the way MyWebshop lets you define tables.
+        // @todo: adapt to the way MyWebshop lets you define tables. Just return true if this is done in a separate script.
         return $this->getDb()->execute("CREATE TABLE IF NOT EXISTS `{$this->tableName}` (
         `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
         `id_shop` int(11) UNSIGNED NOT NULL DEFAULT '1',
@@ -100,7 +115,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      */
     public function uninstall()
     {
-        // @todo: adapt to the way MyWebshop lets you delete tables.
+        // @todo: adapt to the way MyWebshop lets you delete tables. Just return true if this is done in a separate script.
         return $this->getDb()->execute("DROP TABLE `{$this->tableName}`");
     }
 

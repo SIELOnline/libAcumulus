@@ -3,11 +3,11 @@
 namespace Siel\Acumulus\Invoice;
 
 /**
- * Wraps a source for an invoice, typically an order or a credit note.
+ * A wrapper around a webshop order or refund.
  *
- * By defining a wrapper around orders from a specific web shop we can:
- * - define unified access to common properties (like reference, date, etc.).
- * - pass them around in a type safe way.
+ * Source is used to pass an order or refund object (or array) around in a
+ * strongly typed way and to provide unified access to information about the
+ * order or refund.
  */
 abstract class Source
 {
@@ -29,6 +29,8 @@ abstract class Source
     protected $invoice;
 
     /**
+     * Constructor
+     *
      * @param string $type
      * @param int|string|array|object $idOrSource
      */
@@ -46,21 +48,7 @@ abstract class Source
     }
 
     /**
-     * Returns the type of the wrapped source.
-     *
-     * @return string
-     *   One of the Source constants Source::Order or Source::CreditNote.
-     */
-    public function getType()
-    {
-        return $this->type;
-    }
-
-    /**
      * Sets the source based on type and id.
-     *
-     * Should either be overridden or both setSourceOrder() and
-     * setSourceCreditNote() should be implemented.
      */
     protected function setSource()
     {
@@ -68,22 +56,7 @@ abstract class Source
     }
 
     /**
-     * Returns the web shop specific source for an invoice.
-     *
-     * @return array|object
-     *   the web sop specific source for an invoice, either an order or a credit
-     *   note object or array.
-     */
-    public function getSource()
-    {
-        return $this->source;
-    }
-
-    /**
      * Sets the id based on type and source.
-     *
-     * Should either be overridden or both setIdOrder() and
-     * setIdCreditNote() should be implemented.
      */
     protected function setId()
     {
@@ -91,10 +64,32 @@ abstract class Source
     }
 
     /**
-     * Returns the internal id of this invoice source.
+     * Returns the type of the wrapped source.
+     *
+     * @return string
+     *   One of the constants Source::Order or Source::CreditNote.
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * Returns the webshop specific source for an invoice.
+     *
+     * @return array|object
+     *   The webshop specific source for an invoice.
+     */
+    public function getSource()
+    {
+        return $this->source;
+    }
+
+    /**
+     * Returns the internal id of the webshop's invoice source.
      *
      * @return int|string
-     *   The internal id.
+     *   The internal id of the webshop's invoice source.
      */
     public function getId()
     {
@@ -102,13 +97,13 @@ abstract class Source
     }
 
     /**
-     * Returns the user facing reference for this invoice source.
+     * Returns the user facing reference for the webshop's invoice source.
      *
      * Should be overridden when this is not the internal id.
      *
      * @return string|int
-     *   The user facing id for this invoice source. This is not necessarily the
-     *   internal id!
+     *   The user facing id for the webshop's invoice source. This is not
+     *   necessarily the internal id.
      */
     public function getReference()
     {
@@ -116,11 +111,12 @@ abstract class Source
     }
 
     /**
-     * Returns the sign to use for amounts that are always defined as a positive
-     * number, also on credit notes.
+     * Returns the sign to use for amounts that normally are always defined as a
+     * positive number, also on credit notes.
      *
      * @return float
-     *   1 for orders, -1 for credit notes.
+     *   1 for orders, -1 for credit notes (unless the amounts or quantities on
+     *   the webshop's credit notes are already negative).
      */
     public function getSign()
     {
@@ -128,7 +124,7 @@ abstract class Source
     }
 
     /**
-     * Returns the order (or credit memo) date.
+     * Returns the webshop's invoice source date.
      *
      * @return string
      *   The order (or credit memo) date: yyyy-mm-dd.
@@ -140,6 +136,9 @@ abstract class Source
 
     /**
      * Returns the status for this invoice source.
+     *
+     * The Acumulus plugin does not define its own states, so 1 of the webshop's
+     * order or credit note states should be returned.
      *
      * Should either be overridden or both getStatusOrder() and
      * getStatusCreditNote() should be implemented.
@@ -155,17 +154,29 @@ abstract class Source
     /**
      * Returns the payment method used.
      *
-     * This default implementation returns an empty payment method.
-     *
-     * If no payment method is stored for credit notes, it is expected to be the
-     * same as for its order, as this will normally indeed be the case.
+     * This default implementation returns the payment method for the order as
+     * several webshops do not store a payment method with credit notes but
+     * instead assume it is the same as for its original order.
      *
      * @return int|string|null
      *   A value identifying the payment method or null if unknown.
      */
     public function getPaymentMethod()
     {
-        return null;
+        return $this->getOrder()->getPaymentMethodOrder();
+    }
+
+    /**
+     * Returns the payment method used for this order.
+     *
+     * This method will only be called when $this represents an order.
+     *
+     * @return int|string|null
+     *   A value identifying the payment method or null if unknown.
+     */
+    public function getPaymentMethodOrder()
+    {
+        throw new \RuntimeException('Source::getPaymentMethodOrder() not implemented for ' . get_class($this));
     }
 
     /**
@@ -183,12 +194,13 @@ abstract class Source
     /**
      * Returns the payment date.
      *
-     * The payment date is defined as the date on which the status changed from a
-     * non-paid state to a paid state. If there are multiple state changes, the
-     * last one is taken.
+     * The payment date is defined as the date on which the status changed from
+     * a non-paid state to a paid state. If there are multiple state changes,
+     * the last one should be taken.
      *
      * @return string|null
-     *   The payment date (yyyy-mm-dd) or null if the order has not been paid yet.
+     *   The payment date (yyyy-mm-dd) or null if the order has not been (fully)
+     *   paid yet.
      */
     public function getPaymentDate()
     {
@@ -222,23 +234,23 @@ abstract class Source
     /**
      * Returns an array with the totals fields.
      *
-     * All total fields are optional but may be used or even expected by the
-     * Completor or are used for support and debugging purposes.
-     *
-     * This default implementation returns an empty array. Override to provide the
-     * values.
+     * Most webshops provide only 2 of the 3 totals, so only return those that
+     * are provided. If missing, the 3rd will be computed by the Creator.
      *
      * @return array
      *   An array with the following possible keys:
      *   - meta-invoice-amount: the total invoice amount excluding VAT.
      *   - meta-invoice-amountinc: the total invoice amount including VAT.
      *   - meta-invoice-vatamount: the total vat amount for the invoice.
-     *   - meta-invoice-vat: a vat breakdown per vat rate.
+     *
+     *   This one is really optional: so far only filled by OpenCart and
+     *   purely for reasons of support:
+     *   - meta-invoice-vat-breakdown: a vat breakdown per vat rate.
      */
     abstract public function getTotals();
 
     /**
-     * Loads and sets the web shop invoice linked ot this source.
+     * Loads and sets the web shop invoice linked to this source.
      */
     protected function setInvoice()
     {
@@ -258,11 +270,11 @@ abstract class Source
     }
 
     /**
-     * Returns the number of the web shop invoice linked to this source.
+     * Returns the reference of the web shop invoice linked to this source.
      *
      * @return int|string|null
-     *   The reference number of the (web shop) invoice linked to this source,
-     *   or null if no invoice is linked to this source.
+     *   The reference of the (web shop) invoice linked to this source, or null
+     *   if no invoice is linked to this source.
      */
     public function getInvoiceReference()
     {
@@ -302,7 +314,7 @@ abstract class Source
     /**
      * Returns the order source for a credit note source.
      *
-     * Do not override this method but override getShopOrder() instead.
+     * Do not override this method but override getShopOrderOrId() instead.
      *
      * @return Source
      *   If the invoice source is a credit note, its original order is returned,
@@ -310,23 +322,26 @@ abstract class Source
      */
     public function getOrder()
     {
-        return $this->getType() === Source::CreditNote ? new static(Source::Order, $this->getShopOrderId()) : $this;
+        return $this->getType() === Source::CreditNote ? new static(Source::Order, $this->getShopOrderOrId()) : $this;
     }
 
+    /** @noinspection PhpDocSignatureInspection */
     /**
      * Returns the original order or order id for this credit note.
      *
-     * The base implementation returns $this. Override if the shop supports
-     * credit notes and thus the result can be a different order.
+     * This method will only be called when $this represents a credit note.
+     *
+     * The base implementation throws an exception for those webshops that do
+     * not support credit notes. Override if the webshop supports credit notes.
+     * Do not do any object loading here if only the id is readily available.
      *
      * @return array|object|int
-     *   If the invoice source is a credit note, its original shop order is
-     *   returned, otherwise, the invoice source is an order, the shop order
-     *   itself is returned.
+     *   The original order itself, if readily available, or the id of the
+     *   original order for this credit note.
      */
-    protected function getShopOrderId()
+    protected function getShopOrderOrId()
     {
-        return $this->source;
+        throw new \RuntimeException('Source::getShopOrderOrId() not implemented for ' . get_class($this));
     }
 
     /**
@@ -334,7 +349,7 @@ abstract class Source
      *
      * Do not override this method but override getShopCreditNotes() instead.
      *
-     * @return Source[]?
+     * @return Source[]|null
      *   If the invoice source is an order, an array of refunds is returned,
      *   null otherwise.
      */
@@ -343,7 +358,7 @@ abstract class Source
         $result = null;
         if ($this->getType() === Source::Order) {
             $result = array();
-            $shopCreditNotes = $this->getShopCreditNotes();
+            $shopCreditNotes = $this->getShopCreditNotesOrIds();
             foreach ($shopCreditNotes as $shopCreditNote) {
                 $result[] = new static(Source::CreditNote, $shopCreditNote);
             }
@@ -354,14 +369,16 @@ abstract class Source
     /**
      * Returns the credit notes or credit note ids for this order.
      *
-     * The base implementation returns null. Override if the shop supports
-     * credit notes.
+     * This method will only be called when $this represents an order.
      *
-     * @return array[]|object[]|int[]|\Traversable null
-     *   The, possibly empty, set of refunds or refund-ids for this order, or
-     *   null if not supported.
+     * The base implementation returns an empty array for those webshops that do
+     * not support credit notes. Override if the webshop supports credit notes.
+     * Do not do any object loading here if only the ids are readily available.
+     *
+     * @return array[]|object[]|int[]|\Traversable
+     *   The, possibly empty, set of refunds or refund-ids for this order.
      */
-    protected function getShopCreditNotes()
+    protected function getShopCreditNotesOrIds()
     {
         return array();
     }
@@ -373,7 +390,7 @@ abstract class Source
      * methods.
      *
      * The method name is expected to be the original method name suffixed with
-     * the source type.
+     * the source type (Order or CreditNote).
      *
      * @param string $method
      *   The original method called.

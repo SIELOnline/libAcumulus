@@ -22,8 +22,13 @@ class ConfigStore extends BaSeConfigStore
      */
     public function save(array $values)
     {
-        // @todo: no changes also returns false: differentiate between no changes and real errors.
-        $result = update_option('acumulus', $values);
-        return $result;
+        // WP: update_option() also returns false when there are no changes. We
+        // want to return true, so we perform the same check as update_option()
+        // before calling update_option().
+        $oldValues = get_option('acumulus');
+        if ($values === $oldValues || maybe_serialize($values) === maybe_serialize($oldValues)) {
+          return true;
+        }
+        return update_option('acumulus', $values);
     }
 }

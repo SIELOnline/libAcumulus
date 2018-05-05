@@ -16,6 +16,8 @@ use Siel\Acumulus\Tag;
 /**
  * Creates a raw version of the Acumulus invoice based on a {@see Source}.
  *
+ * Introduction
+ * ------------
  * The Acumulus invoice structure is specified on:
  * {@link https://www.siel.nl/acumulus/API/Invoicing/Add_Invoice/ }
  *
@@ -43,9 +45,38 @@ use Siel\Acumulus\Tag;
  * - Contains most invoice tags (as far as they should or can be set), except
  *   vattype and concept.
  * - Contains all invoice lines (based on order data), but:
- *     - Possibly hierarchically structured
- *     - Does not have to be complete or correct
- *     - In the used currency, not necessarily Euro
+ *     - Possibly hierarchically structured.
+ *     - Does not have to be complete or correct.
+ *     - In the used currency, not necessarily Euro.
+ *
+ * Hierarchically structured invoice lines
+ * ---------------------------------------
+ * If your shop supports:
+ * 1 options or variants, like size, color, etc.
+ * 2 bundles or composed products
+ * Then you should create hierarchical lines for these product types.
+ *
+ * ad 1)
+ * For each option or variant you add a child line. Set the meta tag
+ * meta-vatrate-source to Creator::VatRateSource_Parent. Copy the quantity from
+ * the parent to the child. Price info is probably on the parent line only,
+ * unless your shop administers additional or reduced costs for a given option
+ * on the child lines.
+ *
+ * ad 2)
+ * For each product that is part of the bundle add a child line. As this may be
+ * a bundle/composed product on its own, you may create multiple levels, there
+ * is no maximum depth on child lines.
+ *
+ * Price info may be on the child lines, but may also be on the parent line,
+ * especially so, if the bundle is cheaper that its separate parts. The child
+ * lines may have their own vat rates, so depending on your situation fetch the
+ * vat info from the child line objects itself or copy it from the parent. When
+ * left empty, it is copied from the parent in the Completor phase.
+ *
+ * Hierarchical lines are "corrected" in the Completor phase, see
+ * {@see FlattenerInvoiceLines}
+ *
  */
 abstract class Creator
 {

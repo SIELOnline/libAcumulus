@@ -7,13 +7,35 @@ use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
 
 /**
- * The invoice lines flattener class provides functionality to flatten and
- * correct invoice lines that describe bundle or composed products, or just
- * options or variants.
+ * The invoice lines flattener flattens hierarchical invoice lines.
  *
  * This class flattens the invoice lines (recursively). If an invoice line has
  * child lines they are either merged into the parent line or added as separate
  * invoice lines at the same level as the parent invoice line.
+ *
+ * The ideas and reasoning behind hierarchical lines and subsequently flattening
+ * it :
+ * - To provide the use some flexibility in how options, variants, composed
+ *   products, or bundles are shown on the invoice, the Creator should create a
+ *   raw invoice with all options, etc. on separate child lines.
+ * - Acumulus only accepts flat lines, so eventually the lines must be
+ *   flattened.
+ * - There are a number of settings that determine how this is done: e.g. show
+ *   all on 1 line; show indented child lines; do not show at all (because e.g.
+ *   child lines are only used internally for price calculations or stock
+ *   keeping).
+ * - If a child vat rate differs from that of the parent, lines may not be
+ *   merged. The library takes this into account and ignores any settings in
+ *   this case.
+ * - While flattening, especially when merging the children into the parent,
+ *   price info on the children gets lost, so the flattening phase might have to
+ *   fetch it from the children and add it to the parent.
+ * - The library has various merge strategies (regarding copying, ignoring or
+ *   adding price info) already implemented. You might have to override the
+ *   flattener to select the strategy that applies to your shop.
+ *
+ * @todo: shortly describe strategies and its methods to simplify overriding and
+ *   choosing the correct strategy.
  */
 class FlattenerInvoiceLines
 {
@@ -251,7 +273,8 @@ class FlattenerInvoiceLines
      * - Price info only on parent.
      *
      * What do we do in this situation:
-     * - Copy vat rate info from parent to children (may be empty on the children).
+     * - Copy vat rate info from parent to children (may be empty on the
+     *   children).
      * - Remove price info from children (just to be sure).
      *
      * Known usages:
@@ -302,7 +325,8 @@ class FlattenerInvoiceLines
      * - Price info is on the parent and children, but they double each other.
      *
      * What do we do in this situation:
-     * - Remove price info from parent to ensure that the amount appears only once.
+     * - Remove price info from parent to ensure that the amount appears only
+     *   once.
      * - If the vat rate on the parent is absent or incorrect, it should best be
      *   set to the maximum vat rate appearing on the children.
      *
@@ -331,7 +355,8 @@ class FlattenerInvoiceLines
      * This method should be called when:
      * - Child invoice lines are kept separately.
      * - Price info is on the parent and children, but these amounts do not
-     *   double each other (base price + extra prices for more expensive options).
+     *   double each other (base price + extra prices for more expensive
+     *   options).
      *
      * What do we do in this situation:
      * - Nothing, price and vat info are considered to be correct on all lines.

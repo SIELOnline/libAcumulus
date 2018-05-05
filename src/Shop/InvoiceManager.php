@@ -481,11 +481,11 @@ abstract class InvoiceManager
             if (!empty($entryId)) {
                 $deleteResult = $this->getService()->setDeleteStatus($entryId, API::Entry_Delete);
                 if ($deleteResult->hasMessages()) {
-                    // Add messages to result but not if the entry has already the
-                    // delete status or does not exist at all (anymore).
+                    // Add messages to result but not if the entry has already
+                    // the delete status or does not exist at all (anymore).
                     if ($deleteResult->hasCodeTag('P2XFELO12')) {
-                        // Successfully deleted the ld entry: add a warning so this
-                        // info will be  mailed to the user.
+                        // Successfully deleted the old entry: add a warning so
+                        // this info will be  mailed to the user.
                         $result->addWarning(902, '',
                             sprintf($this->t('message_warning_old_entry_not_deleted'), $this->t($invoiceSource->getType()), $entryId));
                     } else {

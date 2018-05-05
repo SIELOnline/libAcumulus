@@ -89,7 +89,7 @@ class CompletorStrategyLines
     protected function completeStrategyLines()
     {
         if ($this->invoiceHasStrategyLine()) {
-            $this->invoice[Tag::Customer][Tag::Invoice][Meta::StrategyCompletorInput]['vat-rates'] = str_replace(array(' ', "\r", "\n", "\t"), '', var_export($this->possibleVatRates, true));
+            $this->invoice[Tag::Customer][Tag::Invoice][Meta::CompletorStrategyInput]['vat-rates'] = str_replace(array(' ', "\r", "\n", "\t"), '', var_export($this->possibleVatRates, true));
 
             $isFirst = true;
             $strategies = $this->getStrategyClasses();
@@ -97,16 +97,16 @@ class CompletorStrategyLines
                 /** @var CompletorStrategyBase $strategy */
                 $strategy = new $strategyClass($this->config, $this->translator, $this->invoice, $this->possibleVatTypes, $this->possibleVatRates, $this->source);
                 if ($isFirst) {
-                    $this->invoice[Tag::Customer][Tag::Invoice][Meta::StrategyCompletorInput]['vat-2-divide'] = $strategy->getVat2Divide();
-                    $this->invoice[Tag::Customer][Tag::Invoice][Meta::StrategyCompletorInput]['vat-breakdown'] = str_replace(array(' ', "\r", "\n", "\t"), '', var_export($strategy->getVatBreakdown(), true));
+                    $this->invoice[Tag::Customer][Tag::Invoice][Meta::CompletorStrategyInput]['vat-2-divide'] = $strategy->getVat2Divide();
+                    $this->invoice[Tag::Customer][Tag::Invoice][Meta::CompletorStrategyInput]['vat-breakdown'] = str_replace(array(' ', "\r", "\n", "\t"), '', var_export($strategy->getVatBreakdown(), true));
                     $isFirst = false;
                 }
                 if ($strategy->apply()) {
                     $this->replaceLinesCompleted($strategy->getLinesCompleted(), $strategy->getReplacingLines(), $strategy->getName());
-                    if (empty($this->invoice[Tag::Customer][Tag::Invoice][Meta::StrategyCompletorUsed])) {
-                        $this->invoice[Tag::Customer][Tag::Invoice][Meta::StrategyCompletorUsed] = $strategy->getDescription();
+                    if (empty($this->invoice[Tag::Customer][Tag::Invoice][Meta::CompletorStrategyUsed])) {
+                        $this->invoice[Tag::Customer][Tag::Invoice][Meta::CompletorStrategyUsed] = $strategy->getDescription();
                     } else {
-                        $this->invoice[Tag::Customer][Tag::Invoice][Meta::StrategyCompletorUsed] .= '; ' . $strategy->getDescription();
+                        $this->invoice[Tag::Customer][Tag::Invoice][Meta::CompletorStrategyUsed] .= '; ' . $strategy->getDescription();
                     }
                     // Allow for partial solutions: a strategy may correct only some of
                     // the strategy lines and leave the rest up to other strategies.
@@ -177,7 +177,7 @@ class CompletorStrategyLines
         foreach ($completedLines as &$completedLine) {
             if ($completedLine[Meta::VatRateSource] === Creator::VatRateSource_Strategy) {
                 $completedLine[Meta::VatRateSource] = Completor::VatRateSource_Strategy_Completed;
-                $completedLine[Meta::StrategyCompletorUsed] = $strategyName;
+                $completedLine[Meta::CompletorStrategyUsed] = $strategyName;
             }
         }
         $this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] = array_merge($lines, $completedLines);

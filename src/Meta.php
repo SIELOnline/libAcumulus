@@ -250,21 +250,21 @@ interface Meta
      * Support: prefix for an entry that describes the parameters used in 1 try
      * of a strategy.
      */
-    const StrategyCompletor = 'meta-strategy-completor-';
+    const CompletorStrategy = 'meta-completor-strategy-';
     /**
      * Support: the input to the strategy phase.
      */
-    const StrategyCompletorInput = 'meta-strategy-completor-input';
+    const CompletorStrategyInput = 'meta-completor-strategy-input';
     /**
      * Support: the name(s) of the strategy(ies) that were successful in
      * completing this line.
      */
-    const StrategyCompletorUsed = 'meta-completor-strategy-used';
+    const CompletorStrategyUsed = 'meta-completor-strategy-used';
     /**
      * Support: the names of the strategies that were not tried because their
      * preconditions failed.
      */
-    const StrategyCompletorPreconditionFailed = 'meta-strategy-completor-precondition-failed';
+    const CompletorStrategyPreconditionFailed = 'meta-completor-strategy-precondition-failed';
     /**
      * Support: the payment method used for this order or refund.
      */

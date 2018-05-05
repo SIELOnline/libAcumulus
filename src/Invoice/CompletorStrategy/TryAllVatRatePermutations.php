@@ -110,7 +110,7 @@ class TryAllVatRatePermutations extends CompletorStrategyBase
             $i++;
         }
 
-        $this->invoice[Tag::Customer][Tag::Invoice][Meta::StrategyCompletor . $this->getName()] = sprintf("try1Permutation([%s]): %f", implode(', ', $permutation), $vatAmount);
+        $this->invoice[Tag::Customer][Tag::Invoice][Meta::CompletorStrategy . $this->getName()] = sprintf("try1Permutation([%s]): %f", implode(', ', $permutation), $vatAmount);
         // The strategy worked if the vat totals equals the vat to divide.
         return Number::floatsAreEqual($vatAmount, $this->vat2Divide);
     }

@@ -38,7 +38,7 @@ class Creator extends BaseCreator
     /** @var Order */
     protected $order;
 
-    /** @var OrderRefund */
+    /** @var Refund */
     protected $creditNote;
 
     /**

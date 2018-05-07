@@ -134,12 +134,15 @@ class Source extends BaseSource
      */
     public function getCurrency()
     {
-        $currency = unserialize($this->source->order_currency_info);
-        $result = array (
-            Meta::Currency => $currency->currency_code,
-            Meta::CurrencyRate => (float) $currency->currency_rate,
-            Meta::CurrencyDoConvert => true,
-        );
+        $result = array();
+        if (!empty($this->source->order_currency_info)) {
+            $currency = unserialize($this->source->order_currency_info);
+            $result = array(
+                Meta::Currency => $currency->currency_code,
+                Meta::CurrencyRate => (float) $currency->currency_rate,
+                Meta::CurrencyDoConvert => true,
+            );
+        }
         return $result;
     }
 

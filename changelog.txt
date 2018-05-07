@@ -26,6 +26,8 @@ Important note:
   5.4.1 version.
 
 Changes:
+- HS: Trying to get property of non-object in Joomla\HikaShop\Invoice\Source.php
+  on line 139
 - ALL: Looked up vat rates were not copied from parent to children.
 - ALL: Config form now also displays the exception message when an exception
   was raised.

@@ -91,7 +91,7 @@ class Source extends BaseSource
      */
     protected function getPaymentStateOrder()
     {
-        return $this->source->needs_payment() ? Api::PaymentStatus_Due : Api::PaymentStatus_Paid;
+        return $this->source->is_paid() ? Api::PaymentStatus_Paid : Api::PaymentStatus_Due;
     }
 
     /**

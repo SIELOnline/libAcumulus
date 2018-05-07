@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\WooCommerce\WooCommerce2\Invoice;
 
+use Siel\Acumulus\Api;
 use Siel\Acumulus\WooCommerce\Invoice\Source as BaseSource;
 use Siel\Acumulus\Invoice\Source as GrandParentSource;
 
@@ -67,6 +68,17 @@ class Source extends BaseSource
         return GrandParentSource::getPaymentMethod();
     }
 
+    /**
+     * Returns whether the order has been paid or not.
+     *
+     * @return int
+     *   \Siel\Acumulus\Api::PaymentStatus_Paid or
+     *   \Siel\Acumulus\Api::PaymentStatus_Due
+     */
+    protected function getPaymentStateOrder()
+    {
+        return $this->source->needs_payment() ? Api::PaymentStatus_Due : Api::PaymentStatus_Paid;
+    }
 
     /**
      * Returns the payment date of the order.

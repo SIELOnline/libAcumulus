@@ -13,51 +13,60 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getTokenInfo()
+    protected function getTokenInfoSource()
     {
-        return parent::getTokenInfo() + array(
-            'source' => array(
-                'table' => array('hikashop_order'),
-                'properties' => array(
-                    'order_id',
-                    'order_billing_address_id',
-                    'order_shipping_address_id',
-                    'order_user_id',
-                    'order_status',
-                    'order_type',
-                    'order_number',
-                    'order_created',
-                    'order_modified',
-                    'order_invoice_id',
-                    'order_invoice_number',
-                    'order_invoice_created',
-                    'order_currency_id',
-                    'order_currency_info',
-                    'order_full_price',
-                    'order_discount_code',
-                    'order_discount_price',
-                    'order_discount_tax',
-                    'order_payment_id',
-                    'order_payment_method',
-                    'order_payment_price',
-                    'order_payment_tax',
-                    'order_shipping_id',
-                    'order_shipping_method',
-                    'order_shipping_price',
-                    'order_shipping_tax',
-                    'order_partner_id',
-                    'order_partner_price',
-                    'order_partner_paid',
-                    'order_partner_currency_id',
-                    'order_ip',
-                    'order_site_id',
-                    'comment',
-                    'deliverydate',
-                    'order_lang',
-                    'order_token',
-                ),
-                'properties-more' => true,
-            ),
+        $source = array(
+            'order_id',
+            'order_billing_address_id',
+            'order_shipping_address_id',
+            'order_user_id',
+            'order_status',
+            'order_type',
+            'order_number',
+            'order_created',
+            'order_modified',
+            'order_invoice_id',
+            'order_invoice_number',
+            'order_invoice_created',
+            'order_currency_id',
+            'order_currency_info',
+            'order_full_price',
+            'order_discount_code',
+            'order_discount_price',
+            'order_discount_tax',
+            'order_payment_id',
+            'order_payment_method',
+            'order_payment_price',
+            'order_payment_tax',
+            'order_shipping_id',
+            'order_shipping_method',
+            'order_shipping_price',
+            'order_shipping_tax',
+            'order_partner_id',
+            'order_partner_price',
+            'order_partner_paid',
+            'order_partner_currency_id',
+            'order_ip',
+            'order_site_id',
+            'comment',
+            'deliverydate',
+            'order_lang',
+            'order_token',
+        );
+
+        return array(
+            'table' => 'hikashop_order',
+            'properties' => $source,
+            'properties-more' => true,
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTokenInfoShopProperties()
+    {
+        return array(
             'billing_address' => array(
                 'table' => 'hikashop_address',
                 'properties' => array(

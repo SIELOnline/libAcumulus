@@ -23,76 +23,94 @@ class ShopCapabilities extends ShopCapabilitiesBase
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function getTokenInfo()
+    protected function getTokenInfoSource()
     {
-        // @t
+        // @todo: fill in the common properties of your order and refund class.
+        // @todo: If MyWebShop does not support refunds, fill in the properties of your Order class.
+        $source = array(
+            'date_created',
+            'date_modified',
+            'shipping_method',
+            'total',
+            'subtotal',
+            'used_coupons',
+            'item_count',
+        );
+
+        // @todo: complete the class and file name.
+        return array(
+            'class' => '/MyWebShop/BaseOrder',
+            'file' => '.../BaseOrder.php',
+            'properties' => $source,
+            'properties-more' => true,
+        );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function getTokenInfoRefund()
+    {
+        // @todo: fill in the properties that are unique to your Refund class (i.e. do not appear in orders),
+        // @todo: remove if MyWebShop does not support refunds.
+        $refund = array(
+            'amount',
+            'reason',
+        );
+
+        // @todo: complete the class and file name.
+        return array(
+            'more-info' => $this->t('refund_only'),
+            'class' => '/MyWebShop/Refund',
+            'file' => '.../Refund.php',
+            'properties' => $refund,
+            'properties-more' => true,
+        );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function getTokenInfoOrder()
+    {
+        // @todo: fill in the properties that are unique to your Order class (i.e. do not appear in refunds),
+        // @todo: remove if MyWebShop does not support refunds.
+        $order = array(
+            'order_number',
+            'billing_first_name',
+            'billing_last_name',
+            'billing_company',
+            'billing_address_1',
+            'billing_address_2',
+            '...',
+        );
+
+        // @todo: complete the class and file name.
+        return array(
+            'more-info' => $this->t('original_order_for_refund'),
+            'class' => '/MyWebShop/Order',
+            'file' => '.../Order.php',
+            'properties' => $order,
+            'properties-more' => true,
+        );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function getTokenInfoShopProperties()
+    {
+        // @todo: define the properties of other objects that may be used to fetch info from.
+        // @todo: ensure that your Creator class calls addPropertySource() to all properties defined here.
         return parent::getTokenInfo() + array(
-            'source' => array(
-                'class' => 'Order',
-                'file' => 'classes/Order.php',
-                'properties' => array(
-                    'id_address_delivery',
-                    'id_address_invoice',
-                    'id_shop_group',
-                    'id_shop',
-                    'id_cart',
-                    'id_currency',
-                    'id_lang',
-                    'id_customer',
-                    'id_carrier',
-                    'current_state',
-                    'secure_key',
-                    'payment',
-                    'module',
-                    'conversion_rate',
-                    'recyclable = 1',
-                    'gift',
-                    'gift_message',
-                    'mobile_theme',
-                    'shipping_number',
-                    'total_discounts',
-                    'total_discounts_tax_incl',
-                    'total_discounts_tax_excl',
-                    'total_paid',
-                    'total_paid_tax_incl',
-                    'total_paid_tax_excl',
-                    'total_paid_real',
-                    'total_products',
-                    'total_products_wt',
-                    'total_shipping',
-                    'total_shipping_tax_incl',
-                    'total_shipping_tax_excl',
-                    'carrier_tax_rate',
-                    'total_wrapping',
-                    'total_wrapping_tax_incl',
-                    'total_wrapping_tax_excl',
-                    'invoice_number',
-                    'delivery_number',
-                    'invoice_date',
-                    'delivery_date',
-                    'valid',
-                    'date_add',
-                    'date_upd',
-                    'reference',
-                    'round_mode',
-                    'round_type',
-                ),
-                'properties-more' => true,
-            ),
+            // @todo: complete the class and file name.
             'address_invoice' => array(
                 'class' => 'Address',
                 'file' => 'classes/Address.php',
                 'properties' => array(
-                    'id_customer',
-                    'id_manufacturer',
-                    'id_supplier',
-                    'id_warehouse',
-                    'id_country',
-                    'id_state',
                     'country',
-                    'alias',
                     'company',
                     'lastname',
                     'firstname',
@@ -104,10 +122,10 @@ class ShopCapabilities extends ShopCapabilitiesBase
                     'phone',
                     'phone_mobile',
                     'vat_number',
-                    'dni',
                 ),
                 'properties-more' => true,
             ),
+            // @todo: complete the class and file name.
             'address_delivery' => array(
                 'more-info' => $this->t('see_billing_address'),
                 'class' => 'Address',
@@ -117,14 +135,12 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 ),
                 'properties-more' => false,
             ),
+            // @todo: complete the class and file name.
             'customer' => array(
                 'class' => 'Customer',
                 'file' => 'classes/Customer.php',
                 'properties' => array(
                     'id',
-                    'id_shop',
-                    'id_shop_group',
-                    'secure_key',
                     'note',
                     'id_gender',
                     'id_default_group',
@@ -142,28 +158,15 @@ class ShopCapabilities extends ShopCapabilitiesBase
                     'siret',
                     'ape',
                     'outstanding_allow_amount',
-                    'show_public_prices',
-                    'id_risk',
-                    'max_payment_days',
-                    'passwd',
-                    'last_passwd_gen',
-                    'active',
-                    'is_guest',
-                    'deleted',
                     'date_add',
                     'date_upd',
                     'years',
                     'days',
                     'months',
-                    'geoloc_id_country',
-                    'geoloc_id_state',
-                    'geoloc_postcode',
-                    'logged',
-                    'id_guest',
-                    'groupBox',
                 ),
                 'properties-more' => true,
             ),
+            // @todo: complete the class and file name.
             'item' => array(
                 'class' => 'OrderDetail',
                 'file' => 'classes/order/OrderDetail.php',
@@ -174,14 +177,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
                     'product_quantity',
                     'product_quantity_in_stock',
                     'product_quantity_return',
-                    'product_quantity_refunded',
-                    'product_quantity_reinjected',
                     'product_price',
-                    'reduction_percent',
-                    'reduction_amount',
-                    'reduction_amount_tax_incl',
-                    'reduction_amount_tax_excl',
-                    'group_reduction',
                     'product_quantity_discount',
                     'product_ean13',
                     'product_upc',
@@ -190,21 +186,8 @@ class ShopCapabilities extends ShopCapabilitiesBase
                     'product_weight',
                     'tax_name',
                     'tax_rate',
-                    'tax_computation_method',
-                    'id_tax_rules_group',
-                    'ecotax',
-                    'ecotax_tax_rate',
-                    'discount_quantity_applied',
-                    'download_hash',
-                    'download_nb',
-                    'download_deadline',
                     'unit_price_tax_incl',
                     'unit_price_tax_excl',
-                    'total_price_tax_incl',
-                    'total_price_tax_excl',
-                    'total_shipping_price_tax_excl',
-                    'total_shipping_price_tax_incl',
-                    'purchase_supplier_price',
                     'original_product_price',
                     'original_wholesale_price',
                 ),
@@ -219,8 +202,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function getShopDefaults()
     {
         // @todo: fill in the appropriate property names, remove a line when no appropriate default exists.
-        // @todo: ensure that your Creator class calls addPropertySource() to add all objects necessary.
-        // @todo: ensure that all these objects are defined in the method getTokenInfo() above.
+        // @todo: ensure that all these objects are defined in the method getTokenInfoShopProperties() above.
         return array(
             // Customer defaults.
             'contactYourId' => '[id]',
@@ -246,7 +228,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
 
             // Invoice lines defaults.
             // @todo: ensure that your Creator class calls addPropertySource() and removePropertySource per item line to add all objects necessary.
-            // @todo: ensure that all these objects are defined in the method getTokenInfo() above.
+            // @todo: ensure that all these objects are defined in the method getTokenInfoShopProperties() above.
             'itemNumber' => '[product_reference|product_supplier_reference|product_ean13|product_upc]',
             'productName' => '[product_name]',
             'nature' => '',

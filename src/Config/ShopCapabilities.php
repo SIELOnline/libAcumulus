@@ -127,28 +127,78 @@ abstract class ShopCapabilities
      */
     public function getTokenInfo()
     {
-        return array(
+        $result = array(
             'invoiceSource' => array(
+                'more-info' => ucfirst($this->t('invoice_source')),
                 'class' => '\Siel\Acumulus\Invoice\Source',
                 'properties' => array(
                     'type (' . $this->t(Source::Order) . ' ' . $this->t('or') . ' ' . $this->t(Source::CreditNote) . ')',
                     'id (' . $this->t('internal_id') . ')',
                     'reference (' . $this->t('external_id') . ')',
-                    'getInvoiceReference (' . $this->t('external_id') . ')',
-                    'getInvoiceDate',
+                    'date',
                     'status (' . $this->t('internal_not_label') . ')',
+                    'paymentMethod (' . $this->t('internal_not_label') . ')',
+                    'paymentState (1: ' . $this->t('payment_status_1') . '; 2: ' . $this->t('payment_status_2') . ')',
+                    'paymentDate',
+                    'countryCode',
+                    'currency',
+                    'invoiceReference (' . $this->t('external_id') . ')',
+                    'invoiceDate',
                 ),
                 'properties-more' => false,
             ),
-            'originalInvoiceSource' => array(
-                'more-info' => ucfirst($this->t('refund_only')) . '!',
-                'properties' => array(
-                    $this->t('see_above'),
-                ),
-                'properties-more' => false,
-            ),
+            'source' => array_merge(array('more-info' => ucfirst($this->t('order_or_refund'))), $this->getTokenInfoSource()),
         );
+        if (in_array(Source::CreditNote, $this->getSupportedInvoiceSourceTypes())) {
+            $result += array(
+                'refund' => array_merge(array('more-info' => ucfirst($this->t('refund_only'))), $this->getTokenInfoRefund()),
+                'order' => array_merge(array('more-info' => ucfirst($this->t('original_order_for_refund'))), $this->getTokenInfoOrder()),
+            );
+        }
+
+        return $result;
     }
+
+    /**
+     * Returns shop specific token info for the 'source' property.
+     *
+     * @return array
+     *   An array with shop specific token info for the 'source' property.
+     */
+    abstract protected function getTokenInfoSource();
+
+    /**
+     * Returns shop specific token info for the 'refund' property.
+     *
+     * Override if your shop supports refunds.
+     *
+     * @return array
+     *   An array with shop specific token info for the 'refund' property.
+     */
+    protected function getTokenInfoRefund()
+    {
+        return array();
+    }
+
+    /**
+     * Returns shop specific token info for the 'order' property.
+     *
+     * Override if your shop supports refunds.
+     *
+     * @return array
+     *   An array with shop specific token info for the 'order' property.
+     */
+    protected function getTokenInfoOrder() {
+        return array();
+    }
+
+    /**
+     * Returns token info for shop specific properties.
+     *
+     * @return array
+     *   An array with token info for shop specific properties.
+     */
+    abstract protected function getTokenInfoShopProperties();
 
     /**
      * Returns an option list of all shop order statuses.

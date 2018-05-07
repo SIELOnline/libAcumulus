@@ -97,6 +97,16 @@
  * This should conclude the development of an Acumulus extension for your
  * webshop based on this library. Any questions, support and suggestions
  * can be directed at support at burorader dot com.
+ *
+ * A final note
+ * ------------
+ * If you are proficient with developing modules for the webshop you want to
+ * implement the Acumulus module for, you may implement the forms fully in the
+ * webshop specific part and use this library only for creating and sending
+ * invoices to Acumulus. In this case you may skip all above steps regarding the
+ * FormMapper, FormRenderer and overriding Forms. The step regarding
+ * ShopCapabilities::getTokenInfo() is normally still needed in your own
+ * advanced config form
  */
 namespace Siel\Acumulus\MyWebShop;
 

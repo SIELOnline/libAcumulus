@@ -402,7 +402,7 @@ class Container
     public function getCreator()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('Creator', 'Invoice', array($this->getToken(), $this->getCountries(), $this, $this->getConfig(), $this->getTranslator(), $this->getLog()));
+        return $this->getInstance('Creator', 'Invoice', array($this->getToken(), $this->getCountries(), $this->getShopCapabilities(), $this, $this->getConfig(), $this->getTranslator(), $this->getLog()));
     }
 
     /**

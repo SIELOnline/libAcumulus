@@ -26,6 +26,7 @@ Important note:
   5.4.1 version.
 
 Changes:
+- ALL: Looked up vat rates were not copied from parent to children.
 - ALL: Config form now also displays the exception message when an exception
   was raised.
 - WC: update_option() also returns false when there are no changes. We want to
@@ -43,6 +44,9 @@ Changes:
   - Meta tags renamed to make them more consistent.
   - Form::addWarningMessage() renamed to Form::addWarningMessages().
   - Form::addErrorMessage() renamed to Form::addErrorMessages().
+  - Property source 'originalInvoiceSource' renamed to order.
+  - Property source 'refund' added.
+  - Refactored ShopCapabilities::getTokenInfo().
 - ALL: Continued adding extensive overview documentation aimed at developers
   that want to create a new extension on their own based on this library.
 - ALL: As part of the developers documentation: added a MyWebShop namespace

@@ -96,7 +96,7 @@ class CompletorInvoiceLines
      * This means that the lines have to be walked recursively.
      *
      * The actions that can be done this way are those who operate on a line in
-     * isolation and thus do not need totals, maxs or things like that.
+     * isolation and thus do not need totals, maximums or things like that.
      *
      * @param array[] $invoice
      *   The invoice with the lines to complete recursively.
@@ -115,6 +115,10 @@ class CompletorInvoiceLines
         // meta-vatrate-max and may lead to more (required) data filled in, so
         // should be called before completeLineRequiredData().
         $lines = $this->correctCalculatedVatRates($lines);
+        // addVatRateToLookupLines() only uses meta-vat-rate-lookup and may lead
+        // to more (required) data filled in, so should be called before
+        // completeLineRequiredData().
+        $lines = $this->addVatRateToLookupLines($lines);
         $lines = $this->completeLineRequiredData($lines);
         // Completing the required data may lead to new lines that contain
         // calculated VAT rates and thus can be corrected with
@@ -136,7 +140,6 @@ class CompletorInvoiceLines
      */
     protected function completeInvoiceLines(array $lines)
     {
-        $lines = $this->addVatRateToLookupLines($lines);
         $lines = $this->addVatRateTo0PriceLines($lines);
         $lines = $this->recalculateLineData($lines);
         $lines = $this->completeLineMetaData($lines);
@@ -173,104 +176,6 @@ class CompletorInvoiceLines
             // Recursively convert any amount.
             if (!empty($line[Meta::ChildrenLines])) {
                 $line[Meta::ChildrenLines] = $this->convertToEuro($line[Meta::ChildrenLines], $conversionRate);
-            }
-        }
-        return $lines;
-    }
-
-    /**
-     * Completes fields that are required by the rest of this completor phase.
-     *
-     * The creator filled in the fields that are directly available from the
-     * shops' data store. This method completes (if not filled in):
-     * - unitprice.
-     * - vatamount
-     * - unitpriceinc
-     *
-     * @param array[] $lines
-     *   The invoice lines to complete with required data.
-     *
-     * @param array|null $parent
-     *
-     * @return array[] The completed invoice lines.
-     * The completed invoice lines.
-     */
-    protected function completeLineRequiredData(array $lines, array $parent = null)
-    {
-        foreach ($lines as &$line) {
-            // Easy gain first. Known usages: Magento.
-            if (!isset($line[Meta::VatAmount]) && isset($line[Meta::LineVatAmount])) {
-                $line[Meta::VatAmount] = $line[Meta::LineVatAmount] / $line[Tag::Quantity];
-                $line[Meta::FieldsCalculated][] = Meta::VatAmount;
-            }
-
-            if (!isset($line[Tag::UnitPrice])) {
-                // With margin scheme, the unitprice should be known but may
-                // have ended up in the unitpriceinc.
-                if (isset($line[Tag::CostPrice])) {
-                    if (isset($line[Meta::UnitPriceInc])) {
-                        $line[Tag::UnitPrice] = $line[Meta::UnitPriceInc];
-                    }
-                } elseif (isset($line[Meta::UnitPriceInc])) {
-                    if (Number::isZero($line[Meta::UnitPriceInc])) {
-                        // Free products are free with and without VAT.
-                        $line[Tag::UnitPrice] = 0;
-                    } elseif (isset($line[Tag::VatRate]) && Completor::isCorrectVatRate($line[Meta::VatRateSource])) {
-                         $line[Tag::UnitPrice] = $line[Meta::UnitPriceInc] / (100.0 + $line[Tag::VatRate]) * 100.0;
-                    } elseif (isset($line[Meta::VatAmount])) {
-                        $line[Tag::UnitPrice] = $line[Meta::UnitPriceInc] - $line[Meta::VatAmount];
-                    } //else {
-                        // We cannot fill in unitprice reliably, so better to
-                        // leave it empty and fail clearly.
-                    //}
-                    $line[Meta::FieldsCalculated][] = Tag::UnitPrice;
-                }
-            }
-
-            if (!isset($line[Meta::UnitPriceInc])) {
-                // With margin scheme, the unitpriceinc equals unitprice.
-                if (isset($line[Tag::CostPrice])) {
-                    if (isset($line[Tag::UnitPrice])) {
-                        $line[Meta::UnitPriceInc] = $line[Tag::UnitPrice];
-                    }
-                } elseif (isset($line[Tag::UnitPrice])) {
-                    if (Number::isZero($line[Tag::UnitPrice])) {
-                        // Free products are free with and without VAT.
-                        $line[Meta::UnitPriceInc] = 0;
-                    } elseif (isset($line[Tag::VatRate]) && Completor::isCorrectVatRate($line[Meta::VatRateSource])) {
-                         $line[Meta::UnitPriceInc] = $line[Tag::UnitPrice] * (100.0 + $line[Tag::VatRate]) / 100.0;
-                    } elseif (isset($line[Meta::VatAmount])) {
-                        $line[Meta::UnitPriceInc] = $line[Tag::UnitPrice] + $line[Meta::VatAmount];
-                    } //else {
-                        // We cannot fill in unitpriceinc reliably, so we leave
-                        // it empty as it is metadata after all.
-                    // }
-                    $line[Meta::FieldsCalculated][] = Meta::UnitPriceInc;
-                }
-            }
-
-            if (!isset($line[Tag::VatRate])) {
-                if ($line[Meta::VatRateSource] === Creator::VatRateSource_Parent && $parent !== null && Completor::isCorrectVatRate($parent[Meta::VatRateSource])) {
-                    $line[Tag::VatRate] = $parent[Tag::VatRate];
-                    $line[Meta::VatRateSource] = Completor::VatRateSource_Copied_From_Parent;
-                } elseif (isset($line[Meta::VatAmount]) && isset($line[Tag::UnitPrice])) {
-                    // This may use the easy gain, so known usages: Magento.
-                    // Set (overwrite the tag vatrate-source) vatrate and
-                    // accompanying tags.
-                    $precision = 0.01;
-                    // If the amounts are the sum of amounts taken from
-                    // children products, the precision may be lower.
-                    if (!empty($line[Meta::ChildrenLines])) {
-                        $precision *= count($line[Meta::ChildrenLines]);
-                    }
-                    $line = array_merge($line, Creator::getVatRangeTags($line[Meta::VatAmount], $line[Tag::UnitPrice], $precision, $precision));
-                    $line[Meta::FieldsCalculated][] = Tag::VatRate;
-                }
-            }
-
-            // Recursively complete the required data.
-            if (!empty($line[Meta::ChildrenLines])) {
-                $line[Meta::ChildrenLines] = $this->completeLineRequiredData($line[Meta::ChildrenLines], $line);
             }
         }
         return $lines;
@@ -359,6 +264,156 @@ class CompletorInvoiceLines
     }
 
     /**
+     * Completes lines that have meta-vatrate-lookup(-...) data.
+     *
+     * Meta-vatrate-lookup data is added by the Creator class using vat rates
+     * from the products. However as VAT rates may have changed between the date
+     * of the order and now, we cannot fully rely on it and use it only as a
+     * last resort. In the following cases it may be used:
+     * - 0 price: With free products we cannot calculate a vat rate so we have
+     *   to rely on lookup.
+     * - The calculated vat rate range is so wide that it contains multiple
+     *   possible vat rates. If the looked up vat rate is one of them, we use
+     *   it.
+     *
+     * @param array[] $lines
+     *   The invoice lines to correct using lookup data.
+     *
+     * @return array[]
+     *   The corrected invoice lines.
+     */
+    protected function addVatRateToLookupLines(array $lines)
+    {
+        foreach ($lines as &$line) {
+            if ($line[Meta::VatRateSource] === Creator::VatRateSource_Completor) {
+                if (!empty($line[Meta::VatRateLookup]) && $this->isPossibleVatRate($line[Meta::VatRateLookup])) {
+                    // The vat rate looked up on the product is a possible vat
+                    // rate, so apparently that vat rate did not change between
+                    // the date of the order and now: take that one.
+                    $line[Tag::VatRate] = $line[Meta::VatRateLookup];
+                    $line[Meta::VatRateSource] = Completor::VatRateSource_Looked_Up;
+                }
+            } else {
+                // We either do not have lookup data or the looked up vat rate
+                // is not possible. If this is not a 0-price line we may still
+                // have a chance by using the vat range tactics on the line
+                // totals or reverting to the strategy phase if the line may be
+                // split.
+                // For now I am not going to use the line totals as they are
+                // hardly available.
+                if (!empty($line[Meta::StrategySplit])) {
+                    $line[Meta::VatRateSource] = Creator::VatRateSource_Strategy;
+                }
+            }
+
+            // Recursively complete lines using lookup data.
+            if (!empty($line[Meta::ChildrenLines])) {
+                $line[Meta::ChildrenLines] = $this->addVatRateToLookupLines($line[Meta::ChildrenLines]);
+            }
+        }
+        return $lines;
+    }
+
+    /**
+     * Completes fields that are required by the rest of this completor phase.
+     *
+     * The creator filled in the fields that are directly available from the
+     * shops' data store. This method completes (if not filled in):
+     * - unitprice.
+     * - vatamount
+     * - unitpriceinc
+     *
+     * @param array[] $lines
+     *   The invoice lines to complete with required data.
+     * @param array|null $parent
+     *   The parent line for this set of lines or null if this is the set of
+     *   lines at the top level.
+     *
+     * @return array[]
+     *   The completed invoice lines.
+     */
+    protected function completeLineRequiredData(array $lines, array $parent = null)
+    {
+        foreach ($lines as &$line) {
+            // Easy gain first. Known usages: Magento.
+            if (!isset($line[Meta::VatAmount]) && isset($line[Meta::LineVatAmount])) {
+                $line[Meta::VatAmount] = $line[Meta::LineVatAmount] / $line[Tag::Quantity];
+                $line[Meta::FieldsCalculated][] = Meta::VatAmount;
+            }
+
+            if (!isset($line[Tag::UnitPrice])) {
+                // With margin scheme, the unitprice should be known but may
+                // have ended up in the unitpriceinc.
+                if (isset($line[Tag::CostPrice])) {
+                    if (isset($line[Meta::UnitPriceInc])) {
+                        $line[Tag::UnitPrice] = $line[Meta::UnitPriceInc];
+                    }
+                } elseif (isset($line[Meta::UnitPriceInc])) {
+                    if (Number::isZero($line[Meta::UnitPriceInc])) {
+                        // Free products are free with and without VAT.
+                        $line[Tag::UnitPrice] = 0;
+                    } elseif (isset($line[Tag::VatRate]) && Completor::isCorrectVatRate($line[Meta::VatRateSource])) {
+                         $line[Tag::UnitPrice] = $line[Meta::UnitPriceInc] / (100.0 + $line[Tag::VatRate]) * 100.0;
+                    } elseif (isset($line[Meta::VatAmount])) {
+                        $line[Tag::UnitPrice] = $line[Meta::UnitPriceInc] - $line[Meta::VatAmount];
+                    } //else {
+                        // We cannot fill in unitprice reliably, so better to
+                        // leave it empty and fail clearly.
+                    //}
+                    $line[Meta::FieldsCalculated][] = Tag::UnitPrice;
+                }
+            }
+
+            if (!isset($line[Meta::UnitPriceInc])) {
+                // With margin scheme, the unitpriceinc equals unitprice.
+                if (isset($line[Tag::CostPrice])) {
+                    if (isset($line[Tag::UnitPrice])) {
+                        $line[Meta::UnitPriceInc] = $line[Tag::UnitPrice];
+                    }
+                } elseif (isset($line[Tag::UnitPrice])) {
+                    if (Number::isZero($line[Tag::UnitPrice])) {
+                        // Free products are free with and without VAT.
+                        $line[Meta::UnitPriceInc] = 0;
+                    } elseif (isset($line[Tag::VatRate]) && Completor::isCorrectVatRate($line[Meta::VatRateSource])) {
+                         $line[Meta::UnitPriceInc] = $line[Tag::UnitPrice] * (100.0 + $line[Tag::VatRate]) / 100.0;
+                    } elseif (isset($line[Meta::VatAmount])) {
+                        $line[Meta::UnitPriceInc] = $line[Tag::UnitPrice] + $line[Meta::VatAmount];
+                    } //else {
+                        // We cannot fill in unitpriceinc reliably, so we leave
+                        // it empty as it is metadata after all.
+                    // }
+                    $line[Meta::FieldsCalculated][] = Meta::UnitPriceInc;
+                }
+            }
+
+            if (!isset($line[Tag::VatRate])) {
+                if ($line[Meta::VatRateSource] === Creator::VatRateSource_Parent && $parent !== null && Completor::isCorrectVatRate($parent[Meta::VatRateSource])) {
+                    $line[Tag::VatRate] = $parent[Tag::VatRate];
+                    $line[Meta::VatRateSource] = Completor::VatRateSource_Copied_From_Parent;
+                } elseif (isset($line[Meta::VatAmount]) && isset($line[Tag::UnitPrice])) {
+                    // This may use the easy gain, so known usages: Magento.
+                    // Set (overwrite the tag vatrate-source) vatrate and
+                    // accompanying tags.
+                    $precision = 0.01;
+                    // If the amounts are the sum of amounts taken from
+                    // children products, the precision may be lower.
+                    if (!empty($line[Meta::ChildrenLines])) {
+                        $precision *= count($line[Meta::ChildrenLines]);
+                    }
+                    $line = array_merge($line, Creator::getVatRangeTags($line[Meta::VatAmount], $line[Tag::UnitPrice], $precision, $precision));
+                    $line[Meta::FieldsCalculated][] = Tag::VatRate;
+                }
+            }
+
+            // Recursively complete the required data.
+            if (!empty($line[Meta::ChildrenLines])) {
+                $line[Meta::ChildrenLines] = $this->completeLineRequiredData($line[Meta::ChildrenLines], $line);
+            }
+        }
+        return $lines;
+    }
+
+    /**
      * Returns the set of vat rates that fall within the given vat range.
      *
      * @param array $line
@@ -411,59 +466,12 @@ class CompletorInvoiceLines
     }
 
     /**
-     * Completes lines that have meta-vatrate-lookup(-...) data.
-     *
-     * Meta-vatrate-lookup data is added by the Creator class using vat rates
-     * from the products. However as VAT rates may have changed between the date
-     * of the order and now, we cannot fully rely on it and use it only as a
-     * last resort. In the following cases it may be used:
-     * - 0 price: With free products we cannot calculate a vat rate so we have
-     *   to rely on lookup.
-     * - The calculated vat rate range is so wide that it contains multiple
-     *   possible vat rates. If the looked up vat rate is one of them, we use
-     *   it.
-     *
-     * @param array[] $lines
-     *   The invoice lines to correct using lookup data.
-     *
-     * @return array[]
-     *   The corrected invoice lines.
-     */
-    protected function addVatRateToLookupLines(array $lines)
-    {
-        foreach ($lines as &$line) {
-            if ($line[Meta::VatRateSource] === Creator::VatRateSource_Completor) {
-                if (!empty($line[Meta::VatRateLookup]) && $this->isPossibleVatRate($line[Meta::VatRateLookup])) {
-                    // The vat rate looked up on the product is a possible vat
-                    // rate, so apparently that vat rate did not change between
-                    // the date of the order and now: take that one.
-                    $line[Tag::VatRate] = $line[Meta::VatRateLookup];
-                    $line[Meta::VatRateSource] = Completor::VatRateSource_Looked_Up;
-                }
-            } else {
-                // We either do not have lookup data or the looked up vat rate
-                // is not possible. If this is not a 0-price line we may still
-                // have a chance by using the vat range tactics on the line
-                // totals or reverting to the strategy phase if the line may be
-                // split.
-                // For now I am not going to use the line totals as they are
-                // hardly available.
-                if (!empty($line[Meta::StrategySplit])) {
-                    $line[Meta::VatRateSource] = Creator::VatRateSource_Strategy;
-                }
-
-            }
-        }
-        return $lines;
-    }
-
-    /**
      * Completes lines with free items (price = 0) by giving them the maximum
      * tax rate that appears in the other lines.
      *
      * These lines already have gone through the addVatRateToLookupLines()
      * method, but either no lookup vat data is available or the looked up vat
-     * rate s not a possible vat rate.
+     * rate is not a possible vat rate.
      *
      * @param array[] $lines
      *   The invoice lines to correct by adding a vat rate to 0 amounts.

@@ -3,6 +3,7 @@ namespace Siel\Acumulus\Invoice;
 
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Config\ShopCapabilities;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Countries;
 use Siel\Acumulus\Helpers\Log;
@@ -100,6 +101,9 @@ abstract class Creator
     /** @var \Siel\Acumulus\Config\Config */
     protected $config;
 
+    /** @var \Siel\Acumulus\Config\ShopCapabilities */
+    protected $shopCapabilities;
+
     /** @var \Siel\Acumulus\Helpers\Token */
     protected $token;
 
@@ -133,16 +137,18 @@ abstract class Creator
      *
      * @param \Siel\Acumulus\Helpers\Token $token
      * @param \Siel\Acumulus\Helpers\Countries $countries
+     * @param \Siel\Acumulus\Config\ShopCapabilities $shopCapabilities
      * @param \Siel\Acumulus\Helpers\Container $container
      * @param \Siel\Acumulus\Config\Config $config
      * @param \Siel\Acumulus\Helpers\Translator $translator
      * @param \Siel\Acumulus\Helpers\Log $log
      */
-    public function __construct(Token $token, Countries $countries, Container $container, Config $config, Translator $translator, Log $log)
+    public function __construct(Token $token, Countries $countries, ShopCapabilities $shopCapabilities, Container $container, Config $config, Translator $translator, Log $log)
     {
         $this->token = $token;
         $this->countries = $countries;
         $this->container = $container;
+        $this->shopCapabilities = $shopCapabilities;
         $this->config = $config;
         $this->log = $log;
         $this->translator = $translator;
@@ -187,9 +193,11 @@ abstract class Creator
             'invoiceSource' => $this->invoiceSource,
             'source' => $this->invoiceSource->getSource(),
         );
-        if ($this->invoiceSource->getType() === Source::CreditNote) {
-            // @todo: rename to 'order' in major/minor.
-            $this->propertySources['originalInvoiceSource'] = $this->invoiceSource->getOrder();
+        if (in_array(Source::CreditNote, $this->shopCapabilities->getSupportedInvoiceSourceTypes())) {
+            if ($this->invoiceSource->getType() === Source::CreditNote) {
+                $this->propertySources['refund'] = $this->invoiceSource->getSource();
+            }
+            $this->propertySources['order'] = $this->invoiceSource->getOrder();
         }
     }
 

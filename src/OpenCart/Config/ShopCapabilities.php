@@ -28,7 +28,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getTokenInfo()
+    protected function getTokenInfoSource()
     {
         $catalogOrder = array(
             'order_id',
@@ -171,12 +171,21 @@ class ShopCapabilities extends ShopCapabilitiesBase
             'date_added',
             'date_modified',
         );
-        return parent::getTokenInfo() + array(
-            'source' => array(
-                'file' => 'catalog/model/checkout/order.php',
-                'properties' => array_intersect($catalogOrder, $adminOrder),
-                'properties-more' => true,
-            ),
+        $source = array_intersect($catalogOrder, $adminOrder);
+
+        return array(
+            'file' => 'catalog/model/checkout/order.php',
+            'properties' => $source,
+            'properties-more' => true,
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getTokenInfoShopProperties()
+    {
+        return array_merge(parent::getTokenInfo(), array(
             'item' => array(
                 'table' => 'order_product',
                 'properties' => array(
@@ -231,7 +240,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
                     'description',
                 ),
             ),
-        );
+        ));
     }
 
     /**

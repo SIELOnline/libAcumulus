@@ -1103,4 +1103,30 @@ class Config
 
         return $result;
     }
+
+    /**
+     * 5.4.1 upgrade.
+     *
+     * - property source originalInvoiceSource renamed to order.
+     *
+     * @return bool
+     */
+    protected function upgrade541()
+    {
+        $result = true;
+        $doSave = false;
+        $configStore = $this->getConfigStore();
+        $values = $configStore->load();
+        foreach ($values as $key => &$value) {
+            if (strpos($value, 'originalInvoiceSource::') !== false) {
+                str_replace('originalInvoiceSource::', 'order::', $value);
+                $doSave = true;
+            }
+        }
+        if ($doSave) {
+            $result = $this->save($values);
+        }
+
+        return $result;
+    }
 }

@@ -12,16 +12,6 @@ class AdvancedConfigForm extends BaseAdvancedConfigForm
     /**
      * {@inheritdoc}
      *
-     * @todo: adapt to the way you can find out in MyWebshop if a form was submitted. Remove if there's no way other than to check for $_SERVER['REQUEST_METHOD']
-     */
-    public function isSubmitted()
-    {
-        return Tools::isSubmit('submitAdd');
-    }
-
-    /**
-     * {@inheritdoc}
-     *
      * This override ensures that array values are passed with the correct key
      * to the PS form renderer.
      */

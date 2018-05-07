@@ -46,6 +46,8 @@ Changes:
   - Meta tags renamed to make them more consistent.
   - Form::addWarningMessage() renamed to Form::addWarningMessages().
   - Form::addErrorMessage() renamed to Form::addErrorMessages().
+  - Form::isSubmitted() moved to a separate FormHelper class.
+  - Form::systemValidate() removed, should be done in the webshop specific part.
   - Property source 'originalInvoiceSource' renamed to order.
   - Property source 'refund' added.
   - Refactored ShopCapabilities::getTokenInfo().

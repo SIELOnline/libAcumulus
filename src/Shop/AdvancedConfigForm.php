@@ -8,8 +8,6 @@ use Siel\Acumulus\PluginConfig;
  * Provides advanced config form handling.
  *
  * Shop specific may optionally (have to) override:
- * - systemValidate()
- * - isSubmitted()
  * - setSubmittedValues()
  */
 class AdvancedConfigForm extends BaseConfigForm

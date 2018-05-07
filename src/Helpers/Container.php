@@ -280,6 +280,15 @@ class Container
     }
 
     /**
+     * @return \Siel\Acumulus\Helpers\FormHelper
+     */
+    public function getFormHelper()
+    {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return $this->getInstance('FormHelper', 'Helpers');
+    }
+
+    /**
      * @return \Siel\Acumulus\Helpers\FormRenderer
      */
     public function getFormRenderer()
@@ -506,6 +515,7 @@ class Container
                 throw new \InvalidArgumentException("Unknown form type $type");
         }
         $arguments = array_merge($arguments, array(
+            $this->getFormHelper(),
             $this->getShopCapabilities(),
             $this->getConfig(),
             $this->getTranslator(),

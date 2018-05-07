@@ -32,6 +32,9 @@
  *   it processed. Example code is not in this library but in the Webshop
  *   specific module parts for existing modules, these can all be found on
  *   github on https://github.com/SIELOnline.
+ * - If your webshop provides something like a form token to protect against
+ *   CSRF attacks, handle it in the webshop specific part. Handling consists of
+ *   rendering it in your views and checking it in your controllers.
  * - Add install/enable code that creates the acumulus entry table. If your
  *   webshop expects separate (sql) scripts for this, add it over there, if not,
  *   have the module's install method/function initialize the Container, get the
@@ -74,7 +77,7 @@
  *   ShopCapabilities::getTokenInfo(), so correct that method now as well.
  *
  * This should give you a working batch form allowing you to extensively test
- * your Creator class tos ee if it handles all situations correctly. Test
+ * your Creator class to see if it handles all situations correctly. Test
  * situations like:
  * - Orders and refunds.
  * - Shipping costs and other fees, including free shipping.

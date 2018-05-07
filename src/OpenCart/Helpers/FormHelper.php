@@ -1,14 +1,12 @@
 <?php
-namespace Siel\Acumulus\OpenCart\Shop;
+namespace Siel\Acumulus\OpenCart\Helpers;
 
-use Siel\Acumulus\OpenCart\Helpers\Registry;
-use Siel\Acumulus\Shop\ConfigForm as BaseConfigForm;
+use Siel\Acumulus\Helpers\FormHelper as BaseFormHelper;
 
 /**
- * Class ConfigForm processes and builds the settings form page for the
- * OpenCart Acumulus module.
+ * OpenCart override of the FormHelper.
  */
-class ConfigForm extends BaseConfigForm
+class FormHelper extends BaseFormHelper
 {
     /**
      * {@inheritdoc}

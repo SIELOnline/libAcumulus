@@ -9,8 +9,6 @@ use Siel\Acumulus\Tag;
  * Provides basic config form handling.
  *
  * Shop specific may optionally (have to) override:
- * - systemValidate()
- * - isSubmitted()
  * - setSubmittedValues()
  */
 class ConfigForm extends BaseConfigForm

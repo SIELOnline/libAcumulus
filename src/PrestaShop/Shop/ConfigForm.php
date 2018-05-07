@@ -1,12 +1,7 @@
 <?php
 namespace Siel\Acumulus\PrestaShop\Shop;
 
-use Siel\Acumulus\Config\Config;
-use Siel\Acumulus\Config\ShopCapabilities;
-use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Shop\ConfigForm as BaseConfigForm;
-use Siel\Acumulus\Web\Service;
-use Tools;
 
 /**
  * Class ConfigForm processes and builds the settings form page for the
@@ -14,19 +9,6 @@ use Tools;
  */
 class ConfigForm extends BaseConfigForm
 {
-    /** @var string */
-    protected $moduleName = 'acumulus';
-
-    /**
-     * {@inheritdoc}
-     *
-     * This override uses the PS way of checking if a form is submitted.
-     */
-    public function isSubmitted()
-    {
-        return Tools::isSubmit('submit' . $this->moduleName);
-    }
-
     /**
      * {@inheritdoc}
      *

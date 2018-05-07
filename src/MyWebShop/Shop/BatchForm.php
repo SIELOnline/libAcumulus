@@ -8,11 +8,6 @@ use Siel\Acumulus\Shop\BatchForm as BaseBatchForm;
  */
 class BatchForm extends BaseBatchForm
 {
-    public function isSubmitted()
-    {
-        return Tools::isSubmit('submitAdd');
-    }
-
     /**
      * {@inheritdoc}
      */

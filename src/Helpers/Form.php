@@ -65,6 +65,9 @@ abstract class Form
     /** @var \Siel\Acumulus\Helpers\Translator */
     protected $translator;
 
+    /** @var \Siel\Acumulus\Helpers\FormHelper */
+    protected $formHelper;
+
     /** @var \Siel\Acumulus\Config\ShopCapabilities */
     protected $shopCapabilities;
 
@@ -111,11 +114,12 @@ abstract class Form
     protected $errorMessages;
 
     /**
+     * @param \Siel\Acumulus\Helpers\FormHelper $formHelper
      * @param \Siel\Acumulus\Config\ShopCapabilities $shopCapabilities
      * @param \Siel\Acumulus\Config\Config $config
      * @param \Siel\Acumulus\Helpers\Translator $translator
      */
-    public function __construct(ShopCapabilities $shopCapabilities, Config $config, Translator $translator)
+    public function __construct(FormHelper $formHelper, ShopCapabilities $shopCapabilities, Config $config, Translator $translator)
     {
         $this->successMessages = array();
         $this->warningMessages = array();
@@ -123,6 +127,7 @@ abstract class Form
         $this->formValuesSet = false;
         $this->submittedValues = array();
 
+        $this->formHelper = $formHelper;
         $this->shopCapabilities = $shopCapabilities;
         $this->translator = $translator;
         $this->acumulusConfig = $config;
@@ -270,7 +275,7 @@ abstract class Form
      */
     public function isSubmitted()
     {
-        return $_SERVER['REQUEST_METHOD'] === 'POST';
+        return $this->formHelper->isSubmitted();
     }
 
     /**
@@ -479,7 +484,7 @@ abstract class Form
         $this->submittedValues = array();
 
         // Process the form if it was submitted.
-        if ($this->isSubmitted() && $this->systemValidate()) {
+        if ($this->isSubmitted()) {
             $this->setSubmittedValues();
             $this->validate();
             if ($executeIfValid && $this->isValid()) {
@@ -500,17 +505,6 @@ abstract class Form
         }
 
         return $this->isValid();
-    }
-
-    /**
-     * Checks system specific form properties.
-     *
-     * This typically includes protection against CSRF attacks and such.
-     * Override this per form with the proper checks from the system.
-     */
-    protected function systemValidate()
-    {
-        return true;
     }
 
     /**

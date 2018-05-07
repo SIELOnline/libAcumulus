@@ -6,6 +6,7 @@ use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\ShopCapabilities;
 use Siel\Acumulus\Helpers\Form;
+use Siel\Acumulus\Helpers\FormHelper;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Invoice\Translations as InvoiceTranslations;
 use Siel\Acumulus\PluginConfig;
@@ -18,10 +19,6 @@ use Siel\Acumulus\PluginConfig;
  * Should typically override:
  * - none
  * And may optionally (have to) override:
- * - systemValidate()
- * - getDateFormat
- * - getShopDateFormat()
- * - isSubmitted()
  * - setSubmittedValues()
  */
 class BatchForm extends Form
@@ -34,13 +31,14 @@ class BatchForm extends Form
 
     /**
      * @param \Siel\Acumulus\Shop\InvoiceManager $invoiceManager
+     * @param \Siel\Acumulus\Helpers\FormHelper $formHelper
      * @param \Siel\Acumulus\Config\ShopCapabilities $shopCapabilities
      * @param \Siel\Acumulus\Config\Config $config
      * @param \Siel\Acumulus\Helpers\Translator $translator
      */
-    public function __construct(InvoiceManager $invoiceManager, ShopCapabilities $shopCapabilities, Config $config, Translator $translator)
+    public function __construct(InvoiceManager $invoiceManager, FormHelper $formHelper, ShopCapabilities $shopCapabilities, Config $config, Translator $translator)
     {
-        parent::__construct($shopCapabilities, $config, $translator);
+        parent::__construct($formHelper, $shopCapabilities, $config, $translator);
 
         $translations = new InvoiceTranslations();
         $this->translator->add($translations);

@@ -2,18 +2,12 @@
 namespace Siel\Acumulus\PrestaShop\Shop;
 
 use Siel\Acumulus\Shop\BatchForm as BaseBatchForm;
-use Tools;
 
 /**
  * Provides the Batch send form handling for the VirtueMart Acumulus module.
  */
 class BatchForm extends BaseBatchForm
 {
-    public function isSubmitted()
-    {
-        return Tools::isSubmit('submitAdd');
-    }
-
     /**
      * {@inheritdoc}
      */

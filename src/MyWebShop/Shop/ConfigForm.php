@@ -14,19 +14,6 @@ use Tools;
  */
 class ConfigForm extends BaseConfigForm
 {
-    /** @var string */
-    protected $moduleName = 'acumulus';
-
-    /**
-     * {@inheritdoc}
-     *
-     * This override uses the PS way of checking if a form is submitted.
-     */
-    public function isSubmitted()
-    {
-        return Tools::isSubmit('submit' . $this->moduleName);
-    }
-
     /**
      * {@inheritdoc}
      *

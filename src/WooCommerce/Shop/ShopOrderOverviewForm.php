@@ -6,6 +6,7 @@ use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\ShopCapabilities;
 use Siel\Acumulus\Helpers\Form;
+use Siel\Acumulus\Helpers\FormHelper;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Invoice\Source;
@@ -46,13 +47,14 @@ class ShopOrderOverviewForm extends Form
     /**
      * @param \Siel\Acumulus\WooCommerce\Shop\AcumulusEntryManager $acumulusEntryManager
      * @param \Siel\Acumulus\Web\Service $service
+     * @param \Siel\Acumulus\Helpers\FormHelper $formHelper
      * @param \Siel\Acumulus\Config\ShopCapabilities $shopCapabilities
      * @param \Siel\Acumulus\Config\Config $config
      * @param \Siel\Acumulus\Helpers\Translator $translator
      */
-    public function __construct(AcumulusEntryManager $acumulusEntryManager, Service $service, ShopCapabilities $shopCapabilities, Config $config, Translator $translator)
+    public function __construct(AcumulusEntryManager $acumulusEntryManager, Service $service, FormHelper $formHelper, ShopCapabilities $shopCapabilities, Config $config, Translator $translator)
     {
-        parent::__construct($shopCapabilities, $config, $translator);
+        parent::__construct($formHelper, $shopCapabilities, $config, $translator);
 
         $translations = new InvoiceTranslations();
         $this->translator->add($translations);

@@ -345,6 +345,9 @@ class OcHelper
         // Process the form if it was submitted and render it again.
         $form = $this->container->getForm($task);
         $form->process();
+        // Force the creation of the fields to get connection error messages
+        // shown.
+        $form->getFields();
 
         // Show messages.
         foreach ($form->getSuccessMessages() as $message) {

@@ -158,7 +158,9 @@ class Source extends BaseSource
         // No order_tax_info => no tax (?) => vatamount = 0.
         if (!empty($this->source->order_tax_info)) {
             foreach ($this->source->order_tax_info as $taxInfo) {
-                $vatAmount += $taxInfo->tax_amount;
+                if (!empty($taxInfo->tax_amount)) {
+                    $vatAmount += $taxInfo->tax_amount;
+                }
             }
         }
         return array(

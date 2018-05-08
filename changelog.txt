@@ -967,6 +967,7 @@ Ondersteunde versies van de verschillende pakketten
 
 HikaShop
 --------
+* 3.4.0 (Joomla 3.8.7)
 * 3.3.0 (Joomla 3.8.5)
 * 3.2.2 (Joomla 3.8.3)
 * 3.2.1 (Joomla 3.8.1)
@@ -1026,6 +1027,7 @@ PrestaShop
 
 VirtueMart
 ----------
+* 3.2.14 (Joomla 3.8.7)
 * 3.2.12 (Joomla 3.8.5)
 * 3.2.12 (Joomla 3.8.3)
 * 3.2.4 (Joomla 3.8.1)

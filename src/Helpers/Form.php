@@ -304,7 +304,7 @@ abstract class Form
             foreach ($defaultFormValues as $key => $defaultFormValue) {
                 // We start with a simple addition or overwrite.
                 $this->formValues[$key] = $defaultFormValue;
-                // distribute keyed arrays over separate values if existing.
+                // Distribute keyed arrays over separate values if existing.
                 if (is_array($defaultFormValue)) {
                     foreach ($defaultFormValue as $valueKey => $valueValue) {
                         $fullKey = "{$key}[{$valueKey}]";
@@ -319,6 +319,29 @@ abstract class Form
                 $this->formValues = array_merge($this->formValues, $this->submittedValues);
             }
             $this->formValues = array_merge($this->formValues, $this->getFieldValues($this->getFields()));
+            // Handle checkboxes
+            // 1 Prepend (checked) checkboxes with their collection name.
+            //   Known usages: PrestaShop.
+            // 2 Place (checked) checkboxes in their collection.
+            //   Known usages: Magento.
+            // As not all webshops handle checkboxes in this way, we do not
+            // unset the original keys (as we do in the reverse functionality in
+            // getPostedValues().
+            foreach ($this->getCheckboxKeys() as $checkboxName => $collectionName) {
+                // 1.
+                if (isset($this->formValues[$checkboxName])) {
+                    $this->formValues["{$collectionName}_{$checkboxName}"] = $this->formValues[$checkboxName];
+                }
+                // 2.
+                if (!empty($this->formValues[$checkboxName])) {
+                    // Check for empty() as the collection name value will have
+                    // been initialized with an empty string.
+                    if (empty($this->formValues[$collectionName])) {
+                        $this->formValues[$collectionName] = array();
+                    }
+                    $this->formValues[$collectionName][] = $checkboxName;
+                }
+            }
 
             $this->formValuesSet = true;
         }
@@ -328,11 +351,11 @@ abstract class Form
      * Returns the values for all the fields on the form definition.
      *
      * This method will not have a use on every web shop, but, e.g. Magento and
-     * PrestaShop have a separate "bind" method to bind a set of values to a form
-     * at once.
+     * PrestaShop have a separate "bind" method to bind a set of values to a
+     * form at once.
      *
      * @return array
-     *  An array of values keyed by the form field names.
+     *   An array of values keyed by the form field names.
      */
     public function getFormValues()
     {
@@ -622,18 +645,14 @@ abstract class Form
      * @param array $target
      * @param string $key
      * @param array $source
-     * @param string $sourceKey
      *
      * @return bool
-     *   True if the value isset and thus has been copied, false otherwise,
+     *   True if the value is set and has been copied, false otherwise.
      */
-    protected function addIfIsset(array &$target, $key, array $source, $sourceKey = '')
+    protected function addIfIsset(array &$target, $key, array $source)
     {
-        if (empty($sourceKey)) {
-            $sourceKey = $key;
-        }
-        if (isset($source[$sourceKey])) {
-            $target[$key] = $source[$sourceKey];
+        if (isset($source[$key])) {
+            $target[$key] = $source[$key];
             return true;
         }
         return false;
@@ -704,30 +723,6 @@ abstract class Form
      */
     protected function getPostedValues()
     {
-        $result = $_POST;
-
-        // Handle checkboxes.
-        $checkboxKeys = $this->getCheckboxKeys();
-        foreach ($checkboxKeys as $checkboxName => $collectionName) {
-            if (isset($result[$collectionName]) && is_array($result[$collectionName])) {
-                // Checkboxes are handled as an array of checkboxes.
-                // Extract the checked values.
-                $checkedValues = array_combine(array_values($result[$collectionName]), array_fill(0, count($result[$collectionName]), 1));
-                // Replace the array value with the checked values, unset first
-                // as the keys for the collection and (1 of the) checkboxes may
-                // be the same.
-                unset($result[$collectionName]);
-                $result += $checkedValues;
-            } elseif (isset($result["{$collectionName}_{$checkboxName}"])) {
-                // Checkbox keys are prepended with their collection name.
-                // Add value for key without collection name.
-                $result[$checkboxName] = $result["{$collectionName}_{$checkboxName}"];
-                // And unset for key with collection name.
-                unset($result["{$collectionName}_{$checkboxName}"]);
-            }
-        }
-
-        return $result;
+        return $this->formHelper->getPostedValues($this->getCheckboxKeys());
     }
-
 }

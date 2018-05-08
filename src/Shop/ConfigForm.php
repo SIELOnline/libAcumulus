@@ -149,14 +149,18 @@ class ConfigForm extends BaseConfigForm
             'versionInformationHeader' => array(
                 'type' => 'fieldset',
                 'legend' => $this->t('versionInformationHeader'),
-                'fields' => $this->getVersionInformation(),
-            ),
-            'advancedConfigHeader' => array(
-                'type' => 'fieldset',
-                'legend' => $this->t('advanced_form_header'),
-                'fields' => $this->getAdvancedConfigLinkFields(),
+                'fields' => $this->getVersionInformation($accountOk),
             ),
         );
+        if ($accountOk) {
+            $fields += array(
+                'advancedConfigHeader' => array(
+                    'type' => 'fieldset',
+                    'legend' => $this->t('advanced_form_header'),
+                    'fields' => $this->getAdvancedConfigLinkFields(),
+                ),
+            );
+        }
 
         return $fields;
     }

@@ -76,18 +76,6 @@ class ShopOrderOverviewForm extends Form
     }
 
     /**
-     * @inheritDoc
-     */
-    protected function getPostedValues()
-    {
-        $result = parent::getPostedValues();
-        // WordPress calls wp_magic_quotes() on every request to add magic
-        // quotes to form input: we undo this here.
-        $result = stripslashes_deep($result);
-        return $result;
-    }
-
-    /**
      * Executes the form action on valid form submission.
      *
      * Override to implement the actual form handling, like saving values.
@@ -211,15 +199,13 @@ class ShopOrderOverviewForm extends Form
         if ($localEntryInfo === null) {
             $status = static::Status_NotSent;
             $statusIndicator = 'info';
-        }
-        else {
+        } else {
             $arg1 = $this->getDate($localEntryInfo->getUpdated());
             if ($localEntryInfo->getEntryId() === null) {
                 $status = static::Status_SentConcept;
                 $description = 'concept_description';
                 $statusIndicator = 'warning';
-            }
-            else {
+            } else {
                 $result = $this->service->getEntry($localEntryInfo->getEntryId());
                 $entry = $this->sanitizeEntry($result->getResponse());
                 if ($result->hasCodeTag('XGYBSN000')) {

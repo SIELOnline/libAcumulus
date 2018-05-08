@@ -136,8 +136,8 @@ class Config
             unset($values[Tag::Password]);
         }
 
-        // With updates or as we have 2 setting screens, not all settings will
-        // be passed in: complete with other settings.
+        // As we have 2 setting screens, but also with updates, not all settings
+        // will be passed in: complete with other settings.
         $this->load();
         $values = array_merge($this->values, $values);
         $values = $this->castValues($values);

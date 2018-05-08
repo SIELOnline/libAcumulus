@@ -225,7 +225,7 @@ class BatchForm extends Form
                         'send_test_mode' => $this->t('option_send_test_mode'),
                     ),
                 ),
-                'dry_run' => array(
+                'dry_run_cb' => array(
                     'type' => 'checkbox',
                     'label' => $this->t('field_dry_run'),
                     'description' => $this->t('desc_dry_run'),

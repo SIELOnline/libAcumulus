@@ -58,8 +58,7 @@ abstract class BaseConfigForm extends Form
     {
         $postedValues = $this->getPostedValues();
         // Check if the full form was displayed or only the account details.
-        // @todo: salutation is ConfigForm specific, not BaseConfigForm???
-        $fullForm = array_key_exists('salutation', $postedValues);
+        $fullForm = !empty($postedValues['accountOk']) && $postedValues['accountOk'] === 'true';
         foreach ($this->acumulusConfig->getKeys() as $key) {
             if (!$this->addIfIsset($this->submittedValues, $key, $postedValues)) {
                 // Add unchecked checkboxes, but only if the full form was
@@ -138,10 +137,12 @@ abstract class BaseConfigForm extends Form
      * - versionInformation
      * - versionInformationDesc
      *
+     * @param bool $accountOk
+     *
      * @return array[]
      *   The set of version related informational fields.
      */
-    protected function getVersionInformation()
+    protected function getVersionInformation($accountOk)
     {
         $env = $this->acumulusConfig->getEnvironment();
         return array(
@@ -153,6 +154,10 @@ abstract class BaseConfigForm extends Form
             'versionInformationDesc' => array(
                 'type' => 'markup',
                 'value' => $this->t('desc_versionInformation'),
+            ),
+            'accountOk' => array(
+                'type' => 'hidden',
+                'value' => $accountOk ? 'true' : 'false',
             ),
         );
     }
@@ -265,7 +270,8 @@ abstract class BaseConfigForm extends Form
     {
         $result = array();
 
-        // @todo: moet 0 er wel bij als dit een multiple select is?
+        // Because many users won't know how to deselect a single option in a
+        // multiple select element, an empty option is added.
         $result['0'] = $this->t('option_empty_triggerOrderStatus');
         $result += $this->shopCapabilities->getShopOrderStatuses();
 

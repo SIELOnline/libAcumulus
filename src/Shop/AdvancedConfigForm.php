@@ -150,13 +150,16 @@ class AdvancedConfigForm extends BaseConfigForm
                     'description' => $this->t('desc_emailAsPdfSettings'),
                     'fields' => $this->getEmailAsPdfFields(),
                 ),
-                'versionInformationHeader' => array(
-                    'type' => 'fieldset',
-                    'legend' => $this->t('versionInformationHeader'),
-                    'fields' => $this->getVersionInformation(),
-                ),
             );
         }
+
+        $fields += array(
+            'versionInformationHeader' => array(
+                'type' => 'fieldset',
+                'legend' => $this->t('versionInformationHeader'),
+                'fields' => $this->getVersionInformation($accountOk),
+            ),
+        );
 
         return $fields;
     }
@@ -651,7 +654,7 @@ class AdvancedConfigForm extends BaseConfigForm
     protected function getEmailAsPdfFields()
     {
         return array(
-            'emailAsPdf' => array(
+            'emailAsPdf_cb' => array(
                 'type' => 'checkbox',
                 'label' => $this->t('field_emailAsPdf'),
                 'description' => $this->t('desc_emailAsPdf'),

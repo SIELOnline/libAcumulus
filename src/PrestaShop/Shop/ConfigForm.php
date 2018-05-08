@@ -24,21 +24,6 @@ class ConfigForm extends BaseConfigForm
 
     /**
      * {@inheritdoc}
-     */
-    protected function setFormValues()
-    {
-        parent::setFormValues();
-
-        // Prepend (checked) checkboxes with their collection name.
-        foreach ($this->getCheckboxKeys() as $checkboxName => $collectionName) {
-            if (isset($this->formValues[$checkboxName])) {
-                $this->formValues["{$collectionName}_{$checkboxName}"] = $this->formValues[$checkboxName];
-            }
-        }
-    }
-
-    /**
-     * {@inheritdoc}
      *
      * This override returns the config form. At the minimum, this includes the
      * account settings. If these are OK, the other settings are included as

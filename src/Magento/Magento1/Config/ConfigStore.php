@@ -31,7 +31,10 @@ class ConfigStore extends BaSeConfigStore
         /** @var \Mage_Core_Model_Config $configModel */
         $configModel = Mage::getModel('core/config');
         $configModel->saveConfig($this->configPath . $this->configKey, $values);
-        Mage::getConfig()->reinit();
+        // Reset the config cache,so our subsequent load() will receive the new
+        // values.
+        /** @noinspection PhpUnhandledExceptionInspection */
+        Mage::app()->getStore()->resetConfig();
         return true;
     }
 

@@ -241,15 +241,20 @@ class Communicator
         }
 
         // Configure the curl connection.
+        // Since 2017-09-19 the Acumulus web service only accepts TLS 1.2.
+        // - Apparently, some curl libraries do support this version but do not
+        //   use it by default, so we force it.
+        // - Apparently, some up-to-date curl libraries do not define this
+        //   constant,so we define it, if not defined.
+        if (!defined('CURL_SSLVERSION_TLSv1_2')) {
+            define('CURL_SSLVERSION_TLSv1_2', 6);
+        }
         $options = array(
             CURLOPT_URL => $uri,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => $post,
-            // Since 2017-09-19 the Acumulus web service only accepts TLS 1.2.
-            // Apparently, some libraries do support this version but do not use
-            // it by default, so we force it.
             CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1_2,
             //CURLOPT_PROXY => '127.0.0.1:8888', // Uncomment to debug with Fiddler.
         );

@@ -26,6 +26,8 @@ Important note:
   5.4.1 version.
 
 Changes:
+- ALL: Not all curl liraries define the CURL_SSLVERSION_TLSv1_2 constant, even
+  if they support that TLS version.
 - HS: Trying to get property of non-object in Joomla\HikaShop\Invoice\Source.php
   on line 139
 - ALL: Looked up vat rates were not copied from parent to children.
@@ -47,6 +49,7 @@ Changes:
   - Form::addWarningMessage() renamed to Form::addWarningMessages().
   - Form::addErrorMessage() renamed to Form::addErrorMessages().
   - Form::isSubmitted() moved to a separate FormHelper class.
+  - Form::getPostedValues() moved to a separate FormHelper class.
   - Form::systemValidate() removed, should be done in the webshop specific part.
   - Property source 'originalInvoiceSource' renamed to order.
   - Property source 'refund' added.

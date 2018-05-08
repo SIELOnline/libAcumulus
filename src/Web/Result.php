@@ -388,7 +388,6 @@ class Result
         }
         foreach ($messages as $message) {
             call_user_func(array($this, $method), $message);
-            $this->addWarning($message);
         }
         return $this;
     }

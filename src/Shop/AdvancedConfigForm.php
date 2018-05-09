@@ -110,7 +110,6 @@ class AdvancedConfigForm extends BaseConfigForm
         $fields['configHeader'] = array(
             'type' => 'fieldset',
             'legend' => $this->t('config_form_header'),
-            // @todo: add field(s) (1st (and 2nd) field) as description?
             'fields' => $this->getConfigLinkFields(),
         );
 

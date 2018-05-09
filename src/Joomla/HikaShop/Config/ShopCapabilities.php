@@ -155,7 +155,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
         return array(
             'contactYourId' => '[order_user_id]', // order
             'companyName1' => '[address_company]', // billing_address
-            // @todo: hoe kan een klant dit (en vat#) invullen?
             'fullName' => '[address_firstname+address_middle_name+address_lastname|name]', // billing_address, customer
             'address1' => '[address_street]', // billing_address
             'address2' => '[address_street2]', // billing_address

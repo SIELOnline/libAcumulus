@@ -32,11 +32,11 @@ use TaxManagerFactory;
  *   this were. However:
  *   - amount is excl vat if not manually entered.
  *   - amount is incl vat if manually entered (assuming administrators enter
- *     amounts incl tax, and this is what gets listed on the credit PDF.
+ *     amounts incl tax) and this is what gets listed on the credit PDF.
+ *   - Manually entered amounts do not have vat defined, so users should try not
+ *     to use them.
  *   - shipping_cost_amount is excl vat.
  *   So this is never going to work in all situations!!!
- *
- * @todo: So, can we get a tax amount/rate over the manually entered refund?
  */
 class Creator extends BaseCreator
 {

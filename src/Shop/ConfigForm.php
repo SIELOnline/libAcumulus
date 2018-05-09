@@ -275,7 +275,6 @@ class ConfigForm extends BaseConfigForm
                     'size' => min(count($this->getOrderStatusesList()), 8),
                 ),
             ),
-            // @todo: multi-select? if we change this to multi select, none should no longer be an option.
             'triggerInvoiceEvent' => $this->getOptionsOrHiddenField('triggerInvoiceEvent', 'radio', false),
         );
         return $fields;

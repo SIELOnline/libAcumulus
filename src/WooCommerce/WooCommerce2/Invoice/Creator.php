@@ -281,7 +281,6 @@ class Creator extends BaseCreator
         // VAT is as precise as a float can be and is based on the shipping cost
         // as entered by the admin. However, for refunds it is also rounded to
         // the cent.
-        // @todo: to avoid rounding errors, can we get the non-formatted amount?
         $shippingEx = $this->shopSource->get_total_shipping();
         $shippingExPrecision = 0.01;
         $shippingVat = $this->shopSource->get_shipping_tax();

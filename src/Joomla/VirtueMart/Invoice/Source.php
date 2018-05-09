@@ -67,7 +67,6 @@ class Source extends BaseSource
      */
     public function getPaymentMethod()
     {
-        // @todo: test this: correct sub-array?
         if (isset($this->source['details']['BT']->virtuemart_paymentmethod_id)) {
             return $this->source['details']['BT']->virtuemart_paymentmethod_id;
         }

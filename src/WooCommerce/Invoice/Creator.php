@@ -427,8 +427,6 @@ class Creator extends BaseCreator
                 $taxes = current($taxes);
             }
             if (is_array($taxes) && count($taxes) === 1) {
-                // @todo: $tax contains amount: can we use that?
-                //$tax = reset($taxes);
                 $vatLookupTags = array(
                     // Will contain a % at the end of the string.
                     Meta::VatRateLookup => substr(WC_Tax::get_rate_percent(key($taxes)), 0, -1),

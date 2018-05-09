@@ -213,7 +213,6 @@ class CreatorPluginSupport
                 } else {
                     // Oops: not found. Store a message in the line meta data
                     // and keep it as a separate line.
-                    // @todo: add warning?
                     $itemLine[Meta::BundleParentId] .= ': not found';
                     $result[] = $itemLine;
                 }

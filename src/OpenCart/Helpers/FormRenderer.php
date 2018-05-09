@@ -19,7 +19,6 @@ class FormRenderer extends BaseFormRenderer
         $this->requiredMarkup = '';
         $this->inputWrapperClass = 'form-control';
 
-        // @todo: check if we have to correct this for OC1.
         $this->elementWrapperClass = 'form-group';
         $this->labelWrapperClass = 'form-group';
         $this->multiLabelClass = 'control-label';

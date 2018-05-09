@@ -336,7 +336,6 @@ class Creator extends BaseCreator
      */
     protected function getCouponCodeDiscountLine()
     {
-        // @todo: standardize coupon lines: use itemnumber?, use shop specific names?, etc.
         $result = array(
             Tag::ItemNumber => $this->order['details']['BT']->coupon_code,
             Tag::Product => $this->t('discount'),

@@ -762,7 +762,7 @@ class Config
                     'type' => 'bool',
                     'default' => true,
                 ),
-                // @todo: add to UI if shop does support it (PS?, WC?).
+                // @nth: add to UI if shop does support it (PS?, WC?).
                 'useMargin' => array(
                     'group' => Tag::Invoice,
                     'type' => 'bool',

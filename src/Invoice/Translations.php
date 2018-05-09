@@ -26,7 +26,7 @@ class Translations extends TranslationCollection
         'inc_vat' => 'incl. btw',
         'ex_vat' => 'excl. btw',
         'shipping_costs' => 'Verzendkosten',
-        // @todo: try to better distinguish free shipping and pickup: for now only WC, HS, and PS do so
+        // @nth: try to better distinguish free shipping and pickup: for now only WC, HS, and PS do so
         'free_shipping' => 'Gratis verzending',
         'pickup' => 'Afhalen',
         'payment_costs' => 'Betalingskosten',

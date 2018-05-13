@@ -185,7 +185,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     protected function getTokenInfoShopProperties()
     {
-        return array_merge(parent::getTokenInfo(), array(
+        return array(
             'item' => array(
                 'table' => 'order_product',
                 'properties' => array(
@@ -240,7 +240,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
                     'description',
                 ),
             ),
-        ));
+        );
     }
 
     /**

@@ -155,6 +155,7 @@ abstract class ShopCapabilities
                 'order' => array_merge(array('more-info' => ucfirst($this->t('original_order_for_refund'))), $this->getTokenInfoOrder()),
             );
         }
+        $result += $this->getTokenInfoShopProperties();
 
         return $result;
     }

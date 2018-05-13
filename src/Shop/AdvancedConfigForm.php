@@ -108,16 +108,16 @@ class AdvancedConfigForm extends BaseConfigForm
 
         // 1st fieldset: Link to config form.
         $fields['configHeader'] = array(
-            'type' => 'fieldset',
-            'legend' => $this->t('config_form_header'),
+            'type' => 'details',
+            'summary' => $this->t('config_form_header'),
             'fields' => $this->getConfigLinkFields(),
         );
 
         if ($accountOk) {
             $fields += array(
                 'tokenHelpHeader' => array(
-                    'type' => 'fieldset',
-                    'legend' => $this->t('tokenHelpHeader'),
+                    'type' => 'details',
+                    'summary' => $this->t('tokenHelpHeader'),
                     'description' => $this->t('desc_tokens'),
                     'fields' => $this->getTokenFields(),
                 ),
@@ -520,7 +520,7 @@ class AdvancedConfigForm extends BaseConfigForm
                 'attributes' => array(
                     'size' => 60,
                     'rows' => 6,
-                    'style' => 'box-sizing: border-box; width: 100%; min-width: 24em;',
+                    'style' => 'box-sizing: border-box; width: 83%; min-width: 24em;',
                 ),
             ),
             'invoiceNotes' => array(
@@ -530,7 +530,7 @@ class AdvancedConfigForm extends BaseConfigForm
                 'attributes' => array(
                     'size' => 60,
                     'rows' => 6,
-                    'style' => 'box-sizing: border-box; width: 100%; min-width: 24em;',
+                    'style' => 'box-sizing: border-box; width: 83%; min-width: 24em;',
                 ),
             ),
         );

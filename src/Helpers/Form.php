@@ -417,7 +417,7 @@ abstract class Form
     protected function addValuesToFields(array $fields)
     {
         foreach ($fields as $name => &$field) {
-            if ($field['type'] === 'fieldset') {
+            if (!empty($field['fields'])) {
                 $field['fields'] = $this->addValuesToFields($field['fields']);
             } elseif ($field['type'] === 'checkbox') {
                 // Value is a list of checked options.
@@ -471,7 +471,7 @@ abstract class Form
             if (isset($field['value'])) {
                 $result[$id] = $field['value'];
             }
-            if ($field['type'] === 'fieldset') {
+            if (!empty($field['fields'])) {
                 $result = array_merge($result, $this->getFieldValues($field['fields']));
             }
         }
@@ -557,30 +557,33 @@ abstract class Form
      * Returns a definition of the form fields.
      *
      * This should NOT include any:
-     * - Submit or cancel buttons. These are often added by the web shop software
+     * - Submit or cancel buttons. These are often added by the webshop software
      *   in their specific way.
-     * - Tokens, form-id's or other (hidden) fields used by the web shop software
+     * - Tokens, form-id's or other (hidden) fields used by the webshop software
      *   to protect against certain attacks or to facilitate internal form
      *   processing.
      *
-     * This is a recursive, keyed array defining each form field. The key defines
-     * the name of the form field, to be used for the name, and possibly id,
-     * attribute. The values are a keyed array, that can have the following keys:
-     * - type: (required, string) fieldset, text, email, password, date, textarea,
-     *     select, radio, checkbox, markup.
-     * - label: (string) human readable label.
+     * This is a recursive, keyed array defining each form field. The key
+     * defines the name of the form field, to be used for the name, and possibly
+     * id, attribute. The values are a keyed array, that can have the following
+     * keys:
+     * - type: (required, string) fieldset, details, text, email, password,
+     *   date, textarea, select, radio, checkbox, markup.
+     * - legend/summary: (string) human readable title for a fieldset/details.
+     * - label: (string) human readable label, legend or summary.
      * - description: (string) human readable help text.
      * - value: (string) the value for the form field.
-     * - attributes: (array) keyed array with other - possibly html5 - attributes
+     * - attributes: (array) keyed array with other, possibly html5, attributes
      *   to be rendered. Possible keys include e.g:
-     *   - size
-     *   - class
-     *   - required: (bool) whether the field is required.
-     * - fields: (array) If the type = 'fieldset', this value defines the fields
-     *   (and possibly sub fieldsets) of the fieldset.
+     *     - size
+     *     - class
+     *     - required: (bool) whether the field is required.
+     * - fields: (array) If the type = 'fieldset' or 'details', this value
+     *   defines the (possibly recursive) fields of a fieldset/details element.
      * - options: (array) If the type = checkbox, select or radio, this value
      *   contains the options as a keyed array, the keys being the value to
-     *   submit if that choice is selected and the value being the label to show.
+     *   submit if that choice is selected and the value being the label to
+     *   show.
      *
      * Do NOT override this method, instead override getFieldDefinitions().
      *
@@ -632,7 +635,7 @@ abstract class Form
         $result = array();
         foreach ($fields as $key => $field) {
             $result[$key] = $key;
-            if ($field['type'] === 'fieldset') {
+            if (!empty($field['fields'])) {
                 $result += $this->getFieldKeys($field['fields']);
             }
         }
@@ -705,7 +708,7 @@ abstract class Form
         foreach ($fields as $name => $field) {
             if ($field['type'] === 'checkbox') {
                 $result += array_combine(array_keys($field['options']), array_fill(0, count($field['options']), $name));
-            } elseif ($field['type'] === 'fieldset') {
+            } elseif (!empty($field['fields'])) {
                 $result += $this->getCheckboxKeysByFields($field['fields']);
             }
         }

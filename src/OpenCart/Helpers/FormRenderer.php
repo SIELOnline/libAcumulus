@@ -16,6 +16,7 @@ class FormRenderer extends BaseFormRenderer
         // Default OpenCart template seems to use html 5.
         $this->fieldsetWrapperClass = 'adminform';
         $this->legendWrapperClass = 'form-group';
+        $this->summaryWrapperClass = 'form-group';
         $this->requiredMarkup = '';
         $this->inputWrapperClass = 'form-control';
 

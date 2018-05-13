@@ -155,8 +155,8 @@ class ConfigForm extends BaseConfigForm
         if ($accountOk) {
             $fields += array(
                 'advancedConfigHeader' => array(
-                    'type' => 'fieldset',
-                    'legend' => $this->t('advanced_form_header'),
+                    'type' => 'details',
+                    'summary' => $this->t('advanced_form_header'),
                     'fields' => $this->getAdvancedConfigLinkFields(),
                 ),
             );

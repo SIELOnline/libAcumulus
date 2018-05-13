@@ -19,6 +19,7 @@ class FormRenderer extends BaseFormRenderer
         $this->legendWrapperTag = 'h2';
         $this->fieldsetContentWrapperTag = 'table';
         $this->fieldsetContentWrapperClass = 'form-table';
+        $this->detailsWrapperClass = 'form-table';
         $this->elementWrapperTag = 'tr';
         $this->labelWrapperTag = 'th';
         $this->labelWrapperClass = 'titledesc';

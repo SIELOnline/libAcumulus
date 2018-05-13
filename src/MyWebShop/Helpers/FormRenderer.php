@@ -26,7 +26,7 @@ class FormRenderer extends BaseFormRenderer
         // @todo: define if MyWebshop's templating system renders html5.
         $this->html5 = true;
 
-        // @todo: define tags and classes to use around form elements like a fieldset, legend, label, input, radio button input, select and description.
+        // @todo: define tags and classes to use around form elements like a fieldset, details, legend, summary, label, input, radio button input, select and description.
         // See the base class for all properties.
         $this->legendWrapperClass = 'form-group';
         // @todo: required markup no longer necessary in html5

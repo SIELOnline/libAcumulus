@@ -77,8 +77,9 @@ class FormMapper extends BaseFormMapper
         }
         $element = $parent->addField($field['id'], $this->getMagentoType($field), $this->getMagentoElementSettings($field));
 
-        if ($field['type'] === 'fieldset') {
-            // Add description at the start of the fieldset as a note element.
+        if (!empty($field['fields'])) {
+            // Add description at the start of the fieldset/summary as a note
+            // element.
             if (isset($field['description'])) {
                 $element->addField($field['id'] . '-note', 'note', array('text' => '<p class="note">' . $field['description'] . '</p>'));
             }
@@ -114,6 +115,10 @@ class FormMapper extends BaseFormMapper
             case 'select':
                 $type = empty($field['attributes']['multiple']) ? 'select' : 'multiselect';
                 break;
+            case 'details':
+                $type = 'fieldset';
+                break;
+            // Other types are returned as is: fieldset, text, password, date
             default:
                 $type = $field['type'];
                 break;
@@ -133,6 +138,11 @@ class FormMapper extends BaseFormMapper
     protected function getMagentoElementSettings(array $field)
     {
         $config = array();
+
+        if ($field['type'] === 'details') {
+            $config['collapsable'] = true;
+            $config['opened'] = false;
+        }
 
         foreach ($field as $key => $value) {
             $config += $this->getMagentoProperty($key, $value, $field['type']);
@@ -162,6 +172,9 @@ class FormMapper extends BaseFormMapper
             case 'id':
             case 'fields':
                 $result = array();
+                break;
+            case 'summary':
+                $result = array('legend' => $value);
                 break;
             // Fields to return unchanged:
             case 'legend':

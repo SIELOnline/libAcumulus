@@ -43,10 +43,22 @@ class FormRenderer
     protected $fieldsetWrapperClass = '';
 
     /** @var string */
+    protected $detailsWrapperTag = 'details';
+
+    /** @var string */
+    protected $detailsWrapperClass = '';
+
+    /** @var string */
     protected $legendWrapperTag = 'legend';
 
     /** @var string */
     protected $legendWrapperClass = '';
+
+    /** @var string */
+    protected $summaryWrapperTag = 'summary';
+
+    /** @var string */
+    protected $summaryWrapperClass = '';
 
     /** @var string */
     protected $fieldsetDescriptionWrapperTag = 'div';
@@ -54,10 +66,18 @@ class FormRenderer
     /** @var string */
     protected $fieldsetDescriptionWrapperClass = 'fieldset-description';
 
-    /** @var string */
+    /**
+     * Also used for details content.
+     *
+     * @var string
+     */
     protected $fieldsetContentWrapperTag = '';
 
-    /** @var string */
+    /**
+     * Also used for details content.
+     *
+     * @var string
+     */
     protected $fieldsetContentWrapperClass = 'fieldset-content';
 
     /** @var string */
@@ -150,7 +170,7 @@ class FormRenderer
      */
     public function setProperty($property, $value)
     {
-        if (property_exists($this, $property) && !in_Array($property, array('form'))) {
+        if (property_exists($this, $property) && !in_array($property, array('form'))) {
             $this->$property = $value;
         }
         return $this;
@@ -210,7 +230,7 @@ class FormRenderer
         if (!isset($field['attributes'])) {
             $field['attributes'] = array();
         }
-        $output .= $field['type'] === 'fieldset' ? $this->renderFieldset($field) : $this->renderField($field);
+        $output .= !empty($field['fields']) ? $this->renderFieldset($field) : $this->renderField($field);
         return $output;
     }
 
@@ -241,12 +261,11 @@ class FormRenderer
     protected function fieldsetBegin(array $field)
     {
         $output = '';
-        $output .= $this->getWrapper('fieldset', $field['attributes']);
-        if (!empty($field['legend'])) {
-            $output .= $this->getWrapper('legend', $field['attributes']);
-            $output .= $field['legend'];
-            $output .= $this->getWrapperEnd('legend');
-        }
+        $output .= $this->getWrapper($field['type'], $field['attributes']);
+        $titleTag = $field['type'] === 'fieldset' ? 'legend' : 'summary';
+        $output .= $this->getWrapper($titleTag, $field['attributes']);
+        $output .= $field[$titleTag];
+        $output .= $this->getWrapperEnd($titleTag);
         $output .= $this->getWrapper('fieldsetContent');
         if (!empty($field['description'])) {
             $output .= $this->renderDescription($field['description'], true);
@@ -261,11 +280,11 @@ class FormRenderer
      *
      * @return string
      */
-    protected function fieldsetEnd(/** @noinspection PhpUnusedParameterInspection */ array $field)
+    protected function fieldsetEnd(array $field)
     {
         $output = '';
         $output .= $this->getWrapperEnd('fieldsetContent');
-        $output .= $this->getWrapperEnd('fieldset');
+        $output .= $this->getWrapperEnd($field['type']);
         return $output;
     }
 

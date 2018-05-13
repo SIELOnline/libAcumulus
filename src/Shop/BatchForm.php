@@ -262,8 +262,8 @@ class BatchForm extends Form
 
         // 3rd fieldset: Batch info.
         $fields['batchInfoHeader'] = array(
-            'type' => 'fieldset',
-            'legend' => $this->t('batchInfoHeader'),
+            'type' => 'details',
+            'summary' => $this->t('batchInfoHeader'),
             'fields' => array(
                 'info' => array(
                     'type' => 'markup',

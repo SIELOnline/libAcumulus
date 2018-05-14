@@ -263,9 +263,11 @@ class FormRenderer
         $output = '';
         $output .= $this->getWrapper($field['type'], $field['attributes']);
         $titleTag = $field['type'] === 'fieldset' ? 'legend' : 'summary';
-        $output .= $this->getWrapper($titleTag, $field['attributes']);
-        $output .= $field[$titleTag];
-        $output .= $this->getWrapperEnd($titleTag);
+        if (!empty($field[$titleTag])) {
+            $output .= $this->getWrapper($titleTag, $field['attributes']);
+            $output .= $field[$titleTag];
+            $output .= $this->getWrapperEnd($titleTag);
+        }
         $output .= $this->getWrapper('fieldsetContent');
         if (!empty($field['description'])) {
             $output .= $this->renderDescription($field['description'], true);

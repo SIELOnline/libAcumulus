@@ -185,9 +185,9 @@ class ShopOrderOverviewForm extends Form
      * @return array
      *   Keyed array with keys:
      *   - status (string): 1 of the ShopOrderOverviewForm::Status_ constants.
-     *   - result (\Siel\Acumulus\Web\Result?): Result of the getEntry API call.
-     *   - entry (array|null): the <entry> part of the getEntryAPI call.
-     *   - statusField (array): A form field array representing the status.
+     *   - result (\Siel\Acumulus\Web\Result?): result of the getEntry API call.
+     *   - entry (array|null): the <entry> part of the getEntry API call.
+     *   - statusField (array): a form field array representing the status.
      */
     protected function getStatus($localEntryInfo)
     {
@@ -248,8 +248,8 @@ class ShopOrderOverviewForm extends Form
     }
 
     /**
-     * Returns additional form fields to show when the Acumulus invoice has
-     * not yet been sent.
+     * Returns additional form fields to show when the invoice has not yet been
+     * sent.
      *
      * @return array[]
      *   Array of form fields.
@@ -318,6 +318,12 @@ class ShopOrderOverviewForm extends Form
     protected function getNonExistingFields()
     {
         $fields = array();
+        $fields += array(
+            'send' => array(
+                'type' => 'button',
+                'value' => $this->t('send_again'),
+            ),
+        );
         return $fields;
     }
 
@@ -332,20 +338,20 @@ class ShopOrderOverviewForm extends Form
     {
         $fields = array();
         $fields += array(
-            'send' => array(
-                'type' => 'button',
-                'value' => $this->t('send_again'),
-            ),
             'undelete' => array(
                 'type' => 'button',
                 'value' => $this->t('undelete'),
+            ),
+            'send' => array(
+                'type' => 'button',
+                'value' => $this->t('send_again'),
             ),
         );
         return $fields;
     }
 
     /**
-     * Returns additional form fields to show when the Acumulus invoice is still there.
+     * Returns additional form fields to show when the invoice is still there.
      *
      * @param \Siel\Acumulus\Shop\AcumulusEntry $localEntryInfo
      * @param array $entry
@@ -679,10 +685,27 @@ class ShopOrderOverviewForm extends Form
         );
     }
 
+    /**
+     * Sanitizes an entry struct received via an getEntry API call.
+     *
+     * The info received from an external API call must not be trusted. So we
+     * sanitize it by:
+     * - Casting int, float, and bool fields it to its proper type.
+     * - Date strings are parsed to a DateTime and formatted back to a date
+     *   string.
+     * - Strings that can only contain a restricted set of values are checked
+     *   against that set and emptied if not part of it.
+     * - Free string values are escaped to safe html.
+     *
+     * @param $entry
+     *
+     * @return mixed
+     *
+     */
     protected function sanitizeEntry($entry)
     {
         if (!empty($entry)) {
-            /* keys in $entry array that are not yet used and not yet sanitized:
+            /* @todo: keys in $entry array that are not yet used and not yet sanitized:
              *   - entrytype
              *   - entrydescription
              *   - entrynote
@@ -779,16 +802,21 @@ class ShopOrderOverviewForm extends Form
      * @param array $entry
      * @param string $key
      *
-     * @return DateTime|null
-     *   The date value of the value under this key or null if the string
-     *   is not in the valid date format (yyyy-mm-dd)
+     * @return string
+     *   The date value (yyyy-mm-dd) of the value under this key or the empty
+     *   string, if the string is not in the valid date format (yyyy-mm-dd).
      */
     protected function sanitizeEntryDateValue(array $entry, $key)
     {
-        $date = null;
+        $date = '';
         if (!empty($entry[$key])) {
             $date = DateTime::createFromFormat(API::DateFormat_Iso, $entry[$key]);
+            if ($date instanceof DateTime) {
+                $date = $date->format(Api::DateFormat_Iso);
+            } else {
+                $date = '';
+            }
         }
-        return $date instanceof DateTime ? $date : null;
+        return $date;
     }
 }

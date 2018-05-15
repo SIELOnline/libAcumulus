@@ -29,7 +29,7 @@ use Siel\Acumulus\Meta;
  *   getPaymentDateCreditNote()
  * - getCountryCode(): implement
  * - getCurrency(): implement
- * - getTotals(): implement
+ * - getAvailableTotals(): implement
  * - setInvoice(): override if MyWebShop has separate invoice objects
  * - getInvoiceReferenceOrder(): implement if MyWebShop has separate invoice
  *   numbers or references
@@ -156,7 +156,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    public function getTotals()
+    protected function getAvailableTotals()
     {
         // @todo
     }

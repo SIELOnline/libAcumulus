@@ -2,6 +2,8 @@
 
 namespace Siel\Acumulus\Invoice;
 
+use Siel\Acumulus\Meta;
+
 /**
  * A wrapper around a webshop order or refund.
  *
@@ -242,8 +244,7 @@ abstract class Source
     /**
      * Returns an array with the totals fields.
      *
-     * Most webshops provide only 2 of the 3 totals, so only return those that
-     * are provided. If missing, the 3rd will be computed by the Creator.
+     * Do not override this method but implement getAvailableTotals() instead.
      *
      * @return array
      *   An array with the following possible keys:
@@ -255,7 +256,62 @@ abstract class Source
      *   purely for reasons of support:
      *   - meta-invoice-vat-breakdown: a vat breakdown per vat rate.
      */
-    abstract public function getTotals();
+    public function getTotals()
+    {
+        $result = $this->getAvailableTotals();
+        $result = $this->completeTotals($result);
+        return $result;
+    }
+
+    /**
+     * Returns an array with the available totals fields.
+     *
+     * Most webshops provide only 2 of the 3 totals, so only return those that
+     * are provided. Source::getTotals() will complete missing fields by calling
+     * Source::completeTotals();
+     *
+     * @return array
+     *   An array with the following possible keys:
+     *   - meta-invoice-amount: the total invoice amount excluding VAT.
+     *   - meta-invoice-amountinc: the total invoice amount including VAT.
+     *   - meta-invoice-vatamount: the total vat amount for the invoice.
+     *
+     *   This one is really optional: so far only filled by OpenCart and
+     *   purely for reasons of support:
+     *   - meta-invoice-vat-breakdown: a vat breakdown per vat rate.
+     */
+    abstract protected function getAvailableTotals();
+
+    /**
+     * Completes the set of invoice totals as set by getInvoiceTotals.
+     *
+     * Most shops only provide 2 out of these 3 in their data, so we calculate
+     * the 3rd.
+     *
+     * Do not override this method, just implement getAvailableTotals().
+     *
+     * @param array $totals
+     *   The invoice totals to complete with missing total fields.
+     *
+     * @return array
+     *   The invoice totals with all invoice total fields.
+     */
+    protected function completeTotals(array $totals)
+    {
+        if (!isset($totals[Meta::InvoiceAmount])) {
+            $totals[Meta::InvoiceAmount] = $totals[Meta::InvoiceAmountInc] - $totals[Meta::InvoiceVatAmount];
+            $totals[Meta::InvoiceCalculated ] = Meta::InvoiceAmount;
+        }
+        if (!isset($totals[Meta::InvoiceAmountInc])) {
+            $totals[Meta::InvoiceAmountInc] = $totals[Meta::InvoiceAmount] + $totals[Meta::InvoiceVatAmount];
+            $totals[Meta::InvoiceCalculated ] = Meta::InvoiceAmountInc;
+        }
+        if (!isset($totals[Meta::InvoiceVatAmount])) {
+            $totals[Meta::InvoiceVatAmount] = $totals[Meta::InvoiceAmountInc] - $totals[Meta::InvoiceAmount];
+            $totals[Meta::InvoiceCalculated ] = Meta::InvoiceVatAmount;
+        }
+        return $totals;
+    }
 
     /**
      * Loads and sets the web shop invoice linked to this source.

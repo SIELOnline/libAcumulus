@@ -432,7 +432,7 @@ abstract class Creator
         // Meta data.
         $invoice += $this->invoiceSource->getCurrency();
         $this->addIfNotEmpty($invoice, Meta::paymentMethod, $paymentMethod);
-        $invoice += $this->getInvoiceTotals();
+        $invoice += $this->invoiceSource->getTotals();
 
         return $invoice;
     }
@@ -475,51 +475,6 @@ abstract class Creator
             $result = $this->invoiceSource->getDate();
         }
         return $result;
-    }
-
-    /**
-     * Returns metadata about the invoice totals.
-     *
-     * @return array
-     *   An array with the invoice totals meta tags:
-     *   - meta-invoice-amount
-     *   - meta-invoice-amountinc
-     *   - meta-invoice-vatamount
-     */
-    protected function getInvoiceTotals()
-    {
-        $result = $this->invoiceSource->getTotals();
-        $result = $this->completeInvoiceTotals($result);
-        return $result;
-    }
-
-    /**
-     * Completes the set of invoice totals as set by getInvoiceTotals.
-     *
-     * Most shops only provide 2 out of these 3 in their data, so we calculate
-     * the 3rd.
-     *
-     * @param array $invoiceTotals
-     *   The invoice totals to complete with missing total fields.
-     *
-     * @return array
-     *   The invoice totals with all invoice total fields.
-     */
-    protected function completeInvoiceTotals(array $invoiceTotals)
-    {
-        if (!isset($invoiceTotals[Meta::InvoiceAmount])) {
-            $invoiceTotals[Meta::InvoiceAmount] = $invoiceTotals[Meta::InvoiceAmountInc] - $invoiceTotals[Meta::InvoiceVatAmount];
-            $invoiceTotals[Meta::InvoiceCalculated ] = Meta::InvoiceAmount;
-        }
-        if (!isset($invoiceTotals[Meta::InvoiceAmountInc])) {
-            $invoiceTotals[Meta::InvoiceAmountInc] = $invoiceTotals[Meta::InvoiceAmount] + $invoiceTotals[Meta::InvoiceVatAmount];
-            $invoiceTotals[Meta::InvoiceCalculated ] = Meta::InvoiceAmountInc;
-        }
-        if (!isset($invoiceTotals[Meta::InvoiceVatAmount])) {
-            $invoiceTotals[Meta::InvoiceVatAmount] = $invoiceTotals[Meta::InvoiceAmountInc] - $invoiceTotals[Meta::InvoiceAmount];
-            $invoiceTotals[Meta::InvoiceCalculated ] = Meta::InvoiceVatAmount;
-        }
-        return $invoiceTotals;
     }
 
     /**

@@ -173,7 +173,7 @@ class Source extends BaseSource
      * This override provides the values meta-invoice-amountinc and
      * meta-invoice-vatamount.
      */
-    public function getTotals()
+    protected function getAvailableTotals()
     {
         return array(
             Meta::InvoiceAmountInc => $this->source->get_total(),

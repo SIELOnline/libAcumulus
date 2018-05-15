@@ -19,6 +19,9 @@ WC3 = WooCommerce 3 (WordPress)
 
 5.4.2 (2018-05-13)
 ------------------
+- ALL: moved Creator::getInvoiceTotals() to Source::getTotals().
+- ALL: moved Creator::completeInvoiceTotals() to Source::completeTotals().
+- ALL: renamed Source::getTotals() to Source::getAvailableTotals().
 - ALL: renamed Source::getPaymentState() to Source::getPaymentStatus().
 - ALL: Legend or summary are not required: Notice:  Undefined index: legend ...
 

@@ -152,7 +152,7 @@ class Source extends BaseSource
      * This override provides the values meta-invoice-amountinc and
      * meta-invoice-vatamount.
      */
-    public function getTotals()
+    protected function getAvailableTotals()
     {
         $vatAmount = 0.0;
         // No order_tax_info => no tax (?) => vatamount = 0.

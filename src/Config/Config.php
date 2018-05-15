@@ -938,6 +938,14 @@ class Config
             $result = $this->upgrade540() && $result;
         }
 
+        if (version_compare($currentVersion, '5.4.1', '<')) {
+            $result = $this->upgrade541() && $result;
+        }
+
+        if (version_compare($currentVersion, '5.4.2', '<')) {
+            $result = $this->upgrade542() && $result;
+        }
+
         return $result;
     }
 
@@ -1120,6 +1128,32 @@ class Config
         foreach ($values as $key => &$value) {
             if (strpos($value, 'originalInvoiceSource::') !== false) {
                 str_replace('originalInvoiceSource::', 'order::', $value);
+                $doSave = true;
+            }
+        }
+        if ($doSave) {
+            $result = $this->save($values);
+        }
+
+        return $result;
+    }
+
+    /**
+     * 5.4.2 upgrade.
+     *
+     * - property paymentState renamed to paymentStatus.
+     *
+     * @return bool
+     */
+    protected function upgrade542()
+    {
+        $result = true;
+        $doSave = false;
+        $configStore = $this->getConfigStore();
+        $values = $configStore->load();
+        foreach ($values as $key => &$value) {
+            if (strpos($value, 'paymentState') !== false) {
+                str_replace('paymentState', 'paymentStatus', $value);
                 $doSave = true;
             }
         }

@@ -23,8 +23,8 @@ use Siel\Acumulus\Meta;
  *   a separate payment method for them
  * - getPaymentMethodOrder(): implement if MyWebShop does not support credit
  *   notes or does not store a separate payment method for them
- * - getPaymentState(): override or implement both getPaymentStateOrder()
- *   and getPaymentStateCreditNote()
+ * - getPaymentStatus(): override or implement both getPaymentStatusOrder()
+ *   and getPaymentStatusCreditNote()
  * - getPaymentDate(): override or implement both getPaymentDateOrder() and
  *   getPaymentDateCreditNote()
  * - getCountryCode(): implement
@@ -108,10 +108,10 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    public function getPaymentState()
+    public function getPaymentStatus()
     {
-        // @todo: override or implement both getPaymentStateOrder() and getPaymentStateCreditNote()
-        // Assumption: credit slips are always in a paid state.
+        // @todo: override or implement both getPaymentStatusOrder() and getPaymentStatusCreditNote()
+        // Assumption: credit slips are always in a paid status.
         if (($this->getType() === Source::Order && $this->source->hasBeenPaid()) || $this->getType() === Source::CreditNote) {
             $result = Api::PaymentStatus_Paid;
         } else {

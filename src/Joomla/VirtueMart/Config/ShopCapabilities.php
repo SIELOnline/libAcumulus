@@ -196,12 +196,12 @@ class ShopCapabilities extends ShopCapabilitiesBase
     {
         /** @var VirtueMartModelOrderstatus $orderStatusModel */
         $orderStatusModel = VmModel::getModel('orderstatus');
-        /** @var array[] $orderStates Method getOrderStatusNames() has an incorrect @return type ... */
-        $orderStates = $orderStatusModel->getOrderStatusNames();
-        foreach ($orderStates as $code => &$value) {
+        /** @var array[] $orderStatuses Method getOrderStatusNames() has an incorrect @return type ... */
+        $orderStatuses = $orderStatusModel->getOrderStatusNames();
+        foreach ($orderStatuses as $code => &$value) {
             $value = \JText::_($value['order_status_name']);
         }
-        return $orderStates;
+        return $orderStatuses;
     }
 
     /**

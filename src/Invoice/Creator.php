@@ -359,7 +359,7 @@ abstract class Creator
      *
      * Extending classes should normally not have to override this method, but
      * should instead implement getInvoiceNumber(), getInvoiceDate(),
-     * getPaymentState(), getPaymentDate(), and, optionally, getDescription().
+     * getPaymentStatus(), getPaymentDate(), and, optionally, getDescription().
      *
      * @return array
      *   A keyed array with the invoice data (without the invoice lines and the
@@ -403,7 +403,7 @@ abstract class Creator
         $this->addDefault($invoice, Tag::AccountNumber, $invoiceSettings['defaultAccountNumber']);
 
         // Payment info.
-        $invoice[Tag::PaymentStatus] = $this->invoiceSource->getPaymentState();
+        $invoice[Tag::PaymentStatus] = $this->invoiceSource->getPaymentStatus();
         if ($invoice[Tag::PaymentStatus] === Api::PaymentStatus_Paid) {
             $this->addIfNotEmpty($invoice, Tag::PaymentDate, $this->invoiceSource->getPaymentDate());
         }

@@ -309,7 +309,7 @@ class Service
      *   The result of the webservice call. The structured response will contain
      *   1 "entry" array, being a keyed array with keys:
      *   - entryid
-     *   - entryproc: (description new state): 'removed' or '???'
+     *   - entryproc: (description new status): 'removed' or '???'
      *   Possible errors:
      *   - "XCM7ELO12: Invalid entrydeletestatus value supplied": $deleteStatus
      *     is not one of the indicated constants.

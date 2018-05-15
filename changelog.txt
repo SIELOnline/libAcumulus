@@ -19,8 +19,8 @@ WC3 = WooCommerce 3 (WordPress)
 
 5.4.2 (2018-05-13)
 ------------------
+- ALL: renamed Source::getPaymentState() to Source::getPaymentStatus().
 - ALL: Legend or summary are not required: Notice:  Undefined index: legend ...
-- WC: statusoverzicht: fout bij het sanitizen.
 
 5.4.1 (2018-05-13)
 ------------------

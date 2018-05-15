@@ -138,7 +138,7 @@ abstract class ShopCapabilities
                     'date',
                     'status (' . $this->t('internal_not_label') . ')',
                     'paymentMethod (' . $this->t('internal_not_label') . ')',
-                    'paymentState (1: ' . $this->t('payment_status_1') . '; 2: ' . $this->t('payment_status_2') . ')',
+                    'paymentStatus (1: ' . $this->t('payment_status_1') . '; 2: ' . $this->t('payment_status_2') . ')',
                     'paymentDate',
                     'countryCode',
                     'currency',

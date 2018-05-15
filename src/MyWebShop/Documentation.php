@@ -88,7 +88,7 @@
  * - In your module's code, define event handlers for events that inform you
  *   about:
  *     - Order creation
- *     - Order (state) changes
+ *     - Order (status) changes
  *     - Refund creation
  *     - (Shop) Invoice creation
  *     - (Shop) Invoice sending (to the client)

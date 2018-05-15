@@ -193,8 +193,8 @@ class ShopCapabilities extends ShopCapabilitiesBase
         $statuses = $class->loadAllWithTrans('status');
 
         $orderStatuses = array();
-        foreach ($statuses as $state) {
-            $orderStatuses[$state->category_name] = $state->translation;
+        foreach ($statuses as $status) {
+            $orderStatuses[$status->category_name] = $status->translation;
         }
         return $orderStatuses;
     }

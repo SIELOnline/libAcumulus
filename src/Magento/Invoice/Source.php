@@ -112,7 +112,7 @@ abstract class Source extends BaseSource
      *   \Siel\Acumulus\Api::PaymentStatus_Paid or
      *   \Siel\Acumulus\Api::PaymentStatus_Due
      */
-    protected function getPaymentStateOrder()
+    protected function getPaymentStatusOrder()
     {
         return Number::isZero($this->source->getBaseTotalDue())
             ? Api::PaymentStatus_Paid
@@ -120,7 +120,7 @@ abstract class Source extends BaseSource
     }
 
     /**
-     * Returns whether the order is in a state that makes it considered paid.
+     * Returns whether the order is in a status that makes it considered paid.
      *
      * This method is NOT used to determine the paid status, but is used to
      * determine the paid date by looking for these statuses in the

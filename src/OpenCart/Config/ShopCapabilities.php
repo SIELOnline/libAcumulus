@@ -286,10 +286,10 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function getShopOrderStatuses()
     {
         Registry::getInstance()->load->model('localisation/order_status');
-        $states = Registry::getInstance()->model_localisation_order_status->getOrderStatuses();
+        $statuses = Registry::getInstance()->model_localisation_order_status->getOrderStatuses();
         $result = array();
-        foreach ($states as $state) {
-            list($optionValue, $optionText) = array_values($state);
+        foreach ($statuses as $status) {
+            list($optionValue, $optionText) = array_values($status);
             $result[$optionValue] = $optionText;
         }
         return $result;

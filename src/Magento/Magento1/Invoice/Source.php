@@ -47,7 +47,7 @@ class Source extends BaseSource
      *   \Siel\Acumulus\Api::PaymentStatus_Paid or
      *   \Siel\Acumulus\Api::PaymentStatus_Due
      */
-    protected function getPaymentStateCreditNote()
+    protected function getPaymentStatusCreditNote()
     {
         return $this->source->getState() == \Mage_Sales_Model_Order_Creditmemo::STATE_REFUNDED
             ? Api::PaymentStatus_Paid

@@ -106,9 +106,9 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    public function getPaymentState()
+    public function getPaymentStatus()
     {
-        // Assumption: credit slips are always in a paid state.
+        // Assumption: credit slips are always in a paid status.
         if (($this->getType() === Source::Order && $this->source->hasBeenPaid()) || $this->getType() === Source::CreditNote) {
             $result = Api::PaymentStatus_Paid;
         } else {

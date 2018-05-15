@@ -137,8 +137,8 @@ abstract class Source
     /**
      * Returns the status for this invoice source.
      *
-     * The Acumulus plugin does not define its own states, so 1 of the webshop's
-     * order or credit note states should be returned.
+     * The Acumulus plugin does not define its own statuses, so 1 of the
+     * webshop's order or credit note statuses should be returned.
      *
      * Should either be overridden or both getStatusOrder() and
      * getStatusCreditNote() should be implemented.
@@ -180,13 +180,21 @@ abstract class Source
     }
 
     /**
+     * @deprecated: use Source::getPaymentStatus()
+     */
+    public function getPaymentState()
+    {
+        return $this->getPaymentStatus();
+    }
+
+    /**
      * Returns whether the order has been paid or not.
      *
      * @return int
      *   \Siel\Acumulus\Api::PaymentStatus_Paid or
      *   \Siel\Acumulus\Api::PaymentStatus_Due
      */
-    public function getPaymentState()
+    public function getPaymentStatus()
     {
         return $this->callTypeSpecificMethod(__FUNCTION__);
     }
@@ -195,8 +203,8 @@ abstract class Source
      * Returns the payment date.
      *
      * The payment date is defined as the date on which the status changed from
-     * a non-paid state to a paid state. If there are multiple state changes,
-     * the last one should be taken.
+     * the non-paid status to the paid status. If there are multiple status
+     * changes, the last one should be taken.
      *
      * @return string|null
      *   The payment date (yyyy-mm-dd) or null if the order has not been (fully)

@@ -76,9 +76,9 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    public function getPaymentState()
+    public function getPaymentStatus()
     {
-        return in_array($this->source['details']['BT']->order_status, $this->getPaidStates())
+        return in_array($this->source['details']['BT']->order_status, $this->getPaidStatuses())
             ? Api::PaymentStatus_Paid
             : Api::PaymentStatus_Due;
     }
@@ -91,7 +91,7 @@ class Source extends BaseSource
         $date = null;
         $previousStatus = '';
         foreach ($this->source['history'] as $orderHistory) {
-            if (in_array($orderHistory->order_status_code, $this->getPaidStates()) && !in_array($previousStatus, $this->getPaidStates())) {
+            if (in_array($orderHistory->order_status_code, $this->getPaidStatuses()) && !in_array($previousStatus, $this->getPaidStatuses())) {
                 $date = $orderHistory->created_on;
             }
             $previousStatus = $orderHistory->order_status_code;
@@ -100,12 +100,12 @@ class Source extends BaseSource
     }
 
     /**
-     * Returns a list of order states that indicate that the order has been
+     * Returns a list of order statuses that indicate that the order has been
      * paid.
      *
      * @return array
      */
-    protected function getPaidStates()
+    protected function getPaidStatuses()
     {
         return array('C', 'S', 'R');
     }

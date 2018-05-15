@@ -241,11 +241,11 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     public function getShopOrderStatuses()
     {
-        // @todo: adapt to MyWebshop's way of retrieving the list of order states.
-        $states = OrderState::getOrderStates($this->translator->getLanguage());
+        // @todo: adapt to MyWebshop's way of retrieving the list of order statuses.
+        $statuses = OrderState::getOrderStates($this->translator->getLanguage());
         $result = array();
-        foreach ($states as $state) {
-            $result[$state['id_order_state']] = $state['name'];
+        foreach ($statuses as $status) {
+            $result[$status['id_order_state']] = $status['name'];
         }
         return $result;
     }

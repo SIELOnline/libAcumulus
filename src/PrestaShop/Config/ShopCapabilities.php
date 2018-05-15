@@ -285,10 +285,10 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     public function getShopOrderStatuses()
     {
-        $states = OrderState::getOrderStates((int) Context::getContext()->language->id);
+        $statuses = OrderState::getOrderStates((int) Context::getContext()->language->id);
         $result = array();
-        foreach ($states as $state) {
-            $result[$state['id_order_state']] = $state['name'];
+        foreach ($statuses as $status) {
+            $result[$status['id_order_state']] = $status['name'];
         }
         return $result;
     }

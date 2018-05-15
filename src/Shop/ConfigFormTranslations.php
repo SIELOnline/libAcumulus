@@ -391,15 +391,15 @@ See <a href="http://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastin
         'triggerSettingsHeader' => 'When to have your invoices sent to Acumulus.',
         'desc_triggerSettings' => 'This(these) setting(s) determine(s) at what instants the invoice for an order should be sent to Acumulus. If you select multiple instants, the invoice wil be sent as soon as the order reaches one of the selected statuses. Note that an invoice will only be sent once to Acumulus. This extension only uses order data, so you may select any status, the webshop invoice does not already have to be created,unless you want to use the webshop\'s invoice date and number as invoice date and number for the Acumulus invoice. If you select "Do not send automatically" you will have to use the <a href="%s">Acumulus batch send form</a>.',
 
-        'field_triggerOrderStatus' => 'Order state(s)',
-        'desc_triggerOrderStatus' => 'Select if and with which order states to send the invoice to Acumulus. If you select multiple states, the invoice will only be sent once as soon as one of the selected states is reached. This extension only uses order data, so you may select any status, the webshop invoice does not already have to be created. If you select "Do not send automatically" you will have to use the send batch form.',
+        'field_triggerOrderStatus' => 'Order status(es)',
+        'desc_triggerOrderStatus' => 'Select if and with which order statuses to send the invoice to Acumulus. If you select multiple statuses, the invoice will only be sent once as soon as one of the selected statuses is reached. This extension only uses order data, so you may select any status, the webshop invoice does not already have to be created. If you select "Do not send automatically" you will have to use the send batch form.',
         'option_empty_triggerOrderStatus' => 'Do not send automatically ',
 
-        'field_triggerInvoiceEvent' => 'Webshop invoice state',
+        'field_triggerInvoiceEvent' => 'Webshop invoice status',
         'option_triggerInvoiceEvent_0' => 'Do not send automatically.',
         'option_triggerInvoiceEvent_1' => 'When the webshop invoice gets created.',
         'option_triggerInvoiceEvent_2' => 'When the webshop invoice gets sent to the customer.',
-        'desc_triggerInvoiceEvent' => 'Select if and on which webshop invoice event to send the invoice to Acumulus. If you select "Do not send automatically" you can use the send batch form, or you can set one or more order states above to trigger the sending of the invoice.',
+        'desc_triggerInvoiceEvent' => 'Select if and on which webshop invoice event to send the invoice to Acumulus. If you select "Do not send automatically" you can use the send batch form, or you can set one or more order statuses above to trigger the sending of the invoice.',
 
 
         // Tokens

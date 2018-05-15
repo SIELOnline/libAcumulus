@@ -75,7 +75,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    public function getPaymentState()
+    public function getPaymentStatus()
     {
         /** @var \hikashopConfigClass $config */
         $config = hikashop_config();

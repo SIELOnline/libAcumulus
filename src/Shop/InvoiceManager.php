@@ -17,7 +17,7 @@ use Siel\Acumulus\Tag;
  *
  * The features of this class include:
  * - Retrieval of webshop invoice sources (orders or refunds).
- * - Handle order state changes.
+ * - Handle order status changes.
  * - Handle refund creation or credit memo sending.
  * - Handle batch sending
  * - Create and send an invoice to Acumulus for a given invoice source,
@@ -292,7 +292,7 @@ abstract class InvoiceManager
     /**
      * Processes an invoice source status change event.
      *
-     * For now we don't look at credit note states, they are always sent.
+     * For now we don't look at credit note statuses, they are always sent.
      *
      * @param \Siel\Acumulus\Invoice\Source $invoiceSource
      *   The source whose status has changed.

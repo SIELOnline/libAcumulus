@@ -75,7 +75,7 @@ class Source extends BaseSource
      *   \Siel\Acumulus\Api::PaymentStatus_Paid or
      *   \Siel\Acumulus\Api::PaymentStatus_Due
      */
-    protected function getPaymentStateOrder()
+    protected function getPaymentStatusOrder()
     {
         return $this->source->needs_payment() ? Api::PaymentStatus_Due : Api::PaymentStatus_Paid;
     }

@@ -77,7 +77,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    public function getPaymentState()
+    public function getPaymentStatus()
     {
         // The 'config_complete_status' setting contains a set of statuses that,
         //  according to the help on the settings form:

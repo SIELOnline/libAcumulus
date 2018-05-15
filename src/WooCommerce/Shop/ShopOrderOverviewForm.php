@@ -11,6 +11,7 @@ use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Invoice\Translations as InvoiceTranslations;
+use Siel\Acumulus\Meta;
 use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
 use Siel\Acumulus\Web\Result;
 use Siel\Acumulus\Web\Service;
@@ -28,21 +29,41 @@ class ShopOrderOverviewForm extends Form
 {
     // Constants representing the status of the Acumulus invoice for a given
     // shop order or refund.
-    const Status_NotSent = 'status_not_sent';
-    const Status_Sent = 'status_sent';
-    const Status_SentConcept  = 'status_sent_concept';
-    const Status_Deleted = 'status_deleted';
-    const Status_NonExisting = 'status_non_existing';
-    const Status_CommunicationError = 'status_communication_error';
+    const Invoice_NotSent = 'invoice_not_sent';
+    const Invoice_Sent = 'invoice_sent';
+    const Invoice_SentConcept  = 'invoice_sent_concept';
+    const Invoice_Deleted = 'invoice_deleted';
+    const Invoice_NonExisting = 'invoice_non_existing';
+    const Invoice_CommunicationError = 'invoice_communication_error';
+
+    const Status_Unknown = 0;
+    const Status_Success = 1;
+    const Status_Info = 2;
+    const Status_Warning = 3;
+    const Status_Error = 4;
 
     /** @var \Siel\Acumulus\Web\Service */
-    protected $service;
+    private $service;
 
     /** @var \Siel\Acumulus\Shop\AcumulusEntryManager */
-    protected $acumulusEntryManager;
+    private $acumulusEntryManager;
 
     /** @var \Siel\Acumulus\Invoice\Source */
-    protected $source;
+    private $source;
+
+    /**
+     * One of the Result::Status_... constants.
+     *
+     * @var int
+     */
+    private $status;
+
+    /**
+     * A message indicating why the status is not OK..
+     *
+     * @var string
+     */
+    private $statusMessage;
 
     /**
      * @param \Siel\Acumulus\WooCommerce\Shop\AcumulusEntryManager $acumulusEntryManager
@@ -65,6 +86,7 @@ class ShopOrderOverviewForm extends Form
         $this->acumulusEntryManager = $acumulusEntryManager;
         $this->service = $service;
         $this->source = null;
+        $this->status = static::Status_Unknown;
     }
 
     /**
@@ -73,6 +95,128 @@ class ShopOrderOverviewForm extends Form
     public function setSource(Source $source)
     {
         $this->source = $source;
+    }
+
+    /**
+     * Sets the status, but only if it is "worse" than the current status.
+     *
+     *
+     * @param int $status
+     *   The status to set.
+     * @param string $message
+     *   Optionally, a message indicating what is wrong may be given.
+     */
+    private function setStatus($status, $message = '')
+    {
+        if ($status > $this->status) {
+            $this->status = $status;
+            // Save the message belonging to this worse state.
+            if (!empty($message)) {
+                $this->statusMessage = $message;
+            }
+        }
+    }
+
+    /**
+     * Returns a string to use as css class for the current status.
+     *
+     * @param int $status
+     *
+     * @return string
+     */
+    public function getStatusClass($status = null)
+    {
+        if ($status === null) {
+            $status = $this->status;
+        }
+        switch ($status) {
+            case static::Status_Success:
+                $result = 'success';
+                break;
+            case static::Status_Info:
+                $result = 'info';
+                break;
+            case static::Status_Warning:
+                $result = 'warning';
+                break;
+            case static::Status_Error:
+            default:
+                $result = 'error';
+                break;
+        }
+        return $result;
+    }
+
+    /**
+     * Returns an icon character that represents the current status.
+     *
+     * @param int $status
+     *
+     * @return string
+     *   An icon character that represents the status.
+     */
+    private function getStatusIcon($status = null)
+    {
+        if ($status === null) {
+            $status = $this->status;
+        }
+        switch ($status) {
+            case static::Status_Success:
+                $result = json_decode('"\u2714"');
+                break;
+            case static::Status_Info:
+            case static::Status_Warning:
+                $result = '!';
+                break;
+            case static::Status_Error:
+            default:
+                $result = json_decode('"\u2716"');
+                break;
+        }
+        return $result;
+    }
+
+    /**
+     * Returns a set of label attributes for the current status.
+     *
+     * @param int $status
+     *
+     * @return array
+     *   A set of attributes to add to the label.
+     */
+    private function getStatusLabelAttributes($status = null)
+    {
+        if ($status === null) {
+            $status = $this->status;
+        }
+        $status = $this->getStatusClass($status);
+        $attributes = array(
+            'class' => array('notice', 'notice-' . $status),
+            'wrapper' => array(
+                'class' => array('notice', 'notice-' . $status),
+            ),
+        );
+        if (!empty($this->statusMessage)) {
+            $attributes['title'] = $this->statusMessage;
+        }
+        return $attributes;
+    }
+
+    /**
+     * Returns a description of the amount status.
+     *
+     * @param int $status
+     *
+     * @return string
+     *   A description of the amount status.
+     */
+    private function getAmountStatusTitle($status)
+    {
+        $result = '';
+        if ($status > static::Status_Success) {
+            $result = $this->t('amount_status_' . $status);
+        }
+        return $result;
     }
 
     /**
@@ -100,21 +244,21 @@ class ShopOrderOverviewForm extends Form
         $source = $this->source;
         $localEntryInfo = $this->acumulusEntryManager->getByInvoiceSource($source);
         $idPrefix = 'order_' . $source->getId();
-        $fields1Source = $this->addIdPrefix($this->getFields1Source($localEntryInfo), $idPrefix . '_');
+        $fields1Source = $this->addIdPrefix($this->getFields1Source($source, $localEntryInfo), $idPrefix . '_');
         $fields[$idPrefix] = array(
             'type' => 'fieldset',
             'fields' => $fields1Source,
         );
 
         // Other fieldsets: creditNotes.
-        $creditNotes = $this->source->getCreditNotes();
+        $creditNotes = $source->getCreditNotes();
         foreach($creditNotes as $creditNote) {
             $localEntryInfo = $this->acumulusEntryManager->getByInvoiceSource($creditNote);
             $idPrefix = 'credit_note_' . $creditNote->getId();
-            $fields1Source = $this->addIdPrefix($this->getFields1Source($localEntryInfo), $idPrefix . '_');
+            $fields1Source = $this->addIdPrefix($this->getFields1Source($source, $localEntryInfo), $idPrefix . '_');
             $fields[$idPrefix] = array(
-                'type' => 'fieldset',
-                'legend' => $this->t($creditNote->getType()) . ' ' . $creditNote->getReference(),
+                'type' => 'details',
+                'summary' => ucfirst($this->t($creditNote->getType())) . ' ' . $creditNote->getReference(),
                 'fields' => $fields1Source,
             );
         }
@@ -123,62 +267,78 @@ class ShopOrderOverviewForm extends Form
 
 
     /**
+     * Returns the overview for 1 source.
+     *
+     * @param \Siel\Acumulus\Invoice\Source $source
      * @param \Siel\Acumulus\Shop\AcumulusEntry|null $localEntryInfo
      *
      * @return array[]
+     *   The fields that describe the status for 1 source.
      */
-    protected function getFields1Source($localEntryInfo)
+    private function getFields1Source(Source $source, $localEntryInfo)
     {
-        $statusInfo = $this->getStatus($localEntryInfo);
-        /** @var string $status */
-        $status = $statusInfo['status'];
-        /** @var array $statusField */
-        $statusField = $statusInfo['field'];
+        // Get invoice status field and other invoice status related info.
+        $statusInfo = $this->getInvoiceStatusInfo($localEntryInfo);
+        /** @var string $invoiceStatus */
+        $invoiceStatus = $statusInfo['status'];
+        /** @var string $statusText */
+        $statusText = $statusInfo['text'];
+        /** @var string $statusDescription */
+        $statusDescription = $statusInfo['description'];
         /** @var Result|null $result */
         $result = $statusInfo['result'];
         /** @var array $entry */
         $entry = $statusInfo['entry'];
 
-        $fields = array(
-            'status' => $statusField,
-        );
-
-        switch ($status) {
-            case static::Status_NotSent:
+        // Create and add additional fields based on invoice status.
+        switch ($invoiceStatus) {
+            case static::Invoice_NotSent:
                 $additionalFields = $this->getNotSentFields();
                 break;
-            case static::Status_SentConcept:
+            case static::Invoice_SentConcept:
                 $additionalFields = $this->getConceptFields();
                 break;
-            case static::Status_CommunicationError:
+            case static::Invoice_CommunicationError:
                 /** @noinspection PhpUndefinedVariableInspection */
                 $additionalFields = $this->getCommunicationErrorFields($result);
                 break;
-            case static::Status_NonExisting:
+            case static::Invoice_NonExisting:
                 $additionalFields = $this->getNonExistingFields();
                 break;
-            case static::Status_Deleted:
+            case static::Invoice_Deleted:
                 $additionalFields = $this->getDeletedFields();
                 break;
-            case static::Status_Sent:
-                $additionalFields = $this->getEntryFields($localEntryInfo, $entry);
+            case static::Invoice_Sent:
+                $additionalFields = $this->getEntryFields($source, $localEntryInfo, $entry);
                 break;
             default:
                 $additionalFields = array(
                     'unknown' => array(
                         'type' => 'markup',
-                        'value' => sprintf($this->t('status_unknown'), $status),
+                        'value' => sprintf($this->t('invoice_status_unknown'), $invoiceStatus),
                     )
                 );
                 break;
         }
 
-        $fields = array_merge($fields, $additionalFields);
+        // Create main status field after we have the other fields, so we can
+        // use the results in rendering the overall status.
+        $fields = array(
+            'status' => array(
+                'type' => 'markup',
+                'label' => $this->getStatusIcon(),
+                'attributes' => array(
+                    'label' => $this->getStatusLabelAttributes(),
+                ),
+                'value' => $statusText,
+                'description' => $statusDescription,
+            ),
+        ) + $additionalFields;
         return $fields;
     }
 
     /**
-     * Returns status related information
+     * Returns status related information.
      *
      * @param \Siel\Acumulus\Shop\AcumulusEntry|null $localEntryInfo
      *
@@ -189,61 +349,50 @@ class ShopOrderOverviewForm extends Form
      *   - entry (array|null): the <entry> part of the getEntry API call.
      *   - statusField (array): a form field array representing the status.
      */
-    protected function getStatus($localEntryInfo)
+    private function getInvoiceStatusInfo($localEntryInfo)
     {
         $result = null;
         $entry = null;
         $arg1 = null;
         $arg2 = null;
-        $description = null;
+        $description = '';
         if ($localEntryInfo === null) {
-            $status = static::Status_NotSent;
-            $statusIndicator = 'info';
+            $invoiceStatus = static::Invoice_NotSent;
+            $this->setStatus(static::Status_Info);
         } else {
             $arg1 = $this->getDate($localEntryInfo->getUpdated());
             if ($localEntryInfo->getEntryId() === null) {
-                $status = static::Status_SentConcept;
+                $invoiceStatus = static::Invoice_SentConcept;
                 $description = 'concept_description';
-                $statusIndicator = 'warning';
+                $this->setStatus(static::Status_Warning);
             } else {
                 $result = $this->service->getEntry($localEntryInfo->getEntryId());
                 $entry = $this->sanitizeEntry($result->getResponse());
                 if ($result->hasCodeTag('XGYBSN000')) {
-                    $status = static::Status_NonExisting;
-                    $statusIndicator = 'error';
+                    $invoiceStatus = static::Invoice_NonExisting;
+                    $this->setStatus(static::Status_Error);
                 } elseif (empty($entry)) {
-                    $status = static::Status_CommunicationError;
-                    $statusIndicator = 'error';
+                    $invoiceStatus = static::Invoice_CommunicationError;
+                    $this->setStatus(static::Status_Error);
                 } elseif (!empty($entry['deleted'])) {
-                    $status = static::Status_Deleted;
-                    $statusIndicator = 'warning';
+                    $invoiceStatus = static::Invoice_Deleted;
+                    $this->setStatus(static::Status_Warning);
                     $arg2 = $entry['deleted'];
                 } else {
-                    $status = static::Status_Sent;
+                    $invoiceStatus = static::Invoice_Sent;
                     $arg1 = $entry['invoicenumber'];
                     $arg2 = $entry['entrydate'];
-                    $statusIndicator = 'success';
+                    $this->setStatus(static::Status_Success, $this->t('invoice_status_ok'));
                 }
             }
         }
 
-        $statusField = array(
-            'type' => 'markup',
-            'label' => $this->getStatusIcon($statusIndicator),
-            'value' => sprintf($this->t($status), $arg1, $arg2),
-            'attributes' => array(
-                'label' => $this->getLabelAttributes($statusIndicator),
-            ),
-        );
-        if ($description !== null) {
-            $statusField['description'] = $this->t($description);
-        }
-
         return array(
-            'status' => $status,
+            'status' => $invoiceStatus,
             'result' => $result,
             'entry' => $entry,
-            'field' => $statusField,
+            'text' => sprintf($this->t($invoiceStatus), $arg1, $arg2),
+            'description' => $this->t($description),
         );
     }
 
@@ -254,14 +403,15 @@ class ShopOrderOverviewForm extends Form
      * @return array[]
      *   Array of form fields.
      */
-    protected function getNotSentFields()
+    private function getNotSentFields()
     {
         $fields = array();
+        // @todo: action fields are disabled for now: next version.
         $fields += array(
-          'send' => array(
-            'type' => 'button',
-            'value' => $this->t('send_now'),
-          ),
+//          'send' => array(
+//            'type' => 'button',
+//            'value' => $this->t('send_now'),
+//          ),
         );
         return $fields;
     }
@@ -273,14 +423,15 @@ class ShopOrderOverviewForm extends Form
      * @return array[]
      *   Array of form fields.
      */
-    protected function getConceptFields()
+    private function getConceptFields()
     {
         $fields = array();
+        // @todo: action fields are disabled for now: next version.
         $fields += array(
-            'send' => array(
-                'type' => 'button',
-                'value' => $this->t('send_again'),
-            ),
+//            'send' => array(
+//                'type' => 'button',
+//                'value' => $this->t('send_again'),
+//            ),
         );
         return $fields;
     }
@@ -295,7 +446,7 @@ class ShopOrderOverviewForm extends Form
      * @return array[]
      *   Array of form fields.
      */
-    protected function getCommunicationErrorFields(Result $result)
+    private function getCommunicationErrorFields(Result $result)
     {
         $fields = array();
         $fields += array(
@@ -315,14 +466,15 @@ class ShopOrderOverviewForm extends Form
      * @return array[]
      *   Array of form fields.
      */
-    protected function getNonExistingFields()
+    private function getNonExistingFields()
     {
         $fields = array();
+        // @todo: action fields are disabled for now: next version.
         $fields += array(
-            'send' => array(
-                'type' => 'button',
-                'value' => $this->t('send_again'),
-            ),
+//            'send' => array(
+//                'type' => 'button',
+//                'value' => $this->t('send_again'),
+//            ),
         );
         return $fields;
     }
@@ -334,18 +486,19 @@ class ShopOrderOverviewForm extends Form
      * @return array[]
      *   Array of form fields.
      */
-    protected function getDeletedFields()
+    private function getDeletedFields()
     {
         $fields = array();
+        // @todo: action fields are disabled for now: next version.
         $fields += array(
-            'undelete' => array(
-                'type' => 'button',
-                'value' => $this->t('undelete'),
-            ),
-            'send' => array(
-                'type' => 'button',
-                'value' => $this->t('send_again'),
-            ),
+//            'undelete' => array(
+//                'type' => 'button',
+//                'value' => $this->t('undelete'),
+//            ),
+//            'send' => array(
+//                'type' => 'button',
+//                'value' => $this->t('send_again'),
+//            ),
         );
         return $fields;
     }
@@ -353,13 +506,14 @@ class ShopOrderOverviewForm extends Form
     /**
      * Returns additional form fields to show when the invoice is still there.
      *
+     * @param \Siel\Acumulus\Invoice\Source $source
      * @param \Siel\Acumulus\Shop\AcumulusEntry $localEntryInfo
      * @param array $entry
      *
      * @return array[]
      *   Array of form fields.
      */
-    protected function getEntryFields(BaseAcumulusEntry $localEntryInfo, array $entry)
+    private function getEntryFields(Source $source, BaseAcumulusEntry $localEntryInfo, array $entry)
     {
         /* keys in $entry array:
          *   - entryid
@@ -388,49 +542,23 @@ class ShopOrderOverviewForm extends Form
          *   * paymentstatus: 1 or 2
          *   * deleted: timestamp
          */
-        $fields = array();
-        $fields += array(
-            'invoice_number' => $this->getInvoiceNumber($entry),
-            'invoice_date' => array(
-                'type' => 'markup',
-                'label' => $this->t('invoice_date'),
-                'value' => $entry['entrydate'],
-            ),
-            'vat_type' => $this->getVatType($entry),
-        );
-        $fields += $this->getAmountFields($entry);
-        $fields += $this->getPaymentStatusFields($entry);
-        $fields += $this->getLinksField($localEntryInfo->getToken());
-
-        $fields = array(
-            'invoice_info' => array(
-                'type' => 'fieldset',
-                'legend' => '',
-                'fields' => $fields,
-            ),
-        );
+        $fields = $this->getVatTypeField($entry)
+            + $this->getAmountFields($source, $entry)
+            + $this->getPaymentStatusFields($source, $entry)
+            + $this->getLinksField($localEntryInfo->getToken());
 
         return $fields;
     }
 
     /**
-     * Returns the number of the invoice in Acumulus.
+     * Returns the vat type field.
      *
      * @param array $entry
      *
      * @return array
-     *   Form field with the number of the invoice in Acumulus.
+     *    The vattype field.
      */
-    protected function getInvoiceNumber(array $entry)
-    {
-        return array(
-            'type' => 'markup',
-            'label' => $this->t('invoice_number'),
-            'value' => isset($entry['invoicenumber']) ? $entry['invoicenumber'] : $this->t('unknown'),
-        );
-    }
-
-    protected function getVatType(array $entry)
+    private function getVatTypeField(array $entry)
     {
         if (!empty($entry['vatreversecharge'])) {
             if (!empty($entry['foreigneu'])) {
@@ -448,110 +576,181 @@ class ShopOrderOverviewForm extends Form
             $vatType = API::VatType_National;
         }
         return array(
+            'vat_type' => array(
             'type' => 'markup',
             'label' => $this->t('vat_type'),
             'value' => $this->t('vat_type_' . $vatType),
+            ),
         );
     }
 
     /**
      * Returns the payment status and date (if status is paid) of the invoice.
      *
+     * @param \Siel\Acumulus\Invoice\Source $source
      * @param array $entry
      *
      * @return array[]
      *   array with form fields with the payment status and date (if paid) of
      *   the invoice.
      */
-    protected function getPaymentStatusFields(array $entry)
+    private function getPaymentStatusFields(Source $source, array $entry)
     {
         $fields = array();
-        $remotePaymentStatus = isset($entry['paymentstatus']) ? (int) $entry['paymentstatus'] : 0;
-        $paymentDate = isset($entry['paymentdate']) ? $entry['paymentdate'] : '';
-        $paymentStatusText = $remotePaymentStatus !== 0 ? ('payment_status_' . $remotePaymentStatus) : 'unknown';
-        if ($remotePaymentStatus === API::PaymentStatus_Paid && !empty($paymentDate)) {
+        $paymentStatus = $entry['paymentstatus'];
+        $paymentDate = $entry['paymentdate'];
+
+        $paymentStatusText = $paymentStatus !== 0 ? ('payment_status_' . $paymentStatus) : 'unknown';
+        if ($paymentStatus === API::PaymentStatus_Paid && !empty($paymentDate)) {
             $paymentStatusText .= '_date';
-            $statusIndicator = $this->source->getPaymentState() === $remotePaymentStatus ? 'success' : 'warning';
-        } else {
-            $statusIndicator = $this->source->getPaymentState() === $remotePaymentStatus ? 'success' : 'info';
         }
+        $paymentStatusText = sprintf($this->t($paymentStatusText), $paymentDate);
+
+        $localPaymentStatus = $source->getPaymentStatus();
+        if ($localPaymentStatus !== $paymentStatus) {
+            $paymentCompareStatus = $paymentStatus === API::PaymentStatus_Paid ? static::Status_Warning : static::Status_Info;
+            $paymentCompareStatustext = $this->t('payment_status_not_equal');
+            $this->setStatus($paymentCompareStatus, $paymentCompareStatustext);
+        } else {
+            $paymentCompareStatus = static::Status_Success;
+        }
+
+        $paymentStatusMarkup = sprintf('<span class="notice-%s">%s</span>', $this->getStatusClass($paymentCompareStatus), $paymentStatusText);
         $fields['payment_status'] = array(
             'type' => 'markup',
             'label' => $this->t('payment_status'),
-            'attributes' => array(
-                'label' => $this->getLabelAttributes($statusIndicator),
-            ),
-            'value' => sprintf($this->t($paymentStatusText), $paymentDate),
+            'value' => $paymentStatusMarkup,
         );
-        if ($remotePaymentStatus === API::PaymentStatus_Paid) {
-            $fields['set_paid'] = array(
-                'type' => 'button',
-                'value' => $this->t('set_due'),
-            );
-        } else {
-            $fields['payment_date'] = array(
-                'type' => 'date',
-                'label' => $this->t('payment_date'),
-                'default' => date(API::DateFormat_Iso),
-            );
-            $fields['set_paid'] = array(
-                'type' => 'button',
-                'value' => $this->t('set_paid'),
+        if (!empty($paymentCompareStatustext)) {
+            $fields['payment_status'] = array_merge_recursive($fields['payment_status'],
+                array(
+                    'attributes' => array(
+                        'title' => $paymentCompareStatustext,
+                    ),
+                )
             );
         }
+
+        // @todo: action fields are disabled for now: next version.
+//        if ($paymentStatus === API::PaymentStatus_Paid) {
+//            $fields['set_paid'] = array(
+//                'type' => 'button',
+//                'value' => $this->t('set_due'),
+//            );
+//        } else {
+//            $fields['payment_date'] = array(
+//                'type' => 'date',
+//                'label' => $this->t('payment_date'),
+//                'default' => date(API::DateFormat_Iso),
+//            );
+//            $fields['set_paid'] = array(
+//                'type' => 'button',
+//                'value' => $this->t('set_paid'),
+//            );
+//        }
+
         return $fields;
     }
 
     /**
      * Returns the amounts of this invoice.
      *
+     * @param \Siel\Acumulus\Invoice\Source $source
      * @param array $entry
      *
      * @return array[]
      *   Array with form fields with the payment status and date (if paid) of
      *   the invoice.
      */
-    protected function getAmountFields(array $entry)
+    private function getAmountFields(Source $source, array $entry)
     {
         $fields = array();
         if (!empty($entry['totalvalue']) && !empty($entry['totalvalueexclvat'])) {
-            $amountEx = $entry['totalvalueexclvat'];
-            $amountInc = $entry['totalvalue'];
-            $amountVat = $amountInc - $amountEx;
+            // Get Acumulus amounts.
+            $amountExAcumulus = $entry['totalvalueexclvat'];
+            $amountIncAcumulus = $entry['totalvalue'];
+            $amountVatAcumulus = $amountIncAcumulus - $amountExAcumulus;
 
-            // Compare local amounts
-            $amountIncLocal = $this->source->getSource()->get_total();
-            $amountVatLocal = $this->source->getSource()->get_total_tax();
-            $amountExLocal = $amountIncLocal - $amountVatLocal;
-            if (Number::floatsAreEqual($amountInc, $amountIncLocal) && Number::floatsAreEqual($amountEx, $amountExLocal)) {
-                $statusIndicator = 'success';
-            } elseif (Number::floatsAreEqual($amountInc, $amountIncLocal, 0.02) && Number::floatsAreEqual($amountEx, $amountExLocal, 0.02)) {
-                $statusIndicator = 'info';
-            } elseif (Number::floatsAreEqual($amountInc, $amountIncLocal, 0.05) && Number::floatsAreEqual($amountEx, $amountExLocal, 0.05)) {
-                $statusIndicator = 'warning';
-            } else {
-                $statusIndicator = 'error';
-            }
+            // Get local amounts.
+            $localTotals = $source->getTotals();
 
-            $amountEx = wc_price($amountEx, array('currency' => 'EUR'));
-            $amountInc = wc_price($amountInc, array('currency' => 'EUR'));
-            if ($amountVat >= 0.0) {
-                $amountVat = wc_price($amountVat, array('currency' => 'EUR'));
-                $sign = '+';
-            } else {
-                $amountVat = wc_price(-$amountVat, array('currency' => 'EUR'));
-                $sign = '-';
-            }
+            // Compare.
+            $amountExStatus = $this->getAmountStatus($amountExAcumulus, $localTotals[Meta::InvoiceAmount]);
+            $amountIncStatus = $this->getAmountStatus($amountIncAcumulus, $localTotals[Meta::InvoiceAmountInc]);
+            $amountVatStatus = $this->getAmountStatus($amountVatAcumulus, $localTotals[Meta::InvoiceVatAmount]);
+
+            $amountEx = $this->getFormattedAmount($amountExAcumulus, $amountExStatus);
+            $amountInc = $this->getFormattedAmount($amountIncAcumulus, $amountIncStatus);
+            $amountVat = $this->getFormattedAmount($amountVatAcumulus, $amountVatStatus);
+
             $fields['invoice_amount'] = array(
                 'type' => 'markup',
-                'label' => $this->getStatusIcon($statusIndicator) . ' ' . $this->t('invoice_amount'),
-                'attributes' => array(
-                    'label' => $this->getLabelAttributes($statusIndicator),
-                ),
-                'value' => sprintf('%1$s %2$s %3$s %4$s = %5$s', $amountEx, $sign, $amountVat, $this->t('vat'), $amountInc),
+                'label' => $this->t('invoice_amount'),
+                'value' => sprintf('<div class="acumulus-amount">%1$s%2$s %4$s%3$s</div>', $amountEx, $amountVat, $amountInc, $this->t('vat')),
             );
         }
         return $fields;
+    }
+
+    /**
+     * Returns the status of an amount by comparing it with its local value.
+     *
+     * If the amounts differ:
+     * - < 0.5 cent, they are considered equal and 'success' will be returned.
+     * - < 2 cents, it is considered a mere rounding error and 'info' will be returned.
+     * - < 5 cents, it is considered a probable error and 'warning' will be returned.
+     * - >= 5 cents, it is considered an error and 'error' will be returned.
+     *
+     * @param float $amount
+     * @param float $amountLocal
+     *
+     * @return int
+     *   One of the Status_... constants.
+     */
+    private function getAmountStatus($amount, $amountLocal)
+    {
+        if (Number::floatsAreEqual($amount, $amountLocal)) {
+            $status = static::Status_Success;
+        } elseif (Number::floatsAreEqual($amount, $amountLocal, 0.02)) {
+            $status = static::Status_Info;
+        } elseif (Number::floatsAreEqual($amount, $amountLocal, 0.05)) {
+            $status = static::Status_Warning;
+        } else {
+            $status = static::Status_Error;
+        }
+        return $status;
+    }
+
+    /**
+     * Formats an amount in html, adding classes given the status.
+     *
+     * @param float $amount
+     * @param int $status
+     *   One of the Status_... constants.
+     *
+     * @return string
+     *   An html string representing the amount and its status.
+     */
+    private function getFormattedAmount($amount, $status)
+    {
+        $currency = '€';
+        $sign = $amount < 0.0 ? '-' : '';
+        $amount = abs($amount);
+        $statusClass = $this->getStatusClass($status);
+        $statusMessage = $this->getAmountStatusTitle($status);
+        $this->setStatus($status, $statusMessage);
+        if (!empty($statusMessage)) {
+            $statusMessage = " title=\"$statusMessage\"";
+        }
+
+        $result = '';
+        $result .= '<span class="sign">' . $sign . '</span>';
+        $result .= '<span class="currency">' . $currency . '</span>';
+        $result .= number_format($amount, 2, ',', '.');
+        // Prevents warning "There should be a space between attribute ...
+        $wrapperBegin = "<span class=\"amount notice-$statusClass\"" . $statusMessage . '>';
+        $result = $wrapperBegin . $result . '</span>';
+        return $result;
     }
 
     /**
@@ -563,23 +762,26 @@ class ShopOrderOverviewForm extends Form
      *   Array with form field that contains links to documents related to this
      *   invoice.
      */
-    protected function getLinksField($token)
+    private function getLinksField($token)
     {
-        $invoiceUri = $this->service->getInvoicePdfUri($token);
-        $invoiceText = $this->t('invoice');
-        $invoicPdf = sprintf($this->t('open_as_pdf'), $invoiceText);
+        $uri = $this->service->getInvoicePdfUri($token);
+        $text = ucfirst($this->t('invoice'));
+        $title = sprintf($this->t('open_as_pdf'), $text);
         /** @noinspection HtmlUnknownTarget */
-        $invoiceLink = sprintf('<a class="%4$s" href="%1$s" title="%3$s">%2$s</a>', $invoiceUri, $invoiceText, $invoicPdf, 'fa fa-file-pdf-o basic-icon fa-color-pdf pdf pdf-invoice');
-        $packingSlipUri = $this->service->getPackingSlipUri($token);
-        $packingSlipText = $this->t('packing_slip');
-        $packingSlipPdf = sprintf($this->t('open_as_pdf'), $packingSlipText);
+        $invoiceLink = sprintf('<a class="%4$s" href="%1$s" title="%3$s">%2$s</a>', $uri, $text, $title, 'fa fa-file-pdf-o basic-icon fa-color-pdf pdf pdf-invoice');
+
+        $uri = $this->service->getPackingSlipUri($token);
+        $text = ucfirst($this->t('packing_slip'));
+        $title = sprintf($this->t('open_as_pdf'), $text);
         /** @noinspection HtmlUnknownTarget */
-        $packingSlipLink = sprintf('<a class="%3$s" href="%1$s" title="%3$s">%2$s</a>', $packingSlipUri, $packingSlipText, $packingSlipPdf, 'fa fa-file-pdf-o basic-icon fa-color-pdf pdf pdf-packing-slip');
-        $fields = array();
-        $fields['links'] = array(
-            'type' => 'markup',
-            'label' => $this->t('documents'),
-            'value' => "$invoiceLink $packingSlipLink",
+        $packingSlipLink = sprintf('<a class="%3$s" href="%1$s" title="%3$s">%2$s</a>', $uri, $text, $title, 'fa fa-file-pdf-o basic-icon fa-color-pdf pdf pdf-packing-slip');
+
+        $fields = array(
+            'links' => array(
+                'type' => 'markup',
+                'label' => $this->t('documents'),
+                'value' => "$invoiceLink $packingSlipLink",
+            ),
         );
         return $fields;
     }
@@ -591,28 +793,9 @@ class ShopOrderOverviewForm extends Form
      *
      * @return string
      */
-    protected function getDate($timestamp)
+    private function getDate($timestamp)
     {
         return date(API::DateFormat_Iso, $timestamp);
-    }
-
-    /**
-     * Returns the fieldset for 1 refund.
-     *
-     * @param \WC_Order_Refund $refund
-     *
-     * @return array[]
-     */
-    protected function getRefundFieldset($refund)
-    {
-        $id = (string) $refund->get_id();
-        $fieldset = array(
-            'type' => 'fieldset',
-            'legend' => $this->t(Source::CreditNote) . " $id",
-            'fields' => array()
-        );
-
-        return array('refund_' . $id => $fieldset);
     }
 
     /**
@@ -626,83 +809,44 @@ class ShopOrderOverviewForm extends Form
      * @return array[]
      *
      */
-    protected function addIdPrefix($fields, $idPrefix)
+    private function addIdPrefix($fields, $idPrefix)
     {
         $result = array();
         foreach ($fields as $key => $field) {
             $newKey = $idPrefix . $key;
             $result[$newKey] = $field;
             if (isset($field['fields'])) {
-                $result[$newKey]['fields'] = $this->addIdPrefix($field['fields'], $newKey);
+                $result[$newKey]['fields'] = $this->addIdPrefix($field['fields'], $newKey . '_');
             }
         }
         return $result;
     }
 
     /**
-     * Returns an icon character that represents the status.
-     *
-     * @param $status
-     *   Status indication, like success, info, warning, or error.
-     *
-     * @return string
-     *   An icon character that represents the status.
-     */
-    protected function getStatusIcon($status)
-    {
-        switch ($status) {
-            case 'success':
-                $result = json_decode('"\u2714"');
-                break;
-            case 'info':
-            case 'warning':
-                $result = '!';
-                break;
-            case 'error':
-            default:
-                $result = json_decode('"\u2716"');
-                break;
-        }
-        return $result;
-    }
-
-    /**
-     * Returns a set of label attributes given a status indicator.
-     *
-     * @param $status
-     *   Status indication, like success, info, warning, or error.
-     *
-     * @return array
-     *   A set of attributes to add to the label.
-     */
-    protected function getLabelAttributes($status)
-    {
-        return array(
-            'class' => array($status, 'notice', 'notice-' . $status),
-            'wrapper' => array(
-                'class' => array($status, 'notice', 'notice-' . $status),
-            ),
-        );
-    }
-
-    /**
      * Sanitizes an entry struct received via an getEntry API call.
      *
-     * The info received from an external API call must not be trusted. So we
-     * sanitize it by:
-     * - Casting int, float, and bool fields it to its proper type.
+     * The info received from an external API call must not be trusted, so it
+     * should be sanitized. As most info from this API call is placed in markup
+     * fields we cannot rely on the FormRenderer or the webshop's form API
+     * (which do not sanitize markup fields).
+     *
+     * So we sanitize the values in the struct itself before using them:
+     * - Int, float, and bool fields are cast to their proper type.
      * - Date strings are parsed to a DateTime and formatted back to a date
      *   string.
      * - Strings that can only contain a restricted set of values are checked
      *   against that set and emptied if not part of it.
      * - Free string values are escaped to safe html.
+     * - Keys we don't use are not returned. This keeps the output safe when a
+     *   future API version returns additional fields and we forget to sanitize
+     *   it and thus use it non sanitised.
      *
      * @param $entry
      *
      * @return mixed
-     *
+     *   The sanitized entry struct.
      */
-    protected function sanitizeEntry($entry)
+    private function sanitizeEntry($entry)
     {
         if (!empty($entry)) {
             /* @todo: keys in $entry array that are not yet used and not yet sanitized:
@@ -730,6 +874,7 @@ class ShopOrderOverviewForm extends Form
             $result['invoicenumber'] = $this->sanitizeEntryIntValue($entry, 'invoicenumber');
             $result['totalvalueexclvat'] = $this->sanitizeEntryFloatValue($entry, 'totalvalueexclvat');
             $result['totalvalue'] = $this->sanitizeEntryFloatValue($entry, 'totalvalue');
+            $result['paymentstatus'] = $this->sanitizeEntryIntValue($entry, 'paymentstatus');
             $result['paymentdate'] = $this->sanitizeEntryDateValue($entry, 'paymentdate');
             $result['deleted'] = $this->sanitizeEntryStringValue($entry, 'deleted');
         } else {
@@ -748,7 +893,7 @@ class ShopOrderOverviewForm extends Form
      *   The html safe version of the value under this key or the empty string
      *   if not set.
      */
-    protected function sanitizeEntryStringValue(array $entry, $key)
+    private function sanitizeEntryStringValue(array $entry, $key)
     {
         return !empty($entry[$key]) ? htmlspecialchars($entry[$key], ENT_NOQUOTES) : '';
     }
@@ -762,7 +907,7 @@ class ShopOrderOverviewForm extends Form
      * @return int
      *   The int value of the value under this key.
      */
-    protected function sanitizeEntryIntValue(array $entry, $key)
+    private function sanitizeEntryIntValue(array $entry, $key)
     {
         return !empty($entry[$key]) ? (int) $entry[$key] : 0;
     }
@@ -776,7 +921,7 @@ class ShopOrderOverviewForm extends Form
      * @return int
      *   The float value of the value under this key.
      */
-    protected function sanitizeEntryFloatValue(array $entry, $key)
+    private function sanitizeEntryFloatValue(array $entry, $key)
     {
         return !empty($entry[$key]) ? (float) $entry[$key] : 0.0;
     }
@@ -791,7 +936,7 @@ class ShopOrderOverviewForm extends Form
      *   The bool value of the value under this key. True values are represented
      *   by 1, false values by 0.
      */
-    protected function sanitizeEntryBoolValue(array $entry, $key)
+    private function sanitizeEntryBoolValue(array $entry, $key)
     {
         return isset($entry[$key]) && $entry[$key] == 1;
     }
@@ -806,7 +951,7 @@ class ShopOrderOverviewForm extends Form
      *   The date value (yyyy-mm-dd) of the value under this key or the empty
      *   string, if the string is not in the valid date format (yyyy-mm-dd).
      */
-    protected function sanitizeEntryDateValue(array $entry, $key)
+    private function sanitizeEntryDateValue(array $entry, $key)
     {
         $date = '';
         if (!empty($entry[$key])) {

@@ -17,8 +17,13 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies)
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
-5.4.2 (2018-05-13)
+5.4.2 (2018-05-15)
 ------------------
+- WC: typo in css class is-dismissible on messages.
+- WC: Op een bestellingpagina in de backend wordt nu een statusoverzicht getoond
+  van de Acumulusfactuur. In een volgende versie zullen acties als bv. 'Opnieuw
+  verzenden' en 'Op betaald zetten' toegevoegd worden. Laat ons weten wat u hier
+  van vindt. Suggesties en opmerkingen zijn van harte welkom!
 - ALL: moved Creator::getInvoiceTotals() to Source::getTotals().
 - ALL: moved Creator::completeInvoiceTotals() to Source::completeTotals().
 - ALL: renamed Source::getTotals() to Source::getAvailableTotals().

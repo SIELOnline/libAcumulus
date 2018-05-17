@@ -1125,12 +1125,12 @@ class Config
         $doSave = false;
         $configStore = $this->getConfigStore();
         $values = $configStore->load();
-        foreach ($values as $key => &$value) {
-            if (strpos($value, 'originalInvoiceSource::') !== false) {
+        array_walk_recursive($values, function(&$value, $key) use (&$doSave) {
+            if (is_string($value) && strpos($value, 'originalInvoiceSource::') !== false) {
                 str_replace('originalInvoiceSource::', 'order::', $value);
                 $doSave = true;
             }
-        }
+        });
         if ($doSave) {
             $result = $this->save($values);
         }
@@ -1151,12 +1151,12 @@ class Config
         $doSave = false;
         $configStore = $this->getConfigStore();
         $values = $configStore->load();
-        foreach ($values as $key => &$value) {
-            if (strpos($value, 'paymentState') !== false) {
+        array_walk_recursive($values, function(&$value, $key) use (&$doSave) {
+            if (is_string($value) && strpos($value, 'paymentState') !== false) {
                 str_replace('paymentState', 'paymentStatus', $value);
                 $doSave = true;
             }
-        }
+        });
         if ($doSave) {
             $result = $this->save($values);
         }

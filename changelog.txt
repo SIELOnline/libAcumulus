@@ -17,6 +17,11 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies)
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
+5.4.3 (2018-05-??)
+------------------
+- WC: Rendering of invoice and packing slip contained errors possibly leading to
+  2 pdf icons before the invoice.
+
 5.4.2 (2018-05-15)
 ------------------
 - WC: typo in css class is-dismissible on messages.

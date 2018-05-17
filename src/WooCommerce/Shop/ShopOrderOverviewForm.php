@@ -768,13 +768,13 @@ class ShopOrderOverviewForm extends Form
         $text = ucfirst($this->t('invoice'));
         $title = sprintf($this->t('open_as_pdf'), $text);
         /** @noinspection HtmlUnknownTarget */
-        $invoiceLink = sprintf('<a class="%4$s" href="%1$s" title="%3$s">%2$s</a>', $uri, $text, $title, 'fa fa-file-pdf-o basic-icon fa-color-pdf pdf pdf-invoice');
+        $invoiceLink = sprintf('<a class="%4$s" href="%1$s" title="%3$s">%2$s</a>', $uri, $text, $title, 'pdf');
 
         $uri = $this->service->getPackingSlipUri($token);
         $text = ucfirst($this->t('packing_slip'));
         $title = sprintf($this->t('open_as_pdf'), $text);
         /** @noinspection HtmlUnknownTarget */
-        $packingSlipLink = sprintf('<a class="%3$s" href="%1$s" title="%3$s">%2$s</a>', $uri, $text, $title, 'fa fa-file-pdf-o basic-icon fa-color-pdf pdf pdf-packing-slip');
+        $packingSlipLink = sprintf('<a class="%4$s" href="%1$s" title="%3$s">%2$s</a>', $uri, $text, $title, 'pdf');
 
         $fields = array(
             'links' => array(

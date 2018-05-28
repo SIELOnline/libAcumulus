@@ -19,10 +19,12 @@ WC3 = WooCommerce 3 (WordPress)
 
 5.4.3 (2018-05-??)
 ------------------
+- ALL: validation between send customer and email invoice as pdf on advanced
+  config could go wrong.
 - WC: Rendering of invoice and packing slip contained errors possibly leading to
   2 pdf icons before the invoice.
-- Warning: strpos() expects parameter 1 to be string, array given in Config.php
-  on line 1129/1155.
+- ALL: Warning: strpos() expects parameter 1 to be string, array given in
+  Config.php on line 1129/1155.
 
 5.4.2 (2018-05-15)
 ------------------

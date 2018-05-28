@@ -27,8 +27,7 @@ class AdvancedConfigForm extends BaseConfigForm
      */
     protected function validateRelationFields()
     {
-        $settings = $this->acumulusConfig->getEmailAsPdfSettings();
-        if ((!array_key_exists('sendCustomer', $this->submittedValues) || !(bool) $this->submittedValues['sendCustomer']) && $settings['emailAsPdf']) {
+        if (empty($this->submittedValues['sendCustomer']) && !empty($this->submittedValues['emailAsPdf'])) {
             $this->warningMessages['conflicting_options'] = $this->t('message_validate_conflicting_options');
         }
     }
@@ -70,11 +69,6 @@ class AdvancedConfigForm extends BaseConfigForm
         // Check for valid email address if no token syntax is used.
         if (!empty($this->submittedValues['emailFrom']) && strpos($this->submittedValues['emailFrom'], '[') === false && !preg_match($regexpEmail, $this->submittedValues['emailFrom'])) {
             $this->errorMessages['emailFrom'] = $this->t('message_validate_email_4');
-        }
-
-        $settings = $this->acumulusConfig->getCustomerSettings();
-        if (isset($this->submittedValues['emailAsPdf']) && (bool) $this->submittedValues['emailAsPdf'] && !$settings['sendCustomer']) {
-            $this->errorMessages  ['conflicting_options'] = $this->t('message_validate_conflicting_options');
         }
     }
 

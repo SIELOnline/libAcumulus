@@ -823,6 +823,11 @@ class Config
                     'type' => 'string',
                     'default' => '',
                 ),
+                'nature_shop' => array(
+                    'group' => 'shop',
+                    'type' => 'int',
+                    'default' => PluginConfig::Nature_Unknown,
+                ),
                 'digitalServices' => array(
                     'group' => 'shop',
                     'type' => 'int',
@@ -832,6 +837,11 @@ class Config
                     'group' => 'shop',
                     'type' => 'int',
                     'default' => PluginConfig::VatFreeProducts_Unknown,
+                ),
+                'marginProducts' => array(
+                    'group' => 'shop',
+                    'type' => 'int',
+                    'default' => PluginConfig::MarginProducts_Unknown,
                 ),
                 'invoiceNrSource' => array(
                     'group' => 'shop',
@@ -1125,7 +1135,7 @@ class Config
         $doSave = false;
         $configStore = $this->getConfigStore();
         $values = $configStore->load();
-        array_walk_recursive($values, function(&$value, $key) use (&$doSave) {
+        array_walk_recursive($values, function(&$value) use (&$doSave) {
             if (is_string($value) && strpos($value, 'originalInvoiceSource::') !== false) {
                 str_replace('originalInvoiceSource::', 'order::', $value);
                 $doSave = true;
@@ -1151,7 +1161,7 @@ class Config
         $doSave = false;
         $configStore = $this->getConfigStore();
         $values = $configStore->load();
-        array_walk_recursive($values, function(&$value, $key) use (&$doSave) {
+        array_walk_recursive($values, function(&$value) use (&$doSave) {
             if (is_string($value) && strpos($value, 'paymentState') !== false) {
                 str_replace('paymentState', 'paymentStatus', $value);
                 $doSave = true;

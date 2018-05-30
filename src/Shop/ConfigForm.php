@@ -35,6 +35,7 @@ class ConfigForm extends BaseConfigForm
     protected function validate()
     {
         $this->validateAccountFields();
+        $this->validateShopFields();
     }
 
     /**
@@ -72,6 +73,25 @@ class ConfigForm extends BaseConfigForm
             $this->errorMessages[Tag::EmailOnError] = $this->t('message_validate_email_1');
         } elseif (!preg_match($regexpEmail, $this->submittedValues[Tag::EmailOnError])) {
             $this->errorMessages[Tag::EmailOnError] = $this->t('message_validate_email_0');
+        }
+    }
+
+    /**
+     * Validates fields in the shop settings fieldset.
+     */
+    protected function validateShopFields()
+    {
+        if ($this->submittedValues['nature_shop'] == PluginConfig::Nature_Goods && $this->submittedValues['digitalServices'] != PluginConfig::DigitalServices_No) {
+            $this->errorMessages['conflicting_options_0'] = $this->t('message_validate_conflicting_shop_options_0');
+        }
+        if ($this->submittedValues['digitalServices'] == PluginConfig::DigitalServices_Only && $this->submittedValues['nature_shop'] != PluginConfig::Nature_Services) {
+            $this->errorMessages['nature_shop_0'] = $this->t('message_validate_conflicting_shop_options_1');
+        }
+        if ($this->submittedValues['nature_shop'] == PluginConfig::Nature_Services && $this->submittedValues['marginProducts'] != PluginConfig::MarginProducts_No) {
+            $this->errorMessages['conflicting_options_1'] = $this->t('message_validate_conflicting_shop_options_2');
+        }
+        if ($this->submittedValues['marginProducts'] == PluginConfig::MarginProducts_Only && $this->submittedValues['nature_shop'] != PluginConfig::Nature_Goods) {
+            $this->errorMessages['nature_shop_1'] = $this->t('message_validate_conflicting_shop_options_3');
         }
     }
 
@@ -229,6 +249,15 @@ class ConfigForm extends BaseConfigForm
     protected function getShopFields()
     {
         $fields = array(
+            'nature_shop' => array(
+                'type' => 'radio',
+                'label' => $this->t('field_nature_shop'),
+                'description' => $this->t('desc_nature_shop'),
+                'options' => $this->getNatureOptions(),
+                'attributes' => array(
+                    'required' => true,
+                ),
+            ),
             'digitalServices' => array(
                 'type' => 'radio',
                 'label' => $this->t('field_digitalServices'),
@@ -243,6 +272,15 @@ class ConfigForm extends BaseConfigForm
                 'label' => $this->t('field_vatFreeProducts'),
                 'description' => $this->t('desc_vatFreeProducts'),
                 'options' => $this->getVatFreeProductsOptions(),
+                'attributes' => array(
+                    'required' => true,
+                ),
+            ),
+            'marginProducts' => array(
+                'type' => 'radio',
+                'label' => $this->t('field_marginProducts'),
+                'description' => $this->t('desc_marginProducts'),
+                'options' => $this->getMarginProductsOptions(),
                 'attributes' => array(
                     'required' => true,
                 ),
@@ -445,11 +483,26 @@ class ConfigForm extends BaseConfigForm
         return array();
     }
 
+    /**
+     * Returns a list of options for the nature field.
+     *
+     * @return string[]
+     *   An array keyed by the option values and having translated descriptions
+     *   as values.
+     */
+    protected function getNatureOptions()
+    {
+        return array(
+            PluginConfig::Nature_Both => $this->t('option_nature_1'),
+            PluginConfig::Nature_Goods => $this->t('option_nature_2'),
+            PluginConfig::Nature_Services => $this->t('option_nature_3'),
+        );
+    }
 
     /**
      * Returns a list of options for the digital services field.
      *
-     * @return array
+     * @return string[]
      *   An array keyed by the option values and having translated descriptions
      *   as values.
      */
@@ -465,7 +518,7 @@ class ConfigForm extends BaseConfigForm
     /**
      * Returns a list of options for the vat free products field.
      *
-     * @return array
+     * @return string[]
      *   An array keyed by the option values and having translated descriptions
      *   as values.
      */
@@ -478,5 +531,19 @@ class ConfigForm extends BaseConfigForm
         );
     }
 
-
+    /**
+     * Returns a list of options for the margin products field.
+     *
+     * @return string[]
+     *   An array keyed by the option values and having translated descriptions
+     *   as values.
+     */
+    protected function getMarginProductsOptions()
+    {
+        return array(
+            PluginConfig::MarginProducts_Both => $this->t('option_marginProducts_1'),
+            PluginConfig::MarginProducts_No => $this->t('option_marginProducts_2'),
+            PluginConfig::MarginProducts_Only => $this->t('option_marginProducts_3'),
+        );
+    }
 }

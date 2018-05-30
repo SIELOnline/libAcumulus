@@ -57,23 +57,39 @@ class ConfigFormTranslations extends TranslationCollection
         'message_validate_password_2' => 'Het veld Wachtwoord bevat tekens die Acumulus verbiedt (`\'"#%&;<>\\). Weet u zeker dat u het juiste wachtwoord heeft ingetypt?',
         'message_validate_email_0' => 'Het veld Email is geen valide e-mailadres, vul uw eigen e-mailadres in.',
         'message_validate_email_1' => 'Het veld Email is verplicht, vul uw eigen e-mailadres in.',
+        'message_validate_conflicting_shop_options_0' => 'Als u alleen producten verkoopt, kunt u geen digitale diensten verkopen. Pas één van deze opties aan.',
+        'message_validate_conflicting_shop_options_1' => 'Als u alleen digitale diensten verkoopt, vink dan bij "Soort" aan dat u alleen diensten verkoopt.',
+        'message_validate_conflicting_shop_options_2' => 'Als u alleen diensten verkoopt, kunt u geen margegoederen verkopen. Pas één van deze opties aan.',
+        'message_validate_conflicting_shop_options_3' => 'Als u alleen margegoederen verkoopt, vink dan bij "Soort" aan dat u alleen producten verkoopt.',
 
         // Shop settings.
         'shopSettingsHeader' => 'Over uw winkel',
-        'desc_shopSettings' => 'Met behulp van deze instellingen kan de koppeling beter: het <a href="https://wiki.acumulus.nl/index.php?page=127" target="_blank">factuurtype</a> bepalen; controles uitvoeren; en btw tarieven terugrekenen.',
+        'desc_shopSettings' => 'Met behulp van deze instellingen kan de koppeling beter: het <a href="https://wiki.acumulus.nl/index.php?page=facturen-naar-het-buitenland" target="_blank">factuurtype</a> bepalen; controles uitvoeren; en btw tarieven terugrekenen.',
+
+        'field_nature_shop' => 'Soort: wat verkoopt u?',
+        'option_nature_1' => 'Zowel producten als diensten.',
+        'option_nature_2' => 'Alleen producten.',
+        'option_nature_3' => 'Alleen diensten.',
+        'desc_nature_shop' => 'Geef aan of u in uw winkel producten en/of diensten aanbiedt. In Acumulus is dit het veld "Soort".',
 
         'field_digitalServices' => 'Verkoopt u digitale diensten?',
-        'option_digitalServices_1' => 'Zowel digitale diensten als normale producten.',
-        'option_digitalServices_2' => 'Alleen producten die onder Nederlandse btw vallen.',
+        'option_digitalServices_1' => 'Zowel digitale diensten als normale producten en/of diensten.',
+        'option_digitalServices_2' => 'Alleen producten en/of diensten die onder Nederlandse btw vallen.',
         'option_digitalServices_3' => 'Alleen digitale diensten die met buitenlandse btw belast moeten worden voor buitenlandse klanten.',
         'desc_digitalServices' => 'Geef aan of u in uw winkel digitale diensten aanbiedt waarbij u buitenlandse btw moet hanteren voor EU klanten.
-Zie <a href="http://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/btw_berekenen_bij_diensten/wijziging_in_digitale_diensten_vanaf_2015/wijziging_in_digitale_diensten_vanaf_2015" target="_blank">Belastingdienst: diensten naar andere EU landen</a>.',
+Zie <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/btw_berekenen_bij_diensten/wijziging_in_digitale_diensten_vanaf_2015/wijziging_in_digitale_diensten_vanaf_2015" target="_blank">Belastingdienst: diensten naar andere EU landen</a>.',
 
         'field_vatFreeProducts' => 'Verkoopt u van btw vrijgestelde producten of diensten?',
         'option_vatFreeProducts_1' => 'Zowel btw vrije als aan btw onderhevige producten en/of diensten.',
         'option_vatFreeProducts_2' => 'Alleen aan btw onderhevige producten en/of diensten.',
         'option_vatFreeProducts_3' => 'Alleen producten of diensten die van btw vrijgesteld zijn.',
         'desc_vatFreeProducts' => 'Geef aan of u in uw winkel producten en/of diensten aanbiedt die vrijgesteld zijn van btw, bv. onderwijs. LET OP: het gaat er om of het product of de dienst btw-vrij is, niet of u een btw-vrije factuur of een factuur met verlegde btw opstelt.',
+
+        'field_marginProducts' => 'Verkoopt u margegoederen?',
+        'option_marginProducts_1' => 'Zowel nieuwe producten en/of diensten als margegoederen.',
+        'option_marginProducts_2' => 'Alleen nieuwe producten en/of diensten.',
+        'option_marginProducts_3' => 'Alleen margegoederen.',
+        'desc_marginProducts' => 'Geef aan of u in uw winkel margegoederen (bv. 2e-hands producten) verkoopt. Zie <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/bijzondere_regelingen/margeregeling/margeregeling" target="_blank">Margeregeling</a>.',
 
         // Trigger settings.
         'triggerSettingsHeader' => 'Wanneer wilt u uw facturen automatisch versturen naar Acumulus',
@@ -369,23 +385,39 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'message_validate_password_2' => 'The field Password contains a character that is forbidden by Acumulus (`\'"#%&;<>\\). Are you sure that you typed the correct password?',
         'message_validate_email_0' => 'The field Email is not a valid e-mail address, please fill in your own e-mail address.',
         'message_validate_email_1' => 'The field Email is required, please fill in your own e-mail address.',
+        'message_validate_conflicting_shop_options_0' => 'If you only sell goods, you cannot sell digital services. change one of these options.',
+        'message_validate_conflicting_shop_options_1' => 'If you only sell digital services, you should select that you only sell services on the "Nature" field.',
+        'message_validate_conflicting_shop_options_2' => 'If you only sell services, you cannot sell using the margin scheme. change one of these options.',
+        'message_validate_conflicting_shop_options_3' => 'If you only sell using the margin scheme, you should select that you only sell goods on the "Nature" field.',
 
         // Shop settings.
         'shopSettingsHeader' => 'About your shop',
-        'desc_shopSettings' => 'With these settings, this plugin is better able to: determine the <a href="https://wiki.acumulus.nl/index.php?page=127" target="_blank">invoice type</a>; perform some sanity checks; and to compute VAT rates.',
+        'desc_shopSettings' => 'With these settings, this plugin is better able to: determine the <a href="https://wiki.acumulus.nl/index.php?page=facturen-naar-het-buitenland" target="_blank">invoice type</a>; perform some sanity checks; and to compute VAT rates.',
+
+        'field_nature_shop' => 'Nature: what do you sell?',
+        'option_nature_1' => 'Products and services.',
+        'option_nature_2' => 'Only products.',
+        'option_nature_3' => 'Only services.',
+        'desc_nature_shop' => 'Select whether you sell products and/or services. In Acumulus this is the field "Nature" ("Soort").',
 
         'field_digitalServices' => 'Do you sell digital services?',
         'option_digitalServices_1' => 'Both digital services and normal products.',
         'option_digitalServices_2' => 'Only products that are subject to dutch VAT.',
         'option_digitalServices_3' => 'Only digital services subject to the regulations concerning using foreign VAT rates.',
         'desc_digitalServices' => 'Select whether your store offers digital services that are subject to foreign VAT for clients in other EU countries.
-See <a href="http://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/btw_berekenen_bij_diensten/wijziging_in_digitale_diensten_vanaf_2015/wijziging_in_digitale_diensten_vanaf_2015">Dutch tax office: services to other EU countries (in dutch)</a>.',
+See <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/btw_berekenen_bij_diensten/wijziging_in_digitale_diensten_vanaf_2015/wijziging_in_digitale_diensten_vanaf_2015">Dutch tax office: services to other EU countries (in dutch)</a>.',
 
         'field_vatFreeProducts' => 'Do you sell  VAT free products or services?',
         'option_vatFreeProducts_1' => 'Both VAT free and VAT liable products or services.',
         'option_vatFreeProducts_2' => 'Only products or services that are VAT liable.',
         'option_vatFreeProducts_3' => 'Only VAT free products or services.',
         'desc_vatFreeProducts' => 'Select whether your store offers products or services that are VAT free, e.g. education. NOTE: this settings concerns whether the products or services you offer are inherently vat free, not whether you create vat free invoices or invoices with reversed vat.',
+
+        'field_marginProducts' => 'Do you sell products using the margin scheme?',
+        'option_marginProducts_1' => 'New products and/or services as well as products that use the margin scheme.',
+        'option_marginProducts_2' => 'Only new products and/or services.',
+        'option_marginProducts_3' => 'Only products that use the margin scheme.',
+        'desc_marginProducts' => 'Select whether your store sells (2nd hand) products using the margin scheme. See <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/bijzondere_regelingen/margeregeling/margeregeling" target="_blank">Dutch tax office: margin goods (in dutch)</a>.',
 
         // Trigger settings.
         'triggerSettingsHeader' => 'When to have your invoices sent to Acumulus.',

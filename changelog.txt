@@ -19,6 +19,8 @@ WC3 = WooCommerce 3 (WordPress)
 
 5.4.3 (2018-05-??)
 ------------------
+- ALL: Added configuration settings to determine the nature of the products in
+  the catalog and if goods are sold using the margin scheme.
 - ALL: validation between send customer and email invoice as pdf on advanced
   config could go wrong.
 - WC: Rendering of invoice and packing slip contained errors possibly leading to

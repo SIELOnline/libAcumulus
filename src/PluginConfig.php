@@ -42,6 +42,11 @@ interface PluginConfig
     const InvoiceDate_OrderCreate = 2;
     const InvoiceDate_Transfer = 3;
 
+    const Nature_Unknown = 0;
+    const Nature_Both = 1;
+    const Nature_Goods = 2;
+    const Nature_Services = 3;
+
     const DigitalServices_Unknown = 0;
     const DigitalServices_Both = 1;
     const DigitalServices_No = 2;
@@ -51,6 +56,11 @@ interface PluginConfig
     const VatFreeProducts_Both = 1;
     const VatFreeProducts_No = 2;
     const VatFreeProducts_Only = 3;
+
+    const MarginProducts_Unknown = 0;
+    const MarginProducts_Both = 1;
+    const MarginProducts_No = 2;
+    const MarginProducts_Only = 3;
 
     const TriggerInvoiceEvent_None = 0;
     const TriggerInvoiceEvent_Create = 1;

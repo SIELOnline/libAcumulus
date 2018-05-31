@@ -375,7 +375,7 @@ class Container
     public function getCompletor()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('Completor', 'Invoice', array($this->getCompletorInvoiceLines(), $this->getCompletorStrategyLines(), $this->getCountries(), $this->getService(), $this->getConfig(), $this->getTranslator()));
+        return $this->getInstance('Completor', 'Invoice', array($this->getCompletorInvoiceLines(), $this->getCompletorStrategyLines(), $this->getCountries(), $this->getService(), $this->getConfig(), $this->getTranslator(), $this->getLog()));
     }
 
     /**

@@ -19,13 +19,18 @@ WC3 = WooCommerce 3 (WordPress)
 
 5.4.3 (2018-05-??)
 ------------------
-- ALL: Added configuration settings to determine the nature of the products in
-  the catalog and if goods are sold using the margin scheme.
-- ALL: validation between send customer and email invoice as pdf on advanced
-  config could go wrong.
-- WC: Rendering of invoice and packing slip contained errors possibly leading to
-  2 pdf icons before the invoice.
-- ALL: Warning: strpos() expects parameter 1 to be string, array given in
+- ALL: feature: based on the new settings, the code to determine the vat type
+  and any warning to give when no vat type could be determined, has been
+  improved.
+- ALL: feature: Added configuration settings to determine the nature of the
+  products in the catalog and if goods are sold using the margin scheme. These
+  settings are used to fill in the nature tag and to better determine the vat
+  type.
+- ALL: bug: validation between send customer and email invoice as pdf on
+  advanced config could go wrong.
+- WC: bug Rendering of invoice and packing slip contained errors possibly
+  leading to 2 pdf icons before the invoice.
+- ALL: bug: Warning: strpos() expects parameter 1 to be string, array given in
   Config.php on line 1129/1155.
 
 5.4.2 (2018-05-15)

@@ -23,14 +23,20 @@ class CompletorInvoiceLines
 {
     /**
      * The list of possible vat types, initially filled with possible vat types
-     * type based on client country, invoiceHasLineWithVat(), is_company(), and
-     * the digital services setting.
+     * based on client country, invoiceHasLineWithVat(), is_company(), and the
+     * digital services setting.
      *
      * @var int[]
      */
     protected $possibleVatTypes;
 
-    /** @var array[] */
+    /**
+     * The list of possible vat rates, based on the possible vat types and
+     * extended with the zero rates (0 and -1 (vat-free)) if they might be
+     * applicable.
+     *
+     * @var array[]
+     */
     protected $possibleVatRates;
 
     /** @var \Siel\Acumulus\Config\Config  */

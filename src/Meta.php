@@ -19,7 +19,7 @@ interface Meta
 {
     // Line: Price and vat related meta tags.
     /**
-     * Creator->Completor/Strategy: Unit price inc vat (in addition to
+     * Creator -> Completor/Strategy: Unit price inc vat (in addition to
      * unitpriceinc).
      */
     const UnitPriceInc = 'unitpriceinc';
@@ -62,7 +62,7 @@ interface Meta
      */
     const UnitPriceOld = 'meta-unitprice-old';
     /**
-     * Creator->Completor: (current) vat rate looked up from e.g. the product or
+     * Creator -> Completor: (current) vat rate looked up from e.g. the product or
      * shipping settings.
      */
     const VatRateLookup = 'meta-vatrate-lookup';
@@ -106,8 +106,8 @@ interface Meta
      */
     const LineDiscountAmountInc = 'meta-line-discount-amountinc';
     /**
-     * Creator->Strategy: the discount vat amount that was applied to this line
-     * (used by the SplitKnownDiscountLine strategy, Magento only).
+     * Creator -> Strategy: the discount vat amount that was applied to this
+     * line (used by the SplitKnownDiscountLine strategy, Magento only).
      */
     const LineDiscountVatAmount = 'meta-line-discount-vatamount';
 
@@ -128,14 +128,16 @@ interface Meta
     const PrecisionVatAmount = 'meta-vatamount-precision';
 
     // Invoice: Invoice totals meta tags.
-    /** Creator->Completor: the total amount ex vat of the invoice. */
+    /**
+     * Creator -> Completor: the total amount ex vat of the invoice.
+     */
     const InvoiceAmount = 'meta-invoice-amount';
     /**
-     * Creator->Completor: the total amount inc vat of the invoice.
+     * Creator -> Completor: the total amount inc vat of the invoice.
      */
     const InvoiceAmountInc = 'meta-invoice-amountinc';
     /**
-     * Creator->Completor: the total vat amount of the invoice.
+     * Creator -> Completor: the total vat amount of the invoice.
      */
     const InvoiceVatAmount = 'meta-invoice-vatamount';
     /**
@@ -164,6 +166,20 @@ interface Meta
      * not (yet) known for all lines.
      */
     const LinesIncomplete = 'meta-lines-incomplete';
+
+    // Invoice: Vat type related meta tags.
+    /**
+     * Completor: Possible vat types for this invoice (and shop settings).
+     */
+    const VatTypesPossibleInvoice = 'meta-vattypes-possible-invoice';
+    /**
+     * Completor: Union of possible vat types for the invoice lines.
+     */
+    const VatTypesPossibleInvoiceLinesUnion = 'meta-vattypes-possible-lines-union';
+    /**
+     * Completor: Intersection of possible vat types for the invoice lines.
+     */
+    const VatTypesPossibleInvoiceLinesIntersection = 'meta-vattypes-possible-lines-intersection';
 
     // Invoice: Currency related meta tags.
     /**

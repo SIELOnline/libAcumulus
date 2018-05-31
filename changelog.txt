@@ -19,6 +19,8 @@ WC3 = WooCommerce 3 (WordPress)
 
 5.4.3 (2018-05-??)
 ------------------
+- ALL: feature: removed invoice setting useMargin in favor of shop setting
+  marginProducts.
 - ALL: feature: based on the new settings, the code to determine the vat type
   and any warning to give when no vat type could be determined, has been
   improved.

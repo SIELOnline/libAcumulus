@@ -820,11 +820,13 @@ abstract class Creator
      * Returns whether the margin scheme may be used.
      *
      * @return bool
+     *
+     * @deprecated Use shop setting marginProducts. Will be removed when no longer used.
      */
     protected function allowMarginScheme()
     {
-        $invoiceSettings = $this->config->getInvoiceSettings();
-        return $invoiceSettings['useMargin'];
+        $shopSettings = $this->config->getShopSettings();
+        return $shopSettings['marginProducts'];
     }
 
     /**

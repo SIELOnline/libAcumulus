@@ -391,7 +391,6 @@ class Config
      *   - description
      *   - descriptionText
      *   - invoiceNotes
-     *   - useMargin
      *   - optionsShow
      *   - optionsAllOn1Line
      *   - optionsAllOnOwnLine
@@ -761,12 +760,6 @@ class Config
                     'group' => Tag::Invoice,
                     'type' => 'bool',
                     'default' => true,
-                ),
-                // @nth: add to UI if shop does support it (PS?, WC?).
-                'useMargin' => array(
-                    'group' => Tag::Invoice,
-                    'type' => 'bool',
-                    'default' => false,
                 ),
                 'optionsShow' => array(
                     'group' => Tag::Invoice,

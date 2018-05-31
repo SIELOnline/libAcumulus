@@ -976,95 +976,6 @@ class Completor
     }
 
     /**
-     * Returns whether the invoice has lines with vat and/or has lines with a
-     * 0% or vat free vat rate.
-     *
-     * The invoice lines do not have to be flattened when we arrive here.
-     *
-     * @param array $lines
-     *   The lines to determine the vat situation for.
-     * @param bool $includeDiscountLines
-     *   Discount lines representing a partial payment should be VAT free and
-     *   should not always trigger a return value of true. This parameter can be
-     *   used to indicate what to do with VAT free discount lines.
-     *
-     * @return int
-     *   Bit combination of:
-     *   - static::Vat_HasVat: 1 or more lines have a positive vat rate.
-     *   - static::Vat_Has0Vat: 1 or more lines have a 0% or vat free vat rate.
-     *   - static::Vat_Unknown: For 1 or more lines it is unknown whether the
-     *     line has vat or not.
-     *   The latter will be the case with free products and a webshop that does
-     *   not store vat rates with order lines.
-     *
-     * @deprecated No longer used
-     */
-    protected function getVatSituation(array $lines, $includeDiscountLines = false)
-    {
-        $result = 0;
-        foreach ($lines as $line) {
-            if ($line[Meta::LineType] !== Creator::LineType_Discount || $includeDiscountLines) {
-                $result |= $this->getLineVatSituation($line);
-            }
-            if (!empty($line[Meta::ChildrenLines])) {
-                $result |= $this->getVatSituation($line[Meta::ChildrenLines], $includeDiscountLines);
-            }
-        }
-        return $result;
-    }
-
-    /**
-     * Returns the vat situation of the given line.
-     *
-     * @param array $line
-     *
-     * @return int
-     *   Either:
-     *   - static::Vat_HasVat: line has a positive vat rate.
-     *   - static::Vat_Has0Vat: line has a 0% or vat free vat rate.
-     *   - static::Vat_Unknown: it is unknown whether the line has vat or not.
-     *   The latter will be the case with free products and a webshop that does
-     *   not store vat rates with order lines.
-     *
-     * @deprecated No longer used
-     */
-    protected function getLineVatSituation(array $line)
-    {
-        $result = static::Vat_Unknown;
-        if ($this->lineHasVatRate($line)) {
-            $result = static::Vat_HasVat;
-        }
-        if ($this->lineHas0VatRate($line)) {
-            $result = static::Vat_Has0Vat;
-        }
-        return $result;
-    }
-
-    /**
-     * Returns whether the line has a positive vat rate.
-     *
-     * @param array $line
-     *   The invoice line.
-     *
-     * @return bool
-     *   True if the line has a positive vat rate, false otherwise.
-     *
-     * @deprecated No longer used
-     */
-    protected function lineHasVatRate(array $line)
-    {
-        $result = false;
-        if (isset($line[Tag::VatRate]) && (float) $line[Tag::VatRate] > 0.0) {
-            $result = true;
-        } elseif (isset($line[Meta::VatAmount]) && !Number::isZero($line[Meta::VatAmount])) {
-            $result = true;
-        } elseif (isset($line[Meta::LineVatAmount]) && !Number::isZero($line[Meta::LineVatAmount])) {
-            $result = true;
-        }
-        return $result;
-    }
-
-    /**
      * Returns whether the given line has a 0% or vat free vat rate.
      *
      * @param array $line
@@ -1080,30 +991,6 @@ class Completor
             $result = true;
         }
         return $result;
-    }
-
-    /**
-     * Returns whether the invoice has at least 1 line with a costprice set.
-     *
-     * @param array $lines
-     *
-     * @return bool
-     *
-     * @deprecated No longer used
-     */
-    protected function invoiceHasLineWithCostPrice(array $lines)
-    {
-        $hasLineWithCostPrice = false;
-        foreach ($lines as $line) {
-            if (isset($line[Tag::CostPrice])) {
-                $hasLineWithCostPrice = true;
-                break;
-            } elseif (!empty($line[Meta::ChildrenLines]) && $this->invoiceHasLineWithCostPrice($line[Meta::ChildrenLines])) {
-                $hasLineWithCostPrice = true;
-                break;
-            }
-        }
-        return $hasLineWithCostPrice;
     }
 
     /**

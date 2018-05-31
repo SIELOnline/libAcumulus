@@ -17,7 +17,7 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies)
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
-5.4.3 (2018-05-??)
+5.4.3 (2018-05-31)
 ------------------
 - ALL: feature: added support for costprice setting in all plugins, was only for
   WooCommerce and, not completely correct, PrestaShop.

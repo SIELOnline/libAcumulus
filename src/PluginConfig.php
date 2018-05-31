@@ -44,7 +44,7 @@ interface PluginConfig
 
     const Nature_Unknown = 0;
     const Nature_Both = 1;
-    const Nature_Goods = 2;
+    const Nature_Products = 2;
     const Nature_Services = 3;
 
     const DigitalServices_Unknown = 0;

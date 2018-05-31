@@ -81,7 +81,7 @@ class ConfigForm extends BaseConfigForm
      */
     protected function validateShopFields()
     {
-        if ($this->submittedValues['nature_shop'] == PluginConfig::Nature_Goods && $this->submittedValues['digitalServices'] != PluginConfig::DigitalServices_No) {
+        if ($this->submittedValues['nature_shop'] == PluginConfig::Nature_Products && $this->submittedValues['digitalServices'] != PluginConfig::DigitalServices_No) {
             $this->errorMessages['conflicting_options_0'] = $this->t('message_validate_conflicting_shop_options_0');
         }
         if ($this->submittedValues['digitalServices'] == PluginConfig::DigitalServices_Only && $this->submittedValues['nature_shop'] != PluginConfig::Nature_Services) {
@@ -90,7 +90,7 @@ class ConfigForm extends BaseConfigForm
         if ($this->submittedValues['nature_shop'] == PluginConfig::Nature_Services && $this->submittedValues['marginProducts'] != PluginConfig::MarginProducts_No) {
             $this->errorMessages['conflicting_options_1'] = $this->t('message_validate_conflicting_shop_options_2');
         }
-        if ($this->submittedValues['marginProducts'] == PluginConfig::MarginProducts_Only && $this->submittedValues['nature_shop'] != PluginConfig::Nature_Goods) {
+        if ($this->submittedValues['marginProducts'] == PluginConfig::MarginProducts_Only && $this->submittedValues['nature_shop'] != PluginConfig::Nature_Products) {
             $this->errorMessages['nature_shop_1'] = $this->t('message_validate_conflicting_shop_options_3');
         }
     }
@@ -494,7 +494,7 @@ class ConfigForm extends BaseConfigForm
     {
         return array(
             PluginConfig::Nature_Both => $this->t('option_nature_1'),
-            PluginConfig::Nature_Goods => $this->t('option_nature_2'),
+            PluginConfig::Nature_Products => $this->t('option_nature_2'),
             PluginConfig::Nature_Services => $this->t('option_nature_3'),
         );
     }

@@ -85,15 +85,12 @@ class Creator extends BaseCreator
     {
         $result = array();
         $this->addPropertySource('item', $item);
-        $invoiceSettings = $this->config->getInvoiceSettings();
-        $this->addTokenDefault($result, Tag::ItemNumber, $invoiceSettings['itemNumber']);
-        $this->addTokenDefault($result, Tag::Product, $invoiceSettings['productName']);
+        $this->addProductInfo($result);
         // Remove html with variant info from product name, we'll add that later
         // using children lines.
         if (isset($result[Tag::Product]) && ($pos = strpos($result[Tag::Product], '<span')) !== false) {
             $result[Tag::Product] = substr($result[Tag::Product], 0, $pos);
         }
-        $this->addTokenDefault($result,Tag::Nature, $invoiceSettings['nature']);
 
         $productPriceEx = (float) $item->order_product_price;
         $productVat = (float) $item->order_product_tax;

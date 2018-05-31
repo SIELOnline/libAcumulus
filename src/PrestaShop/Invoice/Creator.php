@@ -137,12 +137,9 @@ class Creator extends BaseCreator
 
         $this->addPropertySource('item', $item);
 
-        $invoiceSettings = $this->config->getInvoiceSettings();
-        $this->addTokenDefault($result, Tag::ItemNumber, $invoiceSettings['itemNumber']);
-        $this->addTokenDefault($result, Tag::Product, $invoiceSettings['productName']);
-        $this->addTokenDefault($result, Tag::Nature, $invoiceSettings['nature']);
-
+        $this->addProductInfo($result);
         $sign = $this->invoiceSource->getSign();
+
         // Prestashop does not support the margin scheme. So in a standard
         // install this method will always return false. But if this method
         // happens to return true anyway (customisation, hook), the costprice
@@ -153,6 +150,7 @@ class Creator extends BaseCreator
             // - But still send the VAT rate to Acumulus.
             $result[Tag::UnitPrice] = $sign * $item['unit_price_tax_incl'];
             // Costprice > 0 triggers the margin scheme in Acumulus.
+            $invoiceSettings = $this->config->getInvoiceSettings();
             $this->addTokenDefault($result, Tag::CostPrice, $invoiceSettings['costPrice']);
         } else {
             // Unit price is without VAT: use product_price.

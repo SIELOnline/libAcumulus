@@ -70,7 +70,7 @@ class ConfigFormTranslations extends TranslationCollection
         'option_nature_1' => 'Zowel producten als diensten.',
         'option_nature_2' => 'Alleen producten.',
         'option_nature_3' => 'Alleen diensten.',
-        'desc_nature_shop' => 'Geef aan of u in uw winkel producten en/of diensten aanbiedt. In Acumulus is dit het veld "Soort".',
+        'desc_nature_shop' => 'Geef aan of u in uw winkel producten en/of diensten aanbiedt. In Acumulus is dit het veld "Soort". LET OP: deze instelling betreft alleen de artikelen in uw catalogus, niet verzend, handling, verpakkings, of betaalkosten.',
 
         'field_digitalServices' => 'Verkoopt u digitale diensten?',
         'option_digitalServices_1' => 'Zowel digitale diensten als normale producten en/of diensten.',
@@ -251,7 +251,7 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'field_productName' => 'Productnaam',
         'desc_productName' => 'De productnaam of omschrijving die u op de factuurregel wilt tonen.',
         'field_nature' => 'Soort product',
-        'desc_nature' => 'Kan 2 waardes krijgen: "Product" of  "service". Als u alleen maar producten of alleen maar services verkoopt via deze webwinkel, kunt u dit letterljik invullen. Als u zowel producten als services verkoopt en u slaat dit als een kenmerk op bij alle artikelen in uw catalogus, kunt u een veldverwijzing gebruiken naar dat kenmerk.',
+        'desc_nature' => 'Kan 2 waardes krijgen: "Product" of "Service". Als u alleen maar producten of alleen maar services verkoopt via deze webwinkel, stel u dit in op het Acumulus instellingen formulier en vult de plugin dit automatisch in. Als u zowel producten als services verkoopt en u slaat dit als een kenmerk op bij alle artikelen in uw catalogus, kunt u een veldverwijzing gebruiken naar dat kenmerk.',
         'field_costPrice' => 'Kostprijs',
         'desc_costPrice' => 'De kostprijs van een artikel. Dit wordt alleen gebruikt op margefacturen.',
 
@@ -398,7 +398,7 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'option_nature_1' => 'Products and services.',
         'option_nature_2' => 'Only products.',
         'option_nature_3' => 'Only services.',
-        'desc_nature_shop' => 'Select whether you sell products and/or services. In Acumulus this is the field "Nature" ("Soort").',
+        'desc_nature_shop' => 'Select whether you sell products and/or services. In Acumulus this is the field "Nature" ("Soort"). NOTE: this settings only concerns the items in your "catalog", not shipping, handling, packing, or payment fees.',
 
         'field_digitalServices' => 'Do you sell digital services?',
         'option_digitalServices_1' => 'Both digital services and normal products.',
@@ -407,7 +407,7 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'desc_digitalServices' => 'Select whether your store offers digital services that are subject to foreign VAT for clients in other EU countries.
 See <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/btw_berekenen_bij_diensten/wijziging_in_digitale_diensten_vanaf_2015/wijziging_in_digitale_diensten_vanaf_2015">Dutch tax office: services to other EU countries (in dutch)</a>.',
 
-        'field_vatFreeProducts' => 'Do you sell  VAT free products or services?',
+        'field_vatFreeProducts' => 'Do you sell VAT free products or services?',
         'option_vatFreeProducts_1' => 'Both VAT free and VAT liable products or services.',
         'option_vatFreeProducts_2' => 'Only products or services that are VAT liable.',
         'option_vatFreeProducts_3' => 'Only VAT free products or services.',
@@ -579,9 +579,9 @@ If you unchecked the first option, the second option only applies to business cl
         'field_productName' => 'Product name',
         'desc_productName' => 'The product name or description you want to show on the invoice.',
         'field_nature' => 'Nature',
-        'desc_nature' => 'The nature of the  article sold. This can be either "Product" or "Service". If this shop only sells products or only services, you can fill that in here. If you sell both and you store this as a property for all articles in your catalog you can use a field reference to use that property.',
+        'desc_nature' => 'The nature of the article sold. This can be either "Product" or "Service". If your shop only sells products or only sells services, you should indicate so in the Acumulus settings form and the plugin will fill this in automatically. If you sell both and you store this as a property for all items in your catalog you can use a field reference to use that property.',
         'field_costPrice' => 'Cost price',
-        'desc_costPrice' => 'The cost price of this article. This is only used on margin invoices.',
+        'desc_costPrice' => 'The cost price of this article. This is only used on margin scheme invoices.',
 
         // Options settings.
         'optionsSettingsHeader' => 'Options or variants',
@@ -612,7 +612,7 @@ If you unchecked the first option, the second option only applies to business cl
         'desc_paymentMethodAccountNumberFieldset' => 'Below you can enter an account to use per (active) payment method. The default above serves as fallback for payment methods for which you do not specify an account.',
 
         'paymentMethodCostCenterFieldset' => 'Cost center per payment method',
-        'desc_paymentMethodCostCenterFieldset' => 'Below you can enter a cost center to use per (active) payment method.  The default above serves as fallback for payment methods for which you do not specify a cost center.',
+        'desc_paymentMethodCostCenterFieldset' => 'Below you can enter a cost center to use per (active) payment method. The default above serves as fallback for payment methods for which you do not specify a cost center.',
 
         // Email as pdf settings.
         'emailAsPdfSettingsHeader' => 'PDF Invoice',

@@ -130,10 +130,8 @@ class Creator extends BaseCreator
     {
         $result = array();
         $this->addPropertySource('item', $item);
-        $invoiceSettings = $this->config->getInvoiceSettings();
-        $this->addTokenDefault($result, Tag::ItemNumber, $invoiceSettings['itemNumber']);
-        $this->addTokenDefault($result, Tag::Product, $invoiceSettings['productName']);
-        $this->addTokenDefault($result, Tag::Nature, $invoiceSettings['nature']);
+
+        $this->addProductInfo($result);
 
         $productPriceEx = (float) $item->product_discountedPriceWithoutTax;
         $productPriceInc = (float) $item->product_final_price;

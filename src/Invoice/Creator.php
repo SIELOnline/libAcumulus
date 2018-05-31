@@ -589,6 +589,55 @@ abstract class Creator
     }
 
     /**
+     * Adds the product based tags to a line.
+     *
+     * The product based tags are:
+     * - item number
+     * - product name
+     * - nature
+     *
+     * @param array $line
+     */
+    protected function addProductInfo(array &$line)
+    {
+        $invoiceSettings = $this->config->getInvoiceSettings();
+        $this->addTokenDefault($line, Tag::ItemNumber, $invoiceSettings['itemNumber']);
+        $this->addTokenDefault($line, Tag::Product, $invoiceSettings['productName']);
+        $this->addNature($line);
+    }
+
+    /**
+     * Adds the nature tag to the line.
+     *
+     * The nature tag indicates the nature of the article for which the line is
+     * being constructed. It can be Product or Service.
+     *
+     * The nature can come from the:
+     * - Shop settings: the nature_shop setting.
+     * - Invoice settings: The nature field reference.
+     *
+     * @param array $line
+     */
+    protected function addNature(array &$line)
+    {
+        if (empty($line[Tag::Nature])) {
+            $shopSettings = $this->config->getShopSettings();
+            switch ($shopSettings['nature_shop']) {
+                case PluginConfig::Nature_Products:
+                    $line[Tag::Nature] = Api::Nature_Product;
+                    break;
+                case PluginConfig::Nature_Services:
+                    $line[Tag::Nature] = Api::Nature_Service;
+                    break;
+                default:
+                    $invoiceSettings = $this->config->getInvoiceSettings();
+                    $this->addTokenDefault($line, Tag::Nature, $invoiceSettings['nature']);
+                    break;
+            }
+        }
+    }
+
+    /**
      * Returns all the fee lines for the order.
      *
      * Override this method if it is easier to return all fee lines at once.
@@ -612,13 +661,13 @@ abstract class Creator
 
         $line = $this->getPaymentFeeLine();
         if ($line) {
-            $line[Meta::LineType] = static::LineType_PaymentFee;
+            $line = $this->addLineType($line,static::LineType_PaymentFee);
             $result[] = $line;
         }
 
         $line = $this->getGiftWrappingLine();
         if ($line) {
-            $line[Meta::LineType] = static::LineType_GiftWrapping;
+            $line = $this->addLineType($line,static::LineType_GiftWrapping);
             $result[] = $line;
         }
 
@@ -931,21 +980,38 @@ abstract class Creator
     }
 
     /**
-     * Adds a meta-line-type tag to the line and its children, if any.
+     * Adds a meta-line-type tag to the line(s) and its children, if any.
      *
-     * @param array[] $lines
+     * @param array|array[] $lines
+     *   May be a single line not placed in an array.
      * @param string $lineType
+     *   The line type to add to the line.
+     * @param string $nature
+     *   Optional: the nature to add to the line.
      *
-     * @return array
-     *   The line with the line type meta tag added.
+     * @return array|array[]
+     *   The line(s) with the line type meta tag added.
      */
-    protected function addLineType(array $lines, $lineType)
+    protected function addLineType(array $lines, $lineType, $nature = '')
     {
-        foreach ($lines as &$line) {
-            $line[Meta::LineType] = $lineType;
-            if (isset($line[Meta::ChildrenLines])) {
-                foreach ($line[Meta::ChildrenLines] as &$childLine) {
-                    $childLine[Meta::LineType] = $lineType;
+        if (!empty($lines)) {
+            // reset(), so key() does not return null if the array is not empty.
+            reset($lines);
+            if (is_numeric(key($lines))) {
+                // Numeric index: array of lines.
+                foreach ($lines as &$line) {
+                    $this->addDefault($line, Meta::LineType, $lineType);
+                    $this->addDefault($line, Tag::Nature, $nature);
+                    if (isset($line[Meta::ChildrenLines])) {
+                        $line[Meta::ChildrenLines] = $this->addLineType($line[Meta::ChildrenLines], $lineType, $nature);
+                    }
+                }
+            } else {
+                // String key: single line.
+                $this->addDefault($lines, Meta::LineType, $lineType);
+                $this->addDefault($lines, Tag::Nature, $nature);
+                if (isset($lines[Meta::ChildrenLines])) {
+                    $lines[Meta::ChildrenLines] = $this->addLineType($lines[Meta::ChildrenLines], $lineType, $nature);
                 }
             }
         }

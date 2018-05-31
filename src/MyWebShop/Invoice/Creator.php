@@ -101,10 +101,7 @@ class Creator extends BaseCreator
         // @todo: add property source(s) for this item line.
         $this->addPropertySource('item', $item);
 
-        $invoiceSettings = $this->config->getInvoiceSettings();
-        $this->addTokenDefault($result, Tag::ItemNumber, $invoiceSettings['itemNumber']);
-        $this->addTokenDefault($result, Tag::Product, $invoiceSettings['productName']);
-        $this->addTokenDefault($result, Tag::Nature, $invoiceSettings['nature']);
+        $this->addProductInfo($result);
         $sign = $this->invoiceSource->getSign();
 
         // @todo: add other tags and available meta tags (* = required):

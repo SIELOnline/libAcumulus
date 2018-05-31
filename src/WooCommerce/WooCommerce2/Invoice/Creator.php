@@ -128,10 +128,7 @@ class Creator extends BaseCreator
         }
         $this->addPropertySource('item', $item);
 
-        $invoiceSettings = $this->config->getInvoiceSettings();
-        $this->addTokenDefault($result, Tag::ItemNumber, $invoiceSettings['itemNumber']);
-        $this->addTokenDefault($result, Tag::Product, $invoiceSettings['productName']);
-        $this->addTokenDefault($result, Tag::Nature, $invoiceSettings['nature']);
+        $this->addProductInfo($result);
 
         // Add quantity: quantity is negative on refunds, make it positive.
         $sign  = $this->invoiceSource->getType() === source::CreditNote ? -1 : 1;
@@ -150,6 +147,7 @@ class Creator extends BaseCreator
         // install this method will always return false. But if this method
         // happens to return true anyway (customisation, hook), the costprice
         // tag will trigger vattype = 5 for Acumulus.
+        $invoiceSettings = $this->config->getInvoiceSettings();
         if ($this->allowMarginScheme() && !empty($invoiceSettings['costPrice'])) {
             $value = $this->getTokenizedValue($invoiceSettings['costPrice']);
             if (!empty($value)) {

@@ -79,10 +79,7 @@ class Creator extends BaseCreator
 
         $this->addPropertySource('item', $item);
 
-        $invoiceSettings = $this->config->getInvoiceSettings();
-        $this->addTokenDefault($result, Tag::ItemNumber, $invoiceSettings['itemNumber']);
-        $this->addTokenDefault($result, Tag::Product, $invoiceSettings['productName']);
-        $this->addTokenDefault($result, Tag::Nature, $invoiceSettings['nature']);
+        $this->addProductInfo($result);
 
         // For higher precision of the unit price, we will recalculate the price
         // ex vat if product prices are entered inc vat by the admin.
@@ -160,10 +157,7 @@ class Creator extends BaseCreator
 
         $this->addPropertySource('item', $item);
 
-        $invoiceSettings = $this->config->getInvoiceSettings();
-        $this->addTokenDefault($result, Tag::ItemNumber, $invoiceSettings['itemNumber']);
-        $this->addTokenDefault($result, Tag::Product, $invoiceSettings['productName']);
-        $this->addTokenDefault($result, Tag::Nature, $invoiceSettings['nature']);
+        $this->addProductInfo($result);
 
         $productPriceEx = -((float) $item->getBasePrice());
         $productPriceInc = -((float) $item->getBasePriceInclTax());

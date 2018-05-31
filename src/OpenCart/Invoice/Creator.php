@@ -100,10 +100,7 @@ class Creator extends BaseCreator
         }
         $this->addPropertySource('item', $item);
 
-        $invoiceSettings = $this->config->getInvoiceSettings();
-        $this->addTokenDefault($result, Tag::ItemNumber, $invoiceSettings['itemNumber']);
-        $this->addTokenDefault($result, Tag::Product, $invoiceSettings['productName']);
-        $this->addTokenDefault($result, Tag::Nature, $invoiceSettings['nature']);
+        $this->addProductInfo($result);
 
         // Get vat range info from item line.
         $productPriceEx = $item['price'];

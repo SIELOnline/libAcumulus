@@ -124,12 +124,8 @@ class Creator extends BaseCreator
         }
         $this->addPropertySource('item', $item);
 
-        $invoiceSettings = $this->config->getInvoiceSettings();
-        $this->addTokenDefault($result, Tag::ItemNumber, $invoiceSettings['itemNumber']);
-        $this->addTokenDefault($result, Tag::Product, $invoiceSettings['productName']);
-        $this->addTokenDefault($result, Tag::Nature, $invoiceSettings['nature']);
+        $this->addProductInfo($result);
         $result[Meta::Id] = $item->get_id();
-
 
         // Add quantity: quantity is negative on refunds, the unit price will be
         // positive.
@@ -158,6 +154,7 @@ class Creator extends BaseCreator
         // install this method will always return false. But if this method
         // happens to return true anyway (customisation, hook), the costprice
         // tag will trigger vattype = 5 for Acumulus.
+        $invoiceSettings = $this->config->getInvoiceSettings();
         if ($this->allowMarginScheme() && !empty($invoiceSettings['costPrice'])) {
             $value = $this->getTokenizedValue($invoiceSettings['costPrice']);
             if (!empty($value)) {
@@ -415,14 +412,14 @@ class Creator extends BaseCreator
      *
      * @return array
      *   Either an array with keys Meta::VatRateLookup,
-     *  Meta::VatRateLookupLabel, and Meta::VatRateLookupSource or an
-     *   empty array.
+     *   Meta::VatRateLookupLabel, and Meta::VatRateLookupSource or an empty
+     *   array.
      */
     protected function getShippingVatRateLookupMetadata($taxes)
     {
         $vatLookupTags = array();
         if (is_array($taxes)) {
-            // Since ??? $taxes is indirected by a key 'total' ...
+            // Since version ?.?, $taxes has an indirection by key 'total'.
             if (!is_numeric(key($taxes))) {
                 $taxes = current($taxes);
             }

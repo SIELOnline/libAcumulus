@@ -143,32 +143,39 @@ class Creator extends BaseCreator
         // get_item_tax returns tax per item after discount.
         $productVat = $this->shopSource->get_item_tax($item, false);
 
-        // WooCommerce does not support the margin scheme. So in a standard
-        // install this method will always return false. But if this method
-        // happens to return true anyway (customisation, hook), the costprice
-        // tag will trigger vattype = 5 for Acumulus.
+        // Check for cost price.
+        $isMargin = false;
         $invoiceSettings = $this->config->getInvoiceSettings();
-        if ($this->allowMarginScheme() && !empty($invoiceSettings['costPrice'])) {
+        if (!empty($invoiceSettings['costPrice'])) {
             $value = $this->getTokenizedValue($invoiceSettings['costPrice']);
             if (!empty($value)) {
-                // Margin scheme:
-                // - Do not put VAT on invoice: send price incl VAT as unitprice.
-                // - But still send the VAT rate to Acumulus.
-                // Costprice > 0 triggers the margin scheme in Acumulus.
+                if ($this->allowMarginScheme()) {
+                    // Margin scheme:
+                    // - Do not put VAT on invoice: send price incl VAT as
+                    //   unitprice.
+                    // - But still send the VAT rate to Acumulus.
+                    $isMargin = true;
+                    $result += array(
+                        Tag::UnitPrice => $productPriceInc,
+                        Meta::PrecisionUnitPrice => $this->precisionPriceCalculated,
+                    );
+                }
+                // If we have a cost price we add it, even if this no margin
+                // invoice.
                 $result += array(
-                    Tag::UnitPrice => $productPriceInc,
-                    Meta::PrecisionUnitPrice => $this->precisionPriceCalculated,
                     Tag::CostPrice => $value,
-                    Meta::PrecisionCostPrice => $this->precisionPriceCalculated,
+                    Meta::PrecisionCostPrice => $this->precisionPriceEntered,
                 );
             }
-        } else {
+        }
+        if (!$isMargin) {
             $result += array(
                 Tag::UnitPrice => $productPriceEx,
                 Meta::PrecisionUnitPrice => $this->precisionPriceCalculated,
                 Meta::UnitPriceInc => $productPriceInc,
                 Meta::PrecisionUnitPriceInc => $this->precisionPriceCalculated,
             );
+
         }
 
         // Add tax info.

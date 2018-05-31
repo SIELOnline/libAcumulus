@@ -95,13 +95,34 @@ class Creator extends BaseCreator
         $productPriceEx = (float) $item->order_product_price;
         $productVat = (float) $item->order_product_tax;
 
-        $result += array(
+        // Check for cost price.
+        $isMargin = false;
+        $invoiceSettings = $this->config->getInvoiceSettings();
+        if (!empty($invoiceSettings['costPrice'])) {
+            $value = $this->getTokenizedValue($invoiceSettings['costPrice']);
+            if (!empty($value)) {
+                if ($this->allowMarginScheme()) {
+                    // Margin scheme:
+                    // - Do not put VAT on invoice: send price incl VAT as
+                    //   unitprice.
+                    // - But still send the VAT rate to Acumulus.
+                    $isMargin = true;
+                    $result[Tag::UnitPrice] = $productPriceEx + $productVat;
+                }
+                // If we have a cost price we add it, even if this no margin
+                // invoice.
+                $result [Tag::CostPrice] = $value;
+            }
+        }
+        if (!$isMargin) {
+            $result += array(
                 Tag::UnitPrice => $productPriceEx,
                 Meta::LineAmount => $item->order_product_total_price_no_vat,
                 Meta::LineAmountInc => $item->order_product_total_price,
-                Tag::Quantity => $item->order_product_quantity,
                 Meta::VatAmount => $productVat,
             );
+        }
+        $result[Tag::Quantity] = $item->order_product_quantity;
 
         // Note that this info remains correct when rates are changed as upon
         // order creation this info is stored in the order_product table.

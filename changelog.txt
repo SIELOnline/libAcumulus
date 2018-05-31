@@ -19,6 +19,8 @@ WC3 = WooCommerce 3 (WordPress)
 
 5.4.3 (2018-05-??)
 ------------------
+- ALL: feature: added support for costprice setting in all plugins, was only for
+  WooCommerce and, not completely correct, PrestaShop.
 - ALL: feature: removed invoice setting useMargin in favor of shop setting
   marginProducts.
 - ALL: feature: based on the new settings, the code to determine the vat type

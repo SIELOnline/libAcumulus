@@ -152,6 +152,8 @@ abstract class Creator extends BaseCreator
      *
      * @return bool
      *   Whether the prices for the products are entered with or without tax.
+     *
+     * @nth: can we generalize this?
      */
     abstract protected function productPricesIncludeTax();
 }

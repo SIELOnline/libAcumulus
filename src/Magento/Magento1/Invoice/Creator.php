@@ -84,13 +84,33 @@ class Creator extends BaseCreator
         $productPriceEx = (float) $item->getBasePrice();
         $productPriceInc = (float) $item->getBasePriceInclTax();
 
-        // Add price and quantity info.
-        $result += array(
-            Tag::UnitPrice => $productPriceEx,
-            Meta::UnitPriceInc => $productPriceInc,
-            Meta::RecalculateUnitPrice => $this->productPricesIncludeTax(),
-            Tag::Quantity => $item->getQtyOrdered(),
-        );
+        // Check for cost price.
+        $isMargin = false;
+        $invoiceSettings = $this->config->getInvoiceSettings();
+        if (!empty($invoiceSettings['costPrice'])) {
+            $value = $this->getTokenizedValue($invoiceSettings['costPrice']);
+            if (!empty($value)) {
+                if ($this->allowMarginScheme()) {
+                    // Margin scheme:
+                    // - Do not put VAT on invoice: send price incl VAT as
+                    //   unitprice.
+                    // - But still send the VAT rate to Acumulus.
+                    $isMargin = true;
+                    $result[Tag::UnitPrice] = $productPriceInc;
+                }
+                // If we have a cost price we add it, even if this no margin
+                // invoice.
+                $result [Tag::CostPrice] = $value;
+            }
+        }
+        if (!$isMargin) {
+            $result += array(
+                Tag::UnitPrice => $productPriceEx,
+                Meta::UnitPriceInc => $productPriceInc,
+                Meta::RecalculateUnitPrice => $this->productPricesIncludeTax(),
+            );
+        }
+        $result[Tag::Quantity] = $item->getQtyOrdered();
 
         // Tax amount = VAT over discounted product price.
         // Hidden tax amount = VAT over discount.
@@ -161,14 +181,35 @@ class Creator extends BaseCreator
         $productPriceInc = -((float) $item->getBasePriceInclTax());
         $lineVat = -((float) $item->getBaseTaxAmount() + (float) $item->getBaseHiddenTaxAmount());
 
-        // Add price and quantity info.
-        $result += array(
-            Tag::UnitPrice => $productPriceEx,
-            Meta::UnitPriceInc => $productPriceInc,
-            Meta::RecalculateUnitPrice => $this->productPricesIncludeTax(),
-            Tag::Quantity => $item->getQty(),
-            Meta::LineVatAmount => $lineVat,
-        );
+        // Check for cost price.
+        $isMargin = false;
+        $invoiceSettings = $this->config->getInvoiceSettings();
+        if (!empty($invoiceSettings['costPrice'])) {
+            $value = $this->getTokenizedValue($invoiceSettings['costPrice']);
+            if (!empty($value)) {
+                if ($this->allowMarginScheme()) {
+                    // Margin scheme:
+                    // - Do not put VAT on invoice: send price incl VAT as
+                    //   unitprice.
+                    // - But still send the VAT rate to Acumulus.
+                    $isMargin = true;
+                    $result[Tag::UnitPrice] = $productPriceInc;
+                }
+                // If we have a cost price we add it, even if this no margin
+                // invoice.
+                $result [Tag::CostPrice] = $value;
+            }
+        }
+        if (!$isMargin) {
+            // Add price info.
+            $result += array(
+                Tag::UnitPrice => $productPriceEx,
+                Meta::UnitPriceInc => $productPriceInc,
+                Meta::RecalculateUnitPrice => $this->productPricesIncludeTax(),
+                Meta::LinesVatAmount => $lineVat,
+            );
+        }
+        $result[Tag::Quantity] = $item->getQty();
 
         // Add VAT related info.
         $orderItemId = $item->getOrderItemId();

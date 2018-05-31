@@ -116,6 +116,45 @@ class Creator extends BaseCreator
         //   If the exact vat rate is not yet known, it may be recalculated in
         //   the Completor phase.
         // - line totals
+        // Should result in something like this:
+
+        // Check for cost price.
+        $productPriceEx = $sign * $item->priceEx;
+        $precisionEx = 0.01;
+        $productVat = $sign * $item->productTax;
+        $precisionVat = 0.01;
+        $productPriceInc = $sign * $item->priceInc;
+        $quantity = $item->quantity;
+
+        $isMargin = false;
+        $invoiceSettings = $this->config->getInvoiceSettings();
+        if (!empty($invoiceSettings['costPrice'])) {
+            $value = $this->getTokenizedValue($invoiceSettings['costPrice']);
+            if (!empty($value)) {
+                if ($this->allowMarginScheme()) {
+                    // Margin scheme:
+                    // - Do not put VAT on invoice: send price incl VAT as
+                    //   unitprice.
+                    // - But still send the VAT rate to Acumulus.
+                    $isMargin = true;
+                    $result[Tag::UnitPrice] = $productPriceInc;
+                }
+                // If we have a cost price we add it, even if this no margin
+                // invoice.
+                $result [Tag::CostPrice] = $value;
+            }
+        }
+        if (!$isMargin) {
+            $result += array(
+                Tag::UnitPrice => $productPriceEx,
+                Meta::UnitPriceInc => $productPriceInc,
+                Meta::RecalculateUnitPrice => $productPricesIncludeTax,
+            );
+        }
+        $result[Tag::Quantity] = $quantity;
+
+        // Add tax info.
+        $result += $this->getVatRangeTags($productVat, $productPriceEx, $precisionVat, $precisionEx);
 
         // @todo: remove property source(s) for this item line.
         $this->removePropertySource('item');

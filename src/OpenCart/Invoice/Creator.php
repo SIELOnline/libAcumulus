@@ -110,10 +110,31 @@ class Creator extends BaseCreator
         // Try to look up the vat rate via product.
         $vatInfo += $this->getVatRateLookupMetadata($product['tax_class_id']);
 
-        $result[Tag::UnitPrice] = $productPriceEx;
+        // Check for cost price.
+        $isMargin = false;
+        $invoiceSettings = $this->config->getInvoiceSettings();
+        if (!empty($invoiceSettings['costPrice'])) {
+            $value = $this->getTokenizedValue($invoiceSettings['costPrice']);
+            if (!empty($value)) {
+                if ($this->allowMarginScheme()) {
+                    // Margin scheme:
+                    // - Do not put VAT on invoice: send price incl VAT as
+                    //   unitprice.
+                    // - But still send the VAT rate to Acumulus.
+                    $isMargin = true;
+                    $result[Tag::UnitPrice] = $productPriceEx + $productVat;
+                }
+                // If we have a cost price we add it, even if this no margin
+                // invoice.
+                $result [Tag::CostPrice] = $value;
+            }
+        }
+        if (!$isMargin) {
+            $result[Tag::UnitPrice] = $productPriceEx;
+            $result[Meta::VatAmount] = $productVat;
+        }
         $result[Tag::Quantity] = $item['quantity'];
         $result += $vatInfo;
-        $result[Meta::VatAmount] = $productVat;
 
         // Options (variants).
         $options = $this->getOrderModel()->getOrderOptions($item['order_id'], $item['order_product_id']);

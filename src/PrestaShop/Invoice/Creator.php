@@ -140,20 +140,26 @@ class Creator extends BaseCreator
         $this->addProductInfo($result);
         $sign = $this->invoiceSource->getSign();
 
-        // Prestashop does not support the margin scheme. So in a standard
-        // install this method will always return false. But if this method
-        // happens to return true anyway (customisation, hook), the costprice
-        // will trigger vattype = 5 for Acumulus.
-        if ($this->allowMarginScheme() && !empty($item['purchase_supplier_price'])) {
-            // Margin scheme:
-            // - Do not put VAT on invoice: send price incl VAT as unitprice.
-            // - But still send the VAT rate to Acumulus.
-            $result[Tag::UnitPrice] = $sign * $item['unit_price_tax_incl'];
-            // Costprice > 0 triggers the margin scheme in Acumulus.
-            $invoiceSettings = $this->config->getInvoiceSettings();
-            $this->addTokenDefault($result, Tag::CostPrice, $invoiceSettings['costPrice']);
-        } else {
-            // Unit price is without VAT: use product_price.
+        // Check for cost price.
+        $isMargin = false;
+        $invoiceSettings = $this->config->getInvoiceSettings();
+        if (!empty($invoiceSettings['costPrice'])) {
+            $value = $this->getTokenizedValue($invoiceSettings['costPrice']);
+            if (!empty($value)) {
+                if ($this->allowMarginScheme()) {
+                    // Margin scheme:
+                    // - Do not put VAT on invoice: send price incl VAT as
+                    //   unitprice.
+                    // - But still send the VAT rate to Acumulus.
+                    $isMargin = true;
+                    $result[Tag::UnitPrice] = $sign * $item['unit_price_tax_incl'];
+                }
+                // If we have a cost price we add it, even if this no margin
+                // invoice.
+                $result[Tag::CostPrice] = $value;
+            }
+        }
+        if (!$isMargin) {
             $result[Tag::UnitPrice] = $sign * $item['unit_price_tax_excl'];
             $result[Meta::UnitPriceInc] = $sign * $item['unit_price_tax_incl'];
             $result[Meta::LineAmount] = $sign * $item['total_price_tax_excl'];

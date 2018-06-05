@@ -81,15 +81,27 @@ class ConfigForm extends BaseConfigForm
      */
     protected function validateShopFields()
     {
+        // If we only sell Products, we cannot (also) sell digital services.
         if ($this->submittedValues['nature_shop'] == PluginConfig::Nature_Products && $this->submittedValues['digitalServices'] != PluginConfig::DigitalServices_No) {
             $this->errorMessages['conflicting_options_0'] = $this->t('message_validate_conflicting_shop_options_0');
         }
+        // If we only sell Digital services, the nature of all we sell is
+        // Services.
         if ($this->submittedValues['digitalServices'] == PluginConfig::DigitalServices_Only && $this->submittedValues['nature_shop'] != PluginConfig::Nature_Services) {
             $this->errorMessages['nature_shop_0'] = $this->t('message_validate_conflicting_shop_options_1');
         }
+
+        // NOTE: it is debatable whether margin articles can be services, e.g.
+        // selling 2nd hand software licenses. However it is not debatable that
+        // margin goods can never be digital services. So the 1st validation is
+        // debatable and my be removed inthe future, the 2nd isn't.
+
+        // If wel only sell articles with nature Services, we cannot (also) sell
+        // margin goods.
         if ($this->submittedValues['nature_shop'] == PluginConfig::Nature_Services && $this->submittedValues['marginProducts'] != PluginConfig::MarginProducts_No) {
             $this->errorMessages['conflicting_options_1'] = $this->t('message_validate_conflicting_shop_options_2');
         }
+        // If we only sell margin goods, the nature of all we sell is Products.
         if ($this->submittedValues['marginProducts'] == PluginConfig::MarginProducts_Only && $this->submittedValues['nature_shop'] != PluginConfig::Nature_Products) {
             $this->errorMessages['nature_shop_1'] = $this->t('message_validate_conflicting_shop_options_3');
         }

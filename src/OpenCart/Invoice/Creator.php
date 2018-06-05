@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\OpenCart\Invoice;
 
+use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\Meta;
@@ -255,11 +256,11 @@ class Creator extends BaseCreator
                     break;
                 case 'shipping':
                     $line = $this->getTotalLine($totalLine);
-                    $line[Meta::LineType] = static::LineType_Shipping;
+                    $line = $this->addLineType($line, static::LineType_Shipping, Api::Nature_Service);
                     break;
                 case 'coupon':
                     $line = $this->getTotalLine($totalLine);
-                    $line[Meta::LineType] = static::LineType_Discount;
+                    $line = $this->addLineType($line, static::LineType_Discount);
                     break;
                 case 'tax':
                     // Tax line: added to invoice level
@@ -267,7 +268,7 @@ class Creator extends BaseCreator
                     break;
                 case 'voucher':
                     $line = $this->getTotalLine($totalLine);
-                    $line[Meta::LineType] = static::LineType_Voucher;
+                    $line = $this->addLineType($line, static::LineType_Voucher);
                     break;
                 case 'total':
                     // Overall total: ignore.
@@ -275,7 +276,7 @@ class Creator extends BaseCreator
                     break;
                 default:
                     $line = $this->getTotalLine($totalLine);
-                    $line[Meta::LineType] = static::LineType_Other;
+                    $line = $this->addLineType($line, static::LineType_Other);
                     break;
             }
             if ($line) {

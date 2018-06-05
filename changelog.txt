@@ -19,6 +19,8 @@ WC3 = WooCommerce 3 (WordPress)
 
 5.4.4 (2018-06-05)
 ------------------
+- ALL: better filling and handling of field nature, especially for non-item
+  fields (shipping costs, payment fee).
 - WC: Styling van popup-help in het statusoverzicht op bestellingpagina.
 - WC2: Fatal error: Uncaught Error: Call to a member function get_items() on
   null in Creator.

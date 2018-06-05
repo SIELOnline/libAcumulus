@@ -655,19 +655,19 @@ abstract class Creator
 
         $shippingLines = $this->getShippingLines();
         if ($shippingLines) {
-            $shippingLines = $this->addLineType($shippingLines, static::LineType_Shipping);
+            $shippingLines = $this->addLineType($shippingLines, static::LineType_Shipping, Api::Nature_Service);
             $result = array_merge($result, $shippingLines);
         }
 
         $line = $this->getPaymentFeeLine();
         if ($line) {
-            $line = $this->addLineType($line,static::LineType_PaymentFee);
+            $line = $this->addLineType($line,static::LineType_PaymentFee, Api::Nature_Service);
             $result[] = $line;
         }
 
         $line = $this->getGiftWrappingLine();
         if ($line) {
-            $line = $this->addLineType($line,static::LineType_GiftWrapping);
+            $line = $this->addLineType($line,static::LineType_GiftWrapping, Api::Nature_Service);
             $result[] = $line;
         }
 

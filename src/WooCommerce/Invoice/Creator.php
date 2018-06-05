@@ -314,7 +314,7 @@ class Creator extends BaseCreator
         // not been tested yet!.
         foreach ($this->invoiceSource->getSource()->get_fees() as $feeLine) {
             $line = $this->getFeeLine($feeLine);
-            $line[Meta::LineType] = static::LineType_Other;
+            $line = $this->addLineType($line, static::LineType_Other);
             $result[] = $line;
         }
         return $result;

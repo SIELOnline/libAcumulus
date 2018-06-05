@@ -339,8 +339,7 @@ class Completor
                     $vatTypeVatRates = $this->getVatRatesByCountryAndDate('nl');
                     // Add vat free (-1):
                     // - if selling vat free products/services
-                    // - OR if outside EU AND (possibly digital services OR
-                    //      company).
+                    // - OR if outside EU AND (digital services OR company).
                     if ($vatFreeProducts != PluginConfig::VatFreeProducts_No) {
                         $vatTypeVatRates[] = -1;
                     } elseif ($this->isOutsideEu() && ($digitalServices !== PluginConfig::DigitalServices_No || $this->isCompany())) {
@@ -638,11 +637,9 @@ class Completor
                     Tag::Product => $product,
                     Tag::Quantity => 1,
                     Tag::UnitPrice => $missingAmount,
-                    Meta::VatAmount => $missingVatAmount,
-                ) + Creator::getVatRangeTags($missingVatAmount, $missingAmount, $countLines * 0.02, $countLines * 0.02)
-                    + array(
-                    Meta::LineType => Creator::LineType_Corrector,
                 );
+            $line += Creator::getVatRangeTags($missingVatAmount, $missingAmount, $countLines * 0.02, $countLines * 0.02);
+            $line[Meta::LineType] = Creator::LineType_Corrector;
             // Correct and add this line (round of correcting has already been
             // executed).
             if ($line[Meta::VatRateSource] === Creator::VatRateSource_Calculated) {
@@ -850,9 +847,11 @@ class Completor
                             }
                         }
                         // 3) Outside EU: goods should have vat type 4, services
-                        //    vat type 1.
-                        // @todo: handling of non item lines: for now, nature is not filled in for these type of lines.
-                        if ($this->isOutsideEu() && !empty($line[Tag::Nature])) {
+                        //    vat type 1. However, we only look at item lines,
+                        //    as services like shipping and packing are part of
+                        //    the delivery as a whole and should not change the
+                        //    vat type.
+                        if ($this->isOutsideEu() && $line[Meta::LineType] === Creator::LineType_Order && !empty($line[Tag::Nature])) {
                             if ($vatType === Api::VatType_National && $line[Tag::Nature] !== Api::Nature_Service) {
                                 $doAdd = false;
                             }
@@ -1076,7 +1075,8 @@ class Completor
      */
     protected function isCompany()
     {
-        // @todo: must companies outside EU have a vat number?
+        // Note: companies outside EU must also fill in their vat number!? Even
+        // if there's no way to check it with a webservice like VIES.
         return !empty($this->invoice[Tag::Customer][Tag::CompanyName1]) && !empty($this->invoice[Tag::Customer][Tag::VatNumber]);
     }
 

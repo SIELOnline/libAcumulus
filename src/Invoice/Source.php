@@ -165,7 +165,7 @@ abstract class Source
      */
     public function getPaymentMethod()
     {
-        return $this->getOrder()->getPaymentMethodOrder();
+        return $this->getOrder()->getPaymentMethod();
     }
 
     /**

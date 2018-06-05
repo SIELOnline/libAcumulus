@@ -112,4 +112,16 @@ class Source extends BaseSource
     {
         return isset($this->source->billing_country) ? $this->source->billing_country : '';
     }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return \WC_Order|int
+     */
+    protected function getShopOrderOrId()
+    {
+        /** @var \WC_Order_Refund $refund */
+        $refund = $this->source;
+        return $refund->post->post_parent;
+    }
 }

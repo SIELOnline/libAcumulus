@@ -328,6 +328,7 @@ class ShopOrderOverviewForm extends Form
                 'type' => 'markup',
                 'label' => $this->getStatusIcon(),
                 'attributes' => array(
+                    'class' => str_replace('_', '-', $invoiceStatus),
                     'label' => $this->getStatusLabelAttributes(),
                 ),
                 'value' => $statusText,

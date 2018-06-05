@@ -83,11 +83,13 @@ class Creator extends BaseCreator
     protected function getItemLines()
     {
         $result = array();
+        /** @var \WC_Abstract_Order $shopSource */
+        $shopSource = $this->invoiceSource->getSource();
         /** @var array[] $lines */
-        $lines = $this->shopSource->get_items(apply_filters('woocommerce_admin_order_item_types', 'line_item'));
+        $lines = $shopSource->get_items(apply_filters('woocommerce_admin_order_item_types', 'line_item'));
         foreach ($lines as $order_item_id => $line) {
             $line['order_item_id'] = $order_item_id;
-            $product = $this->shopSource->get_product_from_item($line);
+            $product = $shopSource->get_product_from_item($line);
             $itemLine = $this->getItemLine($line, $product);
             if ($itemLine) {
                 $result[] = $itemLine;
@@ -138,10 +140,12 @@ class Creator extends BaseCreator
         // Add price info.
         // get_item_total() returns cost per item after discount and ex vat (2nd
         // param).
-        $productPriceEx = $this->shopSource->get_item_total($item, false, false);
-        $productPriceInc = $this->shopSource->get_item_total($item, true, false);
+        /** @var \WC_Abstract_Order $shopSource */
+        $shopSource = $this->invoiceSource->getSource();
+        $productPriceEx = $shopSource->get_item_total($item, false, false);
+        $productPriceInc = $shopSource->get_item_total($item, true, false);
         // get_item_tax returns tax per item after discount.
-        $productVat = $this->shopSource->get_item_tax($item, false);
+        $productVat = $shopSource->get_item_tax($item, false);
 
         // Check for cost price.
         $isMargin = false;
@@ -213,7 +217,9 @@ class Creator extends BaseCreator
     {
         $result = array();
 
-        if ($metadata = $this->shopSource->has_meta($item['order_item_id'])) {
+        /** @var \WC_Abstract_Order $shopSource */
+        $shopSource = $this->invoiceSource->getSource();
+        if ($metadata = $shopSource->has_meta($item['order_item_id'])) {
             // Define hidden core fields.
             $hiddenOrderItemMeta = apply_filters('woocommerce_hidden_order_itemmeta', array(
                 '_qty',
@@ -286,9 +292,11 @@ class Creator extends BaseCreator
         // VAT is as precise as a float can be and is based on the shipping cost
         // as entered by the admin. However, for refunds it is also rounded to
         // the cent.
-        $shippingEx = $this->shopSource->get_total_shipping();
+        /** @var \WC_Abstract_Order $shopSource */
+        $shopSource = $this->invoiceSource->getSource();
+        $shippingEx = $shopSource->get_total_shipping();
         $shippingExPrecision = 0.01;
-        $shippingVat = $this->shopSource->get_shipping_tax();
+        $shippingVat = $shopSource->get_shipping_tax();
         $vatPrecision = $this->invoiceSource->getType() === Source::CreditNote ? 0.01 : 0.0001;
 
         $result = array(
@@ -309,7 +317,10 @@ class Creator extends BaseCreator
     protected function getShippingMethodName()
     {
         // Check if a shipping line item exists for this order.
-        $lines = $this->shopSource->get_items(apply_filters('woocommerce_admin_order_item_types', 'shipping'));
+        /** @var \WC_Abstract_Order $shopSource */
+        $shopSource = $this->invoiceSource->getSource();
+        /** @var array[] $lines */
+        $lines = $shopSource->get_items(apply_filters('woocommerce_admin_order_item_types', 'shipping'));
         if (!empty($lines)) {
             $line = reset($lines);
             return $line['name'];

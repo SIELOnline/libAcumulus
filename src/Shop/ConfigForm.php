@@ -35,7 +35,9 @@ class ConfigForm extends BaseConfigForm
     protected function validate()
     {
         $this->validateAccountFields();
-        $this->validateShopFields();
+        if ($this->isFullForm()) {
+            $this->validateShopFields();
+        }
     }
 
     /**

@@ -58,7 +58,7 @@ abstract class BaseConfigForm extends Form
     {
         $postedValues = $this->getPostedValues();
         // Check if the full form was displayed or only the account details.
-        $fullForm = !empty($postedValues['accountOk']) && $postedValues['accountOk'] === 'true';
+        $fullForm = $this->isFullForm();
         foreach ($this->acumulusConfig->getKeys() as $key) {
             if (!$this->addIfIsset($this->submittedValues, $key, $postedValues)) {
                 // Add unchecked checkboxes, but only if the full form was
@@ -287,5 +287,17 @@ abstract class BaseConfigForm extends Form
     protected function isAdvancedConfigForm()
     {
         return $this instanceof AdvancedConfigForm;
+    }
+
+    /**
+     * Returns whether the full form was rendered and posted.
+     *
+     * @return bool
+     *   True if the full form was rendered and posted, false otherwise.
+     */
+    protected function isFullForm()
+    {
+        $postedValues = $this->getPostedValues();
+        return isset($postedValues['accountOk']) && $postedValues['accountOk'] === 'true';
     }
 }

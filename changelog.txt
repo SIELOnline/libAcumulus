@@ -17,8 +17,8 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies)
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
-5.?.?
------
+5.4.5 (2018-07-04)
+------------------
 - ALL: Notice: Undefined index: nature_shop in ConfigForm.php on line 85.
 
 5.4.4 (2018-06-05)

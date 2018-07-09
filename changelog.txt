@@ -17,6 +17,14 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies)
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
+5.4.6 (2018-07-10 JOO)
+5.4.6 (2018-07-09 OC)
+---------------------
+- JOO: com_acumulusInstallerScript.php still contained references to the old
+  library path.
+- OC: Warning: lsprintf(): Too few arguments in Opencart/Shop/AcumulusEntryManager.php
+  on line 93. Warning: mysqli::Query(): Empty query.
+
 5.4.5 (2018-07-04)
 ------------------
 - ALL: Notice: Undefined index: nature_shop in ConfigForm.php on line 85.

@@ -83,7 +83,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         }
         /** @noinspection PhpUnhandledExceptionInspection */
         return (bool) $this->getDb()->query(sprintf(
-            "INSERT INTO `%s` (store_id, entry_id, token, source_type, source_id, updated) VALUES (%u, %s, %s, '%s', %u, '%s')".
+            "INSERT INTO `%s` (store_id, entry_id, token, source_type, source_id, updated) VALUES (%u, %s, %s, '%s', %u, '%s')",
             $this->tableName,
             $storeId,
             $entryId === null ? 'null' : (string) (int) $entryId,

@@ -604,6 +604,14 @@ abstract class Creator
         $this->addTokenDefault($line, Tag::ItemNumber, $invoiceSettings['itemNumber']);
         $this->addTokenDefault($line, Tag::Product, $invoiceSettings['productName']);
         $this->addNature($line);
+        if (!empty($invoiceSettings['costPrice'])) {
+            $value = $this->getTokenizedValue($invoiceSettings['costPrice']);
+            if (!Number::isZero($value)) {
+                // If we have a cost price we add it, even if this is no margin
+                // invoice.
+                $line[Tag::CostPrice] = $value;
+            }
+        }
     }
 
     /**
@@ -824,7 +832,7 @@ abstract class Creator
     protected function allowMarginScheme()
     {
         $shopSettings = $this->config->getShopSettings();
-        return $shopSettings['marginProducts'];
+        return $shopSettings['marginProducts'] !== PluginConfig::MarginProducts_No;
     }
 
     /**

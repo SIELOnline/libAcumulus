@@ -147,32 +147,16 @@ class Creator extends BaseCreator
         // get_item_tax returns tax per item after discount.
         $productVat = $shopSource->get_item_tax($item, false);
 
-        // Check for cost price.
-        $isMargin = false;
-        $invoiceSettings = $this->config->getInvoiceSettings();
-        if (!empty($invoiceSettings['costPrice'])) {
-            $value = $this->getTokenizedValue($invoiceSettings['costPrice']);
-            if (!empty($value)) {
-                if ($this->allowMarginScheme()) {
-                    // Margin scheme:
-                    // - Do not put VAT on invoice: send price incl VAT as
-                    //   unitprice.
-                    // - But still send the VAT rate to Acumulus.
-                    $isMargin = true;
-                    $result += array(
-                        Tag::UnitPrice => $productPriceInc,
-                        Meta::PrecisionUnitPrice => $this->precisionPriceCalculated,
-                    );
-                }
-                // If we have a cost price we add it, even if this no margin
-                // invoice.
-                $result += array(
-                    Tag::CostPrice => $value,
-                    Meta::PrecisionCostPrice => $this->precisionPriceEntered,
-                );
-            }
-        }
-        if (!$isMargin) {
+        // Check for cost price and margin scheme.
+        if (!empty($line['costPrice']) && $this->allowMarginScheme()) {
+            // Margin scheme:
+            // - Do not put VAT on invoice: send price incl VAT as unitprice.
+            // - But still send the VAT rate to Acumulus.
+            $result += array(
+                Tag::UnitPrice => $productPriceInc,
+                Meta::PrecisionUnitPrice => $this->precisionPriceCalculated,
+            );
+        } else {
             $result += array(
                 Tag::UnitPrice => $productPriceEx,
                 Meta::PrecisionUnitPrice => $this->precisionPriceCalculated,

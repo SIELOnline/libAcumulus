@@ -17,11 +17,15 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies)
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
+5.4.7 (2018-07-11)
+------------------
+- ALL (bug): improved handling of costprice and margin lines.
+
 5.4.6 (2018-07-10 JOO)
 5.4.6 (2018-07-09 OC)
 ---------------------
 - JOO: com_acumulusInstallerScript.php still contained references to the old
-  library path.
+  library path and defined a psr0 namespace instead of a psr4 one.
 - OC: Warning: lsprintf(): Too few arguments in Opencart/Shop/AcumulusEntryManager.php
   on line 93. Warning: mysqli::Query(): Empty query.
 
@@ -1029,7 +1033,7 @@ Ondersteunde versies van de verschillende pakketten
 
 HikaShop
 --------
-* 3.4.0 (Joomla 3.8.7)
+* 3.4.0 (Joomla 3.8.10)
 * 3.3.0 (Joomla 3.8.5)
 * 3.2.2 (Joomla 3.8.3)
 * 3.2.1 (Joomla 3.8.1)
@@ -1089,7 +1093,7 @@ PrestaShop
 
 VirtueMart
 ----------
-* 3.2.14 (Joomla 3.8.7)
+* 3.2.14 (Joomla 3.8.10)
 * 3.2.12 (Joomla 3.8.5)
 * 3.2.12 (Joomla 3.8.3)
 * 3.2.4 (Joomla 3.8.1)

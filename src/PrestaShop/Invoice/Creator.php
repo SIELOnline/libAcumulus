@@ -68,6 +68,9 @@ class Creator extends BaseCreator
 
     /**
      * {@inheritdoc}
+     *
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
      */
     protected function setPropertySources()
     {
@@ -140,43 +143,33 @@ class Creator extends BaseCreator
         $this->addProductInfo($result);
         $sign = $this->invoiceSource->getSign();
 
-        // Check for cost price.
-        $isMargin = false;
-        $invoiceSettings = $this->config->getInvoiceSettings();
-        if (!empty($invoiceSettings['costPrice'])) {
-            $value = $this->getTokenizedValue($invoiceSettings['costPrice']);
-            if (!empty($value)) {
-                if ($this->allowMarginScheme()) {
-                    // Margin scheme:
-                    // - Do not put VAT on invoice: send price incl VAT as
-                    //   unitprice.
-                    // - But still send the VAT rate to Acumulus.
-                    $isMargin = true;
-                    $result[Tag::UnitPrice] = $sign * $item['unit_price_tax_incl'];
-                }
-                // If we have a cost price we add it, even if this no margin
-                // invoice.
-                $result[Tag::CostPrice] = $value;
-            }
-        }
-        if (!$isMargin) {
+        // Check for cost price and margin scheme.
+        if (!empty($line['costPrice']) && $this->allowMarginScheme()) {
+            // Margin scheme:
+            // - Do not put VAT on invoice: send price incl VAT as unitprice.
+            // - But still send the VAT rate to Acumulus.
+            $result[Tag::UnitPrice] = $sign * $item['unit_price_tax_incl'];
+        } else {
             $result[Tag::UnitPrice] = $sign * $item['unit_price_tax_excl'];
             $result[Meta::UnitPriceInc] = $sign * $item['unit_price_tax_incl'];
             $result[Meta::LineAmount] = $sign * $item['total_price_tax_excl'];
             $result[Meta::LineAmountInc] = $sign * $item['total_price_tax_incl'];
+            if (!Number::floatsAreEqual($item['unit_amount'], $result[Meta::UnitPriceInc] - $result[Tag::UnitPrice])) {
+                $result[Meta::LineDiscountVatAmount] = $item['unit_amount'] - ($result[Meta::UnitPriceInc] - $result[Tag::UnitPrice]);
+            }
         }
         $result[Tag::Quantity] = $item['product_quantity'];
+
+        // Get vat rate:
         // The field 'rate' comes from order->getOrderDetailTaxes() and is only
         // defined for orders and was not filled in before PS1.6.1.1. So, check
         // if the field is available.
         // The fields 'unit_amount' and 'total_amount' (table order_detail_tax)
-        // are based on the discounted product price and thus cannot be used.
+        // are based on the discounted product price and thus cannot be used to
+        // get the vat rate.
         if (isset($item['rate'])) {
             $result[Tag::VatRate] = $item['rate'];
             $result[Meta::VatRateSource] = Creator::VatRateSource_Exact;
-            if (!Number::floatsAreEqual($item['unit_amount'], $result[Meta::UnitPriceInc] - $result[Tag::UnitPrice])) {
-                $result[Meta::LineDiscountVatAmount] = $item['unit_amount'] - ($result[Meta::UnitPriceInc] - $result[Tag::UnitPrice]);
-            }
         } else {
             // Precision: 1 of the amounts, probably the prince incl tax, is
             // entered by the admin and can thus be considered exact. The other
@@ -187,12 +180,14 @@ class Creator extends BaseCreator
         $result[Meta::FieldsCalculated][] = Meta::VatAmount;
 
         $this->removePropertySource('item');
-
         return $result;
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
      */
     protected function getShippingLine()
     {

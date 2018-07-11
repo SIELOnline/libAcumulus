@@ -19,6 +19,8 @@ WC3 = WooCommerce 3 (WordPress)
 
 5.4.7 (2018-07-11)
 ------------------
+- ALL (bug): Option "Send consumer client records to Acumulus." removes country
+  code before it is used to determine the vat type.
 - ALL (bug): goods outside EU may use vat type = 1 when you can't or don't want
   to prove that the goods will leave the EU.
 - ALL (bug): improved handling of costprice and margin lines.

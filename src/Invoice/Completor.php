@@ -375,13 +375,14 @@ class Completor
     /**
      * Anonymize customer if set so.
      *
-     * We don't do this for business clients, only consumers.
+     * - We don't do this for business clients, only consumers.
+     * - We keep the country code as it is needed to determine the vat type.
      */
     protected function fictitiousClient()
     {
         $customerSettings = $this->config->getCustomerSettings();
         if (!$customerSettings['sendCustomer'] && !$this->isCompany()) {
-            $keysToKeep = array(Tag::Invoice);
+            $keysToKeep = array(Tag::CountryCode, Tag::Invoice);
             foreach ($this->invoice[Tag::Customer] as $key => $value) {
                 if (!in_array($key, $keysToKeep)) {
                     unset($this->invoice[Tag::Customer][$key]);
@@ -389,7 +390,7 @@ class Completor
             }
             $this->invoice[Tag::Customer][Tag::Email] = $customerSettings['genericCustomerEmail'];
             $this->invoice[Tag::Customer][Tag::ContactStatus] = Api::ContactStatus_Disabled;
-            $this->invoice[Tag::Customer][Tag::OverwriteIfExists] = 0;
+            $this->invoice[Tag::Customer][Tag::OverwriteIfExists] = Api::OverwriteIfExists_No;
         }
     }
 

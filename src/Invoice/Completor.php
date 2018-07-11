@@ -297,8 +297,13 @@ class Completor
                 if ($nature !== PluginConfig::Nature_Products) {
                     $possibleVatTypes[] = Api::VatType_National;
                 }
-                // Can it be rest of world (0%)? Goods should use vat type = 4.
+                // Can it be rest of world (0%)? Goods should use vat type = 4
+                // unless you can't or don't want to prove that the goods will
+                // leave the EU (see
+                // https://www.belastingdienst.nl/rekenhulpen/leveren_van_goederen_naar_het_buitenland/),
+                // in which case we should use vat type = 1.
                 if ($nature !== PluginConfig::Nature_Services) {
+                    $possibleVatTypes[] = Api::VatType_National;
                     $possibleVatTypes[] = Api::VatType_RestOfWorld;
                 }
             }
@@ -701,7 +706,7 @@ class Completor
             $code = 0;
             if (count($vatTypeInfo['intersection']) === 0) {
                 // No single vat type is correct for all lines, use the
-                // intersection to guess what went wrong.
+                // union to guess what went wrong.
                 if (count($vatTypeInfo['union']) === 0) {
                     // None of the vat rates of the invoice lines could be
                     // matched with any vat rate for any possible vat type.

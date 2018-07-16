@@ -213,12 +213,7 @@ class Completor
         $this->convertToEuro();
         $this->invoice = $this->LineCompletor->complete($this->invoice, $this->possibleVatTypes, $this->possibleVatRates);
 
-        // Check if we are missing an amount and, if so, add a line for it.
-        $this->completeLineTotals();
-        $areTotalsEqual = $this->areTotalsEqual();
-        if ($areTotalsEqual === false) {
-            $this->addMissingAmountLine();
-        }
+        $this->checkMissingAmount();
 
         // Complete strategy lines: those lines that have to be completed based
         // on the whole invoice.
@@ -477,6 +472,19 @@ class Completor
     }
 
     /**
+     * Checks for a missing amount and handles it.
+     */
+    protected function checkMissingAmount()
+    {
+        // Check if we are missing an amount and, if so, add a line for it.
+        $this->completeLineTotals();
+        $areTotalsEqual = $this->areTotalsEqual();
+        if ($areTotalsEqual === false) {
+            $this->addMissingAmountLine();
+        }
+    }
+
+    /**
      * Calculates the total amount and vat amount for the invoice lines and adds
      * these to the fields meta-lines-amount and meta-lines-vatamount.
      */
@@ -604,8 +612,9 @@ class Completor
     {
         $invoice = &$this->invoice[Tag::Customer][Tag::Invoice];
 
+        $invoiceSettings = $this->config->getInvoiceSettings();
         $incomplete = count($this->lineTotalsStates['incomplete']);
-        if ($incomplete <= 1) {
+        if ($invoiceSettings['missingAmount'] === PluginConfig::MissingAmount_AddLine && $incomplete <= 1) {
             // NOTE: $incomplete <= 1 IMPLIES $equal + $differ >= 2
             // We want to use the differences in amount and vat amount. Check if
             // they are available, if not compute them based on data that is
@@ -655,23 +664,27 @@ class Completor
 
             // Add warning.
             $this->changeInvoiceToConcept('message_warning_missing_amount_added', 809, $missingAmount, $missingVatAmount);
-        } else {
+        } elseif ($invoiceSettings['missingAmount'] !== PluginConfig::MissingAmount_Ignore) {
             // Due to lack of information, we cannot add a missing line, even
             // though we know we are missing something: just add a warning.
+            $missing = array();
             if (array_key_exists(Meta::LinesAmount, $this->lineTotalsStates['differ'])) {
-                $missing = $this->lineTotalsStates['differ'][Meta::LinesAmount];
-                $missingField = $this->t('amount_ex');
+                $amount = $this->lineTotalsStates['differ'][Meta::LinesAmount];
+                $field = $this->t('amount_ex');
+                $missing[] = sprintf($this->t('message_warning_missing_amount_spec'), $amount, $field);
             }
             if (array_key_exists(Meta::LinesAmountInc, $this->lineTotalsStates['differ'])) {
-                $missing = $this->lineTotalsStates['differ'][Meta::LinesAmountInc];
-                $missingField = $this->t('amount_inc');
+                $amount = $this->lineTotalsStates['differ'][Meta::LinesAmountInc];
+                $field = $this->t('amount_inc');
+                $missing[] = sprintf($this->t('message_warning_missing_amount_spec'), $amount, $field);
             }
             if (array_key_exists(Meta::LinesVatAmount, $this->lineTotalsStates['differ'])) {
-                $missing = $this->lineTotalsStates['differ'][Meta::LinesVatAmount];
-                $missingField = $this->t('amount_vat');
+                $amount = $this->lineTotalsStates['differ'][Meta::LinesVatAmount];
+                $field = $this->t('amount_vat');
+                $missing[] = sprintf($this->t('message_warning_missing_amount_spec'), $amount, $field);
             }
             /** @noinspection PhpUndefinedVariableInspection */
-            $this->changeInvoiceToConcept('message_warning_missing_amount_not_added', 810, $missingField, $missing);
+            $this->changeInvoiceToConcept('message_warning_missing_amount_warn', 810, ucfirst(implode(', ', $missing)));
         }
     }
 

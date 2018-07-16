@@ -19,6 +19,7 @@ WC3 = WooCommerce 3 (WordPress)
 
 5.4.7 (2018-07-??)
 ------------------
+- ALL: Added an option that covers how to handle missing amounts.
 - OC: Better handling of total lines (e.g. shipping) regarding whether the
   amount is inc or ex vat and vat rate lookup for those lines.
 - ALL (bug): Option "Send consumer client records to Acumulus." removes country

@@ -639,7 +639,7 @@ class Config
                 'emailIfAbsent' => array(
                     'group' => Tag::Customer,
                     'type' => 'string',
-                    'default' => $shopName . '@nul.sielsystems.nl',
+                    'default' => "$shopName@nul.sielsystems.nl",
                 ),
                 'contactYourId' => array(
                     'group' => Tag::Customer,
@@ -725,6 +725,11 @@ class Config
                     'group' => Tag::Invoice,
                     'type' => 'int',
                     'default' => PluginConfig::Concept_Plugin,
+                ),
+                'missingAmount' => array(
+                    'group' => Tag::Invoice,
+                    'type' => 'int',
+                    'default' => PluginConfig::MissingAmount_Warn,
                 ),
                 'defaultAccountNumber' => array(
                     'group' => Tag::Invoice,

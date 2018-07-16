@@ -34,6 +34,10 @@ interface PluginConfig
     // Not an API constant.
     const Concept_Plugin = 2;
 
+    const MissingAmount_Ignore = 1;
+    const MissingAmount_Warn = 2;
+    const MissingAmount_AddLine = 3;
+
     const InvoiceNrSource_ShopInvoice = 1;
     const InvoiceNrSource_ShopOrder = 2;
     const InvoiceNrSource_Acumulus = 3;

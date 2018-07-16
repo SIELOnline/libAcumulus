@@ -223,7 +223,7 @@ class Creator extends BaseCreator
 
 
     /**
-     * Returns all total lines: shipping,handling, discount, ...
+     * Returns all total lines: shipping, handling, discount, ...
      *
      * @return array[]
      *   An array of invoice lines.
@@ -234,7 +234,16 @@ class Creator extends BaseCreator
     {
         $result = array();
 
+        /**
+         * The set of order total lines for this order.
+         *
+         * This set is ordered by sort_order, meaning that lines before the tax
+         * line are amounts ex vat and line after are inc vat.
+         *
+         * @var array[] $totalLines
+         */
         $totalLines = $this->invoiceSource->getOrderTotalLines();
+        $exVat = true;
         foreach ($totalLines as $totalLine) {
             switch ($totalLine['code']) {
                 case 'sub_total':
@@ -242,19 +251,20 @@ class Creator extends BaseCreator
                     $line = null;
                     break;
                 case 'shipping':
-                    $line = $this->getTotalLine($totalLine);
+                    $line = $this->getTotalLine($totalLine, $exVat);
                     $line = $this->addLineType($line, static::LineType_Shipping, Api::Nature_Service);
                     break;
                 case 'coupon':
-                    $line = $this->getTotalLine($totalLine);
+                    $line = $this->getTotalLine($totalLine, $exVat);
                     $line = $this->addLineType($line, static::LineType_Discount);
                     break;
                 case 'tax':
                     // Tax line: added to invoice level
                     $line = null;
+                    $exVat = false;
                     break;
                 case 'voucher':
-                    $line = $this->getTotalLine($totalLine);
+                    $line = $this->getTotalLine($totalLine, $exVat);
                     $line = $this->addLineType($line, static::LineType_Voucher);
                     break;
                 case 'total':
@@ -262,7 +272,7 @@ class Creator extends BaseCreator
                     $line = null;
                     break;
                 default:
-                    $line = $this->getTotalLine($totalLine);
+                    $line = $this->getTotalLine($totalLine, $exVat);
                     $line = $this->addLineType($line, static::LineType_Other);
                     break;
             }
@@ -278,19 +288,26 @@ class Creator extends BaseCreator
      * Returns a line based on a "order total line".
      *
      * @param array $line
+     *   The total line.
+     * @param bool $exVat
+     *   Whether the value in this line is ex (true) or inc (false) vat.
      *
      * @return array
+     *   An Acumulus invoice line.
      *
      * @throws \Exception
      */
-    protected function getTotalLine(array $line)
+    protected function getTotalLine(array $line, $exVat)
     {
         $result = array(
             Tag::Product => $line['title'],
-            // Let's hope that this is the value ex vat...
-            Tag::UnitPrice => $line['value'],
             Tag::Quantity => 1,
         );
+        if ($exVat) {
+            $result[Tag::UnitPrice] = $line['value'];
+        } else {
+            $result[Meta::UnitPriceInc] = $line['value'];
+        }
 
         if ($line['code'] === 'voucher') {
             // A voucher is to be seen as a partial payment, thus no tax.
@@ -306,25 +323,16 @@ class Creator extends BaseCreator
                 Meta::StrategySplit => $line['code'] === 'coupon',
             );
         } else {
-            // Try to get a vat rate
+            // Try to get a vat rate.
             $vatRateLookupMetaData = $this->getVatRateLookupByTotalLineType($line['code']);
-            if (Number::isZero($line['value'])) {
-                // 0-cost lines - e.g. free shipping - also don't have a tax amount,
-                // let the completor add the looked up vat rate or just the
-                // highest appearing vat rate.
-                $result += array(
-                    Tag::VatRate => null,
-                    Meta::VatRateSource => Creator::VatRateSource_Completor,
-                ) + $vatRateLookupMetaData;
-            } else {
-                // Other lines do not have a discoverable vatrate, let a strategy
-                // try to compute it.
-                $result += array(
-                    Tag::VatRate => null,
-                    Meta::VatRateSource => Creator::VatRateSource_Strategy,
-                    Meta::StrategySplit => false,
-                ) + $vatRateLookupMetaData;
-            }
+            // The completor will add the looked up vat rate based on looked up
+            // or just the highest appearing vat rate, or wil pass it to the
+            // strategy phase.
+            $result += array(
+                Tag::VatRate => null,
+                Meta::VatRateSource => Creator::VatRateSource_Completor,
+                Meta::StrategySplit => false,
+            ) + $vatRateLookupMetaData;
         }
 
         return $result;
@@ -365,7 +373,7 @@ class Creator extends BaseCreator
     {
         $result = array();
         $prefix = DB_PREFIX;
-        $query = "SELECT distinct `value` FROM {$prefix}setting, {$prefix}extension where `type` = '$code' and `key` = concat(`{$prefix}extension`.`code`, '_tax_class_id')";
+        $query = "SELECT distinct `value` FROM {$prefix}setting, {$prefix}extension where `type` = '$code' and `key` like '{$code}_%_tax_class_id'";
         $records = $this->getRegistry()->db->query($query);
         foreach ($records->rows as $row) {
             $taxClassId = reset($row);

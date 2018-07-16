@@ -493,7 +493,8 @@ class CompletorInvoiceLines
         $maxVatRate = $this->getMaxAppearingVatRate($lines);
 
         foreach ($lines as &$line) {
-            if ($line[Meta::VatRateSource] === Creator::VatRateSource_Completor && Number::isZero($line[Tag::UnitPrice])) {
+            $price = isset($line[Tag::UnitPrice]) ? $line[Tag::UnitPrice] : $line[Meta::UnitPriceInc];
+            if ($line[Meta::VatRateSource] === Creator::VatRateSource_Completor && Number::isZero($price)) {
                 if ($maxVatRate !== null) {
                     $line[Tag::VatRate] = $maxVatRate;
                     $line[Meta::VatRateSource] = Completor::VatRateSource_Completor_Completed;

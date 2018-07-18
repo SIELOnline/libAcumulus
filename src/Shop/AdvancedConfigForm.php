@@ -490,6 +490,16 @@ class AdvancedConfigForm extends BaseConfigForm
                     'required' => true,
                 ),
             ),
+            'missingAmount' => array(
+                'type' => 'radio',
+                'label' => $this->t('field_missing_amount'),
+                'description' => $this->t('desc_missing_amount'),
+                'options' => array(
+                    PluginConfig::MissingAmount_Warn => $this->t('option_missing_amount_2'),
+                    PluginConfig::MissingAmount_AddLine => $this->t('option_missing_amount_3'),
+                    PluginConfig::MissingAmount_Ignore => $this->t('option_missing_amount_1'),
+                ),
+            ),
             'sendWhat' => array(
                 'type' => 'checkbox',
                 'label' => $this->t('field_sendWhat'),

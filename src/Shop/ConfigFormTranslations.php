@@ -238,8 +238,14 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'field_concept' => 'Concept',
         'desc_concept' => 'Geef aan hoe de factuur verstuurd moet worden. De 1e optie zal normaal gesproken voldoen. Echter, als u uw facturen altijd als concept wil versturen, kies dan de 3e optie. De 2e optie zou eigenlijk niet gekozen moeten worden, tenzij de waarschuwingen altijd onterecht blijken.',
         'option_concept_2' => 'Als definitieve factuur versturen, tenzij er onregelmatigheden zijn geconstateerd. Kies deze optie tenzij u weet wat u doet.',
-        'option_concept_0' => 'Altijd als definitieve factuur versturen',
-        'option_concept_1' => 'Altijd als concept versturen',
+        'option_concept_0' => 'Altijd als definitieve factuur versturen.',
+        'option_concept_1' => 'Altijd als concept versturen.',
+
+        'field_missing_amount' => 'Ontbrekend bedrag',
+        'desc_missing_amount' => 'Geef aan wat te doen als er een verschil tussen het factuurtotaal en het totaal van de factuurregels geconstateerd wordt. Normaal gesproken zal de 1e optie voldoen. Als het vaak voorkomt en de ontbrekende bedragen zjn eigenlijk altijd correct (bv. betaalkosten van een specifieke payment provider worden niet als losse regel herkend) kan de 2e optie handiger zijn. Er wordt dan al een factuurregel toegevoegd zodat de factuur alleen maar definitief gemaakt hoeft te worden. Gebruik de 3e optie als dit verschil door een instelling of andere plugin optreedt maar de factuur eigenlijk toch altijd correct is.',
+        'option_missing_amount_2' => 'Vestuur een waarschuwing, de factuur wordt als concept verstuurd.',
+        'option_missing_amount_3' => 'Voeg een correctieregel toe, de factuur zal echter bg steeds als concept verstuurd worden.',
+        'option_missing_amount_1' => 'Negeer het verschil.',
 
         'field_description' => 'Toelichting',
         'desc_description' => 'Toelichting op de factuur. Deze inhoud kan in Acumulus op een factuursjabloon getoond worden mbv de veldverwijzing [toelichting].',
@@ -568,10 +574,16 @@ If you unchecked the first option, the second option only applies to business cl
         'desc_defaultInvoiceTemplate' => 'Select the invoice templates to use when generating your Acumulus invoices for due respectively paid orders.',
 
         'field_concept' => 'Concept',
-        'desc_concept' => 'Indicate how to send the invoice to Acumulus. The 1st option will normally do fine, unless you want to send all your invoices as concept to Acumulus. The 2nd option should normally not be chosen, unless the warnings always turn out to be incorrect.',
+        'desc_concept' => 'Indicate how to send the invoice to Acumulus. Normally, the 1st option will do fine, unless you want to send all your invoices as concept to Acumulus. The 2nd option should normally not be chosen, unless the warnings always turn out to be incorrect.',
         'option_concept_2' => 'Send the invoice as final unless the plugin discovered irregularities. Choose this option unless you know what you are doing.',
-        'option_concept_0' => 'Always send as final',
-        'option_concept_1' => 'Always send as concept',
+        'option_concept_0' => 'Always send as final.',
+        'option_concept_1' => 'Always send as concept.',
+
+        'field_missing_amount' => 'Missing amount',
+        'desc_missing_amount' => 'Indicate what to do when the invoice total and the total of the invoice lines differ. Normally, the 1st option will do fine. However, if this happens often and the missing amounts are always correct (e.g. payment fees for a specific payment provider that are not recognised as a separate invoice line), you\'d better use the 2nd option. This will already add an invoice line to the invoice, so you only have to make it final. Use the 3rd option if a setting or another plugin causes this difference but the invoice turns out to be correct anyway.',
+        'option_missing_amount_2' => 'Send a warning, the invoice will be sent as concept.',
+        'option_missing_amount_3' => 'Add a correction line, note that the invoice will still be sent as concept.',
+        'option_missing_amount_1' => 'Ignore.',
 
         'field_description' => 'Description',
         'desc_description' => 'Invoice description. In Acumulus, you can use the contents of this field in invoice templates using the field reference [toelichting].',

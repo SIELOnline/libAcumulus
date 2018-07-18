@@ -102,7 +102,7 @@ class Translations extends TranslationCollection
         'message_warning_strategies_failed' => 'Due to an error in your settings or VAT rates, we could not complete all invoice lines correctly. The invoice has been saved as concept. Correct the invoice in Acumulus.',
         'message_warning_missing_amount_added' => 'The invoice total does not match with the lines total. Therefore a corrective line was added with an amount (ex. vat) of €%1$.2f and a vat amount of €%2$.2f. The invoice has been saved as concept. Check and correct the invoice in Acumulus.',
         'message_warning_missing_amount_warn' => 'The invoice total does not match with the lines total. %1$s. The invoice has been saved as concept. Check and correct the invoice in Acumulus.',
-        'message_warning_missing_amount_spec' => 'the %1$s differs with €2$.2f',
+        'message_warning_missing_amount_spec' => 'the %1$s differs with €%2$.2f',
         'amount_ex' => 'amount (ex. vat)',
         'amount_inc' => 'amount (inc. vat)',
         'amount_vat' => 'vat amount',

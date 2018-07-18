@@ -671,17 +671,17 @@ class Completor
             if (array_key_exists(Meta::LinesAmount, $this->lineTotalsStates['differ'])) {
                 $amount = $this->lineTotalsStates['differ'][Meta::LinesAmount];
                 $field = $this->t('amount_ex');
-                $missing[] = sprintf($this->t('message_warning_missing_amount_spec'), $amount, $field);
+                $missing[] = sprintf($this->t('message_warning_missing_amount_spec'), $field, $amount);
             }
             if (array_key_exists(Meta::LinesAmountInc, $this->lineTotalsStates['differ'])) {
                 $amount = $this->lineTotalsStates['differ'][Meta::LinesAmountInc];
                 $field = $this->t('amount_inc');
-                $missing[] = sprintf($this->t('message_warning_missing_amount_spec'), $amount, $field);
+                $missing[] = sprintf($this->t('message_warning_missing_amount_spec'), $field, $amount);
             }
             if (array_key_exists(Meta::LinesVatAmount, $this->lineTotalsStates['differ'])) {
                 $amount = $this->lineTotalsStates['differ'][Meta::LinesVatAmount];
                 $field = $this->t('amount_vat');
-                $missing[] = sprintf($this->t('message_warning_missing_amount_spec'), $amount, $field);
+                $missing[] = sprintf($this->t('message_warning_missing_amount_spec'), $field, $amount);
             }
             /** @noinspection PhpUndefinedVariableInspection */
             $this->changeInvoiceToConcept('message_warning_missing_amount_warn', 810, ucfirst(implode(', ', $missing)));

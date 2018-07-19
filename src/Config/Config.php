@@ -525,11 +525,18 @@ class Config
         if ($this->keyInfo === null) {
             $curlVersion = curl_version();
             $environment = $this->getShopCapabilities()->getShopEnvironment();
+            $hostName = $this->getHostName();
+            // remove TLD.
+            $pos = strrpos($hostName, '.');
+            if ($pos !== false) {
+                $hostName = substr($hostName, 0, $pos);
+            }
             // As utf8 is now commonly accepted, it is a bit difficult to
             // express the set of characters that are allowed for email
             // addresses, so we remove characters not allowed.
             // See http://stackoverflow.com/a/2049537/1475662: @ ()[]\:;"<>,
-            $shopName = str_replace(array(' ', '@', '(', ')', '[', ']', '\\', ':', ';', '"', '<', '>', ','), '', $environment['shopName']);
+            $hostName = str_replace(array(' ', '@', '(', ')', '[', ']', '\\', ':', ';', '"', '<', '>', ','), '', $hostName);
+
             $this->keyInfo = array(
                 'baseUri' => array(
                     'group' => 'environment',
@@ -634,12 +641,12 @@ class Config
                 'genericCustomerEmail' => array(
                     'group' => Tag::Customer,
                     'type' => 'string',
-                    'default' => "consumer.$shopName@nul.sielsystems.nl",
+                    'default' => "consumer.$hostName@nul.sielsystems.nl",
                 ),
                 'emailIfAbsent' => array(
                     'group' => Tag::Customer,
                     'type' => 'string',
-                    'default' => "$shopName@nul.sielsystems.nl",
+                    'default' => "$hostName@nul.sielsystems.nl",
                 ),
                 'contactYourId' => array(
                     'group' => Tag::Customer,

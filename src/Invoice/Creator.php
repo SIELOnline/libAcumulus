@@ -828,6 +828,10 @@ abstract class Creator
      * Returns whether the margin scheme may be used.
      *
      * @return bool
+     *
+     * @todo: remove margin scheme handling from (plugin specific) creators and
+     *   move it to the completor phase. This will aid in simplifying the
+     *   creators towards raw data collectors.
      */
     protected function allowMarginScheme()
     {
@@ -1062,6 +1066,10 @@ abstract class Creator
      *   - meta-vatrate-max
      *   - meta-vatamount-precision
      *   - meta-vatrate-source
+     *
+     * @todo: can we move this from the (plugin specific) creators to the
+     *   completor phase? This would aid in simplifying the creators towards raw
+     *   data collectors. Note: this would need a meta-vatamount-precision.
      */
     public static function getVatRangeTags($numerator, $denominator, $numeratorPrecision = 0.01, $denominatorPrecision = 0.01)
     {

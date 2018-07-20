@@ -17,18 +17,18 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies)
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
-5.4.7 (2018-07-??)
+5.4.7 (2018-07-20)
 ------------------
 - ALL: Added an option that covers how to handle missing amounts.
-- OC: Better handling of total lines (e.g. shipping) regarding whether the
-  amount is inc or ex vat and vat rate lookup for those lines.
+- OC (bug/feature?): Better handling of total lines (e.g. shipping) regarding
+  whether the amount is inc or ex vat and vat rate lookup for those lines.
 - ALL (bug): Option "Send consumer client records to Acumulus." removes country
   code before it is used to determine the vat type.
 - ALL (bug): goods outside EU may use vat type = 1 when you can't or don't want
   to prove that the goods will leave the EU.
 - ALL (bug): improved handling of costprice and margin lines.
-- ALL: Use host name instead of shop (software) name when creating fictitious
-  email addresses.
+- ALL (bug): Use host name instead of shop software name when creating
+  fictitious email addresses.
 
 5.4.6 (2018-07-10 JOO)
 5.4.6 (2018-07-09 OC)

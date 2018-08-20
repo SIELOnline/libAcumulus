@@ -75,6 +75,10 @@ interface Meta
      */
     const VatRateLookupSource = 'meta-vatrate-lookup-source';
     /**
+     * Support: source of the looked up vat rate.
+     */
+    const VatRateLookupMatches = 'meta-vatrate-lookup-matches';
+    /**
      * Completor -> Strategy: Possible vat rates that lie in the VatRateMin to
      * VatRateMax range.
      */

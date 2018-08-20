@@ -17,6 +17,14 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies)
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
+
+5.4.8 (2018-08-??)
+------------------
+- ALL: Handle the case where a vat rate lookup results in multiple vat rates.
+- ALL: If a parent line must be handled by the strategy phase , ensure that the
+  child lines also are handled by the strategy phase if they have 'vat rate
+  source' = 'parent'.
+
 5.4.7 (2018-07-20)
 ------------------
 - ALL: Added an option that covers how to handle missing amounts.

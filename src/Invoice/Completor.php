@@ -237,6 +237,9 @@ class Completor
         // the fact that the invoice lines have been completed.
         $this->removeEmptyShipping();
 
+        // Massages the meta data before sending the invoice.
+        $this->processMetaData();
+
         return $this->invoice;
     }
 
@@ -858,7 +861,7 @@ class Completor
                         }
                         // 2) If this is a 0 vat rate while the lookup vat rate,
                         //    if available, is not, it must be a 0-vat vat type.
-                        if ($this->lineHas0VatRate($line) && isset($line[Meta::VatRateLookup]) && !Number::isZero($line[Meta::VatRateLookup])) {
+                        if ($this->lineHas0VatRate($line) && isset($line[Meta::VatRateLookup]) && !is_array($line[Meta::VatRateLookup]) && !Number::isZero($line[Meta::VatRateLookup])) {
                             // This article is not intrinsically vat free, so
                             // the vat type must be no vat invoice vat type.
                             if (!in_array($vatType, static::$vatTypesAllowing0Vat)) {
@@ -990,6 +993,21 @@ class Completor
                 function ($line) {
                     return $line[Meta::LineType] !== Creator::LineType_Shipping || !Number::isZero($line[Tag::UnitPrice]);
                 });
+        }
+    }
+
+    /**
+     * Processes meta data before sending the invoice.
+     *
+     * Currently the following processing is done:
+     * - Meta::VatRateLookup is converted to a string if it is an array.
+     */
+    protected function processMetaData()
+    {
+        foreach ($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] as &$line) {
+            if (isset($line[Meta::VatRateLookup]) && is_array($line[Meta::VatRateLookup])) {
+                $line[Meta::VatRateLookup] = implode(',', $line[Meta::VatRateLookup]);
+            }
         }
     }
 

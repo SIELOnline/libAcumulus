@@ -164,23 +164,30 @@ class Creator extends BaseCreator
     {
         $result = array();
         $taxRules = $this->getTaxRules($taxClassId);
-        // We are not going to drill down geo zones, so if we got only 1 rate,
-        // or all rates are the same, we use that, otherwise we don't use it.
+        // We are not going to drill down geo zones, so let's hope we only get 1
+        // rate, or all rates are the same.
         $vatRates = array();
         $label = '';
         foreach ($taxRules as $taxRule) {
-            $taxRate = $this->getTaxRate($taxRule['tax_rate_id']);
-            if (!empty($taxRate)) {
-                $vatRates[$taxRate['rate']] = $taxRate['rate'];
-                if (empty($label)) {
-                    $label = $taxRate['name'];
-                }
+            $vatRate = $this->getTaxRate($taxRule['tax_rate_id']);
+            if (!empty($vatRate)) {
+                $vatRates[$vatRate['rate']] = $vatRate['rate'];
+                $label = $vatRate['name'];
             }
         }
         if (count($vatRates) === 1) {
             $result[Meta::VatRateLookup] = reset($vatRates);
-            // Take the first name (if there were more tax rates).
+            // Take the last name (if there were more tax rates).
             $result[Meta::VatRateLookupLabel] = $label;
+        } elseif (count($vatRates) > 1) {
+            $vatRateLookups = array();
+            foreach ($vatRates as $vatRate) {
+                $vatRateLookups[] = $vatRate['rate'];
+            }
+            $result = array(
+                Meta::VatRateLookup => $vatRateLookups,
+                Meta::VatRateLookupLabel => $label,
+            );
         }
         return $result;
     }
@@ -378,16 +385,13 @@ class Creator extends BaseCreator
         foreach ($records->rows as $row) {
             $taxClassId = reset($row);
             $vatRateMetadata = $this->getVatRateLookupMetadata($taxClassId);
-            if (empty($vatRateMetadata)) {
-                // Different vat rates within same tax class: return no result.
-                return array();
-            } elseif (empty($result)) {
+            if (empty($result)) {
                 // First row: set result
                 $result = $vatRateMetadata;
-            } elseif (!Number::floatsAreEqual($vatRateMetadata[Meta::VatRateLookup], $result[Meta::VatRateLookup])) {
-                // Different rates between tax classes: return no result.
-                return array();
-            } // else: rates are the same: continue.
+            } else {
+                // Next row: merge.
+                $result[Meta::VatRateLookup] = array_merge((array) $result[Meta::VatRateLookup], (array) $vatRateMetadata[Meta::VatRateLookup]);
+            }
         }
         return $result;
     }

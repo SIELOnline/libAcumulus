@@ -217,6 +217,17 @@ class Creator extends BaseCreator
                 Meta::VatRateLookup => $taxRate['rate'],
                 Meta::VatRateLookupLabel => $taxRate['label'],
             );
+        } elseif (count($taxRates) > 1) {
+            $vatRateLookups = array();
+            foreach ($taxRates as $taxRate) {
+                $vatRateLookups[] = $taxRate['rate'];
+            }
+            $result = array(
+                Meta::VatRateLookup => $vatRateLookups,
+                // Last label, I guess they should all be the same, but I am not
+                // sure about that.
+                Meta::VatRateLookupLabel => $taxRate['label'],
+            );
         }
         return $result;
     }
@@ -413,13 +424,18 @@ class Creator extends BaseCreator
             if (!is_numeric(key($taxes))) {
                 $taxes = current($taxes);
             }
-            if (is_array($taxes) && count($taxes) === 1) {
+            if (is_array($taxes)) {
                 $vatLookupTags = array(
-                    // Will contain a % at the end of the string.
-                    Meta::VatRateLookup => substr(WC_Tax::get_rate_percent(key($taxes)), 0, -1),
+                    Meta::VatRateLookup => array(),
                     Meta::VatRateLookupLabel => WC_Tax::get_rate_label(key($taxes)),
                     Meta::VatRateLookupSource => 'shipping line taxes',
                 );
+                foreach ($taxes as $key => $tax) {
+                    // Will contain a % at the end of the string: remove it.
+                    $vatRate = substr(WC_Tax::get_rate_percent($key), 0, -1);
+                    // Assure unique values.
+                    $vatLookupTags[Meta::VatRateLookup][$vatRate] = $vatRate;
+                }
             }
         }
         if (empty($vatLookupTags)) {

@@ -2,7 +2,6 @@
 namespace Siel\Acumulus\OpenCart\Invoice;
 
 use Siel\Acumulus\Api;
-use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
@@ -368,7 +367,8 @@ class Creator extends BaseCreator
      * that this results in only 1 tax rate.
      *
      * @param string $code
-     *   The total line type: shipping, handling, ... (no other known types).
+     *   The total line type: shipping, handling, low_order_fee, ... (no other
+     *   known types).
      *
      * @return array
      *   A, possibly empty, array with vat rate lookup meta data. Empty if no or
@@ -379,8 +379,7 @@ class Creator extends BaseCreator
     protected function getVatRateLookupByTotalLineType($code)
     {
         $result = array();
-        $prefix = DB_PREFIX;
-        $query = "SELECT distinct `value` FROM {$prefix}setting, {$prefix}extension where `type` = '$code' and `key` like '{$code}_%_tax_class_id'";
+        $query = $this->getTotalLineTaxClassLookupQuery($code);
         $records = $this->getRegistry()->db->query($query);
         foreach ($records->rows as $row) {
             $taxClassId = reset($row);
@@ -394,6 +393,28 @@ class Creator extends BaseCreator
             }
         }
         return $result;
+    }
+
+    /**
+     * Returns the query to get the tax class id for a given total type.
+     *
+     * In OC3 the tax class ids for total lines are either stored under:
+     * - key = 'total_{$code}_tax_class_id', e.g. total_handling_tax_class_id or
+     *   total_low_order_fee_tax_class_id.
+     * - key = '{$code}_{module}_tax_class_id', e.g. shipping_flat_tax_class_id
+     *   or shipping_weight_tax_class_id.
+     *
+     * @param string $code
+     *   The type of total line, e.g. shipping, handling or low_order_fee
+     *
+     * @return string
+     *   The query to execute.
+     */
+    protected function getTotalLineTaxClassLookupQuery($code)
+    {
+        $prefix = DB_PREFIX;
+        $code = $this->getRegistry()->db->escape($code);
+        return "SELECT distinct `value` FROM {$prefix}setting where `key` = 'total_{$code}_tax_class_id' OR `key` LIKE '{$code}_%_tax_class_id'";
     }
 
     /**

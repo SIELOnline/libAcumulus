@@ -204,6 +204,7 @@ class Completor
         // Completes the invoice with default settings that do not depend on
         // shop specific data.
         $this->fictitiousClient();
+        $this->validateCountryCode();
         $this->validateEmail();
         $this->invoiceTemplate();
 
@@ -311,7 +312,7 @@ class Completor
                 $possibleVatTypes[] = Api::VatType_MarginScheme;
             }
         }
-        $this->possibleVatTypes = $possibleVatTypes;
+        $this->possibleVatTypes = array_unique($possibleVatTypes, SORT_NUMERIC);
     }
 
     /**
@@ -389,6 +390,24 @@ class Completor
             $this->invoice[Tag::Customer][Tag::Email] = $customerSettings['genericCustomerEmail'];
             $this->invoice[Tag::Customer][Tag::ContactStatus] = Api::ContactStatus_Disabled;
             $this->invoice[Tag::Customer][Tag::OverwriteIfExists] = Api::OverwriteIfExists_No;
+        }
+    }
+
+    /**
+     * Validates the country code of the invoice.
+     *
+     * Validations performed:
+     * - If empty, NL will be assigned to the country code.
+     *
+     * Validations not performed:
+     * - I do not check against a list of defined country codes as I do not want
+     *   another offline hardcoded list to keep up to date.
+     */
+    protected function validateCountryCode()
+    {
+        // Check country code.
+        if (empty($this->invoice[Tag::Customer][Tag::CountryCode])) {
+            $this->invoice[Tag::Customer][Tag::CountryCode] = 'nl';
         }
     }
 
@@ -1092,7 +1111,7 @@ class Completor
      */
     protected function isEu()
     {
-        return $this->countries->isEu($this->invoice[Tag::Customer][Tag::CountryCode]);
+        return !$this->isNl() && $this->countries->isEu($this->invoice[Tag::Customer][Tag::CountryCode]);
     }
 
     /**

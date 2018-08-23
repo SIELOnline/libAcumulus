@@ -20,6 +20,8 @@ WC3 = WooCommerce 3 (WordPress)
 
 5.4.8 (2018-08-??)
 ------------------
+- ALL: Error in initializing possible vat types.
+- ALL: Empty country code now handled as NL.
 - OC1/OC23: getVatRateLookupByTotalLineType() did not return any tax class id.
 - ALL: Handle the case where a vat rate lookup results in multiple vat rates.
 - ALL: If a parent line must be handled by the strategy phase , ensure that the

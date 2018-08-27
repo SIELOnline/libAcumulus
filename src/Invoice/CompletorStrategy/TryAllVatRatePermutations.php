@@ -8,7 +8,7 @@ use Siel\Acumulus\Tag;
 
 /**
  * Class TryAllTaxRatePermutations implements a vat completor strategy by trying
- * all possible permutations of the vat rates for all possible vat types.
+ * all possible permutations of the possible vat rates on the lines to complete.
  *
  * Current known usages:
  * - ???

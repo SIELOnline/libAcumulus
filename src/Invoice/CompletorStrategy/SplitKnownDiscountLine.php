@@ -15,9 +15,9 @@ use Siel\Acumulus\Tag;
  *
  * Preconditions:
  * - lines2Complete contains 1 line that may be split.
- * - There should be other lines that have a Meta::LineDiscountAmountInc tag
- *   and an exact vat rate, and these amounts must add up to the amount of the
- *   line that is to be split.
+ * - There should be other (already completed) lines that have a
+ *   Meta::LineDiscountAmountInc tag and an exact vat rate, and these amounts
+ *   must add up to the amount of the line that is to be split.
  * - This strategy should be executed early as it is a sure and controlled win
  *   and can even be used as a partial solution.
  *

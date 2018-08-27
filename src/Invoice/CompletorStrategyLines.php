@@ -89,7 +89,7 @@ class CompletorStrategyLines
     protected function completeStrategyLines()
     {
         if ($this->invoiceHasStrategyLine()) {
-            $this->invoice[Tag::Customer][Tag::Invoice][Meta::CompletorStrategyInput]['vat-rates'] = str_replace(array(' ', "\r", "\n", "\t"), '', var_export($this->possibleVatRates, true));
+            $this->invoice[Tag::Customer][Tag::Invoice][Meta::CompletorStrategyInput]['vat-rates'] = str_replace(array('=>', ' ', "\r", "\n", "\t"), array('='), var_export($this->possibleVatRates, true));
 
             $isFirst = true;
             $strategies = $this->getStrategyClasses();
@@ -98,7 +98,7 @@ class CompletorStrategyLines
                 $strategy = new $strategyClass($this->config, $this->translator, $this->invoice, $this->possibleVatTypes, $this->possibleVatRates, $this->source);
                 if ($isFirst) {
                     $this->invoice[Tag::Customer][Tag::Invoice][Meta::CompletorStrategyInput]['vat-2-divide'] = $strategy->getVat2Divide();
-                    $this->invoice[Tag::Customer][Tag::Invoice][Meta::CompletorStrategyInput]['vat-breakdown'] = str_replace(array(' ', "\r", "\n", "\t"), '', var_export($strategy->getVatBreakdown(), true));
+                    $this->invoice[Tag::Customer][Tag::Invoice][Meta::CompletorStrategyInput]['vat-breakdown'] = str_replace(array('=>', ' ', "\r", "\n", "\t"), array('='), var_export($strategy->getVatBreakdown(), true));
                     $isFirst = false;
                 }
                 if ($strategy->apply()) {
@@ -147,10 +147,15 @@ class CompletorStrategyLines
 
         // For now hardcoded, but this can be turned into a discovery.
         $namespace = '\Siel\Acumulus\Invoice\CompletorStrategy';
-        $result[] = "$namespace\\SplitKnownDiscountLine";
-        $result[] = "$namespace\\SplitNonMatchingLine";
         $result[] = "$namespace\\ApplySameVatRate";
+        $result[] = "$namespace\\SplitKnownDiscountLine";
+        $result[] = "$namespace\\SplitLine";
+        $result[] = "$namespace\\SplitNonMatchingLine";
         $result[] = "$namespace\\TryAllVatRatePermutations";
+
+        usort($result, function($class1, $class2) {
+           return $class1::$tryOrder - $class2::$tryOrder;
+        });
 
         return $result;
     }

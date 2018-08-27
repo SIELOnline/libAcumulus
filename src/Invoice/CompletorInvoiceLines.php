@@ -309,16 +309,16 @@ class CompletorInvoiceLines
                         // And have the strategy phase give it another try.
                         $line[Meta::VatRateSource] = Creator::VatRateSource_Strategy;
                     }
+                } else {
+                    // We either do not have lookup data or the looked up vat rate
+                    // is not possible. If this is not a 0-price line we may still
+                    // have a chance by using the vat range tactics on the line
+                    // totals or reverting to the strategy phase if the line may be
+                    // split.
+                    // For now I am not going to use the line totals as they are
+                    // hardly available.
+                    $line[Meta::VatRateSource] = Creator::VatRateSource_Strategy;
                 }
-            } else {
-                // We either do not have lookup data or the looked up vat rate
-                // is not possible. If this is not a 0-price line we may still
-                // have a chance by using the vat range tactics on the line
-                // totals or reverting to the strategy phase if the line may be
-                // split.
-                // For now I am not going to use the line totals as they are
-                // hardly available.
-                $line[Meta::VatRateSource] = Creator::VatRateSource_Strategy;
             }
 
             // Recursively complete lines using lookup data.

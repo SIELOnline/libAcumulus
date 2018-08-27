@@ -18,8 +18,12 @@ WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
 
-5.4.8 (2018-08-??)
+5.4.8 (2018-08-27)
 ------------------
+- OC: SplitLine strategy was removed as having no usages: it turns out that
+  OpenCart coupons need it.
+- ALL: Error in assigning strategy to the vatrate-source tag in
+  CompletorInvoiceLines::addVatRateToLookupLines.
 - ALL: Error in initializing possible vat types.
 - ALL: Empty country code now handled as NL.
 - OC1/OC23: getVatRateLookupByTotalLineType() did not return any tax class id.

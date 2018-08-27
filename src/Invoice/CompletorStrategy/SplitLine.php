@@ -13,7 +13,8 @@ use Siel\Acumulus\Tag;
  * have different vat rates.
  *
  * Preconditions:
- * - lines2Complete contains at least 1 line that may be split.
+ * - lines2Complete contains at least 1 line that may be split (tag
+ *   'meta-strategy-split' = true).
  * - Exactly 2 vat rates that appear in the invoice, otherwise we can't compute
  *   1 division.
  * - This strategy should be executed after the tryAllVatRatePermutations, so we
@@ -22,7 +23,7 @@ use Siel\Acumulus\Tag;
  * Strategy:
  * Other non completed lines, typically shipping and other fees, are all given
  * the same vat rate and subsequently the then remaining vat to divide is split
- * ove the slit lines.
+ * over the split lines.
  *
  * If there are multiple split lines, we cannot arrive at a correct division
  * for all theses line separately, so we combine them into 1 discount line and
@@ -33,6 +34,10 @@ use Siel\Acumulus\Tag;
  * lines, being the key component (hoofdbestanddeel). But as no known shop
  * implements this, we start with the maximum rate (this is used by most shops)
  * followed by the minimum rate but only if it is the key component.
+ *
+ * Note that because VAT lookup has already taken place - and thus most fee
+ * lines will have a correct vat rate -  a lot of the freedom of this strategy
+ * has been removed from it.
  *
  * Possible improvements:
  * - Instead of restricting us to vat rates that already appear on the invoice,
@@ -48,14 +53,13 @@ use Siel\Acumulus\Tag;
  * - Instead of restricting us to appearing or possible vat rates we could try
  *   to assume that 1 line is a prepaid voucher and therefore vat free, and
  *   split just the other line(s).
+ * - If we only have 1 splittable line to correct (and no non-splittable ones),
+ *   then trying to find out if a subset of products (and/or fees) exists that
+ *   would lead to the given vat to divide would be a more confident hit (and
+ *   would work with more than 2 vat rates).
  *
  * Current known usages:
- * - ???
- * @todo: deprecated or are there situations where other fee lines also do not
- *  have a vatrate.
- * In the current versions, all lines that may be split will have a
- * meta-strategy-split entry, so SplitNonMatchingLine or SplitKnownDiscountLine
- * should do this trick.
+ * - OpenCart discount coupons
  */
 class SplitLine extends CompletorStrategyBase
 {
@@ -64,7 +68,7 @@ class SplitLine extends CompletorStrategyBase
      *   This strategy should be tried last before the fail strategy as there
      *   are chances of returning a wrong true result.
      */
-    static public $tryOrder = 100;
+    static public $tryOrder = 40;
 
     /** @var array[] */
     protected $splitLines;
@@ -108,9 +112,9 @@ class SplitLine extends CompletorStrategyBase
         }
 
         $this->nonStrategyAmount = 0.0;
-        foreach ($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] as $line2Complete) {
-            if ($line2Complete[Meta::VatRateSource] !== Creator::VatRateSource_Strategy) {
-                $this->nonStrategyAmount += $line2Complete[Tag::UnitPrice] * $line2Complete[Tag::Quantity];
+        foreach ($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] as $line) {
+            if ($line[Meta::VatRateSource] !== Creator::VatRateSource_Strategy) {
+                $this->nonStrategyAmount += $line[Tag::UnitPrice] * $line[Tag::Quantity];
             }
         }
         $this->splitLinesAmount = $this->invoiceAmount - $this->nonStrategyAmount - $this->otherLinesAmount;
@@ -164,8 +168,8 @@ class SplitLine extends CompletorStrategyBase
             $otherVatAmount += $this->completeLine($otherLine2Complete, $vatRateForOtherLines);
         }
         return $this->divideAmountOver2VatRates($this->vat2Divide - $otherVatAmount,
-            (float) $this->minVatRate[Tag::VatRate] / 100.0,
-            (float) $this->maxVatRate[Tag::VatRate] / 100.0);
+            (float) $this->minVatRate[Tag::VatRate],
+            (float) $this->maxVatRate[Tag::VatRate]);
     }
 
     /**

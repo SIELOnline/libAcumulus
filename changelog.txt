@@ -18,6 +18,10 @@ WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
 
+5.4.9 (2018-09-??)
+------------------
+- JOO: Add access right to config, advanced config and batch screens.
+
 5.4.8 (2018-08-27)
 ------------------
 - OC: SplitLine strategy was removed as having no usages: it turns out that
@@ -1057,6 +1061,7 @@ Ondersteunde versies van de verschillende pakketten
 
 HikaShop
 --------
+* 3.5.1 (Joomla 3.8.12)
 * 3.4.0 (Joomla 3.8.10)
 * 3.3.0 (Joomla 3.8.5)
 * 3.2.2 (Joomla 3.8.3)

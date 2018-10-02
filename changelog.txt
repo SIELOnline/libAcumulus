@@ -1113,6 +1113,10 @@ PrestaShop
 * 1.7.2.5
 * 1.7.2.0
 * 1.7.1.1
+* 1.6 lijkt iha te werken, maar de link van het geavanceerde instellingenscherm
+  naar het configureerscherm werkt niet.
+* Thirtybees lijkt een kloon van PS1.6 en kan/zal dus dezelfde problemen als 1.6
+  hebben.
 * 1.6.1.13
 * 1.6.1.5
 * 1.6.1.3

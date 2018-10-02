@@ -315,6 +315,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     {
         switch ($formType) {
             case 'config':
+                // Does not work in PS1.6.
                 return Context::getContext()->link->getAdminLink('AdminModules', true, array(), array('configure' => 'acumulus'));
             case 'advanced':
                 return Context::getContext()->link->getAdminLink('AdminAcumulusAdvanced', true);

@@ -18,8 +18,10 @@ WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
 
-5.4.9 (2018-09-??)
+5.4.9 (2018-10-??)
 ------------------
+- JOO: Install/update: Call to a member function getAcumulusConfig() on boolean.
+- JOO: Install: File does not exist .../com_acumulus/admin/language/en-GB.com_acumulus.ini
 - JOO: Add access right to config, advanced config and batch screens.
 
 5.4.8 (2018-08-27)

@@ -77,6 +77,7 @@ LONGSTRING
         'message_form_range_reference' => 'Reeks: %1$s van %2$s tot %3$s.',
         'message_form_range_date' => 'Reeks: %1$s tussen %2$s en %3$s.',
         'message_form_range_empty' => 'De door u opgegeven reeks bevat geen enkele %1$s.',
+        'message_form_range_list' => 'Gevonden %1$s.',
         'message_form_batch_success' => 'De facturen zijn succesvol verzonden. Zie het resultatenoverzicht voor eventuele opmerkingen en waarschuwingen.',
         'message_form_batch_error' => 'Er zijn fouten opgetreden bij het versturen van de facturen. Zie het resultatenoverzicht voor meer informatie over de fouten.',
 
@@ -148,6 +149,7 @@ LONGSTRING
         'message_form_range_reference' => 'Range: %1$s from %2$s to %3$s.',
         'message_form_range_date' => 'Range: %1$s between %2$s and %3$s.',
         'message_form_range_empty' => 'The range you defined does not contain any %1$s.',
+        'message_form_range_list' => 'Found %1$s.',
         'message_form_success' => 'The invoices were sent successfully. See the results overview for any remarks or warnings.',
         'message_form_error' => 'Errors during sending the invoices. See the results overview for more information on the errors.',
 

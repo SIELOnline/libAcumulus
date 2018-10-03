@@ -65,6 +65,9 @@ abstract class Form
     /** @var \Siel\Acumulus\Helpers\Translator */
     protected $translator;
 
+    /** @var \Siel\Acumulus\Helpers\Log */
+    protected $log;
+
     /** @var \Siel\Acumulus\Helpers\FormHelper */
     protected $formHelper;
 
@@ -118,8 +121,9 @@ abstract class Form
      * @param \Siel\Acumulus\Config\ShopCapabilities $shopCapabilities
      * @param \Siel\Acumulus\Config\Config $config
      * @param \Siel\Acumulus\Helpers\Translator $translator
+     * @param \Siel\Acumulus\Helpers\Log $log
      */
-    public function __construct(FormHelper $formHelper, ShopCapabilities $shopCapabilities, Config $config, Translator $translator)
+    public function __construct(FormHelper $formHelper, ShopCapabilities $shopCapabilities, Config $config, Translator $translator, Log $log)
     {
         $this->successMessages = array();
         $this->warningMessages = array();
@@ -131,6 +135,7 @@ abstract class Form
         $this->shopCapabilities = $shopCapabilities;
         $this->translator = $translator;
         $this->acumulusConfig = $config;
+        $this->log = $log;
         $this->fields = array();
 
         $class = get_class($this);

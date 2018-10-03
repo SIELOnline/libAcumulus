@@ -5,6 +5,7 @@ use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\ShopCapabilities;
 use Siel\Acumulus\Helpers\Form;
 use Siel\Acumulus\Helpers\FormHelper;
+use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Tag;
 use Siel\Acumulus\Web\Result;
@@ -38,10 +39,11 @@ abstract class BaseConfigForm extends Form
      * @param \Siel\Acumulus\Config\ShopCapabilities $shopCapabilities
      * @param \Siel\Acumulus\Config\Config $config
      * @param \Siel\Acumulus\Helpers\Translator $translator
+     * @param \Siel\Acumulus\Helpers\Log $log
      */
-    public function __construct(Service $service, FormHelper $formHelper, ShopCapabilities $shopCapabilities, Config $config, Translator $translator)
+    public function __construct(Service $service, FormHelper $formHelper, ShopCapabilities $shopCapabilities, Config $config, Translator $translator, Log $log)
     {
-        parent::__construct($formHelper, $shopCapabilities, $config, $translator);
+        parent::__construct($formHelper, $shopCapabilities, $config, $translator, $log);
 
         $translations = new ConfigFormTranslations();
         $this->translator->add($translations);

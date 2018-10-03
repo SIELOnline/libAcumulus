@@ -17,6 +17,11 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies)
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
+5.5.0 (2018-10-??)
+------------------
+- ALL: Add logging to execution stage of batch form.
+- ALL: Warning: implode(): Invalid arguments passed in Completor.php on line 835.
+- ALL: Make not found property specification a debug level message.
 
 5.4.9 (2018-10-03)
 ------------------

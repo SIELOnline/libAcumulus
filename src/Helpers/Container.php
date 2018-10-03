@@ -519,6 +519,7 @@ class Container
             $this->getShopCapabilities(),
             $this->getConfig(),
             $this->getTranslator(),
+            $this->getLog(),
         ));
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance($class . 'Form', 'Shop', $arguments);

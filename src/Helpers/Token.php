@@ -194,7 +194,7 @@ class Token
         }
 
         if ($value === null) {
-            $this->log->info("Token::searchProperty('%s'): not found", $propertySpec);
+            $this->log->debug("Token::searchProperty('%s'): not found", $propertySpec);
         }
 
         return $value !== null ? $value : '';

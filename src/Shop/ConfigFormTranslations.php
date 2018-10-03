@@ -30,17 +30,21 @@ class ConfigFormTranslations extends TranslationCollection
         'message_uninstall' => 'Wilt u de configuratie-instellingen verwijderen?',
 
         'message_error_header' => 'Fout in uw Acumulus accountgegevens',
-        'message_error_auth' => 'Uw Acumulus accountgegevens zijn onjuist. Zodra u %2$s de correcte gevens hebt ingevuld, worden hier de %1$s instellingen getoond.',
+        'message_error_auth' => 'Uw Acumulus accountgegevens zijn onjuist. Zodra u %2$s de correcte gegevens hebt ingevuld, worden hier de %1$s instellingen getoond.',
+        'message_error_forb' => 'Uw Acumulus accountgegevens zijn juist maar staan geen toegang via de web service toe. Zodra u %2$s correcte gegevens hebt ingevuld, worden hier de %1$s instellingen getoond.',
         'message_error_comm' => 'Er is een fout opgetreden bij het ophalen van uw gegevens van Acumulus. Probeer het later nog eens. Zodra de verbinding hersteld is worden hier de %1$s instellingen getoond.',
         'message_auth_unknown' => 'Zodra u %2$s uw Acumulus accountgegevens hebt ingevuld, worden %1$s de overige instellingen getoond.',
         'message_error_arg1_config' => 'overige',
         'message_error_arg1_advanced' => 'geavanceerde',
         'message_error_arg2_config' => 'hier',
         'message_error_arg2_advanced' => 'in het "Acumulus basisinstellingenformulier"',
+        'message_warning_role_deprecated' => 'U gebruikt accountgegevens met een gebruikerstype dat binnenkort niet meer gebruikt kan worden om de Acumulus API mee te benaderen. Voeg een andere gebruiker toe met gebruikerstype API-Gebruiker of verander het gebruikerstype van de huidige gebruiker.',
+        'message_warning_role_insufficient' => 'U gebruikt een account met het gebruikerstype API-Invoerder. Dit gebruikerstype heeft niet alle rechten die deze plugin gebruikt. Verander het gebruikerstype van de huidige gebruiker naar API-Gebruiker of voeg een andere gebruiker toe.',
+        'message_warning_role_overkill' => 'U gebruikt een account met het gebruikerstype API-Beheerder. Dit gebruikerstype heeft meer rechten dan deze plugin nodig heeft. Wij raden u aan om het gebruikerstype te veranderen naar API-Gebruiker.',
 
         // Account settings.
         'accountSettingsHeader' => 'Uw Acumulus account',
-        'desc_accountSettings' => 'Vul hier de gegevens in die u in de welkomstmail heeft ontvangen, of beter nog: u kunt in Acumulus ook een extra gebruiker aanmaken onder "Beheer → Gebruikers → Gebruiker toevoegen". Vul "api - koppeling" in als "Gebruikerstype", deze heeft minder rechten dan een "beheerder" en is dus veiliger.',
+        'desc_accountSettings' => 'Log in op Acumulus en voeg een gebruiker toe onder "Beheer → Gebruikers → Gebruiker toevoegen". Vul "API - Gebruiker" in als "Gebruikerstype".',
 
         'field_code' => 'Contractcode',
         'field_username' => 'Gebruikersnaam',
@@ -369,17 +373,20 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
 
         'message_error_header' => 'Error in your Acumulus connection settings',
         'message_error_auth' => 'Your Acumulus connection settings are incorrect. Please check them. After you have entered the correct connection settings %2$s, the %1$s settings will be shown.',
+        'message_error_forb' => 'Your Acumulus connection settings are correct but do not allow access via the web service. After you have entered correct connection settings %2$s, the %1$s settings will be shown.',
         'message_error_comm' => 'The module encountered an error retrieving your Acumulus configuration. Please try again. When the connection is restored the %1$s settings will be shown as well.',
         'message_auth_unknown' => 'When you have filled in your Acumulus connection settings %2$s, the %1$s settings will be shown as well.',
         'message_error_arg1_config' => 'other',
         'message_error_arg1_advanced' => 'advanced',
         'message_error_arg2_config' => 'here',
         'message_error_arg2_advanced' => 'in the "Acumulus basic settings form"',
+        'message_warning_role_deprecated' => 'You are using a deprecated user role to connect to the Acumulus API. Please add another user with an API-compliant role or change the role for the current user.',
+        'message_warning_role_insufficient' => 'You are using the user role API-Creator. This role does not have all permissions this plugin needs. Change the role of the current user to API-User or create a new user.',
+        'message_warning_role_overkill' => 'You are using the user role API-Manager. This role has mre permissions than this plugin needs. We advice you to change the role to API-User.',
 
         // Account settings.
         'accountSettingsHeader' => 'Your Acumulus connection settings',
-        //'desc_accountSettings' => 'Enter the details you received by email, or even better: create an additional user in Acumulus under "Beheer → Gebruikers → Gebruiker toevoegen" having "api - koppeling" as "Gebruikerstype". Such a user has less permissions and is thus more secure.',
-        'desc_accountSettings' => 'Enter the details you received by email, or even better: create an additional user in Acumulus under "Admin → Users → Add user" having "api - plugin" as "User type". Such a user has less permissions and is thus more secure.',
+        'desc_accountSettings' => 'Log in to Acumulus and create an additional user in Acumulus under "Admin → Users → Add user" having "API-User" as "User type".',
 
         'field_code' => 'Contract code',
         'field_username' => 'User name',

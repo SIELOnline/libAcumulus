@@ -14,6 +14,14 @@ interface Api
      */
     const DateFormat_Iso = 'Y-m-d';
 
+    // API role ids
+    const RoleManager = 1;
+    const RoleUser = 2;
+    const RoleCreator = 3;
+    const RoleApiManager = 4;
+    const RoleApiUser = 5;
+    const RoleApiCreator = 6;
+
     // API result codes. Note that internally I want an increasing order of
     // worseness, so these constants are not used internally but mapped to the
     // PluginConfig::status_... constants.

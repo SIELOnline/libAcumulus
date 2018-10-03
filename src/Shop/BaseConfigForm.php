@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\Shop;
 
+use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\ShopCapabilities;
 use Siel\Acumulus\Helpers\Form;
@@ -24,12 +25,11 @@ abstract class BaseConfigForm extends Form
     protected $service;
 
     /**
-     * Contact types picklist result, used to test the connection, storing it in
-     * this property prevents another webservice call.
+     * About API call result.
      *
      * @var \Siel\Acumulus\Web\Result
      */
-    protected $contactTypesResult;
+    protected $about;
 
     /**
      * Constructor.
@@ -96,9 +96,9 @@ abstract class BaseConfigForm extends Form
     }
 
     /**
-     * Checks if the account settings are correct.
+     * Checks the account settings for correctness and sufficient authorization.
      *
-     * This is done by trying to download the contact types picklist.
+     * This is done by calling the about API call and checking the result.
      *
      * @return string
      *   Message to show in the 2nd and 3rd fieldset. Empty if successful.
@@ -108,15 +108,26 @@ abstract class BaseConfigForm extends Form
         // Check if we can retrieve a picklist. This indicates if the account
         // settings are correct.
         $message = '';
-        $this->contactTypesResult = null;
         $credentials = $this->acumulusConfig->getCredentials();
         if (!empty($credentials[Tag::ContractCode]) && !empty($credentials[Tag::UserName]) && !empty($credentials[Tag::Password])) {
-            $this->contactTypesResult = $this->service->getPicklistContactTypes();
-            if ($this->contactTypesResult->hasError()) {
-                $message = $this->contactTypesResult->hasCode(401) ? 'message_error_auth' : 'message_error_comm';
-                $this->addErrorMessages($this->contactTypesResult->getExceptionMessage());
-                $this->addErrorMessages($this->contactTypesResult->getErrors(Result::Format_PlainTextArray));
-                $this->addWarningMessages($this->contactTypesResult->getWarnings(Result::Format_PlainTextArray));
+            $this->about = $this->service->getAbout();
+            if ($this->about->hasError()) {
+                $message = $this->about->hasCode(401) ? 'message_error_auth' : ($this->about->hasCode(403) ? 'message_error_forb' : 'message_error_comm');
+                $this->addErrorMessages($this->about->getExceptionMessage());
+                $this->addErrorMessages($this->about->getErrors(Result::Format_PlainTextArray));
+                $this->addWarningMessages($this->about->getWarnings(Result::Format_PlainTextArray));
+            } elseif ($this->about->hasCode(553)) {
+                // Role has been deprecated role for use with the API.
+                $this->addWarningMessages($this->t('message_warning_role_deprecated'));
+            } else {
+                // Check role for sufficient rights but no overkill.
+                $response = $this->about->getResponse();
+                $roleId = (int) $response['roleid'];
+                if ($roleId === Api::RoleApiCreator) {
+                    $this->addWarningMessages($this->t('message_warning_role_insufficient'));
+                } elseif ($roleId === Api::RoleApiManager) {
+                    $this->addWarningMessages($this->t('message_warning_role_overkill'));
+                }
             }
         } else {
             // First fill in your account details.

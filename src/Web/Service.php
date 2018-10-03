@@ -63,6 +63,39 @@ class Service
     }
 
     /**
+     * Retrieve the about information.
+     *
+     * The Acumulus API for picklists is so well standardized, that it is
+     * possible to use 1 general picklist retrieval function that can process
+     * all picklist types.
+     *
+     * @return \Siel\Acumulus\Web\Result
+     *   The result of the webservice call. The structured response will contain
+     *   1 "about" array, being a keyed array with keys:
+     *   - about: General name for the API.
+     *   - tree: stable, current, deprecated or closed.
+     *   - myrole: Name of user role, current known roles: Beheerder, Gebruiker,
+     *       Invoerder, API-beheerder, API-gebruiker, API-invoerder, API-open
+     *       (not a real role, just to indicate the calls that are available
+     *       without authentication).
+     *   - myroleid: Numeric identifier of user role.
+     *
+     *   Possible errors:
+     *   - 553 XUPR7NEC8: Warning: You are using a deprecated user role to
+     *     connect to the Acumulus API. Please add another user with an
+     *     API-compliant role or change the role for the current user.
+     *   - 403 A8N403GCN: Forbidden - Insufficient credential level for
+     *     general\/general_about.php. Not authorized to perform request.
+     *
+     * @see https://www.siel.nl/acumulus/API/Misc/About/
+     *   for more information about the contents of the returned array.
+     */
+    public function getAbout()
+    {
+        return $this->communicator->callApiFunction("general/general_about", array())->setMainResponseKey('general', false);
+    }
+
+    /**
      * Retrieves a list of accounts.
      *
      * @return \Siel\Acumulus\Web\Result

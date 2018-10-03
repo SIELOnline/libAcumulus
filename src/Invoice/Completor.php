@@ -911,12 +911,12 @@ class Completor
                 // Add to result, union and intersection
                 $list[$index] = $possibleLineVatTypes;
                 $union = array_unique(array_merge($union, $possibleLineVatTypes));
-                $intersection = $intersection ? array_intersect($intersection, $possibleLineVatTypes) : $possibleLineVatTypes;
+                $intersection = $intersection !== null ? array_intersect($intersection, $possibleLineVatTypes) : $possibleLineVatTypes;
             }
         }
 
         $list['union'] = $union;
-        $list['intersection'] = $intersection;
+        $list['intersection'] = $intersection !== null ? $intersection : array();
         return $list;
     }
 

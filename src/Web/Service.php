@@ -74,12 +74,11 @@ class Service
      *   1 "about" array, being a keyed array with keys:
      *   - about: General name for the API.
      *   - tree: stable, current, deprecated or closed.
-     *   - myrole: Name of user role, current known roles: Beheerder, Gebruiker,
+     *   - role: Name of user role, current known roles: Beheerder, Gebruiker,
      *       Invoerder, API-beheerder, API-gebruiker, API-invoerder, API-open
      *       (not a real role, just to indicate the calls that are available
      *       without authentication).
-     *   - myroleid: Numeric identifier of user role.
-     *
+     *   - roleid: Numeric identifier of user role.
      *   Possible errors:
      *   - 553 XUPR7NEC8: Warning: You are using a deprecated user role to
      *     connect to the Acumulus API. Please add another user with an
@@ -329,7 +328,7 @@ class Service
     }
 
     /**
-     * Moves the entry in, or out the trashbin.
+     * Moves the entry into or out of the trashbin.
      *
      * @param int $entryId
      *   The id of the entry.

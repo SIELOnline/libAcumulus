@@ -548,14 +548,14 @@ class CompletorInvoiceLines
     }
 
     /**
-     * Returns whether the given vat rate is a possible vat rate.
+     * Returns whether the given vat rate(s) is/are a possible vat rate.
      *
      * @param float|float[] $vatRates
      *   The vat rate(s) to lookup.
      *
      * @return float[]
      *   The, possibly empty, subset of $vatRates that occur in the set of
-     *   possible vat rates.
+     *   $this->possibleVatRates.
      */
     protected function getPossibleVatRates($vatRates)
     {

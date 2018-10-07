@@ -198,22 +198,33 @@ class Creator extends BaseCreator
      * this method will only return metadata if only 1 rate was found.
      *
      * @param string $taxClass
-     *   The tax class of the product.
+     *   The tax class of the product. For the default tax class it can be
+     *   'standard' or empty.
      *
      * @return array
-     *   Either an array with keys Meta::VatRateLookup and
-     *  Meta::VatRateLookupLabel or an empty array.
+     *   An array with keys:
+     *   - Meta::VatClassId
+     *   - Meta::VatClassName
+     *   - Meta::VatRateLookup (*)
+     *   - Meta::VatRateLookupLabel (*)
+     *   * = optional.
      */
     protected function getVatRateLookupMetadataByTaxClass($taxClass)
     {
+        if ($taxClass === '') {
+            $taxClass = 'standard';
+        }
+        $result = array(
+            Meta::VatClassId => sanitize_title($taxClass),
+            Meta::VatClassName => $taxClass,
+        );
         if ($taxClass === 'standard') {
             $taxClass = '';
         }
-        $result = array();
         $taxRates = WC_Tax::get_rates($taxClass);
         if (count($taxRates) === 1) {
             $taxRate = reset($taxRates);
-            $result = array(
+            $result += array(
                 Meta::VatRateLookup => $taxRate['rate'],
                 Meta::VatRateLookupLabel => $taxRate['label'],
             );
@@ -222,7 +233,7 @@ class Creator extends BaseCreator
             foreach ($taxRates as $taxRate) {
                 $vatRateLookups[] = $taxRate['rate'];
             }
-            $result = array(
+            $result += array(
                 Meta::VatRateLookup => $vatRateLookups,
                 // Last label, I guess they should all be the same, but I am not
                 // sure about that.
@@ -412,45 +423,53 @@ class Creator extends BaseCreator
      *   The taxes applied to a shipping line.
      *
      * @return array
-     *   Either an array with keys Meta::VatRateLookup,
-     *   Meta::VatRateLookupLabel, and Meta::VatRateLookupSource or an empty
-     *   array.
+     *   An empty array or an array with keys:
+     *   - Meta::VatClassId
+     *   - Meta::VatClassName (*)
+     *   - Meta::VatRateLookup (*)
+     *   - Meta::VatRateLookupLabel (*)
+     *   - Meta::VatRateLookupSource (*)
+     *   * = optional.
      */
     protected function getShippingVatRateLookupMetadata($taxes)
     {
-        $vatLookupTags = array();
+        $result = array();
         if (is_array($taxes)) {
             // Since version ?.?, $taxes has an indirection by key 'total'.
             if (!is_numeric(key($taxes))) {
                 $taxes = current($taxes);
             }
             if (is_array($taxes)) {
-                $vatLookupTags = array(
-                    Meta::VatRateLookup => array(),
-                    Meta::VatRateLookupLabel => WC_Tax::get_rate_label(key($taxes)),
-                    Meta::VatRateLookupSource => 'shipping line taxes',
-                );
                 foreach ($taxes as $key => $tax) {
-                    // Will contain a % at the end of the string: remove it.
-                    $vatRate = substr(WC_Tax::get_rate_percent($key), 0, -1);
-                    // Assure unique values.
-                    $vatLookupTags[Meta::VatRateLookup][$vatRate] = $vatRate;
+                    $taxRate = WC_Tax::_get_tax_rate($key, OBJECT);
+                    if ($taxRate) {
+                        $result = array(
+                            Meta::VatClassId => $taxRate->tax_rate_class !== '' ? $taxRate->tax_rate_class : 'standard',
+                            // Will contain a % at the end of the string: remove it.
+                            Meta::VatRateLookup => substr(WC_Tax::get_rate_percent($key), 0, -1),
+                            Meta::VatRateLookupLabel => WC_Tax::get_rate_label($taxRate),
+                            Meta::VatRateLookupSource => 'shipping line taxes',
+                        );
+                        // We can handle only 1 set of vat rate lookup meta
+                        // data, so break after the first.
+                        break;
+                    }
                 }
             }
         }
-        if (empty($vatLookupTags)) {
+        if (empty($result)) {
             // Apparently we have free shipping (or a misconfigured shipment
             // method). Use a fall-back: WooCommerce only knows 1 tax rate
             // for all shipping methods, stored in config:
             $shipping_tax_class = get_option('woocommerce_shipping_tax_class');
             if (is_string($shipping_tax_class)) {
-                $vatLookupTags = $this->getVatRateLookupMetadataByTaxClass($shipping_tax_class);
-                if (!empty($vatLookupTags)) {
-                    $vatLookupTags [Meta::VatRateLookupSource] = "get_option('woocommerce_shipping_tax_class')";
+                $result = $this->getVatRateLookupMetadataByTaxClass($shipping_tax_class);
+                if (!empty($result)) {
+                    $result[Meta::VatRateLookupSource] = "get_option('woocommerce_shipping_tax_class')";
                 }
             }
         }
-        return $vatLookupTags;
+        return $result;
     }
 
     /**

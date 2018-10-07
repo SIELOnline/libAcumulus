@@ -19,10 +19,14 @@ WC3 = WooCommerce 3 (WordPress)
 
 5.5.0 (2018-10-??)
 ------------------
+- ALL: Add vat class information as metadata. This can help to differentiate
+  between invoice type 1 and 6 for countries having the same vat rate as NL.
 - ALL: Support for new roles and permissions to access the api.
 - ALL: Add logging to execution stage of batch form.
 - ALL: Warning: implode(): Invalid arguments passed in Completor.php on line 835.
-- ALL: Make not found property specification a debug level message.
+- ALL: Make "property specification not found" a debug level message.
+- JOO: Access rights revisited so that menu-items remain visible in the admin
+  menu for people who only have access to the batch send form.
 
 5.4.9 (2018-10-03)
 ------------------

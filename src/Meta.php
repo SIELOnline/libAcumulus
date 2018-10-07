@@ -75,7 +75,7 @@ interface Meta
      */
     const VatRateLookupSource = 'meta-vatrate-lookup-source';
     /**
-     * Support: source of the looked up vat rate.
+     * Support: matches of the looked up vat rate(s) with possible vat rates.
      */
     const VatRateLookupMatches = 'meta-vatrate-lookup-matches';
     /**
@@ -83,6 +83,17 @@ interface Meta
      * VatRateMax range.
      */
     const VatRateMatches = 'meta-vatrate-matches';
+    /**
+     * Creator -> Completor: (current) vat class id looked up from e.g. the
+     * product or shipping settings. Can be used to differentiate between vat
+     * type 1 and 6 when foreign vat rate equals that of NL.
+     */
+    const VatClassId = 'meta-vatclass-id';
+    /**
+     * Support: (current) vat class name looked up from e.g. the
+     * product or shipping settings.
+     */
+    const VatClassName = 'meta-vatclass-name';
     /**
      * Completor: Possible vat types for this line.
      */

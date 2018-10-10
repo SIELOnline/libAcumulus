@@ -131,6 +131,13 @@ class Creator extends BaseCreator
             Meta::LineVatAmount => $lineVat,
         );
 
+        // Add vat meta data.
+        $product = $item->getProduct();
+        if ($product) {
+            /** @noinspection PhpUndefinedMethodInspection */
+            $result += $this->getTaxClassMetaData((int) $product->getTaxClassId());
+        }
+
         // Add discount related info.
         if (!Number::isZero($item->getBaseDiscountAmount())) {
             // Store discount on this item to be able to get correct discount
@@ -200,6 +207,14 @@ class Creator extends BaseCreator
             $result[Meta::FieldsCalculated][] = Meta::VatAmount;
         }
 
+        // Add vat meta data.
+        $product = \Magento\Framework\App\ObjectManager::getInstance()->create(\Magento\Catalog\Model\Product::class);
+        $product->getResource()->load($product, $item->getProductId());
+        if ($product->getId()) {
+            /** @noinspection PhpUndefinedMethodInspection */
+            $result += $this->getTaxClassMetaData((int) $product->getTaxClassId());
+        }
+
         // Add discount related info.
         if (!Number::isZero($item->getDiscountAmount())) {
             // Credit note: discounts are cancelled, thus amount is positive.
@@ -251,9 +266,12 @@ class Creator extends BaseCreator
                 $result += array(
                         Tag::UnitPrice => $shippingEx,
                         Meta::UnitPriceInc => $shippingInc,
-                        Meta::RecalculateUnitPrice => $this->shippingPricesIncludeTax(),
-                    ) + $this->getVatRangeTags($shippingVat, $shippingEx, 0.02,$this->shippingPricesIncludeTax() ? 0.02 : 0.01);
+                        Meta::RecalculateUnitPrice => $this->shippingPriceIncludeTax(),
+                    ) + $this->getVatRangeTags($shippingVat, $shippingEx, 0.02,$this->shippingPriceIncludeTax() ? 0.02 : 0.01);
                 $result[Meta::FieldsCalculated][] = Meta::VatAmount;
+
+                // Add vat meta data.
+                $result += $this->getTaxClassMetaData($this->getShippingTaxClassId());
 
                 // getBaseShippingDiscountAmount() only exists on Orders.
                 if ($this->invoiceSource->getType() === Source::Order && !Number::isZero($magentoSource->getBaseShippingDiscountAmount())) {
@@ -281,13 +299,34 @@ class Creator extends BaseCreator
     }
 
     /**
+     * Returns meta data regarding the tax class.
+     *
+     * @param int $taxClassId
+     *
+     * @return array
+     *   An empty array or an array with keys:
+     *   - Meta::VatClassId
+     *   - Meta::VatClassName
+     */
+    protected function getTaxClassMetaData($taxClassId)
+    {
+        $result = array();
+        if ($taxClassId) {
+            $result[Meta::VatClassId] = $taxClassId;
+            /** @var \Magento\Tax\Model\ClassModel $taxClass */
+            $taxClass = \Magento\Framework\App\ObjectManager::getInstance()->create(\Magento\Tax\Model\ClassModel::class);
+            $taxClass->getResource()->load($taxClass, $taxClassId);
+            $result[Meta::VatClassName] = $taxClass->getClassName();
+        }
+        return $result;
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function productPricesIncludeTax()
     {
-        /** @var \Magento\Tax\Model\Config $taxConfig */
-        $taxConfig = Registry::getInstance()->create('Magento\Tax\Model\Config');
-        return $taxConfig->priceIncludesTax();
+        return $this->getTaxConfig()->priceIncludesTax();
     }
 
     /**
@@ -296,10 +335,29 @@ class Creator extends BaseCreator
      * @return bool
      *   true if shipping prices include tax, false otherwise.
      */
-    protected function shippingPricesIncludeTax()
+    protected function shippingPriceIncludeTax()
     {
-        /** @var \Magento\Tax\Model\Config $taxConfig */
-        $taxConfig = Registry::getInstance()->create('Magento\Tax\Model\Config');
-        return $taxConfig->shippingPriceIncludesTax();
+        return $this->getTaxConfig()->shippingPriceIncludesTax();
+    }
+
+    /**
+     * Returns the shipping tax class id.
+     *
+     * @return int
+     *   The id of the tax class used for shipping.
+     */
+    protected function getShippingTaxClassId()
+    {
+        return $this->getTaxConfig()->getShippingTaxClass();
+    }
+
+    /**
+     * Returns a \Magento\Tax\Model\Config object.
+     *
+     * @return \Magento\Tax\Model\Config
+     */
+    protected function getTaxConfig()
+    {
+        return Registry::getInstance()->create('Magento\Tax\Model\Config');
     }
 }

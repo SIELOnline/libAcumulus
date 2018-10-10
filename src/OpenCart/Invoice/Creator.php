@@ -154,42 +154,73 @@ class Creator extends BaseCreator
      *   The tax class to look up the vat rate for.
      *
      * @return array
-     *   Either an array with keys Meta::VatRateLookup and
-     *  Meta::VatRateLookupLabel or an empty array.
+     *   An empty array or an array with keys:
+     *   - Meta::VatClassId
+     *   - Meta::VatClassName
+     *   - Meta::VatRateLookup (*)
+     *   - Meta::VatRateLookupLabel (*)
+     *   * = optional.
      *
      * @throws \Exception
      */
     protected function getVatRateLookupMetadata($taxClassId)
     {
         $result = array();
-        $taxRules = $this->getTaxRules($taxClassId);
-        // We are not going to drill down geo zones, so let's hope we only get 1
-        // rate, or all rates are the same.
-        $vatRates = array();
-        $label = '';
-        foreach ($taxRules as $taxRule) {
-            $vatRate = $this->getTaxRate($taxRule['tax_rate_id']);
-            if (!empty($vatRate)) {
-                $vatRates[$vatRate['rate']] = $vatRate['rate'];
-                $label = $vatRate['name'];
+
+        $taxClass = $this->getTaxClass($taxClassId);
+        if ($taxClass) {
+            $result[Meta::VatClassId] = $taxClass['tax_class_id'];
+            $result[Meta::VatClassName] = $taxClass['title'];
+
+            $taxRules = $this->getTaxRules($taxClassId);
+            // We are not going to drill down geo zones, so let's hope we only get 1
+            // rate, or all rates are the same.
+            $vatRates = array();
+            $label = '';
+            foreach ($taxRules as $taxRule) {
+                $vatRate = $this->getTaxRate($taxRule['tax_rate_id']);
+                if (!empty($vatRate)) {
+                    $vatRates[$vatRate['rate']] = $vatRate['rate'];
+                    $label = $vatRate['name'];
+                }
             }
-        }
-        if (count($vatRates) === 1) {
-            $result[Meta::VatRateLookup] = reset($vatRates);
-            // Take the last name (if there were more tax rates).
-            $result[Meta::VatRateLookupLabel] = $label;
-        } elseif (count($vatRates) > 1) {
-            $vatRateLookups = array();
-            foreach ($vatRates as $vatRate) {
-                $vatRateLookups[] = $vatRate['rate'];
+            if (count($vatRates) === 1) {
+                $result[Meta::VatRateLookup] = reset($vatRates);
+                // Take the last name (if there were more tax rates).
+                $result[Meta::VatRateLookupLabel] = $label;
+            } elseif (count($vatRates) > 1) {
+                $vatRateLookups = array();
+                foreach ($vatRates as $vatRate) {
+                    $vatRateLookups[] = $vatRate['rate'];
+                }
+                $result = array(
+                    Meta::VatRateLookup => $vatRateLookups,
+                    Meta::VatRateLookupLabel => $label,
+                );
             }
-            $result = array(
-                Meta::VatRateLookup => $vatRateLookups,
-                Meta::VatRateLookupLabel => $label,
-            );
         }
         return $result;
     }
+
+    /**
+     * Copy of ModelLocalisationTaxClass::getTaxClass().
+     *
+     * The above mentioned model cannot be used on the catalog side, so I just
+     * copied the code.
+     *
+     * @param int $tax_class_id
+     *
+     * @return array[]
+     *
+     * @throws \Exception
+     */
+    protected function getTaxClass($tax_class_id)
+    {
+        /** @noinspection SqlResolve */
+        $query = $this->getRegistry()->db->query("SELECT * FROM " . DB_PREFIX . "tax_class WHERE tax_class_id = '" . (int) $tax_class_id . "'");
+        return $query->row;
+    }
+
 
     /**
      * Copy of ModelLocalisationTaxClass::getTaxRules().
@@ -205,6 +236,7 @@ class Creator extends BaseCreator
      */
     protected function getTaxRules($tax_class_id)
     {
+        /** @noinspection SqlResolve */
         $query = $this->getRegistry()->db->query("SELECT * FROM " . DB_PREFIX . "tax_rule WHERE tax_class_id = '" . (int) $tax_class_id . "'");
         return $query->rows;
     }
@@ -223,6 +255,7 @@ class Creator extends BaseCreator
      */
     protected function getTaxRate($tax_rate_id)
     {
+        /** @noinspection SqlResolve */
         $query = $this->getRegistry()->db->query("SELECT tr.tax_rate_id, tr.name AS name, tr.rate, tr.type, tr.geo_zone_id, gz.name AS geo_zone, tr.date_added, tr.date_modified FROM " . DB_PREFIX . "tax_rate tr LEFT JOIN " . DB_PREFIX . "geo_zone gz ON (tr.geo_zone_id = gz.geo_zone_id) WHERE tr.tax_rate_id = '" . (int) $tax_rate_id . "'");
         return $query->row;
     }
@@ -414,6 +447,7 @@ class Creator extends BaseCreator
     {
         $prefix = DB_PREFIX;
         $code = $this->getRegistry()->db->escape($code);
+        /** @noinspection SqlResolve */
         return "SELECT distinct `value` FROM {$prefix}setting where `key` = 'total_{$code}_tax_class_id' OR `key` LIKE '{$code}_%_tax_class_id'";
     }
 

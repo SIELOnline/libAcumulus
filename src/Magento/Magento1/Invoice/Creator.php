@@ -129,6 +129,13 @@ class Creator extends BaseCreator
             Meta::LineVatAmount => $lineVat,
         );
 
+        // Add vat meta data.
+        $product = $item->getProduct();
+        if ($product) {
+            /** @noinspection PhpUndefinedMethodInspection */
+            $result += $this->getTaxClassMetaData((int) $product->getTaxClassId());
+        }
+
         // Add discount related info.
         if (!Number::isZero($item->getBaseDiscountAmount())) {
             // Store discount on this item to be able to get correct discount
@@ -198,6 +205,15 @@ class Creator extends BaseCreator
             $result[Meta::FieldsCalculated][] = Meta::VatAmount;
         }
 
+        // Add vat meta data.
+        /** @var \Mage_Catalog_Model_Product $product */
+        $product = \Mage::getModel('catalog/product');
+        $product->getResource()->load($product, $item->getProductId());
+        if ($product->getId()) {
+            /** @noinspection PhpUndefinedMethodInspection */
+            $result += $this->getTaxClassMetaData((int) $product->getTaxClassId());
+        }
+
         // Add discount related info.
         if (!Number::isZero($item->getBaseDiscountAmount())) {
             // Credit note: discounts are cancelled, thus amount is positive.
@@ -253,6 +269,9 @@ class Creator extends BaseCreator
                     ) + $this->getVatRangeTags($shippingVat, $shippingEx, 0.02,$this->shippingPricesIncludeTax() ? 0.02 : 0.01);
                 $result[Meta::FieldsCalculated][] = Meta::VatAmount;
 
+                // Add vat meta data.
+                $result += $this->getTaxClassMetaData($this->getShippingTaxClassId());
+
                 // getShippingDiscountAmount() only exists on Orders.
                 if ($this->invoiceSource->getType() === Source::Order && !Number::isZero($magentoSource->getBaseShippingDiscountAmount())) {
                     $result[Meta::LineDiscountAmountInc] = -$sign * $magentoSource->getBaseShippingDiscountAmount();
@@ -278,13 +297,34 @@ class Creator extends BaseCreator
     }
 
     /**
+     * Returns meta data regarding the tax class.
+     *
+     * @param int $taxClassId
+     *
+     * @return array
+     *   An empty array or an array with keys:
+     *   - Meta::VatClassId
+     *   - Meta::VatClassName
+     */
+    protected function getTaxClassMetaData($taxClassId)
+    {
+        $result = array();
+        if ($taxClassId) {
+            $result[Meta::VatClassId] = $taxClassId;
+            /** @var \Mage_Tax_Model_Class $taxClass */
+            $taxClass = \Mage::getModel('tax/class');
+            $taxClass->getResource()->load($taxClass, $taxClassId);
+            $result[Meta::VatClassName] = $taxClass->getClassName();
+        }
+        return $result;
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function productPricesIncludeTax()
     {
-        /** @var \Mage_Tax_Model_Config $taxConfig */
-        $taxConfig = \Mage::getModel('tax/config');
-        return $taxConfig->priceIncludesTax();
+        return $this->getTaxConfig()->priceIncludesTax();
     }
 
     /**
@@ -295,8 +335,28 @@ class Creator extends BaseCreator
      */
     protected function shippingPricesIncludeTax()
     {
-        /** @var \Mage_Tax_Model_Config $taxConfig */
-        $taxConfig = \Mage::getModel('tax/config');
-        return $taxConfig->shippingPriceIncludesTax();
+        return $this->getTaxConfig()->shippingPriceIncludesTax();
     }
+
+    /**
+     * Returns the shipping tax class id.
+     *
+     * @return int
+     *   The id of the tax class used for shipping.
+     */
+    protected function getShippingTaxClassId()
+    {
+        return $this->getTaxConfig()->getShippingTaxClass();
+    }
+
+    /**
+     * Returns a \Mage_Tax_Model_Config object.
+     *
+     * @return false|\Mage_Tax_Model_Config
+     */
+    protected function getTaxConfig()
+    {
+        return \Mage::getModel('tax/config');
+    }
+
 }

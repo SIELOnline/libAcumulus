@@ -595,6 +595,7 @@ abstract class Creator
      * - item number
      * - product name
      * - nature
+     * - cost price
      *
      * @param array $line
      */

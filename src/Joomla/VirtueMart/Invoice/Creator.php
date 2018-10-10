@@ -142,6 +142,8 @@ class Creator extends BaseCreator
             $vatInfo = array(
                 Tag::VatRate => (float) $calcRule->calc_value,
                 Meta::VatRateSource => static::VatRateSource_Exact,
+                Meta::VatClassId => $calcRule->virtuemart_calc_id,
+                Meta::VatClassName => $calcRule->calc_rule_name,
             );
         } else {
             $vatInfo = $this->getVatRangeTags($productVat, $productPriceEx, 0.0001, 0.0001);
@@ -239,6 +241,8 @@ class Creator extends BaseCreator
                 $vatInfo = array(
                     Tag::VatRate => (float) $calcRule->calc_value,
                     Meta::VatRateSource => static::VatRateSource_Exact,
+                    Meta::VatClassId => $calcRule->virtuemart_calc_id,
+                    Meta::VatClassName => $calcRule->calc_rule_name,
                 );
             } else {
                 $vatInfo = $this->getVatRangeTags($shippingVat, $shippingEx, 0.0001, 0.01);
@@ -372,6 +376,8 @@ class Creator extends BaseCreator
                     $vatInfo = array(
                         Tag::VatRate => (float) $calcRule->calc_value,
                         Meta::VatRateSource => static::VatRateSource_Exact,
+                        Meta::VatClassId => $calcRule->virtuemart_calc_id,
+                        Meta::VatClassName => $calcRule->calc_rule_name,
                     );
                 } else {
                     $vatInfo = $this->getVatRangeTags($paymentVat, $paymentEx, 0.0001, 0.01);

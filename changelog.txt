@@ -25,6 +25,10 @@ WC3 = WooCommerce 3 (WordPress)
 - ALL: Add logging to execution stage of batch form.
 - ALL: Warning: implode(): Invalid arguments passed in Completor.php on line 835.
 - ALL: Make "property specification not found" a debug level message.
+- ALL: module specific translations were not loaded on case sensitive systems
+  (e.g. linux).
+- ALL: Message 'message_warning_no_vattype_must_split' was not translated.
+- OC: Breadcrumb on settings page was incorrect.
 - JOO: Access rights revisited so that menu-items remain visible in the admin
   menu for people who only have access to the batch send form.
 

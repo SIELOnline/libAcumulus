@@ -226,7 +226,7 @@ class Container
         if (!$this->moduleSpecificTranslationsAdded) {
             try {
                 /** @var \Siel\Acumulus\Helpers\TranslationCollection $translations */
-                $translations = $this->getInstance('ModuleSpecificTranslations', 'helpers');
+                $translations = $this->getInstance('ModuleSpecificTranslations', 'Helpers');
                 $translator->add($translations);
             } catch (\InvalidArgumentException $e) {}
             $this->moduleSpecificTranslationsAdded = true;

@@ -131,13 +131,28 @@ class OcHelper
         }
 
         // Add an intermediate level to the breadcrumb.
-        $this->data['breadcrumbs'][] = array(
-            'text' => $this->t('modules'),
-            'href' => Registry::getInstance()->getLink('extension/module'),
-            'separator' => ' :: '
-        );
+        $this->data['breadcrumbs'][] = $this->getExtensionsBreadcrumb();
 
         $this->renderFormCommon('config', 'button_save');
+    }
+
+    /**
+     * Returns the intermediate breadcrumb for the config screen.
+     *
+     * The config screen is normally accessed via the extensions part of
+     * OpenCart. Therefore an intermediate level is added to the breadcrumb,
+     * consisting of the extensions page.
+     *
+     * @return array
+     *   The intermediate breadcrumb for the config screen.
+     */
+    protected function getExtensionsBreadcrumb()
+    {
+        return array(
+            'text' => $this->t('extensions'),
+            'href' => Registry::getInstance()->getLink('marketplace/extension'),
+            'separator' => ' :: '
+        );
     }
 
     /**

@@ -364,7 +364,7 @@ class Completor
                     break;
             }
             $vatTypeVatRates = array_map(function ($vatRate) use ($vatType) {
-                return array(Tag::VatRate => $vatRate, Tag::VatType =>$vatType);
+                return array(Tag::VatRate => $vatRate, Tag::VatType => $vatType);
             }, $vatTypeVatRates);
             $possibleVatRates = array_merge($possibleVatRates, $vatTypeVatRates);
         }
@@ -773,7 +773,7 @@ class Completor
                     // - Non matching lines have vat. Message: 'Manual line
                     //   entered with incorrect vat' or 'Check vat settings on
                     //   those products.'.
-                    $this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType] = reset($vatTypeInfo['intersection']);
+                    $this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType] = reset($vatTypeInfo['union']);
                     $message = 'message_warning_no_vattype_incorrect_lines';
                     $code = 812;
                 } else {
@@ -880,6 +880,7 @@ class Completor
                         }
                         // 2) If this is a 0 vat rate while the lookup vat rate,
                         //    if available, is not, it must be a 0-vat vat type.
+                        // @todo: if array and array contains a non-zero rate ...
                         if ($this->lineHas0VatRate($line) && isset($line[Meta::VatRateLookup]) && !is_array($line[Meta::VatRateLookup]) && !Number::isZero($line[Meta::VatRateLookup])) {
                             // This article is not intrinsically vat free, so
                             // the vat type must be no vat invoice vat type.
@@ -933,7 +934,7 @@ class Completor
      */
     protected function correctMarginInvoice()
     {
-        if (isset($this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType]) && $this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType] == Api::VatType_MarginScheme) {
+        if (isset($this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType]) && $this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType] === Api::VatType_MarginScheme) {
             foreach ($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] as &$line) {
                 // For margin invoices, Acumulus expects the unitprice to be the
                 // sales price, ie the price the client pays. So we set

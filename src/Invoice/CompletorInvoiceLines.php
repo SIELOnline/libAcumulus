@@ -293,7 +293,7 @@ class CompletorInvoiceLines
         foreach ($lines as &$line) {
             if ($line[Meta::VatRateSource] === Creator::VatRateSource_Completor) {
                 if (!empty($line[Meta::VatRateLookup])) {
-                    $possibleLookupRates = $this->getPossibleVatRates($line[Meta::VatRateLookup]);
+                    $possibleLookupRates = $this->filterPossibleVatRates($line[Meta::VatRateLookup]);
                     if (count($possibleLookupRates) === 1) {
                         // Only a single looked up vat rate is also a possible
                         // vat rate: take that one.
@@ -548,16 +548,16 @@ class CompletorInvoiceLines
     }
 
     /**
-     * Returns whether the given vat rate(s) is/are a possible vat rate.
+     * Returns the subset of the vat rate(s) that are also a possible vat rate.
      *
      * @param float|float[] $vatRates
-     *   The vat rate(s) to lookup.
+     *   The vat rate(s) to filter.
      *
      * @return float[]
-     *   The, possibly empty, subset of $vatRates that occur in the set of
+     *   The, possibly empty, "intersection" of $vatRates and
      *   $this->possibleVatRates.
      */
-    protected function getPossibleVatRates($vatRates)
+    protected function filterPossibleVatRates($vatRates)
     {
         $result = array();
         $vatRates = (array) $vatRates;

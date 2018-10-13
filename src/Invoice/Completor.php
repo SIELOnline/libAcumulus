@@ -721,13 +721,15 @@ class Completor
      * - Whether there are margin products in the order.
      *
      * So to start with, any list of (possible) vat types is based on the above.
-     * Furthermore this method is aware of:
+     * Furthermore this method and {@see getInvoiceLinesVatTypeInfo()} are aware
+     * of:
      * - The fact that orders do not have to be split over different vat types,
      *   but that invoices should be split if both national and foreign VAT
      *   rates appear on the order.
-     * - The fact that the vat type may be indeterminable if EU countries have
-     *   VAT rates in common with NL and the settings indicate that this shop
-     *   sells products in both vat type categories.
+     * - The vat class meta data per line and which classes denote foreign vat.
+     *   This info is used to distinguish between NL and foreign vat for EU
+     *   countries that have VAT rates in common with NL and the settings
+     *   indicate that this shop sells products in both vat type categories.
      *
      * If multiple vat types are possible, the invoice is sent as concept, so
      * that it may be corrected in Acumulus.
@@ -809,6 +811,7 @@ class Completor
                 // - Client country has same vat rates as the Netherlands and
                 //   shop sells digital services but also other products or
                 //   services. Not solvable (for now)!
+                // @todo: not solvable for some shops???
                 // - Invoice has no vat and the client is outside the EU and it
                 //   is unknown whether the invoice lines contain services or
                 //   goods. Perhaps solvable by correct shop settings.
@@ -872,12 +875,14 @@ class Completor
                         // We have a possibly matching vat type. Perform some
                         // additional checks:
                         $doAdd = true;
+
                         // 1) Vat type margin scheme requires a cost price.
                         if ($vatType === Api::VatType_MarginScheme) {
                             if (empty($line[Tag::CostPrice])) {
                                 $doAdd = false;
                             }
                         }
+
                         // 2) If this is a 0 vat rate while the lookup vat rate,
                         //    if available, is not, it must be a 0-vat vat type.
                         // @todo: if array and array contains a non-zero rate ...
@@ -888,7 +893,19 @@ class Completor
                                 $doAdd = false;
                             }
                         }
-                        // 3) Outside EU: goods should have vat type 4, services
+
+                        // 3) In EU: If the vat class is known and denotes
+                        //    foreign vat, we do not add the dutch vat type.
+                        // Note that the inverse can prevent finding vat type 6
+                        // when there's a fee line at NL vat which happens to be
+                        // the foreign vat rate as well.
+                        if ($this->isEu() && !empty($line[Meta::VatClassId]) && $this->isForeignVatClass($line[Meta::VatClassId])) {
+                            if ($vatType === Api::VatType_National) {
+                                $doAdd = false;
+                            }
+                        }
+
+                        // 4) Outside EU: goods should have vat type 4, services
                         //    vat type 1. However, we only look at item lines,
                         //    as services like shipping and packing are part of
                         //    the delivery as a whole and should not change the
@@ -909,7 +926,7 @@ class Completor
                 }
                 // Add meta info to Acumulus invoice.
                 $line[Meta::VatTypesPossible] = implode(',', $possibleLineVatTypes);
-                // Add to result, union and intersection
+                // Add to result, union and intersection.
                 $list[$index] = $possibleLineVatTypes;
                 $union = array_unique(array_merge($union, $possibleLineVatTypes));
                 $intersection = $intersection !== null ? array_intersect($intersection, $possibleLineVatTypes) : $possibleLineVatTypes;
@@ -1043,6 +1060,7 @@ class Completor
     protected function lineHas0VatRate(array $line)
     {
         $result = false;
+        // @todo: extract method is0VatRate.
         if (isset($line[Tag::VatRate]) && (Number::isZero($line[Tag::VatRate]) || Number::floatsAreEqual($line[Tag::VatRate], -1.0))) {
             $result = true;
         }
@@ -1203,7 +1221,8 @@ class Completor
      * Returns if the vat rate is correct, given its source.
      *
      * @param string $source
-     *   The vat rate source.
+     *   The vat rate source, one of the Creator::VatRateSource_... or
+     *   Completor::VatRateSource... constants.
      *
      * @return bool
      *   True if the given vat rate source indicates that the vat rate is
@@ -1212,6 +1231,22 @@ class Completor
     public static function isCorrectVatRate($source)
     {
         return in_array($source, self::$CorrectVatRateSources);
+    }
+
+    /**
+     * Returns whether the vat class id denotes foreign vat
+     *
+     * @param int|string $vatClassId
+     *   The vat class to check.
+     *
+     * @return bool
+     *   True if the vat class id denotes foreign vat, false otherwise.
+     */
+    protected function isForeignVatClass($vatClassId)
+    {
+        $shopSettings = $this->config->getShopSettings();
+        $vatClassIds = $shopSettings['foreignVatClasses'];
+        return in_array($vatClassId, $vatClassIds);
     }
 
     /**

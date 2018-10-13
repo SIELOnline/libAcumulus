@@ -335,10 +335,14 @@ class Config
      *
      * @return array
      *   A keyed array with the keys:
+     *   - nature_shop
      *   - digitalServices
      *   - vatFreeProducts
+     *   - marginProducts
+     *   - foreignVatClasses
      *   - invoiceNrSource
      *   - dateToUse
+     *
      */
     public function getShopSettings()
     {
@@ -847,6 +851,11 @@ class Config
                     'group' => 'shop',
                     'type' => 'int',
                     'default' => PluginConfig::MarginProducts_Unknown,
+                ),
+                'foreignVatClasses' => array(
+                    'group' => 'shop',
+                    'type' => 'array',
+                    'default' => array(),
                 ),
                 'invoiceNrSource' => array(
                     'group' => 'shop',

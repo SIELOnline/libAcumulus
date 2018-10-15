@@ -382,15 +382,30 @@ class Creator extends BaseCreator
         $shippingEx = $item->get_total();
         $shippingExPrecision = 0.01;
 
-        // To avoid rounding errors, we try to get the non-formatted amount
+        // To avoid rounding errors, we try to get the non-formatted amount.
+        // Due to changes in how WC configures shipping methods (now based on
+        // zones), storage of order item meta data has changed. Therefore we
+        // have to try several option names.
         $methodId = $item->get_method_id();
         if (substr($methodId, 0, strlen('legacy_')) === 'legacy_') {
             $methodId = substr($methodId, strlen('legacy_'));
         }
-        $options = get_option( 'woocommerce_' . $methodId . '_settings' );
-        if (isset($options['cost']) && Number::floatsAreEqual($options['cost'], $shippingEx)) {
-            $shippingEx = $options['cost'];
-            $shippingExPrecision = 0.001;
+        // Instance id is the zone, will return an empty value if not present.
+        $instanceId = $item->get_instance_id();
+
+        if (!empty($instanceId)) {
+            $optionName = "woocommerce_{$methodId}_{$instanceId}_settings";
+        } else {
+            $optionName = "woocommerce_{$methodId}_settings";
+        }
+        $option = get_option($optionName);
+        if (isset($option['cost'])) {
+            // Cost may be entered with a comma ...
+            $cost = str_replace(',', '.', $option['cost']);
+            if (Number::floatsAreEqual($cost, $shippingEx)) {
+                $shippingEx = $cost;
+                $shippingExPrecision = 0.001;
+            }
         }
         $quantity = $item->get_quantity();
         $shippingEx /= $quantity;
@@ -403,8 +418,8 @@ class Creator extends BaseCreator
                 Meta::PrecisionUnitPrice => $shippingExPrecision,
                 Tag::Quantity => $quantity,
             )
-                  + $this->getVatRangeTags($shippingVat, $shippingEx, $vatPrecision, $shippingExPrecision)
-                  + $vatLookupTags;
+            + $this->getVatRangeTags($shippingVat, $shippingEx, $vatPrecision, $shippingExPrecision)
+            + $vatLookupTags;
 
         return $result;
     }

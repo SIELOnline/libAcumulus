@@ -33,6 +33,8 @@ Features:
 - JOO: Access rights revisited so that menu-items remain visible in the admin
   menu for people who only have access to the batch send form.
 Bugs:
+- WC3: Code to improve precision of shipping costs ex vat ignores zone based
+  shipping method settings of WC3.
 - ALL: Warning: implode(): Invalid arguments passed in Completor.php on line 835.
 - ALL: module specific translations were not loaded on case sensitive systems
   (e.g. linux).

@@ -458,15 +458,18 @@ class Creator extends BaseCreator
                 foreach ($taxes as $key => $tax) {
                     $taxRate = WC_Tax::_get_tax_rate($key, OBJECT);
                     if ($taxRate) {
+                        // Vat class name will be the non-sanitized version of
+                        // the id and thus does not more information: don't add.
+                        // get_rate_percent() contains a % at the end of the
+                        // string: remove it.
                         $result = array(
                             Meta::VatClassId => $taxRate->tax_rate_class !== '' ? $taxRate->tax_rate_class : 'standard',
-                            // Will contain a % at the end of the string: remove it.
                             Meta::VatRateLookup => substr(WC_Tax::get_rate_percent($key), 0, -1),
                             Meta::VatRateLookupLabel => WC_Tax::get_rate_label($taxRate),
                             Meta::VatRateLookupSource => 'shipping line taxes',
                         );
-                        // We can handle only 1 set of vat rate lookup meta
-                        // data, so break after the first.
+                        // We handle only 1 set of vat rate lookup meta data,
+                        // so break after the first.
                         break;
                     }
                 }

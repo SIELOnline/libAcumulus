@@ -810,8 +810,7 @@ class Completor
                 // Possible causes:
                 // - Client country has same vat rates as the Netherlands and
                 //   shop sells digital services but also other products or
-                //   services. Not solvable (for now)!
-                // @todo: not solvable for some shops???
+                //   services. Solvable by correct shop settings.
                 // - Invoice has no vat and the client is outside the EU and it
                 //   is unknown whether the invoice lines contain services or
                 //   goods. Perhaps solvable by correct shop settings.
@@ -885,10 +884,9 @@ class Completor
 
                         // 2) If this is a 0 vat rate while the lookup vat rate,
                         //    if available, is not, it must be a 0-vat vat type.
-                        // @todo: if array and array contains a non-zero rate ...
-                        if ($this->lineHas0VatRate($line) && isset($line[Meta::VatRateLookup]) && !is_array($line[Meta::VatRateLookup]) && !Number::isZero($line[Meta::VatRateLookup])) {
+                        if ($this->lineHas0VatRate($line) && isset($line[Meta::VatRateLookup]) && !$this->metaDataHas0VatRate($line[Meta::VatRateLookup])) {
                             // This article is not intrinsically vat free, so
-                            // the vat type must be no vat invoice vat type.
+                            // the vat type must be a "no vat" vat type.
                             if (!in_array($vatType, static::$vatTypesAllowing0Vat)) {
                                 $doAdd = false;
                             }
@@ -1060,11 +1058,50 @@ class Completor
     protected function lineHas0VatRate(array $line)
     {
         $result = false;
-        // @todo: extract method is0VatRate.
-        if (isset($line[Tag::VatRate]) && (Number::isZero($line[Tag::VatRate]) || Number::floatsAreEqual($line[Tag::VatRate], -1.0))) {
+        if ($this->is0VatRate($line)) {
             $result = true;
         }
         return $result;
+    }
+
+    /**
+     * Returns whether an array or single int contains 0 vat rate.
+     *
+     * @param int|int[] $vatRates
+     *
+     * @return bool
+     *   True if the array contains 0 vat rate, false otherwise.
+     */
+    protected function metaDataHas0VatRate(array $vatRates)
+    {
+        if (is_array($vatRates)) {
+            foreach ($vatRates as $vatRate) {
+                if ($this->is0VatRate($vatRate)) {
+                    return true;
+                }
+            }
+            return false;
+        } else {
+            return $this->is0VatRate($vatRates);
+        }
+    }
+
+    /**
+     * Returns whether the vat rate is a 0 vat rate.
+     *
+     * @param int|array $vatRate
+     *   An integer (or numeric string), an array possibly containing an entry
+     *   with key Tag::VatRate entry
+     *
+     * @return bool
+     *   True if the vat rate is a 0 vat rate, false otherwise.
+     */
+    protected function is0VatRate($vatRate)
+    {
+        if (is_array($vatRate) && isset($vatRate)) {
+            $vatRate = isset($vatRate[Tag::VatRate]) ? $vatRate[Tag::VatRate] : null;
+        }
+        return isset($vatRate) && (Number::isZero($vatRate) || Number::floatsAreEqual($vatRate, -1.0));
     }
 
     /**

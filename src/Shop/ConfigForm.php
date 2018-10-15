@@ -278,6 +278,7 @@ class ConfigForm extends BaseConfigForm
      */
     protected function getShopFields()
     {
+        $vatClasses = $this->shopCapabilities->getVatClasses();
         $fields = array(
             'nature_shop' => array(
                 'type' => 'radio',
@@ -295,6 +296,17 @@ class ConfigForm extends BaseConfigForm
                 'options' => $this->getDigitalServicesOptions(),
                 'attributes' => array(
                     'required' => true,
+                ),
+            ),
+            'foreignVatClasses' => array(
+                'name' => 'foreignVatClasses[]',
+                'type' => 'select',
+                'label' => $this->t('field_foreignVatClasses'),
+                'description' => $this->t('desc_foreignVatClasses'),
+                'options' => $vatClasses,
+                'attributes' => array(
+                    'multiple' => true,
+                    'size' => min(count($vatClasses), 8),
                 ),
             ),
             'vatFreeProducts' => array(
@@ -331,16 +343,17 @@ class ConfigForm extends BaseConfigForm
      */
     protected function getTriggerFields()
     {
+        $orderStatusesList = $this->getOrderStatusesList();
         $fields = array(
             'triggerOrderStatus' => array(
                 'name' => 'triggerOrderStatus[]',
                 'type' => 'select',
                 'label' => $this->t('field_triggerOrderStatus'),
                 'description' => $this->t('desc_triggerOrderStatus'),
-                'options' => $this->getOrderStatusesList(),
+                'options' => $orderStatusesList,
                 'attributes' => array(
                     'multiple' => true,
-                    'size' => min(count($this->getOrderStatusesList()), 8),
+                    'size' => min(count($orderStatusesList), 8),
                 ),
             ),
             'triggerInvoiceEvent' => $this->getOptionsOrHiddenField('triggerInvoiceEvent', 'radio', false),

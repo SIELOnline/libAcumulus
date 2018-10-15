@@ -87,6 +87,11 @@ class ConfigFormTranslations extends TranslationCollection
         'desc_digitalServices' => 'Geef aan of u in uw winkel digitale diensten aanbiedt waarbij u buitenlandse btw moet hanteren voor EU klanten.
 Zie <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/btw_berekenen_bij_diensten/wijziging_in_digitale_diensten_vanaf_2015/wijziging_in_digitale_diensten_vanaf_2015" target="_blank">Belastingdienst: diensten naar andere EU landen</a>.',
 
+        'field_foreignVatClasses' => 'Welke belastingklassen definiëren EU btw tarieven?',
+        'desc_foreignVatClasses' => 'Geef aan welke van deze belastingklassen gebruikt worden bij producten of diensten waarbij u buitenlandse btw moet hanteren voor EU klanten.
+ Mbv de "Ctrl" toets kunt u meerdere statussen kiezen of keuzes ongedaan maken.
+ Behalve voor de hierboven al genoemde digitale diensten kan dit ook gelden bij <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/export_van_specifieke_goederen_en_in_bijzondere_situaties/export_van_specifieke_goederen_en_in_bijzondere_situaties" target="_blank">Export van specifieke goederen en in bijzondere situaties</a>.',
+
         'field_vatFreeProducts' => 'Verkoopt u van btw vrijgestelde producten of diensten?',
         'option_vatFreeProducts_1' => 'Zowel btw vrije als aan btw onderhevige producten en/of diensten.',
         'option_vatFreeProducts_2' => 'Alleen aan btw onderhevige producten en/of diensten.',
@@ -425,14 +430,19 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'option_digitalServices_1' => 'Both digital services and normal products.',
         'option_digitalServices_2' => 'Only products that are subject to dutch VAT.',
         'option_digitalServices_3' => 'Only digital services subject to the regulations concerning using foreign VAT rates.',
-        'desc_digitalServices' => 'Select whether your store offers digital services that are subject to foreign VAT for clients in other EU countries.
-See <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/btw_berekenen_bij_diensten/wijziging_in_digitale_diensten_vanaf_2015/wijziging_in_digitale_diensten_vanaf_2015">Dutch tax office: services to other EU countries (in dutch)</a>.',
+        'desc_digitalServices' => 'Select whether your store offers digital services that are subject to foreign VAT for EU customers.
+See <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/btw_berekenen_bij_diensten/wijziging_in_digitale_diensten_vanaf_2015/wijziging_in_digitale_diensten_vanaf_2015" target="_blank">Dutch tax office: services to other EU countries (in dutch)</a>.',
+
+        'field_foreignVatClasses' => 'Which vat classes define EU vat rates?',
+        'desc_foreignVatClasses' => 'Indicate which of these vat classes are used for products or services that are subject to foreign VAT for EU customers.
+ Using the "Ctrl" key, you can select/deselect multiple items.
+ Except for the above mentioned digital services this may also apply with <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/export_van_specifieke_goederen_en_in_bijzondere_situaties/export_van_specifieke_goederen_en_in_bijzondere_situaties" target="_blank">Export of specific products or special cases (in dutch)</a>.',
 
         'field_vatFreeProducts' => 'Do you sell VAT free products or services?',
         'option_vatFreeProducts_1' => 'Both VAT free and VAT liable products or services.',
         'option_vatFreeProducts_2' => 'Only products or services that are VAT liable.',
         'option_vatFreeProducts_3' => 'Only VAT free products or services.',
-        'desc_vatFreeProducts' => 'Select whether your store offers products or services that are VAT free, e.g. education. NOTE: this settings concerns whether the products or services you offer are inherently vat free, not whether you create vat free invoices or invoices with reversed vat.',
+        'desc_vatFreeProducts' => 'Select whether your store offers products or services that are VAT free, e.g. education. NOTE: this setting concerns whether the products or services you offer are inherently vat free, not whether you create vat free invoices or invoices with reversed vat.',
 
         'field_marginProducts' => 'Do you sell products using the margin scheme?',
         'option_marginProducts_1' => 'New products and/or services as well as products that use the margin scheme.',
@@ -445,7 +455,7 @@ See <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belasti
         'desc_triggerSettings' => 'This(these) setting(s) determine(s) at what instants the invoice for an order should be sent to Acumulus. If you select multiple instants, the invoice wil be sent as soon as the order reaches one of the selected statuses. Note that an invoice will only be sent once to Acumulus. This extension only uses order data, so you may select any status, the webshop invoice does not already have to be created,unless you want to use the webshop\'s invoice date and number as invoice date and number for the Acumulus invoice. If you select "Do not send automatically" you will have to use the <a href="%s">Acumulus batch send form</a>.',
 
         'field_triggerOrderStatus' => 'Order status(es)',
-        'desc_triggerOrderStatus' => 'Select if and with which order statuses to send the invoice to Acumulus. If you select multiple statuses, the invoice will only be sent once as soon as one of the selected statuses is reached. This extension only uses order data, so you may select any status, the webshop invoice does not already have to be created. If you select "Do not send automatically" you will have to use the send batch form.',
+        'desc_triggerOrderStatus' => 'Using the "Ctrl" key, you can select/deselect multiple items.',
         'option_empty_triggerOrderStatus' => 'Do not send automatically ',
 
         'field_triggerInvoiceEvent' => 'Webshop invoice status',
@@ -453,7 +463,6 @@ See <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belasti
         'option_triggerInvoiceEvent_1' => 'When the webshop invoice gets created.',
         'option_triggerInvoiceEvent_2' => 'When the webshop invoice gets sent to the customer.',
         'desc_triggerInvoiceEvent' => 'Select if and on which webshop invoice event to send the invoice to Acumulus. If you select "Do not send automatically" you can use the send batch form, or you can set one or more order statuses above to trigger the sending of the invoice.',
-
 
         // Tokens
         'tokenHelpHeader' => 'Field references',

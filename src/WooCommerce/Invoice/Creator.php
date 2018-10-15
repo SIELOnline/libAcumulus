@@ -173,7 +173,9 @@ class Creator extends BaseCreator
         // Add tax info.
         $result += $this->getVatRangeTags($productVat, $productPriceEx, $this->precisionVat, $precisionEx);
         if ($product instanceof WC_Product) {
-            $result += $this->getVatRateLookupMetadataByTaxClass($product->get_tax_class());
+            /** @var \WC_Order $order */
+            $order = $this->invoiceSource->getOrder()->getSource();
+            $result += $this->getVatRateLookupMetadataByTaxClass($product->get_tax_class(), $order->get_customer_id());
         }
 
         // Add variants/options.
@@ -197,31 +199,70 @@ class Creator extends BaseCreator
      * depending on the region of the customer. As we don't have that data here,
      * this method will only return metadata if only 1 rate was found.
      *
-     * @param string $taxClass
+     * @param string $taxClassId
      *   The tax class of the product. For the default tax class it can be
      *   'standard' or empty.
+     * @param int $customerId
+     *   The id of the customer. This is needed to select the correct vat rate
+     *   within the vat class based on the zone of the customer.
      *
      * @return array
      *   An array with keys:
      *   - Meta::VatClassId
-     *   - Meta::VatClassName
      *   - Meta::VatRateLookup (*)
      *   - Meta::VatRateLookupLabel (*)
      *   * = optional.
      */
-    protected function getVatRateLookupMetadataByTaxClass($taxClass)
+    protected function getVatRateLookupMetadataByTaxClass($taxClassId, $customerId)
     {
-        if ($taxClass === '') {
-            $taxClass = 'standard';
+        if ($taxClassId === '') {
+            $taxClassId = 'standard';
         }
         $result = array(
-            Meta::VatClassId => sanitize_title($taxClass),
-            Meta::VatClassName => $taxClass,
+            Meta::VatClassId => sanitize_title($taxClassId),
+            // Vat class name is the non-sanitized version of the id
+            // and thus does not convey more information: don't add.
         );
-        if ($taxClass === 'standard') {
-            $taxClass = '';
+
+        if ($taxClassId === 'standard') {
+            $taxClassId = '';
         }
-        $taxRates = WC_Tax::get_rates($taxClass);
+
+        // Find applicable vat rates. We will use WC_Tax::find_rates() to find
+        // them, but to do so we need to get customer location info.
+        $args = array(
+            'tax_class' => $taxClassId,
+        );
+        try {
+            $customer = new \WC_Customer($customerId);
+            $tax_based_on = get_option( 'woocommerce_tax_based_on' );
+            if ($tax_based_on === 'billing') {
+                $args += array(
+                    'country' => $customer->get_billing_country(),
+                    'state' => $customer->get_billing_state(),
+                    'city' => $customer->get_billing_city(),
+                    'postcode' => $customer->get_billing_postcode(),
+                );
+            } else {
+                $args += array(
+                    'country' => $customer->get_shipping_country(),
+                    'state' => $customer->get_shipping_state(),
+                    'city' => $customer->get_shipping_city(),
+                    'postcode' => $customer->get_shipping_postcode(),
+                );
+            }
+
+        } catch (\Exception $e) {
+        }
+
+        $args = wp_parse_args($args, array(
+            'country'   => '',
+            'state'     => '',
+            'city'      => '',
+            'postcode'  => '',
+            'tax_class' => $taxClassId,
+        ));
+        $taxRates = WC_Tax::find_rates($args);
         if (count($taxRates) === 1) {
             $taxRate = reset($taxRates);
             $result += array(
@@ -233,6 +274,7 @@ class Creator extends BaseCreator
             foreach ($taxRates as $taxRate) {
                 $vatRateLookups[] = $taxRate['rate'];
             }
+            /** @noinspection PhpUndefinedVariableInspection */
             $result += array(
                 Meta::VatRateLookup => $vatRateLookups,
                 // Last label, I guess they should all be the same, but I am not
@@ -458,8 +500,8 @@ class Creator extends BaseCreator
                 foreach ($taxes as $key => $tax) {
                     $taxRate = WC_Tax::_get_tax_rate($key, OBJECT);
                     if ($taxRate) {
-                        // Vat class name will be the non-sanitized version of
-                        // the id and thus does not more information: don't add.
+                        // Vat class name is the non-sanitized version of the id
+                        // and thus does not convey more information: don't add.
                         // get_rate_percent() contains a % at the end of the
                         // string: remove it.
                         $result = array(
@@ -481,9 +523,23 @@ class Creator extends BaseCreator
             // for all shipping methods, stored in config:
             $shipping_tax_class = get_option('woocommerce_shipping_tax_class');
             if (is_string($shipping_tax_class)) {
-                $result = $this->getVatRateLookupMetadataByTaxClass($shipping_tax_class);
-                if (!empty($result)) {
-                    $result[Meta::VatRateLookupSource] = "get_option('woocommerce_shipping_tax_class')";
+                /** @var \WC_Order $order */
+                $order = $this->invoiceSource->getOrder()->getSource();
+
+                // Since WC3, the shipping tax class can be "inherited" from the
+                // product items (which should be the preferred value for this
+                // setting). The code to get the "inherited" tax class is more
+                // or less copied from WC_Abstract_Order.
+                if ($shipping_tax_class === 'inherit') {
+                    $found_classes = array_intersect(array_merge(array(''), WC_Tax::get_tax_class_slugs()), $order->get_items_tax_classes());
+                    $shipping_tax_class = count($found_classes) === 1 ? reset($found_classes) : false;
+                }
+
+                if (is_string($shipping_tax_class)) {
+                    $result = $this->getVatRateLookupMetadataByTaxClass($shipping_tax_class, $order->get_customer_id());
+                    if (!empty($result)) {
+                        $result[Meta::VatRateLookupSource] = "get_option('woocommerce_shipping_tax_class')";
+                    }
                 }
             }
         }

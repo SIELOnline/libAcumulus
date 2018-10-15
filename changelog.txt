@@ -24,7 +24,7 @@ Features:
   vat rate as NL:
   * Add vat class information as metadata.
   * Add method ShopCapabilities::getVatClasses().
-  * Add setting foreignVatClasses (no UI, empty setting for now).
+  * Add setting foreignVatClasses (default, UI on config form).
   * Use setting foreignVatClasses and vat class meta data to select between vat
     type 1 and 6.
 - ALL: Support for new roles and permissions to access the web server API.
@@ -33,6 +33,11 @@ Features:
 - JOO: Access rights revisited so that menu-items remain visible in the admin
   menu for people who only have access to the batch send form.
 Bugs:
+- WC3: Since WC3, the shipping tax class can be "inherited" from the product
+  items (which should be the preferred value for this setting). The plugin did
+  not handle this value correctly.
+- WC3: Code to get the vat rate lookup meta data did not use customer location
+  and would therefore be based on shop location.
 - WC3: Code to improve precision of shipping costs ex vat ignores zone based
   shipping method settings of WC3.
 - ALL: Warning: implode(): Invalid arguments passed in Completor.php on line 835.

@@ -4,6 +4,7 @@ namespace Siel\Acumulus\WooCommerce\Config;
 use Acumulus;
 use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
 use Siel\Acumulus\PluginConfig;
+use WC_Tax;
 
 /**
  * Defines the WooCommerce webshop specific capabilities.
@@ -310,19 +311,29 @@ class ShopCapabilities extends ShopCapabilitiesBase
         return $result;
     }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getLink($formType)
-  {
-      switch ($formType) {
-          case 'config':
-              return admin_url('options-general.php?page=acumulus_config');
-          case 'advanced':
-              return admin_url('options-general.php?page=acumulus_advanced');
-          case 'batch':
-              return admin_url('admin.php?page=acumulus_batch');
-      }
-      return parent::getLink($formType);
-  }
+    /**
+     * @inheritDoc
+     */
+    public function getVatClasses()
+    {
+        $keys =  WC_Tax::get_tax_class_slugs();
+        $labels = WC_Tax::get_tax_classes();
+        return array_combine($keys, $labels);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getLink($formType)
+    {
+        switch ($formType) {
+            case 'config':
+                return admin_url('options-general.php?page=acumulus_config');
+            case 'advanced':
+                return admin_url('options-general.php?page=acumulus_advanced');
+            case 'batch':
+                return admin_url('admin.php?page=acumulus_batch');
+        }
+        return parent::getLink($formType);
+    }
 }

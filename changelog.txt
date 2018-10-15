@@ -20,9 +20,13 @@ WC3 = WooCommerce 3 (WordPress)
 5.5.0 (2018-10-??)
 ------------------
 Features:
-- ALL: Add setting foreignVatClasses (no UI, empty setting for now).
-- ALL: Add vat class information as metadata. This can help to differentiate
-  between invoice type 1 and 6 for countries having the same vat rate as NL.
+- ALL: differentiate between invoice type 1 and 6 for countries having the same
+  vat rate as NL:
+  * Add vat class information as metadata.
+  * Add method ShopCapabilities::getVatClasses().
+  * Add setting foreignVatClasses (no UI, empty setting for now).
+  * Use setting foreignVatClasses and vat class meta data to select between vat
+    type 1 and 6.
 - ALL: Support for new roles and permissions to access the web server API.
 - ALL: Added logging to execution stage of batch form.
 - ALL: Make "property specification not found" a debug level message.

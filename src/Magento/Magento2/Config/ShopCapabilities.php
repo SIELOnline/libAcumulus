@@ -558,6 +558,20 @@ class ShopCapabilities extends ShopCapabilitiesBase
         return $result;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getVatClasses()
+    {
+        /** @var \Magento\Tax\Model\ClassModel $taxClass */
+        $taxClass = \Magento\Framework\App\ObjectManager::getInstance()->create(\Magento\Tax\Model\ClassModel::class);
+        $result = $taxClass->getCollection()->toOptionArray();
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getLink($formType)
     {
         $registry = Registry::getInstance();

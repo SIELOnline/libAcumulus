@@ -6,6 +6,7 @@ use Module;
 use OrderState;
 use PaymentModule;
 use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
+use TaxRulesGroup;
 
 /**
  * Defines the PrestaShop webshop specific capabilities.
@@ -304,6 +305,19 @@ class ShopCapabilities extends ShopCapabilitiesBase
         {
             $module = Module::getInstanceById($paymentModule['id_module']);
             $result[$module->name] = $module->displayName;
+        }
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getVatClasses()
+    {
+        $result = array();
+        $taxClasses = TaxRulesGroup::getTaxRulesGroups();
+        foreach ($taxClasses as $taxClass) {
+            $result[$taxClass->id] = $taxClass[$taxClass->name];
         }
         return $result;
     }

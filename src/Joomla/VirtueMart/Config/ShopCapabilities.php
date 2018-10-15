@@ -3,6 +3,7 @@ namespace Siel\Acumulus\Joomla\VirtueMart\Config;
 
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Joomla\Config\ShopCapabilities as ShopCapabilitiesBase;
+use VirtueMartModelCalc;
 use VirtueMartModelOrderstatus;
 use VmModel;
 
@@ -202,6 +203,29 @@ class ShopCapabilities extends ShopCapabilitiesBase
             $value = \JText::_($value['order_status_name']);
         }
         return $orderStatuses;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * VirtueMart does not group collections of tax rates into a tax class, but
+     * can assign a different tax rate (calc rules) to a product - user group
+     * combination. I guess that's how to implement digital goods vat in
+     * VirtueMart. This means that users should define different tax calc rules
+     * for each country - rate combination, even if the rates are the same,
+     * otherwise this plugin might still not be able to distinguish between
+     * dutch and belgium 21% vat.
+     */
+    public function getVatClasses()
+    {
+        $result = array();
+        /** @var \TableCalcs[] $taxes */
+        $taxes = VirtueMartModelCalc::getTaxes();
+        foreach ($taxes as $tax) {
+            $result[$tax->virtuemart_calc_id] = $tax->calc_name;
+        }
+
+        return $result;
     }
 
     /**

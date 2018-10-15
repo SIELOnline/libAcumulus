@@ -495,6 +495,20 @@ class ShopCapabilities extends ShopCapabilitiesBase
         return $result;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getVatClasses()
+    {
+        /** @var \Mage_Tax_Model_Class $taxClass */
+        $taxClass = Mage::getModel('Mage_Tax_Model_Class');
+        $result = $taxClass->getCollection()->toOptionArray();
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getLink($formType)
     {
         /** @var \Mage_Adminhtml_helper_data $helper */

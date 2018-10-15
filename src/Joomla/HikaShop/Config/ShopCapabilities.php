@@ -214,6 +214,29 @@ class ShopCapabilities extends ShopCapabilitiesBase
 
     /**
      * {@inheritdoc}
+     *
+     * The order_product table stores the category_namekey, while the shipping
+     * and payment tables store the category_id. So which one we sue is a bit
+     * arbitrary, but we use the category_namekey as id.
+     */
+    public function getVatClasses()
+    {
+        $result = array();
+        /** @var \hikashopCategoryClass $categoryClass */
+        $categoryClass = hikashop_get('class.category');
+        $category = 'tax';
+        /** @var \stdClass $category */
+        $categoryClass->getMainElement($category);
+        $taxClasses = $categoryClass->getChildren((int) $category->category_id, true, array(), '', 0, 0);
+        foreach ($taxClasses as $taxClass) {
+            /** @var \stdClass $category */
+            $result[$taxClass->category_namekey] = $taxClass->category_name;
+        }
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getPaymentMethods()
     {

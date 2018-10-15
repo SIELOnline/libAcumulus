@@ -301,15 +301,25 @@ abstract class ShopCapabilities
     /**
      * Returns an option list of active payment methods.
      *
-     * The IDs returned are later on used to compare with an order's payment
+     * The ids returned are later on used to compare with an order's payment
      * method, so the appropriate template and account can be chosen.
      *
      * @return string[]
-     *   An array of active payment methods, with the key being the ID (internal
+     *   An array of active payment methods, with the key being the id (internal
      *   name) for the dropdown item and the value being the label for the
      *   dropdown item.
      */
     abstract public function getPaymentMethods();
+
+    /**
+     * Returns an option list of tax classes.
+     *
+     * @return string[]
+     *   An array of tax classes, with the key being the tax class id, to be
+     *   used as id for the dropdown item and the value being the tax class
+     *   name, to be used as the label for the dropdown item.
+     */
+    abstract public function getVatClasses();
 
     /**
      * Returns a link to a form page.

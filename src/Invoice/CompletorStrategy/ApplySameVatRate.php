@@ -15,7 +15,11 @@ use Siel\Acumulus\Tag;
  * system anyway, we will return it as is.
  *
  * Current known usages:
- * - ???
+ * - Magento free shipping lines
+ *
+ * @todo: try this first with vat rate that actually do appear in the invoice.
+ *   Doing so, we can prevent adding 6% to a free shipping line on an all 21%
+ *   invoice.
  */
 class ApplySameVatRate extends CompletorStrategyBase
 {

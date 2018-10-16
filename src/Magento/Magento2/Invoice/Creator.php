@@ -135,7 +135,7 @@ class Creator extends BaseCreator
         $product = $item->getProduct();
         if ($product) {
             /** @noinspection PhpUndefinedMethodInspection */
-            $result += $this->getTaxClassMetaData((int) $product->getTaxClassId());
+            $result += $this->getVatClassMetaData((int) $product->getTaxClassId());
         }
 
         // Add discount related info.
@@ -212,7 +212,7 @@ class Creator extends BaseCreator
         $product->getResource()->load($product, $item->getProductId());
         if ($product->getId()) {
             /** @noinspection PhpUndefinedMethodInspection */
-            $result += $this->getTaxClassMetaData((int) $product->getTaxClassId());
+            $result += $this->getVatClassMetaData((int) $product->getTaxClassId());
         }
 
         // Add discount related info.
@@ -271,7 +271,7 @@ class Creator extends BaseCreator
                 $result[Meta::FieldsCalculated][] = Meta::VatAmount;
 
                 // Add vat meta data.
-                $result += $this->getTaxClassMetaData($this->getShippingTaxClassId());
+                $result += $this->getVatClassMetaData($this->getShippingTaxClassId());
 
                 // getBaseShippingDiscountAmount() only exists on Orders.
                 if ($this->invoiceSource->getType() === Source::Order && !Number::isZero($magentoSource->getBaseShippingDiscountAmount())) {
@@ -302,13 +302,14 @@ class Creator extends BaseCreator
      * Returns meta data regarding the tax class.
      *
      * @param int $taxClassId
+     *   The id of the tax class.
      *
      * @return array
      *   An empty array or an array with keys:
      *   - Meta::VatClassId
      *   - Meta::VatClassName
      */
-    protected function getTaxClassMetaData($taxClassId)
+    protected function getVatClassMetaData($taxClassId)
     {
         $result = array();
         if ($taxClassId) {

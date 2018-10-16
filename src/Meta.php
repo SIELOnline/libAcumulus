@@ -43,6 +43,7 @@ interface Meta
      * amounts.
      */
     const VatRateMax = 'meta-vatrate-max';
+    // @todo: process this array field in Completor::processMetaData().
     /**
      * Debug: what fields have been calculated (as opposed to fetched from the
      * webshop.

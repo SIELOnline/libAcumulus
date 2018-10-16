@@ -563,9 +563,12 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     public function getVatClasses()
     {
+        $result = array();
         /** @var \Magento\Tax\Model\ClassModel $taxClass */
         $taxClass = \Magento\Framework\App\ObjectManager::getInstance()->create(\Magento\Tax\Model\ClassModel::class);
-        $result = $taxClass->getCollection()->toOptionArray();
+        foreach ($taxClass->getCollection() as $item) {
+            $result[$item->getData('class_id')] = $item->getData('class_name');
+        }
         return $result;
     }
 

@@ -36,6 +36,8 @@ Features:
 - JOO: Access rights revisited so that menu-items remain visible in the admin
   menu for people who only have access to the batch send form.
 Bugs:
+- MA: The size attribute on a multi select form element was not taken from our
+  form settings.
 - WC3: Since WC3, the shipping tax class can be "inherited" from the product
   items (which should be the preferred value for this setting). The plugin did
   not handle this value correctly.

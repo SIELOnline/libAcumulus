@@ -500,9 +500,14 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     public function getVatClasses()
     {
+        $result = array();
         /** @var \Mage_Tax_Model_Class $taxClass */
         $taxClass = Mage::getModel('Mage_Tax_Model_Class');
-        $result = $taxClass->getCollection()->toOptionArray();
+        /** @var \Mage_Tax_Model_Resource_Class_Collection $collection */
+        $collection = $taxClass->getCollection();
+        foreach ($collection as $item) {
+            $result[$item->getData('class_id')] = $item->getData('class_name');
+        }
         return $result;
     }
 

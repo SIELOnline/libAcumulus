@@ -2,7 +2,6 @@
 namespace Siel\Acumulus\Magento\Helpers;
 
 use Siel\Acumulus\Helpers\Form;
-use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\FormMapper as BaseFormMapper;
 
 /**
@@ -75,7 +74,16 @@ class FormMapper extends BaseFormMapper
         if (!isset($field['attributes'])) {
             $field['attributes'] = array();
         }
-        $element = $parent->addField($field['id'], $this->getMagentoType($field), $this->getMagentoElementSettings($field));
+        $magentoType = $this->getMagentoType($field);
+        $magentoElementSettings = $this->getMagentoElementSettings($field);
+        $element = $parent->addField($field['id'], $magentoType, $magentoElementSettings);
+
+        if ($magentoType === 'multiselect') {
+            if (!empty($magentoElementSettings['size'])) {
+                /** @noinspection PhpUndefinedMethodInspection */
+                $element->setSize($magentoElementSettings['size']);
+            }
+        }
 
         if (!empty($field['fields'])) {
             // Add description at the start of the fieldset/summary as a note

@@ -62,12 +62,13 @@ interface Meta
      */
     const UnitPriceOld = 'meta-unitprice-old';
     /**
-     * Creator -> Completor: (current) vat rate looked up from e.g. the product or
-     * shipping settings.
+     * Creator -> Completor: (current) vat rate(s) looked up from e.g. the
+     * product or shipping settings.
      */
     const VatRateLookup = 'meta-vatrate-lookup';
+    // @todo: make this an array in all places.
     /**
-     * Support: (current) name of the looked up vat rate.
+     * Support: (current) name(s) of the looked up vat rate(s).
      */
     const VatRateLookupLabel = 'meta-vatrate-lookup-label';
     /**

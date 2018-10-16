@@ -148,18 +148,17 @@ class Creator extends BaseCreator
     }
 
     /**
-     * Looks up and returns, if only 1 rate was found, vat rate metadata.
+     * Looks up and returns vat class and vat rate metadata.
      *
      * @param int $taxClassId
-     *   The tax class to look up the vat rate for.
+     *   The tax class to look up.
      *
      * @return array
      *   An empty array or an array with keys:
      *   - Meta::VatClassId
      *   - Meta::VatClassName
-     *   - Meta::VatRateLookup (*)
-     *   - Meta::VatRateLookupLabel (*)
-     *   * = optional.
+     *   - Meta::VatRateLookup
+     *   - Meta::VatRateLookupLabel
      *
      * @throws \Exception
      */
@@ -169,97 +168,26 @@ class Creator extends BaseCreator
 
         $taxClass = $this->getTaxClass($taxClassId);
         if ($taxClass) {
-            $result[Meta::VatClassId] = $taxClass['tax_class_id'];
-            $result[Meta::VatClassName] = $taxClass['title'];
+            $result += array(
+                Meta::VatClassId => $taxClass['tax_class_id'],
+                Meta::VatClassName => $taxClass['title'],
+                Meta::VatRateLookup => array(),
+                Meta::VatRateLookupLabel => array(),
+            );
 
             $taxRules = $this->getTaxRules($taxClassId);
-            // We are not going to drill down geo zones, so let's hope we only get 1
-            // rate, or all rates are the same.
-            $vatRates = array();
-            $label = '';
             foreach ($taxRules as $taxRule) {
-                $vatRate = $this->getTaxRate($taxRule['tax_rate_id']);
-                if (!empty($vatRate)) {
-                    $vatRates[$vatRate['rate']] = $vatRate['rate'];
-                    $label = $vatRate['name'];
+                $taxRate = $this->getTaxRate($taxRule['tax_rate_id']);
+                if (!empty($taxRate)) {
+                    if ($this->isAddressInGeoZone($this->order, $taxRule['based'], $taxRate['geo_zone_id'])) {
+                        $result[Meta::VatRateLookup][] = $taxRate['rate'];
+                        $result[Meta::VatRateLookupLabel][] = $taxRate['name'];
+                    }
                 }
-            }
-            if (count($vatRates) === 1) {
-                $result[Meta::VatRateLookup] = reset($vatRates);
-                // Take the last name (if there were more tax rates).
-                $result[Meta::VatRateLookupLabel] = $label;
-            } elseif (count($vatRates) > 1) {
-                $vatRateLookups = array();
-                foreach ($vatRates as $vatRate) {
-                    $vatRateLookups[] = $vatRate['rate'];
-                }
-                $result = array(
-                    Meta::VatRateLookup => $vatRateLookups,
-                    Meta::VatRateLookupLabel => $label,
-                );
             }
         }
         return $result;
     }
-
-    /**
-     * Copy of ModelLocalisationTaxClass::getTaxClass().
-     *
-     * The above mentioned model cannot be used on the catalog side, so I just
-     * copied the code.
-     *
-     * @param int $tax_class_id
-     *
-     * @return array[]
-     *
-     * @throws \Exception
-     */
-    protected function getTaxClass($tax_class_id)
-    {
-        /** @noinspection SqlResolve */
-        $query = $this->getRegistry()->db->query("SELECT * FROM " . DB_PREFIX . "tax_class WHERE tax_class_id = '" . (int) $tax_class_id . "'");
-        return $query->row;
-    }
-
-
-    /**
-     * Copy of ModelLocalisationTaxClass::getTaxRules().
-     *
-     * The above mentioned model cannot be used on the catalog side, so I just
-     * copied the code.
-     *
-     * @param int $tax_class_id
-     *
-     * @return array[]
-     *
-     * @throws \Exception
-     */
-    protected function getTaxRules($tax_class_id)
-    {
-        /** @noinspection SqlResolve */
-        $query = $this->getRegistry()->db->query("SELECT * FROM " . DB_PREFIX . "tax_rule WHERE tax_class_id = '" . (int) $tax_class_id . "'");
-        return $query->rows;
-    }
-
-    /**
-     * Copy of ModelLocalisationTaxRate::getTaxRate().
-     *
-     * The above mentioned model cannot be used on the catalog side, so I just
-     * copied the code.
-     *
-     * @param int $tax_rate_id
-     *
-     * @return array
-     *
-     * @throws \Exception
-     */
-    protected function getTaxRate($tax_rate_id)
-    {
-        /** @noinspection SqlResolve */
-        $query = $this->getRegistry()->db->query("SELECT tr.tax_rate_id, tr.name AS name, tr.rate, tr.type, tr.geo_zone_id, gz.name AS geo_zone, tr.date_added, tr.date_modified FROM " . DB_PREFIX . "tax_rate tr LEFT JOIN " . DB_PREFIX . "geo_zone gz ON (tr.geo_zone_id = gz.geo_zone_id) WHERE tr.tax_rate_id = '" . (int) $tax_rate_id . "'");
-        return $query->row;
-    }
-
 
     /**
      * Returns all total lines: shipping, handling, discount, ...
@@ -378,17 +306,6 @@ class Creator extends BaseCreator
     }
 
     /**
-     * @return \ModelAccountOrder|\ModelSaleOrder
-     *
-     * @throws \Exception
-     */
-    protected function getOrderModel()
-    {
-        /** @noinspection PhpUnhandledExceptionInspection */
-        return $this->getRegistry()->getOrderModel();
-    }
-
-    /**
      * Tries to lookup and return vat rate meta data for the given line type.
      *
      * This is quite hard. The total line (table order_total) contains a code
@@ -429,6 +346,51 @@ class Creator extends BaseCreator
     }
 
     /**
+     * Returns whether the address of the order lies within the geo zone.
+     *
+     * @param array $order
+     *   The order.
+     * @param string $addressType
+     *   'payment' or 'shipping'.
+     * @param int $geoZoneId
+     *   The id of the geo zone.
+     *
+     * @return bool
+     *   True if the address of the order lies within the geo zone, false
+     *   otherwise.
+     *
+     * @throws \Exception
+     */
+    protected function isAddressInGeoZone(array $order, $addressType, $geoZoneId)
+    {
+        $fallbackAddressType = $addressType === 'payment' ? 'shipping' : 'payment';
+        if (!empty($order["{$addressType}_country_id"])) {
+            $countryId = $order["{$addressType}_country_id"];
+            $zoneId = !empty($order["{$addressType}_zone_id"]) ? $order["{$addressType}_zone_id"] : 0;
+        } elseif (!empty($order["{$fallbackAddressType}_country_id"])) {
+            $countryId = $order["{$fallbackAddressType}_country_id"];
+            $zoneId = !empty($order["{$fallbackAddressType}_zone_id"]) ? $order["{$fallbackAddressType}_zone_id"] : 0;
+        } else {
+            $countryId = 0;
+            $zoneId = 0;
+        }
+
+        // @nth: we could cache this.
+        $zones = $this->getZoneToGeoZones($geoZoneId);
+        foreach ($zones as $zone) {
+            // Check if this zone definition covers the same country.
+            if ($zone['country_id'] == $countryId) {
+                // Check if the zone definition covers the whole country or if
+                // they are equal.
+                if ($zone['zone_id'] == 0 || $zone['zone_id'] == $zoneId) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
      * Returns the query to get the tax class id for a given total type.
      *
      * In OC3 the tax class ids for total lines are either stored under:
@@ -457,6 +419,93 @@ class Creator extends BaseCreator
     protected function getShippingLine()
     {
         throw new \RuntimeException(__METHOD__ . ' should never be called');
+    }
+
+    /**
+     * Copy of ModelLocalisationTaxClass::getTaxClass().
+     *
+     * The above mentioned model cannot be used on the catalog side, so I just
+     * copied the code.
+     *
+     * @param int $tax_class_id
+     *
+     * @return array[]
+     *
+     * @throws \Exception
+     */
+    protected function getTaxClass($tax_class_id)
+    {
+        /** @noinspection SqlResolve */
+        $query = $this->getRegistry()->db->query("SELECT * FROM " . DB_PREFIX . "tax_class WHERE tax_class_id = '" . (int) $tax_class_id . "'");
+        return $query->row;
+    }
+
+    /**
+     * Copy of ModelLocalisationTaxClass::getTaxRules().
+     *
+     * The above mentioned model cannot be used on the catalog side, so I just
+     * copied the code.
+     *
+     * @param int $tax_class_id
+     *
+     * @return array[]
+     *
+     * @throws \Exception
+     */
+    protected function getTaxRules($tax_class_id)
+    {
+        /** @noinspection SqlResolve */
+        $query = $this->getRegistry()->db->query("SELECT * FROM " . DB_PREFIX . "tax_rule WHERE tax_class_id = '" . (int) $tax_class_id . "'");
+        return $query->rows;
+    }
+
+    /**
+     * Copy of ModelLocalisationTaxRate::getTaxRate().
+     *
+     * The above mentioned model cannot be used on the catalog side, so I just
+     * copied the code.
+     *
+     * @param int $tax_rate_id
+     *
+     * @return array
+     *
+     * @throws \Exception
+     */
+    protected function getTaxRate($tax_rate_id)
+    {
+        /** @noinspection SqlResolve */
+        $query = $this->getRegistry()->db->query("SELECT tr.tax_rate_id, tr.name AS name, tr.rate, tr.type, tr.geo_zone_id, gz.name AS geo_zone, tr.date_added, tr.date_modified FROM " . DB_PREFIX . "tax_rate tr LEFT JOIN " . DB_PREFIX . "geo_zone gz ON (tr.geo_zone_id = gz.geo_zone_id) WHERE tr.tax_rate_id = '" . (int) $tax_rate_id . "'");
+        return $query->row;
+    }
+
+    /**
+     * Copy of \ModelLocalisationGeoZone::getZoneToGeoZones().
+     *
+     * The above mentioned model cannot be used on the catalog side, so I just
+     * copied the code.
+     *
+     * @param int $geo_zone_id
+     *
+     * @return array[]
+     *
+     * @throws \Exception
+     */
+    protected function getZoneToGeoZones($geo_zone_id)
+    {
+        /** @noinspection SqlResolve */
+        $query = $this->getRegistry()->db->query("SELECT * FROM " . DB_PREFIX . "zone_to_geo_zone WHERE geo_zone_id = '" . (int)$geo_zone_id . "'");
+        return $query->rows;
+    }
+
+    /**
+     * @return \ModelAccountOrder|\ModelSaleOrder
+     *
+     * @throws \Exception
+     */
+    protected function getOrderModel()
+    {
+        /** @noinspection PhpUnhandledExceptionInspection */
+        return $this->getRegistry()->getOrderModel();
     }
 
     /**

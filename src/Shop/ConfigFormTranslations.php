@@ -427,9 +427,9 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'desc_nature_shop' => 'Select whether you sell products and/or services. In Acumulus this is the field "Nature" ("Soort"). NOTE: this settings only concerns the items in your "catalog", not shipping, handling, packing, or payment fees.',
 
         'field_digitalServices' => 'Do you sell digital services?',
-        'option_digitalServices_1' => 'Both digital services and normal products.',
-        'option_digitalServices_2' => 'Only products that are subject to dutch VAT.',
-        'option_digitalServices_3' => 'Only digital services subject to the regulations concerning using foreign VAT rates.',
+        'option_digitalServices_1' => 'Both digital services and normal products or services.',
+        'option_digitalServices_2' => 'Only products or services that are subject to dutch VAT.',
+        'option_digitalServices_3' => 'Only digital services subject to foreign VAT for EU customers.',
         'desc_digitalServices' => 'Select whether your store offers digital services that are subject to foreign VAT for EU customers.
 See <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/btw_berekenen_bij_diensten/wijziging_in_digitale_diensten_vanaf_2015/wijziging_in_digitale_diensten_vanaf_2015" target="_blank">Dutch tax office: services to other EU countries (in dutch)</a>.',
 

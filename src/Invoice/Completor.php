@@ -1036,12 +1036,16 @@ class Completor
      *
      * Currently the following processing is done:
      * - Meta::VatRateLookup is converted to a string if it is an array.
+     * - Meta::VatRateLookupLabel is converted to a string if it is an array.
      */
     protected function processMetaData()
     {
         foreach ($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] as &$line) {
             if (isset($line[Meta::VatRateLookup]) && is_array($line[Meta::VatRateLookup])) {
                 $line[Meta::VatRateLookup] = implode(',', $line[Meta::VatRateLookup]);
+            }
+            if (isset($line[Meta::VatRateLookupLabel]) && is_array($line[Meta::VatRateLookupLabel])) {
+                $line[Meta::VatRateLookupLabel] = implode(',', $line[Meta::VatRateLookupLabel]);
             }
         }
     }

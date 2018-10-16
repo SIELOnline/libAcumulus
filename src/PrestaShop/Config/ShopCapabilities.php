@@ -315,9 +315,10 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function getVatClasses()
     {
         $result = array();
+        /** @var \stdClass[] $taxClasses */
         $taxClasses = TaxRulesGroup::getTaxRulesGroups();
         foreach ($taxClasses as $taxClass) {
-            $result[$taxClass->id] = $taxClass[$taxClass->name];
+            $result[$taxClass['id_tax_rules_group']] = $taxClass['name'];
         }
         return $result;
     }

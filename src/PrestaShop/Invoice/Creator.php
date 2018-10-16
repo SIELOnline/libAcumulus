@@ -388,7 +388,6 @@ class Creator extends BaseCreator
                 // - including VAT, the precision would be 0.01, 0.01.
                 // - excluding VAT, the precision would be 0.01, 0
                 // However, for a %, it will be: 0.02, 0.01, so use 0.02.
-                // @todo: can we determine so?
             ) + $this->getVatRangeTags($discountVat, $discountEx, 0.02);
         $result[Meta::FieldsCalculated][] = Meta::VatAmount;
 

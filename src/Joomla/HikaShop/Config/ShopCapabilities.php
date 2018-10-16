@@ -224,9 +224,8 @@ class ShopCapabilities extends ShopCapabilitiesBase
         $result = array();
         /** @var \hikashopCategoryClass $categoryClass */
         $categoryClass = hikashop_get('class.category');
-        $category = 'tax';
         /** @var \stdClass $category */
-        $categoryClass->getMainElement($category);
+        $category = $categoryClass->get('tax');
         $taxClasses = $categoryClass->getChildren((int) $category->category_id, true, array(), '', 0, 0);
         foreach ($taxClasses as $taxClass) {
             /** @var \stdClass $category */

@@ -155,10 +155,10 @@ class Creator extends BaseCreator
      *
      * @return array
      *   An empty array or an array with keys:
-     *   - Meta::VatClassId
-     *   - Meta::VatClassName
-     *   - Meta::VatRateLookup
-     *   - Meta::VatRateLookupLabel
+     *   - Meta::VatClassId: int
+     *   - Meta::VatClassName: string
+     *   - Meta::VatRateLookup: float[]
+     *   - Meta::VatRateLookupLabel: string[]
      *
      * @throws \Exception
      */
@@ -330,17 +330,10 @@ class Creator extends BaseCreator
     {
         $result = array();
         $query = $this->getTotalLineTaxClassLookupQuery($code);
-        $records = $this->getRegistry()->db->query($query);
-        foreach ($records->rows as $row) {
-            $taxClassId = reset($row);
-            $vatRateMetadata = $this->getVatRateLookupMetadata($taxClassId);
-            if (empty($result)) {
-                // First row: set result
-                $result = $vatRateMetadata;
-            } else {
-                // Next row: merge.
-                $result[Meta::VatRateLookup] = array_merge((array) $result[Meta::VatRateLookup], (array) $vatRateMetadata[Meta::VatRateLookup]);
-            }
+        $queryResult = $this->getRegistry()->db->query($query);
+        if (!empty($queryResult->row)) {
+            $taxClassId = reset($queryResult->row);
+            $result = $this->getVatRateLookupMetadata($taxClassId);
         }
         return $result;
     }
@@ -410,7 +403,7 @@ class Creator extends BaseCreator
         $prefix = DB_PREFIX;
         $code = $this->getRegistry()->db->escape($code);
         /** @noinspection SqlResolve */
-        return "SELECT distinct `value` FROM {$prefix}setting where `key` = 'total_{$code}_tax_class_id' OR `key` LIKE '{$code}_%_tax_class_id'";
+        return "SELECT `value` FROM {$prefix}setting where `key` = 'total_{$code}_tax_class_id' OR `key` LIKE '{$code}_%_tax_class_id'";
     }
 
     /**

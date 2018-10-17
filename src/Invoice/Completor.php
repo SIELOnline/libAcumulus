@@ -1037,6 +1037,8 @@ class Completor
      * Currently the following processing is done:
      * - Meta::VatRateLookup is converted to a string if it is an array.
      * - Meta::VatRateLookupLabel is converted to a string if it is an array.
+     * - Meta::FieldsCalculated is converted to a string if it is an array.
+     * - Meta::VatRateLookupMatches is converted to a string if it is an array.
      */
     protected function processMetaData()
     {
@@ -1046,6 +1048,12 @@ class Completor
             }
             if (isset($line[Meta::VatRateLookupLabel]) && is_array($line[Meta::VatRateLookupLabel])) {
                 $line[Meta::VatRateLookupLabel] = implode(',', $line[Meta::VatRateLookupLabel]);
+            }
+            if (isset($line[Meta::FieldsCalculated]) && is_array($line[Meta::FieldsCalculated])) {
+                $line[Meta::FieldsCalculated] = implode(',', array_unique($line[Meta::FieldsCalculated]));
+            }
+            if (isset($line[Meta::VatRateLookupMatches]) && is_array($line[Meta::VatRateLookupMatches])) {
+                $line[Meta::VatRateLookupMatches] = implode(',', $line[Meta::VatRateLookupMatches]);
             }
         }
     }

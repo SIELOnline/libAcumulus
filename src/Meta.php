@@ -43,7 +43,6 @@ interface Meta
      * amounts.
      */
     const VatRateMax = 'meta-vatrate-max';
-    // @todo: process this array field in Completor::processMetaData().
     /**
      * Debug: what fields have been calculated (as opposed to fetched from the
      * webshop.
@@ -67,7 +66,6 @@ interface Meta
      * product or shipping settings.
      */
     const VatRateLookup = 'meta-vatrate-lookup';
-    // @todo: make this an array in all places.
     /**
      * Support: (current) name(s) of the looked up vat rate(s).
      */

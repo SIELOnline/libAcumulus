@@ -389,30 +389,37 @@ class FlattenerInvoiceLines
      */
     protected function copyVatInfoToChildren(array $parent, array $children)
     {
+        static $vatMetaInfoTags = array(
+            Meta::VatRateMin,
+            Meta::VatRateMax,
+            Meta::VatRateLookup,
+            Meta::VatRateLookupLabel,
+            Meta::VatRateLookupSource,
+            Meta::VatRateLookupMatches,
+            Meta::VatClassId,
+            Meta::VatClassName,
+        );
+
         foreach ($children as &$child) {
-            $child[Tag::VatRate] = $parent[Tag::VatRate];
+            if (isset($parent[Tag::VatRate])) {
+                $child[Tag::VatRate] = $parent[Tag::VatRate];
+            }
             $child[Meta::VatAmount] = 0;
+            foreach ($vatMetaInfoTags as $tag) {
+                unset($child[$tag]);
+            }
+
             if (Completor::isCorrectVatRate($parent[Meta::VatRateSource])) {
                 $child[Meta::VatRateSource] = Completor::VatRateSource_Copied_From_Parent;
-                unset($child[Meta::VatRateMin]);
-                unset($child[Meta::VatRateMax]);
-                unset($child[Meta::VatRateLookup]);
             } else {
+                // The parent does not yet have correct vat rate info, so also
+                // copy the meta data to the child, so later phases can also
+                // correct the children.
                 $child[Meta::VatRateSource] = $parent[Meta::VatRateSource];
-                if (isset($parent[Meta::VatRateMin])) {
-                    $child[Meta::VatRateMin] = $parent[Meta::VatRateMin];
-                } else {
-                    unset($child[Meta::VatRateMin]);
-                }
-                if (isset($parent[Meta::VatRateMax])) {
-                    $child[Meta::VatRateMax] = $parent[Meta::VatRateMax];
-                } else {
-                    unset($child[Meta::VatRateMax]);
-                }
-                if (isset($parent[Meta::VatRateLookup])) {
-                    $child[Meta::VatRateLookup] = $parent[Meta::VatRateLookup];
-                } else {
-                    unset($child[Meta::VatRateLookup]);
+                foreach ($vatMetaInfoTags as $tag) {
+                    if (isset($parent[$tag])) {
+                        $child[$tag] = $parent[$tag];
+                    }
                 }
             }
 

@@ -124,7 +124,7 @@ class CompletorInvoiceLines
         // addVatRateToLookupLines() only uses meta-vat-rate-lookup and may lead
         // to more (required) data filled in, so should be called before
         // completeLineRequiredData().
-        $lines = $this->addVatRateToLookupLines($lines);
+        $lines = $this->addVatRateUsingLookupData($lines);
         $lines = $this->completeLineRequiredData($lines);
         // Completing the required data may lead to new lines that contain
         // calculated VAT rates and thus can be corrected with
@@ -288,7 +288,7 @@ class CompletorInvoiceLines
      * @return array[]
      *   The corrected invoice lines.
      */
-    protected function addVatRateToLookupLines(array $lines)
+    protected function addVatRateUsingLookupData(array $lines)
     {
         foreach ($lines as &$line) {
             if ($line[Meta::VatRateSource] === Creator::VatRateSource_Completor) {
@@ -304,7 +304,7 @@ class CompletorInvoiceLines
                         if (empty($possibleLookupRates)) {
                             $line[Meta::VatRateLookupMatches] = 'none';
                         } else {
-                            $line[Meta::VatRateLookupMatches] = implode(',', $possibleLookupRates);
+                            $line[Meta::VatRateLookupMatches] = $possibleLookupRates;
                         }
                         // And have the strategy phase give it another try.
                         $line[Meta::VatRateSource] = Creator::VatRateSource_Strategy;
@@ -323,7 +323,7 @@ class CompletorInvoiceLines
 
             // Recursively complete lines using lookup data.
             if (!empty($line[Meta::ChildrenLines])) {
-                $line[Meta::ChildrenLines] = $this->addVatRateToLookupLines($line[Meta::ChildrenLines]);
+                $line[Meta::ChildrenLines] = $this->addVatRateUsingLookupData($line[Meta::ChildrenLines]);
             }
         }
         return $lines;
@@ -657,10 +657,6 @@ class CompletorInvoiceLines
                         $line[Meta::LineAmountInc] = $line[Meta::UnitPriceInc] * $line[Tag::Quantity];
                     }
                 }
-            }
-
-            if (isset($line[Meta::FieldsCalculated])) {
-                $line[Meta::FieldsCalculated] = implode(',', array_unique($line[Meta::FieldsCalculated]));
             }
         }
         return $lines;

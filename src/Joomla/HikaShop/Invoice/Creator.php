@@ -220,7 +220,7 @@ class Creator extends BaseCreator
                                 $tax = $taxClass->get($vatKey);
                                 if (!empty($tax->tax_namekey)) {
                                     $vatLookupMetaData += array(
-                                        Meta::VatRateLookup => (int) ((float) $tax->tax_rate * 100),
+                                        Meta::VatRateLookup => (float) $tax->tax_rate * 100,
                                         Meta::VatRateLookupLabel => $tax->tax_namekey,
                                     );
                                 }

@@ -171,10 +171,15 @@ class Creator extends BaseCreator
      *
      * @return array
      *   An array with keys
-     *   - Meta::VatRateLookup
-     *   - Meta::VatRateLookupLabel
-     *   - Meta::VatRateLookupSource
-     *   or an empty array.
+     *   - Meta::VatClassId: int|string
+     *   - Meta::VatClassName: string
+     *   - Meta::VatRateLookup: float|float[]
+     *   - Meta::VatRateLookupLabel: string|string[]
+     *   - Meta::VatRateLookupSource: string, free text indicating where you
+     *     found the other info. Fill if you use multiple sources to get the
+     *     other info. SO this is debug info that tells you which code path was
+     *     followed.
+     *   Keys are optional, but the more keys you can fill, the better.
      */
     protected function getVatRateLookupMetadata()
     {

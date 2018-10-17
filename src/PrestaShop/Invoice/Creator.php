@@ -472,21 +472,22 @@ class Creator extends BaseCreator
      * @param int $taxRulesGroupId
      *
      * @return array
-     *   Either an array with keys Meta::VatRateLookup and
-     *   Meta::VatRateLookupLabel or an empty array.
+     *   An empty array or an array with keys:
+     *   - Meta::VatClassId: int
+     *   - Meta::VatClassName: string
+     *   - Meta::VatRateLookup: float
+     *   - Meta::VatRateLookupLabel: string
      */
     protected function getVatRateLookupMetadata($addressId, $taxRulesGroupId)
     {
         try {
             $taxRulesGroup = new TaxRulesGroup($taxRulesGroupId);
-            $result = array(
-                Meta::VatClassId => $taxRulesGroup->id,
-                Meta::VatClassName => $taxRulesGroup->name,
-            );
             $address = new Address($addressId);
             $taxManager = TaxManagerFactory::getManager($address, $taxRulesGroupId);
             $taxCalculator = $taxManager->getTaxCalculator();
-            $result += array(
+            $result = array(
+                Meta::VatClassId => $taxRulesGroup->id,
+                Meta::VatClassName => $taxRulesGroup->name,
                 Meta::VatRateLookup => $taxCalculator->getTotalRate(),
                 Meta::VatRateLookupLabel => $taxCalculator->getTaxesName(),
             );

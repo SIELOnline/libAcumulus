@@ -32,13 +32,13 @@ class Creator extends BaseCreator
      *
      * @var float
      */
-    protected $precisionPriceEntered  = 0.01;
+    protected $precision  = 0.01;
 
     /** @var float */
-    protected $precisionPriceCalculated  = 0.02;
+    protected $precisionCalculated  = 0.02;
 
     /** @var float */
-    protected $precisionVat  = 0.01;
+    protected $preciseVat  = 0.01;
 
     /**
      * {@inheritdoc}
@@ -141,12 +141,12 @@ class Creator extends BaseCreator
 
         // Get precision info.
         if ($this->productPricesIncludeTax()) {
-            $precisionEx = $this->precisionPriceCalculated;
-            $precisionInc = $this->precisionPriceEntered;
+            $precisionEx = 2 * $this->precision;
+            $precisionInc = $this->precision;
             $recalculateUnitPrice = true;
         } else {
-            $precisionEx = $this->precisionPriceEntered;
-            $precisionInc = $this->precisionPriceCalculated;
+            $precisionEx = $this->precision;
+            $precisionInc = 2 * $this->precision;
             $recalculateUnitPrice = false;
         }
 
@@ -157,12 +157,11 @@ class Creator extends BaseCreator
             // - But still send the VAT rate to Acumulus.
             $result += array(
                 Tag::UnitPrice => $productPriceInc,
-                Meta::PrecisionUnitPrice => $precisionInc,
             );
+            $precisionEx = $precisionInc;
         } else {
             $result += array(
                 Tag::UnitPrice => $productPriceEx,
-                Meta::PrecisionUnitPrice => $precisionEx,
                 Meta::UnitPriceInc => $productPriceInc,
                 Meta::PrecisionUnitPriceInc => $precisionInc,
                 Meta::RecalculateUnitPrice => $recalculateUnitPrice,
@@ -171,7 +170,7 @@ class Creator extends BaseCreator
         }
 
         // Add tax info.
-        $result += $this->getVatRangeTags($productVat, $productPriceEx, $this->precisionVat, $precisionEx);
+        $result += $this->getVatRangeTags($productVat, $productPriceEx, $this->precision, $precisionEx);
         if ($product instanceof WC_Product) {
             $result += $this->getVatRateLookupMetadataByTaxClass($product->get_tax_class());
         }
@@ -360,9 +359,8 @@ class Creator extends BaseCreator
         $result = array(
                 Tag::Product => $this->t($item->get_name()),
                 Tag::UnitPrice => $feeEx,
-                Meta::PrecisionUnitPrice => 0.01,
                 Tag::Quantity => $item->get_quantity(),
-            ) + $this->getVatRangeTags($feeVat, $feeEx);
+            ) + $this->getVatRangeTags($feeVat, $feeEx, $this->precision, $this->precision);
 
         return $result;
     }
@@ -400,7 +398,7 @@ class Creator extends BaseCreator
         // precise, but it will be rounded to the cent by WC. The VAT is also
         // rounded to the cent.
         $shippingEx = $item->get_total();
-        $shippingExPrecision = 0.01;
+        $precisionShippingEx = 0.01;
 
         // To avoid rounding errors, we try to get the non-formatted amount.
         // Due to changes in how WC configures shipping methods (now based on
@@ -424,21 +422,20 @@ class Creator extends BaseCreator
             $cost = str_replace(',', '.', $option['cost']);
             if (Number::floatsAreEqual($cost, $shippingEx)) {
                 $shippingEx = $cost;
-                $shippingExPrecision = 0.001;
+                $precisionShippingEx = 0.001;
             }
         }
         $quantity = $item->get_quantity();
         $shippingEx /= $quantity;
         $shippingVat = $item->get_total_tax() / $quantity;
-        $vatPrecision = 0.01;
+        $precisionVat = 0.01;
 
         $result = array(
                 Tag::Product => $item->get_name(),
                 Tag::UnitPrice => $shippingEx,
-                Meta::PrecisionUnitPrice => $shippingExPrecision,
                 Tag::Quantity => $quantity,
             )
-            + $this->getVatRangeTags($shippingVat, $shippingEx, $vatPrecision, $shippingExPrecision)
+            + $this->getVatRangeTags($shippingVat, $shippingEx, $precisionVat, $precisionShippingEx)
             + $vatLookupTags;
 
         return $result;

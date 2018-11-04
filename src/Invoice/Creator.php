@@ -1093,6 +1093,7 @@ abstract class Creator
                 Meta::VatRateMin => 100.0 * $range['min'],
                 Meta::VatRateMax => 100.0 * $range['max'],
                 Meta::VatAmount => $numerator,
+                Meta::PrecisionUnitPrice => $denominatorPrecision,
                 Meta::PrecisionVatAmount => $numeratorPrecision,
                 Meta::VatRateSource => static::VatRateSource_Calculated,
             );

@@ -17,7 +17,7 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies)
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
-5.5.0 (2018-10-??)
+5.5.0 (2018-11-??)
 ------------------
 Features:
 - ALL: differentiate between invoice type 1 and 6 for countries having the same
@@ -35,6 +35,8 @@ Features:
 - ALL: Make "property specification not found" a debug level message.
 - JOO: Access rights revisited so that menu-items remain visible in the admin
   menu for people who only have access to the batch send form.
+- Improved precision handling: getVatRangeTags() now adds the precision meta
+  tags, removed from the shop specific Creator classes.
 Bugs:
 - MA: The size attribute on a multi select form element was not taken from our
   form settings.

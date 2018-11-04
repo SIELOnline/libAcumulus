@@ -30,13 +30,13 @@ class Creator extends BaseCreator
     protected $order;
 
     /**
-     * Product price precision in HS: TODO.
+     * Precision of amounts stored in HS. In HS you can enter either the price
+     * inc or ex vat. The other amount will be calculated and stored with 5
+     * digits precision. So 0.0001 is on the pessimistic side.
      *
      * @var float
      */
-    protected $precisionPriceEntered  = 0.0001;
-    protected $precisionPriceCalculated  = 0.0002;
-    protected $precisionVat  = 0.0011;
+    protected $precision = 0.0001;
 
     /**
      * {@inheritdoc}
@@ -95,8 +95,8 @@ class Creator extends BaseCreator
         $productPriceEx = (float) $item->order_product_price;
         $productVat = (float) $item->order_product_tax;
 
-            // Check for cost price and margin scheme.
-            if (!empty($line['costPrice']) && $this->allowMarginScheme()) {
+        // Check for cost price and margin scheme.
+        if (!empty($line['costPrice']) && $this->allowMarginScheme()) {
             // Margin scheme:
             // - Do not put VAT on invoice: send price incl VAT as unitprice.
             // - But still send the VAT rate to Acumulus.
@@ -111,8 +111,9 @@ class Creator extends BaseCreator
         }
         $result[Tag::Quantity] = $item->order_product_quantity;
 
-        // Note that this info remains correct when rates are changed as upon
-        // order creation this info is stored in the order_product table.
+        // Try to get the exact vat rate from the order-product info.
+        // Note that this info remains correct when rates are changed as this
+        // info is stored upon order creation in the order_product table.
         if (is_array($item->order_product_tax_info) && count($item->order_product_tax_info) === 1) {
             $productVatInfo = reset($item->order_product_tax_info);
             if (!empty($productVatInfo->tax_rate)) {
@@ -126,7 +127,7 @@ class Creator extends BaseCreator
                 Meta::VatRateSource => static::VatRateSource_Exact,
             );
         } else {
-            $vatInfo = $this->getVatRangeTags($productVat, $productPriceEx, 0.0001, 0.0001);
+            $vatInfo = $this->getVatRangeTags($productVat, $productPriceEx, $this->precision, $this->precision);
         }
         $result += $vatInfo;
 
@@ -198,10 +199,8 @@ class Creator extends BaseCreator
                 $shippingInc = (float) $this->order->order_shipping_price;
                 $shippingVat = (float) $this->order->order_shipping_tax;
                 $shippingEx = $shippingInc - $shippingVat;
-                $precisionEx = $this->precisionPriceCalculated;
-                $precisionInc = $this->precisionPriceEntered;
                 $recalculateUnitPrice = true;
-                $vatInfo = $this->getVatRangeTags($shippingVat, $shippingEx, $this->precisionVat, $precisionEx);
+                $vatInfo = $this->getVatRangeTags($shippingVat, $shippingEx, $this->precision, 2 * $this->precision);
 
                 // Add vat lookup meta data.
                 $vatLookupMetaData = array();
@@ -247,9 +246,8 @@ class Creator extends BaseCreator
                         Tag::Product => $this->getShippingMethodName(),
                         Tag::Quantity => 1,
                         Tag::UnitPrice => $shippingEx,
-                        Meta::PrecisionUnitPrice => $precisionEx,
                         Meta::UnitPriceInc => $shippingInc,
-                        Meta::PrecisionUnitPriceInc => $precisionInc,
+                        Meta::PrecisionUnitPriceInc => $this->precision,
                         Meta::RecalculateUnitPrice => $recalculateUnitPrice,
                         Meta::VatAmount => $shippingVat,
                     ) + $vatInfo + $vatLookupMetaData;
@@ -283,7 +281,7 @@ class Creator extends BaseCreator
             $discountInc = (float) $this->order->order_discount_price;
             $discountVat = (float) $this->order->order_discount_tax;
             $discountEx = $discountInc - $discountVat;
-            $vatInfo = $this->getVatRangeTags($discountVat, $discountEx, 0.0001, 0.0002);
+            $vatInfo = $this->getVatRangeTags($discountVat, $discountEx, $this->precision, 2 * $this->precision);
             if ($vatInfo[Tag::VatRate] === null) {
                 $vatInfo[Meta::StrategySplit] = true;
             }
@@ -313,10 +311,8 @@ class Creator extends BaseCreator
             $paymentInc = (float) $this->order->order_payment_price;
             $paymentVat = (float) $this->order->order_payment_tax;
             $paymentEx = $paymentInc - $paymentVat;
-            $precisionEx = $this->precisionPriceCalculated;
-            $precisionInc = $this->precisionPriceEntered;
             $recalculateUnitPrice = true;
-            $vatInfo = $this->getVatRangeTags($paymentVat, $paymentEx, 0.0001, 0.0002);
+            $vatInfo = $this->getVatRangeTags($paymentVat, $paymentEx, $this->precision, 2 * $this->precision);
             $description = $this->t('payment_costs');
 
             // Add vat lookup meta data.
@@ -344,9 +340,8 @@ class Creator extends BaseCreator
                     Tag::Product => $description,
                     Tag::Quantity => 1,
                     Tag::UnitPrice => $paymentEx,
-                    Meta::PrecisionUnitPrice => $precisionEx,
                     Meta::UnitPriceInc => $paymentInc,
-                    Meta::PrecisionUnitPriceInc => $precisionInc,
+                    Meta::PrecisionUnitPriceInc => $this->precision,
                     Meta::RecalculateUnitPrice => $recalculateUnitPrice,
                     Meta::VatAmount => $paymentVat,
                 ) + $vatInfo + $vatLookupMetaData;

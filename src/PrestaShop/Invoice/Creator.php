@@ -51,6 +51,15 @@ class Creator extends BaseCreator
     protected $creditSlip;
 
     /**
+     * Precision of amounts stored in PS. In PS you can enter either the price
+     * inc or ex vat. The other amount will be calculated and not rounded before
+     * being stored with. So 0.0001 is on the safe side.
+     *
+     * @var float
+     */
+    protected $precision = 0.0001;
+
+    /**
      * {@inheritdoc}
      *
      * This override also initializes WooCommerce specific properties related to
@@ -179,7 +188,9 @@ class Creator extends BaseCreator
             // entered by the admin and can thus be considered exact. The other
             // is calculated by the system and not rounded and can thus be
             // considered to have a precision better than 0.0001
-            $result += $this->getVatRangeTags($sign * ($item['unit_price_tax_incl'] - $item['unit_price_tax_excl']), $sign * $item['unit_price_tax_excl'], 0.0001, 0.0001);
+            $result += $this->getVatRangeTags($sign * ($item['unit_price_tax_incl'] - $item['unit_price_tax_excl']),
+                $sign * $item['unit_price_tax_excl'],
+                $this->precision, $this->precision);
         }
         $result += $this->getVatRateLookupMetadata($this->order->id_address_invoice, $this->getItemLineTaxRuleGroupId($item));
 
@@ -276,6 +287,9 @@ class Creator extends BaseCreator
             if (Number::floatsAreEqual($wrappingEx, $wrappingExLookedUp, 0.005)) {
                 $wrappingEx = $wrappingExLookedUp;
                 $metaCalculatedFields[] = Tag::UnitPrice;
+                $precision = $this->precision;
+            } else {
+                $precision = 0.01;
             }
             $wrappingInc = $this->order->total_wrapping_tax_incl;
             $wrappingVat = $wrappingInc - $wrappingEx;
@@ -287,7 +301,7 @@ class Creator extends BaseCreator
                     Tag::UnitPrice => $wrappingEx,
                     Meta::UnitPriceInc => $wrappingInc,
                     Tag::Quantity => 1,
-                ) + $this->getVatRangeTags($wrappingVat, $wrappingEx, 0.02)
+                ) + $this->getVatRangeTags($wrappingVat, $wrappingEx, 0.01 + $precision, $precision)
                 + $vatLookupTags;
             $result[Meta::FieldsCalculated] = $metaCalculatedFields;
         }
@@ -388,7 +402,7 @@ class Creator extends BaseCreator
                 // - including VAT, the precision would be 0.01, 0.01.
                 // - excluding VAT, the precision would be 0.01, 0
                 // However, for a %, it will be: 0.02, 0.01, so use 0.02.
-            ) + $this->getVatRangeTags($discountVat, $discountEx, 0.02);
+            ) + $this->getVatRangeTags($discountVat, $discountEx, 0.02, 0.01);
         $result[Meta::FieldsCalculated][] = Meta::VatAmount;
 
         return $result;

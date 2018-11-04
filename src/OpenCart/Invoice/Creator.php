@@ -21,6 +21,15 @@ class Creator extends BaseCreator
     protected $order;
 
     /**
+     * Precision of amounts stored in OC. In OC you enter prices inc vat. The
+     * price ex vat and vat amount will be calculated and stored with 4
+     * digits precision. So 0.001 is on the pessimistic side.
+     *
+     * @var float
+     */
+    protected $precision = 0.001;
+
+    /**
      * {@inheritdoc}
      *
      * This override also initializes WooCommerce specific properties related to
@@ -105,7 +114,7 @@ class Creator extends BaseCreator
         // Get vat range info from item line.
         $productPriceEx = $item['price'];
         $productVat = $item['tax'];
-        $vatInfo = $this->getVatRangeTags($productVat, $productPriceEx);
+        $vatInfo = $this->getVatRangeTags($productVat, $productPriceEx, $this->precision, $this->precision);
 
         // Try to look up the vat rate via product.
         $vatInfo += $this->getVatRateLookupMetadata($product['tax_class_id']);

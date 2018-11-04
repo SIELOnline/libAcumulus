@@ -65,6 +65,15 @@ class Creator extends BaseCreator
     protected $shopInvoice = array();
 
     /**
+     * Precision of amounts stored in VM. In VM you can enter either the price
+     * inc or ex vat. The other amount will be calculated and stored with 4
+     * digits precision. So 0.0001 is on the pessimistic side.
+     *
+     * @var float
+     */
+    protected $precision = 0.001;
+
+    /**
      * {@inheritdoc}
      *
      * This override also initializes VM specific properties related to the
@@ -146,7 +155,7 @@ class Creator extends BaseCreator
                 Meta::VatClassName => $calcRule->calc_rule_name,
             );
         } else {
-            $vatInfo = $this->getVatRangeTags($productVat, $productPriceEx, 0.0001, 0.0001);
+            $vatInfo = $this->getVatRangeTags($productVat, $productPriceEx, $this->precision, $this->precision);
         }
 
         // Check for cost price and margin scheme.
@@ -245,7 +254,7 @@ class Creator extends BaseCreator
                     Meta::VatClassName => $calcRule->calc_rule_name,
                 );
             } else {
-                $vatInfo = $this->getVatRangeTags($shippingVat, $shippingEx, 0.0001, 0.01);
+                $vatInfo = $this->getVatRangeTags($shippingVat, $shippingEx, $this->precision, 0.01);
             }
 
             $result = array(
@@ -380,7 +389,7 @@ class Creator extends BaseCreator
                         Meta::VatClassName => $calcRule->calc_rule_name,
                     );
                 } else {
-                    $vatInfo = $this->getVatRangeTags($paymentVat, $paymentEx, 0.0001, 0.01);
+                    $vatInfo = $this->getVatRangeTags($paymentVat, $paymentEx, $this->precision, 0.01);
                 }
 
                 $result = array(

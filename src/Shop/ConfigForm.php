@@ -86,26 +86,14 @@ class ConfigForm extends BaseConfigForm
         if (!isset($this->submittedValues['nature_shop'])) {
             $this->errorMessages['nature_shop'] = $this->t('message_validate_nature_0');
         }
-        if (!isset($this->submittedValues['digitalServices'])) {
-            $this->errorMessages['digitalServices'] = $this->t('message_validate_digital_services_0');
+        if (!isset($this->submittedValues['foreignVat'])) {
+            $this->errorMessages['foreignVat'] = $this->t('message_validate_foreign_vat_0');
         }
         if (!isset($this->submittedValues['vatFreeProducts'])) {
             $this->errorMessages['vatFreeProducts'] = $this->t('message_validate_vat_free_products_0');
         }
         if (!isset($this->submittedValues['marginProducts'])) {
             $this->errorMessages['marginProducts'] = $this->t('message_validate_margin_products_0');
-        }
-
-        if (isset($this->submittedValues['nature_shop']) && isset($this->submittedValues['digitalServices'])) {
-            // If we only sell Products, we cannot (also) sell digital services.
-            if ($this->submittedValues['nature_shop'] == PluginConfig::Nature_Products && $this->submittedValues['digitalServices'] != PluginConfig::DigitalServices_No) {
-                $this->errorMessages['conflicting_options_0'] = $this->t('message_validate_conflicting_shop_options_0');
-            }
-            // If we only sell Digital services, the nature of all we sell is
-            // Services.
-            if ($this->submittedValues['digitalServices'] == PluginConfig::DigitalServices_Only && $this->submittedValues['nature_shop'] != PluginConfig::Nature_Services) {
-                $this->errorMessages['nature_shop_0'] = $this->t('message_validate_conflicting_shop_options_1');
-            }
         }
 
         // NOTE: it is debatable whether margin articles can be services, e.g.
@@ -270,8 +258,11 @@ class ConfigForm extends BaseConfigForm
      * Returns the set of invoice related fields.
      *
      * The fields returned:
-     * - digitalServices
+     * - nature_shop
+     * - foreignVat
+     * - foreignVatClasses
      * - vatFreeProducts
+     * - marginProducts
      *
      * @return array[]
      *   The set of shop related fields.
@@ -289,11 +280,11 @@ class ConfigForm extends BaseConfigForm
                     'required' => true,
                 ),
             ),
-            'digitalServices' => array(
+            'foreignVat' => array(
                 'type' => 'radio',
-                'label' => $this->t('field_digitalServices'),
-                'description' => $this->t('desc_digitalServices'),
-                'options' => $this->getDigitalServicesOptions(),
+                'label' => $this->t('field_foreignVat'),
+                'description' => $this->t('desc_foreignVat'),
+                'options' => $this->getForeignVatOptions(),
                 'attributes' => array(
                     'required' => true,
                 ),
@@ -543,18 +534,18 @@ class ConfigForm extends BaseConfigForm
     }
 
     /**
-     * Returns a list of options for the digital services field.
+     * Returns a list of options for the foreign vat field.
      *
      * @return string[]
      *   An array keyed by the option values and having translated descriptions
      *   as values.
      */
-    protected function getDigitalServicesOptions()
+    protected function getForeignVatOptions()
     {
         return array(
-            PluginConfig::DigitalServices_Both => $this->t('option_digitalServices_1'),
-            PluginConfig::DigitalServices_No => $this->t('option_digitalServices_2'),
-            PluginConfig::DigitalServices_Only => $this->t('option_digitalServices_3'),
+            PluginConfig::ForeignVat_Both => $this->t('option_foreignVat_1'),
+            PluginConfig::ForeignVat_No => $this->t('option_foreignVat_2'),
+            PluginConfig::ForeignVat_Only => $this->t('option_foreignVat_3'),
         );
     }
 

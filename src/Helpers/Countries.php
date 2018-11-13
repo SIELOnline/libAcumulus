@@ -104,13 +104,13 @@ class Countries
     }
 
     /**
-     * Returns the dutch name for the given country code.
+     * Returns the Dutch name for the given country code.
      *
      * @param $countryCode
      *   ISO country code (2 characters).
      *
      * @return string
-     *   The (dutch) name of the country or the empty string if the code could
+     *   The (Dutch) name of the country or the empty string if the code could
      *   not be looked up.
      */
     public function getCountryName($countryCode)

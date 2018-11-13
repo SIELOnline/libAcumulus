@@ -78,7 +78,7 @@
  *   that if an autoloader already exists it often won't work with the PSR4
  *   standard.
  * - Its own translation system to present user facing texts in this library in
- *   english and dutch, see {@see \Siel\Acumulus\Helpers\Translator} for more
+ *   English and Dutch, see {@see \Siel\Acumulus\Helpers\Translator} for more
  *   information about translation.
  * - Its own way of defining forms, and subsequently rendering them or mapping
  *   them to the webshop's form system, see {@see \Siel\Acumulus\Helpers\Form},

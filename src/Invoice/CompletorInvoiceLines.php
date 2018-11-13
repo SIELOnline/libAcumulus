@@ -24,7 +24,7 @@ class CompletorInvoiceLines
     /**
      * The list of possible vat types, initially filled with possible vat types
      * based on client country, invoiceHasLineWithVat(), is_company(), and the
-     * digital services setting.
+     * foreign vat setting.
      *
      * @var int[]
      */

@@ -17,7 +17,7 @@ interface PluginConfig
      *
      * @var string
      */
-    const Version = '5.4.9';
+    const Version = '5.5.0';
 
     /**
      * Format to use with date() and DateTime formatting methods for SQL
@@ -51,10 +51,10 @@ interface PluginConfig
     const Nature_Products = 2;
     const Nature_Services = 3;
 
-    const DigitalServices_Unknown = 0;
-    const DigitalServices_Both = 1;
-    const DigitalServices_No = 2;
-    const DigitalServices_Only = 3;
+    const ForeignVat_Unknown = 0;
+    const ForeignVat_Both = 1;
+    const ForeignVat_No = 2;
+    const ForeignVat_Only = 3;
 
     const VatFreeProducts_Unknown = 0;
     const VatFreeProducts_Both = 1;

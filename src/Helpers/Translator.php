@@ -31,7 +31,7 @@ namespace Siel\Acumulus\Helpers;
  *   values being the translated text.
  * - If a text needs to be parameterised, use ordered arguments, like %1$s, as
  *   the appearing order may differ between languages.
- * - Typically, this library is translated into dutch and english, dutch being
+ * - Typically, this library is translated into Dutch and English, Dutch being
  *   the main language.
 
  *
@@ -94,7 +94,7 @@ class Translator
      * @return string
      *   Return in order of being available:
      *   - The string in the current language for the given key.
-     *   - The string in dutch for the given key.
+     *   - The string in Dutch for the given key.
      *   - The key itself.
      */
     public function get($key)

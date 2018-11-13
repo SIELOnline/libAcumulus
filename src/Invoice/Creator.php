@@ -285,7 +285,7 @@ abstract class Creator
      *
      * Extending classes should normally not have to override this method as all
      * values are fetched via configurable settings that may contain tokens
-     * (veldverwijzingen (dutch)) that refer to properties of objects in the
+     * (veldverwijzingen (Dutch)) that refer to properties of objects in the
      * webshop (property sources). The exception is the (ISO) country code which
      * may not be easy to fetch via a property source as this might include a
      * database lookup to a "Countries" table. This is fetched via

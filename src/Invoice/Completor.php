@@ -103,7 +103,7 @@ class Completor
     /**
      * The list of possible vat types, initially filled with possible vat types
      * based on client country, invoiceHasLineWithVat(), is_company(), and the
-     * digital services setting. But then reduced by VAT rates we find on the
+     * foreign vat setting. But then reduced by VAT rates we find on the
      * order lines.
      *
      * @var int[]
@@ -252,7 +252,7 @@ class Completor
      * - Whether there is at least 1 line with a costprice.
      * - The country of the client.
      * - Whether the client is a company.
-     * - The shop settings (selling digital services, vat free products).
+     * - The shop settings (selling foreign vat or vat free products).
      * - Optionally, the date of the invoice.
      *
      * See also: {@see https://wiki.acumulus.nl/index.php?page=facturen-naar-het-buitenland}.
@@ -263,7 +263,7 @@ class Completor
         $shopSettings = $this->config->getShopSettings();
         $nature = $shopSettings['nature_shop'];
         $margin = $shopSettings['marginProducts'];
-        $digitalServices = $shopSettings['digitalServices'];
+        $foreignVat = $shopSettings['foreignVat'];
 
         if (!empty($this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType])) {
             // If shop specific code or an event handler has already set the vat
@@ -279,11 +279,11 @@ class Completor
                 }
             } elseif ($this->isEu()) {
                 // Can it be normal vat?
-                if ($digitalServices !== PluginConfig::DigitalServices_Only || $this->getInvoiceDate() < '2015-01-01') {
+                if ($foreignVat !== PluginConfig::ForeignVat_Only) {
                     $possibleVatTypes[] = Api::VatType_National;
                 }
                 // Can it be foreign vat?
-                if ($digitalServices !== PluginConfig::DigitalServices_No && $this->getInvoiceDate() >= '2015-01-01') {
+                if ($foreignVat !== PluginConfig::ForeignVat_No) {
                     $possibleVatTypes[] = Api::VatType_ForeignVat;
                 }
                 // Can it be EU reversed VAT.
@@ -333,7 +333,7 @@ class Completor
         $possibleVatRates = array();
 
         $shopSettings = $this->config->getShopSettings();
-        $digitalServices = $shopSettings['digitalServices'];
+        $nature = $shopSettings['nature'];
         $vatFreeProducts = $shopSettings['vatFreeProducts'];
 
         foreach ($this->possibleVatTypes as $vatType) {
@@ -343,10 +343,10 @@ class Completor
                     $vatTypeVatRates = $this->getVatRatesByCountryAndDate('nl');
                     // Add vat free (-1):
                     // - if selling vat free products/services
-                    // - OR if outside EU AND (digital services OR company).
+                    // - OR if outside EU AND (services OR company).
                     if ($vatFreeProducts != PluginConfig::VatFreeProducts_No) {
                         $vatTypeVatRates[] = -1;
-                    } elseif ($this->isOutsideEu() && ($digitalServices !== PluginConfig::DigitalServices_No || $this->isCompany())) {
+                    } elseif ($this->isOutsideEu() && ($nature !== PluginConfig::Nature_Products || $this->isCompany())) {
                         $vatTypeVatRates[] = -1;
                     }
                     break;
@@ -714,7 +714,7 @@ class Completor
      * Determines the vattype of the invoice.
      *
      * This method (and class) is aware of:
-     * - The setting digitalServices.
+     * - The setting foreignVat.
      * - The country of the client.
      * - Whether the client is a company.
      * - The actual VAT rates on the day of the order.
@@ -757,11 +757,11 @@ class Completor
                     //   Message: 'Did you configure the correct settings for
                     //   country ..?' or 'Were there recent changes in tax
                     //   rates?'.
-                    // - Vat rates are for digital services but the shop does
-                    //   not sell digital services. Message'Check "about your
-                    //   shop" settings'.
-                    // - Vat rates are dutch vat rates but shop only sells
-                    //   digital services and client is in the EU. Message:
+                    // - Vat rates are for foreign VAT but the shop does
+                    //   not sell foreign VAT products. Message'Check "about
+                    //   your shop" settings'.
+                    // - Vat rates are Dutch vat rates but shop only sells
+                    //   foreign VAT products and client is in the EU. Message:
                     //   'Check the vat rates assigned to your products.'.
                     $message = 'message_warning_no_vattype_at_all';
                     $code = 804;
@@ -782,7 +782,7 @@ class Completor
                     // Separate lines could be matched with some of the possible
                     // vat types, but not all with the same vat type.
                     // Possible causes:
-                    // - Mix of digital services and other goods or services.
+                    // - Mix of foreign VAT rates and other goods or services.
                     //   Message: 'Split invoice.'.
                     // - Some lines have no vat but no vat free goods or
                     //   services are sold and thus this could be a reversed vat
@@ -809,8 +809,8 @@ class Completor
                 // Take one and add a warning.
                 // Possible causes:
                 // - Client country has same vat rates as the Netherlands and
-                //   shop sells digital services but also other products or
-                //   services. Solvable by correct shop settings.
+                //   shop sells products at foreign vat rates but also other
+                //   products or services. Solvable by correct shop settings.
                 // - Invoice has no vat and the client is outside the EU and it
                 //   is unknown whether the invoice lines contain services or
                 //   goods. Perhaps solvable by correct shop settings.
@@ -893,7 +893,7 @@ class Completor
                         }
 
                         // 3) In EU: If the vat class is known and denotes
-                        //    foreign vat, we do not add the dutch vat type.
+                        //    foreign vat, we do not add the Dutch vat type.
                         // Note that the inverse can prevent finding vat type 6
                         // when there's a fee line at NL vat which happens to be
                         // the foreign vat rate as well.
@@ -996,8 +996,8 @@ class Completor
      * Thus, to do this correctly, especially for invoices outside the EU, we
      * should be able to distinguish between services and products. For that,
      * the nature field should be filled in or the shop should only sell
-     * products or only services, but that is currently not a setting.
-     * If not, we act as if the line invoices a product.
+     * products or only services. If not, we act as if the line invoices a
+     * product.
      *
      * See:
      * - {@see https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/tarieven_en_vrijstellingen/}

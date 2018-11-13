@@ -115,7 +115,7 @@ class Config
      *
      * @param array $values
      *   A keyed array that contains the values to store, this may be a subset
-     *   of the possible keys.
+     *   of the possible keys. Keys that are not present will not be changed.
      *
      * @return bool
      *   Success.
@@ -336,7 +336,7 @@ class Config
      * @return array
      *   A keyed array with the keys:
      *   - nature_shop
-     *   - digitalServices
+     *   - foreignVat
      *   - vatFreeProducts
      *   - marginProducts
      *   - foreignVatClasses
@@ -837,10 +837,10 @@ class Config
                     'type' => 'int',
                     'default' => PluginConfig::Nature_Unknown,
                 ),
-                'digitalServices' => array(
+                'foreignVat' => array(
                     'group' => 'shop',
                     'type' => 'int',
-                    'default' => PluginConfig::DigitalServices_Unknown,
+                    'default' => PluginConfig::ForeignVat_Unknown,
                 ),
                 'vatFreeProducts' => array(
                     'group' => 'shop',
@@ -970,6 +970,10 @@ class Config
             $result = $this->upgrade542() && $result;
         }
 
+        if (version_compare($currentVersion, '5.5.0', '<')) {
+            $result = $this->upgrade550() && $result;
+        }
+
         return $result;
     }
 
@@ -1027,13 +1031,15 @@ class Config
      */
     protected function upgrade453()
     {
+        // Keep track of settings that should be updated.
+        $newSettings = array();
         if ($this->get('triggerInvoiceSendEvent') == 2) {
-            $values['triggerInvoiceEvent'] = PluginConfig::TriggerInvoiceEvent_Create;
+            $newSettings['triggerInvoiceEvent'] = PluginConfig::TriggerInvoiceEvent_Create;
         } else {
-            $values['triggerInvoiceEvent'] = PluginConfig::TriggerInvoiceEvent_None;
+            $newSettings['triggerInvoiceEvent'] = PluginConfig::TriggerInvoiceEvent_None;
         }
 
-        return $this->save($values);
+        return $this->save($newSettings);
     }
 
     /**
@@ -1049,7 +1055,7 @@ class Config
         $newSettings = array();
 
         if ($this->get('removeEmptyShipping') !== null) {
-            $values['sendEmptyShipping'] = !$this->get('removeEmptyShipping');
+            $newSettings['sendEmptyShipping'] = !$this->get('removeEmptyShipping');
         }
 
         if (!empty($newSettings)) {
@@ -1186,5 +1192,19 @@ class Config
         }
 
         return $result;
+    }
+
+    /**
+     * 5.5.0 upgrade.
+     *
+     * - setting digitalServices extended and therefore renamed to foreignVat.
+     *
+     * @return bool
+     */
+    protected function upgrade550()
+    {
+        $newSettings = array();
+        $newSettings['foreignVat'] = (int) $this->get('digitalServices');
+        return $this->save($newSettings);
     }
 }

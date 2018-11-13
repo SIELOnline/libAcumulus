@@ -15,7 +15,7 @@ namespace Siel\Acumulus\Helpers;
  * be calculated. Instead a range within which the vat rate falls can be
  * calculated. This library uses this range to determine the actual vat rate
  * later on after knowing which vat rates may apply (Dutch vat rates, foreign
- * vat rates for digital services).
+ * vat rates).
  */
 class Number
 {

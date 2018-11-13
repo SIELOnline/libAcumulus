@@ -62,11 +62,9 @@ class ConfigFormTranslations extends TranslationCollection
         'message_validate_email_0' => 'Het veld Email is geen valide e-mailadres, vul uw eigen e-mailadres in.',
         'message_validate_email_1' => 'Het veld Email is verplicht, vul uw eigen e-mailadres in.',
         'message_validate_nature_0' => 'Het veld \'Soort: wat verkoopt u?\' is verplicht, kies een waarde.',
-        'message_validate_digital_services_0' => 'Het veld \'Verkoopt u digitale diensten?\' is verplicht, kies een waarde.',
+        'message_validate_foreign_vat_0' => 'Het veld \'Verkoopt u producten of diensten waarbij u EU btw moet hanteren?\' is verplicht, kies een waarde.',
         'message_validate_vat_free_products_0' => 'Het veld \'Verkoopt u van btw vrijgestelde producten of diensten?\' is verplicht, kies een waarde.',
         'message_validate_margin_products_0' => 'Het veld \'Verkoopt u margegoederen?\' is verplicht, kies een waarde.',
-        'message_validate_conflicting_shop_options_0' => 'Als u alleen producten verkoopt, kunt u geen digitale diensten verkopen. Pas één van deze opties aan.',
-        'message_validate_conflicting_shop_options_1' => 'Als u alleen digitale diensten verkoopt, vink dan bij "Soort" aan dat u alleen diensten verkoopt.',
         'message_validate_conflicting_shop_options_2' => 'Als u alleen diensten verkoopt, kunt u geen margegoederen verkopen. Pas één van deze opties aan.',
         'message_validate_conflicting_shop_options_3' => 'Als u alleen margegoederen verkoopt, vink dan bij "Soort" aan dat u alleen producten verkoopt.',
 
@@ -80,17 +78,21 @@ class ConfigFormTranslations extends TranslationCollection
         'option_nature_3' => 'Alleen diensten.',
         'desc_nature_shop' => 'Geef aan of u in uw winkel producten en/of diensten aanbiedt. In Acumulus is dit het veld "Soort". LET OP: deze instelling betreft alleen de artikelen in uw catalogus, niet verzend, handling, verpakkings, of betaalkosten.',
 
-        'field_digitalServices' => 'Verkoopt u digitale diensten?',
-        'option_digitalServices_1' => 'Zowel digitale diensten als normale producten en/of diensten.',
-        'option_digitalServices_2' => 'Alleen producten en/of diensten die onder Nederlandse btw vallen.',
-        'option_digitalServices_3' => 'Alleen digitale diensten die met buitenlandse btw belast moeten worden voor buitenlandse klanten.',
-        'desc_digitalServices' => 'Geef aan of u in uw winkel digitale diensten aanbiedt waarbij u buitenlandse btw moet hanteren voor EU klanten.
-Zie <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/btw_berekenen_bij_diensten/wijziging_in_digitale_diensten_vanaf_2015/wijziging_in_digitale_diensten_vanaf_2015" target="_blank">Belastingdienst: diensten naar andere EU landen</a>.',
+        'field_foreignVat' => 'Verkoopt u producten of diensten waarbij u EU btw moet hanteren?',
+        'option_foreignVat_1' => 'Zowel producten en/of diensten die onder Nederlandse btw vallen als die waarbij u het btw tarief van het EU land waaraan u levert moet hanteren.',
+        'option_foreignVat_2' => 'Alleen producten en/of diensten die onder Nederlandse btw vallen.',
+        'option_foreignVat_3' => 'Alleen producten en/of diensten waarbij u het btw tarief van het EU land waaraan u levert moet hanteren.',
+        'desc_foreignVat' => 'Geef aan of u in uw winkel goederen en/of diensten aanbiedt waarbij u voor EU klanten het btw tarief van het land waaraan u levert moet hanteren.
+Dit kunnen bv. <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/btw_berekenen_bij_diensten/wijziging_in_digitale_diensten_vanaf_2015/wijziging_in_digitale_diensten_vanaf_2015" target="_blank">digitale diensten</a>
+of <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/export_van_specifieke_goederen_en_in_bijzondere_situaties/export_van_accijnsgoederen/export_accijnsgoederen_naar_eu_landen" target="_blank">accijnsgoederen</a> zijn.
+Zie <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/export_van_specifieke_goederen_en_in_bijzondere_situaties/export_van_specifieke_goederen_en_in_bijzondere_situaties" target="_blank">Belastingdienst: Export van specifieke goederen en bijzondere situaties</a>.
+Let op: vanaf 2019 geldt er een <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/btw_berekenen_bij_diensten/wijziging_in_digitale_diensten_vanaf_2015/wijziging_in_digitale_diensten_vanaf_2015" target="_blank">drempelbedrag voor digitale diensten</a>.
+Als u daaronder blijft mag u gewoon Nederlandse btw berekenen.',
 
         'field_foreignVatClasses' => 'Welke belastingklassen definiëren EU btw tarieven?',
         'desc_foreignVatClasses' => 'Geef aan welke van deze belastingklassen gebruikt worden bij producten of diensten waarbij u buitenlandse btw moet hanteren voor EU klanten.
- Mbv de "Ctrl" toets kunt u meerdere statussen kiezen of keuzes ongedaan maken.
- Behalve voor de hierboven al genoemde digitale diensten kan dit ook gelden bij <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/export_van_specifieke_goederen_en_in_bijzondere_situaties/export_van_specifieke_goederen_en_in_bijzondere_situaties" target="_blank">Export van specifieke goederen en in bijzondere situaties</a>.',
+Deze instelling hoeft u alleen in te vullen als u hierboven hebt aangegeven dat u niet "Alleen producten en/of diensten die onder Nederlandse btw vallen" verkoopt.
+Mbv de "Ctrl" toets kunt u meerdere statussen kiezen of keuzes ongedaan maken.',
 
         'field_vatFreeProducts' => 'Verkoopt u van btw vrijgestelde producten of diensten?',
         'option_vatFreeProducts_1' => 'Zowel btw vrije als aan btw onderhevige producten en/of diensten.',
@@ -119,7 +121,7 @@ Zie <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belasti
         'desc_triggerInvoiceEvent' => 'U kunt hier kiezen of en bij welke webwinkelfactuur-gebeurtenissen de factuur naar Acumulus wordt verstuurd. Als u voor "Niet automatisch versturen" kiest, kunt u de facturen zelf overzetten m.b.v. het batchformulier of op basis van één of meerdere bestelstatussen.',
 
         // Tokens
-        'tokenHelpHeader' => 'Veldverwijzingen',
+        'tokenHelpHeader' => 'Uitleg over veldverwijzingen',
         'desc_tokens' => '<p>Op deze pagina staan een aantal velden die "veldverwijzingen" mogen bevatten.
 Dit wil zeggen dat ze naast vrije tekst ook gegevens van de bestelling, de klant of het klantadres kunnen bevatten.
 Veldverwijzingen worden ingegeven door de naam van de eigenschap van de bestelling tussen vierkante haken, dwz. [ en ], te plaatsen.
@@ -253,7 +255,7 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'field_missing_amount' => 'Ontbrekend bedrag',
         'desc_missing_amount' => 'Geef aan wat te doen als er een verschil tussen het factuurtotaal en het totaal van de factuurregels geconstateerd wordt. Normaal gesproken zal de 1e optie voldoen. Als het vaak voorkomt en de ontbrekende bedragen zjn eigenlijk altijd correct (bv. betaalkosten van een specifieke payment provider worden niet als losse regel herkend) kan de 2e optie handiger zijn. Er wordt dan al een factuurregel toegevoegd zodat de factuur alleen maar definitief gemaakt hoeft te worden. Gebruik de 3e optie als dit verschil door een instelling of andere plugin optreedt maar de factuur eigenlijk toch altijd correct is.',
         'option_missing_amount_2' => 'Vestuur een waarschuwing, de factuur wordt als concept verstuurd.',
-        'option_missing_amount_3' => 'Voeg een correctieregel toe, de factuur zal echter bg steeds als concept verstuurd worden.',
+        'option_missing_amount_3' => 'Voeg een correctieregel toe, de factuur zal echter nog steeds als concept verstuurd worden.',
         'option_missing_amount_1' => 'Negeer het verschil.',
 
         'field_description' => 'Toelichting',
@@ -349,10 +351,10 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'desc_versionInformation' => 'Vermeld aub deze gegevens bij een supportverzoek.',
 
         // Link to other config form.
-        'desc_advancedSettings' => 'Deze plugin kent veel instellingen en daarom bevat deze pagina niet alle instellingen. Een aantal minder gebruikte instellingen vindt u in het "%1$s" onder "%2$s". Nadat u hier de gegevens hebt ingevuld en opgeslagen, kunt u het andere formulier bezoeken:',
+        'desc_advancedSettings' => 'Deze plugin kent veel instellingen en daarom bevat deze pagina niet alle instellingen. Een aantal minder gebruikte instellingen vindt u op het "%1$s" formulier onder "%2$s". Nadat u hier de gegevens hebt ingevuld en opgeslagen, kunt u het andere formulier bezoeken:',
         'menu_advancedSettings' => 'Instellingen → Acumulus geavanceerde instellingen',
 
-        'desc_basicSettings' => 'Dit is het formulier met geavanceerde, ofwel minder gebruikte, instellingen. De basisinstellingen vindt u in het "%1$s" onder "%2$s", of via de button hieronder. Let op: als u op deze button klikt worden de op deze pagina ingevulde of gewijzigde gegevens NIET opgeslagen!',
+        'desc_basicSettings' => 'U bevindt zich nu op het formulier met geavanceerde, ofwel minder gebruikte, instellingen. De basisinstellingen vindt u op het "%1$s" formulier onder "%2$s", of via de button hieronder. Let op: als u op deze button klikt worden de op deze pagina ingevulde of gewijzigde gegevens NIET opgeslagen!',
         'menu_basicSettings' => 'Instellingen → Acumulus',
     );
 
@@ -408,11 +410,9 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'message_validate_email_0' => 'The field Email is not a valid e-mail address, please fill in your own e-mail address.',
         'message_validate_email_1' => 'The field Email is required, please fill in your own e-mail address.',
         'message_validate_nature_0' => 'The field \'Nature: what do you sell?\' is required, select a value.',
-        'message_validate_digital_services_0' => 'The field \'Do you sell digital services?\' is required, select a value.',
+        'message_validate_foreign_vat_0' => 'The field \'Do you sell products or services that are subject to foreign VAT for EU customers?\' is required, select a value.',
         'message_validate_vat_free_products_0' => 'The field \'Do you sell VAT free products or services?\' is required, select a value.',
         'message_validate_margin_products_0' => 'The field \'Do you sell products using the margin scheme?\' is required, select a value.',
-        'message_validate_conflicting_shop_options_0' => 'If you only sell goods, you cannot sell digital services. change one of these options.',
-        'message_validate_conflicting_shop_options_1' => 'If you only sell digital services, you should select that you only sell services on the "Nature" field.',
         'message_validate_conflicting_shop_options_2' => 'If you only sell services, you cannot sell using the margin scheme. change one of these options.',
         'message_validate_conflicting_shop_options_3' => 'If you only sell using the margin scheme, you should select that you only sell goods on the "Nature" field.',
 
@@ -426,17 +426,21 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'option_nature_3' => 'Only services.',
         'desc_nature_shop' => 'Select whether you sell products and/or services. In Acumulus this is the field "Nature" ("Soort"). NOTE: this settings only concerns the items in your "catalog", not shipping, handling, packing, or payment fees.',
 
-        'field_digitalServices' => 'Do you sell digital services?',
-        'option_digitalServices_1' => 'Both digital services and normal products or services.',
-        'option_digitalServices_2' => 'Only products or services that are subject to dutch VAT.',
-        'option_digitalServices_3' => 'Only digital services subject to foreign VAT for EU customers.',
-        'desc_digitalServices' => 'Select whether your store offers digital services that are subject to foreign VAT for EU customers.
-See <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/btw_berekenen_bij_diensten/wijziging_in_digitale_diensten_vanaf_2015/wijziging_in_digitale_diensten_vanaf_2015" target="_blank">Dutch tax office: services to other EU countries (in dutch)</a>.',
+        'field_foreignVat' => 'Do you sell products or services that are subject to foreign VAT for EU customers?',
+        'option_foreignVat_1' => 'Products or services that are subject to Dutch VAT and those that are subject to foreign VAT for EU customers.',
+        'option_foreignVat_2' => 'Only products or services that are subject to Dutch VAT.',
+        'option_foreignVat_3' => 'Only products or services that are subject to foreign VAT for EU customers.',
+        'desc_foreignVat' => 'Indicate if you sell products or servies where yo have to apply foreign VAT rates for EU customers.
+These can be, a.o, <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/btw_berekenen_bij_diensten/wijziging_in_digitale_diensten_vanaf_2015/wijziging_in_digitale_diensten_vanaf_2015" target="_blank">digital services</a>
+or <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/export_van_specifieke_goederen_en_in_bijzondere_situaties/export_van_accijnsgoederen/export_accijnsgoederen_naar_eu_landen" target="_blank">excise goods</a>.
+See <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/export_van_specifieke_goederen_en_in_bijzondere_situaties/export_van_specifieke_goederen_en_in_bijzondere_situaties" target="_blank">Tax office: Export of specific goods and special cases</a>.
+Note: as of 2019 there is a <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/btw_berekenen_bij_diensten/wijziging_in_digitale_diensten_vanaf_2015/wijziging_in_digitale_diensten_vanaf_2015" target="_blank">threshold for digital services</a>.
+If you remain under that threshold you may apply Dutch VAT.',
 
         'field_foreignVatClasses' => 'Which vat classes define EU vat rates?',
         'desc_foreignVatClasses' => 'Indicate which of these vat classes are used for products or services that are subject to foreign VAT for EU customers.
  Using the "Ctrl" key, you can select/deselect multiple items.
- Except for the above mentioned digital services this may also apply with <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/export_van_specifieke_goederen_en_in_bijzondere_situaties/export_van_specifieke_goederen_en_in_bijzondere_situaties" target="_blank">Export of specific products or special cases (in dutch)</a>.',
+ Except for the above mentioned digital services this may also apply with <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/export_van_specifieke_goederen_en_in_bijzondere_situaties/export_van_specifieke_goederen_en_in_bijzondere_situaties" target="_blank">Export of specific products or special cases (in Dutch)</a>.',
 
         'field_vatFreeProducts' => 'Do you sell VAT free products or services?',
         'option_vatFreeProducts_1' => 'Both VAT free and VAT liable products or services.',
@@ -448,7 +452,7 @@ See <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belasti
         'option_marginProducts_1' => 'New products and/or services as well as products that use the margin scheme.',
         'option_marginProducts_2' => 'Only new products and/or services.',
         'option_marginProducts_3' => 'Only products that use the margin scheme.',
-        'desc_marginProducts' => 'Select whether your store sells (2nd hand) products using the margin scheme. See <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/bijzondere_regelingen/margeregeling/margeregeling" target="_blank">Dutch tax office: margin goods (in dutch)</a>.',
+        'desc_marginProducts' => 'Select whether your store sells (2nd hand) products using the margin scheme. See <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/bijzondere_regelingen/margeregeling/margeregeling" target="_blank">Dutch tax office: margin goods (in Dutch)</a>.',
 
         // Trigger settings.
         'triggerSettingsHeader' => 'When to have your invoices sent to Acumulus.',
@@ -465,7 +469,7 @@ See <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belasti
         'desc_triggerInvoiceEvent' => 'Select if and on which webshop invoice event to send the invoice to Acumulus. If you select "Do not send automatically" you can use the send batch form, or you can set one or more order statuses above to trigger the sending of the invoice.',
 
         // Tokens
-        'tokenHelpHeader' => 'Field references',
+        'tokenHelpHeader' => 'Explanation of field references',
         'desc_tokens' => '<p>This form contains a number of fields that may contain "field references".
 This means that besides free literal text, these fields can contain data from the order, customer and customer address.
 Field references are denoted by placing the name of the property between square brackets, ie. [ and ].

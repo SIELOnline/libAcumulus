@@ -20,8 +20,12 @@ WC3 = WooCommerce 3 (WordPress)
 5.5.0 (2018-11-??)
 ------------------
 Features:
-- ALL: differentiate between invoice type 1 and 6 for countries having the same
-  vat rate as NL:
+- ALL: There are more products than the digital services that are subject to
+  foreign vat for EU customers:
+  - Rephrase everything that has to do with digital services (vat type 6).
+  - Rename option digitalServices to foreignVat.
+- ALL: better differentiate between invoice type 1 and 6 for countries having
+  the same vat rate as NL:
   * Meta::VatRateLookupLabel is now also an array.
   * Add vat class information as metadata.
   * Add method ShopCapabilities::getVatClasses().
@@ -35,9 +39,13 @@ Features:
 - ALL: Make "property specification not found" a debug level message.
 - JOO: Access rights revisited so that menu-items remain visible in the admin
   menu for people who only have access to the batch send form.
+- WC: Now supports WC3.5 and WP5. Better update handling.
+- WC2: show message that support for WC2 will end with a next version.
 - Improved precision handling: getVatRangeTags() now adds the precision meta
   tags, removed from the shop specific Creator classes.
 Bugs:
+- ALL: Capitalise country adjectives (e.g. dutch -> Dutch) in code documentation
+  and comments).
 - MA: The size attribute on a multi select form element was not taken from our
   form settings.
 - WC3: Since WC3, the shipping tax class can be "inherited" from the product

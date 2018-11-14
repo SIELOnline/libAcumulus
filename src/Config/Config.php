@@ -837,6 +837,7 @@ class Config
                     'type' => 'int',
                     'default' => PluginConfig::Nature_Unknown,
                 ),
+                // @todo: is deze nog wel nodig als we de foreign vat tax classes hebben?
                 'foreignVat' => array(
                     'group' => 'shop',
                     'type' => 'int',

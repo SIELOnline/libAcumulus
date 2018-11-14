@@ -17,7 +17,7 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies)
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
-5.5.0 (2018-11-??)
+5.5.0 (2018-11-14)
 ------------------
 Features:
 - ALL: There are more products than the digital services that are subject to
@@ -40,7 +40,7 @@ Features:
 - JOO: Access rights revisited so that menu-items remain visible in the admin
   menu for people who only have access to the batch send form.
 - WC: Now supports WC3.5 and WP5. Better update handling.
-- WC2: show message that support for WC2 will end with a next version.
+- WC2: show message that support for WC2 will end in a next version.
 - Improved precision handling: getVatRangeTags() now adds the precision meta
   tags, removed from the shop specific Creator classes.
 Bugs:

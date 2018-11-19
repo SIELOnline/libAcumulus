@@ -3,16 +3,20 @@
 /**
  * Registers an autoloader for the Siel\Acumulus namespace.
  *
- * As not all web shops support auto-loading based on namespaces or have
- * other glitches, eg. expecting lower cased file names, we define our own
- * autoloader. If the module cannot use the autoloader of the web shop, this
- * file/class should be loaded during bootstrapping of the module and the
- * register method should called.
- *
  * Thanks to https://gist.github.com/mageekguy/8300961
  */
 class SielAcumulusAutoloader
 {
+  /**
+   * Registers an autoloader for the Siel\Acumulus namespace.
+   *
+   * As not all web shops support auto-loading based on namespaces or have
+   * other glitches, eg. expecting lower cased file names, we define our own
+   * autoloader. If the module cannot use the autoloader of the web shop, this
+   * method should be called during bootstrapping of the module.
+   *
+   * Thanks to https://gist.github.com/mageekguy/8300961
+   */
     public static function register()
     {
         // In some shops (OpenCart1) there's not one central entry point and
@@ -32,8 +36,8 @@ class SielAcumulusAutoloader
                     }
                 }
             };
-            // Prepend this autoloader: it will not throw, nor warn, while the shop
-            // specific autoloader might do so.
+            // Prepend this autoloader: it will not throw, nor warn, while the
+            // shop specific autoloader might do so.
             spl_autoload_register($autoloadFunction, true, true);
             $hasBeenRegistered = true;
         }

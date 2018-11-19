@@ -2,9 +2,10 @@
 namespace Siel\Acumulus\PrestaShop\Shop;
 
 use Db;
-use Siel\Acumulus\Helpers\ContainerInterface;
+use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Invoice\Source;
+use Siel\Acumulus\PluginConfig;
 use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
 use Siel\Acumulus\Shop\AcumulusEntryManager as BaseAcumulusEntryManager;
 
@@ -33,7 +34,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    public function __construct(ContainerInterface $container, Log $log)
+    public function __construct(Container $container, Log $log)
     {
         parent::__construct($container, $log);
         $this->tableName = _DB_PREFIX_ . 'acumulus_entry';
@@ -115,7 +116,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      */
     protected function sqlNow()
     {
-        return date('Y-m-d H:i:s');
+        return date(PluginConfig::TimeStampFormat_Sql);
     }
 
     /**
@@ -148,7 +149,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     }
 
     /**
-     * Wrapper method around teh Db instance.
+     * Wrapper method around the Db instance.
      *
      * @return \Db
      */

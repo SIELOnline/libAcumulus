@@ -106,9 +106,9 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    public function getPaymentState()
+    public function getPaymentStatus()
     {
-        // Assumption: credit slips are always in a paid state.
+        // Assumption: credit slips are always in a paid status.
         if (($this->getType() === Source::Order && $this->source->hasBeenPaid()) || $this->getType() === Source::CreditNote) {
             $result = Api::PaymentStatus_Paid;
         } else {
@@ -173,7 +173,7 @@ class Source extends BaseSource
      * This override provides the values meta-invoice-amountinc and
      * meta-invoice-amount.
      */
-    public function getTotals()
+    protected function getAvailableTotals()
     {
         $sign = $this->getSign();
         if ($this->getType() === Source::Order) {
@@ -224,7 +224,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    protected function getShopOrderId()
+    protected function getShopOrderOrId()
     {
         /** @var \OrderSlip $orderSlip */
         $orderSlip = $this->source;
@@ -234,7 +234,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    protected function getShopCreditNotes()
+    protected function getShopCreditNotesOrIds()
     {
         /** @var \Order $order */
         $order = $this->source;

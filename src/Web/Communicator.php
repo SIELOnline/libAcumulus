@@ -6,53 +6,59 @@ use DOMElement;
 use LibXMLError;
 use RuntimeException;
 use Siel\Acumulus\Api;
-use Siel\Acumulus\Config\ConfigInterface;
-use Siel\Acumulus\Helpers\ContainerInterface;
+use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
-use Siel\Acumulus\Helpers\TranslatorInterface;
+use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\PluginConfig;
 
 /**
- * Communication implements the communication with the Acumulus WebAPI.
+ * Communicator implements the communication with the Acumulus WebAPI.
  *
  * It offers:
  * - Conversion between array and XML.
  * - Conversion from Json to array.
- * - (https) Communication with the Acumulus webservice using the curl library.
- * - Good error handling during communication.
+ * - (https) Communication with the Acumulus webservice using the curl library:
+ *   setting up the connection, sending the request, receiving the response.
+ * - Good error handling.
  */
-class Communicator implements CommunicatorInterface
+class Communicator
 {
-    /** @var \Siel\Acumulus\Config\ConfigInterface */
+    /** @var \Siel\Acumulus\Config\Config */
     protected $config;
 
     /** @var \Siel\Acumulus\Helpers\Log */
     protected $log;
 
-    /** @var \Siel\Acumulus\Helpers\ContainerInterface */
+    /** @var \Siel\Acumulus\Helpers\Container */
     protected $container;
 
-    /** @var \Siel\Acumulus\Helpers\TranslatorInterface */
+    /** @var \Siel\Acumulus\Helpers\Translator */
     protected $translator;
 
     /**
      * Communicator constructor.
      *
-     * @param \Siel\Acumulus\Config\ConfigInterface $config
+     * @param \Siel\Acumulus\Helpers\Container $container
+     * @param \Siel\Acumulus\Config\Config $config
+     * @param \Siel\Acumulus\Helpers\Translator $translator
      * @param \Siel\Acumulus\Helpers\Log $log
-     * @param \Siel\Acumulus\Helpers\ContainerInterface $container
-     * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
      */
-    public function __construct(ConfigInterface $config, Log $log, ContainerInterface $container, TranslatorInterface $translator)
+    public function __construct(Container $container, Config $config, Translator $translator, Log $log)
     {
-        $this->config = $config;
-        $this->log = $log;
         $this->container = $container;
+        $this->config = $config;
         $this->translator = $translator;
+        $this->log = $log;
     }
 
     /**
-     * {@inheritdoc}
+     * Returns the uri to the requested API call.
+     *
+     * @param string $apiFunction
+     *
+     * @return string
+     *   The uri to the requested API call.
      */
     public function getUri($apiFunction)
     {
@@ -62,7 +68,20 @@ class Communicator implements CommunicatorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Sends a message to the given API function and returns the results.
+     *
+     * @param string $apiFunction
+     *   The API function to invoke.
+     * @param array $message
+     *   The values to submit.
+     * @param \Siel\Acumulus\Web\Result $result
+     *   It is possible to already create a Result object before calling the Web
+     *   Service to store local messages. By passing this Result object these
+     *   local messages will be merged with any remote messages in the returned
+     *   Result object.
+     *
+     * @return \Siel\Acumulus\Web\Result
+     *   A Result object containing the results.
      */
     public function callApiFunction($apiFunction, array $message, Result $result = null)
     {
@@ -222,15 +241,20 @@ class Communicator implements CommunicatorInterface
         }
 
         // Configure the curl connection.
+        // Since 2017-09-19 the Acumulus web service only accepts TLS 1.2.
+        // - Apparently, some curl libraries do support this version but do not
+        //   use it by default, so we force it.
+        // - Apparently, some up-to-date curl libraries do not define this
+        //   constant,so we define it, if not defined.
+        if (!defined('CURL_SSLVERSION_TLSv1_2')) {
+            define('CURL_SSLVERSION_TLSv1_2', 6);
+        }
         $options = array(
             CURLOPT_URL => $uri,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => $post,
-            // Since 2017-09-19 the Acumulus web service only accepts TLS 1.2.
-            // Apparently, some libraries do support this version but do not use
-            // it by default, so we force it.
             CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1_2,
             //CURLOPT_PROXY => '127.0.0.1:8888', // Uncomment to debug with Fiddler.
         );

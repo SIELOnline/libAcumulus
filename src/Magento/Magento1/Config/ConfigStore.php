@@ -9,17 +9,53 @@ use Siel\Acumulus\Config\ConfigStore as BaseConfigStore;
  */
 class ConfigStore extends BaSeConfigStore
 {
-    protected $configKey = 'siel_acumulus/';
+    protected $configPath = 'siel_acumulus/';
 
     /**
      * {@inheritdoc}
      */
-    public function load(array $keys)
+    public function load()
+    {
+        // Load the values from the web shop specific configuration.
+        $values = Mage::getStoreConfig($this->configPath . $this->configKey);
+        $values = unserialize($values);
+        return $values;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function save(array $values)
+    {
+        $values = serialize($values);
+        /** @var \Mage_Core_Model_Config $configModel */
+        $configModel = Mage::getModel('core/config');
+        $configModel->saveConfig($this->configPath . $this->configKey, $values);
+        // Reset the config cache,so our subsequent load() will receive the new
+        // values.
+        /** @noinspection PhpUnhandledExceptionInspection */
+        Mage::app()->getStore()->resetConfig();
+        return true;
+    }
+
+    /**
+     * {@deprecated} Only still here for use during update.
+     *
+     * @param array $keys
+     *
+     * @return array
+     */
+    public function loadOld(array $keys)
     {
         $result = array();
+        /** @var \Mage_Core_Model_Config $configModel */
+        $configModel = Mage::getModel('core/config');
         // Load the values from the web shop specific configuration.
         foreach ($keys as $key) {
-            $value = Mage::getStoreConfig($this->configKey . $key);
+            $value = Mage::getStoreConfig($this->configPath . $key);
+            // Delete the value, this will only be used one more time: during
+            // updating to 5.4.0.
+            $configModel->deleteConfig($this->configPath . $key);
             // Do not overwrite defaults if no value is set.
             if (isset($value)) {
                 if (is_string($value) && strpos($value, '{') !== false) {
@@ -32,29 +68,5 @@ class ConfigStore extends BaSeConfigStore
             }
         }
         return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function save(array $values)
-    {
-        /** @var \Mage_Core_Model_Config $configModel */
-        $configModel = Mage::getModel('core/config');
-        $defaults = $this->acumulusConfig->getDefaults();
-        foreach ($values as $key => $value) {
-            if ((isset($defaults[$key]) && $defaults[$key] === $value) || $value === null) {
-                $configModel->deleteConfig($this->configKey . $key);
-            } else {
-                if (is_bool($value)) {
-                    $value = $value ? 1 : 0;
-                } elseif (is_array($value)) {
-                    $value = serialize($value);
-                }
-                $configModel->saveConfig($this->configKey . $key, $value);
-            }
-        }
-        Mage::getConfig()->reinit();
-        return true;
     }
 }

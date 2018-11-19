@@ -3,6 +3,7 @@ namespace Siel\Acumulus\Joomla\VirtueMart\Config;
 
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Joomla\Config\ShopCapabilities as ShopCapabilitiesBase;
+use VirtueMartModelCalc;
 use VirtueMartModelOrderstatus;
 use VmModel;
 
@@ -14,9 +15,20 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getTokenInfo()
+    public function getTokenInfoSource()
     {
-        return parent::getTokenInfo() + array(
+        return array(
+            'more-info' => $this->t('see_properties_below'),
+            'properties' => array(),
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getTokenInfoShopProperties()
+    {
+        return array(
             'BT' => array(
                 'table' => array('virtuemart_orders', 'virtuemart_order_userinfos'),
                 'properties' => array(
@@ -185,12 +197,35 @@ class ShopCapabilities extends ShopCapabilitiesBase
     {
         /** @var VirtueMartModelOrderstatus $orderStatusModel */
         $orderStatusModel = VmModel::getModel('orderstatus');
-        /** @var array[] $orderStates Method getOrderStatusNames() has an incorrect @return type ... */
-        $orderStates = $orderStatusModel->getOrderStatusNames();
-        foreach ($orderStates as $code => &$value) {
+        /** @var array[] $orderStatuses Method getOrderStatusNames() has an incorrect @return type ... */
+        $orderStatuses = $orderStatusModel->getOrderStatusNames();
+        foreach ($orderStatuses as $code => &$value) {
             $value = \JText::_($value['order_status_name']);
         }
-        return $orderStates;
+        return $orderStatuses;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * VirtueMart does not group collections of tax rates into a tax class, but
+     * can assign a different tax rate (calc rules) to a product - user group
+     * combination. I guess that's how to implement foreign vat goods in
+     * VirtueMart. This means that users should define different tax calc rules
+     * for each country - rate combination, even if the rates are the same,
+     * otherwise this plugin might still not be able to distinguish between
+     * Dutch and Belgium 21% vat.
+     */
+    public function getVatClasses()
+    {
+        $result = array();
+        /** @var \TableCalcs[] $taxes */
+        $taxes = VirtueMartModelCalc::getTaxes();
+        foreach ($taxes as $tax) {
+            $result[$tax->virtuemart_calc_id] = $tax->calc_name;
+        }
+
+        return $result;
     }
 
     /**

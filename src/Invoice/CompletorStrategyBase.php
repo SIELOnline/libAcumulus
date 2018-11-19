@@ -1,8 +1,8 @@
 <?php
 namespace Siel\Acumulus\Invoice;
 
-use Siel\Acumulus\Config\ConfigInterface;
-use Siel\Acumulus\Helpers\TranslatorInterface;
+use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
 
@@ -13,10 +13,10 @@ use Siel\Acumulus\Tag;
  */
 abstract class CompletorStrategyBase
 {
-    /** @var \Siel\Acumulus\Config\ConfigInterface */
+    /** @var \Siel\Acumulus\Config\Config */
     protected $config;
 
-    /** @var \Siel\Acumulus\Helpers\TranslatorInterface */
+    /** @var \Siel\Acumulus\Helpers\Translator */
     protected $translator;
 
     /** @var int Indication of the order of execution of the strategy. */
@@ -91,14 +91,14 @@ abstract class CompletorStrategyBase
     protected $source;
 
     /**
-     * @param \Siel\Acumulus\Config\ConfigInterface $config
-     * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
+     * @param \Siel\Acumulus\Config\Config $config
+     * @param \Siel\Acumulus\Helpers\Translator $translator
      * @param array $invoice
      * @param array $possibleVatTypes
      * @param array $possibleVatRates
      * @param \Siel\Acumulus\Invoice\Source $source
      */
-    public function __construct(ConfigInterface $config, TranslatorInterface $translator, array $invoice, array $possibleVatTypes, array $possibleVatRates, Source $source)
+    public function __construct(Config $config, Translator $translator, array $invoice, array $possibleVatTypes, array $possibleVatRates, Source $source)
     {
         $this->config = $config;
         $this->translator = $translator;
@@ -327,7 +327,12 @@ abstract class CompletorStrategyBase
         if ($this->checkPreconditions()) {
             return $this->execute();
         } else {
-            $this->invoice[Tag::Customer][Tag::Invoice][Meta::StrategyCompletorPreconditionFailed] = $this->getName();
+            if (!empty($this->invoice[Tag::Customer][Tag::Invoice][Meta::CompletorStrategyPreconditionFailed])) {
+                $this->invoice[Tag::Customer][Tag::Invoice][Meta::CompletorStrategyPreconditionFailed] .= ', ';
+            } else {
+                $this->invoice[Tag::Customer][Tag::Invoice][Meta::CompletorStrategyPreconditionFailed] = '';
+            }
+            $this->invoice[Tag::Customer][Tag::Invoice][Meta::CompletorStrategyPreconditionFailed] .= $this->getName();
             return false;
         }
     }

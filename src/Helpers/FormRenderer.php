@@ -10,18 +10,18 @@ namespace Siel\Acumulus\Helpers;
  *
  * SECURITY REMARKS
  * ----------------
- * - All values (inputs) and texts (between opening and closing tag) are passed
- *   through htmlspecialchars().
+ * - All values (inputs) and texts between opening and closing tags are passed
+ *   through {@see htmlspecialchars()}.
  * - The exceptions being:
- *   * A label prefix and postfix that come from code and may contain html.
- *     @see FormRenderer::renderLabel().
- *   * markup is rendered as is as it may containhtml, therefore its name ...
- *     @see FormRenderer::markup();
+ *     * A label prefix and postfix that come from code and may contain html.
+ *       See {@see FormRenderer::renderLabel()}.
+ *     * markup is rendered as is as it may contain html (therefore its name
+ *       markup ...). See {@see FormRenderer::markup()};
  * - All tags come from object properties or are hard coded and thus present no
- *   security risk but they are passed through htmlspecialchars() anyway. @see
- *   FormRenderer::getOpenTag() and FormRenderer::getCloseTag().
- * - All attributes, name and value are passed through htmlpecialchars(). @see
- *   FormRenderer::renderAttributes().
+ *   security risk but they are passed through htmlspecialchars() anyway. See
+ *   {@see FormRenderer::getOpenTag()} and {@see FormRenderer::getCloseTag()}.
+ * - All attributes, name and value are passed through htmlpecialchars(). See
+ *   {@see FormRenderer::renderAttributes()}.
  */
 class FormRenderer
 {
@@ -43,10 +43,22 @@ class FormRenderer
     protected $fieldsetWrapperClass = '';
 
     /** @var string */
+    protected $detailsWrapperTag = 'details';
+
+    /** @var string */
+    protected $detailsWrapperClass = '';
+
+    /** @var string */
     protected $legendWrapperTag = 'legend';
 
     /** @var string */
     protected $legendWrapperClass = '';
+
+    /** @var string */
+    protected $summaryWrapperTag = 'summary';
+
+    /** @var string */
+    protected $summaryWrapperClass = '';
 
     /** @var string */
     protected $fieldsetDescriptionWrapperTag = 'div';
@@ -54,10 +66,18 @@ class FormRenderer
     /** @var string */
     protected $fieldsetDescriptionWrapperClass = 'fieldset-description';
 
-    /** @var string */
+    /**
+     * Also used for details content.
+     *
+     * @var string
+     */
     protected $fieldsetContentWrapperTag = '';
 
-    /** @var string */
+    /**
+     * Also used for details content.
+     *
+     * @var string
+     */
     protected $fieldsetContentWrapperClass = 'fieldset-content';
 
     /** @var string */
@@ -109,10 +129,10 @@ class FormRenderer
     protected $checkbox1WrapperClass = '';
 
     /** @var string */
-    protected $multiLabelTag = 'span';
+    protected $multiLabelTag = 'label';
 
     /** @var string */
-    protected $multiLabelClass = 'label';
+    protected $multiLabelClass = '';
 
     /** @var string */
     protected $descriptionWrapperTag = 'div';
@@ -135,6 +155,9 @@ class FormRenderer
     /** @var Form */
     protected $form;
 
+    /** @var int */
+    protected $htmlSpecialCharsFlag;
+
     /**
      * Sets the value of a property of this object.
      *
@@ -147,7 +170,7 @@ class FormRenderer
      */
     public function setProperty($property, $value)
     {
-        if (property_exists($this, $property) && !in_Array($property, array('form'))) {
+        if (property_exists($this, $property) && !in_array($property, array('form'))) {
             $this->$property = $value;
         }
         return $this;
@@ -162,6 +185,10 @@ class FormRenderer
      */
     public function render(Form $form)
     {
+        $this->htmlSpecialCharsFlag = ENT_NOQUOTES;
+        if (defined('ENT_HTML5')) {
+            $this->htmlSpecialCharsFlag |= $this->html5 ? ENT_HTML5 : ENT_HTML401;
+        }
         $this->form = $form;
         $this->form->addValues();
         return $this->fields($this->form->getFields());
@@ -203,7 +230,7 @@ class FormRenderer
         if (!isset($field['attributes'])) {
             $field['attributes'] = array();
         }
-        $output .= $field['type'] === 'fieldset' ? $this->renderFieldset($field) : $this->renderField($field);
+        $output .= !empty($field['fields']) ? $this->renderFieldset($field) : $this->renderField($field);
         return $output;
     }
 
@@ -234,11 +261,12 @@ class FormRenderer
     protected function fieldsetBegin(array $field)
     {
         $output = '';
-        $output .= $this->getWrapper('fieldset', $field['attributes']);
-        if (!empty($field['legend'])) {
-            $output .= $this->getWrapper('legend', $field['attributes']);
-            $output .= $field['legend'];
-            $output .= $this->getWrapperEnd('legend');
+        $output .= $this->getWrapper($field['type'], $field['attributes']);
+        $titleTag = $field['type'] === 'fieldset' ? 'legend' : 'summary';
+        if (!empty($field[$titleTag])) {
+            $output .= $this->getWrapper($titleTag, $field['attributes']);
+            $output .= $field[$titleTag];
+            $output .= $this->getWrapperEnd($titleTag);
         }
         $output .= $this->getWrapper('fieldsetContent');
         if (!empty($field['description'])) {
@@ -254,11 +282,11 @@ class FormRenderer
      *
      * @return string
      */
-    protected function fieldsetEnd(/** @noinspection PhpUnusedParameterInspection */ array $field)
+    protected function fieldsetEnd(array $field)
     {
         $output = '';
         $output .= $this->getWrapperEnd('fieldsetContent');
-        $output .= $this->getWrapperEnd('fieldset');
+        $output .= $this->getWrapperEnd($field['type']);
         return $output;
     }
 
@@ -296,7 +324,7 @@ class FormRenderer
 
         if ($type !== 'hidden') {
             $output .= $this->getWrapper('element');
-            $output .= $this->renderLabel($label, $type !== 'radio' && $type !== 'checkbox' ? $id : null, $labelAttributes);
+            $output .= $this->renderLabel($label, in_array($type, array('radio', 'checkbox', 'markup')) ? null : $id, $labelAttributes);
             $output .= $this->getWrapper('inputDescription');
         }
         $output .= $this->renderElement($type, $id, $name, $value, $attributes, $options);
@@ -410,7 +438,7 @@ class FormRenderer
         $postfix .= !empty($attributes['required']) ? $this->requiredMarkup : '';
         $tag = empty($id) ? $this->multiLabelTag : 'label';
         $output .= $this->getOpenTag($tag, $attributes);
-        $output .= $prefix . htmlspecialchars($text, ENT_NOQUOTES, 'UTF-8') . $postfix;
+        $output .= $prefix . htmlspecialchars($text, $this->htmlSpecialCharsFlag, 'UTF-8') . $postfix;
         $output .= $this->getCloseTag($tag);
 
         // Tag around labels.
@@ -489,7 +517,7 @@ class FormRenderer
         $attributes = $this->addAttribute($attributes, 'id', $id);
         $attributes = $this->addAttribute($attributes, 'name', $name);
         $output .= $this->getOpenTag('textarea', $attributes);
-        $output .= htmlspecialchars($value, ENT_NOQUOTES, 'UTF-8');
+        $output .= htmlspecialchars($value, $this->htmlSpecialCharsFlag, 'UTF-8');
         $output .= $this->getCloseTag('textarea');
 
         // Tag around input element.
@@ -589,7 +617,7 @@ class FormRenderer
                 $optionAttributes['selected'] = true;
             }
             $output .= $this->getOpenTag('option', $optionAttributes);
-            $output .= htmlspecialchars($text, ENT_NOQUOTES, 'UTF-8');
+            $output .= htmlspecialchars($text, $this->htmlSpecialCharsFlag, 'UTF-8');
             $output .= $this->getCloseTag('option');
         }
 
@@ -799,7 +827,7 @@ class FormRenderer
      */
     protected function getOpenTag($tag, array $attributes = array(), $selfClosing = false)
     {
-        return '<' . htmlspecialchars($tag) . $this->renderAttributes($attributes) . ($selfClosing && !$this->html5 ? '/' : '') . '>';
+        return '<' . htmlspecialchars($tag, ENT_QUOTES) . $this->renderAttributes($attributes) . ($selfClosing && !$this->html5 ? '/' : '') . '>';
     }
 
     /**
@@ -813,7 +841,7 @@ class FormRenderer
      */
     protected function getCloseTag($tag)
     {
-        return '</' . htmlspecialchars($tag) .'>';
+        return '</' . htmlspecialchars($tag, ENT_QUOTES) .'>';
     }
 
     /**

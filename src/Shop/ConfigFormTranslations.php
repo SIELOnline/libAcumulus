@@ -30,17 +30,21 @@ class ConfigFormTranslations extends TranslationCollection
         'message_uninstall' => 'Wilt u de configuratie-instellingen verwijderen?',
 
         'message_error_header' => 'Fout in uw Acumulus accountgegevens',
-        'message_error_auth' => 'Uw Acumulus accountgegevens zijn onjuist. Zodra u %2$s de correcte gevens hebt ingevuld, worden hier de %1$s instellingen getoond.',
+        'message_error_auth' => 'Uw Acumulus accountgegevens zijn onjuist. Zodra u %2$s de correcte gegevens hebt ingevuld, worden hier de %1$s instellingen getoond.',
+        'message_error_forb' => 'Uw Acumulus accountgegevens zijn juist maar staan geen toegang via de web service toe. Zodra u %2$s correcte gegevens hebt ingevuld, worden hier de %1$s instellingen getoond.',
         'message_error_comm' => 'Er is een fout opgetreden bij het ophalen van uw gegevens van Acumulus. Probeer het later nog eens. Zodra de verbinding hersteld is worden hier de %1$s instellingen getoond.',
         'message_auth_unknown' => 'Zodra u %2$s uw Acumulus accountgegevens hebt ingevuld, worden %1$s de overige instellingen getoond.',
         'message_error_arg1_config' => 'overige',
         'message_error_arg1_advanced' => 'geavanceerde',
         'message_error_arg2_config' => 'hier',
         'message_error_arg2_advanced' => 'in het "Acumulus basisinstellingenformulier"',
+        'message_warning_role_deprecated' => 'U gebruikt accountgegevens met een gebruikerstype dat binnenkort niet meer gebruikt kan worden om de Acumulus API mee te benaderen. Voeg een andere gebruiker toe met gebruikerstype API-Gebruiker of verander het gebruikerstype van de huidige gebruiker.',
+        'message_warning_role_insufficient' => 'U gebruikt een account met het gebruikerstype API-Invoerder. Dit gebruikerstype heeft niet alle rechten die deze plugin gebruikt. Verander het gebruikerstype van de huidige gebruiker naar API-Gebruiker of voeg een andere gebruiker toe.',
+        'message_warning_role_overkill' => 'U gebruikt een account met het gebruikerstype API-Beheerder. Dit gebruikerstype heeft meer rechten dan deze plugin nodig heeft. Wij raden u aan om het gebruikerstype te veranderen naar API-Gebruiker.',
 
         // Account settings.
         'accountSettingsHeader' => 'Uw Acumulus account',
-        'desc_accountSettings' => 'Vul hier de gegevens in die u in de welkomstmail heeft ontvangen, of beter nog: u kunt in Acumulus ook een extra gebruiker aanmaken onder "Beheer → Gebruikers → Gebruiker toevoegen". Vul "api - koppeling" in als "Gebruikerstype", deze heeft minder rechten dan een "beheerder" en is dus veiliger.',
+        'desc_accountSettings' => 'Log in op Acumulus en voeg een gebruiker toe onder "Beheer → Gebruikers → Gebruiker toevoegen". Vul "API - Gebruiker" in als "Gebruikerstype".',
 
         'field_code' => 'Contractcode',
         'field_username' => 'Gebruikersnaam',
@@ -57,23 +61,50 @@ class ConfigFormTranslations extends TranslationCollection
         'message_validate_password_2' => 'Het veld Wachtwoord bevat tekens die Acumulus verbiedt (`\'"#%&;<>\\). Weet u zeker dat u het juiste wachtwoord heeft ingetypt?',
         'message_validate_email_0' => 'Het veld Email is geen valide e-mailadres, vul uw eigen e-mailadres in.',
         'message_validate_email_1' => 'Het veld Email is verplicht, vul uw eigen e-mailadres in.',
+        'message_validate_nature_0' => 'Het veld \'Soort: wat verkoopt u?\' is verplicht, kies een waarde.',
+        'message_validate_foreign_vat_0' => 'Het veld \'Verkoopt u producten of diensten waarbij u EU btw moet hanteren?\' is verplicht, kies een waarde.',
+        'message_validate_vat_free_products_0' => 'Het veld \'Verkoopt u van btw vrijgestelde producten of diensten?\' is verplicht, kies een waarde.',
+        'message_validate_margin_products_0' => 'Het veld \'Verkoopt u margegoederen?\' is verplicht, kies een waarde.',
+        'message_validate_conflicting_shop_options_2' => 'Als u alleen diensten verkoopt, kunt u geen margegoederen verkopen. Pas één van deze opties aan.',
+        'message_validate_conflicting_shop_options_3' => 'Als u alleen margegoederen verkoopt, vink dan bij "Soort" aan dat u alleen producten verkoopt.',
 
         // Shop settings.
         'shopSettingsHeader' => 'Over uw winkel',
-        'desc_shopSettings' => 'Met behulp van deze instellingen kan de koppeling beter: het <a href="https://wiki.acumulus.nl/index.php?page=127" target="_blank">factuurtype</a> bepalen; controles uitvoeren; en btw tarieven terugrekenen.',
+        'desc_shopSettings' => 'Met behulp van deze instellingen kan de koppeling beter: het <a href="https://wiki.acumulus.nl/index.php?page=facturen-naar-het-buitenland" target="_blank">factuurtype</a> bepalen; controles uitvoeren; en btw tarieven terugrekenen.',
 
-        'field_digitalServices' => 'Verkoopt u digitale diensten?',
-        'option_digitalServices_1' => 'Zowel digitale diensten als normale producten.',
-        'option_digitalServices_2' => 'Alleen producten die onder Nederlandse btw vallen.',
-        'option_digitalServices_3' => 'Alleen digitale diensten die met buitenlandse btw belast moeten worden voor buitenlandse klanten.',
-        'desc_digitalServices' => 'Geef aan of u in uw winkel digitale diensten aanbiedt waarbij u buitenlandse btw moet hanteren voor EU klanten.
-Zie <a href="http://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/btw_berekenen_bij_diensten/wijziging_in_digitale_diensten_vanaf_2015/wijziging_in_digitale_diensten_vanaf_2015" target="_blank">Belastingdienst: diensten naar andere EU landen</a>.',
+        'field_nature_shop' => 'Soort: wat verkoopt u?',
+        'option_nature_1' => 'Zowel producten als diensten.',
+        'option_nature_2' => 'Alleen producten.',
+        'option_nature_3' => 'Alleen diensten.',
+        'desc_nature_shop' => 'Geef aan of u in uw winkel producten en/of diensten aanbiedt. In Acumulus is dit het veld "Soort". LET OP: deze instelling betreft alleen de artikelen in uw catalogus, niet verzend, handling, verpakkings, of betaalkosten.',
+
+        'field_foreignVat' => 'Verkoopt u producten of diensten waarbij u EU btw moet hanteren?',
+        'option_foreignVat_1' => 'Zowel producten en/of diensten die onder Nederlandse btw vallen als die waarbij u het btw tarief van het EU land waaraan u levert moet hanteren.',
+        'option_foreignVat_2' => 'Alleen producten en/of diensten die onder Nederlandse btw vallen.',
+        'option_foreignVat_3' => 'Alleen producten en/of diensten waarbij u het btw tarief van het EU land waaraan u levert moet hanteren.',
+        'desc_foreignVat' => 'Geef aan of u in uw winkel goederen en/of diensten aanbiedt waarbij u voor EU klanten het btw tarief van het land waaraan u levert moet hanteren.
+Dit kunnen bv. <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/btw_berekenen_bij_diensten/wijziging_in_digitale_diensten_vanaf_2015/wijziging_in_digitale_diensten_vanaf_2015" target="_blank">digitale diensten</a>
+of <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/export_van_specifieke_goederen_en_in_bijzondere_situaties/export_van_accijnsgoederen/export_accijnsgoederen_naar_eu_landen" target="_blank">accijnsgoederen</a> zijn.
+Zie <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/export_van_specifieke_goederen_en_in_bijzondere_situaties/export_van_specifieke_goederen_en_in_bijzondere_situaties" target="_blank">Belastingdienst: Export van specifieke goederen en bijzondere situaties</a>.
+Let op: vanaf 2019 geldt er een <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/btw_berekenen_bij_diensten/wijziging_in_digitale_diensten_vanaf_2015/wijziging_in_digitale_diensten_vanaf_2015" target="_blank">drempelbedrag voor digitale diensten</a>.
+Als u daaronder blijft mag u gewoon Nederlandse btw berekenen.',
+
+        'field_foreignVatClasses' => 'Welke belastingklassen definiëren EU btw tarieven?',
+        'desc_foreignVatClasses' => 'Geef aan welke van deze belastingklassen gebruikt worden bij producten of diensten waarbij u buitenlandse btw moet hanteren voor EU klanten.
+Deze instelling hoeft u alleen in te vullen als u hierboven hebt aangegeven dat u niet "Alleen producten en/of diensten die onder Nederlandse btw vallen" verkoopt.
+Mbv de "Ctrl" toets kunt u meerdere statussen kiezen of keuzes ongedaan maken.',
 
         'field_vatFreeProducts' => 'Verkoopt u van btw vrijgestelde producten of diensten?',
         'option_vatFreeProducts_1' => 'Zowel btw vrije als aan btw onderhevige producten en/of diensten.',
         'option_vatFreeProducts_2' => 'Alleen aan btw onderhevige producten en/of diensten.',
         'option_vatFreeProducts_3' => 'Alleen producten of diensten die van btw vrijgesteld zijn.',
         'desc_vatFreeProducts' => 'Geef aan of u in uw winkel producten en/of diensten aanbiedt die vrijgesteld zijn van btw, bv. onderwijs. LET OP: het gaat er om of het product of de dienst btw-vrij is, niet of u een btw-vrije factuur of een factuur met verlegde btw opstelt.',
+
+        'field_marginProducts' => 'Verkoopt u margegoederen?',
+        'option_marginProducts_1' => 'Zowel nieuwe producten en/of diensten als margegoederen.',
+        'option_marginProducts_2' => 'Alleen nieuwe producten en/of diensten.',
+        'option_marginProducts_3' => 'Alleen margegoederen.',
+        'desc_marginProducts' => 'Geef aan of u in uw winkel margegoederen (bv. 2e-hands producten) verkoopt. Zie <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/bijzondere_regelingen/margeregeling/margeregeling" target="_blank">Margeregeling</a>.',
 
         // Trigger settings.
         'triggerSettingsHeader' => 'Wanneer wilt u uw facturen automatisch versturen naar Acumulus',
@@ -90,7 +121,7 @@ Zie <a href="http://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastin
         'desc_triggerInvoiceEvent' => 'U kunt hier kiezen of en bij welke webwinkelfactuur-gebeurtenissen de factuur naar Acumulus wordt verstuurd. Als u voor "Niet automatisch versturen" kiest, kunt u de facturen zelf overzetten m.b.v. het batchformulier of op basis van één of meerdere bestelstatussen.',
 
         // Tokens
-        'tokenHelpHeader' => 'Veldverwijzingen',
+        'tokenHelpHeader' => 'Uitleg over veldverwijzingen',
         'desc_tokens' => '<p>Op deze pagina staan een aantal velden die "veldverwijzingen" mogen bevatten.
 Dit wil zeggen dat ze naast vrije tekst ook gegevens van de bestelling, de klant of het klantadres kunnen bevatten.
 Veldverwijzingen worden ingegeven door de naam van de eigenschap van de bestelling tussen vierkante haken, dwz. [ en ], te plaatsen.
@@ -123,13 +154,18 @@ De eigenschappen die uw webshop kent worden hieronder opgesomd.</p>
         'see_classes_more' => 'zie de classes %1$s voor mogelijke andere properties en methods die als veldverwijzing gebruikt kunnen worden',
         'see_table_more' => 'zie de tabel %1$s voor mogelijke andere velden die als veldverwijzing gebruikt kunnen worden',
         'see_tables_more' => 'zie de tabellen %1$s voor mogelijke andere velden die als veldverwijzing gebruikt kunnen worden',
+        'invoice_source' => "een Acumulus specifieke representatie van een bestelling of creditnota.",
         'see_above' => 'zie hierboven.',
-        'original_order_for_refund' => 'Oorspronkelijke bestelling, alleen beschikbaar bij credit nota\'s',
+        'see_source_above' => "zie hierboven bij 'source'.",
+        'order_or_refund' => 'De bestelling of creditnota waarvoor de factuur naar Acumulus verzonden wordt.',
+        'original_order_for_refund' => 'De bestelling zelf of de oorspronkelijke bestelling bij een credit nota',
         'refund_only' => 'alleen bij een credit nota',
         'internal_id' => 'intern ID, ook wel technische sleutel genoemd',
         'external_id' => 'de voor iedereen zichtbare referentie',
         'internal_not_label' => 'waarde zoals die wordt opgeslagen in de database, geen (vertaald) label',
         'invoice_lines_only' => 'alleen beschikbaar bij de factuurregels',
+        'payment_status_1' => 'Nog niet betaald',
+        'payment_status_2' => 'Betaald',
 
         // Relation management settings.
         'relationSettingsHeader' => 'Relatiebeheer',
@@ -213,8 +249,14 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'field_concept' => 'Concept',
         'desc_concept' => 'Geef aan hoe de factuur verstuurd moet worden. De 1e optie zal normaal gesproken voldoen. Echter, als u uw facturen altijd als concept wil versturen, kies dan de 3e optie. De 2e optie zou eigenlijk niet gekozen moeten worden, tenzij de waarschuwingen altijd onterecht blijken.',
         'option_concept_2' => 'Als definitieve factuur versturen, tenzij er onregelmatigheden zijn geconstateerd. Kies deze optie tenzij u weet wat u doet.',
-        'option_concept_0' => 'Altijd als definitieve factuur versturen',
-        'option_concept_1' => 'Altijd als concept versturen',
+        'option_concept_0' => 'Altijd als definitieve factuur versturen.',
+        'option_concept_1' => 'Altijd als concept versturen.',
+
+        'field_missing_amount' => 'Ontbrekend bedrag',
+        'desc_missing_amount' => 'Geef aan wat te doen als er een verschil tussen het factuurtotaal en het totaal van de factuurregels geconstateerd wordt. Normaal gesproken zal de 1e optie voldoen. Als het vaak voorkomt en de ontbrekende bedragen zjn eigenlijk altijd correct (bv. betaalkosten van een specifieke payment provider worden niet als losse regel herkend) kan de 2e optie handiger zijn. Er wordt dan al een factuurregel toegevoegd zodat de factuur alleen maar definitief gemaakt hoeft te worden. Gebruik de 3e optie als dit verschil door een instelling of andere plugin optreedt maar de factuur eigenlijk toch altijd correct is.',
+        'option_missing_amount_2' => 'Vestuur een waarschuwing, de factuur wordt als concept verstuurd.',
+        'option_missing_amount_3' => 'Voeg een correctieregel toe, de factuur zal echter nog steeds als concept verstuurd worden.',
+        'option_missing_amount_1' => 'Negeer het verschil.',
 
         'field_description' => 'Toelichting',
         'desc_description' => 'Toelichting op de factuur. Deze inhoud kan in Acumulus op een factuursjabloon getoond worden mbv de veldverwijzing [toelichting].',
@@ -230,7 +272,7 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'field_productName' => 'Productnaam',
         'desc_productName' => 'De productnaam of omschrijving die u op de factuurregel wilt tonen.',
         'field_nature' => 'Soort product',
-        'desc_nature' => 'Kan 2 waardes krijgen: "Product" of  "service". Als u alleen maar producten of alleen maar services verkoopt via deze webwinkel, kunt u dit letterljik invullen. Als u zowel producten als services verkoopt en u slaat dit als een kenmerk op bij alle artikelen in uw catalogus, kunt u een veldverwijzing gebruiken naar dat kenmerk.',
+        'desc_nature' => 'Kan 2 waardes krijgen: "Product" of "Service". Als u alleen maar producten of alleen maar services verkoopt via deze webwinkel, stel u dit in op het Acumulus instellingen formulier en vult de plugin dit automatisch in. Als u zowel producten als services verkoopt en u slaat dit als een kenmerk op bij alle artikelen in uw catalogus, kunt u een veldverwijzing gebruiken naar dat kenmerk.',
         'field_costPrice' => 'Kostprijs',
         'desc_costPrice' => 'De kostprijs van een artikel. Dit wordt alleen gebruikt op margefacturen.',
 
@@ -309,10 +351,10 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'desc_versionInformation' => 'Vermeld aub deze gegevens bij een supportverzoek.',
 
         // Link to other config form.
-        'desc_advancedSettings' => 'Deze plugin kent veel instellingen en daarom bevat deze pagina niet alle instellingen. Een aantal minder gebruikte instellingen vindt u in het "%1$s" onder "%2$s". Nadat u hier de gegevens hebt ingevuld en opgeslagen, kunt u het andere formulier bezoeken:',
+        'desc_advancedSettings' => 'Deze plugin kent veel instellingen en daarom bevat deze pagina niet alle instellingen. Een aantal minder gebruikte instellingen vindt u op het "%1$s" formulier onder "%2$s". Nadat u hier de gegevens hebt ingevuld en opgeslagen, kunt u het andere formulier bezoeken:',
         'menu_advancedSettings' => 'Instellingen → Acumulus geavanceerde instellingen',
 
-        'desc_basicSettings' => 'Dit is het formulier met geavanceerde, ofwel minder gebruikte, instellingen. De basisinstellingen vindt u in het "%1$s" onder "%2$s", of via de button hieronder. Let op: als u op deze button klikt worden de op deze pagina ingevulde of gewijzigde gegevens NIET opgeslagen!',
+        'desc_basicSettings' => 'U bevindt zich nu op het formulier met geavanceerde, ofwel minder gebruikte, instellingen. De basisinstellingen vindt u op het "%1$s" formulier onder "%2$s", of via de button hieronder. Let op: als u op deze button klikt worden de op deze pagina ingevulde of gewijzigde gegevens NIET opgeslagen!',
         'menu_basicSettings' => 'Instellingen → Acumulus',
     );
 
@@ -338,17 +380,20 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
 
         'message_error_header' => 'Error in your Acumulus connection settings',
         'message_error_auth' => 'Your Acumulus connection settings are incorrect. Please check them. After you have entered the correct connection settings %2$s, the %1$s settings will be shown.',
+        'message_error_forb' => 'Your Acumulus connection settings are correct but do not allow access via the web service. After you have entered correct connection settings %2$s, the %1$s settings will be shown.',
         'message_error_comm' => 'The module encountered an error retrieving your Acumulus configuration. Please try again. When the connection is restored the %1$s settings will be shown as well.',
         'message_auth_unknown' => 'When you have filled in your Acumulus connection settings %2$s, the %1$s settings will be shown as well.',
         'message_error_arg1_config' => 'other',
         'message_error_arg1_advanced' => 'advanced',
         'message_error_arg2_config' => 'here',
         'message_error_arg2_advanced' => 'in the "Acumulus basic settings form"',
+        'message_warning_role_deprecated' => 'You are using a deprecated user role to connect to the Acumulus API. Please add another user with an API-compliant role or change the role for the current user.',
+        'message_warning_role_insufficient' => 'You are using the user role API-Creator. This role does not have all permissions this plugin needs. Change the role of the current user to API-User or create a new user.',
+        'message_warning_role_overkill' => 'You are using the user role API-Manager. This role has mre permissions than this plugin needs. We advice you to change the role to API-User.',
 
         // Account settings.
         'accountSettingsHeader' => 'Your Acumulus connection settings',
-        //'desc_accountSettings' => 'Enter the details you received by email, or even better: create an additional user in Acumulus under "Beheer → Gebruikers → Gebruiker toevoegen" having "api - koppeling" as "Gebruikerstype". Such a user has less permissions and is thus more secure.',
-        'desc_accountSettings' => 'Enter the details you received by email, or even better: create an additional user in Acumulus under "Admin → Users → Add user" having "api - plugin" as "User type". Such a user has less permissions and is thus more secure.',
+        'desc_accountSettings' => 'Log in to Acumulus and create an additional user in Acumulus under "Admin → Users → Add user" having "API-User" as "User type".',
 
         'field_code' => 'Contract code',
         'field_username' => 'User name',
@@ -364,41 +409,67 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'message_validate_password_2' => 'The field Password contains a character that is forbidden by Acumulus (`\'"#%&;<>\\). Are you sure that you typed the correct password?',
         'message_validate_email_0' => 'The field Email is not a valid e-mail address, please fill in your own e-mail address.',
         'message_validate_email_1' => 'The field Email is required, please fill in your own e-mail address.',
+        'message_validate_nature_0' => 'The field \'Nature: what do you sell?\' is required, select a value.',
+        'message_validate_foreign_vat_0' => 'The field \'Do you sell products or services that are subject to foreign VAT for EU customers?\' is required, select a value.',
+        'message_validate_vat_free_products_0' => 'The field \'Do you sell VAT free products or services?\' is required, select a value.',
+        'message_validate_margin_products_0' => 'The field \'Do you sell products using the margin scheme?\' is required, select a value.',
+        'message_validate_conflicting_shop_options_2' => 'If you only sell services, you cannot sell using the margin scheme. change one of these options.',
+        'message_validate_conflicting_shop_options_3' => 'If you only sell using the margin scheme, you should select that you only sell goods on the "Nature" field.',
 
         // Shop settings.
         'shopSettingsHeader' => 'About your shop',
-        'desc_shopSettings' => 'With these settings, this plugin is better able to: determine the <a href="https://wiki.acumulus.nl/index.php?page=127" target="_blank">invoice type</a>; perform some sanity checks; and to compute VAT rates.',
+        'desc_shopSettings' => 'With these settings, this plugin is better able to: determine the <a href="https://wiki.acumulus.nl/index.php?page=facturen-naar-het-buitenland" target="_blank">invoice type</a>; perform some sanity checks; and to compute VAT rates.',
 
-        'field_digitalServices' => 'Do you sell digital services?',
-        'option_digitalServices_1' => 'Both digital services and normal products.',
-        'option_digitalServices_2' => 'Only products that are subject to dutch VAT.',
-        'option_digitalServices_3' => 'Only digital services subject to the regulations concerning using foreign VAT rates.',
-        'desc_digitalServices' => 'Select whether your store offers digital services that are subject to foreign VAT for clients in other EU countries.
-See <a href="http://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/btw_berekenen_bij_diensten/wijziging_in_digitale_diensten_vanaf_2015/wijziging_in_digitale_diensten_vanaf_2015">Dutch tax office: services to other EU countries (in dutch)</a>.',
+        'field_nature_shop' => 'Nature: what do you sell?',
+        'option_nature_1' => 'Products and services.',
+        'option_nature_2' => 'Only products.',
+        'option_nature_3' => 'Only services.',
+        'desc_nature_shop' => 'Select whether you sell products and/or services. In Acumulus this is the field "Nature" ("Soort"). NOTE: this settings only concerns the items in your "catalog", not shipping, handling, packing, or payment fees.',
 
-        'field_vatFreeProducts' => 'Do you sell  VAT free products or services?',
+        'field_foreignVat' => 'Do you sell products or services that are subject to foreign VAT for EU customers?',
+        'option_foreignVat_1' => 'Products or services that are subject to Dutch VAT and those that are subject to foreign VAT for EU customers.',
+        'option_foreignVat_2' => 'Only products or services that are subject to Dutch VAT.',
+        'option_foreignVat_3' => 'Only products or services that are subject to foreign VAT for EU customers.',
+        'desc_foreignVat' => 'Indicate if you sell products or servies where yo have to apply foreign VAT rates for EU customers.
+These can be, a.o, <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/btw_berekenen_bij_diensten/wijziging_in_digitale_diensten_vanaf_2015/wijziging_in_digitale_diensten_vanaf_2015" target="_blank">digital services</a>
+or <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/export_van_specifieke_goederen_en_in_bijzondere_situaties/export_van_accijnsgoederen/export_accijnsgoederen_naar_eu_landen" target="_blank">excise goods</a>.
+See <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/export_van_specifieke_goederen_en_in_bijzondere_situaties/export_van_specifieke_goederen_en_in_bijzondere_situaties" target="_blank">Tax office: Export of specific goods and special cases</a>.
+Note: as of 2019 there is a <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/btw_berekenen_bij_diensten/wijziging_in_digitale_diensten_vanaf_2015/wijziging_in_digitale_diensten_vanaf_2015" target="_blank">threshold for digital services</a>.
+If you remain under that threshold you may apply Dutch VAT.',
+
+        'field_foreignVatClasses' => 'Which vat classes define EU vat rates?',
+        'desc_foreignVatClasses' => 'Indicate which of these vat classes are used for products or services that are subject to foreign VAT for EU customers.
+ Using the "Ctrl" key, you can select/deselect multiple items.
+ Except for the above mentioned digital services this may also apply with <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/export_van_specifieke_goederen_en_in_bijzondere_situaties/export_van_specifieke_goederen_en_in_bijzondere_situaties" target="_blank">Export of specific products or special cases (in Dutch)</a>.',
+
+        'field_vatFreeProducts' => 'Do you sell VAT free products or services?',
         'option_vatFreeProducts_1' => 'Both VAT free and VAT liable products or services.',
         'option_vatFreeProducts_2' => 'Only products or services that are VAT liable.',
         'option_vatFreeProducts_3' => 'Only VAT free products or services.',
-        'desc_vatFreeProducts' => 'Select whether your store offers products or services that are VAT free, e.g. education. NOTE: this settings concerns whether the products or services you offer are inherently vat free, not whether you create vat free invoices or invoices with reversed vat.',
+        'desc_vatFreeProducts' => 'Select whether your store offers products or services that are VAT free, e.g. education. NOTE: this setting concerns whether the products or services you offer are inherently vat free, not whether you create vat free invoices or invoices with reversed vat.',
+
+        'field_marginProducts' => 'Do you sell products using the margin scheme?',
+        'option_marginProducts_1' => 'New products and/or services as well as products that use the margin scheme.',
+        'option_marginProducts_2' => 'Only new products and/or services.',
+        'option_marginProducts_3' => 'Only products that use the margin scheme.',
+        'desc_marginProducts' => 'Select whether your store sells (2nd hand) products using the margin scheme. See <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/bijzondere_regelingen/margeregeling/margeregeling" target="_blank">Dutch tax office: margin goods (in Dutch)</a>.',
 
         // Trigger settings.
         'triggerSettingsHeader' => 'When to have your invoices sent to Acumulus.',
         'desc_triggerSettings' => 'This(these) setting(s) determine(s) at what instants the invoice for an order should be sent to Acumulus. If you select multiple instants, the invoice wil be sent as soon as the order reaches one of the selected statuses. Note that an invoice will only be sent once to Acumulus. This extension only uses order data, so you may select any status, the webshop invoice does not already have to be created,unless you want to use the webshop\'s invoice date and number as invoice date and number for the Acumulus invoice. If you select "Do not send automatically" you will have to use the <a href="%s">Acumulus batch send form</a>.',
 
-        'field_triggerOrderStatus' => 'Order state(s)',
-        'desc_triggerOrderStatus' => 'Select if and with which order states to send the invoice to Acumulus. If you select multiple states, the invoice will only be sent once as soon as one of the selected states is reached. This extension only uses order data, so you may select any status, the webshop invoice does not already have to be created. If you select "Do not send automatically" you will have to use the send batch form.',
+        'field_triggerOrderStatus' => 'Order status(es)',
+        'desc_triggerOrderStatus' => 'Using the "Ctrl" key, you can select/deselect multiple items.',
         'option_empty_triggerOrderStatus' => 'Do not send automatically ',
 
-        'field_triggerInvoiceEvent' => 'Webshop invoice state',
+        'field_triggerInvoiceEvent' => 'Webshop invoice status',
         'option_triggerInvoiceEvent_0' => 'Do not send automatically.',
         'option_triggerInvoiceEvent_1' => 'When the webshop invoice gets created.',
         'option_triggerInvoiceEvent_2' => 'When the webshop invoice gets sent to the customer.',
-        'desc_triggerInvoiceEvent' => 'Select if and on which webshop invoice event to send the invoice to Acumulus. If you select "Do not send automatically" you can use the send batch form, or you can set one or more order states above to trigger the sending of the invoice.',
-
+        'desc_triggerInvoiceEvent' => 'Select if and on which webshop invoice event to send the invoice to Acumulus. If you select "Do not send automatically" you can use the send batch form, or you can set one or more order statuses above to trigger the sending of the invoice.',
 
         // Tokens
-        'tokenHelpHeader' => 'Field references',
+        'tokenHelpHeader' => 'Explanation of field references',
         'desc_tokens' => '<p>This form contains a number of fields that may contain "field references".
 This means that besides free literal text, these fields can contain data from the order, customer and customer address.
 Field references are denoted by placing the name of the property between square brackets, ie. [ and ].
@@ -431,13 +502,18 @@ The properties known by your web shop are listed below.</p>
         'see_classes_more' => 'see the classes %1$s for possible other properties and methods that can be used as field reference',
         'see_table_more' => 'see the table %1$s for possible other fields that can be used as field reference',
         'see_tables_more' => 'see the tables %1$s for possible other fields that can be used as field reference',
+        'invoice_source' => "An Acumulus specific representation of an order or credit note.",
         'see_above' => 'see above.',
-        'original_order_for_refund' => 'Original order, only available with refunds',
+        'see_source_above' => "see above with 'source'.",
+        'order_or_refund' => 'The order or creditnote for which the invoice is sent to Acumulus.',
+        'original_order_for_refund' => 'The order itself or the original order for a refund.',
         'refund_only' => 'only for refunds',
         'internal_id' => 'internal ID, the so-called technical key',
         'external_id' => 'A reference used in external communication',
         'internal_not_label' => 'value as stored in the database, not a (translated) label',
         'invoice_lines_only' => 'only available with the invoice lines',
+        'payment_status_1' => 'Due',
+        'payment_status_2' => 'Paid',
 
         // Relation management settings.
         'relationSettingsHeader' => 'Relation management',
@@ -518,10 +594,16 @@ If you unchecked the first option, the second option only applies to business cl
         'desc_defaultInvoiceTemplate' => 'Select the invoice templates to use when generating your Acumulus invoices for due respectively paid orders.',
 
         'field_concept' => 'Concept',
-        'desc_concept' => 'Indicate how to send the invoice to Acumulus. The 1st option will normally do fine, unless you want to send all your invoices as concept to Acumulus. The 2nd option should normally not be chosen, unless the warnings always turn out to be incorrect.',
+        'desc_concept' => 'Indicate how to send the invoice to Acumulus. Normally, the 1st option will do fine, unless you want to send all your invoices as concept to Acumulus. The 2nd option should normally not be chosen, unless the warnings always turn out to be incorrect.',
         'option_concept_2' => 'Send the invoice as final unless the plugin discovered irregularities. Choose this option unless you know what you are doing.',
-        'option_concept_0' => 'Always send as final',
-        'option_concept_1' => 'Always send as concept',
+        'option_concept_0' => 'Always send as final.',
+        'option_concept_1' => 'Always send as concept.',
+
+        'field_missing_amount' => 'Missing amount',
+        'desc_missing_amount' => 'Indicate what to do when the invoice total and the total of the invoice lines differ. Normally, the 1st option will do fine. However, if this happens often and the missing amounts are always correct (e.g. payment fees for a specific payment provider that are not recognised as a separate invoice line), you\'d better use the 2nd option. This will already add an invoice line to the invoice, so you only have to make it final. Use the 3rd option if a setting or another plugin causes this difference but the invoice turns out to be correct anyway.',
+        'option_missing_amount_2' => 'Send a warning, the invoice will be sent as concept.',
+        'option_missing_amount_3' => 'Add a correction line, note that the invoice will still be sent as concept.',
+        'option_missing_amount_1' => 'Ignore.',
 
         'field_description' => 'Description',
         'desc_description' => 'Invoice description. In Acumulus, you can use the contents of this field in invoice templates using the field reference [toelichting].',
@@ -537,9 +619,9 @@ If you unchecked the first option, the second option only applies to business cl
         'field_productName' => 'Product name',
         'desc_productName' => 'The product name or description you want to show on the invoice.',
         'field_nature' => 'Nature',
-        'desc_nature' => 'The nature of the  article sold. This can be either "Product" or "Service". If this shop only sells products or only services, you can fill that in here. If you sell both and you store this as a property for all articles in your catalog you can use a field reference to use that property.',
+        'desc_nature' => 'The nature of the article sold. This can be either "Product" or "Service". If your shop only sells products or only sells services, you should indicate so in the Acumulus settings form and the plugin will fill this in automatically. If you sell both and this is stored as a property for all items in your catalog you can use a field reference to use that property.',
         'field_costPrice' => 'Cost price',
-        'desc_costPrice' => 'The cost price of this article. This is only used on margin invoices.',
+        'desc_costPrice' => 'The cost price of this article. This is only used on margin scheme invoices.',
 
         // Options settings.
         'optionsSettingsHeader' => 'Options or variants',
@@ -570,7 +652,7 @@ If you unchecked the first option, the second option only applies to business cl
         'desc_paymentMethodAccountNumberFieldset' => 'Below you can enter an account to use per (active) payment method. The default above serves as fallback for payment methods for which you do not specify an account.',
 
         'paymentMethodCostCenterFieldset' => 'Cost center per payment method',
-        'desc_paymentMethodCostCenterFieldset' => 'Below you can enter a cost center to use per (active) payment method.  The default above serves as fallback for payment methods for which you do not specify a cost center.',
+        'desc_paymentMethodCostCenterFieldset' => 'Below you can enter a cost center to use per (active) payment method. The default above serves as fallback for payment methods for which you do not specify a cost center.',
 
         // Email as pdf settings.
         'emailAsPdfSettingsHeader' => 'PDF Invoice',

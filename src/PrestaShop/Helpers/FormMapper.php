@@ -53,7 +53,7 @@ class FormMapper extends BaseFormMapper
      */
     protected function field(array $field)
     {
-        if ($field['type'] === 'fieldset') {
+        if (!empty($field['fields'])) {
             $result = $this->fieldset($field);
         } else {
             $result = $this->element($field);
@@ -73,7 +73,7 @@ class FormMapper extends BaseFormMapper
         $result = array(
             'form' => array(
                 'legend' => array(
-                    'title' => $field['legend'],
+                    'title' => !empty($field['summary']) ? $field['summary'] : $field['legend'],
                 ),
                 'input' => $this->fields($field['fields']),
             ),
@@ -109,7 +109,7 @@ class FormMapper extends BaseFormMapper
             'multiple' => isset($field['attributes']['multiple']) ? $field['attributes']['multiple'] : false,
         );
 
-        if (isset($field['attributes'])) {
+        if (!empty($field['attributes'])) {
             $result['attributes'] = $field['attributes'];
         }
         if (isset($field['description'])) {
@@ -141,6 +141,7 @@ class FormMapper extends BaseFormMapper
     {
         switch ($type) {
             case 'fieldset':
+            case 'details':
             case 'markup':
                 $type = 'free';
                 break;

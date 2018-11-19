@@ -89,9 +89,9 @@ class Source extends BaseSource
      *   \Siel\Acumulus\Api::PaymentStatus_Paid or
      *   \Siel\Acumulus\Api::PaymentStatus_Due
      */
-    protected function getPaymentStateOrder()
+    protected function getPaymentStatusOrder()
     {
-        return $this->source->needs_payment() ? Api::PaymentStatus_Due : Api::PaymentStatus_Paid;
+        return $this->source->is_paid() ? Api::PaymentStatus_Paid : Api::PaymentStatus_Due;
     }
 
     /**
@@ -103,7 +103,7 @@ class Source extends BaseSource
      *   \Siel\Acumulus\Api::PaymentStatus_Paid or
      *   \Siel\Acumulus\Api::PaymentStatus_Due
      */
-    protected function getPaymentStateCreditNote()
+    protected function getPaymentStatusCreditNote()
     {
         return Api::PaymentStatus_Paid;
     }
@@ -173,7 +173,7 @@ class Source extends BaseSource
      * This override provides the values meta-invoice-amountinc and
      * meta-invoice-vatamount.
      */
-    public function getTotals()
+    protected function getAvailableTotals()
     {
         return array(
             Meta::InvoiceAmountInc => $this->source->get_total(),
@@ -186,7 +186,7 @@ class Source extends BaseSource
      *
      * @return \WC_Order|int
      */
-    protected function getShopOrderId()
+    protected function getShopOrderOrId()
     {
         /** @var \WC_Order_Refund $refund */
         $refund = $this->source;
@@ -196,7 +196,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    protected function getShopCreditNotes()
+    protected function getShopCreditNotesOrIds()
     {
         /** @var \WC_Order $order */
         $order = $this->source;

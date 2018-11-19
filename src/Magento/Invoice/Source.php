@@ -112,7 +112,7 @@ abstract class Source extends BaseSource
      *   \Siel\Acumulus\Api::PaymentStatus_Paid or
      *   \Siel\Acumulus\Api::PaymentStatus_Due
      */
-    protected function getPaymentStateOrder()
+    protected function getPaymentStatusOrder()
     {
         return Number::isZero($this->source->getBaseTotalDue())
             ? Api::PaymentStatus_Paid
@@ -120,7 +120,7 @@ abstract class Source extends BaseSource
     }
 
     /**
-     * Returns whether the order is in a state that makes it considered paid.
+     * Returns whether the order is in a status that makes it considered paid.
      *
      * This method is NOT used to determine the paid status, but is used to
      * determine the paid date by looking for these statuses in the
@@ -163,7 +163,7 @@ abstract class Source extends BaseSource
      * This override provides the values meta-invoice-amountinc and
      * meta-invoice-vatamount.
      */
-    public function getTotals()
+    protected function getAvailableTotals()
     {
         $sign = $this->getSign();
         return array(
@@ -207,7 +207,7 @@ abstract class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    protected function getShopOrderId()
+    protected function getShopOrderOrId()
     {
         /** @var \Mage_Sales_Model_Order_Creditmemo|\Magento\Sales\Model\Order\Creditmemo $creditmemo */
         $creditmemo = $this->source;
@@ -217,7 +217,7 @@ abstract class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    protected function getShopCreditNotes()
+    protected function getShopCreditNotesOrIds()
     {
         /** @var \Mage_Sales_Model_Order|\Magento\Sales\Model\Order $order */
         $order = $this->source;

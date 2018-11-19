@@ -46,7 +46,7 @@ class Source extends BaseSource
      */
     public function getDate()
     {
-        return date('Y-m-d', strtotime($this->source['details']['BT']->created_on));
+        return date(API::DateFormat_Iso, strtotime($this->source['details']['BT']->created_on));
     }
 
     /**
@@ -67,7 +67,6 @@ class Source extends BaseSource
      */
     public function getPaymentMethod()
     {
-        // @todo: test this: correct sub-array?
         if (isset($this->source['details']['BT']->virtuemart_paymentmethod_id)) {
             return $this->source['details']['BT']->virtuemart_paymentmethod_id;
         }
@@ -77,9 +76,9 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    public function getPaymentState()
+    public function getPaymentStatus()
     {
-        return in_array($this->source['details']['BT']->order_status, $this->getPaidStates())
+        return in_array($this->source['details']['BT']->order_status, $this->getPaidStatuses())
             ? Api::PaymentStatus_Paid
             : Api::PaymentStatus_Due;
     }
@@ -92,21 +91,21 @@ class Source extends BaseSource
         $date = null;
         $previousStatus = '';
         foreach ($this->source['history'] as $orderHistory) {
-            if (in_array($orderHistory->order_status_code, $this->getPaidStates()) && !in_array($previousStatus, $this->getPaidStates())) {
+            if (in_array($orderHistory->order_status_code, $this->getPaidStatuses()) && !in_array($previousStatus, $this->getPaidStatuses())) {
                 $date = $orderHistory->created_on;
             }
             $previousStatus = $orderHistory->order_status_code;
         }
-        return $date ? date('Y-m-d', strtotime($date)) : $date;
+        return $date ? date(API::DateFormat_Iso, strtotime($date)) : $date;
     }
 
     /**
-     * Returns a list of order states that indicate that the order has been
+     * Returns a list of order statuses that indicate that the order has been
      * paid.
      *
      * @return array
      */
-    protected function getPaidStates()
+    protected function getPaidStatuses()
     {
         return array('C', 'S', 'R');
     }
@@ -160,7 +159,7 @@ class Source extends BaseSource
      * This override provides the values meta-invoice-amountinc and
      * meta-invoice-vatamount as they may be needed by the Completor.
      */
-    public function getTotals()
+    protected function getAvailableTotals()
     {
         return array(
             Meta::InvoiceAmountInc => $this->source['details']['BT']->order_total,
@@ -194,6 +193,6 @@ class Source extends BaseSource
      */
     public function getInvoiceDate()
     {
-        return !empty($this->invoice['created_on']) ? date('Y-m-d', strtotime($this->invoice['created_on'])) : parent::getInvoiceDate();
+        return !empty($this->invoice['created_on']) ? date(API::DateFormat_Iso, strtotime($this->invoice['created_on'])) : parent::getInvoiceDate();
     }
 }

@@ -2,8 +2,8 @@
 namespace Siel\Acumulus\Web;
 
 use Siel\Acumulus\Api;
-use Siel\Acumulus\Config\ConfigInterface;
-use Siel\Acumulus\Helpers\TranslatorInterface;
+use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Helpers\Translator;
 
 /**
  * Provides an easy interface towards the different API calls of the Acumulus
@@ -21,23 +21,23 @@ use Siel\Acumulus\Helpers\TranslatorInterface;
  */
 class Service
 {
-    /** @var \Siel\Acumulus\Config\ConfigInterface */
+    /** @var \Siel\Acumulus\Config\Config */
     protected $config;
 
-    /** @var \Siel\Acumulus\Helpers\TranslatorInterface */
+    /** @var \Siel\Acumulus\Helpers\Translator */
     protected $translator;
 
-    /** @var CommunicatorInterface */
+    /** @var Communicator */
     protected $communicator;
 
     /**
      * Constructor.
      *
-     * @param CommunicatorInterface $communicator
-     * @param \Siel\Acumulus\Config\ConfigInterface $config
-     * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
+     * @param Communicator $communicator
+     * @param \Siel\Acumulus\Config\Config $config
+     * @param \Siel\Acumulus\Helpers\Translator $translator
      */
-    public function __construct(CommunicatorInterface $communicator, ConfigInterface $config, TranslatorInterface $translator)
+    public function __construct(Communicator $communicator, Config $config, Translator $translator)
     {
         $this->config = $config;
         $this->communicator = $communicator;
@@ -60,6 +60,38 @@ class Service
     protected function t($key)
     {
         return $this->translator->get($key);
+    }
+
+    /**
+     * Retrieve the about information.
+     *
+     * The Acumulus API for picklists is so well standardized, that it is
+     * possible to use 1 general picklist retrieval function that can process
+     * all picklist types.
+     *
+     * @return \Siel\Acumulus\Web\Result
+     *   The result of the webservice call. The structured response will contain
+     *   1 "about" array, being a keyed array with keys:
+     *   - about: General name for the API.
+     *   - tree: stable, current, deprecated or closed.
+     *   - role: Name of user role, current known roles: Beheerder, Gebruiker,
+     *       Invoerder, API-beheerder, API-gebruiker, API-invoerder, API-open
+     *       (not a real role, just to indicate the calls that are available
+     *       without authentication).
+     *   - roleid: Numeric identifier of user role.
+     *   Possible errors:
+     *   - 553 XUPR7NEC8: Warning: You are using a deprecated user role to
+     *     connect to the Acumulus API. Please add another user with an
+     *     API-compliant role or change the role for the current user.
+     *   - 403 A8N403GCN: Forbidden - Insufficient credential level for
+     *     general\/general_about.php. Not authorized to perform request.
+     *
+     * @see https://www.siel.nl/acumulus/API/Misc/About/
+     *   for more information about the contents of the returned array.
+     */
+    public function getAbout()
+    {
+        return $this->communicator->callApiFunction("general/general_about", array())->setMainResponseKey('general', false);
     }
 
     /**
@@ -209,7 +241,7 @@ class Service
     public function getVatInfo($countryCode, $date = '')
     {
         if (empty($date)) {
-            $date = date('Y-m-d');
+            $date = date(API::DateFormat_Iso);
         }
         $message = array(
             'vatdate' => $date,
@@ -296,7 +328,7 @@ class Service
     }
 
     /**
-     * Moves the entry in, or out the trashbin.
+     * Moves the entry into or out of the trashbin.
      *
      * @param int $entryId
      *   The id of the entry.
@@ -309,7 +341,7 @@ class Service
      *   The result of the webservice call. The structured response will contain
      *   1 "entry" array, being a keyed array with keys:
      *   - entryid
-     *   - entryproc: (description new state): 'removed' or '???'
+     *   - entryproc: (description new status): 'removed' or '???'
      *   Possible errors:
      *   - "XCM7ELO12: Invalid entrydeletestatus value supplied": $deleteStatus
      *     is not one of the indicated constants.
@@ -389,7 +421,7 @@ class Service
     public function setPaymentStatus($token, $paymentStatus, $paymentDate = '')
     {
         if (empty($paymentDate)) {
-            $paymentDate = date('Y-m-d');
+            $paymentDate = date(API::DateFormat_Iso);
         }
         $message = array(
             'token' => (string) $token,

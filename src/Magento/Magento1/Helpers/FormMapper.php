@@ -18,6 +18,7 @@ class FormMapper extends BaseFormMapper
         $result = parent::getMagentoProperty($key, $value, $type);
 
         if ($key === 'type' && $value === 'date') {
+            $result['format'] = static::DateFormat;
             $result['image'] = \Mage::getDesign()->getSkinUrl('images/grid-cal.gif');
         }
         return $result;

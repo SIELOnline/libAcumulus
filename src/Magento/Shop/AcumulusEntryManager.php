@@ -21,12 +21,23 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /** @var \Siel_Acumulus_Model_Entry|\Siel\AcumulusMa2\Model\Entry */
     protected $model;
 
+    /** @var \Siel_Acumulus_Model_Resource_Entry|\Siel\AcumulusMa2\Model\ResourceModel\Entry */
+    protected $resourceModel;
+
     /**
      * @return \Siel_Acumulus_Model_Entry|\Siel\AcumulusMa2\Model\Entry
      */
     protected function getModel()
     {
         return $this->model;
+    }
+
+    /**
+     * @return \Siel_Acumulus_Model_Resource_Entry|\Siel\AcumulusMa2\Model\ResourceModel\Entry
+     */
+    protected function getResourceModel()
+    {
+        return $this->resourceModel;
     }
 
     /**
@@ -56,39 +67,40 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
             ->getResourceCollection()
             ->addFieldToFilter('source_type', $invoiceSource->getType())
             ->addFieldToFilter('source_id', $invoiceSource->getId())
-            ->getFirstItem();
+            ->getItems();
         return $this->convertDbResultToAcumulusEntries($result);
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @throws \Exception
      */
     protected function insert(Source $invoiceSource, $entryId, $token, $created)
     {
-        /** @noinspection PhpDeprecationInspection http://magento.stackexchange.com/questions/114929/deprecated-save-and-load-methods-in-abstract-model */
         /** @noinspection PhpUnhandledExceptionInspection */
-        return $this
+        $entry = $this
             ->getModel()
             ->setEntryId($entryId)
             ->setToken($token)
             ->setSourceType($invoiceSource->getType())
-            ->setSourceId($invoiceSource->getId())
-            ->save();
+            ->setSourceId($invoiceSource->getId());
+        return $this->getResourceModel()->save($entry);
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @throws \Exception
      */
     protected function update(BaseAcumulusEntry $record, $entryId, $token, $updated)
     {
         /** @var \Siel_Acumulus_Model_Entry|\Siel\AcumulusMa2\Model\Entry $entry */
-        $entry = $record->getRecord();
-        /** @noinspection PhpDeprecationInspection http://magento.stackexchange.com/questions/114929/deprecated-save-and-load-methods-in-abstract-model */
-        /** @noinspection PhpUnhandledExceptionInspection */
-        return $entry
+        $entry = $record
+            ->getRecord()
             ->setEntryId($entryId)
-            ->setToken($token)
-            ->save();
+            ->setToken($token);
+        return $this->getResourceModel()->save($entry);
     }
 
     /**

@@ -1,12 +1,12 @@
 <?php
 namespace Siel\Acumulus\PrestaShop\Config;
 
-use Acumulus;
 use Context;
 use Module;
 use OrderState;
 use PaymentModule;
 use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
+use TaxRulesGroup;
 
 /**
  * Defines the PrestaShop webshop specific capabilities.
@@ -30,61 +30,101 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getTokenInfo()
+    protected function getTokenInfoSource()
     {
-        return parent::getTokenInfo() + array(
-            'source' => array(
-                'class' => 'Order',
-                'file' => 'classes/Order.php',
-                'properties' => array(
-                    'id_address_delivery',
-                    'id_address_invoice',
-                    'id_shop_group',
-                    'id_shop',
-                    'id_cart',
-                    'id_currency',
-                    'id_lang',
-                    'id_customer',
-                    'id_carrier',
-                    'current_state',
-                    'secure_key',
-                    'payment',
-                    'module',
-                    'conversion_rate',
-                    'recyclable = 1',
-                    'gift',
-                    'gift_message',
-                    'mobile_theme',
-                    'shipping_number',
-                    'total_discounts',
-                    'total_discounts_tax_incl',
-                    'total_discounts_tax_excl',
-                    'total_paid',
-                    'total_paid_tax_incl',
-                    'total_paid_tax_excl',
-                    'total_paid_real',
-                    'total_products',
-                    'total_products_wt',
-                    'total_shipping',
-                    'total_shipping_tax_incl',
-                    'total_shipping_tax_excl',
-                    'carrier_tax_rate',
-                    'total_wrapping',
-                    'total_wrapping_tax_incl',
-                    'total_wrapping_tax_excl',
-                    'invoice_number',
-                    'delivery_number',
-                    'invoice_date',
-                    'delivery_date',
-                    'valid',
-                    'date_add',
-                    'date_upd',
-                    'reference',
-                    'round_mode',
-                    'round_type',
-                ),
-                'properties-more' => true,
-            ),
+        $source = array(
+            'id',
+            'id_shop',
+            'date_add',
+            'date_upd',
+            'id_currency',
+            'conversion_rate',
+        );
+        return array(
+            'class' => ['Order', 'OrderSlip'],
+            'file' => ['classes/Order.php', 'classes/OrderSlip.php'],
+            'properties' => $source,
+            'properties-more' => true,
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getTokenInfoRefund()
+    {
+        $refund = array(
+            'id_order',
+            'total_products_tax_excl',
+            'total_products_tax_incl',
+            'total_shipping_tax_excl',
+            'total_shipping_tax_incl',
+            'amount',
+            'shipping_cost',
+            'shipping_cost_amount',
+            'partial',
+        );
+
+        return array(
+            'class' => 'OrderSlip',
+            'file' => 'classes/OrderSlip.php',
+            'properties' => $refund,
+            'properties-more' => true,
+        );
+
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getTokenInfoOrder()
+    {
+        $order = array(
+            'current_state',
+            'secure_key',
+            'payment',
+            'recyclable',
+            'gift',
+            'gift_message',
+            'shipping_number',
+            'total_discounts',
+            'total_discounts_tax_incl',
+            'total_discounts_tax_excl',
+            'total_paid',
+            'total_paid_tax_incl',
+            'total_paid_tax_excl',
+            'total_paid_real',
+            'total_products',
+            'total_products_wt',
+            'total_shipping',
+            'total_shipping_tax_incl',
+            'total_shipping_tax_excl',
+            'carrier_tax_rate',
+            'total_wrapping',
+            'total_wrapping_tax_incl',
+            'total_wrapping_tax_excl',
+            'invoice_number',
+            'delivery_number',
+            'invoice_date',
+            'delivery_date',
+            'valid',
+            'reference',
+        );
+
+        return array(
+            'class' => 'Order',
+            'file' => 'classes/Order.php',
+            'properties' => $order,
+            'properties-more' => true,
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getTokenInfoShopProperties()
+    {
+        return array(
             'address_invoice' => array(
                 'class' => 'Address',
                 'file' => 'classes/Address.php',
@@ -246,10 +286,10 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     public function getShopOrderStatuses()
     {
-        $states = OrderState::getOrderStates((int) Context::getContext()->language->id);
+        $statuses = OrderState::getOrderStates((int) Context::getContext()->language->id);
         $result = array();
-        foreach ($states as $state) {
-            $result[$state['id_order_state']] = $state['name'];
+        foreach ($statuses as $status) {
+            $result[$status['id_order_state']] = $status['name'];
         }
         return $result;
     }
@@ -272,10 +312,25 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
+    public function getVatClasses()
+    {
+        $result = array();
+        /** @var \stdClass[] $taxClasses */
+        $taxClasses = TaxRulesGroup::getTaxRulesGroups();
+        foreach ($taxClasses as $taxClass) {
+            $result[$taxClass['id_tax_rules_group']] = $taxClass['name'];
+        }
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getLink($formType)
     {
         switch ($formType) {
             case 'config':
+                // Does not work in PS1.6.
                 return Context::getContext()->link->getAdminLink('AdminModules', true, array(), array('configure' => 'acumulus'));
             case 'advanced':
                 return Context::getContext()->link->getAdminLink('AdminAcumulusAdvanced', true);

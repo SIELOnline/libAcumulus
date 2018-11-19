@@ -2,10 +2,13 @@
 namespace Siel\Acumulus\Shop;
 
 use DateTime;
-use Siel\Acumulus\Config\ConfigInterface;
-use Siel\Acumulus\Config\ShopCapabilitiesInterface;
+use Siel\Acumulus\Api;
+use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Config\ShopCapabilities;
 use Siel\Acumulus\Helpers\Form;
-use Siel\Acumulus\Helpers\TranslatorInterface;
+use Siel\Acumulus\Helpers\FormHelper;
+use Siel\Acumulus\Helpers\Log;
+use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Invoice\Translations as InvoiceTranslations;
 use Siel\Acumulus\PluginConfig;
 
@@ -17,32 +20,34 @@ use Siel\Acumulus\PluginConfig;
  * Should typically override:
  * - none
  * And may optionally (have to) override:
- * - systemValidate()
- * - getDateFormat
- * - getShopDateFormat()
- * - isSubmitted()
  * - setSubmittedValues()
  */
 class BatchForm extends Form
 {
-    /** @var \Siel\Acumulus\Config\ShopCapabilitiesInterface */
-    protected $shopCapabilities;
-
     /** @var \Siel\Acumulus\Shop\InvoiceManager */
     protected $invoiceManager;
 
-    /** @var array */
-    protected $log;
+    /** @var string[] */
+    protected $screenLog;
 
     /**
-     * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
-     * @param \Siel\Acumulus\Config\ConfigInterface $config
-     * @param \Siel\Acumulus\Config\ShopCapabilitiesInterface $shopCapabilities
      * @param \Siel\Acumulus\Shop\InvoiceManager $invoiceManager
+     * @param \Siel\Acumulus\Helpers\FormHelper $formHelper
+     * @param \Siel\Acumulus\Config\ShopCapabilities $shopCapabilities
+     * @param \Siel\Acumulus\Config\Config $config
+     * @param \Siel\Acumulus\Helpers\Translator $translator
+     * @param \Siel\Acumulus\Helpers\Log $log
      */
-    public function __construct(TranslatorInterface $translator, ConfigInterface $config, ShopCapabilitiesInterface $shopCapabilities, InvoiceManager $invoiceManager)
+    public function __construct(
+        InvoiceManager $invoiceManager,
+        FormHelper $formHelper,
+        ShopCapabilities $shopCapabilities,
+        Config $config,
+        Translator $translator,
+        Log $log
+    )
     {
-        parent::__construct($translator, $config);
+        parent::__construct($formHelper, $shopCapabilities, $config, $translator, $log);
 
         $translations = new InvoiceTranslations();
         $this->translator->add($translations);
@@ -50,8 +55,7 @@ class BatchForm extends Form
         $translations = new BatchFormTranslations();
         $this->translator->add($translations);
 
-        $this->log = array();
-        $this->shopCapabilities = $shopCapabilities;
+        $this->screenLog = array();
         $this->invoiceManager = $invoiceManager;
     }
 
@@ -64,8 +68,9 @@ class BatchForm extends Form
     protected function getDefaultFormValues()
     {
         $result = parent::getDefaultFormValues();
-        if (!empty($this->log)) {
-            $result['log'] = implode("\n", $this->log);
+        $result['send_mode'] = 'send_normal';
+        if (!empty($this->screenLog)) {
+            $result['log'] = implode("\n", $this->screenLog);
         }
         return $result;
     }
@@ -99,15 +104,14 @@ class BatchForm extends Form
         } else /*if ($this->submittedValues['date_to'] !== '') */ {
             // Range of dates has been filled in.
             // We ignore any order # to value.
-            $dateFormat = $this->getDateFormat();
-            if (!DateTime::createFromFormat($dateFormat, $this->submittedValues['date_from'])) {
+            if (!DateTime::createFromFormat(API::DateFormat_Iso, $this->submittedValues['date_from'])) {
                 // Date from not a valid date.
-                $this->errorMessages['date_from'] = sprintf($this->t('message_validate_batch_bad_date_from'), $this->getShopDateFormat());
+                $this->errorMessages['date_from'] = sprintf($this->t('message_validate_batch_bad_date_from'), $this->t('date_format'));
             }
             if ($this->submittedValues['date_to']) {
-                if (!DateTime::createFromFormat($dateFormat, $this->submittedValues['date_to'])) {
+                if (!DateTime::createFromFormat(API::DateFormat_Iso, $this->submittedValues['date_to'])) {
                     // Date to not a valid date.
-                    $this->errorMessages['date_to'] = sprintf($this->t('message_validate_batch_bad_date_to'), $this->getShopDateFormat());
+                    $this->errorMessages['date_to'] = sprintf($this->t('message_validate_batch_bad_date_to'), $this->t('date_format'));
                 } elseif ($this->submittedValues['date_to'] < $this->submittedValues['date_from']) {
                     // date to is smaller than date from
                     $this->errorMessages['date_to'] = $this->t('message_validate_batch_bad_date_range');
@@ -128,37 +132,42 @@ class BatchForm extends Form
             // Retrieve by order reference range.
             $from = $this->getFormValue('invoice_source_reference_from');
             $to = $this->getFormValue('invoice_source_reference_to') ? $this->getFormValue('invoice_source_reference_to') : $from;
-            $this->log['range'] = sprintf($this->t('message_form_range_reference'), $this->t("plural_{$type}_ref"), $from, $to);
+            $this->screenLog['range'] = sprintf($this->t('message_form_range_reference'), $this->t("plural_{$type}_ref"), $from, $to);
             $invoiceSources = $this->invoiceManager->getInvoiceSourcesByReferenceRange($type, $from, $to);
             if (empty($invoiceSources)) {
                 $invoiceSources = $this->invoiceManager->getInvoiceSourcesByIdRange($type, $from, $to);
-                $this->log['range'] = sprintf($this->t('message_form_range_reference'), $this->t("plural_{$type}_id"), $from, $to);
+                $this->screenLog['range'] = sprintf($this->t('message_form_range_reference'), $this->t("plural_{$type}_id"), $from, $to);
             }
         } else {
             // Retrieve by order date.
-            $dateFormat = $this->getDateFormat();
-            $from = DateTime::createFromFormat($dateFormat, $this->getFormValue('date_from'));
+            $from = DateTime::createFromFormat(API::DateFormat_Iso, $this->getFormValue('date_from'));
             $from->setTime(0, 0, 0);
-            $to = $this->getFormValue('date_to') ? DateTime::createFromFormat($dateFormat, $this->getFormValue('date_to')) : clone $from;
+            $to = $this->getFormValue('date_to') ? DateTime::createFromFormat(API::DateFormat_Iso, $this->getFormValue('date_to')) : clone $from;
             $to->setTime(23, 59, 59);
-            $this->log['range'] = sprintf($this->t('message_form_range_date'), $this->t("plural_$type"), $from->format(($dateFormat)), $to->format($dateFormat));
+            $this->screenLog['range'] = sprintf($this->t('message_form_range_date'), $this->t("plural_$type"), $from->format((API::DateFormat_Iso)), $to->format(API::DateFormat_Iso));
             $invoiceSources = $this->invoiceManager->getInvoiceSourcesByDateRange($type, $from, $to);
         }
 
         if (count($invoiceSources) === 0) {
-            $this->log[$type] = sprintf($this->t('message_form_range_empty'), $this->t($type));
-            $this->setFormValue('result', $this->log[$type]);
+            $rangeList = sprintf($this->t('message_form_range_empty'), $this->t($type));
+            $this->screenLog[$type] = $rangeList;
+            $this->setFormValue('result', $this->screenLog[$type]);
+            $this->log->info('BatchForm::execute(): ' . $this->screenLog['range'] . $rangeList);
             $result = true;
         } else {
-            if ((bool) $this->getFormValue('send_test_mode')) {
+            $rangeList = sprintf($this->t('message_form_range_list'), $this->getInvoiceSourceReferenceList($invoiceSources));
+            $sendMode = $this->getFormValue('send_mode');
+            if ($sendMode === 'send_test_mode') {
                 // Overrule debug setting for (the rest of) this run.
                 $this->acumulusConfig->set('debug', PluginConfig::Send_TestMode);
             }
-            $result = $this->invoiceManager->sendMultiple($invoiceSources, (bool) $this->getFormValue('force_send'), (bool) $this->getFormValue('dry_run'), $this->log);
+            // Do the sending (and some info/debug logging).
+            $this->log->info('BatchForm::execute(): ' . $this->screenLog['range'] . ' ' . $rangeList);
+            $result = $this->invoiceManager->sendMultiple($invoiceSources, $sendMode === 'send_force', (bool) $this->getFormValue('dry_run'), $this->screenLog);
         }
 
         // Set formValue for log in case form values are already queried.
-        $logText = implode("\n", $this->log);
+        $logText = implode("\n", $this->screenLog);
         $this->setFormValue('log', $logText);
         return $result;
     }
@@ -205,23 +214,36 @@ class BatchForm extends Form
                 'date_from' => array(
                     'type' => 'date',
                     'label' => $this->t('field_date_from'),
-                    'format' => $this->getShopDateFormat(),
+                    'attributes' => array(
+                        'placeholder' => $this->t('date_format'),
+                    ),
                 ),
-                // @todo: html date fields have their own format based on language settings?
                 'date_to' => array(
                     'type' => 'date',
                     'label' => $this->t('field_date_to'),
-                    'description' => sprintf($this->t('desc_date_from_to'), $this->getShopDateFormat()),
-                    'format' => $this->getShopDateFormat(),
+                    'attributes' => array(
+                        'placeholder' => $this->t('date_format'),
+                    ),
+                    'description' => $this->t('desc_date_from_to'),
                 ),
-                // @todo: make this a radio and rephrase: Do not overwrite if already sent, overwrite if already sent
-                'options' => array(
-                    'type' => 'checkbox',
-                    'label' => $this->t('field_options'),
-                    'description' => $this->t('desc_batch_options'),
+                'send_mode' => array(
+                    'type' => 'radio',
+                    'label' => $this->t('field_send_mode'),
+                    'description' => $this->t('desc_send_mode'),
+                    'attributes' => array(
+                        'required' => true,
+                    ),
                     'options' => array(
-                        'force_send' => $this->t('option_force_send'),
+                        'send_normal' => $this->t('option_send_normal'),
+                        'send_force' => $this->t('option_send_force'),
                         'send_test_mode' => $this->t('option_send_test_mode'),
+                    ),
+                ),
+                'dry_run_cb' => array(
+                    'type' => 'checkbox',
+                    'label' => $this->t('field_dry_run'),
+                    'description' => $this->t('desc_dry_run'),
+                    'options' => array(
                         'dry_run' => $this->t('option_dry_run'),
                     ),
                 ),
@@ -239,14 +261,14 @@ class BatchForm extends Form
                         'type' => 'textarea',
                         'attributes' => array(
                             'readonly' => true,
-                            'rows' => max(5, min(10, count($this->log))),
+                            'rows' => max(5, min(10, count($this->screenLog))),
                             'style' => 'box-sizing: border-box; width: 100%; min-width: 48em;',
                         ),
                     ),
                 ),
             );
-            if (!empty($this->log)) {
-                $logText = implode("\n", $this->log);
+            if (!empty($this->screenLog)) {
+                $logText = implode("\n", $this->screenLog);
                 $this->formValues['log'] = $logText;
                 $fields['batchLogHeader']['fields']['log']['value'] = $logText;
             }
@@ -254,8 +276,8 @@ class BatchForm extends Form
 
         // 3rd fieldset: Batch info.
         $fields['batchInfoHeader'] = array(
-            'type' => 'fieldset',
-            'legend' => $this->t('batchInfoHeader'),
+            'type' => 'details',
+            'summary' => $this->t('batchInfoHeader'),
             'fields' => array(
                 'info' => array(
                     'type' => 'markup',
@@ -268,5 +290,22 @@ class BatchForm extends Form
         );
 
         return $fields;
+    }
+
+    /**
+     * Returns a formatted string with the list of ids of the given sources.
+     *
+     * @param \Siel\Acumulus\Invoice\Source[] $invoiceSources
+     *
+     * @return string
+     *   A loggable (formatted) string with a list of ids of the sources.
+     */
+    protected function getInvoiceSourceReferenceList(array $invoiceSources)
+    {
+        $result = array();
+        foreach ($invoiceSources as $invoiceSource) {
+            $result[] = $invoiceSource->getReference();
+        }
+        return '{' . implode(',', $result) . '}';
     }
 }

@@ -2,8 +2,9 @@
 namespace Siel\Acumulus\WooCommerce\Config;
 
 use Acumulus;
-use Siel\Acumulus\PluginConfig;
 use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
+use Siel\Acumulus\PluginConfig;
+use WC_Tax;
 
 /**
  * Defines the WooCommerce webshop specific capabilities.
@@ -30,9 +31,60 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getTokenInfo()
+    protected function getTokenInfoSource()
+    {
+        $source = array(
+            'date_created',
+            'date_modified',
+            'discount_total',
+            'discount_tax',
+            'shipping_total',
+            'shipping_tax',
+            'shipping_method',
+            'cart_tax',
+            'total',
+            'total_tax',
+            'subtotal',
+            'used_coupons',
+            'item_count',
+            'version',
+        );
+
+        return array(
+            'class' => 'WC_Abstract_Order',
+            'file' => 'wp-content/plugins/woocommerce/includes/abstracts/abstract-wc-order.php',
+            'properties' => $source,
+            'properties-more' => true,
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getTokenInfoRefund()
+    {
+        $refund = array(
+            'amount',
+            'reason',
+        );
+
+        return array(
+            'more-info' => $this->t('refund_only'),
+            'class' => 'WC_Order_Refund',
+            'file' => 'wp-content/plugins/woocommerce/includes/class-wc-order-refund.php',
+            'properties' => $refund,
+            'properties-more' => true,
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getTokenInfoOrder()
     {
         $order = array(
+            'order_number',
+            'order_key',
             'billing_first_name',
             'billing_last_name',
             'billing_company',
@@ -53,48 +105,45 @@ class ShopCapabilities extends ShopCapabilitiesBase
             'shipping_state',
             'shipping_postcode',
             'shipping_country',
-            'cart_discount',
-            'cart_discount_tax',
-            'shipping_method_title',
-            'customer_user',
-            'order_key',
-            'order_discount',
-            'order_tax',
-            'order_shipping_tax',
-            'order_shipping',
-            'order_total',
-            'order_currency',
             'payment_method',
             'payment_method_title',
+            'transaction_id',
+            'checkout_payment_url',
+            'checkout_order_received_url',
+            'cancel_order_url',
+            'view_order_url',
+            'customer_id',
             'customer_ip_address',
             'customer_user_agent',
+            'customer_note',
+            'date_completed',
+            'date_paid',
+            'created_via',
         );
-        $refund = array(
-            'reason (' . $this->t('refund_only') . ')',
-            'date (' . $this->t('refund_only') . ')',
+
+        return array(
+            'more-info' => $this->t('original_order_for_refund'),
+            'class' => 'WC_Order',
+            'file' => 'wp-content/plugins/woocommerce/includes/class-wc-order.php',
+            'properties' => $order,
+            'properties-more' => true,
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getTokenInfoShopProperties()
+    {
         $meta = array(
             'vat_number (With EU VAT plugin only)',
         );
         $result = array(
-            'source' => array(
-                'class' => 'WC_Abstract_Order',
-                'file' => 'wp-content/plugins/woocommerce/includes/abstracts/abstract-wc-order.php',
-                'properties' => array_merge($order, $refund),
-                'properties-more' => true,
-            ),
             'meta' => array(
                 'table' => 'postmeta',
                 'additional-info' => $this->t('see_post_meta'),
                 'properties' => $meta,
                 'properties-more' => true,
-            ),
-            'order' => array(
-                'more-info' => $this->t('original_order_for_refund'),
-                'properties' => array(
-                    $this->t('see_above'),
-                ),
-                'properties-more' => false,
             ),
             'order_meta' => array(
                 'table' => 'postmeta',
@@ -175,7 +224,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 'properties-more' => true,
             );
         }
-        return parent::getTokenInfo() + $result;
+        return $result;
     }
 
     /**
@@ -253,7 +302,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function getPaymentMethods()
     {
         $result = array();
-        $paymentGateways = WC()->payment_gateways->payment_gateways();
+        $paymentGateways = wc()->payment_gateways->payment_gateways();
         foreach ($paymentGateways as $id => $paymentGateway) {
             if (isset($paymentGateway->enabled) && $paymentGateway->enabled === 'yes') {
                 $result[$id] = $paymentGateway->title;
@@ -262,19 +311,30 @@ class ShopCapabilities extends ShopCapabilitiesBase
         return $result;
     }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getLink($formType)
-  {
-      switch ($formType) {
-          case 'config':
-              return admin_url('options-general.php?page=acumulus_config');
-          case 'advanced':
-              return admin_url('options-general.php?page=acumulus_advanced');
-          case 'batch':
-              return admin_url('admin.php?page=acumulus_batch');
-      }
-      return parent::getLink($formType);
-  }
+    /**
+     * @inheritDoc
+     */
+    public function getVatClasses()
+    {
+        $keys =  WC_Tax::get_tax_class_slugs();
+        $labels = WC_Tax::get_tax_classes();
+
+        return array('standard' => 'Standaard') + array_combine($keys, $labels);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getLink($formType)
+    {
+        switch ($formType) {
+            case 'config':
+                return admin_url('options-general.php?page=acumulus_config');
+            case 'advanced':
+                return admin_url('options-general.php?page=acumulus_advanced');
+            case 'batch':
+                return admin_url('admin.php?page=acumulus_batch');
+        }
+        return parent::getLink($formType);
+    }
 }

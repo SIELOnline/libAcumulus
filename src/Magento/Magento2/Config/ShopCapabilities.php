@@ -1,8 +1,8 @@
 <?php
 namespace Siel\Acumulus\Magento\Magento2\Config;
 
-use Siel\Acumulus\Magento\Magento2\Helpers\Registry;
 use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
+use Siel\Acumulus\Magento\Magento2\Helpers\Registry;
 use Siel\Acumulus\PluginConfig;
 
 /**
@@ -10,6 +10,199 @@ use Siel\Acumulus\PluginConfig;
  */
 class ShopCapabilities extends ShopCapabilitiesBase
 {
+    private $order = array(
+        'adjustmentNegative',
+        'adjustmentPositive',
+        'appliedRuleIds',
+        'baseAdjustmentNegative',
+        'baseAdjustmentPositive',
+        'baseCurrencyCode',
+        'baseDiscountAmount',
+        'baseDiscountCanceled',
+        'baseDiscountInvoiced',
+        'baseDiscountRefunded',
+        'baseGrandTotal',
+        'baseDiscountTaxCompensationAmount',
+        'baseDiscountTaxCompensationInvoiced',
+        'baseDiscountTaxCompensationRefunded',
+        'baseShippingAmount',
+        'baseShippingCanceled',
+        'baseShippingDiscountAmount',
+        'baseShippingDiscountTaxCompensationAmnt',
+        'baseShippingInclTax',
+        'baseShippingInvoiced',
+        'baseShippingRefunded',
+        'baseShippingTaxAmount',
+        'baseShippingTaxRefunded',
+        'baseSubtotal',
+        'baseSubtotalCanceled',
+        'baseSubtotalInclTax',
+        'baseSubtotalInvoiced',
+        'baseSubtotalRefunded',
+        'baseTaxAmount',
+        'baseTaxCanceled',
+        'baseTaxInvoiced',
+        'baseTaxRefunded',
+        'baseTotalCanceled',
+        'baseTotalDue',
+        'baseTotalInvoiced',
+        'baseTotalInvoicedCost',
+        'baseTotalOfflineRefunded',
+        'baseTotalOnlineRefunded',
+        'baseTotalPaid',
+        'baseTotalQtyOrdered',
+        'baseTotalRefunded',
+        'baseToGlobalRate',
+        'baseToOrderRate',
+        'billingAddressId',
+        'canShipPartially',
+        'canShipPartiallyItem',
+        'couponCode',
+        'createdAt',
+        'customerDob',
+        'customerEmail',
+        'customerFirstname',
+        'customerGender',
+        'customerGroupId',
+        'customerId',
+        'customerIsGuest',
+        'customerLastname',
+        'customerMiddlename',
+        'customerNote',
+        'customerNoteNotify',
+        'customerPrefix',
+        'customerSuffix',
+        'customerTaxvat',
+        'discountAmount',
+        'discountCanceled',
+        'discountDescription',
+        'discountInvoiced',
+        'discountRefunded',
+        'editIncrement',
+        'emailSent',
+        'entityId',
+        'extCustomerId',
+        'extOrderId',
+        'forcedShipmentWithInvoice',
+        'globalCurrencyCode',
+        'grandTotal',
+        'discountTaxCompensationAmount',
+        'discountTaxCompensationInvoiced',
+        'discountTaxCompensationRefunded',
+        'holdBeforeState',
+        'holdBeforeStatus',
+        'incrementId',
+        'isVirtual',
+        'orderCurrencyCode',
+        'originalIncrementId',
+        'paymentAuthorizationAmount',
+        'paymentAuthExpiration',
+        'protectCode',
+        'quoteAddressId',
+        'quoteId',
+        'relationChildId',
+        'relationChildRealId',
+        'relationParentId',
+        'relationParentRealId',
+        'remoteIp',
+        'shippingAmount',
+        'shippingCanceled',
+        'shippingDescription',
+        'shippingDiscountAmount',
+        'shippingDiscountTaxCompensationAmount',
+        'shippingInclTax',
+        'shippingInvoiced',
+        'shippingRefunded',
+        'shippingTaxAmount',
+        'shippingTaxRefunded',
+        'state',
+        'status',
+        'storeCurrencyCode',
+        'storeId',
+        'storeName',
+        'storeToBaseRate',
+        'storeToOrderRate',
+        'subtotal',
+        'subtotalCanceled',
+        'subtotalInclTax',
+        'subtotalInvoiced',
+        'subtotalRefunded',
+        'taxAmount',
+        'taxCanceled',
+        'taxInvoiced',
+        'taxRefunded',
+        'totalCanceled',
+        'totalDue',
+        'totalInvoiced',
+        'totalItemCount',
+        'totalOfflineRefunded',
+        'totalOnlineRefunded',
+        'totalPaid',
+        'totalQtyOrdered',
+        'totalRefunded',
+        'updatedAt',
+        'weight',
+        'xForwardedFor',
+        'items',
+        'billingAddress',
+        'payment',
+        'statusHistories',
+        'extensionAttributes',
+    );
+    private $creditMemo = array(
+        'adjustment',
+        'adjustmentNegative',
+        'adjustmentPositive',
+        'baseAdjustment',
+        'baseAdjustmentNegative',
+        'baseAdjustmentPositive',
+        'baseCurrencyCode',
+        'baseDiscountAmount',
+        'baseGrandTotal',
+        'baseDiscountTaxCompensationAmount',
+        'baseShippingAmount',
+        'baseShippingDiscountTaxCompensationAmnt',
+        'baseShippingInclTax',
+        'baseShippingTaxAmount',
+        'baseSubtotal',
+        'baseSubtotalInclTax',
+        'baseTaxAmount',
+        'baseToGlobalRate',
+        'baseToOrderRate',
+        'billingAddressId',
+        'createdAt',
+        'creditmemoStatus',
+        'discountAmount',
+        'discountDescription',
+        'emailSent',
+        'entityId',
+        'globalCurrencyCode',
+        'grandTotal',
+        'discountTaxCompensationAmount',
+        'incrementId',
+        'invoiceId',
+        'orderCurrencyCode',
+        'orderId',
+        'shippingAddressId',
+        'shippingAmount',
+        'shippingDiscountTaxCompensationAmount',
+        'shippingInclTax',
+        'shippingTaxAmount',
+        'state',
+        'storeCurrencyCode',
+        'storeId',
+        'storeToBaseRate',
+        'storeToOrderRate',
+        'subtotal',
+        'subtotalInclTax',
+        'taxAmount',
+        'transactionId',
+        'updatedAt',
+        'items',
+        'comments',
+        'extensionAttributes',
+    );
+
     /**
      * {@inheritdoc}
      */
@@ -38,200 +231,47 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getTokenInfo()
+    protected function getTokenInfoSource()
     {
-        $order = array(
-            'adjustmentNegative',
-            'adjustmentPositive',
-            'appliedRuleIds',
-            'baseAdjustmentNegative',
-            'baseAdjustmentPositive',
-            'baseCurrencyCode',
-            'baseDiscountAmount',
-            'baseDiscountCanceled',
-            'baseDiscountInvoiced',
-            'baseDiscountRefunded',
-            'baseGrandTotal',
-            'baseDiscountTaxCompensationAmount',
-            'baseDiscountTaxCompensationInvoiced',
-            'baseDiscountTaxCompensationRefunded',
-            'baseShippingAmount',
-            'baseShippingCanceled',
-            'baseShippingDiscountAmount',
-            'baseShippingDiscountTaxCompensationAmnt',
-            'baseShippingInclTax',
-            'baseShippingInvoiced',
-            'baseShippingRefunded',
-            'baseShippingTaxAmount',
-            'baseShippingTaxRefunded',
-            'baseSubtotal',
-            'baseSubtotalCanceled',
-            'baseSubtotalInclTax',
-            'baseSubtotalInvoiced',
-            'baseSubtotalRefunded',
-            'baseTaxAmount',
-            'baseTaxCanceled',
-            'baseTaxInvoiced',
-            'baseTaxRefunded',
-            'baseTotalCanceled',
-            'baseTotalDue',
-            'baseTotalInvoiced',
-            'baseTotalInvoicedCost',
-            'baseTotalOfflineRefunded',
-            'baseTotalOnlineRefunded',
-            'baseTotalPaid',
-            'baseTotalQtyOrdered',
-            'baseTotalRefunded',
-            'baseToGlobalRate',
-            'baseToOrderRate',
-            'billingAddressId',
-            'canShipPartially',
-            'canShipPartiallyItem',
-            'couponCode',
-            'createdAt',
-            'customerDob',
-            'customerEmail',
-            'customerFirstname',
-            'customerGender',
-            'customerGroupId',
-            'customerId',
-            'customerIsGuest',
-            'customerLastname',
-            'customerMiddlename',
-            'customerNote',
-            'customerNoteNotify',
-            'customerPrefix',
-            'customerSuffix',
-            'customerTaxvat',
-            'discountAmount',
-            'discountCanceled',
-            'discountDescription',
-            'discountInvoiced',
-            'discountRefunded',
-            'editIncrement',
-            'emailSent',
-            'entityId',
-            'extCustomerId',
-            'extOrderId',
-            'forcedShipmentWithInvoice',
-            'globalCurrencyCode',
-            'grandTotal',
-            'discountTaxCompensationAmount',
-            'discountTaxCompensationInvoiced',
-            'discountTaxCompensationRefunded',
-            'holdBeforeState',
-            'holdBeforeStatus',
-            'incrementId',
-            'isVirtual',
-            'orderCurrencyCode',
-            'originalIncrementId',
-            'paymentAuthorizationAmount',
-            'paymentAuthExpiration',
-            'protectCode',
-            'quoteAddressId',
-            'quoteId',
-            'relationChildId',
-            'relationChildRealId',
-            'relationParentId',
-            'relationParentRealId',
-            'remoteIp',
-            'shippingAmount',
-            'shippingCanceled',
-            'shippingDescription',
-            'shippingDiscountAmount',
-            'shippingDiscountTaxCompensationAmount',
-            'shippingInclTax',
-            'shippingInvoiced',
-            'shippingRefunded',
-            'shippingTaxAmount',
-            'shippingTaxRefunded',
-            'state',
-            'status',
-            'storeCurrencyCode',
-            'storeId',
-            'storeName',
-            'storeToBaseRate',
-            'storeToOrderRate',
-            'subtotal',
-            'subtotalCanceled',
-            'subtotalInclTax',
-            'subtotalInvoiced',
-            'subtotalRefunded',
-            'taxAmount',
-            'taxCanceled',
-            'taxInvoiced',
-            'taxRefunded',
-            'totalCanceled',
-            'totalDue',
-            'totalInvoiced',
-            'totalItemCount',
-            'totalOfflineRefunded',
-            'totalOnlineRefunded',
-            'totalPaid',
-            'totalQtyOrdered',
-            'totalRefunded',
-            'updatedAt',
-            'weight',
-            'xForwardedFor',
-            'items',
-            'billingAddress',
-            'payment',
-            'statusHistories',
-            'extensionAttributes',
+        return array(
+            'class' => array('\Magento\Sales\Model\Order', '\Magento\Sales\Model\Order\CreditMemo'),
+            'file' => array('vendor/magento/module-sales/Model/Order.php', 'vendor/magento/module-sales/Model/Order/Creditmemo.php'),
+            'properties' => array_intersect($this->order, $this->creditMemo),
+            'properties-more' => true,
         );
-        $creditMemo = array(
-            'adjustment',
-            'adjustmentNegative',
-            'adjustmentPositive',
-            'baseAdjustment',
-            'baseAdjustmentNegative',
-            'baseAdjustmentPositive',
-            'baseCurrencyCode',
-            'baseDiscountAmount',
-            'baseGrandTotal',
-            'baseDiscountTaxCompensationAmount',
-            'baseShippingAmount',
-            'baseShippingDiscountTaxCompensationAmnt',
-            'baseShippingInclTax',
-            'baseShippingTaxAmount',
-            'baseSubtotal',
-            'baseSubtotalInclTax',
-            'baseTaxAmount',
-            'baseToGlobalRate',
-            'baseToOrderRate',
-            'billingAddressId',
-            'createdAt',
-            'creditmemoStatus',
-            'discountAmount',
-            'discountDescription',
-            'emailSent',
-            'entityId',
-            'globalCurrencyCode',
-            'grandTotal',
-            'discountTaxCompensationAmount',
-            'incrementId',
-            'invoiceId',
-            'orderCurrencyCode',
-            'orderId',
-            'shippingAddressId',
-            'shippingAmount',
-            'shippingDiscountTaxCompensationAmount',
-            'shippingInclTax',
-            'shippingTaxAmount',
-            'state',
-            'storeCurrencyCode',
-            'storeId',
-            'storeToBaseRate',
-            'storeToOrderRate',
-            'subtotal',
-            'subtotalInclTax',
-            'taxAmount',
-            'transactionId',
-            'updatedAt',
-            'items',
-            'comments',
-            'extensionAttributes',
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getTokenInfoRefund()
+    {
+        return array(
+            'class' => 'Mage_Sales_Model_Order_CreditMemo',
+            'file' => 'app/code/core/Mage/Sales/Model/Order/Creditmemo.php',
+            'properties' => array_diff($this->creditMemo, $this->order),
+            'properties-more' => true,
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getTokenInfoOrder()
+    {
+        return array(
+            'class' => '\Magento\Sales\Model\Order\Order',
+            'file' => 'vendor/magento/module-sales/Model/Order/Order.php',
+            'properties' => array_diff($this->order, $this->creditMemo),
+            'properties-more' => true,
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getTokenInfoShopProperties()
+    {
         $orderItem = array(
             'additionalData',
             'amountRefunded',
@@ -362,14 +402,8 @@ class ShopCapabilities extends ShopCapabilitiesBase
             'weeeTaxDisposition',
             'weeeTaxRowDisposition',
         );
-        return parent::getTokenInfo() + array(
-            'source' => array(
-                'class' => array('\Magento\Sales\Model\Order', '\Magento\Sales\Model\Order\CreditMemo'),
-                'file' => array('vendor/magento/module-sales/Model/Order.php', 'vendor/magento/module-sales/Model/Order/Creditmemo.php'),
-                'properties' => array_unique(array_merge($order, $creditMemo)),
-                'properties-more' => true,
-            ),
-            'billingAaddress' => array(
+        return array(
+            'billingAddress' => array(
                 'class' => '\Magento\Sales\Model\Order\Address',
                 'file' => 'vendor/magento/module-sales/Model/Order/Address.php',
                 'properties' => array(
@@ -482,6 +516,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     {
         /** @var \Magento\Sales\Model\Order\Status $model */
         $model = Registry::getInstance()->create('Magento\Sales\Model\Order\Status');
+        /** @noinspection PhpUnhandledExceptionInspection */
         $items = $model->getResourceCollection()->getData();
         $result = array();
         foreach ($items as $item) {
@@ -510,6 +545,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
         $paymentHelper = Registry::getInstance()->get('Magento\Payment\Helper\Data');
         $paymentMethods = $paymentHelper->getPaymentMethods();
         foreach ($paymentMethods as $code => $paymentMethodData) {
+            /** @noinspection PhpUnhandledExceptionInspection */
             $instance = $paymentHelper->getMethodInstance($code);
             if ($instance->isActive()) {
                 $title = $instance->getConfigData('title');
@@ -522,6 +558,23 @@ class ShopCapabilities extends ShopCapabilitiesBase
         return $result;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getVatClasses()
+    {
+        $result = array();
+        /** @var \Magento\Tax\Model\ClassModel $taxClass */
+        $taxClass = \Magento\Framework\App\ObjectManager::getInstance()->create(\Magento\Tax\Model\ClassModel::class);
+        foreach ($taxClass->getCollection() as $item) {
+            $result[$item->getData('class_id')] = $item->getData('class_name');
+        }
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getLink($formType)
     {
         $registry = Registry::getInstance();

@@ -77,7 +77,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    public function getPaymentState()
+    public function getPaymentStatus()
     {
         // The 'config_complete_status' setting contains a set of statuses that,
         //  according to the help on the settings form:
@@ -125,19 +125,19 @@ class Source extends BaseSource
      * This override provides the values meta-invoice-amountinc,
      * meta-invoice-vatamount and a vat breakdown in meta-invoice-vat.
      */
-    public function getTotals()
+    protected function getAvailableTotals()
     {
         $result = array(
             Meta::InvoiceAmountInc => $this->source['total'],
             Meta::InvoiceVatAmount => 0.0,
-            Meta::InvoiceVat => array(),
+            Meta::InvoiceVatBreakdown => array(),
         );
 
         /** @noinspection PhpUnhandledExceptionInspection */
         $orderTotals = $this->getOrderTotalLines();
         foreach ($orderTotals as $totalLine) {
             if ($totalLine['code'] === 'tax') {
-                $result[Meta::InvoiceVat][] = $totalLine['title'] . ': ' . $totalLine['value'];
+                $result[Meta::InvoiceVatBreakdown][] = $totalLine['title'] . ': ' . $totalLine['value'];
                 $result[Meta::InvoiceVatAmount] += $totalLine['value'];
             }
         }

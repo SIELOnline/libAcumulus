@@ -5,13 +5,17 @@ use Address;
 use Carrier;
 use Configuration;
 use Customer;
+use Db;
 use Order;
 use OrderSlip;
+use PrestaShopDatabaseException;
+use PrestaShopException;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
 use TaxManagerFactory;
+use TaxRulesGroup;
 
 /**
  * Allows to create arrays in the Acumulus invoice structure from a PrestaShop
@@ -32,11 +36,11 @@ use TaxManagerFactory;
  *   this were. However:
  *   - amount is excl vat if not manually entered.
  *   - amount is incl vat if manually entered (assuming administrators enter
- *     amounts incl tax, and this is what gets listed on the credit PDF.
+ *     amounts incl tax) and this is what gets listed on the credit PDF.
+ *   - Manually entered amounts do not have vat defined, so users should try not
+ *     to use them.
  *   - shipping_cost_amount is excl vat.
  *   So this is never going to work in all situations!!!
- *
- * @todo: So, can we get a tax amount/rate over the manually entered refund?
  */
 class Creator extends BaseCreator
 {
@@ -45,6 +49,15 @@ class Creator extends BaseCreator
 
     /** @var OrderSlip */
     protected $creditSlip;
+
+    /**
+     * Precision of amounts stored in PS. In PS you can enter either the price
+     * inc or ex vat. The other amount will be calculated and not rounded before
+     * being stored with. So 0.0001 is on the safe side.
+     *
+     * @var float
+     */
+    protected $precision = 0.0001;
 
     /**
      * {@inheritdoc}
@@ -79,6 +92,8 @@ class Creator extends BaseCreator
 
     /**
      * {@inheritdoc}
+     *
+     * @throws \PrestaShopDatabaseException
      */
     protected function getItemLines()
     {
@@ -130,6 +145,7 @@ class Creator extends BaseCreator
      *   an array with an OrderSlipDetail line.
      *
      * @return array
+     * @throws \PrestaShopDatabaseException
      */
     protected function getItemLine(array $item)
     {
@@ -137,54 +153,73 @@ class Creator extends BaseCreator
 
         $this->addPropertySource('item', $item);
 
-        $invoiceSettings = $this->config->getInvoiceSettings();
-        $this->addTokenDefault($result, Tag::ItemNumber, $invoiceSettings['itemNumber']);
-        $this->addTokenDefault($result, Tag::Product, $invoiceSettings['productName']);
-        $this->addTokenDefault($result, Tag::Nature, $invoiceSettings['nature']);
-
+        $this->addProductInfo($result);
         $sign = $this->invoiceSource->getSign();
-        // Prestashop does not support the margin scheme. So in a standard
-        // install this method will always return false. But if this method
-        // happens to return true anyway (customisation, hook), the costprice
-        // will trigger vattype = 5 for Acumulus.
-        if ($this->allowMarginScheme() && !empty($item['purchase_supplier_price'])) {
+
+        // Check for cost price and margin scheme.
+        if (!empty($line['costPrice']) && $this->allowMarginScheme()) {
             // Margin scheme:
             // - Do not put VAT on invoice: send price incl VAT as unitprice.
             // - But still send the VAT rate to Acumulus.
             $result[Tag::UnitPrice] = $sign * $item['unit_price_tax_incl'];
-            // Costprice > 0 triggers the margin scheme in Acumulus.
-            $this->addTokenDefault($result, Tag::CostPrice, $invoiceSettings['costPrice']);
         } else {
-            // Unit price is without VAT: use product_price.
             $result[Tag::UnitPrice] = $sign * $item['unit_price_tax_excl'];
             $result[Meta::UnitPriceInc] = $sign * $item['unit_price_tax_incl'];
             $result[Meta::LineAmount] = $sign * $item['total_price_tax_excl'];
             $result[Meta::LineAmountInc] = $sign * $item['total_price_tax_incl'];
+            if (!Number::floatsAreEqual($item['unit_amount'], $result[Meta::UnitPriceInc] - $result[Tag::UnitPrice])) {
+                $result[Meta::LineDiscountVatAmount] = $item['unit_amount'] - ($result[Meta::UnitPriceInc] - $result[Tag::UnitPrice]);
+            }
         }
         $result[Tag::Quantity] = $item['product_quantity'];
+
+        // Get vat rate:
         // The field 'rate' comes from order->getOrderDetailTaxes() and is only
         // defined for orders and was not filled in before PS1.6.1.1. So, check
         // if the field is available.
         // The fields 'unit_amount' and 'total_amount' (table order_detail_tax)
-        // are based on the discounted product price and thus cannot be used.
+        // are based on the discounted product price and thus cannot be used to
+        // get the vat rate.
         if (isset($item['rate'])) {
             $result[Tag::VatRate] = $item['rate'];
             $result[Meta::VatRateSource] = Creator::VatRateSource_Exact;
-            if (!Number::floatsAreEqual($item['unit_amount'], $result[Meta::UnitPriceInc] - $result[Tag::UnitPrice])) {
-                $result[Meta::LineDiscountVatAmount] = $item['unit_amount'] - ($result[Meta::UnitPriceInc] - $result[Tag::UnitPrice]);
-            }
         } else {
             // Precision: 1 of the amounts, probably the prince incl tax, is
             // entered by the admin and can thus be considered exact. The other
             // is calculated by the system and not rounded and can thus be
             // considered to have a precision better than 0.0001
-            $result += $this->getVatRangeTags($sign * ($item['unit_price_tax_incl'] - $item['unit_price_tax_excl']), $sign * $item['unit_price_tax_excl'], 0.0001, 0.0001);
+            $result += $this->getVatRangeTags($sign * ($item['unit_price_tax_incl'] - $item['unit_price_tax_excl']),
+                $sign * $item['unit_price_tax_excl'],
+                $this->precision, $this->precision);
         }
+        $result += $this->getVatRateLookupMetadata($this->order->id_address_invoice, $this->getItemLineTaxRuleGroupId($item));
+
         $result[Meta::FieldsCalculated][] = Meta::VatAmount;
 
         $this->removePropertySource('item');
-
         return $result;
+    }
+
+    /**
+     * Returns the tax rule group id of the product in the given order line.
+     *
+     * @param array $item
+     *
+     * @return int
+     *   The id of the tax rule group, or 0 if none or multiple were found.
+     *
+     * @throws \PrestaShopDatabaseException
+     */
+    protected function getItemLineTaxRuleGroupId(array $item)
+    {
+        if (isset($item['id_tax_rules_group'])) {
+            return (int) $item['id_tax_rules_group'];
+        } elseif (isset($item['id_tax'])) {
+            $query = 'select distinct id_tax_rules_group from ps_tax_rule where id_tax = ' . (int) $item['id_tax'];
+            $results = Db::getInstance()->executeS($query);
+            return count($results) === 1 ? (int) $results[0]['id_tax_rules_group'] : 0;
+        }
+        return 0;
     }
 
     /**
@@ -192,27 +227,39 @@ class Creator extends BaseCreator
      */
     protected function getShippingLine()
     {
-        $sign = $this->invoiceSource->getSign();
-        $carrier = new Carrier($this->order->id_carrier);
-        // total_shipping_tax_excl is not very precise (rounded to the cent) and
-        // often leads to 1 cent off invoices in Acumulus (assuming that the
-        // amount entered is based on a nice rounded amount incl tax. So we
-        // recalculate this ourselves.
-        $vatRate = $this->order->carrier_tax_rate;
-        $shippingInc = $sign * $this->invoiceSource->getSource()->total_shipping_tax_incl;
-        $shippingEx = $shippingInc / (100 + $vatRate) * 100;
-        $shippingVat = $shippingInc - $shippingEx;
+        try {
+            $sign = $this->invoiceSource->getSign();
+            $carrier = new Carrier($this->order->id_carrier);
+            // total_shipping_tax_excl is not very precise (rounded to the cent) and
+            // often leads to 1 cent off invoices in Acumulus (assuming that the
+            // amount entered is based on a nice rounded amount incl tax. So we
+            // recalculate this ourselves.
+            $vatRate = $this->order->carrier_tax_rate;
+            $shippingInc = $sign * $this->invoiceSource->getSource()->total_shipping_tax_incl;
+            $shippingEx = $shippingInc / (100 + $vatRate) * 100;
+            $shippingVat = $shippingInc - $shippingEx;
 
-        $result = array(
-            Tag::Product => !empty($carrier->name) ? $carrier->name : $this->t('shipping_costs'),
-            Tag::UnitPrice => $shippingInc / (100 + $vatRate) * 100,
-            Meta::UnitPriceInc => $shippingInc,
-            Tag::Quantity => 1,
-            Tag::VatRate => $vatRate,
-            Meta::VatAmount => $shippingVat,
-            Meta::VatRateSource => static::VatRateSource_Exact,
-            Meta::FieldsCalculated => array(Tag::UnitPrice, Meta::VatAmount),
-        );
+            $result = array(
+                Tag::Product => !empty($carrier->name) ? $carrier->name : $this->t('shipping_costs'),
+                Tag::UnitPrice => $shippingInc / (100 + $vatRate) * 100,
+                Meta::UnitPriceInc => $shippingInc,
+                Tag::Quantity => 1,
+                Tag::VatRate => $vatRate,
+                Meta::VatAmount => $shippingVat,
+                Meta::VatRateSource => static::VatRateSource_Exact,
+                Meta::FieldsCalculated => array(Tag::UnitPrice, Meta::VatAmount),
+            );
+
+            $result += $this->getVatRateLookupMetadata($this->order->id_address_invoice, $carrier->getIdTaxRulesGroup());
+        }
+        /** @noinspection PhpRedundantCatchClauseInspection */
+        catch (PrestaShopDatabaseException $e) {
+            $result = array();
+        }
+        /** @noinspection PhpRedundantCatchClauseInspection */
+        catch (PrestaShopException $e) {
+            $result = array();
+        }
 
         return $result;
     }
@@ -240,6 +287,9 @@ class Creator extends BaseCreator
             if (Number::floatsAreEqual($wrappingEx, $wrappingExLookedUp, 0.005)) {
                 $wrappingEx = $wrappingExLookedUp;
                 $metaCalculatedFields[] = Tag::UnitPrice;
+                $precision = $this->precision;
+            } else {
+                $precision = 0.01;
             }
             $wrappingInc = $this->order->total_wrapping_tax_incl;
             $wrappingVat = $wrappingInc - $wrappingEx;
@@ -251,7 +301,7 @@ class Creator extends BaseCreator
                     Tag::UnitPrice => $wrappingEx,
                     Meta::UnitPriceInc => $wrappingInc,
                     Tag::Quantity => 1,
-                ) + $this->getVatRangeTags($wrappingVat, $wrappingEx, 0.02)
+                ) + $this->getVatRangeTags($wrappingVat, $wrappingEx, 0.01 + $precision, $precision)
                 + $vatLookupTags;
             $result[Meta::FieldsCalculated] = $metaCalculatedFields;
         }
@@ -296,7 +346,7 @@ class Creator extends BaseCreator
             );
 
             // Add these amounts to the invoice totals.
-            // @see \Siel\Acumulus\PrestaShop\Invoice\Creator\getInvoiceTotals()
+            // @see \Siel\Acumulus\Invoice\Source\getTotals()
             $this->invoice[Tag::Customer][Tag::Invoice][Meta::InvoiceAmountInc] += $paymentInc;
             $this->invoice[Tag::Customer][Tag::Invoice][Meta::InvoiceAmount] += $paymentEx;
             return $result;
@@ -352,8 +402,7 @@ class Creator extends BaseCreator
                 // - including VAT, the precision would be 0.01, 0.01.
                 // - excluding VAT, the precision would be 0.01, 0
                 // However, for a %, it will be: 0.02, 0.01, so use 0.02.
-                // @todo: can we determine so?
-            ) + $this->getVatRangeTags($discountVat, $discountEx, 0.02);
+            ) + $this->getVatRangeTags($discountVat, $discountEx, 0.02, 0.01);
         $result[Meta::FieldsCalculated][] = Meta::VatAmount;
 
         return $result;
@@ -437,18 +486,24 @@ class Creator extends BaseCreator
      * @param int $taxRulesGroupId
      *
      * @return array
-     *   Either an array with keys Meta::VatRateLookup and
-     *   Meta::VatRateLookupLabel or an empty array.
+     *   An empty array or an array with keys:
+     *   - Meta::VatClassId: int
+     *   - Meta::VatClassName: string
+     *   - Meta::VatRateLookup: float
+     *   - Meta::VatRateLookupLabel: string
      */
     protected function getVatRateLookupMetadata($addressId, $taxRulesGroupId)
     {
         try {
+            $taxRulesGroup = new TaxRulesGroup($taxRulesGroupId);
             $address = new Address($addressId);
-            $tax_manager = TaxManagerFactory::getManager($address, $taxRulesGroupId);
-            $tax_calculator = $tax_manager->getTaxCalculator();
+            $taxManager = TaxManagerFactory::getManager($address, $taxRulesGroupId);
+            $taxCalculator = $taxManager->getTaxCalculator();
             $result = array(
-                Meta::VatRateLookup => $tax_calculator->getTotalRate(),
-                Meta::VatRateLookupLabel => $tax_calculator->getTaxesName(),
+                Meta::VatClassId => $taxRulesGroup->id,
+                Meta::VatClassName => $taxRulesGroup->name,
+                Meta::VatRateLookup => $taxCalculator->getTotalRate(),
+                Meta::VatRateLookupLabel => $taxCalculator->getTaxesName(),
             );
         } catch (\Exception $e) {
             $result = array();

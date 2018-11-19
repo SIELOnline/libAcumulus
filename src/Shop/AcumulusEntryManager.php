@@ -1,33 +1,36 @@
 <?php
 namespace Siel\Acumulus\Shop;
 
-use Siel\Acumulus\Helpers\ContainerInterface;
+use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Invoice\Source;
 
 /**
- * Manages AcumulusEntry records/objects.
+ * Manages {@see AcumulusEntry} records/objects.
  *
- * These records tie orders or credit notes from the web shop to entries in
- * Acumulus.
- *
- * This manager class can perform the CRU(D) operations on the shop database.
+ * This manager class performs CRU(D) operations on Acumulus entries in the
+ * webshop database. The features of this class include:
+ * - Retrieval of an Acumulus entry record for an invoice source (orders or
+ *   refunds).
+ * - Retrieval of an Acumulus entry record for a given entry id.
+ * - Save (insert or update) an Acumulus entry.
+ * - Install and uninstall the db table at module install resp. uninstall time.
  */
 abstract class AcumulusEntryManager
 {
     /** @var \Siel\Acumulus\Helpers\Log */
     protected $log;
 
-    /** @var \Siel\Acumulus\Helpers\ContainerInterface */
+    /** @var \Siel\Acumulus\Helpers\Container */
     protected $container;
 
     /**
      * AcumulusEntryManager constructor.
      *
-     * @param \Siel\Acumulus\Helpers\ContainerInterface $container
+     * @param \Siel\Acumulus\Helpers\Container $container
      * @param \Siel\Acumulus\Helpers\Log $log
      */
-    public function __construct(ContainerInterface $container, Log $log)
+    public function __construct(Container $container, Log $log)
     {
         $this->container = $container;
         $this->log = $log;
@@ -86,6 +89,7 @@ abstract class AcumulusEntryManager
         }
         return $result;
     }
+
     /**
      * Saves the Acumulus entry for the given order in the web shop's database.
      *
@@ -163,15 +167,18 @@ abstract class AcumulusEntryManager
     abstract protected function update(AcumulusEntry $record, $entryId, $token, $updated);
 
     /**
+     * Installs the datamodel. Called when the module gets installed.
+     *
      * @return bool
+     *   Success.
      */
     abstract public function install();
 
     /**
-     * Upgrade the datamodel to the given version. Only called when the module
-     * got updated.
+     * Upgrades the datamodel. Called when the module gets updated.
      *
      * @param string $version
+     *   The version to update to.
      *
      * @return bool
      *   Success.
@@ -182,6 +189,8 @@ abstract class AcumulusEntryManager
     }
 
     /**
+     * Uninstalls the datamodel. Called when the module gets uninstalled.
+     *
      * @return bool
      *   Success.
      */

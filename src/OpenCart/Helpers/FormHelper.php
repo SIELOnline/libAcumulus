@@ -1,13 +1,12 @@
 <?php
-namespace Siel\Acumulus\OpenCart\Shop;
+namespace Siel\Acumulus\OpenCart\Helpers;
 
-use Siel\Acumulus\OpenCart\Helpers\Registry;
-use Siel\Acumulus\Shop\BatchForm as BaseBatchForm;
+use Siel\Acumulus\Helpers\FormHelper as BaseFormHelper;
 
 /**
- * Provides the Batch send form handling for the OpenCart Acumulus module.
+ * OpenCart override of the FormHelper.
  */
-class BatchForm extends BaseBatchForm
+class FormHelper extends BaseFormHelper
 {
     /**
      * {@inheritdoc}

@@ -3,7 +3,7 @@ namespace Siel\Acumulus\Shop;
 
 use DateTime;
 use Siel\Acumulus\Api;
-use Siel\Acumulus\Helpers\ContainerInterface;
+use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Result;
 use Siel\Acumulus\Invoice\ResultTranslations;
@@ -14,16 +14,24 @@ use Siel\Acumulus\Tag;
 
 /**
  * Provides functionality to manage invoices.
+ *
+ * The features of this class include:
+ * - Retrieval of webshop invoice sources (orders or refunds).
+ * - Handle order status changes.
+ * - Handle refund creation or credit memo sending.
+ * - Handle batch sending
+ * - Create and send an invoice to Acumulus for a given invoice source,
+ *   including triggering our own events and processing the result.
  */
 abstract class InvoiceManager
 {
-    /** @var \Siel\Acumulus\Helpers\ContainerInterface */
+    /** @var \Siel\Acumulus\Helpers\Container */
     protected $container;
 
     /**
-     * @param \Siel\Acumulus\Helpers\ContainerInterface $container
+     * @param \Siel\Acumulus\Helpers\Container $container
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(Container $container)
     {
         $this->container = $container;
 
@@ -49,7 +57,7 @@ abstract class InvoiceManager
     /**
      * Returns a Translator instance.
      *
-     * @return \Siel\Acumulus\Helpers\TranslatorInterface
+     * @return \Siel\Acumulus\Helpers\Translator
      */
     protected function getTranslator()
     {
@@ -69,7 +77,7 @@ abstract class InvoiceManager
     /**
      * Returns a Config instance.
      *
-     * @return \Siel\Acumulus\Config\ConfigInterface
+     * @return \Siel\Acumulus\Config\Config
      */
     protected function getConfig()
     {
@@ -284,7 +292,7 @@ abstract class InvoiceManager
     /**
      * Processes an invoice source status change event.
      *
-     * For now we don't look at credit note states, they are always sent.
+     * For now we don't look at credit note statuses, they are always sent.
      *
      * @param \Siel\Acumulus\Invoice\Source $invoiceSource
      *   The source whose status has changed.
@@ -473,11 +481,11 @@ abstract class InvoiceManager
             if (!empty($entryId)) {
                 $deleteResult = $this->getService()->setDeleteStatus($entryId, API::Entry_Delete);
                 if ($deleteResult->hasMessages()) {
-                    // Add messages to result but not if the entry has already the
-                    // delete status or does not exist at all (anymore).
+                    // Add messages to result but not if the entry has already
+                    // the delete status or does not exist at all (anymore).
                     if ($deleteResult->hasCodeTag('P2XFELO12')) {
-                        // Successfully deleted the ld entry: add a warning so this
-                        // info will be  mailed to the user.
+                        // Successfully deleted the old entry: add a warning so
+                        // this info will be  mailed to the user.
                         $result->addWarning(902, '',
                             sprintf($this->t('message_warning_old_entry_not_deleted'), $this->t($invoiceSource->getType()), $entryId));
                     } else {
@@ -610,7 +618,7 @@ abstract class InvoiceManager
      */
     protected function getSqlDate(DateTime $date)
     {
-        return $date->format('Y-m-d H:i:s');
+        return $date->format(PluginConfig::TimeStampFormat_Sql);
     }
 
     /**

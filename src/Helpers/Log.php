@@ -2,8 +2,10 @@
 namespace Siel\Acumulus\Helpers;
 
 /**
- * Defines a logger class. This class is supposed to be overridden by shop
- * specific classes to integrate with the shop specific way of logging.
+ * Allows to log messages to a log.
+ *
+ * This base class will log to the PHP error file. It should be overridden per
+ * webshop to integrate with the webshop's specific way of logging.
  */
 class Log
 {
@@ -23,14 +25,14 @@ class Log
 
     /**
      * Log constructor.
+     *
+     * @param string $libraryVersion
      */
-    public function __construct()
+    public function __construct($libraryVersion)
     {
-        // Start with logging everything. Soon after the creation of this log object
-        // the log level should be set based on the configuration.
-        $this->setLogLevel(static::NotYetSet);
-        $this->setLibraryVersion('version not yet set');
+        $this->libraryVersion = $libraryVersion;
     }
+
 
     /**
      * Gets the actual log level.
@@ -55,19 +57,10 @@ class Log
     /**
      * @return string
      */
-    public function getLibraryVersion()
+    protected function getLibraryVersion()
     {
         return $this->libraryVersion;
     }
-
-    /**
-     * @param string $libraryVersion
-     */
-    public function setLibraryVersion($libraryVersion)
-    {
-        $this->libraryVersion = $libraryVersion;
-    }
-
 
     /**
      * Returns a textual representation of the severity.
@@ -211,15 +204,17 @@ class Log
     /**
      * Writes the message to the actual log sink.
      *
-     * This base implementation sends the message to error_log(). Override if the
-     * web shop offers its own log mechanism.
+     * This base implementation adds the name Acumulus, the version of this
+     * library, and the severity and then sends the message to error_log().
+     *
+     * Override if the web shop offers its own log mechanism.
      *
      * @param string $message
      * @param int $severity
      */
     protected function write($message, $severity)
     {
-        $message = sprintf('Acumulus %s: %s - %s', $this->libraryVersion, $this->getSeverityString($severity), $message);
+        $message = sprintf('Acumulus %s: %s - %s', $this->getLibraryVersion(), $this->getSeverityString($severity), $message);
         error_log($message);
     }
 }

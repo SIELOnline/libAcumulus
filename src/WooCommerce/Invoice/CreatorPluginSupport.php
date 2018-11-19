@@ -14,11 +14,11 @@ use WC_Product;
 /**
  * CreatorSupportForOtherPlugins contains support for other plugins.
  *
- * The WooCommerce field contains many additional plugins that add features
+ * The WooCommerce market contains many additional plugins that add features
  * to standard WooCommerce. Supporting all these plugins is difficult and can
  * lead to hard to read and maintain code. Therefore we try to split support for
- * these other plugins off into its own containers reacting to the Acumulus
- * filters and actions
+ * these other plugins off into its own containers that react to the Acumulus
+ * filters and actions.
  */
 class CreatorPluginSupport
 {
@@ -213,7 +213,6 @@ class CreatorPluginSupport
                 } else {
                     // Oops: not found. Store a message in the line meta data
                     // and keep it as a separate line.
-                    // @todo: add warning?
                     $itemLine[Meta::BundleParentId] .= ': not found';
                     $result[] = $itemLine;
                 }

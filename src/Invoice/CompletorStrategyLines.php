@@ -1,8 +1,8 @@
 <?php
 namespace Siel\Acumulus\Invoice;
 
-use Siel\Acumulus\Config\ConfigInterface;
-use Siel\Acumulus\Helpers\TranslatorInterface;
+use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
 
@@ -17,10 +17,10 @@ use Siel\Acumulus\Tag;
  */
 class CompletorStrategyLines
 {
-    /** @var \Siel\Acumulus\Config\ConfigInterface */
+    /** @var \Siel\Acumulus\Config\Config */
     protected $config;
 
-    /** @var \Siel\Acumulus\Helpers\TranslatorInterface */
+    /** @var \Siel\Acumulus\Helpers\Translator */
     protected $translator;
 
     /** @var array[] */
@@ -35,7 +35,7 @@ class CompletorStrategyLines
     /**
      * The list of possible vat types, initially filled with possible vat types
      * type based on client country, invoiceHasLineWithVat(), is_company(), and
-     * the digital services setting.
+     * the foreign vat setting.
      *
      * @var int[]
      */
@@ -47,10 +47,10 @@ class CompletorStrategyLines
     /**
      * Constructor.
      *
-     * @param \Siel\Acumulus\Config\ConfigInterface $config
-     * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
+     * @param \Siel\Acumulus\Config\Config $config
+     * @param \Siel\Acumulus\Helpers\Translator $translator
      */
-    public function __construct(ConfigInterface $config, TranslatorInterface $translator)
+    public function __construct(Config $config, Translator $translator)
     {
         $this->config = $config;
         $this->translator = $translator;
@@ -89,7 +89,7 @@ class CompletorStrategyLines
     protected function completeStrategyLines()
     {
         if ($this->invoiceHasStrategyLine()) {
-            $this->invoice[Tag::Customer][Tag::Invoice][Meta::StrategyCompletorInput]['vat-rates'] = str_replace(array(' ', "\r", "\n", "\t"), '', var_export($this->possibleVatRates, true));
+            $this->invoice[Tag::Customer][Tag::Invoice][Meta::CompletorStrategyInput]['vat-rates'] = str_replace(array('=>', ' ', "\r", "\n", "\t"), array('='), var_export($this->possibleVatRates, true));
 
             $isFirst = true;
             $strategies = $this->getStrategyClasses();
@@ -97,16 +97,16 @@ class CompletorStrategyLines
                 /** @var CompletorStrategyBase $strategy */
                 $strategy = new $strategyClass($this->config, $this->translator, $this->invoice, $this->possibleVatTypes, $this->possibleVatRates, $this->source);
                 if ($isFirst) {
-                    $this->invoice[Tag::Customer][Tag::Invoice][Meta::StrategyCompletorInput]['vat-2-divide'] = $strategy->getVat2Divide();
-                    $this->invoice[Tag::Customer][Tag::Invoice][Meta::StrategyCompletorInput]['vat-breakdown'] = str_replace(array(' ', "\r", "\n", "\t"), '', var_export($strategy->getVatBreakdown(), true));
+                    $this->invoice[Tag::Customer][Tag::Invoice][Meta::CompletorStrategyInput]['vat-2-divide'] = $strategy->getVat2Divide();
+                    $this->invoice[Tag::Customer][Tag::Invoice][Meta::CompletorStrategyInput]['vat-breakdown'] = str_replace(array('=>', ' ', "\r", "\n", "\t"), array('='), var_export($strategy->getVatBreakdown(), true));
                     $isFirst = false;
                 }
                 if ($strategy->apply()) {
                     $this->replaceLinesCompleted($strategy->getLinesCompleted(), $strategy->getReplacingLines(), $strategy->getName());
-                    if (empty($this->invoice[Tag::Customer][Tag::Invoice][Meta::StrategyCompletorUsed])) {
-                        $this->invoice[Tag::Customer][Tag::Invoice][Meta::StrategyCompletorUsed] = $strategy->getDescription();
+                    if (empty($this->invoice[Tag::Customer][Tag::Invoice][Meta::CompletorStrategyUsed])) {
+                        $this->invoice[Tag::Customer][Tag::Invoice][Meta::CompletorStrategyUsed] = $strategy->getDescription();
                     } else {
-                        $this->invoice[Tag::Customer][Tag::Invoice][Meta::StrategyCompletorUsed] .= '; ' . $strategy->getDescription();
+                        $this->invoice[Tag::Customer][Tag::Invoice][Meta::CompletorStrategyUsed] .= '; ' . $strategy->getDescription();
                     }
                     // Allow for partial solutions: a strategy may correct only some of
                     // the strategy lines and leave the rest up to other strategies.
@@ -147,10 +147,15 @@ class CompletorStrategyLines
 
         // For now hardcoded, but this can be turned into a discovery.
         $namespace = '\Siel\Acumulus\Invoice\CompletorStrategy';
-        $result[] = "$namespace\\SplitKnownDiscountLine";
-        $result[] = "$namespace\\SplitNonMatchingLine";
         $result[] = "$namespace\\ApplySameVatRate";
+        $result[] = "$namespace\\SplitKnownDiscountLine";
+        $result[] = "$namespace\\SplitLine";
+        $result[] = "$namespace\\SplitNonMatchingLine";
         $result[] = "$namespace\\TryAllVatRatePermutations";
+
+        usort($result, function($class1, $class2) {
+           return $class1::$tryOrder - $class2::$tryOrder;
+        });
 
         return $result;
     }
@@ -177,7 +182,7 @@ class CompletorStrategyLines
         foreach ($completedLines as &$completedLine) {
             if ($completedLine[Meta::VatRateSource] === Creator::VatRateSource_Strategy) {
                 $completedLine[Meta::VatRateSource] = Completor::VatRateSource_Strategy_Completed;
-                $completedLine[Meta::StrategyCompletorUsed] = $strategyName;
+                $completedLine[Meta::CompletorStrategyUsed] = $strategyName;
             }
         }
         $this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] = array_merge($lines, $completedLines);

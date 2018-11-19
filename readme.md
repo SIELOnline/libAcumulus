@@ -49,9 +49,9 @@ This library may deviate from specific coding standards in a.o. these ways:
    
 License
 -------
-This library is licensed under the GNU GPLv3 Open Source license. The english
+This library is licensed under the GNU GPLv3 Open Source license. The English
 and only official text can be found on: http://www.gnu.org/licenses/gpl.html.
-A non-binding dutch version can be found on:
+A non-binding Dutch version can be found on:
 http://bartbeuving.files.wordpress.com/2008/07/gpl-v3-nl-101.pdf.
 Both texts are also delivered as part of this library.
 

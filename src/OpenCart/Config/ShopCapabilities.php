@@ -28,7 +28,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getTokenInfo()
+    protected function getTokenInfoSource()
     {
         $catalogOrder = array(
             'order_id',
@@ -171,12 +171,21 @@ class ShopCapabilities extends ShopCapabilitiesBase
             'date_added',
             'date_modified',
         );
-        return parent::getTokenInfo() + array(
-            'source' => array(
-                'file' => 'catalog/model/checkout/order.php',
-                'properties' => array_intersect($catalogOrder, $adminOrder),
-                'properties-more' => true,
-            ),
+        $source = array_intersect($catalogOrder, $adminOrder);
+
+        return array(
+            'file' => 'catalog/model/checkout/order.php',
+            'properties' => $source,
+            'properties-more' => true,
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getTokenInfoShopProperties()
+    {
+        return array(
             'item' => array(
                 'table' => 'order_product',
                 'properties' => array(
@@ -276,11 +285,13 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     public function getShopOrderStatuses()
     {
-        Registry::getInstance()->load->model('localisation/order_status');
-        $states = Registry::getInstance()->model_localisation_order_status->getOrderStatuses();
+        $registry = $this->getRegistry();
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $registry->load->model('localisation/order_status');
+        $statuses = $registry->model_localisation_order_status->getOrderStatuses();
         $result = array();
-        foreach ($states as $state) {
-            list($optionValue, $optionText) = array_values($state);
+        foreach ($statuses as $status) {
+            list($optionValue, $optionText) = array_values($status);
             $result[$optionValue] = $optionText;
         }
         return $result;
@@ -304,11 +315,13 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     public function getPaymentMethods()
     {
-        $prefix = Registry::getInstance()->isOc3() ? 'payment_' : '';
+        $registry = $this->getRegistry();
+        $prefix = $registry->isOc3() ? 'payment_' : '';
         $enabled = array();
-        $extensions = Registry::getInstance()->getExtensionModel()->getInstalled('payment');
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $extensions = $registry->getExtensionModel()->getInstalled('payment');
         foreach ($extensions as $extension) {
-            if ((bool) Registry::getInstance()->config->get($prefix . $extension . '_status')) {
+            if ((bool) $registry->config->get($prefix . $extension . '_status')) {
                 $enabled[] = $extension;
             }
         }
@@ -326,10 +339,11 @@ class ShopCapabilities extends ShopCapabilitiesBase
     protected function paymentMethodToOptions(array $extensions)
     {
         $results = array();
-        $directory = !Registry::getInstance()->isOc1() ? 'extension/payment/' : 'payment/';
+        $registry = $this->getRegistry();
+        $directory = !$registry->isOc1() ? 'extension/payment/' : 'payment/';
         foreach ($extensions as $extension) {
-            Registry::getInstance()->language->load($directory . $extension);
-            $results[$extension] = Registry::getInstance()->language->get('heading_title');
+            $registry->language->load($directory . $extension);
+            $results[$extension] = $registry->language->get('heading_title');
         }
         return $results;
     }
@@ -337,9 +351,25 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
+    public function getVatClasses()
+    {
+        $result = array();
+        $registry = $this->getRegistry();
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $registry->load->model('localisation/tax_class');
+        $taxClasses = $registry->model_localisation_tax_class->getTaxClasses();
+        foreach ($taxClasses as $taxClass) {
+            $result[$taxClass['tax_class_id']] = $taxClass['title'];
+        }
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getLink($formType)
     {
-        $registry = Registry::getInstance();
+        $registry = $this->getRegistry();
         switch ($formType) {
             case 'config':
                 return $registry->getLink($registry->getLocation());
@@ -349,5 +379,17 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 return $registry->getLink($registry->getLocation() . '/batch');
         }
         return parent::getLink($formType);
+    }
+
+    /**
+     * Returns the registry.
+     *
+     * Wrapper around Registry::getInstance().
+     *
+     * @return \Siel\Acumulus\OpenCart\Helpers\Registry
+     */
+    protected function getRegistry()
+    {
+        return Registry::getInstance();
     }
 }

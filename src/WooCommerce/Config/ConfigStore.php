@@ -11,19 +11,10 @@ class ConfigStore extends BaSeConfigStore
     /**
      * {@inheritdoc}
      */
-    public function load(array $keys)
+    public function load()
     {
-        $result = array();
-        $configurationValues = get_option('acumulus');
-        if (is_array($configurationValues)) {
-            foreach ($keys as $key) {
-                // Do not overwrite defaults if no value is set.
-                if (isset($configurationValues[$key])) {
-                    $result[$key] = $configurationValues[$key];
-                }
-            }
-        }
-        return $result;
+        $values = get_option('acumulus');
+        return $values;
     }
 
     /**
@@ -31,28 +22,13 @@ class ConfigStore extends BaSeConfigStore
      */
     public function save(array $values)
     {
-        $result = true;
-        // With 2 forms for the settings, not all settings will be saved at the
-        // same moment.
-        // - Read all currently stored settings.
-        // - Overwrite existing settings.
-        // - Add settings that had not yet a value.
-        // - Remove settings that do not (or no longer) have a custom value.
-        $defaults = $this->acumulusConfig->getDefaults();
-        $configurationValues = get_option('acumulus');
-        $oldConfigurationValues = $configurationValues;
-        foreach ($values as $key => $value) {
-            if ((isset($defaults[$key]) && $defaults[$key] === $value) || $value === null) {
-                unset($configurationValues[$key]);
-            } else {
-                $configurationValues[$key] = $value;
-            }
+        // WP: update_option() also returns false when there are no changes. We
+        // want to return true, so we perform the same check as update_option()
+        // before calling update_option().
+        $oldValues = get_option('acumulus');
+        if ($values === $oldValues || maybe_serialize($values) === maybe_serialize($oldValues)) {
+          return true;
         }
-
-        // Prevent error message when there are no changes:
-        if ($oldConfigurationValues != $configurationValues) {
-          $result = update_option('acumulus', $configurationValues);
-        }
-        return $result;
+        return update_option('acumulus', $values);
     }
 }

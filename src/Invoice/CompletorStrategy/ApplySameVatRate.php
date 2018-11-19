@@ -15,7 +15,11 @@ use Siel\Acumulus\Tag;
  * system anyway, we will return it as is.
  *
  * Current known usages:
- * - ???
+ * - Magento free shipping lines
+ *
+ * @todo: try this first with vat rate that actually do appear in the invoice.
+ *   Doing so, we can prevent adding 6% to a free shipping line on an all 21%
+ *   invoice.
  */
 class ApplySameVatRate extends CompletorStrategyBase
 {
@@ -60,7 +64,7 @@ class ApplySameVatRate extends CompletorStrategyBase
             $vatAmount += $this->completeLine($line2Complete, $vatRate);
         }
 
-        $this->invoice[Tag::Customer][Tag::Invoice][Meta::StrategyCompletor . $this->getName()] = "tryVatRate($vatRate): $vatAmount";
+        $this->invoice[Tag::Customer][Tag::Invoice][Meta::CompletorStrategy . $this->getName()] = "tryVatRate($vatRate): $vatAmount";
         // If the vat totals are equal, the strategy worked.
         // We allow for a reasonable margin, as rounding errors may add up.
         return Number::floatsAreEqual($vatAmount, $this->vat2Divide, 0.04);

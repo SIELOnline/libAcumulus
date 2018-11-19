@@ -1,10 +1,11 @@
 <?php
 namespace Siel\Acumulus\OpenCart\Shop;
 
-use Siel\Acumulus\Helpers\ContainerInterface;
+use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
+use Siel\Acumulus\PluginConfig;
 use Siel\Acumulus\Shop\AcumulusEntryManager as BaseAcumulusEntryManager;
 use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
 
@@ -33,7 +34,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    public function __construct(ContainerInterface $container, Log $log)
+    public function __construct(Container $container, Log $log)
     {
         parent::__construct($container, $log);
         $this->tableName = DB_PREFIX . 'acumulus_entry';
@@ -82,7 +83,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         }
         /** @noinspection PhpUnhandledExceptionInspection */
         return (bool) $this->getDb()->query(sprintf(
-            "INSERT INTO `%s` (store_id, entry_id, token, source_type, source_id, updated) VALUES (%u, %s, %s, '%s', %u, '%s')".
+            "INSERT INTO `%s` (store_id, entry_id, token, source_type, source_id, updated) VALUES (%u, %s, %s, '%s', %u, '%s')",
             $this->tableName,
             $storeId,
             $entryId === null ? 'null' : (string) (int) $entryId,
@@ -127,7 +128,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      */
     protected function sqlNow()
     {
-        return date('Y-m-d H:i:s');
+        return date(PluginConfig::TimeStampFormat_Sql);
     }
 
     /**

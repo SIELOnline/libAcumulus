@@ -2,7 +2,6 @@
 namespace Siel\Acumulus\Magento\Helpers;
 
 use Siel\Acumulus\Helpers\Form;
-use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\FormMapper as BaseFormMapper;
 
 /**
@@ -11,6 +10,13 @@ use Siel\Acumulus\Helpers\FormMapper as BaseFormMapper;
  */
 class FormMapper extends BaseFormMapper
 {
+
+    /**
+     * The date format as Magento uses it.
+     *
+     * @var string
+     */
+    const DateFormat = 'yyyy-MM-dd';
 
     /**
      * The slug-name of the settings page on which to show the section.
@@ -68,10 +74,20 @@ class FormMapper extends BaseFormMapper
         if (!isset($field['attributes'])) {
             $field['attributes'] = array();
         }
-        $element = $parent->addField($field['id'], $this->getMagentoType($field), $this->getMagentoElementSettings($field));
+        $magentoType = $this->getMagentoType($field);
+        $magentoElementSettings = $this->getMagentoElementSettings($field);
+        $element = $parent->addField($field['id'], $magentoType, $magentoElementSettings);
 
-        if ($field['type'] === 'fieldset') {
-            // Add description at the start of the fieldset as a note element.
+        if ($magentoType === 'multiselect') {
+            if (!empty($magentoElementSettings['size'])) {
+                /** @noinspection PhpUndefinedMethodInspection */
+                $element->setSize($magentoElementSettings['size']);
+            }
+        }
+
+        if (!empty($field['fields'])) {
+            // Add description at the start of the fieldset/summary as a note
+            // element.
             if (isset($field['description'])) {
                 $element->addField($field['id'] . '-note', 'note', array('text' => '<p class="note">' . $field['description'] . '</p>'));
             }
@@ -107,6 +123,10 @@ class FormMapper extends BaseFormMapper
             case 'select':
                 $type = empty($field['attributes']['multiple']) ? 'select' : 'multiselect';
                 break;
+            case 'details':
+                $type = 'fieldset';
+                break;
+            // Other types are returned as is: fieldset, text, password, date
             default:
                 $type = $field['type'];
                 break;
@@ -127,10 +147,14 @@ class FormMapper extends BaseFormMapper
     {
         $config = array();
 
+        if ($field['type'] === 'details') {
+            $config['collapsable'] = true;
+            $config['opened'] = false;
+        }
+
         foreach ($field as $key => $value) {
             $config += $this->getMagentoProperty($key, $value, $field['type']);
         }
-
         return $config;
     }
 
@@ -156,6 +180,9 @@ class FormMapper extends BaseFormMapper
             case 'id':
             case 'fields':
                 $result = array();
+                break;
+            case 'summary':
+                $result = array('legend' => $value);
                 break;
             // Fields to return unchanged:
             case 'legend':

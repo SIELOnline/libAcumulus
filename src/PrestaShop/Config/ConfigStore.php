@@ -14,13 +14,38 @@ class ConfigStore extends BaSeConfigStore
     /**
      * {@inheritdoc}
      */
-    public function load(array $keys)
+    public function load()
+    {
+        $values = Configuration::get(strtoupper($this->configKey));
+        $values = unserialize($values);
+        return $values;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function save(array $values)
+    {
+        $values = serialize($values);
+        $result = Configuration::updateValue(strtoupper($this->configKey), $values);
+        return $result;
+    }
+
+    /**
+     * {@deprecated} Only still here for use during update.
+     *
+     * @param array $keys
+     *
+     * @return array
+     */
+    public function loadOld(array $keys)
     {
         $result = array();
         // Load the values from the web shop specific configuration.
         foreach ($keys as $key) {
-            $dbKey = substr(static::CONFIG_KEY . $key, 0, 32);
+            $dbKey = substr('ACUMULUS_' . $key, 0, 32);
             $value = Configuration::get($dbKey);
+            Configuration::deleteByName($dbKey);
             // Do not overwrite defaults if no value is stored.
             if ($value !== false) {
                 if (is_string($value) && strpos($value, '{') !== false) {
@@ -30,29 +55,6 @@ class ConfigStore extends BaSeConfigStore
                     }
                 }
                 $result[$key] = $value;
-            }
-        }
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function save(array $values)
-    {
-        $result = true;
-        $defaults = $this->acumulusConfig->getDefaults();
-        foreach ($values as $key => $value) {
-            $dbKey = substr(static::CONFIG_KEY . $key, 0, 32);
-            if ((isset($defaults[$key]) && $defaults[$key] === $value) || $value === null) {
-              $result = Configuration::deleteByName($dbKey) && $result;
-            } else {
-                if (is_bool($value)) {
-                    $value = $value ? '1' : '0';
-                } elseif (is_array($value)) {
-                    $value = serialize($value);
-                }
-                $result = Configuration::updateValue($dbKey, $value) && $result;
             }
         }
         return $result;

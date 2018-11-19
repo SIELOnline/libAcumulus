@@ -2,13 +2,15 @@
 namespace Siel\Acumulus\Helpers;
 
 /**
- * Represents a collection of translated texts.
+ * Represents a collection of texts translated into 1 or more languages.
  *
- * Most web shops offer their own language handling, but to prevent redoing all
- * the translations in the web shop specific way, a simple general way is
- * defined.
+ * This abstract base class defines the way to get access to a set of
+ * translations that should be defined in extending classes.
+ *
+ * See {@see Translator} for more information about the translation system as
+ * used in this library.
  */
-class TranslationCollection
+abstract class TranslationCollection
 {
     /**
      * Returns a set of translations for the given language, completed with Dutch

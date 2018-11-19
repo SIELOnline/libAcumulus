@@ -83,11 +83,13 @@ class Creator extends BaseCreator
     protected function getItemLines()
     {
         $result = array();
+        /** @var \WC_Abstract_Order $shopSource */
+        $shopSource = $this->invoiceSource->getSource();
         /** @var array[] $lines */
-        $lines = $this->shopSource->get_items(apply_filters('woocommerce_admin_order_item_types', 'line_item'));
+        $lines = $shopSource->get_items(apply_filters('woocommerce_admin_order_item_types', 'line_item'));
         foreach ($lines as $order_item_id => $line) {
             $line['order_item_id'] = $order_item_id;
-            $product = $this->shopSource->get_product_from_item($line);
+            $product = $shopSource->get_product_from_item($line);
             $itemLine = $this->getItemLine($line, $product);
             if ($itemLine) {
                 $result[] = $itemLine;
@@ -128,10 +130,7 @@ class Creator extends BaseCreator
         }
         $this->addPropertySource('item', $item);
 
-        $invoiceSettings = $this->config->getInvoiceSettings();
-        $this->addTokenDefault($result, Tag::ItemNumber, $invoiceSettings['itemNumber']);
-        $this->addTokenDefault($result, Tag::Product, $invoiceSettings['productName']);
-        $this->addTokenDefault($result, Tag::Nature, $invoiceSettings['nature']);
+        $this->addProductInfo($result);
 
         // Add quantity: quantity is negative on refunds, make it positive.
         $sign  = $this->invoiceSource->getType() === source::CreditNote ? -1 : 1;
@@ -141,29 +140,22 @@ class Creator extends BaseCreator
         // Add price info.
         // get_item_total() returns cost per item after discount and ex vat (2nd
         // param).
-        $productPriceEx = $this->shopSource->get_item_total($item, false, false);
-        $productPriceInc = $this->shopSource->get_item_total($item, true, false);
+        /** @var \WC_Abstract_Order $shopSource */
+        $shopSource = $this->invoiceSource->getSource();
+        $productPriceEx = $shopSource->get_item_total($item, false, false);
+        $productPriceInc = $shopSource->get_item_total($item, true, false);
         // get_item_tax returns tax per item after discount.
-        $productVat = $this->shopSource->get_item_tax($item, false);
+        $productVat = $shopSource->get_item_tax($item, false);
 
-        // WooCommerce does not support the margin scheme. So in a standard
-        // install this method will always return false. But if this method
-        // happens to return true anyway (customisation, hook), the costprice
-        // tag will trigger vattype = 5 for Acumulus.
-        if ($this->allowMarginScheme() && !empty($invoiceSettings['costPrice'])) {
-            $value = $this->getTokenizedValue($invoiceSettings['costPrice']);
-            if (!empty($value)) {
-                // Margin scheme:
-                // - Do not put VAT on invoice: send price incl VAT as unitprice.
-                // - But still send the VAT rate to Acumulus.
-                // Costprice > 0 triggers the margin scheme in Acumulus.
-                $result += array(
-                    Tag::UnitPrice => $productPriceInc,
-                    Meta::PrecisionUnitPrice => $this->precisionPriceCalculated,
-                    Tag::CostPrice => $value,
-                    Meta::PrecisionCostPrice => $this->precisionPriceCalculated,
-                );
-            }
+        // Check for cost price and margin scheme.
+        if (!empty($line['costPrice']) && $this->allowMarginScheme()) {
+            // Margin scheme:
+            // - Do not put VAT on invoice: send price incl VAT as unitprice.
+            // - But still send the VAT rate to Acumulus.
+            $result += array(
+                Tag::UnitPrice => $productPriceInc,
+                Meta::PrecisionUnitPrice => $this->precisionPriceCalculated,
+            );
         } else {
             $result += array(
                 Tag::UnitPrice => $productPriceEx,
@@ -171,6 +163,7 @@ class Creator extends BaseCreator
                 Meta::UnitPriceInc => $productPriceInc,
                 Meta::PrecisionUnitPriceInc => $this->precisionPriceCalculated,
             );
+
         }
 
         // Add tax info.
@@ -208,7 +201,9 @@ class Creator extends BaseCreator
     {
         $result = array();
 
-        if ($metadata = $this->shopSource->has_meta($item['order_item_id'])) {
+        /** @var \WC_Abstract_Order $shopSource */
+        $shopSource = $this->invoiceSource->getSource();
+        if ($metadata = $shopSource->has_meta($item['order_item_id'])) {
             // Define hidden core fields.
             $hiddenOrderItemMeta = apply_filters('woocommerce_hidden_order_itemmeta', array(
                 '_qty',
@@ -281,10 +276,11 @@ class Creator extends BaseCreator
         // VAT is as precise as a float can be and is based on the shipping cost
         // as entered by the admin. However, for refunds it is also rounded to
         // the cent.
-        // @todo: to avoid rounding errors, can we get the non-formatted amount?
-        $shippingEx = $this->shopSource->get_total_shipping();
+        /** @var \WC_Abstract_Order $shopSource */
+        $shopSource = $this->invoiceSource->getSource();
+        $shippingEx = $shopSource->get_total_shipping();
         $shippingExPrecision = 0.01;
-        $shippingVat = $this->shopSource->get_shipping_tax();
+        $shippingVat = $shopSource->get_shipping_tax();
         $vatPrecision = $this->invoiceSource->getType() === Source::CreditNote ? 0.01 : 0.0001;
 
         $result = array(
@@ -305,7 +301,10 @@ class Creator extends BaseCreator
     protected function getShippingMethodName()
     {
         // Check if a shipping line item exists for this order.
-        $lines = $this->shopSource->get_items(apply_filters('woocommerce_admin_order_item_types', 'shipping'));
+        /** @var \WC_Abstract_Order $shopSource */
+        $shopSource = $this->invoiceSource->getSource();
+        /** @var array[] $lines */
+        $lines = $shopSource->get_items(apply_filters('woocommerce_admin_order_item_types', 'shipping'));
         if (!empty($lines)) {
             $line = reset($lines);
             return $line['name'];

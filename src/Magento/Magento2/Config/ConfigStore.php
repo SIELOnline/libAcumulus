@@ -10,30 +10,16 @@ use Siel\Acumulus\Config\ConfigStore as BaseConfigStore;
  */
 class ConfigStore extends BaSeConfigStore
 {
-    protected $configKey = 'siel_acumulus/';
+    protected $configPath = 'siel_acumulus/';
 
     /**
      * {@inheritdoc}
      */
-    public function load(array $keys)
+    public function load()
     {
-        $result = array();
-        $config = $this->getConfigInterface();
-        // Load the values from the web shop specific configuration.
-        foreach ($keys as $key) {
-            $value = $config->getValue($this->configKey . $key);
-            // Do not overwrite defaults if no value is set.
-            if (isset($value)) {
-                if (is_string($value) && strpos($value, '{') !== false) {
-                    $unserialized = @unserialize($value);
-                    if ($unserialized !== false) {
-                        $value = $unserialized;
-                    }
-                }
-                $result[$key] = $value;
-            }
-        }
-        return $result;
+        $values = $this->getConfigInterface()->getValue($this->configPath . $this->configKey);
+        $values = unserialize($values);
+        return $values;
     }
 
     /**
@@ -41,21 +27,10 @@ class ConfigStore extends BaSeConfigStore
      */
     public function save(array $values)
     {
-        $resourceConfig = $this->getResourceConfig();
-        $defaults = $this->acumulusConfig->getDefaults();
-        foreach ($values as $key => $value) {
-            if ((isset($defaults[$key]) && $defaults[$key] === $value) || $value === null) {
-                $resourceConfig->deleteConfig($this->configKey . $key, 'default', 0);
-            } else {
-                if (is_bool($value)) {
-                    $value = $value ? 1 : 0;
-                } elseif (is_array($value)) {
-                    $value = serialize($value);
-                }
-                $resourceConfig->saveConfig($this->configKey . $key, $value, 'default', 0);
-            }
-        }
+        $values = serialize($values);
+        $this->getResourceConfig()->saveConfig($this->configPath . $this->configKey, $values, 'default', 0);
 
+        // Force a cache clear.
         /** @var \Magento\Framework\App\Config $config */
 	    $config = ObjectManager::getInstance()->get(\Magento\Framework\App\Config::class);
 	    $config->clean();
@@ -78,4 +53,34 @@ class ConfigStore extends BaSeConfigStore
         return Registry::getInstance()->getResourceConfig();
     }
 
+    /**
+     * {@deprecated} Only still here for use during update.
+     *
+     * @param array $keys
+     *
+     * @return array
+     */
+    public function loadOld(array $keys)
+    {
+        $result = array();
+        $config = $this->getConfigInterface();
+        // Load the values from the web shop specific configuration.
+        foreach ($keys as $key) {
+            $value = $config->getValue($this->configPath . $key);
+            // Delete the value, this will only be used one more time: during
+            // updating to 5.4.0.
+            $this->getResourceConfig()->deleteConfig($this->configPath . $key, 'default', 0);
+            // Do not overwrite defaults if no value is set.
+            if (isset($value)) {
+                if (is_string($value) && strpos($value, '{') !== false) {
+                    $unserialized = @unserialize($value);
+                    if ($unserialized !== false) {
+                        $value = $unserialized;
+                    }
+                }
+                $result[$key] = $value;
+            }
+        }
+        return $result;
+    }
 }

@@ -6,17 +6,29 @@ namespace Siel\Acumulus;
  */
 interface Api
 {
+    /**
+     * Format to use with date() and DateTime formatting methods when a date is
+     * required in the API.
+     *
+     * @var string
+     */
+    const DateFormat_Iso = 'Y-m-d';
+
+    // API role ids
+    const RoleManager = 1;
+    const RoleUser = 2;
+    const RoleCreator = 3;
+    const RoleApiManager = 4;
+    const RoleApiUser = 5;
+    const RoleApiCreator = 6;
+
     // API result codes. Note that internally I want an increasing order of
     // worseness, so these constants are not used internally but mapped to the
-    // Plugin::status_... constants.
+    // PluginConfig::status_... constants.
     const Success = 0;
     const Warnings = 2;
     const Errors = 1;
     const Exception = 3;
-
-    // Web service API constants.
-    const TestMode_Normal = 0;
-    const TestMode_Test = 1;
 
     // Web service related defaults.
     const baseUri = 'https://api.sielsystems.nl/acumulus';
@@ -25,7 +37,10 @@ interface Api
     const testApiVersion = '4.0.4';
     const outputFormat = 'json';
 
-    // Invoice API related constants.
+    // API related constants.
+    const TestMode_Normal = 0;
+    const TestMode_Test = 1;
+
     const PaymentStatus_Due = 1;
     const PaymentStatus_Paid = 2;
 

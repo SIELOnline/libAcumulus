@@ -8,8 +8,6 @@ use Siel\Acumulus\PluginConfig;
  * Provides advanced config form handling.
  *
  * Shop specific may optionally (have to) override:
- * - systemValidate()
- * - isSubmitted()
  * - setSubmittedValues()
  */
 class AdvancedConfigForm extends BaseConfigForm
@@ -29,8 +27,7 @@ class AdvancedConfigForm extends BaseConfigForm
      */
     protected function validateRelationFields()
     {
-        $settings = $this->acumulusConfig->getEmailAsPdfSettings();
-        if ((!array_key_exists('sendCustomer', $this->submittedValues) || !(bool) $this->submittedValues['sendCustomer']) && $settings['emailAsPdf']) {
+        if (empty($this->submittedValues['sendCustomer']) && !empty($this->submittedValues['emailAsPdf'])) {
             $this->warningMessages['conflicting_options'] = $this->t('message_validate_conflicting_options');
         }
     }
@@ -73,11 +70,6 @@ class AdvancedConfigForm extends BaseConfigForm
         if (!empty($this->submittedValues['emailFrom']) && strpos($this->submittedValues['emailFrom'], '[') === false && !preg_match($regexpEmail, $this->submittedValues['emailFrom'])) {
             $this->errorMessages['emailFrom'] = $this->t('message_validate_email_4');
         }
-
-        $settings = $this->acumulusConfig->getCustomerSettings();
-        if (isset($this->submittedValues['emailAsPdf']) && (bool) $this->submittedValues['emailAsPdf'] && !$settings['sendCustomer']) {
-            $this->errorMessages  ['conflicting_options'] = $this->t('message_validate_conflicting_options');
-        }
     }
 
     /**
@@ -110,17 +102,16 @@ class AdvancedConfigForm extends BaseConfigForm
 
         // 1st fieldset: Link to config form.
         $fields['configHeader'] = array(
-            'type' => 'fieldset',
-            'legend' => $this->t('config_form_header'),
-            // @todo: add field(s) (1st (and 2nd) field) as description?
+            'type' => 'details',
+            'summary' => $this->t('config_form_header'),
             'fields' => $this->getConfigLinkFields(),
         );
 
         if ($accountOk) {
             $fields += array(
                 'tokenHelpHeader' => array(
-                    'type' => 'fieldset',
-                    'legend' => $this->t('tokenHelpHeader'),
+                    'type' => 'details',
+                    'summary' => $this->t('tokenHelpHeader'),
                     'description' => $this->t('desc_tokens'),
                     'fields' => $this->getTokenFields(),
                 ),
@@ -152,13 +143,16 @@ class AdvancedConfigForm extends BaseConfigForm
                     'description' => $this->t('desc_emailAsPdfSettings'),
                     'fields' => $this->getEmailAsPdfFields(),
                 ),
-                'versionInformationHeader' => array(
-                    'type' => 'fieldset',
-                    'legend' => $this->t('versionInformationHeader'),
-                    'fields' => $this->getVersionInformation(),
-                ),
             );
         }
+
+        $fields += array(
+            'versionInformationHeader' => array(
+                'type' => 'fieldset',
+                'legend' => $this->t('versionInformationHeader'),
+                'fields' => $this->getVersionInformation($accountOk),
+            ),
+        );
 
         return $fields;
     }
@@ -278,8 +272,8 @@ class AdvancedConfigForm extends BaseConfigForm
      */
     protected function seeList($keySingle, $keyPlural, $list)
     {
-        $sList = $this->listToString($list);
         $key = is_array($list) && count($list) > 1 ? $keyPlural : $keySingle;
+        $sList = $this->listToString($list);
         return sprintf($this->t($key), $sList);
     }
 
@@ -345,7 +339,7 @@ class AdvancedConfigForm extends BaseConfigForm
             'defaultCustomerType' => array(
                 'type' => 'select',
                 'label' => $this->t('field_defaultCustomerType'),
-                'options' => $this->picklistToOptions($this->contactTypesResult, 0, $this->t('option_empty')),
+                'options' => $this->picklistToOptions($this->service->getPicklistContactTypes(), 0, $this->t('option_empty')),
             ),
             'contactStatus' => array(
                 'type' => 'radio',
@@ -496,6 +490,16 @@ class AdvancedConfigForm extends BaseConfigForm
                     'required' => true,
                 ),
             ),
+            'missingAmount' => array(
+                'type' => 'radio',
+                'label' => $this->t('field_missing_amount'),
+                'description' => $this->t('desc_missing_amount'),
+                'options' => array(
+                    PluginConfig::MissingAmount_Warn => $this->t('option_missing_amount_2'),
+                    PluginConfig::MissingAmount_AddLine => $this->t('option_missing_amount_3'),
+                    PluginConfig::MissingAmount_Ignore => $this->t('option_missing_amount_1'),
+                ),
+            ),
             'sendWhat' => array(
                 'type' => 'checkbox',
                 'label' => $this->t('field_sendWhat'),
@@ -520,7 +524,7 @@ class AdvancedConfigForm extends BaseConfigForm
                 'attributes' => array(
                     'size' => 60,
                     'rows' => 6,
-                    'style' => 'box-sizing: border-box; width: 100%; min-width: 24em;',
+                    'style' => 'box-sizing: border-box; width: 83%; min-width: 24em;',
                 ),
             ),
             'invoiceNotes' => array(
@@ -530,7 +534,7 @@ class AdvancedConfigForm extends BaseConfigForm
                 'attributes' => array(
                     'size' => 60,
                     'rows' => 6,
-                    'style' => 'box-sizing: border-box; width: 100%; min-width: 24em;',
+                    'style' => 'box-sizing: border-box; width: 83%; min-width: 24em;',
                 ),
             ),
         );
@@ -653,7 +657,7 @@ class AdvancedConfigForm extends BaseConfigForm
     protected function getEmailAsPdfFields()
     {
         return array(
-            'emailAsPdf' => array(
+            'emailAsPdf_cb' => array(
                 'type' => 'checkbox',
                 'label' => $this->t('field_emailAsPdf'),
                 'description' => $this->t('desc_emailAsPdf'),

@@ -1,7 +1,8 @@
 <?php
 namespace Siel\Acumulus\Helpers;
 
-use Siel\Acumulus\Config\ConfigInterface;
+use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Config\ShopCapabilities;
 
 /**
  * Provides basic form handling.
@@ -9,17 +10,18 @@ use Siel\Acumulus\Config\ConfigInterface;
  * Most webshop and CMS software provide their own sort of form API. To be able
  * to generalize or abstract our form handling, this class defines our own
  * minimal form API. This allows us to define our form handing in a cross
- * webshop compatible way. The webshop/CMs specific part should then define a
- * wrapper/mapper to the webshop specific way of form handling.
+ * webshop compatible way. The webshop/CMS specific part should then define a
+ * renderer/mapper to the webshop specific way of form handling.
  *
  * This base Form class defines a way to:
  * - Define the form elements.
- * - Render the form, including their values.
+ * - Render the form, including assigning values to form elements based on
+ *   POSTed values, configuration settings, and defaults.
  * - Process a form submission:
- *   - Recognise form submission.
- *   - Perform form (submission) validation.
- *   - Execute a task on valid form submission.
- *   - Show success and/or error messages.
+ *     * Recognise form submission form just rendering a form.
+ *     * Perform form (submission) validation.
+ *     * Execute a task on valid form submission.
+ *     * Show success and/or error messages.
  *
  * Usage:
  * This code is typically performed by a controller that processes the request:
@@ -42,7 +44,7 @@ use Siel\Acumulus\Config\ConfigInterface;
  * </code>
  *
  * This code is to be used when the CMS or webshop does provide its own form
- * handling and processing.
+ * handling and processing:
  * <code>
  *   // Create shop specific Form object
  *   $shopForm = new ShopForm()
@@ -53,7 +55,6 @@ use Siel\Acumulus\Config\ConfigInterface;
  *   $shopForm->setValues($form->GetValues)
  *   // and rendering it.
  *   $shopForm->render()
- *
  * </code>
  */
 abstract class Form
@@ -61,13 +62,19 @@ abstract class Form
     /** @var string */
     protected $type;
 
-    /** @var \Siel\Acumulus\Helpers\TranslatorInterface */
+    /** @var \Siel\Acumulus\Helpers\Translator */
     protected $translator;
 
-    /** @var \Siel\Acumulus\Config\ShopCapabilitiesInterface */
+    /** @var \Siel\Acumulus\Helpers\Log */
+    protected $log;
+
+    /** @var \Siel\Acumulus\Helpers\FormHelper */
+    protected $formHelper;
+
+    /** @var \Siel\Acumulus\Config\ShopCapabilities */
     protected $shopCapabilities;
 
-    /** @var \Siel\Acumulus\Config\ConfigInterface */
+    /** @var \Siel\Acumulus\Config\Config */
     protected $acumulusConfig;
 
     /** @var array[] */
@@ -82,20 +89,41 @@ abstract class Form
     /** @var string[] The values as filled in on form submission. */
     protected $submittedValues;
 
-    /** @var string[] Any success messages. */
+    /**
+     * Any success messages.
+     *
+     * @var string[]
+     */
     protected $successMessages;
 
-    /** @var string[] Any warning messages. */
+    /**
+     * Any warning messages.
+     *
+     * These messages may be keyed by the name of a form field. If so, the
+     * warning concerns the value of that field.
+     *
+     * @var string[]
+     */
     protected $warningMessages;
 
-    /** @var string[] Any error messages. */
+    /**
+     * Any error messages.
+     *
+     * These messages may be keyed by the name of a form field. If so, the
+     * error concerns the value of that field.
+     *
+     * @var string[]
+     */
     protected $errorMessages;
 
     /**
-     * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
-     * @param \Siel\Acumulus\Config\ConfigInterface $config
+     * @param \Siel\Acumulus\Helpers\FormHelper $formHelper
+     * @param \Siel\Acumulus\Config\ShopCapabilities $shopCapabilities
+     * @param \Siel\Acumulus\Config\Config $config
+     * @param \Siel\Acumulus\Helpers\Translator $translator
+     * @param \Siel\Acumulus\Helpers\Log $log
      */
-    public function __construct(TranslatorInterface $translator, ConfigInterface $config)
+    public function __construct(FormHelper $formHelper, ShopCapabilities $shopCapabilities, Config $config, Translator $translator, Log $log)
     {
         $this->successMessages = array();
         $this->warningMessages = array();
@@ -103,8 +131,11 @@ abstract class Form
         $this->formValuesSet = false;
         $this->submittedValues = array();
 
+        $this->formHelper = $formHelper;
+        $this->shopCapabilities = $shopCapabilities;
         $this->translator = $translator;
         $this->acumulusConfig = $config;
+        $this->log = $log;
         $this->fields = array();
 
         $class = get_class($this);
@@ -176,22 +207,31 @@ abstract class Form
     }
 
     /**
-     * Adds a warning message.
+     * Adds 1 or more warning messages.
      *
-     * To be used by web shop specific form handling to add a message to the
-     * list of messages to display.
+     * To be used by web shop specific form handling to add a message to the list
+     * of messages to display.
      *
-     * @param string $message
+     * @param string|string[] $message
+     *   A warning message or an array of warning messages. If empty, nothing
+     *   will be added.
      *
      * @return $this
      */
-    public function addWarningMessage($message)
+    public function addWarningMessages($message)
     {
-        $this->warningMessages[] = $message;
+        if (!empty($message)) {
+            if (is_array($message)) {
+                $this->warningMessages = array_merge($this->warningMessages, $message);
+
+            } else {
+                $this->warningMessages[] = $message;
+            }
+        }
         return $this;
     }
 
-  /**
+    /**
      * Returns the error messages.
      *
      * To be used by web shop specific form handling to display validation and
@@ -209,18 +249,27 @@ abstract class Form
     }
 
   /**
-   * Adds an error message.
+   * Adds 1 or more error messages.
    *
    * To be used by web shop specific form handling to add a message to the list
    * of messages to display.
    *
-   * @param string $message
+   * @param string|string[] $message
+   *   An error message or an array of error messages. If empty, nothing
+   *   will be added.
    *
    * @return $this
    */
-    public function addErrorMessage($message)
+    public function addErrorMessages($message)
     {
-        $this->errorMessages[] = $message;
+        if (!empty($message)) {
+            if (is_array($message)) {
+                $this->errorMessages = array_merge($this->errorMessages, $message);
+
+            } else {
+                $this->errorMessages[] = $message;
+            }
+        }
         return $this;
     }
 
@@ -231,7 +280,7 @@ abstract class Form
      */
     public function isSubmitted()
     {
-        return $_SERVER['REQUEST_METHOD'] === 'POST';
+        return $this->formHelper->isSubmitted();
     }
 
     /**
@@ -260,7 +309,7 @@ abstract class Form
             foreach ($defaultFormValues as $key => $defaultFormValue) {
                 // We start with a simple addition or overwrite.
                 $this->formValues[$key] = $defaultFormValue;
-                // distribute keyed arrays over separate values if existing.
+                // Distribute keyed arrays over separate values if existing.
                 if (is_array($defaultFormValue)) {
                     foreach ($defaultFormValue as $valueKey => $valueValue) {
                         $fullKey = "{$key}[{$valueKey}]";
@@ -275,6 +324,29 @@ abstract class Form
                 $this->formValues = array_merge($this->formValues, $this->submittedValues);
             }
             $this->formValues = array_merge($this->formValues, $this->getFieldValues($this->getFields()));
+            // Handle checkboxes
+            // 1 Prepend (checked) checkboxes with their collection name.
+            //   Known usages: PrestaShop.
+            // 2 Place (checked) checkboxes in their collection.
+            //   Known usages: Magento.
+            // As not all webshops handle checkboxes in this way, we do not
+            // unset the original keys (as we do in the reverse functionality in
+            // getPostedValues().
+            foreach ($this->getCheckboxKeys() as $checkboxName => $collectionName) {
+                // 1.
+                if (isset($this->formValues[$checkboxName])) {
+                    $this->formValues["{$collectionName}_{$checkboxName}"] = $this->formValues[$checkboxName];
+                }
+                // 2.
+                if (!empty($this->formValues[$checkboxName])) {
+                    // Check for empty() as the collection name value will have
+                    // been initialized with an empty string.
+                    if (empty($this->formValues[$collectionName])) {
+                        $this->formValues[$collectionName] = array();
+                    }
+                    $this->formValues[$collectionName][] = $checkboxName;
+                }
+            }
 
             $this->formValuesSet = true;
         }
@@ -284,11 +356,11 @@ abstract class Form
      * Returns the values for all the fields on the form definition.
      *
      * This method will not have a use on every web shop, but, e.g. Magento and
-     * PrestaShop have a separate "bind" method to bind a set of values to a form
-     * at once.
+     * PrestaShop have a separate "bind" method to bind a set of values to a
+     * form at once.
      *
      * @return array
-     *  An array of values keyed by the form field names.
+     *   An array of values keyed by the form field names.
      */
     public function getFormValues()
     {
@@ -350,7 +422,7 @@ abstract class Form
     protected function addValuesToFields(array $fields)
     {
         foreach ($fields as $name => &$field) {
-            if ($field['type'] === 'fieldset') {
+            if (!empty($field['fields'])) {
                 $field['fields'] = $this->addValuesToFields($field['fields']);
             } elseif ($field['type'] === 'checkbox') {
                 // Value is a list of checked options.
@@ -404,7 +476,7 @@ abstract class Form
             if (isset($field['value'])) {
                 $result[$id] = $field['value'];
             }
-            if ($field['type'] === 'fieldset') {
+            if (!empty($field['fields'])) {
                 $result = array_merge($result, $this->getFieldValues($field['fields']));
             }
         }
@@ -440,7 +512,7 @@ abstract class Form
         $this->submittedValues = array();
 
         // Process the form if it was submitted.
-        if ($this->isSubmitted() && $this->systemValidate()) {
+        if ($this->isSubmitted()) {
             $this->setSubmittedValues();
             $this->validate();
             if ($executeIfValid && $this->isValid()) {
@@ -449,29 +521,18 @@ abstract class Form
                     if ($message === "message_form_{$this->type}_success") {
                         $message = $this->t('message_form_success');
                     }
-                    $this->successMessages[] = $message;
+                    $this->addSuccessMessage($message);
                 } else {
                     $message = $this->t("message_form_{$this->type}_error");
                     if ($message === "message_form_{$this->type}_error") {
                         $message = $this->t('message_form_error');
                     }
-                    $this->errorMessages[] = $message;
+                    $this->addErrorMessages($message);
                 }
             }
         }
 
         return $this->isValid();
-    }
-
-    /**
-     * Checks system specific form properties.
-     *
-     * This typically includes protection against CSRF attacks and such.
-     * Override this per form with the proper checks from the system.
-     */
-    protected function systemValidate()
-    {
-        return true;
     }
 
     /**
@@ -501,30 +562,33 @@ abstract class Form
      * Returns a definition of the form fields.
      *
      * This should NOT include any:
-     * - Submit or cancel buttons. These are often added by the web shop software
+     * - Submit or cancel buttons. These are often added by the webshop software
      *   in their specific way.
-     * - Tokens, form-id's or other (hidden) fields used by the web shop software
+     * - Tokens, form-id's or other (hidden) fields used by the webshop software
      *   to protect against certain attacks or to facilitate internal form
      *   processing.
      *
-     * This is a recursive, keyed array defining each form field. The key defines
-     * the name of the form field, to be used for the name, and possibly id,
-     * attribute. The values are a keyed array, that can have the following keys:
-     * - type: (required, string) fieldset, text, email, password, date, textarea,
-     *     select, radio, checkbox, markup.
-     * - label: (string) human readable label.
+     * This is a recursive, keyed array defining each form field. The key
+     * defines the name of the form field, to be used for the name, and possibly
+     * id, attribute. The values are a keyed array, that can have the following
+     * keys:
+     * - type: (required, string) fieldset, details, text, email, password,
+     *   date, textarea, select, radio, checkbox, markup.
+     * - legend/summary: (string) human readable title for a fieldset/details.
+     * - label: (string) human readable label, legend or summary.
      * - description: (string) human readable help text.
      * - value: (string) the value for the form field.
-     * - attributes: (array) keyed array with other - possibly html5 - attributes
+     * - attributes: (array) keyed array with other, possibly html5, attributes
      *   to be rendered. Possible keys include e.g:
-     *   - size
-     *   - class
-     *   - required: (bool) whether the field is required.
-     * - fields: (array) If the type = 'fieldset', this value defines the fields
-     *   (and possibly sub fieldsets) of the fieldset.
+     *     - size
+     *     - class
+     *     - required: (bool) whether the field is required.
+     * - fields: (array) If the type = 'fieldset' or 'details', this value
+     *   defines the (possibly recursive) fields of a fieldset/details element.
      * - options: (array) If the type = checkbox, select or radio, this value
      *   contains the options as a keyed array, the keys being the value to
-     *   submit if that choice is selected and the value being the label to show.
+     *   submit if that choice is selected and the value being the label to
+     *   show.
      *
      * Do NOT override this method, instead override getFieldDefinitions().
      *
@@ -542,7 +606,7 @@ abstract class Form
     /**
      * Internal version of getFields();
      *
-     * - Internal method, do not call directly but call getfields() instead.
+     * - Internal method, do not call directly but call getFields() instead.
      * - Do override this method, not getFields().
      *
      * @return array[]
@@ -576,7 +640,7 @@ abstract class Form
         $result = array();
         foreach ($fields as $key => $field) {
             $result[$key] = $key;
-            if ($field['type'] === 'fieldset') {
+            if (!empty($field['fields'])) {
                 $result += $this->getFieldKeys($field['fields']);
             }
         }
@@ -589,18 +653,14 @@ abstract class Form
      * @param array $target
      * @param string $key
      * @param array $source
-     * @param string $sourceKey
      *
      * @return bool
-     *   True if the value isset and thus has been copied, false otherwise,
+     *   True if the value is set and has been copied, false otherwise.
      */
-    protected function addIfIsset(array &$target, $key, array $source, $sourceKey = '')
+    protected function addIfIsset(array &$target, $key, array $source)
     {
-        if (empty($sourceKey)) {
-            $sourceKey = $key;
-        }
-        if (isset($source[$sourceKey])) {
-            $target[$key] = $source[$sourceKey];
+        if (isset($source[$key])) {
+            $target[$key] = $source[$key];
             return true;
         }
         return false;
@@ -653,7 +713,7 @@ abstract class Form
         foreach ($fields as $name => $field) {
             if ($field['type'] === 'checkbox') {
                 $result += array_combine(array_keys($field['options']), array_fill(0, count($field['options']), $name));
-            } elseif ($field['type'] === 'fieldset') {
+            } elseif (!empty($field['fields'])) {
                 $result += $this->getCheckboxKeysByFields($field['fields']);
             }
         }
@@ -671,57 +731,6 @@ abstract class Form
      */
     protected function getPostedValues()
     {
-        $result = $_POST;
-
-        // Handle checkboxes.
-        $checkboxKeys = $this->getCheckboxKeys();
-        foreach ($checkboxKeys as $checkboxName => $collectionName) {
-            if (isset($result[$collectionName]) && is_array($result[$collectionName])) {
-                // Checkboxes are handled as an array of checkboxes.
-                // Extract the checked values.
-                $checkedValues = array_combine(array_values($result[$collectionName]), array_fill(0, count($result[$collectionName]), 1));
-                // Replace the array value with the checked values, unset first
-                // as the keys for the collection and (1 of the) checkboxes may
-                // be the same.
-                unset($result[$collectionName]);
-                $result += $checkedValues;
-            } elseif (isset($result["{$collectionName}_{$checkboxName}"])) {
-                // Checkbox keys are prepended with their collection name.
-                // Add value for key without collection name.
-                $result[$checkboxName] = $result["{$collectionName}_{$checkboxName}"];
-                // And unset for key with collection name.
-                unset($result["{$collectionName}_{$checkboxName}"]);
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * Returns the expected date format using a format as accepted by
-     * DateTime::createFromFormat().
-     *
-     * This default implementation assumes that the shop uses the same format
-     * options as PHP.
-     *
-     * @return string
-     */
-    public function getDateFormat()
-    {
-        return $this->getShopDateFormat();
-    }
-
-    /**
-     * Returns the expected date format using a format as accepted by the shop's
-     * date handling functions.
-     *
-     * This default implementation assumes that the shop does not provide its own
-     * date handling formats and settings.
-     *
-     * @return string
-     */
-    public function getShopDateFormat()
-    {
-        return 'Y-m-d';
+        return $this->formHelper->getPostedValues($this->getCheckboxKeys());
     }
 }

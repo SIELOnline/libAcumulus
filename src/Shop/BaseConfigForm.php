@@ -1,10 +1,13 @@
 <?php
 namespace Siel\Acumulus\Shop;
 
-use Siel\Acumulus\Config\ConfigInterface;
-use Siel\Acumulus\Config\ShopCapabilitiesInterface;
+use Siel\Acumulus\Api;
+use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Config\ShopCapabilities;
 use Siel\Acumulus\Helpers\Form;
-use Siel\Acumulus\Helpers\TranslatorInterface;
+use Siel\Acumulus\Helpers\FormHelper;
+use Siel\Acumulus\Helpers\Log;
+use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Tag;
 use Siel\Acumulus\Web\Result;
 use Siel\Acumulus\Web\Service;
@@ -13,43 +16,38 @@ use Siel\Acumulus\Web\Service;
  * Provides basic config form handling.
  *
  * Shop specific may optionally (have to) override:
- * - systemValidate()
- * - isSubmitted()
  * - setSubmittedValues()
  * - getPostedValues()
  */
 abstract class BaseConfigForm extends Form
 {
-    /** @var \Siel\Acumulus\Config\ShopCapabilitiesInterface */
-    protected $shopCapabilities;
-
     /** @var \Siel\Acumulus\Web\Service */
     protected $service;
 
     /**
-     * Contact types picklist result, used to test the connection, storing it in
-     * this property prevents another webservice call.
+     * About API call result.
      *
      * @var \Siel\Acumulus\Web\Result
      */
-    protected $contactTypesResult;
+    protected $about;
 
     /**
      * Constructor.
      *
-     * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
-     * @param \Siel\Acumulus\Config\ShopCapabilitiesInterface $shopCapabilities
-     * @param \Siel\Acumulus\Config\ConfigInterface $config
      * @param \Siel\Acumulus\Web\Service $service
+     * @param \Siel\Acumulus\Helpers\FormHelper $formHelper
+     * @param \Siel\Acumulus\Config\ShopCapabilities $shopCapabilities
+     * @param \Siel\Acumulus\Config\Config $config
+     * @param \Siel\Acumulus\Helpers\Translator $translator
+     * @param \Siel\Acumulus\Helpers\Log $log
      */
-    public function __construct(TranslatorInterface $translator, ConfigInterface $config, ShopCapabilitiesInterface $shopCapabilities, Service $service)
+    public function __construct(Service $service, FormHelper $formHelper, ShopCapabilities $shopCapabilities, Config $config, Translator $translator, Log $log)
     {
-        parent::__construct($translator, $config);
+        parent::__construct($formHelper, $shopCapabilities, $config, $translator, $log);
 
         $translations = new ConfigFormTranslations();
         $this->translator->add($translations);
 
-        $this->shopCapabilities = $shopCapabilities;
         $this->service = $service;
     }
 
@@ -62,7 +60,7 @@ abstract class BaseConfigForm extends Form
     {
         $postedValues = $this->getPostedValues();
         // Check if the full form was displayed or only the account details.
-        $fullForm = array_key_exists('salutation', $postedValues);
+        $fullForm = $this->isFullForm();
         foreach ($this->acumulusConfig->getKeys() as $key) {
             if (!$this->addIfIsset($this->submittedValues, $key, $postedValues)) {
                 // Add unchecked checkboxes, but only if the full form was
@@ -98,9 +96,9 @@ abstract class BaseConfigForm extends Form
     }
 
     /**
-     * Checks if the account settings are correct.
+     * Checks the account settings for correctness and sufficient authorization.
      *
-     * This is done by trying to download the contact types picklist.
+     * This is done by calling the about API call and checking the result.
      *
      * @return string
      *   Message to show in the 2nd and 3rd fieldset. Empty if successful.
@@ -110,14 +108,26 @@ abstract class BaseConfigForm extends Form
         // Check if we can retrieve a picklist. This indicates if the account
         // settings are correct.
         $message = '';
-        $this->contactTypesResult = null;
         $credentials = $this->acumulusConfig->getCredentials();
         if (!empty($credentials[Tag::ContractCode]) && !empty($credentials[Tag::UserName]) && !empty($credentials[Tag::Password])) {
-            $this->contactTypesResult = $this->service->getPicklistContactTypes();
-            if ($this->contactTypesResult->hasError()) {
-                $message = $this->contactTypesResult->hasCode(401) ? 'message_error_auth' : 'message_error_comm';
-                $this->errorMessages = array_merge($this->errorMessages, $this->contactTypesResult->getErrors(Result::Format_PlainTextArray));
-                $this->warningMessages = array_merge($this->warningMessages, $this->contactTypesResult->getWarnings(Result::Format_PlainTextArray));
+            $this->about = $this->service->getAbout();
+            if ($this->about->hasError()) {
+                $message = $this->about->hasCode(401) ? 'message_error_auth' : ($this->about->hasCode(403) ? 'message_error_forb' : 'message_error_comm');
+                $this->addErrorMessages($this->about->getExceptionMessage());
+                $this->addErrorMessages($this->about->getErrors(Result::Format_PlainTextArray));
+                $this->addWarningMessages($this->about->getWarnings(Result::Format_PlainTextArray));
+            } elseif ($this->about->hasCode(553)) {
+                // Role has been deprecated role for use with the API.
+                $this->addWarningMessages($this->t('message_warning_role_deprecated'));
+            } else {
+                // Check role for sufficient rights but no overkill.
+                $response = $this->about->getResponse();
+                $roleId = (int) $response['roleid'];
+                if ($roleId === Api::RoleApiCreator) {
+                    $this->addWarningMessages($this->t('message_warning_role_insufficient'));
+                } elseif ($roleId === Api::RoleApiManager) {
+                    $this->addWarningMessages($this->t('message_warning_role_overkill'));
+                }
             }
         } else {
             // First fill in your account details.
@@ -140,10 +150,12 @@ abstract class BaseConfigForm extends Form
      * - versionInformation
      * - versionInformationDesc
      *
+     * @param bool $accountOk
+     *
      * @return array[]
      *   The set of version related informational fields.
      */
-    protected function getVersionInformation()
+    protected function getVersionInformation($accountOk)
     {
         $env = $this->acumulusConfig->getEnvironment();
         return array(
@@ -155,6 +167,10 @@ abstract class BaseConfigForm extends Form
             'versionInformationDesc' => array(
                 'type' => 'markup',
                 'value' => $this->t('desc_versionInformation'),
+            ),
+            'accountOk' => array(
+                'type' => 'hidden',
+                'value' => $accountOk ? 'true' : 'false',
             ),
         );
     }
@@ -267,7 +283,8 @@ abstract class BaseConfigForm extends Form
     {
         $result = array();
 
-        // @todo: moet 0 er wel bij als dit een multiple select is?
+        // Because many users won't know how to deselect a single option in a
+        // multiple select element, an empty option is added.
         $result['0'] = $this->t('option_empty_triggerOrderStatus');
         $result += $this->shopCapabilities->getShopOrderStatuses();
 
@@ -283,5 +300,17 @@ abstract class BaseConfigForm extends Form
     protected function isAdvancedConfigForm()
     {
         return $this instanceof AdvancedConfigForm;
+    }
+
+    /**
+     * Returns whether the full form was rendered and posted.
+     *
+     * @return bool
+     *   True if the full form was rendered and posted, false otherwise.
+     */
+    protected function isFullForm()
+    {
+        $postedValues = $this->getPostedValues();
+        return isset($postedValues['accountOk']) && $postedValues['accountOk'] === 'true';
     }
 }

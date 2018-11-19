@@ -30,13 +30,13 @@ class Creator extends BaseCreator
     protected $order;
 
     /**
-     * Product price precision in HS: TODO.
+     * Precision of amounts stored in HS. In HS you can enter either the price
+     * inc or ex vat. The other amount will be calculated and stored with 5
+     * digits precision. So 0.0001 is on the pessimistic side.
      *
      * @var float
      */
-    protected $precisionPriceEntered  = 0.0001;
-    protected $precisionPriceCalculated  = 0.0002;
-    protected $precisionVat  = 0.0011;
+    protected $precision = 0.0001;
 
     /**
      * {@inheritdoc}
@@ -85,44 +85,64 @@ class Creator extends BaseCreator
     {
         $result = array();
         $this->addPropertySource('item', $item);
-        $invoiceSettings = $this->config->getInvoiceSettings();
-        $this->addTokenDefault($result, Tag::ItemNumber, $invoiceSettings['itemNumber']);
-        $this->addTokenDefault($result, Tag::Product, $invoiceSettings['productName']);
+        $this->addProductInfo($result);
         // Remove html with variant info from product name, we'll add that later
         // using children lines.
         if (isset($result[Tag::Product]) && ($pos = strpos($result[Tag::Product], '<span')) !== false) {
             $result[Tag::Product] = substr($result[Tag::Product], 0, $pos);
         }
-        $this->addTokenDefault($result,Tag::Nature, $invoiceSettings['nature']);
 
         $productPriceEx = (float) $item->order_product_price;
         $productVat = (float) $item->order_product_tax;
 
-        $result += array(
+        // Check for cost price and margin scheme.
+        if (!empty($line['costPrice']) && $this->allowMarginScheme()) {
+            // Margin scheme:
+            // - Do not put VAT on invoice: send price incl VAT as unitprice.
+            // - But still send the VAT rate to Acumulus.
+            $result[Tag::UnitPrice] = $productPriceEx + $productVat;
+        } else {
+            $result += array(
                 Tag::UnitPrice => $productPriceEx,
                 Meta::LineAmount => $item->order_product_total_price_no_vat,
                 Meta::LineAmountInc => $item->order_product_total_price,
-                Tag::Quantity => $item->order_product_quantity,
                 Meta::VatAmount => $productVat,
             );
+        }
+        $result[Tag::Quantity] = $item->order_product_quantity;
 
-        // Note that this info remains correct when rates are changed as upon
-        // order creation this info is stored in the order_product table.
+        // Try to get the exact vat rate from the order-product info.
+        // Note that this info remains correct when rates are changed as this
+        // info is stored upon order creation in the order_product table.
         if (is_array($item->order_product_tax_info) && count($item->order_product_tax_info) === 1) {
             $productVatInfo = reset($item->order_product_tax_info);
             if (!empty($productVatInfo->tax_rate)) {
                 $vatRate = $productVatInfo->tax_rate;
             }
         }
+
         if (isset($vatRate)) {
             $vatInfo = array(
                 Tag::VatRate => 100.0 * $vatRate,
                 Meta::VatRateSource => static::VatRateSource_Exact,
             );
         } else {
-            $vatInfo = $this->getVatRangeTags($productVat, $productPriceEx, 0.0001, 0.0001);
+            $vatInfo = $this->getVatRangeTags($productVat, $productPriceEx, $this->precision, $this->precision);
         }
         $result += $vatInfo;
+
+        // Add vat class meta data.
+        if (isset($productVatInfo->category_namekey)) {
+            $result[Meta::VatClassId] = $productVatInfo->category_namekey;
+            /** @var \hikashopCategoryClass $categoryClass */
+            $categoryClass = hikashop_get('class.category');
+            $categoryClass->namekeys = array('category_namekey');
+            /** @var stdClass $category */
+            $category = $categoryClass->get($productVatInfo->category_namekey);
+            if (isset($category->category_name)) {
+                $result[Meta::VatClassName] = $category->category_name;
+            }
+        }
 
         // Add variant info.
         if (!empty($item->order_product_options)) {
@@ -174,26 +194,63 @@ class Creator extends BaseCreator
         $result = array();
         // Check if there is a shipping id attached to the order.
         if (!empty($this->order->order_shipping_id)) {
-            // Check for free shipping on a credit note.
+            // Free shipping on a credit note will not be added as a line.
             if (!Number::isZero($this->order->order_shipping_price) || $this->invoiceSource->getType() !== Source::CreditNote) {
                 $shippingInc = (float) $this->order->order_shipping_price;
                 $shippingVat = (float) $this->order->order_shipping_tax;
                 $shippingEx = $shippingInc - $shippingVat;
-                $precisionEx = $this->precisionPriceCalculated;
-                $precisionInc = $this->precisionPriceEntered;
                 $recalculateUnitPrice = true;
-                $vatInfo = $this->getVatRangeTags($shippingVat, $shippingEx, $this->precisionVat, $precisionEx);
+                $vatInfo = $this->getVatRangeTags($shippingVat, $shippingEx, $this->precision, 2 * $this->precision);
+
+                // Add vat lookup meta data.
+                $vatLookupMetaData = array();
+                if (!empty($this->order->order_shipping_params->prices)) {
+                    $prices = $this->order->order_shipping_params->prices;
+                    if (is_array($prices)) {
+                        $price = reset($prices);
+                        if (!empty($price->taxes) && is_array($price->taxes)) {
+                            reset($price->taxes);
+                            $vatKey = key($price->taxes);
+                            if ($vatKey) {
+                                /** @var \hikashopTaxClass $taxClass */
+                                $taxClass = hikashop_get('class.tax');
+                                $taxClass->namekeys = array('tax_namekey');
+                                /** @var stdClass $tax */
+                                $tax = $taxClass->get($vatKey);
+                                if (!empty($tax->tax_namekey)) {
+                                    $vatLookupMetaData += array(
+                                        Meta::VatRateLookup => (float) $tax->tax_rate * 100,
+                                        Meta::VatRateLookupLabel => $tax->tax_namekey,
+                                    );
+                                }
+                            }
+                        }
+                    }
+                }
+                /** @var \hikashopShippingClass $shippingClass */
+                $shippingClass = hikashop_get('class.shipping');
+                /** @var stdClass $shipping */
+                $shipping = $shippingClass->get($this->order->order_shipping_id);
+                /** @var \hikashopCategoryClass $categoryClass */
+                $categoryClass = hikashop_get('class.category');
+                /** @var stdClass $category */
+                $category = $categoryClass->get($shipping->shipping_tax_id);
+                if (isset($category->category_namekey)) {
+                    $vatLookupMetaData += array(
+                        Meta::VatClassId => $category->category_namekey,
+                        Meta::VatClassName => $category->category_name,
+                    );
+                }
 
                 $result = array(
                         Tag::Product => $this->getShippingMethodName(),
                         Tag::Quantity => 1,
                         Tag::UnitPrice => $shippingEx,
-                        Meta::PrecisionUnitPrice => $precisionEx,
                         Meta::UnitPriceInc => $shippingInc,
-                        Meta::PrecisionUnitPriceInc => $precisionInc,
+                        Meta::PrecisionUnitPriceInc => $this->precision,
                         Meta::RecalculateUnitPrice => $recalculateUnitPrice,
                         Meta::VatAmount => $shippingVat,
-                    ) + $vatInfo;
+                    ) + $vatInfo + $vatLookupMetaData;
             }
         }
         return $result;
@@ -224,7 +281,7 @@ class Creator extends BaseCreator
             $discountInc = (float) $this->order->order_discount_price;
             $discountVat = (float) $this->order->order_discount_tax;
             $discountEx = $discountInc - $discountVat;
-            $vatInfo = $this->getVatRangeTags($discountVat, $discountEx, 0.0001, 0.0002);
+            $vatInfo = $this->getVatRangeTags($discountVat, $discountEx, $this->precision, 2 * $this->precision);
             if ($vatInfo[Tag::VatRate] === null) {
                 $vatInfo[Meta::StrategySplit] = true;
             }
@@ -254,22 +311,40 @@ class Creator extends BaseCreator
             $paymentInc = (float) $this->order->order_payment_price;
             $paymentVat = (float) $this->order->order_payment_tax;
             $paymentEx = $paymentInc - $paymentVat;
-            $precisionEx = $this->precisionPriceCalculated;
-            $precisionInc = $this->precisionPriceEntered;
             $recalculateUnitPrice = true;
-            $vatInfo = $this->getVatRangeTags($paymentVat, $paymentEx, 0.0001, 0.0002);
+            $vatInfo = $this->getVatRangeTags($paymentVat, $paymentEx, $this->precision, 2 * $this->precision);
             $description = $this->t('payment_costs');
+
+            // Add vat lookup meta data.
+            $vatLookupMetaData = array();
+            if (!empty($this->order->order_payment_id)) {
+                /** @var \hikashopShippingClass $paymentClass */
+                $paymentClass = hikashop_get('class.payment');
+                /** @var stdClass $payment */
+                $payment = $paymentClass->get($this->order->order_payment_id);
+                if (!empty($payment->payment_params->payment_tax_id)) {
+                    /** @var \hikashopCategoryClass $categoryClass */
+                    $categoryClass = hikashop_get('class.category');
+                    /** @var stdClass $category */
+                    $category = $categoryClass->get($payment->payment_params->payment_tax_id);
+                    if (isset($category->category_namekey)) {
+                        $vatLookupMetaData += array(
+                            Meta::VatClassId => $category->category_namekey,
+                            Meta::VatClassName => $category->category_name,
+                        );
+                    }
+                }
+            }
 
             $result = array(
                     Tag::Product => $description,
                     Tag::Quantity => 1,
                     Tag::UnitPrice => $paymentEx,
-                    Meta::PrecisionUnitPrice => $precisionEx,
                     Meta::UnitPriceInc => $paymentInc,
-                    Meta::PrecisionUnitPriceInc => $precisionInc,
+                    Meta::PrecisionUnitPriceInc => $this->precision,
                     Meta::RecalculateUnitPrice => $recalculateUnitPrice,
                     Meta::VatAmount => $paymentVat,
-                ) + $vatInfo;
+                ) + $vatInfo + $vatLookupMetaData;
         }
         return $result;
     }

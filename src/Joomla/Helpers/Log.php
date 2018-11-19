@@ -9,9 +9,13 @@ use Siel\Acumulus\Helpers\Log as BaseLog;
  */
 class Log extends BaseLog
 {
-    public function __construct()
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __construct($libraryVersion)
     {
-        parent::__construct();
+        parent::__construct($libraryVersion);
         JLog::addLogger(array('text_file' => 'acumulus.log.php'),
             JLog::ALL,
             array('com_acumulus')

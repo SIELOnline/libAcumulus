@@ -17,6 +17,240 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies)
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
+5.5.1 (2018-11-??)
+------------------
+Bugs:
+- ALL: notice Undefined index nature in completor.php on line 336.
+
+5.5.0 (2018-11-14)
+------------------
+Features:
+- ALL: There are more products than the digital services that are subject to
+  foreign vat for EU customers:
+  - Rephrase everything that has to do with digital services (vat type 6).
+  - Rename option digitalServices to foreignVat.
+- ALL: better differentiate between invoice type 1 and 6 for countries having
+  the same vat rate as NL:
+  * Meta::VatRateLookupLabel is now also an array.
+  * Add vat class information as metadata.
+  * Add method ShopCapabilities::getVatClasses().
+  * Add setting foreignVatClasses (default, UI on config form).
+  * Use setting foreignVatClasses and vat class meta data to select between vat
+    type 1 and 6.
+- OC: Improved filling vat class/rate lookup meta data by matching zones of
+  order address with geo zones of tax rates.
+- ALL: Support for new roles and permissions to access the web server API.
+- ALL: Added logging to execution stage of batch form.
+- ALL: Make "property specification not found" a debug level message.
+- JOO: Access rights revisited so that menu-items remain visible in the admin
+  menu for people who only have access to the batch send form.
+- WC: Now supports WC3.5 and WP5. Better update handling.
+- WC2: show message that support for WC2 will end in a next version.
+- Improved precision handling: getVatRangeTags() now adds the precision meta
+  tags, removed from the shop specific Creator classes.
+Bugs:
+- ALL: Capitalise country adjectives (e.g. dutch -> Dutch) in code documentation
+  and comments).
+- MA: The size attribute on a multi select form element was not taken from our
+  form settings.
+- WC3: Since WC3, the shipping tax class can be "inherited" from the product
+  items (which should be the preferred value for this setting). The plugin did
+  not handle this value correctly.
+- WC3: Code to get the vat rate lookup meta data did not use customer location
+  and would therefore be based on shop location.
+- WC3: Code to improve precision of shipping costs ex vat ignores zone based
+  shipping method settings of WC3.
+- ALL: Warning: implode(): Invalid arguments passed in Completor.php on line 835.
+- ALL: module specific translations were not loaded on case sensitive systems
+  (e.g. linux).
+- ALL: Warning 511: Incorrect vattype value used (false) in vattype tag as part
+  of invoice section in the XML. Using default value of 1(national, regular
+  invoice). (CE005BVTC)
+- ALL: Message 'message_warning_no_vattype_must_split' was not translated.
+- OC: Breadcrumb on settings page was incorrect.
+
+5.4.9 (2018-10-03)
+------------------
+Features:
+- JOO: Add access right to config, advanced config and batch screens.
+Bugs:
+- JOO: Install/update: Call to a member function getAcumulusConfig() on boolean.
+- JOO: Install: File does not exist .../com_acumulus/admin/language/en-GB.com_acumulus.ini
+
+5.4.8 (2018-08-27)
+------------------
+Bugs:
+- OC: SplitLine strategy was removed as having no usages: it turns out that
+  OpenCart coupons need it.
+- ALL: Error in assigning strategy to the vatrate-source tag in
+  CompletorInvoiceLines::addVatRateToLookupLines.
+- ALL: Error in initializing possible vat types.
+- ALL: Empty country code now handled as NL.
+- OC1/OC23: getVatRateLookupByTotalLineType() did not return any tax class id.
+- ALL: Handle the case where a vat rate lookup results in multiple vat rates.
+- ALL: If a parent line must be handled by the strategy phase , ensure that the
+  child lines also are handled by the strategy phase if they have 'vat rate
+  source' = 'parent'.
+
+5.4.7 (2018-07-20)
+------------------
+- ALL: Added an option that covers how to handle missing amounts.
+Bugs:
+- OC (bug/feature?): Better handling of total lines (e.g. shipping) regarding
+  whether the amount is inc or ex vat and vat rate lookup for those lines.
+- ALL: Option "Send consumer client records to Acumulus." removes country code
+  before it is used to determine the vat type.
+- ALL: goods outside EU may use vat type = 1 when you can't or don't want to
+  prove that the goods will leave the EU.
+- ALL: improved handling of costprice and margin lines.
+- ALL: Use host name instead of shop software name when creating fictitious
+  email addresses.
+
+5.4.6 (2018-07-10 JOO)
+5.4.6 (2018-07-09 OC)
+---------------------
+- JOO: com_acumulusInstallerScript.php still contained references to the old
+  library path and defined a psr0 namespace instead of a psr4 one.
+- OC: Warning: lsprintf(): Too few arguments in Opencart/Shop/AcumulusEntryManager.php
+  on line 93. Warning: mysqli::Query(): Empty query.
+
+5.4.5 (2018-07-04)
+------------------
+- ALL: Notice: Undefined index: nature_shop in ConfigForm.php on line 85.
+
+5.4.4 (2018-06-05)
+------------------
+- ALL: better filling and handling of field nature, especially for non-item
+  fields (shipping costs, payment fee).
+- WC: Styling van popup-help in het statusoverzicht op bestellingpagina.
+- WC2: Fatal error: Uncaught Error: Call to a member function get_items() on
+  null in Creator.
+- WC2: Fatal error: Uncaught Error: Call to undefined method
+  WC_Order_Refund::get_parent_id() in Source.
+- WC2: Fatal error: Uncaught RuntimeException: Source::getPaymentMethodOrder()
+  not implemented for Source.
+
+5.4.3 (2018-05-31)
+------------------
+- ALL: feature: added support for costprice setting in all plugins, was only for
+  WooCommerce and, not completely correct, PrestaShop.
+- ALL: feature: removed invoice setting useMargin in favor of shop setting
+  marginProducts.
+- ALL: feature: based on the new settings, the code to determine the vat type
+  and any warning to give when no vat type could be determined, has been
+  improved.
+- ALL: feature: Added configuration settings to determine the nature of the
+  products in the catalog and if goods are sold using the margin scheme. These
+  settings are used to fill in the nature tag and to better determine the vat
+  type.
+- ALL: bug: validation between send customer and email invoice as pdf on
+  advanced config could go wrong.
+- WC: bug Rendering of invoice and packing slip contained errors possibly
+  leading to 2 pdf icons before the invoice.
+- ALL: bug: Warning: strpos() expects parameter 1 to be string, array given in
+  Config.php on line 1129/1155.
+
+5.4.2 (2018-05-15)
+------------------
+- WC: typo in css class is-dismissible on messages.
+- WC: Op een bestellingpagina in de backend wordt nu een statusoverzicht getoond
+  van de Acumulusfactuur. In een volgende versie zullen acties als bv. 'Opnieuw
+  verzenden' en 'Op betaald zetten' toegevoegd worden. Laat ons weten wat u hier
+  van vindt. Suggesties en opmerkingen zijn van harte welkom!
+- ALL: moved Creator::getInvoiceTotals() to Source::getTotals().
+- ALL: moved Creator::completeInvoiceTotals() to Source::completeTotals().
+- ALL: renamed Source::getTotals() to Source::getAvailableTotals().
+- ALL: renamed Source::getPaymentState() to Source::getPaymentStatus().
+- ALL: Legend or summary are not required: Notice:  Undefined index: legend ...
+
+5.4.1 (2018-05-13)
+------------------
+Important note:
+- ALL: Version 5.4.0 has been released to solve some fatal errors for Magento.
+  This has been done while not all the documentation had been finished yet, so
+  more backwards incompatible changes (for developers) will be found in this
+  5.4.1 version.
+
+Changes:
+- ALL: To "clean up" the appearance of the forms, especially the advanced config
+  form, use of the html5 details tag has been introduced. A number of fieldsets
+  are made collapsible/expandable and will be closed by default. PrestaShop does
+  not support this tag, nor js collapsable fieldsets.
+- ALL (MOST): Errors and warnings weren't shown when generated during saving the
+  config.
+- ALL: Not all curl libraries define the CURL_SSLVERSION_TLSv1_2 constant, even
+  if they support that TLS version.
+- HS: Trying to get property of non-object in Joomla\HikaShop\Invoice\Source.php
+  on line 139
+- ALL: Looked up vat rates were not copied from parent to children.
+- ALL: Config form now also displays the exception message when an exception
+  was raised.
+- WC: update_option() also returns false when there are no changes. We want to
+  return true to prevent a user message "There was an error saving the config".
+- ALL: As a consequence of documenting this library from a developers view
+  point, non backwards compatible changes were made that simplify or reduce the
+  amount of code that needs to be written when developing a new extension:
+  - Order of constructor parameters changed to make it consistent among the
+    various classes. This should only affect the Container class in the
+    library.
+  - Container::getManager() renamed to Container::getInvoiceManager().
+  - Now that (since long) the library version is a constant, it can be passed
+    to the constructor of Log, instead of setting it when the Config has been
+    created.
+  - Meta tags renamed to make them more consistent.
+  - Form::addWarningMessage() renamed to Form::addWarningMessages().
+  - Form::addErrorMessage() renamed to Form::addErrorMessages().
+  - Form::isSubmitted() moved to a separate FormHelper class.
+  - Form::getPostedValues() moved to a separate FormHelper class.
+  - Form::systemValidate() removed, should be done in the webshop specific part.
+  - Property source 'originalInvoiceSource' renamed to order.
+  - Property source 'refund' added.
+  - Refactored ShopCapabilities::getTokenInfo().
+- ALL: Continued adding extensive overview documentation aimed at developers
+  that want to create a new extension on their own based on this library.
+- ALL: As part of the developers documentation: added a MyWebShop namespace
+  containing "template" code that can be used when developing a new extension
+  based on this library.
+
+5.4.0 (2018-04-17)
+------------------
+- MA: main.CRITICAL: Exception message: SQLSTATE[23000]: Integrity constraint
+  violation: 1062 Duplicate entry.
+- MA2: Fatal error: Call to undefined method Creator::getSign().
+- ALL: Added extensive overview documentation aimed at developers that want to
+  create a new extension on their own based on this library.
+- ALL: As a consequence of documenting this library from a developers view
+  point, simplifications were made to the code by removing interfaces in favor
+  of the base class that implements that interface:
+  - Removed TranslatorInterface
+  - Removed ContainerInterface
+  - Removed ConfigStoreInterface
+  - Removed ConfigInterface
+  - Removed ShopCapabilitiesInterface
+  - Removed CommunicatorInterface
+- ALL: As a consequence of documenting this library from a developers view
+  point, non backwards compatible changes were made that simplify or reduce the
+  amount of code that needs to be written when developing a new extension:
+  - ConfigStore was simplified, it now only should store the one array value as
+    passed in.
+  - Order of constructor parameters changed to make it consistent among the
+    various Classes.
+
+5.3.0 (2018-04-09)
+------------------
+- WC: statusoverzicht uitgeschakeld voor deze versie.
+- ALL: Gebruik de opgezochte btw percentages van de productinformatie als de
+  berekende btw bandbreedte zo wijd is dat er meerdere btw percentages mogelijk
+  zijn.
+- ALL: Do not render the for attribute with a label for a markup element.
+- ALL: Controls op Batchscherm aangepast: radio buttons voor verzendwijzen en
+  een aparte checkbox voor dry-run.
+- ALL: Methods Form::getDateFormat() en Form::geShopDateFormat() zijn
+  verwijderd. Die shops die nog geen html5 input type=date gebruiken, krijgen
+  een (html5 attribuut) placeholder met het verwachte formaat dat
+  gestandaardiseerd is op wat een date field verstuurt (yyyy-mm-dd).
+- Refactor: centralise date formats.
+
 5.2.2 (2018-03-16)
 ------------------
 - ALL: security review: better code and document security measures taken. Some
@@ -884,6 +1118,9 @@ Ondersteunde versies van de verschillende pakketten
 
 HikaShop
 --------
+* 3.5.1 (Joomla 3.8.13)
+* 3.5.1 (Joomla 3.8.12)
+* 3.4.0 (Joomla 3.8.10)
 * 3.3.0 (Joomla 3.8.5)
 * 3.2.2 (Joomla 3.8.3)
 * 3.2.1 (Joomla 3.8.1)
@@ -918,8 +1155,8 @@ OpenCart 3.x
 OpenCart 2.x
 ------------
 * 2.3.0.2
-* 2.2.0.0
-* 2.1.0.1
+* 2.2.0.0 (t/m library versie 8.4.1)
+* 2.1.0.1 (t/m library versie 8.4.1)
 
 
 OpenCart 1.x
@@ -932,6 +1169,10 @@ PrestaShop
 * 1.7.2.5
 * 1.7.2.0
 * 1.7.1.1
+* 1.6 lijkt iha te werken, maar de link van het geavanceerde instellingenscherm
+  naar het configureerscherm werkt niet.
+* Thirtybees lijkt een kloon van PS1.6 en kan/zal dus dezelfde problemen als 1.6
+  hebben.
 * 1.6.1.13
 * 1.6.1.5
 * 1.6.1.3
@@ -943,6 +1184,8 @@ PrestaShop
 
 VirtueMart
 ----------
+* 3.4.2 (Joomla 3.8.13)
+* 3.2.14 (Joomla 3.8.10)
 * 3.2.12 (Joomla 3.8.5)
 * 3.2.12 (Joomla 3.8.3)
 * 3.2.4 (Joomla 3.8.1)
@@ -956,6 +1199,8 @@ VirtueMart
 
 WooCommerce
 -----------
+* 3.3.5 (WordPress: 5.0)
+* 3.3.5 (WordPress: 4.9.5)
 * 3.2.6 (WordPress: 4.9.2)
 * 3.1.2 (WordPress: 4.8.2)
 * 3.1.2 (WordPress: 4.8)

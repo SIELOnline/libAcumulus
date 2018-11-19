@@ -6,7 +6,7 @@ use Db;
 use Hook;
 use Order;
 use OrderSlip;
-use Siel\Acumulus\Helpers\ContainerInterface;
+use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
 use Siel\Acumulus\Invoice\Result;
@@ -35,7 +35,7 @@ class InvoiceManager extends BaseInvoiceManager
     /**
      * {@inheritdoc}
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(Container $container)
     {
         parent::__construct($container);
         $this->orderTableName = _DB_PREFIX_ . Order::$definition['table'];

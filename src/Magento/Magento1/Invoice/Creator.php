@@ -77,23 +77,27 @@ class Creator extends BaseCreator
 
         $this->addPropertySource('item', $item);
 
-        $invoiceSettings = $this->config->getInvoiceSettings();
-        $this->addTokenDefault($result, Tag::ItemNumber, $invoiceSettings['itemNumber']);
-        $this->addTokenDefault($result, Tag::Product, $invoiceSettings['productName']);
-        $this->addTokenDefault($result, Tag::Nature, $invoiceSettings['nature']);
+        $this->addProductInfo($result);
 
         // For higher precision of the unit price, we will recalculate the price
         // ex vat if product prices are entered inc vat by the admin.
         $productPriceEx = (float) $item->getBasePrice();
         $productPriceInc = (float) $item->getBasePriceInclTax();
 
-        // Add price and quantity info.
-        $result += array(
-            Tag::UnitPrice => $productPriceEx,
-            Meta::UnitPriceInc => $productPriceInc,
-            Meta::RecalculateUnitPrice => $this->productPricesIncludeTax(),
-            Tag::Quantity => $item->getQtyOrdered(),
-        );
+        // Check for cost price and margin scheme.
+        if (!empty($line['costPrice']) && $this->allowMarginScheme()) {
+            // Margin scheme:
+            // - Do not put VAT on invoice: send price incl VAT as unitprice.
+            // - But still send the VAT rate to Acumulus.
+            $result[Tag::UnitPrice] = $productPriceInc;
+        } else {
+            $result += array(
+                Tag::UnitPrice => $productPriceEx,
+                Meta::UnitPriceInc => $productPriceInc,
+                Meta::RecalculateUnitPrice => $this->productPricesIncludeTax(),
+            );
+        }
+        $result[Tag::Quantity] = $item->getQtyOrdered();
 
         // Tax amount = VAT over discounted product price.
         // Hidden tax amount = VAT over discount.
@@ -124,6 +128,13 @@ class Creator extends BaseCreator
         $result += array(
             Meta::LineVatAmount => $lineVat,
         );
+
+        // Add vat meta data.
+        $product = $item->getProduct();
+        if ($product) {
+            /** @noinspection PhpUndefinedMethodInspection */
+            $result += $this->getTaxClassMetaData((int) $product->getTaxClassId());
+        }
 
         // Add discount related info.
         if (!Number::isZero($item->getBaseDiscountAmount())) {
@@ -158,23 +169,28 @@ class Creator extends BaseCreator
 
         $this->addPropertySource('item', $item);
 
-        $invoiceSettings = $this->config->getInvoiceSettings();
-        $this->addTokenDefault($result, Tag::ItemNumber, $invoiceSettings['itemNumber']);
-        $this->addTokenDefault($result, Tag::Product, $invoiceSettings['productName']);
-        $this->addTokenDefault($result, Tag::Nature, $invoiceSettings['nature']);
+        $this->addProductInfo($result);
 
         $productPriceEx = -((float) $item->getBasePrice());
         $productPriceInc = -((float) $item->getBasePriceInclTax());
         $lineVat = -((float) $item->getBaseTaxAmount() + (float) $item->getBaseHiddenTaxAmount());
 
-        // Add price and quantity info.
-        $result += array(
-            Tag::UnitPrice => $productPriceEx,
-            Meta::UnitPriceInc => $productPriceInc,
-            Meta::RecalculateUnitPrice => $this->productPricesIncludeTax(),
-            Tag::Quantity => $item->getQty(),
-            Meta::LineVatAmount => $lineVat,
-        );
+        // Check for cost price and margin scheme.
+        if (!empty($line['costPrice']) && $this->allowMarginScheme()) {
+            // Margin scheme:
+            // - Do not put VAT on invoice: send price incl VAT as unitprice.
+            // - But still send the VAT rate to Acumulus.
+            $result[Tag::UnitPrice] = $productPriceInc;
+        } else {
+            // Add price info.
+            $result += array(
+                Tag::UnitPrice => $productPriceEx,
+                Meta::UnitPriceInc => $productPriceInc,
+                Meta::RecalculateUnitPrice => $this->productPricesIncludeTax(),
+                Meta::LinesVatAmount => $lineVat,
+            );
+        }
+        $result[Tag::Quantity] = $item->getQty();
 
         // Add VAT related info.
         $orderItemId = $item->getOrderItemId();
@@ -187,6 +203,15 @@ class Creator extends BaseCreator
         } else {
             $result += $this->getVatRangeTags($lineVat / $item->getQty(), $productPriceEx, 0.02, $this->productPricesIncludeTax() ? 0.02 : 0.01);
             $result[Meta::FieldsCalculated][] = Meta::VatAmount;
+        }
+
+        // Add vat meta data.
+        /** @var \Mage_Catalog_Model_Product $product */
+        $product = \Mage::getModel('catalog/product');
+        $product->getResource()->load($product, $item->getProductId());
+        if ($product->getId()) {
+            /** @noinspection PhpUndefinedMethodInspection */
+            $result += $this->getTaxClassMetaData((int) $product->getTaxClassId());
         }
 
         // Add discount related info.
@@ -244,6 +269,9 @@ class Creator extends BaseCreator
                     ) + $this->getVatRangeTags($shippingVat, $shippingEx, 0.02,$this->shippingPricesIncludeTax() ? 0.02 : 0.01);
                 $result[Meta::FieldsCalculated][] = Meta::VatAmount;
 
+                // Add vat meta data.
+                $result += $this->getTaxClassMetaData($this->getShippingTaxClassId());
+
                 // getShippingDiscountAmount() only exists on Orders.
                 if ($this->invoiceSource->getType() === Source::Order && !Number::isZero($magentoSource->getBaseShippingDiscountAmount())) {
                     $result[Meta::LineDiscountAmountInc] = -$sign * $magentoSource->getBaseShippingDiscountAmount();
@@ -269,13 +297,34 @@ class Creator extends BaseCreator
     }
 
     /**
+     * Returns meta data regarding the tax class.
+     *
+     * @param int $taxClassId
+     *
+     * @return array
+     *   An empty array or an array with keys:
+     *   - Meta::VatClassId
+     *   - Meta::VatClassName
+     */
+    protected function getTaxClassMetaData($taxClassId)
+    {
+        $result = array();
+        if ($taxClassId) {
+            $result[Meta::VatClassId] = $taxClassId;
+            /** @var \Mage_Tax_Model_Class $taxClass */
+            $taxClass = \Mage::getModel('tax/class');
+            $taxClass->getResource()->load($taxClass, $taxClassId);
+            $result[Meta::VatClassName] = $taxClass->getClassName();
+        }
+        return $result;
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function productPricesIncludeTax()
     {
-        /** @var \Mage_Tax_Model_Config $taxConfig */
-        $taxConfig = \Mage::getModel('tax/config');
-        return $taxConfig->priceIncludesTax();
+        return $this->getTaxConfig()->priceIncludesTax();
     }
 
     /**
@@ -286,8 +335,28 @@ class Creator extends BaseCreator
      */
     protected function shippingPricesIncludeTax()
     {
-        /** @var \Mage_Tax_Model_Config $taxConfig */
-        $taxConfig = \Mage::getModel('tax/config');
-        return $taxConfig->shippingPriceIncludesTax();
+        return $this->getTaxConfig()->shippingPriceIncludesTax();
     }
+
+    /**
+     * Returns the shipping tax class id.
+     *
+     * @return int
+     *   The id of the tax class used for shipping.
+     */
+    protected function getShippingTaxClassId()
+    {
+        return $this->getTaxConfig()->getShippingTaxClass();
+    }
+
+    /**
+     * Returns a \Mage_Tax_Model_Config object.
+     *
+     * @return false|\Mage_Tax_Model_Config
+     */
+    protected function getTaxConfig()
+    {
+        return \Mage::getModel('tax/config');
+    }
+
 }

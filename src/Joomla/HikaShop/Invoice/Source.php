@@ -46,7 +46,7 @@ class Source extends BaseSource
      */
     public function getDate()
     {
-        return date('Y-m-d', $this->source->order_created);
+        return date(API::DateFormat_Iso, $this->source->order_created);
     }
 
     /**
@@ -75,7 +75,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    public function getPaymentState()
+    public function getPaymentStatus()
     {
         /** @var \hikashopConfigClass $config */
         $config = hikashop_config();
@@ -111,7 +111,7 @@ class Source extends BaseSource
                 }
             }
         }
-        return $date ? date('Y-m-d', $date) : $date;
+        return $date ? date(API::DateFormat_Iso, $date) : $date;
     }
 
     /**
@@ -134,12 +134,15 @@ class Source extends BaseSource
      */
     public function getCurrency()
     {
-        $currency = unserialize($this->source->order_currency_info);
-        $result = array (
-            Meta::Currency => $currency->currency_code,
-            Meta::CurrencyRate => (float) $currency->currency_rate,
-            Meta::CurrencyDoConvert => true,
-        );
+        $result = array();
+        if (!empty($this->source->order_currency_info)) {
+            $currency = unserialize($this->source->order_currency_info);
+            $result = array(
+                Meta::Currency => $currency->currency_code,
+                Meta::CurrencyRate => (float) $currency->currency_rate,
+                Meta::CurrencyDoConvert => true,
+            );
+        }
         return $result;
     }
 
@@ -149,13 +152,15 @@ class Source extends BaseSource
      * This override provides the values meta-invoice-amountinc and
      * meta-invoice-vatamount.
      */
-    public function getTotals()
+    protected function getAvailableTotals()
     {
         $vatAmount = 0.0;
         // No order_tax_info => no tax (?) => vatamount = 0.
         if (!empty($this->source->order_tax_info)) {
             foreach ($this->source->order_tax_info as $taxInfo) {
-                $vatAmount += $taxInfo->tax_amount;
+                if (!empty($taxInfo->tax_amount)) {
+                    $vatAmount += $taxInfo->tax_amount;
+                }
             }
         }
         return array(
@@ -177,6 +182,6 @@ class Source extends BaseSource
      */
     public function getInvoiceDate()
     {
-        return !empty($this->source->order_invoice_created) ? date('Y-m-d', $this->source->order_invoice_created) : parent::getInvoiceDate();
+        return !empty($this->source->order_invoice_created) ? date(API::DateFormat_Iso, $this->source->order_invoice_created) : parent::getInvoiceDate();
     }
 }

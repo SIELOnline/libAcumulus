@@ -9,8 +9,6 @@ use Siel\Acumulus\Tag;
  * Provides basic config form handling.
  *
  * Shop specific may optionally (have to) override:
- * - systemValidate()
- * - isSubmitted()
  * - setSubmittedValues()
  */
 class ConfigForm extends BaseConfigForm
@@ -37,6 +35,9 @@ class ConfigForm extends BaseConfigForm
     protected function validate()
     {
         $this->validateAccountFields();
+        if ($this->isFullForm()) {
+            $this->validateShopFields();
+        }
     }
 
     /**
@@ -74,6 +75,41 @@ class ConfigForm extends BaseConfigForm
             $this->errorMessages[Tag::EmailOnError] = $this->t('message_validate_email_1');
         } elseif (!preg_match($regexpEmail, $this->submittedValues[Tag::EmailOnError])) {
             $this->errorMessages[Tag::EmailOnError] = $this->t('message_validate_email_0');
+        }
+    }
+
+    /**
+     * Validates fields in the shop settings fieldset.
+     */
+    protected function validateShopFields()
+    {
+        if (!isset($this->submittedValues['nature_shop'])) {
+            $this->errorMessages['nature_shop'] = $this->t('message_validate_nature_0');
+        }
+        if (!isset($this->submittedValues['foreignVat'])) {
+            $this->errorMessages['foreignVat'] = $this->t('message_validate_foreign_vat_0');
+        }
+        if (!isset($this->submittedValues['vatFreeProducts'])) {
+            $this->errorMessages['vatFreeProducts'] = $this->t('message_validate_vat_free_products_0');
+        }
+        if (!isset($this->submittedValues['marginProducts'])) {
+            $this->errorMessages['marginProducts'] = $this->t('message_validate_margin_products_0');
+        }
+
+        // NOTE: it is debatable whether margin articles can be services, e.g.
+        // selling 2nd hand software licenses. However it is not debatable that
+        // margin goods can never be digital services. So the 1st validation is
+        // debatable and my be removed in the future, the 2nd isn't.
+        if (isset($this->submittedValues['nature_shop']) && isset($this->submittedValues['marginProducts'])) {
+            // If wel only sell articles with nature Services, we cannot (also) sell
+            // margin goods.
+            if ($this->submittedValues['nature_shop'] == PluginConfig::Nature_Services && $this->submittedValues['marginProducts'] != PluginConfig::MarginProducts_No) {
+                $this->errorMessages['conflicting_options_1'] = $this->t('message_validate_conflicting_shop_options_2');
+            }
+            // If we only sell margin goods, the nature of all we sell is Products.
+            if ($this->submittedValues['marginProducts'] == PluginConfig::MarginProducts_Only && $this->submittedValues['nature_shop'] != PluginConfig::Nature_Products) {
+                $this->errorMessages['nature_shop_1'] = $this->t('message_validate_conflicting_shop_options_3');
+            }
         }
     }
 
@@ -151,14 +187,18 @@ class ConfigForm extends BaseConfigForm
             'versionInformationHeader' => array(
                 'type' => 'fieldset',
                 'legend' => $this->t('versionInformationHeader'),
-                'fields' => $this->getVersionInformation(),
-            ),
-            'advancedConfigHeader' => array(
-                'type' => 'fieldset',
-                'legend' => $this->t('advanced_form_header'),
-                'fields' => $this->getAdvancedConfigLinkFields(),
+                'fields' => $this->getVersionInformation($accountOk),
             ),
         );
+        if ($accountOk) {
+            $fields += array(
+                'advancedConfigHeader' => array(
+                    'type' => 'details',
+                    'summary' => $this->t('advanced_form_header'),
+                    'fields' => $this->getAdvancedConfigLinkFields(),
+                ),
+            );
+        }
 
         return $fields;
     }
@@ -218,22 +258,46 @@ class ConfigForm extends BaseConfigForm
      * Returns the set of invoice related fields.
      *
      * The fields returned:
-     * - digitalServices
+     * - nature_shop
+     * - foreignVat
+     * - foreignVatClasses
      * - vatFreeProducts
+     * - marginProducts
      *
      * @return array[]
      *   The set of shop related fields.
      */
     protected function getShopFields()
     {
+        $vatClasses = $this->shopCapabilities->getVatClasses();
         $fields = array(
-            'digitalServices' => array(
+            'nature_shop' => array(
                 'type' => 'radio',
-                'label' => $this->t('field_digitalServices'),
-                'description' => $this->t('desc_digitalServices'),
-                'options' => $this->getDigitalServicesOptions(),
+                'label' => $this->t('field_nature_shop'),
+                'description' => $this->t('desc_nature_shop'),
+                'options' => $this->getNatureOptions(),
                 'attributes' => array(
                     'required' => true,
+                ),
+            ),
+            'foreignVat' => array(
+                'type' => 'radio',
+                'label' => $this->t('field_foreignVat'),
+                'description' => $this->t('desc_foreignVat'),
+                'options' => $this->getForeignVatOptions(),
+                'attributes' => array(
+                    'required' => true,
+                ),
+            ),
+            'foreignVatClasses' => array(
+                'name' => 'foreignVatClasses[]',
+                'type' => 'select',
+                'label' => $this->t('field_foreignVatClasses'),
+                'description' => $this->t('desc_foreignVatClasses'),
+                'options' => $vatClasses,
+                'attributes' => array(
+                    'multiple' => true,
+                    'size' => min(count($vatClasses), 8),
                 ),
             ),
             'vatFreeProducts' => array(
@@ -241,6 +305,15 @@ class ConfigForm extends BaseConfigForm
                 'label' => $this->t('field_vatFreeProducts'),
                 'description' => $this->t('desc_vatFreeProducts'),
                 'options' => $this->getVatFreeProductsOptions(),
+                'attributes' => array(
+                    'required' => true,
+                ),
+            ),
+            'marginProducts' => array(
+                'type' => 'radio',
+                'label' => $this->t('field_marginProducts'),
+                'description' => $this->t('desc_marginProducts'),
+                'options' => $this->getMarginProductsOptions(),
                 'attributes' => array(
                     'required' => true,
                 ),
@@ -261,19 +334,19 @@ class ConfigForm extends BaseConfigForm
      */
     protected function getTriggerFields()
     {
+        $orderStatusesList = $this->getOrderStatusesList();
         $fields = array(
             'triggerOrderStatus' => array(
                 'name' => 'triggerOrderStatus[]',
                 'type' => 'select',
                 'label' => $this->t('field_triggerOrderStatus'),
                 'description' => $this->t('desc_triggerOrderStatus'),
-                'options' => $this->getOrderStatusesList(),
+                'options' => $orderStatusesList,
                 'attributes' => array(
                     'multiple' => true,
-                    'size' => min(count($this->getOrderStatusesList()), 8),
+                    'size' => min(count($orderStatusesList), 8),
                 ),
             ),
-            // @todo: multi-select? if we change this to multi select, none should no longer be an option.
             'triggerInvoiceEvent' => $this->getOptionsOrHiddenField('triggerInvoiceEvent', 'radio', false),
         );
         return $fields;
@@ -444,27 +517,42 @@ class ConfigForm extends BaseConfigForm
         return array();
     }
 
-
     /**
-     * Returns a list of options for the digital services field.
+     * Returns a list of options for the nature field.
      *
-     * @return array
+     * @return string[]
      *   An array keyed by the option values and having translated descriptions
      *   as values.
      */
-    protected function getDigitalServicesOptions()
+    protected function getNatureOptions()
     {
         return array(
-            PluginConfig::DigitalServices_Both => $this->t('option_digitalServices_1'),
-            PluginConfig::DigitalServices_No => $this->t('option_digitalServices_2'),
-            PluginConfig::DigitalServices_Only => $this->t('option_digitalServices_3'),
+            PluginConfig::Nature_Both => $this->t('option_nature_1'),
+            PluginConfig::Nature_Products => $this->t('option_nature_2'),
+            PluginConfig::Nature_Services => $this->t('option_nature_3'),
+        );
+    }
+
+    /**
+     * Returns a list of options for the foreign vat field.
+     *
+     * @return string[]
+     *   An array keyed by the option values and having translated descriptions
+     *   as values.
+     */
+    protected function getForeignVatOptions()
+    {
+        return array(
+            PluginConfig::ForeignVat_Both => $this->t('option_foreignVat_1'),
+            PluginConfig::ForeignVat_No => $this->t('option_foreignVat_2'),
+            PluginConfig::ForeignVat_Only => $this->t('option_foreignVat_3'),
         );
     }
 
     /**
      * Returns a list of options for the vat free products field.
      *
-     * @return array
+     * @return string[]
      *   An array keyed by the option values and having translated descriptions
      *   as values.
      */
@@ -477,5 +565,19 @@ class ConfigForm extends BaseConfigForm
         );
     }
 
-
+    /**
+     * Returns a list of options for the margin products field.
+     *
+     * @return string[]
+     *   An array keyed by the option values and having translated descriptions
+     *   as values.
+     */
+    protected function getMarginProductsOptions()
+    {
+        return array(
+            PluginConfig::MarginProducts_Both => $this->t('option_marginProducts_1'),
+            PluginConfig::MarginProducts_No => $this->t('option_marginProducts_2'),
+            PluginConfig::MarginProducts_Only => $this->t('option_marginProducts_3'),
+        );
+    }
 }

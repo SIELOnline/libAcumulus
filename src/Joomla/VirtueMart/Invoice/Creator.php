@@ -65,6 +65,15 @@ class Creator extends BaseCreator
     protected $shopInvoice = array();
 
     /**
+     * Precision of amounts stored in VM. In VM you can enter either the price
+     * inc or ex vat. The other amount will be calculated and stored with 4
+     * digits precision. So 0.0001 is on the pessimistic side.
+     *
+     * @var float
+     */
+    protected $precision = 0.001;
+
+    /**
      * {@inheritdoc}
      *
      * This override also initializes VM specific properties related to the
@@ -130,10 +139,8 @@ class Creator extends BaseCreator
     {
         $result = array();
         $this->addPropertySource('item', $item);
-        $invoiceSettings = $this->config->getInvoiceSettings();
-        $this->addTokenDefault($result, Tag::ItemNumber, $invoiceSettings['itemNumber']);
-        $this->addTokenDefault($result, Tag::Product, $invoiceSettings['productName']);
-        $this->addTokenDefault($result, Tag::Nature, $invoiceSettings['nature']);
+
+        $this->addProductInfo($result);
 
         $productPriceEx = (float) $item->product_discountedPriceWithoutTax;
         $productPriceInc = (float) $item->product_final_price;
@@ -144,17 +151,28 @@ class Creator extends BaseCreator
             $vatInfo = array(
                 Tag::VatRate => (float) $calcRule->calc_value,
                 Meta::VatRateSource => static::VatRateSource_Exact,
+                Meta::VatClassId => $calcRule->virtuemart_calc_id,
+                Meta::VatClassName => $calcRule->calc_rule_name,
             );
         } else {
-            $vatInfo = $this->getVatRangeTags($productVat, $productPriceEx, 0.0001, 0.0001);
+            $vatInfo = $this->getVatRangeTags($productVat, $productPriceEx, $this->precision, $this->precision);
         }
 
-        $result += array(
+        // Check for cost price and margin scheme.
+        if (!empty($line['costPrice']) && $this->allowMarginScheme()) {
+            // Margin scheme:
+            // - Do not put VAT on invoice: send price incl VAT as unitprice.
+            // - But still send the VAT rate to Acumulus.
+            $result[Tag::UnitPrice] = $productPriceInc;
+        } else {
+            $result += array(
                 Tag::UnitPrice => $productPriceEx,
                 Meta::UnitPriceInc => $productPriceInc,
-                Tag::Quantity => $item->product_quantity,
                 Meta::VatAmount => $productVat,
-            ) + $vatInfo;
+            );
+        }
+        $result[Tag::Quantity] = $item->product_quantity;
+        $result += $vatInfo;
 
         // Add variant info.
         $children = $this->getVariantLines($item, $result[Tag::Quantity], $vatInfo);
@@ -232,9 +250,11 @@ class Creator extends BaseCreator
                 $vatInfo = array(
                     Tag::VatRate => (float) $calcRule->calc_value,
                     Meta::VatRateSource => static::VatRateSource_Exact,
+                    Meta::VatClassId => $calcRule->virtuemart_calc_id,
+                    Meta::VatClassName => $calcRule->calc_rule_name,
                 );
             } else {
-                $vatInfo = $this->getVatRangeTags($shippingVat, $shippingEx, 0.0001, 0.01);
+                $vatInfo = $this->getVatRangeTags($shippingVat, $shippingEx, $this->precision, 0.01);
             }
 
             $result = array(
@@ -336,7 +356,6 @@ class Creator extends BaseCreator
      */
     protected function getCouponCodeDiscountLine()
     {
-        // @todo: standardize coupon lines: use itemnumber?, use shop specific names?, etc.
         $result = array(
             Tag::ItemNumber => $this->order['details']['BT']->coupon_code,
             Tag::Product => $this->t('discount'),
@@ -366,9 +385,11 @@ class Creator extends BaseCreator
                     $vatInfo = array(
                         Tag::VatRate => (float) $calcRule->calc_value,
                         Meta::VatRateSource => static::VatRateSource_Exact,
+                        Meta::VatClassId => $calcRule->virtuemart_calc_id,
+                        Meta::VatClassName => $calcRule->calc_rule_name,
                     );
                 } else {
-                    $vatInfo = $this->getVatRangeTags($paymentVat, $paymentEx, 0.0001, 0.01);
+                    $vatInfo = $this->getVatRangeTags($paymentVat, $paymentEx, $this->precision, 0.01);
                 }
 
                 $result = array(

@@ -57,9 +57,6 @@ class Token extends BaseToken
      */
     protected function getDataValue(array $data, $property)
     {
-	    if (stripos($property, 'vat') !== false) {
-		    $i = 3;
-	    }
         $value = null;
         if (array_key_exists($property, $data)) {
             // Found: return the value.
@@ -85,7 +82,7 @@ class Token extends BaseToken
      *
      * WooCommerce meta data is stored in objects having twice the set of
      * properties id, key, and value, once in the property current_value and
-     * once in the property data.  If 1 of the properties id, key or value is
+     * once in the property data. If 1 of the properties id, key or value is
      * retrieved, its value from the current_value set is returned.
      *
      * @param object[] $metaData

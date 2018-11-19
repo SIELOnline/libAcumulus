@@ -3,7 +3,7 @@ namespace Siel\Acumulus\Web;
 
 use Exception;
 use Siel\Acumulus\Api;
-use Siel\Acumulus\Helpers\TranslatorInterface;
+use Siel\Acumulus\Helpers\Translator;
 
 /**
  * Class Result wraps an Acumulus web service result into an object.
@@ -42,7 +42,7 @@ class Result
     const AddReqResp_Always = 2;
     const AddReqResp_WithOther = 3;
 
-    /** @var \Siel\Acumulus\Helpers\TranslatorInterface */
+    /** @var \Siel\Acumulus\Helpers\Translator */
     protected $translator;
 
     /**
@@ -137,9 +137,9 @@ class Result
     /**
      * Result constructor.
      *
-     * @param \Siel\Acumulus\Helpers\TranslatorInterface $translator
+     * @param \Siel\Acumulus\Helpers\Translator $translator
      */
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(Translator $translator)
     {
         $this->status = null;
         $this->isSent = false;
@@ -257,14 +257,6 @@ class Result
     }
 
     /**
-     * @return \Exception|null
-     */
-    public function getException()
-    {
-        return $this->exception;
-    }
-
-    /**
      * @param \Exception $exception
      *
      * @return $this
@@ -273,6 +265,31 @@ class Result
     {
         $this->exception = $exception;
         return $this->raiseStatus(self::Status_Exception);
+    }
+
+    /**
+     * Returns the exception object, if an exception was set.
+     *
+     * @return \Exception|null
+     */
+    public function getException()
+    {
+        return $this->exception;
+    }
+
+    /**
+     * Returns the exception message, if an exception was set.
+     *
+     * @return string
+     */
+    public function getExceptionMessage()
+    {
+        $message = '';
+        if (($e = $this->getException()) !== null) {
+            $message = $e->getCode() . ': ' . $e->getMessage();
+            $message = $this->t('message_exception') . ' ' . $message;
+        }
+        return $message;
     }
 
     /**
@@ -371,7 +388,6 @@ class Result
         }
         foreach ($messages as $message) {
             call_user_func(array($this, $method), $message);
-            $this->addWarning($message);
         }
         return $this;
     }
@@ -595,12 +611,9 @@ class Result
         $messages = array();
 
         // Collect the messages.
-        if (($e = $this->getException()) !== null) {
-            $message = $e->getCode() . ': ';
-            $message .= $e->getMessage();
-            $messages[] = $this->t('message_exception') . ' ' . $message;
+        if (($message = $this->getExceptionMessage()) !== '') {
+            $messages[] = $message;
         }
-
         $messages = array_merge($messages, $this->getErrors(self::Format_PlainTextArray));
         $messages = array_merge($messages, $this->getWarnings(self::Format_PlainTextArray));
         $messages = array_merge($messages, $this->getNotices(self::Format_PlainTextArray));

@@ -8,23 +8,20 @@ use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Tag;
 
 /**
- * Gives common code in this package uniform access to the settings for this
- * extension, hiding all the web shop specific implementations of their config
- * store.
+ * Provides uniform access to the settings of libAcumulus.
  *
- * This class implements all <...ConfigInterface>s and makes, via a ConfigStore,
- * use of the shop specific configuration functionality to store this
- * configuration in a persistent way.
+ * Configuration is stored in the host environment bridged via the ConfigStore
+ * class.
  *
- * This class als implements the injector interface to allow other classes to
- * easily get the correct derived classes of the base classes.
+ * This class also provides an {@see Config::update()) method to update the
+ * stored config values when changes in these are made between versions.
  */
-class Config implements ConfigInterface
+class Config
 {
-    /** @var \Siel\Acumulus\Config\ConfigStoreInterface */
+    /** @var \Siel\Acumulus\Config\ConfigStore */
     protected $configStore;
 
-    /** @var \Siel\Acumulus\Config\ShopCapabilitiesInterface */
+    /** @var \Siel\Acumulus\Config\ShopCapabilities */
     protected $shopCapabilities;
 
     /** @var \Siel\Acumulus\Helpers\Translator */
@@ -45,12 +42,12 @@ class Config implements ConfigInterface
     /**
      * Config constructor.
      *
-     * @param \Siel\Acumulus\Config\ConfigStoreInterface $configStore
-     * @param \Siel\Acumulus\Config\ShopCapabilitiesInterface $shopCapabilities
+     * @param \Siel\Acumulus\Config\ConfigStore $configStore
+     * @param \Siel\Acumulus\Config\ShopCapabilities $shopCapabilities
      * @param \Siel\Acumulus\Helpers\Translator $translator
      * @param \Siel\Acumulus\Helpers\Log $log
      */
-    public function __construct(ConfigStoreInterface $configStore, ShopCapabilitiesInterface $shopCapabilities, Translator $translator, Log $log)
+    public function __construct(ConfigStore $configStore, ShopCapabilities $shopCapabilities, Translator $translator, Log $log)
     {
         $this->configStore = $configStore;
         $this->shopCapabilities = $shopCapabilities;
@@ -80,7 +77,7 @@ class Config implements ConfigInterface
     /**
      * Wrapper getter around the config store object.
      *
-     * @return \Siel\Acumulus\Config\ConfigStoreInterface
+     * @return \Siel\Acumulus\Config\ConfigStore
      */
     protected function getConfigStore()
     {
@@ -90,7 +87,7 @@ class Config implements ConfigInterface
     /**
      * Wrapper getter around the store capabilities object.
      *
-     * @return \Siel\Acumulus\Config\ShopCapabilitiesInterface
+     * @return \Siel\Acumulus\Config\ShopCapabilities
      */
     protected function getShopCapabilities()
     {
@@ -103,13 +100,25 @@ class Config implements ConfigInterface
     protected function load()
     {
         if (!$this->isConfigurationLoaded) {
-            $this->values = $this->castValues(array_merge($this->getDefaults(), $this->getConfigStore()->load($this->getKeys())));
+            $this->values = $this->getDefaults();
+            $values = $this->getConfigStore()->load();
+            if (is_array($values)) {
+                $this->values = array_merge($this->getDefaults(), $values);
+            }
+            $this->values = $this->castValues($this->values);
             $this->isConfigurationLoaded = true;
         }
     }
 
     /**
-     * {@inheritdoc}
+     * Saves the configuration to the actual configuration provider.
+     *
+     * @param array $values
+     *   A keyed array that contains the values to store, this may be a subset
+     *   of the possible keys. Keys that are not present will not be changed.
+     *
+     * @return bool
+     *   Success.
      */
     public function save(array $values)
     {
@@ -127,125 +136,16 @@ class Config implements ConfigInterface
             unset($values[Tag::Password]);
         }
 
+        // As we have 2 setting screens, but also with updates, not all settings
+        // will be passed in: complete with other settings.
+        $this->load();
+        $values = array_merge($this->values, $values);
         $values = $this->castValues($values);
+        $values = $this->removeValuesNotToBeStored($values);
         $result = $this->getConfigStore()->save($values);
         $this->isConfigurationLoaded = false;
         // Sync internal values.
         $this->load();
-        return $result;
-    }
-
-    /**
-     * Returns the value of the specified configuration value.
-     *
-     * @param string $key
-     *   The requested configuration value
-     *
-     * @return mixed
-     *   The value of the given configuration value or null if not defined. This
-     *   will be a simple type (string, int, bool) or a keyed array with simple
-     *   values.
-     */
-    protected function get($key)
-    {
-        $this->load();
-        return isset($this->values[$key]) ? $this->values[$key] : null;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function set($key, $value)
-    {
-        $this->load();
-        $oldValue = isset($this->values[$key]) ? $this->values[$key] : null;
-        $this->values[$key] = $value;
-        return $oldValue;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getEnvironment()
-    {
-        return $this->getSettingsByGroup('environment');
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getCredentials()
-    {
-        $result = $this->getSettingsByGroup('credentials');
-        // No separate key for now.
-        $result[Tag::EmailOnWarning] = $result[Tag::EmailOnError];
-        return $result;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getShopEventSettings()
-    {
-        return $this->getSettingsByGroup('event');
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getPluginSettings()
-    {
-        return $this->getSettingsByGroup('plugin');
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getCustomerSettings()
-    {
-        return $this->getSettingsByGroup(Tag::Customer);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getInvoiceSettings()
-    {
-        return $this->getSettingsByGroup(Tag::Invoice);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getShopSettings()
-    {
-        return $this->getSettingsByGroup('shop');
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getEmailAsPdfSettings()
-    {
-        return $this->getSettingsByGroup(Tag::EmailAsPdf);
-    }
-
-    /**
-     * Get all settings belonging to the same group.
-     *
-     * @param string $group
-     *
-     * @return array
-     *   An array of settings.
-     */
-    protected function getSettingsByGroup($group)
-    {
-        $result = array();
-        foreach ($this->getKeyInfo() as $key => $keyInfo) {
-            if ($keyInfo['group'] === $group) {
-                $result[$key] = $this->get($key);
-            }
-        }
         return $result;
     }
 
@@ -264,7 +164,8 @@ class Config implements ConfigInterface
      */
     protected function castValues(array $values)
     {
-        foreach ($this->getKeyInfo() as $key => $keyInfo) {
+        $keyInfos = $this->getKeyInfo();
+        foreach ($keyInfos as $key => $keyInfo) {
             if (array_key_exists($key, $values)) {
                 switch ($keyInfo['type']) {
                     case 'string':
@@ -294,7 +195,255 @@ class Config implements ConfigInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Removes configuration values that do not have to be stored.
+     *
+     * Values that do not have to be stored:
+     * - Values that are not set.
+     * - Values that equal their default value.
+     * - Keys that are unknown.
+     *
+     * @param array $values
+     *   The array to remove values from.
+     *
+     * @return array
+     *   The passed in set of values reduced to values that should be stored.
+     */
+    protected function removeValuesNotToBeStored(array $values)
+    {
+        $result = array();
+        $keys = $this->getKeys();
+        $defaults = $this->getDefaults();
+        foreach ($keys as $key) {
+            if (isset($values[$key]) && (!isset($defaults[$key]) || $values[$key] !== $defaults[$key])) {
+                $result[$key] = $values[$key];
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Returns the value of the specified configuration value.
+     *
+     * @param string $key
+     *   The requested configuration value
+     *
+     * @return mixed
+     *   The value of the given configuration value or null if not defined. This
+     *   will be a simple type (string, int, bool) or a keyed array with simple
+     *   values.
+     */
+    protected function get($key)
+    {
+        $this->load();
+        return isset($this->values[$key]) ? $this->values[$key] : null;
+    }
+
+    /**
+     * Sets the internal value of the specified configuration key.
+     *
+     * This value will not be stored, use save() for that.
+     *
+     * @param string $key
+     *   The configuration value to set.
+     * @param mixed $value
+     *   The new value for the configuration key.
+     *
+     * @return mixed
+     *   The old value.
+     */
+    public function set($key, $value)
+    {
+        $this->load();
+        $oldValue = isset($this->values[$key]) ? $this->values[$key] : null;
+        $this->values[$key] = $value;
+        return $oldValue;
+    }
+
+    /**
+     * Returns information about the environment of this library.
+     *
+     * @return array
+     *   A keyed array with information about the environment of this library:
+     *   - baseUri
+     *   - apiVersion
+     *   - libraryVersion
+     *   - moduleVersion
+     *   - shopName
+     *   - shopVersion
+     *   - hostName
+     *   - phpVersion
+     *   - os
+     *   - curlVersion
+     *   - jsonVersion
+     */
+    public function getEnvironment()
+    {
+        return $this->getSettingsByGroup('environment');
+    }
+
+    /**
+     * Returns the contract credentials to authenticate with the Acumulus API.
+     *
+     * @return array
+     *   A keyed array with the keys:
+     *   - contractcode
+     *   - username
+     *   - password
+     *   - emailonerror
+     *   - emailonwarning
+     */
+    public function getCredentials()
+    {
+        $result = $this->getSettingsByGroup('credentials');
+        // No separate key for now.
+        $result[Tag::EmailOnWarning] = $result[Tag::EmailOnError];
+        return $result;
+    }
+
+    /**
+     * Returns the set of settings related to reacting to shop events.
+     *
+     * @return array
+     *   A keyed array with the keys:
+     *   - debug
+     *   - logLevel
+     *   - outputFormat
+     */
+    public function getPluginSettings()
+    {
+        return $this->getSettingsByGroup('plugin');
+    }
+
+    /**
+     * Returns the set of settings related to reacting to shop events.
+     *
+     * @return array
+     *   A keyed array with the keys:
+     *   - triggerOrderStatus
+     *   - triggerInvoiceEvent
+     *   - sendEmptyInvoice
+     */
+    public function getShopEventSettings()
+    {
+        return $this->getSettingsByGroup('event');
+    }
+
+    /**
+     * Returns the set of settings related to the shop characteristics.
+     *
+     * These settings influence the invoice creation and completion tasks.
+     *
+     * @return array
+     *   A keyed array with the keys:
+     *   - nature_shop
+     *   - foreignVat
+     *   - vatFreeProducts
+     *   - marginProducts
+     *   - foreignVatClasses
+     *   - invoiceNrSource
+     *   - dateToUse
+     *
+     */
+    public function getShopSettings()
+    {
+        return $this->getSettingsByGroup('shop');
+    }
+
+    /**
+     * Returns the set of settings related to the customer part of an invoice.
+     *
+     * @return array
+     *   A keyed array with the keys:
+     *   - sendCustomer
+     *   - overwriteIfExists
+     *   - defaultCustomerType
+     *   - contactStatus
+     *   - contactYourId
+     *   - companyName1
+     *   - companyName2
+     *   - vatNumber
+     *   - fullName
+     *   - salutation
+     *   - address1
+     *   - address2
+     *   - postalCode
+     *   - city
+     *   - telephone
+     *   - fax
+     *   - email
+     *   - mark
+     *   - genericCustomerEmail
+     */
+    public function getCustomerSettings()
+    {
+        return $this->getSettingsByGroup(Tag::Customer);
+    }
+
+    /**
+     * Returns the set of settings related to the invoice part of an invoice.
+     *
+     * @return array
+     *   A keyed array with the keys:
+     *   - defaultAccountNumber
+     *   - defaultCostCenter
+     *   - defaultInvoiceTemplate
+     *   - defaultInvoicePaidTemplate
+     *   - paymentMethodAccountNumber
+     *   - paymentMethodCostCenter
+     *   - sendEmptyInvoice
+     *   - sendEmptyShipping
+     *   - description
+     *   - descriptionText
+     *   - invoiceNotes
+     *   - optionsShow
+     *   - optionsAllOn1Line
+     *   - optionsAllOnOwnLine
+     *   - optionsMaxLength
+     */
+    public function getInvoiceSettings()
+    {
+        return $this->getSettingsByGroup(Tag::Invoice);
+    }
+
+    /**
+     * Returns the set of settings related to sending an email.
+     *
+     * @return array
+     *   A keyed array with the keys:
+     *   - emailAsPdf
+     *   - emailBcc
+     *   - emailFrom
+     *   - subject
+     *   - confirmReading
+     */
+    public function getEmailAsPdfSettings()
+    {
+        return $this->getSettingsByGroup(Tag::EmailAsPdf);
+    }
+
+    /**
+     * Get all settings belonging to the same group.
+     *
+     * @param string $group
+     *
+     * @return array
+     *   An array of settings.
+     */
+    protected function getSettingsByGroup($group)
+    {
+        $result = array();
+        foreach ($this->getKeyInfo() as $key => $keyInfo) {
+            if ($keyInfo['group'] === $group) {
+                $result[$key] = $this->get($key);
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Returns a list of keys that are stored in the shop specific config store.
+     *
+     * @return array
      */
     public function getKeys()
     {
@@ -344,7 +493,13 @@ class Config implements ConfigInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Returns the hostname of the current request.
+     *
+     * The hostname is returned without www. so it can be used as domain name
+     * in constructing e-mail addresses.
+     *
+     * @return string
+     *   The hostname of the current request.
      */
     protected function getHostName()
     {
@@ -374,11 +529,18 @@ class Config implements ConfigInterface
         if ($this->keyInfo === null) {
             $curlVersion = curl_version();
             $environment = $this->getShopCapabilities()->getShopEnvironment();
+            $hostName = $this->getHostName();
+            // remove TLD.
+            $pos = strrpos($hostName, '.');
+            if ($pos !== false) {
+                $hostName = substr($hostName, 0, $pos);
+            }
             // As utf8 is now commonly accepted, it is a bit difficult to
             // express the set of characters that are allowed for email
             // addresses, so we remove characters not allowed.
             // See http://stackoverflow.com/a/2049537/1475662: @ ()[]\:;"<>,
-            $shopName = str_replace(array(' ', '@', '(', ')', '[', ']', '\\', ':', ';', '"', '<', '>', ','), '', $environment['shopName']);
+            $hostName = str_replace(array(' ', '@', '(', ')', '[', ']', '\\', ':', ';', '"', '<', '>', ','), '', $hostName);
+
             $this->keyInfo = array(
                 'baseUri' => array(
                     'group' => 'environment',
@@ -483,12 +645,12 @@ class Config implements ConfigInterface
                 'genericCustomerEmail' => array(
                     'group' => Tag::Customer,
                     'type' => 'string',
-                    'default' => "consumer.$shopName@nul.sielsystems.nl",
+                    'default' => "consumer.$hostName@nul.sielsystems.nl",
                 ),
                 'emailIfAbsent' => array(
                     'group' => Tag::Customer,
                     'type' => 'string',
-                    'default' => $shopName . '@nul.sielsystems.nl',
+                    'default' => "$hostName@nul.sielsystems.nl",
                 ),
                 'contactYourId' => array(
                     'group' => Tag::Customer,
@@ -575,6 +737,11 @@ class Config implements ConfigInterface
                     'type' => 'int',
                     'default' => PluginConfig::Concept_Plugin,
                 ),
+                'missingAmount' => array(
+                    'group' => Tag::Invoice,
+                    'type' => 'int',
+                    'default' => PluginConfig::MissingAmount_Warn,
+                ),
                 'defaultAccountNumber' => array(
                     'group' => Tag::Invoice,
                     'type' => 'int',
@@ -609,12 +776,6 @@ class Config implements ConfigInterface
                     'group' => Tag::Invoice,
                     'type' => 'bool',
                     'default' => true,
-                ),
-                // @todo: add to UI if shop does support it (PS?, WC?).
-                'useMargin' => array(
-                    'group' => Tag::Invoice,
-                    'type' => 'bool',
-                    'default' => false,
                 ),
                 'optionsShow' => array(
                     'group' => Tag::Invoice,
@@ -671,15 +832,31 @@ class Config implements ConfigInterface
                     'type' => 'string',
                     'default' => '',
                 ),
-                'digitalServices' => array(
+                'nature_shop' => array(
                     'group' => 'shop',
                     'type' => 'int',
-                    'default' => PluginConfig::DigitalServices_Unknown,
+                    'default' => PluginConfig::Nature_Unknown,
+                ),
+                // @todo: is deze nog wel nodig als we de foreign vat tax classes hebben?
+                'foreignVat' => array(
+                    'group' => 'shop',
+                    'type' => 'int',
+                    'default' => PluginConfig::ForeignVat_Unknown,
                 ),
                 'vatFreeProducts' => array(
                     'group' => 'shop',
                     'type' => 'int',
                     'default' => PluginConfig::VatFreeProducts_Unknown,
+                ),
+                'marginProducts' => array(
+                    'group' => 'shop',
+                    'type' => 'int',
+                    'default' => PluginConfig::MarginProducts_Unknown,
+                ),
+                'foreignVatClasses' => array(
+                    'group' => 'shop',
+                    'type' => 'array',
+                    'default' => array(),
                 ),
                 'invoiceNrSource' => array(
                     'group' => 'shop',
@@ -782,6 +959,22 @@ class Config implements ConfigInterface
             $result = $this->upgrade496() && $result;
         }
 
+        if (version_compare($currentVersion, '5.4.0', '<')) {
+            $result = $this->upgrade540() && $result;
+        }
+
+        if (version_compare($currentVersion, '5.4.1', '<')) {
+            $result = $this->upgrade541() && $result;
+        }
+
+        if (version_compare($currentVersion, '5.4.2', '<')) {
+            $result = $this->upgrade542() && $result;
+        }
+
+        if (version_compare($currentVersion, '5.5.0', '<')) {
+            $result = $this->upgrade550() && $result;
+        }
+
         return $result;
     }
 
@@ -818,7 +1011,7 @@ class Config implements ConfigInterface
 
         // 2) Debug mode.
         switch ($this->get('debug')) {
-            case 4: // Value for deprecated ServiceConfigInterfacePlugin::Debug_StayLocal.
+            case 4: // Value for deprecated PluginConfig::Debug_StayLocal.
                 $newSettings['logLevel'] = PluginConfig::Send_TestMode;
                 break;
         }
@@ -835,22 +1028,19 @@ class Config implements ConfigInterface
      * - setting triggerInvoiceSendEvent removed.
      * - setting triggerInvoiceEvent introduced.
      *
-     * @todo: extract updates into own object.
-     *
      * @return bool
      */
     protected function upgrade453()
     {
-        // Get current values.
-        $values = $this->castValues($this->getConfigStore()->load($this->getKeys()));
+        // Keep track of settings that should be updated.
+        $newSettings = array();
         if ($this->get('triggerInvoiceSendEvent') == 2) {
-            $values['triggerInvoiceEvent'] = PluginConfig::TriggerInvoiceEvent_Create;
+            $newSettings['triggerInvoiceEvent'] = PluginConfig::TriggerInvoiceEvent_Create;
         } else {
-            $values['triggerInvoiceEvent'] = PluginConfig::TriggerInvoiceEvent_None;
+            $newSettings['triggerInvoiceEvent'] = PluginConfig::TriggerInvoiceEvent_None;
         }
-        unset($values['triggerInvoiceSendEvent']);
 
-        return $this->getConfigStore()->save($values);
+        return $this->save($newSettings);
     }
 
     /**
@@ -862,14 +1052,17 @@ class Config implements ConfigInterface
      */
     protected function upgrade460()
     {
-        // Get current values.
-        $values = $this->castValues($this->getConfigStore()->load($this->getKeys()));
+        $result = true;
+        $newSettings = array();
+
         if ($this->get('removeEmptyShipping') !== null) {
-            $values['sendEmptyShipping'] = !$this->get('removeEmptyShipping');
-            unset($values['removeEmptyShipping']);
+            $newSettings['sendEmptyShipping'] = !$this->get('removeEmptyShipping');
         }
 
-        return $this->getConfigStore()->save($values);
+        if (!empty($newSettings)) {
+            $result = $this->save($newSettings);
+        }
+        return $result;
     }
 
     /**
@@ -882,14 +1075,15 @@ class Config implements ConfigInterface
     protected function upgrade470()
     {
         $result = true;
+        $newSettings = array();
 
-        // Get current values.
-        $values = $this->castValues($this->getConfigStore()->load($this->getKeys()));
-        if (!empty($values['salutation']) && strpos($values['salutation'], '[#') !== false) {
-            $values['salutation'] = str_replace('[#', '[', $values['salutation']);
-            $result = $this->getConfigStore()->save($values);
+        if ($this->get('salutation') && strpos($this->get('salutation'), '[#') !== false) {
+            $newSettings['salutation'] = str_replace('[#', '[', $this->get('salutation'));
         }
 
+        if (!empty($newSettings)) {
+            $result = $this->save($newSettings);
+        }
         return $result;
     }
 
@@ -903,15 +1097,16 @@ class Config implements ConfigInterface
     protected function upgrade473()
     {
         $result = true;
+        $newSettings = array();
 
-        // Get current values.
-        $values = $this->castValues($this->getConfigStore()->load($this->getKeys()));
-        if (!empty($values['subject']) && strpos($values['subject'], '[#') !== false) {
-            str_replace('[#b]', '[invoiceSource::reference]', $values['subject']);
-            str_replace('[#f]', '[invoiceSource::invoiceNumber]', $values['subject']);
-            $result = $this->getConfigStore()->save($values);
+        if ($this->get('subject') && strpos($this->get('subject'), '[#') !== false) {
+            str_replace('[#b]', '[invoiceSource::reference]', $this->get('subject'));
+            str_replace('[#f]', '[invoiceSource::invoiceNumber]', $this->get('subject'));
         }
 
+        if (!empty($newSettings)) {
+            $result = $this->save($newSettings);
+        }
         return $result;
     }
 
@@ -925,5 +1120,92 @@ class Config implements ConfigInterface
     protected function upgrade496()
     {
         return $this->upgrade473();
+    }
+
+    /**
+     * 5.4.0 upgrade.
+     *
+     * - ConfigStore->save should store all settings in 1 serialized value.
+     *
+     * @return bool
+     */
+    protected function upgrade540()
+    {
+        $result = true;
+
+        // ConfigStore::save should store all settings in 1 serialized value.
+        $configStore = $this->getConfigStore();
+        if (method_exists($configStore, 'loadOld')) {
+            $values = $configStore->loadOld($this->getKeys());
+            $result = $this->save($values);
+        }
+
+        return $result;
+    }
+
+    /**
+     * 5.4.1 upgrade.
+     *
+     * - property source originalInvoiceSource renamed to order.
+     *
+     * @return bool
+     */
+    protected function upgrade541()
+    {
+        $result = true;
+        $doSave = false;
+        $configStore = $this->getConfigStore();
+        $values = $configStore->load();
+        array_walk_recursive($values, function(&$value) use (&$doSave) {
+            if (is_string($value) && strpos($value, 'originalInvoiceSource::') !== false) {
+                str_replace('originalInvoiceSource::', 'order::', $value);
+                $doSave = true;
+            }
+        });
+        if ($doSave) {
+            $result = $this->save($values);
+        }
+
+        return $result;
+    }
+
+    /**
+     * 5.4.2 upgrade.
+     *
+     * - property paymentState renamed to paymentStatus.
+     *
+     * @return bool
+     */
+    protected function upgrade542()
+    {
+        $result = true;
+        $doSave = false;
+        $configStore = $this->getConfigStore();
+        $values = $configStore->load();
+        array_walk_recursive($values, function(&$value) use (&$doSave) {
+            if (is_string($value) && strpos($value, 'paymentState') !== false) {
+                str_replace('paymentState', 'paymentStatus', $value);
+                $doSave = true;
+            }
+        });
+        if ($doSave) {
+            $result = $this->save($values);
+        }
+
+        return $result;
+    }
+
+    /**
+     * 5.5.0 upgrade.
+     *
+     * - setting digitalServices extended and therefore renamed to foreignVat.
+     *
+     * @return bool
+     */
+    protected function upgrade550()
+    {
+        $newSettings = array();
+        $newSettings['foreignVat'] = (int) $this->get('digitalServices');
+        return $this->save($newSettings);
     }
 }

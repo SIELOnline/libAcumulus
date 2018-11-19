@@ -2,7 +2,7 @@
 namespace Siel\Acumulus\OpenCart\Helpers;
 
 use Siel\Acumulus\PluginConfig;
-use Siel\Acumulus\Helpers\ContainerInterface;
+use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Shop\ModuleTranslations;
 
@@ -12,7 +12,7 @@ use Siel\Acumulus\Shop\ModuleTranslations;
  */
 class OcHelper
 {
-    /** @var \Siel\Acumulus\Helpers\ContainerInterface */
+    /** @var \Siel\Acumulus\Helpers\Container */
     protected $container = null;
 
     /** @var array */
@@ -25,11 +25,9 @@ class OcHelper
      * OcHelper constructor.
      *
      * @param \Registry $registry
-     * @param \Siel\Acumulus\Helpers\ContainerInterface $container
-     *
-     * @throws \ReflectionException
+     * @param \Siel\Acumulus\Helpers\Container $container
      */
-    public function __construct(\Registry $registry, ContainerInterface $container)
+    public function __construct(\Registry $registry, Container $container)
     {
         $this->container = $container;
         $this->registry = $this->container->getInstance('Registry', 'Helpers', array($registry));
@@ -133,13 +131,28 @@ class OcHelper
         }
 
         // Add an intermediate level to the breadcrumb.
-        $this->data['breadcrumbs'][] = array(
-            'text' => $this->t('modules'),
-            'href' => Registry::getInstance()->getLink('extension/module'),
-            'separator' => ' :: '
-        );
+        $this->data['breadcrumbs'][] = $this->getExtensionsBreadcrumb();
 
         $this->renderFormCommon('config', 'button_save');
+    }
+
+    /**
+     * Returns the intermediate breadcrumb for the config screen.
+     *
+     * The config screen is normally accessed via the extensions part of
+     * OpenCart. Therefore an intermediate level is added to the breadcrumb,
+     * consisting of the extensions page.
+     *
+     * @return array
+     *   The intermediate breadcrumb for the config screen.
+     */
+    protected function getExtensionsBreadcrumb()
+    {
+        return array(
+            'text' => $this->t('extensions'),
+            'href' => Registry::getInstance()->getLink('marketplace/extension'),
+            'separator' => ' :: '
+        );
     }
 
     /**
@@ -260,7 +273,7 @@ class OcHelper
     public function eventOrderUpdate($order_id)
     {
         $source = $this->container->getSource(Source::Order, $order_id);
-        $this->container->getManager()->sourceStatusChange($source);
+        $this->container->getInvoiceManager()->sourceStatusChange($source);
     }
 
     /**
@@ -347,6 +360,9 @@ class OcHelper
         // Process the form if it was submitted and render it again.
         $form = $this->container->getForm($task);
         $form->process();
+        // Force the creation of the fields to get connection error messages
+        // shown.
+        $form->getFields();
 
         // Show messages.
         foreach ($form->getSuccessMessages() as $message) {

@@ -23,6 +23,7 @@ namespace Siel\Acumulus\OpenCart\Helpers;
  * @property \ModelCheckoutOrder model_checkout_order
  * @property \ModelSaleOrder model_sale_order
  * @property \ModelLocalisationOrderStatus model_localisation_order_status
+ * @property \ModelLocalisationTaxClass model_localisation_tax_class
  * @property \ModelSettingSetting model_setting_setting
  */
 class Registry

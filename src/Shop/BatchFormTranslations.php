@@ -25,14 +25,17 @@ class BatchFormTranslations extends TranslationCollection
         'desc_invoice_source_reference_from_to_2' => 'Vul de reeks bestel of creditnota-referenties of nummers in die u naar Acumulus wilt verzenden. Als u slechts 1 factuur wilt verzenden hoeft u alleen het \'# van\' in te vullen. Laat beide velden leeg als u op datum wilt verzenden.',
         'field_date_from' => 'Datum van',
         'field_date_to' => 'Datum tot',
-        'desc_date_from_to' => 'Vul de periode in waarvan u de facturen naar Acumulus wilt verzenden (verwacht formaat %1$s). De selectie vindt plaats op basis van de datum van de meest recente wijziging aan de bestelling of creditnota. Als u slechts de facturen van 1 dag wilt verzenden hoeft u alleen de \'Datum van\' in te vullen. Laat beide velden leeg als u op nummer wilt verzenden.',
-        'field_options' => 'Opties',
-        'option_force_send' => 'Forceer verzenden',
+        'desc_date_from_to' => 'Vul de periode in waarvan u de facturen naar Acumulus wilt verzenden. De selectie vindt plaats op basis van de datum van de meest recente wijziging aan de bestelling of creditnota. Als u slechts de facturen van 1 dag wilt verzenden hoeft u alleen de \'Datum van\' in te vullen. Laat beide velden leeg als u op nummer wilt verzenden.',
+        'date_format' => 'jjjj-mm-dd',
+        'field_send_mode' => 'Verzendwijze',
+        'option_send_normal' => 'Verzend alleen indien nog niet verzonden',
+        'option_send_force' => 'Altijd verzenden, als de factuur al is verzonden wordt de bestaande factuur verwijderd in Acumulus',
         'option_send_test_mode' => 'Verzend in testmodus',
+        'desc_send_mode' => 'Facturen die binnen de reeks vallen maar al naar Acumulus verstuurd zijn, worden standaard niet verzonden. Dit is de 1e optie. Door de 2e optie te selecteren forceert u het nogmaals versturen van deze facturen. Indien nog aanwezig, wordt de oude boeking in Acumulus naar de prullenbak verplaatst. Let op: dit kan tot gaten in uw factuurnummers leiden.<br><br>
+                                 Met de 3e optie worden de facturen in testmodus naar Acumulus verstuurd. Acumulus zal alleen de factuur controleren op fouten en waarschuwingen maar zal deze niet opslaan, zodat uw administratie niet in de war raakt. U ontvangt alijd een mail met de resultaten. Deze optie is gelijk aan de optie "Testmodus" van de instelling "Factuur verzendmodus" van het instellingenformulier, maar geldt alleen voor deze batchverzending. Gebruik deze optie om de mail die u ontvangt mee te kunnen sturen met een supportverzoek.',
+        'field_dry_run' => 'Dry run',
         'option_dry_run' => 'Laat alleen de lijst van facturen zien die verstuurd zouden worden, zonder daadwerkelijk te versturen.',
-        'desc_batch_options' => '<p>Facturen die binnen de reeks vallen maar al naar Acumulus verstuurd zijn, worden standaard niet verzonden. Door de 1e optie aan te vinken forceert u het nogmaals versturen van deze facturen. Indien nog aanwezig, wordt de oude boeking in Acumulus naar de prullenbak verplaatst.</p>
-                                 <p>Met de 2e optie worden de facturen in testmodus naar Acumulus verstuurd. Acumulus zal alleen de factuur controleren op fouten en waarschuwingen maar zal deze niet opslaan, zodat uw administratie niet in de war raakt. U ontvangt alijd een mail met de resultaten. Deze optie is gelijk aan de optie "Testmodus" van de instelling "Factuur verzendmodus" van het instellingenformulier, maar geldt alleen voor deze batchverzending. Gebruik deze optie om de mail die u ontvangt mee te kunnen sturen met een supportverzoek.</p>
-                                 <p>De filters die u hierboven opgeeft kunnen in bepaalde gevallen voor verrassingen zorgen. Door de laatste optie te selecteren krijgt u in het resultatenoverzicht een lijst te zien van facturen die verstuurd zouden worden, zonder dat het versturen daadwerkelijk plaats vindt.</p>',
+        'desc_dry_run' => 'De filters die u hierboven heeft opgegeven kunnen in bepaalde gevallen voor verrassingen zorgen. Door deze optie aan te vinken krijgt u in het resultatenoverzicht een lijst te zien van facturen die verstuurd zouden worden, zonder dat het versturen daadwerkelijk plaats vindt.</p>',
         'batchLogHeader' => 'Resultaten',
         'batchInfoHeader' => 'Uitgebreide informatie',
         'batch_info' => <<<LONGSTRING
@@ -51,22 +54,12 @@ factuur niet opgeslagen wordt.</strong></p>
 versturen.</li>
 <li>Als er facturen zijn die fouten bevatten ontvangt u een mail per factuur.
 </li>
-<li>Als u een event handler heeft geregistreerd voor het 'AcumulusInvoiceAdd"
-event (of hook of actie) wordt die voor alle facturen die verzonden gaan worden
-uitgevoerd.</li>
+<li>Alle door u geregistreerde event handlers die reageren op één van de door
+deze Acumulus module gedefinieerde events (of hook of actie) worden voor alle
+facturen die verzonden gaan worden uitgevoerd.</li>
 </ul>
-<p>Dit formulier bevindt zich in een experimentele status.
-Het werkt in zijn huidige vorm, maar als u de behoefte heeft om de reeks van
-facturen op een andere manier te willen aangeven, laat dit ons dan weten.</p>
-<p>Standaard worden facturen die al naar Acumulus verzonden zijn, niet opnieuw
-verstuurd. Dit kunt u forceren door die optie aan te vinken, maar let op: in
-Acumulus wordt dit als een nieuwe factuur gezien. U dient zelf uw boekhouding te
-ontdubbelen.
-Merk ook nog op dat deze beveiliging alleen werkt voor facturen die sinds de
-installatie van de versie met uitgiftedatum begin september 2014 van deze
-koppeling verstuurd zijn.
-In oudere versies werd nog niet bijgehouden voor welke orders en creditnota's al
-een factuur verzonden was.</p>
+<p>Dit formulier werkt in zijn huidige vorm, maar er zijn vast nog wel
+verbeteringen aan te brengen. Dus als u ideeën heeft, laat het ons weten..</p>
 LONGSTRING
     ,
 
@@ -84,6 +77,7 @@ LONGSTRING
         'message_form_range_reference' => 'Reeks: %1$s van %2$s tot %3$s.',
         'message_form_range_date' => 'Reeks: %1$s tussen %2$s en %3$s.',
         'message_form_range_empty' => 'De door u opgegeven reeks bevat geen enkele %1$s.',
+        'message_form_range_list' => 'Gevonden %1$s.',
         'message_form_batch_success' => 'De facturen zijn succesvol verzonden. Zie het resultatenoverzicht voor eventuele opmerkingen en waarschuwingen.',
         'message_form_batch_error' => 'Er zijn fouten opgetreden bij het versturen van de facturen. Zie het resultatenoverzicht voor meer informatie over de fouten.',
 
@@ -106,25 +100,26 @@ LONGSTRING
         'desc_invoice_source_reference_from_to_2' => 'Enter the range of order or credit note numbers or ids you want to send to Acumulus. If you only want to send 1 invoice, you only have to fill in the \'# from\' field. Leave empty if you want to send by date.',
         'field_date_from' => 'Date from',
         'field_date_to' => 'Date to',
-        'desc_date_from_to' => 'Enter the period over which you want to send invoices to Acumulus (expected format: %1$s). If you want to send the invoices of 1 day, only fill in the \'Date from\' field. Leave empty if you want to send by id.',
-        'field_options' => 'Options',
-        'option_force_send' => 'Force sending',
+        'desc_date_from_to' => 'Enter the period over which you want to send invoices to Acumulus. If you want to send the invoices of 1 day, only fill in the \'Date from\' field. Leave empty if you want to send by id.',
+        'date_format' => 'yyyy-mm-dd',
+        'field_send_mode' => 'Send mode',
+        'option_send_normal' => 'Only send if not already sent',
+        'option_send_force' => 'Always send, overwrite the existing invoice if already sent',
         'option_send_test_mode' => 'Send in test mode',
-        'option_dry_run' => 'Dry run.',
-        'desc_batch_options' => '<p>Invoices that fall within the range but are already sent to Acumulus will normally not be sent again. By checking the 1st option, these orders will be sent again. If still available, the old entry will be moved to the waste bin in Acumulus.</p>
-                                 <p>With the 2nd option, invoices will be sent to Acumulus using the test mode. Acumulus will only check the input for errors and warnings but not store the invoice, so your administration will not be polluted. You will always receive a mail with the results. This option overrules the setting "Invoice send mode" on the configuration form. Use this option so you can forward the mail you receive with a support request.</p>
-                                 <p>In some cases, the filters you define here can lead to surprises. By cheking the last option you will get a list of invoices that would be sent, without actually being sent.</p>',
+        'desc_send_mode' => '<p>Invoices that fall within the range but are already sent to Acumulus will normally not be sent again. This is the 1st option. By checking the 2nd option, these orders will be sent again. If still available, the old entry will be moved to the waste bin in Acumulus.</p>
+                             <p>With the 3rd option, invoices will be sent to Acumulus using the test mode. Acumulus will only check the input for errors and warnings but not store the invoice, so your administration will not be polluted. You will always receive a mail with the results. This option overrules the setting "Invoice send mode" on the configuration form. Use this option so you can forward the mail you receive with a support request.</p>',
+        'field_dry_run' => 'Dry run',
+        'option_dry_run' => 'Dry run',
+        'desc_dry_run' => 'In some cases, the filters you defined here can lead to surprises. By checking this option you will get a list of invoices that would be sent, without actually being sent.</p>',
         'batchLogHeader' => 'Results',
         'batchInfoHeader' => 'Additional information',
         'batch_info' => <<<LONGSTRING
 <p>You can use this form to send a number of orders or credit notes at once.
 This is most useful when you just installed the plugin, because normally you
 should prefer automatic sending.</p>
-<p><strong>Performance: sending an invoice can take up to a few seconds,.
-Therefore you should not try to send to many invoices in 1 batch as that may
+<p><strong>Performance: sending an invoice can take up to a few seconds.
+Therefore, you should not try to send to many invoices in 1 batch as that may
 lead to a time-out on your web server.</strong></p>
-<p><strong>NOTE: Using the 'Force sending' is at your own risk as this may
-corrupt your administration as invoices may get added a 2nd time.</strong></p>
 <p>Sending invoices is done as with automatic sending:</p>
 <ul style="list-style: inside disc;">
 <li>The invoice is created exactly the same way as with automatic sending.</li>
@@ -135,6 +130,8 @@ incorrect invoice.</li>
 <li>All registered event handlers that react to 1 of the Acumulus defined
 events are triggered for all invoices that are sent.</li>
 </ul>
+<p>This form works as it is but we guess that improvements can be made.
+So, if you have any ideas, please let us know.</p>
 LONGSTRING
     ,
 
@@ -152,6 +149,7 @@ LONGSTRING
         'message_form_range_reference' => 'Range: %1$s from %2$s to %3$s.',
         'message_form_range_date' => 'Range: %1$s between %2$s and %3$s.',
         'message_form_range_empty' => 'The range you defined does not contain any %1$s.',
+        'message_form_range_list' => 'Found %1$s.',
         'message_form_success' => 'The invoices were sent successfully. See the results overview for any remarks or warnings.',
         'message_form_error' => 'Errors during sending the invoices. See the results overview for more information on the errors.',
 

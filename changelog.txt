@@ -17,6 +17,11 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies)
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
+5.5.1 (2018-11-??)
+------------------
+Bugs:
+- ALL: notice Undefined index nature in completor.php on line 336.
+
 5.5.0 (2018-11-14)
 ------------------
 Features:

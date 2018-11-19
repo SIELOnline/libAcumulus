@@ -619,7 +619,7 @@ If you unchecked the first option, the second option only applies to business cl
         'field_productName' => 'Product name',
         'desc_productName' => 'The product name or description you want to show on the invoice.',
         'field_nature' => 'Nature',
-        'desc_nature' => 'The nature of the article sold. This can be either "Product" or "Service". If your shop only sells products or only sells services, you should indicate so in the Acumulus settings form and the plugin will fill this in automatically. If you sell both and you store this as a property for all items in your catalog you can use a field reference to use that property.',
+        'desc_nature' => 'The nature of the article sold. This can be either "Product" or "Service". If your shop only sells products or only sells services, you should indicate so in the Acumulus settings form and the plugin will fill this in automatically. If you sell both and this is stored as a property for all items in your catalog you can use a field reference to use that property.',
         'field_costPrice' => 'Cost price',
         'desc_costPrice' => 'The cost price of this article. This is only used on margin scheme invoices.',
 

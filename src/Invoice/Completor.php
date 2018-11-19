@@ -322,6 +322,7 @@ class Completor
      * - the possible vat types.
      * - optionally, the date of the invoice.
      * - optionally, the country of the client.
+     * - optionally, the nature of the articles sold.
      *
      * On finishing, $this->possibleVatRates will contain an array with possible
      * vat rates. A vat rate being an array with keys vatrate and vattype. This
@@ -333,7 +334,7 @@ class Completor
         $possibleVatRates = array();
 
         $shopSettings = $this->config->getShopSettings();
-        $nature = $shopSettings['nature'];
+        $nature = $shopSettings['nature_shop'];
         $vatFreeProducts = $shopSettings['vatFreeProducts'];
 
         foreach ($this->possibleVatTypes as $vatType) {

@@ -18,7 +18,7 @@ class Creator extends BaseCreator
     /** @var \WC_Order The order self or the order that got refunded. */
     protected $order;
 
-    /** @var \WC_Order_Refund the refund for an order. */
+    /** @var \WC_Order_Refund The refund for an order. */
     protected $refund;
 
     /** @var bool Whether the order has (non empty) item lines. */
@@ -26,19 +26,14 @@ class Creator extends BaseCreator
 
     /**
      * Product price precision in WC3: one of the prices is entered by the
-     * administrator but rounded to the cent by WC. The computed one is based
-     * on the subtraction/addition of 2 amounts rounded to the cent, so has a
-     * precision that may be a bit worse than 1 cent.
+     * administrator and may be assumed exact. The computed one is based on the
+     * subtraction/addition of 2 amounts, so has a precision that may be twice
+     * as worse.WC tended to round amounts to the cent, but does not seem to any
+     * longer do so.
      *
      * @var float
      */
-    protected $precision  = 0.01;
-
-    /** @var float */
-    protected $precisionCalculated  = 0.02;
-
-    /** @var float */
-    protected $preciseVat  = 0.01;
+    protected $precision = 0.001;
 
     /**
      * {@inheritdoc}
@@ -166,7 +161,6 @@ class Creator extends BaseCreator
                 Meta::PrecisionUnitPriceInc => $precisionInc,
                 Meta::RecalculateUnitPrice => $recalculateUnitPrice,
             );
-
         }
 
         // Add tax info.
@@ -250,8 +244,8 @@ class Creator extends BaseCreator
                     'postcode' => $customer->get_shipping_postcode(),
                 ));
             }
-
         } catch (\Exception $e) {
+            $this->log->notice('WooCommerce\Creator::getVatRateLookupMetadataByTaxClass: Could not get customer location: %s', $e->getMessage());
         }
 
         $taxRates = WC_Tax::find_rates($args);
@@ -345,11 +339,14 @@ class Creator extends BaseCreator
         return $result;
     }
 
-  /**
-   * @param \WC_Order_Item_Fee $item
-   *
-   * @return array
-   */
+    /**
+     * Returns an invoice line for 1 fee line.
+     *
+     * @param \WC_Order_Item_Fee $item
+     *
+     * @return array
+     *   The invoice line for the given fee line.
+     */
     protected function getFeeLine($item)
     {
         $quantity = $item->get_quantity();
@@ -484,7 +481,6 @@ class Creator extends BaseCreator
                                     Meta::VatRateLookupLabel => array(),
                                     Meta::VatRateLookupSource => 'shipping line taxes',
                                 );
-
                             }
                             // get_rate_percent() contains a % at the end of the
                             // string: remove it.
@@ -614,11 +610,11 @@ class Creator extends BaseCreator
     }
 
     /**
-     *
-     *
+     * Returns whether the prices entered by an admin include taxes or not.
      *
      * @return bool
-     *
+     *   True if the prices as entered by an admin include VAT, false if they are
+     *   entered ex VAT.
      */
     protected function productPricesIncludeTax()
     {

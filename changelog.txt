@@ -21,6 +21,8 @@ WC3 = WooCommerce 3 (WordPress)
 ------------------
 Bugs:
 - ALL: notice Undefined index nature in completor.php on line 336.
+- WC3: Wc seems to return amounts with an increased precision (was: rounded to
+  the cent. now: it seems not any longer rounded).
 
 5.5.0 (2018-11-14)
 ------------------

@@ -1284,19 +1284,21 @@ class Completor
     }
 
     /**
-     * Returns whether the vat class id denotes foreign vat
+     * Returns whether the vat class id denotes foreign vat.
      *
      * @param int|string $vatClassId
      *   The vat class to check.
      *
      * @return bool
-     *   True if the vat class id denotes foreign vat, false otherwise.
+     *   True if the shop might sell foreign vat articles and the vat class id
+     *   denotes a foreign vat class, false otherwise.
      */
     protected function isForeignVatClass($vatClassId)
     {
         $shopSettings = $this->config->getShopSettings();
-        $vatClassIds = $shopSettings['foreignVatClasses'];
-        return in_array($vatClassId, $vatClassIds);
+        $foreignVat = $shopSettings['foreignVat'];
+        $foreignVatClasses = $shopSettings['foreignVatClasses'];
+        return $foreignVat !== PluginConfig::ForeignVat_No && in_array($vatClassId, $foreignVatClasses);
     }
 
     /**

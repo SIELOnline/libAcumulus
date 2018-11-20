@@ -20,8 +20,12 @@ WC3 = WooCommerce 3 (WordPress)
 5.5.1 (2018-11-??)
 ------------------
 Bugs:
+- ALL: only use the setting that defines EU vat classes when the shop might sell
+  articles subject to EU vat.
 - ALL: notice Undefined index nature in completor.php on line 336.
-- WC3: Wc seems to return amounts with an increased precision (was: rounded to
+
+Features:
+- WC3: WC seems to return amounts with an increased precision (was: rounded to
   the cent. now: it seems not any longer rounded).
 
 5.5.0 (2018-11-14)

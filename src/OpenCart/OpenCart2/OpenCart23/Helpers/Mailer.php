@@ -1,8 +1,8 @@
 <?php
-namespace Siel\Acumulus\OpenCart\Helpers;
+namespace Siel\Acumulus\OpenCart\OpenCart2\OpenCart23\Helpers;
 
 use Mail;
-use Siel\Acumulus\Helpers\Mailer as BaseMailer;
+use Siel\Acumulus\OpenCart\Helpers\Mailer as BaseMailer;
 
 /**
  * Extends the base mailer class to send a mail using the OpenCart mailer.
@@ -18,18 +18,12 @@ class Mailer extends BaseMailer
         try {
             $config = Registry::getInstance()->config;
             $mail = new Mail();
-            /** @noinspection PhpUndefinedFieldInspection */
             $mail->protocol = $config->get('config_mail_protocol');
             $mail->parameter = $config->get('config_mail_parameter');
-            /** @noinspection PhpUndefinedFieldInspection */
             $mail->smtp_hostname = $config->get('config_mail_smtp_hostname');
-            /** @noinspection PhpUndefinedFieldInspection */
             $mail->smtp_username = $config->get('config_mail_smtp_username');
-            /** @noinspection PhpUndefinedFieldInspection */
             $mail->smtp_password = html_entity_decode($config->get('config_mail_smtp_password'), ENT_QUOTES, 'UTF-8');
-            /** @noinspection PhpUndefinedFieldInspection */
             $mail->smtp_port = $config->get('config_mail_smtp_port');
-            /** @noinspection PhpUndefinedFieldInspection */
             $mail->smtp_timeout = $config->get('config_mail_smtp_timeout');
 
             $mail->setTo($to);
@@ -47,14 +41,5 @@ class Mailer extends BaseMailer
             $result = $e;
         }
         return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getFrom()
-    {
-        $config = Registry::getInstance()->config;
-        return $config->get('config_email');
     }
 }

@@ -23,6 +23,7 @@ Bugs:
 - ALL: only use the setting that defines EU vat classes when the shop might sell
   articles subject to EU vat.
 - ALL: notice Undefined index nature in completor.php on line 336.
+- OC2/OC3: mail did not use the correct property names for the smtp settings.
 
 Features:
 - WC3: WC seems to return amounts with an increased precision (was: rounded to

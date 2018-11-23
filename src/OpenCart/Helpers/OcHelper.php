@@ -227,7 +227,8 @@ class OcHelper
      * param mixed $output
      * param int $order_id
      * param int $order_status_id
-     * Parameters for OC 2.3+
+     *
+     * Parameters for OC 2.3+:
      * param string $route
      *   checkout/order/addOrder or checkout/order/addOrderHistory.
      * param array $args

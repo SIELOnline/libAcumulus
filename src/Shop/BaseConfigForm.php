@@ -14,10 +14,6 @@ use Siel\Acumulus\Web\Service;
 
 /**
  * Provides basic config form handling.
- *
- * Shop specific may optionally (have to) override:
- * - setSubmittedValues()
- * - getPostedValues()
  */
 abstract class BaseConfigForm extends Form
 {
@@ -58,16 +54,20 @@ abstract class BaseConfigForm extends Form
      */
     protected function setSubmittedValues()
     {
-        $postedValues = $this->getPostedValues();
-        // Check if the full form was displayed or only the account details.
-        $fullForm = $this->isFullForm();
+        parent::setSubmittedValues();
+        $submittedValues = $this->submittedValues;
+        $this->submittedValues = array();
+
         foreach ($this->acumulusConfig->getKeys() as $key) {
-            if (!$this->addIfIsset($this->submittedValues, $key, $postedValues)) {
-                // Add unchecked checkboxes, but only if the full form was
-                // displayed as all checkboxes on this form appear in the full
-                // form only.
-                if ($fullForm && $this->isCheckboxKey($key)) {
-                    $this->submittedValues[$key] = '';
+            if (!$this->addIfIsset($this->submittedValues, $key, $submittedValues)) {
+                // Add unchecked checkboxes and empty arrays,but only if they
+                // were defined on the form.
+                if ($this->isKey($key)) {
+                    if ($this->isCheckbox($key)) {
+                        $this->submittedValues[$key] = '';
+                    } elseif ($this->isArray($key)) {
+                        $this->submittedValues[$key] = array();
+                    }
                 }
             }
         }
@@ -80,7 +80,13 @@ abstract class BaseConfigForm extends Form
      */
     protected function getDefaultFormValues()
     {
-        $defaultValues = $this->acumulusConfig->getCredentials() + $this->acumulusConfig->getShopSettings() + $this->acumulusConfig->getShopEventSettings() + $this->acumulusConfig->getCustomerSettings() + $this->acumulusConfig->getInvoiceSettings() + $this->acumulusConfig->getEmailAsPdfSettings() + $this->acumulusConfig->getPluginSettings();
+        $defaultValues = $this->acumulusConfig->getCredentials()
+             + $this->acumulusConfig->getShopSettings()
+             + $this->acumulusConfig->getShopEventSettings()
+             + $this->acumulusConfig->getCustomerSettings()
+             + $this->acumulusConfig->getInvoiceSettings()
+             + $this->acumulusConfig->getEmailAsPdfSettings()
+             + $this->acumulusConfig->getPluginSettings();
         return $defaultValues;
     }
 
@@ -150,12 +156,10 @@ abstract class BaseConfigForm extends Form
      * - versionInformation
      * - versionInformationDesc
      *
-     * @param bool $accountOk
-     *
      * @return array[]
      *   The set of version related informational fields.
      */
-    protected function getVersionInformation($accountOk)
+    protected function getVersionInformation()
     {
         $env = $this->acumulusConfig->getEnvironment();
         return array(
@@ -167,10 +171,6 @@ abstract class BaseConfigForm extends Form
             'versionInformationDesc' => array(
                 'type' => 'markup',
                 'value' => $this->t('desc_versionInformation'),
-            ),
-            'accountOk' => array(
-                'type' => 'hidden',
-                'value' => $accountOk ? 'true' : 'false',
             ),
         );
     }
@@ -300,17 +300,5 @@ abstract class BaseConfigForm extends Form
     protected function isAdvancedConfigForm()
     {
         return $this instanceof AdvancedConfigForm;
-    }
-
-    /**
-     * Returns whether the full form was rendered and posted.
-     *
-     * @return bool
-     *   True if the full form was rendered and posted, false otherwise.
-     */
-    protected function isFullForm()
-    {
-        $postedValues = $this->getPostedValues();
-        return isset($postedValues['accountOk']) && $postedValues['accountOk'] === 'true';
     }
 }

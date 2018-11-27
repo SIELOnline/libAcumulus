@@ -5,18 +5,28 @@ use Siel\Acumulus\Helpers\FormHelper as BaseFormHelper;
 
 /**
  * WooCommerce override of the FormHelper.
+ *
+ * WordPress calls wp_magic_quotes() on every request to add magic quotes to
+ * form input in $_POST: we undo this here.
  */
 class FormHelper extends BaseFormHelper
 {
     /**
      * {@inheritdoc}
      */
-    public function getPostedValues(array $checkboxKeys)
+    protected function getMeta()
     {
-        $result = parent::getPostedValues($checkboxKeys);
-        // WordPress calls wp_magic_quotes() on every request to add magic
-        // quotes to form input: we undo this here.
-        $result = stripslashes_deep($result);
-        return $result;
+        if ($this->meta === null && $this->isSubmitted() && isset($_POST[static::Meta])) {
+            $this->setMeta(json_decode(stripslashes($_POST[static::Meta])));
+        }
+        return $this->meta;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function alterPostedValues(array $postedValues)
+    {
+        return stripslashes_deep($postedValues);
     }
 }

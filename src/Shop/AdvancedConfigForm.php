@@ -150,7 +150,7 @@ class AdvancedConfigForm extends BaseConfigForm
             'versionInformationHeader' => array(
                 'type' => 'fieldset',
                 'legend' => $this->t('versionInformationHeader'),
-                'fields' => $this->getVersionInformation($accountOk),
+                'fields' => $this->getVersionInformation(),
             ),
         );
 

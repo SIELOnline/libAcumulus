@@ -302,51 +302,45 @@ abstract class Form
     protected function setFormValues()
     {
         if (!$this->formValuesSet) {
+            // Start by assuring the field definitions are constructed.
+            $this->getFields();
+
+            // 1: Hard coded default value for form fields: empty string.
             $this->formValues = array_fill_keys($this->getKeys(), '');
-            // Merge the default form values into the form values, but do so
-            // with some special array handling.
+
+            // 2: Overwrite with the default values from the field definitions,
+            // but do so with some special array handling.
             $defaultFormValues = $this->getDefaultFormValues();
             foreach ($defaultFormValues as $key => $defaultFormValue) {
-                // We start with a simple addition or overwrite.
-                $this->formValues[$key] = $defaultFormValue;
+                // We start with a simple overwrite.
+                if (array_key_exists($key, $this->formValues)) {
+                    $this->formValues[$key] = $defaultFormValue;
+                } elseif (is_array($defaultFormValue)) {
                 // Distribute keyed arrays over separate values if existing.
-                if (is_array($defaultFormValue)) {
-                    foreach ($defaultFormValue as $valueKey => $valueValue) {
-                        $fullKey = "{$key}[{$valueKey}]";
+                    foreach ($defaultFormValue as $arrayKey => $arrayValue) {
+                        $fullKey = "{$key}[{$arrayKey}]";
                         if (array_key_exists($fullKey, $this->formValues)) {
-                            $this->formValues[$fullKey] = $valueValue;
+                            $this->formValues[$fullKey] = $arrayValue;
                         }
                     }
                 }
             }
-            $this->formValues = array_merge($this->formValues, $defaultFormValues);
+
+            // 3: Overwrite with the submitted values.
             if (!empty($this->submittedValues)) {
                 $this->formValues = array_merge($this->formValues, $this->submittedValues);
             }
+
+            // 4: Overwrite with the (hard set) values as set in the field
+            // definitions.
             $this->formValues = array_merge($this->formValues, $this->getFieldValues($this->getFields()));
-            // Handle checkboxes
-            // 1 Prepend (checked) checkboxes with their collection name.
-            //   Known usages: PrestaShop.
-            // 2 Place (checked) checkboxes in their collection.
-            //   Known usages: Magento.
-            // As not all webshops handle checkboxes in this way, we do not
-            // unset the original keys (as we do in the reverse functionality in
-            // getPostedValues().
-            foreach ($this->getCheckboxKeys() as $checkboxName => $collectionName) {
-                // 1.
-                if (isset($this->formValues[$checkboxName])) {
-                    $this->formValues["{$collectionName}_{$checkboxName}"] = $this->formValues[$checkboxName];
-                }
-                // 2.
-                if (!empty($this->formValues[$checkboxName])) {
-                    // Check for empty() as the collection name value will have
-                    // been initialized with an empty string.
-                    if (empty($this->formValues[$collectionName])) {
-                        $this->formValues[$collectionName] = array();
-                    }
-                    $this->formValues[$collectionName][] = $checkboxName;
-                }
-            }
+
+            // 5: Allow for any web shop specific processing of the values.
+            // Known usages:
+            // - Prepend (checked) checkboxes with their collection name
+            //   (PrestaShop).
+            // - Place (checked) checkboxes in their collection (Magento).
+            $this->formValues = $this->formHelper->alterFormValues($this->formValues);
 
             $this->formValuesSet = true;
         }
@@ -434,9 +428,9 @@ abstract class Form
                 }
                 $field['value'] = $value;
             } else {
-                // Explicitly set values (in the 'value' key) take precedence over
-                // submitted values, which in turn take precedence over default values
-                // (gathered via getDefaultFormValues()).
+                // Explicitly set values (in the 'value' key) take precedence
+                // over submitted values, which in turn take precedence over
+                // default values (gathered via getDefaultFormValues()).
                 if (!isset($field['value'])) {
                     $field['value'] = $this->getFormValue($name);
                 }
@@ -491,7 +485,7 @@ abstract class Form
      */
     protected function setSubmittedValues()
     {
-        $this->submittedValues = $this->getPostedValues();
+        $this->submittedValues = $this->formHelper->getPostedValues();
     }
 
     /**
@@ -599,6 +593,7 @@ abstract class Form
     {
         if (empty($this->fields)) {
             $this->fields = $this->getFieldDefinitions();
+            $this->fields = $this->formHelper->addMetaField($this->fields);
         }
         return $this->fields;
     }
@@ -622,29 +617,50 @@ abstract class Form
      */
     protected function getKeys()
     {
-        return $this->getFieldKeys($this->getFields());
+        return $this->formHelper->getKeys();
     }
 
     /**
-     * Returns the keys of the fields in the given array.
+     * Indicates whether the given key defines a field on the posted form.
      *
-     * Internal method, do not call directly.
+     * @param string $key
+     *   The name of the field.
      *
-     * @param array[] $fields
-     *
-     * @return array
-     *   Array of key names, keyed by these names.
+     * @return bool
+     *   true if the given key defines a field that was rendered on the posted
+     *   form, false otherwise.
      */
-    protected function getFieldKeys(array $fields)
+    protected function isKey($key)
     {
-        $result = array();
-        foreach ($fields as $key => $field) {
-            $result[$key] = $key;
-            if (!empty($field['fields'])) {
-                $result += $this->getFieldKeys($field['fields']);
-            }
-        }
-        return $result;
+        return $this->formHelper->isKey($key);
+    }
+
+    /**
+     * Indicates whether the given key defines an array field.
+     *
+     * @param string $key
+     *   The name of the field.
+     *
+     * @return bool
+     *   Whether the given key defines an array field.
+     */
+    protected function isArray($key)
+    {
+        return $this->formHelper->isArray($key);
+    }
+
+    /**
+     * Indicates whether the given key defines a checkbox field.
+     *
+     * @param string $key
+     *   The name of the field.
+     *
+     * @return bool
+     *   Whether the given key defines a checkbox field.
+     */
+    protected function isCheckbox($key)
+    {
+        return $this->formHelper->isCheckbox($key);
     }
 
     /**
@@ -664,73 +680,5 @@ abstract class Form
             return true;
         }
         return false;
-    }
-
-    /**
-     * Indicates whether the given key defines a checkbox field.
-     *
-     * This base implementation returns false. Override this method if your form
-     * has checkbox fields.
-     *
-     * @param string $key
-     *   The name of the field.
-     *
-     * @return bool
-     *   Whether the given key defines a checkbox field.
-     */
-    protected function isCheckboxKey($key)
-    {
-        return array_key_exists($key, $this->getCheckboxKeys());
-    }
-
-    /**
-     * Returns a list of the checkbox names for this form.
-     *
-     * @return array
-     *   An array with as keys the checkbox names of this form and as values the
-     *   checkbox collection name the checkbox belongs to.
-     */
-    protected function getCheckboxKeys()
-    {
-        // Call getFieldDefinitions(), not getFields(), as that may prevent
-        // changes to e.g. fixed values at a later stage in form handling.
-        return $this->getCheckboxKeysByFields($this->getFieldDefinitions());
-    }
-
-    /**
-     * Returns a list of the checkbox names for the given fields.
-     *
-     * @param array[] $fields
-     *   The fields(ets) to extract the checkboxes from.
-     *
-     * @return array
-     *   An array with as keys the checkbox names of this form and as values the
-     *   checkbox collection name the checkbox belongs to.
-     */
-    protected function getCheckboxKeysByFields(array $fields)
-    {
-        $result = array();
-        foreach ($fields as $name => $field) {
-            if ($field['type'] === 'checkbox') {
-                $result += array_combine(array_keys($field['options']), array_fill(0, count($field['options']), $name));
-            } elseif (!empty($field['fields'])) {
-                $result += $this->getCheckboxKeysByFields($field['fields']);
-            }
-        }
-        return $result;
-    }
-
-    /**
-     * Returns a flat array of the posted values.
-     *
-     * As especially checkbox handling differs per web shop, often resulting in an
-     * array of checkbox values, this method returns a flattened version of the
-     * posted values.
-     *
-     * @return array
-     */
-    protected function getPostedValues()
-    {
-        return $this->formHelper->getPostedValues($this->getCheckboxKeys());
     }
 }

@@ -35,9 +35,7 @@ class ConfigForm extends BaseConfigForm
     protected function validate()
     {
         $this->validateAccountFields();
-        if ($this->isFullForm()) {
-            $this->validateShopFields();
-        }
+        $this->validateShopFields();
     }
 
     /**
@@ -83,6 +81,11 @@ class ConfigForm extends BaseConfigForm
      */
     protected function validateShopFields()
     {
+        // Check if this fieldset was rendered.
+        if (!$this->isKey('nature_shop')) {
+            return;
+        }
+
         if (!isset($this->submittedValues['nature_shop'])) {
             $this->errorMessages['nature_shop'] = $this->t('message_validate_nature_0');
         }
@@ -187,7 +190,7 @@ class ConfigForm extends BaseConfigForm
             'versionInformationHeader' => array(
                 'type' => 'fieldset',
                 'legend' => $this->t('versionInformationHeader'),
-                'fields' => $this->getVersionInformation($accountOk),
+                'fields' => $this->getVersionInformation(),
             ),
         );
         if ($accountOk) {

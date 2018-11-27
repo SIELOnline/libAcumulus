@@ -18,7 +18,7 @@ use Siel\Acumulus\Web\Result;
 use Siel\Acumulus\Web\Service;
 
 /**
- * Class ShopOrderOverviewForm defines the shop order status oveview form.
+ * Class ShopOrderOverviewForm defines the shop order status overview form.
  *
  * This form is mostly informative but may contain some buttons and a few fields
  * to update the invoice in Acumulus.

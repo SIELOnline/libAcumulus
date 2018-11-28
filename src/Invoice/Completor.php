@@ -740,6 +740,8 @@ class Completor
         // If shop specific code or an event handler has already set the vat
         // type, we don't change it.
         if (empty($this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType])) {
+        	// @todo: if we only have one possible vattype, should we use that,
+	        //   or should we perform all checks to look for contradictory evidence?
             $vatTypeInfo = $this->getInvoiceLinesVatTypeInfo();
             $message = '';
             $code = 0;
@@ -885,7 +887,7 @@ class Completor
 
                         // 2) If this is a 0 vat rate while the lookup vat rate,
                         //    if available, is not, it must be a 0-vat vat type.
-                        if ($this->lineHas0VatRate($line) && isset($line[Meta::VatRateLookup]) && !$this->metaDataHas0VatRate($line[Meta::VatRateLookup])) {
+                        if ($this->lineHas0VatRate($line) && !empty($line[Meta::VatRateLookup]) && !$this->metaDataHas0VatRate($line[Meta::VatRateLookup])) {
                             // This article is not intrinsically vat free, so
                             // the vat type must be a "no vat" vat type.
                             if (!in_array($vatType, static::$vatTypesAllowing0Vat)) {
@@ -1081,6 +1083,7 @@ class Completor
      * Returns whether an array or single int contains 0 vat rate.
      *
      * @param int|int[] $vatRates
+     * @todo: always an array (as the type hint defines) or is a single int still possible?
      *
      * @return bool
      *   True if the array contains 0 vat rate, false otherwise.

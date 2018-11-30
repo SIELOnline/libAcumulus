@@ -68,7 +68,9 @@ class Creator extends BaseCreator
      */
     public function getOrderMeta($property)
     {
-        $value = get_post_meta($this->order->id, $property, true);
+    	/** @var \WC_Order $order */
+	    $order = $this->invoiceSource->getOrder()->getSource();
+	    $value  = get_post_meta( $order->id, $property, true);
         // get_post_meta() can return false or ''.
         if (empty($value)) {
             // Not found: indicate so by returning null.

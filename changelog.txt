@@ -33,6 +33,11 @@ Bugs:
 Features:
 - WC3: WC seems to return amounts with an increased precision (was: rounded to
   the cent. now: it seems not any longer rounded).
+- WC3: Follow setting 'woocommerce_tax_based_on' to determine the country code.
+- WC: Use country, city and postal code of Acumulus invoice (instead of Customer
+  object) to get lookup tax rates. (this also makes
+  WooCommerce\Creator::getVatRateLookupMetadataByTaxClass() work in WC2...)
+- WC: Remove properties $order and $refund from Creator class.
 
 5.5.0 (2018-11-14)
 ------------------

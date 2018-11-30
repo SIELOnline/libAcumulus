@@ -15,12 +15,6 @@ use WC_Tax;
  */
 class Creator extends BaseCreator
 {
-    /** @var \WC_Order The order self or the order that got refunded. */
-    protected $order;
-
-    /** @var \WC_Order_Refund The refund for an order. */
-    protected $refund;
-
     /** @var bool Whether the order has (non empty) item lines. */
     protected $hasItemLines;
 
@@ -37,32 +31,12 @@ class Creator extends BaseCreator
 
     /**
      * {@inheritdoc}
-     *
-     * This override also initializes WooCommerce specific properties related to
-     * the source.
-     */
-    protected function setInvoiceSource($invoiceSource)
-    {
-        parent::setInvoiceSource($invoiceSource);
-        switch ($this->invoiceSource->getType()) {
-            case Source::Order:
-                $this->order = $this->invoiceSource->getSource();
-                break;
-            case Source::CreditNote:
-                $this->refund = $this->invoiceSource->getSource();
-                $this->order = $this->invoiceSource->getOrder()->getSource();
-                break;
-        }
-    }
-
-    /**
-     * {@inheritdoc}
      */
     protected function setPropertySources()
     {
         parent::setPropertySources();
         if ($this->invoiceSource->getType() === Source::CreditNote) {
-            $this->propertySources['order'] = $this->order;
+            $this->propertySources['order'] = $this->invoiceSource->getOrder()->getSource();
         }
     }
 
@@ -219,34 +193,13 @@ class Creator extends BaseCreator
         }
 
         // Find applicable vat rates. We will use WC_Tax::find_rates() to find
-        // them. With the customer location info we can select the correct vat
-        // rate within the vat class based on the zone of the customer.
+        // them.
         $args = array(
             'tax_class' => $taxClassId,
+            'country' => $this->invoice[Tag::Customer][Tag::CountryCode],
+            'city' => $this->invoice[Tag::Customer][Tag::City],
+            'postcode' => $this->invoice[Tag::Customer][Tag::PostalCode],
         );
-        try {
-            /** @var \WC_Order $order */
-            $order = $this->invoiceSource->getOrder()->getSource();
-            $customer = new \WC_Customer($order->get_customer_id());
-            $tax_based_on = get_option('woocommerce_tax_based_on');
-            if ($tax_based_on === 'billing') {
-                $args += array_merge($args, array(
-                    'country' => $customer->get_billing_country(),
-                    'state' => $customer->get_billing_state(),
-                    'city' => $customer->get_billing_city(),
-                    'postcode' => $customer->get_billing_postcode(),
-                ));
-            } else {
-                $args += array_merge($args, array(
-                    'country' => $customer->get_shipping_country(),
-                    'state' => $customer->get_shipping_state(),
-                    'city' => $customer->get_shipping_city(),
-                    'postcode' => $customer->get_shipping_postcode(),
-                ));
-            }
-        } catch (\Exception $e) {
-            $this->log->notice('WooCommerce\Creator::getVatRateLookupMetadataByTaxClass: Could not get customer location: %s', $e->getMessage());
-        }
 
         $taxRates = WC_Tax::find_rates($args);
         foreach ($taxRates as $taxRate) {
@@ -534,8 +487,10 @@ class Creator extends BaseCreator
         // So skip get_used_coupons() on refunds without articles.
         if ($this->invoiceSource->getType() !== Source::CreditNote || $this->hasItemLines) {
             // Add a line for all coupons applied. Coupons are only stored on
-            // the order, not on refunds, so use the order property.
-            $usedCoupons = $this->order->get_used_coupons();
+            // the order, not on refunds, so use the order.
+	        /** @var \WC_Order $order */
+            $order = $this->invoiceSource->getOrder()->getSource();
+	        $usedCoupons = $order->get_used_coupons();
             foreach ($usedCoupons as $code) {
                 $coupon = new WC_Coupon($code);
                 $result[] = $this->getDiscountLine($coupon);

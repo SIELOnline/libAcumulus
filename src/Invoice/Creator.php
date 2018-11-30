@@ -1070,7 +1070,7 @@ abstract class Creator
      *
      * @todo: can we move this from the (plugin specific) creators to the
      *   completor phase? This would aid in simplifying the creators towards raw
-     *   data collectors. Note: this would need a meta-vatamount-precision.
+     *   data collectors..
      */
     public static function getVatRangeTags($numerator, $denominator, $numeratorPrecision = 0.01, $denominatorPrecision = 0.01)
     {

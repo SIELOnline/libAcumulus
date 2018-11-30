@@ -24,6 +24,8 @@ Bugs:
   articles subject to EU vat.
 - ALL: looked up vat rate meta data may be an empty array: use empty() instead
   of isset().
+- ALL: looked up vat rate may still be a single float, not necessarily an array:
+  'array' type hint in Completor::metaDataHas0VatRate() is incorrect.
 - ALL: allow, recognise and store empty multi-select fields on the config forms.
 - ALL: notice Undefined index nature in completor.php on line 336.
 - OC2/OC3: mail did not use the correct property names for the smtp settings.

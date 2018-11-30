@@ -1080,26 +1080,22 @@ class Completor
     }
 
     /**
-     * Returns whether an array or single int contains 0 vat rate.
+     * Returns whether $vatRates contains 0 vat rate.
      *
-     * @param int|int[] $vatRates
-     * @todo: always an array (as the type hint defines) or is a single int still possible?
+     * @param float|float[] $vatRates
      *
      * @return bool
-     *   True if the array contains 0 vat rate, false otherwise.
+     *   True if $vatRates contains a 0 vat rate, false otherwise.
      */
-    protected function metaDataHas0VatRate(array $vatRates)
+    protected function metaDataHas0VatRate($vatRates)
     {
-        if (is_array($vatRates)) {
-            foreach ($vatRates as $vatRate) {
-                if ($this->is0VatRate($vatRate)) {
-                    return true;
-                }
+    	$vatRates = (array) $vatRates;
+        foreach ($vatRates as $vatRate) {
+            if ($this->is0VatRate($vatRate)) {
+                return true;
             }
-            return false;
-        } else {
-            return $this->is0VatRate($vatRates);
         }
+        return false;
     }
 
     /**

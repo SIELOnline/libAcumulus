@@ -192,15 +192,13 @@ class Creator extends BaseCreator
             $taxClassId = '';
         }
 
-        // Find applicable vat rates. We will use WC_Tax::find_rates() to find
-        // them.
+        // Find applicable vat rates. We use WC_Tax::find_rates() to find them.
         $args = array(
             'tax_class' => $taxClassId,
             'country' => $this->invoice[Tag::Customer][Tag::CountryCode],
             'city' => $this->invoice[Tag::Customer][Tag::City],
             'postcode' => $this->invoice[Tag::Customer][Tag::PostalCode],
         );
-
         $taxRates = WC_Tax::find_rates($args);
         foreach ($taxRates as $taxRate) {
             $result[Meta::VatRateLookup][] = $taxRate['rate'];
@@ -510,12 +508,6 @@ class Creator extends BaseCreator
      * Discounts are already applied, add a descriptive line with 0 amount. The
      * VAT rate to categorize this line under should be determined by the
      * completor.
-     *
-     * Hooray:
-     * As of WooCommerce 2.3, coupons can no longer be set as "apply after tax":
-     * https://woocommerce.wordpress.com/2014/12/12/upcoming-coupon-changes-in-woocommerce-2-3/
-     * WC_Coupon::apply_before_tax() now always returns true (and thus might be
-     * deprecated and removed in the future): do no longer use.
      *
      * @param \WC_Coupon $coupon
      *

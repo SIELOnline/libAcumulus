@@ -99,7 +99,7 @@ class SplitNonMatchingLine extends CompletorStrategyBase
         $this->description = sprintf('"SplitNonMatchingLine(%f, %f)', $this->minVatRate[Tag::VatRate], $this->maxVatRate[Tag::VatRate]);
         $result = false;
         foreach ($this->lines2Complete as $key => $line2Complete) {
-            if (!empty($line2Complete[Meta::StrategySplit]) && isset($line2Complete[Meta::VatRateMatches]) && $line2Complete[Meta::VatRateMatches] === 'none') {
+            if (!empty($line2Complete[Meta::StrategySplit]) && isset($line2Complete[Meta::VatRateRangeMatches]) && empty($line2Complete[Meta::VatRateRangeMatches])) {
                 // Line may be split and line does not have a matching vat rate.
                 if ($this->splitNonMatchingLine($line2Complete)) {
                     $result = true;

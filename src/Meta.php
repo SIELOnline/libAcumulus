@@ -82,7 +82,7 @@ interface Meta
      * Completor -> Strategy: Possible vat rates that lie in the VatRateMin to
      * VatRateMax range.
      */
-    const VatRateMatches = 'meta-vatrate-matches';
+    const VatRateRangeMatches = 'meta-vatrate-range-matches';
     /**
      * Creator -> Completor: (current) vat class id looked up from e.g. the
      * product or shipping settings. Can be used to differentiate between vat

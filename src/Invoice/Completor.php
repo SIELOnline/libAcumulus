@@ -33,9 +33,11 @@ use Siel\Acumulus\Web\Service;
  */
 class Completor
 {
-    const VatRateSource_Calculated_Corrected = 'calculated-corrected';
-    const VatRateSource_Looked_Up = 'completor-looked-up';
-    const VatRateSource_Completor_Completed = 'completor-completed';
+    const VatRateSource_Completor_Range = 'completor-range';
+    const VatRateSource_Completor_Lookup = 'completor-lookup';
+    const VatRateSource_Completor_Range_Lookup = 'completor-range-lookup';
+    const VatRateSource_Completor_Range_Lookup_Foreign = 'completor-range-lookup-foreign';
+    const VatRateSource_Completor_Max_Appearing = 'completor-max-appearing';
     const VatRateSource_Strategy_Completed = 'strategy-completed';
     const VatRateSource_Copied_From_Children = 'copied-from-children';
     const VatRateSource_Copied_From_Parent = 'copied-from-parent';
@@ -53,9 +55,11 @@ class Completor
     protected static $CorrectVatRateSources = array(
         Creator::VatRateSource_Exact,
         Creator::VatRateSource_Exact0,
-        self::VatRateSource_Calculated_Corrected,
-        self::VatRateSource_Looked_Up,
-        self::VatRateSource_Completor_Completed,
+        self::VatRateSource_Completor_Range,
+        self::VatRateSource_Completor_Lookup,
+        self::VatRateSource_Completor_Range_Lookup,
+        self::VatRateSource_Completor_Range_Lookup_Foreign,
+        self::VatRateSource_Completor_Max_Appearing,
         self::VatRateSource_Strategy_Completed,
         self::VatRateSource_Copied_From_Children,
         self::VatRateSource_Copied_From_Parent,
@@ -1038,25 +1042,27 @@ class Completor
      * Processes meta data before sending the invoice.
      *
      * Currently the following processing is done:
-     * - Meta::VatRateLookup is converted to a string if it is an array.
-     * - Meta::VatRateLookupLabel is converted to a string if it is an array.
-     * - Meta::FieldsCalculated is converted to a string if it is an array.
-     * - Meta::VatRateLookupMatches is converted to a string if it is an array.
+     * - Meta::VatRateLookup, Meta::VatRateLookupLabel, Meta::FieldsCalculated,
+     *   Meta::VatRateLookupMatches, and Meta::VatRateRangeMatches are converted
+     *   a json string if they are an array.
      */
     protected function processMetaData()
     {
         foreach ($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] as &$line) {
             if (isset($line[Meta::VatRateLookup]) && is_array($line[Meta::VatRateLookup])) {
-                $line[Meta::VatRateLookup] = implode(',', $line[Meta::VatRateLookup]);
+                $line[Meta::VatRateLookup] = json_encode($line[Meta::VatRateLookup]);
             }
             if (isset($line[Meta::VatRateLookupLabel]) && is_array($line[Meta::VatRateLookupLabel])) {
-                $line[Meta::VatRateLookupLabel] = implode(',', $line[Meta::VatRateLookupLabel]);
+                $line[Meta::VatRateLookupLabel] = json_encode($line[Meta::VatRateLookupLabel]);
             }
             if (isset($line[Meta::FieldsCalculated]) && is_array($line[Meta::FieldsCalculated])) {
-                $line[Meta::FieldsCalculated] = implode(',', array_unique($line[Meta::FieldsCalculated]));
+                $line[Meta::FieldsCalculated] = json_encode(array_unique($line[Meta::FieldsCalculated]));
             }
             if (isset($line[Meta::VatRateLookupMatches]) && is_array($line[Meta::VatRateLookupMatches])) {
-                $line[Meta::VatRateLookupMatches] = implode(',', $line[Meta::VatRateLookupMatches]);
+                $line[Meta::VatRateLookupMatches] = json_encode($line[Meta::VatRateLookupMatches]);
+            }
+            if (isset($line[Meta::VatRateRangeMatches]) && is_array($line[Meta::VatRateRangeMatches])) {
+                $line[Meta::VatRateRangeMatches] = json_encode($line[Meta::VatRateRangeMatches]);
             }
         }
     }
@@ -1292,7 +1298,7 @@ class Completor
      *   True if the shop might sell foreign vat articles and the vat class id
      *   denotes a foreign vat class, false otherwise.
      */
-    protected function isForeignVatClass($vatClassId)
+    public function isForeignVatClass($vatClassId)
     {
         $shopSettings = $this->config->getShopSettings();
         $foreignVat = $shopSettings['foreignVat'];

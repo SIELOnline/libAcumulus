@@ -316,9 +316,8 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     public function getVatClasses()
     {
-        $keys =  WC_Tax::get_tax_class_slugs();
         $labels = WC_Tax::get_tax_classes();
-
+        $keys =  WC_Tax::get_tax_class_slugs();
         return array('standard' => 'Standaard') + array_combine($keys, $labels);
     }
 

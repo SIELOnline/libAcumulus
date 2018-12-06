@@ -14,8 +14,8 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     public function getVatClasses()
     {
-        $keys = array_map( 'sanitize_title', WC_Tax::get_tax_classes());
         $labels = WC_Tax::get_tax_classes();
+        $keys = array_map( 'sanitize_title', $labels);
         return array_combine($keys, $labels);
     }
 }

@@ -88,7 +88,7 @@ abstract class Creator
     const VatRateSource_Strategy = 'strategy';
     const VatRateSource_Parent = 'parent';
 
-    const LineType_Order = 'product';
+    const LineType_OrderItem = 'order-item';
     const LineType_Shipping = 'shipping';
     const LineType_PaymentFee = 'payment';
     const LineType_GiftWrapping = 'gift';
@@ -560,7 +560,7 @@ abstract class Creator
     protected function getInvoiceLines()
     {
         $itemLines = $this->getItemLines();
-        $itemLines = $this->addLineType($itemLines, static::LineType_Order);
+        $itemLines = $this->addLineType($itemLines, static::LineType_OrderItem);
 
         $feeLines = $this->getFeeLines();
 

@@ -61,7 +61,7 @@ class Creator extends BaseCreator
     protected function getInvoiceLines()
     {
         $itemLines = $this->getItemLines();
-        $itemLines = $this->addLineType($itemLines, static::LineType_Order);
+        $itemLines = $this->addLineType($itemLines, static::LineType_OrderItem);
 
         $totalLines = $this->getTotalLines();
 

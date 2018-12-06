@@ -45,6 +45,7 @@ Features:
 Refactorings:
 - WC: Remove properties $order and $refund from Creator class.
 - WC: Only call WC method WC_Tax::get_tax_class_slugs() once in getVatClasses().
+- ALL: Rename Creator::LineType_Order to Creator::LineType_OrderItem.
 
 5.5.0 (2018-11-14)
 ------------------

@@ -913,7 +913,7 @@ class Completor
                         //   when there's a fee line at NL vat rate which
                         //   happens to be the foreign vat rate as well, we only
                         //   do this for item lines.
-                        if ($line[Meta::LineType] === Creator::LineType_Order && !empty($line[Meta::VatClassId]) && !$this->isForeignVatClass($line[Meta::VatClassId])) {
+                        if ($line[Meta::LineType] === Creator::LineType_OrderItem && !empty($line[Meta::VatClassId]) && !$this->isForeignVatClass($line[Meta::VatClassId])) {
                             if ($vatType === Api::VatType_ForeignVat) {
                                 $doAdd = false;
                             }
@@ -924,7 +924,7 @@ class Completor
                         //   services like shipping and packing are part of the
                         //   delivery as a whole and should not change the vat
                         //   type.
-                        if ($this->isOutsideEu() && $line[Meta::LineType] === Creator::LineType_Order && !empty($line[Tag::Nature])) {
+                        if ($this->isOutsideEu() && $line[Meta::LineType] === Creator::LineType_OrderItem && !empty($line[Tag::Nature])) {
                             if ($vatType === Api::VatType_National && $line[Tag::Nature] !== Api::Nature_Service) {
                                 $doAdd = false;
                             }

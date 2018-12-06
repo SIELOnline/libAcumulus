@@ -890,7 +890,7 @@ class Completor
                         }
 
                         // 2) If this is a 0 vat rate while the lookup vat rate,
-                        //    if available, is not, it must be a 0-vat vat type.
+                        //   if available, is not, it must be a 0-vat vat type.
                         if ($this->lineHas0VatRate($line) && !empty($line[Meta::VatRateLookup]) && !$this->metaDataHas0VatRate($line[Meta::VatRateLookup])) {
                             // This article is not intrinsically vat free, so
                             // the vat type must be a "no vat" vat type.
@@ -900,21 +900,30 @@ class Completor
                         }
 
                         // 3) In EU: If the vat class is known and denotes
-                        //    foreign vat, we do not add the Dutch vat type.
-                        // Note that the inverse can prevent finding vat type 6
-                        // when there's a fee line at NL vat which happens to be
-                        // the foreign vat rate as well.
+                        //   foreign vat, we do not add the Dutch vat type.
                         if ($this->isEu() && !empty($line[Meta::VatClassId]) && $this->isForeignVatClass($line[Meta::VatClassId])) {
                             if ($vatType === Api::VatType_National) {
                                 $doAdd = false;
                             }
                         }
 
-                        // 4) Outside EU: goods should have vat type 4, services
-                        //    vat type 1. However, we only look at item lines,
-                        //    as services like shipping and packing are part of
-                        //    the delivery as a whole and should not change the
-                        //    vat type.
+                        // 4) If the vat class is known and does not denote
+                        //   foreign vat, we do not add the Foreign vat type.
+                        //   Note that as this can prevent finding vat type 6
+                        //   when there's a fee line at NL vat rate which
+                        //   happens to be the foreign vat rate as well, we only
+                        //   do this for item lines.
+                        if ($line[Meta::LineType] === Creator::LineType_Order && !empty($line[Meta::VatClassId]) && !$this->isForeignVatClass($line[Meta::VatClassId])) {
+                            if ($vatType === Api::VatType_ForeignVat) {
+                                $doAdd = false;
+                            }
+                        }
+
+                        // 5) Outside EU: goods should have vat type 4, services
+                        //   vat type 1. However, we only look at item lines, as
+                        //   services like shipping and packing are part of the
+                        //   delivery as a whole and should not change the vat
+                        //   type.
                         if ($this->isOutsideEu() && $line[Meta::LineType] === Creator::LineType_Order && !empty($line[Tag::Nature])) {
                             if ($vatType === Api::VatType_National && $line[Tag::Nature] !== Api::Nature_Service) {
                                 $doAdd = false;

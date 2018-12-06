@@ -88,11 +88,11 @@ abstract class Creator
     const VatRateSource_Strategy = 'strategy';
     const VatRateSource_Parent = 'parent';
 
+    const LineType_Order = 'product';
     const LineType_Shipping = 'shipping';
     const LineType_PaymentFee = 'payment';
     const LineType_GiftWrapping = 'gift';
     const LineType_Manual = 'manual';
-    const LineType_Order = 'product';
     const LineType_Discount = 'discount';
     const LineType_Voucher = 'voucher';
     const LineType_Other = 'other';

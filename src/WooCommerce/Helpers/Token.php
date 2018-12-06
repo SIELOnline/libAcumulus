@@ -69,7 +69,7 @@ class Token extends BaseToken
             if ($value === null) {
                 // Not found in meta_data: check if we should descend a level.
                 $propertyParts = explode('_', $property, 2);
-                if (count($propertyParts) === 2 && array_key_exists($propertyParts[0], $data)) {
+                if (count($propertyParts) === 2 && array_key_exists($propertyParts[0], $data) && is_array($data[$propertyParts[0]])) {
                     $value = $this->getDataValue($data[$propertyParts[0]], $propertyParts[1]);
                 }
             }

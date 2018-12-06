@@ -29,6 +29,10 @@ Bugs:
 - ALL: allow, recognise and store empty multi-select fields on the config forms.
 - ALL: notice Undefined index nature in completor.php on line 336.
 - OC2/OC3: mail did not use the correct property names for the smtp settings.
+- WC: PHP Fatal error:  Uncaught TypeError: Argument 1 passed to
+  WooCommerce\Helpers\Token::getDataValue() must be of the type array, string
+  given: only descend recursively if the property found by tokenizing on _, is a
+  (data) array itself.
 
 Features:
 - ALL: Make better use of available vat class meta data to reduce the possible

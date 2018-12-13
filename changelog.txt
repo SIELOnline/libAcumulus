@@ -17,7 +17,7 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies)
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
-5.5.1 (2018-11-??)
+5.5.1 (2018-12-13)
 ------------------
 Bugs:
 - ALL: only use the setting that defines EU vat classes when the shop might sell

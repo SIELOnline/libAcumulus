@@ -34,7 +34,6 @@ interface Api
     const baseUri = 'https://api.sielsystems.nl/acumulus';
     const testUri = 'https://ng1.sielsystems.nl';
     const apiVersion = 'stable';
-    const testApiVersion = '4.0.4';
     const outputFormat = 'json';
 
     // API related constants.

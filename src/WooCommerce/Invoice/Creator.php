@@ -38,6 +38,7 @@ class Creator extends BaseCreator
         if ($this->invoiceSource->getType() === Source::CreditNote) {
             $this->propertySources['order'] = $this->invoiceSource->getOrder()->getSource();
         }
+        // @todo: $this->propertySources['orderSource'] = $this->invoiceSource->getOrder()->getSource();
     }
 
     /**

@@ -32,18 +32,6 @@ class Creator extends BaseCreator
     /**
      * {@inheritdoc}
      */
-    protected function setPropertySources()
-    {
-        parent::setPropertySources();
-        if ($this->invoiceSource->getType() === Source::CreditNote) {
-            $this->propertySources['order'] = $this->invoiceSource->getOrder()->getSource();
-        }
-        // @todo: $this->propertySources['orderSource'] = $this->invoiceSource->getOrder()->getSource();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     protected function getItemLines()
     {
         $result = array();

@@ -21,7 +21,7 @@ class BatchFormTranslations extends TranslationCollection
         'field_invoice_source_type' => 'Factuurtype',
         'field_invoice_source_reference_from' => '# van',
         'field_invoice_source_reference_to' => '# tot',
-        'desc_invoice_source_reference_from_to_1' => 'Vul de reeks bestelling-referenties of nummers in die u naar Acumulus wilt verzenden. Als u slechts 1 factuur wilt verzenden hoeft u alleen het \'# van\' in te vullen. Laat beide velden leeg als u op datum wilt verzenden.',
+        'desc_invoice_source_reference_from_to_1' => 'Vul de reeks bestel-referenties of nummers in die u naar Acumulus wilt verzenden. Als u slechts 1 factuur wilt verzenden hoeft u alleen het \'# van\' in te vullen. Laat beide velden leeg als u op datum wilt verzenden.',
         'desc_invoice_source_reference_from_to_2' => 'Vul de reeks bestel of creditnota-referenties of nummers in die u naar Acumulus wilt verzenden. Als u slechts 1 factuur wilt verzenden hoeft u alleen het \'# van\' in te vullen. Laat beide velden leeg als u op datum wilt verzenden.',
         'field_date_from' => 'Datum van',
         'field_date_to' => 'Datum tot',

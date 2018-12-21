@@ -19,6 +19,9 @@ WC3 = WooCommerce 3 (WordPress)
 
 5.5.2 (2019-01-??)
 ------------------
+Features:
+- WC3: Added support for the 'Custom Order Numbers for WooCommerce' plugin.
+
 Bugs:
 - ALL: For refunds, the "property source" 'order' referred to an Invoice\Source
   object instead of to the hosting webshops's order object/array. The property
@@ -28,6 +31,18 @@ Bugs:
 
 5.5.1 (2018-12-13)
 ------------------
+Features:
+- ALL: Make better use of available vat class meta data to reduce the possible
+  vat types of a line.
+- ALL: Make better use of available meta data (by combining them) to get the vat
+  rate of a line.
+- WC3: WC seems to return amounts with an increased precision (was: rounded to
+  the cent. now: it seems not any longer rounded).
+- WC3: Follow setting 'woocommerce_tax_based_on' to determine the country code.
+- WC: Use country, city and postal code of Acumulus invoice (instead of Customer
+  object) to get lookup tax rates. (this also makes
+  WooCommerce\Creator::getVatRateLookupMetadataByTaxClass() work in WC2...)
+
 Bugs:
 - ALL: only use the setting that defines EU vat classes when the shop might sell
   articles subject to EU vat.
@@ -42,18 +57,6 @@ Bugs:
   WooCommerce\Helpers\Token::getDataValue() must be of the type array, string
   given: only descend recursively if the property found by tokenizing on _, is a
   (data) array itself.
-
-Features:
-- ALL: Make better use of available vat class meta data to reduce the possible
-  vat types of a line.
-- ALL: Make better use of available meta data (by combining them) to get the vat
-  rate of a line.
-- WC3: WC seems to return amounts with an increased precision (was: rounded to
-  the cent. now: it seems not any longer rounded).
-- WC3: Follow setting 'woocommerce_tax_based_on' to determine the country code.
-- WC: Use country, city and postal code of Acumulus invoice (instead of Customer
-  object) to get lookup tax rates. (this also makes
-  WooCommerce\Creator::getVatRateLookupMetadataByTaxClass() work in WC2...)
 
 Refactorings:
 - WC: Remove properties $order and $refund from Creator class.

@@ -42,8 +42,8 @@ class Source extends BaseSource
     {
         // Method get_order_number() is used for when other plugins are
         // installed that add an order number that differs from the ID. Known
-        // plugins that do so: woocommerce-sequential-order-numbers(-pro) and
-        // wc-sequential-order-numbers.
+        // plugins that do so: woocommerce-sequential-order-numbers(-pro),
+        // wc-sequential-order-numbers, and custom-order-numbers-for-woocommerce(-pro).
         if ($this->getType() === Source::Order) {
             /** @var \WC_Order $order */
             $order = $this->source;

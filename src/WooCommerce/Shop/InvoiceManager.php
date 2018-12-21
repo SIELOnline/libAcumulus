@@ -69,19 +69,24 @@ class InvoiceManager extends BaseInvoiceManager
      * - "WC Sequential Order Numbers", see
      *   https://wordpress.org/plugins/wc-sequential-order-numbers/ and
      *   http://plugins.dualcube.com/product/wc-sequential-order-numbers/.
+     * - "Custom Order Numbers for WooCommerce (pro)", see
+     *   https://wordpress.org/plugins/custom-order-numbers-for-woocommerce and
+     *   https://wpfactory.com/item/custom-order-numbers-woocommerce/.
      *
      * If you know of other plugins, please let us know.
+     *
+     * These plugins mostly only store the number part, not the prefix, suffix
+     * or date part. If so, you will have to search for the number part only.
      */
     public function getInvoiceSourcesByReferenceRange($invoiceSourceType, $invoiceSourceReferenceFrom, $invoiceSourceReferenceTo)
     {
         // To be able to define the query we need to know under which meta key
         // the order number/reference is stored.
-        // - WooCommerce Sequential Order Numbers uses _order_number.
-        // - WooCommerce Sequential Order Numbers Pro uses _order_number or
-        //   _order_number_formatted.
-        // - WC Sequential Order Numbers uses _order_number or
-        //   _order_number_formatted.
-        // Both only work with orders, not refunds.
+        // - WooCommerce Sequential Order Numbers: _order_number.
+        // - WooCommerce Sequential Order Numbers Pro: _order_number or _order_number_formatted.
+        // - WC Sequential Order Numbers: _order_number or _order_number_formatted.
+        // - Custom Order Numbers for WooCommerce (Pro): _alg_wc_custom_order_number.
+        // All only work with orders, not refunds.
         if ($invoiceSourceType === Source::Order) {
             if (is_plugin_active('woocommerce-sequential-order-numbers/woocommerce-sequential-order-numbers.php')) {
                 // Search by the order number as assigned by the plugin.
@@ -130,6 +135,23 @@ class InvoiceManager extends BaseInvoiceManager
                       'type' => $type,
                     ),
                   ),
+                );
+                return $this->query2Sources($args, $invoiceSourceType);
+            } elseif (is_plugin_active('custom-order-numbers-for-woocommerce-pro/custom-order-numbers-for-woocommerce-pro.php')
+                      || is_plugin_active('custom-order-numbers-for-woocommerce/custom-order-numbers-for-woocommerce.php')) {
+                // Search by the order number as assigned by the plugin.
+                $args = array(
+                    'meta_query' => array(
+                        array(
+                            'key' => '_alg_wc_custom_order_number',
+                            'value' => array(
+                                $invoiceSourceReferenceFrom,
+                                $invoiceSourceReferenceTo,
+                            ),
+                            'compare' => 'BETWEEN',
+                            'type' => 'UNSIGNED',
+                        ),
+                    ),
                 );
                 return $this->query2Sources($args, $invoiceSourceType);
             }

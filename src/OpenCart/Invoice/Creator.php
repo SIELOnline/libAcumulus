@@ -377,7 +377,6 @@ class Creator extends BaseCreator
             $zoneId = 0;
         }
 
-        // @nth: we could cache this.
         $zones = $this->getZoneToGeoZones($geoZoneId);
         foreach ($zones as $zone) {
             // Check if this zone definition covers the same country.
@@ -494,9 +493,14 @@ class Creator extends BaseCreator
      */
     protected function getZoneToGeoZones($geo_zone_id)
     {
-        /** @noinspection SqlResolve */
-        $query = $this->getRegistry()->db->query("SELECT * FROM " . DB_PREFIX . "zone_to_geo_zone WHERE geo_zone_id = '" . (int)$geo_zone_id . "'");
-        return $query->rows;
+        static $geoZonesCache = array();
+
+        if (!isset($geoZonesCache[$geo_zone_id])) {
+            /** @noinspection SqlResolve */
+            $query = $this->getRegistry()->db->query("SELECT * FROM " . DB_PREFIX . "zone_to_geo_zone WHERE geo_zone_id = '" . (int) $geo_zone_id . "'");
+            $geoZonesCache[$geo_zone_id] = $query->rows;
+        }
+        return $geoZonesCache[$geo_zone_id];
     }
 
     /**

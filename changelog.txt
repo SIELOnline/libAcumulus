@@ -13,14 +13,14 @@ OC2 = OpenCart 2 (OC21, OC22, OC23 = specifieke minor versie binnen major versie
 OC3 = OpenCart 3
 PS  = PrestaShop
 VM3 = VirtueMart3 (Joomla)
-WC  = WooCommerce (WordPress) (alle ondersteunde versies)
+WC  = WooCommerce (WordPress) (alle ondersteunde versies, vanaf 5.5.2 is dat alleen nog WC3)
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
 5.5.2 (2019-01-??)
 ------------------
 Features:
-- WC3: Added support for the 'Custom Order Numbers for WooCommerce' plugin.
+- WC: Added support for the 'Custom Order Numbers for WooCommerce' plugin.
 
 Bugs:
 - ALL: For refunds, the "property source" 'order' referred to an Invoice\Source
@@ -28,6 +28,10 @@ Bugs:
   source 'orderSource' now no longer exists in WC.
   NOTE: This may have consequences for your field references (veldverwijzingen)
   in your advanced settings!
+
+Refactorings:
+- OC: Cache geo zones.
+- WC: Use add_meta_boxes_{post_type} instead of add_meta_boxes action.
 
 5.5.1 (2018-12-13)
 ------------------

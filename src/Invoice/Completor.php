@@ -1319,7 +1319,7 @@ class Completor
      * Makes the invoice a concept invoice and optionally adds a warning.
      *
      * @param string $messageKey
-     *   The key of the message to add as warning,  or the empty string if no
+     *   The key of the message to add as warning, or the empty string if no
      *   warning has to be added.
      * @param int $code
      *   The code for this message.
@@ -1328,19 +1328,25 @@ class Completor
      */
     protected function changeInvoiceToConcept($messageKey, $code)
     {
+        $pdfMessage = '';
+        $invoiceSettings = $this->config->getInvoiceSettings();
+        $concept = $invoiceSettings['concept'];
+        if ($concept == PluginConfig::Concept_Plugin) {
+            $this->invoice[Tag::Customer][Tag::Invoice][Tag::Concept] = Api::Concept_Yes;
+            $emailAsPdfSettings = $this->config->getEmailAsPdfSettings();
+            if ($emailAsPdfSettings['emailAsPdf']) {
+                $pdfMessage = ' ' . $this->t('message_warning_no_pdf');
+            }
+        }
+
         if ($messageKey !== '') {
-            $message = $this->t($messageKey);
+            $message = $this->t($messageKey) . $pdfMessage;
             if (func_num_args() > 2) {
                 $args = func_get_args();
                 $message = vsprintf($message, array_slice($args, 2));
             }
-            $emailAsPdfSettings = $this->config->getEmailAsPdfSettings();
-            if ($emailAsPdfSettings['emailAsPdf']) {
-                $message .= ' ' . $this->t('message_warning_no_pdf');
-            }
             $this->result->addWarning($code, '', $message);
         }
-        $this->invoice[Tag::Customer][Tag::Invoice][Tag::Concept] = Api::Concept_Yes;
     }
 
     /**

@@ -28,10 +28,14 @@ Bugs:
   source 'orderSource' now no longer exists in WC.
   NOTE: This may have consequences for your field references (veldverwijzingen)
   in your advanced settings!
+- ALL: Setting Concept not used: plugin would make an invoice a concept on
+  warnings regardless the value for this setting.
 
 Refactorings:
 - OC: Cache geo zones.
 - WC: Use add_meta_boxes_{post_type} instead of add_meta_boxes action.
+- ALL: Make field references handling more robust (though catchable fatal errors
+  are still not caught).
 
 5.5.1 (2018-12-13)
 ------------------

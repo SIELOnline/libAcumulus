@@ -27,6 +27,7 @@ class ConfigStore extends BaSeConfigStore
      */
     public function save(array $values)
     {
+        // @todo: switch to json.
         $values = serialize($values);
         $this->getResourceConfig()->saveConfig($this->configPath . $this->configKey, $values, 'default', 0);
 

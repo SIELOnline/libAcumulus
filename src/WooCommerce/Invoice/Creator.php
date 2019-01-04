@@ -22,8 +22,8 @@ class Creator extends BaseCreator
      * Product price precision in WC3: one of the prices is entered by the
      * administrator and may be assumed exact. The computed one is based on the
      * subtraction/addition of 2 amounts, so has a precision that may be twice
-     * as worse.WC tended to round amounts to the cent, but does not seem to any
-     * longer do so.
+     * as worse. WC tended to round amounts to the cent, but does not seem to
+     * any longer do so.
      *
      * @var float
      */

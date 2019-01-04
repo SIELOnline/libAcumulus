@@ -271,7 +271,6 @@ class Service
      *   - entryid
      *
      * @see https://www.siel.nl/acumulus/API/Invoicing/Add_Invoice/
-     * for more information about this API call.
      */
     public function invoiceAdd(array $invoice, Result $result = null)
     {
@@ -317,7 +316,6 @@ class Service
      *     does not exist.
      *
      * @see https://siel.nl/acumulus/API/Entry/Get_Entry_Details/
-     * for more information about this API call.
      */
     public function getEntry($entryId)
     {
@@ -351,7 +349,6 @@ class Service
      *     $entryId does not exist or already has requested status.
      *
      * @see https://siel.nl/acumulus/API/Entry/Set_Delete_Status/
-     * for more information about this API call.
      */
     public function setDeleteStatus($entryId, $deleteStatus)
     {
@@ -380,7 +377,6 @@ class Service
      *     exist.
      *
      * @see https://siel.nl/acumulus/API/Entry/Get_Entry_Details/
-     * for more information about this API call.
      */
     public function getPaymentStatus($token)
     {
@@ -416,7 +412,6 @@ class Service
      *     received: $paymentDate. Unable to proceed."
      *
      * @see https://siel.nl/acumulus/API/Entry/Get_Entry_Details/
-     * for more information about this API call.
      */
     public function setPaymentStatus($token, $paymentStatus, $paymentDate = '')
     {
@@ -464,7 +459,6 @@ class Service
      *     Unable to proceed."
      *
      * @see https://siel.nl/acumulus/API/Invoicing/Email/
-     * for more information about this API call.
      */
     public function emailInvoiceAsPdf($token, $invoiceType, array $emailAsPdf, $invoiceNotes = '')
     {
@@ -495,7 +489,6 @@ class Service
      *     exist.
      *
      * @see https://siel.nl/acumulus/API/Invoicing/Get_PDF_Invoice/
-     * for more information about this API call.
      */
     public function getInvoicePdfUri($token, $applyGraphics = true)
     {
@@ -520,7 +513,6 @@ class Service
      *   - "ZKFATNF04: Requested packing slip for $token not found or no longer available."
      *
      * @see https://siel.nl/acumulus/API/Delivery/Get_PDF_Packing_Slip/
-     * for more information about this API call.
      */
     public function getPackingSlipUri($token)
     {

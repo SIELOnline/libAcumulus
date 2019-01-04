@@ -287,11 +287,25 @@ class Token
             }
         }
 
-        // Some web shops can return an array of values: try to convert to a
-        // string by imploding it (hoping the values are all scalar).
-        // Known uses: Magento2 street value: array of street lines.
-        if (is_array($value)) {
-            $value = implode(" ", $value);
+        // Some properties may be arrays or objects: try to convert to a string
+        // by "imploding" and/or calling __toString().
+        // Known usages: Magento2 street value: array of street lines.
+        try {
+            if (is_array($value)) {
+                $result = '';
+                foreach ($value as $item) {
+                    if (!is_object($item) || method_exists($item, '__toString')) {
+                        if ($result !== '') {
+                            $result .= ' ';
+                        }
+                        $result .= (string) $item;
+                    }
+                }
+                $value = $result !== '' ? $result : null;
+            } elseif (is_object($value) && method_exists($value, '__toString')) {
+                $value = (string) $value;
+            }
+        } catch (\Throwable $e) {
         }
 
         return $value;

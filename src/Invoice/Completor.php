@@ -1326,7 +1326,7 @@ class Completor
      * @param string ...
      *   Additional arguments to format the message.
      */
-    protected function changeInvoiceToConcept($messageKey, $code)
+    public function changeInvoiceToConcept($messageKey, $code)
     {
         $pdfMessage = '';
         $invoiceSettings = $this->config->getInvoiceSettings();

@@ -257,14 +257,24 @@ class CompletorInvoiceLines
         if ($vatRate === null) {
             // No match at all.
             unset($line[Tag::VatRate]);
-            // If this line may be split, we make it a strategy line (even
-            // though 2 out of the 3 fields ex, inc, and vat are known). This
-            // way the strategy phase gets a chance to correct this line.
             if (!empty($line[Meta::StrategySplit])) {
+                // If this line may be split, we make it a strategy line (even
+                // though 2 out of the 3 fields ex, inc, and vat are known).
+                // This way the strategy phase may be able to correct this line.
                 $line[Tag::VatRate] = null;
                 $line[Meta::VatRateSource] = Creator::VatRateSource_Strategy;
+            } else {
+                // Set vatrate to null and try to use lookup data to get a vat
+                // rate. It will be invalid but may be better than the "setting
+                // to standard 21%".
+                $line[Tag::VatRate] = null;
+                $line[Meta::VatRateSource] = Creator::VatRateSource_Completor;
+                $this->completor->changeInvoiceToConcept('message_warning_no_vatrate', 821);
+                // @todo: this can also happen with exact or looked up vat rates
+                //   add a checker in the Completor that checks all lines for
+                //   no or an incorrect vat rate and changes the invoice into a
+                //   concept.
             }
-
         } elseif ($vatRate === false) {
             // Multiple matches: set vatrate to null and try to use lookup data.
             $line[Tag::VatRate] = null;
@@ -687,7 +697,7 @@ class CompletorInvoiceLines
      *   available).
      *
      * For strategy invoice lines that may be split with the SplitNonMatching
-     * line  strategy, we need to know the line totals.
+     * line strategy, we need to know the line totals.
      *
      * Complete (if missing):
      * - meta-line-price

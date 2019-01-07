@@ -21,6 +21,8 @@ WC3 = WooCommerce 3 (WordPress)
 ------------------
 Features:
 - WC: Added support for the 'Custom Order Numbers for WooCommerce' plugin.
+- ALL: Verander de factuur in een concept als een regel een onbekend btw
+  percentage bevat.
 
 Bugs:
 - ALL: For refunds, the "property source" 'order' referred to an Invoice\Source

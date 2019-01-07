@@ -42,6 +42,7 @@ class Translations extends TranslationCollection
         'discount_adjustment' => 'Handmatige korting',
 
         'message_warning_no_email' => 'De factuur bevat geen e-mailadres van de klant. Hierdoor kan er geen relatie in Acumulus aangemaakt of bijgewerkt worden. U kunt zelf in Acumulus een andere relatie aan deze factuur koppelen.',
+        'message_warning_no_vatrate' => 'Een van de bestelregels bevat een foutief btw percentage. Daarom is de factuur als concept opgeslagen. In Acumulus zijn deze onder "Overzichten » Concept-facturen / offertes" terug te vinden. Corrigeer daar de factuur in Acumulus.',
         'message_warning_no_vattype' => 'Het factuurtype (https://wiki.acumulus.nl/index.php?page=facturen-naar-het-buitenland) kan niet bepaald worden. Daarom is de factuur als concept opgeslagen. In Acumulus zijn deze onder "Overzichten » Concept-facturen / offertes" terug te vinden. Corrigeer daar de factuur in Acumulus.',
         'message_warning_no_vattype_at_all' => '%1$s Dit is hoogstwaarschijnlijk het gevolg van: bestelregels die ten onrechte geen btw hebben; foute "Over uw winkel" instellingen; of verkeerd ingestelde btw tarieven. Controleer deze.',
         'message_warning_no_vattype_incorrect_lines' => '%1$s Dit is hoogstwaarschijnlijk het gevolg van: enkele (handmatig ingevoerde) bestelregels die ten onrechte geen btw hebben; of foute "Over uw winkel" instellingen, controleer deze.',
@@ -94,6 +95,7 @@ class Translations extends TranslationCollection
         'discount_adjustment' => 'Manual discount',
 
         'message_warning_no_email' => 'The invoice does not have a customer email address. Therefore we could not create or update a relation in Acumulus. You can connect a relation to this invoice yourself.',
+        'message_warning_no_vatrate' => 'One of the invoice lines contains an invalid vat rate. The invoice has been saved as concept. Correct the invoice in Acumulus.',
         'message_warning_no_vattype' => 'The invoice type for the invoice (https://wiki.acumulus.nl/index.php?page=facturen-naar-het-buitenland) could not be determined. The invoice has been saved as concept. Correct the invoice in Acumulus.',
         'message_warning_no_vattype_at_all' => '%1$s This is very likely caused by: order lines incorrectly not having vat; incorrect "About your shop" settings; or incorrect vat rates. Check these.',
         'message_warning_no_vattype_incorrect_lines' => '%1$s This is very likely caused by: some (manually entered) order lines incorrectly not having vat; or incorrect "About your shop" settings, check these.',

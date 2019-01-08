@@ -97,16 +97,30 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    protected function update(BaseAcumulusEntry $record, $entryId, $token, $updated)
+    protected function update(BaseAcumulusEntry $entry, $entryId, $token, $updated)
     {
-        $record = $record->getRecord();
+        $record = $entry->getRecord();
         /** @noinspection PhpUnhandledExceptionInspection */
         return (bool) $this->getDb()->query(sprintf(
-            "UPDATE `%s` SET entry_id = %s, token = %s, updated = '%s' WHERE id = %s",
+            "UPDATE `%s` SET entry_id = %s, token = %s, updated = '%s' WHERE id = %u",
             $this->tableName,
             $entryId === null ? 'null' : (string) (int) $entryId,
             $token === null ? 'null' : "'" . $this->getDb()->escape($token) . "'",
             $this->getDb()->escape($updated),
+            $record['id']
+        ));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function delete(BaseAcumulusEntry $entry)
+    {
+        $record = $entry->getRecord();
+        /** @noinspection PhpUnhandledExceptionInspection */
+        return (bool) $this->getDb()->query(sprintf(
+            "DELETE FROM `%s` WHERE id = %u",
+            $this->tableName,
             $record['id']
         ));
     }

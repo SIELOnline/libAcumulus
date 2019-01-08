@@ -73,15 +73,22 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    protected function update(BaseAcumulusEntry $record, $entryId, $token, $updated)
+    protected function update(BaseAcumulusEntry $entry, $entryId, $token, $updated)
     {
         // Continue with existing table object with already loaded record.
         /** @var \AcumulusTableAcumulusEntry $table */
-        $table = $record->getRecord();
+        $table = $entry->getRecord();
         $table->entry_id = $entryId;
         $table->token = $token;
         $table->updated = $updated;
         return $table->store(false);
+    }
+
+    public function delete(BaseAcumulusEntry $entry)
+    {
+        /** @var \AcumulusTableAcumulusEntry $table */
+        $table = $entry->getRecord();
+        return $table->delete();
     }
 
     /**

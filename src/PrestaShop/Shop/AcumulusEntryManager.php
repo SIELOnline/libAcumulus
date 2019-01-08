@@ -46,7 +46,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     public function getByEntryId($entryId)
     {
         /** @noinspection PhpUnhandledExceptionInspection */
-        $result = $this->getDb()->executeS(sprintf(
+        $result = $this->getDb()->query(sprintf(
             "SELECT * FROM `%s` WHERE id_entry %s %s",
             $this->tableName,
             $entryId === null ? 'is' : '=',
@@ -61,7 +61,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     public function getByInvoiceSource(Source $invoiceSource)
     {
         /** @noinspection PhpUnhandledExceptionInspection */
-        $result = $this->getDb()->executeS(sprintf(
+        $result = $this->getDb()->query(sprintf(
             "SELECT * FROM `%s` WHERE source_type = '%s' AND source_id = %u",
             $this->tableName,
             pSql($invoiceSource->getType()),
@@ -98,15 +98,29 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    protected function update(BaseAcumulusEntry $record, $entryId, $token, $updated)
+    protected function update(BaseAcumulusEntry $entry, $entryId, $token, $updated)
     {
-        $record = $record->getRecord();
+        $record = $entry->getRecord();
         return $this->getDb()->execute(sprintf(
             "UPDATE `%s` SET id_entry = %s, token = %s, updated = '%s' WHERE id = %u",
             $this->tableName,
             $entryId === null ? 'null' : (string) (int) $entryId,
             $token === null ? 'null' : ("'" . pSql($token) . "'"),
             pSql($updated),
+            $record['id']
+        ));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function delete(BaseAcumulusEntry $entry)
+    {
+        $record = $entry->getRecord();
+        /** @noinspection PhpUnhandledExceptionInspection */
+        return (bool) $this->getDb()->execute(sprintf(
+            "DELETE FROM `%s` WHERE id = %u",
+            $this->tableName,
             $record['id']
         ));
     }

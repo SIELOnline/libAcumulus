@@ -151,7 +151,7 @@ abstract class AcumulusEntryManager
     /**
      * Updates the Acumulus entry for the given invoice source.
      *
-     * @param \Siel\Acumulus\Shop\AcumulusEntry $record
+     * @param \Siel\Acumulus\Shop\AcumulusEntry $entry
      *   The existing record for the invoice source to be updated.
      * @param int|null $entryId
      *   The new Acumulus entry id for the invoice source.
@@ -164,7 +164,39 @@ abstract class AcumulusEntryManager
      * @return bool
      *   Success.
      */
-    abstract protected function update(AcumulusEntry $record, $entryId, $token, $updated);
+    abstract protected function update(AcumulusEntry $entry, $entryId, $token, $updated);
+
+    /**
+     * Deletes the Acumulus entry for the given entry id.
+     *
+     * @param int $entryId
+     *   The Acumulus entry id to delete.
+     *
+     * @return bool
+     *   Success.
+     */
+    public function deleteByEntryId($entryId)
+    {
+        $entryId = (int) $entryId;
+        if ($entryId >= 1) {
+            $entry = $this->getByEntryId($entryId);
+            if ($entry instanceof AcumulusEntry) {
+                return $this->delete($entry);
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Deletes the given AcumulusEntry.
+     *
+     * @param \Siel\Acumulus\Shop\AcumulusEntry $entry
+     *   The Acumulus entry to delete.
+     *
+     * @return bool
+     *   Success.
+     */
+    abstract public function delete(AcumulusEntry $entry);
 
     /**
      * Installs the datamodel. Called when the module gets installed.

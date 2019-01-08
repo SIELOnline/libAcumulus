@@ -23,6 +23,9 @@ Features:
 - WC: Added support for the 'Custom Order Numbers for WooCommerce' plugin.
 - ALL: Verander de factuur in een concept als een regel een onbekend btw
   percentage bevat.
+- ALL: To prevent recurring "404 - Error - Bad Request - Requested invoice for
+  entry 123456 not found. - XGYBSN000", the data for a no longer existing
+  Acumulus entry are deleted from the local database.
 
 Bugs:
 - ALL: For refunds, the "property source" 'order' referred to an Invoice\Source
@@ -30,7 +33,7 @@ Bugs:
   source 'orderSource' now no longer exists in WC.
   NOTE: This may have consequences for your field references (veldverwijzingen)
   in your advanced settings!
-- ALL: Setting Concept not used: plugin would make an invoice a concept on
+- ALL: Setting "Concept" was not used: plugin would make an invoice a concept on
   warnings regardless the value for this setting.
 
 Refactorings:

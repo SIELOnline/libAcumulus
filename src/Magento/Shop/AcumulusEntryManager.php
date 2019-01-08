@@ -93,15 +93,33 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      *
      * @throws \Exception
      */
-    protected function update(BaseAcumulusEntry $record, $entryId, $token, $updated)
+    protected function update(BaseAcumulusEntry $entry, $entryId, $token, $updated)
     {
         /** @var \Siel_Acumulus_Model_Entry|\Siel\AcumulusMa2\Model\Entry $entry */
-        $entry = $record
+        $entry = $entry
             ->getRecord()
             ->setEntryId($entryId)
             ->setToken($token);
         return $this->getResourceModel()->save($entry);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function delete(BaseAcumulusEntry $entry)
+    {
+        $result = true;
+        /** @var \Siel_Acumulus_Model_Entry[]|\Siel\AcumulusMa2\Model\Entry[] $record */
+        $record = $entry->getRecord();
+        try {
+            $this->getResourceModel()->delete($record);
+        } catch (\Exception $e) {
+            $result = false;
+        }
+
+        return $result;
+    }
+
 
     /**
      * {@inheritdoc}

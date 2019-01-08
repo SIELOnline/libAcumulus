@@ -75,9 +75,17 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    protected function update(BaseAcumulusEntry $record, $entryId, $token, $updated)
+    protected function update(BaseAcumulusEntry $entry, $entryId, $token, $updated)
     {
         // @todo: update an existing entry (note that save() takes care of distinguishing between insert and update).
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function delete(BaseAcumulusEntry $entry)
+    {
+        // @todo: delete an existing entry.
     }
 
     /**

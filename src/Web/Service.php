@@ -356,6 +356,7 @@ class Service
             'entryid' => (int) $entryId,
             'entrydeletestatus' => (int) $deleteStatus,
         );
+        // @todo: clean up on receiving P2XFELO12?
         return $this->communicator->callApiFunction('entry/entry_deletestatus_set', $message)->setMainResponseKey('entry');
     }
 

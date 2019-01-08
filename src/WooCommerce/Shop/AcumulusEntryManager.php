@@ -82,8 +82,8 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         if (!empty($post->post_type) && $this->shopTypeToSourceType($post->post_type) === $invoiceSourceType) {
             $result = get_post_meta($invoiceSourceId);
             if (array_key_exists(static::$keyEntryId, $result)) {
-                // Acumulus meta data found: add source id and type as these are not stored in
-                // the meta data.
+                // Acumulus meta data found: add source id and type as these are
+                // not stored in the meta data.
                 $result[static::$keySourceType] = $invoiceSourceType;
                 $result[static::$keySourceId] = $invoiceSourceId;
                 $result = $this->container->getAcumulusEntry($result);
@@ -97,8 +97,8 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      *
-     * This override uses the WordPress meta data API to store the acumulus entry
-     * data with the order.
+     * This override uses the WordPress meta data API to store the acumulus
+     * entry data with the order.
      */
     public function save($invoiceSource, $entryId, $token)
     {
@@ -122,9 +122,22 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    protected function update(BaseAcumulusEntry $record, $entryId, $token, $updated)
+    protected function update(BaseAcumulusEntry $entry, $entryId, $token, $updated)
     {
         throw new \BadMethodCallException(__METHOD__ . ' not implemented');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function delete(BaseAcumulusEntry $entry)
+    {
+        $postId = $entry->getSourceId();
+        delete_post_meta($postId, static::$keyEntryId);
+        delete_post_meta($postId, static::$keyToken);
+        delete_post_meta($postId, static::$keyCreated);
+        delete_post_meta($postId, static::$keyUpdated);
+        return true;
     }
 
     /**

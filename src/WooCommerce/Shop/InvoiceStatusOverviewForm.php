@@ -14,19 +14,20 @@ use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Invoice\Translations as InvoiceTranslations;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
+use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
 use Siel\Acumulus\Web\Result;
 use Siel\Acumulus\Web\Service;
 
 /**
- * Class ShopOrderOverviewForm defines the shop order status overview form.
+ * Defines the Acumulus invoice status overview form.
  *
- * This form is mostly informative but may contain some buttons and a few fields
+ * This form is mostly informative but contains some buttons and a few fields
  * to update the invoice in Acumulus.
  *
  * SECURITY REMARKS
  * ----------------
  */
-class ShopOrderOverviewForm extends Form
+class InvoiceStatusOverviewForm extends Form
 {
     // Constants representing the status of the Acumulus invoice for a given
     // shop order or refund.
@@ -46,11 +47,32 @@ class ShopOrderOverviewForm extends Form
     /** @var \Siel\Acumulus\Web\Service */
     private $service;
 
+    /** @var \Siel\Acumulus\Shop\InvoiceManager */
+    private $invoiceManager;
+
     /** @var \Siel\Acumulus\Shop\AcumulusEntryManager */
     private $acumulusEntryManager;
 
-    /** @var \Siel\Acumulus\Invoice\Source */
+    /**
+     * The main Source for this form.
+     *
+     * This form can handle an order and its credit notes at the same time, the
+     * order being the "main" source.
+     *
+     * @var \Siel\Acumulus\Invoice\Source
+     */
     private $source;
+
+    /**
+     * The submitted Source for this form.
+     *
+     * This form can handle an order and its credit notes at the same time. A
+     * submitted action will be on 1 of these Sources, we keep track of which
+     * source this is in this property.
+     *
+     * @var \Siel\Acumulus\Invoice\Source
+     */
+    private $submittedSource;
 
     /**
      * One of the Result::Status_... constants.
@@ -67,6 +89,7 @@ class ShopOrderOverviewForm extends Form
     private $statusMessage;
 
     /**
+     * @param \Siel\Acumulus\Shop\InvoiceManager $invoiceManager
      * @param \Siel\Acumulus\WooCommerce\Shop\AcumulusEntryManager $acumulusEntryManager
      * @param \Siel\Acumulus\Web\Service $service
      * @param \Siel\Acumulus\Helpers\FormHelper $formHelper
@@ -76,6 +99,7 @@ class ShopOrderOverviewForm extends Form
      * @param \Siel\Acumulus\Helpers\Log $log
      */
     public function __construct(
+        BaseInvoiceManager $invoiceManager,
         AcumulusEntryManager $acumulusEntryManager,
         Service $service,
         FormHelper $formHelper,
@@ -90,12 +114,12 @@ class ShopOrderOverviewForm extends Form
         $translations = new InvoiceTranslations();
         $this->translator->add($translations);
 
-        $translations = new ShopOrderOverviewFormTranslations();
+        $translations = new InvoiceStatusOverviewFormTranslations();
         $this->translator->add($translations);
 
         $this->acumulusEntryManager = $acumulusEntryManager;
+        $this->invoiceManager = $invoiceManager;
         $this->service = $service;
-        $this->source = null;
         $this->status = static::Status_Unknown;
     }
 
@@ -199,11 +223,11 @@ class ShopOrderOverviewForm extends Form
         if ($status === null) {
             $status = $this->status;
         }
-        $status = $this->getStatusClass($status);
+        $statusClass = $this->getStatusClass($status);
         $attributes = array(
-            'class' => array('notice', 'notice-' . $status),
+            'class' => array('notice', 'notice-' . $statusClass),
             'wrapper' => array(
-                'class' => array('notice', 'notice-' . $status),
+                'class' => array('notice', 'notice-' . $statusClass),
             ),
         );
         if (!empty($this->statusMessage)) {
@@ -230,17 +254,119 @@ class ShopOrderOverviewForm extends Form
     }
 
     /**
-     * Executes the form action on valid form submission.
+     * @inheritDoc
      *
-     * Override to implement the actual form handling, like saving values.
+     * This override adds sanitation to the values and already combines some of
+     * the values to retrieve  a Source object
+     */
+    protected function setSubmittedValues()
+    {
+        parent::setSubmittedValues();
+
+        // Get the targeted source.
+        $this->setSubmittedSource();
+        // Sanitise service: lowercase ascii characters, numbers, _ and -.
+        $this->submittedValues['service'] = preg_replace('/[^a-z0-9_\-]/', '', $this->submittedValues['service']);
+    }
+
+    /**
+     * Extracts the source on which the submitted action is targeted.
+     */
+    private function setSubmittedSource()
+    {
+        // Get actual source ($this->source may be the parent, not the source to
+        // execute on). Do so without trusting the input.
+        $sourceType = $this->getSubmittedValue('type') === Source::Order ? Source::Order : Source::CreditNote;
+        $sourceId = (int) $this->getSubmittedValue('source');
+        $this->submittedSource = null;
+        if ($this->source->getType() === $sourceType && $this->source->getId() === $sourceId) {
+            $this->submittedSource = $this->source;
+        } else {
+            $creditNotes = $this->source->getCreditNotes();
+            foreach ($creditNotes as $creditNote) {
+                if ($creditNote->getType() === $sourceType && $creditNote->getId() === $sourceId) {
+                    $this->submittedSource = $creditNote;
+                }
+            }
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function validate()
+    {
+        if ($this->submittedSource === null) {
+            $this->addErrorMessages(sprintf($this->t('unknown_source'),
+                htmlspecialchars($this->getSubmittedValue('type'), ENT_COMPAT, 'UTF-8'),
+                (int) $this->getSubmittedValue('source')
+            ));
+        } elseif ($this->getSubmittedValue('service') === 'invoice_paymentstatus_set' && (int) $this->getSubmittedValue('value') === Api::PaymentStatus_Paid) {
+            $dateFieldName = $this->getIdPrefix($this->submittedSource) . 'payment_date';
+            if (!DateTime::createFromFormat(API::DateFormat_Iso, $this->submittedValues[$dateFieldName])) {
+                // Date is not a valid date.
+                $this->errorMessages[$dateFieldName] = sprintf($this->t('message_validate_batch_bad_payment_date'), $this->t('date_format'));
+            }
+        }
+    }
+
+
+    /**
+     * {@inheritdoc}
      *
-     * @return bool
-     *   Success.
+     * Performs the given action on the Acumulus invoice for the given Source.
      */
     protected function execute()
     {
-        // @todo.
-        return true;
+        $result = false;
+
+        $service = $this->getSubmittedValue('service');
+        $source = $this->submittedSource;
+        switch ($service) {
+            case 'invoice_add':
+                $forceSend = (bool) $this->getSubmittedValue('value');
+                $result = $this->invoiceManager->send1($source, $forceSend);
+                break;
+
+            case 'invoice_paymentstatus_set':
+                $localEntryInfo = $this->acumulusEntryManager->getByInvoiceSource($source);
+                if ($localEntryInfo) {
+                    if ((int) $this->getSubmittedValue('value') === Api::PaymentStatus_Paid) {
+                        $paymentStatus = Api::PaymentStatus_Paid;
+                        $dateFieldName = $this->getIdPrefix($this->submittedSource) . 'payment_date';
+                        $paymentDate = $this->submittedValues[$dateFieldName];
+                    } else {
+                        $paymentStatus = Api::PaymentStatus_Due;
+                        $paymentDate = '';
+                    }
+                    $result = $this->service->setPaymentStatus($localEntryInfo->getToken(), $paymentStatus, $paymentDate);
+                } else {
+                    $this->addErrorMessages(sprintf($this->t('unknown_entry'),
+                        strtolower($this->t($this->submittedSource->getType())),
+                        $this->submittedSource->getId()
+                    ));
+                }
+                break;
+
+            case 'entry_deletestatus_set':
+                $localEntryInfo = $this->acumulusEntryManager->getByInvoiceSource($source);
+                if ($localEntryInfo) {
+                    $deleteStatus = $this->getSubmittedValue('value') === Api::Entry_Delete ? Api::Entry_Delete : Api::Entry_UnDelete;
+                    $result = $this->service->setDeleteStatus($localEntryInfo->getEntryId(), $deleteStatus);
+                } else {
+                    $this->addErrorMessages(sprintf($this->t('unknown_entry'),
+                    strtolower($this->t($this->submittedSource->getType())),
+                        $this->submittedSource->getId()
+                    ));
+                }
+                break;
+
+            default:
+                $this->addErrorMessages(sprintf($this->t('unknown_action'), $service));
+                break;
+        }
+
+        return $result;
     }
 
     /**
@@ -253,19 +379,19 @@ class ShopOrderOverviewForm extends Form
         // 1st fieldset: Order.
         $source = $this->source;
         $localEntryInfo = $this->acumulusEntryManager->getByInvoiceSource($source);
-        $idPrefix = 'order_' . $source->getId();
-        $fields1Source = $this->addIdPrefix($this->getFields1Source($source, $localEntryInfo), $idPrefix . '_');
+        $idPrefix = $this->getIdPrefix($source);
+        $fields1Source = $this->addIdPrefix($this->getFields1Source($source, $localEntryInfo), $idPrefix);
         $fields[$idPrefix] = array(
             'type' => 'fieldset',
             'fields' => $fields1Source,
         );
 
-        // Other fieldsets: creditNotes.
+        // Other fieldsets: credit notes.
         $creditNotes = $source->getCreditNotes();
         foreach($creditNotes as $creditNote) {
             $localEntryInfo = $this->acumulusEntryManager->getByInvoiceSource($creditNote);
-            $idPrefix = 'credit_note_' . $creditNote->getId();
-            $fields1Source = $this->addIdPrefix($this->getFields1Source($source, $localEntryInfo), $idPrefix . '_');
+            $idPrefix = $this->getIdPrefix($creditNote);
+            $fields1Source = $this->addIdPrefix($this->getFields1Source($source, $localEntryInfo), $idPrefix);
             $fields[$idPrefix] = array(
                 'type' => 'details',
                 'summary' => ucfirst($this->t($creditNote->getType())) . ' ' . $creditNote->getReference(),
@@ -303,20 +429,20 @@ class ShopOrderOverviewForm extends Form
         // Create and add additional fields based on invoice status.
         switch ($invoiceStatus) {
             case static::Invoice_NotSent:
-                $additionalFields = $this->getNotSentFields();
+                $additionalFields = $this->getNotSentFields($source);
                 break;
             case static::Invoice_SentConcept:
-                $additionalFields = $this->getConceptFields();
+                $additionalFields = $this->getConceptFields($source);
                 break;
             case static::Invoice_CommunicationError:
                 /** @noinspection PhpUndefinedVariableInspection */
                 $additionalFields = $this->getCommunicationErrorFields($result);
                 break;
             case static::Invoice_NonExisting:
-                $additionalFields = $this->getNonExistingFields();
+                $additionalFields = $this->getNonExistingFields($source);
                 break;
             case static::Invoice_Deleted:
-                $additionalFields = $this->getDeletedFields();
+                $additionalFields = $this->getDeletedFields($source);
                 break;
             case static::Invoice_Sent:
                 $additionalFields = $this->getEntryFields($source, $localEntryInfo, $entry);
@@ -382,6 +508,9 @@ class ShopOrderOverviewForm extends Form
                 if ($result->hasCodeTag('XGYBSN000')) {
                     $invoiceStatus = static::Invoice_NonExisting;
                     $this->setStatus(static::Status_Error);
+                    // To prevent this error in the future, we delete the local
+                    // entry.
+                    $this->acumulusEntryManager->delete($localEntryInfo);
                 } elseif (empty($entry)) {
                     $invoiceStatus = static::Invoice_CommunicationError;
                     $this->setStatus(static::Status_Error);
@@ -411,19 +540,30 @@ class ShopOrderOverviewForm extends Form
      * Returns additional form fields to show when the invoice has not yet been
      * sent.
      *
+     * @param \Siel\Acumulus\Invoice\Source $source
+     *   The Source for which the invoice has not yet been sent.
+     *
      * @return array[]
      *   Array of form fields.
      */
-    private function getNotSentFields()
+    private function getNotSentFields(Source $source)
     {
         $fields = array();
-        // @todo: action fields are disabled for now: next version.
         $fields += array(
-//          'send' => array(
-//            'type' => 'button',
-//            'value' => $this->t('send_now'),
-//          ),
+            'send' => array(
+                'type' => 'button',
+                'ajax' => array(
+                    'service' => 'invoice_add',
+                    'parent_type' => $this->source->getType(),
+                    'parent_source' => $this->source->getId(),
+                    'type' => $source->getType(),
+                    'source' => $source->getId(),
+                    'value' => 0,
+                ),
+                'value' => $this->t('send_now'),
+            ),
         );
+
         return $fields;
     }
 
@@ -431,18 +571,28 @@ class ShopOrderOverviewForm extends Form
      * Returns additional form fields to show when the invoice has been sent as
      * concept.
      *
+     * @param \Siel\Acumulus\Invoice\Source $source
+     *   The Source for which the invoice was sent as concept.
+     *
      * @return array[]
      *   Array of form fields.
      */
-    private function getConceptFields()
+    private function getConceptFields(Source $source)
     {
         $fields = array();
-        // @todo: action fields are disabled for now: next version.
         $fields += array(
-//            'send' => array(
-//                'type' => 'button',
-//                'value' => $this->t('send_again'),
-//            ),
+            'send' => array(
+                'type' => 'button',
+                'value' => $this->t('send_again'),
+                'ajax' => array(
+                    'service' => 'invoice_add',
+                    'parent_type' => $this->source->getType(),
+                    'parent_source' => $this->source->getId(),
+                    'type' => $source->getType(),
+                    'source' => $source->getId(),
+                    'value' => 1,
+                ),
+            ),
         );
         return $fields;
     }
@@ -474,18 +624,28 @@ class ShopOrderOverviewForm extends Form
      * Returns additional form fields to show when the invoice has been sent but
      * does no longer exist.
      *
+     * @param \Siel\Acumulus\Invoice\Source $source
+     *   The Source for which the invoice does no longer exist.
+     *
      * @return array[]
      *   Array of form fields.
      */
-    private function getNonExistingFields()
+    private function getNonExistingFields(Source $source)
     {
         $fields = array();
-        // @todo: action fields are disabled for now: next version.
         $fields += array(
-//            'send' => array(
-//                'type' => 'button',
-//                'value' => $this->t('send_again'),
-//            ),
+            'send' => array(
+                'type' => 'button',
+                'value' => $this->t('send_again'),
+                'ajax' => array(
+                    'service' => 'invoice_add',
+                    'parent_type' => $this->source->getType(),
+                    'parent_source' => $this->source->getId(),
+                    'type' => $source->getType(),
+                    'source' => $source->getId(),
+                    'value' => 1,
+                ),
+            ),
         );
         return $fields;
     }
@@ -494,22 +654,40 @@ class ShopOrderOverviewForm extends Form
      * Returns additional form fields to show when the invoice has been sent but
      * subsequently has been deleted in Acumulus.
      *
+     * @param \Siel\Acumulus\Invoice\Source $source
+     *   The Source for which the invoice has been deleted.
+     *
      * @return array[]
      *   Array of form fields.
      */
-    private function getDeletedFields()
+    private function getDeletedFields(Source $source)
     {
         $fields = array();
-        // @todo: action fields are disabled for now: next version.
         $fields += array(
-//            'undelete' => array(
-//                'type' => 'button',
-//                'value' => $this->t('undelete'),
-//            ),
-//            'send' => array(
-//                'type' => 'button',
-//                'value' => $this->t('send_again'),
-//            ),
+            'undelete' => array(
+                'type' => 'button',
+                'value' => $this->t('undelete'),
+                'ajax' => array(
+                    'service' => 'entry_deletestatus_set',
+                    'parent_type' => $this->source->getType(),
+                    'parent_source' => $this->source->getId(),
+                    'type' => $source->getType(),
+                    'source' => $source->getId(),
+                    'value' => API::Entry_Delete,
+                ),
+            ),
+            'send' => array(
+                'type' => 'button',
+                'value' => $this->t('send_again'),
+                'ajax' => array(
+                    'service' => 'invoice_add',
+                    'parent_type' => $this->source->getType(),
+                    'parent_source' => $this->source->getId(),
+                    'type' => $source->getType(),
+                    'source' => $source->getId(),
+                    'value' => 1,
+                ),
+            ),
         );
         return $fields;
     }
@@ -618,7 +796,7 @@ class ShopOrderOverviewForm extends Form
         $paymentStatusText = sprintf($this->t($paymentStatusText), $paymentDate);
 
         $localPaymentStatus = $source->getPaymentStatus();
-        if ($localPaymentStatus !== $paymentStatus) {
+       if ($localPaymentStatus !== $paymentStatus) {
             $paymentCompareStatus = $paymentStatus === API::PaymentStatus_Paid ? static::Status_Warning : static::Status_Info;
             $paymentCompareStatustext = $this->t('payment_status_not_equal');
             $this->setStatus($paymentCompareStatus, $paymentCompareStatustext);
@@ -642,23 +820,42 @@ class ShopOrderOverviewForm extends Form
             );
         }
 
-        // @todo: action fields are disabled for now: next version.
-//        if ($paymentStatus === API::PaymentStatus_Paid) {
-//            $fields['set_paid'] = array(
-//                'type' => 'button',
-//                'value' => $this->t('set_due'),
-//            );
-//        } else {
-//            $fields['payment_date'] = array(
-//                'type' => 'date',
-//                'label' => $this->t('payment_date'),
-//                'default' => date(API::DateFormat_Iso),
-//            );
-//            $fields['set_paid'] = array(
-//                'type' => 'button',
-//                'value' => $this->t('set_paid'),
-//            );
-//        }
+        if ($paymentStatus === API::PaymentStatus_Paid) {
+            $fields['set_paid'] = array(
+                'type' => 'button',
+                'value' => $this->t('set_due'),
+                'ajax' => array(
+                    'service' => 'invoice_paymentstatus_set',
+                    'parent_type' => $this->source->getType(),
+                    'parent_source' => $this->source->getId(),
+                    'type' => $source->getType(),
+                    'source' => $source->getId(),
+                    'value' => Api::PaymentStatus_Due,
+                ),
+            );
+        } else {
+            $fields['payment_date'] = array(
+                'type' => 'date',
+                'label' => $this->t('payment_date'),
+                'attributes' => array(
+                    'placeholder' => $this->t('date_format'),
+                    'class' => 'acumulus-ajax-data',
+                ),
+                'default' => date(API::DateFormat_Iso),
+            );
+            $fields['set_paid'] = array(
+                'type' => 'button',
+                'value' => $this->t('set_paid'),
+                'ajax' => array(
+                    'service' => 'invoice_paymentstatus_set',
+                    'parent_type' => $this->source->getType(),
+                    'parent_source' => $this->source->getId(),
+                    'type' => $source->getType(),
+                    'source' => $source->getId(),
+                    'value' => Api::PaymentStatus_Paid,
+                ),
+            );
+        }
 
         return $fields;
     }
@@ -746,6 +943,7 @@ class ShopOrderOverviewForm extends Form
     {
         $currency = '€';
         $sign = $amount < 0.0 ? '-' : '';
+        /** @noinspection CallableParameterUseCaseInTypeContextInspection */
         $amount = abs($amount);
         $statusClass = $this->getStatusClass($status);
         $statusMessage = $this->getAmountStatusTitle($status);
@@ -810,6 +1008,19 @@ class ShopOrderOverviewForm extends Form
     }
 
     /**
+     * Returns a prefix for ids and names to make them unique if multiple
+     * invoices (an order and its credit notes) are shown at the same time.
+     *
+     * @param \Siel\Acumulus\Invoice\Source $source
+     *
+     * @return string
+     */
+    private function getIdPrefix(Source $source)
+    {
+        return strtolower($source->getType()) . '_' . $source->getId() . '_';
+    }
+
+    /**
      * Adds a prefix to all keys in the set of $fields.
      *
      * This is done to ensure unique id's in case of repeating fieldsets.
@@ -847,7 +1058,7 @@ class ShopOrderOverviewForm extends Form
      *   string.
      * - Strings that can only contain a restricted set of values are checked
      *   against that set and emptied if not part of it.
-     * - Free string values are escaped to safe html.
+     * - Free string values are escaped to save html.
      * - Keys we don't use are not returned. This keeps the output safe when a
      *   future API version returns additional fields and we forget to sanitize
      *   it and thus use it non sanitised.
@@ -949,6 +1160,7 @@ class ShopOrderOverviewForm extends Form
      */
     private function sanitizeEntryBoolValue(array $entry, $key)
     {
+        /** @noinspection TypeUnsafeComparisonInspection */
         return isset($entry[$key]) && $entry[$key] == 1;
     }
 

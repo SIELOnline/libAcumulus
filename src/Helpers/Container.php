@@ -506,8 +506,9 @@ class Container
                 $class = 'Batch';
                 $arguments[] = $this->getInvoiceManager();
                 break;
-            case 'shop_order':
-                $class = 'ShopOrderOverview';
+            case 'invoice':
+                $class = 'InvoiceStatusOverview';
+                $arguments[] = $this->getInvoiceManager();
                 $arguments[] = $this->getAcumulusEntryManager();
                 $arguments[] = $this->getService();
                 break;

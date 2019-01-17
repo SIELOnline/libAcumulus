@@ -20,6 +20,8 @@ WC3 = WooCommerce 3 (WordPress)
 5.5.2 (2019-01-??)
 ------------------
 Features:
+- WC: Added actions to the 'invoice status overview' meta box on the edit order
+  screen.
 - WC: Added support for the 'Custom Order Numbers for WooCommerce' plugin.
 - ALL: Verander de factuur in een concept als een regel een onbekend btw
   percentage bevat.
@@ -41,6 +43,13 @@ Refactorings:
 - WC: Use add_meta_boxes_{post_type} instead of add_meta_boxes action.
 - ALL: Make field references handling more robust (though catchable fatal errors
   are still not caught).
+- ALL: Form refactoring: do not add success/error message if none specified;
+  added getSubmittedValue() method; added getType() method.
+- ALL: FormRenderer: changed list of parameters into 1 $field parameter on most
+  render methods; added addAjax() method to support ajax submissions.
+- ALL: InvoiceManager: added send1() method; made send() protected.
+- ALL: Removed a lot of code warnings.
+- ALL: Moved some translatable strings from batch to module.
 
 5.5.1 (2018-12-13)
 ------------------

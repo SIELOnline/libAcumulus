@@ -6,22 +6,25 @@ use Siel\Acumulus\Helpers\TranslationCollection;
 /**
  * Contains translations for the shop order status overview form.
  */
-class ShopOrderOverviewFormTranslations extends TranslationCollection
+class InvoiceStatusOverviewFormTranslations extends TranslationCollection
 {
     protected $nl = array(
         // Invoice status.
         'acumulus_invoice_title' => 'Acumulus',
-        ShopOrderOverviewForm::Invoice_NotSent => 'Nog niet verzonden',
-        ShopOrderOverviewForm::Invoice_Sent => 'Factuur %1$s van %2$s',
-        ShopOrderOverviewForm::Invoice_SentConcept => 'Op %1$s als concept verzonden',
-        ShopOrderOverviewForm::Invoice_Deleted => 'Verzonden op %1$s maar vervolgens op %2$s naar de prullenbak verplaatst.',
-        ShopOrderOverviewForm::Invoice_NonExisting => 'Verzonden op %1$s maar niet meer bestaand in Acumulus, ook niet in de prullenbak.',
-        ShopOrderOverviewForm::Invoice_CommunicationError => 'Verzonden, maar door een communicatiefout met Acumulus kunnen we niet meer informatie tonen. Probeer het later nog eens.',
+        InvoiceStatusOverviewForm::Invoice_NotSent => 'Nog niet verzonden',
+        InvoiceStatusOverviewForm::Invoice_Sent => 'Factuur %1$s van %2$s',
+        InvoiceStatusOverviewForm::Invoice_SentConcept => 'Op %1$s als concept verzonden',
+        InvoiceStatusOverviewForm::Invoice_Deleted => 'Verzonden op %1$s maar vervolgens op %2$s naar de prullenbak verplaatst.',
+        InvoiceStatusOverviewForm::Invoice_NonExisting => 'Verzonden op %1$s maar niet meer bestaand in Acumulus, ook niet in de prullenbak.',
+        InvoiceStatusOverviewForm::Invoice_CommunicationError => 'Verzonden, maar door een communicatiefout met Acumulus kunnen we niet meer informatie tonen. Probeer het later nog eens.',
         'invoice_status_ok' => "De factuur lijkt in orde, er zijn geen onregelmatigheden gevonden",
         'concept_description' => 'Helaas kan van een conceptfactuur niet meer informatie getoond worden, ook niet als u deze definitief gemaakt heeft.',
         'messages' => 'Meldingen',
         'invoice_status_unknown' => "Onbekende status '%s'",
         'unknown' => 'onbekend',
+        'unknown_action' => "Onbekende actie '%s'",
+        'unknown_source' => 'Onbekende %s %u',
+        'unknown_entry' => 'Onbekende Acumulus factuur voor %s %u',
 
         // Vat type.
         'vat_type' => 'Soort',
@@ -45,6 +48,7 @@ class ShopOrderOverviewFormTranslations extends TranslationCollection
         'payment_status_2_date' => 'Betaald op %1$s',
         'payment_date' => 'Betaaldatum',
         'payment_status_not_equal' => 'De betaalstatus in Acumulus komt niet overeen met die in uw webshop',
+        'message_validate_batch_bad_payment_date' => 'U dient een correcte \'Betaaldatum\' in te vullen (verwacht formaat: %1$s).',
 
         // Actions.
         'send_now' => 'Nu verzenden',
@@ -63,17 +67,20 @@ class ShopOrderOverviewFormTranslations extends TranslationCollection
     protected $en = array(
         // Invoice status.
         'acumulus_invoice_title' => 'Acumulus',
-        ShopOrderOverviewForm::Invoice_NotSent => 'Not yet sent',
-        ShopOrderOverviewForm::Invoice_Sent => 'Invoice %1$s of %2$s',
-        ShopOrderOverviewForm::Invoice_SentConcept => 'On %1$s sent as concept',
-        ShopOrderOverviewForm::Invoice_Deleted => 'Sent on %1$s, but subsequently on %2$s moved to the trash bin.',
-        ShopOrderOverviewForm::Invoice_NonExisting => 'Sent on %1$s, but no longer existing in Acumulus, not even in the thrash bin.',
-        ShopOrderOverviewForm::Invoice_CommunicationError => 'Sent, but due to a communication error we cannot show more information. Try again later.',
-        'invoice_status_ok' => "The invoice seems to be fine, no irregularities were found",
+        InvoiceStatusOverviewForm::Invoice_NotSent => 'Not yet sent',
+        InvoiceStatusOverviewForm::Invoice_Sent => 'Invoice %1$s of %2$s',
+        InvoiceStatusOverviewForm::Invoice_SentConcept => 'On %1$s sent as concept',
+        InvoiceStatusOverviewForm::Invoice_Deleted => 'Sent on %1$s, but subsequently on %2$s moved to the trash bin.',
+        InvoiceStatusOverviewForm::Invoice_NonExisting => 'Sent on %1$s, but no longer existing in Acumulus, not even in the thrash bin.',
+        InvoiceStatusOverviewForm::Invoice_CommunicationError => 'Sent, but due to a communication error we cannot show more information. Try again later.',
+        'invoice_status_ok' => 'The invoice seems to be fine, no irregularities were found',
         'concept_description' => 'Unfortunately, we cannot show more information about a concept invoice, not even when it has been made definitive.',
         'messages' => 'Messages',
         'invoice_status_unknown' => "Unknown status '%s'",
         'unknown' => 'unknown',
+        'unknown_action' => "Unknown action '%s'",
+        'unknown_source' => 'Unknown %s %u',
+        'unknown_entry' => 'Unknown Acumulus invoice for %s %u',
 
         // Vat type.
         'vat_type' => 'Type',
@@ -95,13 +102,14 @@ class ShopOrderOverviewFormTranslations extends TranslationCollection
         'payment_status_1' => 'Due',
         'payment_status_2' => 'Paid',
         'payment_status_2_date' => 'Paid on %1$s',
+        'payment_date' => 'Payment date',
         'payment_status_not_equal' => 'The payment state in Acumulus differs from the one in your webshop',
+        'message_validate_batch_bad_payment_date' => 'Incorrect \'Payment date\' (expected format: %1$s).',
 
         // Actions.
         'send_now' => 'Send now',
         'send_again' => 'Send again',
         'undelete' => 'Restore deleted invoice',
-        'payment_date' => 'Payment date',
         'set_paid' => 'Set paid',
         'set_due' => 'Set due',
 

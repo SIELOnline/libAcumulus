@@ -26,7 +26,6 @@ class BatchFormTranslations extends TranslationCollection
         'field_date_from' => 'Datum van',
         'field_date_to' => 'Datum tot',
         'desc_date_from_to' => 'Vul de periode in waarvan u de facturen naar Acumulus wilt verzenden. De selectie vindt plaats op basis van de datum van de meest recente wijziging aan de bestelling of creditnota. Als u slechts de facturen van 1 dag wilt verzenden hoeft u alleen de \'Datum van\' in te vullen. Laat beide velden leeg als u op nummer wilt verzenden.',
-        'date_format' => 'jjjj-mm-dd',
         'field_send_mode' => 'Verzendwijze',
         'option_send_normal' => 'Verzend alleen indien nog niet verzonden',
         'option_send_force' => 'Altijd verzenden, als de factuur al is verzonden wordt de bestaande factuur verwijderd in Acumulus',
@@ -101,7 +100,6 @@ LONGSTRING
         'field_date_from' => 'Date from',
         'field_date_to' => 'Date to',
         'desc_date_from_to' => 'Enter the period over which you want to send invoices to Acumulus. If you want to send the invoices of 1 day, only fill in the \'Date from\' field. Leave empty if you want to send by id.',
-        'date_format' => 'yyyy-mm-dd',
         'field_send_mode' => 'Send mode',
         'option_send_normal' => 'Only send if not already sent',
         'option_send_force' => 'Always send, overwrite the existing invoice if already sent',
@@ -150,8 +148,8 @@ LONGSTRING
         'message_form_range_date' => 'Range: %1$s between %2$s and %3$s.',
         'message_form_range_empty' => 'The range you defined does not contain any %1$s.',
         'message_form_range_list' => 'Found %1$s.',
-        'message_form_success' => 'The invoices were sent successfully. See the results overview for any remarks or warnings.',
-        'message_form_error' => 'Errors during sending the invoices. See the results overview for more information on the errors.',
+        'message_form_batch_success' => 'The invoices were sent successfully. See the results overview for any remarks or warnings.',
+        'message_form_batch_error' => 'Errors during sending the invoices. See the results overview for more information on the errors.',
 
     );
 }

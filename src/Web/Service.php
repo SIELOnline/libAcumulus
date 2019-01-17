@@ -91,7 +91,7 @@ class Service
      */
     public function getAbout()
     {
-        return $this->communicator->callApiFunction("general/general_about", array())->setMainResponseKey('general', false);
+        return $this->communicator->callApiFunction('general/general_about', array())->setMainResponseKey('general', false);
     }
 
     /**
@@ -377,7 +377,7 @@ class Service
      *   - "XGYTTNF04: Requested invoice for $token not found": $token does not
      *     exist.
      *
-     * @see https://siel.nl/acumulus/API/Entry/Get_Entry_Details/
+     * @see https://www.siel.nl/acumulus/API/Invoicing/Payment_Get_Status/
      */
     public function getPaymentStatus($token)
     {
@@ -412,7 +412,7 @@ class Service
      *     invalid date format (YYYY-MM-DD) used in paymentdate field. We
      *     received: $paymentDate. Unable to proceed."
      *
-     * @see https://siel.nl/acumulus/API/Entry/Get_Entry_Details/
+     * @see https://www.siel.nl/acumulus/API/Invoicing/Payment_Set_Status/
      */
     public function setPaymentStatus($token, $paymentStatus, $paymentDate = '')
     {
@@ -493,7 +493,6 @@ class Service
      */
     public function getInvoicePdfUri($token, $applyGraphics = true)
     {
-        $token = (string) $token;
         $uri = $this->communicator->getUri('invoices/invoice_get_pdf');
         $uri .= "?token=$token";
         if (!$applyGraphics) {
@@ -517,7 +516,6 @@ class Service
      */
     public function getPackingSlipUri($token)
     {
-        $token = (string) $token;
         $uri = $this->communicator->getUri('delivery/packing_slip_get_pdf');
         $uri .= "?token=$token";
         return $uri;

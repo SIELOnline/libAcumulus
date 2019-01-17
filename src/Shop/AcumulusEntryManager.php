@@ -75,16 +75,12 @@ abstract class AcumulusEntryManager
         } elseif (is_object($result)) {
             $result = $this->container->getAcumulusEntry($result);
         } else {
-            // It's an array of results
-            if (count($result) === 0) {
-                $result = null;
-            } else {
-                foreach ($result as &$record) {
-                    $record = $this->container->getAcumulusEntry($record);
-                }
-                if (count($result) === 1) {
-                    $result = reset($result);
-                }
+            // It's a non empty array of results.
+            foreach ($result as &$record) {
+                $record = $this->container->getAcumulusEntry($record);
+            }
+            if (count($result) === 1) {
+                $result = reset($result);
             }
         }
         return $result;
@@ -115,10 +111,11 @@ abstract class AcumulusEntryManager
         $now = $this->sqlNow();
         $record = $this->getByInvoiceSource($invoiceSource);
         if ($record === null) {
-            return $this->insert($invoiceSource, $entryId, $token, $now);
+            $result = $this->insert($invoiceSource, $entryId, $token, $now);
         } else {
-            return $this->update($record, $entryId, $token, $now);
+            $result = $this->update($record, $entryId, $token, $now);
         }
+        return $result;
     }
 
     /**

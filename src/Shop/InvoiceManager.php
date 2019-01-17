@@ -288,6 +288,27 @@ abstract class InvoiceManager
         }
         return $success;
     }
+    /**
+     * Sends 1 invoice to Acumulus.
+     *
+     * @param \Siel\Acumulus\Invoice\Source $invoiceSource
+     *   The invoice source to send the invoice for.
+     * @param bool $forceSend
+     *   If true, force sending the invoices even if an invoice has already been
+     *   sent for a given invoice source.
+     *
+     * @return bool
+     *   Success.
+     */
+    public function send1(Source $invoiceSource, $forceSend)
+    {
+        $this->getTranslator()->add(new ResultTranslations());
+        $result = $this->getInvoiceResult('InvoiceManager::send1()');
+        $result = $this->send($invoiceSource, $result, $forceSend);
+        $success = !$result->hasError();
+        $this->getLog()->notice($this->getSendResultLogText($invoiceSource, $result));
+        return $success;
+    }
 
     /**
      * Processes an invoice source status change event.
@@ -378,7 +399,7 @@ abstract class InvoiceManager
      * @return \Siel\Acumulus\Invoice\Result
      *   The result of sending (or not sending) the invoice.
      */
-    public function send(Source $invoiceSource, Result $result, $forceSend = false, $dryRun = false)
+    protected function send(Source $invoiceSource, Result $result, $forceSend = false, $dryRun = false)
     {
         if ($this->isTestMode()) {
             $result->setSendStatus(Result::Sent_TestMode);

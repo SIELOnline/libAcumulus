@@ -122,7 +122,7 @@ abstract class Source
      */
     public function getSign()
     {
-        return (float) ($this->getType() === Source::CreditNote ? -1.0 : 1.0);
+        return (float) ($this->getType() === static::CreditNote ? -1.0 : 1.0);
     }
 
     /**
@@ -386,7 +386,7 @@ abstract class Source
      */
     public function getOrder()
     {
-        return $this->getType() === Source::CreditNote ? new static(Source::Order, $this->getShopOrderOrId()) : $this;
+        return $this->getType() === static::CreditNote ? new static(static::Order, $this->getShopOrderOrId()) : $this;
     }
 
     /** @noinspection PhpDocSignatureInspection */
@@ -420,11 +420,11 @@ abstract class Source
     public function getCreditNotes()
     {
         $result = null;
-        if ($this->getType() === Source::Order) {
+        if ($this->getType() === static::Order) {
             $result = array();
             $shopCreditNotes = $this->getShopCreditNotesOrIds();
             foreach ($shopCreditNotes as $shopCreditNote) {
-                $result[] = new static(Source::CreditNote, $shopCreditNote);
+                $result[] = new static(static::CreditNote, $shopCreditNote);
             }
         }
         return $result;

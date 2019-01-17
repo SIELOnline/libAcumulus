@@ -152,11 +152,11 @@ class FormRenderer
     /** @var bool */
     protected $usePopupDescription = false;
 
-    /** @var Form */
-    protected $form;
-
     /** @var int */
     protected $htmlSpecialCharsFlag;
+
+    /** @var Form */
+    protected $form;
 
     /**
      * Sets the value of a property of this object.
@@ -170,7 +170,7 @@ class FormRenderer
      */
     public function setProperty($property, $value)
     {
-        if (property_exists($this, $property) && !in_array($property, array('form'))) {
+        if (property_exists($this, $property) && $property !== 'form') {
             $this->$property = $value;
         }
         return $this;
@@ -191,7 +191,7 @@ class FormRenderer
         }
         $this->form = $form;
         $this->form->addValues();
-        return $this->fields($this->form->getFields());
+        return $this->renderFields($this->form->getFields());
     }
 
     /**
@@ -201,17 +201,21 @@ class FormRenderer
      *
      * @return string
      */
-    public function fields(array $fields)
+    protected function renderFields(array $fields)
     {
         $output = '';
         foreach ($fields as $id => $field) {
-            if (!isset($field['id'])) {
-                $field['id'] = $id;
-            }
-            if (!isset($field['name'])) {
-                $field['name'] = $id;
-            }
-            $output .= $this->field($field);
+            // Add defaults.
+            $field += array(
+                'id' => $id,
+                'name' => $id,
+                'label' => '',
+                'value' => '',
+                'description' => '',
+                'attributes' => array(),
+                'options' => array(),
+            );
+            $output .= $this->renderField($field);
         }
         return $output;
     }
@@ -220,33 +224,32 @@ class FormRenderer
      * Renders 1 field definition (which may be a fieldset with multiple fields).
      *
      * @param array $field
-     *   Array with the form field definition. the keys id and name are expected to be set.
+     *   Array with the form field definition. the keys id, name, and attributes
+     *   are expected to be set.
      *
      * @return string
+     *   The rendered form field.
      */
-    public function field(array $field)
+    protected function renderField(array $field)
     {
         $output = '';
-        if (!isset($field['attributes'])) {
-            $field['attributes'] = array();
-        }
-        $output .= !empty($field['fields']) ? $this->renderFieldset($field) : $this->renderField($field);
+        $output .= !empty($field['fields']) ? $this->renderFieldset($field) : $this->renderSimpleField($field);
         return $output;
     }
 
     /**
-     * Renders a fieldset.
+     * Renders a fieldset or details form element.
      *
      * @param array $field
      *
      * @return string
-     *   The rendered fieldset.
+     *   The rendered fieldset or details form element.
      */
     protected function renderFieldset(array $field)
     {
         $output = '';
         $output .= $this->fieldsetBegin($field);
-        $output .= $this->fields($field['fields']);
+        $output .= $this->renderFields($field['fields']);
         $output .= $this->fieldsetEnd($field);
         return $output;
     }
@@ -298,21 +301,16 @@ class FormRenderer
      * @return string
      *   Html for this form field.
      */
-    protected function renderField(array $field)
+    protected function renderSimpleField(array $field)
     {
-        $type = $field['type'];
-        // Id and name may be empty/not set for markup fields.
-        $id = isset($field['id']) ? $field['id'] : '';
-        $name = isset($field['name']) ? $field['name'] : '';
-        $label = isset($field['label']) ? $field['label'] : '';
-        $value = isset($field['value']) ? $field['value'] : '';
-        $attributes = isset($field['attributes']) ? $field['attributes'] : array();
-        $description = isset($field['description']) ? $field['description'] : '';
-        $options = isset($field['options']) ? $field['options'] : array();
+        if (!empty($field['ajax'])) {
+            $field = $this->addAjax($field);
+        }
 
         $output = '';
 
         // Split attributes over label and element.
+        $attributes = $field['attributes'];
         $labelAttributes = array();
         if (!empty($attributes['label'])) {
             $labelAttributes = $attributes['label'];
@@ -321,15 +319,19 @@ class FormRenderer
         if (!empty($attributes['required'])) {
             $labelAttributes['required'] = $attributes['required'];
         }
+        $field['attributes'] = $attributes;
 
-        if ($type !== 'hidden') {
+        if ($field['type'] !== 'hidden') {
             $output .= $this->getWrapper('element');
-            $output .= $this->renderLabel($label, in_array($type, array('radio', 'checkbox', 'markup')) ? null : $id, $labelAttributes);
+            // Do not use a <label> with an "id" attribute on the label for a
+            // set of radio buttons, a set of checkboxes, or on markup.
+            $id = in_array($field['type'], array('radio', 'checkbox', 'markup')) ? '' : $field['id'];
+            $output .= $this->renderLabel($field['label'], $id, $labelAttributes, true);
             $output .= $this->getWrapper('inputDescription');
         }
-        $output .= $this->renderElement($type, $id, $name, $value, $attributes, $options);
-        if ($type !== 'hidden') {
-            $output .= $this->renderDescription($description);
+        $output .= $this->renderElement($field);
+        if ($field['type'] !== 'hidden') {
+            $output .= $this->renderDescription($field['description']);
             $output .= $this->getWrapperEnd('inputDescription');
             $output .= $this->getWrapperEnd('element');
         }
@@ -339,28 +341,23 @@ class FormRenderer
     /**
      * Renders a form field itself, ie without label and description.
      *
-     * @param string $type
-     * @param string $id
-     * @param string $name
-     * @param string|int $value
-     * @param array $attributes
-     * @param array $options
+     * @param $field
      *
      * @return string
+     *   The html for the form element.
      */
-    protected function renderElement($type, $id, $name, $value, array $attributes = array(), array $options = array())
+    protected function renderElement($field)
     {
+        $type = $field['type'];
         switch ($type) {
             case 'textarea':
-                return $this->textarea($id, $name, $value, $attributes);
+            case 'markup':
             case 'select':
             case 'radio':
             case 'checkbox':
-                return $this->$type($id, $name, $value, $options, $attributes);
-            case 'markup':
-                return $this->markup($id, $name, $value, $attributes);
+                return $this->$type($field);
             default:
-                return $this->input($type, $id, $name, $value, $attributes);
+                return $this->input($field);
         }
     }
 
@@ -394,9 +391,9 @@ class FormRenderer
      *
      * @param string $text
      *   The label text.
-     * @param string|null $id
-     *   The value of the for attribute. If null, not a label tag but a span with
-     *   a class="label" will be rendered.
+     * @param string $id
+     *   The value of the for attribute. If the empty string, not a label tag
+     *   but a span with a class="label" will be rendered.
      * @param array $attributes
      *   Any additional attributes to render for the label. The array is a keyed
      *   array, the keys being the attribute names, the values being the
@@ -414,7 +411,7 @@ class FormRenderer
      * @return string The rendered label.
      *   The rendered label.
      */
-    protected function renderLabel($text, $id = null, array $attributes = array(), $wrapLabel = true, $prefix = '', $postfix = '')
+    protected function renderLabel($text, $id, array $attributes, $wrapLabel, $prefix = '', $postfix = '')
     {
         $output = '';
 
@@ -451,35 +448,23 @@ class FormRenderer
     /**
      * Renders an input field.
      *
-     * @param string $type
-     *   The input type, required.
-     * @param string $id
-     *   The id attribute of the text field, required.
-     * @param string $name
-     *   The name attribute of the text field, required.
-     * @param string $value
-     *   The initial value of the text field.
-     * @param array $attributes
-     *   Any additional attributes to render for the text field, think of size or
-     *   maxlength. The array is a keyed array, the keys being the attribute
-     *   names, the values being the value of that attribute. If that value is an
-     *   array it is rendered as a joined string of the values separated by a
-     *   space (e.g. multiple classes).
+     * @param array $field
      *
      * @return string
-     *   The rendered text field.
+     *   The rendered input field.
      */
-    protected function input($type, $id, $name, $value = '', array $attributes = array())
+    protected function input(array $field)
     {
         $output = '';
 
         // Tag around input element.
         $output .= $this->getWrapper('input');
 
-        $attributes = $this->addAttribute($attributes, 'type', $type);
-        $attributes = $this->addAttribute($attributes, 'id', $id);
-        $attributes = $this->addAttribute($attributes, 'name', $name);
-        $attributes = $this->addAttribute($attributes, 'value', $value);
+        $attributes = $field['attributes'];
+        $attributes = $this->addAttribute($attributes, 'type', $field['type']);
+        $attributes = $this->addAttribute($attributes, 'id', $field['id']);
+        $attributes = $this->addAttribute($attributes, 'name', $field['name']);
+        $attributes = $this->addAttribute($attributes, 'value', $field['value']);
         $output .= $this->getOpenTag('input', $attributes, true);
 
         // Tag around input element.
@@ -491,33 +476,22 @@ class FormRenderer
     /**
      * Renders a textarea field.
      *
-     * @param string $id
-     *   The id attribute of the text field, required.
-     * @param string $name
-     *   The name attribute of the text field, required.
-     * @param string $value
-     *   The initial value of the text field.
-     * @param array $attributes
-     *   Any additional attributes to render for the text field, think of size or
-     *   maxlength. The array is a keyed array, the keys being the attribute
-     *   names, the values being the value of that attribute. If that value is an
-     *   array it is rendered as a joined string of the values separated by a
-     *   space (e.g. multiple classes).
+     * @param $field
      *
-     * @return string The rendered textarea field.
-     * The rendered textarea field.
+     * @return string
+     *   The rendered textarea field.
      */
-    protected function textarea($id, $name, $value = '', array $attributes = array())
+    protected function textarea(array $field)
     {
         $output = '';
 
         // Tag around input element.
         $output .= $this->getWrapper('input');
-
-        $attributes = $this->addAttribute($attributes, 'id', $id);
-        $attributes = $this->addAttribute($attributes, 'name', $name);
+        $attributes = $field['attributes'];
+        $attributes = $this->addAttribute($attributes, 'id', $field['id']);
+        $attributes = $this->addAttribute($attributes, 'name', $field['name']);
         $output .= $this->getOpenTag('textarea', $attributes);
-        $output .= htmlspecialchars($value, $this->htmlSpecialCharsFlag, 'UTF-8');
+        $output .= htmlspecialchars($field['value'], $this->htmlSpecialCharsFlag, 'UTF-8');
         $output .= $this->getCloseTag('textarea');
 
         // Tag around input element.
@@ -527,79 +501,34 @@ class FormRenderer
     }
 
     /**
-     * Renders a text field (input tag with type="text").
+     * Renders a markup (free format output) element.
      *
-     * @param string $id
-     *   The id attribute of the text field, required.
-     * @param string $name
-     *   The name attribute of the text field, required.
-     * @param string $value
-     *   The initial value of the text field.
-     * @param array $attributes
-     *   Any additional attributes to render for the text field, think of size or
-     *   maxlength. The array is a keyed array, the keys being the attribute
-     *   names, the values being the value of that attribute. If that value is an
-     *   array it is rendered as a joined string of the values separated by a
-     *   space (e.g. multiple classes).
+     * @param array $field
      *
      * @return string
-     *   The rendered text field.
-     *
-     * @deprecated
+     *   The rendered markup.
      */
-    protected function text($id, $name, $value = '', array $attributes = array())
+    protected function markup(array $field)
     {
-        return $this->input('text', $id, $name, $value, $attributes);
-    }
-
-    /**
-     * Renders a password field (input tag with type="password").
-     *
-     * @param string $id
-     *   The id attribute of the password field, required.
-     * @param string $name
-     *   The name attribute of the password field, required.
-     * @param string $value
-     *   The initial value of the field.
-     * @param array $attributes
-     *   Any additional attributes to render for this field. The array is a keyed
-     *   array, the keys being the attribute names, the values being the value of
-     *   that attribute. If that value is an array it is rendered as a joined
-     *   string of the values separated by a space (e.g. multiple classes).
-     *
-     * @return string
-     *   The rendered field.
-     *
-     * @deprecated
-     */
-    protected function password($id, $name, $value = '', array $attributes = array())
-    {
-        return $this->input('password', $id, $name, $value, $attributes);
+        $attributes = $field['attributes'];
+        $attributes = $this->addAttribute($attributes, 'id', $field['id']);
+        $attributes = $this->addAttribute($attributes, 'name', $field['name']);
+        $output = '';
+        $output .= $this->getWrapper('markup', $attributes);
+        $output .= $field['value'];
+        $output .= $this->getWrapperEnd('markup');
+        return $output;
     }
 
     /**
      * Renders a select element.
      *
-     * @param string $id
-     *   The id attribute of the select, required.
-     * @param string $name
-     *   The name attribute of the select, required.
-     * @param mixed|null $selected
-     *   The selected value, null if no value has to be set to selected.
-     * @param array $options
-     *   The list of options as a keyed array, the keys being the value attribute
-     *   of the option tag, the values being the text within the option tag.
-     * @param array $attributes
-     *   Any additional attributes to render for the select tag, think of disabled.
-     *   The array is a keyed array, the keys being the attribute names, the
-     *   values being the value of that attribute. If that value is an array it is
-     *   rendered as a joined string of the values separated by a space (e.g.
-     *   multiple classes).
+     * @param array $field
      *
-     * @return string The rendered select element.
-     * The rendered select element.
+     * @return string
+     *   The rendered select element.
      */
-    protected function select($id, $name, $selected, array $options, array $attributes = array())
+    protected function select(array $field)
     {
         $output = '';
 
@@ -607,13 +536,15 @@ class FormRenderer
         $output .= $this->getWrapper('input');
 
         // Select tag.
-        $attributes = array_merge(array('id' => $id, 'name' => $name), $attributes);
+        $attributes = $field['attributes'];
+        $attributes = $this->addAttribute($attributes, 'id', $field['id']);
+        $attributes = $this->addAttribute($attributes, 'name', $field['name']);
         $output .= $this->getOpenTag('select', $attributes);
 
         // Options.
-        foreach ($options as $value => $text) {
+        foreach ($field['options'] as $value => $text) {
             $optionAttributes = array('value' => $value);
-            if ($this->compareValues($selected, $value)) {
+            if ($this->isOptionSelected($field['value'], $value)) {
                 $optionAttributes['selected'] = true;
             }
             $output .= $this->getOpenTag('option', $optionAttributes);
@@ -630,33 +561,20 @@ class FormRenderer
     }
 
     /**
-     * Renders a list of radio buttons (input tag with type="radio").
+     * Renders a list of radio buttons.
      *
-     * @param string $id
-     *   The id attribute for all the radio buttons, required.
-     * @param string $name
-     *   The name attribute for all the radio buttons, required.
-     * @param mixed|null $selected
-     *   The selected value, null if no value has to be set to selected.
-     * @param array $options
-     *   The list of radio buttons as a keyed array, the keys being the value
-     *   attribute of the radio button, the values being the label of the radio
-     *   button.
-     * @param array $attributes
-     *   Any additional attributes to render on the div tag. The array is a keyed
-     *   array, the keys being the attribute names, the values being the value of
-     *   that attribute. If that value is an array it is rendered as a joined
-     *   string of the values separated by a space (e.g. multiple classes).
+     * @param array $field
      *
-     * @return string The rendered radio buttons.
-     * The rendered radio buttons.
+     * @return string
+     *   The rendered radio buttons.
      */
-    protected function radio($id, $name, $selected, array $options, array $attributes = array())
+    protected function radio(array $field)
     {
         $output = '';
 
-        // Handling of required attribute: may appear on on all radio buttons with
+        // Handling of required attribute: may appear on all radio buttons with
         // the same name.
+        $attributes = $field['attributes'];
         $required = !empty($attributes['required']);
         unset($attributes['required']);
 
@@ -665,10 +583,10 @@ class FormRenderer
         $output .= $this->getWrapper('radio', $attributes);
 
         // Radio buttons.
-        foreach ($options as $value => $text) {
-            $radioAttributes = $this->getRadioAttributes($id, $name, $value);
+        foreach ($field['options'] as $value => $text) {
+            $radioAttributes = $this->getRadioAttributes($field['id'], $field['name'], $value);
             $radioAttributes = $this->addAttribute($radioAttributes, 'required', $required);
-            if ($this->compareValues($selected, $value)) {
+            if ($this->isOptionSelected($field['value'], $value)) {
                 $radioAttributes['checked'] = true;
             }
 
@@ -691,41 +609,28 @@ class FormRenderer
     }
 
     /**
-     * Renders a list of checkboxes (input tag with type="checkbox") enclosed in a
-     * div.
+     * Renders a list of checkboxes.
      *
-     * @param string $id
-     *   The id prefix attribute for the checkboxes, required.
-     * @param string $name
-     *   The name attribute for all the checkboxes, required. When rendering
-     *   multiple checkboxes, use a name that ends with [] for easy PHP processing.
-     * @param array $selected
-     *   The selected values.
-     * @param array $options
-     *   The list of checkboxes as a keyed array, the keys being the value
-     *   attribute of the checkbox, the values being the label of the checkbox.
-     * @param array $attributes
-     *   Any additional attributes to render on the div tag. The array is a keyed
-     *   array, the keys being the attribute names, the values being the value of
-     *   that attribute. If that value is an array it is rendered as a joined
-     *   string of the values separated by a space (e.g. multiple classes).
+     * @param array $field
      *
-     * @return string The rendered checkboxes.
-     * The rendered checkboxes.
+     * @return string
+     *   The rendered checkboxes.
      */
-    protected function checkbox($id, $name, array $selected, array $options, array $attributes = array())
+    protected function checkbox(array $field)
     {
         $output = '';
 
         // Div tag.
-        unset($attributes['required']);
+        $attributes = $field['attributes'];
+//?        unset($attributes['required']);
+
         $output .= $this->getWrapper('input', $attributes);
         $output .= $this->getWrapper('checkbox', $attributes);
 
         // Checkboxes.
-        foreach ($options as $value => $text) {
-            $checkboxAttributes = $this->getCheckboxAttributes($id, $name, $value);
-            if (in_array($value, $selected)) {
+        foreach ($field['options'] as $value => $text) {
+            $checkboxAttributes = $this->getCheckboxAttributes($field['id'], $field['name'], $value);
+            if (in_array($value, $field['value'], false)) {
                 $checkboxAttributes['checked'] = true;
             }
             $output .= $this->getWrapper('checkbox1');
@@ -747,36 +652,8 @@ class FormRenderer
     }
 
     /**
-     * Renders a markup (free format output) element.
+     * Returns the open tag for a wrapper element.
      *
-     * @param string $id
-     *   The id attribute of the markup field.
-     * @param string $name
-     *   The name attribute of the markup field.
-     * @param string $value
-     *   The markup to render, may contain html, so don't escape. Will come from
-     *   code not users.
-     * @param array $attributes
-     *   Any additional attributes to render for this field. The array is a
-     *   keyed array, the keys being the attribute names, the values being the
-     *   value of that attribute. If that value is an array it is rendered as a
-     *   joined string of the values separated by a space (e.g. multiple
-     *   classes).
-     *
-     * @return string
-     *   The rendered markup.
-     */
-    protected function markup($id, $name, $value, array $attributes = array())
-    {
-        $attributes = array_merge(array('id' => $id, 'name' => $name), $attributes);
-        $output = '';
-        $output .= $this->getWrapper('markup', $attributes);
-        $output .= $value;
-        $output .= $this->getWrapperEnd('markup');
-        return $output;
-    }
-
-    /**
      * @param string $type
      * @param array $attributes
      *
@@ -797,6 +674,8 @@ class FormRenderer
     }
 
     /**
+     * Returns the closing tag for a wrapper element.
+     *
      * @param string $type
      *
      * @return string
@@ -827,7 +706,7 @@ class FormRenderer
      */
     protected function getOpenTag($tag, array $attributes = array(), $selfClosing = false)
     {
-        return '<' . htmlspecialchars($tag, ENT_QUOTES) . $this->renderAttributes($attributes) . ($selfClosing && !$this->html5 ? '/' : '') . '>';
+        return '<' . htmlspecialchars($tag, ENT_QUOTES, 'ISO-8859-1') . $this->renderAttributes($attributes) . ($selfClosing && !$this->html5 ? '/' : '') . '>';
     }
 
     /**
@@ -841,7 +720,7 @@ class FormRenderer
      */
     protected function getCloseTag($tag)
     {
-        return '</' . htmlspecialchars($tag, ENT_QUOTES) .'>';
+        return '</' . htmlspecialchars($tag, ENT_QUOTES, 'ISO-8859-1') .'>';
     }
 
     /**
@@ -876,15 +755,21 @@ class FormRenderer
     }
 
     /**
+     * Adds (or overwrites) an attribute.
+     *
+     * If the attribute already exists and $multiple is false, the existing
+     * value will be overwritten. If it is true, or null while $attribute is
+     * 'class', it will be added.
+     *
      * @param array $attributes
      *   The array of attributes to add the value to.
      * @param string $attribute
-     *   The name of the attribute to add.
+     *   The name of the attribute to set.
      * @param string $value
-     *   The value of the attribute to add.
+     *   The value of the attribute to add or set.
      * @param bool|null $multiple
-     *   Allow multiple values for the given attribute. By default this is
-     *   only allowed for the class attribute.
+     *   Allow multiple values for the given attribute. By default (null) this
+     *   is only allowed for the class attribute.
      *
      * @return array
      *   The set of attributes with the value added.
@@ -917,6 +802,8 @@ class FormRenderer
     }
 
     /**
+     * Adds a set of attributes specific for a label.
+     *
      * @param array $attributes
      * @param string $id
      *
@@ -932,6 +819,8 @@ class FormRenderer
     }
 
     /**
+     * Returns a set of attributes for a single checkbox.
+     *
      * @param string $id
      * @param string $name
      * @param string $value
@@ -950,6 +839,8 @@ class FormRenderer
     }
 
     /**
+     * Returns a set of attributes for a single radio button.
+     *
      * @param string $id
      * @param string $name
      * @param string $value
@@ -968,16 +859,46 @@ class FormRenderer
     }
 
     /**
-     * Compares an option and a value to see if this option should be "selected".
+     * Returns whether an option is part of a set of selected values.
      *
-     * @param string|int|array $value
-     * @param string|int $optionValue
+     * @param string|int|array $selectedValues
+     *   The set of selected values, may be just 1 scalar value.
+     * @param string|int $option
+     *   The option to search for in the set of selected values.
      *
      * @return bool
-     *   If this option equals the value.
+     *   If this option is part of the selected values.
      */
-    protected function compareValues($value, $optionValue)
+    protected function isOptionSelected($selectedValues, $option)
     {
-        return is_array($value) ? in_array((string) $optionValue, $value) : (string) $optionValue === (string) $value;
+        return is_array($selectedValues) ? in_array((string) $option, $selectedValues,false) : (string) $option === (string) $selectedValues;
+    }
+
+    /**
+     * Processes the ajax setting on a field.
+     *
+     * The ajax setting is typically an array with data values to be added as
+     * data-* attributes tot he fom element.
+     *
+     * @param array $field
+     *   The field for which an ajax action is to be enabled.
+     *
+     * @return array
+     *   The field with ajax settings mapped to additional attributes.
+     */
+    protected function addAjax(array $field)
+    {
+        // We add a class so this element can be recognised by js as having an
+        // ajax action.
+        $field['attributes'] = $this->addAttribute($field['attributes'], 'class', 'acumulus-ajax');
+
+        // Add the data`-* attributes.
+        if (!empty($field['ajax']) && is_array($field['ajax'])) {
+            foreach ($field['ajax'] as $dataName => $dataValue) {
+                $field['attributes'] = $this->addAttribute($field['attributes'], 'data-acumulus-' . $dataName, $dataValue);
+            }
+        }
+
+        return $field;
     }
 }

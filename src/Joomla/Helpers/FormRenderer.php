@@ -24,22 +24,22 @@ class FormRenderer extends BaseFormRenderer
         $this->inputWrapperTag = 'div';
         $this->inputWrapperClass = 'controls';
         $this->multiLabelClass = 'control-label';
-        $this->descriptionClass = 'controls';
+        $this->descriptionWrapperClass = 'controls';
         $this->markupWrapperClass = 'controls';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function input($type, $id, $name, $value = '', array $attributes = array())
+    public function input(array $field)
     {
         $output = '';
-        if ($type === 'date') {
+        if ($field['type'] === 'date') {
             $output .= $this->getWrapper('input');
-            $output .= JHtml::calendar($value, $name, $id, '%Y-%m-%d', $attributes);
+            $output .= JHtml::calendar($field['value'], $field['name'], $field['id'], '%Y-%m-%d', $field['attributes']);
             $output .= $this->getWrapperEnd('input');
         } else {
-            $output .= parent::input($type, $id, $name, $value, $attributes);
+            $output .= parent::input($field);
         }
         return $output;
     }

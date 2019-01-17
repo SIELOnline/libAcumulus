@@ -161,6 +161,17 @@ abstract class Form
     }
 
     /**
+     * Returns the type of the form.
+     *
+     * @return string
+     *   The type of the form.
+     */
+    public function getType()
+    {
+      return $this->type;
+    }
+
+    /**
      * Returns the success messages.
      *
      * To be used by web shop specific form handling to display success
@@ -209,8 +220,8 @@ abstract class Form
     /**
      * Adds 1 or more warning messages.
      *
-     * To be used by web shop specific form handling to add a message to the list
-     * of messages to display.
+     * To be used by web shop specific form handling to add a message to the
+     * list of messages to display.
      *
      * @param string|string[] $message
      *   A warning message or an array of warning messages. If empty, nothing
@@ -393,10 +404,10 @@ abstract class Form
     /**
      * Adds the form values to the field definitions.
      *
-     * This method will not have a use on every web shop, but, e.g. VirtueMart and
-     * OpenCart have a form helper/renderer to render individual fields including
-     * their value attribute instead of binding values to a form and rendering the
-     * form.
+     * This method will not have a use on every web shop, but, e.g. VirtueMart
+     * and OpenCart have a form helper/renderer to render individual fields
+     * including their value attribute instead of binding values to a form and
+     * rendering the form.
      */
     public function addValues()
     {
@@ -427,13 +438,11 @@ abstract class Form
                     }
                 }
                 $field['value'] = $value;
-            } else {
+            } elseif (!isset($field['value'])) {
                 // Explicitly set values (in the 'value' key) take precedence
                 // over submitted values, which in turn take precedence over
                 // default values (gathered via getDefaultFormValues()).
-                if (!isset($field['value'])) {
-                    $field['value'] = $this->getFormValue($name);
-                }
+                $field['value'] = $this->getFormValue($name);
             }
         }
         return $fields;
@@ -471,6 +480,7 @@ abstract class Form
                 $result[$id] = $field['value'];
             }
             if (!empty($field['fields'])) {
+                /** @noinspection SlowArrayOperationsInLoopInspection */
                 $result = array_merge($result, $this->getFieldValues($field['fields']));
             }
         }
@@ -489,13 +499,32 @@ abstract class Form
     }
 
     /**
+     * Returns a submitted value.
+     *
+     * @param string $name
+     *   The name of the value to return
+     * @param string|null $default
+     *   The default to return when this value was not submitted.
+     *
+     * @return string|null
+     *   The submitted value, or the default if the value was not submitted.
+     */
+    protected function getSubmittedValue($name, $default = null)
+    {
+        if (empty($this->submittedValues)) {
+            $this->setSubmittedValues();
+        }
+        return array_key_exists($name, $this->submittedValues) ? $this->submittedValues[$name] : $default;
+    }
+
+    /**
      * Processes the form.
      *
      * @param bool $executeIfValid
      *   Whether this method should execute the intended action after successful
      *   validation. Some web shops (WooCommerce) sometimes do their own form
-     *   handling (setting pages) and we should only do the validation and setting
-     *   admin notices as necessary.
+     *   handling (setting pages) and we should only do the validation and
+     *   setting admin notices as necessary.
      *
      * @return bool
      *   True if there was no form submission or a successful submission.
@@ -515,13 +544,17 @@ abstract class Form
                     if ($message === "message_form_{$this->type}_success") {
                         $message = $this->t('message_form_success');
                     }
-                    $this->addSuccessMessage($message);
+                    if (!empty($message) && $message !== 'message_form_success') {
+                        $this->addSuccessMessage($message);
+                    }
                 } else {
                     $message = $this->t("message_form_{$this->type}_error");
                     if ($message === "message_form_{$this->type}_error") {
                         $message = $this->t('message_form_error');
                     }
-                    $this->addErrorMessages($message);
+                    if (!empty($message) && $message !== 'message_form_error') {
+                        $this->addErrorMessages($message);
+                    }
                 }
             }
         }
@@ -535,8 +568,8 @@ abstract class Form
      * Any errors are stored as a user readable message in the $errorMessages
      * property and will be keyed by the field name.
      *
-     * This default implementation does no validation at all. Override to add form
-     * specific validation.
+     * This default implementation does no validation at all. Override to add
+     * form specific validation.
      */
     protected function validate()
     {

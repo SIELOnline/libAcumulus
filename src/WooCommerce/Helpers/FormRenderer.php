@@ -50,6 +50,7 @@ class FormRenderer extends BaseFormRenderer
                 $output .= $text;
                 $output .= $this->getWrapperEnd($wrapperType);
             } else {
+                /** @noinspection NestedPositiveIfStatementsInspection */
                 if ($this->usePopupDescription) {
                     $output .= wc_help_tip($text);
                 } else {

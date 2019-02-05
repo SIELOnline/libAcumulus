@@ -24,6 +24,9 @@ Features:
   to send are now also logged when the invoice has been sent (was only when it
   was not sent).
 
+Refactorings:
+- ALL: Add type hint to AcumulusEntryManager::save() method parameter.
+
 5.5.2 (2019-01-23)
 ------------------
 Features:

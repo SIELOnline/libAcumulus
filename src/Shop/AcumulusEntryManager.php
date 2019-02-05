@@ -106,7 +106,7 @@ abstract class AcumulusEntryManager
      * @return bool
      *   Success.
      */
-    public function save($invoiceSource, $entryId, $token)
+    public function save(Source $invoiceSource, $entryId, $token)
     {
         $now = $this->sqlNow();
         $record = $this->getByInvoiceSource($invoiceSource);

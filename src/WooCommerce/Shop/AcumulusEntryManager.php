@@ -81,6 +81,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         $post = get_post($invoiceSourceId);
         if (!empty($post->post_type) && $this->shopTypeToSourceType($post->post_type) === $invoiceSourceType) {
             $result = get_post_meta($invoiceSourceId);
+            // EntryId can be null, so check if key exists, do not use isset().
             if (array_key_exists(static::$keyEntryId, $result)) {
                 // Acumulus meta data found: add source id and type as these are
                 // not stored in the meta data.
@@ -100,7 +101,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      * This override uses the WordPress meta data API to store the acumulus
      * entry data with the order.
      */
-    public function save($invoiceSource, $entryId, $token)
+    public function save(Source $invoiceSource, $entryId, $token)
     {
         $now = $this->sqlNow();
         $orderId = $invoiceSource->getId();

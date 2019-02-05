@@ -17,6 +17,13 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies, vanaf 5.5.2 is dat all
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
+5.5.? (2019-0?-??)
+------------------
+Features:
+- ALL: Better logging on status change, new status and set of statuses on which
+  to send are now also logged when the invoice has been sent (was only when it
+  was not sent).
+
 5.5.2 (2019-01-23)
 ------------------
 Features:

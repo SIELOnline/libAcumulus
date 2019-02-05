@@ -194,7 +194,11 @@ class Result extends WebResult
                 $message = 'reason_sent_testMode';
                 break;
             case self::Sent_New:
-                $message = 'reason_sent_new';
+                if (empty($this->sendStatusArguments)) {
+                    $message = 'reason_sent_new';
+                } else {
+                    $message = 'reason_sent_new_status_change';
+                }
                 break;
             case self::Sent_Forced:
                 $message = 'reason_sent_forced';

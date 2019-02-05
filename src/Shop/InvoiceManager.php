@@ -328,6 +328,9 @@ abstract class InvoiceManager
         $result = $this->getInvoiceResult('InvoiceManager::sourceStatusChange()');
         if ($invoiceSource->getType() === Source::CreditNote || in_array($status, $shopEventSettings['triggerOrderStatus'])) {
             $result = $this->send($invoiceSource, $result);
+            // Add argument to send status, this will add the current status and
+            // the set of statuses on which to send to the log line.
+            $result->setSendStatus($result->getSendStatus(), array($status, implode(',', $shopEventSettings['triggerOrderStatus'])));
         } else {
             $result->setSendStatus(Result::NotSent_WrongStatus, array($status, implode(',', $shopEventSettings['triggerOrderStatus'])));
         }

@@ -26,6 +26,8 @@ Features:
 
 Bugs:
 - WC: [SIEL #123927] Dubbele concept-facturen.
+- WC: update_meta_data() also returns false when the new value is the same as
+  the old value.
 
 Refactorings:
 - ALL: Add type hint to AcumulusEntryManager::save() method parameter.

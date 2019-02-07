@@ -106,29 +106,17 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
 
     /**
      * {@inheritdoc}
-     *
-     * This override uses the WordPress meta data API to store the acumulus
-     * entry data with the order.
-     */
-    public function save(Source $invoiceSource, $entryId, $token)
-    {
-        $now = $this->sqlNow();
-        $orderId = $invoiceSource->getId();
-        // Add but do not overwrite created timestamp.
-        //$exists = add_post_meta($orderId, static::$keyCreated, $now, true) === false;
-        add_post_meta($orderId, static::$keyCreated, $now, true);
-        // Add or overwrite other fields.
-        return update_post_meta($orderId, static::$keyEntryId, $entryId) !== false
-            && update_post_meta($orderId, static::$keyToken, $token) !== false
-            && update_post_meta($orderId, static::$keyUpdated, $now) !== false;
-    }
-
-    /**
-     * {@inheritdoc}
      */
     protected function insert(Source $invoiceSource, $entryId, $token, $created)
     {
-        throw new \BadMethodCallException(__METHOD__ . ' not implemented');
+        $now = $this->sqlNow();
+        $postId = $invoiceSource->getId();
+        // Add meta data.
+        $result1 = add_post_meta($postId, static::$keyCreated, $now, true);
+        $result2 = add_post_meta($postId, static::$keyEntryId, $entryId, true);
+        $result3 = add_post_meta($postId, static::$keyToken, $token, true);
+        $result4 = add_post_meta($postId, static::$keyUpdated, $now, true);
+        return $result1 !== false && $result2 !== false && $result3 !== false && $result4 !== false;
     }
 
     /**
@@ -136,7 +124,13 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      */
     protected function update(BaseAcumulusEntry $entry, $entryId, $token, $updated)
     {
-        throw new \BadMethodCallException(__METHOD__ . ' not implemented');
+        $postId = $entry->getSourceId();
+        // Overwrite fields. To be able to return a correct success value, we
+        // should not update with the same value as that also returns false ...!
+        $result1 = $entry->getEntryId() !== $entryId ? update_post_meta($postId, static::$keyEntryId, $entryId) : true;
+        $result2 = $entry->getToken() !== $token ? update_post_meta($postId, static::$keyToken, $token) : true;
+        $result3 = $entry->getUpdated() != $updated ? update_post_meta($postId, static::$keyUpdated, $updated) : true;
+        return $result1 !== false && $result2 !== false && $result3 !== false;
     }
 
     /**

@@ -498,9 +498,11 @@ abstract class InvoiceManager
             }
         }
 
-        // Delete if there is an old entry and we successfully saved the new entry.
+        // Delete if there is an old entry and we successfully saved the new
+        // entry.
         if ($deleteOldEntry && isset($oldEntry)) {
-            // But only if the old entry was not a concept as concepts cannot be deleted.
+            // But only if the old entry was not a concept as concepts cannot be
+            // deleted.
             $entryId = $oldEntry->getEntryId();
             if (!empty($entryId)) {
                 $deleteResult = $this->getService()->setDeleteStatus($entryId, API::Entry_Delete);

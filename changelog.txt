@@ -24,6 +24,9 @@ Features:
   to send are now also logged when the invoice has been sent (was only when it
   was not sent).
 
+Bugs:
+- WC: [SIEL #123927] Dubbele concept-facturen.
+
 Refactorings:
 - ALL: Add type hint to AcumulusEntryManager::save() method parameter.
 

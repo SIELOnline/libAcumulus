@@ -1,9 +1,9 @@
 <?php
 namespace Siel\Acumulus\WooCommerce\Shop;
 
-use Siel\Acumulus\Shop\AcumulusEntryManager as BaseAcumulusEntryManager;
-use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
 use Siel\Acumulus\Invoice\Source;
+use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
+use Siel\Acumulus\Shop\AcumulusEntryManager as BaseAcumulusEntryManager;
 
 /**
  * Implements the WooCommerce/WordPress specific acumulus entry model class.
@@ -79,18 +79,27 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         $invoiceSourceType = $invoiceSource->getType();
         $invoiceSourceId = (int) $invoiceSource->getId();
         $post = get_post($invoiceSourceId);
-        if (!empty($post->post_type) && $this->shopTypeToSourceType($post->post_type) === $invoiceSourceType) {
-            $result = get_post_meta($invoiceSourceId);
-            // EntryId can be null, so check if key exists, do not use isset().
-            if (array_key_exists(static::$keyEntryId, $result)) {
-                // Acumulus meta data found: add source id and type as these are
-                // not stored in the meta data.
-                $result[static::$keySourceType] = $invoiceSourceType;
-                $result[static::$keySourceId] = $invoiceSourceId;
-                $result = $this->container->getAcumulusEntry($result);
+        if (!empty($post)) {
+            if ($this->shopTypeToSourceType($post->post_type) === $invoiceSourceType) {
+                $postMeta = get_post_meta($invoiceSourceId);
+                // [SIEL #123927]: EntryId may be null and that can lead to an
+                // incorrect "not found" result: use a key that will never
+                // contain a null value.
+                if (isset($postMeta[static::$keyCreated])) {
+                    // Acumulus meta data found: add source id and type as these
+                    // are not stored in the meta data.
+                    $postMeta[static::$keySourceType] = $invoiceSourceType;
+                    $postMeta[static::$keySourceId] = $invoiceSourceId;
+                    $this->log->debug('InvoiceManager::getByInvoiceSource(%s %d): found in post meta %s', $invoiceSourceType, $invoiceSourceId, json_encode($postMeta));
+                    $result = $this->container->getAcumulusEntry($postMeta);
+                } else {
+                    $this->log->debug('InvoiceManager::getByInvoiceSource(%s %d): not found in post meta %s', $invoiceSourceType, $invoiceSourceId, json_encode($postMeta));
+                }
             } else {
-                $result = null;
+                $this->log->error('InvoiceManager::getByInvoiceSource(%s %d): unknown post type %s', $invoiceSourceType, $invoiceSourceId, empty($post->post_type) ? 'no post type' : $post->post_type);
             }
+        } else {
+            $this->log->error('InvoiceManager::getByInvoiceSource(%s %d): unknown post', $invoiceSourceType, $invoiceSourceId);
         }
         return $result;
     }
@@ -105,8 +114,10 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     {
         $now = $this->sqlNow();
         $orderId = $invoiceSource->getId();
+        // Add but do not overwrite created timestamp.
+        //$exists = add_post_meta($orderId, static::$keyCreated, $now, true) === false;
         add_post_meta($orderId, static::$keyCreated, $now, true);
-        //$exists = add_post_meta($orderId, '_acumulus_created', $now, true) === false;
+        // Add or overwrite other fields.
         return update_post_meta($orderId, static::$keyEntryId, $entryId) !== false
             && update_post_meta($orderId, static::$keyToken, $token) !== false
             && update_post_meta($orderId, static::$keyUpdated, $now) !== false;

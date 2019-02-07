@@ -147,6 +147,7 @@ class AcumulusEntry
     {
         $value = null;
         if (is_array($this->record)) {
+            // Value may be null: use array_key_exists(), not isset().
             if (array_key_exists($field, $this->record)) {
                 $value = $this->record[$field];
             }

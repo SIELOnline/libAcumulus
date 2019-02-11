@@ -90,10 +90,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
                     // are not stored in the meta data.
                     $postMeta[static::$keySourceType] = $invoiceSourceType;
                     $postMeta[static::$keySourceId] = $invoiceSourceId;
-                    $this->log->debug('InvoiceManager::getByInvoiceSource(%s %d): found in post meta %s', $invoiceSourceType, $invoiceSourceId, json_encode($postMeta));
                     $result = $this->container->getAcumulusEntry($postMeta);
-                } else {
-                    $this->log->debug('InvoiceManager::getByInvoiceSource(%s %d): not found in post meta %s', $invoiceSourceType, $invoiceSourceId, json_encode($postMeta));
                 }
             } else {
                 $this->log->error('InvoiceManager::getByInvoiceSource(%s %d): unknown post type %s', $invoiceSourceType, $invoiceSourceId, empty($post->post_type) ? 'no post type' : $post->post_type);

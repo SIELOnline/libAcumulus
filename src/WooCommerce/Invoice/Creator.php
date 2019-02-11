@@ -185,8 +185,8 @@ class Creator extends BaseCreator
         $args = array(
             'tax_class' => $taxClassId,
             'country' => $this->invoice[Tag::Customer][Tag::CountryCode],
-            'city' => $this->invoice[Tag::Customer][Tag::City],
-            'postcode' => $this->invoice[Tag::Customer][Tag::PostalCode],
+            'city' => isset($this->invoice[Tag::Customer][Tag::City]) ? $this->invoice[Tag::Customer][Tag::City] : '',
+            'postcode' => isset($this->invoice[Tag::Customer][Tag::PostalCode]) ? $this->invoice[Tag::Customer][Tag::PostalCode] : '',
         );
         $taxRates = WC_Tax::find_rates($args);
         foreach ($taxRates as $taxRate) {

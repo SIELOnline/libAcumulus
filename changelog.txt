@@ -17,7 +17,7 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies, vanaf 5.5.2 is dat all
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
-5.5.? (2019-0?-??)
+5.5.3 (2019-02-11)
 ------------------
 Features:
 - ALL: Better logging on status change, new status and set of statuses on which
@@ -28,6 +28,9 @@ Bugs:
 - WC: [SIEL #123927] Dubbele concept-facturen.
 - WC: update_meta_data() also returns false when the new value is the same as
   the old value.
+- ALL: Property sources refund an order were not defined with credit notes and
+  therefore their properties were not accessible. Especially problematic for WC.
+- WC: Prevent notices on missing city and postal code if they are not provided.
 
 Refactorings:
 - ALL: Add type hint to AcumulusEntryManager::save() method parameter.

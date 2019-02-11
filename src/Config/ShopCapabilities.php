@@ -149,7 +149,7 @@ abstract class ShopCapabilities
             ),
             'source' => array_merge(array('more-info' => ucfirst($this->t('order_or_refund'))), $this->getTokenInfoSource()),
         );
-        if (in_array(Source::CreditNote, $this->getSupportedInvoiceSourceTypes())) {
+        if (array_key_exists(Source::CreditNote, $this->getSupportedInvoiceSourceTypes())) {
             $result += array(
                 'refund' => array_merge(array('more-info' => ucfirst($this->t('refund_only'))), $this->getTokenInfoRefund()),
                 'order' => array_merge(array('more-info' => ucfirst($this->t('original_order_for_refund'))), $this->getTokenInfoOrder()),

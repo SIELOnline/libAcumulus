@@ -193,7 +193,7 @@ abstract class Creator
             'invoiceSource' => $this->invoiceSource,
             'source' => $this->invoiceSource->getSource(),
         );
-        if (in_array(Source::CreditNote, $this->shopCapabilities->getSupportedInvoiceSourceTypes())) {
+        if (array_key_exists(Source::CreditNote, $this->shopCapabilities->getSupportedInvoiceSourceTypes())) {
             if ($this->invoiceSource->getType() === Source::CreditNote) {
                 $this->propertySources['refund'] = $this->invoiceSource->getSource();
             }

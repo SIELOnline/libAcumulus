@@ -27,7 +27,7 @@ class Creator extends BaseCreator
      *
      * @var float
      */
-    protected $precision = 0.001;
+    protected $precision = 0.005;
 
     /**
      * {@inheritdoc}

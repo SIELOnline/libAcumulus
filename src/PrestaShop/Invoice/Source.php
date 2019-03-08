@@ -245,6 +245,8 @@ class Source extends BaseSource
      * OrderSlip does store but not load the values total_products_tax_excl,
      * total_shipping_tax_excl, total_products_tax_incl, and
      * total_shipping_tax_incl. As we need them, we load them ourselves.
+     *
+     * @todo: Has this been changed in 1.7.5?
      */
     protected function addProperties()
     {

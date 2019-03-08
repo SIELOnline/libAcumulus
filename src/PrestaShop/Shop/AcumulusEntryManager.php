@@ -46,7 +46,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     public function getByEntryId($entryId)
     {
         /** @noinspection PhpUnhandledExceptionInspection */
-        $result = $this->getDb()->query(sprintf(
+        $result = $this->getDb()->executeS(sprintf(
             "SELECT * FROM `%s` WHERE id_entry %s %s",
             $this->tableName,
             $entryId === null ? 'is' : '=',
@@ -61,7 +61,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     public function getByInvoiceSource(Source $invoiceSource)
     {
         /** @noinspection PhpUnhandledExceptionInspection */
-        $result = $this->getDb()->query(sprintf(
+        $result = $this->getDb()->executeS(sprintf(
             "SELECT * FROM `%s` WHERE source_type = '%s' AND source_id = %u",
             $this->tableName,
             pSql($invoiceSource->getType()),

@@ -53,6 +53,16 @@ class Creator extends BaseCreator
     /**
      * Returns 1 item line.
      *
+     * Some processing notes:
+     * - Though recently I did not see it any more, in the past I have seen
+     *   refunds where articles that were not returned were still listed but
+     *   with qty = 0 (and line total = 0).
+     * - It turns out that you can do partial refunds by entering a broken
+     *   number in the quantity field when defining a refund on the edit order
+     *   page. However, the quantity stored is still rounded towards zero and
+     *   thus may result in qty = 0 but line total != 0 or just item price not
+     *   being equal to line total divided by the qty.
+     *
      * @param WC_Order_Item_Product $item
      *   An array representing an order item line, meta values are already
      *   available under their own names and as an array under key 'item_meta'.
@@ -68,9 +78,9 @@ class Creator extends BaseCreator
     {
         $result = array();
 
-        // Qty = 0 can happen on refunds: products that are not returned are
-        // still listed but have qty = 0.
-        if (Number::isZero($item->get_quantity())) {
+        // Return if this "really" is an empty line, not when this is a line
+        // with free products or an amount but without a quantity.
+        if (Number::isZero($item->get_quantity()) && Number::isZero($item->get_total())) {
             return $result;
         }
 
@@ -88,6 +98,10 @@ class Creator extends BaseCreator
         // Add quantity: quantity is negative on refunds, the unit price will be
         // positive.
         $quantity = $item->get_quantity();
+        // Correct if 0.
+        if (Number::isZero($quantity)) {
+            $quantity = $this->invoiceSource->getSign();
+        }
         $commonTags = array(Tag::Quantity => $quantity);
         $result += $commonTags;
 

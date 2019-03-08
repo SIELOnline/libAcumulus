@@ -53,7 +53,13 @@ class Log extends BaseLog
     {
         if ($this->logger === null) {
 
-            $logDirectory = version_compare(_PS_VERSION_, 1.7, '>=') ? 'app/logs' : 'log';
+            if (version_compare(_PS_VERSION_, '1.7.5', '>=')) {
+                $logDirectory = 'var/logs';
+            } elseif (version_compare(_PS_VERSION_, '1.7', '>=')) {
+                $logDirectory = 'app/logs';
+            } else {
+                $logDirectory = 'log';
+            }
             $this->logger = new FileLogger(AbstractLogger::DEBUG);
             $this->logger->setFilename(_PS_ROOT_DIR_ . '/'. $logDirectory . '/acumulus.log');
         }

@@ -8,6 +8,7 @@ use Siel\Acumulus\Helpers\TranslationCollection;
  */
 class Translations extends TranslationCollection
 {
+    const  sharedNl = 'De factuur is als concept opgeslagen. In Acumulus zijn deze onder "Overzichten » Concept-facturen / offertes" terug te vinden. Controleer en corrigeer daar de factuur.';
     protected $nl = array(
         Source::Order => 'bestelling',
         Source::CreditNote => 'creditnota',
@@ -42,17 +43,18 @@ class Translations extends TranslationCollection
         'discount_adjustment' => 'Handmatige korting',
 
         'message_warning_no_email' => 'De factuur bevat geen e-mailadres van de klant. Hierdoor kan er geen relatie in Acumulus aangemaakt of bijgewerkt worden. U kunt zelf in Acumulus een andere relatie aan deze factuur koppelen.',
-        'message_warning_no_vatrate' => 'Een van de bestelregels bevat een foutief btw percentage. Daarom is de factuur als concept opgeslagen. In Acumulus zijn deze onder "Overzichten » Concept-facturen / offertes" terug te vinden. Corrigeer daar de factuur in Acumulus.',
-        'message_warning_no_vattype' => 'Het factuurtype (https://wiki.acumulus.nl/index.php?page=facturen-naar-het-buitenland) kan niet bepaald worden. Daarom is de factuur als concept opgeslagen. In Acumulus zijn deze onder "Overzichten » Concept-facturen / offertes" terug te vinden. Corrigeer daar de factuur in Acumulus.',
+        'message_warning_no_vatrate' => 'Een van de bestelregels bevat een foutief btw percentage. ' . self::sharedNl,
+        'message_warning_no_vattype' => 'Het factuurtype (https://wiki.acumulus.nl/index.php?page=facturen-naar-het-buitenland) kan niet bepaald worden. ' . self::sharedNl,
+        'message_warning_multiple_vattypes' => 'Er zijn meerdere factuurtypes (https://wiki.acumulus.nl/index.php?page=facturen-naar-het-buitenland) mogelijk. ' . self::sharedNl,
         'message_warning_no_vattype_at_all' => '%1$s Dit is hoogstwaarschijnlijk het gevolg van: bestelregels die ten onrechte geen btw hebben; foute "Over uw winkel" instellingen; of verkeerd ingestelde btw tarieven. Controleer deze.',
         'message_warning_no_vattype_incorrect_lines' => '%1$s Dit is hoogstwaarschijnlijk het gevolg van: enkele (handmatig ingevoerde) bestelregels die ten onrechte geen btw hebben; of foute "Over uw winkel" instellingen, controleer deze.',
         'message_warning_no_vattype_may_split' => '%1$s Hoogstwaarschijnlijk dient u de factuur te splitsen in verschillende factuurtypes. Echter, controleer voor de zekerheid ook de "Over uw winkel" instellingen.',
         'message_warning_no_vattype_must_split' => '%1$s U dient de factuur te splitsen in verschillende factuurtypes.',
         'message_warning_no_vattype_multiple_possible' => '%1$s Waarschijnlijk komt dit door een gebrek aan informatie over de aard van de bestelde artikelen. Het volledig invullen van de "Over uw winkel" instellingen zou kunnen helpen.',
-        'message_warning_line_without_vat' => 'Één of meer van de factuurregels hebben geen btw terwijl is ingesteld dat er "Alleen aan btw onderhevige producten en/of diensten" aangeboden worden. Daarom is de factuur als concept opgeslagen. In Acumulus zijn deze onder "Overzichten » Concept-facturen / offertes" terug te vinden. Corrigeer daar de factuur in Acumulus en controleer uw instellingen.',
-        'message_warning_strategies_failed' => 'Door een fout in uw instellingen of btw tarieven, konden niet alle fatuurregels correct gecompleteerd worden. Daarom is de factuur als concept opgeslagen. In Acumulus zijn deze onder "Overzichten » Concept-facturen / offertes" terug te vinden. Corrigeer daar de factuur in Acumulus.',
-        'message_warning_missing_amount_added' => 'Het factuurbedrag klopt niet met het totaal van de regels. Daarom is er een correctieregel toegevoegd met een bedrag (ex. btw) van €%1$.2f en een btw bedrag van €%2$.2f. De factuur is als concept opgeslagen. In Acumulus zijn deze onder "Overzichten » Concept-facturen / offertes" terug te vinden. Controleer en corrigeer daar de factuur.',
-        'message_warning_missing_amount_warn' => 'Het factuurbedrag klopt niet met het totaal van de regels. %1$s. De factuur is als concept opgeslagen. In Acumulus zijn deze onder "Overzichten » Concept-facturen / offertes" terug te vinden. Controleer en corrigeer daar de factuur.',
+        'message_warning_line_without_vat' => 'Één of meer van de factuurregels hebben geen btw terwijl is ingesteld dat er "Alleen aan btw onderhevige producten en/of diensten" aangeboden worden. ' . self::sharedNl,
+        'message_warning_strategies_failed' => 'Door een fout in uw instellingen of btw tarieven, konden niet alle fatuurregels correct gecompleteerd worden. ' . self::sharedNl,
+        'message_warning_missing_amount_added' => 'Het factuurbedrag klopt niet met het totaal van de regels. Daarom is er een correctieregel toegevoegd met een bedrag (ex. btw) van €%1$.2f en een btw bedrag van €%2$.2f. ' . self::sharedNl,
+        'message_warning_missing_amount_warn' => 'Het factuurbedrag klopt niet met het totaal van de regels. %1$s. ' . self::sharedNl,
         'message_warning_missing_amount_spec' => 'het %1$s wijkt €%2$.2f af',
         'amount_ex' => 'bedrag (ex. btw)',
         'amount_inc' => 'bedrag (incl. btw)',
@@ -97,6 +99,7 @@ class Translations extends TranslationCollection
         'message_warning_no_email' => 'The invoice does not have a customer email address. Therefore we could not create or update a relation in Acumulus. You can connect a relation to this invoice yourself.',
         'message_warning_no_vatrate' => 'One of the invoice lines contains an invalid vat rate. The invoice has been saved as concept. Correct the invoice in Acumulus.',
         'message_warning_no_vattype' => 'The invoice type for the invoice (https://wiki.acumulus.nl/index.php?page=facturen-naar-het-buitenland) could not be determined. The invoice has been saved as concept. Correct the invoice in Acumulus.',
+        'message_warning_multiple_vattypes' => 'The invoice can have multiple vat types (https://wiki.acumulus.nl/index.php?page=facturen-naar-het-buitenland) . The invoice has been saved as concept. Correct the invoice in Acumulus.',
         'message_warning_no_vattype_at_all' => '%1$s This is very likely caused by: order lines incorrectly not having vat; incorrect "About your shop" settings; or incorrect vat rates. Check these.',
         'message_warning_no_vattype_incorrect_lines' => '%1$s This is very likely caused by: some (manually entered) order lines incorrectly not having vat; or incorrect "About your shop" settings, check these.',
         'message_warning_no_vattype_may_split' => '%1$s You likely have to split the invoice over multiple invoice types. However, please also check your "About your shop" settings.',

@@ -86,6 +86,7 @@ class ConfigForm extends BaseConfigForm
             return;
         }
 
+        // Check that required fields are filled.
         if (!isset($this->submittedValues['nature_shop'])) {
             $this->errorMessages['nature_shop'] = $this->t('message_validate_nature_0');
         }
@@ -99,13 +100,28 @@ class ConfigForm extends BaseConfigForm
             $this->errorMessages['marginProducts'] = $this->t('message_validate_margin_products_0');
         }
 
+        // Check the foreignVat and foreignVatClasses settings.
+        if (isset($this->submittedValues['foreignVat']) && $this->submittedValues['foreignVat'] != PluginConfig::ForeignVat_No) {
+            if (empty($this->submittedValues['foreignVatClasses'])) {
+                $this->errorMessages['foreignVatClasses'] = $this->t('message_validate_foreign_vat_classes_0');
+            }
+        }
+
+        // Check the foreignVat and vatFreeProducts settings.
+        if (isset($this->submittedValues['foreignVat']) && $this->submittedValues['foreignVat'] != PluginConfig::ForeignVat_No) {
+            if (isset($this->submittedValues['vatFreeProducts']) && $this->submittedValues['vatFreeProducts'] == PluginConfig::VatFreeProducts_Only) {
+                $this->errorMessages['foreignVatClasses'] = $this->t('message_validate_vat_free_products_1');
+            }
+        }
+
+        // Check the marginProducts setting in combination with other settings.
         // NOTE: it is debatable whether margin articles can be services, e.g.
         // selling 2nd hand software licenses. However it is not debatable that
         // margin goods can never be digital services. So the 1st validation is
         // debatable and my be removed in the future, the 2nd isn't.
         if (isset($this->submittedValues['nature_shop']) && isset($this->submittedValues['marginProducts'])) {
-            // If wel only sell articles with nature Services, we cannot (also) sell
-            // margin goods.
+            // If we only sell articles with nature Services, we cannot (also)
+            // sell margin goods.
             if ($this->submittedValues['nature_shop'] == PluginConfig::Nature_Services && $this->submittedValues['marginProducts'] != PluginConfig::MarginProducts_No) {
                 $this->errorMessages['conflicting_options_1'] = $this->t('message_validate_conflicting_shop_options_2');
             }

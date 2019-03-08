@@ -64,7 +64,9 @@ class ConfigFormTranslations extends TranslationCollection
         'message_validate_nature_0' => 'Het veld \'Soort: wat verkoopt u?\' is verplicht, kies een waarde.',
         'message_validate_foreign_vat_0' => 'Het veld \'Verkoopt u producten of diensten waarbij u EU btw moet hanteren?\' is verplicht, kies een waarde.',
         'message_validate_vat_free_products_0' => 'Het veld \'Verkoopt u van btw vrijgestelde producten of diensten?\' is verplicht, kies een waarde.',
+        'message_validate_vat_free_products_1' => 'Als u \'Alleen producten of diensten verkoopt die van btw vrijgesteld zijn\' kunt u niet (ook) \'producten of diensten verkopen waarbij u EU btw moet hanteren\'. Pas één van deze opties aan.',
         'message_validate_margin_products_0' => 'Het veld \'Verkoopt u margegoederen?\' is verplicht, kies een waarde.',
+        'message_validate_foreign_vat_classes_0' => 'Het veld \'Welke belastingklassen definiëren EU btw tarieven?\' moet één of meer belastingklassen bevatten als u (ook) \'producten of diensten verkoopt waarbij u EU btw moet hanteren\'.',
         'message_validate_conflicting_shop_options_2' => 'Als u alleen diensten verkoopt, kunt u geen margegoederen verkopen. Pas één van deze opties aan.',
         'message_validate_conflicting_shop_options_3' => 'Als u alleen margegoederen verkoopt, vink dan bij "Soort" aan dat u alleen producten verkoopt.',
 
@@ -412,8 +414,10 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'message_validate_nature_0' => 'The field \'Nature: what do you sell?\' is required, select a value.',
         'message_validate_foreign_vat_0' => 'The field \'Do you sell products or services that are subject to foreign VAT for EU customers?\' is required, select a value.',
         'message_validate_vat_free_products_0' => 'The field \'Do you sell VAT free products or services?\' is required, select a value.',
+        'message_validate_vat_free_products_1' => 'If you sell \'Only VAT free products or services\' you cannot (also) sell \'products or services that are subject to foreign VAT for EU customers\'. Change one of these options.',
         'message_validate_margin_products_0' => 'The field \'Do you sell products using the margin scheme?\' is required, select a value.',
-        'message_validate_conflicting_shop_options_2' => 'If you only sell services, you cannot sell using the margin scheme. change one of these options.',
+        'message_validate_foreign_vat_classes_0' => 'The field \'Which vat classes define EU vat rates?\' must contain 1 or more vat classes if you (also) \'sell products or services that are subject to foreign VAT for EU customers\'.',
+        'message_validate_conflicting_shop_options_2' => 'If you only sell services, you cannot sell using the margin scheme. Change one of these options.',
         'message_validate_conflicting_shop_options_3' => 'If you only sell using the margin scheme, you should select that you only sell goods on the "Nature" field.',
 
         // Shop settings.

@@ -838,7 +838,10 @@ class Completor
             if (!empty($message)) {
                 // Make the invoice a concept, so it can be changed in Acumulus
                 // and add message and meta info.
-                $this->changeInvoiceToConcept($message, $code, $this->t('message_warning_no_vattype'));
+                $startSentence = count($vatTypeInfo['intersection']) === 0
+                    ? 'message_warning_no_vattype'
+                    : 'message_warning_multiple_vattypes';
+                $this->changeInvoiceToConcept($message, $code, $this->t($startSentence));
             }
             $this->invoice[Tag::Customer][Tag::Invoice][Meta::VatTypesPossibleInvoice] = implode(',', $this->possibleVatTypes);
             $this->invoice[Tag::Customer][Tag::Invoice][Meta::VatTypesPossibleInvoiceLinesIntersection] = implode(',', $vatTypeInfo['intersection']);

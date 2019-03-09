@@ -242,21 +242,25 @@ class Source extends BaseSource
     }
 
     /**
+     * PS before 1.7.5 (it may have been fixed earlier, but this method is not a
+     * problem to execute anyway):
      * OrderSlip does store but not load the values total_products_tax_excl,
      * total_shipping_tax_excl, total_products_tax_incl, and
      * total_shipping_tax_incl. As we need them, we load them ourselves.
      *
-     * @todo: Has this been changed in 1.7.5?
+     * Remove in the far future.
      */
     protected function addProperties()
     {
-        $row = Db::getInstance()->executeS(sprintf('SELECT * FROM `%s` WHERE `%s` = %u',
-            _DB_PREFIX_ . OrderSlip::$definition['table'], OrderSlip::$definition['primary'], $this->id));
-        // Get 1st (and only) result.
-        $row = reset($row);
-        foreach ($row as $key => $value) {
-            if (!isset($this->source->$key)) {
-                $this->source->$key = $value;
+        if (version_compare(_PS_VERSION_, '1.7.5', '<')) {
+            $row = Db::getInstance()->executeS(sprintf('SELECT * FROM `%s` WHERE `%s` = %u',
+                _DB_PREFIX_ . OrderSlip::$definition['table'], OrderSlip::$definition['primary'], $this->id));
+            // Get 1st (and only) result.
+            $row = reset($row);
+            foreach ($row as $key => $value) {
+                if (!isset($this->source->$key)) {
+                    $this->source->$key = $value;
+                }
             }
         }
     }

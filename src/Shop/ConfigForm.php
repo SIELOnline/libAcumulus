@@ -367,6 +367,7 @@ class ConfigForm extends BaseConfigForm
                 ),
             ),
             'triggerInvoiceEvent' => $this->getOptionsOrHiddenField('triggerInvoiceEvent', 'radio', false),
+            'triggerCreditNoteEvent' => $this->getOptionsOrHiddenField('triggerCreditNoteEvent', 'radio', false),
         );
         return $fields;
     }

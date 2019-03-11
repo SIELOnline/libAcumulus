@@ -110,17 +110,22 @@ Mbv de "Ctrl" toets kunt u meerdere statussen kiezen of keuzes ongedaan maken.',
 
         // Trigger settings.
         'triggerSettingsHeader' => 'Wanneer wilt u uw facturen automatisch versturen naar Acumulus',
-        'desc_triggerSettings' => 'Met behulp van deze instelling kunt u aangeven op welk(e) moment(en) u de factuur voor een bestelling naar Acumulus wilt versturen. Als u meerdere momenten selecteert, wordt de factuur naar Acumulus verstuurd zodra de bestelling één van de gekozen statussen bereikt. Een factuur zal altijd slechts 1 keer naar Acumulus worden verstuurd. Deze koppeling gebruikt alleen gegevens van de bestelling, dus u kunt elke status kiezen. De webwinkelfactuur hoeft dus nog niet aangemaakt te zijn, tenzij u voor de factuurdatum en nummer de webwinkelfactuurdatum en nummer wilt gebruiken. Als u voor "Niet automatisch versturen" kiest, dient u de facturen zelf over te zetten m.b.v. het <a href="%s">Acumulus batchverzendformulier</a>.',
+        'desc_triggerSettings' => 'Met behulp van deze instelling kunt u aangeven op welk(e) moment(en) u de factuur voor een bestelling of creditfactuur naar Acumulus wilt versturen. Als u meerdere momenten selecteert, wordt de factuur naar Acumulus verstuurd zodra de bestelling één van de gekozen statussen bereikt. Een factuur zal altijd slechts 1 keer naar Acumulus worden verstuurd. Deze koppeling gebruikt alleen gegevens van de bestelling, dus u kunt elke status kiezen. De webwinkelfactuur hoeft dus nog niet aangemaakt te zijn, tenzij u voor de factuurdatum en nummer de webwinkelfactuurdatum en nummer wilt gebruiken. Als u voor "Niet automatisch versturen" kiest, dient u de facturen zelf over te zetten m.b.v. het <a href="%s">Acumulus batchverzendformulier</a>.',
 
-        'field_triggerOrderStatus' => 'Bestelstatus(sen)',
+        'field_triggerOrderStatus' => 'Bestelling, op basis van bestelstatus(sen)',
         'desc_triggerOrderStatus' => 'Mbv de "Ctrl" toets kunt u meerdere statussen kiezen.',
         'option_empty_triggerOrderStatus' => 'Niet automatisch versturen',
 
-        'field_triggerInvoiceEvent' => 'Webshopfactuur status',
+        'field_triggerInvoiceEvent' => 'Bestelling, op basis van webshopfactuur status',
         'option_triggerInvoiceEvent_0' => 'Niet automatisch versturen.',
-        'option_triggerInvoiceEvent_1' => 'Als een factuur van de webwinkel aangemaakt wordt.',
-        'option_triggerInvoiceEvent_2' => 'Als een factuur van de webwinkel naar de klant verzonden wordt.',
+        'option_triggerInvoiceEvent_1' => 'Als een factuur van de webwinkel wordt aangemaakt.',
+        'option_triggerInvoiceEvent_2' => 'Als een factuur van de webwinkel wordt verzonden naar de klant.',
         'desc_triggerInvoiceEvent' => 'U kunt hier kiezen of en bij welke webwinkelfactuur-gebeurtenissen de factuur naar Acumulus wordt verstuurd. Als u voor "Niet automatisch versturen" kiest, kunt u de facturen zelf overzetten m.b.v. het batchformulier of op basis van één of meerdere bestelstatussen.',
+
+        'field_triggerCreditNoteEvent' => 'Creditfactuur',
+        'option_triggerCreditNoteEvent_0' => 'Niet automatisch versturen.',
+        'option_triggerCreditNoteEvent_1' => 'Als de webshop een creditfactuur aanmaakt.',
+        'desc_triggerCreditNoteEvent' => 'U kunt hier kiezen of u de factuur voor een creditfactuur automatisch naar Acumulus wilt versturen. Als u voor "Niet automatisch versturen" kiest, kunt u de facturen zelf overzetten m.b.v. het batchformulier. Merk op dat de aanmaak van een creditfactuur in de webwinkel plaatsvindt voordat de betaalprovider het bedrag daadwerkelijk terugstort.',
 
         // Tokens
         'tokenHelpHeader' => 'Uitleg over veldverwijzingen',
@@ -460,17 +465,22 @@ If you remain under that threshold you may apply Dutch VAT.',
 
         // Trigger settings.
         'triggerSettingsHeader' => 'When to have your invoices sent to Acumulus.',
-        'desc_triggerSettings' => 'This(these) setting(s) determine(s) at what instants the invoice for an order should be sent to Acumulus. If you select multiple instants, the invoice wil be sent as soon as the order reaches one of the selected statuses. Note that an invoice will only be sent once to Acumulus. This extension only uses order data, so you may select any status, the webshop invoice does not already have to be created,unless you want to use the webshop\'s invoice date and number as invoice date and number for the Acumulus invoice. If you select "Do not send automatically" you will have to use the <a href="%s">Acumulus batch send form</a>.',
+        'desc_triggerSettings' => 'This(these) setting(s) determine(s) at what instants the invoice for an order or credit note should be sent to Acumulus. If you select multiple instants, the invoice wil be sent as soon as the order reaches one of the selected statuses. Note that an invoice will only be sent once to Acumulus. This extension only uses order data, so you may select any status, the webshop invoice does not already have to be created,unless you want to use the webshop\'s invoice date and number as invoice date and number for the Acumulus invoice. If you select "Do not send automatically" you will have to use the <a href="%s">Acumulus batch send form</a>.',
 
-        'field_triggerOrderStatus' => 'Order status(es)',
+        'field_triggerOrderStatus' => 'Order',
         'desc_triggerOrderStatus' => 'Using the "Ctrl" key, you can select/deselect multiple items.',
-        'option_empty_triggerOrderStatus' => 'Do not send automatically ',
+        'option_empty_triggerOrderStatus' => 'Do not send automatically.',
 
-        'field_triggerInvoiceEvent' => 'Webshop invoice status',
+        'field_triggerInvoiceEvent' => 'Order, based on webshop invoice',
         'option_triggerInvoiceEvent_0' => 'Do not send automatically.',
         'option_triggerInvoiceEvent_1' => 'When the webshop invoice gets created.',
         'option_triggerInvoiceEvent_2' => 'When the webshop invoice gets sent to the customer.',
         'desc_triggerInvoiceEvent' => 'Select if and on which webshop invoice event to send the invoice to Acumulus. If you select "Do not send automatically" you can use the send batch form, or you can set one or more order statuses above to trigger the sending of the invoice.',
+
+        'field_triggerCreditNoteEvent' => 'Credit Note',
+        'option_triggerCreditNoteEvent_0' => 'Do not send automatically.',
+        'option_triggerCreditNoteEvent_1' => 'When the credit note gets created.',
+        'desc_triggerCreditNoteEvent' => 'Select if to send the invoice for a credit note automatically to Acumulus. If you select "Do not send automatically" you can use the send batch form. Note that creation of the web shop credit note normally takes place before the payment gateway actually refunds the money to your client.',
 
         // Tokens
         'tokenHelpHeader' => 'Explanation of field references',

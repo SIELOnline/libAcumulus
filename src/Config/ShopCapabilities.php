@@ -253,6 +253,37 @@ abstract class ShopCapabilities
     }
 
     /**
+     * Returns an option list of credit note related events.
+     *
+     * This list represents the shop initiated events that may trigger the
+     * sending of a credit invoice to Acumulus.
+     *
+     * This default implementation returns
+     * - PluginConfig::TriggerCreditNoteEvent_None for all shops, and as only
+     *   value for shops that do not support credit notes
+     * - PluginConfig::TriggerCreditNoteEvent_Create for shops that do support
+     *   credit notes (based on {@see getSupportedInvoiceSourceTypes()}).
+     *
+     * @return string[]
+     *   An array of all credit note related events, with the key being the ID
+     *   for the dropdown item, 1 of the {@see \Siel\Acumulus\PluginConfig}
+     *   TriggerCreditNoteEvent_... constants, and the value being the label for
+     *   the dropdown item.
+     */
+    public function getTriggerCreditNoteEventOptions()
+    {
+        $result = array(
+            PluginConfig::TriggerCreditNoteEvent_None => $this->t('option_triggerCreditNoteEvent_0'),
+        );
+
+        if (in_array(Source::CreditNote, $this->getSupportedInvoiceSourceTypes())) {
+            $result[PluginConfig::TriggerCreditNoteEvent_Create] = $this->t('option_triggerCreditNoteEvent_1');
+        }
+
+        return $result;
+    }
+
+    /**
      * Returns a list of valid sources that can be used as invoice number.
      *
      * This may differ per shop as not all shops support invoices as a separate

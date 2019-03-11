@@ -17,7 +17,7 @@ interface PluginConfig
      *
      * @var string
      */
-    const Version = '5.5.4';
+    const Version = '5.6.0-beta1';
 
     /**
      * Format to use with date() and DateTime formatting methods for SQL
@@ -69,4 +69,7 @@ interface PluginConfig
     const TriggerInvoiceEvent_None = 0;
     const TriggerInvoiceEvent_Create = 1;
     const TriggerInvoiceEvent_Send = 2;
+
+    const TriggerCreditNoteEvent_None = 0;
+    const TriggerCreditNoteEvent_Create = 1;
 }

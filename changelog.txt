@@ -20,6 +20,10 @@ WC3 = WooCommerce 3 (WordPress)
 5.6.0 (2019-03-??)
 ------------------
 Bugs:
+- ALL: (but mostly WC) to retrieve vat rates based on vat classes, we normally
+  need a country code. If no country code has been saved in the customer info,
+  this might fail. so "completing" the country code (with nl as default) will
+  now be done directly when retrieving the address data.
 - WC: You can refund a fraction of an article (price) but Woocommerce will still
   store quantity as an integer rounded towards 0 (and thus possibly even 0). We
   now do accept this, but unit prices may be strange, though line totals should

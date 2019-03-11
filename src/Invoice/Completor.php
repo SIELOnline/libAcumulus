@@ -208,7 +208,6 @@ class Completor
         // Completes the invoice with default settings that do not depend on
         // shop specific data.
         $this->fictitiousClient();
-        $this->validateCountryCode();
         $this->validateEmail();
         $this->invoiceTemplate();
 
@@ -395,24 +394,6 @@ class Completor
             $this->invoice[Tag::Customer][Tag::Email] = $customerSettings['genericCustomerEmail'];
             $this->invoice[Tag::Customer][Tag::ContactStatus] = Api::ContactStatus_Disabled;
             $this->invoice[Tag::Customer][Tag::OverwriteIfExists] = Api::OverwriteIfExists_No;
-        }
-    }
-
-    /**
-     * Validates the country code of the invoice.
-     *
-     * Validations performed:
-     * - If empty, NL will be assigned to the country code.
-     *
-     * Validations not performed:
-     * - I do not check against a list of defined country codes as I do not want
-     *   another offline hardcoded list to keep up to date.
-     */
-    protected function validateCountryCode()
-    {
-        // Check country code.
-        if (empty($this->invoice[Tag::Customer][Tag::CountryCode])) {
-            $this->invoice[Tag::Customer][Tag::CountryCode] = 'nl';
         }
     }
 
@@ -744,8 +725,8 @@ class Completor
         // If shop specific code or an event handler has already set the vat
         // type, we don't change it.
         if (empty($this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType])) {
-        	// @todo: if we only have one possible vattype, should we use that,
-	        //   or should we perform all checks to look for contradictory evidence?
+        	// @todo: if we only have one possible vattype, should we use that, or
+	        //   should we perform all checks to look for contradictory evidence?
             $vatTypeInfo = $this->getInvoiceLinesVatTypeInfo();
             $message = '';
             $code = 0;

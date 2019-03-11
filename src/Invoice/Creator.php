@@ -311,6 +311,10 @@ abstract class Creator
         $this->addTokenDefault($customer, Tag::PostalCode, $customerSettings['postalCode']);
         $this->addTokenDefault($customer, Tag::City, $customerSettings['city']);
         $customer[Tag::CountryCode] = $this->countries->convertEuCountryCode($this->invoiceSource->getCountryCode());
+        // Add 'nl' as default country code. As other methods in the creator may
+        // depend on this value being filled, e.g. looking up product vat rates,
+        // we cannot wait until the completion phase, so we add it here.
+        $this->addDefault($customer, Tag::CountryCode, 'nl');
         $this->addDefault($customer, Tag::Country, $this->countries->getCountryName($customer[Tag::CountryCode]));
         $this->addTokenDefault($customer, Tag::Telephone, $customerSettings['telephone']);
         $this->addTokenDefault($customer, Tag::Fax, $customerSettings['fax']);

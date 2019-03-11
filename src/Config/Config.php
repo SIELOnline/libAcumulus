@@ -321,6 +321,7 @@ class Config
      *   A keyed array with the keys:
      *   - triggerOrderStatus
      *   - triggerInvoiceEvent
+     *   - triggerCreditNoteEvent
      *   - sendEmptyInvoice
      */
     public function getShopEventSettings()
@@ -880,7 +881,7 @@ class Config
                 'triggerCreditNoteEvent' => array(
                     'group' => 'event',
                     'type' => 'int',
-                    'default' => PluginConfig::TriggerCreditNoteEvent_None,
+                    'default' => PluginConfig::TriggerCreditNoteEvent_Create,
                 ),
                 'sendEmptyInvoice' => array(
                     'group' => 'event',

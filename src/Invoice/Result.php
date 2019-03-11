@@ -164,7 +164,9 @@ class Result extends WebResult
     {
         switch ($this->sendStatus) {
             case self::NotSent_WrongStatus:
-                $message = 'reason_not_sent_wrongStatus';
+                $message = empty($this->sendStatusArguments)
+                    ? 'reason_not_sent_triggerCreditNoteEvent_None'
+                    : 'reason_not_sent_wrongStatus';
                 break;
             case self::NotSent_AlreadySent:
                 $message = 'reason_not_sent_alreadySent';
@@ -194,11 +196,9 @@ class Result extends WebResult
                 $message = 'reason_sent_testMode';
                 break;
             case self::Sent_New:
-                if (empty($this->sendStatusArguments)) {
-                    $message = 'reason_sent_new';
-                } else {
-                    $message = 'reason_sent_new_status_change';
-                }
+                $message = empty($this->sendStatusArguments)
+                    ? 'reason_sent_new'
+                    : 'reason_sent_new_status_change';
                 break;
             case self::Sent_Forced:
                 $message = 'reason_sent_forced';

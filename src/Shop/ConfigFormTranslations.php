@@ -162,6 +162,7 @@ De eigenschappen die uw webshop kent worden hieronder opgesomd.</p>
         'see_table_more' => 'zie de tabel %1$s voor mogelijke andere velden die als veldverwijzing gebruikt kunnen worden',
         'see_tables_more' => 'zie de tabellen %1$s voor mogelijke andere velden die als veldverwijzing gebruikt kunnen worden',
         'invoice_source' => "een Acumulus specifieke representatie van een bestelling of creditnota.",
+        'original_invoice_source' => "een Acumulus specifieke representatie van een bestelling zelf of de oorspronkelijke bestelling bij een credit nota.",
         'see_above' => 'zie hierboven.',
         'see_source_above' => "zie hierboven bij 'source'.",
         'order_or_refund' => 'De bestelling of creditnota waarvoor de factuur naar Acumulus verzonden wordt.',

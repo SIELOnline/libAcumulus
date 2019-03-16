@@ -21,6 +21,7 @@ class Result extends WebResult
     const NotSent_TriggerInvoiceSentNotEnabled = 0x70;
     const NotSent_LocalErrors = 0x80;
     const NotSent_DryRun = 0x90;
+    const NotSent_TriggerCreditNoteEventNotEnabled = 0xa0;
     const NotSent_Mask = 0xf0;
     // Reason for sending: bits 9 and 10
     const Sent_New = 0x100;

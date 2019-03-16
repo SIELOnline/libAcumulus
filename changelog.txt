@@ -17,6 +17,16 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies, vanaf 5.5.2 is dat all
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
+5.6.1 (2019-03-??)
+------------------
+Bugs:
+- "property source" 'originalInvoiceOrder' in ere hersteld, deze info is af en
+  toe toch nodig. Deze property verwijst nu naar de Acumulus wrapper om de
+  (oorspronkelijke) order heen. NB: deze peroperty bestaat alleen in shops die
+  creditfcturen ondersteunen.
+- Het niet automatisch verzenden van een creditfactuur werd op een misleidende
+  manier gelogd. Dit is nu vebeterd.
+
 5.6.0 (2019-03-13)
 ------------------
 Bugs:

@@ -329,9 +329,11 @@ abstract class InvoiceManager
         if ($invoiceSource->getType() === Source::Order) {
             $doSend = in_array($status, $shopEventSettings['triggerOrderStatus']);
             $arguments = array($status, implode(',', $shopEventSettings['triggerOrderStatus']));
+            $notSendReason = Result::NotSent_WrongStatus;
         } else {
             $doSend = $shopEventSettings['triggerCreditNoteEvent'] === PluginConfig::TriggerCreditNoteEvent_Create;
             $arguments = array();
+            $notSendReason = Result::NotSent_TriggerCreditNoteEventNotEnabled;
         }
         if ($doSend) {
             $result = $this->send($invoiceSource, $result);
@@ -339,7 +341,7 @@ abstract class InvoiceManager
             // the set of statuses on which to send to the log line.
             $result->setSendStatus($result->getSendStatus(), $arguments);
         } else {
-            $result->setSendStatus(Result::NotSent_WrongStatus, $arguments);
+            $result->setSendStatus($notSendReason, $arguments);
         }
         $this->getLog()->notice($this->getSendResultLogText($invoiceSource, $result));
         return $result;

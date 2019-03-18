@@ -234,21 +234,21 @@ class ShopCapabilities extends ShopCapabilitiesBase
     {
         return array(
             // Customer defaults.
-            'contactYourId' => '[customer_user]', // WC_Abstact_order
-            'companyName1' => '[billing_company]', // WC_Abstact_order
-            'fullName' => '[billing_first_name+billing_last_name]', // WC_Abstact_order
-            'address1' => '[billing_address_1]', // WC_Abstact_order
-            'address2' => '[billing_address_2]', // WC_Abstact_order
-            'postalCode' => '[billing_postcode]', // WC_Abstact_order
-            'city' => '[billing_city]', // WC_Abstact_order
+            'contactYourId' => '[customer_user]', // WC_Abstract_order
+            'companyName1' => '[billing_company]', // WC_Abstract_order
+            'fullName' => '[billing_first_name+billing_last_name]', // WC_Abstract_order
+            'address1' => '[billing_address_1]', // WC_Abstract_order
+            'address2' => '[billing_address_2]', // WC_Abstract_order
+            'postalCode' => '[billing_postcode]', // WC_Abstract_order
+            'city' => '[billing_city]', // WC_Abstract_order
             // The EU VAT Number plugin allows customers to indicate their VAT
             // number with which they can apply for the reversed VAT scheme. The
             // vat number is stored under the '_vat_number' meta key, though
             // older versions did so under the 'VAT Number' key.
             // See http://docs.woothemes.com/document/eu-vat-number-2/
             'vatNumber' => '[vat_number|VAT Number]', // Post meta
-            'telephone' => '[billing_phone]', // WC_Abstact_order
-            'email' => '[billing_email]', // WC_Abstact_order
+            'telephone' => '[billing_phone]', // WC_Abstract_order
+            'email' => '[billing_email]', // WC_Abstract_order
 
             // Invoice lines defaults.
             'itemNumber' => '[sku]',

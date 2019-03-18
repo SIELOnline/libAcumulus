@@ -127,39 +127,46 @@ abstract class ShopCapabilities
      */
     public function getTokenInfo()
     {
-        $result = array(
-            'invoiceSource' => array(
-                'more-info' => ucfirst($this->t('invoice_source')),
-                'class' => '\Siel\Acumulus\Invoice\Source',
-                'properties' => array(
-                    'type (' . $this->t(Source::Order) . ' ' . $this->t('or') . ' ' . $this->t(Source::CreditNote) . ')',
-                    'id (' . $this->t('internal_id') . ')',
-                    'reference (' . $this->t('external_id') . ')',
-                    'date',
-                    'status (' . $this->t('internal_not_label') . ')',
-                    'paymentMethod (' . $this->t('internal_not_label') . ')',
-                    'paymentStatus (1: ' . $this->t('payment_status_1') . '; 2: ' . $this->t('payment_status_2') . ')',
-                    'paymentDate',
-                    'countryCode',
-                    'currency',
-                    'invoiceReference (' . $this->t('external_id') . ')',
-                    'invoiceDate',
-                ),
-                'properties-more' => false,
+        $result = array();
+        $result['invoiceSource'] = array(
+            'more-info' => ucfirst($this->t('invoice_source')),
+            'class' => '\Siel\Acumulus\Invoice\Source',
+            'properties' => array(
+                'type (' . $this->t(Source::Order) . ' ' . $this->t('or') . ' ' . $this->t(Source::CreditNote) . ')',
+                'id (' . $this->t('internal_id') . ')',
+                'reference (' . $this->t('external_id') . ')',
+                'date',
+                'status (' . $this->t('internal_not_label') . ')',
+                'paymentMethod (' . $this->t('internal_not_label') . ')',
+                'paymentStatus (1: ' . $this->t('payment_status_1') . '; 2: ' . $this->t('payment_status_2') . ')',
+                'paymentDate',
+                'countryCode',
+                'currency',
+                'invoiceReference (' . $this->t('external_id') . ')',
+                'invoiceDate',
             ),
-            'source' => array_merge(array('more-info' => ucfirst($this->t('order_or_refund'))), $this->getTokenInfoSource()),
+            'properties-more' => false,
         );
         if (array_key_exists(Source::CreditNote, $this->getSupportedInvoiceSourceTypes())) {
-            $result += array(
-                'originalInvoiceSource' => array(
-                    'more-info' => ucfirst($this->t('original_invoice_source')),
-                    'properties' => array(
-                        $this->t('see_source_above'),
-                    ),
-                    'properties-more' => false,
-                ),
-                'refund' => array_merge(array('more-info' => ucfirst($this->t('refund_only'))), $this->getTokenInfoRefund()),
-                'order' => array_merge(array('more-info' => ucfirst($this->t('original_order_for_refund'))), $this->getTokenInfoOrder()),
+            $result['originalInvoiceSource'] = array(
+                'more-info' => ucfirst($this->t('original_invoice_source')),
+                'properties' => array($this->t('see_invoice_source_above')),
+                'properties-more' => false,
+            );
+        }
+        $result['source'] = array_merge(array('more-info' => ucfirst($this->t('order_or_refund'))), $this->getTokenInfoSource());
+        if (array_key_exists(Source::CreditNote, $this->getSupportedInvoiceSourceTypes())) {
+            $result['refund'] = array_merge(array('more-info' => ucfirst($this->t('refund_only'))), $this->getTokenInfoRefund());
+            $result['order'] = array_merge(array('more-info' => ucfirst($this->t('original_order_for_refund'))), $this->getTokenInfoOrder());
+            $result['refundedInvoiceSource'] = array(
+                'more-info' => ucfirst($this->t('original_invoice_source') . ' ' . ucfirst($this->t('refund_only'))),
+                'properties' => array($this->t('see_invoice_source_above')),
+                'properties-more' => false,
+            );
+            $result['refundedOrder'] = array(
+                'more-info' => ucfirst($this->t('original_order_for_refund') . ' ' . ucfirst($this->t('refund_only'))),
+                'properties' => array($this->t('see_order_above')),
+                'properties-more' => false,
             );
         }
         $result += $this->getTokenInfoShopProperties();

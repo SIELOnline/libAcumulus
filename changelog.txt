@@ -20,17 +20,25 @@ WC3 = WooCommerce 3 (WordPress)
 5.6.1 (2019-03-??)
 ------------------
 Bugs:
-- Facturen voor klanten buiten de EU waar gewoon btw wordt geheven kregen niet
-  factuurtype 1 toegewezen.
-- "property source" 'originalInvoiceOrder' in ere hersteld, deze info is af en
-  toe toch nodig. Deze property verwijst nu naar de Acumulus wrapper om de
-  (oorspronkelijke) order heen. NB: deze peroperty bestaat alleen in shops die
-  creditfcturen ondersteunen.
+- ALL: Facturen voor klanten buiten de EU waar gewoon btw wordt geheven kregen
+  niet factuurtype 1 toegewezen.
 
 Features:
-- Het niet automatisch verzenden van een creditfactuur werd niet duidelijk
-  gelogd. Dit is nu vebeterd.
-- Een helptekst over factuurnummers verbeterd.
+- WC/MA/PS: (These are the web shops that do support credit notes.): "Property
+  source" 'originalInvoiceOrder' in ere hersteld. Deze info is af en toe toch
+  nodig. Deze property verwijst nu naar de Acumulus wrapper om de
+  (oorspronkelijke) order heen. NB: deze property bestaat alleen in shops die
+  creditfacturen ondersteunen.
+- WC/MA/PS: (These are the web shops that do support credit notes.): "Property
+  sources" 'refundedInvoceSource' en 'refundedOrder' toegevoegd. In
+  tegenstelling tot de property sources 'originalInvouiceSource' en
+  'originalOrder' hebben deze nieuwe property sources alleen een waarde als het
+  daadwerkelijk een refund betreft.
+- ALL: Standaard waarde voor het veld 'toelichting' bevat voor een creditfactuur
+  nu ook een verwijzing naar de oorspronkelijke bestelling.
+- WC/MA/PS: (These are the web shops that do support credit notes.): Het niet
+  automatisch verzenden van een creditfactuur werd niet duidelijk gelogd.
+- ALL: Een helptekst over factuurnummers verbeterd.
 
 5.6.0 (2019-03-13)
 ------------------

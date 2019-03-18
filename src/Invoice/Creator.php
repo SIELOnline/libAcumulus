@@ -189,16 +189,21 @@ abstract class Creator
      */
     protected function setPropertySources()
     {
-        $this->propertySources = array(
-            'invoiceSource' => $this->invoiceSource,
-            'source' => $this->invoiceSource->getSource(),
-        );
+        $this->propertySources = array();
+        $this->propertySources['invoiceSource'] = $this->invoiceSource;
+        if (array_key_exists(Source::CreditNote, $this->shopCapabilities->getSupportedInvoiceSourceTypes())) {
+            $this->propertySources['originalInvoiceSource'] = $this->invoiceSource->getOrder();
+        }
+        $this->propertySources['source'] = $this->invoiceSource->getSource();
         if (array_key_exists(Source::CreditNote, $this->shopCapabilities->getSupportedInvoiceSourceTypes())) {
             if ($this->invoiceSource->getType() === Source::CreditNote) {
                 $this->propertySources['refund'] = $this->invoiceSource->getSource();
             }
-            $this->propertySources['originalInvoiceSource'] = $this->invoiceSource->getOrder();
             $this->propertySources['order'] = $this->invoiceSource->getOrder()->getSource();
+            if ($this->invoiceSource->getType() === Source::CreditNote) {
+                $this->propertySources['refundedInvoiceSource'] = $this->invoiceSource->getOrder();
+                $this->propertySources['refundedOrder'] = $this->invoiceSource->getOrder()->getSource();
+            }
         }
     }
 

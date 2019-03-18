@@ -801,7 +801,7 @@ class Config
                 'description' => array(
                     'group' => Tag::Invoice,
                     'type' => 'string',
-                    'default' => '[invoiceSource::type] [invoiceSource::reference]',
+                    'default' => '[invoiceSource::type+invoiceSource::reference+"-"+refundedInvoiceSource::type+refundedInvoiceSource::reference]',
                 ),
                 'descriptionText' => array(
                     'group' => Tag::Invoice,
@@ -853,6 +853,7 @@ class Config
                     'type' => 'int',
                     'default' => PluginConfig::MarginProducts_Unknown,
                 ),
+                // @todo: should we also create a 0 rate vat classes?
                 'foreignVatClasses' => array(
                     'group' => 'shop',
                     'type' => 'array',

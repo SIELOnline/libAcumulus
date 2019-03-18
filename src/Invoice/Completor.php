@@ -73,11 +73,11 @@ class Completor
     protected static $vatTypesAllowingVatFree = array(Api::VatType_National, Api::VatType_ForeignVat, Api::VatType_MarginScheme);
 
     /**
-     * A list of vat types that allow 0 vat rates.
+     * A list of vat types that do not charge vat.
      *
      * @var int[]
      */
-    protected static $vatTypesAllowing0Vat = array(Api::VatType_NationalReversed, Api::VatType_EuReversed, Api::VatType_RestOfWorld);
+    protected static $noVatVatTypes = array(Api::VatType_NationalReversed, Api::VatType_EuReversed, Api::VatType_RestOfWorld);
 
 
     /** @var \Siel\Acumulus\Config\Config */
@@ -367,9 +367,10 @@ class Completor
                     $this->log->error('Completor::initPossibleVatRates(): unknown vat type %d', $vatType);
                     break;
             }
-            $vatTypeVatRates = array_map(function ($vatRate) use ($vatType) {
-                return array(Tag::VatRate => $vatRate, Tag::VatType => $vatType);
-            }, $vatTypeVatRates);
+            // convert the list of vat rates to a list of vat rate infos.
+            foreach ($vatTypeVatRates as &$vatRate) {
+                $vatRate = array(Tag::VatRate => $vatRate, Tag::VatType => $vatType);
+            }
             $possibleVatRates = array_merge($possibleVatRates, $vatTypeVatRates);
         }
         $this->possibleVatRates = $possibleVatRates;
@@ -863,7 +864,7 @@ class Completor
                     $freeAndZero = Number::floatsAreEqual($vatRate,-1) && Number::isZero($line[Tag::VatRate]);
                     if ($equal || $zeroAndFree || $freeAndZero) {
                         // We have a possibly matching vat type. Perform some
-                        // additional checks:
+                        // additional checks before we really add it as a match:
                         $doAdd = true;
 
                         // 1) Vat type margin scheme requires a cost price.
@@ -874,12 +875,32 @@ class Completor
                         }
 
                         // 2) If this is a 0 vat rate while the lookup vat rate,
-                        //   if available, is not, it must be a 0-vat vat type.
+                        //   if available, is not, it must be a no vat invoice:
+                        //   - one of the no vat vat types.
+                        //   - vat type national with client outside EU.
                         if ($this->lineHas0VatRate($line) && !empty($line[Meta::VatRateLookup]) && !$this->metaDataHas0VatRate($line[Meta::VatRateLookup])) {
                             // This article is not intrinsically vat free, so
-                            // the vat type must be a "no vat" vat type.
-                            if (!in_array($vatType, static::$vatTypesAllowing0Vat)) {
+                            // the vat type must be a vat type allowing no vat,
+                            // i.e. a no vat vat type or national vat for a
+                            // customer outside the EU.
+                            if (!in_array($vatType, static::$noVatVatTypes) && !($vatType === Api::VatType_National && $this->isOutsideEu())) {
                                 $doAdd = false;
+                            }
+
+                            // If the customer is outside the EU and we do not
+                            // charge vat, goods should get vat type 4 and
+                            // services vat type 1. However, we only look at
+                            // item lines, as services like shipping and packing
+                            // are part of the delivery as a whole and should
+                            // not change the vat type just because they are a
+                            // service.
+                            if ($this->isOutsideEu() && $line[Meta::LineType] === Creator::LineType_OrderItem && !empty($line[Tag::Nature])) {
+                                if ($vatType === Api::VatType_National && $line[Tag::Nature] === Api::Nature_Product) {
+                                    $doAdd = false;
+                                }
+                                if ($vatType === Api::VatType_RestOfWorld && $line[Tag::Nature] === Api::Nature_Service) {
+                                    $doAdd = false;
+                                }
                             }
                         }
 
@@ -899,20 +920,6 @@ class Completor
                         //   do this for item lines.
                         if ($line[Meta::LineType] === Creator::LineType_OrderItem && !empty($line[Meta::VatClassId]) && !$this->isForeignVatClass($line[Meta::VatClassId])) {
                             if ($vatType === Api::VatType_ForeignVat) {
-                                $doAdd = false;
-                            }
-                        }
-
-                        // 5) Outside EU: goods should have vat type 4, services
-                        //   vat type 1. However, we only look at item lines, as
-                        //   services like shipping and packing are part of the
-                        //   delivery as a whole and should not change the vat
-                        //   type.
-                        if ($this->isOutsideEu() && $line[Meta::LineType] === Creator::LineType_OrderItem && !empty($line[Tag::Nature])) {
-                            if ($vatType === Api::VatType_National && $line[Tag::Nature] !== Api::Nature_Service) {
-                                $doAdd = false;
-                            }
-                            if ($vatType === Api::VatType_ForeignVat && $line[Tag::Nature] !== Api::Nature_Product) {
                                 $doAdd = false;
                             }
                         }
@@ -988,8 +995,8 @@ class Completor
      * - Reversed vat invoices, EU or national (vat type = 2 or 3).
      * - Products invoiced outside the EU (vat type = 4).
      * Vat free should be used for:
-     * - Vat free products and services, e.g. care, education (vat type = 1 or
-     *   5).
+     * - Vat free products and services, e.g. care, education (vat type = 1, 5
+     *   or, theoretically, 6).
      * - Services invoiced to companies outside the EU (vat type = 1).
      * - Digital services outside the EU, consumers or companies (vat type = 1).
      *
@@ -1079,7 +1086,7 @@ class Completor
     }
 
     /**
-     * Returns whether $vatRates contains 0 vat rate.
+     * Returns whether $vatRates contains a 0 vat rate.
      *
      * @param float|float[] $vatRates
      *

@@ -49,18 +49,18 @@ interface Meta
      */
     const FieldsCalculated = 'meta-fields-calculated';
     /**
-     * Instruction: whether to recalculate the unitprice when the exact vatrate
-     * is known.
+     * Instruction: if and what price (unitprice or unitpriceinc) to recalculate
+     * when the exact vatrate is known.
      */
-    const RecalculateUnitPrice = 'meta-unitprice-recalculate';
+    const RecalculatePrice = 'meta-recalculate-price';
     /**
-     * Support: whether to the unitprice has been recalculated.
+     * Support: whether the unitprice(inc) has been recalculated.
      */
-    const RecalculatedUnitPrice = 'meta-unitprice-recalculated';
+    const RecalculatedPrice = 'meta-did-recalculate';
     /**
-     * Support: Unitprice as it was before being recalculated.
+     * Support: unitprice(inc) as it was before being recalculated.
      */
-    const UnitPriceOld = 'meta-unitprice-old';
+    const RecalculateOldPrice = 'meta-recalculate-old-price';
     /**
      * Creator -> Completor: (current) vat rate(s) looked up from e.g. the
      * product or shipping settings.

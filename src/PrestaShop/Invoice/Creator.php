@@ -53,7 +53,7 @@ class Creator extends BaseCreator
     /**
      * Precision of amounts stored in PS. In PS you can enter either the price
      * inc or ex vat. The other amount will be calculated and not rounded before
-     * being stored with. So 0.0001 is on the safe side.
+     * being stored. So 0.0001 is on the safe side.
      *
      * @var float
      */

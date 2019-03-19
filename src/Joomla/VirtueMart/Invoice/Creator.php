@@ -67,7 +67,7 @@ class Creator extends BaseCreator
     /**
      * Precision of amounts stored in VM. In VM you can enter either the price
      * inc or ex vat. The other amount will be calculated and stored with 4
-     * digits precision. So 0.0001 is on the pessimistic side.
+     * digits precision. So 0.001 is on the pessimistic side.
      *
      * @var float
      */

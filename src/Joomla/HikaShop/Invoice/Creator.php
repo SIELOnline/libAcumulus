@@ -199,7 +199,7 @@ class Creator extends BaseCreator
                 $shippingInc = (float) $this->order->order_shipping_price;
                 $shippingVat = (float) $this->order->order_shipping_tax;
                 $shippingEx = $shippingInc - $shippingVat;
-                $recalculateUnitPrice = true;
+                $recalculatePrice = Tag::UnitPrice;
                 $vatInfo = $this->getVatRangeTags($shippingVat, $shippingEx, $this->precision, 2 * $this->precision);
 
                 // Add vat lookup meta data.
@@ -248,7 +248,7 @@ class Creator extends BaseCreator
                         Tag::UnitPrice => $shippingEx,
                         Meta::UnitPriceInc => $shippingInc,
                         Meta::PrecisionUnitPriceInc => $this->precision,
-                        Meta::RecalculateUnitPrice => $recalculateUnitPrice,
+                        Meta::RecalculatePrice => $recalculatePrice,
                         Meta::VatAmount => $shippingVat,
                     ) + $vatInfo + $vatLookupMetaData;
             }
@@ -311,7 +311,7 @@ class Creator extends BaseCreator
             $paymentInc = (float) $this->order->order_payment_price;
             $paymentVat = (float) $this->order->order_payment_tax;
             $paymentEx = $paymentInc - $paymentVat;
-            $recalculateUnitPrice = true;
+            $recalculatePrice = Tag::UnitPrice;
             $vatInfo = $this->getVatRangeTags($paymentVat, $paymentEx, $this->precision, 2 * $this->precision);
             $description = $this->t('payment_costs');
 
@@ -342,7 +342,7 @@ class Creator extends BaseCreator
                     Tag::UnitPrice => $paymentEx,
                     Meta::UnitPriceInc => $paymentInc,
                     Meta::PrecisionUnitPriceInc => $this->precision,
-                    Meta::RecalculateUnitPrice => $recalculateUnitPrice,
+                    Meta::RecalculatePrice => $recalculatePrice,
                     Meta::VatAmount => $paymentVat,
                 ) + $vatInfo + $vatLookupMetaData;
         }

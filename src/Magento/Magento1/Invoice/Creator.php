@@ -94,7 +94,7 @@ class Creator extends BaseCreator
             $result += array(
                 Tag::UnitPrice => $productPriceEx,
                 Meta::UnitPriceInc => $productPriceInc,
-                Meta::RecalculateUnitPrice => $this->productPricesIncludeTax(),
+                Meta::RecalculatePrice => $this->productPricesIncludeTax() ? Tag::UnitPrice : Meta::UnitPriceInc,
             );
         }
         $result[Tag::Quantity] = $item->getQtyOrdered();
@@ -186,7 +186,7 @@ class Creator extends BaseCreator
             $result += array(
                 Tag::UnitPrice => $productPriceEx,
                 Meta::UnitPriceInc => $productPriceInc,
-                Meta::RecalculateUnitPrice => $this->productPricesIncludeTax(),
+                Meta::RecalculatePrice => $this->productPricesIncludeTax() ? Tag::UnitPrice : Meta::UnitPriceInc,
                 Meta::LinesVatAmount => $lineVat,
             );
         }
@@ -265,7 +265,7 @@ class Creator extends BaseCreator
                 $result += array(
                         Tag::UnitPrice => $shippingEx,
                         Meta::UnitPriceInc => $shippingInc,
-                        Meta::RecalculateUnitPrice => $this->shippingPricesIncludeTax(),
+                        Meta::RecalculatePrice => $this->shippingPricesIncludeTax() ? Tag::UnitPrice : Meta::UnitPriceInc,
                     ) + $this->getVatRangeTags($shippingVat, $shippingEx, 0.02,$this->shippingPricesIncludeTax() ? 0.02 : 0.01);
                 $result[Meta::FieldsCalculated][] = Meta::VatAmount;
 

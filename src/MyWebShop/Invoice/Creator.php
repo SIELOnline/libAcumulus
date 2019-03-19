@@ -136,7 +136,7 @@ class Creator extends BaseCreator
             $result += array(
                 Tag::UnitPrice => $productPriceEx,
                 Meta::UnitPriceInc => $productPriceInc,
-                Meta::RecalculateUnitPrice => $productPricesIncludeTax,
+                Meta::RecalculatePrice => $productPricesIncludeTax ? Tag::UnitPrice : Meta::UnitPriceInc,
             );
         }
         $result[Tag::Quantity] = $quantity;

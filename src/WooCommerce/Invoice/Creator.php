@@ -136,7 +136,7 @@ class Creator extends BaseCreator
                 Tag::UnitPrice => $productPriceEx,
                 Meta::UnitPriceInc => $productPriceInc,
                 Meta::PrecisionUnitPriceInc => $precisionInc,
-                Meta::RecalculateUnitPrice => $recalculateUnitPrice,
+                Meta::RecalculatePrice => $recalculateUnitPrice ? Tag::UnitPrice : Meta::UnitPriceInc,
             );
         }
 

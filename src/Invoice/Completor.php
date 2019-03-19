@@ -969,7 +969,7 @@ class Completor
                     $line[Tag::CostPrice] = 0.0;
                 }
                 // Add "marker" tag (for debug purposes) for this correction.
-                $line[Meta::UnitPriceOld] = $line[Tag::UnitPrice];
+                $line[Meta::RecalculateOldPrice] = $line[Tag::UnitPrice];
                 // Change unitprice tag to include VAT.
                 if (isset($line[Meta::UnitPriceInc])) {
                     $line[Tag::UnitPrice] = $line[Meta::UnitPriceInc];

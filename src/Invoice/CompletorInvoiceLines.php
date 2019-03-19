@@ -650,17 +650,17 @@ class CompletorInvoiceLines
     }
 
     /**
-     * Recalculates the unit price for lines that indicate so.
+     * Recalculates the unitprice(inc) for lines that indicate so.
      *
      * All non strategy invoice lines have unitprice and vatrate filled in and
-     * should by now have correct(ed) VAT rates. In some shops the unit price is
-     * imprecise because they are based on prices entered including vat and are
-     * returned rounded to the cent.
+     * should by now have correct(ed) VAT rates. In some shops the unitprice or
+     * unitpriceinc is imprecise because they are based on prices entered
+     * including vat (resp. excluding vat) and are returned rounded to the cent.
      *
-     * To prevent differences between the Acumulus and shop invoice we recompute
-     * the unit price if:
+     * To prevent differences between the Acumulus and shop invoice (or between
+     * the invoice and line totals) we recompute the unitprice(inc) if:
      * - vatrate is correct
-     * - meta-recalculate-unitprice is true
+     * - meta-recalculate-price is set (Tag::UnitPrice or Meta:UnitPriceInc)
      * - unitpriceinc is available
      *
      * @param array[] $lines
@@ -672,10 +672,17 @@ class CompletorInvoiceLines
     protected function recalculateLineData(array $lines)
     {
         foreach ($lines as &$line) {
-            if (!empty($line[Meta::RecalculateUnitPrice]) && Completor::isCorrectVatRate($line[Meta::VatRateSource]) && isset($line[Meta::UnitPriceInc])) {
-                $line[Meta::UnitPriceOld] = $line[Tag::UnitPrice];
-                $line[Tag::UnitPrice] = $line[Meta::UnitPriceInc] / (100 + $line[Tag::VatRate]) * 100;
-                $line[Meta::RecalculatedUnitPrice] = true;
+            if (!empty($line[Meta::RecalculatePrice]) && Completor::isCorrectVatRate($line[Meta::VatRateSource]) && isset($line[Meta::UnitPriceInc])) {
+                if ($line[Meta::RecalculatePrice] === Tag::UnitPrice) {
+                    $line[Meta::RecalculateOldPrice] = $line[Tag::UnitPrice];
+                    $line[Tag::UnitPrice] = $line[Meta::UnitPriceInc] / (100 + $line[Tag::VatRate]) * 100;
+                    $line[Meta::RecalculatedPrice] = true;
+                } else {
+                    // $line[Meta::RecalculateUnitPrice] === Meta::UnitPriceInc
+                    $line[Meta::RecalculateOldPrice] = $line[Meta::UnitPriceInc];
+                    $line[Meta::UnitPriceInc] = (1 + $line[Tag::VatRate] / 100) * $line[Tag::UnitPrice];
+                    $line[Meta::RecalculatedPrice] = true;
+                }
             }
         }
         return $lines;

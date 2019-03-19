@@ -24,6 +24,7 @@ Bugs:
   niet factuurtype 1 toegewezen.
 
 Features:
+- ALL: Recalculate unitpriceinc to get accurate line totals.
 - WC/MA/PS: (These are the web shops that do support credit notes.): "Property
   source" 'originalInvoiceOrder' in ere hersteld. Deze info is af en toe toch
   nodig. Deze property verwijst nu naar de Acumulus wrapper om de

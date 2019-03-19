@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\Magento\Magento2\Invoice;
 
+use Magento\Framework\App\ObjectManager;
 use Magento\Sales\Model\Order\Creditmemo\Item as CreditmemoItem;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Magento\Invoice\Creator as BaseCreator;
@@ -208,7 +209,8 @@ class Creator extends BaseCreator
         }
 
         // Add vat meta data.
-        $product = \Magento\Framework\App\ObjectManager::getInstance()->create(\Magento\Catalog\Model\Product::class);
+        /** @noinspection PhpFullyQualifiedNameUsageInspection */
+        $product = ObjectManager::getInstance()->create(\Magento\Catalog\Model\Product::class);
         $product->getResource()->load($product, $item->getProductId());
         if ($product->getId()) {
             /** @noinspection PhpUndefinedMethodInspection */
@@ -315,7 +317,8 @@ class Creator extends BaseCreator
         if ($taxClassId) {
             $result[Meta::VatClassId] = $taxClassId;
             /** @var \Magento\Tax\Model\ClassModel $taxClass */
-            $taxClass = \Magento\Framework\App\ObjectManager::getInstance()->create(\Magento\Tax\Model\ClassModel::class);
+            /** @noinspection PhpFullyQualifiedNameUsageInspection */
+            $taxClass = ObjectManager::getInstance()->create(\Magento\Tax\Model\ClassModel::class);
             $taxClass->getResource()->load($taxClass, $taxClassId);
             $result[Meta::VatClassName] = $taxClass->getClassName();
         }

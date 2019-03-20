@@ -22,6 +22,8 @@ WC3 = WooCommerce 3 (WordPress)
 Bugs:
 - ALL: Facturen voor klanten buiten de EU waar gewoon btw wordt geheven kregen
   niet factuurtype 1 toegewezen.
+- MA: kolom 'updated' van tabel 'acumulus_entry' kreeg geen waarde. Niet bij
+  toevoegen en niet bij updaten.
 
 Features:
 - ALL: Recalculate unitpriceinc to get accurate line totals.
@@ -1288,8 +1290,8 @@ OpenCart 3.x
 OpenCart 2.x
 ------------
 * 2.3.0.2
-* 2.2.0.0 (t/m library versie 8.4.1)
-* 2.1.0.1 (t/m library versie 8.4.1)
+* 2.2.0.0 (t/m library versie 5.4.1)
+* 2.1.0.1 (t/m library versie 5.4.1)
 
 
 OpenCart 1.x

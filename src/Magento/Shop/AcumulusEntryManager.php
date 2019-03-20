@@ -79,13 +79,15 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     protected function insert(Source $invoiceSource, $entryId, $token, $created)
     {
         /** @noinspection PhpUnhandledExceptionInspection */
-        $entry = $this
+        $record = $this
             ->getModel()
             ->setEntryId($entryId)
             ->setToken($token)
             ->setSourceType($invoiceSource->getType())
-            ->setSourceId($invoiceSource->getId());
-        return $this->getResourceModel()->save($entry);
+            ->setSourceId($invoiceSource->getId())
+            ->setUpdated($created
+            );
+        return $this->getResourceModel()->save($record);
     }
 
     /**
@@ -95,12 +97,13 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      */
     protected function update(BaseAcumulusEntry $entry, $entryId, $token, $updated)
     {
-        /** @var \Siel_Acumulus_Model_Entry|\Siel\AcumulusMa2\Model\Entry $entry */
-        $entry = $entry
+        /** @var \Siel_Acumulus_Model_Entry|\Siel\AcumulusMa2\Model\Entry $record */
+        $record = $entry
             ->getRecord()
             ->setEntryId($entryId)
-            ->setToken($token);
-        return $this->getResourceModel()->save($entry);
+            ->setToken($token)
+            ->setUpdated($updated);
+        return $this->getResourceModel()->save($record);
     }
 
     /**
@@ -109,7 +112,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     public function delete(BaseAcumulusEntry $entry)
     {
         $result = true;
-        /** @var \Siel_Acumulus_Model_Entry[]|\Siel\AcumulusMa2\Model\Entry[] $record */
+        /** @var \Siel_Acumulus_Model_Entry|\Siel\AcumulusMa2\Model\Entry $record */
         $record = $entry->getRecord();
         try {
             $this->getResourceModel()->delete($record);

@@ -17,7 +17,7 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies, vanaf 5.5.2 is dat all
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
-5.6.1 (2019-03-??)
+5.6.1 (2019-04-??)
 ------------------
 Bugs:
 - ALL: Facturen voor klanten buiten de EU waar gewoon btw wordt geheven kregen
@@ -26,6 +26,7 @@ Bugs:
   toevoegen en niet bij updaten.
 
 Features:
+- WC: Added more support for WC_Bookings (resource info is now available).
 - ALL: Recalculate unitpriceinc to get accurate line totals.
 - WC/MA/PS: (These are the web shops that do support credit notes.): "Property
   source" 'originalInvoiceOrder' in ere hersteld. Deze info is af en toe toch

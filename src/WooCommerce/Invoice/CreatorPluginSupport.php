@@ -80,6 +80,10 @@ class CreatorPluginSupport
                     // be added as a property source.
                     $booking = new WC_Booking(reset($booking_ids));
                     $creator->addPropertySource('booking', $booking);
+                    $resource = $booking->get_resource();
+                    if ($resource) {
+                        $creator->addPropertySource('resource', $resource);
+                    }
                 }
             }
         }
@@ -94,6 +98,7 @@ class CreatorPluginSupport
      */
     public function getItemLineAfterBookings(Creator $creator)
     {
+        $creator->removePropertySource('resource');
         $creator->removePropertySource('booking');
     }
 

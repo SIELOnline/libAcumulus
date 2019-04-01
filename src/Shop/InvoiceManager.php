@@ -469,7 +469,9 @@ abstract class InvoiceManager
      *
      * After sending the invoice:
      * - A successful result gets saved to the acumulus entries table.
-     * - The invoice sent event gets triggered
+     * - If the sent was forced and an older submission exists, it will be
+     *   deleted from Acumulus.
+     * - The invoice sent event gets triggered.
      * - A mail with the results may be sent.
      *
      * @param \Siel\Acumulus\Invoice\Source $invoiceSource

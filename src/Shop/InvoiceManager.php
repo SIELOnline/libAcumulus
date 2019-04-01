@@ -413,17 +413,27 @@ abstract class InvoiceManager
      */
     protected function send(Source $invoiceSource, Result $result, $forceSend = false, $dryRun = false)
     {
+        $acumulusEntry = null;
         if ($this->isTestMode()) {
             $result->setSendStatus(Result::Sent_TestMode);
-        } elseif ($this->getAcumulusEntryManager()->getByInvoiceSource($invoiceSource) === null) {
+        } elseif (($acumulusEntry = $this->getAcumulusEntryManager()->getByInvoiceSource($invoiceSource)) === null) {
             $result->setSendStatus(Result::Sent_New);
         } elseif ($forceSend) {
             $result->setSendStatus(Result::Sent_Forced);
+        } elseif ($acumulusEntry->hasLockExpired()) {
+            $result->setSendStatus(Result::Sent_LockExpired);
+        } elseif ($acumulusEntry->isSendingLocked()) {
+            $result->setSendStatus(Result::NotSent_AlreadySending);
         } else {
             $result->setSendStatus(Result::NotSent_AlreadySent);
         }
 
-        if ($result->getSendStatus() !== Result::NotSent_AlreadySent) {
+        // @todo: delete expired lock (on sent_new and hasLockExpired()), set
+        //   lock (on sent_new).
+        // @todo: before or after creating and completing? (not on dry run, so
+        //   probably around or in doSend(). New method lockAndSend()?
+
+        if (($result->getSendStatus() & Result::Sent_Mask) !== 0) {
             $invoice = $this->getCreator()->create($invoiceSource);
 
             // Do not send 0-amount invoices, if set so.

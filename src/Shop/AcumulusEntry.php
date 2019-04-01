@@ -1,6 +1,9 @@
 <?php
 namespace Siel\Acumulus\Shop;
 
+use DateTime;
+use Siel\Acumulus\PluginConfig;
+
 /**
  * Ties webshop orders or credit notes to entries in Acumulus.
  *
@@ -29,6 +32,15 @@ class AcumulusEntry
     static protected $keySourceId = 'source_id';
     static protected $keyCreated = 'created';
     static protected $keyUpdated = 'updated';
+
+    // The format of the created and updated timestamps, when saved as a string.
+    static protected $timestampFormat = PluginConfig::TimeStampFormat_Sql;
+
+    // Constants to enable some kind of locking and thereby preventing sending
+    // invoices twice.
+    static protected $maxLockTime = 10;
+    const lockEntryId = 1;
+    const lockToken = 'Send locked, delete if too old';
 
     /**
      * @var array|object
@@ -98,23 +110,60 @@ class AcumulusEntry
     /**
      * Returns the time when this record was created.
      *
-     * @return string
+     * @param bool $raw
+     *   Whether to return the raw value as stored in the database, or a
+     *   Datetime object. The raw value will differ per webshop.
+     *
+     * @return string|int|\DateTime
      *   The timestamp when this record was created.
      */
-    public function getCreated()
+    public function getCreated($raw = false)
     {
-        return $this->get(static::$keyCreated);
+        $result = $this->get(static::$keyCreated);
+        if (!$raw) {
+            $result = $this->toDateTime($result);
+        }
+        return $result;
     }
 
     /**
      * Returns the time when this record was last updated.
      *
-     * @return string
+     * @param bool $raw
+     *   Whether to return the raw value as stored in the database, or a
+     *   Datetime object. The raw value will differ per webshop.
+     *
+     * @return string|int|\DateTime
      *   The timestamp when this record was last updated.
      */
-    public function getUpdated()
+    public function getUpdated($raw = false)
     {
-        return $this->get(static::$keyUpdated);
+        $result = $this->get(static::$keyUpdated);
+        if (!$raw) {
+            $result = $this->toDateTime($result);
+        }
+        return $result;
+    }
+
+    /** @noinspection PhpDocMissingThrowsInspection
+     *
+     * Returns a DateTime object based on the timestamp in database format.
+     *
+     * @param int|string $timestamp
+     *
+     * @return bool|\DateTime
+     */
+    protected function toDateTime($timestamp)
+    {
+        if (is_numeric($timestamp)) {
+            // Unix timestamp.
+            $result = new DateTime();
+            $result->setTimestamp($timestamp);
+        } else {
+            // Formatted timestamp, e.g. yyyy-mm-dd hh:mm:ss.
+            $result = DateTime::createFromFormat(static::$timestampFormat, $timestamp);
+        }
+        return $result;
     }
 
     /**
@@ -166,5 +215,34 @@ class AcumulusEntry
             }
         }
         return $value;
+    }
+
+    /**
+     * Returns whether another process has already started sending the invoice.
+     *
+     * This method just indicates if there is a "lock" on the entry, even if
+     * that lock already has expired. So normally you also want to check
+     * hasLockExpired().
+     *
+     * @return bool
+     *   True if another process has already started sending the invoice, false
+     *   otherwise.
+     */
+    public function isSendingLocked()
+    {
+        return $this->getEntryId() === static::$lockEntryId && $this->getToken() === static::$lockToken;
+    }
+
+    /** @noinspection PhpDocMissingThrowsInspection
+     *
+     * Returns whether there is a lock on sending the invoice, but has expired.
+     *
+     * @return bool
+     *   True if the entry indicates that there is a lock on sending the
+     *   invoice, but has expired, false otherwise.
+     */
+    public function hasLockExpired()
+    {
+        return $this->isSendingLocked() && time() - $this->getCreated()->getTimestamp() > static::$maxLockTime;
     }
 }

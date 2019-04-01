@@ -17,6 +17,15 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies, vanaf 5.5.2 is dat all
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
+5.7.0 (2019-04-??)
+------------------
+Features:
+- ALL: Prevent sending an invoice twice at the same moment. Some online payment
+  methods can trigger multiple status updates within a short time interval,
+  possibly triggering sending the invoice a 2nd time while the 1st is still
+  being executed. We are adding measures to prevent and, if it still occurs,
+  recognise this situation, so we can warn about it.
+
 5.6.1 (2019-04-01)
 ------------------
 Bugs:

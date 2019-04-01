@@ -22,12 +22,14 @@ class Result extends WebResult
     const NotSent_LocalErrors = 0x80;
     const NotSent_DryRun = 0x90;
     const NotSent_TriggerCreditNoteEventNotEnabled = 0xa0;
+    const NotSent_AlreadySending = 0xb0;
     const NotSent_Mask = 0xf0;
-    // Reason for sending: bits 9 and 10
+    // Reason for sending: bits 9 to 11.
     const Sent_New = 0x100;
     const Sent_Forced = 0x200;
     const Sent_TestMode = 0x300;
-    const Sent_Mask = 0x300;
+    const Sent_LockExpired = 0x400;
+    const Sent_Mask = 0x700;
 
     private static $translationsLoaded = false;
 
@@ -172,6 +174,9 @@ class Result extends WebResult
             case self::NotSent_AlreadySent:
                 $message = 'reason_not_sent_alreadySent';
                 break;
+            case self::NotSent_AlreadySending:
+                $message = 'reason_not_sent_alreadySending';
+                break;
             case self::NotSent_EventInvoiceCreated:
                 $message = 'reason_not_sent_prevented_invoiceCreated';
                 break;
@@ -200,6 +205,9 @@ class Result extends WebResult
                 $message = empty($this->sendStatusArguments)
                     ? 'reason_sent_new'
                     : 'reason_sent_new_status_change';
+                break;
+            case self::Sent_LockExpired:
+                $message = 'reason_sent_lock_expired';
                 break;
             case self::Sent_Forced:
                 $message = 'reason_sent_forced';

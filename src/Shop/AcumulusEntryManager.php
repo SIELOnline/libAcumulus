@@ -87,6 +87,25 @@ abstract class AcumulusEntryManager
     }
 
     /**
+     * Locks an invoice source for sending twice.
+     *
+     * To prevent two processes or threads to send an invoice twice, the sending
+     * process sets a lock on the invoiceSource by already creating an
+     * AcumulusEntry for it before starting to send. That record will contain
+     * some special values by which it can be recognised as a lock instead of as
+     * a reference to a real entry in Acumulus.
+     *
+     * @param \Siel\Acumulus\Invoice\Source $invoiceSource
+     *
+     * @return bool
+     *   Whether the lock was successfully acquired.
+     */
+    public function lockForSending(Source $invoiceSource)
+    {
+        return $this->insert($invoiceSource, AcumulusEntry::lockEntryId, AcumulusEntry::lockToken, $this->sqlNow());
+    }
+
+    /**
      * Saves the Acumulus entry for the given order in the web shop's database.
      *
      * This default implementation calls getByInvoiceSource() to determine

@@ -996,15 +996,15 @@ class InvoiceStatusOverviewForm extends Form
     }
 
     /**
-     * Returns a locale aware formatted date.
+     * Returns a formatted date.
      *
-     * @param int $timestamp
+     * @param \DateTime $date
      *
      * @return string
      */
-    private function getDate($timestamp)
+    private function getDate($date)
     {
-        return date(API::DateFormat_Iso, $timestamp);
+        return $date->format(API::DateFormat_Iso);
     }
 
     /**

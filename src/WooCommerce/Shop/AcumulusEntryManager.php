@@ -126,7 +126,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         // should not update with the same value as that also returns false ...!
         $result1 = $entry->getEntryId() !== $entryId ? update_post_meta($postId, static::$keyEntryId, $entryId) : true;
         $result2 = $entry->getToken() !== $token ? update_post_meta($postId, static::$keyToken, $token) : true;
-        $result3 = $entry->getUpdated() != $updated ? update_post_meta($postId, static::$keyUpdated, $updated) : true;
+        $result3 = $entry->getUpdated(true) != $updated ? update_post_meta($postId, static::$keyUpdated, $updated) : true;
         return $result1 !== false && $result2 !== false && $result3 !== false;
     }
 

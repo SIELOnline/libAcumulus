@@ -25,11 +25,11 @@ class Result extends WebResult
     const NotSent_AlreadySending = 0xb0;
     const NotSent_Mask = 0xf0;
     // Reason for sending: bits 9 to 11.
-    const Sent_New = 0x100;
-    const Sent_Forced = 0x200;
-    const Sent_TestMode = 0x300;
-    const Sent_LockExpired = 0x400;
-    const Sent_Mask = 0x700;
+    const Send_New = 0x100;
+    const Send_Forced = 0x200;
+    const Send_TestMode = 0x300;
+    const Send_LockExpired = 0x400;
+    const Send_Mask = 0x700;
 
     private static $translationsLoaded = false;
 
@@ -106,7 +106,7 @@ class Result extends WebResult
      */
     public function hasBeenSent()
     {
-        return ($this->sendStatus & self::Sent_Mask) !== 0;
+        return ($this->sendStatus & self::Send_Mask) !== 0;
     }
 
     /**
@@ -198,18 +198,18 @@ class Result extends WebResult
             case self::NotSent_DryRun:
                 $message = 'reason_not_sent_dry_run';
                 break;
-            case self::Sent_TestMode:
+            case self::Send_TestMode:
                 $message = 'reason_sent_testMode';
                 break;
-            case self::Sent_New:
+            case self::Send_New:
                 $message = empty($this->sendStatusArguments)
                     ? 'reason_sent_new'
                     : 'reason_sent_new_status_change';
                 break;
-            case self::Sent_LockExpired:
+            case self::Send_LockExpired:
                 $message = 'reason_sent_lock_expired';
                 break;
-            case self::Sent_Forced:
+            case self::Send_Forced:
                 $message = 'reason_sent_forced';
                 break;
             default:

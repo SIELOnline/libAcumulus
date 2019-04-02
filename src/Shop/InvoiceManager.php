@@ -415,13 +415,13 @@ abstract class InvoiceManager
     {
         $acumulusEntry = null;
         if ($this->isTestMode()) {
-            $result->setSendStatus(Result::Sent_TestMode);
+            $result->setSendStatus(Result::Send_TestMode);
         } elseif (($acumulusEntry = $this->getAcumulusEntryManager()->getByInvoiceSource($invoiceSource)) === null) {
-            $result->setSendStatus(Result::Sent_New);
+            $result->setSendStatus(Result::Send_New);
         } elseif ($forceSend) {
-            $result->setSendStatus(Result::Sent_Forced);
+            $result->setSendStatus(Result::Send_Forced);
         } elseif ($acumulusEntry->hasLockExpired()) {
-            $result->setSendStatus(Result::Sent_LockExpired);
+            $result->setSendStatus(Result::Send_LockExpired);
         } elseif ($acumulusEntry->isSendingLocked()) {
             $result->setSendStatus(Result::NotSent_AlreadySending);
         } else {
@@ -433,7 +433,7 @@ abstract class InvoiceManager
         // @todo: before or after creating and completing? (not on dry run, so
         //   probably around or in doSend(). New method lockAndSend()?
 
-        if (($result->getSendStatus() & Result::Sent_Mask) !== 0) {
+        if (($result->getSendStatus() & Result::Send_Mask) !== 0) {
             $invoice = $this->getCreator()->create($invoiceSource);
 
             // Do not send 0-amount invoices, if set so.
@@ -501,7 +501,7 @@ abstract class InvoiceManager
         // that from Acumulus upon success.
         $deleteOldEntry = false;
         $acumulusEntryManager = $this->getAcumulusEntryManager();
-        if ($result->getSendStatus() === Result::Sent_Forced) {
+        if ($result->getSendStatus() === Result::Send_Forced) {
             $oldEntry = $acumulusEntryManager->getByInvoiceSource($invoiceSource);
         }
 

@@ -26,6 +26,9 @@ Features:
   being executed. We are adding measures to prevent and, if it still occurs,
   recognise this situation, so we can warn about it.
 
+Refactoring:
+- Renamed Result::Sent_... constants to Result::Send_.
+
 5.6.1 (2019-04-01)
 ------------------
 Bugs:

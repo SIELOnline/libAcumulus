@@ -73,7 +73,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    public function getByInvoiceSource(Source $invoiceSource)
+    public function getByInvoiceSource(Source $invoiceSource, $ignoreLock = true)
     {
         $result = null;
         $invoiceSourceType = $invoiceSource->getType();
@@ -90,7 +90,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
                     // are not stored in the meta data.
                     $postMeta[static::$keySourceType] = $invoiceSourceType;
                     $postMeta[static::$keySourceId] = $invoiceSourceId;
-                    $result = $this->container->getAcumulusEntry($postMeta);
+                    $result = $this->convertDbResultToAcumulusEntries(array($postMeta), $ignoreLock);
                 }
             } else {
                 $this->log->error('InvoiceManager::getByInvoiceSource(%s %d): unknown post type %s', $invoiceSourceType, $invoiceSourceId, empty($post->post_type) ? 'no post type' : $post->post_type);

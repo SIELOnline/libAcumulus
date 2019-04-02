@@ -23,7 +23,7 @@ class ResultTranslations extends TranslationCollection
         'reason_not_sent_wrongStatus' => 'verkeerde status: %1$s niet in [%2$s]',
         'reason_not_sent_triggerCreditNoteEvent_None' => 'optie om creditfactuur automatisch te verzenden niet aangezet',
         'reason_not_sent_alreadySent' => 'is al eerder verzonden',
-        'reason_not_sent_alreadySending' => 'dubbele verzending',
+        'reason_not_sent_alreadySending' => 'andere verzending aan de gang',
         'reason_not_sent_prevented_invoiceCreated' => 'verzenden tegengehouden door het event "AcumulusInvoiceCreated"',
         'reason_not_sent_prevented_invoiceCompleted' => 'verzenden tegengehouden door het event "AcumulusInvoiceSendBefore"',
         'reason_not_sent_empty_invoice' => '0-bedrag factuur',

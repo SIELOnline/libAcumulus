@@ -54,32 +54,48 @@ abstract class AcumulusEntryManager
      *
      * @param \Siel\Acumulus\Invoice\Source $invoiceSource
      *   The source object for which the invoice was created.
+     * @param bool $ignoreLock
+     *   Whether to return an entry that serves as a send lock (false) or ignore
+     *   it (true)
      *
      * @return \Siel\Acumulus\Shop\AcumulusEntry|null
      *   Acumulus entry record for the given invoice source or null if no
      *   invoice has yet been created in Acumulus for this invoice source.
      */
-    abstract public function getByInvoiceSource(Source $invoiceSource);
+    abstract public function getByInvoiceSource(Source $invoiceSource, $ignoreLock = true);
 
     /**
      * Converts the results of a DB query to AcumulusEntries.
      *
      * @param object|array[]|object[] $result
+     *   The DB query result.
+     * @param bool $ignoreLock
+     *   Whether to return an entry that serves as a send lock (false) or ignore
+     *   it (true)
      *
      * @return \Siel\Acumulus\Shop\AcumulusEntry|\Siel\Acumulus\Shop\AcumulusEntry[]|null
      */
-    protected function convertDbResultToAcumulusEntries($result)
+    protected function convertDbResultToAcumulusEntries($result, $ignoreLock = true)
     {
         if (empty($result)) {
             $result = null;
         } elseif (is_object($result)) {
             $result = $this->container->getAcumulusEntry($result);
+            if ($ignoreLock && $result->isSendLock()) {
+                $result = null;
+            }
         } else {
             // It's a non empty array of results.
             foreach ($result as &$record) {
                 $record = $this->container->getAcumulusEntry($record);
+                if ($ignoreLock && $record->isSendLock()) {
+                    $record = null;
+                }
             }
-            if (count($result) === 1) {
+            array_filter($result);
+            if (empty($result)) {
+                $result = null;
+            } elseif (count($result) === 1) {
                 $result = reset($result);
             }
         }
@@ -96,6 +112,7 @@ abstract class AcumulusEntryManager
      * a reference to a real entry in Acumulus.
      *
      * @param \Siel\Acumulus\Invoice\Source $invoiceSource
+     *   The invoice source to set and acquire a lock on.
      *
      * @return bool
      *   Whether the lock was successfully acquired.
@@ -103,6 +120,36 @@ abstract class AcumulusEntryManager
     public function lockForSending(Source $invoiceSource)
     {
         return $this->insert($invoiceSource, AcumulusEntry::lockEntryId, AcumulusEntry::lockToken, $this->sqlNow());
+    }
+
+    /**
+     * Deletes the lock for sending on the given invoice source.
+     *
+     * @param Source $invoiceSource
+     *   The invoice source to delete the lock for.
+     *
+     * @return int
+     *   One of the AcumulusEntry::Lock_... constants describing the status of
+     *   the lock.
+     */
+    public function deleteLock(Source $invoiceSource)
+    {
+        $entry = $this->getByInvoiceSource($invoiceSource, false);
+        if ($entry === null) {
+            // - The process that had the lock may have failed sending the
+            //   invoice to Acumulus and has removed the lock (e.g. a connection
+            //   timeout, with the timeout being longer than our lock expiry).
+            // - Yet another process already cleared the lock.
+            return AcumulusEntry::Lock_NoLongerExists;
+        }
+        if ($entry->isSendLock()) {
+            // The lock is still there: remove it.
+            $this->delete($entry);
+            return AcumulusEntry::Lock_Deleted;
+        }
+        // The AcumulusEntry became a real entry: apparently the process that
+        // had the lock, successfully finished sending the invoice after all.
+        return AcumulusEntry::Lock_BecameRealEntry;
     }
 
     /**
@@ -128,7 +175,7 @@ abstract class AcumulusEntryManager
     public function save(Source $invoiceSource, $entryId, $token)
     {
         $now = $this->sqlNow();
-        $record = $this->getByInvoiceSource($invoiceSource);
+        $record = $this->getByInvoiceSource($invoiceSource, false);
         if ($record === null) {
             $result = $this->insert($invoiceSource, $entryId, $token, $now);
         } else {
@@ -194,7 +241,7 @@ abstract class AcumulusEntryManager
     public function deleteByEntryId($entryId)
     {
         $entryId = (int) $entryId;
-        if ($entryId >= 1) {
+        if ($entryId >= 2) {
             $entry = $this->getByEntryId($entryId);
             if ($entry instanceof AcumulusEntry) {
                 return $this->delete($entry);

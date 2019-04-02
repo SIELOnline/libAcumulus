@@ -58,7 +58,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    public function getByInvoiceSource(Source $invoiceSource)
+    public function getByInvoiceSource(Source $invoiceSource, $ignoreLock = true)
     {
         /** @var \Siel_Acumulus_Model_Entry|\Siel\AcumulusMa2\Model\Entry $result */
         /** @noinspection PhpUnhandledExceptionInspection */
@@ -68,7 +68,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
             ->addFieldToFilter('source_type', $invoiceSource->getType())
             ->addFieldToFilter('source_id', $invoiceSource->getId())
             ->getItems();
-        return $this->convertDbResultToAcumulusEntries($result);
+        return $this->convertDbResultToAcumulusEntries($result, $ignoreLock);
     }
 
     /**

@@ -59,7 +59,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    public function getByInvoiceSource(Source $invoiceSource)
+    public function getByInvoiceSource(Source $invoiceSource, $ignoreLock = true)
     {
         // @todo
     }

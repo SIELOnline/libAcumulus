@@ -47,11 +47,11 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    public function getByInvoiceSource(Source $invoiceSource)
+    public function getByInvoiceSource(Source $invoiceSource, $ignoreLock = true)
     {
         $table = $this->newTable();
         $result = $table->load(array('source_type' => $invoiceSource->getType(), 'source_id' => $invoiceSource->getId()), true);
-        return $result ? $this->convertDbResultToAcumulusEntries($table) : null;
+        return $result ? $this->convertDbResultToAcumulusEntries($table, $ignoreLock) : null;
     }
 
     /**

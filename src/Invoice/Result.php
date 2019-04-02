@@ -22,7 +22,7 @@ class Result extends WebResult
     const NotSent_LocalErrors = 0x80;
     const NotSent_DryRun = 0x90;
     const NotSent_TriggerCreditNoteEventNotEnabled = 0xa0;
-    const NotSent_AlreadySending = 0xb0;
+    const NotSent_LockedForSending = 0xb0;
     const NotSent_Mask = 0xf0;
     // Reason for sending: bits 9 to 11.
     const Send_New = 0x100;
@@ -174,7 +174,7 @@ class Result extends WebResult
             case self::NotSent_AlreadySent:
                 $message = 'reason_not_sent_alreadySent';
                 break;
-            case self::NotSent_AlreadySending:
+            case self::NotSent_LockedForSending:
                 $message = 'reason_not_sent_alreadySending';
                 break;
             case self::NotSent_EventInvoiceCreated:

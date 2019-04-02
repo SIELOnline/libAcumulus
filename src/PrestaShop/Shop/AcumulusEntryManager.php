@@ -58,7 +58,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    public function getByInvoiceSource(Source $invoiceSource)
+    public function getByInvoiceSource(Source $invoiceSource, $ignoreLock = true)
     {
         /** @noinspection PhpUnhandledExceptionInspection */
         $result = $this->getDb()->executeS(sprintf(
@@ -67,7 +67,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
             pSql($invoiceSource->getType()),
             $invoiceSource->getId()
         ));
-        return $this->convertDbResultToAcumulusEntries($result);
+        return $this->convertDbResultToAcumulusEntries($result, $ignoreLock);
     }
 
     /**

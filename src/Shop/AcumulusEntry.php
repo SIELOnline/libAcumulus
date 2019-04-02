@@ -38,9 +38,14 @@ class AcumulusEntry
 
     // Constants to enable some kind of locking and thereby preventing sending
     // invoices twice.
-    static protected $maxLockTime = 10;
+    static protected $maxLockTime = 15;
     const lockEntryId = 1;
     const lockToken = 'Send locked, delete if too old';
+
+    // Constants that define the various delete lock results.
+    const Lock_NoLongerExists = 1;
+    const Lock_Deleted = 2;
+    const Lock_BecameRealEntry = 3;
 
     /**
      * @var array|object
@@ -70,7 +75,11 @@ class AcumulusEntry
      */
     public function getEntryId()
     {
-        return $this->get(static::$keyEntryId);
+        $entryId = $this->get(static::$keyEntryId);
+        if (!empty($entryId)) {
+            $entryId = (int) $entryId;
+        }
+        return $entryId;
     }
 
     /**
@@ -218,19 +227,19 @@ class AcumulusEntry
     }
 
     /**
-     * Returns whether another process has already started sending the invoice.
+     * Returns whether the entry serves as a lock on sending.
      *
      * This method just indicates if there is a "lock" on the entry, even if
      * that lock already has expired. So normally you also want to check
      * hasLockExpired().
      *
      * @return bool
-     *   True if another process has already started sending the invoice, false
-     *   otherwise.
+     *   True if the entry serves as a lock on sending instead of as a reference
+     *   to the invoice in Acumulus, false otherwise.
      */
-    public function isSendingLocked()
+    public function isSendLock()
     {
-        return $this->getEntryId() === static::$lockEntryId && $this->getToken() === static::$lockToken;
+        return $this->getEntryId() === static::lockEntryId && $this->getToken() === static::lockToken;
     }
 
     /** @noinspection PhpDocMissingThrowsInspection
@@ -243,6 +252,6 @@ class AcumulusEntry
      */
     public function hasLockExpired()
     {
-        return $this->isSendingLocked() && time() - $this->getCreated()->getTimestamp() > static::$maxLockTime;
+        return $this->isSendLock() && time() - $this->getCreated()->getTimestamp() > static::$maxLockTime;
     }
 }

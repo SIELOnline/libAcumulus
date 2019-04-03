@@ -38,7 +38,7 @@ class AcumulusEntry
 
     // Constants to enable some kind of locking and thereby preventing sending
     // invoices twice.
-    static protected $maxLockTime = 15;
+    static protected $maxLockTime = 40;
     const lockEntryId = 1;
     const lockToken = 'Send locked, delete if too old';
 

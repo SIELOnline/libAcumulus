@@ -44,7 +44,7 @@ class ResultTranslations extends TranslationCollection
         'reason_sent_testMode' => 'test mode',
         'reason_sent_new' => 'not yet sent',
         'reason_sent_new_status_change' => 'mot yet sent and %1$s in [%2$s]',
-        'reason_sent_lock_expired' => 'not yet sent becasue the previous attempt failed',
+        'reason_sent_lock_expired' => 'not yet sent because the previous attempt failed',
         'reason_sent_forced' => 'forced',
         'reason_not_sent_wrongStatus' => 'wrong status: %1$s not in [%2$s]',
         'reason_not_sent_triggerCreditNoteEvent_None' => 'option to automatically send credit notes not enabled',

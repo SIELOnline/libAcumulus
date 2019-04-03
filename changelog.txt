@@ -17,7 +17,7 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies, vanaf 5.5.2 is dat all
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
-5.7.0 (2019-04-??)
+5.7.0 (2019-04-03)
 ------------------
 Features:
 - ALL: Prevent sending an invoice twice at the same moment. Some online payment

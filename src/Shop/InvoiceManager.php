@@ -567,7 +567,7 @@ abstract class InvoiceManager
         //   will have been created in Acumulus: nothing to store.
         // - If the invoice was sent as a concept, the entry id and token will
         //   be empty: store nulls.
-        if (!$this->isTestMode() || !$result->hasError()) {
+        if (!$this->isTestMode() && !$result->hasError()) {
             // If we are going to overwrite an existing entry, we want to delete
             // that from Acumulus.
             $acumulusEntryManager = $this->getAcumulusEntryManager();

@@ -17,6 +17,14 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies, vanaf 5.5.2 is dat all
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
+5.7.1 (2019-04-23)
+------------------
+Bugs:
+- WC: tweaked the precision settings again.
+
+Refactorings:
+- ALL: Number::getDivisionRange(): all parameters are now obligatory.
+
 5.7.0 (2019-04-03)
 ------------------
 Features:
@@ -26,7 +34,7 @@ Features:
   being executed. We are adding measures to prevent and, if it still occurs,
   recognise this situation, so we can warn about it.
 
-Refactoring:
+Refactorings:
 - Renamed Result::Sent_... constants to Result::Send_.
 
 5.6.1 (2019-04-01)

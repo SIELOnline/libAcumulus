@@ -37,7 +37,7 @@ class Number
      * @return array
      *   Array of floats with keys min, max and calculated.
      */
-    static public function getDivisionRange($numerator, $denominator, $numeratorPrecision = 0.01, $denominatorPrecision = 0.01)
+    static public function getDivisionRange($numerator, $denominator, $numeratorPrecision, $denominatorPrecision)
     {
         // The actual value can be half the precision lower or higher.
         // To err on the save side, we take 60% of it (instead of 50%).

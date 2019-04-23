@@ -25,9 +25,13 @@ class Creator extends BaseCreator
      * as worse. WC tended to round amounts to the cent, but does not seem to
      * any longer do so.
      *
+     * However, we still get reports of missed vat rates because they are out of
+     * range, so we remain on the safe side and only use higher precision when
+     * possible.
+     *
      * @var float
      */
-    protected $precision = 0.005;
+    protected $precision = 0.01;
 
     /**
      * {@inheritdoc}
@@ -113,14 +117,18 @@ class Creator extends BaseCreator
 
         // Get precision info.
         if ($this->productPricesIncludeTax()) {
-            $precisionEx = 2 * $this->precision;
-            $precisionInc = $this->precision;
+            $precisionEx = $this->precision;
+            $precisionInc = 0.001;
             $recalculateUnitPrice = true;
         } else {
-            $precisionEx = $this->precision;
-            $precisionInc = 2 * $this->precision;
+            $precisionEx = 0.001;
+            $precisionInc = $this->precision;
             $recalculateUnitPrice = false;
         }
+        // Note: this assumes that line calculations are done in a very precise
+        // way (in other words: total_tax has not a precision of
+        // base_precision * quantity) ...
+        $precisionVat = max(abs($this->precision / $quantity), 0.001);
 
         // Check for cost price and margin scheme.
         if (!empty($line['costPrice']) && $this->allowMarginScheme()) {
@@ -141,7 +149,7 @@ class Creator extends BaseCreator
         }
 
         // Add tax info.
-        $result += $this->getVatRangeTags($productVat, $productPriceEx, $this->precision, $precisionEx);
+        $result += $this->getVatRangeTags($productVat, $productPriceEx, $precisionVat, $precisionEx);
         if ($product instanceof WC_Product) {
             $result += $this->getVatRateLookupMetadataByTaxClass($product->get_tax_class());
         }

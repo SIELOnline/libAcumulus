@@ -21,6 +21,10 @@ WC3 = WooCommerce 3 (WordPress)
 ------------------
 Bugs:
 - WC: tweaked the precision settings again.
+- WC: Acumulus info box op bestellingpagina toont verkeerde status voor credit
+  facturen (nl dezelfde status als voor de oorspronkelijke bestelling).
+- WC: Acumulus info box op bestellingpagina stuurt de oorspronkelijke factuur
+  bij klik op "Opnieuw verzenden" bij een credit factuur.
 
 Refactorings:
 - ALL: Number::getDivisionRange(): all parameters are now obligatory.

@@ -120,7 +120,7 @@ class InvoiceStatusOverviewForm extends Form
         $this->acumulusEntryManager = $acumulusEntryManager;
         $this->invoiceManager = $invoiceManager;
         $this->service = $service;
-        $this->status = static::Status_Unknown;
+        $this->resetStatus();
     }
 
     /**
@@ -133,7 +133,6 @@ class InvoiceStatusOverviewForm extends Form
 
     /**
      * Sets the status, but only if it is "worse" than the current status.
-     *
      *
      * @param int $status
      *   The status to set.
@@ -152,17 +151,23 @@ class InvoiceStatusOverviewForm extends Form
     }
 
     /**
+     * Resets the status.
+     */
+    private function resetStatus()
+    {
+        $this->status = static::Status_Unknown;
+        $this->statusMessage = '';
+    }
+
+    /**
      * Returns a string to use as css class for the current status.
      *
      * @param int $status
      *
      * @return string
      */
-    public function getStatusClass($status = null)
+    public function getStatusClass($status)
     {
-        if ($status === null) {
-            $status = $this->status;
-        }
         switch ($status) {
             case static::Status_Success:
                 $result = 'success';
@@ -189,11 +194,8 @@ class InvoiceStatusOverviewForm extends Form
      * @return string
      *   An icon character that represents the status.
      */
-    private function getStatusIcon($status = null)
+    private function getStatusIcon($status)
     {
-        if ($status === null) {
-            $status = $this->status;
-        }
         switch ($status) {
             case static::Status_Success:
                 $result = json_decode('"\u2714"');
@@ -214,15 +216,13 @@ class InvoiceStatusOverviewForm extends Form
      * Returns a set of label attributes for the current status.
      *
      * @param int $status
+     * @param string $statusMessage
      *
      * @return array
      *   A set of attributes to add to the label.
      */
-    private function getStatusLabelAttributes($status = null)
+    private function getStatusLabelAttributes($status, $statusMessage)
     {
-        if ($status === null) {
-            $status = $this->status;
-        }
         $statusClass = $this->getStatusClass($status);
         $attributes = array(
             'class' => array('notice', 'notice-' . $statusClass),
@@ -230,8 +230,8 @@ class InvoiceStatusOverviewForm extends Form
                 'class' => array('notice', 'notice-' . $statusClass),
             ),
         );
-        if (!empty($this->statusMessage)) {
-            $attributes['title'] = $this->statusMessage;
+        if (!empty($statusMessage)) {
+            $attributes['title'] = $statusMessage;
         }
         return $attributes;
     }
@@ -391,7 +391,7 @@ class InvoiceStatusOverviewForm extends Form
         foreach($creditNotes as $creditNote) {
             $localEntryInfo = $this->acumulusEntryManager->getByInvoiceSource($creditNote);
             $idPrefix = $this->getIdPrefix($creditNote);
-            $fields1Source = $this->addIdPrefix($this->getFields1Source($source, $localEntryInfo), $idPrefix);
+            $fields1Source = $this->addIdPrefix($this->getFields1Source($creditNote, $localEntryInfo), $idPrefix);
             $fields[$idPrefix] = array(
                 'type' => 'details',
                 'summary' => ucfirst($this->t($creditNote->getType())) . ' ' . $creditNote->getReference(),
@@ -413,8 +413,11 @@ class InvoiceStatusOverviewForm extends Form
      */
     private function getFields1Source(Source $source, $localEntryInfo)
     {
+        $this->resetStatus();
         // Get invoice status field and other invoice status related info.
         $statusInfo = $this->getInvoiceStatusInfo($localEntryInfo);
+
+        $this->setStatus($statusInfo['severity'], $statusInfo['severity-message']);
         /** @var string $invoiceStatus */
         $invoiceStatus = $statusInfo['status'];
         /** @var string $statusText */
@@ -462,10 +465,10 @@ class InvoiceStatusOverviewForm extends Form
         $fields = array(
             'status' => array(
                 'type' => 'markup',
-                'label' => $this->getStatusIcon(),
+                'label' => $this->getStatusIcon($this->status),
                 'attributes' => array(
                     'class' => str_replace('_', '-', $invoiceStatus),
-                    'label' => $this->getStatusLabelAttributes(),
+                    'label' => $this->getStatusLabelAttributes($this->status, $this->statusMessage),
                 ),
                 'value' => $statusText,
                 'description' => $statusDescription,
@@ -482,6 +485,7 @@ class InvoiceStatusOverviewForm extends Form
      * @return array
      *   Keyed array with keys:
      *   - status (string): 1 of the ShopOrderOverviewForm::Status_ constants.
+     *   - send-status (string): 1 of the ShopOrderOverviewForm::Invoice_ constants.
      *   - result (\Siel\Acumulus\Web\Result?): result of the getEntry API call.
      *   - entry (array|null): the <entry> part of the getEntry API call.
      *   - statusField (array): a form field array representing the status.
@@ -493,41 +497,45 @@ class InvoiceStatusOverviewForm extends Form
         $arg1 = null;
         $arg2 = null;
         $description = '';
+        $statusMessage = null;
         if ($localEntryInfo === null) {
             $invoiceStatus = static::Invoice_NotSent;
-            $this->setStatus(static::Status_Info);
+            $statusSeverity = static::Status_Info;
         } else {
             $arg1 = $this->getDate($localEntryInfo->getUpdated());
             if ($localEntryInfo->getEntryId() === null) {
                 $invoiceStatus = static::Invoice_SentConcept;
                 $description = 'concept_description';
-                $this->setStatus(static::Status_Warning);
+                $statusSeverity = static::Status_Warning;
             } else {
                 $result = $this->service->getEntry($localEntryInfo->getEntryId());
                 $entry = $this->sanitizeEntry($result->getResponse());
                 if ($result->hasCodeTag('XGYBSN000')) {
                     $invoiceStatus = static::Invoice_NonExisting;
-                    $this->setStatus(static::Status_Error);
+                    $statusSeverity = static::Status_Error;
                     // To prevent this error in the future, we delete the local
                     // entry.
                     $this->acumulusEntryManager->delete($localEntryInfo);
                 } elseif (empty($entry)) {
                     $invoiceStatus = static::Invoice_CommunicationError;
-                    $this->setStatus(static::Status_Error);
+                    $statusSeverity = static::Status_Error;
                 } elseif (!empty($entry['deleted'])) {
                     $invoiceStatus = static::Invoice_Deleted;
-                    $this->setStatus(static::Status_Warning);
+                    $statusSeverity = static::Status_Warning;
                     $arg2 = $entry['deleted'];
                 } else {
                     $invoiceStatus = static::Invoice_Sent;
                     $arg1 = $entry['invoicenumber'];
                     $arg2 = $entry['entrydate'];
-                    $this->setStatus(static::Status_Success, $this->t('invoice_status_ok'));
+                    $statusSeverity = static::Status_Success;
+                    $statusMessage = $this->t('invoice_status_ok');
                 }
             }
         }
 
         return array(
+            'severity' => $statusSeverity,
+            'severity-message' => $statusMessage,
             'status' => $invoiceStatus,
             'result' => $result,
             'entry' => $entry,
@@ -796,7 +804,7 @@ class InvoiceStatusOverviewForm extends Form
         $paymentStatusText = sprintf($this->t($paymentStatusText), $paymentDate);
 
         $localPaymentStatus = $source->getPaymentStatus();
-       if ($localPaymentStatus !== $paymentStatus) {
+        if ($localPaymentStatus !== $paymentStatus) {
             $paymentCompareStatus = $paymentStatus === API::PaymentStatus_Paid ? static::Status_Warning : static::Status_Info;
             $paymentCompareStatustext = $this->t('payment_status_not_equal');
             $this->setStatus($paymentCompareStatus, $paymentCompareStatustext);

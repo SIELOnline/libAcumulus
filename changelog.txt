@@ -17,8 +17,20 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies, vanaf 5.5.2 is dat all
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
-5.7.1 (2019-05-02)
-------------------
+
+5.7.2 (2019-05-15) (JOO only)
+-----------------------------
+Bugs:
+- Errors in the install process:
+  * syntax error in <version> tag in xml files.
+  * class inheritance dependency on Virtuemart.
+
+Refactorings:
+- JOO: Registration of our own autoloader now takes place in only 1 place: the
+  Acumulus Joomla model.
+
+5.7.1 (2019-05-02) (WC only)
+----------------------------
 Bugs:
 - WC: tweaked the precision settings again.
 - WC: Acumulus info box op bestellingpagina toont verkeerde status voor credit

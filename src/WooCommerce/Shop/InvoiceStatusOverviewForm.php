@@ -712,33 +712,6 @@ class InvoiceStatusOverviewForm extends Form
      */
     private function getEntryFields(Source $source, BaseAcumulusEntry $localEntryInfo, array $entry)
     {
-        /* keys in $entry array:
-         *   - entryid
-         *   * entrydate: yy-mm-dd
-         *   - entrytype
-         *   - entrydescription
-         *   - entrynote
-         *   - fiscaltype
-         *   * vatreversecharge: 0 or 1
-         *   * foreigneu: 0 or 1
-         *   * foreignnoneu: 0 or 1
-         *   * marginscheme: 0 or 1
-         *   * foreignvat: 0 or 1
-         *   - contactid
-         *   - accountnumber
-         *   - costcenterid
-         *   - costtypeid
-         *   * invoicenumber
-         *   - invoicenote
-         *   - descriptiontext
-         *   - invoicelayoutid
-         *   - totalvalueexclvat
-         *   - totalvalue
-         *   - paymenttermdays
-         *   * paymentdate: yy-mm-dd
-         *   * paymentstatus: 1 or 2
-         *   * deleted: timestamp
-         */
         $fields = $this->getVatTypeField($entry)
             + $this->getAmountFields($source, $entry)
             + $this->getPaymentStatusFields($source, $entry)
@@ -871,12 +844,14 @@ class InvoiceStatusOverviewForm extends Form
     /**
      * Returns the amounts of this invoice.
      *
+     * To check if the amounts match we have to treat local and foreign vat the
+     * same, which Acumulus doesn't.
+     *
      * @param \Siel\Acumulus\Invoice\Source $source
      * @param array $entry
      *
      * @return array[]
-     *   Array with form fields with the payment status and date (if paid) of
-     *   the invoice.
+     *   Array with form fields with the invoice amounts.
      */
     private function getAmountFields(Source $source, array $entry)
     {
@@ -886,6 +861,16 @@ class InvoiceStatusOverviewForm extends Form
             $amountExAcumulus = $entry['totalvalueexclvat'];
             $amountIncAcumulus = $entry['totalvalue'];
             $amountVatAcumulus = $amountIncAcumulus - $amountExAcumulus;
+            $amountForeignVatAcumulus = $entry['totalvalueforeignvat'];
+            if (!Number::isZero($amountForeignVatAcumulus)) {
+                $vatType = Number::isZero($amountVatAcumulus)
+                    ? $this->t('foreign_vat')
+                    : $this->t('foreign_national_vat');
+                $amountExAcumulus -= $amountForeignVatAcumulus;
+                $amountVatAcumulus += $amountForeignVatAcumulus;
+            } else {
+                $vatType = $this->t('vat');
+            }
 
             // Get local amounts.
             $localTotals = $source->getTotals();
@@ -902,7 +887,7 @@ class InvoiceStatusOverviewForm extends Form
             $fields['invoice_amount'] = array(
                 'type' => 'markup',
                 'label' => $this->t('invoice_amount'),
-                'value' => sprintf('<div class="acumulus-amount">%1$s%2$s %4$s%3$s</div>', $amountEx, $amountVat, $amountInc, $this->t('vat')),
+                'value' => sprintf('<div class="acumulus-amount">%1$s%2$s %4$s%3$s</div>', $amountEx, $amountVat, $amountInc, $vatType),
             );
         }
         return $fields;
@@ -1055,7 +1040,7 @@ class InvoiceStatusOverviewForm extends Form
     /**
      * Sanitizes an entry struct received via an getEntry API call.
      *
-     * The info received from an external API call must not be trusted, so it
+     * The info received from an external API call should not be trusted, so it
      * should be sanitized. As most info from this API call is placed in markup
      * fields we cannot rely on the FormRenderer or the webshop's form API
      * (which do not sanitize markup fields).
@@ -1071,29 +1056,43 @@ class InvoiceStatusOverviewForm extends Form
      *   future API version returns additional fields and we forget to sanitize
      *   it and thus use it non sanitised.
      *
-     * @param $entry
+     * Keys in $entry array:
+     *   - entryid
+     *   * entrydate: yy-mm-dd
+     *   - entrytype
+     *   - entrydescription
+     *   - entrynote
+     *   - fiscaltype
+     *   * vatreversecharge: 0 or 1
+     *   * foreigneu: 0 or 1
+     *   * foreignnoneu: 0 or 1
+     *   * marginscheme: 0 or 1
+     *   * foreignvat: 0 or 1
+     *   - contactid
+     *   - accountnumber
+     *   - costcenterid
+     *   - costtypeid
+     *   * invoicenumber
+     *   - invoicenote
+     *   - descriptiontext
+     *   - invoicelayoutid
+     *   - totalvalueexclvat
+     *   - totalvalue
+     *   - totalvalueforeignvat
+     *   - paymenttermdays
+     *   * paymentdate: yy-mm-dd
+     *   * paymentstatus: 1 or 2
+     *   * deleted: timestamp
+     *
+     * @param array $entry
      *
      * @return mixed
      *   The sanitized entry struct.
      */
-    private function sanitizeEntry($entry)
+    private function sanitizeEntry(array $entry)
     {
         if (!empty($entry)) {
-            /* @todo: keys in $entry array that are not yet used and not yet sanitized:
-             *   - entrytype
-             *   - entrydescription
-             *   - entrynote
-             *   - fiscaltype
-             *   - contactid
-             *   - accountnumber
-             *   - costcenterid
-             *   - costtypeid
-             *   - invoicenote
-             *   - descriptiontext
-             *   - invoicelayoutid
-             *   - token
-             *   - paymenttermdays
-             */
+            // @todo: keys in $entry array that are not yet used and not yet sanitized.
             $result['entryid'] = $this->sanitizeEntryIntValue($entry, 'entryid');
             $result['entrydate'] = $this->sanitizeEntryDateValue($entry, 'entrydate');
             $result['vatreversecharge'] = $this->sanitizeEntryBoolValue($entry, 'vatreversecharge');
@@ -1104,6 +1103,7 @@ class InvoiceStatusOverviewForm extends Form
             $result['invoicenumber'] = $this->sanitizeEntryIntValue($entry, 'invoicenumber');
             $result['totalvalueexclvat'] = $this->sanitizeEntryFloatValue($entry, 'totalvalueexclvat');
             $result['totalvalue'] = $this->sanitizeEntryFloatValue($entry, 'totalvalue');
+            $result['totalvalueforeignvat'] = $this->sanitizeEntryFloatValue($entry, 'totalvalueforeignvat');
             $result['paymentstatus'] = $this->sanitizeEntryIntValue($entry, 'paymentstatus');
             $result['paymentdate'] = $this->sanitizeEntryDateValue($entry, 'paymentdate');
             $result['deleted'] = $this->sanitizeEntryStringValue($entry, 'deleted');

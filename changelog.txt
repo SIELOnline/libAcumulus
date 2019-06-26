@@ -17,6 +17,16 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies, vanaf 5.5.2 is dat all
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
+5.7.4 (2019-07-??)
+------------------
+Bugs:
+-  WC: Acumulus info box op bestellingpagina toont verkeerde bedragen, en
+   daardoor een waarschuwing, bij facturen met buitenlandse btw.
+
+5.7.3 (2019-06-25) (MA2 only)
+-----------------------------
+Features:
+- Added support for the Fooman surcharge payment module.
 
 5.7.2 (2019-05-15) (JOO only)
 -----------------------------

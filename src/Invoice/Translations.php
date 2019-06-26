@@ -24,6 +24,8 @@ class Translations extends TranslationCollection
 
         'for' => 'voor',
         'vat' => 'btw',
+        'foreign_vat' => 'buitenlandse btw',
+        'foreign_national_vat' => '(buitenlandse) btw',
         'inc_vat' => 'incl. btw',
         'ex_vat' => 'excl. btw',
         'shipping_costs' => 'Verzendkosten',
@@ -80,6 +82,8 @@ class Translations extends TranslationCollection
 
         'for' => 'for',
         'vat' => 'VAT',
+        'foreign_vat' => 'foreign VAT',
+        'foreign_national_vat' => '(foreign) VAT',
         'inc_vat' => 'incl. VAT',
         'ex_vat' => 'ex. VAT',
         'shipping_costs' => 'Shipping costs',

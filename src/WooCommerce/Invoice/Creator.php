@@ -119,11 +119,11 @@ class Creator extends BaseCreator
         if ($this->productPricesIncludeTax()) {
             $precisionEx = $this->precision;
             $precisionInc = 0.001;
-            $recalculateUnitPrice = true;
+            $recalculatePrice = Tag::UnitPrice;
         } else {
             $precisionEx = 0.001;
             $precisionInc = $this->precision;
-            $recalculateUnitPrice = false;
+            $recalculatePrice = Meta::UnitPriceInc;
         }
         // Note: this assumes that line calculations are done in a very precise
         // way (in other words: total_tax has not a precision of
@@ -144,7 +144,7 @@ class Creator extends BaseCreator
                 Tag::UnitPrice => $productPriceEx,
                 Meta::UnitPriceInc => $productPriceInc,
                 Meta::PrecisionUnitPriceInc => $precisionInc,
-                Meta::RecalculatePrice => $recalculateUnitPrice ? Tag::UnitPrice : Meta::UnitPriceInc,
+                Meta::RecalculatePrice => $recalculatePrice,
             );
         }
 

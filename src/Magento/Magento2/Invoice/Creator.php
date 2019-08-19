@@ -50,7 +50,8 @@ class Creator extends BaseCreator
         $this->propertySources['customer'] = Registry::getInstance()->create('Magento\Customer\Model\Customer')->load($source->getCustomerId());
     }
 
-    /**
+    /** @noinspection PhpUnused
+     *
      * {@inheritdoc}
      */
     protected function getItemLinesCreditNote()
@@ -83,7 +84,7 @@ class Creator extends BaseCreator
         $this->addProductInfo($result);
 
         // For higher precision of the unit price, we will recalculate the price
-        // ex vat if product prices are entered inc vat by the admin.
+        // ex vat later on, if product prices are entered inc vat by the admin.
         $productPriceEx = (float) $item->getBasePrice();
         $productPriceInc = (float) $item->getBasePriceInclTax();
 
@@ -102,19 +103,42 @@ class Creator extends BaseCreator
         }
         $result[Tag::Quantity] = $item->getQtyOrdered();
 
-        // Tax amount = VAT over discounted product price.
-        // Hidden tax amount = VAT over discount.
-        // Tax percent = VAT % as specified in product settings, for the parent
-        // of bundled products this may be 0 and incorrect.
-        // But as discounts get their own lines and the product lines are
-        // showing the normal (not discounted) price we add these 2.
+
+        // Get vat and discount information
+        // - Tax percent = VAT % as specified in product settings, for the
+        //   parent of bundled products this may be 0 and incorrect.
         $vatRate = (float) $item->getTaxPercent();
-        $lineVat = (float) $item->getBaseTaxAmount() + (float) $item->getBaseDiscountTaxCompensationAmount();
+        // - (Base) tax amount = VAT over discounted item line =
+        //   ((product price - discount) * qty) * vat rate.
+        // But as discounts get their own lines, this order item line should
+        // show the vat amount over the normal, not discounted, price. To get
+        // that, we can use the:
+        // - (Base) discount tax compensation amount = VAT over line discount.
+        // However, it turned out ([SIEL #127821]) that if discounts are applied
+        // before tax, this value is 0, so in those cases we can't use that.
+        $lineVat = (float) $item->getBaseTaxAmount();
+        if (!Number::isZero($item->getBaseDiscountAmount())) {
+            // Store discount on this item to be able to get correct discount
+            // lines later on in the completion phase.
+            $tag = $this->discountIncludesTax() ? Meta::LineDiscountAmountInc : Meta::LineDiscountAmount;
+            $result[$tag] = -$item->getBaseDiscountAmount();
+            if (!Number::isZero($item->getBaseDiscountTaxCompensationAmount())) {
+                $lineVat += (float) $item->getBaseDiscountTaxCompensationAmount();
+            } else {
+                // We cannot trust lineVat, so do not add it but as we normally
+                // have an exact vat rate, this is surplus data anyway.
+                $lineVat = null;
+            }
+        }
+        if (isset($lineVat)) {
+            $result[Meta::LineVatAmount] = $lineVat;
+        }
 
         // Add VAT related info.
         $childrenItems = $item->getChildrenItems();
         if (Number::isZero($vatRate) && !empty($childrenItems)) {
-            // 0 VAT rate on parent: this is (very very) probably not correct.
+            // 0 VAT rate on parent: this is probably not correct. The completor
+            // will fetch the vat rate from the children.
             $result += array(
                 Tag::VatRate => null,
                 Meta::VatRateSource => Creator::VatRateSource_Completor,
@@ -128,22 +152,12 @@ class Creator extends BaseCreator
                 Meta::VatRateSource => Number::isZero($vatRate) ? Creator::VatRateSource_Exact0 : Creator::VatRateSource_Exact,
             );
         }
-        $result += array(
-            Meta::LineVatAmount => $lineVat,
-        );
 
         // Add vat meta data.
         $product = $item->getProduct();
         if ($product) {
             /** @noinspection PhpUndefinedMethodInspection */
             $result += $this->getVatClassMetaData((int) $product->getTaxClassId());
-        }
-
-        // Add discount related info.
-        if (!Number::isZero($item->getBaseDiscountAmount())) {
-            // Store discount on this item to be able to get correct discount
-            // lines later on in the completion phase.
-            $result[Meta::LineDiscountAmountInc] = -$item->getBaseDiscountAmount();
         }
 
         // Add children lines for composed products.
@@ -176,7 +190,6 @@ class Creator extends BaseCreator
 
         $productPriceEx = -((float) $item->getBasePrice());
         $productPriceInc = -((float) $item->getBasePriceInclTax());
-        $lineVat = -((float) $item->getBaseTaxAmount() + (float) $item->getBaseDiscountTaxCompensationAmount());
 
         // Check for cost price and margin scheme.
         if (!empty($line['costPrice']) && $this->allowMarginScheme()) {
@@ -190,21 +203,46 @@ class Creator extends BaseCreator
                 Tag::UnitPrice => $productPriceEx,
                 Meta::UnitPriceInc => $productPriceInc,
                 Meta::RecalculatePrice => $this->productPricesIncludeTax() ? Tag::UnitPrice : Meta::UnitPriceInc,
-                Meta::LinesVatAmount => $lineVat,
             );
         }
         $result[Tag::Quantity] = $item->getQty();
 
-        // Add VAT related info.
+        // Get vat and discount information (also see above getItemLineOrder()):
         $orderItemId = $item->getOrderItemId();
+        $vat_rate = null;
         if (!empty($orderItemId)) {
             $orderItem = $item->getOrderItem();
+            $vat_rate = $orderItem->getTaxPercent();
+        }
+        $lineVat = -(float) $item->getBaseTaxAmount();
+        if (!Number::isZero($item->getBaseDiscountAmount())) {
+            // Store discount on this item to be able to get correct discount
+            // lines later on in the completion phase.
+            $tag = $this->discountIncludesTax() ? Meta::LineDiscountAmountInc : Meta::LineDiscountAmount;
+            $result[$tag] = $item->getBaseDiscountAmount();
+            if (!Number::isZero($item->getBaseDiscountTaxCompensationAmount())) {
+                $lineVat -= (float) $item->getBaseDiscountTaxCompensationAmount();
+            } else {
+                // We cannot trust lineVat, so do not add it but as we normally
+                // have an exact vat rate, this is surplus data anyway.
+                $lineVat = null;
+            }
+        }
+        if (isset($lineVat)) {
+            $result[Meta::LineVatAmount] = $lineVat;
+        }
+
+        // And the VAT related info.
+        if (isset($vat_rate)) {
             $result += array(
-                Tag::VatRate => $orderItem->getTaxPercent(),
+                Tag::VatRate => $vat_rate,
                 Meta::VatRateSource => static::VatRateSource_Exact,
             );
+        } elseif (isset($lineVat)) {
+            $result += $this->getVatRangeTags($lineVat / $result[Tag::Quantity], $productPriceEx, 0.02 / min($result[Tag::Quantity], 2), 0.01);
         } else {
-            $result += $this->getVatRangeTags($lineVat / $item->getQty(), $productPriceEx, 0.02, $this->productPricesIncludeTax() ? 0.02 : 0.01);
+            // No exact vat rate and no line vat: just use price inc - price ex.
+            $result += $this->getVatRangeTags($productPriceInc - $productPriceEx, $productPriceEx, 0.02, 0.01);
             $result[Meta::FieldsCalculated][] = Meta::VatAmount;
         }
 
@@ -215,12 +253,6 @@ class Creator extends BaseCreator
         if ($product->getId()) {
             /** @noinspection PhpUndefinedMethodInspection */
             $result += $this->getVatClassMetaData((int) $product->getTaxClassId());
-        }
-
-        // Add discount related info.
-        if (!Number::isZero($item->getDiscountAmount())) {
-            // Credit note: discounts are cancelled, thus amount is positive.
-            $result[Meta::LineDiscountAmountInc] = $item->getBaseDiscountAmount();
         }
 
         // On a credit note we only have single lines, no compound lines, thus
@@ -272,12 +304,13 @@ class Creator extends BaseCreator
                     ) + $this->getVatRangeTags($shippingVat, $shippingEx, 0.02,$this->shippingPriceIncludeTax() ? 0.02 : 0.01);
                 $result[Meta::FieldsCalculated][] = Meta::VatAmount;
 
-                // Add vat meta data.
+                // Add vat class meta data.
                 $result += $this->getVatClassMetaData($this->getShippingTaxClassId());
 
                 // getBaseShippingDiscountAmount() only exists on Orders.
                 if ($this->invoiceSource->getType() === Source::Order && !Number::isZero($magentoSource->getBaseShippingDiscountAmount())) {
-                    $result[Meta::LineDiscountAmountInc] = -$sign * $magentoSource->getBaseShippingDiscountAmount();
+                    $tag = $this->discountIncludesTax() ? Meta::LineDiscountAmountInc : Meta::LineDiscountAmount;
+                    $result[$tag] = -$sign * $magentoSource->getBaseShippingDiscountAmount();
                 } elseif ($this->invoiceSource->getType() === Source::CreditNote
                     && !Number::floatsAreEqual($shippingVat, $magentoSource->getBaseShippingTaxAmount(), 0.02)) {
                     // On credit notes, the shipping discount amount is not
@@ -353,6 +386,18 @@ class Creator extends BaseCreator
     protected function getShippingTaxClassId()
     {
         return $this->getTaxConfig()->getShippingTaxClass();
+    }
+
+    /**
+     * Returns whether a discount amount includes tax.
+     *
+     * @return bool
+     *   true if a discount is applied on the price including tax, false if a
+     *   discount is applied on the price excluding tax.
+     */
+    protected function discountIncludesTax()
+    {
+        return $this->getTaxConfig()->discountTax();
     }
 
     /**

@@ -17,13 +17,21 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies, vanaf 5.5.2 is dat all
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
-5.7.4 (2019-07-??)
+5.7.4 (2019-08-??)
 ------------------
 Bugs:
+- MA2: Kortingen worden niet goed doorgegeven als prijzen ex btw zijn ingevoerd.
+  getBaseShippingDiscountAmount() is inc of ex btw afhankelijk van of korting
+  voor of na btw verrrekend wordt.
 - WC: Acumulus info box op bestellingpagina verdwijnt bij handmatige sortering
   van de info boxen.
 - WC: Acumulus info box op bestellingpagina toont verkeerde bedragen, en
   daardoor een waarschuwing, bij facturen met buitenlandse btw.
+
+Refactorings:
+- WC: Use $recalculatePrice (with the tag to recalculate as value) instead of
+  boolean $recalculateUnitPrice.
+
 
 5.7.3 (2019-06-25) (MA2 only)
 -----------------------------

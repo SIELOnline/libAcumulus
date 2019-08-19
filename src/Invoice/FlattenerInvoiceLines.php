@@ -487,6 +487,7 @@ class FlattenerInvoiceLines
             $child[Meta::UnitPriceInc] = 0;
             unset($child[Meta::LineAmount]);
             unset($child[Meta::LineAmountInc]);
+            unset($child[Meta::LineDiscountAmount]);
             unset($child[Meta::LineDiscountAmountInc]);
         }
         return $children;
@@ -509,6 +510,7 @@ class FlattenerInvoiceLines
         $parent[Meta::UnitPriceInc] = 0;
         unset($parent[Meta::LineAmount]);
         unset($parent[Meta::LineAmountInc]);
+        unset($parent[Meta::LineDiscountAmount]);
         unset($parent[Meta::LineDiscountAmountInc]);
         return $parent;
     }

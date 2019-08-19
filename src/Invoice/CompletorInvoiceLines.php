@@ -188,6 +188,7 @@ class CompletorInvoiceLines
             $this->completor->convertAmount($line, Meta::LineAmount, $conversionRate);
             $this->completor->convertAmount($line, Meta::LineAmountInc, $conversionRate);
             $this->completor->convertAmount($line, Meta::LineVatAmount, $conversionRate);
+            $this->completor->convertAmount($line, Meta::LineDiscountAmount, $conversionRate);
             $this->completor->convertAmount($line, Meta::LineDiscountAmountInc, $conversionRate);
             $this->completor->convertAmount($line, Meta::LineDiscountVatAmount, $conversionRate);
 
@@ -384,7 +385,7 @@ class CompletorInvoiceLines
             // Easy gain first. Known usages: Magento.
             if (!isset($line[Meta::VatAmount]) && isset($line[Meta::LineVatAmount])) {
                 $line[Meta::VatAmount] = $line[Meta::LineVatAmount] / $line[Tag::Quantity];
-                $line[Meta::FieldsCalculated][] = Meta::VatAmount;
+                $line[Meta::FieldsCalculated][] = Meta::VatAmount . ' (from ' . Meta::LineVatAmount . ')';
             }
 
             if (!isset($line[Tag::UnitPrice])) {
@@ -726,9 +727,13 @@ class CompletorInvoiceLines
                 }
                 if (!isset($line[Meta::VatAmount])) {
                     $line[Meta::VatAmount] = $line[Tag::VatRate] / 100.0 * $line[Tag::UnitPrice];
-                    $line[Meta::FieldsCalculated][] = Meta::VatAmount;
+                    $line[Meta::FieldsCalculated][] = Meta::VatAmount. ' (from ' . Tag::VatRate . ')';
                 }
-                if (isset($line[Meta::LineDiscountVatAmount]) && !isset($line[Meta::LineDiscountAmountInc])) {
+                if (isset($line[Meta::LineDiscountAmount]) && !isset($line[Meta::LineDiscountAmountInc])) {
+                    $line[Meta::LineDiscountAmountInc] = $line[Meta::LineDiscountAmount] / 100.0 * (100.0 + $line[Tag::VatRate]);
+                    $line[Meta::FieldsCalculated][] = Meta::LineDiscountAmountInc;
+                }
+                elseif (isset($line[Meta::LineDiscountVatAmount]) && !isset($line[Meta::LineDiscountAmountInc])) {
                     $line[Meta::LineDiscountAmountInc] = $line[Meta::LineDiscountVatAmount] / $line[Tag::VatRate] * (100 + $line[Tag::VatRate]);
                     $line[Meta::FieldsCalculated][] = Meta::LineDiscountAmountInc;
                 }

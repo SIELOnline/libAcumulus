@@ -116,6 +116,11 @@ interface Meta
      */
     const LineVatAmount = 'meta-line-vatamount';
     /**
+     * Creator->Strategy: the discount amount ex vat that was applied to this
+     * line (used by the SplitKnownDiscountLine strategy, Magento only).
+     */
+    const LineDiscountAmount = 'meta-line-discount-amount';
+    /**
      * Creator->Strategy: the discount amount inc vat that was applied to this
      * line (used by the SplitKnownDiscountLine strategy, Magento only).
      */

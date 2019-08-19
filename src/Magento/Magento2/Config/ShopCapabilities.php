@@ -218,9 +218,9 @@ class ShopCapabilities extends ShopCapabilitiesBase
             $version = 'UNKNOWN';
         }
 
-        $moduleResource = Registry::getInstance()->getModuleResource();
         $environment = array(
-            'moduleVersion' => $moduleResource->getDbVersion('Siel_AcumulusMa2'),
+            'moduleVersion' => Registry::getInstance()->getModuleVersion('Siel_AcumulusMa2'),
+            'schemaVersion' => Registry::getInstance()->getSchemaVersion('Siel_AcumulusMa2'),
             'shopName' => $this->shopName,
             'shopVersion' => $version,
         );

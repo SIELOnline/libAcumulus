@@ -20,9 +20,13 @@ WC3 = WooCommerce 3 (WordPress)
 5.7.4 (2019-08-??)
 ------------------
 Bugs:
+- MA2: Versie die getoond werd bij de support-informatie was de databaseschema-
+  versie (uit module.xml), niet de moduleversie van de module (uit
+  composer.json).
 - MA2: Kortingen worden niet goed doorgegeven als prijzen ex btw zijn ingevoerd.
   getBaseShippingDiscountAmount() is inc of ex btw afhankelijk van of korting
-  voor of na btw verrrekend wordt.
+  voor of na btw verrrekend wordt. MA1 heeft dit waarschijnlijk ook, maar daar
+  gaat de winkel ook de fout in.
 - WC: Acumulus info box op bestellingpagina verdwijnt bij handmatige sortering
   van de info boxen.
 - WC: Acumulus info box op bestellingpagina toont verkeerde bedragen, en

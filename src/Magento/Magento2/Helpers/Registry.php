@@ -2,6 +2,8 @@
 namespace Siel\Acumulus\Magento\Magento2\Helpers;
 
 use Magento\Framework\App\Bootstrap;
+use Magento\Framework\Component\ComponentRegistrar;
+use Magento\Framework\Exception\FileSystemException;
 
 /**
  * Registry is a wrapper around the Magento2 ObjectManager to get
@@ -113,9 +115,25 @@ class Registry
     }
 
     /**
+     * @return \Magento\Framework\Component\ComponentRegistrarInterface
+     */
+    private function getComponentRegistrar()
+    {
+        return $this->get('\Magento\Framework\Component\ComponentRegistrarInterface');
+    }
+
+    /**
+     * @return \Magento\Framework\Filesystem\Directory\ReadFactory
+     */
+    private function getReadFactory()
+    {
+        return $this->get('\Magento\Framework\Filesystem\Directory\ReadFactory');
+    }
+
+    /**
      * @return \Magento\Framework\Module\ResourceInterface
      */
-    public function getModuleResource()
+    private function getModuleResource()
     {
         return $this->get('Magento\Framework\Module\ResourceInterface');
     }
@@ -130,4 +148,42 @@ class Registry
         $resolver = $this->get('Magento\Framework\Locale\ResolverInterface');
         return $resolver->getLocale();
     }
+
+    /**
+     * Returns the composer version for the given module.
+     *
+     * @param $moduleName
+     * @return \Magento\Framework\Phrase|string|void
+     */
+    public function getModuleVersion($moduleName)
+    {
+        try {
+            $path = $this->getComponentRegistrar()->getPath(ComponentRegistrar::MODULE, $moduleName);
+            if ($path) {
+                $directoryRead = $this->getReadFactory()->create($path);
+                $composerJsonData = $directoryRead->readFile('composer.json');
+                $data = json_decode($composerJsonData);
+                $result = !empty($data->version) ? $data->version : ($data === null ? 'JSON ERROR' : 'NOT SET');
+            } else {
+                $result = 'MODULE ERROR';
+            }
+        } catch (FileSystemException $e) {
+            $result = $e->getMessage();
+        }
+
+        return $result;
+    }
+
+    /**
+     * Returns the schema version for the given module.
+     *
+     * @param string $moduleName
+     *
+     * @return string|false
+     */
+    public function getSchemaVersion($moduleName)
+    {
+        return $this->getModuleResource()->getDataVersion($moduleName);
+    }
+
 }

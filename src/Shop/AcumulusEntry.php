@@ -10,9 +10,15 @@ use Siel\Acumulus\PluginConfig;
  * Acumulus identifies entries by their entry id (boekstuknummer in het
  * Nederlands) or, for a number of API calls, a token. Both the entry id and
  * token are stored together with information that identifies the shop invoice
- * source (order or credit note) and create and last updated timestamps. Most
- * webshops also require/expect a single primary key (technical key) but that
- * is irrelevant for this class.
+ * source (order or credit note) and create and last updated timestamps.
+ *
+ * Concepts do not have a token, they only have a concept id. As this feature
+ * was added after this class and the underlying storage had been created, we
+ * store the concept id in the entry id field and use the token field (empty or
+ * set) to determine what the entry id field refers to.
+ *
+ * Most webshops also require/expect a single primary key (technical key) but
+ * that is irrelevant for this class.
  *
  * Usages of this information (* = not (yet) implemented):
  * - Prevent that an invoice for a given order or credit note is sent twice.
@@ -75,11 +81,29 @@ class AcumulusEntry
      */
     public function getEntryId()
     {
-        $entryId = $this->get(static::$keyEntryId);
-        if (!empty($entryId)) {
-            $entryId = (int) $entryId;
-        }
+        // Is it a real entry id or a concept id.
+        $token = $this->getToken();
+        $entryId =  !empty($token) && $token !== static::lockToken ? (int) ($this->get(static::$keyEntryId)) : null;
         return $entryId;
+    }
+
+    /**
+     * Returns the concept id for this Acumulus entry.
+     *
+     * Before support for the Acumulus API v4.3.0 was added, concepts were
+     * stored as null for token AND entry id. Since it was added they are stored
+     * as an int for entry id (actually the concept id) and null for token.
+     *
+     * @return int|null
+     *   The concept id of this Acumulus entry, 0 if it was not stored, or null
+     *   if it is a real entry.
+     */
+    public function getConceptId()
+    {
+        // Is it a concept id or a real entry id.
+        $token = $this->getToken();
+        $conceptId = empty($token) && $token !== static::lockToken ? (int) ($this->get(static::$keyEntryId)) : null;
+        return $conceptId;
     }
 
     /**

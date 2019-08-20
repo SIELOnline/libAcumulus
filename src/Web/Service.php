@@ -269,6 +269,7 @@ class Service
      *   - invoicenumber
      *   - token
      *   - entryid
+     *   - conceptid
      *
      * @see https://www.siel.nl/acumulus/API/Invoicing/Add_Invoice/
      */

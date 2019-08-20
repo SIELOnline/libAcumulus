@@ -566,23 +566,32 @@ abstract class InvoiceManager
         // - If we were sending in test mode or there were errors, no invoice
         //   will have been created in Acumulus: nothing to store.
         // - If the invoice was sent as a concept, the entry id and token will
-        //   be empty: store nulls.
+        //   be empty, but we will receive a concept id and store that instead.
         if (!$this->isTestMode() && !$result->hasError()) {
             // If we are going to overwrite an existing entry, we want to delete
             // that from Acumulus.
             $acumulusEntryManager = $this->getAcumulusEntryManager();
             $oldEntry = $acumulusEntryManager->getByInvoiceSource($invoiceSource, true);
-            $response = $result->getResponse();
-            $saved = (bool) $acumulusEntryManager->save($invoiceSource,
-                empty($response['entryid']) ? null : $response['entryid'],
-                empty($response['token']) ? null : $response['token']
-            );
 
-            // Delete if there is an old entry and we successfully saved the new
-            // entry.
+            $response = $result->getResponse();
+            if (!empty($response['token']) && !empty('entryid')) {
+                // A real entry.
+                $token = $response['token'];
+                $id = $response['entryid'];
+            } elseif (!empty($response['conceptid'])) {
+                // A concept.
+                $token = null;
+                $id = $response['conceptid'];
+            } else {
+                // An error (or old API version).
+                $token = null;
+                $id = null;
+            }
+            $saved = (bool) $acumulusEntryManager->save($invoiceSource, $id, $token);
+
+            // If we successfully saved the new entry, we may delete the old one
+            // if there is one nad it's not a concept.
             if ($saved && isset($oldEntry) && $oldEntry->getEntryId()) {
-                // But only if the old entry does not refer to a concept as
-                // concepts do not have an entry id and thus cannot be deleted.
                 $entryId = $oldEntry->getEntryId();
                 $deleteResult = $this->getService()->setDeleteStatus($entryId, API::Entry_Delete);
                 if ($deleteResult->hasMessages()) {

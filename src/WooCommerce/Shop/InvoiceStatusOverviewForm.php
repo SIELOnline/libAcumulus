@@ -350,14 +350,13 @@ class InvoiceStatusOverviewForm extends Form
 
             case 'entry_deletestatus_set':
                 $localEntryInfo = $this->acumulusEntryManager->getByInvoiceSource($source);
-                if ($localEntryInfo) {
+                if ($localEntryInfo && $localEntryInfo->getEntryId() !== null) {
                     $deleteStatus = $this->getSubmittedValue('value') === Api::Entry_Delete ? Api::Entry_Delete : Api::Entry_UnDelete;
                     $result = $this->service->setDeleteStatus($localEntryInfo->getEntryId(), $deleteStatus);
                 } else {
                     $this->addErrorMessages(sprintf($this->t('unknown_entry'),
-                    strtolower($this->t($this->submittedSource->getType())),
-                        $this->submittedSource->getId()
-                    ));
+                      strtolower($this->t($this->submittedSource->getType())), $this->submittedSource->getId())
+                    );
                 }
                 break;
 
@@ -503,7 +502,7 @@ class InvoiceStatusOverviewForm extends Form
             $statusSeverity = static::Status_Info;
         } else {
             $arg1 = $this->getDate($localEntryInfo->getUpdated());
-            if ($localEntryInfo->getEntryId() === null) {
+            if ($localEntryInfo->getConceptId() !== null) {
                 $invoiceStatus = static::Invoice_SentConcept;
                 $description = 'concept_description';
                 $statusSeverity = static::Status_Warning;

@@ -22,11 +22,12 @@ use Siel\Acumulus\PluginConfig;
  *
  * Usages of this information (* = not (yet) implemented):
  * - Prevent that an invoice for a given order or credit note is sent twice.
- * - Show additional information on order or order list screens (*).
- * - Update payment status (*)
- * - Resend Acumulus invoice PDF (*).
- * At the moment of writing (april 2018), the 3 not yet implemented features are
- * being added to the Acumulus WooCommerce plugin.
+ * - Show additional information on order or order list screens.
+ * - Update payment status
+ * - Show or resend (*) Acumulus invoice PDF
+ *
+ * Note: some of these features are only implemented in the Acumulus
+ *   WooCommerce plugin.
  */
 class AcumulusEntry
 {
@@ -47,6 +48,7 @@ class AcumulusEntry
     static protected $maxLockTime = 40;
     const lockEntryId = 1;
     const lockToken = 'Send locked, delete if too old';
+    const conceptIdUnknown = 0;
 
     // Constants that define the various delete lock results.
     const Lock_NoLongerExists = 1;

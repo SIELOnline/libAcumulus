@@ -37,6 +37,7 @@ class InvoiceStatusOverviewForm extends Form
     const Invoice_Deleted = 'invoice_deleted';
     const Invoice_NonExisting = 'invoice_non_existing';
     const Invoice_CommunicationError = 'invoice_communication_error';
+    const Invoice_LocalError = 'invoice_local_error';
 
     const Status_Unknown = 0;
     const Status_Success = 1;
@@ -352,6 +353,7 @@ class InvoiceStatusOverviewForm extends Form
                 $localEntryInfo = $this->acumulusEntryManager->getByInvoiceSource($source);
                 if ($localEntryInfo && $localEntryInfo->getEntryId() !== null) {
                     $deleteStatus = $this->getSubmittedValue('value') === Api::Entry_Delete ? Api::Entry_Delete : Api::Entry_UnDelete;
+                    // @todo: clean up on receiving P2XFELO12?
                     $result = $this->service->setDeleteStatus($localEntryInfo->getEntryId(), $deleteStatus);
                 } else {
                     $this->addErrorMessages(sprintf($this->t('unknown_entry'),
@@ -414,7 +416,7 @@ class InvoiceStatusOverviewForm extends Form
     {
         $this->resetStatus();
         // Get invoice status field and other invoice status related info.
-        $statusInfo = $this->getInvoiceStatusInfo($localEntryInfo);
+        $statusInfo = $this->getInvoiceStatusInfo($source, $localEntryInfo);
 
         $this->setStatus($statusInfo['severity'], $statusInfo['severity-message']);
         /** @var string $invoiceStatus */
@@ -447,7 +449,7 @@ class InvoiceStatusOverviewForm extends Form
                 $additionalFields = $this->getDeletedFields($source);
                 break;
             case static::Invoice_Sent:
-                $additionalFields = $this->getEntryFields($source, $localEntryInfo, $entry);
+                $additionalFields = $this->getEntryFields($source, $entry);
                 break;
             default:
                 $additionalFields = array(
@@ -479,7 +481,10 @@ class InvoiceStatusOverviewForm extends Form
     /**
      * Returns status related information.
      *
+     * @param \Siel\Acumulus\Invoice\Source $source
      * @param \Siel\Acumulus\Shop\AcumulusEntry|null $localEntryInfo
+     *   Passed by reference as it may have to be renewed when a concept was
+     *   made definitive.
      *
      * @return array
      *   Keyed array with keys:
@@ -489,7 +494,7 @@ class InvoiceStatusOverviewForm extends Form
      *   - entry (array|null): the <entry> part of the getEntry API call.
      *   - statusField (array): a form field array representing the status.
      */
-    private function getInvoiceStatusInfo($localEntryInfo)
+    private function getInvoiceStatusInfo(Source $source, &$localEntryInfo)
     {
         $result = null;
         $entry = null;
@@ -503,10 +508,65 @@ class InvoiceStatusOverviewForm extends Form
         } else {
             $arg1 = $this->getDate($localEntryInfo->getUpdated());
             if ($localEntryInfo->getConceptId() !== null) {
-                $invoiceStatus = static::Invoice_SentConcept;
-                $description = 'concept_description';
-                $statusSeverity = static::Status_Warning;
-            } else {
+                if ($localEntryInfo->getConceptId() === BaseAcumulusEntry::conceptIdUnknown) {
+                    // Old entry: no concept id stored, we cannot show more
+                    // information.
+                    $invoiceStatus = static::Invoice_SentConcept;
+                    $description = 'concept_no_conceptid';
+                    $statusSeverity = static::Status_Warning;
+                } else {
+                    // Entry saved with support for concept ids.
+                    // Has the concept been changed into an invoice?
+                    $result = $this->service->getConceptInfo($localEntryInfo->getConceptId());
+                    $conceptInfo = $this->sanitizeConceptInfo($result->getResponse());
+                    if (empty($conceptInfo)) {
+                        $invoiceStatus = static::Invoice_CommunicationError;
+                        $statusSeverity = static::Status_Error;
+                    } elseif ($result->hasCodeTag('FGYBSN040') || $result->hasCodeTag('FGYBSN048')) {
+                        // Concept id does not exist (anymore).
+                        $invoiceStatus = static::Invoice_SentConcept;
+                        $statusSeverity = static::Status_Warning;
+                        $description = 'concept_conceptid_deleted';
+                        // Prevent this API call in the future, it will return
+                        // the same result.
+                        $this->acumulusEntryManager->save($source, null, null);
+                    } elseif (empty($conceptInfo['entryid'])) {
+                        // Concept has not yet been turned into a definitive
+                        // invoice.
+                        $invoiceStatus = static::Invoice_SentConcept;
+                        $statusSeverity = static::Status_Warning;
+                        $description = 'concept_no_invoiceid';
+                    } elseif (is_array($conceptInfo['entryid']) && count($conceptInfo['entryid']) >= 2) {
+                        // Multiple real invoices created out of this concept:
+                        // cannot link concept to just 1 invoice.
+                        // @nth: unless all but 1 are deleted ...
+                        $invoiceStatus = static::Invoice_SentConcept;
+                        $description = 'concept_multiple_invoiceid';
+                        $statusSeverity = static::Status_Warning;
+                    } else {
+                        // Concept turned into 1 definitive invoice: update
+                        // acumulus entry to have it refer to that invoice.
+                        $result = $this->service->getEntry($conceptInfo['entryid']);
+                        $entry = $this->sanitizeEntry($result->getResponse());
+                        if (!$result->hasError() && !empty($entry['token'])) {
+                            if ($this->acumulusEntryManager->save($source, $conceptInfo['entryid'], $entry['token'])) {
+                                $localEntryInfo = $this->acumulusEntryManager->getByInvoiceSource($source);
+                                // Status will be set below based on real
+                                // invoice.
+                            } else {
+                                $invoiceStatus = static::Invoice_LocalError;
+                                $statusSeverity = static::Status_Error;
+                                $description = 'entry_concept_not_updated';
+                            }
+                        } else {
+                            $invoiceStatus = static::Invoice_CommunicationError;
+                            $statusSeverity = static::Status_Error;
+                        }
+                    }
+                }
+            }
+
+            if ($localEntryInfo->getEntryId() !== null) {
                 $result = $this->service->getEntry($localEntryInfo->getEntryId());
                 $entry = $this->sanitizeEntry($result->getResponse());
                 if ($result->hasCodeTag('XGYBSN000')) {
@@ -703,18 +763,17 @@ class InvoiceStatusOverviewForm extends Form
      * Returns additional form fields to show when the invoice is still there.
      *
      * @param \Siel\Acumulus\Invoice\Source $source
-     * @param \Siel\Acumulus\Shop\AcumulusEntry $localEntryInfo
      * @param array $entry
      *
      * @return array[]
      *   Array of form fields.
      */
-    private function getEntryFields(Source $source, BaseAcumulusEntry $localEntryInfo, array $entry)
+    private function getEntryFields(Source $source, array $entry)
     {
         $fields = $this->getVatTypeField($entry)
             + $this->getAmountFields($source, $entry)
             + $this->getPaymentStatusFields($source, $entry)
-            + $this->getLinksField($localEntryInfo->getToken());
+            + $this->getLinksField($entry['token']);
 
         return $fields;
     }
@@ -1037,7 +1096,7 @@ class InvoiceStatusOverviewForm extends Form
     }
 
     /**
-     * Sanitizes an entry struct received via an getEntry API call.
+     * Sanitizes an entry struct received via a getEntry API call.
      *
      * The info received from an external API call should not be trusted, so it
      * should be sanitized. As most info from this API call is placed in markup
@@ -1055,8 +1114,9 @@ class InvoiceStatusOverviewForm extends Form
      *   future API version returns additional fields and we forget to sanitize
      *   it and thus use it non sanitised.
      *
-     * Keys in $entry array:
-     *   - entryid
+     * Keys in $entry array (* are sanitized):
+     *   * token
+     *   * entryid
      *   * entrydate: yy-mm-dd
      *   - entrytype
      *   - entrydescription
@@ -1075,9 +1135,10 @@ class InvoiceStatusOverviewForm extends Form
      *   - invoicenote
      *   - descriptiontext
      *   - invoicelayoutid
-     *   - totalvalueexclvat
-     *   - totalvalue
-     *   - totalvalueforeignvat
+     *   - paymenttoken
+     *   * totalvalueexclvat
+     *   * totalvalue
+     *   * totalvalueforeignvat
      *   - paymenttermdays
      *   * paymentdate: yy-mm-dd
      *   * paymentstatus: 1 or 2
@@ -1091,21 +1152,62 @@ class InvoiceStatusOverviewForm extends Form
     private function sanitizeEntry(array $entry)
     {
         if (!empty($entry)) {
-            // @todo: keys in $entry array that are not yet used and not yet sanitized.
-            $result['entryid'] = $this->sanitizeEntryIntValue($entry, 'entryid');
-            $result['entrydate'] = $this->sanitizeEntryDateValue($entry, 'entrydate');
-            $result['vatreversecharge'] = $this->sanitizeEntryBoolValue($entry, 'vatreversecharge');
-            $result['foreigneu'] = $this->sanitizeEntryBoolValue($entry, 'foreigneu');
-            $result['foreignnoneu'] = $this->sanitizeEntryBoolValue($entry, 'foreignnoneu');
-            $result['marginscheme'] = $this->sanitizeEntryBoolValue($entry, 'marginscheme');
-            $result['foreignvat'] = $this->sanitizeEntryBoolValue($entry, 'foreignvat');
-            $result['invoicenumber'] = $this->sanitizeEntryIntValue($entry, 'invoicenumber');
-            $result['totalvalueexclvat'] = $this->sanitizeEntryFloatValue($entry, 'totalvalueexclvat');
-            $result['totalvalue'] = $this->sanitizeEntryFloatValue($entry, 'totalvalue');
-            $result['totalvalueforeignvat'] = $this->sanitizeEntryFloatValue($entry, 'totalvalueforeignvat');
-            $result['paymentstatus'] = $this->sanitizeEntryIntValue($entry, 'paymentstatus');
-            $result['paymentdate'] = $this->sanitizeEntryDateValue($entry, 'paymentdate');
-            $result['deleted'] = $this->sanitizeEntryStringValue($entry, 'deleted');
+            $result = array();
+            $result['entryid'] = $this->sanitizeIntValue($entry, 'entryid');
+            $result['token'] = $this->sanitizeStringValue($entry, 'token', '/^[0-9a-zA-Z]{32}$/');
+            $result['entrydate'] = $this->sanitizeDateValue($entry, 'entrydate');
+            $result['vatreversecharge'] = $this->sanitizeBoolValue($entry, 'vatreversecharge');
+            $result['foreigneu'] = $this->sanitizeBoolValue($entry, 'foreigneu');
+            $result['foreignnoneu'] = $this->sanitizeBoolValue($entry, 'foreignnoneu');
+            $result['marginscheme'] = $this->sanitizeBoolValue($entry, 'marginscheme');
+            $result['foreignvat'] = $this->sanitizeBoolValue($entry, 'foreignvat');
+            $result['invoicenumber'] = $this->sanitizeIntValue($entry, 'invoicenumber');
+            $result['totalvalueexclvat'] = $this->sanitizeFloatValue($entry, 'totalvalueexclvat');
+            $result['totalvalue'] = $this->sanitizeFloatValue($entry, 'totalvalue');
+            $result['totalvalueforeignvat'] = $this->sanitizeFloatValue($entry, 'totalvalueforeignvat');
+            $result['paymentstatus'] = $this->sanitizeIntValue($entry, 'paymentstatus');
+            $result['paymentdate'] = $this->sanitizeDateValue($entry, 'paymentdate');
+            $result['deleted'] = $this->sanitizeStringValue($entry, 'deleted');
+        } else {
+            $result = null;
+        }
+        return $result;
+    }
+
+    /**
+     * Sanitizes an concept info struct received via a getConceptInfo API call.
+     *
+     * The info received from an external API call should not be trusted, so it
+     * should be sanitized. As most info from this API call is placed in markup
+     * fields we cannot rely on the FormRenderer or the webshop's form API as
+     * these do not sanitize markup fields.
+     *
+     * So we sanitize the values in the struct itself before using them:
+     * - Int, float, and bool fields are cast to their proper type.
+     * - Date strings are parsed to a DateTime and formatted back to a date
+     *   string.
+     * - Strings that can only contain a restricted set of values are checked
+     *   against that set and emptied if not part of it.
+     * - Free string values are escaped to save html.
+     * - Keys we don't use are not returned. This keeps the output safe when a
+     *   future API version returns additional fields and we forget to sanitize
+     *   it and thus use it non sanitised.
+     *
+     * Keys in $entry array:
+     *   - conceptid: int
+     *   - entryid: int|int[]
+     *
+     * @param array $conceptInfo
+     *
+     * @return array|null
+     *   The sanitized entry struct.
+     */
+    private function sanitizeConceptInfo(array $conceptInfo)
+    {
+        if (!empty($conceptInfo)) {
+            $result = array();
+            $result['conceptid'] = $this->sanitizeIntValue($conceptInfo, 'conceptid');
+            $result['entryid'] = $this->sanitizeIntValue($conceptInfo, 'entryid', true);
         } else {
             $result = null;
         }
@@ -1117,14 +1219,34 @@ class InvoiceStatusOverviewForm extends Form
      *
      * @param array $entry
      * @param string $key
+     * @param string|string[]|null $additionalRestriction
+     *   An optional additional restriction to apply. If it is a string it is
+     *   considered a regular expression and the value is matched against it.
+     *   If it is an array, it is considered a set of allowed values and the
+     *   value is tested for being in the array.
      *
      * @return string
      *   The html safe version of the value under this key or the empty string
      *   if not set.
      */
-    private function sanitizeEntryStringValue(array $entry, $key)
+    private function sanitizeStringValue(array $entry, $key, $additionalRestriction = null)
     {
-        return !empty($entry[$key]) ? htmlspecialchars($entry[$key], ENT_NOQUOTES) : '';
+        $result = '';
+        if (!empty($entry[$key])) {
+            $value = $entry[$key];
+            if (is_string($additionalRestriction)) {
+                if (preg_match($additionalRestriction, $value)) {
+                    $result = $value;
+                }
+            } elseif (is_array($additionalRestriction)) {
+                if (in_array($value, $additionalRestriction)) {
+                    $result = $value;
+                }
+            } else {
+                $result = htmlspecialchars($value, ENT_NOQUOTES);
+            }
+        }
+        return $result;
     }
 
     /**
@@ -1132,13 +1254,27 @@ class InvoiceStatusOverviewForm extends Form
      *
      * @param array $entry
      * @param string $key
+     * @param bool $allowArray
      *
-     * @return int
-     *   The int value of the value under this key.
+     * @return int|int[]
+     *   The int value of the value under this key or 0 if not provided. If
+     *   $allowArray is set, an empty array is returned, if no value is set.
      */
-    private function sanitizeEntryIntValue(array $entry, $key)
+    private function sanitizeIntValue(array $entry, $key, $allowArray = false)
     {
-        return !empty($entry[$key]) ? (int) $entry[$key] : 0;
+        if (isset($entry[$key])) {
+            if ($allowArray && is_array($entry[$key])) {
+                $result = array();
+                foreach ($entry[$key] as $value) {
+                    $result[] = (int) $value;
+                }
+            } else {
+                $result = (int) $entry[$key];
+            }
+        } else {
+            $result = $allowArray ? array() : 0;
+        }
+        return $result;
     }
 
     /**
@@ -1150,7 +1286,7 @@ class InvoiceStatusOverviewForm extends Form
      * @return int
      *   The float value of the value under this key.
      */
-    private function sanitizeEntryFloatValue(array $entry, $key)
+    private function sanitizeFloatValue(array $entry, $key)
     {
         return !empty($entry[$key]) ? (float) $entry[$key] : 0.0;
     }
@@ -1165,7 +1301,7 @@ class InvoiceStatusOverviewForm extends Form
      *   The bool value of the value under this key. True values are represented
      *   by 1, false values by 0.
      */
-    private function sanitizeEntryBoolValue(array $entry, $key)
+    private function sanitizeBoolValue(array $entry, $key)
     {
         /** @noinspection TypeUnsafeComparisonInspection */
         return isset($entry[$key]) && $entry[$key] == 1;
@@ -1181,7 +1317,7 @@ class InvoiceStatusOverviewForm extends Form
      *   The date value (yyyy-mm-dd) of the value under this key or the empty
      *   string, if the string is not in the valid date format (yyyy-mm-dd).
      */
-    private function sanitizeEntryDateValue(array $entry, $key)
+    private function sanitizeDateValue(array $entry, $key)
     {
         $date = '';
         if (!empty($entry[$key])) {

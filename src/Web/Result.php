@@ -614,9 +614,11 @@ class Result
         if (($message = $this->getExceptionMessage()) !== '') {
             $messages[] = $message;
         }
-        $messages = array_merge($messages, $this->getErrors(self::Format_PlainTextArray));
-        $messages = array_merge($messages, $this->getWarnings(self::Format_PlainTextArray));
-        $messages = array_merge($messages, $this->getNotices(self::Format_PlainTextArray));
+        $messages = array_merge($messages,
+            $this->getErrors(self::Format_PlainTextArray),
+            $this->getWarnings(self::Format_PlainTextArray),
+            $this->getNotices(self::Format_PlainTextArray)
+        );
 
         return $this->formatMessages($messages, $format);
     }

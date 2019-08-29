@@ -19,6 +19,10 @@ WC3 = WooCommerce 3 (WordPress)
 
 5.7.4 (2019-08-29)
 ------------------
+Features:
+- Support for API v4.3.0 (https://www.siel.nl/acumulus/API/Changelog/): Store
+  conceptid if available and there is no entryid.
+
 Bugs:
 - MA2: Versie die getoond werd bij de support-informatie was de databaseschema-
   versie (uit module.xml), niet de moduleversie van de module (uit

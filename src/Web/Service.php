@@ -279,6 +279,33 @@ class Service
     }
 
     /**
+     * Retrieves information about a concept.
+     *
+     * @param int $conceptId
+     *   The id of the concept.
+     *
+     * @return \Siel\Acumulus\Web\Result
+     *   The result of the webservice call. The structured response will contain
+     *   1 "concept" array, being a keyed array with keys:
+     *   - conceptid: int
+     *   - entryid: int|int[]
+     *   Possible errors:
+     *   - FGYBSN040: Requested invoice for concept $concepId not found: No
+     *     definitive invoice has yet been created for this concept.
+     *   - FGYBSN048: Information not available for $conceptId older then 127466.
+     *   -
+     *
+     * @see https://www.siel.nl/acumulus/API/Invoicing/Concept_Info/
+     */
+    public function getConceptInfo($conceptId)
+    {
+        $message = array(
+            'conceptid' => (int) $conceptId,
+        );
+        return $this->communicator->callApiFunction('invoices/invoice_concept_info', $message)->setMainResponseKey('concept');
+    }
+
+    /**
      * Retrieves Entry (Boeking) Details.
      *
      * @param int $entryId
@@ -313,7 +340,7 @@ class Service
      *   - paymentstatus
      *   - deleted
      *   Possible errors:
-     *   - "XGYBSN000: Requested invoice for entry $entryId not found": $entryId
+     *   - XGYBSN000: Requested invoice for entry $entryId not found": $entryId
      *     does not exist.
      *
      * @see https://siel.nl/acumulus/API/Entry/Get_Entry_Details/
@@ -342,11 +369,11 @@ class Service
      *   - entryid
      *   - entryproc: (description new status): 'removed' or '???'
      *   Possible errors:
-     *   - "XCM7ELO12: Invalid entrydeletestatus value supplied": $deleteStatus
+     *   - XCM7ELO12: Invalid entrydeletestatus value supplied": $deleteStatus
      *     is not one of the indicated constants.
-     *   - "XCM7ELO14: Invalid entrydeletestatus value supplied": $deleteStatus
+     *   - XCM7ELO14: Invalid entrydeletestatus value supplied": $deleteStatus
      *     is not one of the indicated constants.
-     *   - "P2XFELO12: Requested for entryid: $entryId not found or forbidden":
+     *   - P2XFELO12: Requested for entryid: $entryId not found or forbidden":
      *     $entryId does not exist or already has requested status.
      *
      * @see https://siel.nl/acumulus/API/Entry/Set_Delete_Status/
@@ -357,7 +384,6 @@ class Service
             'entryid' => (int) $entryId,
             'entrydeletestatus' => (int) $deleteStatus,
         );
-        // @todo: clean up on receiving P2XFELO12?
         return $this->communicator->callApiFunction('entry/entry_deletestatus_set', $message)->setMainResponseKey('entry');
     }
 
@@ -375,7 +401,7 @@ class Service
      *   - paymentstatus
      *   - paymentdate
      *   Possible errors:
-     *   - "XGYTTNF04: Requested invoice for $token not found": $token does not
+     *   - XGYTTNF04: Requested invoice for $token not found": $token does not
      *     exist.
      *
      * @see https://www.siel.nl/acumulus/API/Invoicing/Payment_Get_Status/
@@ -408,10 +434,10 @@ class Service
      *   - paymentstatus
      *   - paymentdate
      *   Possible errors:
-     *   - "DATE590ZW: Missing mandatory paymentdate field. Unable to proceed."
-     *   - "DATE590ZW: Incorrect date range (2000-01-01 to 2099-12-31) or
-     *     invalid date format (YYYY-MM-DD) used in paymentdate field. We
-     *     received: $paymentDate. Unable to proceed."
+     *   - DATE590ZW: Missing mandatory paymentdate field. Unable to proceed."
+     *   - DATE590ZW: Incorrect date range (2000-01-01 to 2099-12-31) or invalid
+     *     date format (YYYY-MM-DD) used in paymentdate field. We received:
+     *     $paymentDate. Unable to proceed."
      *
      * @see https://www.siel.nl/acumulus/API/Invoicing/Payment_Set_Status/
      */
@@ -454,10 +480,9 @@ class Service
      *   - token
      *   - invoicetype
      *   Possible errors/warnings:
-     *   - "GK6FKHU52: Incorrect invoicetype value used (9) in invoicetype tag
-     *     as part of invoice section in the XML. Using default value of 0
-     *     normal."
-     *   - "TNFE4035G: Requested token not found or invalid token supplied.
+     *   - GK6FKHU52: Incorrect invoicetype value used (9) in invoicetype tag as
+     *     part of invoice section in the XML. Using default value of 0 normal."
+     *   - TNFE4035G: Requested token not found or invalid token supplied.
      *     Unable to proceed."
      *
      * @see https://siel.nl/acumulus/API/Invoicing/Email/
@@ -487,7 +512,7 @@ class Service
      * @return string
      *   The uri to download the invoice PDF.
      *   Possible errors (in download, not in return value):
-     *   - "PDFATNF04: Requested invoice for $token not found": $token does not
+     *   - PDFATNF04: Requested invoice for $token not found": $token does not
      *     exist.
      *
      * @see https://siel.nl/acumulus/API/Invoicing/Get_PDF_Invoice/
@@ -511,7 +536,8 @@ class Service
      * @return string
      *   The uri to download the packing slip PDF.
      *   Possible errors (in download, not in return value):
-     *   - "ZKFATNF04: Requested packing slip for $token not found or no longer available."
+     *   - ZKFATNF04: Requested packing slip for $token not found or no longer
+     *     available."
      *
      * @see https://siel.nl/acumulus/API/Delivery/Get_PDF_Packing_Slip/
      */

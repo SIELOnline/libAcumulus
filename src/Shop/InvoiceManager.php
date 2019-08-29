@@ -591,8 +591,9 @@ abstract class InvoiceManager
 
             // If we successfully saved the new entry, we may delete the old one
             // if there is one nad it's not a concept.
-            if ($saved && isset($oldEntry) && $oldEntry->getEntryId()) {
+            if ($saved && $oldEntry && $oldEntry->getEntryId()) {
                 $entryId = $oldEntry->getEntryId();
+                // @todo: clean up on receiving P2XFELO12?
                 $deleteResult = $this->getService()->setDeleteStatus($entryId, API::Entry_Delete);
                 if ($deleteResult->hasMessages()) {
                     // Add messages to result but not if the entry has already

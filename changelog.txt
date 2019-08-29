@@ -17,7 +17,7 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies, vanaf 5.5.2 is dat all
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
-5.7.4 (2019-08-??)
+5.7.4 (2019-08-29)
 ------------------
 Bugs:
 - MA2: Versie die getoond werd bij de support-informatie was de databaseschema-
@@ -27,6 +27,8 @@ Bugs:
   getBaseShippingDiscountAmount() is inc of ex btw afhankelijk van of korting
   voor of na btw verrrekend wordt. MA1 heeft dit waarschijnlijk ook, maar daar
   gaat de winkel ook de fout in.
+- WC: CRITICAL Uncaught ArgumentCountError: Too few arguments to function
+  ...::woocommerce_attribute_label(), 2 passed and exactly 3 expected.
 - WC: Acumulus info box op bestellingpagina verdwijnt bij handmatige sortering
   van de info boxen.
 - WC: Acumulus info box op bestellingpagina toont verkeerde bedragen, en
@@ -35,7 +37,7 @@ Bugs:
 Refactorings:
 - WC: Use $recalculatePrice (with the tag to recalculate as value) instead of
   boolean $recalculateUnitPrice.
-
+- WC: WooCommerce 3.7 renamed get_used_coupons() to get_coupon_codes().
 
 5.7.3 (2019-06-25) (MA2 only)
 -----------------------------

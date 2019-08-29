@@ -266,7 +266,7 @@ class Creator extends BaseCreator
                     $variantLabel = wc_attribute_label(wc_sanitize_taxonomy_name($meta->key));
                     $variantValue = isset($term->name) ? $term->name : $meta->value;
                 } else {
-                    $variantLabel = apply_filters('woocommerce_attribute_label', wc_attribute_label($meta->key, $product), $meta->key);
+                    $variantLabel = apply_filters('woocommerce_attribute_label', wc_attribute_label($meta->key, $product), $meta->key, $product);
                     $variantValue = $meta->value;
                 }
 
@@ -499,7 +499,9 @@ class Creator extends BaseCreator
             // the order, not on refunds, so use the order.
 	        /** @var \WC_Order $order */
             $order = $this->invoiceSource->getOrder()->getSource();
-	        $usedCoupons = $order->get_used_coupons();
+            // WooCommerce 3.7 renamed get_used_coupons() to get_coupon_codes().
+            // Remove in time.
+	        $usedCoupons = method_exists($order, 'get_coupon_codes') ? $order->get_coupon_codes() : $order->get_used_coupons();
             foreach ($usedCoupons as $code) {
                 $coupon = new WC_Coupon($code);
                 $result[] = $this->getDiscountLine($coupon);

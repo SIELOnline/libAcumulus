@@ -17,12 +17,18 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies, vanaf 5.5.2 is dat all
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
-5.7.4 (2019-08-29)
+5.8.0 (2019-??-??)
 ------------------
 Features:
 - Support for API v4.3.0 (https://www.siel.nl/acumulus/API/Changelog/): Store
   conceptid if available and there is no entryid.
 
+Bugs:
+- WC: Use billing address if shipping address is not available and tax is based
+  on shipping address.
+
+5.7.4 (2019-08-29)
+------------------
 Bugs:
 - MA2: Versie die getoond werd bij de support-informatie was de databaseschema-
   versie (uit module.xml), niet de moduleversie van de module (uit

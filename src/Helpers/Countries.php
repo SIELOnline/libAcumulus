@@ -94,10 +94,10 @@ class Countries
      */
     public function convertEuCountryCode($countryCode)
     {
-        if ($countryCode === 'EL') {
+        if (strtoupper($countryCode) === 'EL') {
             $countryCode = 'GR';
         }
-        if ($countryCode === 'UK') {
+        if (strtoupper($countryCode) === 'UK') {
             $countryCode = 'GB';
         }
         return $countryCode;

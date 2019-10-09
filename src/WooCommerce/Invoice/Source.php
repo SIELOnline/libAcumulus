@@ -146,7 +146,14 @@ class Source extends BaseSource
         /** @var \WC_Order $order */
         $order = $this->getOrder()->source;
         $tax_based_on = get_option('woocommerce_tax_based_on');
-        return $tax_based_on === 'billing' ? $order->get_billing_country() : $order->get_shipping_country();
+        $result = '';
+        if ($tax_based_on === 'shipping') {
+            $result = $order->get_shipping_country();
+        }
+        if (empty($result)) {
+            $result = $order->get_billing_country();
+        }
+        return $result;
     }
 
     /**

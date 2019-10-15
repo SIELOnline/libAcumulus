@@ -109,10 +109,13 @@ class Creator extends BaseCreator
         $commonTags = array(Tag::Quantity => $quantity);
         $result += $commonTags;
 
-        // Add price info. get_total() and get_total_tax() return line totals
-        // after discount (and will be negative on refunds).
+        // Add price info. get_total() and get_taxes() return line totals after
+        // discount. get_taxes() returns non-rounded tax amounts per tax class
+        // id, whereas  get_total_tax() returns either a rounded or non-rounded
+        // amount, depending on the 'woocommerce_tax_round_at_subtotal' setting.
         $productPriceEx = $item->get_total() / $quantity;
-        $productVat = $item->get_total_tax() / $quantity;
+        $taxes = $item->get_taxes();
+        $productVat = array_sum($taxes['total']) / $quantity;
         $productPriceInc = $productPriceEx + $productVat;
 
         // Get precision info.

@@ -24,6 +24,8 @@ Features:
   conceptid if available and there is no entryid.
 
 Bugs:
+- WC3: WC3 changed what actions are fired during order create/update. As a
+  result this plugin missed checking the status on order creation.
 - WC: Use billing address if shipping address is not available and tax is based
   on shipping address.
 

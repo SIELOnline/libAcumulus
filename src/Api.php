@@ -7,12 +7,13 @@ namespace Siel\Acumulus;
 interface Api
 {
     /**
-     * Format to use with date() and DateTime formatting methods when a date is
-     * required in the API.
+     * Formats to use with date() and DateTime formatting methods when dates or
+     * times are expected in the API.
      *
      * @var string
      */
     const DateFormat_Iso = 'Y-m-d';
+    const Format_TimeStamp = 'Y-m-d H:i:s';
 
     // API role ids
     const RoleManager = 1;

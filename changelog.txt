@@ -30,6 +30,9 @@ Bugs:
   would recalculate the unit price ex vat incorrectly.
 - WC3: WC3 changed what actions are fired during order create/update. As a
   result this plugin missed checking the status on order creation.
+- WC: An invoice that gets saved in Acumulus will return '0000-00-00 00:00:00'
+  for the field 'deleted',leading to an error in recognising if an entry has
+  been deleted or not.
 - WC: Use billing address if shipping address is not available and tax is based
   on shipping address.
 

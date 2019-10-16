@@ -546,13 +546,23 @@ class InvoiceStatusOverviewForm extends Form
                     } else {
                         // Concept turned into 1 definitive invoice: update
                         // acumulus entry to have it refer to that invoice.
+                        /** @noinspection PhpParamsInspection, see bug: https://youtrack.jetbrains.com/issue/WI-48388 */
+                        /** @noinspection PhpParamsInspection bug:*/
                         $result = $this->service->getEntry($conceptInfo['entryid']);
                         $entry = $this->sanitizeEntry($result->getResponse());
                         if (!$result->hasError() && !empty($entry['token'])) {
+                            /** @noinspection PhpParamsInspection, see bug: https://youtrack.jetbrains.com/issue/WI-48388 */
                             if ($this->acumulusEntryManager->save($source, $conceptInfo['entryid'], $entry['token'])) {
-                                $localEntryInfo = $this->acumulusEntryManager->getByInvoiceSource($source);
-                                // Status will be set below based on real
-                                // invoice.
+                                $newLocalEntryInfo = $this->acumulusEntryManager->getByInvoiceSource($source);
+                                if ($newLocalEntryInfo === null) {
+                                    $invoiceStatus = static::Invoice_LocalError;
+                                    $statusSeverity = static::Status_Error;
+                                    $description = 'entry_concept_not_loaded';
+                                } else {
+                                    $localEntryInfo = $newLocalEntryInfo;
+                                    // Status and severity will be overwritten
+                                    // below based on the found real invoice.
+                                }
                             } else {
                                 $invoiceStatus = static::Invoice_LocalError;
                                 $statusSeverity = static::Status_Error;
@@ -578,10 +588,10 @@ class InvoiceStatusOverviewForm extends Form
                 } elseif (empty($entry)) {
                     $invoiceStatus = static::Invoice_CommunicationError;
                     $statusSeverity = static::Status_Error;
-                } elseif (!empty($entry['deleted'])) {
+                } elseif ($entry['deleted'] instanceof DateTime) {
                     $invoiceStatus = static::Invoice_Deleted;
                     $statusSeverity = static::Status_Warning;
-                    $arg2 = $entry['deleted'];
+                    $arg2 = $entry['deleted']->format(Api::Format_TimeStamp);
                 } else {
                     $invoiceStatus = static::Invoice_Sent;
                     $arg1 = $entry['invoicenumber'];
@@ -592,6 +602,7 @@ class InvoiceStatusOverviewForm extends Form
             }
         }
 
+        /** @noinspection PhpUndefinedVariableInspection */
         return array(
             'severity' => $statusSeverity,
             'severity-message' => $statusMessage,
@@ -1167,7 +1178,7 @@ class InvoiceStatusOverviewForm extends Form
             $result['totalvalueforeignvat'] = $this->sanitizeFloatValue($entry, 'totalvalueforeignvat');
             $result['paymentstatus'] = $this->sanitizeIntValue($entry, 'paymentstatus');
             $result['paymentdate'] = $this->sanitizeDateValue($entry, 'paymentdate');
-            $result['deleted'] = $this->sanitizeStringValue($entry, 'deleted');
+            $result['deleted'] = $this->sanitizeDateTimeValue($entry, 'deleted');
         } else {
             $result = null;
         }
@@ -1329,5 +1340,29 @@ class InvoiceStatusOverviewForm extends Form
             }
         }
         return $date;
+    }
+
+    /**
+     * Returns a sanitized date time value of an entry record.
+     *
+     * @param array $entry
+     * @param string $key
+     *
+     * @return DateTime|null
+     *   The date time value of the value under this key or null if the string
+     *   is not in the valid date-time format (yyyy-mm-dd hh:mm:ss).
+     *   Note that the API might return 0000-00-00 00:00:00 which should not be
+     *   accepted.
+     */
+    private function sanitizeDateTimeValue(array $entry, $key)
+    {
+        $timeStamp = null;
+        if (!empty($entry[$key])) {
+            $timeStamp = DateTime::createFromFormat(API::Format_TimeStamp, $entry[$key]);
+            if (!$timeStamp instanceof DateTime || $timeStamp->getTimestamp() < 0) {
+                $timeStamp = null;
+            }
+        }
+        return $timeStamp;
     }
 }

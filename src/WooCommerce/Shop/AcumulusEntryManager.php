@@ -123,8 +123,12 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     {
         $postId = $entry->getSourceId();
         // Overwrite fields. To be able to return a correct success value, we
-        // should not update with the same value as that also returns false ...!
-        $result1 = $entry->getEntryId() !== $entryId ? update_post_meta($postId, static::$keyEntryId, $entryId) : true;
+        // should not update with the same value as that returns false ...!
+        if ($entry->getEntryId() !== null) {
+            $result1 = $entry->getEntryId() !== $entryId ? update_post_meta($postId, static::$keyEntryId, $entryId) : true;
+        } else {
+            $result1 = $entry->getConceptId() !== $entryId ? update_post_meta($postId, static::$keyEntryId, $entryId) : true;
+        }
         $result2 = $entry->getToken() !== $token ? update_post_meta($postId, static::$keyToken, $token) : true;
         $result3 = $entry->getUpdated(true) != $updated ? update_post_meta($postId, static::$keyUpdated, $updated) : true;
         return $result1 !== false && $result2 !== false && $result3 !== false;

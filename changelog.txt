@@ -21,11 +21,11 @@ WC3 = WooCommerce 3 (WordPress)
 ------------------
 Features:
 - Support for API v4.3.0 (https://www.siel.nl/acumulus/API/Changelog/): Store
-  conceptid if available and there is no entryid.
+  conceptid if invoice has been created as concept.
 
 Bugs:
 - WC: If the setting "Rond belastingen af bij subtotalen, in plaats van per
-  regel" was not checked and if the setting "Prijzen ingevoerd met belastingen"
+  regel" was not enabled and if the setting "Prijzen ingevoerd met belastingen"
   was set to "Ja, ik wil prijzen inclusief belasting invoeren", the plugin
   would recalculate the unit price ex vat incorrectly.
 - WC3: WC3 changed what actions are fired during order create/update. As a

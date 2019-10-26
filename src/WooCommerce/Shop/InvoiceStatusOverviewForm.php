@@ -34,6 +34,7 @@ class InvoiceStatusOverviewForm extends Form
     const Invoice_NotSent = 'invoice_not_sent';
     const Invoice_Sent = 'invoice_sent';
     const Invoice_SentConcept  = 'invoice_sent_concept';
+    const Invoice_SentConceptNoInvoice  = 'invoice_sent_concept_no_invoice';
     const Invoice_Deleted = 'invoice_deleted';
     const Invoice_NonExisting = 'invoice_non_existing';
     const Invoice_CommunicationError = 'invoice_communication_error';
@@ -436,10 +437,10 @@ class InvoiceStatusOverviewForm extends Form
                 $additionalFields = $this->getNotSentFields($source);
                 break;
             case static::Invoice_SentConcept:
+            case static::Invoice_SentConceptNoInvoice:
                 $additionalFields = $this->getConceptFields($source);
                 break;
             case static::Invoice_CommunicationError:
-                /** @noinspection PhpUndefinedVariableInspection */
                 $additionalFields = $this->getCommunicationErrorFields($result);
                 break;
             case static::Invoice_NonExisting:
@@ -523,19 +524,19 @@ class InvoiceStatusOverviewForm extends Form
                         $invoiceStatus = static::Invoice_CommunicationError;
                         $statusSeverity = static::Status_Error;
                     } elseif ($result->hasCodeTag('FGYBSN040') || $result->hasCodeTag('FGYBSN048')) {
-                        // Concept id does not exist (anymore).
+                        // FGYBSN040: concept id does not exist (anymore) or no access.
+                        // FGYBSN048: concept id to old, cannot be tracked.
                         $invoiceStatus = static::Invoice_SentConcept;
                         $statusSeverity = static::Status_Warning;
-                        $description = 'concept_conceptid_deleted';
+                        $description = $result->hasCodeTag('FGYBSN040') ? 'concept_conceptid_deleted' : $description = 'concept_no_conceptid';
                         // Prevent this API call in the future, it will return
                         // the same result.
                         $this->acumulusEntryManager->save($source, null, null);
                     } elseif (empty($conceptInfo['entryid'])) {
                         // Concept has not yet been turned into a definitive
                         // invoice.
-                        $invoiceStatus = static::Invoice_SentConcept;
+                        $invoiceStatus = static::Invoice_SentConceptNoInvoice;
                         $statusSeverity = static::Status_Warning;
-                        $description = 'concept_no_invoiceid';
                     } elseif (is_array($conceptInfo['entryid']) && count($conceptInfo['entryid']) >= 2) {
                         // Multiple real invoices created out of this concept:
                         // cannot link concept to just 1 invoice.
@@ -1352,7 +1353,7 @@ class InvoiceStatusOverviewForm extends Form
      *   The date time value of the value under this key or null if the string
      *   is not in the valid date-time format (yyyy-mm-dd hh:mm:ss).
      *   Note that the API might return 0000-00-00 00:00:00 which should not be
-     *   accepted.
+     *   accepted (recognised by a negative timestamp).
      */
     private function sanitizeDateTimeValue(array $entry, $key)
     {

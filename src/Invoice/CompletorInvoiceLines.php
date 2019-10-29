@@ -653,16 +653,25 @@ class CompletorInvoiceLines
     /**
      * Recalculates the unitprice(inc) for lines that indicate so.
      *
-     * All non strategy invoice lines have unitprice and vatrate filled in and
-     * should by now have correct(ed) VAT rates. In some shops the unitprice or
-     * unitpriceinc is imprecise because they are based on prices entered
-     * including vat (resp. excluding vat) and are returned rounded to the cent.
+     * PRE: All non strategy invoice lines have unitprice and vatrate filled in
+     * and should by now have correct(ed) VAT rates. In some shops the unitprice
+     * or unitpriceinc is imprecise because they are returned rounded to the
+     * cent.
      *
      * To prevent differences between the Acumulus and shop invoice (or between
-     * the invoice and line totals) we recompute the unitprice(inc) if:
-     * - vatrate is correct
-     * - meta-recalculate-price is set (Tag::UnitPrice or Meta:UnitPriceInc)
-     * - unitpriceinc is available
+     * the invoice and line totals) we recompute the unitprice if:
+     * - vatrate is correct.
+     * - meta-recalculate-price is set to Tag::UnitPrice. (Shops should set
+     *   so, if prices are entered inc vat and the price ex vat as obtained by
+     *   this plugin is known to have a precision worse than 0.0001.
+     * - unitpriceinc is available.
+     *
+     * We recompute the unitpriceinc if:
+     * - vatrate is correct.
+     * - meta-recalculate-price is set to Meta:UnitPriceInc. (Shops should set
+     *   so, if prices are entered ex vat and the price inc vat as obtained by
+     *   this plugin is known to have a precision worse than 0.0001.
+     * - unitprice is available.
      *
      * @param array[] $lines
      *   The invoice lines to recalculate.

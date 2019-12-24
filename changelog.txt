@@ -17,11 +17,16 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies, vanaf 5.5.2 is dat all
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
+5.8.1 (20??-??-??)
+------------------
+Bugs:
+- HS: Vat range calculation of discounts used incorrect precisions.
+
 5.8.0 (2019-10-28)
 ------------------
 Features:
-- Support for API v4.3.0 (https://www.siel.nl/acumulus/API/Changelog/): Store
-  conceptid if invoice has been created as concept.
+- ALL: Support for API v4.3.0 (https://www.siel.nl/acumulus/API/Changelog/):
+  Store conceptid if invoice has been created as concept.
 
 Bugs:
 - WC: If the setting "Rond belastingen af bij subtotalen, in plaats van per

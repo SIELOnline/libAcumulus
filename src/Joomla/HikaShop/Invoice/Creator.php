@@ -36,7 +36,7 @@ class Creator extends BaseCreator
      *
      * @var float
      */
-    protected $precision = 0.0001;
+    protected $precision = 0.0002;
 
     /**
      * {@inheritdoc}
@@ -200,7 +200,7 @@ class Creator extends BaseCreator
                 $shippingVat = (float) $this->order->order_shipping_tax;
                 $shippingEx = $shippingInc - $shippingVat;
                 $recalculatePrice = Tag::UnitPrice;
-                $vatInfo = $this->getVatRangeTags($shippingVat, $shippingEx, $this->precision, 2 * $this->precision);
+                $vatInfo = $this->getVatRangeTags($shippingVat, $shippingEx, $this->precision, $this->precision);
 
                 // Add vat lookup meta data.
                 $vatLookupMetaData = array();
@@ -281,7 +281,8 @@ class Creator extends BaseCreator
             $discountInc = (float) $this->order->order_discount_price;
             $discountVat = (float) $this->order->order_discount_tax;
             $discountEx = $discountInc - $discountVat;
-            $vatInfo = $this->getVatRangeTags($discountVat, $discountEx, $this->precision, 2 * $this->precision);
+            $recalculatePrice = Tag::UnitPrice;
+            $vatInfo = $this->getVatRangeTags($discountVat, $discountEx, $this->precision, $this->precision);
             if ($vatInfo[Tag::VatRate] === null) {
                 $vatInfo[Meta::StrategySplit] = true;
             }
@@ -291,8 +292,11 @@ class Creator extends BaseCreator
 
             $result[] = array(
                     Tag::Product => $description,
-                    Meta::UnitPriceInc => -$discountInc,
                     Tag::Quantity => 1,
+                    Tag::UnitPrice => -$discountEx,
+                    Meta::UnitPriceInc => -$discountInc,
+                    Meta::PrecisionUnitPriceInc => $this->precision,
+                    Meta::RecalculatePrice => $recalculatePrice,
                     Meta::VatAmount => -$discountVat,
                 ) + $vatInfo;
         }
@@ -312,7 +316,7 @@ class Creator extends BaseCreator
             $paymentVat = (float) $this->order->order_payment_tax;
             $paymentEx = $paymentInc - $paymentVat;
             $recalculatePrice = Tag::UnitPrice;
-            $vatInfo = $this->getVatRangeTags($paymentVat, $paymentEx, $this->precision, 2 * $this->precision);
+            $vatInfo = $this->getVatRangeTags($paymentVat, $paymentEx, $this->precision, $this->precision);
             $description = $this->t('payment_costs');
 
             // Add vat lookup meta data.

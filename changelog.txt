@@ -20,6 +20,10 @@ WC3 = WooCommerce 3 (WordPress)
 5.8.1 (20??-??-??)
 ------------------
 Bugs:
+- OC1: Multiple errors in OC1 getTotalLineTaxClassLookupQuery() leading to mal
+  constructed queries.
+- OC1: setting config_complete_status is not an array in OC1 and thus cannot be
+  used for determining the payment status.
 - HS: Vat range calculation of discounts used incorrect precisions.
 
 5.8.0 (2019-10-28)

@@ -85,10 +85,9 @@ class Source extends BaseSource
         //  allowed to access their downloadable products and gift vouchers."
         // This seems like the set of statuses where payment has been
         // completed...
-        $orderStatuses = $this->getRegistry()->config->get('config_complete_status');
+        $orderStatuses = (array) $this->getRegistry()->config->get('config_complete_status');
 
-        $result = in_array($this->source['order_status_id'], $orderStatuses) ? Api::PaymentStatus_Paid : Api::PaymentStatus_Due;
-        //        $result = Api::PaymentStatus_Paid;
+        $result = (empty($orderStatuses) || in_array($this->source['order_status_id'], $orderStatuses)) ? Api::PaymentStatus_Paid : Api::PaymentStatus_Due;
         return $result;
     }
 

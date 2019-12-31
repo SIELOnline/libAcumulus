@@ -8,7 +8,6 @@ use Siel\Acumulus\OpenCart\Invoice\Creator as BaseCreator;
  */
 class Creator extends BaseCreator
 {
-
     /**
      * Returns the query to get the tax class id for a given total type.
      *
@@ -31,7 +30,7 @@ class Creator extends BaseCreator
     {
         $prefix = DB_PREFIX;
         $code = $this->getRegistry()->db->escape($code);
-        $query = "SELECT `code` FROM {$prefix}extension WHERE `type` = '{$code}''";
+        $query = "SELECT `code` FROM {$prefix}extension WHERE `type` = '{$code}'";
         $records = $this->getRegistry()->db->query($query);
         $modules = array();
         foreach ($records->rows as $row) {
@@ -40,11 +39,11 @@ class Creator extends BaseCreator
 
         if (!empty($modules)) {
             // Total line type has pluggable modules.
-            $modules = "('" . implode("','", $modules) . "')'";
-            return "SELECT distinct `value` FROM {$prefix}setting WHERE `code` IN $modules and `key` LIKE '%_tax_class_id'";
+            $modules = "('" . implode("','", $modules) . "')";
+            return "SELECT distinct `value` FROM {$prefix}setting WHERE `group` IN $modules and `key` LIKE '%_tax_class_id'";
         } else {
             // Total line type has only 1 OpenCart provided module.
-            return "SELECT distinct `value` FROM {$prefix}setting WHERE `code` = '$code' and `key` = '{$code}_tax_class_id'";
+            return "SELECT distinct `value` FROM {$prefix}setting WHERE `group` = '$code' and `key` = '{$code}_tax_class_id'";
         }
     }
 }

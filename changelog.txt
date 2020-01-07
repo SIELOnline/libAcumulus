@@ -25,6 +25,9 @@ Bugs:
 - OC1: setting config_complete_status is not an array in OC1 and thus cannot be
   used for determining the payment status.
 - HS: Vat range calculation of discounts used incorrect precisions.
+- MA2(.3?): Exception #0 (InvalidArgumentException): Unknown form type or
+  acumulus.ERROR: Unknown block type
+  Siel\AcumulusMa2\Block\Adminhtml\Batch\Form\Interceptor.
 
 5.8.0 (2019-10-28)
 ------------------

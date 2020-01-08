@@ -17,7 +17,7 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies, vanaf 5.5.2 is dat all
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
-5.8.1 (20??-??-??)
+5.8.1 (2020-01-07)
 ------------------
 Bugs:
 - OC1: Multiple errors in OC1 getTotalLineTaxClassLookupQuery() leading to mal

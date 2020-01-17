@@ -17,7 +17,7 @@ interface PluginConfig
      *
      * @var string
      */
-    const Version = '5.8.1';
+    const Version = '5.8.2-rc1';
 
     /**
      * Format to use with date() and DateTime formatting methods for SQL

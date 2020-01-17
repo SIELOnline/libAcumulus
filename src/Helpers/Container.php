@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\Helpers;
 
+use InvalidArgumentException;
 use ReflectionClass;
 use Siel\Acumulus\PluginConfig;
 
@@ -228,7 +229,7 @@ class Container
                 /** @var \Siel\Acumulus\Helpers\TranslationCollection $translations */
                 $translations = $this->getInstance('ModuleSpecificTranslations', 'Helpers');
                 $translator->add($translations);
-            } catch (\InvalidArgumentException $e) {}
+            } catch (InvalidArgumentException $e) {}
             $this->moduleSpecificTranslationsAdded = true;
         }
         return $translator;
@@ -512,8 +513,11 @@ class Container
                 $arguments[] = $this->getAcumulusEntryManager();
                 $arguments[] = $this->getService();
                 break;
+            case 'rate':
+                $class = 'RatePlugin';
+                break;
             default;
-                throw new \InvalidArgumentException("Unknown form type $type");
+                throw new InvalidArgumentException("Unknown form type $type");
         }
         $arguments = array_merge($arguments, array(
             $this->getFormHelper(),
@@ -581,7 +585,7 @@ class Container
             }
 
             if (empty($fqClass)) {
-                throw new \InvalidArgumentException("Class $class not found in namespace $subNamespace");
+                throw new InvalidArgumentException("Class $class not found in namespace $subNamespace");
             }
 
             // Create a new instance.

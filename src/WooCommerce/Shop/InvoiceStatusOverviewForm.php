@@ -26,6 +26,14 @@ use Siel\Acumulus\Web\Service;
  *
  * SECURITY REMARKS
  * ----------------
+ * The info received from an external API call should not be trusted, so it
+ * should be sanitized. As most info from this API call is placed in markup
+ * fields we cannot rely on the FormRenderer or the webshop's form API
+ * (who do not sanitize markup fields).
+ *
+ * This form uses ajax calls, values received from an ajax call are to be
+ * treated as user input and thus should be sanitized and checked as all user
+ * input.
  */
 class InvoiceStatusOverviewForm extends Form
 {
@@ -259,13 +267,13 @@ class InvoiceStatusOverviewForm extends Form
      * @inheritDoc
      *
      * This override adds sanitation to the values and already combines some of
-     * the values to retrieve  a Source object
+     * the values to retrieve a Source object
      */
     protected function setSubmittedValues()
     {
         parent::setSubmittedValues();
 
-        // Get the targeted source.
+        // Get the targeted invoice source.
         $this->setSubmittedSource();
         // Sanitise service: lowercase ascii characters, numbers, _ and -.
         $this->submittedValues['service'] = preg_replace('/[^a-z0-9_\-]/', '', $this->submittedValues['service']);

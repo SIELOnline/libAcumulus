@@ -15,7 +15,7 @@ namespace Siel\Acumulus\Helpers;
  * - The exceptions being:
  *     * A label prefix and postfix that come from code and may contain html.
  *       See {@see FormRenderer::renderLabel()}.
- *     * markup is rendered as is as it may contain html (therefore its name
+ *     * markup is rendered as is, as it may contain html (therefore its name
  *       markup ...). See {@see FormRenderer::markup()};
  * - All tags come from object properties or are hard coded and thus present no
  *   security risk but they are passed through htmlspecialchars() anyway. See
@@ -127,6 +127,12 @@ class FormRenderer
 
     /** @var string */
     protected $checkbox1WrapperClass = '';
+
+    /** @var string */
+    protected $renderEmptyLabel = true;
+
+    /** @var string */
+    protected $labelTag = 'label';
 
     /** @var string */
     protected $multiLabelTag = 'label';
@@ -415,32 +421,34 @@ class FormRenderer
     {
         $output = '';
 
-        // Split attributes over label and wrapper.
-        $wrapperAttributes = array();
-        if (!empty($attributes['wrapper'])) {
-            $wrapperAttributes = $attributes['wrapper'];
-            unset($attributes['wrapper']);
-        }
-        if (!empty($attributes['required'])) {
-            $wrapperAttributes['required'] = $attributes['required'];
-        }
+        if ($this->renderEmptyLabel || !empty($text)) {
+            // Split attributes over label and wrapper.
+            $wrapperAttributes = array();
+            if (!empty($attributes['wrapper'])) {
+                $wrapperAttributes = $attributes['wrapper'];
+                unset($attributes['wrapper']);
+            }
+            if (!empty($attributes['required'])) {
+                $wrapperAttributes['required'] = $attributes['required'];
+            }
 
-        // Tag around main labels.
-        if ($wrapLabel) {
-            $output .= $this->getWrapper('label', $wrapperAttributes);
-        }
+            // Tag around main labels.
+            if ($wrapLabel) {
+                $output .= $this->getWrapper('label', $wrapperAttributes);
+            }
 
-        // Label.
-        $attributes = $this->addLabelAttributes($attributes, $id);
-        $postfix .= !empty($attributes['required']) ? $this->requiredMarkup : '';
-        $tag = empty($id) ? $this->multiLabelTag : 'label';
-        $output .= $this->getOpenTag($tag, $attributes);
-        $output .= $prefix . htmlspecialchars($text, $this->htmlSpecialCharsFlag, 'UTF-8') . $postfix;
-        $output .= $this->getCloseTag($tag);
+            // Label.
+            $attributes = $this->addLabelAttributes($attributes, $id);
+            $postfix .= !empty($attributes['required']) ? $this->requiredMarkup : '';
+            $tag = empty($id) ? $this->multiLabelTag : $this->labelTag;
+            $output .= $this->getOpenTag($tag, $attributes);
+            $output .= $prefix . htmlspecialchars($text, $this->htmlSpecialCharsFlag, 'UTF-8') . $postfix;
+            $output .= $this->getCloseTag($tag);
 
-        // Tag around labels.
-        if ($wrapLabel) {
-            $output .= $this->getWrapperEnd('label');
+            // Tag around labels.
+            if ($wrapLabel) {
+                $output .= $this->getWrapperEnd('label');
+            }
         }
         return $output;
     }
@@ -891,6 +899,9 @@ class FormRenderer
         // We add a class so this element can be recognised by js as having an
         // ajax action.
         $field['attributes'] = $this->addAttribute($field['attributes'], 'class', 'acumulus-ajax');
+
+        // Add the form type as a data`-* attribute.
+        $field['attributes'] = $this->addAttribute($field['attributes'], 'data-acumulus-form', $this->form->getType());
 
         // Add the data`-* attributes.
         if (!empty($field['ajax']) && is_array($field['ajax'])) {

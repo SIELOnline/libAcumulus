@@ -17,6 +17,13 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies, vanaf 5.5.2 is dat all
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
+5.8.2 (2020-01-??)
+------------------
+Features:
+- WC: Vraag gebruikers om de plugin te beoordelen op de WP plugin directory.
+- ALL: Add the form type as data to an ajax button.
+- ALL: Allows to not render an empty form label.
+
 5.8.1 (2020-01-07)
 ------------------
 Bugs:
@@ -28,6 +35,7 @@ Bugs:
 - MA2(.3?): Exception #0 (InvalidArgumentException): Unknown form type or
   acumulus.ERROR: Unknown block type
   Siel\AcumulusMa2\Block\Adminhtml\Batch\Form\Interceptor.
+- WC3.8: border around status icon in status overview meta box removed.
 
 5.8.0 (2019-10-28)
 ------------------

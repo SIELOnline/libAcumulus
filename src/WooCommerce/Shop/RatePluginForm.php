@@ -103,19 +103,22 @@ class RatePluginForm extends Form
                         'type' => 'markup',
                         'value' => $this->t('rate_acumulus_plugin'),
                     ),
+                    'do' => array(
+                        'type' => 'button',
+                        'ajax' => array(
+                            'service' => 'done',
+                        ),
+                        'attributes' => array(
+                            'onclick' => 'window.open("' . $this->t('review_url') . '")',
+                        ),
+                        'value' => $this->t('do'),
+                    ),
                     'later' => array(
                         'type' => 'button',
                         'ajax' => array(
                             'service' => 'later',
                         ),
                         'value' => $this->t('later'),
-                    ),
-                    'done' => array(
-                        'type' => 'button',
-                        'ajax' => array(
-                            'service' => 'done',
-                        ),
-                        'value' => $this->t('done'),
                     ),
                 ),
             ),

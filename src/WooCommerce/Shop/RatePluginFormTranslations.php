@@ -9,20 +9,20 @@ use Siel\Acumulus\Helpers\TranslationCollection;
 class RatePluginFormTranslations extends TranslationCollection
 {
     protected $nl = array(
-        'rate_acumulus_plugin' => "<p>Dankjewel dat je onze plugin voor Acumulus gebruikt!</p>
-            <p>Je bespaart jezelf hier veel invoerwerk mee. Deze plugin is met veel zorg ontwikkeld en we blijven deze steeds beter maken maar is en blijft gratis.</p>
-            <p>Heb jij ook voordeel van deze plugin? Laat het ons weten en geef je waardering op <a href='https://nl.wordpress.org/plugins/acumulus/'>onze pagina op de WordPress Plugin Directory</a> (log in en klik op \"Voeg mijn beoordeling toe\".</p>",
-        'later' => 'Later',
-        'done' => 'Ja, ik heb een rating gegeven',
+        'rate_acumulus_plugin' => "<p>Leuk dat je de plugin voor Acumulus gebruikt!</p>
+            <p>Wij hebben hard ons best gedaan om deze zo gebruiksvriendelijk mogelijk te maken. Laat jij weten wat je er van vindt?</p>",
+        'do' => 'OK, breng me er heen',
+        'later' => 'Liever niet nu',
         'done_thanks' => 'Bedankt voor het beoordelen van de Acumulus plugin.',
+        'review_url' => 'https://wordpress.org/support/plugin/acumulus/reviews/#new-post'
     );
 
     protected $en = array(
-        'rate_acumulus_plugin' => "<p>Thanks for using our plugin!</p>
-            <p>You save yourself a lot of time using this plugin. The Acumulus plugin has been developed with great care and we will continue to improve it but will remain free of charge.</p>
-            <p>Do you also benefit from this plugin? Let us know and give your rating on <a href='https://wordpress.org/plugins/acumulus/'>our page on the WordPress Plugin Directory</a> (login en click on \"Add my review\".</p>",
+        'rate_acumulus_plugin' => "<p>Thank you so much for using the Acumulus plugin!</p>
+            <p>We tried really hard to provide you the best possible user experience. Would you please let us know your opinion?</p>",
+        'do' => 'OK, get me there',
         'later' => 'Not now',
-        'done' => 'Yes, I have done so',
-        'done_thanks' => 'Thanks for rating the Acumulus plugin.',
+        'done_thanks' => 'Thank you for taking the time to review the plugin.',
+        'review_url' => 'https://wordpress.org/support/plugin/acumulus/reviews/#new-post'
     );
 }

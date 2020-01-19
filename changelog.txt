@@ -17,7 +17,7 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies, vanaf 5.5.2 is dat all
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
-5.8.2 (2020-01-??)
+5.8.2 (2020-01-19)
 ------------------
 Features:
 - WC: Vraag gebruikers om de plugin te beoordelen op de WP plugin directory.

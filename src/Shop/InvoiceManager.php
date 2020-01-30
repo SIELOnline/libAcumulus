@@ -590,7 +590,7 @@ abstract class InvoiceManager
             $saved = (bool) $acumulusEntryManager->save($invoiceSource, $id, $token);
 
             // If we successfully saved the new entry, we may delete the old one
-            // if there is one nad it's not a concept.
+            // if there is one and it's not a concept.
             if ($saved && $oldEntry && $oldEntry->getEntryId()) {
                 $entryId = $oldEntry->getEntryId();
                 // @todo: clean up on receiving P2XFELO12?
@@ -599,8 +599,9 @@ abstract class InvoiceManager
                     // Add messages to result but not if the entry has already
                     // the delete status or does not exist at all (anymore).
                     if ($deleteResult->hasCodeTag('P2XFELO12')) {
-                        // Successfully deleted the old entry: add a warning so
-                        // this info will be  mailed to the user.
+                        // Could not delete the old entry (already deleted or
+                        // does not exist at all (anymore)): add as a warning so
+                        // this info will be mailed to the user.
                         $result->addWarning(902, '',
                             sprintf($this->t('message_warning_old_entry_not_deleted'), $this->t($invoiceSource->getType()), $entryId));
                     } else {

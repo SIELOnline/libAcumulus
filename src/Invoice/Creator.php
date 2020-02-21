@@ -181,7 +181,7 @@ abstract class Creator
         $this->invoiceSource = $invoiceSource;
         if (!in_array($invoiceSource->getType(), array(Source::Order, Source::CreditNote))) {
             $this->log->error('Creator::setSource(): unknown source type %s', $this->invoiceSource->getType());
-        };
+        }
     }
 
     /**

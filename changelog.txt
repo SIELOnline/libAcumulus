@@ -19,8 +19,14 @@ WC3 = WooCommerce 3 (WordPress)
 
 5.8.? (2020-??-??)
 ------------------
+Bugs:
+- WC: Support for the "WooCommerce TM Extra Product Options" plugin updated so
+  it also works with the latest versions.
+
+Refactorings:
 - WC: Performance: switched to using get_plugins() instead of get_plugin_data()
   as the former caches its data.
+- ALL : Documentation improvements
 
 5.8.2 (2020-01-19)
 ------------------
@@ -56,7 +62,7 @@ Bugs:
 - WC3: WC3 changed what actions are fired during order create/update. As a
   result this plugin missed checking the status on order creation.
 - WC: An invoice that gets saved in Acumulus will return '0000-00-00 00:00:00'
-  for the field 'deleted',leading to an error in recognising if an entry has
+  for the field 'deleted', leading to an error in recognising if an entry has
   been deleted or not.
 - WC: Use billing address if shipping address is not available and tax is based
   on shipping address.

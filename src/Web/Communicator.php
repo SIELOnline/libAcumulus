@@ -252,11 +252,12 @@ class Communicator
         $options = array(
             CURLOPT_URL => $uri,
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYPEER => false, // @todo: why?
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => $post,
             CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1_2,
             //CURLOPT_PROXY => '127.0.0.1:8888', // Uncomment to debug with Fiddler.
+            // @todo: CURLOPT_TIMEOUT?
         );
         if (!curl_setopt_array($ch, $options)) {
             $this->raiseCurlError($ch, 'curl_setopt_array()');
@@ -362,7 +363,7 @@ class Communicator
      * Recursively converts a value to a DOMDocument|DOMElement.
      *
      * @param mixed $values
-     *   A keyed array, an numerically indexed array, or a scalar type.
+     *   A keyed array, a numerically indexed array, or a scalar type.
      * @param DOMDocument|DOMElement $element
      *   The element to append the values to.
      *

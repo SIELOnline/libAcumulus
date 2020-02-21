@@ -33,6 +33,8 @@ class CreatorPluginSupport
      *   The product that was sold on this line, may also be a bool according to
      *   the WC3 php documentation. I guess it will be false if the product has
      *   been deleted since.
+     *
+     * @noinspection PhpUnused
      */
     public function getItemLineBefore(Creator $creator, WC_Order_Item_Product $item, $product)
     {
@@ -50,6 +52,8 @@ class CreatorPluginSupport
      *   The product that was sold on this line, may also be a bool according to
      *   the WC3 php documentation. I guess it will be false if the product has
      *   been deleted since.
+     *
+     * @noinspection PhpUnused
      */
     public function getItemLineAfter(
         Creator $creator,
@@ -181,7 +185,7 @@ class CreatorPluginSupport
         return $invoice;
     }
 
-    protected function &getLineByMetaId($lines, $id)
+    protected function &getLineByMetaId(&$lines, $id)
     {
         foreach ($lines as &$line) {
             if ($line[Meta::Id] == $id) {
@@ -189,7 +193,8 @@ class CreatorPluginSupport
             }
         }
         // Not found: occurs with refunds and a quantity of 0.
-        return null;
+        $result = null;
+        return $result;
     }
 
     /**
@@ -214,6 +219,9 @@ class CreatorPluginSupport
                 $parent = &$this->getParentBundle($result, $itemLine[Meta::BundleParentId]);
                 if ($parent !== null) {
                     // Add the bundled product as a child to the bundle.
+                    if (!isset($parent[Meta::ChildrenLines])) {
+                        $parent[Meta::ChildrenLines] = [];
+                    }
                     $parent[Meta::ChildrenLines][] = $itemLine;
                 } else {
                     // Oops: not found. Store a message in the line meta data
@@ -254,7 +262,8 @@ class CreatorPluginSupport
             }
         }
         // Not found.
-        return null;
+        $result = null;
+        return $result;
     }
 
     /**
@@ -291,7 +300,10 @@ class CreatorPluginSupport
                         Tag::Quantity => $line[Tag::Quantity],
                         Meta::VatRateSource => Creator::VatRateSource_Parent,
                     );
-                    $result[Meta::ChildrenLines] = $this->getExtraProductOptionsLines($item, $commonTags);
+                    if (!isset($line[Meta::ChildrenLines])) {
+                        $line[Meta::ChildrenLines] = [];
+                    }
+                    $line[Meta::ChildrenLines] = array_merge($line[Meta::ChildrenLines], $this->getExtraProductOptionsLines($item, $commonTags));
                 }
             }
         }
@@ -314,7 +326,22 @@ class CreatorPluginSupport
     {
         $result = array();
 
-        $options = unserialize($item['tmcartepo_data']);
+        // It is a bit unclear what format this meta data should have. In old
+        // versions I had an unconditional unserialize, but now I get an array
+        // of options (being arrays themselves) and code of the plugin itself
+        // expects an array that may contain serialized values (i.e it uses
+        // maybe_unserialize() on the elements, not on the complete value.
+        $options = $item['tmcartepo_data'];
+        if (is_string($options)) {
+            $options = (array) maybe_unserialize($options);
+        } else {
+            array_walk($options, function(&$value) {
+                if (is_string($value)) {
+                    $value = maybe_unserialize($value);
+                }
+            });
+        }
+
         foreach ($options as $option) {
             // Get option name and choice.
             $label = $option['name'];

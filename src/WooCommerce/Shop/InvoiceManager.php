@@ -216,7 +216,7 @@ class InvoiceManager extends BaseInvoiceManager
     }
 
     /**
-     * Helper method to get a list of Source given a set of query arguments.
+     * Helper method to get a list of Sources given a set of query arguments.
      *
      * @param array $args
      * @param string $invoiceSourceType

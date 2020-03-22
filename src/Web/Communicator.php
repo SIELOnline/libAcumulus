@@ -252,11 +252,11 @@ class Communicator
         $options = array(
             CURLOPT_URL => $uri,
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_SSL_VERIFYPEER => false, // @todo: why?
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => $post,
             CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1_2,
             //CURLOPT_PROXY => '127.0.0.1:8888', // Uncomment to debug with Fiddler.
+            //CURLOPT_SSL_VERIFYPEER => false, // @todo: why? Uncomment to debug with Fiddler.
             // @todo: CURLOPT_TIMEOUT?
         );
         if (!curl_setopt_array($ch, $options)) {

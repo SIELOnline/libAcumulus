@@ -4,6 +4,7 @@ namespace Siel\Acumulus\WooCommerce\Shop;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
 use Siel\Acumulus\Shop\AcumulusEntryManager as BaseAcumulusEntryManager;
+use WP_Query;
 
 /**
  * Implements the WooCommerce/WordPress specific acumulus entry model class.
@@ -59,7 +60,8 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
             'meta_value' => $entryId,
             'meta_compare' => '=',
         );
-        $posts = query_posts($metaQuery);
+        $query = new WP_Query();
+        $posts = $query->query($query);
         $result = array();
         foreach ($posts as $post) {
             $result1 = get_post_meta($post->id);

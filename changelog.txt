@@ -17,13 +17,14 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies, vanaf 5.5.2 is dat all
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
-5.8.? (2020-??-??)
+5.8.3 (2020-03-22)
 ------------------
 Bugs:
 - WC: Support for the "WooCommerce TM Extra Product Options" plugin updated so
   it also works with the latest versions.
 
 Refactorings:
+- WC: Do not use query_posts().
 - WC: Performance: switched to using get_plugins() instead of get_plugin_data()
   as the former caches its data.
 - ALL : Documentation improvements

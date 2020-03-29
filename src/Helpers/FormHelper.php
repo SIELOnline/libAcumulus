@@ -1,6 +1,8 @@
 <?php
 namespace Siel\Acumulus\Helpers;
 
+use stdClass;
+
 /**
  * Provides basic form helper features.
  *
@@ -99,14 +101,14 @@ class FormHelper
             $type = $field['type'];
             if ($type === 'checkbox') {
                 foreach ($field['options'] as $checkboxKey => $option) {
-                    $data = new \stdClass();
+                    $data = new stdClass();
                     $data->name = $name;
                     $data->type = $type;
                     $data->collection = $key;
                     $result[$checkboxKey] = $data;
                 }
             } else {
-                $data = new \stdClass();
+                $data = new stdClass();
                 $data->name = $name;
                 $data->type = $type;
                 $result[$key] = $data;

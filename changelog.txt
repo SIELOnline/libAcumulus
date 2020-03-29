@@ -17,6 +17,19 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies, vanaf 5.5.2 is dat all
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3 (WordPress)
 
+5.9.0 (2020-04-??)
+------------------
+Refactorings:
+- ALL: Move class Siel\Acumulus\WooCommerce\Shop\InvoiceStatusOverviewForm (and
+  Siel\Acumulus\WooCommerce\Shop\InvoiceStatusOverviewFormTranslations) to
+  Siel\Acumulus\Shop\InvoiceStatusForm (resp.
+  Siel\Acumulus\Shop\InvoiceStatusFormTranslations).
+- WC: Extract checking for the Woocommerce version into a separate method.
+- MA2: Extract helper and access to it into a "Helper" trait.
+- MA2: Allow to work with symlinks.
+- MA2: Schema locations in xml files.
+- ALL: Add required PHP extensions to composer.json.
+
 5.8.3 (2020-03-22)
 ------------------
 Bugs:

@@ -1,23 +1,23 @@
 <?php
-namespace Siel\Acumulus\WooCommerce\Shop;
+namespace Siel\Acumulus\Shop;
 
 use Siel\Acumulus\Helpers\TranslationCollection;
 
 /**
  * Contains translations for the shop order status overview form.
  */
-class InvoiceStatusOverviewFormTranslations extends TranslationCollection
+class InvoiceStatusFormTranslations extends TranslationCollection
 {
     protected $nl = array(
         // Invoice status.
         'acumulus_invoice_title' => 'Acumulus',
-        InvoiceStatusOverviewForm::Invoice_NotSent => 'Nog niet verzonden',
-        InvoiceStatusOverviewForm::Invoice_Sent => 'Factuur %1$s van %2$s',
-        InvoiceStatusOverviewForm::Invoice_SentConcept => 'Op %1$s als concept verzonden',
-        InvoiceStatusOverviewForm::Invoice_SentConceptNoInvoice => 'Op %1$s als concept verzonden maar nog niet definitief gemaakt.',
-        InvoiceStatusOverviewForm::Invoice_Deleted => 'Verzonden op %1$s maar vervolgens op %2$s naar de prullenbak verplaatst.',
-        InvoiceStatusOverviewForm::Invoice_NonExisting => 'Verzonden op %1$s maar niet meer bestaand in Acumulus, ook niet in de prullenbak.',
-        InvoiceStatusOverviewForm::Invoice_CommunicationError => 'Verzonden, maar door een communicatiefout met Acumulus kunnen we niet meer informatie tonen. Probeer het later nog eens.',
+        InvoiceStatusForm::Invoice_NotSent => 'Nog niet verzonden',
+        InvoiceStatusForm::Invoice_Sent => 'Factuur %1$s van %2$s',
+        InvoiceStatusForm::Invoice_SentConcept => 'Op %1$s als concept verzonden',
+        InvoiceStatusForm::Invoice_SentConceptNoInvoice => 'Op %1$s als concept verzonden maar nog niet definitief gemaakt.',
+        InvoiceStatusForm::Invoice_Deleted => 'Verzonden op %1$s maar vervolgens op %2$s naar de prullenbak verplaatst.',
+        InvoiceStatusForm::Invoice_NonExisting => 'Verzonden op %1$s maar niet meer bestaand in Acumulus, ook niet in de prullenbak.',
+        InvoiceStatusForm::Invoice_CommunicationError => 'Verzonden, maar door een communicatiefout met Acumulus kunnen we niet meer informatie tonen. Probeer het later nog eens.',
         'invoice_status_ok' => "De factuur lijkt in orde, er zijn geen onregelmatigheden gevonden",
         'concept_no_conceptid' => 'Helaas kan van deze conceptfactuur niet meer informatie getoond worden, ook niet als u deze definitief gemaakt heeft.',
         'concept_conceptid_deleted' => 'Deze conceptfactuur is verwijderd voordat deze definitief gemaakt is.',
@@ -71,13 +71,13 @@ class InvoiceStatusOverviewFormTranslations extends TranslationCollection
     protected $en = array(
         // Invoice status.
         'acumulus_invoice_title' => 'Acumulus',
-        InvoiceStatusOverviewForm::Invoice_NotSent => 'Not yet sent',
-        InvoiceStatusOverviewForm::Invoice_Sent => 'Invoice %1$s of %2$s',
-        InvoiceStatusOverviewForm::Invoice_SentConcept => 'On %1$s sent as concept',
-        InvoiceStatusOverviewForm::Invoice_SentConceptNoInvoice => 'On %1$s sent as concept but not yet turned into a definitive invoice.',
-        InvoiceStatusOverviewForm::Invoice_Deleted => 'Sent on %1$s, but subsequently on %2$s moved to the trash bin.',
-        InvoiceStatusOverviewForm::Invoice_NonExisting => 'Sent on %1$s, but no longer existing in Acumulus, not even in the thrash bin.',
-        InvoiceStatusOverviewForm::Invoice_CommunicationError => 'Sent, but due to a communication error we cannot show more information. Try again later.',
+        InvoiceStatusForm::Invoice_NotSent => 'Not yet sent',
+        InvoiceStatusForm::Invoice_Sent => 'Invoice %1$s of %2$s',
+        InvoiceStatusForm::Invoice_SentConcept => 'On %1$s sent as concept',
+        InvoiceStatusForm::Invoice_SentConceptNoInvoice => 'On %1$s sent as concept but not yet turned into a definitive invoice.',
+        InvoiceStatusForm::Invoice_Deleted => 'Sent on %1$s, but subsequently on %2$s moved to the trash bin.',
+        InvoiceStatusForm::Invoice_NonExisting => 'Sent on %1$s, but no longer existing in Acumulus, not even in the thrash bin.',
+        InvoiceStatusForm::Invoice_CommunicationError => 'Sent, but due to a communication error we cannot show more information. Try again later.',
         'invoice_status_ok' => 'The invoice seems to be fine, no irregularities were found',
         'concept_no_conceptid' => 'Unfortunately, we cannot show more information about this concept invoice, not even when it has been made definitive.',
         'concept_conceptid_deleted' => 'This concept invoice has been deleted before turning it into a definitive invoice.',

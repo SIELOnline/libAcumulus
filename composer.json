@@ -4,6 +4,11 @@
     "license": [
         "GPL-3.0-or-later"
     ],
+    "require": {
+      "ext-json": "*",
+      "ext-dom": "*",
+      "ext-libxml": "*"
+    },
     "autoload": {
         "psr-4": {
             "Siel\\Acumulus\\": "src/"

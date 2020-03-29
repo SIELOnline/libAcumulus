@@ -1,5 +1,5 @@
 <?php
-namespace Siel\Acumulus\WooCommerce\Shop;
+namespace Siel\Acumulus\Shop;
 
 use DateTime;
 use Siel\Acumulus\Api;
@@ -13,8 +13,6 @@ use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Invoice\Translations as InvoiceTranslations;
 use Siel\Acumulus\Meta;
-use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
-use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
 use Siel\Acumulus\Web\Result;
 use Siel\Acumulus\Web\Service;
 
@@ -35,7 +33,7 @@ use Siel\Acumulus\Web\Service;
  * treated as user input and thus should be sanitized and checked as all user
  * input.
  */
-class InvoiceStatusOverviewForm extends Form
+class InvoiceStatusForm extends Form
 {
     // Constants representing the status of the Acumulus invoice for a given
     // shop order or refund.
@@ -100,7 +98,7 @@ class InvoiceStatusOverviewForm extends Form
 
     /**
      * @param \Siel\Acumulus\Shop\InvoiceManager $invoiceManager
-     * @param \Siel\Acumulus\WooCommerce\Shop\AcumulusEntryManager $acumulusEntryManager
+     * @param \Siel\Acumulus\Shop\AcumulusEntryManager $acumulusEntryManager
      * @param \Siel\Acumulus\Web\Service $service
      * @param \Siel\Acumulus\Helpers\FormHelper $formHelper
      * @param \Siel\Acumulus\Config\ShopCapabilities $shopCapabilities
@@ -109,7 +107,7 @@ class InvoiceStatusOverviewForm extends Form
      * @param \Siel\Acumulus\Helpers\Log $log
      */
     public function __construct(
-        BaseInvoiceManager $invoiceManager,
+        InvoiceManager $invoiceManager,
         AcumulusEntryManager $acumulusEntryManager,
         Service $service,
         FormHelper $formHelper,
@@ -124,7 +122,7 @@ class InvoiceStatusOverviewForm extends Form
         $translations = new InvoiceTranslations();
         $this->translator->add($translations);
 
-        $translations = new InvoiceStatusOverviewFormTranslations();
+        $translations = new InvoiceStatusFormTranslations();
         $this->translator->add($translations);
 
         $this->acumulusEntryManager = $acumulusEntryManager;
@@ -472,7 +470,7 @@ class InvoiceStatusOverviewForm extends Form
 
         // Create main status field after we have the other fields, so we can
         // use the results in rendering the overall status.
-        $fields = array(
+        return array(
             'status' => array(
                 'type' => 'markup',
                 'label' => $this->getStatusIcon($this->status),
@@ -484,7 +482,6 @@ class InvoiceStatusOverviewForm extends Form
                 'description' => $statusDescription,
             ),
         ) + $additionalFields;
-        return $fields;
     }
 
     /**
@@ -517,7 +514,7 @@ class InvoiceStatusOverviewForm extends Form
         } else {
             $arg1 = $this->getDate($localEntryInfo->getUpdated());
             if ($localEntryInfo->getConceptId() !== null) {
-                if ($localEntryInfo->getConceptId() === BaseAcumulusEntry::conceptIdUnknown) {
+                if ($localEntryInfo->getConceptId() === AcumulusEntry::conceptIdUnknown) {
                     // Old entry: no concept id stored, we cannot show more
                     // information.
                     $invoiceStatus = static::Invoice_SentConcept;
@@ -555,12 +552,9 @@ class InvoiceStatusOverviewForm extends Form
                     } else {
                         // Concept turned into 1 definitive invoice: update
                         // acumulus entry to have it refer to that invoice.
-                        /** @noinspection PhpParamsInspection, see bug: https://youtrack.jetbrains.com/issue/WI-48388 */
-                        /** @noinspection PhpParamsInspection bug:*/
                         $result = $this->service->getEntry($conceptInfo['entryid']);
                         $entry = $this->sanitizeEntry($result->getResponse());
                         if (!$result->hasError() && !empty($entry['token'])) {
-                            /** @noinspection PhpParamsInspection, see bug: https://youtrack.jetbrains.com/issue/WI-48388 */
                             if ($this->acumulusEntryManager->save($source, $conceptInfo['entryid'], $entry['token'])) {
                                 $newLocalEntryInfo = $this->acumulusEntryManager->getByInvoiceSource($source);
                                 if ($newLocalEntryInfo === null) {
@@ -790,12 +784,10 @@ class InvoiceStatusOverviewForm extends Form
      */
     private function getEntryFields(Source $source, array $entry)
     {
-        $fields = $this->getVatTypeField($entry)
-            + $this->getAmountFields($source, $entry)
-            + $this->getPaymentStatusFields($source, $entry)
-            + $this->getLinksField($entry['token']);
-
-        return $fields;
+        return $this->getVatTypeField($entry)
+               + $this->getAmountFields($source, $entry)
+               + $this->getPaymentStatusFields($source, $entry)
+               + $this->getLinksField($entry['token']);
     }
 
     /**
@@ -1056,14 +1048,13 @@ class InvoiceStatusOverviewForm extends Form
         /** @noinspection HtmlUnknownTarget */
         $packingSlipLink = sprintf('<a class="%4$s" href="%1$s" title="%3$s">%2$s</a>', $uri, $text, $title, 'pdf');
 
-        $fields = array(
+        return array(
             'links' => array(
                 'type' => 'markup',
                 'label' => $this->t('documents'),
                 'value' => "$invoiceLink $packingSlipLink",
             ),
         );
-        return $fields;
     }
 
     /**

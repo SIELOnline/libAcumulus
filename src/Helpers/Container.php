@@ -508,7 +508,7 @@ class Container
                 $arguments[] = $this->getInvoiceManager();
                 break;
             case 'invoice':
-                $class = 'InvoiceStatusOverview';
+                $class = 'InvoiceStatus';
                 $arguments[] = $this->getInvoiceManager();
                 $arguments[] = $this->getAcumulusEntryManager();
                 $arguments[] = $this->getService();

@@ -309,10 +309,6 @@ class FormRenderer
      */
     protected function renderSimpleField(array $field)
     {
-        if (!empty($field['ajax'])) {
-            $field = $this->addAjax($field);
-        }
-
         $output = '';
 
         // Split attributes over label and element.
@@ -880,36 +876,5 @@ class FormRenderer
     protected function isOptionSelected($selectedValues, $option)
     {
         return is_array($selectedValues) ? in_array((string) $option, $selectedValues,false) : (string) $option === (string) $selectedValues;
-    }
-
-    /**
-     * Processes the ajax setting on a field.
-     *
-     * The ajax setting is typically an array with data values to be added as
-     * data-* attributes tot he fom element.
-     *
-     * @param array $field
-     *   The field for which an ajax action is to be enabled.
-     *
-     * @return array
-     *   The field with ajax settings mapped to additional attributes.
-     */
-    protected function addAjax(array $field)
-    {
-        // We add a class so this element can be recognised by js as having an
-        // ajax action.
-        $field['attributes'] = $this->addAttribute($field['attributes'], 'class', 'acumulus-ajax');
-
-        // Add the form type as a data`-* attribute.
-        $field['attributes'] = $this->addAttribute($field['attributes'], 'data-acumulus-form', $this->form->getType());
-
-        // Add the data`-* attributes.
-        if (!empty($field['ajax']) && is_array($field['ajax'])) {
-            foreach ($field['ajax'] as $dataName => $dataValue) {
-                $field['attributes'] = $this->addAttribute($field['attributes'], 'data-acumulus-' . $dataName, $dataValue);
-            }
-        }
-
-        return $field;
     }
 }

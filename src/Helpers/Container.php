@@ -511,6 +511,7 @@ class Container
                 $class = 'InvoiceStatus';
                 $arguments[] = $this->getInvoiceManager();
                 $arguments[] = $this->getAcumulusEntryManager();
+                $arguments[] = $this;
                 $arguments[] = $this->getService();
                 break;
             case 'rate':

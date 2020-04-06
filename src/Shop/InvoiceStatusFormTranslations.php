@@ -24,6 +24,7 @@ class InvoiceStatusFormTranslations extends TranslationCollection
         'concept_multiple_invoiceid' => 'Van deze conceptfactuur zijn meerdere definitieve facturen gemaakt, we weten dus niet aan welke definitieve factuur deze te koppelen.',
         'entry_concept_not_updated' => 'Deze conceptfactuur is definitief gemaakt, maar lokaal de link aanpassen naar deze definitieve factuur is mislukt.',
         'messages' => 'Meldingen',
+        'wait' => 'Even wachten',
         'invoice_status_unknown' => "Onbekende status '%s'",
         'unknown' => 'onbekend',
         'unknown_action' => "Onbekende actie '%s'",
@@ -52,7 +53,9 @@ class InvoiceStatusFormTranslations extends TranslationCollection
         'payment_status_2_date' => 'Betaald op %1$s',
         'payment_date' => 'Betaaldatum',
         'payment_status_not_equal' => 'De betaalstatus in Acumulus komt niet overeen met die in uw webshop',
-        'message_validate_batch_bad_payment_date' => 'U dient een correcte \'Betaaldatum\' in te vullen (verwacht formaat: %1$s).',
+        'message_validate_batch_bad_payment_date' => 'U dient een correcte \'Betaaldatum\' in te vullen.',
+        // Dit bericht is nodig als we ergens geen date picker zouden hebben.
+        //'message_validate_batch_bad_payment_date' => 'U dient een correcte \'Betaaldatum\' in te vullen (verwacht formaat: %1$s).',
 
         // Actions.
         'send_now' => 'Nu verzenden',
@@ -84,6 +87,7 @@ class InvoiceStatusFormTranslations extends TranslationCollection
         'concept_multiple_invoiceid' => 'This concept invoice has been turned into multiple definitive invoices, so we do not know to which definitive invoice to link it.',
         'entry_concept_not_updated' => 'This concept invoice has been turned into a definitive invoice, but locally updating the link to the definitive invoice failed.',
         'messages' => 'Messages',
+        'wait' => 'Please wait',
         'invoice_status_unknown' => "Unknown status '%s'",
         'unknown' => 'unknown',
         'unknown_action' => "Unknown action '%s'",
@@ -112,7 +116,9 @@ class InvoiceStatusFormTranslations extends TranslationCollection
         'payment_status_2_date' => 'Paid on %1$s',
         'payment_date' => 'Payment date',
         'payment_status_not_equal' => 'The payment state in Acumulus differs from the one in your webshop',
-        'message_validate_batch_bad_payment_date' => 'Incorrect \'Payment date\' (expected format: %1$s).',
+        'message_validate_batch_bad_payment_date' => 'Incorrect \'Payment date\'.',
+        // Dit bericht is nodig als we ergens geen date picker zouden hebben.
+        //'message_validate_batch_bad_payment_date' => 'Incorrect \'Payment date\' (expected format: %1$s).',
 
         // Actions.
         'send_now' => 'Send now',

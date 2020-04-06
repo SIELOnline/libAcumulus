@@ -14,7 +14,9 @@ class RatePluginFormTranslations extends TranslationCollection
         'do' => 'OK, breng me er heen',
         'later' => 'Liever niet nu',
         'done_thanks' => 'Bedankt voor het beoordelen van de Acumulus plugin.',
-        'review_url' => 'https://wordpress.org/support/plugin/acumulus/reviews/#new-post'
+        'review_url' => 'https://wordpress.org/support/plugin/acumulus/reviews/#new-post',
+        'wait' => 'Even wachten',
+        'unknown_action' => "Onbekende actie '%s'",
     );
 
     protected $en = array(
@@ -23,6 +25,8 @@ class RatePluginFormTranslations extends TranslationCollection
         'do' => 'OK, get me there',
         'later' => 'Not now',
         'done_thanks' => 'Thank you for taking the time to review the plugin.',
-        'review_url' => 'https://wordpress.org/support/plugin/acumulus/reviews/#new-post'
+        'review_url' => 'https://wordpress.org/support/plugin/acumulus/reviews/#new-post',
+        'wait' => 'Please wait',
+        'unknown_action' => "Unknown action '%s'",
     );
 }

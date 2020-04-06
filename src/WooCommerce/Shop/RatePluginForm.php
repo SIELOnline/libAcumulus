@@ -50,8 +50,8 @@ class RatePluginForm extends Form
     {
         parent::setSubmittedValues();
 
-        // Sanitise service: lowercase ascii characters, numbers, _ and -.
-        $this->submittedValues['service'] = preg_replace('/[^a-z0-9_\-]/', '', $this->submittedValues['service']);
+        // Sanitise service: lowercase ascii.
+        $this->submittedValues['service'] = preg_replace('/[^a-z]/', '', $this->submittedValues['clicked']);
     }
 
     /**
@@ -76,8 +76,7 @@ class RatePluginForm extends Form
                 break;
         }
 
-        return false;
-//        return $result;
+        return $result;
     }
 
     /**
@@ -103,22 +102,20 @@ class RatePluginForm extends Form
                         'type' => 'markup',
                         'value' => $this->t('rate_acumulus_plugin'),
                     ),
-                    'do' => array(
+                    'done' => array(
                         'type' => 'button',
-                        'ajax' => array(
-                            'service' => 'done',
-                        ),
+                        'value' => $this->t('do'),
                         'attributes' => array(
                             'onclick' => 'window.open("' . $this->t('review_url') . '")',
+                            'class' => 'acumulus-ajax',
                         ),
-                        'value' => $this->t('do'),
                     ),
                     'later' => array(
                         'type' => 'button',
-                        'ajax' => array(
-                            'service' => 'later',
-                        ),
                         'value' => $this->t('later'),
+                        'attributes' => array(
+                            'class' => 'acumulus-ajax',
+                        ),
                     ),
                 ),
             ),

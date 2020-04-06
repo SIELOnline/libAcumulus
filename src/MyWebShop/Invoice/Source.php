@@ -10,36 +10,32 @@ use Siel\Acumulus\Meta;
  *
  * @todo:
  * - for reasons of autocomplete in your IDE, you might want to override the
- *   $source property and define its possible type(s) (using @var)
- * - setId(): override or implement both setIdOrder() and setIdCreditNote()
+ *   $source property and define its possible type(s) (using @var).
+ * - setId(): override or implement both setIdOrder() and setIdCreditNote().
  * - setSource(): override or implement both setSourceOrder() and
- *   setSourceCreditNote()
- * - getReference(): override when this is not the internal id
+ *   setSourceCreditNote().
+ * - getReference(): override when this is not the internal id.
  * - getDate(): override or implement both getDateOrder() and
- *   getDateCreditNote()
+ *   getDateCreditNote().
  * - getStatus(): override or implement both getStatusOrder() and
- *   getStatusCreditNote()
+ *   getStatusCreditNote().
  * - getPaymentMethod(): override if MyWebShop supports credit notes and stores
- *   a separate payment method for them
+ *   a separate payment method for them.
  * - getPaymentMethodOrder(): implement if MyWebShop does not support credit
- *   notes or does not store a separate payment method for them
+ *   notes or does not store a separate payment method for them.
  * - getPaymentStatus(): override or implement both getPaymentStatusOrder()
- *   and getPaymentStatusCreditNote()
+ *   and getPaymentStatusCreditNote().
  * - getPaymentDate(): override or implement both getPaymentDateOrder() and
- *   getPaymentDateCreditNote()
- * - getCountryCode(): implement
- * - getCurrency(): implement
- * - getAvailableTotals(): implement
- * - setInvoice(): override if MyWebShop has separate invoice objects
+ *   getPaymentDateCreditNote().
+ * - getCountryCode(): implement.
+ * - getCurrency(): implement.
+ * - getAvailableTotals(): implement.
+ * - setInvoice(): override if MyWebShop has separate invoice objects.
  * - getInvoiceReferenceOrder(): implement if MyWebShop has separate invoice
- *   numbers or references
- * - getInvoiceReferenceCreditNote(): implement if a credit note is not seen as
- *   an invoice and has a separate invoice of its own with a different reference.
- * - getInvoiceDateOrder(): implement if MyWebShop has separate invoice dates
- * - getInvoiceDateCreditNote(): implement if a credit note is not seen as an
- *   invoice and has a separate invoice of its own with a different date
- * - getShopOrder: override if MyWebShop supports credit notes
- * - getShopCreditNotes(): override if MyWebShop supports credit notes
+ *   numbers or references.
+ * - getInvoiceDateOrder(): implement if MyWebShop has separate invoice dates.
+ * - getShopOrder: override if MyWebShop supports credit notes.
+ * - getShopCreditNotes(): override if MyWebShop supports credit notes.
  */
 class Source extends BaseSource
 {

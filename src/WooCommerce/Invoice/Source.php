@@ -4,6 +4,7 @@ namespace Siel\Acumulus\WooCommerce\Invoice;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Invoice\Source as BaseSource;
 use Siel\Acumulus\Meta;
+use WC_Abstract_Order;
 
 /**
  * Wraps a WooCommerce order in an invoice source object.
@@ -25,6 +26,10 @@ class Source extends BaseSource
     protected function setSource()
     {
         $this->source = WC()->order_factory->get_order($this->id);
+        if (!is_object($this->source)) {
+            $this->source = null;
+            $this->id = null;
+        }
     }
 
     /**
@@ -32,7 +37,12 @@ class Source extends BaseSource
      */
     protected function setId()
     {
-        $this->id = $this->source->get_id();
+        if ($this->source instanceof WC_Abstract_Order) {
+            $this->id = $this->source->get_id();
+        } else {
+            $this->source = null;
+            $this->id = null;
+        }
     }
 
     /**
@@ -167,12 +177,11 @@ class Source extends BaseSource
      */
     public function getCurrency()
     {
-        $result = array(
+        return array(
             Meta::Currency => 'EUR',
             Meta::CurrencyRate => 1.0,
             Meta::CurrencyDoConvert => false,
         );
-        return $result;
     }
 
     /**

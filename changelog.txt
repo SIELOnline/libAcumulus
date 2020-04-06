@@ -20,6 +20,8 @@ WC3 = WooCommerce 3 (WordPress)
 5.9.0 (2020-04-??)
 ------------------
 Refactorings:
+- ALL: Tightened Source creation to cover for non validated input.
+- WC: Refactored ajax handling to make it usable in other shops as well.
 - ALL: Move class Siel\Acumulus\WooCommerce\Shop\InvoiceStatusOverviewForm (and
   Siel\Acumulus\WooCommerce\Shop\InvoiceStatusOverviewFormTranslations) to
   Siel\Acumulus\Shop\InvoiceStatusForm (resp.
@@ -29,6 +31,7 @@ Refactorings:
 - MA2: Allow to work with symlinks.
 - MA2: Schema locations in xml files.
 - ALL: Add required PHP extensions to composer.json.
+- ALL: removed method Source::getPaymentState() (deprecated since 5.4).
 
 5.8.3 (2020-03-22)
 ------------------

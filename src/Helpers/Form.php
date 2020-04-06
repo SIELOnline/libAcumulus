@@ -469,8 +469,8 @@ abstract class Form
      *
      * @param array[] $fields
      *
-     * @return array An array of values keyed by the form field names.
-     * An array of values keyed by the form field names.
+     * @return array
+     *   An array of values keyed by the form field names.
      */
     protected function getFieldValues($fields)
     {
@@ -610,6 +610,7 @@ abstract class Form
      *     - size
      *     - class
      *     - required: (bool) whether the field is required.
+     *     - disabled: (bool) whether the field is disabled.
      * - fields: (array) If the type = 'fieldset' or 'details', this value
      *   defines the (possibly recursive) fields of a fieldset/details element.
      * - options: (array) If the type = checkbox, select or radio, this value

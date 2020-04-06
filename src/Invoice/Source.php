@@ -2,6 +2,7 @@
 
 namespace Siel\Acumulus\Invoice;
 
+use RuntimeException;
 use Siel\Acumulus\Meta;
 
 /**
@@ -24,10 +25,10 @@ abstract class Source
     /** @var int */
     protected $id;
 
-    /** @var array|object */
-    protected $source;
+    /** @var array|object|null */
+    protected $source = null;
 
-    /** @var array|object */
+    /** @var array|object|null */
     protected $invoice;
 
     /**
@@ -39,8 +40,11 @@ abstract class Source
     public function __construct($type, $idOrSource)
     {
         $this->type = $type;
-        if (is_scalar($idOrSource)) {
-            $this->id = $idOrSource;
+        if (empty($idOrSource)) {
+            $this->id = null;
+            $this->source = null;
+        } elseif (is_scalar($idOrSource)) {
+            $this->id = (int) $idOrSource;
             $this->setSource();
         } else {
             $this->source = $idOrSource;
@@ -63,6 +67,20 @@ abstract class Source
     protected function setId()
     {
         return $this->callTypeSpecificMethod(__FUNCTION__);
+    }
+
+    /**
+     * Returns whether the wrapped source is a valid source.
+     *
+     * This should mainly be used directly after creating a Source from
+     * non-trusted input.
+     *
+     * @return bool
+     *   True if the wrapped source is a valid source, false otherwise.
+     */
+    public function isValid()
+    {
+        return $this->id !== null && $this->source !== null;
     }
 
     /**
@@ -90,7 +108,7 @@ abstract class Source
     /**
      * Returns the internal id of the webshop's invoice source.
      *
-     * @return int|string
+     * @return int
      *   The internal id of the webshop's invoice source.
      */
     public function getId()
@@ -178,15 +196,7 @@ abstract class Source
      */
     public function getPaymentMethodOrder()
     {
-        throw new \RuntimeException('Source::getPaymentMethodOrder() not implemented for ' . get_class($this));
-    }
-
-    /**
-     * @deprecated: use Source::getPaymentStatus()
-     */
-    public function getPaymentState()
-    {
-        return $this->getPaymentStatus();
+        throw new RuntimeException('Source::getPaymentMethodOrder() not implemented for ' . get_class($this));
     }
 
     /**
@@ -346,7 +356,9 @@ abstract class Source
     }
 
     /**
-     * {@inheritdoc}
+     * See {@see getInvoiceReference}
+     *
+     * @noinspection PhpUnused
      */
     public function getInvoiceReferenceCreditNote()
     {
@@ -367,7 +379,9 @@ abstract class Source
     }
 
     /**
-     * {@inheritdoc}
+     * See {@see getInvoiceDate}
+     *
+     * @noinspection PhpUnused
      */
     public function getInvoiceDateCreditNote()
     {
@@ -405,7 +419,7 @@ abstract class Source
      */
     protected function getShopOrderOrId()
     {
-        throw new \RuntimeException('Source::getShopOrderOrId() not implemented for ' . get_class($this));
+        throw new RuntimeException('Source::getShopOrderOrId() not implemented for ' . get_class($this));
     }
 
     /**

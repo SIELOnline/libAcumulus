@@ -89,7 +89,7 @@ Dit kunnen bv. <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldconten
 of <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/export_van_specifieke_goederen_en_in_bijzondere_situaties/export_van_accijnsgoederen/export_accijnsgoederen_naar_eu_landen" target="_blank">accijnsgoederen</a> zijn.
 Zie <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/export_van_specifieke_goederen_en_in_bijzondere_situaties/export_van_specifieke_goederen_en_in_bijzondere_situaties" target="_blank">Belastingdienst: Export van specifieke goederen en bijzondere situaties</a>.
 Let op: vanaf 2019 geldt er een <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/btw_berekenen_bij_diensten/wijziging_in_digitale_diensten_vanaf_2015/wijziging_in_digitale_diensten_vanaf_2015" target="_blank">drempelbedrag voor digitale diensten</a>.
-Als u daaronder blijft mag u gewoon Nederlandse btw berekenen.',
+Als u daaronder blijft mag u gewoon Nederlandse btw berekenen, maar let op: dit dient u in de webshop in te stellen, Acumulus volgt de btw-bedragen en tarieven die de winkel heeft berekend en zal dit zelf niet gaan wijzigen.',
 
         'field_foreignVatClasses' => 'Welke belastingklassen definiëren EU btw tarieven?',
         'desc_foreignVatClasses' => 'Geef aan welke van deze belastingklassen gebruikt worden bij producten of diensten waarbij u buitenlandse btw moet hanteren voor EU klanten.
@@ -446,7 +446,7 @@ These can be, a.o, <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldco
 or <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/export_van_specifieke_goederen_en_in_bijzondere_situaties/export_van_accijnsgoederen/export_accijnsgoederen_naar_eu_landen" target="_blank">excise goods</a>.
 See <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/export_van_specifieke_goederen_en_in_bijzondere_situaties/export_van_specifieke_goederen_en_in_bijzondere_situaties" target="_blank">Tax office: Export of specific goods and special cases</a>.
 Note: as of 2019 there is a <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/btw_berekenen_bij_diensten/wijziging_in_digitale_diensten_vanaf_2015/wijziging_in_digitale_diensten_vanaf_2015" target="_blank">threshold for digital services</a>.
-If you remain under that threshold you may apply Dutch VAT.',
+If you remain under that threshold you may apply Dutch VAT. However, please note that you have to configure this in your webshop. Acumulus follows the vat amounts and tarifs as charged by the shop and won\'t change this on its own.',
 
         'field_foreignVatClasses' => 'Which vat classes define EU vat rates?',
         'desc_foreignVatClasses' => 'Indicate which of these vat classes are used for products or services that are subject to foreign VAT for EU customers.

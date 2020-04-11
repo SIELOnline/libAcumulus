@@ -4,7 +4,6 @@ namespace Siel\Acumulus\OpenCart\Helpers;
 use Siel\Acumulus\PluginConfig;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Invoice\Source;
-use Siel\Acumulus\Shop\ModuleTranslations;
 
 /**
  * OcHelper contains functionality shared between the OC1, OC2 and OC3
@@ -37,7 +36,6 @@ class OcHelper
         if (empty($languageCode)) {
             $languageCode = 'nl';
         }
-        $this->container->setLanguage($languageCode)->getTranslator()->add(new ModuleTranslations());
     }
 
     protected function addError($message)

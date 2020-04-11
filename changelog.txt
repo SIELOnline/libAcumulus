@@ -19,6 +19,10 @@ WC3 = WooCommerce 3 (WordPress)
 
 5.9.0 (2020-04-??)
 ------------------
+Bugs:
+- MA: ModuleTranslations were not loaded: refactored to be loaded automatically
+  after loading any ModuleSpecificTranslations.
+
 Refactorings:
 - ALL: Tightened Source creation to cover for non validated input.
 - WC: Refactored ajax handling to make it usable in other shops as well.

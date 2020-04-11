@@ -139,7 +139,7 @@ class Container
     protected $instances = array();
 
     /** @var bool */
-    protected $moduleSpecificTranslationsAdded = false;
+    protected $moduleTranslationsAdded = false;
 
     /**
      * The language to display texts in.
@@ -224,13 +224,15 @@ class Container
     {
         /** @var \Siel\Acumulus\Helpers\Translator $translator */
         $translator = $this->getInstance('Translator', 'Helpers', array($this->language));
-        if (!$this->moduleSpecificTranslationsAdded) {
+        if (!$this->moduleTranslationsAdded) {
             try {
                 /** @var \Siel\Acumulus\Helpers\TranslationCollection $translations */
                 $translations = $this->getInstance('ModuleSpecificTranslations', 'Helpers');
                 $translator->add($translations);
             } catch (InvalidArgumentException $e) {}
-            $this->moduleSpecificTranslationsAdded = true;
+            $translations = $this->getInstance('ModuleTranslations', 'Shop');
+            $translator->add($translations);
+            $this->moduleTranslationsAdded = true;
         }
         return $translator;
     }

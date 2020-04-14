@@ -481,7 +481,7 @@ abstract class Creator
     protected function getInvoiceDate($dateToUse)
     {
         $result = $this->invoiceSource->getInvoiceDate();
-        if ($dateToUse != PluginConfig::InvoiceDate_OrderCreate || empty($result)) {
+        if ($dateToUse != PluginConfig::InvoiceDate_InvoiceCreate || empty($result)) {
             $result = $this->invoiceSource->getDate();
         }
         return $result;

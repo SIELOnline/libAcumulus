@@ -24,6 +24,7 @@ Features:
   invoice for that order and its credit notes, if any, in Acumulus.
 
 Bugs:
+- ALL: Using order date to send as invoice date did not work correctly.
 - MA (and others?): ModuleTranslations were not loaded: refactored to be loaded
   automatically after loading any ModuleSpecificTranslations.
 

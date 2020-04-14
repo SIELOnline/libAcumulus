@@ -76,19 +76,24 @@ class FormMapper extends BaseFormMapper
         }
         $magentoType = $this->getMagentoType($field);
         $magentoElementSettings = $this->getMagentoElementSettings($field);
-        $element = $parent->addField($field['id'], $magentoType, $magentoElementSettings);
+        // Constructor of multiselect (and perhaps others as well) overwrites
+        // some the settings passed into the constructor, so we add our settings
+        // after the element has been constructed...
+        $element = $parent->addField($field['id'], $magentoType, [])->addData($magentoElementSettings);
 
-        if ($magentoType === 'multiselect') {
-            if (!empty($magentoElementSettings['size'])) {
-                /** @noinspection PhpUndefinedMethodInspection */
-                $element->setSize($magentoElementSettings['size']);
-            }
+        if ($magentoType === 'note') {
+            // Attributes are ignored by an element of type note, we add them to
+            // a wrapper element using beforeElementHtml and afterElementHtml.
+            $htmlAttributes = ['class', 'title'];
+            $element->setBeforeElementHtml('<div ' . $element->serialize($htmlAttributes) . '>' . $element->getLabelHtml());
+            $element->setAfterElementHtml('</div>');
+            $element->setLabel(null);
         }
 
         if (!empty($field['fields'])) {
-            // Add description at the start of the fieldset/summary as a note
+            // Add description at the start of the fieldset/summary as a Note
             // element.
-            if (isset($field['description'])) {
+            if (!empty($field['description'])) {
                 $element->addField($field['id'] . '-note', 'note', array('text' => '<p class="note">' . $field['description'] . '</p>'));
             }
 
@@ -126,7 +131,8 @@ class FormMapper extends BaseFormMapper
             case 'details':
                 $type = 'fieldset';
                 break;
-            // Other types are returned as is: fieldset, text, password, date
+            // Other types are returned as is: fieldset, text, password, date,
+            // button.
             default:
                 $type = $field['type'];
                 break;
@@ -145,22 +151,27 @@ class FormMapper extends BaseFormMapper
      */
     protected function getMagentoElementSettings(array $field)
     {
-        $config = array();
-
-        if ($field['type'] === 'details') {
-            $config['collapsable'] = true;
-            $config['opened'] = false;
-        }
-
+        $config = [
+            'class'=> [],
+        ];
+        $config = $this->addMagentoAdminClasses($config, $field);
         foreach ($field as $key => $value) {
-            $config += $this->getMagentoProperty($key, $value, $field['type']);
+            $config = $this->getMagentoProperty($config, $key, $value, $field['type']);
         }
+        $config['class'] = implode(' ', $config['class']);
+        if (empty($config['class'])) {
+            unset($config['class']);
+        }
+
         return $config;
     }
 
     /**
      * Converts an Acumulus settings to a Magento setting.
      *
+     * @param array $config
+     *   The Magento settings constructed so far. New settings should be added
+     *   to this array and this array should be returned.
      * @param string $key
      *   The name of the setting to convert.
      * @param mixed $value
@@ -169,26 +180,29 @@ class FormMapper extends BaseFormMapper
      *   The Acumulus field type.
      *
      * @return array
-     *   The Magento setting. This will typically contain 1 element, but in some
-     *   cases 1 Acumulus field setting may result in multiple Magento settings.
+     *   The Magento settings.
      */
-    protected function getMagentoProperty($key, $value, $type)
+    protected function getMagentoProperty(array $config, $key, $value, $type)
     {
         switch ($key) {
             // Fields to ignore:
-            case 'type':
             case 'id':
             case 'fields':
-                $result = array();
-                break;
-            case 'summary':
-                $result = array('legend' => $value);
                 break;
             // Fields to return unchanged:
             case 'legend':
             case 'label':
             case 'format':
-                $result = array($key => $value);
+                $config[$key] = $value;
+                break;
+            case 'type':
+                if ($value === 'details') {
+                    $config['collapsable'] = true;
+                    $config['opened'] = false;
+                }
+                break;
+            case 'summary':
+                $config['legend'] = $value;
                 break;
             case 'name':
                 if ($type === 'checkbox') {
@@ -196,46 +210,75 @@ class FormMapper extends BaseFormMapper
                     // are multiple checkboxes.
                     $value .= '[]';
                 }
-                $result = array($key => $value);
+                $config[$key] = $value;
                 break;
             case 'description':
-                // The description of a fieldset is handled elsewhere.
-                $result = $type !== 'fieldset' ? array('after_element_html' => '<p class="note">' . $value . '</p>') : array();
+                // Note that the description of a fieldset is handled elsewhere.
+                if (!empty($value) && $type !== 'fieldset') {
+                    $config['after_element_html'] = '<p class="note">' . $value . '</p>';
+                }
                 break;
             case 'value':
                 if ($type === 'markup') {
-                    $result = array('text' => $value);
+                    $config['text'] = $value;
                 } else { // $type === 'hidden'
-                    $result = array('value' => $value);
+                    $config['value'] = $value;
                 }
                 break;
             case 'attributes':
                 // In magento you add pure html attributes at the same level as
-                // the "field attributes" that are for Magento.
-                $result = $value;
-                if (!empty($value['required'])) {
-                    if (isset($result['class'])) {
-                        $result['class'] .= ' ';
-                    } else {
-                        $result['class'] = '';
-                    }
-                    if ($type === 'radio') {
-                        unset($result['required']);
-                        $result['class'] .= 'validate-one-required-by-name';
-                    } else {
-                        $result['class'] .= 'required-entry';
+                // the "field attributes" that are for Magento. Most attributes
+                // are accepted and rendered by input accepting elements, but a
+                // Note (our markup type) ignores all these, as are all label
+                // attributes.
+                foreach ($value as $attributeName => $attributeValue) {
+                    switch ($attributeName) {
+                        case 'required':
+                            // Required for a set of radio buttons is handled
+                            // differently.
+                            if ($attributeValue) {
+                                if ($type === 'radio') {
+                                    $config['class'][] = 'validate-one-required-by-name';
+                                } else {
+                                    $config['required'] = true;
+                                }
+                            }
+                            break;
+                        case 'class':
+                            // Merge classes.
+                            $class = (array) $attributeValue;
+                            $config['class'] = array_merge($config['class'], $class);
+                            if (in_array('acumulus-ajax', $class)) {
+                                $config['onclick'] = 'acumulusAjaxHandling(this)';
+                            }
+                            break;
+                        case 'label':
+                            // Just add them to the element, for a note, they
+                            // wil then be put into a wrapping element. That
+                            // should be enough to address them in css.
+                            $config = $this->getMagentoProperty($config, 'attributes', $attributeValue, $type);
+                            break;
+                        default:
+                            // Do not overwrite settings that are already set.
+                            if (!isset($config[$attributeName])) {
+                                $config[$attributeName] = $attributeValue;
+                            }
+                            break;
                     }
                 }
+
                 break;
             case 'options':
-                $result = array('values' => $this->getMagentoOptions($value));
+                $config['values'] = $this->getMagentoOptions($value);
                 break;
             default:
                 $this->log->warning(__METHOD__ . "Unknown key '$key'");
-                $result = array($key => $value);
+                $config[$key] = $value;
                 break;
         }
-        return $result;
+
+        // Handle
+        return $config;
     }
 
     /**
@@ -248,13 +291,35 @@ class FormMapper extends BaseFormMapper
      */
     protected function getMagentoOptions(array $options)
     {
-        $result = array();
+        $config = array();
         foreach ($options as $value => $label) {
-            $result[] = array(
+            $config[] = array(
                 'value' => $value,
                 'label' => $label,
             );
         }
-        return $result;
+        return $config;
+    }
+
+    /**
+     * Adds any classes typical for the Magento admin section.
+     *
+     * These classes are typically used to:
+     * - Add styling from the admin theme.
+     * - Add behavior.
+     *
+     * @param array $config
+     * @param array $field
+     *
+     * @return array
+     */
+    protected function addMagentoAdminClasses(array $config, array $field)
+    {
+        // Add a class action-secondary to buttons (action-primary buttons are
+        // part of the toolbar outside the form).
+        if ($field['type'] === 'button') {
+            $config['class'][] = 'action-secondary';
+        }
+        return $config;
     }
 }

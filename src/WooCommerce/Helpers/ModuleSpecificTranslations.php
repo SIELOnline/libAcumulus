@@ -13,11 +13,19 @@ class ModuleSpecificTranslations extends TranslationCollection
         'see_post_meta' => 'Zie de tabel postmeta voor posts van het type "order" of "refund"',
         'meta_original_order_for_refund' => 'Post meta van de oorspronkelijke bestelling, alleen beschikbaar bij credit nota\'s',
         'wc2_end_support' => 'LET OP: de Acumulus plugin zal in een volgende versie stoppen met het ondersteunen van Woocommerce 2! Begin nu met het upgraden naar WooCommerce 3.',
+
+        'vat_type' => 'Soort',
+        'payment_status' => 'Status',
+        'documents' => 'Pdf\'s',
     );
 
     protected $en = array(
         'see_post_meta' => 'See the table postmeta for posts of the type "order" of "refund"',
         'meta_original_order_for_refund' => 'Post meta of the original order, only available with credit notes',
         'wc2_end_support' => 'NOTE: in a next version the Acumulus plugin will stop supporting WooCommerce 2! Start upgrading to wooCommerce 3 now.',
+
+        'vat_type' => 'Type',
+        'payment_status' => 'Status',
+        'documents' => 'Docs',
     );
 }

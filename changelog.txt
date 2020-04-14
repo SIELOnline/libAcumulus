@@ -19,11 +19,20 @@ WC3 = WooCommerce 3 (WordPress)
 
 5.9.0 (2020-04-??)
 ------------------
+Features:
+- MA2: Added an Acumulus tab to the view order page, showing the status of the
+  invoice for that order and its credit notes, if any, in Acumulus.
+
 Bugs:
-- MA: ModuleTranslations were not loaded: refactored to be loaded automatically
-  after loading any ModuleSpecificTranslations.
+- MA (and others?): ModuleTranslations were not loaded: refactored to be loaded
+  automatically after loading any ModuleSpecificTranslations.
 
 Refactorings:
+- MA: Refactored the FormMapper to allow for the new (in Magento) Invoice status
+  overview form to be rendered as required.
+- MA2|WC: Changed labels on the Acumulus invoice status overview page, as it has
+  much more space than in WooCommerce. For Woocommerce these labels are now
+  overridden to remain short.
 - ALL: Tightened Source creation to cover for non validated input.
 - WC: Refactored ajax handling to make it usable in other shops as well.
 - ALL: Move class Siel\Acumulus\WooCommerce\Shop\InvoiceStatusOverviewForm (and

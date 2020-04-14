@@ -241,9 +241,6 @@ class InvoiceStatusForm extends Form
         $statusClass = $this->getStatusClass($status);
         $attributes = array(
             'class' => array('notice', 'notice-' . $statusClass),
-            'wrapper' => array(
-                'class' => array('notice', 'notice-' . $statusClass),
-            ),
         );
         if (!empty($statusMessage)) {
             $attributes['title'] = $statusMessage;
@@ -267,6 +264,18 @@ class InvoiceStatusForm extends Form
         }
         return $result;
     }
+
+    /**
+     * {@inheritdoc}
+     *
+     * This override handles the case that also the initial form load may be
+     * done via ajax, thus being a post but not submitted.
+     */
+    public function isSubmitted()
+    {
+        return parent::isSubmitted() && isset($_POST['clicked']);
+    }
+
 
     /**
      * @inheritDoc

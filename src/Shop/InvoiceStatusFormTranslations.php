@@ -11,6 +11,7 @@ class InvoiceStatusFormTranslations extends TranslationCollection
     protected $nl = array(
         // Invoice status.
         'acumulus_invoice_title' => 'Acumulus',
+        'acumulus_invoice_header' => 'Status in Acumulus voor deze bestelling',
         InvoiceStatusForm::Invoice_NotSent => 'Nog niet verzonden',
         InvoiceStatusForm::Invoice_Sent => 'Factuur %1$s van %2$s',
         InvoiceStatusForm::Invoice_SentConcept => 'Op %1$s als concept verzonden',
@@ -32,7 +33,7 @@ class InvoiceStatusFormTranslations extends TranslationCollection
         'unknown_entry' => 'Onbekende Acumulus factuur voor %s %u',
 
         // Vat type.
-        'vat_type' => 'Soort',
+        'vat_type' => 'Soort factuur',
         'vat_type_1' => 'Normaal, Nederlandse btw',
         'vat_type_2' => 'Btw-verlegd binnen Nederland',
         'vat_type_3' => 'Btw-verlegd in de EU',
@@ -47,7 +48,7 @@ class InvoiceStatusFormTranslations extends TranslationCollection
         'amount_status_4' => 'Verschil meer dan 5 cent: fout!',
 
         // Payment status.
-        'payment_status' => 'Status',
+        'payment_status' => 'Betaalstatus',
         'payment_status_1' => 'Nog niet betaald',
         'payment_status_2' => 'Betaald',
         'payment_status_2_date' => 'Betaald op %1$s',
@@ -65,7 +66,7 @@ class InvoiceStatusFormTranslations extends TranslationCollection
         'set_due' => 'Zet op Niet betaald',
 
         // Links to pdf documents.
-        'documents' => 'Pdf\'s',
+        'documents' => 'Documenten',
         'invoice' => 'factuur',
         'packing_slip' => 'pakbon',
         'open_as_pdf' => 'Acumulus %1$s openen als pdf',
@@ -74,6 +75,7 @@ class InvoiceStatusFormTranslations extends TranslationCollection
     protected $en = array(
         // Invoice status.
         'acumulus_invoice_title' => 'Acumulus',
+        'acumulus_invoice_header' => 'Status in Acumulus for this order',
         InvoiceStatusForm::Invoice_NotSent => 'Not yet sent',
         InvoiceStatusForm::Invoice_Sent => 'Invoice %1$s of %2$s',
         InvoiceStatusForm::Invoice_SentConcept => 'On %1$s sent as concept',
@@ -95,7 +97,7 @@ class InvoiceStatusFormTranslations extends TranslationCollection
         'unknown_entry' => 'Unknown Acumulus invoice for %s %u',
 
         // Vat type.
-        'vat_type' => 'Type',
+        'vat_type' => 'Invoice type',
         'vat_type_1' => 'Normal, Dutch vat',
         'vat_type_2' => 'Reversed vat within the Netherlands',
         'vat_type_3' => 'Reversed vat within the EU',
@@ -110,7 +112,7 @@ class InvoiceStatusFormTranslations extends TranslationCollection
         'amount_status_4' => 'Difference more than 5 cents: error!',
 
         // Payment status.
-        'payment_status' => 'Status',
+        'payment_status' => 'Payment status',
         'payment_status_1' => 'Due',
         'payment_status_2' => 'Paid',
         'payment_status_2_date' => 'Paid on %1$s',
@@ -128,7 +130,7 @@ class InvoiceStatusFormTranslations extends TranslationCollection
         'set_due' => 'Set due',
 
         // Links to pdf documents.
-        'documents' => 'Docs',
+        'documents' => 'Documents',
         'invoice' => 'invoice',
         'packing_slip' => 'packing slip',
         'open_as_pdf' => 'Open Acumulus %1$s as pdf',

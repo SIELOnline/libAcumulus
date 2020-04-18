@@ -433,6 +433,19 @@ class Config
     }
 
     /**
+     * Returns the set of settings related to the invoice status tab/box.
+     *
+     * @return array
+     *   A keyed array with the keys:
+     *   - showInvoiceStatus
+     *   - showPdfLinks
+     */
+    public function getInvoiceStatusSettings()
+    {
+        return $this->getSettingsByGroup('status');
+    }
+
+    /**
      * Get all settings belonging to the same group.
      *
      * @param string $group
@@ -930,6 +943,16 @@ class Config
                     'group' => Tag::EmailAsPdf,
                     'type' => 'bool',
                     'default' => false,
+                ),
+                'showInvoiceStatus' => array(
+                    'group' => 'status',
+                    'type' => 'bool',
+                    'default' => true,
+                ),
+                'showPdfLinks' => array(
+                    'group' => 'status',
+                    'type' => 'bool',
+                    'default' => true,
                 ),
                 'showRatePluginMessage' => array(
                     'group' => 'other',

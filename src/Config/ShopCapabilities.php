@@ -380,7 +380,18 @@ abstract class ShopCapabilities
      */
     public function getLink($linkType)
     {
-        $this->log->error("ShopCapabilities::getLink('$linkType'): not defined for or unknown link type");
+        $this->log->error("ShopCapabilities::getLink('$linkType'): unknown link type");
         return '#';
+    }
+
+    /**
+     * Returns whether our module for this shop (already) implements the
+     * InvoiceStatus screen.
+     *
+     * @return bool
+     */
+    public function hasInvoiceStatusScreen()
+    {
+        return false;
     }
 }

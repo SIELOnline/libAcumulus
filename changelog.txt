@@ -20,6 +20,8 @@ WC3 = WooCommerce 3 (WordPress)
 5.9.0 (2020-04-??)
 ------------------
 Features:
+- ALL: Added an option to show or hide the status invoice box/tab and an option
+  to show or hide the pdf links on that status invoice box/tab.
 - MA2: Added a message to ask to rate our module on Magento marketplace.
 - MA2: Added an Acumulus tab to the view order page, showing the status of the
   invoice for that order and its credit notes, if any, in Acumulus.
@@ -31,6 +33,9 @@ Bugs:
   automatically after loading any ModuleSpecificTranslations.
 
 Refactorings:
+- ALL: Added method ShopCapabilities::hasInvoiceStatusScreen().
+- MA2: Refactored inheritance structure of controller classes.
+- MA2: Refactored naming of full page block classes.
 - MA: Refactored the FormMapper to allow for the new (in Magento) Invoice status
   overview form to be rendered as required.
 - MA2|WC: Changed labels on the Acumulus invoice status overview page, as it has

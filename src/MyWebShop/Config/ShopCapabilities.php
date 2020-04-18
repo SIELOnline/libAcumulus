@@ -269,10 +269,10 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getLink($formType)
+    public function getLink($linkType)
     {
         // @todo: adapt to MyWebshop's way of creating links.
-        switch ($formType) {
+        switch ($linkType) {
             case 'config':
                 return Context::getContext()->link->getAdminLink('AdminModules', true, array(), array('configure' => 'acumulus'));
             case 'advanced':
@@ -280,6 +280,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
             case 'batch':
                 return Context::getContext()->link->getAdminLink('AdminAcumulusBatch', true);
         }
-        return parent::getLink($formType);
+        return parent::getLink($linkType);
     }
 }

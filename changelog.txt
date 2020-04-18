@@ -20,6 +20,7 @@ WC3 = WooCommerce 3 (WordPress)
 5.9.0 (2020-04-??)
 ------------------
 Features:
+- MA2: Added a message to ask to rate our module on Magento marketplace.
 - MA2: Added an Acumulus tab to the view order page, showing the status of the
   invoice for that order and its credit notes, if any, in Acumulus.
 

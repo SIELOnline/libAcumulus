@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\Magento\Magento2\Config;
 
+use Magento\Framework\App\ObjectManager;
 use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
 use Siel\Acumulus\Magento\Magento2\Helpers\Registry;
 use Siel\Acumulus\PluginConfig;
@@ -575,17 +576,20 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getLink($formType)
+    public function getLink($linkType)
     {
         $registry = Registry::getInstance();
-        switch ($formType) {
+        switch ($linkType) {
             case 'config':
                 return $registry->getUrlInterface()->getUrl('acumulus/config');
             case 'advanced':
                 return $registry->getUrlInterface()->getUrl('acumulus/config/advanced');
             case 'batch':
                 return $registry->getUrlInterface()->getUrl('acumulus/batch');
+            case 'logo':
+                $repository = ObjectManager::getInstance()->get(\Magento\Framework\View\Asset\Repository::class);
+                return $repository->getUrl('Siel_AcumulusMa2::images/siel-logo.svg');
         }
-        return parent::getLink($formType);
+        return parent::getLink($linkType);
     }
 }

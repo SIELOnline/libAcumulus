@@ -222,6 +222,16 @@ class Config
     }
 
     /**
+     * Returns the ShowRatePluginMessage config setting.
+     *
+     * @return int
+     */
+    public function getShowRatePluginMessage()
+    {
+        return $this->get('showRatePluginMessage');
+    }
+
+    /**
      * Returns the value of the specified configuration value.
      *
      * @param string $key
@@ -301,7 +311,7 @@ class Config
     }
 
     /**
-     * Returns the set of settings related to reacting to shop events.
+     * Returns the set of internal plugin settings.
      *
      * @return array
      *   A keyed array with the keys:
@@ -921,6 +931,11 @@ class Config
                     'type' => 'bool',
                     'default' => false,
                 ),
+                'showRatePluginMessage' => array(
+                    'group' => 'other',
+                    'type' => 'int',
+                    'default' => 0,
+                ),
             );
         }
         return $this->keyInfo;
@@ -1164,7 +1179,7 @@ class Config
         $values = $configStore->load();
         array_walk_recursive($values, function(&$value) use (&$doSave) {
             if (is_string($value) && strpos($value, 'originalInvoiceSource::') !== false) {
-                str_replace('originalInvoiceSource::', 'order::', $value);
+                $value = str_replace('originalInvoiceSource::', 'order::', $value);
                 $doSave = true;
             }
         });
@@ -1190,7 +1205,7 @@ class Config
         $values = $configStore->load();
         array_walk_recursive($values, function(&$value) use (&$doSave) {
             if (is_string($value) && strpos($value, 'paymentState') !== false) {
-                str_replace('paymentState', 'paymentStatus', $value);
+                $value = str_replace('paymentState', 'paymentStatus', $value);
                 $doSave = true;
             }
         });

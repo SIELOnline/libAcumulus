@@ -514,11 +514,11 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getLink($formType)
+    public function getLink($linkType)
     {
         /** @var \Mage_Adminhtml_helper_data $helper */
         $helper = Mage::helper('adminhtml');
-        switch ($formType) {
+        switch ($linkType) {
             case 'config':
                 return $helper->getUrl('adminhtml/acumulus/config');
             case 'advanced':
@@ -526,6 +526,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
             case 'batch':
                 return $helper->getUrl('adminhtml/acumulus/batch');
         }
-        return parent::getLink($formType);
+        return parent::getLink($linkType);
     }
 }

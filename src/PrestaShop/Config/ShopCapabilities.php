@@ -326,9 +326,9 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getLink($formType)
+    public function getLink($linkType)
     {
-        switch ($formType) {
+        switch ($linkType) {
             case 'config':
                 // Does not work in PS1.6.
                 return Context::getContext()->link->getAdminLink('AdminModules', true, array(), array('configure' => 'acumulus'));
@@ -337,6 +337,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
             case 'batch':
                 return Context::getContext()->link->getAdminLink('AdminAcumulusBatch', true);
         }
-        return parent::getLink($formType);
+        return parent::getLink($linkType);
     }
 }

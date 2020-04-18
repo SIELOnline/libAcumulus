@@ -1,5 +1,6 @@
 <?php
-namespace Siel\Acumulus\WooCommerce\Shop;
+
+namespace Siel\Acumulus\Shop;
 
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\ShopCapabilities;
@@ -20,6 +21,11 @@ use Siel\Acumulus\Helpers\Translator;
 class RatePluginForm extends Form
 {
     /**
+     * @var string
+     */
+    protected $action = '';
+
+    /**
      * @param \Siel\Acumulus\Helpers\FormHelper $formHelper
      * @param \Siel\Acumulus\Config\ShopCapabilities $shopCapabilities
      * @param \Siel\Acumulus\Config\Config $config
@@ -32,12 +38,21 @@ class RatePluginForm extends Form
         Config $config,
         Translator $translator,
         Log $log
-    )
-    {
+    ) {
         parent::__construct($formHelper, $shopCapabilities, $config, $translator, $log);
 
         $translations = new RatePluginFormTranslations();
         $this->translator->add($translations);
+    }
+
+    /**
+     * Returns the url to the logo.
+     *
+     * @return string
+     */
+    protected function getLogoUrl()
+    {
+        return $this->shopCapabilities->getLink('logo');
     }
 
     /**
@@ -63,20 +78,29 @@ class RatePluginForm extends Form
     {
         $result = false;
 
-        $service = $this->getSubmittedValue('service');
-        switch ($service) {
+        $this->action = $this->getSubmittedValue('service');
+        switch ($this->action) {
             case 'later':
-                $result = set_transient('acumulus_rate_plugin', time() + 7 * 24 * 60 * 60);
+                $this->acumulusConfig->save(array('showRatePluginMessage' => time() + 7 * 24 * 60 * 60));
                 break;
             case 'done':
-                $result = set_transient('acumulus_rate_plugin', 'done');
+                $this->acumulusConfig->save(array('showRatePluginMessage' => PHP_INT_MAX));
+                $this->addSuccessMessage(sprintf($this->t('done_thanks'), $this->t('module')));
                 break;
             default:
-                $this->addErrorMessages(sprintf($this->t('unknown_action'), $service));
+                $this->addErrorMessages(sprintf($this->t('unknown_action'), $this->action));
                 break;
         }
 
         return $result;
+    }
+
+    public function getFields()
+    {
+        if (empty($this->fields)) {
+            $this->fields = $this->getFieldDefinitions();
+        }
+        return $this->fields;
     }
 
     /**
@@ -84,29 +108,55 @@ class RatePluginForm extends Form
      */
     protected function getFieldDefinitions()
     {
-        $img = '<img src="' . home_url('wp-content/plugins/acumulus/siel-logo.svg') . '" alt="Logo SIEL Acumulus" title="SIEL Acumulus" width="100" height="100">';
-        $fields = array(
-            'acumulus-logo' => array(
-                'type' => 'fieldset',
-                'fields' => array(
-                    'logo-img' => array(
+        switch ($this->action) {
+            case 'done':
+                $fields = array(
+                    'done' => array(
                         'type' => 'markup',
-                        'value' => $img,
+                        'value' => sprintf($this->t('done_thanks'), $this->t('module')),
                     ),
-                ),
-            ),
+                );
+                break;
+            case 'later':
+                $fields = array(
+                    'later' => array(
+                        'type' => 'markup',
+                        'value' => $this->t('no_problem'),
+                    ),
+                );
+                break;
+            default:
+                $fields = $this->getFieldDefinitionsFull();
+                break;
+        }
+        return $fields;
+    }
+
+    /**
+     * Returns the field definitions when we are showing the full message.
+     *
+     * @return array[];
+     */
+    protected function getFieldDefinitionsFull()
+    {
+        $img = '<img src="' . $this->getLogoUrl() . '" alt="Logo SIEL Acumulus" title="SIEL Acumulus" width="100" height="100">';
+        return array(
             'acumulus-rate-plugin' => array(
                 'type' => 'fieldset',
                 'fields' => array(
+                    'logo' => array(
+                        'type' => 'markup',
+                        'value' => $img,
+                    ),
                     'message' => array(
                         'type' => 'markup',
-                        'value' => $this->t('rate_acumulus_plugin'),
+                        'value' => sprintf($this->t('rate_acumulus_plugin'), $this->t('module'), $this->t('review_on_marketplace')),
                     ),
                     'done' => array(
                         'type' => 'button',
                         'value' => $this->t('do'),
                         'attributes' => array(
-                            'onclick' => 'window.open("' . $this->t('review_url') . '")',
+                            'onclick' => "window.open('" . $this->t('review_url') . "')",
                             'class' => 'acumulus-ajax',
                         ),
                     ),
@@ -120,8 +170,5 @@ class RatePluginForm extends Form
                 ),
             ),
         );
-
-        return $fields;
     }
-
 }

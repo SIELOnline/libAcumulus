@@ -372,15 +372,15 @@ abstract class ShopCapabilities
      * If the webshop adds a session token or something like that to
      * administrative links, the returned link should contain so as well.
      *
-     * @param string $formType
-     *   The form to get the link to.
+     * @param string $linkType
+     *   The form or resource to get the link to: config, advanced, batch, logo.
      *
      * @return string
      *   The link to the requested form page.
      */
-    public function getLink($formType)
+    public function getLink($linkType)
     {
-        $this->log->error('ShopCapabilities::getLink("%s"): not defined for or unknown form type', $formType);
+        $this->log->error("ShopCapabilities::getLink('$linkType'): not defined for or unknown link type");
         return '#';
     }
 }

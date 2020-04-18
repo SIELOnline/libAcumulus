@@ -45,9 +45,9 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getLink($formType)
+    public function getLink($linkType)
     {
-        switch ($formType) {
+        switch ($linkType) {
             case 'config':
                 return JRoute::_('index.php?option=com_acumulus&task=config');
             case 'advanced':
@@ -55,6 +55,6 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
             case 'batch':
                 return JRoute::_('index.php?option=com_acumulus&task=batch');
         }
-        return parent::getLink($formType);
+        return parent::getLink($linkType);
     }
 }

@@ -249,7 +249,11 @@ class FormMapper extends BaseFormMapper
                             $class = (array) $attributeValue;
                             $config['class'] = array_merge($config['class'], $class);
                             if (in_array('acumulus-ajax', $class)) {
-                                $config['onclick'] = 'acumulusAjaxHandling(this)';
+                                if (empty($config['onclick'])) {
+                                    $config['onclick'] = 'acumulusAjaxHandling(this)';
+                                } else {
+                                    $config['onclick'] .= ';acumulusAjaxHandling(this)';
+                                }
                             }
                             break;
                         case 'label':

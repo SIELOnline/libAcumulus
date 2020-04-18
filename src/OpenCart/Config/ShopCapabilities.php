@@ -367,10 +367,10 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getLink($formType)
+    public function getLink($linkType)
     {
         $registry = $this->getRegistry();
-        switch ($formType) {
+        switch ($linkType) {
             case 'config':
                 return $registry->getLink($registry->getLocation());
             case 'advanced':
@@ -378,7 +378,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
             case 'batch':
                 return $registry->getLink($registry->getLocation() . '/batch');
         }
-        return parent::getLink($formType);
+        return parent::getLink($linkType);
     }
 
     /**

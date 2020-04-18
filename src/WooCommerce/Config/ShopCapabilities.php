@@ -324,16 +324,18 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getLink($formType)
+    public function getLink($linkType)
     {
-        switch ($formType) {
+        switch ($linkType) {
             case 'config':
                 return admin_url('options-general.php?page=acumulus_config');
             case 'advanced':
                 return admin_url('options-general.php?page=acumulus_advanced');
             case 'batch':
                 return admin_url('admin.php?page=acumulus_batch');
+            case 'logo':
+                return home_url('wp-content/plugins/acumulus/siel-logo.svg');
         }
-        return parent::getLink($formType);
+        return parent::getLink($linkType);
     }
 }

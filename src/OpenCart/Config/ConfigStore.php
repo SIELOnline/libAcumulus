@@ -45,7 +45,7 @@ class ConfigStore extends BaSeConfigStore
     }
 
     /**
-     * {@deprecated} Only still here for use during update.
+     * @deprecated Only still here for use during update.
      *
      * @param array $keys
      *

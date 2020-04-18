@@ -23,6 +23,7 @@ Features:
 - MA2: Added a message to ask to rate our module on Magento marketplace.
 - MA2: Added an Acumulus tab to the view order page, showing the status of the
   invoice for that order and its credit notes, if any, in Acumulus.
+- WC: Message asking to rate our plugin is now also shown on our own pages.
 
 Bugs:
 - ALL: Using order date to send as invoice date did not work correctly.

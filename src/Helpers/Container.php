@@ -292,12 +292,14 @@ class Container
     }
 
     /**
+     * @param bool $newInstance
+     *
      * @return \Siel\Acumulus\Helpers\FormRenderer
      */
-    public function getFormRenderer()
+    public function getFormRenderer($newInstance = false)
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('FormRenderer', 'Helpers');
+        return $this->getInstance('FormRenderer', 'Helpers', array(), $newInstance);
     }
 
     /**

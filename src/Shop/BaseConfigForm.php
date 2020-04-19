@@ -60,7 +60,7 @@ abstract class BaseConfigForm extends Form
 
         foreach ($this->acumulusConfig->getKeys() as $key) {
             if (!$this->addIfIsset($this->submittedValues, $key, $submittedValues)) {
-                // Add unchecked checkboxes and empty arrays,but only if they
+                // Add unchecked checkboxes and empty arrays, but only if they
                 // were defined on the form.
                 if ($this->isKey($key)) {
                     if ($this->isCheckbox($key)) {
@@ -80,14 +80,14 @@ abstract class BaseConfigForm extends Form
      */
     protected function getDefaultFormValues()
     {
-        $defaultValues = $this->acumulusConfig->getCredentials()
-             + $this->acumulusConfig->getShopSettings()
-             + $this->acumulusConfig->getShopEventSettings()
-             + $this->acumulusConfig->getCustomerSettings()
-             + $this->acumulusConfig->getInvoiceSettings()
-             + $this->acumulusConfig->getEmailAsPdfSettings()
-             + $this->acumulusConfig->getPluginSettings();
-        return $defaultValues;
+        return $this->acumulusConfig->getCredentials()
+               + $this->acumulusConfig->getShopSettings()
+               + $this->acumulusConfig->getShopEventSettings()
+               + $this->acumulusConfig->getCustomerSettings()
+               + $this->acumulusConfig->getInvoiceSettings()
+               + $this->acumulusConfig->getEmailAsPdfSettings()
+               + $this->acumulusConfig->getInvoiceStatusSettings()
+               + $this->acumulusConfig->getPluginSettings();
     }
 
     /**
@@ -268,7 +268,7 @@ abstract class BaseConfigForm extends Form
                 }
             }
             $result[$optionId] = $optionText;
-        };
+        }
 
         return $result;
     }

@@ -1052,25 +1052,33 @@ class InvoiceStatusForm extends Form
      */
     protected function getLinksField($token)
     {
-        $uri = $this->service->getInvoicePdfUri($token);
-        $text = ucfirst($this->t('invoice'));
-        $title = sprintf($this->t('open_as_pdf'), $text);
-        /** @noinspection HtmlUnknownTarget */
-        $invoiceLink = sprintf('<a class="%4$s" href="%1$s" title="%3$s">%2$s</a>', $uri, $text, $title, 'pdf');
+        $result = array();
+        $links = [];
+        $invoiceStatusSettings = $this->container->getConfig()->getInvoiceStatusSettings();
+        if ($invoiceStatusSettings['showPdfInvoice']) {
+            $uri = $this->service->getInvoicePdfUri($token);
+            $text = ucfirst($this->t('invoice'));
+            $title = sprintf($this->t('open_as_pdf'), $text);
+            /** @noinspection HtmlUnknownTarget */
+            $links[] = sprintf('<a class="%4$s" href="%1$s" title="%3$s">%2$s</a>', $uri, $text, $title, 'pdf');
+        }
 
-        $uri = $this->service->getPackingSlipUri($token);
-        $text = ucfirst($this->t('packing_slip'));
-        $title = sprintf($this->t('open_as_pdf'), $text);
-        /** @noinspection HtmlUnknownTarget */
-        $packingSlipLink = sprintf('<a class="%4$s" href="%1$s" title="%3$s">%2$s</a>', $uri, $text, $title, 'pdf');
+        if ($invoiceStatusSettings['showPdfPackingSlip']) {
+            $uri = $this->service->getPackingSlipUri($token);
+            $text = ucfirst($this->t('packing_slip'));
+            $title = sprintf($this->t('open_as_pdf'), $text);
+            /** @noinspection HtmlUnknownTarget */
+            $links[] = sprintf('<a class="%4$s" href="%1$s" title="%3$s">%2$s</a>', $uri, $text, $title, 'pdf');
+        }
 
-        return array(
-            'links' => array(
+        if (!empty($links)) {
+            $result['links'] = array(
                 'type' => 'markup',
-                'label' => $this->t('documents'),
-                'value' => "$invoiceLink $packingSlipLink",
-            ),
-        );
+                'label' => $this->t(count($links) === 1 ? 'document' : 'documents'),
+                'value' => implode(' ', $links),
+            );
+        }
+        return $result;
     }
 
     /**

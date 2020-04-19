@@ -20,8 +20,8 @@ WC3 = WooCommerce 3 (WordPress)
 5.9.0 (2020-04-??)
 ------------------
 Features:
-- ALL: Added an option to show or hide the status invoice box/tab and an option
-  to show or hide the pdf links on that status invoice box/tab.
+- ALL: Added an option to show or hide the status invoice screen and options to
+  show or hide the pdf links on that status invoice screen.
 - MA2: Added a message to ask to rate our module on Magento marketplace.
 - MA2: Added an Acumulus tab to the view order page, showing the status of the
   invoice for that order and its credit notes, if any, in Acumulus.

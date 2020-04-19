@@ -438,7 +438,8 @@ class Config
      * @return array
      *   A keyed array with the keys:
      *   - showInvoiceStatus
-     *   - showPdfLinks
+     *   - showPdfInvoice
+     *   - showPdfPackingSlip
      */
     public function getInvoiceStatusSettings()
     {
@@ -949,7 +950,12 @@ class Config
                     'type' => 'bool',
                     'default' => true,
                 ),
-                'showPdfLinks' => array(
+                'showPdfInvoice' => array(
+                    'group' => 'status',
+                    'type' => 'bool',
+                    'default' => true,
+                ),
+                'showPdfPackingSlip' => array(
                     'group' => 'status',
                     'type' => 'bool',
                     'default' => true,

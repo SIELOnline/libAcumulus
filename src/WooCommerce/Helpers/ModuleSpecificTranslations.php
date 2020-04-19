@@ -18,6 +18,7 @@ class ModuleSpecificTranslations extends TranslationCollection
         'vat_type' => 'Soort',
         'payment_status' => 'Status',
         'documents' => 'Pdf\'s',
+        'document' => 'Pdf',
 
         // Rate our plugin message.
         'review_on_marketplace' => 'Zou jij ons een review willen geven op WordPress.org?',
@@ -34,7 +35,8 @@ class ModuleSpecificTranslations extends TranslationCollection
         // Invoice status overview: shorter labels due to available space.
         'vat_type' => 'Type',
         'payment_status' => 'Status',
-        'documents' => 'Docs',
+        'documents' => 'Pdfs',
+        'document' => 'Pdf',
 
         // Rate our plugin message.
         'review_on_marketplace' => 'Would you please give us a review on WordPress.org?',

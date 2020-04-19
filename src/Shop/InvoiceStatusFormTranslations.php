@@ -67,6 +67,7 @@ class InvoiceStatusFormTranslations extends TranslationCollection
 
         // Links to pdf documents.
         'documents' => 'Documenten',
+        'document' => 'Document',
         'invoice' => 'factuur',
         'packing_slip' => 'pakbon',
         'open_as_pdf' => 'Acumulus %1$s openen als pdf',
@@ -131,6 +132,7 @@ class InvoiceStatusFormTranslations extends TranslationCollection
 
         // Links to pdf documents.
         'documents' => 'Documents',
+        'document' => 'Document',
         'invoice' => 'invoice',
         'packing_slip' => 'packing slip',
         'open_as_pdf' => 'Open Acumulus %1$s as pdf',

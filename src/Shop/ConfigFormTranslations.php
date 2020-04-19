@@ -339,6 +339,16 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'field_subject' => 'Onderwerp',
         'desc_subject' => 'Het onderwerp van de email. Als u dit leeg laat wordt "Factuur [nummer] [omschrijving]" gebruikt. Let op: als u Acumulus het factuurnummer laat bepalen, is het helaas niet mogelijk om naar het factuurnnummer te verwijzen.',
 
+        // Invoice status screen settings.
+        'invoiceStatusScreenSettingsHeader' => 'Factuurstatusoverzicht',
+        'desc_invoiceStatusScreenSettings' => 'Acumulus kan op de detailpagina van een bestelling de status tonen van de bijbehorende factuur in Acumulus.',
+        'desc_invoiceStatusScreenSettings2' => 'Hierdoor ziet u in een oogopslag of de factuur correct is verstuurd naar Acumulus en of de betaalstatus correct is. Ook kunt u de factuurgegevens opnieuw naar Acumulus versturen of de betaalstatus aanpassen.',
+        'desc_invoiceStatusScreen' => 'Met de eerste optie geeft u aan of u dit scherm getoond wil hebben. Met de 2e en 3e optie geeft u aan of u downloadlinks naar deze pdf bestanden getoond wilt hebben. Dit zijn de pdf bestanden die Acumulus maakt, niet die van de webwinkel zelf. Als u deze bestanden niet gebruikt kun u deze opties beter uitvinken.',
+        'field_invoiceStatusScreen' => 'Welke onderdelen wilt u tonen.',
+        'option_showInvoiceStatus' => 'Toon dit scherm.',
+        'option_showPdfInvoice' => 'Toon de link naar de factuur.',
+        'option_showPdfPackingSlip' => 'Toon de link naar de pakbon.',
+
         // Plugin settings.
         'pluginSettingsHeader' => 'Plugin instellingen',
 
@@ -709,6 +719,16 @@ If you unchecked the first option, the second option only applies to business cl
         'option_logLevel_4' => 'Log error messages, warnings, and operational and informational notices.',
         'option_logLevel_5' => 'Log error messages, warnings, notices, and communication messages.',
         'desc_logLevel' => 'Select a log level. Choose for the 1st or 2nd option unless otherwise instructed by support staff.',
+
+        // Invoice status screen settings.
+        'invoiceStatusScreenSettingsHeader' => 'Invoice status overview',
+        'desc_invoiceStatusScreenSettings' => 'On the detail page of an order, Acumulus can show the status of the accompanying invoice in Acumulus.',
+        'desc_invoiceStatusScreenSettings2' => 'This allows you to easily check if the invoice was correctly sent and if the payment status is still correct. You can also resend the invoice data or change the payment status.',
+        'desc_invoiceStatusScreen' => 'The 1st option indicates whether you want to show this screen at all. Use the 2nd and 3rd option to indicate whether you want to show download links to these pdf files. These are the pdf files from Acumulus, not from your webshop! If you don\'t use them, you better uncheck these options.',
+        'field_invoiceStatusScreen' => 'What parts do you want to show.',
+        'option_showInvoiceStatus' => 'Show this screen.',
+        'option_showPdfInvoice' => 'Show the link to the invoice.',
+        'option_showPdfPackingSlip' => 'Show the link to the packing slip.',
 
         // Plugin version information.
         'versionInformationHeader' => 'Information about your webshop and this module',

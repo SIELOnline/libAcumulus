@@ -326,7 +326,7 @@ class AdvancedConfigForm extends BaseConfigForm
      */
     protected function getRelationFields()
     {
-        $fields = array(
+        return array(
             'clientData' => array(
                 'type' => 'checkbox',
                 'label' => $this->t('field_clientData'),
@@ -458,7 +458,6 @@ class AdvancedConfigForm extends BaseConfigForm
                 ),
             ),
         );
-        return $fields;
     }
 
     /**
@@ -476,7 +475,7 @@ class AdvancedConfigForm extends BaseConfigForm
      */
     protected function getInvoiceFields()
     {
-        $fields = array(
+        return array(
             'concept' => array(
                 'type' => 'radio',
                 'label' => $this->t('field_concept'),
@@ -538,7 +537,6 @@ class AdvancedConfigForm extends BaseConfigForm
                 ),
             ),
         );
-        return $fields;
     }
 
     /**
@@ -555,7 +553,7 @@ class AdvancedConfigForm extends BaseConfigForm
      */
     protected function getInvoiceLinesFields()
     {
-        $fields = array(
+        return array(
             'itemNumber' => array(
                 'type' => 'text',
                 'label' => $this->t('field_itemNumber'),
@@ -589,7 +587,6 @@ class AdvancedConfigForm extends BaseConfigForm
                 ),
             ),
         );
-        return $fields;
     }
 
     /**
@@ -605,7 +602,7 @@ class AdvancedConfigForm extends BaseConfigForm
      */
     protected function getOptionsFields()
     {
-        $fields = array(
+        return array(
             'showOptions' => array(
                 'type' => 'checkbox',
                 'label' => $this->t('field_showOptions'),
@@ -639,7 +636,6 @@ class AdvancedConfigForm extends BaseConfigForm
                 ),
             ),
         );
-        return $fields;
     }
 
     /**

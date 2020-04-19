@@ -195,6 +195,15 @@ class ConfigForm extends BaseConfigForm
                     'paymentMethodCostCenterFieldset' => $this->getPaymentMethodsFieldset($paymentMethods, 'paymentMethodCostCenter', $this->costCenterOptions),
                 );
             }
+
+            $fields += array(
+                'invoiceStatusScreenSettingsHeader' => array(
+                    'type' => 'fieldset',
+                    'legend' => $this->t('invoiceStatusScreenSettingsHeader'),
+                    'description' => $this->t('desc_invoiceStatusScreenSettings') . ' ' . $this->t('desc_invoiceStatusScreenSettings2'),
+                    'fields' => $this->getInvoiceStatusScreenFields(),
+                ),
+            );
         }
 
         $fields += array(
@@ -289,7 +298,8 @@ class ConfigForm extends BaseConfigForm
     protected function getShopFields()
     {
         $vatClasses = $this->shopCapabilities->getVatClasses();
-        $fields = array(
+
+        return array(
             'nature_shop' => array(
                 'type' => 'radio',
                 'label' => $this->t('field_nature_shop'),
@@ -338,7 +348,6 @@ class ConfigForm extends BaseConfigForm
                 ),
             ),
         );
-        return $fields;
     }
 
     /**
@@ -354,7 +363,8 @@ class ConfigForm extends BaseConfigForm
     protected function getTriggerFields()
     {
         $orderStatusesList = $this->getOrderStatusesList();
-        $fields = array(
+
+        return array(
             'triggerOrderStatus' => array(
                 'name' => 'triggerOrderStatus[]',
                 'type' => 'select',
@@ -369,7 +379,6 @@ class ConfigForm extends BaseConfigForm
             'triggerInvoiceEvent' => $this->getOptionsOrHiddenField('triggerInvoiceEvent', 'radio', false),
             'triggerCreditNoteEvent' => $this->getOptionsOrHiddenField('triggerCreditNoteEvent', 'radio', false),
         );
-        return $fields;
     }
 
     /**
@@ -394,7 +403,7 @@ class ConfigForm extends BaseConfigForm
         $this->accountNumberOptions = $this->picklistToOptions($this->service->getPicklistAccounts(), 0, $this->t('option_empty'));
         $this->costCenterOptions = $this->picklistToOptions($this->service->getPicklistCostCenters(), 0, $this->t('option_empty'));
 
-        $fields = array(
+        return array(
             'invoiceNrSource' => $this->getOptionsOrHiddenField('invoiceNrSource', 'radio'),
             'dateToUse' => $this->getOptionsOrHiddenField('dateToUse', 'radio'),
             'defaultAccountNumber' => array(
@@ -421,6 +430,23 @@ class ConfigForm extends BaseConfigForm
                 'options' => $this->picklistToOptions($invoiceTemplates, 0, $this->t('option_same_template')),
             ),
         );
+    }
+
+    protected function getInvoiceStatusScreenFields()
+    {
+        $fields = [];
+        if ($this->shopCapabilities->hasInvoiceStatusScreen()) {
+            $fields['invoiceStatusScreen'] = [
+                'type' => 'checkbox',
+                'label' => $this->t('field_invoiceStatusScreen'),
+                'description' => $this->t('desc_invoiceStatusScreen'),
+                'options' => [
+                    'showInvoiceStatus' => $this->t('option_showInvoiceStatus'),
+                    'showPdfInvoice' => $this->t('option_showPdfInvoice'),
+                    'showPdfPackingSlip' => $this->t('option_showPdfPackingSlip'),
+                ],
+            ];
+        }
         return $fields;
     }
 
@@ -523,18 +549,6 @@ class ConfigForm extends BaseConfigForm
             );
         }
         return $fieldset;
-    }
-
-    /**
-     * @inheritDoc
-     *
-     * This override prevents calling the API just to get the field definitions,
-     * as this leads to strange errors and problems when changing the
-     * credentials themselves.
-     */
-    protected function getCheckboxKeys()
-    {
-        return array();
     }
 
     /**

@@ -15,7 +15,7 @@ PS  = PrestaShop
 VM3 = VirtueMart3 (Joomla)
 WC  = WooCommerce (WordPress) (alle ondersteunde versies, vanaf 5.5.2 is dat alleen nog WC3)
 WC2 = WooCommerce 2 (WordPress)
-WC3 = WooCommerce 3 (WordPress)
+WC3 = WooCommerce 3+ (WordPress)
 
 5.9.0 (2020-04-??)
 ------------------
@@ -28,6 +28,8 @@ Features:
 - WC: Message asking to rate our plugin is now also shown on our own pages.
 
 Bugs:
+- WC3: WC introduced new 'hidden' order item meta keys ('method_id', 'cost',
+  '_reduced_stock') that are not variant info.
 - ALL: Using order date to send as invoice date did not work correctly.
 - MA (and others?): ModuleTranslations were not loaded: refactored to be loaded
   automatically after loading any ModuleSpecificTranslations.

@@ -43,7 +43,6 @@ class Creator extends BaseCreator
         $items = $this->invoiceSource->getSource()->get_items(apply_filters('woocommerce_admin_order_item_types', 'line_item'));
         foreach ($items as $item) {
             $product = $item->get_product();
-            /** @noinspection PhpUnhandledExceptionInspection */
             $line = $this->getItemLine($item, $product);
             if ($line) {
                 $result[] = $line;
@@ -245,7 +244,9 @@ class Creator extends BaseCreator
          */
         $metadata = $item->get_meta_data();
         if (!empty($metadata)) {
-            // Define hidden core fields.
+            // Define hidden core fields: check this when new versions from WC
+            // are released with the list in e.g.
+            // wp-content\plugins\woocommerce\includes\admin\meta-boxes\views\html-order-item-meta.php
             $hiddenOrderItemMeta = apply_filters('woocommerce_hidden_order_itemmeta', array(
                 '_qty',
                 '_tax_class',
@@ -255,6 +256,9 @@ class Creator extends BaseCreator
                 '_line_subtotal_tax',
                 '_line_total',
                 '_line_tax',
+                'method_id',
+                'cost',
+                '_reduced_stock',
             ));
             foreach ($metadata as $meta) {
                 // Skip hidden core fields and serialized data (also hidden core
@@ -318,13 +322,11 @@ class Creator extends BaseCreator
         $feeEx = $item->get_total() / $quantity;
         $feeVat = $item->get_total_tax() / $quantity;
 
-        $result = array(
+        return array(
                 Tag::Product => $this->t($item->get_name()),
                 Tag::UnitPrice => $feeEx,
                 Tag::Quantity => $item->get_quantity(),
             ) + $this->getVatRangeTags($feeVat, $feeEx, $this->precision, $this->precision);
-
-        return $result;
     }
 
     /**
@@ -392,15 +394,13 @@ class Creator extends BaseCreator
         $shippingVat = $item->get_total_tax() / $quantity;
         $precisionVat = 0.01;
 
-        $result = array(
+        return array(
                 Tag::Product => $item->get_name(),
                 Tag::UnitPrice => $shippingEx,
                 Tag::Quantity => $quantity,
             )
-            + $this->getVatRangeTags($shippingVat, $shippingEx, $precisionVat, $precisionShippingEx)
-            + $vatLookupTags;
-
-        return $result;
+               + $this->getVatRangeTags($shippingVat, $shippingEx, $precisionVat, $precisionShippingEx)
+               + $vatLookupTags;
     }
 
     /**

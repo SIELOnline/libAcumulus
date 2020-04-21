@@ -62,12 +62,10 @@ abstract class BaseConfigForm extends Form
             if (!$this->addIfIsset($this->submittedValues, $key, $submittedValues)) {
                 // Add unchecked checkboxes and empty arrays, but only if they
                 // were defined on the form.
-                if ($this->isKey($key)) {
-                    if ($this->isCheckbox($key)) {
-                        $this->submittedValues[$key] = '';
-                    } elseif ($this->isArray($key)) {
-                        $this->submittedValues[$key] = array();
-                    }
+                if ($this->isCheckbox($key)) {
+                    $this->submittedValues[$key] = '';
+                } elseif ($this->isArray($key)) {
+                    $this->submittedValues[$key] = array();
                 }
             }
         }

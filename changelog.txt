@@ -21,7 +21,7 @@ WC3 = WooCommerce 3+ (WordPress)
 ------------------
 Features:
 - ALL: Added an option to show or hide the status invoice screen and options to
-  show or hide the pdf links on that status invoice screen.
+  show or hide the pdfs on that status invoice screen (for now only MA2|WC).
 - MA2: Added a message to ask to rate our module on Magento marketplace.
 - MA2: Added an Acumulus tab to the view order page, showing the status of the
   invoice for that order and its credit notes, if any, in Acumulus.
@@ -31,10 +31,11 @@ Bugs:
 - WC3: WC introduced new 'hidden' order item meta keys ('method_id', 'cost',
   '_reduced_stock') that are not variant info.
 - ALL: Using order date to send as invoice date did not work correctly.
-- MA (and others?): ModuleTranslations were not loaded: refactored to be loaded
+- MA|JOO: ModuleTranslations were not loaded: refactored to be loaded
   automatically after loading any ModuleSpecificTranslations.
 
 Refactorings:
+- ALL: Refactored handling the meta field on our forms.
 - ALL: Added method ShopCapabilities::hasInvoiceStatusScreen().
 - MA2: Refactored inheritance structure of controller classes.
 - MA2: Refactored naming of full page block classes.

@@ -40,7 +40,7 @@ class RatePluginForm extends Form
         Log $log
     ) {
         parent::__construct($formHelper, $shopCapabilities, $config, $translator, $log);
-
+        $this->addMeta = false;
         $translations = new RatePluginFormTranslations();
         $this->translator->add($translations);
     }

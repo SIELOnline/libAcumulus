@@ -16,7 +16,7 @@ class FormHelper extends BaseFormHelper
      */
     protected function getMeta()
     {
-        if ($this->meta === null && $this->isSubmitted() && isset($_POST[static::Meta])) {
+        if (empty($this->meta) && $this->isSubmitted() && isset($_POST[static::Meta])) {
             $this->setMeta(json_decode(stripslashes($_POST[static::Meta])));
         }
         return $this->meta;

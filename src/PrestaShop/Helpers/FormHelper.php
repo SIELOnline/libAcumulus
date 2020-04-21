@@ -23,14 +23,14 @@ class FormHelper extends BaseFormHelper
     /**
      * {@inheritdoc}
      *
-     * Prestashop requires field sets at the top level: t the meta field to the
-     * first field set.
+     * Prestashop requires field sets at the top level: move the meta field to
+     * the first field collection.
      */
     public function addMetaField(array $fields)
     {
         $fields = parent::addMetaField($fields);
         foreach ($fields as $key => &$field) {
-            if ($field['type'] === 'fieldset') {
+            if (isset($field['fields'])) {
                 $field['fields'][static::Meta] = $fields[static::Meta];
                 unset($fields[static::Meta]);
                 break;

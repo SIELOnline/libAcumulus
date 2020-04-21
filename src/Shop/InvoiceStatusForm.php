@@ -113,6 +113,7 @@ class InvoiceStatusForm extends Form
     )
     {
         parent::__construct($formHelper, $shopCapabilities, $config, $translator, $log);
+        $this->addMeta = false;
 
         $translations = new InvoiceTranslations();
         $this->translator->add($translations);
@@ -1088,7 +1089,7 @@ class InvoiceStatusForm extends Form
      *
      * @return array
      */
-    protected function getHiddenField($value): array
+    protected function getHiddenField($value)
     {
         return array(
             'type' => 'hidden',

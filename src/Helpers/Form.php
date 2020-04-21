@@ -89,6 +89,9 @@ abstract class Form
     /** @var string[] The values as filled in on form submission. */
     protected $submittedValues;
 
+    /** @var bool */
+    protected $addMeta = true;
+
     /**
      * Any success messages.
      *
@@ -327,7 +330,7 @@ abstract class Form
                 if (array_key_exists($key, $this->formValues)) {
                     $this->formValues[$key] = $defaultFormValue;
                 } elseif (is_array($defaultFormValue)) {
-                // Distribute keyed arrays over separate values if existing.
+                    // Distribute keyed arrays over separate values if existing.
                     foreach ($defaultFormValue as $arrayKey => $arrayValue) {
                         $fullKey = "{$key}[{$arrayKey}]";
                         if (array_key_exists($fullKey, $this->formValues)) {
@@ -627,7 +630,9 @@ abstract class Form
     {
         if (empty($this->fields)) {
             $this->fields = $this->getFieldDefinitions();
-            $this->fields = $this->formHelper->addMetaField($this->fields);
+            if ($this->addMeta) {
+                $this->fields = $this->formHelper->addMetaField($this->fields);
+            }
         }
         return $this->fields;
     }
@@ -646,7 +651,7 @@ abstract class Form
     /**
      * Returns a list of field ids/keys appearing in the form.
      *
-     * @return array
+     * @return string[]
      *   Array of key names appearing in the form, keyed by these names.
      */
     protected function getKeys()

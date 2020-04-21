@@ -27,15 +27,18 @@ class FormHelper
      *
      * @var object[]|null
      */
-    protected $meta = null;
+    protected $meta = array();
 
     /**
      * @return object[]|null
      */
     protected function getMeta()
     {
-        if ($this->meta === null && $this->isSubmitted() && isset($_POST[static::Meta])) {
-            $this->setMeta(json_decode($_POST[static::Meta]));
+        if (empty($this->meta) && $this->isSubmitted() && isset($_POST[static::Meta])) {
+            $meta = json_decode($_POST[static::Meta]);
+            if (is_object($meta) || is_array($meta)) {
+                $this->setMeta($meta);
+            }
         }
         return $this->meta;
     }

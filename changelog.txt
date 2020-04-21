@@ -17,8 +17,13 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies, vanaf 5.5.2 is dat all
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3+ (WordPress)
 
-5.9.0 (2020-04-??)
+5.9.0 (2020-04-21)
 ------------------
+NOTE: Magento 1 reaches end of life at june 2020. As of this version we will no
+  longer maintain Magento 1 specific code, nor add features to Magento 1. You
+  may continue to open (bug) tickets for Magento 1 and these will be addressed
+  within the limits of a "reasonable" effort.
+
 Features:
 - ALL: Added an option to show or hide the status invoice screen and options to
   show or hide the pdfs on that status invoice screen (for now only MA2|WC).

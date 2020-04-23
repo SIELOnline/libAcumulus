@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\OpenCart\Invoice;
 
+use RuntimeException;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\Meta;
@@ -65,8 +66,7 @@ class Creator extends BaseCreator
 
         $totalLines = $this->getTotalLines();
 
-        $result = array_merge($itemLines, $totalLines);
-        return $result;
+        return array_merge($itemLines, $totalLines);
     }
 
     /**
@@ -211,12 +211,9 @@ class Creator extends BaseCreator
         $result = array();
 
         /**
-         * The set of order total lines for this order.
-         *
-         * This set is ordered by sort_order, meaning that lines before the tax
-         * line are amounts ex vat and line after are inc vat.
-         *
-         * @var array[] $totalLines
+         * @var array[] $totalLines The set of order total lines for this order.
+         *   This set is ordered by sort_order, meaning that lines before
+         *   the tax line are amounts ex vat and line after are inc vat.
          */
         $totalLines = $this->invoiceSource->getOrderTotalLines();
         $exVat = true;
@@ -419,7 +416,7 @@ class Creator extends BaseCreator
      */
     protected function getShippingLine()
     {
-        throw new \RuntimeException(__METHOD__ . ' should never be called');
+        throw new RuntimeException(__METHOD__ . ' should never be called');
     }
 
     /**

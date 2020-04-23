@@ -56,6 +56,17 @@ class RatePluginForm extends Form
     }
 
     /**
+     * {@inheritdoc}
+     *
+     * This override handles the case that this message is displayed on another
+     * Acumulus form and the post thus is meant for that form not this one.
+     */
+    public function isSubmitted()
+    {
+        return parent::isSubmitted() && isset($_POST['clicked']);
+    }
+
+    /**
      * @inheritDoc
      *
      * This override adds sanitation to the values and already combines some of

@@ -21,6 +21,8 @@ WC3 = WooCommerce 3+ (WordPress)
 -----------------
 Bugs:
 - MA|WC: Filling in some lacking error handling on the invoice status screen.
+- WC: Ensure that the rate plugin on one of our own form pages do not treat form
+  submission of the whole page as its own form submission (link expired error).
 
 5.9.0 (2020-04-21)
 ------------------

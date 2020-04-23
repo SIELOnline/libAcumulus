@@ -17,6 +17,11 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies, vanaf 5.5.2 is dat all
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3+ (WordPress)
 
+5.9.1 (202-04-??)
+-----------------
+Bugs:
+- MA|WC: Filling in some lacking error handling on the invoice status screen.
+
 5.9.0 (2020-04-21)
 ------------------
 NOTE: Magento 1 reaches end of life at june 2020. As of this version we will no

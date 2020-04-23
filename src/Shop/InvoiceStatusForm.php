@@ -277,7 +277,6 @@ class InvoiceStatusForm extends Form
         return parent::isSubmitted() && isset($_POST['clicked']);
     }
 
-
     /**
      * @inheritDoc
      *
@@ -515,6 +514,9 @@ class InvoiceStatusForm extends Form
             case static::Invoice_Sent:
                 $additionalFields = $this->getEntryFields($source, $entry);
                 break;
+            case static::Invoice_LocalError:
+                $additionalFields = [];
+                break;
             default:
                 $additionalFields = array(
                     'unknown' => array(
@@ -659,6 +661,10 @@ class InvoiceStatusForm extends Form
                     $statusSeverity = static::Status_Success;
                     $statusMessage = $this->t('invoice_status_ok');
                 }
+            } elseif (empty($invoiceStatus)) {
+                $invoiceStatus = static::Invoice_LocalError;
+                $statusSeverity = static::Status_Error;
+                $description = 'entry_concept_noid';
             }
         }
 

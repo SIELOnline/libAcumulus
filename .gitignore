@@ -1,9 +1,0 @@
-# patches, diffs, merges
-*.patch
-interdiff.txt
-*.orig
-*.bak
-*.old
-
-# PHPStorm
-.idea/*

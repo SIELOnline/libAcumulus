@@ -9,14 +9,14 @@ use Siel\Acumulus\Helpers\Translator;
  * Class Result wraps an Acumulus web service result into an object.
  *
  * A Result object will contain the:
- * - result status (internal code: 1 of the self::Status_... constants)
- * - exception, if one was thrown
- * - any error messages, local and/or remote
- * - any warnings, local and/or remote
- * - any notices, local
- * - message sent, for logging purposes
- * - (raw) message received, for logging purposes
- * - result array
+ * - result status (internal code: one of the self::Status_... constants).
+ * - exception, if one was thrown.
+ * - any error messages, local and/or remote.
+ * - any warnings, local and/or remote.
+ * - any notices, local.
+ * - message sent, for logging purposes.
+ * - (raw) message received, for logging purposes.
+ * - result array.
  */
 class Result
 {
@@ -296,6 +296,12 @@ class Result
      * Returns a - possibly empty - list of (formatted) error messages.
      *
      * @param int $format
+     *   The format in which to return the messages:
+     *   - Result::Format_PlainTextArray: an array of strings
+     *   - Result::Format_FormattedText: a plain text string with all messages
+     *     on its own line indented by a '*'.
+     *   - Result::Format_Html: a html string with all messages in an
+     *     unordered HTML list
      *
      * @return array[]|string[]|string
      */
@@ -308,6 +314,12 @@ class Result
      * Returns a - possibly empty - list of warning messages.
      *
      * @param int $format
+     *   The format in which to return the messages:
+     *   - Result::Format_PlainTextArray: an array of strings
+     *   - Result::Format_FormattedText: a plain text string with all messages
+     *     on its own line indented by a '*'.
+     *   - Result::Format_Html: a html string with all messages in an
+     *     unordered HTML list
      *
      * @return array[]|string[]|string
      */
@@ -320,6 +332,12 @@ class Result
      * Returns a - possibly empty - list of notice messages.
      *
      * @param int $format
+     *   The format in which to return the messages:
+     *   - Result::Format_PlainTextArray: an array of strings
+     *   - Result::Format_FormattedText: a plain text string with all messages
+     *     on its own line indented by a '*'.
+     *   - Result::Format_Html: a html string with all messages in an
+     *     unordered HTML list
      *
      * @return array[]|string[]|string
      */
@@ -461,13 +479,13 @@ class Result
      * @param string $message
      *   A message describing the notice, warning or error.
      * @param array $list
-     *   The list ot add the message to.
+     *   The list to add the message to.
      * @param int $level
      *   The severity level to set the status to.
      *
      * @return $this
      */
-    public function addMessage($code, $codeTag, $message, array &$list, $level)
+    protected function addMessage($code, $codeTag, $message, array &$list, $level)
     {
         if (is_array($code)) {
             $message = $code['message'];
@@ -491,10 +509,10 @@ class Result
     }
 
     /**
-     * Merges sets of exception, error and warning messages of 2 results.
+     * Merges the sets of exception, errors, warnings and notices of 2 results.
      *
      * This allows to inform the user about errors and warnings that occurred
-     * during additional API calls, e.g. querying VAT rates or deleteing old
+     * during additional API calls, e.g. querying VAT rates or deleting old
      * entries.
      *
      * @param \Siel\Acumulus\Web\Result $other
@@ -628,8 +646,14 @@ class Result
      *
      * @param string[] $messages
      * @param int $format
-     *
+     *   The format in which to return the messages:
+     *   - Result::Format_PlainTextArray: an array of strings
+     *   - Result::Format_FormattedText: a plain text string with all messages
+     *     on its own line indented by a '*'.
+     *   - Result::Format_Html: a html string with all messages in an
+     *     unordered HTML list
      * @param string $type
+     *   The type of messages that is passed in, e.g. message_error.
      *
      * @return string|\string[]
      */
@@ -686,8 +710,8 @@ class Result
      *
      * @return $this
      *
-     * @see https://www.siel.nl/acumulus/API/Basic_Response/ For the
-     *   common part of a response.
+     * @see https://www.siel.nl/acumulus/API/Basic_Response/ For the common part
+     *   of a response.
      */
     public function setResponse(array $response)
     {
@@ -752,6 +776,10 @@ class Result
     }
 
     /**
+     * Returns the raw request as sent to the Acumulus web API.
+     *
+     * @todo: make protected.
+     *
      * @return string|null
      */
     public function getRawRequest()
@@ -760,7 +788,11 @@ class Result
     }
 
     /**
-     * @param string|null $rawRequest
+     * Sets the raw request as sent to the Acumulus web API.
+     *
+     * Only used for logging purposes.
+     *
+     * @param string $rawRequest
      *
      * @return $this
      */
@@ -771,6 +803,10 @@ class Result
     }
 
     /**
+     * Returns the raw response as received from the Acumulus web API.
+     *
+     * @todo: make protected.
+     *
      * @return string|null
      */
     public function getRawResponse()
@@ -779,7 +815,11 @@ class Result
     }
 
     /**
-     * @param string|null $rawResponse
+     * Sets the raw response as received from the Acumulus web API.
+     *
+     * Only used for logging purposes.
+     *
+     * @param string $rawResponse
      *
      * @return $this
      */
@@ -790,15 +830,20 @@ class Result
     }
 
     /**
-     * Returns a string with messages for support, ie the request and response.
+     * Returns a string with the request and response messages for support.
      *
      * In html format it will be formatted in a details tag so that it is closed
      * by default.
      *
-     * @param $format
+     * @param int $format
+     *   The format in which to return the messages:
+     *   - Result::Format_PlainTextArray: an array of strings
+     *   - Result::Format_FormattedText: a plain text string with all messages
+     *     on its own line indented by a '*'.
+     *   - Result::Format_Html: a html string with all messages in an
+     *     unordered HTML list
      *
      * @return string
-     *
      */
     public function getRawRequestResponse($format)
     {

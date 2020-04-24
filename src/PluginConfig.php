@@ -4,26 +4,22 @@ namespace Siel\Acumulus;
 /**
  * Plugin defines the version and other plugin related constants.
  *
- * These constants are used as configuration settings.
+ * These constants are mainly used as configuration settings.
  */
 interface PluginConfig
 {
 
     /**
-     * Version of this library, used in reporting.
-     *
-     * Note that composer will use git tags to determine the version of this
-     * library.
-     *
-     * @var string
+     * @var string Version of this library, used in reporting.
+     *   Note that composer will use git tags to determine the version of this
+     *   library, this version is used in communication with the Acumulus API
+     *   and when users contact support.
      */
-    const Version = '5.9.0';
+    const Version = '5.10.0-alpha1';
 
     /**
-     * Format to use with date() and DateTime formatting methods for SQL
-     * timestamps.
-     *
-     * @var string
+     * @var string Format to use with date() and DateTime formatting methods for
+     *   SQL timestamps.
      */
     const TimeStampFormat_Sql = 'Y-m-d H:i:s';
 

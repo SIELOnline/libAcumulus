@@ -73,4 +73,11 @@ interface Api
 
     const Email_Normal = 0;
     const Email_Reminder = 1;
+
+    const Gender_Female = 'F';
+    const Gender_Male = 'M';
+    const Gender_Neutral = 'X';
+
+    const CreateApiUser_No = 0;
+    const CreateApiUser_Yes = 1;
 }

@@ -3,6 +3,7 @@ namespace Siel\Acumulus\Web;
 
 use DOMDocument;
 use DOMElement;
+use DOMException;
 use LibXMLError;
 use RuntimeException;
 use Siel\Acumulus\Api;
@@ -63,8 +64,7 @@ class Communicator
     public function getUri($apiFunction)
     {
         $environment = $this->config->getEnvironment();
-        $uri = $environment['baseUri'] . '/' . $environment['apiVersion'] . '/' . $apiFunction . '.php';
-        return $uri;
+        return $environment['baseUri'] . '/' . $environment['apiVersion'] . '/' . $apiFunction . '.php';
     }
 
     /**
@@ -74,6 +74,11 @@ class Communicator
      *   The API function to invoke.
      * @param array $message
      *   The values to submit.
+     * @param bool $needContract
+     *   Indicates whether this api function needs the contract details. Most
+     *   API functions do, do the default is true, but for some general listing
+     *   functions, like vat info, it is optional, and for signUp, it is even
+     *   not allowed.
      * @param \Siel\Acumulus\Web\Result $result
      *   It is possible to already create a Result object before calling the Web
      *   Service to store local messages. By passing this Result object these
@@ -83,7 +88,7 @@ class Communicator
      * @return \Siel\Acumulus\Web\Result
      *   A Result object containing the results.
      */
-    public function callApiFunction($apiFunction, array $message, Result $result = null)
+    public function callApiFunction($apiFunction, array $message, $needContract = true, Result $result = null)
     {
         if ($result === null) {
             $result = $this->container->getResult();
@@ -91,7 +96,7 @@ class Communicator
         $uri = $this->getUri($apiFunction);
 
         try {
-            $commonMessagePart = $this->getCommonPart();
+            $commonMessagePart = $this->getBasicSubmit($needContract);
             $message = array_merge($commonMessagePart, $message);
 
             // Send message, receive response.
@@ -108,36 +113,47 @@ class Communicator
      * Returns the common part of each API message.
      *
      * The common part consists of the following tags:
-     * - contract
-     * - format
-     * - testmode
-     * - connector
+     * - contract (optional)
+     * - format: 'json' or 'xml'
+     * - testmode: 0 (real) or 1 (test mode)
+     * - lang: Language for error and warning in responses.
+     * - inodes: List of ";"-separated XML-node identifiers which should be
+     *   included in the response. Defaults to full response when left out or empty.
+     * - connector: information about the client
+     *
+     * @param bool $needContract
+     *   Indicates whether this api function needs the contract details. Most
+     *   API functions do, so the default is true, but for some general listing
+     *   functions, like vat info, it is optional, and for signUp it is even
+     *   not allowed.
      *
      * @return array
-     *   The common part of each API message.
+     *   The common part of an API message.
+     *
+     * @see https://www.siel.nl/acumulus/API/Basic_Submit/
      */
-    protected function getCommonPart()
+    protected function getBasicSubmit($needContract)
     {
         $environment = $this->config->getEnvironment();
         $pluginSettings = $this->config->getPluginSettings();
 
-        // Complete message with values common to all API calls:
-        // - contract part
-        // - format part
-        // - environment part
-        $commonMessagePart = array(
-            'contract' => $this->config->getCredentials(),
+        $result = [];
+        if ($needContract) {
+            $result['contract'] = $this->config->getCredentials();
+        }
+        $result += [
             'format' => $pluginSettings['outputFormat'],
             'testmode' => $pluginSettings['debug'] === PluginConfig::Send_TestMode ? Api::TestMode_Test : Api::TestMode_Normal,
-            'connector' => array(
+            'lang' => $this->translator->getLanguage(),
+            'connector' => [
                 'application' => "{$environment['shopName']} {$environment['shopVersion']}",
                 'webkoppel' => "Acumulus {$environment['moduleVersion']}",
                 'development' => 'SIEL - Buro RaDer',
                 'remark' => "Library {$environment['libraryVersion']} - PHP {$environment['phpVersion']}",
                 'sourceuri' => 'https://www.siel.nl/',
-            ),
-        );
-        return $commonMessagePart;
+            ],
+        ];
+        return $result;
     }
 
     /**
@@ -170,11 +186,9 @@ class Communicator
     {
         // Convert message to XML. XML requires 1 top level tag, so add one.
         // The tagname is ignored by the Acumulus WebAPI.
-        $message = $this->convertArrayToXml(array('myxml' => $message));
-        // Keep track of communication for debugging/logging at higher levels.
+        $message = $this->convertArrayToXml(['myxml' => $message]);
         $result->setRawRequest($message);
-
-        $rawResponse = $this->sendHttpPost($uri, array('xmlstring' => $message), $result);
+        $rawResponse = $this->sendHttpPost($uri, ['xmlstring' => $message], $result);
         $result->setRawResponse($rawResponse);
 
         if (empty($rawResponse)) {
@@ -187,7 +201,7 @@ class Communicator
             $this->raiseHtmlReceivedError($result->getRawResponse());
         } else {
             // Decode the response as either json or xml.
-            $response = array();
+            $response = [];
             $pluginSettings = $this->config->getPluginSettings();
 
             if ($pluginSettings['outputFormat'] === 'json') {
@@ -249,16 +263,16 @@ class Communicator
         if (!defined('CURL_SSLVERSION_TLSv1_2')) {
             define('CURL_SSLVERSION_TLSv1_2', 6);
         }
-        $options = array(
+        $options = [
             CURLOPT_URL => $uri,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => $post,
             CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1_2,
             //CURLOPT_PROXY => '127.0.0.1:8888', // Uncomment to debug with Fiddler.
-            //CURLOPT_SSL_VERIFYPEER => false, // @todo: why? Uncomment to debug with Fiddler.
+            //CURLOPT_SSL_VERIFYPEER => false, // Uncomment to debug with Fiddler.
             // @todo: CURLOPT_TIMEOUT?
-        );
+        ];
         if (!curl_setopt_array($ch, $options)) {
             $this->raiseCurlError($ch, 'curl_setopt_array()');
         }
@@ -352,7 +366,7 @@ class Communicator
             // real error has been found and solved.
             $result = str_replace('\\', '&#92;', $result);
             return $result;
-        } catch (\DOMException $e) {
+        } catch (DOMException $e) {
             // Convert a DOMException to a RuntimeException, so we only have to
             // handle RuntimeExceptions.
             throw new RuntimeException($e->getMessage(), $e->getCode(), $e);
@@ -433,7 +447,7 @@ class Communicator
      */
     protected function raiseLibxmlError(array $errors)
     {
-        $messages = array();
+        $messages = [];
         $code = 704;
         foreach ($errors as $error) {
             // Overwrite our own code with the 1st code we get from libxml.

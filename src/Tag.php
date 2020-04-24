@@ -3,6 +3,9 @@ namespace Siel\Acumulus;
 
 /**
  * Tag defines string constants for the tags used in the Acumulus API messages.
+ *
+ * Mainly the tags used in the invoice-add api call are added here as they are
+ * used in multiple places.
  */
 interface Tag
 {

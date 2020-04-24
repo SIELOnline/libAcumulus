@@ -7,7 +7,9 @@
     "require": {
       "ext-json": "*",
       "ext-dom": "*",
-      "ext-libxml": "*"
+      "ext-libxml": "*",
+      "ext-simplexml": "*",
+      "ext-curl": "*"
     },
     "autoload": {
         "psr-4": {

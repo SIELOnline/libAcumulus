@@ -9,14 +9,6 @@ namespace Siel\Acumulus\Helpers;
  */
 class Log
 {
-    const None = 0;
-    const Error = 1;
-    const Warning = 2;
-    const Notice = 3;
-    const Info = 4;
-    const Debug = 5;
-    const NotYetSet = 6;
-
     /** @var int */
     protected $logLevel;
 
@@ -32,7 +24,6 @@ class Log
     {
         $this->libraryVersion = $libraryVersion;
     }
-
 
     /**
      * Gets the actual log level.
@@ -66,25 +57,29 @@ class Log
      * Returns a textual representation of the severity.
      *
      * @param int $severity
-     *   One of the constants of this class.
+     *   One of the Severity::... constants.
      *
      * @return string
      *   A textual representation of the severity.
      */
     protected function getSeverityString($severity)
     {
+        $severity = (int) $severity;
         switch ($severity) {
-            case Log::Error:
-                return 'Error';
-            case Log::Warning:
-                return 'Warning';
-            case Log::Notice:
-                return 'Notice';
-            case Log::Info:
-                return 'Info';
-            case Log::Debug:
-            default:
+            case Severity::Log:
                 return 'Debug';
+            case Severity::Info:
+                return 'Info';
+            case Severity::Notice:
+                return 'Notice';
+            case Severity::Warning:
+                return 'Warning';
+            case Severity::Error:
+                return 'Error';
+            case Severity::Exception:
+                return 'Exception';
+            default:
+                return "Unknown severity $severity";
         }
     }
 
@@ -99,7 +94,10 @@ class Log
      * - adding "Acumulus {version} {severity}: " in front of the message.
      *
      * @param int $severity
+     *   One of the Severity::... constants.
      * @param string $message
+     *   The message to log, optionally followed by arguments. If there are
+     *   arguments the $message is passed through vsprintf().
      * @param array $args
      *
      * @return string
@@ -107,7 +105,7 @@ class Log
      */
     public function log($severity, $message, array $args = array())
     {
-        if ($severity <= max($this->getLogLevel(), Log::Warning)) {
+        if ($severity <= max($this->getLogLevel(), Severity::Warning)) {
             if (count($args) > 0) {
                 $message = vsprintf($message, $args);
             }
@@ -130,24 +128,7 @@ class Log
     {
         $args = func_get_args();
         array_shift($args);
-        return $this->log(Log::Debug, $message, $args);
-    }
-
-    /**
-     * Logs a notice.
-     *
-     * @param string $message,...
-     *   The message to log, optionally followed by arguments. If there are
-     *   arguments the $message is passed through vsprintf().
-     *
-     * @return string
-     *   The full formatted message whether it got logged or not.
-     */
-    public function notice($message)
-    {
-        $args = func_get_args();
-        array_shift($args);
-        return $this->log(Log::Notice, $message, $args);
+        return $this->log(Severity::Log, $message, $args);
     }
 
     /**
@@ -164,7 +145,24 @@ class Log
     {
         $args = func_get_args();
         array_shift($args);
-        return $this->log(Log::Info, $message, $args);
+        return $this->log(Severity::Info, $message, $args);
+    }
+
+    /**
+     * Logs a notice.
+     *
+     * @param string $message,...
+     *   The message to log, optionally followed by arguments. If there are
+     *   arguments the $message is passed through vsprintf().
+     *
+     * @return string
+     *   The full formatted message whether it got logged or not.
+     */
+    public function notice($message)
+    {
+        $args = func_get_args();
+        array_shift($args);
+        return $this->log(Severity::Notice, $message, $args);
     }
 
     /**
@@ -181,7 +179,7 @@ class Log
     {
         $args = func_get_args();
         array_shift($args);
-        return $this->log(Log::Warning, $message, $args);
+        return $this->log(Severity::Warning, $message, $args);
     }
 
     /**
@@ -198,7 +196,7 @@ class Log
     {
         $args = func_get_args();
         array_shift($args);
-        return $this->log(Log::Error, $message, $args);
+        return $this->log(Severity::Error, $message, $args);
     }
 
     /**
@@ -210,7 +208,9 @@ class Log
      * Override if the web shop offers its own log mechanism.
      *
      * @param string $message
+     *   The message to log.
      * @param int $severity
+     *   One of the Severity::... constants.
      */
     protected function write($message, $severity)
     {

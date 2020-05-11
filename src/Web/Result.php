@@ -1,15 +1,18 @@
 <?php
 namespace Siel\Acumulus\Web;
 
-use Exception;
+use RuntimeException;
 use Siel\Acumulus\Api;
+use Siel\Acumulus\Helpers\Message;
+use Siel\Acumulus\Helpers\MessageCollection;
+use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Helpers\Translator;
 
 /**
  * Class Result wraps an Acumulus web service result into an object.
  *
  * A Result object will contain the:
- * - result status (internal code: one of the self::Status_... constants).
+ * - result status (internal code: one of the Severity::... constants).
  * - exception, if one was thrown.
  * - any error messages, local and/or remote.
  * - any warnings, local and/or remote.
@@ -18,119 +21,68 @@ use Siel\Acumulus\Helpers\Translator;
  * - (raw) message received, for logging purposes.
  * - result array.
  */
-class Result
+class Result extends MessageCollection
 {
-    // Web service configuration related constants.
-    // Send status: bits 1 to 4. Can be combined with a
-    // Invoice\Result::NotSent_... (bit 5 to 8) or Invoice\Result::Sent_...
-    // (bit 9) constant. Not necessarily a single bit per value, but the order
-    // should be by increasing worseness.
-    const Status_Success = 0;
-    const Status_Notices = 1;
-    const Status_Warnings = 2;
-    const Status_Errors = 4;
-    const Status_Exception = 8;
-
-    // Format in which to return messages
-    const Format_Array = 1;
-    const Format_PlainTextArray = 2;
-    const Format_FormattedText = 3;
-    const Format_Html = 4;
-
     // Whether to add the raw request and response.
     const AddReqResp_Never = 1;
     const AddReqResp_Always = 2;
     const AddReqResp_WithOther = 3;
 
+    // Code tags for raw request and response
+    const CodeTagRawRequest = 'request';
+    const CodeTagRawResponse = 'response';
+
     /** @var \Siel\Acumulus\Helpers\Translator */
     protected $translator;
 
     /**
-     * Whether the message was sent.
-     *
-     * This bool indicates whether curl_exec was called and thus if the service
-     * call may have arrived and may have been processed at the server.
-     *
      * @var bool
+     *   Whether the message was sent. This bool indicates whether curl_exec has
+     *   been called and thus if the service call may have arrived and may have
+     *   been processed at the server.
      */
     protected $isSent;
 
     /**
-     * The status as returned by the web service.
-     *
-     * @see https://www.siel.nl/acumulus/API/Basic_Response/
-     *
-     * @var int
-     */
-    protected $status;
-
-    /**
-     * A - possibly empty - list of error messages.
-     *
-     * @var \Exception|null
-     */
-    protected $exception;
-
-    /**
-     * A - possibly empty - list of error messages.
-     *
-     * @var array[]
-     */
-    protected $errors;
-
-    /**
-     * A - possibly empty - list of warning messages.
-     *
-     * @var array[]
-     */
-    protected $warnings;
-
-    /**
-     * A - possibly empty - list of notice messages.
-     *
-     * @var array[]
-     */
-    protected $notices;
-
-    /**
-     * The raw contents of the request as was sent to the web service.
-     *
      * @var string|null
+     *   The raw contents of the request as was sent to the web service.
      */
     protected $rawRequest;
 
     /**
-     * The raw contents of the response as was received from the web service.
-     *
      * @var string|null
+     *   The raw contents of the response as was received from the web service.
      */
     protected $rawResponse;
 
     /**
-     * The structured response as was received from the web service.
-     *
+     * @var int|null
+     *   The received api status or null if not yet sent.
+     */
+    protected $apiStatus;
+
+    /**
      * @var array
+     *   The structured response as was received from the web service.
      */
     protected $response;
 
     /**
-     * The key that contains the main response of a service call.
-     *
-     * Besides the general response structure (status, errors, and warnings),
-     * each service call result will contain the result specific for that call.
-     * This variable contains the key under which to find that. It should be set
-     * by each service call, allowing users of the service to retrieve the main
-     * result without the need to know more details then strictly needed of the
-     * Acumulus API.
-     *
      * @var string
+     *   The key that contains the main response of a service call.
+     *
+     *   Besides the general response structure (status, errors, and warnings),
+     *   each service call result will contain the result specific for that
+     *   call. This variable contains the key under which to find that. It
+     *   should be set by each service call, allowing users of the service to
+     *   retrieve the main result without the need to know more details then
+     *   strictly needed of the Acumulus API.
      */
     protected $mainResponseKey;
 
     /**
-     * Indicates if the main response should be a list.
-     *
      * @var bool
+     *   Indicates if the main response should be a list.
      */
     protected $isList;
 
@@ -141,21 +93,16 @@ class Result
      */
     public function __construct(Translator $translator)
     {
-        $this->status = null;
+        parent::__construct();
+        $this->translator = $translator;
+        $this->translator->add(new Translations());
         $this->isSent = false;
-        $this->exception = null;
-        $this->errors = array();
-        $this->warnings = array();
-        $this->notices = array();
+        $this->apiStatus = null;
         $this->rawRequest = null;
         $this->rawResponse = null;
-        $this->response = array();
+        $this->response = [];
         $this->mainResponseKey = '';
         $this->isList = false;
-
-        $this->translator = $translator;
-        $webTranslations = new Translations();
-        $this->translator->add($webTranslations);
     }
 
     /**
@@ -175,11 +122,19 @@ class Result
 
     /**
      * @return int
-     *   1 of the Result::Status_... constants
+     *   The status is the result of taking the worst of:
+     *   - the response.
+     *   - the severity of the message collection.
+     *   - ignoring messages of Severity::Log
      */
     public function getStatus()
     {
-        return $this->status;
+        $status = $this->ApiStatus2Severity($this->apiStatus);
+        $severity = $this->getSeverity();
+        if ($severity > $status && $severity !== Severity::Log) {
+            $status = $severity;
+        }
+        return $status;
     }
 
     /**
@@ -190,20 +145,59 @@ class Result
     public function getStatusText()
     {
         switch ($this->getStatus()) {
-            case self::Status_Success:
+            case Severity::Unknown:
+                return $this->t('request_not_yet_sent');
+            case Severity::Success:
                 return $this->t('message_response_success');
-            case self::Status_Notices:
-                return $this->t('message_response_notices');
-            case self::Status_Warnings:
-                return $this->t('message_response_warnings');
-            case self::Status_Errors:
-                return $this->t('message_response_errors');
-            case self::Status_Exception:
+            case Severity::Info:
+                return $this->t('message_response_info');
+            case Severity::Notice:
+                return $this->t('message_response_notice');
+            case Severity::Warning:
+                return $this->t('message_response_warning');
+            case Severity::Error:
+                return $this->t('message_response_error');
+            case Severity::Exception:
                 return $this->t('message_response_exception');
-            case null:
-                return $this->t('message_response_not_set');
             default:
-                return sprintf($this->t('message_response_unknown'), $this->getStatus());
+                return sprintf($this->t('severity_unknown'), $this->getSeverity());
+        }
+    }
+
+    /**
+     * @param int $apiStatus
+     */
+    protected function setApiStatus(int $apiStatus)
+    {
+        $this->apiStatus = $apiStatus;
+    }
+
+    /**
+     * Returns the corresponding internal status.
+     *
+     * @param int|null $apiStatus
+     *   The status as returned by the API.
+     *
+     * @return int
+     *   The corresponding internal status.
+     */
+    protected function ApiStatus2Severity($apiStatus)
+    {
+        // O and null are not distinguished by a switch.
+        if ($apiStatus === null) {
+            return Severity::Unknown;
+        }
+        switch ($apiStatus) {
+            case Api::Status_Success:
+                return Severity::Success;
+            case Api::Status_Errors:
+                return Severity::Error;
+            case Api::Status_Warnings:
+                return Severity::Warning;
+            case Api::Status_Exception:
+                return Severity::Exception;
+            default:
+                throw new RuntimeException(sprintf('Unknown api status %d', $apiStatus));
         }
     }
 
@@ -227,475 +221,13 @@ class Result
     }
 
     /**
-     * Sets the status code.
-     *
-     * @param int $status
-     *   An internal status code, i.e. a self::Status_... constant.
-     *
-     * @return $this
-     */
-    protected function setStatus($status)
-    {
-        $this->status = $status;
-        return $this;
-    }
-
-    /**
-     * Raises the status code to the passed $minimalStatus.
-     *
-     * @param int $minimalStatus
-     *   The minimal (internal) status code that the result should have.
-     *
-     * @return $this
-     */
-    protected function raiseStatus($minimalStatus)
-    {
-        if ($this->getStatus() === null || $this->getStatus() < $minimalStatus) {
-            $this->setStatus($minimalStatus);
-        }
-        return $this;
-    }
-
-    /**
-     * @param \Exception $exception
-     *
-     * @return $this
-     */
-    public function setException(Exception $exception)
-    {
-        $this->exception = $exception;
-        return $this->raiseStatus(self::Status_Exception);
-    }
-
-    /**
-     * Returns the exception object, if an exception was set.
-     *
-     * @return \Exception|null
-     */
-    public function getException()
-    {
-        return $this->exception;
-    }
-
-    /**
-     * Returns the exception message, if an exception was set.
-     *
-     * @return string
-     */
-    public function getExceptionMessage()
-    {
-        $message = '';
-        if (($e = $this->getException()) !== null) {
-            $message = $e->getCode() . ': ' . $e->getMessage();
-            $message = $this->t('message_exception') . ' ' . $message;
-        }
-        return $message;
-    }
-
-    /**
-     * Returns a - possibly empty - list of (formatted) error messages.
-     *
-     * @param int $format
-     *   The format in which to return the messages:
-     *   - Result::Format_PlainTextArray: an array of strings
-     *   - Result::Format_FormattedText: a plain text string with all messages
-     *     on its own line indented by a '*'.
-     *   - Result::Format_Html: a html string with all messages in an
-     *     unordered HTML list
-     *
-     * @return array[]|string[]|string
-     */
-    public function getErrors($format = self::Format_Array)
-    {
-        return $this->formatMessages($this->errors, $format, 'message_error');
-    }
-
-    /**
-     * Returns a - possibly empty - list of warning messages.
-     *
-     * @param int $format
-     *   The format in which to return the messages:
-     *   - Result::Format_PlainTextArray: an array of strings
-     *   - Result::Format_FormattedText: a plain text string with all messages
-     *     on its own line indented by a '*'.
-     *   - Result::Format_Html: a html string with all messages in an
-     *     unordered HTML list
-     *
-     * @return array[]|string[]|string
-     */
-    public function getWarnings($format = self::Format_Array)
-    {
-        return $this->formatMessages($this->warnings, $format, 'message_warning');
-    }
-
-    /**
-     * Returns a - possibly empty - list of notice messages.
-     *
-     * @param int $format
-     *   The format in which to return the messages:
-     *   - Result::Format_PlainTextArray: an array of strings
-     *   - Result::Format_FormattedText: a plain text string with all messages
-     *     on its own line indented by a '*'.
-     *   - Result::Format_Html: a html string with all messages in an
-     *     unordered HTML list
-     *
-     * @return array[]|string[]|string
-     */
-    public function getNotices($format = self::Format_Array)
-    {
-        return $this->formatMessages($this->notices, $format, 'message_notice');
-    }
-
-    /**
-     * Adds multiple errors to the list of errors.
-     *
-     * A single error may be passed in as a 1-dimensional array.
-     *
-     * @param array[] $errors
-     *
-     * @return $this
-     */
-    protected function addErrors(array $errors)
-    {
-        return $this->addMessages('addError', $errors);
-    }
-
-    /**
-     * Adds multiple warnings to the list of warnings.
-     *
-     * A single warning may be passed in as a 1-dimensional array.
-     *
-     * @param array[] $warnings
-     *
-     * @return $this
-     */
-    protected function addWarnings(array $warnings)
-    {
-        return $this->addMessages('addWarning', $warnings);
-    }
-
-    /**
-     * Adds multiple notices to the list of notices.
-     *
-     * A single notice may be passed in as a 1-dimensional array.
-     *
-     * @param array[] $notices
-     *
-     * @return $this
-     */
-    protected function addNotices(array $notices)
-    {
-        return $this->addMessages('addNotice', $notices);
-    }
-
-    /**
-     * Adds multiple warnings to the list of warnings.
-     *
-     * A single warning may be passed in as a 1-dimensional array.
-     *
-     * @param string $method
-     * @param array $messages
-     *
-     * @return $this
-     */
-    protected function addMessages($method, array $messages)
-    {
-        // If there was exactly 1 message, it wasn't put in an array of messages.
-        if (array_key_exists('code', $messages)) {
-            $messages = array($messages);
-        }
-        foreach ($messages as $message) {
-            call_user_func(array($this, $method), $message);
-        }
-        return $this;
-    }
-
-    /**
-     * Adds an error to the list of errors.
-     *
-     * @param int|array $code
-     *   Error code number. Usually of type 4xx, 5xx, 6xx or 7xx (internal).
-     *   It may also be an already completed error array.
-     * @param string $codeTag
-     *   Special code tag. Use this as a reference when communicating with
-     *   Acumulus technical support.
-     * @param string $message
-     *   A message describing the error.
-     *
-     * @return $this
-     */
-    public function addError($code, $codeTag = '', $message = '')
-    {
-        return $this->addMessage($code, $codeTag, $message, $this->errors, self::Status_Errors);
-    }
-
-    /**
-     * Adds a warning to the list of warnings.
-     *
-     * @param int $code
-     *   Warning code number. Usually of type 4xx, 5xx, 6xx or 7xx (internal).
-     *  It may also be an already completed warning array.
-     * @param string $codeTag
-     *   Special code tag. Use this as a reference when communicating with
-     *   Acumulus technical support.
-     * @param string $message
-     *   A message describing the warning.
-     *
-     * @return $this
-     */
-    public function addWarning($code, $codeTag = '', $message = '')
-    {
-        return $this->addMessage($code, $codeTag, $message, $this->warnings, self::Status_Warnings);
-    }
-
-    /**
-     * Adds a notice to the list of notices.
-     *
-     * @param int $code
-     *   Notice code number. Usually of type 4xx, 5xx, 6xx or 7xx (internal).
-     *   It may also be an already completed notice array.
-     * @param string $codeTag
-     *   Special code tag. Use this as a reference when communicating with
-     *   Acumulus technical support.
-     * @param string $message
-     *   A message describing the notice.
-     *
-     * @return $this
-     */
-    public function addNotice($code, $codeTag = '', $message = '')
-    {
-        return $this->addMessage($code, $codeTag, $message, $this->notices, self::Status_Notices);
-    }
-
-    /**
-     * Adds a warning to the list of warnings.
-     *
-     * @param int $code
-     *   Error/warning/notice code number. Usually of type 4xx, 5xx, 6xx or 7xx
-     *   (internal). It may also be an already completed notice array.
-     * @param string $codeTag
-     *   Special code tag. Use this as a reference when communicating with
-     *   Acumulus technical support.
-     * @param string $message
-     *   A message describing the notice, warning or error.
-     * @param array $list
-     *   The list to add the message to.
-     * @param int $level
-     *   The severity level to set the status to.
-     *
-     * @return $this
-     */
-    protected function addMessage($code, $codeTag, $message, array &$list, $level)
-    {
-        if (is_array($code)) {
-            $message = $code['message'];
-            $codeTag = $code['codetag'];
-            $code = $code['code'];
-        }
-        if (empty($codeTag)) {
-            $list[] = array(
-                'code' => $code,
-                'codetag' => $codeTag,
-                'message' => $message
-            );
-        } elseif (!array_key_exists($codeTag, $list)) {
-            $list[$codeTag] = array(
-                'code' => $code,
-                'codetag' => $codeTag,
-                'message' => $message
-            );
-        }
-        return $this->raiseStatus($level);
-    }
-
-    /**
-     * Merges the sets of exception, errors, warnings and notices of 2 results.
-     *
-     * This allows to inform the user about errors and warnings that occurred
-     * during additional API calls, e.g. querying VAT rates or deleting old
-     * entries.
-     *
-     * @param \Siel\Acumulus\Web\Result $other
-     *   The other result to add the messages from.
-     * @param bool $errorsAsWarnings
-     *   Whether errors should be merged as errors or as mere warnings because
-     *   the main result is not really influenced by these errors.
-     *
-     * @return $this
-     */
-    public function mergeMessages(Result $other, $errorsAsWarnings = false)
-    {
-        if ($this->getException() === null && $other->getException() !== null) {
-            $this->setException($other->getException());
-        }
-        if ($errorsAsWarnings) {
-            $this->addWarnings($other->getErrors());
-        } else {
-            $this->addErrors($other->getErrors());
-        }
-        return $this->addWarnings($other->getWarnings())->addNotices($other->getNotices());
-    }
-
-    /**
-     * Returns whether the result contains a warning, error or exception.
-     *
-     * @return bool
-     *   True if the result contains at least 1 warning, error or exception,
-     *   false otherwise.
-     */
-    public function hasMessages()
-    {
-        return !empty($this->notices) || !empty($this->warnings) || !empty($this->errors) || !empty($this->exception);
-    }
-
-    /**
-     * Returns whether the result contains errors or an exception.
-     *
-     * @return bool
-     *   True if the result status indicates if there were errors or an
-     *   exception, false otherwise.
-     */
-    public function hasError()
-    {
-        return $this->getStatus() >= self::Status_Errors;
-    }
-
-    /**
-     * Returns whether the result contains a given code.
-     *
-     * @param int $code
-     *
-     * @return bool
-     *   True if the result contains a given code, false otherwise.
-     */
-    public function hasCode($code)
-    {
-        if ($this->getException() !== null && $this->getException()->getCode() === $code) {
-            return true;
-        }
-
-        foreach ($this->getErrors() as $message) {
-            if ($message['code'] == $code) {
-                return true;
-            }
-        }
-
-        foreach ($this->getWarnings() as $message) {
-            if ($message['code'] == $code) {
-                return true;
-            }
-        }
-
-        foreach ($this->getNotices() as $message) {
-            if ($message['code'] == $code) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Returns whether the result contains a given codeTag.
-     *
-     * @param string $codeTag
-     *
-     * @return bool
-     *   True if the result contains a given codeTag, false otherwise.
-     */
-    public function hasCodeTag($codeTag)
-    {
-        return array_key_exists($codeTag, $this->errors) || array_key_exists($codeTag, $this->warnings) || array_key_exists($codeTag, $this->notices);
-    }
-
-    /**
-     * If the result contains any errors or warnings, a list of verbose messages
-     * is returned.
-     *
-     * @param int $format
-     *   The format in which to return the messages:
-     *   - Result::Format_PlainTextArray: an array of strings
-     *   - Result::Format_FormattedText: a plain text string with all messages
-     *     on its own line indented by a '*'.
-     *   - Result::Format_Html: a html string with all messages in an
-     *     unordered HTML list
-     *
-     * @return string|string[]
-     *   An string or array with textual messages that can be used to inform the
-     *   user.
-     */
-    public function getMessages($format = self::Format_Array)
-    {
-        $messages = array();
-
-        // Collect the messages.
-        if (($message = $this->getExceptionMessage()) !== '') {
-            $messages[] = $message;
-        }
-        $messages = array_merge($messages,
-            $this->getErrors(self::Format_PlainTextArray),
-            $this->getWarnings(self::Format_PlainTextArray),
-            $this->getNotices(self::Format_PlainTextArray)
-        );
-
-        return $this->formatMessages($messages, $format);
-    }
-
-    /**
-     * Formats a set of messages.
-     *
-     * @param string[] $messages
-     * @param int $format
-     *   The format in which to return the messages:
-     *   - Result::Format_PlainTextArray: an array of strings
-     *   - Result::Format_FormattedText: a plain text string with all messages
-     *     on its own line indented by a '*'.
-     *   - Result::Format_Html: a html string with all messages in an
-     *     unordered HTML list
-     * @param string $type
-     *   The type of messages that is passed in, e.g. message_error.
-     *
-     * @return string|\string[]
-     */
-    protected function formatMessages($messages, $format, $type = '')
-    {
-
-        if ($format === self::Format_Array) {
-            $result = $messages;
-        } else {
-            $result = array();
-            foreach ($messages as $message) {
-                if (is_array($message)) {
-                    $messagePart = "{$message['code']}: ";
-                    $messagePart .= $this->t($message['message']);
-                    if ($message['codetag']) {
-                        $messagePart .= " ({$message['codetag']})";
-                    }
-                    $message = $this->t($type) . ' ' . $messagePart;
-                }
-                if ($format === self::Format_FormattedText) {
-                    $message = "* $message\n\n";
-                } elseif ($format === self::Format_Html) {
-                    $message = "<li>" . nl2br(htmlspecialchars($message, ENT_NOQUOTES)) . "</li>\n";
-                }
-                $result[] = $message;
-            }
-            if ($format === self::Format_FormattedText) {
-                $result = implode('', $result);
-            } elseif ($format === self::Format_Html) {
-                $result = "<ul>\n" . implode('', $result) . "</ul>\n";
-            }
-        }
-        return $result;
-    }
-
-    /**
      * Returns the structured main response part of the received response.
      *
      * @return array
      *   The main response part of the response as received from the Acumulus
-     *   web service conmverted to a keyed array. The status, errors and
-     *   warnings are removed. In case of errors, this array may be empty.
+     *   web service converted to a(n array of) keyed array(s). The status,
+     *   errors and warnings are removed. In case of errors, this array may be
+     *   empty.
      */
     public function getResponse()
     {
@@ -716,16 +248,20 @@ class Result
     public function setResponse(array $response)
     {
         // Move the common parts into their respective properties.
-        $this->raiseStatus(isset($response['status']) ? $this->ApiStatus2InternalStatus($response['status']) : self::Status_Errors);
-        unset($response['status']);
+        if (isset($response['status'])) {
+            $this->setApiStatus($response['status']);
+            unset($response['status']);
+        } else {
+            $this->addMessage(new RuntimeException('Status not set in reponse'));
+        }
 
         if (!empty($response['errors']['error'])) {
-            $this->addErrors($response['errors']['error']);
+            $this->addMessages($response['errors']['error'], Severity::Error);
         }
         unset($response['errors']);
 
         if (!empty($response['warnings']['warning'])) {
-            $this->addWarnings($response['warnings']['warning']);
+            $this->addMessages($response['warnings']['warning'], Severity::Warning);
         }
         unset($response['warnings']);
 
@@ -733,30 +269,6 @@ class Result
         $this->response = $response;
 
         return $this;
-    }
-
-    /**
-     * Returns the corresponding internal status.
-     *
-     * @param $status
-     *   The status as returned by the API.
-     *
-     * @return int
-     *   The corresponding internal status.
-     */
-    protected function ApiStatus2InternalStatus($status)
-    {
-        switch ($status) {
-            case Api::Success:
-                return self::Status_Success;
-            case Api::Errors:
-                return self::Status_Errors;
-            case Api::Warnings:
-                return self::Status_Warnings;
-            case Api::Exception:
-            default:
-                return self::Status_Exception;
-        }
     }
 
     /**
@@ -773,116 +285,6 @@ class Result
             $this->response = $this->simplifyResponse($this->response);
         }
         return $this;
-    }
-
-    /**
-     * Returns the raw request as sent to the Acumulus web API.
-     *
-     * @todo: make protected.
-     *
-     * @return string|null
-     */
-    public function getRawRequest()
-    {
-        return $this->rawRequest;
-    }
-
-    /**
-     * Sets the raw request as sent to the Acumulus web API.
-     *
-     * Only used for logging purposes.
-     *
-     * @param string $rawRequest
-     *
-     * @return $this
-     */
-    public function setRawRequest($rawRequest)
-    {
-        $this->rawRequest = preg_replace('|<password>.*</password>|', '<password>REMOVED FOR SECURITY</password>', $rawRequest);
-        return $this;
-    }
-
-    /**
-     * Returns the raw response as received from the Acumulus web API.
-     *
-     * @todo: make protected.
-     *
-     * @return string|null
-     */
-    public function getRawResponse()
-    {
-        return $this->rawResponse;
-    }
-
-    /**
-     * Sets the raw response as received from the Acumulus web API.
-     *
-     * Only used for logging purposes.
-     *
-     * @param string $rawResponse
-     *
-     * @return $this
-     */
-    public function setRawResponse($rawResponse)
-    {
-        $this->rawResponse = $rawResponse;
-        return $this;
-    }
-
-    /**
-     * Returns a string with the request and response messages for support.
-     *
-     * In html format it will be formatted in a details tag so that it is closed
-     * by default.
-     *
-     * @param int $format
-     *   The format in which to return the messages:
-     *   - Result::Format_PlainTextArray: an array of strings
-     *   - Result::Format_FormattedText: a plain text string with all messages
-     *     on its own line indented by a '*'.
-     *   - Result::Format_Html: a html string with all messages in an
-     *     unordered HTML list
-     *
-     * @return string
-     */
-    public function getRawRequestResponse($format)
-    {
-        $result = '';
-        if ($this->getRawRequest() !== null || $this->getRawResponse() !== null) {
-            $messages = array();
-            if ($this->getRawRequest() !== null) {
-                $messages[] = $this->t('message_sent') . ":\n" . $this->getRawRequest();
-            }
-            if ($this->getRawResponse() !== null) {
-                $messages[] = $this->t('message_received') . ":\n" . $this->getRawResponse();
-            }
-            $result .= $this->formatMessages($messages, $format);
-        }
-        return $result;
-    }
-
-    /**
-     * Returns a string representation of the result object for logging purposes.
-     *
-     * @return string
-     *   A string representation of the result object for logging purposes.
-     */
-    public function toLogString()
-    {
-        $logParts = array();
-        if ($this->getStatus() !== null) {
-            $logParts[] = 'status=' . $this->getStatus();
-        }
-        if ($this->getRawRequest() !== null) {
-            $logParts[] = 'request=' . $this->getRawRequest();
-        }
-        if ($this->getRawResponse() !== null) {
-            $logParts[] = 'response=' . $this->getRawResponse();
-        }
-        if ($this->getException() !== null) {
-            $logParts[] = $this->getException()->__toString();
-        }
-        return implode('; ', $logParts);
     }
 
     /**
@@ -910,5 +312,58 @@ class Result
             }
         }
         return $response;
+    }
+
+    /**
+     * Sets the raw request as sent to the Acumulus web API.
+     *
+     * Only used for logging purposes.
+     *
+     * @param string $rawRequest
+     */
+    public function setRawRequest($rawRequest)
+    {
+        $this->addMessage(
+            Severity::Log,
+            0,
+            self::CodeTagRawRequest,
+            preg_replace('|<password>.*</password>|', '<password>REMOVED FOR SECURITY</password>', $rawRequest)
+        );
+    }
+
+    /**
+     * Sets the raw response as received from the Acumulus web API.
+     *
+     * Only used for logging purposes.
+     *
+     * @param string $rawResponse
+     */
+    public function setRawResponse($rawResponse)
+    {
+        $this->addMessage(
+            Severity::Log,
+            0,
+            self::CodeTagRawResponse,
+            preg_replace('|<password>.*</password>|', '<password>REMOVED FOR SECURITY</password>', $rawResponse)
+        );
+    }
+
+    /**
+     * Returns a string representation of the result object for logging purposes.
+     *
+     * @return string
+     *   A string representation of the result object for logging purposes.
+     */
+    public function toLogString()
+    {
+        $logParts = array();
+        if ($this->getStatus() !== Severity::Unknown) {
+            $logParts[] = 'status=' . $this->getStatus();
+        }
+        $logParts = array_merge($logParts,
+            $this->formatMessages(Message::Format_PlainWithSeverity, Severity::RealMessages),
+            $this->formatMessages(Message::Format_Plain, Severity::Log)
+        );
+        return implode('; ', $logParts);
     }
 }

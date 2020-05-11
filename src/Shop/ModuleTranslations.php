@@ -31,11 +31,6 @@ class ModuleTranslations extends TranslationCollection
         'message_update_failed' => 'De interne upgrade naar versie %s is mislukt. Als deze melding terug blijft komen, neem dan contact op met support.',
         'message_uninstall' => 'Wilt u de configuratie-instellingen verwijderen?',
 
-        // Requirements.
-        'message_error_req_curl' => 'Voor het gebruik van deze module dient de CURL PHP extensie actief te zijn op uw server.',
-        'message_error_req_xml' => 'Voor het gebruik van deze module met het output format XML, dient de SimpleXML PHP extensie actief te zijn op uw server.',
-        'message_error_req_dom' => 'Voor het gebruik van deze module dient de DOM PHP extensie actief te zijn op uw server.',
-
         'date_format' => 'jjjj-mm-dd',
     );
 
@@ -58,11 +53,6 @@ class ModuleTranslations extends TranslationCollection
         'message_config_saved' => 'The settings are saved.',
         'message_update_failed' => 'The internal upgrade to version %s failed. Please contact support, if this message keeps being displayed.',
         'message_uninstall' => 'Are you sure that you want to delete the configuration settings?',
-
-        // Requirements.
-        'message_error_req_curl' => 'The CURL PHP extension needs to be activated on your server for this module to work.',
-        'message_error_req_xml' => 'The SimpleXML extension needs to be activated on your server for this module to be able to work with the XML format.',
-        'message_error_req_dom' => 'The DOM PHP extension needs to be activated on your server for this module to work.',
 
         'date_format' => 'yyyy-mm-dd',
     );

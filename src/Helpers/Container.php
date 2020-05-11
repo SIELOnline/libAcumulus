@@ -139,7 +139,7 @@ class Container
     protected $instances = array();
 
     /** @var bool */
-    protected $moduleTranslationsAdded = false;
+    protected $baseTranslationsAdded = false;
 
     /**
      * The language to display texts in.
@@ -168,7 +168,7 @@ class Container
             $this->shopNamespace = static::baseNamespace;
         }
         $this->shopNamespace .= '\\' . $shopNamespace;
-        $this->language = substr($language, 0, 2);
+        $this->setLanguage($language);
     }
 
     /**
@@ -181,7 +181,7 @@ class Container
      */
     public function setLanguage($language)
     {
-        $this->language = $language;
+        $this->language = substr($language, 0, 2);
         return $this;
     }
 
@@ -224,7 +224,7 @@ class Container
     {
         /** @var \Siel\Acumulus\Helpers\Translator $translator */
         $translator = $this->getInstance('Translator', 'Helpers', array($this->language));
-        if (!$this->moduleTranslationsAdded) {
+        if (!$this->baseTranslationsAdded) {
             try {
                 /** @var \Siel\Acumulus\Helpers\TranslationCollection $translations */
                 $translations = $this->getInstance('ModuleSpecificTranslations', 'Helpers');
@@ -232,7 +232,9 @@ class Container
             } catch (InvalidArgumentException $e) {}
             $translations = $this->getInstance('ModuleTranslations', 'Shop');
             $translator->add($translations);
-            $this->moduleTranslationsAdded = true;
+            $translations = $this->getInstance('SeverityTranslations', 'Helpers');
+            $translator->add($translations);
+            $this->baseTranslationsAdded = true;
         }
         return $translator;
     }

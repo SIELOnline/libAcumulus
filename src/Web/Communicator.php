@@ -10,6 +10,7 @@ use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
+use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\PluginConfig;
 
@@ -102,7 +103,7 @@ class Communicator
             // Send message, receive response.
             $result = $this->sendApiMessage($uri, $message, $result);
         } catch (RuntimeException $e) {
-            $result->setException($e);
+            $result->addMessage($e);
         }
 
         $this->log->debug('Communicator::callApiFunction() uri=%s; %s', $uri, $result->toLogString());
@@ -195,25 +196,25 @@ class Communicator
             // CURL may get a time-out and return an empty response without
             // further error messages: Add an error to tell the user to check if
             // the invoice was sent or not.
-            $result->addError(701, 'Empty response', '');
-        } elseif ($this->isHtmlResponse($result->getRawResponse())) {
+            $result->addMessage(Severity::Error, 701, '', 'Empty response');
+        } elseif ($this->isHtmlResponse($rawResponse)) {
             // When the API is gone we might receive an html error message page.
-            $this->raiseHtmlReceivedError($result->getRawResponse());
+            $this->raiseHtmlReceivedError($rawResponse);
         } else {
             // Decode the response as either json or xml.
             $response = [];
             $pluginSettings = $this->config->getPluginSettings();
 
             if ($pluginSettings['outputFormat'] === 'json') {
-                $response = json_decode($result->getRawResponse(), true);
+                $response = json_decode($rawResponse, true);
             }
             // Even if we pass <format>json</format> we might receive an XML
             // response in case the XML was rejected before or during parsing.
             // So if the response is null we also try to decode the response as
             // XML.
-            if ($pluginSettings['outputFormat'] === 'xml' || $response === null) {
+            if ($pluginSettings['outputFormat'] === 'xml' || !is_array($response)) {
                 try {
-                    $response = $this->convertXmlToArray($result->getRawResponse());
+                    $response = $this->convertXmlToArray($rawResponse);
                 } catch (RuntimeException $e) {
                     // Not an XML response. Treat it as an json error if we were
                     // expecting a json response.
@@ -269,16 +270,15 @@ class Communicator
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => $post,
             CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1_2,
+            CURLOPT_TIMEOUT => 20,
             //CURLOPT_PROXY => '127.0.0.1:8888', // Uncomment to debug with Fiddler.
             //CURLOPT_SSL_VERIFYPEER => false, // Uncomment to debug with Fiddler.
-            // @todo: CURLOPT_TIMEOUT?
         ];
         if (!curl_setopt_array($ch, $options)) {
             $this->raiseCurlError($ch, 'curl_setopt_array()');
         }
 
         // Send and receive over the curl connection.
-
         $result->setIsSent(true);
         $response = curl_exec($ch);
         if ($response === false) {
@@ -422,6 +422,8 @@ class Communicator
      *
      * @param resource|bool $ch
      * @param string $function
+     *
+     * @throws \RuntimeException
      */
     protected function raiseCurlError($ch, $function)
     {

@@ -16,6 +16,11 @@
             "Siel\\Acumulus\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Siel\\Acumulus\\": "tests/"
+        }
+    },
     "require-dev": {
         "phpunit/phpunit": "9"
     }

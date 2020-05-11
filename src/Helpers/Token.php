@@ -305,7 +305,7 @@ class Token
             } elseif (is_object($value) && method_exists($value, '__toString')) {
                 $value = (string) $value;
             }
-        } catch (\Throwable $e) {
+        } catch (\Exception $e) {
         }
 
         return $value;

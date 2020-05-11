@@ -78,7 +78,7 @@ class Number
      *   True if the the floats are "equal", i.e. do not differ more than the
      *   specified maximum difference.
      */
-    static public function floatsAreEqual($f1, $f2, $maxDiff = 0.005)
+    static public function floatsAreEqual($f1, $f2, $maxDiff = 0.0051)
     {
         return abs((float) $f2 - (float) $f1) < $maxDiff;
     }
@@ -95,7 +95,7 @@ class Number
      * @return bool
      *   True if the float is (almost) zero, false otherwise.
      */
-    static public function isZero($f1, $maxDiff = 0.001)
+    static public function isZero($f1, $maxDiff = 0.0011)
     {
         return static::floatsAreEqual($f1, 0.0, $maxDiff);
     }

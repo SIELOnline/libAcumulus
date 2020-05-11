@@ -3,6 +3,7 @@ namespace Siel\Acumulus\Magento\Magento1\Helpers;
 
 use Mage;
 use Siel\Acumulus\Helpers\Log as BaseLog;
+use Siel\Acumulus\Helpers\Severity;
 use Zend_Log;
 
 /**
@@ -25,7 +26,7 @@ class Log extends BaseLog
      * Returns the Magento equivalent of the severity.
      *
      * @param int $severity
-     *   One of the constants of the base Log class.
+     *   One of the Severity::... constants.
      *
      * @return int
      *   The Magento equivalent of the severity.
@@ -33,15 +34,15 @@ class Log extends BaseLog
     protected function getMagentoSeverity($severity)
     {
         switch ($severity) {
-            case Log::Error:
+            case Severity::Error:
                 return Zend_Log::ERR;
-            case Log::Warning:
+            case Severity::Warning:
                 return Zend_Log::WARN;
-            case Log::Notice:
+            case Severity::Notice:
                 return Zend_Log::NOTICE;
-            case Log::Info:
+            case Severity::Info:
                 return Zend_Log::INFO;
-            case Log::Debug:
+            case Severity::Log:
             default:
                 return Zend_Log::DEBUG;
         }

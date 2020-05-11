@@ -3,6 +3,7 @@ namespace Siel\Acumulus\Magento\Magento2\Helpers;
 
 use Magento\Framework\Filesystem\Driver\File;
 use Monolog\Logger;
+use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Magento\Magento2\Helpers\Logger\Handler;
 use Siel\Acumulus\Helpers\Log as BaseLog;
 
@@ -41,7 +42,7 @@ class Log extends BaseLog
      * Returns the Magento equivalent of the severity.
      *
      * @param int $severity
-     *   One of the constants of the base Log class.
+     *   One of the Severity::... constants.
      *
      * @return int
      *   The Magento equivalent of the severity.
@@ -49,15 +50,15 @@ class Log extends BaseLog
     protected function getMagentoSeverity($severity)
     {
         switch ($severity) {
-            case Log::Error:
+            case Severity::Error:
                 return Logger::ERROR;
-            case Log::Warning:
+            case Severity::Warning:
                 return Logger::WARNING;
-            case Log::Notice:
+            case Severity::Notice:
                 return Logger::NOTICE;
-            case Log::Info:
+            case Severity::Info:
                 return Logger::INFO;
-            case Log::Debug:
+            case Severity::Log:
             default:
                 return Logger::DEBUG;
         }

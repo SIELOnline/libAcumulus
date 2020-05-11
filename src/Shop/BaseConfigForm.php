@@ -11,6 +11,7 @@ use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Tag;
 use Siel\Acumulus\Web\Result;
 use Siel\Acumulus\Web\Service;
+use Siel\Acumulus\Helpers\Severity;
 
 /**
  * Provides basic config form handling.
@@ -116,11 +117,10 @@ abstract class BaseConfigForm extends Form
         if (!empty($credentials[Tag::ContractCode]) && !empty($credentials[Tag::UserName]) && !empty($credentials[Tag::Password])) {
             $this->about = $this->service->getAbout();
             if ($this->about->hasError()) {
-                $message = $this->about->hasCode(401) ? 'message_error_auth' : ($this->about->hasCode(403) ? 'message_error_forb' : 'message_error_comm');
-                $this->addErrorMessages($this->about->getExceptionMessage());
-                $this->addErrorMessages($this->about->getErrors(Result::Format_PlainTextArray));
-                $this->addWarningMessages($this->about->getWarnings(Result::Format_PlainTextArray));
-            } elseif ($this->about->hasCode(553)) {
+                $message = $this->about->getByCode(401) ? 'message_error_auth' : ($this->about->getByCode(403) ? 'message_error_forb' : 'message_error_comm');
+                $this->addErrorMessages($this->about->getMessages(Severity::ErrorOrWorse));
+                $this->addWarningMessages($this->about->getMessages(Severity::Warning));
+            } elseif ($this->about->getByCode(553)) {
                 // Role has been deprecated role for use with the API.
                 $this->addWarningMessages($this->t('message_warning_role_deprecated'));
             } else {

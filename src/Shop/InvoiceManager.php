@@ -12,6 +12,7 @@ use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\PluginConfig;
 use Siel\Acumulus\Tag;
+use Siel\Acumulus\Helpers\Severity;
 
 /**
  * Provides functionality to manage invoices.
@@ -516,7 +517,7 @@ abstract class InvoiceManager
         try {
             $result = $this->doSend($invoice, $invoiceSource, $result);
         } catch (Exception $e) {
-            $result->setException($e);
+            $result->addMessage($e);
         }
 
         // When everything went well, the lock will have been replaced by a real
@@ -528,7 +529,7 @@ abstract class InvoiceManager
             // in Acumulus: tell user to check.
             if (($lockStatus = $this->getAcumulusEntryManager()->deleteLock($invoiceSource)) !== AcumulusEntry::Lock_Deleted) {
                 $code = $lockStatus === AcumulusEntry::Lock_NoLongerExists ? 903 : 904;
-                $result->addWarning($code, '',
+                $result->addMessage(Severity::Warning, $code, '',
                     sprintf($this->t('message_warning_delete_lock_failed'), $this->t($invoiceSource->getType())));
             }
         }
@@ -595,22 +596,22 @@ abstract class InvoiceManager
                 $entryId = $oldEntry->getEntryId();
                 // @todo: clean up on receiving P2XFELO12?
                 $deleteResult = $this->getService()->setDeleteStatus($entryId, API::Entry_Delete);
-                if ($deleteResult->hasMessages()) {
+                if ($deleteResult->hasRealMessages()) {
                     // Add messages to result but not if the entry has already
                     // the delete status or does not exist at all (anymore).
-                    if ($deleteResult->hasCodeTag('P2XFELO12')) {
+                    if ($deleteResult->getByCodeTag('P2XFELO12')) {
                         // Could not delete the old entry (already deleted or
                         // does not exist at all (anymore)): add as a warning so
                         // this info will be mailed to the user.
-                        $result->addWarning(902, '',
+                        $result->addMessage(Severity::Warning, 902, '',
                             sprintf($this->t('message_warning_old_entry_not_deleted'), $this->t($invoiceSource->getType()), $entryId));
                     } else {
-                        $result->mergeMessages($deleteResult, true);
+                        $result->addMessages($deleteResult->getMessages(Severity::InfoOrWorse), true);
                     }
                 } else {
                     // Successfully deleted the old entry: add a notice so this
                     // info will be mailed to the user.
-                    $result->addNotice(901, '',
+                    $result->addMessage(Severity::Notice, 901, '',
                         sprintf($this->t('message_warning_old_entry_deleted'), $this->t($invoiceSource->getType()), $entryId));
                 }
             }
@@ -634,7 +635,7 @@ abstract class InvoiceManager
     {
         $pluginSettings = $this->getConfig()->getPluginSettings();
         $addReqResp = $pluginSettings['debug'] === PluginConfig::Send_SendAndMailOnError ? Result::AddReqResp_WithOther : Result::AddReqResp_Always;
-        if ($addReqResp === Result::AddReqResp_Always || ($addReqResp === Result::AddReqResp_WithOther && $result->hasMessages())) {
+        if ($addReqResp === Result::AddReqResp_Always || ($addReqResp === Result::AddReqResp_WithOther && $result->hasRealMessages())) {
             return $this->getMailer()->sendInvoiceAddMailResult($result, $invoiceSource->getType(), $invoiceSource->getReference());
         }
         return true;

@@ -17,8 +17,29 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies, vanaf 5.5.2 is dat all
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3+ (WordPress)
 
-5.9.1 (202-04-??)
------------------
+5.10.0-alpha1 (2020-05-11)
+--------------------------
+NOTE: The minimum PHP version requirement is now set to 5.6.
+
+Refactorings:
+- Added some unit tests for basic classes in the Web namespace. As a consequence
+  a lot of classes and methods were moved, renamed, or split:
+- Introduced an interface Helpers/Severity, defining constants for severity and
+  log levels, replacing similar constants from both Helpers/Log and Web/Result.
+- Introduced a Helpers/Message class that wraps a Message (internal message, API
+  message, exception, success message, debug message). Extracted (more or less)
+  from Web/Result, used by Web/Result, Helpers/MessageCollection and, soon,
+  Helpers/Form.
+- Introduced a Helpers/MessageCollection class that wraps a set of Message
+  objects (see above). Extracted from Web/Result, used by Web/Result and, soon,
+  Helpers/Form.
+- Many methods or parameters of methods in Web/Result were renamed or have
+  (subtly) changed their (default) behavior.
+- Requirements regarding required php extensions are completed in both
+  Helpers/Requirements and composer.json.
+
+5.9.1 (2020-04-23) (never released)
+-----------------------------------
 Bugs:
 - MA|WC: Filling in some lacking error handling on the invoice status screen.
 - WC: Ensure that the rate plugin on one of our own form pages do not treat form
@@ -26,6 +47,8 @@ Bugs:
 
 5.9.0 (2020-04-21)
 ------------------
+NOTE: The minimum PHP version requirement is now set to 5.4.
+
 NOTE: Magento 1 reaches end of life at june 2020. As of this version we will no
   longer maintain Magento 1 specific code, nor add features to Magento 1. You
   may continue to open (bug) tickets for Magento 1 and these will be addressed

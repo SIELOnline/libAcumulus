@@ -14,8 +14,10 @@ use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Invoice\Translations as InvoiceTranslations;
 use Siel\Acumulus\Meta;
+use Siel\Acumulus\Helpers\Message;
 use Siel\Acumulus\Web\Result;
 use Siel\Acumulus\Web\Service;
+use Siel\Acumulus\Helpers\Severity;
 
 /**
  * Defines the Acumulus invoice status overview form.
@@ -587,12 +589,12 @@ class InvoiceStatusForm extends Form
                     if (empty($conceptInfo)) {
                         $invoiceStatus = static::Invoice_CommunicationError;
                         $statusSeverity = static::Status_Error;
-                    } elseif ($result->hasCodeTag('FGYBSN040') || $result->hasCodeTag('FGYBSN048')) {
+                    } elseif ($result->getByCodeTag('FGYBSN040') || $result->getByCodeTag('FGYBSN048')) {
                         // FGYBSN040: concept id does not exist (anymore) or no access.
                         // FGYBSN048: concept id to old, cannot be tracked.
                         $invoiceStatus = static::Invoice_SentConcept;
                         $statusSeverity = static::Status_Warning;
-                        $description = $result->hasCodeTag('FGYBSN040') ? 'concept_conceptid_deleted' : $description = 'concept_no_conceptid';
+                        $description = $result->getByCodeTag('FGYBSN040') ? 'concept_conceptid_deleted' : $description = 'concept_no_conceptid';
                         // Prevent this API call in the future, it will return
                         // the same result.
                         $this->acumulusEntryManager->save($source, null, null);
@@ -641,7 +643,7 @@ class InvoiceStatusForm extends Form
             if ($localEntryInfo->getEntryId() !== null) {
                 $result = $this->service->getEntry($localEntryInfo->getEntryId());
                 $entry = $this->sanitizeEntry($result->getResponse());
-                if ($result->hasCodeTag('XGYBSN000')) {
+                if ($result->getByCodeTag('XGYBSN000')) {
                     $invoiceStatus = static::Invoice_NonExisting;
                     $statusSeverity = static::Status_Error;
                     // To prevent this error in the future, we delete the local
@@ -744,7 +746,7 @@ class InvoiceStatusForm extends Form
             'messages' => array(
                 'type' => 'markup',
                 'label' => $this->t('messages'),
-                'value' => $result->getMessages(Result::Format_FormattedText),
+                'value' => $result->formatMessages(Message::Format_PlainListWithSeverity, Severity::RealMessages),
             ),
         );
         return $fields;

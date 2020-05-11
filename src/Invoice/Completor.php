@@ -12,6 +12,7 @@ use Siel\Acumulus\PluginConfig;
 use Siel\Acumulus\Tag;
 use Siel\Acumulus\Web\Result as WebResult;
 use Siel\Acumulus\Web\Service;
+use Siel\Acumulus\Helpers\Severity;
 
 /**
  * The invoice completor class provides functionality to correct and complete
@@ -414,7 +415,7 @@ class Completor
         if (empty($this->invoice[Tag::Customer][Tag::Email])) {
             $customerSettings = $this->config->getCustomerSettings();
             $this->invoice[Tag::Customer][Tag::Email] = $customerSettings['emailIfAbsent'];
-            $this->result->addWarning(801,'', $this->t('message_warning_no_email'));
+            $this->result->addMessage(Severity::Warning, 801, '', $this->t('message_warning_no_email'));
         } else {
             $email = $this->invoice[Tag::Customer][Tag::Email];
             $at = strpos($email, '@');
@@ -692,7 +693,6 @@ class Completor
                 $field = $this->t('amount_vat');
                 $missing[] = sprintf($this->t('message_warning_missing_amount_spec'), $field, $amount);
             }
-            /** @noinspection PhpUndefinedVariableInspection */
             $this->changeInvoiceToConcept('message_warning_missing_amount_warn', 810, ucfirst(implode(', ', $missing)));
         }
     }
@@ -1145,8 +1145,8 @@ class Completor
             $date = $this->getInvoiceDate();
         }
         $result = $this->service->getVatInfo($countryCode, $date);
-        if ($result->hasMessages()) {
-            $this->result->mergeMessages($result);
+        if ($result->hasRealMessages()) {
+            $this->result->addMessages($result->getMessages(Severity::InfoOrWorse));
         }
         $vatInfo = $result->getResponse();
         // PHP5.5: array_column($vatInfo, Tag::VatRate);
@@ -1164,8 +1164,9 @@ class Completor
      */
     protected function getInvoiceDate()
     {
-        $date = !empty($this->invoice[Tag::Customer][Tag::Invoice][Tag::IssueDate]) ? $this->invoice[Tag::Customer][Tag::Invoice][Tag::IssueDate] : date(API::DateFormat_Iso);
-        return $date;
+        return !empty($this->invoice[Tag::Customer][Tag::Invoice][Tag::IssueDate])
+            ? $this->invoice[Tag::Customer][Tag::Invoice][Tag::IssueDate]
+            : date(API::DateFormat_Iso);
     }
 
     /**
@@ -1336,7 +1337,7 @@ class Completor
                 $args = func_get_args();
                 $message = vsprintf($message, array_slice($args, 2));
             }
-            $this->result->addWarning($code, '', $message);
+            $this->result->addMessage(Severity::Warning, $code, '', $message);
         }
     }
 

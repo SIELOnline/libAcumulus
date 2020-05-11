@@ -3,6 +3,7 @@ namespace Siel\Acumulus\Joomla\Helpers;
 
 use JLog;
 use Siel\Acumulus\Helpers\Log as BaseLog;
+use Siel\Acumulus\Helpers\Severity;
 
 /**
  * Extends the base log class to log any library logging to the Joomla log.
@@ -37,7 +38,7 @@ class Log extends BaseLog
      * Returns the joomla equivalent of the severity.
      *
      * @param int $severity
-     *   One of the constants of the base Log class.
+     *   One of the Severity::... constants.
      *
      * @return int
      *   the Joomla equivalent of the severity.
@@ -45,15 +46,15 @@ class Log extends BaseLog
     protected function getJoomlaSeverity($severity)
     {
         switch ($severity) {
-            case Log::Error:
+            case Severity::Error:
                 return JLog::ERROR;
-            case Log::Warning:
+            case Severity::Warning:
                 return JLog::WARNING;
-            case Log::Notice:
+            case Severity::Notice:
                 return JLog::NOTICE;
-            case Log::Info:
+            case Severity::Info:
                 return JLog::INFO;
-            case Log::Debug:
+            case Severity::Log:
             default:
                 return JLog::DEBUG;
         }

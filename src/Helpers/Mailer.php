@@ -1,10 +1,11 @@
 <?php
 namespace Siel\Acumulus\Helpers;
 
+use Exception;
 use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Invoice\Result;
 use Siel\Acumulus\PluginConfig;
 use Siel\Acumulus\Tag;
-use Siel\Acumulus\Invoice\Result;
 
 /**
  * Mailer allows to send mails.
@@ -98,11 +99,11 @@ abstract class Mailer
         if ($result !== true) {
             if ($result === false) {
                 $message = 'false';
-            } else  if ($result === null) {
+            } elseif ($result === null) {
                 $message = 'null';
-            } else  if ($result instanceof \Exception) {
+            } elseif ($result instanceof Exception) {
                 $message = $result->getMessage();
-            } else  if (!is_string($result)) {
+            } elseif (!is_string($result)) {
                 $message = print_r($result, true);
             } else {
                 $message = $result;
@@ -186,16 +187,16 @@ abstract class Mailer
 
         $subjectResult = 'mail_subject';
         switch ($invoiceSendResult->getStatus()) {
-            case Result::Status_Exception:
+            case Severity::Exception:
                 $subjectResult .= '_exception';
                 break;
-            case Result::Status_Errors:
+            case Severity::Error:
                 $subjectResult .= '_error';
                 break;
-            case Result::Status_Warnings:
+            case Severity::Warning:
                 $subjectResult .= '_warning';
                 break;
-            case Result::Status_Success:
+            case Severity::Success:
             default:
                 $subjectResult .= '_success';
                 break;
@@ -228,8 +229,8 @@ abstract class Mailer
     {
         $resultInvoice = $result->getResponse();
         $bodyTexts = $this->getStatusSpecificBody($result);
-        $supportTexts = $this->getSupportMessages($result);
         $messagesTexts = $this->getMessages($result);
+        $supportTexts = $this->getSupportMessages($result);
         $replacements = array(
             '{invoice_source_type}' => $this->t($invoiceSourceType),
             '{invoice_source_reference}' => $invoiceSourceReference,
@@ -277,11 +278,11 @@ abstract class Mailer
         // Collect the messages.
         $sentences = array();
         switch ($invoiceSendResult->getStatus()) {
-            case Result::Status_Exception:
+            case Severity::Exception:
                 $sentences[] = 'mail_body_exception';
                 $sentences[] = $invoiceSendResult->isSent() ? 'mail_body_exception_invoice_maybe_created' : 'mail_body_exception_invoice_not_created';
                 break;
-            case Result::Status_Errors:
+            case Severity::Error:
                 $sentences[] = 'mail_body_errors';
                 $sentences[] = 'mail_body_errors_not_created';
                 if ($isEmailAsPdf) {
@@ -289,7 +290,7 @@ abstract class Mailer
                     $sentences[] = 'mail_body_pdf_not_sent_errors';
                 }
                 break;
-            case Result::Status_Warnings:
+            case Severity::Warning:
                 $sentences[] = 'mail_body_warnings';
                 if ($isTestMode) {
                     $sentences[] = 'mail_body_testmode';
@@ -303,7 +304,7 @@ abstract class Mailer
                     $sentences[] = 'mail_body_warnings_created';
                 }
                 break;
-            case Result::Status_Success:
+            case Severity::Success:
             default:
                 $sentences[] = 'mail_body_success';
                 if ($isTestMode) {
@@ -325,11 +326,11 @@ abstract class Mailer
 
         // Collapse and format the sentences.
         $sentences = implode(' ', $sentences);
-        $texts = array(
+
+        return array(
             'text' => wordwrap($sentences, 70),
             'html' => "<p>$sentences</p>",
         );
-        return $texts;
     }
 
     /**
@@ -348,12 +349,12 @@ abstract class Mailer
             'html' => '',
         );
 
-        if ($result->hasMessages()) {
+        if ($result->hasRealMessages()) {
             $header = $this->t('mail_messages_header');
             $description = $this->t('mail_messages_desc');
             $descriptionHtml = $this->t('mail_messages_desc_html');
-            $messagesText = $result->getMessages(Result::Format_FormattedText);
-            $messagesHtml = $result->getMessages(Result::Format_Html);
+            $messagesText = $result->formatMessages(Message::Format_PlainListWithSeverity, Severity::RealMessages);
+            $messagesHtml = $result->formatMessages(Message::Format_HtmlListWithSeverity, Severity::RealMessages);
             $messages = array(
                 'text' => "\n$header\n\n$messagesText\n\n$description\n",
                 'html' => "<details open><summary>$header</summary>$messagesHtml<p>$descriptionHtml</p></details>",
@@ -382,12 +383,14 @@ abstract class Mailer
         // We add the request and response messages when set so or if there were
         // warnings or severer messages, thus not with notices.
         $addReqResp = $pluginSettings['debug'] === PluginConfig::Send_SendAndMailOnError ? Result::AddReqResp_WithOther : Result::AddReqResp_Always;
-        if ($addReqResp === Result::AddReqResp_Always || ($addReqResp === Result::AddReqResp_WithOther && $result->getStatus() >= Result::Status_Warnings)) {
-            if ($result->getRawRequest() !== null || $result->getRawResponse() !== null) {
+        if ($addReqResp === Result::AddReqResp_Always || ($addReqResp === Result::AddReqResp_WithOther && $result->getStatus() >= Severity::Warning)) {
+            $rawRequest = $result->getByCodeTag(Result::CodeTagRawRequest);
+            $rawResponse = $result->getByCodeTag(Result::CodeTagRawResponse);
+            if ($rawRequest !== null || $rawResponse !== null) {
                 $header = $this->t('mail_support_header');
                 $description = $this->t('mail_support_desc');
-                $supportMessagesText = $result->getRawRequestResponse(Result::Format_FormattedText);
-                $supportMessagesHtml = $result->getRawRequestResponse(Result::Format_Html);
+                $supportMessagesText = $result->formatMessages(Message::Format_PlainList, Severity::Log);
+                $supportMessagesHtml = $result->formatMessages(Message::Format_HtmlList, Severity::Log);
                 $messages = array(
                     'text' => "\n$header\n\n$description\n\n$supportMessagesText\n",
                     'html' => "<details><summary>$header</summary><p>$description</p>$supportMessagesHtml</details>",

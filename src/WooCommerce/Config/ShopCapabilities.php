@@ -265,7 +265,10 @@ class ShopCapabilities extends ShopCapabilitiesBase
         $result = array();
         $orderStatuses = wc_get_order_statuses();
         foreach ($orderStatuses as $key => $label) {
-            $result[substr($key, strlen('wc-'))] = $label;
+            if (substr($key, 0, strlen('wc-')) === 'wc-') {
+                $key = substr($key, strlen('wc-'));
+            }
+            $result[$key] = $label;
         }
         return $result;
     }

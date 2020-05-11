@@ -374,7 +374,6 @@ class Creator extends BaseCreator
         }
         // Instance id is the zone, will return an empty value if not present.
         $instanceId = $item->get_instance_id();
-
         if (!empty($instanceId)) {
             $optionName = "woocommerce_{$methodId}_{$instanceId}_settings";
         } else {
@@ -466,10 +465,10 @@ class Creator extends BaseCreator
                 /** @var \WC_Order $order */
                 $order = $this->invoiceSource->getOrder()->getSource();
 
-                // Since WC3, the shipping tax class can be "inherited" from the
-                // product items (which should be the preferred value for this
-                // setting). The code to get the "inherited" tax class is more
-                // or less copied from WC_Abstract_Order.
+                // Since WC3, the shipping tax class can be based on those from
+                // the product items in the cart (which should be the preferred
+                // value for this setting). The code to get the derived tax
+                // class is more or less copied from WC_Abstract_Order.
                 if ($shippingTaxClass === 'inherit') {
                     $foundClasses = array_intersect(array_merge(array(''), WC_Tax::get_tax_class_slugs()), $order->get_items_tax_classes());
                     $shippingTaxClass = count($foundClasses) === 1 ? reset($foundClasses) : false;

@@ -36,6 +36,7 @@ class OcHelper
         if (empty($languageCode)) {
             $languageCode = 'nl';
         }
+        $this->container->setLanguage($languageCode);
     }
 
     protected function addError($message)

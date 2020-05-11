@@ -2,6 +2,7 @@
 namespace Siel\Acumulus\Config;
 
 use Siel\Acumulus\Api;
+use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\PluginConfig;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Translator;
@@ -630,7 +631,7 @@ class Config
                 'logLevel' => array(
                     'group' => 'plugin',
                     'type' => 'int',
-                    'default' => Log::Notice,
+                    'default' => Severity::Notice,
                 ),
                 'outputFormat' => array(
                     'group' => 'plugin',
@@ -1047,15 +1048,15 @@ class Config
 
         // 1) Log level.
         switch ($this->get('logLevel')) {
-            case Log::Error:
-            case Log::Warning:
+            case Severity::Error:
+            case Severity::Warning:
                 // This is often not giving enough information, so we set it
                 // to Notice by default.
-                $newSettings['logLevel'] = Log::Notice;
+                $newSettings['logLevel'] = Severity::Notice;
                 break;
-            case Log::Info:
+            case Severity::Info:
                 // Info was inserted, so this is the former debug level.
-                $newSettings['logLevel'] = Log::Debug;
+                $newSettings['logLevel'] = Severity::Log;
                 break;
         }
 

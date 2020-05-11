@@ -243,7 +243,7 @@ class Service
             'vatdate' => $date,
             'vatcountry' => $countryCode,
         );
-        return $this->communicator->callApiFunction('lookups/lookup_vatinfo', $message, false)->setMainResponseKey('vatinfo', true);
+        return $this->communicator->callApiFunction('lookups/lookup_vatinfo', $message, true)->setMainResponseKey('vatinfo', true);
     }
 
     /**

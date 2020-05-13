@@ -57,7 +57,7 @@ use Siel\Acumulus\Config\ShopCapabilities;
  *   $shopForm->render()
  * </code>
  */
-abstract class Form
+abstract class Form extends MessageCollection
 {
     /** @var string */
     protected $type;
@@ -93,33 +93,6 @@ abstract class Form
     protected $addMeta = true;
 
     /**
-     * Any success messages.
-     *
-     * @var string[]
-     */
-    protected $successMessages;
-
-    /**
-     * Any warning messages.
-     *
-     * These messages may be keyed by the name of a form field. If so, the
-     * warning concerns the value of that field.
-     *
-     * @var string[]
-     */
-    protected $warningMessages;
-
-    /**
-     * Any error messages.
-     *
-     * These messages may be keyed by the name of a form field. If so, the
-     * error concerns the value of that field.
-     *
-     * @var string[]
-     */
-    protected $errorMessages;
-
-    /**
      * @param \Siel\Acumulus\Helpers\FormHelper $formHelper
      * @param \Siel\Acumulus\Config\ShopCapabilities $shopCapabilities
      * @param \Siel\Acumulus\Config\Config $config
@@ -128,9 +101,7 @@ abstract class Form
      */
     public function __construct(FormHelper $formHelper, ShopCapabilities $shopCapabilities, Config $config, Translator $translator, Log $log)
     {
-        $this->successMessages = array();
-        $this->warningMessages = array();
-        $this->errorMessages = array();
+        parent::__construct($translator);
         $this->formValuesSet = false;
         $this->submittedValues = array();
 
@@ -174,6 +145,7 @@ abstract class Form
       return $this->type;
     }
 
+    // @todo: replace get(Success|Warning|Error)Messages with getMessages? (that returns Message objects instead of formatted messages)
     /**
      * Returns the success messages.
      *
@@ -183,26 +155,12 @@ abstract class Form
      * @return string[]
      *   Possibly empty list of success messages, will normally contain 0 or 1
      *   messages
+     *
+     * @deprecated
      */
     public function getSuccessMessages()
     {
-        return $this->successMessages;
-    }
-
-    /**
-     * Adds a success message.
-     *
-     * To be used by web shop specific form handling to add a message to the
-     * list of messages to display.
-     *
-     * @param string $message
-     *
-     * @return $this
-     */
-    public function addSuccessMessage($message)
-    {
-        $this->successMessages[] = $message;
-        return $this;
+        return $this->formatMessages(Message::Format_Plain, Severity::Success);
     }
 
     /**
@@ -214,35 +172,12 @@ abstract class Form
      * @return string[]
      *   An array of translated messages. In case of validation warnings they
      *   are keyed by the name of the form field.
+     *
+     * @deprecated
      */
     public function getWarningMessages()
     {
-        return $this->warningMessages;
-    }
-
-    /**
-     * Adds 1 or more warning messages.
-     *
-     * To be used by web shop specific form handling to add a message to the
-     * list of messages to display.
-     *
-     * @param string|string[] $message
-     *   A warning message or an array of warning messages. If empty, nothing
-     *   will be added.
-     *
-     * @return $this
-     */
-    public function addWarningMessages($message)
-    {
-        if (!empty($message)) {
-            if (is_array($message)) {
-                $this->warningMessages = array_merge($this->warningMessages, $message);
-
-            } else {
-                $this->warningMessages[] = $message;
-            }
-        }
-        return $this;
+        return $this->formatMessages(Message::Format_Plain, Severity::Warning);
     }
 
     /**
@@ -256,35 +191,12 @@ abstract class Form
      * @return string[]
      *   An array of translated messages. In case of validation errors they
      *   are keyed by the name of the invalid form field.
+     *
+     * @deprecated
      */
     public function getErrorMessages()
     {
-        return $this->errorMessages;
-    }
-
-  /**
-   * Adds 1 or more error messages.
-   *
-   * To be used by web shop specific form handling to add a message to the list
-   * of messages to display.
-   *
-   * @param string|string[] $message
-   *   An error message or an array of error messages. If empty, nothing
-   *   will be added.
-   *
-   * @return $this
-   */
-    public function addErrorMessages($message)
-    {
-        if (!empty($message)) {
-            if (is_array($message)) {
-                $this->errorMessages = array_merge($this->errorMessages, $message);
-
-            } else {
-                $this->errorMessages[] = $message;
-            }
-        }
-        return $this;
+        return $this->formatMessages(Message::Format_Plain, Severity::Error);
     }
 
     /**
@@ -304,7 +216,7 @@ abstract class Form
      */
     public function isValid()
     {
-        return empty($this->errorMessages);
+        return !$this->hasError();
     }
 
     /**
@@ -548,7 +460,7 @@ abstract class Form
                         $message = $this->t('message_form_success');
                     }
                     if (!empty($message) && $message !== 'message_form_success') {
-                        $this->addSuccessMessage($message);
+                        $this->addMessage($message, Severity::Success);
                     }
                 } else {
                     $message = $this->t("message_form_{$this->type}_error");
@@ -556,7 +468,7 @@ abstract class Form
                         $message = $this->t('message_form_error');
                     }
                     if (!empty($message) && $message !== 'message_form_error') {
-                        $this->addErrorMessages($message);
+                        $this->addMessage($message, Severity::Error);
                     }
                 }
             }

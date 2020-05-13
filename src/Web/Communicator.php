@@ -10,6 +10,7 @@ use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
+use Siel\Acumulus\Helpers\Message;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\PluginConfig;
@@ -106,7 +107,10 @@ class Communicator
             $result->addMessage($e);
         }
 
-        $this->log->debug('Communicator::callApiFunction() uri=%s; %s', $uri, $result->toLogString());
+        $this->log->debug("Communicator::callApiFunction() uri=%s\n%s",
+            $uri,
+            implode("\n", $result->formatMessages(Message::Format_Plain, Severity::Log))
+        );
         return $result;
     }
 
@@ -196,7 +200,7 @@ class Communicator
             // CURL may get a time-out and return an empty response without
             // further error messages: Add an error to tell the user to check if
             // the invoice was sent or not.
-            $result->addMessage(Severity::Error, 701, '', 'Empty response');
+            $result->addMessage('Empty response', Severity::Error, "", 701);
         } elseif ($this->isHtmlResponse($rawResponse)) {
             // When the API is gone we might receive an html error message page.
             $this->raiseHtmlReceivedError($rawResponse);

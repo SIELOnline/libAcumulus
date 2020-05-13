@@ -2,6 +2,7 @@
 namespace Siel\Acumulus\Shop;
 
 use Siel\Acumulus\Helpers\Log;
+use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\PluginConfig;
 use Siel\Acumulus\Tag;
 
@@ -483,9 +484,9 @@ class ConfigForm extends BaseConfigForm
                 'label' => $this->t('field_logLevel'),
                 'description' => $this->t('desc_logLevel'),
                 'options' => array(
-                    Log::Notice => $this->t('option_logLevel_3'),
-                    Log::Info => $this->t('option_logLevel_4'),
-                    Log::Debug => $this->t('option_logLevel_5'),
+                    Severity::Notice => $this->t('option_logLevel_3'),
+                    Severity::Info => $this->t('option_logLevel_4'),
+                    Severity::Log => $this->t('option_logLevel_5'),
                 ),
                 'attributes' => array(
                     'required' => true,

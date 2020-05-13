@@ -344,16 +344,16 @@ class InvoiceStatusForm extends Form
     {
         if ($this->source === null) {
             // Use a basic filtering on the wrong user input.
-            $this->addErrorMessages(sprintf($this->t('unknown_source'),
-                preg_replace('/[^a-z0-9_\-]/', '', $this->getSubmittedValue('acumulus_parent_type')),
-                preg_replace('/[^a-z0-9_\-]/', '', $this->getSubmittedValue('acumulus_parent_id'))
-            ));
+            $this->addMessage(sprintf($this->t('unknown_source'),
+                    preg_replace('/[^a-z0-9_\-]/', '', $this->getSubmittedValue('acumulus_parent_type')),
+                    preg_replace('/[^a-z0-9_\-]/', '', $this->getSubmittedValue('acumulus_parent_id'))),
+                Severity::Error);
         } elseif ($this->getSubmittedValue('source') === null) {
             // Use a basic filtering on the wrong user input.
-            $this->addErrorMessages(sprintf($this->t('unknown_source'),
-                preg_replace('/[^a-z0-9_\-]/', '', $this->getSubmittedValue('source_type')),
-                preg_replace('/[^a-z0-9_\-]/', '', $this->getSubmittedValue('source_id'))
-            ));
+            $this->addMessage(sprintf($this->t('unknown_source'),
+                    preg_replace('/[^a-z0-9_\-]/', '', $this->getSubmittedValue('source_type')),
+                    preg_replace('/[^a-z0-9_\-]/', '', $this->getSubmittedValue('source_id'))),
+                Severity::Error);
         } elseif ($this->getSubmittedValue('service') === 'invoice_paymentstatus_set') {
             /** @var Source $source */
             $source = $this->getSubmittedValue('source');
@@ -362,7 +362,7 @@ class InvoiceStatusForm extends Form
                 $dateFieldName = $idPrefix . 'payment_date';
                 if (!DateTime::createFromFormat(API::DateFormat_Iso, $this->getSubmittedValue($dateFieldName))) {
                     // Date is not a valid date.
-                    $this->errorMessages[$dateFieldName] = sprintf($this->t('message_validate_batch_bad_payment_date'), $this->t('date_format'));
+                    $this->addMessage(sprintf($this->t('message_validate_batch_bad_payment_date'), $this->t('date_format')), Severity::Error, $dateFieldName);
                 }
             }
         }
@@ -400,10 +400,9 @@ class InvoiceStatusForm extends Form
                     }
                     $result = $this->service->setPaymentStatus($localEntryInfo->getToken(), $paymentStatus, $paymentDate);
                 } else {
-                    $this->addErrorMessages(sprintf($this->t('unknown_entry'),
-                        strtolower($this->t($source->getType())),
-                        $source->getId()
-                    ));
+                    $this->addMessage(
+                        sprintf($this->t('unknown_entry'), strtolower($this->t($source->getType())),$source->getId()),
+                        Severity::Error);
                 }
                 break;
 
@@ -414,15 +413,17 @@ class InvoiceStatusForm extends Form
                     // @todo: clean up on receiving P2XFELO12?
                     $result = $this->service->setDeleteStatus($localEntryInfo->getEntryId(), $deleteStatus);
                 } else {
-                    $this->addErrorMessages(sprintf($this->t('unknown_entry'),
-                      strtolower($this->t($source->getType())), $source->getId())
-                    );
+                    $this->addMessage(
+                        sprintf($this->t('unknown_entry'), strtolower($this->t($source->getType())), $source->getId()),
+                        Severity::Error);
                 }
                 break;
 
             default:
                 // Use a basic filtering on the wrong user input.
-                $this->addErrorMessages(sprintf($this->t('unknown_action'), preg_replace('/[^a-z0-9_\-]/', '', $service)));
+                $this->addMessage(
+                    sprintf($this->t('unknown_action'), preg_replace('/[^a-z0-9_\-]/', '', $service)),
+                    Severity::Error);
                 break;
         }
 

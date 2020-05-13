@@ -3,7 +3,6 @@ namespace Siel\Acumulus\Web;
 
 use RuntimeException;
 use Siel\Acumulus\Api;
-use Siel\Acumulus\Helpers\Message;
 use Siel\Acumulus\Helpers\MessageCollection;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Helpers\Translator;
@@ -23,11 +22,6 @@ use Siel\Acumulus\Helpers\Translator;
  */
 class Result extends MessageCollection
 {
-    // Whether to add the raw request and response.
-    const AddReqResp_Never = 1;
-    const AddReqResp_Always = 2;
-    const AddReqResp_WithOther = 3;
-
     // Code tags for raw request and response
     const CodeTagRawRequest = 'request';
     const CodeTagRawResponse = 'response';
@@ -93,7 +87,7 @@ class Result extends MessageCollection
      */
     public function __construct(Translator $translator)
     {
-        parent::__construct();
+        parent::__construct($translator);
         $this->translator = $translator;
         $this->translator->add(new Translations());
         $this->isSent = false;
@@ -324,10 +318,10 @@ class Result extends MessageCollection
     public function setRawRequest($rawRequest)
     {
         $this->addMessage(
+            preg_replace('|<password>.*</password>|', '<password>REMOVED FOR SECURITY</password>', $rawRequest),
             Severity::Log,
-            0,
             self::CodeTagRawRequest,
-            preg_replace('|<password>.*</password>|', '<password>REMOVED FOR SECURITY</password>', $rawRequest)
+            0
         );
     }
 
@@ -341,29 +335,10 @@ class Result extends MessageCollection
     public function setRawResponse($rawResponse)
     {
         $this->addMessage(
+            preg_replace('|<password>.*</password>|', '<password>REMOVED FOR SECURITY</password>', $rawResponse),
             Severity::Log,
-            0,
             self::CodeTagRawResponse,
-            preg_replace('|<password>.*</password>|', '<password>REMOVED FOR SECURITY</password>', $rawResponse)
+            0
         );
-    }
-
-    /**
-     * Returns a string representation of the result object for logging purposes.
-     *
-     * @return string
-     *   A string representation of the result object for logging purposes.
-     */
-    public function toLogString()
-    {
-        $logParts = array();
-        if ($this->getStatus() !== Severity::Unknown) {
-            $logParts[] = 'status=' . $this->getStatus();
-        }
-        $logParts = array_merge($logParts,
-            $this->formatMessages(Message::Format_PlainWithSeverity, Severity::RealMessages),
-            $this->formatMessages(Message::Format_Plain, Severity::Log)
-        );
-        return implode('; ', $logParts);
     }
 }

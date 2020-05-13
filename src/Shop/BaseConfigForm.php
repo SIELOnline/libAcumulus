@@ -118,19 +118,18 @@ abstract class BaseConfigForm extends Form
             $this->about = $this->service->getAbout();
             if ($this->about->hasError()) {
                 $message = $this->about->getByCode(401) ? 'message_error_auth' : ($this->about->getByCode(403) ? 'message_error_forb' : 'message_error_comm');
-                $this->addErrorMessages($this->about->getMessages(Severity::ErrorOrWorse));
-                $this->addWarningMessages($this->about->getMessages(Severity::Warning));
+                $this->addMessages($this->about->getMessages(Severity::WarningOrWorse));
             } elseif ($this->about->getByCode(553)) {
                 // Role has been deprecated role for use with the API.
-                $this->addWarningMessages($this->t('message_warning_role_deprecated'));
+                $this->addMessage($this->t('message_warning_role_deprecated'), Severity::Warning, Tag::UserName);
             } else {
                 // Check role for sufficient rights but no overkill.
                 $response = $this->about->getResponse();
                 $roleId = (int) $response['roleid'];
                 if ($roleId === Api::RoleApiCreator) {
-                    $this->addWarningMessages($this->t('message_warning_role_insufficient'));
+                    $this->addMessage($this->t('message_warning_role_insufficient'), Severity::Warning, Tag::UserName);
                 } elseif ($roleId === Api::RoleApiManager) {
-                    $this->addWarningMessages($this->t('message_warning_role_overkill'));
+                    $this->addMessage($this->t('message_warning_role_overkill'), Severity::Warning, Tag::UserName);
                 }
             }
         } else {

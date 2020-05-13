@@ -1,9 +1,8 @@
 <?php
+
 namespace Siel\Acumulus\Helpers;
 
 use Exception;
-use Siel\Acumulus\Helpers\Severity;
-use Siel\Acumulus\Helpers\Translator;
 
 /**
  * Class Message defines a message.
@@ -16,12 +15,15 @@ use Siel\Acumulus\Helpers\Translator;
  */
 class Message
 {
-    // Format in which to return messages.
-    // 2 basic formats: plain or html, but no severity, and not as a list item.
+    // Formats in which to return messages.
+    /** @var int Format as plain text */
     const Format_Plain = 0;
+    /** @var int Format as html. */
     const Format_Html = 1;
     // PHP7.1: These 2 could become protected.
+    /** @var int Format as list item */
     const Format_ListItem = 2;
+    /** @var int Format with the severity level prepended. */
     const Format_AddSeverity = 4;
     // Combinations of the above.
     const Format_PlainWithSeverity = self::Format_Plain | self::Format_AddSeverity;
@@ -34,6 +36,9 @@ class Message
     /** @var \Siel\Acumulus\Helpers\Translator */
     static protected $translator;
 
+    /** @var string */
+    protected $text;
+
     /** @var int */
     protected $severity;
 
@@ -44,7 +49,7 @@ class Message
     protected $codeTag;
 
     /** @var string */
-    protected $text;
+    protected $field;
 
     /** @var \Exception|null */
     protected $exception;
@@ -55,45 +60,62 @@ class Message
      * NOTE: This is an "overloaded" method. Parameter naming is based on the
      * case where all parameters are supplied.
      *
-     * @param int|Exception $severity
+     * @param string|Exception|array $message
      *   Either:
-     *   - One of the Severity constants (except Severity::Exception)
+     *   - A human readable, thus possibly translated, text.
      *   - An \Exception object, in which case other parameters are ignored.
-     * @param int|string|array $code
-     *   Either:
-     *   - The code, typically an int, but a string is allowed as well.
      *   - An Acumulus API message array,
-     *     see {@see https://www.siel.nl/acumulus/API/Basic_Response/}.
-     *     In which case further parameters are ignored.
-     * @param $codeTag
-     *   The code tag part of an Acumulus API message.
-     * @param $text
-     *   A human readable, thus possibly translated, text.
+     *     see {@link https://www.siel.nl/acumulus/API/Basic_Response/}, in which
+     *     case the 2nd parameter should be present to indicate the severity.
+     * @param int $severity
+     *   One of the Severity constants (except Severity::Exception).
+     * @param string $fieldOrCodeOrTag
+     *   Either:
+     *   - The code tag part of an Acumulus API message.
+     *   - The form field name.
+     * @param int|string $code
+     *   The code, typically an int, but a string is allowed as well.
      */
-    public function __construct($severity, $code = 0, $codeTag = '', $text = '')
+    public function __construct($message, $severity = Severity::Unknown, $fieldOrCodeOrTag = '', $code = 0)
     {
         // PHP7: instanceof Throwable.
-        if ($severity instanceof Exception) {
+        if ($message instanceof Exception) {
             // Only 1 argument: an Exception.
+            $this->text = $message->getMessage();
             $this->severity = Severity::Exception;
-            $this->code = $severity->getCode();
+            $this->code = $message->getCode();
             $this->codeTag = '';
-            $this->text = $severity->getMessage();
-            $this->exception = $severity;
+            $this->exception = $message;
+            $this->field = '';
         } else {
             $this->severity = $severity;
             $this->exception = null;
-            if (is_array($code)) {
-                // Only 2 arguments: a severity and an Acumulus API message
-                // array.
-                $this->code = $code['code'];
-                $this->codeTag = $code['codetag'];
-                $this->text = $code['message'];
+            if (is_array($message)) {
+                $this->text = $message['message'];
+                $this->code = $message['code'];
+                $this->codeTag = $message['codetag'];
+                $this->field = '';
             } else {
-                // All arguments passed in.
-                $this->code = $code;
-                $this->codeTag = $codeTag;
-                $this->text = $text;
+                $this->text = $message;
+                if (func_num_args() === 3) {
+                    // 3 parameters passed: 3 is field name or code.
+                    if (is_int($fieldOrCodeOrTag)) {
+                        // It's an integer, thus a code.
+                        $this->code = $fieldOrCodeOrTag;
+                        $this->codeTag = '';
+                        $this->field = '';
+                    } else {
+                        // It's a string, thus a field name.
+                        $this->field = $fieldOrCodeOrTag;
+                        $this->code = 0;
+                        $this->codeTag = '';
+                    }
+                } else {
+                    // All parameters passed: 3 and 4 are codeTag resp. code.
+                    $this->code = $code;
+                    $this->codeTag = $fieldOrCodeOrTag;
+                    $this->field = '';
+                }
             }
         }
     }
@@ -119,6 +141,15 @@ class Message
     protected function t($key)
     {
         return static::$translator instanceof Translator ? static::$translator->get($key) : $key;
+    }
+
+    /**
+     * @return string
+     *   A human readable, thus possibly translated, text.
+     */
+    public function getText()
+    {
+        return $this->text;
     }
 
     /**
@@ -179,11 +210,11 @@ class Message
 
     /**
      * @return string
-     *   A human readable, thus possibly translated, text.
+     *   The (form) field name at which this message points.
      */
-    public function getText()
+    public function getField()
     {
-        return $this->text;
+        return $this->field;
     }
 
     /**
@@ -200,7 +231,8 @@ class Message
      * Returns a formatted message text.
      *
      * - In the basis it returns: "code, codeTag: Text".
-     * - If Format_AddSeverity is set, "Severity :" will be prepended.
+     * - If Format_AddSeverity is set, "Severity :" will be prepended if it is
+     *   info or higher severity (i.e. non-log and non-success).
      * - If Format_Html is set, the 2 or 3 parts of the message will each be
      *   wrapped in a <span> and newlines in the message text will be converted
      *   to <br>.
@@ -218,25 +250,26 @@ class Message
         $isHtml = ($format & self::Format_Html) !== 0;
         $text = '';
 
-        // Severity:
-        if (($format & self::Format_AddSeverity) !== 0) {
-            $severity = $this->getSeverityText();
+        // Severity.
+        if (($format & self::Format_AddSeverity) !== 0 && ($this->getSeverity() & Severity::InfoOrWorse) !== 0) {
+            $severity = $this->getSeverityText() . ':';
             if ($isHtml) {
                 $severity = '<span>' . htmlspecialchars($severity, ENT_NOQUOTES) . '</span>';
             }
-            $text .= "$severity: ";
+            $text .= $severity . ' ';
         }
 
-        // Code and code tag:
+        // Code and code tag.
         $codes = implode(', ', array_filter([$this->getCode(), $this->getCodeTag()]));
         if (!empty($codes)) {
+            $codes .= ':';
             if ($isHtml) {
                 $codes = '<span>' . htmlspecialchars($codes, ENT_NOQUOTES) . '</span>';
             }
-            $text .= "$codes: ";
+            $text .= $codes . ' ';
         }
 
-        // Text:
+        // Text.
         $messageText = $this->getText();
         if ($isHtml) {
             $messageText = '<span>' .  htmlspecialchars($messageText, ENT_NOQUOTES) . '</span>';

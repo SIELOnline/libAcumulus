@@ -7,16 +7,22 @@ use Siel\Acumulus\Config\ShopCapabilities;
 use Siel\Acumulus\Helpers\Form;
 use Siel\Acumulus\Helpers\FormHelper;
 use Siel\Acumulus\Helpers\Log;
+use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Helpers\Translator;
 
 /**
- * Defines the Acumulus invoice status overview form.
+ * Defines a message that asks the user to rate the Acumulus plugin on the
+ * webshop specific marketplace.
  *
- * This form is mostly informative but contains some buttons and a few fields
- * to update the invoice in Acumulus.
+ * This form contains only text and 2 buttons.
  *
  * SECURITY REMARKS
  * ----------------
+ * The only user provided value is the button clicked and that is sanitised as
+ * it gets printed in an error message if not recognised (thus faulty user
+ * input). For the rest it is only compared to hardcoded values.
+ *
+ * @noinspection PhpUnused
  */
 class RatePluginForm extends Form
 {
@@ -96,10 +102,10 @@ class RatePluginForm extends Form
                 break;
             case 'done':
                 $this->acumulusConfig->save(array('showRatePluginMessage' => PHP_INT_MAX));
-                $this->addSuccessMessage(sprintf($this->t('done_thanks'), $this->t('module')));
+                $this->addMessage(sprintf($this->t('done_thanks'), $this->t('module')), Severity::Success);
                 break;
             default:
-                $this->addErrorMessages(sprintf($this->t('unknown_action'), $this->action));
+                $this->addMessage(sprintf($this->t('unknown_action'), $this->action), Severity::Error);
                 break;
         }
 

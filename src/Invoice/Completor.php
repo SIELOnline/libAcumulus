@@ -415,7 +415,7 @@ class Completor
         if (empty($this->invoice[Tag::Customer][Tag::Email])) {
             $customerSettings = $this->config->getCustomerSettings();
             $this->invoice[Tag::Customer][Tag::Email] = $customerSettings['emailIfAbsent'];
-            $this->result->addMessage(Severity::Warning, 801, '', $this->t('message_warning_no_email'));
+            $this->result->addMessage($this->t('message_warning_no_email'), Severity::Warning, '', 801);
         } else {
             $email = $this->invoice[Tag::Customer][Tag::Email];
             $at = strpos($email, '@');
@@ -1337,7 +1337,7 @@ class Completor
                 $args = func_get_args();
                 $message = vsprintf($message, array_slice($args, 2));
             }
-            $this->result->addMessage(Severity::Warning, $code, '', $message);
+            $this->result->addMessage($message, Severity::Warning, '', $code);
         }
     }
 

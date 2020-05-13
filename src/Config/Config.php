@@ -1026,6 +1026,10 @@ class Config
             $result = $this->upgrade550() && $result;
         }
 
+        if (version_compare($currentVersion, '5.10.0', '<')) {
+            $result = $this->upgrade5100() && $result;
+        }
+
         return $result;
     }
 
@@ -1048,15 +1052,15 @@ class Config
 
         // 1) Log level.
         switch ($this->get('logLevel')) {
-            case Severity::Error:
-            case Severity::Warning:
+            case 1 /*Log::Error*/:
+            case 2 /*Log::Warning*/:
                 // This is often not giving enough information, so we set it
                 // to Notice by default.
-                $newSettings['logLevel'] = Severity::Notice;
+                $newSettings['logLevel'] = 3 /*Log::Notice*/;
                 break;
-            case Severity::Info:
+            case 4 /*Log::Info*/:
                 // Info was inserted, so this is the former debug level.
-                $newSettings['logLevel'] = Severity::Log;
+                $newSettings['logLevel'] = 5 /*Log::Debug*/;
                 break;
         }
 
@@ -1257,6 +1261,31 @@ class Config
     {
         $newSettings = array();
         $newSettings['foreignVat'] = (int) $this->get('digitalServices');
+        return $this->save($newSettings);
+    }
+
+    /**
+     * 5.10.0 upgrade.
+     *
+     * - Log level is now a Severity constant.
+     *
+     * @return bool
+     */
+    protected function upgrade5100()
+    {
+        $newSettings = array();
+        switch ($this->get('logLevel')) {
+            case 3 /*Log::Notice*/:
+                $newSettings['logLevel'] = Severity::Notice;
+                break;
+            case 4 /*Log::Info*/:
+            default:
+                $newSettings['logLevel'] = Severity::Info;
+                break;
+            case 5 /*Log::Debug*/:
+                $newSettings['logLevel'] = Severity::Log;
+                break;
+        }
         return $this->save($newSettings);
     }
 }

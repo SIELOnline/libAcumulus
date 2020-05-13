@@ -28,10 +28,10 @@ Refactorings:
   log levels, replacing similar constants from both Helpers/Log and Web/Result.
 - Introduced a Helpers/Message class that wraps a Message (internal message, API
   message, exception, success message, debug message). Extracted (more or less)
-  from Web/Result, used by Web/Result, Helpers/MessageCollection and, soon,
-  Helpers/Form.
+  from Web/Result, used by Helpers/MessageCollection, Web/Result, and,
+  Helpers/Form and everywhere messages are shown, logged or mailed.
 - Introduced a Helpers/MessageCollection class that wraps a set of Message
-  objects (see above). Extracted from Web/Result, used by Web/Result and, soon,
+  objects (see above). Extracted from Web/Result, used by Web/Result and,
   Helpers/Form.
 - Many methods or parameters of methods in Web/Result were renamed or have
   (subtly) changed their (default) behavior.

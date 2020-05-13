@@ -6,6 +6,11 @@ namespace Siel\Acumulus\Helpers;
  *
  * This base class will log to the PHP error file. It should be overridden per
  * webshop to integrate with the webshop's specific way of logging.
+ *
+ * @todo: log a Message
+ * @todo: log a Message[]
+ * @todo: log a MessageCollection
+ * @todo: log an exception?
  */
 class Log
 {
@@ -29,6 +34,7 @@ class Log
      * Gets the actual log level.
      *
      * @return int
+     *   One of the Severity::... constants.
      */
     public function getLogLevel()
     {
@@ -39,6 +45,7 @@ class Log
      * Sets the log level, eg. based on configuration.
      *
      * @param int $logLevel
+     *   One of the Severity::... constants.
      */
     public function setLogLevel($logLevel)
     {
@@ -86,8 +93,8 @@ class Log
     /**
      * Formats and logs the message if the log level indicates so.
      *
-     * Errors and Warnings are always logged, other levels only if the log level
-     * is set to do so.
+     * Errors, warnings and notices are always logged, other levels only if the
+     * log level is set to do so.
      *
      * Formatting involves:
      * - calling vsprintf() if $args is not empty
@@ -105,7 +112,7 @@ class Log
      */
     public function log($severity, $message, array $args = array())
     {
-        if ($severity <= max($this->getLogLevel(), Severity::Warning)) {
+        if ($severity > min($this->getLogLevel(), Severity::Notice)) {
             if (count($args) > 0) {
                 $message = vsprintf($message, $args);
             }

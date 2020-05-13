@@ -2,7 +2,9 @@
 namespace Siel\Acumulus\Invoice;
 
 use Siel\Acumulus\Helpers\Translator;
+use Siel\Acumulus\Helpers\Message;
 use Siel\Acumulus\Web\Result as WebResult;
+use Siel\Acumulus\Helpers\Severity;
 
 /**
  * Extends Result with properties and features specific to the InvoiceAdd web
@@ -10,49 +12,56 @@ use Siel\Acumulus\Web\Result as WebResult;
  */
 class Result extends WebResult
 {
+    // Whether to add the raw request and response to mails or log messages.
+    const AddReqResp_Never = 1;
+    const AddReqResp_Always = 2;
+    const AddReqResp_WithOther = 3;
+
+    const SendStatus_Unknown = 0;
     // Invoice send handling related constants.
-    // Reason for not sending: bits 5 to 8.
-    const NotSent_EventInvoiceCreated = 0x10;
-    const NotSent_EventInvoiceCompleted = 0x20;
-    const NotSent_AlreadySent = 0x30;
-    const NotSent_WrongStatus = 0x40;
-    const NotSent_EmptyInvoice = 0x50;
-    const NotSent_TriggerInvoiceCreateNotEnabled = 0x60;
-    const NotSent_TriggerInvoiceSentNotEnabled = 0x70;
-    const NotSent_LocalErrors = 0x80;
-    const NotSent_DryRun = 0x90;
-    const NotSent_TriggerCreditNoteEventNotEnabled = 0xa0;
-    const NotSent_LockedForSending = 0xb0;
-    const NotSent_Mask = 0xf0;
-    // Reason for sending: bits 9 to 11.
-    const Send_New = 0x100;
-    const Send_Forced = 0x200;
-    const Send_TestMode = 0x300;
-    const Send_LockExpired = 0x400;
-    const Send_Mask = 0x700;
+    // Reason for not sending
+    const NotSent_EventInvoiceCreated = 0x1;
+    const NotSent_EventInvoiceCompleted = 0x2;
+    const NotSent_AlreadySent = 0x3;
+    const NotSent_WrongStatus = 0x4;
+    const NotSent_EmptyInvoice = 0x5;
+    const NotSent_TriggerInvoiceCreateNotEnabled = 0x6;
+    const NotSent_TriggerInvoiceSentNotEnabled = 0x7;
+    const NotSent_LocalErrors = 0x8;
+    const NotSent_DryRun = 0x9;
+    const NotSent_TriggerCreditNoteEventNotEnabled = 0xa;
+    const NotSent_LockedForSending = 0xb;
+    const NotSent_Mask = 0xf;
+    // Reason for sending
+    const Send_New = 0x10;
+    const Send_Forced = 0x20;
+    const Send_TestMode = 0x30;
+    const Send_LockExpired = 0x40;
+    const Send_Mask = 0xf0;
 
     private static $translationsLoaded = false;
 
     /**
-     * A status indicating if and why an invoice was sent or not sent. It will
-     * contain 1 of the self::Sent_... or Invoice_NotSent_...
-     * constants.
-     *
      * @var int
+     *   A status indicating if and why an invoice was sent or not sent. It will
+     *   contain 1 of the Result::Sent_... or Result::Invoice_NotSent_...
+     *   constants.
+     *
+     *   Note that, unlike the parent property Result::isSent, this property is
+     *   at the application level, not at the API level.
      */
     protected $sendStatus;
 
     /**
-     * A list of parameters to use when getting the send status as text.
-     *
      * @var array
+     *   A list of parameters to use when getting the send status as text.
      */
     protected $sendStatusArguments;
 
     /**
-     * A string indicating the function that triggered the sending.
-     *
      * @var string
+     *   A string indicating the function that triggered the sending, e.g.
+     *   InvoiceManager::sourceStatusChange().
      */
     protected $trigger;
 
@@ -60,13 +69,15 @@ class Result extends WebResult
      * InvoiceSendResult constructor.
      *
      * @param string $trigger
+     *   A string indicating the function that triggered the sending, e.g.
+     *   InvoiceManager::sourceStatusChange().
      * @param \Siel\Acumulus\Helpers\Translator $translator
      */
     public function __construct($trigger, Translator $translator)
     {
         parent::__construct($translator);
         $this->trigger = $trigger;
-        $this->sendStatus = 0;
+        $this->sendStatus = self::SendStatus_Unknown;
         $this->sendStatusArguments = array();
 
         if (!self::$translationsLoaded) {
@@ -78,6 +89,9 @@ class Result extends WebResult
 
     /**
      * @return int
+     *   A status indicating if and why an invoice was sent or not sent. It will
+     *   contain 1 of the Result::Sent_... or Result::Invoice_NotSent_...
+     *   constants.
      */
     public function getSendStatus()
     {
@@ -86,7 +100,11 @@ class Result extends WebResult
 
     /**
      * @param int $sendStatus
+     *   A status indicating if and why an invoice was sent or not sent. It will
+     *   contain 1 of the Result::Sent_... or Result::Invoice_NotSent_...
+     *   constants.
      * @param array $arguments
+     *   A list of parameters to use when getting the send status as text.
      *
      * @return $this
      */
@@ -113,7 +131,7 @@ class Result extends WebResult
      * Returns whether the invoice has been prevented from sending.
      *
      * @return bool
-     *   True if the invoice has been prevnted from sensing, false if it has
+     *   True if the invoice has been prevented from sensing, false if it has
      *   been sent or if the sendStatus has not yet been set.
      */
     public function isSendingPrevented()
@@ -123,6 +141,8 @@ class Result extends WebResult
 
     /**
      * @return string
+     *   A string indicating the function that triggered the sending, e.g.
+     *   InvoiceManager::sourceStatusChange().
      */
     public function getTrigger()
     {
@@ -131,6 +151,8 @@ class Result extends WebResult
 
     /**
      * @param string $trigger
+     *   A string indicating the function that triggered the sending, e.g.
+     *   InvoiceManager::sourceStatusChange().
      *
      * @return $this
      */
@@ -227,9 +249,9 @@ class Result extends WebResult
     /**
      * Returns a translated sentence that can be used for logging.
      *
-     * The returned sentence indicated what happened and why. If the invoice was
+     * The returned sentence indicates what happened and why. If the invoice was
      * sent or local errors prevented it being sent, then the returned string
-     * also includes any messages (warnings, errors, or exception).
+     * also includes any messages.
      *
      * @param int $addReqResp
      *   Whether to add the raw request and response.
@@ -247,11 +269,11 @@ class Result extends WebResult
             if ($this->hasBeenSent()) {
                 $message .= ' ' . $this->getStatusText();
             }
-            if ($this->hasMessages()) {
-                $message .= "\n" . $this->getMessages(Result::Format_FormattedText);
+            if ($this->hasRealMessages()) {
+                $message .= "\n" . $this->formatMessages(Message::Format_PlainListWithSeverity, Severity::RealMessages);
             }
-            if ($addReqResp === Result::AddReqResp_Always || ($addReqResp === Result::AddReqResp_WithOther && $this->hasMessages())) {
-                $message .= ' ' . $this->getRawRequestResponse(Result::Format_FormattedText);
+            if ($addReqResp === Result::AddReqResp_Always || ($addReqResp === Result::AddReqResp_WithOther && $this->hasRealMessages())) {
+                $message .= "\n" . $this->formatMessages(Message::Format_PlainList, Severity::Log);
             }
         }
         return $message;

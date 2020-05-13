@@ -197,6 +197,8 @@ class Container
      * derived by using __DIR__.
      *
      * @param string $baseDir
+     *
+     * @noinspection PhpUnused
      */
     public function setBaseDir($baseDir)
     {
@@ -306,6 +308,8 @@ class Container
 
     /**
      * @return \Siel\Acumulus\Helpers\FormMapper
+     *
+     * @noinspection PhpUnused
      */
     public function getFormMapper()
     {

@@ -11,6 +11,9 @@ class Requirements
     /**
      * Checks if the requirements for the environment are met.
      *
+     * Note: we cannot use MessageCollection as we use php 5.6 specific features
+     * in its dependencies.
+     *
      * @return string[]
      *   An array with messages regarding missing requirements, empty if all
      *   requirements are met. The keys are the translations keys, the values are

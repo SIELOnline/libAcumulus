@@ -58,7 +58,7 @@ class InvoiceStatusFormTranslations extends TranslationCollection
         'payment_date' => 'Betaaldatum',
         'payment_status_not_equal' => 'De betaalstatus in Acumulus komt niet overeen met die in uw webshop',
         'message_validate_batch_bad_payment_date' => 'U dient een correcte \'Betaaldatum\' in te vullen.',
-        // Dit bericht is nodig als we ergens geen date picker zouden hebben.
+        // Dit bericht (met format) is nodig als we ergens geen date picker engeenhtml5 date field zouden hebben.
         //'message_validate_batch_bad_payment_date' => 'U dient een correcte \'Betaaldatum\' in te vullen (verwacht formaat: %1$s).',
 
         // Actions.
@@ -126,7 +126,7 @@ class InvoiceStatusFormTranslations extends TranslationCollection
         'payment_date' => 'Payment date',
         'payment_status_not_equal' => 'The payment state in Acumulus differs from the one in your webshop',
         'message_validate_batch_bad_payment_date' => 'Incorrect \'Payment date\'.',
-        // Dit bericht is nodig als we ergens geen date picker zouden hebben.
+        // Dit bericht (met format) is nodig als we ergens geen date picker engeenhtml5 date field zouden hebben.
         //'message_validate_batch_bad_payment_date' => 'Incorrect \'Payment date\' (expected format: %1$s).',
 
         // Actions.

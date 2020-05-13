@@ -1,6 +1,8 @@
 <?php
 namespace Siel\Acumulus\OpenCart\Helpers;
 
+use Siel\Acumulus\Helpers\Message;
+use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\PluginConfig;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Invoice\Source;
@@ -39,27 +41,35 @@ class OcHelper
         $this->container->setLanguage($languageCode);
     }
 
-    protected function addError($message)
+    /**
+     * Adds the messages to the resp sets of messages in $data.
+     *
+     * @param Message[] $messages
+     */
+    protected function addMessages($messages)
     {
-        if (is_array($message)) {
-            $this->data['error_messages'] = array_merge($this->data['error_messages'], $message);
-        } else {
-            $this->data['error_messages'][] = $message;
+        foreach ($messages as $message) {
+            switch ($message->getSeverity()) {
+                case Severity::Success:
+                case Severity::Info:
+                case Severity::Notice:
+                    $dataKey = 'success_messages';
+                    break;
+                case Severity::Warning:
+                    $dataKey = 'warning_messages';
+                    break;
+                case Severity::Error:
+                case Severity::Exception:
+                    $dataKey = 'error_messages';
+                    break;
+                default:
+                    $dataKey = '';
+                    break;
+            }
+            if (!empty($dataKey)) {
+                $this->data[$dataKey][] = $message->getText();
+            }
         }
-    }
-
-    protected function addWarning($message)
-    {
-        if (is_array($message)) {
-            $this->data['warning_messages'] = array_merge($this->data['warning_messages'], $message);
-        } else {
-            $this->data['warning_messages'][] = $message;
-        }
-    }
-
-    protected function addSuccess($message)
-    {
-        $this->data['success_messages'][] = $message;
     }
 
     /**
@@ -365,15 +375,7 @@ class OcHelper
         $form->getFields();
 
         // Show messages.
-        foreach ($form->getSuccessMessages() as $message) {
-            $this->addSuccess($message);
-        }
-        foreach ($form->getWarningMessages() as $message) {
-            $this->addWarning($this->t($message));
-        }
-        foreach ($form->getErrorMessages() as $message) {
-            $this->addError($this->t($message));
-        }
+        $this->addMessages($form->getMessages());
 
         $this->data['form'] = $form;
         $this->data['formRenderer'] = $this->container->getFormRenderer();
@@ -431,8 +433,8 @@ class OcHelper
             $requirements = $this->container->getRequirements();
             $messages = $requirements->check();
             foreach ($messages as $message) {
-                $this->addError($message['message']);
-                $this->container->getLog()->error($message['message']);
+                $this->addMessages([new Message($message, Severity::Error)]);
+                $this->container->getLog()->error($message);
             }
             if (!empty($messages)) {
                 return false;

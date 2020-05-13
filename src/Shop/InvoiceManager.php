@@ -529,8 +529,10 @@ abstract class InvoiceManager
             // in Acumulus: tell user to check.
             if (($lockStatus = $this->getAcumulusEntryManager()->deleteLock($invoiceSource)) !== AcumulusEntry::Lock_Deleted) {
                 $code = $lockStatus === AcumulusEntry::Lock_NoLongerExists ? 903 : 904;
-                $result->addMessage(Severity::Warning, $code, '',
-                    sprintf($this->t('message_warning_delete_lock_failed'), $this->t($invoiceSource->getType())));
+                $result->addMessage(
+                    sprintf($this->t('message_warning_delete_lock_failed'), $this->t($invoiceSource->getType())),
+                    Severity::Warning, '', $code
+                );
             }
         }
 
@@ -603,16 +605,20 @@ abstract class InvoiceManager
                         // Could not delete the old entry (already deleted or
                         // does not exist at all (anymore)): add as a warning so
                         // this info will be mailed to the user.
-                        $result->addMessage(Severity::Warning, 902, '',
-                            sprintf($this->t('message_warning_old_entry_not_deleted'), $this->t($invoiceSource->getType()), $entryId));
+                        $result->addMessage(
+                            sprintf($this->t('message_warning_old_entry_not_deleted'), $this->t($invoiceSource->getType()), $entryId),
+                            Severity::Warning, '', 902
+                        );
                     } else {
                         $result->addMessages($deleteResult->getMessages(Severity::InfoOrWorse), true);
                     }
                 } else {
                     // Successfully deleted the old entry: add a notice so this
                     // info will be mailed to the user.
-                    $result->addMessage(Severity::Notice, 901, '',
-                        sprintf($this->t('message_warning_old_entry_deleted'), $this->t($invoiceSource->getType()), $entryId));
+                    $result->addMessage(
+                        sprintf($this->t('message_warning_old_entry_deleted'), $this->t($invoiceSource->getType()), $entryId),
+                        Severity::Notice, '', 901
+                    );
                 }
             }
         }

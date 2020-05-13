@@ -25,9 +25,12 @@ class MessageCollection
 
     /**
      * Result constructor.
+     *
+     * @param \Siel\Acumulus\Helpers\Translator|null $translator
      */
-    public function __construct()
+    public function __construct(Translator $translator)
     {
+        Message::setTranslator($translator);
         $this->messages = [];
     }
 
@@ -37,31 +40,41 @@ class MessageCollection
      * NOTE: This is an "overloaded" method. Parameter naming is based on the
      * case where all parameters are supplied.
      *
-     * @param int|Exception|\Siel\Acumulus\Helpers\Message $severity
+     * @param string|Exception|array $message
      *   Either:
-     *   - One of the Severity constants (except Severity::Exception)
+     *   - A human readable, thus possibly translated, text.
      *   - An \Exception object, in which case other parameters are ignored.
-     *   - An \Siel\Acumulus\Web\Message object, in which case other parameters
-     *     are ignored
-     * @param int|string|array $code
-     *   Either:
-     *   - The code, typically an int, but a string is allowed as well.
      *   - An Acumulus API message array,
-     *     see {@see https://www.siel.nl/acumulus/API/Basic_Response/}.
-     *     In which case further parameters are ignored.
-     * @param $codeTag
-     *   The code tag part of an Acumulus API message.
-     * @param $text
-     *   A human readable, thus possibly translated, text.
+     *     see {@see https://www.siel.nl/acumulus/API/Basic_Response/}, in which
+     *     case the 2nd parameter should be present to indicate the severity.
+     * @param int $severity
+     *   One of the Severity constants (except Severity::Exception).
+     * @param string|int $fieldOrCodeOrTag
+     *   Either:
+     *   - The code tag part of an Acumulus API message (string) .
+     *   - The form field name (string) .
+     *   - The code (int) when no code tag is provided in combination with the
+     *     code and the code is not a string.
+     * @param int|string $code
+     *   The code, typically an int, but a string is allowed as well.
      *
      * @return $this
      */
-    public function addMessage($severity, $code = 0, $codeTag = '', $text = '')
+    public function addMessage($message, $severity = Severity::Unknown, $fieldOrCodeOrTag = '', $code = 0)
     {
-        if ($severity instanceof Message) {
-            $message = $severity;
-        } else {
-            $message = new Message($severity, $code, $codeTag, $text);
+        if (!$message instanceof Message) {
+            switch (func_num_args()) {
+                case 2:
+                    $message = new Message($message, $severity);
+                    break;
+                case 3:
+                    $message = new Message($message, $severity, $fieldOrCodeOrTag);
+                    break;
+                case 4:
+                default:
+                    $message = new Message($message, $severity, $fieldOrCodeOrTag, $code);
+                    break;
+            }
         }
         $this->messages[] = $message;
         return $this;
@@ -80,35 +93,64 @@ class MessageCollection
      * 3) Merging 2 MessageCollection objects. This allows to inform the user
      *    about errors and warnings that occurred during additional API calls,
      *    e.g. querying VAT rates or deleting old entries.
+     * 4) Adding an array of text messages, giving them the passed severity.
      *
-     * @param array|array[]|\Siel\Acumulus\Helpers\Message[] $messages
-     *   The message(s) to add. These are either:
-     *   - 1 Acumulus API message array (with keys code, codetag and message).
-     *   - A numerically indexed array of Acumulus API messages.
-     *   - An array of \Siel\Acumulus\Web\Message objects.
-     * @param int|bool $severity
-     *   - If the messages are Acumulus API message arrays: the severity of the
-     *     messages, either Severity::Error or Severity::Warning.
-     *   - If the messages are Message objects, whether errors should be merged
-     *     as errors or as mere warnings because the main result is not really
+     * @param \Siel\Acumulus\Helpers\MessageCollection|\Siel\Acumulus\Helpers\Message[]|string[]|array[]|array $messages
+     *   The message(s) to add. Either:
+     *   - A MessageCollection to be merged into this one.
+     *   - An array of Message objects.
+     *   - A (numerically indexed) array of Acumulus API messages.
+     *   - A (numerically indexed) array of message strings
+     *   - An Acumulus API message array (with keys code, codetag and message).
+     *     This edge case is supported because of the json conversion of an API
+     *     call result might result in just 1 API message instead of an array
+     *     with 1 api message.
+     * @param int $severity
+     *   - If $messages does not contain the severity for the individual
+     *     messages (i.e they are not Message objects) the severity is used for
+     *     all messages.
+     *   - If $messages are Message objects, Severity might indicate the maximum
+     *     severity with which to add the messages. This can be used to merge
+     *     errors as mere warnings because the main result is not really
      *     influenced by these errors.
      *
      * @return $this
      */
-    public function addMessages(array $messages, $severity = false)
+    public function addMessages($messages, $severity = Severity::Unknown)
     {
-        if (is_int($severity) && is_string(key($messages))) {
+        // Process $messages so that it becomes an array of messages in
+        // whichever form.
+        if ($messages instanceof MessageCollection) {
+            $messages = $messages->getMessages();
+        } elseif (count($messages) === 3 && isset($messages['code']) && isset($messages['codetag']) && isset($messages['message'])) {
             // 1 Acumulus API message array.
-            $this->addMessage($severity, $messages);
-        } else {
-            foreach ($messages as $message) {
-                if (is_array($message)) {
-                    $this->addMessage($severity, $message);
-                } elseif ($severity && $message->getSeverity() === Severity::Error) {
-                    $this->addMessage(Severity::Warning, $message->getCode(), $message->getCodeTag(), $message->getText());
+            $messages = [$messages];
+        }
+
+        foreach ($messages as $key => $message) {
+            if (is_string($message)) {
+                if (is_string($key)) {
+                    // Text message for a field.
+                    $this->addMessage($message, $severity, $key);
                 } else {
-                    $this->addMessage($message);
+                    // Just a text message.
+                    $this->addMessage($message, $severity);
                 }
+            } elseif (is_array($message)) {
+                // An Acumulus API message.
+                $this->addMessage($message, $severity);
+            } elseif ($severity !== Severity::Unknown && $message->getSeverity() > $severity) {
+                // Message object but restrict severity
+                if ($message->getField() !== '') {
+                    // A Message object with a field.
+                    $this->addMessage($message->getText(), $severity, $message->getField());
+                } else {
+                    // A Message object without a field.
+                    $this->addMessage($message->getText(), $severity, $message->getCodeTag(), $message->getCode());
+                }
+            } else {
+                // A message object and no changing of severity.
+                $this->addMessage($message);
             }
         }
         return $this;
@@ -200,6 +242,25 @@ class MessageCollection
     }
 
     /**
+     * Returns the Messages in the collection for the given field.
+     *
+     * @param string $field
+     *
+     * @return Message[]
+     *   The messages for the given field, may be empty.
+     */
+    public function getByField($field)
+    {
+        $result = [];
+        foreach ($this->getMessages() as $message) {
+            if ($message->getField() === $field) {
+                $result[] = $message;
+            }
+        }
+        return $result;
+    }
+
+    /**
      * @param int $severity
      *   A severity level to get the messages for. May be a bitwise combination
      *   of multiple severities.
@@ -233,7 +294,8 @@ class MessageCollection
      *
      * @return string|string[]
      *   Depending on $format, either:
-     *   - An array of formatted messages.
+     *   - An array of formatted messages, keyed by field or numeric indices
+     *     for messages without field.
      *   - A string containing an html or plain text list of formatted messages.
      *
      * @see Message::format()

@@ -8,6 +8,7 @@ use Siel\Acumulus\Config\ShopCapabilities;
 use Siel\Acumulus\Helpers\Form;
 use Siel\Acumulus\Helpers\FormHelper;
 use Siel\Acumulus\Helpers\Log;
+use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Invoice\Translations as InvoiceTranslations;
 use Siel\Acumulus\PluginConfig;
@@ -82,39 +83,49 @@ class BatchForm extends Form
     {
         $invoiceSourceTypes = $this->shopCapabilities->getSupportedInvoiceSourceTypes();
         if (empty($this->submittedValues['invoice_source_type'])) {
-            $this->errorMessages['invoice_source_type'] = $this->t('message_validate_batch_source_type_required');
+            $this->addMessage($this->t('message_validate_batch_source_type_required'), Severity::Error, 'invoice_source_type');
         } elseif (!array_key_exists($this->submittedValues['invoice_source_type'], $invoiceSourceTypes)) {
-            $this->errorMessages['invoice_source_type'] = $this->t('message_validate_batch_source_type_invalid');
+            $this->addMessage($this->t('message_validate_batch_source_type_invalid'), Severity::Error, 'invoice_source_type');
         }
 
         if ($this->submittedValues['invoice_source_reference_from'] === '' && $this->submittedValues['date_from'] === '') {
             // Either a range of order id's or a range of dates should be entered.
-            $this->errorMessages['invoice_source_reference_from'] = $this->t(count($invoiceSourceTypes) === 1 ? 'message_validate_batch_reference_or_date_1' : 'message_validate_batch_reference_or_date_2');
+            $this->addMessage(
+                $this->t(count($invoiceSourceTypes) === 1 ? 'message_validate_batch_reference_or_date_1' : 'message_validate_batch_reference_or_date_2'),
+                Severity::Error,
+                'invoice_source_reference_from');
         } elseif ($this->submittedValues['invoice_source_reference_from'] !== '' && $this->submittedValues['date_from'] !== '') {
             // Not both ranges should be entered.
-            $this->errorMessages['date_from'] = $this->t(count($invoiceSourceTypes) === 1 ? 'message_validate_batch_reference_and_date_1' : 'message_validate_batch_reference_and_date_2');
+            $this->addMessage(
+                $this->t(count($invoiceSourceTypes) === 1 ? 'message_validate_batch_reference_and_date_1' : 'message_validate_batch_reference_and_date_2'),
+                Severity::Error,
+                'date_from');
         } elseif ($this->submittedValues['invoice_source_reference_from'] !== '') {
             // Date from is empty, we go for a range of order ids.
             // (We ignore any date to value.)
             // Single id or range of ids?
-            if ($this->submittedValues['invoice_source_reference_to'] !== '' && $this->submittedValues['invoice_source_reference_to'] < $this->submittedValues['invoice_source_reference_from']) {
+            if ($this->submittedValues['invoice_source_reference_to'] !== ''
+                && $this->submittedValues['invoice_source_reference_to'] < $this->submittedValues['invoice_source_reference_from']) {
                 // order id to is smaller than order id from.
-                $this->errorMessages['invoice_source_reference_to'] = $this->t('message_validate_batch_bad_order_range');
+                $this->addMessage($this->t('message_validate_batch_bad_order_range'), Severity::Error, 'invoice_source_reference_to');
             }
         } else /*if ($this->submittedValues['date_to'] !== '') */ {
             // Range of dates has been filled in.
             // We ignore any order # to value.
             if (!DateTime::createFromFormat(API::DateFormat_Iso, $this->submittedValues['date_from'])) {
                 // Date from not a valid date.
-                $this->errorMessages['date_from'] = sprintf($this->t('message_validate_batch_bad_date_from'), $this->t('date_format'));
+                $this->addMessage(sprintf($this->t('message_validate_batch_bad_date_from'), $this->t('date_format')),
+                    Severity::Error, 'date_from');
             }
             if ($this->submittedValues['date_to']) {
                 if (!DateTime::createFromFormat(API::DateFormat_Iso, $this->submittedValues['date_to'])) {
                     // Date to not a valid date.
-                    $this->errorMessages['date_to'] = sprintf($this->t('message_validate_batch_bad_date_to'), $this->t('date_format'));
+                    $this->addMessage(sprintf($this->t('message_validate_batch_bad_date_to'), $this->t('date_format')),
+                    Severity::Error, 'date_to');
                 } elseif ($this->submittedValues['date_to'] < $this->submittedValues['date_from']) {
                     // date to is smaller than date from
-                    $this->errorMessages['date_to'] = $this->t('message_validate_batch_bad_date_range');
+                    $this->addMessage($this->t('message_validate_batch_bad_date_range'),
+                    Severity::Error, 'date_to');
                 }
             }
         }
@@ -129,12 +140,14 @@ class BatchForm extends Form
     {
         $type = $this->getFormValue('invoice_source_type');
         if ($this->getFormValue('invoice_source_reference_from') !== '') {
-            // Retrieve by order reference range.
+            // Retrieve by order/refund reference range.
             $from = $this->getFormValue('invoice_source_reference_from');
             $to = $this->getFormValue('invoice_source_reference_to') ? $this->getFormValue('invoice_source_reference_to') : $from;
             $this->screenLog['range'] = sprintf($this->t('message_form_range_reference'), $this->t("plural_{$type}_ref"), $from, $to);
             $invoiceSources = $this->invoiceManager->getInvoiceSourcesByReferenceRange($type, $from, $to);
             if (empty($invoiceSources)) {
+                // Empty set when searching on references: retrieve by order/
+                // refund id range.
                 $invoiceSources = $this->invoiceManager->getInvoiceSourcesByIdRange($type, $from, $to);
                 $this->screenLog['range'] = sprintf($this->t('message_form_range_reference'), $this->t("plural_{$type}_id"), $from, $to);
             }

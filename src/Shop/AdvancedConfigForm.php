@@ -2,6 +2,7 @@
 namespace Siel\Acumulus\Shop;
 
 use Siel\Acumulus\Api;
+use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\PluginConfig;
 
 /**
@@ -28,7 +29,7 @@ class AdvancedConfigForm extends BaseConfigForm
     protected function validateRelationFields()
     {
         if (empty($this->submittedValues['sendCustomer']) && !empty($this->submittedValues['emailAsPdf'])) {
-            $this->warningMessages['conflicting_options'] = $this->t('message_validate_conflicting_options');
+            $this->addMessage($this->t('message_validate_conflicting_options'), Severity::Warning);
         }
     }
 
@@ -38,14 +39,14 @@ class AdvancedConfigForm extends BaseConfigForm
     protected function validateOptionsFields()
     {
         if ($this->submittedValues['optionsAllOn1Line'] == PHP_INT_MAX && $this->submittedValues['optionsAllOnOwnLine'] == 1) {
-            $this->errorMessages['optionsAllOnOwnLine'] = $this->t('message_validate_options_0');
+            $this->addMessage($this->t('message_validate_options_0'), Severity::Error, 'optionsAllOnOwnLine');
         }
         if ($this->submittedValues['optionsAllOn1Line'] > $this->submittedValues['optionsAllOnOwnLine'] && $this->submittedValues['optionsAllOnOwnLine'] > 1) {
-            $this->errorMessages['optionsAllOnOwnLine'] = $this->t('message_validate_options_1');
+            $this->addMessage($this->t('message_validate_options_1'), Severity::Error, 'optionsAllOnOwnLine');
         }
 
         if (isset($this->submittedValues['optionsMaxLength']) && !ctype_digit($this->submittedValues['optionsMaxLength'])) {
-            $this->errorMessages['optionsMaxLength'] = $this->t('message_validate_options_2');
+            $this->addMessage($this->t('message_validate_options_2'), Severity::Error, 'optionsMaxLength');
         }
     }
 
@@ -57,18 +58,18 @@ class AdvancedConfigForm extends BaseConfigForm
         // Check for valid email address if no token syntax is used.
         $regexpEmail = '/^[^@<>,; "\']+@([^.@ ,;]+\.)+[^.@ ,;]+$/';
         if (!empty($this->submittedValues['emailTo']) && strpos($this->submittedValues['emailTo'], '[') === false && !preg_match($regexpEmail, $this->submittedValues['emailTo'])) {
-            $this->errorMessages['emailTo'] = $this->t('message_validate_email_5');
+            $this->addMessage($this->t('message_validate_email_5'), Severity::Error, 'emailTo');
         }
 
         // Check for valid email addresses if no token syntax is used.
         $regexpMultiEmail = '/^[^@<>,; "\']+@([^.@ ,;]+\.)+[^.@ ,;]+([,;][^@<>,; "\']+@([^.@ ,;]+\.)+[^.@ ,;]+)*$/';
         if (!empty($this->submittedValues['emailBcc']) && strpos($this->submittedValues['emailBcc'], '[') === false && !preg_match($regexpMultiEmail, $this->submittedValues['emailBcc'])) {
-            $this->errorMessages['emailBcc'] = $this->t('message_validate_email_3');
+            $this->addMessage($this->t('message_validate_email_3'), Severity::Error, 'emailBcc');
         }
 
         // Check for valid email address if no token syntax is used.
         if (!empty($this->submittedValues['emailFrom']) && strpos($this->submittedValues['emailFrom'], '[') === false && !preg_match($regexpEmail, $this->submittedValues['emailFrom'])) {
-            $this->errorMessages['emailFrom'] = $this->t('message_validate_email_4');
+            $this->addMessage($this->t('message_validate_email_4'), Severity::Error, 'emailFrom');
         }
     }
 

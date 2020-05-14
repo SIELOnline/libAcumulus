@@ -145,60 +145,6 @@ abstract class Form extends MessageCollection
       return $this->type;
     }
 
-    // @todo: replace get(Success|Warning|Error)Messages with getMessages? (that returns Message objects instead of formatted messages)
-    /**
-     * Returns the success messages.
-     *
-     * To be used by web shop specific form handling to display success
-     * messages.
-     *
-     * @return string[]
-     *   Possibly empty list of success messages, will normally contain 0 or 1
-     *   messages
-     *
-     * @deprecated
-     */
-    public function getSuccessMessages()
-    {
-        return $this->formatMessages(Message::Format_Plain, Severity::Success);
-    }
-
-    /**
-     * Returns the warning messages.
-     *
-     * To be used by web shop specific form handling to display validation
-     * warnings.
-     *
-     * @return string[]
-     *   An array of translated messages. In case of validation warnings they
-     *   are keyed by the name of the form field.
-     *
-     * @deprecated
-     */
-    public function getWarningMessages()
-    {
-        return $this->formatMessages(Message::Format_Plain, Severity::Warning);
-    }
-
-    /**
-     * Returns the error messages.
-     *
-     * To be used by web shop specific form handling to display validation and
-     * connection error messages.
-     *
-     * An empty result indicates successful validation.
-     *
-     * @return string[]
-     *   An array of translated messages. In case of validation errors they
-     *   are keyed by the name of the invalid form field.
-     *
-     * @deprecated
-     */
-    public function getErrorMessages()
-    {
-        return $this->formatMessages(Message::Format_Plain, Severity::Error);
-    }
-
     /**
      * Indicates whether the current form handling is a form submission.
      *

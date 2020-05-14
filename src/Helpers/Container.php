@@ -434,7 +434,7 @@ class Container
 
         $log = $this->getLog();
         /** @var \Siel\Acumulus\Config\Config $config */
-        $config = $this->getInstance('Config', 'Config', array($this->getConfigStore(), $this->getShopCapabilities(), $this->getTranslator(), $log));
+        $config = $this->getInstance('Config', 'Config', array($this->getConfigStore(), $this->getShopCapabilities(), $this, $this->getTranslator(), $log));
         if ($is1stTime) {
             $pluginSettings = $config->getPluginSettings();
             $log->setLogLevel($pluginSettings['logLevel']);

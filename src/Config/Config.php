@@ -1,7 +1,9 @@
 <?php
 namespace Siel\Acumulus\Config;
 
+use Exception;
 use Siel\Acumulus\Api;
+use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\PluginConfig;
 use Siel\Acumulus\Helpers\Log;
@@ -25,6 +27,9 @@ class Config
     /** @var \Siel\Acumulus\Config\ShopCapabilities */
     protected $shopCapabilities;
 
+    /** @var \Siel\Acumulus\Helpers\Container */
+    protected $container;
+
     /** @var \Siel\Acumulus\Helpers\Translator */
     protected $translator;
 
@@ -45,13 +50,15 @@ class Config
      *
      * @param \Siel\Acumulus\Config\ConfigStore $configStore
      * @param \Siel\Acumulus\Config\ShopCapabilities $shopCapabilities
+     * @param \Siel\Acumulus\Helpers\Container $container
      * @param \Siel\Acumulus\Helpers\Translator $translator
      * @param \Siel\Acumulus\Helpers\Log $log
      */
-    public function __construct(ConfigStore $configStore, ShopCapabilities $shopCapabilities, Translator $translator, Log $log)
+    public function __construct(ConfigStore $configStore, ShopCapabilities $shopCapabilities, Container $container, Translator $translator, Log $log)
     {
         $this->configStore = $configStore;
         $this->shopCapabilities = $shopCapabilities;
+        $this->container = $container;
         $this->translator = $translator;
         $this->log = $log;
 
@@ -226,6 +233,8 @@ class Config
      * Returns the ShowRatePluginMessage config setting.
      *
      * @return int
+     *
+     * @noinspection PhpUnused
      */
     public function getShowRatePluginMessage()
     {
@@ -981,6 +990,8 @@ class Config
      *
      * @return bool
      *   Success.
+     *
+     * @throws \Exception
      */
     public function upgrade($currentVersion)
     {
@@ -1191,6 +1202,7 @@ class Config
         // ConfigStore::save should store all settings in 1 serialized value.
         $configStore = $this->getConfigStore();
         if (method_exists($configStore, 'loadOld')) {
+            /** @noinspection PhpDeprecationInspection */
             $values = $configStore->loadOld($this->getKeys());
             $result = $this->save($values);
         }
@@ -1270,9 +1282,20 @@ class Config
      * - Log level is now a Severity constant.
      *
      * @return bool
+     *
+     * @throws \Exception
      */
     protected function upgrade5100()
     {
+        $requirements = $this->container->getRequirements();
+        $messages = $requirements->check();
+        foreach ($messages as $message) {
+            $this->container->getLog()->error($message);
+        }
+        if (!empty($messages)) {
+            throw new Exception(implode(';', $messages));
+        }
+
         $newSettings = array();
         switch ($this->get('logLevel')) {
             case 3 /*Log::Notice*/:

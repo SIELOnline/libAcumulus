@@ -67,7 +67,7 @@ class OcHelper
                     break;
             }
             if (!empty($dataKey)) {
-                $this->data[$dataKey][] = $message->getText();
+                $this->data[$dataKey][] = $message->format(Message::Format_PlainWithSeverity);
             }
         }
     }

@@ -237,6 +237,8 @@ abstract class AcumulusEntryManager
      *
      * @return bool
      *   Success.
+     *
+     * @noinspection PhpUnused
      */
     public function deleteByEntryId($entryId)
     {

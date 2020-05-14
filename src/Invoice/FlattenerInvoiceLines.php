@@ -285,7 +285,7 @@ class FlattenerInvoiceLines
      * @param array[] $children
      *   The child invoice lines.
      */
-    protected function keepChildrenAndPriceOnParentOnly(array &$parent, array &$children)
+    protected function keepChildrenAndPriceOnParentOnly(array $parent, array &$children)
     {
        $children = $this->copyVatInfoToChildren($parent, $children);
        $children = $this->removePriceInfoFromChildren($children);
@@ -311,7 +311,7 @@ class FlattenerInvoiceLines
      * @param array[] $children
      *   The child invoice lines.
      */
-    protected function keepChildrenAndPriceOnChildrenOnly(array &$parent, array &$children)
+    protected function keepChildrenAndPriceOnChildrenOnly(array &$parent, array $children)
     {
         $parent = $this->copyVatInfoToParent($parent, $children);
         $parent = $this->removePriceInfoFromParent($parent);
@@ -340,8 +340,10 @@ class FlattenerInvoiceLines
      *   The parent invoice line.
      * @param array[] $children
      *   The child invoice lines.
+     *
+     * @noinspection PhpUnused
      */
-    protected function keepChildrenAndPriceOnParentAndChildren(array &$parent, array &$children)
+    protected function keepChildrenAndPriceOnParentAndChildren(array &$parent, array $children)
     {
         if (!Completor::isCorrectVatRate($parent[Meta::VatRateSource]) || Number::isZero($parent[Tag::VatRate])) {
             $parent = $this->copyVatInfoToParent($parent, $children);
@@ -368,6 +370,8 @@ class FlattenerInvoiceLines
      *   The parent invoice line.
      * @param array[] $children
      *   The child invoice lines.
+     *
+     * @noinspection PhpUnused
      */
     protected function keepChildrenAndPriceOnParentPlusChildren(array &$parent, array &$children)
     {

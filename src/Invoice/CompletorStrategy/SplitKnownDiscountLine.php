@@ -33,6 +33,8 @@ use Siel\Acumulus\Tag;
  *     does have (valid) content.
  *   - if no discount on shipping and other fees as these do not end up in table
  *     order_detail_tax.
+ *
+ * @noinspection PhpUnused
  */
 class SplitKnownDiscountLine extends CompletorStrategyBase
 {

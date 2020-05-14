@@ -20,6 +20,8 @@ use Siel\Acumulus\Tag;
  * @todo: try this first with vat rate that actually do appear in the invoice.
  *   Doing so, we can prevent adding 6% to a free shipping line on an all 21%
  *   invoice.
+ *
+ * @noinspection PhpUnused
  */
 class ApplySameVatRate extends CompletorStrategyBase
 {

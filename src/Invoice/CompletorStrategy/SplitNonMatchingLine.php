@@ -39,6 +39,8 @@ use Siel\Acumulus\Tag;
  *
  * Current (known) usages:
  * - PrestaShop (discount lines)
+ *
+ * @noinspection PhpUnused
  */
 class SplitNonMatchingLine extends CompletorStrategyBase
 {

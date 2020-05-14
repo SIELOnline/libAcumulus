@@ -283,6 +283,9 @@ abstract class ShopCapabilities
      *   for the dropdown item, 1 of the {@see \Siel\Acumulus\PluginConfig}
      *   TriggerCreditNoteEvent_... constants, and the value being the label for
      *   the dropdown item.
+     *
+     * @noinspection PhpUnused Called via method name construction in
+     *   BaseConfigForm::getOptionsOrHiddenField().
      */
     public function getTriggerCreditNoteEventOptions()
     {

@@ -170,8 +170,8 @@ abstract class InvoiceManager
     protected function isTestMode()
     {
         $pluginSettings = $this->getConfig()->getPluginSettings();
-        $testMode = $pluginSettings['debug'] == PluginConfig::Send_TestMode;
-        return $testMode;
+
+        return $pluginSettings['debug'] == PluginConfig::Send_TestMode;
     }
 
 
@@ -357,6 +357,8 @@ abstract class InvoiceManager
      *
      * @return \Siel\Acumulus\Invoice\Result
      *   The result of sending (or not sending) the invoice.
+     *
+     * @noinspection PhpUnused
      */
     public function invoiceCreate(Source $invoiceSource)
     {
@@ -382,6 +384,8 @@ abstract class InvoiceManager
      *
      * @return \Siel\Acumulus\Invoice\Result
      *   The result of sending (or not sending) the invoice.
+     *
+     * @noinspection PhpUnused
      */
     public function invoiceSend(Source $invoiceSource)
     {
@@ -773,11 +777,11 @@ abstract class InvoiceManager
             $this->t($invoiceSource->getType()),
             $invoiceSource->getReference()
         );
-        $logMessage = sprintf($this->t('message_invoice_send'),
+
+        return sprintf($this->t('message_invoice_send'),
             $result->getTrigger(),
             $invoiceSourceText,
             $result->getLogText($addReqResp)
         );
-        return $logMessage;
     }
 }

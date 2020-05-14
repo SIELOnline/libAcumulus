@@ -1,9 +1,6 @@
 <?php
 namespace Siel\Acumulus\Helpers;
 
-use Siel\Acumulus\Helpers\Severity;
-use Siel\Acumulus\Helpers\TranslationCollection;
-
 /**
  * Contains translations for classes in the \Siel\Acumulus\Web namespace.
  */

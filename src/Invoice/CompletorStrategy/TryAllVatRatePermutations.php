@@ -12,6 +12,8 @@ use Siel\Acumulus\Tag;
  *
  * Current known usages:
  * - ???
+ *
+ * @noinspection PhpUnused
  */
 class TryAllVatRatePermutations extends CompletorStrategyBase
 {

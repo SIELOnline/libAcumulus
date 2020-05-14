@@ -580,8 +580,7 @@ abstract class Creator
         $manualLines = $this->getManualLines();
         $manualLines = $this->addLineType($manualLines, static::LineType_Manual);
 
-        $result = array_merge($itemLines, $feeLines, $discountLines, $manualLines);
-        return $result;
+        return array_merge($itemLines, $feeLines, $discountLines, $manualLines);
     }
 
     /**
@@ -889,35 +888,6 @@ abstract class Creator
     }
 
     /**
-     * Helper method to add a value from an array or object only if it is set
-     * and not empty.
-     *
-     * @param array $targetArray
-     * @param string $targetKey
-     * @param array|object $source
-     * @param string $sourceKey
-     *
-     * @return bool
-     *   Whether the array value or object property is set and not empty and
-     *   thus has been added.
-     */
-    protected function addIfSetAndNotEmpty(array &$targetArray, $targetKey, $source, $sourceKey)
-    {
-        if (is_array($source)) {
-            if (!empty($source[$sourceKey])) {
-                $targetArray[$targetKey] = $source[$sourceKey];
-                return true;
-            }
-        } else {
-            if (!empty($source->$sourceKey)) {
-                $targetArray[$targetKey] = $source->$sourceKey;
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
      * Helper method to add a non-empty value to an array.
      *
      * @param array $array
@@ -935,29 +905,6 @@ abstract class Creator
             return true;
         }
         return false;
-    }
-
-    /**
-     * Helper method to add a value to an array even if it is empty.
-     *
-     * @param array $array
-     * @param string $key
-     * @param mixed $value
-     * @param mixed $default
-     *
-     * @return bool
-     *   True if the value was not empty and thus has been added, false if the
-     *   default has been added.
-     */
-    protected function addEmpty(array &$array, $key, $value, $default = '')
-    {
-        if (!empty($value)) {
-            $array[$key] = $value;
-            return true;
-        } else {
-            $array[$key] = $default;
-            return false;
-        }
     }
 
     /**

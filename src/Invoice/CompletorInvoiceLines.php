@@ -480,7 +480,7 @@ class CompletorInvoiceLines
      */
     protected function getUniqueVatRate(array $vatRateInfos)
     {
-        $result = array_reduce($vatRateInfos, function ($carry, $matchedVatRate) {
+        return array_reduce($vatRateInfos, function ($carry, $matchedVatRate) {
             if ($carry === null) {
                 // 1st item: return its vat rate.
                 return $matchedVatRate[Tag::VatRate];
@@ -495,7 +495,6 @@ class CompletorInvoiceLines
                 return false;
             }
         }, null);
-        return $result;
     }
 
     /**

@@ -1,4 +1,8 @@
 <?php
+/** @noinspection PhpUnused Many properties are used via property name
+ *    construction.
+ */
+
 namespace Siel\Acumulus\Helpers;
 
 /**
@@ -833,13 +837,12 @@ class FormRenderer
      */
     protected function getCheckboxAttributes(/** @noinspection PhpUnusedParameterInspection */$id, $name, $value)
     {
-        $checkboxAttributes = array(
+        return array(
             'type' => 'checkbox',
             'id' => "{$name}_{$value}",
             'name' => $value,
             'value' => 1,
         );
-        return $checkboxAttributes;
     }
 
     /**
@@ -853,13 +856,12 @@ class FormRenderer
      */
     protected function getRadioAttributes($id, $name, $value)
     {
-        $radioAttributes = array(
+        return array(
             'type' => 'radio',
             'id' => "{$id}_{$value}",
             'name' => $name,
             'value' => $value,
         );
-        return $radioAttributes;
     }
 
     /**

@@ -155,6 +155,8 @@ class Result extends WebResult
      *   InvoiceManager::sourceStatusChange().
      *
      * @return $this
+     *
+     * @noinspection PhpUnused
      */
     public function setTrigger($trigger)
     {

@@ -85,8 +85,8 @@ class AcumulusEntry
     {
         // Is it a real entry id or a concept id.
         $token = $this->getToken();
-        $entryId =  !empty($token) && $token !== static::lockToken ? (int) ($this->get(static::$keyEntryId)) : null;
-        return $entryId;
+
+        return !empty($token) && $token !== static::lockToken ? (int) ($this->get(static::$keyEntryId)) : null;
     }
 
     /**
@@ -104,8 +104,8 @@ class AcumulusEntry
     {
         // Is it a concept id or a real entry id.
         $token = $this->getToken();
-        $conceptId = empty($token) && $token !== static::lockToken ? (int) ($this->get(static::$keyEntryId)) : null;
-        return $conceptId;
+
+        return empty($token) && $token !== static::lockToken ? (int) ($this->get(static::$keyEntryId)) : null;
     }
 
     /**
@@ -125,6 +125,8 @@ class AcumulusEntry
      *
      * @return string
      *   The type of shop source being Source::Order or Source::CreditNote.
+     *
+     * @noinspection PhpUnused
      */
     public function getSourceType()
     {

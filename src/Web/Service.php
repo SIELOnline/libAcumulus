@@ -153,6 +153,8 @@ class Service
      *   - costheadingname
      *
      * @see https://www.siel.nl/acumulus/API/Picklists/Cost_Headings/
+     *
+     * @noinspection PhpUnused
      */
     public function getPicklistCostHeadings()
     {
@@ -187,6 +189,8 @@ class Service
      *   - 'vattypename'
      *
      * @see https://www.siel.nl/acumulus/API/Picklists/VAT_Types/
+     *
+     * @noinspection PhpUnused
      */
     public function getPicklistVatTypes()
     {
@@ -401,6 +405,8 @@ class Service
      *     exist.
      *
      * @see https://www.siel.nl/acumulus/API/Invoicing/Payment_Get_Status/
+     *
+     * @noinspection PhpUnused
      */
     public function getPaymentStatus($token)
     {
@@ -482,6 +488,8 @@ class Service
      *     Unable to proceed."
      *
      * @see https://siel.nl/acumulus/API/Invoicing/Email/
+     *
+     * @noinspection PhpUnused
      */
     public function emailInvoiceAsPdf($token, $invoiceType, array $emailAsPdf, $invoiceNotes = '')
     {
@@ -585,6 +593,8 @@ class Service
      *   Possible errors/warnings:
      *
      * @see https://www.siel.nl/acumulus/API/Sign_Up/Sign_Up/
+     *
+     * @noinspection PhpUnused
      */
     public function signUp(array $signup)
     {

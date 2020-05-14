@@ -141,6 +141,8 @@ class InvoiceStatusForm extends Form
     /**
      * @return bool
      *   Whether the form has a source set.
+     *
+     * @noinspection PhpUnused
      */
     public function hasSource()
     {

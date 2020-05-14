@@ -43,10 +43,6 @@ class Completor
     const VatRateSource_Copied_From_Children = 'copied-from-children';
     const VatRateSource_Copied_From_Parent = 'copied-from-parent';
 
-    const Vat_HasVat = 1;
-    const Vat_Has0Vat = 2;
-    const Vat_Unknown = 4;
-
     /**
      * A list of vat rate sources that indicate that the vat rate can be
      * considered correct.
@@ -129,9 +125,6 @@ class Completor
 
     /** @var \Siel\Acumulus\Invoice\CompletorStrategyLines */
     protected $strategyLineCompletor = null;
-
-    /** @var array */
-    protected $incompleteValues;
 
     /** @var (string|int)[][] */
     protected $lineTotalsStates;
@@ -555,6 +548,8 @@ class Completor
      * @return bool|null
      *   True if the totals are equal, false if not equal, null if undecided
      *   (all 3 values are incomplete).
+     *
+     * @noinspection DuplicatedCode
      */
     protected function areTotalsEqual()
     {

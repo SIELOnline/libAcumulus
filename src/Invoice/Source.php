@@ -77,6 +77,8 @@ abstract class Source
      *
      * @return bool
      *   True if the wrapped source is a valid source, false otherwise.
+     *
+     * @noinspection PhpUnused
      */
     public function isValid()
     {

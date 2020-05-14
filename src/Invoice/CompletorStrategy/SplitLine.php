@@ -60,6 +60,8 @@ use Siel\Acumulus\Tag;
  *
  * Current known usages:
  * - OpenCart discount coupons
+ *
+ * @noinspection PhpUnused
  */
 class SplitLine extends CompletorStrategyBase
 {
@@ -201,6 +203,8 @@ class SplitLine extends CompletorStrategyBase
      *
      * @return bool
      *   Success.
+     *
+     * @noinspection DuplicatedCode
      */
     protected function divideAmountOver2VatRates($splitVatAmount, $lowVatRate, $highVatRate)
     {

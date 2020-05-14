@@ -6,6 +6,8 @@ use Siel\Acumulus\Helpers\TranslationCollection;
 /**
  * Contains module related translations, like module name, buttons, requirement
  * messages, and save/cancel/failure messages.
+ *
+ * @noinspection PhpUnused
  */
 class ModuleTranslations extends TranslationCollection
 {

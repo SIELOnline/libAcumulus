@@ -125,7 +125,7 @@
  *   completion phases.
  * - Invoice sending: when the invoice is completed, it is sent by the
  *   {@see \Siel\Acumulus\Shop\InvoiceManager} that uses the
- *   {@see \Siel\Acumulus\Web\Service} for the actual communication.
+ *   {@see \Siel\Acumulus\Web\Acumulus} for the actual communication.
  * - Result handling: when the invoice is sent, the results are processed. if
  *   sending it was successful, an {@see \Siel\Acumulus\Shop\AcumulusEntry}
  *   record is stored to prevent sending it again, if not a mail is sent

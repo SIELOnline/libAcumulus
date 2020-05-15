@@ -2,7 +2,7 @@
 /**
  * The Web namespace handles the external communication with the Acumulus API
  * and contains the following classes:
- * - {@see Service}: Provides abstracted access to the Acumulus API methods.
+ * - {@see Acumulus}: Provides abstracted access to the Acumulus API methods.
  * - {@see Result}: Contains the result of a service call: the actual response
  *   and any other information like the status, exceptions, error messages, and
  *   warnings.

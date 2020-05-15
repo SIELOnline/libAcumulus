@@ -318,12 +318,12 @@ class Container
     }
 
     /**
-     * @return \Siel\Acumulus\Web\Service
+     * @return \Siel\Acumulus\Web\Acumulus
      */
-    public function getService()
+    public function getAcumulusApiClient()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('Service', 'Web', array($this->getCommunicator(), $this->getConfig(), $this->getTranslator()));
+        return $this->getInstance('Acumulus', 'Web', array($this->getCommunicator(), $this->getConfig(), $this->getTranslator()));
     }
 
     /**
@@ -386,7 +386,7 @@ class Container
     public function getCompletor()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('Completor', 'Invoice', array($this->getCompletorInvoiceLines(), $this->getCompletorStrategyLines(), $this->getCountries(), $this->getService(), $this->getConfig(), $this->getTranslator(), $this->getLog()));
+        return $this->getInstance('Completor', 'Invoice', array($this->getCompletorInvoiceLines(), $this->getCompletorStrategyLines(), $this->getCountries(), $this->getAcumulusApiClient(), $this->getConfig(), $this->getTranslator(), $this->getLog()));
     }
 
     /**
@@ -507,11 +507,11 @@ class Container
         switch (strtolower($type)) {
             case 'config':
                 $class = 'Config';
-                $arguments[] = $this->getService();
+                $arguments[] = $this->getAcumulusApiClient();
                 break;
             case 'advanced':
                 $class = 'AdvancedConfig';
-                $arguments[] = $this->getService();
+                $arguments[] = $this->getAcumulusApiClient();
                 break;
             case 'batch':
                 $class = 'Batch';
@@ -522,7 +522,7 @@ class Container
                 $arguments[] = $this->getInvoiceManager();
                 $arguments[] = $this->getAcumulusEntryManager();
                 $arguments[] = $this;
-                $arguments[] = $this->getService();
+                $arguments[] = $this->getAcumulusApiClient();
                 break;
             case 'rate':
                 $class = 'RatePlugin';

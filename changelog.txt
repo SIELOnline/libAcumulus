@@ -27,6 +27,8 @@ Features:
 Refactorings:
 - Added some unit tests for basic classes in the Web namespace. As a consequence
   a lot of classes and methods were moved, renamed, or split:
+- Renamed Service to Acumulus and parameters/properties/variables for this type
+  to acumulusApiClient.
 - Introduced an interface Helpers/Severity, defining constants for severity and
   log levels, replacing similar constants from both Helpers/Log and Web/Result.
 - Introduced a Helpers/Message class that wraps a Message (internal message, API

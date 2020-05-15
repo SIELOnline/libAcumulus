@@ -6,6 +6,6 @@ use PHPUnit\Framework\TestCase;
 /**
  *
  */
-class ServiceTest1 extends TestCase
+class AcumulusTest extends TestCase
 {
 }

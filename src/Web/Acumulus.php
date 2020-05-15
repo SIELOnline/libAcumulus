@@ -19,7 +19,7 @@ use Siel\Acumulus\Helpers\Translator;
  * The Web API call wrappers return their information as a keyed array, which is
  * a simplified version of the call specific part of the response structure.
  */
-class Service
+class Acumulus
 {
     /** @var \Siel\Acumulus\Config\Config */
     protected $config;
@@ -41,10 +41,8 @@ class Service
     {
         $this->config = $config;
         $this->communicator = $communicator;
-
         $this->translator = $translator;
-        $webServiceTranslations = new Translations();
-        $this->translator->add($webServiceTranslations);
+        $this->translator->add(new Translations());
     }
 
     /**
@@ -256,8 +254,8 @@ class Service
      * @param array $invoice
      *   The invoice to send.
      * @param \Siel\Acumulus\Web\Result|null $result
-     *   It is possible to already create a Result object before calling the Web
-     *   Service to store local messages. By passing this Result object these
+     *   It is possible to already create a Result object before calling this
+     *   api-client to store local messages. By passing this Result object these
      *   local messages will be merged with any remote messages in the returned
      *   Result object.
      *

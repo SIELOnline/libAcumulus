@@ -340,7 +340,7 @@ class AdvancedConfigForm extends BaseConfigForm
             'defaultCustomerType' => array(
                 'type' => 'select',
                 'label' => $this->t('field_defaultCustomerType'),
-                'options' => $this->picklistToOptions($this->service->getPicklistContactTypes(), 0, $this->t('option_empty')),
+                'options' => $this->picklistToOptions($this->acumulusApiClient->getPicklistContactTypes(), 0, $this->t('option_empty')),
             ),
             'contactStatus' => array(
                 'type' => 'radio',

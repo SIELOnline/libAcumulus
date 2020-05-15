@@ -400,8 +400,8 @@ class ConfigForm extends BaseConfigForm
      */
     protected function getInvoiceFields()
     {
-        $this->accountNumberOptions = $this->picklistToOptions($this->service->getPicklistAccounts(), 0, $this->t('option_empty'));
-        $this->costCenterOptions = $this->picklistToOptions($this->service->getPicklistCostCenters(), 0, $this->t('option_empty'));
+        $this->accountNumberOptions = $this->picklistToOptions($this->acumulusApiClient->getPicklistAccounts(), 0, $this->t('option_empty'));
+        $this->costCenterOptions = $this->picklistToOptions($this->acumulusApiClient->getPicklistCostCenters(), 0, $this->t('option_empty'));
 
         return array(
             'invoiceNrSource' => $this->getOptionsOrHiddenField('invoiceNrSource', 'radio'),
@@ -421,7 +421,7 @@ class ConfigForm extends BaseConfigForm
             'defaultInvoiceTemplate' => array(
                 'type' => 'select',
                 'label' => $this->t('field_defaultInvoiceTemplate'),
-                'options' => $this->picklistToOptions($invoiceTemplates = $this->service->getPicklistInvoiceTemplates(), 0, $this->t('option_empty')),
+                'options' => $this->picklistToOptions($invoiceTemplates = $this->acumulusApiClient->getPicklistInvoiceTemplates(), 0, $this->t('option_empty')),
             ),
             'defaultInvoicePaidTemplate' => array(
                 'type' => 'select',

@@ -82,8 +82,8 @@ class Communicator
      *   functions, like vat info, it is optional, and for signUp, it is even
      *   not allowed.
      * @param \Siel\Acumulus\Web\Result $result
-     *   It is possible to already create a Result object before calling the Web
-     *   Service to store local messages. By passing this Result object these
+     *   It is possible to already create a Result object before calling the
+     *   api-client to store local messages. By passing this Result object these
      *   local messages will be merged with any remote messages in the returned
      *   Result object.
      *

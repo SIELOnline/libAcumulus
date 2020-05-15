@@ -10,7 +10,7 @@ use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Tag;
 use Siel\Acumulus\Web\Result;
-use Siel\Acumulus\Web\Service;
+use Siel\Acumulus\Web\Acumulus;
 use Siel\Acumulus\Helpers\Severity;
 
 /**
@@ -18,8 +18,8 @@ use Siel\Acumulus\Helpers\Severity;
  */
 abstract class BaseConfigForm extends Form
 {
-    /** @var \Siel\Acumulus\Web\Service */
-    protected $service;
+    /** @var \Siel\Acumulus\Web\Acumulus */
+    protected $acumulusApiClient;
 
     /**
      * About API call result.
@@ -31,21 +31,21 @@ abstract class BaseConfigForm extends Form
     /**
      * Constructor.
      *
-     * @param \Siel\Acumulus\Web\Service $service
+     * @param \Siel\Acumulus\Web\Acumulus $acumulusApiClient
      * @param \Siel\Acumulus\Helpers\FormHelper $formHelper
      * @param \Siel\Acumulus\Config\ShopCapabilities $shopCapabilities
      * @param \Siel\Acumulus\Config\Config $config
      * @param \Siel\Acumulus\Helpers\Translator $translator
      * @param \Siel\Acumulus\Helpers\Log $log
      */
-    public function __construct(Service $service, FormHelper $formHelper, ShopCapabilities $shopCapabilities, Config $config, Translator $translator, Log $log)
+    public function __construct(Acumulus $acumulusApiClient, FormHelper $formHelper, ShopCapabilities $shopCapabilities, Config $config, Translator $translator, Log $log)
     {
         parent::__construct($formHelper, $shopCapabilities, $config, $translator, $log);
 
         $translations = new ConfigFormTranslations();
         $this->translator->add($translations);
 
-        $this->service = $service;
+        $this->acumulusApiClient = $acumulusApiClient;
     }
 
     /**
@@ -115,7 +115,7 @@ abstract class BaseConfigForm extends Form
         $message = '';
         $credentials = $this->acumulusConfig->getCredentials();
         if (!empty($credentials[Tag::ContractCode]) && !empty($credentials[Tag::UserName]) && !empty($credentials[Tag::Password])) {
-            $this->about = $this->service->getAbout();
+            $this->about = $this->acumulusApiClient->getAbout();
             if ($this->about->hasError()) {
                 $message = $this->about->getByCode(401) ? 'message_error_auth' : ($this->about->getByCode(403) ? 'message_error_forb' : 'message_error_comm');
                 $this->addMessages($this->about->getMessages(Severity::WarningOrWorse));

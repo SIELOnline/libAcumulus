@@ -11,7 +11,7 @@ use Siel\Acumulus\Meta;
 use Siel\Acumulus\PluginConfig;
 use Siel\Acumulus\Tag;
 use Siel\Acumulus\Web\Result as WebResult;
-use Siel\Acumulus\Web\Service;
+use Siel\Acumulus\Web\Acumulus;
 use Siel\Acumulus\Helpers\Severity;
 
 /**
@@ -20,7 +20,7 @@ use Siel\Acumulus\Helpers\Severity;
  *
  * This class:
  * - Changes the customer into a fictitious client if set so in the config.
- * - Validates the email address: the webservice does not allow an empty email
+ * - Validates the email address: the Acumulus api does not allow an empty email
  *   address (but does allow a non provided email address).
  * - Adds line totals. These are compared with what the shop advertises as order
  *   totals to see if an amount might be missing.
@@ -86,8 +86,8 @@ class Completor
     /** @var \Siel\Acumulus\Helpers\Log */
     protected $log;
 
-    /** @var \Siel\Acumulus\Web\Service */
-    protected $service;
+    /** @var \Siel\Acumulus\Web\Acumulus */
+    protected $acumulusApiClient;
 
     /** @var \Siel\Acumulus\Helpers\Countries */
     protected $countries;
@@ -135,7 +135,7 @@ class Completor
      * @param \Siel\Acumulus\Invoice\CompletorInvoiceLines $completorInvoiceLines
      * @param \Siel\Acumulus\Invoice\CompletorStrategyLines $completorStrategyLines
      * @param \Siel\Acumulus\Helpers\Countries $countries
-     * @param \Siel\Acumulus\Web\Service $service
+     * @param \Siel\Acumulus\Web\Acumulus $acumulusApiClient
      * @param \Siel\Acumulus\Config\Config $config
      * @param \Siel\Acumulus\Helpers\Translator $translator
      * @param \Siel\Acumulus\Helpers\Log $log
@@ -144,7 +144,7 @@ class Completor
         CompletorInvoiceLines $completorInvoiceLines,
         CompletorStrategyLines $completorStrategyLines,
         Countries $countries,
-        Service $service,
+        Acumulus $acumulusApiClient,
         Config $config,
         Translator $translator,
         Log $log
@@ -157,7 +157,7 @@ class Completor
         $this->translator->add($invoiceHelperTranslations);
 
         $this->countries = $countries;
-        $this->service = $service;
+        $this->acumulusApiClient = $acumulusApiClient;
 
         $this->LineCompletor = $completorInvoiceLines;
         $this->LineCompletor->setCompletor($this);
@@ -1132,14 +1132,14 @@ class Completor
      * @return float[]
      *   Actual type will be string[] containing strings representing floats.
      *
-     * @see \Siel\Acumulus\Web\Service::getVatInfo().
+     * @see \Siel\Acumulus\Web\Acumulus::getVatInfo().
      */
     protected function getVatRatesByCountryAndDate($countryCode, $date = null)
     {
         if (empty($date)) {
             $date = $this->getInvoiceDate();
         }
-        $result = $this->service->getVatInfo($countryCode, $date);
+        $result = $this->acumulusApiClient->getVatInfo($countryCode, $date);
         if ($result->hasRealMessages()) {
             $this->result->addMessages($result->getMessages(Severity::InfoOrWorse));
         }

@@ -16,7 +16,7 @@ use Siel\Acumulus\Invoice\Translations as InvoiceTranslations;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Helpers\Message;
 use Siel\Acumulus\Web\Result;
-use Siel\Acumulus\Web\Service;
+use Siel\Acumulus\Web\Acumulus;
 use Siel\Acumulus\Helpers\Severity;
 
 /**
@@ -58,8 +58,8 @@ class InvoiceStatusForm extends Form
     /** @var \Siel\Acumulus\Helpers\Container*/
     protected $container;
 
-    /** @var \Siel\Acumulus\Web\Service */
-    protected $service;
+    /** @var \Siel\Acumulus\Web\Acumulus */
+    protected $acumulusApiClient;
 
     /** @var \Siel\Acumulus\Shop\InvoiceManager */
     protected $invoiceManager;
@@ -95,7 +95,7 @@ class InvoiceStatusForm extends Form
      * @param \Siel\Acumulus\Shop\InvoiceManager $invoiceManager
      * @param \Siel\Acumulus\Shop\AcumulusEntryManager $acumulusEntryManager
      * @param \Siel\Acumulus\Helpers\Container $container
-     * @param \Siel\Acumulus\Web\Service $service
+     * @param \Siel\Acumulus\Web\Acumulus $acumulusApiClient
      * @param \Siel\Acumulus\Helpers\FormHelper $formHelper
      * @param \Siel\Acumulus\Config\ShopCapabilities $shopCapabilities
      * @param \Siel\Acumulus\Config\Config $config
@@ -106,7 +106,7 @@ class InvoiceStatusForm extends Form
         InvoiceManager $invoiceManager,
         AcumulusEntryManager $acumulusEntryManager,
         Container $container,
-        Service $service,
+        Acumulus $acumulusApiClient,
         FormHelper $formHelper,
         ShopCapabilities $shopCapabilities,
         Config $config,
@@ -126,7 +126,7 @@ class InvoiceStatusForm extends Form
         $this->container = $container;
         $this->acumulusEntryManager = $acumulusEntryManager;
         $this->invoiceManager = $invoiceManager;
-        $this->service = $service;
+        $this->acumulusApiClient = $acumulusApiClient;
         $this->resetStatus();
     }
 
@@ -400,7 +400,7 @@ class InvoiceStatusForm extends Form
                         $paymentStatus = Api::PaymentStatus_Due;
                         $paymentDate = '';
                     }
-                    $result = $this->service->setPaymentStatus($localEntryInfo->getToken(), $paymentStatus, $paymentDate);
+                    $result = $this->acumulusApiClient->setPaymentStatus($localEntryInfo->getToken(), $paymentStatus, $paymentDate);
                 } else {
                     $this->addMessage(
                         sprintf($this->t('unknown_entry'), strtolower($this->t($source->getType())),$source->getId()),
@@ -413,7 +413,7 @@ class InvoiceStatusForm extends Form
                 if ($localEntryInfo && $localEntryInfo->getEntryId() !== null) {
                     $deleteStatus = $this->getSubmittedValue($idPrefix . 'delete_status') === Api::Entry_Delete ? Api::Entry_Delete : Api::Entry_UnDelete;
                     // @todo: clean up on receiving P2XFELO12?
-                    $result = $this->service->setDeleteStatus($localEntryInfo->getEntryId(), $deleteStatus);
+                    $result = $this->acumulusApiClient->setDeleteStatus($localEntryInfo->getEntryId(), $deleteStatus);
                 } else {
                     $this->addMessage(
                         sprintf($this->t('unknown_entry'), strtolower($this->t($source->getType())), $source->getId()),
@@ -587,7 +587,7 @@ class InvoiceStatusForm extends Form
                 } else {
                     // Entry saved with support for concept ids.
                     // Has the concept been changed into an invoice?
-                    $result = $this->service->getConceptInfo($localEntryInfo->getConceptId());
+                    $result = $this->acumulusApiClient->getConceptInfo($localEntryInfo->getConceptId());
                     $conceptInfo = $this->sanitizeConceptInfo($result->getResponse());
                     if (empty($conceptInfo)) {
                         $invoiceStatus = static::Invoice_CommunicationError;
@@ -616,7 +616,7 @@ class InvoiceStatusForm extends Form
                     } else {
                         // Concept turned into 1 definitive invoice: update
                         // acumulus entry to have it refer to that invoice.
-                        $result = $this->service->getEntry($conceptInfo['entryid']);
+                        $result = $this->acumulusApiClient->getEntry($conceptInfo['entryid']);
                         $entry = $this->sanitizeEntry($result->getResponse());
                         if (!$result->hasError() && !empty($entry['token'])) {
                             if ($this->acumulusEntryManager->save($source, $conceptInfo['entryid'], $entry['token'])) {
@@ -644,7 +644,7 @@ class InvoiceStatusForm extends Form
             }
 
             if ($localEntryInfo->getEntryId() !== null) {
-                $result = $this->service->getEntry($localEntryInfo->getEntryId());
+                $result = $this->acumulusApiClient->getEntry($localEntryInfo->getEntryId());
                 $entry = $this->sanitizeEntry($result->getResponse());
                 if ($result->getByCodeTag('XGYBSN000')) {
                     $invoiceStatus = static::Invoice_NonExisting;
@@ -1068,7 +1068,7 @@ class InvoiceStatusForm extends Form
         $links = [];
         $invoiceStatusSettings = $this->container->getConfig()->getInvoiceStatusSettings();
         if ($invoiceStatusSettings['showPdfInvoice']) {
-            $uri = $this->service->getInvoicePdfUri($token);
+            $uri = $this->acumulusApiClient->getInvoicePdfUri($token);
             $text = ucfirst($this->t('invoice'));
             $title = sprintf($this->t('open_as_pdf'), $text);
             /** @noinspection HtmlUnknownTarget */
@@ -1076,7 +1076,7 @@ class InvoiceStatusForm extends Form
         }
 
         if ($invoiceStatusSettings['showPdfPackingSlip']) {
-            $uri = $this->service->getPackingSlipUri($token);
+            $uri = $this->acumulusApiClient->getPackingSlipUri($token);
             $text = ucfirst($this->t('packing_slip'));
             $title = sprintf($this->t('open_as_pdf'), $text);
             /** @noinspection HtmlUnknownTarget */

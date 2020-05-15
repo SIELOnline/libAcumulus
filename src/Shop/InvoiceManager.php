@@ -97,13 +97,13 @@ abstract class InvoiceManager
     }
 
     /**
-     * Returns a Service instance.
+     * Returns an Acumulus api-client instance.
      *
-     * @return \Siel\Acumulus\Web\Service
+     * @return \Siel\Acumulus\Web\Acumulus
      */
-    protected function getService()
+    protected function getAcumulusApiClient()
     {
-        return $this->container->getService();
+        return $this->container->getAcumulusApiClient();
     }
 
     /**
@@ -567,7 +567,7 @@ abstract class InvoiceManager
     protected function doSend(array $invoice, Source $invoiceSource, Result $result)
     {
         /** @var \Siel\Acumulus\Invoice\Result $result */
-        $result = $this->getService()->invoiceAdd($invoice, $result);// Store the reference between the source of the webshop invoice and the
+        $result = $this->getAcumulusApiClient()->invoiceAdd($invoice, $result);// Store the reference between the source of the webshop invoice and the
 
         // Save Acumulus entry:
         // - If we were sending in test mode or there were errors, no invoice
@@ -601,7 +601,7 @@ abstract class InvoiceManager
             if ($saved && $oldEntry && $oldEntry->getEntryId()) {
                 $entryId = $oldEntry->getEntryId();
                 // @todo: clean up on receiving P2XFELO12?
-                $deleteResult = $this->getService()->setDeleteStatus($entryId, API::Entry_Delete);
+                $deleteResult = $this->getAcumulusApiClient()->setDeleteStatus($entryId, API::Entry_Delete);
                 if ($deleteResult->hasRealMessages()) {
                     // Add messages to result but not if the entry has already
                     // the delete status or does not exist at all (anymore).

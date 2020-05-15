@@ -10,8 +10,8 @@ use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\PluginConfig;
 use Siel\Acumulus\Tag;
-use Siel\Acumulus\Web\Result as WebResult;
-use Siel\Acumulus\Web\Acumulus;
+use Siel\Acumulus\ApiClient\Result as WebResult;
+use Siel\Acumulus\ApiClient\Acumulus;
 use Siel\Acumulus\Helpers\Severity;
 
 /**
@@ -86,13 +86,13 @@ class Completor
     /** @var \Siel\Acumulus\Helpers\Log */
     protected $log;
 
-    /** @var \Siel\Acumulus\Web\Acumulus */
+    /** @var \Siel\Acumulus\ApiClient\Acumulus */
     protected $acumulusApiClient;
 
     /** @var \Siel\Acumulus\Helpers\Countries */
     protected $countries;
 
-    /** @var \Siel\Acumulus\Web\Result */
+    /** @var \Siel\Acumulus\ApiClient\Result */
     protected $result;
 
     /** @var array */
@@ -135,7 +135,7 @@ class Completor
      * @param \Siel\Acumulus\Invoice\CompletorInvoiceLines $completorInvoiceLines
      * @param \Siel\Acumulus\Invoice\CompletorStrategyLines $completorStrategyLines
      * @param \Siel\Acumulus\Helpers\Countries $countries
-     * @param \Siel\Acumulus\Web\Acumulus $acumulusApiClient
+     * @param \Siel\Acumulus\ApiClient\Acumulus $acumulusApiClient
      * @param \Siel\Acumulus\Config\Config $config
      * @param \Siel\Acumulus\Helpers\Translator $translator
      * @param \Siel\Acumulus\Helpers\Log $log
@@ -187,7 +187,7 @@ class Completor
      *   The invoice to complete.
      * @param Source $source
      *   The source object for which this invoice was created.
-     * @param \Siel\Acumulus\Web\Result $result
+     * @param \Siel\Acumulus\ApiClient\Result $result
      *   A Result object where local errors and warnings can be added.
      *
      * @return array
@@ -1132,7 +1132,7 @@ class Completor
      * @return float[]
      *   Actual type will be string[] containing strings representing floats.
      *
-     * @see \Siel\Acumulus\Web\Acumulus::getVatInfo().
+     * @see \Siel\Acumulus\ApiClient\Acumulus::getVatInfo().
      */
     protected function getVatRatesByCountryAndDate($countryCode, $date = null)
     {

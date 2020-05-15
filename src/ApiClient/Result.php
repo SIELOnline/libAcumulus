@@ -1,5 +1,5 @@
 <?php
-namespace Siel\Acumulus\Web;
+namespace Siel\Acumulus\ApiClient;
 
 use RuntimeException;
 use Siel\Acumulus\Api;

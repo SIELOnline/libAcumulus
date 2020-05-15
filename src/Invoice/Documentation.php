@@ -16,7 +16,7 @@
  *   invoice structure based on a {@see Source}.
  * - {@see Completor}: The class that completes the Acumulus invoice structure
  *   given a raw version as created by the {@see Creator}.
- * - {@see Result}: An extension of the Web {@see Siel\Acumulus\Web\Result}
+ * - {@see Result}: An extension of the ApiClient {@see Siel\Acumulus\ApiClient\Result}
  *   class with additional methods specific for handling the result of sending
  *   an Invoice over the Acumulus API.
  *

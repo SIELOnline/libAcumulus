@@ -2,7 +2,7 @@
 namespace Siel\Acumulus\Helpers;
 
 /**
- * Contains translations for classes in the \Siel\Acumulus\Web namespace.
+ * Contains translations for classes in the \Siel\Acumulus\ApiClient namespace.
  */
 class SeverityTranslations extends TranslationCollection
 {

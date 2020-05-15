@@ -9,8 +9,8 @@ use Siel\Acumulus\Helpers\FormHelper;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Tag;
-use Siel\Acumulus\Web\Result;
-use Siel\Acumulus\Web\Acumulus;
+use Siel\Acumulus\ApiClient\Result;
+use Siel\Acumulus\ApiClient\Acumulus;
 use Siel\Acumulus\Helpers\Severity;
 
 /**
@@ -18,20 +18,20 @@ use Siel\Acumulus\Helpers\Severity;
  */
 abstract class BaseConfigForm extends Form
 {
-    /** @var \Siel\Acumulus\Web\Acumulus */
+    /** @var \Siel\Acumulus\ApiClient\Acumulus */
     protected $acumulusApiClient;
 
     /**
      * About API call result.
      *
-     * @var \Siel\Acumulus\Web\Result
+     * @var \Siel\Acumulus\ApiClient\Result
      */
     protected $about;
 
     /**
      * Constructor.
      *
-     * @param \Siel\Acumulus\Web\Acumulus $acumulusApiClient
+     * @param \Siel\Acumulus\ApiClient\Acumulus $acumulusApiClient
      * @param \Siel\Acumulus\Helpers\FormHelper $formHelper
      * @param \Siel\Acumulus\Config\ShopCapabilities $shopCapabilities
      * @param \Siel\Acumulus\Config\Config $config
@@ -227,7 +227,7 @@ abstract class BaseConfigForm extends Form
      * - Some picklist items contain an altenative/additional description in the
      *   3rd entry.
      *
-     * @param \Siel\Acumulus\Web\Result $picklist
+     * @param \Siel\Acumulus\ApiClient\Result $picklist
      *   The picklist result structure.
      * @param string|null $emptyValue
      *   The value to use for an empty selection.

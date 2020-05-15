@@ -15,8 +15,8 @@ use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Invoice\Translations as InvoiceTranslations;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Helpers\Message;
-use Siel\Acumulus\Web\Result;
-use Siel\Acumulus\Web\Acumulus;
+use Siel\Acumulus\ApiClient\Result;
+use Siel\Acumulus\ApiClient\Acumulus;
 use Siel\Acumulus\Helpers\Severity;
 
 /**
@@ -58,7 +58,7 @@ class InvoiceStatusForm extends Form
     /** @var \Siel\Acumulus\Helpers\Container*/
     protected $container;
 
-    /** @var \Siel\Acumulus\Web\Acumulus */
+    /** @var \Siel\Acumulus\ApiClient\Acumulus */
     protected $acumulusApiClient;
 
     /** @var \Siel\Acumulus\Shop\InvoiceManager */
@@ -95,7 +95,7 @@ class InvoiceStatusForm extends Form
      * @param \Siel\Acumulus\Shop\InvoiceManager $invoiceManager
      * @param \Siel\Acumulus\Shop\AcumulusEntryManager $acumulusEntryManager
      * @param \Siel\Acumulus\Helpers\Container $container
-     * @param \Siel\Acumulus\Web\Acumulus $acumulusApiClient
+     * @param \Siel\Acumulus\ApiClient\Acumulus $acumulusApiClient
      * @param \Siel\Acumulus\Helpers\FormHelper $formHelper
      * @param \Siel\Acumulus\Config\ShopCapabilities $shopCapabilities
      * @param \Siel\Acumulus\Config\Config $config
@@ -560,7 +560,7 @@ class InvoiceStatusForm extends Form
      *   Keyed array with keys:
      *   - status (string): 1 of the ShopOrderOverviewForm::Status_ constants.
      *   - send-status (string): 1 of the ShopOrderOverviewForm::Invoice_ constants.
-     *   - result (\Siel\Acumulus\Web\Result?): result of the getEntry API call.
+     *   - result (\Siel\Acumulus\ApiClient\Result?): result of the getEntry API call.
      *   - entry (array|null): the <entry> part of the getEntry API call.
      *   - statusField (array): a form field array representing the status.
      */
@@ -736,7 +736,7 @@ class InvoiceStatusForm extends Form
      * Returns additional form fields to show when the invoice has been sent but
      * a communication error occurred in retrieving the entry.
      *
-     * @param \Siel\Acumulus\Web\Result $result
+     * @param \Siel\Acumulus\ApiClient\Result $result
      *   The result that details the error.
      *
      * @return array[]

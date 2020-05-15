@@ -1,10 +1,10 @@
 <?php
-namespace Siel\Acumulus\Web;
+namespace Siel\Acumulus\ApiClient;
 
 use Siel\Acumulus\Helpers\TranslationCollection;
 
 /**
- * Contains translations for classes in the \Siel\Acumulus\Web namespace.
+ * Contains translations for classes in the \Siel\Acumulus\ApiClient namespace.
  */
 class Translations extends TranslationCollection
 {

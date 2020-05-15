@@ -27,6 +27,7 @@ Features:
 Refactorings:
 - Added some unit tests for basic classes in the Web namespace. As a consequence
   a lot of classes and methods were moved, renamed, or split:
+- Renamed Web namespace to ApiClient.
 - Renamed Service to Acumulus and parameters/properties/variables for this type
   to acumulusApiClient.
 - Introduced an interface Helpers/Severity, defining constants for severity and

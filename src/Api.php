@@ -31,7 +31,7 @@ interface Api
     const Status_Errors = 1;
     const Status_Exception = 3;
 
-    // Web service related defaults.
+    // ApiClient service related defaults.
     const baseUri = 'https://api.sielsystems.nl/acumulus';
     const testUri = 'https://ng1.sielsystems.nl';
     const apiVersion = 'stable';

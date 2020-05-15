@@ -99,7 +99,7 @@ abstract class InvoiceManager
     /**
      * Returns an Acumulus api-client instance.
      *
-     * @return \Siel\Acumulus\Web\Acumulus
+     * @return \Siel\Acumulus\ApiClient\Acumulus
      */
     protected function getAcumulusApiClient()
     {

@@ -1,7 +1,7 @@
 <?php
 /**
- * The Web namespace handles the external communication with the Acumulus API
- * and contains the following classes:
+ * The ApiClient namespace handles the external communication with the Acumulus
+ * API and contains the following classes:
  * - {@see Acumulus}: Provides abstracted access to the Acumulus API methods.
  * - {@see Result}: Contains the result of a service call: the actual response
  *   and any other information like the status, exceptions, error messages, and
@@ -13,4 +13,4 @@
  * When implementing a new extension, you should not have to override any of the
  * classes in this namespace.
  */
-namespace Siel\Acumulus\Web;
+namespace Siel\Acumulus\ApiClient;

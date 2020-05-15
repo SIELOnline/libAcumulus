@@ -69,7 +69,7 @@ use Siel\Acumulus\PluginConfig;
  * At whatever level you are overriding classes from this library, you always
  * have to place them in the same sub namespace as where they are placed in this
  * library. That is, in 1 of the namespaces Config, Helpers, Invoice, or Shop.
- * Note that there should be no need to override classes in Web.
+ * Note that there should be no need to override classes in ApiClient.
  *
  * If you do no want to use \Siel\Acumulus as starting part of your namespace,
  * you may replace Siel by your own vendor name and/or your department name, but
@@ -318,32 +318,32 @@ class Container
     }
 
     /**
-     * @return \Siel\Acumulus\Web\Acumulus
+     * @return \Siel\Acumulus\ApiClient\Acumulus
      */
     public function getAcumulusApiClient()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('Acumulus', 'Web', array($this->getCommunicator(), $this->getConfig(), $this->getTranslator()));
+        return $this->getInstance('Acumulus', 'ApiClient', array($this->getCommunicator(), $this->getConfig(), $this->getTranslator()));
     }
 
     /**
-     * Creates and returns a new \Siel\Acumulus\Web\Result instance.
+     * Creates and returns a new \Siel\Acumulus\ApiClient\Result instance.
      *
-     * @return \Siel\Acumulus\Web\Result
+     * @return \Siel\Acumulus\ApiClient\Result
      */
     public function getResult()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('Result', 'Web', array($this->getTranslator()), true);
+        return $this->getInstance('Result', 'ApiClient', array($this->getTranslator()), true);
     }
 
     /**
-     * @return \Siel\Acumulus\Web\Communicator
+     * @return \Siel\Acumulus\ApiClient\Communicator
      */
     public function getCommunicator()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('Communicator', 'Web', array($this, $this->getConfig(), $this->getTranslator(), $this->getLog()));
+        return $this->getInstance('Communicator', 'ApiClient', array($this, $this->getConfig(), $this->getTranslator(), $this->getLog()));
     }
 
     /**

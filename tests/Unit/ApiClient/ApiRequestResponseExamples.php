@@ -1,5 +1,5 @@
 <?php
-namespace Siel\Acumulus\Unit\Web;
+namespace Siel\Acumulus\Unit\ApiClient;
 
 class ApiRequestResponseExamples
 {

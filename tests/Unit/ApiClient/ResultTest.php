@@ -1,13 +1,13 @@
 <?php /** @noinspection PhpDocSignatureInspection */
-namespace Siel\Acumulus\Unit\Web;
+namespace Siel\Acumulus\Unit\ApiClient;
 
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Helpers\SeverityTranslations;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Helpers\Message;
-use Siel\Acumulus\Web\Result;
+use Siel\Acumulus\ApiClient\Result;
 use Siel\Acumulus\Helpers\Severity;
-use Siel\Acumulus\Web\Translations;
+use Siel\Acumulus\ApiClient\Translations;
 
 /**
  * A Result has the following features:

@@ -3,7 +3,7 @@ namespace Siel\Acumulus\Invoice;
 
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Helpers\Message;
-use Siel\Acumulus\Web\Result as WebResult;
+use Siel\Acumulus\ApiClient\Result as WebResult;
 use Siel\Acumulus\Helpers\Severity;
 
 /**

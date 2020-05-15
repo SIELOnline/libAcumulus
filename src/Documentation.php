@@ -49,7 +49,7 @@
  * - {@see \Siel\Acumulus\Invoice}: invoice handling related classes.
  * - {@see \Siel\Acumulus\Shop}: Entity handling, form handling, and managing
  *   (controller like) classes.
- * - {@see \Siel\Acumulus\Web}: web service and communication related classes.
+ * - {@see \Siel\Acumulus\ApiClient}: web service and communication related classes.
  *
  * More detail about these sub namespaces and their classes can be found in the
  * documentation per sub-namespace or per class.
@@ -125,7 +125,7 @@
  *   completion phases.
  * - Invoice sending: when the invoice is completed, it is sent by the
  *   {@see \Siel\Acumulus\Shop\InvoiceManager} that uses the
- *   {@see \Siel\Acumulus\Web\Acumulus} for the actual communication.
+ *   {@see \Siel\Acumulus\ApiClient\Acumulus} for the actual communication.
  * - Result handling: when the invoice is sent, the results are processed. if
  *   sending it was successful, an {@see \Siel\Acumulus\Shop\AcumulusEntry}
  *   record is stored to prevent sending it again, if not a mail is sent

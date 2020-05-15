@@ -1,5 +1,5 @@
 <?php
-namespace Siel\Acumulus\Web;
+namespace Siel\Acumulus\ApiClient;
 
 use DOMDocument;
 use DOMElement;
@@ -81,13 +81,13 @@ class Communicator
      *   API functions do, do the default is true, but for some general listing
      *   functions, like vat info, it is optional, and for signUp, it is even
      *   not allowed.
-     * @param \Siel\Acumulus\Web\Result $result
+     * @param \Siel\Acumulus\ApiClient\Result $result
      *   It is possible to already create a Result object before calling the
      *   api-client to store local messages. By passing this Result object these
      *   local messages will be merged with any remote messages in the returned
      *   Result object.
      *
-     * @return \Siel\Acumulus\Web\Result
+     * @return \Siel\Acumulus\ApiClient\Result
      *   A Result object containing the results.
      */
     public function callApiFunction($apiFunction, array $message, $needContract = true, Result $result = null)
@@ -178,10 +178,10 @@ class Communicator
      *   The URI of the Acumulus WebAPI call to send the message to.
      * @param array $message
      *   The message to send to the Acumulus WebAPI.
-     * @param \Siel\Acumulus\Web\Result $result
+     * @param \Siel\Acumulus\ApiClient\Result $result
      *   The result structure to add the results to.
      *
-     * @return \Siel\Acumulus\Web\Result
+     * @return \Siel\Acumulus\ApiClient\Result
      *   The result of the web service call.
      *
      * @see https://www.siel.nl/acumulus/API/Basic_Response/ For the
@@ -243,7 +243,7 @@ class Communicator
      * @param array|string $post
      *   An array of values to be placed in the POST body or an url-encoded
      *   string that contains all the POST values
-     * @param \Siel\Acumulus\Web\Result $result
+     * @param \Siel\Acumulus\ApiClient\Result $result
      *   The result structure to add the results to.
      *
      * @return string

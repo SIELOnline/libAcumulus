@@ -1,5 +1,5 @@
 <?php
-namespace Siel\Acumulus\Web;
+namespace Siel\Acumulus\ApiClient;
 
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
@@ -16,7 +16,7 @@ use Siel\Acumulus\Helpers\Translator;
  * - https://www.siel.nl/acumulus/API/
  * - http://www.siel.nl/acumulus/koppelingen/
  *
- * The Web API call wrappers return their information as a keyed array, which is
+ * The ApiClient API call wrappers return their information as a keyed array, which is
  * a simplified version of the call specific part of the response structure.
  */
 class Acumulus
@@ -63,7 +63,7 @@ class Acumulus
     /**
      * Retrieve the about information.
      *
-     * @return \Siel\Acumulus\Web\Result
+     * @return \Siel\Acumulus\ApiClient\Result
      *   The result of the webservice call. The structured response will contain
      *   1 "about" array, being a keyed array with keys:
      *   - about: General name for the API.
@@ -91,7 +91,7 @@ class Acumulus
     /**
      * Retrieves a list of accounts.
      *
-     * @return \Siel\Acumulus\Web\Result
+     * @return \Siel\Acumulus\ApiClient\Result
      *   The result of the webservice call. The structured response will contain
      *   a non-keyed array of "account" arrays, each "account" array being a
      *   keyed array with keys:
@@ -109,7 +109,7 @@ class Acumulus
     /**
      * Retrieves a list of contact types.
      *
-     * @return \Siel\Acumulus\Web\Result
+     * @return \Siel\Acumulus\ApiClient\Result
      *   The result of the webservice call. The structured response will contain
      *   a non-keyed array of "contacttype" arrays, each "contacttype" array
      *   being a keyed array with keys:
@@ -126,7 +126,7 @@ class Acumulus
     /**
      * Retrieves a list of cost centers.
      *
-     * @return \Siel\Acumulus\Web\Result
+     * @return \Siel\Acumulus\ApiClient\Result
      *   The result of the webservice call. The structured response will contain
      *   a non-keyed array of "costcenter" arrays, each "costcenter" array being
      *   a keyed array with keys:
@@ -143,7 +143,7 @@ class Acumulus
     /**
      * Retrieves a list of cost headings.
      *
-     * @return \Siel\Acumulus\Web\Result
+     * @return \Siel\Acumulus\ApiClient\Result
      *   The result of the webservice call. The structured response will contain
      *   a non-keyed array of "costheading" arrays, each "costheading" array being
      *   a keyed array with keys:
@@ -162,7 +162,7 @@ class Acumulus
     /**
      * Retrieves a list of invoice templates.
      *
-     * @return \Siel\Acumulus\Web\Result
+     * @return \Siel\Acumulus\ApiClient\Result
      *   The result of the webservice call. The structured response will contain
      *   a non-keyed array of "invoicetemplate" arrays, each "invoicetemplate"
      *   array being a keyed array with keys:
@@ -179,7 +179,7 @@ class Acumulus
     /**
      * Retrieves a list of VAT types.
      *
-     * @return \Siel\Acumulus\Web\Result
+     * @return \Siel\Acumulus\ApiClient\Result
      *   The result of the webservice call. The structured response will contain
      *   a non-keyed array of "vattype" arrays, each "vattype" array being a
      *   keyed array with keys:
@@ -206,7 +206,7 @@ class Acumulus
      *   The picklist to retrieve, specify in plural form: accounts,
      *   contacttypes, costcenters, etc.
      *
-     * @return \Siel\Acumulus\Web\Result
+     * @return \Siel\Acumulus\ApiClient\Result
      *   The result of the webservice call. The structured response will contain
      *   a non-keyed array of "picklist" arrays, each 'picklist' array being a
      *   keyed array with keys that depend on the requested picklist.
@@ -226,7 +226,7 @@ class Acumulus
      * @param string $date
      *   ISO date string (yyyy-mm-dd) for the date to retrieve the VAT info for.
      *
-     * @return \Siel\Acumulus\Web\Result
+     * @return \Siel\Acumulus\ApiClient\Result
      *   The result of the webservice call. The structured response will contain
      *   a non-keyed array of "vatinfo" arrays, each 'vatinfo' array being a
      *   keyed array with keys:
@@ -253,13 +253,13 @@ class Acumulus
      *
      * @param array $invoice
      *   The invoice to send.
-     * @param \Siel\Acumulus\Web\Result|null $result
+     * @param \Siel\Acumulus\ApiClient\Result|null $result
      *   It is possible to already create a Result object before calling this
      *   api-client to store local messages. By passing this Result object these
      *   local messages will be merged with any remote messages in the returned
      *   Result object.
      *
-     * @return \Siel\Acumulus\Web\Result
+     * @return \Siel\Acumulus\ApiClient\Result
      * The Result of the webservice call. A successful call will contain a
      * response array with key:
      * - invoice: an array of information about the created invoice, being an
@@ -282,7 +282,7 @@ class Acumulus
      * @param int $conceptId
      *   The id of the concept.
      *
-     * @return \Siel\Acumulus\Web\Result
+     * @return \Siel\Acumulus\ApiClient\Result
      *   The result of the webservice call. The structured response will contain
      *   1 "concept" array, being a keyed array with keys:
      *   - conceptid: int
@@ -309,7 +309,7 @@ class Acumulus
      * @param int $entryId
      *   The id of the entry.
      *
-     * @return \Siel\Acumulus\Web\Result
+     * @return \Siel\Acumulus\ApiClient\Result
      *   The result of the webservice call. The structured response will contain
      *   1 "entry" array, being a keyed array with keys:
      *   - entryid
@@ -361,7 +361,7 @@ class Acumulus
      *   API::Entry_UnDelete constants. API::Entry_UnDelete does not work for
      *   now.
      *
-     * @return \Siel\Acumulus\Web\Result
+     * @return \Siel\Acumulus\ApiClient\Result
      *   The result of the webservice call. The structured response will contain
      *   1 "entry" array, being a keyed array with keys:
      *   - entryid
@@ -391,7 +391,7 @@ class Acumulus
      * @param string $token
      *   The token for the invoice.
      *
-     * @return \Siel\Acumulus\Web\Result
+     * @return \Siel\Acumulus\ApiClient\Result
      *   The result of the webservice call. The structured response will contain
      *   1 "invoice" array, being a keyed array with keys:
      *   - entryid
@@ -426,7 +426,7 @@ class Acumulus
      *   ISO date string (yyyy-mm-dd) for the date to set as payment date, may
      *   be empty for today or if the payment sattus is API::PaymentStatus_Due.
      *
-     * @return \Siel\Acumulus\Web\Result
+     * @return \Siel\Acumulus\ApiClient\Result
      *   The result of the webservice call. The structured response will contain
      *   1 "invoice" array, being a keyed array with keys:
      *   - entryid
@@ -474,7 +474,7 @@ class Acumulus
      *   tabs. Contents is placed in notes/comments section of the invoice.
      *   Content will not appear on the actual invoice or associated emails.
      *
-     * @return \Siel\Acumulus\Web\Result
+     * @return \Siel\Acumulus\ApiClient\Result
      *   The result of the webservice call. The structured response will contain
      *   1 "invoice" array, being a keyed array with keys:
      *   - token
@@ -579,7 +579,7 @@ class Acumulus
      *     request. If filled, a ticket will be opened with the notes as
      *     content, so can be used as a request for comment by customer support.
      *
-     * @return \Siel\Acumulus\Web\Result
+     * @return \Siel\Acumulus\ApiClient\Result
      *   The result of the webservice call. The structured response will contain
      *   1 "signup" array, being a keyed array with keys:
      *   - contractcode

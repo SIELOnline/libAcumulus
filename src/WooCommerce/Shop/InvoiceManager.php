@@ -1,4 +1,6 @@
 <?php
+/** @noinspection SqlNoDataSourceInspection */
+
 namespace Siel\Acumulus\WooCommerce\Shop;
 
 use DateTime;
@@ -45,7 +47,6 @@ class InvoiceManager extends BaseInvoiceManager
     {
         // We use our own query here as defining a range of post ids based on a
         // between does not seem to be possible with the query syntax.
-        /** @var \wpdb $wpdb */
         global $wpdb;
         $key = 'ID';
         /** @noinspection SqlResolve */

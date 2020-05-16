@@ -112,6 +112,8 @@ class Source extends BaseSource
      * @return int
      *   \Siel\Acumulus\Api::PaymentStatus_Paid or
      *   \Siel\Acumulus\Api::PaymentStatus_Due
+     *
+     * @noinspection PhpUnused Called via callTypeSpecificMethod().
      */
     protected function getPaymentStatusCreditNote()
     {

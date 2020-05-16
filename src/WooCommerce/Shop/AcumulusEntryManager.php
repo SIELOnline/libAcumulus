@@ -61,12 +61,12 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
             'meta_compare' => '=',
         );
         $query = new WP_Query();
-        $posts = $query->query($query);
+        $posts = $query->query($metaQuery);
         $result = array();
         foreach ($posts as $post) {
-            $result1 = get_post_meta($post->id);
+            $result1 = get_post_meta($post->ID);
             $result1[static::$keySourceType] = $this->shopTypeToSourceType($post->post_type);
-            $result1[static::$keySourceId] = $post->id;
+            $result1[static::$keySourceId] = $post->ID;
             $result[] = $result1;
         }
         return $this->convertDbResultToAcumulusEntries($result);

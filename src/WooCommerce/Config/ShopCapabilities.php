@@ -18,14 +18,13 @@ class ShopCapabilities extends ShopCapabilitiesBase
     {
         global $wp_version, $woocommerce;
         /** @var \WooCommerce $woocommerce */
-        $environment = array(
-            // Lazy load is no longer needed (as in L3) as this method will only be
-            // called when the config gets actually queried.
-            'moduleVersion' => Acumulus::create()->getVersionNumber(),
-            'shopName' => $this->shopName,
-            'shopVersion' => (isset($woocommerce) ? $woocommerce->version : 'unknown') . ' (WordPress: ' . $wp_version . ')',
-        );
-        return $environment;
+      return array(
+          // Lazy load is no longer needed (as in L3) as this method will only be
+          // called when the config gets actually queried.
+          'moduleVersion' => Acumulus::create()->getVersionNumber(),
+          'shopName' => $this->shopName,
+          'shopVersion' => (isset($woocommerce) ? $woocommerce->version : 'unknown') . ' (WordPress: ' . $wp_version . ')',
+      );
     }
 
     /**

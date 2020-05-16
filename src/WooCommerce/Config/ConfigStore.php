@@ -13,8 +13,7 @@ class ConfigStore extends BaSeConfigStore
      */
     public function load()
     {
-        $values = get_option('acumulus');
-        return $values;
+      return get_option('acumulus');
     }
 
     /**

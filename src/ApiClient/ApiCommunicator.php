@@ -112,7 +112,7 @@ class ApiCommunicator
             $result->addMessage($e);
         }
 
-        $this->log->debug("Communicator::callApiFunction() uri=%s\n%s",
+        $this->log->debug("ApiCommunicator::callApiFunction() uri=%s\n%s",
             $uri,
             implode("\n", $result->formatMessages(Message::Format_Plain, Severity::Log))
         );

@@ -384,13 +384,14 @@ abstract class Mailer
         // warnings or severer messages, thus not with notices.
         $addReqResp = $pluginSettings['debug'] === PluginConfig::Send_SendAndMailOnError ? Result::AddReqResp_WithOther : Result::AddReqResp_Always;
         if ($addReqResp === Result::AddReqResp_Always || ($addReqResp === Result::AddReqResp_WithOther && $result->getStatus() >= Severity::Warning)) {
-            $rawRequest = $result->getByCodeTag(Result::CodeTagRawRequest);
-            $rawResponse = $result->getByCodeTag(Result::CodeTagRawResponse);
-            if ($rawRequest !== null || $rawResponse !== null) {
+            $logMessages = new MessageCollection($this->translator);
+            $logMessages->addMessage($result->getByCodeTag(Result::CodeTagRawRequest))
+                        ->addMessage($result->getByCodeTag(Result::CodeTagRawResponse));
+            if (!empty($logMessages->getMessages())) {
                 $header = $this->t('mail_support_header');
                 $description = $this->t('mail_support_desc');
-                $supportMessagesText = $result->formatMessages(Message::Format_PlainList, Severity::Log);
-                $supportMessagesHtml = $result->formatMessages(Message::Format_HtmlList, Severity::Log);
+                $supportMessagesText = $logMessages->formatMessages(Message::Format_PlainList);
+                $supportMessagesHtml = $logMessages->formatMessages(Message::Format_HtmlList);
                 $messages = array(
                     'text' => "\n$header\n\n$description\n\n$supportMessagesText\n",
                     'html' => "<details><summary>$header</summary><p>$description</p>$supportMessagesHtml</details>",

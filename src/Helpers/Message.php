@@ -273,6 +273,7 @@ class Message
         $messageText = $this->getText();
         if ($isHtml) {
             $messageText = '<span>' .  htmlspecialchars($messageText, ENT_NOQUOTES) . '</span>';
+            $messageText = nl2br($messageText, false);
         }
         $text .= $messageText;
 

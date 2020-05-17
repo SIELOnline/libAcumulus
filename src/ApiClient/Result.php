@@ -23,8 +23,8 @@ use Siel\Acumulus\Helpers\Translator;
 class Result extends MessageCollection
 {
     // Code tags for raw request and response
-    const CodeTagRawRequest = 'request';
-    const CodeTagRawResponse = 'response';
+    const CodeTagRawRequest = 'Request';
+    const CodeTagRawResponse = 'Response';
 
     /** @var \Siel\Acumulus\Helpers\Translator */
     protected $translator;

@@ -28,8 +28,11 @@ Refactorings:
 - Added some unit tests for basic classes in the Web namespace. As a consequence
   a lot of classes and methods were moved, renamed, or split:
 - Renamed Web namespace to ApiClient.
-- Renamed Service to Acumulus and parameters/properties/variables for this type
-  to acumulusApiClient.
+- Renamed class Service to Acumulus and parameters/properties/variables for this
+  type to acumulusApiClient.
+- Split class Communicator into ApiCommunicator and HttpCommunicator. This gives
+  us a better separation of concerns and testability as we can more easily mock
+  http communication.
 - Introduced an interface Helpers/Severity, defining constants for severity and
   log levels, replacing similar constants from both Helpers/Log and Web/Result.
 - Introduced a Helpers/Message class that wraps a Message (internal message, API

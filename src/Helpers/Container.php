@@ -323,7 +323,7 @@ class Container
     public function getAcumulusApiClient()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('Acumulus', 'ApiClient', array($this->getCommunicator(), $this->getConfig(), $this->getTranslator()));
+        return $this->getInstance('Acumulus', 'ApiClient', array($this->getApiCommunicator(), $this->getConfig(), $this->getTranslator()));
     }
 
     /**
@@ -338,12 +338,21 @@ class Container
     }
 
     /**
-     * @return \Siel\Acumulus\ApiClient\Communicator
+     * @return \Siel\Acumulus\ApiClient\ApiCommunicator
      */
-    public function getCommunicator()
+    public function getApiCommunicator()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('Communicator', 'ApiClient', array($this, $this->getConfig(), $this->getTranslator(), $this->getLog()));
+        return $this->getInstance('ApiCommunicator', 'ApiClient', array($this->getHttpCommunicator(), $this, $this->getConfig(), $this->getTranslator(), $this->getLog()));
+    }
+
+    /**
+     * @return \Siel\Acumulus\ApiClient\HttpCommunicator
+     */
+    public function getHttpCommunicator()
+    {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return $this->getInstance('HttpCommunicator', 'ApiClient', array());
     }
 
     /**

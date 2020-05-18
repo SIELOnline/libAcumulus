@@ -17,7 +17,7 @@ use Siel\Acumulus\PluginConfig;
  *   will be instantiated and returned. See below how this is done.
  * * Container::getInstance() is the weakly typed instance getting method, but
  *   for almost all known classes in this library, a strongly typed getter is
- *   available as well. This getter also takes care of getting the constructor
+ *   available as well. These getters also takes care of getting the constructor
  *   arguments.
  * * By default only a single instance is created and this instance is returned
  *   on each subsequent request for an instance of that type. The strongly typed
@@ -94,7 +94,7 @@ use Siel\Acumulus\PluginConfig;
  * library to your specific situation.
  *
  * Most of these problems can be solved by reacting to one of the events
- * triggered by the Acumulus module. but f that turns out to be impossible, you
+ * triggered by the Acumulus module. but if that turns out to be impossible, you
  * can define another level of namespace searching by calling
  * {@see Container::setCustomNamespace()}. This will define 1 additional
  * namespace to look for before the above list as defined by the $shopNamespace
@@ -112,9 +112,14 @@ use Siel\Acumulus\PluginConfig;
 class Container
 {
     /**
-     * The base directory where the Acumulus library is located.
-     *
      * @var string
+     *   The base directory where the Acumulus library is located. This is used
+     *   to check if the file that should contain a class exists before calling
+     *   class_exists(). This is not a good practice and should only be done if
+     *   older auto loaders are used that generate errors or warnings if a class
+     *   is not found.
+     *
+     *   If this contains an empty value, no check will be performed.
      */
     protected $baseDir;
 
@@ -129,9 +134,8 @@ class Container
     protected $shopNamespace;
 
     /**
-     * The namespace for customisations on top of the current shop.
-     *
      * @var string
+     *   The namespace for customisations on top of the current shop.
      */
     protected $customNamespace = '';
 
@@ -142,9 +146,8 @@ class Container
     protected $baseTranslationsAdded = false;
 
     /**
-     * The language to display texts in.
-     *
      * @var string
+     *   The language to display texts in.
      */
     protected $language;
 
@@ -156,13 +159,11 @@ class Container
      *   classes. This does not have to start with Siel\Acumulus and must not
      *   start or end with a \.
      * @param string $language
-     *   A language or locale code, e.g. nl, nl-NL, or en-UK.
+     *   A language or locale code, e.g. nl, nl-NL, or en-UK. Only the first 2
+     *   characters will be used.
      */
-    public function __construct($shopNamespace, $language = 'nl')
+    public function __construct($shopNamespace, $language)
     {
-        // Base directory of libAcumulus is parent directory of this file's
-        // directory.
-        $this->baseDir =  dirname(__DIR__);
         $this->shopNamespace = '';
         if (strpos($shopNamespace, 'Acumulus') === false) {
             $this->shopNamespace = static::baseNamespace;
@@ -175,7 +176,8 @@ class Container
      * Sets the language code.
      *
      * @param string $language
-     *   A language or locale code, e.g. nl, nl-NL, or en-UK.
+     *   A language or locale code, e.g. nl, nl-NL, or en-UK. Only the first 2
+     *   characters will be used.
      *
      * @return $this
      */
@@ -198,11 +200,11 @@ class Container
      *
      * @param string $baseDir
      *
-     * @noinspection PhpUnused
+     * @noinspection PhpUnused Used in Magento1 module.
      */
-    public function setBaseDir($baseDir)
+    public function setBaseDir($baseDir = null)
     {
-        $this->baseDir = $baseDir;
+        $this->baseDir = $baseDir === null ? dirname(__DIR__) : $baseDir;
     }
 
     /**
@@ -640,10 +642,9 @@ class Container
     protected function tryNsInstance($class, $subNamespace, $namespace)
     {
         $fqClass = $this->getFqClass($class, $subNamespace, $namespace);
-        $fileName = $this->getFileName($fqClass);
         // Checking if the file exists prevents warnings in Magento whose own
         // autoloader logs warnings when a class cannot be loaded.
-        return is_readable($fileName) && class_exists($fqClass) ? $fqClass : '';
+        return (empty($this->baseDir) || is_readable($this->getFileName($fqClass))) && class_exists($fqClass) ? $fqClass : '';
     }
 
     /**

@@ -256,7 +256,6 @@ abstract class Mailer
      *
      * The body depends on:
      * - the result status.
-     * - the value of isSent (in the result object)
      * - whether the invoice was sent in test mode
      * - whether the invoice was sent as concept
      * - the emailAsPdf setting
@@ -280,7 +279,9 @@ abstract class Mailer
         switch ($invoiceSendResult->getStatus()) {
             case Severity::Exception:
                 $sentences[] = 'mail_body_exception';
-                $sentences[] = $invoiceSendResult->isSent() ? 'mail_body_exception_invoice_maybe_created' : 'mail_body_exception_invoice_not_created';
+                $sentences[] = $invoiceSendResult->getByCodeTag(Result::CodeTagRawRequest) !== null
+                    ? 'mail_body_exception_invoice_maybe_created'
+                    : 'mail_body_exception_invoice_not_created';
                 break;
             case Severity::Error:
                 $sentences[] = 'mail_body_errors';

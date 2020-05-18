@@ -43,12 +43,9 @@ class Result extends WebResult
 
     /**
      * @var int
-     *   A status indicating if and why an invoice was sent or not sent. It will
+     *   A status indicating if and why an invoice was or was not sent. It will
      *   contain 1 of the Result::Sent_... or Result::Invoice_NotSent_...
      *   constants.
-     *
-     *   Note that, unlike the parent property Result::isSent, this property is
-     *   at the application level, not at the API level.
      */
     protected $sendStatus;
 

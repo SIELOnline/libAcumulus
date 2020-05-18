@@ -16,7 +16,7 @@ use Siel\Acumulus\Helpers\Translator;
  * - any error messages, local and/or remote.
  * - any warnings, local and/or remote.
  * - any notices, local.
- * - message sent, for logging purposes.
+ * - (raw) message sent, for logging purposes.
  * - (raw) message received, for logging purposes.
  * - result array.
  */
@@ -28,14 +28,6 @@ class Result extends MessageCollection
 
     /** @var \Siel\Acumulus\Helpers\Translator */
     protected $translator;
-
-    /**
-     * @var bool
-     *   Whether the message was sent. This bool indicates whether curl_exec has
-     *   been called and thus if the service call may have arrived and may have
-     *   been processed at the server.
-     */
-    protected $isSent;
 
     /**
      * @var string|null
@@ -90,7 +82,6 @@ class Result extends MessageCollection
         parent::__construct($translator);
         $this->translator = $translator;
         $this->translator->add(new Translations());
-        $this->isSent = false;
         $this->apiStatus = null;
         $this->rawRequest = null;
         $this->rawResponse = null;
@@ -193,25 +184,6 @@ class Result extends MessageCollection
             default:
                 throw new RuntimeException(sprintf('Unknown api status %d', $apiStatus));
         }
-    }
-
-    /**
-     * @return bool
-     */
-    public function isSent()
-    {
-        return $this->isSent;
-    }
-
-    /**
-     * @param bool $isSent
-     *
-     * @return $this
-     */
-    public function setIsSent($isSent)
-    {
-        $this->isSent = $isSent;
-        return $this;
     }
 
     /**

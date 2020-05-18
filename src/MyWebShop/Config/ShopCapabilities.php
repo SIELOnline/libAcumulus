@@ -266,6 +266,17 @@ class ShopCapabilities extends ShopCapabilitiesBase
         return $result;
     }
 
+    public function getVatClasses()
+    {
+        // @todo: adapt to MyWebshop's way of retrieving the list of (active) tax classes.
+        $result = array();
+        $taxClasses = TaxRulesGroup::getTaxRulesGroups();
+        foreach ($taxClasses as $taxClass) {
+            $result[$taxClass['id']] = $taxClass['name'];
+        }
+        return $result;
+    }
+
     /**
      * {@inheritdoc}
      */

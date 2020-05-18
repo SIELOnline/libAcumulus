@@ -85,7 +85,7 @@ class Acumulus
      */
     public function getAbout()
     {
-        return $this->apiCommunicator->callApiFunction('general/general_about', array())->setMainResponseKey('general', false);
+        return $this->callApiFunction('general/general_about', array())->setMainResponseKey('general', false);
     }
 
     /**
@@ -215,7 +215,7 @@ class Acumulus
     {
         // For picklists, the main result is found under the name of the
         // picklist but in singular form, i.e. without the s at the end.
-        return $this->apiCommunicator->callApiFunction("picklists/picklist_$picklist", array())->setMainResponseKey($picklist, true);
+        return $this->callApiFunction("picklists/picklist_$picklist", array())->setMainResponseKey($picklist, true);
     }
 
     /**
@@ -245,7 +245,7 @@ class Acumulus
             'vatdate' => $date,
             'vatcountry' => $countryCode,
         );
-        return $this->apiCommunicator->callApiFunction('lookups/lookup_vatinfo', $message, true)->setMainResponseKey('vatinfo', true);
+        return $this->callApiFunction('lookups/lookup_vatinfo', $message, true)->setMainResponseKey('vatinfo', true);
     }
 
     /**
@@ -273,7 +273,7 @@ class Acumulus
      */
     public function invoiceAdd(array $invoice, Result $result = null)
     {
-        return $this->apiCommunicator->callApiFunction('invoices/invoice_add', $invoice, true, $result)->setMainResponseKey('invoice');
+        return $this->callApiFunction('invoices/invoice_add', $invoice, true, $result)->setMainResponseKey('invoice');
     }
 
     /**
@@ -300,7 +300,7 @@ class Acumulus
         $message = array(
             'conceptid' => (int) $conceptId,
         );
-        return $this->apiCommunicator->callApiFunction('invoices/invoice_concept_info', $message)->setMainResponseKey('concept');
+        return $this->callApiFunction('invoices/invoice_concept_info', $message)->setMainResponseKey('concept');
     }
 
     /**
@@ -348,7 +348,7 @@ class Acumulus
         $message = array(
             'entryid' => (int) $entryId,
         );
-        return $this->apiCommunicator->callApiFunction('entry/entry_info', $message)->setMainResponseKey('entry');
+        return $this->callApiFunction('entry/entry_info', $message)->setMainResponseKey('entry');
     }
 
     /**
@@ -382,7 +382,7 @@ class Acumulus
             'entryid' => (int) $entryId,
             'entrydeletestatus' => (int) $deleteStatus,
         );
-        return $this->apiCommunicator->callApiFunction('entry/entry_deletestatus_set', $message)->setMainResponseKey('entry');
+        return $this->callApiFunction('entry/entry_deletestatus_set', $message)->setMainResponseKey('entry');
     }
 
     /**
@@ -411,7 +411,7 @@ class Acumulus
         $message = array(
             'token' => (string) $token,
         );
-        return $this->apiCommunicator->callApiFunction('invoices/invoice_paymentstatus_get', $message)->setMainResponseKey('invoice');
+        return $this->callApiFunction('invoices/invoice_paymentstatus_get', $message)->setMainResponseKey('invoice');
     }
 
     /**
@@ -451,7 +451,7 @@ class Acumulus
             'paymentstatus' => (int) $paymentStatus,
             'paymentdate' => (string) $paymentDate,
         );
-        return $this->apiCommunicator->callApiFunction('invoices/invoice_paymentstatus_set', $message)->setMainResponseKey('invoice');
+        return $this->callApiFunction('invoices/invoice_paymentstatus_set', $message)->setMainResponseKey('invoice');
     }
 
     /**
@@ -499,7 +499,7 @@ class Acumulus
         if (!empty($invoiceNotes)) {
             $message['invoicenotes'] = (string) $invoiceNotes;
         }
-        return $this->apiCommunicator->callApiFunction('invoices/invoice_mail', $message)->setMainResponseKey('invoice');
+        return $this->callApiFunction('invoices/invoice_mail', $message)->setMainResponseKey('invoice');
     }
 
     /**
@@ -521,7 +521,7 @@ class Acumulus
      */
     public function getInvoicePdfUri($token, $applyGraphics = true)
     {
-        $uri = $this->apiCommunicator->getUri('invoices/invoice_get_pdf');
+        $uri = $this->getUri('invoices/invoice_get_pdf');
         $uri .= "?token=$token";
         if (!$applyGraphics) {
             $uri .= '&gfx=0';
@@ -545,7 +545,7 @@ class Acumulus
      */
     public function getPackingSlipUri($token)
     {
-        $uri = $this->apiCommunicator->getUri('delivery/packing_slip_get_pdf');
+        $uri = $this->getUri('delivery/packing_slip_get_pdf');
         $uri .= "?token=$token";
         return $uri;
     }
@@ -599,6 +599,48 @@ class Acumulus
         $message = array(
             'signup' => $signup,
         );
-        return $this->apiCommunicator->callApiFunction('signup/signup.php', $message, false)->setMainResponseKey('signup');
+        return $this->callApiFunction('signup/signup.php', $message, false)->setMainResponseKey('signup');
+    }
+
+    /**
+     * Wrapper around
+     * {@see \Siel\Acumulus\ApiClient\ApiCommunicator::getUri()}.
+     *
+     * @param string $apiFunction
+     *   The api service to get the uri for.
+     *
+     * @return string
+     *   The uri to the requested API call.
+     */
+    protected function getUri($apiFunction)
+    {
+        return $this->apiCommunicator->getUri($apiFunction);
+    }
+
+    /**
+     * Wrapper around
+     * {@see \Siel\Acumulus\ApiClient\ApiCommunicator::callApiFunction()}.
+     *
+     * @param string $apiFunction
+     *   The API function to invoke.
+     * @param array $message
+     *   The values to submit.
+     * @param bool $needContract
+     *   Indicates whether this api function needs the contract details. Most
+     *   API functions do, do the default is true, but for some general listing
+     *   functions, like vat info, it is optional, and for signUp, it is even
+     *   not allowed.
+     * @param \Siel\Acumulus\ApiClient\Result $result
+     *   It is possible to already create a Result object before calling the
+     *   api-client to store local messages. By passing this Result object these
+     *   local messages will be merged with any remote messages in the returned
+     *   Result object.
+     *
+     * @return \Siel\Acumulus\ApiClient\Result
+     *   A Result object containing the results.
+     */
+    protected function callApiFunction($apiFunction, array $message, $needContract = true, Result $result = null)
+    {
+        return $this->apiCommunicator->callApiFunction($apiFunction, $message, $needContract, $result);
     }
 }

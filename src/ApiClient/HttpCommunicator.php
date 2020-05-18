@@ -2,20 +2,19 @@
 namespace Siel\Acumulus\ApiClient;
 
 use RuntimeException;
-use Siel\Acumulus\Config\Config;
 
 /**
- * Communicator implements the communication with the Acumulus WebAPI.
+ * HttpCommunicator implements the communication with the Acumulus WebAPI at the
+ * https level.
  *
  * It offers:
- * - Conversion between array and XML.
- * - Conversion from Json to array.
- * - (https) Communication with the Acumulus webservice using the curl library:
+ * - Https communication with the Acumulus webservice using the curl library:
  *   setting up the connection, sending the request, receiving the response.
  * - Good error handling.
  */
 class HttpCommunicator
 {
+
     /**
      * Executes an http post request.
      *
@@ -24,15 +23,13 @@ class HttpCommunicator
      * @param array|string $post
      *   An array of values to be placed in the POST body or an url-encoded
      *   string that contains all the POST values
-     * @param \Siel\Acumulus\ApiClient\Result $result
-     *   The result structure to add the results to.
      *
      * @return string
      *  The response body from the HTTP response.
      *
      * @throws \RuntimeException
      */
-    public function post($uri, $post, Result $result)
+    public function post($uri, $post)
     {
         // Open a curl connection.
         $ch = curl_init();
@@ -64,7 +61,6 @@ class HttpCommunicator
         }
 
         // Send and receive over the curl connection.
-        $result->setIsSent(true);
         $response = curl_exec($ch);
         if ($response === false) {
             $this->raiseCurlError($ch, 'curl_exec()');

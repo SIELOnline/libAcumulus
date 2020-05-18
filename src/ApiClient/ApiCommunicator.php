@@ -21,9 +21,10 @@ use Siel\Acumulus\PluginConfig;
  * It offers:
  * - Conversion between array and XML.
  * - Conversion from Json to array.
- * - (https) Communication with the Acumulus webservice using the curl library:
- *   setting up the connection, sending the request, receiving the response.
- * - Good error handling.
+ * - Communicating with the Acumulus webservice using the
+ *   {@se HttpCommunicator}.
+ * - Good error handling, including detecting html responses from the proxy
+ *   before the actual web service.
  */
 class ApiCommunicator
 {
@@ -64,6 +65,7 @@ class ApiCommunicator
      * Returns the uri to the requested API call.
      *
      * @param string $apiFunction
+     *   The api service to get the uri for.
      *
      * @return string
      *   The uri to the requested API call.
@@ -189,6 +191,8 @@ class ApiCommunicator
      * @return \Siel\Acumulus\ApiClient\Result
      *   The result of the web service call.
      *
+     * @throws \RuntimeException
+     *
      * @see https://www.siel.nl/acumulus/API/Basic_Response/ For the
      *   structure of a response.
      */
@@ -198,7 +202,7 @@ class ApiCommunicator
         // The tagname is ignored by the Acumulus WebAPI.
         $message = $this->convertArrayToXml(['myxml' => $message]);
         $result->setRawRequest($message);
-        $rawResponse = $this->httpCommunicator->post($uri, ['xmlstring' => $message], $result);
+        $rawResponse = $this->httpCommunicator->post($uri, ['xmlstring' => $message]);
         $result->setRawResponse($rawResponse);
 
         if (empty($rawResponse)) {

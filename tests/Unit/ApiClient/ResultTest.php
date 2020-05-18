@@ -10,16 +10,18 @@ use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\ApiClient\Translations;
 
 /**
- * A Result has the following features:
+ * A Result has the following features that we want to test:
  * - (Raw) request:
  *   - set
  *   - password hiding
  *   - formatting for logging/notifying
- * - isSent
  * - (Raw) response
  *   - set raw response
+ *   - formatting for logging/notifying
  *   - set and simplify response
- *   - setting status
+ * - Status
+ *   - getting based on api status and severity
+ *   - getting textual description for it.
  */
 class ResultTest extends TestCase
 {
@@ -45,7 +47,6 @@ class ResultTest extends TestCase
         $this->assertEquals(Severity::Unknown, $result->getStatus());
         $this->assertEquals($this->t('request_not_yet_sent'), $result->getStatusText());
         $this->assertEquals(Severity::Unknown, $result->getSeverity());
-        $this->assertFalse($result->isSent());
         $this->assertCount(0, $result->getMessages());
         $this->assertFalse($result->hasRealMessages());
         $this->assertFalse($result->hasError());
@@ -57,20 +58,6 @@ class ResultTest extends TestCase
 
     /**
      * @depends testCreate
-     */
-    public function testIsSent(Result $result)
-    {
-        $result->setIsSent(false);
-        $this->assertFalse($result->isSent());
-
-        $result->setIsSent(true);
-        $this->assertTrue($result->isSent());
-
-        return $result;
-    }
-
-    /**
-     * @depends testIsSent
      */
     public function testSetRawRequest(Result $result)
     {
@@ -115,7 +102,6 @@ class ResultTest extends TestCase
     public function testResultWithError()
     {
         $result = new Result($this->translator);
-        $result->setIsSent(true);
         $result->setRawRequest($this->examples->getRequest(2));
         $result->setRawResponse($this->examples->getResponse(2));
         $result->setMainResponseKey('vatinfo', true)

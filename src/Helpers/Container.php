@@ -339,7 +339,7 @@ class Container
     public function getAcumulusApiClient()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('Acumulus', 'ApiClient', array($this->getApiCommunicator(), $this->getConfig()));
+        return $this->getInstance('Acumulus', 'ApiClient', array($this->getApiCommunicator(), $this, $this->getConfig()));
     }
 
     /**
@@ -359,7 +359,7 @@ class Container
     public function getApiCommunicator()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('ApiCommunicator', 'ApiClient', array($this->getHttpCommunicator(), $this, $this->getConfig(), $this->getLanguage(), $this->getLog()));
+        return $this->getInstance('ApiCommunicator', 'ApiClient', array($this->getHttpCommunicator(), $this->getConfig(), $this->getLanguage(), $this->getLog()));
     }
 
     /**

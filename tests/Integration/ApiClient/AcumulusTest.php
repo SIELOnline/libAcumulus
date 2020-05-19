@@ -21,8 +21,8 @@ class AcumulusTest extends TestCase
         // a real one here.
         $container = new Container('TestWebShop', 'nl');
         $httpCommunicator = new HttpCommunicator();
-        $apiCommunicator = new ApiCommunicator($httpCommunicator, $container, $container->getConfig(), $container->getLanguage(), $container->getLog());
-        $this->acumulusClient = new Acumulus($apiCommunicator, $container->getConfig());
+        $apiCommunicator = new ApiCommunicator($httpCommunicator, $container->getConfig(), $container->getLanguage(), $container->getLog());
+        $this->acumulusClient = new Acumulus($apiCommunicator, $container, $container->getConfig());
     }
 
     public function responseKeysProvider()

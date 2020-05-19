@@ -8,7 +8,6 @@ use LibXMLError;
 use RuntimeException;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
-use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Message;
 use Siel\Acumulus\Helpers\Severity;
@@ -30,9 +29,6 @@ class ApiCommunicator
     /** @var \Siel\Acumulus\ApiClient\HttpCommunicator */
     protected $httpCommunicator;
 
-    /** @var \Siel\Acumulus\Helpers\Container */
-    protected $container;
-
     /** @var \Siel\Acumulus\Config\Config */
     protected $config;
 
@@ -46,15 +42,13 @@ class ApiCommunicator
      * Communicator constructor.
      *
      * @param \Siel\Acumulus\ApiClient\HttpCommunicator $httpCommunicator
-     * @param \Siel\Acumulus\Helpers\Container $container
      * @param \Siel\Acumulus\Config\Config $config
      * @param string $language
      * @param \Siel\Acumulus\Helpers\Log $log
      */
-    public function __construct(HttpCommunicator $httpCommunicator, Container $container, Config $config, $language, Log $log)
+    public function __construct(HttpCommunicator $httpCommunicator, Config $config, $language, Log $log)
     {
         $this->httpCommunicator = $httpCommunicator;
-        $this->container = $container;
         $this->config = $config;
         $this->language = $language;
         $this->log = $log;
@@ -96,13 +90,9 @@ class ApiCommunicator
      * @return \Siel\Acumulus\ApiClient\Result
      *   A Result object containing the results.
      */
-    public function callApiFunction($apiFunction, array $message, $needContract = true, Result $result = null)
+    public function callApiFunction($apiFunction, array $message, $needContract, Result $result)
     {
-        if ($result === null) {
-            $result = $this->container->getResult();
-        }
         $uri = $this->getUri($apiFunction);
-
         try {
             $commonMessagePart = $this->getBasicSubmit($needContract);
             $message = array_merge($commonMessagePart, $message);

@@ -3,6 +3,7 @@ namespace Siel\Acumulus\ApiClient;
 
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Helpers\Container;
 
 /**
  * Provides an easy interface towards the different API calls of the Acumulus
@@ -24,6 +25,9 @@ class Acumulus
     /** @var \Siel\Acumulus\Config\Config */
     protected $config;
 
+    /** @var \Siel\Acumulus\Helpers\Container */
+    protected $container;
+
     /** @var ApiCommunicator */
     protected $apiCommunicator;
 
@@ -31,11 +35,13 @@ class Acumulus
      * Constructor.
      *
      * @param ApiCommunicator $apiCommunicator
+     * @param \Siel\Acumulus\Helpers\Container $container
      * @param \Siel\Acumulus\Config\Config $config
      */
-    public function __construct(ApiCommunicator $apiCommunicator, Config $config)
+    public function __construct(ApiCommunicator $apiCommunicator, Container $container, Config $config)
     {
         $this->config = $config;
+        $this->container = $container;
         $this->apiCommunicator = $apiCommunicator;
     }
 
@@ -582,6 +588,9 @@ class Acumulus
      */
     protected function callApiFunction($apiFunction, array $message, $needContract = true, Result $result = null)
     {
+        if ($result === null) {
+            $result = $this->container->getResult();
+        }
         return $this->apiCommunicator->callApiFunction($apiFunction, $message, $needContract, $result);
     }
 }

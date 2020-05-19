@@ -6,7 +6,7 @@ use Siel\Acumulus\Helpers\TranslationCollection;
 /**
  * Contains translations for classes in the \Siel\Acumulus\ApiClient namespace.
  */
-class Translations extends TranslationCollection
+class ResultTranslations extends TranslationCollection
 {
     protected $nl = array(
         'api_status_unknown' => 'Onbekende API status code %d',

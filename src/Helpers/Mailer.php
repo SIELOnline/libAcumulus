@@ -385,7 +385,7 @@ abstract class Mailer
         // warnings or severer messages, thus not with notices.
         $addReqResp = $pluginSettings['debug'] === PluginConfig::Send_SendAndMailOnError ? Result::AddReqResp_WithOther : Result::AddReqResp_Always;
         if ($addReqResp === Result::AddReqResp_Always || ($addReqResp === Result::AddReqResp_WithOther && $result->getStatus() >= Severity::Warning)) {
-            $logMessages = new MessageCollection($this->translator);
+            $logMessages = new MessageCollection();
             $logMessages->addMessage($result->getByCodeTag(Result::CodeTagRawRequest))
                         ->addMessage($result->getByCodeTag(Result::CodeTagRawResponse));
             if (!empty($logMessages->getMessages())) {

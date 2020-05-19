@@ -3,7 +3,6 @@ namespace Siel\Acumulus\ApiClient;
 
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
-use Siel\Acumulus\Helpers\Translator;
 
 /**
  * Provides an easy interface towards the different API calls of the Acumulus
@@ -16,16 +15,14 @@ use Siel\Acumulus\Helpers\Translator;
  * - https://www.siel.nl/acumulus/API/
  * - http://www.siel.nl/acumulus/koppelingen/
  *
- * The ApiClient API call wrappers return their information as a keyed array, which is
- * a simplified version of the call specific part of the response structure.
+ * The ApiClient API call wrappers return their information as a keyed array,
+ * which is a simplified version of the call specific part of the response
+ * structure.
  */
 class Acumulus
 {
     /** @var \Siel\Acumulus\Config\Config */
     protected $config;
-
-    /** @var \Siel\Acumulus\Helpers\Translator */
-    protected $translator;
 
     /** @var ApiCommunicator */
     protected $apiCommunicator;
@@ -35,29 +32,11 @@ class Acumulus
      *
      * @param ApiCommunicator $apiCommunicator
      * @param \Siel\Acumulus\Config\Config $config
-     * @param \Siel\Acumulus\Helpers\Translator $translator
      */
-    public function __construct(ApiCommunicator $apiCommunicator, Config $config, Translator $translator)
+    public function __construct(ApiCommunicator $apiCommunicator, Config $config)
     {
         $this->config = $config;
         $this->apiCommunicator = $apiCommunicator;
-        $this->translator = $translator;
-        $this->translator->add(new Translations());
-    }
-
-    /**
-     * Helper method to translate strings.
-     *
-     * @param string $key
-     *  The key to get a translation for.
-     *
-     * @return string
-     *   The translation for the given key or the key itself if no translation
-     *   could be found.
-     */
-    protected function t($key)
-    {
-        return $this->translator->get($key);
     }
 
     /**
@@ -503,6 +482,58 @@ class Acumulus
     }
 
     /**
+     * Signs up for a 30 day trial and receive credentials.
+     *
+     * @param array $signUp
+     *   An array with the fields:
+     *   - companyname (mandatory) Name of company to sign up.
+     *   - fullname (mandatory) Full name of person associated with company.
+     *   - loginname (mandatory) Preferred login name to be used as credentials
+     *     when logging in.
+     *   - gender (mandatory) Indication of gender. Used to predefine some
+     *     strings within Acumulus.
+     *     - F Female
+     *     - M Male
+     *     - X Neutral
+     *   - address (mandatory) Address including house number.
+     *   - postalcode (mandatory)
+     *   - city (mandatory)
+     *   - telephone
+     *   - bankaccount Preference is to use a valid IBAN-code so Acumulus can
+     *     improve preparation of the (trial) sign up.
+     *   - email (mandatory)
+     *   - createapiuser Include the creation of an additional user specifically
+     *     suited for API-usage.
+     *     - 0 Do not create additional user (default)
+     *     - 1 Generate additional user specifically suited for API-usage
+     *   - notes Notes or remarks which you would like to be part of the sign up
+     *     request. If filled, a ticket will be opened with the notes as
+     *     content, so can be used as a request for comment by customer support.
+     *
+     * @return \Siel\Acumulus\ApiClient\Result
+     *   The result of the webservice call. The structured response will contain
+     *   1 "signup" array, being a keyed array with keys:
+     *   - contractcode
+     *   - contractloginname
+     *   - contractpassword
+     *   - contractapiuserloginname
+     *   - contractapiuserpassword
+     *
+     *   Possible errors/warnings:
+     *
+     * @see https://www.siel.nl/acumulus/API/Sign_Up/Sign_Up/
+     *
+     * @noinspection PhpUnused
+     */
+    public function signUp(array $signUp)
+    {
+        $message = array(
+            'signup' => $signUp,
+        );
+        return $this->callApiFunction('signup/signup.php', $message, false)->setMainResponseKey('signup');
+    }
+
+    /**
      * Returns the uri to download the invoice PDF.
      *
      * @param string $token
@@ -548,58 +579,6 @@ class Acumulus
         $uri = $this->getUri('delivery/packing_slip_get_pdf');
         $uri .= "?token=$token";
         return $uri;
-    }
-
-    /**
-     * Signs up for a 30 day trial and receive credentials.
-     *
-     * @param array $signup
-     *   An array with the fields:
-     *   - companyname (mandatory) Name of company to sign up.
-     *   - fullname (mandatory) Full name of person associated with company.
-     *   - loginname (mandatory) Preferred login name to be used as credentials
-     *     when logging in.
-     *   - gender (mandatory) Indication of gender. Used to predefine some
-     *     strings within Acumulus.
-     *     - F Female
-     *     - M Male
-     *     - X Neutral
-     *   - address (mandatory) Address including house number.
-     *   - postalcode (mandatory)
-     *   - city (mandatory)
-     *   - telephone
-     *   - bankaccount Preference is to use a valid IBAN-code so Acumulus can
-     *     improve preparation of the (trial) sign up.
-     *   - email (mandatory)
-     *   - createapiuser Include the creation of an additional user specifically
-     *     suited for API-usage.
-     *     - 0 Do not create additional user (default)
-     *     - 1 Generate additional user specifically suited for API-usage
-     *   - notes Notes or remarks which you would like to be part of the sign up
-     *     request. If filled, a ticket will be opened with the notes as
-     *     content, so can be used as a request for comment by customer support.
-     *
-     * @return \Siel\Acumulus\ApiClient\Result
-     *   The result of the webservice call. The structured response will contain
-     *   1 "signup" array, being a keyed array with keys:
-     *   - contractcode
-     *   - contractloginname
-     *   - contractpassword
-     *   - contractapiuserloginname
-     *   - contractapiuserpassword
-     *
-     *   Possible errors/warnings:
-     *
-     * @see https://www.siel.nl/acumulus/API/Sign_Up/Sign_Up/
-     *
-     * @noinspection PhpUnused
-     */
-    public function signUp(array $signup)
-    {
-        $message = array(
-            'signup' => $signup,
-        );
-        return $this->callApiFunction('signup/signup.php', $message, false)->setMainResponseKey('signup');
     }
 
     /**

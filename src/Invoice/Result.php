@@ -1,7 +1,6 @@
 <?php
 namespace Siel\Acumulus\Invoice;
 
-use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Helpers\Message;
 use Siel\Acumulus\ApiClient\Result as WebResult;
 use Siel\Acumulus\Helpers\Severity;
@@ -39,8 +38,6 @@ class Result extends WebResult
     const Send_LockExpired = 0x40;
     const Send_Mask = 0xf0;
 
-    private static $translationsLoaded = false;
-
     /**
      * @var int
      *   A status indicating if and why an invoice was or was not sent. It will
@@ -68,20 +65,13 @@ class Result extends WebResult
      * @param string $trigger
      *   A string indicating the function that triggered the sending, e.g.
      *   InvoiceManager::sourceStatusChange().
-     * @param \Siel\Acumulus\Helpers\Translator $translator
      */
-    public function __construct($trigger, Translator $translator)
+    public function __construct($trigger)
     {
-        parent::__construct($translator);
+        parent::__construct();
         $this->trigger = $trigger;
         $this->sendStatus = self::SendStatus_Unknown;
         $this->sendStatusArguments = array();
-
-        if (!self::$translationsLoaded) {
-            $translations = new ResultTranslations();
-            $this->translator->add($translations);
-            self::$translationsLoaded = true;
-        }
     }
 
     /**

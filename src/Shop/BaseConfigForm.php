@@ -25,6 +25,8 @@ abstract class BaseConfigForm extends Form
      * About API call result.
      *
      * @var \Siel\Acumulus\ApiClient\Result
+     *
+     * @todo: change to variable.
      */
     protected $about;
 

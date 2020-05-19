@@ -24,13 +24,10 @@ class MessageCollection
     protected $messages;
 
     /**
-     * Result constructor.
-     *
-     * @param \Siel\Acumulus\Helpers\Translator|null $translator
+     * Constructor.
      */
-    public function __construct(Translator $translator)
+    public function __construct()
     {
-        Message::setTranslator($translator);
         $this->messages = [];
     }
 

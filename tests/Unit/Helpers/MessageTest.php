@@ -13,8 +13,8 @@ class MessageTest extends TestCase
     protected function setUp(): void
     {
         $translator = new Translator('nl');
+        Translator::$instance = $translator;
         $translator->add(new SeverityTranslations());
-        Message::setTranslator($translator);
     }
 
     public function testCreateWithAllParams1()

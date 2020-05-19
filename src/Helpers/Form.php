@@ -101,7 +101,7 @@ abstract class Form extends MessageCollection
      */
     public function __construct(FormHelper $formHelper, ShopCapabilities $shopCapabilities, Config $config, Translator $translator, Log $log)
     {
-        parent::__construct($translator);
+        parent::__construct();
         $this->formValuesSet = false;
         $this->submittedValues = array();
 

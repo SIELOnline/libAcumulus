@@ -173,6 +173,14 @@ class Container
     }
 
     /**
+     * @return string
+     */
+    public function getLanguage()
+    {
+        return $this->language;
+    }
+
+    /**
      * Sets the language code.
      *
      * @param string $language
@@ -227,8 +235,10 @@ class Container
     public function getTranslator()
     {
         /** @var \Siel\Acumulus\Helpers\Translator $translator */
-        $translator = $this->getInstance('Translator', 'Helpers', array($this->language));
+        $translator = $this->getInstance('Translator', 'Helpers', array($this->getLanguage()));
+        Translator::$instance = $translator;
         if (!$this->baseTranslationsAdded) {
+            // Add some basic translations that are hard to add just-in-time.
             try {
                 /** @var \Siel\Acumulus\Helpers\TranslationCollection $translations */
                 $translations = $this->getInstance('ModuleSpecificTranslations', 'Helpers');
@@ -237,6 +247,10 @@ class Container
             $translations = $this->getInstance('ModuleTranslations', 'Shop');
             $translator->add($translations);
             $translations = $this->getInstance('SeverityTranslations', 'Helpers');
+            $translator->add($translations);
+            $translations = $this->getInstance('ResultTranslations', 'ApiClient');
+            $translator->add($translations);
+            $translations = $this->getInstance('ResultTranslations', 'Invoice');
             $translator->add($translations);
             $this->baseTranslationsAdded = true;
         }
@@ -325,7 +339,7 @@ class Container
     public function getAcumulusApiClient()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('Acumulus', 'ApiClient', array($this->getApiCommunicator(), $this->getConfig(), $this->getTranslator()));
+        return $this->getInstance('Acumulus', 'ApiClient', array($this->getApiCommunicator(), $this->getConfig()));
     }
 
     /**
@@ -336,7 +350,7 @@ class Container
     public function getResult()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('Result', 'ApiClient', array($this->getTranslator()), true);
+        return $this->getInstance('Result', 'ApiClient', array(), true);
     }
 
     /**
@@ -345,7 +359,7 @@ class Container
     public function getApiCommunicator()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('ApiCommunicator', 'ApiClient', array($this->getHttpCommunicator(), $this, $this->getConfig(), $this->getTranslator(), $this->getLog()));
+        return $this->getInstance('ApiCommunicator', 'ApiClient', array($this->getHttpCommunicator(), $this, $this->getConfig(), $this->getLanguage(), $this->getLog()));
     }
 
     /**
@@ -388,7 +402,7 @@ class Container
     public function getInvoiceResult($trigger)
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('Result', 'Invoice', array($trigger, $this->getTranslator()), true);
+        return $this->getInstance('Result', 'Invoice', array($trigger), true);
     }
 
     /**

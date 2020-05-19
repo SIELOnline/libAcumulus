@@ -7,7 +7,7 @@ use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Helpers\Message;
 use Siel\Acumulus\ApiClient\Result;
 use Siel\Acumulus\Helpers\Severity;
-use Siel\Acumulus\ApiClient\Translations;
+use Siel\Acumulus\ApiClient\ResultTranslations;
 
 /**
  * A Result has the following features that we want to test:
@@ -32,7 +32,7 @@ class ResultTest extends TestCase
     {
         $this->translator = new Translator('nl');
         $this->translator->add(new SeverityTranslations());
-        $this->translator->add(new Translations());
+        $this->translator->add(new ResultTranslations());
         $this->examples = new ApiRequestResponseExamples();
     }
 
@@ -43,7 +43,7 @@ class ResultTest extends TestCase
 
     public function testCreate()
     {
-        $result = new Result($this->translator);
+        $result = new Result();
         $this->assertEquals(Severity::Unknown, $result->getStatus());
         $this->assertEquals($this->t('request_not_yet_sent'), $result->getStatusText());
         $this->assertEquals(Severity::Unknown, $result->getSeverity());
@@ -101,7 +101,7 @@ class ResultTest extends TestCase
 
     public function testResultWithError()
     {
-        $result = new Result($this->translator);
+        $result = new Result();
         $result->setRawRequest($this->examples->getRequest(2));
         $result->setRawResponse($this->examples->getResponse(2));
         $result->setMainResponseKey('vatinfo', true)

@@ -37,7 +37,7 @@ namespace Siel\Acumulus\Helpers;
  *
  * How to use translations:
  * - If you need to translate texts in a given class, have the Translator Object
- *   injected into it via the constructor. If you are overriding a bae class,
+ *   injected into it via the constructor. If you are overriding a base class,
  *   most of the times the base class will already have done so. If not, ask for
  *   a change in the library.
  * - Normally, when the Translator object is injected into a class, also a
@@ -47,6 +47,9 @@ namespace Siel\Acumulus\Helpers;
  */
 class Translator
 {
+    /** @var \Siel\Acumulus\Helpers\Translator */
+    public static $instance;
+
     /** @var string */
     protected $language;
 

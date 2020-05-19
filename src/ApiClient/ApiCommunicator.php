@@ -12,7 +12,6 @@ use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Message;
 use Siel\Acumulus\Helpers\Severity;
-use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\PluginConfig;
 
 /**
@@ -31,17 +30,17 @@ class ApiCommunicator
     /** @var \Siel\Acumulus\ApiClient\HttpCommunicator */
     protected $httpCommunicator;
 
+    /** @var \Siel\Acumulus\Helpers\Container */
+    protected $container;
+
     /** @var \Siel\Acumulus\Config\Config */
     protected $config;
 
     /** @var \Siel\Acumulus\Helpers\Log */
     protected $log;
 
-    /** @var \Siel\Acumulus\Helpers\Container */
-    protected $container;
-
-    /** @var \Siel\Acumulus\Helpers\Translator */
-    protected $translator;
+    /** @var string */
+    protected $language;
 
     /**
      * Communicator constructor.
@@ -49,15 +48,15 @@ class ApiCommunicator
      * @param \Siel\Acumulus\ApiClient\HttpCommunicator $httpCommunicator
      * @param \Siel\Acumulus\Helpers\Container $container
      * @param \Siel\Acumulus\Config\Config $config
-     * @param \Siel\Acumulus\Helpers\Translator $translator
+     * @param string $language
      * @param \Siel\Acumulus\Helpers\Log $log
      */
-    public function __construct(HttpCommunicator $httpCommunicator, Container $container, Config $config, Translator $translator, Log $log)
+    public function __construct(HttpCommunicator $httpCommunicator, Container $container, Config $config, $language, Log $log)
     {
         $this->httpCommunicator = $httpCommunicator;
         $this->container = $container;
         $this->config = $config;
-        $this->translator = $translator;
+        $this->language = $language;
         $this->log = $log;
     }
 
@@ -156,7 +155,7 @@ class ApiCommunicator
         $result += [
             'format' => $pluginSettings['outputFormat'],
             'testmode' => $pluginSettings['debug'] === PluginConfig::Send_TestMode ? Api::TestMode_Test : Api::TestMode_Normal,
-            'lang' => $this->translator->getLanguage(),
+            'lang' => $this->language,
             'connector' => [
                 'application' => "{$environment['shopName']} {$environment['shopVersion']}",
                 'webkoppel' => "Acumulus {$environment['moduleVersion']}",

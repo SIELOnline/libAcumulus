@@ -25,7 +25,7 @@ class MessageCollectionTest extends TestCase
 
     public function testCreateMessageCollection()
     {
-        $collection = new MessageCollection($this->translator);
+        $collection = new MessageCollection();
         $this->assertEquals(Severity::Unknown, $collection->getSeverity());
         $this->assertFalse($collection->hasRealMessages());
         $this->assertFalse($collection->hasError());

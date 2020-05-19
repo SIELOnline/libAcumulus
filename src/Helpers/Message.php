@@ -1,5 +1,4 @@
 <?php
-
 namespace Siel\Acumulus\Helpers;
 
 use Exception;
@@ -32,9 +31,6 @@ class Message
     const Format_HtmlList = self::Format_Html | self::Format_ListItem;
     const Format_PlainListWithSeverity = self::Format_Plain | self::Format_ListItem | self::Format_AddSeverity;
     const Format_HtmlListWithSeverity = self::Format_Html | self::Format_ListItem | self::Format_AddSeverity;
-
-    /** @var \Siel\Acumulus\Helpers\Translator */
-    static protected $translator;
 
     /** @var string */
     protected $text;
@@ -121,14 +117,6 @@ class Message
     }
 
     /**
-     * @param \Siel\Acumulus\Helpers\Translator $translator
-     */
-    public static function setTranslator(Translator $translator)
-    {
-        self::$translator = $translator;
-    }
-
-    /**
      * Helper method to translate strings.
      *
      * @param string $key
@@ -140,7 +128,7 @@ class Message
      */
     protected function t($key)
     {
-        return static::$translator instanceof Translator ? static::$translator->get($key) : $key;
+        return Translator::$instance instanceof Translator ? Translator::$instance->get($key) : $key;
     }
 
     /**

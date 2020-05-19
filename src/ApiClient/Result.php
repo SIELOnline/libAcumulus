@@ -26,9 +26,6 @@ class Result extends MessageCollection
     const CodeTagRawRequest = 'Request';
     const CodeTagRawResponse = 'Response';
 
-    /** @var \Siel\Acumulus\Helpers\Translator */
-    protected $translator;
-
     /**
      * @var string|null
      *   The raw contents of the request as was sent to the web service.
@@ -74,14 +71,10 @@ class Result extends MessageCollection
 
     /**
      * Result constructor.
-     *
-     * @param \Siel\Acumulus\Helpers\Translator $translator
      */
-    public function __construct(Translator $translator)
+    public function __construct()
     {
-        parent::__construct($translator);
-        $this->translator = $translator;
-        $this->translator->add(new Translations());
+        parent::__construct();
         $this->apiStatus = null;
         $this->rawRequest = null;
         $this->rawResponse = null;
@@ -102,7 +95,7 @@ class Result extends MessageCollection
      */
     protected function t($key)
     {
-        return $this->translator->get($key);
+        return Translator::$instance instanceof Translator ? Translator::$instance->get($key) : $key;
     }
 
     /**
@@ -123,7 +116,7 @@ class Result extends MessageCollection
     }
 
     /**
-     * Returns a textual representation of the status.
+     * Returns a textual translated representation of the status.
      *
      * @return string
      */

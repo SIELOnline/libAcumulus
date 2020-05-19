@@ -2,9 +2,7 @@
 namespace Siel\Acumulus\Unit\ApiClient;
 
 use PHPUnit\Framework\TestCase;
-use Siel\Acumulus\ApiClient\Translations;
 use Siel\Acumulus\Helpers\Container;
-use Siel\Acumulus\Helpers\Severity;
 
 class AcumulusTest extends TestCase
 {
@@ -15,18 +13,85 @@ class AcumulusTest extends TestCase
 
     protected function setUp(): void
     {
-        // Using TestWebShop ensures that we are using a test HttpCommunicator.
+        // Using TestWebShop gives us the test ApiCommunicator.
         $container = new Container('TestWebShop', 'nl');
-        $container->getTranslator()->add(new Translations());
         $this->acumulusClient = $container->getAcumulusApiClient();
     }
 
-    public function testGetAbout()
+    public function argumentsPassed()
     {
-        $result = $this->acumulusClient->getAbout();
+        return [
+            'About' => ['getAbout', [], 'general/general_about', true],
+            'Accounts' => ['getPicklistAccounts', [], 'picklists/picklist_accounts', true],
+            'ContactTypes' => ['getPicklistContactTypes', [], 'picklists/picklist_contacttypes', true],
+            'CostCenters' => ['getPicklistCostCenters', [], 'picklists/picklist_costcenters', true],
+            'CostHeadings' => ['getPicklistCostHeadings', [], 'picklists/picklist_costheadings', true],
+            'InvoiceTemplates' => ['getPicklistInvoiceTemplates', [], 'picklists/picklist_invoicetemplates', true],
+            'VatTypes' => ['getPicklistVatTypes', [], 'picklists/picklist_vattypes', true],
+            'VatInfo' => ['getVatInfo', ['nl'], 'lookups/lookup_vatinfo', true],
+        ];
+    }
 
-        $this->assertEquals(Severity::Success, $result->getStatus());
+    /**
+     * @dataProvider argumentsPassed
+     */
+    public function testServices(string $method, array $args, string $apiFunction, $needContract, array $message = null)
+    {
+        /** @var \Siel\Acumulus\ApiClient\Result $result */
+        $result = $this->acumulusClient->$method(... $args);
+        $this->assertSame($result->getByCodeTag('apiFunction')->getText(), $apiFunction);
+        $this->assertSame($result->getByCodeTag('needContract')->getText(), $needContract ? 'true' : 'false');
+    }
+
+/*
+    public function testInvoiceAdd()
+    {
 
     }
 
+    public function testGetConceptInfo()
+    {
+
+    }
+
+    public function testGetEntry()
+    {
+
+    }
+
+    public function testSetDeleteStatus()
+    {
+
+    }
+
+    public function testGetPaymentStatus()
+    {
+
+    }
+
+    public function testSetPaymentStatus()
+    {
+
+    }
+
+    public function testEmailInvoiceAsPdf()
+    {
+
+    }
+
+    public function testSignUp()
+    {
+
+    }
+
+    public function testGetInvoicePdfUri()
+    {
+
+    }
+
+    public function testGetPackingSlipUri()
+    {
+
+    }
+*/
 }

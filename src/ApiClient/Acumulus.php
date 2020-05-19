@@ -498,7 +498,7 @@ class Acumulus
         $message = array(
             'signup' => $signUp,
         );
-        return $this->callApiFunction('signup/signup.php', $message, false)->setMainResponseKey('signup');
+        return $this->callApiFunction('signup/signup', $message, false)->setMainResponseKey('signup');
     }
 
     /**

@@ -29,11 +29,9 @@ class ApiCommunicator extends BaseApiCommunicator
     /**
      * @inheritDoc
      */
-    public function callApiFunction($apiFunction, array $message, $needContract = true, Result $result = null)
+    public function callApiFunction($apiFunction, array $message, $needContract, Result $result)
     {
-        if ($result === null) {
-            $result = $this->container->getResult();
-        }
+        // Add messages for the parameters that were passed in, so they can be checked.
         $result->addMessage($apiFunction, Severity::Log, 'apiFunction', 0);
         $result->addMessage(json_encode($message), Severity::Log, 'message', 0);
         $result->addMessage($needContract ? 'true' : 'false', Severity::Log, 'needContract', 0);

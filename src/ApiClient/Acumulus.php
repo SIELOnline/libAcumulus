@@ -120,25 +120,6 @@ class Acumulus
     }
 
     /**
-     * Retrieves a list of cost headings.
-     *
-     * @return \Siel\Acumulus\ApiClient\Result
-     *   The result of the webservice call. The structured response will contain
-     *   a non-keyed array of "costheading" arrays, each "costheading" array being
-     *   a keyed array with keys:
-     *   - costheadingid
-     *   - costheadingname
-     *
-     * @see https://www.siel.nl/acumulus/API/Picklists/Cost_Headings/
-     *
-     * @noinspection PhpUnused
-     */
-    public function getPicklistCostHeadings()
-    {
-        return $this->getPicklist('costheadings');
-    }
-
-    /**
      * Retrieves a list of invoice templates.
      *
      * @return \Siel\Acumulus\ApiClient\Result
@@ -153,25 +134,6 @@ class Acumulus
     public function getPicklistInvoiceTemplates()
     {
         return $this->getPicklist('invoicetemplates');
-    }
-
-    /**
-     * Retrieves a list of VAT types.
-     *
-     * @return \Siel\Acumulus\ApiClient\Result
-     *   The result of the webservice call. The structured response will contain
-     *   a non-keyed array of "vattype" arrays, each "vattype" array being a
-     *   keyed array with keys:
-     *   - 'vattypeid'
-     *   - 'vattypename'
-     *
-     * @see https://www.siel.nl/acumulus/API/Picklists/VAT_Types/
-     *
-     * @noinspection PhpUnused
-     */
-    public function getPicklistVatTypes()
-    {
-        return $this->getPicklist('vattypes');
     }
 
     /**

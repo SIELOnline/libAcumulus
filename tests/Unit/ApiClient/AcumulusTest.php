@@ -25,9 +25,7 @@ class AcumulusTest extends TestCase
             'Accounts' => ['getPicklistAccounts', [], 'picklists/picklist_accounts', true],
             'ContactTypes' => ['getPicklistContactTypes', [], 'picklists/picklist_contacttypes', true],
             'CostCenters' => ['getPicklistCostCenters', [], 'picklists/picklist_costcenters', true],
-            'CostHeadings' => ['getPicklistCostHeadings', [], 'picklists/picklist_costheadings', true],
             'InvoiceTemplates' => ['getPicklistInvoiceTemplates', [], 'picklists/picklist_invoicetemplates', true],
-            'VatTypes' => ['getPicklistVatTypes', [], 'picklists/picklist_vattypes', true],
             'VatInfo' => ['getVatInfo', ['nl'], 'lookups/lookup_vatinfo', true],
         ];
     }

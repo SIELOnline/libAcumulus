@@ -32,9 +32,7 @@ class AcumulusTest extends TestCase
             'Accounts' => ['getPicklistAccounts', [], true, ['accountid', 'accountnumber', 'accountdescription','accounttypeid']],
             'ContactTypes' => ['getPicklistContactTypes', [], true, ['contacttypeid', 'contacttypename','contacttypenamenl']],
             'CostCenters' => ['getPicklistCostCenters', [], true, ['costcenterid','costcentername']],
-            'CostHeadings' => ['getPicklistCostHeadings', [], true, ['costheadingfrule','costheadingid','costheadingname']],
             'InvoiceTemplates' => ['getPicklistInvoiceTemplates', [], true, ['invoicetemplateid','invoicetemplatename']],
-            'VatTypes' => ['getPicklistVatTypes', [], true, ['vattypeid','vattypename','vattypenamenl']],
             'VatInfo' => ['getVatInfo', ['nl'], true, ['vattype','vatrate']],
         ];
     }

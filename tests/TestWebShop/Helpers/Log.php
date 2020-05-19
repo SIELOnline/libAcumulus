@@ -17,7 +17,7 @@ class Log extends BaseLog
      */
     protected function write($message, $severity)
     {
-        $message = sprintf('Acumulus %s: %s - %s', $this->getLibraryVersion(), $this->getSeverityString($severity), $message);
+        $message = sprintf('%s Acumulus %s: %s - %s', date('Y-m-d H:i:s'), $this->getLibraryVersion(), $this->getSeverityString($severity), $message);
         file_put_contents(__DIR__ . '/test.log', $message . "\n", FILE_APPEND);
     }
 }

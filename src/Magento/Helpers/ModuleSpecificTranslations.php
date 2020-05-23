@@ -9,6 +9,7 @@ use Siel\Acumulus\Helpers\TranslationCollection;
 class ModuleSpecificTranslations extends TranslationCollection
 {
     protected $nl = array(
+        'module' => 'extensie',
         // Config form.
         'field_triggerOrderStatus' => 'Bestelling, op basis van bestelstatus(sen)',
         // Advanced config form.
@@ -16,6 +17,7 @@ class ModuleSpecificTranslations extends TranslationCollection
     );
 
     protected $en = array(
+        'module' => 'extension',
         // Config form.
         'field_triggerOrderStatus' => 'Order, based on status(es)',
         // Advanced config form.

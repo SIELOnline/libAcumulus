@@ -9,6 +9,7 @@ use Siel\Acumulus\Helpers\TranslationCollection;
 class ModuleSpecificTranslations extends TranslationCollection
 {
     protected $nl = array(
+        'module' => 'extensie',
         'button_link' => '<a href="%2$s" class="button btn btn-primary"><i class="fa fa-cog"></i> %1$s</a>',
         'advanced_form_link_text' => 'Geavanceerde instellingen',
         'batch_form_link_text' => 'Batchverzending',
@@ -20,6 +21,7 @@ class ModuleSpecificTranslations extends TranslationCollection
     );
 
     protected $en = array(
+        'module' => 'extension',
         'advanced_form_link_text' => 'Advanced settings',
         'batch_form_link_text' => 'Send batch',
 

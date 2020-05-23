@@ -274,7 +274,7 @@ class BatchForm extends Form
                         'type' => 'textarea',
                         'attributes' => array(
                             'readonly' => true,
-                            'rows' => max(5, min(10, count($this->screenLog))),
+                            'rows' => max(5, min(15, count($this->screenLog))),
                             'style' => 'box-sizing: border-box; width: 100%; min-width: 48em;',
                         ),
                     ),

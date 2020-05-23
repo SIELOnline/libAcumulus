@@ -41,6 +41,8 @@ class AcumulusTest extends TestCase
     }
 
     /**
+     * Tests that the correct arguments are passed to ApiCommunicator::callApiFunction.
+     *
      * @dataProvider argumentsPassed
      */
     public function testApiCalls(string $method, array $args, string $apiFunction, $needContract, string $mainResponseKey, bool $isList, array $message = null)
@@ -56,6 +58,10 @@ class AcumulusTest extends TestCase
         }
     }
 
+    /**
+     * Tests that the correct arguments are passed to ApiCommunicator::getUri
+     * and that the correct query arguments are concatenated.
+     */
     public function testGetInvoicePdfUri()
     {
         $this->assertSame('invoices/invoice_get_pdf?token=TOKEN', $this->acumulusClient->getInvoicePdfUri('TOKEN'));
@@ -63,6 +69,10 @@ class AcumulusTest extends TestCase
         $this->assertSame('invoices/invoice_get_pdf?token=TOKEN&gfx=0', $this->acumulusClient->getInvoicePdfUri('TOKEN', false));
     }
 
+    /**
+     * Tests that the correct arguments are passed to ApiCommunicator::getUri
+     * and that the correct query arguments are concatenated.
+     */
     public function testGetPackingSlipUri()
     {
         $this->assertSame('delivery/packing_slip_get_pdf?token=TOKEN', $this->acumulusClient->getPackingSlipUri('TOKEN'));

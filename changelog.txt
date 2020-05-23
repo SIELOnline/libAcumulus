@@ -21,10 +21,21 @@ WC3 = WooCommerce 3+ (WordPress)
 --------------------------
 NOTE: The minimum PHP version requirement is now set to 5.6.
 
+Bugs:
+- WC: Support for TM Extra Product Options did not add the meta tag
+  meta-line-type.
+
 Features:
+- WC: If form error messages are for a specific field that field will be given
+  a red border.
+- WC: If form error messages are for a specific field they are now clickable,
+  upon which the focus will be set to the erroneous form field.
 - Upgrade function to 5.10.0 checks strengthened Requirements.
 
 Refactorings:
+- Pushed method getLogoUrl to the base Form class
+- Allow labels to contain html.
+
 - Added some unit tests for basic classes in the Web namespace. As a consequence
   a lot of classes and methods were moved, renamed, or split:
 - Renamed Web namespace to ApiClient.

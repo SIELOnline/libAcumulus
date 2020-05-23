@@ -11,8 +11,8 @@ namespace Siel\Acumulus\Helpers;
 interface Severity
 {
     /**
-     * Unknown severity, 1 {@see Message} should always have a severity, but a
-     * {@see MessageCollection} can have no severity yet.
+     * Unknown severity: a {@see Message} should always have a severity, but a
+     * {@see MessageCollection} can have no messages and thus no severity yet.
      */
     const Unknown = 0;
     const Log = 1;

@@ -382,11 +382,18 @@ class CompletorInvoiceLines
     protected function completeLineRequiredData(array $lines, array $parent = null)
     {
         foreach ($lines as &$line) {
-            // Easy gain first. Known usages: Magento.
+            // Easy gains first. Known usages: Magento.
             if (!isset($line[Meta::VatAmount]) && isset($line[Meta::LineVatAmount])) {
+                // Known usages: Magento.
                 $line[Meta::VatAmount] = $line[Meta::LineVatAmount] / $line[Tag::Quantity];
                 $line[Meta::FieldsCalculated][] = Meta::VatAmount . ' (from ' . Meta::LineVatAmount . ')';
             }
+            if (!isset($line[Meta::LineType]) && !empty($parent)) {
+                // Known usages: WooCommerce TM Extra Product Options that adds
+                // child lines.
+                $line[Meta::LineType] = $parent[Meta::LineType];
+            }
+
 
             if (!isset($line[Tag::UnitPrice])) {
                 // With margin scheme, the unitprice should be known but may

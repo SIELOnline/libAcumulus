@@ -19,6 +19,8 @@ namespace Siel\Acumulus\Helpers;
  * - The exceptions being:
  *     * A label prefix and postfix that come from code and may contain html.
  *       See {@see FormRenderer::renderLabel()}.
+ *     * Label text if indicated as containing html by a label attribute 'html'
+ *       (which comes from code).
  *     * markup is rendered as is, as it may contain html (therefore its name
  *       markup ...). See {@see FormRenderer::markup()};
  * - All tags come from object properties or are hard coded and thus present no
@@ -438,11 +440,15 @@ class FormRenderer
             }
 
             // Label.
+            $allowHtml = !empty($attributes['html']);
+            unset($attributes['html']);
             $attributes = $this->addLabelAttributes($attributes, $id);
             $postfix .= !empty($attributes['required']) ? $this->requiredMarkup : '';
             $tag = empty($id) ? $this->multiLabelTag : $this->labelTag;
             $output .= $this->getOpenTag($tag, $attributes);
-            $output .= $prefix . htmlspecialchars($text, $this->htmlSpecialCharsFlag, 'UTF-8') . $postfix;
+            $output .= $prefix;
+            $output .= $allowHtml ? $text : htmlspecialchars($text, $this->htmlSpecialCharsFlag, 'UTF-8');
+            $output .= $postfix;
             $output .= $this->getCloseTag($tag);
 
             // Tag around labels.

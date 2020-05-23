@@ -229,4 +229,72 @@ class FormHelper
     {
         return $formValues;
     }
+
+    /**
+     * Adds a severity css class to form fields that do have a message.
+     *
+     * @param array[] $fields
+     * @param Message[] $messages
+     */
+    public function addSeverityClassToFields(array $fields, array $messages)
+    {
+        foreach ($messages as $message) {
+            if (!empty($message->getField())) {
+                $this->addSeverityClassToField($fields, $message->getField(), $this->severityToClass($message->getSeverity()));
+            }
+        }
+        return $fields;
+    }
+
+    /**
+     * Adds a severity css class to a form field.
+     *
+     * @param array $fields
+     * @param $id
+     * @param $severityClass
+     */
+    protected function addSeverityClassToField(array &$fields, $id, $severityClass)
+    {
+        foreach ($fields as $key => &$field) {
+            if ($key === $id) {
+                if (isset($field['attributes']['class'])) {
+                    if (is_array($field['attributes']['class'])) {
+                        $field['attributes']['class'][] = $severityClass;
+                    } else {
+                        $field['attributes']['class'] .= " $severityClass";
+                    }
+                } else {
+                    $field['attributes']['class'] = $severityClass;
+                }
+            } elseif (!empty($field['fields'])) {
+                $this->addSeverityClassToField($field['fields'], $id, $severityClass);
+            }
+        }
+    }
+
+    /**
+     * Returns a css class for a given severity.
+     *
+     * @param int $severity
+     *
+     * @return string
+     */
+    protected function severityToClass($severity)
+    {
+        switch ($severity) {
+            case Severity::Exception:
+            case Severity::Error:
+                return 'error';
+            case Severity::Warning:
+                return 'warning';
+            case Severity::Notice:
+                return 'notice';
+            case Severity::Info:
+                return 'info';
+            case Severity::Success:
+                return 'success';
+            default:
+                return '';
+        }
+    }
 }

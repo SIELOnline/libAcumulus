@@ -13,8 +13,7 @@ class BatchFormTranslations extends TranslationCollection
         'batch_form_header' => 'Verzend facturen naar Acumulus',
         'batch_form_link_text' => 'Acumulus batchverzending',
 
-        'button_save' => 'Verzenden',
-        'button_send' => 'Verzenden',
+        'button_submit_batch'=> 'Verzenden',
         'button_cancel' => 'Annuleren',
 
         'batchFieldsHeader' => 'Batchgewijs verzenden van facturen naar Acumulus',
@@ -87,8 +86,7 @@ LONGSTRING
         'batch_form_header' => 'Send a batch of invoices to Acumulus',
         'batch_form_link_text' => 'Acumulus batch',
 
-        'button_save' => 'Send',
-        'button_send' => 'Send',
+        'button_submit_batch'=> 'Send',
         'button_cancel' => 'Cancel',
 
         'batchFieldsHeader' => 'Send a batch of invoices to Acumulus',

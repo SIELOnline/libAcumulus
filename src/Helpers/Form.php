@@ -92,6 +92,9 @@ abstract class Form extends MessageCollection
     /** @var bool */
     protected $addMeta = true;
 
+    /** @var bool */
+    protected $addErrors = true;
+
     /**
      * @param \Siel\Acumulus\Helpers\FormHelper $formHelper
      * @param \Siel\Acumulus\Config\ShopCapabilities $shopCapabilities
@@ -401,19 +404,17 @@ abstract class Form extends MessageCollection
             $this->validate();
             if ($executeIfValid && $this->isValid()) {
                 if ($this->execute()) {
+                    // Add a success message if one was defined for this form.
                     $message = $this->t("message_form_{$this->type}_success");
-                    if ($message === "message_form_{$this->type}_success") {
-                        $message = $this->t('message_form_success');
-                    }
-                    if (!empty($message) && $message !== 'message_form_success') {
+                    if (!empty($message) && $message !== "message_form_{$this->type}_success") {
                         $this->addMessage($message, Severity::Success);
                     }
                 } else {
+                    // Add a generic error message if one was defined for this
+                    // form. Though note that most forms will add more specific
+                    // error messages and thus will not define this one.
                     $message = $this->t("message_form_{$this->type}_error");
-                    if ($message === "message_form_{$this->type}_error") {
-                        $message = $this->t('message_form_error');
-                    }
-                    if (!empty($message) && $message !== 'message_form_error') {
+                    if (!empty($message) && $message !== "message_form_{$this->type}_error") {
                         $this->addMessage($message, Severity::Error);
                     }
                 }
@@ -491,6 +492,9 @@ abstract class Form extends MessageCollection
             if ($this->addMeta) {
                 $this->fields = $this->formHelper->addMetaField($this->fields);
             }
+            if ($this->addErrors && $this->hasRealMessages()) {
+                $this->fields = $this->formHelper->addSeverityClassToFields($this->fields, $this->getMessages());
+            }
         }
         return $this->fields;
     }
@@ -505,6 +509,15 @@ abstract class Form extends MessageCollection
      *   The definition of the form.
      */
     abstract protected function getFieldDefinitions();
+
+    /**
+     * Returns the url to the logo.
+     *
+     * @return string
+     */
+    protected function getLogoUrl() {
+      return $this->shopCapabilities->getLink('logo');
+    }
 
     /**
      * Returns a list of field ids/keys appearing in the form.

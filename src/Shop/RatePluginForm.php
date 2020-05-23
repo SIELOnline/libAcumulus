@@ -52,16 +52,6 @@ class RatePluginForm extends Form
     }
 
     /**
-     * Returns the url to the logo.
-     *
-     * @return string
-     */
-    protected function getLogoUrl()
-    {
-        return $this->shopCapabilities->getLink('logo');
-    }
-
-    /**
      * {@inheritdoc}
      *
      * This override handles the case that this message is displayed on another

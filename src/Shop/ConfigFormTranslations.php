@@ -18,23 +18,28 @@ class ConfigFormTranslations extends TranslationCollection
         'advanced_form_header' => 'Acumulus geavanceerde instellingen',
         'advanced_form_link_text' => 'Acumulus geavanceerde instellingen',
 
+        'button_submit_config'=> 'Instellingen opslaan',
+        'button_submit_advanced'=> 'Instellingen opslaan',
         'button_link' => '<a href="%2$s">%1$s</a>',
-        'button_save' => 'Opslaan',
         'button_cancel' => 'Terug',
 
         'message_validate_email_2' => 'Het veld (fictieve klant) Email is geen valide e-mailadres, vul een correct e-mailadres in.',
         'message_validate_conflicting_options' => 'Als u geen klantgegevens naar Acumulus verstuurt, kunt u Acumulus geen PDF factuur laten versturen. Pas één van beide opties aan.',
 
-        'message_form_success' => 'De instellingen zijn opgeslagen.',
-        'message_form_error' => 'Er is een fout opgetreden bij het opslaan van de instellingen',
+        'message_form_config_success' => 'De instellingen zijn opgeslagen.',
+        'message_form_config_error' => 'Er is een fout opgetreden bij het opslaan van de instellingen',
+
+        'message_form_advanced_success' => 'De instellingen zijn opgeslagen.',
+        'message_form_advanced_error' => 'Er is een fout opgetreden bij het opslaan van de instellingen',
+
         'message_uninstall' => 'Wilt u de configuratie-instellingen verwijderen?',
 
         'message_error_header' => 'Fout in uw Acumulus accountgegevens',
         'message_error_auth' => 'Uw Acumulus accountgegevens zijn onjuist. Zodra u %2$s de correcte gegevens hebt ingevuld, worden hier de %1$s instellingen getoond.',
         'message_error_forb' => 'Uw Acumulus accountgegevens zijn juist maar staan geen toegang via de web service toe. Zodra u %2$s correcte gegevens hebt ingevuld, worden hier de %1$s instellingen getoond.',
         'message_error_comm' => 'Er is een fout opgetreden bij het ophalen van uw gegevens van Acumulus. Probeer het later nog eens. Zodra de verbinding hersteld is worden hier de %1$s instellingen getoond.',
-        'message_auth_unknown' => 'Zodra u %2$s uw Acumulus accountgegevens hebt ingevuld, worden %1$s de overige instellingen getoond.',
-        'message_error_arg1_config' => 'overige',
+        'message_auth_unknown' => 'Zodra u %2$s uw Acumulus accountgegevens hebt ingevuld, worden hier de %1$s instellingen getoond.',
+        'message_error_arg1_config' => 'basis',
         'message_error_arg1_advanced' => 'geavanceerde',
         'message_error_arg2_config' => 'hier',
         'message_error_arg2_advanced' => 'in het "Acumulus basisinstellingenformulier"',
@@ -355,7 +360,7 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'field_debug' => 'Factuur verzendmodus',
         'option_debug_1' => 'Ontvang alleen een mail bij fouten, waarschuwingen, of opmerkingen tijdens het verzenden van een factuur naar Acumulus.',
         'option_debug_2' => 'Ontvang altijd een mail met de resultaten bij het verzenden van een factuur naar Acumulus.',
-        'option_debug_3' => 'Verstuur facturen in testmodus naar Acumulus. Acumulus zal alleen de factuur controleren op fouten en waarschuwingen maar zal deze niet opslaan. U ontvangt alijd een mail met de resultaten.',
+        'option_debug_3' => 'Verstuur facturen in testmodus naar Acumulus. Acumulus zal de factuur controleren op fouten en waarschuwingen maar zal deze niet opslaan. U ontvangt alijd een mail met de resultaten.',
         'option_debug_4' => 'Verzend berichten niet naar Acumulus maar ontvang wel een mail met het bericht zoals dat vestuurd zou zijn.',
         'desc_debug' => 'U kunt hier een verzend modus kiezen. Kies voor de eerste optie tenzij u i.v.m. een supportverzoek bent geïnstrueerd om iets anders te kiezen.',
 
@@ -387,14 +392,19 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'advanced_form_header' => 'Acumulus advanced settings',
         'advanced_form_link_text' => 'Acumulus advanced settings',
 
-        'button_save' => 'Save',
+        'button_submit_config'=> 'Save settings',
+        'button_submit_advanced'=> 'Save settings',
         'button_cancel' => 'Back',
 
         'message_validate_email_2' => 'The field (fictitious customer) Email is not a valid e-mail address, please fill in a correct e-mail address.',
         'message_validate_conflicting_options' => 'If you don\'t send customer data to Acumulus, Acumulus cannot send PDF invoices. Change one of the options.',
 
-        'message_form_success' => 'The settings are saved.',
-        'message_form_error' => 'an error occurred wile saving the settings.',
+        'message_form_config_success' => 'The settings are saved.',
+        'message_form_config_error' => 'an error occurred wile saving the settings.',
+
+        'message_form_advanced_success' => 'The settings are saved.',
+        'message_form_advanced_error' => 'an error occurred wile saving the settings.',
+
         'message_uninstall' => 'Are you sure to delete the configuration settings?',
 
         'message_error_header' => 'Error in your Acumulus connection settings',

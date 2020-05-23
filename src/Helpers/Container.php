@@ -530,6 +530,10 @@ class Container
     {
         $arguments = array();
         switch (strtolower($type)) {
+            case 'registration':
+                $class = 'Registration';
+                $arguments[] = $this->getAcumulusApiClient();
+                break;
             case 'config':
                 $class = 'Config';
                 $arguments[] = $this->getAcumulusApiClient();

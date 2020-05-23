@@ -4,8 +4,7 @@ namespace Siel\Acumulus;
 /**
  * Tag defines string constants for the tags used in the Acumulus API messages.
  *
- * Mainly the tags used in the invoice-add api call are added here as they are
- * used in multiple places.
+ * Mainly the tags used in the invoice-add and signup api call are added here.
  */
 interface Tag
 {
@@ -23,10 +22,12 @@ interface Tag
     const ContactId = 'contactid';
     const ContactYourId = 'contactyourid';
     const ContactStatus = 'contactstatus';
+    const CompanyName = 'companyname';
     const CompanyName1 = 'companyname1';
     const CompanyName2 = 'companyname2';
     const FullName = 'fullname';
     const Salutation = 'salutation';
+    const Address = 'address';
     const Address1 = 'address1';
     const Address2 = 'address2';
     const PostalCode = 'postalcode';
@@ -38,6 +39,7 @@ interface Tag
     const Fax = 'fax';
     const Email = 'email';
     const OverwriteIfExists = 'overwriteifexists';
+    const BankAccount = 'bankaccount';
     const BankAccountNumber = 'bankaccountnumber';
     const Mark = 'mark';
     const DisableDuplicates = 'disableduplicates';
@@ -54,6 +56,7 @@ interface Tag
     const Description = 'description';
     const DescriptionText = 'descriptiontext';
     const Template = 'template';
+    const Notes = 'notes';
     const InvoiceNotes = 'invoicenotes';
 
     const ItemNumber = 'itemnumber';
@@ -71,4 +74,8 @@ interface Tag
     const Subject = 'subject';
     const Message = 'message';
     const ConfirmReading = 'confirmreading';
+
+    const LoginName = 'loginname';
+    const Gender = 'gender';
+    const CreateApiUser = 'createapiuser';
 }

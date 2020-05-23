@@ -283,7 +283,7 @@ class Result extends MessageCollection
     public function setRawRequest($rawRequest)
     {
         $this->addMessage(
-            preg_replace('|<password>.*</password>|', '<password>REMOVED FOR SECURITY</password>', $rawRequest),
+            preg_replace('|<[a-z]*password>.*</[a-z]*password>|', '<$1password>REMOVED FOR SECURITY</$1password>', $rawRequest),
             Severity::Log,
             self::CodeTagRawRequest,
             0
@@ -300,7 +300,7 @@ class Result extends MessageCollection
     public function setRawResponse($rawResponse)
     {
         $this->addMessage(
-            preg_replace('|<password>.*</password>|', '<password>REMOVED FOR SECURITY</password>', $rawResponse),
+            preg_replace('|<([a-z]*)password>.*</[a-z]*password>|', '<$1password>REMOVED FOR SECURITY</$1password>', $rawResponse),
             Severity::Log,
             self::CodeTagRawResponse,
             0

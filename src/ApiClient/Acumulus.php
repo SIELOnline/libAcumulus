@@ -488,6 +488,13 @@ class Acumulus
      *   - contractapiuserpassword
      *
      *   Possible errors/warnings:
+     *   - AA7E10AA: Verplichte companyname ontbreekt
+     *   - AAC8C3AA: Verplichte fullname ontbreekt
+     *   - AAFA1AAA: Verplichte loginname ontbreekt
+     *   - AAE9CDAA: Verplichte address ontbreekt
+     *   - AAC34DAA: Verplichte postalcode ontbreekt
+     *   - AA6894AA: Onjuiste postalcode
+     *   - AABC1FAA: Verplichte city ontbreekt
      *
      * @see https://www.siel.nl/acumulus/API/Sign_Up/Sign_Up/
      *

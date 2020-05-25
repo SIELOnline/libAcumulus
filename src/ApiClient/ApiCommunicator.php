@@ -189,7 +189,7 @@ class ApiCommunicator
     {
         // Convert message to XML. XML requires 1 top level tag, so add one.
         // The tagname is ignored by the Acumulus WebAPI.
-        $message = $this->convertArrayToXml(['myxml' => $message]);
+        $message = trim($this->convertArrayToXml(['myxml' => $message]));
         $result->setRawRequest($message);
         $rawResponse = $this->httpCommunicator->post($uri, ['xmlstring' => $message]);
         $result->setRawResponse($rawResponse);

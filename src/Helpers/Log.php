@@ -112,7 +112,7 @@ class Log
      */
     public function log($severity, $message, array $args = array())
     {
-        if ($severity > min($this->getLogLevel(), Severity::Notice)) {
+        if ($severity >= min($this->getLogLevel(), Severity::Notice)) {
             if (count($args) > 0) {
                 $message = vsprintf($message, $args);
             }

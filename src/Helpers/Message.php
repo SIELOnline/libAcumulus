@@ -267,7 +267,7 @@ class Message
 
         // List item:
         if (($format & self::Format_ListItem) !== 0) {
-            $text = $isHtml ? "<li>$text</li>" : "* $text\n";
+            $text = $isHtml ? "<li>$text</li>" : "* $text";
         }
 
         return $text;
@@ -281,6 +281,4 @@ class Message
     {
         return $this->format(self::Format_Plain);
     }
-
-
 }

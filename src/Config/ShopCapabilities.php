@@ -376,7 +376,8 @@ abstract class ShopCapabilities
      * administrative links, the returned link should contain so as well.
      *
      * @param string $linkType
-     *   The form or resource to get the link to: config, advanced, batch, logo.
+     *   The form or resource to get the link to: config, advanced, batch, logo,
+     *   or registration.
      *
      * @return string
      *   The link to the requested form page.

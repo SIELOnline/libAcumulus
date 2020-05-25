@@ -251,7 +251,7 @@ class ConfigForm extends BaseConfigForm
                 'label' => $this->t('field_code'),
                 'attributes' => array(
                     'required' => true,
-                    'size' => 20,
+                    'size' => 10,
                 ),
             ),
             Tag::UserName => array(
@@ -276,7 +276,7 @@ class ConfigForm extends BaseConfigForm
                 'description' => $this->t('desc_emailonerror'),
                 'attributes' => array(
                     'required' => true,
-                    'size' => 20,
+                    'size' => 30,
                 ),
             ),
         );

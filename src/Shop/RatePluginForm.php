@@ -146,14 +146,13 @@ class RatePluginForm extends Form
      */
     protected function getFieldDefinitionsFull()
     {
-        $img = '<img src="' . $this->getLogoUrl() . '" alt="Logo SIEL Acumulus" title="SIEL Acumulus" width="100" height="100">';
         return array(
             'acumulus-rate-plugin' => array(
                 'type' => 'fieldset',
                 'fields' => array(
                     'logo' => array(
                         'type' => 'markup',
-                        'value' => $img,
+                        'value' => $this->getLogo(),
                     ),
                     'message' => array(
                         'type' => 'markup',

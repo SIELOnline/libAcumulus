@@ -1,7 +1,6 @@
 <?php
 namespace Siel\Acumulus\OpenCart\Helpers;
 
-/** @noinspection PhpUndefinedNamespaceInspection */
 /** @noinspection PhpUndefinedClassInspection */
 /**
  * Registry is a wrapper around the registry instance which is not directly
@@ -34,7 +33,6 @@ class Registry
     /** @var \Registry */
     protected $registry;
 
-    /** @noinspection PhpUndefinedClassInspection */
     /** @var \ModelAccountOrder|\ModelSaleOrder */
     protected $orderModel;
 

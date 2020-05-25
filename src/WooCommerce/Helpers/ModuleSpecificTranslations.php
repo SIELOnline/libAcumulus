@@ -12,7 +12,7 @@ class ModuleSpecificTranslations extends TranslationCollection
         'button_link' => '<a href="%2$s" class="button button-primary button-large">%1$s</a>',
         'see_post_meta' => 'Zie de tabel postmeta voor posts van het type "order" of "refund"',
         'meta_original_order_for_refund' => 'Post meta van de oorspronkelijke bestelling, alleen beschikbaar bij credit nota\'s',
-        'wc2_end_support' => 'LET OP: de Acumulus plugin zal in een volgende versie stoppen met het ondersteunen van Woocommerce 2! Begin nu met het upgraden naar WooCommerce 3.',
+        'wc2_end_support' => 'LET OP: de Acumulus plugin zal in een volgende versie stoppen met het ondersteunen van Woocommerce 2! Begin nu met het upgraden naar WooCommerce 4.',
 
         // Invoice status overview: shorter labels due to available space.
         'vat_type' => 'Soort',

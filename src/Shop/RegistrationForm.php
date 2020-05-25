@@ -2,6 +2,7 @@
 
 namespace Siel\Acumulus\Shop;
 
+use DateTime;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\ApiClient\Acumulus;
 use Siel\Acumulus\Config\Config;
@@ -25,6 +26,14 @@ class RegistrationForm extends Form
     protected $acumulusApiClient;
 
     /**
+     * @var array
+     *   The response structure of a successful sign-up call,
+     *   {@see https://www.siel.nl/acumulus/API/Sign_Up/Sign_Up/} for more
+     *   details.
+     */
+    protected $signUpResponse;
+
+    /**
      * RegistrationForm constructor.
      *
      * @param \Siel\Acumulus\ApiClient\Acumulus $acumulusApiClient
@@ -42,6 +51,19 @@ class RegistrationForm extends Form
         $this->translator->add($translations);
 
         $this->acumulusApiClient = $acumulusApiClient;
+        $this->signUpResponse = null;
+        // TMP
+        $this->signUpResponse = [
+            'contractcode' => '218975',
+            'contractloginname' => 'erwind',
+            'contractpassword' => 'WCpAfaW8hABq',
+            'contractstartdate' => '2020-05-25',
+            'contractenddate' => '2020-06-24',
+            'contractapiuserloginname' => 'Acumulus-API-ce5bb',
+            'contractapiuserpassword' => 'OTAcu3eq5VjezM',
+        ];
+        $this->submittedValues[Tag::Email] = 'erwin@burorader.com';
+        // TMP
     }
 
     /**
@@ -51,40 +73,39 @@ class RegistrationForm extends Form
     {
         $regexpEmail = '/^[^@<>,; "\']+@([^.@ ,;]+\.)+[^.@ ,;]+$/';
 
-        // @todo: required, email, gender, postalcode, loginname?
         if (empty($this->submittedValues[Tag::CompanyName])) {
             $this->addMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_companyName')), Severity::Error, Tag::CompanyName);
         }
+
         if (empty($this->submittedValues[Tag::FullName])) {
             $this->addMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_fullName')), Severity::Error, Tag::FullName);
         }
+
         if (empty($this->submittedValues[Tag::LoginName])) {
             $this->addMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_loginName')), Severity::Error, Tag::LoginName);
+        } elseif (mb_strlen($this->submittedValues[Tag::LoginName]) < 6) {
+            $this->addMessage(sprintf($this->t('message_validate_loginname_0'), $this->t('field_loginName')), Severity::Error, Tag::LoginName);
         }
+
         if (empty($this->submittedValues[Tag::Address])) {
             $this->addMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_address')), Severity::Error, Tag::Address);
         }
+
         if (empty($this->submittedValues[Tag::PostalCode])) {
             $this->addMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_postalCode')), Severity::Error, Tag::PostalCode);
         } elseif (!preg_match('/^\d{4}\s*[a-zA-Z]{2}$/', $this->submittedValues[Tag::PostalCode])) {
             $this->addMessage($this->t('message_validate_postalCode_0'), Severity::Error, Tag::PostalCode);
         }
+
         if (empty($this->submittedValues[Tag::City])) {
             $this->addMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_city')), Severity::Error, Tag::City);
         }
+
         if (empty($this->submittedValues[Tag::Email])) {
             $this->addMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_email')), Severity::Error, Tag::Email);
         } elseif (!preg_match($regexpEmail, $this->submittedValues[Tag::Email])) {
             $this->addMessage($this->t('message_validate_email_0'), Severity::Error, Tag::Email);
         }
-// required:  Tag::CompanyName,
-//            Tag::FullName,
-//            Tag::LoginName,
-//            Tag::Address,
-//            Tag::PostalCode,
-//            Tag::City,
-//            Tag::Email,
-
     }
 
     /**
@@ -119,11 +140,11 @@ class RegistrationForm extends Form
 
         $result = $this->acumulusApiClient->signUp($signUp);
 
+        $this->addMessages($result->getMessages(Severity::WarningOrWorse));
         $formSuccess = !$result->hasError();
         if ($formSuccess) {
-            $this->setAccountInfo($result->getResponse());
-        } else {
-            $this->addMessages($result->getMessages(Severity::WarningOrWorse));
+            $this->signUpResponse = $result->getResponse();
+            $this->setAccountInfo($this->signUpResponse);
         }
 
         return $formSuccess;
@@ -164,29 +185,43 @@ class RegistrationForm extends Form
     protected function getFieldDefinitions()
     {
         $fields = [];
-        $fields += [
-            'introHeader' => [
-                'type' => 'fieldset',
-                'legend' => $this->t('introHeader'),
-                'fields' => $this->getIntroFields(),
-            ],
-            'personSettingsHeader' => [
-                'type' => 'fieldset',
-                'legend' => $this->t('personSettingsHeader'),
-                'fields' => $this->getPersonFields(),
-            ],
-            'companySettingsHeader' => [
-                'type' => 'fieldset',
-                'legend' => $this->t('companySettingsHeader'),
-                'description' => $this->t('desc_companySettings'),
-                'fields' => $this->getCompanyFields(),
-            ],
-            'notesSettingsHeader' => [
-                'type' => 'fieldset',
-                'legend' => $this->t('notesSettingsHeader'),
-                'fields' => $this->getNotesFields(),
-            ],
-        ];
+        if ($this->signUpResponse === null) {
+            // Not submitted or errors: render registration form.
+            $fields += [
+                'introHeader' => [
+                    'type' => 'fieldset',
+                    'legend' => $this->t('introHeader'),
+                    'fields' => $this->getIntroFields(),
+                ],
+                'personSettingsHeader' => [
+                    'type' => 'fieldset',
+                    'legend' => $this->t('personSettingsHeader'),
+                    'fields' => $this->getPersonFields(),
+                ],
+                'companySettingsHeader' => [
+                    'type' => 'fieldset',
+                    'legend' => $this->t('companySettingsHeader'),
+                    'description' => $this->t('desc_companySettings'),
+                    'fields' => $this->getCompanyFields(),
+                ],
+                'notesSettingsHeader' => [
+                    'type' => 'fieldset',
+                    'legend' => $this->t('notesSettingsHeader'),
+                    'fields' => $this->getNotesFields(),
+                ],
+            ];
+        } else {
+            // Successfully submitted: show details of the created account.
+            $fields += $this->getCreatedAccountFields();
+            $fields += $this->getCreatedApiAccountFields();
+            $fields += [
+                'whatsNext' => [
+                    'type' => 'fieldset',
+                    'legend' => $this->t('whatsNextHeader'),
+                    'fields' => $this->getWhatsNextFields(),
+                ],
+            ];
+        }
         return $fields;
     }
 
@@ -204,7 +239,7 @@ class RegistrationForm extends Form
         return [
             'intro' => [
                 'type' => 'markup',
-                'label' => '<img src="' . $this->getLogoUrl() . '" width="150"; height="150">',
+                'label' => $this->getLogo(),
                 'value' => $this->t('registration_form_intro'),
                 'attributes' => [
                     'label' => [
@@ -245,7 +280,7 @@ class RegistrationForm extends Form
                 'label' => $this->t('field_fullName'),
                 'description' => $this->t('desc_fullName'),
                 'attributes' => [
-//                    'required' => true,
+                    'required' => true,
                     'size' => 40,
                 ],
             ],
@@ -254,7 +289,7 @@ class RegistrationForm extends Form
                 'label' => $this->t('field_loginName'),
                 'description' => sprintf($this->t('desc_loginName'), $this->t('module')),
                 'attributes' => [
-//                    'required' => true,
+                    'required' => true,
                     'size' => 20,
                 ],
             ],
@@ -281,7 +316,7 @@ class RegistrationForm extends Form
                 'type' => 'text',
                 'label' => $this->t('field_companyName'),
                 'attributes' => [
-//                    'required' => true,
+                    'required' => true,
                     'size' => 40,
                 ],
             ],
@@ -289,7 +324,7 @@ class RegistrationForm extends Form
                 'type' => 'text',
                 'label' => $this->t('field_address'),
                 'attributes' => [
-//                    'required' => true,
+                    'required' => true,
                     'size' => 40,
                 ],
             ],
@@ -297,7 +332,7 @@ class RegistrationForm extends Form
                 'type' => 'text',
                 'label' => $this->t('field_postalCode'),
                 'attributes' => [
-//                    'required' => true,
+                    'required' => true,
                     'size' => 8,
                 ],
             ],
@@ -305,7 +340,7 @@ class RegistrationForm extends Form
                 'type' => 'text',
                 'label' => $this->t('field_city'),
                 'attributes' => [
-//                    'required' => true,
+                    'required' => true,
                     'size' => 20,
                 ],
             ],
@@ -314,7 +349,7 @@ class RegistrationForm extends Form
                 'label' => $this->t('field_emailRegistration'),
                 'description' => sprintf($this->t('desc_emailRegistration'), $this->t('module')),
                 'attributes' => [
-//                    'required' => true,
+                    'required' => true,
                     'size' => 40,
                 ],
             ],
@@ -331,11 +366,9 @@ class RegistrationForm extends Form
                 'label' => $this->t('field_bankAccount'),
                 'description' => $this->t('desc_bankAccount'),
                 'attributes' => [
-//                    'required' => true,
                     'size' => 20,
                 ],
             ],
-
         ];
     }
 
@@ -358,6 +391,135 @@ class RegistrationForm extends Form
                 'attributes' => array(
                     'rows' => 6,
                 ),
+            ],
+        ];
+    }
+
+    /**
+     * Returns explanatory text about the test account that has been created.
+     *
+     * @return array[]
+     *   Markup that gives more information about the the test account that has
+     *   been created.
+     */
+    protected function getCreatedAccountFields()
+    {
+        $title = $this->t('registration_form_success_title');
+        $line1 = sprintf($this->t('registration_form_success_text1'), DateTime::createFromFormat('Y-m-d', $this->signUpResponse['contractenddate'])->format('d-m-Y'));
+        $line2 = sprintf($this->t('registration_form_success_text2'), htmlspecialchars($this->getSubmittedValue(Tag::Email), ENT_NOQUOTES | ENT_HTML5, 'UTF-8'));
+        $line3 = $this->t('registration_form_success_login_button');
+        return [
+            'congratulations' => [
+                'type' => 'markup',
+                'value' => "<h1>$title</h1>\n<p>$line1</p>\n<p>$line2</p>",
+            ],
+            'loginDetails' => [
+                'type' => 'details',
+                'summary' => $this->t('loginDetailsHeader'),
+                'fields' => [
+                    Tag::ContractCode => [
+                        'type' => 'text',
+                        'label' => $this->t('field_code'),
+                        'attributes' => [
+                            'readonly' => true,
+                            'size' => 10,
+                        ],
+                        'value' => $this->signUpResponse[Tag::ContractCode],
+                    ],
+                    Tag::LoginName => [
+                        'type' => 'text',
+                        'label' => $this->t('field_loginName'),
+                        'attributes' => [
+                            'readonly' => true,
+                            'size' => 20,
+                        ],
+                        'value' => $this->signUpResponse['contract' . Tag::LoginName],
+                    ],
+                    Tag::Password => [
+                        'type' => 'text',
+                        'label' => $this->t('field_password'),
+                        'attributes' => [
+                            'readonly' => true,
+                            'size' => 20,
+                        ],
+                        'value' => $this->signUpResponse['contract' . Tag::Password],
+                    ],
+                    'loginButton' => [
+                        'type' => 'markup',
+                        'value' => "<p>$line3</p>",
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Returns explanatory text about the test account that has been created.
+     *
+     * @return array[]
+     *   Markup that gives more information about the the test account that has
+     *   been created.
+     */
+    protected function getCreatedApiAccountFields()
+    {
+        $line1 = sprintf($this->t('registration_form_success_api_account'), $this->t('module'));
+        return [
+            'apiAccount' => [
+                'type' => 'markup',
+                'value' => "<p>$line1</p>",
+            ],
+            'loginDetails' => [
+                'type' => 'details',
+                'summary' => sprintf($this->t('moduleLoginDetailsHeader'), $this->t('module')),
+                'fields' => [
+                    'contractapiuser' . Tag::ContractCode => [
+                        'type' => 'text',
+                        'label' => $this->t('field_code'),
+                        'attributes' => [
+                            'readonly' => true,
+                            'size' => 10,
+                        ],
+                        'value' => $this->signUpResponse[Tag::ContractCode],
+                    ],
+                    'contractapiuser' . Tag::LoginName => [
+                        'type' => 'text',
+                        'label' => $this->t('field_loginName'),
+                        'attributes' => [
+                            'readonly' => true,
+                            'size' => 20,
+                        ],
+                        'value' => $this->signUpResponse['contractapiuser' . Tag::LoginName],
+                    ],
+                    'contractapiuser' . Tag::Password => [
+                        'type' => 'text',
+                        'label' => $this->t('field_password'),
+                        'attributes' => [
+                            'readonly' => true,
+                            'size' => 20,
+                        ],
+                        'value' => $this->signUpResponse['contractapiuser' . Tag::Password],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Returns explanatory text about what to do next.
+     *
+     * @return array[]
+     *   Markup that explains what to do next.
+     */
+    protected function getWhatsNextFields()
+    {
+        $line1 = $this->t('registration_form_success_acumulus'  );
+        $line2 = sprintf($this->t('registration_form_success_config'), $this->t('module'));
+        $line3 = sprintf($this->t('registration_form_success_config_button'), $this->t('module'), $this->shopCapabilities->getLink('config'));
+        $line4 = sprintf($this->t('registration_form_success_batch'), $this->t('module'));
+        return [
+            'configButton' => [
+                'type' => 'markup',
+                'value' => "<p>$line1</p>\n<p>$line2</p>\n<p>$line3</p>\n<p>$line4</p>\n",
             ],
         ];
     }

@@ -511,6 +511,18 @@ abstract class Form extends MessageCollection
     abstract protected function getFieldDefinitions();
 
     /**
+     * Returns the html of an <img> tag to show the logo.
+     *
+     * @param int $size
+     *
+     * @return string
+     */
+    protected function getLogo($size = 150) {
+        /** @noinspection HtmlUnknownTarget */
+        return sprintf('<img src="%1$s" alt="Logo SIEL Acumulus" title="SIEL Acumulus" width="%2$d" height="%2$d">', $this->getLogoUrl(), $size);
+    }
+
+    /**
      * Returns the url to the logo.
      *
      * @return string

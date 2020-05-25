@@ -162,7 +162,7 @@ class Container
      *   A language or locale code, e.g. nl, nl-NL, or en-UK. Only the first 2
      *   characters will be used.
      */
-    public function __construct($shopNamespace, $language)
+    public function __construct($shopNamespace, $language = 'nl')
     {
         $this->shopNamespace = '';
         if (strpos($shopNamespace, 'Acumulus') === false) {

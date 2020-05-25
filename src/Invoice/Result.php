@@ -262,9 +262,10 @@ class Result extends WebResult
                 $message .= "\n" . $this->formatMessages(Message::Format_PlainListWithSeverity, Severity::RealMessages);
             }
             if ($addReqResp === Result::AddReqResp_Always || ($addReqResp === Result::AddReqResp_WithOther && $this->hasRealMessages())) {
+                $message = rtrim($message);
                 $message .= "\n" . $this->formatMessages(Message::Format_PlainList, Severity::Log);
             }
         }
-        return $message;
+        return rtrim($message);
     }
 }

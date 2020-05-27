@@ -27,18 +27,6 @@ class Result extends MessageCollection
     const CodeTagRawResponse = 'Response';
 
     /**
-     * @var string|null
-     *   The raw contents of the request as was sent to the web service.
-     */
-    protected $rawRequest;
-
-    /**
-     * @var string|null
-     *   The raw contents of the response as was received from the web service.
-     */
-    protected $rawResponse;
-
-    /**
      * @var int|null
      *   The received api status or null if not yet sent.
      */
@@ -76,8 +64,6 @@ class Result extends MessageCollection
     {
         parent::__construct();
         $this->apiStatus = null;
-        $this->rawRequest = null;
-        $this->rawResponse = null;
         $this->response = [];
         $this->mainResponseKey = '';
         $this->isList = false;
@@ -299,8 +285,10 @@ class Result extends MessageCollection
      */
     public function setRawResponse($rawResponse)
     {
+        $rawResponse = preg_replace('|<([a-z]*)password>.*</[a-z]*password>|', '<$1password>REMOVED FOR SECURITY</$1password>', $rawResponse);
+        $rawResponse = preg_replace('|"([a-z]*)password"(\s*):(\s*)"[^"]+"|', '"$1password"$2:$3"REMOVED FOR SECURITY"', $rawResponse);
         $this->addMessage(
-            preg_replace('|<([a-z]*)password>.*</[a-z]*password>|', '<$1password>REMOVED FOR SECURITY</$1password>', $rawResponse),
+            $rawResponse,
             Severity::Log,
             self::CodeTagRawResponse,
             0

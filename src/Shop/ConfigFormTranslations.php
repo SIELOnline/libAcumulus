@@ -23,7 +23,7 @@ class ConfigFormTranslations extends TranslationCollection
         'button_link' => '<a href="%2$s">%1$s</a>',
         'button_cancel' => 'Terug',
 
-        'message_validate_email_2' => 'Het veld (fictieve klant) Email is geen valide e-mailadres, vul een correct e-mailadres in.',
+        'message_validate_email_2' => 'Het veld (fictieve klant) E-mail is geen valide e-mailadres, vul een correct e-mailadres in.',
         'message_validate_conflicting_options' => 'Als u geen klantgegevens naar Acumulus verstuurt, kunt u Acumulus geen PDF factuur laten versturen. Pas één van beide opties aan.',
 
         'message_form_config_success' => 'De instellingen zijn opgeslagen.',
@@ -64,8 +64,8 @@ class ConfigFormTranslations extends TranslationCollection
         'message_validate_password_0' => 'Het veld Wachtwoord is verplicht, vul het wachtwoord in dat u ook gebruikt om in te loggen op Acumulus.',
         'message_validate_password_1' => 'Het veld Wachtwoord bevat spaties aan het begin of eind. Dit is toegestaan, maar weet u zeker dat dit de bedoeling is?',
         'message_validate_password_2' => 'Het veld Wachtwoord bevat tekens die Acumulus verbiedt (`\'"#%&;<>\\). Weet u zeker dat u het juiste wachtwoord heeft ingetypt?',
-        'message_validate_email_0' => 'Het veld Email is geen valide e-mailadres, vul uw eigen e-mailadres in.',
-        'message_validate_email_1' => 'Het veld Email is verplicht, vul uw eigen e-mailadres in.',
+        'message_validate_email_0' => 'Het veld E-mail is geen valide e-mailadres, vul uw eigen e-mailadres in.',
+        'message_validate_email_1' => 'Het veld E-mail is verplicht, vul uw eigen e-mailadres in.',
         'message_validate_nature_0' => 'Het veld \'Soort: wat verkoopt u?\' is verplicht, kies een waarde.',
         'message_validate_foreign_vat_0' => 'Het veld \'Verkoopt u producten of diensten waarbij u EU btw moet hanteren?\' is verplicht, kies een waarde.',
         'message_validate_vat_free_products_0' => 'Het veld \'Verkoopt u van btw vrijgestelde producten of diensten?\' is verplicht, kies een waarde.',
@@ -396,7 +396,7 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'button_submit_advanced'=> 'Save settings',
         'button_cancel' => 'Back',
 
-        'message_validate_email_2' => 'The field (fictitious customer) Email is not a valid e-mail address, please fill in a correct e-mail address.',
+        'message_validate_email_2' => 'The field (fictitious customer) E-mail is not a valid e-mail address, please fill in a correct e-mail address.',
         'message_validate_conflicting_options' => 'If you don\'t send customer data to Acumulus, Acumulus cannot send PDF invoices. Change one of the options.',
 
         'message_form_config_success' => 'The settings are saved.',
@@ -436,8 +436,8 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'message_validate_password_0' => 'The field Password is required, please fill in the password you use to log in to Acumulus.',
         'message_validate_password_1' => 'The field Password contains spaces at the start or end. This is allowed but are you sure that you meant to do so?',
         'message_validate_password_2' => 'The field Password contains a character that is forbidden by Acumulus (`\'"#%&;<>\\). Are you sure that you typed the correct password?',
-        'message_validate_email_0' => 'The field Email is not a valid e-mail address, please fill in your own e-mail address.',
-        'message_validate_email_1' => 'The field Email is required, please fill in your own e-mail address.',
+        'message_validate_email_0' => 'The field E-mail is not a valid e-mail address, please fill in your own e-mail address.',
+        'message_validate_email_1' => 'The field E-mail is required, please fill in your own e-mail address.',
         'message_validate_nature_0' => 'The field \'Nature: what do you sell?\' is required, select a value.',
         'message_validate_foreign_vat_0' => 'The field \'Do you sell products or services that are subject to foreign VAT for EU customers?\' is required, select a value.',
         'message_validate_vat_free_products_0' => 'The field \'Do you sell VAT free products or services?\' is required, select a value.',

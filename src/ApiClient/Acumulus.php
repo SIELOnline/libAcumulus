@@ -143,6 +143,24 @@ class Acumulus
     }
 
     /**
+     * Retrieves a list of invoice templates.
+     *
+     * @return \Siel\Acumulus\ApiClient\Result
+     *   The result of the webservice call. The structured response will contain
+     *   a non-keyed array of "companytype" arrays, each "companytype"
+     *   array being a keyed array with keys:
+     *   - companytypeid
+     *   - companytypename
+     *   - companytypenamenl
+     *
+     * @see https://www.siel.nl/acumulus/API/Picklists/Company_Types/
+     */
+    public function getPicklistCompanyTypes()
+    {
+        return $this->callApiFunction('picklists/picklist_companytypes', [], false)->setMainResponseKey('companytypes', true);
+    }
+
+    /**
      * A helper method to retrieve a given picklist.
      *
      * The Acumulus API for picklists is so well standardized, that it is

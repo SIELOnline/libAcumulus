@@ -22,6 +22,7 @@ interface Tag
     const ContactId = 'contactid';
     const ContactYourId = 'contactyourid';
     const ContactStatus = 'contactstatus';
+    const CompanyTypeId = 'companytypeid';
     const CompanyName = 'companyname';
     const CompanyName1 = 'companyname1';
     const CompanyName2 = 'companyname2';

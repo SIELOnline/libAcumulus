@@ -28,11 +28,12 @@ class AcumulusTest extends TestCase
     public function responseKeysProvider()
     {
         return [
-            'About' => ['getAbout', [], false, ['about', 'status', 'role', 'roleid', 'tree', 'usability']],
+            'About' => ['getAbout', [], false, ['about', 'role', 'roleid']],
             'Accounts' => ['getPicklistAccounts', [], true, ['accountid', 'accountnumber', 'accountdescription','accounttypeid']],
             'ContactTypes' => ['getPicklistContactTypes', [], true, ['contacttypeid', 'contacttypename','contacttypenamenl']],
             'CostCenters' => ['getPicklistCostCenters', [], true, ['costcenterid','costcentername']],
             'InvoiceTemplates' => ['getPicklistInvoiceTemplates', [], true, ['invoicetemplateid','invoicetemplatename']],
+            'CompanyTypes' => ['getPicklistCompanyTypes', [], true, ['companytypeid', 'companytypename', 'companytypenamenl']],
             'VatInfo' => ['getVatInfo', ['nl'], true, ['vattype','vatrate']],
         ];
     }

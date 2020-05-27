@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\Helpers;
 
+use Siel\Acumulus\ApiClient\Result;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\ShopCapabilities;
 
@@ -59,7 +60,12 @@ use Siel\Acumulus\Config\ShopCapabilities;
  */
 abstract class Form extends MessageCollection
 {
-    /** @var string */
+    /**
+     * @var string
+     *   The type of this form, the class could also be used to determine so,
+     *   but as a simple type string is already used on creation, that is used.
+     *   Should be one of: registration, config, advanced, batch, invoice, rate.
+     */
     protected $type;
 
     /** @var \Siel\Acumulus\Helpers\Translator */
@@ -89,11 +95,37 @@ abstract class Form extends MessageCollection
     /** @var string[] The values as filled in on form submission. */
     protected $submittedValues;
 
-    /** @var bool */
+    /**
+     * @var bool
+     *   For some forms it is important to know which fields were rendered and
+     *   of what type they were  and to which set (of checkboxes) they belong.
+     *   As empty fields will not be present in the $_POST variable, this may be
+     *   hard to determine on submit, so a hidden field containing a summary of
+     *   rendered fields is added to the form and will thus be available on
+     *   submit.
+     *
+     *   For other forms it turned out to be a hindrance, so a property now
+     *   guides whether the meta field is rendered or not.
+     */
     protected $addMeta = true;
 
-    /** @var bool */
-    protected $addErrors = true;
+    /**
+     * @var bool
+     *   Whether this forms needs to be followed by a submit button and
+     *   surrounded by a form tag.
+     *
+     *   Not all "forms" as defined by this library are real forms in the sense
+     *   of being enclosed in a <form> tag and having a "submit" button rendered
+     *   following the standards of the specific webshop/CMS.
+     */
+    protected $needsFormAndSubmitButton = true;
+
+    /**
+     * @var bool
+     *   Whether too add a css class to fields that indicates the severity of
+     *   any message linked to this field.
+     */
+    protected $addSeverityClassToFields = true;
 
     /**
      * @param \Siel\Acumulus\Helpers\FormHelper $formHelper
@@ -146,6 +178,14 @@ abstract class Form extends MessageCollection
     public function getType()
     {
       return $this->type;
+    }
+
+    /**
+     * @return bool
+     */
+    public function needsFormAndSubmitButton()
+    {
+        return $this->needsFormAndSubmitButton;
     }
 
     /**
@@ -492,7 +532,7 @@ abstract class Form extends MessageCollection
             if ($this->addMeta) {
                 $this->fields = $this->formHelper->addMetaField($this->fields);
             }
-            if ($this->addErrors && $this->hasRealMessages()) {
+            if ($this->addSeverityClassToFields && $this->hasRealMessages()) {
                 $this->fields = $this->formHelper->addSeverityClassToFields($this->fields, $this->getMessages());
             }
         }
@@ -509,6 +549,69 @@ abstract class Form extends MessageCollection
      *   The definition of the form.
      */
     abstract protected function getFieldDefinitions();
+
+    /**
+     * Converts a picklist response into a set of options, e.g. for a dropdown.
+     *
+     * A picklist is a list of items that have the following structure:
+     * - Each picklist item contains an identifying value in the 1st entry.
+     * - Most picklist items contain a describing string in the 2nd entry.
+     * - Some picklist items contain an alternative/additional description in
+     *   the 3rd entry.
+     * - The company type picklist contains an english resp dutch description in
+     *   the 2nd and 3rd entry.
+     *
+     * @param \Siel\Acumulus\ApiClient\Result $picklist
+     *   The picklist result structure.
+     * @param string|null $emptyValue
+     *   The value to use for an empty selection.
+     * @param string|null $emptyText
+     *   The label to use for an empty selection.
+     *
+     * @return array
+     */
+    protected function picklistToOptions(Result $picklist, $emptyValue = null, $emptyText = null)
+    {
+        $result = array();
+
+        // Empty value, if any, at top.
+        if ($emptyValue !== null) {
+            $result[$emptyValue] = $emptyText;
+        }
+
+        // Other values follow, we do not change the order.
+        $pickListItems = $picklist->getResponse();
+        foreach ($pickListItems as $picklistItem) {
+            $optionId = reset($picklistItem);
+            if (count($picklistItem) === 1) {
+                $optionText = $optionId;
+            } else {
+                $optionText = next($picklistItem);
+                $key2 = key($picklistItem);
+                if (count($picklistItem) > 2) {
+                    $optionalText = next($picklistItem);
+                    $key3 = key($picklistItem);
+                    if (empty($optionText)) {
+                        $optionText = $optionalText;
+                    } elseif (!empty($optionalText)) {
+                        if ($key3 === $key2 . 'nl') {
+                            if ($this->translator->getLanguage() === 'nl') {
+                                // english and dutch descriptions and dutch is
+                                // the active language: use the 3rd text.
+                                $optionText = $optionalText;
+                            }
+                        } else {
+                            // Additional description: add it.
+                            $optionText .= ' (' . $optionalText . ')';
+                        }
+                    }
+                }
+            }
+            $result[$optionId] = $optionText;
+        }
+
+        return $result;
+    }
 
     /**
      * Returns the html of an <img> tag to show the logo.

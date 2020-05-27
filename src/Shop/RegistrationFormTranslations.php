@@ -37,6 +37,7 @@ class RegistrationFormTranslations extends TranslationCollection
         'companySettingsHeader' => 'Over uw bedrijf',
         'desc_companySettings' => 'Met onderstaande info kunnen we uw proefaccount beter inrichten, zo kunnen we b.v. een factuursjabloon maken. Uiteraard kunt u deze gegevens later nog aanpassen.',
 
+        'field_companyTypeId' => 'Rechtsvorm',
         'field_companyName' => 'Bedrijfsnaam',
         'field_address' => 'Adres',
         'field_postalCode' => 'Postcode',
@@ -64,25 +65,26 @@ class RegistrationFormTranslations extends TranslationCollection
 
         'registration_form_success_title' => 'Hartelijk dank voor uw aanmelding!',
         'registration_form_success_text1' => 'U kunt Acumulus 30 dagen (tot %s) gratis en vrijblijvend proberen. Uw proefaccount is volledig functioneel doch met een maximum van 50 boekingen. Indien u vragen hebt, vernemen wij dat graag.',
-        'registration_form_success_text2' => 'Uw inloggegevens zijn verstuurd naar %s, maar wij hebben ze hier ook voor u genoteerd. Bewaar deze bij voorkeur in een wachwoordbeheerder.',
+        'registration_form_success_text2' => 'Uw inloggegevens zijn verstuurd naar %s, maar wij hebben ze hier ook voor u genoteerd. Bewaar deze bij voorkeur in een wachtwoordbeheerder.',
+        'registration_form_success_text3' => 'Hebt u geen e-mail ontvangen? Mogelijk wordt ons e-mailbericht met uw inlogcodes gefilterd door uw spamfilter. Controleer uw spamfilter en de map met gefilterde e-mail. Neem anders contact met ons op zodat wij u uw gegevens opnieuw kunnen toesturen.',
         'loginDetailsHeader' => 'Klik om uw inlogcodes te zien',
 
         'field_code' => 'Contractcode',
         'field_password' => 'Wachtwoord',
-        'registration_form_success_login_button' => '<a class="button" target="_blank" href="https://www.sielsystems.nl/acumulus/login.php">Nu inloggen op Acumulus</a> (opent in een nieuwe tab).',
 
         'registration_form_success_api_account' => 'Deze %1$s zal met zijn eigen aanmeldingsgegevens communiceren met Acumulus.
-           Deze zijn al opgeslagen in de instellingen van deze %1$s, maar staan voor u ook hieronder genoteerd zodat u ze kunt opslaan in een wachwoordbeheerder.
+           Deze zijn al opgeslagen in de instellingen van deze %1$s, maar staan voor u ook hieronder genoteerd zodat u ze kunt opslaan in een wachtwoordbeheerder.
            Voor de beveiliging van uw Acumulus account heeft dit speciale account een ander gebruikerstype, dat alleen via de API met Acumulus mag communiceren. Er kan niet mee worden ingelogd op Acumulus zelf.',
         'moduleLoginDetailsHeader' => 'Klik om de inlogcodes van deze %s te zien',
+        'desc_apiloginDetails' => 'Deze inlogcodes zijn toegevoegd aan de instellingen van deze %1$s',
 
-        'whatsNextHeader' => 'Wat nu?',
-        'registration_form_success_acumulus' => 'U kunt Acumulus verder instellen door o.a. rekeningen, kostenplaatsen en factuursjablonen toe te voegen.',
-        'registration_form_success_config' => 'U dient deze %1$s verder in te stellen op de "instellingen" en "geavanceerde instellingen" schermen.',
-        'registration_form_success_config_button' => '<a class="button" target="_blank" href="%2$s">Acumulus %1$s instellen</a> (opent in een nieuwe tab).',
+        'whatsNextHeader' => 'Volgende stappen',
+        'registration_form_success_configure_acumulus' => 'U kunt <strong>Acumulus verder instellen</strong> door o.a. rekeningen, kostenplaatsen en factuursjablonen toe te voegen.',
+        'registration_form_success_login_button' => '<a class="button" target="_blank" href="https://www.sielsystems.nl/acumulus/login.php">Nu inloggen op Acumulus</a> (opent in een nieuwe tab en gaat naar de Acumulus website).',
+        'registration_form_success_configure_module' => 'U dient <strong>deze %1$s verder in te stellen</strong> op de "instellingen" en "geavanceerde instellingen" schermen.',
+        'registration_form_success_config_button' => '<a class="button" target="_blank" href="%2$s">Acumulus %1$s instellen</a> (opent in een nieuwe tab maar blijft in uw webwinkel).',
         'registration_form_success_batch' => 'Nadat u deze %1$s heeft ingeregeld worden de factuurgegevens van uw nieuwe bestellingen automatisch naar Acumulus verstuurd.
-           Om al afgeronde bestellingen alsnog toe te voegen aanuw adminsitratie, kunt u het batchverzendformulier van deze %1$s gebruiken.',
-
+           Om al afgeronde bestellingen alsnog toe te voegen aan uw administratie, kunt u het batchverzendformulier van deze %1$s gebruiken.',
     ];
 
     protected $en = [

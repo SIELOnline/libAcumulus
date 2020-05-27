@@ -17,6 +17,9 @@ use Siel\Acumulus\Tag;
 /**
  * Class RegistrationForm implements a registration form to register for a
  * temporary free Acumulus account (which can be converted to a full account).
+ * It is similar to the form on https://www.siel.nl/acumulus/proefaccount/,
+ * though via the API we will also get authentication details for an API
+ * account.
  *
  * @noinspection PhpUnused Instantiated by \Siel\Acumulus\Helpers\Container::getForm().
  */
@@ -52,18 +55,6 @@ class RegistrationForm extends Form
 
         $this->acumulusApiClient = $acumulusApiClient;
         $this->signUpResponse = null;
-        // TMP
-        $this->signUpResponse = [
-            'contractcode' => '218975',
-            'contractloginname' => 'erwind',
-            'contractpassword' => 'WCpAfaW8hABq',
-            'contractstartdate' => '2020-05-25',
-            'contractenddate' => '2020-06-24',
-            'contractapiuserloginname' => 'Acumulus-API-ce5bb',
-            'contractapiuserpassword' => 'OTAcu3eq5VjezM',
-        ];
-        $this->submittedValues[Tag::Email] = 'erwin@burorader.com';
-        // TMP
     }
 
     /**
@@ -72,6 +63,10 @@ class RegistrationForm extends Form
     protected function validate()
     {
         $regexpEmail = '/^[^@<>,; "\']+@([^.@ ,;]+\.)+[^.@ ,;]+$/';
+
+        if (empty($this->submittedValues[Tag::CompanyTypeId]) || $this->submittedValues[Tag::CompanyTypeId] === $this->t('option_empty')) {
+            $this->addMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_companyTypeId')), Severity::Error, Tag::CompanyTypeId);
+        }
 
         if (empty($this->submittedValues[Tag::CompanyName])) {
             $this->addMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_companyName')), Severity::Error, Tag::CompanyName);
@@ -114,6 +109,7 @@ class RegistrationForm extends Form
     protected function execute()
     {
         $tags = [
+            Tag::CompanyTypeId,
             Tag::CompanyName,
             Tag::FullName,
             Tag::LoginName,
@@ -184,6 +180,19 @@ class RegistrationForm extends Form
      */
     protected function getFieldDefinitions()
     {
+        // Test success screen
+//        $this->signUpResponse = [
+//            'contractcode' => '218975',
+//            'contractloginname' => 'erwind',
+//            'contractpassword' => 'WCpAfaW8hABq',
+//            'contractstartdate' => '2020-05-25',
+//            'contractenddate' => '2020-06-24',
+//            'contractapiuserloginname' => 'Acumulus-API-ce5bb',
+//            'contractapiuserpassword' => 'OTAcu3eq5VjezM',
+//        ];
+//        $this->submittedValues[Tag::Email] = 'erwin@burorader.com';
+        // End test success screen
+
         $fields = [];
         if ($this->signUpResponse === null) {
             // Not submitted or errors: render registration form.
@@ -212,15 +221,10 @@ class RegistrationForm extends Form
             ];
         } else {
             // Successfully submitted: show details of the created account.
+            $this->needsFormAndSubmitButton = false;
             $fields += $this->getCreatedAccountFields();
             $fields += $this->getCreatedApiAccountFields();
-            $fields += [
-                'whatsNext' => [
-                    'type' => 'fieldset',
-                    'legend' => $this->t('whatsNextHeader'),
-                    'fields' => $this->getWhatsNextFields(),
-                ],
-            ];
+            $fields += $this->getNextSteps();
         }
         return $fields;
     }
@@ -312,6 +316,14 @@ class RegistrationForm extends Form
     protected function getCompanyFields()
     {
         return [
+            Tag::CompanyTypeId => [
+                'type' => 'select',
+                'label' => $this->t('field_companyTypeId'),
+                'options' => $this->picklistToOptions($this->acumulusApiClient->getPicklistCompanyTypes(), '', $this->t('option_empty')),
+                'attributes' => [
+                    'required' => true,
+                ],
+            ],
             Tag::CompanyName => [
                 'type' => 'text',
                 'label' => $this->t('field_companyName'),
@@ -407,11 +419,11 @@ class RegistrationForm extends Form
         $title = $this->t('registration_form_success_title');
         $line1 = sprintf($this->t('registration_form_success_text1'), DateTime::createFromFormat('Y-m-d', $this->signUpResponse['contractenddate'])->format('d-m-Y'));
         $line2 = sprintf($this->t('registration_form_success_text2'), htmlspecialchars($this->getSubmittedValue(Tag::Email), ENT_NOQUOTES | ENT_HTML5, 'UTF-8'));
-        $line3 = $this->t('registration_form_success_login_button');
+        $line3 = $this->t('registration_form_success_text3');
         return [
             'congratulations' => [
                 'type' => 'markup',
-                'value' => "<h1>$title</h1>\n<p>$line1</p>\n<p>$line2</p>",
+                'value' => "<h1>$title</h1>\n<p>$line1</p>\n<p>$line2 $line3</p>",
             ],
             'loginDetails' => [
                 'type' => 'details',
@@ -422,7 +434,7 @@ class RegistrationForm extends Form
                         'label' => $this->t('field_code'),
                         'attributes' => [
                             'readonly' => true,
-                            'size' => 10,
+                            'size' => 8,
                         ],
                         'value' => $this->signUpResponse[Tag::ContractCode],
                     ],
@@ -444,10 +456,6 @@ class RegistrationForm extends Form
                         ],
                         'value' => $this->signUpResponse['contract' . Tag::Password],
                     ],
-                    'loginButton' => [
-                        'type' => 'markup',
-                        'value' => "<p>$line3</p>",
-                    ],
                 ],
             ],
         ];
@@ -468,7 +476,7 @@ class RegistrationForm extends Form
                 'type' => 'markup',
                 'value' => "<p>$line1</p>",
             ],
-            'loginDetails' => [
+            'apiloginDetails' => [
                 'type' => 'details',
                 'summary' => sprintf($this->t('moduleLoginDetailsHeader'), $this->t('module')),
                 'fields' => [
@@ -477,7 +485,7 @@ class RegistrationForm extends Form
                         'label' => $this->t('field_code'),
                         'attributes' => [
                             'readonly' => true,
-                            'size' => 10,
+                            'size' => 8,
                         ],
                         'value' => $this->signUpResponse[Tag::ContractCode],
                     ],
@@ -499,6 +507,10 @@ class RegistrationForm extends Form
                         ],
                         'value' => $this->signUpResponse['contractapiuser' . Tag::Password],
                     ],
+                    'desc_apiloginDetails' => [
+                        'type' => 'markup',
+                        'value' => sprintf($this->t('desc_apiloginDetails'), $this->t('module')),
+                    ],
                 ],
             ],
         ];
@@ -510,16 +522,18 @@ class RegistrationForm extends Form
      * @return array[]
      *   Markup that explains what to do next.
      */
-    protected function getWhatsNextFields()
+    protected function getNextSteps()
     {
-        $line1 = $this->t('registration_form_success_acumulus'  );
-        $line2 = sprintf($this->t('registration_form_success_config'), $this->t('module'));
-        $line3 = sprintf($this->t('registration_form_success_config_button'), $this->t('module'), $this->shopCapabilities->getLink('config'));
-        $line4 = sprintf($this->t('registration_form_success_batch'), $this->t('module'));
+        $title = $this->t('whatsNextHeader');
+        $line1 = $this->t('registration_form_success_configure_acumulus');
+        $button1 = $this->t('registration_form_success_login_button');
+        $line2 = sprintf($this->t('registration_form_success_configure_module'), $this->t('module'));
+        $button2 = sprintf($this->t('registration_form_success_config_button'), $this->t('module'), $this->shopCapabilities->getLink('config'));
+        $line3 = sprintf($this->t('registration_form_success_batch'), $this->t('module'));
         return [
-            'configButton' => [
+            'nextSteps' => [
                 'type' => 'markup',
-                'value' => "<p>$line1</p>\n<p>$line2</p>\n<p>$line3</p>\n<p>$line4</p>\n",
+                'value' => "<h2>$title</h2><p>$line1</p>\n<p>$button1<br><br></p>\n<p>$line2</p>\n<p>$button2<br><br></p>\n<p>$line3</p>\n",
             ],
         ];
     }

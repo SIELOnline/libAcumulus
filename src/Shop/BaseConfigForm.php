@@ -221,58 +221,6 @@ abstract class BaseConfigForm extends Form
     }
 
     /**
-     * Converts a picklist response into a set of options, e.g. for a dropdown.
-     *
-     * A picklist is a list of items that have the following structure:
-     * - Each picklist item contains an identifying value in the 1st entry.
-     * - Most picklist items contain a describing string in the 2nd entry.
-     * - Some picklist items contain an altenative/additional description in the
-     *   3rd entry.
-     *
-     * @param \Siel\Acumulus\ApiClient\Result $picklist
-     *   The picklist result structure.
-     * @param string|null $emptyValue
-     *   The value to use for an empty selection.
-     * @param string|null $emptyText
-     *   The label to use for an empty selection.
-     *
-     * @return array
-     * @internal param string $key The key in the picklist result structure under which the actual results*   The key in the picklist result structure under which the actual results
-     *   can be found.
-     */
-    protected function picklistToOptions(Result $picklist, $emptyValue = null, $emptyText = null)
-    {
-        $result = array();
-
-        // Empty value, if any, at top.
-        if ($emptyValue !== null) {
-            $result[$emptyValue] = $emptyText;
-        }
-
-        // Other values follow, we do not change the order.
-        $pickListItems = $picklist->getResponse();
-        foreach ($pickListItems as $picklistItem) {
-            $optionId = reset($picklistItem);
-            if (count($picklistItem) === 1) {
-                $optionText = $optionId;
-            } else {
-                $optionText = next($picklistItem);
-                if (count($picklistItem) > 2) {
-                    $optionalText = next($picklistItem);
-                    if (empty($optionText)) {
-                        $optionText = $optionalText;
-                    } elseif (!empty($optionalText)) {
-                        $optionText .= ' (' . $optionalText . ')';
-                    }
-                }
-            }
-            $result[$optionId] = $optionText;
-        }
-
-        return $result;
-    }
-
-    /**
      * Returns an option list of all order statuses including an empty choice.
      *
      * @return array

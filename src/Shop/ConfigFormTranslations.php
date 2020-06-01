@@ -23,7 +23,7 @@ class ConfigFormTranslations extends TranslationCollection
         'button_link' => '<a href="%2$s">%1$s</a>',
         'button_cancel' => 'Terug',
 
-        'message_validate_email_2' => 'Het veld (fictieve klant) E-mail is geen valide e-mailadres, vul een correct e-mailadres in.',
+        'message_validate_email_2' => 'Het veld (fictieve klant) E-mail bevat geen geldig e-mailadres, vul een correct e-mailadres in.',
         'message_validate_conflicting_options' => 'Als u geen klantgegevens naar Acumulus verstuurt, kunt u Acumulus geen PDF factuur laten versturen. Pas één van beide opties aan.',
 
         'message_form_config_success' => 'De instellingen zijn opgeslagen.',
@@ -64,7 +64,7 @@ class ConfigFormTranslations extends TranslationCollection
         'message_validate_password_0' => 'Het veld Wachtwoord is verplicht, vul het wachtwoord in dat u ook gebruikt om in te loggen op Acumulus.',
         'message_validate_password_1' => 'Het veld Wachtwoord bevat spaties aan het begin of eind. Dit is toegestaan, maar weet u zeker dat dit de bedoeling is?',
         'message_validate_password_2' => 'Het veld Wachtwoord bevat tekens die Acumulus verbiedt (`\'"#%&;<>\\). Weet u zeker dat u het juiste wachtwoord heeft ingetypt?',
-        'message_validate_email_0' => 'Het veld E-mail is geen valide e-mailadres, vul uw eigen e-mailadres in.',
+        'message_validate_email_0' => 'Het veld E-mail bevat geen geldig e-mailadres, vul uw eigen e-mailadres in.',
         'message_validate_email_1' => 'Het veld E-mail is verplicht, vul uw eigen e-mailadres in.',
         'message_validate_nature_0' => 'Het veld \'Soort: wat verkoopt u?\' is verplicht, kies een waarde.',
         'message_validate_foreign_vat_0' => 'Het veld \'Verkoopt u producten of diensten waarbij u EU btw moet hanteren?\' is verplicht, kies een waarde.',
@@ -331,15 +331,15 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
 
         'field_emailTo' => 'Aan',
         'desc_emailTo' => 'Het email adres waar naartoe de factur verstuurd moet worden. Als u dit leeg laat wordt het emailadres uit de klantgegevens van de factuur gebruikt. Wij adviseren dit veld leeg te laten. U mag meerdere email adressen invullen, gescheiden door een komma (,) of een punt-komma (;).',
-        'message_validate_email_5' => 'Het veld Aan is geen valide e-mailadres, vul een correct e-mailadres in.',
+        'message_validate_email_5' => 'Het veld Aan bevat geen geldig e-mailadres, vul een correct e-mailadres in.',
 
         'field_emailBcc' => 'BCC',
         'desc_emailBcc' => 'Additioneel emailadres om de factuur naar toe te sturen, bv. het emailadres van uw eigen administratie-afdeling. Als u dit leeg laat wordt de factuur alleen naar de klant verstuurd. U mag meerdere email adressen invullen, gescheiden door een komma (,) of een punt-komma (;).',
-        'message_validate_email_3' => 'Het veld BCC is geen valide e-mailadres, vul een correct e-mailadres in.',
+        'message_validate_email_3' => 'Het veld BCC bevat geen geldig e-mailadres, vul een correct e-mailadres in.',
 
         'field_emailFrom' => 'Afzender',
         'desc_emailFrom' => 'Het email adres dat als afzender gebruikt moet worden. Als u dit leeg laat wordt het emailadres uit het Acumulus sjabloon gebruikt.',
-        'message_validate_email_4' => 'Het veld Afzender is geen valide e-mailadres, vul een correct e-mailadres in.',
+        'message_validate_email_4' => 'Het veld Afzender bevat geen geldig e-mailadres, vul een correct e-mailadres in.',
 
         'field_subject' => 'Onderwerp',
         'desc_subject' => 'Het onderwerp van de email. Als u dit leeg laat wordt "Factuur [nummer] [omschrijving]" gebruikt. Let op: als u Acumulus het factuurnummer laat bepalen, is het helaas niet mogelijk om naar het factuurnnummer te verwijzen.',

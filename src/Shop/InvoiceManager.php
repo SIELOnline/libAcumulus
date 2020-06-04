@@ -7,7 +7,6 @@ use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Result;
-use Siel\Acumulus\Invoice\ResultTranslations;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\PluginConfig;
@@ -36,9 +35,6 @@ abstract class InvoiceManager
     public function __construct(Container $container)
     {
         $this->container = $container;
-
-        $translations = new ResultTranslations();
-        $this->getTranslator()->add($translations);
     }
 
     /**
@@ -267,7 +263,6 @@ abstract class InvoiceManager
      */
     public function sendMultiple(array $invoiceSources, $forceSend, $dryRun, array &$log)
     {
-        $this->getTranslator()->add(new ResultTranslations());
         $errorLogged = false;
         $success = true;
         $time_limit = ini_get('max_execution_time');
@@ -304,7 +299,6 @@ abstract class InvoiceManager
      */
     public function send1(Source $invoiceSource, $forceSend)
     {
-        $this->getTranslator()->add(new ResultTranslations());
         $result = $this->getInvoiceResult('InvoiceManager::send1()');
         $result = $this->createAndSend($invoiceSource, $result, $forceSend);
         $success = !$result->hasError();

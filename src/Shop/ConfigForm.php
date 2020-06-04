@@ -141,145 +141,191 @@ class ConfigForm extends BaseConfigForm
      */
     public function getFieldDefinitions()
     {
-        $fields = array();
-
-        // 1st fieldset: Acumulus account settings.
-        $fields['accountSettingsHeader'] = array(
-            'type' => 'fieldset',
-            'legend' => $this->t('accountSettingsHeader'),
-            'description' => $this->t('desc_accountSettings'),
-            'fields' => $this->getAccountFields()
-        );
+        $fields = [];
 
         $message = $this->checkAccountSettings();
-        $accountOk = empty($message);
+        $accountStatus = $this->emptyCredentials() ? null : empty($message);
 
-        if (!$accountOk) {
-            $fields['accountSettingsHeaderMessage'] = array(
+        //  Acumulus account settings.
+        $desc2 = '';
+        if ($accountStatus === null) {
+            $desc = 'desc_accountSettings_N';
+        } elseif ($accountStatus === true) {
+            $desc = 'desc_accountSettings_T';
+        } else {
+            $desc = 'desc_accountSettings_F';
+            if ($message === 'message_error_auth') {
+                $desc2 = 'desc_accountSettings_auth';
+            }
+        }
+        $desc = $this->t($desc);
+        if (!empty($desc2)) {
+            $desc .= ' ' . sprintf($this->t($desc2), $this->shopCapabilities->getLink('registration'));
+        }
+        $fields['accountSettingsHeader'] = [
+            'type' => 'fieldset',
+            'legend' => $this->t('accountSettingsHeader'),
+            'fields' => $this->getAccountFields($accountStatus, $desc),
+        ];
+
+        if ($accountStatus === false) {
+            $fields['accountSettingsHeaderMessage'] = [
                 'type' => 'fieldset',
                 'legend' => $this->t('message_error_header'),
-                'fields' => array(
-                    'invoiceMessage' => array(
+                'fields' => [
+                    'invoiceMessage' => [
                         'type' => 'markup',
-                        'value' => $message,
-                    ),
-                ),
-            );
+                        'value' => $this->translateAccountMessage($message),
+                    ],
+                ],
+            ];
         }
 
-        if ($accountOk) {
-            $fields += array(
-                'shopSettingsHeader' => array(
+        if ($accountStatus) {
+            $fields += [
+                'shopSettingsHeader' => [
                     'type' => 'fieldset',
                     'legend' => $this->t('shopSettingsHeader'),
                     'description' => $this->t('desc_shopSettings'),
                     'fields' => $this->getShopFields(),
-                ),
-                'triggerSettingsHeader' => array(
+                ],
+                'triggerSettingsHeader' => [
                     'type' => 'fieldset',
                     'legend' => $this->t('triggerSettingsHeader'),
                     'description' => sprintf($this->t('desc_triggerSettings'), $this->shopCapabilities->getLink('batch')),
                     'fields' => $this->getTriggerFields(),
-                ),
-                'invoiceSettingsHeader' => array(
+                ],
+                'invoiceSettingsHeader' => [
                     'type' => 'fieldset',
                     'legend' => $this->t('invoiceSettingsHeader'),
                     'fields' => $this->getInvoiceFields(),
-                ),
-            );
+                ],
+            ];
 
             $paymentMethods = $this->shopCapabilities->getPaymentMethods();
             if (!empty($paymentMethods)) {
-                $fields += array(
+                $fields += [
                     'paymentMethodAccountNumberFieldset' => $this->getPaymentMethodsFieldset($paymentMethods, 'paymentMethodAccountNumber', $this->accountNumberOptions),
                     'paymentMethodCostCenterFieldset' => $this->getPaymentMethodsFieldset($paymentMethods, 'paymentMethodCostCenter', $this->costCenterOptions),
-                );
+                ];
             }
 
-            $fields += array(
-                'invoiceStatusScreenSettingsHeader' => array(
+            $fields += [
+                'invoiceStatusScreenSettingsHeader' => [
                     'type' => 'fieldset',
                     'legend' => $this->t('invoiceStatusScreenSettingsHeader'),
                     'description' => $this->t('desc_invoiceStatusScreenSettings') . ' ' . $this->t('desc_invoiceStatusScreenSettings2'),
                     'fields' => $this->getInvoiceStatusScreenFields(),
-                ),
-            );
+                ],
+            ];
         }
 
-        $fields += array(
-            'pluginSettingsHeader' => array(
+        $fields += [
+            'pluginSettingsHeader' => [
                 'type' => 'fieldset',
                 'legend' => $this->t('pluginSettingsHeader'),
                 'fields' => $this->getPluginFields(),
-            ),
-            'versionInformationHeader' => array(
-                'type' => 'fieldset',
-                'legend' => $this->t('versionInformationHeader'),
-                'fields' => $this->getVersionInformation(),
-            ),
-        );
-        if ($accountOk) {
-            $fields += array(
-                'advancedConfigHeader' => array(
+            ],
+            'versionInformationHeader' => $this->getInformationBlock(),
+        ];
+        if ($accountStatus) {
+            $fields += [
+                'advancedConfigHeader' => [
                     'type' => 'details',
                     'summary' => $this->t('advanced_form_header'),
                     'fields' => $this->getAdvancedConfigLinkFields(),
-                ),
-            );
+                ],
+            ];
         }
 
         return $fields;
     }
 
     /**
+     * Returns a field that explains and links to the possibility to register.
+     *
+     * @return array[]
+     *   The registration field.
+     */
+    protected function getRegistrationFields()
+    {
+        return [
+            'register_text' => [
+                'type' => 'markup',
+                'value' => sprintf($this->t('config_form_registration'), $this->t('module')),
+            ],
+            'register_button' => [
+                'type' => 'markup',
+                'value' => sprintf($this->t('config_form_registration_button'), $this->shopCapabilities->getLink('registration')),
+            ],
+        ];
+    }
+
+    /**
      * Returns the set of account related fields.
      *
      * The fields returned:
+     * - optional: registration button + explanation
+     * - description (replaces the legend, as it should come below the optional
+     *   registration button)
      * - contractcode
      * - username
      * - password
      * - emailonerror
      *
+     * @param bool|null $accountStatus
+     * @param string $description
+     *
      * @return array[]
      *   The set of account related fields.
      */
-    protected function getAccountFields()
+    protected function getAccountFields($accountStatus, $description)
     {
-        return array(
-            Tag::ContractCode => array(
+        $fields = [];
+        if ($accountStatus === null) {
+            $fields += $this->getRegistrationFields();
+        }
+        $fields += [
+            'descAccountSettings' => [
+                'type' => 'markup',
+                'value' => $description,
+            ],
+            Tag::ContractCode => [
                 'type' => 'text',
                 'label' => $this->t('field_code'),
-                'attributes' => array(
+                'attributes' => [
                     'required' => true,
                     'size' => 10,
-                ),
-            ),
-            Tag::UserName => array(
+                ],
+            ],
+            Tag::UserName => [
                 'type' => 'text',
                 'label' => $this->t('field_username'),
-                'attributes' => array(
+                'description' => $this->t('desc_username'),
+                'attributes' => [
                     'required' => true,
                     'size' => 20,
-                ),
-            ),
-            Tag::Password => array(
+                ],
+            ],
+            Tag::Password => [
                 'type' => 'password',
                 'label' => $this->t('field_password'),
-                'attributes' => array(
+                'attributes' => [
                     'required' => true,
                     'size' => 20,
-                ),
-            ),
-            Tag::EmailOnError => array(
+                ],
+            ],
+            Tag::EmailOnError => [
                 'type' => 'email',
                 'label' => $this->t('field_emailonerror'),
                 'description' => $this->t('desc_emailonerror'),
-                'attributes' => array(
+                'attributes' => [
                     'required' => true,
                     'size' => 30,
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
+        return $fields;
     }
 
     /**
@@ -299,55 +345,55 @@ class ConfigForm extends BaseConfigForm
     {
         $vatClasses = $this->shopCapabilities->getVatClasses();
 
-        return array(
-            'nature_shop' => array(
+        return [
+            'nature_shop' => [
                 'type' => 'radio',
                 'label' => $this->t('field_nature_shop'),
                 'description' => $this->t('desc_nature_shop'),
                 'options' => $this->getNatureOptions(),
-                'attributes' => array(
+                'attributes' => [
                     'required' => true,
-                ),
-            ),
-            'foreignVat' => array(
+                ],
+            ],
+            'foreignVat' => [
                 'type' => 'radio',
                 'label' => $this->t('field_foreignVat'),
                 'description' => $this->t('desc_foreignVat'),
                 'options' => $this->getForeignVatOptions(),
-                'attributes' => array(
+                'attributes' => [
                     'required' => true,
-                ),
-            ),
-            'foreignVatClasses' => array(
+                ],
+            ],
+            'foreignVatClasses' => [
                 'name' => 'foreignVatClasses[]',
                 'type' => 'select',
                 'label' => $this->t('field_foreignVatClasses'),
                 'description' => $this->t('desc_foreignVatClasses'),
                 'options' => $vatClasses,
-                'attributes' => array(
+                'attributes' => [
                     'multiple' => true,
                     'size' => min(count($vatClasses), 8),
-                ),
-            ),
-            'vatFreeProducts' => array(
+                ],
+            ],
+            'vatFreeProducts' => [
                 'type' => 'radio',
                 'label' => $this->t('field_vatFreeProducts'),
                 'description' => $this->t('desc_vatFreeProducts'),
                 'options' => $this->getVatFreeProductsOptions(),
-                'attributes' => array(
+                'attributes' => [
                     'required' => true,
-                ),
-            ),
-            'marginProducts' => array(
+                ],
+            ],
+            'marginProducts' => [
                 'type' => 'radio',
                 'label' => $this->t('field_marginProducts'),
                 'description' => $this->t('desc_marginProducts'),
                 'options' => $this->getMarginProductsOptions(),
-                'attributes' => array(
+                'attributes' => [
                     'required' => true,
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
     }
 
     /**
@@ -364,21 +410,21 @@ class ConfigForm extends BaseConfigForm
     {
         $orderStatusesList = $this->getOrderStatusesList();
 
-        return array(
-            'triggerOrderStatus' => array(
+        return [
+            'triggerOrderStatus' => [
                 'name' => 'triggerOrderStatus[]',
                 'type' => 'select',
                 'label' => $this->t('field_triggerOrderStatus'),
                 'description' => $this->t('desc_triggerOrderStatus'),
                 'options' => $orderStatusesList,
-                'attributes' => array(
+                'attributes' => [
                     'multiple' => true,
                     'size' => min(count($orderStatusesList), 8),
-                ),
-            ),
+                ],
+            ],
             'triggerInvoiceEvent' => $this->getOptionsOrHiddenField('triggerInvoiceEvent', 'radio', false),
             'triggerCreditNoteEvent' => $this->getOptionsOrHiddenField('triggerCreditNoteEvent', 'radio', false),
-        );
+        ];
     }
 
     /**
@@ -403,33 +449,33 @@ class ConfigForm extends BaseConfigForm
         $this->accountNumberOptions = $this->picklistToOptions($this->acumulusApiClient->getPicklistAccounts(), 0, $this->t('option_empty'));
         $this->costCenterOptions = $this->picklistToOptions($this->acumulusApiClient->getPicklistCostCenters(), 0, $this->t('option_empty'));
 
-        return array(
+        return [
             'invoiceNrSource' => $this->getOptionsOrHiddenField('invoiceNrSource', 'radio'),
             'dateToUse' => $this->getOptionsOrHiddenField('dateToUse', 'radio'),
-            'defaultAccountNumber' => array(
+            'defaultAccountNumber' => [
                 'type' => 'select',
                 'label' => $this->t('field_defaultAccountNumber'),
                 'description' => $this->t('desc_defaultAccountNumber'),
                 'options' => $this->accountNumberOptions,
-            ),
-            'defaultCostCenter' => array(
+            ],
+            'defaultCostCenter' => [
                 'type' => 'select',
                 'label' => $this->t('field_defaultCostCenter'),
                 'description' => $this->t('desc_defaultCostCenter'),
                 'options' => $this->costCenterOptions,
-            ),
-            'defaultInvoiceTemplate' => array(
+            ],
+            'defaultInvoiceTemplate' => [
                 'type' => 'select',
                 'label' => $this->t('field_defaultInvoiceTemplate'),
                 'options' => $this->picklistToOptions($invoiceTemplates = $this->acumulusApiClient->getPicklistInvoiceTemplates(), 0, $this->t('option_empty')),
-            ),
-            'defaultInvoicePaidTemplate' => array(
+            ],
+            'defaultInvoicePaidTemplate' => [
                 'type' => 'select',
                 'label' => $this->t('field_defaultInvoicePaidTemplate'),
                 'description' => $this->t('desc_defaultInvoiceTemplate'),
                 'options' => $this->picklistToOptions($invoiceTemplates, 0, $this->t('option_same_template')),
-            ),
-        );
+            ],
+        ];
     }
 
     protected function getInvoiceStatusScreenFields()
@@ -464,34 +510,34 @@ class ConfigForm extends BaseConfigForm
      */
     protected function getPluginFields()
     {
-        return array(
-            'debug' => array(
+        return [
+            'debug' => [
                 'type' => 'radio',
                 'label' => $this->t('field_debug'),
                 'description' => $this->t('desc_debug'),
-                'options' => array(
+                'options' => [
                     PluginConfig::Send_SendAndMailOnError => $this->t('option_debug_1'),
                     PluginConfig::Send_SendAndMail => $this->t('option_debug_2'),
                     PluginConfig::Send_TestMode => $this->t('option_debug_3'),
-                ),
-                'attributes' => array(
+                ],
+                'attributes' => [
                     'required' => true,
-                ),
-            ),
-            'logLevel' => array(
+                ],
+            ],
+            'logLevel' => [
                 'type' => 'radio',
                 'label' => $this->t('field_logLevel'),
                 'description' => $this->t('desc_logLevel'),
-                'options' => array(
+                'options' => [
                     Severity::Notice => $this->t('option_logLevel_3'),
                     Severity::Info => $this->t('option_logLevel_4'),
                     Severity::Log => $this->t('option_logLevel_5'),
-                ),
-                'attributes' => array(
+                ],
+                'attributes' => [
                     'required' => true,
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
     }
 
     /**
@@ -506,16 +552,16 @@ class ConfigForm extends BaseConfigForm
      */
     protected function getAdvancedConfigLinkFields()
     {
-        return array(
-            'tellAboutAdvancedSettings' => array(
+        return [
+            'tellAboutAdvancedSettings' => [
                 'type' => 'markup',
                 'value' => sprintf($this->t('desc_advancedSettings'), $this->t('advanced_form_link_text'), $this->t('menu_advancedSettings')),
-            ),
-            'advancedSettingsLink' => array(
+            ],
+            'advancedSettingsLink' => [
                 'type' => 'markup',
                 'value' => sprintf($this->t('button_link'), $this->t('advanced_form_link_text'), $this->shopCapabilities->getLink('advanced')),
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -533,20 +579,20 @@ class ConfigForm extends BaseConfigForm
      */
     protected function getPaymentMethodsFieldset(array $paymentMethods, $key, array $options)
     {
-        $fieldset = array(
+        $fieldset = [
             'type' => 'fieldset',
             'legend' => $this->t("{$key}Fieldset"),
             'description' => $this->t("desc_{$key}Fieldset"),
-            'fields' => array(),
-        );
+            'fields' => [],
+        ];
 
         $options[0] = $this->t('option_use_default');
         foreach ($paymentMethods as $paymentMethodId => $paymentMethodLabel) {
-            $fieldset['fields']["{$key}[{$paymentMethodId}]"] = array(
+            $fieldset['fields']["{$key}[{$paymentMethodId}]"] = [
                 'type' => 'select',
                 'label' => $paymentMethodLabel,
                 'options' => $options,
-            );
+            ];
         }
         return $fieldset;
     }
@@ -576,11 +622,11 @@ class ConfigForm extends BaseConfigForm
      */
     protected function getForeignVatOptions()
     {
-        return array(
+        return [
             PluginConfig::ForeignVat_Both => $this->t('option_foreignVat_1'),
             PluginConfig::ForeignVat_No => $this->t('option_foreignVat_2'),
             PluginConfig::ForeignVat_Only => $this->t('option_foreignVat_3'),
-        );
+        ];
     }
 
     /**
@@ -592,11 +638,11 @@ class ConfigForm extends BaseConfigForm
      */
     protected function getVatFreeProductsOptions()
     {
-        return array(
+        return [
             PluginConfig::VatFreeProducts_Both => $this->t('option_vatFreeProducts_1'),
             PluginConfig::VatFreeProducts_No => $this->t('option_vatFreeProducts_2'),
             PluginConfig::VatFreeProducts_Only => $this->t('option_vatFreeProducts_3'),
-        );
+        ];
     }
 
     /**
@@ -608,10 +654,10 @@ class ConfigForm extends BaseConfigForm
      */
     protected function getMarginProductsOptions()
     {
-        return array(
+        return [
             PluginConfig::MarginProducts_Both => $this->t('option_marginProducts_1'),
             PluginConfig::MarginProducts_No => $this->t('option_marginProducts_2'),
             PluginConfig::MarginProducts_Only => $this->t('option_marginProducts_3'),
-        );
+        ];
     }
 }

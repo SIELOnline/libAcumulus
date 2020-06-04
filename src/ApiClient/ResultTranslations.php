@@ -4,11 +4,13 @@ namespace Siel\Acumulus\ApiClient;
 use Siel\Acumulus\Helpers\TranslationCollection;
 
 /**
- * Contains translations for classes in the \Siel\Acumulus\ApiClient namespace.
+ * Contains translations for the Result class.
+ *
+ * @noinspection PhpUnused Loaded by the Container
  */
 class ResultTranslations extends TranslationCollection
 {
-    protected $nl = array(
+    protected $nl = [
         'api_status_unknown' => 'Onbekende API status code %d',
         'request_not_yet_sent' => 'Verzoek (nog) niet verstuurd',
         'message_sent' => 'Verzonden bericht',
@@ -19,9 +21,9 @@ class ResultTranslations extends TranslationCollection
         'message_response_warning' => 'Succes, met waarschuwingen',
         'message_response_error' => 'Mislukt, fouten gevonden',
         'message_response_exception' => 'Ernstige fout, neem contact op met Acumulus',
-    );
+    ];
 
-    protected $en = array(
+    protected $en = [
         'api_status_unknown' => 'Unknwon API status code %d',
         'request_not_yet_sent' => 'Request not (yet) sent',
         'message_sent' => 'Message sent',
@@ -32,5 +34,5 @@ class ResultTranslations extends TranslationCollection
         'message_response_warning' => 'Success, with warnings',
         'message_response_error' => 'Failed, errors found',
         'message_response_exception' => 'Exception, please contact Acumulus technical support',
-    );
+    ];
 }

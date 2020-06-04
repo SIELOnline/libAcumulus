@@ -58,9 +58,6 @@ class InvoiceStatusForm extends Form
     /** @var \Siel\Acumulus\Helpers\Container*/
     protected $container;
 
-    /** @var \Siel\Acumulus\ApiClient\Acumulus */
-    protected $acumulusApiClient;
-
     /** @var \Siel\Acumulus\Shop\InvoiceManager */
     protected $invoiceManager;
 
@@ -94,8 +91,8 @@ class InvoiceStatusForm extends Form
     /**
      * @param \Siel\Acumulus\Shop\InvoiceManager $invoiceManager
      * @param \Siel\Acumulus\Shop\AcumulusEntryManager $acumulusEntryManager
-     * @param \Siel\Acumulus\Helpers\Container $container
      * @param \Siel\Acumulus\ApiClient\Acumulus $acumulusApiClient
+     * @param \Siel\Acumulus\Helpers\Container $container
      * @param \Siel\Acumulus\Helpers\FormHelper $formHelper
      * @param \Siel\Acumulus\Config\ShopCapabilities $shopCapabilities
      * @param \Siel\Acumulus\Config\Config $config
@@ -105,8 +102,8 @@ class InvoiceStatusForm extends Form
     public function __construct(
         InvoiceManager $invoiceManager,
         AcumulusEntryManager $acumulusEntryManager,
-        Container $container,
         Acumulus $acumulusApiClient,
+        Container $container,
         FormHelper $formHelper,
         ShopCapabilities $shopCapabilities,
         Config $config,
@@ -114,7 +111,7 @@ class InvoiceStatusForm extends Form
         Log $log
     )
     {
-        parent::__construct($formHelper, $shopCapabilities, $config, $translator, $log);
+        parent::__construct($acumulusApiClient, $formHelper, $shopCapabilities, $config, $translator, $log);
         $this->addMeta = false;
 
         $translations = new InvoiceTranslations();
@@ -126,7 +123,6 @@ class InvoiceStatusForm extends Form
         $this->container = $container;
         $this->acumulusEntryManager = $acumulusEntryManager;
         $this->invoiceManager = $invoiceManager;
-        $this->acumulusApiClient = $acumulusApiClient;
         $this->resetStatus();
     }
 
@@ -244,9 +240,9 @@ class InvoiceStatusForm extends Form
     protected function getStatusLabelAttributes($status, $statusMessage)
     {
         $statusClass = $this->getStatusClass($status);
-        $attributes = array(
-            'class' => array('notice', 'notice-' . $statusClass),
-        );
+        $attributes = [
+            'class' => ['notice', 'notice-' . $statusClass],
+        ];
         if (!empty($statusMessage)) {
             $attributes['title'] = $statusMessage;
         }
@@ -437,7 +433,7 @@ class InvoiceStatusForm extends Form
      */
     protected function getFieldDefinitions()
     {
-        $fields = array();
+        $fields = [];
         $parent = $this->source;
 
         // Add base information in hidden fields:
@@ -450,10 +446,10 @@ class InvoiceStatusForm extends Form
         $localEntryInfo = $this->acumulusEntryManager->getByInvoiceSource($parent);
         $idPrefix = $this->getIdPrefix($parent);
         $fields1Source = $this->addIdPrefix($this->getFields1Source($parent, $localEntryInfo), $idPrefix);
-        $fields[$idPrefix] = array(
+        $fields[$idPrefix] = [
             'type' => 'fieldset',
             'fields' => $fields1Source,
-        );
+        ];
 
         // Other fieldsets: credit notes.
         $creditNotes = $parent->getCreditNotes();
@@ -461,11 +457,11 @@ class InvoiceStatusForm extends Form
             $localEntryInfo = $this->acumulusEntryManager->getByInvoiceSource($creditNote);
             $idPrefix = $this->getIdPrefix($creditNote);
             $fields1Source = $this->addIdPrefix($this->getFields1Source($creditNote, $localEntryInfo), $idPrefix);
-            $fields[$idPrefix] = array(
+            $fields[$idPrefix] = [
                 'type' => 'details',
                 'summary' => ucfirst($this->t($creditNote->getType())) . ' ' . $creditNote->getReference(),
                 'fields' => $fields1Source,
-            );
+            ];
         }
         return $fields;
     }
@@ -523,29 +519,29 @@ class InvoiceStatusForm extends Form
                 $additionalFields = [];
                 break;
             default:
-                $additionalFields = array(
-                    'unknown' => array(
+                $additionalFields = [
+                    'unknown' => [
                         'type' => 'markup',
                         'value' => sprintf($this->t('invoice_status_unknown'), $invoiceStatus),
-                    )
-                );
+                    ]
+                ];
                 break;
         }
 
         // Create main status field after we have the other fields, so we can
         // use the results in rendering the overall status.
-        return array(
-            'status' => array(
+        return [
+            'status' => [
                 'type' => 'markup',
                 'label' => $this->getStatusIcon($this->status),
-                'attributes' => array(
+                'attributes' => [
                     'class' => str_replace('_', '-', $invoiceStatus),
                     'label' => $this->getStatusLabelAttributes($this->status, $this->statusMessage),
-                ),
+                ],
                 'value' => $statusText,
                 'description' => $statusDescription,
-            ),
-        ) + $additionalFields;
+            ],
+               ] + $additionalFields;
     }
 
     /**
@@ -674,7 +670,7 @@ class InvoiceStatusForm extends Form
         }
 
         /** @noinspection PhpUndefinedVariableInspection */
-        return array(
+        return [
             'severity' => $statusSeverity,
             'severity-message' => $statusMessage,
             'status' => $invoiceStatus,
@@ -682,7 +678,7 @@ class InvoiceStatusForm extends Form
             'entry' => $entry,
             'text' => sprintf($this->t($invoiceStatus), $arg1, $arg2),
             'description' => $this->t($description),
-        );
+        ];
     }
 
     /**
@@ -694,17 +690,17 @@ class InvoiceStatusForm extends Form
      */
     protected function getNotSentFields()
     {
-        $fields = array();
-        $fields += array(
-            'invoice_add' => array(
+        $fields = [];
+        $fields += [
+            'invoice_add' => [
                 'type' => 'button',
                 'value' => $this->t('send_now'),
-                'attributes' => array(
+                'attributes' => [
                     'class' => 'acumulus-ajax',
-                ),
-            ),
+                ],
+            ],
             'force_send' => $this->getHiddenField(0),
-        );
+        ];
 
         return $fields;
     }
@@ -718,17 +714,17 @@ class InvoiceStatusForm extends Form
      */
     protected function getConceptFields()
     {
-        $fields = array();
-        $fields += array(
-            'invoice_add' => array(
+        $fields = [];
+        $fields += [
+            'invoice_add' => [
                 'type' => 'button',
                 'value' => $this->t('send_again'),
-                'attributes' => array(
+                'attributes' => [
                     'class' => 'acumulus-ajax',
-                ),
-            ),
+                ],
+            ],
             'force_send' => $this->getHiddenField(1),
-        );
+        ];
         return $fields;
     }
 
@@ -744,14 +740,14 @@ class InvoiceStatusForm extends Form
      */
     protected function getCommunicationErrorFields(Result $result)
     {
-        $fields = array();
-        $fields += array(
-            'messages' => array(
+        $fields = [];
+        $fields += [
+            'messages' => [
                 'type' => 'markup',
                 'label' => $this->t('messages'),
                 'value' => $result->formatMessages(Message::Format_PlainListWithSeverity, Severity::RealMessages),
-            ),
-        );
+            ],
+        ];
         return $fields;
     }
 
@@ -764,17 +760,17 @@ class InvoiceStatusForm extends Form
      */
     protected function getNonExistingFields()
     {
-        $fields = array();
-        $fields += array(
-            'invoice_add' => array(
+        $fields = [];
+        $fields += [
+            'invoice_add' => [
                 'type' => 'button',
                 'value' => $this->t('send_again'),
-                'attributes' => array(
+                'attributes' => [
                     'class' => 'acumulus-ajax',
-                ),
-            ),
+                ],
+            ],
             'force_send' => $this->getHiddenField(1),
-        );
+        ];
         return $fields;
     }
 
@@ -787,25 +783,25 @@ class InvoiceStatusForm extends Form
      */
     protected function getDeletedFields()
     {
-        $fields = array();
-        $fields += array(
-            'entry_deletestatus_set' => array(
+        $fields = [];
+        $fields += [
+            'entry_deletestatus_set' => [
                 'type' => 'button',
                 'value' => $this->t('undelete'),
-                'attributes' => array(
+                'attributes' => [
                     'class' => 'acumulus-ajax',
-                ),
-            ),
+                ],
+            ],
             'delete_status' => $this->getHiddenField(API::Entry_UnDelete),
-            'invoice_add' => array(
+            'invoice_add' => [
                 'type' => 'button',
                 'value' => $this->t('send_again'),
-                'attributes' => array(
+                'attributes' => [
                     'class' => 'acumulus-ajax',
-                ),
-            ),
+                ],
+            ],
             'force_send' => $this->getHiddenField(1),
-        );
+        ];
         return $fields;
     }
 
@@ -851,13 +847,13 @@ class InvoiceStatusForm extends Form
         } else {
             $vatType = API::VatType_National;
         }
-        return array(
-            'vat_type' => array(
+        return [
+            'vat_type' => [
             'type' => 'markup',
             'label' => $this->t('vat_type'),
             'value' => $this->t('vat_type_' . $vatType),
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -872,7 +868,7 @@ class InvoiceStatusForm extends Form
      */
     protected function getPaymentStatusFields(Source $source, array $entry)
     {
-        $fields = array();
+        $fields = [];
         $paymentStatus = $entry['paymentstatus'];
         $paymentDate = $entry['paymentdate'];
 
@@ -892,48 +888,48 @@ class InvoiceStatusForm extends Form
         }
 
         $paymentStatusMarkup = sprintf('<span class="notice-%s">%s</span>', $this->getStatusClass($paymentCompareStatus), $paymentStatusText);
-        $fields['payment_status'] = array(
+        $fields['payment_status'] = [
             'type' => 'markup',
             'label' => $this->t('payment_status'),
             'value' => $paymentStatusMarkup,
-        );
+        ];
         if (!empty($paymentCompareStatustext)) {
-            $fields['payment_status']['attributes'] = array(
+            $fields['payment_status']['attributes'] = [
                 'title' => $paymentCompareStatustext,
-            );
+            ];
         }
 
         if ($paymentStatus === API::PaymentStatus_Paid) {
-            $fields += array(
-                'invoice_paymentstatus_set' => array(
+            $fields += [
+                'invoice_paymentstatus_set' => [
                     'type' => 'button',
                     'value' => $this->t('set_due'),
-                    'attributes' => array(
+                    'attributes' => [
                         'class' => 'acumulus-ajax',
-                    ),
-                ),
+                    ],
+                ],
                 'payment_status_new' => $this->getHiddenField(Api::PaymentStatus_Due),
-            );
+            ];
         } else {
-            $fields += array(
-                'payment_date' => array(
+            $fields += [
+                'payment_date' => [
                     'type' => 'date',
                     'label' => $this->t('payment_date'),
-                    'attributes' => array(
+                    'attributes' => [
                         'placeholder' => $this->t('date_format'),
                         'required' => true,
-                    ),
+                    ],
                     'default' => date(API::DateFormat_Iso),
-                ),
-                'invoice_paymentstatus_set' => array(
+                ],
+                'invoice_paymentstatus_set' => [
                     'type' => 'button',
                     'value' => $this->t('set_paid'),
-                    'attributes' => array(
+                    'attributes' => [
                         'class' => 'acumulus-ajax',
-                    ),
-                ),
+                    ],
+                ],
                 'payment_status_new' => $this->getHiddenField(Api::PaymentStatus_Paid),
-            );
+            ];
         }
 
         return $fields;
@@ -953,7 +949,7 @@ class InvoiceStatusForm extends Form
      */
     protected function getAmountFields(Source $source, array $entry)
     {
-        $fields = array();
+        $fields = [];
         if (!empty($entry['totalvalue']) && !empty($entry['totalvalueexclvat'])) {
             // Get Acumulus amounts.
             $amountExAcumulus = $entry['totalvalueexclvat'];
@@ -982,11 +978,11 @@ class InvoiceStatusForm extends Form
             $amountInc = $this->getFormattedAmount($amountIncAcumulus, $amountIncStatus);
             $amountVat = $this->getFormattedAmount($amountVatAcumulus, $amountVatStatus);
 
-            $fields['invoice_amount'] = array(
+            $fields['invoice_amount'] = [
                 'type' => 'markup',
                 'label' => $this->t('invoice_amount'),
                 'value' => sprintf('<div class="acumulus-amount">%1$s%2$s %4$s%3$s</div>', $amountEx, $amountVat, $amountInc, $vatType),
-            );
+            ];
         }
         return $fields;
     }
@@ -1064,7 +1060,7 @@ class InvoiceStatusForm extends Form
      */
     protected function getLinksField($token)
     {
-        $result = array();
+        $result = [];
         $links = [];
         $invoiceStatusSettings = $this->container->getConfig()->getInvoiceStatusSettings();
         if ($invoiceStatusSettings['showPdfInvoice']) {
@@ -1084,11 +1080,11 @@ class InvoiceStatusForm extends Form
         }
 
         if (!empty($links)) {
-            $result['links'] = array(
+            $result['links'] = [
                 'type' => 'markup',
                 'label' => $this->t(count($links) === 1 ? 'document' : 'documents'),
                 'value' => implode(' ', $links),
-            );
+            ];
         }
         return $result;
     }
@@ -1102,10 +1098,10 @@ class InvoiceStatusForm extends Form
      */
     protected function getHiddenField($value)
     {
-        return array(
+        return [
             'type' => 'hidden',
             'value' => $value,
-        );
+        ];
     }
 
     /**
@@ -1146,7 +1142,7 @@ class InvoiceStatusForm extends Form
      */
     protected function addIdPrefix($fields, $idPrefix)
     {
-        $result = array();
+        $result = [];
         foreach ($fields as $key => $field) {
             $newKey = $idPrefix . $key;
             $result[$newKey] = $field;
@@ -1214,7 +1210,7 @@ class InvoiceStatusForm extends Form
     protected function sanitizeEntry(array $entry)
     {
         if (!empty($entry)) {
-            $result = array();
+            $result = [];
             $result['entryid'] = $this->sanitizeIntValue($entry, 'entryid');
             $result['token'] = $this->sanitizeStringValue($entry, 'token', '/^[0-9a-zA-Z]{32}$/');
             $result['entrydate'] = $this->sanitizeDateValue($entry, 'entrydate');
@@ -1267,7 +1263,7 @@ class InvoiceStatusForm extends Form
     protected function sanitizeConceptInfo(array $conceptInfo)
     {
         if (!empty($conceptInfo)) {
-            $result = array();
+            $result = [];
             $result['conceptid'] = $this->sanitizeIntValue($conceptInfo, 'conceptid');
             $result['entryid'] = $this->sanitizeIntValue($conceptInfo, 'entryid', true);
         } else {
@@ -1326,7 +1322,7 @@ class InvoiceStatusForm extends Form
     {
         if (isset($entry[$key])) {
             if ($allowArray && is_array($entry[$key])) {
-                $result = array();
+                $result = [];
                 foreach ($entry[$key] as $value) {
                     $result[] = (int) $value;
                 }
@@ -1334,7 +1330,7 @@ class InvoiceStatusForm extends Form
                 $result = (int) $entry[$key];
             }
         } else {
-            $result = $allowArray ? array() : 0;
+            $result = $allowArray ? [] : 0;
         }
         return $result;
     }

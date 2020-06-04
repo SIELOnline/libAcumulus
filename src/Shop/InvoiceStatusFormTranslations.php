@@ -8,7 +8,7 @@ use Siel\Acumulus\Helpers\TranslationCollection;
  */
 class InvoiceStatusFormTranslations extends TranslationCollection
 {
-    protected $nl = array(
+    protected $nl = [
         // Invoice status.
         'acumulus_invoice_title' => 'Acumulus',
         'acumulus_invoice_header' => 'Status in Acumulus voor deze bestelling',
@@ -30,7 +30,6 @@ class InvoiceStatusFormTranslations extends TranslationCollection
         'messages' => 'Meldingen',
         'wait' => 'Even wachten',
         'invoice_status_unknown' => "Onbekende status '%s'",
-        'unknown' => 'onbekend',
         'unknown_action' => "Onbekende actie '%s'",
         'unknown_source' => 'Onbekende %s %u',
         'unknown_entry' => 'Onbekende Acumulus factuur voor %s %u',
@@ -74,9 +73,9 @@ class InvoiceStatusFormTranslations extends TranslationCollection
         'invoice' => 'factuur',
         'packing_slip' => 'pakbon',
         'open_as_pdf' => 'Acumulus %1$s openen als pdf',
-    );
+    ];
 
-    protected $en = array(
+    protected $en = [
         // Invoice status.
         'acumulus_invoice_title' => 'Acumulus',
         'acumulus_invoice_header' => 'Status in Acumulus for this order',
@@ -98,7 +97,6 @@ class InvoiceStatusFormTranslations extends TranslationCollection
         'messages' => 'Messages',
         'wait' => 'Please wait',
         'invoice_status_unknown' => "Unknown status '%s'",
-        'unknown' => 'unknown',
         'unknown_action' => "Unknown action '%s'",
         'unknown_source' => 'Unknown %s %u',
         'unknown_entry' => 'Unknown Acumulus invoice for %s %u',
@@ -142,5 +140,5 @@ class InvoiceStatusFormTranslations extends TranslationCollection
         'invoice' => 'invoice',
         'packing_slip' => 'packing slip',
         'open_as_pdf' => 'Open Acumulus %1$s as pdf',
-    );
+    ];
 }

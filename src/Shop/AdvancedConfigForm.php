@@ -82,78 +82,72 @@ class AdvancedConfigForm extends BaseConfigForm
      */
     public function getFieldDefinitions()
     {
-        $fields = array();
+        $fields = [];
 
         $message = $this->checkAccountSettings();
-        $accountOk = empty($message);
+        $accountStatus = $this->emptyCredentials() ? null : empty($message);
 
         // Message fieldset: if account settings have not been filled in.
-        if (!$accountOk) {
-            $fields['accountSettingsHeader'] = array(
+        if ($accountStatus === false) {
+            $fields['accountSettingsHeader'] = [
               'type' => 'fieldset',
               'legend' => $this->t('message_error_header'),
-              'fields' => array(
-                'invoiceMessage' => array(
+              'fields' => [
+                'invoiceMessage' => [
                   'type' => 'markup',
-                  'value' => $message,
-                ),
-              ),
-            );
+                  'value' => $this->translateAccountMessage($message),
+                ],
+              ],
+            ];
         }
 
         // 1st fieldset: Link to config form.
-        $fields['configHeader'] = array(
+        $fields['configHeader'] = [
             'type' => 'details',
             'summary' => $this->t('config_form_header'),
             'fields' => $this->getConfigLinkFields(),
-        );
+        ];
 
-        if ($accountOk) {
-            $fields += array(
-                'tokenHelpHeader' => array(
+        if ($accountStatus) {
+            $fields += [
+                'tokenHelpHeader' => [
                     'type' => 'details',
                     'summary' => $this->t('tokenHelpHeader'),
                     'description' => $this->t('desc_tokens'),
                     'fields' => $this->getTokenFields(),
-                ),
-                'relationSettingsHeader' => array(
+                ],
+                'relationSettingsHeader' => [
                     'type' => 'fieldset',
                     'legend' => $this->t('relationSettingsHeader'),
                     'description' => $this->t('desc_relationSettingsHeader'),
                     'fields' => $this->getRelationFields(),
-                ),
-                'invoiceSettingsHeader' => array(
+                ],
+                'invoiceSettingsHeader' => [
                     'type' => 'fieldset',
                     'legend' => $this->t('invoiceSettingsHeader'),
                     'fields' => $this->getInvoiceFields(),
-                ),
-                'invoiceLinesSettingsHeader' => array(
+                ],
+                'invoiceLinesSettingsHeader' => [
                     'type' => 'fieldset',
                     'legend' => $this->t('invoiceLinesSettingsHeader'),
                     'fields' => $this->getInvoiceLinesFields(),
-                ),
-                'optionsSettingsHeader' => array(
+                ],
+                'optionsSettingsHeader' => [
                     'type' => 'fieldset',
                     'legend' => $this->t('optionsSettingsHeader'),
                     'description' => $this->t('desc_optionsSettingsHeader'),
                     'fields' => $this->getOptionsFields(),
-                ),
-                'emailAsPdfSettingsHeader' => array(
+                ],
+                'emailAsPdfSettingsHeader' => [
                     'type' => 'fieldset',
                     'legend' => $this->t('emailAsPdfSettingsHeader'),
                     'description' => $this->t('desc_emailAsPdfSettings'),
                     'fields' => $this->getEmailAsPdfFields(),
-                ),
-            );
+                ],
+            ];
         }
 
-        $fields += array(
-            'versionInformationHeader' => array(
-                'type' => 'fieldset',
-                'legend' => $this->t('versionInformationHeader'),
-                'fields' => $this->getVersionInformation(),
-            ),
-        );
+        $fields['versionInformationHeader'] = $this->getInformationBlock();
 
         return $fields;
     }
@@ -180,7 +174,7 @@ class AdvancedConfigForm extends BaseConfigForm
      */
     protected function tokenInfo2Fields(array $tokenInfo)
     {
-        $fields = array();
+        $fields = [];
         foreach ($tokenInfo as $variableName => $variableInfo) {
             $fields["token-$variableName"] = $this->get1TokenField($variableName, $variableInfo);
         }
@@ -238,10 +232,10 @@ class AdvancedConfigForm extends BaseConfigForm
             $value .= '</ul>';
         }
 
-        return array(
+        return [
             'type'=> 'markup',
             'value' => $value,
-        );
+        ];
     }
 
     /**
@@ -294,7 +288,7 @@ class AdvancedConfigForm extends BaseConfigForm
                 array_push($list, $listBeforeLast . ' ' . $this->t('and') . ' ' . $listLast);
             }
         } else {
-            $list = array($list);
+            $list = [$list];
         }
         return implode(', ', $list);
     }
@@ -327,138 +321,138 @@ class AdvancedConfigForm extends BaseConfigForm
      */
     protected function getRelationFields()
     {
-        return array(
-            'clientData' => array(
+        return [
+            'clientData' => [
                 'type' => 'checkbox',
                 'label' => $this->t('field_clientData'),
                 'description' => $this->t('desc_clientData'),
-                'options' => array(
+                'options' => [
                     'sendCustomer' => $this->t('option_sendCustomer'),
                     'overwriteIfExists' => $this->t('option_overwriteIfExists'),
-                ),
-            ),
-            'defaultCustomerType' => array(
+                ],
+            ],
+            'defaultCustomerType' => [
                 'type' => 'select',
                 'label' => $this->t('field_defaultCustomerType'),
                 'options' => $this->picklistToOptions($this->acumulusApiClient->getPicklistContactTypes(), 0, $this->t('option_empty')),
-            ),
-            'contactStatus' => array(
+            ],
+            'contactStatus' => [
                 'type' => 'radio',
                 'label' => $this->t('field_contactStatus'),
                 'description' => $this->t('desc_contactStatus'),
                 'options' => $this->getContactStatusOptions(),
-            ),
-            'contactYourId' => array(
+            ],
+            'contactYourId' => [
                 'type' => 'text',
                 'label' => $this->t('field_contactYourId'),
                 'description' => $this->t('desc_contactYourId') . ' ' . $this->t('msg_token'),
-                'attributes' => array(
+                'attributes' => [
                     'size' => 60,
-                ),
-            ),
-            'companyName1' => array(
+                ],
+            ],
+            'companyName1' => [
                 'type' => 'text',
                 'label' => $this->t('field_companyName1'),
-                'attributes' => array(
+                'attributes' => [
                     'size' => 60,
-                ),
-            ),
-            'companyName2' => array(
+                ],
+            ],
+            'companyName2' => [
                 'type' => 'text',
                 'label' => $this->t('field_companyName2'),
                 'description' => $this->t('msg_tokens'),
-                'attributes' => array(
+                'attributes' => [
                     'size' => 60,
-                ),
-            ),
-            'vatNumber' => array(
+                ],
+            ],
+            'vatNumber' => [
                 'type' => 'text',
                 'label' => $this->t('field_vatNumber'),
                 'description' => $this->t('desc_vatNumber') . ' ' . $this->t('msg_token'),
-                'attributes' => array(
+                'attributes' => [
                     'size' => 60,
-                ),
-            ),
-            'fullName' => array(
+                ],
+            ],
+            'fullName' => [
                 'type' => 'text',
                 'label' => $this->t('field_fullName'),
                 'description' => $this->t('desc_fullName') . ' ' . $this->t('msg_token'),
-                'attributes' => array(
+                'attributes' => [
                     'size' => 60,
-                ),
-            ),
-            'salutation' => array(
+                ],
+            ],
+            'salutation' => [
                 'type' => 'text',
                 'label' => $this->t('field_salutation'),
                 'description' => $this->t('desc_salutation') . ' ' . $this->t('msg_token'),
-                'attributes' => array(
+                'attributes' => [
                     'size' => 60,
-                ),
-            ),
-            'address1' => array(
+                ],
+            ],
+            'address1' => [
                 'type' => 'text',
                 'label' => $this->t('field_address1'),
-                'attributes' => array(
+                'attributes' => [
                     'size' => 60,
-                ),
-            ),
-            'address2' => array(
+                ],
+            ],
+            'address2' => [
                 'type' => 'text',
                 'label' => $this->t('field_address2'),
                 'description' => $this->t('desc_address') . ' ' . $this->t('msg_tokens'),
-                'attributes' => array(
+                'attributes' => [
                     'size' => 60,
-                ),
-            ),
-            'postalCode' => array(
+                ],
+            ],
+            'postalCode' => [
                 'type' => 'text',
                 'label' => $this->t('field_postalCode'),
                 'description' => $this->t('msg_token'),
-                'attributes' => array(
+                'attributes' => [
                     'size' => 60,
-                ),
-            ),
-            'city' => array(
+                ],
+            ],
+            'city' => [
                 'type' => 'text',
                 'label' => $this->t('field_city'),
                 'description' => $this->t('msg_token'),
-                'attributes' => array(
+                'attributes' => [
                     'size' => 60,
-                ),
-            ),
-            'telephone' => array(
+                ],
+            ],
+            'telephone' => [
                 'type' => 'text',
                 'label' => $this->t('field_telephone'),
                 'description' => $this->t('desc_telephone') . ' ' . $this->t('msg_token'),
-                'attributes' => array(
+                'attributes' => [
                     'size' => 60,
-                ),
-            ),
-            'fax' => array(
+                ],
+            ],
+            'fax' => [
                 'type' => 'text',
                 'label' => $this->t('field_fax'),
                 'description' => $this->t('desc_fax') . ' ' . $this->t('msg_token'),
-                'attributes' => array(
+                'attributes' => [
                     'size' => 60,
-                ),
-            ),
-            'email' => array(
+                ],
+            ],
+            'email' => [
                 'type' => 'text',
                 'label' => $this->t('field_email'),
                 'description' => $this->t('msg_token'),
-                'attributes' => array(
+                'attributes' => [
                     'size' => 60,
-                ),
-            ),
-            'mark' => array(
+                ],
+            ],
+            'mark' => [
                 'type' => 'text',
                 'label' => $this->t('field_mark'),
                 'description' => $this->t('desc_mark') . ' ' . $this->t('msg_token'),
-                'attributes' => array(
+                'attributes' => [
                     'size' => 60,
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
     }
 
     /**
@@ -476,68 +470,68 @@ class AdvancedConfigForm extends BaseConfigForm
      */
     protected function getInvoiceFields()
     {
-        return array(
-            'concept' => array(
+        return [
+            'concept' => [
                 'type' => 'radio',
                 'label' => $this->t('field_concept'),
                 'description' => $this->t('desc_concept'),
-                'options' => array(
+                'options' => [
                     PluginConfig::Concept_Plugin => $this->t('option_concept_2'),
                     Api::Concept_No => $this->t('option_concept_0'),
                     Api::Concept_Yes => $this->t('option_concept_1'),
-                ),
-                'attributes' => array(
+                ],
+                'attributes' => [
                     'required' => true,
-                ),
-            ),
-            'missingAmount' => array(
+                ],
+            ],
+            'missingAmount' => [
                 'type' => 'radio',
                 'label' => $this->t('field_missing_amount'),
                 'description' => $this->t('desc_missing_amount'),
-                'options' => array(
+                'options' => [
                     PluginConfig::MissingAmount_Warn => $this->t('option_missing_amount_2'),
                     PluginConfig::MissingAmount_AddLine => $this->t('option_missing_amount_3'),
                     PluginConfig::MissingAmount_Ignore => $this->t('option_missing_amount_1'),
-                ),
-            ),
-            'sendWhat' => array(
+                ],
+            ],
+            'sendWhat' => [
                 'type' => 'checkbox',
                 'label' => $this->t('field_sendWhat'),
                 'description' => $this->t('desc_sendWhat'),
-                'options' => array(
+                'options' => [
                     'sendEmptyInvoice' => $this->t('option_sendEmptyInvoice'),
                     'sendEmptyShipping' => $this->t('option_sendEmptyShipping'),
-                ),
-            ),
-            'description' => array(
+                ],
+            ],
+            'description' => [
                 'type' => 'text',
                 'label' => $this->t('field_description'),
                 'description' => $this->t('desc_description') . ' ' . $this->t('msg_token'),
-                'attributes' => array(
+                'attributes' => [
                     'size' => 60,
-                ),
-            ),
-            'descriptionText' => array(
+                ],
+            ],
+            'descriptionText' => [
                 'type' => 'textarea',
                 'label' => $this->t('field_descriptionText'),
                 'description' => $this->t('desc_descriptionText') . ' ' . $this->t('msg_token'),
-                'attributes' => array(
+                'attributes' => [
                     'size' => 60,
                     'rows' => 6,
                     'style' => 'box-sizing: border-box; width: 83%; min-width: 24em;',
-                ),
-            ),
-            'invoiceNotes' => array(
+                ],
+            ],
+            'invoiceNotes' => [
                 'type' => 'textarea',
                 'label' => $this->t('field_invoiceNotes'),
                 'description' => $this->t('desc_invoiceNotes') . ' ' . $this->t('msg_token'),
-                'attributes' => array(
+                'attributes' => [
                     'size' => 60,
                     'rows' => 6,
                     'style' => 'box-sizing: border-box; width: 83%; min-width: 24em;',
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
     }
 
     /**
@@ -554,40 +548,40 @@ class AdvancedConfigForm extends BaseConfigForm
      */
     protected function getInvoiceLinesFields()
     {
-        return array(
-            'itemNumber' => array(
+        return [
+            'itemNumber' => [
                 'type' => 'text',
                 'label' => $this->t('field_itemNumber'),
                 'description' => $this->t('desc_itemNumber') . ' ' . $this->t('msg_token'),
-                'attributes' => array(
+                'attributes' => [
                     'size' => 60,
-                ),
-            ),
-            'productName' => array(
+                ],
+            ],
+            'productName' => [
                 'type' => 'text',
                 'label' => $this->t('field_productName'),
                 'description' => $this->t('desc_productName') . ' ' . $this->t('msg_token'),
-                'attributes' => array(
+                'attributes' => [
                     'size' => 60,
-                ),
-            ),
-            'nature' => array(
+                ],
+            ],
+            'nature' => [
                 'type' => 'text',
                 'label' => $this->t('field_nature'),
                 'description' => $this->t('desc_nature'),
-                'attributes' => array(
+                'attributes' => [
                     'size' => 30,
-                ),
-            ),
-            'costPrice' => array(
+                ],
+            ],
+            'costPrice' => [
                 'type' => 'text',
                 'label' => $this->t('field_costPrice'),
                 'description' => $this->t('desc_costPrice') . ' ' . $this->t('msg_token'),
-                'attributes' => array(
+                'attributes' => [
                     'size' => 60,
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
     }
 
     /**
@@ -603,40 +597,40 @@ class AdvancedConfigForm extends BaseConfigForm
      */
     protected function getOptionsFields()
     {
-        return array(
-            'showOptions' => array(
+        return [
+            'showOptions' => [
                 'type' => 'checkbox',
                 'label' => $this->t('field_showOptions'),
                 'description' => $this->t('desc_showOptions'),
-                'options' => array(
+                'options' => [
                     'optionsShow' => $this->t('option_optionsShow'),
-                ),
-            ),
-            'optionsAllOn1Line' => array(
+                ],
+            ],
+            'optionsAllOn1Line' => [
                 'type' => 'select',
                 'label' => $this->t('field_optionsAllOn1Line'),
-                'options' => array(
+                'options' => [
                     0 => $this->t('option_do_not_use'),
                     PHP_INT_MAX => $this->t('option_always'),
-                ) + array_combine(range(1, 10), range(1, 10)),
-            ),
-            'optionsAllOnOwnLine' => array(
+                             ] + array_combine(range(1, 10), range(1, 10)),
+            ],
+            'optionsAllOnOwnLine' => [
                 'type' => 'select',
                 'label' => $this->t('field_optionsAllOnOwnLine'),
-                'options' => array(
+                'options' => [
                     PHP_INT_MAX => $this->t('option_do_not_use'),
                     1 => $this->t('option_always'),
-                ) + array_combine(range(2, 10), range(2, 10)),
-            ),
-            'optionsMaxLength' => array(
+                             ] + array_combine(range(2, 10), range(2, 10)),
+            ],
+            'optionsMaxLength' => [
                 'type' => 'number',
                 'label' => $this->t('field_optionsMaxLength'),
                 'description' => $this->t('desc_optionsMaxLength'),
-                'attributes' => array(
+                'attributes' => [
                     'min' => 1,
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
     }
 
     /**
@@ -653,49 +647,49 @@ class AdvancedConfigForm extends BaseConfigForm
      */
     protected function getEmailAsPdfFields()
     {
-        return array(
-            'emailAsPdf_cb' => array(
+        return [
+            'emailAsPdf_cb' => [
                 'type' => 'checkbox',
                 'label' => $this->t('field_emailAsPdf'),
                 'description' => $this->t('desc_emailAsPdf'),
-                'options' => array(
+                'options' => [
                     'emailAsPdf' => $this->t('option_emailAsPdf'),
-                ),
-            ),
-            'emailTo' => array(
+                ],
+            ],
+            'emailTo' => [
                 'type' => 'email',
                 'label' => $this->t('field_emailTo'),
                 'description' => $this->t('desc_emailTo') . ' ' . $this->t('msg_token'),
-                'attributes' => array(
+                'attributes' => [
                     'size' => 60,
-                ),
-            ),
-            'emailBcc' => array(
+                ],
+            ],
+            'emailBcc' => [
                 'type' => 'email',
                 'label' => $this->t('field_emailBcc'),
                 'description' => $this->t('desc_emailBcc') . ' ' . $this->t('msg_token'),
-                'attributes' => array(
+                'attributes' => [
                     'multiple' => true,
                     'size' => 60,
-                ),
-            ),
-            'emailFrom' => array(
+                ],
+            ],
+            'emailFrom' => [
                 'type' => 'email',
                 'label' => $this->t('field_emailFrom'),
                 'description' => $this->t('desc_emailFrom') . ' ' . $this->t('msg_token'),
-                'attributes' => array(
+                'attributes' => [
                     'size' => 60,
-                ),
-            ),
-            'subject' => array(
+                ],
+            ],
+            'subject' => [
                 'type' => 'text',
                 'label' => $this->t('field_subject'),
                 'description' => $this->t('desc_subject') . ' ' . $this->t('msg_token'),
-                'attributes' => array(
+                'attributes' => [
                     'size' => 60,
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
     }
 
 
@@ -711,16 +705,16 @@ class AdvancedConfigForm extends BaseConfigForm
      */
     protected function getConfigLinkFields()
     {
-        return array(
-            'tellAboutBasicSettings' => array(
+        return [
+            'tellAboutBasicSettings' => [
                 'type' => 'markup',
                 'value' => sprintf($this->t('desc_basicSettings'), $this->t('config_form_link_text'), $this->t('menu_basicSettings')),
-            ),
-            'basicSettingsLink' => array(
+            ],
+            'basicSettingsLink' => [
                 'type' => 'markup',
                 'value' => sprintf($this->t('button_link'), $this->t('config_form_link_text') , $this->shopCapabilities->getLink('config')),
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -733,9 +727,9 @@ class AdvancedConfigForm extends BaseConfigForm
      */
     protected function getContactStatusOptions()
     {
-        return array(
+        return [
             Api::ContactStatus_Active => $this->t('option_contactStatus_Active'),
             Api::ContactStatus_Disabled => $this->t('option_contactStatus_Disabled'),
-        );
+        ];
     }
 }

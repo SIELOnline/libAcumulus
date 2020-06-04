@@ -29,6 +29,7 @@ class AcumulusTest extends TestCase
     {
         return [
             'About' => ['getAbout', [], false, ['about', 'role', 'roleid']],
+            'MyAcumulus' => ['getMyAcumulus', [], false, ['mycontractcode','mycompanyname','mycontactperson','myaddress','mypostalcode','mycity','mytelephone','myemail','myiban','mysepamandatenr','mycontractenddate']],
             'Accounts' => ['getPicklistAccounts', [], true, ['accountid', 'accountnumber', 'accountdescription','accounttypeid']],
             'ContactTypes' => ['getPicklistContactTypes', [], true, ['contacttypeid', 'contacttypename','contacttypenamenl']],
             'CostCenters' => ['getPicklistCostCenters', [], true, ['costcenterid','costcentername']],

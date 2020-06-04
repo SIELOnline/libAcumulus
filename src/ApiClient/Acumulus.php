@@ -46,7 +46,7 @@ class Acumulus
     }
 
     /**
-     * Retrieve the about information.
+     * Retrieves the about information.
      *
      * @return \Siel\Acumulus\ApiClient\Result
      *   The result of the webservice call. The structured response will contain
@@ -71,6 +71,33 @@ class Acumulus
     public function getAbout()
     {
         return $this->callApiFunction('general/general_about', array())->setMainResponseKey('general', false);
+    }
+
+    /**
+     * Retrieves the my Acumulus information.
+     *
+     * @return \Siel\Acumulus\ApiClient\Result
+     *   The result of the webservice call. The structured response will contain
+     *   1 "mydata" array, being a keyed array with keys:
+     *   - mycontractcode
+     *   - mycompanyname
+     *   - mycontactperson
+     *   - myaddress
+     *   - mypostalcode
+     *   - mycity
+     *   - mytelephone
+     *   - myemail
+     *   - myiban
+     *   - mysepamandatenr
+     *   - mycontractenddate
+     *   Possible errors:
+     *
+     * @see https://www.siel.nl/acumulus/API/Misc/My_Acumulus/
+     *   for more information about the contents of the returned array.
+     */
+    public function getMyAcumulus()
+    {
+        return $this->callApiFunction('general/my_acumulus', array())->setMainResponseKey('mydata', false);
     }
 
     /**

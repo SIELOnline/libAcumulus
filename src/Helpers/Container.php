@@ -545,13 +545,14 @@ class Container
             case 'batch':
                 $class = 'Batch';
                 $arguments[] = $this->getInvoiceManager();
+                $arguments[] = $this->getAcumulusApiClient();
                 break;
             case 'invoice':
                 $class = 'InvoiceStatus';
                 $arguments[] = $this->getInvoiceManager();
                 $arguments[] = $this->getAcumulusEntryManager();
-                $arguments[] = $this;
                 $arguments[] = $this->getAcumulusApiClient();
+                $arguments[] = $this;
                 break;
             case 'rate':
                 $class = 'RatePlugin';

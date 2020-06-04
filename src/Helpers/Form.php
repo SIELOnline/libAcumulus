@@ -1,9 +1,13 @@
 <?php
 namespace Siel\Acumulus\Helpers;
 
+use DateTimeImmutable;
+use Siel\Acumulus\Api;
 use Siel\Acumulus\ApiClient\Result;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\ShopCapabilities;
+use Siel\Acumulus\Shop\MoreAcumulusTranslations;
+use Siel\Acumulus\Tag;
 
 /**
  * Provides basic form handling.
@@ -83,6 +87,9 @@ abstract class Form extends MessageCollection
     /** @var \Siel\Acumulus\Config\Config */
     protected $acumulusConfig;
 
+    /** @var \Siel\Acumulus\ApiClient\Acumulus */
+    protected $acumulusApiClient;
+
     /** @var array[] */
     protected $fields;
 
@@ -128,24 +135,26 @@ abstract class Form extends MessageCollection
     protected $addSeverityClassToFields = true;
 
     /**
+     * @param \Siel\Acumulus\ApiClient\Acumulus|null $acumulusApiClient
      * @param \Siel\Acumulus\Helpers\FormHelper $formHelper
      * @param \Siel\Acumulus\Config\ShopCapabilities $shopCapabilities
      * @param \Siel\Acumulus\Config\Config $config
      * @param \Siel\Acumulus\Helpers\Translator $translator
      * @param \Siel\Acumulus\Helpers\Log $log
      */
-    public function __construct(FormHelper $formHelper, ShopCapabilities $shopCapabilities, Config $config, Translator $translator, Log $log)
+    public function __construct($acumulusApiClient, FormHelper $formHelper, ShopCapabilities $shopCapabilities, Config $config, Translator $translator, Log $log)
     {
         parent::__construct();
         $this->formValuesSet = false;
-        $this->submittedValues = array();
+        $this->submittedValues = [];
 
+        $this->acumulusApiClient = $acumulusApiClient;
         $this->formHelper = $formHelper;
         $this->shopCapabilities = $shopCapabilities;
         $this->translator = $translator;
         $this->acumulusConfig = $config;
         $this->log = $log;
-        $this->fields = array();
+        $this->fields = [];
 
         $class = get_class($this);
         $pos = strrpos($class, '\\');
@@ -335,7 +344,7 @@ abstract class Form extends MessageCollection
                 $field['fields'] = $this->addValuesToFields($field['fields']);
             } elseif ($field['type'] === 'checkbox') {
                 // Value is a list of checked options.
-                $value = array();
+                $value = [];
                 foreach ($field['options'] as $optionName => $optionLabel) {
                     if ($this->getFormValue($optionName)) {
                         $value[] = $optionName;
@@ -363,7 +372,7 @@ abstract class Form extends MessageCollection
      */
     protected function getDefaultFormValues()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -378,7 +387,7 @@ abstract class Form extends MessageCollection
      */
     protected function getFieldValues($fields)
     {
-        $result = array();
+        $result = [];
         foreach ($fields as $id => $field) {
             if (isset($field['value'])) {
                 $result[$id] = $field['value'];
@@ -435,8 +444,8 @@ abstract class Form extends MessageCollection
      */
     public function process($executeIfValid = true)
     {
-        $this->formValues = array();
-        $this->submittedValues = array();
+        $this->formValues = [];
+        $this->submittedValues = [];
 
         // Process the form if it was submitted.
         if ($this->isSubmitted()) {
@@ -551,6 +560,135 @@ abstract class Form extends MessageCollection
     abstract protected function getFieldDefinitions();
 
     /**
+     * Returns whether (at least one of) the credentials are (is) empty.
+     *
+     * @return bool
+     *   True, if the credentials are empty, false if they are all filled in.
+     */
+    protected function emptyCredentials()
+    {
+        $credentials = $this->acumulusConfig->getCredentials();
+        return empty($credentials[Tag::ContractCode]) || empty($credentials[Tag::UserName]) || empty($credentials[Tag::Password]);
+    }
+
+    /**
+     * Returns version information.
+     *
+     * The fields returned:
+     * - versionInformation
+     * - versionInformationDesc
+     *
+     * @return array[]
+     *   The set of version related informational fields.
+     */
+    protected function getInformationBlock()
+    {
+        static $translationsAdded = false;
+        if (!$translationsAdded) {
+            $this->translator->add(new MoreAcumulusTranslations());
+            $translationsAdded = true;
+        }
+
+        $env = $this->acumulusConfig->getEnvironment();
+        $module = $this->t('module');
+        $environment = [
+            'Shop' => "{$env['shopName']} {$env['shopVersion']}",
+            "Application" => "Acumulus $module {$env['moduleVersion']}; Library: {$env['libraryVersion']}",
+            "System" => "PHP {$env['phpVersion']}; Curl: {$env['curlVersion']}; JSON: {$env['jsonVersion']}; OS: {$env['os']}",
+            'Server' => $env['hostName'],
+        ];
+        $support = strtolower(rtrim($env['shopName'], '0123456789')) . '@acumulus.nl';
+        $subject = sprintf($this->t('support_subject'), $env['shopName'], $this->t('module'));
+        if ($this->emptyCredentials()) {
+            $contractMsg = $this->t('no_contract_data_local') . "\n";
+            $contract = [];
+        } else {
+            $myAcumulus = $this->acumulusApiClient->getMyAcumulus();
+            $myData = $myAcumulus->getResponse();
+            if (!empty($myData)) {
+                $contractMsg = '';
+                $contract = [
+                    $this->t('field_code') => isset($myData['mycontractcode']) ? $myData['mycontractcode'] : $this->t('unknown'),
+                    $this->t('field_companyName') => isset($myData['mycompanyname']) ? $myData['mycompanyname'] : $this->t('unknown'),
+                ];
+                if (!empty($myData['mycontractenddate'])) {
+                    $endDate = DateTimeImmutable::createFromFormat(API::DateFormat_Iso, $myData['mycontractenddate']);
+                    if ($endDate) {
+                        $now = new DateTimeImmutable();
+                        $days = $now->diff($endDate)->days;
+                        if ($days < 40) {
+                            $contract[$this->t('contractEndDate')] = $endDate->format('j F Y');
+                        }
+                    }
+                }
+            } else {
+                $contractMsg = $this->t('no_contract_data') . "\n";
+                $contract = $myAcumulus->formatMessages(Message::Format_PlainWithSeverity, Severity::RealMessages);
+            }
+        }
+        $body = sprintf("%s:\n%s%s%s:\n%s%s\n%s\n%s\n",
+            $this->t('contract'),
+            $contractMsg,
+            $this->arrayToList($contract, false),
+            $this->t('environment'),
+            $this->arrayToList($environment, false),
+            $this->t('support_body'),
+            $this->t('regards'),
+            isset($myData['mycontactperson']) ? $myData['mycontactperson'] : $this->t('your_name')
+        );
+        $moreAcumulus = [
+            $this->t('link_login') . '.',
+            $this->t('link_app') . '.',
+            $this->t('link_manual') . '.',
+            $this->t('link_forum') . '.',
+            $this->t('link_website') . '.',
+            sprintf($this->t('link_support'), rawurldecode($support), rawurlencode($subject), rawurlencode($body)) . '.',
+        ];
+
+        $fields = [
+            'contractInformation' => [
+                'type' => 'markup',
+                'value' => '<h3>' . $this->t('contract') . '</h3>' . $contractMsg . $this->arrayToList($contract, true),
+            ],
+            'environmentInformation' => [
+                'type' => 'markup',
+                'value' => '<h3>' . $this->t('environment') . '</h3>' . $this->arrayToList($environment, true) . $this->t('desc_environmentInformation'),
+            ],
+            'moreAcumulusInformation' => [
+                'type' => 'markup',
+                'value' => '<h3>' . $this->t('moreAcumulusTitle') . '</h3>' . $this->arrayToList($moreAcumulus, true),
+            ],
+        ];
+
+        $wrapperType = $this->getType() === 'batch' ? 'details' : 'fieldset';
+        $wrapperTitleType = $this->getType() === 'batch' ? 'summary' : 'legend';
+        return [
+            'type' => $wrapperType,
+            $wrapperTitleType => sprintf($this->t('informationBlockHeader'), $this->t('module')),
+            'fields' => $fields,
+        ];
+    }
+
+    protected function arrayToList($list, $isHtml)
+    {
+        $result = '';
+        if (!empty($list)) {
+            foreach ($list as $key => $line) {
+                if (is_string($key) && !ctype_digit($key)) {
+                    $line = "$key: $line";
+                }
+                $result .= $isHtml ? "<li>$line</li>" : "• $line";
+                $result .= "\n";
+            }
+            if ($isHtml) {
+                $result = "<ul>$result</ul>";
+            }
+            $result .= "\n";
+        }
+        return $result;
+    }
+
+    /**
      * Converts a picklist response into a set of options, e.g. for a dropdown.
      *
      * A picklist is a list of items that have the following structure:
@@ -572,7 +710,7 @@ abstract class Form extends MessageCollection
      */
     protected function picklistToOptions(Result $picklist, $emptyValue = null, $emptyText = null)
     {
-        $result = array();
+        $result = [];
 
         // Empty value, if any, at top.
         if ($emptyValue !== null) {

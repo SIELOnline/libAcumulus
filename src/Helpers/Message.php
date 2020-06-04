@@ -267,7 +267,7 @@ class Message
 
         // List item:
         if (($format & self::Format_ListItem) !== 0) {
-            $text = $isHtml ? "<li>$text</li>" : "* $text";
+            $text = $isHtml ? "<li>$text</li>" : "• $text";
         }
 
         return $text;

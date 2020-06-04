@@ -8,7 +8,7 @@ use Siel\Acumulus\Helpers\TranslationCollection;
  */
 class ModuleSpecificTranslations extends TranslationCollection
 {
-    protected $nl = array(
+    protected $nl = [
         'button_link' => '<a href="%2$s" class="button button-primary button-large">%1$s</a>',
         'see_post_meta' => 'Zie de tabel postmeta voor posts van het type "order" of "refund"',
         'meta_original_order_for_refund' => 'Post meta van de oorspronkelijke bestelling, alleen beschikbaar bij credit nota\'s',
@@ -25,9 +25,9 @@ class ModuleSpecificTranslations extends TranslationCollection
         // These are the same for English thus no need to copy them.
         'module' => 'plugin',
         'review_url' => 'https://wordpress.org/support/plugin/acumulus/reviews/#new-post',
-    );
+    ];
 
-    protected $en = array(
+    protected $en = [
         'see_post_meta' => 'See the table postmeta for posts of the type "order" of "refund"',
         'meta_original_order_for_refund' => 'Post meta of the original order, only available with credit notes',
         'wc2_end_support' => 'NOTE: in a next version the Acumulus plugin will stop supporting WooCommerce 2! Start upgrading to wooCommerce 3 now.',
@@ -40,5 +40,5 @@ class ModuleSpecificTranslations extends TranslationCollection
 
         // Rate our plugin message.
         'review_on_marketplace' => 'Would you please give us a review on WordPress.org?',
-    );
+    ];
 }

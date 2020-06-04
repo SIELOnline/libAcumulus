@@ -3,10 +3,12 @@ namespace Siel\Acumulus\Helpers;
 
 /**
  * Contains translations for classes in the \Siel\Acumulus\ApiClient namespace.
+ *
+ * @noinspection PhpUnused Loaded by the Container
  */
 class SeverityTranslations extends TranslationCollection
 {
-    protected $nl = array(
+    protected $nl = [
         Severity::Exception => 'Ernstige fout',
         Severity::Error => 'Fout',
         Severity::Warning => 'Waarschuwing',
@@ -16,9 +18,9 @@ class SeverityTranslations extends TranslationCollection
         Severity::Success => 'Succes',
         Severity::Unknown => 'Nog niet gezet',
         'severity_unknown' => 'Onbekende severity code %d',
-    );
+    ];
 
-    protected $en = array(
+    protected $en = [
         Severity::Exception => 'Exception',
         Severity::Error => 'Error',
         Severity::Warning => 'Warning',
@@ -28,5 +30,5 @@ class SeverityTranslations extends TranslationCollection
         Severity::Success => 'Success',
         Severity::Unknown => 'Not yet set',
         'severity_unknown' => 'Unknown severity code %d',
-    );
+    ];
 }

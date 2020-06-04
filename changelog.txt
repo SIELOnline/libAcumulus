@@ -17,15 +17,30 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies, vanaf 5.5.2 is dat all
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3+ (WordPress)
 
-5.10.0-alpha1 (2020-05-11)
---------------------------
+6.0.0-alpha1 (2020-06-04) (never released)
+-------------------------------------------
 NOTE: The minimum PHP version requirement is now set to 5.6.
 
+Features:
+- Added a registration form that uses the API sign_up to apply for an Acumulus
+  test account.
+- Added a link to the registration form on the settings page, if login
+  credentials are not yet set or are incorrect.
+- Complete make-over of the information block on the settings forms. This block
+  is now also shown on the batch form and the registration success screen.
+- Added sign_up, MyAcumulus and picklist Company types API calls.
+
+
+5.10.0-alpha1 (2020-05-11) (never released)
+-------------------------------------------
 Bugs:
 - WC: Support for TM Extra Product Options did not add the meta tag
   meta-line-type.
 
 Features:
+- Added a registration form that uses the API sign_up to apply for an Acumulus
+  test account.
+- Added sign_up and picklist Company types API calls.
 - WC: If form error messages are for a specific field that field will be given
   a red border.
 - WC: If form error messages are for a specific field they are now clickable,

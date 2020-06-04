@@ -1037,8 +1037,8 @@ class Config
             $result = $this->upgrade550() && $result;
         }
 
-        if (version_compare($currentVersion, '5.10.0', '<')) {
-            $result = $this->upgrade5100() && $result;
+        if (version_compare($currentVersion, '6.0.0', '<')) {
+            $result = $this->upgrade600() && $result;
         }
 
         return $result;
@@ -1285,7 +1285,7 @@ class Config
      *
      * @throws \Exception
      */
-    protected function upgrade5100()
+    protected function upgrade600()
     {
         $requirements = $this->container->getRequirements();
         $messages = $requirements->check();

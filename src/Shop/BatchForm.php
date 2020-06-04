@@ -3,6 +3,7 @@ namespace Siel\Acumulus\Shop;
 
 use DateTime;
 use Siel\Acumulus\Api;
+use Siel\Acumulus\ApiClient\Acumulus;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\ShopCapabilities;
 use Siel\Acumulus\Helpers\Form;
@@ -33,6 +34,7 @@ class BatchForm extends Form
 
     /**
      * @param \Siel\Acumulus\Shop\InvoiceManager $invoiceManager
+     * @param \Siel\Acumulus\ApiClient\Acumulus $acumulusApiClient
      * @param \Siel\Acumulus\Helpers\FormHelper $formHelper
      * @param \Siel\Acumulus\Config\ShopCapabilities $shopCapabilities
      * @param \Siel\Acumulus\Config\Config $config
@@ -41,6 +43,7 @@ class BatchForm extends Form
      */
     public function __construct(
         InvoiceManager $invoiceManager,
+        Acumulus $acumulusApiClient,
         FormHelper $formHelper,
         ShopCapabilities $shopCapabilities,
         Config $config,
@@ -48,7 +51,7 @@ class BatchForm extends Form
         Log $log
     )
     {
-        parent::__construct($formHelper, $shopCapabilities, $config, $translator, $log);
+        parent::__construct($acumulusApiClient, $formHelper, $shopCapabilities, $config, $translator, $log);
 
         $translations = new InvoiceTranslations();
         $this->translator->add($translations);
@@ -56,7 +59,7 @@ class BatchForm extends Form
         $translations = new BatchFormTranslations();
         $this->translator->add($translations);
 
-        $this->screenLog = array();
+        $this->screenLog = [];
         $this->invoiceManager = $invoiceManager;
     }
 
@@ -190,96 +193,96 @@ class BatchForm extends Form
      */
     public function getFieldDefinitions()
     {
-        $fields = array();
+        $fields = [];
 
         $invoiceSourceTypes = $this->shopCapabilities->getSupportedInvoiceSourceTypes();
         if (count($invoiceSourceTypes) === 1) {
             // Make it a hidden field.
-            $invoiceSourceTypeField = array(
+            $invoiceSourceTypeField = [
                 'type' => 'hidden',
                 'value' => key($invoiceSourceTypes),
-            );
+            ];
         } else {
-            $invoiceSourceTypeField = array(
+            $invoiceSourceTypeField = [
                 'type' => 'radio',
                 'label' => $this->t('field_invoice_source_type'),
                 'options' => $invoiceSourceTypes,
-                'attributes' => array(
+                'attributes' => [
                     'required' => true,
-                ),
-            );
+                ],
+            ];
         }
         // 1st fieldset: Batch options.
-        $fields['batchFieldsHeader'] = array(
+        $fields['batchFieldsHeader'] = [
             'type' => 'fieldset',
             'legend' => $this->t('batchFieldsHeader'),
-            'fields' => array(
+            'fields' => [
                 'invoice_source_type' => $invoiceSourceTypeField,
-                'invoice_source_reference_from' => array(
+                'invoice_source_reference_from' => [
                     'type' => 'text',
                     'label' => $this->t('field_invoice_source_reference_from'),
-                ),
-                'invoice_source_reference_to' => array(
+                ],
+                'invoice_source_reference_to' => [
                     'type' => 'text',
                     'label' => $this->t('field_invoice_source_reference_to'),
                     'description' => count($invoiceSourceTypes) === 1 ? $this->t('desc_invoice_source_reference_from_to_1') : $this->t('desc_invoice_source_reference_from_to_2'),
-                ),
-                'date_from' => array(
+                ],
+                'date_from' => [
                     'type' => 'date',
                     'label' => $this->t('field_date_from'),
-                    'attributes' => array(
+                    'attributes' => [
                         'placeholder' => $this->t('date_format'),
-                    ),
-                ),
-                'date_to' => array(
+                    ],
+                ],
+                'date_to' => [
                     'type' => 'date',
                     'label' => $this->t('field_date_to'),
-                    'attributes' => array(
+                    'attributes' => [
                         'placeholder' => $this->t('date_format'),
-                    ),
+                    ],
                     'description' => $this->t('desc_date_from_to'),
-                ),
-                'send_mode' => array(
+                ],
+                'send_mode' => [
                     'type' => 'radio',
                     'label' => $this->t('field_send_mode'),
                     'description' => $this->t('desc_send_mode'),
-                    'attributes' => array(
+                    'attributes' => [
                         'required' => true,
-                    ),
-                    'options' => array(
+                    ],
+                    'options' => [
                         'send_normal' => $this->t('option_send_normal'),
                         'send_force' => $this->t('option_send_force'),
                         'send_test_mode' => $this->t('option_send_test_mode'),
-                    ),
-                ),
-                'dry_run_cb' => array(
+                    ],
+                ],
+                'dry_run_cb' => [
                     'type' => 'checkbox',
                     'label' => $this->t('field_dry_run'),
                     'description' => $this->t('desc_dry_run'),
-                    'options' => array(
+                    'options' => [
                         'dry_run' => $this->t('option_dry_run'),
-                    ),
-                ),
-            ),
-        );
+                    ],
+                ],
+            ],
+        ];
 
         // 2nd fieldset: Batch log.
         if ($this->isSubmitted() && !empty($this->submittedValues) && $this->isValid()) {
             // Set formValue for log as value in case form values are not yet queried.
-            $fields['batchLogHeader'] = array(
+            $fields['batchLogHeader'] = [
                 'type' => 'fieldset',
                 'legend' => $this->t('batchLogHeader'),
-                'fields' => array(
-                    'log' => array(
+                'fields' => [
+                    'log' => [
                         'type' => 'textarea',
-                        'attributes' => array(
+                        'attributes' => [
                             'readonly' => true,
                             'rows' => max(5, min(15, count($this->screenLog))),
                             'style' => 'box-sizing: border-box; width: 100%; min-width: 48em;',
-                        ),
-                    ),
-                ),
-            );
+                        ],
+                    ],
+                ],
+            ];
             if (!empty($this->screenLog)) {
                 $logText = implode("\n", $this->screenLog);
                 $this->formValues['log'] = $logText;
@@ -288,19 +291,22 @@ class BatchForm extends Form
         }
 
         // 3rd fieldset: Batch info.
-        $fields['batchInfoHeader'] = array(
+        $fields['batchInfoHeader'] = [
             'type' => 'details',
             'summary' => $this->t('batchInfoHeader'),
-            'fields' => array(
-                'info' => array(
+            'fields' => [
+                'info' => [
                     'type' => 'markup',
                     'value' => $this->t('batch_info'),
-                    'attributes' => array(
+                    'attributes' => [
                         'readonly' => true,
-                    ),
-                ),
-            ),
-        );
+                    ],
+                ],
+            ],
+        ];
+
+        // 4rd fieldset: More Acumulus.
+        $fields['versionInformationHeader'] = $this->getInformationBlock();
 
         return $fields;
     }
@@ -315,7 +321,7 @@ class BatchForm extends Form
      */
     protected function getInvoiceSourceReferenceList(array $invoiceSources)
     {
-        $result = array();
+        $result = [];
         foreach ($invoiceSources as $invoiceSource) {
             $result[] = $invoiceSource->getReference();
         }

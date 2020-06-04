@@ -1,4 +1,6 @@
 <?php
+/** @noinspection HtmlUnknownTarget */
+
 namespace Siel\Acumulus\Shop;
 
 use Siel\Acumulus\Helpers\TranslationCollection;
@@ -8,7 +10,7 @@ use Siel\Acumulus\Helpers\TranslationCollection;
  */
 class ConfigFormTranslations extends TranslationCollection
 {
-    protected $nl = array(
+    protected $nl = [
         // Titles, headers, links, buttons and messages.
         'config_form_title' => 'Acumulus | Instellingen',
         'config_form_header' => 'Acumulus instellingen',
@@ -47,12 +49,19 @@ class ConfigFormTranslations extends TranslationCollection
         'message_warning_role_insufficient' => 'U gebruikt een account met het gebruikerstype API-Invoerder. Dit gebruikerstype heeft niet alle rechten die deze plugin gebruikt. Verander het gebruikerstype van de huidige gebruiker naar API-Gebruiker of voeg een andere gebruiker toe.',
         'message_warning_role_overkill' => 'U gebruikt een account met het gebruikerstype API-Beheerder. Dit gebruikerstype heeft meer rechten dan deze plugin nodig heeft. Wij raden u aan om het gebruikerstype te veranderen naar API-Gebruiker.',
 
+        // Registration.
+        'config_form_registration' => 'U heeft nog geen accountgegevens ingevuld. Als u nog geen account heeft kunt u vanuit deze %1$s een proefaccount aanmaken:',
+        'config_form_registration_button' => '<a class="button" href="%1$s">Nu vrijblijvend een gratis Acumulus proefaccount aanmaken</a>',
+
         // Account settings.
         'accountSettingsHeader' => 'Uw Acumulus account',
-        'desc_accountSettings' => 'Log in op Acumulus en voeg een gebruiker toe onder "Beheer → Gebruikers → Gebruiker toevoegen". Vul "API - Gebruiker" in als "Gebruikerstype".',
+        'desc_accountSettings_N' => 'Als u al wel een account hebt, kunt u hieronder de gegevens invullen.',
+        'desc_accountSettings_F' => 'De ingevulde accountgegevens zijn onjuist, verbeter ze.',
+        'desc_accountSettings_auth' => 'Als u nog geen account heeft kunt u hier een <a href="%1$s">gratis proefaccount aanvragen</a>.',
+        'desc_accountSettings_T' => 'Deze plugin heeft zich succesvol aangemeld met deze gegevens.',
 
-        'field_code' => 'Contractcode',
         'field_username' => 'Gebruikersnaam',
+        'desc_username' => 'Let op dat u de gegevens van een gebruiker van het type "API-gebruiker" invoert. Als u die nog niet heeft, <a href="https://www.sielsystems.nl/" target="_blank">log dan in op Acumulus</a> en voeg een gebruiker toe onder "Beheer → Gebruikers → Gebruiker toevoegen". Vul "API - Gebruiker" in als "Gebruikerstype".',
         'field_password' => 'Wachtwoord',
         'field_emailonerror' => 'E-mail',
         'desc_emailonerror' => 'Het e-mailadres waarop u geïnformeerd wordt over fouten die zijn opgetreden tijdens het versturen van facturen. Omdat deze module niet kan weten of het vanuit een beheerscherm is aangeroepen, zal het geen berichten op het scherm plaatsen. Daarom is het invullen van een e-mailadres verplicht.',
@@ -370,19 +379,15 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'option_logLevel_5' => 'Log foutmeldingen, waarschuwingen, mededelingen, en communicatieberichten.',
         'desc_logLevel' => 'U kunt hier een logniveau kiezen. Kies voor de 1e of 2e optie tenzij u i.v.m. een supportverzoek bent geïnstrueerd om iets anders te kiezen.',
 
-        // Plugin version information.
-        'versionInformationHeader' => 'Informatie over uw webshop en deze module',
-        'desc_versionInformation' => 'Vermeld aub deze gegevens bij een supportverzoek.',
-
         // Link to other config form.
         'desc_advancedSettings' => 'Deze plugin kent veel instellingen en daarom bevat deze pagina niet alle instellingen. Een aantal minder gebruikte instellingen vindt u op het "%1$s" formulier onder "%2$s". Nadat u hier de gegevens hebt ingevuld en opgeslagen, kunt u het andere formulier bezoeken:',
         'menu_advancedSettings' => 'Instellingen → Acumulus geavanceerde instellingen',
 
         'desc_basicSettings' => 'U bevindt zich nu op het formulier met geavanceerde, ofwel minder gebruikte, instellingen. De basisinstellingen vindt u op het "%1$s" formulier onder "%2$s", of via de button hieronder. Let op: als u op deze button klikt worden de op deze pagina ingevulde of gewijzigde gegevens NIET opgeslagen!',
         'menu_basicSettings' => 'Instellingen → Acumulus',
-    );
+    ];
 
-    protected $en = array(
+    protected $en = [
         // Titles, headers, links, buttons and messages.
         'config_form_title' => 'Acumulus | Settings',
         'config_form_header' => 'Acumulus settings',
@@ -424,7 +429,6 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'accountSettingsHeader' => 'Your Acumulus connection settings',
         'desc_accountSettings' => 'Log in to Acumulus and create an additional user in Acumulus under "Admin → Users → Add user" having "API-User" as "User type".',
 
-        'field_code' => 'Contract code',
         'field_username' => 'User name',
         'field_password' => 'Password',
         'field_emailonerror' => 'E-mail',
@@ -740,15 +744,11 @@ If you unchecked the first option, the second option only applies to business cl
         'option_showPdfInvoice' => 'Show the link to the invoice.',
         'option_showPdfPackingSlip' => 'Show the link to the packing slip.',
 
-        // Plugin version information.
-        'versionInformationHeader' => 'Information about your webshop and this module',
-        'desc_versionInformation' => 'Please mention this information with any support request.',
-
         // Link to other config form.
         'desc_advancedSettings' => 'This plugin is highly configurable and therefore this form does not contain all settings. You can find the other settings in the "%1$s" under "%2$s". Once you have completed and saved the settings over here, you can visit that form to fill in the advanced settings.',
         'menu_advancedSettings' => 'Settings → Acumulus advanced settings',
 
         'desc_basicSettings' => 'This is the form with advanced, i.e. less commonly used, settings. You can find the basic settings in the "%1$s" under "%2$s", or via the button below. Note: if you click on this button, changes you made to this page will NOT be saved!',
         'menu_basicSettings' => 'Settings → Acumulus',
-    );
+    ];
 }

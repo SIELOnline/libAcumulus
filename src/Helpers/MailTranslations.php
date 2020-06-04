@@ -6,7 +6,7 @@ namespace Siel\Acumulus\Helpers;
  */
 class MailTranslations extends TranslationCollection
 {
-    protected $nl = array(
+    protected $nl = [
         // Mails.
         'mail_subject' => 'Factuur verzonden naar Acumulus',
         'mail_subject_concept' => 'Conceptfactuur verzonden naar Acumulus',
@@ -65,9 +65,9 @@ LONGSTRING
 {support_messages_html}
 LONGSTRING
     ,
-    );
+    ];
 
-    protected $en = array(
+    protected $en = [
         // Mails.
         'mail_subject' => 'Invoice sent to Acumulus',
         'mail_subject_concept' => 'Concept invoice sent to Acumulus',
@@ -126,5 +126,5 @@ LONGSTRING
 {support_messages_html}
 LONGSTRING
     ,
-    );
+    ];
 }

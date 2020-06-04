@@ -25,9 +25,6 @@ use Siel\Acumulus\Tag;
  */
 class RegistrationForm extends Form
 {
-    /** @var \Siel\Acumulus\ApiClient\Acumulus */
-    protected $acumulusApiClient;
-
     /**
      * @var array
      *   The response structure of a successful sign-up call,
@@ -48,12 +45,8 @@ class RegistrationForm extends Form
      */
     public function __construct(Acumulus $acumulusApiClient, FormHelper $formHelper, ShopCapabilities $shopCapabilities, Config $config, Translator $translator, Log $log)
     {
-        parent::__construct($formHelper, $shopCapabilities, $config, $translator, $log);
-
-        $translations = new RegistrationFormTranslations();
-        $this->translator->add($translations);
-
-        $this->acumulusApiClient = $acumulusApiClient;
+        parent::__construct($acumulusApiClient, $formHelper, $shopCapabilities, $config, $translator, $log);
+        $this->translator->add(new RegistrationFormTranslations());
         $this->signUpResponse = null;
     }
 
@@ -64,12 +57,8 @@ class RegistrationForm extends Form
     {
         $regexpEmail = '/^[^@<>,; "\']+@([^.@ ,;]+\.)+[^.@ ,;]+$/';
 
-        if (empty($this->submittedValues[Tag::CompanyTypeId]) || $this->submittedValues[Tag::CompanyTypeId] === $this->t('option_empty')) {
-            $this->addMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_companyTypeId')), Severity::Error, Tag::CompanyTypeId);
-        }
-
-        if (empty($this->submittedValues[Tag::CompanyName])) {
-            $this->addMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_companyName')), Severity::Error, Tag::CompanyName);
+        if (empty($this->submittedValues[Tag::Gender])) {
+            $this->addMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_gender')), Severity::Error, Tag::Gender);
         }
 
         if (empty($this->submittedValues[Tag::FullName])) {
@@ -80,6 +69,14 @@ class RegistrationForm extends Form
             $this->addMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_loginName')), Severity::Error, Tag::LoginName);
         } elseif (mb_strlen($this->submittedValues[Tag::LoginName]) < 6) {
             $this->addMessage(sprintf($this->t('message_validate_loginname_0'), $this->t('field_loginName')), Severity::Error, Tag::LoginName);
+        }
+
+        if (empty($this->submittedValues[Tag::CompanyTypeId]) || $this->submittedValues[Tag::CompanyTypeId] === $this->t('option_empty')) {
+            $this->addMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_companyTypeId')), Severity::Error, Tag::CompanyTypeId);
+        }
+
+        if (empty($this->submittedValues[Tag::CompanyName])) {
+            $this->addMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_companyName')), Severity::Error, Tag::CompanyName);
         }
 
         if (empty($this->submittedValues[Tag::Address])) {
@@ -225,6 +222,7 @@ class RegistrationForm extends Form
             $fields += $this->getCreatedAccountFields();
             $fields += $this->getCreatedApiAccountFields();
             $fields += $this->getNextSteps();
+            $fields['versionInformationHeader'] = $this->getInformationBlock();
         }
         return $fields;
     }
@@ -275,8 +273,12 @@ class RegistrationForm extends Form
                 'label' => $this->t('field_gender'),
                 'description' => $this->t('desc_gender'),
                 'options' => [
+                    Api::Gender_Neutral => $this->t('option_gender_neutral'),
                     Api::Gender_Female => $this->t('option_gender_female'),
                     Api::Gender_Male => $this->t('option_gender_male'),
+                ],
+                'attributes' => [
+                    'required' => true,
                 ],
             ],
             Tag::FullName => [
@@ -400,9 +402,9 @@ class RegistrationForm extends Form
                 'type' => 'textarea',
                 'label' => $this->t('field_notes'),
                 'description' => sprintf($this->t('desc_notes'), $this->t('module')),
-                'attributes' => array(
+                'attributes' => [
                     'rows' => 6,
-                ),
+                ],
             ],
         ];
     }
@@ -417,7 +419,7 @@ class RegistrationForm extends Form
     protected function getCreatedAccountFields()
     {
         $title = $this->t('registration_form_success_title');
-        $line1 = sprintf($this->t('registration_form_success_text1'), DateTime::createFromFormat('Y-m-d', $this->signUpResponse['contractenddate'])->format('d-m-Y'));
+        $line1 = sprintf($this->t('registration_form_success_text1'), DateTime::createFromFormat(API::DateFormat_Iso, $this->signUpResponse['contractenddate'])->format('d-m-Y'));
         $line2 = sprintf($this->t('registration_form_success_text2'), htmlspecialchars($this->getSubmittedValue(Tag::Email), ENT_NOQUOTES | ENT_HTML5, 'UTF-8'));
         $line3 = $this->t('registration_form_success_text3');
         return [

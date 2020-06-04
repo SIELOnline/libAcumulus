@@ -45,7 +45,7 @@ class RatePluginForm extends Form
         Translator $translator,
         Log $log
     ) {
-        parent::__construct($formHelper, $shopCapabilities, $config, $translator, $log);
+        parent::__construct(null, $formHelper, $shopCapabilities, $config, $translator, $log);
         $this->addMeta = false;
         $translations = new RatePluginFormTranslations();
         $this->translator->add($translations);
@@ -117,20 +117,20 @@ class RatePluginForm extends Form
     {
         switch ($this->action) {
             case 'done':
-                $fields = array(
-                    'done' => array(
+                $fields = [
+                    'done' => [
                         'type' => 'markup',
                         'value' => sprintf($this->t('done_thanks'), $this->t('module')),
-                    ),
-                );
+                    ],
+                ];
                 break;
             case 'later':
-                $fields = array(
-                    'later' => array(
+                $fields = [
+                    'later' => [
                         'type' => 'markup',
                         'value' => $this->t('no_problem'),
-                    ),
-                );
+                    ],
+                ];
                 break;
             default:
                 $fields = $this->getFieldDefinitionsFull();
@@ -146,35 +146,35 @@ class RatePluginForm extends Form
      */
     protected function getFieldDefinitionsFull()
     {
-        return array(
-            'acumulus-rate-plugin' => array(
+        return [
+            'acumulus-rate-plugin' => [
                 'type' => 'fieldset',
-                'fields' => array(
-                    'logo' => array(
+                'fields' => [
+                    'logo' => [
                         'type' => 'markup',
-                        'value' => $this->getLogo(),
-                    ),
-                    'message' => array(
+                        'value' => $this->getLogo(100),
+                    ],
+                    'message' => [
                         'type' => 'markup',
                         'value' => sprintf($this->t('rate_acumulus_plugin'), $this->t('module'), $this->t('review_on_marketplace')),
-                    ),
-                    'done' => array(
+                    ],
+                    'done' => [
                         'type' => 'button',
                         'value' => $this->t('do'),
-                        'attributes' => array(
+                        'attributes' => [
                             'onclick' => "window.open('" . $this->t('review_url') . "')",
                             'class' => 'acumulus-ajax',
-                        ),
-                    ),
-                    'later' => array(
+                        ],
+                    ],
+                    'later' => [
                         'type' => 'button',
                         'value' => $this->t('later'),
-                        'attributes' => array(
+                        'attributes' => [
                             'class' => 'acumulus-ajax',
-                        ),
-                    ),
-                ),
-            ),
-        );
+                        ],
+                    ],
+                ],
+            ],
+        ];
     }
 }

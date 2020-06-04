@@ -1,4 +1,6 @@
 <?php
+/** @noinspection HtmlUnknownTarget */
+
 namespace Siel\Acumulus\Shop;
 
 use Siel\Acumulus\Helpers\TranslationCollection;
@@ -24,7 +26,7 @@ class RegistrationFormTranslations extends TranslationCollection
 
         'field_gender' => 'Geslacht',
         'desc_gender' => 'Uw geslacht. Dit wordt gebruikt om sjablonen in Acumulus in te stellen en in de aanhef in communicatie naar u toe.',
-        'option_gender_neutral' => 'Neutraal',
+        'option_gender_neutral' => 'Genderneutraal',
         'option_gender_female' => 'Vrouw',
         'option_gender_male' => 'Man',
 
@@ -32,13 +34,13 @@ class RegistrationFormTranslations extends TranslationCollection
         'desc_fullName' => 'Uw voor- en achternaam.',
 
         'field_loginName' => 'Gebruikersnaam',
-        'desc_loginName' => 'Minimaal 6 tekens. De gebruikersnaam die u wilt gebruiken om zelf in te loggen op Acumulus. Deze %s zal een eigen gebruikersnaam en wachtwoord krijgen.',
+        'desc_loginName' => 'De gebruikersnaam, minimaal 6 tekens, die u wilt gebruiken om zelf in te loggen op Acumulus. Deze %s zal een eigen gebruikersnaam en wachtwoord krijgen.',
 
         'companySettingsHeader' => 'Over uw bedrijf',
         'desc_companySettings' => 'Met onderstaande informatie kunnen we uw proefaccount beter inrichten, zo kunnen we b.v. een factuursjabloon maken. Uiteraard kunt u deze gegevens later nog aanpassen.',
 
-        'field_companyTypeId' => 'Rechtsvorm',
         'field_companyName' => 'Bedrijfsnaam',
+        'field_companyTypeId' => 'Rechtsvorm',
         'field_address' => 'Adres',
         'field_postalCode' => 'Postcode',
         'field_city' => 'Plaats',
@@ -69,7 +71,6 @@ class RegistrationFormTranslations extends TranslationCollection
         'registration_form_success_text3' => 'Hebt u geen e-mail ontvangen? Mogelijk wordt ons e-mailbericht met uw inlogcodes gefilterd door uw spamfilter. Controleer uw spamfilter en de map met gefilterde e-mail. Neem anders contact met ons op zodat wij u uw gegevens opnieuw kunnen toesturen.',
         'loginDetailsHeader' => 'Klik om uw inlogcodes te zien',
 
-        'field_code' => 'Contractcode',
         'field_password' => 'Wachtwoord',
 
         'registration_form_success_api_account' => 'Deze %1$s zal met zijn eigen aanmeldingsgegevens communiceren met Acumulus.

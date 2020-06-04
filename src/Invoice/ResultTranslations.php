@@ -1,14 +1,17 @@
 <?php
+
 namespace Siel\Acumulus\Invoice;
 
 use Siel\Acumulus\Helpers\TranslationCollection;
 
 /**
  * Contains translations for invoice send result logging.
+ *
+ * @noinspection PhpUnused Loaded by the Container
  */
 class ResultTranslations extends TranslationCollection
 {
-    protected $nl = array(
+    protected $nl = [
         'message_invoice_send' => '%1$s: %2$s is %3$s',
         'message_invoice_source' => 'Factuur voor %1$s %2$s',
         'message_invoice_reason' => '%1$s (reden: %2$s)',
@@ -32,9 +35,9 @@ class ResultTranslations extends TranslationCollection
         'reason_not_sent_dry_run' => 'verzenden tegengehouden door optie om niet daadwerkelijk te versturen',
         'reason_not_sent_local_errors' => 'verzenden tegengehouden omdat er lokaal fouten zijn geconstateerd',
         'reason_unknown' => 'onbekende reden: %d',
-    );
+    ];
 
-    protected $en = array(
+    protected $en = [
         'message_invoice_send' => '%1$s: %2$s was %3$s',
         'message_invoice_source' => 'Invoice for %1$s %2$s',
         'message_invoice_reason' => '%1$s (reason: %2$s)',
@@ -58,5 +61,5 @@ class ResultTranslations extends TranslationCollection
         'reason_not_sent_dry_run' => 'sending prevented by "dry run" option',
         'reason_not_sent_local_errors' => 'sending prevented by local errors',
         'reason_unknown' => 'unknown reason: %d',
-    );
+    ];
 }

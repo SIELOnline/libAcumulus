@@ -113,7 +113,7 @@ class MessageTest extends TestCase
         $this->assertEquals('Ernstige fout: 703: Message 703', $message4->format(Message::Format_PlainWithSeverity));
         $this->assertEquals('<span>Waarschuwing:</span> <span>702, W2:</span> <span>Message 702</span>', $message3->format(Message::Format_HtmlWithSeverity));
 
-        $this->assertEquals("* S1: Message 701\n", $message1->format(Message::Format_PlainList));
+        $this->assertEquals("• S1: Message 701", $message1->format(Message::Format_PlainList));
         $this->assertEquals('<li><span>702, W2:</span> <span>Message 702</span></li>', $message3->format(Message::Format_HtmlList));
 
         $this->assertEquals('Not a valid e-mail address', $message5->format(Message::Format_Plain));

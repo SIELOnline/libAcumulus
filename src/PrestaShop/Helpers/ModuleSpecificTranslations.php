@@ -8,7 +8,7 @@ use Siel\Acumulus\Helpers\TranslationCollection;
  */
 class ModuleSpecificTranslations extends TranslationCollection
 {
-    protected $nl = array(
+    protected $nl = [
         'module' => 'module',
         'button_link' => '<a href="%2$s" class="btn btn-default"><i class="process-icon-cogs"></i>%1$s</a>',
 
@@ -16,13 +16,13 @@ class ModuleSpecificTranslations extends TranslationCollection
         'menu_basicSettings' => 'Instellingen → Acumulus → Configureer',
 
         'see_billing_address' => 'Verzendadresgegevens, bevat dezelfde eigenschappen als het "address_invoice" object hierboven',
-    );
+    ];
 
-    protected $en = array(
+    protected $en = [
         'module' => 'module',
         'menu_advancedSettings' => 'Advanced Parameters → Acumulus advanced settings',
         'menu_basicSettings' => 'Settings → Acumulus → Configure',
 
         'see_billing_address' => 'Shipping address, contains the same properties as the "address_invoice" object above',
-    );
+    ];
 }

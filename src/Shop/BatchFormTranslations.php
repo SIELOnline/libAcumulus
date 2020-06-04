@@ -8,7 +8,7 @@ use Siel\Acumulus\Helpers\TranslationCollection;
  */
 class BatchFormTranslations extends TranslationCollection
 {
-    protected $nl = array(
+    protected $nl = [
         'batch_form_title' => 'Acumulus | Batchverzending',
         'batch_form_header' => 'Verzend facturen naar Acumulus',
         'batch_form_link_text' => 'Acumulus batchverzending',
@@ -35,7 +35,7 @@ class BatchFormTranslations extends TranslationCollection
         'option_dry_run' => 'Laat alleen de lijst van facturen zien die verstuurd zouden worden, zonder daadwerkelijk te versturen.',
         'desc_dry_run' => 'De filters die u hierboven heeft opgegeven kunnen in bepaalde gevallen voor verrassingen zorgen. Door deze optie aan te vinken krijgt u in het resultatenoverzicht een lijst te zien van facturen die verstuurd zouden worden, zonder dat het versturen daadwerkelijk plaats vindt.</p>',
         'batchLogHeader' => 'Resultaten',
-        'batchInfoHeader' => 'Uitgebreide informatie',
+        'batchInfoHeader' => 'Uitgebreide toelichting op dit formulier',
         'batch_info' => <<<LONGSTRING
 <p>Met dit formulier kunt u de facturen van een aantal orders of creditnota's in
 één keer versturen.
@@ -79,9 +79,9 @@ LONGSTRING
         'message_form_batch_success' => 'De facturen zijn succesvol verzonden. Zie het resultatenoverzicht voor eventuele opmerkingen en waarschuwingen.',
         'message_form_batch_error' => 'Er zijn fouten opgetreden bij het versturen van de facturen. Zie het resultatenoverzicht voor meer informatie over de fouten.',
 
-    );
+    ];
 
-    protected $en = array(
+    protected $en = [
         'batch_form_title' => 'Acumulus | Send batch',
         'batch_form_header' => 'Send a batch of invoices to Acumulus',
         'batch_form_link_text' => 'Acumulus batch',
@@ -108,7 +108,7 @@ LONGSTRING
         'option_dry_run' => 'Dry run',
         'desc_dry_run' => 'In some cases, the filters you defined here can lead to surprises. By checking this option you will get a list of invoices that would be sent, without actually being sent.</p>',
         'batchLogHeader' => 'Results',
-        'batchInfoHeader' => 'Additional information',
+        'batchInfoHeader' => 'Additional explanations about this form',
         'batch_info' => <<<LONGSTRING
 <p>You can use this form to send a number of orders or credit notes at once.
 This is most useful when you just installed the plugin, because normally you
@@ -149,5 +149,5 @@ LONGSTRING
         'message_form_batch_success' => 'The invoices were sent successfully. See the results overview for any remarks or warnings.',
         'message_form_batch_error' => 'Errors during sending the invoices. See the results overview for more information on the errors.',
 
-    );
+    ];
 }

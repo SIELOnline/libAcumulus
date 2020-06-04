@@ -9,7 +9,6 @@ use Siel\Acumulus\Helpers\FormHelper;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Tag;
-use Siel\Acumulus\ApiClient\Result;
 use Siel\Acumulus\ApiClient\Acumulus;
 use Siel\Acumulus\Helpers\Severity;
 
@@ -18,18 +17,6 @@ use Siel\Acumulus\Helpers\Severity;
  */
 abstract class BaseConfigForm extends Form
 {
-    /** @var \Siel\Acumulus\ApiClient\Acumulus */
-    protected $acumulusApiClient;
-
-    /**
-     * About API call result.
-     *
-     * @var \Siel\Acumulus\ApiClient\Result
-     *
-     * @todo: change to variable.
-     */
-    protected $about;
-
     /**
      * Constructor.
      *
@@ -42,12 +29,8 @@ abstract class BaseConfigForm extends Form
      */
     public function __construct(Acumulus $acumulusApiClient, FormHelper $formHelper, ShopCapabilities $shopCapabilities, Config $config, Translator $translator, Log $log)
     {
-        parent::__construct($formHelper, $shopCapabilities, $config, $translator, $log);
-
-        $translations = new ConfigFormTranslations();
-        $this->translator->add($translations);
-
-        $this->acumulusApiClient = $acumulusApiClient;
+        parent::__construct($acumulusApiClient, $formHelper, $shopCapabilities, $config, $translator, $log);
+        $this->translator->add(new ConfigFormTranslations());
     }
 
     /**
@@ -59,7 +42,7 @@ abstract class BaseConfigForm extends Form
     {
         parent::setSubmittedValues();
         $submittedValues = $this->submittedValues;
-        $this->submittedValues = array();
+        $this->submittedValues = [];
 
         foreach ($this->acumulusConfig->getKeys() as $key) {
             if (!$this->addIfIsset($this->submittedValues, $key, $submittedValues)) {
@@ -68,7 +51,7 @@ abstract class BaseConfigForm extends Form
                 if ($this->isCheckbox($key)) {
                     $this->submittedValues[$key] = '';
                 } elseif ($this->isArray($key)) {
-                    $this->submittedValues[$key] = array();
+                    $this->submittedValues[$key] = [];
                 }
             }
         }
@@ -115,18 +98,17 @@ abstract class BaseConfigForm extends Form
         // Check if we can retrieve a picklist. This indicates if the account
         // settings are correct.
         $message = '';
-        $credentials = $this->acumulusConfig->getCredentials();
-        if (!empty($credentials[Tag::ContractCode]) && !empty($credentials[Tag::UserName]) && !empty($credentials[Tag::Password])) {
-            $this->about = $this->acumulusApiClient->getAbout();
-            if ($this->about->hasError()) {
-                $message = $this->about->getByCode(401) ? 'message_error_auth' : ($this->about->getByCode(403) ? 'message_error_forb' : 'message_error_comm');
-                $this->addMessages($this->about->getMessages(Severity::WarningOrWorse));
-            } elseif ($this->about->getByCode(553)) {
+        if (!$this->emptyCredentials()) {
+            $about = $this->acumulusApiClient->getAbout();
+            if ($about->hasError()) {
+                $message = $about->getByCode(401) ? 'message_error_auth' : ($about->getByCode(403) ? 'message_error_forb' : 'message_error_comm');
+                $this->addMessages($about->getMessages(Severity::WarningOrWorse));
+            } elseif ($about->getByCode(553)) {
                 // Role has been deprecated role for use with the API.
                 $this->addMessage($this->t('message_warning_role_deprecated'), Severity::Warning, Tag::UserName);
             } else {
                 // Check role for sufficient rights but no overkill.
-                $response = $this->about->getResponse();
+                $response = $about->getResponse();
                 $roleId = (int) $response['roleid'];
                 if ($roleId === Api::RoleApiCreator) {
                     $this->addMessage($this->t('message_warning_role_insufficient'), Severity::Warning, Tag::UserName);
@@ -139,39 +121,24 @@ abstract class BaseConfigForm extends Form
             $message = 'message_auth_unknown';
         }
 
-        // Translate and format message.
-        if (!empty($message)) {
-            $formType = $this->isAdvancedConfigForm() ? 'advanced' : 'config';
-            $message = sprintf($this->t($message), $this->t("message_error_arg1_$formType"), $this->t("message_error_arg2_$formType"));
-        }
-
         return $message;
     }
 
     /**
-     * Returns version information.
+     * Translate and format message.
      *
-     * The fields returned:
-     * - versionInformation
-     * - versionInformationDesc
+     * @param $message
      *
-     * @return array[]
-     *   The set of version related informational fields.
+     * @return string
+     *
      */
-    protected function getVersionInformation()
+    protected function translateAccountMessage($message)
     {
-        $env = $this->acumulusConfig->getEnvironment();
-        return array(
-            'versionInformation' => array(
-                'type' => 'markup',
-                'value' => "<p>Application: Acumulus module {$env['moduleVersion']}; Library: {$env['libraryVersion']}; Shop: {$env['shopName']} {$env['shopVersion']};<br>" .
-                    "Environment: PHP {$env['phpVersion']}; Curl: {$env['curlVersion']}; JSON: {$env['jsonVersion']}; OS: {$env['os']}  Server: {$env['hostName']}.</p>",
-            ),
-            'versionInformationDesc' => array(
-                'type' => 'markup',
-                'value' => $this->t('desc_versionInformation'),
-            ),
-        );
+        if (!empty($message)) {
+            $formType = $this->isAdvancedConfigForm() ? 'advanced' : 'config';
+            $message = sprintf($this->t($message), $this->t("message_error_arg1_$formType"), $this->t("message_error_arg2_$formType"));
+        }
+        return $message;
     }
 
     /**
@@ -202,20 +169,20 @@ abstract class BaseConfigForm extends Form
         }
         if (count($options) === 1) {
             // Make it a hidden field.
-            $field = array(
+            $field = [
                 'type' => 'hidden',
                 'value' => reset($options),
-            );
+            ];
         } else {
-            $field = array(
+            $field = [
                 'type' => $type,
                 'label' => $this->t("field_$name"),
                 'description' => $this->t($this->t("desc_$name")),
                 'options' => $options,
-                'attributes' => array(
+                'attributes' => [
                     'required' => $required,
-                ),
-            );
+                ],
+            ];
         }
         return $field;
     }
@@ -228,7 +195,7 @@ abstract class BaseConfigForm extends Form
      */
     protected function getOrderStatusesList()
     {
-        $result = array();
+        $result = [];
 
         // Because many users won't know how to deselect a single option in a
         // multiple select element, an empty option is added.

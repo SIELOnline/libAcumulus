@@ -726,7 +726,7 @@ If you unchecked the first option, the second option only applies to business cl
         'option_debug_2' => 'Always receive a mail with the results on sending an invoice to Acumulus.',
         'option_debug_3' => 'Send invoices to Acumulus in test mode. Acumulus will only check the input for errors and warnings but not store the invoice. You will always receive a mail with the results.',
         'option_debug_4' => 'Do not send messages to Acumulus, but receive a mail with the message as would have been sent.',
-        'desc_debug' => 'Select a debug mode. Choose for the 1st option unless otherwise instructed by support staff.',
+        'desc_debug' => 'Select a mode that defines how to react on sending invoices to Acumulus. Choose for the 1st option unless otherwise instructed by support staff.',
 
         'field_logLevel' => 'Log level',
         'option_logLevel_3' => 'Log error messages, warnings, and operational notices.',

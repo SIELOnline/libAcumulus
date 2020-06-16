@@ -49,14 +49,17 @@ abstract class Creator extends BaseCreator
     }
 
     /**
-     * {@inheritdoc}
+     * Returns the item lines for an order.
      */
     protected function getItemLinesOrder()
     {
         $result = array();
         // Items may be composed, so start with all "visible" items.
         foreach ($this->order->getAllVisibleItems() as $item) {
-            $result[] = $this->getItemLineOrder($item);
+            $item = $this->getItemLineOrder($item);
+            if ($item !== null) {
+                $result[] = $item;
+            }
         }
         return $result;
     }
@@ -65,10 +68,11 @@ abstract class Creator extends BaseCreator
      * Returns an item line for 1 main product line.
      *
      * @param $item
+     * @param bool $isChild
      *
      * @return array
      */
-    abstract protected function getItemLineOrder($item);
+    abstract protected function getItemLineOrder($item, $isChild = false);
 
     /**
      * {@inheritdoc}

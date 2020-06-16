@@ -68,10 +68,8 @@ class Creator extends BaseCreator
      * {@inheritdoc}
      *
      * @param \Mage_Sales_Model_Order_Item $item
-     *
-     * @return array
      */
-    protected function getItemLineOrder($item)
+    protected function getItemLineOrder($item, $isChild = false)
     {
         $result = array();
 

@@ -72,16 +72,16 @@ class Creator extends BaseCreator
      * {@inheritdoc}
      *
      * @param \Magento\Sales\Model\Order\Item $item
-     *
-     * @return array
      */
-    protected function getItemLineOrder($item)
+    protected function getItemLineOrder($item, $isChild = false)
     {
         $result = array();
 
         $this->addPropertySource('item', $item);
 
         $this->addProductInfo($result);
+        $result[Meta::Id] = $item->getId();
+        $result[Meta::ProductId] = $item->getProductId();
 
         // For higher precision of the unit price, we will recalculate the price
         // ex vat later on, if product prices are entered inc vat by the admin.
@@ -145,8 +145,16 @@ class Creator extends BaseCreator
                 Meta::VatRateLookup => $vatRate,
                 Meta::VatRateLookupSource => '$item->getTaxPercent()',
             );
+        } elseif (Number::isZero($vatRate) && Number::isZero($productPriceEx) && !$isChild) {
+            // 0 vat rate and zero price on a main item: when the order gets
+            // send on creation, I have seen child lines on their own, i.e. not
+            // being attached to their parent, while at the same time the parent
+            // did have (a copy of) that child under its childrenItems.
+            // We bail out by returning null
+            return null;
         } else {
-            // No 0 VAT or not a parent product: the vat rate is real.
+            // No 0 VAT, or 0 vat and not a parent product and not a zero price:
+            // the vat rate is real.
             $result += array(
                 Tag::VatRate => $vatRate,
                 Meta::VatRateSource => Number::isZero($vatRate) ? Creator::VatRateSource_Exact0 : Creator::VatRateSource_Exact,
@@ -164,7 +172,10 @@ class Creator extends BaseCreator
         if (!empty($childrenItems)) {
             $result[Meta::ChildrenLines] = array();
             foreach ($childrenItems as $child) {
-                $result[Meta::ChildrenLines][] = $this->getItemLineOrder($child);
+                $childLine = $this->getItemLineOrder($child, true);
+                if ($childLine !== null) {
+                    $result[Meta::ChildrenLines][] = $childLine;
+                }
             }
         }
 

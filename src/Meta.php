@@ -265,10 +265,15 @@ interface Meta
 
     // Line: Other meta tags.
     /**
-     * Creator->Event: the internal id of the order item line (WooCommerce
-     * only).
+     * Creator->Event: the internal id of the order item line
+     * (WooCommerce and Magento only).
      */
     const Id = 'meta-id';
+    /**
+     * Creator->Event: the internal prouct id of the order item line product
+     * (Magento only).
+     */
+    const ProductId = 'meta-product-id';
     /**
      * Creator->Completor: the type of line: product, shipping, payment fee,
      * discount line, etc.

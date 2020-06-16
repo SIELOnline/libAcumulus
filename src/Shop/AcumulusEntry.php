@@ -7,15 +7,26 @@ use Siel\Acumulus\PluginConfig;
 /**
  * Ties webshop orders or credit notes to entries in Acumulus.
  *
- * Acumulus identifies entries by their entry id (boekstuknummer in het
- * Nederlands) or, for a number of API calls, a token. Both the entry id and
- * token are stored together with information that identifies the shop invoice
- * source (order or credit note) and create and last updated timestamps.
+ * Acumulus identifies entries by their entry id (boekstuknummer in dutch) or,
+ * for a number of API calls, a token. Both the entry id and token are stored
+ * together with information that identifies the shop invoice source (order or
+ * credit note) and create and last updated timestamps.
  *
  * Concepts do not have a token, they only have a concept id. As this feature
  * was added after this class and the underlying storage had been created, we
  * store the concept id in the entry id field and use the token field (empty or
  * set) to determine what the entry id field refers to.
+ *
+ * A 3rd "type" of entry is a "lock" entry that is inserted just before an
+ * invoiceAdd request is sent and deleted/replaced with a real record after the
+ * result has been received. This is used to prevent sending an invoice twice at
+ * more or less the same time.
+ *
+ * Summarising, each entry characterises one of the following:
+ * - Entry: entryIOd= entry id AND token = token
+ * - Concept old style: entryId = null AND token = null
+ * - Concept new style: entryId = concept id AND token = null
+ * - Lock record: entryId = const lockEntryId AND token = const lockToken
  *
  * Most webshops also require/expect a single primary key (technical key) but
  * that is irrelevant for this class.
@@ -23,8 +34,8 @@ use Siel\Acumulus\PluginConfig;
  * Usages of this information (* = not (yet) implemented):
  * - Prevent that an invoice for a given order or credit note is sent twice.
  * - Show additional information on order or order list screens.
- * - Update payment status
- * - Show or resend (*) Acumulus invoice PDF
+ * - Update payment status.
+ * - Show or resend(*) Acumulus invoice PDF.
  *
  * Note: some of these features are only implemented in the Acumulus
  *   WooCommerce plugin.
@@ -98,14 +109,14 @@ class AcumulusEntry
      *
      * @return int|null
      *   The concept id of this Acumulus entry, 0 if it was not stored, or null
-     *   if it is a real entry.
+     *   if it is a real entry (i.e. not a concept).
      */
     public function getConceptId()
     {
         // Is it a concept id or a real entry id.
         $token = $this->getToken();
 
-        return empty($token) && $token !== static::lockToken ? (int) ($this->get(static::$keyEntryId)) : null;
+        return empty($token) ? (int) ($this->get(static::$keyEntryId)) : null;
     }
 
     /**
@@ -267,7 +278,7 @@ class AcumulusEntry
      */
     public function isSendLock()
     {
-        return $this->getEntryId() === static::lockEntryId && $this->getToken() === static::lockToken;
+        return $this->getToken() === static::lockToken;
     }
 
     /** @noinspection PhpDocMissingThrowsInspection

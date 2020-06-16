@@ -79,13 +79,11 @@ abstract class AcumulusEntryManager
     {
         if (empty($result)) {
             $result = null;
-        } elseif (is_object($result)) {
-            $result = $this->container->getAcumulusEntry($result);
-            if ($ignoreLock && $result->isSendLock()) {
-                $result = null;
-            }
         } else {
-            // It's a non empty array of results.
+            if (is_object($result)) {
+                $result = [$result];
+            }
+            // Now, it's a non empty array of results.
             foreach ($result as &$record) {
                 $record = $this->container->getAcumulusEntry($record);
                 if ($ignoreLock && $record->isSendLock()) {

@@ -603,7 +603,8 @@ class Container
      */
     public function getInstance($class, $subNamespace, array $constructorArgs = array(), $newInstance = false)
     {
-        if (!isset($this->instances[$class]) || $newInstance) {
+        $instanceKey = "$subNamespace\\$class";
+        if (!isset($this->instances[$instanceKey]) || $newInstance) {
             // Try custom namespace.
             if (!empty($this->customNamespace)) {
                 $fqClass = $this->tryNsInstance($class, $subNamespace, $this->customNamespace);
@@ -634,14 +635,14 @@ class Container
             // and newInstanceArgs() is called, we have to differentiate between
             // no arguments and arguments.
             if (empty($constructorArgs)) {
-                $this->instances[$class] = new $fqClass();
+                $this->instances[$instanceKey] = new $fqClass();
             } else {
                 /** @noinspection PhpUnhandledExceptionInspection */
                 $reflector = new ReflectionClass($fqClass);
-                $this->instances[$class] = $reflector->newInstanceArgs($constructorArgs);
+                $this->instances[$instanceKey] = $reflector->newInstanceArgs($constructorArgs);
             }
         }
-        return $this->instances[$class];
+        return $this->instances[$instanceKey];
     }
 
     /**

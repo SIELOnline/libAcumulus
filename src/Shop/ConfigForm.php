@@ -256,7 +256,7 @@ class ConfigForm extends BaseConfigForm
             ],
             'register_button' => [
                 'type' => 'markup',
-                'value' => sprintf($this->t('config_form_registration_button'), $this->shopCapabilities->getLink('registration')),
+                'value' => sprintf($this->t('config_form_registration_button'), $this->shopCapabilities->getLink('registration'), $this->t('button_class')),
             ],
         ];
     }

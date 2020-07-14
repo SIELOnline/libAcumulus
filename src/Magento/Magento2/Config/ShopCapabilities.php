@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\Magento\Magento2\Config;
 
+use Exception;
 use Magento\Framework\App\ObjectManager;
 use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
 use Siel\Acumulus\Magento\Magento2\Helpers\Registry;
@@ -213,20 +214,18 @@ class ShopCapabilities extends ShopCapabilitiesBase
         $productMetadata = Registry::getInstance()->get('Magento\Framework\App\ProductMetadataInterface');
         try {
             $version = $productMetadata->getVersion();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // In CLI mode (php bin/magento ...) getVersion() throws an
             // exception.
             $version = 'UNKNOWN';
         }
 
-        $environment = array(
+        return array(
             'moduleVersion' => Registry::getInstance()->getModuleVersion('Siel_AcumulusMa2'),
             'schemaVersion' => Registry::getInstance()->getSchemaVersion('Siel_AcumulusMa2'),
             'shopName' => $this->shopName,
             'shopVersion' => $version,
         );
-
-        return $environment;
     }
 
     /**
@@ -566,7 +565,8 @@ class ShopCapabilities extends ShopCapabilitiesBase
     {
         $result = array();
         /** @var \Magento\Tax\Model\ClassModel $taxClass */
-        $taxClass = \Magento\Framework\App\ObjectManager::getInstance()->create(\Magento\Tax\Model\ClassModel::class);
+        /** @noinspection PhpFullyQualifiedNameUsageInspection */
+        $taxClass = ObjectManager::getInstance()->create(\Magento\Tax\Model\ClassModel::class);
         foreach ($taxClass->getCollection() as $item) {
             $result[$item->getData('class_id')] = $item->getData('class_name');
         }
@@ -580,6 +580,8 @@ class ShopCapabilities extends ShopCapabilitiesBase
     {
         $registry = Registry::getInstance();
         switch ($linkType) {
+            case 'registration':
+                return $registry->getUrlInterface()->getUrl('acumulus/registration');
             case 'config':
                 return $registry->getUrlInterface()->getUrl('acumulus/config');
             case 'advanced':
@@ -587,6 +589,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
             case 'batch':
                 return $registry->getUrlInterface()->getUrl('acumulus/batch');
             case 'logo':
+                /** @noinspection PhpFullyQualifiedNameUsageInspection */
                 $repository = ObjectManager::getInstance()->get(\Magento\Framework\View\Asset\Repository::class);
                 return $repository->getUrl('Siel_AcumulusMa2::images/siel-logo.svg');
         }

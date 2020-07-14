@@ -85,8 +85,17 @@ class FormMapper extends BaseFormMapper
             // Attributes are ignored by an element of type note, we add them to
             // a wrapper element using beforeElementHtml and afterElementHtml.
             $htmlAttributes = ['class', 'title'];
-            $element->setBeforeElementHtml('<div ' . $element->serialize($htmlAttributes) . '>' . $element->getLabelHtml());
+            $label = $element->getLabelHtml();
+            /** @noinspection PhpUndefinedMethodInspection */
+            if (!empty($element->getLabelIsHtml())) {
+                /** @noinspection PhpUndefinedMethodInspection */
+                $label = preg_replace('|<span>.+</span>|U', '<span>' . $element->getLabel() . '</span>', $label);
+            }
+            /** @noinspection PhpUndefinedMethodInspection */
+            $element->setBeforeElementHtml('<div ' . $element->serialize($htmlAttributes) . '>' . $label);
+            /** @noinspection PhpUndefinedMethodInspection */
             $element->setAfterElementHtml('</div>');
+            /** @noinspection PhpUndefinedMethodInspection */
             $element->setLabel(null);
         }
 
@@ -131,9 +140,9 @@ class FormMapper extends BaseFormMapper
             case 'details':
                 $type = 'fieldset';
                 break;
-            // Other types are returned as is: fieldset, text, password, date,
-            // button.
             default:
+                // Other types are returned as is: fieldset, text, password,
+                // date, button.
                 $type = $field['type'];
                 break;
         }
@@ -196,13 +205,21 @@ class FormMapper extends BaseFormMapper
                 $config[$key] = $value;
                 break;
             case 'type':
-                if ($value === 'details') {
+                if ($value === 'fieldset') {
                     $config['collapsable'] = true;
-                    $config['opened'] = false;
+                    $config['opened'] = true;
+                } elseif ($value === 'details') {
+                    $config['before_element_html'] = '<details>';
+                    $config['after_element_html'] = '</details>';
                 }
                 break;
             case 'summary':
-                $config['legend'] = $value;
+                $config['before_element_html'] .= '<summary>' . $value . '</summary>';
+                break;
+            case 'collapsable':
+            case 'opened':
+                // Do overwrite, as it has explicitly been set.
+                $config['collapsable'] = $value;
                 break;
             case 'name':
                 if ($type === 'checkbox') {
@@ -257,9 +274,13 @@ class FormMapper extends BaseFormMapper
                             }
                             break;
                         case 'label':
-                            // Just add them to the element, for a note, they
-                            // wil then be put into a wrapping element. That
+                            // Just add them to the element. For a note, they
+                            // will then be put into a wrapping element. That
                             // should be enough to address them in css.
+                            if (isset($attributeValue['html'])) {
+                                $attributeValue['label_is_html'] = $attributeValue['html'];
+                                unset($attributeValue['html']);
+                            }
                             $config = $this->getMagentoProperty($config, 'attributes', $attributeValue, $type);
                             break;
                         default:

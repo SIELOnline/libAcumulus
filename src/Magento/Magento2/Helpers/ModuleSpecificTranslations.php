@@ -11,7 +11,8 @@ class ModuleSpecificTranslations extends ModuleSpecificTranslationsBase
     public function __construct()
     {
         $this->nl += [
-            'button_link' => '<a href="%2$s" class="abs-action-primary" style="text-decoration: none; color: #fff">%1$s</a>',
+            'button_link' => '<a href="%2$s" class="action-secondary">%1$s</a>',
+            'button_class' => 'action-secondary',
 
             'menu_advancedSettings' => 'Winkels → Overige instellingen → Acumulus Advanced Config',
             'menu_basicSettings' => 'Winkels → Overige instellingen → Acumulus Config',

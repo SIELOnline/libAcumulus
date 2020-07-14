@@ -71,7 +71,7 @@ class RegistrationForm extends Form
             $this->addMessage(sprintf($this->t('message_validate_loginname_0'), $this->t('field_loginName')), Severity::Error, Tag::LoginName);
         }
 
-        if (empty($this->submittedValues[Tag::CompanyTypeId]) || $this->submittedValues[Tag::CompanyTypeId] === $this->t('option_empty')) {
+        if (empty($this->submittedValues[Tag::CompanyTypeId]) && $this->submittedValues[Tag::CompanyTypeId] !== 0) {
             $this->addMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_companyTypeId')), Severity::Error, Tag::CompanyTypeId);
         }
 
@@ -218,6 +218,7 @@ class RegistrationForm extends Form
             ];
         } else {
             // Successfully submitted: show details of the created account.
+            $this->loadInfoBlockTranslations();
             $this->needsFormAndSubmitButton = false;
             $fields += $this->getCreatedAccountFields();
             $fields += $this->getCreatedApiAccountFields();

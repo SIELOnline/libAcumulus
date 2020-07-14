@@ -19,6 +19,11 @@ class FormHelper
     const Meta = 'meta';
 
     /**
+     * Name of the hidden meta field.
+     */
+    const Unique = 'UNIQUE_';
+
+    /**
      * Meta data about the fields on the form.
      *
      * This info is added to the form in a hidden field and thus can come from
@@ -195,9 +200,29 @@ class FormHelper
     public function getPostedValues()
     {
         $result = $_POST;
+        $result = $this->removeUnique($result);
         $result = $this->alterPostedValues($result);
         unset($result[static::Meta]);
         return $result;
+    }
+
+    /**
+     * If options were made unique (wrt the empty value), remove that here.
+     *
+     * @param array $postedValues
+     *   The set of posted values to alter.
+     *
+     * @return array
+     *   The altered posted values.
+     */
+    protected function removeUnique(array $postedValues)
+    {
+        array_walk_recursive($postedValues, function(&$postedValue/*, $key*/) {
+            if (in_array(substr($postedValue, 0 , strlen(self::Unique . 'i:')), [self::Unique . 'i:', self::Unique . 's:'])) {
+                $postedValue = unserialize(substr($postedValue, strlen(self::Unique)));
+            }
+        });
+        return $postedValues;
     }
 
     /**
@@ -235,6 +260,8 @@ class FormHelper
      *
      * @param array[] $fields
      * @param Message[] $messages
+     *
+     * @return array[]
      */
     public function addSeverityClassToFields(array $fields, array $messages)
     {
@@ -249,9 +276,9 @@ class FormHelper
     /**
      * Adds a severity css class to a form field.
      *
-     * @param array $fields
-     * @param $id
-     * @param $severityClass
+     * @param array[] $fields
+     * @param string $id
+     * @param string $severityClass
      */
     protected function addSeverityClassToField(array &$fields, $id, $severityClass)
     {

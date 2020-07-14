@@ -22,6 +22,8 @@ WC3 = WooCommerce 3+ (WordPress)
 NOTE: The minimum PHP version requirement is now set to 5.6.
 
 Bugs:
+- MA2: Magento uses weak comparison to check for a selected value: 0 may clash
+  with ''.
 - ALL(?): Warning 901 on send new.
 - MA2: Minor bug: when invoice gets sent directly on create, child items may
   appear as main items in getVisibleItems().

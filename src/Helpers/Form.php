@@ -6,6 +6,7 @@ use Siel\Acumulus\Api;
 use Siel\Acumulus\ApiClient\Result;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\ShopCapabilities;
+use Siel\Acumulus\Magento\Helpers\FormHelper;
 use Siel\Acumulus\Shop\MoreAcumulusTranslations;
 use Siel\Acumulus\Tag;
 
@@ -583,11 +584,7 @@ abstract class Form extends MessageCollection
      */
     protected function getInformationBlock()
     {
-        static $translationsAdded = false;
-        if (!$translationsAdded) {
-            $this->translator->add(new MoreAcumulusTranslations());
-            $translationsAdded = true;
-        }
+        $this->loadInfoBlockTranslations();
 
         $env = $this->acumulusConfig->getEnvironment();
         $module = $this->t('module');
@@ -666,6 +663,7 @@ abstract class Form extends MessageCollection
             'type' => $wrapperType,
             $wrapperTitleType => sprintf($this->t('informationBlockHeader'), $this->t('module')),
             'fields' => $fields,
+            'collapsable' => false,
         ];
     }
 
@@ -720,7 +718,21 @@ abstract class Form extends MessageCollection
         // Other values follow, we do not change the order.
         $pickListItems = $picklist->getResponse();
         foreach ($pickListItems as $picklistItem) {
+            // Option value, may not clash with the "empty value" in a weak
+            // comparison (Magento uses in_array with the strict parameter set
+            // to false).
             $optionId = reset($picklistItem);
+            if (ctype_digit($optionId)) {
+                $optionId = (int) $optionId;
+            }
+            if ($optionId == $emptyValue) {
+                if ($optionId === $emptyValue) {
+                    $this->log->warning('%s: option "%s" (picklist key: %s) equals empty option "%s"', __METHOD__, $optionId, key($picklistItem), $emptyValue);
+                };
+                $optionId = FormHelper::Unique . serialize($optionId);
+            }
+
+            // Option label
             if (count($picklistItem) === 1) {
                 $optionText = $optionId;
             } else {
@@ -843,5 +855,14 @@ abstract class Form extends MessageCollection
             return true;
         }
         return false;
+    }
+
+    protected function loadInfoBlockTranslations()
+    {
+        static $translationsAdded = false;
+        if (!$translationsAdded) {
+            $this->translator->add(new MoreAcumulusTranslations());
+            $translationsAdded = true;
+        }
     }
 }

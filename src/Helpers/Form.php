@@ -6,7 +6,6 @@ use Siel\Acumulus\Api;
 use Siel\Acumulus\ApiClient\Result;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\ShopCapabilities;
-use Siel\Acumulus\Magento\Helpers\FormHelper;
 use Siel\Acumulus\Shop\MoreAcumulusTranslations;
 use Siel\Acumulus\Tag;
 
@@ -728,7 +727,7 @@ abstract class Form extends MessageCollection
             if ($optionId == $emptyValue) {
                 if ($optionId === $emptyValue) {
                     $this->log->warning('%s: option "%s" (picklist key: %s) equals empty option "%s"', __METHOD__, $optionId, key($picklistItem), $emptyValue);
-                };
+                }
                 $optionId = FormHelper::Unique . serialize($optionId);
             }
 

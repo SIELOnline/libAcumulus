@@ -1277,7 +1277,7 @@ class Config
     }
 
     /**
-     * 5.10.0 upgrade.
+     * 6.0.0 upgrade.
      *
      * - Log level is now a Severity constant.
      *

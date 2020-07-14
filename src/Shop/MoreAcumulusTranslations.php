@@ -46,7 +46,7 @@ class MoreAcumulusTranslations extends TranslationCollection
         'link_forum' => '<a href="https://forum.acumulus.nl/index.php" target="_blank">Visit the Acumulus forum</a> where you can ask general questions or look up the answers to already asked questions.',
         'link_website' => '<a href="https://siel.nl/acumulus/" target="_blank">Visit our website</a>',
         'link_support' => '<a href="mailto:%1$s?subject=%2$s&body=%3$s">Open a support request</a> (opens in your mail app)',
-        'support_subject' => 'I have a problem with my Acumulus for %1$s %2$s]',
+        'support_subject' => '[I have a problem with my Acumulus for %1$s %2$s]',
         'support_body' => "[Please describe your problem here, include all relevant information]\n\n[If possible and necessary include these log files: the PHP error and the Acumulus log.]\n",
         'regards' => 'Regards,',
         'your_name' => '[Your name]',

@@ -67,7 +67,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         $table->source_id = $invoiceSource->getId();
         $table->created = $created;
         $table->updated = $created;
-        return $table->store();
+        return $table->store(true);
     }
 
     /**
@@ -81,7 +81,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         $table->entry_id = $entryId;
         $table->token = $token;
         $table->updated = $updated;
-        return $table->store(false);
+        return $table->store(true);
     }
 
     public function delete(BaseAcumulusEntry $entry)

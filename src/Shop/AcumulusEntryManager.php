@@ -272,13 +272,13 @@ abstract class AcumulusEntryManager
     /**
      * Upgrades the datamodel. Called when the module gets updated.
      *
-     * @param string $version
-     *   The version to update to.
+     * @param string $currentVersion
+     *   The current version we are updating from.
      *
      * @return bool
      *   Success.
      */
-    public function upgrade(/** @noinspection PhpUnusedParameterInspection */ $version)
+    public function upgrade(/** @noinspection PhpUnusedParameterInspection */ $currentVersion)
     {
         return true;
     }

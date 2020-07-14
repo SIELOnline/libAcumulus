@@ -125,7 +125,6 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         ));
     }
 
-    /** @noinspection PhpUndefinedNamespaceInspection */
     /** @noinspection PhpUndefinedClassInspection */
     /**
      * Helper method to get the db object.
@@ -147,6 +146,8 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
 
     /**
      * {@inheritdoc}
+     *
+     * @throws \Exception
      */
     public function install()
     {
@@ -203,6 +204,8 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
 
     /**
      * @return bool
+     *
+     * @throws \Exception
      */
     protected function createTable()
     {
@@ -223,20 +226,26 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     }
 
     /**
-     * Updates the table to the correct version.
-     *
-     * @param string $version
-     *
-     * @return bool
+     * {@inheritDoc}
      */
-    public function upgrade($version)
+    public function upgrade($currentVersion)
     {
-        if ($version === '4.4.0') {
+        $result = true;
+
+        if (version_compare($currentVersion, '4.4.0', '<')) {
             /** @noinspection PhpUnhandledExceptionInspection */
-            return (bool)$this->getDb()->query("ALTER TABLE `{$this->tableName}`
+            $result = $this->getDb()->query("ALTER TABLE `{$this->tableName}`
                 CHANGE COLUMN `entry_id` `entry_id` INT(11) NULL DEFAULT NULL,
                 CHANGE COLUMN `token` `token` CHAR(32) NULL DEFAULT NULL");
         }
-        return true;
+
+        // Drop and recreate index (to make it non-unique).
+        if (version_compare($currentVersion, '6.0.0', '<')) {
+            /** @noinspection PhpUnhandledExceptionInspection */
+            $result = $this->getDb()->query("ALTER TABLE `{$this->tableName}` DROP INDEX `acumulus_idx_entry_id`")
+                  AND $this->getDb()->query("CREATE INDEX `acumulus_idx_entry_id` ON `{$this->tableName}` (`entry_id`)");
+        }
+
+        return $result;
     }
 }

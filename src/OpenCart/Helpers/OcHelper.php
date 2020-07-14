@@ -420,7 +420,6 @@ class OcHelper
      */
     protected function doInstall()
     {
-        $result = true;
         $this->registry->load->model('setting/setting');
         $setting = $this->registry->model_setting_setting->getSetting('acumulus_siel');
         $currentDataModelVersion = isset($setting['acumulus_siel_datamodel_version']) ? $setting['acumulus_siel_datamodel_version'] : '';
@@ -445,10 +444,9 @@ class OcHelper
                 $setting['acumulus_siel_datamodel_version'] = '4.0';
                 $this->registry->model_setting_setting->editSetting('acumulus_siel', $setting);
             }
-        } elseif (version_compare($currentDataModelVersion, '4.4', '<')) {
-            // Update table columns.
-            if ($result = $this->container->getAcumulusEntryManager()->upgrade('4.4.0')) {
-                $setting['acumulus_siel_datamodel_version'] = '4.4';
+        } else {
+            if ($result = $this->container->getAcumulusEntryManager()->upgrade($currentDataModelVersion)) {
+                $setting['acumulus_siel_datamodel_version'] = PluginConfig::Version;
                 $this->registry->model_setting_setting->editSetting('acumulus_siel', $setting);
             }
         }
@@ -493,7 +491,8 @@ class OcHelper
      */
     protected function doUpgrade()
     {
-        //Install/update datamodel first.
+        // @todo: extract updating part from doInstall to here.
+        // Install/update datamodel first.
         $result = $this->doInstall();
 
         $this->registry->load->model('setting/setting');

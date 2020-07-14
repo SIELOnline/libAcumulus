@@ -51,7 +51,7 @@ class ConfigFormTranslations extends TranslationCollection
 
         // Registration.
         'config_form_registration' => 'U heeft nog geen accountgegevens ingevuld. Als u nog geen account heeft kunt u vanuit deze %1$s een proefaccount aanmaken:',
-        'config_form_registration_button' => '<a class="button" href="%1$s">Nu vrijblijvend een gratis Acumulus proefaccount aanmaken</a>',
+        'config_form_registration_button' => '<a class="%2$s" href="%1$s">Nu vrijblijvend een gratis Acumulus proefaccount aanmaken</a>',
 
         // Account settings.
         'accountSettingsHeader' => 'Uw Acumulus account',
@@ -60,6 +60,7 @@ class ConfigFormTranslations extends TranslationCollection
         'desc_accountSettings_auth' => 'Als u nog geen account heeft kunt u hier een <a href="%1$s">gratis proefaccount aanvragen</a>.',
         'desc_accountSettings_T' => 'Deze plugin heeft zich succesvol aangemeld met deze gegevens.',
 
+        'field_code' => 'Contractcode',
         'field_username' => 'Gebruikersnaam',
         'desc_username' => 'Let op dat u de gegevens van een gebruiker van het type "API-gebruiker" invoert. Als u die nog niet heeft, <a href="https://www.sielsystems.nl/" target="_blank">log dan in op Acumulus</a> en voeg een gebruiker toe onder "Beheer → Gebruikers → Gebruiker toevoegen". Vul "API - Gebruiker" in als "Gebruikerstype".',
         'field_password' => 'Wachtwoord',
@@ -425,11 +426,17 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'message_warning_role_insufficient' => 'You are using the user role API-Creator. This role does not have all permissions this plugin needs. Change the role of the current user to API-User or create a new user.',
         'message_warning_role_overkill' => 'You are using the user role API-Manager. This role has mre permissions than this plugin needs. We advice you to change the role to API-User.',
 
+        // Registration.
+        'config_form_registration' => 'You have not entered your account details yet. If you don\'t have an account yet you can create a trial account with this %1$s',
+        'config_form_registration_button' => '<a class="%2$s" href="%1$s">Create a free Acumulus trial account now without any obligation</a>',
+
         // Account settings.
         'accountSettingsHeader' => 'Your Acumulus connection settings',
         'desc_accountSettings' => 'Log in to Acumulus and create an additional user in Acumulus under "Admin → Users → Add user" having "API-User" as "User type".',
 
+        'field_code' => 'Contract code',
         'field_username' => 'User name',
+        'desc_username' => 'Make sure you enter the data of an "API user" user type. If you don\'t have them yet, <a href="https://www.sielsystems.nl/" target="_blank">log in to Acumulus</a> and add a user under "Beheer → Gebruikers → Gebruiker toevoegen". Fill in "API - Gebruiker" as "Gebruikerstype".',
         'field_password' => 'Password',
         'field_emailonerror' => 'E-mail',
         'desc_emailonerror' => 'The e-mail address at which you will be informed about any errors that occur during invoice sending. As this module cannot know if it is called from an interactive administrator screen, it will not display any messages in the user interface. Therefore you have to fill in an e-mail address.',

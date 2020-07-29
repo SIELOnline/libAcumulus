@@ -21,19 +21,6 @@ WC3 = WooCommerce 3+ (WordPress)
 ------------
 NOTE: The minimum PHP version requirement is now set to 5.6.
 
-Bugs:
-- ALL (but WC): table index on acumulus_entry.entry_id should not be unique
-  as lock records all have entry_id = 1.
-- MA2: Magento uses weak comparison to check for a selected value: 0 may clash
-  with ''.
-- ALL(?): Warning 901 on send new.
-- MA2: Minor bug: when invoice gets sent directly on create, child items may
-  appear as main items in getVisibleItems().
-
-6.0.0-alpha1 (2020-06-04) (never released)
-------------------------------------------
-NOTE: The minimum PHP version requirement is now set to 5.6.
-
 Features:
 - Added a registration form that uses the API sign_up to apply for an Acumulus
   test account.
@@ -42,28 +29,31 @@ Features:
 - Complete make-over of the information block on the settings forms. This block
   is now also shown on the batch form and the registration success screen.
 - Added sign_up, MyAcumulus and picklist Company types API calls.
-
-
-5.10.0-alpha1 (2020-05-11) (never released)
--------------------------------------------
-Bugs:
-- WC: Support for TM Extra Product Options did not add the meta tag
-  meta-line-type.
-
-Features:
-- Added a registration form that uses the API sign_up to apply for an Acumulus
-  test account.
-- Added sign_up and picklist Company types API calls.
 - WC: If form error messages are for a specific field that field will be given
   a red border.
 - WC: If form error messages are for a specific field they are now clickable,
   upon which the focus will be set to the erroneous form field.
-- Upgrade function to 5.10.0 checks strengthened Requirements.
+- Upgrade function to 6.0.0 checks strengthened Requirements.
+
+Bugs:
+- ALL: Empty vatinfo list response leads to a PHP Warning: reset() expects
+  parameter 1 to be array, bool given in ApiClient\Result.php on line 254.
+- ALL (but WC): table index on acumulus_entry.entry_id should not be unique
+  as lock records all have entry_id = 1.
+- MA2: Magento uses weak comparison to check for a selected value: 0 may clash
+  with ''.
+- ALL(?): Warning 901 on send new.
+- MA2: Minor bug: when invoice gets sent directly on create, child items may
+  appear as main items in getVisibleItems().
+- WC: Support for TM Extra Product Options did not add the meta tag
+  meta-line-type.
+- MA|WC: Filling in some lacking error handling on the invoice status screen.
+- WC: Ensure that the rate plugin on one of our own form pages do not treat form
+  submission of the whole page as its own form submission (link expired error).
 
 Refactorings:
 - Pushed method getLogoUrl to the base Form class
 - Allow labels to contain html.
-
 - Added some unit tests for basic classes in the Web namespace. As a consequence
   a lot of classes and methods were moved, renamed, or split:
 - Renamed Web namespace to ApiClient.
@@ -85,13 +75,6 @@ Refactorings:
   (subtly) changed their (default) behavior.
 - Requirements regarding required php extensions are completed in both
   Helpers/Requirements and composer.json.
-
-5.9.1 (2020-04-23) (never released)
------------------------------------
-Bugs:
-- MA|WC: Filling in some lacking error handling on the invoice status screen.
-- WC: Ensure that the rate plugin on one of our own form pages do not treat form
-  submission of the whole page as its own form submission (link expired error).
 
 5.9.0 (2020-04-21)
 ------------------

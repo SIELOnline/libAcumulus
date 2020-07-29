@@ -247,12 +247,15 @@ class Result extends MessageCollection
             $response = $response[$this->mainResponseKey];
 
             if ($this->isList) {
-                // Remove further indirection, i.e. get value of "singular",
-                // which will be the first (and only) key.
-                $response = reset($response);
-                // If there was only 1 list result, it wasn't put in an array.
-                if (!is_array(reset($response))) {
-                    $response = array($response);
+                // Check for an empty list result.
+                if (!empty($response)) {
+                    // Not empty: remove further indirection, i.e. get value of
+                    // "singular", which will be the first (and only) key.
+                    $response = reset($response);
+                    // If there was only 1 list result, it wasn't put in an array.
+                    if (!is_array(reset($response))) {
+                        $response = array($response);
+                    }
                 }
             }
         }

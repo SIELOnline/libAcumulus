@@ -5,8 +5,7 @@ class ApiRequestResponseExamples
 {
 
     private $sets = [
-        // 0
-        [
+        'accounts' => [
             '<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <myxml>
   <contract>
@@ -31,8 +30,8 @@ class ApiRequestResponseExamples
             '{"accounts":{"account":[{"accountid":"70582","accountnumber":"4911764","accountdescription":"Giro","accounttypeid":"1"},{"accountid":"70583","accountnumber":{},"accountdescription":"Kas","accounttypeid":"1"},{"accountid":"147659","accountnumber":"123456789","accountdescription":{},"accounttypeid":"1"}]},"errors":{"count_errors":"0"},"warnings":{"count_warnings":"0"},"status":"0"}',
             [["accountid" => "70582","accountnumber" => "4911764","accountdescription" => "Giro","accounttypeid" => "1"],["accountid" => "70583","accountnumber" => [],"accountdescription" => "Kas","accounttypeid" => "1"],["accountid" => "147659","accountnumber" => "123456789","accountdescription" => [],"accounttypeid" => "1"]],
         ],
-        // 1
-        [
+
+        'costcenters' => [
             '<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <myxml>
   <contract>
@@ -57,8 +56,8 @@ class ApiRequestResponseExamples
             '{"costcenters":{"costcenter":[{"costcenterid":"48663","costcentername":"Algemeen"},{"costcenterid":"56074","costcentername":"kostenplaats 1"},{"costcenterid":"56075","costcentername":"kostenplaats 2"}]},"errors":{"count_errors":"0"},"warnings":{"count_warnings":"0"},"status":"0"}',
             [["costcenterid" => "48663","costcentername" => "Algemeen"],["costcenterid" => "56074","costcentername" => "kostenplaats 1"],["costcenterid" => "56075","costcentername" => "kostenplaats 2"]],
         ],
-        // 2
-        [
+
+        'no_contract' => [
             '<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <myxml>
   <format>json</format>
@@ -78,8 +77,8 @@ class ApiRequestResponseExamples
             '{"errors":{"error":{"code":"403 Forbidden","codetag":"AF1001MCS","message":"Verplichte contract sectie ontbreekt"},"count_errors":"1"},"warnings":{"count_warnings":"0"},"status":"1"}',
             [],
         ],
-        // 3
-        [
+
+        'vatinfo' => [
             '<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <myxml>
   <contract>
@@ -106,8 +105,36 @@ class ApiRequestResponseExamples
             '{"vatinfo":{"vat":[{"vattype":"normal","vatrate":"21.0000"},{"vattype":"reduced","vatrate":"9.0000"}]},"errors":{"count_errors":"0"},"warnings":{"count_warnings":"0"},"status":"0"}',
             [["vattype" => "normal","vatrate" => "21.0000"],["vattype" => "reduced","vatrate" => "9.0000"]],
         ],
-        // 4
-        [
+
+        'vatinfo-empty-return' => [
+            '<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<myxml>
+  <contract>
+    <contractcode>288252</contractcode>
+    <username>APIGebruiker12345</username>
+    <password>mysecret</password>
+    <emailonerror>erwin@burorader.com</emailonerror>
+    <emailonwarning>erwin@burorader.com</emailonwarning>
+  </contract>
+  <format>json</format>
+  <testmode>1</testmode>
+  <lang>nl</lang>
+  <connector>
+    <application>WooCommerce 4.0.1 (WordPress: 5.4)</application>
+    <webkoppel>Acumulus 5.9.0</webkoppel>
+    <development>SIEL - Buro RaDer</development>
+    <remark>Library 5.10.0-alpha1 - PHP 7.1.33</remark>
+    <sourceuri>https://www.siel.nl/</sourceuri>
+  </connector>
+  <vatdate>2014-01-01</vatdate>
+  <vatcountry>fr</vatcountry>
+</myxml>
+',
+            '{"vatinfo":{},"errors":{"count_errors":"0"},"warnings":{"count_warnings":"0"},"status":"0"}',
+            [],
+        ],
+
+        'invoice-add' => [
             '<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <myxml>
   <contract>
@@ -224,18 +251,18 @@ class ApiRequestResponseExamples
         ],
     ];
 
-    public function getRequest($i)
+    public function getRequest($key)
     {
-        return $this->sets[$i][0];
+        return $this->sets[$key][0];
     }
 
-    public function getResponse($i)
+    public function getResponse($key)
     {
-        return $this->sets[$i][1];
+        return $this->sets[$key][1];
     }
 
-    public function getResponseArray($i)
+    public function getResponseArray($key)
     {
-        return $this->sets[$i][2];
+        return $this->sets[$key][2];
     }
 }

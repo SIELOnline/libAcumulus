@@ -291,13 +291,12 @@ class FormMapper extends BaseFormMapper
                             break;
                     }
                 }
-
                 break;
             case 'options':
                 $config['values'] = $this->getMagentoOptions($value);
                 break;
             default:
-                $this->log->warning(__METHOD__ . "Unknown key '$key'");
+                $this->log->warning(__METHOD__ . ": Unknown key '$key'");
                 $config[$key] = $value;
                 break;
         }

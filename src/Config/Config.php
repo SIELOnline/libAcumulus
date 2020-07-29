@@ -573,7 +573,7 @@ class Config
             // As utf8 is now commonly accepted, it is a bit difficult to
             // express the set of characters that are allowed for email
             // addresses, so we remove characters not allowed.
-            // See http://stackoverflow.com/a/2049537/1475662: @ ()[]\:;"<>,
+            // See https://stackoverflow.com/a/2049537/1475662: @ ()[]\:;"<>,
             $hostName = str_replace(array(' ', '@', '(', ')', '[', ']', '\\', ':', ';', '"', '<', '>', ','), '', $hostName);
 
             $this->keyInfo = array(

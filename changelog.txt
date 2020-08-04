@@ -6,7 +6,7 @@ HS  = HikaShop (Joomla)
 JOO = Joomla (HikaShop + VirtueMart3)
 MA  = Magento (alle ondersteunde versies)
 MA1 = Magento 1
-MA2 = Magento 2 (MA20, MA21 = specifieke minor versie binnen major versie 2)
+MA2 = Magento 2 (MA20, MA21, ... = specifieke minor versie binnen major versie 2)
 OC  = OpenCart (alle ondersteunde versies)
 OC1 = OpenCart 1
 OC2 = OpenCart 2 (OC21, OC22, OC23 = specifieke minor versie binnen major versie 2)
@@ -17,9 +17,14 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies, vanaf 5.5.2 is dat all
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3+ (WordPress)
 
-6.0.0-alpha2
-------------
+6.0.0
+-----
 NOTE: The minimum PHP version requirement is now set to 5.6.
+
+NOTE: Magento 1 reached end of life in june 2020. We no longer maintain Magento
+  1 specific code, nor add features to it. You may continue to open (bug)
+  tickets for Magento 1 and these will be addressed within the limits of a
+  "reasonable" effort.
 
 Features:
 - Added a registration form that uses the API sign_up to apply for an Acumulus
@@ -36,6 +41,9 @@ Features:
 - Upgrade function to 6.0.0 checks strengthened Requirements.
 
 Bugs:
+- JOO: Parameter to update NULL values should be set to TRUE in calls to
+  JTable::store(). (In not doing so, the token field for concepts was not set to
+  NULL.)
 - ALL: Empty vatinfo list response leads to a PHP Warning: reset() expects
   parameter 1 to be array, bool given in ApiClient\Result.php on line 254.
 - ALL (but WC): table index on acumulus_entry.entry_id should not be unique

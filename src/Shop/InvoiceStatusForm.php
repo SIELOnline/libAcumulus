@@ -113,6 +113,7 @@ class InvoiceStatusForm extends Form
     {
         parent::__construct($acumulusApiClient, $formHelper, $shopCapabilities, $config, $translator, $log);
         $this->addMeta = false;
+        $this->needsFormAndSubmitButton = false;
 
         $translations = new InvoiceTranslations();
         $this->translator->add($translations);

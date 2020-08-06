@@ -17,8 +17,14 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies, vanaf 5.5.2 is dat all
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3+ (WordPress)
 
-6.0.0
------
+6.0.1 (2020-08-06)
+------------------
+Bugs:
+- WC: Buttons op het statusoverzicht werken niet meer (en een button met als
+  tekst "button_submit_invoice" verschijnt onderaan het overzicht).
+
+6.0.0 (2020-08-05)
+------------------
 NOTE: The minimum PHP version requirement is now set to 5.6.
 
 NOTE: Magento 1 reached end of life in june 2020. We no longer maintain Magento

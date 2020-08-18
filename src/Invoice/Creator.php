@@ -634,6 +634,9 @@ abstract class Creator
      * - Shop settings: the nature_shop setting.
      * - Invoice settings: The nature field reference.
      *
+     * It will be left undefined when no value can be given to it based on these
+     * settings.
+     *
      * @param array $line
      */
     protected function addNature(array &$line)
@@ -673,19 +676,19 @@ abstract class Creator
 
         $shippingLines = $this->getShippingLines();
         if ($shippingLines) {
-            $shippingLines = $this->addLineType($shippingLines, static::LineType_Shipping, Api::Nature_Service);
+            $shippingLines = $this->addLineType($shippingLines, static::LineType_Shipping);
             $result = array_merge($result, $shippingLines);
         }
 
         $line = $this->getPaymentFeeLine();
         if ($line) {
-            $line = $this->addLineType($line,static::LineType_PaymentFee, Api::Nature_Service);
+            $line = $this->addLineType($line,static::LineType_PaymentFee);
             $result[] = $line;
         }
 
         $line = $this->getGiftWrappingLine();
         if ($line) {
-            $line = $this->addLineType($line,static::LineType_GiftWrapping, Api::Nature_Service);
+            $line = $this->addLineType($line,static::LineType_GiftWrapping);
             $result[] = $line;
         }
 
@@ -956,13 +959,11 @@ abstract class Creator
      *   May be a single line not placed in an array.
      * @param string $lineType
      *   The line type to add to the line.
-     * @param string $nature
-     *   Optional: the nature to add to the line.
      *
      * @return array|array[]
      *   The line(s) with the line type meta tag added.
      */
-    protected function addLineType(array $lines, $lineType, $nature = '')
+    protected function addLineType(array $lines, $lineType)
     {
         if (!empty($lines)) {
             // reset(), so key() does not return null if the array is not empty.
@@ -970,18 +971,13 @@ abstract class Creator
             if (is_numeric(key($lines))) {
                 // Numeric index: array of lines.
                 foreach ($lines as &$line) {
-                    $this->addDefault($line, Meta::LineType, $lineType);
-                    $this->addDefault($line, Tag::Nature, $nature);
-                    if (isset($line[Meta::ChildrenLines])) {
-                        $line[Meta::ChildrenLines] = $this->addLineType($line[Meta::ChildrenLines], $lineType, $nature);
-                    }
+                    $line = $this->addLineType($line, $lineType);
                 }
             } else {
                 // String key: single line.
                 $this->addDefault($lines, Meta::LineType, $lineType);
-                $this->addDefault($lines, Tag::Nature, $nature);
                 if (isset($lines[Meta::ChildrenLines])) {
-                    $lines[Meta::ChildrenLines] = $this->addLineType($lines[Meta::ChildrenLines], $lineType, $nature);
+                    $lines[Meta::ChildrenLines] = $this->addLineType($lines[Meta::ChildrenLines], $lineType);
                 }
             }
         }
@@ -1017,7 +1013,7 @@ abstract class Creator
      *   original denominator will not differ more than half of this.
      *
      * @return array
-     *   Array with keys (noy all keys will always be available):
+     *   Array with keys (not all keys will always be available):
      *   - vatrate
      *   - vatamount
      *   - meta-vatrate-min
@@ -1027,7 +1023,7 @@ abstract class Creator
      *
      * @todo: can we move this from the (plugin specific) creators to the
      *   completor phase? This would aid in simplifying the creators towards raw
-     *   data collectors..
+     *   data collectors.
      */
     public static function getVatRangeTags($numerator, $denominator, $numeratorPrecision = 0.01, $denominatorPrecision = 0.01)
     {

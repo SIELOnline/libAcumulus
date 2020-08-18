@@ -276,7 +276,7 @@ interface Meta
     const ProductId = 'meta-product-id';
     /**
      * Creator->Completor: the type of line: product, shipping, payment fee,
-     * discount line, etc.
+     * discount line, etc. Defined with the Creator::LineType_... constants.
      */
     const LineType = 'meta-line-type';
     /**

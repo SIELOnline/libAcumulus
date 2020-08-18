@@ -158,6 +158,7 @@ class CompletorInvoiceLines
      */
     protected function completeInvoiceLines(array $lines)
     {
+        $lines = $this->addNatureToNonItemLines($lines);
         $lines = $this->addVatRateTo0PriceLines($lines);
         $lines = $this->recalculateLineData($lines);
         $lines = $this->completeLineMetaData($lines);
@@ -502,6 +503,66 @@ class CompletorInvoiceLines
                 return false;
             }
         }, null);
+    }
+
+    /**
+     * Adds the nature tag to the non item lines.
+     *
+     * The nature tag indicates the nature of the order line: product or
+     * service. However for accompanying services like shipping or payment fees,
+     * the nature should follow the major part of the "real" order items.
+     *
+     * @param array[] $lines
+     *
+     * @return array[]
+     *   The lines with the nature field completed for non item lines.
+     */
+    protected function addNatureToNonItemLines(array $lines)
+    {
+        $nature = $this->getMaxAppearingNature($lines);
+        if (!empty($nature)) {
+            foreach ($lines as &$line) {
+                if (isset($line[Meta::LineType]) && $line[Meta::LineType] !== Creator::LineType_OrderItem && !isset($line[Tag::Nature])) {
+                    $line[Tag::Nature] = $nature;
+                }
+            }
+        }
+        return $lines;
+    }
+
+    /**
+     * Returns the nature that forms the major part of the invoice amount.
+     *
+     * Notes:
+     * - We take the abs value to correctly cover credit invoices. This won't
+     *   disturb discount lines, see the following note.
+     * - If discounts appear on separate lines, they won't have a nature field.
+     *   If such a discount was meant for certain lines only, it should get the
+     *   nature of these lines (and subsequently be used to calculate the major
+     *   part). However we do not know for which lines it was meant, so we treat
+     *   them like the other extra lines.
+     *
+     * @param array[] $lines
+     *   The invoice lines to search.
+     *
+     * @return string
+     *   The nature that forms the major part of the amount of all order item
+     *   lines (hoofdbestanddeel). Can be the empty string to indicate that no
+     *   nature is known for the major part.
+     */
+    public function getMaxAppearingNature(array $lines)
+    {
+        $amountPerNature = ['' => 0.0, Api::Nature_Product => 0.0, Api::Nature_Service => 0.0];
+        foreach ($lines as $key => $line) {
+            if (isset($line[Meta::LineType]) && $line[Meta::LineType] === Creator::LineType_OrderItem) {
+                $nature = !empty($line[Tag::Nature]) ? $line[Tag::Nature] : '';
+                $amount = abs($line[Tag::Quantity] * $line[Tag::UnitPrice]);
+                $amountPerNature[$nature] += $amount;
+            }
+        }
+        arsort($amountPerNature, SORT_NUMERIC);
+        reset($amountPerNature);
+        return key($amountPerNature);
     }
 
     /**

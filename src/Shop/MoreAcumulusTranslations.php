@@ -4,7 +4,8 @@ namespace Siel\Acumulus\Shop;
 use Siel\Acumulus\Helpers\TranslationCollection;
 
 /**
- * Contains translations for the more Acumulus section on the config and registration forms.
+ * Contains translations for the "More Acumulus" section on the config and
+ * register forms.
  */
 class MoreAcumulusTranslations extends TranslationCollection
 {

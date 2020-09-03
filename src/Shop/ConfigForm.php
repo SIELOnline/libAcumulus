@@ -160,7 +160,7 @@ class ConfigForm extends BaseConfigForm
         }
         $desc = $this->t($desc);
         if (!empty($desc2)) {
-            $desc .= ' ' . sprintf($this->t($desc2), $this->shopCapabilities->getLink('registration'));
+            $desc .= ' ' . sprintf($this->t($desc2), $this->shopCapabilities->getLink('register'));
         }
         $fields['accountSettingsHeader'] = [
             'type' => 'fieldset',
@@ -245,18 +245,18 @@ class ConfigForm extends BaseConfigForm
      * Returns a field that explains and links to the possibility to register.
      *
      * @return array[]
-     *   The registration field.
+     *   The register field.
      */
-    protected function getRegistrationFields()
+    protected function getRegisterFields()
     {
         return [
             'register_text' => [
                 'type' => 'markup',
-                'value' => sprintf($this->t('config_form_registration'), $this->t('module')),
+                'value' => sprintf($this->t('config_form_register'), $this->t('module')),
             ],
             'register_button' => [
                 'type' => 'markup',
-                'value' => sprintf($this->t('config_form_registration_button'), $this->shopCapabilities->getLink('registration'), $this->t('button_class')),
+                'value' => sprintf($this->t('config_form_register_button'), $this->shopCapabilities->getLink('register'), $this->t('button_class')),
             ],
         ];
     }
@@ -265,9 +265,9 @@ class ConfigForm extends BaseConfigForm
      * Returns the set of account related fields.
      *
      * The fields returned:
-     * - optional: registration button + explanation
+     * - optional: register button + explanation
      * - description (replaces the legend, as it should come below the optional
-     *   registration button)
+     *   register button)
      * - contractcode
      * - username
      * - password
@@ -283,7 +283,7 @@ class ConfigForm extends BaseConfigForm
     {
         $fields = [];
         if ($accountStatus === null) {
-            $fields += $this->getRegistrationFields();
+            $fields += $this->getRegisterFields();
         }
         $fields += [
             'descAccountSettings' => [

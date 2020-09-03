@@ -329,8 +329,8 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function getLink($linkType)
     {
         switch ($linkType) {
-            case 'registration':
-                return admin_url('admin.php?page=acumulus_registration');
+            case 'register':
+                return admin_url('admin.php?page=acumulus_register');
             case 'config':
                 return admin_url('options-general.php?page=acumulus_config');
             case 'advanced':

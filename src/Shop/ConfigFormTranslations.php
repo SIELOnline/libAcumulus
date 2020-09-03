@@ -49,9 +49,9 @@ class ConfigFormTranslations extends TranslationCollection
         'message_warning_role_insufficient' => 'U gebruikt een account met het gebruikerstype API-Invoerder. Dit gebruikerstype heeft niet alle rechten die deze plugin gebruikt. Verander het gebruikerstype van de huidige gebruiker naar API-Gebruiker of voeg een andere gebruiker toe.',
         'message_warning_role_overkill' => 'U gebruikt een account met het gebruikerstype API-Beheerder. Dit gebruikerstype heeft meer rechten dan deze plugin nodig heeft. Wij raden u aan om het gebruikerstype te veranderen naar API-Gebruiker.',
 
-        // Registration.
-        'config_form_registration' => 'U heeft nog geen accountgegevens ingevuld. Als u nog geen account heeft kunt u vanuit deze %1$s een proefaccount aanmaken:',
-        'config_form_registration_button' => '<a class="%2$s" href="%1$s">Nu vrijblijvend een gratis Acumulus proefaccount aanmaken</a>',
+        // Register.
+        'config_form_register' => 'U heeft nog geen accountgegevens ingevuld. Als u nog geen account heeft kunt u vanuit deze %1$s een proefaccount aanmaken:',
+        'config_form_register_button' => '<a class="%2$s" href="%1$s">Nu vrijblijvend een gratis Acumulus proefaccount aanmaken</a>',
 
         // Account settings.
         'accountSettingsHeader' => 'Uw Acumulus account',
@@ -426,9 +426,9 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'message_warning_role_insufficient' => 'You are using the user role API-Creator. This role does not have all permissions this plugin needs. Change the role of the current user to API-User or create a new user.',
         'message_warning_role_overkill' => 'You are using the user role API-Manager. This role has mre permissions than this plugin needs. We advice you to change the role to API-User.',
 
-        // Registration.
-        'config_form_registration' => 'You have not entered your account details yet. If you don\'t have an account yet you can create a trial account with this %1$s',
-        'config_form_registration_button' => '<a class="%2$s" href="%1$s">Create a free Acumulus trial account now without any obligation</a>',
+        // Register.
+        'config_form_register' => 'You have not entered your account details yet. If you don\'t have an account yet you can create a trial account with this %1$s',
+        'config_form_register_button' => '<a class="%2$s" href="%1$s">Create a free Acumulus trial account now without any obligation</a>',
 
         // Account settings.
         'accountSettingsHeader' => 'Your Acumulus connection settings',

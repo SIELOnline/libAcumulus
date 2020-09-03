@@ -580,8 +580,8 @@ class ShopCapabilities extends ShopCapabilitiesBase
     {
         $registry = Registry::getInstance();
         switch ($linkType) {
-            case 'registration':
-                return $registry->getUrlInterface()->getUrl('acumulus/registration');
+            case 'register':
+                return $registry->getUrlInterface()->getUrl('acumulus/register');
             case 'config':
                 return $registry->getUrlInterface()->getUrl('acumulus/config');
             case 'advanced':

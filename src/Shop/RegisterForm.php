@@ -15,7 +15,7 @@ use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Tag;
 
 /**
- * Class RegistrationForm implements a registration form to register for a
+ * Class RegisterForm implements a registration form to register for a
  * temporary free Acumulus account (which can be converted to a full account).
  * It is similar to the form on https://www.siel.nl/acumulus/proefaccount/,
  * though via the API we will also get authentication details for an API
@@ -23,7 +23,7 @@ use Siel\Acumulus\Tag;
  *
  * @noinspection PhpUnused Instantiated by \Siel\Acumulus\Helpers\Container::getForm().
  */
-class RegistrationForm extends Form
+class RegisterForm extends Form
 {
     /**
      * @var array
@@ -34,7 +34,7 @@ class RegistrationForm extends Form
     protected $signUpResponse;
 
     /**
-     * RegistrationForm constructor.
+     * RegisterForm constructor.
      *
      * @param \Siel\Acumulus\ApiClient\Acumulus $acumulusApiClient
      * @param \Siel\Acumulus\Helpers\FormHelper $formHelper
@@ -46,7 +46,7 @@ class RegistrationForm extends Form
     public function __construct(Acumulus $acumulusApiClient, FormHelper $formHelper, ShopCapabilities $shopCapabilities, Config $config, Translator $translator, Log $log)
     {
         parent::__construct($acumulusApiClient, $formHelper, $shopCapabilities, $config, $translator, $log);
-        $this->translator->add(new RegistrationFormTranslations());
+        $this->translator->add(new RegisterFormTranslations());
         $this->signUpResponse = null;
     }
 
@@ -243,7 +243,7 @@ class RegistrationForm extends Form
             'intro' => [
                 'type' => 'markup',
                 'label' => $this->getLogo(),
-                'value' => $this->t('registration_form_intro'),
+                'value' => $this->t('register_form_intro'),
                 'attributes' => [
                     'label' => [
                         'html' => true,
@@ -419,10 +419,10 @@ class RegistrationForm extends Form
      */
     protected function getCreatedAccountFields()
     {
-        $title = $this->t('registration_form_success_title');
-        $line1 = sprintf($this->t('registration_form_success_text1'), DateTime::createFromFormat(API::DateFormat_Iso, $this->signUpResponse['contractenddate'])->format('d-m-Y'));
-        $line2 = sprintf($this->t('registration_form_success_text2'), htmlspecialchars($this->getSubmittedValue(Tag::Email), ENT_NOQUOTES | ENT_HTML5, 'UTF-8'));
-        $line3 = $this->t('registration_form_success_text3');
+        $title = $this->t('register_form_success_title');
+        $line1 = sprintf($this->t('register_form_success_text1'), DateTime::createFromFormat(API::DateFormat_Iso, $this->signUpResponse['contractenddate'])->format('d-m-Y'));
+        $line2 = sprintf($this->t('register_form_success_text2'), htmlspecialchars($this->getSubmittedValue(Tag::Email), ENT_NOQUOTES | ENT_HTML5, 'UTF-8'));
+        $line3 = $this->t('register_form_success_text3');
         return [
             'congratulations' => [
                 'type' => 'markup',
@@ -473,7 +473,7 @@ class RegistrationForm extends Form
      */
     protected function getCreatedApiAccountFields()
     {
-        $line1 = sprintf($this->t('registration_form_success_api_account'), $this->t('module'));
+        $line1 = sprintf($this->t('register_form_success_api_account'), $this->t('module'));
         return [
             'apiAccount' => [
                 'type' => 'markup',
@@ -528,11 +528,11 @@ class RegistrationForm extends Form
     protected function getNextSteps()
     {
         $title = $this->t('whatsNextHeader');
-        $line1 = $this->t('registration_form_success_configure_acumulus');
-        $button1 = $this->t('registration_form_success_login_button');
-        $line2 = sprintf($this->t('registration_form_success_configure_module'), $this->t('module'));
-        $button2 = sprintf($this->t('registration_form_success_config_button'), $this->t('module'), $this->shopCapabilities->getLink('config'));
-        $line3 = sprintf($this->t('registration_form_success_batch'), $this->t('module'));
+        $line1 = $this->t('register_form_success_configure_acumulus');
+        $button1 = $this->t('register_form_success_login_button');
+        $line2 = sprintf($this->t('register_form_success_configure_module'), $this->t('module'));
+        $button2 = sprintf($this->t('register_form_success_config_button'), $this->t('module'), $this->shopCapabilities->getLink('config'));
+        $line3 = sprintf($this->t('register_form_success_batch'), $this->t('module'));
         return [
             'nextSteps' => [
                 'type' => 'markup',

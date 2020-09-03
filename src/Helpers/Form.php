@@ -68,7 +68,7 @@ abstract class Form extends MessageCollection
      * @var string
      *   The type of this form, the class could also be used to determine so,
      *   but as a simple type string is already used on creation, that is used.
-     *   Should be one of: registration, config, advanced, batch, invoice, rate.
+     *   Should be one of: register, config, advanced, batch, invoice, rate.
      */
     protected $type;
 

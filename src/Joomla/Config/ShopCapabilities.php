@@ -54,6 +54,8 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
                 return JRoute::_('index.php?option=com_acumulus&task=advanced');
             case 'batch':
                 return JRoute::_('index.php?option=com_acumulus&task=batch');
+            case 'register':
+                return JRoute::_('index.php?option=com_acumulus&task=register');
         }
         return parent::getLink($linkType);
     }

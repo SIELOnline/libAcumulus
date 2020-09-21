@@ -381,8 +381,8 @@ abstract class CompletorStrategyBase
      * Completes a line by filling in the given vat rate and calculating other
      * possibly missing fields (vatamount, unitprice).
      *
-     * @param $line2Complete
-     * @param $vatRate
+     * @param array $line2Complete
+     * @param float $vatRate
      *
      * @return float
      *   The vat amount for the completed line.

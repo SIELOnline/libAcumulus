@@ -154,7 +154,7 @@ class FlattenerInvoiceLines
             // We MUST keep them separate to retain correct vat info.
             $separateLines = true;
         } elseif (!$invoiceSettings['optionsShow']) {
-            // Do not kshow the children info at all, but do collect price info.
+            // Do not show the children info at all, but do collect price info.
             $separateLines = false;
         } elseif (count($children) <= $invoiceSettings['optionsAllOn1Line']) {
             $separateLines = false;

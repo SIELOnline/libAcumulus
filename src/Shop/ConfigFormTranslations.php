@@ -278,7 +278,7 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
 
         'field_missing_amount' => 'Ontbrekend bedrag',
         'desc_missing_amount' => 'Geef aan wat te doen als er een verschil tussen het factuurtotaal en het totaal van de factuurregels geconstateerd wordt. Normaal gesproken zal de 1e optie voldoen. Als het vaak voorkomt en de ontbrekende bedragen zjn eigenlijk altijd correct (bv. betaalkosten van een specifieke payment provider worden niet als losse regel herkend) kan de 2e optie handiger zijn. Er wordt dan al een factuurregel toegevoegd zodat de factuur alleen maar definitief gemaakt hoeft te worden. Gebruik de 3e optie als dit verschil door een instelling of andere plugin optreedt maar de factuur eigenlijk toch altijd correct is.',
-        'option_missing_amount_2' => 'Vestuur een waarschuwing, de factuur wordt als concept verstuurd.',
+        'option_missing_amount_2' => 'Verstuur een waarschuwing, de factuur wordt als concept verstuurd.',
         'option_missing_amount_3' => 'Voeg een correctieregel toe, de factuur zal echter nog steeds als concept verstuurd worden.',
         'option_missing_amount_1' => 'Negeer het verschil.',
 
@@ -371,8 +371,8 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'option_debug_1' => 'Ontvang alleen een mail bij fouten, waarschuwingen, of opmerkingen tijdens het verzenden van een factuur naar Acumulus.',
         'option_debug_2' => 'Ontvang altijd een mail met de resultaten bij het verzenden van een factuur naar Acumulus.',
         'option_debug_3' => 'Verstuur facturen in testmodus naar Acumulus. Acumulus zal de factuur controleren op fouten en waarschuwingen maar zal deze niet opslaan. U ontvangt alijd een mail met de resultaten.',
-        'option_debug_4' => 'Verzend berichten niet naar Acumulus maar ontvang wel een mail met het bericht zoals dat vestuurd zou zijn.',
-        'desc_debug' => 'U kunt hier een verzend modus kiezen. Kies voor de eerste optie tenzij u i.v.m. een supportverzoek bent geïnstrueerd om iets anders te kiezen.',
+        'option_debug_4' => 'Verzend berichten niet naar Acumulus maar ontvang wel een mail met het bericht zoals dat verstuurd zou zijn.',
+        'desc_debug' => 'U kunt hier een verzendmodus kiezen. Kies voor de eerste optie tenzij u i.v.m. een supportverzoek bent geïnstrueerd om iets anders te kiezen.',
 
         'field_logLevel' => 'Logniveau',
         'option_logLevel_3' => 'Log foutmeldingen, waarschuwingen en operationele mededelingen.',

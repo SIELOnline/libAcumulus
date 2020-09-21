@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\WooCommerce\Invoice;
 
+use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Completor;
 use Siel\Acumulus\Invoice\FlattenerInvoiceLines as BaseFlattenerInvoiceLines;
 use Siel\Acumulus\Meta;
@@ -43,9 +44,12 @@ class FlattenerInvoiceLines extends BaseFlattenerInvoiceLines
 
                 // Collect vat rate data.
                 if (empty($child[Tag::VatRate])) {
-                    // no vatrate on 1 of the children: do not assume they are
-                    // all the same.
-                    $childrenVatRate = false;
+                    // No vatrate on 1 of the children: do not assume they are
+                    // all the same. However, we may ignore this line if it is
+                    // an empty price line, i.e. just an informative line.
+                    if (!Number::isZero($child[Tag::UnitPrice])) {
+                        $childrenVatRate = false;
+                    }
                 } elseif ($childrenVatRate === null) {
                     // 1st vat rate encountered: set it to this vat rate.
                     $childrenVatRate = $child[Tag::VatRate];

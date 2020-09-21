@@ -17,6 +17,12 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies, vanaf 5.5.2 is dat all
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3+ (WordPress)
 
+6.0.3 (2020-09-??)
+------------------
+Bugs:
+- WC: Bundle lines with price info on their children might not get a correct vat
+  rate.
+
 6.0.2 (2020-09-03)
 ------------------
 Bugs:

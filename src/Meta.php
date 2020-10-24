@@ -270,10 +270,15 @@ interface Meta
      */
     const Id = 'meta-id';
     /**
-     * Creator->Event: the internal prouct id of the order item line product
+     * Creator->Event: the internal product id of the order item line product
      * (Magento only).
      */
     const ProductId = 'meta-product-id';
+    /**
+     * Creator->Event: the internal product type of the order item line product
+     * (Magento only).
+     */
+    const ProductType = 'meta-product-type';
     /**
      * Creator->Completor: the type of line: product, shipping, payment fee,
      * discount line, etc. Defined with the Creator::LineType_... constants.

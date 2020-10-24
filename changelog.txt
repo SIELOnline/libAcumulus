@@ -5,7 +5,7 @@ ALL = Alle webshops.
 HS  = HikaShop (Joomla)
 JOO = Joomla (HikaShop + VirtueMart3)
 MA  = Magento (alle ondersteunde versies)
-MA1 = Magento 1
+MA1 = Magento 1 (wordt niet meer ondersteund sinds 6.0.0)
 MA2 = Magento 2 (MA20, MA21, ... = specifieke minor versie binnen major versie 2)
 OC  = OpenCart (alle ondersteunde versies)
 OC1 = OpenCart 1
@@ -17,11 +17,15 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies, vanaf 5.5.2 is dat all
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3+ (WordPress)
 
-6.0.3 (2020-09-??)
+6.0.3 (2020-10-??)
 ------------------
 Bugs:
+- MA: Aanpasbare opties worden niet op de factuur gezet.
 - WC: Bundle lines with price info on their children might not get a correct vat
   rate.
+
+Features:
+- OC: Added the registration form to OC.
 
 6.0.2 (2020-09-03)
 ------------------

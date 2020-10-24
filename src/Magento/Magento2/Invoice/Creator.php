@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\Magento\Magento2\Invoice;
 
+use Magento\Catalog\Model\Product\Type;
 use Magento\Framework\App\ObjectManager;
 use Magento\Sales\Model\Order\Creditmemo\Item as CreditmemoItem;
 use Siel\Acumulus\Helpers\Number;
@@ -81,6 +82,7 @@ class Creator extends BaseCreator
 
         $this->addProductInfo($result);
         $result[Meta::Id] = $item->getId();
+        $result[Meta::ProductType] = $item->getProductType();
         $result[Meta::ProductId] = $item->getProductId();
 
         // For higher precision of the unit price, we will recalculate the price
@@ -168,20 +170,86 @@ class Creator extends BaseCreator
             $result += $this->getVatClassMetaData((int) $product->getTaxClassId());
         }
 
-        // Add children lines for composed products.
+        // Add children lines for customisable options and composed products.
+        // For a configurable product, some info of the chosen variant will be
+        // merged directly into the parent.
+        $result[Meta::ChildrenLines] = [];
+
+        // Add composed products or product variant.
         if (!empty($childrenItems)) {
-            $result[Meta::ChildrenLines] = array();
+            $childrenLines = [];
             foreach ($childrenItems as $child) {
                 $childLine = $this->getItemLineOrder($child, true);
                 if ($childLine !== null) {
-                    $result[Meta::ChildrenLines][] = $childLine;
+                    $childrenLines[] = $childLine;
                 }
             }
+            if ($this->isChildSameAsParent($result, $childrenLines)) {
+                // A configurable product having 1 child means the child is the
+                // chosen variant: use the product id and name of the child.
+                $childLine = reset($childrenLines);
+                $result[Tag::Product] = $childLine[Tag::Product];
+                $result[Meta::ProductId] = $childLine[Meta::ProductId];
+            } else {
+                $result[Meta::ChildrenLines] = array_merge($result[Meta::ChildrenLines], $childrenLines);
+            }
+        }
+
+        // Add customizable options.
+        $customizableOptions = $item->getProductOptionByCode('options');
+        if (!empty($customizableOptions)) {
+            foreach ($customizableOptions as $customizableOption) {
+                $child = [];
+                $child[Meta::ProductType] = 'option';
+                $child[Meta::ProductId] = $customizableOption['option_id'] . ': ' . $customizableOption['option_value'];
+                $child[Tag::Product] = $customizableOption['label'] . ': ' . $customizableOption['print_value'];
+                $child[Tag::Quantity] = $result[Tag::Quantity];
+                $child[Tag::UnitPrice] = 0;
+                $child[Meta::VatRateSource] = static::VatRateSource_Parent;
+                $result[Meta::ChildrenLines][] = $child;
+            }
+        }
+
+        // Unset children lines if no children were added.
+        if (empty($result[Meta::ChildrenLines])) {
+            unset($result[Meta::ChildrenLines]);
         }
 
         $this->removePropertySource('item');
 
         return $result;
+    }
+
+    /**
+     * Returns whether a single child line is actually the same as its parent.
+     *
+     * If:
+     * - the parent is a configurable product
+     * - there is exactly 1 child line
+     * - for the same item number and quantity
+     * - with no price info on the child
+     * We are processing a configurable product that contains the chosen variant
+     * as single child: do not add the child, but copy the product description
+     * to the result as it contains more option descriptions.
+     *
+     * @param array $parent
+     * @param array[] $children
+     *
+     * @return bool
+     *   True if the single child line is actually the same as its parent.
+     */
+    protected function isChildSameAsParent(array $parent, array $children)
+    {
+        if ($parent[Meta::ProductType] === 'configurable' && count($children) === 1) {
+            $child = reset($children);
+            if ($parent[Tag::ItemNumber] === $child[Tag::ItemNumber]
+                && $parent[Tag::Quantity] === $child[Tag::Quantity]
+                && Number::isZero($child[Tag::UnitPrice])
+            ) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -262,12 +330,12 @@ class Creator extends BaseCreator
         $product = ObjectManager::getInstance()->create(\Magento\Catalog\Model\Product::class);
         $product->getResource()->load($product, $item->getProductId());
         if ($product->getId()) {
-            /** @noinspection PhpUndefinedMethodInspection */
             $result += $this->getVatClassMetaData((int) $product->getTaxClassId());
         }
 
         // On a credit note we only have single lines, no compound lines, thus
         // no children that might have to be added.
+        // @todo: but do we have options and variants?
 
         $this->removePropertySource('item');
 

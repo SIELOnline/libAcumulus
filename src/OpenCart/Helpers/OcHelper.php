@@ -142,7 +142,7 @@ class OcHelper
         // Add an intermediate level to the breadcrumb.
         $this->data['breadcrumbs'][] = $this->getExtensionsBreadcrumb();
 
-        $this->renderFormCommon('config', 'button_save');
+        $this->renderFormCommon('config');
     }
 
     /**
@@ -170,7 +170,7 @@ class OcHelper
     public function advancedConfig()
     {
         $this->displayFormCommon('advanced');
-        $this->renderFormCommon('advanced', 'button_save');
+        $this->renderFormCommon('advanced');
     }
 
     /**
@@ -179,7 +179,16 @@ class OcHelper
     public function batch()
     {
         $this->displayFormCommon('batch');
-        $this->renderFormCommon('batch', 'button_send');
+        $this->renderFormCommon('batch');
+    }
+
+    /**
+     * Controller action: show/process the register form for this module.
+     */
+    public function register()
+    {
+        $this->displayFormCommon('register');
+        $this->renderFormCommon('register');
     }
 
     /**
@@ -363,9 +372,8 @@ class OcHelper
      * Performs the common tasks when processing and rendering a form.
      *
      * @param string $task
-     * @param string $button
      */
-    protected function renderFormCommon($task, $button)
+    protected function renderFormCommon($task)
     {
         // Process the form if it was submitted and render it again.
         $form = $this->container->getForm($task);
@@ -393,8 +401,8 @@ class OcHelper
 
         // Set the action buttons (action + text).
         $this->data['action'] = $this->registry->getLink($link);
-        $this->data['button_icon'] = $task === 'batch' ? 'fa-envelope-o' : ($task === 'uninstall' ? 'fa-delete' : 'fa-save');
-        $this->data['button_save'] = $this->t($button);
+        $this->data['button_icon'] = $task === 'batch' ? 'fa-envelope-o' : ($task === 'uninstall' ? 'fa-delete' : ($task === 'register' ? 'fa-plus' : 'fa-save'));
+        $this->data['button_save'] = $form->needsFormAndSubmitButton() ? $this->t("button_submit_$task") : '';
         $this->data['cancel'] = $this->registry->getLink('common/dashboard');
         $this->data['button_cancel'] = $task === 'uninstall' ? $this->t('button_cancel_uninstall') : $this->t('button_cancel');
 

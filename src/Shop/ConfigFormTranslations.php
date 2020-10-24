@@ -58,7 +58,7 @@ class ConfigFormTranslations extends TranslationCollection
         'desc_accountSettings_N' => 'Als u al wel een account hebt, kunt u hieronder de gegevens invullen.',
         'desc_accountSettings_F' => 'De ingevulde accountgegevens zijn onjuist, verbeter ze.',
         'desc_accountSettings_auth' => 'Als u nog geen account heeft kunt u hier een <a href="%1$s">gratis proefaccount aanvragen</a>.',
-        'desc_accountSettings_T' => 'Deze plugin heeft zich succesvol aangemeld met deze gegevens.',
+        'desc_accountSettings_T' => 'Deze %s heeft zich succesvol aangemeld met deze gegevens.',
 
         'field_code' => 'Contractcode',
         'field_username' => 'Gebruikersnaam',
@@ -432,7 +432,10 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
 
         // Account settings.
         'accountSettingsHeader' => 'Your Acumulus connection settings',
-        'desc_accountSettings' => 'Log in to Acumulus and create an additional user in Acumulus under "Admin → Users → Add user" having "API-User" as "User type".',
+        'desc_accountSettings_N' => 'If you already do have an Acumulus account, you can fill in your details below.',
+        'desc_accountSettings_F' => 'The entered account details are not correct, please correct them.',
+        'desc_accountSettings_auth' => 'If you do not have an account yet, you can <a href="%1$s">register a free trial account</a>.',
+        'desc_accountSettings_T' => 'The %s could successfully connect to Acumulus with these details.',
 
         'field_code' => 'Contract code',
         'field_username' => 'User name',

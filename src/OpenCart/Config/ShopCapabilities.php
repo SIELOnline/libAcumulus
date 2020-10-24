@@ -377,6 +377,10 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 return $registry->getLink($registry->getLocation() . '/advanced');
             case 'batch':
                 return $registry->getLink($registry->getLocation() . '/batch');
+            case 'register':
+                return $registry->getLink($registry->getLocation() . '/register');
+            case 'logo':
+                return (defined('HTTPS_SERVER') ? HTTPS_SERVER : HTTP_SERVER) . 'view/image/acumulus/siel-logo.png';
         }
         return parent::getLink($linkType);
     }

@@ -15,6 +15,7 @@ class RegisterFormTranslations extends TranslationCollection
         'register_form_header' => 'Een vrijblijvend Acumulus proefaccount aanmaken',
         'button_submit_register'=> 'Gratis account aanmaken',
         'message_form_register_success' => 'Uw tijdelijke proefaccount is met succes aangemaakt.',
+        'button_cancel' => 'Terug',
 
         'introHeader' => 'Een Acumulus proefaccount aanmaken',
         'register_form_intro' => '<p>Door dit formulier in te vullen kunt u een gratis en vrijblijvend proefaccount aanmaken bij Acumulus.</p>
@@ -93,6 +94,7 @@ class RegisterFormTranslations extends TranslationCollection
         'register_form_header' => 'Apply for a free trial account for Acumulus',
         'button_submit_register'=> 'Create free account',
         'message_form_register_success' => 'Your temporary account has been created successfully.',
+        'button_cancel' => 'Back',
 
         'introHeader' => 'Apply for a free Acumulus trial account',
         'register_form_intro' => '<p>By filling in this form you can create a free trial account for Acumulus.</p>
@@ -112,7 +114,7 @@ class RegisterFormTranslations extends TranslationCollection
         'desc_fullName' => 'Your first and last name.',
 
         'field_loginName' => 'Username',
-        'desc_loginName' => 'The username, at least 6 characters, that you want to use to login to Acumulus yourself. This %s will have its own username and password.',
+        'desc_loginName' => 'The username, at least 6 characters, that you want to use to login to Acumulus yourself. This %s will get its own username and password.',
 
         'companySettingsHeader' => 'About your company',
         'desc_companySettings' => 'With the information below we can better set up your trial account, e.g. we can create an invoice template. Of course you can change this information later on.',
@@ -144,8 +146,8 @@ class RegisterFormTranslations extends TranslationCollection
         'message_validate_postalCode_0' => 'The zip code field does not contain a valid zip code, enter your zip code in the format: "1234 AB".',
 
         'register_form_success_title' => 'Thank you very much for your registration!',
-        'register_form_success_text1' => 'You can try Acumulus 30 days (up to %s) free of charge and without any obligation. Your trial account is fully functional with a maximum of 50 bookings. If you have any questions, please let us know.',
-        'register_form_success_text2' => 'Your login details have been sent to %s, but we have listed them for you here as well. Preferably keep them in a password manager.',
+        'register_form_success_text1' => 'You can try Acumulus 30 days (up to %s) free of charge and without any obligation. Your trial account is fully functional but with a maximum of 50 bookings. Please let us know if you have any questions.',
+        'register_form_success_text2' => 'Your login details have been sent to %s, but we have listed them here as well. Preferably keep them in a password manager.',
         'register_form_success_text3' => 'Didn\'t receive an e-mail? It is possible that our e-mail with your login codes will be filtered by your spam filter. Please check your spam folder. If you still did not receive it, please contact us so that we can resend you your details.',
         'loginDetailsHeader' => 'Click to view your login codes',
 
@@ -163,6 +165,6 @@ class RegisterFormTranslations extends TranslationCollection
         'register_form_success_configure_module' => 'You need to <strong>configure this %1$s</strong> further on the "settings" and "advanced settings" screens.',
         'register_form_success_config_button' => '<a class="button" target="_blank" href="%2$s">Configure Acumulus %1$s</a> (opens in a new tab but remains in your webshop).',
         'register_form_success_batch' => 'After you have set up this %1$s, the invoice details of your new orders will automatically be sent to Acumulus.
-           To add already completed orders to your administration, you can use the batch shipping form of this %1$s.',
+           To add already completed orders to your administration, you can use the "Send batch" form of this %1$s.',
     ];
 }

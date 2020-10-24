@@ -158,7 +158,8 @@ class ConfigForm extends BaseConfigForm
                 $desc2 = 'desc_accountSettings_auth';
             }
         }
-        $desc = $this->t($desc);
+        // 'desc_accountSettings_T' uses plugin/module/extension in its message.
+        $desc = sprintf($this->t($desc), $this->t('module'));
         if (!empty($desc2)) {
             $desc .= ' ' . sprintf($this->t($desc2), $this->shopCapabilities->getLink('register'));
         }

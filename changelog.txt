@@ -17,6 +17,12 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies, vanaf 5.5.2 is dat all
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3+ (WordPress)
 
+6.0.4 (2020-10-??)
+------------------
+Bugs:
+- JOO: Improved styling of forms and added logo to register form.
+- ALL: Allow attribute values in class FormRenderer to be defined as an array.
+
 6.0.3 (2020-10-26)
 ------------------
 Bugs:
@@ -39,6 +45,7 @@ Bugs:
 Features:
 - ALL: Nature van additionele services bepalen adhv hoofdbestanddeel van de
   factuur.
+- JOO: Added the registration form to JOO.
 
 Refactorings:
 - ALL: RegistrationForm => RegisterForm

@@ -4,6 +4,7 @@ namespace Siel\Acumulus\Joomla\Config;
 use JRoute;
 use JTable;
 use JTableExtension;
+use JUri;
 use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
 
 /**
@@ -56,6 +57,8 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
                 return JRoute::_('index.php?option=com_acumulus&task=batch');
             case 'register':
                 return JRoute::_('index.php?option=com_acumulus&task=register');
+            case 'logo':
+                return JURI::root(true) . '/administrator/components/com_acumulus/media/siel-logo.svg';
         }
         return parent::getLink($linkType);
     }

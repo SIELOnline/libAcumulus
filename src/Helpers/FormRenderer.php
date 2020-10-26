@@ -806,7 +806,7 @@ class FormRenderer
                     $attributes[$attribute] = array();
                 }
                 // Now we know for sure that it is an array, add it.
-                $attributes[$attribute][] = $value;
+                $attributes[$attribute] = array_merge($attributes[$attribute], (array) $value);
             } else {
                 // Single value: just set, possibly overwriting.
                 $attributes[$attribute] = $value;

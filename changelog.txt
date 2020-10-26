@@ -17,7 +17,7 @@ WC  = WooCommerce (WordPress) (alle ondersteunde versies, vanaf 5.5.2 is dat all
 WC2 = WooCommerce 2 (WordPress)
 WC3 = WooCommerce 3+ (WordPress)
 
-6.0.3 (2020-10-??)
+6.0.3 (2020-10-26)
 ------------------
 Bugs:
 - MA: Aanpasbare opties worden niet op de factuur gezet.

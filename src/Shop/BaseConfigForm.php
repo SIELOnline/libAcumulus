@@ -98,29 +98,34 @@ abstract class BaseConfigForm extends Form
         // Check if we can retrieve a picklist. This indicates if the account
         // settings are correct.
         $message = '';
-        if (!$this->emptyCredentials()) {
-            $about = $this->acumulusApiClient->getAbout();
-            if ($about->hasError()) {
-                $message = $about->getByCode(401) ? 'message_error_auth' : ($about->getByCode(403) ? 'message_error_forb' : 'message_error_comm');
-                $this->addMessages($about->getMessages(Severity::WarningOrWorse));
-            } elseif ($about->getByCode(553)) {
-                // Role has been deprecated role for use with the API.
-                $this->addMessage($this->t('message_warning_role_deprecated'), Severity::Warning, Tag::UserName);
-            } else {
-                // Check role for sufficient rights but no overkill.
-                $response = $about->getResponse();
-                $roleId = (int) $response['roleid'];
-                if ($roleId === Api::RoleApiCreator) {
-                    $this->addMessage($this->t('message_warning_role_insufficient'), Severity::Warning, Tag::UserName);
-                } elseif ($roleId === Api::RoleApiManager) {
-                    $this->addMessage($this->t('message_warning_role_overkill'), Severity::Warning, Tag::UserName);
-                }
-            }
-        } else {
+        if ($this->emptyCredentials()) {
             // First fill in your account details.
             $message = 'message_auth_unknown';
+        } else {
+            $about = $this->acumulusApiClient->getAbout();
+            if ($about->hasError()) {
+                $message = $about->getByCode(403) ? 'message_error_auth' : 'message_error_comm';
+                $this->addMessages($about->getMessages(Severity::WarningOrWorse));
+            } else {
+                // Check role.
+                $response = $about->getResponse();
+                $roleId = (int) $response['roleid'];
+                switch ($roleId) {
+                    case Api::RoleApiUser:
+                        // Correct role: no additional message.
+                        break;
+                    case Api::RoleApiCreator:
+                        $this->addMessage($this->t('message_warning_role_insufficient'), Severity::Warning, Tag::UserName);
+                        break;
+                    case Api::RoleApiManager:
+                        $this->addMessage($this->t('message_warning_role_overkill'), Severity::Warning, Tag::UserName);
+                        break;
+                    default:
+                        $this->addMessage($this->t('message_warning_role_deprecated'), Severity::Warning, Tag::UserName);
+                        break;
+                }
+            }
         }
-
         return $message;
     }
 
@@ -139,6 +144,26 @@ abstract class BaseConfigForm extends Form
             $message = sprintf($this->t($message), $this->t("message_error_arg1_$formType"), $this->t("message_error_arg2_$formType"));
         }
         return $message;
+    }
+
+    /**
+     * Returns a field that explains and links to the possibility to register.
+     *
+     * @return array[]
+     *   The register field.
+     */
+    protected function getRegisterFields()
+    {
+        return [
+            'register_text' => [
+                'type' => 'markup',
+                'value' => sprintf($this->t('config_form_register'), $this->t('module')),
+            ],
+            'register_button' => [
+                'type' => 'markup',
+                'value' => sprintf($this->t('config_form_register_button'), $this->shopCapabilities->getLink('register'), $this->t('button_class')),
+            ],
+        ];
     }
 
     /**

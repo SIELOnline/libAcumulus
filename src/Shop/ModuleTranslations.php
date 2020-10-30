@@ -16,11 +16,10 @@ class ModuleTranslations extends TranslationCollection
         // messages.
         'extensions' => 'Extensies',
         'modules' => 'Modules',
-        'page_title' => 'Acumulus instellingen',
-        'advanced_page_title' => 'Acumulus geavanceerde instellingen',
         'module_name' => 'Acumulus',
         'module_description' => 'Verstuurt uw facturen automatisch naar Acumulus',
         'text_home' => 'Home',
+        // @todo: which ones are still used?
         'button_settings' => 'Instellingen',
         'button_advanced_settings' => 'Geavanceerde Instellingen',
         'button_save' => 'Opslaan',
@@ -28,7 +27,6 @@ class ModuleTranslations extends TranslationCollection
         'button_confirm_uninstall' => 'Ja, verwijder data en instellingen',
         'button_cancel_uninstall' => 'Nee, alleen uitschakelen, bewaar data en instellingen',
         'button_cancel' => 'Annuleren',
-        'button_send' => 'Verzenden',
         // @todo: start using these 3 parameters, for now this text is
         //   overridden in all shops with only 2 parameters.
         'button_link' => '<a href="%2$s" class="%3$s">%1$s</a>',
@@ -45,8 +43,6 @@ class ModuleTranslations extends TranslationCollection
     protected $en = array(
         'extensions' => 'Extensions',
         'modules' => 'Modules',
-        'page_title' => 'Acumulus settings',
-        'advanced_page_title' => 'Acumulus advanced settings',
         'module_name' => 'Acumulus',
         'module_description' => 'Automatically sends your invoices to Acumulus',
         'text_home' => 'Home',
@@ -57,7 +53,6 @@ class ModuleTranslations extends TranslationCollection
         'button_confirm_uninstall' => 'Yes, uninstall data and settings',
         'button_cancel_uninstall' => 'No, disable only, keep data and settings',
         'button_cancel' => 'Cancel',
-        'button_send' => 'Send',
         'message_config_saved' => 'The settings are saved.',
         'message_update_failed' => 'The internal upgrade to version %s failed. Please contact support, if this message keeps being displayed.',
         'message_uninstall' => 'Are you sure that you want to delete the configuration settings?',

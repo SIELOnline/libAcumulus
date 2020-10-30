@@ -21,8 +21,12 @@ WC3 = WooCommerce 3+ (WordPress)
 ------------------
 Features:
 - PS: Added the registration form to PS.
+- ALL: verbeterde helpteksten op de instellingenformulieren als de logingegevens
+  ontbreken of fout zijn.
 
 Bugs:
+- ALL: Acumulus API misc/about en misc/my_acumulus geven geen 401 meer terug,
+  maar een 403.
 - JOO: Improved styling of forms and added logo to register form.
 - ALL: Allow attribute values in class FormRenderer to be defined as an array.
 

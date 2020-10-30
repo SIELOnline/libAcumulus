@@ -88,16 +88,22 @@ class AdvancedConfigForm extends BaseConfigForm
         $accountStatus = $this->emptyCredentials() ? null : empty($message);
 
         // Message fieldset: if account settings have not been filled in.
-        if ($accountStatus === false) {
+        if ($accountStatus !== true) {
+            if ($accountStatus === null) {
+                $aubFields = $this->getRegisterFields();
+            } else /* $accountStatus === false */ {
+                $desc = ' ' . sprintf($this->t('desc_accountSettings_auth'), $this->shopCapabilities->getLink('register'));
+                $aubFields = [
+                    'invoiceMessage' => [
+                        'type' => 'markup',
+                        'value' => $this->translateAccountMessage($message) . $desc,
+                    ]
+                ];
+            }
             $fields['accountSettingsHeader'] = [
               'type' => 'fieldset',
               'legend' => $this->t('message_error_header'),
-              'fields' => [
-                'invoiceMessage' => [
-                  'type' => 'markup',
-                  'value' => $this->translateAccountMessage($message),
-                ],
-              ],
+              'fields' => $aubFields,
             ];
         }
 

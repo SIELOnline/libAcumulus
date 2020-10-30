@@ -243,26 +243,6 @@ class ConfigForm extends BaseConfigForm
     }
 
     /**
-     * Returns a field that explains and links to the possibility to register.
-     *
-     * @return array[]
-     *   The register field.
-     */
-    protected function getRegisterFields()
-    {
-        return [
-            'register_text' => [
-                'type' => 'markup',
-                'value' => sprintf($this->t('config_form_register'), $this->t('module')),
-            ],
-            'register_button' => [
-                'type' => 'markup',
-                'value' => sprintf($this->t('config_form_register_button'), $this->shopCapabilities->getLink('register'), $this->t('button_class')),
-            ],
-        ];
-    }
-
-    /**
      * Returns the set of account related fields.
      *
      * The fields returned:

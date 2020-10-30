@@ -11,6 +11,7 @@ class ModuleSpecificTranslations extends TranslationCollection
     protected $nl = [
         'module' => 'module',
         'button_link' => '<a href="%2$s" class="btn btn-default"><i class="process-icon-cogs"></i>%1$s</a>',
+        'button_class' => 'btn btn-primary',
 
         'menu_advancedSettings' => 'Geavanceerde instellingen → Acumulus geavanceerde instellingen',
         'menu_basicSettings' => 'Instellingen → Acumulus → Configureer',

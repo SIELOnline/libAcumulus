@@ -613,8 +613,29 @@ abstract class Form extends MessageCollection
                         $now = new DateTimeImmutable();
                         $days = $now->diff($endDate)->days;
                         if ($days < 40) {
-                            $contract[$this->t('contractEndDate')] = $endDate->format('j F Y');
+                            $contract[$this->t('contract_end_date')] = $endDate->format('j F Y');
                         }
+                    }
+                }
+                if ($myData['mymaxentries'] != -1) {
+                    $contract[$this->t('entries_about')] = sprintf($this->t('entries_numbers'), $myData['myentries'], $myData['mymaxentries'], $myData['myentriesleft']);
+                }
+                if ($myData['myemailstatusid'] !== '0') {
+                    if ($this->translator->getLanguage() === 'nl') {
+                        if ($this->translator->getLanguage() === 'nl' && !empty($myData['myemailstatus_nl'])) {
+                            $reason = $myData['myemailstatus_nl'];
+                        } elseif ($this->translator->getLanguage() === 'en' && !empty($myData['myemailstatus_en'])) {
+                            $reason = $myData['myemailstatus_en'];
+                        } elseif (!empty($myData['myemailstatus'])) {
+                            $reason = $myData['myemailstatus'];
+                        } else {
+                            $reason = '';
+                        }
+                    }
+                    if (!empty($reason)) {
+                        $contract[$this->t('email_status_label')] = sprintf($this->t('email_status_text_reason'), $reason);
+                    } else {
+                        $contract[$this->t('email_status_label')] = $this->t('email_status_text');
                     }
                 }
             } else {

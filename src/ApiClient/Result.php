@@ -131,7 +131,7 @@ class Result extends MessageCollection
     /**
      * @param int $apiStatus
      */
-    protected function setApiStatus(int $apiStatus)
+    protected function setApiStatus($apiStatus)
     {
         $this->apiStatus = $apiStatus;
     }

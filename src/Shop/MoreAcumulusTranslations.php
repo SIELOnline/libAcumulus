@@ -32,7 +32,12 @@ class MoreAcumulusTranslations extends TranslationCollection
 
         'field_companyName' => 'Bedrijfsnaam',
         'field_code' => 'Contractcode',
-        'contractEndDate' => 'Vervaldatum',
+        'contract_end_date' => 'Vervaldatum',
+        'entries_about' => 'Aantal boekingen',
+        'entries_numbers' => 'U heeft %1$d boekingen gedaan. U heeft een maximum van %2$d boekingen en kunt dus nog %3$d boekingen doen.',
+        'email_status_label' => 'E-mail',
+        'email_status_text' => 'Wij ondervinden afleverproblemen in onze communicatie naar u toe. Log in op Acumulus voor meer info of om te melden dat de problemen verholpen zijn.',
+        'email_status_text_reason' => 'In onze communicatie naar u toe ontvingen wij deze melding: "%1$s". Log in op Acumulus voor meer info of om te melden dat de problemen verholpen zijn.',
     ];
 
     protected $en = [
@@ -58,6 +63,11 @@ class MoreAcumulusTranslations extends TranslationCollection
 
         'field_companyName' => 'Company name',
         'field_code' => 'Contract code',
-        'contractEndDate' => 'Ends on',
+        'contract_end_date' => 'Ends on',
+        'entries_about' => 'Number of entries',
+        'entries_numbers' => 'You have created %1$d entries out of your maximum of %2$d, so you can create yet %3$d more entries.',
+        'email_status_label' => 'E-mail',
+        'email_status_text' => 'We received errors on trying to communicate with you. Please log in on Acumulus for more info or to mark the problems as resolved.',
+        'email_status_text_reason' => 'On trying to communicate with you, we received this message: "%1$s". Please log in on Acumulus for more info or to mark the problems as resolved.',
     ];
 }

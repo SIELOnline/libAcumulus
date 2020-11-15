@@ -8,27 +8,31 @@ MA  = Magento (alle ondersteunde versies)
 MA1 = Magento 1 (wordt niet meer ondersteund sinds 6.0.0)
 MA2 = Magento 2 (MA20, MA21, ... = specifieke minor versie binnen major versie 2)
 OC  = OpenCart (alle ondersteunde versies)
-OC1 = OpenCart 1
-OC2 = OpenCart 2 (OC21, OC22, OC23 = specifieke minor versie binnen major versie 2)
+OC1 = OpenCart 1 (alleen OpenCart 1.5.6.4 wordt nog ondersteund)
+OC2 = OpenCart 2 (alleen OpenCart 2.3 wordt nog ondersteund)
 OC3 = OpenCart 3
 PS  = PrestaShop
 VM3 = VirtueMart3 (Joomla)
-WC  = WooCommerce (WordPress) (alle ondersteunde versies, vanaf 5.5.2 is dat alleen nog WC3)
-WC2 = WooCommerce 2 (WordPress)
-WC3 = WooCommerce 3+ (WordPress)
+WC  = WooCommerce (WordPress) (alle ondersteunde versies)
+WC2 = WooCommerce 2 (WordPress) (wordt niet meer ondersteund sinds 5.5.2)
+WC3 = WooCommerce 3 (WordPress)
+WC4 = WooCommerce 4 (WordPress)
 
-6.0.4 (2020-10-??)
+6.0.4 (2020-11-15)
 ------------------
 Features:
 - PS: Added the registration form to PS.
 - ALL: verbeterde helpteksten op de instellingenformulieren als de logingegevens
   ontbreken of fout zijn.
+- ALL: Over Acumulus info-blok bevat bij een proefcontract nu ook info over het
+  aantal resterende boekingen en of er problemen zijn met e-mailverzending.
 
 Bugs:
 - ALL: Acumulus API misc/about en misc/my_acumulus geven geen 401 meer terug,
   maar een 403.
 - JOO: Improved styling of forms and added logo to register form.
 - ALL: Allow attribute values in class FormRenderer to be defined as an array.
+- ALL: Gebruik van PHP 7 language construct.
 
 6.0.3 (2020-10-26)
 ------------------

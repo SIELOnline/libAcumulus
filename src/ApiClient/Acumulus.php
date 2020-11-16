@@ -357,7 +357,8 @@ class Acumulus
      *   The result of the webservice call. The structured response will contain
      *   1 "entry" array, being a keyed array with keys:
      *   - entryid
-     *   - entryproc: (description new status): 'removed' or '???'
+     *   - entryproc: (description new status): 'removed', 'recovered' or 'no
+     *     changes made'.
      *   Possible errors:
      *   - XCM7ELO12: Invalid entrydeletestatus value supplied": $deleteStatus
      *     is not one of the indicated constants.

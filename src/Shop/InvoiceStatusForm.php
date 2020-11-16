@@ -692,8 +692,7 @@ class InvoiceStatusForm extends Form
      */
     protected function getNotSentFields()
     {
-        $fields = [];
-        $fields += [
+        return [
             'invoice_add' => [
                 'type' => 'button',
                 'value' => $this->t('send_now'),
@@ -703,8 +702,6 @@ class InvoiceStatusForm extends Form
             ],
             'force_send' => $this->getHiddenField(0),
         ];
-
-        return $fields;
     }
 
     /**
@@ -716,18 +713,7 @@ class InvoiceStatusForm extends Form
      */
     protected function getConceptFields()
     {
-        $fields = [];
-        $fields += [
-            'invoice_add' => [
-                'type' => 'button',
-                'value' => $this->t('send_again'),
-                'attributes' => [
-                    'class' => 'acumulus-ajax',
-                ],
-            ],
-            'force_send' => $this->getHiddenField(1),
-        ];
-        return $fields;
+        return $this->getSendAgainFields();
     }
 
     /**
@@ -742,15 +728,13 @@ class InvoiceStatusForm extends Form
      */
     protected function getCommunicationErrorFields(Result $result)
     {
-        $fields = [];
-        $fields += [
+        return [
             'messages' => [
                 'type' => 'markup',
                 'label' => $this->t('messages'),
                 'value' => $result->formatMessages(Message::Format_PlainListWithSeverity, Severity::RealMessages),
             ],
         ];
-        return $fields;
     }
 
     /**
@@ -762,18 +746,7 @@ class InvoiceStatusForm extends Form
      */
     protected function getNonExistingFields()
     {
-        $fields = [];
-        $fields += [
-            'invoice_add' => [
-                'type' => 'button',
-                'value' => $this->t('send_again'),
-                'attributes' => [
-                    'class' => 'acumulus-ajax',
-                ],
-            ],
-            'force_send' => $this->getHiddenField(1),
-        ];
-        return $fields;
+        return $this->getSendAgainFields();
     }
 
     /**
@@ -785,26 +758,17 @@ class InvoiceStatusForm extends Form
      */
     protected function getDeletedFields()
     {
-        $fields = [];
-        $fields += [
-            'entry_deletestatus_set' => [
-                'type' => 'button',
-                'value' => $this->t('undelete'),
-                'attributes' => [
-                    'class' => 'acumulus-ajax',
-                ],
-            ],
-            'delete_status' => $this->getHiddenField(API::Entry_UnDelete),
-            'invoice_add' => [
-                'type' => 'button',
-                'value' => $this->t('send_again'),
-                'attributes' => [
-                    'class' => 'acumulus-ajax',
-                ],
-            ],
-            'force_send' => $this->getHiddenField(1),
-        ];
-        return $fields;
+        return [
+                   'entry_deletestatus_set' => [
+                       'type' => 'button',
+                       'value' => $this->t('undelete'),
+                       'attributes' => [
+                           'class' => 'acumulus-ajax',
+                       ],
+                   ],
+                   'delete_status' => $this->getHiddenField(API::Entry_UnDelete),
+               ]
+               + $this->getSendAgainFields();
     }
 
     /**
@@ -818,10 +782,14 @@ class InvoiceStatusForm extends Form
      */
     protected function getEntryFields(Source $source, array $entry)
     {
-        return $this->getVatTypeField($entry)
+        $fields = $this->getVatTypeField($entry)
                + $this->getAmountFields($source, $entry)
                + $this->getPaymentStatusFields($source, $entry)
                + $this->getLinksField($entry['token']);
+        if ($this->status >= self::Status_Warning) {
+            $fields += $this->getSendAgainFields();
+        }
+        return $fields;
     }
 
     /**
@@ -1102,6 +1070,30 @@ class InvoiceStatusForm extends Form
             ];
         }
         return $result;
+    }
+
+    /**
+     * Returns additional form fields to send the invoice again.
+     *
+     * This will be shown when the invoice was sent as a concept, has been
+     * deleted or does not exist at all in Acumulus, or if there is a warning
+     * or error status.
+     *
+     * @return array[]
+     *   Array of form fields.
+     */
+    protected function getSendAgainFields()
+    {
+        return [
+            'invoice_add' => [
+                'type' => 'button',
+                'value' => $this->t('send_again'),
+                'attributes' => [
+                    'class' => 'acumulus-ajax',
+                ],
+            ],
+            'force_send' => $this->getHiddenField(1),
+        ];
     }
 
     /**

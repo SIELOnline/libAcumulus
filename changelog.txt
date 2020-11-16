@@ -21,6 +21,9 @@ WC4 = WooCommerce 4 (WordPress)
 6.1.0 (2020-11-??)
 ------------------
 Features:
+- WC|MA: Op het factuurstatusoverzicht kun je nu de factuurgegevens opnieuw
+  versturen als er een fout is ontdekt tussen de bestelling in de webshop en de
+  factuur in Acumulus.
 - WC|MA: Op het factuurstatusoverzicht heeft het veld waarop je de betaaldatum
   kunt invullen nu een standaardwaarde die op dezelfde manier bepaald wordt als
   bij automatische verzending.

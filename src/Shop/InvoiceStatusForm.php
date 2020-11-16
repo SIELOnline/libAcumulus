@@ -18,6 +18,8 @@ use Siel\Acumulus\Helpers\Message;
 use Siel\Acumulus\ApiClient\Result;
 use Siel\Acumulus\ApiClient\Acumulus;
 use Siel\Acumulus\Helpers\Severity;
+use Siel\Acumulus\PluginConfig;
+use Siel\Acumulus\Tag;
 
 /**
  * Defines the Acumulus invoice status overview form.
@@ -366,7 +368,6 @@ class InvoiceStatusForm extends Form
             }
         }
     }
-
 
     /**
      * {@inheritdoc}
@@ -858,20 +859,23 @@ class InvoiceStatusForm extends Form
     }
 
     /**
-     * Returns the payment status and date (if status is paid) of the invoice.
+     * Returns the payment status fields for the given Acumulus invoice.
      *
      * @param \Siel\Acumulus\Invoice\Source $source
      * @param array $entry
      *
      * @return array[]
-     *   array with form fields with the payment status and date (if paid) of
-     *   the invoice.
+     *   An array with form fields:
+     *   - Actual payment status (and date if paid) of the invoice in Acumulus.
+     *   - [Optional] date field to define the date to set the payment date to.
+     *   - Button to change the payment status of the invoice in Acumulus.
      */
     protected function getPaymentStatusFields(Source $source, array $entry)
     {
         $fields = [];
         $paymentStatus = $entry['paymentstatus'];
         $paymentDate = $entry['paymentdate'];
+        $defaultPaymentDate = date(API::DateFormat_Iso);
 
         $paymentStatusText = $paymentStatus !== 0 ? ('payment_status_' . $paymentStatus) : 'unknown';
         if ($paymentStatus === API::PaymentStatus_Paid && !empty($paymentDate)) {
@@ -882,8 +886,18 @@ class InvoiceStatusForm extends Form
         $localPaymentStatus = $source->getPaymentStatus();
         if ($localPaymentStatus !== $paymentStatus) {
             $paymentCompareStatus = static::Status_Warning;
-            $paymentCompareStatustext = $this->t('payment_status_not_equal');
-            $this->setStatus($paymentCompareStatus, $paymentCompareStatustext);
+            $paymentCompareStatusText = $this->t('payment_status_not_equal');
+            $this->setStatus($paymentCompareStatus, $paymentCompareStatusText);
+            if ($localPaymentStatus === API::PaymentStatus_Paid) {
+                $shopSettings = $this->acumulusConfig->getShopSettings();
+                $dateToUse = $shopSettings['dateToUse'];
+                if ($dateToUse != PluginConfig::InvoiceDate_Transfer) {
+                    $defaultPaymentDate = $source->getInvoiceDate();
+                    if ($dateToUse != PluginConfig::InvoiceDate_InvoiceCreate || empty($defaultPaymentDate)) {
+                        $defaultPaymentDate = $source->getDate();
+                    }
+                }
+            }
         } else {
             $paymentCompareStatus = static::Status_Success;
         }
@@ -894,9 +908,9 @@ class InvoiceStatusForm extends Form
             'label' => $this->t('payment_status'),
             'value' => $paymentStatusMarkup,
         ];
-        if (!empty($paymentCompareStatustext)) {
+        if (!empty($paymentCompareStatusText)) {
             $fields['payment_status']['attributes'] = [
-                'title' => $paymentCompareStatustext,
+                'title' => $paymentCompareStatusText,
             ];
         }
 
@@ -920,7 +934,7 @@ class InvoiceStatusForm extends Form
                         'placeholder' => $this->t('date_format'),
                         'required' => true,
                     ],
-                    'default' => date(API::DateFormat_Iso),
+                    'value' => $defaultPaymentDate,
                 ],
                 'invoice_paymentstatus_set' => [
                     'type' => 'button',

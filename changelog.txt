@@ -18,6 +18,13 @@ WC2 = WooCommerce 2 (WordPress) (wordt niet meer ondersteund sinds 5.5.2)
 WC3 = WooCommerce 3 (WordPress)
 WC4 = WooCommerce 4 (WordPress)
 
+6.1.0 (2020-11-??)
+------------------
+Features:
+- WC|MA: Op het factuurstatusoverzicht heeft het veld waarop je de betaaldatum
+  kunt invullen nu een standaardwaarde die op dezelfde manier bepaald wordt als
+  bij automatische verzending.
+
 6.0.4 (2020-11-15)
 ------------------
 Features:

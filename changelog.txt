@@ -24,6 +24,7 @@ Features:
 - WC|MA: Op het factuurstatusoverzicht heeft het veld waarop je de betaaldatum
   kunt invullen nu een standaardwaarde die op dezelfde manier bepaald wordt als
   bij automatische verzending.
+- WC: Tekst  "buitenlandse btw" ingekort.
 
 6.0.4 (2020-11-15)
 ------------------

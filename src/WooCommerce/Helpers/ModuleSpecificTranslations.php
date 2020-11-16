@@ -14,8 +14,10 @@ class ModuleSpecificTranslations extends TranslationCollection
         'meta_original_order_for_refund' => 'Post meta van de oorspronkelijke bestelling, alleen beschikbaar bij credit nota\'s',
         'wc2_end_support' => 'LET OP: de Acumulus plugin zal in een volgende versie stoppen met het ondersteunen van Woocommerce 2! Begin nu met het upgraden naar WooCommerce 4.',
 
-        // Invoice status overview: shorter labels due to available space.
+        // Invoice status overview: shorter labels due to very limited available space.
         'vat_type' => 'Soort',
+        'foreign_vat' => 'EU btw',
+        'foreign_national_vat' => '(EU) btw',
         'payment_status' => 'Status',
         'documents' => 'Pdf\'s',
         'document' => 'Pdf',

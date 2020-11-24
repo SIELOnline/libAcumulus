@@ -29,6 +29,10 @@ Features:
   bij automatische verzending.
 - WC: Tekst  "buitenlandse btw" ingekort.
 
+Bugs:
+- PS: config form: password wordt niet meegestuurd, dus maak het niet verplicht
+  en accepteer leeg als "geen verandering".
+
 6.0.4 (2020-11-15)
 ------------------
 Features:

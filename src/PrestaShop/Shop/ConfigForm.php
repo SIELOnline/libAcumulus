@@ -2,6 +2,7 @@
 namespace Siel\Acumulus\PrestaShop\Shop;
 
 use Siel\Acumulus\Shop\ConfigForm as BaseConfigForm;
+use Siel\Acumulus\Tag;
 
 /**
  * Class ConfigForm processes and builds the settings form page for the
@@ -9,6 +10,24 @@ use Siel\Acumulus\Shop\ConfigForm as BaseConfigForm;
  */
 class ConfigForm extends BaseConfigForm
 {
+    /**
+     * {@inheritdoc}
+     *
+     * This override ensures that the password value is filled on submit with
+     * its current value when the user did not fill it in (not fill it = leave
+     * unchanged).
+     */
+    protected function setSubmittedValues()
+    {
+        parent::setSubmittedValues();
+        if (array_key_exists(Tag::Password, $this->submittedValues) && $this->submittedValues[Tag::Password] === '') {
+            $credentials = $this->acumulusConfig->getCredentials();
+            if (!empty($credentials[Tag::Password])) {
+                $this->submittedValues[Tag::Password] = $credentials[Tag::Password];
+            }
+        }
+    }
+
     /**
      * {@inheritdoc}
      *
@@ -37,6 +56,9 @@ class ConfigForm extends BaseConfigForm
         // Add icons.
         if (isset($result['accountSettingsHeader'])) {
             $result['accountSettingsHeader']['icon'] = 'icon-user';
+            if (isset($result['accountSettingsHeader']['fields'][Tag::Password])) {
+                $result['accountSettingsHeader']['fields'][Tag::Password]['attributes']['required'] = false;
+            }
         }
         if (isset($result['shopSettingsHeader'])) {
             $result['shopSettingsHeader']['icon'] = 'icon-shopping-cart';

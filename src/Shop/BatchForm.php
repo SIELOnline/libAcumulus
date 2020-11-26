@@ -213,7 +213,7 @@ class BatchForm extends Form
             ];
         }
         // 1st fieldset: Batch options.
-        $fields['batchFieldsHeader'] = [
+        $fields['batchFields'] = [
             'type' => 'fieldset',
             'legend' => $this->t('batchFieldsHeader'),
             'fields' => [
@@ -269,7 +269,7 @@ class BatchForm extends Form
         // 2nd fieldset: Batch log.
         if ($this->isSubmitted() && !empty($this->submittedValues) && $this->isValid()) {
             // Set formValue for log as value in case form values are not yet queried.
-            $fields['batchLogHeader'] = [
+            $fields['batchLog'] = [
                 'type' => 'fieldset',
                 'legend' => $this->t('batchLogHeader'),
                 'fields' => [
@@ -286,12 +286,12 @@ class BatchForm extends Form
             if (!empty($this->screenLog)) {
                 $logText = implode("\n", $this->screenLog);
                 $this->formValues['log'] = $logText;
-                $fields['batchLogHeader']['fields']['log']['value'] = $logText;
+                $fields['batchLog']['fields']['log']['value'] = $logText;
             }
         }
 
         // 3rd fieldset: Batch info.
-        $fields['batchInfoHeader'] = [
+        $fields['batchInfo'] = [
             'type' => 'details',
             'summary' => $this->t('batchInfoHeader'),
             'fields' => [
@@ -306,7 +306,7 @@ class BatchForm extends Form
         ];
 
         // 4rd fieldset: More Acumulus.
-        $fields['versionInformationHeader'] = $this->getInformationBlock();
+        $fields['versionInformation'] = $this->getInformationBlock();
 
         return $fields;
     }

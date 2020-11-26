@@ -4,7 +4,7 @@ namespace Siel\Acumulus\PrestaShop\Shop;
 use Siel\Acumulus\Shop\BatchForm as BaseBatchForm;
 
 /**
- * Provides the Batch send form handling for the VirtueMart Acumulus module.
+ * Provides PrestaShop specific handling for the Batch form.
  */
 class BatchForm extends BaseBatchForm
 {
@@ -14,11 +14,12 @@ class BatchForm extends BaseBatchForm
     public function getFieldDefinitions()
     {
         $result = parent::getFieldDefinitions();
-        $result['batchFieldsHeader']['icon'] = 'icon-exchange';
-        if (isset($result['batchLogHeader'])) {
-            $result['batchLogHeader']['icon'] = 'icon-list';
+        $result['batchFields']['icon'] = 'icon-exchange';
+        if (isset($result['batchLog'])) {
+            $result['batchLog']['icon'] = 'icon-list';
         }
-        $result['batchInfoHeader']['icon'] = 'icon-info-circle';
+        $result['batchInfo']['icon'] = 'icon-info-circle';
+        $result['versionInformation']['icon'] = 'icon-info-circle';
         return $result;
     }
 }

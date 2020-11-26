@@ -4,8 +4,7 @@ namespace Siel\Acumulus\PrestaShop\Shop;
 use Siel\Acumulus\Shop\AdvancedConfigForm as BaseAdvancedConfigForm;
 
 /**
- * Class ConfigForm processes and builds the settings form page for the
- * PrestaShop Acumulus module.
+ * Provides PrestaShop specific handling for the Advanced config form.
  */
 class AdvancedConfigForm extends BaseAdvancedConfigForm
 {
@@ -17,8 +16,8 @@ class AdvancedConfigForm extends BaseAdvancedConfigForm
         $result = parent::getFieldDefinitions();
 
         // Add icons.
-        if (isset($result['accountSettingsHeader'])) {
-            $result['accountSettingsHeader']['icon'] = 'icon-user';
+        if (isset($result['accountSettings'])) {
+            $result['accountSettings']['icon'] = 'icon-user';
         }
         if (isset($result['configHeader'])) {
             $result['configHeader']['icon'] = 'icon-cogs';
@@ -29,8 +28,8 @@ class AdvancedConfigForm extends BaseAdvancedConfigForm
         if (isset($result['relationSettingsHeader'])) {
             $result['relationSettingsHeader']['icon'] = 'icon-users';
         }
-        if (isset($result['invoiceSettingsHeader'])) {
-            $result['invoiceSettingsHeader']['icon'] = 'icon-list-alt';
+        if (isset($result['invoiceSettings'])) {
+            $result['invoiceSettings']['icon'] = 'icon-list-alt';
         }
         if (isset($result['optionsSettingsHeader'])) {
             $result['optionsSettingsHeader']['icon'] = 'icon-indent';
@@ -38,8 +37,8 @@ class AdvancedConfigForm extends BaseAdvancedConfigForm
         if (isset($result['emailAsPdfSettingsHeader'])) {
             $result['emailAsPdfSettingsHeader']['icon'] = 'icon-file-pdf-o';
         }
-        if (isset($result['versionInformationHeader'])) {
-            $result['versionInformationHeader']['icon'] = 'icon-info-circle';
+        if (isset($result['versionInformation'])) {
+            $result['versionInformation']['icon'] = 'icon-info-circle';
         }
 
         return $result;

@@ -27,11 +27,19 @@ Features:
 - WC|MA: Op het factuurstatusoverzicht heeft het veld waarop je de betaaldatum
   kunt invullen nu een standaardwaarde die op dezelfde manier bepaald wordt als
   bij automatische verzending.
-- WC: Tekst  "buitenlandse btw" ingekort.
+- WC: Tekst "buitenlandse btw" ingekort.
+- ALL: Het registratieformulier maakt geen gebruik meer van html <details>. Dit
+  opdat het in alle ondersteunde webshops correct getoond wordt.
+- ALL: Sta toe dat fieldsets geen fields hebben, alleen een titel en
+  beschrijving.
 
 Bugs:
-- PS: config form: password wordt niet meegestuurd, dus maak het niet verplicht
-  en accepteer leeg als "geen verandering".
+- PS: Instellingenformulier: password wordt niet meegestuurd, dus maak het niet
+  verplicht en accepteer leeg als "geen verandering".
+- PS: Het registratieformulier dient niet zichtbaar te zijn in het admin menu.
+
+Refactorings:
+- ALL: Do not use "Header" in fieldset ids.
 
 6.0.4 (2020-11-15)
 ------------------

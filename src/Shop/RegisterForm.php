@@ -220,10 +220,11 @@ class RegisterForm extends Form
             // Successfully submitted: show details of the created account.
             $this->loadInfoBlockTranslations();
             $this->needsFormAndSubmitButton = false;
+            $fields += $this->getCongratulationsFields();
             $fields += $this->getCreatedAccountFields();
             $fields += $this->getCreatedApiAccountFields();
             $fields += $this->getNextSteps();
-            $fields['versionInformationHeader'] = $this->getInformationBlock();
+            $fields['versionInformation'] = $this->getInformationBlock();
         }
         return $fields;
     }
@@ -411,26 +412,40 @@ class RegisterForm extends Form
     }
 
     /**
-     * Returns explanatory text about the test account that has been created.
+     * Returns text about the successful creation of the temporary account.
      *
      * @return array[]
      *   Markup that gives more information about the the test account that has
      *   been created.
      */
-    protected function getCreatedAccountFields()
+    protected function getCongratulationsFields()
     {
-        $title = $this->t('register_form_success_title');
-        $line1 = sprintf($this->t('register_form_success_text1'), DateTime::createFromFormat(API::DateFormat_Iso, $this->signUpResponse['contractenddate'])->format('d-m-Y'));
-        $line2 = sprintf($this->t('register_form_success_text2'), htmlspecialchars($this->getSubmittedValue(Tag::Email), ENT_NOQUOTES | ENT_HTML5, 'UTF-8'));
-        $line3 = $this->t('register_form_success_text3');
         return [
             'congratulations' => [
-                'type' => 'markup',
-                'value' => "<h1>$title</h1>\n<p>$line1</p>\n<p>$line2 $line3</p>",
+                'type' => 'fieldset',
+                'legend' => $this->t('congratulationsHeader'),
+                'description' => sprintf($this->t('congratulationsDesc'), DateTime::createFromFormat(API::DateFormat_Iso, $this->signUpResponse['contractenddate'])->format('d-m-Y')),
+                'fields' => [],
             ],
+        ];
+    }
+
+    /**
+     * Returns explanatory text about the test account that has been created.
+     *
+     * @return array[]
+     *   Markup that gives more information about the the account that has
+     *   been created.
+     */
+    protected function getCreatedAccountFields()
+    {
+        $line1 = sprintf($this->t('loginDesc_1'), htmlspecialchars($this->getSubmittedValue(Tag::Email), ENT_NOQUOTES | ENT_HTML5, 'UTF-8'));
+        $line2 = $this->t('loginDesc_2');
+        return [
             'loginDetails' => [
-                'type' => 'details',
-                'summary' => $this->t('loginDetailsHeader'),
+                'type' => 'fieldset',
+                'legend' => $this->t('loginHeader'),
+                'description' => "$line1 $line2",
                 'fields' => [
                     Tag::ContractCode => [
                         'type' => 'text',
@@ -473,15 +488,12 @@ class RegisterForm extends Form
      */
     protected function getCreatedApiAccountFields()
     {
-        $line1 = sprintf($this->t('register_form_success_api_account'), $this->t('module'));
+        $line1 = sprintf($this->t('apiLoginDesc'), $this->t('module'));
         return [
-            'apiAccount' => [
-                'type' => 'markup',
-                'value' => "<p>$line1</p>",
-            ],
-            'apiloginDetails' => [
-                'type' => 'details',
-                'summary' => sprintf($this->t('moduleLoginDetailsHeader'), $this->t('module')),
+            'apiLoginDetails' => [
+                'type' => 'fieldset',
+                'legend' => sprintf($this->t('apiLoginHeader'), $this->t('module')),
+                'description' => $line1,
                 'fields' => [
                     'contractapiuser' . Tag::ContractCode => [
                         'type' => 'text',
@@ -510,9 +522,9 @@ class RegisterForm extends Form
                         ],
                         'value' => $this->signUpResponse['contractapiuser' . Tag::Password],
                     ],
-                    'desc_apiloginDetails' => [
+                    'apiLoginRemark' => [
                         'type' => 'markup',
-                        'value' => sprintf($this->t('desc_apiloginDetails'), $this->t('module')),
+                        'value' => sprintf($this->t('apiLoginRemark'), $this->t('module')),
                     ],
                 ],
             ],
@@ -527,16 +539,32 @@ class RegisterForm extends Form
      */
     protected function getNextSteps()
     {
-        $title = $this->t('whatsNextHeader');
-        $line1 = $this->t('register_form_success_configure_acumulus');
-        $button1 = $this->t('register_form_success_login_button');
-        $line2 = sprintf($this->t('register_form_success_configure_module'), $this->t('module'));
-        $button2 = sprintf($this->t('register_form_success_config_button'), $this->t('module'), $this->shopCapabilities->getLink('config'));
-        $line3 = sprintf($this->t('register_form_success_batch'), $this->t('module'));
         return [
-            'nextSteps' => [
-                'type' => 'markup',
-                'value' => "<h2>$title</h2><p>$line1</p>\n<p>$button1<br><br></p>\n<p>$line2</p>\n<p>$button2<br><br></p>\n<p>$line3</p>\n",
+            'whatsNext' => [
+                'type' => 'fieldset',
+                'legend' => $this->t('whatsNextHeader'),
+                'fields' => [
+                    'next1' => [
+                        'type' => 'markup',
+                        'value' => $this->t('register_form_success_configure_acumulus'),
+                    ],
+                    'loginLink' => [
+                        'type' => 'markup',
+                        'value' => sprintf($this->t('register_form_success_login_button'), $this->t('button_class')),
+                    ],
+                    'next2' => [
+                        'type' => 'markup',
+                        'value' => '<br>' . sprintf($this->t('register_form_success_configure_module'), $this->t('module')),
+                    ],
+                    'basicSettingsLink' => [
+                        'type' => 'markup',
+                        'value' => sprintf($this->t('register_form_success_config_button'), $this->t('module'), $this->shopCapabilities->getLink('config'), $this->t('button_class')),
+                    ],
+                    'next3' => [
+                        'type' => 'markup',
+                        'value' => sprintf($this->t('register_form_success_batch'), $this->t('module')),
+                    ],
+                ],
             ],
         ];
     }

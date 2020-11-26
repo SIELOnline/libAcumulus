@@ -163,14 +163,14 @@ class ConfigForm extends BaseConfigForm
         if (!empty($desc2)) {
             $desc .= ' ' . sprintf($this->t($desc2), $this->shopCapabilities->getLink('register'));
         }
-        $fields['accountSettingsHeader'] = [
+        $fields['accountSettings'] = [
             'type' => 'fieldset',
             'legend' => $this->t('accountSettingsHeader'),
             'fields' => $this->getAccountFields($accountStatus, $desc),
         ];
 
         if ($accountStatus === false) {
-            $fields['accountSettingsHeaderMessage'] = [
+            $fields['accountSettingsMessage'] = [
                 'type' => 'fieldset',
                 'legend' => $this->t('message_error_header'),
                 'fields' => [
@@ -184,19 +184,19 @@ class ConfigForm extends BaseConfigForm
 
         if ($accountStatus) {
             $fields += [
-                'shopSettingsHeader' => [
+                'shopSettings' => [
                     'type' => 'fieldset',
                     'legend' => $this->t('shopSettingsHeader'),
                     'description' => $this->t('desc_shopSettings'),
                     'fields' => $this->getShopFields(),
                 ],
-                'triggerSettingsHeader' => [
+                'triggerSettings' => [
                     'type' => 'fieldset',
                     'legend' => $this->t('triggerSettingsHeader'),
                     'description' => sprintf($this->t('desc_triggerSettings'), $this->shopCapabilities->getLink('batch')),
                     'fields' => $this->getTriggerFields(),
                 ],
-                'invoiceSettingsHeader' => [
+                'invoiceSettings' => [
                     'type' => 'fieldset',
                     'legend' => $this->t('invoiceSettingsHeader'),
                     'fields' => $this->getInvoiceFields(),
@@ -222,16 +222,16 @@ class ConfigForm extends BaseConfigForm
         }
 
         $fields += [
-            'pluginSettingsHeader' => [
+            'pluginSettings' => [
                 'type' => 'fieldset',
                 'legend' => $this->t('pluginSettingsHeader'),
                 'fields' => $this->getPluginFields(),
             ],
-            'versionInformationHeader' => $this->getInformationBlock(),
+            'versionInformation' => $this->getInformationBlock(),
         ];
         if ($accountStatus) {
             $fields += [
-                'advancedConfigHeader' => [
+                'advancedConfig' => [
                     'type' => 'details',
                     'summary' => $this->t('advanced_form_header'),
                     'fields' => $this->getAdvancedConfigLinkFields(),

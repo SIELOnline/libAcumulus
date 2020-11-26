@@ -245,7 +245,7 @@ class FormRenderer
     protected function renderField(array $field)
     {
         $output = '';
-        $output .= !empty($field['fields']) ? $this->renderFieldset($field) : $this->renderSimpleField($field);
+        $output .= isset($field['fields']) ? $this->renderFieldset($field) : $this->renderSimpleField($field);
         return $output;
     }
 

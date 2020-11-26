@@ -100,7 +100,7 @@ class AdvancedConfigForm extends BaseConfigForm
                     ]
                 ];
             }
-            $fields['accountSettingsHeader'] = [
+            $fields['accountSettings'] = [
               'type' => 'fieldset',
               'legend' => $this->t('message_error_header'),
               'fields' => $aubFields,
@@ -128,7 +128,7 @@ class AdvancedConfigForm extends BaseConfigForm
                     'description' => $this->t('desc_relationSettingsHeader'),
                     'fields' => $this->getRelationFields(),
                 ],
-                'invoiceSettingsHeader' => [
+                'invoiceSettings' => [
                     'type' => 'fieldset',
                     'legend' => $this->t('invoiceSettingsHeader'),
                     'fields' => $this->getInvoiceFields(),
@@ -153,7 +153,7 @@ class AdvancedConfigForm extends BaseConfigForm
             ];
         }
 
-        $fields['versionInformationHeader'] = $this->getInformationBlock();
+        $fields['versionInformation'] = $this->getInformationBlock();
 
         return $fields;
     }

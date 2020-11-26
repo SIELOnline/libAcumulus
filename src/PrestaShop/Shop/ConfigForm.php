@@ -5,8 +5,7 @@ use Siel\Acumulus\Shop\ConfigForm as BaseConfigForm;
 use Siel\Acumulus\Tag;
 
 /**
- * Class ConfigForm processes and builds the settings form page for the
- * PrestaShop Acumulus module.
+ * Provides PrestaShop specific handling for the Config form.
  */
 class ConfigForm extends BaseConfigForm
 {
@@ -54,20 +53,20 @@ class ConfigForm extends BaseConfigForm
         $result = parent::getFieldDefinitions();
 
         // Add icons.
-        if (isset($result['accountSettingsHeader'])) {
-            $result['accountSettingsHeader']['icon'] = 'icon-user';
-            if (isset($result['accountSettingsHeader']['fields'][Tag::Password])) {
-                $result['accountSettingsHeader']['fields'][Tag::Password]['attributes']['required'] = false;
+        if (isset($result['accountSettings'])) {
+            $result['accountSettings']['icon'] = 'icon-user';
+            if (isset($result['accountSettings']['fields'][Tag::Password])) {
+                $result['accountSettings']['fields'][Tag::Password]['attributes']['required'] = false;
             }
         }
-        if (isset($result['shopSettingsHeader'])) {
-            $result['shopSettingsHeader']['icon'] = 'icon-shopping-cart';
+        if (isset($result['shopSettings'])) {
+            $result['shopSettings']['icon'] = 'icon-shopping-cart';
         }
-        if (isset($result['triggerSettingsHeader'])) {
-            $result['triggerSettingsHeader']['icon'] = 'icon-exchange';
+        if (isset($result['triggerSettings'])) {
+            $result['triggerSettings']['icon'] = 'icon-exchange';
         }
-        if (isset($result['invoiceSettingsHeader'])) {
-            $result['invoiceSettingsHeader']['icon'] = 'icon-list-alt';
+        if (isset($result['invoiceSettings'])) {
+            $result['invoiceSettings']['icon'] = 'icon-list-alt';
         }
         if (isset($result['paymentMethodAccountNumberFieldset'])) {
             $result['paymentMethodAccountNumberFieldset']['icon'] = 'icon-credit-card';
@@ -78,14 +77,14 @@ class ConfigForm extends BaseConfigForm
         if (isset($result['emailAsPdfSettingsHeader'])) {
             $result['emailAsPdfSettingsHeader']['icon'] = 'icon-file-pdf-o';
         }
-        if (isset($result['pluginSettingsHeader'])) {
-            $result['pluginSettingsHeader']['icon'] = 'icon-puzzle-piece';
+        if (isset($result['pluginSettings'])) {
+            $result['pluginSettings']['icon'] = 'icon-puzzle-piece';
         }
-        if (isset($result['versionInformationHeader'])) {
-            $result['versionInformationHeader']['icon'] = 'icon-info-circle';
+        if (isset($result['versionInformation'])) {
+            $result['versionInformation']['icon'] = 'icon-info-circle';
         }
-        if (isset($result['advancedConfigHeader'])) {
-            $result['advancedConfigHeader']['icon'] = 'icon-cogs';
+        if (isset($result['advancedConfig'])) {
+            $result['advancedConfig']['icon'] = 'icon-cogs';
         }
 
         return $result;

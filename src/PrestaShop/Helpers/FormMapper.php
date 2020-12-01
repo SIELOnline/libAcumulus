@@ -149,8 +149,8 @@ class FormMapper extends BaseFormMapper
                 $type = 'text';
                 break;
             default:
-                // Return as is: text, password, textarea, radio, select, checkbox,
-                // date. PrestaShop accepts these as are.
+                // Return as is: text, password, textarea, radio, select,
+                // checkbox, date. PrestaShop accepts these as are.
                 break;
         }
         return $type;

@@ -1,11 +1,10 @@
 <?php
 namespace Siel\Acumulus\Joomla\Helpers;
 
-use JHtml;
 use Siel\Acumulus\Helpers\FormRenderer as BaseFormRenderer;
 
 /**
- * Class FormRenderer renders a form in the Joomla/VirtueMart standards.
+ * Class FormRenderer renders a form in the Joomla standards.
  */
 class FormRenderer extends BaseFormRenderer
 {
@@ -26,21 +25,5 @@ class FormRenderer extends BaseFormRenderer
         $this->multiLabelClass = 'control-label';
         $this->descriptionWrapperClass = ['controls', 'description'];
         $this->markupWrapperClass = 'controls';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function input(array $field)
-    {
-        $output = '';
-        if ($field['type'] === 'date') {
-            $output .= $this->getWrapper('input');
-            $output .= JHtml::calendar($field['value'], $field['name'], $field['id'], '%Y-%m-%d', $field['attributes']);
-            $output .= $this->getWrapperEnd('input');
-        } else {
-            $output .= parent::input($field);
-        }
-        return $output;
     }
 }

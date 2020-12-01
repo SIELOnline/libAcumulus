@@ -17,7 +17,7 @@ class FormHelper extends BaseFormHelper
      */
     public function isSubmitted()
     {
-        return Tools::isSubmit('submitAdd') || Tools::isSubmit('submit' . $this->moduleName);
+        return Tools::isSubmit('submitAdd') || Tools::isSubmit('submit' . $this->moduleName) || Tools::getValue('ajax') !== false;
     }
 
     /**

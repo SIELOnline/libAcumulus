@@ -338,6 +338,8 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 return Context::getContext()->link->getAdminLink('AdminAcumulusBatch', true);
             case 'register':
                 return Context::getContext()->link->getAdminLink('AdminAcumulusRegister', true);
+            case 'invoice':
+                return Context::getContext()->link->getAdminLink('AdminAcumulusInvoice', true);
             case 'logo':
                 return  __PS_BASE_URI__ . 'modules/acumulus/views/img/siel-logo.svg';
         }

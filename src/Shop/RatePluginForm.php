@@ -147,7 +147,7 @@ class RatePluginForm extends Form
     protected function getFieldDefinitionsFull()
     {
         return [
-            'acumulus-rate-plugin' => [
+            'acumulus-rate' => [
                 'type' => 'fieldset',
                 'fields' => [
                     'logo' => [

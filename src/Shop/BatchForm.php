@@ -230,6 +230,7 @@ class BatchForm extends Form
                 'date_from' => [
                     'type' => 'date',
                     'label' => $this->t('field_date_from'),
+                    // Only shown by MA2.
                     'attributes' => [
                         'placeholder' => $this->t('date_format'),
                     ],

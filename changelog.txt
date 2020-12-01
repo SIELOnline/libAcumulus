@@ -21,6 +21,8 @@ WC4 = WooCommerce 4 (WordPress)
 6.1.0 (2020-11-??)
 ------------------
 Features:
+- PS: Ook in PrestaShop wordt nu het factuurstatusoverzicht getoond (uiteraard
+  inclusief de verbeteringen die hieronder staan).
 - WC|MA: Op het factuurstatusoverzicht kun je nu de factuurgegevens opnieuw
   versturen als er een fout is ontdekt tussen de bestelling in de webshop en de
   factuur in Acumulus.
@@ -29,9 +31,10 @@ Features:
   bij automatische verzending.
 - WC: Tekst "buitenlandse btw" ingekort.
 - ALL: Het registratieformulier maakt geen gebruik meer van html <details>. Dit
-  opdat het in alle ondersteunde webshops correct getoond wordt.
+  zodat het in alle ondersteunde webshops correct getoond wordt.
 - ALL: Sta toe dat fieldsets geen fields hebben, alleen een titel en
   beschrijving.
+- JOO: Use html 5 date fields instead of old date fields from Joomla self.
 
 Bugs:
 - PS: Instellingenformulier: password wordt niet meegestuurd, dus maak het niet
@@ -39,7 +42,9 @@ Bugs:
 - PS: Het registratieformulier dient niet zichtbaar te zijn in het admin menu.
 
 Refactorings:
-- ALL: Do not use "Header" in fieldset ids.
+- ALL: Naming: do not use "Header" in fieldset ids.
+- ALL: Do no longer place hiddnefields in wrappers.
+- OC: Improved multi class handling in FormRenderer.
 
 6.0.4 (2020-11-15)
 ------------------

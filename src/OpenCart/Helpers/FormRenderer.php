@@ -22,7 +22,8 @@ class FormRenderer extends BaseFormRenderer
 
         $this->elementWrapperClass = 'form-group';
         $this->labelWrapperClass = 'form-group';
-        $this->multiLabelClass = 'control-label';
+        $this->labelClass = ['col-sm-2', 'control-label'];
+        $this->multiLabelClass = ['col-sm-2', 'control-label'];
         $this->descriptionWrapperClass = 'col-sm-offset-2 description';
     }
 
@@ -39,17 +40,6 @@ class FormRenderer extends BaseFormRenderer
     }
 
     /**
-     * {@inheritdoc}
-     */
-    protected function addLabelAttributes(array $attributes, $id)
-    {
-        $attributes = parent::addLabelAttributes($attributes, $id);
-        $attributes = $this->addAttribute($attributes, 'class', 'col-sm-2');
-        $attributes = $this->addAttribute($attributes, 'class', 'control-label');
-        return $attributes;
-    }
-
-    /**
      * Handles required fields.
      *
      * @param array $field
@@ -58,11 +48,13 @@ class FormRenderer extends BaseFormRenderer
     {
         if (!empty($field['attributes']['required'])) {
             if (empty($this->elementWrapperClass)) {
-                $this->elementWrapperClass = '';
+                $this->elementWrapperClass = 'required';
             } else {
-                $this->elementWrapperClass .= ' ';
+                if (!is_array($this->elementWrapperClass)) {
+                    $this->elementWrapperClass = (array) $this->elementWrapperClass;
+                }
+                $this->elementWrapperClass[] = 'required';
             }
-            $this->elementWrapperClass .= 'required';
         }
     }
 }

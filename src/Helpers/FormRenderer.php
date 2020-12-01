@@ -144,6 +144,9 @@ class FormRenderer
     protected $multiLabelTag = 'label';
 
     /** @var string */
+    protected $labelClass = '';
+
+    /** @var string */
     protected $multiLabelClass = '';
 
     /** @var string */
@@ -332,8 +335,8 @@ class FormRenderer
         if ($field['type'] !== 'hidden') {
             $output .= $this->getWrapper('element');
             // Do not use a <label> with an "id" attribute on the label for a
-            // set of radio buttons, a set of checkboxes, or on markup.
-            $id = in_array($field['type'], array('radio', 'checkbox', 'markup')) ? '' : $field['id'];
+            // set of radio buttons, a set of checkboxes (, or on markup).
+            $id = in_array($field['type'], array('radio', 'checkbox')) ? '' : $field['id'];
             $output .= $this->renderLabel($field['label'], $id, $labelAttributes, true);
             $output .= $this->getWrapper('inputDescription');
         }
@@ -472,7 +475,9 @@ class FormRenderer
         $output = '';
 
         // Tag around input element.
-        $output .= $this->getWrapper('input');
+        if ($field['type'] !== 'hidden') {
+            $output .= $this->getWrapper('input');
+        }
 
         $attributes = $field['attributes'];
         $attributes = $this->addAttribute($attributes, 'type', $field['type']);
@@ -482,7 +487,9 @@ class FormRenderer
         $output .= $this->getOpenTag('input', $attributes, true);
 
         // Tag around input element.
-        $output .= $this->getWrapperEnd('input');
+        if ($field['type'] !== 'hidden') {
+            $output .= $this->getWrapperEnd('input');
+        }
 
         return $output;
     }
@@ -779,8 +786,8 @@ class FormRenderer
      *   The array of attributes to add the value to.
      * @param string $attribute
      *   The name of the attribute to set.
-     * @param string $value
-     *   The value of the attribute to add or set.
+     * @param string|string[] $value
+     *   The value(s) of the attribute to add or set.
      * @param bool|null $multiple
      *   Allow multiple values for the given attribute. By default (null) this
      *   is only allowed for the class attribute.
@@ -790,10 +797,10 @@ class FormRenderer
      */
     protected function addAttribute(array $attributes, $attribute, $value, $multiple = null)
     {
-        // Do add false and 0, but not an empty string or null.
-        if ($value !== null && $value !== '') {
+        // Do add false and 0, but not an empty string, empty array or null.
+        if ($value !== null && $value !== '' && $value !== []) {
             if ($multiple === null) {
-                $multiple = $attribute === 'class';
+                $multiple = is_array($value) || $attribute === 'class';
             }
 
             if ($multiple) {
@@ -826,7 +833,9 @@ class FormRenderer
     protected function addLabelAttributes(array $attributes, $id)
     {
         $attributes = $this->addAttribute($attributes, 'for', $id);
-        if (empty($id)) {
+        if (!empty($id)) {
+            $attributes = $this->addAttribute($attributes, 'class', $this->labelClass);
+        } else {
             $attributes = $this->addAttribute($attributes, 'class', $this->multiLabelClass);
         }
         return $attributes;

@@ -528,4 +528,12 @@ class ShopCapabilities extends ShopCapabilitiesBase
         }
         return parent::getLink($linkType);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasInvoiceStatusScreen()
+    {
+        return false;
+    }
 }

@@ -396,6 +396,6 @@ abstract class ShopCapabilities
      */
     public function hasInvoiceStatusScreen()
     {
-        return false;
+        return true;
     }
 }

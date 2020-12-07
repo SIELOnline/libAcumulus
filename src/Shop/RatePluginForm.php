@@ -47,6 +47,7 @@ class RatePluginForm extends Form
     ) {
         parent::__construct(null, $formHelper, $shopCapabilities, $config, $translator, $log);
         $this->addMeta = false;
+        $this->addSeverityClassToFields = false;
         $translations = new RatePluginFormTranslations();
         $this->translator->add($translations);
     }
@@ -100,14 +101,6 @@ class RatePluginForm extends Form
         }
 
         return $result;
-    }
-
-    public function getFields()
-    {
-        if (empty($this->fields)) {
-            $this->fields = $this->getFieldDefinitions();
-        }
-        return $this->fields;
     }
 
     /**

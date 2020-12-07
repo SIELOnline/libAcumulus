@@ -281,6 +281,7 @@ abstract class InvoiceManager
             $result = $this->createAndSend($invoiceSource, $result, $forceSend, $dryRun);
             $success = $success && !$result->hasError();
             $this->getLog()->notice($this->getSendResultLogText($invoiceSource, $result));
+            // @todo: we are kind of loosing error messages here.
             $log[$invoiceSource->getId()] = $this->getSendResultLogText($invoiceSource, $result,Result::AddReqResp_Never);
         }
         return $success;
@@ -303,6 +304,7 @@ abstract class InvoiceManager
         $result = $this->createAndSend($invoiceSource, $result, $forceSend);
         $success = !$result->hasError();
         $this->getLog()->notice($this->getSendResultLogText($invoiceSource, $result));
+        // @todo: we are loosing error messages here.
         return $success;
     }
 
@@ -439,6 +441,8 @@ abstract class InvoiceManager
 
                 // If the invoice is not set to null, we continue by completing it.
                 if ($invoice !== null) {
+                    // @todo: handle verification errors here. Currently they
+                    //  get severity Error, should perhaps become Exception.
                     $invoice = $this->getCompletor()->complete($invoice, $invoiceSource, $result);
 
                     // Trigger the InvoiceCompleted event.

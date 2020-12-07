@@ -11,7 +11,7 @@ OC  = OpenCart (alle ondersteunde versies)
 OC1 = OpenCart 1 (alleen OpenCart 1.5.6.4 wordt nog ondersteund)
 OC2 = OpenCart 2 (alleen OpenCart 2.3 wordt nog ondersteund)
 OC3 = OpenCart 3
-PS  = PrestaShop
+PS  = PrestaShop (1.7.6+)
 VM3 = VirtueMart3 (Joomla)
 WC  = WooCommerce (WordPress) (alle ondersteunde versies)
 WC2 = WooCommerce 2 (WordPress) (wordt niet meer ondersteund sinds 5.5.2)
@@ -23,8 +23,8 @@ WC4 = WooCommerce 4 (WordPress)
 Features:
 - PS: PS 1.5 and 1.6 will probably not work anymore, so only PS1.7 remains
   supported.
-- PS|OC|VM: Het factuurstatusoverzicht is nu ook aan PrestaShop, OpenCart en
-  VirtueMart toegevoegd.
+- PS|OC|VM|HS: Het factuurstatusoverzicht is nu ook aan PrestaShop, OpenCart,
+  VirtueMart en HikaShop toegevoegd.
 - ALL: Het factuurstatusoverzicht wordt nu geladen via lazy-load.
 - ALL: Op het factuurstatusoverzicht kun je nu de factuurgegevens opnieuw
   versturen als er een fout is ontdekt tussen de bestelling in de webshop en de

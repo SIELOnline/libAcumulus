@@ -1,10 +1,10 @@
 <?php
-namespace Siel\Acumulus\PrestaShop\Shop;
+namespace Siel\Acumulus\Joomla\Shop;
 
 use Siel\Acumulus\Shop\InvoiceStatusForm as BaseInvoiceStatusForm;
 
 /**
- * Provides PrestaShop specific handling for the Invoice status form.
+ * Provides Joomla specific handling for the Invoice status form.
  */
 class InvoiceStatusForm extends BaseInvoiceStatusForm
 {
@@ -36,8 +36,8 @@ class InvoiceStatusForm extends BaseInvoiceStatusForm
             'acumulus' => [
                 'type' => 'fieldset',
                 'legend' => 'Acumulus',
+                'description' => $this->t('invoice_form_header'),
                 'fields' => $allFields,
-                'icon' => 'icon-acumulus',
             ]
         ];
 

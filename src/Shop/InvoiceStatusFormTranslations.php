@@ -10,8 +10,9 @@ class InvoiceStatusFormTranslations extends TranslationCollection
 {
     protected $nl = [
         // Invoice status.
-        'acumulus_invoice_title' => 'Acumulus',
-        'acumulus_invoice_header' => 'Status in Acumulus voor deze bestelling',
+        'invoice_form_title' => 'Acumulus',
+        'invoice_form_header' => 'Status van de factuur in Acumulus voor deze bestelling',
+        'invoice_form_header_p' => 'Status van de factuur in Acumulus voor deze %1$s',
         InvoiceStatusForm::Invoice_NotSent => 'Nog niet verzonden',
         InvoiceStatusForm::Invoice_Sent => 'Factuur %1$s van %2$s',
         InvoiceStatusForm::Invoice_SentConcept => 'Op %1$s als concept verzonden',
@@ -57,10 +58,11 @@ class InvoiceStatusFormTranslations extends TranslationCollection
         'payment_date' => 'Betaaldatum',
         'payment_status_not_equal' => 'De betaalstatus in Acumulus komt niet overeen met die in uw webshop',
         'message_validate_batch_bad_payment_date' => 'U dient een correcte \'Betaaldatum\' in te vullen.',
-        // Dit bericht (met format) is nodig als we ergens geen date picker engeenhtml5 date field zouden hebben.
+        // Dit bericht (met format) is nodig als we ergens geen date picker en geen html5 date field zouden hebben.
         //'message_validate_batch_bad_payment_date' => 'U dient een correcte \'Betaaldatum\' in te vullen (verwacht formaat: %1$s).',
 
         // Actions.
+        'show' => 'Tonen',
         'send_now' => 'Nu verzenden',
         'send_again' => 'Opnieuw verzenden',
         'undelete' => 'Herstel verwijderde boeking',
@@ -77,8 +79,9 @@ class InvoiceStatusFormTranslations extends TranslationCollection
 
     protected $en = [
         // Invoice status.
-        'acumulus_invoice_title' => 'Acumulus',
-        'acumulus_invoice_header' => 'Status in Acumulus for this order',
+        'invoice_form_title' => 'Acumulus',
+        'invoice_form_header' => 'Status of the invoice in Acumulus for this order',
+        'invoice_form_header_p' => 'Status of the invoice in Acumulus for this %1$s',
         InvoiceStatusForm::Invoice_NotSent => 'Not yet sent',
         InvoiceStatusForm::Invoice_Sent => 'Invoice %1$s of %2$s',
         InvoiceStatusForm::Invoice_SentConcept => 'On %1$s sent as concept',
@@ -124,10 +127,11 @@ class InvoiceStatusFormTranslations extends TranslationCollection
         'payment_date' => 'Payment date',
         'payment_status_not_equal' => 'The payment state in Acumulus differs from the one in your webshop',
         'message_validate_batch_bad_payment_date' => 'Incorrect \'Payment date\'.',
-        // Dit bericht (met format) is nodig als we ergens geen date picker engeenhtml5 date field zouden hebben.
+        // Dit bericht (met format) is nodig als we ergens geen date picker en geen html5 date field zouden hebben.
         //'message_validate_batch_bad_payment_date' => 'Incorrect \'Payment date\' (expected format: %1$s).',
 
         // Actions.
+        'show' => 'Show',
         'send_now' => 'Send now',
         'send_again' => 'Send again',
         'undelete' => 'Restore deleted invoice',

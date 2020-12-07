@@ -57,6 +57,8 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
                 return JRoute::_('index.php?option=com_acumulus&task=batch');
             case 'register':
                 return JRoute::_('index.php?option=com_acumulus&task=register');
+            case 'invoice':
+                return JRoute::_('index.php?option=com_acumulus&task=invoice');
             case 'logo':
                 return JURI::root(true) . '/administrator/components/com_acumulus/media/siel-logo.svg';
         }

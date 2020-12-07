@@ -19,7 +19,6 @@ use Siel\Acumulus\ApiClient\Result;
 use Siel\Acumulus\ApiClient\Acumulus;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\PluginConfig;
-use Siel\Acumulus\Tag;
 
 /**
  * Defines the Acumulus invoice status overview form.
@@ -115,7 +114,7 @@ class InvoiceStatusForm extends Form
     {
         parent::__construct($acumulusApiClient, $formHelper, $shopCapabilities, $config, $translator, $log);
         $this->addMeta = false;
-        $this->needsFormAndSubmitButton = false;
+        $this->isFullPage = false;
 
         $translations = new InvoiceTranslations();
         $this->translator->add($translations);
@@ -300,18 +299,18 @@ class InvoiceStatusForm extends Form
      */
     protected function setServiceAndSubmittedSource()
     {
-        // Get parent source. The action may be on one of its children, a credit
-        // note, but we also have to set the parent source,so we can fully
+        // Get base source. The action may be on one of its children, a credit
+        // note, but we also have to set the base source,so we can fully
         // process and render the form.
-        $parentType = $this->getSubmittedValue('acumulus_parent_type');
-        $parentId = (int) $this->getSubmittedValue('acumulus_parent_id');
-        $parentSource = $this->container->getSource($parentType, $parentId);
-        if ($parentSource->getSource()) {
-            $this->setSource($parentSource);
+        $type = $this->getSubmittedValue('acumulus_main_source_type');
+        $id = (int) $this->getSubmittedValue('acumulus_main_source_id');
+        $mainSource = $this->container->getSource($type, $id);
+        if ($mainSource->getSource()) {
+            $this->setSource($mainSource);
         }
 
-        // Get actual source ($this->source may be the parent, not the source to
-        // execute on). Do so without trusting the input.
+        // Get actual source ($this->source is the main source, not the source
+        // to execute on). Do so without trusting the input.
         $parts = explode('_', $this->submittedValues['clicked'], 3);
         if (count($parts) === 3) {
             $this->submittedValues['service'] = $parts[2];
@@ -346,24 +345,27 @@ class InvoiceStatusForm extends Form
         if ($this->source === null) {
             // Use a basic filtering on the wrong user input.
             $this->addMessage(sprintf($this->t('unknown_source'),
-                    preg_replace('/[^a-z0-9_\-]/', '', $this->getSubmittedValue('acumulus_parent_type')),
-                    preg_replace('/[^a-z0-9_\-]/', '', $this->getSubmittedValue('acumulus_parent_id'))),
+                preg_replace('/[^a-z0-9_\-]/', '', $this->getSubmittedValue('acumulus_main_source_type')),
+                preg_replace('/[^a-z0-9_\-]/', '', $this->getSubmittedValue('acumulus_main_source_id'))),
                 Severity::Error);
-        } elseif ($this->getSubmittedValue('source') === null) {
-            // Use a basic filtering on the wrong user input.
-            $this->addMessage(sprintf($this->t('unknown_source'),
+        } elseif ($this->getSubmittedValue('service') !== 'invoice_show') {
+            if ($this->getSubmittedValue('source') === null) {
+                // Use a basic filtering on the wrong user input.
+                $this->addMessage(sprintf($this->t('unknown_source'),
                     preg_replace('/[^a-z0-9_\-]/', '', $this->getSubmittedValue('source_type')),
                     preg_replace('/[^a-z0-9_\-]/', '', $this->getSubmittedValue('source_id'))),
-                Severity::Error);
-        } elseif ($this->getSubmittedValue('service') === 'invoice_paymentstatus_set') {
-            /** @var Source $source */
-            $source = $this->getSubmittedValue('source');
-            $idPrefix = $this->getIdPrefix($source);
-            if ((int) $this->getSubmittedValue($idPrefix . 'payment_status_new') === Api::PaymentStatus_Paid) {
-                $dateFieldName = $idPrefix . 'payment_date';
-                if (!DateTime::createFromFormat(API::DateFormat_Iso, $this->getSubmittedValue($dateFieldName))) {
-                    // Date is not a valid date.
-                    $this->addMessage(sprintf($this->t('message_validate_batch_bad_payment_date'), $this->t('date_format')), Severity::Error, $dateFieldName);
+                    Severity::Error);
+            } elseif ($this->getSubmittedValue('service') === 'invoice_paymentstatus_set') {
+                /** @var Source $source */
+                $source = $this->getSubmittedValue('source');
+                $idPrefix = $this->getIdPrefix($source);
+                if ((int) $this->getSubmittedValue($idPrefix . 'payment_status_new') === Api::PaymentStatus_Paid) {
+                    $dateFieldName = $idPrefix . 'payment_date';
+                    if (!DateTime::createFromFormat(API::DateFormat_Iso, $this->getSubmittedValue($dateFieldName))) {
+                        // Date is not a valid date.
+                        $this->addMessage(sprintf($this->t('message_validate_batch_bad_payment_date'), $this->t('date_format')), Severity::Error,
+                            $dateFieldName);
+                    }
                 }
             }
         }
@@ -383,6 +385,11 @@ class InvoiceStatusForm extends Form
         $source = $this->getSubmittedValue('source');
         $idPrefix = $this->getIdPrefix($source);
         switch ($service) {
+            case 'invoice_show':
+                // Just show(/refresh) the form (Ajax based lazy load).
+                $result = true;
+                break;
+
             case 'invoice_add':
                 $forceSend = (bool) $this->getSubmittedValue($idPrefix . 'force_send');
                 $result = $this->invoiceManager->send1($source, $forceSend);
@@ -436,34 +443,45 @@ class InvoiceStatusForm extends Form
     protected function getFieldDefinitions()
     {
         $fields = [];
-        $parent = $this->source;
+        $source = $this->source;
 
         // Add base information in hidden fields:
         // - Source (type and id) for the main source on this form. This will be
         //   an order. Fieldsets with children, credit notes, may follow.
-        $fields['acumulus_parent_type'] = $this->getHiddenField($parent->getType());
-        $fields['acumulus_parent_id'] = $this->getHiddenField($parent->getId());
+        $fields['acumulus_main_source_type'] = $this->getHiddenField($source->getType());
+        $fields['acumulus_main_source_id'] = $this->getHiddenField($source->getId());
 
-        // 1st fieldset: Order.
-        $localEntryInfo = $this->acumulusEntryManager->getByInvoiceSource($parent);
-        $idPrefix = $this->getIdPrefix($parent);
-        $fields1Source = $this->addIdPrefix($this->getFields1Source($parent, $localEntryInfo), $idPrefix);
-        $fields[$idPrefix] = [
-            'type' => 'fieldset',
-            'fields' => $fields1Source,
-        ];
-
-        // Other fieldsets: credit notes.
-        $creditNotes = $parent->getCreditNotes();
-        foreach($creditNotes as $creditNote) {
-            $localEntryInfo = $this->acumulusEntryManager->getByInvoiceSource($creditNote);
-            $idPrefix = $this->getIdPrefix($creditNote);
-            $fields1Source = $this->addIdPrefix($this->getFields1Source($creditNote, $localEntryInfo), $idPrefix);
+        $idPrefix = $this->getIdPrefix($source);
+        if (!$this->isSubmitted()) {
+            $fields[$idPrefix . 'invoice_show'] = [
+                'type' => 'button',
+                'value' => $this->t('show'),
+                'attributes' => [
+                    'class' => ['acumulus-ajax', 'acumulus-auto-click'],
+                ],
+            ];
+        } else {
+            // 1st fieldset: the order (the main source).
+            $localEntryInfo = $this->acumulusEntryManager->getByInvoiceSource($source);
+            $idPrefix = $this->getIdPrefix($source);
+            $fields1Source = $this->addIdPrefix($this->getFields1Source($source, $localEntryInfo), $idPrefix);
             $fields[$idPrefix] = [
-                'type' => 'details',
-                'summary' => ucfirst($this->t($creditNote->getType())) . ' ' . $creditNote->getReference(),
+                'type' => 'fieldset',
                 'fields' => $fields1Source,
             ];
+
+            // Other fieldsets: credit notes.
+            $creditNotes = $source->getCreditNotes();
+            foreach ($creditNotes as $creditNote) {
+                $localEntryInfo = $this->acumulusEntryManager->getByInvoiceSource($creditNote);
+                $idPrefix = $this->getIdPrefix($creditNote);
+                $fields1Source = $this->addIdPrefix($this->getFields1Source($creditNote, $localEntryInfo), $idPrefix);
+                $fields[$idPrefix] = [
+                    'type' => 'details',
+                    'summary' => ucfirst($this->t($creditNote->getType())) . ' ' . $creditNote->getReference(),
+                    'fields' => $fields1Source,
+                ];
+            }
         }
         return $fields;
     }

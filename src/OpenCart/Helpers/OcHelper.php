@@ -42,7 +42,7 @@ class OcHelper
     }
 
     /**
-     * Adds the messages to the resp sets of messages in $data.
+     * Adds the messages to the respective sets of messages in $data.
      *
      * @param Message[] $messages
      */
@@ -126,7 +126,7 @@ class OcHelper
     }
 
     /**
-     * Controller action: show/process the settings form for this module.
+     * Controller action: show/process the settings form.
      *
      * @throws \Exception
      */
@@ -165,7 +165,7 @@ class OcHelper
     }
 
     /**
-     * Controller action: show/process the settings form for this module.
+     * Controller action: show/process the settings form.
      */
     public function advancedConfig()
     {
@@ -174,7 +174,7 @@ class OcHelper
     }
 
     /**
-     * Controller action: show/process the settings form for this module.
+     * Controller action: show/process the settings form.
      */
     public function batch()
     {
@@ -183,12 +183,23 @@ class OcHelper
     }
 
     /**
-     * Controller action: show/process the register form for this module.
+     * Controller action: show/process the register form.
      */
     public function register()
     {
         $this->displayFormCommon('register');
         $this->renderFormCommon('register');
+    }
+
+    /**
+     * Controller action: process and refresh the register form.
+     */
+    public function invoice()
+    {
+        $output = $this->renderFormInvoice(null);
+        // Send the output.
+        $this->registry->response->addHeader('Content-Type: application/json;charset=utf-8');
+        $this->registry->response->setOutput(json_encode(['content' => $output]));
     }
 
     /**
@@ -326,36 +337,70 @@ class OcHelper
     }
 
     /**
+     * Adds css and js to our status overview on the order info view.
+     */
+    public function eventControllerSaleOrderInfo()
+    {
+        $this->registry->document->addStyle('view/stylesheet/acumulus.css');
+        $this->registry->document->addScript('view/javascript/acumulus/acumulus-ajax.js');
+    }
+
+    /**
+     * Adds our status overview as a tab to the order info view.
+     *
+     * @param int $orderId
+     *   The order id to show the Acumulus invoice status for.
+     * @param array $tabs
+     *   The tabs that will be displayed along the 'History' and 'Additional'
+     *   tabs.
+     */
+    public function eventViewSaleOrderInfo($orderId, &$tabs)
+    {
+        $type= 'invoice';
+        $id = "acumulus-$type";
+        $output = $this->renderFormInvoice($orderId);
+
+        $tab = new \stdClass();
+        $tab->code = $id;
+        $tab->title = $this->t("{$type}_form_title");
+        $tab->content = $output;
+        $tabs[] = $tab;
+    }
+
+    /**
      * Performs the common tasks when displaying a form.
      *
-     * @param string $task
+     * @param string $type
+     *   The type of the form to display.
      */
-    protected function displayFormCommon($task)
+    protected function displayFormCommon($type)
     {
         // This will initialize the form translations.
-        $this->container->getForm($task);
-
-        $this->registry->document->addStyle('view/stylesheet/acumulus.css');
+        $this->data['form'] = $this->container->getForm($type);
 
         $this->data['success_messages'] = array();
         $this->data['warning_messages'] = array();
         $this->data['error_messages'] = array();
 
-        // Set the page title.
-        $this->registry->document->setTitle($this->t("{$task}_form_title"));
-        $this->data["page_title"] = $this->t("{$task}_form_title");
-        $this->data["heading_title"] = $this->t("{$task}_form_header");
-        $this->data["text_edit"] = $this->t("{$task}_form_header");
+        if ($this->data['form']->isFullPage()) {
+            $this->registry->document->addStyle('view/stylesheet/acumulus.css');
 
-        // Set up breadcrumb.
-        $this->data['breadcrumbs'] = array();
-        $this->data['breadcrumbs'][] = array(
-            'text' => $this->t('text_home'),
-            'href' => $this->registry->getLink('common/dashboard'),
-            'separator' => false
-        );
+            // Set the page title.
+            $this->registry->document->setTitle($this->t("{$type}_form_title"));
+            $this->data["page_title"] = $this->t("{$type}_form_title");
+            $this->data["heading_title"] = $this->t("{$type}_form_header");
+            $this->data["text_edit"] = $this->t("{$type}_form_header");
 
-        $this->displayCommonParts();
+            // Set up breadcrumb.
+            $this->data['breadcrumbs'] = array();
+            $this->data['breadcrumbs'][] = array(
+                'text' => $this->t('text_home'),
+                'href' => $this->registry->getLink('common/dashboard'),
+                'separator' => false
+            );
+
+            $this->displayCommonParts();
+        }
     }
 
     /**
@@ -371,12 +416,14 @@ class OcHelper
     /**
      * Performs the common tasks when processing and rendering a form.
      *
-     * @param string $task
+     * @param string $type
+     *   The type of the form to display.
      */
-    protected function renderFormCommon($task)
+    protected function renderFormCommon($type)
     {
         // Process the form if it was submitted and render it again.
-        $form = $this->container->getForm($task);
+        /** @var \Siel\Acumulus\Helpers\Form $form */
+        $form = $this->data['form'];
         $form->process();
         // Force the creation of the fields to get connection error messages
         // shown.
@@ -385,28 +432,51 @@ class OcHelper
         // Show messages.
         $this->addMessages($form->getMessages());
 
-        $this->data['form'] = $form;
         $this->data['formRenderer'] = $this->container->getFormRenderer();
 
-        // Complete the breadcrumb with the current path.
-        $link = $this->getLocation();
-        if ($task !== 'config') {
-            $link .= "/$task";
+        if ($form->isFullPage()) {
+            // Complete the breadcrumb with the current path.
+            $link = $this->getLocation();
+            if ($type !== 'config') {
+                $link .= "/$type";
+            }
+            $this->data['breadcrumbs'][] = array(
+                'text' => $this->t("{$type}_form_header"),
+                'href' => $this->registry->getLink($link),
+                'separator' => ' :: '
+            );
+
+            // Set the action buttons (action + text).
+            $this->data['action'] = $this->registry->getLink($link);
+            $this->data['button_icon'] = $type === 'batch' ? 'fa-envelope-o' : ($type === 'uninstall' ? 'fa-delete' : ($type === 'register' ? 'fa-plus' : 'fa-save'));
+            $this->data['button_save'] = $this->t("button_submit_$type");
+            $this->data['cancel'] = $this->registry->getLink('common/dashboard');
+            $this->data['button_cancel'] = $type === 'uninstall' ? $this->t('button_cancel_uninstall') : $this->t('button_cancel');
+            $this->setOutput();
         }
-        $this->data['breadcrumbs'][] = array(
-            'text' => $this->t("{$task}_form_header"),
-            'href' => $this->registry->getLink($link),
-            'separator' => ' :: '
-        );
+    }
 
-        // Set the action buttons (action + text).
-        $this->data['action'] = $this->registry->getLink($link);
-        $this->data['button_icon'] = $task === 'batch' ? 'fa-envelope-o' : ($task === 'uninstall' ? 'fa-delete' : ($task === 'register' ? 'fa-plus' : 'fa-save'));
-        $this->data['button_save'] = $form->needsFormAndSubmitButton() ? $this->t("button_submit_$task") : '';
-        $this->data['cancel'] = $this->registry->getLink('common/dashboard');
-        $this->data['button_cancel'] = $task === 'uninstall' ? $this->t('button_cancel_uninstall') : $this->t('button_cancel');
+    protected function renderFormInvoice($orderId)
+    {
+        $type = 'invoice';
+        $this->displayFormCommon($type);
+        if ($orderId !== null) {
+            $orderId = (int) $orderId;
+            /** @var \Siel\Acumulus\Shop\InvoiceStatusForm $form */
+            $form = $this->data['form'];
+            $form->setSource($this->container->getSource(Source::Order, $orderId));
+        }
+        $this->renderFormCommon($type);
 
-        $this->setOutput();
+        $id = "acumulus-$type";
+        $url = $this->container->getShopCapabilities()->getLink('invoice');
+        $wait = $this->t('wait');
+        $output = '';
+        $output .= "<form method='POST' action='$url' id='$id' class='form-horizontal acumulus-area' data-acumulus-wait='$wait'>";
+        $output .= '<h3>' . $this->t("{$type}_form_header") . '</h3>';
+        $output .= $this->data['formRenderer']->render($this->data['form']);
+        $output .= '</form>';
+        return $output;
     }
 
     /**
@@ -550,6 +620,8 @@ class OcHelper
         $model->addEvent('acumulus','admin/model/*/addOrder/after',$location . '/eventOrderUpdate');
         $model->addEvent('acumulus','admin/model/*/addOrderHistory/after',$location . '/eventOrderUpdate');
         $model->addEvent('acumulus','admin/view/common/column_left/before',$location . '/eventViewColumnLeft');
+        $model->addEvent('acumulus','admin/controller/sale/order/info/before',$location . '/eventControllerSaleOrderInfo');
+        $model->addEvent('acumulus','admin/view/sale/order_info/before',$location . '/eventViewSaleOrderInfo');
     }
 
     /**

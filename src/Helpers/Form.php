@@ -118,14 +118,15 @@ abstract class Form extends MessageCollection
 
     /**
      * @var bool
-     *   Whether this forms needs to be followed by a submit button and
-     *   surrounded by a form tag.
+     *   Whether this form is a full page form, thus surrounded by a <form> tag
+     *   and having a possibly standardized submit button.
      *
-     *   Not all "forms" as defined by this library are real forms in the sense
-     *   of being enclosed in a <form> tag and having a "submit" button rendered
-     *   following the standards of the specific webshop/CMS.
+     *   Not all "forms" as defined by this library are real forms (in the sense
+     *   of being enclosed in a <form> tag) or full page forms (having a
+     *   "submit" button rendered following the standards of the specific
+     *   webshop/CMS).
      */
-    protected $needsFormAndSubmitButton = true;
+    protected $isFullPage = true;
 
     /**
      * @var bool
@@ -160,6 +161,7 @@ abstract class Form extends MessageCollection
         $pos = strrpos($class, '\\');
         $class = $pos !== false ? substr($class, $pos + 1) : $class;
         $classParts = preg_split('/([[:upper:]][[:lower:]]+)/', $class, null, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
+        /** @noinspection PhpParamsInspection */
         $this->type = strtolower(is_array($classParts) && !empty($classParts) ? reset($classParts) : $class);
     }
 
@@ -191,10 +193,12 @@ abstract class Form extends MessageCollection
 
     /**
      * @return bool
+     *   Whether this form is a full page form, thus surrounded by a <form> tag
+     *   and having a possibly standardized submit button.
      */
-    public function needsFormAndSubmitButton()
+    public function isFullPage()
     {
-        return $this->needsFormAndSubmitButton;
+        return $this->isFullPage;
     }
 
     /**

@@ -18,15 +18,18 @@ WC2 = WooCommerce 2 (WordPress) (wordt niet meer ondersteund sinds 5.5.2)
 WC3 = WooCommerce 3 (WordPress)
 WC4 = WooCommerce 4 (WordPress)
 
-6.1.0 (2020-11-??)
+6.1.0 (2020-12-??)
 ------------------
 Features:
-- PS: Ook in PrestaShop wordt nu het factuurstatusoverzicht getoond (uiteraard
-  inclusief de verbeteringen die hieronder staan).
-- WC|MA: Op het factuurstatusoverzicht kun je nu de factuurgegevens opnieuw
+- PS: PS 1.5 and 1.6 will probably not work anymore, so only PS1.7 remains
+  supported.
+- PS|OC|VM: Het factuurstatusoverzicht is nu ook aan PrestaShop, OpenCart en
+  VirtueMart toegevoegd.
+- ALL: Het factuurstatusoverzicht wordt nu geladen via lazy-load.
+- ALL: Op het factuurstatusoverzicht kun je nu de factuurgegevens opnieuw
   versturen als er een fout is ontdekt tussen de bestelling in de webshop en de
   factuur in Acumulus.
-- WC|MA: Op het factuurstatusoverzicht heeft het veld waarop je de betaaldatum
+- ALL: Op het factuurstatusoverzicht heeft het veld waarop je de betaaldatum
   kunt invullen nu een standaardwaarde die op dezelfde manier bepaald wordt als
   bij automatische verzending.
 - WC: Tekst "buitenlandse btw" ingekort.
@@ -35,16 +38,26 @@ Features:
 - ALL: Sta toe dat fieldsets geen fields hebben, alleen een titel en
   beschrijving.
 - JOO: Use html 5 date fields instead of old date fields from Joomla self.
+- WC: Use html 5 date fields instead of adding the jquery date picker.
 
 Bugs:
+- PS: PS1.7.7.0 introduced a property Module::confirmUninstall that we already
+  use in our AcumulusModule, so we had to rename our (internal) property.
 - PS: Instellingenformulier: password wordt niet meegestuurd, dus maak het niet
   verplicht en accepteer leeg als "geen verandering".
 - PS: Het registratieformulier dient niet zichtbaar te zijn in het admin menu.
+- JOO: Each instance of AcumulusModelAcumulus created its own instance of the
+  Acumlus Container.
 
 Refactorings:
+- ALL: Property (+ method) Form::needsFormAndSubmitButton renamed to isFullPage.
 - ALL: Naming: do not use "Header" in fieldset ids.
-- ALL: Do no longer place hiddnefields in wrappers.
+- ALL: Naming: shorten form id's to acumulus-{type}.
+- ALL: Do no longer place hidden fields in wrappers.
 - OC: Improved multi class handling in FormRenderer.
+- PS: Controllers now inherits from ModuleAdminController (was AdminController).
+- JOO: Refactored base module file and AcumulusController class, moved css
+  loading to view, we do no longer use a template for just 3 lines of html.
 
 6.0.4 (2020-11-15)
 ------------------

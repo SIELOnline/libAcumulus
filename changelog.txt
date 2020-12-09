@@ -61,6 +61,8 @@ Refactorings:
 - PS: Controllers now inherits from ModuleAdminController (was AdminController).
 - JOO: Refactored base module file and AcumulusController class, moved css
   loading to view, we do no longer use a template for just 3 lines of html.
+- MA: Lazy loading of the invoice status form is now done on page load, not on
+  tab show.
 
 6.0.4 (2020-11-15)
 ------------------

@@ -13,14 +13,14 @@ class FormMapper extends BaseFormMapper
     /**
      * {@inheritdoc}
      */
-    protected function getMagentoProperty($key, $value, $type)
+    protected function getMagentoProperty(array $config, $key, $value, $type)
     {
-        $result = parent::getMagentoProperty($key, $value, $type);
+        $config = parent::getMagentoProperty($config, $key, $value, $type);
 
         if ($key === 'type' && $value === 'date') {
-            $result['format'] = static::DateFormat;
-            $result['image'] = \Mage::getDesign()->getSkinUrl('images/grid-cal.gif');
+            $config['format'] = static::DateFormat;
+            $config['image'] = \Mage::getDesign()->getSkinUrl('images/grid-cal.gif');
         }
-        return $result;
+        return $config;
     }
 }

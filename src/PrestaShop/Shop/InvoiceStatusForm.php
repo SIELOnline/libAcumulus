@@ -37,7 +37,6 @@ class InvoiceStatusForm extends BaseInvoiceStatusForm
                 'type' => 'fieldset',
                 'legend' => 'Acumulus',
                 'fields' => $allFields,
-                'icon' => 'icon-acumulus',
             ]
         ];
 

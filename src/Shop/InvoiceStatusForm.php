@@ -83,7 +83,7 @@ class InvoiceStatusForm extends Form
     protected $status;
 
     /**
-     * A message indicating why the status is not OK..
+     * A message indicating why the status is not OK.
      *
      * @var string
      */
@@ -453,6 +453,8 @@ class InvoiceStatusForm extends Form
 
         $idPrefix = $this->getIdPrefix($source);
         if (!$this->isSubmitted()) {
+            // We are loading the form for the first time: just add a "show"
+            // button to lazy load it (so no calls to the Acumulus API).
             $fields[$idPrefix . 'invoice_show'] = [
                 'type' => 'button',
                 'value' => $this->t('show'),

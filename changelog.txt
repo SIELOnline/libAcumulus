@@ -21,8 +21,6 @@ WC4 = WooCommerce 4 (WordPress)
 6.1.0 (2020-12-??)
 ------------------
 Features:
-- PS: PS 1.5 and 1.6 will probably not work anymore, so only PS1.7 remains
-  supported.
 - PS|OC|VM|HS: Het factuurstatusoverzicht is nu ook aan PrestaShop, OpenCart,
   VirtueMart en HikaShop toegevoegd.
 - ALL: Het factuurstatusoverzicht wordt nu geladen via lazy-load.
@@ -32,6 +30,9 @@ Features:
 - ALL: Op het factuurstatusoverzicht heeft het veld waarop je de betaaldatum
   kunt invullen nu een standaardwaarde die op dezelfde manier bepaald wordt als
   bij automatische verzending.
+- PS: html5 details elements worden nu nagebootst met javascript en css opmaak.
+- PS: PS 1.5 and 1.6 will probably not work anymore, so only PS1.7 remains
+  supported.
 - WC: Tekst "buitenlandse btw" ingekort.
 - ALL: Het registratieformulier maakt geen gebruik meer van html <details>. Dit
   zodat het in alle ondersteunde webshops correct getoond wordt.
@@ -50,6 +51,8 @@ Bugs:
   Acumlus Container.
 
 Refactorings:
+- ALL: Generalised webshop specific form field processing (e.g. adding icons in
+  PrestaShop).
 - ALL: Property (+ method) Form::needsFormAndSubmitButton renamed to isFullPage.
 - ALL: Naming: do not use "Header" in fieldset ids.
 - ALL: Naming: shorten form id's to acumulus-{type}.

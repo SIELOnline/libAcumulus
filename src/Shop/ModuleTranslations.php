@@ -36,7 +36,7 @@ class ModuleTranslations extends TranslationCollection
         'message_uninstall' => 'Wilt u de configuratie-instellingen verwijderen?',
         'unknown' => 'onbekend',
         'option_empty' => 'Maak uw keuze',
-
+        'click_to_toggle' => '<span>(klik om te tonen of te verbergen)</span>',
         'date_format' => 'jjjj-mm-dd',
     );
 
@@ -58,6 +58,7 @@ class ModuleTranslations extends TranslationCollection
         'message_uninstall' => 'Are you sure that you want to delete the configuration settings?',
         'unknown' => 'unknown',
         'option_empty' => 'Select one',
+        'click_to_toggle' => '<span>(click to show or hide)</span>',
 
         'date_format' => 'yyyy-mm-dd',
     );

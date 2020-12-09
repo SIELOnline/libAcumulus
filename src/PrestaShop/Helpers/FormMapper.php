@@ -75,6 +75,7 @@ class FormMapper extends BaseFormMapper
                 'legend' => array(
                     'title' => !empty($field['summary']) ? $field['summary'] : $field['legend'],
                 ),
+                'attributes' => ['class' => 'details'],
                 'input' => $this->fields($field['fields']),
             ),
         );

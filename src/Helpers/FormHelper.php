@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\Helpers;
 
+use Siel\Acumulus\Tag;
 use stdClass;
 
 /**
@@ -23,6 +24,9 @@ class FormHelper
      */
     const Unique = 'UNIQUE_';
 
+    /** @var \Siel\Acumulus\Helpers\Translator */
+    protected $translator;
+
     /**
      * Meta data about the fields on the form.
      *
@@ -33,6 +37,31 @@ class FormHelper
      * @var object[]|null
      */
     protected $meta = array();
+
+    /**
+     * FormHelper constructor.
+     *
+     * @param \Siel\Acumulus\Helpers\Translator $translator
+     */
+    public function __construct(Translator $translator)
+    {
+        $this->translator = $translator;
+    }
+
+    /**
+     * Helper method to translate strings.
+     *
+     * @param string $key
+     *  The key to get a translation for.
+     *
+     * @return string
+     *   The translation for the given key or the key itself if no translation
+     *   could be found.
+     */
+    protected function t($key)
+    {
+        return $this->translator->get($key);
+    }
 
     /**
      * @return object[]|null
@@ -323,5 +352,47 @@ class FormHelper
             default:
                 return '';
         }
+    }
+
+    /**
+     * Process all fields.
+     *
+     * @param array $fields
+     *
+     * @return array[]
+     *   The fields with the details processed
+     */
+    public function processFields(array $fields)
+    {
+        foreach ($fields as $key => &$field) {
+            $field = $this->processField($field, $key);
+            // Recursively process children.
+            if (isset($field['fields'])) {
+                $field['fields'] = $this->processFields($field['fields']);
+            }
+        }
+        return $fields;
+    }
+
+    /**
+     * (Non recursively) processes 1 field.
+     *
+     * @param array $field
+     * @param string $key
+     *
+     * @return array
+     *   The processed field.
+     */
+    protected function processField(array $field, $key)
+    {
+        // Add help text to details fields.
+        if ($field['type'] === 'details') {
+            if (!empty($field['summary'])) {
+                $field['summary'] .= $this->t('click_to_toggle');
+            } else {
+                $field['summary'] = $this->t('click_to_toggle');
+            }
+        }
+        return $field;
     }
 }

@@ -308,7 +308,7 @@ class Container
     public function getFormHelper()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('FormHelper', 'Helpers');
+        return $this->getInstance('FormHelper', 'Helpers', array($this->getTranslator()));
     }
 
     /**

@@ -548,6 +548,7 @@ abstract class Form extends MessageCollection
             if ($this->addSeverityClassToFields && $this->hasRealMessages()) {
                 $this->fields = $this->formHelper->addSeverityClassToFields($this->fields, $this->getMessages());
             }
+            $this->fields = $this->formHelper->processFields($this->fields);
         }
         return $this->fields;
     }

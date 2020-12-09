@@ -2,6 +2,7 @@
 namespace Siel\Acumulus\PrestaShop\Helpers;
 
 use Siel\Acumulus\Helpers\FormHelper as BaseFormHelper;
+use Siel\Acumulus\Tag;
 use Tools;
 
 /**
@@ -11,6 +12,31 @@ class FormHelper extends BaseFormHelper
 {
     /** @var string */
     protected $moduleName = 'acumulus';
+
+    protected $icons = [
+        'acumulus' => 'icon-acumulus',
+        'accountSettings' => 'icon-user',
+        'shopSettings' => 'icon-shopping-cart',
+        'triggerSettings' => 'icon-exchange',
+        'invoiceSettings' => 'icon-list-alt',
+        'paymentMethodAccountNumberFieldset' => 'icon-credit-card',
+        'paymentMethodCostCenterFieldset' => 'icon-credit-card',
+        'emailAsPdfSettingsHeader' => 'icon-file-pdf-o',
+        'pluginSettings' => 'icon-puzzle-piece',
+        'versionInformation' => 'icon-info-circle',
+        'advancedConfig' => 'icon-cogs',
+        'configHeader' => 'icon-cogs',
+        'tokenHelpHeader' => 'icon-question-circle',
+        'relationSettingsHeader' => 'icon-users',
+        'optionsSettingsHeader' => 'icon-indent',
+        'batchFields' => 'icon-exchange',
+        'batchLog' => 'icon-list',
+        'batchInfo' => 'icon-info-circle',
+        'congratulations' => 'icon-thumbs-up',
+        'loginDetails' => 'icon-key',
+        'apiLoginDetails' => 'icon-key',
+        'whatsNext' => 'icon-forward',
+    ];
 
     /**
      * {@inheritdoc}
@@ -76,5 +102,38 @@ class FormHelper extends BaseFormHelper
             }
         }
         return $formValues;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * This override adds a "details" class to all details fields, thereby
+     * allowing a js solution.
+     */
+    public function processField(array $field, $key)
+    {
+        $field = parent::processField($field, $key);
+
+        // Password fields are rendered (and may remain) empty to indicate no
+        // change.
+        if ($key === Tag::Password) {
+            $field['attributes']['required'] = false;
+        }
+
+        // Add icon to headers.
+        if (isset($this->icons[$key])) {
+            $field['icon'] = $this->icons[$key];
+        }
+
+        // Add class "details" to icon (part of headers).
+        if ($field['type'] === 'details') {
+            if (empty($field['icon'])) {
+                $field['icon'] = 'details';
+            } else {
+                $field['icon'] .= ' details';
+            }
+        }
+
+        return $field;
     }
 }

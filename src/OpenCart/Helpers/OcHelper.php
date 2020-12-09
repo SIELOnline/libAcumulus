@@ -341,8 +341,10 @@ class OcHelper
      */
     public function eventControllerSaleOrderInfo()
     {
-        $this->registry->document->addStyle('view/stylesheet/acumulus.css');
-        $this->registry->document->addScript('view/javascript/acumulus/acumulus-ajax.js');
+        if ($this->container->getConfig()->getInvoiceStatusSettings()['showInvoiceStatus']) {
+            $this->registry->document->addStyle('view/stylesheet/acumulus.css');
+            $this->registry->document->addScript('view/javascript/acumulus/acumulus-ajax.js');
+        }
     }
 
     /**
@@ -356,15 +358,17 @@ class OcHelper
      */
     public function eventViewSaleOrderInfo($orderId, &$tabs)
     {
-        $type= 'invoice';
-        $id = "acumulus-$type";
-        $output = $this->renderFormInvoice($orderId);
+        if ($this->container->getConfig()->getInvoiceStatusSettings()['showInvoiceStatus']) {
+            $type = 'invoice';
+            $id = "acumulus-$type";
+            $output = $this->renderFormInvoice($orderId);
 
-        $tab = new \stdClass();
-        $tab->code = $id;
-        $tab->title = $this->t("{$type}_form_title");
-        $tab->content = $output;
-        $tabs[] = $tab;
+            $tab = new \stdClass();
+            $tab->code = $id;
+            $tab->title = $this->t("{$type}_form_title");
+            $tab->content = $output;
+            $tabs[] = $tab;
+        }
     }
 
     /**

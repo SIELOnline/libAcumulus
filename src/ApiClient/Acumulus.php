@@ -66,11 +66,10 @@ class Acumulus
      *     general/general_about.php. Not authorized to perform request.
      *
      * @see https://www.siel.nl/acumulus/API/Misc/About/
-     *   for more information about the contents of the returned array.
      */
     public function getAbout()
     {
-        return $this->callApiFunction('general/general_about', array())->setMainResponseKey('general', false);
+        return $this->callApiFunction('general/general_about', [])->setMainResponseKey('general', false);
     }
 
     /**
@@ -79,25 +78,33 @@ class Acumulus
      * @return \Siel\Acumulus\ApiClient\Result
      *   The result of the webservice call. The structured response will contain
      *   1 "mydata" array, being a keyed array with keys:
-     *   - mycontractcode
+     *   - myaddress
+     *   - mycity
      *   - mycompanyname
      *   - mycontactperson
-     *   - myaddress
-     *   - mypostalcode
-     *   - mycity
-     *   - mytelephone
-     *   - myemail
-     *   - myiban
-     *   - mysepamandatenr
+     *   - mycontractcode
      *   - mycontractenddate
+     *   - mydebt
+     *   - myemail
+     *   - myemailstatusid
+     *   - myemailstatusreferenceid
+     *   - myentries
+     *   - myentriesleft
+     *   - myiban
+     *   - mymaxentries
+     *   - mypostalcode
+     *   - mysalutation
+     *   - mysepamandatenr
+     *   - mystatusid
+     *   - mytelephone
+     *   - myvatnumber
      *   Possible errors:
      *
      * @see https://www.siel.nl/acumulus/API/Misc/My_Acumulus/
-     *   for more information about the contents of the returned array.
      */
     public function getMyAcumulus()
     {
-        return $this->callApiFunction('general/my_acumulus', array())->setMainResponseKey('mydata', false);
+        return $this->callApiFunction('general/my_acumulus', [])->setMainResponseKey('mydata', false);
     }
 
     /**
@@ -116,6 +123,24 @@ class Acumulus
     public function getPicklistAccounts()
     {
         return $this->getPicklist('accounts');
+    }
+
+    /**
+     * Retrieves a list of invoice templates.
+     *
+     * @return \Siel\Acumulus\ApiClient\Result
+     *   The result of the webservice call. The structured response will contain
+     *   a non-keyed array of "companytype" arrays, each "companytype"
+     *   array being a keyed array with keys:
+     *   - companytypeid
+     *   - companytypename
+     *   - companytypenamenl
+     *
+     * @see https://www.siel.nl/acumulus/API/Picklists/Company_Types/
+     */
+    public function getPicklistCompanyTypes()
+    {
+        return $this->getPicklist('companytypes', [], false);
     }
 
     /**
@@ -170,21 +195,40 @@ class Acumulus
     }
 
     /**
-     * Retrieves a list of invoice templates.
+     * Retrieves a list of products.
+     *
+     * @param ?string $filter
+     * @param ?int $producttagid
      *
      * @return \Siel\Acumulus\ApiClient\Result
      *   The result of the webservice call. The structured response will contain
-     *   a non-keyed array of "companytype" arrays, each "companytype"
+     *   a non-keyed array of "product" arrays, each "product"
      *   array being a keyed array with keys:
-     *   - companytypeid
-     *   - companytypename
-     *   - companytypenamenl
+     *   - productid
+     *   - productnature
+     *   - productdescription
+     *   - producttagid
+     *   - productcontactid
+     *   - productprice
+     *   - productvatrate
+     *   - productsku
+     *   - productstockamount
+     *   - productean
+     *   - producthash
+     *   - productnotes
      *
-     * @see https://www.siel.nl/acumulus/API/Picklists/Company_Types/
+     * @see https://www.siel.nl/acumulus/API/Picklists/Products/
      */
-    public function getPicklistCompanyTypes()
+    public function getPicklistProducts($filter = null, $producttagid = null)
     {
-        return $this->callApiFunction('picklists/picklist_companytypes', [], false)->setMainResponseKey('companytypes', true);
+        $filters = [];
+        if ($filter !== null) {
+            $filters['filter'] = (string) $filter;
+        }
+        if ($producttagid !== null) {
+            $filters['producttagid'] = (int) $producttagid;
+        }
+        return $this->getPicklist('products', $filters);
     }
 
     /**
@@ -197,17 +241,22 @@ class Acumulus
      * @param string $picklist
      *   The picklist to retrieve, specify in plural form: accounts,
      *   contacttypes, costcenters, etc.
+     * @param array $filters
+     *   A set of filters to filter the picklist. Currently only the Products
+     *   picklist supports filters.
+     * @param bool $needContract
+     *   Whether the contract part needs to be send with the request.
      *
      * @return \Siel\Acumulus\ApiClient\Result
      *   The result of the webservice call. The structured response will contain
      *   a non-keyed array of "picklist" arrays, each 'picklist' array being a
      *   keyed array with keys that depend on the requested picklist.
      */
-    protected function getPicklist($picklist)
+    protected function getPicklist($picklist, array $filters = [], $needContract = true)
     {
         // For picklists, the main result is found under the name of the
         // picklist but in singular form, i.e. without the s at the end.
-        return $this->callApiFunction("picklists/picklist_$picklist", array())->setMainResponseKey($picklist, true);
+        return $this->callApiFunction("picklists/picklist_$picklist", $filters, $needContract)->setMainResponseKey($picklist, true);
     }
 
     /**
@@ -226,17 +275,16 @@ class Acumulus
      *   - vatrate
      *
      * @see https://www.siel.nl/acumulus/API/Picklists/VAT_Info/
-     *   for more information about the contents of the returned array.
      */
     public function getVatInfo($countryCode, $date = '')
     {
         if (empty($date)) {
             $date = date(API::DateFormat_Iso);
         }
-        $message = array(
+        $message = [
             'vatdate' => $date,
             'vatcountry' => $countryCode,
-        );
+        ];
         return $this->callApiFunction('lookups/lookup_vatinfo', $message, true)->setMainResponseKey('vatinfo', true);
     }
 
@@ -289,9 +337,9 @@ class Acumulus
      */
     public function getConceptInfo($conceptId)
     {
-        $message = array(
+        $message = [
             'conceptid' => (int) $conceptId,
-        );
+        ];
         return $this->callApiFunction('invoices/invoice_concept_info', $message)->setMainResponseKey('concept');
     }
 
@@ -337,9 +385,9 @@ class Acumulus
      */
     public function getEntry($entryId)
     {
-        $message = array(
+        $message = [
             'entryid' => (int) $entryId,
-        );
+        ];
         return $this->callApiFunction('entry/entry_info', $message)->setMainResponseKey('entry');
     }
 
@@ -371,10 +419,10 @@ class Acumulus
      */
     public function setDeleteStatus($entryId, $deleteStatus)
     {
-        $message = array(
+        $message = [
             'entryid' => (int) $entryId,
             'entrydeletestatus' => (int) $deleteStatus,
-        );
+        ];
         return $this->callApiFunction('entry/entry_deletestatus_set', $message)->setMainResponseKey('entry');
     }
 
@@ -401,9 +449,9 @@ class Acumulus
      */
     public function getPaymentStatus($token)
     {
-        $message = array(
+        $message = [
             'token' => (string) $token,
-        );
+        ];
         return $this->callApiFunction('invoices/invoice_paymentstatus_get', $message)->setMainResponseKey('invoice');
     }
 
@@ -439,11 +487,11 @@ class Acumulus
         if (empty($paymentDate)) {
             $paymentDate = date(API::DateFormat_Iso);
         }
-        $message = array(
+        $message = [
             'token' => (string) $token,
             'paymentstatus' => (int) $paymentStatus,
             'paymentdate' => (string) $paymentDate,
-        );
+        ];
         return $this->callApiFunction('invoices/invoice_paymentstatus_set', $message)->setMainResponseKey('invoice');
     }
 
@@ -484,11 +532,11 @@ class Acumulus
      */
     public function emailInvoiceAsPdf($token, $invoiceType, array $emailAsPdf, $invoiceNotes = '')
     {
-        $message = array(
+        $message = [
             'token' => (string) $token,
             'invoicetype' => (int) $invoiceType,
             'emailaspdf' => $emailAsPdf,
-        );
+        ];
         if (!empty($invoiceNotes)) {
             $message['invoicenotes'] = (string) $invoiceNotes;
         }
@@ -548,10 +596,52 @@ class Acumulus
      */
     public function signUp(array $signUp)
     {
-        $message = array(
+        $message = [
             'signup' => $signUp,
-        );
+        ];
         return $this->callApiFunction('signup/signup', $message, false)->setMainResponseKey('signup');
+    }
+
+    /**
+     * Updates the stock for a product.
+     *
+     * @param int $productId
+     *   The id of the product for which to update the stock.
+     * @param float $quantity
+     *   The quantity to update the actual stock with. Use a positive number for
+     *   an increase in stock (typically with a return), a negative number for a
+     *   decrease of stock (typically with an order).
+     * @param string $description
+     *   The description to store with the stock update. Ideally, this field
+     *   should identify the system and transaction that triggered the update
+     *   In this context thus probably shop and order/refund number.
+     * @param string $date
+     *   ISO date string (yyyy-mm-dd) for the date to set as update date for the
+     *   stock update.
+     *
+     * @return \Siel\Acumulus\ApiClient\Result
+     *   The result of the webservice call. The structured response will contain
+     *   1 "stock" array, being a keyed array with keys:
+     *   - productid
+     *   - stockamount (the new stock level for this product)
+     *   Possible errors:
+     *
+     * @see https://www.siel.nl/acumulus/API/Stock/Add_Stock_Transaction/
+     */
+    public function stockAdd($productId, $quantity, $description, $date = null)
+    {
+        if (empty($date)) {
+            $date = date(API::DateFormat_Iso);
+        }
+        $message = [
+            'stock' => [
+                'productid' => (int) $productId,
+                'stockamount' => (float) $quantity,
+                'stockdescription' => $description,
+                'stockdate' => $date,
+            ]
+        ];
+        return $this->callApiFunction('stock/stock_add', $message)->setMainResponseKey('stock');
     }
 
     /**

@@ -40,7 +40,7 @@ Features:
   beschrijving.
 - JOO: Use html 5 date fields instead of old date fields from Joomla self.
 - WC: Use html 5 date fields instead of adding the jquery date picker.
-
+- ALL: Added support for API calls Picklists/Products and Stock/Stock_Add
 Bugs:
 - PS: PS1.7.7.0 introduced a property Module::confirmUninstall that we already
   use in our AcumulusModule, so we had to rename our (internal) property.

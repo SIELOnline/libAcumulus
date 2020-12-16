@@ -31,7 +31,7 @@ class AcumulusTest extends TestCase
         return [
             'About' => ['getAbout', [], false, ['about', 'role', 'roleapi', 'roleid', 'rolenl']],
             'MyAcumulus' => ['getMyAcumulus', [], false, ['myaddress', 'mycity', 'mycompanyname', 'mycontactperson', 'mycontractcode', 'mycontractenddate', 'mydebt', 'myemail', 'myemailstatusid', 'myemailstatusreferenceid', 'myentries', 'myentriesleft', 'myiban', 'mymaxentries', 'mypostalcode', 'mysalutation', 'mysepamandatenr', 'mystatusid', 'mytelephone', 'myvatnumber']],
-            'Accounts' => ['getPicklistAccounts', [], true, ['accountid', 'accountnumber', 'accountdescription', 'accounttypeid']],
+            'Accounts' => ['getPicklistAccounts', [], true, ['accountid', 'accountnumber', 'accountdescription', 'accountorderid', 'accountstatus', 'accounttypeid']],
             'ContactTypes' => ['getPicklistContactTypes', [], true, ['contacttypeid', 'contacttypename', 'contacttypenamenl']],
             'CostCenters' => ['getPicklistCostCenters', [], true, ['costcenterid', 'costcentername']],
             'InvoiceTemplates' => ['getPicklistInvoiceTemplates', [], true, ['invoicetemplateid', 'invoicetemplatename']],
@@ -73,7 +73,6 @@ class AcumulusTest extends TestCase
             'eu-wrong-date' => [['be', '2014-12-01'], []],
             'gb-eu' => [['gb', '2020-12-01'], [['vattype' => 'reduced', 'vatrate' => '0.0000'],['vattype' => 'reduced', 'vatrate' => '5.0000'],['vattype' => 'normal', 'vatrate' => '20.0000']]],
             'no-eu' => [['af', '2020-12-01'], []],
-            'no-country' => [['ln', '2020-12-01'], []],
         ];
     }
 
@@ -97,10 +96,19 @@ class AcumulusTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
+    /**
+     * Tests call to get VAT info with an invalid country code.
+     */
+    public function testGetVatInfoInvalidCountryCode()
+    {
+        $result = $this->acumulusClient->getVatInfo('ln', '2020-12-01');
+        $this->assertSame(Severity::Error, $result->getStatus());
+        $this->assertNotEmpty($result->getByCodeTag('AA6A45AA'));
+    }
+
     public function stockAddProvider()
     {
         $productId = 1833636;
-        $date = date(API::DateFormat_Iso);
         return [ // $productId, $quantity, $description, $date
             'buy' => [[$productId, -2, 'Bestelling 123', '2020-12-11'], ['productid' => $productId, 'stockamount' => 18]],
             'refund' => [[$productId, 2, 'Refund bestelling 123'], ['productid' => $productId, 'stockamount' => 20]]

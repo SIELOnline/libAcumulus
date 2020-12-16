@@ -117,6 +117,9 @@ class Acumulus
      *   - accountid
      *   - accountnumber
      *   - accountdescription
+     *   - accountorderid
+     *   - accountstatus
+     *   - accounttypeid
      *
      * @see https://www.siel.nl/acumulus/API/Accounts/List_Accounts/
      */
@@ -282,8 +285,8 @@ class Acumulus
             $date = date(API::DateFormat_Iso);
         }
         $message = [
-            'vatdate' => $date,
             'vatcountry' => $countryCode,
+            'vatdate' => $date,
         ];
         return $this->callApiFunction('lookups/lookup_vatinfo', $message, true)->setMainResponseKey('vatinfo', true);
     }

@@ -129,6 +129,9 @@ class Completor
     /** @var (string|int)[][] */
     protected $lineTotalsStates;
 
+    /** @var float[][] */
+    protected $vatRatesCache = [];
+
     /**
      * Constructor.
      *
@@ -338,7 +341,7 @@ class Completor
             switch ($vatType) {
                 case Api::VatType_National:
                 case Api::VatType_MarginScheme:
-                    $vatTypeVatRates = $this->getVatRatesByCountryAndDate('nl');
+                    $vatTypeVatRates = $this->getVatRatesByCountryAndInvoiceDate('nl');
                     // Add vat free (-1):
                     // - if selling vat free products/services
                     // - OR if outside EU AND (services OR company).
@@ -354,7 +357,7 @@ class Completor
                     $vatTypeVatRates = array(0);
                     break;
                 case Api::VatType_ForeignVat:
-                    $vatTypeVatRates = $this->getVatRatesByCountryAndDate($this->invoice[Tag::Customer][Tag::CountryCode]);
+                    $vatTypeVatRates = $this->getVatRatesByCountryAndInvoiceDate($this->invoice[Tag::Customer][Tag::CountryCode]);
                     break;
                 default:
                     $vatTypeVatRates = array();
@@ -1111,7 +1114,7 @@ class Completor
      */
     protected function is0VatRate($vatRate)
     {
-        if (is_array($vatRate) && isset($vatRate)) {
+        if (is_array($vatRate)) {
             $vatRate = isset($vatRate[Tag::VatRate]) ? $vatRate[Tag::VatRate] : null;
         }
         return isset($vatRate) && (Number::isZero($vatRate) || Number::floatsAreEqual($vatRate, -1.0));
@@ -1120,42 +1123,38 @@ class Completor
     /**
      * Helper method to get the vat rates for the current invoice.
      *
-     * - This method contacts the Acumulus server.
+     * - This method contacts the Acumulus server and will cache the results.
      * - The vat rates returned reflect those as they were at the invoice date.
      * - No zero vat rates are returned.
      *
      * @param string $countryCode
-     *   The country to fetch the vat rates for.
-     * @param string|null $date
-     *   The date (yyyy-mm-dd) to fetch the vat rates for.
+     *   The country code of the country to fetch the vat rates for.
      *
      * @return float[]
      *   Actual type will be string[] containing strings representing floats.
      *
      * @see \Siel\Acumulus\ApiClient\Acumulus::getVatInfo().
      */
-    protected function getVatRatesByCountryAndDate($countryCode, $date = null)
+    protected function getVatRatesByCountryAndInvoiceDate($countryCode)
     {
-        if (empty($date)) {
-            $date = $this->getInvoiceDate();
+        $countryCode = strtoupper($countryCode);
+        $date = $this->getInvoiceDate();
+        $cacheKey = "$countryCode&$date";
+        if (!isset($this->vatRatesCache[$cacheKey])) {
+            $result = $this->acumulusApiClient->getVatInfo($countryCode, $date);
+            if ($result->hasRealMessages()) {
+                $this->result->addMessages($result->getMessages(Severity::InfoOrWorse));
+            }
+            $this->vatRatesCache[$cacheKey] = array_column($result->getResponse(), Tag::VatRate);
         }
-        $result = $this->acumulusApiClient->getVatInfo($countryCode, $date);
-        if ($result->hasRealMessages()) {
-            $this->result->addMessages($result->getMessages(Severity::InfoOrWorse));
-        }
-        $vatInfo = $result->getResponse();
-        // PHP5.5: array_column($vatInfo, Tag::VatRate);
-        $vatInfo = array_unique(array_map(function ($vatInfo1) {
-            return $vatInfo1[Tag::VatRate];
-        }, $vatInfo));
-        return $vatInfo;
+        return $this->vatRatesCache[$cacheKey];
     }
 
     /**
      * Returns the invoice date in the iso yyyy-mm-dd format.
      *
      * @return string
-     *   The invoice dae in the iso yyyy-mm-dd format.
+     *   The invoice date in the iso yyyy-mm-dd format.
      */
     protected function getInvoiceDate()
     {
@@ -1175,13 +1174,22 @@ class Completor
     }
 
     /**
-     * Wrapper around Countries::isEu().
+     * Returns whether the country is a EU country outside the Netherlands.
+     *
+     * This method determines whether a country is in or outside the EU based on
+     * fiscal handling of invoices to customers in that country. If vattype 3 -
+     * EU reversed vat - and 6 - foreign vat - are possible it is considered to
+     * be in the EU.
      *
      * @return bool
      */
     protected function isEu()
     {
-        return !$this->isNl() && $this->countries->isEu($this->invoice[Tag::Customer][Tag::CountryCode]);
+        $result = false;
+        if (!$this->isNl()) {
+            $result = !empty($this->getVatRatesByCountryAndInvoiceDate($this->invoice[Tag::Customer][Tag::CountryCode]));
+        }
+        return $result;
     }
 
     /**
@@ -1191,7 +1199,7 @@ class Completor
      */
     protected function isOutsideEu()
     {
-        return !$this->isNl() && !$this->isEu();
+        return !$this->isEu();
     }
 
     /**

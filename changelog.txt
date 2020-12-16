@@ -20,9 +20,13 @@ WC4 = WooCommerce 4 (WordPress)
 
 6.1.0 (2020-12-??)
 ------------------
-Features:
+Important:
+- ALL: Maak de plugin brexit-proof door geen gebruik meer te maken van een hard
+  gecodeerde lijst van EU landen.
 - PS|OC|VM|HS: Het factuurstatusoverzicht is nu ook aan PrestaShop, OpenCart,
   VirtueMart en HikaShop toegevoegd.
+
+Features:
 - ALL: Het factuurstatusoverzicht wordt nu geladen via lazy-load.
 - ALL: Op het factuurstatusoverzicht kun je nu de factuurgegevens opnieuw
   versturen als er een fout is ontdekt tussen de bestelling in de webshop en de

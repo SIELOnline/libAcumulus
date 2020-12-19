@@ -22,7 +22,9 @@ WC4 = WooCommerce 4 (WordPress)
 ------------------
 Important:
 - ALL: Maak de plugin brexit-proof door geen gebruik meer te maken van een hard
-  gecodeerde lijst van EU landen.
+  gecodeerde lijst van EU landen. Dit wordt nu aan de API gevraagd zodat de
+  plugin in de toekomst niet meer bijgewerkt hoeft te worden bij een wijziging
+  hierin.
 - PS|OC|VM|HS: Het factuurstatusoverzicht is nu ook aan PrestaShop, OpenCart,
   VirtueMart en HikaShop toegevoegd.
 
@@ -44,7 +46,8 @@ Features:
   beschrijving.
 - JOO: Use html 5 date fields instead of old date fields from Joomla self.
 - WC: Use html 5 date fields instead of adding the jquery date picker.
-- ALL: Added support for API calls Picklists/Products and Stock/Stock_Add
+- ALL: Added support for "Rekening buiten Acumulus" as account.
+
 Bugs:
 - PS: PS1.7.7.0 introduced a property Module::confirmUninstall that we already
   use in our AcumulusModule, so we had to rename our (internal) property.
@@ -53,8 +56,12 @@ Bugs:
 - PS: Het registratieformulier dient niet zichtbaar te zijn in het admin menu.
 - JOO: Each instance of AcumulusModelAcumulus created its own instance of the
   Acumlus Container.
+- ALL: Accept negative values as id when processing picklists into dropdown
+  lists.
 
 Refactorings:
+- ALL: Added support for API calls Picklists/Products and Stock/Stock_Add
+- ALL: Added support for the enabled/disabled filter on the accounts picklist.
 - ALL: Generalised webshop specific form field processing (e.g. adding icons in
   PrestaShop).
 - ALL: Property (+ method) Form::needsFormAndSubmitButton renamed to isFullPage.

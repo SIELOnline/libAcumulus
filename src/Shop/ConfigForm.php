@@ -23,7 +23,7 @@ class ConfigForm extends BaseConfigForm
 
     /**
      * Array of key => value pairs that can be used in a select and that
-     * represent all accounts defined in Acumulus for the given account.
+     * represent all (bank) accounts defined in Acumulus for the given account.
      *
      * @var array
      */

@@ -110,6 +110,10 @@ class Acumulus
     /**
      * Retrieves a list of accounts.
      *
+     * @param bool $enabled
+     *   Whether to retrieve enabled (true, default) or disabled (false)
+     *   accounts.
+     *
      * @return \Siel\Acumulus\ApiClient\Result
      *   The result of the webservice call. The structured response will contain
      *   a non-keyed array of "account" arrays, each "account" array being a
@@ -123,9 +127,12 @@ class Acumulus
      *
      * @see https://www.siel.nl/acumulus/API/Accounts/List_Accounts/
      */
-    public function getPicklistAccounts()
+    public function getPicklistAccounts($enabled = true)
     {
-        return $this->getPicklist('accounts');
+        $filters = [
+            'accountstatus' => $enabled ? 1 : 0,
+        ];
+        return $this->getPicklist('accounts', $filters);
     }
 
     /**

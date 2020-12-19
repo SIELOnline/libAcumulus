@@ -160,8 +160,7 @@ abstract class Form extends MessageCollection
         $class = get_class($this);
         $pos = strrpos($class, '\\');
         $class = $pos !== false ? substr($class, $pos + 1) : $class;
-        $classParts = preg_split('/([[:upper:]][[:lower:]]+)/', $class, null, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
-        /** @noinspection PhpParamsInspection */
+        $classParts = preg_split('/([[:upper:]][[:lower:]]+)/', $class, null, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
         $this->type = strtolower(is_array($classParts) && !empty($classParts) ? reset($classParts) : $class);
     }
 
@@ -747,7 +746,7 @@ abstract class Form extends MessageCollection
             // comparison (Magento uses in_array with the strict parameter set
             // to false).
             $optionId = reset($picklistItem);
-            if (ctype_digit($optionId)) {
+            if (is_numeric($optionId)) {
                 $optionId = (int) $optionId;
             }
             if ($optionId == $emptyValue) {

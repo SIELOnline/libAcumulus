@@ -2,7 +2,6 @@
 namespace Siel\Acumulus\Integration\ApiClient;
 
 use PHPUnit\Framework\TestCase;
-use Siel\Acumulus\Api;
 use Siel\Acumulus\ApiClient\Acumulus;
 use Siel\Acumulus\ApiClient\ApiCommunicator;
 use Siel\Acumulus\Helpers\Container;
@@ -31,7 +30,7 @@ class AcumulusTest extends TestCase
         return [
             'About' => ['getAbout', [], false, ['about', 'role', 'roleapi', 'roleid', 'rolenl']],
             'MyAcumulus' => ['getMyAcumulus', [], false, ['myaddress', 'mycity', 'mycompanyname', 'mycontactperson', 'mycontractcode', 'mycontractenddate', 'mydebt', 'myemail', 'myemailstatusid', 'myemailstatusreferenceid', 'myentries', 'myentriesleft', 'myiban', 'mymaxentries', 'mypostalcode', 'mysalutation', 'mysepamandatenr', 'mystatusid', 'mytelephone', 'myvatnumber']],
-            'Accounts' => ['getPicklistAccounts', [], true, ['accountid', 'accountnumber', 'accountdescription', 'accountorderid', 'accountstatus', 'accounttypeid']],
+            'Accounts enabled' => ['getPicklistAccounts', [true], true, ['accountid', 'accountnumber', 'accountdescription', 'accountorderid', 'accountstatus', 'accounttypeid']],
             'ContactTypes' => ['getPicklistContactTypes', [], true, ['contacttypeid', 'contacttypename', 'contacttypenamenl']],
             'CostCenters' => ['getPicklistCostCenters', [], true, ['costcenterid', 'costcentername']],
             'InvoiceTemplates' => ['getPicklistInvoiceTemplates', [], true, ['invoicetemplateid', 'invoicetemplatename']],

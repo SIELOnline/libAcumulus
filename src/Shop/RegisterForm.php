@@ -192,9 +192,9 @@ class RegisterForm extends Form
 
         $fields = [];
         if ($this->signUpResponse === null) {
-            // Not submitted or errors: render registration form.
+            // Not submitted or errors: render register form.
             $fields += [
-                'intro' => [
+                'introContainer' => [
                     'type' => 'fieldset',
                     'legend' => $this->t('introHeader'),
                     'fields' => $this->getIntroFields(),

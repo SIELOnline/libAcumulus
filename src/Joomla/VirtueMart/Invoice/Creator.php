@@ -79,9 +79,9 @@ class Creator extends BaseCreator
      * This override also initializes VM specific properties related to the
      * source.
      */
-    protected function setInvoiceSource($source)
+    protected function setInvoiceSource($invoiceSource)
     {
-        parent::setInvoiceSource($source);
+        parent::setInvoiceSource($invoiceSource);
         $this->order = $this->invoiceSource->getSource();
         /** @var \VirtueMartModelOrders orderModel */
         $this->orderModel = VmModel::getModel('orders');

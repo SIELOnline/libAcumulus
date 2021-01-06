@@ -44,9 +44,9 @@ class Creator extends BaseCreator
      * This override also initializes HS specific properties related to the
      * source.
      */
-    protected function setInvoiceSource($source)
+    protected function setInvoiceSource($invoiceSource)
     {
-        parent::setInvoiceSource($source);
+        parent::setInvoiceSource($invoiceSource);
         $this->order = $this->invoiceSource->getSource();
     }
 
@@ -70,8 +70,7 @@ class Creator extends BaseCreator
      */
     protected function getItemLines()
     {
-        $result = array_map(array($this, 'getItemLine'), $this->order->products);
-        return $result;
+        return array_map(array($this, 'getItemLine'), $this->order->products);
     }
 
     /**
@@ -116,7 +115,7 @@ class Creator extends BaseCreator
         // info is stored upon order creation in the order_product table.
         if (is_array($item->order_product_tax_info) && count($item->order_product_tax_info) === 1) {
             $productVatInfo = reset($item->order_product_tax_info);
-            if (!empty($productVatInfo->tax_rate)) {
+            if (isset($productVatInfo->tax_rate)) {
                 $vatRate = $productVatInfo->tax_rate;
             }
         }
@@ -124,7 +123,7 @@ class Creator extends BaseCreator
         if (isset($vatRate)) {
             $vatInfo = array(
                 Tag::VatRate => 100.0 * $vatRate,
-                Meta::VatRateSource => static::VatRateSource_Exact,
+                Meta::VatRateSource => Number::isZero($vatRate) ? Creator::VatRateSource_Exact0 : Creator::VatRateSource_Exact,
             );
         } else {
             $vatInfo = $this->getVatRangeTags($productVat, $productPriceEx, $this->precision, $this->precision);

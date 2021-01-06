@@ -31,9 +31,9 @@ abstract class Creator extends BaseCreator
      * This override also initializes Magento specific properties related to the
      * source.
      */
-    protected function setInvoiceSource($source)
+    protected function setInvoiceSource($invoiceSource)
     {
-        parent::setInvoiceSource($source);
+        parent::setInvoiceSource($invoiceSource);
         switch ($this->invoiceSource->getType()) {
             case Source::Order:
                 $this->order = $this->invoiceSource->getSource();

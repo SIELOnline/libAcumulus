@@ -94,10 +94,6 @@ interface Meta
      * product or shipping settings.
      */
     const VatClassName = 'meta-vatclass-name';
-    /**
-     * Completor: Possible vat types for this line.
-     */
-    const VatTypesPossible = 'meta-vattypes-possible';
 
     // Line: Line amounts related meta tags.
     /**
@@ -189,6 +185,10 @@ interface Meta
 
     // Invoice: Vat type related meta tags.
     /**
+     * Completor: Possible vat types for this line.
+     */
+    const VatTypesPossible = 'meta-vattypes-possible';
+    /**
      * Completor: Possible vat types for this invoice (and shop settings).
      */
     const VatTypesPossibleInvoice = 'meta-vattypes-possible-invoice';
@@ -200,6 +200,10 @@ interface Meta
      * Completor: Intersection of possible vat types for the invoice lines.
      */
     const VatTypesPossibleInvoiceLinesIntersection = 'meta-vattypes-possible-lines-intersection';
+    /**
+     * Completor: Where was the choice for the vat type made?
+     */
+    const VatTypeSource = 'meta-vattype-source';
 
     // Invoice: Currency related meta tags.
     /**

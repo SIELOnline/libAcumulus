@@ -189,7 +189,7 @@ class Creator extends BaseCreator
      */
     protected function getVatRateLookupMetadataByTaxClass($taxClassId)
     {
-        // '' denotes the 'standard'tax class, use 'standard' in meta data, ''
+        // '' denotes the 'standard' tax class, use 'standard' in meta data, ''
         // when searching.
         if ($taxClassId === '') {
             $taxClassId = 'standard';

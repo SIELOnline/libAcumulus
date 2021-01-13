@@ -65,8 +65,8 @@ class AcumulusTest extends TestCase
     public function vatInfoProvider()
     {
         return [
-            'nl' => [['nl', '2015-01-01'], [['vattype' => 'reduced', 'vatrate' => '6.0000'],['vattype' => 'normal', 'vatrate' => '21.0000']]],
-            'nl-no-date' => [['nl'], [['vattype' => 'reduced', 'vatrate' => '9.0000'],['vattype' => 'normal', 'vatrate' => '21.0000']]],
+            'nl' => [['nl', '2015-01-01'], [['vattype' => 'reduced', 'vatrate' => '0.0000'],['vattype' => 'reduced', 'vatrate' => '6.0000'],['vattype' => 'normal', 'vatrate' => '21.0000']]],
+            'nl-no-date' => [['nl'], [['vattype' => 'reduced', 'vatrate' => '0.0000'],['vattype' => 'reduced', 'vatrate' => '9.0000'],['vattype' => 'normal', 'vatrate' => '21.0000']]],
             'eu' => [['be', '2015-12-01'], [['vattype' => 'reduced', 'vatrate' => '6.0000'],['vattype' => 'reduced', 'vatrate' => '12.0000'],['vattype' => 'normal', 'vatrate' => '21.0000'],['vattype' => 'parked', 'vatrate' => '12.0000'],['vattype' => 'reduced', 'vatrate' => '0.0000']]],
             'eu-no-date' => [['be'], [['vattype' => 'reduced', 'vatrate' => '6.0000'],['vattype' => 'reduced', 'vatrate' => '12.0000'],['vattype' => 'normal', 'vatrate' => '21.0000'],['vattype' => 'parked', 'vatrate' => '12.0000'],['vattype' => 'reduced', 'vatrate' => '0.0000']]],
             'eu-wrong-date' => [['be', '2014-12-01'], []],

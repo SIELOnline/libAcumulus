@@ -18,12 +18,12 @@ WC2 = WooCommerce 2 (WordPress) (wordt niet meer ondersteund sinds 5.5.2)
 WC3 = WooCommerce 3 (WordPress)
 WC4 = WooCommerce 4 (WordPress)
 
-6.1.2 (2021-01-??)
+6.1.2 (2021-01-16)
 ------------------
 Bug:
 - ALL: Due to changes on the API server, a 0% vat rate is now returned for all
-  EU countries, the library could have difficulties determining the vat type,
-  sending the invoice as a concept.
+  EU countries. As a consequence, the library could have difficulties
+  determining the vat type and send the invoice as a concept.
 
 Features:
 - ALL: The completor phase now makes an even greater effort to determine the vat

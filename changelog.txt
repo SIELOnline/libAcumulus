@@ -33,9 +33,13 @@ Features:
     determining the vat type with absolute certainty. Example: the WooCommerce
     EU Vat assistant stores if an invoice is vat exempt.
   * Code has been added to guess the vat type if the standard effort results in
-    2 possible vat types, e.g. an order for vat-free products or services to a
-    EU company. If this guess results in assigning a vat type, the invoice will
-    no longer be sent as concept.
+    2 possible vat types, e.g. an order for vat-free services to a EU company.
+    If this guess results in assigning a vat type, the invoice will no longer be
+    sent as concept.
+- WC: The completor phase now makes an even greater effort to determine the vat
+  type by looking at the result of the 'woocommerce_order_is_vat_exempt' filter
+  (mostly based on the 'is_vat_exempt' meta data as set by (a.o.) the
+  woocommerce-eu-vat-assistant plugin.
 
 Refactorings:
 - ALL: Creator::setInvoiceSource(): parameter in overrides was not everywhere

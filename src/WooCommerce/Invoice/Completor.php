@@ -4,7 +4,6 @@ namespace Siel\Acumulus\WooCommerce\Invoice;
 use Siel\Acumulus\Api;
 use \Siel\Acumulus\Invoice\Completor as BaseCompletor;
 use Siel\Acumulus\Meta;
-use Siel\Acumulus\PluginConfig;
 use Siel\Acumulus\Tag;
 
 /**
@@ -21,7 +20,7 @@ class Completor extends BaseCompletor
     protected function guessVatType(array $possibleVatTypes)
     {
         // First try the base guesses,
-        //parent::guessVatType($possibleVatTypes);
+        parent::guessVatType($possibleVatTypes);
         // and if that did not result in a vat type try the WC specific guesses.
         if (empty($this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType])) {
             /** @var \WC_Order $order */
@@ -30,7 +29,7 @@ class Completor extends BaseCompletor
                 && apply_filters('woocommerce_order_is_vat_exempt', $order->get_meta('is_vat_exempt') === 'yes', $order))
             {
                 $this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType] = Api::VatType_EuReversed;
-                $this->invoice[Tag::Customer][Tag::Invoice][Meta::VatTypeSource] = 'WooCommerce\Completor::guessVatType: woocommerce_order_is_vat_exempt';
+                $this->invoice[Tag::Customer][Tag::Invoice][Meta::VatTypeSource] = 'WooCommerce\Completor::guessVatType: order is vat exempt';
             }
         }
     }

@@ -1,7 +1,6 @@
 <?php
 namespace Siel\Acumulus\Invoice;
 
-use Composer\Installers\Plugin;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Helpers\Countries;
@@ -1010,16 +1009,18 @@ class Completor
         if ($possibleVatTypes == [Api::VatType_National, Api::VatType_EuReversed]) {
             // The invoice does not have vat and no vat class refers to only >0
             // vat rates (but could be unknown). Reversed vat would do but if we
-            // really only have vat-free items, reversed vat would make it 0%
-            // instead of vat-free, which we should not want, nor is what the
+            // really only have vat-free services, reversed vat would make it 0%
+            // instead of vat-free, which we should not want because of what the
             // tax office says to do in this situation: "... U mag op de factuur
             // niet vermelden dat de btw is verlegd, maar in plaats daarvan
             // geeft u aan dat de dienst in het land van uw afnemer onder een
             // vrijstelling of het 0%-tarief valt."
             $shopSettings = $this->config->getShopSettings();
             $vatFreeProducts = $shopSettings['vatFreeProducts'];
+            $nature = $shopSettings['nature_shop'];
             $allIItemsVatFree = true;
-            if ($vatFreeProducts == PluginConfig::VatFreeProducts_Only) {
+            $allIItemsService = true;
+            if ($vatFreeProducts == PluginConfig::VatFreeProducts_Only && $nature == PluginConfig::Nature_Services) {
                 $this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType] = Api::VatType_National;
                 $this->invoice[Tag::Customer][Tag::Invoice][Meta::VatTypeSource] = 'Completor::guessVatType: VatFreeProducts_Only';
             } else {
@@ -1037,11 +1038,26 @@ class Completor
                         $allIItemsVatFree = null;
                         break;
                     }
+
+                    if (empty($line[Tag::Nature])) {
+                        // We have a (possible) non-service item line: do not
+                        // choose
+                        $allIItemsService = null;
+                        break;
+                    }
+                    if ($line[Tag::Nature] !== Api::Nature_Service) {
+                        // We have a non-service item line: do not choose
+                        $allIItemsService = false;
+                        break;
+                    }
                 }
             }
-            if ($allIItemsVatFree) {
+            if ($allIItemsVatFree && $allIItemsService) {
                 $this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType] = Api::VatType_National;
-                $this->invoice[Tag::Customer][Tag::Invoice][Meta::VatTypeSource] = 'WooCommerce\Completor::guessVatType: all items are vat free';
+                $this->invoice[Tag::Customer][Tag::Invoice][Meta::VatTypeSource] = 'Completor::guessVatType: all items are vat free services';
+            } elseif ($allIItemsService === false) {
+                $this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType] = Api::VatType_EuReversed;
+                $this->invoice[Tag::Customer][Tag::Invoice][Meta::VatTypeSource] = 'Completor::guessVatType: at least 1 item is not a service';
             }
         }
     }

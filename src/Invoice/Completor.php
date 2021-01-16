@@ -371,15 +371,24 @@ class Completor
                     $vatTypeVatRates = array(0);
                     break;
                 case Api::VatType_ForeignVat:
-                    $vatTypeVatRates = $this->getVatRatesByCountryAndInvoiceDate($this->invoice[Tag::Customer][Tag::CountryCode]);
-                    // Now, I could (should?) try to remove reduced and 0% &
-                    // vat-free rates, but as the vat rate to apply to an item
-                    // (standard, reduced or 0/vat-free) might not be the same
-                    // in all countries, I won't.
-                    // Plus that we are still working on the assumption of
-                    // digital services, not the broader concept of including
-                    // all e-commerce (as will be the case as of july 1, 2021)
-                    // this is not really necessary.
+                    $countryVatRates = $this->getVatRatesByCountryAndInvoiceDate($this->invoice[Tag::Customer][Tag::CountryCode]);
+                    // Only add those foreign vat rates that are possible given
+                    // the plugin settings.
+                    foreach ($countryVatRates as $countryVatRate) {
+                        if (Number::isZero($countryVatRate) || Number::floatsAreEqual($countryVatRate, Api::VatFree)) {
+                            // Zero or vat free rate: add if (we might be)
+                            // selling vat free products.
+                            if ($vatFreeProducts != PluginConfig::VatFreeProducts_No && $nature !== PluginConfig::Nature_Services) {
+                                $vatTypeVatRates[] = $countryVatRate;
+                            }
+                        } else {
+                            // Positive (non-zero and non free) vat rate: add if
+                            // not only selling vat-free items.
+                            if ($vatFreeProducts != PluginConfig::VatFreeProducts_Only) {
+                                $vatTypeVatRates[] = $countryVatRate;
+                            }
+                        }
+                    }
                     break;
                 default:
                     $vatTypeVatRates = array();

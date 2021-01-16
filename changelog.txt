@@ -40,6 +40,8 @@ Features:
   type by looking at the result of the 'woocommerce_order_is_vat_exempt' filter
   (mostly based on the 'is_vat_exempt' meta data as set by (a.o.) the
   woocommerce-eu-vat-assistant plugin.
+- HS: Look up the "non vat exempt" vat rate of the product for this customer's
+  location as vat rate meta data.
 
 Refactorings:
 - ALL: Creator::setInvoiceSource(): parameter in overrides was not everywhere

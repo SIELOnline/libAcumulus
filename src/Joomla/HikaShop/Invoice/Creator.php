@@ -113,6 +113,8 @@ class Creator extends BaseCreator
         // Try to get the exact vat rate from the order-product info.
         // Note that this info remains correct when rates are changed as this
         // info is stored upon order creation in the order_product table.
+        // Also note that on order lines the count should be 1, as we don't do
+        // cumulative vat (eco contribution might renounce this remark).
         if (is_array($item->order_product_tax_info) && count($item->order_product_tax_info) === 1) {
             $productVatInfo = reset($item->order_product_tax_info);
             if (isset($productVatInfo->tax_rate)) {
@@ -140,6 +142,37 @@ class Creator extends BaseCreator
             $category = $categoryClass->get($productVatInfo->category_namekey);
             if (isset($category->category_name)) {
                 $result[Meta::VatClassName] = $category->category_name;
+            }
+
+            // Add vat rate meta data.
+            // We can use hikashopCurrencyClass::getTax() to get a tax rate.
+            // This method wants:
+            // - The zone - state or country - where the customer lives.
+            // - The customer type: we should use 'individual' to prevent
+            //   getting 0% (vat exempt) when the customer is a
+            //  'company_with_vat_number'.
+            // - The category id of the tax class, which we have in $category.
+            if (isset($category->category_id)) {
+                $address = $this->order->billing_address;
+                $zone_name = !empty($address->address_state_orig) ? $address->address_state_orig : $address->address_country_orig;
+                if (empty($zone_name)) {
+                    $address = $this->order->shipping_adress;
+                    $zone_name = !empty($address->address_state_orig) ? $address->address_state_orig : $address->address_country_orig;
+                }
+                if (!empty($zone_name)) {
+                    /** @var \hikashopZoneClass $zoneClass */
+                    $zoneClass = hikashop_get('class.zone');
+                    $zone = $zoneClass->get($zone_name);
+                    if (!empty($zone->zone_id)) {
+                        // a "current" address) and hikashopVatHelper::regexCheck() to prevent
+                        // an online check (which hikashopVatHelper::isValid() would do) and
+                        // showing a message (which hikashopVatHelper::regexCheck() does).
+                        /** @var \hikashopCurrencyClass $currencyClass */
+                        $currencyClass = hikashop_get('class.currency');
+                        $vatRate = $currencyClass->getTax($zone->zone_id, $category->category_id, 'individual');
+                        $result[Meta::VatRateLookup] =  (float) $vatRate * 100;
+                    }
+                }
             }
         }
 

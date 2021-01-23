@@ -22,6 +22,9 @@ class ModuleSpecificTranslations extends ModuleSpecificTranslationsBase
 
             'module' => 'module',
             'review_url' => 'https://marketplace.magento.com/siel-acumulus-ma2.html',
+
+            'vat_class' => 'BTW-tariefgroep',
+            'vat_classes' => 'BTW-tariefgroepen',
         ];
 
         $this->en += [
@@ -32,6 +35,9 @@ class ModuleSpecificTranslations extends ModuleSpecificTranslationsBase
             'review_on_marketplace' => 'Would you please give us a review on Magento Marketplace?',
 
             'module' => 'module',
+
+            'vat_class' => 'tax class',
+            'vat_classes' => 'tax classes',
         ];
     }
 }

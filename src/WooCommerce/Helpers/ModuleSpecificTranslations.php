@@ -14,6 +14,12 @@ class ModuleSpecificTranslations extends TranslationCollection
         'meta_original_order_for_refund' => 'Post meta van de oorspronkelijke bestelling, alleen beschikbaar bij credit nota\'s',
         'wc2_end_support' => 'LET OP: de Acumulus plugin zal in een volgende versie stoppen met het ondersteunen van Woocommerce 2! Begin nu met het upgraden naar WooCommerce 4.',
 
+        'Standaard' => 'Standaard',
+        'vat_class_left_empty' => 'Ik zet "Btw status" op "Geen"',
+        'desc_vatFreeClass' => 'Geef aan welke belastingklasse u gebruikt om aan te geven dat een product of dienst btw-vrij is.
+Kies de eerste optie als u bij uw btw-vrije producten en diensten de "Btw status" op "Geen" zet.
+Deze instelling hoeft u alleen in te vullen als u hierboven hebt aangegeven dat u niet "Alleen aan btw onderhevige producten en/of diensten." verkoopt.',
+
         // Invoice status overview: shorter labels due to very limited available space.
         'vat_type' => 'Soort',
         'foreign_vat' => 'EU btw',
@@ -33,6 +39,12 @@ class ModuleSpecificTranslations extends TranslationCollection
         'see_post_meta' => 'See the table postmeta for posts of the type "order" of "refund"',
         'meta_original_order_for_refund' => 'Post meta of the original order, only available with credit notes',
         'wc2_end_support' => 'NOTE: in a next version the Acumulus plugin will stop supporting WooCommerce 2! Start upgrading to wooCommerce 3 now.',
+
+        'Standaard' => 'Standard', // WC uses standard tax rate, not default tax rate.
+        'vat_class_left_empty' => 'I set "Tax status" to "None"',
+        'desc_vatFreeClass' => 'Indicate which vat class you use to indicate that a product or service is VAT free.
+Choose the first option if you do set the "Tax status" to "None" for your vat free products and services.
+You only have to fill in this setting if above you did not select the option that you sell "Only products or services that are VAT liable."',
 
         // Invoice status overview: shorter labels due to available space.
         'vat_type' => 'Type',

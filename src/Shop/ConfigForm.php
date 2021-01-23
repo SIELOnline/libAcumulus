@@ -348,8 +348,8 @@ class ConfigForm extends BaseConfigForm
             'foreignVatClasses' => [
                 'name' => 'foreignVatClasses[]',
                 'type' => 'select',
-                'label' => $this->t('field_foreignVatClasses'),
-                'description' => $this->t('desc_foreignVatClasses'),
+                'label' => sprintf($this->t('field_foreignVatClasses'), $this->t('vat_class')),
+                'description' => sprintf($this->t('desc_foreignVatClasses'), $this->t('vat_class')),
                 'options' => $vatClasses,
                 'attributes' => [
                     'multiple' => true,
@@ -363,6 +363,33 @@ class ConfigForm extends BaseConfigForm
                 'options' => $this->getVatFreeProductsOptions(),
                 'attributes' => [
                     'required' => true,
+                ],
+            ],
+            'vatFreeClass' => [
+                'type' => 'select',
+                'label' => sprintf($this->t('field_vatFreeClass'), $this->t('vat_class')),
+                'description' => sprintf($this->t('desc_vatFreeClass'), $this->t('vat_class')),
+                'options' => [PluginConfig::VatClass_Null => sprintf($this->t('vat_class_left_empty'), $this->t('vat_class'))] + $vatClasses,
+                'attributes' => [
+                    'multiple' => false,
+                ],
+            ],
+            'zeroVatProducts' => [
+                'type' => 'radio',
+                'label' => $this->t('field_zeroVatProducts'),
+                'description' => $this->t('desc_zeroVatProducts'),
+                'options' => $this->getZeroVatProductsOptions(),
+                'attributes' => [
+                    'required' => true,
+                ],
+            ],
+            'zeroVatClass' => [
+                'type' => 'select',
+                'label' => sprintf($this->t('field_zeroVatClass'), $this->t('vat_class')),
+                'description' => sprintf($this->t('desc_zeroVatClass'), $this->t('vat_class')),
+                'options' => $vatClasses,
+                'attributes' => [
+                    'multiple' => false,
                 ],
             ],
             'marginProducts' => [
@@ -623,6 +650,22 @@ class ConfigForm extends BaseConfigForm
             PluginConfig::VatFreeProducts_Both => $this->t('option_vatFreeProducts_1'),
             PluginConfig::VatFreeProducts_No => $this->t('option_vatFreeProducts_2'),
             PluginConfig::VatFreeProducts_Only => $this->t('option_vatFreeProducts_3'),
+        ];
+    }
+
+    /**
+     * Returns a list of options for the zero vat products field.
+     *
+     * @return string[]
+     *   An array keyed by the option values and having translated descriptions
+     *   as values.
+     */
+    protected function getZeroVatProductsOptions()
+    {
+        return [
+            PluginConfig::ZeroVatProducts_Both => $this->t('option_zeroVatProducts_1'),
+            PluginConfig::ZeroVatProducts_No => $this->t('option_zeroVatProducts_2'),
+            PluginConfig::ZeroVatProducts_Only => $this->t('option_zeroVatProducts_3'),
         ];
     }
 

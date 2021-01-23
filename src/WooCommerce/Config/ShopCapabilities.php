@@ -318,9 +318,10 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     public function getVatClasses()
     {
+        // Standard tax class is not stored in table wc_tax_rate_classes.
         $labels = WC_Tax::get_tax_classes();
         $keys =  WC_Tax::get_tax_class_slugs();
-        return array('standard' => 'Standaard') + array_combine($keys, $labels);
+        return array('standard' => $this->t('Standaard')) + array_combine($keys, $labels);
     }
 
     /**

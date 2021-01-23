@@ -57,6 +57,13 @@ interface PluginConfig
     const VatFreeProducts_No = 2;
     const VatFreeProducts_Only = 3;
 
+    const VatClass_Null = 'vat_class_null';
+
+    const ZeroVatProducts_Unknown = 0;
+    const ZeroVatProducts_Both = 1;
+    const ZeroVatProducts_No = 2;
+    const ZeroVatProducts_Only = 3;
+
     const MarginProducts_Unknown = 0;
     const MarginProducts_Both = 1;
     const MarginProducts_No = 2;

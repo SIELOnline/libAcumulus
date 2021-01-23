@@ -17,6 +17,9 @@ class ModuleSpecificTranslations extends TranslationCollection
         'menu_basicSettings' => 'Instellingen → Acumulus → Configureer',
 
         'see_billing_address' => 'Verzendadresgegevens, bevat dezelfde eigenschappen als het "address_invoice" object hierboven',
+
+        'vat_class' => 'belastingregel',
+        'vat_classes' => 'belastingregels',
     ];
 
     protected $en = [
@@ -25,5 +28,8 @@ class ModuleSpecificTranslations extends TranslationCollection
         'menu_basicSettings' => 'Settings → Acumulus → Configure',
 
         'see_billing_address' => 'Shipping address, contains the same properties as the "address_invoice" object above',
+
+        'vat_class' => 'tax rule',
+        'vat_classes' => 'tax rules',
     ];
 }

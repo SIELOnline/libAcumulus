@@ -18,6 +18,16 @@ WC2 = WooCommerce 2 (WordPress) (wordt niet meer ondersteund sinds 5.5.2)
 WC3 = WooCommerce 3 (WordPress)
 WC4 = WooCommerce 4 (WordPress)
 
+6.2.0 (2021-01-??)
+------------------
+Features:
+- ALL: New settings that allow to better distinguish between vat-free and 0% vat
+  rates. This is important to get correct vat declarations and reports.
+  Please visit the settings page and fill in these new settings.
+- ALL: These new settings and some already existing ones use the term "vat
+  class"/"belastingklasse", but this does not always match the shop's way of
+  naming this concept. Help texts now use the shop's name.
+
 6.1.2 (2021-01-16)
 ------------------
 Bug:

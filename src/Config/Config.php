@@ -358,12 +358,14 @@ class Config
      *   A keyed array with the keys:
      *   - nature_shop
      *   - foreignVat
-     *   - vatFreeProducts
-     *   - marginProducts
      *   - foreignVatClasses
+     *   - vatFreeProducts
+     *   - vatFreeClass
+     *   - zeroVatProducts
+     *   - zeroVatClasses
+     *   - marginProducts
      *   - invoiceNrSource
      *   - dateToUse
-     *
      */
     public function getShopSettings()
     {
@@ -877,21 +879,35 @@ class Config
                     'type' => 'int',
                     'default' => PluginConfig::ForeignVat_Unknown,
                 ),
+                'foreignVatClasses' => array(
+                    'group' => 'shop',
+                    'type' => 'array',
+                    'default' => array(),
+                ),
                 'vatFreeProducts' => array(
                     'group' => 'shop',
                     'type' => 'int',
                     'default' => PluginConfig::VatFreeProducts_Unknown,
                 ),
+                'vatFreeClass' => array(
+                    'group' => 'shop',
+                    'type' => 'array',
+                    'default' => PluginConfig::VatClass_Null,
+                ),
+                'zeroVatProducts' => array(
+                    'group' => 'shop',
+                    'type' => 'int',
+                    'default' => PluginConfig::ZeroVatProducts_Unknown,
+                ),
+                'zeroVatClass' => array(
+                    'group' => 'shop',
+                    'type' => 'array',
+                    'default' => null,
+                ),
                 'marginProducts' => array(
                     'group' => 'shop',
                     'type' => 'int',
                     'default' => PluginConfig::MarginProducts_Unknown,
-                ),
-                // @todo: should we also create a 0 rate vat classes?
-                'foreignVatClasses' => array(
-                    'group' => 'shop',
-                    'type' => 'array',
-                    'default' => array(),
                 ),
                 'invoiceNrSource' => array(
                     'group' => 'shop',

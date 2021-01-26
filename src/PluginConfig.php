@@ -12,7 +12,7 @@ interface PluginConfig
     /**
      * @var string Version of this library, used in reporting.
      *   Note that composer will use git tags to determine the version of this
-     *   library, this version is used in communication with the Acumulus API
+     *   library. This version is used in communication with the Acumulus API
      *   and when users contact support.
      */
     const Version = '6.1.2';
@@ -23,12 +23,12 @@ interface PluginConfig
      */
     const TimeStampFormat_Sql = 'Y-m-d H:i:s';
 
+    // @todo: these are Config constants
+    const Concept_Plugin = 2;
+
     const Send_SendAndMailOnError = 1;
     const Send_SendAndMail = 2;
     const Send_TestMode = 3;
-
-    // Not an API constant.
-    const Concept_Plugin = 2;
 
     const MissingAmount_Ignore = 1;
     const MissingAmount_Warn = 2;
@@ -57,6 +57,7 @@ interface PluginConfig
     const VatFreeProducts_No = 2;
     const VatFreeProducts_Only = 3;
 
+    // Note: used both as value in Config and as value for Meta::VatClassId.
     const VatClass_Null = 'vat_class_null';
 
     const ZeroVatProducts_Unknown = 0;
@@ -75,4 +76,5 @@ interface PluginConfig
 
     const TriggerCreditNoteEvent_None = 0;
     const TriggerCreditNoteEvent_Create = 1;
+    // end of @todo: these are Config constants
 }

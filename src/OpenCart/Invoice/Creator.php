@@ -6,6 +6,7 @@ use Siel\Acumulus\Api;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
+use Siel\Acumulus\PluginConfig;
 use Siel\Acumulus\Tag;
 
 /**
@@ -159,7 +160,7 @@ class Creator extends BaseCreator
     /**
      * Looks up and returns vat class and vat rate metadata.
      *
-     * @param int $taxClassId
+     * @param int|null $taxClassId
      *   The tax class to look up.
      *
      * @return array
@@ -175,25 +176,31 @@ class Creator extends BaseCreator
     {
         $result = array();
 
-        $taxClass = $this->getTaxClass($taxClassId);
-        if ($taxClass) {
-            $result += array(
-                Meta::VatClassId => $taxClass['tax_class_id'],
-                Meta::VatClassName => $taxClass['title'],
-                Meta::VatRateLookup => array(),
-                Meta::VatRateLookupLabel => array(),
-            );
+        if (!empty($taxClassId)) {
+            $taxClass = $this->getTaxClass($taxClassId);
+            if ($taxClass) {
+                $result += array(
+                    Meta::VatClassId => $taxClass['tax_class_id'],
+                    Meta::VatClassName => $taxClass['title'],
+                    Meta::VatRateLookup => array(),
+                    Meta::VatRateLookupLabel => array(),
+                );
 
-            $taxRules = $this->getTaxRules($taxClassId);
-            foreach ($taxRules as $taxRule) {
-                $taxRate = $this->getTaxRate($taxRule['tax_rate_id']);
-                if (!empty($taxRate)) {
-                    if ($this->isAddressInGeoZone($this->order, $taxRule['based'], $taxRate['geo_zone_id'])) {
-                        $result[Meta::VatRateLookup][] = $taxRate['rate'];
-                        $result[Meta::VatRateLookupLabel][] = $taxRate['name'];
+                $taxRules = $this->getTaxRules($taxClassId);
+                foreach ($taxRules as $taxRule) {
+                    $taxRate = $this->getTaxRate($taxRule['tax_rate_id']);
+                    if (!empty($taxRate)) {
+                        if ($this->isAddressInGeoZone($this->order, $taxRule['based'], $taxRate['geo_zone_id'])) {
+                            $result[Meta::VatRateLookup][] = $taxRate['rate'];
+                            $result[Meta::VatRateLookupLabel][] = $taxRate['name'];
+                        }
                     }
                 }
             }
+        } else {
+            $result += array(
+                Meta::VatClassId => PluginConfig::VatClass_Null,
+            );
         }
         return $result;
     }

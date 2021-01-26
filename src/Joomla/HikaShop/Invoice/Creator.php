@@ -1,9 +1,12 @@
 <?php
 namespace Siel\Acumulus\Joomla\HikaShop\Invoice;
 
+use RuntimeException;
+use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\Meta;
+use Siel\Acumulus\PluginConfig;
 use Siel\Acumulus\Tag;
 use stdClass;
 
@@ -113,19 +116,23 @@ class Creator extends BaseCreator
         // Try to get the exact vat rate from the order-product info.
         // Note that this info remains correct when rates are changed as this
         // info is stored upon order creation in the order_product table.
-        // Also note that on order lines the count should be 1, as we don't do
-        // cumulative vat (eco contribution might renounce this remark).
-        if (is_array($item->order_product_tax_info) && count($item->order_product_tax_info) === 1) {
-            $productVatInfo = reset($item->order_product_tax_info);
-            if (isset($productVatInfo->tax_rate)) {
-                $vatRate = $productVatInfo->tax_rate;
+        if (is_array($item->order_product_tax_info)) {
+            if (count($item->order_product_tax_info) === 1) {
+                $productVatInfo = reset($item->order_product_tax_info);
+                if (isset($productVatInfo->tax_rate)) {
+                    $vatRate = $productVatInfo->tax_rate;
+                }
+            } elseif (count($item->order_product_tax_info) === 0) {
+                $result[Meta::VatClassId] = PluginConfig::VatClass_Null;
+            } else {
+                $result[Meta::Warning] = 'Cumulative vat rates applied: unknown in NL';
             }
         }
 
         if (isset($vatRate)) {
             $vatInfo = array(
                 Tag::VatRate => 100.0 * $vatRate,
-                Meta::VatRateSource => Number::isZero($vatRate) ? Creator::VatRateSource_Exact0 : Creator::VatRateSource_Exact,
+                Meta::VatRateSource => Number::isZero($productVat) ? Creator::VatRateSource_Exact0 : Creator::VatRateSource_Exact,
             );
         } else {
             $vatInfo = $this->getVatRangeTags($productVat, $productPriceEx, $this->precision, $this->precision);
@@ -164,9 +171,9 @@ class Creator extends BaseCreator
                     $zoneClass = hikashop_get('class.zone');
                     $zone = $zoneClass->get($zone_name);
                     if (!empty($zone->zone_id)) {
-                        // a "current" address) and hikashopVatHelper::regexCheck() to prevent
-                        // an online check (which hikashopVatHelper::isValid() would do) and
-                        // showing a message (which hikashopVatHelper::regexCheck() does).
+                        // We have a zone for the customer. Get the vat rate for
+                        // a normal customer, even if this is a company, so we
+                        // do not get the "vat exempt" rate.
                         /** @var \hikashopCurrencyClass $currencyClass */
                         $currencyClass = hikashop_get('class.currency');
                         $vatRate = $currencyClass->getTax($zone->zone_id, $category->category_id, 'individual');
@@ -174,6 +181,10 @@ class Creator extends BaseCreator
                     }
                 }
             }
+        } elseif (is_array($item->order_product_tax_info) && count($item->order_product_tax_info) === 0) {
+            // We do not have any order_product_vat_info at all: the product
+            // does not have any tax category assigned.
+            $result[Meta::VatClassId] = PluginConfig::VatClass_Null;
         }
 
         // Add variant info.
@@ -220,72 +231,115 @@ class Creator extends BaseCreator
 
     /**
      * {@inheritdoc}
+     *
+     * Note: HS 4+ has a setting on shipping methods "Automatic taxes"/
+     * "Automatische belastingen" that determines how the vat on shipping is
+     * calculated. It is stored in shipping_params->shipping_tax and can have
+     * the following values:
+     * 0 - No/Nee: use the specified "Product tax category"/"Product btw
+     *   categorie" to get the vat rate.
+     * 1 - Proportion/Verhouding: use the weighed average vat rate on the item
+     *   lines as vat rate for the shipping. This results in multiple shipping
+     *   lines if there are different vat rates on the item lines.
+     * 2 - Highest rate/Hoogste waarde: use the highest vat rate from the item
+     *   lines as vat rate for the shipping.
      */
-    protected function getShippingLine()
+    protected function getShippingLines()
     {
-        $result = array();
-        // Check if there is a shipping id attached to the order.
-        if (!empty($this->order->order_shipping_id)) {
-            // Free shipping on a credit note will not be added as a line.
-            if (!Number::isZero($this->order->order_shipping_price) || $this->invoiceSource->getType() !== Source::CreditNote) {
-                $shippingInc = (float) $this->order->order_shipping_price;
-                $shippingVat = (float) $this->order->order_shipping_tax;
-                $shippingEx = $shippingInc - $shippingVat;
-                $recalculatePrice = Tag::UnitPrice;
-                $vatInfo = $this->getVatRangeTags($shippingVat, $shippingEx, $this->precision, $this->precision);
-
-                // Add vat lookup meta data.
-                $vatLookupMetaData = array();
-                if (!empty($this->order->order_shipping_params->prices)) {
-                    $prices = $this->order->order_shipping_params->prices;
-                    if (is_array($prices)) {
-                        $price = reset($prices);
-                        if (!empty($price->taxes) && is_array($price->taxes)) {
-                            reset($price->taxes);
-                            $vatKey = key($price->taxes);
-                            if ($vatKey) {
-                                /** @var \hikashopTaxClass $taxClass */
-                                $taxClass = hikashop_get('class.tax');
-                                $taxClass->namekeys = array('tax_namekey');
-                                /** @var stdClass $tax */
-                                $tax = $taxClass->get($vatKey);
-                                if (!empty($tax->tax_namekey)) {
-                                    $vatLookupMetaData += array(
-                                        Meta::VatRateLookup => (float) $tax->tax_rate * 100,
-                                        Meta::VatRateLookupLabel => $tax->tax_namekey,
-                                    );
-                                }
-                            }
-                        }
-                    }
-                }
+        $result = [];
+        // Do not add free shipping on a credit note.
+        if (!Number::isZero($this->order->order_shipping_price) || $this->invoiceSource->getType() !== Source::CreditNote) {
+            // Sanity check, should result in true unless free shipping or
+            // in-store pick-up.
+            if (!empty($this->order->order_shipping_params->prices) && is_array($this->order->order_shipping_params->prices)) {
+                // We are going to add 1 or more shipping lines based on the
+                // contents of the order_shipping_params.
                 /** @var \hikashopShippingClass $shippingClass */
                 $shippingClass = hikashop_get('class.shipping');
-                /** @var stdClass $shipping */
-                $shipping = $shippingClass->get($this->order->order_shipping_id);
-                /** @var \hikashopCategoryClass $categoryClass */
-                $categoryClass = hikashop_get('class.category');
-                /** @var stdClass $category */
-                $category = $categoryClass->get($shipping->shipping_tax_id);
-                if (isset($category->category_namekey)) {
-                    $vatLookupMetaData += array(
-                        Meta::VatClassId => $category->category_namekey,
-                        Meta::VatClassName => $category->category_name,
-                    );
+                /** @var \hikashopTaxClass $taxClass */
+                $taxClass = hikashop_get('class.tax');
+
+                $shippingAmountIncTotal = 0.0;
+                $shippingVatTotal = 0.0;
+                $warningAdded = false;
+                foreach ($this->order->order_shipping_params->prices as $key => $price) {
+                    // $key is of the form '{shipping_method_id}@0'.
+                    $shippingMethodId = (int) explode('@', $key)[0];
+                    /** @var stdClass $shipping */
+                    $shipping = $shippingClass->get($shippingMethodId);
+                    $shippingLine = [
+                        Tag::Product => $shipping->shipping_name,
+                        Tag::Quantity => 1,
+                    ];
+                    $shippingMethodAmountIncTotal = 0.0;
+                    $addMissingAmountIndex = null;
+                    foreach ($price->taxes as $taxNameKey => $shippingVat) {
+                        $vatRate = (float) $taxClass->get($taxNameKey)->tax_rate;
+                        if (!Number::isZero($vatRate)) {
+                            $shippingEx = $shippingVat / $vatRate;
+                        } else {
+                            // If the rate = 0, we can not compute the price ex,
+                            // so we fill in 0.0 for now and will fill it with
+                            // the missing amount at the end of this loop.
+                            $shippingEx = 0.0;
+                            $addMissingAmountIndex = count($result);
+                        }
+                        $result[] = $shippingLine + [
+                                Tag::UnitPrice => $shippingEx,
+                                Meta::VatAmount => $shippingVat,
+                                Tag::VatRate => 100.0 * $vatRate,
+                                Meta::VatRateSource => static::VatRateSource_Creator_Lookup,
+                            ];
+                        $shippingMethodAmountIncTotal += $shippingEx + $shippingVat;
+                    }
+                    // Fill in the missing amount if we had a 0 rate.
+                    if ($addMissingAmountIndex !== null) {
+                        $result[$addMissingAmountIndex][Tag::UnitPrice] = $price->price_with_tax - $shippingMethodAmountIncTotal;
+                        $shippingMethodAmountIncTotal += $result[$addMissingAmountIndex][Tag::UnitPrice];
+                    }
+                    if (!Number::floatsAreEqual($shippingMethodAmountIncTotal, $price->price_with_tax)) {
+                        // Problem: rates have probably changed.
+                        $result[count($result) - 1][Meta::Warning] = 'Amounts for this shipping method do not add up: rates have probably changed';
+                        $warningAdded = true;
+                    }
+                    $shippingAmountIncTotal += $price->price_with_tax;
+                    $shippingVatTotal += $price->tax;
+                }
+                if (!Number::floatsAreEqual($shippingAmountIncTotal, $this->order->order_shipping_price)
+                    || !Number::floatsAreEqual($shippingVatTotal, $this->order->order_shipping_tax)) {
+                    // Problem: lost too much precision? (or we had a rate
+                    if (!$warningAdded) {
+                        $result[count($result) - 1][Meta::Warning] = 'Amounts for the shipping method(s) do not add up: lost too much precision?';
+                    }
                 }
 
-                $result = array(
-                        Tag::Product => $this->getShippingMethodName(),
-                        Tag::Quantity => 1,
-                        Tag::UnitPrice => $shippingEx,
-                        Meta::UnitPriceInc => $shippingInc,
-                        Meta::PrecisionUnitPriceInc => $this->precision,
-                        Meta::RecalculatePrice => $recalculatePrice,
-                        Meta::VatAmount => $shippingVat,
-                    ) + $vatInfo + $vatLookupMetaData;
+                // $result will almost always contain only 1 shipping line, in
+                // which case the values at the order record level tend to be
+                // just a bit more precise, so we use those.
+                if (count($result) === 1) {
+                    $result[0][Meta::UnitPriceInc] = $this->order->order_shipping_price;
+                    $result[0][Meta::RecalculatePrice] = Tag::UnitPrice;
+                }
+            } else {
+                // @nth: free shipping? in-store pickup?
+                $result[] = [
+                    Tag::Product => $this->t('free_shipping'),
+                    Tag::Quantity => 1,
+                    Tag::UnitPrice => 0.0,
+                    Tag::VatRate => null,
+                    Meta::VatRateSource => static::VatRateSource_Completor,
+                ];
             }
         }
         return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getShippingLine()
+    {
+        throw new RuntimeException(__METHOD__ . ' should never be called');
     }
 
     /**

@@ -52,6 +52,7 @@ class Completor
     protected static $CorrectVatRateSources = [
         Creator::VatRateSource_Exact,
         Creator::VatRateSource_Exact0,
+        Creator::VatRateSource_Creator_Lookup,
         self::VatRateSource_Completor_Range,
         self::VatRateSource_Completor_Lookup,
         self::VatRateSource_Completor_Range_Lookup,
@@ -1437,6 +1438,45 @@ class Completor
         $foreignVat = $shopSettings['foreignVat'];
         $foreignVatClasses = $shopSettings['foreignVatClasses'];
         return $foreignVat !== PluginConfig::ForeignVat_No && in_array($vatClassId, $foreignVatClasses);
+    }
+
+    /**
+     * Returns whether the vat class id (or emptiness of it) denotes vat free.
+     *
+     * @param int|string $vatClassId
+     *   The vat class to check.
+     *
+     * @return bool
+     *   True if the shop might sell vat free articles and the vat class id
+     *   denotes the vat free class (or is left empty), false otherwise.
+     */
+    public function isVatFreeClass($vatClassId)
+    {
+        $shopSettings = $this->config->getShopSettings();
+        $vatFreeProducts = $shopSettings['vatFreeProducts'];
+        $vatFreeClass = $shopSettings['vatFreeClass'];
+        if (empty($vatClassId)) {
+            $vatClassId = PluginConfig::VatClass_Null;
+        }
+        return $vatFreeProducts !== PluginConfig::VatFreeProducts_No && $vatClassId == $vatFreeClass;
+    }
+
+    /**
+     * Returns whether the vat class id denotes the 0% vat rat.
+     *
+     * @param int|string $vatClassId
+     *   The vat class to check.
+     *
+     * @return bool
+     *   True if the shop might sell 0% vat articles and the vat class id
+     *   denotes the 0% vat rate class, false otherwise.
+     */
+    public function isZeroVatClass($vatClassId)
+    {
+        $shopSettings = $this->config->getShopSettings();
+        $zeroVatProducts = $shopSettings['zeroVatProducts'];
+        $zeroVatClass = $shopSettings['zeroVatClass'];
+        return $zeroVatProducts !== PluginConfig::ZeroVatProducts_No && $vatClassId == $zeroVatClass;
     }
 
     /**

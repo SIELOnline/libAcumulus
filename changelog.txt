@@ -24,6 +24,12 @@ Features:
 - ALL: New settings that allow to better distinguish between vat-free and 0% vat
   rates. This is important to get correct vat declarations and reports.
   Please visit the settings page and fill in these new settings.
+- HS: HS 4+ has a setting on shipping methods "Automatic taxes"/"Automatische
+  belastingen" that determines how the vat on shipping is calculated. The value
+  "Proportion"/"Verhouding" uses the (weighed) average vat rate on the item
+  lines as vat rate for the shipping. This component now supports this value.
+  Note that it may result in multiple shipping lines if there are different vat
+  rates on the item lines.
 - ALL: These new settings and some already existing ones use the term "vat
   class"/"belastingklasse", but this does not always match the shop's way of
   naming this concept. Help texts now use the shop's name.

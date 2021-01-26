@@ -1,9 +1,11 @@
 <?php
 namespace Siel\Acumulus\WooCommerce\Invoice;
 
+use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\Meta;
+use Siel\Acumulus\PluginConfig;
 use Siel\Acumulus\Tag;
 use WC_Coupon;
 use WC_Order_Item_Product;
@@ -67,9 +69,8 @@ class Creator extends BaseCreator
      *   being equal to line total divided by the qty.
      *
      * @param WC_Order_Item_Product $item
-     *   An array representing an order item line, meta values are already
-     *   available under their own names and as an array under key 'item_meta'.
-     * @param WC_Product|bool $product
+     *   An object representing an order item line.
+     * @param WC_Product|bool|null $product
      *   The product that was sold on this line, may also be a bool according to
      *   the WC3 php documentation. I guess it will be false if the product has
      *   been deleted since.
@@ -87,8 +88,11 @@ class Creator extends BaseCreator
             return $result;
         }
 
+        // Support for some often used plugins that extend WooCommerce,
+        // especially in the area of products (bundles, bookings, ...).
         $creatorPluginSupport = $this->container->getInstance('CreatorPluginSupport', 'Invoice');
         $creatorPluginSupport->getItemLineBefore($this, $item, $product);
+
         // $product can be null if the product has been deleted.
         if ($product instanceof WC_Product) {
             $this->addPropertySource('product', $product);
@@ -110,7 +114,7 @@ class Creator extends BaseCreator
 
         // Add price info. get_total() and get_taxes() return line totals after
         // discount. get_taxes() returns non-rounded tax amounts per tax class
-        // id, whereas  get_total_tax() returns either a rounded or non-rounded
+        // id, whereas get_total_tax() returns either a rounded or non-rounded
         // amount, depending on the 'woocommerce_tax_round_at_subtotal' setting.
         $productPriceEx = $item->get_total() / $quantity;
         $taxes = $item->get_taxes();
@@ -153,7 +157,9 @@ class Creator extends BaseCreator
         // Add tax info.
         $result += $this->getVatRangeTags($productVat, $productPriceEx, $precisionVat, $precisionEx);
         if ($product instanceof WC_Product) {
-            $result += $this->getVatRateLookupMetadataByTaxClass($product->get_tax_class());
+            // get_tax_status() returns 'taxable', 'shipping', or 'none'.
+            $taxClass = $product->get_tax_status() === 'taxable' ? $product->get_tax_class() : PluginConfig::VatClass_Null;
+            $result += $this->getVatRateLookupMetadataByTaxClass($taxClass);
         }
 
         // Add variants/options.
@@ -174,12 +180,13 @@ class Creator extends BaseCreator
      * Looks up and returns vat rate metadata for product lines.
      *
      * A product has a tax class. A tax class can have multiple tax rates,
-     * depending on the region of the customer. As we don't have that data here,
-     * this method will only return metadata if only 1 rate was found.
+     * depending on the region of the customer. We use the customers address in
+     * the raw invoice that is being created, to get the possible rates.
      *
      * @param string $taxClassId
      *   The tax class of the product. For the default tax class it can be
-     *   'standard' or empty.
+     *   'standard' or the empty string. For no tax class at all, it will be
+     *   PluginConfig::VatClass_Null.
      *
      * @return array
      *   An array with keys:
@@ -189,8 +196,8 @@ class Creator extends BaseCreator
      */
     protected function getVatRateLookupMetadataByTaxClass($taxClassId)
     {
-        // '' denotes the 'standard' tax class, use 'standard' in meta data, ''
-        // when searching.
+        // '' denotes the 'standard' tax class, use 'standard' in meta data,
+        // '' when searching.
         if ($taxClassId === '') {
             $taxClassId = 'standard';
         }
@@ -201,21 +208,30 @@ class Creator extends BaseCreator
             Meta::VatRateLookup => array(),
             Meta::VatRateLookupLabel => array(),
         );
-        if ($taxClassId === 'standard') {
-            $taxClassId = '';
-        }
 
-        // Find applicable vat rates. We use WC_Tax::find_rates() to find them.
-        $args = array(
-            'tax_class' => $taxClassId,
-            'country' => $this->invoice[Tag::Customer][Tag::CountryCode],
-            'city' => isset($this->invoice[Tag::Customer][Tag::City]) ? $this->invoice[Tag::Customer][Tag::City] : '',
-            'postcode' => isset($this->invoice[Tag::Customer][Tag::PostalCode]) ? $this->invoice[Tag::Customer][Tag::PostalCode] : '',
-        );
-        $taxRates = WC_Tax::find_rates($args);
-        foreach ($taxRates as $taxRate) {
-            $result[Meta::VatRateLookup][] = $taxRate['rate'];
-            $result[Meta::VatRateLookupLabel][] = $taxRate['label'];
+        if ($taxClassId === PluginConfig::VatClass_Null) {
+            $result[Meta::VatRateLookup] = Api::VatFree;
+            $result[Meta::VatRateLookupLabel] = "tax_status='none'";
+
+        } else {
+            // '' denotes the 'standard' tax class, use 'standard' in meta data,
+            // '' when searching.
+            if ($taxClassId === 'standard') {
+                $taxClassId = '';
+            }
+
+            // Find applicable vat rates. We use WC_Tax::find_rates() to find them.
+            $args = array(
+                'tax_class' => $taxClassId,
+                'country' => $this->invoice[Tag::Customer][Tag::CountryCode],
+                'city' => isset($this->invoice[Tag::Customer][Tag::City]) ? $this->invoice[Tag::Customer][Tag::City] : '',
+                'postcode' => isset($this->invoice[Tag::Customer][Tag::PostalCode]) ? $this->invoice[Tag::Customer][Tag::PostalCode] : '',
+            );
+            $taxRates = WC_Tax::find_rates($args);
+            foreach ($taxRates as $taxRate) {
+                $result[Meta::VatRateLookup][] = $taxRate['rate'];
+                $result[Meta::VatRateLookupLabel][] = $taxRate['label'];
+            }
         }
         return $result;
     }

@@ -268,6 +268,12 @@ interface Meta
     const PrecisionBundleChildrenLineAmountInc = 'meta-bundle-children-line-amountinc-precision';
 
     // Line: Other meta tags.
+
+    /**
+     * Anywhere: the code discovered a problem. This is often the result of a
+     * failing sanity check (a check that should result in true but didn't).
+     */
+    const Warning = 'meta-warning';
     /**
      * Creator->Event: the internal id of the order item line
      * (WooCommerce and Magento only).

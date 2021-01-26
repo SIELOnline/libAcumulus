@@ -2,9 +2,11 @@
 namespace Siel\Acumulus\Joomla\VirtueMart\Invoice;
 
 use DOMDocument;
+use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\Meta;
+use Siel\Acumulus\PluginConfig;
 use Siel\Acumulus\Tag;
 use stdClass;
 use VirtueMartModelCustomfields;
@@ -124,8 +126,7 @@ class Creator extends BaseCreator
      */
     protected function getItemLines()
     {
-        $result = array_map(array($this, 'getItemLine'), $this->order['items']);
-        return $result;
+        return array_map(array($this, 'getItemLine'), $this->order['items']);
     }
 
     /**
@@ -145,18 +146,7 @@ class Creator extends BaseCreator
         $productPriceEx = (float) $item->product_discountedPriceWithoutTax;
         $productPriceInc = (float) $item->product_final_price;
         $productVat = (float) $item->product_tax;
-
-        $calcRule = $this->getCalcRule('VatTax', $item->virtuemart_order_item_id);
-        if (!empty($calcRule->calc_value)) {
-            $vatInfo = array(
-                Tag::VatRate => (float) $calcRule->calc_value,
-                Meta::VatRateSource => static::VatRateSource_Exact,
-                Meta::VatClassId => $calcRule->virtuemart_calc_id,
-                Meta::VatClassName => $calcRule->calc_rule_name,
-            );
-        } else {
-            $vatInfo = $this->getVatRangeTags($productVat, $productPriceEx, $this->precision, $this->precision);
-        }
+        $vatInfo = $this->getVatData('VatTax', $productPriceEx, $productVat, $item->virtuemart_order_item_id);
 
         // Check for cost price and margin scheme.
         if (!empty($line['costPrice']) && $this->allowMarginScheme()) {
@@ -244,25 +234,12 @@ class Creator extends BaseCreator
         if (!empty($this->order['details']['BT']->order_shipment)) {
             $shippingEx = (float) $this->order['details']['BT']->order_shipment;
             $shippingVat = (float) $this->order['details']['BT']->order_shipment_tax;
-
-            $calcRule = $this->getCalcRule('shipment');
-            if (!empty($calcRule->calc_value)) {
-                $vatInfo = array(
-                    Tag::VatRate => (float) $calcRule->calc_value,
-                    Meta::VatRateSource => static::VatRateSource_Exact,
-                    Meta::VatClassId => $calcRule->virtuemart_calc_id,
-                    Meta::VatClassName => $calcRule->calc_rule_name,
-                );
-            } else {
-                $vatInfo = $this->getVatRangeTags($shippingVat, $shippingEx, $this->precision, 0.01);
-            }
-
             $result = array(
                     Tag::Product => $this->getShippingMethodName(),
                     Tag::UnitPrice => $shippingEx,
                     Tag::Quantity => 1,
                     Meta::VatAmount => $shippingVat,
-                ) + $vatInfo;
+                ) + $this->getVatData('shipment', $shippingEx, $shippingVat);
         }
         return $result;
     }
@@ -318,7 +295,7 @@ class Creator extends BaseCreator
     protected function isDiscountCalcRule(stdClass $calcRule)
     {
         return $calcRule->calc_amount < 0.0
-        && !in_array($calcRule->calc_kind, array('VatTax', 'shipment', 'payment'));
+               && !in_array($calcRule->calc_kind, array('VatTax', 'shipment', 'payment'));
     }
 
     /*
@@ -335,7 +312,7 @@ class Creator extends BaseCreator
      */
     protected function getCalcRuleDiscountLine(stdClass $calcRule)
     {
-        $result = array(
+        return array(
             Tag::Product => $calcRule->calc_rule_name,
             Tag::Quantity => 1,
             Tag::UnitPrice => null,
@@ -344,8 +321,6 @@ class Creator extends BaseCreator
             Meta::VatRateSource => static::VatRateSource_Strategy,
             Meta::StrategySplit => true,
         );
-
-        return $result;
     }
 
     /**
@@ -356,7 +331,7 @@ class Creator extends BaseCreator
      */
     protected function getCouponCodeDiscountLine()
     {
-        $result = array(
+        return array(
             Tag::ItemNumber => $this->order['details']['BT']->coupon_code,
             Tag::Product => $this->t('discount'),
             Tag::Quantity => 1,
@@ -365,8 +340,6 @@ class Creator extends BaseCreator
             Meta::VatRateSource => static::VatRateSource_Strategy,
             Meta::StrategySplit => true,
         );
-
-        return $result;
     }
 
     /**
@@ -379,25 +352,12 @@ class Creator extends BaseCreator
             $paymentEx = (float) $this->order['details']['BT']->order_payment;
             if (!Number::isZero($paymentEx)) {
                 $paymentVat = (float) $this->order['details']['BT']->order_payment_tax;
-
-                $calcRule = $this->getCalcRule('payment');
-                if (!empty($calcRule->calc_value)) {
-                    $vatInfo = array(
-                        Tag::VatRate => (float) $calcRule->calc_value,
-                        Meta::VatRateSource => static::VatRateSource_Exact,
-                        Meta::VatClassId => $calcRule->virtuemart_calc_id,
-                        Meta::VatClassName => $calcRule->calc_rule_name,
-                    );
-                } else {
-                    $vatInfo = $this->getVatRangeTags($paymentVat, $paymentEx, $this->precision, 0.01);
-                }
-
                 $result = array(
                         Tag::Product => $this->t('payment_costs'),
                         Tag::UnitPrice => $paymentEx,
                         Tag::Quantity => 1,
                         Meta::VatAmount => $paymentVat,
-                    ) + $vatInfo;
+                    ) + $this->getVatData('payment', $paymentEx, $paymentVat);
             }
         }
         return $result;
@@ -425,5 +385,43 @@ class Creator extends BaseCreator
             }
         }
         return null;
+    }
+
+    /**
+     * Returns vat data and vat lookup meta data for the current order (item).
+     *
+     * @param string $calcRuleType
+     *   Type of calc rule to search for: 'VatTax', 'shipment' or 'payment'.
+     * @param float $amountEx
+     * @param float $vatAmount
+     * @param int $orderItemId
+     *   The order item to search the calc rule for, or search at the order
+     *   level if left empty.
+     *
+     * @return array
+     *   Vat data and vat lookup meta data to add to the Acumulus invoice line.
+     */
+    protected function getVatData($calcRuleType, $amountEx, $vatAmount, $orderItemId = 0)
+    {
+        $calcRule = $this->getCalcRule($calcRuleType, $orderItemId);
+        if (!empty($calcRule->calc_value)) {
+            $vatInfo = array(
+                Tag::VatRate => (float) $calcRule->calc_value,
+                Meta::VatRateSource => Number::isZero($vatAmount) ? static::VatRateSource_Exact0 : static::VatRateSource_Exact,
+                Meta::VatClassId => $calcRule->virtuemart_calc_id,
+                Meta::VatClassName => $calcRule->calc_rule_name,
+            );
+        } elseif (Number::isZero($vatAmount)) {
+            // No vat class assigned to payment.
+            $vatInfo = array(
+                Tag::VatRate => Api::VatFree,
+                Meta::VatRateSource => static::VatRateSource_Exact0,
+                Meta::VatClassId => PluginConfig::VatClass_Null,
+            );
+        } else {
+            $vatInfo = $this->getVatRangeTags($vatAmount, $amountEx, $this->precision);
+        }
+
+        return $vatInfo;
     }
 }

@@ -1,13 +1,13 @@
 <?php
 namespace Siel\Acumulus\Magento\Magento2\Invoice;
 
-use Magento\Catalog\Model\Product\Type;
 use Magento\Framework\App\ObjectManager;
 use Magento\Sales\Model\Order\Creditmemo\Item as CreditmemoItem;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Magento\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\Magento\Magento2\Helpers\Registry;
 use Siel\Acumulus\Meta;
+use Siel\Acumulus\PluginConfig;
 use Siel\Acumulus\Tag;
 
 /**
@@ -51,9 +51,10 @@ class Creator extends BaseCreator
         $this->propertySources['customer'] = Registry::getInstance()->create('Magento\Customer\Model\Customer')->load($source->getCustomerId());
     }
 
-    /** @noinspection PhpUnused
+    /**
+     * Returns the item lines for a credit mote.
      *
-     * {@inheritdoc}
+     * @noinspection PhpUnused Called via Creator::callSourceTypeSpecificMethod().
      */
     protected function getItemLinesCreditNote()
     {
@@ -61,7 +62,6 @@ class Creator extends BaseCreator
         // Items may be composed, so start with all "visible" items.
         foreach ($this->creditNote->getAllItems() as $item) {
             // Only items for which row total is set, are refunded
-            /** @var CreditmemoItem $item */
             if (!Number::isZero($item->getRowTotal())) {
                 $result[] = $this->getItemLineCreditNote($item);
             }
@@ -139,8 +139,13 @@ class Creator extends BaseCreator
         // Add VAT related info.
         $childrenItems = $item->getChildrenItems();
         if (Number::isZero($vatRate) && !empty($childrenItems)) {
-            // 0 VAT rate on parent: this is probably not correct. The completor
-            // will fetch the vat rate from the children.
+            // 0 VAT rate on parent: this is probably not correct, but can
+            // happen with configurable products. If there's only 1 child, and
+            // that child is the same as this parent, vat rate is taken form the
+            // child anyway, so the vat (class) info will be copied over from
+            // the child further on in this method. If not the completor will
+            // have to do something:
+            // @todo: should we do this here or in the completor?
             $result += array(
                 Tag::VatRate => null,
                 Meta::VatRateSource => Creator::VatRateSource_Completor,
@@ -148,11 +153,11 @@ class Creator extends BaseCreator
                 Meta::VatRateLookupSource => '$item->getTaxPercent()',
             );
         } elseif (Number::isZero($vatRate) && Number::isZero($productPriceEx) && !$isChild) {
-            // 0 vat rate and zero price on a main item: when the order gets
-            // send on creation, I have seen child lines on their own, i.e. not
-            // being attached to their parent, while at the same time the parent
-            // did have (a copy of) that child under its childrenItems.
-            // We bail out by returning null
+            // 0 vat rate and zero price on a main item: when the invoice gets
+            // send on order creation, I have seen child lines on their own,
+            // i.e. not being attached to their parent, while at the same time
+            // the parent did have (a copy of) that child under its
+            // childrenItems. We bail out by returning null.
             return null;
         } else {
             // No 0 VAT, or 0 vat and not a parent product and not a zero price:
@@ -167,7 +172,7 @@ class Creator extends BaseCreator
         $product = $item->getProduct();
         if ($product) {
             /** @noinspection PhpUndefinedMethodInspection */
-            $result += $this->getVatClassMetaData((int) $product->getTaxClassId());
+            $result += $this->getVatClassMetaData($product->getTaxClassId());
         }
 
         // Add children lines for customisable options and composed products.
@@ -187,9 +192,35 @@ class Creator extends BaseCreator
             if ($this->isChildSameAsParent($result, $childrenLines)) {
                 // A configurable product having 1 child means the child is the
                 // chosen variant: use the product id and name of the child.
+                // @todo: should we do this here or in the completor?
                 $childLine = reset($childrenLines);
                 $result[Tag::Product] = $childLine[Tag::Product];
                 $result[Meta::ProductId] = $childLine[Meta::ProductId];
+                // We may have to copy vat data.
+                if (empty($result[Tag::VatRate]) && $childLine[Tag::VatRate] !== $result[Tag::VatRate]) {
+                    $result[Tag::VatRate] = $childLine[Tag::VatRate];
+                    $result[Meta::VatRateSource] = Creator::VatRateSource_Child;
+                    if (!empty($childLine[Meta::VatRateLookup])) {
+                        $result[Meta::VatRateLookup] = $childLine[Meta::VatRateLookup];
+                    } else {
+                        unset($result[Meta::VatRateLookup]);
+                    }
+                    if (!empty($childLine[Meta::VatRateLookupSource])) {
+                        $result[Meta::VatRateLookupSource] = $childLine[Meta::VatRateLookupSource];
+                    } else {
+                        unset($result[Meta::VatRateLookupSource]);
+                    }
+                    if (!empty($childLine[Meta::VatClassId])) {
+                        $result[Meta::VatClassId] = $childLine[Meta::VatClassId];
+                    } else {
+                        unset($result[Meta::VatClassId]);
+                    }
+                    if (!empty($childLine[Meta::VatClassName])) {
+                        $result[Meta::VatClassName] = $childLine[Meta::VatClassName];
+                    } else {
+                        unset($result[Meta::VatClassName]);
+                    }
+                }
             } else {
                 $result[Meta::ChildrenLines] = array_merge($result[Meta::ChildrenLines], $childrenLines);
             }
@@ -326,11 +357,13 @@ class Creator extends BaseCreator
         }
 
         // Add vat meta data.
+        /** @var \Magento\Catalog\Model\Product $product */
         /** @noinspection PhpFullyQualifiedNameUsageInspection */
         $product = ObjectManager::getInstance()->create(\Magento\Catalog\Model\Product::class);
         $product->getResource()->load($product, $item->getProductId());
         if ($product->getId()) {
-            $result += $this->getVatClassMetaData((int) $product->getTaxClassId());
+            /** @noinspection PhpUndefinedMethodInspection */
+            $result += $this->getVatClassMetaData($product->getTaxClassId());
         }
 
         // On a credit note we only have single lines, no compound lines, thus
@@ -415,7 +448,7 @@ class Creator extends BaseCreator
     /**
      * Returns meta data regarding the tax class.
      *
-     * @param int $taxClassId
+     * @param int|null $taxClassId
      *   The id of the tax class.
      *
      * @return array
@@ -427,12 +460,15 @@ class Creator extends BaseCreator
     {
         $result = array();
         if ($taxClassId) {
+            $taxClassId = (int) $taxClassId;
             $result[Meta::VatClassId] = $taxClassId;
             /** @var \Magento\Tax\Model\ClassModel $taxClass */
             /** @noinspection PhpFullyQualifiedNameUsageInspection */
             $taxClass = ObjectManager::getInstance()->create(\Magento\Tax\Model\ClassModel::class);
             $taxClass->getResource()->load($taxClass, $taxClassId);
             $result[Meta::VatClassName] = $taxClass->getClassName();
+        } else {
+            $result[Meta::VatClassId] = PluginConfig::VatClass_Null;
         }
         return $result;
     }

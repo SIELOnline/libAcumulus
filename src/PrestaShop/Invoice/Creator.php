@@ -5,14 +5,13 @@ use Address;
 use Carrier;
 use Configuration;
 use Customer;
-use Db;
+use Exception;
 use Order;
 use OrderSlip;
-use PrestaShopDatabaseException;
-use PrestaShopException;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\Meta;
+use Siel\Acumulus\PluginConfig;
 use Siel\Acumulus\Tag;
 use TaxManagerFactory;
 use TaxRulesGroup;
@@ -92,8 +91,6 @@ class Creator extends BaseCreator
 
     /**
      * {@inheritdoc}
-     *
-     * @throws \PrestaShopDatabaseException
      */
     protected function getItemLines()
     {
@@ -145,7 +142,6 @@ class Creator extends BaseCreator
      *   an array with an OrderSlipDetail line.
      *
      * @return array
-     * @throws \PrestaShopDatabaseException
      */
     protected function getItemLine(array $item)
     {
@@ -192,7 +188,8 @@ class Creator extends BaseCreator
                 $sign * $item['unit_price_tax_excl'],
                 $this->precision, $this->precision);
         }
-        $result += $this->getVatRateLookupMetadata($this->order->id_address_invoice, $this->getItemLineTaxRuleGroupId($item));
+        $taxRulesGroupId = isset($item['id_tax_rules_group']) ? (int) $item['id_tax_rules_group'] : 0;
+        $result += $this->getVatRateLookupMetadata($this->order->id_address_invoice, $taxRulesGroupId);
 
         $result[Meta::FieldsCalculated][] = Meta::VatAmount;
 
@@ -201,67 +198,31 @@ class Creator extends BaseCreator
     }
 
     /**
-     * Returns the tax rule group id of the product in the given order line.
-     *
-     * @param array $item
-     *
-     * @return int
-     *   The id of the tax rule group, or 0 if none or multiple were found.
-     *
-     * @throws \PrestaShopDatabaseException
-     */
-    protected function getItemLineTaxRuleGroupId(array $item)
-    {
-        if (isset($item['id_tax_rules_group'])) {
-            return (int) $item['id_tax_rules_group'];
-        } elseif (isset($item['id_tax'])) {
-            $query = 'select distinct id_tax_rules_group from ps_tax_rule where id_tax = ' . (int) $item['id_tax'];
-            $results = Db::getInstance()->executeS($query);
-            return count($results) === 1 ? (int) $results[0]['id_tax_rules_group'] : 0;
-        }
-        return 0;
-    }
-
-    /**
      * {@inheritdoc}
      */
     protected function getShippingLine()
     {
-        try {
-            $sign = $this->invoiceSource->getSign();
-            $carrier = new Carrier($this->order->id_carrier);
-            // total_shipping_tax_excl is not very precise (rounded to the cent) and
-            // often leads to 1 cent off invoices in Acumulus (assuming that the
-            // amount entered is based on a nice rounded amount incl tax. So we
-            // recalculate this ourselves.
-            $vatRate = $this->order->carrier_tax_rate;
-            $shippingInc = $sign * $this->invoiceSource->getSource()->total_shipping_tax_incl;
-            $shippingEx = $shippingInc / (100 + $vatRate) * 100;
-            $shippingVat = $shippingInc - $shippingEx;
+        $sign = $this->invoiceSource->getSign();
+        $carrier = new Carrier($this->order->id_carrier);
+        // total_shipping_tax_excl is not very precise (rounded to the cent) and
+        // often leads to 1 cent off invoices in Acumulus (assuming that the
+        // amount entered is based on a nice rounded amount incl tax. So we
+        // recalculate this ourselves.
+        $vatRate = $this->order->carrier_tax_rate;
+        $shippingInc = $sign * $this->invoiceSource->getSource()->total_shipping_tax_incl;
+        $shippingEx = $shippingInc / (100 + $vatRate) * 100;
+        $shippingVat = $shippingInc - $shippingEx;
 
-            $result = array(
-                Tag::Product => !empty($carrier->name) ? $carrier->name : $this->t('shipping_costs'),
-                Tag::UnitPrice => $shippingInc / (100 + $vatRate) * 100,
-                Meta::UnitPriceInc => $shippingInc,
-                Tag::Quantity => 1,
-                Tag::VatRate => $vatRate,
-                Meta::VatAmount => $shippingVat,
-                Meta::VatRateSource => static::VatRateSource_Exact,
-                Meta::FieldsCalculated => array(Tag::UnitPrice, Meta::VatAmount),
-            );
-
-            $result += $this->getVatRateLookupMetadata($this->order->id_address_invoice, $carrier->getIdTaxRulesGroup());
-        }
-        /** @noinspection PhpRedundantCatchClauseInspection */
-        catch (PrestaShopDatabaseException $e) {
-            $result = array();
-        }
-        /** @noinspection PhpRedundantCatchClauseInspection */
-        catch (PrestaShopException $e) {
-            $result = array();
-        }
-
-        return $result;
+        return array(
+            Tag::Product => !empty($carrier->name) ? $carrier->name : $this->t('shipping_costs'),
+            Tag::UnitPrice => $shippingInc / (100 + $vatRate) * 100,
+            Meta::UnitPriceInc => $shippingInc,
+            Tag::Quantity => 1,
+            Tag::VatRate => $vatRate,
+            Meta::VatAmount => $shippingVat,
+            Meta::VatRateSource => static::VatRateSource_Exact,
+            Meta::FieldsCalculated => array(Tag::UnitPrice, Meta::VatAmount),
+        ) + $this->getVatRateLookupMetadata($this->order->id_address_invoice, $carrier->getIdTaxRulesGroup());
     }
 
     /**
@@ -330,7 +291,7 @@ class Creator extends BaseCreator
             && (float) $source->payment_fee !== 0.0)
         {
             $sign = $this->invoiceSource->getSign();
-            $paymentInc = (float) $sign * $source->payment_fee;
+            $paymentInc = $sign * $source->payment_fee;
             $paymentVatRate = (float) $source->payment_fee_rate;
             $paymentEx = $paymentInc / (100.0 + $paymentVatRate) * 100;
             $paymentVat = $paymentInc - $paymentEx;
@@ -414,13 +375,14 @@ class Creator extends BaseCreator
      * total_products_tax_incl and the sum of the OrderSlipDetail amounts.
      *
      * @return array[]
+     *
+     * @noinspection PhpUnused Called via Creator::callSourceTypeSpecificMethod().
      */
     protected function getDiscountLinesCreditNote()
     {
         $result = array();
 
         // Get total amount credited.
-        /** @noinspection PhpUndefinedFieldInspection */
         $creditSlipAmountInc = $this->creditSlip->total_products_tax_incl;
 
         // Get sum of product lines.
@@ -495,17 +457,23 @@ class Creator extends BaseCreator
     protected function getVatRateLookupMetadata($addressId, $taxRulesGroupId)
     {
         try {
-            $taxRulesGroup = new TaxRulesGroup($taxRulesGroupId);
-            $address = new Address($addressId);
-            $taxManager = TaxManagerFactory::getManager($address, $taxRulesGroupId);
-            $taxCalculator = $taxManager->getTaxCalculator();
-            $result = array(
-                Meta::VatClassId => $taxRulesGroup->id,
-                Meta::VatClassName => $taxRulesGroup->name,
-                Meta::VatRateLookup => $taxCalculator->getTotalRate(),
-                Meta::VatRateLookupLabel => $taxCalculator->getTaxesName(),
-            );
-        } catch (\Exception $e) {
+            if (!empty($taxRulesGroupId)) {
+                $taxRulesGroup = new TaxRulesGroup($taxRulesGroupId);
+                $address = new Address($addressId);
+                $taxManager = TaxManagerFactory::getManager($address, $taxRulesGroupId);
+                $taxCalculator = $taxManager->getTaxCalculator();
+                $result = array(
+                    Meta::VatClassId => $taxRulesGroup->id,
+                    Meta::VatClassName => $taxRulesGroup->name,
+                    Meta::VatRateLookup => $taxCalculator->getTotalRate(),
+                    Meta::VatRateLookupLabel => $taxCalculator->getTaxesName(),
+                );
+            } else {
+                $result = array(
+                    Meta::VatClassId => PluginConfig::VatClass_Null,
+                );
+            }
+        } catch (Exception $e) {
             $result = array();
         }
         return $result;

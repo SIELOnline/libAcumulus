@@ -118,7 +118,7 @@ Mbv de "Ctrl" toets kunt u meerdere statussen kiezen of keuzes ongedaan maken.',
         'option_vatFreeProducts_2' => 'Alleen aan btw onderhevige producten en/of diensten.',
         'option_vatFreeProducts_3' => 'Alleen producten en/of diensten die van btw vrijgesteld zijn.',
         'desc_vatFreeProducts' => 'Geef aan of u in uw winkel producten en/of diensten aanbiedt die vrijgesteld zijn van btw, bv. onderwijs.
-LET OP: het gaat er om of het product of de dienst btw-vrij is, niet of u een factuur zonder btw opstelt.
+LET OP: het gaat er om of het product of de dienst btw-vrij is, of omdat uw bedrijf voor de <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/hoe_werkt_de_btw/nieuwe-kleineondernemersregeling/kleineondernemersregeling" target="_blank"">KOR regeling</a> heeft gekozen, eem btw vrijstelling heeft, niet of u voor specifieke situaties een factuur zonder btw opstelt.
 Ook is er een verschil met het 0%-tarief hieronder, Dit verschil zit hem met name in de mogelijkheid tot aftrek van voorbelasting.',
 
         'field_vatFreeClass' => 'Welke %1$s definieert btw-vrij?',
@@ -135,8 +135,8 @@ Deze instelling hoeft u alleen in te vullen als u hierboven hebt aangegeven dat 
 Momenteel (begin 2021) geldt er b.v. een uitzondering voor mondkapjes.
 LET OP 2: het gaat er om of het product of de dienst onder het 0%-tarief valt, niet of u 0% btw op een factuur mag noteren vanwege b.v. verkoop aan het buitenland of een factuur met verlegde btw.',
 
-        'field_zeroVatClass' => 'Welke %1$s definieert het 0% btw-tarief?',
-        'desc_zeroVatClass' => 'Geef aan welke %1$s u gebruikt om aan te geven dat een product of dienst onder het 0%-tarief valt.
+        'field_zeroVatClass' => 'Welke %1$s definieert het 0%% btw-tarief?',
+        'desc_zeroVatClass' => 'Geef aan welke %1$s u gebruikt om aan te geven dat een product of dienst onder het 0%%-tarief valt.
 Deze instelling hoeft u alleen in te vullen als u hierboven hebt aangegeven dat u niet "Alleen producten en/of diensten die onder het normale of verlaagde tarief vallen." verkoopt.',
 
         'field_marginProducts' => 'Verkoopt u margegoederen?',
@@ -516,7 +516,7 @@ If you remain under that threshold you may apply Dutch VAT. However, please note
         'option_vatFreeProducts_2' => 'Only products or services that are VAT liable.',
         'option_vatFreeProducts_3' => 'Only VAT free products or services.',
         'desc_vatFreeProducts' => 'Indicate whether your store offers products or services that are VAT free, e.g. education.
-NOTE: this setting concerns whether the products or services you offer are inherently VAT free, not whether you create an invoice with no or reversed VAT.
+NOTE: this setting concerns whether the products or services you offer are inherently VAT free, or because your company has chosen to use the <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/hoe_werkt_de_btw/nieuwe-kleineondernemersregeling/kleineondernemersregeling" target="_blank"">KOR regulations</a> (in Dutch), not whether you create an invoice with no or reversed VAT.
 Also note that vat free differs from the 0% vat rate below. This difference mainly concerns the right to deduct vat paid on your purchases.',
 
         'field_vatFreeClass' => 'Which %1$s defines VAT free?',

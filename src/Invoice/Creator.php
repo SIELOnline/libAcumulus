@@ -87,6 +87,7 @@ abstract class Creator
     const VatRateSource_Completor = 'completor';
     const VatRateSource_Strategy = 'strategy';
     const VatRateSource_Parent = 'parent';
+    const VatRateSource_Child = 'child';
     const VatRateSource_Creator_Lookup = 'creator-lookup';
 
     const LineType_OrderItem = 'order-item';

@@ -60,7 +60,7 @@ class ApplySameVatRate extends CompletorStrategyBase
     protected function tryVatRate($vatRate)
     {
         $this->description = "ApplySameVatRate($vatRate)";
-        $this->replacingLines = array();
+        $this->replacingLines = [];
         $vatAmount = 0.0;
         foreach ($this->lines2Complete as $line2Complete) {
             $vatAmount += $this->completeLine($line2Complete, $vatRate);

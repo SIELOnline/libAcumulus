@@ -58,7 +58,7 @@ class Creator extends BaseCreator
      */
     protected function getItemLinesCreditNote()
     {
-        $result = array();
+        $result = [];
         // Items may be composed, so start with all "visible" items.
         foreach ($this->creditNote->getAllItems() as $item) {
             // Only items for which row total is set, are refunded
@@ -76,7 +76,7 @@ class Creator extends BaseCreator
      */
     protected function getItemLineOrder($item, $isChild = false)
     {
-        $result = array();
+        $result = [];
 
         $this->addPropertySource('item', $item);
 
@@ -97,11 +97,11 @@ class Creator extends BaseCreator
             // - But still send the VAT rate to Acumulus.
             $result[Tag::UnitPrice] = $productPriceInc;
         } else {
-            $result += array(
+            $result += [
                 Tag::UnitPrice => $productPriceEx,
                 Meta::UnitPriceInc => $productPriceInc,
                 Meta::RecalculatePrice => $this->productPricesIncludeTax() ? Tag::UnitPrice : Meta::UnitPriceInc,
-            );
+            ];
         }
         $result[Tag::Quantity] = $item->getQtyOrdered();
 
@@ -146,12 +146,12 @@ class Creator extends BaseCreator
             // the child further on in this method. If not the completor will
             // have to do something:
             // @todo: should we do this here or in the completor?
-            $result += array(
+            $result += [
                 Tag::VatRate => null,
                 Meta::VatRateSource => Creator::VatRateSource_Completor,
                 Meta::VatRateLookup => $vatRate,
                 Meta::VatRateLookupSource => '$item->getTaxPercent()',
-            );
+            ];
         } elseif (Number::isZero($vatRate) && Number::isZero($productPriceEx) && !$isChild) {
             // 0 vat rate and zero price on a main item: when the invoice gets
             // send on order creation, I have seen child lines on their own,
@@ -162,10 +162,10 @@ class Creator extends BaseCreator
         } else {
             // No 0 VAT, or 0 vat and not a parent product and not a zero price:
             // the vat rate is real.
-            $result += array(
+            $result += [
                 Tag::VatRate => $vatRate,
                 Meta::VatRateSource => Number::isZero($vatRate) ? Creator::VatRateSource_Exact0 : Creator::VatRateSource_Exact,
-            );
+            ];
         }
 
         // Add vat meta data.
@@ -292,7 +292,7 @@ class Creator extends BaseCreator
      */
     protected function getItemLineCreditNote(CreditmemoItem $item)
     {
-        $result = array();
+        $result = [];
 
         $this->addPropertySource('item', $item);
 
@@ -309,11 +309,11 @@ class Creator extends BaseCreator
             $result[Tag::UnitPrice] = $productPriceInc;
         } else {
             // Add price info.
-            $result += array(
+            $result += [
                 Tag::UnitPrice => $productPriceEx,
                 Meta::UnitPriceInc => $productPriceInc,
                 Meta::RecalculatePrice => $this->productPricesIncludeTax() ? Tag::UnitPrice : Meta::UnitPriceInc,
-            );
+            ];
         }
         $result[Tag::Quantity] = $item->getQty();
 
@@ -344,10 +344,10 @@ class Creator extends BaseCreator
 
         // And the VAT related info.
         if (isset($vat_rate)) {
-            $result += array(
+            $result += [
                 Tag::VatRate => $vat_rate,
                 Meta::VatRateSource => static::VatRateSource_Exact,
-            );
+            ];
         } elseif (isset($lineVat)) {
             $result += $this->getVatRangeTags($lineVat / $result[Tag::Quantity], $productPriceEx, 0.02 / min($result[Tag::Quantity], 2), 0.01);
         } else {
@@ -380,16 +380,16 @@ class Creator extends BaseCreator
      */
     protected function getShippingLine()
     {
-        $result = array();
+        $result = [];
         /** @var \Magento\Sales\Model\Order|\Magento\Sales\Model\Order\Creditmemo $magentoSource */
         $magentoSource = $this->invoiceSource->getSource();
         // Only add a free shipping line on an order, not on a credit note:
         // free shipping is never refunded...
         if ($this->invoiceSource->getType() === Source::Order || !Number::isZero($magentoSource->getBaseShippingAmount())) {
-            $result += array(
+            $result += [
                 Tag::Product => $this->getShippingMethodName(),
                 Tag::Quantity => 1,
-            );
+            ];
 
             // What do the following methods return:
             // - getBaseShippingAmount(): shipping costs ex VAT ex any discount.
@@ -409,11 +409,11 @@ class Creator extends BaseCreator
                 $shippingInc = $sign * $magentoSource->getBaseShippingInclTax();
                 $shippingEx = $sign * $magentoSource->getBaseShippingAmount();
                 $shippingVat = $shippingInc - $shippingEx;
-                $result += array(
+                $result += [
                         Tag::UnitPrice => $shippingEx,
                         Meta::UnitPriceInc => $shippingInc,
                         Meta::RecalculatePrice => $this->shippingPriceIncludeTax() ? Tag::UnitPrice : Meta::UnitPriceInc,
-                    ) + $this->getVatRangeTags($shippingVat, $shippingEx, 0.02,$this->shippingPriceIncludeTax() ? 0.02 : 0.01);
+                           ] + $this->getVatRangeTags($shippingVat, $shippingEx, 0.02,$this->shippingPriceIncludeTax() ? 0.02 : 0.01);
                 $result[Meta::FieldsCalculated][] = Meta::VatAmount;
 
                 // Add vat class meta data.
@@ -435,11 +435,11 @@ class Creator extends BaseCreator
             } else {
                 // Free shipping should get a "normal" tax rate. We leave that
                 // to the completor to determine.
-                $result += array(
+                $result += [
                     Tag::UnitPrice => 0,
                     Tag::VatRate => null,
                     Meta::VatRateSource => static::VatRateSource_Completor,
-                );
+                ];
             }
         }
         return $result;
@@ -458,7 +458,7 @@ class Creator extends BaseCreator
      */
     protected function getVatClassMetaData($taxClassId)
     {
-        $result = array();
+        $result = [];
         if ($taxClassId) {
             $taxClassId = (int) $taxClassId;
             $result[Meta::VatClassId] = $taxClassId;

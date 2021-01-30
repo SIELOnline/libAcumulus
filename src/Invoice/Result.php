@@ -71,7 +71,7 @@ class Result extends WebResult
         parent::__construct();
         $this->trigger = $trigger;
         $this->sendStatus = self::SendStatus_Unknown;
-        $this->sendStatusArguments = array();
+        $this->sendStatusArguments = [];
     }
 
     /**
@@ -95,7 +95,7 @@ class Result extends WebResult
      *
      * @return $this
      */
-    public function setSendStatus($sendStatus, $arguments = array())
+    public function setSendStatus($sendStatus, $arguments = [])
     {
         $this->sendStatus = $sendStatus;
         $this->sendStatusArguments = $arguments;
@@ -225,7 +225,7 @@ class Result extends WebResult
                 break;
             default:
                 $message = 'reason_unknown';
-                $this->sendStatusArguments = array(($this->sendStatus));
+                $this->sendStatusArguments = [($this->sendStatus)];
                 break;
         }
         $message = $this->t($message);

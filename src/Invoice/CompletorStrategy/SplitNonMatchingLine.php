@@ -65,7 +65,7 @@ class SplitNonMatchingLine extends CompletorStrategyBase
      */
     protected function init()
     {
-        $this->linesCompleted = array();
+        $this->linesCompleted = [];
     }
 
     /**

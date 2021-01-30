@@ -89,7 +89,7 @@ class CompletorStrategyLines
     protected function completeStrategyLines()
     {
         if ($this->invoiceHasStrategyLine()) {
-            $this->invoice[Tag::Customer][Tag::Invoice][Meta::CompletorStrategyInput]['vat-rates'] = str_replace(array('=>', ' ', "\r", "\n", "\t"), array('='), var_export($this->possibleVatRates, true));
+            $this->invoice[Tag::Customer][Tag::Invoice][Meta::CompletorStrategyInput]['vat-rates'] = str_replace(['=>', ' ', "\r", "\n", "\t"], ['='], var_export($this->possibleVatRates, true));
 
             $isFirst = true;
             $strategies = $this->getStrategyClasses();
@@ -98,7 +98,7 @@ class CompletorStrategyLines
                 $strategy = new $strategyClass($this->config, $this->translator, $this->invoice, $this->possibleVatTypes, $this->possibleVatRates, $this->source);
                 if ($isFirst) {
                     $this->invoice[Tag::Customer][Tag::Invoice][Meta::CompletorStrategyInput]['vat-2-divide'] = $strategy->getVat2Divide();
-                    $this->invoice[Tag::Customer][Tag::Invoice][Meta::CompletorStrategyInput]['vat-breakdown'] = str_replace(array('=>', ' ', "\r", "\n", "\t"), array('='), var_export($strategy->getVatBreakdown(), true));
+                    $this->invoice[Tag::Customer][Tag::Invoice][Meta::CompletorStrategyInput]['vat-breakdown'] = str_replace(['=>', ' ', "\r", "\n", "\t"], ['='], var_export($strategy->getVatBreakdown(), true));
                     $isFirst = false;
                 }
                 if ($strategy->apply()) {
@@ -143,7 +143,7 @@ class CompletorStrategyLines
      */
     protected function getStrategyClasses()
     {
-        $result = array();
+        $result = [];
 
         // For now hardcoded, but this can be turned into a discovery.
         $namespace = '\Siel\Acumulus\Invoice\CompletorStrategy';
@@ -171,7 +171,7 @@ class CompletorStrategyLines
     protected function replaceLinesCompleted(array $linesCompleted, array $completedLines, $strategyName)
     {
         // Remove old strategy lines that are now completed.
-        $lines = array();
+        $lines = [];
         foreach ($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] as $key => $line) {
             if (!in_array($key, $linesCompleted)) {
                 $lines[] = $line;

@@ -94,7 +94,7 @@ class Creator extends BaseCreator
      */
     protected function getItemLines()
     {
-        $result = array();
+        $result = [];
         if ($this->invoiceSource->getType() === Source::Order) {
             // Note: getOrderDetailTaxes() is new in 1.6.1.0.
             $lines = method_exists($this->order, 'getOrderDetailTaxes')
@@ -120,7 +120,7 @@ class Creator extends BaseCreator
      */
     public function mergeProductLines(array $productLines, array $taxLines)
     {
-        $result = array();
+        $result = [];
         // Key the product lines on id_order_detail, so we can easily add the
         // tax lines in the 2nd loop.
         foreach ($productLines as $productLine) {
@@ -145,7 +145,7 @@ class Creator extends BaseCreator
      */
     protected function getItemLine(array $item)
     {
-        $result = array();
+        $result = [];
 
         $this->addPropertySource('item', $item);
 
@@ -213,7 +213,7 @@ class Creator extends BaseCreator
         $shippingEx = $shippingInc / (100 + $vatRate) * 100;
         $shippingVat = $shippingInc - $shippingEx;
 
-        return array(
+        return [
             Tag::Product => !empty($carrier->name) ? $carrier->name : $this->t('shipping_costs'),
             Tag::UnitPrice => $shippingInc / (100 + $vatRate) * 100,
             Meta::UnitPriceInc => $shippingInc,
@@ -221,8 +221,8 @@ class Creator extends BaseCreator
             Tag::VatRate => $vatRate,
             Meta::VatAmount => $shippingVat,
             Meta::VatRateSource => static::VatRateSource_Exact,
-            Meta::FieldsCalculated => array(Tag::UnitPrice, Meta::VatAmount),
-        ) + $this->getVatRateLookupMetadata($this->order->id_address_invoice, $carrier->getIdTaxRulesGroup());
+            Meta::FieldsCalculated => [Tag::UnitPrice, Meta::VatAmount],
+               ] + $this->getVatRateLookupMetadata($this->order->id_address_invoice, $carrier->getIdTaxRulesGroup());
     }
 
     /**
@@ -237,11 +237,11 @@ class Creator extends BaseCreator
         // can easily lead to 1 cent off invoices in Acumulus (assuming that the
         // amount entered is based on a nice rounded amount incl tax. So we
         // recalculate this ourselves by looking up the tax rate.
-        $result = array();
+        $result = [];
 
         if ($this->invoiceSource->getType() === Source::Order && $this->order->gift && !Number::isZero($this->order->total_wrapping_tax_incl)) {
             /** @var string[] $metaCalculatedFields */
-            $metaCalculatedFields = array();
+            $metaCalculatedFields = [];
             $wrappingEx = $this->order->total_wrapping_tax_excl;
             $wrappingExLookedUp = (float) Configuration::get('PS_GIFT_WRAPPING_PRICE');
             // Increase precision if possible.
@@ -257,13 +257,13 @@ class Creator extends BaseCreator
             $metaCalculatedFields[] = Meta::VatAmount;
 
             $vatLookupTags = $this->getVatRateLookupMetadata($this->order->id_address_invoice, (int) Configuration::get('PS_GIFT_WRAPPING_TAX_RULES_GROUP'));
-            $result = array(
+            $result = [
                     Tag::Product => $this->t('gift_wrapping'),
                     Tag::UnitPrice => $wrappingEx,
                     Meta::UnitPriceInc => $wrappingInc,
                     Tag::Quantity => 1,
-                ) + $this->getVatRangeTags($wrappingVat, $wrappingEx, 0.01 + $precision, $precision)
-                + $vatLookupTags;
+                      ] + $this->getVatRangeTags($wrappingVat, $wrappingEx, 0.01 + $precision, $precision)
+                      + $vatLookupTags;
             $result[Meta::FieldsCalculated] = $metaCalculatedFields;
         }
         return $result;
@@ -295,7 +295,7 @@ class Creator extends BaseCreator
             $paymentVatRate = (float) $source->payment_fee_rate;
             $paymentEx = $paymentInc / (100.0 + $paymentVatRate) * 100;
             $paymentVat = $paymentInc - $paymentEx;
-            $result = array(
+            $result = [
               Tag::Product => $this->t('payment_costs'),
               Tag::Quantity => 1,
               Tag::UnitPrice => $paymentEx,
@@ -303,8 +303,8 @@ class Creator extends BaseCreator
               Tag::VatRate => $paymentVatRate,
               Meta::VatRateSource => static::VatRateSource_Exact,
               Meta::VatAmount => $paymentVat,
-              Meta::FieldsCalculated => array(Tag::UnitPrice, Meta::VatAmount),
-            );
+              Meta::FieldsCalculated => [Tag::UnitPrice, Meta::VatAmount],
+            ];
 
             // Add these amounts to the invoice totals.
             // @see \Siel\Acumulus\Invoice\Source\getTotals()
@@ -324,7 +324,7 @@ class Creator extends BaseCreator
      */
     protected function getDiscountLinesOrder()
     {
-        $result = array();
+        $result = [];
 
         foreach ($this->order->getCartRules() as $line) {
             $result[] = $this->getDiscountLineOrder($line);
@@ -351,7 +351,7 @@ class Creator extends BaseCreator
         $discountInc = -$sign * $line['value'];
         $discountEx = -$sign * $line['value_tax_excl'];
         $discountVat = $discountInc - $discountEx;
-        $result = array(
+        $result = [
                 Tag::ItemNumber => $line['id_cart_rule'],
                 Tag::Product => $this->t('discount_code') . ' ' . $line['name'],
                 Tag::UnitPrice => $discountEx,
@@ -363,7 +363,7 @@ class Creator extends BaseCreator
                 // - including VAT, the precision would be 0.01, 0.01.
                 // - excluding VAT, the precision would be 0.01, 0
                 // However, for a %, it will be: 0.02, 0.01, so use 0.02.
-            ) + $this->getVatRangeTags($discountVat, $discountEx, 0.02, 0.01);
+                  ] + $this->getVatRangeTags($discountVat, $discountEx, 0.02, 0.01);
         $result[Meta::FieldsCalculated][] = Meta::VatAmount;
 
         return $result;
@@ -380,7 +380,7 @@ class Creator extends BaseCreator
      */
     protected function getDiscountLinesCreditNote()
     {
-        $result = array();
+        $result = [];
 
         // Get total amount credited.
         $creditSlipAmountInc = $this->creditSlip->total_products_tax_incl;
@@ -462,19 +462,19 @@ class Creator extends BaseCreator
                 $address = new Address($addressId);
                 $taxManager = TaxManagerFactory::getManager($address, $taxRulesGroupId);
                 $taxCalculator = $taxManager->getTaxCalculator();
-                $result = array(
+                $result = [
                     Meta::VatClassId => $taxRulesGroup->id,
                     Meta::VatClassName => $taxRulesGroup->name,
                     Meta::VatRateLookup => $taxCalculator->getTotalRate(),
                     Meta::VatRateLookupLabel => $taxCalculator->getTaxesName(),
-                );
+                ];
             } else {
-                $result = array(
+                $result = [
                     Meta::VatClassId => Config::VatClass_Null,
-                );
+                ];
             }
         } catch (Exception $e) {
-            $result = array();
+            $result = [];
         }
         return $result;
     }

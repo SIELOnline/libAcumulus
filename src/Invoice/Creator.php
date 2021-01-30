@@ -121,7 +121,7 @@ abstract class Creator
     protected $container;
 
     /** @var array Resulting Acumulus invoice */
-    protected $invoice = array();
+    protected $invoice = [];
 
     /** @var Source */
     protected $invoiceSource;
@@ -180,7 +180,7 @@ abstract class Creator
     protected function setInvoiceSource($invoiceSource)
     {
         $this->invoiceSource = $invoiceSource;
-        if (!in_array($invoiceSource->getType(), array(Source::Order, Source::CreditNote))) {
+        if (!in_array($invoiceSource->getType(), [Source::Order, Source::CreditNote])) {
             $this->log->error('Creator::setSource(): unknown source type %s', $this->invoiceSource->getType());
         }
     }
@@ -190,7 +190,7 @@ abstract class Creator
      */
     protected function setPropertySources()
     {
-        $this->propertySources = array();
+        $this->propertySources = [];
         $this->propertySources['invoiceSource'] = $this->invoiceSource;
         if (array_key_exists(Source::CreditNote, $this->shopCapabilities->getSupportedInvoiceSourceTypes())) {
             $this->propertySources['originalInvoiceSource'] = $this->invoiceSource->getOrder();
@@ -221,7 +221,7 @@ abstract class Creator
      */
     public function addPropertySource($name, $property)
     {
-        $this->propertySources = array($name => $property) + $this->propertySources;
+        $this->propertySources = [$name => $property] + $this->propertySources;
     }
 
     /**
@@ -248,7 +248,7 @@ abstract class Creator
     {
         $this->setInvoiceSource($source);
         $this->setPropertySources();
-        $this->invoice = array();
+        $this->invoice = [];
         $this->invoice[Tag::Customer] = $this->getCustomer();
         $this->invoice[Tag::Customer][Tag::Invoice] = $this->getInvoice();
         $this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] = $this->getInvoiceLines();
@@ -303,7 +303,7 @@ abstract class Creator
      */
     protected function getCustomer()
     {
-        $customer = array();
+        $customer = [];
         $customerSettings = $this->config->getCustomerSettings();
         $this->addDefault($customer, Tag::Type, $customerSettings['defaultCustomerType']);
         $this->addTokenDefault($customer, Tag::ContactYourId, $customerSettings['contactYourId']);
@@ -378,7 +378,7 @@ abstract class Creator
      */
     protected function getInvoice()
     {
-        $invoice = array();
+        $invoice = [];
 
         $shopSettings = $this->config->getShopSettings();
         $invoiceSettings = $this->config->getInvoiceSettings();
@@ -424,7 +424,7 @@ abstract class Creator
         $this->addTokenDefault($invoice, Tag::DescriptionText, $invoiceSettings['descriptionText']);
         // Change newlines to the literal \n, tabs are not supported.
         if (!empty($invoice[Tag::DescriptionText])) {
-            $invoice[Tag::DescriptionText] = str_replace(array("\r\n", "\r", "\n"), '\n', $invoice[Tag::DescriptionText]);
+            $invoice[Tag::DescriptionText] = str_replace(["\r\n", "\r", "\n"], '\n', $invoice[Tag::DescriptionText]);
         }
 
         // Acumulus invoice template to use: this depends on the payment status
@@ -437,7 +437,7 @@ abstract class Creator
         $this->addTokenDefault($invoice, Tag::InvoiceNotes, $invoiceSettings['invoiceNotes']);
         // Change newlines to the literal \n and tabs to \t.
         if (!empty($invoice[Tag::InvoiceNotes])) {
-            $invoice[Tag::InvoiceNotes] = str_replace(array("\r\n", "\r", "\n", "\t"), array('\n', '\n', '\n', '\t'), $invoice[Tag::InvoiceNotes]);
+            $invoice[Tag::InvoiceNotes] = str_replace(["\r\n", "\r", "\n", "\t"], ['\n', '\n', '\n', '\t'], $invoice[Tag::InvoiceNotes]);
         }
 
         // Meta data.
@@ -673,7 +673,7 @@ abstract class Creator
      */
     protected function getFeeLines()
     {
-        $result = array();
+        $result = [];
 
         $shippingLines = $this->getShippingLines();
         if ($shippingLines) {
@@ -709,7 +709,7 @@ abstract class Creator
      */
     protected function getShippingLines()
     {
-        $result = array();
+        $result = [];
         $line = $this->getShippingLine();
         if ($line) {
             $result[] = $line;
@@ -754,7 +754,7 @@ abstract class Creator
      */
     protected function getPaymentFeeLine()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -767,7 +767,7 @@ abstract class Creator
      */
     protected function getGiftWrappingLine()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -809,7 +809,7 @@ abstract class Creator
      */
     protected function getManualLines()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -823,7 +823,7 @@ abstract class Creator
      */
     protected function getEmailAsPdf($fallbackEmailTo)
     {
-        $emailAsPdf = array();
+        $emailAsPdf = [];
         $emailAsPdfSettings = $this->config->getEmailAsPdfSettings();
         if ($emailAsPdfSettings['emailAsPdf']) {
             $emailTo = !empty($emailAsPdfSettings['emailTo']) ? $this->getTokenizedValue($emailAsPdfSettings['emailTo']) : $fallbackEmailTo;
@@ -1029,20 +1029,20 @@ abstract class Creator
     public static function getVatRangeTags($numerator, $denominator, $numeratorPrecision = 0.01, $denominatorPrecision = 0.01)
     {
         if (Number::isZero($denominator, 0.0001)) {
-            $result = array(
+            $result = [
                 Tag::VatRate => null,
                 Meta::VatAmount => $numerator,
                 Meta::VatRateSource => static::VatRateSource_Completor,
-            );
+            ];
         } elseif (Number::isZero($numerator, 0.0001)) {
-            $result = array(
+            $result = [
                 Tag::VatRate => 0,
                 Meta::VatAmount => $numerator,
                 Meta::VatRateSource => static::VatRateSource_Exact0,
-            );
+            ];
         } else {
             $range = Number::getDivisionRange($numerator, $denominator, $numeratorPrecision, $denominatorPrecision);
-            $result = array(
+            $result = [
                 Tag::VatRate => 100.0 * $range['calculated'],
                 Meta::VatRateMin => 100.0 * $range['min'],
                 Meta::VatRateMax => 100.0 * $range['max'],
@@ -1050,7 +1050,7 @@ abstract class Creator
                 Meta::PrecisionUnitPrice => $denominatorPrecision,
                 Meta::PrecisionVatAmount => $numeratorPrecision,
                 Meta::VatRateSource => static::VatRateSource_Calculated,
-            );
+            ];
         }
         return $result;
     }
@@ -1070,9 +1070,9 @@ abstract class Creator
      *
      * @return mixed
      */
-    protected function callSourceTypeSpecificMethod($method, $args = array())
+    protected function callSourceTypeSpecificMethod($method, $args = [])
     {
         $method .= $this->invoiceSource->getType();
-        return call_user_func_array(array($this, $method), $args);
+        return call_user_func_array([$this, $method], $args);
     }
 }

@@ -72,7 +72,7 @@ class Creator extends BaseCreator
      */
     protected function getItemLines()
     {
-        return array_map(array($this, 'getItemLine'), $this->order->products);
+        return array_map([$this, 'getItemLine'], $this->order->products);
     }
 
     /**
@@ -84,7 +84,7 @@ class Creator extends BaseCreator
      */
     protected function getItemLine(stdClass $item)
     {
-        $result = array();
+        $result = [];
         $this->addPropertySource('item', $item);
         $this->addProductInfo($result);
         // Remove html with variant info from product name, we'll add that later
@@ -103,12 +103,12 @@ class Creator extends BaseCreator
             // - But still send the VAT rate to Acumulus.
             $result[Tag::UnitPrice] = $productPriceEx + $productVat;
         } else {
-            $result += array(
+            $result += [
                 Tag::UnitPrice => $productPriceEx,
                 Meta::LineAmount => $item->order_product_total_price_no_vat,
                 Meta::LineAmountInc => $item->order_product_total_price,
                 Meta::VatAmount => $productVat,
-            );
+            ];
         }
         $result[Tag::Quantity] = $item->order_product_quantity;
 
@@ -129,10 +129,10 @@ class Creator extends BaseCreator
         }
 
         if (isset($vatRate)) {
-            $vatInfo = array(
+            $vatInfo = [
                 Tag::VatRate => 100.0 * $vatRate,
                 Meta::VatRateSource => Number::isZero($productVat) ? Creator::VatRateSource_Exact0 : Creator::VatRateSource_Exact,
-            );
+            ];
         } else {
             $vatInfo = $this->getVatRangeTags($productVat, $productPriceEx, $this->precision, $this->precision);
         }
@@ -143,7 +143,7 @@ class Creator extends BaseCreator
             $result[Meta::VatClassId] = $productVatInfo->category_namekey;
             /** @var \hikashopCategoryClass $categoryClass */
             $categoryClass = hikashop_get('class.category');
-            $categoryClass->namekeys = array('category_namekey');
+            $categoryClass->namekeys = ['category_namekey'];
             /** @var stdClass $category */
             $category = $categoryClass->get($productVatInfo->category_namekey);
             if (isset($category->category_name)) {
@@ -211,17 +211,17 @@ class Creator extends BaseCreator
      */
     protected function getVariantLines(stdClass $item, $parentQuantity, $vatRangeTags)
     {
-        $result = array();
+        $result = [];
 
         foreach ($item->order_product_options as $key => $value) {
             // Skip numeric keys that have a StdClass as value.
             if (!is_numeric($key) && is_string($value)) {
                 // Add variant.
-                $result[] = array(
+                $result[] = [
                     Tag::Product => $key . ': ' . $value,
                     Tag::UnitPrice => 0,
                     Tag::Quantity => $parentQuantity,
-                ) + $vatRangeTags;
+                ] + $vatRangeTags;
             }
         }
 
@@ -360,7 +360,7 @@ class Creator extends BaseCreator
      */
     protected function getDiscountLines()
     {
-        $result = array();
+        $result = [];
 
         if (!Number::isZero($this->order->order_discount_price)) {
             $discountInc = (float) $this->order->order_discount_price;
@@ -375,7 +375,7 @@ class Creator extends BaseCreator
                 ? $this->t('discount')
                 : $this->t('discount_code') . ' ' . $this->order->order_discount_code;
 
-            $result[] = array(
+            $result[] = [
                     Tag::Product => $description,
                     Tag::Quantity => 1,
                     Tag::UnitPrice => -$discountEx,
@@ -383,7 +383,7 @@ class Creator extends BaseCreator
                     Meta::PrecisionUnitPriceInc => $this->precision,
                     Meta::RecalculatePrice => $recalculatePrice,
                     Meta::VatAmount => -$discountVat,
-                ) + $vatInfo;
+                        ] + $vatInfo;
         }
 
         return $result;
@@ -395,7 +395,7 @@ class Creator extends BaseCreator
     protected function getPaymentFeeLine()
     {
         // @todo check (return on refund?)
-        $result = array();
+        $result = [];
         if (!Number::isZero($this->order->order_payment_price)) {
             $paymentInc = (float) $this->order->order_payment_price;
             $paymentVat = (float) $this->order->order_payment_tax;
@@ -405,7 +405,7 @@ class Creator extends BaseCreator
             $description = $this->t('payment_costs');
 
             // Add vat lookup meta data.
-            $vatLookupMetaData = array();
+            $vatLookupMetaData = [];
             if (!empty($this->order->order_payment_id)) {
                 /** @var \hikashopShippingClass $paymentClass */
                 $paymentClass = hikashop_get('class.payment');
@@ -417,15 +417,15 @@ class Creator extends BaseCreator
                     /** @var stdClass $category */
                     $category = $categoryClass->get($payment->payment_params->payment_tax_id);
                     if (isset($category->category_namekey)) {
-                        $vatLookupMetaData += array(
+                        $vatLookupMetaData += [
                             Meta::VatClassId => $category->category_namekey,
                             Meta::VatClassName => $category->category_name,
-                        );
+                        ];
                     }
                 }
             }
 
-            $result = array(
+            $result = [
                     Tag::Product => $description,
                     Tag::Quantity => 1,
                     Tag::UnitPrice => $paymentEx,
@@ -433,7 +433,7 @@ class Creator extends BaseCreator
                     Meta::PrecisionUnitPriceInc => $this->precision,
                     Meta::RecalculatePrice => $recalculatePrice,
                     Meta::VatAmount => $paymentVat,
-                ) + $vatInfo + $vatLookupMetaData;
+                ] + $vatInfo + $vatLookupMetaData;
         }
         return $result;
     }

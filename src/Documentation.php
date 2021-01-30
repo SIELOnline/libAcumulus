@@ -135,9 +135,9 @@
  * --------------------------
  * If you want to develop an extension for another webshop these are the steps
  * to follow:
- * - Use only PHP language constructs that were already available in PHP 5.3 and
- *   have not been deprecated since. Even though PHP5.3 is hardly used anymore,
- *   e.g. WordPress still validates on it when checking in code.
+ * - Use only PHP language constructs that are available in PHP 5.6 and have not
+ *   been deprecated since. Even though PHP5 is hardly used anymore, e.g.
+ *   WordPress still (might) validate(s) on it when checking in code.
  * - We advice using PhpStorm. This IDE guards you against numerous errors that
  *   are simply to make in not strongly typed languages.
  * - Document all your code, especially parameter, return and variable types.

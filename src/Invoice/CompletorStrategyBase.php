@@ -223,8 +223,8 @@ abstract class CompletorStrategyBase
      */
     protected function initLines2Complete()
     {
-        $this->linesCompleted = array();
-        $this->lines2Complete = array();
+        $this->linesCompleted = [];
+        $this->lines2Complete = [];
         foreach ($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] as $key => $line) {
             if ($line[Meta::VatRateSource] === Creator::VatRateSource_Strategy) {
                 $this->linesCompleted[] = $key;
@@ -239,7 +239,7 @@ abstract class CompletorStrategyBase
      */
     protected function initVatBreakdown()
     {
-        $this->vatBreakdown = array();
+        $this->vatBreakdown = [];
         foreach ($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] as $line) {
             if ($line[Meta::VatRateSource] !== Creator::VatRateSource_Strategy && isset($line[Tag::VatRate])) {
                 $amount = $line[Tag::UnitPrice] * $line[Tag::Quantity];
@@ -252,12 +252,12 @@ abstract class CompletorStrategyBase
                     $breakdown['amount'] += $amount;
                     $breakdown['count']++;
                 } else {
-                    $this->vatBreakdown[$vatRate] = array(
+                    $this->vatBreakdown[$vatRate] = [
                         Tag::VatRate => (float) $vatRate,
                         Meta::VatAmount => $vatAmount,
                         'amount' => $amount,
                         'count' => 1,
-                    );
+                    ];
                 }
             }
         }
@@ -271,7 +271,7 @@ abstract class CompletorStrategyBase
      */
     protected function getVatBreakDownMinRate()
     {
-        $result = array(Tag::VatRate => PHP_INT_MAX);
+        $result = [Tag::VatRate => PHP_INT_MAX];
         foreach ($this->vatBreakdown as $breakDown) {
             if ($breakDown[Tag::VatRate] < $result[Tag::VatRate]) {
                 $result = $breakDown;
@@ -288,7 +288,7 @@ abstract class CompletorStrategyBase
      */
     protected function getVatBreakDownMaxRate()
     {
-        $result = array(Tag::VatRate => -PHP_INT_MAX);
+        $result = [Tag::VatRate => -PHP_INT_MAX];
         foreach ($this->vatBreakdown as $breakDown) {
             if ($breakDown[Tag::VatRate] > $result[Tag::VatRate]) {
                 $result = $breakDown;
@@ -305,7 +305,7 @@ abstract class CompletorStrategyBase
      */
     protected function getVatBreakDownMaxAmount()
     {
-        $result = array('amount' => -PHP_INT_MAX);
+        $result = ['amount' => -PHP_INT_MAX];
         foreach ($this->vatBreakdown as $breakDown) {
             if ($breakDown['amount'] > $result['amount']) {
                 $result = $breakDown;
@@ -322,7 +322,7 @@ abstract class CompletorStrategyBase
      */
     public function apply()
     {
-        $this->replacingLines = array();
+        $this->replacingLines = [];
         $this->init();
         if ($this->checkPreconditions()) {
             return $this->execute();
@@ -423,6 +423,6 @@ abstract class CompletorStrategyBase
         $highVatRate /= 100;
         $highAmount = ($vatAmount - $amount * $lowVatRate) / ($highVatRate - $lowVatRate);
         $lowAmount = $amount - $highAmount;
-        return array($lowAmount, $highAmount);
+        return [$lowAmount, $highAmount];
     }
 }

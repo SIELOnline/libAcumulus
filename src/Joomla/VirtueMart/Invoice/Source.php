@@ -107,7 +107,7 @@ class Source extends BaseSource
      */
     protected function getPaidStatuses()
     {
-        return array('C', 'S', 'R');
+        return ['C', 'S', 'R'];
     }
 
     /**
@@ -161,10 +161,10 @@ class Source extends BaseSource
      */
     protected function getAvailableTotals()
     {
-        return array(
+        return [
             Meta::InvoiceAmountInc => $this->source['details']['BT']->order_total,
             Meta::InvoiceVatAmount => $this->source['details']['BT']->order_billTaxAmount,
-        );
+        ];
     }
 
     /**

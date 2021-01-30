@@ -85,7 +85,7 @@ class SplitKnownDiscountLine extends CompletorStrategyBase
         }
 
         if ($this->splitLineCount === 1) {
-            $this->discountsPerVatRate = array();
+            $this->discountsPerVatRate = [];
             $this->knownDiscountAmountInc = 0.0;
             $this->knownDiscountVatAmount = 0.0;
             foreach ($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] as $line) {
@@ -124,7 +124,7 @@ class SplitKnownDiscountLine extends CompletorStrategyBase
      */
     public function execute()
     {
-        $this->linesCompleted = array($this->splitLineKey);
+        $this->linesCompleted = [$this->splitLineKey];
         return $this->splitDiscountLine();
     }
 
@@ -134,7 +134,7 @@ class SplitKnownDiscountLine extends CompletorStrategyBase
     protected function splitDiscountLine()
     {
         $this->description = "SplitKnownDiscountLine({$this->knownDiscountAmountInc}, {$this->knownDiscountVatAmount})";
-        $this->replacingLines = array();
+        $this->replacingLines = [];
         foreach ($this->discountsPerVatRate as $vatRate => $discountAmountInc) {
             $line = $this->splitLine;
             $line[Tag::Product] = "{$line[Tag::Product]} ($vatRate%)";

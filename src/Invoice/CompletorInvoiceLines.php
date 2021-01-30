@@ -644,7 +644,7 @@ class CompletorInvoiceLines
             $vatRateInfos = $this->possibleVatRates;
         }
 
-        $result = array();
+        $result = [];
         foreach ($vatRateInfos as $vatRateInfo) {
             $vatRate = is_array($vatRateInfo) ? $vatRateInfo[Tag::VatRate] : $vatRateInfo;
             if ($min <= $vatRate && $vatRate <= $max) {
@@ -675,7 +675,7 @@ class CompletorInvoiceLines
             $vatRateInfos = $this->possibleVatRates;
         }
 
-        $result = array();
+        $result = [];
         foreach ($vatRateInfos as $vatRateInfo) {
             $vatRate = $vatRateInfo[Tag::VatRate];
             foreach ($vatRates as $vatRateInfo2) {
@@ -708,7 +708,7 @@ class CompletorInvoiceLines
             $vatRateInfos = $this->possibleVatRates;
         }
 
-        $result = array();
+        $result = [];
         foreach ($vatRateInfos as $vatRateInfo) {
             if (($vatRateInfo[Tag::VatType] === Api::VatType_ForeignVat) === $isForeignVatType) {
                 $result[] = $vatRateInfo;

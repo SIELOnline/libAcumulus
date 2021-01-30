@@ -134,14 +134,14 @@ class Source extends BaseSource
      */
     public function getCurrency()
     {
-        $result = array();
+        $result = [];
         if (!empty($this->source->order_currency_info)) {
             $currency = unserialize($this->source->order_currency_info);
-            $result = array(
+            $result = [
                 Meta::Currency => $currency->currency_code,
                 Meta::CurrencyRate => (float) $currency->currency_rate,
                 Meta::CurrencyDoConvert => true,
-            );
+            ];
         }
         return $result;
     }
@@ -163,10 +163,10 @@ class Source extends BaseSource
                 }
             }
         }
-        return array(
+        return [
             Meta::InvoiceAmountInc => $this->source->order_full_price,
             Meta::InvoiceVatAmount => $vatAmount,
-        );
+        ];
     }
 
     /**

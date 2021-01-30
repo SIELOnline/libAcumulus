@@ -132,7 +132,7 @@ abstract class Source extends BaseSource
      */
     protected function isPaidStatus($status)
     {
-        return in_array($status, array('processing', 'closed', 'complete'));
+        return in_array($status, ['processing', 'closed', 'complete']);
     }
 
     /**
@@ -166,10 +166,10 @@ abstract class Source extends BaseSource
     protected function getAvailableTotals()
     {
         $sign = $this->getSign();
-        return array(
+        return [
             Meta::InvoiceAmountInc => $sign * $this->source->getBaseGrandTotal(),
             Meta::InvoiceVatAmount => $sign * $this->source->getBaseTaxAmount(),
-        );
+        ];
     }
 
     /**

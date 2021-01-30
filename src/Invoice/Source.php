@@ -437,7 +437,7 @@ abstract class Source
     {
         $result = null;
         if ($this->getType() === static::Order) {
-            $result = array();
+            $result = [];
             $shopCreditNotes = $this->getShopCreditNotesOrIds();
             foreach ($shopCreditNotes as $shopCreditNote) {
                 $result[] = new static(static::CreditNote, $shopCreditNote);
@@ -460,7 +460,7 @@ abstract class Source
      */
     protected function getShopCreditNotesOrIds()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -479,11 +479,11 @@ abstract class Source
      *
      * @return mixed
      */
-    protected function callTypeSpecificMethod($method, $args = array())
+    protected function callTypeSpecificMethod($method, $args = [])
     {
         $method .= $this->getType();
         if (method_exists($this, $method)) {
-            return call_user_func_array(array($this, $method), $args);
+            return call_user_func_array([$this, $method], $args);
         }
         return null;
     }

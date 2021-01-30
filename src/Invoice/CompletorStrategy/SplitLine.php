@@ -101,8 +101,8 @@ class SplitLine extends CompletorStrategyBase
      */
     protected function init()
     {
-        $this->splitLines = array();
-        $this->otherLines = array();
+        $this->splitLines = [];
+        $this->otherLines = [];
         $this->otherLinesAmount = 0.0;
         foreach ($this->lines2Complete as $line2Complete) {
             if (!empty($line2Complete[Meta::StrategySplit])) {
@@ -164,7 +164,7 @@ class SplitLine extends CompletorStrategyBase
     protected function tryVatRate($vatRateForOtherLines)
     {
         $this->description = "SplitLine($vatRateForOtherLines, {$this->minVatRate[Tag::VatRate]}, {$this->maxVatRate[Tag::VatRate]})";
-        $this->replacingLines = array();
+        $this->replacingLines = [];
         $otherVatAmount = 0.0;
         foreach ($this->otherLines as $otherLine2Complete) {
             $otherVatAmount += $this->completeLine($otherLine2Complete, $vatRateForOtherLines);

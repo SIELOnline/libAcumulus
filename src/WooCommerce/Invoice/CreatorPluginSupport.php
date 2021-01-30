@@ -210,7 +210,7 @@ class CreatorPluginSupport
      */
     protected function groupBundles(array $itemLines)
     {
-        $result = array();
+        $result = [];
         foreach ($itemLines as &$itemLine) {
             if (!empty($itemLine[Meta::BundleParentId])) {
                 // Find the parent, note that we expect bundle products to
@@ -296,10 +296,10 @@ class CreatorPluginSupport
             if (!empty($item['tmcartepo_data'])) {
                 $line = &$this->getLineByMetaId($invoice[Tag::Customer][Tag::Invoice][Tag::Line], $item->get_id());
                 if ($line !== null) {
-                    $commonTags = array(
+                    $commonTags = [
                         Tag::Quantity => $line[Tag::Quantity],
                         Meta::VatRateSource => Creator::VatRateSource_Parent,
-                    );
+                    ];
                     if (!isset($line[Meta::ChildrenLines])) {
                         $line[Meta::ChildrenLines] = [];
                     }
@@ -324,7 +324,7 @@ class CreatorPluginSupport
      */
     protected function getExtraProductOptionsLines($item, array $commonTags)
     {
-        $result = array();
+        $result = [];
 
         // It is a bit unclear what format this meta data should have. In old
         // versions I had an unconditional unserialize, but now I get an array
@@ -346,10 +346,10 @@ class CreatorPluginSupport
             // Get option name and choice.
             $label = $option['name'];
             $choice = $option['value'];
-            $result[] = array(
+            $result[] = [
                             Tag::Product => $label . ': ' . $choice,
                             Tag::UnitPrice => 0,
-                        ) + $commonTags;
+                        ] + $commonTags;
         }
 
         return $result;

@@ -179,11 +179,11 @@ class Source extends BaseSource
      */
     public function getCurrency()
     {
-        return array(
+        return [
             Meta::Currency => 'EUR',
             Meta::CurrencyRate => 1.0,
             Meta::CurrencyDoConvert => false,
-        );
+        ];
     }
 
     /**
@@ -194,10 +194,10 @@ class Source extends BaseSource
      */
     protected function getAvailableTotals()
     {
-        return array(
+        return [
             Meta::InvoiceAmountInc => $this->source->get_total(),
             Meta::InvoiceVatAmount => $this->source->get_total_tax(),
-        );
+        ];
     }
 
     /**

@@ -77,7 +77,7 @@ class Creator extends BaseCreator
     protected function getItemLines()
     {
         // @todo: override or implement both addItemLinesOrder() and addItemLinesCreditNote()
-        $result = array();
+        $result = [];
         $lines = $this->invoiceSource->getSource()->getItemLines();
         foreach ($lines as $line) {
             $result[] = $this->getItemLine($line);
@@ -96,7 +96,7 @@ class Creator extends BaseCreator
      */
     protected function getItemLine($item)
     {
-        $result = array();
+        $result = [];
 
         // @todo: add property source(s) for this item line.
         $this->addPropertySource('item', $item);

@@ -195,10 +195,10 @@ class Source extends BaseSource
                          + $this->source->total_shipping_tax_incl;
         }
 
-        return array(
+        return [
             Meta::InvoiceAmountInc => $sign * $amountInc,
             Meta::InvoiceAmount => $sign * $amount,
-        );
+        ];
     }
 
     /**

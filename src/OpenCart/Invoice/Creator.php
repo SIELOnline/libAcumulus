@@ -76,7 +76,7 @@ class Creator extends BaseCreator
      */
     protected function getItemLines()
     {
-        $result = array();
+        $result = [];
 
         $orderProducts = $this->getOrderModel()->getOrderProducts($this->invoiceSource->getId());
         foreach ($orderProducts as $line) {
@@ -100,7 +100,7 @@ class Creator extends BaseCreator
      */
     protected function getItemLine(array $item)
     {
-        $result = array();
+        $result = [];
 
         // $product can be empty if the product has been deleted.
         $product = $this->getRegistry()->model_catalog_product->getProduct($item['product_id']);
@@ -136,18 +136,18 @@ class Creator extends BaseCreator
         $options = $this->getOrderModel()->getOrderOptions($item['order_id'], $item['order_product_id']);
         if (!empty($options)) {
             // Add options as children.
-            $result[Meta::ChildrenLines] = array();
+            $result[Meta::ChildrenLines] = [];
             $optionsVatInfo = $vatInfo;
             $optionsVatInfo[Meta::VatAmount] = 0;
             foreach ($options as $option) {
-                $result[Meta::ChildrenLines][] = array(
+                $result[Meta::ChildrenLines][] = [
                     Tag::Product => "{$option['name']}: {$option['value']}",
                     Tag::UnitPrice => 0,
                       // Table order_option does not have a quantity field, so
                       // composite products with multiple same sub product
                       // are apparently not covered. Take quantity from parent.
                     Tag::Quantity => $item['quantity'],
-                  ) + $optionsVatInfo;
+                                                 ] + $optionsVatInfo;
             }
         }
         $this->removePropertySource('product');
@@ -173,17 +173,17 @@ class Creator extends BaseCreator
      */
     protected function getVatRateLookupMetadata($taxClassId)
     {
-        $result = array();
+        $result = [];
 
         if (!empty($taxClassId)) {
             $taxClass = $this->getTaxClass($taxClassId);
             if ($taxClass) {
-                $result += array(
+                $result += [
                     Meta::VatClassId => $taxClass['tax_class_id'],
                     Meta::VatClassName => $taxClass['title'],
-                    Meta::VatRateLookup => array(),
-                    Meta::VatRateLookupLabel => array(),
-                );
+                    Meta::VatRateLookup => [],
+                    Meta::VatRateLookupLabel => [],
+                ];
 
                 $taxRules = $this->getTaxRules($taxClassId);
                 foreach ($taxRules as $taxRule) {
@@ -197,9 +197,9 @@ class Creator extends BaseCreator
                 }
             }
         } else {
-            $result += array(
+            $result += [
                 Meta::VatClassId => Config::VatClass_Null,
-            );
+            ];
         }
         return $result;
     }
@@ -214,7 +214,7 @@ class Creator extends BaseCreator
      */
     protected function getTotalLines()
     {
-        $result = array();
+        $result = [];
 
         /**
          * @var $totalLines
@@ -279,10 +279,10 @@ class Creator extends BaseCreator
      */
     protected function getTotalLine(array $line, $exVat)
     {
-        $result = array(
+        $result = [
             Tag::Product => $line['title'],
             Tag::Quantity => 1,
-        );
+        ];
         if ($exVat) {
             $result[Tag::UnitPrice] = $line['value'];
         } else {
@@ -291,28 +291,28 @@ class Creator extends BaseCreator
 
         if ($line['code'] === 'voucher') {
             // A voucher is to be seen as a partial payment, thus no tax.
-            $result += array(
+            $result += [
                 Tag::VatRate => -1,
                 Meta::VatRateSource => Creator::VatRateSource_Exact0,
-            );
+            ];
         } elseif ($line['code'] === 'coupon') {
             // Coupons may have to be split over various taxes.
-            $result += array(
+            $result += [
                 Tag::VatRate => null,
                 Meta::VatRateSource => Creator::VatRateSource_Strategy,
                 Meta::StrategySplit => $line['code'] === 'coupon',
-            );
+            ];
         } else {
             // Try to get a vat rate.
             $vatRateLookupMetaData = $this->getVatRateLookupByTotalLineType($line['code']);
             // The completor will add the looked up vat rate based on looked up
             // or just the highest appearing vat rate, or wil pass it to the
             // strategy phase.
-            $result += array(
+            $result += [
                 Tag::VatRate => null,
                 Meta::VatRateSource => Creator::VatRateSource_Completor,
                 Meta::StrategySplit => false,
-            ) + $vatRateLookupMetaData;
+                       ] + $vatRateLookupMetaData;
         }
 
         return $result;
@@ -341,7 +341,7 @@ class Creator extends BaseCreator
      */
     protected function getVatRateLookupByTotalLineType($code)
     {
-        $result = array();
+        $result = [];
         $query = $this->getTotalLineTaxClassLookupQuery($code);
         $queryResult = $this->getRegistry()->db->query($query);
         if (!empty($queryResult->row)) {
@@ -497,7 +497,7 @@ class Creator extends BaseCreator
      */
     protected function getZoneToGeoZones($geo_zone_id)
     {
-        static $geoZonesCache = array();
+        static $geoZonesCache = [];
 
         if (!isset($geoZonesCache[$geo_zone_id])) {
             /** @noinspection SqlResolve */

@@ -15,9 +15,9 @@ use Siel\Acumulus\Tag;
  *
  * The ideas and reasoning behind hierarchical lines and subsequently flattening
  * it :
- * - To provide the use some flexibility in how options, variants, composed
- *   products, or bundles are shown on the invoice, the Creator should create a
- *   raw invoice with all options, etc. on separate child lines.
+ * - To provide the user with some flexibility in how options, variants,
+ *   composed products, or bundles are shown on the invoice, the Creator should
+ *   create a raw invoice with all options, etc. on separate child lines.
  * - Acumulus only accepts flat lines, so eventually the lines must be
  *   flattened.
  * - There are a number of settings that determine how this is done: e.g. show
@@ -87,7 +87,7 @@ class FlattenerInvoiceLines
      */
     protected function flattenInvoiceLines(array $lines)
     {
-        $result = array();
+        $result = [];
 
         foreach ($lines as $line) {
             $children = null;
@@ -180,7 +180,7 @@ class FlattenerInvoiceLines
      */
     protected function getMergedLinesText(array $parent, array $children)
     {
-        $childrenTexts = array();
+        $childrenTexts = [];
         foreach ($children as $child) {
             $childrenTexts[] = $child[Tag::Product];
         }
@@ -393,7 +393,7 @@ class FlattenerInvoiceLines
      */
     protected function copyVatInfoToChildren(array $parent, array $children)
     {
-        static $vatMetaInfoTags = array(
+        static $vatMetaInfoTags = [
             Meta::VatRateMin,
             Meta::VatRateMax,
             Meta::VatRateLookup,
@@ -402,7 +402,7 @@ class FlattenerInvoiceLines
             Meta::VatRateLookupMatches,
             Meta::VatClassId,
             Meta::VatClassName,
-        );
+        ];
 
         foreach ($children as &$child) {
             if (isset($parent[Tag::VatRate])) {
@@ -550,7 +550,7 @@ class FlattenerInvoiceLines
      */
     protected function getAppearingVatRates(array $lines)
     {
-        $vatRates = array();
+        $vatRates = [];
         foreach ($lines as $line) {
             if (isset($line[Tag::VatRate])) {
                 $vatRate = sprintf('%.1f', $line[Tag::VatRate]);

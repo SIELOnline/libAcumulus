@@ -64,7 +64,7 @@ class Creator extends BaseCreator
      * - + others
      *
      * @var array */
-    protected $shopInvoice = array();
+    protected $shopInvoice = [];
 
     /**
      * Precision of amounts stored in VM. In VM you can enter either the price
@@ -126,7 +126,7 @@ class Creator extends BaseCreator
      */
     protected function getItemLines()
     {
-        return array_map(array($this, 'getItemLine'), $this->order['items']);
+        return array_map([$this, 'getItemLine'], $this->order['items']);
     }
 
     /**
@@ -138,7 +138,7 @@ class Creator extends BaseCreator
      */
     protected function getItemLine(stdClass $item)
     {
-        $result = array();
+        $result = [];
         $this->addPropertySource('item', $item);
 
         $this->addProductInfo($result);
@@ -155,11 +155,11 @@ class Creator extends BaseCreator
             // - But still send the VAT rate to Acumulus.
             $result[Tag::UnitPrice] = $productPriceInc;
         } else {
-            $result += array(
+            $result += [
                 Tag::UnitPrice => $productPriceEx,
                 Meta::UnitPriceInc => $productPriceInc,
                 Meta::VatAmount => $productVat,
-            );
+            ];
         }
         $result[Tag::Quantity] = $item->product_quantity;
         $result += $vatInfo;
@@ -187,7 +187,7 @@ class Creator extends BaseCreator
      */
     protected function getVariantLines(stdClass $item, $parentQuantity, $vatRangeTags)
     {
-        $result = array();
+        $result = [];
 
         // It is not possible (other then by copying a lot of awful code) to get
         // a list of separate attribute and value values. So we stick with
@@ -209,11 +209,11 @@ class Creator extends BaseCreator
                 // spans.
                 if ($span->getElementsByTagName('span')->length === 0) {
                     $text[] = $span->textContent;
-                    $result[] = array(
+                    $result[] = [
                         Tag::Product => $span->textContent,
                         Tag::UnitPrice => 0,
                         Tag::Quantity => $parentQuantity,
-                      ) + $vatRangeTags;
+                                ] + $vatRangeTags;
                 }
             }
         }
@@ -226,7 +226,7 @@ class Creator extends BaseCreator
      */
     protected function getShippingLine()
     {
-        $result = array();
+        $result = [];
         // We are checking on empty, assuming that a null value will be used to
         // indicate no shipping at all (downloadable product) and that free
         // shipping will be represented as the string '0.00' which is not
@@ -234,12 +234,12 @@ class Creator extends BaseCreator
         if (!empty($this->order['details']['BT']->order_shipment)) {
             $shippingEx = (float) $this->order['details']['BT']->order_shipment;
             $shippingVat = (float) $this->order['details']['BT']->order_shipment_tax;
-            $result = array(
+            $result = [
                     Tag::Product => $this->getShippingMethodName(),
                     Tag::UnitPrice => $shippingEx,
                     Tag::Quantity => 1,
                     Meta::VatAmount => $shippingVat,
-                ) + $this->getVatData('shipment', $shippingEx, $shippingVat);
+                      ] + $this->getVatData('shipment', $shippingEx, $shippingVat);
         }
         return $result;
     }
@@ -263,7 +263,7 @@ class Creator extends BaseCreator
      */
     protected function getDiscountLines()
     {
-        $result = array();
+        $result = [];
 
         // We do have several discount related fields in the order details:
         // - order_billDiscountAmount
@@ -273,8 +273,8 @@ class Creator extends BaseCreator
         // However, these fields seem to be totals based on applied non-tax
         // calculation rules. So it is better to add a line per calc rule with a
         // negative amount: this gives us descriptions of the discounts as well.
-        $result = array_merge($result, array_map(array($this, 'getCalcRuleDiscountLine'),
-            array_filter($this->order['calc_rules'], array($this, 'isDiscountCalcRule'))));
+        $result = array_merge($result, array_map([$this, 'getCalcRuleDiscountLine'],
+            array_filter($this->order['calc_rules'], [$this, 'isDiscountCalcRule'])));
 
         // Coupon codes are not stored in a calc rules, so handle them separately.
         if (!Number::isZero($this->order['details']['BT']->coupon_discount)) {
@@ -295,7 +295,7 @@ class Creator extends BaseCreator
     protected function isDiscountCalcRule(stdClass $calcRule)
     {
         return $calcRule->calc_amount < 0.0
-               && !in_array($calcRule->calc_kind, array('VatTax', 'shipment', 'payment'));
+               && !in_array($calcRule->calc_kind, ['VatTax', 'shipment', 'payment']);
     }
 
     /*
@@ -312,7 +312,7 @@ class Creator extends BaseCreator
      */
     protected function getCalcRuleDiscountLine(stdClass $calcRule)
     {
-        return array(
+        return [
             Tag::Product => $calcRule->calc_rule_name,
             Tag::Quantity => 1,
             Tag::UnitPrice => null,
@@ -320,7 +320,7 @@ class Creator extends BaseCreator
             Tag::VatRate => null,
             Meta::VatRateSource => static::VatRateSource_Strategy,
             Meta::StrategySplit => true,
-        );
+        ];
     }
 
     /**
@@ -331,7 +331,7 @@ class Creator extends BaseCreator
      */
     protected function getCouponCodeDiscountLine()
     {
-        return array(
+        return [
             Tag::ItemNumber => $this->order['details']['BT']->coupon_code,
             Tag::Product => $this->t('discount'),
             Tag::Quantity => 1,
@@ -339,7 +339,7 @@ class Creator extends BaseCreator
             Tag::VatRate => null,
             Meta::VatRateSource => static::VatRateSource_Strategy,
             Meta::StrategySplit => true,
-        );
+        ];
     }
 
     /**
@@ -347,17 +347,17 @@ class Creator extends BaseCreator
      */
     protected function getPaymentFeeLine()
     {
-        $result = array();
+        $result = [];
         if (!empty($this->order['details']['BT']->order_payment)) {
             $paymentEx = (float) $this->order['details']['BT']->order_payment;
             if (!Number::isZero($paymentEx)) {
                 $paymentVat = (float) $this->order['details']['BT']->order_payment_tax;
-                $result = array(
+                $result = [
                         Tag::Product => $this->t('payment_costs'),
                         Tag::UnitPrice => $paymentEx,
                         Tag::Quantity => 1,
                         Meta::VatAmount => $paymentVat,
-                    ) + $this->getVatData('payment', $paymentEx, $paymentVat);
+                          ] + $this->getVatData('payment', $paymentEx, $paymentVat);
             }
         }
         return $result;
@@ -405,19 +405,19 @@ class Creator extends BaseCreator
     {
         $calcRule = $this->getCalcRule($calcRuleType, $orderItemId);
         if (!empty($calcRule->calc_value)) {
-            $vatInfo = array(
+            $vatInfo = [
                 Tag::VatRate => (float) $calcRule->calc_value,
                 Meta::VatRateSource => Number::isZero($vatAmount) ? static::VatRateSource_Exact0 : static::VatRateSource_Exact,
                 Meta::VatClassId => $calcRule->virtuemart_calc_id,
                 Meta::VatClassName => $calcRule->calc_rule_name,
-            );
+            ];
         } elseif (Number::isZero($vatAmount)) {
             // No vat class assigned to payment.
-            $vatInfo = array(
+            $vatInfo = [
                 Tag::VatRate => Api::VatFree,
                 Meta::VatRateSource => static::VatRateSource_Exact0,
                 Meta::VatClassId => Config::VatClass_Null,
-            );
+            ];
         } else {
             $vatInfo = $this->getVatRangeTags($vatAmount, $amountEx, $this->precision);
         }

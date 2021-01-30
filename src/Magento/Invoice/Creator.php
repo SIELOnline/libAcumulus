@@ -53,7 +53,7 @@ abstract class Creator extends BaseCreator
      */
     protected function getItemLinesOrder()
     {
-        $result = array();
+        $result = [];
         // Items may be composed, so start with all "visible" items.
         foreach ($this->order->getAllVisibleItems() as $item) {
             $item = $this->getItemLineOrder($item);
@@ -91,19 +91,19 @@ abstract class Creator extends BaseCreator
      */
     protected function getDiscountLines()
     {
-        $result = array();
+        $result = [];
 
         /** @var \Mage_Sales_Model_Order|\Magento\Sales\Model\Order|\Mage_Sales_Model_Order_Creditmemo|\Magento\Sales\Model\Order\Creditmemo $source */
         $source = $this->invoiceSource->getSource();
         if (!Number::isZero($source->getBaseDiscountAmount())) {
-            $line = array(
+            $line = [
                 Tag::ItemNumber => '',
                 Tag::Product => $this->getDiscountDescription(),
                 Tag::VatRate => null,
                 Meta::VatRateSource => static::VatRateSource_Strategy,
                 Meta::StrategySplit => true,
                 Tag::Quantity => 1,
-            );
+            ];
             // Product prices incl. VAT => discount amount is also incl. VAT
             if ($this->productPricesIncludeTax()) {
                 $line[Meta::UnitPriceInc] = $this->invoiceSource->getSign() * $source->getBaseDiscountAmount();
@@ -122,15 +122,15 @@ abstract class Creator extends BaseCreator
      */
     protected function getManualLines()
     {
-        $result = array();
+        $result = [];
 
         if (isset($this->creditNote) && !Number::isZero($this->creditNote->getBaseAdjustment())) {
-            $line = array(
+            $line = [
                 Tag::Product => $this->t('refund_adjustment'),
                 Tag::UnitPrice => -$this->creditNote->getBaseAdjustment(),
                 Tag::Quantity => 1,
                 Tag::VatRate => 0,
-            );
+            ];
             $result[] = $line;
         }
         return $result;

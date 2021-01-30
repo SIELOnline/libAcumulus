@@ -87,8 +87,7 @@ class Source extends BaseSource
         // completed...
         $orderStatuses = (array) $this->getRegistry()->config->get('config_complete_status');
 
-        $result = (empty($orderStatuses) || in_array($this->source['order_status_id'], $orderStatuses)) ? Api::PaymentStatus_Paid : Api::PaymentStatus_Due;
-        return $result;
+        return (empty($orderStatuses) || in_array($this->source['order_status_id'], $orderStatuses)) ? Api::PaymentStatus_Paid : Api::PaymentStatus_Due;
     }
 
     /**
@@ -110,12 +109,11 @@ class Source extends BaseSource
      */
     public function getCurrency()
     {
-        $result = array(
+        return [
             Meta::Currency => $this->source['currency_code'],
             Meta::CurrencyRate => (float) $this->source['currency_value'],
             Meta::CurrencyDoConvert => false,
-        );
-        return $result;
+        ];
     }
 
     /**
@@ -126,11 +124,11 @@ class Source extends BaseSource
      */
     protected function getAvailableTotals()
     {
-        $result = array(
+        $result = [
             Meta::InvoiceAmountInc => $this->source['total'],
             Meta::InvoiceVatAmount => 0.0,
-            Meta::InvoiceVatBreakdown => array(),
-        );
+            Meta::InvoiceVatBreakdown => [],
+        ];
 
         /** @noinspection PhpUnhandledExceptionInspection */
         $orderTotals = $this->getOrderTotalLines();

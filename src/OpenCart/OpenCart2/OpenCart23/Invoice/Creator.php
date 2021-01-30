@@ -33,7 +33,7 @@ class Creator extends BaseCreator
         $code = $this->getRegistry()->db->escape($code);
         $query = "SELECT `code` FROM {$prefix}extension WHERE `type` = '{$code}'";
         $records = $this->getRegistry()->db->query($query);
-        $modules = array();
+        $modules = [];
         foreach ($records->rows as $row) {
             $modules[] = reset($row);
         }

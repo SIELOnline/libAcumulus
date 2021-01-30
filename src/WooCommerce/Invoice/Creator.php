@@ -39,7 +39,7 @@ class Creator extends BaseCreator
      */
     protected function getItemLines()
     {
-        $result = array();
+        $result = [];
         /** @var WC_Order_Item_Product[] $items */
         $items = $this->invoiceSource->getSource()->get_items(apply_filters('woocommerce_admin_order_item_types', 'line_item'));
         foreach ($items as $item) {
@@ -79,7 +79,7 @@ class Creator extends BaseCreator
      */
     protected function getItemLine($item, $product)
     {
-        $result = array();
+        $result = [];
 
         // Return if this "really" is an empty line, not when this is a line
         // with free products or an amount but without a quantity.
@@ -108,7 +108,7 @@ class Creator extends BaseCreator
         if (Number::isZero($quantity)) {
             $quantity = $this->invoiceSource->getSign();
         }
-        $commonTags = array(Tag::Quantity => $quantity);
+        $commonTags = [Tag::Quantity => $quantity];
         $result += $commonTags;
 
         // Add price info. get_total() and get_taxes() return line totals after
@@ -140,17 +140,17 @@ class Creator extends BaseCreator
             // Margin scheme:
             // - Do not put VAT on invoice: send price incl VAT as unitprice.
             // - But still send the VAT rate to Acumulus.
-            $result += array(
+            $result += [
                 Tag::UnitPrice => $productPriceInc,
-            );
+            ];
             $precisionEx = $precisionInc;
         } else {
-            $result += array(
+            $result += [
                 Tag::UnitPrice => $productPriceEx,
                 Meta::UnitPriceInc => $productPriceInc,
                 Meta::PrecisionUnitPriceInc => $precisionInc,
                 Meta::RecalculatePrice => $recalculatePrice,
-            );
+            ];
         }
 
         // Add tax info.
@@ -196,34 +196,34 @@ class Creator extends BaseCreator
     protected function getVatRateLookupMetadataByTaxClass($taxClassId)
     {
         if ($taxClassId === null) {
-            $result = array(
+            $result = [
                 Meta::VatClassId => Config::VatClass_Null,
-            );
+            ];
         } else {
             // '' denotes the 'standard' tax class, use 'standard' in meta data,
             // '' when searching.
             if ($taxClassId === '') {
                 $taxClassId = 'standard';
             }
-            $result = array(
+            $result = [
                 Meta::VatClassId => sanitize_title($taxClassId),
                 // Vat class name is the non-sanitized version of the id
                 // and thus does not convey more information: don't add.
-                Meta::VatRateLookup => array(),
-                Meta::VatRateLookupLabel => array(),
-            );
+                Meta::VatRateLookup => [],
+                Meta::VatRateLookupLabel => [],
+            ];
             if ($taxClassId === 'standard') {
                 $taxClassId = '';
             }
 
             // Find applicable vat rates. We use WC_Tax::find_rates() to find
             // them.
-            $args = array(
+            $args = [
                 'tax_class' => $taxClassId,
                 'country' => $this->invoice[Tag::Customer][Tag::CountryCode],
                 'city' => isset($this->invoice[Tag::Customer][Tag::City]) ? $this->invoice[Tag::Customer][Tag::City] : '',
                 'postcode' => isset($this->invoice[Tag::Customer][Tag::PostalCode]) ? $this->invoice[Tag::Customer][Tag::PostalCode] : '',
-            );
+            ];
             $taxRates = WC_Tax::find_rates($args);
             foreach ($taxRates as $taxRate) {
                 $result[Meta::VatRateLookup][] = $taxRate['rate'];
@@ -248,7 +248,7 @@ class Creator extends BaseCreator
      */
     protected function getVariantLines($item, WC_Product $product, array $commonTags)
     {
-        $result = array();
+        $result = [];
 
         /**
          * An array of objects with properties id, key, and value.
@@ -260,7 +260,7 @@ class Creator extends BaseCreator
             // Define hidden core fields: check this when new versions from WC
             // are released with the list in e.g.
             // wp-content\plugins\woocommerce\includes\admin\meta-boxes\views\html-order-item-meta.php
-            $hiddenOrderItemMeta = apply_filters('woocommerce_hidden_order_itemmeta', array(
+            $hiddenOrderItemMeta = apply_filters('woocommerce_hidden_order_itemmeta', [
                 '_qty',
                 '_tax_class',
                 '_product_id',
@@ -272,7 +272,7 @@ class Creator extends BaseCreator
                 'method_id',
                 'cost',
                 '_reduced_stock',
-            ));
+            ]);
             foreach ($metadata as $meta) {
                 // Skip hidden core fields and serialized data (also hidden core
                 // fields).
@@ -290,10 +290,10 @@ class Creator extends BaseCreator
                     $variantValue = $meta->value;
                 }
 
-                $result[] = array(
+                $result[] = [
                         Tag::Product => $variantLabel . ': ' . rawurldecode($variantValue),
                         Tag::UnitPrice => 0,
-                    ) + $commonTags;
+                            ] + $commonTags;
             }
         }
 
@@ -335,11 +335,11 @@ class Creator extends BaseCreator
         $feeEx = $item->get_total() / $quantity;
         $feeVat = $item->get_total_tax() / $quantity;
 
-        return array(
+        return [
                 Tag::Product => $this->t($item->get_name()),
                 Tag::UnitPrice => $feeEx,
                 Tag::Quantity => $item->get_quantity(),
-            ) + $this->getVatRangeTags($feeVat, $feeEx, $this->precision, $this->precision);
+               ] + $this->getVatRangeTags($feeVat, $feeEx, $this->precision, $this->precision);
     }
 
     /**
@@ -347,7 +347,7 @@ class Creator extends BaseCreator
      */
     protected function getShippingLines()
     {
-        $result = array();
+        $result = [];
         // Get the shipping lines for this order.
         /** @var \WC_Order_Item_Shipping[] $shippingItems */
         $shippingItems = $this->invoiceSource->getSource()->get_items(apply_filters('woocommerce_admin_order_item_types', 'shipping'));
@@ -406,11 +406,11 @@ class Creator extends BaseCreator
         $shippingVat = $item->get_total_tax() / $quantity;
         $precisionVat = 0.01;
 
-        return array(
+        return [
                 Tag::Product => $item->get_name(),
                 Tag::UnitPrice => $shippingEx,
                 Tag::Quantity => $quantity,
-            )
+               ]
                + $this->getVatRangeTags($shippingVat, $shippingEx, $precisionVat, $precisionShippingEx)
                + $vatLookupTags;
     }
@@ -437,7 +437,7 @@ class Creator extends BaseCreator
      */
     protected function getShippingVatRateLookupMetadata($taxes)
     {
-        $result = array();
+        $result = [];
         if (is_array($taxes)) {
             // Since version ?.?, $taxes has an indirection by key 'total'.
             if (!is_numeric(key($taxes))) {
@@ -449,15 +449,15 @@ class Creator extends BaseCreator
                         $taxRate = WC_Tax::_get_tax_rate($taxRateId, OBJECT);
                         if ($taxRate) {
                             if (empty($result)) {
-                                $result = array(
+                                $result = [
                                     Meta::VatClassId => $taxRate->tax_rate_class !== '' ? $taxRate->tax_rate_class : 'standard',
                                     // Vat class name is the non-sanitized
                                     // version of the id and thus does not
                                     // convey more information: don't add.
-                                    Meta::VatRateLookup => array(),
-                                    Meta::VatRateLookupLabel => array(),
+                                    Meta::VatRateLookup => [],
+                                    Meta::VatRateLookupLabel => [],
                                     Meta::VatRateLookupSource => 'shipping line taxes',
-                                );
+                                ];
                             }
                             // get_rate_percent() contains a % at the end of the
                             // string: remove it.
@@ -483,7 +483,7 @@ class Creator extends BaseCreator
                 // value for this setting). The code to get the derived tax
                 // class is more or less copied from WC_Abstract_Order.
                 if ($shippingTaxClass === 'inherit') {
-                    $foundClasses = array_intersect(array_merge(array(''), WC_Tax::get_tax_class_slugs()), $order->get_items_tax_classes());
+                    $foundClasses = array_intersect(array_merge([''], WC_Tax::get_tax_class_slugs()), $order->get_items_tax_classes());
                     $shippingTaxClass = count($foundClasses) === 1 ? reset($foundClasses) : false;
                 }
 
@@ -504,7 +504,7 @@ class Creator extends BaseCreator
      */
     protected function getDiscountLines()
     {
-        $result = array();
+        $result = [];
 
         // For refunds without any articles (probably just a manual refund) we
         // don't need to know what discounts were applied on the original order.
@@ -547,7 +547,7 @@ class Creator extends BaseCreator
         if ($coupon->get_id()) {
             // Coupon still exists: extract info from coupon.
             $description = sprintf('%s %s: ', $this->t('discount_code'), $coupon->get_code());
-            if (in_array($coupon->get_discount_type(), array('fixed_product', 'fixed_cart'))) {
+            if (in_array($coupon->get_discount_type(), ['fixed_product', 'fixed_cart'])) {
                 $amount = $this->invoiceSource->getSign() * $coupon->get_amount();
                 if (!Number::isZero($amount)) {
                     $description .= sprintf('€%.2f (%s)', $amount, $this->productPricesIncludeTax() ? $this->t('inc_vat') : $this->t('ex_vat'));
@@ -570,7 +570,7 @@ class Creator extends BaseCreator
             // Coupon no longer exists: use generic name.
             $description = $this->t('discount_code');
         }
-        return array(
+        return [
             Tag::ItemNumber => $coupon->get_code(),
             Tag::Product => $description,
             Tag::UnitPrice => 0,
@@ -579,7 +579,7 @@ class Creator extends BaseCreator
             Tag::VatRate => null,
             Meta::VatAmount => 0,
             Meta::VatRateSource => static::VatRateSource_Completor,
-        );
+        ];
     }
 
     /**

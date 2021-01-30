@@ -110,7 +110,7 @@ class Log
      * @return string
      *   The full formatted message whether it got logged or not.
      */
-    public function log($severity, $message, array $args = array())
+    public function log($severity, $message, array $args = [])
     {
         if ($severity >= min($this->getLogLevel(), Severity::Notice)) {
             if (count($args) > 0) {

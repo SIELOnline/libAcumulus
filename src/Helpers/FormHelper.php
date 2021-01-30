@@ -36,7 +36,7 @@ class FormHelper
      *
      * @var object[]|null
      */
-    protected $meta = array();
+    protected $meta = [];
 
     /**
      * FormHelper constructor.
@@ -113,10 +113,10 @@ class FormHelper
     public function addMetaField(array $fields)
     {
         $this->setMeta($this->constructFieldMeta($fields));
-        $fields[static::Meta] = array(
+        $fields[static::Meta] = [
             'type' => 'hidden',
             'value' => json_encode($this->getMeta()),
-        );
+        ];
         return $fields;
     }
 
@@ -132,7 +132,7 @@ class FormHelper
      */
     protected function constructFieldMeta(array $fields)
     {
-        $result = array();
+        $result = [];
         foreach ($fields as $key => $field) {
             $name = isset($field['name']) ? $field['name'] : (isset($field['id']) ? $field['id'] : $key);
             $type = $field['type'];

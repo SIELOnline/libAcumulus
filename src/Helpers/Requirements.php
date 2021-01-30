@@ -21,7 +21,7 @@ class Requirements
      */
     public function check()
     {
-        $result = array();
+        $result = [];
 
         // PHP 5.3 is a requirement as well because we use namespaces. But as
         // the parser will already have failed fatally before we get here, it

@@ -43,7 +43,7 @@ class FormRenderer extends BaseFormRenderer
         $wrapperType = $isFieldset ? 'fieldsetDescription' : 'description';
         if (!empty($text)) {
             if ($isFieldset) {
-                $output .= $this->getWrapper('label', array('class' => 'fieldset-description-label'));
+                $output .= $this->getWrapper('label', ['class' => 'fieldset-description-label']);
                 $output .= '🛈';
                 $output .= $this->getWrapperEnd('label');
                 $output .= $this->getWrapper($wrapperType);

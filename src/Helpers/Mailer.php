@@ -230,7 +230,7 @@ abstract class Mailer
         $bodyTexts = $this->getStatusSpecificBody($result);
         $messagesTexts = $this->getMessages($result);
         $supportTexts = $this->getSupportMessages($result);
-        $replacements = array(
+        $replacements = [
             '{invoice_source_type}' => $this->t($invoiceSourceType),
             '{invoice_source_reference}' => $invoiceSourceReference,
             '{acumulus_invoice_id}' => isset($resultInvoice['invoicenumber']) ? $resultInvoice['invoicenumber'] : $this->t('message_no_invoice'),
@@ -242,12 +242,12 @@ abstract class Mailer
             '{messages_html}' => $messagesTexts['html'],
             '{support_messages_text}' => $supportTexts['text'],
             '{support_messages_html}' => $supportTexts['html'],
-        );
+        ];
         $text = $this->t('mail_text');
         $text = strtr($text, $replacements);
         $html = $this->t('mail_html');
         $html = strtr($html, $replacements);
-        return array('text' => $text, 'html' => $html);
+        return ['text' => $text, 'html' => $html];
     }
 
     /**
@@ -274,7 +274,7 @@ abstract class Mailer
         $isEmailAsPdf = (bool) $emailAsPdfSettings['emailAsPdf'];
 
         // Collect the messages.
-        $sentences = array();
+        $sentences = [];
         switch ($invoiceSendResult->getStatus()) {
             case Severity::Exception:
                 $sentences[] = 'mail_body_exception';
@@ -327,10 +327,10 @@ abstract class Mailer
         // Collapse and format the sentences.
         $sentences = implode(' ', $sentences);
 
-        return array(
+        return [
             'text' => wordwrap($sentences, 70),
             'html' => "<p>$sentences</p>",
-        );
+        ];
     }
 
     /**
@@ -344,10 +344,10 @@ abstract class Mailer
      */
     protected function getMessages(Result $result)
     {
-        $messages = array(
+        $messages = [
             'text' => '',
             'html' => '',
-        );
+        ];
 
         if ($result->hasRealMessages()) {
             $header = $this->t('mail_messages_header');
@@ -355,10 +355,10 @@ abstract class Mailer
             $descriptionHtml = $this->t('mail_messages_desc_html');
             $messagesText = $result->formatMessages(Message::Format_PlainListWithSeverity, Severity::RealMessages);
             $messagesHtml = $result->formatMessages(Message::Format_HtmlListWithSeverity, Severity::RealMessages);
-            $messages = array(
+            $messages = [
                 'text' => "\n$header\n\n$messagesText\n\n$description\n",
                 'html' => "<details open><summary>$header</summary>$messagesHtml<p>$descriptionHtml</p></details>",
-            );
+            ];
         }
         return $messages;
     }
@@ -374,10 +374,10 @@ abstract class Mailer
      */
     protected function getSupportMessages(Result $result)
     {
-        $messages = array(
+        $messages = [
             'text' => '',
             'html' => '',
-        );
+        ];
 
         $pluginSettings = $this->config->getPluginSettings();
         // We add the request and response messages when set so or if there were
@@ -392,10 +392,10 @@ abstract class Mailer
                 $description = $this->t('mail_support_desc');
                 $supportMessagesText = $logMessages->formatMessages(Message::Format_PlainList);
                 $supportMessagesHtml = $logMessages->formatMessages(Message::Format_HtmlList);
-                $messages = array(
+                $messages = [
                     'text' => "\n$header\n\n$description\n\n$supportMessagesText\n",
                     'html' => "<details><summary>$header</summary><p>$description</p>$supportMessagesHtml</details>",
-                );
+                ];
             }
         }
         return $messages;

@@ -54,7 +54,7 @@ class Countries
         // - https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
         // EFTA countries are not part of this list because regarding invoicing
         // they are considered to be outside of the EU.
-        $euCountryCodes = array(
+        $euCountryCodes = [
             'BE',
             'BG',
             'CZ',
@@ -83,7 +83,7 @@ class Countries
             'SK',
             'FI',
             'SE',
-        );
+        ];
         return in_array(strtoupper($countryCode), $euCountryCodes);
     }
 
@@ -123,7 +123,7 @@ class Countries
      */
     public function getCountryName($countryCode)
     {
-        $countryNames = array(
+        $countryNames = [
             'AF' => 'Afghanistan',
             'AX' => 'Åland',
             'AL' => 'Albanië',
@@ -373,7 +373,7 @@ class Countries
             'SS' => 'Zuid-Soedan',
             'SE' => 'Zweden',
             'CH' => 'Zwitserland',
-        );
+        ];
         return isset($countryNames[$countryCode]) ? $countryNames[$countryCode] : '';
     }
 }

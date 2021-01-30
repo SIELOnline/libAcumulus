@@ -13,10 +13,10 @@ class Mailer extends BaseMailer
      */
     public function sendMail($from, $fromName, $to, $subject, $bodyText, $bodyHtml)
     {
-        $headers = array(
+        $headers = [
             "from: $fromName <$from>",
             'Content-Type: text/html; charset=UTF-8',
-        );
+        ];
         return wp_mail($to, $subject, $bodyHtml, $headers);
     }
 

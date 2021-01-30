@@ -44,7 +44,7 @@ class FormHelper extends BaseFormHelper
                     // Check for empty() as the collection name may have
                     // been initialized with an empty string.
                     if (empty($formValues[$fieldMeta->collection])) {
-                        $formValues[$fieldMeta->collection] = array();
+                        $formValues[$fieldMeta->collection] = [];
                     }
                     $formValues[$fieldMeta->collection][] = $key;
                 }

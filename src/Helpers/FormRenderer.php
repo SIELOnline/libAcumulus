@@ -221,15 +221,15 @@ class FormRenderer
         $output = '';
         foreach ($fields as $id => $field) {
             // Add defaults.
-            $field += array(
+            $field += [
                 'id' => $id,
                 'name' => $id,
                 'label' => '',
                 'value' => '',
                 'description' => '',
-                'attributes' => array(),
-                'options' => array(),
-            );
+                'attributes' => [],
+                'options' => [],
+            ];
             $output .= $this->renderField($field);
         }
         return $output;
@@ -322,7 +322,7 @@ class FormRenderer
 
         // Split attributes over label and element.
         $attributes = $field['attributes'];
-        $labelAttributes = array();
+        $labelAttributes = [];
         if (!empty($attributes['label'])) {
             $labelAttributes = $attributes['label'];
             unset($attributes['label']);
@@ -336,7 +336,7 @@ class FormRenderer
             $output .= $this->getWrapper('element');
             // Do not use a <label> with an "id" attribute on the label for a
             // set of radio buttons, a set of checkboxes (, or on markup).
-            $id = in_array($field['type'], array('radio', 'checkbox')) ? '' : $field['id'];
+            $id = in_array($field['type'], ['radio', 'checkbox']) ? '' : $field['id'];
             $output .= $this->renderLabel($field['label'], $id, $labelAttributes, true);
             $output .= $this->getWrapper('inputDescription');
         }
@@ -428,7 +428,7 @@ class FormRenderer
 
         if ($this->renderEmptyLabel || !empty($text)) {
             // Split attributes over label and wrapper.
-            $wrapperAttributes = array();
+            $wrapperAttributes = [];
             if (!empty($attributes['wrapper'])) {
                 $wrapperAttributes = $attributes['wrapper'];
                 unset($attributes['wrapper']);
@@ -564,7 +564,7 @@ class FormRenderer
 
         // Options.
         foreach ($field['options'] as $value => $text) {
-            $optionAttributes = array('value' => $value);
+            $optionAttributes = ['value' => $value];
             if ($this->isOptionSelected($field['value'], $value)) {
                 $optionAttributes['selected'] = true;
             }
@@ -614,10 +614,10 @@ class FormRenderer
             $output .= $this->getWrapper('radio1');
             $radioInput = $this->getOpenTag('input', $radioAttributes);
             if ($this->radioInputInLabel) {
-                $output .= $this->renderLabel($text, $radioAttributes['id'], array(), false, $radioInput);
+                $output .= $this->renderLabel($text, $radioAttributes['id'], [], false, $radioInput);
             } else {
                 $output .= $radioInput;
-                $output .= $this->renderLabel($text, $radioAttributes['id'], array(), false);
+                $output .= $this->renderLabel($text, $radioAttributes['id'], [], false);
             }
             $output .= $this->getWrapperEnd('radio1');
         }
@@ -657,10 +657,10 @@ class FormRenderer
             $output .= $this->getWrapper('checkbox1');
             $checkboxInput = $this->getOpenTag('input', $checkboxAttributes);
             if ($this->checkboxInputInLabel) {
-                $output .= $this->renderLabel($text, $checkboxAttributes['id'], array(), false, $checkboxInput);
+                $output .= $this->renderLabel($text, $checkboxAttributes['id'], [], false, $checkboxInput);
             } else {
                 $output .= $checkboxInput;
-                $output .= $this->renderLabel($text, $checkboxAttributes['id'], array(), false);
+                $output .= $this->renderLabel($text, $checkboxAttributes['id'], [], false);
             }
             $output .= $this->getWrapperEnd('checkbox1');
         }
@@ -680,7 +680,7 @@ class FormRenderer
      *
      * @return string
      */
-    protected function getWrapper($type, array $attributes = array())
+    protected function getWrapper($type, array $attributes = [])
     {
         $tag = "{$type}WrapperTag";
         $class = "{$type}WrapperClass";
@@ -725,7 +725,7 @@ class FormRenderer
      * @return string
      *   The rendered open tag.
      */
-    protected function getOpenTag($tag, array $attributes = array(), $selfClosing = false)
+    protected function getOpenTag($tag, array $attributes = [], $selfClosing = false)
     {
         return '<' . htmlspecialchars($tag, ENT_QUOTES, 'ISO-8859-1') . $this->renderAttributes($attributes) . ($selfClosing && !$this->html5 ? '/' : '') . '>';
     }
@@ -810,7 +810,7 @@ class FormRenderer
                     $attributes[$attribute] = (array) $attributes[$attribute];
                 } else {
                     // Set as an empty array
-                    $attributes[$attribute] = array();
+                    $attributes[$attribute] = [];
                 }
                 // Now we know for sure that it is an array, add it.
                 $attributes[$attribute] = array_merge($attributes[$attribute], (array) $value);
@@ -852,12 +852,12 @@ class FormRenderer
      */
     protected function getCheckboxAttributes(/** @noinspection PhpUnusedParameterInspection */$id, $name, $value)
     {
-        return array(
+        return [
             'type' => 'checkbox',
             'id' => "{$name}_{$value}",
             'name' => $value,
             'value' => 1,
-        );
+        ];
     }
 
     /**
@@ -871,12 +871,12 @@ class FormRenderer
      */
     protected function getRadioAttributes($id, $name, $value)
     {
-        return array(
+        return [
             'type' => 'radio',
             'id' => "{$id}_{$value}",
             'name' => $name,
             'value' => $value,
-        );
+        ];
     }
 
     /**

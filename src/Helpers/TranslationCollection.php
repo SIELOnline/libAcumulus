@@ -24,7 +24,7 @@ abstract class TranslationCollection
      */
     public function get($language)
     {
-        $result = array();
+        $result = [];
         if (isset($this->{$language})) {
             $result = $this->{$language};
         }

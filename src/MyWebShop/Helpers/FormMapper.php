@@ -43,7 +43,7 @@ class FormMapper extends BaseFormMapper
         // @todo: adapt to the way MyWebshop wants you to create a form,
         //  e.g. adding the Form object as parameter, or creating and returning
         //  a Form object.
-        $result = array();
+        $result = [];
         foreach ($fields as $id => $field) {
             if (!isset($field['id'])) {
                 $field['id'] = $id;
@@ -88,7 +88,7 @@ class FormMapper extends BaseFormMapper
      */
     protected function fieldset(array $field)
     {
-        $result = array();
+        $result = [];
 
         // @todo: adapt to the way MyWebshop wants you to define a fieldset.
 
@@ -106,7 +106,7 @@ class FormMapper extends BaseFormMapper
      */
     protected function element(array $field)
     {
-        $result = array();
+        $result = [];
 
         // @todo: adapt to the way MyWebshop wants you to define a simple form field.
 

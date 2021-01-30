@@ -64,7 +64,7 @@ class Number
         $max = $maxNumerator / $minDenominator;
         $calculated = $numerator / $denominator;
 
-        return array('min' => $min, 'calculated' => $calculated, 'max' => $max);
+        return ['min' => $min, 'calculated' => $calculated, 'max' => $max];
     }
 
     /**

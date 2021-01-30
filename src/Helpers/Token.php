@@ -62,10 +62,10 @@ use Exception;
  *
  * Example 3:
  * <pre>
- *   variables = array(
+ *   variables = [
  *     'order => Order(id = 3, date_created = 2016-02-03, ...),
  *     'customer' => Customer(id = 5, , date_created = 2016-01-01, name = 'Doe', ...),
- *    );
+ *    ];
  *   pattern = '[id] [customer::date_created] [name]'
  *   result = '3 2016-01-01 Doe'
  * </pre>
@@ -129,7 +129,7 @@ class Token
     public function expand($pattern, array $variables)
     {
         $this->variables = $variables;
-        return preg_replace_callback('/\[([^]]+)]/', array($this, 'tokenMatch'), $pattern);
+        return preg_replace_callback('/\[([^]]+)]/', [$this, 'tokenMatch'], $pattern);
     }
 
     /**
@@ -167,10 +167,10 @@ class Token
         $propertyAlternatives = explode('|', $propertySpec);
         foreach ($propertyAlternatives as $propertyAlternative) {
             $spaceSeparatedProperties = explode('+', $propertyAlternative);
-            $spaceSeparatedValues = array();
+            $spaceSeparatedValues = [];
             foreach ($spaceSeparatedProperties as $spaceSeparatedProperty) {
                 $nonSeparatedProperties = explode('&', $spaceSeparatedProperty);
-                $nonSeparatedValues = array();
+                $nonSeparatedValues = [];
                 foreach ($nonSeparatedProperties as $nonSeparatedProperty) {
                     if (substr($nonSeparatedProperty, 0, 1) === '"' && substr($nonSeparatedProperty, -1, 1) === '"') {
                         $nonSeparatedValue = substr($nonSeparatedProperty, 1, -1);
@@ -179,7 +179,7 @@ class Token
                         $nonSeparatedValue = $this->searchProperty($nonSeparatedProperty);
                         $valueType = self::TypeProperty;
                     }
-                    $nonSeparatedValues[] = array('type' => $valueType, 'value' => $nonSeparatedValue);
+                    $nonSeparatedValues[] = ['type' => $valueType, 'value' => $nonSeparatedValue];
                 }
                 $spaceSeparatedValues[] = $this->implodeValues('', $nonSeparatedValues);
             }
@@ -263,7 +263,7 @@ class Token
     {
         $value = null;
 
-        $args = array();
+        $args = [];
         if (preg_match('/(.+)\((.*)\)/', $property, $matches)) {
             $property = $matches[1];
             $args = explode(',', $matches[2]);
@@ -339,33 +339,33 @@ class Token
         $method2 = 'get' . ucfirst($property);
         $method3 = 'get_' . $property;
         if (method_exists($variable, $method1)) {
-            $value = call_user_func_array(array($variable, $method1), $args);
+            $value = call_user_func_array([$variable, $method1], $args);
         } elseif (method_exists($variable, $method2)) {
-            $value = call_user_func_array(array($variable, $method2), $args);
+            $value = call_user_func_array([$variable, $method2], $args);
         } elseif (method_exists($variable, $method3)) {
-            $value = call_user_func_array(array($variable, $method3), $args);
+            $value = call_user_func_array([$variable, $method3], $args);
         } elseif (method_exists($variable, '__get')) {
             @$value = $variable->$property;
         } elseif (method_exists($variable, '__call')) {
             try {
-                $value = @call_user_func_array(array($variable, $property), $args);
+                $value = @call_user_func_array([$variable, $property], $args);
             } catch (Exception $e) {
             }
             if ($value === null || $value === '') {
                 try {
-                    $value = call_user_func_array(array($variable, $method1), $args);
+                    $value = call_user_func_array([$variable, $method1], $args);
                 } catch (Exception $e) {
                 }
             }
             if ($value === null || $value === '') {
                 try {
-                    $value = call_user_func_array(array($variable, $method2), $args);
+                    $value = call_user_func_array([$variable, $method2], $args);
                 } catch (Exception $e) {
                 }
             }
             if ($value === null || $value === '') {
                 try {
-                    $value = call_user_func_array(array($variable, $method3), $args);
+                    $value = call_user_func_array([$variable, $method3], $args);
                 } catch (Exception $e) {
                 }
             }
@@ -435,6 +435,6 @@ class Token
             $result .= $previous;
         }
 
-        return array('type' => $hasProperty ? self::TypeProperty : self::TypeLiteral ,'value' => $result);
+        return ['type' => $hasProperty ? self::TypeProperty : self::TypeLiteral ,'value' => $result];
     }
 }

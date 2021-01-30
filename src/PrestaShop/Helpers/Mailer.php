@@ -27,7 +27,7 @@ class Mailer extends BaseMailer
         $this->writeTemplateFiles($bodyText, $bodyHtml);
 
         $languageId = Language::getIdByIso($this->translator->getLanguage());
-        $templateVars = array();
+        $templateVars = [];
 
         $result = Mail::Send($languageId, $this->templateName, $subject, $templateVars, $to, '', $from, $fromName, null, null, $this->templateDir);
 

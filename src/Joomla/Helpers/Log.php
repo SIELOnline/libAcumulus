@@ -17,9 +17,9 @@ class Log extends BaseLog
     public function __construct($libraryVersion)
     {
         parent::__construct($libraryVersion);
-        JLog::addLogger(array('text_file' => 'acumulus.log.php'),
+        JLog::addLogger(['text_file' => 'acumulus.log.php'],
             JLog::ALL,
-            array('com_acumulus')
+            ['com_acumulus']
         );
     }
 

@@ -299,7 +299,7 @@ class MessageCollection
      */
     public function formatMessages($format, $severity = Severity::All)
     {
-        $result = array();
+        $result = [];
         foreach ($this->getMessages($severity) as $message) {
             if (($message->getSeverity() & $severity) !== 0) {
                 $result[] = $message->format($format);

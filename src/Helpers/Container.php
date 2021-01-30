@@ -144,7 +144,7 @@ class Container
     protected $customNamespace = '';
 
     /** @var array */
-    protected $instances = array();
+    protected $instances = [];
 
     /** @var bool */
     protected $baseTranslationsAdded = false;
@@ -239,7 +239,7 @@ class Container
     public function getTranslator()
     {
         /** @var \Siel\Acumulus\Helpers\Translator $translator */
-        $translator = $this->getInstance('Translator', 'Helpers', array($this->getLanguage()));
+        $translator = $this->getInstance('Translator', 'Helpers', [$this->getLanguage()]);
         Translator::$instance = $translator;
         if (!$this->baseTranslationsAdded) {
             // Add some basic translations that are hard to add just-in-time.
@@ -274,7 +274,7 @@ class Container
     public function getLog()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('Log', 'Helpers', array(Version));
+        return $this->getInstance('Log', 'Helpers', [Version]);
     }
 
     /**
@@ -307,7 +307,7 @@ class Container
     public function getMailer()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('Mailer', 'Helpers', array($this->getConfig(), $this->getTranslator(), $this->getLog()));
+        return $this->getInstance('Mailer', 'Helpers', [$this->getConfig(), $this->getTranslator(), $this->getLog()]);
     }
 
     /**
@@ -318,7 +318,7 @@ class Container
     public function getToken()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('Token', 'Helpers', array($this->getLog()));
+        return $this->getInstance('Token', 'Helpers', [$this->getLog()]);
     }
 
     /**
@@ -329,7 +329,7 @@ class Container
     public function getFormHelper()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('FormHelper', 'Helpers', array($this->getTranslator()));
+        return $this->getInstance('FormHelper', 'Helpers', [$this->getTranslator()]);
     }
 
     /**
@@ -342,7 +342,7 @@ class Container
     public function getFormRenderer($newInstance = false)
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('FormRenderer', 'Helpers', array(), $newInstance);
+        return $this->getInstance('FormRenderer', 'Helpers', [], $newInstance);
     }
 
     /**
@@ -354,7 +354,7 @@ class Container
     public function getFormMapper()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('FormMapper', 'Helpers', array($this->getLog()));
+        return $this->getInstance('FormMapper', 'Helpers', [$this->getLog()]);
     }
 
     /**
@@ -365,7 +365,7 @@ class Container
     public function getAcumulusApiClient()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('Acumulus', 'ApiClient', array($this->getApiCommunicator(), $this, $this->getConfig()));
+        return $this->getInstance('Acumulus', 'ApiClient', [$this->getApiCommunicator(), $this, $this->getConfig()]);
     }
 
     /**
@@ -378,7 +378,7 @@ class Container
     public function getResult()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('Result', 'ApiClient', array(), true);
+        return $this->getInstance('Result', 'ApiClient', [], true);
     }
 
     /**
@@ -389,7 +389,7 @@ class Container
     public function getApiCommunicator()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('ApiCommunicator', 'ApiClient', array($this->getHttpCommunicator(), $this->getConfig(), $this->getLanguage(), $this->getLog()));
+        return $this->getInstance('ApiCommunicator', 'ApiClient', [$this->getHttpCommunicator(), $this->getConfig(), $this->getLanguage(), $this->getLog()]);
     }
 
     /**
@@ -400,7 +400,7 @@ class Container
     public function getHttpCommunicator()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('HttpCommunicator', 'ApiClient', array());
+        return $this->getInstance('HttpCommunicator', 'ApiClient', []);
     }
 
     /**
@@ -420,7 +420,7 @@ class Container
     public function getSource($invoiceSourceType, $invoiceSourceOrId)
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('Source', 'Invoice', array($invoiceSourceType, $invoiceSourceOrId), true);
+        return $this->getInstance('Source', 'Invoice', [$invoiceSourceType, $invoiceSourceOrId], true);
     }
 
     /**
@@ -438,7 +438,7 @@ class Container
     public function getInvoiceResult($trigger)
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('Result', 'Invoice', array($trigger), true);
+        return $this->getInstance('Result', 'Invoice', [$trigger], true);
     }
 
     /**
@@ -449,7 +449,7 @@ class Container
     public function getCompletor()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('Completor', 'Invoice', array($this->getCompletorInvoiceLines(), $this->getCompletorStrategyLines(), $this->getCountries(), $this->getAcumulusApiClient(), $this->getConfig(), $this->getTranslator(), $this->getLog()));
+        return $this->getInstance('Completor', 'Invoice', [$this->getCompletorInvoiceLines(), $this->getCompletorStrategyLines(), $this->getCountries(), $this->getAcumulusApiClient(), $this->getConfig(), $this->getTranslator(), $this->getLog()]);
     }
 
     /**
@@ -460,7 +460,7 @@ class Container
     public function getCompletorInvoiceLines()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('CompletorInvoiceLines', 'Invoice', array($this->getFlattenerInvoiceLines(), $this->getConfig()));
+        return $this->getInstance('CompletorInvoiceLines', 'Invoice', [$this->getFlattenerInvoiceLines(), $this->getConfig()]);
     }
 
     /**
@@ -471,7 +471,7 @@ class Container
     public function getFlattenerInvoiceLines()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('FlattenerInvoiceLines', 'Invoice', array($this->getConfig()));
+        return $this->getInstance('FlattenerInvoiceLines', 'Invoice', [$this->getConfig()]);
     }
 
     /**
@@ -482,7 +482,7 @@ class Container
     public function getCompletorStrategyLines()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('CompletorStrategyLines', 'Invoice', array($this->getConfig(), $this->getTranslator()));
+        return $this->getInstance('CompletorStrategyLines', 'Invoice', [$this->getConfig(), $this->getTranslator()]);
     }
 
     /**
@@ -493,7 +493,7 @@ class Container
     public function getCreator()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('Creator', 'Invoice', array($this->getToken(), $this->getCountries(), $this->getShopCapabilities(), $this, $this->getConfig(), $this->getTranslator(), $this->getLog()));
+        return $this->getInstance('Creator', 'Invoice', [$this->getToken(), $this->getCountries(), $this->getShopCapabilities(), $this, $this->getConfig(), $this->getTranslator(), $this->getLog()]);
     }
 
     /**
@@ -505,7 +505,7 @@ class Container
 
         $log = $this->getLog();
         /** @var \Siel\Acumulus\Config\Config $config */
-        $config = $this->getInstance('Config', 'Config', array($this->getConfigStore(), $this->getShopCapabilities(), $this, $this->getTranslator(), $log));
+        $config = $this->getInstance('Config', 'Config', [$this->getConfigStore(), $this->getShopCapabilities(), $this, $this->getTranslator(), $log]);
         if ($is1stTime) {
             $pluginSettings = $config->getPluginSettings();
             $log->setLogLevel($pluginSettings['logLevel']);
@@ -533,7 +533,7 @@ class Container
     public function getShopCapabilities()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('ShopCapabilities', 'Config', array($this->shopNamespace, $this->getTranslator(), $this->getLog()));
+        return $this->getInstance('ShopCapabilities', 'Config', [$this->shopNamespace, $this->getTranslator(), $this->getLog()]);
     }
 
     /**
@@ -544,7 +544,7 @@ class Container
     public function getInvoiceManager()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('InvoiceManager', 'Shop', array($this));
+        return $this->getInstance('InvoiceManager', 'Shop', [$this]);
     }
 
     /**
@@ -555,7 +555,7 @@ class Container
     public function getAcumulusEntryManager()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('AcumulusEntryManager', 'Shop', array($this, $this->getLog()));
+        return $this->getInstance('AcumulusEntryManager', 'Shop', [$this, $this->getLog()]);
     }
 
     /**
@@ -571,7 +571,7 @@ class Container
     public function getAcumulusEntry($record)
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('AcumulusEntry', 'Shop', array($record), true);
+        return $this->getInstance('AcumulusEntry', 'Shop', [$record], true);
     }
 
     /**
@@ -586,7 +586,7 @@ class Container
      */
     public function getForm($type)
     {
-        $arguments = array();
+        $arguments = [];
         switch (strtolower($type)) {
             case 'register':
                 $class = 'Register';
@@ -618,13 +618,13 @@ class Container
             default;
                 throw new InvalidArgumentException("Unknown form type $type");
         }
-        $arguments = array_merge($arguments, array(
+        $arguments = array_merge($arguments, [
             $this->getFormHelper(),
             $this->getShopCapabilities(),
             $this->getConfig(),
             $this->getTranslator(),
             $this->getLog(),
-        ));
+        ]);
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance($class . 'Form', 'Shop', $arguments);
     }
@@ -659,7 +659,7 @@ class Container
      *
      * @throws \InvalidArgumentException
      */
-    public function getInstance($class, $subNamespace, array $constructorArgs = array(), $newInstance = false)
+    public function getInstance($class, $subNamespace, array $constructorArgs = [], $newInstance = false)
     {
         $instanceKey = "$subNamespace\\$class";
         if (!isset($this->instances[$instanceKey]) || $newInstance) {
@@ -676,7 +676,7 @@ class Container
                     // Base level is always \Siel\Acumulus, even if
                     // \MyVendorName\Acumulus\MyWebShop was set as shopNamespace.
                     $namespace = static::baseNamespace;
-                    $namespaces = array();
+                    $namespaces = [];
                 } else {
                     $namespace = implode('\\', $namespaces);
                     array_pop($namespaces);

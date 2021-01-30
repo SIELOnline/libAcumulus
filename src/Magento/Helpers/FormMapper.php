@@ -72,7 +72,7 @@ class FormMapper extends BaseFormMapper
     public function field($parent, array $field)
     {
         if (!isset($field['attributes'])) {
-            $field['attributes'] = array();
+            $field['attributes'] = [];
         }
         $magentoType = $this->getMagentoType($field);
         $magentoElementSettings = $this->getMagentoElementSettings($field);
@@ -103,7 +103,7 @@ class FormMapper extends BaseFormMapper
             // Add description at the start of the fieldset/summary as a Note
             // element.
             if (!empty($field['description'])) {
-                $element->addField($field['id'] . '-note', 'note', array('text' => '<p class="note">' . $field['description'] . '</p>'));
+                $element->addField($field['id'] . '-note', 'note', ['text' => '<p class="note">' . $field['description'] . '</p>']);
             }
 
             // Add fields of fieldset.
@@ -308,12 +308,12 @@ class FormMapper extends BaseFormMapper
      */
     protected function getMagentoOptions(array $options)
     {
-        $config = array();
+        $config = [];
         foreach ($options as $value => $label) {
-            $config[] = array(
+            $config[] = [
                 'value' => $value,
                 'label' => $label,
-            );
+            ];
         }
         return $config;
     }

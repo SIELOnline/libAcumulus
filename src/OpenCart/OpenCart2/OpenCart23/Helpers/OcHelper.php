@@ -20,11 +20,11 @@ class OcHelper extends BaseOcHelper
      */
     protected function getExtensionsBreadcrumb()
     {
-        return array(
+        return [
             'text' => $this->t('extensions'),
             'href' => Registry::getInstance()->getLink('extension/extension'),
             'separator' => ' :: '
-        );
+        ];
     }
 
     /**

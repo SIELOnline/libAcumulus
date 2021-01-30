@@ -30,7 +30,7 @@ class FormMapper extends BaseFormMapper
      */
     protected function fields(array $fields)
     {
-        $result = array();
+        $result = [];
         foreach ($fields as $id => $field) {
             if (!isset($field['id'])) {
                 $field['id'] = $id;
@@ -70,19 +70,19 @@ class FormMapper extends BaseFormMapper
      */
     protected function fieldset(array $field)
     {
-        $result = array(
-            'form' => array(
-                'legend' => array(
+        $result = [
+            'form' => [
+                'legend' => [
                     'title' => !empty($field['summary']) ? $field['summary'] : $field['legend'],
-                ),
+                ],
                 'attributes' => ['class' => 'details'],
                 'input' => $this->fields($field['fields']),
-            ),
-        );
+            ],
+        ];
 
         // Add description at the start of the fieldset as an html element.
         if (isset($field['description'])) {
-            array_unshift($result['form']['input'], array('type' => 'html', 'name' => $field['name'] . '_description', 'html_content' => '<div class="help-block">' . $field['description'] . '</div>'));
+            array_unshift($result['form']['input'], ['type' => 'html', 'name' => $field['name'] . '_description', 'html_content' => '<div class="help-block">' . $field['description'] . '</div>']);
         }
 
         // Add icon to legend.
@@ -102,13 +102,13 @@ class FormMapper extends BaseFormMapper
      */
     protected function element(array $field)
     {
-        $result = array(
+        $result = [
             'type' => $this->getPrestaShopType($field['type']),
             'label' => isset($field['label']) ? $field['label'] : '',
             'name' => $field['name'],
             'required' => isset($field['attributes']['required']) ? $field['attributes']['required'] : false,
             'multiple' => isset($field['attributes']['multiple']) ? $field['attributes']['multiple'] : false,
-        );
+        ];
 
         if (!empty($field['attributes'])) {
             $result['attributes'] = $field['attributes'];
@@ -169,13 +169,13 @@ class FormMapper extends BaseFormMapper
      */
     protected function getPrestaShopValues($id, array $options)
     {
-        $result = array();
+        $result = [];
         foreach ($options as $value => $label) {
-            $result[] = array(
+            $result[] = [
                 'id' => $id . $value,
                 'value' => $value,
                 'label' => $label,
-            );
+            ];
         }
         return $result;
     }
@@ -191,17 +191,17 @@ class FormMapper extends BaseFormMapper
      */
     protected function getPrestaShopOptions(array $options)
     {
-        $result = array(
-            'query' => array(),
+        $result = [
+            'query' => [],
             'id' => 'id',
             'name' => 'name',
-        );
+        ];
 
         foreach ($options as $value => $label) {
-            $result['query'][] = array(
+            $result['query'][] = [
                 'id' => $value,
                 'name' => $label,
-            );
+            ];
         }
 
         return $result;

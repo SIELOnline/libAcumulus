@@ -17,7 +17,7 @@ class Mailer extends BaseMailer
     {
         $mailer = JFactory::getMailer();
         $mailer->isHtml(true);
-        $mailer->setSender(array($from, $fromName));
+        $mailer->setSender([$from, $fromName]);
         $mailer->addRecipient($to);
         $mailer->setSubject(html_entity_decode($subject));
         $mailer->setBody($bodyHtml);

@@ -63,7 +63,7 @@ class Translator
     public function __construct($language)
     {
         $this->language = $language;
-        $this->translations = array();
+        $this->translations = [];
     }
 
     /**

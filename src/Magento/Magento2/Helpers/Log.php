@@ -23,7 +23,7 @@ class Log extends BaseLog
     protected function getLogger()
     {
         if (!$this->logger) {
-            $this->logger = new Logger('acumulus', array(new Handler(new File())));
+            $this->logger = new Logger('acumulus', [new Handler(new File())]);
         }
         return $this->logger;
     }

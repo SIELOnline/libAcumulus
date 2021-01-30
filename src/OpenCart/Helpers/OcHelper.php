@@ -32,8 +32,8 @@ class OcHelper
     public function __construct(\Registry $registry, Container $container)
     {
         $this->container = $container;
-        $this->registry = $this->container->getInstance('Registry', 'Helpers', array($registry));
-        $this->data = array();
+        $this->registry = $this->container->getInstance('Registry', 'Helpers', [$registry]);
+        $this->data = [];
 
         $languageCode = $this->registry->language->get('code');
         if (empty($languageCode)) {
@@ -158,11 +158,11 @@ class OcHelper
      */
     protected function getExtensionsBreadcrumb()
     {
-        return array(
+        return [
             'text' => $this->t('extensions'),
             'href' => Registry::getInstance()->getLink('marketplace/extension'),
             'separator' => ' :: '
-        );
+        ];
     }
 
     /**
@@ -222,11 +222,11 @@ class OcHelper
 //        }
 //
 //        // Add an intermediate level to the breadcrumb.
-//        $this->data['breadcrumbs'][] = array(
+//        $this->data['breadcrumbs'][] = [
 //            'text' => $this->t('modules'),
 //            'href' => $this->registry->getLink('extension/module',),
 //            'separator' => ' :: '
-//        );
+//        ];
 //
 //        $this->renderFormCommon('confirmUninstall', 'button_confirm_uninstall');
     }
@@ -317,22 +317,22 @@ class OcHelper
     {
         foreach ($menus as &$menu) {
             if ($menu['id'] === 'menu-sale') {
-                $menu['children'][] = array(
+                $menu['children'][] = [
                     'name' => 'Acumulus',
                     'href' => '',
-                    'children' => array(
-                        array(
+                    'children' => [
+                        [
                             'name' => $this->t('batch_form_link_text'),
                             'href' => $this->container->getShopCapabilities()->getLink('batch'),
-                            'children' => array(),
-                        ),
-                        array(
+                            'children' => [],
+                        ],
+                        [
                             'name' => $this->t('advanced_form_link_text'),
                             'href' => $this->container->getShopCapabilities()->getLink('advanced'),
-                            'children' => array(),
-                        ),
-                    ),
-                );
+                            'children' => [],
+                        ],
+                    ],
+                ];
             }
         }
     }
@@ -383,9 +383,9 @@ class OcHelper
         // This will initialize the form translations.
         $this->data['form'] = $this->container->getForm($type);
 
-        $this->data['success_messages'] = array();
-        $this->data['warning_messages'] = array();
-        $this->data['error_messages'] = array();
+        $this->data['success_messages'] = [];
+        $this->data['warning_messages'] = [];
+        $this->data['error_messages'] = [];
 
         if ($this->data['form']->isFullPage()) {
             $this->registry->document->addStyle('view/stylesheet/acumulus.css');
@@ -397,12 +397,12 @@ class OcHelper
             $this->data["text_edit"] = $this->t("{$type}_form_header");
 
             // Set up breadcrumb.
-            $this->data['breadcrumbs'] = array();
-            $this->data['breadcrumbs'][] = array(
+            $this->data['breadcrumbs'] = [];
+            $this->data['breadcrumbs'][] = [
                 'text' => $this->t('text_home'),
                 'href' => $this->registry->getLink('common/dashboard'),
                 'separator' => false
-            );
+            ];
 
             $this->displayCommonParts();
         }
@@ -445,11 +445,11 @@ class OcHelper
             if ($type !== 'config') {
                 $link .= "/$type";
             }
-            $this->data['breadcrumbs'][] = array(
+            $this->data['breadcrumbs'][] = [
                 'text' => $this->t("{$type}_form_header"),
                 'href' => $this->registry->getLink($link),
                 'separator' => ' :: '
-            );
+            ];
 
             // Set the action buttons (action + text).
             $this->data['action'] = $this->registry->getLink($link);

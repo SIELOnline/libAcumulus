@@ -144,10 +144,14 @@ class Source extends BaseSource
     }
 
     /**
-     * Returns a list of OpenCart order total records. These are shipment,
-     * other fee, tax, and discount lines.
+     * Returns a list of OpenCart order total records.
+     *
+     * These are shipment, other fee, tax, and discount lines.
      *
      * @return array[]
+     *   The set of order total lines for this order. This set is ordered by
+     *   sort_order, meaning that lines before the tax line are amounts ex vat
+     *   and lines after are inc vat.
      *
      * @throws \Exception
      */

@@ -15,7 +15,7 @@ interface PluginConfig
      *   library. This version is used in communication with the Acumulus API
      *   and when users contact support.
      */
-    const Version = '6.1.2';
+    const Version = '6.2.0-alpha1';
 
     /**
      * @var string Format to use with date() and DateTime formatting methods for

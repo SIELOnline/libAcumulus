@@ -2,7 +2,6 @@
 namespace Siel\Acumulus\OpenCart\Invoice;
 
 use RuntimeException;
-use Siel\Acumulus\Api;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
@@ -218,9 +217,10 @@ class Creator extends BaseCreator
         $result = array();
 
         /**
-         * @var array[] $totalLines The set of order total lines for this order.
-         *   This set is ordered by sort_order, meaning that lines before
-         *   the tax line are amounts ex vat and line after are inc vat.
+         * @var $totalLines
+         *   The set of order total lines for this order. This set is ordered by
+         *   sort_order, meaning that lines before the tax line are amounts ex
+         *   vat and line after are inc vat.
          */
         $totalLines = $this->invoiceSource->getOrderTotalLines();
         $exVat = true;
@@ -232,7 +232,7 @@ class Creator extends BaseCreator
                     break;
                 case 'shipping':
                     $line = $this->getTotalLine($totalLine, $exVat);
-                    $line = $this->addLineType($line, static::LineType_Shipping, Api::Nature_Service);
+                    $line = $this->addLineType($line, static::LineType_Shipping);
                     break;
                 case 'coupon':
                     $line = $this->getTotalLine($totalLine, $exVat);

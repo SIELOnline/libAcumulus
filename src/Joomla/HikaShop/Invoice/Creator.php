@@ -2,7 +2,6 @@
 namespace Siel\Acumulus\Joomla\HikaShop\Invoice;
 
 use RuntimeException;
-use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\Meta;

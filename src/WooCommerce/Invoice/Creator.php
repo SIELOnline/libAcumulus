@@ -1,7 +1,6 @@
 <?php
 namespace Siel\Acumulus\WooCommerce\Invoice;
 
-use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\Meta;
@@ -158,7 +157,7 @@ class Creator extends BaseCreator
         $result += $this->getVatRangeTags($productVat, $productPriceEx, $precisionVat, $precisionEx);
         if ($product instanceof WC_Product) {
             // get_tax_status() returns 'taxable', 'shipping', or 'none'.
-            $taxClass = $product->get_tax_status() === 'taxable' ? $product->get_tax_class() : PluginConfig::VatClass_Null;
+            $taxClass = $product->get_tax_status() === 'taxable' ? $product->get_tax_class() : null;
             $result += $this->getVatRateLookupMetadataByTaxClass($taxClass);
         }
 
@@ -183,7 +182,7 @@ class Creator extends BaseCreator
      * depending on the region of the customer. We use the customers address in
      * the raw invoice that is being created, to get the possible rates.
      *
-     * @param string $taxClassId
+     * @param string|null $taxClassId
      *   The tax class of the product. For the default tax class it can be
      *   'standard' or the empty string. For no tax class at all, it will be
      *   PluginConfig::VatClass_Null.
@@ -196,31 +195,29 @@ class Creator extends BaseCreator
      */
     protected function getVatRateLookupMetadataByTaxClass($taxClassId)
     {
-        // '' denotes the 'standard' tax class, use 'standard' in meta data,
-        // '' when searching.
-        if ($taxClassId === '') {
-            $taxClassId = 'standard';
-        }
-        $result = array(
-            Meta::VatClassId => sanitize_title($taxClassId),
-            // Vat class name is the non-sanitized version of the id
-            // and thus does not convey more information: don't add.
-            Meta::VatRateLookup => array(),
-            Meta::VatRateLookupLabel => array(),
-        );
-
-        if ($taxClassId === PluginConfig::VatClass_Null) {
-            $result[Meta::VatRateLookup] = Api::VatFree;
-            $result[Meta::VatRateLookupLabel] = "tax_status='none'";
-
+        if ($taxClassId === null) {
+            $result = array(
+                Meta::VatClassId => PluginConfig::VatClass_Null,
+            );
         } else {
             // '' denotes the 'standard' tax class, use 'standard' in meta data,
             // '' when searching.
+            if ($taxClassId === '') {
+                $taxClassId = 'standard';
+            }
+            $result = array(
+                Meta::VatClassId => sanitize_title($taxClassId),
+                // Vat class name is the non-sanitized version of the id
+                // and thus does not convey more information: don't add.
+                Meta::VatRateLookup => array(),
+                Meta::VatRateLookupLabel => array(),
+            );
             if ($taxClassId === 'standard') {
                 $taxClassId = '';
             }
 
-            // Find applicable vat rates. We use WC_Tax::find_rates() to find them.
+            // Find applicable vat rates. We use WC_Tax::find_rates() to find
+            // them.
             $args = array(
                 'tax_class' => $taxClassId,
                 'country' => $this->invoice[Tag::Customer][Tag::CountryCode],
@@ -517,9 +514,7 @@ class Creator extends BaseCreator
             // the order, not on refunds, so use the order.
 	        /** @var \WC_Order $order */
             $order = $this->invoiceSource->getOrder()->getSource();
-            // WooCommerce 3.7 renamed get_used_coupons() to get_coupon_codes().
-            // Remove in time.
-	        $usedCoupons = method_exists($order, 'get_coupon_codes') ? $order->get_coupon_codes() : $order->get_used_coupons();
+	        $usedCoupons = $order->get_coupon_codes();
             foreach ($usedCoupons as $code) {
                 $coupon = new WC_Coupon($code);
                 $result[] = $this->getDiscountLine($coupon);
@@ -553,7 +548,7 @@ class Creator extends BaseCreator
             // Coupon still exists: extract info from coupon.
             $description = sprintf('%s %s: ', $this->t('discount_code'), $coupon->get_code());
             if (in_array($coupon->get_discount_type(), array('fixed_product', 'fixed_cart'))) {
-                $amount = $this->invoiceSource->getSign() * (float) $coupon->get_amount();
+                $amount = $this->invoiceSource->getSign() * $coupon->get_amount();
                 if (!Number::isZero($amount)) {
                     $description .= sprintf('€%.2f (%s)', $amount, $this->productPricesIncludeTax() ? $this->t('inc_vat') : $this->t('ex_vat'));
                 }
@@ -566,7 +561,7 @@ class Creator extends BaseCreator
             } else {
                 // Value may be entered with or without % sign at the end.
                 // Remove it by converting to a float.
-                $description .= ((float) $coupon->get_amount()) . '%';
+                $description .= $coupon->get_amount() . '%';
                 if ($coupon->get_free_shipping()) {
                     $description .= ' + ' . $this->t('free_shipping');
                 }

@@ -197,7 +197,7 @@ class Creator extends BaseCreator
             /** @noinspection PhpIncludeInspection */
             require(VMPATH_ADMIN . '/models/customfields.php');
         }
-        $product_attribute = VirtueMartModelCustomfields::CustomsFieldOrderDisplay($item, 'FE');
+        $product_attribute = VirtueMartModelCustomfields::CustomsFieldOrderDisplay($item);
         if (!empty($product_attribute)) {
             $document = new DOMDocument();
             $document->loadHTML($product_attribute);

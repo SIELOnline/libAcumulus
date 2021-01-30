@@ -63,7 +63,7 @@ class ConfigStore extends BaSeConfigStore
      */
     public function loadOld(array $keys)
     {
-        $result = array();
+        $result = [];
         $config = $this->getConfigInterface();
         // Load the values from the web shop specific configuration.
         foreach ($keys as $key) {

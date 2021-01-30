@@ -12,7 +12,7 @@ use Siel\Acumulus\Config\Config;
  */
 class ShopCapabilities extends ShopCapabilitiesBase
 {
-    private $order = array(
+    private $order = [
         'adjustmentNegative',
         'adjustmentPositive',
         'appliedRuleIds',
@@ -150,8 +150,8 @@ class ShopCapabilities extends ShopCapabilitiesBase
         'payment',
         'statusHistories',
         'extensionAttributes',
-    );
-    private $creditMemo = array(
+    ];
+    private $creditMemo = [
         'adjustment',
         'adjustmentNegative',
         'adjustmentPositive',
@@ -203,7 +203,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
         'items',
         'comments',
         'extensionAttributes',
-    );
+    ];
 
     /**
      * {@inheritdoc}
@@ -220,12 +220,12 @@ class ShopCapabilities extends ShopCapabilitiesBase
             $version = 'UNKNOWN';
         }
 
-        return array(
+        return [
             'moduleVersion' => Registry::getInstance()->getModuleVersion('Siel_AcumulusMa2'),
             'schemaVersion' => Registry::getInstance()->getSchemaVersion('Siel_AcumulusMa2'),
             'shopName' => $this->shopName,
             'shopVersion' => $version,
-        );
+        ];
     }
 
     /**
@@ -233,12 +233,12 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     protected function getTokenInfoSource()
     {
-        return array(
-            'class' => array('\Magento\Sales\Model\Order', '\Magento\Sales\Model\Order\CreditMemo'),
-            'file' => array('vendor/magento/module-sales/Model/Order.php', 'vendor/magento/module-sales/Model/Order/Creditmemo.php'),
+        return [
+            'class' => ['\Magento\Sales\Model\Order', '\Magento\Sales\Model\Order\CreditMemo'],
+            'file' => ['vendor/magento/module-sales/Model/Order.php', 'vendor/magento/module-sales/Model/Order/Creditmemo.php'],
             'properties' => array_intersect($this->order, $this->creditMemo),
             'properties-more' => true,
-        );
+        ];
     }
 
     /**
@@ -246,12 +246,12 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     protected function getTokenInfoRefund()
     {
-        return array(
+        return [
             'class' => 'Mage_Sales_Model_Order_CreditMemo',
             'file' => 'app/code/core/Mage/Sales/Model/Order/Creditmemo.php',
             'properties' => array_diff($this->creditMemo, $this->order),
             'properties-more' => true,
-        );
+        ];
     }
 
     /**
@@ -259,12 +259,12 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     protected function getTokenInfoOrder()
     {
-        return array(
+        return [
             'class' => '\Magento\Sales\Model\Order\Order',
             'file' => 'vendor/magento/module-sales/Model/Order/Order.php',
             'properties' => array_diff($this->order, $this->creditMemo),
             'properties-more' => true,
-        );
+        ];
     }
 
     /**
@@ -272,7 +272,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     protected function getTokenInfoShopProperties()
     {
-        $orderItem = array(
+        $orderItem = [
             'additionalData',
             'amountRefunded',
             'appliedRuleIds',
@@ -366,8 +366,8 @@ class ShopCapabilities extends ShopCapabilitiesBase
             'weeeTaxRowDisposition',
             'weight',
             'parentItem',
-        );
-        $creditMemoItem = array(
+        ];
+        $creditMemoItem = [
             'additionalData',
             'baseCost',
             'baseDiscountAmount',
@@ -401,12 +401,12 @@ class ShopCapabilities extends ShopCapabilitiesBase
             'weeeTaxAppliedRowAmount',
             'weeeTaxDisposition',
             'weeeTaxRowDisposition',
-        );
-        return array(
-            'billingAddress' => array(
+        ];
+        return [
+            'billingAddress' => [
                 'class' => '\Magento\Sales\Model\Order\Address',
                 'file' => 'vendor/magento/module-sales/Model/Order/Address.php',
-                'properties' => array(
+                'properties' => [
                     'addressType',
                     'city',
                     'company',
@@ -434,22 +434,22 @@ class ShopCapabilities extends ShopCapabilitiesBase
                     'vatRequestId',
                     'vatRequestSuccess',
                     'extensionAttributes',
-                ),
+                ],
                 'properties-more' => true,
-            ),
-            'shippingAddress' => array(
+            ],
+            'shippingAddress' => [
                 'more-info' => $this->t('see_billing_address'),
                 'class' => '\Magento\Sales\Model\Order\Address',
                 'file' => 'vendor/magento/module-sales/Model/Order/Address.php',
-                'properties' => array(
+                'properties' => [
                     $this->t('see_above'),
-                ),
+                ],
                 'properties-more' => false,
-            ),
-            'customer' => array(
+            ],
+            'customer' => [
                 'class' => '\Magento\Customer\Model\Customer',
                 'file' => 'vendor/magento/module-customer/Model/Customer.php',
-                'properties' => array(
+                'properties' => [
                     'name',
                     'taxClassId',
                     'store',
@@ -471,16 +471,16 @@ class ShopCapabilities extends ShopCapabilitiesBase
                     'dob',
                     'taxvat',
                     'gender',
-                ),
+                ],
                 'properties-more' => true,
-            ),
-            'item' => array(
-                'class' => array('\Magento\Sales\Model\Order\Item', '\Magento\Sales\Model\Order\Creditmemo\Item'),
-                'file' => array('vendor/magento/module-sales/Model/Order/Item.php', 'vendor/magento/module-sales/Model/Order/Creditmemo/Item.php'),
+            ],
+            'item' => [
+                'class' => ['\Magento\Sales\Model\Order\Item', '\Magento\Sales\Model\Order\Creditmemo\Item'],
+                'file' => ['vendor/magento/module-sales/Model/Order/Item.php', 'vendor/magento/module-sales/Model/Order/Creditmemo/Item.php'],
                 'properties' => array_unique(array_merge($orderItem, $creditMemoItem)),
                 'properties-more' => true,
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -488,7 +488,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     public function getShopDefaults()
     {
-        return array(
+        return [
             'contactYourId' => '[customer::incrementId|customer::entityId]', // \Mage\Customer\Model\Customer
             'companyName1' => '[company]', // \Magento\Sales\Model\Order\Address
             'fullName' => '[name]', // \Magento\Sales\Model\Order\Address
@@ -506,7 +506,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
             // Invoice lines defaults.
             'itemNumber' => '[sku]',
             'productName' => '[name]',
-        );
+        ];
     }
 
     /**
@@ -518,7 +518,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
         $model = Registry::getInstance()->create('Magento\Sales\Model\Order\Status');
         /** @noinspection PhpUnhandledExceptionInspection */
         $items = $model->getResourceCollection()->getData();
-        $result = array();
+        $result = [];
         foreach ($items as $item) {
             $result[reset($item)] = next($item);
         }
@@ -540,7 +540,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     public function getPaymentMethods()
     {
-        $result = array();
+        $result = [];
         /** @var \Magento\Payment\Helper\Data $paymentHelper */
         $paymentHelper = Registry::getInstance()->get('Magento\Payment\Helper\Data');
         $paymentMethods = $paymentHelper->getPaymentMethods();
@@ -563,7 +563,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     public function getVatClasses()
     {
-        $result = array();
+        $result = [];
         /** @var \Magento\Tax\Model\ClassModel $taxClass */
         /** @noinspection PhpFullyQualifiedNameUsageInspection */
         $taxClass = ObjectManager::getInstance()->create(\Magento\Tax\Model\ClassModel::class);

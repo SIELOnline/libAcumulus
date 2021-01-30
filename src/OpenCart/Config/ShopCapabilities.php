@@ -17,12 +17,12 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     public function getShopEnvironment()
     {
-        $environment = array(
+        $environment = [
             // Module has same version as library.
             'moduleVersion' => Version,
             'shopName' => $this->shopName,
             'shopVersion' => VERSION,
-        );
+        ];
         return $environment;
     }
 
@@ -31,7 +31,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     protected function getTokenInfoSource()
     {
-        $catalogOrder = array(
+        $catalogOrder = [
             'order_id',
             'invoice_no',
             'invoice_prefix',
@@ -97,8 +97,8 @@ class ShopCapabilities extends ShopCapabilitiesBase
             'accept_language',
             'date_modified',
             'date_added',
-        );
-        $adminOrder = array(
+        ];
+        $adminOrder = [
             'amazon_order_id',
             'order_id',
             'invoice_no',
@@ -171,14 +171,14 @@ class ShopCapabilities extends ShopCapabilitiesBase
             'accept_language',
             'date_added',
             'date_modified',
-        );
+        ];
         $source = array_intersect($catalogOrder, $adminOrder);
 
-        return array(
+        return [
             'file' => 'catalog/model/checkout/order.php',
             'properties' => $source,
             'properties-more' => true,
-        );
+        ];
     }
 
     /**
@@ -186,10 +186,10 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     protected function getTokenInfoShopProperties()
     {
-        return array(
-            'item' => array(
+        return [
+            'item' => [
                 'table' => 'order_product',
-                'properties' => array(
+                'properties' => [
                     'order_product_id',
                     'product_id',
                     'name',
@@ -199,11 +199,11 @@ class ShopCapabilities extends ShopCapabilitiesBase
                     'total',
                     'tax',
                     'reward',
-                ),
-            ),
-            'product' => array(
-                'table' => array('product', 'product_description', 'url_alias'),
-                'properties' => array(
+                ],
+            ],
+            'product' => [
+                'table' => ['product', 'product_description', 'url_alias'],
+                'properties' => [
                     'product_id',
                     'model',
                     'sku',
@@ -239,9 +239,9 @@ class ShopCapabilities extends ShopCapabilitiesBase
                     'meta_description',
                     'meta_keyword',
                     'description',
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
     }
 
     /**
@@ -249,7 +249,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     public function getShopDefaults()
     {
-        return array(
+        return [
             'contactYourId' => '[customer_id]', // Order
             'companyName1' => '[payment_company]', // Order
             'fullName' => '[firstname+lastname]', // Order
@@ -265,7 +265,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
             // Invoice lines defaults.
             'itemNumber' => '[sku|upc|ean|jan|isbn|mpn]',
             'productName' => '[name+"("&model&")"]',
-        );
+        ];
     }
 
     /**
@@ -290,7 +290,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
         /** @noinspection PhpUnhandledExceptionInspection */
         $registry->load->model('localisation/order_status');
         $statuses = $registry->model_localisation_order_status->getOrderStatuses();
-        $result = array();
+        $result = [];
         foreach ($statuses as $status) {
             list($optionValue, $optionText) = array_values($status);
             $result[$optionValue] = $optionText;
@@ -318,7 +318,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     {
         $registry = $this->getRegistry();
         $prefix = $registry->isOc3() ? 'payment_' : '';
-        $enabled = array();
+        $enabled = [];
         /** @noinspection PhpUnhandledExceptionInspection */
         $extensions = $registry->getExtensionModel()->getInstalled('payment');
         foreach ($extensions as $extension) {
@@ -339,7 +339,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     protected function paymentMethodToOptions(array $extensions)
     {
-        $results = array();
+        $results = [];
         $registry = $this->getRegistry();
         $directory = !$registry->isOc1() ? 'extension/payment/' : 'payment/';
         foreach ($extensions as $extension) {
@@ -354,7 +354,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     public function getVatClasses()
     {
-        $result = array();
+        $result = [];
         $registry = $this->getRegistry();
         /** @noinspection PhpUnhandledExceptionInspection */
         $registry->load->model('localisation/tax_class');

@@ -17,7 +17,7 @@ class ConfigStore extends BaSeConfigStore
     public function load()
     {
         $values = $this->getSettings()->getSetting($this->configCode);
-        $values = isset($values[$this->configCode . '_' . $this->configKey]) ? $values[$this->configCode . '_' . $this->configKey] : array();
+        $values = isset($values[$this->configCode . '_' . $this->configKey]) ? $values[$this->configCode . '_' . $this->configKey] : [];
         return $values;
     }
 
@@ -53,10 +53,10 @@ class ConfigStore extends BaSeConfigStore
      */
     public function loadOld(array $keys)
     {
-        $result = array();
+        $result = [];
         // Load the values from the web shop specific configuration.
         $configurationValues = $this->getSettings()->getSetting($this->configCode);
-        $values = isset($configurationValues['acumulus_siel_module']) ? $configurationValues['acumulus_siel_module'] : array();
+        $values = isset($configurationValues['acumulus_siel_module']) ? $configurationValues['acumulus_siel_module'] : [];
         foreach ($keys as $key) {
             if (array_key_exists($key, $values)) {
                 $result[$key] = $values[$key];

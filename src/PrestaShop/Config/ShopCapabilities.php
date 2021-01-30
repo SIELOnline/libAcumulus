@@ -18,12 +18,12 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     public function getShopEnvironment()
     {
-        $environment = array(
+        $environment = [
             //'moduleVersion' => Acumulus::$module_version,
             'moduleVersion' => Module::getInstanceByName('acumulus')->version,
             'shopName' => $this->shopName,
             'shopVersion' => _PS_VERSION_,
-        );
+        ];
         return $environment;
     }
 
@@ -32,20 +32,20 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     protected function getTokenInfoSource()
     {
-        $source = array(
+        $source = [
             'id',
             'id_shop',
             'date_add',
             'date_upd',
             'id_currency',
             'conversion_rate',
-        );
-        return array(
+        ];
+        return [
             'class' => ['Order', 'OrderSlip'],
             'file' => ['classes/Order.php', 'classes/OrderSlip.php'],
             'properties' => $source,
             'properties-more' => true,
-        );
+        ];
     }
 
     /**
@@ -53,7 +53,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     protected function getTokenInfoRefund()
     {
-        $refund = array(
+        $refund = [
             'id_order',
             'total_products_tax_excl',
             'total_products_tax_incl',
@@ -63,14 +63,14 @@ class ShopCapabilities extends ShopCapabilitiesBase
             'shipping_cost',
             'shipping_cost_amount',
             'partial',
-        );
+        ];
 
-        return array(
+        return [
             'class' => 'OrderSlip',
             'file' => 'classes/OrderSlip.php',
             'properties' => $refund,
             'properties-more' => true,
-        );
+        ];
 
     }
 
@@ -79,7 +79,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     protected function getTokenInfoOrder()
     {
-        $order = array(
+        $order = [
             'current_state',
             'secure_key',
             'payment',
@@ -109,14 +109,14 @@ class ShopCapabilities extends ShopCapabilitiesBase
             'delivery_date',
             'valid',
             'reference',
-        );
+        ];
 
-        return array(
+        return [
             'class' => 'Order',
             'file' => 'classes/Order.php',
             'properties' => $order,
             'properties-more' => true,
-        );
+        ];
     }
 
     /**
@@ -124,11 +124,11 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     protected function getTokenInfoShopProperties()
     {
-        return array(
-            'address_invoice' => array(
+        return [
+            'address_invoice' => [
                 'class' => 'Address',
                 'file' => 'classes/Address.php',
-                'properties' => array(
+                'properties' => [
                     'id_customer',
                     'id_manufacturer',
                     'id_supplier',
@@ -149,22 +149,22 @@ class ShopCapabilities extends ShopCapabilitiesBase
                     'phone_mobile',
                     'vat_number',
                     'dni',
-                ),
+                ],
                 'properties-more' => true,
-            ),
-            'address_delivery' => array(
+            ],
+            'address_delivery' => [
                 'more-info' => $this->t('see_billing_address'),
                 'class' => 'Address',
                 'file' => 'classes/Address.php',
-                'properties' => array(
+                'properties' => [
                     $this->t('see_above'),
-                ),
+                ],
                 'properties-more' => false,
-            ),
-            'customer' => array(
+            ],
+            'customer' => [
                 'class' => 'Customer',
                 'file' => 'classes/Customer.php',
-                'properties' => array(
+                'properties' => [
                     'id',
                     'id_shop',
                     'id_shop_group',
@@ -205,13 +205,13 @@ class ShopCapabilities extends ShopCapabilitiesBase
                     'logged',
                     'id_guest',
                     'groupBox',
-                ),
+                ],
                 'properties-more' => true,
-            ),
-            'item' => array(
+            ],
+            'item' => [
                 'class' => 'OrderDetail',
                 'file' => 'classes/order/OrderDetail.php',
-                'properties' => array(
+                'properties' => [
                     'product_id',
                     'product_attribute_id',
                     'product_name',
@@ -251,10 +251,10 @@ class ShopCapabilities extends ShopCapabilitiesBase
                     'purchase_supplier_price',
                     'original_product_price',
                     'original_wholesale_price',
-                ),
+                ],
                 'properties-more' => true,
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -262,7 +262,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     public function getShopDefaults()
     {
-        return array(
+        return [
             'contactYourId' => '[id]', // Customer
             'companyName1' => '[company]', // InvoiceAddress
             'fullName' => '[firstname+lastname]', // InvoiceAddress
@@ -278,7 +278,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
             'itemNumber' => '[product_reference|product_supplier_reference|product_ean13|product_upc]',
             'productName' => '[product_name]',
             'costPrice' => '[purchase_supplier_price]',
-        );
+        ];
     }
 
     /**
@@ -287,7 +287,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function getShopOrderStatuses()
     {
         $statuses = OrderState::getOrderStates((int) Context::getContext()->language->id);
-        $result = array();
+        $result = [];
         foreach ($statuses as $status) {
             $result[$status['id_order_state']] = $status['name'];
         }
@@ -300,7 +300,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function getPaymentMethods()
     {
         $paymentModules = PaymentModule::getInstalledPaymentModules();
-        $result = array();
+        $result = [];
         foreach($paymentModules as $paymentModule)
         {
             $module = Module::getInstanceById($paymentModule['id_module']);
@@ -314,7 +314,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     public function getVatClasses()
     {
-        $result = array();
+        $result = [];
         /** @var \stdClass[] $taxClasses */
         $taxClasses = TaxRulesGroup::getTaxRulesGroups();
         foreach ($taxClasses as $taxClass) {
@@ -331,7 +331,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
         switch ($linkType) {
             case 'config':
                 // Does not work in PS1.6.
-                return Context::getContext()->link->getAdminLink('AdminModules', true, array(), array('configure' => 'acumulus'));
+                return Context::getContext()->link->getAdminLink('AdminModules', true, [], ['configure' => 'acumulus']);
             case 'advanced':
                 return Context::getContext()->link->getAdminLink('AdminAcumulusAdvanced', true);
             case 'batch':

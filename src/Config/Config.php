@@ -117,7 +117,7 @@ class Config
 
         $this->keyInfo = null;
         $this->isConfigurationLoaded = false;
-        $this->values = array();
+        $this->values = [];
     }
 
     /**
@@ -246,7 +246,7 @@ class Config
                         break;
                     case 'array':
                         if (!is_array($values[$key])) {
-                            $values[$key] = array($values[$key]);
+                            $values[$key] = [$values[$key]];
                         }
                         break;
                 }
@@ -271,7 +271,7 @@ class Config
      */
     protected function removeValuesNotToBeStored(array $values)
     {
-        $result = array();
+        $result = [];
         $keys = $this->getKeys();
         $defaults = $this->getDefaults();
         foreach ($keys as $key) {
@@ -521,7 +521,7 @@ class Config
      */
     protected function getSettingsByGroup($group)
     {
-        $result = array();
+        $result = [];
         foreach ($this->getKeyInfo() as $key => $keyInfo) {
             if ($keyInfo['group'] === $group) {
                 $result[$key] = $this->get($key);
@@ -629,422 +629,422 @@ class Config
             // express the set of characters that are allowed for email
             // addresses, so we remove characters not allowed.
             // See https://stackoverflow.com/a/2049537/1475662: @ ()[]\:;"<>,
-            $hostName = str_replace(array(' ', '@', '(', ')', '[', ']', '\\', ':', ';', '"', '<', '>', ','), '', $hostName);
+            $hostName = str_replace([' ', '@', '(', ')', '[', ']', '\\', ':', ';', '"', '<', '>', ','], '', $hostName);
 
-            $this->keyInfo = array(
-                'baseUri' => array(
+            $this->keyInfo = [
+                'baseUri' => [
                     'group' => 'environment',
                     'type' => 'string',
                     'default' => Api::baseUri,
-                ),
-                'apiVersion' => array(
+                ],
+                'apiVersion' => [
                     'group' => 'environment',
                     'type' => 'string',
                     'default' => Api::apiVersion,
-                ),
-                'libraryVersion' => array(
+                ],
+                'libraryVersion' => [
                     'group' => 'environment',
                     'type' => 'string',
                     'default' => Version,
-                ),
-                'moduleVersion' => array(
+                ],
+                'moduleVersion' => [
                     'group' => 'environment',
                     'type' => 'string',
                     'default' => $environment['moduleVersion'],
-                ),
-                'shopName' => array(
+                ],
+                'shopName' => [
                     'group' => 'environment',
                     'type' => 'string',
                     'default' => $environment['shopName'],
-                ),
-                'shopVersion' => array(
+                ],
+                'shopVersion' => [
                     'group' => 'environment',
                     'type' => 'string',
                     'default' => $environment['shopVersion'],
-                ),
-                'hostName' => array(
+                ],
+                'hostName' => [
                     'group' => 'environment',
                     'type' => 'string',
                     'default' => $this->getHostName(),
-                ),
-                'phpVersion' => array(
+                ],
+                'phpVersion' => [
                     'group' => 'environment',
                     'type' => 'string',
                     'default' => phpversion(),
-                ),
-                'os' => array(
+                ],
+                'os' => [
                     'group' => 'environment',
                     'type' => 'string',
                     'default' => php_uname(),
-                ),
-                'curlVersion' => array(
+                ],
+                'curlVersion' => [
                     'group' => 'environment',
                     'type' => 'string',
                     'default' => "{$curlVersion['version']} (ssl: {$curlVersion['ssl_version']}; zlib: {$curlVersion['libz_version']})",
-                ),
-                'jsonVersion' => array(
+                ],
+                'jsonVersion' => [
                     'group' => 'environment',
                     'type' => 'string',
                     'default' => phpversion('json'),
-                ),
-                'debug' => array(
+                ],
+                'debug' => [
                     'group' => 'plugin',
                     'type' => 'int',
                     'default' => Config::Send_SendAndMailOnError,
-                ),
-                'logLevel' => array(
+                ],
+                'logLevel' => [
                     'group' => 'plugin',
                     'type' => 'int',
                     'default' => Severity::Notice,
-                ),
-                'outputFormat' => array(
+                ],
+                'outputFormat' => [
                     'group' => 'plugin',
                     'type' => 'string',
                     'default' => Api::outputFormat,
-                ),
-                Tag::ContractCode => array(
+                ],
+                Tag::ContractCode => [
                     'group' => 'credentials',
                     'type' => 'string',
                     'default' => '',
-                ),
-                Tag::UserName => array(
+                ],
+                Tag::UserName => [
                     'group' => 'credentials',
                     'type' => 'string',
                     'default' => '',
-                ),
-                Tag::Password => array(
+                ],
+                Tag::Password => [
                     'group' => 'credentials',
                     'type' => 'string',
                     'default' => '',
-                ),
-                Tag::EmailOnError => array(
+                ],
+                Tag::EmailOnError => [
                     'group' => 'credentials',
                     'type' => 'string',
                     'default' => '',
-                ),
-                'defaultCustomerType' => array(
+                ],
+                'defaultCustomerType' => [
                     'group' => Tag::Customer,
                     'type' => 'int',
                     'default' => 0,
-                ),
-                'sendCustomer' => array(
+                ],
+                'sendCustomer' => [
                     'group' => Tag::Customer,
                     'type' => 'bool',
                     'default' => true,
-                ),
-                'genericCustomerEmail' => array(
+                ],
+                'genericCustomerEmail' => [
                     'group' => Tag::Customer,
                     'type' => 'string',
                     'default' => "consumer.$hostName@nul.sielsystems.nl",
-                ),
-                'emailIfAbsent' => array(
+                ],
+                'emailIfAbsent' => [
                     'group' => Tag::Customer,
                     'type' => 'string',
                     'default' => "$hostName@nul.sielsystems.nl",
-                ),
-                'contactYourId' => array(
+                ],
+                'contactYourId' => [
                     'group' => Tag::Customer,
                     'type' => 'string',
                     'default' => '',
-                ),
-                'contactStatus' => array(
+                ],
+                'contactStatus' => [
                     'group' => Tag::Customer,
                     'type' => 'int',
                     'default' => Api::ContactStatus_Active,
-                ),
-                'companyName1' => array(
+                ],
+                'companyName1' => [
                     'group' => Tag::Customer,
                     'type' => 'string',
                     'default' => '',
-                ),
-                'companyName2' => array(
+                ],
+                'companyName2' => [
                     'group' => Tag::Customer,
                     'type' => 'string',
                     'default' => '',
-                ),
-                'fullName' => array(
+                ],
+                'fullName' => [
                     'group' => Tag::Customer,
                     'type' => 'string',
                     'default' => '',
-                ),
-                'salutation' => array(
+                ],
+                'salutation' => [
                     'group' => Tag::Customer,
                     'type' => 'string',
                     'default' => '',
-                ),
-                'address1' => array(
+                ],
+                'address1' => [
                     'group' => Tag::Customer,
                     'type' => 'string',
                     'default' => '',
-                ),
-                'address2' => array(
+                ],
+                'address2' => [
                     'group' => Tag::Customer,
                     'type' => 'string',
                     'default' => '',
-                ),
-                'postalCode' => array(
+                ],
+                'postalCode' => [
                     'group' => Tag::Customer,
                     'type' => 'string',
                     'default' => '',
-                ),
-                'city' => array(
+                ],
+                'city' => [
                     'group' => Tag::Customer,
                     'type' => 'string',
                     'default' => '',
-                ),
-                'vatNumber' => array(
+                ],
+                'vatNumber' => [
                     'group' => Tag::Customer,
                     'type' => 'string',
                     'default' => '',
-                ),
-                'telephone' => array(
+                ],
+                'telephone' => [
                     'group' => Tag::Customer,
                     'type' => 'string',
                     'default' => '',
-                ),
-                'fax' => array(
+                ],
+                'fax' => [
                     'group' => Tag::Customer,
                     'type' => 'string',
                     'default' => '',
-                ),
-                'email' => array(
+                ],
+                'email' => [
                     'group' => Tag::Customer,
                     'type' => 'string',
                     'default' => '',
-                ),
-                'overwriteIfExists' => array(
+                ],
+                'overwriteIfExists' => [
                     'group' => Tag::Customer,
                     'type' => 'bool',
                     'default' => true,
-                ),
-                'mark' => array(
+                ],
+                'mark' => [
                     'group' => Tag::Customer,
                     'type' => 'string',
                     'default' => '',
-                ),
-                'concept' => array(
+                ],
+                'concept' => [
                     'group' => Tag::Invoice,
                     'type' => 'int',
                     'default' => Config::Concept_Plugin,
-                ),
-                'missingAmount' => array(
+                ],
+                'missingAmount' => [
                     'group' => Tag::Invoice,
                     'type' => 'int',
                     'default' => Config::MissingAmount_Warn,
-                ),
-                'defaultAccountNumber' => array(
+                ],
+                'defaultAccountNumber' => [
                     'group' => Tag::Invoice,
                     'type' => 'int',
                     'default' => 0,
-                ),
-                'defaultCostCenter' => array(
+                ],
+                'defaultCostCenter' => [
                     'group' => Tag::Invoice,
                     'type' => 'int',
                     'default' => 0,
-                ),
-                'defaultInvoiceTemplate' => array(
+                ],
+                'defaultInvoiceTemplate' => [
                     'group' => Tag::Invoice,
                     'type' => 'int',
                     'default' => 0,
-                ),
-                'defaultInvoicePaidTemplate' => array(
+                ],
+                'defaultInvoicePaidTemplate' => [
                     'group' => Tag::Invoice,
                     'type' => 'int',
                     'default' => 0,
-                ),
-                'paymentMethodAccountNumber' => array(
+                ],
+                'paymentMethodAccountNumber' => [
                     'group' => Tag::Invoice,
                     'type' => 'array',
-                    'default' => array(),
-                ),
-                'paymentMethodCostCenter' => array(
+                    'default' => [],
+                ],
+                'paymentMethodCostCenter' => [
                     'group' => Tag::Invoice,
                     'type' => 'array',
-                    'default' => array(),
-                ),
-                'sendEmptyShipping' => array(
+                    'default' => [],
+                ],
+                'sendEmptyShipping' => [
                     'group' => Tag::Invoice,
                     'type' => 'bool',
                     'default' => true,
-                ),
-                'optionsShow' => array(
+                ],
+                'optionsShow' => [
                     'group' => Tag::Invoice,
                     'type' => 'bool',
                     'default' => true,
-                ),
-                'optionsAllOn1Line' => array(
+                ],
+                'optionsAllOn1Line' => [
                     'group' => Tag::Invoice,
                     'type' => 'int',
                     'default' => 2,
-                ),
-                'optionsAllOnOwnLine' => array(
+                ],
+                'optionsAllOnOwnLine' => [
                     'group' => Tag::Invoice,
                     'type' => 'int',
                     'default' => 4,
-                ),
-                'optionsMaxLength' => array(
+                ],
+                'optionsMaxLength' => [
                     'group' => Tag::Invoice,
                     'type' => 'int',
                     'default' => 80,
-                ),
-                'description' => array(
+                ],
+                'description' => [
                     'group' => Tag::Invoice,
                     'type' => 'string',
                     'default' => '[invoiceSource::type+invoiceSource::reference+"-"+refundedInvoiceSource::type+refundedInvoiceSource::reference]',
-                ),
-                'descriptionText' => array(
+                ],
+                'descriptionText' => [
                     'group' => Tag::Invoice,
                     'type' => 'string',
                     'default' => '',
-                ),
-                'invoiceNotes' => array(
+                ],
+                'invoiceNotes' => [
                     'group' => Tag::Invoice,
                     'type' => 'string',
                     'default' => '',
-                ),
-                'itemNumber' => array(
+                ],
+                'itemNumber' => [
                     'group' => Tag::Invoice,
                     'type' => 'string',
                     'default' => '',
-                ),
-                'productName' => array(
+                ],
+                'productName' => [
                     'group' => Tag::Invoice,
                     'type' => 'string',
                     'default' => '',
-                ),
-                'nature' => array(
+                ],
+                'nature' => [
                     'group' => Tag::Invoice,
                     'type' => 'string',
                     'default' => '',
-                ),
-                'costPrice' => array(
+                ],
+                'costPrice' => [
                     'group' => Tag::Invoice,
                     'type' => 'string',
                     'default' => '',
-                ),
-                'nature_shop' => array(
+                ],
+                'nature_shop' => [
                     'group' => 'shop',
                     'type' => 'int',
                     'default' => Config::Nature_Unknown,
-                ),
-                'foreignVat' => array(
+                ],
+                'foreignVat' => [
                     'group' => 'shop',
                     'type' => 'int',
                     'default' => Config::ForeignVat_Unknown,
-                ),
-                'foreignVatClasses' => array(
+                ],
+                'foreignVatClasses' => [
                     'group' => 'shop',
                     'type' => 'array',
-                    'default' => array(),
-                ),
-                'vatFreeProducts' => array(
+                    'default' => [],
+                ],
+                'vatFreeProducts' => [
                     'group' => 'shop',
                     'type' => 'int',
                     'default' => Config::VatFreeProducts_Unknown,
-                ),
-                'vatFreeClass' => array(
+                ],
+                'vatFreeClass' => [
                     'group' => 'shop',
                     'type' => 'array',
                     'default' => Config::VatClass_Null,
-                ),
-                'zeroVatProducts' => array(
+                ],
+                'zeroVatProducts' => [
                     'group' => 'shop',
                     'type' => 'int',
                     'default' => Config::ZeroVatProducts_Unknown,
-                ),
-                'zeroVatClass' => array(
+                ],
+                'zeroVatClass' => [
                     'group' => 'shop',
                     'type' => 'array',
                     'default' => null,
-                ),
-                'marginProducts' => array(
+                ],
+                'marginProducts' => [
                     'group' => 'shop',
                     'type' => 'int',
                     'default' => Config::MarginProducts_Unknown,
-                ),
-                'invoiceNrSource' => array(
+                ],
+                'invoiceNrSource' => [
                     'group' => 'shop',
                     'type' => 'int',
                     'default' => Config::InvoiceNrSource_ShopInvoice,
-                ),
-                'dateToUse' => array(
+                ],
+                'dateToUse' => [
                     'group' => 'shop',
                     'type' => 'int',
                     'default' => Config::InvoiceDate_InvoiceCreate,
-                ),
-                'triggerOrderStatus' => array(
+                ],
+                'triggerOrderStatus' => [
                     'group' => 'event',
                     'type' => 'array',
-                    'default' => array(),
-                ),
-                'triggerInvoiceEvent' => array(
+                    'default' => [],
+                ],
+                'triggerInvoiceEvent' => [
                     'group' => 'event',
                     'type' => 'int',
                     'default' => Config::TriggerInvoiceEvent_None,
-                ),
-                'triggerCreditNoteEvent' => array(
+                ],
+                'triggerCreditNoteEvent' => [
                     'group' => 'event',
                     'type' => 'int',
                     'default' => Config::TriggerCreditNoteEvent_Create,
-                ),
-                'sendEmptyInvoice' => array(
+                ],
+                'sendEmptyInvoice' => [
                     'group' => 'event',
                     'type' => 'bool',
                     'default' => true,
-                ),
-                'emailAsPdf' => array(
+                ],
+                'emailAsPdf' => [
                     'group' => Tag::EmailAsPdf,
                     'type' => 'bool',
                     'default' => false,
-                ),
-                'emailFrom' => array(
+                ],
+                'emailFrom' => [
                   'group' => Tag::EmailAsPdf,
                   'type' => 'string',
                   'default' => '',
-                ),
-                'emailTo' => array(
+                ],
+                'emailTo' => [
                     'group' => Tag::EmailAsPdf,
                     'type' => 'string',
                     'default' => '',
-                ),
-                'emailBcc' => array(
+                ],
+                'emailBcc' => [
                     'group' => Tag::EmailAsPdf,
                     'type' => 'string',
                     'default' => '',
-                ),
-                'subject' => array(
+                ],
+                'subject' => [
                     'group' => Tag::EmailAsPdf,
                     'type' => 'string',
                     'default' => '',
-                ),
+                ],
                 // For now, we do not make message configurable...
                 // For now we don't present the confirmReading option in the UI.
-                'confirmReading' => array(
+                'confirmReading' => [
                     'group' => Tag::EmailAsPdf,
                     'type' => 'bool',
                     'default' => false,
-                ),
-                'showInvoiceStatus' => array(
+                ],
+                'showInvoiceStatus' => [
                     'group' => 'status',
                     'type' => 'bool',
                     'default' => true,
-                ),
-                'showPdfInvoice' => array(
+                ],
+                'showPdfInvoice' => [
                     'group' => 'status',
                     'type' => 'bool',
                     'default' => true,
-                ),
-                'showPdfPackingSlip' => array(
+                ],
+                'showPdfPackingSlip' => [
                     'group' => 'status',
                     'type' => 'bool',
                     'default' => true,
-                ),
-                'showRatePluginMessage' => array(
+                ],
+                'showRatePluginMessage' => [
                     'group' => 'other',
                     'type' => 'int',
                     'default' => 0,
-                ),
-            );
+                ],
+            ];
         }
         return $this->keyInfo;
     }
@@ -1128,7 +1128,7 @@ class Config
     {
         $result = true;
         // Keep track of settings that should be updated.
-        $newSettings = array();
+        $newSettings = [];
 
         // 1) Log level.
         switch ($this->get('logLevel')) {
@@ -1168,7 +1168,7 @@ class Config
     protected function upgrade453()
     {
         // Keep track of settings that should be updated.
-        $newSettings = array();
+        $newSettings = [];
         if ($this->get('triggerInvoiceSendEvent') == 2) {
             $newSettings['triggerInvoiceEvent'] = Config::TriggerInvoiceEvent_Create;
         } else {
@@ -1188,7 +1188,7 @@ class Config
     protected function upgrade460()
     {
         $result = true;
-        $newSettings = array();
+        $newSettings = [];
 
         if ($this->get('removeEmptyShipping') !== null) {
             $newSettings['sendEmptyShipping'] = !$this->get('removeEmptyShipping');
@@ -1210,7 +1210,7 @@ class Config
     protected function upgrade470()
     {
         $result = true;
-        $newSettings = array();
+        $newSettings = [];
 
         if ($this->get('salutation') && strpos($this->get('salutation'), '[#') !== false) {
             $newSettings['salutation'] = str_replace('[#', '[', $this->get('salutation'));
@@ -1232,7 +1232,7 @@ class Config
     protected function upgrade473()
     {
         $result = true;
-        $newSettings = array();
+        $newSettings = [];
 
         if ($this->get('subject') && strpos($this->get('subject'), '[#') !== false) {
             str_replace('[#b]', '[invoiceSource::reference]', $this->get('subject'));
@@ -1340,7 +1340,7 @@ class Config
      */
     protected function upgrade550()
     {
-        $newSettings = array();
+        $newSettings = [];
         $newSettings['foreignVat'] = (int) $this->get('digitalServices');
         return $this->save($newSettings);
     }
@@ -1365,7 +1365,7 @@ class Config
             throw new Exception(implode(';', $messages));
         }
 
-        $newSettings = array();
+        $newSettings = [];
         switch ($this->get('logLevel')) {
             case 3 /*Log::Notice*/:
                 $newSettings['logLevel'] = Severity::Notice;

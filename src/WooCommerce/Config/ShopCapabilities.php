@@ -18,13 +18,13 @@ class ShopCapabilities extends ShopCapabilitiesBase
     {
         global $wp_version, $woocommerce;
         /** @var \WooCommerce $woocommerce */
-      return array(
+      return [
           // Lazy load is no longer needed (as in L3) as this method will only be
           // called when the config gets actually queried.
           'moduleVersion' => Acumulus::create()->getVersionNumber(),
           'shopName' => $this->shopName,
           'shopVersion' => (isset($woocommerce) ? $woocommerce->version : 'unknown') . ' (WordPress: ' . $wp_version . ')',
-      );
+      ];
     }
 
     /**
@@ -32,7 +32,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     protected function getTokenInfoSource()
     {
-        $source = array(
+        $source = [
             'date_created',
             'date_modified',
             'discount_total',
@@ -47,14 +47,14 @@ class ShopCapabilities extends ShopCapabilitiesBase
             'used_coupons',
             'item_count',
             'version',
-        );
+        ];
 
-        return array(
+        return [
             'class' => 'WC_Abstract_Order',
             'file' => 'wp-content/plugins/woocommerce/includes/abstracts/abstract-wc-order.php',
             'properties' => $source,
             'properties-more' => true,
-        );
+        ];
     }
 
     /**
@@ -62,18 +62,18 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     protected function getTokenInfoRefund()
     {
-        $refund = array(
+        $refund = [
             'amount',
             'reason',
-        );
+        ];
 
-        return array(
+        return [
             'more-info' => $this->t('refund_only'),
             'class' => 'WC_Order_Refund',
             'file' => 'wp-content/plugins/woocommerce/includes/class-wc-order-refund.php',
             'properties' => $refund,
             'properties-more' => true,
-        );
+        ];
     }
 
     /**
@@ -81,7 +81,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     protected function getTokenInfoOrder()
     {
-        $order = array(
+        $order = [
             'order_number',
             'order_key',
             'billing_first_name',
@@ -118,15 +118,15 @@ class ShopCapabilities extends ShopCapabilitiesBase
             'date_completed',
             'date_paid',
             'created_via',
-        );
+        ];
 
-        return array(
+        return [
             'more-info' => $this->t('original_order_for_refund'),
             'class' => 'WC_Order',
             'file' => 'wp-content/plugins/woocommerce/includes/class-wc-order.php',
             'properties' => $order,
             'properties-more' => true,
-        );
+        ];
     }
 
     /**
@@ -134,43 +134,43 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     protected function getTokenInfoShopProperties()
     {
-        $meta = array(
+        $meta = [
             'vat_number (With EU VAT plugin only)',
-        );
-        $result = array(
-            'meta' => array(
+        ];
+        $result = [
+            'meta' => [
                 'table' => 'postmeta',
                 'additional-info' => $this->t('see_post_meta'),
                 'properties' => $meta,
                 'properties-more' => true,
-            ),
-            'order_meta' => array(
+            ],
+            'order_meta' => [
                 'table' => 'postmeta',
                 'additional-info' => $this->t('meta_original_order_for_refund'),
-                'properties' => array(
+                'properties' => [
                     $this->t('see_above'),
-                ),
+                ],
                 'properties-more' => false,
-            ),
-            'item' => array(
+            ],
+            'item' => [
                 'class' => 'WC_Abstract_Order::expand_item_meta()',
                 'file' => 'wp-content/plugins/woocommerce/includes/abstracts/abstract-wc-order.php',
                 'additional-info' => $this->t('invoice_lines_only'),
-                'properties' => array(
+                'properties' => [
                     'name',
                     'type',
                     'qty',
                     'tax_class',
                     'product_id',
                     'variation_id',
-                ),
+                ],
                 'properties-more' => true,
-            ),
-            'product' => array(
+            ],
+            'product' => [
                 'class' => 'WC_Product',
                 'file' => 'wp-content/plugins/woocommerce/includes/abstracts/abstract-wc-product.php',
                 'additional-info' => $this->t('invoice_lines_only'),
-                'properties' => array(
+                'properties' => [
                     'title',
                     'type',
                     'width',
@@ -197,16 +197,16 @@ class ShopCapabilities extends ShopCapabilitiesBase
                     'variation_id',
                     'shipping_class',
                     'shipping_class_id',
-                ),
+                ],
                 'properties-more' => true,
-            ),
-        );
+            ],
+        ];
         if (function_exists('is_wc_booking_product')) {
-            $result['booking'] = array(
+            $result['booking'] = [
                 'class' => 'WC_Booking',
                 'file' => 'wp-content/plugins/woocommerce-bookings/includes/data-objects/class-wc-booking.php',
                 'additional-info' => $this->t('invoice_lines_only'),
-                'properties' => array(
+                'properties' => [
                     'id',
                     'cost',
                     'start_date',
@@ -219,9 +219,9 @@ class ShopCapabilities extends ShopCapabilitiesBase
                     'product_id',
                     'status',
                     'is_all_day',
-                ),
+                ],
                 'properties-more' => true,
-            );
+            ];
         }
         return $result;
     }
@@ -231,7 +231,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     public function getShopDefaults()
     {
-        return array(
+        return [
             // Customer defaults.
             'contactYourId' => '[customer_user]', // WC_Abstract_order
             'companyName1' => '[billing_company]', // WC_Abstract_order
@@ -253,7 +253,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
             'itemNumber' => '[sku]',
             'productName' => '[name]',
             'costPrice' => '[cost_price]',
-        );
+        ];
     }
 
     /**
@@ -261,7 +261,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     public function getShopOrderStatuses()
     {
-        $result = array();
+        $result = [];
         $orderStatuses = wc_get_order_statuses();
         foreach ($orderStatuses as $key => $label) {
             if (substr($key, 0, strlen('wc-')) === 'wc-') {
@@ -303,7 +303,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     public function getPaymentMethods()
     {
-        $result = array();
+        $result = [];
         $paymentGateways = wc()->payment_gateways->payment_gateways();
         foreach ($paymentGateways as $id => $paymentGateway) {
             if (isset($paymentGateway->enabled) && $paymentGateway->enabled === 'yes') {
@@ -321,7 +321,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
         // Standard tax class is not stored in table wc_tax_rate_classes.
         $labels = WC_Tax::get_tax_classes();
         $keys =  WC_Tax::get_tax_class_slugs();
-        return array('standard' => $this->t('Standaard')) + array_combine($keys, $labels);
+        return ['standard' => $this->t('Standaard')] + array_combine($keys, $labels);
     }
 
     /**

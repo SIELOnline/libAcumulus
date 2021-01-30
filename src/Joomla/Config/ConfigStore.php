@@ -20,7 +20,7 @@ class ConfigStore extends BaSeConfigStore
         $extensionTable = new JtableExtension(JFactory::getDbo());
         $extensionTable->load(array('element' => 'com_acumulus'));
         $values = $extensionTable->get('custom_data');
-        $values = !empty($values) ? json_decode($values, true) : array();
+        $values = !empty($values) ? json_decode($values, true) : [];
 
         return $values;
     }
@@ -31,7 +31,7 @@ class ConfigStore extends BaSeConfigStore
     public function save(array $values)
     {
         $extensionTable = new JtableExtension(JFactory::getDbo());
-        $extensionTable->load(array('element' => 'com_acumulus'));
+        $extensionTable->load(['element' => 'com_acumulus']);
         $extensionTable->set('custom_data', json_encode($values, JSON_FORCE_OBJECT));
         $result = $extensionTable->store();
         return $result;
@@ -46,7 +46,7 @@ class ConfigStore extends BaSeConfigStore
      */
     public function loadOld(array $keys)
     {
-        $result = array();
+        $result = [];
         $params = JComponentHelper::getParams('com_acumulus');
         foreach ($keys as $key) {
             $value = $params->get($key, null);
@@ -68,7 +68,7 @@ class ConfigStore extends BaSeConfigStore
         // Delete the values, this will only be used one more time: during
         // updating to 5.4.0.
         $extensionTable = new JtableExtension(JFactory::getDbo());
-        $extensionTable->load(array('element' => 'com_acumulus'));
+        $extensionTable->load(['element' => 'com_acumulus']);
         $extensionTable->set('params', '');
         $extensionTable->store();
 

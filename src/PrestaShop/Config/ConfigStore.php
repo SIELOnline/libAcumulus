@@ -40,7 +40,7 @@ class ConfigStore extends BaSeConfigStore
      */
     public function loadOld(array $keys)
     {
-        $result = array();
+        $result = [];
         // Load the values from the web shop specific configuration.
         foreach ($keys as $key) {
             $dbKey = substr('ACUMULUS_' . $key, 0, 32);

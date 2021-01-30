@@ -14,11 +14,11 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function getShopEnvironment()
     {
         // @todo: adapt by retrieving your module, webshop, and - optionally - CMS version.
-        $environment = array(
+        $environment = [
             'moduleVersion' => 'todo',
             'shopName' => 'MyWebShop',
             'shopVersion' => 'todo' . ' (MyCMS: ' . 'todo' . ')',
-        );
+        ];
         return $environment;
     }
 
@@ -29,7 +29,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     {
         // @todo: fill in the common properties of your order and refund class.
         // @todo: If MyWebShop does not support refunds, fill in the properties of your Order class.
-        $source = array(
+        $source = [
             'date_created',
             'date_modified',
             'shipping_method',
@@ -37,15 +37,15 @@ class ShopCapabilities extends ShopCapabilitiesBase
             'subtotal',
             'used_coupons',
             'item_count',
-        );
+        ];
 
         // @todo: complete the class and file name.
-        return array(
+        return [
             'class' => '/MyWebShop/BaseOrder',
             'file' => '.../BaseOrder.php',
             'properties' => $source,
             'properties-more' => true,
-        );
+        ];
     }
 
     /**
@@ -55,19 +55,19 @@ class ShopCapabilities extends ShopCapabilitiesBase
     {
         // @todo: fill in the properties that are unique to your Refund class (i.e. do not appear in orders),
         // @todo: remove if MyWebShop does not support refunds.
-        $refund = array(
+        $refund = [
             'amount',
             'reason',
-        );
+        ];
 
         // @todo: complete the class and file name.
-        return array(
+        return [
             'more-info' => $this->t('refund_only'),
             'class' => '/MyWebShop/Refund',
             'file' => '.../Refund.php',
             'properties' => $refund,
             'properties-more' => true,
-        );
+        ];
     }
 
     /**
@@ -77,7 +77,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     {
         // @todo: fill in the properties that are unique to your Order class (i.e. do not appear in refunds),
         // @todo: remove if MyWebShop does not support refunds.
-        $order = array(
+        $order = [
             'order_number',
             'billing_first_name',
             'billing_last_name',
@@ -85,16 +85,16 @@ class ShopCapabilities extends ShopCapabilitiesBase
             'billing_address_1',
             'billing_address_2',
             '...',
-        );
+        ];
 
         // @todo: complete the class and file name.
-        return array(
+        return [
             'more-info' => $this->t('original_order_for_refund'),
             'class' => '/MyWebShop/Order',
             'file' => '.../Order.php',
             'properties' => $order,
             'properties-more' => true,
-        );
+        ];
     }
 
     /**
@@ -104,12 +104,12 @@ class ShopCapabilities extends ShopCapabilitiesBase
     {
         // @todo: define the properties of other objects that may be used to fetch info from.
         // @todo: ensure that your Creator class calls addPropertySource() to all properties defined here.
-        return parent::getTokenInfo() + array(
+        return parent::getTokenInfo() + [
             // @todo: complete the class and file name.
-            'address_invoice' => array(
+            'address_invoice' => [
                 'class' => 'Address',
                 'file' => 'classes/Address.php',
-                'properties' => array(
+                'properties' => [
                     'country',
                     'company',
                     'lastname',
@@ -122,24 +122,24 @@ class ShopCapabilities extends ShopCapabilitiesBase
                     'phone',
                     'phone_mobile',
                     'vat_number',
-                ),
+                ],
                 'properties-more' => true,
-            ),
+            ],
             // @todo: complete the class and file name.
-            'address_delivery' => array(
+            'address_delivery' => [
                 'more-info' => $this->t('see_billing_address'),
                 'class' => 'Address',
                 'file' => 'classes/Address.php',
-                'properties' => array(
+                'properties' => [
                     $this->t('see_above'),
-                ),
+                ],
                 'properties-more' => false,
-            ),
+            ],
             // @todo: complete the class and file name.
-            'customer' => array(
+            'customer' => [
                 'class' => 'Customer',
                 'file' => 'classes/Customer.php',
-                'properties' => array(
+                'properties' => [
                     'id',
                     'note',
                     'id_gender',
@@ -163,14 +163,14 @@ class ShopCapabilities extends ShopCapabilitiesBase
                     'years',
                     'days',
                     'months',
-                ),
+                ],
                 'properties-more' => true,
-            ),
+            ],
             // @todo: complete the class and file name.
-            'item' => array(
+            'item' => [
                 'class' => 'OrderDetail',
                 'file' => 'classes/order/OrderDetail.php',
-                'properties' => array(
+                'properties' => [
                     'product_id',
                     'product_attribute_id',
                     'product_name',
@@ -190,10 +190,10 @@ class ShopCapabilities extends ShopCapabilitiesBase
                     'unit_price_tax_excl',
                     'original_product_price',
                     'original_wholesale_price',
-                ),
+                ],
                 'properties-more' => true,
-            ),
-        );
+            ],
+            ];
     }
 
     /**
@@ -203,7 +203,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     {
         // @todo: fill in the appropriate property names, remove a line when no appropriate default exists.
         // @todo: ensure that all these objects are defined in the method getTokenInfoShopProperties() above.
-        return array(
+        return [
             // Customer defaults.
             'contactYourId' => '[id]',
             'companyName1' => '[company1]',
@@ -233,7 +233,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
             'productName' => '[product_name]',
             'nature' => '',
             'costPrice' => '[purchase_supplier_price]',
-        );
+        ];
     }
 
     /**
@@ -243,7 +243,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     {
         // @todo: adapt to MyWebshop's way of retrieving the list of order statuses.
         $statuses = OrderState::getOrderStates($this->translator->getLanguage());
-        $result = array();
+        $result = [];
         foreach ($statuses as $status) {
             $result[$status['id_order_state']] = $status['name'];
         }
@@ -257,7 +257,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     {
         // @todo: adapt to MyWebshop's way of retrieving the list of (active) payment methods.
         $paymentModules = PaymentModule::getInstalledPaymentModules();
-        $result = array();
+        $result = [];
         foreach($paymentModules as $paymentModule)
         {
             $module = Module::getInstanceById($paymentModule['id_module']);
@@ -269,7 +269,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function getVatClasses()
     {
         // @todo: adapt to MyWebshop's way of retrieving the list of (active) tax classes.
-        $result = array();
+        $result = [];
         $taxClasses = TaxRulesGroup::getTaxRulesGroups();
         foreach ($taxClasses as $taxClass) {
             $result[$taxClass['id']] = $taxClass['name'];
@@ -285,7 +285,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
         // @todo: adapt to MyWebshop's way of creating links.
         switch ($linkType) {
             case 'config':
-                return Context::getContext()->link->getAdminLink('AdminModules', true, array(), array('configure' => 'acumulus'));
+                return Context::getContext()->link->getAdminLink('AdminModules', true, [], ['configure' => 'acumulus']);
             case 'advanced':
                 return Context::getContext()->link->getAdminLink('AdminAcumulusAdvanced', true);
             case 'batch':

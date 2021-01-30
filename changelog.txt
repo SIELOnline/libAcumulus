@@ -20,6 +20,9 @@ WC4 = WooCommerce 4 (WordPress)
 
 6.2.0 (2021-01-??)
 ------------------
+Bugs:
+- OC: PHP7 syntax in ConfigStore.
+
 Features:
 - ALL: New settings that allow to better distinguish between vat-free and 0% vat
   rates. This is important to get correct vat declarations and reports.

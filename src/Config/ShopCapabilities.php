@@ -127,11 +127,11 @@ abstract class ShopCapabilities
      */
     public function getTokenInfo()
     {
-        $result = array();
-        $result['invoiceSource'] = array(
+        $result = [];
+        $result['invoiceSource'] = [
             'more-info' => ucfirst($this->t('invoice_source')),
             'class' => '\Siel\Acumulus\Invoice\Source',
-            'properties' => array(
+            'properties' => [
                 'type (' . $this->t(Source::Order) . ' ' . $this->t('or') . ' ' . $this->t(Source::CreditNote) . ')',
                 'id (' . $this->t('internal_id') . ')',
                 'reference (' . $this->t('external_id') . ')',
@@ -144,30 +144,30 @@ abstract class ShopCapabilities
                 'currency',
                 'invoiceReference (' . $this->t('external_id') . ')',
                 'invoiceDate',
-            ),
+            ],
             'properties-more' => false,
-        );
+        ];
         if (array_key_exists(Source::CreditNote, $this->getSupportedInvoiceSourceTypes())) {
-            $result['originalInvoiceSource'] = array(
+            $result['originalInvoiceSource'] = [
                 'more-info' => ucfirst($this->t('original_invoice_source')),
-                'properties' => array($this->t('see_invoice_source_above')),
+                'properties' => [$this->t('see_invoice_source_above')],
                 'properties-more' => false,
-            );
+            ];
         }
-        $result['source'] = array_merge(array('more-info' => ucfirst($this->t('order_or_refund'))), $this->getTokenInfoSource());
+        $result['source'] = array_merge(['more-info' => ucfirst($this->t('order_or_refund'))], $this->getTokenInfoSource());
         if (array_key_exists(Source::CreditNote, $this->getSupportedInvoiceSourceTypes())) {
-            $result['refund'] = array_merge(array('more-info' => ucfirst($this->t('refund_only'))), $this->getTokenInfoRefund());
-            $result['order'] = array_merge(array('more-info' => ucfirst($this->t('original_order_for_refund'))), $this->getTokenInfoOrder());
-            $result['refundedInvoiceSource'] = array(
+            $result['refund'] = array_merge(['more-info' => ucfirst($this->t('refund_only'))], $this->getTokenInfoRefund());
+            $result['order'] = array_merge(['more-info' => ucfirst($this->t('original_order_for_refund'))], $this->getTokenInfoOrder());
+            $result['refundedInvoiceSource'] = [
                 'more-info' => ucfirst($this->t('original_invoice_source') . ' ' . ucfirst($this->t('refund_only'))),
-                'properties' => array($this->t('see_invoice_source_above')),
+                'properties' => [$this->t('see_invoice_source_above')],
                 'properties-more' => false,
-            );
-            $result['refundedOrder'] = array(
+            ];
+            $result['refundedOrder'] = [
                 'more-info' => ucfirst($this->t('original_order_for_refund') . ' ' . ucfirst($this->t('refund_only'))),
-                'properties' => array($this->t('see_order_above')),
+                'properties' => [$this->t('see_order_above')],
                 'properties-more' => false,
-            );
+            ];
         }
         $result += $this->getTokenInfoShopProperties();
 
@@ -192,7 +192,7 @@ abstract class ShopCapabilities
      */
     protected function getTokenInfoRefund()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -204,7 +204,7 @@ abstract class ShopCapabilities
      *   An array with shop specific token info for the 'order' property.
      */
     protected function getTokenInfoOrder() {
-        return array();
+        return [];
     }
 
     /**
@@ -241,10 +241,10 @@ abstract class ShopCapabilities
      */
     public function getSupportedInvoiceSourceTypes()
     {
-        return array(
+        return [
             Source::Order => ucfirst($this->t(Source::Order)),
             Source::CreditNote => ucfirst($this->t(Source::CreditNote)),
-        );
+        ];
     }
 
     /**
@@ -261,9 +261,9 @@ abstract class ShopCapabilities
      */
     public function getTriggerInvoiceEventOptions()
     {
-        return array(
+        return [
             Config::TriggerInvoiceEvent_None => $this->t('option_triggerInvoiceEvent_0'),
-        );
+        ];
     }
 
     /**
@@ -289,9 +289,9 @@ abstract class ShopCapabilities
      */
     public function getTriggerCreditNoteEventOptions()
     {
-        $result = array(
+        $result = [
             Config::TriggerCreditNoteEvent_None => $this->t('option_triggerCreditNoteEvent_0'),
-        );
+        ];
 
         if (in_array(Source::CreditNote, $this->getSupportedInvoiceSourceTypes())) {
             $result[Config::TriggerCreditNoteEvent_Create] = $this->t('option_triggerCreditNoteEvent_1');
@@ -316,11 +316,11 @@ abstract class ShopCapabilities
      */
     public function getInvoiceNrSourceOptions()
     {
-        return array(
+        return [
             Config::InvoiceNrSource_ShopInvoice => $this->t('option_invoiceNrSource_1'),
             Config::InvoiceNrSource_ShopOrder => $this->t('option_invoiceNrSource_2'),
             Config::InvoiceNrSource_Acumulus => $this->t('option_invoiceNrSource_3'),
-        );
+        ];
     }
 
     /**
@@ -339,11 +339,11 @@ abstract class ShopCapabilities
      */
     public function getDateToUseOptions()
     {
-        return array(
+        return [
             Config::InvoiceDate_InvoiceCreate => $this->t('option_dateToUse_1'),
             Config::InvoiceDate_OrderCreate => $this->t('option_dateToUse_2'),
             Config::InvoiceDate_Transfer => $this->t('option_dateToUse_3'),
-        );
+        ];
     }
 
     /**

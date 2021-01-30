@@ -11,7 +11,6 @@ use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Helpers\Token;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Meta;
-use Siel\Acumulus\PluginConfig;
 use Siel\Acumulus\Tag;
 
 /**
@@ -386,18 +385,18 @@ abstract class Creator
 
         // Invoice type.
         $concept = $invoiceSettings['concept'];
-        if ($concept == PluginConfig::Concept_Plugin) {
+        if ($concept == Config::Concept_Plugin) {
             $concept = Api::Concept_No;
         }
         $this->addDefaultEmpty($invoice, Tag::Concept, $concept);
 
         // Invoice number and date.
         $sourceToUse = $shopSettings['invoiceNrSource'];
-        if ($sourceToUse != PluginConfig::InvoiceNrSource_Acumulus) {
+        if ($sourceToUse != Config::InvoiceNrSource_Acumulus) {
             $invoice[Tag::Number] = $this->getInvoiceNumber($sourceToUse);
         }
         $dateToUse = $shopSettings['dateToUse'];
-        if ($dateToUse != PluginConfig::InvoiceDate_Transfer) {
+        if ($dateToUse != Config::InvoiceDate_Transfer) {
             $invoice[Tag::IssueDate] = $this->getInvoiceDate($dateToUse);
         }
 
@@ -463,7 +462,7 @@ abstract class Creator
      */
     protected function getInvoiceNumber($invoiceNumberSource)
     {
-        $result = $invoiceNumberSource === PluginConfig::InvoiceNrSource_ShopInvoice ? $this->invoiceSource->getInvoiceReference() : null;
+        $result = $invoiceNumberSource === Config::InvoiceNrSource_ShopInvoice ? $this->invoiceSource->getInvoiceReference() : null;
         if (empty($result)) {
             $result = $this->invoiceSource->getReference();
         }
@@ -483,7 +482,7 @@ abstract class Creator
     protected function getInvoiceDate($dateToUse)
     {
         $result = $this->invoiceSource->getInvoiceDate();
-        if ($dateToUse != PluginConfig::InvoiceDate_InvoiceCreate || empty($result)) {
+        if ($dateToUse != Config::InvoiceDate_InvoiceCreate || empty($result)) {
             $result = $this->invoiceSource->getDate();
         }
         return $result;
@@ -646,10 +645,10 @@ abstract class Creator
         if (empty($line[Tag::Nature])) {
             $shopSettings = $this->config->getShopSettings();
             switch ($shopSettings['nature_shop']) {
-                case PluginConfig::Nature_Products:
+                case Config::Nature_Products:
                     $line[Tag::Nature] = Api::Nature_Product;
                     break;
-                case PluginConfig::Nature_Services:
+                case Config::Nature_Services:
                     $line[Tag::Nature] = Api::Nature_Service;
                     break;
                 default:
@@ -851,7 +850,7 @@ abstract class Creator
     protected function allowMarginScheme()
     {
         $shopSettings = $this->config->getShopSettings();
-        return $shopSettings['marginProducts'] !== PluginConfig::MarginProducts_No;
+        return $shopSettings['marginProducts'] !== Config::MarginProducts_No;
     }
 
     /**

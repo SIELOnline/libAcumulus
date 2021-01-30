@@ -11,7 +11,7 @@ use OrderSlip;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\Meta;
-use Siel\Acumulus\PluginConfig;
+use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Tag;
 use TaxManagerFactory;
 use TaxRulesGroup;
@@ -470,7 +470,7 @@ class Creator extends BaseCreator
                 );
             } else {
                 $result = array(
-                    Meta::VatClassId => PluginConfig::VatClass_Null,
+                    Meta::VatClassId => Config::VatClass_Null,
                 );
             }
         } catch (Exception $e) {

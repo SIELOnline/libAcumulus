@@ -4,7 +4,7 @@ namespace Siel\Acumulus\WooCommerce\Invoice;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\Meta;
-use Siel\Acumulus\PluginConfig;
+use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Tag;
 use WC_Coupon;
 use WC_Order_Item_Product;
@@ -197,7 +197,7 @@ class Creator extends BaseCreator
     {
         if ($taxClassId === null) {
             $result = array(
-                Meta::VatClassId => PluginConfig::VatClass_Null,
+                Meta::VatClassId => Config::VatClass_Null,
             );
         } else {
             // '' denotes the 'standard' tax class, use 'standard' in meta data,

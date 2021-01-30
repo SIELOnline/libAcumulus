@@ -34,6 +34,12 @@ Features:
   class"/"belastingklasse", but this does not always match the shop's way of
   naming this concept. Help texts now use the shop's name.
 
+Refactorings:
+- ALL: Interface PluginConfig has been removed. All Configuration related
+  constants are now in Config, the library version constant is now directly in
+  the base namespace: /Siel/Acumulus/Version, and the sql timestamp format is
+  taken from API.
+
 6.1.2 (2021-01-16)
 ------------------
 Bug:

@@ -5,7 +5,7 @@ use Exception;
 use Magento\Framework\App\ObjectManager;
 use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
 use Siel\Acumulus\Magento\Magento2\Helpers\Registry;
-use Siel\Acumulus\PluginConfig;
+use Siel\Acumulus\Config\Config;
 
 /**
  * Defines the Magento 2 webshop specific capabilities.
@@ -531,7 +531,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function getTriggerInvoiceEventOptions()
     {
         $result = parent::getTriggerInvoiceEventOptions();
-        $result[PluginConfig::TriggerInvoiceEvent_Create] = $this->t('option_triggerInvoiceEvent_1');
+        $result[Config::TriggerInvoiceEvent_Create] = $this->t('option_triggerInvoiceEvent_1');
         return $result;
     }
 

@@ -9,7 +9,7 @@ use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Result;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Meta;
-use Siel\Acumulus\PluginConfig;
+use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Tag;
 use Siel\Acumulus\Helpers\Severity;
 
@@ -167,7 +167,7 @@ abstract class InvoiceManager
     {
         $pluginSettings = $this->getConfig()->getPluginSettings();
 
-        return $pluginSettings['debug'] == PluginConfig::Send_TestMode;
+        return $pluginSettings['debug'] == Config::Send_TestMode;
     }
 
 
@@ -329,7 +329,7 @@ abstract class InvoiceManager
             $arguments = array($status, implode(',', $shopEventSettings['triggerOrderStatus']));
             $notSendReason = Result::NotSent_WrongStatus;
         } else {
-            $doSend = $shopEventSettings['triggerCreditNoteEvent'] === PluginConfig::TriggerCreditNoteEvent_Create;
+            $doSend = $shopEventSettings['triggerCreditNoteEvent'] === Config::TriggerCreditNoteEvent_Create;
             $arguments = array();
             $notSendReason = Result::NotSent_TriggerCreditNoteEventNotEnabled;
         }
@@ -360,7 +360,7 @@ abstract class InvoiceManager
     {
         $result = $this->getInvoiceResult('InvoiceManager::invoiceCreate()');
         $shopEventSettings = $this->getConfig()->getShopEventSettings();
-        if ($shopEventSettings['triggerInvoiceEvent'] == PluginConfig::TriggerInvoiceEvent_Create) {
+        if ($shopEventSettings['triggerInvoiceEvent'] == Config::TriggerInvoiceEvent_Create) {
             $result = $this->createAndSend($invoiceSource, $result);
         } else {
             $result->setSendStatus(Result::NotSent_TriggerInvoiceCreateNotEnabled);
@@ -387,7 +387,7 @@ abstract class InvoiceManager
     {
         $result = $this->getInvoiceResult('InvoiceManager::invoiceSend()');
         $shopEventSettings = $this->getConfig()->getShopEventSettings();
-        if ($shopEventSettings['triggerInvoiceEvent'] == PluginConfig::TriggerInvoiceEvent_Send) {
+        if ($shopEventSettings['triggerInvoiceEvent'] == Config::TriggerInvoiceEvent_Send) {
             $result = $this->createAndSend($invoiceSource, $result);
         } else {
             $result->setSendStatus(Result::NotSent_TriggerInvoiceSentNotEnabled);
@@ -642,7 +642,7 @@ abstract class InvoiceManager
     protected function mailInvoiceAddResult(Result $result, Source $invoiceSource)
     {
         $pluginSettings = $this->getConfig()->getPluginSettings();
-        $addReqResp = $pluginSettings['debug'] === PluginConfig::Send_SendAndMailOnError ? Result::AddReqResp_WithOther : Result::AddReqResp_Always;
+        $addReqResp = $pluginSettings['debug'] === Config::Send_SendAndMailOnError ? Result::AddReqResp_WithOther : Result::AddReqResp_Always;
         if ($addReqResp === Result::AddReqResp_Always || ($addReqResp === Result::AddReqResp_WithOther && $result->hasRealMessages())) {
             return $this->getMailer()->sendInvoiceAddMailResult($result, $invoiceSource->getType(), $invoiceSource->getReference());
         }
@@ -733,11 +733,11 @@ abstract class InvoiceManager
      *
      * @param \DateTime $date
      *
-     * @return int|string
+     * @return string
      */
     protected function getSqlDate(DateTime $date)
     {
-        return $date->format(PluginConfig::TimeStampFormat_Sql);
+        return $date->format(Api::Format_TimeStamp);
     }
 
     /**

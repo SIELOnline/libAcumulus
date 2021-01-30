@@ -4,7 +4,7 @@ namespace Siel\Acumulus\Config;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Invoice\Source;
-use Siel\Acumulus\PluginConfig;
+use Siel\Acumulus\Config\Config;
 
 /**
  * Defines an interface to access the shop specific's capabilities.
@@ -255,14 +255,14 @@ abstract class ShopCapabilities
      *
      * @return string[]
      *   An array of all shop invoice related events, with the key being the ID
-     *   for the dropdown item, 1 of the {@see \Siel\Acumulus\PluginConfig}
+     *   for the dropdown item, 1 of the {@see \Siel\Acumulus\Config}
      *   TriggerInvoiceEvent_... constants, and the value being the label for
      *   the dropdown item.
      */
     public function getTriggerInvoiceEventOptions()
     {
         return array(
-            PluginConfig::TriggerInvoiceEvent_None => $this->t('option_triggerInvoiceEvent_0'),
+            Config::TriggerInvoiceEvent_None => $this->t('option_triggerInvoiceEvent_0'),
         );
     }
 
@@ -280,7 +280,7 @@ abstract class ShopCapabilities
      *
      * @return string[]
      *   An array of all credit note related events, with the key being the ID
-     *   for the dropdown item, 1 of the {@see \Siel\Acumulus\PluginConfig}
+     *   for the dropdown item, 1 of the {@see \Siel\Acumulus\Config}
      *   TriggerCreditNoteEvent_... constants, and the value being the label for
      *   the dropdown item.
      *
@@ -290,11 +290,11 @@ abstract class ShopCapabilities
     public function getTriggerCreditNoteEventOptions()
     {
         $result = array(
-            PluginConfig::TriggerCreditNoteEvent_None => $this->t('option_triggerCreditNoteEvent_0'),
+            Config::TriggerCreditNoteEvent_None => $this->t('option_triggerCreditNoteEvent_0'),
         );
 
         if (in_array(Source::CreditNote, $this->getSupportedInvoiceSourceTypes())) {
-            $result[PluginConfig::TriggerCreditNoteEvent_Create] = $this->t('option_triggerCreditNoteEvent_1');
+            $result[Config::TriggerCreditNoteEvent_Create] = $this->t('option_triggerCreditNoteEvent_1');
         }
 
         return $result;
@@ -308,7 +308,7 @@ abstract class ShopCapabilities
      *
      * Overrides should typically return a subset of the constants defined in
      * this base implementation, but including at least
-     * {@see \Siel\Acumulus\PluginConfig::InvoiceNrSource_Acumulus}.
+     * {@see \Siel\Acumulus\Config::InvoiceNrSource_Acumulus}.
      *
      * @return string[]
      *   An array keyed by the option values and having translated descriptions
@@ -317,9 +317,9 @@ abstract class ShopCapabilities
     public function getInvoiceNrSourceOptions()
     {
         return array(
-            PluginConfig::InvoiceNrSource_ShopInvoice => $this->t('option_invoiceNrSource_1'),
-            PluginConfig::InvoiceNrSource_ShopOrder => $this->t('option_invoiceNrSource_2'),
-            PluginConfig::InvoiceNrSource_Acumulus => $this->t('option_invoiceNrSource_3'),
+            Config::InvoiceNrSource_ShopInvoice => $this->t('option_invoiceNrSource_1'),
+            Config::InvoiceNrSource_ShopOrder => $this->t('option_invoiceNrSource_2'),
+            Config::InvoiceNrSource_Acumulus => $this->t('option_invoiceNrSource_3'),
         );
     }
 
@@ -331,7 +331,7 @@ abstract class ShopCapabilities
      *
      * Overrides should typically return a subset of the constants defined in
      * this base implementation, but including at least
-     * {@see \Siel\Acumulus\PluginConfig::InvoiceDate_Transfer}.
+     * {@see \Siel\Acumulus\Config::InvoiceDate_Transfer}.
      *
      * @return string[]
      *   An array keyed by the option values and having translated descriptions
@@ -340,9 +340,9 @@ abstract class ShopCapabilities
     public function getDateToUseOptions()
     {
         return array(
-            PluginConfig::InvoiceDate_InvoiceCreate => $this->t('option_dateToUse_1'),
-            PluginConfig::InvoiceDate_OrderCreate => $this->t('option_dateToUse_2'),
-            PluginConfig::InvoiceDate_Transfer => $this->t('option_dateToUse_3'),
+            Config::InvoiceDate_InvoiceCreate => $this->t('option_dateToUse_1'),
+            Config::InvoiceDate_OrderCreate => $this->t('option_dateToUse_2'),
+            Config::InvoiceDate_Transfer => $this->t('option_dateToUse_3'),
         );
     }
 

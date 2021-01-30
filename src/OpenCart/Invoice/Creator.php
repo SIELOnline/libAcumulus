@@ -5,7 +5,7 @@ use RuntimeException;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
-use Siel\Acumulus\PluginConfig;
+use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Tag;
 
 /**
@@ -198,7 +198,7 @@ class Creator extends BaseCreator
             }
         } else {
             $result += array(
-                Meta::VatClassId => PluginConfig::VatClass_Null,
+                Meta::VatClassId => Config::VatClass_Null,
             );
         }
         return $result;

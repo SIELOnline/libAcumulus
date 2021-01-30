@@ -4,7 +4,6 @@ namespace Siel\Acumulus\Helpers;
 use Exception;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Invoice\Result;
-use Siel\Acumulus\PluginConfig;
 use Siel\Acumulus\Tag;
 
 /**
@@ -173,7 +172,7 @@ abstract class Mailer
     protected function getSubject(Result $invoiceSendResult)
     {
         $pluginSettings = $this->config->getPluginSettings();
-        $isTestMode = $pluginSettings['debug'] === PluginConfig::Send_TestMode;
+        $isTestMode = $pluginSettings['debug'] === Config::Send_TestMode;
         $resultInvoice = $invoiceSendResult->getResponse();
         $isConcept = !$invoiceSendResult->hasError() && empty($resultInvoice['entryid']);
 
@@ -267,7 +266,7 @@ abstract class Mailer
     protected function getStatusSpecificBody(Result $invoiceSendResult)
     {
         $pluginSettings = $this->config->getPluginSettings();
-        $isTestMode = $pluginSettings['debug'] === PluginConfig::Send_TestMode;
+        $isTestMode = $pluginSettings['debug'] === Config::Send_TestMode;
         $resultInvoice = $invoiceSendResult->getResponse();
         // @refactor: can be taken from invoice array if that would be part of the Result
         $isConcept = !$invoiceSendResult->hasError() && empty($resultInvoice['entryid']);
@@ -383,7 +382,7 @@ abstract class Mailer
         $pluginSettings = $this->config->getPluginSettings();
         // We add the request and response messages when set so or if there were
         // warnings or severer messages, thus not with notices.
-        $addReqResp = $pluginSettings['debug'] === PluginConfig::Send_SendAndMailOnError ? Result::AddReqResp_WithOther : Result::AddReqResp_Always;
+        $addReqResp = $pluginSettings['debug'] === Config::Send_SendAndMailOnError ? Result::AddReqResp_WithOther : Result::AddReqResp_Always;
         if ($addReqResp === Result::AddReqResp_Always || ($addReqResp === Result::AddReqResp_WithOther && $result->getStatus() >= Severity::Warning)) {
             $logMessages = new MessageCollection();
             $logMessages->addMessage($result->getByCodeTag(Result::CodeTagRawRequest))

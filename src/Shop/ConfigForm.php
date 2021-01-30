@@ -2,7 +2,7 @@
 namespace Siel\Acumulus\Shop;
 
 use Siel\Acumulus\Helpers\Severity;
-use Siel\Acumulus\PluginConfig;
+use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Tag;
 
 /**
@@ -101,15 +101,15 @@ class ConfigForm extends BaseConfigForm
         }
 
         // Check the foreignVat and foreignVatClasses settings.
-        if (isset($this->submittedValues['foreignVat']) && $this->submittedValues['foreignVat'] != PluginConfig::ForeignVat_No) {
+        if (isset($this->submittedValues['foreignVat']) && $this->submittedValues['foreignVat'] != Config::ForeignVat_No) {
             if (empty($this->submittedValues['foreignVatClasses'])) {
                 $this->addMessage($this->t('message_validate_foreign_vat_classes_0'), Severity::Error, 'foreignVatClasses');
             }
         }
 
         // Check the foreignVat and vatFreeProducts settings.
-        if (isset($this->submittedValues['foreignVat']) && $this->submittedValues['foreignVat'] != PluginConfig::ForeignVat_No) {
-            if (isset($this->submittedValues['vatFreeProducts']) && $this->submittedValues['vatFreeProducts'] == PluginConfig::VatFreeProducts_Only) {
+        if (isset($this->submittedValues['foreignVat']) && $this->submittedValues['foreignVat'] != Config::ForeignVat_No) {
+            if (isset($this->submittedValues['vatFreeProducts']) && $this->submittedValues['vatFreeProducts'] == Config::VatFreeProducts_Only) {
                 $this->addMessage($this->t('message_validate_vat_free_products_1'), Severity::Error, 'foreignVatClasses');
             }
         }
@@ -122,11 +122,11 @@ class ConfigForm extends BaseConfigForm
         if (isset($this->submittedValues['nature_shop']) && isset($this->submittedValues['marginProducts'])) {
             // If we only sell articles with nature Services, we cannot (also)
             // sell margin goods.
-            if ($this->submittedValues['nature_shop'] == PluginConfig::Nature_Services && $this->submittedValues['marginProducts'] != PluginConfig::MarginProducts_No) {
+            if ($this->submittedValues['nature_shop'] == Config::Nature_Services && $this->submittedValues['marginProducts'] != Config::MarginProducts_No) {
                 $this->addMessage($this->t('message_validate_conflicting_shop_options_2'), Severity::Error, 'nature_shop');
             }
             // If we only sell margin goods, the nature of all we sell is Products.
-            if ($this->submittedValues['marginProducts'] == PluginConfig::MarginProducts_Only && $this->submittedValues['nature_shop'] != PluginConfig::Nature_Products) {
+            if ($this->submittedValues['marginProducts'] == Config::MarginProducts_Only && $this->submittedValues['nature_shop'] != Config::Nature_Products) {
                 $this->addMessage($this->t('message_validate_conflicting_shop_options_3'), Severity::Error, 'nature_shop');
             }
         }
@@ -369,7 +369,7 @@ class ConfigForm extends BaseConfigForm
                 'type' => 'select',
                 'label' => sprintf($this->t('field_vatFreeClass'), $this->t('vat_class')),
                 'description' => sprintf($this->t('desc_vatFreeClass'), $this->t('vat_class')),
-                'options' => [PluginConfig::VatClass_Null => sprintf($this->t('vat_class_left_empty'), $this->t('vat_class'))] + $vatClasses,
+                'options' => [Config::VatClass_Null => sprintf($this->t('vat_class_left_empty'), $this->t('vat_class'))] + $vatClasses,
                 'attributes' => [
                     'multiple' => false,
                 ],
@@ -524,9 +524,9 @@ class ConfigForm extends BaseConfigForm
                 'label' => $this->t('field_debug'),
                 'description' => $this->t('desc_debug'),
                 'options' => [
-                    PluginConfig::Send_SendAndMailOnError => $this->t('option_debug_1'),
-                    PluginConfig::Send_SendAndMail => $this->t('option_debug_2'),
-                    PluginConfig::Send_TestMode => $this->t('option_debug_3'),
+                    Config::Send_SendAndMailOnError => $this->t('option_debug_1'),
+                    Config::Send_SendAndMail => $this->t('option_debug_2'),
+                    Config::Send_TestMode => $this->t('option_debug_3'),
                 ],
                 'attributes' => [
                     'required' => true,
@@ -596,6 +596,7 @@ class ConfigForm extends BaseConfigForm
 
         $options[0] = $this->t('option_use_default');
         foreach ($paymentMethods as $paymentMethodId => $paymentMethodLabel) {
+            /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
             $fieldset['fields']["{$key}[{$paymentMethodId}]"] = [
                 'type' => 'select',
                 'label' => $paymentMethodLabel,
@@ -615,9 +616,9 @@ class ConfigForm extends BaseConfigForm
     protected function getNatureOptions()
     {
         return array(
-            PluginConfig::Nature_Both => $this->t('option_nature_1'),
-            PluginConfig::Nature_Products => $this->t('option_nature_2'),
-            PluginConfig::Nature_Services => $this->t('option_nature_3'),
+            Config::Nature_Both => $this->t('option_nature_1'),
+            Config::Nature_Products => $this->t('option_nature_2'),
+            Config::Nature_Services => $this->t('option_nature_3'),
         );
     }
 
@@ -631,9 +632,9 @@ class ConfigForm extends BaseConfigForm
     protected function getForeignVatOptions()
     {
         return [
-            PluginConfig::ForeignVat_Both => $this->t('option_foreignVat_1'),
-            PluginConfig::ForeignVat_No => $this->t('option_foreignVat_2'),
-            PluginConfig::ForeignVat_Only => $this->t('option_foreignVat_3'),
+            Config::ForeignVat_Both => $this->t('option_foreignVat_1'),
+            Config::ForeignVat_No => $this->t('option_foreignVat_2'),
+            Config::ForeignVat_Only => $this->t('option_foreignVat_3'),
         ];
     }
 
@@ -647,9 +648,9 @@ class ConfigForm extends BaseConfigForm
     protected function getVatFreeProductsOptions()
     {
         return [
-            PluginConfig::VatFreeProducts_Both => $this->t('option_vatFreeProducts_1'),
-            PluginConfig::VatFreeProducts_No => $this->t('option_vatFreeProducts_2'),
-            PluginConfig::VatFreeProducts_Only => $this->t('option_vatFreeProducts_3'),
+            Config::VatFreeProducts_Both => $this->t('option_vatFreeProducts_1'),
+            Config::VatFreeProducts_No => $this->t('option_vatFreeProducts_2'),
+            Config::VatFreeProducts_Only => $this->t('option_vatFreeProducts_3'),
         ];
     }
 
@@ -663,9 +664,9 @@ class ConfigForm extends BaseConfigForm
     protected function getZeroVatProductsOptions()
     {
         return [
-            PluginConfig::ZeroVatProducts_Both => $this->t('option_zeroVatProducts_1'),
-            PluginConfig::ZeroVatProducts_No => $this->t('option_zeroVatProducts_2'),
-            PluginConfig::ZeroVatProducts_Only => $this->t('option_zeroVatProducts_3'),
+            Config::ZeroVatProducts_Both => $this->t('option_zeroVatProducts_1'),
+            Config::ZeroVatProducts_No => $this->t('option_zeroVatProducts_2'),
+            Config::ZeroVatProducts_Only => $this->t('option_zeroVatProducts_3'),
         ];
     }
 
@@ -679,9 +680,9 @@ class ConfigForm extends BaseConfigForm
     protected function getMarginProductsOptions()
     {
         return [
-            PluginConfig::MarginProducts_Both => $this->t('option_marginProducts_1'),
-            PluginConfig::MarginProducts_No => $this->t('option_marginProducts_2'),
-            PluginConfig::MarginProducts_Only => $this->t('option_marginProducts_3'),
+            Config::MarginProducts_Both => $this->t('option_marginProducts_1'),
+            Config::MarginProducts_No => $this->t('option_marginProducts_2'),
+            Config::MarginProducts_Only => $this->t('option_marginProducts_3'),
         ];
     }
 }

@@ -1,10 +1,10 @@
 <?php
 namespace Siel\Acumulus\MyWebShop\Shop;
 
+use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Invoice\Source;
-use Siel\Acumulus\PluginConfig;
 use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
 use Siel\Acumulus\Shop\AcumulusEntryManager as BaseAcumulusEntryManager;
 
@@ -93,7 +93,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      */
     protected function sqlNow()
     {
-        return date(PluginConfig::TimeStampFormat_Sql);
+        return date(Api::Format_TimeStamp);
     }
 
     /**
@@ -102,6 +102,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     public function install()
     {
         // @todo: adapt to the way MyWebshop lets you define tables. Just return true if this is done in a separate script.
+        /** @noinspection SqlNoDataSourceInspection */
         return $this->getDb()->execute("CREATE TABLE IF NOT EXISTS `{$this->tableName}` (
         `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
         `id_shop` int(11) UNSIGNED NOT NULL DEFAULT '1',

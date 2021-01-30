@@ -5,7 +5,7 @@ use RuntimeException;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\Meta;
-use Siel\Acumulus\PluginConfig;
+use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Tag;
 use stdClass;
 
@@ -122,7 +122,7 @@ class Creator extends BaseCreator
                     $vatRate = $productVatInfo->tax_rate;
                 }
             } elseif (count($item->order_product_tax_info) === 0) {
-                $result[Meta::VatClassId] = PluginConfig::VatClass_Null;
+                $result[Meta::VatClassId] = Config::VatClass_Null;
             } else {
                 $result[Meta::Warning] = 'Cumulative vat rates applied: unknown in NL';
             }
@@ -183,7 +183,7 @@ class Creator extends BaseCreator
         } elseif (is_array($item->order_product_tax_info) && count($item->order_product_tax_info) === 0) {
             // We do not have any order_product_vat_info at all: the product
             // does not have any tax category assigned.
-            $result[Meta::VatClassId] = PluginConfig::VatClass_Null;
+            $result[Meta::VatClassId] = Config::VatClass_Null;
         }
 
         // Add variant info.

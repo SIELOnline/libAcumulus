@@ -18,7 +18,6 @@ use Siel\Acumulus\Helpers\Message;
 use Siel\Acumulus\ApiClient\Result;
 use Siel\Acumulus\ApiClient\Acumulus;
 use Siel\Acumulus\Helpers\Severity;
-use Siel\Acumulus\PluginConfig;
 
 /**
  * Defines the Acumulus invoice status overview form.
@@ -879,9 +878,9 @@ class InvoiceStatusForm extends Form
             if ($localPaymentStatus === API::PaymentStatus_Paid) {
                 $shopSettings = $this->acumulusConfig->getShopSettings();
                 $dateToUse = $shopSettings['dateToUse'];
-                if ($dateToUse != PluginConfig::InvoiceDate_Transfer) {
+                if ($dateToUse != Config::InvoiceDate_Transfer) {
                     $defaultPaymentDate = $source->getInvoiceDate();
-                    if ($dateToUse != PluginConfig::InvoiceDate_InvoiceCreate || empty($defaultPaymentDate)) {
+                    if ($dateToUse != Config::InvoiceDate_InvoiceCreate || empty($defaultPaymentDate)) {
                         $defaultPaymentDate = $source->getDate();
                     }
                 }
@@ -1231,7 +1230,7 @@ class InvoiceStatusForm extends Form
      *
      * @param array $entry
      *
-     * @return mixed
+     * @return array
      *   The sanitized entry struct.
      */
     protected function sanitizeEntry(array $entry)
@@ -1368,7 +1367,7 @@ class InvoiceStatusForm extends Form
      * @param array $entry
      * @param string $key
      *
-     * @return int
+     * @return float
      *   The float value of the value under this key.
      */
     protected function sanitizeFloatValue(array $entry, $key)

@@ -1,11 +1,11 @@
 <?php
 namespace Siel\Acumulus\OpenCart\Shop;
 
+use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
-use Siel\Acumulus\PluginConfig;
 use Siel\Acumulus\Shop\AcumulusEntryManager as BaseAcumulusEntryManager;
 use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
 
@@ -141,7 +141,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      */
     protected function sqlNow()
     {
-        return date(PluginConfig::TimeStampFormat_Sql);
+        return date(Api::Format_TimeStamp);
     }
 
     /**

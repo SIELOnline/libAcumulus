@@ -7,7 +7,7 @@ use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Magento\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\Magento\Magento2\Helpers\Registry;
 use Siel\Acumulus\Meta;
-use Siel\Acumulus\PluginConfig;
+use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Tag;
 
 /**
@@ -468,7 +468,7 @@ class Creator extends BaseCreator
             $taxClass->getResource()->load($taxClass, $taxClassId);
             $result[Meta::VatClassName] = $taxClass->getClassName();
         } else {
-            $result[Meta::VatClassId] = PluginConfig::VatClass_Null;
+            $result[Meta::VatClassId] = Config::VatClass_Null;
         }
         return $result;
     }

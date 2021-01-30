@@ -11,7 +11,6 @@ use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Message;
 use Siel\Acumulus\Helpers\Severity;
-use Siel\Acumulus\PluginConfig;
 
 /**
  * Communicator implements the communication with the Acumulus WebAPI.
@@ -144,7 +143,7 @@ class ApiCommunicator
         }
         $result += [
             'format' => $pluginSettings['outputFormat'],
-            'testmode' => $pluginSettings['debug'] === PluginConfig::Send_TestMode ? Api::TestMode_Test : Api::TestMode_Normal,
+            'testmode' => $pluginSettings['debug'] === Config::Send_TestMode ? Api::TestMode_Test : Api::TestMode_Normal,
             'lang' => $this->language,
             'connector' => [
                 'application' => "{$environment['shopName']} {$environment['shopVersion']}",

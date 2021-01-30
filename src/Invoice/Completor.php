@@ -8,7 +8,6 @@ use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Meta;
-use Siel\Acumulus\PluginConfig;
 use Siel\Acumulus\Tag;
 use Siel\Acumulus\ApiClient\Result as WebResult;
 use Siel\Acumulus\ApiClient\Acumulus;
@@ -280,11 +279,11 @@ class Completor
                 }
             } elseif ($this->isEu()) {
                 // Can it be normal vat?
-                if ($foreignVat !== PluginConfig::ForeignVat_Only) {
+                if ($foreignVat !== Config::ForeignVat_Only) {
                     $possibleVatTypes[] = Api::VatType_National;
                 }
                 // Can it be foreign vat?
-                if ($foreignVat !== PluginConfig::ForeignVat_No) {
+                if ($foreignVat !== Config::ForeignVat_No) {
                     $possibleVatTypes[] = Api::VatType_ForeignVat;
                 }
                 // Can it be EU reversed VAT.
@@ -294,7 +293,7 @@ class Completor
             } elseif ($this->isOutsideEu()) {
                 // Can it be national vat (possibly vat free)? Services should
                 // use vattype = 1.
-                if ($nature !== PluginConfig::Nature_Products) {
+                if ($nature !== Config::Nature_Products) {
                     $possibleVatTypes[] = Api::VatType_National;
                 }
                 // Can it be rest of world (0%)? Goods should use vat type = 4
@@ -302,14 +301,14 @@ class Completor
                 // leave the EU (see
                 // https://www.belastingdienst.nl/rekenhulpen/leveren_van_goederen_naar_het_buitenland/),
                 // in which case we should use vat type = 1.
-                if ($nature !== PluginConfig::Nature_Services) {
+                if ($nature !== Config::Nature_Services) {
                     $possibleVatTypes[] = Api::VatType_National;
                     $possibleVatTypes[] = Api::VatType_RestOfWorld;
                 }
             }
 
             // Can it be a margin invoice?
-            if ($margin !== PluginConfig::MarginProducts_No) {
+            if ($margin !== Config::MarginProducts_No) {
                 $possibleVatTypes[] = Api::VatType_MarginScheme;
             }
         }
@@ -351,15 +350,15 @@ class Completor
                             // Zero or vat free rate: add if
                             // - selling vat free products/services
                             // - OR (outside EU AND services).
-                            if ($vatFreeProducts != PluginConfig::VatFreeProducts_No) {
+                            if ($vatFreeProducts != Config::VatFreeProducts_No) {
                                 $vatTypeVatRates[] = $countryVatRate;
-                            } elseif ($this->isOutsideEu() && $nature !== PluginConfig::Nature_Products) {
+                            } elseif ($this->isOutsideEu() && $nature !== Config::Nature_Products) {
                                 $vatTypeVatRates[] = $countryVatRate;
                             }
                         } else {
                             // Positive (non-zero and non free) vat rate: add if
                             // not only selling vat-free products.
-                            if ($vatFreeProducts != PluginConfig::VatFreeProducts_Only) {
+                            if ($vatFreeProducts != Config::VatFreeProducts_Only) {
                                 $vatTypeVatRates[] = $countryVatRate;
                             }
                         }
@@ -380,13 +379,13 @@ class Completor
                         if (Number::isZero($countryVatRate) || Number::floatsAreEqual($countryVatRate, Api::VatFree)) {
                             // Zero or vat free rate: add if (we might be)
                             // selling vat free products.
-                            if ($vatFreeProducts != PluginConfig::VatFreeProducts_No && $nature !== PluginConfig::Nature_Services) {
+                            if ($vatFreeProducts != Config::VatFreeProducts_No && $nature !== Config::Nature_Services) {
                                 $vatTypeVatRates[] = $countryVatRate;
                             }
                         } else {
                             // Positive (non-zero and non free) vat rate: add if
                             // not only selling vat-free items.
-                            if ($vatFreeProducts != PluginConfig::VatFreeProducts_Only) {
+                            if ($vatFreeProducts != Config::VatFreeProducts_Only) {
                                 $vatTypeVatRates[] = $countryVatRate;
                             }
                         }
@@ -655,7 +654,7 @@ class Completor
 
         $invoiceSettings = $this->config->getInvoiceSettings();
         $incomplete = count($this->lineTotalsStates['incomplete']);
-        if ($invoiceSettings['missingAmount'] === PluginConfig::MissingAmount_AddLine && $incomplete <= 1) {
+        if ($invoiceSettings['missingAmount'] === Config::MissingAmount_AddLine && $incomplete <= 1) {
             // NOTE: $incomplete <= 1 IMPLIES $equal + $differ >= 2
             // We want to use the differences in amount and vat amount. Check if
             // they are available, if not compute them based on data that is
@@ -705,7 +704,7 @@ class Completor
 
             // Add warning.
             $this->changeInvoiceToConcept('message_warning_missing_amount_added', 809, $missingAmount, $missingVatAmount);
-        } elseif ($invoiceSettings['missingAmount'] !== PluginConfig::MissingAmount_Ignore) {
+        } elseif ($invoiceSettings['missingAmount'] !== Config::MissingAmount_Ignore) {
             // Due to lack of information, we cannot add a missing line, even
             // though we know we are missing something: just add a warning.
             $missing = [];
@@ -1031,7 +1030,7 @@ class Completor
             $nature = $shopSettings['nature_shop'];
             $allItemsVatFree = true;
             $allItemsService = true;
-            if ($vatFreeProducts == PluginConfig::VatFreeProducts_Only && $nature == PluginConfig::Nature_Services) {
+            if ($vatFreeProducts == Config::VatFreeProducts_Only && $nature == Config::Nature_Services) {
                 $this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType] = Api::VatType_National;
                 $this->invoice[Tag::Customer][Tag::Invoice][Meta::VatTypeSource] = 'Completor::guessVatType: VatFreeProducts_Only';
             } else {
@@ -1437,7 +1436,7 @@ class Completor
         $shopSettings = $this->config->getShopSettings();
         $foreignVat = $shopSettings['foreignVat'];
         $foreignVatClasses = $shopSettings['foreignVatClasses'];
-        return $foreignVat !== PluginConfig::ForeignVat_No && in_array($vatClassId, $foreignVatClasses);
+        return $foreignVat !== Config::ForeignVat_No && in_array($vatClassId, $foreignVatClasses);
     }
 
     /**
@@ -1456,9 +1455,9 @@ class Completor
         $vatFreeProducts = $shopSettings['vatFreeProducts'];
         $vatFreeClass = $shopSettings['vatFreeClass'];
         if (empty($vatClassId)) {
-            $vatClassId = PluginConfig::VatClass_Null;
+            $vatClassId = Config::VatClass_Null;
         }
-        return $vatFreeProducts !== PluginConfig::VatFreeProducts_No && $vatClassId == $vatFreeClass;
+        return $vatFreeProducts !== Config::VatFreeProducts_No && $vatClassId == $vatFreeClass;
     }
 
     /**
@@ -1476,7 +1475,7 @@ class Completor
         $shopSettings = $this->config->getShopSettings();
         $zeroVatProducts = $shopSettings['zeroVatProducts'];
         $zeroVatClass = $shopSettings['zeroVatClass'];
-        return $zeroVatProducts !== PluginConfig::ZeroVatProducts_No && $vatClassId == $zeroVatClass;
+        return $zeroVatProducts !== Config::ZeroVatProducts_No && $vatClassId == $zeroVatClass;
     }
 
     /**
@@ -1495,7 +1494,7 @@ class Completor
         $pdfMessage = '';
         $invoiceSettings = $this->config->getInvoiceSettings();
         $concept = $invoiceSettings['concept'];
-        if ($concept == PluginConfig::Concept_Plugin) {
+        if ($concept == Config::Concept_Plugin) {
             $this->invoice[Tag::Customer][Tag::Invoice][Tag::Concept] = Api::Concept_Yes;
             $emailAsPdfSettings = $this->config->getEmailAsPdfSettings();
             if ($emailAsPdfSettings['emailAsPdf']) {

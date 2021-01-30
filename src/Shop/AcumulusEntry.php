@@ -2,7 +2,8 @@
 namespace Siel\Acumulus\Shop;
 
 use DateTime;
-use Siel\Acumulus\PluginConfig;
+use Siel\Acumulus\Api;
+use Siel\Acumulus\Config\Config;
 
 /**
  * Ties webshop orders or credit notes to entries in Acumulus.
@@ -52,7 +53,7 @@ class AcumulusEntry
     static protected $keyUpdated = 'updated';
 
     // The format of the created and updated timestamps, when saved as a string.
-    static protected $timestampFormat = PluginConfig::TimeStampFormat_Sql;
+    static protected $timestampFormat = Api::Format_TimeStamp;
 
     // Constants to enable some kind of locking and thereby preventing sending
     // invoices twice.

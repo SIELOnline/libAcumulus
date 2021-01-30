@@ -5,10 +5,10 @@ use Exception;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Severity;
-use Siel\Acumulus\PluginConfig;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Tag;
+use const Siel\Acumulus\Version;
 
 /**
  * Provides uniform access to the settings of libAcumulus.
@@ -21,6 +21,59 @@ use Siel\Acumulus\Tag;
  */
 class Config
 {
+    const Concept_Plugin = 2;
+
+    const Send_SendAndMailOnError = 1;
+    const Send_SendAndMail = 2;
+    const Send_TestMode = 3;
+
+    const MissingAmount_Ignore = 1;
+    const MissingAmount_Warn = 2;
+    const MissingAmount_AddLine = 3;
+
+    const InvoiceNrSource_ShopInvoice = 1;
+    const InvoiceNrSource_ShopOrder = 2;
+    const InvoiceNrSource_Acumulus = 3;
+
+    const InvoiceDate_InvoiceCreate = 1;
+    const InvoiceDate_OrderCreate = 2;
+    const InvoiceDate_Transfer = 3;
+
+    const Nature_Unknown = 0;
+    const Nature_Both = 1;
+    const Nature_Products = 2;
+    const Nature_Services = 3;
+
+    const ForeignVat_Unknown = 0;
+    const ForeignVat_Both = 1;
+    const ForeignVat_No = 2;
+    const ForeignVat_Only = 3;
+
+    const VatFreeProducts_Unknown = 0;
+    const VatFreeProducts_Both = 1;
+    const VatFreeProducts_No = 2;
+    const VatFreeProducts_Only = 3;
+
+    // Note: used both as value in Config and as value for Meta::VatClassId.
+    const VatClass_Null = 'vat_class_null';
+
+    const ZeroVatProducts_Unknown = 0;
+    const ZeroVatProducts_Both = 1;
+    const ZeroVatProducts_No = 2;
+    const ZeroVatProducts_Only = 3;
+
+    const MarginProducts_Unknown = 0;
+    const MarginProducts_Both = 1;
+    const MarginProducts_No = 2;
+    const MarginProducts_Only = 3;
+
+    const TriggerInvoiceEvent_None = 0;
+    const TriggerInvoiceEvent_Create = 1;
+    const TriggerInvoiceEvent_Send = 2;
+
+    const TriggerCreditNoteEvent_None = 0;
+    const TriggerCreditNoteEvent_Create = 1;
+
     /** @var \Siel\Acumulus\Config\ConfigStore */
     protected $configStore;
 
@@ -592,7 +645,7 @@ class Config
                 'libraryVersion' => array(
                     'group' => 'environment',
                     'type' => 'string',
-                    'default' => PluginConfig::Version,
+                    'default' => Version,
                 ),
                 'moduleVersion' => array(
                     'group' => 'environment',
@@ -637,7 +690,7 @@ class Config
                 'debug' => array(
                     'group' => 'plugin',
                     'type' => 'int',
-                    'default' => PluginConfig::Send_SendAndMailOnError,
+                    'default' => Config::Send_SendAndMailOnError,
                 ),
                 'logLevel' => array(
                     'group' => 'plugin',
@@ -772,12 +825,12 @@ class Config
                 'concept' => array(
                     'group' => Tag::Invoice,
                     'type' => 'int',
-                    'default' => PluginConfig::Concept_Plugin,
+                    'default' => Config::Concept_Plugin,
                 ),
                 'missingAmount' => array(
                     'group' => Tag::Invoice,
                     'type' => 'int',
-                    'default' => PluginConfig::MissingAmount_Warn,
+                    'default' => Config::MissingAmount_Warn,
                 ),
                 'defaultAccountNumber' => array(
                     'group' => Tag::Invoice,
@@ -872,12 +925,12 @@ class Config
                 'nature_shop' => array(
                     'group' => 'shop',
                     'type' => 'int',
-                    'default' => PluginConfig::Nature_Unknown,
+                    'default' => Config::Nature_Unknown,
                 ),
                 'foreignVat' => array(
                     'group' => 'shop',
                     'type' => 'int',
-                    'default' => PluginConfig::ForeignVat_Unknown,
+                    'default' => Config::ForeignVat_Unknown,
                 ),
                 'foreignVatClasses' => array(
                     'group' => 'shop',
@@ -887,17 +940,17 @@ class Config
                 'vatFreeProducts' => array(
                     'group' => 'shop',
                     'type' => 'int',
-                    'default' => PluginConfig::VatFreeProducts_Unknown,
+                    'default' => Config::VatFreeProducts_Unknown,
                 ),
                 'vatFreeClass' => array(
                     'group' => 'shop',
                     'type' => 'array',
-                    'default' => PluginConfig::VatClass_Null,
+                    'default' => Config::VatClass_Null,
                 ),
                 'zeroVatProducts' => array(
                     'group' => 'shop',
                     'type' => 'int',
-                    'default' => PluginConfig::ZeroVatProducts_Unknown,
+                    'default' => Config::ZeroVatProducts_Unknown,
                 ),
                 'zeroVatClass' => array(
                     'group' => 'shop',
@@ -907,17 +960,17 @@ class Config
                 'marginProducts' => array(
                     'group' => 'shop',
                     'type' => 'int',
-                    'default' => PluginConfig::MarginProducts_Unknown,
+                    'default' => Config::MarginProducts_Unknown,
                 ),
                 'invoiceNrSource' => array(
                     'group' => 'shop',
                     'type' => 'int',
-                    'default' => PluginConfig::InvoiceNrSource_ShopInvoice,
+                    'default' => Config::InvoiceNrSource_ShopInvoice,
                 ),
                 'dateToUse' => array(
                     'group' => 'shop',
                     'type' => 'int',
-                    'default' => PluginConfig::InvoiceDate_InvoiceCreate,
+                    'default' => Config::InvoiceDate_InvoiceCreate,
                 ),
                 'triggerOrderStatus' => array(
                     'group' => 'event',
@@ -927,12 +980,12 @@ class Config
                 'triggerInvoiceEvent' => array(
                     'group' => 'event',
                     'type' => 'int',
-                    'default' => PluginConfig::TriggerInvoiceEvent_None,
+                    'default' => Config::TriggerInvoiceEvent_None,
                 ),
                 'triggerCreditNoteEvent' => array(
                     'group' => 'event',
                     'type' => 'int',
-                    'default' => PluginConfig::TriggerCreditNoteEvent_Create,
+                    'default' => Config::TriggerCreditNoteEvent_Create,
                 ),
                 'sendEmptyInvoice' => array(
                     'group' => 'event',
@@ -1094,7 +1147,7 @@ class Config
         // 2) Debug mode.
         switch ($this->get('debug')) {
             case 4: // Value for deprecated PluginConfig::Debug_StayLocal.
-                $newSettings['logLevel'] = PluginConfig::Send_TestMode;
+                $newSettings['logLevel'] = Config::Send_TestMode;
                 break;
         }
 
@@ -1117,9 +1170,9 @@ class Config
         // Keep track of settings that should be updated.
         $newSettings = array();
         if ($this->get('triggerInvoiceSendEvent') == 2) {
-            $newSettings['triggerInvoiceEvent'] = PluginConfig::TriggerInvoiceEvent_Create;
+            $newSettings['triggerInvoiceEvent'] = Config::TriggerInvoiceEvent_Create;
         } else {
-            $newSettings['triggerInvoiceEvent'] = PluginConfig::TriggerInvoiceEvent_None;
+            $newSettings['triggerInvoiceEvent'] = Config::TriggerInvoiceEvent_None;
         }
 
         return $this->save($newSettings);

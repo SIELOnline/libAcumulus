@@ -3,7 +3,7 @@ namespace Siel\Acumulus\Magento\Magento1\Config;
 
 use Mage;
 use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
-use Siel\Acumulus\PluginConfig;
+use Siel\Acumulus\Config\Config;
 
 /**
  * Defines the Magento 1 webshop specific capabilities.
@@ -466,7 +466,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function getTriggerInvoiceEventOptions()
     {
         $result = parent::getTriggerInvoiceEventOptions();
-        $result[PluginConfig::TriggerInvoiceEvent_Create] = $this->t('option_triggerInvoiceEvent_1');
+        $result[Config::TriggerInvoiceEvent_Create] = $this->t('option_triggerInvoiceEvent_1');
         return $result;
     }
 

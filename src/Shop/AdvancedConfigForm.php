@@ -3,7 +3,7 @@ namespace Siel\Acumulus\Shop;
 
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Severity;
-use Siel\Acumulus\PluginConfig;
+use Siel\Acumulus\Config\Config;
 
 /**
  * Provides advanced config form handling.
@@ -482,7 +482,7 @@ class AdvancedConfigForm extends BaseConfigForm
                 'label' => $this->t('field_concept'),
                 'description' => $this->t('desc_concept'),
                 'options' => [
-                    PluginConfig::Concept_Plugin => $this->t('option_concept_2'),
+                    Config::Concept_Plugin => $this->t('option_concept_2'),
                     Api::Concept_No => $this->t('option_concept_0'),
                     Api::Concept_Yes => $this->t('option_concept_1'),
                 ],
@@ -495,9 +495,9 @@ class AdvancedConfigForm extends BaseConfigForm
                 'label' => $this->t('field_missing_amount'),
                 'description' => $this->t('desc_missing_amount'),
                 'options' => [
-                    PluginConfig::MissingAmount_Warn => $this->t('option_missing_amount_2'),
-                    PluginConfig::MissingAmount_AddLine => $this->t('option_missing_amount_3'),
-                    PluginConfig::MissingAmount_Ignore => $this->t('option_missing_amount_1'),
+                    Config::MissingAmount_Warn => $this->t('option_missing_amount_2'),
+                    Config::MissingAmount_AddLine => $this->t('option_missing_amount_3'),
+                    Config::MissingAmount_Ignore => $this->t('option_missing_amount_1'),
                 ],
             ],
             'sendWhat' => [

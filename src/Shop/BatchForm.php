@@ -12,7 +12,6 @@ use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Invoice\Translations as InvoiceTranslations;
-use Siel\Acumulus\PluginConfig;
 
 /**
  * Provides batch form handling.
@@ -175,7 +174,7 @@ class BatchForm extends Form
             $sendMode = $this->getFormValue('send_mode');
             if ($sendMode === 'send_test_mode') {
                 // Overrule debug setting for (the rest of) this run.
-                $this->acumulusConfig->set('debug', PluginConfig::Send_TestMode);
+                $this->acumulusConfig->set('debug', Config::Send_TestMode);
             }
             // Do the sending (and some info/debug logging).
             $this->log->info('BatchForm::execute(): ' . $this->screenLog['range'] . ' ' . $rangeList);

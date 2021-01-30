@@ -3,7 +3,7 @@ namespace Siel\Acumulus\Joomla\HikaShop\Config;
 
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Joomla\Config\ShopCapabilities as ShopCapabilitiesBase;
-use Siel\Acumulus\PluginConfig;
+use Siel\Acumulus\Config\Config;
 
 /**
  * Defines the HikaShop webshop specific capabilities.
@@ -208,7 +208,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function getDateToUseOptions()
     {
         $result = parent::getDateToUseOptions();
-        unset($result[PluginConfig::InvoiceDate_InvoiceCreate]);
+        unset($result[Config::InvoiceDate_InvoiceCreate]);
         return $result;
     }
 

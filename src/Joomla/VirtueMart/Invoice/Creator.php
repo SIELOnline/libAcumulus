@@ -6,7 +6,7 @@ use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\Meta;
-use Siel\Acumulus\PluginConfig;
+use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Tag;
 use stdClass;
 use VirtueMartModelCustomfields;
@@ -416,7 +416,7 @@ class Creator extends BaseCreator
             $vatInfo = array(
                 Tag::VatRate => Api::VatFree,
                 Meta::VatRateSource => static::VatRateSource_Exact0,
-                Meta::VatClassId => PluginConfig::VatClass_Null,
+                Meta::VatClassId => Config::VatClass_Null,
             );
         } else {
             $vatInfo = $this->getVatRangeTags($vatAmount, $amountEx, $this->precision);

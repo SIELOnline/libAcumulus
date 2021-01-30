@@ -1,9 +1,13 @@
 <?php
+namespace Siel\Acumulus;
+
+const Version = '6.2.0-alpha2';
+
 namespace Siel\Acumulus\Helpers;
 
 use InvalidArgumentException;
 use ReflectionClass;
-use Siel\Acumulus\PluginConfig;
+use const Siel\Acumulus\Version;
 
 /**
  * Container defines a dependency injector pattern for this library.
@@ -240,16 +244,21 @@ class Container
         if (!$this->baseTranslationsAdded) {
             // Add some basic translations that are hard to add just-in-time.
             try {
+                // @todo: introduce more specific method to get translations?
                 /** @var \Siel\Acumulus\Helpers\TranslationCollection $translations */
                 $translations = $this->getInstance('ModuleSpecificTranslations', 'Helpers');
                 $translator->add($translations);
             } catch (InvalidArgumentException $e) {}
+            /** @var \Siel\Acumulus\Helpers\TranslationCollection $translations */
             $translations = $this->getInstance('ModuleTranslations', 'Shop');
             $translator->add($translations);
+            /** @var \Siel\Acumulus\Helpers\TranslationCollection $translations */
             $translations = $this->getInstance('SeverityTranslations', 'Helpers');
             $translator->add($translations);
+            /** @var \Siel\Acumulus\Helpers\TranslationCollection $translations */
             $translations = $this->getInstance('ResultTranslations', 'ApiClient');
             $translator->add($translations);
+            /** @var \Siel\Acumulus\Helpers\TranslationCollection $translations */
             $translations = $this->getInstance('ResultTranslations', 'Invoice');
             $translator->add($translations);
             $this->baseTranslationsAdded = true;
@@ -259,15 +268,19 @@ class Container
 
     /**
      * @return \Siel\Acumulus\Helpers\Log
+     *
+     * @noinspection PhpReturnDocTypeMismatchInspection
      */
     public function getLog()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('Log', 'Helpers', array(PluginConfig::Version));
+        return $this->getInstance('Log', 'Helpers', array(Version));
     }
 
     /**
      * @return \Siel\Acumulus\Helpers\Requirements
+     *
+     * @noinspection PhpReturnDocTypeMismatchInspection
      */
     public function getRequirements()
     {
@@ -277,6 +290,8 @@ class Container
 
     /**
      * @return \Siel\Acumulus\Helpers\Countries
+     *
+     * @noinspection PhpReturnDocTypeMismatchInspection
      */
     public function getCountries()
     {
@@ -286,6 +301,8 @@ class Container
 
     /**
      * @return \Siel\Acumulus\Helpers\Mailer
+     *
+     * @noinspection PhpReturnDocTypeMismatchInspection
      */
     public function getMailer()
     {
@@ -295,6 +312,8 @@ class Container
 
     /**
      * @return \Siel\Acumulus\Helpers\Token
+     *
+     * @noinspection PhpReturnDocTypeMismatchInspection
      */
     public function getToken()
     {
@@ -304,6 +323,8 @@ class Container
 
     /**
      * @return \Siel\Acumulus\Helpers\FormHelper
+     *
+     * @noinspection PhpReturnDocTypeMismatchInspection
      */
     public function getFormHelper()
     {
@@ -315,6 +336,8 @@ class Container
      * @param bool $newInstance
      *
      * @return \Siel\Acumulus\Helpers\FormRenderer
+     *
+     * @noinspection PhpReturnDocTypeMismatchInspection
      */
     public function getFormRenderer($newInstance = false)
     {
@@ -325,6 +348,7 @@ class Container
     /**
      * @return \Siel\Acumulus\Helpers\FormMapper
      *
+     * @noinspection PhpReturnDocTypeMismatchInspection
      * @noinspection PhpUnused
      */
     public function getFormMapper()
@@ -335,6 +359,8 @@ class Container
 
     /**
      * @return \Siel\Acumulus\ApiClient\Acumulus
+     *
+     * @noinspection PhpReturnDocTypeMismatchInspection
      */
     public function getAcumulusApiClient()
     {
@@ -346,6 +372,8 @@ class Container
      * Creates and returns a new \Siel\Acumulus\ApiClient\Result instance.
      *
      * @return \Siel\Acumulus\ApiClient\Result
+     *
+     * @noinspection PhpReturnDocTypeMismatchInspection
      */
     public function getResult()
     {
@@ -355,6 +383,8 @@ class Container
 
     /**
      * @return \Siel\Acumulus\ApiClient\ApiCommunicator
+     *
+     * @noinspection PhpReturnDocTypeMismatchInspection
      */
     public function getApiCommunicator()
     {
@@ -364,6 +394,8 @@ class Container
 
     /**
      * @return \Siel\Acumulus\ApiClient\HttpCommunicator
+     *
+     * @noinspection PhpReturnDocTypeMismatchInspection
      */
     public function getHttpCommunicator()
     {
@@ -382,6 +414,8 @@ class Container
      *
      * @return \Siel\Acumulus\Invoice\Source
      *   A wrapper object around a shop specific invoice source object.
+     *
+     * @noinspection PhpReturnDocTypeMismatchInspection
      */
     public function getSource($invoiceSourceType, $invoiceSourceOrId)
     {
@@ -398,6 +432,8 @@ class Container
      *
      * @return \Siel\Acumulus\Invoice\Result
      *   A wrapper object around an Acumulus invoice-add service result.
+     *
+     * @noinspection PhpReturnDocTypeMismatchInspection
      */
     public function getInvoiceResult($trigger)
     {
@@ -407,6 +443,8 @@ class Container
 
     /**
      * @return \Siel\Acumulus\Invoice\Completor
+     *
+     * @noinspection PhpReturnDocTypeMismatchInspection
      */
     public function getCompletor()
     {
@@ -416,6 +454,8 @@ class Container
 
     /**
      * @return \Siel\Acumulus\Invoice\CompletorInvoiceLines
+     *
+     * @noinspection PhpReturnDocTypeMismatchInspection
      */
     public function getCompletorInvoiceLines()
     {
@@ -425,6 +465,8 @@ class Container
 
     /**
      * @return \Siel\Acumulus\Invoice\FlattenerInvoiceLines
+     *
+     * @noinspection PhpReturnDocTypeMismatchInspection
      */
     public function getFlattenerInvoiceLines()
     {
@@ -434,6 +476,8 @@ class Container
 
     /**
      * @return \Siel\Acumulus\Invoice\CompletorStrategyLines
+     *
+     * @noinspection PhpReturnDocTypeMismatchInspection
      */
     public function getCompletorStrategyLines()
     {
@@ -443,6 +487,8 @@ class Container
 
     /**
      * @return \Siel\Acumulus\Invoice\Creator
+     *
+     * @noinspection PhpReturnDocTypeMismatchInspection
      */
     public function getCreator()
     {
@@ -470,6 +516,8 @@ class Container
 
     /**
      * @return \Siel\Acumulus\Config\ConfigStore
+     *
+     * @noinspection PhpReturnDocTypeMismatchInspection
      */
     public function getConfigStore()
     {
@@ -479,6 +527,8 @@ class Container
 
     /**
      * @return \Siel\Acumulus\Config\ShopCapabilities
+     *
+     * @noinspection PhpReturnDocTypeMismatchInspection
      */
     public function getShopCapabilities()
     {
@@ -488,6 +538,8 @@ class Container
 
     /**
      * @return \Siel\Acumulus\Shop\InvoiceManager
+     *
+     * @noinspection PhpReturnDocTypeMismatchInspection
      */
     public function getInvoiceManager()
     {
@@ -497,6 +549,8 @@ class Container
 
     /**
      * @return \Siel\Acumulus\Shop\AcumulusEntryManager
+     *
+     * @noinspection PhpReturnDocTypeMismatchInspection
      */
     public function getAcumulusEntryManager()
     {
@@ -511,6 +565,8 @@ class Container
      *   The Acumulus entry data to populate the object with.
      *
      * @return \Siel\Acumulus\Shop\AcumulusEntry
+     *
+     * @noinspection PhpReturnDocTypeMismatchInspection
      */
     public function getAcumulusEntry($record)
     {
@@ -525,6 +581,8 @@ class Container
      *   The type of form requested.
      *
      * @return \Siel\Acumulus\Helpers\Form
+     *
+     * @noinspection PhpReturnDocTypeMismatchInspection
      */
     public function getForm($type)
     {
@@ -639,6 +697,7 @@ class Container
             } else {
                 /** @noinspection PhpUnhandledExceptionInspection */
                 $reflector = new ReflectionClass($fqClass);
+                /** @noinspection PhpUnhandledExceptionInspection */
                 $this->instances[$instanceKey] = $reflector->newInstanceArgs($constructorArgs);
             }
         }

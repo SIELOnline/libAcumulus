@@ -2,10 +2,10 @@
 namespace Siel\Acumulus\PrestaShop\Shop;
 
 use Db;
+use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Invoice\Source;
-use Siel\Acumulus\PluginConfig;
 use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
 use Siel\Acumulus\Shop\AcumulusEntryManager as BaseAcumulusEntryManager;
 
@@ -130,7 +130,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      */
     protected function sqlNow()
     {
-        return date(PluginConfig::TimeStampFormat_Sql);
+        return date(Api::Format_TimeStamp);
     }
 
     /**

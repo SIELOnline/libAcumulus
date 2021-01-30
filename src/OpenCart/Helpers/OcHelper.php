@@ -3,9 +3,10 @@ namespace Siel\Acumulus\OpenCart\Helpers;
 
 use Siel\Acumulus\Helpers\Message;
 use Siel\Acumulus\Helpers\Severity;
-use Siel\Acumulus\PluginConfig;
+use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Invoice\Source;
+use const Siel\Acumulus\Version;
 
 /**
  * OcHelper contains functionality shared between the OC1, OC2 and OC3
@@ -528,7 +529,7 @@ class OcHelper
             }
         } else {
             if ($result = $this->container->getAcumulusEntryManager()->upgrade($currentDataModelVersion)) {
-                $setting['acumulus_siel_datamodel_version'] = PluginConfig::Version;
+                $setting['acumulus_siel_datamodel_version'] = Version;
                 $this->registry->model_setting_setting->editSetting('acumulus_siel', $setting);
             }
         }
@@ -580,7 +581,7 @@ class OcHelper
         $this->registry->load->model('setting/setting');
         $setting = $this->registry->model_setting_setting->getSetting('acumulus_siel');
         $currentDataModelVersion = isset($setting['acumulus_siel_datamodel_version']) ? $setting['acumulus_siel_datamodel_version'] : '';
-        $apiVersion = PluginConfig::Version;
+        $apiVersion = Version;
 
         $this->container->getLog()->info('%s: installed version = %s, API = %s', __METHOD__, $currentDataModelVersion, $apiVersion);
 

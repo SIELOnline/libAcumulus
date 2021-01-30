@@ -254,7 +254,7 @@ class Result extends MessageCollection
                     $response = reset($response);
                     // If there was only 1 list result, it wasn't put in an array.
                     if (!is_array(reset($response))) {
-                        $response = array($response);
+                        $response = [$response];
                     }
                 }
             }

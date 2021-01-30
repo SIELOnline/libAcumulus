@@ -256,7 +256,7 @@ class AcumulusEntry
             if (!empty($properties) && array_key_exists($field, $properties)) {
                 $value = $properties[$field];
             } elseif (method_exists($this->record, $field)) {
-                $value = call_user_func(array($this->record, $field));
+                $value = call_user_func([$this->record, $field]);
             } elseif (method_exists($this->record, '__get')) {
                 @$value = $this->record->$field;
             } elseif (method_exists($this->record, '__call')) {

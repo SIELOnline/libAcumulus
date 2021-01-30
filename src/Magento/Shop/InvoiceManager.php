@@ -21,10 +21,10 @@ abstract class InvoiceManager extends BaseInvoiceManager
     public function getInvoiceSourcesByIdRange($invoiceSourceType, $InvoiceSourceIdFrom, $InvoiceSourceIdTo)
     {
         $field = 'entity_id';
-        $condition = array(
+        $condition = [
             'from' => $InvoiceSourceIdFrom,
             'to' => $InvoiceSourceIdTo,
-        );
+        ];
         return $this->getByCondition($invoiceSourceType, $field, $condition);
     }
 
@@ -34,10 +34,10 @@ abstract class InvoiceManager extends BaseInvoiceManager
     public function getInvoiceSourcesByReferenceRange($invoiceSourceType, $invoiceSourceReferenceFrom, $invoiceSourceReferenceTo)
     {
         $field = 'increment_id';
-        $condition = array(
+        $condition = [
             'from' => $invoiceSourceReferenceFrom,
             'to' => $invoiceSourceReferenceTo,
-        );
+        ];
         return $this->getByCondition($invoiceSourceType, $field, $condition);
     }
 
@@ -49,7 +49,7 @@ abstract class InvoiceManager extends BaseInvoiceManager
         $dateFrom = $this->getSqlDate($dateFrom);
         $dateTo = $this->getSqlDate($dateTo);
         $field = 'updated_at';
-        $condition = array('from' => $dateFrom, 'to' => $dateTo);
+        $condition = ['from' => $dateFrom, 'to' => $dateTo];
         return $this->getByCondition($invoiceSourceType, $field, $condition);
     }
 
@@ -94,7 +94,7 @@ abstract class InvoiceManager extends BaseInvoiceManager
      */
     protected function triggerInvoiceCreated(array &$invoice, Source $invoiceSource, Result $localResult)
     {
-        $this->dispatchEvent('acumulus_invoice_created', array('invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult));
+        $this->dispatchEvent('acumulus_invoice_created', ['invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult]);
     }
 
     /**
@@ -104,7 +104,7 @@ abstract class InvoiceManager extends BaseInvoiceManager
      */
     protected function triggerInvoiceSendBefore(array &$invoice, Source $invoiceSource, Result $localResult)
     {
-        $this->dispatchEvent('acumulus_invoice_send_before', array('invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult));
+        $this->dispatchEvent('acumulus_invoice_send_before', ['invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult]);
     }
 
     /**
@@ -114,7 +114,7 @@ abstract class InvoiceManager extends BaseInvoiceManager
      */
     protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, Result $result)
     {
-        $this->dispatchEvent('acumulus_invoice_send_after', array('invoice' => $invoice, 'source' => $invoiceSource, 'result' => $result));
+        $this->dispatchEvent('acumulus_invoice_send_after', ['invoice' => $invoice, 'source' => $invoiceSource, 'result' => $result]);
     }
 
     /**

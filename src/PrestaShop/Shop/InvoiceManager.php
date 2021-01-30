@@ -73,7 +73,7 @@ class InvoiceManager extends BaseInvoiceManager
                 ));
                 return $this->getSourcesByIdsOrSources($invoiceSourceType, $this->getCol($ids, $key));
         }
-        return array();
+        return [];
     }
 
     /**
@@ -97,7 +97,7 @@ class InvoiceManager extends BaseInvoiceManager
             case Source::CreditNote:
                 return $this->getInvoiceSourcesByIdRange($invoiceSourceType, $invoiceSourceReferenceFrom, $invoiceSourceReferenceTo);
         }
-        return array();
+        return [];
     }
 
     /**
@@ -115,7 +115,7 @@ class InvoiceManager extends BaseInvoiceManager
                 $ids = OrderSlip::getSlipsIdByDate($dateFrom, $dateTo);
                 return $this->getSourcesByIdsOrSources($invoiceSourceType, $ids);
         }
-        return array();
+        return [];
     }
 
     /**
@@ -126,7 +126,7 @@ class InvoiceManager extends BaseInvoiceManager
     protected function triggerInvoiceCreated(array &$invoice, Source $invoiceSource, Result $localResult)
     {
         /** @noinspection PhpUnhandledExceptionInspection */
-        Hook::exec('actionAcumulusInvoiceCreated', array('invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult));
+        Hook::exec('actionAcumulusInvoiceCreated', ['invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult]);
     }
 
     /**
@@ -137,7 +137,7 @@ class InvoiceManager extends BaseInvoiceManager
     protected function triggerInvoiceSendBefore(array &$invoice, Source $invoiceSource, Result $localResult)
     {
         /** @noinspection PhpUnhandledExceptionInspection */
-        Hook::exec('actionAcumulusInvoiceSendBefore', array('invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult));
+        Hook::exec('actionAcumulusInvoiceSendBefore', ['invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult]);
     }
 
     /**
@@ -148,6 +148,6 @@ class InvoiceManager extends BaseInvoiceManager
     protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, Result $result)
     {
         /** @noinspection PhpUnhandledExceptionInspection */
-        Hook::exec('actionAcumulusInvoiceSendAfter', array('invoice' => $invoice, 'source' => $invoiceSource, 'result' => $result));
+        Hook::exec('actionAcumulusInvoiceSendAfter', ['invoice' => $invoice, 'source' => $invoiceSource, 'result' => $result]);
     }
 }

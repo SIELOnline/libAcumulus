@@ -84,7 +84,7 @@ abstract class InvoiceManager extends BaseInvoiceManager
     protected function triggerInvoiceCreated(array &$invoice, Source $invoiceSource, Result $localResult)
     {
         JPluginHelper::importPlugin('acumulus');
-        $results = JEventDispatcher::getInstance()->trigger('onAcumulusInvoiceCreated', array(&$invoice, $invoiceSource, $localResult));
+        $results = JEventDispatcher::getInstance()->trigger('onAcumulusInvoiceCreated', [&$invoice, $invoiceSource, $localResult]);
         if (count(array_filter($results, function ($value) {
                 return $value === false;
             })) >= 1
@@ -101,7 +101,7 @@ abstract class InvoiceManager extends BaseInvoiceManager
     protected function triggerInvoiceSendBefore(array &$invoice, Source $invoiceSource, Result $localResult)
     {
         JPluginHelper::importPlugin('acumulus');
-        $results = JEventDispatcher::getInstance()->trigger('onAcumulusInvoiceSendBefore', array(&$invoice, $invoiceSource, $localResult));
+        $results = JEventDispatcher::getInstance()->trigger('onAcumulusInvoiceSendBefore', [&$invoice, $invoiceSource, $localResult]);
         if (count(array_filter($results, function ($value) {
                 return $value === false;
             })) >= 1
@@ -118,6 +118,6 @@ abstract class InvoiceManager extends BaseInvoiceManager
     protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, Result $result)
     {
         JPluginHelper::importPlugin('acumulus');
-        JEventDispatcher::getInstance()->trigger('onAcumulusInvoiceSendAfter', array($invoice, $invoiceSource, $result));
+        JEventDispatcher::getInstance()->trigger('onAcumulusInvoiceSendAfter', [$invoice, $invoiceSource, $result]);
     }
 }

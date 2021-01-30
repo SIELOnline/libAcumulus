@@ -50,19 +50,19 @@ class ConfirmUninstallForm extends Form
      */
     protected function getFieldDefinitions()
     {
-        $fields = array();
+        $fields = [];
 
         // 1st fieldset: Confirm uninstall message.
-        $fields['uninstallHeader'] = array(
+        $fields['uninstallHeader'] = [
             'type' => 'fieldset',
             'legend' => $this->t('uninstallHeader'),
-            'fields' => array(
-                'uninstall_message' =>  array(
+            'fields' => [
+                'uninstall_message' =>  [
                     'type' => 'markup',
                     'value' => $this->t('desc_uninstall'),
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
 
         return $fields;
     }

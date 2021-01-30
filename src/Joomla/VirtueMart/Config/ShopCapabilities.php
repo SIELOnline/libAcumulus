@@ -17,10 +17,10 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     public function getTokenInfoSource()
     {
-        return array(
+        return [
             'more-info' => $this->t('see_properties_below'),
-            'properties' => array(),
-        );
+            'properties' => [],
+        ];
     }
 
     /**
@@ -28,10 +28,10 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     protected function getTokenInfoShopProperties()
     {
-        return array(
-            'BT' => array(
-                'table' => array('virtuemart_orders', 'virtuemart_order_userinfos'),
-                'properties' => array(
+        return [
+            'BT' => [
+                'table' => ['virtuemart_orders', 'virtuemart_order_userinfos'],
+                'properties' => [
                     // Table virtuemart_orders.
                     'virtuemart_order_id',
                     'virtuemart_vendor_id',
@@ -105,30 +105,30 @@ class ShopCapabilities extends ShopCapabilitiesBase
                     'customer_note',
                     // 1 added field from virtuemart_userinfos.
                     'tax_exemption_number',
-                ),
+                ],
                 'properties-more' => true,
-            ),
-            'ST' => array(
+            ],
+            'ST' => [
                 'more-info' => $this->t('see_bt'),
-                'properties' => array(
+                'properties' => [
                     $this->t('see_above'),
-                ),
+                ],
                 'properties-more' => false,
-            ),
-            'shopInvoice' => array(
+            ],
+            'shopInvoice' => [
                 'table' => 'virtuemart_invoices',
-                'properties' => array(
+                'properties' => [
                     'virtuemart_invoice_id',
                     'invoice_number',
                     'order_status',
                     'xhtml',
-                ),
+                ],
                 'properties-more' => true,
-            ),
-            'item' => array(
+            ],
+            'item' => [
                 'table' => 'virtuemart_order_items',
                 'additional-info' => $this->t('invoice_lines_only'),
-                'properties' => array(
+                'properties' => [
                     'virtuemart_order_item_id',
                     'virtuemart_vendor_id',
                     'virtuemart_product_id',
@@ -147,10 +147,10 @@ class ShopCapabilities extends ShopCapabilitiesBase
                     'order_status',
                     'product_attribute',
                     'delivery_date',
-                ),
+                ],
                 'properties-more' => true,
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -158,7 +158,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     public function getShopDefaults()
     {
-        return array(
+        return [
             'contactYourId' => '[virtuemart_user_id]', // Order BT
             'companyName1' => '[company]', // Order BT
             'fullName' => '[first_name+middle_name+last_name]', // Order BT
@@ -174,7 +174,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
             // Invoice lines defaults.
             'itemNumber' => '[order_item_sku]',
             'productName' => '[order_item_name]',
-        );
+        ];
     }
 
     /**
@@ -218,7 +218,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     public function getVatClasses()
     {
-        $result = array();
+        $result = [];
         /** @var \TableCalcs[] $taxes */
         $taxes = VirtueMartModelCalc::getTaxes();
         foreach ($taxes as $tax) {
@@ -233,7 +233,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     public function getPaymentMethods()
     {
-        $result = array();
+        $result = [];
         /** @var \VirtueMartModelPaymentmethod $model */
         $model = VmModel::getModel('paymentmethod');
         $paymentMethods = $model->getPayments(true);

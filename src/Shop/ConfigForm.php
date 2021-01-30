@@ -615,11 +615,11 @@ class ConfigForm extends BaseConfigForm
      */
     protected function getNatureOptions()
     {
-        return array(
+        return [
             Config::Nature_Both => $this->t('option_nature_1'),
             Config::Nature_Products => $this->t('option_nature_2'),
             Config::Nature_Services => $this->t('option_nature_3'),
-        );
+        ];
     }
 
     /**

@@ -37,16 +37,16 @@ class InvoiceManager extends BaseInvoiceManager
     public function __construct(Container $container)
     {
         parent::__construct($container);
-        $this->tableInfo = array(
-            Source::Order => array(
+        $this->tableInfo = [
+            Source::Order => [
                 'table' => DB_PREFIX . 'order',
                 'key' => 'order_id',
-            ),
-            Source::CreditNote => array(
+            ],
+            Source::CreditNote => [
                 'table' => DB_PREFIX . 'return',
                 'key' => 'return_id',
-            ),
-        );
+            ],
+        ];
     }
 
     /** @noinspection PhpUndefinedNamespaceInspection */
@@ -104,8 +104,8 @@ class InvoiceManager extends BaseInvoiceManager
     protected function triggerInvoiceCreated(array &$invoice, Source $invoiceSource, Result $localResult)
     {
 	    $route = 'model/' . Registry::getInstance()->getLocation() . '/invoiceCreated/after';
-        $args = array('invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult);
-	    $this->getEvent()->trigger($route, array(&$route, $args));
+        $args = ['invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult];
+	    $this->getEvent()->trigger($route, [&$route, $args]);
     }
 
     /**
@@ -116,8 +116,8 @@ class InvoiceManager extends BaseInvoiceManager
     protected function triggerInvoiceSendBefore(array &$invoice, Source $invoiceSource, Result $localResult)
     {
 	    $route = 'model/' . Registry::getInstance()->getLocation() . '/invoiceSend/before';
-        $args = array('invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult);
-	    $this->getEvent()->trigger($route, array(&$route, $args));
+        $args = ['invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult];
+	    $this->getEvent()->trigger($route, [&$route, $args]);
     }
 
     /**
@@ -128,8 +128,8 @@ class InvoiceManager extends BaseInvoiceManager
     protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, Result $result)
     {
 	    $route = 'model/' . Registry::getInstance()->getLocation() . '/invoiceSend/after';
-        $args = array('invoice' => $invoice, 'source' => $invoiceSource, 'result' => $result);
-	    $this->getEvent()->trigger($route, array(&$route, $args));
+        $args = ['invoice' => $invoice, 'source' => $invoiceSource, 'result' => $result];
+	    $this->getEvent()->trigger($route, [&$route, $args]);
     }
 
     /**

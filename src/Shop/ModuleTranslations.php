@@ -11,7 +11,7 @@ use Siel\Acumulus\Helpers\TranslationCollection;
  */
 class ModuleTranslations extends TranslationCollection
 {
-    protected $nl = array(
+    protected $nl = [
         // Linking into the shop's extension system, standard buttons and
         // messages.
         'extensions' => 'Extensies',
@@ -38,9 +38,9 @@ class ModuleTranslations extends TranslationCollection
         'option_empty' => 'Maak uw keuze',
         'click_to_toggle' => '<span>(klik om te tonen of te verbergen)</span>',
         'date_format' => 'jjjj-mm-dd',
-    );
+    ];
 
-    protected $en = array(
+    protected $en = [
         'extensions' => 'Extensions',
         'modules' => 'Modules',
         'module_name' => 'Acumulus',
@@ -61,5 +61,5 @@ class ModuleTranslations extends TranslationCollection
         'click_to_toggle' => '<span>(click to show or hide)</span>',
 
         'date_format' => 'yyyy-mm-dd',
-    );
+    ];
 }

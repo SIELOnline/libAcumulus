@@ -33,7 +33,7 @@ class InvoiceManager extends BaseInvoiceManager
             );
             return $this->getSourcesByQuery($invoiceSourceType, $query);
         }
-        return array();
+        return [];
     }
 
     /**
@@ -61,7 +61,7 @@ class InvoiceManager extends BaseInvoiceManager
             );
             return $this->getSourcesByQuery($invoiceSourceType, $query);
         }
-        return array();
+        return [];
     }
 
     /**
@@ -78,6 +78,6 @@ class InvoiceManager extends BaseInvoiceManager
             );
             return $this->getSourcesByQuery($invoiceSourceType, $query);
         }
-        return array();
+        return [];
     }
 }

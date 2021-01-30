@@ -133,11 +133,11 @@ class Creator extends BaseCreator
             // - But still send the VAT rate to Acumulus.
             $result[Tag::UnitPrice] = $productPriceInc;
         } else {
-            $result += array(
+            $result += [
                 Tag::UnitPrice => $productPriceEx,
                 Meta::UnitPriceInc => $productPriceInc,
                 Meta::RecalculatePrice => $productPricesIncludeTax ? Tag::UnitPrice : Meta::UnitPriceInc,
-            );
+            ];
         }
         $result[Tag::Quantity] = $quantity;
 
@@ -155,7 +155,7 @@ class Creator extends BaseCreator
      */
     protected function getShippingLine()
     {
-        $result = array();
+        $result = [];
 
         $sign = $this->invoiceSource->getSign();
 

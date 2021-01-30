@@ -40,7 +40,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     public function getByEntryId($entryId)
     {
         $table = $this->newTable();
-        $result = $table->loadMultiple(array('entry_id' => $entryId));
+        $result = $table->loadMultiple(['entry_id' => $entryId]);
         return $this->convertDbResultToAcumulusEntries($result);
     }
 
@@ -50,7 +50,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     public function getByInvoiceSource(Source $invoiceSource, $ignoreLock = true)
     {
         $table = $this->newTable();
-        $result = $table->load(array('source_type' => $invoiceSource->getType(), 'source_id' => $invoiceSource->getId()), true);
+        $result = $table->load(['source_type' => $invoiceSource->getType(), 'source_id' => $invoiceSource->getId()], true);
         return $result ? $this->convertDbResultToAcumulusEntries($table, $ignoreLock) : null;
     }
 

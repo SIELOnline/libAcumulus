@@ -89,10 +89,10 @@ class RatePluginForm extends Form
         $this->action = $this->getSubmittedValue('service');
         switch ($this->action) {
             case 'later':
-                $this->acumulusConfig->save(array('showRatePluginMessage' => time() + 7 * 24 * 60 * 60));
+                $this->acumulusConfig->save(['showRatePluginMessage' => time() + 7 * 24 * 60 * 60]);
                 break;
             case 'done':
-                $this->acumulusConfig->save(array('showRatePluginMessage' => PHP_INT_MAX));
+                $this->acumulusConfig->save(['showRatePluginMessage' => PHP_INT_MAX]);
                 $this->addMessage(sprintf($this->t('done_thanks'), $this->t('module')), Severity::Success);
                 break;
             default:

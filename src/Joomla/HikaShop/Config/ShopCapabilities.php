@@ -15,7 +15,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     protected function getTokenInfoSource()
     {
-        $source = array(
+        $source = [
             'order_id',
             'order_billing_address_id',
             'order_shipping_address_id',
@@ -52,13 +52,13 @@ class ShopCapabilities extends ShopCapabilitiesBase
             'deliverydate',
             'order_lang',
             'order_token',
-        );
+        ];
 
-        return array(
+        return [
             'table' => 'hikashop_order',
             'properties' => $source,
             'properties-more' => true,
-        );
+        ];
     }
 
     /**
@@ -66,10 +66,10 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     public function getTokenInfoShopProperties()
     {
-        return array(
-            'billing_address' => array(
+        return [
+            'billing_address' => [
                 'table' => 'hikashop_address',
-                'properties' => array(
+                'properties' => [
                     'address_id',
                     'address_user_id',
                     'address_title',
@@ -90,20 +90,20 @@ class ShopCapabilities extends ShopCapabilitiesBase
                     'address_vat',
                     'address_default',
                     'address_type',
-                ),
+                ],
                 'properties-more' => false,
-            ),
-            'shipping_address' => array(
+            ],
+            'shipping_address' => [
                 'table' => 'hikashop_address',
                 'additional-info' => $this->t('see_billing_address'),
-                'properties' => array(
+                'properties' => [
                     $this->t('see_above'),
-                ),
+                ],
                 'properties-more' => false,
-            ),
-            'customer' => array(
+            ],
+            'customer' => [
                 'table' => 'hikashop_customer',
-                'properties' => array(
+                'properties' => [
                     'user_id',
                     'user_cms_id',
                     'user_email',
@@ -118,13 +118,13 @@ class ShopCapabilities extends ShopCapabilitiesBase
                     'user_created',
                     'user_currency_id',
                     'user_partner_activated',
-                ),
+                ],
                 'properties-more' => false,
-            ),
-            'item' => array(
+            ],
+            'item' => [
                 'table' => 'hikashop_order_product',
                 'additional-info' => $this->t('invoice_lines_only'),
-                'properties' => array(
+                'properties' => [
                     'product_id',
                     'order_product_quantity',
                     'order_product_name',
@@ -141,10 +141,10 @@ class ShopCapabilities extends ShopCapabilitiesBase
                     'order_product_shipping_price',
                     'order_product_shipping_tax',
                     'order_product_shipping_params'
-                ),
+                ],
                 'properties-more' => true,
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -152,7 +152,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     public function getShopDefaults()
     {
-        return array(
+        return [
             'contactYourId' => '[order_user_id]', // order
             'companyName1' => '[address_company]', // billing_address
             'fullName' => '[address_firstname+address_middle_name+address_lastname|name]', // billing_address, customer
@@ -168,7 +168,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
             // Invoice lines defaults.
             'itemNumber' => '[order_product_code]',
             'productName' => '[order_product_name]',
-        );
+        ];
     }
 
     /**
@@ -192,7 +192,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
         $class = hikashop_get('class.category');
         $statuses = $class->loadAllWithTrans('status');
 
-        $orderStatuses = array();
+        $orderStatuses = [];
         foreach ($statuses as $status) {
             $orderStatuses[$status->category_name] = $status->translation;
         }
@@ -221,12 +221,12 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     public function getVatClasses()
     {
-        $result = array();
+        $result = [];
         /** @var \hikashopCategoryClass $categoryClass */
         $categoryClass = hikashop_get('class.category');
         /** @var \stdClass $category */
         $category = $categoryClass->get('tax');
-        $taxClasses = $categoryClass->getChildren((int) $category->category_id, true, array(), '', 0, 0);
+        $taxClasses = $categoryClass->getChildren((int) $category->category_id, true, [], '', 0, 0);
         foreach ($taxClasses as $taxClass) {
             /** @var \stdClass $category */
             $result[$taxClass->category_namekey] = $taxClass->category_name;
@@ -239,7 +239,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     public function getPaymentMethods()
     {
-        $result = array();
+        $result = [];
         /** @var \hikashopPluginsClass $pluginClass */
         $pluginClass = hikashop_get('class.plugins');
         $paymentPlugins = $pluginClass->getMethods('payment');

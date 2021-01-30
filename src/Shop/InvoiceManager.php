@@ -224,7 +224,7 @@ abstract class InvoiceManager
      */
     public function getSourcesByIdsOrSources($invoiceSourceType, array $idsOrSources)
     {
-        $results = array();
+        $results = [];
         foreach ($idsOrSources as $sourceId) {
             $results[] = $this->getSourceByIdOrSource($invoiceSourceType, $sourceId);
         }
@@ -326,11 +326,11 @@ abstract class InvoiceManager
         $shopEventSettings = $this->getConfig()->getShopEventSettings();
         if ($invoiceSource->getType() === Source::Order) {
             $doSend = in_array($status, $shopEventSettings['triggerOrderStatus']);
-            $arguments = array($status, implode(',', $shopEventSettings['triggerOrderStatus']));
+            $arguments = [$status, implode(',', $shopEventSettings['triggerOrderStatus'])];
             $notSendReason = Result::NotSent_WrongStatus;
         } else {
             $doSend = $shopEventSettings['triggerCreditNoteEvent'] === Config::TriggerCreditNoteEvent_Create;
-            $arguments = array();
+            $arguments = [];
             $notSendReason = Result::NotSent_TriggerCreditNoteEventNotEnabled;
         }
         if ($doSend) {
@@ -497,7 +497,7 @@ abstract class InvoiceManager
      */
     protected function lockAndSend(array $invoice, Source $invoiceSource, Result $result)
     {
-        $doLock = !$this->isTestMode() && in_array($result->getSendStatus(), array(Result::Send_New, Result::Send_LockExpired));
+        $doLock = !$this->isTestMode() && in_array($result->getSendStatus(), [Result::Send_New, Result::Send_LockExpired]);
 
         if ($doLock) {
             // Check if we may expect an expired lock and, if so, remove it.
@@ -750,7 +750,7 @@ abstract class InvoiceManager
      */
     protected function getCol(array $dbResults, $key)
     {
-        $results = array();
+        $results = [];
         foreach ($dbResults as $dbResult) {
             $results[] = (int) $dbResult[$key];
         }

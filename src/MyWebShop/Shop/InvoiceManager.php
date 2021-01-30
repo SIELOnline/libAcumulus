@@ -75,7 +75,7 @@ class InvoiceManager extends BaseInvoiceManager
     protected function triggerInvoiceCreated(array &$invoice, Source $invoiceSource, Result $localResult)
     {
         // @todo: adapt to the way MyWebShop triggers events (and passes parameters (by value and reference) to the event handlers).
-        Hook::exec('actionAcumulusInvoiceCreated', array('invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult));
+        Hook::exec('actionAcumulusInvoiceCreated', ['invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult]);
     }
 
     /**
@@ -86,7 +86,7 @@ class InvoiceManager extends BaseInvoiceManager
     protected function triggerInvoiceSendBefore(array &$invoice, Source $invoiceSource, Result $localResult)
     {
         // @todo: adapt to the way MyWebShop triggers events (and passes parameters (by value and reference) to the event handlers).
-        Hook::exec('actionAcumulusInvoiceSendBefore', array('invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult));
+        Hook::exec('actionAcumulusInvoiceSendBefore', ['invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult]);
     }
 
     /**
@@ -97,6 +97,6 @@ class InvoiceManager extends BaseInvoiceManager
     protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, Result $result)
     {
         // @todo: adapt to the way MyWebShop triggers events (and passes parameters (by value) to the event handlers).
-        Hook::exec('actionAcumulusInvoiceSendAfter', array('invoice' => $invoice, 'source' => $invoiceSource, 'result' => $result));
+        Hook::exec('actionAcumulusInvoiceSendAfter', ['invoice' => $invoice, 'source' => $invoiceSource, 'result' => $result]);
     }
 }

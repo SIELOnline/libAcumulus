@@ -54,15 +54,15 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      */
     public function getByEntryId($entryId)
     {
-        $metaQuery = array(
+        $metaQuery = [
             'posts_per_page' => 1,
             'meta_key' => static::$keyEntryId,
             'meta_value' => $entryId,
             'meta_compare' => '=',
-        );
+        ];
         $query = new WP_Query();
         $posts = $query->query($metaQuery);
-        $result = array();
+        $result = [];
         foreach ($posts as $post) {
             $result1 = get_post_meta($post->ID);
             $result1[static::$keySourceType] = $this->shopTypeToSourceType($post->post_type);
@@ -92,7 +92,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
                     // are not stored in the meta data.
                     $postMeta[static::$keySourceType] = $invoiceSourceType;
                     $postMeta[static::$keySourceId] = $invoiceSourceId;
-                    $result = $this->convertDbResultToAcumulusEntries(array($postMeta), $ignoreLock);
+                    $result = $this->convertDbResultToAcumulusEntries([$postMeta], $ignoreLock);
                 }
             } else {
                 $this->log->error('InvoiceManager::getByInvoiceSource(%s %d): unknown post type %s', $invoiceSourceType, $invoiceSourceId, empty($post->post_type) ? 'no post type' : $post->post_type);

@@ -91,19 +91,19 @@ class InvoiceManager extends BaseInvoiceManager
         if ($invoiceSourceType === Source::Order) {
             if (is_plugin_active('woocommerce-sequential-order-numbers/woocommerce-sequential-order-numbers.php')) {
                 // Search by the order number as assigned by the plugin.
-                $args = array(
-                  'meta_query' => array(
-                    array(
+                $args = [
+                  'meta_query' => [
+                    [
                       'key' => '_order_number',
-                      'value' => array(
+                      'value' => [
                         $invoiceSourceReferenceFrom,
                         $invoiceSourceReferenceTo,
-                      ),
+                      ],
                       'compare' => 'BETWEEN',
                       'type' => 'UNSIGNED',
-                    ),
-                  ),
-                );
+                    ],
+                  ],
+                ];
                 return $this->query2Sources($args, $invoiceSourceType);
             } elseif (is_plugin_active('woocommerce-sequential-order-numbers-pro/woocommerce-sequential-order-numbers.php')
               || is_plugin_active('wc-sequential-order-numbers/Sequential_Order_Numbers.php')) {
@@ -124,36 +124,36 @@ class InvoiceManager extends BaseInvoiceManager
                     $key = '_order_number_formatted';
                     $type = 'CHAR';
                 }
-                $args = array(
-                  'meta_query' => array(
-                    array(
+                $args = [
+                  'meta_query' => [
+                    [
                       'key' => $key,
-                      'value' => array(
+                      'value' => [
                         $invoiceSourceReferenceFrom,
                         $invoiceSourceReferenceTo,
-                      ),
+                      ],
                       'compare' => 'BETWEEN',
                       'type' => $type,
-                    ),
-                  ),
-                );
+                    ],
+                  ],
+                ];
                 return $this->query2Sources($args, $invoiceSourceType);
             } elseif (is_plugin_active('custom-order-numbers-for-woocommerce-pro/custom-order-numbers-for-woocommerce-pro.php')
                       || is_plugin_active('custom-order-numbers-for-woocommerce/custom-order-numbers-for-woocommerce.php')) {
                 // Search by the order number as assigned by the plugin.
-                $args = array(
-                    'meta_query' => array(
-                        array(
+                $args = [
+                    'meta_query' => [
+                        [
                             'key' => '_alg_wc_custom_order_number',
-                            'value' => array(
+                            'value' => [
                                 $invoiceSourceReferenceFrom,
                                 $invoiceSourceReferenceTo,
-                            ),
+                            ],
                             'compare' => 'BETWEEN',
                             'type' => 'UNSIGNED',
-                        ),
-                    ),
-                );
+                        ],
+                    ],
+                ];
                 return $this->query2Sources($args, $invoiceSourceType);
             }
         }
@@ -165,24 +165,24 @@ class InvoiceManager extends BaseInvoiceManager
      */
     public function getInvoiceSourcesByDateRange($invoiceSourceType, DateTime $dateFrom, DateTime $dateTo)
     {
-        $args = array(
-            'date_query' => array(
-                array(
+        $args = [
+            'date_query' => [
+                [
                     'column' => 'post_modified',
-                    'after' => array(
+                    'after' => [
                         'year' => $dateFrom->format('Y'),
                         'month' => $dateFrom->format('m'),
                         'day' => $dateFrom->format('d'),
-                    ),
-                    'before' => array(
+                    ],
+                    'before' => [
                         'year' => $dateTo->format('Y'),
                         'month' => $dateTo->format('m'),
                         'day' => $dateTo->format('d'),
-                    ),
+                    ],
                     'inclusive' => true,
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
         return $this->query2Sources($args, $invoiceSourceType);
     }
 
@@ -227,14 +227,14 @@ class InvoiceManager extends BaseInvoiceManager
      */
     protected function query2Sources(array $args, $invoiceSourceType, $sort = true)
     {
-        $this->getLog()->info('WooCommerce\InvoiceManager::query2Sources: args = %s', str_replace(array(' ', "\r", "\n", "\t"), '', var_export($args, true)));
+        $this->getLog()->info('WooCommerce\InvoiceManager::query2Sources: args = %s', str_replace([' ', "\r", "\n", "\t"], '', var_export($args, true)));
         // Add default arguments.
-        $args = $args + array(
+        $args = $args + [
                 'fields' => 'ids',
                 'posts_per_page' => -1,
                 'post_type' => $this->sourceTypeToShopType($invoiceSourceType),
                 'post_status' => array_keys(wc_get_order_statuses()),
-            );
+            ];
         $query = new WP_Query($args);
         $ids = $query->get_posts();
         if ($sort) {

@@ -243,27 +243,34 @@ class Container
         Translator::$instance = $translator;
         if (!$this->baseTranslationsAdded) {
             // Add some basic translations that are hard to add just-in-time.
-            try {
-                // @todo: introduce more specific method to get translations?
-                /** @var \Siel\Acumulus\Helpers\TranslationCollection $translations */
-                $translations = $this->getInstance('ModuleSpecificTranslations', 'Helpers');
-                $translator->add($translations);
-            } catch (InvalidArgumentException $e) {}
-            /** @var \Siel\Acumulus\Helpers\TranslationCollection $translations */
-            $translations = $this->getInstance('ModuleTranslations', 'Shop');
-            $translator->add($translations);
-            /** @var \Siel\Acumulus\Helpers\TranslationCollection $translations */
-            $translations = $this->getInstance('SeverityTranslations', 'Helpers');
-            $translator->add($translations);
-            /** @var \Siel\Acumulus\Helpers\TranslationCollection $translations */
-            $translations = $this->getInstance('ResultTranslations', 'ApiClient');
-            $translator->add($translations);
-            /** @var \Siel\Acumulus\Helpers\TranslationCollection $translations */
-            $translations = $this->getInstance('ResultTranslations', 'Invoice');
-            $translator->add($translations);
+            // @todo: add a hasTranslations interface to (largely) automate this on getInstance?
             $this->baseTranslationsAdded = true;
+            try {
+                $this->addTranslations('ModuleSpecificTranslations', 'Helpers');
+            } catch (InvalidArgumentException $e) {}
+            $this->addTranslations('ModuleTranslations', 'Shop');
+            $this->addTranslations('SeverityTranslations', 'Helpers');
+            $this->addTranslations('ResultTranslations', 'ApiClient');
+            $this->addTranslations('ResultTranslations', 'Invoice');
         }
         return $translator;
+    }
+
+    /**
+     * Adds a {@see TranslationCollection} to the {@see Translator}.
+     *
+     * @param string $class
+     *   The name of the class to search. The class should extend
+     *   {@see \Siel\Acumulus\Helpers\TranslationCollection}.
+     * @param string $subNameSpace
+     *   The namespace in which $class resides.
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function addTranslations($class, $subNameSpace)
+    {
+        /** @noinspection PhpParamsInspection */
+        $this->getTranslator()->add($this->getInstance($class, $subNameSpace));
     }
 
     /**
@@ -449,7 +456,15 @@ class Container
     public function getCompletor()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('Completor', 'Invoice', [$this->getCompletorInvoiceLines(), $this->getCompletorStrategyLines(), $this->getCountries(), $this->getAcumulusApiClient(), $this->getConfig(), $this->getTranslator(), $this->getLog()]);
+        return $this->getInstance('Completor', 'Invoice', [
+            $this->getCompletorInvoiceLines(),
+            $this->getCompletorStrategyLines(),
+            $this->getCountries(),
+            $this->getAcumulusApiClient(),
+            $this->getConfig(),
+            $this->getTranslator(),
+            $this->getLog(),
+        ], true);
     }
 
     /**
@@ -493,7 +508,8 @@ class Container
     public function getCreator()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('Creator', 'Invoice', [$this->getToken(), $this->getCountries(), $this->getShopCapabilities(), $this, $this->getConfig(), $this->getTranslator(), $this->getLog()]);
+        return $this->getInstance('Creator', 'Invoice',
+            [$this->getToken(), $this->getCountries(), $this->getShopCapabilities(), $this, $this->getConfig(), $this->getTranslator(), $this->getLog()]);
     }
 
     /**

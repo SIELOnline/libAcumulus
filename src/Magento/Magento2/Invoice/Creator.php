@@ -1,7 +1,6 @@
 <?php
 namespace Siel\Acumulus\Magento\Magento2\Invoice;
 
-use Magento\Framework\App\ObjectManager;
 use Magento\Sales\Model\Order\Creditmemo\Item as CreditmemoItem;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Magento\Invoice\Creator as BaseCreator;
@@ -298,6 +297,7 @@ class Creator extends BaseCreator
 
         $this->addProductInfo($result);
 
+        /** @noinspection PhpCastIsUnnecessaryInspection */
         $productPriceEx = -((float) $item->getBasePrice());
         $productPriceInc = -((float) $item->getBasePriceInclTax());
 
@@ -359,8 +359,8 @@ class Creator extends BaseCreator
         // Add vat meta data.
         /** @var \Magento\Catalog\Model\Product $product */
         /** @noinspection PhpFullyQualifiedNameUsageInspection */
-        $product = ObjectManager::getInstance()->create(\Magento\Catalog\Model\Product::class);
-        $product->getResource()->load($product, $item->getProductId());
+        $product = Registry::getInstance()->create(\Magento\Catalog\Model\Product::class);
+        Registry::getInstance()->get($product->getResourceName())->load($product, $item->getProductId());
         if ($product->getId()) {
             /** @noinspection PhpUndefinedMethodInspection */
             $result += $this->getVatClassMetaData($product->getTaxClassId());
@@ -464,8 +464,8 @@ class Creator extends BaseCreator
             $result[Meta::VatClassId] = $taxClassId;
             /** @var \Magento\Tax\Model\ClassModel $taxClass */
             /** @noinspection PhpFullyQualifiedNameUsageInspection */
-            $taxClass = ObjectManager::getInstance()->create(\Magento\Tax\Model\ClassModel::class);
-            $taxClass->getResource()->load($taxClass, $taxClassId);
+            $taxClass = Registry::getInstance()->create(\Magento\Tax\Model\ClassModel::class);
+            Registry::getInstance()->get($taxClass->getResourceName())->load($taxClass, $taxClassId);
             $result[Meta::VatClassName] = $taxClass->getClassName();
         } else {
             $result[Meta::VatClassId] = Config::VatClass_Null;

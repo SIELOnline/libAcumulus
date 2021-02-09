@@ -81,7 +81,9 @@ class ConfigFormTranslations extends TranslationCollection
         'message_validate_vat_free_products_0' => 'Het veld \'Verkoopt u van btw vrijgestelde producten of diensten?\' is verplicht, kies een waarde.',
         'message_validate_vat_free_products_1' => 'Als u \'Alleen producten of diensten verkoopt die van btw vrijgesteld zijn\' kunt u niet (ook) \'producten of diensten verkopen waarbij u EU btw moet hanteren\'. Pas één van deze opties aan.',
         'message_validate_margin_products_0' => 'Het veld \'Verkoopt u margegoederen?\' is verplicht, kies een waarde.',
-        'message_validate_foreign_vat_classes_0' => 'Het veld \'Welke belastingklassen definiëren EU btw tarieven?\' moet één of meer belastingklassen bevatten als u (ook) \'producten of diensten verkoopt waarbij u EU btw moet hanteren\'.',
+        'message_validate_foreign_vat_classes_0' => 'Het veld \'%1$s\' moet één of meer %2$s bevatten als u (ook) \'producten of diensten verkoopt waarbij u EU btw moet hanteren\'.',
+        'message_validate_zero_vat_class_0' => 'Het veld \'%1$s\' moet een keuze bevatten als u (ook) \'producten en/of diensten verkoopt die onder het 0%%-tarief vallen\'.',
+        'message_validate_zero_vat_class_1' => 'U moet verschllende %1$s gebruiken om onderscheid te maken tussen producten of diensten aan 0%% btw en die zijn vrijgesteld van btw.',
         'message_validate_conflicting_shop_options_2' => 'Als u alleen diensten verkoopt, kunt u geen margegoederen verkopen. Pas één van deze opties aan.',
         'message_validate_conflicting_shop_options_3' => 'Als u alleen margegoederen verkoopt, vink dan bij "Soort" aan dat u alleen producten verkoopt.',
 
@@ -104,7 +106,7 @@ Dit kunnen bv. <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldconten
 of <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/export_van_specifieke_goederen_en_in_bijzondere_situaties/export_van_accijnsgoederen/export_accijnsgoederen_naar_eu_landen" target="_blank">accijnsgoederen</a> zijn.
 Zie <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/export_van_specifieke_goederen_en_in_bijzondere_situaties/export_van_specifieke_goederen_en_in_bijzondere_situaties" target="_blank">Belastingdienst: Export van specifieke goederen en bijzondere situaties</a>.
 Let op: vanaf 2019 geldt er een <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/btw_berekenen_bij_diensten/wijziging_in_digitale_diensten_vanaf_2015/wijziging_in_digitale_diensten_vanaf_2015" target="_blank">drempelbedrag voor digitale diensten</a>.
-Als u daaronder blijft mag u gewoon Nederlandse btw berekenen, maar let op: dit dient u in de webshop in te stellen, Acumulus volgt de btw-bedragen en tarieven die de winkel heeft berekend en zal dit zelf niet gaan wijzigen.',
+Als u daaronder blijft mag u gewoon Nederlandse btw berekenen, maar let op: dit dient u in de webshop in te stellen, Acumulus volgt de btw-bedragen en tarieven die de winkel heeft gehanteerd en zal dit zelf niet gaan wijzigen.',
 
         'vat_class' => 'belastingklasse',
         'vat_classes' => 'belastingklasses',
@@ -479,7 +481,9 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'message_validate_vat_free_products_0' => 'The field \'Do you sell VAT free products or services?\' is required, select a value.',
         'message_validate_vat_free_products_1' => 'If you sell \'Only VAT free products or services\' you cannot (also) sell \'products or services that are subject to foreign VAT for EU customers\'. Change one of these options.',
         'message_validate_margin_products_0' => 'The field \'Do you sell products using the margin scheme?\' is required, select a value.',
-        'message_validate_foreign_vat_classes_0' => 'The field \'Which vat classes define EU vat rates?\' must contain 1 or more vat classes if you (also) \'sell products or services that are subject to foreign VAT for EU customers\'.',
+        'message_validate_foreign_vat_classes_0' => 'The field \'%1$s\' must contain 1 or more %2$s if you (also) \'sell products or services that are subject to foreign VAT for EU customers\'.',
+        'message_validate_zero_vat_class_0' => 'The field \'%1$s\' must be set if you (also) \'sell products or services that are subject to the 0%% VAT rate\'.',
+        'message_validate_zero_vat_class_1' => 'You must use different %1$s to distinguish between products or services subject to the 0%% VAT rate and those that are VAT free.',
         'message_validate_conflicting_shop_options_2' => 'If you only sell services, you cannot sell using the margin scheme. Change one of these options.',
         'message_validate_conflicting_shop_options_3' => 'If you only sell using the margin scheme, you should select that you only sell goods on the "Nature" field.',
 
@@ -502,7 +506,7 @@ These can be, a.o, <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldco
 or <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/export_van_specifieke_goederen_en_in_bijzondere_situaties/export_van_accijnsgoederen/export_accijnsgoederen_naar_eu_landen" target="_blank">excise goods</a>.
 See <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/export_van_specifieke_goederen_en_in_bijzondere_situaties/export_van_specifieke_goederen_en_in_bijzondere_situaties" target="_blank">Tax office: Export of specific goods and special cases</a>.
 Note: as of 2019 there is a <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/btw_berekenen_bij_diensten/wijziging_in_digitale_diensten_vanaf_2015/wijziging_in_digitale_diensten_vanaf_2015" target="_blank">threshold for digital services</a>.
-If you remain under that threshold you may apply Dutch VAT. However, please note that you have to configure this in your webshop. Acumulus follows the vat amounts and tarifs as charged by the shop and won\'t change this on its own.',
+If you remain under that threshold you may apply Dutch VAT. However, please note that you have to configure this in your webshop. Acumulus follows the vat amounts and tariffs as used by the shop and won\'t change this on its own.',
 
         'vat_class' => 'tax class',
         'vat_classes' => 'tax classes',
@@ -533,8 +537,8 @@ You only have to fill in this setting if above you did not select the option tha
 E.g, currently (early 2021), masks fall under the 0% vat rate.
 NOTE 2: this setting concerns whether the products or services you offer are inherently subject to the 0% vat rate, not if you make no vat (e.g. sometimes when selling abroad) or reversed vat invoices.',
 
-        'field_zeroVatClass' => 'Which %1$s defines the 0% vat rate?',
-        'desc_zeroVatClass' => 'Indicate which %1$s you use to indicate that a product or service is subject to the 0% vat rate.
+        'field_zeroVatClass' => 'Which %1$s defines the 0%% vat rate?',
+        'desc_zeroVatClass' => 'Indicate which %1$s you use to indicate that a product or service is subject to the 0%% vat rate.
 You only have to fill in this setting if above you did not select the option that you sell "Only products or services that are subject to the normal or reduced vat rate."',
 
         'field_marginProducts' => 'Do you sell products using the margin scheme?',

@@ -18,10 +18,12 @@ WC2 = WooCommerce 2 (WordPress) (wordt niet meer ondersteund sinds 5.5.2)
 WC3 = WooCommerce 3 (WordPress)
 WC4 = WooCommerce 4 (WordPress)
 
-6.2.0 (2021-01-??)
+6.2.0 (2021-02-??)
 ------------------
 Bugs:
-- OC: PHP7 syntax in ConfigStore.
+- OC: PHP 7 syntax (?? instead of isset(a) ? a : b) in OC::ConfigStore removed.
+- WC|MA2: Het laden van de javascript voor het "geef deze plugin een waardering"
+  bericht ging niet goed.
 
 Features:
 - ALL: New settings that allow to better distinguish between vat-free and 0% vat
@@ -42,6 +44,11 @@ Refactorings:
   constants are now in Config, the library version constant is now directly in
   the base namespace: /Siel/Acumulus/Version, and the sql timestamp format is
   taken from API.
+- ALL: Warnings that turn an invoice into a concept, ar now also added to the
+  xml message within a "meta-warning" tag.
+- ALL: Ubiquitous use of PHP5.4 to 5.6 constructs, notably short array syntax,
+  can now be found in the code.
+- MA2: Replaced use of deprecated method getResource().
 
 6.1.2 (2021-01-16)
 ------------------

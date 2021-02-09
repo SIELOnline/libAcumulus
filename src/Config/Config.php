@@ -944,8 +944,8 @@ class Config
                 ],
                 'vatFreeClass' => [
                     'group' => 'shop',
-                    'type' => 'array',
-                    'default' => Config::VatClass_Null,
+                    'type' => 'string',
+                    'default' => '',
                 ],
                 'zeroVatProducts' => [
                     'group' => 'shop',
@@ -954,8 +954,8 @@ class Config
                 ],
                 'zeroVatClass' => [
                     'group' => 'shop',
-                    'type' => 'array',
-                    'default' => null,
+                    'type' => 'string',
+                    'default' => '',
                 ],
                 'marginProducts' => [
                     'group' => 'shop',

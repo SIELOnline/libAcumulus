@@ -271,7 +271,7 @@ class CompletorInvoiceLines
                 // to standard 21%".
                 $line[Tag::VatRate] = null;
                 $line[Meta::VatRateSource] = Creator::VatRateSource_Completor;
-                $this->completor->changeInvoiceToConcept('message_warning_no_vatrate', 821);
+                $this->completor->changeInvoiceToConcept($line, 'message_warning_no_vatrate', 821);
                 // @todo: this can also happen with exact or looked up vat rates
                 //   add a checker in the Completor that checks all lines for
                 //   no or an incorrect vat rate and changes the invoice into a
@@ -753,13 +753,12 @@ class CompletorInvoiceLines
                 if ($line[Meta::RecalculatePrice] === Tag::UnitPrice) {
                     $line[Meta::RecalculateOldPrice] = $line[Tag::UnitPrice];
                     $line[Tag::UnitPrice] = $line[Meta::UnitPriceInc] / (100 + $line[Tag::VatRate]) * 100;
-                    $line[Meta::RecalculatedPrice] = true;
                 } else {
                     // $line[Meta::RecalculateUnitPrice] === Meta::UnitPriceInc
                     $line[Meta::RecalculateOldPrice] = $line[Meta::UnitPriceInc];
                     $line[Meta::UnitPriceInc] = (1 + $line[Tag::VatRate] / 100) * $line[Tag::UnitPrice];
-                    $line[Meta::RecalculatedPrice] = true;
                 }
+                $line[Meta::RecalculatedPrice] = true;
             }
         }
         return $lines;

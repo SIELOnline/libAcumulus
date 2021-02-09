@@ -1,7 +1,6 @@
 <?php
 namespace Siel\Acumulus\Magento\Invoice;
 
-use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\Meta;
@@ -13,16 +12,16 @@ use Siel\Acumulus\Tag;
  */
 abstract class Creator extends BaseCreator
 {
-    /** @var \Mage_Sales_Model_Order|\Magento\Sales\Model\Order */
+    /** @var \Magento\Sales\Model\Order */
     protected $order;
 
-    /** @var \Mage_Sales_Model_Order_Creditmemo|\Magento\Sales\Model\Order\Creditmemo */
+    /** @var \Magento\Sales\Model\Order\Creditmemo */
     protected $creditNote;
 
-    /** @var \Mage_Core_Model_Resource_Db_Collection_Abstract|\Magento\Sales\Model\ResourceModel\Order\Invoice\Collection */
+    /** @var \Magento\Sales\Model\ResourceModel\Order\Invoice\Collection */
     protected $shopInvoices;
 
-    /** @var \Mage_Sales_Model_Order_Invoice|\Magento\Sales\Model\Order\Invoice */
+    /** @var \Magento\Sales\Model\Order\Invoice */
     protected $shopInvoice;
 
     /**
@@ -93,7 +92,7 @@ abstract class Creator extends BaseCreator
     {
         $result = [];
 
-        /** @var \Mage_Sales_Model_Order|\Magento\Sales\Model\Order|\Mage_Sales_Model_Order_Creditmemo|\Magento\Sales\Model\Order\Creditmemo $source */
+        /** @var \Magento\Sales\Model\Order|\Magento\Sales\Model\Order\Creditmemo $source */
         $source = $this->invoiceSource->getSource();
         if (!Number::isZero($source->getBaseDiscountAmount())) {
             $line = [

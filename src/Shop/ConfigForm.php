@@ -103,7 +103,8 @@ class ConfigForm extends BaseConfigForm
         // Check the foreignVat and foreignVatClasses settings.
         if (isset($this->submittedValues['foreignVat']) && $this->submittedValues['foreignVat'] != Config::ForeignVat_No) {
             if (empty($this->submittedValues['foreignVatClasses'])) {
-                $this->addMessage($this->t('message_validate_foreign_vat_classes_0'), Severity::Error, 'foreignVatClasses');
+                $this->addMessage(sprintf($this->t('message_validate_foreign_vat_classes_0'), sprintf($this->t('field_foreignVatClasses'), $this->t('vat_classes')), $this->t('vat_classes')),
+                    Severity::Error, 'foreignVatClasses');
             }
         }
 
@@ -111,6 +112,26 @@ class ConfigForm extends BaseConfigForm
         if (isset($this->submittedValues['foreignVat']) && $this->submittedValues['foreignVat'] != Config::ForeignVat_No) {
             if (isset($this->submittedValues['vatFreeProducts']) && $this->submittedValues['vatFreeProducts'] == Config::VatFreeProducts_Only) {
                 $this->addMessage($this->t('message_validate_vat_free_products_1'), Severity::Error, 'foreignVatClasses');
+            }
+        }
+
+        // Check the zeroVatProducts and zeroVatClass settings.
+        if (isset($this->submittedValues['zeroVatProducts']) && $this->submittedValues['zeroVatProducts'] != Config::ZeroVatProducts_No) {
+            if (empty($this->submittedValues['zeroVatClass'])) {
+                $this->addMessage(sprintf($this->t('message_validate_zero_vat_class_0'), sprintf($this->t('field_zeroVatClass'), $this->t('vat_class'))),
+                    Severity::Error, 'zeroVatClass');
+            }
+        }
+
+        // Check the vatFreeProducts and zeroVatProducts settings.
+        if (isset($this->submittedValues['vatFreeProducts']) && $this->submittedValues['vatFreeProducts'] != Config::VatFreeProducts_No) {
+            if (isset($this->submittedValues['zeroVatProducts']) && $this->submittedValues['zeroVatProducts'] != Config::ZeroVatProducts_No) {
+                if (isset($this->submittedValues['vatFreeClass']) && isset($this->submittedValues['zeroVatClass'])) {
+                    if ($this->submittedValues['vatFreeClass'] == $this->submittedValues['zeroVatClass']) {
+                        $this->addMessage(sprintf($this->t('message_validate_zero_vat_class_1'), $this->t('vat_classes')),
+                            Severity::Error, 'zeroVatClass');
+                    }
+                }
             }
         }
 
@@ -348,8 +369,8 @@ class ConfigForm extends BaseConfigForm
             'foreignVatClasses' => [
                 'name' => 'foreignVatClasses[]',
                 'type' => 'select',
-                'label' => sprintf($this->t('field_foreignVatClasses'), $this->t('vat_class')),
-                'description' => sprintf($this->t('desc_foreignVatClasses'), $this->t('vat_class')),
+                'label' => sprintf($this->t('field_foreignVatClasses'), $this->t('vat_classes')),
+                'description' => sprintf($this->t('desc_foreignVatClasses'), $this->t('vat_classes')),
                 'options' => $vatClasses,
                 'attributes' => [
                     'multiple' => true,
@@ -387,7 +408,7 @@ class ConfigForm extends BaseConfigForm
                 'type' => 'select',
                 'label' => sprintf($this->t('field_zeroVatClass'), $this->t('vat_class')),
                 'description' => sprintf($this->t('desc_zeroVatClass'), $this->t('vat_class')),
-                'options' => $vatClasses,
+                'options' => [0 => $this->t('option_empty')] + $vatClasses,
                 'attributes' => [
                     'multiple' => false,
                 ],

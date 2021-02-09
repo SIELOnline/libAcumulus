@@ -120,16 +120,18 @@ abstract class Creator
     /** @var \Siel\Acumulus\Helpers\Container*/
     protected $container;
 
-    /** @var array Resulting Acumulus invoice */
+    /**
+     * @var array
+     *   Resulting Acumulus invoice.
+     */
     protected $invoice = [];
 
     /** @var Source */
     protected $invoiceSource;
 
     /**
-     * The list of sources to search for properties.
-     *
      * @var array
+     *   The list of sources to search for properties.
      */
     protected $propertySources;
 

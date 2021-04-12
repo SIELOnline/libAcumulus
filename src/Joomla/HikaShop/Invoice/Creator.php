@@ -253,21 +253,15 @@ class Creator extends BaseCreator
             if (!empty($this->order->order_shipping_params->prices) && is_array($this->order->order_shipping_params->prices)) {
                 // We are going to add 1 or more shipping lines based on the
                 // contents of the order_shipping_params.
-                /** @var \hikashopShippingClass $shippingClass */
-                $shippingClass = hikashop_get('class.shipping');
                 /** @var \hikashopTaxClass $taxClass */
                 $taxClass = hikashop_get('class.tax');
 
                 $shippingAmountIncTotal = 0.0;
                 $shippingVatTotal = 0.0;
                 $warningAdded = false;
-                foreach ($this->order->order_shipping_params->prices as $key => $price) {
-                    // $key is of the form '{shipping_method_id}@0'.
-                    $shippingMethodId = (int) explode('@', $key)[0];
-                    /** @var stdClass $shipping */
-                    $shipping = $shippingClass->get($shippingMethodId);
+                foreach ($this->order->order_shipping_params->prices as $price) {
                     $shippingLine = [
-                        Tag::Product => $shipping->shipping_name,
+                        Tag::Product => $this->getShippingMethodName(),
                         Tag::Quantity => 1,
                     ];
                     $shippingMethodAmountIncTotal = 0.0;
@@ -298,7 +292,10 @@ class Creator extends BaseCreator
                     }
                     if (!Number::floatsAreEqual($shippingMethodAmountIncTotal, $price->price_with_tax)) {
                         // Problem: rates have probably changed.
-                        $result[count($result) - 1][Meta::Warning] = 'Amounts for this shipping method do not add up: rates have probably changed';
+                        $result[count($result) - 1][Meta::Warning] = 'Amounts for this shipping method do not add up: rates have probably changed.'
+                            . ' (order_shipping_params->prices = '
+                            . json_encode($this->order->order_shipping_params->prices)
+                            . ')';
                         $warningAdded = true;
                     }
                     $shippingAmountIncTotal += $price->price_with_tax;
@@ -306,9 +303,14 @@ class Creator extends BaseCreator
                 }
                 if (!Number::floatsAreEqual($shippingAmountIncTotal, $this->order->order_shipping_price)
                     || !Number::floatsAreEqual($shippingVatTotal, $this->order->order_shipping_tax)) {
-                    // Problem: lost too much precision? (or we had a rate
+                    // Problem: lost too much precision? (or we had a rate that
+                    // has changed: we will already have discovered that above,
+                    // so we do not produce this warning here.)
                     if (!$warningAdded) {
-                        $result[count($result) - 1][Meta::Warning] = 'Amounts for the shipping method(s) do not add up: lost too much precision?';
+                        $result[count($result) - 1][Meta::Warning] = 'Amounts for the shipping method(s) do not add up: lost too much precision?'
+                            . ' (order_shipping_params->prices = '
+                            . json_encode($this->order->order_shipping_params->prices)
+                            . ')';
                     }
                 }
 

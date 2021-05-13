@@ -291,8 +291,9 @@ class CreatorPluginSupport
         foreach ($items as $item) {
             // If the plugin is no longer used, we may still have an order with
             // products where the plugin was used. Moreover we don't use any
-            // function or method from the plugin, only its stored data, so we
-            // don'have to check for it being active, just the data being there.
+            // function or method from the plugin, only its stored data. So we
+            // do not have to check for the plugin being active, just for the
+            // data being there.
             if (!empty($item['tmcartepo_data'])) {
                 $line = &$this->getLineByMetaId($invoice[Tag::Customer][Tag::Invoice][Tag::Line], $item->get_id());
                 if ($line !== null) {

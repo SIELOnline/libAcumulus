@@ -238,6 +238,8 @@ class Creator extends BaseCreator
      *
      * This method supports the default WooCommerce variant functionality.
      *
+     * @todo: can $item->get_formatted_meta_data(''); be used to get this info?
+     *
      * @param \WC_Order_Item_Product $item
      * @param \WC_Product $product
      * @param array $commonTags

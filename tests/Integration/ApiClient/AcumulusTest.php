@@ -36,6 +36,7 @@ class AcumulusTest extends TestCase
             'InvoiceTemplates' => ['getPicklistInvoiceTemplates', [], true, ['invoicetemplateid', 'invoicetemplatename']],
             'CompanyTypes' => ['getPicklistCompanyTypes', [], true, ['companytypeid', 'companytypename', 'companytypenamenl']],
             'VatInfo' => ['getVatInfo', ['nl'], true, ['vattype', 'vatrate']],
+            'ThresholdEuCommerce' => ['reportThresholdEuCommerce', [], false, ['year', 'threshold', 'nltaxed', 'reached']],
             'Products' => ['getPicklistProducts', [], true, ['productid', 'productnature', 'productdescription', 'producttagid', 'productcontactid', 'productprice', 'productvatrate', 'productsku', 'productstockamount', 'productean', 'producthash', 'productnotes']],
         ];
     }
@@ -103,6 +104,40 @@ class AcumulusTest extends TestCase
         $result = $this->acumulusClient->getVatInfo('ln', '2020-12-01');
         $this->assertSame(Severity::Error, $result->getStatus());
         $this->assertNotEmpty($result->getByCodeTag('AA6A45AA'));
+    }
+
+    /**
+     * Tests call to get the threshold for 2021.
+     */
+    public function testReportThresholdEuCommerce()
+    {
+        $result = $this->acumulusClient->reportThresholdEuCommerce(2021);
+        $this->assertSame(Severity::Success, $result->getStatus());
+        $actual = $result->getResponse();
+        $threshold = $actual['threshold'];
+        $this->assertEquals(10000, $threshold);
+    }
+
+    /**
+     * Tests call to report threshold EU commerce with an old year before it was introduced.
+     */
+    public function testReportThresholdEuCommerceOldYear()
+    {
+        $result = $this->acumulusClient->reportThresholdEuCommerce(2020);
+        $this->assertSame(Severity::Error, $result->getStatus());
+        $this->assertNotEmpty($result->getByCodeTag('AAC37EAA'));
+    }
+
+    /**
+     * Tests call to report threshold EU commerce with a future year.
+     */
+    public function testReportThresholdEuCommerceFutureYear()
+    {
+        $result = $this->acumulusClient->reportThresholdEuCommerce(2099);
+        $this->assertSame(Severity::Success, $result->getStatus());
+        $actual = $result->getResponse();
+        $threshold = $actual['threshold'];
+        $this->assertEquals(10000, $threshold);
     }
 
     public function stockAddProvider()

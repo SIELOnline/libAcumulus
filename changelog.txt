@@ -18,6 +18,18 @@ WC2 = WooCommerce 2 (WordPress) (wordt niet meer ondersteund sinds 5.5.2)
 WC3 = WooCommerce 3 (WordPress)
 WC4 = WooCommerce 4 (WordPress)
 
+6.2.1 (2021-04-??)
+------------------
+Bugs:
+- HS: reinstated use of fallback name for shipping method.
+
+Features:
+- All: Added the ReportThresholdEuCommerce API call to AcumulusClient (but this
+  call is not used yet).
+
+Refactorings:
+- HS: better logging with warnings in method getShippingLines().
+
 6.2.0 (2021-02-10)
 ------------------
 Bugs:

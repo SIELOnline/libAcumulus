@@ -299,6 +299,36 @@ class Acumulus
     }
 
     /**
+     * Retrieves a report on the threshold for EU commerce.
+     *
+     * @param int $year
+     *   The year to get a report for. Leave empty for the current year.
+     *
+     * @return \Siel\Acumulus\ApiClient\Result
+     *   The result of the webservice call. The structured response will contain
+     *   an array with keys:
+     *   - year: int, Year to which information in response is applicable.
+     *   - threshold: float, threshold value at which the EU e-Commerce
+     *     directive applies.
+     *   - nltaxed, float, Amount of turnover taxed using Dutch VAT against
+     *     target customer set. Should ideally not gain when threshold reached.
+     *   - reached: int, 0 when threshold not reached. 1 when so.
+     *   Possible errors:
+     *   - AAC37EAA: Ongeldig year. EU regelgeving van toepassing vanaf 2021.
+     *
+     * @see https://www.siel.nl/acumulus/API/Reports/EU_eCommerce_Threshold/
+     */
+    public function reportThresholdEuCommerce($year = null)
+    {
+        $message = [];
+        $year = (int) $year;
+        if (!empty($year)) {
+            $message['year'] = $year;
+        }
+        return $this->callApiFunction('reports/report_threshold_eu_ecommerce', $message, true)->setMainResponseKey('');
+    }
+
+    /**
      * Sends an invoice to Acumulus.
      *
      * @param array $invoice

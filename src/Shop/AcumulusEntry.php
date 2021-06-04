@@ -57,7 +57,7 @@ class AcumulusEntry
 
     // Constants to enable some kind of locking and thereby preventing sending
     // invoices twice.
-    static protected $maxLockTime = 40;
+    static protected $maxLockTimeMs = 40000;
     const lockEntryId = 1;
     const lockToken = 'Send locked, delete if too old';
     const conceptIdUnknown = 0;
@@ -292,6 +292,6 @@ class AcumulusEntry
      */
     public function hasLockExpired()
     {
-        return $this->isSendLock() && time() - $this->getCreated()->getTimestamp() > static::$maxLockTime;
+        return $this->isSendLock() && time() - $this->getCreated()->getTimestamp() > static::$maxLockTimeMs;
     }
 }

@@ -22,6 +22,8 @@ WC4 = WooCommerce 4 (WordPress)
 ------------------
 Bugs:
 - HS: reinstated use of fallback name for shipping method.
+- ALL: timeout period used to prevent double sending was too short (expressed in
+  seconds while used as milliseconds).
 
 Features:
 - All: Added the ReportThresholdEuCommerce API call to AcumulusClient (but this

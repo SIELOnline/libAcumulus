@@ -99,4 +99,58 @@ class Number
     {
         return static::floatsAreEqual($f1, 0.0, $maxDiff);
     }
+
+    /**
+     * Returns whether a number can be considered a number being rounded to the
+     * given precision.
+     *
+     * @param float $f
+     *   The number may be passed as a string, and in many cases probably will
+     *   indeed be passed as a string as it comes from the database.
+     * @param int $precision
+     *   The number of decimals to which it should have been rounded, if it is a
+     *   rounded number. Should be a non-negative integer.
+     *
+     * @return bool
+     *   true if $f is a number that appears to be rounded to the given
+     *   precision, false otherwise.
+     */
+    static public function isRounded($f, $precision)
+    {
+        if (is_string($f)) {
+            // For strings we look at the position of the last non-0 digit after
+            // the decimal point.
+            $pos = strrpos($f, '.');
+            return $pos === false || strlen(rtrim($f, '0')) - $pos < $precision + strlen('.');
+        } else {
+            // For floats we use the round() function and look at the difference
+            // (testing floats for equality within a given margin).
+            return static::floatsAreEqual($f, round($f, $precision), pow(10, -($precision + 2)) / 2.0);
+        }
+    }
+
+    /**
+     * Returns whether a list of numbers can be considered numbers being rounded
+     * to the given precision.
+     *
+     * @param float[] $fs
+     *   The numbers may be passed as a string, and in many cases probably will
+     *   indeed be passed as a string as it comes from the database.
+     * @param int $precision
+     *   The number of decimals to which they should have been rounded, if they
+     *   are rounded numbers. Should be a non-negative integer.
+     *
+     * @return bool
+     *   true if all numbers in $fs appear to be rounded to the given
+     *   precision, false otherwise.
+     */
+    static public function areRounded(array $fs, $precision)
+    {
+        foreach ($fs as $f) {
+            if (!static::isRounded($f, $precision)) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

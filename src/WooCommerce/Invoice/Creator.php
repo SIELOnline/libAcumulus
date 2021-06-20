@@ -116,15 +116,26 @@ class Creator extends BaseCreator
         // id, whereas get_total_tax() returns either a rounded or non-rounded
         // amount, depending on the 'woocommerce_tax_round_at_subtotal' setting.
         $productPriceEx = $item->get_total() / $quantity;
-        $taxes = $item->get_taxes();
-        $productVat = array_sum($taxes['total']) / $quantity;
+        $taxes = $item->get_taxes()['total'];
+        $productVat = array_sum($taxes) / $quantity;
         $productPriceInc = $productPriceEx + $productVat;
 
         // Get precision info.
         if ($this->productPricesIncludeTax()) {
+            // In the past I have seen WooCommerce store rounded vat amounts
+            // together with a not rounded ex price. If that is the case, the
+            // precision of the - calculated - inc price is not best and we
+            // should not recalculate the price ex when we have obtained a
+            // corrected vat rate as that will worsen the precision of the price
+            // ex.
             $precisionEx = $this->precision;
-            $precisionInc = 0.001;
-            $recalculatePrice = Tag::UnitPrice;
+            if ($this->isPriceIncRealistic($productPriceInc, $taxes, $product)) {
+                $precisionInc = 0.001;
+                $recalculatePrice = Tag::UnitPrice;
+            } else {
+                $precisionInc = 0.02;
+                $recalculatePrice = Meta::UnitPriceInc;
+            }
         } else {
             $precisionEx = 0.001;
             $precisionInc = $this->precision;
@@ -276,8 +287,8 @@ class Creator extends BaseCreator
                 '_reduced_stock',
             ]);
             foreach ($metadata as $meta) {
-                // Skip hidden core fields and serialized data (also hidden core
-                // fields).
+                // Skip hidden core fields and serialized data (which are also
+                // hidden core fields).
                 if (in_array($meta->key, $hiddenOrderItemMeta) || is_serialized($meta->value)) {
                     continue;
                 }
@@ -594,5 +605,47 @@ class Creator extends BaseCreator
     protected function productPricesIncludeTax()
     {
         return wc_prices_include_tax();
+    }
+
+
+    /**
+     * Returns whether the price inc can be considered realistic.
+     *
+     * Precondition: product prices as entered by the shop manager include tax
+     *  and thus can be considered to be expressed in cents.
+     *
+     * If a price inc is not considered realistic, we should not recalculate the
+     * product price ex based on the product price inc after we have obtained a
+     * corrected vat rate.
+     *
+     * @param float $productPriceInc
+     *   The product price including vat found on an item line, this includes
+     *   any discount.
+     * @param float[] $taxes
+     *   May be passed as strings.
+     * @param \WC_Product|null $product
+     *   The product that has the given price inc and taxes.
+     *
+     * @return bool
+     *   true if the price inc can be considered realistic, false otherwise.
+     */
+    protected function isPriceIncRealistic($productPriceInc, array $taxes, $product)
+    {
+        // Given the precondition that product prices as entered include vat, we
+        // consider a price in cents realistic.
+        if ((Number::isRounded($productPriceInc, 2))) {
+            return true;
+        }
+        // If the price equals the actual product price, we consider it
+        // realistic. Note that there may be valid reasons that the price differs
+        // from the actual price, e.g. a price change since the order was placed,
+        // or a discount that has been applied to the item line.
+        if ($product instanceof WC_Product && Number::floatsAreEqual($productPriceInc, $product->get_price())) {
+            return true;
+        }
+        if (!Number::areRounded($taxes, 2)) {
+            return true;
+        }
+        return false;
     }
 }

@@ -23,6 +23,7 @@ WC4 = WooCommerce 4 (WordPress)
 Features:
 - All: Added the ReportThresholdEuCommerce API call to AcumulusClient (but this
   call is not used yet).
+- All: Added the field vattypeid to the InvoiceAdd API call.
 
 Bugs:
 - HS: reinstated use of fallback name for shipping method.

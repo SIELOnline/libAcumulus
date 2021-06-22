@@ -56,6 +56,9 @@ interface Api
     const ConfirmReading_No = 0;
     const ConfirmReading_Yes = 1;
 
+    const VatTypeId_Private = 1; // or vat exempt business.
+    const VatTypeId_Business = 2;
+
     const VatType_National = 1;
     const VatType_NationalReversed = 2;
     const VatType_EuReversed = 3;

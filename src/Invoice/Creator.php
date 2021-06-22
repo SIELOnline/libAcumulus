@@ -308,6 +308,9 @@ abstract class Creator
         $customer = [];
         $customerSettings = $this->config->getCustomerSettings();
         $this->addDefault($customer, Tag::Type, $customerSettings['defaultCustomerType']);
+        // Add an empty value to have it rendered high up in the xml message.
+        // I know, I am neurotic...
+        $customer[Tag::VatTypeId] = '';
         $this->addTokenDefault($customer, Tag::ContactYourId, $customerSettings['contactYourId']);
         $this->addDefaultEmpty($customer, Tag::ContactStatus, $customerSettings['contactStatus']);
         $this->addTokenDefault($customer, Tag::CompanyName1, $customerSettings['companyName1']);

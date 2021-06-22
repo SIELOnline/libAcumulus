@@ -19,6 +19,7 @@ interface Tag
     const EmailOnWarning = 'emailonwarning';
 
     const Type = 'type';
+    const VatTypeId = 'vattypeid';
     const ContactId = 'contactid';
     const ContactYourId = 'contactyourid';
     const ContactStatus = 'contactstatus';

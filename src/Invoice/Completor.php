@@ -225,8 +225,9 @@ class Completor
 
         // Determine the VAT type and warn if multiple vat types are possible.
         $this->completeVatType();
+        $this->completeVatTypeId();
         // If the invoice has margin products, all invoice lines have to follow
-        // the margin scheme, i.e. have a costprice and a unitprice incl. VAT.
+        // the margin scheme, i.e. have a cost price and a unit price incl. VAT.
         $this->correctMarginInvoice();
         // Correct 0% and vat free rates where applicable.
         $this->correctNoVatLines();
@@ -1112,6 +1113,53 @@ class Completor
                 $this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType] = Api::VatType_EuReversed;
                 $this->invoice[Tag::Customer][Tag::Invoice][Meta::VatTypeSource] = 'Completor::guessVatType: at least 1 item is not a service';
             }
+        }
+    }
+
+    /**
+     * Adds the field vattypeid to the customer part of the invoice.
+     *
+     * - Non companies are always 1 - private.
+     * - Companies in the Netherlands will normally not get reversed vat, so we
+     *   can not determine the vat type id unless, somehow, the vat type of the
+     *   invoice has been set to VatType_NationalReversed.
+     * - For companies in the EU we will base the vat type id on the vat type
+     *   in the invoice part:
+     *   - Thereby thus assuming that web shops will use reversed vat whenever
+     *     allowed.
+     *   - If the vat type could not be determined, the vat type id will remain
+     *     undefined.
+     * - For companies outside the EU, it will be set to 1 - private.
+     */
+    protected function completeVatTypeId()
+    {
+        // If shop specific code or an event handler has already set the vat
+        // type id, we don't change it.
+        $vatTypeId = $this->invoice[Tag::Customer][Tag::VatTypeId];
+        if (empty($vatTypeId)) {
+            if ($this->isCompany()) {
+                if ($this->isNl()) {
+                    if (!empty($this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType]) && $this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType] === Api::VatType_NationalReversed) {
+                        $vatTypeId = Api::VatTypeId_Business;
+                    }
+                } elseif ($this->isEu()) {
+                    if (!empty($this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType])) {
+                        $vatTypeId = $this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType] === Api::VatType_EuReversed
+                            ? Api::VatTypeId_Business
+                            : Api::VatTypeId_Private;
+                    }
+                } else {
+                    // Outside EU.
+                    $vatTypeId = Api::VatTypeId_Private;
+                }
+            } else {
+                $vatTypeId = Api::VatTypeId_Private;
+            }
+        }
+        if (empty($vatTypeId)) {
+            unset($this->invoice[Tag::Customer][Tag::VatTypeId]);
+        } else {
+            $this->invoice[Tag::Customer][Tag::VatTypeId] = $vatTypeId;
         }
     }
 

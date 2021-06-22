@@ -223,14 +223,17 @@ class Completor
             $this->changeInvoiceToConcept($this->invoice[Tag::Customer][Tag::Invoice],'message_warning_strategies_failed', 808);
         }
 
-        // Determine the VAT type and warn if multiple vat types are possible.
+        // Determine the VAT type for the invoice and warn if multiple vat types
+        // are possible.
         $this->completeVatType();
+        // Correct 0% and vat free rates where applicable.
+        $this->correctNoVatLines();
+        // Determine the vat type id for the customer
         $this->completeVatTypeId();
+
         // If the invoice has margin products, all invoice lines have to follow
         // the margin scheme, i.e. have a cost price and a unit price incl. VAT.
         $this->correctMarginInvoice();
-        // Correct 0% and vat free rates where applicable.
-        $this->correctNoVatLines();
 
         // Completes the invoice with settings or behaviour that might depend on
         // the fact that the invoice lines have been completed.
@@ -938,7 +941,7 @@ class Completor
                         //   - one of the no vat vat types.
                         //   - vat type national with client outside EU.
                         if ($this->lineHasNoVat($line)) {
-                            $zeroOrVatFreeClass = $this->isZeroVatClass($line) || $this->isVatFreeClass($line);
+                            $zeroOrVatFreeClass = $this->is0VatClass($line) || $this->isVatFreeClass($line);
                             $zeroOrVatFreeRate = !empty($line[Meta::VatRateLookup]) && $this->metaDataHasANoVat($line[Meta::VatRateLookup]);
                             if (!($zeroOrVatFreeClass || $zeroOrVatFreeRate)) {
                                 // This article cannot be intrinsically 0% or
@@ -1078,7 +1081,7 @@ class Completor
             // vrijstelling of het 0%-tarief valt."
             $allItemsVatFree = true;
             $allItemsService = true;
-            foreach ($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] as $index => $line) {
+            foreach ($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] as $line) {
                 if (!empty($line[Meta::VatClassId])) {
                     if (!$this->isVatFreeClass($line[Meta::VatClassId])) {
                         $allItemsVatFree = false;
@@ -1119,48 +1122,28 @@ class Completor
     /**
      * Adds the field vattypeid to the customer part of the invoice.
      *
+     * - If shop specific code or an event handler has already set the vat type
+     *   id, we don't change it.
      * - Non companies are always 1 - private.
-     * - Companies in the Netherlands will normally not get reversed vat, so we
-     *   can not determine the vat type id unless, somehow, the vat type of the
-     *   invoice has been set to VatType_NationalReversed.
-     * - For companies in the EU we will base the vat type id on the vat type
-     *   in the invoice part:
-     *   - Thereby thus assuming that web shops will use reversed vat whenever
-     *     allowed.
-     *   - If the vat type could not be determined, the vat type id will remain
-     *     undefined.
-     * - For companies outside the EU, it will be set to 1 - private.
+     * - Companies will get 2 - business unless we can determine that the
+     *   invoice targets a vat exempt company: the company is EU (outside NL)
+     *   and the invoice type is not EU reversed and the invoice is not vat-free
+     *   as vat-free trumps reversed vat.
      */
     protected function completeVatTypeId()
     {
-        // If shop specific code or an event handler has already set the vat
-        // type id, we don't change it.
         $vatTypeId = $this->invoice[Tag::Customer][Tag::VatTypeId];
         if (empty($vatTypeId)) {
-            if ($this->isCompany()) {
-                if ($this->isNl()) {
-                    if (!empty($this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType]) && $this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType] === Api::VatType_NationalReversed) {
-                        $vatTypeId = Api::VatTypeId_Business;
-                    }
-                } elseif ($this->isEu()) {
-                    if (!empty($this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType])) {
-                        $vatTypeId = $this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType] === Api::VatType_EuReversed
-                            ? Api::VatTypeId_Business
-                            : Api::VatTypeId_Private;
-                    }
-                } else {
-                    // Outside EU.
+            $vatTypeId = $this->isCompany() ? Api::VatTypeId_Business : Api::VatTypeId_Private;
+            if ($this->isCompany() && $this->isEu()) {
+                if (!empty($this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType])
+                        && $this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType] !== Api::VatType_EuReversed
+                        && !$this->isVatFreeInvoice()) {
                     $vatTypeId = Api::VatTypeId_Private;
                 }
-            } else {
-                $vatTypeId = Api::VatTypeId_Private;
             }
         }
-        if (empty($vatTypeId)) {
-            unset($this->invoice[Tag::Customer][Tag::VatTypeId]);
-        } else {
-            $this->invoice[Tag::Customer][Tag::VatTypeId] = $vatTypeId;
-        }
+        $this->invoice[Tag::Customer][Tag::VatTypeId] = $vatTypeId;
     }
 
     /**
@@ -1239,16 +1222,16 @@ class Completor
     {
         $vatType = isset($this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType]) ? $this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType] : null;
         foreach ($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] as &$line) {
-            if ($this->isVatFree($line)) {
+            if ($this->isFreeVatRate($line)) {
                 // Change if the vat class indicates a 0% vat-rate or if vat
                 // free is not allowed for the vat type
-                if ($this->isZeroVatClass($line) || !in_array($vatType, static::$vatTypesAllowingVatFree))
+                if ($this->is0VatClass($line) || !in_array($vatType, static::$vatTypesAllowingVatFree))
                 {
                     $line[Tag::VatRate] = 0.0;
                     $line[Meta::VatRateSource] .= ',' . self::VatRateSource_Corrected_NoVat;
                 }
             }
-            if ($this->is0Vat($line)) {
+            if ($this->is0VatRate($line)) {
                 // Change if the vat class indicates a vat free rate and vat
                 // free is allowed for the vat type.
                 if ($this->isVatFreeClass($line) && in_array($vatType, static::$vatTypesAllowingVatFree)) {
@@ -1574,7 +1557,7 @@ class Completor
      *   given and denotes the vat free class (or is left empty), false
      *   otherwise.
      */
-    public function isVatFreeClass($vatClassId)
+    protected function isVatFreeClass($vatClassId)
     {
         if (is_array($vatClassId)) {
             $vatClassId = array_key_exists(Meta::VatClassId, $vatClassId) ? $vatClassId[Meta::VatClassId] : null;
@@ -1595,7 +1578,7 @@ class Completor
      *   True if the shop might sell 0% vat articles and the vat class id
      *   denotes the 0% vat rate class, false otherwise.
      */
-    public function isZeroVatClass($vatClassId)
+    protected function is0VatClass($vatClassId)
     {
         if (is_array($vatClassId)) {
             $vatClassId = array_key_exists(Meta::VatClassId, $vatClassId) ? $vatClassId[Meta::VatClassId] : null;
@@ -1618,7 +1601,7 @@ class Completor
      */
     protected function isNoVat($vatRate)
     {
-        return $this->is0Vat($vatRate) || $this->isVatFree($vatRate);
+        return $this->is0VatRate($vatRate) || $this->isFreeVatRate($vatRate);
     }
 
     /**
@@ -1631,7 +1614,7 @@ class Completor
      * @return bool
      *   True if $vatRate is the 0% or the vat free vat rate, false otherwise.
      */
-    protected function is0Vat($vatRate)
+    protected function is0VatRate($vatRate)
     {
         if (is_array($vatRate)) {
             $vatRate = isset($vatRate[Tag::VatRate]) ? $vatRate[Tag::VatRate] : null;
@@ -1649,12 +1632,29 @@ class Completor
      * @return bool
      *   True if $vatRate is the 0% or the vat free vat rate, false otherwise.
      */
-    protected function isVatFree($vatRate)
+    protected function isFreeVatRate($vatRate)
     {
         if (is_array($vatRate)) {
             $vatRate = isset($vatRate[Tag::VatRate]) ? $vatRate[Tag::VatRate] : null;
         }
         return isset($vatRate) && Number::floatsAreEqual($vatRate, Api::VatFree);
+    }
+
+    /**
+     * Returns whether the invoice is a vat free invoice.
+     *
+     * @return bool
+     *   True if the invoice is vat free, i.e. has only vat free lines, false
+     *   otherwise.
+     */
+    protected function isVatFreeInvoice()
+    {
+        foreach ($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] as $line) {
+            if (!$this->isFreeVatRate($line)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**

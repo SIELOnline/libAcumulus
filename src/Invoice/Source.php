@@ -142,7 +142,7 @@ abstract class Source
      */
     public function getSign()
     {
-        return (float) ($this->getType() === static::CreditNote ? -1.0 : 1.0);
+        return $this->getType() === static::CreditNote ? -1.0 : 1.0;
     }
 
     /**

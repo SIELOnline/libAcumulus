@@ -44,28 +44,14 @@ class Config
     const Nature_Products = 2;
     const Nature_Services = 3;
 
-    const ForeignVat_Unknown = 0;
-    const ForeignVat_Both = 1;
-    const ForeignVat_No = 2;
-    const ForeignVat_Only = 3;
-
-    const VatFreeProducts_Unknown = 0;
-    const VatFreeProducts_Both = 1;
-    const VatFreeProducts_No = 2;
-    const VatFreeProducts_Only = 3;
-
-    // Note: used both as value in Config and as value for Meta::VatClassId.
-    const VatClass_Null = 'vat_class_null';
-
-    const ZeroVatProducts_Unknown = 0;
-    const ZeroVatProducts_Both = 1;
-    const ZeroVatProducts_No = 2;
-    const ZeroVatProducts_Only = 3;
-
     const MarginProducts_Unknown = 0;
     const MarginProducts_Both = 1;
     const MarginProducts_No = 2;
     const MarginProducts_Only = 3;
+
+    const VatClass_NotApplicable = 'vat_class_not_applicable';
+    // Note: used both as value in Config and as value for Meta::VatClassId.
+    const VatClass_Null = 'vat_class_null';
 
     const TriggerInvoiceEvent_None = 0;
     const TriggerInvoiceEvent_Create = 1;
@@ -410,13 +396,10 @@ class Config
      * @return array
      *   A keyed array with the keys:
      *   - nature_shop
-     *   - foreignVat
-     *   - foreignVatClasses
-     *   - vatFreeProducts
-     *   - vatFreeClass
-     *   - zeroVatProducts
-     *   - zeroVatClasses
      *   - marginProducts
+     *   - foreignVatClasses
+     *   - vatFreeClass
+     *   - zeroVatClass
      *   - invoiceNrSource
      *   - dateToUse
      */
@@ -927,40 +910,25 @@ class Config
                     'type' => 'int',
                     'default' => Config::Nature_Unknown,
                 ],
-                'foreignVat' => [
+                'marginProducts' => [
                     'group' => 'shop',
                     'type' => 'int',
-                    'default' => Config::ForeignVat_Unknown,
+                    'default' => Config::MarginProducts_Unknown,
                 ],
                 'foreignVatClasses' => [
                     'group' => 'shop',
                     'type' => 'array',
                     'default' => [],
                 ],
-                'vatFreeProducts' => [
-                    'group' => 'shop',
-                    'type' => 'int',
-                    'default' => Config::VatFreeProducts_Unknown,
-                ],
                 'vatFreeClass' => [
                     'group' => 'shop',
                     'type' => 'string',
                     'default' => '',
                 ],
-                'zeroVatProducts' => [
-                    'group' => 'shop',
-                    'type' => 'int',
-                    'default' => Config::ZeroVatProducts_Unknown,
-                ],
                 'zeroVatClass' => [
                     'group' => 'shop',
                     'type' => 'string',
                     'default' => '',
-                ],
-                'marginProducts' => [
-                    'group' => 'shop',
-                    'type' => 'int',
-                    'default' => Config::MarginProducts_Unknown,
                 ],
                 'invoiceNrSource' => [
                     'group' => 'shop',
@@ -1108,6 +1076,10 @@ class Config
 
         if (version_compare($currentVersion, '6.0.0', '<')) {
             $result = $this->upgrade600() && $result;
+        }
+
+        if (version_compare($currentVersion, '6.3.0', '<')) {
+            $result = $this->upgrade630() && $result;
         }
 
         return $result;
@@ -1379,5 +1351,56 @@ class Config
                 break;
         }
         return $this->save($newSettings);
+    }
+
+    /**
+     * 6.3.0 upgrade.
+     *
+     * - Only 1 setting for type of tax (foreign, free, 0).
+     *
+     * @return bool
+     */
+    protected function upgrade630()
+    {
+        $configStore = $this->getConfigStore();
+        $values = $configStore->load();
+        // If Foreign vat was not set (unknown) or set to No, we should reset
+        // any value in foreignVatClasses.
+        // const ForeignVat_Unknown = 0;
+        // const ForeignVat_No = 2;
+        if ($values['foreignVat'] === 0 || $values['foreignVat'] === 2) {
+            $values['foreignVatClasses'] = [];
+        }
+        unset($values['foreignVat']);
+
+        // If "vat free products" was not set (unknown) we should set the value
+        // of vatFreeClass to "empty".
+        // const VatFreeProducts_Unknown = 0;
+        if ($values['vatFreeProducts'] === 0) {
+            $values['vatFreeClass'] = '';
+        }
+        // If "vat free products" was set to No, we should set the value
+        // of vatFreeClass to Config::VatClass_NotApplicable.
+        // const VatFreeProducts_No = 2;
+        if ($values['vatFreeProducts'] === 2) {
+            $values['vatFreeClass'] = Config::VatClass_NotApplicable;
+        }
+        unset($values['vatFreeProducts']);
+
+        // If "0 vat products" was not set (unknown) we should set the value
+        // of zeroVatClass to "empty".
+        // const ZeroVatProducts_Unknown = 0;
+        if ($values['zeroVatProducts'] === 0) {
+            $values['zeroVatClass'] = '';
+        }
+        // If "0 vat products" was set to No, we should set the value
+        // of zeroVatClass to Config::VatClass_NotApplicable.
+        // const ZeroVatProducts_No = 2;
+        if ($values['zeroVatProducts'] === 2) {
+            $values['zeroVatClass'] = Config::VatClass_NotApplicable;
+        }
+        unset($values['zeroVatProducts']);
+
+        return $this->save($values);
     }
 }

@@ -264,8 +264,6 @@ class Completor
         $shopSettings = $this->config->getShopSettings();
         $nature = $shopSettings['nature_shop'];
         $margin = $shopSettings['marginProducts'];
-        $foreignVat = $shopSettings['foreignVat'];
-        $vatFreeProducts = $shopSettings['vatFreeProducts'];
 
         if (!empty($this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType])) {
             // If shop specific code or an event handler has already set the vat
@@ -276,27 +274,26 @@ class Completor
                 $possibleVatTypes[] = Api::VatType_National;
                 // Can it be national reversed VAT: not really supported but
                 // possible. Note that reversed vat should not be used with vat
-                // free items.
-                if ($this->isCompany() && $vatFreeProducts != Config::VatFreeProducts_Only) {
+                // free items. @todo: thus if we know that only vat free is used...
+                if ($this->isCompany()) {
                     $possibleVatTypes[] = Api::VatType_NationalReversed;
                 }
             } elseif ($this->isEu()) {
-                // Can it be normal vat?
-                if ($foreignVat !== Config::ForeignVat_Only) {
-                    $possibleVatTypes[] = Api::VatType_National;
-                }
+                // It can be normal vat.
+                // @todo: unless we know that is not used
+                $possibleVatTypes[] = Api::VatType_National;
                 // Can it be foreign vat?
-                if ($foreignVat !== Config::ForeignVat_No) {
+                if ($this->usesForeignVat()) {
                     $possibleVatTypes[] = Api::VatType_ForeignVat;
                 }
                 // Can it be EU reversed VAT. Note that reversed vat should not
                 // be used with vat free items.
-                if ($this->isCompany() && $vatFreeProducts != Config::VatFreeProducts_Only) {
+                if ($this->isCompany()) {
                     $possibleVatTypes[] = Api::VatType_EuReversed;
                 }
             } elseif ($this->isOutsideEu()) {
-                // Can it be national vat? Services should use vattype = 1 with
-                // vat free
+                // Can it be national vat? Services should use vat type = 1 with
+                // vat free. @todo: thus if we know that only vat free is used...
                 if ($nature !== Config::Nature_Products) {
                     $possibleVatTypes[] = Api::VatType_National;
                 }
@@ -339,8 +336,8 @@ class Completor
 
         $shopSettings = $this->config->getShopSettings();
         $nature = $shopSettings['nature_shop'];
-        $vatFreeProducts = $shopSettings['vatFreeProducts'];
-        $zeroVatProducts = $shopSettings['zeroVatProducts'];
+        $vatFreeClass = $shopSettings['vatFreeClass'];
+        $zeroVatClass = $shopSettings['zeroVatClass'];
 
         foreach ($this->possibleVatTypes as $vatType) {
             switch ($vatType) {
@@ -352,22 +349,20 @@ class Completor
                     // the plugin settings and the invoice target (buyer).
                     foreach ($countryVatRates as $countryVatRate) {
                         if (!Number::isZero($countryVatRate) && !Number::floatsAreEqual($countryVatRate, Api::VatFree)) {
-                            // Positive (non-zero and non free) vat rate: add if
-                            // not only selling vat-free or 0% vat products.
-                            if ($vatFreeProducts != Config::VatFreeProducts_Only && $zeroVatProducts != Config::ZeroVatProducts_Only) {
-                                $vatTypeVatRates[] = $countryVatRate;
-                            }
+                            // Positive (non-zero and non free) vat rate:
+                            // @todo: only add if not only selling vat-free or 0% vat products.
+                            $vatTypeVatRates[] = $countryVatRate;
                         }
                     }
                     // Add 0% vat rate if:
                     // - selling 0% vat products/services.
-                    if ($zeroVatProducts != Config::ZeroVatProducts_No) {
+                    if ($zeroVatClass != Config::VatClass_NotApplicable) {
                         $vatTypeVatRates[] = 0.0;
                     }
                     // Add vat free rate if:
                     // - selling vat free products/services
                     // - OR (outside EU AND services).
-                    if ($vatFreeProducts != Config::VatFreeProducts_No) {
+                    if ($vatFreeClass != Config::VatClass_NotApplicable) {
                         $vatTypeVatRates[] = Api::VatFree;
                     } elseif ($this->isOutsideEu() && $nature !== Config::Nature_Products) {
                         $vatTypeVatRates[] = Api::VatFree;
@@ -386,20 +381,18 @@ class Completor
                     // the plugin settings.
                     foreach ($countryVatRates as $countryVatRate) {
                         if (Number::isZero($countryVatRate)) {
-                            // NOTE: we assume here that the 'zeroVatProducts'
-                            // setting is also set to yes or both when selling
+                            // NOTE: we assume here that the 'zeroVatClass'
+                            // setting is also set to a vat class when selling
                             // products or services that are 0% in at least one
-                            // EU country (and we are using that countries vat
-                            // rates).
-                            if ($zeroVatProducts != Config::ZeroVatProducts_No) {
+                            // EU country.
+                            // @todo: this sucks.
+                            if ($zeroVatClass != Config::VatClass_NotApplicable) {
                                 $vatTypeVatRates[] = $countryVatRate;
                             }
                         } elseif (!Number::floatsAreEqual($countryVatRate, Api::VatFree)) {
                             // Positive (non-zero and non free) vat rate: add if
                             // not only selling vat-free or 0% vat products.
-                            if ($vatFreeProducts != Config::VatFreeProducts_Only && $zeroVatProducts != Config::ZeroVatProducts_Only) {
-                                $vatTypeVatRates[] = $countryVatRate;
-                            }
+                            $vatTypeVatRates[] = $countryVatRate;
                         }
                     }
                     // Note1: at this moment the API does not accept vat free as
@@ -409,7 +402,7 @@ class Completor
                     // However, for now we will accept this rate here but will
                     // correct it to 0% later on in correctNoVatLines(). This
                     // might change when the API changes.
-                    if ($vatFreeProducts != Config::VatFreeProducts_No) {
+                    if ($vatFreeClass != Config::VatClass_NotApplicable) {
                         $vatTypeVatRates[] = Api::VatFree;
                     }
                     break;
@@ -1038,15 +1031,16 @@ class Completor
             // Rule 1.
             $this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType] = reset($possibleVatTypes);
             $this->invoice[Tag::Customer][Tag::Invoice][Meta::VatTypeSource] = 'Completor::checkForKnownVatType: only 1 possible vat type';
-        } elseif ($possibleVatTypes == [Api::VatType_National, Api::VatType_EuReversed]) {
-            $shopSettings = $this->config->getShopSettings();
-            $vatFreeProducts = $shopSettings['vatFreeProducts'];
-            $nature = $shopSettings['nature_shop'];
-            if ($vatFreeProducts == Config::VatFreeProducts_Only && $nature == Config::Nature_Services) {
-                // Rule 2.
-                $this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType] = Api::VatType_National;
-                $this->invoice[Tag::Customer][Tag::Invoice][Meta::VatTypeSource] = 'Completor::checkForKnownVatType: vat free services only';
-            }
+//        } elseif ($possibleVatTypes == [Api::VatType_National, Api::VatType_EuReversed]) {
+            // @todo: re-enable if we can determine that the shop only sells vat free services.
+//            $shopSettings = $this->config->getShopSettings();
+//            $vatFreeProducts = $shopSettings['vatFreeProducts'];
+//            $nature = $shopSettings['nature_shop'];
+//            if ($vatFreeProducts == Config::VatFreeProducts_Only && $nature == Config::Nature_Services) {
+//                // Rule 2.
+//                $this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType] = Api::VatType_National;
+//                $this->invoice[Tag::Customer][Tag::Invoice][Meta::VatTypeSource] = 'Completor::checkForKnownVatType: vat free services only';
+//            }
         }
     }
 
@@ -1525,6 +1519,22 @@ class Completor
     }
 
     /**
+     * Returns whether the shop uses foreign vat.
+     *
+     * @return bool
+     *   True if the shop might sell using foreign vat, false otherwise.
+     *
+     * @todo: this and the following methods are actually config related
+     *   questions and thus should be part of Config
+     */
+    public function usesForeignVat()
+    {
+        $shopSettings = $this->config->getShopSettings();
+        $foreignVatClasses = $shopSettings['foreignVatClasses'];
+        return reset($foreignVatClasses) !== Config::VatClass_NotApplicable;
+    }
+
+    /**
      * Returns whether the vat class id denotes foreign vat.
      *
      * @param int|string $vatClassId
@@ -1533,16 +1543,12 @@ class Completor
      * @return bool
      *   True if the shop might sell foreign vat articles and the vat class id
      *   denotes a foreign vat class, false otherwise.
-     *
-     * @todo: this and the following methods are actually config related
-     *   questions and thus should be part of Config
      */
     public function isForeignVatClass($vatClassId)
     {
         $shopSettings = $this->config->getShopSettings();
-        $foreignVat = $shopSettings['foreignVat'];
         $foreignVatClasses = $shopSettings['foreignVatClasses'];
-        return $foreignVat !== Config::ForeignVat_No && in_array($vatClassId, $foreignVatClasses);
+        return in_array($vatClassId, $foreignVatClasses);
     }
 
     /**
@@ -1550,7 +1556,7 @@ class Completor
      *
      * @param int|string|array $vatClassId
      *   The vat class to check or an invoice line that may contain the key
-     *   Meta::VatClassId.
+     *   Meta::VatClassId that refers to a vat class.
      *
      * @return bool
      *   True if the shop might sell vat free articles and the vat class id is
@@ -1563,16 +1569,16 @@ class Completor
             $vatClassId = array_key_exists(Meta::VatClassId, $vatClassId) ? $vatClassId[Meta::VatClassId] : null;
         }
         $shopSettings = $this->config->getShopSettings();
-        $vatFreeProducts = $shopSettings['vatFreeProducts'];
         $vatFreeClass = $shopSettings['vatFreeClass'];
-        return $vatFreeProducts !== Config::VatFreeProducts_No && $vatClassId == $vatFreeClass;
+        return $vatClassId == $vatFreeClass;
     }
 
     /**
      * Returns whether the vat class id denotes the 0% vat rat.
      *
      * @param int|string|array $vatClassId
-     *   The vat class to check.
+     *   The vat class to check or an invoice line that may contain the key
+     *   Meta::VatClassId that refers to a vat class.
      *
      * @return bool
      *   True if the shop might sell 0% vat articles and the vat class id
@@ -1584,9 +1590,8 @@ class Completor
             $vatClassId = array_key_exists(Meta::VatClassId, $vatClassId) ? $vatClassId[Meta::VatClassId] : null;
         }
         $shopSettings = $this->config->getShopSettings();
-        $zeroVatProducts = $shopSettings['zeroVatProducts'];
         $zeroVatClass = $shopSettings['zeroVatClass'];
-        return $zeroVatProducts !== Config::ZeroVatProducts_No && $vatClassId == $zeroVatClass;
+        return $vatClassId == $zeroVatClass;
     }
 
     /**

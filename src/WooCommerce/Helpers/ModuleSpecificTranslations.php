@@ -1,5 +1,5 @@
 <?php
-namespace Siel\Acumulus\Woocommerce\Helpers;
+namespace Siel\Acumulus\WooCommerce\Helpers;
 
 use Siel\Acumulus\Helpers\TranslationCollection;
 
@@ -16,9 +16,11 @@ class ModuleSpecificTranslations extends TranslationCollection
 
         'Standaard' => 'Standaard',
         'vat_class_left_empty' => 'Ik zet "Btw status" op "Geen"',
-        'desc_vatFreeClass' => 'Geef aan welke belastingklasse u gebruikt om aan te geven dat een product of dienst btw-vrij is.
-Kies de eerste optie als u bij uw btw-vrije producten en diensten de "Btw status" op "Geen" zet.
-Deze instelling hoeft u alleen in te vullen als u hierboven hebt aangegeven dat u niet "Alleen aan btw onderhevige producten en/of diensten." verkoopt.',
+        'desc_vatFreeClass' => 'Geef aan welke %1$s u gebruikt om aan te geven dat een product of dienst btw-vrij is.<br>
+Kies de 1e optie ("%2$s") als u geen btw-vrije producten of diensten aanbiedt.<br>
+Kies de 2e optie ("%3$s") als u bij uw btw-vrije producten en diensten de "Btw status" op "Geen" zet.<br>
+LET OP: het gaat er om of het product of de dienst btw-vrij is, uw bedrijf voor de <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/hoe_werkt_de_btw/nieuwe-kleineondernemersregeling/kleineondernemersregeling" target="_blank"">KOR regeling</a> heeft gekozen, of een btw vrijstelling heeft. Niet of u voor specifieke situaties een factuur zonder btw opstelt.
+Ook is er een verschil met het 0%%-tarief hieronder, Dit verschil zit hem met name in de mogelijkheid tot aftrek van voorbelasting.',
 
         // Invoice status overview: shorter labels due to very limited available space.
         'vat_type' => 'Soort',
@@ -42,9 +44,11 @@ Deze instelling hoeft u alleen in te vullen als u hierboven hebt aangegeven dat 
 
         'Standaard' => 'Standard', // WC uses standard tax rate, not default tax rate.
         'vat_class_left_empty' => 'I set "Tax status" to "None"',
-        'desc_vatFreeClass' => 'Indicate which vat class you use to indicate that a product or service is VAT free.
-Choose the first option if you do set the "Tax status" to "None" for your vat free products and services.
-You only have to fill in this setting if above you did not select the option that you sell "Only products or services that are VAT liable."',
+        'desc_vatFreeClass' => 'Indicate which %1$s you use to indicate that a product or service is VAT free.<br>
+Select the 1st option ("%2$s") if you do not sell VAT free goods or services.<br>
+Select the 2nd option ("%3$s") if you set the field "VAT status" to "None" on VAT free products.<br>
+NOTE: this setting concerns whether the goods or services you offer are inherently VAT free, or because your company has chosen to use the <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/hoe_werkt_de_btw/nieuwe-kleineondernemersregeling/kleineondernemersregeling" target="_blank"">KOR regulations (in Dutch)</a>, or is for some other reason not VAT liable. Not whether you create an invoice with no or reversed VAT.
+Also note that VAT free differs from the 0%% VAT rate below. This difference mainly concerns the right to deduct VAT paid on your purchases.',
 
         // Invoice status overview: shorter labels due to available space.
         'vat_type' => 'Type',

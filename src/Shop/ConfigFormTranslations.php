@@ -25,9 +25,6 @@ class ConfigFormTranslations extends TranslationCollection
         'button_link' => '<a href="%2$s">%1$s</a>',
         'button_cancel' => 'Terug',
 
-        'message_validate_email_2' => 'Het veld (fictieve klant) E-mail bevat geen geldig e-mailadres, vul een correct e-mailadres in.',
-        'message_validate_conflicting_options' => 'Als u geen klantgegevens naar Acumulus verstuurt, kunt u Acumulus geen PDF factuur laten versturen. Pas één van beide opties aan.',
-
         'message_form_config_success' => 'De instellingen zijn opgeslagen.',
         'message_form_config_error' => 'Er is een fout opgetreden bij het opslaan van de instellingen',
 
@@ -69,23 +66,19 @@ class ConfigFormTranslations extends TranslationCollection
 
         'message_validate_contractcode_0' => 'Het veld Contractcode is verplicht, vul de contractcode in die u ook gebruikt om in te loggen op Acumulus.',
         'message_validate_contractcode_1' => 'Het veld Contractcode is een numeriek veld, vul de contractcode in die u ook gebruikt om in te loggen op Acumulus.',
-        'message_validate_username_0' => 'Het veld Gebruikersnaam is verplicht, vul de gebruikersnaam in die u ook gebruikt om in te loggen op Acumulus.',
+        'message_validate_username_0' => 'Het veld Gebruikersnaam is verplicht, vul een gebruikersnaam in waarmee u kan inloggen op de API van Acumulus.',
         'message_validate_username_1' => 'Het veld Gebruikersnaam bevat spaties aan het begin of eind. Dit is toegestaan, maar weet u zeker dat dit de bedoeling is?',
         'message_validate_password_0' => 'Het veld Wachtwoord is verplicht, vul het wachtwoord in dat u ook gebruikt om in te loggen op Acumulus.',
         'message_validate_password_1' => 'Het veld Wachtwoord bevat spaties aan het begin of eind. Dit is toegestaan, maar weet u zeker dat dit de bedoeling is?',
         'message_validate_password_2' => 'Het veld Wachtwoord bevat tekens die Acumulus verbiedt (`\'"#%&;<>\\). Weet u zeker dat u het juiste wachtwoord heeft ingetypt?',
         'message_validate_email_0' => 'Het veld E-mail bevat geen geldig e-mailadres, vul uw eigen e-mailadres in.',
         'message_validate_email_1' => 'Het veld E-mail is verplicht, vul uw eigen e-mailadres in.',
-        'message_validate_nature_0' => 'Het veld \'Soort: wat verkoopt u?\' is verplicht, kies een waarde.',
-        'message_validate_foreign_vat_0' => 'Het veld \'Verkoopt u producten of diensten waarbij u EU btw moet hanteren?\' is verplicht, kies een waarde.',
-        'message_validate_vat_free_products_0' => 'Het veld \'Verkoopt u van btw vrijgestelde producten of diensten?\' is verplicht, kies een waarde.',
-        'message_validate_vat_free_products_1' => 'Als u \'Alleen producten of diensten verkoopt die van btw vrijgesteld zijn\' kunt u niet (ook) \'producten of diensten verkopen waarbij u EU btw moet hanteren\'. Pas één van deze opties aan.',
-        'message_validate_margin_products_0' => 'Het veld \'Verkoopt u margegoederen?\' is verplicht, kies een waarde.',
-        'message_validate_foreign_vat_classes_0' => 'Het veld \'%1$s\' moet één of meer %2$s bevatten als u (ook) \'producten of diensten verkoopt waarbij u EU btw moet hanteren\'.',
-        'message_validate_zero_vat_class_0' => 'Het veld \'%1$s\' moet een keuze bevatten als u (ook) \'producten en/of diensten verkoopt die onder het 0%%-tarief vallen\'.',
-        'message_validate_zero_vat_class_1' => 'U moet verschllende %1$s gebruiken om onderscheid te maken tussen producten of diensten aan 0%% btw en die zijn vrijgesteld van btw.',
-        'message_validate_conflicting_shop_options_2' => 'Als u alleen diensten verkoopt, kunt u geen margegoederen verkopen. Pas één van deze opties aan.',
-        'message_validate_conflicting_shop_options_3' => 'Als u alleen margegoederen verkoopt, vink dan bij "Soort" aan dat u alleen producten verkoopt.',
+        'message_validate_required_field' => 'Het veld "%1$s" is verplicht, kies een waarde.',
+        'message_validate_foreign_vat_classes_0' => 'Het veld "%1$s" is verplicht, kies één of meer waardes.',
+        'message_validate_foreign_vat_classes_1' => 'De keuze "%2$s" voor het veld "%1$s" kan niet gecombineerd worden met andere waardes.',
+        'message_validate_zero_vat_class_0' => 'U moet verschillende %1$s gebruiken om onderscheid te maken tussen producten of diensten aan 0%% btw en die zijn vrijgesteld van btw.',
+        'message_validate_conflicting_shop_options_1' => 'Als u alleen diensten verkoopt, kunt u geen margegoederen verkopen. Pas één van deze opties aan.',
+        'message_validate_conflicting_shop_options_2' => 'Als u alleen margegoederen verkoopt, vink dan bij "Soort" aan dat u alleen producten verkoopt.',
 
         // Shop settings.
         'shopSettingsHeader' => 'Over uw winkel',
@@ -97,55 +90,35 @@ class ConfigFormTranslations extends TranslationCollection
         'option_nature_3' => 'Alleen diensten.',
         'desc_nature_shop' => 'Geef aan of u in uw winkel producten en/of diensten aanbiedt. In Acumulus is dit het veld "Soort". LET OP: deze instelling betreft alleen de artikelen in uw catalogus, niet verzend, handling, verpakkings, of betaalkosten.',
 
-        'field_foreignVat' => 'Verkoopt u producten en/of diensten waarbij u EU btw moet hanteren?',
-        'option_foreignVat_1' => 'Zowel producten en/of diensten die onder Nederlandse btw vallen als die waarbij u het btw tarief van het EU land waaraan u levert moet hanteren.',
-        'option_foreignVat_2' => 'Alleen producten en/of diensten die onder Nederlandse btw vallen.',
-        'option_foreignVat_3' => 'Alleen producten en/of diensten waarbij u het btw tarief van het EU land waaraan u levert moet hanteren.',
-        'desc_foreignVat' => 'Geef aan of u in uw winkel goederen en/of diensten aanbiedt waarbij u voor EU klanten het btw tarief van het land waaraan u levert moet hanteren.
-Dit kunnen bv. <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/btw_berekenen_bij_diensten/wijziging_in_digitale_diensten_vanaf_2015/wijziging_in_digitale_diensten_vanaf_2015" target="_blank">digitale diensten</a>
-of <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/export_van_specifieke_goederen_en_in_bijzondere_situaties/export_van_accijnsgoederen/export_accijnsgoederen_naar_eu_landen" target="_blank">accijnsgoederen</a> zijn.
-Zie <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/export_van_specifieke_goederen_en_in_bijzondere_situaties/export_van_specifieke_goederen_en_in_bijzondere_situaties" target="_blank">Belastingdienst: Export van specifieke goederen en bijzondere situaties</a>.
-Let op: vanaf 2019 geldt er een <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/btw_berekenen_bij_diensten/wijziging_in_digitale_diensten_vanaf_2015/wijziging_in_digitale_diensten_vanaf_2015" target="_blank">drempelbedrag voor digitale diensten</a>.
-Als u daaronder blijft mag u gewoon Nederlandse btw berekenen, maar let op: dit dient u in de webshop in te stellen, Acumulus volgt de btw-bedragen en tarieven die de winkel heeft gehanteerd en zal dit zelf niet gaan wijzigen.',
-
-        'vat_class' => 'belastingklasse',
-        'vat_classes' => 'belastingklasses',
-        'field_foreignVatClasses' => 'Welke %1$s definiëren EU btw tarieven?',
-        'desc_foreignVatClasses' => 'Geef aan welke van deze %1$s gebruikt worden bij producten of diensten waarbij u buitenlandse btw moet hanteren voor EU klanten.
-Deze instelling hoeft u alleen in te vullen als u hierboven hebt aangegeven dat u niet "Alleen producten en/of diensten die onder Nederlandse btw vallen" verkoopt.
-Mbv de "Ctrl" toets kunt u meerdere statussen kiezen of keuzes ongedaan maken.',
-
-        'field_vatFreeProducts' => 'Verkoopt u van btw vrijgestelde producten en/of diensten?',
-        'option_vatFreeProducts_1' => 'Zowel btw vrije als aan btw onderhevige producten en/of diensten.',
-        'option_vatFreeProducts_2' => 'Alleen aan btw onderhevige producten en/of diensten.',
-        'option_vatFreeProducts_3' => 'Alleen producten en/of diensten die van btw vrijgesteld zijn.',
-        'desc_vatFreeProducts' => 'Geef aan of u in uw winkel producten en/of diensten aanbiedt die vrijgesteld zijn van btw, bv. onderwijs.
-LET OP: het gaat er om of het product of de dienst btw-vrij is, of omdat uw bedrijf voor de <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/hoe_werkt_de_btw/nieuwe-kleineondernemersregeling/kleineondernemersregeling" target="_blank"">KOR regeling</a> heeft gekozen, eem btw vrijstelling heeft, niet of u voor specifieke situaties een factuur zonder btw opstelt.
-Ook is er een verschil met het 0%-tarief hieronder, Dit verschil zit hem met name in de mogelijkheid tot aftrek van voorbelasting.',
-
-        'field_vatFreeClass' => 'Welke %1$s definieert btw-vrij?',
-        'desc_vatFreeClass' => 'Geef aan welke %1$s u gebruikt om aan te geven dat een product of dienst btw-vrij is.
-Kies de eerste optie als u bij uw btw-vrije producten en diensten het veld %1$s leeg heeft gelaten.
-Deze instelling hoeft u alleen in te vullen als u hierboven hebt aangegeven dat u niet "Alleen aan btw onderhevige producten en/of diensten." verkoopt.',
-        'vat_class_left_empty' => '%1$s laat ik leeg',
-
-        'field_zeroVatProducts' => 'Verkoopt u producten en/of diensten die onder het 0%-tarief vallen?',
-        'option_zeroVatProducts_1' => 'Zowel producten en/of diensten die onder het 0%-tarief vallen als die onder het normale of verlaagde tarief vallen.',
-        'option_zeroVatProducts_2' => 'Alleen producten en/of diensten die onder het normale of verlaagde tarief vallen.',
-        'option_zeroVatProducts_3' => 'Alleen producten en/of diensten die onder het 0%-tarief vallen.',
-        'desc_zeroVatProducts' => 'LET OP: het 0%-tarief is wat anders dan het btw-vrije tarief van hierboven en is in Nederland niet gebruikelijk.
-Momenteel (begin 2021) geldt er b.v. een uitzondering voor mondkapjes.
-LET OP 2: het gaat er om of het product of de dienst onder het 0%-tarief valt, niet of u 0% btw op een factuur mag noteren vanwege b.v. verkoop aan het buitenland of een factuur met verlegde btw.',
-
-        'field_zeroVatClass' => 'Welke %1$s definieert het 0%% btw-tarief?',
-        'desc_zeroVatClass' => 'Geef aan welke %1$s u gebruikt om aan te geven dat een product of dienst onder het 0%%-tarief valt.
-Deze instelling hoeft u alleen in te vullen als u hierboven hebt aangegeven dat u niet "Alleen producten en/of diensten die onder het normale of verlaagde tarief vallen." verkoopt.',
-
         'field_marginProducts' => 'Verkoopt u margegoederen?',
         'option_marginProducts_1' => 'Zowel nieuwe producten en/of diensten als margegoederen.',
         'option_marginProducts_2' => 'Alleen nieuwe producten en/of diensten.',
         'option_marginProducts_3' => 'Alleen margegoederen.',
         'desc_marginProducts' => 'Geef aan of u in uw winkel margegoederen (bv. 2e-hands producten) verkoopt. Zie <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/bijzondere_regelingen/margeregeling/margeregeling" target="_blank">Margeregeling</a>.',
+
+        'vat_class' => 'belastingklasse',
+        'vat_classes' => 'belastingklasses',
+        'vat_class_not_applicable' => 'niet van toepassing',
+        'vat_class_left_empty' => '%1$s laat ik leeg',
+
+        'field_foreignVatClasses' => 'Welke %1$s definiëren EU btw tarieven?',
+        'desc_foreignVatClasses' => 'Geef aan welke van deze %1$s gebruikt worden wanneer u buitenlandse btw berekent voor (niet btw-plichtige) EU klanten.<br>
+Kies de 1e optie ("%2$s") als u uw winkel (nog) niet hebt ingericht op deze regeling.<br>
+Mbv de "Ctrl" toets kunt u meerdere statussen kiezen of keuzes ongedaan maken.<br>
+NB: Sinds 1 juli 2021 gelden er <a href="https://www.belastingdienst.nl/wps/wcm/connect/nl/btw/content/e-commerce-en-diensten-in-de-eu-kijk-wat-er-verandert-voor-de-btw-x" target="_blank">nieuwe regels en drempels voor afstandsverkopen binnen de EU</a> en vallen bijna alle goederen (en diensten) hieronder.',
+
+        'field_vatFreeClass' => 'Welke %1$s definieert btw-vrij?',
+        'desc_vatFreeClass' => 'Geef aan welke %1$s u gebruikt om aan te geven dat een product of dienst btw-vrij is.<br>
+Kies de 1e optie ("%2$s") als u geen btw-vrije producten of diensten aanbiedt.<br>
+Kies de 2e optie ("%3$s") als u bij uw btw-vrije producten en diensten het veld %1$s leeg laat.<br>
+LET OP: het gaat er om of het product of de dienst btw-vrij is, uw bedrijf voor de <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/hoe_werkt_de_btw/nieuwe-kleineondernemersregeling/kleineondernemersregeling" target="_blank"">KOR regeling</a> heeft gekozen, of een btw vrijstelling heeft. Niet of u voor specifieke situaties een factuur zonder btw opstelt.
+Ook is er een verschil met het 0%%-tarief hieronder, Dit verschil zit hem met name in de mogelijkheid tot aftrek van voorbelasting.',
+
+        'field_zeroVatClass' => 'Welke %1$s definieert het 0%% btw-tarief?',
+        'desc_zeroVatClass' => 'Geef aan welke %1$s u gebruikt om aan te geven dat een product of dienst onder het 0%%-tarief valt.<br>
+Kies de 1e optie ("%2$s") als u geen producten of diensten aan aanbiedt die onder het 0%%-tarief vallen.<br>
+LET OP 1: het 0%%-tarief is wat anders dan het btw-vrije tarief van hierboven en is in Nederland niet gebruikelijk. Momenteel (begin 2021) geldt er b.v. een uitzondering voor mondkapjes.<br>
+LET OP 2: het gaat er om of het product of de dienst onder het 0%%-tarief valt, niet of u 0%% btw op een factuur mag noteren vanwege b.v. verkoop aan het buitenland of een factuur met verlegde btw.',
 
         // Trigger settings.
         'triggerSettingsHeader' => 'Wanneer wilt u uw facturen automatisch naar Acumulus laten versturen',
@@ -362,6 +335,7 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'field_emailAsPdf' => 'Optie inschakelen',
         'option_emailAsPdf' => 'Verstuur de factuur als PDF vanuit Acumulus.',
         'desc_emailAsPdf' => 'Als u deze optie aanvinkt, kunt u de overige opties gebruiken om de emailverzending aan uw wensen aan te passen. Het bericht in de email body kunt u niet hier instellen, dat kunt u in Acumulus doen onder "Beheer - Factuur-sjablonen".',
+        'message_validate_conflicting_options' => 'Als u geen klantgegevens naar Acumulus verstuurt, kunt u Acumulus geen PDF factuur laten versturen. Pas één van beide opties aan.',
 
         'field_emailTo' => 'Aan',
         'desc_emailTo' => 'Het email adres waar naartoe de factur verstuurd moet worden. Als u dit leeg laat wordt het emailadres uit de klantgegevens van de factuur gebruikt. Wij adviseren dit veld leeg te laten. U mag meerdere email adressen invullen, gescheiden door een komma (,) of een punt-komma (;).',
@@ -426,9 +400,6 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'button_submit_advanced'=> 'Save settings',
         'button_cancel' => 'Back',
 
-        'message_validate_email_2' => 'The field (fictitious customer) E-mail is not a valid e-mail address, please fill in a correct e-mail address.',
-        'message_validate_conflicting_options' => 'If you don\'t send customer data to Acumulus, Acumulus cannot send PDF invoices. Change one of the options.',
-
         'message_form_config_success' => 'The settings are saved.',
         'message_form_config_error' => 'an error occurred wile saving the settings.',
 
@@ -467,6 +438,7 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'field_password' => 'Password',
         'field_emailonerror' => 'E-mail',
         'desc_emailonerror' => 'The e-mail address at which you will be informed about any errors that occur during invoice sending. As this module cannot know if it is called from an interactive administrator screen, it will not display any messages in the user interface. Therefore you have to fill in an e-mail address.',
+
         'message_validate_contractcode_0' => 'The field Contract code is required, please fill in the contract code you use to log in to Acumulus.',
         'message_validate_contractcode_1' => 'The field Contract code is a numeric field, please fill in the contract code you use to log in to Acumulus.',
         'message_validate_username_0' => 'The field User name is required, please fill in the user name you use to log in to Acumulus.',
@@ -476,16 +448,12 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'message_validate_password_2' => 'The field Password contains a character that is forbidden by Acumulus (`\'"#%&;<>\\). Are you sure that you typed the correct password?',
         'message_validate_email_0' => 'The field E-mail is not a valid e-mail address, please fill in your own e-mail address.',
         'message_validate_email_1' => 'The field E-mail is required, please fill in your own e-mail address.',
-        'message_validate_nature_0' => 'The field \'Nature: what do you sell?\' is required, select a value.',
-        'message_validate_foreign_vat_0' => 'The field \'Do you sell products or services that are subject to foreign VAT for EU customers?\' is required, select a value.',
-        'message_validate_vat_free_products_0' => 'The field \'Do you sell VAT free products or services?\' is required, select a value.',
-        'message_validate_vat_free_products_1' => 'If you sell \'Only VAT free products or services\' you cannot (also) sell \'products or services that are subject to foreign VAT for EU customers\'. Change one of these options.',
-        'message_validate_margin_products_0' => 'The field \'Do you sell products using the margin scheme?\' is required, select a value.',
-        'message_validate_foreign_vat_classes_0' => 'The field \'%1$s\' must contain 1 or more %2$s if you (also) \'sell products or services that are subject to foreign VAT for EU customers\'.',
-        'message_validate_zero_vat_class_0' => 'The field \'%1$s\' must be set if you (also) \'sell products or services that are subject to the 0%% VAT rate\'.',
-        'message_validate_zero_vat_class_1' => 'You must use different %1$s to distinguish between products or services subject to the 0%% VAT rate and those that are VAT free.',
-        'message_validate_conflicting_shop_options_2' => 'If you only sell services, you cannot sell using the margin scheme. Change one of these options.',
-        'message_validate_conflicting_shop_options_3' => 'If you only sell using the margin scheme, you should select that you only sell goods on the "Nature" field.',
+        'message_validate_required_field' => 'the field "%1$s" is required, please select a value.',
+        'message_validate_foreign_vat_classes_0' => 'The field \'%1$s\' is required, please select one or more values.',
+        'message_validate_foreign_vat_classes_1' => 'The choice "%2$s" for the field "%1$s" cannot be combined with other values.',
+        'message_validate_zero_vat_class_0' => 'You must use different %1$s to distinguish between products or services subject to the 0%% VAT rate and those that are VAT free.',
+        'message_validate_conflicting_shop_options_1' => 'If you only sell services, you cannot sell using the margin scheme. Change one of these options.',
+        'message_validate_conflicting_shop_options_2' => 'If you only sell using the margin scheme, you should select that you only sell goods on the "Nature" field.',
 
         // Shop settings.
         'shopSettingsHeader' => 'About your shop',
@@ -497,55 +465,35 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'option_nature_3' => 'Only services.',
         'desc_nature_shop' => 'Select whether you sell products and/or services. In Acumulus this is the field "Nature" ("Soort"). NOTE: this settings only concerns the items in your "catalog", not shipping, handling, packing, or payment fees.',
 
-        'field_foreignVat' => 'Do you sell products or services that are subject to foreign VAT for EU customers?',
-        'option_foreignVat_1' => 'Products or services that are subject to Dutch VAT and those that are subject to foreign VAT for EU customers.',
-        'option_foreignVat_2' => 'Only products or services that are subject to Dutch VAT.',
-        'option_foreignVat_3' => 'Only products or services that are subject to foreign VAT for EU customers.',
-        'desc_foreignVat' => 'Indicate if you sell products or services where yo have to apply foreign VAT rates for EU customers.
-These can be, a.o, <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/btw_berekenen_bij_diensten/wijziging_in_digitale_diensten_vanaf_2015/wijziging_in_digitale_diensten_vanaf_2015" target="_blank">digital services</a>
-or <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/export_van_specifieke_goederen_en_in_bijzondere_situaties/export_van_accijnsgoederen/export_accijnsgoederen_naar_eu_landen" target="_blank">excise goods</a>.
-See <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/export_van_specifieke_goederen_en_in_bijzondere_situaties/export_van_specifieke_goederen_en_in_bijzondere_situaties" target="_blank">Tax office: Export of specific goods and special cases</a>.
-Note: as of 2019 there is a <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/btw_berekenen_bij_diensten/wijziging_in_digitale_diensten_vanaf_2015/wijziging_in_digitale_diensten_vanaf_2015" target="_blank">threshold for digital services</a>.
-If you remain under that threshold you may apply Dutch VAT. However, please note that you have to configure this in your webshop. Acumulus follows the vat amounts and tariffs as used by the shop and won\'t change this on its own.',
-
-        'vat_class' => 'tax class',
-        'vat_classes' => 'tax classes',
-        'field_foreignVatClasses' => 'Which %1$s define EU vat rates?',
-        'desc_foreignVatClasses' => 'Indicate which of these %1$s are used for products or services that are subject to foreign VAT for EU customers.
- Using the "Ctrl" key, you can select/deselect multiple items.
- Except for the above mentioned digital services this may also apply with <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/zakendoen_met_het_buitenland/goederen_en_diensten_naar_andere_eu_landen/export_van_specifieke_goederen_en_in_bijzondere_situaties/export_van_specifieke_goederen_en_in_bijzondere_situaties" target="_blank">Export of specific products or special cases (in Dutch)</a>.',
-
-        'field_vatFreeProducts' => 'Do you sell VAT free products or services?',
-        'option_vatFreeProducts_1' => 'Both VAT free and VAT liable products or services.',
-        'option_vatFreeProducts_2' => 'Only products or services that are VAT liable.',
-        'option_vatFreeProducts_3' => 'Only VAT free products or services.',
-        'desc_vatFreeProducts' => 'Indicate whether your store offers products or services that are VAT free, e.g. education.
-NOTE: this setting concerns whether the products or services you offer are inherently VAT free, or because your company has chosen to use the <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/hoe_werkt_de_btw/nieuwe-kleineondernemersregeling/kleineondernemersregeling" target="_blank"">KOR regulations</a> (in Dutch), not whether you create an invoice with no or reversed VAT.
-Also note that vat free differs from the 0% vat rate below. This difference mainly concerns the right to deduct vat paid on your purchases.',
-
-        'field_vatFreeClass' => 'Which %1$s defines VAT free?',
-        'desc_vatFreeClass' => 'Indicate which %1$s you use to indicate that a product or service is VAT free.
-Choose the first option if you do not select a %1$s at all for vat free products or services.
-You only have to fill in this setting if above you did not select the option that you sell "Only products or services that are VAT liable."',
-        'vat_class_left_empty' => 'I leave the %1$s empty',
-
-        'field_zeroVatProducts' => 'do yo sell products or services that are subject to the 0% vat rate?',
-        'option_zeroVatProducts_1' => 'Both products or services that are subject to the normal or reduced vat rate as to the 0% vat-rate.',
-        'option_zeroVatProducts_2' => 'Only products or services that are subject to the normal or reduced vat rate.',
-        'option_zeroVatProducts_3' => 'Only products or services that are subject to the 0% vat rate.',
-        'desc_zeroVatProducts' => 'NOTE: The 0% vat rate differs from vat free as above en is not common in the Netherlands.
-E.g, currently (early 2021), masks fall under the 0% vat rate.
-NOTE 2: this setting concerns whether the products or services you offer are inherently subject to the 0% vat rate, not if you make no vat (e.g. sometimes when selling abroad) or reversed vat invoices.',
-
-        'field_zeroVatClass' => 'Which %1$s defines the 0%% vat rate?',
-        'desc_zeroVatClass' => 'Indicate which %1$s you use to indicate that a product or service is subject to the 0%% vat rate.
-You only have to fill in this setting if above you did not select the option that you sell "Only products or services that are subject to the normal or reduced vat rate."',
-
         'field_marginProducts' => 'Do you sell products using the margin scheme?',
         'option_marginProducts_1' => 'New products and/or services as well as products that use the margin scheme.',
         'option_marginProducts_2' => 'Only new products and/or services.',
         'option_marginProducts_3' => 'Only products that use the margin scheme.',
         'desc_marginProducts' => 'Select whether your store sells (2nd hand) products using the margin scheme. See <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/bijzondere_regelingen/margeregeling/margeregeling" target="_blank">Dutch tax office: margin goods (in Dutch)</a>.',
+
+        'vat_class' => 'tax class',
+        'vat_classes' => 'tax classes',
+        'vat_class_not_applicable' => 'not applicable',
+        'vat_class_left_empty' => 'I leave the %1$s empty',
+
+        'field_foreignVatClasses' => 'Which %1$s define EU vat rates?',
+        'desc_foreignVatClasses' => 'Indicate which of these %1$s are used when you charge foreign VAT to (non vat subjected) EU customers.
+Select the 1st option ("%2$s") when you have not (yet) configured your shop to use foreign vat.<br>
+Using the "Ctrl" key, you can select/deselect multiple items.<br>
+NB: As of 1 july 2021 <a href="https://www.belastingdienst.nl/wps/wcm/connect/nl/btw/content/e-commerce-en-diensten-in-de-eu-kijk-wat-er-verandert-voor-de-btw-x" target="_blank">new rules and thresholds for E-commerce sales within the EU (in Dutch)</a> apply to almost all goods (and services).',
+
+        'field_vatFreeClass' => 'Which %1$s defines VAT free?',
+        'desc_vatFreeClass' => 'Indicate which %1$s you use to indicate that a product or service is VAT free.<br>
+Select the 1st option ("%2$s") if you do not sell VAT free goods or services.<br>
+Select the 2nd option ("%3$s") if you leave the field %1$s empty on VAT free products.<br>
+NOTE: this setting concerns whether the goods or services you offer are inherently VAT free, or because your company has chosen to use the <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/hoe_werkt_de_btw/nieuwe-kleineondernemersregeling/kleineondernemersregeling" target="_blank"">KOR regulations (in Dutch)</a>, or is for some other reason not VAT liable. Not whether you create an invoice with no or reversed VAT.
+Also note that VAT free differs from the 0%% VAT rate below. This difference mainly concerns the right to deduct VAT paid on your purchases.',
+
+        'field_zeroVatClass' => 'Which %1$s defines the 0%% vat rate?',
+        'desc_zeroVatClass' => 'Indicate which %1$s you use to indicate that a product or service is subject to the 0%% vat rate.<br>
+Select the 1st option ("%2$s") if you do not sell goods or services at the 0%% rate.<br>
+NOTE 1: the 0%% rate differs from vat free as above and is not common in the Netherlands. E.g, currently (early 2021), masks fall under the 0% vat rate.<br>
+NOTE 2: this setting concerns whether the products or services you offer are inherently subject to the 0% vat rate, not if you make invoices without vat (e.g. sometimes when selling abroad) or reversed vat.',
 
         // Trigger settings.
         'triggerSettingsHeader' => 'When to have your invoices sent to Acumulus.',
@@ -760,6 +708,7 @@ If you unchecked the first option, the second option only applies to business cl
         'field_emailAsPdf' => 'Enable the feature',
         'option_emailAsPdf' => 'Have Acumulus send the invoice as PDF.',
         'desc_emailAsPdf' => 'If you check this option, you can use the other options below to configure the emails to your preferences. However, to configure the text in the mail body, go to Acumulus to "Settings » Invoice templates".',
+        'message_validate_conflicting_options' => 'If you don\'t send customer data to Acumulus, Acumulus cannot send PDF invoices. Change one of the options.',
 
         'field_emailTo' => 'To',
         'desc_emailTo' => 'The email address to send the invoice to. If you leave this empty the email address from the invoice\'s customer data will be used. We recommend you to leave this empty. You may enter multiple email addresses separated by a comma (,) or a semi-colon (;).',

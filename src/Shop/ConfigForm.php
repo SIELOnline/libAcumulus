@@ -88,67 +88,61 @@ class ConfigForm extends BaseConfigForm
 
         // Check that required fields are filled.
         if (!isset($this->submittedValues['nature_shop'])) {
-            $this->addMessage($this->t('message_validate_nature_0'), Severity::Error, 'nature_shop');
-        }
-        if (!isset($this->submittedValues['foreignVat'])) {
-            $this->addMessage($this->t('message_validate_foreign_vat_0'), Severity::Error, 'foreignVat');
-        }
-        if (!isset($this->submittedValues['vatFreeProducts'])) {
-            $this->addMessage($this->t('message_validate_vat_free_products_0'), Severity::Error, 'vatFreeProducts');
+            $message = sprintf($this->t('message_validate_required_field'), $this->t('field_nature_shop'));
+            $this->addMessage($message, Severity::Error, 'nature_shop');
         }
         if (!isset($this->submittedValues['marginProducts'])) {
-            $this->addMessage($this->t('message_validate_margin_products_0'), Severity::Error, 'marginProducts');
+            $message = sprintf($this->t('message_validate_required_field'), $this->t('field_marginProducts'));
+            $this->addMessage($message, Severity::Error, 'marginProducts');
         }
-
-        // Check the foreignVat and foreignVatClasses settings.
-        if (isset($this->submittedValues['foreignVat']) && $this->submittedValues['foreignVat'] != Config::ForeignVat_No) {
-            if (empty($this->submittedValues['foreignVatClasses'])) {
-                $this->addMessage(sprintf($this->t('message_validate_foreign_vat_classes_0'), sprintf($this->t('field_foreignVatClasses'), $this->t('vat_classes')), $this->t('vat_classes')),
-                    Severity::Error, 'foreignVatClasses');
+        if (empty($this->submittedValues['foreignVatClasses'])) {
+            $field = sprintf($this->t('field_foreignVatClasses'), $this->t('vat_classes'));
+            $message = sprintf($this->t('message_validate_foreign_vat_classes_0'), $field);
+            $this->addMessage($message, Severity::Error, 'foreignVatClasses');
+        } else {
+            // Check that Not applicable is not selected with other classes for foreign vat classes
+            if (count($this->submittedValues['foreignVatClasses']) >= 2 && in_array(Config::VatClass_NotApplicable, $this->submittedValues['foreignVatClasses'])) {
+                $field = sprintf($this->t('field_foreignVatClasses'), $this->t('vat_classes'));
+                $message = sprintf($this->t('message_validate_foreign_vat_classes_1'), $field, $this->t('vat_class_not_applicable'));
+                $this->addMessage($message, Severity::Error, 'foreignVatClasses');
             }
         }
 
-        // Check the foreignVat and vatFreeProducts settings.
-        if (isset($this->submittedValues['foreignVat']) && $this->submittedValues['foreignVat'] != Config::ForeignVat_No) {
-            if (isset($this->submittedValues['vatFreeProducts']) && $this->submittedValues['vatFreeProducts'] == Config::VatFreeProducts_Only) {
-                $this->addMessage($this->t('message_validate_vat_free_products_1'), Severity::Error, 'foreignVatClasses');
-            }
+        if (empty($this->submittedValues['vatFreeClass'])) {
+            $field = sprintf($this->t('field_vatFreeClass'), $this->t('vat_class'));
+            $message = sprintf($this->t('message_validate_required_field'), $field);
+            $this->addMessage($message, Severity::Error, 'vatFreeClass');
+        }
+        if (empty($this->submittedValues['zeroVatClass'])) {
+            $field = sprintf($this->t('field_zeroVatClass'), $this->t('vat_class'));
+            $message = sprintf($this->t('message_validate_required_field'), $field);
+            $this->addMessage($message, Severity::Error, 'zeroVatClass');
         }
 
-        // Check the zeroVatProducts and zeroVatClass settings.
-        if (isset($this->submittedValues['zeroVatProducts']) && $this->submittedValues['zeroVatProducts'] != Config::ZeroVatProducts_No) {
-            if (empty($this->submittedValues['zeroVatClass'])) {
-                $this->addMessage(sprintf($this->t('message_validate_zero_vat_class_0'), sprintf($this->t('field_zeroVatClass'), $this->t('vat_class'))),
+        // Check that vatFreeClass and zeroVatClass do not point to the same (real) vat class.
+        if (!empty($this->submittedValues['vatFreeClass']) && !empty($this->submittedValues['zeroVatClass'])) {
+            if (
+                $this->submittedValues['zeroVatClass'] != Config::VatClass_NotApplicable
+                && $this->submittedValues['vatFreeClass'] == $this->submittedValues['zeroVatClass']
+            ) {
+                $this->addMessage(sprintf($this->t('message_validate_zero_vat_class_0'), $this->t('vat_classes')),
                     Severity::Error, 'zeroVatClass');
-            }
-        }
-
-        // Check the vatFreeProducts and zeroVatProducts settings.
-        if (isset($this->submittedValues['vatFreeProducts']) && $this->submittedValues['vatFreeProducts'] != Config::VatFreeProducts_No) {
-            if (isset($this->submittedValues['zeroVatProducts']) && $this->submittedValues['zeroVatProducts'] != Config::ZeroVatProducts_No) {
-                if (isset($this->submittedValues['vatFreeClass']) && isset($this->submittedValues['zeroVatClass'])) {
-                    if ($this->submittedValues['vatFreeClass'] == $this->submittedValues['zeroVatClass']) {
-                        $this->addMessage(sprintf($this->t('message_validate_zero_vat_class_1'), $this->t('vat_classes')),
-                            Severity::Error, 'zeroVatClass');
-                    }
-                }
             }
         }
 
         // Check the marginProducts setting in combination with other settings.
         // NOTE: it is debatable whether margin articles can be services, e.g.
-        // selling 2nd hand software licenses. However it is not debatable that
-        // margin goods can never be digital services. So the 1st validation is
-        // debatable and my be removed in the future, the 2nd isn't.
+        // selling 2nd hand software licenses. So the validations may be removed
+        // in the future.
         if (isset($this->submittedValues['nature_shop']) && isset($this->submittedValues['marginProducts'])) {
             // If we only sell articles with nature Services, we cannot (also)
             // sell margin goods.
             if ($this->submittedValues['nature_shop'] == Config::Nature_Services && $this->submittedValues['marginProducts'] != Config::MarginProducts_No) {
-                $this->addMessage($this->t('message_validate_conflicting_shop_options_2'), Severity::Error, 'nature_shop');
+                $this->addMessage($this->t('message_validate_conflicting_shop_options_1'), Severity::Error, 'nature_shop');
             }
             // If we only sell margin goods, the nature of all we sell is Products.
             if ($this->submittedValues['marginProducts'] == Config::MarginProducts_Only && $this->submittedValues['nature_shop'] != Config::Nature_Products) {
-                $this->addMessage($this->t('message_validate_conflicting_shop_options_3'), Severity::Error, 'nature_shop');
+                $this->addMessage($this->t('message_validate_conflicting_shop_options_2'), Severity::Error, 'nature_shop');
             }
         }
     }
@@ -168,26 +162,10 @@ class ConfigForm extends BaseConfigForm
         $accountStatus = $this->emptyCredentials() ? null : empty($message);
 
         //  Acumulus account settings.
-        $desc2 = '';
-        if ($accountStatus === null) {
-            $desc = 'desc_accountSettings_N';
-        } elseif ($accountStatus === true) {
-            $desc = 'desc_accountSettings_T';
-        } else {
-            $desc = 'desc_accountSettings_F';
-            if ($message === 'message_error_auth') {
-                $desc2 = 'desc_accountSettings_auth';
-            }
-        }
-        // 'desc_accountSettings_T' uses plugin/module/extension in its message.
-        $desc = sprintf($this->t($desc), $this->t('module'));
-        if (!empty($desc2)) {
-            $desc .= ' ' . sprintf($this->t($desc2), $this->shopCapabilities->getLink('register'));
-        }
         $fields['accountSettings'] = [
             'type' => 'fieldset',
             'legend' => $this->t('accountSettingsHeader'),
-            'fields' => $this->getAccountFields($accountStatus, $desc),
+            'fields' => $this->getAccountFields($accountStatus, $message),
         ];
 
         if ($accountStatus === false) {
@@ -276,13 +254,34 @@ class ConfigForm extends BaseConfigForm
      * - emailonerror
      *
      * @param bool|null $accountStatus
-     * @param string $description
+     *   null: no account settings filled in yet.
+     *   true: account settings OK.
+     *   false: authentication error using the given account settings.
+     * @param string $message
+     *   The message code, only filled when $accountStatus = false.
      *
      * @return array[]
      *   The set of account related fields.
      */
-    protected function getAccountFields($accountStatus, $description)
+    protected function getAccountFields($accountStatus, $message)
     {
+        $desc2 = '';
+        if ($accountStatus === null) {
+            $description = 'desc_accountSettings_N';
+        } elseif ($accountStatus === true) {
+            $description = 'desc_accountSettings_T';
+        } else {
+            $description = 'desc_accountSettings_F';
+            if ($message === 'message_error_auth') {
+                $desc2 = 'desc_accountSettings_auth';
+            }
+        }
+        // 'desc_accountSettings_T' uses plugin/module/extension in its message.
+        $description = sprintf($this->t($description), $this->t('module'));
+        if (!empty($desc2)) {
+            $description .= ' ' . sprintf($this->t($desc2), $this->shopCapabilities->getLink('register'));
+        }
+
         $fields = [];
         if ($accountStatus === null) {
             $fields += $this->getRegisterFields();
@@ -331,14 +330,14 @@ class ConfigForm extends BaseConfigForm
     }
 
     /**
-     * Returns the set of invoice related fields.
+     * Returns the set of shop related fields.
      *
      * The fields returned:
      * - nature_shop
-     * - foreignVat
-     * - foreignVatClasses
-     * - vatFreeProducts
      * - marginProducts
+     * - foreignVatClasses
+     * - vatFreeClass
+     * - zeroVatClass
      *
      * @return array[]
      *   The set of shop related fields.
@@ -357,11 +356,11 @@ class ConfigForm extends BaseConfigForm
                     'required' => true,
                 ],
             ],
-            'foreignVat' => [
+            'marginProducts' => [
                 'type' => 'radio',
-                'label' => $this->t('field_foreignVat'),
-                'description' => $this->t('desc_foreignVat'),
-                'options' => $this->getForeignVatOptions(),
+                'label' => $this->t('field_marginProducts'),
+                'description' => $this->t('desc_marginProducts'),
+                'options' => $this->getMarginProductsOptions(),
                 'attributes' => [
                     'required' => true,
                 ],
@@ -370,56 +369,41 @@ class ConfigForm extends BaseConfigForm
                 'name' => 'foreignVatClasses[]',
                 'type' => 'select',
                 'label' => sprintf($this->t('field_foreignVatClasses'), $this->t('vat_classes')),
-                'description' => sprintf($this->t('desc_foreignVatClasses'), $this->t('vat_classes')),
-                'options' => $vatClasses,
-                'attributes' => [
-                    'multiple' => true,
-                    'size' => min(count($vatClasses), 8),
-                ],
-            ],
-            'vatFreeProducts' => [
-                'type' => 'radio',
-                'label' => $this->t('field_vatFreeProducts'),
-                'description' => $this->t('desc_vatFreeProducts'),
-                'options' => $this->getVatFreeProductsOptions(),
+                'description' => sprintf($this->t('desc_foreignVatClasses'), $this->t('vat_classes'), $this->t('vat_class_not_applicable')),
+                'options' => [
+                                 Config::VatClass_NotApplicable => ucfirst($this->t('vat_class_not_applicable')),
+                             ] + $vatClasses,
                 'attributes' => [
                     'required' => true,
+                    'multiple' => true,
+                    'size' => min(count($vatClasses) + 1, 8),
                 ],
             ],
             'vatFreeClass' => [
                 'type' => 'select',
                 'label' => sprintf($this->t('field_vatFreeClass'), $this->t('vat_class')),
-                'description' => sprintf($this->t('desc_vatFreeClass'), $this->t('vat_class')),
-                'options' => [Config::VatClass_Null => sprintf($this->t('vat_class_left_empty'), $this->t('vat_class'))] + $vatClasses,
-                'attributes' => [
-                    'multiple' => false,
-                ],
-            ],
-            'zeroVatProducts' => [
-                'type' => 'radio',
-                'label' => $this->t('field_zeroVatProducts'),
-                'description' => $this->t('desc_zeroVatProducts'),
-                'options' => $this->getZeroVatProductsOptions(),
+                'description' => sprintf($this->t('desc_vatFreeClass'), $this->t('vat_class'), $this->t('vat_class_not_applicable'), $this->t('vat_class_left_empty')),
+                'options' => [
+                                 0 => $this->t('option_empty'),
+                                 Config::VatClass_NotApplicable => ucfirst($this->t('vat_class_not_applicable')),
+                                 Config::VatClass_Null => ucfirst(sprintf($this->t('vat_class_left_empty'), $this->t('vat_class'))),
+                             ] + $vatClasses,
                 'attributes' => [
                     'required' => true,
+                    'multiple' => false,
                 ],
             ],
             'zeroVatClass' => [
                 'type' => 'select',
                 'label' => sprintf($this->t('field_zeroVatClass'), $this->t('vat_class')),
-                'description' => sprintf($this->t('desc_zeroVatClass'), $this->t('vat_class')),
-                'options' => [0 => $this->t('option_empty')] + $vatClasses,
-                'attributes' => [
-                    'multiple' => false,
-                ],
-            ],
-            'marginProducts' => [
-                'type' => 'radio',
-                'label' => $this->t('field_marginProducts'),
-                'description' => $this->t('desc_marginProducts'),
-                'options' => $this->getMarginProductsOptions(),
+                'description' => sprintf($this->t('desc_zeroVatClass'), $this->t('vat_class'), $this->t('vat_class_not_applicable')),
+                'options' => [
+                                 0 => $this->t('option_empty'),
+                                 Config::VatClass_NotApplicable => ucfirst($this->t('vat_class_not_applicable')),
+                             ] + $vatClasses,
                 'attributes' => [
                     'required' => true,
+                    'multiple' => false,
                 ],
             ],
         ];
@@ -640,54 +624,6 @@ class ConfigForm extends BaseConfigForm
             Config::Nature_Both => $this->t('option_nature_1'),
             Config::Nature_Products => $this->t('option_nature_2'),
             Config::Nature_Services => $this->t('option_nature_3'),
-        ];
-    }
-
-    /**
-     * Returns a list of options for the foreign vat field.
-     *
-     * @return string[]
-     *   An array keyed by the option values and having translated descriptions
-     *   as values.
-     */
-    protected function getForeignVatOptions()
-    {
-        return [
-            Config::ForeignVat_Both => $this->t('option_foreignVat_1'),
-            Config::ForeignVat_No => $this->t('option_foreignVat_2'),
-            Config::ForeignVat_Only => $this->t('option_foreignVat_3'),
-        ];
-    }
-
-    /**
-     * Returns a list of options for the vat free products field.
-     *
-     * @return string[]
-     *   An array keyed by the option values and having translated descriptions
-     *   as values.
-     */
-    protected function getVatFreeProductsOptions()
-    {
-        return [
-            Config::VatFreeProducts_Both => $this->t('option_vatFreeProducts_1'),
-            Config::VatFreeProducts_No => $this->t('option_vatFreeProducts_2'),
-            Config::VatFreeProducts_Only => $this->t('option_vatFreeProducts_3'),
-        ];
-    }
-
-    /**
-     * Returns a list of options for the zero vat products field.
-     *
-     * @return string[]
-     *   An array keyed by the option values and having translated descriptions
-     *   as values.
-     */
-    protected function getZeroVatProductsOptions()
-    {
-        return [
-            Config::ZeroVatProducts_Both => $this->t('option_zeroVatProducts_1'),
-            Config::ZeroVatProducts_No => $this->t('option_zeroVatProducts_2'),
-            Config::ZeroVatProducts_Only => $this->t('option_zeroVatProducts_3'),
         ];
     }
 

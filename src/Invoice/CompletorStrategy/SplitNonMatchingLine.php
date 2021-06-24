@@ -76,7 +76,7 @@ class SplitNonMatchingLine extends CompletorStrategyBase
         $result = count($this->vatBreakdown) === 2;
         if (!$result) {
             $shopSettings = $this->config->getShopSettings();
-            if ($shopSettings['vatFreeProducts'] === Config::VatFreeProducts_No) {
+            if ($shopSettings['vatFreeClass'] === Config::VatClass_NotApplicable) {
                 // If there are only 2 positive vat rates that will do as well.
                 // See note above in class doc.
                 $positiveVatRates = 0;

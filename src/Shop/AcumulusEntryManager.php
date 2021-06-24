@@ -262,7 +262,7 @@ abstract class AcumulusEntryManager
     abstract public function delete(AcumulusEntry $entry);
 
     /**
-     * Installs the datamodel. Called when the module gets installed.
+     * Installs the data model. Called when the module gets installed.
      *
      * @return bool
      *   Success.
@@ -270,7 +270,7 @@ abstract class AcumulusEntryManager
     abstract public function install();
 
     /**
-     * Upgrades the datamodel. Called when the module gets updated.
+     * Upgrades the data model. Called when the module gets updated.
      *
      * @param string $currentVersion
      *   The current version we are updating from.
@@ -278,13 +278,13 @@ abstract class AcumulusEntryManager
      * @return bool
      *   Success.
      */
-    public function upgrade(/** @noinspection PhpUnusedParameterInspection */ $currentVersion)
+    public function upgrade($currentVersion)
     {
         return true;
     }
 
     /**
-     * Uninstalls the datamodel. Called when the module gets uninstalled.
+     * Uninstalls the data model. Called when the module gets uninstalled.
      *
      * @return bool
      *   Success.

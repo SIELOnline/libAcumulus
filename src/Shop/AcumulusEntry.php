@@ -3,10 +3,9 @@ namespace Siel\Acumulus\Shop;
 
 use DateTime;
 use Siel\Acumulus\Api;
-use Siel\Acumulus\Config\Config;
 
 /**
- * Ties webshop orders or credit notes to entries in Acumulus.
+ * Ties web shop orders or credit notes to entries in Acumulus.
  *
  * Acumulus identifies entries by their entry id (boekstuknummer in dutch) or,
  * for a number of API calls, a token. Both the entry id and token are stored
@@ -29,7 +28,7 @@ use Siel\Acumulus\Config\Config;
  * - Concept new style: entryId = concept id AND token = null
  * - Lock record: entryId = const lockEntryId AND token = const lockToken
  *
- * Most webshops also require/expect a single primary key (technical key) but
+ * Most web shops also require/expect a single primary key (technical key) but
  * that is irrelevant for this class.
  *
  * Usages of this information (* = not (yet) implemented):
@@ -43,8 +42,8 @@ use Siel\Acumulus\Config\Config;
  */
 class AcumulusEntry
 {
-    // Access to the fields, differs per webshop as we follow db naming
-    // conventions from the webshop.
+    // Access to the fields, differs per web shop as we follow db naming
+    // conventions from the web shop.
     static protected $keyEntryId = 'entry_id';
     static protected $keyToken = 'token';
     static protected $keySourceType = 'source_type';
@@ -57,7 +56,7 @@ class AcumulusEntry
 
     // Constants to enable some kind of locking and thereby preventing sending
     // invoices twice.
-    static protected $maxLockTimeMs = 40000;
+    static protected $maxLockTimeS = 40;
     const lockEntryId = 1;
     const lockToken = 'Send locked, delete if too old';
     const conceptIdUnknown = 0;
@@ -70,7 +69,7 @@ class AcumulusEntry
     /**
      * @var array|object
      *
-     * The webshop specific data holder for the Acumulus entry.
+     * The web shop specific data holder for the Acumulus entry.
      */
     protected $record;
 
@@ -78,7 +77,7 @@ class AcumulusEntry
      * AcumulusEntryManager constructor.
      *
      * @param array|object $record
-     *   A webshop specific record object or array that holds an Acumulus entry
+     *   A web shop specific record object or array that holds an Acumulus entry
      *   record.
      */
     public function __construct($record)
@@ -292,6 +291,6 @@ class AcumulusEntry
      */
     public function hasLockExpired()
     {
-        return $this->isSendLock() && time() - $this->getCreated()->getTimestamp() > static::$maxLockTimeMs;
+        return $this->isSendLock() && time() - $this->getCreated()->getTimestamp() > static::$maxLockTimeS;
     }
 }

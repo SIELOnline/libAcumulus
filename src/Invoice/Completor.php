@@ -238,6 +238,7 @@ class Completor
         // Completes the invoice with settings or behaviour that might depend on
         // the fact that the invoice lines have been completed.
         $this->removeEmptyShipping();
+        $this->checkEuCommerceThreshold();
 
         // Massages the meta data before sending the invoice.
         $this->processMetaData();
@@ -1251,6 +1252,50 @@ class Completor
     }
 
     /**
+     * Checks the EU commerce threshold.
+     *
+     * - We only check if this feature is enabled.
+     * - we only check positive invoices, thus no credit notes, of vat type
+     *   national (1) to EU customers:
+     *   - Are allowed as long as the company is below the threshold.
+     *   - If the threshold has been reached or will be reached with this
+     *     invoice, the invoice will be sent as concept and a warning will be
+     *     added to the mail sent to the shop owner.
+     *   - If the warning percentage is or will be passed, the invoice will be
+     *     sent as is, but a notice will be mailed to the user.
+     */
+    protected function checkEuCommerceThreshold()
+    {
+        $warningPercentage = $this->config->getInvoiceSettings()['euCommerceThresholdPercentage'];
+        $invoice = &$this->invoice[Tag::Customer][Tag::Invoice];
+        if (is_float($warningPercentage)
+            && $this->source->getType() !== Source::CreditNote
+            && $this->isEu()
+            && isset($invoice[Tag::VatType])
+            && $invoice[Tag::VatType] === Api::VatType_National
+        ) {
+            $year = (int) substr($this->getInvoiceDate(), 0, 4);
+            $result = $this->acumulusApiClient->reportThresholdEuCommerce($year);
+            if (!$result->hasError()) {
+                $euCommerceReport = $result->getResponse();
+                if ($euCommerceReport['reached'] == 1) {
+                    $this->changeInvoiceToConcept($invoice, 'eu_commerce_threshold_passed', 830);
+                } else {
+                    $invoiceAmount = $invoice[Meta::InvoiceAmount];
+                    $percentage = ((float) $euCommerceReport['nltaxed'] + (float) $invoiceAmount) / ((float) $euCommerceReport['threshold']) * 100.0;
+                    if ($percentage > 100.0) {
+                        $this->changeInvoiceToConcept($invoice, 'eu_commerce_threshold_will_pass', 831);
+                    } elseif ($percentage > $warningPercentage) {
+                        // Send mail with notice, xml message will not be added
+                        // if there are no warnings or worse.
+                        $this->result->addMessage(sprintf($this->t('eu_commerce_threshold_warning'), $percentage), Severity::Notice, 832);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * Processes meta data before sending the invoice.
      *
      * Currently the following processing is done:
@@ -1673,10 +1718,10 @@ class Completor
      *   warning has to be added.
      * @param int $code
      *   The code for this message.
-     * @param string ...
+     * @param string ...$args
      *   Additional arguments to format the message.
      */
-    public function changeInvoiceToConcept(&$array, $messageKey, $code)
+    public function changeInvoiceToConcept(&$array, $messageKey, $code, ...$args)
     {
         $pdfMessage = '';
         $invoiceSettings = $this->config->getInvoiceSettings();
@@ -1691,9 +1736,8 @@ class Completor
 
         if ($messageKey !== '') {
             $message = $this->t($messageKey) . $pdfMessage;
-            if (func_num_args() > 3) {
-                $args = func_get_args();
-                $message = vsprintf($message, array_slice($args, 3));
+            if (!empty($args)) {
+                $message = sprintf($message, ...$args);
             }
             $this->result->addMessage($message, Severity::Warning, '', $code);
             if (!isset($array[Meta::Warning])) {

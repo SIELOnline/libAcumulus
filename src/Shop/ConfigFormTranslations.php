@@ -103,22 +103,22 @@ class ConfigFormTranslations extends TranslationCollection
 
         'field_foreignVatClasses' => 'Welke %1$s definiëren EU btw tarieven?',
         'desc_foreignVatClasses' => 'Geef aan welke van deze %1$s gebruikt worden wanneer u buitenlandse btw berekent voor (niet btw-plichtige) EU klanten.<br>
-Kies de 1e optie ("%2$s") als u uw winkel (nog) niet hebt ingericht op deze regeling.<br>
-Mbv de "Ctrl" toets kunt u meerdere statussen kiezen of keuzes ongedaan maken.<br>
-NB: Sinds 1 juli 2021 gelden er <a href="https://www.belastingdienst.nl/wps/wcm/connect/nl/btw/content/e-commerce-en-diensten-in-de-eu-kijk-wat-er-verandert-voor-de-btw-x" target="_blank">nieuwe regels en drempels voor afstandsverkopen binnen de EU</a> en vallen bijna alle goederen (en diensten) hieronder.',
+• Kies de 1e optie ("%2$s") als u uw winkel (nog) niet hebt ingericht op deze regeling.<br>
+• Mbv de "Ctrl" toets kunt u meerdere %1$s kiezen of keuzes ongedaan maken.<br>
+• NB: Sinds 1 juli 2021 gelden er <a href="https://www.belastingdienst.nl/wps/wcm/connect/nl/btw/content/e-commerce-en-diensten-in-de-eu-kijk-wat-er-verandert-voor-de-btw-x" target="_blank">nieuwe regels en drempels voor afstandsverkopen binnen de EU</a> en vallen bijna alle goederen (en diensten) hieronder.',
 
         'field_vatFreeClass' => 'Welke %1$s definieert btw-vrij?',
         'desc_vatFreeClass' => 'Geef aan welke %1$s u gebruikt om aan te geven dat een product of dienst btw-vrij is.<br>
-Kies de 1e optie ("%2$s") als u geen btw-vrije producten of diensten aanbiedt.<br>
-Kies de 2e optie ("%3$s") als u bij uw btw-vrije producten en diensten het veld %1$s leeg laat.<br>
-LET OP: het gaat er om of het product of de dienst btw-vrij is, uw bedrijf voor de <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/hoe_werkt_de_btw/nieuwe-kleineondernemersregeling/kleineondernemersregeling" target="_blank"">KOR regeling</a> heeft gekozen, of een btw vrijstelling heeft. Niet of u voor specifieke situaties een factuur zonder btw opstelt.
+• Kies de 1e optie ("%2$s") als u geen btw-vrije producten of diensten aanbiedt.<br>
+• Kies de 2e optie ("%3$s") als u bij uw btw-vrije producten en diensten het veld %1$s leeg laat.<br>
+• LET OP: het gaat er om of het product of de dienst btw-vrij is, uw bedrijf voor de <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/hoe_werkt_de_btw/nieuwe-kleineondernemersregeling/kleineondernemersregeling" target="_blank"">KOR regeling</a> heeft gekozen, of een btw vrijstelling heeft. Niet of u voor specifieke situaties een factuur zonder btw opstelt.
 Ook is er een verschil met het 0%%-tarief hieronder, Dit verschil zit hem met name in de mogelijkheid tot aftrek van voorbelasting.',
 
         'field_zeroVatClass' => 'Welke %1$s definieert het 0%% btw-tarief?',
         'desc_zeroVatClass' => 'Geef aan welke %1$s u gebruikt om aan te geven dat een product of dienst onder het 0%%-tarief valt.<br>
-Kies de 1e optie ("%2$s") als u geen producten of diensten aan aanbiedt die onder het 0%%-tarief vallen.<br>
-LET OP 1: het 0%%-tarief is wat anders dan het btw-vrije tarief van hierboven en is in Nederland niet gebruikelijk. Momenteel (begin 2021) geldt er b.v. een uitzondering voor mondkapjes.<br>
-LET OP 2: het gaat er om of het product of de dienst onder het 0%%-tarief valt, niet of u 0%% btw op een factuur mag noteren vanwege b.v. verkoop aan het buitenland of een factuur met verlegde btw.',
+• Kies de 1e optie ("%2$s") als u geen producten of diensten aan aanbiedt die onder het 0%%-tarief vallen.<br>
+• LET OP 1: het 0%%-tarief is wat anders dan het btw-vrije tarief van hierboven en is in Nederland niet gebruikelijk. Momenteel (begin 2021) geldt er b.v. een uitzondering voor mondkapjes.<br>
+• LET OP 2: het gaat er om of het product of de dienst onder het 0%%-tarief valt, niet of u 0%% btw op een factuur mag noteren vanwege b.v. verkoop aan het buitenland of een factuur met verlegde btw.',
 
         // Trigger settings.
         'triggerSettingsHeader' => 'Wanneer wilt u uw facturen automatisch naar Acumulus laten versturen',
@@ -273,6 +273,14 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'option_concept_0' => 'Altijd als definitieve factuur versturen.',
         'option_concept_1' => 'Altijd als concept versturen.',
 
+        'field_eu_commerce_threshold_percentage' => 'Percentage EU Omzetdrempel',
+        'desc_eu_commerce_threshold_percentage' => 'Acumulus houdt bij hoeveel omzet binnen de EU u al heeft gedraaid. '
+        . 'Deze %1$s kan een melding geven als u die drempel bijna heeft bereikt, en zal als u daadwerkelijk over de drempel heen gaat de factuur als concept versturen.<br>'
+        . '• Vul een percentage in vanaf waar Acumulus een waarschuwing gaat geven. Gebroken percentages kunt u met een punt (.) aangeven. Het %-teken mag u weglaten.<br>'
+        . '• Vul 100 in als u geen waarschuwing vooraf wil, maar wel als u wilt dat de factuur als concept verstuurd moet worden als u met deze factuur over de drempel heen zou gaan of al bent.<br>'
+        . '• Laat leeg als u deze functie niet wilt gebruiken.',
+        'message_validate_percentage_0' => 'Vul een percentage (een getal tussen 0 en 100) in voor het veld "%s".',
+
         'field_missing_amount' => 'Ontbrekend bedrag',
         'desc_missing_amount' => 'Geef aan wat te doen als er een verschil tussen het factuurtotaal en het totaal van de factuurregels geconstateerd wordt. Normaal gesproken zal de 1e optie voldoen. Als het vaak voorkomt en de ontbrekende bedragen zjn eigenlijk altijd correct (bv. betaalkosten van een specifieke payment provider worden niet als losse regel herkend) kan de 2e optie handiger zijn. Er wordt dan al een factuurregel toegevoegd zodat de factuur alleen maar definitief gemaakt hoeft te worden. Gebruik de 3e optie als dit verschil door een instelling of andere plugin optreedt maar de factuur eigenlijk toch altijd correct is.',
         'option_missing_amount_2' => 'Verstuur een waarschuwing, de factuur wordt als concept verstuurd.',
@@ -356,7 +364,7 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'invoiceStatusScreenSettingsHeader' => 'Factuurstatusoverzicht',
         'desc_invoiceStatusScreenSettings' => 'Acumulus kan op de detailpagina van een bestelling de status tonen van de bijbehorende factuur in Acumulus.',
         'desc_invoiceStatusScreenSettings2' => 'Hierdoor ziet u in een oogopslag of de factuur correct is verstuurd naar Acumulus en of de betaalstatus correct is. Ook kunt u de factuurgegevens opnieuw naar Acumulus versturen of de betaalstatus aanpassen.',
-        'desc_invoiceStatusScreen' => 'Met de eerste optie geeft u aan of u dit scherm getoond wil hebben. Met de 2e en 3e optie geeft u aan of u downloadlinks naar deze pdf bestanden op dit scherm getoond wilt hebben. Dit zijn de pdf bestanden die Acumulus maakt, niet die van de webwinkel zelf. Als u deze bestanden niet gebruikt kun u deze opties beter uitvinken.',
+        'desc_invoiceStatusScreen' => '• Met de eerste optie geeft u aan of u dit scherm getoond wil hebben.<br>•  Met de 2e en 3e optie geeft u aan of u downloadlinks naar deze pdf bestanden op dit scherm getoond wilt hebben. Dit zijn de pdf bestanden die Acumulus maakt, niet die van de webwinkel zelf. Als u deze bestanden niet gebruikt kun u opties 2 en 3 beter uitvinken.',
         'field_invoiceStatusScreen' => 'Welke onderdelen wilt u tonen.',
         'option_showInvoiceStatus' => 'Toon dit scherm.',
         'option_showPdfInvoice' => 'Toon de link naar de factuur.',
@@ -479,7 +487,7 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'field_foreignVatClasses' => 'Which %1$s define EU vat rates?',
         'desc_foreignVatClasses' => 'Indicate which of these %1$s are used when you charge foreign VAT to (non vat subjected) EU customers.
 Select the 1st option ("%2$s") when you have not (yet) configured your shop to use foreign vat.<br>
-Using the "Ctrl" key, you can select/deselect multiple items.<br>
+Using the "Ctrl" key, you can select/deselect multiple %1$s.<br>
 NB: As of 1 july 2021 <a href="https://www.belastingdienst.nl/wps/wcm/connect/nl/btw/content/e-commerce-en-diensten-in-de-eu-kijk-wat-er-verandert-voor-de-btw-x" target="_blank">new rules and thresholds for E-commerce sales within the EU (in Dutch)</a> apply to almost all goods (and services).',
 
         'field_vatFreeClass' => 'Which %1$s defines VAT free?',
@@ -645,6 +653,15 @@ If you unchecked the first option, the second option only applies to business cl
         'option_concept_2' => 'Send the invoice as final unless the plugin discovered irregularities. Choose this option unless you know what you are doing.',
         'option_concept_0' => 'Always send as final.',
         'option_concept_1' => 'Always send as concept.',
+
+        // @todo: translate
+//        'field_eu_commerce_threshold_percentage' => 'Percentage EU Omzetdrempel',
+//        'desc_eu_commerce_threshold_percentage' => 'Acumulus houdt bij hoeveel omzet binnen de EU u al heeft gedraaid. '
+//                                                   . 'Deze %1$s kan een melding geven als u die drempel bijna heeft bereikt, en zal als u daadwerkelijk over de drempel heen gaat de factuur als concept versturen.<br>'
+//                                                   . '• Vul een percentage in vanaf waar Acumulus een waarschuwing gaat geven. Gebroken percentages kunt u met een punt (.) aangeven. Het %-teken mag u weglaten.<br>'
+//                                                   . '• Vul 100 in als u geen waarschuwing vooraf wil, maar wel als u wilt dat de factuur als concept verstuurd moet worden als u met deze factuur over de drempel heen zou gaan of al bent.<br>'
+//                                                   . '• Laat leeg als u deze functie niet wilt gebruiken.',
+//        'message_validate_percentage_0' => 'Vul een percentage (een getal tussen 0 en 100) in voor het veld "%s".',
 
         'field_missing_amount' => 'Missing amount',
         'desc_missing_amount' => 'Indicate what to do when the invoice total and the total of the invoice lines differ. Normally, the 1st option will do fine. However, if this happens often and the missing amounts are always correct (e.g. payment fees for a specific payment provider that are not recognised as a separate invoice line), you\'d better use the 2nd option. This will already add an invoice line to the invoice, so you only have to make it final. Use the 3rd option if a setting or another plugin causes this difference but the invoice turns out to be correct anyway.',

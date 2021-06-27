@@ -66,6 +66,9 @@ class Translations extends TranslationCollection
         'message_warning_old_entry_not_deleted' => 'De factuur heeft een oudere boeking voor deze %1$s in Acumulus overschreven. We hebben geprobeerd deze oudere boeking met boeknummer %2$d in Acumulus naar de prullenbak te verplaatsen, maar dit is niet gelukt omdat de oude factuur waarschijnlijk al verwijderd was. Deze oude factuur kan misschien nog steeds teruggevonden worden onder "Overzichten » Laatste boekingen » Verwijderde boekingen".',
         'message_warning_lock_no_longer_exists' => 'De controle op dubbel verzenden kan niet bepalen of dit wel of niet gebeurd is. Controleer of Acumulus meerdere facturen voor deze %1$s heeft.',
         'message_warning_delete_lock_failed' => 'Het verwijderen van een lock op een %s is mislukt.',
+        'eu_commerce_threshold_passed' => 'U bent de drempel van verkopen binnen de EU tot aan waar u Nederlandse btw mag berekenen gepasseerd. U dient vanaf nu, tot aan het eind van het jaar, op alle facturen naar consumenten binnen de EU het btw tarief van het klantland berekenen. Pas direct uw webshop hierop aan. ' . self::sharedNl,
+        'eu_commerce_threshold_will_pass' => 'Met deze factuur zou u de drempel van verkopen binnen de EU tot aan waar u Nederlandse btw mag berekenen passeren. U dient vanaf nu, tot aan het eind van het jaar, op alle facturen naar consumenten binnen de EU - dus ook op deze factuur - het btw tarief van het klantland berekenen. Pas uw webshop hierop aan. ' . self::sharedNl,
+        'eu_commerce_threshold_warning' => 'U bent de drempel van verkopen binnen de EU tot aan waar u Nederlandse btw mag berekenen tot op %.1f%% benaderd. Begin op tijd aan de voorbereidingen tot het aanpassen van de belastinginstellingen van uw webwinkel en overige verkoopkanalen.',
     ];
 
     protected $en = [
@@ -125,5 +128,9 @@ class Translations extends TranslationCollection
         'message_warning_old_entry_not_deleted' => 'The invoice has overwritten an older invoice for this %1$s in Acumulus. In Acumulus, we tried to move this older invoice to the waste bin but did not succeed probably because the older invoice has already been deleted. This older invoice with entry = %2$d may or may not still be found under "Views » Latest entries » Deleted entries".',
         'message_warning_lock_no_longer_exists' => 'The check on double sending could not determine whether this happened or not. Check if Acumulus has multiple entries for this %1$s.',
         'message_warning_delete_lock_failed' => 'Failed to delete the lock on the %s.',
+        // @todo' translate
+//        'eu_commerce_threshold_passed' => 'U bent de drempel van verkopen binnen de EU tot aan waar u Nederlandse btw mag berekenen gepasseerd. U dient vanaf nu, tot aan het eind van het jaar, op alle facturen naar consumenten binnen de EU het btw tarief van het klantland berekenen. Pas direct uw webshop hierop aan. ' . self::sharedNl,
+//        'eu_commerce_threshold_will_pass' => 'Met deze factuur zou u de drempel van verkopen binnen de EU tot aan waar u Nederlandse btw mag berekenen passeren. U dient vanaf nu, tot aan het eind van het jaar, op alle facturen naar consumenten binnen de EU - dus ook op deze factuur - het btw tarief van het klantland berekenen. Pas uw webshop hierop aan. ' . self::sharedNl,
+//        'eu_commerce_threshold_warning' => 'U bent de drempel van verkopen binnen de EU tot aan waar u Nederlandse btw mag berekenen tot op %.1f%% benaderd. Begin op tijd aan de voorbereidingen tot het aanpassen van de belastinginstellingen van uw webwinkel en overige verkoopkanalen.',
     ];
 }

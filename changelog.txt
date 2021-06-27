@@ -21,8 +21,7 @@ WC4 = WooCommerce 4 (WordPress)
 6.3.0 (2021-06-??)
 ------------------
 Features:
-- ALL: Added the ReportThresholdEuCommerce API call to AcumulusClient (but this
-  call is not used yet).
+- ALL: Added the ReportThresholdEuCommerce API call to AcumulusClient.
 - ALL: Added the field vattypeid to the InvoiceAdd API call.
 - ALL: Changed the settings under "About your shop":
   * For the fields related to the different tax classes (foreign vat, vat free,
@@ -31,6 +30,9 @@ Features:
   * Labels and descriptions for the foreign vat classes has been changed to
     reflect the new rules regarding international sales in the EU that apply as
     of 1 july 2021.
+- ALL: Added the setting 'Percentage EU Omzetdrempel' to 'Uw factuurinstellingen'
+  on the advanced settings form. This feature checks your invoices against the
+  new EU Commerce threshold above which you should use foreign vat.
 
 Bugs:
 - HS: reinstated use of fallback name for shipping method.
@@ -38,6 +40,8 @@ Bugs:
   rounded to the cent. If so, the price ex has a higher precision than the price
   inc, even if prices are entered including vat. So, in these cases we should
   not recalculate the price ex after we have obtained a corrected vat rate.
+- ALL: Leaving config settings empty was not well supported. This has been
+  improved to better distinguish between e.g. 0 and empty.
 
 Refactorings:
 - HS: better logging with warnings in method getShippingLines().

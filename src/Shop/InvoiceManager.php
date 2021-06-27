@@ -415,7 +415,6 @@ abstract class InvoiceManager
      */
     protected function createAndSend(Source $invoiceSource, Result $result, $forceSend = false, $dryRun = false)
     {
-        $acumulusEntry = null;
         if ($this->isTestMode()) {
             $result->setSendStatus(Result::Send_TestMode);
         } elseif (($acumulusEntry = $this->getAcumulusEntryManager()->getByInvoiceSource($invoiceSource, false)) === null) {
@@ -592,7 +591,7 @@ abstract class InvoiceManager
                 $token = null;
                 $id = null;
             }
-            $saved = (bool) $acumulusEntryManager->save($invoiceSource, $id, $token);
+            $saved = $acumulusEntryManager->save($invoiceSource, $id, $token);
 
             // If we successfully saved the new entry, we may delete the old one
             // if there is one and it's not a concept.

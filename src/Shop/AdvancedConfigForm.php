@@ -19,6 +19,7 @@ class AdvancedConfigForm extends BaseConfigForm
     protected function validate()
     {
         $this->validateRelationFields();
+        $this->validateInvoiceFields();
         $this->validateOptionsFields();
         $this->validateEmailAsPdfFields();
     }
@@ -35,6 +36,20 @@ class AdvancedConfigForm extends BaseConfigForm
 
     /**
      * Validates fields in the "Invoice" settings fieldset.
+     */
+    protected function validateInvoiceFields()
+    {
+        if (!empty($this->submittedValues['euCommerceThresholdPercentage'])) {
+            $regex = '/^((\d{1,2}(\.\d{1,3})?)|(100))%?$/';
+            if (preg_match($regex, $this->submittedValues['euCommerceThresholdPercentage']) !== 1) {
+                $message = sprintf($this->t('message_validate_percentage_0'), $this->t('field_eu_commerce_threshold_percentage'));
+                $this->addMessage($message, Severity::Error, 'euCommerceThresholdPercentage');
+            }
+        }
+    }
+
+    /**
+     * Validates fields in the "Options" settings fieldset.
      */
     protected function validateOptionsFields()
     {
@@ -488,6 +503,14 @@ class AdvancedConfigForm extends BaseConfigForm
                 ],
                 'attributes' => [
                     'required' => true,
+                ],
+            ],
+            'euCommerceThresholdPercentage' => [
+                'type' => 'text',
+                'label' => $this->t('field_eu_commerce_threshold_percentage'),
+                'description' => sprintf($this->t('desc_eu_commerce_threshold_percentage'), $this->t('module')),
+                'attributes' => [
+                    'size' => 10,
                 ],
             ],
             'missingAmount' => [

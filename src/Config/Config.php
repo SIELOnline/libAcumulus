@@ -222,12 +222,17 @@ class Config
                         break;
                     case 'int':
                         if (!is_int($values[$key])) {
-                            $values[$key] = (int) $values[$key];
+                            $values[$key] = $values[$key] === '' ? '' : (int) $values[$key];
+                        }
+                        break;
+                    case 'float':
+                        if (!is_float($values[$key])) {
+                            $values[$key] = $values[$key] === '' ? '' : (float) $values[$key];
                         }
                         break;
                     case 'bool':
                         if (!is_bool($values[$key])) {
-                            $values[$key] = (bool) $values[$key];
+                            $values[$key] =  $values[$key] === '' ? '' : (bool) $values[$key];
                         }
                         break;
                     case 'array':
@@ -443,13 +448,15 @@ class Config
      *
      * @return array
      *   A keyed array with the keys:
+     *   - concept
+     *   - euCommerceThresholdPercentage
+     *   - missingAmount
      *   - defaultAccountNumber
      *   - defaultCostCenter
      *   - defaultInvoiceTemplate
      *   - defaultInvoicePaidTemplate
      *   - paymentMethodAccountNumber
      *   - paymentMethodCostCenter
-     *   - sendEmptyInvoice
      *   - sendEmptyShipping
      *   - description
      *   - descriptionText
@@ -458,6 +465,10 @@ class Config
      *   - optionsAllOn1Line
      *   - optionsAllOnOwnLine
      *   - optionsMaxLength
+     *   - itemNumber
+     *   - productName
+     *   - nature
+     *   - costPrice
      */
     public function getInvoiceSettings()
     {
@@ -809,6 +820,11 @@ class Config
                     'group' => Tag::Invoice,
                     'type' => 'int',
                     'default' => Config::Concept_Plugin,
+                ],
+                'euCommerceThresholdPercentage' => [
+                    'group' => Tag::Invoice,
+                    'type' => 'float',
+                    'default' => 95.0,
                 ],
                 'missingAmount' => [
                     'group' => Tag::Invoice,

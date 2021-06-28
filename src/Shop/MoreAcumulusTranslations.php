@@ -28,6 +28,8 @@ class MoreAcumulusTranslations extends TranslationCollection
         'contract' => 'Uw contract',
         'no_contract_data_local' => 'Contractdata nog niet ingevuld.',
         'no_contract_data' => 'Contractdata niet beschikbaar, meldingen:',
+        'euCommerce' => 'EU verkopen',
+        'no_eu_commerce_data' => 'Informatie over EU verkopen niet beschikbaar, meldingen:',
         'environment' => 'Over uw webwinkel',
 
         'field_companyName' => 'Bedrijfsnaam',
@@ -38,6 +40,10 @@ class MoreAcumulusTranslations extends TranslationCollection
         'email_status_label' => 'E-mail',
         'email_status_text' => 'Wij ondervinden afleverproblemen in onze communicatie naar u toe. Log in op Acumulus voor meer info of om te melden dat de problemen verholpen zijn.',
         'email_status_text_reason' => 'In onze communicatie naar u toe ontvingen wij deze melding: "%1$s". Log in op Acumulus voor meer info of om te melden dat de problemen verholpen zijn.',
+
+        'info_block_eu_commerce_threshold_passed' => 'U bent de drempel van verkopen binnen de EU tot aan waar u Nederlandse btw mag berekenen gepasseerd. U dient vanaf nu, tot aan het eind van het jaar, op alle facturen naar particulieren of btw-vrijgestelden binnen de EU het btw tarief van het land van afname te berekenen. Pas direct uw webshop hierop aan.',
+        'info_block_eu_commerce_threshold_warning' => 'U zit op %.1f%% van de drempel van verkopen binnen de EU tot aan waar u Nederlandse btw mag berekenen. Begin op tijd aan de voorbereidingen tot het aanpassen van de belastinginstellingen van uw webwinkel en overige verkoopkanalen.',
+        'info_block_eu_commerce_threshold_ok' => 'U zit nog ruim onder de drempel van verkopen binnen de EU tot aan waar u Nederlandse btw mag berekenen.',
     ];
 
     protected $en = [
@@ -57,7 +63,7 @@ class MoreAcumulusTranslations extends TranslationCollection
         'regards' => 'Regards,',
         'your_name' => '[Your name]',
         'contract' => 'Your contract',
-        'no_contract_data_local' => 'Contract data not yet completed.',
+        'no_contract_data_local' => 'Contract data not yet set.',
         'no_contract_data' => 'Contract data not available, messages:',
         'environment' => 'About your webshop',
 
@@ -69,5 +75,9 @@ class MoreAcumulusTranslations extends TranslationCollection
         'email_status_label' => 'E-mail',
         'email_status_text' => 'We received errors on trying to communicate with you. Please log in on Acumulus for more info or to mark the problems as resolved.',
         'email_status_text_reason' => 'On trying to communicate with you, we received this message: "%1$s". Please log in on Acumulus for more info or to mark the problems as resolved.',
+
+        'info_block_eu_commerce_threshold_passed' => 'You are above the threshold up to which you may charge Dutch VAT for EU customers. As of now, and up to the end of the year, you must charge foreign VAT. Immediately change the VAT settings of your web shop and other sales channels.',
+        'info_block_eu_commerce_threshold_warning' => 'You are at %.1f%% of the threshold up to which you may charge Dutch VAT for EU customers. Start preparing to change your VAT settings of your web shop and other sales channels.',
+        'info_block_eu_commerce_threshold_ok' => 'You are still way below the threshold up to which you may charge Dutch VAT for EU customers.',
     ];
 }

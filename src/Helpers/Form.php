@@ -602,6 +602,8 @@ abstract class Form extends MessageCollection
         if ($this->emptyCredentials()) {
             $contractMsg = $this->t('no_contract_data_local') . "\n";
             $contract = [];
+            $euCommerceProgressBar = $this->addProgressBar($this->t('unknown'), $this->t('unknown'), 0, 'warning');
+            $euCommerceMessage = $this->t('no_contract_data_local');
         } else {
             $myAcumulus = $this->acumulusApiClient->getMyAcumulus();
             $myData = $myAcumulus->getResponse();
@@ -646,6 +648,36 @@ abstract class Form extends MessageCollection
                 $contractMsg = $this->t('no_contract_data') . "\n";
                 $contract = $myAcumulus->formatMessages(Message::Format_PlainWithSeverity, Severity::RealMessages);
             }
+            $warningPercentage = $this->acumulusConfig->getInvoiceSettings()['euCommerceThresholdPercentage'];
+            if ($warningPercentage !== '') {
+                $euCommerceReport = $this->acumulusApiClient->reportThresholdEuCommerce();
+                if (!$euCommerceReport->hasError()) {
+                    $euCommerceReport = $euCommerceReport->getResponse();
+                    $reached = $euCommerceReport['reached'] == 1;
+                    $nlTaxed = (float) $euCommerceReport['nltaxed'];
+                    $threshold = (float) $euCommerceReport['threshold'];
+                    $percentage = min($nlTaxed / $threshold * 100.0, 100.0);
+                    if ($reached) {
+                        $message = $this->t('info_block_eu_commerce_threshold_passed');
+                        $status = 'error';
+                    } else {
+                        if ($percentage < $warningPercentage) {
+                            $message = $this->t('info_block_eu_commerce_threshold_ok');
+                            $status = 'ok';
+                        } else {
+                            $message = sprintf($this->t('info_block_eu_commerce_threshold_warning'), $percentage);
+                            $status = 'warning';
+                        }
+                    }
+                    $percentage = (int) round($percentage);
+                    $euCommerceProgressBar = $this->addProgressBar($nlTaxed, $threshold, $percentage, $status);
+                    $euCommerceMessage = $message;
+                } else {
+                    $euCommerceProgressBar = $this->addProgressBar($this->t('unknown'), $this->t('unknown'), 0, 'error');
+                    $euCommerceMessage = $this->t('no_eu_commerce_data') . "\n";
+                    $euCommerceMessage .= $this->arrayToList($euCommerceReport->formatMessages(Message::Format_PlainWithSeverity, Severity::RealMessages), true);
+                }
+            }
         }
         $body = sprintf("%s:\n%s%s%s:\n%s%s\n%s\n%s\n",
             $this->t('contract'),
@@ -671,6 +703,15 @@ abstract class Form extends MessageCollection
                 'type' => 'markup',
                 'value' => '<h3>' . $this->t('contract') . '</h3>' . $contractMsg . $this->arrayToList($contract, true),
             ],
+        ];
+        if (isset($euCommerceMessage)) {
+            /** @noinspection PhpUndefinedVariableInspection */
+            $fields['euCommerce'] = [
+                'type' => 'markup',
+                'value' => '<h3>' . $this->t('euCommerce') . '</h3>' . "<p>$euCommerceProgressBar<br>$euCommerceMessage</p>",
+            ];
+        }
+        $fields += [
             'environmentInformation' => [
                 'type' => 'markup',
                 'value' => '<h3>' . $this->t('environment') . '</h3>' . $this->arrayToList($environment, true) . $this->t('desc_environmentInformation'),
@@ -689,6 +730,11 @@ abstract class Form extends MessageCollection
             'fields' => $fields,
             'collapsable' => false,
         ];
+    }
+
+    protected function addProgressBar($nlTaxed, $threshold, $percentage, $status)
+    {
+        return "<span class='acumulus-progressbar'><span class='acumulus-progress acumulus-$status' style='min-width:$percentage%'>$nlTaxed €</span></span><span class='acumulus-threshold'>$threshold €</span>";
     }
 
     protected function arrayToList($list, $isHtml)

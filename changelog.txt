@@ -8,8 +8,10 @@ MA  = Magento (alle ondersteunde versies)
 MA1 = Magento 1 (wordt niet meer ondersteund sinds 6.0.0)
 MA2 = Magento 2 (MA20, MA21, ... = specifieke minor versie binnen major versie 2)
 OC  = OpenCart (alle ondersteunde versies)
-OC1 = OpenCart 1 (alleen OpenCart 1.5.6.4 wordt nog ondersteund)
-OC2 = OpenCart 2 (alleen OpenCart 2.3 wordt nog ondersteund)
+OC1 = OpenCart 1 (sinds 6.3.0 wordt OC1 niet meer actief onderhouden en getest.
+      Sowieso werd al voor langere tijd alleen OpenCart 1.5.6.4 nog ondersteund)
+OC2 = OpenCart 2 (sinds 6.3.0 wordt OC1 niet meer actief onderhouden en getest.
+      Sowieso werd al voor langere tijd alleen OpenCart 2.3 nog ondersteund)
 OC3 = OpenCart 3
 PS  = PrestaShop (1.7.6+) (1.6- wordt niet meer ondersteund sinds 6.0.0)
 VM3 = VirtueMart3 (Joomla)
@@ -37,6 +39,8 @@ Features:
 - ALL: Added the field vattypeid to the InvoiceAdd API call.
 
 Bugs:
+- OC: Update functions were not executed as a call to install(), executed before
+  update(), already increased the "data model" version to the new version.
 - HS: reinstated use of fallback name for shipping method.
 - WC: Sometimes, vat amounts on item lines are stored with a precision of being
   rounded to the cent. If so, the price ex has a higher precision than the price

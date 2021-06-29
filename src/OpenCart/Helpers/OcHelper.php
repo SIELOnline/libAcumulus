@@ -171,6 +171,12 @@ class OcHelper
     public function advancedConfig()
     {
         $this->displayFormCommon('advanced');
+
+        // Are we posting? If not so, handle this as a trigger to update.
+        if ($this->registry->request->server['REQUEST_METHOD'] !== 'POST') {
+            $this->doUpgrade();
+        }
+
         $this->renderFormCommon('advanced');
     }
 
@@ -180,6 +186,12 @@ class OcHelper
     public function batch()
     {
         $this->displayFormCommon('batch');
+
+        // Are we posting? If not so, handle this as a trigger to update.
+        if ($this->registry->request->server['REQUEST_METHOD'] !== 'POST') {
+            $this->doUpgrade();
+        }
+
         $this->renderFormCommon('batch');
     }
 
@@ -574,14 +586,15 @@ class OcHelper
      */
     protected function doUpgrade()
     {
-        // @todo: extract updating part from doInstall to here.
-        // Install/update datamodel first.
-        $result = $this->doInstall();
 
         $this->registry->load->model('setting/setting');
         $setting = $this->registry->model_setting_setting->getSetting('acumulus_siel');
         $currentDataModelVersion = isset($setting['acumulus_siel_datamodel_version']) ? $setting['acumulus_siel_datamodel_version'] : '';
         $apiVersion = Version;
+
+        // @todo: extract updating part from doInstall to here.
+        // Install/update data model first.
+        $result = $this->doInstall();
 
         $this->container->getLog()->info('%s: installed version = %s, API = %s', __METHOD__, $currentDataModelVersion, $apiVersion);
 

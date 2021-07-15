@@ -276,8 +276,9 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'field_eu_commerce_threshold_percentage' => 'EU Omzetdrempelpercentage',
         'desc_eu_commerce_threshold_percentage' => 'Acumulus houdt bij hoeveel omzet binnen de EU u al heeft gedraaid. '
             . 'Deze %1$s kan een melding geven als u die drempel bijna heeft bereikt, en zal als u daadwerkelijk over de drempel heen gaat de factuur als concept versturen.<br>'
-            . '• Vul een percentage in vanaf waar Acumulus een waarschuwing gaat geven. Gebroken percentages kunt u met een punt (.) aangeven. Het %-teken mag u weglaten.<br>'
+            . '• Vul een percentage in vanaf waar Acumulus een waarschuwing gaat geven. Gebroken percentages kunt u met een punt (.) aangeven. Het %%-teken mag u weglaten.<br>'
             . '• Vul 100 in als u geen waarschuwing vooraf wil, maar wel als u wilt dat de factuur als concept verstuurd moet worden als u met deze factuur over de drempel heen zou gaan of al bent.<br>'
+            . '• Vul 0 in als u vanaf het begin van het jaar buitenlandse btw rekent en een waarschuwing wilt ontvangen als er toch een artikel met een verkeerd btw-%% verkocht wordt.<br>'
             . '• Laat leeg als u deze functie niet wilt gebruiken.',
         'message_validate_percentage_0' => 'Vul een percentage (een getal tussen 0 en 100) in voor het veld "%s".',
 
@@ -656,9 +657,10 @@ If you unchecked the first option, the second option only applies to business cl
 
         'field_eu_commerce_threshold_percentage' => 'EU Commerce percentage',
         'desc_eu_commerce_threshold_percentage' => 'Acumulus keeps track of how many sales you already have made within the EU aggregated over all your sales channels. '
-                                                   . 'This %1$s can give you a warning when you are nearing the threshold above which you have to charge foreign VAT. If yo are passing tha threshold it will send all new invoices as a concept.<br>'
-                                                   . '• Enter a percentage as of which Acumulus should start warning you. use a decimal point if you wish to enter a fraction. The %-sign is optional.<br>'
-                                                   . '• Enter 100 if yo don\'t want a warning, but want to send invoices as concept as soon as you are passing or already past the threshold.<br>'
+                                                   . 'This %1$s can give you a warning when you are nearing the threshold above which you have to charge foreign VAT. If you are passing that threshold it will send all new invoices as a concept.<br>'
+                                                   . '• Enter a percentage as of which Acumulus should start warning you. use a decimal point if you wish to enter a fraction. The %%-sign is optional.<br>'
+                                                   . '• Enter 100 if you don\'t want a warning, but want to send invoices as concept as soon as you are passing or already past the threshold.<br>'
+                                                   . '• Enter 0 if you use foreign VAT as of the start of the year and want to receive a warning when some misconfigured articles are sold.<br>'
                                                    . '• Leave empty if yo do not want to use this feature.',
         'message_validate_percentage_0' => 'Enter a percentage (a number between 0 and 100) in the field "%s".',
 

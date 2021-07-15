@@ -118,10 +118,10 @@ class Number
     static public function isRounded($f, $precision)
     {
         if (is_string($f)) {
-            // For strings we look at the position of the last non-0 digit after
-            // the decimal point.
+            // For strings we look at the number of digits after the decimal
+            // point (ignoring trailing 0's).
             $pos = strrpos($f, '.');
-            return $pos === false || strlen(rtrim($f, '0')) - $pos < $precision + strlen('.');
+            return $pos === false || strlen(rtrim($f, '0')) - $pos - strlen('.') <= $precision;
         } else {
             // For floats we use the round() function and look at the difference
             // (testing floats for equality within a given margin).

@@ -349,9 +349,10 @@ class Creator extends BaseCreator
         $feeVat = $item->get_total_tax() / $quantity;
 
         return [
-                Tag::Product => $this->t($item->get_name()),
-                Tag::UnitPrice => $feeEx,
-                Tag::Quantity => $item->get_quantity(),
+                   Tag::Product => $this->t($item->get_name()),
+                   Tag::UnitPrice => $feeEx,
+                   Tag::Quantity => $item->get_quantity(),
+                   Meta::Id => $item->get_id(),
                ] + $this->getVatRangeTags($feeVat, $feeEx, $this->precision, $this->precision);
     }
 
@@ -383,7 +384,7 @@ class Creator extends BaseCreator
         $taxes = $item->get_taxes();
         $vatLookupTags = $this->getShippingVatRateLookupMetadata($taxes);
 
-        // Note: this info is WC3 specific.
+        // Note: this info is WC3+ specific.
         // Precision: shipping costs are entered ex VAT, so that may be very
         // precise, but it will be rounded to the cent by WC. The VAT is also
         // rounded to the cent.
@@ -420,9 +421,10 @@ class Creator extends BaseCreator
         $precisionVat = 0.01;
 
         return [
-                Tag::Product => $item->get_name(),
-                Tag::UnitPrice => $shippingEx,
-                Tag::Quantity => $quantity,
+                   Tag::Product => $item->get_name(),
+                   Tag::UnitPrice => $shippingEx,
+                   Tag::Quantity => $quantity,
+                   Meta::Id => $item->get_id(),
                ]
                + $this->getVatRangeTags($shippingVat, $shippingEx, $precisionVat, $precisionShippingEx)
                + $vatLookupTags;
@@ -557,7 +559,8 @@ class Creator extends BaseCreator
         // Get a description for the value of this coupon. Entered discount
         // amounts follow the productPricesIncludeTax() setting. Use that info
         // in the description.
-        if ($coupon->get_id()) {
+        $couponId = $coupon->get_id();
+        if ($couponId) {
             // Coupon still exists: extract info from coupon.
             $description = sprintf('%s %s: ', $this->t('discount_code'), $coupon->get_code());
             if (in_array($coupon->get_discount_type(), ['fixed_product', 'fixed_cart'])) {
@@ -592,6 +595,7 @@ class Creator extends BaseCreator
             Tag::VatRate => null,
             Meta::VatAmount => 0,
             Meta::VatRateSource => static::VatRateSource_Completor,
+            Meta::Id => $couponId,
         ];
     }
 

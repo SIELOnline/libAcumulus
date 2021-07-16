@@ -22,6 +22,7 @@ WC4 = WooCommerce 4 (WordPress)
 
 6.3.1 (2021-07-??)
 ------------------
+Bugs:
 - HS: Revisit/improve commit 2021-01-26 (6.2.0): HS 4+ has a setting on shipping
   methods "Automatic taxes"/"Automatische belastingen" that determines [...].
   Improvement: property taxes is not always defined, handle that case as well.
@@ -29,6 +30,9 @@ WC4 = WooCommerce 4 (WordPress)
   rounded tax amounts in WC.
 - ALL: Typos and unescaped %-sign in message (about EU limit) that gets passed
   through sprintf().
+- ALL: During the upgrade to 6.3.0 you can get a possible notice "undefined
+  index: foreignVat in Config.php on line 1387". Similar notices but with
+  different index names and slightly higher line numbers are also possible.
 
 6.3.0 (2021-06-29)
 ------------------

@@ -1094,8 +1094,8 @@ class Config
             $result = $this->upgrade600() && $result;
         }
 
-        if (version_compare($currentVersion, '6.3.0', '<')) {
-            $result = $this->upgrade630() && $result;
+        if (version_compare($currentVersion, '6.3.1', '<')) {
+            $result = $this->upgrade631() && $result;
         }
 
         return $result;
@@ -1376,7 +1376,7 @@ class Config
      *
      * @return bool
      */
-    protected function upgrade630()
+    protected function upgrade631()
     {
         $configStore = $this->getConfigStore();
         $values = $configStore->load();
@@ -1384,7 +1384,7 @@ class Config
         // any value in foreignVatClasses.
         // const ForeignVat_Unknown = 0;
         // const ForeignVat_No = 2;
-        if ($values['foreignVat'] === 0 || $values['foreignVat'] === 2) {
+        if (isset($values['foreignVat']) && ($values['foreignVat'] === 0 || $values['foreignVat'] === 2)) {
             $values['foreignVatClasses'] = [];
         }
         unset($values['foreignVat']);
@@ -1392,13 +1392,13 @@ class Config
         // If "vat free products" was not set (unknown) we should set the value
         // of vatFreeClass to "empty".
         // const VatFreeProducts_Unknown = 0;
-        if ($values['vatFreeProducts'] === 0) {
+        if (isset($values['vatFreeProducts']) && $values['vatFreeProducts'] === 0) {
             $values['vatFreeClass'] = '';
         }
         // If "vat free products" was set to No, we should set the value
         // of vatFreeClass to Config::VatClass_NotApplicable.
         // const VatFreeProducts_No = 2;
-        if ($values['vatFreeProducts'] === 2) {
+        if (isset($values['vatFreeProducts']) && $values['vatFreeProducts'] === 2) {
             $values['vatFreeClass'] = Config::VatClass_NotApplicable;
         }
         unset($values['vatFreeProducts']);
@@ -1406,13 +1406,13 @@ class Config
         // If "0 vat products" was not set (unknown) we should set the value
         // of zeroVatClass to "empty".
         // const ZeroVatProducts_Unknown = 0;
-        if ($values['zeroVatProducts'] === 0) {
+        if (isset($values['zeroVatProducts']) && $values['zeroVatProducts'] === 0) {
             $values['zeroVatClass'] = '';
         }
         // If "0 vat products" was set to No, we should set the value
         // of zeroVatClass to Config::VatClass_NotApplicable.
         // const ZeroVatProducts_No = 2;
-        if ($values['zeroVatProducts'] === 2) {
+        if (isset($values['zeroVatProducts']) && $values['zeroVatProducts'] === 2) {
             $values['zeroVatClass'] = Config::VatClass_NotApplicable;
         }
         unset($values['zeroVatProducts']);

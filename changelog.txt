@@ -20,6 +20,16 @@ WC2 = WooCommerce 2 (WordPress) (wordt niet meer ondersteund sinds 5.5.2)
 WC3 = WooCommerce 3 (WordPress)
 WC4 = WooCommerce 4 (WordPress)
 
+6.3.1 (2021-07-??)
+------------------
+- HS: Revisit/improve commit 2021-01-26 (6.2.0): HS 4+ has a setting on shipping
+  methods "Automatic taxes"/"Automatische belastingen" that determines [...].
+  Improvement: property taxes is not always defined, handle that case as well.
+- WC: Error in commit of 2021-06-20 (6.3.0) that tried to solve a problem with
+  rounded tax amounts in WC.
+- ALL: Typos and unescaped %-sign in message (about EU limit) that gets passed
+  through sprintf().
+
 6.3.0 (2021-06-29)
 ------------------
 Features:

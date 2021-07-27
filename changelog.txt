@@ -34,6 +34,14 @@ Bugs:
   index: foreignVat in Config.php on line 1387". Similar notices but with
   different index names and slightly higher line numbers are also possible.
 
+Features:
+- ALL: The internal order/refund id is now added as meta info to the invoice
+  data sent to Acumulus.
+
+Refactorings:
+- ALL: Latest IDE used to develop the plugins contains even more inspections
+  that are honored where possible.
+
 6.3.0 (2021-06-29)
 ------------------
 Features:

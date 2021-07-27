@@ -182,7 +182,7 @@ abstract class Creator
     protected function setInvoiceSource($invoiceSource)
     {
         $this->invoiceSource = $invoiceSource;
-        if (!in_array($invoiceSource->getType(), [Source::Order, Source::CreditNote])) {
+        if (!in_array($invoiceSource->getType(), [Source::Order, Source::CreditNote], true)) {
             $this->log->error('Creator::setSource(): unknown source type %s', $this->invoiceSource->getType());
         }
     }
@@ -390,17 +390,23 @@ abstract class Creator
 
         // Invoice type.
         $concept = $invoiceSettings['concept'];
+        /** @noinspection TypeUnsafeComparisonInspection */
         if ($concept == Config::Concept_Plugin) {
             $concept = Api::Concept_No;
         }
         $this->addDefaultEmpty($invoice, Tag::Concept, $concept);
 
+        // Meta info: internal order/refund id
+        $invoice[Meta::Id] = $this->invoiceSource->getId();
+
         // Invoice number and date.
         $sourceToUse = $shopSettings['invoiceNrSource'];
+        /** @noinspection TypeUnsafeComparisonInspection */
         if ($sourceToUse != Config::InvoiceNrSource_Acumulus) {
             $invoice[Tag::Number] = $this->getInvoiceNumber($sourceToUse);
         }
         $dateToUse = $shopSettings['dateToUse'];
+        /** @noinspection TypeUnsafeComparisonInspection */
         if ($dateToUse != Config::InvoiceDate_Transfer) {
             $invoice[Tag::IssueDate] = $this->getInvoiceDate($dateToUse);
         }
@@ -487,6 +493,7 @@ abstract class Creator
     protected function getInvoiceDate($dateToUse)
     {
         $result = $this->invoiceSource->getInvoiceDate();
+        /** @noinspection TypeUnsafeComparisonInspection */
         if ($dateToUse != Config::InvoiceDate_InvoiceCreate || empty($result)) {
             $result = $this->invoiceSource->getDate();
         }

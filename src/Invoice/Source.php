@@ -6,7 +6,7 @@ use RuntimeException;
 use Siel\Acumulus\Meta;
 
 /**
- * A wrapper around a webshop order or refund.
+ * A wrapper around a web shop order or refund.
  *
  * Source is used to pass an order or refund object (or array) around in a
  * strongly typed way and to provide unified access to information about the
@@ -26,7 +26,7 @@ abstract class Source
     protected $id;
 
     /** @var array|object|null */
-    protected $source = null;
+    protected $source;
 
     /** @var array|object|null */
     protected $invoice;
@@ -97,10 +97,10 @@ abstract class Source
     }
 
     /**
-     * Returns the webshop specific source for an invoice.
+     * Returns the web shop specific source for an invoice.
      *
      * @return array|object
-     *   The webshop specific source for an invoice.
+     *   The web shop specific source for an invoice.
      */
     public function getSource()
     {
@@ -108,10 +108,10 @@ abstract class Source
     }
 
     /**
-     * Returns the internal id of the webshop's invoice source.
+     * Returns the internal id of the web shop's invoice source.
      *
      * @return int
-     *   The internal id of the webshop's invoice source.
+     *   The internal id of the web shop's invoice source.
      */
     public function getId()
     {
@@ -119,12 +119,12 @@ abstract class Source
     }
 
     /**
-     * Returns the user facing reference for the webshop's invoice source.
+     * Returns the user facing reference for the web shop's invoice source.
      *
      * Should be overridden when this is not the internal id.
      *
      * @return string|int
-     *   The user facing id for the webshop's invoice source. This is not
+     *   The user facing id for the web shop's invoice source. This is not
      *   necessarily the internal id.
      */
     public function getReference()
@@ -138,7 +138,7 @@ abstract class Source
      *
      * @return float
      *   1 for orders, -1 for credit notes (unless the amounts or quantities on
-     *   the webshop's credit notes are already negative).
+     *   the web shop's credit notes are already negative).
      */
     public function getSign()
     {
@@ -146,7 +146,7 @@ abstract class Source
     }
 
     /**
-     * Returns the webshop's invoice source date.
+     * Returns the web shop's invoice source date.
      *
      * @return string
      *   The order (or credit memo) date: yyyy-mm-dd.
@@ -160,7 +160,7 @@ abstract class Source
      * Returns the status for this invoice source.
      *
      * The Acumulus plugin does not define its own statuses, so 1 of the
-     * webshop's order or credit note statuses should be returned.
+     * web shop's order or credit note statuses should be returned.
      *
      * Should either be overridden or both getStatusOrder() and
      * getStatusCreditNote() should be implemented.
@@ -177,7 +177,7 @@ abstract class Source
      * Returns the payment method used.
      *
      * This default implementation returns the payment method for the order as
-     * several webshops do not store a payment method with credit notes but
+     * several web shops do not store a payment method with credit notes but
      * instead assume it is the same as for its original order.
      *
      * @return int|string|null
@@ -270,15 +270,13 @@ abstract class Source
      */
     public function getTotals()
     {
-        $result = $this->getAvailableTotals();
-        $result = $this->completeTotals($result);
-        return $result;
+        return $this->completeTotals($this->getAvailableTotals());
     }
 
     /**
      * Returns an array with the available totals fields.
      *
-     * Most webshops provide only 2 of the 3 totals, so only return those that
+     * Most web shops provide only 2 of the 3 totals, so only return those that
      * are provided. Source::getTotals() will complete missing fields by calling
      * Source::completeTotals();
      *
@@ -411,8 +409,8 @@ abstract class Source
      *
      * This method will only be called when $this represents a credit note.
      *
-     * The base implementation throws an exception for those webshops that do
-     * not support credit notes. Override if the webshop supports credit notes.
+     * The base implementation throws an exception for those web shops that do
+     * not support credit notes. Override if the web shop supports credit notes.
      * Do not do any object loading here if only the id is readily available.
      *
      * @return array|object|int
@@ -451,9 +449,10 @@ abstract class Source
      *
      * This method will only be called when $this represents an order.
      *
-     * The base implementation returns an empty array for those webshops that do
-     * not support credit notes. Override if the webshop supports credit notes.
-     * Do not do any object loading here if only the ids are readily available.
+     * The base implementation returns an empty array for those web shops that
+     * do not support credit notes. Override if the web shop does support credit
+     * notes. Do not do any object loading here if only the ids are readily
+     * available.
      *
      * @return array[]|object[]|int[]|\Traversable
      *   The, possibly empty, set of refunds or refund-ids for this order.

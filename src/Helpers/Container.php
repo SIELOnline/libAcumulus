@@ -1,7 +1,7 @@
 <?php
 namespace Siel\Acumulus;
 
-const Version = '6.3.0';
+const Version = '6.3.1';
 
 namespace Siel\Acumulus\Helpers;
 
@@ -15,8 +15,8 @@ use const Siel\Acumulus\Version;
  * Principles
  * ----------
  * * This library is built with the idea to extract common code into base
- *   classes and have webshop specific classes extend those base classes with
- *   webshop specific overrides and implementations of abstract methods.
+ *   classes and have web shop specific classes extend those base classes with
+ *   web shop specific overrides and implementations of abstract methods.
  * * Therefore, upon creating an instance, the most specialized class possible,
  *   will be instantiated and returned. See below how this is done.
  * * Container::getInstance() is the weakly typed instance getting method, but
@@ -32,7 +32,7 @@ use const Siel\Acumulus\Version;
  * Creating the container
  * ----------------------
  * Creating the container is normally done by code in the part adhering to your
- * webshop's architecture, e.g. a controller or model. That code must pass the
+ * web shop's architecture, e.g. a controller or model. That code must pass the
  * following arguments:
  * * $shopNamespace: defines the namespace hierarchy where to look for
  *   specialized classes. This is further explained below.
@@ -82,7 +82,7 @@ use const Siel\Acumulus\Version;
  *
  * Whatever hierarchy you use, the container should be informed about it by
  * passing it as the 1st constructor argument. Example:
- * If 'MyVendorName\MyDepartmentName\Acumulus\MyCMS\MyWebshop\MyWebShop2' is
+ * If 'MyVendorName\MyDepartmentName\Acumulus\MyCMS\MyWebShop\MyWebShop2' is
  * passed as 1st constructor argument to the Container and the container is
  * asked to return a {@see \Siel\Acumulus\Invoice\Creator}, it will look for
  * the following classes:
@@ -708,7 +708,7 @@ class Container
             // As PHP5.3 produces a fatal error when a class has no constructor
             // and newInstanceArgs() is called, we have to differentiate between
             // no arguments and arguments.
-            if (empty($constructorArgs)) {
+            if (count($constructorArgs) === 0) {
                 $this->instances[$instanceKey] = new $fqClass();
             } else {
                 /** @noinspection PhpUnhandledExceptionInspection */

@@ -20,7 +20,7 @@ WC2 = WooCommerce 2 (WordPress) (wordt niet meer ondersteund sinds 5.5.2)
 WC3 = WooCommerce 3 (WordPress)
 WC4 = WooCommerce 4 (WordPress)
 
-6.3.1 (2021-07-??)
+6.3.1 (2021-07-27)
 ------------------
 Bugs:
 - HS: Revisit/improve commit 2021-01-26 (6.2.0): HS 4+ has a setting on shipping
@@ -33,6 +33,14 @@ Bugs:
 - ALL: During the upgrade to 6.3.0 you can get a possible notice "undefined
   index: foreignVat in Config.php on line 1387". Similar notices but with
   different index names and slightly higher line numbers are also possible.
+
+Features:
+- ALL: The internal order/refund id is now added as meta info to the invoice
+  data sent to Acumulus.
+
+Refactorings:
+- ALL: Latest IDE used to develop the plugins contains even more inspections
+  that are honored where possible.
 
 6.3.0 (2021-06-29)
 ------------------

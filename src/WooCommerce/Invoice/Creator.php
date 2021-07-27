@@ -1,4 +1,10 @@
 <?php
+/**
+ * @noinspection NullPointerExceptionInspection
+ *   $this->invoiceSource->getSource() will not return null in this object's
+ *   context.
+ */
+
 namespace Siel\Acumulus\WooCommerce\Invoice;
 
 use Siel\Acumulus\Helpers\Number;
@@ -165,7 +171,7 @@ class Creator extends BaseCreator
         }
 
         // Add tax info.
-        $result += $this->getVatRangeTags($productVat, $productPriceEx, $precisionVat, $precisionEx);
+        $result += self::getVatRangeTags($productVat, $productPriceEx, $precisionVat, $precisionEx);
         if ($product instanceof WC_Product) {
             // get_tax_status() returns 'taxable', 'shipping', or 'none'.
             $taxClass = $product->get_tax_status() === 'taxable' ? $product->get_tax_class() : null;
@@ -353,7 +359,7 @@ class Creator extends BaseCreator
                    Tag::UnitPrice => $feeEx,
                    Tag::Quantity => $item->get_quantity(),
                    Meta::Id => $item->get_id(),
-               ] + $this->getVatRangeTags($feeVat, $feeEx, $this->precision, $this->precision);
+               ] + self::getVatRangeTags($feeVat, $feeEx, $this->precision, $this->precision);
     }
 
     /**
@@ -426,7 +432,7 @@ class Creator extends BaseCreator
                    Tag::Quantity => $quantity,
                    Meta::Id => $item->get_id(),
                ]
-               + $this->getVatRangeTags($shippingVat, $shippingEx, $precisionVat, $precisionShippingEx)
+               + self::getVatRangeTags($shippingVat, $shippingEx, $precisionVat, $precisionShippingEx)
                + $vatLookupTags;
     }
 
@@ -440,7 +446,7 @@ class Creator extends BaseCreator
      * getVatRateLookupMetadataByTaxClass()). Anyway, this method will only
      * return metadata if only 1 rate was found.
      *
-     * @param array|null $taxes
+     * @param array[]|array|null $taxes
      *   The taxes applied to a shipping line.
      *
      * @return array
@@ -458,6 +464,7 @@ class Creator extends BaseCreator
             if (!is_numeric(key($taxes))) {
                 $taxes = current($taxes);
             }
+            /** @noinspection NotOptimalIfConditionsInspection */
             if (is_array($taxes)) {
                 foreach ($taxes as $taxRateId => $amount) {
                     if (!Number::isZero($amount)) {
@@ -502,6 +509,7 @@ class Creator extends BaseCreator
                     $shippingTaxClass = count($foundClasses) === 1 ? reset($foundClasses) : false;
                 }
 
+                /** @noinspection NotOptimalIfConditionsInspection */
                 if (is_string($shippingTaxClass)) {
                     $result = $this->getVatRateLookupMetadataByTaxClass($shippingTaxClass);
                     if (!empty($result)) {

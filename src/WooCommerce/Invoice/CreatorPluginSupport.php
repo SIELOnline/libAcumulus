@@ -16,9 +16,9 @@ use WC_Product;
  *
  * The WooCommerce market contains many additional plugins that add features
  * to standard WooCommerce. Supporting all these plugins is difficult and can
- * lead to hard to read and maintain code. Therefore we try to split support for
- * these other plugins off into its own containers that react to the Acumulus
- * filters and actions.
+ * lead to hard to read and maintain code. Therefore, we try to split support
+ * for these other plugins off into its own containers that react to the
+ * Acumulus filters and actions.
  */
 class CreatorPluginSupport
 {
@@ -128,22 +128,22 @@ class CreatorPluginSupport
      *
      * This method supports the woocommerce-product-bundles extension that
      * stores the bundle products as separate item lines below the bundle line
-     * and uses the meta data described below to link them to each other.
+     * and uses the metadata described below to link them to each other.
      *
      * This method hierarchically groups bundled products into the bundle
      * product and can do so multi-level.
      *
-     * Meta data on bundle lines:
+     * Metadata on bundle lines:
      * - bundle_cart_key (hash) unique identifier.
      * - bundled_items (hash[]) refers to the bundle_cart_key of the bundled
      *     products.
      *
-     * Meta data on bundled items:
+     * Metadata on bundled items:
      * - bundled_by (hash) refers to bundle_cart_key of the bundle line.
      * - bundle_cart_key (hash) unique identifier.
      * - bundled_item_hidden: 'yes'|'no' or absent (= 'no').
      *
-     * 1) In a 1st pass, we first add bundle meta data to each invoice line that
+     * 1) In a 1st pass, we first add bundle metadata to each invoice line that
      *    represents a bundle or bundled item.
      * 2) In a 2nd pass, we group the bundled items as children into the parent
      *    line.

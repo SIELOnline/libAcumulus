@@ -95,6 +95,7 @@ class Creator extends BaseCreator
 
         // Support for some often used plugins that extend WooCommerce,
         // especially in the area of products (bundles, bookings, ...).
+        /** @var \Siel\Acumulus\WooCommerce\Invoice\CreatorPluginSupport $creatorPluginSupport */
         $creatorPluginSupport = $this->container->getInstance('CreatorPluginSupport', 'Invoice');
         $creatorPluginSupport->getItemLineBefore($this, $item, $product);
 
@@ -135,7 +136,9 @@ class Creator extends BaseCreator
             // corrected vat rate as that will worsen the precision of the price
             // ex.
             $precisionEx = $this->precision;
-            if ($this->isPriceIncRealistic($productPriceInc, $taxes, $product)) {
+            $reason = $this->isPriceIncRealistic($productPriceInc, $taxes, $product);
+            if ($reason !== '') {
+                $result[Meta::Warning] = "Price inc is realistic: $reason";
                 $precisionInc = 0.001;
                 $recalculatePrice = Tag::UnitPrice;
             } else {
@@ -275,7 +278,7 @@ class Creator extends BaseCreator
          * @var object[] $metadata
          */
         $metadata = $item->get_meta_data();
-        if (!empty($metadata)) {
+        if (count($metadata) > 0) {
             // Define hidden core fields: check this when new versions from WC
             // are released with the list in e.g.
             // wp-content\plugins\woocommerce\includes\admin\meta-boxes\views\html-order-item-meta.php
@@ -399,10 +402,10 @@ class Creator extends BaseCreator
 
         // To avoid rounding errors, we try to get the non-formatted amount.
         // Due to changes in how WC configures shipping methods (now based on
-        // zones), storage of order item meta data has changed. Therefore we
+        // zones), storage of order item metadata has changed. Therefore, we
         // have to try several option names.
         $methodId = $item->get_method_id();
-        if (substr($methodId, 0, strlen('legacy_')) === 'legacy_') {
+        if (strpos($methodId, 'legacy_') === 0) {
             $methodId = substr($methodId, strlen('legacy_'));
         }
         // Instance id is the zone, will return an empty value if not present.
@@ -421,6 +424,7 @@ class Creator extends BaseCreator
                 $precisionShippingEx = 0.001;
             }
         }
+
         $quantity = $item->get_quantity();
         $shippingEx /= $quantity;
         $shippingVat = $item->get_total_tax() / $quantity;
@@ -462,6 +466,7 @@ class Creator extends BaseCreator
         if (is_array($taxes)) {
             // Since version ?.?, $taxes has an indirection by key 'total'.
             if (!is_numeric(key($taxes))) {
+                /** @noinspection CallableParameterUseCaseInTypeContextInspection */
                 $taxes = current($taxes);
             }
             /** @noinspection NotOptimalIfConditionsInspection */
@@ -470,7 +475,7 @@ class Creator extends BaseCreator
                     if (!Number::isZero($amount)) {
                         $taxRate = WC_Tax::_get_tax_rate($taxRateId, OBJECT);
                         if ($taxRate) {
-                            if (empty($result)) {
+                            if (count($result) === 0) {
                                 $result = [
                                     Meta::VatClassId => $taxRate->tax_rate_class !== '' ? $taxRate->tax_rate_class : 'standard',
                                     // Vat class name is the non-sanitized
@@ -491,7 +496,7 @@ class Creator extends BaseCreator
             }
         }
 
-        if (empty($result)) {
+        if (count($result) === 0) {
             // Apparently we have free shipping (or a misconfigured shipment
             // method). Use a fall-back: WooCommerce only knows 1 tax rate
             // for all shipping methods, stored in config:
@@ -512,7 +517,7 @@ class Creator extends BaseCreator
                 /** @noinspection NotOptimalIfConditionsInspection */
                 if (is_string($shippingTaxClass)) {
                     $result = $this->getVatRateLookupMetadataByTaxClass($shippingTaxClass);
-                    if (!empty($result)) {
+                    if (count($result) > 0) {
                         $result[Meta::VatRateLookupSource] = "get_option('woocommerce_shipping_tax_class')";
                     }
                 }
@@ -638,26 +643,30 @@ class Creator extends BaseCreator
      * @param \WC_Product|null $product
      *   The product that has the given price inc and taxes.
      *
-     * @return bool
+     * @return string
      *   true if the price inc can be considered realistic, false otherwise.
      */
     protected function isPriceIncRealistic($productPriceInc, array $taxes, $product)
     {
+        $reason = '';
         // Given the precondition that product prices as entered include vat, we
         // consider a price in cents realistic.
         if ((Number::isRounded($productPriceInc, 2))) {
-            return true;
+            $reason = "price inc is rounded: $productPriceInc";
         }
         // If the price equals the actual product price, we consider it
         // realistic. Note that there may be valid reasons that the price differs
         // from the actual price, e.g. a price change since the order was placed,
         // or a discount that has been applied to the item line.
-        if ($product instanceof WC_Product && Number::floatsAreEqual($productPriceInc, $product->get_price())) {
-            return true;
+        if ($product instanceof WC_Product ) {
+            $productPriceOrg = $product->get_price();
+            if (Number::floatsAreEqual($productPriceInc, $productPriceOrg, 0.000051)) {
+                $reason = "item price inc ($productPriceInc) = product price inc ($productPriceOrg)";
+            }
         }
         if (!Number::areRounded($taxes, 2)) {
-            return true;
+            $reason = 'not all taxes are rounded => taxes are realistic (' . json_encode($taxes) . ')';
         }
-        return false;
+        return $reason;
     }
 }

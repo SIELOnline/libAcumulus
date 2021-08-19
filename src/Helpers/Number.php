@@ -9,7 +9,7 @@ namespace Siel\Acumulus\Helpers;
  * a small difference. when working with amounts, typically a difference of
  * half a cent is used.
  *
- * Some webshops do not store the used vat percentage with orders but store
+ * Some web shops do not store the used vat percentage with orders but store
  * the product price ex vat and the vat amount. As these amounts are often
  * stored with limited precision, typically 1 cent, the exact vat rate cannot
  * be calculated. Instead a range within which the vat rate falls can be
@@ -37,7 +37,7 @@ class Number
      * @return array
      *   Array of floats with keys min, max and calculated.
      */
-    static public function getDivisionRange($numerator, $denominator, $numeratorPrecision, $denominatorPrecision)
+    public static function getDivisionRange($numerator, $denominator, $numeratorPrecision, $denominatorPrecision)
     {
         // The actual value can be half the precision lower or higher.
         // To err on the save side, we take 60% of it (instead of 50%).
@@ -78,7 +78,7 @@ class Number
      *   True if the the floats are "equal", i.e. do not differ more than the
      *   specified maximum difference.
      */
-    static public function floatsAreEqual($f1, $f2, $maxDiff = 0.0051)
+    public static function floatsAreEqual($f1, $f2, $maxDiff = 0.0051)
     {
         return abs((float) $f2 - (float) $f1) < $maxDiff;
     }
@@ -95,7 +95,7 @@ class Number
      * @return bool
      *   True if the float is (almost) zero, false otherwise.
      */
-    static public function isZero($f1, $maxDiff = 0.0011)
+    public static function isZero($f1, $maxDiff = 0.0011)
     {
         return static::floatsAreEqual($f1, 0.0, $maxDiff);
     }
@@ -104,7 +104,7 @@ class Number
      * Returns whether a number can be considered a number being rounded to the
      * given precision.
      *
-     * @param float $f
+     * @param float|string $f
      *   The number may be passed as a string, and in many cases probably will
      *   indeed be passed as a string as it comes from the database.
      * @param int $precision
@@ -115,7 +115,7 @@ class Number
      *   true if $f is a number that appears to be rounded to the given
      *   precision, false otherwise.
      */
-    static public function isRounded($f, $precision)
+    public static function isRounded($f, $precision)
     {
         if (is_string($f)) {
             // For strings we look at the number of digits after the decimal
@@ -125,7 +125,7 @@ class Number
         } else {
             // For floats we use the round() function and look at the difference
             // (testing floats for equality within a given margin).
-            return static::floatsAreEqual($f, round($f, $precision), pow(10, -($precision + 2)) / 2.0);
+            return static::floatsAreEqual($f, round($f, $precision), (10 ** -($precision + 2)) / 2.0);
         }
     }
 
@@ -144,7 +144,7 @@ class Number
      *   true if all numbers in $fs appear to be rounded to the given
      *   precision, false otherwise.
      */
-    static public function areRounded(array $fs, $precision)
+    public static function areRounded(array $fs, $precision)
     {
         foreach ($fs as $f) {
             if (!static::isRounded($f, $precision)) {

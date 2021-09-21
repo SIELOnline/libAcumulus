@@ -29,8 +29,8 @@ use Siel\Acumulus\Helpers\Severity;
  * ----------------
  * The info received from an external API call should not be trusted, so it
  * should be sanitized. As most info from this API call is placed in markup
- * fields we cannot rely on the FormRenderer or the webshop's form API
- * (who do not sanitize markup fields).
+ * fields we cannot rely on the FormRenderer or the webshop's form API, who do
+ * not sanitize markup fields. so we do this in this form.
  *
  * This form uses ajax calls, values received from an ajax call are to be
  * treated as user input and thus should be sanitized and checked as all user
@@ -395,8 +395,8 @@ class InvoiceStatusForm extends Form
                 break;
 
             case 'invoice_paymentstatus_set':
-                $localEntryInfo = $this->acumulusEntryManager->getByInvoiceSource($source);
-                if ($localEntryInfo) {
+                $localEntry = $this->acumulusEntryManager->getByInvoiceSource($source);
+                if ($localEntry) {
                     if ((int) $this->getSubmittedValue($idPrefix . 'payment_status_new') === Api::PaymentStatus_Paid) {
                         $paymentStatus = Api::PaymentStatus_Paid;
                         $paymentDate =$this->getSubmittedValue($idPrefix . 'payment_date');
@@ -404,7 +404,7 @@ class InvoiceStatusForm extends Form
                         $paymentStatus = Api::PaymentStatus_Due;
                         $paymentDate = '';
                     }
-                    $result = $this->acumulusApiClient->setPaymentStatus($localEntryInfo->getToken(), $paymentStatus, $paymentDate);
+                    $result = $this->acumulusApiClient->setPaymentStatus($localEntry->getToken(), $paymentStatus, $paymentDate);
                 } else {
                     $this->addMessage(
                         sprintf($this->t('unknown_entry'), strtolower($this->t($source->getType())),$source->getId()),
@@ -413,11 +413,11 @@ class InvoiceStatusForm extends Form
                 break;
 
             case 'entry_deletestatus_set':
-                $localEntryInfo = $this->acumulusEntryManager->getByInvoiceSource($source);
-                if ($localEntryInfo && $localEntryInfo->getEntryId() !== null) {
+                $localEntry = $this->acumulusEntryManager->getByInvoiceSource($source);
+                if ($localEntry && $localEntry->getEntryId() !== null) {
                     $deleteStatus = $this->getSubmittedValue($idPrefix . 'delete_status') === Api::Entry_Delete ? Api::Entry_Delete : Api::Entry_UnDelete;
                     // @todo: clean up on receiving P2XFELO12?
-                    $result = $this->acumulusApiClient->setDeleteStatus($localEntryInfo->getEntryId(), $deleteStatus);
+                    $result = $this->acumulusApiClient->setDeleteStatus($localEntry->getEntryId(), $deleteStatus);
                 } else {
                     $this->addMessage(
                         sprintf($this->t('unknown_entry'), strtolower($this->t($source->getType())), $source->getId()),
@@ -463,9 +463,9 @@ class InvoiceStatusForm extends Form
             ];
         } else {
             // 1st fieldset: the order (the main source).
-            $localEntryInfo = $this->acumulusEntryManager->getByInvoiceSource($source);
+            $localEntry = $this->acumulusEntryManager->getByInvoiceSource($source);
             $idPrefix = $this->getIdPrefix($source);
-            $fields1Source = $this->addIdPrefix($this->getFields1Source($source, $localEntryInfo), $idPrefix);
+            $fields1Source = $this->addIdPrefix($this->getFields1Source($source, $localEntry), $idPrefix);
             $fields[$idPrefix] = [
                 'type' => 'fieldset',
                 'fields' => $fields1Source,
@@ -474,9 +474,9 @@ class InvoiceStatusForm extends Form
             // Other fieldsets: credit notes.
             $creditNotes = $source->getCreditNotes();
             foreach ($creditNotes as $creditNote) {
-                $localEntryInfo = $this->acumulusEntryManager->getByInvoiceSource($creditNote);
+                $localEntry = $this->acumulusEntryManager->getByInvoiceSource($creditNote);
                 $idPrefix = $this->getIdPrefix($creditNote);
-                $fields1Source = $this->addIdPrefix($this->getFields1Source($creditNote, $localEntryInfo), $idPrefix);
+                $fields1Source = $this->addIdPrefix($this->getFields1Source($creditNote, $localEntry), $idPrefix);
                 $fields[$idPrefix] = [
                     'type' => 'details',
                     'summary' => ucfirst($this->t($creditNote->getType())) . ' ' . $creditNote->getReference(),
@@ -492,28 +492,28 @@ class InvoiceStatusForm extends Form
      * Returns the overview for 1 source.
      *
      * @param \Siel\Acumulus\Invoice\Source $source
-     * @param \Siel\Acumulus\Shop\AcumulusEntry|null $localEntryInfo
+     * @param \Siel\Acumulus\Shop\AcumulusEntry|null $localEntry
      *
      * @return array[]
      *   The fields that describe the status for 1 source.
      */
-    protected function getFields1Source(Source $source, $localEntryInfo)
+    protected function getFields1Source(Source $source, $localEntry)
     {
         $this->resetStatus();
         // Get invoice status field and other invoice status related info.
-        $statusInfo = $this->getInvoiceStatusInfo($source, $localEntryInfo);
+        $invoiceInfo = $this->getInvoiceInfo($source, $localEntry);
 
-        $this->setStatus($statusInfo['severity'], $statusInfo['severity-message']);
+        $this->setStatus($invoiceInfo['severity'], $invoiceInfo['severity-message']);
         /** @var string $invoiceStatus */
-        $invoiceStatus = $statusInfo['status'];
+        $invoiceStatus = $invoiceInfo['status'];
         /** @var string $statusText */
-        $statusText = $statusInfo['text'];
+        $statusText = $invoiceInfo['text'];
         /** @var string $statusDescription */
-        $statusDescription = $statusInfo['description'];
+        $statusDescription = $invoiceInfo['description'];
         /** @var Result|null $result */
-        $result = $statusInfo['result'];
+        $result = $invoiceInfo['result'];
         /** @var array $entry */
-        $entry = $statusInfo['entry'];
+        $entry = $invoiceInfo['entry'];
 
         // Create and add additional fields based on invoice status.
         switch ($invoiceStatus) {
@@ -566,22 +566,22 @@ class InvoiceStatusForm extends Form
     }
 
     /**
-     * Returns status related information.
+     * Returns (remote and local) invoice related information.
      *
      * @param \Siel\Acumulus\Invoice\Source $source
-     * @param \Siel\Acumulus\Shop\AcumulusEntry|null $localEntryInfo
+     * @param \Siel\Acumulus\Shop\AcumulusEntry|null $localEntry
      *   Passed by reference as it may have to be renewed when a concept was
      *   made definitive.
      *
      * @return array
      *   Keyed array with keys:
-     *   - status (string): 1 of the ShopOrderOverviewForm::Status_ constants.
-     *   - send-status (string): 1 of the ShopOrderOverviewForm::Invoice_ constants.
+     *   - status (string): 1 of the InvoiceStatusForm::Status_ constants.
+     *   - send-status (string): 1 of the InvoiceStatusForm::Invoice_ constants.
      *   - result (\Siel\Acumulus\ApiClient\Result?): result of the getEntry API call.
-     *   - entry (array|null): the <entry> part of the getEntry API call.
+     *   - entry (array?): the (main) response part of the getEntry API call.
      *   - statusField (array): a form field array representing the status.
      */
-    protected function getInvoiceStatusInfo(Source $source, &$localEntryInfo)
+    protected function getInvoiceInfo(Source $source, &$localEntry)
     {
         $result = null;
         $entry = null;
@@ -589,13 +589,13 @@ class InvoiceStatusForm extends Form
         $arg2 = null;
         $description = '';
         $statusMessage = null;
-        if ($localEntryInfo === null) {
+        if ($localEntry === null) {
             $invoiceStatus = static::Invoice_NotSent;
             $statusSeverity = static::Status_Info;
         } else {
-            $arg1 = $this->getDate($localEntryInfo->getUpdated());
-            if ($localEntryInfo->getConceptId() !== null) {
-                if ($localEntryInfo->getConceptId() === AcumulusEntry::conceptIdUnknown) {
+            $arg1 = $this->getDate($localEntry->getUpdated());
+            if ($localEntry->getConceptId() !== null) {
+                if ($localEntry->getConceptId() === AcumulusEntry::conceptIdUnknown) {
                     // Old entry: no concept id stored, we cannot show more
                     // information.
                     $invoiceStatus = static::Invoice_SentConcept;
@@ -604,7 +604,7 @@ class InvoiceStatusForm extends Form
                 } else {
                     // Entry saved with support for concept ids.
                     // Has the concept been changed into an invoice?
-                    $result = $this->acumulusApiClient->getConceptInfo($localEntryInfo->getConceptId());
+                    $result = $this->acumulusApiClient->getConceptInfo($localEntry->getConceptId());
                     $conceptInfo = $this->sanitizeConceptInfo($result->getResponse());
                     if (empty($conceptInfo)) {
                         $invoiceStatus = static::Invoice_CommunicationError;
@@ -637,13 +637,13 @@ class InvoiceStatusForm extends Form
                         $entry = $this->sanitizeEntry($result->getResponse());
                         if (!$result->hasError() && !empty($entry['token'])) {
                             if ($this->acumulusEntryManager->save($source, $conceptInfo['entryid'], $entry['token'])) {
-                                $newLocalEntryInfo = $this->acumulusEntryManager->getByInvoiceSource($source);
-                                if ($newLocalEntryInfo === null) {
+                                $newLocalEntry = $this->acumulusEntryManager->getByInvoiceSource($source);
+                                if ($newLocalEntry === null) {
                                     $invoiceStatus = static::Invoice_LocalError;
                                     $statusSeverity = static::Status_Error;
                                     $description = 'entry_concept_not_loaded';
                                 } else {
-                                    $localEntryInfo = $newLocalEntryInfo;
+                                    $localEntry = $newLocalEntry;
                                     // Status and severity will be overwritten
                                     // below based on the found real invoice.
                                 }
@@ -660,15 +660,15 @@ class InvoiceStatusForm extends Form
                 }
             }
 
-            if ($localEntryInfo->getEntryId() !== null) {
-                $result = $this->acumulusApiClient->getEntry($localEntryInfo->getEntryId());
+            if ($localEntry->getEntryId() !== null) {
+                $result = $this->acumulusApiClient->getEntry($localEntry->getEntryId());
                 $entry = $this->sanitizeEntry($result->getResponse());
                 if ($result->getByCodeTag('XGYBSN000')) {
                     $invoiceStatus = static::Invoice_NonExisting;
                     $statusSeverity = static::Status_Error;
                     // To prevent this error in the future, we delete the local
                     // entry.
-                    $this->acumulusEntryManager->delete($localEntryInfo);
+                    $this->acumulusEntryManager->delete($localEntry);
                 } elseif (empty($entry)) {
                     $invoiceStatus = static::Invoice_CommunicationError;
                     $statusSeverity = static::Status_Error;
@@ -941,10 +941,22 @@ class InvoiceStatusForm extends Form
      * Returns the amounts of this invoice.
      *
      * To check if the amounts match we have to treat local and foreign vat the
-     * same, which Acumulus doesn't.
+     * same, which Acumulus didn't in the past, but does since the new EU
+     * commerce rules:
+     * New order:
+     *   "foreignvat": "1",
+     *   "totalvalueexclvat": "161.14",
+     *   "totalvalue": "193.37",
+     *   "totalvalueforeignvat": "32.23",
+     * Old order:
+     *   "foreignvat": "1",
+     *   "totalvalueexclvat": "193.37",
+     *   "totalvalue": "193.37",
+     *   "totalvalueforeignvat": "32.23",
      *
      * @param \Siel\Acumulus\Invoice\Source $source
      * @param array $entry
+     *   The sanitized remote entry, i.e. the response of the getEntry API call.
      *
      * @return array[]
      *   Array with form fields with the invoice amounts.
@@ -957,13 +969,22 @@ class InvoiceStatusForm extends Form
             $amountExAcumulus = $entry['totalvalueexclvat'];
             $amountIncAcumulus = $entry['totalvalue'];
             $amountVatAcumulus = $amountIncAcumulus - $amountExAcumulus;
-            $amountForeignVatAcumulus = $entry['totalvalueforeignvat'];
-            if (!Number::isZero($amountForeignVatAcumulus)) {
-                $vatType = Number::isZero($amountVatAcumulus)
-                    ? $this->t('foreign_vat')
-                    : $this->t('foreign_national_vat');
-                $amountExAcumulus -= $amountForeignVatAcumulus;
-                $amountVatAcumulus += $amountForeignVatAcumulus;
+            if ($entry['foreignvat']) {
+                $vatType = $this->t('foreign_vat');
+                $amountForeignVatAcumulus = $entry['totalvalueforeignvat'];
+                // Old or new way of storage?
+                if (Number::isZero($amountVatAcumulus)) {
+                    // Old (or zero vat): correct the vat and ex amount.
+                    $amountVatAcumulus += $amountForeignVatAcumulus;
+                    $amountExAcumulus -= $amountForeignVatAcumulus;
+                } else {
+                    // New (or mixed): the difference should be all tax paid.
+                    // We just do a check on mixed vat, which, I think, should
+                    // not be possible.
+                    if (!Number::floatsAreEqual($amountVatAcumulus, $amountForeignVatAcumulus)) {
+                        $vatType = $this->t('foreign_national_vat');
+                    }
+                }
             } else {
                 $vatType = $this->t('vat');
             }

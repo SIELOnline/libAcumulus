@@ -382,7 +382,11 @@ class ConfigForm extends BaseConfigForm
             'vatFreeClass' => [
                 'type' => 'select',
                 'label' => sprintf($this->t('field_vatFreeClass'), $this->t('vat_class')),
-                'description' => sprintf($this->t('desc_vatFreeClass'), $this->t('vat_class'), $this->t('vat_class_not_applicable'), $this->t('vat_class_left_empty')),
+                'description' => sprintf($this->t('desc_vatFreeClass'),
+                    $this->t('vat_class'),
+                    $this->t('vat_class_not_applicable'),
+                    sprintf($this->t('vat_class_left_empty'), $this->t('vat_class'))
+                ),
                 'options' => [
                                  0 => $this->t('option_empty'),
                                  Config::VatClass_NotApplicable => ucfirst($this->t('vat_class_not_applicable')),

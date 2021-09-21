@@ -8,17 +8,32 @@ MA  = Magento (alle ondersteunde versies)
 MA1 = Magento 1 (wordt niet meer ondersteund sinds 6.0.0)
 MA2 = Magento 2 (MA20, MA21, ... = specifieke minor versie binnen major versie 2)
 OC  = OpenCart (alle ondersteunde versies)
-OC1 = OpenCart 1 (sinds 6.3.0 wordt OC1 niet meer actief onderhouden en getest.
-      Sowieso werd al voor langere tijd alleen OpenCart 1.5.6.4 nog ondersteund)
-OC2 = OpenCart 2 (sinds 6.3.0 wordt OC1 niet meer actief onderhouden en getest.
-      Sowieso werd al voor langere tijd alleen OpenCart 2.3 nog ondersteund)
+OC1 = OpenCart 1 (sinds 6.3.0 wordt OC1 niet meer actief onderhouden en getest.)
+      Sowieso werd al alleen OpenCart 1.5.6.4 nog ondersteund.
+OC2 = OpenCart 2 (sinds 6.3.0 wordt OC2 niet meer actief onderhouden en getest.)
+      Sowieso werd al alleen OpenCart 2.3.0.2 nog ondersteund.
 OC3 = OpenCart 3
-PS  = PrestaShop (1.7.6+) (1.6- wordt niet meer ondersteund sinds 6.0.0)
+PS  = PrestaShop (1.7.6+) (1.6.x- wordt niet meer ondersteund sinds 6.0.0)
 VM3 = VirtueMart3 (Joomla)
-WC  = WooCommerce (WordPress) (alle ondersteunde versies)
-WC2 = WooCommerce 2 (WordPress) (wordt niet meer ondersteund sinds 5.5.2)
-WC3 = WooCommerce 3 (WordPress)
-WC4 = WooCommerce 4 (WordPress)
+WC  = WooCommerce 5 (WC 4 en 3 zullen waarschijnlijk ook werken)
+WC2 = WooCommerce 2 (wordt niet meer ondersteund vanaf onze versie 5.5.2)
+
+6.3.2 (2021-09-21)
+------------------
+Bugs:
+- ALL: Invoice status overview: Acumulus no longer distinguishes between dutch
+  and EU vat. As a result, the amounts in the get_entry API call changed,
+  leading to warnings about incorrect vat and amount ex vat.
+- ALL: ajax event handlers where not refreshed after an ajax (partial) page
+  refresh.
+- WC: The html for our "please rate our plugin" message triggered WP to move our
+  message above the title "Dashboard", leading to our js no longer reacting
+  correctly to the "No thanks" button.
+- PS: 1.7.7.0 introduced new hooks to add content to the order view page. As a
+  result, our status invoice overview was no longer shown.
+- ALL: Non-expanded %-code in help text in Configuration form.
+- ALL: Verwijzing naar "Electronische diensten in de EU" gewijzigd in
+  "Buitenlandse (EU) btw".
 
 6.3.1 (2021-07-27)
 ------------------
@@ -1720,97 +1735,64 @@ toepassing waren op 4.x ook hier opgelost. Vanwege de grote verschillen is de
 
 Ondersteunde versies van de verschillende pakketten
 ===================================================
-Merk op dat dit versies zijn die "ooit" getest zijn, waarbij uiteraard de meest
-recente versie momenteel gebruikt wordt bij het ontwikkelen en testen. Het is
-dus niet gegarandeerd dat de huidige versie van onze plugin oudere versies van
-de webshop correct ondersteund. Daar waar kennis daarover beschikbaar is, wordt
-die hieronder vermeld.
+Merk op dat dit de versies zijn die momenteel gebruikt worden voor het
+ontwikkelen van nieuwe features, het oplossen van fouten en het testen. De kans
+bestaat dat deze lijst niet helemaal up to date is
 
 HikaShop
 --------
-* 4.0.3 (Joomla 3.9.3) - 2.6.0 (Joomla 3.4.8)
+* 4.4.3 (Joomla 3.10.2)
 
 
 Magento 2
 ---------
-* 2.3 lokaal niet werkend te krijgen, maar er is geen feedback van klanten dat
+* 2.4 lokaal niet werkend te krijgen, maar er is geen feedback van klanten dat
   het niet werkt.
-* 2.2 lokaal niet werkend te krijgen, maar er is geen feedback van klanten dat
-  het niet werkt.
-* 2.1.11 - 2.1.2
-* 2.0.6 - 2.0.4
+* 2.3 lokaal werkend en dus de versie wear mee getest wordt.
 
 
 Magento 1
 ---------
+* wordt niet meer ondersteund, maar de code specifiek voor deze versie is ook
+  nog niet verwijderd, maar niewuwe feature worden al lange tijd niet meer
+  getest op deze versie.
 * 1.9.3.7 - 1.9.2.1
-* 1.7 door klanten getest, lijkt te werken.
 
 
 OpenCart 3.x
 ------------
-* 3.0.2.1b
+* 3.0.3.7 (3.0.3.8 nog  niet getest)
 
 
 OpenCart 2.x
 ------------
-* 2.3.0.2
+* 2.3.0.2 op deze versie wordt af en toe nog getest, maar alleen OpenCart 3
+  wordt continu getest.
 * 2.2.0.0 (t/m library versie 5.4.1)
 * 2.1.0.1 (t/m library versie 5.4.1)
 
 
 OpenCart 1.x
 ------------
-* 1.5.6.4
+* 1.5.6.4 op deze versie wordt af en toe nog getest, maar alleen OpenCart 3
+  wordt continu getest.
 
 
 PrestaShop
 ----------
-* 1.7.5 - 1.7.1
+* 1.7.7.8
+* 1.7.6.x zal werken
 * 1.6 lijkt iha te werken, maar de link van het geavanceerde instellingenscherm
   naar het configureerscherm werkt niet.
 * Thirtybees lijkt een kloon van PS1.6 en kan/zal dus dezelfde problemen als 1.6
   hebben.
-* 1.6.1.13
-* 1.6.1.2 bevat een fout die deze koppeling raakt
-* 1.6.1.0 bevat fouten die deze koppeling raken.
-* 1.5.x (werkt volgens gebruikers vanaf 4.2.0-alpha5)
 
 
 VirtueMart
 ----------
-* 3.4.2 (Joomla 3.8.13)
-* 3.2.14 (Joomla 3.8.10)
-* 3.2.12 (Joomla 3.8.5)
-* 3.2.12 (Joomla 3.8.3)
-* 3.2.4 (Joomla 3.8.1)
-* 3.0.18 (Joomla 3.7.2)
-* 3.0.18 (Joomla 3.6.5)
-* 3.0.18 (Joomla 3.6.2)
-* 3.0.14 (Joomla 3.4.4)
-* 3.0.10 (Joomla 3.4.4)
-* 3.0.8 (Joomla 3.4.1)
+* 3.8.8 (Joomla 3.10.2)
 
 
 WooCommerce
 -----------
-* 3.3.5 (WordPress: 4.9.5)
-* 3.2.6 (WordPress: 4.9.2)
-* 3.1.2 (WordPress: 4.8.2)
-* 3.1.2 (WordPress: 4.8)
-* 3.1.1 (WordPress: 4.8)
-* 3.1.0 (WordPress: 4.8)
-* 3.0.1 (WordPress: 4.7.3)
-* 2.6.13 (WordPress: 4.7.3)
-* 2.6.11 (WordPress: 4.7)
-* 2.6.6 (WordPress: 4.6.1)
-* 2.6.4 (WordPress: 4.6.1)
-* 2.6.1 (WordPress: 4.5.3)
-* 2.5.5 (WordPress: 4.5.3)
-* 2.5.5 (WordPress: 4.5.2)
-* 2.5.5 (WordPress: 4.4.2)
-* 2.5.2 (WordPress: 4.4.2)
-* 2.4.12 (WordPress: 4.4.2)
-* 2.4.7 (WordPress: 4.3.1)
-* 2.3.13 (WordPress: 4.2.3)
-* < 2.3 gaat niet correct werken met "apply after tax" coupons.
+* 5.6.0 (WordPress: 5.8.1)

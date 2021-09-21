@@ -42,7 +42,7 @@ class InvoiceStatusFormTranslations extends TranslationCollection
         'vat_type_3' => 'Btw-verlegd in de EU',
         'vat_type_4' => 'Goederen buiten de EU',
         'vat_type_5' => 'Margeregeling (2e-hands producten)',
-        'vat_type_6' => 'Electronische diensten in de EU',
+        'vat_type_6' => 'Buitenlandse (EU) btw',
 
         // Amounts.
         'invoice_amount' => 'Bedrag',

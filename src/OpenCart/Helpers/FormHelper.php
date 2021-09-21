@@ -13,7 +13,7 @@ class FormHelper extends BaseFormHelper
      */
     public function isSubmitted()
     {
-        return $this->getRequest()->server['REQUEST_METHOD'] == 'POST';
+        return $this->getRequest()->server['REQUEST_METHOD'] === 'POST';
     }
 
     /**

@@ -50,9 +50,7 @@ class FormRenderer extends BaseFormRenderer
             if (empty($this->elementWrapperClass)) {
                 $this->elementWrapperClass = 'required';
             } else {
-                if (!is_array($this->elementWrapperClass)) {
-                    $this->elementWrapperClass = (array) $this->elementWrapperClass;
-                }
+                $this->elementWrapperClass = (array) $this->elementWrapperClass;
                 $this->elementWrapperClass[] = 'required';
             }
         }

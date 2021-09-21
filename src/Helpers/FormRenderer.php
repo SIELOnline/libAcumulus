@@ -39,37 +39,37 @@ class FormRenderer
     /** @var string */
     protected $elementWrapperTag = 'div';
 
-    /** @var string */
+    /** @var string|string[] */
     protected $elementWrapperClass = 'form-element';
 
     /** @var string */
     protected $fieldsetWrapperTag = 'fieldset';
 
-    /** @var string */
+    /** @var string|string[] */
     protected $fieldsetWrapperClass = '';
 
     /** @var string */
     protected $detailsWrapperTag = 'details';
 
-    /** @var string */
+    /** @var string|string[] */
     protected $detailsWrapperClass = '';
 
     /** @var string */
     protected $legendWrapperTag = 'legend';
 
-    /** @var string */
+    /** @var string|string[] */
     protected $legendWrapperClass = '';
 
     /** @var string */
     protected $summaryWrapperTag = 'summary';
 
-    /** @var string */
+    /** @var string|string[] */
     protected $summaryWrapperClass = '';
 
     /** @var string */
     protected $fieldsetDescriptionWrapperTag = 'div';
 
-    /** @var string */
+    /** @var string|string[] */
     protected $fieldsetDescriptionWrapperClass = 'fieldset-description';
 
     /**
@@ -82,56 +82,56 @@ class FormRenderer
     /**
      * Also used for details content.
      *
-     * @var string
+     * @var string|string[]
      */
     protected $fieldsetContentWrapperClass = 'fieldset-content';
 
     /** @var string */
     protected $labelWrapperTag = '';
 
-    /** @var string */
+    /** @var string|string[] */
     protected $labelWrapperClass = '';
 
     /** @var string */
     protected $markupWrapperTag = 'div';
 
-    /** @var string */
+    /** @var string|string[] */
     protected $markupWrapperClass = 'message';
 
     /** @var string */
     protected $inputDescriptionWrapperTag = '';
 
-    /** @var string */
+    /** @var string|string[] */
     protected $inputDescriptionWrapperClass = '';
 
     /** @var string */
     protected $inputWrapperTag = '';
 
-    /** @var string */
+    /** @var string|string[] */
     protected $inputWrapperClass = '';
 
     /** @var string */
     protected $radioWrapperTag = 'div';
 
-    /** @var string */
+    /** @var string|string[] */
     protected $radioWrapperClass = 'radio';
 
     /** @var string */
     protected $radio1WrapperTag = '';
 
-    /** @var string */
+    /** @var string|string[] */
     protected $radio1WrapperClass = '';
 
     /** @var string */
     protected $checkboxWrapperTag = 'div';
 
-    /** @var string */
+    /** @var string|string[] */
     protected $checkboxWrapperClass = 'checkbox';
 
     /** @var string */
     protected $checkbox1WrapperTag = '';
 
-    /** @var string */
+    /** @var string|string[] */
     protected $checkbox1WrapperClass = '';
 
     /** @var string */
@@ -143,16 +143,16 @@ class FormRenderer
     /** @var string */
     protected $multiLabelTag = 'label';
 
-    /** @var string */
+    /** @var string|string[] */
     protected $labelClass = '';
 
-    /** @var string */
+    /** @var string|string[] */
     protected $multiLabelClass = '';
 
     /** @var string */
     protected $descriptionWrapperTag = 'div';
 
-    /** @var string */
+    /** @var string|string[] */
     protected $descriptionWrapperClass = 'description';
 
     /** @var bool */

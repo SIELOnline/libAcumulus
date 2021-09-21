@@ -14,11 +14,11 @@ class FormHelper extends BaseFormHelper
     protected $moduleName = 'acumulus';
 
     protected $icons = [
-        'acumulus' => 'icon-acumulus',
         'accountSettings' => 'icon-user',
         'shopSettings' => 'icon-shopping-cart',
         'triggerSettings' => 'icon-exchange',
         'invoiceSettings' => 'icon-list-alt',
+        'invoiceLinesSettingsHeader' => 'icon-list-alt',
         'paymentMethodAccountNumberFieldset' => 'icon-credit-card',
         'paymentMethodCostCenterFieldset' => 'icon-credit-card',
         'emailAsPdfSettingsHeader' => 'icon-file-pdf-o',

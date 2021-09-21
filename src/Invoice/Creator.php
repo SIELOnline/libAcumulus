@@ -840,11 +840,11 @@ abstract class Creator
         if ($emailAsPdfSettings['emailAsPdf']) {
             $emailTo = !empty($emailAsPdfSettings['emailTo']) ? $this->getTokenizedValue($emailAsPdfSettings['emailTo']) : $fallbackEmailTo;
             if (!empty($emailTo)) {
-                $emailAsPdf['emailto'] = $emailTo;
-                $this->addTokenDefault($emailAsPdf, 'emailbcc', $emailAsPdfSettings['emailBcc']);
-                $this->addTokenDefault($emailAsPdf, 'emailfrom', $emailAsPdfSettings['emailFrom']);
-                $this->addTokenDefault($emailAsPdf, 'subject', $emailAsPdfSettings['subject']);
-                $emailAsPdf['confirmreading'] = $emailAsPdfSettings['confirmReading'] ? Api::ConfirmReading_Yes : Api::ConfirmReading_No;
+                $emailAsPdf[Tag::EmailTo] = $emailTo;
+                $this->addTokenDefault($emailAsPdf, Tag::EmailBcc, $emailAsPdfSettings['emailBcc']);
+                $this->addTokenDefault($emailAsPdf, Tag::EmailFrom, $emailAsPdfSettings['emailFrom']);
+                $this->addTokenDefault($emailAsPdf, Tag::Subject, $emailAsPdfSettings['subject']);
+                $emailAsPdf[Tag::ConfirmReading] = $emailAsPdfSettings['confirmReading'] ? Api::ConfirmReading_Yes : Api::ConfirmReading_No;
             }
         }
         return $emailAsPdf;

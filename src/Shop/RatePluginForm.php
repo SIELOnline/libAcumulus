@@ -94,7 +94,6 @@ class RatePluginForm extends Form
                 break;
             case 'done':
                 $this->acumulusConfig->save(['showRatePluginMessage' => PHP_INT_MAX]);
-                $this->addMessage(sprintf($this->t('done_thanks'), $this->t('module')), Severity::Success);
                 break;
             default:
                 $this->addMessage(sprintf($this->t('unknown_action'), $this->action), Severity::Error);

@@ -18,6 +18,15 @@ VM3 = VirtueMart3 (Joomla)
 WC  = WooCommerce 5 (WC 4 en 3 zullen waarschijnlijk ook werken)
 WC2 = WooCommerce 2 (wordt niet meer ondersteund vanaf onze versie 5.5.2)
 
+6.3.3 (2021-09-23)
+------------------
+Bugs:
+- WC: Regression: the solution regarding the problem with our "please rate our
+  plugin" message introduced another error in the "invoice status overview box"
+  with as result that it did no longer auto-load the actual content.
+- ALL: Message "Bedankt voor het beoordelen van de Acumulus plugin/module"
+  verscheen 2 keer.
+
 6.3.2 (2021-09-21)
 ------------------
 Bugs:

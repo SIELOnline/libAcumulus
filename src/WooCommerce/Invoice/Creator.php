@@ -397,7 +397,7 @@ class Creator extends BaseCreator
         // Precision: shipping costs are entered ex VAT, so that may be very
         // precise, but it will be rounded to the cent by WC. The VAT is also
         // rounded to the cent.
-        $shippingEx = $item->get_total();
+        $shippingEx = (float) $item->get_total();
         $precisionShippingEx = 0.01;
 
         // To avoid rounding errors, we try to get the non-formatted amount.
@@ -420,7 +420,7 @@ class Creator extends BaseCreator
             // Cost may be entered with a comma ...
             $cost = str_replace(',', '.', $option['cost']);
             if (Number::floatsAreEqual($cost, $shippingEx)) {
-                $shippingEx = $cost;
+                $shippingEx = (float) $cost;
                 $precisionShippingEx = 0.001;
             }
         }

@@ -20,9 +20,15 @@ WC2 = WooCommerce 2 (wordt niet meer ondersteund vanaf onze versie 5.5.2)
 
 6.3.5 (2021-11-??)
 ------------------
+Bugs:
+- WC|MA (and maybe others): een factuur met verlegde btw en gratis verzending
+  levert een waarschuwing en dus een conceptfactuur op omdat ten onrechte het
+  `standaard btw-tarief van verzendkosten aan de gratis verzending word
+  toegekend ipv 0%.
+
 Refactorings:
-- WC: WC heeft de method add() in zijn logging gedeprecated. Onze log helper is
-  hier nu op aangepast (datum wordt nu in de ISO standaard afgedrukt).
+- WC: de method WC_Logger::add() is deprecated. Onze log helper is hier op
+  aangepast Zichtbaar gevolg: dedatum wordt nu in de ISO standaard afgedrukt.
 
 6.3.4 (2021-10-22)
 ------------------

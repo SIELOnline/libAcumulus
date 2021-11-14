@@ -133,7 +133,7 @@ class CompletorInvoiceLines
         // meta-vatrate-max and may lead to more (required) data filled in, so
         // should be called before completeLineRequiredData().
         $lines = $this->correctCalculatedVatRates($lines);
-        // addVatRateToLookupLines() only uses meta-vat-rate-lookup and may lead
+        // addVatRateUsingLookupData() only uses meta-vat-rate-lookup and may lead
         // to more (required) data filled in, so should be called before
         // completeLineRequiredData().
         $lines = $this->addVatRateUsingLookupData($lines);
@@ -294,14 +294,25 @@ class CompletorInvoiceLines
      * Completes lines that have meta-vatrate-lookup(-...) data.
      *
      * Meta-vatrate-lookup data is added by the Creator class using vat rates
-     * from the products. However as VAT rates may have changed between the date
-     * of the order and now, we cannot fully rely on it and use it only as a(n
-     * almost) last resort. In the following cases it may be used:
-     * - 0 price: With free products we cannot calculate a vat rate so we have
-     *   to rely on lookup.
-     * - The calculated vat rate range is so wide that it contains multiple
-     *   possible vat rates. If the looked up vat rate is one of them, we use
-     *   it.
+     * from the product info. However, as VAT rates may have changed between the
+     * date of the order and now, we cannot fully rely on it and use it only as
+     * a(n almost) last resort.
+     *
+     * We filter the looked up vat rate(s) against:
+     * - The possible vat rates (given the possible vat types).
+     * - The vat rate range (using the value of Meta::VatRateRangeMatches, if
+     *   set).
+     * - If still multiple vat rate (infos) remains, we filter by national
+     *   versus EU vat (e.g. to distinguish between NL and BE 21%).
+     *
+     * In the following cases it may be used:
+     *   1. The calculated vat rate range is so wide that it contains multiple
+     *      possible vat rates. If the looked up vat rate is one of them, we use
+     *      it.
+     *   2. 0 price: With free products we cannot calculate a vat rate, so we
+     *      have to rely on lookup. However, if reversed vat or another 0-vat
+     *      vat type is possible, we cannot blindly choose the lookup rate and
+     *      should rely on the strategy phase.
      *
      * @param array[] $lines
      *   The invoice lines to correct using lookup data.
@@ -313,20 +324,26 @@ class CompletorInvoiceLines
     {
         foreach ($lines as &$line) {
             if ($line[Meta::VatRateSource] === Creator::VatRateSource_Completor) {
-                if (!empty($line[Meta::VatRateLookup])) {
+                // Do we have lookup data and not the exception for situation 2?
+                if (!empty($line[Meta::VatRateLookup])
+                    && (!Number::isZero($line[Tag::UnitPrice]) || !$this->completor->is0VatVatTypePossible())
+                ) {
+                    // Filter lookup rate(s) by the rates of the possible vat types.
                     $line[Meta::VatRateLookupMatches] = $this->filterVatRateInfosByVatRates($line[Meta::VatRateLookup]);
                     $vatRateSource = Completor::VatRateSource_Completor_Lookup;
+
+                    // Try to reduce the set by intersecting with the vat rate
+                    // range matches.
                     if (!$this->getUniqueVatRate($line[Meta::VatRateLookupMatches]) && !empty($line[Meta::VatRateRangeMatches])) {
-                        // Try to reduce the set by intersecting with the vat
-                        // rate range matches.
                         $line[Meta::VatRateLookupMatches] = $this->filterVatRateInfosByVatRates(
                             $line[Meta::VatRateRangeMatches],
                             $line[Meta::VatRateLookupMatches]);
                         $vatRateSource = Completor::VatRateSource_Completor_Range_Lookup;
                     }
 
+                    // Try to reduce the set by filtering on foreign or national
+                    // vat type using the vat class lookup data.
                     if (!$this->getUniqueVatRate($line[Meta::VatRateLookupMatches]) && !empty($line[Meta::VatClassId])) {
-                        // Try to reduce the set by filtering on the vat type.
                         $line[Meta::VatRateLookupMatches] = $this->filterVatRateInfosByForeignVat(
                             $this->completor->isForeignVatClass($line[Meta::VatClassId]),
                             $line[Meta::VatRateLookupMatches]);
@@ -338,18 +355,21 @@ class CompletorInvoiceLines
                         $vatRateInfo = reset($line[Meta::VatRateLookupMatches]);
                         $line[Tag::VatRate] = is_array($vatRateInfo) ? $vatRateInfo[Tag::VatRate] : $vatRateInfo;
                         $line[Meta::VatRateSource] = $vatRateSource;
-                    } else {
-                        // Have the strategy phase give it another try.
-                        $line[Meta::VatRateSource] = Creator::VatRateSource_Strategy;
                     }
-                } else {
-                    // We either do not have lookup data or the looked up vat
-                    // rate is not possible. If this is not a 0-price line we
-                    // may still have a chance by using the vat range tactics
-                    // on the line totals or reverting to the strategy phase if
-                    // the line may be split.
-                    // For now I am not going to use the line totals as they are
-                    // hardly available.
+                }
+
+                /** @noinspection NotOptimalIfConditionsInspection */
+                if ($line[Meta::VatRateSource] === Creator::VatRateSource_Completor) {
+                    // We either do not have lookup data, the looked up vat rate
+                    // is not possible, or we have a 0-price line with multiple
+                    // vat rates possible: give the strategy phase a chance to
+                    // resolve.
+                    //
+                    // Note: if this is not a 0-price line we may still have a
+                    // chance by using the vat range tactics on the line totals
+                    // (as that can be more precise with small prices and large
+                    // quantities). However, for now, I am not going to use the
+                    // line totals as they are hardly available.
                     $line[Meta::VatRateSource] = Creator::VatRateSource_Strategy;
                 }
             }
@@ -462,6 +482,7 @@ class CompletorInvoiceLines
                     if (!empty($line[Meta::ChildrenLines])) {
                         $precision *= count($line[Meta::ChildrenLines]);
                     }
+                    /** @noinspection SlowArrayOperationsInLoopInspection */
                     $line = array_merge($line, Creator::getVatRangeTags($line[Meta::VatAmount], $line[Tag::UnitPrice], $precision, $precision));
                     $line[Meta::FieldsCalculated][] = Tag::VatRate;
                 }
@@ -569,7 +590,7 @@ class CompletorInvoiceLines
      * Completes lines with free items (price = 0) by giving them the maximum
      * tax rate that appears in the other lines.
      *
-     * These lines already have gone through the addVatRateToLookupLines()
+     * These lines already have gone through the addVatRateUsingLookupData()
      * method, but either no lookup vat data is available or the looked up vat
      * rate is not a possible vat rate.
      *
@@ -655,17 +676,17 @@ class CompletorInvoiceLines
     }
 
     /**
-     * Returns the subset of the vat rate infos that have a vat rate that appears within the given set of vat rates.
+     * Returns the subset of the vat rate infos that have a vat rate that
+     * appears within the given set of vat rates.
      *
-     * @param float|float[] $vatRates
-     *   The vat rate(s) to filter.
-     *
+     * @param float|float[]|array|array[] $vatRates
+     *   The vat rate(s) or vat rate info(s) to filter against.
      * @param array|null $vatRateInfos
      *   The set of vat rate infos to filter. If not given, the property
      *   $this->possibleVatRates is used.
      *
      * @return array[]
-     *   The, possibly empty, set of vat rate infos that have a vat rate that
+     *   The, possibly empty, set of $vatRateInfos that have a vat rate that
      *   appears within the set of $vatRates.
      */
     protected function filterVatRateInfosByVatRates($vatRates, array $vatRateInfos = null)
@@ -689,7 +710,8 @@ class CompletorInvoiceLines
     }
 
     /**
-     * Returns the subset of the vat rate infos that have (or do not have) a foreign vat type.
+     * Returns the subset of the vat rate infos that (do not) indicate a foreign
+     * vat type.
      *
      * @param bool $isForeignVatType
      *   True to filter on vat type = Api::VatType_ForeignVat, false to filter
@@ -699,8 +721,8 @@ class CompletorInvoiceLines
      *   $this->possibleVatRates is used.
      *
      * @return array[]
-     *   The, possibly empty, set of vat rate infos that have a vat type that
-     *   have (or do not have) a foreign vat type.
+     *   The, possibly empty, set of vat rate infos that indicate (or not) a
+     *   foreign vat type.
      */
     protected function filterVatRateInfosByForeignVat($isForeignVatType, array $vatRateInfos = null)
     {

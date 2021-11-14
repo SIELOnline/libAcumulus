@@ -75,7 +75,6 @@ class Completor
      */
     protected static $zeroVatVatTypes = [Api::VatType_NationalReversed, Api::VatType_EuReversed, Api::VatType_RestOfWorld];
 
-
     /** @var \Siel\Acumulus\Config\Config */
     protected $config;
 
@@ -416,6 +415,7 @@ class Completor
             foreach ($vatTypeVatRates as &$vatRate) {
                 $vatRate = [Tag::VatRate => $vatRate, Tag::VatType => $vatType];
             }
+            /** @noinspection SlowArrayOperationsInLoopInspection */
             $possibleVatRates = array_merge($possibleVatRates, $vatTypeVatRates);
         }
         $this->possibleVatRates = $possibleVatRates;
@@ -932,7 +932,7 @@ class Completor
                         // 2) If this is a 0 vat rate while the lookup vat rate
                         //   or class, if available, is not, it must be a no vat
                         //   invoice:
-                        //   - one of the no vat vat types.
+                        //   - one of the no-vat vat types.
                         //   - vat type national with client outside EU.
                         if ($this->lineHasNoVat($line)) {
                             $zeroOrVatFreeClass = $this->is0VatClass($line) || $this->isVatFreeClass($line);
@@ -940,14 +940,14 @@ class Completor
                             if (!($zeroOrVatFreeClass || $zeroOrVatFreeRate)) {
                                 // This article cannot be intrinsically 0% or
                                 // vat free. So the vat type must be a vat type
-                                // allowing no vat, i.e. a no vat vat type or
+                                // allowing no vat, i.e. a no-vat vat type or
                                 // national vat for a customer outside the EU.
                                 if (!in_array($vatType, static::$zeroVatVatTypes) && !($vatType === Api::VatType_National && $this->isOutsideEu())) {
                                     $doAdd = false;
                                 }
                             }
 
-                            // If the customer is outside the EU and we do not
+                            // If the customer is outside the EU AND we do not
                             // charge vat, goods should get vat type 4 and
                             // services vat type 1. However, we only look at
                             // item lines, as services like shipping and packing
@@ -995,6 +995,7 @@ class Completor
                 $line[Meta::VatTypesPossible] = implode(',', $possibleLineVatTypes);
                 // Add to result, union and intersection.
                 $list[$index] = $possibleLineVatTypes;
+                /** @noinspection SlowArrayOperationsInLoopInspection */
                 $union = array_merge($union, $possibleLineVatTypes);
                 $intersection = $intersection !== null ? array_intersect($intersection, $possibleLineVatTypes) : $possibleLineVatTypes;
             }
@@ -1705,6 +1706,17 @@ class Completor
             }
         }
         return true;
+    }
+
+    /**
+     * Returns whether this invoice may get a 0-vat vat type
+     *
+     * @return bool
+     *   True if this invoice may get a 0-vat vat type, false otherwise.
+     */
+    public function is0VatVatTypePossible()
+    {
+        return count(array_intersect($this->possibleVatTypes, static::$zeroVatVatTypes)) !== 0;
     }
 
     /**

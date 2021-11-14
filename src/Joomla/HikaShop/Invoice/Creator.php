@@ -329,7 +329,7 @@ class Creator extends BaseCreator
                             Meta::VatRateLookup => (float) $taxClass->get($taxNameKey)->tax_rate,
                         ];
                 } else {
-                    // Multiple taxes applied tot his shipment: add a line per
+                    // Multiple taxes applied to this shipment: add a line per
                     // vat rate.
                     $shippingMethodAmountIncTotal = 0.0;
                     $addMissingAmountIndex = null;

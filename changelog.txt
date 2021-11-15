@@ -18,8 +18,8 @@ VM3 = VirtueMart3 (Joomla)
 WC  = WooCommerce 5 (WC 4 en 3 zullen waarschijnlijk ook werken)
 WC2 = WooCommerce 2 (wordt niet meer ondersteund vanaf onze versie 5.5.2)
 
-6.3.5 (2021-11-??)
-------------------
+6.3.5 (2021-11-15) (WC only)
+----------------------------
 Bugs:
 - WC|MA (and maybe others): een factuur met verlegde btw en gratis verzending
   levert een waarschuwing en dus een conceptfactuur op omdat ten onrechte het

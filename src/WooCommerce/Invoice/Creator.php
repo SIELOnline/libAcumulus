@@ -294,11 +294,17 @@ class Creator extends BaseCreator
                 'method_id',
                 'cost',
                 '_reduced_stock',
+                '_restock_refunded_items',
             ]);
             foreach ($metadata as $meta) {
-                // Skip hidden core fields and serialized data (which are also
-                // hidden core fields).
-                if (in_array($meta->key, $hiddenOrderItemMeta) || is_serialized($meta->value)) {
+                // Skip hidden core fields, serialized data (which are also
+                // hidden core fields), and tm extra product options plugin data
+                // which should be removed by that plugin via the
+                // 'woocommerce_hidden_order_itemmeta' filter, but they don't.
+                if (in_array($meta->key, $hiddenOrderItemMeta)
+                    || is_serialized($meta->value)
+                    || substr($meta->key, 0, strlen('_tm')) === '_tm'
+                ) {
                     continue;
                 }
 

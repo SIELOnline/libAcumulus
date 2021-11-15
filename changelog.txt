@@ -26,6 +26,10 @@ Bugs:
   `standaard btw-tarief van verzendkosten aan de gratis verzending word
   toegekend ipv 0%.
 
+Features:
+- WC: Ignore hidden metadata from the "WooCommerce TM Extra Product Options"
+  plugin when adding child lines for variants/options.
+  
 Refactorings:
 - WC: de method WC_Logger::add() is deprecated. Onze log helper is hier op
   aangepast Zichtbaar gevolg: dedatum wordt nu in de ISO standaard afgedrukt.

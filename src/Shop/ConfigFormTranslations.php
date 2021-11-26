@@ -97,12 +97,12 @@ class ConfigFormTranslations extends TranslationCollection
         'desc_marginProducts' => 'Geef aan of u in uw winkel margegoederen (bv. 2e-hands producten) verkoopt. Zie <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/bijzondere_regelingen/margeregeling/margeregeling" target="_blank">Margeregeling</a>.',
 
         'vat_class' => 'belastingklasse',
-        'vat_classes' => 'belastingklasses',
+        'vat_classes' => 'belastingklassen',
         'vat_class_not_applicable' => 'niet van toepassing',
         'vat_class_left_empty' => '%1$s laat ik leeg',
 
-        'field_foreignVatClasses' => 'Welke %1$s definiëren EU btw tarieven?',
-        'desc_foreignVatClasses' => 'Geef aan welke van deze %1$s gebruikt worden wanneer u buitenlandse btw berekent voor (niet btw-plichtige) EU klanten.<br>
+        'field_foreignVatClasses' => 'Welke %1$s definiëren EU-btw-tarieven?',
+        'desc_foreignVatClasses' => 'Geef aan welke van deze %1$s gebruikt worden wanneer u buitenlandse btw berekent voor (niet btw-plichtige) EU-klanten.<br>
 • Kies de 1e optie ("%2$s") als u uw winkel (nog) niet hebt ingericht op deze regeling.<br>
 • Mbv de "Ctrl" toets kunt u meerdere %1$s kiezen of keuzes ongedaan maken.<br>
 • NB: Sinds 1 juli 2021 gelden er <a href="https://www.belastingdienst.nl/wps/wcm/connect/nl/btw/content/e-commerce-en-diensten-in-de-eu-kijk-wat-er-verandert-voor-de-btw-x" target="_blank">nieuwe regels en drempels voor afstandsverkopen binnen de EU</a> en vallen bijna alle goederen (en diensten) hieronder.',

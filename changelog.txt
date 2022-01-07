@@ -18,6 +18,20 @@ VM3 = VirtueMart3 (Joomla)
 WC  = WooCommerce 5 (WC 4 en 3 zullen waarschijnlijk ook werken)
 WC2 = WooCommerce 2 (wordt niet meer ondersteund vanaf onze versie 5.5.2)
 
+6.3.6 (2022-01-??)
+------------------
+Bugs:
+- VM: Use of is_numeric() replaced by ctype_digit() (or other more or less
+  similar functions) as  is_numeric()'s definition of numeric is too wide for
+  our case. This affects all plugins but it looks like that only for VM it can
+  really cause problems.
+
+Features:
+- JOO: Add library version to log lines.
+
+Refactorings:
+- Documentation typos.
+
 6.3.5 (2021-11-15) (WC only)
 ----------------------------
 Bugs:

@@ -471,7 +471,7 @@ class Creator extends BaseCreator
         $result = [];
         if (is_array($taxes)) {
             // Since version ?.?, $taxes has an indirection by key 'total'.
-            if (!is_numeric(key($taxes))) {
+            if (is_string(key($taxes))) {
                 /** @noinspection CallableParameterUseCaseInTypeContextInspection */
                 $taxes = current($taxes);
             }

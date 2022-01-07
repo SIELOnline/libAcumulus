@@ -792,7 +792,7 @@ abstract class Form extends MessageCollection
             // comparison (Magento uses in_array with the strict parameter set
             // to false).
             $optionId = reset($picklistItem);
-            if (is_numeric($optionId)) {
+            if (ctype_digit((string) $optionId)) {
                 $optionId = (int) $optionId;
             }
             if ($optionId == $emptyValue) {

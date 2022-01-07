@@ -215,7 +215,7 @@ class Creator extends BaseCreator
 
         foreach ($item->order_product_options as $key => $value) {
             // Skip numeric keys that have a StdClass as value.
-            if (!is_numeric($key) && is_string($value)) {
+            if (is_string($key) && is_string($value)) {
                 // Add variant.
                 $result[] = [
                     Tag::Product => $key . ': ' . $value,

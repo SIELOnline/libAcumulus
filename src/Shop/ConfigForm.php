@@ -47,7 +47,7 @@ class ConfigForm extends BaseConfigForm
 
         if (empty($this->submittedValues[Tag::ContractCode])) {
             $this->addMessage($this->t('message_validate_contractcode_0'), Severity::Error, Tag::ContractCode);
-        } elseif (!is_numeric($this->submittedValues[Tag::ContractCode])) {
+        } elseif (!ctype_digit($this->submittedValues[Tag::ContractCode])) {
             $this->addMessage($this->t('message_validate_contractcode_1'), Severity::Error, Tag::ContractCode);
         } else {
             // Prevent errors where a copy & paste of the contractcode from the

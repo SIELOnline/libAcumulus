@@ -305,7 +305,7 @@ class OcHelper
             // OC 2.2.
             $order_id = $args[2];
         }
-        return $order_id;
+        return (int) $order_id;
     }
 
     /**

@@ -311,7 +311,7 @@ abstract class InvoiceManager
     /**
      * Processes an invoice source status change event.
      *
-     * For now we don't look at credit note statuses, they are always sent.
+     * For now, we don't look at credit note statuses, they are always sent.
      *
      * @param \Siel\Acumulus\Invoice\Source $invoiceSource
      *   The source whose status has changed.

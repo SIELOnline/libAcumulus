@@ -981,7 +981,7 @@ abstract class Creator
         if (!empty($lines)) {
             // reset(), so key() does not return null if the array is not empty.
             reset($lines);
-            if (is_numeric(key($lines))) {
+            if (is_int(key($lines))) {
                 // Numeric index: array of lines.
                 foreach ($lines as &$line) {
                     $line = $this->addLineType($line, $lineType);

@@ -118,13 +118,14 @@ class ApiCommunicator
      * - testmode: 0 (real) or 1 (test mode)
      * - lang: Language for error and warning in responses.
      * - inodes: List of ";"-separated XML-node identifiers which should be
-     *   included in the response. Defaults to full response when left out or empty.
+     *     included in the response. Defaults to full response when left out or
+     *     empty.
      * - connector: information about the client
      *
      * @param bool $needContract
      *   Indicates whether this api function needs the contract details. Most
      *   API functions do, so the default is true, but for some general listing
-     *   functions, like vat info, it is optional, and for signUp it is even
+     *   functions, like vat info, it is optional, and for sign-up it is even
      *   not allowed.
      *
      * @return array
@@ -187,7 +188,7 @@ class ApiCommunicator
     protected function sendApiMessage($uri, array $message, Result $result)
     {
         // Convert message to XML. XML requires 1 top level tag, so add one.
-        // The tagname is ignored by the Acumulus WebAPI.
+        // The tag name is ignored by the Acumulus WebAPI.
         $message = trim($this->convertArrayToXml(['myxml' => $message]));
         $result->setRawRequest($message);
         $rawResponse = $this->httpCommunicator->post($uri, ['xmlstring' => $message]);
@@ -199,7 +200,7 @@ class ApiCommunicator
             // the invoice was sent or not.
             $result->addMessage('Empty response', Severity::Error, "", 701);
         } elseif ($this->isHtmlResponse($rawResponse)) {
-            // When the API is gone we might receive an html error message page.
+            // When the API is gone we might receive an HTML error message page.
             $this->raiseHtmlReceivedError($rawResponse);
         } else {
             // Decode the response as either json or xml.
@@ -217,12 +218,12 @@ class ApiCommunicator
                 try {
                     $response = $this->convertXmlToArray($rawResponse);
                 } catch (RuntimeException $e) {
-                    // Not an XML response. Treat it as an json error if we were
+                    // Not an XML response. Treat it as a json error if we were
                     // expecting a json response.
                     if ($pluginSettings['outputFormat'] === 'json') {
                         $this->raiseJsonError();
                     }
-                    // Otherwise treat it as the XML exception that was raised.
+                    // Otherwise, treat it as the XML exception that was raised.
                     throw $e;
                 }
             }

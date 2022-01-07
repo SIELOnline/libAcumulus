@@ -111,7 +111,7 @@ class InvoiceManager extends BaseInvoiceManager
                 // that these plugins allow for text prefixes and suffixes,
                 // therefore, we allow for a lexicographical or a purely numeric
                 // comparison.
-                if (is_numeric($invoiceSourceReferenceFrom) && is_numeric($invoiceSourceReferenceTo)) {
+                if (ctype_digit($invoiceSourceReferenceFrom) && ctype_digit($invoiceSourceReferenceTo)) {
                     if (strlen($invoiceSourceReferenceFrom) < 6 && strlen($invoiceSourceReferenceTo) < 6) {
                         // We assume non formatted search arguments.
                         $key = '_order_number';

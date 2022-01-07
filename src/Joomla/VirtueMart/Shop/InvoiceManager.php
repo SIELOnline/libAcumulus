@@ -47,7 +47,7 @@ class InvoiceManager extends BaseInvoiceManager
     public function getInvoiceSourcesByReferenceRange($invoiceSourceType, $invoiceSourceReferenceFrom, $invoiceSourceReferenceTo)
     {
         if ($invoiceSourceType === Source::Order) {
-            if (is_numeric($invoiceSourceReferenceFrom) && is_numeric($invoiceSourceReferenceTo)) {
+            if (ctype_digit($invoiceSourceReferenceFrom) && ctype_digit($invoiceSourceReferenceTo)) {
                 $from = sprintf('%d', $invoiceSourceReferenceFrom);
                 $to = sprintf('%d', $invoiceSourceReferenceTo);
             } else {

@@ -261,7 +261,7 @@ class CreatorPluginSupport
                 }
             }
         }
-        // Not found.
+        // Not found. We return a reference, so we cannot directly return null.
         $result = null;
         return $result;
     }
@@ -270,8 +270,8 @@ class CreatorPluginSupport
      * Supports the "WooCommerce TM Extra Product Options" plugin.
      *
      * This method supports the tm-woo-extra-product-options extension that
-     * places its data in the meta data under keys that start wth tm_epo or
-     * tmcartepo. We need the the tncartepo_data value as that contains the
+     * places its data in the metadata under keys that start wth tm_epo or
+     * tmcartepo. We need the tncartepo_data value as that contains the
      * options.
      *
      * This method adds the option data as children to the invoice line.
@@ -290,7 +290,7 @@ class CreatorPluginSupport
         $items = $shopSource->get_items(apply_filters('woocommerce_admin_order_item_types', 'line_item'));
         foreach ($items as $item) {
             // If the plugin is no longer used, we may still have an order with
-            // products where the plugin was used. Moreover we don't use any
+            // products where the plugin was used. Moreover, we don't use any
             // function or method from the plugin, only its stored data. So we
             // do not have to check for the plugin being active, just for the
             // data being there.

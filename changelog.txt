@@ -25,6 +25,8 @@ Bugs:
   similar functions) as  is_numeric()'s definition of numeric is too wide for
   our case. This affects all plugins but it looks like that only for VM it can
   really cause problems.
+- WOO: When creating variant lines, we should ignore order item metadata that is
+  an array (like we already do for serialized data).
 
 Features:
 - JOO: Add library version to log lines.
@@ -43,7 +45,7 @@ Bugs:
 Features:
 - WC: Ignore hidden metadata from the "WooCommerce TM Extra Product Options"
   plugin when adding child lines for variants/options.
-  
+
 Refactorings:
 - WC: de method WC_Logger::add() is deprecated. Onze log helper is hier op
   aangepast Zichtbaar gevolg: dedatum wordt nu in de ISO standaard afgedrukt.

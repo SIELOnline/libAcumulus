@@ -283,25 +283,27 @@ class Creator extends BaseCreator
             // are released with the list in e.g.
             // wp-content\plugins\woocommerce\includes\admin\meta-boxes\views\html-order-item-meta.php
             $hiddenOrderItemMeta = apply_filters('woocommerce_hidden_order_itemmeta', [
-                '_qty',
-                '_tax_class',
-                '_product_id',
-                '_variation_id',
-                '_line_subtotal',
-                '_line_subtotal_tax',
-                '_line_total',
-                '_line_tax',
-                'method_id',
-                'cost',
-                '_reduced_stock',
-                '_restock_refunded_items',
-            ]);
+                    '_qty',
+                    '_tax_class',
+                    '_product_id',
+                    '_variation_id',
+                    '_line_subtotal',
+                    '_line_subtotal_tax',
+                    '_line_total',
+                    '_line_tax',
+                    'method_id',
+                    'cost',
+                    '_reduced_stock',
+                    '_restock_refunded_items',
+                ]
+            );
             foreach ($metadata as $meta) {
-                // Skip hidden core fields, serialized data (which are also
-                // hidden core fields), and tm extra product options plugin data
-                // which should be removed by that plugin via the
+                // Skip hidden core fields, arrays and serialized data (which
+                // are also hidden core fields), and tm extra product options
+                // plugin data which should be removed by that plugin via the
                 // 'woocommerce_hidden_order_itemmeta' filter, but they don't.
                 if (in_array($meta->key, $hiddenOrderItemMeta)
+                    || is_array($meta->value)
                     || is_serialized($meta->value)
                     || substr($meta->key, 0, strlen('_tm')) === '_tm'
                 ) {
@@ -543,6 +545,7 @@ class Creator extends BaseCreator
         // For refunds without any articles (probably just a manual refund) we
         // don't need to know what discounts were applied on the original order.
         // So skip get_used_coupons() on refunds without articles.
+        /** @noinspection PhpClassConstantAccessedViaChildClassInspection */
         if ($this->invoiceSource->getType() !== Source::CreditNote || $this->hasItemLines) {
             // Add a line for all coupons applied. Coupons are only stored on
             // the order, not on refunds, so use the order.

@@ -1,7 +1,7 @@
 <?php
 namespace Siel\Acumulus;
 
-const Version = '6.3.5';
+const Version = '6.3.6';
 
 namespace Siel\Acumulus\Helpers;
 

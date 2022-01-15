@@ -320,6 +320,7 @@ class Creator extends BaseCreator
                     $variantValue = $meta->value;
                 }
 
+                // @todo: why a rawurldecode here, is that a "filter" to apply?
                 $result[] = [
                         Tag::Product => $variantLabel . ': ' . rawurldecode($variantValue),
                         Tag::UnitPrice => 0,

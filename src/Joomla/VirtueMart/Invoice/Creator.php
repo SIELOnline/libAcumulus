@@ -13,14 +13,14 @@ use VirtueMartModelCustomfields;
 use VmModel;
 
 /**
- * Allows to create arrays in the Acumulus invoice structure from a VirtueMart
+ * Allows creating arrays in the Acumulus invoice structure from a VirtueMart
  * order
  *
  * Notes:
  * - Calculation rules used, e.g, to give a certain customer group, a discount
  *   (fixed amount or percentage) should always have "price modifier before tax"
  *   or "price modifier before tax per bill" for the Type of Arithmetic
- *   Operation. Otherwise the VAT computations won't comply with Dutch
+ *   Operation. Otherwise, the VAT computations won't comply with Dutch
  *   regulations.
  * - "price modifier before tax per bill" will show normal product prices with a
  *   separate discount line indicating the name of the discount rule.

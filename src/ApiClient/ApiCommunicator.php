@@ -151,7 +151,7 @@ class ApiCommunicator
                 'webkoppel' => "Acumulus {$environment['moduleVersion']}",
                 'development' => 'SIEL - Buro RaDer',
                 'remark' => "Library {$environment['libraryVersion']} - PHP {$environment['phpVersion']}",
-                'sourceuri' => 'https://www.siel.nl/',
+                'sourceuri' => 'https://github.com/SIELOnline/libAcumulus',
             ],
         ];
         return $result;

@@ -8,6 +8,10 @@ use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
  *
  * In WordPress this data is stored as metadata. As such, the "records" returned
  * here are an array of all metadata values, thus not filtered by Acumulus keys.
+ *
+ * Note: our keys start with an underscore '_' as they should not be shown on
+ * the post page, following WP guidelines:
+ * https://developer.wordpress.org/plugins/metadata/managing-post-metadata/#hidden-custom-fields
  */
 class AcumulusEntry extends BaseAcumulusEntry
 {

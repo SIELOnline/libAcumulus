@@ -298,14 +298,21 @@ class Creator extends BaseCreator
                 ]
             );
             foreach ($metadata as $meta) {
-                // Skip hidden core fields, arrays and serialized data (which
-                // are also hidden core fields), and tm extra product options
-                // plugin data which should be removed by that plugin via the
-                // 'woocommerce_hidden_order_itemmeta' filter, but they don't.
+                // Skip hidden fields:
+                // - arrays
+                // - serialized data (which are also hidden fields)
+                // - tm extra product options plugin metadata which should be
+                //   removed by that plugin via the
+                //  'woocommerce_hidden_order_itemmeta' filter, but they don't.
+                // - all metadata keys starting with an underscore (_). This is
+                //   the convention for post metadata, but it is unclear if this
+                //   is also the case for woocommerce order item metadata, see
+                //   their own list versus the documentation on
+                //   https://developer.wordpress.org/plugins/metadata/managing-post-metadata/#hidden-custom-fields
                 if (in_array($meta->key, $hiddenOrderItemMeta)
                     || is_array($meta->value)
                     || is_serialized($meta->value)
-                    || substr($meta->key, 0, strlen('_tm')) === '_tm'
+                    || substr($meta->key, 0, strlen('_')) === '_'
                 ) {
                     continue;
                 }

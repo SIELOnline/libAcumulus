@@ -1650,7 +1650,7 @@ class Completor
      * @return bool
      *   True if $vatRate is the 0% or the vat free vat rate, false otherwise.
      */
-    protected function isNoVat($vatRate)
+    public function isNoVat($vatRate)
     {
         return $this->is0VatRate($vatRate) || $this->isFreeVatRate($vatRate);
     }

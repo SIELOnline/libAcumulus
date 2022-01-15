@@ -1,7 +1,9 @@
 <?php
 namespace Siel\Acumulus\Invoice;
 
+use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
@@ -212,7 +214,9 @@ abstract class CompletorStrategyBase
                 if (isset($line[Meta::VatAmount])) {
                     $this->vat2Divide -= $line[Meta::VatAmount] * $line[Tag::Quantity];
                 } else {
-                    $this->vat2Divide -= ($line[Tag::VatRate] / 100.0) * $line[Tag::UnitPrice] * $line[Tag::Quantity];
+                    $this->vat2Divide -= $this->isNoVat($line[Tag::VatRate])
+                        ? 0.0
+                        : ($line[Tag::VatRate] / 100.0) * $line[Tag::UnitPrice] * $line[Tag::Quantity];
                 }
             }
         }
@@ -243,7 +247,9 @@ abstract class CompletorStrategyBase
         foreach ($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] as $line) {
             if ($line[Meta::VatRateSource] !== Creator::VatRateSource_Strategy && isset($line[Tag::VatRate])) {
                 $amount = $line[Tag::UnitPrice] * $line[Tag::Quantity];
-                $vatAmount = $line[Tag::VatRate] / 100.0 * $amount;
+                $vatAmount = $this->isNoVat($line[Tag::VatRate])
+                    ? 0.0
+                    : $line[Tag::VatRate] / 100.0 * $amount;
                 $vatRate = sprintf('%.3f', $line[Tag::VatRate]);
                 // Add amount to existing vatrate line or create a new line.
                 if (isset($this->vatBreakdown[$vatRate])) {
@@ -394,9 +400,13 @@ abstract class CompletorStrategyBase
         }
         $line2Complete[Tag::VatRate] = $vatRate;
         if (isset($line2Complete[Tag::UnitPrice])) {
-            $line2Complete[Meta::VatAmount] = ($line2Complete[Tag::VatRate] / 100.0) * $line2Complete[Tag::UnitPrice];
+            $line2Complete[Meta::VatAmount] = $this->isNoVat($line2Complete[Tag::VatRate])
+                ? 0.0
+                : ($line2Complete[Tag::VatRate] / 100.0) * $line2Complete[Tag::UnitPrice];
         } else { // isset($line2Complete[Meta::UnitPriceInc])
-            $line2Complete[Meta::VatAmount] = ($line2Complete[Tag::VatRate] / (100.0 + $line2Complete[Tag::VatRate])) * $line2Complete[Meta::UnitPriceInc];
+            $line2Complete[Meta::VatAmount] = $this->isNoVat($line2Complete[Tag::VatRate])
+                ? 0.0
+                : ($line2Complete[Tag::VatRate] / (100.0 + $line2Complete[Tag::VatRate])) * $line2Complete[Meta::UnitPriceInc];
             $line2Complete[Tag::UnitPrice] = $line2Complete[Meta::UnitPriceInc] - $line2Complete[Meta::VatAmount];
         }
         $this->replacingLines[] = $line2Complete;
@@ -424,5 +434,15 @@ abstract class CompletorStrategyBase
         $highAmount = ($vatAmount - $amount * $lowVatRate) / ($highVatRate - $lowVatRate);
         $lowAmount = $amount - $highAmount;
         return [$lowAmount, $highAmount];
+    }
+
+    /**
+     * @param $vatRate
+     *
+     * @return bool
+     */
+    protected function isNoVat($vatRate): bool
+    {
+        return Number::isZero($vatRate) || Number::floatsAreEqual($vatRate, Api::VatFree);
     }
 }

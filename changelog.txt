@@ -18,21 +18,27 @@ VM3 = VirtueMart3 (Joomla)
 WC  = WooCommerce 5 (WC 4 en 3 zullen waarschijnlijk ook werken)
 WC2 = WooCommerce 2 (wordt niet meer ondersteund vanaf onze versie 5.5.2)
 
-6.3.6 (2022-01-??)
+6.3.6 (2022-01-15)
 ------------------
 Bugs:
+- VM: In some cases amounts are calculated based on vat rates. The "vat free"
+  vat rate is stored as -1, to be able to differ it from the "0% vat rate". But
+  this means that the calculations should use 0% instead of -1%. This affects
+  all plugins but it looks like that only for VM it can really cause problems.
 - VM: Use of is_numeric() replaced by ctype_digit() (or other more or less
-  similar functions) as  is_numeric()'s definition of numeric is too wide for
-  our case. This affects all plugins but it looks like that only for VM it can
-  really cause problems.
+  similar functions) as is_numeric()'s definition of a string being numeric is
+  too accepting for our case. This affects all plugins but it looks like that
+  only for VM it can really cause problems.
 - WOO: When creating variant lines, we should ignore order item metadata that is
-  an array (like we already do for serialized data).
+  an array (like we already do for serialized data) or starts with an underscore
+  (_) as that (almost) always also is hidden metadata.
 
 Features:
 - JOO: Add library version to log lines.
 
 Refactorings:
 - Documentation typos.
+- Tag <sourceuri> now points to github instead of www.siel.nl.
 
 6.3.5 (2021-11-15) (WC only)
 ----------------------------

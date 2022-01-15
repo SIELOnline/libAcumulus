@@ -17,7 +17,7 @@ use Siel\Acumulus\Tag;
  * - Adds required but missing fields on the invoice lines.
  * - Adds vat rates to 0 price lines (with a 0 price and thus 0 vat, not all
  *   web shops can fill in a vat rate).
- * - Completes meta data that may be used in the strategy phase or just for
+ * - Completes metadata that may be used in the strategy phase or just for
  *   support purposes.
  */
 class CompletorInvoiceLines
@@ -450,7 +450,9 @@ class CompletorInvoiceLines
                         // Free products are free with and without VAT.
                         $line[Meta::UnitPriceInc] = 0;
                     } elseif (isset($line[Tag::VatRate]) && Completor::isCorrectVatRate($line[Meta::VatRateSource])) {
-                         $line[Meta::UnitPriceInc] = $line[Tag::UnitPrice] * (100.0 + $line[Tag::VatRate]) / 100.0;
+                        $line[Meta::UnitPriceInc] = $this->completor->isNoVat($line[Tag::VatRate])
+                            ? $line[Tag::UnitPrice]
+                            : $line[Tag::UnitPrice] * (100.0 + $line[Tag::VatRate]) / 100.0;
                     } elseif (isset($line[Meta::VatAmount])) {
                         $line[Meta::UnitPriceInc] = $line[Tag::UnitPrice] + $line[Meta::VatAmount];
                     } //else {
@@ -819,15 +821,21 @@ class CompletorInvoiceLines
         foreach ($lines as &$line) {
             if (Completor::isCorrectVatRate($line[Meta::VatRateSource])) {
                 if (!isset($line[Meta::UnitPriceInc])) {
-                    $line[Meta::UnitPriceInc] = $line[Tag::UnitPrice] / 100.0 * (100.0 + $line[Tag::VatRate]);
+                    $line[Meta::UnitPriceInc] = $this->completor->isNoVat($line[Tag::VatRate])
+                        ? $line[Tag::UnitPrice]
+                        : $line[Tag::UnitPrice] * (100.0 + $line[Tag::VatRate]) / 100.0;
                     $line[Meta::FieldsCalculated][] = Meta::UnitPriceInc;
                 }
                 if (!isset($line[Meta::VatAmount])) {
-                    $line[Meta::VatAmount] = $line[Tag::VatRate] / 100.0 * $line[Tag::UnitPrice];
+                    $line[Meta::VatAmount] = $this->completor->isNoVat($line[Tag::VatRate])
+                        ? 0.0
+                        : $line[Tag::VatRate] / 100.0 * $line[Tag::UnitPrice];
                     $line[Meta::FieldsCalculated][] = Meta::VatAmount. ' (from ' . Tag::VatRate . ')';
                 }
                 if (isset($line[Meta::LineDiscountAmount]) && !isset($line[Meta::LineDiscountAmountInc])) {
-                    $line[Meta::LineDiscountAmountInc] = $line[Meta::LineDiscountAmount] / 100.0 * (100.0 + $line[Tag::VatRate]);
+                    $line[Meta::LineDiscountAmountInc] = $this->completor->isNoVat($line[Tag::VatRate])
+                        ? $line[Meta::LineDiscountAmount]
+                        : $line[Meta::LineDiscountAmount] * (100.0 + $line[Tag::VatRate]) / 100.0;
                     $line[Meta::FieldsCalculated][] = Meta::LineDiscountAmountInc;
                 }
                 elseif (isset($line[Meta::LineDiscountVatAmount]) && !isset($line[Meta::LineDiscountAmountInc])) {

@@ -21,7 +21,7 @@ WC2 = WooCommerce 2 (wordt niet meer ondersteund vanaf onze versie 5.5.2)
 6.3.7 (2022-01-22)
 ------------------
 Bugs:
-- PS: Notice undefined index unit_amount inCreator.php, line 166
+- PS: Notice undefined index unit_amount in Creator.php, line 166
 
 Refactorings:
 - Documentation

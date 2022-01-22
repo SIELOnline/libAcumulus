@@ -18,6 +18,15 @@ VM3 = VirtueMart3 (Joomla)
 WC  = WooCommerce 5 (WC 4 en 3 zullen waarschijnlijk ook werken)
 WC2 = WooCommerce 2 (wordt niet meer ondersteund vanaf onze versie 5.5.2)
 
+6.3.7 (2022-01-22)
+------------------
+Bugs:
+- PS: Notice undefined index unit_amount inCreator.php, line 166
+
+Refactorings:
+- Documentation
+- Case of Classes was not always consistent (API => Api)
+
 6.3.6 (2022-01-15)
 ------------------
 Bugs:

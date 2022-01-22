@@ -1,10 +1,11 @@
 Acumulus web service API library
 ================================
 
-@author: Buro RaDer https://burorader.com/  
-@copyright: SIEL BV https://www.siel.nl/acumulus/  
-@license: GPLv3  
-@support: https://forum.acumulus.nl/index.php?board=17.0  
+@author: [Buro RaDer](https://burorader.com/)  
+@copyright: [SIEL BV](https://www.siel.nl/acumulus/)  
+@license: [GPLv3](http://www.gnu.org/licenses/gpl.html)  
+@support: [Webkoppelingen - Acumulus Forum](https://forum.acumulus.nl/index.php?board=17.0)  
+@source: [Acumulus web service API client library](https://github.com/SIELOnline/libAcumulus)
 
 Introduction
 ------------
@@ -59,6 +60,7 @@ Development
 ------------
 This library is still under development and will:
 
+ - where necessary be adapted to changes in fiscal rules.
  - where necessary be adapted to work with even more webshop packages.
  - be extended with new features.
  - where possible and useful be further abstracted.

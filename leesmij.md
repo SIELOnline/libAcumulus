@@ -20,7 +20,7 @@ niet voldoen aan programming guidelines voor een specifieke webshop of CMS. Denk
 hierbij aan:
 
 - Coding standards.
-- Organisatie en naamgeving.
+- Code-organisatie en naamgeving.
 - Vertaling door gebruikmaking van webshop specifieke vertaalfunctionaliteit.
 - Webshop specifieke "Best practises".
 
@@ -37,8 +37,9 @@ Ontwikkeling
 ------------
 Deze library is in ontwikkeling en zal:
 
+- waar nodig aangepast worden aan veranderende fiscale wetgeving. 
 - waar nodig aangepast worden om met nog meer webshops om te kunnen gaan.
-- uitgebreid worden met nieuwe wensen.
+- uitgebreid worden met nieuwe functies.
 - waar mogelijk en zinvol nog verder geabstraheerd worden.
 
 Backwards compatibility is daarbij een zorg maar geen absolute vereiste. Omdat

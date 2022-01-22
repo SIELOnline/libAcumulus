@@ -17,7 +17,7 @@ use TaxManagerFactory;
 use TaxRulesGroup;
 
 /**
- * Allows to create arrays in the Acumulus invoice structure from a PrestaShop
+ * Allows creating arrays in the Acumulus invoice structure from a PrestaShop
  * order or order slip.
  *
  * Notes:
@@ -163,8 +163,12 @@ class Creator extends BaseCreator
             $result[Meta::UnitPriceInc] = $sign * $item['unit_price_tax_incl'];
             $result[Meta::LineAmount] = $sign * $item['total_price_tax_excl'];
             $result[Meta::LineAmountInc] = $sign * $item['total_price_tax_incl'];
-            if (!Number::floatsAreEqual($item['unit_amount'], $result[Meta::UnitPriceInc] - $result[Tag::UnitPrice])) {
-                $result[Meta::LineDiscountVatAmount] = $item['unit_amount'] - ($result[Meta::UnitPriceInc] - $result[Tag::UnitPrice]);
+            // 'unit_amount' (table order_detail_tax) is not always set: assume
+            // no discount if not set, so not necessary to add the value.
+            if (isset($item['unit_amount'])) {
+                if (!Number::floatsAreEqual($item['unit_amount'], $result[Meta::UnitPriceInc] - $result[Tag::UnitPrice])) {
+                    $result[Meta::LineDiscountVatAmount] = $item['unit_amount'] - ($result[Meta::UnitPriceInc] - $result[Tag::UnitPrice]);
+                }
             }
         }
         $result[Tag::Quantity] = $item['product_quantity'];

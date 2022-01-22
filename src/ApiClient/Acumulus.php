@@ -1,4 +1,11 @@
 <?php
+/**
+ * @noinspection PhpMissingParamTypeInspection
+ * @noinspection PhpMissingReturnTypeInspection
+ * @noinspection PhpMissingFieldTypeInspection
+ * @noinspection PhpClassHasTooManyDeclaredMembersInspection
+ */
+
 namespace Siel\Acumulus\ApiClient;
 
 use Siel\Acumulus\Api;
@@ -13,8 +20,8 @@ use Siel\Acumulus\Helpers\Container;
  * specific interfaces can be more rapidly developed.
  *
  * More info:
- * - https://www.siel.nl/acumulus/API/
- * - http://www.siel.nl/acumulus/koppelingen/
+ * - {@see https://www.siel.nl/acumulus/API/}
+ * - {@see http://www.siel.nl/acumulus/koppelingen/}
  *
  * The ApiClient API call wrappers return their information as a keyed array,
  * which is a simplified version of the call specific part of the response
@@ -46,8 +53,10 @@ class Acumulus
     }
 
     /**
-     * Retrieves the about information.
+     * Retrieves the "about information".
      *
+     * See {@see https://www.siel.nl/acumulus/API/Misc/About/}.
+
      * @return \Siel\Acumulus\ApiClient\Result
      *   The result of the webservice call. The structured response will contain
      *   1 "about" array, being a keyed array with keys:
@@ -64,16 +73,16 @@ class Acumulus
      *     API-compliant role or change the role for the current user.
      *   - 403 A8N403GCN: Forbidden - Insufficient credential level for
      *     general/general_about.php. Not authorized to perform request.
-     *
-     * @see https://www.siel.nl/acumulus/API/Misc/About/
      */
     public function getAbout()
     {
-        return $this->callApiFunction('general/general_about', [])->setMainResponseKey('general', false);
+        return $this->callApiFunction('general/general_about', [])->setMainResponseKey('general');
     }
 
     /**
-     * Retrieves the my Acumulus information.
+     * Retrieves the "My Acumulus" information.
+     *
+     * See {@see https://www.siel.nl/acumulus/API/Misc/My_Acumulus/}
      *
      * @return \Siel\Acumulus\ApiClient\Result
      *   The result of the webservice call. The structured response will contain
@@ -98,13 +107,11 @@ class Acumulus
      *   - mystatusid
      *   - mytelephone
      *   - myvatnumber
-     *   Possible errors:
-     *
-     * @see https://www.siel.nl/acumulus/API/Misc/My_Acumulus/
+     *   Possible errors: todo.
      */
     public function getMyAcumulus()
     {
-        return $this->callApiFunction('general/my_acumulus', [])->setMainResponseKey('mydata', false);
+        return $this->callApiFunction('general/my_acumulus', [])->setMainResponseKey('mydata');
     }
 
     /**
@@ -113,6 +120,8 @@ class Acumulus
      * @param bool $enabled
      *   Whether to retrieve enabled (true, default) or disabled (false)
      *   accounts.
+     *
+     * See {@see https://www.siel.nl/acumulus/API/Accounts/List_Accounts/}
      *
      * @return \Siel\Acumulus\ApiClient\Result
      *   The result of the webservice call. The structured response will contain
@@ -124,8 +133,6 @@ class Acumulus
      *   - accountorderid
      *   - accountstatus
      *   - accounttypeid
-     *
-     * @see https://www.siel.nl/acumulus/API/Accounts/List_Accounts/
      */
     public function getPicklistAccounts($enabled = true)
     {
@@ -138,6 +145,8 @@ class Acumulus
     /**
      * Retrieves a list of invoice templates.
      *
+     * See {@see https://www.siel.nl/acumulus/API/Picklists/Company_Types/}.
+     *
      * @return \Siel\Acumulus\ApiClient\Result
      *   The result of the webservice call. The structured response will contain
      *   a non-keyed array of "companytype" arrays, each "companytype"
@@ -145,8 +154,6 @@ class Acumulus
      *   - companytypeid
      *   - companytypename
      *   - companytypenamenl
-     *
-     * @see https://www.siel.nl/acumulus/API/Picklists/Company_Types/
      */
     public function getPicklistCompanyTypes()
     {
@@ -156,14 +163,14 @@ class Acumulus
     /**
      * Retrieves a list of contact types.
      *
+     * See {@see https://www.siel.nl/acumulus/API/Picklists/Contact_Types/}.
+     *
      * @return \Siel\Acumulus\ApiClient\Result
      *   The result of the webservice call. The structured response will contain
      *   a non-keyed array of "contacttype" arrays, each "contacttype" array
      *   being a keyed array with keys:
      *   - contacttypeid
      *   - contacttypename
-     *
-     * @see https://www.siel.nl/acumulus/API/Picklists/Contact_Types/
      */
     public function getPicklistContactTypes()
     {
@@ -173,14 +180,14 @@ class Acumulus
     /**
      * Retrieves a list of cost centers.
      *
+     * See {@see https://www.siel.nl/acumulus/API/Picklists/Cost_Centers/}
+     *
      * @return \Siel\Acumulus\ApiClient\Result
      *   The result of the webservice call. The structured response will contain
      *   a non-keyed array of "costcenter" arrays, each "costcenter" array being
      *   a keyed array with keys:
      *   - costcenterid
      *   - costcentername
-     *
-     * @see https://www.siel.nl/acumulus/API/Picklists/Cost_Centers/
      */
     public function getPicklistCostCenters()
     {
@@ -190,14 +197,14 @@ class Acumulus
     /**
      * Retrieves a list of invoice templates.
      *
+     * See {@see https://www.siel.nl/acumulus/API/Invoicing/Invoice_Templates/}
+     *
      * @return \Siel\Acumulus\ApiClient\Result
      *   The result of the webservice call. The structured response will contain
      *   a non-keyed array of "invoicetemplate" arrays, each "invoicetemplate"
      *   array being a keyed array with keys:
      *   - invoicetemplateid
      *   - invoicetemplatename
-     *
-     * @see https://www.siel.nl/acumulus/API/Invoicing/Invoice_Templates/
      */
     public function getPicklistInvoiceTemplates()
     {
@@ -207,8 +214,10 @@ class Acumulus
     /**
      * Retrieves a list of products.
      *
+     * See {@see https://www.siel.nl/acumulus/API/Picklists/Products/}
+     *
      * @param ?string $filter
-     * @param ?int $producttagid
+     * @param ?int $productTagId
      *
      * @return \Siel\Acumulus\ApiClient\Result
      *   The result of the webservice call. The structured response will contain
@@ -227,16 +236,17 @@ class Acumulus
      *   - producthash
      *   - productnotes
      *
-     * @see https://www.siel.nl/acumulus/API/Picklists/Products/
+     * @noinspection PhpUnused  Not yet used, but this is a library that,
+     *   eventually, should cover all web services provided.
      */
-    public function getPicklistProducts($filter = null, $producttagid = null)
+    public function getPicklistProducts($filter = null, $productTagId = null)
     {
         $filters = [];
         if ($filter !== null) {
             $filters['filter'] = (string) $filter;
         }
-        if ($producttagid !== null) {
-            $filters['producttagid'] = (int) $producttagid;
+        if ($productTagId !== null) {
+            $filters['producttagid'] = (int) $productTagId;
         }
         return $this->getPicklist('products', $filters);
     }
@@ -252,10 +262,10 @@ class Acumulus
      *   The picklist to retrieve, specify in plural form: accounts,
      *   contacttypes, costcenters, etc.
      * @param array $filters
-     *   A set of filters to filter the picklist. Currently only the Products
+     *   A set of filters to filter the picklist. Currently, only the Products
      *   picklist supports filters.
      * @param bool $needContract
-     *   Whether the contract part needs to be send with the request.
+     *   Whether the contract part needs to be sent with the request.
      *
      * @return \Siel\Acumulus\ApiClient\Result
      *   The result of the webservice call. The structured response will contain
@@ -272,6 +282,8 @@ class Acumulus
     /**
      * Retrieves a list of VAT rates for the given country at the given date.
      *
+     * See {@see https://www.siel.nl/acumulus/API/Picklists/VAT_Info/}
+     *
      * @param string $countryCode
      *   Country code of the country to retrieve the VAT info for.
      * @param string $date
@@ -283,23 +295,23 @@ class Acumulus
      *   keyed array with keys:
      *   - vattype
      *   - vatrate
-     *
-     * @see https://www.siel.nl/acumulus/API/Picklists/VAT_Info/
      */
     public function getVatInfo($countryCode, $date = '')
     {
         if (empty($date)) {
-            $date = date(API::DateFormat_Iso);
+            $date = date(Api::DateFormat_Iso);
         }
         $message = [
             'vatcountry' => $countryCode,
             'vatdate' => $date,
         ];
-        return $this->callApiFunction('lookups/lookup_vatinfo', $message, true)->setMainResponseKey('vatinfo', true);
+        return $this->callApiFunction('lookups/lookup_vatinfo', $message)->setMainResponseKey('vatinfo', true);
     }
 
     /**
      * Retrieves a report on the threshold for EU commerce.
+     *
+     * See {@see https://www.siel.nl/acumulus/API/Reports/EU_eCommerce_Threshold/}
      *
      * @param int $year
      *   The year to get a report for. Leave empty for the current year.
@@ -315,8 +327,6 @@ class Acumulus
      *   - reached: int, 0 when threshold not reached. 1 when so.
      *   Possible errors:
      *   - AAC37EAA: Ongeldig year. EU regelgeving van toepassing vanaf 2021.
-     *
-     * @see https://www.siel.nl/acumulus/API/Reports/EU_eCommerce_Threshold/
      */
     public function reportThresholdEuCommerce($year = null)
     {
@@ -325,15 +335,17 @@ class Acumulus
         if (!empty($year)) {
             $message['year'] = $year;
         }
-        return $this->callApiFunction('reports/report_threshold_eu_ecommerce', $message, true)->setMainResponseKey('');
+        return $this->callApiFunction('reports/report_threshold_eu_ecommerce', $message)->setMainResponseKey('');
     }
 
     /**
      * Sends an invoice to Acumulus.
      *
+     * See {@see https://www.siel.nl/acumulus/API/Invoicing/Add_Invoice/}
+     *
      * @param array $invoice
      *   The invoice to send.
-     * @param \Siel\Acumulus\ApiClient\Result|null $result
+     * @param ?\Siel\Acumulus\ApiClient\Result $result
      *   It is possible to already create a Result object before calling this
      *   api-client to store local messages. By passing this Result object these
      *   local messages will be merged with any remote messages in the returned
@@ -348,8 +360,6 @@ class Acumulus
      *   - token
      *   - entryid
      *   - conceptid
-     *
-     * @see https://www.siel.nl/acumulus/API/Invoicing/Add_Invoice/
      */
     public function invoiceAdd(array $invoice, Result $result = null)
     {
@@ -358,6 +368,8 @@ class Acumulus
 
     /**
      * Retrieves information about a concept.
+     *
+     * See {@see https://www.siel.nl/acumulus/API/Invoicing/Concept_Info/}
      *
      * @param int $conceptId
      *   The id of the concept.
@@ -368,12 +380,10 @@ class Acumulus
      *   - conceptid: int
      *   - entryid: int|int[]
      *   Possible errors:
-     *   - FGYBSN040: Requested invoice for concept $concepId not found: No
+     *   - FGYBSN040: Requested invoice for concept $conceptId not found: No
      *     definitive invoice has yet been created for this concept.
-     *   - FGYBSN048: Information not available for $conceptId older then 127466.
-     *   -
-     *
-     * @see https://www.siel.nl/acumulus/API/Invoicing/Concept_Info/
+     *   - FGYBSN048: Information not available for $conceptId older than 127466.
+     *   - todo: others?
      */
     public function getConceptInfo($conceptId)
     {
@@ -385,6 +395,8 @@ class Acumulus
 
     /**
      * Retrieves Entry (Boeking) Details.
+     *
+     * See {@see https://siel.nl/acumulus/API/Entry/Get_Entry_Details/}
      *
      * @param int $entryId
      *   The id of the entry.
@@ -418,10 +430,8 @@ class Acumulus
      *   - paymentstatus
      *   - deleted
      *   Possible errors:
-     *   - XGYBSN000: Requested invoice for entry $entryId not found": $entryId
+     *   - XGYBSN000: Requested invoice for entry $entryId not found: $entryId
      *     does not exist.
-     *
-     * @see https://siel.nl/acumulus/API/Entry/Get_Entry_Details/
      */
     public function getEntry($entryId)
     {
@@ -432,7 +442,9 @@ class Acumulus
     }
 
     /**
-     * Moves the entry into or out of the trashbin.
+     * Moves the entry into or out of the trash bin.
+     *
+     * See {@see https://siel.nl/acumulus/API/Entry/Set_Delete_Status/}
      *
      * @param int $entryId
      *   The id of the entry.
@@ -448,14 +460,12 @@ class Acumulus
      *   - entryproc: (description new status): 'removed', 'recovered' or 'no
      *     changes made'.
      *   Possible errors:
-     *   - XCM7ELO12: Invalid entrydeletestatus value supplied": $deleteStatus
+     *   - XCM7ELO12: Invalid entrydeletestatus value supplied: $deleteStatus
      *     is not one of the indicated constants.
-     *   - XCM7ELO14: Invalid entrydeletestatus value supplied": $deleteStatus
+     *   - XCM7ELO14: Invalid entrydeletestatus value supplied: $deleteStatus
      *     is not one of the indicated constants.
-     *   - P2XFELO12: Requested for entryid: $entryId not found or forbidden":
+     *   - P2XFELO12: Requested for entryid: $entryId not found or forbidden:
      *     $entryId does not exist or already has requested status.
-     *
-     * @see https://siel.nl/acumulus/API/Entry/Set_Delete_Status/
      */
     public function setDeleteStatus($entryId, $deleteStatus)
     {
@@ -469,6 +479,8 @@ class Acumulus
     /**
      * Retrieves the payment status for an invoice.
      *
+     * See {@see https://www.siel.nl/acumulus/API/Invoicing/Payment_Get_Status/}
+     *
      * @param string $token
      *   The token for the invoice.
      *
@@ -480,10 +492,8 @@ class Acumulus
      *   - paymentstatus
      *   - paymentdate
      *   Possible errors:
-     *   - XGYTTNF04: Requested invoice for $token not found": $token does not
+     *   - XGYTTNF04: Requested invoice for $token not found: $token does not
      *     exist.
-     *
-     * @see https://www.siel.nl/acumulus/API/Invoicing/Payment_Get_Status/
      *
      * @noinspection PhpUnused
      */
@@ -498,6 +508,8 @@ class Acumulus
     /**
      * Sets the payment status for an invoice.
      *
+     * See {@see https://www.siel.nl/acumulus/API/Invoicing/Payment_Set_Status/}
+     *
      * @param string $token
      *   The token for the invoice.
      * @param int $paymentStatus
@@ -505,7 +517,7 @@ class Acumulus
      *   API::PaymentStatus_Due constants.
      * @param string $paymentDate
      *   ISO date string (yyyy-mm-dd) for the date to set as payment date, may
-     *   be empty for today or if the payment sattus is API::PaymentStatus_Due.
+     *   be empty for today or if the payment status is API::PaymentStatus_Due.
      *
      * @return \Siel\Acumulus\ApiClient\Result
      *   The result of the webservice call. The structured response will contain
@@ -519,13 +531,11 @@ class Acumulus
      *   - DATE590ZW: Incorrect date range (2000-01-01 to 2099-12-31) or invalid
      *     date format (YYYY-MM-DD) used in paymentdate field. We received:
      *     $paymentDate. Unable to proceed."
-     *
-     * @see https://www.siel.nl/acumulus/API/Invoicing/Payment_Set_Status/
      */
     public function setPaymentStatus($token, $paymentStatus, $paymentDate = '')
     {
         if (empty($paymentDate)) {
-            $paymentDate = date(API::DateFormat_Iso);
+            $paymentDate = date(Api::DateFormat_Iso);
         }
         $message = [
             'token' => (string) $token,
@@ -537,6 +547,8 @@ class Acumulus
 
     /**
      * Sends out an invoice or reminder as PDF.
+     *
+     * See {@see https://siel.nl/acumulus/API/Invoicing/Email/}
      *
      * @param string $token
      *   The token for the invoice.
@@ -566,7 +578,7 @@ class Acumulus
      *   - TNFE4035G: Requested token not found or invalid token supplied.
      *     Unable to proceed."
      *
-     * @see https://siel.nl/acumulus/API/Invoicing/Email/
+     * See {@see https://siel.nl/acumulus/API/Invoicing/Email/}
      *
      * @noinspection PhpUnused
      */
@@ -584,7 +596,9 @@ class Acumulus
     }
 
     /**
-     * Signs up for a 30 day trial and receive credentials.
+     * Signs up for a 30-day trial and receive credentials.
+     *
+     * See {@see https://www.siel.nl/acumulus/API/Sign_Up/Sign_Up/}
      *
      * @param array $signUp
      *   An array with the fields:
@@ -608,7 +622,7 @@ class Acumulus
      *     suited for API-usage.
      *     - 0 Do not create additional user (default)
      *     - 1 Generate additional user specifically suited for API-usage
-     *   - notes Notes or remarks which you would like to be part of the sign up
+     *   - Notes or remarks which you would like to be part of the sign-up
      *     request. If filled, a ticket will be opened with the notes as
      *     content, so can be used as a request for comment by customer support.
      *
@@ -630,8 +644,6 @@ class Acumulus
      *   - AA6894AA: Onjuiste postalcode
      *   - AABC1FAA: Verplichte city ontbreekt
      *
-     * @see https://www.siel.nl/acumulus/API/Sign_Up/Sign_Up/
-     *
      * @noinspection PhpUnused
      */
     public function signUp(array $signUp)
@@ -644,6 +656,8 @@ class Acumulus
 
     /**
      * Updates the stock for a product.
+     *
+     * See {@see https://www.siel.nl/acumulus/API/Stock/Add_Stock_Transaction/}
      *
      * @param int $productId
      *   The id of the product for which to update the stock.
@@ -665,13 +679,11 @@ class Acumulus
      *   - productid
      *   - stockamount (the new stock level for this product)
      *   Possible errors:
-     *
-     * @see https://www.siel.nl/acumulus/API/Stock/Add_Stock_Transaction/
      */
     public function stockAdd($productId, $quantity, $description, $date = null)
     {
         if (empty($date)) {
-            $date = date(API::DateFormat_Iso);
+            $date = date(Api::DateFormat_Iso);
         }
         $message = [
             'stock' => [
@@ -687,6 +699,8 @@ class Acumulus
     /**
      * Returns the uri to download the invoice PDF.
      *
+     * See {@see https://siel.nl/acumulus/API/Invoicing/Get_PDF_Invoice/}
+     *
      * @param string $token
      *   The token for the invoice.
      * @param bool $applyGraphics
@@ -696,14 +710,12 @@ class Acumulus
      * @return string
      *   The uri to download the invoice PDF.
      *   Possible errors (in download, not in return value):
-     *   - PDFATNF04: Requested invoice for $token not found": $token does not
+     *   - PDFATNF04: Requested invoice for $token not found: $token does not
      *     exist.
-     *
-     * @see https://siel.nl/acumulus/API/Invoicing/Get_PDF_Invoice/
      */
     public function getInvoicePdfUri($token, $applyGraphics = true)
     {
-        $uri = $this->getUri('invoices/invoice_get_pdf');
+        $uri = $this->constructUri('invoices/invoice_get_pdf');
         $uri .= "?token=$token";
         if (!$applyGraphics) {
             $uri .= '&gfx=0';
@@ -714,6 +726,8 @@ class Acumulus
     /**
      * Returns the uri to download the packing slip PDF.
      *
+     * See {@see https://siel.nl/acumulus/API/Delivery/Get_PDF_Packing_Slip/}
+     *
      * @param string $token
      *   The token for the invoice to get the packing slip for.
      *
@@ -721,20 +735,18 @@ class Acumulus
      *   The uri to download the packing slip PDF.
      *   Possible errors (in download, not in return value):
      *   - ZKFATNF04: Requested packing slip for $token not found or no longer
-     *     available."
-     *
-     * @see https://siel.nl/acumulus/API/Delivery/Get_PDF_Packing_Slip/
+     *     available.
      */
     public function getPackingSlipUri($token)
     {
-        $uri = $this->getUri('delivery/packing_slip_get_pdf');
+        $uri = $this->constructUri('delivery/packing_slip_get_pdf');
         $uri .= "?token=$token";
         return $uri;
     }
 
     /**
      * Wrapper around
-     * {@see \Siel\Acumulus\ApiClient\ApiCommunicator::getUri()}.
+     * {@see \Siel\Acumulus\ApiClient\ApiCommunicator::constructUri()}.
      *
      * @param string $apiFunction
      *   The api service to get the uri for.
@@ -742,7 +754,7 @@ class Acumulus
      * @return string
      *   The uri to the requested API call.
      */
-    protected function getUri($apiFunction)
+    protected function constructUri($apiFunction)
     {
         return $this->apiCommunicator->getUri($apiFunction);
     }
@@ -760,7 +772,7 @@ class Acumulus
      *   API functions do, do the default is true, but for some general listing
      *   functions, like vat info, it is optional, and for signUp, it is even
      *   not allowed.
-     * @param \Siel\Acumulus\ApiClient\Result $result
+     * @param \Siel\Acumulus\ApiClient\Result|null $result
      *   It is possible to already create a Result object before calling the
      *   api-client to store local messages. By passing this Result object these
      *   local messages will be merged with any remote messages in the returned

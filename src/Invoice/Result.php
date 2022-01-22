@@ -263,6 +263,7 @@ class Result extends WebResult
             }
             if ($addReqResp === Result::AddReqResp_Always || ($addReqResp === Result::AddReqResp_WithOther && $this->hasRealMessages())) {
                 $message = rtrim($message);
+                // @todo: move to dedicated getters.
                 $message .= "\n" . $this->formatMessages(Message::Format_PlainList, Severity::Log);
             }
         }

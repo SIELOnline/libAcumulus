@@ -1,4 +1,6 @@
 <?php
+/** @noinspection PhpStaticAsDynamicMethodCallInspection */
+
 namespace Siel\Acumulus\Integration\ApiClient;
 
 use PHPUnit\Framework\TestCase;
@@ -6,22 +8,22 @@ use Siel\Acumulus\ApiClient\Acumulus;
 use Siel\Acumulus\ApiClient\ApiCommunicator;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Severity;
-use Siel\Acumulus\ApiClient\HttpCommunicator;
+use Siel\Acumulus\ApiClient\HttpRequest;
 
 class AcumulusTest extends TestCase
 {
     /**
      * @var \Siel\Acumulus\ApiClient\Acumulus
      */
-    protected $acumulusClient;
+    protected Acumulus $acumulusClient;
 
     protected function setUp(): void
     {
         // Using TestWebShop would give us a test HttpCommunicator, but we want
         // a real one here.
         $container = new Container('TestWebShop', 'nl');
-        $httpCommunicator = new HttpCommunicator();
-        $apiCommunicator = new ApiCommunicator($httpCommunicator, $container->getConfig(), $container->getLanguage(), $container->getLog());
+        $httpRequest = new HttpRequest();
+        $apiCommunicator = new ApiCommunicator($httpRequest, $container->getConfig(), $container->getLanguage(), $container->getLog());
         $this->acumulusClient = new Acumulus($apiCommunicator, $container, $container->getConfig());
     }
 
@@ -84,14 +86,14 @@ class AcumulusTest extends TestCase
         $result = $this->acumulusClient->getVatInfo(... $args);
         $this->assertSame(Severity::Success, $result->getStatus());
 
-        $vatrate  = array_column($expected, 'vatrate');
-        $vattype = array_column($expected, 'vattype');
-        array_multisort($vatrate, SORT_DESC, $vattype, SORT_ASC, $expected);
+        $vatRate  = array_column($expected, 'vatrate');
+        $vatType = array_column($expected, 'vattype');
+        array_multisort($vatRate, SORT_DESC, $vatType, SORT_ASC, $expected);
 
         $actual = $result->getResponse();
-        $vatrate  = array_column($actual, 'vatrate');
-        $vattype = array_column($actual, 'vattype');
-        array_multisort($vatrate, SORT_DESC, $vattype, SORT_ASC, $actual);
+        $vatRate  = array_column($actual, 'vatrate');
+        $vatType = array_column($actual, 'vattype');
+        array_multisort($vatRate, SORT_DESC, $vatType, SORT_ASC, $actual);
 
         $this->assertEquals($expected, $actual);
     }
@@ -140,7 +142,7 @@ class AcumulusTest extends TestCase
         $this->assertEquals(10000, $threshold);
     }
 
-    public function stockAddProvider()
+    public function stockAddProvider(): array
     {
         $productId = 1833636;
         return [ // $productId, $quantity, $description, $date

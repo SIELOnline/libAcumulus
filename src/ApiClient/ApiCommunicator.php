@@ -9,7 +9,6 @@ use RuntimeException;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Helpers\Log;
-use Siel\Acumulus\Helpers\Message;
 use Siel\Acumulus\Helpers\Severity;
 
 /**
@@ -19,42 +18,27 @@ use Siel\Acumulus\Helpers\Severity;
  * - Conversion between array and XML.
  * - Conversion from Json to array.
  * - Communicating with the Acumulus webservice using the
- *   {@se HttpCommunicator}.
+ *   {@see \Siel\Acumulus\ApiClient\HttpRequest}.
  * - Good error handling, including detecting html responses from the proxy
  *   before the actual web service.
  */
 class ApiCommunicator
 {
-    /** @var \Siel\Acumulus\ApiClient\HttpCommunicator */
-    protected $httpCommunicator;
+    protected ConnectionHandler $connectionHandler;
+    protected Config $config;
+    protected Log $log;
+    protected string $userLanguage;
 
-    /** @var \Siel\Acumulus\Config\Config */
-    protected $config;
-
-    /** @var \Siel\Acumulus\Helpers\Log */
-    protected $log;
-
-    /** @var string */
-    protected $language;
-
-    /**
-     * Communicator constructor.
-     *
-     * @param \Siel\Acumulus\ApiClient\HttpCommunicator $httpCommunicator
-     * @param \Siel\Acumulus\Config\Config $config
-     * @param string $language
-     * @param \Siel\Acumulus\Helpers\Log $log
-     */
-    public function __construct(HttpCommunicator $httpCommunicator, Config $config, $language, Log $log)
+    public function __construct(ConnectionHandler $connectionHandler, Config $config, string $userLanguage, Log $log)
     {
-        $this->httpCommunicator = $httpCommunicator;
+        $this->connectionHandler = $connectionHandler;
         $this->config = $config;
-        $this->language = $language;
+        $this->userLanguage = $userLanguage;
         $this->log = $log;
     }
 
     /**
-     * Returns the uri to the requested API call.
+     * Constructs and returns the uri for the requested API call.
      *
      * @param string $apiFunction
      *   The api service to get the uri for.
@@ -62,7 +46,7 @@ class ApiCommunicator
      * @return string
      *   The uri to the requested API call.
      */
-    public function getUri($apiFunction)
+    public function constructUri(string $apiFunction): string
     {
         $environment = $this->config->getEnvironment();
         return $environment['baseUri'] . '/' . $environment['apiVersion'] . '/' . $apiFunction . '.php';
@@ -89,9 +73,9 @@ class ApiCommunicator
      * @return \Siel\Acumulus\ApiClient\Result
      *   A Result object containing the results.
      */
-    public function callApiFunction($apiFunction, array $message, $needContract, Result $result)
+    public function callApiFunction(string $apiFunction, array $message, bool $needContract, Result $result): Result
     {
-        $uri = $this->getUri($apiFunction);
+        $uri = $this->constructUri($apiFunction);
         try {
             $commonMessagePart = $this->getBasicSubmit($needContract);
             $message = array_merge($commonMessagePart, $message);
@@ -100,12 +84,22 @@ class ApiCommunicator
             $result = $this->sendApiMessage($uri, $message, $result);
         } catch (RuntimeException $e) {
             $result->addMessage($e);
+            $this->connectionHandler->close($this->connectionHandler->get($uri));
         }
 
-        $this->log->debug("ApiCommunicator::callApiFunction() uri=%s\n%s",
+        $message = sprintf(
+            "ApiCommunicator::callApiFunction() uri=%s\nrequest=%s",
             $uri,
-            implode("\n", $result->formatMessages(Message::Format_Plain, Severity::Log))
+            $this->maskPasswords($result->getHttpRequest()->getPostFieldsAsMsg())
         );
+        if ($result->getHttpResponse() !== null) {
+            $message .= sprintf(
+                "\ncode=%d\nresponse=%s",
+                $result->getHttpResponse()->getHttpCode(),
+                $this->maskPasswords($result->getHttpResponse()->getBody()),
+            );
+        }
+        $this->log->debug($message);
         return $result;
     }
 
@@ -133,7 +127,7 @@ class ApiCommunicator
      *
      * @see https://www.siel.nl/acumulus/API/Basic_Submit/
      */
-    protected function getBasicSubmit($needContract)
+    protected function getBasicSubmit(bool $needContract): array
     {
         $environment = $this->config->getEnvironment();
         $pluginSettings = $this->config->getPluginSettings();
@@ -145,7 +139,7 @@ class ApiCommunicator
         $result += [
             'format' => $pluginSettings['outputFormat'],
             'testmode' => $pluginSettings['debug'] === Config::Send_TestMode ? Api::TestMode_Test : Api::TestMode_Normal,
-            'lang' => $this->language,
+            'lang' => $this->userLanguage,
             'connector' => [
                 'application' => "{$environment['shopName']} {$environment['shopVersion']}",
                 'webkoppel' => "Acumulus {$environment['moduleVersion']}",
@@ -164,51 +158,54 @@ class ApiCommunicator
      * - conversion of the message to xml,
      * - communication with the Acumulus web service
      * - converting the answer to an array
-     * are returned as an Exception.
+     * are returned as a RuntimeException.
      *
-     * Any errors (or warnings) returned in the response structure of the web
-     * service are returned via the result value and should be handled at a
-     * higher level.
+     * Any errors (or warnings) in the response structure of the web service are
+     * returned via the result value and should be handled at a higher level.
      *
      * @param string $uri
      *   The URI of the Acumulus WebAPI call to send the message to.
      * @param array $message
      *   The message to send to the Acumulus WebAPI.
      * @param \Siel\Acumulus\ApiClient\Result $result
-     *   The result structure to add the results to.
+     *   The result object to add the results to.
      *
      * @return \Siel\Acumulus\ApiClient\Result
      *   The result of the web service call.
+     *   See {@see https://www.siel.nl/acumulus/API/Basic_Response/}
+     *   for the structure of a response.
      *
      * @throws \RuntimeException
-     *
-     * @see https://www.siel.nl/acumulus/API/Basic_Response/ For the
-     *   structure of a response.
      */
-    protected function sendApiMessage($uri, array $message, Result $result)
+    protected function sendApiMessage(string $uri, array $message, Result $result): Result
     {
         // Convert message to XML. XML requires 1 top level tag, so add one.
-        // The tag name is ignored by the Acumulus WebAPI.
-        $message = trim($this->convertArrayToXml(['myxml' => $message]));
-        $result->setRawRequest($message);
-        $rawResponse = $this->httpCommunicator->post($uri, ['xmlstring' => $message]);
-        $result->setRawResponse($rawResponse);
+        // The top tag name is ignored by the Acumulus WebAPI.
+        $message = trim($this->convertArrayToXml(['acumulus' => $message]));
+        $httpRequest = new HttpRequest($this->connectionHandler->get($uri));
+        $result->setHttpRequest($httpRequest);
+        $httpResponse = $httpRequest->post($uri, ['xmlstring' => $message])->execute();
+        $result->setHttpResponse($httpResponse);
 
-        if (empty($rawResponse)) {
+        // @todo: response knowledge can be placed in Result (move "parsing"
+        //   body into setResponse, called internally from setHttpResponse.
+        // @todo: start using http codes (404, 429, 500, ...)
+        $body = $httpResponse->getBody();
+        if (empty($body)) {
             // CURL may get a time-out and return an empty response without
             // further error messages: Add an error to tell the user to check if
             // the invoice was sent or not.
-            $result->addMessage('Empty response', Severity::Error, "", 701);
-        } elseif ($this->isHtmlResponse($rawResponse)) {
+            $result->addMessage('Empty response body', Severity::Error, '', 701);
+        } elseif ($this->isHtmlResponse($body)) {
             // When the API is gone we might receive an HTML error message page.
-            $this->raiseHtmlReceivedError($rawResponse);
+            $this->raiseHtmlReceivedError($body);
         } else {
             // Decode the response as either json or xml.
             $response = [];
             $pluginSettings = $this->config->getPluginSettings();
 
             if ($pluginSettings['outputFormat'] === 'json') {
-                $response = json_decode($rawResponse, true);
+                $response = json_decode($body, true);
             }
             // Even if we pass <format>json</format> we might receive an XML
             // response in case the XML was rejected before or during parsing.
@@ -216,7 +213,7 @@ class ApiCommunicator
             // XML.
             if ($pluginSettings['outputFormat'] === 'xml' || !is_array($response)) {
                 try {
-                    $response = $this->convertXmlToArray($rawResponse);
+                    $response = $this->convertXmlToArray($body);
                 } catch (RuntimeException $e) {
                     // Not an XML response. Treat it as a json error if we were
                     // expecting a json response.
@@ -239,11 +236,35 @@ class ApiCommunicator
      * @return bool
      *   True if the response is html, false otherwise.
      */
-    protected function isHtmlResponse($response)
+    protected function isHtmlResponse(string $response): bool
     {
         return strtolower(substr($response, 0, strlen('<!doctype html'))) === '<!doctype html'
             || strtolower(substr($response, 0, strlen('<html'))) === '<html'
             || strtolower(substr($response, 0, strlen('<body'))) === '<body';
+    }
+
+    /**
+     * Mask passwords in Acumulus messages.
+     *
+     * Masking passwords allows to safely log communication between the Acumulus
+     * client and server.
+     *
+     * @param string $msg
+     *   A string that contains an Acumulus request or response message. These
+     *   messages are either in XML or in Json format. Password fields are
+     *   supposed to end with the string "password", but may have a prefix.
+     *
+     * @return string
+     *   The message with the value of password fields replaced with the string
+     *   "REMOVED FOR SECURITY"
+     */
+    protected function maskPasswords(string $msg): string
+    {
+        // Xml: don't be greedy to prevent replacing multiple instances at once.
+        $masked = preg_replace('|<([-_.a-z0-9]*)password>.*</[-_.a-z0-9]*password>|U','<$1password>REMOVED FOR SECURITY</$1password>', $msg);
+
+        // Json: getting the right number of back-slashes is not easy...
+        return preg_replace('/"([-_.a-z0-9]*)password"(\\s*):(\\s*)"([^\\\\"]|(\\\\.))*"/', '"$1password"$2:$3"REMOVED FOR SECURITY"', $masked);
     }
 
     /**
@@ -257,7 +278,7 @@ class ApiCommunicator
      *
      * @throws \RuntimeException
      */
-    protected function convertXmlToArray($xml)
+    protected function convertXmlToArray(string $xml): array
     {
         // Convert the response to an array via a 3-way conversion:
         // - create a simplexml object
@@ -292,7 +313,7 @@ class ApiCommunicator
      *
      * @throws \RuntimeException
      */
-    protected function convertArrayToXml(array $values)
+    protected function convertArrayToXml(array $values): string
     {
         $dom = new DOMDocument('1.0', 'utf-8');
         $dom->xmlStandalone = true;
@@ -307,6 +328,7 @@ class ApiCommunicator
             // Backslashes get lost between here and the Acumulus API, but
             // encoding them makes them get through. Solve here until the
             // real error has been found and solved.
+            /** @noinspection PhpUnnecessaryLocalVariableInspection */
             $result = str_replace('\\', '&#92;', $result);
             return $result;
         } catch (DOMException $e) {
@@ -422,11 +444,11 @@ class ApiCommunicator
      * Returns an error message containing the received HTML.
      *
      * @param string $response
-     *   String containing an html document.
+     *   String containing an HTML document.
      *
      * @trows \RuntimeException
      */
-    protected function raiseHtmlReceivedError($response)
+    protected function raiseHtmlReceivedError(string $response)
     {
         libxml_use_internal_errors(true);
         $doc = new DOMDocument('1.0', 'utf-8');

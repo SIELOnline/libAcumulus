@@ -1,7 +1,16 @@
 <?php
+
+/**
+ * @noinspection PhpClassHasTooManyDeclaredMembersInspection
+ * @noinspection PhpMissingParamTypeInspection
+ * @noinspection PhpMissingReturnTypeInspection
+ * @noinspection PhpMissingFieldTypeInspection
+ * @noinspection PhpMissingVisibilityInspection
+ */
+
 namespace Siel\Acumulus;
 
-const Version = '6.3.6';
+const Version = '7.0.0-alpha1';
 
 namespace Siel\Acumulus\Helpers;
 
@@ -75,7 +84,7 @@ use const Siel\Acumulus\Version;
  * library. That is, in 1 of the namespaces Config, Helpers, Invoice, or Shop.
  * Note that there should be no need to override classes in ApiClient.
  *
- * If you do no want to use \Siel\Acumulus as starting part of your namespace,
+ * If you do not want to use \Siel\Acumulus as starting part of your namespace,
  * you may replace Siel by your own vendor name and/or your department name, but
  * it has to be followed by \Acumulus\<...>. Note that if you do so, you are
  * responsible for ensuring that your classes are autoloaded.
@@ -86,8 +95,8 @@ use const Siel\Acumulus\Version;
  * passed as 1st constructor argument to the Container and the container is
  * asked to return a {@see \Siel\Acumulus\Invoice\Creator}, it will look for
  * the following classes:
- * 1. \MyVendorName\MyDepartmentName\Acumulus\MyCMS\MyWebshop\MyWebShop2\Invoice\Creator
- * 2. \MyVendorName\MyDepartmentName\Acumulus\MyCMS\MyWebshop\Invoice\Creator
+ * 1. \MyVendorName\MyDepartmentName\Acumulus\MyCMS\MyWebShop\MyWebShop2\Invoice\Creator
+ * 2. \MyVendorName\MyDepartmentName\Acumulus\MyCMS\MyWebShop\Invoice\Creator
  * 3. \MyVendorName\MyDepartmentName\Acumulus\MyCMS\Invoice\Creator
  * 4. \Siel\Acumulus\Invoice\Creator
  *
@@ -102,10 +111,10 @@ use const Siel\Acumulus\Version;
  * can define another level of namespace searching by calling
  * {@see Container::setCustomNamespace()}. This will define 1 additional
  * namespace to look for before the above list as defined by the $shopNamespace
- * argument is traversed. Taking the above example, and if you would have set
- * 'MyShop\Custom' as custom namespace, the container
- * will first look for the class \MyShop\Custom\Invoice\Creator, before
- * looking for the above list of classes.
+ * argument is traversed. Taking the above example, and if you had set
+ * 'MyShop\Custom' as custom namespace, the container will first look for the
+ * class \MyShop\Custom\Invoice\Creator, before looking for the above list of
+ * classes.
  *
  * By defining a custom namespace and placing your custom code in that
  * namespace, instead of changing the code in this library, it remains possible
@@ -120,7 +129,7 @@ class Container
      *   The base directory where the Acumulus library is located. This is used
      *   to check if the file that should contain a class exists before calling
      *   class_exists(). This is not a good practice and should only be done if
-     *   older auto loaders are used that generate errors or warnings if a class
+     *   older autoloaders are used that generate errors or warnings if a class
      *   is not found.
      *
      *   If this contains an empty value, no check will be performed.
@@ -396,18 +405,18 @@ class Container
     public function getApiCommunicator()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('ApiCommunicator', 'ApiClient', [$this->getHttpCommunicator(), $this->getConfig(), $this->getLanguage(), $this->getLog()]);
+        return $this->getInstance('ApiCommunicator', 'ApiClient', [$this->getConnectionHandler(), $this->getConfig(), $this->getLanguage(), $this->getLog()]);
     }
 
     /**
-     * @return \Siel\Acumulus\ApiClient\HttpCommunicator
+     * @return \Siel\Acumulus\ApiClient\ConnectionHandler
      *
      * @noinspection PhpReturnDocTypeMismatchInspection
      */
-    public function getHttpCommunicator()
+    public function getConnectionHandler()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('HttpCommunicator', 'ApiClient', []);
+        return $this->getInstance('ConnectionHandler', 'ApiClient', []);
     }
 
     /**
@@ -748,7 +757,7 @@ class Container
      * @param string $class
      *   The name of the class without any namespace part.
      * @param string $subNamespace
-     *   The sub namespace where the class belongs to, e.g helpers, invoice or
+     *   The sub namespace where the class belongs to, e.g. helpers, invoice or
      *   shop.
      * @param string $namespace
      *   THe "base" namespace where the class belongs to

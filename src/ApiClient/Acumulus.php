@@ -756,7 +756,7 @@ class Acumulus
      */
     protected function constructUri($apiFunction)
     {
-        return $this->apiCommunicator->getUri($apiFunction);
+        return $this->apiCommunicator->constructUri($apiFunction);
     }
 
     /**

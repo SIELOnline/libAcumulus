@@ -1,7 +1,14 @@
-<?php /** @noinspection PhpDocSignatureInspection */
+<?php
+/**
+ * @noinspection PhpStaticAsDynamicMethodCallInspection
+ * @noinspection PhpDocSignatureInspection
+ */
+
 namespace Siel\Acumulus\Unit\ApiClient;
 
 use PHPUnit\Framework\TestCase;
+use Siel\Acumulus\ApiClient\HttpRequest;
+use Siel\Acumulus\ApiClient\HttpResponse;
 use Siel\Acumulus\Helpers\SeverityTranslations;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Helpers\Message;
@@ -25,7 +32,6 @@ use Siel\Acumulus\ApiClient\ResultTranslations;
  */
 class ResultTest extends TestCase
 {
-
     private Translator $translator;
     private ApiRequestResponseExamples $examples;
 
@@ -38,12 +44,12 @@ class ResultTest extends TestCase
         $this->examples = new ApiRequestResponseExamples();
     }
 
-    private function t($key)
+    private function t($key): string
     {
         return $this->translator->get($key);
     }
 
-    public function testCreate()
+    public function testCreate(): Result
     {
         $result = new Result();
         $this->assertEquals(Severity::Unknown, $result->getStatus());
@@ -61,34 +67,7 @@ class ResultTest extends TestCase
     /**
      * @depends testCreate
      */
-    public function testSetRawRequest(Result $result)
-    {
-        $result->setRawRequest($this->examples->getRequest('accounts'));
-        $this->assertCount(1, $result->getMessages());
-        $this->assertStringNotContainsString('<password>mysecret</password>', $result->getByCodeTag(Result::CodeTagRawRequest)->getText());
-        $this->assertStringContainsString('<password>REMOVED FOR SECURITY</password>', $result->getByCodeTag(Result::CodeTagRawRequest)->getText());
-
-        return $result;
-    }
-
-    /**
-     * @depends testSetRawRequest
-     */
-    public function testSetRawResponse(Result $result)
-    {
-        $result->setRawResponse($this->examples->getResponse('accounts'));
-        $this->assertCount(2, $result->getMessages());
-        $this->assertEquals($this->examples->getResponse('accounts'), $result->getByCodeTag(Result::CodeTagRawResponse)->getText());
-        $this->assertEquals(Severity::Unknown, $result->getStatus());
-        $this->assertEquals(Severity::Log, $result->getSeverity());
-
-        return $result;
-    }
-
-    /**
-     * @depends testSetRawResponse
-     */
-    public function testSetResponse(Result $result)
+    public function testSetResponse(Result $result): Result
     {
         $result->setMainResponseKey('accounts', true)
             ->setResponse(json_decode($this->examples->getResponse('accounts'), true));
@@ -104,14 +83,22 @@ class ResultTest extends TestCase
     public function testSetResponseEmptyList()
     {
         $result = new Result();
-        $result->setRawRequest($this->examples->getRequest('vatinfo-empty-return'));
-        $result->setRawResponse($this->examples->getResponse('vatinfo-empty-return'));
+        $httpRequest = new HttpRequest(curl_init());
+        $httpRequest->post('test', ['xmlstring' => $this->examples->getRequest('vatinfo-empty-return')]);
+        $httpResponse = new HttpResponse(
+            '',
+            $this->examples->getResponse('vatinfo-empty-return'),
+            ['http_code' => 200, 'request_header' => ''],
+            $httpRequest
+        );
+        $result->setHttpRequest($httpRequest);
+        $result->setHttpResponse($httpResponse);
         $result->setMainResponseKey('vatinfo', true)
             ->setResponse(json_decode($this->examples->getResponse('vatinfo-empty-return'), true));
         $this->assertEquals(Severity::Success, $result->getStatus());
         $this->assertEquals($this->t('message_response_success'), $result->getStatusText());
         $this->assertEquals(Severity::Log, $result->getSeverity());
-        $this->assertCount(2, $result->getMessages());
+        $this->assertCount(0, $result->getMessages());
         $this->assertFalse($result->hasRealMessages());
         $this->assertFalse($result->hasError());
         $this->assertNull($result->getByCode(701));
@@ -122,8 +109,6 @@ class ResultTest extends TestCase
     public function testResultWithError()
     {
         $result = new Result();
-        $result->setRawRequest($this->examples->getRequest('no_contract'));
-        $result->setRawResponse($this->examples->getResponse('no_contract'));
         $result->setMainResponseKey('vatinfo', true)
             ->setResponse(json_decode($this->examples->getResponse('no_contract'), true));
         $this->assertEquals(Severity::Error, $result->getStatus());

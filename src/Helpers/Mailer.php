@@ -7,12 +7,12 @@ use Siel\Acumulus\Invoice\Result;
 use Siel\Acumulus\Tag;
 
 /**
- * Mailer allows to send mails.
+ * Mailer allows sending mails.
  *
  * This abstract base class defines functionality to create a mail that
  * communicates the result of sending invoice data to Acumulus (method
- * Mailer::sendInvoiceAddMailResult). It must be overridden per webshop to
- * define the bridge between this library and the webshop's specific mail
+ * Mailer::sendInvoiceAddMailResult). It must be overridden per webs hop to
+ * define the bridge between this library and the web shop's specific mail
  * subsystem.
  *
  * If you want to send other mails, just use the Mailer::sendMail() method.
@@ -278,7 +278,7 @@ abstract class Mailer
         switch ($invoiceSendResult->getStatus()) {
             case Severity::Exception:
                 $sentences[] = 'mail_body_exception';
-                $sentences[] = $invoiceSendResult->getByCodeTag(Result::CodeTagRawRequest) !== null
+                $sentences[] = $invoiceSendResult->getHttpRequest() !== null
                     ? 'mail_body_exception_invoice_maybe_created'
                     : 'mail_body_exception_invoice_not_created';
                 break;
@@ -339,7 +339,7 @@ abstract class Mailer
      * @param \Siel\Acumulus\Invoice\Result $result
      *
      * @return string[]
-     *   An array with a plain text (key='text') and an html string (key='html')
+     *   An array with a plain text (key='text') and an HTML string (key='html')
      *   containing the messages with some descriptive text.
      */
     protected function getMessages(Result $result)
@@ -369,7 +369,7 @@ abstract class Mailer
      * @param \Siel\Acumulus\Invoice\Result $result
      *
      * @return string[]
-     *   An array with a plain text (key='text') and an html string (key='html')
+     *   An array with a plain text (key='text') and an HTML string (key='html')
      *   containing the support messages with some descriptive text.
      */
     protected function getSupportMessages(Result $result)
@@ -383,8 +383,9 @@ abstract class Mailer
         // We add the request and response messages when set so or if there were
         // warnings or severer messages, thus not with notices.
         $addReqResp = $pluginSettings['debug'] === Config::Send_SendAndMailOnError ? Result::AddReqResp_WithOther : Result::AddReqResp_Always;
-        if ($addReqResp === Result::AddReqResp_Always || ($addReqResp === Result::AddReqResp_WithOther && $result->getStatus() >= Severity::Warning)) {
+        if ($addReqResp === Result::AddReqResp_Always || $result->getStatus() >= Severity::Warning) {
             $logMessages = new MessageCollection();
+            // @todo: move getting the raw messages to own method on Result (getMaskedRawResponse())
             $logMessages->addMessage($result->getByCodeTag(Result::CodeTagRawRequest))
                         ->addMessage($result->getByCodeTag(Result::CodeTagRawResponse));
             if (!empty($logMessages->getMessages())) {

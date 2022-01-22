@@ -10,33 +10,48 @@ use Siel\Acumulus\Helpers\Translator;
 /**
  * Class Result wraps an Acumulus web service result into an object.
  *
- * A Result object will contain the:
- * - result status (internal code: one of the Severity::... constants).
- * - exception, if one was thrown.
- * - any error messages, local and/or remote.
- * - any warnings, local and/or remote.
- * - any notices, local.
- * - (raw) message sent, for logging purposes.
- * - (raw) message received, for logging purposes.
- * - result array.
+ * A Result object will contain
+ * Most important:
+ * - The received result, without any warnings or errors, converted to an array.
+ *
+ * But also a lot of other info:
+ * - Result status (internal code: one of the Severity::... constants).
+ * - Exception, if one was thrown.
+ * - Any error messages, local and/or remote.
+ * - Any warnings, local and/or remote.
+ * - Any notices, local.
+ * - Http request and response objects, for logging purposes.
  */
 class Result extends MessageCollection
 {
-    // Code tags for raw request and response
-    const CodeTagRawRequest = 'Request';
-    const CodeTagRawResponse = 'Response';
+    // Code tags for messages containing the raw (but masked) request and
+    // response.
+    public const CodeTagRawRequest = 'Request';
+    public const CodeTagRawResponse = 'Response';
+
+    /**
+     * @var \Siel\Acumulus\ApiClient\HttpRequest|null
+     *   The HTTP request.
+     */
+    protected ?HttpRequest $httpRequest;
+
+    /**
+     * @var \Siel\Acumulus\ApiClient\HttpResponse|null
+     *   The received HTTP response.
+     */
+    protected ?HttpResponse $httpResponse;
 
     /**
      * @var int|null
      *   The received api status or null if not yet sent.
      */
-    protected $apiStatus;
+    protected ?int $apiStatus;
 
     /**
      * @var array
      *   The structured response as was received from the web service.
      */
-    protected $response;
+    protected array $response;
 
     /**
      * @var string
@@ -46,16 +61,16 @@ class Result extends MessageCollection
      *   each service call result will contain the result specific for that
      *   call. This variable contains the key under which to find that. It
      *   should be set by each service call, allowing users of the service to
-     *   retrieve the main result without the need to know more details then
+     *   retrieve the main result without the need to know more details than
      *   strictly needed of the Acumulus API.
      */
-    protected $mainResponseKey;
+    protected string $mainResponseKey;
 
     /**
      * @var bool
      *   Indicates if the main response should be a list.
      */
-    protected $isList;
+    protected bool $isList;
 
     /**
      * Result constructor.
@@ -63,6 +78,8 @@ class Result extends MessageCollection
     public function __construct()
     {
         parent::__construct();
+        $this->httpRequest = null;
+        $this->httpResponse = null;
         $this->apiStatus = null;
         $this->response = [];
         $this->mainResponseKey = '';
@@ -79,7 +96,7 @@ class Result extends MessageCollection
      *   The translation for the given key or the key itself if no translation
      *   could be found.
      */
-    protected function t($key)
+    protected function t(string $key): string
     {
         return Translator::$instance instanceof Translator ? Translator::$instance->get($key) : $key;
     }
@@ -91,7 +108,7 @@ class Result extends MessageCollection
      *   - the severity of the message collection.
      *   - ignoring messages of Severity::Log
      */
-    public function getStatus()
+    public function getStatus(): int
     {
         $status = $this->ApiStatus2Severity($this->apiStatus);
         $severity = $this->getSeverity();
@@ -106,7 +123,7 @@ class Result extends MessageCollection
      *
      * @return string
      */
-    public function getStatusText()
+    public function getStatusText(): string
     {
         switch ($this->getStatus()) {
             case Severity::Unknown:
@@ -130,8 +147,9 @@ class Result extends MessageCollection
 
     /**
      * @param int $apiStatus
+     *   The status as returned by the API. 1 of the Api::Status_... constants.
      */
-    protected function setApiStatus($apiStatus)
+    protected function setApiStatus(int $apiStatus): void
     {
         $this->apiStatus = $apiStatus;
     }
@@ -145,7 +163,7 @@ class Result extends MessageCollection
      * @return int
      *   The corresponding internal status.
      */
-    protected function ApiStatus2Severity($apiStatus)
+    protected function ApiStatus2Severity(?int $apiStatus): int
     {
         // O and null are not distinguished by a switch.
         if ($apiStatus === null) {
@@ -174,30 +192,29 @@ class Result extends MessageCollection
      *   errors and warnings are removed. In case of errors, this array may be
      *   empty.
      */
-    public function getResponse()
+    public function getResponse(): array
     {
         return $this->response;
     }
 
     /**
-     * Sets the (structured) response as was received from the web service.
+     * Sets the (structured) response as was received from the web service. See
+     * {@see https://www.siel.nl/acumulus/API/Basic_Response/} for the common
+     * part of a response.
      *
      * @param array $response
      *   The structured response (json or xml string converted to an array).
      *
      * @return $this
-     *
-     * @see https://www.siel.nl/acumulus/API/Basic_Response/ For the common part
-     *   of a response.
      */
-    public function setResponse(array $response)
+    public function setResponse(array $response): self
     {
         // Move the common parts into their respective properties.
         if (isset($response['status'])) {
             $this->setApiStatus($response['status']);
             unset($response['status']);
         } else {
-            $this->addMessage(new RuntimeException('Status not set in reponse'));
+            $this->addMessage(new RuntimeException('Status not set in response'));
         }
 
         if (!empty($response['errors']['error'])) {
@@ -222,7 +239,7 @@ class Result extends MessageCollection
      *
      * @return $this
      */
-    public function setMainResponseKey($mainResponseKey, $isList = false)
+    public function setMainResponseKey(string $mainResponseKey, bool $isList = false): Result
     {
         $this->mainResponseKey = $mainResponseKey;
         $this->isList = $isList;
@@ -239,7 +256,7 @@ class Result extends MessageCollection
      *
      * @return array
      */
-    protected function simplifyResponse(array $response)
+    protected function simplifyResponse(array $response): array
     {
         // Simplify response by removing main key (which should be the only
         // remaining one).
@@ -263,38 +280,44 @@ class Result extends MessageCollection
     }
 
     /**
-     * Sets the raw request as sent to the Acumulus web API.
-     *
-     * Only used for logging purposes.
-     *
-     * @param string $rawRequest
+     * @return \Siel\Acumulus\ApiClient\HttpRequest|null
      */
-    public function setRawRequest($rawRequest)
+    public function getHttpRequest(): ?HttpRequest
     {
-        $this->addMessage(
-            preg_replace('|<[a-z]*password>.*</[a-z]*password>|', '<$1password>REMOVED FOR SECURITY</$1password>', $rawRequest),
-            Severity::Log,
-            self::CodeTagRawRequest,
-            0
-        );
+        return $this->httpRequest;
     }
 
     /**
-     * Sets the raw response as received from the Acumulus web API.
+     * Sets the http request.
      *
-     * Only used for logging purposes.
+     * Information from the http request is solely used for logging purposes.
      *
-     * @param string $rawResponse
+     * @param \Siel\Acumulus\ApiClient\HttpRequest $httpRequest
      */
-    public function setRawResponse($rawResponse)
+    public function setHttpRequest(HttpRequest $httpRequest): void
     {
-        $rawResponse = preg_replace('|<([a-z]*)password>.*</[a-z]*password>|', '<$1password>REMOVED FOR SECURITY</$1password>', $rawResponse);
-        $rawResponse = preg_replace('|"([a-z]*)password"(\s*):(\s*)"[^"]+"|', '"$1password"$2:$3"REMOVED FOR SECURITY"', $rawResponse);
-        $this->addMessage(
-            $rawResponse,
-            Severity::Log,
-            self::CodeTagRawResponse,
-            0
-        );
+        $this->httpRequest = $httpRequest;
+    }
+
+    /**
+     * @return \Siel\Acumulus\ApiClient\HttpResponse|null
+     */
+    public function getHttpResponse(): ?HttpResponse
+    {
+        return $this->httpResponse;
+    }
+
+    /**
+     * Sets the http response.
+     *
+     * Information from the http response is extracted and placed in the other
+     * properties. After doing so, this property remains for logging purposes.
+     *
+     * @param \Siel\Acumulus\ApiClient\HttpResponse $httpResponse
+     */
+    public function setHttpResponse(HttpResponse $httpResponse): void
+    {
+        $this->httpResponse = $httpResponse;
+        // @todo: invoke $this->setResponse() from here.
     }
 }

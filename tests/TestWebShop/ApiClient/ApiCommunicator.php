@@ -21,7 +21,7 @@ class ApiCommunicator extends BaseApiCommunicator
     /**
      * @inheritDoc
      */
-    public function getUri($apiFunction)
+    public function constructUri(string $apiFunction): string
     {
         return $apiFunction;
     }
@@ -29,7 +29,7 @@ class ApiCommunicator extends BaseApiCommunicator
     /**
      * @inheritDoc
      */
-    public function callApiFunction($apiFunction, array $message, $needContract, Result $result)
+    public function callApiFunction(string $apiFunction, array $message, bool $needContract, Result $result): Result
     {
         // Add messages for the parameters that were passed in, so they can be checked.
         $result->addMessage($apiFunction, Severity::Log, 'apiFunction', 0);

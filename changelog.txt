@@ -23,6 +23,14 @@ WC2 = WooCommerce 2 (wordt niet meer ondersteund vanaf onze versie 5.5.2)
 Bugs:
 - PS: Vermeende precisie van berekend btw-bedrag blijkt toch te hoog. Verlaagd
   tot een goede halve cent.
+- VM: Call to method VirtueMartModelOrders::getMyOrderDetails(), where
+  VirtueMartModelOrders::getOrder() is the correct method to call (no need for
+  access checks).
+
+Refactorings:
+- VM: Logic of Joomla/VirtueMart/Invoice/Source::getInvoiceReference() and
+  getInvoiceDate() moved to getInvoiceReferenceOrder() resp.
+  getInvoiceDateOrder().
 
 6.3.7 (2022-01-22)
 ------------------

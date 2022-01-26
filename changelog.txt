@@ -21,6 +21,10 @@ WC2 = WooCommerce 2 (wordt niet meer ondersteund vanaf onze versie 5.5.2)
 6.3.8 (2022-0?-??)
 ------------------
 Bugs:
+- WC: Responding to order status changes did not work completely correctly:
+  - Starting state of new orders (normally pending) was not reacted on.
+  - Custom states defined by the "WooCommerce order status manager" were not
+    reacted on.
 - PS: Vermeende precisie van berekend btw-bedrag blijkt toch te hoog. Verlaagd
   tot een goede halve cent.
 - VM: Call to method VirtueMartModelOrders::getMyOrderDetails(), where

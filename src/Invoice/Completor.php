@@ -1307,11 +1307,11 @@ class Completor
      */
     protected function processMetaData()
     {
-        if (isset($this->invoice[Tag::Customer][Meta::Warning])) {
+        if (isset($this->invoice[Tag::Customer][Meta::Warning]) && is_array($this->invoice[Tag::Customer][Meta::Warning])) {
             $this->invoice[Tag::Customer][Meta::Warning] = json_encode($this->invoice[Tag::Customer][Meta::Warning]);
         }
-        if (isset($this->invoice[Tag::Customer][Tag::Line][Meta::Warning])) {
-            $this->invoice[Tag::Customer][Tag::Line][Meta::Warning] = json_encode($this->invoice[Tag::Customer][Tag::Line][Meta::Warning]);
+        if (isset($this->invoice[Tag::Customer][Tag::Invoice][Meta::Warning]) && is_array($this->invoice[Tag::Customer][Tag::Invoice][Meta::Warning])) {
+            $this->invoice[Tag::Customer][Tag::Invoice][Meta::Warning] = json_encode($this->invoice[Tag::Customer][Tag::Invoice][Meta::Warning]);
         }
         foreach ($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] as &$line) {
             if (isset($line[Meta::VatRateLookup]) && is_array($line[Meta::VatRateLookup])) {
@@ -1329,7 +1329,7 @@ class Completor
             if (isset($line[Meta::VatRateRangeMatches]) && is_array($line[Meta::VatRateRangeMatches])) {
                 $line[Meta::VatRateRangeMatches] = json_encode($line[Meta::VatRateRangeMatches]);
             }
-            if (isset($line[Meta::Warning])) {
+            if (isset($line[Meta::Warning]) && is_array($line[Meta::Warning])) {
                 $line[Meta::Warning] = json_encode($line[Meta::Warning]);
             }
         }
@@ -1752,10 +1752,7 @@ class Completor
                 $message = sprintf($message, ...$args);
             }
             $this->result->addMessage($message, Severity::Warning, '', $code);
-            if (!isset($array[Meta::Warning])) {
-                $array[Meta::Warning] = [];
-            }
-            $array[Meta::Warning][] = $this->result->getByCode($code)->format(Message::Format_Plain);
+            $this->addWarning($array, $this->result->getByCode($code)->format(Message::Format_Plain));
         }
     }
 
@@ -1778,5 +1775,27 @@ class Completor
             return true;
         }
         return false;
+    }
+
+    /**
+     * Helper method to add a warning to an array.
+     *
+     * Warnings are placed in the $array under the key Meta::Warning. If no
+     * warning is set, $warning is added as a string, otherwise it becomes an
+     * array of warnings to which this $warning is added.
+     *
+     * @param array $array
+     * @param string $warning
+     */
+    protected function addWarning(array &$array, $warning)
+    {
+        if (!isset($array[Meta::Warning])) {
+            $array[Meta::Warning] = $warning;
+        } else {
+            if (!is_array($array[Meta::Warning])) {
+                $array[Meta::Warning] = (array) $array[Meta::Warning];
+            }
+            $array[Meta::Warning][] = $warning;
+        }
     }
 }

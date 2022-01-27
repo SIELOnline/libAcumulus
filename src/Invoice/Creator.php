@@ -966,6 +966,28 @@ abstract class Creator
     }
 
     /**
+     * Helper method to add a warning to an array.
+     *
+     * Warnings are placed in the $array under the key Meta::Warning. If no
+     * warning is set, $warning is added as a string, otherwise it becomes an
+     * array of warnings to which this $warning is added.
+     *
+     * @param array $array
+     * @param string $warning
+     */
+    protected function addWarning(array &$array, $warning)
+    {
+        if (!isset($array[Meta::Warning])) {
+            $array[Meta::Warning] = $warning;
+        } else {
+            if (!is_array($array[Meta::Warning])) {
+                $array[Meta::Warning] = (array) $array[Meta::Warning];
+            }
+            $array[Meta::Warning][] = $warning;
+        }
+    }
+
+    /**
      * Adds a meta-line-type tag to the line(s) and its children, if any.
      *
      * @param array|array[] $lines

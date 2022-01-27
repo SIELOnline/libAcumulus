@@ -21,6 +21,10 @@ WC2 = WooCommerce 2 (wordt niet meer ondersteund vanaf onze versie 5.5.2)
 6.3.8 (2022-0?-??)
 ------------------
 Bugs:
+- ALL: Warnings can be added to the invoice data that is sent to Acumulus. These
+  are placed under the key Meta::Warning. If multiple warnings are added, it
+  should become an array instead of a single string. This was not done so in all
+  places.
 - WC: Responding to order status changes did not work completely correctly:
   - Starting state of new orders (normally pending) was not reacted on.
   - Custom states defined by the "WooCommerce order status manager" were not

@@ -131,14 +131,14 @@ class Creator extends BaseCreator
         if ($this->productPricesIncludeTax()) {
             // In the past I have seen WooCommerce store rounded vat amounts
             // together with a not rounded ex price. If that is the case, the
-            // precision of the - calculated - inc price is not best and we
+            // precision of the - calculated - inc price is not best, and we
             // should not recalculate the price ex when we have obtained a
             // corrected vat rate as that will worsen the precision of the price
             // ex.
             $precisionEx = $this->precision;
             $reason = $this->isPriceIncRealistic($productPriceInc, $taxes, $product);
             if ($reason !== '') {
-                $result[Meta::Warning] = "Price inc is realistic: $reason";
+                $this->addWarning($result, "Price inc is realistic: $reason");
                 $precisionInc = 0.001;
                 $recalculatePrice = Tag::UnitPrice;
             } else {

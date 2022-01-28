@@ -33,14 +33,14 @@ class Countries
      *
      * This method determines whether a country is in or outside the EU based on
      * fiscal handling of invoices to customers in that country. If vattype 3 -
-     * EU reversed vat - or 6 - foreignvat - is possible it is considered to be
-     * in the EU.
+     * EU reversed vat - or 6 - foreign EU vat - is possible it is considered to
+     * be in the EU.
      *
      * For now only the alpha-2 codes are allowed. Other notations will be added
      * as soon we support a web shop with a different way of storing countries.
      *
      * @param string $countryCode
-     *   Case insensitive ISO 3166-1 alpha-2 country code.
+     *   Case-insensitive ISO 3166-1 alpha-2 country code.
      *
      * @return bool
      *

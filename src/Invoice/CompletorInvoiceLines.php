@@ -344,8 +344,8 @@ class CompletorInvoiceLines
                     // Try to reduce the set by filtering on foreign or national
                     // vat type using the vat class lookup data.
                     if (!$this->getUniqueVatRate($line[Meta::VatRateLookupMatches]) && !empty($line[Meta::VatClassId])) {
-                        $line[Meta::VatRateLookupMatches] = $this->filterVatRateInfosByForeignVat(
-                            $this->completor->isForeignVatClass($line[Meta::VatClassId]),
+                        $line[Meta::VatRateLookupMatches] = $this->filterVatRateInfosByForeignEuVat(
+                            $this->completor->isForeignEuVatClass($line[Meta::VatClassId]),
                             $line[Meta::VatRateLookupMatches]);
                         $vatRateSource = Completor::VatRateSource_Completor_Range_Lookup_Foreign;
                     }
@@ -715,9 +715,9 @@ class CompletorInvoiceLines
      * Returns the subset of the vat rate infos that (do not) indicate a foreign
      * vat type.
      *
-     * @param bool $isForeignVatType
-     *   True to filter on vat type = Api::VatType_ForeignVat, false to filter
-     *   on vat type != Api::VatType_ForeignVat.
+     * @param bool $isForeignEuVatType
+     *   True to filter on vat type = Api::VatType_ForeignEuVat, false to filter
+     *   on vat type != Api::VatType_ForeignEuVat.
      * @param array|null $vatRateInfos
      *   The set of vat rate infos to filter. If not given, the property
      *   $this->possibleVatRates is used.
@@ -726,7 +726,7 @@ class CompletorInvoiceLines
      *   The, possibly empty, set of vat rate infos that indicate (or not) a
      *   foreign vat type.
      */
-    protected function filterVatRateInfosByForeignVat($isForeignVatType, array $vatRateInfos = null)
+    protected function filterVatRateInfosByForeignEuVat($isForeignEuVatType, array $vatRateInfos = null)
     {
         if ($vatRateInfos === null) {
             $vatRateInfos = $this->possibleVatRates;
@@ -734,7 +734,7 @@ class CompletorInvoiceLines
 
         $result = [];
         foreach ($vatRateInfos as $vatRateInfo) {
-            if (($vatRateInfo[Tag::VatType] === Api::VatType_ForeignVat) === $isForeignVatType) {
+            if (($vatRateInfo[Tag::VatType] === Api::VatType_ForeignEuVat) === $isForeignEuVatType) {
                 $result[] = $vatRateInfo;
             }
         }

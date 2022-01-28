@@ -21,9 +21,10 @@ WC2 = WooCommerce 2 (wordt niet meer ondersteund vanaf onze versie 5.5.2)
 6.3.8 (2022-0?-??)
 ------------------
 Bugs:
-- ALL: Warnings can be added to the invoice data that is sent to Acumulus. These
-  are placed under the key Meta::Warning. If multiple warnings are added, it
-  should become an array instead of a single string. This was not done so in all
+- ALL: CRITICAL Uncaught Error: [] operator not supported for strings.
+  Warnings can be added to the invoice data that is sent to Acumulus. These are
+  placed under the key Meta::Warning. If multiple warnings are added, it should
+  become an array instead of a single string. This was not done so in all
   places.
 - WC: Responding to order status changes did not work completely correctly:
   - Starting state of new orders (normally pending) was not reacted on.
@@ -34,8 +35,13 @@ Bugs:
 - VM: Call to method VirtueMartModelOrders::getMyOrderDetails(), where
   VirtueMartModelOrders::getOrder() is the correct method to call (no need for
   access checks).
+- ALL: Invoice status form: erroneous assignment to local variable $description
+  when concept was not found.
 
 Refactorings:
+- ALL: added vat type 7 (ForeignOtherVat) and renamed vat type 6 to ForeignEuVat
+  (including variables and methods that are named after that vat type). Config
+  value are not renamed for now.
 - VM: Logic of Joomla/VirtueMart/Invoice/Source::getInvoiceReference() and
   getInvoiceDate() moved to getInvoiceReferenceOrder() resp.
   getInvoiceDateOrder().

@@ -283,8 +283,8 @@ class Completor
                 // @todo: unless we know that is not used
                 $possibleVatTypes[] = Api::VatType_National;
                 // Can it be foreign vat?
-                if ($this->usesForeignVat()) {
-                    $possibleVatTypes[] = Api::VatType_ForeignVat;
+                if ($this->usesForeignEuVat()) {
+                    $possibleVatTypes[] = Api::VatType_ForeignEuVat;
                 }
                 // Can it be EU reversed VAT. Note that reversed vat should not
                 // be used with vat free items.
@@ -374,7 +374,7 @@ class Completor
                     // These vat types can only have the 0% vat rate.
                     $vatTypeVatRates = [0.0];
                     break;
-                case Api::VatType_ForeignVat:
+                case Api::VatType_ForeignEuVat:
                     $countryVatRates = $this->getVatRatesByCountryAndInvoiceDate($this->invoice[Tag::Customer][Tag::CountryCode]);
                     $vatTypeVatRates = [];
                     // Only add those foreign vat rates that are possible given
@@ -754,12 +754,12 @@ class Completor
      * - Whether there are margin products in the order.
      *
      * So to start with, any list of (possible) vat types is based on the above.
-     * Furthermore this method and {@see getInvoiceLinesVatTypeInfo()} are aware
-     * of:
+     * Furthermore, this method and {@see getInvoiceLinesVatTypeInfo()} are
+     * aware of:
      * - The fact that orders do not have to be split over different vat types,
      *   but that invoices should be split if both national and foreign VAT
      *   rates appear on the order.
-     * - The vat class meta data per line and which classes denote foreign vat.
+     * - The vat class metadata per line and which classes denote foreign vat.
      *   This info is used to distinguish between NL and foreign vat for EU
      *   countries that have VAT rates in common with NL and the settings
      *   indicate that this shop sells products in both vat type categories.
@@ -966,7 +966,7 @@ class Completor
 
                         // 3) In EU: If the vat class is known and denotes
                         //   foreign vat, we do not add the Dutch vat type.
-                        if ($this->isEu() && !empty($line[Meta::VatClassId]) && $this->isForeignVatClass($line[Meta::VatClassId])) {
+                        if ($this->isEu() && !empty($line[Meta::VatClassId]) && $this->isForeignEuVatClass($line[Meta::VatClassId])) {
                             if ($vatType === Api::VatType_National) {
                                 $doAdd = false;
                             }
@@ -978,8 +978,8 @@ class Completor
                         //   when there's a fee line at NL vat rate which
                         //   happens to be the foreign vat rate as well, we only
                         //   do this for item lines.
-                        if ($line[Meta::LineType] === Creator::LineType_OrderItem && !empty($line[Meta::VatClassId]) && !$this->isForeignVatClass($line[Meta::VatClassId])) {
-                            if ($vatType === Api::VatType_ForeignVat) {
+                        if ($line[Meta::LineType] === Creator::LineType_OrderItem && !empty($line[Meta::VatClassId]) && !$this->isForeignEuVatClass($line[Meta::VatClassId])) {
+                            if ($vatType === Api::VatType_ForeignEuVat) {
                                 $doAdd = false;
                             }
                         }
@@ -1573,11 +1573,11 @@ class Completor
      * @todo: this and the following methods are actually config related
      *   questions and thus should be part of Config
      */
-    public function usesForeignVat()
+    public function usesForeignEuVat()
     {
         $shopSettings = $this->config->getShopSettings();
-        $foreignVatClasses = $shopSettings['foreignVatClasses'];
-        return reset($foreignVatClasses) !== Config::VatClass_NotApplicable;
+        $foreignVatEuClasses = $shopSettings['foreignVatClasses'];
+        return reset($foreignVatEuClasses) !== Config::VatClass_NotApplicable;
     }
 
     /**
@@ -1590,11 +1590,11 @@ class Completor
      *   True if the shop might sell foreign vat articles and the vat class id
      *   denotes a foreign vat class, false otherwise.
      */
-    public function isForeignVatClass($vatClassId)
+    public function isForeignEuVatClass($vatClassId)
     {
         $shopSettings = $this->config->getShopSettings();
-        $foreignVatClasses = $shopSettings['foreignVatClasses'];
-        return in_array($vatClassId, $foreignVatClasses);
+        $foreignVatEuClasses = $shopSettings['foreignVatClasses'];
+        return in_array($vatClassId, $foreignVatEuClasses);
     }
 
     /**

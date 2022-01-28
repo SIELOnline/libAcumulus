@@ -64,7 +64,8 @@ interface Api
     const VatType_EuReversed = 3;
     const VatType_RestOfWorld = 4;
     const VatType_MarginScheme = 5;
-    const VatType_ForeignVat = 6;
+    const VatType_ForeignEuVat = 6;
+    const VatType_ForeignOtherVat = 7;
 
     const VatFree = -1;
 

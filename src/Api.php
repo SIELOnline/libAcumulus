@@ -59,6 +59,11 @@ interface Api
     const VatTypeId_Private = 1; // or vat exempt business.
     const VatTypeId_Business = 2;
 
+    const VatRegion_NotSet = 0;
+    const VatRegion_Netherlands = 1;
+    const VatRegion_Europe = 2;
+    const VatRegion_World = 3;
+
     const VatType_National = 1;
     const VatType_NationalReversed = 2;
     const VatType_EuReversed = 3;

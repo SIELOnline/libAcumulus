@@ -292,6 +292,9 @@ class Completor
                     $possibleVatTypes[] = Api::VatType_EuReversed;
                 }
             } elseif ($this->isOutsideEu()) {
+                // @todo: handle UK and Northern Ireland
+                //   How to distinguish NI within country code UK:
+                //   https://www.webmasterworld.com/forum22/4514.htm
                 // Can it be national vat? Services should use vat type = 1 with
                 // vat free. @todo: thus if we know that only vat free is used...
                 if ($nature !== Config::Nature_Products) {

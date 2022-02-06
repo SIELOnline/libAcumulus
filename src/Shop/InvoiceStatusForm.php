@@ -830,7 +830,7 @@ class InvoiceStatusForm extends Form
         } elseif (!empty($entry['marginscheme'])) {
             $vatType = API::VatType_MarginScheme;
         } elseif (!empty($entry['foreignvat'])) {
-            $vatType = API::VatType_ForeignEuVat;
+            $vatType = API::VatType_EuVat;
         } elseif (!empty($entry['foreignnoneu'])) {
             $vatType = API::VatType_RestOfWorld;
         } else {
@@ -940,7 +940,7 @@ class InvoiceStatusForm extends Form
     /**
      * Returns the amounts of this invoice.
      *
-     * To check if the amounts match we have to treat local and foreign vat the
+     * To check if the amounts match we have to treat local and EU vat the
      * same, which Acumulus didn't in the past, but does since the new EU
      * commerce rules:
      * New order:
@@ -966,6 +966,9 @@ class InvoiceStatusForm extends Form
         $fields = [];
         if (!empty($entry['totalvalue']) && !empty($entry['totalvalueexclvat'])) {
             // Get Acumulus amounts.
+            // @todo: invoice status form:
+            //   - getEntry API call also handles other foreign vat?
+            //   - $entry['foreignvat'] what does it contain for UK invoice?
             $amountExAcumulus = $entry['totalvalueexclvat'];
             $amountIncAcumulus = $entry['totalvalue'];
             $amountVatAcumulus = $amountIncAcumulus - $amountExAcumulus;

@@ -1,9 +1,4 @@
 <?php
-/**
- * @file
- * Contains ${NAMESPACE}${NAME}.
- */
-
 namespace Siel\Acumulus\Unit\Invoice;
 
 use PHPUnit\Framework\TestCase;

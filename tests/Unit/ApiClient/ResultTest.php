@@ -1,4 +1,5 @@
-<?php /** @noinspection PhpDocSignatureInspection */
+<?php
+/** @noinspection PhpDocSignatureInspection */
 namespace Siel\Acumulus\Unit\ApiClient;
 
 use PHPUnit\Framework\TestCase;

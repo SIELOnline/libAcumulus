@@ -80,4 +80,6 @@ interface Tag
     const LoginName = 'loginname';
     const Gender = 'gender';
     const CreateApiUser = 'createapiuser';
+
+    const CountryRegion = 'countryregion';
 }

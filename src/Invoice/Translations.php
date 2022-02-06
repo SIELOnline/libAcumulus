@@ -129,8 +129,8 @@ class Translations extends TranslationCollection
         'message_warning_lock_no_longer_exists' => 'The check on double sending could not determine whether this happened or not. Check if Acumulus has multiple entries for this %1$s.',
         'message_warning_delete_lock_failed' => 'Failed to delete the lock on the %s.',
 
-        'eu_commerce_threshold_passed' => 'You are above the threshold up to which you may charge Dutch VAT for EU customers. As of now, and up to the end of the year, you must charge foreign VAT. Immediately change the VAT settings of your web shop and other sales channels.',
-        'eu_commerce_threshold_will_pass' => 'With this invoice you will pass threshold up to which you may charge Dutch VAT for EU customers. As of now, and up to the end of the year, and including for this invoice, you must charge foreign VAT. Immediately change the tax settings of your web shop and other sales channels.',
+        'eu_commerce_threshold_passed' => 'You are above the threshold up to which you may charge Dutch VAT for EU customers. As of now, and up to the end of the year, you must charge EU VAT. Immediately change the VAT settings of your web shop and other sales channels.',
+        'eu_commerce_threshold_will_pass' => 'With this invoice you will pass threshold up to which you may charge Dutch VAT for EU customers. As of now, and up to the end of the year, and including for this invoice, you must charge EU VAT. Immediately change the tax settings of your web shop and other sales channels.',
         'eu_commerce_threshold_warning' => 'You are at %.1f%% of the threshold up to which you may charge Dutch VAT for EU customers. Start preparing to change your VAT settings of your web shop and other sales channels.',
     ];
 }

@@ -2,13 +2,11 @@
 namespace Siel\Acumulus\Helpers;
 
 /**
- * Class Countries defines country related features.
- *
- * These features include:
- * * Country codes
- * * Country names (in Dutch)
- * * Fiscal EU countries
- * * Conversion from EU country codes to ISO country codes.
+ * Class Countries defines country related features, including:
+ * - Country codes
+ * - Country names (in Dutch)
+ * - Fiscal EU countries
+ * - Conversion from EU country codes to ISO country codes.
  */
 class Countries
 {
@@ -19,7 +17,7 @@ class Countries
      * as soon we support a web shop with a different way of storing countries.
      *
      * @param string $countryCode
-     *   Case insensitive ISO 3166-1 alpha-2 country code.
+     *   Case-insensitive ISO 3166-1 alpha-2 country code.
      *
      * @return bool
      */
@@ -31,7 +29,7 @@ class Countries
     /**
      * Converts EU country codes to their ISO equivalent:
      *
-     * The EU has 2 country codes that differ form ISO:
+     * The EU has 2 country codes that differ from ISO:
      * - UK instead of GB
      * - EL instead of GR.
      *

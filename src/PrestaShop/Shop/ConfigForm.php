@@ -36,7 +36,7 @@ class ConfigForm extends BaseConfigForm
     public function getFormValues()
     {
         $result = parent::getFormValues();
-        $result['foreignVatClasses[]'] = $result['foreignVatClasses'];
+        $result['euVatClasses[]'] = $result['euVatClasses'];
         $result['triggerOrderStatus[]'] = $result['triggerOrderStatus'];
         return $result;
     }

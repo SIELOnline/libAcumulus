@@ -25,7 +25,7 @@ class CompletorInvoiceLines
     /**
      * The list of possible vat types, initially filled with possible vat types
      * based on client country, invoiceHasLineWithVat(), is_company(), and the
-     * foreign vat setting.
+     * EU vat setting.
      *
      * @var int[]
      */
@@ -122,7 +122,7 @@ class CompletorInvoiceLines
         //   correct vat rate:
         //     - possible vat rates
         //     - filter by range
-        //     - filter by tax class = foreign vat (or not)
+        //     - filter by tax class = EU vat (or not)
         //     - filter by lookup vat
         //   Why? addVatRateUsingLookupData() actually already does so, but will
         //   not work when we do have a lookup vat class but not a lookup vat
@@ -344,8 +344,8 @@ class CompletorInvoiceLines
                     // Try to reduce the set by filtering on foreign or national
                     // vat type using the vat class lookup data.
                     if (!$this->getUniqueVatRate($line[Meta::VatRateLookupMatches]) && !empty($line[Meta::VatClassId])) {
-                        $line[Meta::VatRateLookupMatches] = $this->filterVatRateInfosByForeignEuVat(
-                            $this->completor->isForeignEuVatClass($line[Meta::VatClassId]),
+                        $line[Meta::VatRateLookupMatches] = $this->filterVatRateInfosByEuVat(
+                            $this->completor->isEuVatClass($line[Meta::VatClassId]),
                             $line[Meta::VatRateLookupMatches]);
                         $vatRateSource = Completor::VatRateSource_Completor_Range_Lookup_Foreign;
                     }
@@ -715,18 +715,18 @@ class CompletorInvoiceLines
      * Returns the subset of the vat rate infos that (do not) indicate a foreign
      * vat type.
      *
-     * @param bool $isForeignEuVatType
-     *   True to filter on vat type = Api::VatType_ForeignEuVat, false to filter
-     *   on vat type != Api::VatType_ForeignEuVat.
+     * @param bool $isEuVatType
+     *   True to filter on vat type = Api::VatType_EuVat, false to filter
+     *   on vat type != Api::VatType_EuVat.
      * @param array|null $vatRateInfos
      *   The set of vat rate infos to filter. If not given, the property
      *   $this->possibleVatRates is used.
      *
      * @return array[]
      *   The, possibly empty, set of vat rate infos that indicate (or not) a
-     *   foreign vat type.
+     *   EU vat type.
      */
-    protected function filterVatRateInfosByForeignEuVat($isForeignEuVatType, array $vatRateInfos = null)
+    protected function filterVatRateInfosByEuVat($isEuVatType, array $vatRateInfos = null)
     {
         if ($vatRateInfos === null) {
             $vatRateInfos = $this->possibleVatRates;
@@ -734,7 +734,7 @@ class CompletorInvoiceLines
 
         $result = [];
         foreach ($vatRateInfos as $vatRateInfo) {
-            if (($vatRateInfo[Tag::VatType] === Api::VatType_ForeignEuVat) === $isForeignEuVatType) {
+            if (($vatRateInfo[Tag::VatType] === Api::VatType_EuVat) === $isEuVatType) {
                 $result[] = $vatRateInfo;
             }
         }

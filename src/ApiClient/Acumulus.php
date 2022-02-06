@@ -291,10 +291,13 @@ class Acumulus
      *
      * @return \Siel\Acumulus\ApiClient\Result
      *   The result of the webservice call. The structured response will contain
-     *   a non-keyed array of "vatinfo" arrays, each 'vatinfo' array being a
+     *   a non-keyed array of "vatinfo" arrays, each "vatinfo" array being a
      *   keyed array with keys:
-     *   - vattype
-     *   - vatrate
+     *   - vattype: (string) name for the vat rate, most of the time something
+     *     like 'normal' or 'reduced'.
+     *   - vatrate: (float (as a string)) the vat rate (number between 0 and
+     *     100)
+     *   - countryregion: (int) one of the Api::Region_... constants.
      */
     public function getVatInfo($countryCode, $date = '')
     {

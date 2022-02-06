@@ -1,7 +1,10 @@
 <?php
+/** @noinspection PhpStaticAsDynamicMethodCallInspection */
+
 namespace Siel\Acumulus\Integration\ApiClient;
 
 use PHPUnit\Framework\TestCase;
+use Siel\Acumulus\Api;
 use Siel\Acumulus\ApiClient\Acumulus;
 use Siel\Acumulus\ApiClient\ApiCommunicator;
 use Siel\Acumulus\Helpers\Container;
@@ -35,7 +38,7 @@ class AcumulusTest extends TestCase
             'CostCenters' => ['getPicklistCostCenters', [], true, ['costcenterid', 'costcentername']],
             'InvoiceTemplates' => ['getPicklistInvoiceTemplates', [], true, ['invoicetemplateid', 'invoicetemplatename']],
             'CompanyTypes' => ['getPicklistCompanyTypes', [], true, ['companytypeid', 'companytypename', 'companytypenamenl']],
-            'VatInfo' => ['getVatInfo', ['nl'], true, ['vattype', 'vatrate']],
+            'VatInfo' => ['getVatInfo', ['nl'], true, ['vattype', 'vatrate', 'countryregion']],
             'ThresholdEuCommerce' => ['reportThresholdEuCommerce', [], false, ['year', 'threshold', 'nltaxed', 'reached']],
             'Products' => ['getPicklistProducts', [], true, ['productid', 'productnature', 'productdescription', 'producttagid', 'productcontactid', 'productprice', 'productvatrate', 'productsku', 'productstockamount', 'productean', 'producthash', 'productnotes']],
         ];
@@ -66,13 +69,54 @@ class AcumulusTest extends TestCase
     public function vatInfoProvider()
     {
         return [
-            'nl' => [['nl', '2015-01-01'], [['vattype' => 'reduced', 'vatrate' => '0.0000'],['vattype' => 'reduced', 'vatrate' => '6.0000'],['vattype' => 'normal', 'vatrate' => '21.0000']]],
-            'nl-no-date' => [['nl'], [['vattype' => 'reduced', 'vatrate' => '0.0000'],['vattype' => 'reduced', 'vatrate' => '9.0000'],['vattype' => 'normal', 'vatrate' => '21.0000']]],
-            'eu' => [['be', '2015-12-01'], [['vattype' => 'reduced', 'vatrate' => '6.0000'],['vattype' => 'reduced', 'vatrate' => '12.0000'],['vattype' => 'normal', 'vatrate' => '21.0000'],['vattype' => 'parked', 'vatrate' => '12.0000'],['vattype' => 'reduced', 'vatrate' => '0.0000']]],
-            'eu-no-date' => [['be'], [['vattype' => 'reduced', 'vatrate' => '6.0000'],['vattype' => 'reduced', 'vatrate' => '12.0000'],['vattype' => 'normal', 'vatrate' => '21.0000'],['vattype' => 'parked', 'vatrate' => '12.0000'],['vattype' => 'reduced', 'vatrate' => '0.0000']]],
+            'nl' => [['nl', '2015-01-01'],
+                [
+                    ['vattype' => 'reduced', 'vatrate' => '0.0000', 'countryregion' => Api::Region_Netherlands],
+                    ['vattype' => 'reduced', 'vatrate' => '6.0000', 'countryregion' => Api::Region_Netherlands],
+                    ['vattype' => 'normal', 'vatrate' => '21.0000', 'countryregion' => Api::Region_Netherlands],
+                ],
+            ],
+            'nl-no-date' => [['nl'],
+                [
+                    ['vattype' => 'reduced', 'vatrate' => '0.0000', 'countryregion' => Api::Region_Netherlands],
+                    ['vattype' => 'reduced', 'vatrate' => '9.0000', 'countryregion' => Api::Region_Netherlands],
+                    ['vattype' => 'normal', 'vatrate' => '21.0000', 'countryregion' => Api::Region_Netherlands],
+                ],
+            ],
+            'eu' => [['be', '2015-12-01'],
+                [
+                    ['vattype' => 'reduced', 'vatrate' => '6.0000', 'countryregion' => Api::Region_EU],
+                    ['vattype' => 'reduced', 'vatrate' => '12.0000', 'countryregion' => Api::Region_EU],
+                    ['vattype' => 'normal', 'vatrate' => '21.0000', 'countryregion' => Api::Region_EU],
+                    ['vattype' => 'parked', 'vatrate' => '12.0000', 'countryregion' => Api::Region_EU],
+                    ['vattype' => 'reduced', 'vatrate' => '0.0000', 'countryregion' => Api::Region_EU],
+                ],
+            ],
+            'eu-no-date' => [['be'],
+                [
+                    ['vattype' => 'reduced', 'vatrate' => '6.0000', 'countryregion' => Api::Region_EU],
+                    ['vattype' => 'reduced', 'vatrate' => '12.0000', 'countryregion' => Api::Region_EU],
+                    ['vattype' => 'normal', 'vatrate' => '21.0000', 'countryregion' => Api::Region_EU],
+                    ['vattype' => 'parked', 'vatrate' => '12.0000', 'countryregion' => Api::Region_EU],
+                    ['vattype' => 'reduced', 'vatrate' => '0.0000', 'countryregion' => Api::Region_EU],
+                ],
+            ],
             'eu-wrong-date' => [['be', '2014-12-01'], []],
-            'gb-eu' => [['gb', '2020-12-01'], [['vattype' => 'reduced', 'vatrate' => '0.0000'],['vattype' => 'reduced', 'vatrate' => '5.0000'],['vattype' => 'normal', 'vatrate' => '20.0000']]],
-            'no-eu' => [['af', '2020-12-01'], []],
+            'gb-eu' => [['gb', '2020-12-01'],
+                [
+                    ['vattype' => 'reduced', 'vatrate' => '0.0000', 'countryregion' => Api::Region_EU],
+                    ['vattype' => 'reduced', 'vatrate' => '5.0000', 'countryregion' => Api::Region_EU],
+                    ['vattype' => 'normal', 'vatrate' => '20.0000', 'countryregion' => Api::Region_EU],
+                ],
+            ],
+            'gb-no-eu' => [['gb', '2022-02-01'],
+                [
+                    ['vattype' => 'reduced', 'vatrate' => '0.0000', 'countryregion' => Api::Region_World],
+                    ['vattype' => 'reduced', 'vatrate' => '5.0000', 'countryregion' => Api::Region_World],
+                    ['vattype' => 'normal', 'vatrate' => '20.0000', 'countryregion' => Api::Region_World],
+                ],
+            ],
+            'world' => [['af', '2020-12-01'], []],
         ];
     }
 

@@ -21,7 +21,7 @@ use Siel\Acumulus\Tag;
  * The Acumulus invoice structure is specified on:
  * {@link https://www.siel.nl/acumulus/API/Invoicing/Add_Invoice/ }
  *
- * In addition to the scheme as defined over there, additional meta data tags
+ * In addition to the scheme as defined over there, additional metadata tags
  * are expected to be added. Some of these are required for the completor phase,
  * while others are optional and are merely used for support (deducing where
  * some values came from, or what path was taken to get a value).
@@ -32,10 +32,10 @@ use Siel\Acumulus\Tag;
  * stage.
  *
  * This base class:
- * - Implements the basic break down into smaller actions that webshops should
+ * - Implements the basic break down into smaller actions that web shops should
  *   subsequently implement.
  * - Provides helper methods for some recurring functionality.
- * - Documents the expectations of each method to be implemented by a webshop's
+ * - Documents the expectations of each method to be implemented by a web shop's
  *   Creator class.
  * - Documents the meta tags expected or suggested.
  *
@@ -123,6 +123,14 @@ abstract class Creator
     /**
      * @var array
      *   Resulting Acumulus invoice.
+     *
+     * @todo: This really should become an object that can be passed around like
+     *   Source. We could add a lot of simple query methods to this object. And
+     *   if we are going to extract groups of methods into separate "knowledge"
+     *   classes, it will be easier to pass it around. To keep current code
+     *   compatible, it should be of a type that extends \ArrayAccess. The other
+     *   array like interfaces (Countable, Iterator, Traversable) are probably
+     *   not needed.
      */
     protected $invoice = [];
 

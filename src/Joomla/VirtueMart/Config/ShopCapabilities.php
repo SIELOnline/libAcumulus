@@ -210,7 +210,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
      *
      * VirtueMart does not group collections of tax rates into a tax class, but
      * can assign a different tax rate (calc rules) to a product - user group
-     * combination. I guess that's how to implement foreign vat goods in
+     * combination. I guess that's how to implement EU vat goods in
      * VirtueMart. This means that users should define different tax calc rules
      * for each country - rate combination, even if the rates are the same,
      * otherwise this plugin might still not be able to distinguish between

@@ -1,5 +1,4 @@
 <?php
-
 namespace Siel\Acumulus\Unit\Helpers;
 
 use PHPUnit\Framework\TestCase;

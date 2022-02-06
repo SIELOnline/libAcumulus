@@ -95,16 +95,16 @@ class ConfigForm extends BaseConfigForm
             $message = sprintf($this->t('message_validate_required_field'), $this->t('field_marginProducts'));
             $this->addMessage($message, Severity::Error, 'marginProducts');
         }
-        if (empty($this->submittedValues['foreignVatClasses'])) {
-            $field = sprintf($this->t('field_foreignVatClasses'), $this->t('vat_classes'));
-            $message = sprintf($this->t('message_validate_foreign_vat_classes_0'), $field);
-            $this->addMessage($message, Severity::Error, 'foreignVatClasses');
+        if (empty($this->submittedValues['euVatClasses'])) {
+            $field = sprintf($this->t('field_euVatClasses'), $this->t('vat_classes'));
+            $message = sprintf($this->t('message_validate_eu_vat_classes_0'), $field);
+            $this->addMessage($message, Severity::Error, 'euVatClasses');
         } else {
-            // Check that Not applicable is not selected with other classes for foreign vat classes
-            if (count($this->submittedValues['foreignVatClasses']) >= 2 && in_array(Config::VatClass_NotApplicable, $this->submittedValues['foreignVatClasses'])) {
-                $field = sprintf($this->t('field_foreignVatClasses'), $this->t('vat_classes'));
-                $message = sprintf($this->t('message_validate_foreign_vat_classes_1'), $field, $this->t('vat_class_not_applicable'));
-                $this->addMessage($message, Severity::Error, 'foreignVatClasses');
+            // Check that Not applicable is not selected with other classes for EU vat classes
+            if (count($this->submittedValues['euVatClasses']) >= 2 && in_array(Config::VatClass_NotApplicable, $this->submittedValues['euVatClasses'])) {
+                $field = sprintf($this->t('field_euVatClasses'), $this->t('vat_classes'));
+                $message = sprintf($this->t('message_validate_eu_vat_classes_1'), $field, $this->t('vat_class_not_applicable'));
+                $this->addMessage($message, Severity::Error, 'euVatClasses');
             }
         }
 
@@ -335,7 +335,7 @@ class ConfigForm extends BaseConfigForm
      * The fields returned:
      * - nature_shop
      * - marginProducts
-     * - foreignVatClasses
+     * - euVatClasses
      * - vatFreeClass
      * - zeroVatClass
      *
@@ -365,11 +365,11 @@ class ConfigForm extends BaseConfigForm
                     'required' => true,
                 ],
             ],
-            'foreignVatClasses' => [
-                'name' => 'foreignVatClasses[]',
+            'euVatClasses' => [
+                'name' => 'euVatClasses[]',
                 'type' => 'select',
-                'label' => sprintf($this->t('field_foreignVatClasses'), $this->t('vat_classes')),
-                'description' => sprintf($this->t('desc_foreignVatClasses'), $this->t('vat_classes'), $this->t('vat_class_not_applicable')),
+                'label' => sprintf($this->t('field_euVatClasses'), $this->t('vat_classes')),
+                'description' => sprintf($this->t('desc_euVatClasses'), $this->t('vat_classes'), $this->t('vat_class_not_applicable')),
                 'options' => [
                                  Config::VatClass_NotApplicable => ucfirst($this->t('vat_class_not_applicable')),
                              ] + $vatClasses,

@@ -40,9 +40,9 @@ class Config
     const InvoiceDate_Transfer = 3;
 
     const Nature_Unknown = 0;
-    const Nature_Both = 1;
+    const Nature_Services = 1;
     const Nature_Products = 2;
-    const Nature_Services = 3;
+    const Nature_Both = 3;
 
     const MarginProducts_Unknown = 0;
     const MarginProducts_Both = 1;
@@ -402,7 +402,7 @@ class Config
      *   A keyed array with the keys:
      *   - nature_shop
      *   - marginProducts
-     *   - foreignVatClasses
+     *   - euVatClasses
      *   - vatFreeClass
      *   - zeroVatClass
      *   - invoiceNrSource
@@ -558,10 +558,9 @@ class Config
     protected function getConfigDefaults()
     {
         $result = $this->getKeyInfo();
-        $result = array_map(function ($item) {
+        return array_map(function ($item) {
             return $item['default'];
         }, $result);
-        return $result;
     }
 
     /**
@@ -591,7 +590,7 @@ class Config
             $hostName = parse_url($_SERVER['REQUEST_URI'], PHP_URL_HOST);
         }
         if (!empty($hostName)) {
-            if ($pos = strpos($hostName, 'www.') !== false) {
+            if (($pos = strpos($hostName, 'www.')) !== false) {
                 $hostName = substr($hostName, $pos + strlen('www.'));
             }
         } else {
@@ -931,7 +930,8 @@ class Config
                     'type' => 'int',
                     'default' => Config::MarginProducts_Unknown,
                 ],
-                'foreignVatClasses' => [
+                // @todo: rename in 6.4.0: there's an upgrade method anyway.
+                'euVatClasses' => [
                     'group' => 'shop',
                     'type' => 'array',
                     'default' => [],
@@ -1002,7 +1002,7 @@ class Config
                     'default' => '',
                 ],
                 // For now, we do not make message configurable...
-                // For now we don't present the confirmReading option in the UI.
+                // For now, we don't present the confirmReading option in the UI.
                 'confirmReading' => [
                     'group' => Tag::EmailAsPdf,
                     'type' => 'bool',
@@ -1098,6 +1098,10 @@ class Config
             $result = $this->upgrade631() && $result;
         }
 
+        if (version_compare($currentVersion, '6.4.0', '<')) {
+            $result = $this->upgrade640() && $result;
+        }
+
         return $result;
     }
 
@@ -1133,6 +1137,7 @@ class Config
         }
 
         // 2) Debug mode.
+        /** @noinspection PhpSwitchStatementWitSingleBranchInspection */
         switch ($this->get('debug')) {
             case 4: // Value for deprecated PluginConfig::Debug_StayLocal.
                 $newSettings['logLevel'] = Config::Send_TestMode;
@@ -1417,6 +1422,37 @@ class Config
         }
         unset($values['zeroVatProducts']);
 
+        return $this->save($values);
+    }
+
+    /**
+     * 6.4.0 upgrade.
+     *
+     * - values for setting nature_shop changed into combinable bit values.
+     * - foreignVatClasses renamed to euVatClasses.
+     *
+     * @return bool
+     */
+    protected function upgrade640()
+    {
+        $configStore = $this->getConfigStore();
+        $values = $configStore->load();
+
+        // Nature constants Services and Both are switched.
+        switch ($values['nature_shop']) {
+            case 1:
+                $values['nature_shop'] = 3;
+                break;
+            case 3:
+                $values['nature_shop'] = 1;
+                break;
+        }
+
+        // foreignVatClasses renamed to euVatClasses.
+        $values['euVatClasses'] = $values['foreignVatClasses'];
+        unset($values['foreignVatClasses']);
+
+        $this->log->notice('Config: updated to 6.4.0');
         return $this->save($values);
     }
 }

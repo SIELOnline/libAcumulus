@@ -12,7 +12,7 @@ use Siel\Acumulus\Config\ConfigStore as BaseConfigStore;
  */
 class ConfigStore extends BaSeConfigStore
 {
-    private $configFile = __DIR__ . '/config.json';
+    private $configFile = __DIR__ . '/../../../../config/config.json';
 
     /**
      * {@inheritdoc}

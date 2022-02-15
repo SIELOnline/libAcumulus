@@ -12,7 +12,7 @@ use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Severity;
 
 /**
- * Communicator implements the communication with the Acumulus WebAPI.
+ * Communicator implements the communication with the Acumulus web API.
  *
  * It offers:
  * - Conversion between array and XML.
@@ -21,13 +21,15 @@ use Siel\Acumulus\Helpers\Severity;
  *   {@see \Siel\Acumulus\ApiClient\HttpRequest}.
  * - Good error handling, including detecting html responses from the proxy
  *   before the actual web service.
+ *
+ * @deprecated use AcumulusRequest
  */
 class ApiCommunicator
 {
-    protected ConnectionHandler $connectionHandler;
-    protected Config $config;
-    protected Log $log;
-    protected string $userLanguage;
+    protected /*ConnectionHandler*/ $connectionHandler;
+    protected /*Config*/ $config;
+    protected /*Log*/ $log;
+    protected /*string*/ $userLanguage;
 
     public function __construct(ConnectionHandler $connectionHandler, Config $config, string $userLanguage, Log $log)
     {
@@ -164,9 +166,9 @@ class ApiCommunicator
      * returned via the result value and should be handled at a higher level.
      *
      * @param string $uri
-     *   The URI of the Acumulus WebAPI call to send the message to.
+     *   The URI of the Acumulus web API call to send the message to.
      * @param array $message
-     *   The message to send to the Acumulus WebAPI.
+     *   The message to send to the Acumulus web API.
      * @param \Siel\Acumulus\ApiClient\Result $result
      *   The result object to add the results to.
      *
@@ -180,7 +182,7 @@ class ApiCommunicator
     protected function sendApiMessage(string $uri, array $message, Result $result): Result
     {
         // Convert message to XML. XML requires 1 top level tag, so add one.
-        // The top tag name is ignored by the Acumulus WebAPI.
+        // The top tag name is ignored by the Acumulus web API.
         $message = trim($this->convertArrayToXml(['acumulus' => $message]));
         $httpRequest = new HttpRequest($this->connectionHandler->get($uri));
         $result->setHttpRequest($httpRequest);

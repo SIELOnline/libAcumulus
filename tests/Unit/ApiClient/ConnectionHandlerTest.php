@@ -10,9 +10,18 @@ use PHPUnit\Framework\TestCase;
  */
 class ConnectionHandlerTest extends TestCase
 {
+    /**
+     * @return \Siel\Acumulus\Unit\ApiClient\ConnectionHandler
+     */
+    protected function getConnectionHandler(): ConnectionHandler
+    {
+        /** @noinspection PhpIncompatibleReturnTypeInspection  PHP8: define return type of getInstance() as static */
+        return ConnectionHandler::getInstance();
+    }
+
     public function testCreate()
     {
-        $connectionHandler = new ConnectionHandler();
+        $connectionHandler = $this->getConnectionHandler();
         $ch1 = $connectionHandler->get('https://www.example.com/example-resource');
         $this->assertIsResource($ch1);
         $this->assertEquals(1, $connectionHandler->getCount());

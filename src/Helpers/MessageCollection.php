@@ -21,15 +21,7 @@ class MessageCollection
     /**
      * @var Message[]
      */
-    protected $messages;
-
-    /**
-     * Constructor.
-     */
-    public function __construct()
-    {
-        $this->messages = [];
-    }
+    protected $messages = [];
 
     /**
      * Constructs and adds a Message to the collection.

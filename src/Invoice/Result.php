@@ -8,6 +8,9 @@ use Siel\Acumulus\Helpers\Severity;
 /**
  * Extends Result with properties and features specific to the InvoiceAdd web
  * service call.
+ *
+ * @todo: decouple it from WebResult, so we do not have to create a WebResponse
+ *   upfront.
  */
 class Result extends WebResult
 {

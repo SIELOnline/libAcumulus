@@ -3,65 +3,75 @@
 
 namespace Siel\Acumulus\Unit\ApiClient;
 
+use LogicException;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 use Siel\Acumulus\ApiClient\HttpRequest;
+use Siel\Acumulus\ApiClient\HttpResponse;
 
 class HttpRequestTest extends TestCase
 {
-    private $connection;
+    protected $httpResponseStub;
 
     protected function setUp(): void
     {
-        $this->connection = curl_init();
+    }
+
+    /**
+     * @return \Siel\Acumulus\ApiClient\HttpRequest
+     */
+    protected function getHttpRequestStub(): HttpRequest
+    {
+        $this->httpResponseStub = $this->createStub(HttpResponse::class);
+
+        $stub = $this->getMockBuilder(HttpRequest::class)
+            ->onlyMethods(['executeWithCurl'])
+            ->getMock();
+        $stub->method('executeWithCurl')
+            ->willReturn($this->httpResponseStub);
+        return $stub;
+    }
+
+    public function testBefore()
+    {
+        $httpRequest = $this->getHttpRequestStub();
+        $this->assertNull($httpRequest->getMethod(), 'method not null');
+        $this->assertNull($httpRequest->getUri(), 'uri not null');
+        $this->assertNull($httpRequest->getBody(), 'body not null');
     }
 
     public function testGet()
     {
-        $httpRequest = new HttpRequest($this->connection);
+        $httpRequest = $this->getHttpRequestStub();
         $uri = 'http://localhost/lib-acumulus/readme.md';
+        $httpResponse = $httpRequest->get($uri);
         $this->assertEquals('GET', $httpRequest->getMethod());
         $this->assertEquals($uri, $httpRequest->getUri());
-        $this->assertNull($httpRequest->getPostFields());
+        $this->assertNull($httpRequest->getBody());
+        $this->assertEquals($this->httpResponseStub, $httpResponse);
+    }
+
+    public function testExecuteTwiceNotAllowed()
+    {
+        $this->expectException(LogicException::class);
+        $httpRequest = $this->getHttpRequestStub();
+        $uri = 'http://localhost/lib-acumulus/readme.md';
+        $httpRequest->get($uri);
+        $httpRequest->get($uri);
     }
 
     public function testPost()
     {
-        $httpRequest = new HttpRequest($this->connection);
-        $post = ['my_post' => 'my_value'];
+        $httpRequest = $this->getHttpRequestStub();
         $uri = 'http://localhost/lib-acumulus/readme.md';
-        $httpRequest->post($uri, $post);
+        $post = ['my_post' => 'my_value'];
+        $httpResponse = $httpRequest->post($uri, $post);
         $this->assertEquals('POST', $httpRequest->getMethod());
         $this->assertEquals($uri, $httpRequest->getUri());
-        $this->assertEquals($post, $httpRequest->getPostFields());
+        $this->assertEquals($post, $httpRequest->getBody());
+        $this->assertEquals($this->httpResponseStub, $httpResponse);
     }
 
-    public function testExecute()
-    {
-        $httpRequest = new HttpRequest($this->connection);
-        $post = ['my_post' => 'my_value'];
-        $uri = 'http://localhost/lib-acumulus/readme.md';
-        $httpResponse = $httpRequest->post($uri, $post)->execute();
-        $this->assertEquals($httpRequest, $httpResponse->getRequest());
-    }
-
-    public function testExecuteBeforeSettingMethod()
-    {
-        $httpRequest = new HttpRequest($this->connection);
-        $this->expectException(RuntimeException::class);
-        $httpRequest->execute();
-    }
-
-    public function testExecuteTwice()
-    {
-        $httpRequest = new HttpRequest($this->connection);
-        $this->expectException(RuntimeException::class);
-        $uri = 'http://localhost/lib-acumulus/readme.md';
-        $httpRequest->get($uri)->execute();
-        $httpRequest->execute();
-    }
-
-    public function dataPostFields()
+    public function dataPostFields(): array
     {
         $msg = '<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <acumulus>
@@ -97,18 +107,5 @@ class HttpRequestTest extends TestCase
                 'msg' => 'option1=1&option2=2&text3=Hello%20"World"',
             ],
         ];
-    }
-
-    /**
-     * @dataProvider dataPostFields
-     *
-     * @param array|string $postFields
-     * @param string $msg
-     */
-    public function testGetPostFieldsAsMsg($postFields, string $msg)
-    {
-        $httpRequest = new HttpRequest($this->connection);
-        $httpRequest->post('test', $postFields);
-        $this->assertEquals($msg, $httpRequest->getPostFieldsAsMsg());
     }
 }

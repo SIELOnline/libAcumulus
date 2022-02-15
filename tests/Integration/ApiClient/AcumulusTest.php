@@ -5,29 +5,27 @@ namespace Siel\Acumulus\Integration\ApiClient;
 
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\ApiClient\Acumulus;
-use Siel\Acumulus\ApiClient\ApiCommunicator;
+use Siel\Acumulus\ApiClient\AcumulusRequest;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Severity;
-use Siel\Acumulus\ApiClient\HttpRequest;
 
 class AcumulusTest extends TestCase
 {
     /**
      * @var \Siel\Acumulus\ApiClient\Acumulus
      */
-    protected Acumulus $acumulusClient;
+    protected /*Acumulus*/ $acumulusClient;
 
     protected function setUp(): void
     {
         // Using TestWebShop would give us a test HttpCommunicator, but we want
         // a real one here.
         $container = new Container('TestWebShop', 'nl');
-        $httpRequest = new HttpRequest();
-        $apiCommunicator = new ApiCommunicator($httpRequest, $container->getConfig(), $container->getLanguage(), $container->getLog());
+        $apiCommunicator = new AcumulusRequest($container->getConfig(), $container->getLanguage(), $container->getLog());
         $this->acumulusClient = new Acumulus($apiCommunicator, $container, $container->getConfig());
     }
 
-    public function responseKeysProvider()
+    public function responseKeysProvider(): array
     {
         return [
             'About' => ['getAbout', [], false, ['about', 'role', 'roleapi', 'roleid', 'rolenl']],
@@ -65,7 +63,7 @@ class AcumulusTest extends TestCase
         $this->assertEqualsCanonicalizing($expectedKeys, array_keys($singleResponse));
     }
 
-    public function vatInfoProvider()
+    public function vatInfoProvider(): array
     {
         return [
             'nl' => [['nl', '2015-01-01'], [['vattype' => 'reduced', 'vatrate' => '0.0000'],['vattype' => 'reduced', 'vatrate' => '6.0000'],['vattype' => 'normal', 'vatrate' => '21.0000']]],

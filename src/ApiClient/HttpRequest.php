@@ -1,10 +1,11 @@
 <?php
 namespace Siel\Acumulus\ApiClient;
 
+use LogicException;
 use RuntimeException;
 
 /**
- * HttpCommunicator implements the communication with the Acumulus WebAPI at the
+ * HttpCommunicator implements the communication with the Acumulus web API at the
  * https level.
  *
  * It offers:
@@ -15,77 +16,52 @@ use RuntimeException;
  */
 class HttpRequest
 {
-    protected bool $hasExecuted = false;
-    /**
-     * @var resource (PHP8: CurlHandle)
-     */
-    protected $handle;
-    protected ?string $uri;
-    protected ?string $method;
+    protected /*bool*/ $hasExecuted = false;
+    protected /*?string*/ $method = null;
+    protected /*?string*/ $uri = null;
     /**
      * @var array|string|null
-     *   See {@see HttpRequest::getPostFields()}
+     *   See {@see HttpRequest::getBody()}.
      */
-    protected $postFields = null;
+    protected $body = null;
 
     /**
-     * @param resource $curlHandle (PHP8: CurlHandle)
+     * @return string|null
+     *   Returns the HTTP method to be used for this request: 'POST' or 'GET',
+     *   or null if not yet set.
      */
-    public function __construct($curlHandle)
-    {
-        $this->handle = $curlHandle;
-    }
-
-    public function getUri(): ?string
-    {
-        return $this->uri;
-    }
-
     public function getMethod(): ?string
     {
         return $this->method;
     }
 
     /**
-     * @return array|string|null
-     *   The contents of the body, either:
-     *   - An array of key/value pairs to be placed in the body in the
-     *     multipart/form-data format.
-     *   - An url-encoded string that contains all the POST values.
-     *   - Null when the body is to remain empty (mostly for GET requests).
-
+     * @return string|null
+     *   Returns the uri for this request, or null if not yet set.
      */
-    public function getPostFields()
+    public function getUri(): ?string
     {
-        return $this->postFields;
+        return $this->uri;
     }
 
     /**
-     * Returns the post fields as a message that can be used for logging.
+     * Returns the contents that will be placed in the body of the request.
      *
-     * @return string
+     * Either:
+     * - An array of key/value pairs to be placed in the body in the
+     *   multipart/form-data format.
+     * - An url-encoded string that contains all the POST values.
+     * - Null when the body is to remain empty (GET requests).
+     *
+     * Note that this may contain unmasked sensitive data (e.g. a password) and
+     * thus should not be logged unprocessed.
+     *
+     * @return array|string|null
+     *   The contents of the body, null if empty or not yet set.
      */
-    public function getPostFieldsAsMsg(): string
+    public function getBody()
     {
-        $post = $this->postFields;
-        if ($post !== null) {
-            if (is_array($post)) {
-                if (count($post) === 0) {
-                    $body = '[]';
-                } elseif (count($post) === 1 && key($post) === 'xmlstring') {
-                    // Acumulus specialty: $post contains ['xmlstring' => $message]
-                    $body = reset($post);
-                } else {
-                    $body = json_encode($post);
-                }
-            } else {
-                // Urlencoded string.
-                $body = $post;
-            }
-        } else {
-            $body = '';
-        }
-        return $body;
+        return $this->body;
     }
 
     /**
@@ -94,14 +70,18 @@ class HttpRequest
      * @param string $uri
      *   The uri to send the HTTP request to.
      *
-     * @return $this
+     * @return \Siel\Acumulus\ApiClient\HttpResponse
+     *
+     * @throws \LogicException
+     *   This request has already been executed.
+     * @throws \RuntimeException
+     *   An error occurred at:
+     *   - The Curl internals level, e.g. a out of memory error.
+     *   - The communication level, e.g. time-out or no response received.
      */
-    public function get(string $uri): self
+    public function get(string $uri): HttpResponse
     {
-        $this->uri = $uri;
-        $this->method = 'GET';
-        $this->postFields = null;
-        return $this;
+        return $this->execute('GET', $uri);
     }
 
     /**
@@ -116,48 +96,82 @@ class HttpRequest
      *   - An url-encoded string that contains all the POST values.
      *   - Null when the body is to remain empty (mostly for GET requests).
      *
-     * @return $this
+     * @return \Siel\Acumulus\ApiClient\HttpResponse
+     *
+     * @throws \LogicException
+     *   This request has already been executed.
+     * @throws \RuntimeException
+     *   An error occurred at:
+     *   - The Curl internals level, e.g. a out of memory error.
+     *   - The communication level, e.g. time-out or no response received.
      */
-    public function post(string $uri, $postFields): self
+    public function post(string $uri, $postFields): HttpResponse
     {
-        $this->uri = $uri;
-        $this->method = 'POST';
-        $this->postFields = $postFields;
-        return $this;
+        return $this->execute('POST', $uri, $postFields);
     }
 
     /**
-     * Executes the set HTTP request.
+     * Executes the HTTP request.
      *
-     * PRE: Either the method get() or post() must have been called to set up
-     * the request.
+     * @param string $method
+     *   The HTTP method to use for this request.
+     * @param string $uri
+     *   The uri to send the HTTP request to.
+     * @param array|string|null $body
+     *   The (optional) contents to be placed in the body, either:
+     *   - An array of key/value pairs to be placed in the body in the
+     *     multipart/form-data format.
+     *   - An url-encoded string that contains all the POST values.
+     *   - Null when the body is to remain empty (mostly for GET requests).
      *
      * @return \Siel\Acumulus\ApiClient\HttpResponse
      *  The HTTP response.
      *
+     * @throws \LogicException
+     *   This request has already been executed.
      * @throws \RuntimeException
-     *   In case of an internal curl error or an error at the communication
-     *   level. (Thus not a response indicating error: that is up to the
-     *   application level.)
+     *   An error occurred at:
+     *   - The Curl internals level, e.g. an out of memory error.
+     *   - The communication level, e.g. time-out or no response received.
      */
-    public function execute(): HttpResponse
+    protected function execute(string $method, string $uri, $body = null): HttpResponse
     {
-        if ($this->uri === null || $this->method === null ) {
-            throw new RuntimeException('HttpRequest::execute() may only be called after get() or post() has been called.');
-        }
         if ($this->hasExecuted) {
-            throw new RuntimeException('HttpRequest::execute() may only be called once.');
+            throw new LogicException('HttpRequest::execute() may only be called once.');
         }
-
-        $start = microtime(TRUE);
         $this->hasExecuted = true;
 
-        // Configure the curl connection.
+        $this->uri = $uri;
+        $this->method = $method;
+        $this->body = $body;
+        return $this->executeWithCurl();
+    }
+
+    /**
+     * Executes an HTTP request using Curl and returns the
+     * {@see \Siel\Acumulus\ApiClient\HttpResponse}.
+     *
+     * All details regarding the fact we are using Curl are contained in this
+     * single method (except perhaps, the info array passed to the HttpResponse
+     * that gets created which is based on curl_get_info()).
+     *
+     * @return \Siel\Acumulus\ApiClient\HttpResponse
+     *
+     * @throws \RuntimeException
+     *   An error occurred at the Curl - e.g. memory error - or communication
+     *   level, e.g. time-out or no response received.
+     */
+    protected function executeWithCurl(): HttpResponse
+    {
+        $start = microtime(TRUE);
+
+        // Get and configure the curl connection.
         // Since 2017-09-19 the Acumulus web service only accepts TLS 1.2.
         // - Apparently, some curl libraries do support this version but do not
         //   use it by default, so we force it.
         // - Apparently, some up-to-date curl libraries do not define this
         //   constant, so we define it, if not defined.
+        $handle = $this->getHandle();
         if (!defined('CURL_SSLVERSION_TLSv1_2')) {
             define('CURL_SSLVERSION_TLSv1_2', 6);
         }
@@ -183,22 +197,22 @@ class HttpRequest
                 break;
             case 'POST':
                 $options[CURLOPT_POST] = true;
-                if ($this->getPostFields() !== null) {
-                    $options[CURLOPT_POSTFIELDS] = $this->getPostFields();
+                if ($this->getBody() !== null) {
+                    $options[CURLOPT_POSTFIELDS] = $this->getBody();
                 }
                 break;
         }
-        if (!curl_setopt_array($this->handle, $options)) {
-            $this->raiseCurlError('curl_setopt_array(defaults)');
+        if (!curl_setopt_array($handle, $options)) {
+            $this->raiseCurlError($handle, 'curl_setopt_array(defaults)');
         }
 
         // Send and receive over the curl connection.
-        $response = curl_exec($this->handle);
-        $responseInfo = curl_getinfo($this->handle);
+        $response = curl_exec($handle);
+        $responseInfo = curl_getinfo($handle);
         // We only check for errors at the communication level, not for
         // responses that indicate an error.
-        if (!is_string($response) || empty($response) || curl_errno($this->handle) !== 0 || !isset($responseInfo['header_size'])) {
-            $this->raiseCurlError('curl_exec()');
+        if (!is_string($response) || empty($response) || curl_errno($handle) !== 0 || !isset($responseInfo['header_size'])) {
+            $this->raiseCurlError($handle, 'curl_exec()');
         }
 
         $header_size = (int) $responseInfo['header_size'];
@@ -215,16 +229,41 @@ class HttpRequest
     /**
      * Raises a runtime exception with the curl error message.
      *
+     * @param resource $handle (PHP8: CurlHandle)
      * @param string $function
      *   The name of the Curl function that failed.
      *
      * @throws \RuntimeException
+     *   Always.
      */
-    protected function raiseCurlError(string $function): void
+    protected function raiseCurlError($handle, string $function): void
     {
         $curlVersion = curl_version();
-        $code = curl_errno($this->handle);
-        $message = sprintf('%s (curl: %s): %d - %s', $function, $curlVersion['version'], $code, curl_error($this->handle));
+        $code = curl_errno($handle);
+        $message = sprintf('%s (curl: %s): %d - %s', $function, $curlVersion['version'], $code, curl_error($handle));
+        $this->closeHandle();
         throw new RuntimeException($message, $code);
+    }
+
+    /**
+     * Gets a Curl handle.
+     *
+     * This method is a wrapper around access to the ConnectionHandler.
+     *
+     * @return resource
+     */
+    protected function getHandle()
+    {
+        return ConnectionHandler::getInstance()->get($this->getUri());
+    }
+
+    /**
+     * Closes and deletes a failed Curl handle.
+     *
+     * This method is a wrapper around access to the ConnectionHandler.
+     */
+    protected function closeHandle(): void
+    {
+        ConnectionHandler::getInstance()->close($this->getUri());
     }
 }

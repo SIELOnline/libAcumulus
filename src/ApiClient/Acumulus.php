@@ -35,21 +35,21 @@ class Acumulus
     /** @var \Siel\Acumulus\Helpers\Container */
     protected $container;
 
-    /** @var ApiCommunicator */
-    protected $apiCommunicator;
+    /** @var AcumulusRequest */
+    protected $acumulusRequest;
 
     /**
      * Constructor.
      *
-     * @param ApiCommunicator $apiCommunicator
+     * @param AcumulusRequest $acumulusRequest
      * @param \Siel\Acumulus\Helpers\Container $container
      * @param \Siel\Acumulus\Config\Config $config
      */
-    public function __construct(ApiCommunicator $apiCommunicator, Container $container, Config $config)
+    public function __construct(AcumulusRequest $acumulusRequest, Container $container, Config $config)
     {
         $this->config = $config;
         $this->container = $container;
-        $this->apiCommunicator = $apiCommunicator;
+        $this->acumulusRequest = $acumulusRequest;
     }
 
     /**
@@ -746,7 +746,7 @@ class Acumulus
 
     /**
      * Wrapper around
-     * {@see \Siel\Acumulus\ApiClient\ApiCommunicator::constructUri()}.
+     * {@see \Siel\Acumulus\ApiClient\AcumulusRequest::constructUri()}.
      *
      * @param string $apiFunction
      *   The api service to get the uri for.
@@ -756,12 +756,12 @@ class Acumulus
      */
     protected function constructUri($apiFunction)
     {
-        return $this->apiCommunicator->constructUri($apiFunction);
+        return $this->acumulusRequest->constructUri($apiFunction);
     }
 
     /**
      * Wrapper around
-     * {@see \Siel\Acumulus\ApiClient\ApiCommunicator::callApiFunction()}.
+     * {@see \Siel\Acumulus\ApiClient\AcumulusRequest::callApiFunction()}.
      *
      * @param string $apiFunction
      *   The API function to invoke.
@@ -783,9 +783,6 @@ class Acumulus
      */
     protected function callApiFunction($apiFunction, array $message, $needContract = true, Result $result = null)
     {
-        if ($result === null) {
-            $result = $this->container->getResult();
-        }
-        return $this->apiCommunicator->callApiFunction($apiFunction, $message, $needContract, $result);
+        return $this->acumulusRequest->execute($apiFunction, $message, $needContract, $result);
     }
 }

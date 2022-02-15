@@ -476,7 +476,7 @@ abstract class InvoiceManager
      * Locks, if needed, the invoice for sending and, if acquired, sends it.
      *
      * NOTE: the mechanism used to lock and verify if we got the lock is not
-     * atomic, nor fool proof for all possible situations. However, it is a
+     * atomic, nor foolproof for all possible situations. However, it is a
      * relatively easy to understand solution that will catch 99,9% of the
      * situations. If double sending still occurs, some warning mechanisms are
      * built in (were already built in) to delete one of the entries in Acumulus

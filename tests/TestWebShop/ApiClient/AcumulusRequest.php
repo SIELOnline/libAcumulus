@@ -1,12 +1,12 @@
 <?php
 namespace Siel\Acumulus\TestWebShop\ApiClient;
 
-use Siel\Acumulus\ApiClient\ApiCommunicator as BaseApiCommunicator;
+use Siel\Acumulus\ApiClient\AcumulusRequest as BaseAcumulusRequest;
 use Siel\Acumulus\ApiClient\Result;
 use Siel\Acumulus\Helpers\Severity;
 
 /**
- * Communicator implements the communication with the Acumulus WebAPI.
+ * Communicator implements the communication with the Acumulus web API.
  *
  * It offers:
  * - Conversion between array and XML.
@@ -16,7 +16,7 @@ use Siel\Acumulus\Helpers\Severity;
  * - Good error handling, including detecting html responses from the proxy
  *   before the actual web service.
  */
-class ApiCommunicator extends BaseApiCommunicator
+class AcumulusRequest extends BaseAcumulusRequest
 {
     /**
      * @inheritDoc
@@ -29,7 +29,7 @@ class ApiCommunicator extends BaseApiCommunicator
     /**
      * @inheritDoc
      */
-    public function callApiFunction(string $apiFunction, array $message, bool $needContract, Result $result): Result
+    public function execute(string $apiFunction, array $message, bool $needContract, ?Result $result = null): Result
     {
         // Add messages for the parameters that were passed in, so they can be checked.
         $result->addMessage($apiFunction, Severity::Log, 'apiFunction', 0);

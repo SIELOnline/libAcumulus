@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\ApiClient;
 
+use DOMDocument;
 use RuntimeException;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\MessageCollection;
@@ -30,61 +31,47 @@ class Result extends MessageCollection
     public const CodeTagRawResponse = 'Response';
 
     /**
-     * @var \Siel\Acumulus\ApiClient\HttpRequest|null
-     *   The HTTP request.
+     * @var \Siel\Acumulus\ApiClient\AcumulusRequest|null
+     *   The Acumulus request.
      */
-    protected ?HttpRequest $httpRequest;
+    protected /*?AcumulusRequest*/ $acumulusRequest = null;
 
     /**
      * @var \Siel\Acumulus\ApiClient\HttpResponse|null
      *   The received HTTP response.
      */
-    protected ?HttpResponse $httpResponse;
+    protected /*?HttpResponse*/ $httpResponse = null;
 
     /**
      * @var int|null
      *   The received api status or null if not yet sent.
      */
-    protected ?int $apiStatus;
+    protected /*?int*/ $apiStatus = null;
 
     /**
      * @var array
      *   The structured response as was received from the web service.
      */
-    protected array $response;
+    protected /*array*/ $response = [];
 
     /**
      * @var string
      *   The key that contains the main response of a service call.
      *
-     *   Besides the general response structure (status, errors, and warnings),
+     *   Along the general response structure (status, errors, and warnings),
      *   each service call result will contain the result specific for that
      *   call. This variable contains the key under which to find that. It
      *   should be set by each service call, allowing users of the service to
      *   retrieve the main result without the need to know more details than
      *   strictly needed of the Acumulus API.
      */
-    protected string $mainResponseKey;
+    protected /*string*/ $mainResponseKey = '';
 
     /**
      * @var bool
      *   Indicates if the main response should be a list.
      */
-    protected bool $isList;
-
-    /**
-     * Result constructor.
-     */
-    public function __construct()
-    {
-        parent::__construct();
-        $this->httpRequest = null;
-        $this->httpResponse = null;
-        $this->apiStatus = null;
-        $this->response = [];
-        $this->mainResponseKey = '';
-        $this->isList = false;
-    }
+    protected /*bool*/ $isList = false;
 
     /**
      * Helper method to translate strings.
@@ -184,6 +171,22 @@ class Result extends MessageCollection
     }
 
     /**
+     * @return \Siel\Acumulus\ApiClient\AcumulusRequest|null
+     */
+    public function getAcumulusRequest(): ?AcumulusRequest
+    {
+        return $this->acumulusRequest;
+    }
+
+    /**
+     * @param \Siel\Acumulus\ApiClient\AcumulusRequest|null $acumulusRequest
+     */
+    public function setAcumulusRequest(?AcumulusRequest $acumulusRequest): void
+    {
+        $this->acumulusRequest = $acumulusRequest;
+    }
+
+    /**
      * Returns the structured main response part of the received response.
      *
      * @return array
@@ -199,8 +202,8 @@ class Result extends MessageCollection
 
     /**
      * Sets the (structured) response as was received from the web service. See
-     * {@see https://www.siel.nl/acumulus/API/Basic_Response/} for the common
-     * part of a response.
+     * {@link https://www.siel.nl/acumulus/API/Basic_Response/} for the common
+     * parts of a response.
      *
      * @param array $response
      *   The structured response (json or xml string converted to an array).
@@ -279,29 +282,6 @@ class Result extends MessageCollection
         return $response;
     }
 
-    /**
-     * @return \Siel\Acumulus\ApiClient\HttpRequest|null
-     */
-    public function getHttpRequest(): ?HttpRequest
-    {
-        return $this->httpRequest;
-    }
-
-    /**
-     * Sets the http request.
-     *
-     * Information from the http request is solely used for logging purposes.
-     *
-     * @param \Siel\Acumulus\ApiClient\HttpRequest $httpRequest
-     */
-    public function setHttpRequest(HttpRequest $httpRequest): void
-    {
-        $this->httpRequest = $httpRequest;
-    }
-
-    /**
-     * @return \Siel\Acumulus\ApiClient\HttpResponse|null
-     */
     public function getHttpResponse(): ?HttpResponse
     {
         return $this->httpResponse;
@@ -318,6 +298,167 @@ class Result extends MessageCollection
     public function setHttpResponse(HttpResponse $httpResponse): void
     {
         $this->httpResponse = $httpResponse;
-        // @todo: invoke $this->setResponse() from here.
+        // @todo: start using http codes (404, 429, 500, ...)
+
+        $body = $this->httpResponse->getBody();
+        if (empty($body)) {
+            // Curl did return a non-empty response, otherwise we would not be
+            // here. So, apparently that only contained headers.
+            // @todo: Is this a non 200 response or can we consider this as a critical error?
+            $this->addMessage('Empty response body', Severity::Error, '', 701);
+        } elseif ($this->isHtmlResponse($body)) {
+            // When the API is gone we might receive an HTML error message page.
+            $this->raiseHtmlReceivedError($body);
+        } else {
+            // Decode the response as either json or xml.
+            $response = [];
+            $outputFormat = $this->getAcumulusRequest()->getSubmitMessage()['format'] ?? 'xml';
+            if ($outputFormat === 'json') {
+                $response = json_decode($body, true);
+            }
+            // Even if we pass json as <format> we might receive an XML response
+            // in case the request was rejected before or during parsing. So, if
+            // $response = null, we also try to decode $body as XML.
+            if ($outputFormat === 'xml' || !is_array($response)) {
+                try {
+                    $response = $this->convertXmlToArray($body);
+                } catch (RuntimeException $e) {
+                    // Not an XML response. Treat it as a json error if we were
+                    // expecting a json response.
+                    if ($outputFormat === 'json') {
+                        $this->raiseJsonError();
+                    }
+                    // Otherwise, treat it as the XML exception that was raised.
+                    throw $e;
+                }
+            }
+            $this->setResponse($response);
+        }
+    }
+
+    /**
+     * @param string $response
+     *
+     * @return bool
+     *   True if the response is HTML, false otherwise.
+     */
+    protected function isHtmlResponse(string $response): bool
+    {
+        return strtolower(substr($response, 0, strlen('<!doctype html'))) === '<!doctype html'
+               || strtolower(substr($response, 0, strlen('<html'))) === '<html'
+               || strtolower(substr($response, 0, strlen('<body'))) === '<body';
+    }
+
+    /**
+     * Returns an error message containing the received HTML.
+     *
+     * @param string $response
+     *   String containing an HTML document.
+     *
+     * @trows \RuntimeException
+     *   Always
+     */
+    protected function raiseHtmlReceivedError(string $response)
+    {
+        libxml_use_internal_errors(true);
+        $doc = new DOMDocument('1.0', 'utf-8');
+        $doc->loadHTML($response);
+        $body = $doc->getElementsByTagName('body');
+        if ($body->length > 0) {
+            $body = $body->item(0)->textContent;
+        } else {
+            $body = '';
+        }
+        throw new RuntimeException("HTML response received: $body", 702);
+    }
+
+    /**
+     * Converts an XML string to an array.
+     *
+     * @param string $xml
+     *   A string containing XML.
+     *
+     * @return array
+     *  An array representation of the XML string.
+     *
+     * @throws \RuntimeException
+     */
+    protected function convertXmlToArray(string $xml): array
+    {
+        // Convert the response to an array via a 3-way conversion:
+        // - create a simplexml object
+        // - convert that to json
+        // - convert json to array
+        libxml_use_internal_errors(true);
+        if (!($result = simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA))) {
+            $this->raiseLibxmlError();
+        }
+
+        if (!($result = json_encode($result))) {
+            $this->raiseJsonError();
+        }
+        if (($result = json_decode($result, true)) === null) {
+            $this->raiseJsonError();
+        }
+
+        return $result;
+    }
+
+    /**
+     * Throws an exception with all libxml error messages as message.
+     *
+     * @throws \RuntimeException
+     *   Always.
+     */
+    protected function raiseLibxmlError()
+    {
+        $errors = libxml_get_errors();
+        $messages = [];
+        $code = 704;
+        foreach ($errors as $error) {
+            // Overwrite our own code with the 1st code we get from libxml.
+            if ($code === 704) {
+                $code = $error->code;
+            }
+            $messages[] = sprintf('Line %d, column: %d: %s %d - %s', $error->line, $error->column, $error->level === LIBXML_ERR_WARNING ? 'warning' : 'error', $error->code, trim($error->message));
+        }
+        throw new RuntimeException(implode("\n", $messages), $code);
+    }
+
+    /**
+     * Throws an exception with an error message based on the last json error.
+     *
+     * @throws \RuntimeException
+     *   Always.
+     */
+    protected function raiseJsonError()
+    {
+        $code = json_last_error();
+        switch ($code) {
+            case JSON_ERROR_NONE:
+                $message = 'No error';
+                break;
+            case JSON_ERROR_DEPTH:
+                $message = 'Maximum stack depth exceeded';
+                break;
+            case JSON_ERROR_STATE_MISMATCH:
+                $message = 'Underflow or the modes mismatch';
+                break;
+            case JSON_ERROR_CTRL_CHAR:
+                $message = 'Unexpected control character found';
+                break;
+            case JSON_ERROR_SYNTAX:
+                $message = 'Syntax error, malformed JSON';
+                break;
+            case JSON_ERROR_UTF8:
+                $message = 'Malformed UTF-8 characters, possibly incorrectly encoded';
+                break;
+            default:
+                $code = 705;
+                $message = 'Unknown error';
+                break;
+        }
+        $message = sprintf('json (%s): %d - %s', phpversion('json'), $code, $message);
+        throw new RuntimeException($message, $code);
     }
 }

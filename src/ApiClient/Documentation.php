@@ -14,15 +14,16 @@
  *       [Basis Response](https://www.siel.nl/acumulus/API/Basic_Response/):
  *       status, errors and warnings
  *     - Locally found error and warning messages, and thrown exceptions.
- *     - A reference to the {@see ApiCommunicator}.
+ *     - A reference to the {@see AcumulusRequest}.
  *     - References to the low level {@see HttpRequest} and {@see HttpResponse}
  *       objects of this call.
  *
  * Higher layers in this library and the application will typically only use the
- * above 2 classes to make a service call and process the result. However,
- * behind this facade, other classes encapsulate the actual work and knowledge
- * of the separate layers involved:
- * - {@see ApiCommunicator}: Encapsulates knowledge about the Acumulus API.
+ * above 2 classes to make a service call and process the result.
+ *
+ * However, behind this facade, other classes encapsulate the actual work and
+ * knowledge of the separate layers involved:
+ * - {@see AcumulusRequest}: Encapsulates knowledge about the Acumulus API.
  *   Think of things like:
  *     - Getting the uri for each function.
  *     - Adding the authentication fields, where necessary, and the other
@@ -53,10 +54,10 @@
  *       returns).
  *     - A reference to the {@see HttpRequest}.
  *
- * The latter 2 classes are typically only used by the {@see ApiCommunicator}
- * and  {@see Result} classes, except perhaps for future support of other web
- * services (e.g. looking for newer versions at GitHub or validating VAT
- * numbers with the VIES service).
+ * The latter 2 classes are typically only used by an {@see AcumulusRequest}
+ * and a {@see Result}, except perhaps for future support of other web services,
+ * e.g. looking for newer versions at GitHub or validating VAT numbers with the
+ * VIES service.
  *
  * Note to developers: When implementing a new extension, you should not
  * override any of the classes in this namespace.

@@ -11,13 +11,14 @@ class HttpResponseTest extends TestCase
 {
     public function testHttpResponse()
     {
-        $request = new HttpRequest(curl_init());
+        $request = new HttpRequest();
         $httpCode = 200;
         $requestHeaders = "request-headers1\r\nrequest-headers2\r\n\r\n";
         $responseHeaders = "response-headers1\r\nresponse-headers2\r\n\r\n";
         $responseBody = 'my-response-body';
         $info = ['http_code' => $httpCode, 'request_header' => $requestHeaders];
         $response = new HttpResponse($responseHeaders, $responseBody, $info, $request);
+
         $this->assertEquals($httpCode, $response->getHttpCode());
         $this->assertEquals($responseHeaders, $response->getHeaders());
         $this->assertEquals($responseBody, $response->getBody());

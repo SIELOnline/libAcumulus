@@ -5,7 +5,7 @@
 
 namespace Siel\Acumulus\Unit\ApiClient;
 
-use Siel\Acumulus\ApiClient\ApiCommunicator;
+use Siel\Acumulus\ApiClient\AcumulusRequest;
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\ApiClient\HttpRequest;
 
@@ -17,7 +17,7 @@ use Siel\Acumulus\ApiClient\HttpRequest;
  * - callApiFunction
  * - getUri
  */
-class ApiCommunicatorTest extends TestCase
+class AcumulusRequestTest extends TestCase
 {
 //    public function testGetUri()
 //    {

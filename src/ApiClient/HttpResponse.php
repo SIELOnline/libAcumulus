@@ -25,7 +25,7 @@ class HttpResponse
      * Returns the HTTP response status code.
      *
      * @return int
-     *   The HTTP response status code.
+     *   The HTTP response status code, or 0 if unknown.
      */
     public function getHttpCode(): int
     {
@@ -88,12 +88,13 @@ class HttpResponse
      *
      * @return string
      *   The HTTP request headers as 1 string. Each header is separated by a
-     *   new line (\r\n) and the headers end with a double new line.
+     *   new line (\r\n) and the headers end with a double new line. If the
+     *   request headers are not known, the empty string is returned.
      */
     public function getRequestHeaders(): string
     {
         // @todo: return as string[]? (split on \r\n, double \r\n\r\n at end!)
-        return $this->info['request_header'];
+        return $this->info['request_header'] ?? '';
     }
 
     /**

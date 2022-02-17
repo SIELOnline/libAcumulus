@@ -4,6 +4,7 @@
 namespace Siel\Acumulus\Integration\ApiClient;
 
 use PHPUnit\Framework\TestCase;
+use Siel\Acumulus\Api;
 use Siel\Acumulus\ApiClient\Acumulus;
 use Siel\Acumulus\ApiClient\AcumulusRequest;
 use Siel\Acumulus\Helpers\Container;
@@ -24,6 +25,33 @@ class AcumulusTest extends TestCase
         $apiCommunicator = new AcumulusRequest($container->getConfig(), $container->getLanguage(), $container->getLog());
         $this->acumulusClient = new Acumulus($apiCommunicator, $container, $container->getConfig());
     }
+
+    /**
+     * Kunnen we hier nog wat mee?
+     *
+     * @return array[]
+     */
+    public function argumentsPassedDeprecated(): array
+    {
+        // See for the meaning of each entry the parameter list of testApiCalls.
+        return [
+            'About' => ['getAbout', [], 'general/general_about', true, 'general', false],
+            'Accounts' => ['getPicklistAccounts', [], 'picklists/picklist_accounts', true, 'accounts', true],
+            'ContactTypes' => ['getPicklistContactTypes', [], 'picklists/picklist_contacttypes', true, 'contacttypes', true],
+            'CostCenters' => ['getPicklistCostCenters', [], 'picklists/picklist_costcenters', true, 'costcenters', true],
+            'InvoiceTemplates' => ['getPicklistInvoiceTemplates', [], 'picklists/picklist_invoicetemplates', true, 'invoicetemplates', true],
+            'VatInfo' => ['getVatInfo', ['nl'], 'lookups/lookup_vatinfo', true, 'vatinfo', true],
+            'InvoiceAdd' => ['invoiceAdd', [['customer' => []]], 'invoices/invoice_add', true, 'invoice', false, ['customer' => []]],
+            'ConceptInfo' => ['getConceptInfo', [12345], 'invoices/invoice_concept_info', true, 'concept', false, ['conceptid' => 12345]],
+            'Entry' => ['getEntry', [12345], 'entry/entry_info', true, 'entry', false, ['entryid' => 12345]],
+            'SetDeleteStatus1' => ['setDeleteStatus', [12345, true], 'entry/entry_deletestatus_set', true, 'entry', false, ['entryid' => 12345, 'entrydeletestatus' => 1]],
+            'SetDeleteStatus0' => ['setDeleteStatus', [12345, false], 'entry/entry_deletestatus_set', true, 'entry', false, ['entryid' => 12345, 'entrydeletestatus' => 0]],
+            'GetPaymentStatus' => ['getPaymentStatus', ['TOKEN'], 'invoices/invoice_paymentstatus_get', true, 'invoice', false, ['token' => 'TOKEN']],
+            'SetPaymentStatus' => ['setPaymentStatus', ['TOKEN', Api::PaymentStatus_Paid, '2020-02-02'], 'invoices/invoice_paymentstatus_set', true, 'invoice', false, ['token' => 'TOKEN', 'paymentstatus' => Api::PaymentStatus_Paid, 'paymentdate' => '2020-02-02']],
+            'Signup' => ['signup', [['companyname' => 'BR']], 'signup/signup', false, 'signup', false, ['signup' => ['companyname' => 'BR']]],
+        ];
+    }
+
 
     public function responseKeysProvider(): array
     {
@@ -93,7 +121,7 @@ class AcumulusTest extends TestCase
         $vatType = array_column($actual, 'vattype');
         array_multisort($vatRate, SORT_DESC, $vatType, SORT_ASC, $actual);
 
-        $this->assertEquals($expected, $actual);
+        $this->assertSame($expected, $actual);
     }
 
     /**
@@ -115,7 +143,7 @@ class AcumulusTest extends TestCase
         $this->assertSame(Severity::Success, $result->getStatus());
         $actual = $result->getResponse();
         $threshold = $actual['threshold'];
-        $this->assertEquals(10000, $threshold);
+        $this->assertSame(10000, $threshold);
     }
 
     /**
@@ -137,7 +165,7 @@ class AcumulusTest extends TestCase
         $this->assertSame(Severity::Success, $result->getStatus());
         $actual = $result->getResponse();
         $threshold = $actual['threshold'];
-        $this->assertEquals(10000, $threshold);
+        $this->assertSame(10000, $threshold);
     }
 
     public function stockAddProvider(): array
@@ -159,7 +187,7 @@ class AcumulusTest extends TestCase
 
 
         $actual = $result->getResponse();
-        $this->assertEquals($expected, $actual);
+        $this->assertSame($expected, $actual);
     }
 
     /*

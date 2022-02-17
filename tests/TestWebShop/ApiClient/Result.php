@@ -2,10 +2,11 @@
 namespace Siel\Acumulus\TestWebShop\ApiClient;
 
 use Siel\Acumulus\Helpers\Severity;
+use \Siel\Acumulus\ApiClient\Result as BaseResult;
 
-class Result extends \Siel\Acumulus\ApiClient\Result
+class Result extends BaseResult
 {
-    public function setMainResponseKey(string $mainResponseKey, bool $isList = false): Result
+    public function setMainResponseKey(string $mainResponseKey, bool $isList = false): BaseResult
     {
         // Add messages for the parameters that were passed in, so they can be checked.
         $this->addMessage($mainResponseKey, Severity::Log, 'mainResponseKey', 0);

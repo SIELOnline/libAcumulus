@@ -1,5 +1,7 @@
 <?php
-/** @noinspection PhpStaticAsDynamicMethodCallInspection */
+/**
+ * @noinspection PhpStaticAsDynamicMethodCallInspection
+ */
 
 namespace Siel\Acumulus\Unit\ApiClient;
 
@@ -15,15 +17,15 @@ class HttpResponseTest extends TestCase
         $httpCode = 200;
         $requestHeaders = "request-headers1\r\nrequest-headers2\r\n\r\n";
         $responseHeaders = "response-headers1\r\nresponse-headers2\r\n\r\n";
-        $responseBody = 'my-response-body';
+        $responseBody = '{"vatinfo":{"vat":[{"vattype":"normal","vatrate":"21.0000"},{"vattype":"reduced","vatrate":"9.0000"},{"vattype":"reduced","vatrate":"0.0000"}]},"errors":{"count_errors":"0"},"warnings":{"count_warnings":"0"},"status":"0"}';
         $info = ['http_code' => $httpCode, 'request_header' => $requestHeaders];
         $response = new HttpResponse($responseHeaders, $responseBody, $info, $request);
 
-        $this->assertEquals($httpCode, $response->getHttpCode());
-        $this->assertEquals($responseHeaders, $response->getHeaders());
-        $this->assertEquals($responseBody, $response->getBody());
-        $this->assertEquals($info, $response->getInfo());
-        $this->assertEquals($request, $response->getRequest());
-        $this->assertEquals($requestHeaders, $response->getRequestHeaders());
+        $this->assertSame($httpCode, $response->getHttpCode());
+        $this->assertSame($responseHeaders, $response->getHeaders());
+        $this->assertSame($responseBody, $response->getBody());
+        $this->assertSame($info, $response->getInfo());
+        $this->assertSame($request, $response->getRequest());
+        $this->assertSame($requestHeaders, $response->getRequestHeaders());
     }
 }

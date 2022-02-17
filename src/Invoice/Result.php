@@ -2,17 +2,18 @@
 namespace Siel\Acumulus\Invoice;
 
 use Siel\Acumulus\Helpers\Message;
-use Siel\Acumulus\ApiClient\Result as WebResult;
+use Siel\Acumulus\ApiClient\Result as AcumulusResult;
 use Siel\Acumulus\Helpers\Severity;
 
 /**
  * Extends Result with properties and features specific to the InvoiceAdd web
  * service call.
  *
- * @todo: decouple it from WebResult, so we do not have to create a WebResponse
- *   upfront.
+ * @todo: do not extend it from AcumulusResult, so we do not have to create an
+ *   AcumulusResult up front, that makes things in the ApiClient namespace
+ *   simpler and more elegant.
  */
-class Result extends WebResult
+class Result extends AcumulusResult
 {
     // Whether to add the raw request and response to mails or log messages.
     const AddReqResp_Never = 1;

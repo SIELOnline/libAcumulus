@@ -1,19 +1,21 @@
 <?php
 namespace Siel\Acumulus\TestWebShop\ApiClient;
 
-use Siel\Acumulus\ApiClient\HttpRequest as BaseHttpCommunicator;
+use Siel\Acumulus\ApiClient\HttpRequest as BaseHttpRequest;
 use Siel\Acumulus\ApiClient\HttpResponse;
 
 /**
  * {@inhertidoc}
  */
-class HttpRequest extends BaseHttpCommunicator
+class HttpRequest extends BaseHttpRequest
 {
-    public function execute(): HttpResponse
+    protected function executeWithCurl(): HttpResponse
     {
-        $response = '';
-        // @todo: more intelligent response handling using defines responses for
-        //   given requests, so we can test handling the responses as well.
-        return new HttpResponse('', '', ['http_code' => 200, 'request_header' => ''], $this);
+        $httpCode = 200;
+        $requestHeaders = "request-headers1\r\nrequest-headers2\r\n\r\n";
+        $responseHeaders = "response-headers1\r\nresponse-headers2\r\n\r\n";
+        $responseBody = '{"vatinfo":{"vat":[{"vattype":"normal","vatrate":"21.0000"},{"vattype":"reduced","vatrate":"9.0000"},{"vattype":"reduced","vatrate":"0.0000"}]},"errors":{"count_errors":"0"},"warnings":{"count_warnings":"0"},"status":"0"}';
+        $info = ['http_code' => $httpCode, 'request_header' => $requestHeaders, 'method_time' => 0.00123];
+        return new HttpResponse($responseHeaders, $responseBody, $info, $this);
     }
 }

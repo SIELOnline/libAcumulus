@@ -2,6 +2,8 @@
 namespace Siel\Acumulus\TestWebShop\ApiClient;
 
 use Siel\Acumulus\ApiClient\AcumulusRequest as BaseAcumulusRequest;
+use Siel\Acumulus\ApiClient\HttpRequest;
+use Siel\Acumulus\ApiClient\HttpResponse;
 use Siel\Acumulus\ApiClient\Result;
 use Siel\Acumulus\Helpers\Severity;
 
@@ -18,23 +20,14 @@ use Siel\Acumulus\Helpers\Severity;
  */
 class AcumulusRequest extends BaseAcumulusRequest
 {
-    /**
-     * @inheritDoc
-     */
-    public function constructUri(string $apiFunction): string
+    protected function executeWithHttp(): HttpResponse
     {
-        return $apiFunction;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function execute(string $apiFunction, array $message, bool $needContract, ?Result $result = null): Result
-    {
-        // Add messages for the parameters that were passed in, so they can be checked.
-        $result->addMessage($apiFunction, Severity::Log, 'apiFunction', 0);
-        $result->addMessage(json_encode($message), Severity::Log, 'message', 0);
-        $result->addMessage($needContract ? 'true' : 'false', Severity::Log, 'needContract', 0);
-        return $result;
+        $request = new HttpRequest();
+        $httpCode = 200;
+        $requestHeaders = "request-headers1\r\nrequest-headers2\r\n\r\n";
+        $responseHeaders = "response-headers1\r\nresponse-headers2\r\n\r\n";
+        $responseBody = '{"vatinfo":{"vat":[{"vattype":"normal","vatrate":"21.0000"},{"vattype":"reduced","vatrate":"9.0000"},{"vattype":"reduced","vatrate":"0.0000"}]},"errors":{"count_errors":"0"},"warnings":{"count_warnings":"0"},"status":"0"}';
+        $info = ['http_code' => $httpCode, 'request_header' => $requestHeaders, 'method_time' => 0.00123];
+        return new HttpResponse($responseHeaders, $responseBody, $info, $request);
     }
 }

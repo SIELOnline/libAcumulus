@@ -22,11 +22,18 @@ use Siel\Acumulus\Helpers\Translator;
  * - Any warnings, local and/or remote.
  * - Any notices, local.
  * - Http request and response objects, for logging purposes.
+ *
+ * @todo: - rename to AcumulusResult
+ *   - complete error handling, especially http codes and error values in response
+ *   - Make InvoiceResult use this class not extend it, so we can create it in this layer =>
+ *       - pass AcumulusRequest and HttpResponse in constructor (and remove setters)
+ *       - call simplifyResponse() only after setMainResponseKey()
  */
 class Result extends MessageCollection
 {
     // Code tags for messages containing the raw (but masked) request and
     // response.
+    // @todo: remove as logging is no longer done this way.
     public const CodeTagRawRequest = 'Request';
     public const CodeTagRawResponse = 'Response';
 
@@ -170,20 +177,68 @@ class Result extends MessageCollection
         }
     }
 
-    /**
-     * @return \Siel\Acumulus\ApiClient\AcumulusRequest|null
-     */
     public function getAcumulusRequest(): ?AcumulusRequest
     {
         return $this->acumulusRequest;
     }
 
-    /**
-     * @param \Siel\Acumulus\ApiClient\AcumulusRequest|null $acumulusRequest
-     */
     public function setAcumulusRequest(?AcumulusRequest $acumulusRequest): void
     {
         $this->acumulusRequest = $acumulusRequest;
+    }
+
+    public function getHttpResponse(): ?HttpResponse
+    {
+        return $this->httpResponse;
+    }
+
+    /**
+     * Sets the http response.
+     *
+     * Information from the http response is extracted and placed in the other
+     * properties. After doing so, this property remains for logging purposes.
+     *
+     * @param \Siel\Acumulus\ApiClient\HttpResponse $httpResponse
+     */
+    public function setHttpResponse(HttpResponse $httpResponse): void
+    {
+        $this->httpResponse = $httpResponse;
+        // @todo: start using http codes (403, 429, 500, ...)
+
+        $body = $this->httpResponse->getBody();
+        if (empty($body)) {
+            // Curl did return a non-empty response, otherwise we would not be
+            // here. So, apparently that only contained headers.
+            // @todo: Is this a non 200 response or can we consider this as a critical error?
+            $this->addMessage('Empty response body', Severity::Error, '', 701);
+        } elseif ($this->isHtmlResponse($body)) {
+            // When the API is gone we might receive an HTML error message page.
+            $this->raiseHtmlReceivedError($body);
+        } else {
+            // Decode the response as either json or xml.
+            $response = [];
+            $outputFormat = $this->getAcumulusRequest()->getSubmit()['format'] ?? 'xml';
+            if ($outputFormat === 'json') {
+                $response = json_decode($body, true);
+            }
+            // Even if we pass json as <format> we might receive an XML response
+            // in case the request was rejected before or during parsing. So, if
+            // $response = null, we also try to decode $body as XML.
+            if ($outputFormat === 'xml' || !is_array($response)) {
+                try {
+                    $response = $this->convertXmlToArray($body);
+                } catch (RuntimeException $e) {
+                    // Not an XML response. Treat it as a json error if we were
+                    // expecting a json response.
+                    if ($outputFormat === 'json') {
+                        $this->raiseJsonError();
+                    }
+                    // Otherwise, treat it as the XML exception that was raised.
+                    throw $e;
+                }
+            }
+            $this->setResponse($response);
+        }
     }
 
     /**
@@ -210,7 +265,7 @@ class Result extends MessageCollection
      *
      * @return $this
      */
-    public function setResponse(array $response): self
+    protected function setResponse(array $response): self
     {
         // Move the common parts into their respective properties.
         if (isset($response['status'])) {
@@ -280,60 +335,6 @@ class Result extends MessageCollection
             }
         }
         return $response;
-    }
-
-    public function getHttpResponse(): ?HttpResponse
-    {
-        return $this->httpResponse;
-    }
-
-    /**
-     * Sets the http response.
-     *
-     * Information from the http response is extracted and placed in the other
-     * properties. After doing so, this property remains for logging purposes.
-     *
-     * @param \Siel\Acumulus\ApiClient\HttpResponse $httpResponse
-     */
-    public function setHttpResponse(HttpResponse $httpResponse): void
-    {
-        $this->httpResponse = $httpResponse;
-        // @todo: start using http codes (404, 429, 500, ...)
-
-        $body = $this->httpResponse->getBody();
-        if (empty($body)) {
-            // Curl did return a non-empty response, otherwise we would not be
-            // here. So, apparently that only contained headers.
-            // @todo: Is this a non 200 response or can we consider this as a critical error?
-            $this->addMessage('Empty response body', Severity::Error, '', 701);
-        } elseif ($this->isHtmlResponse($body)) {
-            // When the API is gone we might receive an HTML error message page.
-            $this->raiseHtmlReceivedError($body);
-        } else {
-            // Decode the response as either json or xml.
-            $response = [];
-            $outputFormat = $this->getAcumulusRequest()->getSubmitMessage()['format'] ?? 'xml';
-            if ($outputFormat === 'json') {
-                $response = json_decode($body, true);
-            }
-            // Even if we pass json as <format> we might receive an XML response
-            // in case the request was rejected before or during parsing. So, if
-            // $response = null, we also try to decode $body as XML.
-            if ($outputFormat === 'xml' || !is_array($response)) {
-                try {
-                    $response = $this->convertXmlToArray($body);
-                } catch (RuntimeException $e) {
-                    // Not an XML response. Treat it as a json error if we were
-                    // expecting a json response.
-                    if ($outputFormat === 'json') {
-                        $this->raiseJsonError();
-                    }
-                    // Otherwise, treat it as the XML exception that was raised.
-                    throw $e;
-                }
-            }
-            $this->setResponse($response);
-        }
     }
 
     /**

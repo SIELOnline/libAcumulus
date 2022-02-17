@@ -76,7 +76,7 @@ class HttpRequest
      *   This request has already been executed.
      * @throws \RuntimeException
      *   An error occurred at:
-     *   - The Curl internals level, e.g. a out of memory error.
+     *   - The Curl internals level, e.g. an out of memory error.
      *   - The communication level, e.g. time-out or no response received.
      */
     public function get(string $uri): HttpResponse
@@ -102,7 +102,7 @@ class HttpRequest
      *   This request has already been executed.
      * @throws \RuntimeException
      *   An error occurred at:
-     *   - The Curl internals level, e.g. a out of memory error.
+     *   - The Curl internals level, e.g. an out of memory error.
      *   - The communication level, e.g. time-out or no response received.
      */
     public function post(string $uri, $postFields): HttpResponse
@@ -153,7 +153,9 @@ class HttpRequest
      *
      * All details regarding the fact we are using Curl are contained in this
      * single method (except perhaps, the info array passed to the HttpResponse
-     * that gets created which is based on curl_get_info()).
+     * that gets created which is based on curl_get_info()). This is also done
+     * to be able to unit test this class (by just mocking this 1 method) while
+     * not going so far as to inject a "communication library".
      *
      * @return \Siel\Acumulus\ApiClient\HttpResponse
      *

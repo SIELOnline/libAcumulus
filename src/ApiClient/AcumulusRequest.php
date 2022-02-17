@@ -4,9 +4,11 @@ namespace Siel\Acumulus\ApiClient;
 use DOMDocument;
 use DOMElement;
 use DOMException;
+use LogicException;
 use RuntimeException;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
 
 /**
@@ -29,29 +31,27 @@ use Siel\Acumulus\Helpers\Log;
  */
 class AcumulusRequest
 {
+    protected /*Container*/ $container;
     protected /*Config*/ $config;
     protected /*Log*/ $log;
     protected /*string*/ $userLanguage;
 
-    protected /*string*/ $apiFunction = '';
-    protected /*array*/ $submitMessage = [];
+    protected /*bool*/ $hasExecuted = false;
+    protected /*?string*/ $uri = null;
+    protected /*?array*/ $submit = null;
     protected /*?HttpRequest*/ $httpRequest = null;
 
-    public function __construct(Config $config, string $userLanguage, Log $log)
+    public function __construct(Container $container, Config $config, string $userLanguage, Log $log)
     {
+        $this->container = $container;
         $this->config = $config;
         $this->userLanguage = $userLanguage;
         $this->log = $log;
     }
 
-    public function getApiFunction(): string
+    public function getUri(): ?string
     {
-        return $this->apiFunction;
-    }
-
-    public function getSubmitMessage(): array
-    {
-        return $this->submitMessage;
+        return $this->uri;
     }
 
     public function getHttpRequest(): ?HttpRequest
@@ -60,33 +60,30 @@ class AcumulusRequest
     }
 
     /**
-     * Constructs and returns the uri for the requested API call.
+     * Returns the full submit structure as has been sent to Acumulus.
      *
-     * This method is public because {@see \Siel\Acumulus\ApiClient\Acumulus}
-     * calls it to get just the uri towards pdf files, thus without executing
-     * the request to get that file.
+     * The full submit structure consists of the:
+     * - basic submit: see {@link https://www.siel.nl/acumulus/API/Basic_Submit/}.
+     * - submit: the API call specific part as passed to
+     *   {@see \Siel\Acumulus\TestWebShop\ApiClient\AcumulusRequest::execute()}.
      *
-     * @param string $apiFunction
-     *   The api service to get the uri for.
-     *
-     * @return string
-     *   The uri to the requested API call.
+     * @return array|null
+     *    The full submit structure as has been sent to Acumulus, or null if
+     *    this Acumulus request has not yet been executed.
      */
-    public function constructUri(string $apiFunction): string
+    public function getSubmit(): ?array
     {
-        $environment = $this->config->getEnvironment();
-        return $environment['baseUri'] . '/' . $environment['apiVersion'] . '/' . $apiFunction . '.php';
+        return $this->submit;
     }
 
     /**
-     * Sends a message to the given API function and returns the results.
-     *
+     * Sends the message to the given API function and returns the results.
      * Any errors (or warnings) in the response structure of the web service are
      * returned via the result value and should be handled at a higher level.
      *
-     * @param string $apiFunction
-     *   The API function to invoke.
-     * @param array $message
+     * @param string $uri
+     *   The uri of the API resource to invoke.
+     * @param array $submit
      *   The main submit part to send to the Acumulus web API.
      * @param bool $needContract
      *   Indicates whether this api function needs the contract details. Most
@@ -104,22 +101,26 @@ class AcumulusRequest
      *   structure of a response. In case of errors, an exception or error
      *   message will have been added to the Result and the main response may be
      *   empty.
+     *
+     * @throws \LogicException
+     *   This request has already been executed.
      */
-    public function execute(string $apiFunction, array $message, bool $needContract, ?Result $result = null): Result
+    public function execute(string $uri, array $submit, bool $needContract, ?Result $result = null): Result
     {
-        if ($result === null) {
-            $result = new Result();
+        if ($this->hasExecuted) {
+            throw new LogicException('AcumulusRequest::execute() may only be called once.');
         }
+        $this->hasExecuted = true;
 
-        $result->setAcumulusRequest($this);
-        $this->apiFunction = $apiFunction;
         try {
-
-            $uri = $this->constructUri($this->apiFunction);
-            $body = $this->constructSubmitMessage($message, $needContract);
-            // Send message, receive response.
+            if ($result === null) {
+                $result = $this->container->getResult();
+            }
+            $result->setAcumulusRequest($this);
+            $this->uri= $uri;
+            $this->submit = $this->constructFullSubmit($submit, $needContract);
             $this->httpRequest = new HttpRequest();
-            $httpResponse = $this->httpRequest->post($uri, $body);
+            $httpResponse = $this->executeWithHttp();
             $result->setHttpResponse($httpResponse);
         } catch (RuntimeException $e) {
             // Any errors during:
@@ -134,35 +135,57 @@ class AcumulusRequest
     }
 
     /**
-     * Constructs the submit message to be sent to the Acumulus API.
+     * Actually executes an Acumulus request.
      *
-     * We use the {@link https://www.siel.nl/acumulus/API/Basic_Usage/#:~:text=The%20xmlstring%20approach [XML string approach]}
-     * to construct the submit-message. That is we send the message in the body
-     * of a POST request in the multipart/form-data format. By passing an array
-     * to Curl, we let Curl do the formatting and encoding.
+     * [By wrapping the actual communication call in its own method we can
+     * unit-test this class by just overriding this one method, while not going
+     * so far as to inject the httpRequest.]
      *
+     * We use the
+     * {@link https://www.siel.nl/acumulus/API/Basic_Usage/#:~:text=The%20xmlstring%20approach XML string approach}
+     * to send a request. That is we send the message as XML in the body of a
+     * POST request in multipart/form-data format. Note: by passing an array to
+     * Curl, we let Curl do the formatting and encoding.
+     *
+     * @return \Siel\Acumulus\ApiClient\HttpResponse
+     *
+     * @throws \RuntimeException
+     *   An error occurred at:
+     *   - The internal level, e.g. an out of memory error.
+     *   - The communication level, e.g. time-out or no response received.
+     *   Note that errors at the application level will be set as messages when
+     *   the response is interpreted.
+     */
+    protected function executeWithHttp(): HttpResponse
+    {
+        // - Convert message to XML. XML requires 1 top level tag, so add one.
+        //   The top tag name is ignored by the Acumulus API, we use <acumulus>.
+        // - 'xmlstring' is the post field that Acumulus expects.
+        $body = ['xmlstring' => trim($this->convertArrayToXml(['acumulus' => $this->submit]))];
+        $this->httpRequest = new HttpRequest();
+        return $this->httpRequest->post($this->uri, $body);
+    }
+
+    /**
+     * Constructs the full submit structure to be sent to the Acumulus API.
      * A submit-message is an XML message consisting of:
      * - A {@link https://www.siel.nl/acumulus/API/Basic_Submit/ [basic submit]}
      *   part containing a.o. tags like <contract>, <testmode>, and <connector>.
      * - An endpoint specific part, the actual data to be sent.
      *
-     * @param array $message
+     * @param array $submit
      *   The endpoint specific part to be sent.
      * @param bool $needContract
      *   Whether this endpoint needs the <contract> part to authorize and
      *   authenticate the call.
      *
      * @return array
-     *   The XML string to send to Acumulus.
+     *   The post fields to send to Acumulus.
      */
-    protected function constructSubmitMessage(array $message, bool $needContract): array
+    protected function constructFullSubmit(array $submit, bool $needContract): array
     {
         $commonMessagePart = $this->getBasicSubmit($needContract);
-        $this->submitMessage = array_merge($commonMessagePart, $message);
-
-        // Convert message to XML. XML requires 1 top level tag, so add one.
-        // The top tag name is ignored by the Acumulus API (we use <acumulus>).
-        return ['xmlstring' => trim($this->convertArrayToXml(['acumulus' => $this->submitMessage]))];
+        return array_merge($commonMessagePart, $submit);
     }
 
     /**

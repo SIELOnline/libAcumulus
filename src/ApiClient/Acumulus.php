@@ -30,26 +30,21 @@ use Siel\Acumulus\Helpers\Container;
 class Acumulus
 {
     /** @var \Siel\Acumulus\Config\Config */
-    protected $config;
+    protected /*Config*/ $config;
 
     /** @var \Siel\Acumulus\Helpers\Container */
-    protected $container;
-
-    /** @var AcumulusRequest */
-    protected $acumulusRequest;
+    protected /*Container*/ $container;
 
     /**
      * Constructor.
      *
-     * @param AcumulusRequest $acumulusRequest
      * @param \Siel\Acumulus\Helpers\Container $container
      * @param \Siel\Acumulus\Config\Config $config
      */
-    public function __construct(AcumulusRequest $acumulusRequest, Container $container, Config $config)
+    public function __construct(Container $container, Config $config)
     {
         $this->config = $config;
         $this->container = $container;
-        $this->acumulusRequest = $acumulusRequest;
     }
 
     /**
@@ -214,10 +209,19 @@ class Acumulus
     /**
      * Retrieves a list of products.
      *
-     * See {@see https://www.siel.nl/acumulus/API/Picklists/Products/}
+     * See {@see https://www.siel.nl/acumulus/API/Products/List_Products/}
      *
-     * @param ?string $filter
-     * @param ?int $productTagId
+     * @param string|null $filter
+     *   Free search param, checks against the productid, description, type,
+     *   SKU, EAN and price of the product.
+     * @param int|null $productTagId
+     *   To filter products by status:
+     *   - null: All (DEFAULT)
+     *   - -1: Vervallen (discontinued)
+     *   - 0: Actief (active/available)
+     *   - 1000: Favoriet (Favorite)
+     * @param int|null $offset
+     * @param int|null $rowcount
      *
      * @return \Siel\Acumulus\ApiClient\Result
      *   The result of the webservice call. The structured response will contain
@@ -239,7 +243,7 @@ class Acumulus
      * @noinspection PhpUnused  Not yet used, but this is a library that,
      *   eventually, should cover all web services provided.
      */
-    public function getPicklistProducts($filter = null, $productTagId = null)
+    public function getPicklistProducts($filter = null, $productTagId = null, $offset = null, $rowcount = null)
     {
         $filters = [];
         if ($filter !== null) {
@@ -247,6 +251,12 @@ class Acumulus
         }
         if ($productTagId !== null) {
             $filters['producttagid'] = (int) $productTagId;
+        }
+        if ($offset !== null) {
+            $filters['offset'] = (int) $offset;
+        }
+        if ($rowcount !== null) {
+            $filters['rowcount'] = (int) $rowcount;
         }
         return $this->getPicklist('products', $filters);
     }
@@ -331,9 +341,8 @@ class Acumulus
     public function reportThresholdEuCommerce($year = null)
     {
         $message = [];
-        $year = (int) $year;
         if (!empty($year)) {
-            $message['year'] = $year;
+            $message['year'] = (int) $year;
         }
         return $this->callApiFunction('reports/report_threshold_eu_ecommerce', $message)->setMainResponseKey('');
     }
@@ -552,8 +561,6 @@ class Acumulus
      *
      * @param string $token
      *   The token for the invoice.
-     * @param int $invoiceType
-     *   One of the constants API::Email_Normal or API::Email_Reminder.
      * @param array $emailAsPdf
      *   An array with the fields:
      *   - emailto
@@ -562,6 +569,8 @@ class Acumulus
      *   - subject
      *   - message
      *   - confirmreading
+     * @param int|null $invoiceType
+     *   One of the constants API::Email_Normal (default) or API::Email_Reminder.
      * @param string $invoiceNotes
      *   Multiline field for additional remarks. Use \n for newlines and \t for
      *   tabs. Contents is placed in notes/comments section of the invoice.
@@ -582,13 +591,15 @@ class Acumulus
      *
      * @noinspection PhpUnused
      */
-    public function emailInvoiceAsPdf($token, $invoiceType, array $emailAsPdf, $invoiceNotes = '')
+    public function emailInvoiceAsPdf($token, array $emailAsPdf, $invoiceType = null, $invoiceNotes = '')
     {
         $message = [
             'token' => (string) $token,
-            'invoicetype' => (int) $invoiceType,
             'emailaspdf' => $emailAsPdf,
         ];
+        if ($invoiceType !== null) {
+            $message['invoicetype'] = (int) $invoiceType;
+        }
         if (!empty($invoiceNotes)) {
             $message['invoicenotes'] = (string) $invoiceNotes;
         }
@@ -745,18 +756,18 @@ class Acumulus
     }
 
     /**
-     * Wrapper around
-     * {@see \Siel\Acumulus\ApiClient\AcumulusRequest::constructUri()}.
+     * Constructs and returns the uri for the requested API service.
      *
      * @param string $apiFunction
      *   The api service to get the uri for.
      *
      * @return string
-     *   The uri to the requested API call.
+     *   The uri to the requested API service.
      */
     protected function constructUri($apiFunction)
     {
-        return $this->acumulusRequest->constructUri($apiFunction);
+        $environment = $this->config->getEnvironment();
+        return $environment['baseUri'] . '/' . $environment['apiVersion'] . '/' . $apiFunction . '.php';
     }
 
     /**
@@ -783,6 +794,8 @@ class Acumulus
      */
     protected function callApiFunction($apiFunction, array $message, $needContract = true, Result $result = null)
     {
-        return $this->acumulusRequest->execute($apiFunction, $message, $needContract, $result);
+        $acumulusRequest = $this->container->getAcumulusRequest();
+        $uri = $this->constructUri($apiFunction);
+        return $acumulusRequest->execute($uri, $message, $needContract, $result);
     }
 }

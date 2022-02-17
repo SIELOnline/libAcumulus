@@ -5,72 +5,71 @@
 
 namespace Siel\Acumulus\Unit\ApiClient;
 
-use Siel\Acumulus\ApiClient\AcumulusRequest;
 use PHPUnit\Framework\TestCase;
-use Siel\Acumulus\ApiClient\HttpRequest;
+use Siel\Acumulus\Helpers\Container;
 
 /**
- * Features to test with the ApiCommunicator:
- * - convertXmlToArray
- * - convertArrayToXml (convertToDom)
- * - isHtmlResponse
- * - callApiFunction
+ * Features to test with the AcumulusRequest:
+ * - execute
+ * and before/after that the getters
  * - getUri
+ * - getSubmitMessage (constructSubmitMessage, getBasicSubmit, convertArrayToXml)
+ * - getHttpRequest?
+ * -
  */
 class AcumulusRequestTest extends TestCase
 {
-//    public function testGetUri()
-//    {
-//
-//    }
-//
-//    public function testCallApiFunction()
-//    {
-//
-//    }
+    private $acumulusRequest;
 
-    public function testMaskPasswords()
+    protected function setUp(): void
     {
-        $httpRequest = new HttpRequest(curl_init());
-        $post = ['accounts' =>
-            '<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<myxml>
-    <username>APIGebruiker12345</username>
-    <password>mysecret</password><password>myse&lt;cret"</password>
-    <my1-password>mysecret"</my1-password>
-    <my2-password>myse"\&lt;&lt;cret"</my2-password>
-    <emailonerror>erwin@burorader.com</emailonerror>
-</myxml>'];
-        $uri = 'test';
-        $httpRequest->post($uri, $post);
-        $msg = $httpRequest->getPostFieldsAsMsg();
-        $this->assertStringNotContainsString('<password>mysecret</password>', $msg);
-        $this->assertStringNotContainsString('<mypassword>myse&lt;cret</mypassword>', $msg);
-        $this->assertStringNotContainsString('<my1-password>mysecret"</my1-password>', $msg);
-        $this->assertStringNotContainsString('<my2-password>myse"\&lt;cret"</my2-password>', $msg);
-        $this->assertStringContainsString('<password>REMOVED FOR SECURITY</password>', $msg);
-        $this->assertStringContainsString('<password>REMOVED FOR SECURITY</password><password>REMOVED FOR SECURITY</password>', $msg);
-        $this->assertStringContainsString('<my1-password>REMOVED FOR SECURITY</my1-password>', $msg);
-        $this->assertStringContainsString('<my2-password>REMOVED FOR SECURITY</my2-password>', $msg);
+        $language = 'nl';
+        $container = new Container('TestWebShop', $language);
+        $this->acumulusRequest = $container->getAcumulusRequest();
+    }
 
-        $post = '
-{
-"username": "APIGebruiker12345",
-"password": "mysecret",
-"my1-password": "myse\"/<cret",
-"my2-password": "my\"secret",
-"my3-password": "myse\\\\\\"/<cret",
-"emailonerror": "erwin@burorader.com"
-}';
-        $httpRequest->post($uri, $post);
-        $msg = $httpRequest->getPostFieldsAsMsg();
-        $this->assertStringNotContainsString('"password": "mysecret"', $msg);
-        $this->assertStringNotContainsString('"my1-password": "myse\"/<cret"', $msg);
-        $this->assertStringNotContainsString('"my2-password": "my\"secret"', $msg);
-        $this->assertStringNotContainsString('"my3-password": "myse\\\\\\"/<cret"', $msg);
-        $this->assertStringContainsString('"password": "REMOVED FOR SECURITY",', $msg);
-        $this->assertStringContainsString('"my1-password": "REMOVED FOR SECURITY",', $msg);
-        $this->assertStringContainsString('"my2-password": "REMOVED FOR SECURITY",', $msg);
-        $this->assertStringContainsString('"my3-password": "REMOVED FOR SECURITY",', $msg);
+    public function testGettersBefore()
+    {
+        $this->assertNull($this->acumulusRequest->getUri());
+        $this->assertNull($this->acumulusRequest->getSubmit());
+        $this->assertNull($this->acumulusRequest->getHttpRequest());
+    }
+
+    public function testExecuteNoContract()
+    {
+        $uri = 'uri';
+        $message = ['key' => 'value'];
+        $this->acumulusRequest->execute($uri, $message, false);
+        $this->assertEquals($uri, $this->acumulusRequest->getUri());
+        $submit = $this->acumulusRequest->getSubmit();
+        $this->assertArrayNotHasKey('contract', $submit);
+        $this->assertArrayHasKey('format', $submit);
+        $this->assertArrayHasKey('testmode', $submit);
+        $this->assertArrayHasKey('lang', $submit);
+        $this->assertArrayHasKey('connector', $submit);
+        $this->assertEqualsCanonicalizing($message, array_intersect_assoc($submit, $message));
+        $this->assertNotNull($this->acumulusRequest->getHttpRequest());
+    }
+
+    public function testExecuteContract()
+    {
+        $uri = 'uri';
+        $message = ['key' => 'value'];
+        $this->acumulusRequest->execute($uri, $message, true);
+        $this->assertEquals($uri, $this->acumulusRequest->getUri());
+        $submit = $this->acumulusRequest->getSubmit();
+        $this->assertArrayHasKey('contract', $submit);
+        $this->assertIsArray($submit['contract']);
+        $this->assertArrayHasKey('contractcode', $submit['contract']);
+        $this->assertArrayHasKey('username', $submit['contract']);
+        $this->assertArrayHasKey('password', $submit['contract']);
+        $this->assertArrayHasKey('emailonerror', $submit['contract']);
+        $this->assertArrayHasKey('emailonwarning', $submit['contract']);
+        $this->assertArrayHasKey('format', $submit);
+        $this->assertArrayHasKey('testmode', $submit);
+        $this->assertArrayHasKey('lang', $submit);
+        $this->assertArrayHasKey('connector', $submit);
+        $this->assertEqualsCanonicalizing($message, array_intersect_assoc($submit, $message));
+        $this->assertNotNull($this->acumulusRequest->getHttpRequest());
     }
 }

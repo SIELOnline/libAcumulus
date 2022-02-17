@@ -2,6 +2,7 @@
 /**
  * @noinspection PhpStaticAsDynamicMethodCallInspection
  * @noinspection PhpDocSignatureInspection
+ * @noinspection DuplicatedCode
  */
 
 namespace Siel\Acumulus\Unit\ApiClient;
@@ -16,7 +17,6 @@ use Siel\Acumulus\Helpers\Message;
 use Siel\Acumulus\ApiClient\Result;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\ApiClient\ResultTranslations;
-use Siel\Acumulus\TestWebShop\ApiClient\AcumulusRequest;
 
 /**
  * A Result has the following features that we want to test:
@@ -39,7 +39,7 @@ class ResultTest extends TestCase
     protected function setUp(): void
     {
         $language = 'nl';
-        $this->container = new Container('TestWebShop', $language);
+        $this->container = new Container('TestWebShop\TestDoubles', $language);
         Translator::$instance = $this->container->getTranslator();
         $this->translator = Translator::$instance;
         $this->translator->add(new SeverityTranslations());

@@ -1,11 +1,9 @@
 <?php
-namespace Siel\Acumulus\TestWebShop\ApiClient;
+namespace Siel\Acumulus\TestWebShop\TestDoubles\ApiClient;
 
 use Siel\Acumulus\ApiClient\AcumulusRequest as BaseAcumulusRequest;
 use Siel\Acumulus\ApiClient\HttpRequest;
 use Siel\Acumulus\ApiClient\HttpResponse;
-use Siel\Acumulus\ApiClient\Result;
-use Siel\Acumulus\Helpers\Severity;
 
 /**
  * Communicator implements the communication with the Acumulus web API.

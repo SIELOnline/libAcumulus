@@ -20,8 +20,8 @@ class AcumulusTest extends TestCase
 
     protected function setUp(): void
     {
-        // Using TestWebShop gives us the test ApiCommunicator.
-        $this->container = new Container('TestWebShop', 'nl');
+        // Use the TestWebShop test doubles.
+        $this->container = new Container('TestWebShop\TestDoubles', 'nl');
         $this->acumulusClient = $this->container->getAcumulusApiClient();
     }
 

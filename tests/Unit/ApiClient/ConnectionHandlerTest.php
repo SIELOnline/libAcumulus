@@ -4,7 +4,7 @@
 namespace Siel\Acumulus\Unit\ApiClient;
 
 use PHPUnit\Framework\TestCase;
-use Siel\Acumulus\TestWebShop\ApiClient\ConnectionHandler;
+use Siel\Acumulus\TestWebShop\TestDoubles\ApiClient\ConnectionHandler;
 
 /**
  * Test curl handle creation and reuse based on scheme + host.
@@ -12,7 +12,7 @@ use Siel\Acumulus\TestWebShop\ApiClient\ConnectionHandler;
 class ConnectionHandlerTest extends TestCase
 {
     /**
-     * @return \Siel\Acumulus\TestWebShop\ApiClient\ConnectionHandler
+     * @return \Siel\Acumulus\TestWebShop\TestDoubles\ApiClient\ConnectionHandler
      */
     protected function getConnectionHandler(): ConnectionHandler
     {

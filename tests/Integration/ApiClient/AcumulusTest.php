@@ -5,25 +5,20 @@ namespace Siel\Acumulus\Integration\ApiClient;
 
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Api;
-use Siel\Acumulus\ApiClient\Acumulus;
-use Siel\Acumulus\ApiClient\AcumulusRequest;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Severity;
 
 class AcumulusTest extends TestCase
 {
-    /**
-     * @var \Siel\Acumulus\ApiClient\Acumulus
-     */
+    protected /*Container*/ $container;
     protected /*Acumulus*/ $acumulusClient;
 
     protected function setUp(): void
     {
-        // Using TestWebShop would give us a test HttpCommunicator, but we want
-        // a real one here.
-        $container = new Container('TestWebShop', 'nl');
-        $apiCommunicator = new AcumulusRequest($container->getConfig(), $container->getLanguage(), $container->getLog());
-        $this->acumulusClient = new Acumulus($apiCommunicator, $container, $container->getConfig());
+        // Using TestWebShop would give us test classes, but we want real ones
+        // here.
+        $this->container = new Container('TestWebShop', 'nl');
+        $this->acumulusClient = $this->container->getAcumulusApiClient();
     }
 
     /**
@@ -59,13 +54,13 @@ class AcumulusTest extends TestCase
             'About' => ['getAbout', [], false, ['about', 'role', 'roleapi', 'roleid', 'rolenl']],
             'MyAcumulus' => ['getMyAcumulus', [], false, ['myaddress', 'mycity', 'mycompanyname', 'mycontactperson', 'mycontractcode', 'mycontractenddate', 'mydebt', 'myemail', 'myemailstatusid', 'myemailstatusreferenceid', 'myentries', 'myentriesleft', 'myiban', 'mymaxentries', 'mypostalcode', 'mysalutation', 'mysepamandatenr', 'mystatusid', 'mytelephone', 'myvatnumber']],
             'Accounts enabled' => ['getPicklistAccounts', [true], true, ['accountid', 'accountnumber', 'accountdescription', 'accountorderid', 'accountstatus', 'accounttypeid']],
+            'CompanyTypes' => ['getPicklistCompanyTypes', [], true, ['companytypeid', 'companytypename', 'companytypenamenl']],
             'ContactTypes' => ['getPicklistContactTypes', [], true, ['contacttypeid', 'contacttypename', 'contacttypenamenl']],
             'CostCenters' => ['getPicklistCostCenters', [], true, ['costcenterid', 'costcentername']],
             'InvoiceTemplates' => ['getPicklistInvoiceTemplates', [], true, ['invoicetemplateid', 'invoicetemplatename']],
-            'CompanyTypes' => ['getPicklistCompanyTypes', [], true, ['companytypeid', 'companytypename', 'companytypenamenl']],
-            'VatInfo' => ['getVatInfo', ['nl'], true, ['vattype', 'vatrate']],
-            'ThresholdEuCommerce' => ['reportThresholdEuCommerce', [], false, ['year', 'threshold', 'nltaxed', 'reached']],
             'Products' => ['getPicklistProducts', [], true, ['productid', 'productnature', 'productdescription', 'producttagid', 'productcontactid', 'productprice', 'productvatrate', 'productsku', 'productstockamount', 'productean', 'producthash', 'productnotes']],
+            'VatInfo' => ['getVatInfo', ['nl'], true, ['vattype', 'vatrate', 'countryregion']],
+            'ThresholdEuCommerce' => ['reportThresholdEuCommerce', [], false, ['year', 'threshold', 'nltaxed', 'reached']],
         ];
     }
 
@@ -94,12 +89,53 @@ class AcumulusTest extends TestCase
     public function vatInfoProvider(): array
     {
         return [
-            'nl' => [['nl', '2015-01-01'], [['vattype' => 'reduced', 'vatrate' => '0.0000'],['vattype' => 'reduced', 'vatrate' => '6.0000'],['vattype' => 'normal', 'vatrate' => '21.0000']]],
-            'nl-no-date' => [['nl'], [['vattype' => 'reduced', 'vatrate' => '0.0000'],['vattype' => 'reduced', 'vatrate' => '9.0000'],['vattype' => 'normal', 'vatrate' => '21.0000']]],
-            'eu' => [['be', '2015-12-01'], [['vattype' => 'reduced', 'vatrate' => '6.0000'],['vattype' => 'reduced', 'vatrate' => '12.0000'],['vattype' => 'normal', 'vatrate' => '21.0000'],['vattype' => 'parked', 'vatrate' => '12.0000'],['vattype' => 'reduced', 'vatrate' => '0.0000']]],
-            'eu-no-date' => [['be'], [['vattype' => 'reduced', 'vatrate' => '6.0000'],['vattype' => 'reduced', 'vatrate' => '12.0000'],['vattype' => 'normal', 'vatrate' => '21.0000'],['vattype' => 'parked', 'vatrate' => '12.0000'],['vattype' => 'reduced', 'vatrate' => '0.0000']]],
+            'nl' => [['nl', '2015-01-01'],
+                [
+                    ['vattype' => 'reduced', 'vatrate' => '0.0000', 'countryregion' => '1'],
+                    ['vattype' => 'reduced', 'vatrate' => '6.0000', 'countryregion' => '1'],
+                    ['vattype' => 'normal', 'vatrate' => '21.0000', 'countryregion' => '1'],
+                ],
+            ],
+            'nl-no-date' => [['nl'],
+                [
+                    ['vattype' => 'reduced', 'vatrate' => '0.0000', 'countryregion' => '1'],
+                    ['vattype' => 'reduced', 'vatrate' => '9.0000', 'countryregion' => '1'],
+                    ['vattype' => 'normal', 'vatrate' => '21.0000', 'countryregion' => '1'],
+                ],
+            ],
+            'eu' => [['be', '2015-12-01'],
+                [
+                    ['vattype' => 'reduced', 'vatrate' => '6.0000', 'countryregion' => '2'],
+                    ['vattype' => 'reduced', 'vatrate' => '12.0000', 'countryregion' => '2'],
+                    ['vattype' => 'normal', 'vatrate' => '21.0000', 'countryregion' => '2'],
+                    ['vattype' => 'parked', 'vatrate' => '12.0000', 'countryregion' => '2'],
+                    ['vattype' => 'reduced', 'vatrate' => '0.0000', 'countryregion' => '2'],
+                ],
+            ],
+            'eu-no-date' => [['be'],
+                [
+                    ['vattype' => 'reduced', 'vatrate' => '6.0000', 'countryregion' => '2'],
+                    ['vattype' => 'reduced', 'vatrate' => '12.0000', 'countryregion' => '2'],
+                    ['vattype' => 'normal', 'vatrate' => '21.0000', 'countryregion' => '2'],
+                    ['vattype' => 'parked', 'vatrate' => '12.0000', 'countryregion' => '2'],
+                    ['vattype' => 'reduced', 'vatrate' => '0.0000', 'countryregion' => '2'],
+                ],
+            ],
             'eu-wrong-date' => [['be', '2014-12-01'], []],
-            'gb-eu' => [['gb', '2020-12-01'], [['vattype' => 'reduced', 'vatrate' => '0.0000'],['vattype' => 'reduced', 'vatrate' => '5.0000'],['vattype' => 'normal', 'vatrate' => '20.0000']]],
+            'gb-eu' => [['gb', '2020-12-01'],
+                [
+                    ['vattype' => 'reduced', 'vatrate' => '0.0000', 'countryregion' => '2'],
+                    ['vattype' => 'reduced', 'vatrate' => '5.0000', 'countryregion' => '2'],
+                    ['vattype' => 'normal', 'vatrate' => '20.0000', 'countryregion' => '2'],
+                ],
+            ],
+            'gb-no-eu' => [['gb', '2021-01-01'],
+                [
+                    ['vattype' => 'reduced', 'vatrate' => '0.0000', 'countryregion' => '3'],
+                    ['vattype' => 'reduced', 'vatrate' => '5.0000', 'countryregion' => '3'],
+                    ['vattype' => 'normal', 'vatrate' => '20.0000', 'countryregion' => '3'],
+                ],
+            ],
             'no-eu' => [['af', '2020-12-01'], []],
         ];
     }
@@ -143,7 +179,7 @@ class AcumulusTest extends TestCase
         $this->assertSame(Severity::Success, $result->getStatus());
         $actual = $result->getResponse();
         $threshold = $actual['threshold'];
-        $this->assertSame(10000, $threshold);
+        $this->assertEquals(10000, $threshold);
     }
 
     /**
@@ -165,7 +201,7 @@ class AcumulusTest extends TestCase
         $this->assertSame(Severity::Success, $result->getStatus());
         $actual = $result->getResponse();
         $threshold = $actual['threshold'];
-        $this->assertSame(10000, $threshold);
+        $this->assertEquals(10000, $threshold);
     }
 
     public function stockAddProvider(): array
@@ -183,11 +219,10 @@ class AcumulusTest extends TestCase
     public function testStockAdd(array $args, array $expected)
     {
         $result = $this->acumulusClient->stockAdd(... $args);
+
         $this->assertSame(Severity::Success, $result->getStatus());
-
-
         $actual = $result->getResponse();
-        $this->assertSame($expected, $actual);
+        $this->assertEqualsCanonicalizing($expected, $actual);
     }
 
     /*

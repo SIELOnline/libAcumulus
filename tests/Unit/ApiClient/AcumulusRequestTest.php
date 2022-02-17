@@ -24,7 +24,7 @@ class AcumulusRequestTest extends TestCase
     protected function setUp(): void
     {
         $language = 'nl';
-        $container = new Container('TestWebShop', $language);
+        $container = new Container('TestWebShop\TestDoubles', $language);
         $this->acumulusRequest = $container->getAcumulusRequest();
     }
 

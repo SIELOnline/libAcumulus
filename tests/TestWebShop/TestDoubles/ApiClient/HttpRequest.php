@@ -1,5 +1,5 @@
 <?php
-namespace Siel\Acumulus\TestWebShop\ApiClient;
+namespace Siel\Acumulus\TestWebShop\TestDoubles\ApiClient;
 
 use Siel\Acumulus\ApiClient\HttpRequest as BaseHttpRequest;
 use Siel\Acumulus\ApiClient\HttpResponse;

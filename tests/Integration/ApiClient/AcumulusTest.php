@@ -116,6 +116,16 @@ class AcumulusTest extends TestCase
                     ['vattype' => 'normal', 'vatrate' => '20.0000', 'countryregion' => Api::Region_World],
                 ],
             ],
+            'xi' => [['xi', '2022-02-01'],
+                [
+                    ['vattype' => 'reduced', 'vatrate' => '0.0000', 'countryregion' => Api::Region_EU],
+                    ['vattype' => 'reduced', 'vatrate' => '5.0000', 'countryregion' => Api::Region_EU],
+                    ['vattype' => 'normal', 'vatrate' => '20.0000', 'countryregion' => Api::Region_EU],
+                    ['vattype' => 'reduced', 'vatrate' => '0.0000', 'countryregion' => Api::Region_World],
+                    ['vattype' => 'reduced', 'vatrate' => '5.0000', 'countryregion' => Api::Region_World],
+                    ['vattype' => 'normal', 'vatrate' => '20.0000', 'countryregion' => Api::Region_World],
+                ],
+            ],
             'world' => [['af', '2020-12-01'], []],
         ];
     }
@@ -128,14 +138,14 @@ class AcumulusTest extends TestCase
         $result = $this->acumulusClient->getVatInfo(... $args);
         $this->assertSame(Severity::Success, $result->getStatus());
 
-        $vatrate  = array_column($expected, 'vatrate');
-        $vattype = array_column($expected, 'vattype');
-        array_multisort($vatrate, SORT_DESC, $vattype, SORT_ASC, $expected);
+        $vatRate  = array_column($expected, 'vatrate');
+        $vatType = array_column($expected, 'vattype');
+        array_multisort($vatRate, SORT_DESC, $vatType, SORT_ASC, $expected);
 
         $actual = $result->getResponse();
-        $vatrate  = array_column($actual, 'vatrate');
-        $vattype = array_column($actual, 'vattype');
-        array_multisort($vatrate, SORT_DESC, $vattype, SORT_ASC, $actual);
+        $vatRate  = array_column($actual, 'vatrate');
+        $vatType = array_column($actual, 'vattype');
+        array_multisort($vatRate, SORT_DESC, $vatType, SORT_ASC, $actual);
 
         $this->assertEquals($expected, $actual);
     }
@@ -145,7 +155,7 @@ class AcumulusTest extends TestCase
      */
     public function testGetVatInfoInvalidCountryCode()
     {
-        $result = $this->acumulusClient->getVatInfo('ln', '2020-12-01');
+        $result = $this->acumulusClient->getVatInfo('ln', '2022-01-01');
         $this->assertSame(Severity::Error, $result->getStatus());
         $this->assertNotEmpty($result->getByCodeTag('AA6A45AA'));
     }

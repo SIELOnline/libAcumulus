@@ -22,10 +22,18 @@ WC2 = WooCommerce 2 (wordt niet meer ondersteund vanaf onze versie 5.5.2)
 ------------------
 Features:
 - ALL: Added support for the vat rules regarding the UK and Northern Ireland!
+    * For the UK it is now possible to use the UK vat rates with vat type = 7
+      (other foreign vat).
+    * Addresses in Northern Ireland are given country code 'XI', and for this
+      "country" vat types 3 (EU reversed vat) or 6 (EU vat) are allowed (for
+      goods) as well as vat types = 1 (Dutch vat with vat or vat free) or 7
+      (other foreign vat) for services.
 
-- ALL: Added support for the API v5.0 changes to the vat_info API call: the
-  'countryregion' is now also returned, allowing once more to decide if a
-  country is EU or not. Older versions of this library will now erroneously
+- ALL: Added support for the API v5.0 changes to the vat_info API call: Vat
+  rates for GB are now (again) returned, but with an additional field: the
+  'countryregion'. This allows to decide if a country is EU or not or if
+  special vat arrangements are made (UK and Northern Ireland). Note that with
+  this change in the API, older versions of this library will now erroneously
   decide that GB is EU.
 
 Bugs:
@@ -61,9 +69,9 @@ Refactorings:
 - ALL: Completor::getVatRatesByCountryAndInvoiceDate() now returns an array of
   vat infos instead of an array of vat rates.
 - ALL: Result::simplifyResponse() now changed to return an empty list when
-  a list is expected but the main repsonse key was not found: This probably
+  a list is expected but the main response key was not found: This probably
   indicates an error but that should be found out e.g by checking the status or
-  the messages. simplifyResponse() is aninternal method but influences the
+  the messages. simplifyResponse() is an internal method but influences the
   return value of Result::getResponse().
 
 6.3.7 (2022-01-22)

@@ -428,7 +428,7 @@ class Completor
                     break;
                 case Api::VatType_EuVat:
                     /** @noinspection DuplicatedCode @todo: remove duplication.*/
-                    $countryVatInfos = $this->getVatRatesByCountryAndInvoiceDate($this->invoice[Tag::Customer][Tag::CountryCode]);
+                    $countryVatInfos = $this->getVatRatesByCountryAndInvoiceDate($this->invoice[Tag::Customer][Tag::CountryCode], Api::Region_EU);
                     $vatTypeVatRates = [];
                     // Only add those EU vat rates that are possible given
                     // the plugin settings.
@@ -462,7 +462,7 @@ class Completor
                     break;
                 case Api::VatType_OtherForeignVat:
                     /** @noinspection DuplicatedCode @todo: remove duplication.*/
-                    $countryVatInfos = $this->getVatRatesByCountryAndInvoiceDate($this->invoice[Tag::Customer][Tag::CountryCode]);
+                    $countryVatInfos = $this->getVatRatesByCountryAndInvoiceDate($this->invoice[Tag::Customer][Tag::CountryCode], Api::Region_World);
                     $vatTypeVatRates = [];
                     // Only add those EU vat rates that are possible given
                     // the plugin settings.
@@ -1476,19 +1476,30 @@ class Completor
      *
      * @param string $countryCode
      *   The country code of the country to fetch the vat rates for.
+     * @param int $region
+     *   One of the Api::Region_... constants to filter the vat rates by the
+     *   region of the country. Countries may, even at one given date, fiscally
+     *   be handled like an EU country OR a country outside the EU. At this
+     *   moment, early 2022, only Northern Ireland, part of UK, is such a
+     *   "country".
      *
      * @return array[]
-     *   A non-keyed array of "vat info" arrays, each "vat info" array being a
-     *   keyed array with keys as defined by
-     *   {@see \Siel\Acumulus\ApiClient\Acumulus::getVatInfo()}.
+     *   A numerically indexed array of "vat info" arrays, each "vat info" array
+     *   being a keyed array with keys as defined by
+     *   {@see \Siel\Acumulus\ApiClient\Acumulus::getVatInfo()}. The empty array
+     *   if no vat rates are kept for the given country and invoice date, i.e.
+     *   non EU, non GB countries.
      */
-    protected function getVatRatesByCountryAndInvoiceDate($countryCode)
+    protected function getVatRatesByCountryAndInvoiceDate($countryCode, $region = Api::Region_NotSet)
     {
         $countryCode = strtoupper($countryCode);
         $date = $this->getInvoiceDate();
         $cacheKey = "$countryCode&$date";
         if (!isset($this->vatRatesCache[$cacheKey])) {
             $result = $this->acumulusApiClient->getVatInfo($countryCode, $date);
+            if ($result->hasRealMessages() && $countryCode === 'XI') {
+                $result = $this->acumulusApiClient->getVatInfo('GB', $date);
+            }
             if ($result->hasRealMessages()) {
                 $this->result->addMessages($result->getMessages(Severity::InfoOrWorse));
                 $result = [];
@@ -1497,7 +1508,13 @@ class Completor
             }
             $this->vatRatesCache[$cacheKey] = $result;
         }
-        return $this->vatRatesCache[$cacheKey];
+        $result = $this->vatRatesCache[$cacheKey];
+        if ($region !== Api::Region_NotSet) {
+            $result = array_filter($result, function($value) use ($region) {
+                return $value['countryregion'] == $region;
+            });
+        }
+        return $result;
     }
 
     /**
@@ -1531,28 +1548,21 @@ class Completor
      * returns true, vat type 3 - EU reversed vat - and 6 - foreign EU vat - are
      * allowed.
      *
+     * Note: Northern Ireland, part of the UK (country code = GB), is handled
+     * differently. This method wil return false for Northern Ireland, but vat
+     * type 3 and 6 will be allowed.
+     *
      * @return bool
      */
     protected function isEu()
     {
         $result = false;
         if (!$this->isNl()) {
-
             $vatInfos = $this->getVatRatesByCountryAndInvoiceDate($this->invoice[Tag::Customer][Tag::CountryCode]);
             $regions = array_unique(array_column($vatInfos, Tag::CountryRegion));
-            $result = in_array(Api::Region_EU, $regions);
+            $result = count($regions) === 1 && reset($regions) == Api::Region_EU;
         }
         return $result;
-    }
-
-    /**
-     * Returns whether the invoice date is post brexit
-     *
-     * @return bool
-     */
-    protected function isPostBrexit()
-    {
-        return $this->getInvoiceDate() >= '2021-01-01';
     }
 
     /**
@@ -1564,8 +1574,7 @@ class Completor
      */
     protected function isUk()
     {
-        return in_array(strtoupper($this->invoice[Tag::Customer][Tag::CountryCode]), ['GB', 'XI'])
-            && $this->isPostBrexit();
+        return in_array(strtoupper($this->invoice[Tag::Customer][Tag::CountryCode]), ['GB', 'XI']);
     }
 
     /**

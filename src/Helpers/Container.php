@@ -1,7 +1,7 @@
 <?php
 namespace Siel\Acumulus;
 
-const Version = '6.4.0-beta1';
+const Version = '6.4.0';
 
 namespace Siel\Acumulus\Helpers;
 
@@ -24,10 +24,9 @@ use const Siel\Acumulus\Version;
  *   available as well. These getters also takes care of getting the constructor
  *   arguments.
  * * By default only a single instance is created and this instance is returned
- *   on each subsequent request for an instance of that type. The strongly typed
- *   getters do know when this behaviour is not wanted (mostly when specific
- *   arguments have to be passed) and will create fresh instances in those
- *   cases.
+ *   on each subsequent request for an instance of that type. The typed getters
+ *   do know when this behaviour is not wanted (mostly when specific arguments
+ *   have to be passed) and will create fresh instances in those cases.
  *
  * Creating the container
  * ----------------------

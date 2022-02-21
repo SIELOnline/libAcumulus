@@ -18,7 +18,7 @@ VM3 = VirtueMart3 (Joomla)
 WC  = WooCommerce 5 (WC 4 en 3 zullen waarschijnlijk ook werken)
 WC2 = WooCommerce 2 (wordt niet meer ondersteund vanaf onze versie 5.5.2)
 
-6.4.0 (2022-02-??)
+6.4.0 (2022-02-21)
 ------------------
 Features:
 - ALL: Added support for the vat rules regarding the UK and Northern Ireland!
@@ -28,13 +28,12 @@ Features:
       "country" vat types 3 (EU reversed vat) or 6 (EU vat) are allowed (for
       goods) as well as vat types = 1 (Dutch vat with vat or vat free) or 7
       (other foreign vat) for services.
-
 - ALL: Added support for the API v5.0 changes to the vat_info API call: Vat
   rates for GB are now (again) returned, but with an additional field: the
-  'countryregion'. This allows to decide if a country is EU or not or if
-  special vat arrangements are made (UK and Northern Ireland). Note that with
-  this change in the API, older versions of this library will now erroneously
-  decide that GB is EU.
+  'countryregion'. This allows to decide if a country is EU, or if special vat
+  arrangements are made (UK and Northern Ireland). Note that with this change in
+  the API, older versions of this library will now erroneously decide that GB is
+  EU!
 
 Bugs:
 - ALL: Warnings can be added to the invoice data that is sent to Acumulus. These

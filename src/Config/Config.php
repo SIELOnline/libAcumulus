@@ -1421,7 +1421,7 @@ class Config
     /**
      * 6.3.0 upgrade.
      *
-     * - Only 1 setting for type of tax (foreign, free, 0).
+     * - Only 1 setting for type of tax and its classes (foreign, free, 0).
      *
      * @return bool
      */

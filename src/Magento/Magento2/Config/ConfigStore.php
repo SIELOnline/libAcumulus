@@ -18,8 +18,10 @@ class ConfigStore extends BaSeConfigStore
     public function load()
     {
         $values = $this->getConfigInterface()->getValue($this->configPath . $this->configKey);
-        $values = unserialize($values);
-        return $values;
+        if (!empty($values) && is_string($values)) {
+            $values = unserialize($values);
+        }
+        return is_array($values) ? $values : [];
     }
 
     /**

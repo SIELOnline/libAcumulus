@@ -2,9 +2,9 @@
 namespace Siel\Acumulus\Helpers;
 
 /**
- * Defines and checks the requirements for this library. Used on install.
+ * Defines and checks the requirements for this library. Used on installation.
  *
- * Override if the library for your webshop has additional requirements.
+ * Override if the library for your web shop has additional requirements.
  */
 class Requirements
 {

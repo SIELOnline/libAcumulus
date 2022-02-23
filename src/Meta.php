@@ -86,7 +86,7 @@ interface Meta
     /**
      * Creator -> Completor: (current) vat class id looked up from e.g. the
      * product or shipping settings. Can be used to differentiate between vat
-     * type 1 and 6 when foreign vat rate equals that of NL.
+     * type 1 and 6 when a foreign vat rate equals that of NL.
      */
     const VatClassId = 'meta-vatclass-id';
     /**

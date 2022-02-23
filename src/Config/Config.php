@@ -1,4 +1,9 @@
 <?php
+/**
+ * @noinspection PhpMissingParamTypeInspection
+ * @noinspection PhpMissingReturnTypeInspection
+ */
+
 namespace Siel\Acumulus\Config;
 
 use Exception;
@@ -40,9 +45,9 @@ class Config
     const InvoiceDate_Transfer = 3;
 
     const Nature_Unknown = 0;
-    const Nature_Both = 1;
+    const Nature_Services = 1;
     const Nature_Products = 2;
-    const Nature_Services = 3;
+    const Nature_Both = 3;
 
     const MarginProducts_Unknown = 0;
     const MarginProducts_Both = 1;
@@ -402,7 +407,7 @@ class Config
      *   A keyed array with the keys:
      *   - nature_shop
      *   - marginProducts
-     *   - foreignVatClasses
+     *   - euVatClasses
      *   - vatFreeClass
      *   - zeroVatClass
      *   - invoiceNrSource
@@ -558,10 +563,9 @@ class Config
     protected function getConfigDefaults()
     {
         $result = $this->getKeyInfo();
-        $result = array_map(function ($item) {
+        return array_map(function ($item) {
             return $item['default'];
         }, $result);
-        return $result;
     }
 
     /**
@@ -591,7 +595,7 @@ class Config
             $hostName = parse_url($_SERVER['REQUEST_URI'], PHP_URL_HOST);
         }
         if (!empty($hostName)) {
-            if ($pos = strpos($hostName, 'www.') !== false) {
+            if (($pos = strpos($hostName, 'www.')) !== false) {
                 $hostName = substr($hostName, $pos + strlen('www.'));
             }
         } else {
@@ -626,6 +630,16 @@ class Config
             $hostName = str_replace([' ', '@', '(', ')', '[', ']', '\\', ':', ';', '"', '<', '>', ','], '', $hostName);
 
             $this->keyInfo = [
+                // Keep track of the version of the config values. This allows
+                // us to make changes to the config like reassigning values,
+                // renaming config keys, etc. and be able to execute an update
+                // function without being dependent on the host system to
+                // provide the current "data model" version.
+                'configVersion' => [
+                    'group' => 'config',
+                    'type' => 'string',
+                    'default' => '',
+                ],
                 'baseUri' => [
                     'group' => 'environment',
                     'type' => 'string',
@@ -931,7 +945,7 @@ class Config
                     'type' => 'int',
                     'default' => Config::MarginProducts_Unknown,
                 ],
-                'foreignVatClasses' => [
+                'euVatClasses' => [
                     'group' => 'shop',
                     'type' => 'array',
                     'default' => [],
@@ -1002,7 +1016,7 @@ class Config
                     'default' => '',
                 ],
                 // For now, we do not make message configurable...
-                // For now we don't present the confirmReading option in the UI.
+                // For now, we don't present the confirmReading option in the UI.
                 'confirmReading' => [
                     'group' => Tag::EmailAsPdf,
                     'type' => 'bool',
@@ -1034,12 +1048,23 @@ class Config
     }
 
     /**
-     * Upgrade the datamodel to the given version.
+     * Upgrade the data model to the given version.
      *
      * This method is only called when the module gets updated.
      *
+     * Notes:
+     * - If possible values for a config key are re-assigned, the default, which
+     *   comes from code in this class, will already be the newly assigned
+     *   value. So when updating, we should only update values stored in the
+     *   database. Therefore, in the methods below, you will see that the values
+     *   are "loaded" using the ConfigStore, not the load() method of this
+     *   class.
+     * - $currentVersion can be empty if the host environment cannot deliver
+     *   this value (MA2.4). If so, we switch to using a new key 'configVersion'
+     *   in the set of config values.
+     *
      * @param string $currentVersion
-     *   The current version of the module.
+     *   The current version of the data model of this module.
      *
      * @return bool
      *   Success.
@@ -1048,6 +1073,17 @@ class Config
      */
     public function upgrade($currentVersion)
     {
+        if ($currentVersion === '') {
+            $configVersion = $this->get('configVersion');
+            // If the 'configVersion' has not yet been set, we have to guess it.
+            // The 6.0.0 update is not idempotent, whereas the 6.3.1 update is,
+            // So we "guess" 6.3.0, making this work for everybody running on
+            // 6.0.1 or later (release date 2020-08-06). If running an older
+            // version before updating, some config values may be interpreted
+            // incorrectly.
+            $currentVersion = !empty($configVersion) ? $configVersion : '6.3.0';
+        }
+
         $result = true;
 
         if (version_compare($currentVersion, '4.5.0', '<')) {
@@ -1098,6 +1134,14 @@ class Config
             $result = $this->upgrade631() && $result;
         }
 
+        if (version_compare($currentVersion, '6.4.0', '<')) {
+            $result = $this->upgrade640() && $result;
+        }
+
+        if (version_compare($currentVersion, '6.4.1', '<')) {
+            $result = $this->upgrade641() && $result;
+        }
+
         return $result;
     }
 
@@ -1133,6 +1177,7 @@ class Config
         }
 
         // 2) Debug mode.
+        /** @noinspection PhpSwitchStatementWitSingleBranchInspection */
         switch ($this->get('debug')) {
             case 4: // Value for deprecated PluginConfig::Debug_StayLocal.
                 $newSettings['logLevel'] = Config::Send_TestMode;
@@ -1278,8 +1323,8 @@ class Config
     {
         $result = true;
         $doSave = false;
-        $configStore = $this->getConfigStore();
-        $values = $configStore->load();
+        $this->load();
+        $values = $this->values;
         array_walk_recursive($values, function(&$value) use (&$doSave) {
             if (is_string($value) && strpos($value, 'originalInvoiceSource::') !== false) {
                 $value = str_replace('originalInvoiceSource::', 'order::', $value);
@@ -1353,18 +1398,22 @@ class Config
             throw new Exception(implode(';', $messages));
         }
 
+        $configStore = $this->getConfigStore();
+        $values = $configStore->load();
         $newSettings = [];
-        switch ($this->get('logLevel')) {
-            case 3 /*Log::Notice*/:
-                $newSettings['logLevel'] = Severity::Notice;
-                break;
-            case 4 /*Log::Info*/:
-            default:
-                $newSettings['logLevel'] = Severity::Info;
-                break;
-            case 5 /*Log::Debug*/:
-                $newSettings['logLevel'] = Severity::Log;
-                break;
+        if (isset($values['logLevel'])) {
+            switch ($values('logLevel')) {
+                case 3 /*Log::Notice*/ :
+                    $newSettings['logLevel'] = Severity::Notice;
+                    break;
+                case 4 /*Log::Info*/ :
+                default:
+                    $newSettings['logLevel'] = Severity::Info;
+                    break;
+                case 5 /*Log::Debug*/ :
+                    $newSettings['logLevel'] = Severity::Log;
+                    break;
+            }
         }
         return $this->save($newSettings);
     }
@@ -1372,7 +1421,7 @@ class Config
     /**
      * 6.3.0 upgrade.
      *
-     * - Only 1 setting for type of tax (foreign, free, 0).
+     * - Only 1 setting for type of tax and its classes (foreign, free, 0).
      *
      * @return bool
      */
@@ -1418,5 +1467,60 @@ class Config
         unset($values['zeroVatProducts']);
 
         return $this->save($values);
+    }
+
+    /**
+     * 6.4.0 upgrade.
+     *
+     * - values for setting nature_shop changed into combinable bit values.
+     * - foreignVatClasses renamed to euVatClasses.
+     *
+     * @return bool
+     */
+    protected function upgrade640()
+    {
+        $configStore = $this->getConfigStore();
+        $values = $configStore->load();
+
+        // Nature constants Services and Both are switched.
+        if (isset($values['nature_shop'])) {
+            switch ($values['nature_shop']) {
+                case 1:
+                    $values['nature_shop'] = 3;
+                    break;
+                case 3:
+                    $values['nature_shop'] = 1;
+                    break;
+            }
+        } else {
+            $values['nature_shop'] = static::Nature_Unknown;
+        }
+
+        // foreignVatClasses renamed to euVatClasses.
+        if (isset($values['foreignVatClasses'])) {
+            $values['euVatClasses'] = $values['foreignVatClasses'];
+            unset($values['foreignVatClasses']);
+        } else {
+            $values['euVatClasses'] = [];
+        }
+
+        $this->log->notice('Config: updated to 6.4.0');
+        return $this->save($values);
+    }
+
+    /**
+     * 6.4.1 upgrade.
+     *
+     * - We now store the data model version in the config.
+     *
+     * @return bool
+     */
+    protected function upgrade641()
+    {
+        $newSettings = [];
+        $newSettings['configVersion'] = '6.4.1';
+
+        $this->log->notice('Config: updated to 6.4.1');
+        return $this->save($newSettings);
     }
 }

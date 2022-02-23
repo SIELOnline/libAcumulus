@@ -2,13 +2,11 @@
 namespace Siel\Acumulus\Helpers;
 
 /**
- * Class Countries defines country related features.
- *
- * These features include:
- * * Country codes
- * * Country names (in Dutch)
- * * Fiscal EU countries
- * * Conversion from EU country codes to ISO country codes.
+ * Class Countries defines country related features, including:
+ * - Country codes
+ * - Country names (in Dutch)
+ * - Fiscal EU countries
+ * - Conversion from EU country codes to ISO country codes.
  */
 class Countries
 {
@@ -19,7 +17,7 @@ class Countries
      * as soon we support a web shop with a different way of storing countries.
      *
      * @param string $countryCode
-     *   Case insensitive ISO 3166-1 alpha-2 country code.
+     *   Case-insensitive ISO 3166-1 alpha-2 country code.
      *
      * @return bool
      */
@@ -29,68 +27,9 @@ class Countries
     }
 
     /**
-     * Returns whether the country is a EU country outside the Netherlands.
-     *
-     * This method determines whether a country is in or outside the EU based on
-     * fiscal handling of invoices to customers in that country. If vattype 3 -
-     * EU reversed vat - or 6 - foreignvat - is possible it is considered to be
-     * in the EU.
-     *
-     * For now only the alpha-2 codes are allowed. Other notations will be added
-     * as soon we support a web shop with a different way of storing countries.
-     *
-     * @param string $countryCode
-     *   Case insensitive ISO 3166-1 alpha-2 country code.
-     *
-     * @return bool
-     *
-     * @deprecated: Not brexit-proof, do no longer use, use a solution as in
-     *   Completor::isEu().
-     */
-    public function isEu($countryCode)
-    {
-        // Sources:
-        // - https://publications.europa.eu/code/pdf/370000en.htm
-        // - https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
-        // EFTA countries are not part of this list because regarding invoicing
-        // they are considered to be outside of the EU.
-        $euCountryCodes = [
-            'BE',
-            'BG',
-            'CZ',
-            'DK',
-            'DE',
-            'EE',
-            'IE',
-            'ES',
-            'FR',
-            'GB', // Great Britain/United Kingdom according to ISO.
-            'GR', // Greece according to the ISO
-            'HR',
-            'IT',
-            'CY',
-            'LV',
-            'LT',
-            'LU',
-            'HU',
-            'MT',
-            //'NL', In EU, but here we want "in EU but outside the Netherlands".
-            'AT',
-            'PL',
-            'PT',
-            'RO',
-            'SI',
-            'SK',
-            'FI',
-            'SE',
-        ];
-        return in_array(strtoupper($countryCode), $euCountryCodes);
-    }
-
-    /**
      * Converts EU country codes to their ISO equivalent:
      *
-     * The EU has 2 country codes that differ form ISO:
+     * The EU has 2 country codes that differ from ISO:
      * - UK instead of GB
      * - EL instead of GR.
      *
@@ -120,6 +59,9 @@ class Countries
      * @return string
      *   The (Dutch) name of the country or the empty string if the code could
      *   not be looked up.
+     *
+     * @todo: deprecate by replacing it with using countryautoname or a call to
+     *   https://www.siel.nl/acumulus/API/Picklists/Countries/ (cache results)
      */
     public function getCountryName($countryCode)
     {

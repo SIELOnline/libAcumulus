@@ -13,14 +13,14 @@ This Acumulus web service API library was written to simplify development of
 client side code that communicates with the Acumulus web service. It therefore
 specifically aims at a Dutch based public.
 
-It is currently used by the extensions for the webshop software of HikaShop,
+It is currently used by the extensions for the web shop software of HikaShop,
 Magento, PrestaShop, OpenCart, VirtueMart and WooCommerce, but was built to be
-easily usable with other webshop/CMS software systems as well.
+easily usable with other web shop/CMS software systems as well.
 
 Note to extension/plugin/module reviewers
 -----------------------------------------
-This is a cross webshop/CMS library and can therefore not comply with often
-conflicting coding standards and guidelines for a specific webshop or CMS
+This is a cross web shop/CMS library and can therefore not comply with often
+conflicting coding standards and guidelines for a specific web shop or CMS
 package. We ask for your understanding in these.
 
 This library uses:
@@ -28,7 +28,7 @@ This library uses:
  - The PSR-2 coding standards.
  - Phpdoc to fully document each and every part of the code.
  - When needed, its own PSR-4 autoloader to circumvent the fact that many
-   webshop/CMS systems still live in the pre PSR4 autoloading era, meaning that
+   web shop/CMS systems still live in the pre PSR4 autoloading era, meaning that
    if an autoloader already exists it often won't work with the PSR4 standard.
  - Its own translation system to present this library in English and Dutch.
  - Its own form renderer/builder.
@@ -37,11 +37,11 @@ This library may deviate from specific coding standards in a.o. these ways:
 
  - Classes are placed in namespaces following the PSR4 structure and may
    therefore need to register its own autoloader function and not use the
-   webshop/CMS specific one.
+   web shop/CMS specific one.
  - Class constants are in StudlyCaps.
  - Class properties are in camelCase.
  - Form definitions are placed in the library and are also rendered/built in
-   the library, but do follow form guidelines specific to the webshop/CMS
+   the library, but do follow form guidelines specific to the web shop/CMS
    package.
  - Translation is done using an own included translation system and is only
    done in Dutch and English. As the online SIEL Acumulus service only targets
@@ -66,6 +66,6 @@ This library is still under development and will:
  - where possible and useful be further abstracted.
 
 In doing so, backwards compatibility is a consideration but not a must. Because
-the webshop plugins are delivered with this library this is no problem for the
+the web shop plugins are delivered with this library this is no problem for the
 users, However, developers that are developing their own software on top of this
 library should carefully check new releases for backwards incompatibilities.

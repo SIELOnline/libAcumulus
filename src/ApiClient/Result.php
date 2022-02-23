@@ -318,22 +318,34 @@ class Result extends MessageCollection
     {
         // Simplify response by removing main key (which should be the only
         // remaining one).
-        if (!empty($this->mainResponseKey) && isset($response[$this->mainResponseKey])) {
-            $response = $response[$this->mainResponseKey];
+        if (!empty($this->mainResponseKey)) {
+            if (isset($response[$this->mainResponseKey])) {
+                $response = $response[$this->mainResponseKey];
 
-            if ($this->isList) {
-                // Check for an empty list result.
-                if (!empty($response)) {
-                    // Not empty: remove further indirection, i.e. get value of
-                    // "singular", which will be the first (and only) key.
-                    $response = reset($response);
-                    // If there was only 1 list result, it wasn't put in an array.
-                    if (!is_array(reset($response))) {
-                        $response = [$response];
+                if ($this->isList) {
+                    // Check for an empty list result.
+                    if (!empty($response)) {
+                        // Not empty: remove further indirection, i.e. get value of
+                        // "singular", which will be the first (and only) key.
+                        $response = reset($response);
+                        // If there was only 1 list result, it wasn't put in an array.
+                        if (!is_array(reset($response))) {
+                            $response = [$response];
+                        }
                     }
+                }
+            } else {
+                // Not set: probably an error occurred. This object offers ways
+                // to discover so. Therefore, we return an empty list if it
+                // should have been a list.
+                // @todo: should we return null or an empty array for a non list
+                //   response?
+                if ($this->isList) {
+                    $response = [];
                 }
             }
         }
+
         return $response;
     }
 

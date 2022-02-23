@@ -58,8 +58,8 @@ class Number
         $minDenominator = (float) $denominator - $denominatorHalfRange;
         $maxDenominator = (float) $denominator + $denominatorHalfRange;
 
-        // We get the min value of the division by dividing the minimum numerator by
-        // the maximum denominator and vice versa.
+        // We get the min value of the division by dividing the minimum
+        // numerator by the maximum denominator and vice versa.
         $min = $minNumerator / $maxDenominator;
         $max = $maxNumerator / $minDenominator;
         $calculated = $numerator / $denominator;
@@ -75,7 +75,7 @@ class Number
      * @param float $maxDiff
      *
      * @return bool
-     *   True if the the floats are "equal", i.e. do not differ more than the
+     *   True if the floats are "equal", i.e. do not differ more than the
      *   specified maximum difference.
      */
     public static function floatsAreEqual($f1, $f2, $maxDiff = 0.0051)

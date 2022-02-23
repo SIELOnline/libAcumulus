@@ -124,7 +124,7 @@ class Creator extends BaseCreator
             } elseif (count($item->order_product_tax_info) === 0) {
                 $result[Meta::VatClassId] = Config::VatClass_Null;
             } else {
-                $result[Meta::Warning] = 'Cumulative vat rates applied: unknown in NL';
+                $this->addWarning($result, 'Cumulative vat rates applied: unknown in NL');
             }
         }
 
@@ -361,11 +361,11 @@ class Creator extends BaseCreator
                     }
                     if (!Number::floatsAreEqual($shippingMethodAmountIncTotal, $price->price_with_tax)) {
                         // Problem: rates have probably changed.
-                        $result[count($result) - 1][Meta::Warning] =
+                        $this->$this->addWarning($result[count($result) - 1],
                             'Amounts for this shipping method do not add up: rates have probably changed.'
                             . ' (order_shipping_params->prices = '
                             . json_encode($this->order->order_shipping_params->prices)
-                            . ')';
+                            . ')');
                         $warningAdded = true;
                     }
                 }
@@ -378,10 +378,11 @@ class Creator extends BaseCreator
                 // changed: we will already have discovered that above, so we do
                 // not produce this warning here.)
                 if (!$warningAdded) {
-                    $result[count($result) - 1][Meta::Warning] = 'Amounts for the shipping method(s) do not add up: lost too much precision?'
+                    $this->addWarning($result[count($result) - 1],
+                        'Amounts for the shipping method(s) do not add up: lost too much precision?'
                         . ' (order_shipping_params->prices = '
                         . json_encode($this->order->order_shipping_params->prices)
-                        . ')';
+                        . ')');
                 }
             }
         }

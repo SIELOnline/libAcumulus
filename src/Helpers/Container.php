@@ -111,10 +111,10 @@ use const Siel\Acumulus\Version;
  * can define another level of namespace searching by calling
  * {@see Container::setCustomNamespace()}. This will define 1 additional
  * namespace to look for before the above list as defined by the $shopNamespace
- * argument is traversed. Taking the above example, and if you had set
- * 'MyShop\Custom' as custom namespace, the container will first look for the
- * class \MyShop\Custom\Invoice\Creator, before looking for the above list of
- * classes.
+ * argument is traversed. Taking the above example, and if you would have set
+ * 'MyShop\Custom' as custom namespace, the container
+ * will first look for the class \MyShop\Custom\Invoice\Creator, before
+ * looking for the above list of classes.
  *
  * By defining a custom namespace and placing your custom code in that
  * namespace, instead of changing the code in this library, it remains possible
@@ -129,7 +129,7 @@ class Container
      *   The base directory where the Acumulus library is located. This is used
      *   to check if the file that should contain a class exists before calling
      *   class_exists(). This is not a good practice and should only be done if
-     *   older autoloaders are used that generate errors or warnings if a class
+     *   older auto loaders are used that generate errors or warnings if a class
      *   is not found.
      *
      *   If this contains an empty value, no check will be performed.

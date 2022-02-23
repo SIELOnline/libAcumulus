@@ -76,7 +76,7 @@ class MoreAcumulusTranslations extends TranslationCollection
         'email_status_text' => 'We received errors on trying to communicate with you. Please log in on Acumulus for more info or to mark the problems as resolved.',
         'email_status_text_reason' => 'On trying to communicate with you, we received this message: "%1$s". Please log in on Acumulus for more info or to mark the problems as resolved.',
 
-        'info_block_eu_commerce_threshold_passed' => 'You are above the threshold up to which you may charge Dutch VAT for EU customers. As of now, and up to the end of the year, you must charge foreign VAT. Immediately change the VAT settings of your web shop and other sales channels.',
+        'info_block_eu_commerce_threshold_passed' => 'You are above the threshold up to which you may charge Dutch VAT for EU customers. As of now, and up to the end of the year, you must charge EU VAT. Immediately change the VAT settings of your web shop and other sales channels.',
         'info_block_eu_commerce_threshold_warning' => 'You are at %.1f%% of the threshold up to which you may charge Dutch VAT for EU customers. Start preparing to change your VAT settings of your web shop and other sales channels.',
         'info_block_eu_commerce_threshold_ok' => 'You are still way below the threshold up to which you may charge Dutch VAT for EU customers.',
     ];

@@ -25,7 +25,7 @@ interface Api
 
     // API result codes. Note that internally I want an increasing order of
     // worseness, so these constants are not used internally but mapped to the
-    // Severity:: constants.
+    // Severity::... constants.
     const Status_Success = 0;
     const Status_Warnings = 2;
     const Status_Errors = 1;
@@ -33,8 +33,8 @@ interface Api
 
     // ApiClient service related defaults.
     const baseUri = 'https://api.sielsystems.nl/acumulus';
-    const testUri = 'https://ng1.sielsystems.nl';
     const apiVersion = 'stable';
+    const apiVersionTest = 'dev';
     const outputFormat = 'json';
 
     // API related constants.
@@ -59,12 +59,18 @@ interface Api
     const VatTypeId_Private = 1; // or vat exempt business.
     const VatTypeId_Business = 2;
 
+    const Region_NotSet = 0;
+    const Region_Netherlands = 1;
+    const Region_EU = 2;
+    const Region_World = 3;
+
     const VatType_National = 1;
     const VatType_NationalReversed = 2;
     const VatType_EuReversed = 3;
     const VatType_RestOfWorld = 4;
     const VatType_MarginScheme = 5;
-    const VatType_ForeignVat = 6;
+    const VatType_EuVat = 6;
+    const VatType_OtherForeignVat = 7;
 
     const VatFree = -1;
 

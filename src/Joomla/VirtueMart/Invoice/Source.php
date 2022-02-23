@@ -22,7 +22,7 @@ class Source extends BaseSource
     {
         /** @var \VirtueMartModelOrders $orders */
         $orders = VmModel::getModel('orders');
-        $this->source = $orders->getMyOrderDetails($this->id);
+        $this->source = $orders->getOrder($this->id);
     }
 
     /**
@@ -181,18 +181,22 @@ class Source extends BaseSource
     }
 
     /**
-     * {@inheritdoc}
+     * See {@see getInvoiceReference}
+     *
+     * @noinspection PhpUnused
      */
-    public function getInvoiceReference()
+    public function getInvoiceReferenceOrder()
     {
-        return !empty($this->invoice['invoice_number']) ? $this->invoice['invoice_number'] : parent::getInvoiceReference();
+        return !empty($this->invoice['invoice_number']) ? $this->invoice['invoice_number'] : null;
     }
 
     /**
-     * {@inheritdoc}
+     * See {@see getInvoiceDate}
+     *
+     * @noinspection PhpUnused
      */
-    public function getInvoiceDate()
+    public function getInvoiceDateOrder()
     {
-        return !empty($this->invoice['created_on']) ? date(API::DateFormat_Iso, strtotime($this->invoice['created_on'])) : parent::getInvoiceDate();
+        return !empty($this->invoice['created_on']) ? date(API::DateFormat_Iso, strtotime($this->invoice['created_on'])) : null;
     }
 }

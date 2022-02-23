@@ -31,14 +31,14 @@ use TaxRulesGroup;
  * - Credit notes can get a correction line. They get one if the total amount
  *   does not match the sum of the lines added so far. This can happen if an
  *   amount was entered manually, or if discount(s) applied during the sale were
- *   subtracted from the credit amount but we could not find which discounts
+ *   subtracted from the credit amount, but we could not find which discounts
  *   this were. However:
- *   - amount is excl vat if not manually entered.
- *   - amount is incl vat if manually entered (assuming administrators enter
- *     amounts incl tax) and this is what gets listed on the credit PDF.
+ *   - amount is excl. vat if not manually entered.
+ *   - amount is incl. vat if manually entered (assuming administrators enter
+ *     amounts incl. tax) and this is what gets listed on the credit PDF.
  *   - Manually entered amounts do not have vat defined, so users should try not
  *     to use them.
- *   - shipping_cost_amount is excl vat.
+ *   - shipping_cost_amount is excl. vat.
  *   So this is never going to work in all situations!!!
  */
 class Creator extends BaseCreator
@@ -50,13 +50,18 @@ class Creator extends BaseCreator
     protected $creditSlip;
 
     /**
-     * Precision of amounts stored in PS. In PS you can enter either the price
-     * inc or ex vat. The other amount will be calculated and not rounded before
-     * being stored. So 0.0001 is on the safe side.
-     *
      * @var float
+     *   Precision: 1 of the amounts, probably the prince incl tax, is entered
+     *   by the admin and can thus be considered exact. The other is calculated
+     *   by the system and not rounded and can thus be considered to have a
+     *   precision better than 0.0001.
+     *
+     *   However, we have had a support call where the precision, for a credit
+     *   note, turned out to be only 0.002. This was, apparently, with a price
+     *   entered excl. vat: excl: 34,22; incl: 41,40378; (computed) vat: 7,18378.
+     *   The max-vat rate was just below 21%, so no match was made.
      */
-    protected $precision = 0.0001;
+    protected $precision = 0.005;
 
     /**
      * {@inheritdoc}
@@ -173,21 +178,17 @@ class Creator extends BaseCreator
         }
         $result[Tag::Quantity] = $item['product_quantity'];
 
-        // Get vat rate:
-        // The field 'rate' comes from order->getOrderDetailTaxes() and is only
-        // defined for orders and was not filled in before PS1.6.1.1. So, check
-        // if the field is available.
-        // The fields 'unit_amount' and 'total_amount' (table order_detail_tax)
-        // are based on the discounted product price and thus cannot be used to
-        // get the vat rate.
+        // Try to get the vat rate:
+        // The field 'rate' comes from order->getOrderDetailTaxes() and is thus
+        // only available for orders and was not filled before PS1.6.1.1. So,
+        // check if the field is available.
+        // The fields 'unit_amount' and 'total_amount' (also from table
+        // order_detail_tax) are based on the discounted product price and thus
+        // cannot be used to get the vat rate.
         if (isset($item['rate'])) {
             $result[Tag::VatRate] = $item['rate'];
             $result[Meta::VatRateSource] = Creator::VatRateSource_Exact;
         } else {
-            // Precision: 1 of the amounts, probably the prince incl tax, is
-            // entered by the admin and can thus be considered exact. The other
-            // is calculated by the system and not rounded and can thus be
-            // considered to have a precision better than 0.0001
             $result += $this->getVatRangeTags($sign * ($item['unit_price_tax_incl'] - $item['unit_price_tax_excl']),
                 $sign * $item['unit_price_tax_excl'],
                 $this->precision, $this->precision);

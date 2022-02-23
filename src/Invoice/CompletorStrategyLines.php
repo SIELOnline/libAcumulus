@@ -34,8 +34,8 @@ class CompletorStrategyLines
 
     /**
      * The list of possible vat types, initially filled with possible vat types
-     * type based on client country, invoiceHasLineWithVat(), is_company(), and
-     * the foreign vat setting.
+     * based on client country, invoiceHasLineWithVat(), is_company(), and the
+     * EU vat setting.
      *
      * @var int[]
      */

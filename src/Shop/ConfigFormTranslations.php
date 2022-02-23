@@ -74,8 +74,8 @@ class ConfigFormTranslations extends TranslationCollection
         'message_validate_email_0' => 'Het veld E-mail bevat geen geldig e-mailadres, vul uw eigen e-mailadres in.',
         'message_validate_email_1' => 'Het veld E-mail is verplicht, vul uw eigen e-mailadres in.',
         'message_validate_required_field' => 'Het veld "%1$s" is verplicht, kies een waarde.',
-        'message_validate_foreign_vat_classes_0' => 'Het veld "%1$s" is verplicht, kies één of meer waardes.',
-        'message_validate_foreign_vat_classes_1' => 'De keuze "%2$s" voor het veld "%1$s" kan niet gecombineerd worden met andere waardes.',
+        'message_validate_eu_vat_classes_0' => 'Het veld "%1$s" is verplicht, kies één of meer waardes.',
+        'message_validate_eu_vat_classes_1' => 'De keuze "%2$s" voor het veld "%1$s" kan niet gecombineerd worden met andere waardes.',
         'message_validate_zero_vat_class_0' => 'U moet verschillende %1$s gebruiken om onderscheid te maken tussen producten of diensten aan 0%% btw en die zijn vrijgesteld van btw.',
         'message_validate_conflicting_shop_options_1' => 'Als u alleen diensten verkoopt, kunt u geen margegoederen verkopen. Pas één van deze opties aan.',
         'message_validate_conflicting_shop_options_2' => 'Als u alleen margegoederen verkoopt, vink dan bij "Soort" aan dat u alleen producten verkoopt.',
@@ -101,8 +101,8 @@ class ConfigFormTranslations extends TranslationCollection
         'vat_class_not_applicable' => 'niet van toepassing',
         'vat_class_left_empty' => '%1$s laat ik leeg',
 
-        'field_foreignVatClasses' => 'Welke %1$s definiëren EU-btw-tarieven?',
-        'desc_foreignVatClasses' => 'Geef aan welke van deze %1$s gebruikt worden wanneer u buitenlandse btw berekent voor (niet btw-plichtige) EU-klanten.<br>
+        'field_euVatClasses' => 'Welke %1$s definiëren EU-btw-tarieven?',
+        'desc_euVatClasses' => 'Geef aan welke van deze %1$s gebruikt worden wanneer u EU btw berekent voor (niet btw-plichtige) EU-klanten.<br>
 • Kies de 1e optie ("%2$s") als u uw winkel (nog) niet hebt ingericht op deze regeling.<br>
 • Mbv de "Ctrl" toets kunt u meerdere %1$s kiezen of keuzes ongedaan maken.<br>
 • NB: Sinds 1 juli 2021 gelden er <a href="https://www.belastingdienst.nl/wps/wcm/connect/nl/btw/content/e-commerce-en-diensten-in-de-eu-kijk-wat-er-verandert-voor-de-btw-x" target="_blank">nieuwe regels en drempels voor afstandsverkopen binnen de EU</a> en vallen bijna alle goederen (en diensten) hieronder.',
@@ -278,7 +278,7 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
             . 'Deze %1$s kan een melding geven als u die drempel bijna heeft bereikt, en zal als u daadwerkelijk over de drempel heen gaat de factuur als concept versturen.<br>'
             . '• Vul een percentage in vanaf waar Acumulus een waarschuwing gaat geven. Gebroken percentages kunt u met een punt (.) aangeven. Het %%-teken mag u weglaten.<br>'
             . '• Vul 100 in als u geen waarschuwing vooraf wil, maar wel als u wilt dat de factuur als concept verstuurd moet worden als u met deze factuur over de drempel heen zou gaan of al bent.<br>'
-            . '• Vul 0 in als u vanaf het begin van het jaar buitenlandse btw rekent en een waarschuwing wilt ontvangen als er toch een artikel met een verkeerd btw-%% verkocht wordt.<br>'
+            . '• Vul 0 in als u vanaf het begin van het jaar EU btw rekent en een waarschuwing wilt ontvangen als er toch een artikel met een verkeerd btw-%% verkocht wordt.<br>'
             . '• Laat leeg als u deze functie niet wilt gebruiken.',
         'message_validate_percentage_0' => 'Vul een percentage (een getal tussen 0 en 100) in voor het veld "%s".',
 
@@ -458,8 +458,8 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'message_validate_email_0' => 'The field E-mail is not a valid e-mail address, please fill in your own e-mail address.',
         'message_validate_email_1' => 'The field E-mail is required, please fill in your own e-mail address.',
         'message_validate_required_field' => 'the field "%1$s" is required, please select a value.',
-        'message_validate_foreign_vat_classes_0' => 'The field \'%1$s\' is required, please select one or more values.',
-        'message_validate_foreign_vat_classes_1' => 'The choice "%2$s" for the field "%1$s" cannot be combined with other values.',
+        'message_validate_eu_vat_classes_0' => 'The field \'%1$s\' is required, please select one or more values.',
+        'message_validate_eu_vat_classes_1' => 'The choice "%2$s" for the field "%1$s" cannot be combined with other values.',
         'message_validate_zero_vat_class_0' => 'You must use different %1$s to distinguish between products or services subject to the 0%% VAT rate and those that are VAT free.',
         'message_validate_conflicting_shop_options_1' => 'If you only sell services, you cannot sell using the margin scheme. Change one of these options.',
         'message_validate_conflicting_shop_options_2' => 'If you only sell using the margin scheme, you should select that you only sell goods on the "Nature" field.',
@@ -485,9 +485,9 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'vat_class_not_applicable' => 'not applicable',
         'vat_class_left_empty' => 'I leave the %1$s empty',
 
-        'field_foreignVatClasses' => 'Which %1$s define EU vat rates?',
-        'desc_foreignVatClasses' => 'Indicate which of these %1$s are used when you charge foreign VAT to (non vat subjected) EU customers.
-Select the 1st option ("%2$s") when you have not (yet) configured your shop to use foreign vat.<br>
+        'field_euVatClasses' => 'Which %1$s define EU vat rates?',
+        'desc_euVatClasses' => 'Indicate which of these %1$s are used when you charge EU VAT to (non vat subjected) EU customers.
+Select the 1st option ("%2$s") when you have not (yet) configured your shop to use EU vat.<br>
 Using the "Ctrl" key, you can select/deselect multiple %1$s.<br>
 NB: As of 1 july 2021 <a href="https://www.belastingdienst.nl/wps/wcm/connect/nl/btw/content/e-commerce-en-diensten-in-de-eu-kijk-wat-er-verandert-voor-de-btw-x" target="_blank">new rules and thresholds for E-commerce sales within the EU (in Dutch)</a> apply to almost all goods (and services).',
 
@@ -657,11 +657,11 @@ If you unchecked the first option, the second option only applies to business cl
 
         'field_eu_commerce_threshold_percentage' => 'EU Commerce percentage',
         'desc_eu_commerce_threshold_percentage' => 'Acumulus keeps track of how many sales you already have made within the EU aggregated over all your sales channels. '
-                                                   . 'This %1$s can give you a warning when you are nearing the threshold above which you have to charge foreign VAT. If you are passing that threshold it will send all new invoices as a concept.<br>'
+                                                   . 'This %1$s can give you a warning when you are nearing the threshold above which you have to charge EU VAT. If you are passing that threshold it will send all new invoices as a concept.<br>'
                                                    . '• Enter a percentage as of which Acumulus should start warning you. use a decimal point if you wish to enter a fraction. The %%-sign is optional.<br>'
                                                    . '• Enter 100 if you don\'t want a warning, but want to send invoices as concept as soon as you are passing or already past the threshold.<br>'
-                                                   . '• Enter 0 if you use foreign VAT as of the start of the year and want to receive a warning when some misconfigured articles are sold.<br>'
-                                                   . '• Leave empty if yo do not want to use this feature.',
+                                                   . '• Enter 0 if you use EU VAT as of the start of the year and want to receive a warning when some misconfigured articles are sold.<br>'
+                                                   . '• Leave empty if you do not want to use this feature.',
         'message_validate_percentage_0' => 'Enter a percentage (a number between 0 and 100) in the field "%s".',
 
         'field_missing_amount' => 'Missing amount',

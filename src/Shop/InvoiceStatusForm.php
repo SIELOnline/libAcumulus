@@ -614,7 +614,7 @@ class InvoiceStatusForm extends Form
                         // FGYBSN048: concept id to old, cannot be tracked.
                         $invoiceStatus = static::Invoice_SentConcept;
                         $statusSeverity = static::Status_Warning;
-                        $description = $result->getByCodeTag('FGYBSN040') ? 'concept_conceptid_deleted' : $description = 'concept_no_conceptid';
+                        $description = $result->getByCodeTag('FGYBSN040') ? 'concept_conceptid_deleted' : 'concept_no_conceptid';
                         // Prevent this API call in the future, it will return
                         // the same result.
                         $this->acumulusEntryManager->save($source, null, null);
@@ -830,7 +830,7 @@ class InvoiceStatusForm extends Form
         } elseif (!empty($entry['marginscheme'])) {
             $vatType = API::VatType_MarginScheme;
         } elseif (!empty($entry['foreignvat'])) {
-            $vatType = API::VatType_ForeignVat;
+            $vatType = API::VatType_EuVat;
         } elseif (!empty($entry['foreignnoneu'])) {
             $vatType = API::VatType_RestOfWorld;
         } else {
@@ -940,7 +940,7 @@ class InvoiceStatusForm extends Form
     /**
      * Returns the amounts of this invoice.
      *
-     * To check if the amounts match we have to treat local and foreign vat the
+     * To check if the amounts match we have to treat local and EU vat the
      * same, which Acumulus didn't in the past, but does since the new EU
      * commerce rules:
      * New order:
@@ -966,22 +966,25 @@ class InvoiceStatusForm extends Form
         $fields = [];
         if (!empty($entry['totalvalue']) && !empty($entry['totalvalueexclvat'])) {
             // Get Acumulus amounts.
+            // @todo: invoice status form:
+            //   - getEntry API call also handles other foreign vat?
+            //   - $entry['foreignvat'] what does it contain for UK invoice?
             $amountExAcumulus = $entry['totalvalueexclvat'];
             $amountIncAcumulus = $entry['totalvalue'];
             $amountVatAcumulus = $amountIncAcumulus - $amountExAcumulus;
             if ($entry['foreignvat']) {
                 $vatType = $this->t('foreign_vat');
-                $amountForeignVatAcumulus = $entry['totalvalueforeignvat'];
+                $amountForeignEuVatAcumulus = $entry['totalvalueforeignvat'];
                 // Old or new way of storage?
                 if (Number::isZero($amountVatAcumulus)) {
                     // Old (or zero vat): correct the vat and ex amount.
-                    $amountVatAcumulus += $amountForeignVatAcumulus;
-                    $amountExAcumulus -= $amountForeignVatAcumulus;
+                    $amountVatAcumulus += $amountForeignEuVatAcumulus;
+                    $amountExAcumulus -= $amountForeignEuVatAcumulus;
                 } else {
                     // New (or mixed): the difference should be all tax paid.
                     // We just do a check on mixed vat, which, I think, should
                     // not be possible.
-                    if (!Number::floatsAreEqual($amountVatAcumulus, $amountForeignVatAcumulus)) {
+                    if (!Number::floatsAreEqual($amountVatAcumulus, $amountForeignEuVatAcumulus)) {
                         $vatType = $this->t('foreign_national_vat');
                     }
                 }

@@ -18,8 +18,12 @@ VM3 = VirtueMart3 (Joomla)
 WC  = WooCommerce 5 (WC 4 en 3 zullen waarschijnlijk ook werken)
 WC2 = WooCommerce 2 (wordt niet meer ondersteund vanaf onze versie 5.5.2)
 
-6.4.1 (2022-02-23)
-------------------
+Refactorings:
+- ALL: Refactored request/response storing and logging.
+
+
+6.4.1 (2022-02-23) (MA2 only)
+-----------------------------
 Bugs:
 - MA24: Magento now requires a declarative data schema and does no longer allow
   Setup/InstallSchema.php, Setup/UpgradeSchema.php, and Setup/Uninstall.php.

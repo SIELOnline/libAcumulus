@@ -105,13 +105,13 @@ class Message
                     $this->codeTag = '';
                     $this->field = '';
                 } elseif (func_num_args() === 3) {
-                    // 3 parameters passed, 3rd parameter is a string: A form
-                    // field error.
+                    // 3 parameters passed, 3rd parameter is a string indicating
+                    // a form field.
                     $this->field = $fieldOrCodeOrTag;
                     $this->code = 0;
                     $this->codeTag = '';
                 } else {
-                    // All parameters passed: 3 and 4 are codeTag resp. code.
+                    // 2 or 4 parameters passed: 3 and 4 are codeTag resp. code.
                     $this->code = $code;
                     $this->codeTag = $fieldOrCodeOrTag;
                     $this->field = '';

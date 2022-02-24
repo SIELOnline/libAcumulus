@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @noinspection PhpClassHasTooManyDeclaredMembersInspection
  * @noinspection PhpMissingParamTypeInspection

@@ -34,12 +34,6 @@ use Siel\Acumulus\Helpers\Translator;
  */
 class Result extends MessageCollection
 {
-    // Code tags for messages containing the raw (but masked) request and
-    // response.
-    // @todo: remove as logging is no longer done this way.
-    public const CodeTagRawRequest = 'Request';
-    public const CodeTagRawResponse = 'Response';
-
     protected  /*Translator*/ $translator;
     protected /*Log*/ $log;
 
@@ -514,13 +508,16 @@ class Result extends MessageCollection
      */
     public function toLogMessages(bool $log = true, int $logLevel = Severity::Log): array
     {
-        $request = $this->getMaskedRequest();
-        $response = $this->getMaskedResponse();
-        $exception = $this->formatMessages(Message::Format_PlainWithSeverity, Severity::Exception);
-        $result = array_filter(['Request' => $request, 'Response' => $response, 'Exception' => $exception]);
-        if ($log) {
-            foreach ($result as $what => $message) {
-                $this->log->log($logLevel, '%s: %s', [$what, $message]);
+        $result = array_filter([
+            'Request' => $this->getMaskedRequest(),
+            'Response' => $this->getMaskedResponse(),
+            'Exception' => $this->formatMessages(Message::Format_Plain, Severity::Exception),
+        ]);
+
+        foreach ($result as $what => &$message) {
+            $message = "$what: $message";
+            if ($log) {
+                $this->log->log($logLevel, $message);
             }
         }
         return $result;

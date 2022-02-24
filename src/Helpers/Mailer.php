@@ -1,4 +1,10 @@
 <?php
+/**
+ * @noinspection PhpMissingReturnTypeInspection
+ * @noinspection PhpMissingParamTypeInspection
+ * @noinspection PhpMissingVisibilityInspection
+ */
+
 namespace Siel\Acumulus\Helpers;
 
 use Exception;
@@ -385,9 +391,9 @@ abstract class Mailer
         $addReqResp = $pluginSettings['debug'] === Config::Send_SendAndMailOnError ? Result::AddReqResp_WithOther : Result::AddReqResp_Always;
         if ($addReqResp === Result::AddReqResp_Always || $result->getStatus() >= Severity::Warning) {
             $logMessages = new MessageCollection();
-            // @todo: move getting the raw messages to own method on Result (getMaskedRawResponse())
-            $logMessages->addMessage($result->getByCodeTag(Result::CodeTagRawRequest))
-                        ->addMessage($result->getByCodeTag(Result::CodeTagRawResponse));
+            foreach ($result->toLogMessages() as $message) {
+                $logMessages->addMessage($message, Severity::Log);
+            }
             if (!empty($logMessages->getMessages())) {
                 $header = $this->t('mail_support_header');
                 $description = $this->t('mail_support_desc');

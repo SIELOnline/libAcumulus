@@ -1,4 +1,10 @@
 <?php
+/**
+ * @noinspection PhpMissingReturnTypeInspection
+ * @noinspection PhpMissingParamTypeInspection
+ * @noinspection PhpMissingVisibilityInspection
+ */
+
 namespace Siel\Acumulus\Invoice;
 
 use Siel\Acumulus\Helpers\Log;
@@ -54,7 +60,7 @@ class Result extends AcumulusResult
 
     /**
      * @var array
-     *   A list of parameters to use when getting the send status as text.
+     *   A list of parameters to use when getting the send-status as text.
      */
     protected $sendStatusArguments;
 
@@ -99,7 +105,7 @@ class Result extends AcumulusResult
      *   contain 1 of the Result::Sent_... or Result::Invoice_NotSent_...
      *   constants.
      * @param array $arguments
-     *   A list of parameters to use when getting the send status as text.
+     *   A list of parameters to use when getting the send-status as text.
      *
      * @return $this
      */
@@ -271,8 +277,11 @@ class Result extends AcumulusResult
             }
             if ($addReqResp === Result::AddReqResp_Always || ($addReqResp === Result::AddReqResp_WithOther && $this->hasRealMessages())) {
                 $message = rtrim($message);
-                // @todo: move to dedicated getters.
-                $message .= "\n" . $this->formatMessages(Message::Format_PlainList, Severity::Log);
+                $logMessages = $this->toLogMessages(false);
+                foreach ($logMessages as $logMessage) {
+                    $message .= "\n$logMessage";
+                }
+                $message .= "\n";
             }
         }
         return rtrim($message);

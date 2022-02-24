@@ -18,9 +18,24 @@ VM3 = VirtueMart3 (Joomla)
 WC  = WooCommerce 5 (WC 4 en 3 zullen waarschijnlijk ook werken)
 WC2 = WooCommerce 2 (wordt niet meer ondersteund vanaf onze versie 5.5.2)
 
+7.0.0-alpha1 (2022-02-??)
+-------------------------
 Refactorings:
-- ALL: Refactored request/response storing and logging.
-
+- PHP 7.1 is now the minimal requirement. we DO use language constructs that are
+  new to PHP 7.1, so this module WILL fail fatally when you are still running an
+  older version.
+- Refactored the ApiClient namespace to better separate the different layers and
+  concerns:
+  - Separate HttpRequest and HttpResponse classes that implement HTTP(S)
+    communication and error handling, with no Acumulus knowledge at all. This
+    facilitates communication with other services (e.g. GitHub or VIES).
+  - A ConnectionHandler class that supports connection reuse. This prevents
+    multiple time costly HTTPS connection set-ups during a PHP request.
+  - On top of AcumulusRequest and (Acumulus)Result classes that implement
+    Acumulus Api knowledge like the submit and response structures, and error
+    handling at the Acumulus level.
+  - The Acumulus class still represents the Acumulus service endpoints as PHP
+    methods.
 
 6.4.1 (2022-02-23) (MA2 only)
 -----------------------------

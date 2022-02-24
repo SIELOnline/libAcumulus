@@ -54,11 +54,11 @@ use const Siel\Acumulus\Version;
  * Finding the most specialized class is not done via configuration, as is
  * normally done in container implementations, but via namespace hierarchy.
  *
- * Suppose you are writing code for a webshop named <MyWebShop>: place your
+ * Suppose you are writing code for a web shop named <MyWebShop>: place your
  * classes in the namespace \Siel\Acumulus\<MyWebShop>.
  *
- * If you want to support multiple (major) versions of your webshop, you can add
- * a "version level" to the namespace:
+ * If you want to support multiple (major) versions of your webs hop, you can
+ * add a "version level" to the namespace:
  * \Siel\Acumulus\<MyWebShop>\<MyWebShop><version> (note <MyWebShop> is repeated
  * as namespaces may not start with a digit). In this case you should place code
  * common for all versions in classes under \Siel\Acumulus\<MyWebShop>, but code
@@ -67,7 +67,7 @@ use const Siel\Acumulus\Version;
  *
  * The Magento and WooCommerce namespaces are examples of this.
  *
- * If your webshop is embedded in a CMS and there are multiple webshop
+ * If your web shop is embedded in a CMS and there are multiple web shop
  * extensions for that CMS, you can add a "CMS level" to the namespace:
  * \Siel\Acumulus\<MyCMS>\<MyWebShop>[\<MyWebShop><version>]. Classes at the CMS
  * level should contain code common for the CMS, think of configuration storage,
@@ -110,10 +110,9 @@ use const Siel\Acumulus\Version;
  * can define another level of namespace searching by calling
  * {@see Container::setCustomNamespace()}. This will define 1 additional
  * namespace to look for before the above list as defined by the $shopNamespace
- * argument is traversed. Taking the above example, and if you would have set
- * 'MyShop\Custom' as custom namespace, the container
- * will first look for the class \MyShop\Custom\Invoice\Creator, before
- * looking for the above list of classes.
+ * argument is traversed. Taking the above example, with 'MyShop\Custom' as
+ * custom namespace, the container will first look for the class
+ * \MyShop\Custom\Invoice\Creator, before looking for the above list of classes.
  *
  * By defining a custom namespace and placing your custom code in that
  * namespace, instead of changing the code in this library, it remains possible
@@ -128,10 +127,11 @@ class Container
      *   The base directory where the Acumulus library is located. This is used
      *   to check if the file that should contain a class exists before calling
      *   class_exists(). This is not a good practice and should only be done if
-     *   older auto loaders are used that generate errors or warnings if a class
+     *   older autoloaders are used that generate errors or warnings if a class
      *   is not found.
      *
      *   If this contains an empty value, no check will be performed.
+     * @todo: check if still needed and for which web shops.
      */
     protected $baseDir;
 

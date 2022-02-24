@@ -8,11 +8,16 @@ namespace Siel\Acumulus\Unit\ApiClient;
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\ApiClient\Acumulus;
-use Siel\Acumulus\ApiClient\Result;
 use Siel\Acumulus\Helpers\Container;
 
 class AcumulusTest extends TestCase
 {
+
+    /**
+     * @var object|\Siel\Acumulus\ApiClient\Result
+     */
+    private $result;
+
     /**
      * @var \Siel\Acumulus\Helpers\Container
      */
@@ -23,6 +28,7 @@ class AcumulusTest extends TestCase
         // Use the TestWebShop test doubles.
         $this->container = new Container('TestWebShop\TestDoubles', 'nl');
         $this->acumulusClient = $this->container->getAcumulusApiClient();
+        $this->result = $this->container->getResult();
     }
 
     /**
@@ -88,7 +94,7 @@ class AcumulusTest extends TestCase
                 $this->equalTo($message),
                 $this->equalTo($needContract)
             )
-            ->willReturn(new Result());
+            ->willReturn($this->result);
 
         $stub->$method(... $args);
     }

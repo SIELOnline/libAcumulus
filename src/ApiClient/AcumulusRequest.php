@@ -19,7 +19,6 @@ use Siel\Acumulus\Helpers\Log;
  * - Adding the basic submit structure - contract, connector, testmode, ... - to
  *   create a complete request structure.
  * - Conversion from the request structure array to XML.
- * - Creating the full uri for the api function to call.
  * - Sending the request.
  * - Creating the {@see \Siel\Acumulus\ApiClient\Result} from the
  *   {@see \Siel\Acumulus\ApiClient\HttpResponse}.
@@ -65,7 +64,7 @@ class AcumulusRequest
      * The full submit structure consists of the:
      * - basic submit: see {@link https://www.siel.nl/acumulus/API/Basic_Submit/}.
      * - submit: the API call specific part as passed to
-     *   {@see \Siel\Acumulus\TestWebShop\ApiClient\AcumulusRequest::execute()}.
+     *   {@see \Siel\Acumulus\TestWebShop\TestDoubles\ApiClient\AcumulusRequest::execute()}.
      *
      * @return array|null
      *    The full submit structure as has been sent to Acumulus, or null if
@@ -112,16 +111,16 @@ class AcumulusRequest
         }
         $this->hasExecuted = true;
 
+        if ($result === null) {
+            $result = $this->container->getResult();
+        }
+
         try {
-            if ($result === null) {
-                $result = $this->container->getResult();
-            }
-            $result->setAcumulusRequest($this);
             $this->uri= $uri;
             $this->submit = $this->constructFullSubmit($submit, $needContract);
             $this->httpRequest = new HttpRequest();
-            $httpResponse = $this->executeWithHttp();
-            $result->setHttpResponse($httpResponse);
+            $result->setAcumulusRequest($this);
+            $result->setHttpResponse($this->executeWithHttp());
         } catch (RuntimeException $e) {
             // Any errors during:
             // - conversion of the message to xml
@@ -131,6 +130,7 @@ class AcumulusRequest
             $result->addMessage($e);
         }
 
+        $result->toLogMessages();
         return $result;
     }
 

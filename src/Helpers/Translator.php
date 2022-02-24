@@ -47,7 +47,12 @@ namespace Siel\Acumulus\Helpers;
  */
 class Translator
 {
-    /** @var \Siel\Acumulus\Helpers\Translator */
+    /**
+     * @var \Siel\Acumulus\Helpers\Translator
+     * @todo: deprecate and create messages by passing translator along the
+     *   other values.
+     * @deprecated
+     */
     public static $instance;
 
     /** @var string */
@@ -70,7 +75,7 @@ class Translator
      * Adds a collection of translations to this translator.
      *
      * @param \Siel\Acumulus\Helpers\TranslationCollection $translationCollection
-     *   A possibly multi-lingual set of translations. The translations for the
+     *   A possibly multilingual set of translations. The translations for the
      *   current language are added.
      */
     public function add(TranslationCollection $translationCollection)

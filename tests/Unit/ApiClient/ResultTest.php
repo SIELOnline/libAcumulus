@@ -47,14 +47,25 @@ class ResultTest extends TestCase
         $this->examples = new ApiRequestResponseExamples();
     }
 
+    private function createAcumulusResult(): Result
+    {
+        return $this->container->getResult();
+    }
+
+    private function createAndExecuteAcumulusRequest(string $uri, array $submit, bool $needContract): array
+    {
+        $acumulusRequest = $this->container->getAcumulusRequest();
+        return [$acumulusRequest, $acumulusRequest->execute($uri, $submit, $needContract)];
+    }
+
     private function t($key): string
     {
         return $this->translator->get($key);
     }
 
-    public function testCreate(): Result
+    public function testCreate()
     {
-        $result = new Result();
+        $result = $this->createAcumulusResult();
         $this->assertSame(Severity::Unknown, $result->getStatus());
         $this->assertSame($this->t('request_not_yet_sent'), $result->getStatusText());
         $this->assertSame(Severity::Unknown, $result->getSeverity());
@@ -65,35 +76,30 @@ class ResultTest extends TestCase
         $this->assertNull($result->getByCodeTag('N1'));
         $this->assertNull($result->getAcumulusRequest());
         $this->assertNull($result->getHttpResponse());
-
-        return $result;
     }
 
-    /**
-     * @depends testCreate
-     */
-    public function testSetRequest(Result $result): Result
+    public function testSetAcumulusRequest(): Result
     {
         $acumulusRequest = $this->container->getAcumulusRequest();
         $uri = 'uri';
-        $message = ['key' => 'value'];
-        $acumulusRequest->execute($uri, $message, false);
+        $submit = $this->examples->getSubmit('accounts');
+        $acumulusRequest->execute($uri, $submit, false);
+
+        $result = $this->container->getResult();
         $result->setAcumulusRequest($acumulusRequest);
-
         $this->assertSame($acumulusRequest, $result->getAcumulusRequest());
-
         return $result;
     }
 
     /**
-     * @depends testSetRequest
+     * @depends testSetAcumulusRequest
      */
     public function testSetHttpResponse(Result $result): Result
     {
         $httpCode = 200;
         $httpResponse = new HttpResponse(
             '',
-            $this->examples->getResponse('accounts'),
+            $this->examples->getResponseBody('accounts'),
             ['http_code' => $httpCode],
             new HttpRequest());
         $result->setHttpResponse($httpResponse);
@@ -117,20 +123,41 @@ class ResultTest extends TestCase
     public function testSetMainResponse(Result $result)
     {
         $result->setMainResponseKey('accounts', true);
-        $this->assertSame($this->examples->getResponseArray('accounts'), $result->getResponse());
+        $this->assertSame($this->examples->getMainResponse('accounts'), $result->getResponse());
     }
 
-    /**
-     * @depends testSetRequest
-     */
-    public function testSetHttpResponseEmptyList(Result $result): Result
+    public function testCreateByAcumulusRequestExecute()
     {
+        $uri = 'uri';
+        $submit = ['format' => 'json'];
+        [$acumulusRequest, $result] = $this->createAndExecuteAcumulusRequest($uri, $submit, false);
+
+        $this->assertSame($acumulusRequest, $result->getAcumulusRequest());
+        $this->assertSame(Severity::Success, $result->getStatus());
+        $this->assertSame($this->t(Severity::Success), $result->getStatusText());
+        $this->assertSame(Severity::Unknown, $result->getSeverity());
+        $this->assertCount(0, $result->getMessages());
+        $this->assertFalse($result->hasRealMessages());
+        $this->assertFalse($result->hasError());
+        $this->assertNull($result->getByCode(701));
+        $this->assertNull($result->getByCodeTag('N1'));
+        $this->assertNotNull($result->getHttpResponse());
+    }
+
+    public function testSetHttpResponseEmptyList()
+    {
+        $acumulusRequest = $this->container->getAcumulusRequest();
+        $uri = 'uri';
+        $submit = $this->examples->getSubmit('vatinfo-empty-return');
+        $acumulusRequest->execute($uri, $submit, false);
         $httpCode = 200;
         $httpResponse = new HttpResponse(
             '',
-            $this->examples->getResponse('vatinfo-empty-return'),
+            $this->examples->getResponseBody('vatinfo-empty-return'),
             ['http_code' => $httpCode],
             new HttpRequest());
+        $result = $this->createAcumulusResult();
+        $result->setAcumulusRequest($acumulusRequest);
         $result->setHttpResponse($httpResponse);
 
         $this->assertSame($httpResponse, $result->getHttpResponse());
@@ -143,29 +170,24 @@ class ResultTest extends TestCase
         $this->assertNull($result->getByCode(701));
         $this->assertNull($result->getByCodeTag('N1'));
 
-        return $result;
-    }
-
-    /**
-     * @depends testSetHttpResponseEmptyList
-     */
-    public function testSetMainResponseEmptyList(Result $result)
-    {
         $result->setMainResponseKey('vatinfo', true);
-        $this->assertSame($this->examples->getResponseArray('vatinfo-empty-return'), $result->getResponse());
+        $this->assertSame($this->examples->getMainResponse('vatinfo-empty-return'), $result->getResponse());
     }
 
-    /**
-     * @depends testSetRequest
-     */
-    public function testSetHttpResponseWithError(Result $result): Result
+    public function testSetHttpResponseWithError()
     {
+        $acumulusRequest = $this->container->getAcumulusRequest();
+        $uri = 'uri';
+        $submit = $this->examples->getSubmit('no_contract');
+        $acumulusRequest->execute($uri, $submit, false);
         $httpCode = 200;
         $httpResponse = new HttpResponse(
             '',
-            $this->examples->getResponse('no_contract'),
+            $this->examples->getResponseBody('no_contract'),
             ['http_code' => $httpCode],
             new HttpRequest());
+        $result = $this->createAcumulusResult();
+        $result->setAcumulusRequest($acumulusRequest);
         $result->setHttpResponse($httpResponse);
 
         $this->assertSame($httpResponse, $result->getHttpResponse());
@@ -181,15 +203,55 @@ class ResultTest extends TestCase
         $this->assertInstanceOf(Message::class, $result->getByCode('403 Forbidden'));
         $this->assertInstanceOf(Message::class, $result->getByCodeTag('AF1001MCS'));
 
-        return $result;
-    }
-
-    /**
-     * @depends testSetHttpResponseWithError
-     */
-    public function testSetMainResponseWithError(Result $result)
-    {
         $result->setMainResponseKey('vatinfo', true);
         $this->assertEmpty($result->getResponse());
+    }
+
+    public function testMaskPasswordsRequest()
+    {
+        $acumulusRequest = $this->container->getAcumulusRequest();
+        $uri = 'uri';
+        $submit = $this->examples->getSubmit('accounts');
+        $acumulusRequest->execute($uri, $submit, false);
+        $httpCode = 200;
+        $httpResponse = new HttpResponse(
+            '',
+            $this->examples->getResponseBody('accounts'),
+            ['http_code' => $httpCode],
+            new HttpRequest());
+        $result = $this->createAcumulusResult();
+        $result->setAcumulusRequest($acumulusRequest);
+        $result->setHttpResponse($httpResponse);
+
+        $messages = $result->toLogMessages(false);
+        $this->assertArrayHasKey('Request', $messages);
+        $this->assertArrayHasKey('Response', $messages);
+        $this->assertArrayNotHasKey('exception', $messages);
+        $this->assertStringNotContainsString('mysecret', $messages['Request']);
+        $this->assertStringContainsString('REMOVED FOR SECURITY', $messages['Request']);
+    }
+
+    public function testMaskPasswordsResponse()
+    {
+        $acumulusRequest = $this->container->getAcumulusRequest();
+        $uri = 'uri';
+        $submit = $this->examples->getSubmit('signup');
+        $acumulusRequest->execute($uri, $submit, false);
+        $httpCode = 200;
+        $httpResponse = new HttpResponse(
+            '',
+            $this->examples->getResponseBody('signup'),
+            ['http_code' => $httpCode],
+            new HttpRequest());
+        $result = $this->createAcumulusResult();
+        $result->setAcumulusRequest($acumulusRequest);
+        $result->setHttpResponse($httpResponse);
+
+        $messages = $result->toLogMessages(false);
+        $this->assertArrayHasKey('Request', $messages);
+        $this->assertArrayHasKey('Response', $messages);
+        $this->assertArrayNotHasKey('exception', $messages);
+        $this->assertStringNotContainsString('mysecret', $messages['Response']);
+        $this->assertStringContainsString('REMOVED FOR SECURITY', $messages['Response']);
     }
 }

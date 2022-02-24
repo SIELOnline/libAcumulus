@@ -31,7 +31,7 @@ class MessageCollection
      *
      * @param string|Exception|array $message
      *   Either:
-     *   - A human readable, thus possibly translated, text.
+     *   - A human-readable, thus possibly translated, text.
      *   - An \Exception object, in which case other parameters are ignored.
      *   - An Acumulus API message array,
      *     see {@see https://www.siel.nl/acumulus/API/Basic_Response/}, in which

@@ -42,10 +42,11 @@ class Log
     }
 
     /**
-     * Sets the log level, eg. based on configuration.
+     * Sets the log level, e.g. based on configuration.
      *
      * @param int $logLevel
-     *   One of the Severity::... constants.
+     *   One of the Severity::... constants: Log, Info, Notice, Warning, Error,
+     *   or Exception
      */
     public function setLogLevel($logLevel)
     {

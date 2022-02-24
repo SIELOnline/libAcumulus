@@ -9,7 +9,7 @@ use Exception;
  * Messages may appear in any part of the system and need often be transferred
  * through the system layers and displayed on screen, in log files or in mails.
  *
- * Therefore we define 1 class that wraps messages of all possible sources and
+ * Therefore, we define 1 class that wraps messages of all possible sources and
  * possible places to show.
  */
 class Message
@@ -58,7 +58,7 @@ class Message
      *
      * @param string|Exception|array $message
      *   Either:
-     *   - A human readable, thus possibly translated, text.
+     *   - A human-readable, thus possibly translated, text.
      *   - An \Exception object, in which case other parameters are ignored.
      *   - An Acumulus API message array,
      *     see {@link https://www.siel.nl/acumulus/API/Basic_Response/}, in which
@@ -67,10 +67,15 @@ class Message
      *   One of the Severity constants (except Severity::Exception).
      * @param string $fieldOrCodeOrTag
      *   Either:
-     *   - The code tag part of an Acumulus API message.
+     *   - The 'codetag' part of an Acumulus API message.
      *   - The form field name.
+     *   - An integer code. THe 4th parameter should be absent.
      * @param int|string $code
      *   The code, typically an int, but a string is allowed as well.
+     *
+     * @todo: create separate message create functions (createExceptionMessage,
+     *   createFormFieldMessage, CreateApiMessage, createInternalMessage to
+     *   simplify this constructor.
      */
     public function __construct($message, $severity = Severity::Unknown, $fieldOrCodeOrTag = '', $code = 0)
     {
@@ -87,25 +92,24 @@ class Message
             $this->severity = $severity;
             $this->exception = null;
             if (is_array($message)) {
+                // Only 1 argument: a Message to be cloned.
                 $this->text = $message['message'];
                 $this->code = $message['code'];
                 $this->codeTag = $message['codetag'];
                 $this->field = '';
             } else {
                 $this->text = $message;
-                if (func_num_args() === 3) {
-                    // 3 parameters passed: 3 is field name or code.
-                    if (is_int($fieldOrCodeOrTag)) {
-                        // It's an integer, thus a code.
-                        $this->code = $fieldOrCodeOrTag;
-                        $this->codeTag = '';
-                        $this->field = '';
-                    } else {
-                        // It's a string, thus a field name.
-                        $this->field = $fieldOrCodeOrTag;
-                        $this->code = 0;
-                        $this->codeTag = '';
-                    }
+                if (is_int($fieldOrCodeOrTag)) {
+                    // It's an integer, thus a code.
+                    $this->code = $fieldOrCodeOrTag;
+                    $this->codeTag = '';
+                    $this->field = '';
+                } elseif (func_num_args() === 3) {
+                    // 3 parameters passed, 3rd parameter is a string: A form
+                    // field error.
+                    $this->field = $fieldOrCodeOrTag;
+                    $this->code = 0;
+                    $this->codeTag = '';
                 } else {
                     // All parameters passed: 3 and 4 are codeTag resp. code.
                     $this->code = $code;
@@ -133,7 +137,7 @@ class Message
 
     /**
      * @return string
-     *   A human readable, thus possibly translated, text.
+     *   A human-readable, thus possibly translated, text.
      */
     public function getText()
     {

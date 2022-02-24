@@ -17,7 +17,7 @@ use RuntimeException;
  */
 class ConnectionHandler
 {
-    protected static /*?ConnectionHandler*/ $instance = null;
+    private static /*?ConnectionHandler*/ $instance = null;
 
     /**
      * Singleton pattern.

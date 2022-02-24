@@ -2,8 +2,11 @@
 namespace Siel\Acumulus\ApiClient;
 
 use DOMDocument;
+use LogicException;
 use RuntimeException;
 use Siel\Acumulus\Api;
+use Siel\Acumulus\Helpers\Log;
+use Siel\Acumulus\Helpers\Message;
 use Siel\Acumulus\Helpers\MessageCollection;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Helpers\Translator;
@@ -37,22 +40,13 @@ class Result extends MessageCollection
     public const CodeTagRawRequest = 'Request';
     public const CodeTagRawResponse = 'Response';
 
-    /**
-     * @var \Siel\Acumulus\ApiClient\AcumulusRequest|null
-     *   The Acumulus request.
-     */
+    protected  /*Translator*/ $translator;
+    protected /*Log*/ $log;
+
+    protected /*bool*/ $isAcumulusRequestSet = false;
+    protected /*bool*/ $isHttpResponseSet = false;
     protected /*?AcumulusRequest*/ $acumulusRequest = null;
-
-    /**
-     * @var \Siel\Acumulus\ApiClient\HttpResponse|null
-     *   The received HTTP response.
-     */
     protected /*?HttpResponse*/ $httpResponse = null;
-
-    /**
-     * @var int|null
-     *   The received api status or null if not yet sent.
-     */
     protected /*?int*/ $apiStatus = null;
 
     /**
@@ -81,6 +75,16 @@ class Result extends MessageCollection
     protected /*bool*/ $isList = false;
 
     /**
+     * @param \Siel\Acumulus\Helpers\Translator $translator
+     * @param \Siel\Acumulus\Helpers\Log $log
+     */
+    public function __construct(Translator $translator, Log $log)
+    {
+        $this->log = $log;
+        $this->translator = $translator;
+    }
+
+    /**
      * Helper method to translate strings.
      *
      * @param string $key
@@ -92,7 +96,7 @@ class Result extends MessageCollection
      */
     protected function t(string $key): string
     {
-        return Translator::$instance instanceof Translator ? Translator::$instance->get($key) : $key;
+        return $this->translator->get($key);
     }
 
     /**
@@ -184,6 +188,11 @@ class Result extends MessageCollection
 
     public function setAcumulusRequest(?AcumulusRequest $acumulusRequest): void
     {
+        if ($this->isAcumulusRequestSet) {
+            throw new LogicException('AcumulusResult::setAcumulusRequest() may only be called once.');
+        }
+        $this->isAcumulusRequestSet = true;
+
         $this->acumulusRequest = $acumulusRequest;
     }
 
@@ -202,6 +211,16 @@ class Result extends MessageCollection
      */
     public function setHttpResponse(HttpResponse $httpResponse): void
     {
+        if ($this->isHttpResponseSet) {
+            throw new LogicException('AcumulusResult::setHttpResponse() may only be called once.');
+        }
+        $this->isHttpResponseSet = true;
+        if (!$this->isAcumulusRequestSet) {
+            throw new LogicException('AcumulusResult::setHttpResponse() may only be called after AcumulusResult::setAcumulusRequest()');
+        } elseif ($this->getAcumulusRequest()->getSubmit() === null) {
+            throw new LogicException('AcumulusResult::setHttpResponse() may only be called after AcumulusResult::setAcumulusRequest() with its submit property set');
+        }
+
         $this->httpResponse = $httpResponse;
         // @todo: start using http codes (403, 429, 500, ...)
 
@@ -473,5 +492,77 @@ class Result extends MessageCollection
         }
         $message = sprintf('json (%s): %d - %s', phpversion('json'), $code, $message);
         throw new RuntimeException($message, $code);
+    }
+
+    /**
+     * Returns the masked raw request, response, and exception. if one occurred.
+     *
+     * @param bool $log
+     *   if true, the non-empty messages are also logged with the given
+     *   $logLevel.
+     * @param int $logLevel
+     *    The log level to log the messages with (if $log = true).
+     *
+     * @return string[]
+     *   An array of non-empty messages keyed by the keys:
+     *   - 'Request': The uri and a string representation of the
+     *     submit-structure.
+     *   - 'Response': The http response status code and the response body.
+     *     Non-present if no http response was received.
+     *   - 'Exception': The exception message. Non-present if no exception was
+     *     thrown.
+     */
+    public function toLogMessages(bool $log = true, int $logLevel = Severity::Log): array
+    {
+        $request = $this->getMaskedRequest();
+        $response = $this->getMaskedResponse();
+        $exception = $this->formatMessages(Message::Format_PlainWithSeverity, Severity::Exception);
+        $result = array_filter(['Request' => $request, 'Response' => $response, 'Exception' => $exception]);
+        if ($log) {
+            foreach ($result as $what => $message) {
+                $this->log->log($logLevel, '%s: %s', [$what, $message]);
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Returns the submit-structure as a string, with passwords masked.
+     *
+     * Can be used for logging purposes.
+     */
+    protected function getMaskedRequest(): string
+    {
+        $acumulusRequest = $this->getAcumulusRequest();
+        if ($acumulusRequest !== null) {
+            $submit = $acumulusRequest->getSubmit();
+            if ($submit !== null) {
+                array_walk_recursive($submit, function (&$value, $key) {
+                    if (strpos(strtolower($key), 'password') !== false) {
+                        $value = 'REMOVED FOR SECURITY';
+                    }
+                });
+                $maskedSubmit = var_export($submit, true);
+            }
+            $request = sprintf("%s\n%s", $acumulusRequest->getUri(), $maskedSubmit ?? '');
+        }
+        return $request ?? '';
+    }
+
+    /**
+     * Returns the response from the Acumulus API, with passwords masked.
+     *
+     * Can be used for logging purposes.
+     */
+    protected function getMaskedResponse(): string
+    {
+        if ($this->getHttpResponse() !== null) {
+            $code = $this->getHttpResponse()->getHttpCode();
+            $body = $this->getHttpResponse()->getBody();
+            $body = preg_replace('|<([a-z]*)password>.*</[a-z]*password>|', '<$1password>REMOVED FOR SECURITY</$1password>', $body);
+            $body = preg_replace('|"([a-z]*)password"(\s*):(\s*)"[^"]+"|', '"$1password"$2:$3"REMOVED FOR SECURITY"', $body);
+            $response = sprintf('%d - %s', $code, $body);
+        }
+        return $response ?? '';
     }
 }

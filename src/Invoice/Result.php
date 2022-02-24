@@ -1,9 +1,11 @@
 <?php
 namespace Siel\Acumulus\Invoice;
 
+use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Message;
 use Siel\Acumulus\ApiClient\Result as AcumulusResult;
 use Siel\Acumulus\Helpers\Severity;
+use Siel\Acumulus\Helpers\Translator;
 
 /**
  * Extends Result with properties and features specific to the InvoiceAdd web
@@ -69,10 +71,12 @@ class Result extends AcumulusResult
      * @param string $trigger
      *   A string indicating the function that triggered the sending, e.g.
      *   InvoiceManager::sourceStatusChange().
+     * @param \Siel\Acumulus\Helpers\Translator $translator
+     * @param \Siel\Acumulus\Helpers\Log $log
      */
-    public function __construct($trigger)
+    public function __construct($trigger, Translator $translator, Log $log)
     {
-        parent::__construct();
+        parent::__construct($translator, $log);
         $this->trigger = $trigger;
         $this->sendStatus = self::SendStatus_Unknown;
         $this->sendStatusArguments = [];

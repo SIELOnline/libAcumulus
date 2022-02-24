@@ -17,7 +17,7 @@ class SeverityTranslations extends TranslationCollection
         Severity::Log => 'Debug',
         Severity::Success => 'Succes',
         Severity::Unknown => 'Nog niet gezet',
-        'severity_unknown' => 'Onbekende severity code %d',
+        'severity_unknown' => 'Onbekend bericht-ernstniveau %d',
     ];
 
     protected $en = [
@@ -29,6 +29,6 @@ class SeverityTranslations extends TranslationCollection
         Severity::Log => 'Debug',
         Severity::Success => 'Success',
         Severity::Unknown => 'Not yet set',
-        'severity_unknown' => 'Unknown severity code %d',
+        'severity_unknown' => 'Unknown severity level %d',
     ];
 }

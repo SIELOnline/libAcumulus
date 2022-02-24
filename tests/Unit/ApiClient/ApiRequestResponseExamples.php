@@ -1,268 +1,293 @@
 <?php
+
 namespace Siel\Acumulus\Unit\ApiClient;
+
+use Siel\Acumulus\Tag;
 
 class ApiRequestResponseExamples
 {
 
     private $sets = [
         'accounts' => [
-            '<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<myxml>
-  <contract>
-    <contractcode>288252</contractcode>
-    <username>APIGebruiker12345</username>
-    <password>mysecret</password>
-    <emailonerror>erwin@burorader.com</emailonerror>
-    <emailonwarning>erwin@burorader.com</emailonwarning>
-  </contract>
-  <format>json</format>
-  <testmode>0</testmode>
-  <lang>nl</lang>
-  <connector>
-    <application>WooCommerce 4.0.1 (WordPress: 5.4)</application>
-    <webkoppel>Acumulus 5.9.0</webkoppel>
-    <development>SIEL - Buro RaDer</development>
-    <remark>Library 5.10.0-alpha1 - PHP 7.1.33</remark>
-    <sourceuri>https://www.siel.nl/</sourceuri>
-  </connector>
-</myxml>
-',
-            '{"accounts":{"account":[{"accountid":"70582","accountnumber":"4911764","accountdescription":"Giro","accounttypeid":"1"},{"accountid":"70583","accountnumber":{},"accountdescription":"Kas","accounttypeid":"1"},{"accountid":"147659","accountnumber":"123456789","accountdescription":{},"accounttypeid":"1"}]},"errors":{"count_errors":"0"},"warnings":{"count_warnings":"0"},"status":"0"}',
-            [["accountid" => "70582","accountnumber" => "4911764","accountdescription" => "Giro","accounttypeid" => "1"],["accountid" => "70583","accountnumber" => [],"accountdescription" => "Kas","accounttypeid" => "1"],["accountid" => "147659","accountnumber" => "123456789","accountdescription" => [],"accounttypeid" => "1"]],
+            'submit' => [
+                'contract' => [
+                    'contractcode' => '288252',
+                    'username' => 'APIGebruiker12345',
+                    'password' => 'mysecret',
+                    'emailonerror' => 'erwin@burorader.com',
+                    'emailonwarning' => 'erwin@burorader.com',
+                ],
+                'format' => 'json',
+                'testmode' => '0',
+                'lang' => 'nl',
+                'connector' => [
+                    'application' => 'WooCommerce 4.0.1 (WordPress: 5.4)',
+                    'webkoppel' => 'Acumulus 5.9.0',
+                    'development' => 'SIEL - Buro RaDer',
+                    'remark' => 'Library 5.10.0-alpha1 - PHP 7.1.33',
+                    'sourceuri' => 'https://www.siel.nl/',
+                ],
+            ],
+            'response body' => '{"accounts":{"account":[{"accountid":"70582","accountnumber":"4911764","accountdescription":"Giro","accounttypeid":"1"},{"accountid":"70583","accountnumber":{},"accountdescription":"Kas","accounttypeid":"1"},{"accountid":"147659","accountnumber":"123456789","accountdescription":{},"accounttypeid":"1"}]},"errors":{"count_errors":"0"},"warnings":{"count_warnings":"0"},"status":"0"}',
+            'main response' => [
+                ['accountid' => '70582', 'accountnumber' => '4911764', 'accountdescription' => 'Giro', 'accounttypeid' => '1'],
+                ['accountid' => '70583', 'accountnumber' => [], 'accountdescription' => 'Kas', 'accounttypeid' => '1'],
+                ['accountid' => '147659', 'accountnumber' => '123456789', 'accountdescription' => [], 'accounttypeid' => '1'],
+            ],
         ],
 
         'costcenters' => [
-            '<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<myxml>
-  <contract>
-    <contractcode>288252</contractcode>
-    <username>APIGebruiker12345</username>
-    <password>mysecret</password>
-    <emailonerror>erwin@burorader.com</emailonerror>
-    <emailonwarning>erwin@burorader.com</emailonwarning>
-  </contract>
-  <format>json</format>
-  <testmode>0</testmode>
-  <lang>nl</lang>
-  <connector>
-    <application>WooCommerce 4.0.1 (WordPress: 5.4)</application>
-    <webkoppel>Acumulus 5.9.0</webkoppel>
-    <development>SIEL - Buro RaDer</development>
-    <remark>Library 5.10.0-alpha1 - PHP 7.1.33</remark>
-    <sourceuri>https://www.siel.nl/</sourceuri>
-  </connector>
-</myxml>
-',
-            '{"costcenters":{"costcenter":[{"costcenterid":"48663","costcentername":"Algemeen"},{"costcenterid":"56074","costcentername":"kostenplaats 1"},{"costcenterid":"56075","costcentername":"kostenplaats 2"}]},"errors":{"count_errors":"0"},"warnings":{"count_warnings":"0"},"status":"0"}',
-            [["costcenterid" => "48663","costcentername" => "Algemeen"],["costcenterid" => "56074","costcentername" => "kostenplaats 1"],["costcenterid" => "56075","costcentername" => "kostenplaats 2"]],
+            'submit' => [
+                'contract' => [
+                    'contractcode' => '288252',
+                    'username' => 'APIGebruiker12345',
+                    'password' => 'mysecret',
+                    'emailonerror' => 'erwin@burorader.com',
+                    'emailonwarning' => 'erwin@burorader.com',
+                ],
+                'format' => 'json',
+                'testmode' => '0',
+                'lang' => 'nl',
+                'connector' => [
+                    'application' => 'WooCommerce 4.0.1 (WordPress: 5.4)',
+                    'webkoppel' => 'Acumulus 5.9.0',
+                    'development' => 'SIEL - Buro RaDer',
+                    'remark' => 'Library 5.10.0-alpha1 - PHP 7.1.33',
+                    'sourceuri' => 'https://www.siel.nl/',
+                ],
+            ],
+            'resonse body' => '{"costcenters":{"costcenter":[{"costcenterid":"48663","costcentername":"Algemeen"},{"costcenterid":"56074","costcentername":"kostenplaats 1"},{"costcenterid":"56075","costcentername":"kostenplaats 2"}]},"errors":{"count_errors":"0"},"warnings":{"count_warnings":"0"},"status":"0"}',
+            'main response' => [
+                ['costcenterid' => '48663', 'costcentername' => 'Algemeen'],
+                ['costcenterid' => '56074', 'costcentername' => 'kostenplaats 1'],
+                ['costcenterid' => '56075', 'costcentername' => 'kostenplaats 2'],
+            ],
         ],
 
         'no_contract' => [
-            '<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<myxml>
-  <format>json</format>
-  <testmode>1</testmode>
-  <lang>nl</lang>
-  <connector>
-    <application>WooCommerce 4.0.1 (WordPress: 5.4)</application>
-    <webkoppel>Acumulus 5.9.0</webkoppel>
-    <development>SIEL - Buro RaDer</development>
-    <remark>Library 5.10.0-alpha1 - PHP 7.1.33</remark>
-    <sourceuri>https://www.siel.nl/</sourceuri>
-  </connector>
-  <vatdate>2020-02-05</vatdate>
-  <vatcountry>nl</vatcountry>
-</myxml>
-',
-            '{"errors":{"error":{"code":"403 Forbidden","codetag":"AF1001MCS","message":"Verplichte contract sectie ontbreekt"},"count_errors":"1"},"warnings":{"count_warnings":"0"},"status":"1"}',
-            [],
+            'submit' => [
+                'format' => 'json',
+                'testmode' => '1',
+                'lang' => 'nl',
+                'connector' => [
+                    'application' => 'WooCommerce 4.0.1 (WordPress: 5.4)',
+                    'webkoppel' => 'Acumulus 5.9.0',
+                    'development' => 'SIEL - Buro RaDer',
+                    'remark' => 'Library 5.10.0-alpha1 - PHP 7.1.33',
+                    'sourceuri' => 'https://www.siel.nl/',
+                ],
+                'vatdate' => '2020-02-05',
+                'vatcountry' => 'nl',
+            ],
+            'response body' => '{"errors":{"error":{"code":"403 Forbidden","codetag":"AF1001MCS","message":"Verplichte contract sectie ontbreekt"},"count_errors":"1"},"warnings":{"count_warnings":"0"},"status":"1"}',
+            'main response' => [],
         ],
 
         'vatinfo' => [
-            '<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<myxml>
-  <contract>
-    <contractcode>288252</contractcode>
-    <username>APIGebruiker12345</username>
-    <password>mysecret</password>
-    <emailonerror>erwin@burorader.com</emailonerror>
-    <emailonwarning>erwin@burorader.com</emailonwarning>
-  </contract>
-  <format>json</format>
-  <testmode>1</testmode>
-  <lang>nl</lang>
-  <connector>
-    <application>WooCommerce 4.0.1 (WordPress: 5.4)</application>
-    <webkoppel>Acumulus 5.9.0</webkoppel>
-    <development>SIEL - Buro RaDer</development>
-    <remark>Library 5.10.0-alpha1 - PHP 7.1.33</remark>
-    <sourceuri>https://www.siel.nl/</sourceuri>
-  </connector>
-  <vatdate>2020-02-05</vatdate>
-  <vatcountry>nl</vatcountry>
-</myxml>
-',
-            '{"vatinfo":{"vat":[{"vattype":"normal","vatrate":"21.0000"},{"vattype":"reduced","vatrate":"9.0000"}]},"errors":{"count_errors":"0"},"warnings":{"count_warnings":"0"},"status":"0"}',
-            [["vattype" => "normal","vatrate" => "21.0000"],["vattype" => "reduced","vatrate" => "9.0000"]],
+            'submit' => [
+                'contract' => [
+                    'contractcode' => '288252',
+                    'username' => 'APIGebruiker12345',
+                    'password' => 'mysecret',
+                    'emailonerror' => 'erwin@burorader.com',
+                    'emailonwarning' => 'erwin@burorader.com',
+                ],
+                'format' => 'json',
+                'testmode' => '1',
+                'lang' => 'nl',
+                'connector' => [
+                    'application' => 'WooCommerce 4.0.1 (WordPress: 5.4)',
+                    'webkoppel' => 'Acumulus 5.9.0',
+                    'development' => 'SIEL - Buro RaDer',
+                    'remark' => 'Library 5.10.0-alpha1 - PHP 7.1.33',
+                    'sourceuri' => 'https://www.siel.nl/',
+                ],
+                'vatdate' => '2020-02-05',
+                'vatcountry' => 'nl',
+            ],
+            'response body' => '{"vatinfo":{"vat":[{"vattype":"normal","vatrate":"21.0000"},{"vattype":"reduced","vatrate":"9.0000"}]},"errors":{"count_errors":"0"},"warnings":{"count_warnings":"0"},"status":"0"}',
+            'main response' => [['vattype' => 'normal', 'vatrate' => '21.0000'], ['vattype' => 'reduced', 'vatrate' => '9.0000']],
         ],
 
         'vatinfo-empty-return' => [
-            '<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<myxml>
-  <contract>
-    <contractcode>288252</contractcode>
-    <username>APIGebruiker12345</username>
-    <password>mysecret</password>
-    <emailonerror>erwin@burorader.com</emailonerror>
-    <emailonwarning>erwin@burorader.com</emailonwarning>
-  </contract>
-  <format>json</format>
-  <testmode>1</testmode>
-  <lang>nl</lang>
-  <connector>
-    <application>WooCommerce 4.0.1 (WordPress: 5.4)</application>
-    <webkoppel>Acumulus 5.9.0</webkoppel>
-    <development>SIEL - Buro RaDer</development>
-    <remark>Library 5.10.0-alpha1 - PHP 7.1.33</remark>
-    <sourceuri>https://www.siel.nl/</sourceuri>
-  </connector>
-  <vatdate>2014-01-01</vatdate>
-  <vatcountry>fr</vatcountry>
-</myxml>
-',
-            '{"vatinfo":{},"errors":{"count_errors":"0"},"warnings":{"count_warnings":"0"},"status":"0"}',
-            [],
+            'submit' => [
+                'contract' => [
+                    'contractcode' => '288252',
+                    'username' => 'APIGebruiker12345',
+                    'password' => 'mysecret',
+                    'emailonerror' => 'erwin@burorader.com',
+                    'emailonwarning' => 'erwin@burorader.com',
+                ],
+                'format' => 'json',
+                'testmode' => '1',
+                'lang' => 'nl',
+                'connector' => [
+                    'application' => 'WooCommerce 4.0.1 (WordPress: 5.4)',
+                    'webkoppel' => 'Acumulus 5.9.0',
+                    'development' => 'SIEL - Buro RaDer',
+                    'remark' => 'Library 5.10.0-alpha1 - PHP 7.1.33',
+                    'sourceuri' => 'https://www.siel.nl/',
+                ],
+                'vatdate' => '2014-01-01',
+                'vatcountry' => 'fr',
+            ],
+            'response body' => '{"vatinfo":{},"errors":{"count_errors":"0"},"warnings":{"count_warnings":"0"},"status":"0"}',
+            'main response' => [],
         ],
 
         'invoice-add' => [
-            '<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<myxml>
-  <contract>
-    <contractcode>288252</contractcode>
-    <username>APIGebruiker12345</username>
-    <password>mysecret</password>
-    <emailonerror>erwin@burorader.com</emailonerror>
-    <emailonwarning>erwin@burorader.com</emailonwarning>
-  </contract>
-  <format>json</format>
-  <testmode>1</testmode>
-  <lang>nl</lang>
-  <connector>
-    <application>WooCommerce 4.0.1 (WordPress: 5.4)</application>
-    <webkoppel>Acumulus 5.9.0</webkoppel>
-    <development>SIEL - Buro RaDer</development>
-    <remark>Library 5.10.0-alpha1 - PHP 7.1.33</remark>
-    <sourceuri>https://www.siel.nl/</sourceuri>
-  </connector>
-  <customer>
-    <type>3</type>
-    <contactstatus>0</contactstatus>
-    <companyname1>Les Camélias</companyname1>
-    <companyname2>Les Camélias</companyname2>
-    <fullname>Erwin Derksen</fullname>
-    <salutation>Beste Erwin</salutation>
-    <address1>6 avenue de Clermont</address1>
-    <postalcode>63240</postalcode>
-    <city>Le Mont-Dore</city>
-    <countrycode>FR</countrycode>
-    <country>Frankrijk</country>
-    <telephone>1234567890</telephone>
-    <email>erwin@burorader.com</email>
-    <overwriteifexists>1</overwriteifexists>
-    <mark>::1</mark>
-    <invoice>
-      <concept>0</concept>
-      <issuedate>2020-02-05</issuedate>
-      <costcenter>48663</costcenter>
-      <accountnumber>70582</accountnumber>
-      <paymentstatus>2</paymentstatus>
-      <paymentdate>2020-04-20</paymentdate>
-      <description>Order LC202040</description>
-      <template>52884</template>
-      <meta-currency>EUR</meta-currency>
-      <meta-currency-rate>1</meta-currency-rate>
-      <meta-currency-do-convert>false</meta-currency-do-convert>
-      <meta-payment-method>bacs</meta-payment-method>
-      <meta-invoice-amountinc>99.16</meta-invoice-amountinc>
-      <meta-invoice-vatamount>16.53</meta-invoice-vatamount>
-      <meta-invoice-amount>82.63</meta-invoice-amount>
-      <meta-invoice-calculated>meta-invoice-amount</meta-invoice-calculated>
-      <line>
-        <product>Ninja Silhouette (Naam: Erwin)</product>
-        <nature>Product</nature>
-        <meta-id>401</meta-id>
-        <quantity>1</quantity>
-        <unitprice>78.503443333333</unitprice>
-        <unitpriceinc>94.204132</unitpriceinc>
-        <meta-unitpriceinc-precision>0.001</meta-unitpriceinc-precision>
-        <meta-recalculate-price>unitprice</meta-recalculate-price>
-        <vatrate>20.0000</vatrate>
-        <meta-vatrate-min>19.989776606158</meta-vatrate-min>
-        <meta-vatrate-max>20.00811942888</meta-vatrate-max>
-        <vatamount>15.7</vatamount>
-        <meta-unitprice-precision>0.01</meta-unitprice-precision>
-        <meta-vatamount-precision>0.01</meta-vatamount-precision>
-        <meta-vatrate-source>completor-range</meta-vatrate-source>
-        <meta-vatclass-id>digital-goods</meta-vatclass-id>
-        <meta-vatrate-lookup>[20]</meta-vatrate-lookup>
-        <meta-vatrate-lookup-label>["VAT"]</meta-vatrate-lookup-label>
-        <meta-line-type>order-item</meta-line-type>
-        <meta-vatrate-range-matches>[{"vatrate":"20.0000","vattype":6}]</meta-vatrate-range-matches>
-        <meta-children-merged>1</meta-children-merged>
-        <meta-recalculate-old-price>78.504132</meta-recalculate-old-price>
-        <meta-did-recalculate>true</meta-did-recalculate>
-        <meta-vattypes-possible>6</meta-vattypes-possible>
-      </line>
-      <line>
-        <product>Vast Tarief</product>
-        <unitprice>4.1322</unitprice>
-        <quantity>1</quantity>
-        <vatrate>20.0000</vatrate>
-        <meta-vatrate-min>19.938056523422</meta-vatrate-min>
-        <meta-vatrate-max>20.234291799787</meta-vatrate-max>
-        <vatamount>0.83</vatamount>
-        <meta-unitprice-precision>0.001</meta-unitprice-precision>
-        <meta-vatamount-precision>0.01</meta-vatamount-precision>
-        <meta-vatrate-source>completor-range</meta-vatrate-source>
-        <meta-vatclass-id>digital-goods</meta-vatclass-id>
-        <meta-vatrate-lookup>["20"]</meta-vatrate-lookup>
-        <meta-vatrate-lookup-label>["VAT"]</meta-vatrate-lookup-label>
-        <meta-vatrate-lookup-source>shipping line taxes</meta-vatrate-lookup-source>
-        <meta-line-type>shipping</meta-line-type>
-        <nature>Service</nature>
-        <meta-vatrate-range-matches>[{"vatrate":"20.0000","vattype":6}]</meta-vatrate-range-matches>
-        <unitpriceinc>4.95864</unitpriceinc>
-        <meta-fields-calculated>["unitpriceinc"]</meta-fields-calculated>
-        <meta-vattypes-possible>6</meta-vattypes-possible>
-      </line>
-      <meta-lines-amount>82.635643333333</meta-lines-amount>
-      <meta-lines-amountinc>99.162772</meta-lines-amountinc>
-      <meta-lines-vatamount>16.53</meta-lines-vatamount>
-      <vattype>6</vattype>
-      <meta-vattypes-possible-invoice>1,6</meta-vattypes-possible-invoice>
-      <meta-vattypes-possible-lines-intersection>6</meta-vattypes-possible-lines-intersection>
-      <meta-vattypes-possible-lines-union>6</meta-vattypes-possible-lines-union>
-    </invoice>
-  </customer>
-</myxml>
-',
-            '{"invoice":{"conceptid":{}},"errors":{"count_errors":"0"},"warnings":{"count_warnings":"0"},"status":"0"}',
-            ["conceptid" => []],
+            'submit' => [
+                'contract' => [
+                    'contractcode' => '288252',
+                    'username' => 'APIGebruiker12345',
+                    'password' => 'mysecret',
+                    'emailonerror' => 'erwin@burorader.com',
+                    'emailonwarning' => 'erwin@burorader.com',
+                ],
+                'format' => 'json',
+                'testmode' => '1',
+                'lang' => 'nl',
+                'connector' => [
+                    'application' => 'WooCommerce 4.0.1 (WordPress: 5.4)',
+                    'webkoppel' => 'Acumulus 5.9.0',
+                    'development' => 'SIEL - Buro RaDer',
+                    'remark' => 'Library 5.10.0-alpha1 - PHP 7.1.33',
+                    'sourceuri' => 'https://www.siel.nl/',
+                ],
+                'customer' => [
+                    'type' => '3',
+                    'contactstatus' => '0',
+                    'companyname1' => 'Les Camélias',
+                    'companyname2' => 'Les Camélias',
+                    'fullname' => 'Erwin Derksen',
+                    'salutation' => 'Beste Erwin',
+                    'address1' => '6 avenue de Clermont',
+                    'postalcode' => '63240',
+                    'city' => 'Le Mont-Dore',
+                    'countrycode' => 'FR',
+                    'country' => 'Frankrijk',
+                    'telephone' => '1234567890',
+                    'email' => 'erwin@burorader.com',
+                    'overwriteifexists' => '1',
+                    'mark' => '::1',
+                    'invoice' => [
+                        'concept' => '0',
+                        'issuedate' => '2020-02-05',
+                        'costcenter' => '48663',
+                        'accountnumber' => '70582',
+                        'paymentstatus' => '2',
+                        'paymentdate' => '2020-04-20',
+                        'description' => 'Order LC202040',
+                        'template' => '52884',
+                        'meta-currency' => 'EUR',
+                        'meta-currency-rate' => '1',
+                        'meta-currency-do-convert' => 'false',
+                        'meta-payment-method' => 'bacs',
+                        'meta-invoice-amountinc' => '99.16',
+                        'meta-invoice-vatamount' => '16.53',
+                        'meta-invoice-amount' => '82.63',
+                        'meta-invoice-calculated' => 'meta-invoice-amount',
+                        'line' => [
+                            0 => [
+                                'product' => 'Ninja Silhouette (Naam: Erwin)',
+                                'nature' => 'Product',
+                                'meta-id' => '401',
+                                'quantity' => '1',
+                                'unitprice' => '78.503443333333',
+                                'unitpriceinc' => '94.204132',
+                                'meta-unitpriceinc-precision' => '0.001',
+                                'meta-recalculate-price' => 'unitprice',
+                                'vatrate' => '20.0000',
+                                'meta-vatrate-min' => '19.989776606158',
+                                'meta-vatrate-max' => '20.00811942888',
+                                'vatamount' => '15.7',
+                                'meta-unitprice-precision' => '0.01',
+                                'meta-vatamount-precision' => '0.01',
+                                'meta-vatrate-source' => 'completor-range',
+                                'meta-vatclass-id' => 'digital-goods',
+                                'meta-vatrate-lookup' => '[20]',
+                                'meta-vatrate-lookup-label' => '["VAT"]',
+                                'meta-line-type' => 'order-item',
+                                'meta-vatrate-range-matches' => '[{"vatrate":"20.0000","vattype":6}]',
+                                'meta-children-merged' => '1',
+                                'meta-recalculate-old-price' => '78.504132',
+                                'meta-did-recalculate' => 'true',
+                                'meta-vattypes-possible' => '6',
+                            ],
+                            1 => [
+                                'product' => 'Vast Tarief',
+                                'unitprice' => '4.1322',
+                                'quantity' => '1',
+                                'vatrate' => '20.0000',
+                                'meta-vatrate-min' => '19.938056523422',
+                                'meta-vatrate-max' => '20.234291799787',
+                                'vatamount' => '0.83',
+                                'meta-unitprice-precision' => '0.001',
+                                'meta-vatamount-precision' => '0.01',
+                                'meta-vatrate-source' => 'completor-range',
+                                'meta-vatclass-id' => 'digital-goods',
+                                'meta-vatrate-lookup' => '["20"]',
+                                'meta-vatrate-lookup-label' => '["VAT"]',
+                                'meta-vatrate-lookup-source' => 'shipping line taxes',
+                                'meta-line-type' => 'shipping',
+                                'nature' => 'Service',
+                                'meta-vatrate-range-matches' => '[{"vatrate":"20.0000","vattype":6}]',
+                                'unitpriceinc' => '4.95864',
+                                'meta-fields-calculated' => '["unitpriceinc"]',
+                                'meta-vattypes-possible' => '6',
+                            ],
+                        ],
+                        'meta-lines-amount' => '82.635643333333',
+                        'meta-lines-amountinc' => '99.162772',
+                        'meta-lines-vatamount' => '16.53',
+                        'vattype' => '6',
+                        'meta-vattypes-possible-invoice' => '1,6',
+                        'meta-vattypes-possible-lines-intersection' => '6',
+                        'meta-vattypes-possible-lines-union' => '6',
+                    ],
+                ],
+            ],
+            'response body' => '{"invoice":{"conceptid":{}},"errors":{"count_errors":"0"},"warnings":{"count_warnings":"0"},"status":"0"}',
+            'main response' => ['conceptid' => []],
+        ],
+
+        'signup' => [
+            'submit' => [
+                Tag::CompanyTypeId => 1,
+                Tag::CompanyName => 'My Company',
+                Tag::FullName => 'Smith',
+                Tag::LoginName => 'John',
+                Tag::Gender => 'M',
+                Tag::Address => 'Straat 5',
+                Tag::PostalCode => '1234 AB',
+                Tag::City => 'Amsterdam',
+                Tag::Email => 'john.doe@example.com',
+            ],
+            'response body' => '{"signup:":{"contractcode":"123456","contractloginname":"myuser","contractpassword":"mysecret","contractstartdate":"2022-02-22","contractenddate":"","contractapiuserloginname":"myapiuser","contractapiuserpassword":"mysecret"},"errors":{"count_errors":"0"},"warnings":{"count_warnings":"0"},"status":"0"}',
+            'main response' => [
+                'contractcode' => '123456',
+                'contractloginname' => 'myuser',
+                'contractpassword' => 'mysecret',
+                'contractstartdate' => '2022-02-22',
+                'contractenddate' => '',
+                'contractapiuserloginname' => 'myapiuser',
+                'contractapiuserpassword' => 'mysecret',
+            ],
         ],
     ];
 
-    public function getRequest($key)
+    public function getSubmit($key)
     {
-        return $this->sets[$key][0];
+        return $this->sets[$key]['submit'];
     }
 
-    public function getResponse($key)
+    public function getResponseBody($key)
     {
-        return $this->sets[$key][1];
+        return $this->sets[$key]['response body'];
     }
 
-    public function getResponseArray($key)
+    public function getMainResponse($key)
     {
-        return $this->sets[$key][2];
+        return $this->sets[$key]['main response'];
     }
 }

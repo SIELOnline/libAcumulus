@@ -394,7 +394,7 @@ class Container
     public function getResult()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('Result', 'ApiClient', [], true);
+        return $this->getInstance('Result', 'ApiClient', [$this->getTranslator(), $this->getLog()], true);
     }
 
     /**
@@ -405,7 +405,7 @@ class Container
     public function getAcumulusRequest()
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('AcumulusRequest', 'ApiClient', [$this, $this->getConfig(), $this->getLanguage(), $this->getLog()]);
+        return $this->getInstance('AcumulusRequest', 'ApiClient', [$this, $this->getConfig(), $this->getLanguage(), $this->getLog()], true);
     }
 
     /**
@@ -443,7 +443,7 @@ class Container
     public function getInvoiceResult($trigger)
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('Result', 'Invoice', [$trigger], true);
+        return $this->getInstance('Result', 'Invoice', [$trigger, $this->getTranslator(), $this->getLog()], true);
     }
 
     /**

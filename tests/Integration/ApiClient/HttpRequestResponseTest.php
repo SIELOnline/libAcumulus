@@ -49,7 +49,7 @@ class HttpRequestResponseTest extends TestCase
 
     public function testPost()
     {
-        $uri = 'http://localhost/lib-acumulus/siel-logo.png';
+        $uri = 'http://localhost/lib-acumulus/resources/siel-logo.png';
         $post = ['my_post' => 'my_value'];
         $response = $this->httpRequest->post($uri, $post);
 
@@ -64,7 +64,7 @@ class HttpRequestResponseTest extends TestCase
         // Properties of response.
         $this->assertSame(200, $response->getHttpCode());
         $this->assertIsString($response->getHeaders());
-        $this->assertSame(file_get_contents(__DIR__ . '/../../../siel-logo.png'), $response->getBody());
+        $this->assertSame(file_get_contents(__DIR__ . '/../../../resources/siel-logo.png'), $response->getBody());
         $this->assertIsArray($response->getInfo());
         $this->assertIsString($response->getRequestHeaders());
 

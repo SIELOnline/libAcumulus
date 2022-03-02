@@ -1,4 +1,11 @@
 <?php
+/**
+ * Note: Do not use PHP7 language constructs as long as we want the Requirements
+ * class to check for that and present and log a proper warning.
+ *
+ * @noinspection PhpMissingReturnTypeInspection
+ */
+
 namespace Siel\Acumulus\Helpers;
 
 /**

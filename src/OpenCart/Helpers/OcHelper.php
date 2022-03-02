@@ -1,21 +1,35 @@
 <?php
+/**
+ * @noinspection PhpMissingParamTypeInspection
+ * @noinspection PhpMissingReturnTypeInspection
+ * @noinspection PhpIssetCanBeReplacedWithCoalesceInspection
+ * @noinspection PhpConcatenationWithEmptyStringCanBeInlinedInspection
+ */
+
 namespace Siel\Acumulus\OpenCart\Helpers;
 
+use Exception;
+use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Helpers\Message;
 use Siel\Acumulus\Helpers\Severity;
-use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Invoice\Source;
+use stdClass;
+
 use const Siel\Acumulus\Version;
 
 /**
  * OcHelper contains functionality shared between the OC1, OC2 and OC3
  * controllers and models, for both admin and catalog.
+ *
+ * NOTE: To let this class check the (PHP version) requirements on installing
+ *  or upgrading, this file itself should not contain PHP 7 language constructs,
+ *  nor should Container, Requirements or Log!
  */
 class OcHelper
 {
     /** @var \Siel\Acumulus\Helpers\Container */
-    protected $container = null;
+    protected $acumulusContainer = null;
 
     /** @var array */
     public $data;
@@ -27,19 +41,19 @@ class OcHelper
      * OcHelper constructor.
      *
      * @param \Registry $registry
-     * @param \Siel\Acumulus\Helpers\Container $container
+     * @param \Siel\Acumulus\Helpers\Container $acumulusContainer
      */
-    public function __construct(\Registry $registry, Container $container)
+    public function __construct(\Registry $registry, Container $acumulusContainer)
     {
-        $this->container = $container;
-        $this->registry = $this->container->getInstance('Registry', 'Helpers', [$registry]);
+        $this->acumulusContainer = $acumulusContainer;
+        $this->registry = $this->acumulusContainer->getInstance('Registry', 'Helpers', [$registry]);
         $this->data = [];
 
         $languageCode = $this->registry->language->get('code');
         if (empty($languageCode)) {
             $languageCode = 'nl';
         }
-        $this->container->setLanguage($languageCode);
+        $this->acumulusContainer->setLanguage($languageCode);
     }
 
     /**
@@ -85,7 +99,7 @@ class OcHelper
      */
     protected function t($key)
     {
-        return $this->container->getTranslator()->get($key);
+        return $this->acumulusContainer->getTranslator()->get($key);
     }
 
     /**
@@ -108,10 +122,18 @@ class OcHelper
      */
     public function install()
     {
-        // Call the actual install method.
-        $this->doInstall();
+        $this->registry->load->model('setting/setting');
+        $setting = $this->registry->model_setting_setting->getSetting('acumulus_siel');
+        $isAlreadyInstalled = count($setting) > 0;
 
-        return empty($this->data['error_messages']);
+        if (!$isAlreadyInstalled) {
+            // Call the actual install method.
+            $result = $this->doInstall();
+        } else {
+            // Config already exists:this is not a clean install: upgrade.
+            $result = $this->doUpgrade();
+        }
+        return $result;
     }
 
     /**
@@ -315,8 +337,8 @@ class OcHelper
      */
     public function eventOrderUpdate($order_id)
     {
-        $source = $this->container->getSource(Source::Order, $order_id);
-        $this->container->getInvoiceManager()->sourceStatusChange($source);
+        $source = $this->acumulusContainer->getSource(Source::Order, $order_id);
+        $this->acumulusContainer->getInvoiceManager()->sourceStatusChange($source);
     }
 
     /**
@@ -335,12 +357,17 @@ class OcHelper
                     'children' => [
                         [
                             'name' => $this->t('batch_form_link_text'),
-                            'href' => $this->container->getShopCapabilities()->getLink('batch'),
+                            'href' => $this->acumulusContainer->getShopCapabilities()->getLink('batch'),
+                            'children' => [],
+                        ],
+                        [
+                            'name' => $this->t('config_form_link_text'),
+                            'href' => $this->acumulusContainer->getShopCapabilities()->getLink('config'),
                             'children' => [],
                         ],
                         [
                             'name' => $this->t('advanced_form_link_text'),
-                            'href' => $this->container->getShopCapabilities()->getLink('advanced'),
+                            'href' => $this->acumulusContainer->getShopCapabilities()->getLink('advanced'),
                             'children' => [],
                         ],
                     ],
@@ -354,7 +381,7 @@ class OcHelper
      */
     public function eventControllerSaleOrderInfo()
     {
-        if ($this->container->getConfig()->getInvoiceStatusSettings()['showInvoiceStatus']) {
+        if ($this->acumulusContainer->getConfig()->getInvoiceStatusSettings()['showInvoiceStatus']) {
             $this->registry->document->addStyle('view/stylesheet/acumulus.css');
             $this->registry->document->addScript('view/javascript/acumulus/acumulus-ajax.js');
         }
@@ -371,12 +398,12 @@ class OcHelper
      */
     public function eventViewSaleOrderInfo($orderId, &$tabs)
     {
-        if ($this->container->getConfig()->getInvoiceStatusSettings()['showInvoiceStatus']) {
+        if ($this->acumulusContainer->getConfig()->getInvoiceStatusSettings()['showInvoiceStatus']) {
             $type = 'invoice';
             $id = "acumulus-$type";
             $output = $this->renderFormInvoice($orderId);
 
-            $tab = new \stdClass();
+            $tab = new stdClass();
             $tab->code = $id;
             $tab->title = $this->t("{$type}_form_title");
             $tab->content = $output;
@@ -393,7 +420,7 @@ class OcHelper
     protected function displayFormCommon($type)
     {
         // This will initialize the form translations.
-        $this->data['form'] = $this->container->getForm($type);
+        $this->data['form'] = $this->acumulusContainer->getForm($type);
 
         $this->data['success_messages'] = [];
         $this->data['warning_messages'] = [];
@@ -449,7 +476,7 @@ class OcHelper
         // Show messages.
         $this->addMessages($form->getMessages());
 
-        $this->data['formRenderer'] = $this->container->getFormRenderer();
+        $this->data['formRenderer'] = $this->acumulusContainer->getFormRenderer();
 
         if ($form->isFullPage()) {
             // Complete the breadcrumb with the current path.
@@ -481,12 +508,12 @@ class OcHelper
             $orderId = (int) $orderId;
             /** @var \Siel\Acumulus\Shop\InvoiceStatusForm $form */
             $form = $this->data['form'];
-            $form->setSource($this->container->getSource(Source::Order, $orderId));
+            $form->setSource($this->acumulusContainer->getSource(Source::Order, $orderId));
         }
         $this->renderFormCommon($type);
 
         $id = "acumulus-$type";
-        $url = $this->container->getShopCapabilities()->getLink('invoice');
+        $url = $this->acumulusContainer->getShopCapabilities()->getLink('invoice');
         $wait = $this->t('wait');
         $output = '';
         $output .= "<form method='POST' action='$url' id='$id' class='form-horizontal acumulus-area' data-acumulus-wait='$wait'>";
@@ -506,51 +533,47 @@ class OcHelper
     }
 
     /**
-     * Checks requirements and installs tables for this module.
+     * Performs a clean installation.
+     * Checks requirements and installs tables and initial config.
      *
      * @return bool
      *   Success.
      *
-     * @throws \Exception
-     */
+     * @noinspection PhpDocMissingThrowsInspection*/
     protected function doInstall()
     {
-        $this->registry->load->model('setting/setting');
-        $setting = $this->registry->model_setting_setting->getSetting('acumulus_siel');
-        $currentDataModelVersion = isset($setting['acumulus_siel_datamodel_version']) ? $setting['acumulus_siel_datamodel_version'] : '';
-
-        $this->container->getLog()->info('%s: current version = %s', __METHOD__, $currentDataModelVersion);
-
-        if ($currentDataModelVersion === '' || version_compare($currentDataModelVersion, '4.0', '<')) {
-            // Check requirements (we assume this has been done successfully
-            // before if the data model is at the latest version).
-            $requirements = $this->container->getRequirements();
-            $messages = $requirements->check();
-            foreach ($messages as $message) {
-                $this->addMessages([new Message($message, Severity::Error)]);
-                $this->container->getLog()->error($message);
-            }
-            if (!empty($messages)) {
-                return false;
-            }
-
-            // Install tables.
-            if ($result = $this->container->getAcumulusEntryManager()->install()) {
-                $setting['acumulus_siel_datamodel_version'] = '4.0';
-                $this->registry->model_setting_setting->editSetting('acumulus_siel', $setting);
-            }
-        } else {
-            if ($result = $this->container->getAcumulusEntryManager()->upgrade($currentDataModelVersion)) {
-                $setting['acumulus_siel_datamodel_version'] = Version;
-                $this->registry->model_setting_setting->editSetting('acumulus_siel', $setting);
-            }
+        $requirements = $this->acumulusContainer->getRequirements();
+        $messages = $requirements->check();
+        foreach ($messages as $message) {
+            $this->addMessages([new Message($message, Severity::Error)]);
+            $this->acumulusContainer->getLog()->error($message);
+        }
+        if (!empty($messages)) {
+            return false;
         }
 
-        // Install events
-        if (empty($this->data['error_messages'])) {
+        // Install tables.
+        try {
+            $result = $this->acumulusContainer->getAcumulusEntryManager()->install();
+        } catch (Exception $e) {
+            $this->acumulusContainer->getLog()->error('Exception installing tables: ' . $e->getMessage());
+            $result = false;
+        }
+
+        // Install events.
+        try {
             $this->installEvents();
+        } catch (Exception $e) {
+            $this->acumulusContainer->getLog()->error('Exception installing events: ' . $e->getMessage());
+            $result = false;
         }
 
+        // Install initial config.
+        if ($result) {
+            $this->acumulusContainer->getConfig()->save([Config::configVersion => Version]);
+        }
+
+        $this->acumulusContainer->getLog()->info('%s: installed version = %s, $result = %s', __METHOD__, Version, $result ? 'true' : 'false');
         return $result;
     }
 
@@ -558,13 +581,13 @@ class OcHelper
      * Uninstalls data and settings from this module.
      *
      * @return bool
-     *   Whether the uninstall was successful.
+     *   Whether the uninstallation was successful.
      *
      * @throws \Exception
      */
     protected function doUninstall()
     {
-        $this->container->getAcumulusEntryManager()->uninstall();
+        $this->acumulusContainer->getAcumulusEntryManager()->uninstall();
 
         // Delete all config values.
         $this->registry->load->model('setting/setting');
@@ -576,38 +599,72 @@ class OcHelper
     /**
      * Upgrades the data and settings for this module if needed.
      *
-     * The install now checks for the data model and can do an upgrade instead
-     * of a clean install.
-     *
      * @return bool
      *   Whether the upgrade was successful.
      *
-     * @throws \Exception
+     * @noinspection PhpDocMissingThrowsInspection
      */
     protected function doUpgrade()
     {
-
-        $this->registry->load->model('setting/setting');
-        $setting = $this->registry->model_setting_setting->getSetting('acumulus_siel');
-        $currentDataModelVersion = isset($setting['acumulus_siel_datamodel_version']) ? $setting['acumulus_siel_datamodel_version'] : '';
-        $apiVersion = Version;
-
-        // @todo: extract updating part from doInstall to here.
-        // Install/update data model first.
-        $result = $this->doInstall();
-
-        $this->container->getLog()->info('%s: installed version = %s, API = %s', __METHOD__, $currentDataModelVersion, $apiVersion);
-
-        if (version_compare($currentDataModelVersion, $apiVersion, '<')) {
-            // Update config settings.
-            if ($result = $this->container->getConfig()->upgrade($currentDataModelVersion)) {
-                // Refresh settings.
-                $setting = $this->registry->model_setting_setting->getSetting('acumulus_siel');
-                $setting['acumulus_siel_datamodel_version'] = $apiVersion;
-                $this->registry->model_setting_setting->editSetting('acumulus_siel', $setting);
-            }
+        if (!empty($this->acumulusContainer->getConfig()->get(Config::configVersion))) {
+            // Config updates are now done in the config itself and, for now, no
+            // data model changes have been made since the introduction of
+            // configVersion, so we can return.
+            return true;
         }
 
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $this->registry->load->model('setting/setting');
+        $setting = $this->registry->model_setting_setting->getSetting('acumulus_siel');
+        if (isset($setting['acumulus_siel_datamodel_version'])) {
+            $currentDataModelVersion = $setting['acumulus_siel_datamodel_version'];
+        } else {
+            // We must be coming from a version before the introduction of
+            // 'acumulus_siel_datamodel_version', no idea when that was, but
+            // let's say we pick every update as of version 4.0:
+            $currentDataModelVersion = '4.0.0-beta1';
+        }
+
+        // Update or even install table.
+        if ($currentDataModelVersion === '' || version_compare($currentDataModelVersion, '4.0', '<')) {
+            // Check requirements before we continue upgrading from such an old
+            // version, because this also means that the previous requirements
+            // check also dates back from the PHP 5.3 era.
+            $requirements = $this->acumulusContainer->getRequirements();
+            $messages = $requirements->check();
+            foreach ($messages as $message) {
+                $this->addMessages([new Message($message, Severity::Error)]);
+                $this->acumulusContainer->getLog()->error($message);
+            }
+            if (!empty($messages)) {
+                return false;
+            }
+
+            // Install tables.
+            $result = $this->acumulusContainer->getAcumulusEntryManager()->install();
+        } else {
+            $result = $this->acumulusContainer->getAcumulusEntryManager()->upgrade($currentDataModelVersion);
+        }
+
+        // Install events (just to be sure).
+        try {
+            $this->installEvents();
+        } catch (Exception $e) {
+            $this->acumulusContainer->getLog()->error('Exception installing events: ' . $e->getMessage());
+            $result = false;
+        }
+
+        // Update config values, this should set configVersion.
+        $result = $this->acumulusContainer->getConfigUpgrade()->upgrade($currentDataModelVersion) && $result;
+        if ($result) {
+            // Delete setting 'acumulus_siel_datamodel_version' without
+            // reverting other settings.
+            $setting = $this->registry->model_setting_setting->getSetting('acumulus_siel');
+            unset($setting['acumulus_siel_datamodel_version']);
+            $this->registry->model_setting_setting->editSetting('acumulus_siel', $setting);
+        }
+
+        $this->acumulusContainer->getLog()->info('%s: updated to version = %s, $result = %s', __METHOD__, Version, $result ? 'true' : 'false');
         return $result;
     }
 
@@ -620,7 +677,7 @@ class OcHelper
      * the admin events.
      *
      * To support updating, this will also be called by the index function.
-     * Therefore we will first remove any existing events from our module.
+     * Therefore, we will first remove any existing events from our module.
      *
      * To support other plugins, notably quick_status_updater, we do not only
      * look at the checkout/order events at the catalog side, but at all

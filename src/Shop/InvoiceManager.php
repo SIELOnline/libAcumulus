@@ -250,6 +250,7 @@ abstract class InvoiceManager
      * Sends multiple invoices to Acumulus.
      *
      * @param \Siel\Acumulus\Invoice\Source[] $invoiceSources
+     * @todo: change parameter $forceSend to an int: the 3 options of the batch form field 'send_mode'.
      * @param bool $forceSend
      *   If true, force sending the invoices even if an invoice has already been
      *   sent for a given invoice source.

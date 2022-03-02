@@ -1,11 +1,19 @@
 <?php
+/**
+ * Note: Do not use PHP7 language constructs as long as we want the Requirements
+ * class to check for that and present and log a proper warning.
+ *
+ * @noinspection PhpMissingParamTypeInspection
+ * @noinspection PhpMissingReturnTypeInspection
+ */
+
 namespace Siel\Acumulus\Helpers;
 
 /**
- * Allows to log messages to a log.
+ * Allows logging messages to a log.
  *
  * This base class will log to the PHP error file. It should be overridden per
- * webshop to integrate with the webshop's specific way of logging.
+ * web shop to integrate with the web shop's specific way of logging.
  *
  * @todo: log a Message
  * @todo: log a Message[]
@@ -15,7 +23,7 @@ namespace Siel\Acumulus\Helpers;
 class Log
 {
     /** @var int */
-    protected $logLevel;
+    protected $logLevel = Severity::Info;
 
     /** @var string */
     protected $libraryVersion;
@@ -95,10 +103,11 @@ class Log
      * Formats and logs the message if the log level indicates so.
      *
      * Errors, warnings and notices are always logged, other levels only if the
-     * log level is set to do so.
+     * log level is set to do so. Before the log level is set from config,
+     * informational messages are also logged.
      *
      * Formatting involves:
-     * - calling vsprintf() if $args is not empty
+     * - calling vsprintf() if $args is not empty.
      * - adding "Acumulus {version} {severity}: " in front of the message.
      *
      * @param int $severity
@@ -113,7 +122,7 @@ class Log
      */
     public function log($severity, $message, array $args = [])
     {
-        if ($severity >= min($this->getLogLevel(), Severity::Notice)) {
+        if ($severity >= $this->getLogLevel()) {
             if (count($args) > 0) {
                 $message = vsprintf($message, $args);
             }

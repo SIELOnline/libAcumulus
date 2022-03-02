@@ -145,7 +145,6 @@ abstract class Form extends MessageCollection
      */
     public function __construct($acumulusApiClient, FormHelper $formHelper, ShopCapabilities $shopCapabilities, Config $config, Translator $translator, Log $log)
     {
-        parent::__construct();
         $this->formValuesSet = false;
         $this->submittedValues = [];
 

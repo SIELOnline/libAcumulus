@@ -20,22 +20,40 @@ WC2 = WooCommerce 2 (wordt niet meer ondersteund vanaf onze versie 5.5.2)
 
 7.0.0-alpha1 (2022-02-??)
 -------------------------
+Features:
+- OC: The Acumulus settings form now also appears as a menu-item under "Sales -
+  Acumulus". Before it could only be accessed via "Extensions - Modules - Edit
+  (Acumulus module)", so this makes it easier to access the basic settings.
+
 Refactorings:
 - PHP 7.1 is now the minimal requirement. we DO use language constructs that are
   new to PHP 7.1, so this module WILL fail fatally when you are still running an
-  older version.
+  older PHP version.
 - Refactored the ApiClient namespace to better separate the different layers and
   concerns:
   - Separate HttpRequest and HttpResponse classes that implement HTTP(S)
     communication and error handling, with no Acumulus knowledge at all. This
     facilitates communication with other services (e.g. GitHub or VIES).
   - A ConnectionHandler class that supports connection reuse. This prevents
-    multiple time costly HTTPS connection set-ups during a PHP request.
+    time costly HTTPS connection set-ups during a PHP request.
   - On top of AcumulusRequest and (Acumulus)Result classes that implement
     Acumulus Api knowledge like the submit and response structures, and error
     handling at the Acumulus level.
-  - The Acumulus class still represents the Acumulus service endpoints as PHP
+  - The Acumulus class still represents the Acumulus service calls as PHP
     methods.
+- Refactored upgrading config: we now store the actual config version with the
+  other config values:
+  - We check for an update on every load() of the config, thus independent from
+    a plugin update.
+  - The version of the config is now in line with the library version, not the
+    plugin version. Again, this allows to separately update the library.
+  - Plugins should still force setting the initial version on installation, but
+    do no longer have to initiate updates to it.
+  - Data model updates should still be applied by the plugin as this is often
+    done in a host environment specific way. So with data model changes a new
+    version of a plugin is still needed together with an update of the library.
+  - Update methods are separated into its own class ConfigUpgrade, it became too
+    much code to remain part of Config.
 
 6.4.1 (2022-02-23) (MA2 only)
 -----------------------------

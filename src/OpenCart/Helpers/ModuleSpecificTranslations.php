@@ -11,6 +11,7 @@ class ModuleSpecificTranslations extends TranslationCollection
     protected $nl = [
         'module' => 'extensie',
         'button_link' => '<a href="%2$s" class="button btn btn-primary"><i class="fa fa-cog"></i> %1$s</a>',
+        'config_form_link_text' => 'Instellingen',
         'advanced_form_link_text' => 'Geavanceerde instellingen',
         'batch_form_link_text' => 'Batchverzending',
 
@@ -25,6 +26,7 @@ class ModuleSpecificTranslations extends TranslationCollection
 
     protected $en = [
         'module' => 'extension',
+        'config_form_link_text' => 'Settings',
         'advanced_form_link_text' => 'Advanced settings',
         'batch_form_link_text' => 'Send batch',
 

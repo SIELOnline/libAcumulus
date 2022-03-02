@@ -8,7 +8,7 @@ use JUri;
 use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
 
 /**
- * Defines Joomla webshops specific capabilities.
+ * Defines common Joomla capabilities for web shops running on Joomla.
  */
 abstract class ShopCapabilities extends ShopCapabilitiesBase
 {

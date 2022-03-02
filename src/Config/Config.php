@@ -6,7 +6,6 @@
 
 namespace Siel\Acumulus\Config;
 
-use Exception;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Severity;
@@ -26,6 +25,8 @@ use const Siel\Acumulus\Version;
  */
 class Config
 {
+    const configVersion = 'configVersion';
+
     const Concept_Plugin = 2;
 
     const Send_SendAndMailOnError = 1;
@@ -85,6 +86,11 @@ class Config
 
     /** @var bool */
     protected $isConfigurationLoaded;
+
+    /**
+     * @var bool
+     */
+    protected $isUpgrading;
 
     /** @var array */
     protected $values;
@@ -148,6 +154,9 @@ class Config
 
     /**
      * Loads the configuration from the actual configuration provider.
+     *
+     * After loading this method checks if the stored values need an upgrade
+     * and, if so, will trigger that update.
      */
     protected function load()
     {
@@ -159,6 +168,15 @@ class Config
             }
             $this->values = $this->castValues($this->values);
             $this->isConfigurationLoaded = true;
+
+            if (!empty($this->values[Config::configVersion])
+                && version_compare($this->values[Config::configVersion], Version, '<')
+                && !$this->isUpgrading
+            ) {
+                $this->isUpgrading = true;
+                $this->container->getConfigUpgrade()->upgrade($this->values[Config::configVersion]);
+                $this->isUpgrading = false;
+            }
         }
     }
 
@@ -212,7 +230,7 @@ class Config
      * @param array $values
      *
      * @return array
-     *   Array with casted values.
+     *   Array with cast values.
      */
     protected function castValues(array $values)
     {
@@ -263,7 +281,7 @@ class Config
      *   The array to remove values from.
      *
      * @return array
-     *   The passed in set of values reduced to values that should be stored.
+     *   The set of values passed in reduced to those values to be stored.
      */
     protected function removeValuesNotToBeStored(array $values)
     {
@@ -291,6 +309,18 @@ class Config
     }
 
     /**
+     * Returns all configuration values.
+     *
+     * @return array
+     *   An array with all configuration values keyed by their name.
+     */
+    public function getAll(): array
+    {
+        $this->load();
+        return $this->values;
+    }
+
+    /**
      * Returns the value of the specified configuration value.
      *
      * @param string $key
@@ -301,10 +331,10 @@ class Config
      *   will be a simple type (string, int, bool) or a keyed array with simple
      *   values.
      */
-    protected function get($key)
+    public function get($key)
     {
         $this->load();
-        return isset($this->values[$key]) ? $this->values[$key] : null;
+        return $this->values[$key] ?? null;
     }
 
     /**
@@ -323,7 +353,7 @@ class Config
     public function set($key, $value)
     {
         $this->load();
-        $oldValue = isset($this->values[$key]) ? $this->values[$key] : null;
+        $oldValue = $this->values[$key] ?? null;
         $this->values[$key] = $value;
         return $oldValue;
     }
@@ -635,7 +665,7 @@ class Config
                 // renaming config keys, etc. and be able to execute an update
                 // function without being dependent on the host system to
                 // provide the current "data model" version.
-                'configVersion' => [
+                Config::configVersion => [
                     'group' => 'config',
                     'type' => 'string',
                     'default' => '',
@@ -1045,482 +1075,5 @@ class Config
             ];
         }
         return $this->keyInfo;
-    }
-
-    /**
-     * Upgrade the data model to the given version.
-     *
-     * This method is only called when the module gets updated.
-     *
-     * Notes:
-     * - If possible values for a config key are re-assigned, the default, which
-     *   comes from code in this class, will already be the newly assigned
-     *   value. So when updating, we should only update values stored in the
-     *   database. Therefore, in the methods below, you will see that the values
-     *   are "loaded" using the ConfigStore, not the load() method of this
-     *   class.
-     * - $currentVersion can be empty if the host environment cannot deliver
-     *   this value (MA2.4). If so, we switch to using a new key 'configVersion'
-     *   in the set of config values.
-     *
-     * @param string $currentVersion
-     *   The current version of the data model of this module.
-     *
-     * @return bool
-     *   Success.
-     *
-     * @throws \Exception
-     */
-    public function upgrade($currentVersion)
-    {
-        if ($currentVersion === '') {
-            $configVersion = $this->get('configVersion');
-            // If the 'configVersion' has not yet been set, we have to guess it.
-            // The 6.0.0 update is not idempotent, whereas the 6.3.1 update is,
-            // So we "guess" 6.3.0, making this work for everybody running on
-            // 6.0.1 or later (release date 2020-08-06). If running an older
-            // version before updating, some config values may be interpreted
-            // incorrectly.
-            $currentVersion = !empty($configVersion) ? $configVersion : '6.3.0';
-        }
-
-        $result = true;
-
-        if (version_compare($currentVersion, '4.5.0', '<')) {
-            $result = $this->upgrade450();
-        }
-
-        if (version_compare($currentVersion, '4.5.3', '<')) {
-            $result = $this->upgrade453() && $result;
-        }
-
-        if (version_compare($currentVersion, '4.6.0', '<')) {
-            $result = $this->upgrade460() && $result;
-        }
-
-        if (version_compare($currentVersion, '4.7.0', '<')) {
-            $result = $this->upgrade470() && $result;
-        }
-
-        if (version_compare($currentVersion, '4.7.3', '<')) {
-            $result = $this->upgrade473() && $result;
-        }
-
-        if (version_compare($currentVersion, '4.8.5', '<')) {
-            $result = $this->upgrade496() && $result;
-        }
-
-        if (version_compare($currentVersion, '5.4.0', '<')) {
-            $result = $this->upgrade540() && $result;
-        }
-
-        if (version_compare($currentVersion, '5.4.1', '<')) {
-            $result = $this->upgrade541() && $result;
-        }
-
-        if (version_compare($currentVersion, '5.4.2', '<')) {
-            $result = $this->upgrade542() && $result;
-        }
-
-        if (version_compare($currentVersion, '5.5.0', '<')) {
-            $result = $this->upgrade550() && $result;
-        }
-
-        if (version_compare($currentVersion, '6.0.0', '<')) {
-            $result = $this->upgrade600() && $result;
-        }
-
-        if (version_compare($currentVersion, '6.3.1', '<')) {
-            $result = $this->upgrade631() && $result;
-        }
-
-        if (version_compare($currentVersion, '6.4.0', '<')) {
-            $result = $this->upgrade640() && $result;
-        }
-
-        if (version_compare($currentVersion, '6.4.1', '<')) {
-            $result = $this->upgrade641() && $result;
-        }
-
-        return $result;
-    }
-
-    /**
-     * 4.5.0 upgrade.
-     *
-     * - Log level: added level info and set log level to notice if it currently
-     *   is error or warning.
-     * - Debug mode: the values of test mode and stay local are switched. Stay
-     *   local is no longer used, so both these 2 values become the new test
-     *   mode.
-     *
-     * @return bool
-     */
-    protected function upgrade450()
-    {
-        $result = true;
-        // Keep track of settings that should be updated.
-        $newSettings = [];
-
-        // 1) Log level.
-        switch ($this->get('logLevel')) {
-            case 1 /*Log::Error*/:
-            case 2 /*Log::Warning*/:
-                // This is often not giving enough information, so we set it
-                // to Notice by default.
-                $newSettings['logLevel'] = 3 /*Log::Notice*/;
-                break;
-            case 4 /*Log::Info*/:
-                // Info was inserted, so this is the former debug level.
-                $newSettings['logLevel'] = 5 /*Log::Debug*/;
-                break;
-        }
-
-        // 2) Debug mode.
-        /** @noinspection PhpSwitchStatementWitSingleBranchInspection */
-        switch ($this->get('debug')) {
-            case 4: // Value for deprecated PluginConfig::Debug_StayLocal.
-                $newSettings['logLevel'] = Config::Send_TestMode;
-                break;
-        }
-
-        if (!empty($newSettings)) {
-            $result = $this->save($newSettings);
-        }
-        return $result;
-    }
-
-    /**
-     * 4.5.3 upgrade.
-     *
-     * - setting triggerInvoiceSendEvent removed.
-     * - setting triggerInvoiceEvent introduced.
-     *
-     * @return bool
-     */
-    protected function upgrade453()
-    {
-        // Keep track of settings that should be updated.
-        $newSettings = [];
-        if ($this->get('triggerInvoiceSendEvent') == 2) {
-            $newSettings['triggerInvoiceEvent'] = Config::TriggerInvoiceEvent_Create;
-        } else {
-            $newSettings['triggerInvoiceEvent'] = Config::TriggerInvoiceEvent_None;
-        }
-
-        return $this->save($newSettings);
-    }
-
-    /**
-     * 4.6.0 upgrade.
-     *
-     * - setting removeEmptyShipping inverted.
-     *
-     * @return bool
-     */
-    protected function upgrade460()
-    {
-        $result = true;
-        $newSettings = [];
-
-        if ($this->get('removeEmptyShipping') !== null) {
-            $newSettings['sendEmptyShipping'] = !$this->get('removeEmptyShipping');
-        }
-
-        if (!empty($newSettings)) {
-            $result = $this->save($newSettings);
-        }
-        return $result;
-    }
-
-    /**
-     * 4.7.0 upgrade.
-     *
-     * - salutation could already use token, but with old syntax: remove # after [.
-     *
-     * @return bool
-     */
-    protected function upgrade470()
-    {
-        $result = true;
-        $newSettings = [];
-
-        if ($this->get('salutation') && strpos($this->get('salutation'), '[#') !== false) {
-            $newSettings['salutation'] = str_replace('[#', '[', $this->get('salutation'));
-        }
-
-        if (!empty($newSettings)) {
-            $result = $this->save($newSettings);
-        }
-        return $result;
-    }
-
-    /**
-     * 4.7.3 upgrade.
-     *
-     * - subject could already use token, but with #b and #f replace by new token syntax.
-     *
-     * @return bool
-     */
-    protected function upgrade473()
-    {
-        $result = true;
-        $newSettings = [];
-
-        if ($this->get('subject') && strpos($this->get('subject'), '[#') !== false) {
-            str_replace('[#b]', '[invoiceSource::reference]', $this->get('subject'));
-            str_replace('[#f]', '[invoiceSource::invoiceNumber]', $this->get('subject'));
-        }
-
-        if (!empty($newSettings)) {
-            $result = $this->save($newSettings);
-        }
-        return $result;
-    }
-
-    /**
-     * 4.9.6 upgrade.
-     *
-     * - 4.7.3 update was never called (due to a typo 4.7.0 update was called).
-     *
-     * @return bool
-     */
-    protected function upgrade496()
-    {
-        return $this->upgrade473();
-    }
-
-    /**
-     * 5.4.0 upgrade.
-     *
-     * - ConfigStore->save should store all settings in 1 serialized value.
-     *
-     * @return bool
-     */
-    protected function upgrade540()
-    {
-        $result = true;
-
-        // ConfigStore::save should store all settings in 1 serialized value.
-        $configStore = $this->getConfigStore();
-        if (method_exists($configStore, 'loadOld')) {
-            /** @noinspection PhpDeprecationInspection */
-            $values = $configStore->loadOld($this->getKeys());
-            $result = $this->save($values);
-        }
-
-        return $result;
-    }
-
-    /**
-     * 5.4.1 upgrade.
-     *
-     * - property source originalInvoiceSource renamed to order.
-     *
-     * @return bool
-     */
-    protected function upgrade541()
-    {
-        $result = true;
-        $doSave = false;
-        $this->load();
-        $values = $this->values;
-        array_walk_recursive($values, function(&$value) use (&$doSave) {
-            if (is_string($value) && strpos($value, 'originalInvoiceSource::') !== false) {
-                $value = str_replace('originalInvoiceSource::', 'order::', $value);
-                $doSave = true;
-            }
-        });
-        if ($doSave) {
-            $result = $this->save($values);
-        }
-
-        return $result;
-    }
-
-    /**
-     * 5.4.2 upgrade.
-     *
-     * - property paymentState renamed to paymentStatus.
-     *
-     * @return bool
-     */
-    protected function upgrade542()
-    {
-        $result = true;
-        $doSave = false;
-        $configStore = $this->getConfigStore();
-        $values = $configStore->load();
-        array_walk_recursive($values, function(&$value) use (&$doSave) {
-            if (is_string($value) && strpos($value, 'paymentState') !== false) {
-                $value = str_replace('paymentState', 'paymentStatus', $value);
-                $doSave = true;
-            }
-        });
-        if ($doSave) {
-            $result = $this->save($values);
-        }
-
-        return $result;
-    }
-
-    /**
-     * 5.5.0 upgrade.
-     *
-     * - setting digitalServices extended and therefore renamed to foreignVat.
-     *
-     * @return bool
-     */
-    protected function upgrade550()
-    {
-        $newSettings = [];
-        $newSettings['foreignVat'] = (int) $this->get('digitalServices');
-        return $this->save($newSettings);
-    }
-
-    /**
-     * 6.0.0 upgrade.
-     *
-     * - Log level is now a Severity constant.
-     *
-     * @return bool
-     *
-     * @throws \Exception
-     */
-    protected function upgrade600()
-    {
-        $requirements = $this->container->getRequirements();
-        $messages = $requirements->check();
-        foreach ($messages as $message) {
-            $this->container->getLog()->error($message);
-        }
-        if (!empty($messages)) {
-            throw new Exception(implode(';', $messages));
-        }
-
-        $configStore = $this->getConfigStore();
-        $values = $configStore->load();
-        $newSettings = [];
-        if (isset($values['logLevel'])) {
-            switch ($values('logLevel')) {
-                case 3 /*Log::Notice*/ :
-                    $newSettings['logLevel'] = Severity::Notice;
-                    break;
-                case 4 /*Log::Info*/ :
-                default:
-                    $newSettings['logLevel'] = Severity::Info;
-                    break;
-                case 5 /*Log::Debug*/ :
-                    $newSettings['logLevel'] = Severity::Log;
-                    break;
-            }
-        }
-        return $this->save($newSettings);
-    }
-
-    /**
-     * 6.3.0 upgrade.
-     *
-     * - Only 1 setting for type of tax and its classes (foreign, free, 0).
-     *
-     * @return bool
-     */
-    protected function upgrade631()
-    {
-        $configStore = $this->getConfigStore();
-        $values = $configStore->load();
-        // If Foreign vat was not set (unknown) or set to No, we should reset
-        // any value in foreignVatClasses.
-        // const ForeignVat_Unknown = 0;
-        // const ForeignVat_No = 2;
-        if (isset($values['foreignVat']) && ($values['foreignVat'] === 0 || $values['foreignVat'] === 2)) {
-            $values['foreignVatClasses'] = [];
-        }
-        unset($values['foreignVat']);
-
-        // If "vat free products" was not set (unknown) we should set the value
-        // of vatFreeClass to "empty".
-        // const VatFreeProducts_Unknown = 0;
-        if (isset($values['vatFreeProducts']) && $values['vatFreeProducts'] === 0) {
-            $values['vatFreeClass'] = '';
-        }
-        // If "vat free products" was set to No, we should set the value
-        // of vatFreeClass to Config::VatClass_NotApplicable.
-        // const VatFreeProducts_No = 2;
-        if (isset($values['vatFreeProducts']) && $values['vatFreeProducts'] === 2) {
-            $values['vatFreeClass'] = Config::VatClass_NotApplicable;
-        }
-        unset($values['vatFreeProducts']);
-
-        // If "0 vat products" was not set (unknown) we should set the value
-        // of zeroVatClass to "empty".
-        // const ZeroVatProducts_Unknown = 0;
-        if (isset($values['zeroVatProducts']) && $values['zeroVatProducts'] === 0) {
-            $values['zeroVatClass'] = '';
-        }
-        // If "0 vat products" was set to No, we should set the value
-        // of zeroVatClass to Config::VatClass_NotApplicable.
-        // const ZeroVatProducts_No = 2;
-        if (isset($values['zeroVatProducts']) && $values['zeroVatProducts'] === 2) {
-            $values['zeroVatClass'] = Config::VatClass_NotApplicable;
-        }
-        unset($values['zeroVatProducts']);
-
-        return $this->save($values);
-    }
-
-    /**
-     * 6.4.0 upgrade.
-     *
-     * - values for setting nature_shop changed into combinable bit values.
-     * - foreignVatClasses renamed to euVatClasses.
-     *
-     * @return bool
-     */
-    protected function upgrade640()
-    {
-        $configStore = $this->getConfigStore();
-        $values = $configStore->load();
-
-        // Nature constants Services and Both are switched.
-        if (isset($values['nature_shop'])) {
-            switch ($values['nature_shop']) {
-                case 1:
-                    $values['nature_shop'] = 3;
-                    break;
-                case 3:
-                    $values['nature_shop'] = 1;
-                    break;
-            }
-        } else {
-            $values['nature_shop'] = static::Nature_Unknown;
-        }
-
-        // foreignVatClasses renamed to euVatClasses.
-        if (isset($values['foreignVatClasses'])) {
-            $values['euVatClasses'] = $values['foreignVatClasses'];
-            unset($values['foreignVatClasses']);
-        } else {
-            $values['euVatClasses'] = [];
-        }
-
-        $this->log->notice('Config: updated to 6.4.0');
-        return $this->save($values);
-    }
-
-    /**
-     * 6.4.1 upgrade.
-     *
-     * - We now store the data model version in the config.
-     *
-     * @return bool
-     */
-    protected function upgrade641()
-    {
-        $newSettings = [];
-        $newSettings['configVersion'] = '6.4.1';
-
-        $this->log->notice('Config: updated to 6.4.1');
-        return $this->save($newSettings);
     }
 }

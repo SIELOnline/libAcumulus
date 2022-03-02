@@ -156,7 +156,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         $tableExists = !empty($queryResult->num_rows);
         if (!$tableExists) {
             // Table does not exist: create it.
-            return $this->createTable();
+            $result = $this->createTable();
         } else {
             // Table does exist: but in old or current data model?
             /** @noinspection PhpUnhandledExceptionInspection */
@@ -184,13 +184,12 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
                 // Delete old table.
                 /** @noinspection PhpUnhandledExceptionInspection */
                 $result = $result && $this->getDb()->query("DROP TABLE `$oldTableName`");
-
-                return $result;
             } else {
                 // Table exists in current data model.
-                return true;
+                $result = true;
             }
         }
+        return $result;
     }
 
     /**

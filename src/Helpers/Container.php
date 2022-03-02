@@ -1,5 +1,8 @@
 <?php
 /**
+ * Note: Do not use PHP7 language constructs as long as we want the Requirements
+ * class to check for that and present and log a proper warning.
+ *
  * @noinspection PhpClassHasTooManyDeclaredMembersInspection
  * @noinspection PhpMissingParamTypeInspection
  * @noinspection PhpMissingReturnTypeInspection
@@ -525,6 +528,17 @@ class Container
             $is1stTime = false;
         }
         return $config;
+    }
+
+    /**
+     * @return \Siel\Acumulus\Config\ConfigUpgrade
+     *
+     * @noinspection PhpReturnDocTypeMismatchInspection
+     */
+    public function getConfigUpgrade()
+    {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return $this->getInstance('ConfigUpgrade', 'Config', [$this->getConfig(), $this->getConfigStore(), $this, $this->getLog()]);
     }
 
     /**

@@ -17,8 +17,7 @@ class ConfigStore extends BaSeConfigStore
     public function load()
     {
         $values = $this->getSettings()->getSetting($this->configCode);
-        $values = isset($values[$this->configCode . '_' . $this->configKey]) ? $values[$this->configCode . '_' . $this->configKey] : [];
-        return $values;
+        return isset($values[$this->configCode . '_' . $this->configKey]) ? $values[$this->configCode . '_' . $this->configKey] : [];
     }
 
     /**
@@ -33,9 +32,10 @@ class ConfigStore extends BaSeConfigStore
         return true;
     }
 
-    /** @noinspection PhpDocMissingThrowsInspection */
     /**
      * @return \ModelSettingSetting
+     *
+     * @noinspection PhpDocMissingThrowsInspection
      */
     protected function getSettings()
     {

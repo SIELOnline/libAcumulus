@@ -211,7 +211,11 @@ class FormMapper extends BaseFormMapper
                 } elseif ($value === 'details') {
                     $config['before_element_html'] = '<details>';
                     $config['after_element_html'] = '</details>';
+                } elseif ($value === 'date') {
+                    $config['format'] = static::DateFormat;
+                    $config['date_format'] = static::DateFormat;
                 }
+
                 break;
             case 'summary':
                 $config['before_element_html'] .= '<summary>' . $value . '</summary>';

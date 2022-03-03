@@ -1,7 +1,10 @@
 <?php
 namespace Siel\Acumulus\Magento\Shop;
 
+use Siel\Acumulus\Helpers\Container;
+use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Invoice\Source;
+use Siel\Acumulus\Magento\Helpers\Registry;
 use Siel\Acumulus\Shop\AcumulusEntryManager as BaseAcumulusEntryManager;
 use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
 
@@ -18,6 +21,16 @@ use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
  */
 class AcumulusEntryManager extends BaseAcumulusEntryManager
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function __construct(Container $container, Log $log)
+    {
+        parent::__construct($container, $log);
+        $this->model = Registry::getInstance()->get('Siel\AcumulusMa2\Model\Entry');
+        $this->resourceModel = Registry::getInstance()->get('Siel\AcumulusMa2\Model\ResourceModel\Entry');
+    }
+
     /** @var \Siel_Acumulus_Model_Entry|\Siel\AcumulusMa2\Model\Entry */
     protected $model;
 

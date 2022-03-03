@@ -3,6 +3,7 @@ namespace Siel\Acumulus\Magento\Shop;
 
 use Siel\Acumulus\Invoice\Result;
 use Siel\Acumulus\Invoice\Source;
+use Siel\Acumulus\Magento\Helpers\Registry;
 use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
 
 /**
@@ -13,8 +14,13 @@ use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
  * In Magento saving and querying orders or credit memos is done via the Magento
  * DB API which takes care of sanitizing.
  */
-abstract class InvoiceManager extends BaseInvoiceManager
+class InvoiceManager extends BaseInvoiceManager
 {
+    /**
+     * @var \Magento\Framework\DataObjectFactory
+     */
+    private $dataObjectFactory;
+
     /**
      * {@inheritdoc}
      */
@@ -79,13 +85,18 @@ abstract class InvoiceManager extends BaseInvoiceManager
     }
 
     /**
-     * Returns a Magento model for the given source type.
+     * {@inheritdoc}
      *
-     * @param $invoiceSourceType
+     * @param string $invoiceSourceType
      *
-     * @return \Mage_Sales_Model_Abstract|\Magento\Sales\Model\AbstractModel
+     * @return \Magento\Sales\Model\AbstractModel
      */
-    abstract protected function getInvoiceSourceTypeModel($invoiceSourceType);
+    protected function getInvoiceSourceTypeModel($invoiceSourceType)
+    {
+        return Registry::getInstance()->get($invoiceSourceType == Source::Order
+            ? 'Magento\Sales\Model\Order'
+            : 'Magento\Sales\Model\Order\Creditmemo');
+    }
 
     /**
      * {@inheritdoc}
@@ -118,14 +129,23 @@ abstract class InvoiceManager extends BaseInvoiceManager
     }
 
     /**
-     * Dispatches an event.
-     *
-     * @param string $name
-     *   The name of the event.
-     * @param array $parameters
-     *   The parameters to the event that cannot be changed.
-     *
-     * @return void
+     * @return \Magento\Framework\DataObjectFactory
      */
-    abstract protected function dispatchEvent($name, array $parameters);
+    protected function getDataObjectFactory()
+    {
+        if ($this->dataObjectFactory === null) {
+            $this->dataObjectFactory = Registry::getInstance()->get('\Magento\Framework\DataObjectFactory');
+        }
+        return $this->dataObjectFactory;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function dispatchEvent($name, array $parameters)
+    {
+        /** @var \Magento\Framework\Event\ManagerInterface $dispatcher */
+        $dispatcher = Registry::getInstance()->get('Magento\Framework\Event\ManagerInterface');
+        $dispatcher->dispatch($name, $parameters);
+    }
 }

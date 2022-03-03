@@ -1,18 +1,20 @@
 <?php
 namespace Siel\Acumulus\Magento\Invoice;
 
+use Magento\Sales\Model\Order\Creditmemo;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Source as BaseSource;
+use Siel\Acumulus\Magento\Helpers\Registry;
 use Siel\Acumulus\Meta;
 
 /**
  * Wraps a Magento order or credit memo in an invoice source object.
  */
-abstract class Source extends BaseSource
+class Source extends BaseSource
 {
     // More specifically typed properties.
-    /** @var \Mage_Sales_Model_Order|\Mage_Sales_Model_Order_Creditmemo|\Magento\Sales\Model\Order|\Magento\Sales\Model\Order\Creditmemo */
+    /** @var \Magento\Sales\Model\Order|\Magento\Sales\Model\Order\Creditmemo */
     protected $source;
 
     /**
@@ -21,6 +23,26 @@ abstract class Source extends BaseSource
     protected function setId()
     {
         $this->id = $this->source->getId();
+    }
+
+    /**
+     * Loads an Order source for the set id.
+     */
+    protected function setSourceOrder()
+    {
+        $this->source = Registry::getInstance()->create('\Magento\Sales\Model\Order');
+        /** @noinspection PhpDeprecationInspection http://magento.stackexchange.com/questions/114929/deprecated-save-and-load-methods-in-abstract-model */
+        $this->source->load($this->id);
+    }
+
+    /**
+     * Loads a Credit memo source for the set id.
+     */
+    protected function setSourceCreditNote()
+    {
+        $this->source = Registry::getInstance()->create('\Magento\Sales\Model\Order\Creditmemo');
+        /** @noinspection PhpDeprecationInspection http://magento.stackexchange.com/questions/114929/deprecated-save-and-load-methods-in-abstract-model */
+        $this->source->load($this->id);
     }
 
     /**
@@ -120,6 +142,20 @@ abstract class Source extends BaseSource
     }
 
     /**
+     * Returns whether the credit memo has been paid or not.
+     *
+     * @return int
+     *   \Siel\Acumulus\Api::PaymentStatus_Paid or
+     *   \Siel\Acumulus\Api::PaymentStatus_Due
+     */
+    protected function getPaymentStatusCreditNote()
+    {
+        return $this->source->getState() == Creditmemo::STATE_REFUNDED
+            ? Api::PaymentStatus_Paid
+            : Api::PaymentStatus_Due;
+    }
+
+    /**
      * Returns whether the order is in a status that makes it considered paid.
      *
      * This method is NOT used to determine the paid status, but is used to
@@ -133,6 +169,28 @@ abstract class Source extends BaseSource
     protected function isPaidStatus($status)
     {
         return in_array($status, ['processing', 'closed', 'complete']);
+    }
+
+    /**
+     * Returns the payment date for the order.
+     *
+     * @return string|null
+     *   The payment date (yyyy-mm-dd) or null if the order has not been paid yet.
+     */
+    protected function getPaymentDateOrder()
+    {
+        // Take date of last payment as payment date.
+        $paymentDate = null;
+        foreach ($this->source->getStatusHistoryCollection() as $statusChange) {
+            /** @var \Magento\Sales\Model\Order\Status\History $statusChange */
+            if (!$paymentDate || $this->isPaidStatus($statusChange->getStatus())) {
+                $createdAt = substr($statusChange->getCreatedAt(), 0, strlen('yyyy-mm-dd'));
+                if (!$paymentDate || $createdAt < $paymentDate) {
+                    $paymentDate = $createdAt;
+                }
+            }
+        }
+        return $paymentDate;
     }
 
     /**
@@ -222,5 +280,13 @@ abstract class Source extends BaseSource
         /** @var \Mage_Sales_Model_Order|\Magento\Sales\Model\Order $order */
         $order = $this->source;
         return $order->getCreditmemosCollection();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCountryCode()
+    {
+        return $this->source->getBillingAddress()->getCountryId();
     }
 }

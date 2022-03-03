@@ -41,8 +41,8 @@ Refactorings:
     handling at the Acumulus level.
   - The Acumulus class still represents the Acumulus service calls as PHP
     methods.
-- Refactored upgrading config: we now store the actual config version with the
-  other config values:
+- Refactored upgrading config values: we now store the actual config version
+  with the other config values:
   - We check for an update on every load() of the config, thus independent from
     a plugin update.
   - The version of the config is now in line with the library version, not the
@@ -57,6 +57,9 @@ Refactorings:
 - PS: Use of deprecated Tab::getIdFromClassName() replaced.
 - PS: Config upgrades do not have to be repeated in install files: removed all
   but the latest call to Config(Upgrade)->upgrade().
+- Removed MA1 specific code and constructions needed for MA1
+  (Container::setBaseDir()). Merged code, classes and meethod overides, in
+  namespace \Siel\Acumulus\Magento\Magento2 into \Siel\Acumulus\Magento.
 
 6.4.1 (2022-02-23) (MA2 only)
 -----------------------------

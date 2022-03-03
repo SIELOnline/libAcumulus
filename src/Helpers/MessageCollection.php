@@ -285,7 +285,7 @@ class MessageCollection
      *   Depending on $format, either:
      *   - An array of formatted messages, keyed by field or numeric indices
      *     for messages without field.
-     *   - A string containing an html or plain text list of formatted messages.
+     *   - A string containing an HTML or plain text list of formatted messages.
      *
      * @see Message::format()
      */

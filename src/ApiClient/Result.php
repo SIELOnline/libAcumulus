@@ -508,16 +508,23 @@ class Result extends MessageCollection
      */
     public function toLogMessages(bool $log = true, int $logLevel = Severity::Log): array
     {
-        $result = array_filter([
+        $messages = array_filter([
             'Request' => $this->getMaskedRequest(),
             'Response' => $this->getMaskedResponse(),
             'Exception' => $this->formatMessages(Message::Format_Plain, Severity::Exception),
         ]);
 
-        foreach ($result as $what => &$message) {
-            $message = "$what: $message";
-            if ($log) {
-                $this->log->log($logLevel, $message);
+        $result = [];
+        foreach ($messages as $what => $message) {
+            // formatMessages() will always return an array: treat all entries
+            // as an array (of probably just 1 entry).
+            $message = (array) $message;
+            foreach ($message as $message1) {
+                $message1 = "$what: $message1";
+                $result[] = $message1;
+                if ($log) {
+                    $this->log->log($logLevel, $message1);
+                }
             }
         }
         return $result;

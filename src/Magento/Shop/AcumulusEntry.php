@@ -16,7 +16,7 @@ class AcumulusEntry extends BaseAcumulusEntry
      */
     protected function get($field)
     {
-        /** @var \Siel_Acumulus_Model_Entry|\Siel\AcumulusMa2\Model\Entry $entry */
+        /** @var \Siel\AcumulusMa2\Model\Entry $entry */
         $entry = $this->getRecord();
         return $entry->getData($field);
     }

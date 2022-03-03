@@ -70,8 +70,8 @@ abstract class AcumulusEntryManager
      * @param object|array[]|object[] $result
      *   The DB query result.
      * @param bool $ignoreLock
-     *   Whether to return an entry that serves as a send lock (false) or ignore
-     *   it (true)
+     *   Whether to return an entry that serves as a send-lock (false) or ignore
+     *   it (true).
      *
      * @return \Siel\Acumulus\Shop\AcumulusEntry|\Siel\Acumulus\Shop\AcumulusEntry[]|null
      */
@@ -83,7 +83,7 @@ abstract class AcumulusEntryManager
             if (is_object($result)) {
                 $result = [$result];
             }
-            // Now, it's a non empty array of results.
+            // Now, it's a non-empty array of results.
             foreach ($result as &$record) {
                 $record = $this->container->getAcumulusEntry($record);
                 if ($ignoreLock && $record->isSendLock()) {

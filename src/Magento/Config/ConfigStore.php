@@ -1,7 +1,9 @@
 <?php
 namespace Siel\Acumulus\Magento\Config;
 
-use Magento\Framework\App\Config as MagentoConfig;
+use Magento\Backend\App\ConfigInterface;
+use Magento\Config\Model\ResourceModel\Config as MagentoModelConfig;
+use Magento\Framework\App\Config as MagentoAppConfig;
 use Magento\Framework\App\ObjectManager;
 use Siel\Acumulus\Magento\Helpers\Registry;
 use Siel\Acumulus\Config\ConfigStore as BaseConfigStore;
@@ -16,7 +18,7 @@ class ConfigStore extends BaSeConfigStore
     /**
      * {@inheritdoc}
      */
-    public function load()
+    public function load(): array
     {
         $values = $this->getConfigInterface()->getValue($this->configPath . $this->configKey);
         if (!empty($values) && is_string($values)) {
@@ -28,7 +30,7 @@ class ConfigStore extends BaSeConfigStore
     /**
      * {@inheritdoc}
      */
-    public function save(array $values)
+    public function save(array $values): bool
     {
         // @todo: switch to json.
         $values = serialize($values);
@@ -36,55 +38,18 @@ class ConfigStore extends BaSeConfigStore
 
         // Force a cache clear.
         /** @var \Magento\Framework\App\Config $config */
-	    $config = ObjectManager::getInstance()->get(MagentoConfig::class);
+	    $config = ObjectManager::getInstance()->get(MagentoAppConfig::class);
 	    $config->clean();
         return true;
     }
 
-    /**
-     * @return \Magento\Backend\App\ConfigInterface
-     */
-    protected function getConfigInterface()
+    protected function getConfigInterface(): ConfigInterface
     {
-        return Registry::getInstance()->getConfigInterface();
+        return Registry::getInstance()->get(ConfigInterface::class);
     }
 
-    /**
-     * @return \Magento\Config\Model\ResourceModel\Config
-     */
-    protected function getResourceConfig()
+    protected function getResourceConfig(): MagentoModelConfig
     {
-        return Registry::getInstance()->getResourceConfig();
-    }
-
-    /**
-     * @deprecated Only still here for use during update.
-     *
-     * @param array $keys
-     *
-     * @return array
-     */
-    public function loadOld(array $keys)
-    {
-        $result = [];
-        $config = $this->getConfigInterface();
-        // Load the values from the web shop specific configuration.
-        foreach ($keys as $key) {
-            $value = $config->getValue($this->configPath . $key);
-            // Delete the value, this will only be used one more time: during
-            // updating to 5.4.0.
-            $this->getResourceConfig()->deleteConfig($this->configPath . $key, 'default', 0);
-            // Do not overwrite defaults if no value is set.
-            if (isset($value)) {
-                if (is_string($value) && strpos($value, '{') !== false) {
-                    $unserialized = @unserialize($value);
-                    if ($unserialized !== false) {
-                        $value = $unserialized;
-                    }
-                }
-                $result[$key] = $value;
-            }
-        }
-        return $result;
+        return Registry::getInstance()->get(MagentoModelConfig::class);
     }
 }

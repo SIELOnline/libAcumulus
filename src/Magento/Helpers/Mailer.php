@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\Magento\Helpers;
 
+use Magento\Backend\App\ConfigInterface;
 use Siel\Acumulus\Helpers\Mailer as BaseMailer;
 use Zend_Mail;
 use Zend_Mail_Transport_Exception;
@@ -10,8 +11,11 @@ use Zend_Mail_Transport_Exception;
  */
 class Mailer extends BaseMailer
 {
+
     /**
      * {@inheritdoc}
+     *
+     * @throws \Zend_Mail_Exception
      */
     public function sendMail($from, $fromName, $to, $subject, $bodyText, $bodyHtml)
     {
@@ -30,20 +34,25 @@ class Mailer extends BaseMailer
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getFrom()
+    protected function getConfig(): ConfigInterface
     {
-        return Registry::getInstance()->getConfigInterface()->getValue('trans_email/ident_general/email');
+        return Registry::getInstance()->get(ConfigInterface::class);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function getFromName()
+    protected function getFrom(): string
     {
-        $result = Registry::getInstance()->getConfigInterface()->getValue('general/store_information/name');
-        return $result ? $result : parent::getFromName();
+        return $this->getConfig()->getValue('trans_email/ident_general/email');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getFromName(): string
+    {
+        $result = $this->getConfig()->getValue('general/store_information/name');
+        return $result ?: parent::getFromName();
     }
 }

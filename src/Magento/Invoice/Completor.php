@@ -1,4 +1,8 @@
 <?php
+/**
+ * @noinspection PhpClassConstantAccessedViaChildClassInspection
+ */
+
 namespace Siel\Acumulus\Magento\Invoice;
 
 use Siel\Acumulus\Helpers\Number;

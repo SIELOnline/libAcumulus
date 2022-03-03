@@ -1,6 +1,10 @@
 <?php
 namespace Siel\Acumulus\Magento\Shop;
 
+use DateTime;
+use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
+use Magento\Sales\Model\ResourceModel\Order\Collection as OrderCollection;
+use Magento\Sales\Model\ResourceModel\Order\Creditmemo\Collection as CreditmemoCollection;
 use Siel\Acumulus\Invoice\Result;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Magento\Helpers\Registry;
@@ -17,14 +21,9 @@ use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
 class InvoiceManager extends BaseInvoiceManager
 {
     /**
-     * @var \Magento\Framework\DataObjectFactory
-     */
-    private $dataObjectFactory;
-
-    /**
      * {@inheritdoc}
      */
-    public function getInvoiceSourcesByIdRange($invoiceSourceType, $InvoiceSourceIdFrom, $InvoiceSourceIdTo)
+    public function getInvoiceSourcesByIdRange($invoiceSourceType, $InvoiceSourceIdFrom, $InvoiceSourceIdTo): array
     {
         $field = 'entity_id';
         $condition = [
@@ -37,7 +36,7 @@ class InvoiceManager extends BaseInvoiceManager
     /**
      * {@inheritdoc}
      */
-    public function getInvoiceSourcesByReferenceRange($invoiceSourceType, $invoiceSourceReferenceFrom, $invoiceSourceReferenceTo)
+    public function getInvoiceSourcesByReferenceRange($invoiceSourceType, $invoiceSourceReferenceFrom, $invoiceSourceReferenceTo): array
     {
         $field = 'increment_id';
         $condition = [
@@ -50,7 +49,7 @@ class InvoiceManager extends BaseInvoiceManager
     /**
      * {@inheritdoc}
      */
-    public function getInvoiceSourcesByDateRange($invoiceSourceType, \DateTime $dateFrom, \DateTime $dateTo)
+    public function getInvoiceSourcesByDateRange($invoiceSourceType, DateTime $dateFrom, DateTime $dateTo): array
     {
         $dateFrom = $this->getSqlDate($dateFrom);
         $dateTo = $this->getSqlDate($dateTo);
@@ -69,33 +68,29 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * @return \Siel\Acumulus\Invoice\Source[]
      *   A non keyed array with invoice Sources.
-     *
-     * @throws \Magento\Framework\Exception\LocalizedException
      */
-    protected function getByCondition($invoiceSourceType, $field, $condition)
+    protected function getByCondition(string $invoiceSourceType, $field, $condition): array
     {
-        /** @var  \Varien_Object[]\Magento\Framework\DataObject[] $items */
         $items = $this
-            ->getInvoiceSourceTypeModel($invoiceSourceType)
-            ->getResourceCollection()
+            ->getInvoiceSourceTypeCollection($invoiceSourceType)
             ->addFieldToFilter($field, $condition)
             ->getItems();
-
         return $this->getSourcesByIdsOrSources($invoiceSourceType, $items);
     }
 
     /**
-     * {@inheritdoc}
+     * Returns a Collection cass that can return filtered lists of objects of
+     * the type of the given invoice source (Orders or CreditMemos).
      *
      * @param string $invoiceSourceType
      *
-     * @return \Magento\Sales\Model\AbstractModel
+     * @return \Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection
      */
-    protected function getInvoiceSourceTypeModel($invoiceSourceType)
+    protected function getInvoiceSourceTypeCollection(string $invoiceSourceType): AbstractCollection
     {
         return Registry::getInstance()->get($invoiceSourceType == Source::Order
-            ? 'Magento\Sales\Model\Order'
-            : 'Magento\Sales\Model\Order\Creditmemo');
+            ? OrderCollection::class
+            : CreditmemoCollection::class);
     }
 
     /**
@@ -129,20 +124,16 @@ class InvoiceManager extends BaseInvoiceManager
     }
 
     /**
-     * @return \Magento\Framework\DataObjectFactory
+     * Dispatches an event.
+     *
+     * @param string $name
+     *   The name of the event.
+     * @param array $parameters
+     *   The parameters to the event that cannot be changed.
+     *
+     * @return void
      */
-    protected function getDataObjectFactory()
-    {
-        if ($this->dataObjectFactory === null) {
-            $this->dataObjectFactory = Registry::getInstance()->get('\Magento\Framework\DataObjectFactory');
-        }
-        return $this->dataObjectFactory;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function dispatchEvent($name, array $parameters)
+    protected function dispatchEvent(string $name, array $parameters)
     {
         /** @var \Magento\Framework\Event\ManagerInterface $dispatcher */
         $dispatcher = Registry::getInstance()->get('Magento\Framework\Event\ManagerInterface');

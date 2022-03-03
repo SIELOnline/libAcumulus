@@ -14,7 +14,7 @@ class FormHelper extends BaseFormHelper
      * Magento places (checked) checkboxes in an array named after the
      * collection name.
      */
-    protected function alterPostedValues(array $postedValues)
+    protected function alterPostedValues(array $postedValues): array
     {
         foreach ($this->getMeta() as $key => $fieldMeta) {
             /** @var \stdClass $fieldMeta */
@@ -35,7 +35,7 @@ class FormHelper extends BaseFormHelper
      * Magento places (checked) checkboxes in an array named after the
      * collection name.
      */
-    public function alterFormValues(array $formValues)
+    public function alterFormValues(array $formValues): array
     {
         foreach ($this->getMeta() as $key => $fieldMeta) {
             /** @var \stdClass $fieldMeta */

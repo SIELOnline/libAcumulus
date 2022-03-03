@@ -2,7 +2,11 @@
 namespace Siel\Acumulus\Magento\Config;
 
 use Exception;
-use Magento\Framework\App\ObjectManager;
+use Magento\Framework\App\ProductMetadataInterface;
+use Magento\Framework\UrlInterface;
+use Magento\Framework\View\Asset\Repository as AssetRepository;
+use Magento\Sales\Model\ResourceModel\Status\Collection as OrderStatusCollection;
+use Magento\Tax\Model\ResourceModel\TaxClass\Collection as TaxClassCollection;
 use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
 use Siel\Acumulus\Magento\Helpers\Registry;
 use Siel\Acumulus\Config\Config;
@@ -208,10 +212,10 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getShopEnvironment()
+    public function getShopEnvironment(): array
     {
         /** @var \Magento\Framework\App\ProductMetadataInterface $productMetadata */
-        $productMetadata = Registry::getInstance()->get('Magento\Framework\App\ProductMetadataInterface');
+        $productMetadata = Registry::getInstance()->get(ProductMetadataInterface::class);
         try {
             $version = $productMetadata->getVersion();
         } catch (Exception $e) {
@@ -231,7 +235,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    protected function getTokenInfoSource()
+    protected function getTokenInfoSource(): array
     {
         return [
             'class' => ['\Magento\Sales\Model\Order', '\Magento\Sales\Model\Order\CreditMemo'],
@@ -244,7 +248,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    protected function getTokenInfoRefund()
+    protected function getTokenInfoRefund(): array
     {
         return [
             'class' => 'Mage_Sales_Model_Order_CreditMemo',
@@ -257,7 +261,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    protected function getTokenInfoOrder()
+    protected function getTokenInfoOrder(): array
     {
         return [
             'class' => '\Magento\Sales\Model\Order\Order',
@@ -270,7 +274,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    protected function getTokenInfoShopProperties()
+    protected function getTokenInfoShopProperties(): array
     {
         $orderItem = [
             'additionalData',
@@ -486,7 +490,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getShopDefaults()
+    public function getShopDefaults(): array
     {
         return [
             'contactYourId' => '[customer::incrementId|customer::entityId]', // \Mage\Customer\Model\Customer
@@ -512,15 +516,14 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getShopOrderStatuses()
+    public function getShopOrderStatuses(): array
     {
-        /** @var \Magento\Sales\Model\Order\Status $model */
-        $model = Registry::getInstance()->create('Magento\Sales\Model\Order\Status');
-        /** @noinspection PhpUnhandledExceptionInspection */
-        $items = $model->getResourceCollection()->getData();
+        /** @var OrderStatusCollection $model */
+        $orderStatuses = Registry::getInstance()->create(OrderStatusCollection::class);
         $result = [];
-        foreach ($items as $item) {
-            $result[reset($item)] = next($item);
+        foreach ($orderStatuses as $orderStatus) {
+            /** @var \Magento\Sales\Model\Order\Status $orderStatus */
+            $result[$orderStatus->getStatus()] = $orderStatus->getLabel();
         }
         return $result;
     }
@@ -528,7 +531,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getTriggerInvoiceEventOptions()
+    public function getTriggerInvoiceEventOptions(): array
     {
         $result = parent::getTriggerInvoiceEventOptions();
         $result[Config::TriggerInvoiceEvent_Create] = $this->t('option_triggerInvoiceEvent_1');
@@ -538,7 +541,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getPaymentMethods()
+    public function getPaymentMethods(): array
     {
         $result = [];
         /** @var \Magento\Payment\Helper\Data $paymentHelper */
@@ -548,7 +551,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
             /** @noinspection PhpUnhandledExceptionInspection */
             $instance = $paymentHelper->getMethodInstance($code);
             if ($instance->isActive()) {
-                $title = $instance->getConfigData('title');
+                $title = $instance->getTitle();
                 if (empty($title)) {
                     $title = $code;
                 }
@@ -561,14 +564,14 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getVatClasses()
+    public function getVatClasses(): array
     {
         $result = [];
-        /** @var \Magento\Tax\Model\ClassModel $taxClass */
-        /** @noinspection PhpFullyQualifiedNameUsageInspection */
-        $taxClass = ObjectManager::getInstance()->create(\Magento\Tax\Model\ClassModel::class);
-        foreach ($taxClass->getCollection() as $item) {
-            $result[$item->getData('class_id')] = $item->getData('class_name');
+        /** @var TaxClassCollection $taxClassCollection */
+        $taxClassCollection = Registry::getInstance()->create(TaxClassCollection::class);
+        foreach ($taxClassCollection as $taxClass) {
+            /** @var \Magento\Tax\Model\ClassModel $taxClass */
+            $result[$taxClass->getClassId()] = $taxClass->getClassName();
         }
         return $result;
     }
@@ -576,21 +579,22 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getLink($linkType)
+    public function getLink($linkType): string
     {
         $registry = Registry::getInstance();
+        /** @var UrlInterface $urlInterface */
+        $urlInterface = $registry->get(UrlInterface::class);
         switch ($linkType) {
             case 'register':
-                return $registry->getUrlInterface()->getUrl('acumulus/register');
+                return $urlInterface->getUrl('acumulus/register');
             case 'config':
-                return $registry->getUrlInterface()->getUrl('acumulus/config');
+                return $urlInterface->getUrl('acumulus/config');
             case 'advanced':
-                return $registry->getUrlInterface()->getUrl('acumulus/config/advanced');
+                return $urlInterface->getUrl('acumulus/config/advanced');
             case 'batch':
-                return $registry->getUrlInterface()->getUrl('acumulus/batch');
+                return $urlInterface->getUrl('acumulus/batch');
             case 'logo':
-                /** @noinspection PhpFullyQualifiedNameUsageInspection */
-                $repository = ObjectManager::getInstance()->get(\Magento\Framework\View\Asset\Repository::class);
+                $repository = Registry::getInstance()->get(AssetRepository::class);
                 return $repository->getUrl('Siel_AcumulusMa2::images/siel-logo.svg');
         }
         return parent::getLink($linkType);

@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\Magento\Helpers;
 
+use Magento\Framework\Data\Form\AbstractForm;
 use Siel\Acumulus\Helpers\Form;
 use Siel\Acumulus\Helpers\FormMapper as BaseFormMapper;
 
@@ -10,7 +11,6 @@ use Siel\Acumulus\Helpers\FormMapper as BaseFormMapper;
  */
 class FormMapper extends BaseFormMapper
 {
-
     /**
      * The date format as Magento uses it.
      *
@@ -19,18 +19,15 @@ class FormMapper extends BaseFormMapper
     const DateFormat = 'yyyy-MM-dd';
 
     /**
-     * The slug-name of the settings page on which to show the section.
-     *
-     * @var \Varien_Data_Form_Abstract|\Magento\Framework\Data\Form\AbstractForm
+     * @var \Magento\Framework\Data\Form\AbstractForm
+     *   The slug-name of the settings page on which to show the section.
      */
     protected $magentoForm;
 
     /**
-     * @param \Magento\Framework\Data\Form\AbstractForm|\Varien_Data_Form_Abstract $magentoForm
-     *
      * @return $this
      */
-    public function setMagentoForm($magentoForm)
+    public function setMagentoForm(AbstractForm $magentoForm): FormMapper
     {
         $this->magentoForm = $magentoForm;
         return $this;
@@ -46,11 +43,8 @@ class FormMapper extends BaseFormMapper
 
     /**
      * Maps a set of field definitions.
-     *
-     * @param \Varien_Data_Form_Abstract|\Magento\Framework\Data\Form\AbstractForm $parent
-     * @param array[] $fields
      */
-    public function fields($parent, array $fields)
+    public function fields(AbstractForm $parent, array $fields)
     {
         foreach ($fields as $id => $field) {
             if (!isset($field['id'])) {
@@ -65,11 +59,8 @@ class FormMapper extends BaseFormMapper
 
     /**
      * Maps a single field definition.
-     *
-     * @param \Varien_Data_Form_Abstract|\Magento\Framework\Data\Form\AbstractForm $parent
-     * @param array $field
      */
-    public function field($parent, array $field)
+    public function field(AbstractForm $parent, array $field)
     {
         if (!isset($field['attributes'])) {
             $field['attributes'] = [];
@@ -113,12 +104,8 @@ class FormMapper extends BaseFormMapper
 
     /**
      * Returns the Magento form element type for the given Acumulus type string.
-     *
-     * @param array $field
-     *
-     * @return string
      */
-    protected function getMagentoType(array $field)
+    protected function getMagentoType(array $field): string
     {
         switch ($field['type']) {
             case 'email':
@@ -158,7 +145,7 @@ class FormMapper extends BaseFormMapper
      * @return array
      *   The Magento form element settings.
      */
-    protected function getMagentoElementSettings(array $field)
+    protected function getMagentoElementSettings(array $field): array
     {
         $config = [
             'class'=> [],
@@ -191,7 +178,7 @@ class FormMapper extends BaseFormMapper
      * @return array
      *   The Magento settings.
      */
-    protected function getMagentoProperty(array $config, $key, $value, $type)
+    protected function getMagentoProperty(array $config, string $key, $value, string $type): array
     {
         switch ($key) {
             // Fields to ignore:
@@ -310,7 +297,7 @@ class FormMapper extends BaseFormMapper
      * @return array
      *   A list of Magento form element options.
      */
-    protected function getMagentoOptions(array $options)
+    protected function getMagentoOptions(array $options): array
     {
         $config = [];
         foreach ($options as $value => $label) {
@@ -334,7 +321,7 @@ class FormMapper extends BaseFormMapper
      *
      * @return array
      */
-    protected function addMagentoAdminClasses(array $config, array $field)
+    protected function addMagentoAdminClasses(array $config, array $field): array
     {
         // Add a class action-secondary to buttons (action-primary buttons are
         // part of the toolbar outside the form).

@@ -1,7 +1,16 @@
 <?php
+/**
+ * @noinspection PhpClassConstantAccessedViaChildClassInspection
+ */
+
 namespace Siel\Acumulus\Magento\Invoice;
 
+use Magento\Catalog\Model\Product;
+use Magento\Customer\Model\Customer;
 use Magento\Sales\Model\Order\Creditmemo\Item as CreditmemoItem;
+use Magento\Sales\Model\Order\Item;
+use Magento\Tax\Model\ClassModel as TaxClass;
+use Magento\Tax\Model\Config as MagentoTaxConfig;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
@@ -70,13 +79,13 @@ class Creator extends BaseCreator
             $this->propertySources['shippingAddress'] = $source->getBillingAddress();
         }
 
-        $this->propertySources['customer'] = Registry::getInstance()->create('Magento\Customer\Model\Customer')->load($source->getCustomerId());
+        $this->propertySources['customer'] = $this->getRegistry()->create(Customer::class)->load($source->getCustomerId());
     }
 
     /**
      * Returns the item lines for an order.
      */
-    protected function getItemLinesOrder()
+    protected function getItemLinesOrder(): array
     {
         $result = [];
         // Items may be composed, so start with all "visible" items.
@@ -91,10 +100,8 @@ class Creator extends BaseCreator
 
     /**
      * Returns an item line for 1 main product line.
-     *
-     * @param \Magento\Sales\Model\Order\Item $item
      */
-    protected function getItemLineOrder($item, $isChild = false)
+    protected function getItemLineOrder(Item $item, $isChild = false): ?array
     {
         $result = [];
 
@@ -113,7 +120,7 @@ class Creator extends BaseCreator
         // Check for cost price and margin scheme.
         if (!empty($line['costPrice']) && $this->allowMarginScheme()) {
             // Margin scheme:
-            // - Do not put VAT on invoice: send price incl VAT as unitprice.
+            // - Do not put VAT on invoice: send price incl VAT as 'unitprice'.
             // - But still send the VAT rate to Acumulus.
             $result[Tag::UnitPrice] = $productPriceInc;
         } else {
@@ -289,7 +296,7 @@ class Creator extends BaseCreator
      * @return bool
      *   True if the single child line is actually the same as its parent.
      */
-    protected function isChildSameAsParent(array $parent, array $children)
+    protected function isChildSameAsParent(array $parent, array $children): bool
     {
         if ($parent[Meta::ProductType] === 'configurable' && count($children) === 1) {
             $child = reset($children);
@@ -306,9 +313,9 @@ class Creator extends BaseCreator
     /**
      * Returns the item lines for a credit mote.
      *
-     * @noinspection PhpUnused Called via Creator::callSourceTypeSpecificMethod().
+     * @noinspection PhpUnused : Called via Creator::callSourceTypeSpecificMethod().
      */
-    protected function getItemLinesCreditNote()
+    protected function getItemLinesCreditNote(): array
     {
         $result = [];
         // Items may be composed, so start with all "visible" items.
@@ -323,12 +330,8 @@ class Creator extends BaseCreator
 
     /**
      * Returns 1 item line for 1 credit line.
-     *
-     * @param CreditmemoItem $item
-     *
-     * @return array
      */
-    protected function getItemLineCreditNote(CreditmemoItem $item)
+    protected function getItemLineCreditNote(CreditmemoItem $item): array
     {
         $result = [];
 
@@ -343,7 +346,7 @@ class Creator extends BaseCreator
         // Check for cost price and margin scheme.
         if (!empty($line['costPrice']) && $this->allowMarginScheme()) {
             // Margin scheme:
-            // - Do not put VAT on invoice: send price incl VAT as unitprice.
+            // - Do not put VAT on invoice: send price incl VAT as 'unitprice'.
             // - But still send the VAT rate to Acumulus.
             $result[Tag::UnitPrice] = $productPriceInc;
         } else {
@@ -397,9 +400,8 @@ class Creator extends BaseCreator
 
         // Add vat meta data.
         /** @var \Magento\Catalog\Model\Product $product */
-        /** @noinspection PhpFullyQualifiedNameUsageInspection */
-        $product = Registry::getInstance()->create(\Magento\Catalog\Model\Product::class);
-        Registry::getInstance()->get($product->getResourceName())->load($product, $item->getProductId());
+        $product = $this->getRegistry()->create(Product::class);
+        $this->getRegistry()->get($product->getResourceName())->load($product, $item->getProductId());
         if ($product->getId()) {
             /** @noinspection PhpUndefinedMethodInspection */
             $result += $this->getVatClassMetaData($product->getTaxClassId());
@@ -408,7 +410,6 @@ class Creator extends BaseCreator
         // On a credit note we only have single lines, no compound lines, thus
         // no children that might have to be added.
         // @todo: but do we have options and variants?
-
         $this->removePropertySource('item');
 
         return $result;
@@ -417,7 +418,7 @@ class Creator extends BaseCreator
     /**
      * {@inheritdoc}
      */
-    protected function getShippingLine()
+    protected function getShippingLine(): array
     {
         $result = [];
         /** @var \Magento\Sales\Model\Order|\Magento\Sales\Model\Order\Creditmemo $magentoSource */
@@ -430,7 +431,7 @@ class Creator extends BaseCreator
                 Tag::Quantity => 1,
             ];
 
-            // What do the following methods return:
+            // What do the following methods return?
             // - getBaseShippingAmount(): shipping costs ex VAT ex any discount.
             // - getBaseShippingInclTax(): shipping costs inc VAT ex any discount.
             // - getBaseShippingTaxAmount(): VAT on shipping costs inc discount.
@@ -468,7 +469,7 @@ class Creator extends BaseCreator
                     // stored but can be deduced via the shipping discount tax
                     // amount and the shipping vat rate. To get a more precise
                     // Meta::LineDiscountAmountInc, we compute that in the
-                    // completor when we have corrected the vatrate.
+                    // completor when we have corrected the vat rate.
                     $result[Meta::LineDiscountVatAmount] = $sign * ($shippingVat - $sign * $magentoSource->getBaseShippingTaxAmount());
                 }
             } else {
@@ -499,7 +500,7 @@ class Creator extends BaseCreator
     /**
      * {@inheritdoc}
      */
-    protected function getDiscountLines()
+    protected function getDiscountLines(): array
     {
         $result = [];
 
@@ -530,7 +531,7 @@ class Creator extends BaseCreator
      *
      * This implementation may return a manual line for a credit memo.
      */
-    protected function getManualLines()
+    protected function getManualLines(): array
     {
         $result = [];
 
@@ -546,10 +547,7 @@ class Creator extends BaseCreator
         return $result;
     }
 
-    /**
-     * @return string
-     */
-    protected function getDiscountDescription()
+    protected function getDiscountDescription(): string
     {
         if ($this->order->getDiscountDescription()) {
             $description = $this->t('discount_code') . ' ' . $this->order->getDiscountDescription();
@@ -562,7 +560,7 @@ class Creator extends BaseCreator
     }
 
     /**
-     * Returns meta data regarding the tax class.
+     * Returns metadata regarding the tax class.
      *
      * @param int|null $taxClassId
      *   The id of the tax class.
@@ -572,16 +570,14 @@ class Creator extends BaseCreator
      *   - Meta::VatClassId
      *   - Meta::VatClassName
      */
-    protected function getVatClassMetaData($taxClassId)
+    protected function getVatClassMetaData(?int $taxClassId): array
     {
         $result = [];
         if ($taxClassId) {
-            $taxClassId = (int) $taxClassId;
             $result[Meta::VatClassId] = $taxClassId;
-            /** @var \Magento\Tax\Model\ClassModel $taxClass */
-            /** @noinspection PhpFullyQualifiedNameUsageInspection */
-            $taxClass = Registry::getInstance()->create(\Magento\Tax\Model\ClassModel::class);
-            Registry::getInstance()->get($taxClass->getResourceName())->load($taxClass, $taxClassId);
+            /** @var TaxClass $taxClass */
+            $taxClass = $this->getRegistry()->create(TaxClass::class);
+            $this->getRegistry()->get($taxClass->getResourceName())->load($taxClass, $taxClassId);
             $result[Meta::VatClassName] = $taxClass->getClassName();
         } else {
             $result[Meta::VatClassId] = Config::VatClass_Null;
@@ -596,7 +592,7 @@ class Creator extends BaseCreator
      *   True if the prices for the products are entered with tax, false if the
      *   prices are entered without tax.
      */
-    protected function productPricesIncludeTax()
+    protected function productPricesIncludeTax(): bool
     {
         return $this->getTaxConfig()->priceIncludesTax();
     }
@@ -607,7 +603,7 @@ class Creator extends BaseCreator
      * @return bool
      *   true if shipping prices include tax, false otherwise.
      */
-    protected function shippingPriceIncludeTax()
+    protected function shippingPriceIncludeTax(): bool
     {
         return $this->getTaxConfig()->shippingPriceIncludesTax();
     }
@@ -618,7 +614,7 @@ class Creator extends BaseCreator
      * @return int
      *   The id of the tax class used for shipping.
      */
-    protected function getShippingTaxClassId()
+    protected function getShippingTaxClassId(): int
     {
         return $this->getTaxConfig()->getShippingTaxClass();
     }
@@ -630,18 +626,18 @@ class Creator extends BaseCreator
      *   true if a discount is applied on the price including tax, false if a
      *   discount is applied on the price excluding tax.
      */
-    protected function discountIncludesTax()
+    protected function discountIncludesTax(): bool
     {
         return $this->getTaxConfig()->discountTax();
     }
 
-    /**
-     * Returns a \Magento\Tax\Model\Config object.
-     *
-     * @return \Magento\Tax\Model\Config
-     */
-    protected function getTaxConfig()
+    protected function getTaxConfig(): MagentoTaxConfig
     {
-        return Registry::getInstance()->create('Magento\Tax\Model\Config');
+        return $this->getRegistry()->create(MagentoTaxConfig::class);
+    }
+
+    protected function getRegistry(): Registry
+    {
+        return Registry::getInstance();
     }
 }

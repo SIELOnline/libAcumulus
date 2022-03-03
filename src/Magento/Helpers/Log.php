@@ -25,12 +25,11 @@ class Log extends BaseLog
     /**
      * @return LoggerInterface
      *
-     * @noinspection PhpDocMissingThrowsInspection
+     * @throws \Exception
      */
     protected function getLogger(): LoggerInterface
     {
         if (!$this->logger) {
-            /** @noinspection PhpUnhandledExceptionInspection */
             $this->logger = new Logger('acumulus', [new Handler(new File())]);
         }
         return $this->logger;
@@ -43,6 +42,7 @@ class Log extends BaseLog
      */
     protected function write($message, $severity)
     {
+        /** @noinspection PhpUnhandledExceptionInspection */
         $this->getLogger()->log($this->getMagentoSeverity($severity), $message);
     }
 

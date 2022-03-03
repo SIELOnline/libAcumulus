@@ -1,6 +1,9 @@
-<?php
+<?php /** @noinspection PhpClassConstantAccessedViaChildClassInspection */
+
 namespace Siel\Acumulus\Magento\Invoice;
 
+use Exception;
+use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Creditmemo;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Number;
@@ -30,9 +33,10 @@ class Source extends BaseSource
      */
     protected function setSourceOrder()
     {
-        $this->source = Registry::getInstance()->create('\Magento\Sales\Model\Order');
-        /** @noinspection PhpDeprecationInspection http://magento.stackexchange.com/questions/114929/deprecated-save-and-load-methods-in-abstract-model */
-        $this->source->load($this->id);
+        $this->source = Registry::getInstance()->create(Order::class);
+        /** @var \Magento\Sales\Model\ResourceModel\Order $loader */
+        $loader = Registry::getInstance()->get(\Magento\Sales\Model\ResourceModel\Order::class);
+        $loader->load($this->source, $this->id);
     }
 
     /**
@@ -40,9 +44,10 @@ class Source extends BaseSource
      */
     protected function setSourceCreditNote()
     {
-        $this->source = Registry::getInstance()->create('\Magento\Sales\Model\Order\Creditmemo');
-        /** @noinspection PhpDeprecationInspection http://magento.stackexchange.com/questions/114929/deprecated-save-and-load-methods-in-abstract-model */
-        $this->source->load($this->id);
+        $this->source = Registry::getInstance()->create(Creditmemo::class);
+        /** @var \Magento\Sales\Model\ResourceModel\Order $loader */
+        $loader = Registry::getInstance()->get(\Magento\Sales\Model\ResourceModel\Order\Creditmemo::class);
+        $loader->load($this->source, $this->id);
     }
 
     /**
@@ -55,20 +60,16 @@ class Source extends BaseSource
 
     /**
      * Returns the order reference.
-     *
-     * @return string
      */
-    protected function getReferenceOrder()
+    protected function getReferenceOrder(): string
     {
         return $this->source->getIncrementId();
     }
 
     /**
      * Returns the credit note reference.
-     *
-     * @return string
      */
-    protected function getReferenceCreditNote()
+    protected function getReferenceCreditNote(): string
     {
         return 'CM' . $this->source->getIncrementId();
     }
@@ -84,10 +85,8 @@ class Source extends BaseSource
 
     /**
      * Returns the status of this order.
-     *
-     * @return string
      */
-    protected function getStatusOrder()
+    protected function getStatusOrder(): string
     {
         return $this->source->getStatus();
     }
@@ -107,7 +106,7 @@ class Source extends BaseSource
      *   \Magento\Sales\Model\Order\Creditmemo::STATE_CANCELED = 3;
 
      */
-    protected function getStatusCreditNote()
+    protected function getStatusCreditNote(): int
     {
         return $this->source->getState();
     }
@@ -123,7 +122,7 @@ class Source extends BaseSource
         try {
             return $this->getOrder()->source->getPayment()->getMethod();
         }
-        catch (\Exception $e) {}
+        catch (Exception $e) {}
         return parent::getPaymentMethod();
     }
 
@@ -134,7 +133,7 @@ class Source extends BaseSource
      *   \Siel\Acumulus\Api::PaymentStatus_Paid or
      *   \Siel\Acumulus\Api::PaymentStatus_Due
      */
-    protected function getPaymentStatusOrder()
+    protected function getPaymentStatusOrder(): int
     {
         return Number::isZero($this->source->getBaseTotalDue())
             ? Api::PaymentStatus_Paid
@@ -148,7 +147,7 @@ class Source extends BaseSource
      *   \Siel\Acumulus\Api::PaymentStatus_Paid or
      *   \Siel\Acumulus\Api::PaymentStatus_Due
      */
-    protected function getPaymentStatusCreditNote()
+    protected function getPaymentStatusCreditNote(): int
     {
         return $this->source->getState() == Creditmemo::STATE_REFUNDED
             ? Api::PaymentStatus_Paid
@@ -157,16 +156,11 @@ class Source extends BaseSource
 
     /**
      * Returns whether the order is in a status that makes it considered paid.
-     *
      * This method is NOT used to determine the paid status, but is used to
      * determine the paid date by looking for these statuses in the
      * StatusHistoryCollection.
-     *
-     * @param string $status
-     *
-     * @return bool
      */
-    protected function isPaidStatus($status)
+    protected function isPaidStatus(string $status): bool
     {
         return in_array($status, ['processing', 'closed', 'complete']);
     }
@@ -175,9 +169,10 @@ class Source extends BaseSource
      * Returns the payment date for the order.
      *
      * @return string|null
-     *   The payment date (yyyy-mm-dd) or null if the order has not been paid yet.
+     *   The payment date (yyyy-mm-dd) or null if the order has not been paid
+     *   yet.
      */
-    protected function getPaymentDateOrder()
+    protected function getPaymentDateOrder(): ?string
     {
         // Take date of last payment as payment date.
         $paymentDate = null;
@@ -197,31 +192,31 @@ class Source extends BaseSource
      * Returns the payment date for the credit memo.
      *
      * @return string|null
-     *   The payment date (yyyy-mm-dd) or null if the order has not been paid yet.
+     *   The payment date (yyyy-mm-dd) or null if the credit memo has not been
+     *   paid yet.
      */
-    protected function getPaymentDateCreditNote()
+    protected function getPaymentDateCreditNote(): ?string
     {
         return substr($this->source->getCreatedAt(), 0, strlen('yyyy-mm-dd'));
     }
 
-    public function getCurrency()
+    public function getCurrency(): array
     {
-        $result = array (
+        return array (
             Meta::Currency => $this->source->getOrderCurrencyCode(),
             Meta::CurrencyRate => (float) $this->source->getBaseToOrderRate(),
             Meta::CurrencyDoConvert => false,
         );
-        return $result;
 
     }
 
     /**
      * {@inheritdoc}
      *
-     * This override provides the values meta-invoice-amountinc and
-     * meta-invoice-vatamount.
+     * This override provides the values 'meta-invoice-amountinc' and
+     * 'meta-invoice-vatamount'.
      */
-    protected function getAvailableTotals()
+    protected function getAvailableTotals(): array
     {
         $sign = $this->getSign();
         return [
@@ -237,7 +232,6 @@ class Source extends BaseSource
     {
         parent::setInvoice();
         if ($this->getType() === Source::Order) {
-            /** @var \Mage_Core_Model_Resource_Db_Collection_Abstract|\Magento\Sales\Model\ResourceModel\Order\Invoice\Collection $shopInvoices */
             $shopInvoices = $this->source->getInvoiceCollection();
             if (count($shopInvoices) > 0) {
                 $this->invoice = $shopInvoices->getFirstItem();
@@ -246,7 +240,7 @@ class Source extends BaseSource
     }
 
     /**
-     * {@inheritdoc}
+     * {@see Source::getInvoiceReference()}
      */
     public function getInvoiceReferenceOrder()
     {
@@ -255,7 +249,7 @@ class Source extends BaseSource
     }
 
     /**
-     * {@inheritdoc}
+     * {@see Source::getInvoiceDate()}
      */
     public function getInvoiceDateOrder()
     {
@@ -267,7 +261,7 @@ class Source extends BaseSource
      */
     protected function getShopOrderOrId()
     {
-        /** @var \Mage_Sales_Model_Order_Creditmemo|\Magento\Sales\Model\Order\Creditmemo $creditmemo */
+        /** @var \Magento\Sales\Model\Order\Creditmemo $creditmemo */
         $creditmemo = $this->source;
         return $creditmemo->getOrderId();
     }
@@ -277,7 +271,7 @@ class Source extends BaseSource
      */
     protected function getShopCreditNotesOrIds()
     {
-        /** @var \Mage_Sales_Model_Order|\Magento\Sales\Model\Order $order */
+        /** @var \Magento\Sales\Model\Order $order */
         $order = $this->source;
         return $order->getCreditmemosCollection();
     }
@@ -285,7 +279,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    public function getCountryCode()
+    public function getCountryCode(): string
     {
         return $this->source->getBillingAddress()->getCountryId();
     }

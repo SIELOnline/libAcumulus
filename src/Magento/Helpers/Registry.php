@@ -1,12 +1,17 @@
 <?php
 namespace Siel\Acumulus\Magento\Helpers;
 
+use Exception;
 use Magento\Framework\App\Bootstrap;
 use Magento\Framework\Component\ComponentRegistrar;
-use Magento\Framework\Exception\FileSystemException;
+use Magento\Framework\Component\ComponentRegistrarInterface;
+use Magento\Framework\Filesystem\Directory\ReadFactory;
+use Magento\Framework\Locale\ResolverInterface;
+use Magento\Framework\Module\ResourceInterface;
 
 /**
- * Registry is a wrapper around the Magento2 ObjectManager to get
+ * Registry is a wrapper around the Magento2 ObjectManager to get objects of all
+ * sorts.
  */
 class Registry
 {
@@ -27,10 +32,8 @@ class Registry
 
     /**
      * Returns the Registry instance.
-     *
-     * @return \Siel\Acumulus\Magento\Helpers\Registry
      */
-    public static function getInstance()
+    public static function getInstance(): Registry
     {
         if (!static::$instance) {
             static::$instance = new static();
@@ -58,116 +61,53 @@ class Registry
     }
 
     /**
-     * @return \Magento\Framework\ObjectManagerInterface
-     */
-    public function getObjectManager()
-    {
-        return $this->objectManager;
-    }
-
-    /**
      * Creates a new object of the given type.
-     *
-     * @param string $type
-     *
-     * @return mixed
-     *
      */
-    public function create($type)
+    public function create(string $type)
     {
         return $this->objectManager->create($type);
     }
 
     /**
      * Retrieves a cached object instance or creates a new instance.
-     *
-     * @param string $type
-     *
-     * @return mixed
      */
-    public function get($type)
+    public function get(string $type)
     {
         return $this->objectManager->get($type);
-    }
-
-    /**
-     * @return \Magento\Framework\UrlInterface
-     */
-    public function getUrlInterface()
-    {
-        return $this->get('Magento\Backend\Model\UrlInterface');
-    }
-
-    /**
-     * @return \Magento\Config\Model\ResourceModel\Config
-     */
-    public function getResourceConfig()
-    {
-        return $this->get('Magento\Config\Model\ResourceModel\Config');
-    }
-
-    /**
-     * @return \Magento\Backend\App\ConfigInterface
-     */
-    public function getConfigInterface()
-    {
-        return $this->get('Magento\Backend\App\ConfigInterface');
-    }
-
-    /**
-     * @return \Magento\Framework\Component\ComponentRegistrarInterface
-     */
-    private function getComponentRegistrar()
-    {
-        return $this->get('\Magento\Framework\Component\ComponentRegistrarInterface');
-    }
-
-    /**
-     * @return \Magento\Framework\Filesystem\Directory\ReadFactory
-     */
-    private function getReadFactory()
-    {
-        return $this->get('\Magento\Framework\Filesystem\Directory\ReadFactory');
-    }
-
-    /**
-     * @return \Magento\Framework\Module\ResourceInterface
-     */
-    private function getModuleResource()
-    {
-        return $this->get('Magento\Framework\Module\ResourceInterface');
     }
 
     /**
      * @return string
      *   The locale code.
      */
-    public function getLocale()
+    public function getLocale(): string
     {
         /** @var \Magento\Framework\Locale\ResolverInterface $resolver */
-        $resolver = $this->get('Magento\Framework\Locale\ResolverInterface');
+        $resolver = $this->get(ResolverInterface::class);
         return $resolver->getLocale();
     }
 
     /**
      * Returns the composer version for the given module.
-     *
-     * @param $moduleName
-     * @return \Magento\Framework\Phrase|string|void
      */
-    public function getModuleVersion($moduleName)
+    public function getModuleVersion(string $moduleName): string
     {
         try {
-            $path = $this->getComponentRegistrar()->getPath(ComponentRegistrar::MODULE, $moduleName);
+            /** @var ComponentRegistrarInterface $registrar */
+            $registrar = $this->get(ComponentRegistrarInterface::class);
+            $path = $registrar->getPath(ComponentRegistrar::MODULE, $moduleName);
             if ($path) {
-                $directoryRead = $this->getReadFactory()->create($path);
+                /** @var ReadFactory $readFactory */
+                $readFactory = $this->get(ReadFactory::class);
+                $directoryRead = $readFactory->create($path);
                 $composerJsonData = $directoryRead->readFile('composer.json');
                 $data = json_decode($composerJsonData);
-                $result = !empty($data->version) ? $data->version : ($data === null ? 'JSON ERROR' : 'NOT SET');
+                $result = $data === null ? 'JSON ERROR' : !empty($data->version) ? $data->version : 'NOT SET';
             } else {
                 $result = 'MODULE ERROR';
             }
-        } catch (FileSystemException $e) {
+        } catch (Exception $e) {
+            // FileSystemException or a ValidatorException
             $result = $e->getMessage();
         }
 
@@ -181,9 +121,10 @@ class Registry
      *
      * @return string|false
      */
-    public function getSchemaVersion($moduleName)
+    public function getSchemaVersion(string $moduleName)
     {
-        return $this->getModuleResource()->getDataVersion($moduleName);
+        /** @var ResourceInterface $resource */
+        $resource = $this->get(ResourceInterface::class);
+        return $resource->getDataVersion($moduleName);
     }
-
 }

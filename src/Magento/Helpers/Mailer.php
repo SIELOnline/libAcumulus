@@ -1,5 +1,5 @@
 <?php
-namespace Siel\Acumulus\Magento\Magento2\Helpers;
+namespace Siel\Acumulus\Magento\Helpers;
 
 use Siel\Acumulus\Helpers\Mailer as BaseMailer;
 use Zend_Mail;

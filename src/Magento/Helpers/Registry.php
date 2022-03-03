@@ -1,5 +1,5 @@
 <?php
-namespace Siel\Acumulus\Magento\Magento2\Helpers;
+namespace Siel\Acumulus\Magento\Helpers;
 
 use Magento\Framework\App\Bootstrap;
 use Magento\Framework\Component\ComponentRegistrar;
@@ -11,7 +11,7 @@ use Magento\Framework\Exception\FileSystemException;
 class Registry
 {
     /**
-     * @var \Siel\Acumulus\Magento\Magento2\Helpers\Registry
+     * @var \Siel\Acumulus\Magento\Helpers\Registry
      */
     protected static $instance;
 
@@ -28,7 +28,7 @@ class Registry
     /**
      * Returns the Registry instance.
      *
-     * @return \Siel\Acumulus\Magento\Magento2\Helpers\Registry
+     * @return \Siel\Acumulus\Magento\Helpers\Registry
      */
     public static function getInstance()
     {

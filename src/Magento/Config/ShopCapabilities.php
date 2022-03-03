@@ -1,14 +1,14 @@
 <?php
-namespace Siel\Acumulus\Magento\Magento2\Config;
+namespace Siel\Acumulus\Magento\Config;
 
 use Exception;
 use Magento\Framework\App\ObjectManager;
 use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
-use Siel\Acumulus\Magento\Magento2\Helpers\Registry;
+use Siel\Acumulus\Magento\Helpers\Registry;
 use Siel\Acumulus\Config\Config;
 
 /**
- * Defines the Magento 2 webshop specific capabilities.
+ * Defines the Magento 2 web shop specific capabilities.
  */
 class ShopCapabilities extends ShopCapabilitiesBase
 {

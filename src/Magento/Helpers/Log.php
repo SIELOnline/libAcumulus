@@ -1,10 +1,15 @@
 <?php
-namespace Siel\Acumulus\Magento\Magento2\Helpers;
+/**
+ * @noinspection PhpMultipleClassDeclarationsInspection
+ */
+
+namespace Siel\Acumulus\Magento\Helpers;
 
 use Magento\Framework\Filesystem\Driver\File;
 use Monolog\Logger;
+use Psr\Log\LoggerInterface as LoggerInterface;
 use Siel\Acumulus\Helpers\Severity;
-use Siel\Acumulus\Magento\Magento2\Helpers\Logger\Handler;
+use Siel\Acumulus\Magento\Helpers\Logger\Handler;
 use Siel\Acumulus\Helpers\Log as BaseLog;
 
 /**
@@ -13,16 +18,19 @@ use Siel\Acumulus\Helpers\Log as BaseLog;
 class Log extends BaseLog
 {
     /**
-     * @var \Psr\Log\LoggerInterface
+     * @var LoggerInterface
      */
     protected $logger;
 
     /**
-     * @return \Psr\Log\LoggerInterface
+     * @return LoggerInterface
+     *
+     * @noinspection PhpDocMissingThrowsInspection
      */
-    protected function getLogger()
+    protected function getLogger(): LoggerInterface
     {
         if (!$this->logger) {
+            /** @noinspection PhpUnhandledExceptionInspection */
             $this->logger = new Logger('acumulus', [new Handler(new File())]);
         }
         return $this->logger;
@@ -47,7 +55,7 @@ class Log extends BaseLog
      * @return int
      *   The Magento equivalent of the severity.
      */
-    protected function getMagentoSeverity($severity)
+    protected function getMagentoSeverity(int $severity): int
     {
         switch ($severity) {
             case Severity::Error:

@@ -1,8 +1,9 @@
 <?php
-namespace Siel\Acumulus\Magento\Magento2\Config;
+namespace Siel\Acumulus\Magento\Config;
 
+use Magento\Framework\App\Config as MagentoConfig;
 use Magento\Framework\App\ObjectManager;
-use Siel\Acumulus\Magento\Magento2\Helpers\Registry;
+use Siel\Acumulus\Magento\Helpers\Registry;
 use Siel\Acumulus\Config\ConfigStore as BaseConfigStore;
 
 /**
@@ -35,7 +36,7 @@ class ConfigStore extends BaSeConfigStore
 
         // Force a cache clear.
         /** @var \Magento\Framework\App\Config $config */
-	    $config = ObjectManager::getInstance()->get(\Magento\Framework\App\Config::class);
+	    $config = ObjectManager::getInstance()->get(MagentoConfig::class);
 	    $config->clean();
         return true;
     }

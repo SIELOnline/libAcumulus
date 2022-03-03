@@ -125,19 +125,6 @@ use const Siel\Acumulus\Version;
  */
 class Container
 {
-    /**
-     * @var string
-     *   The base directory where the Acumulus library is located. This is used
-     *   to check if the file that should contain a class exists before calling
-     *   class_exists(). This is not a good practice and should only be done if
-     *   older autoloaders are used that generate errors or warnings if a class
-     *   is not found.
-     *
-     *   If this contains an empty value, no check will be performed.
-     * @todo: check if still needed and for which web shops.
-     */
-    protected $baseDir;
-
     /** @const string */
     const baseNamespace = '\\Siel\\Acumulus';
 
@@ -208,26 +195,6 @@ class Container
     {
         $this->language = substr($language, 0, 2);
         return $this;
-    }
-
-    /**
-     * Sets the base directory of the Acumulus library.
-     *
-     * Known usages: Magento1.
-     * When Magento1 runs in compiled mode, the classes as are instantiated are
-     * in the includes/src directory, in a flattened structure. However, to
-     * prevent errors or warnings, tryNsInstance will, before calling
-     * class_exists(), first look for the existence of the class file in the
-     * original directory structure. but that directory structure cannot be
-     * derived by using __DIR__.
-     *
-     * @param string $baseDir
-     *
-     * @noinspection PhpUnused Used in Magento1 module.
-     */
-    public function setBaseDir($baseDir = null)
-    {
-        $this->baseDir = $baseDir === null ? dirname(__DIR__) : $baseDir;
     }
 
     /**
@@ -719,14 +686,7 @@ class Container
             // As PHP5.3 produces a fatal error when a class has no constructor
             // and newInstanceArgs() is called, we have to differentiate between
             // no arguments and arguments.
-            if (count($constructorArgs) === 0) {
-                $this->instances[$instanceKey] = new $fqClass();
-            } else {
-                /** @noinspection PhpUnhandledExceptionInspection */
-                $reflector = new ReflectionClass($fqClass);
-                /** @noinspection PhpUnhandledExceptionInspection */
-                $this->instances[$instanceKey] = $reflector->newInstanceArgs($constructorArgs);
-            }
+            $this->instances[$instanceKey] = new $fqClass(...$constructorArgs);
         }
         return $this->instances[$instanceKey];
     }
@@ -750,7 +710,7 @@ class Container
         $fqClass = $this->getFqClass($class, $subNamespace, $namespace);
         // Checking if the file exists prevents warnings in Magento whose own
         // autoloader logs warnings when a class cannot be loaded.
-        return (empty($this->baseDir) || is_readable($this->getFileName($fqClass))) && class_exists($fqClass) ? $fqClass : '';
+        return class_exists($fqClass) ? $fqClass : '';
     }
 
     /**
@@ -771,19 +731,5 @@ class Container
     protected function getFqClass($class, $subNamespace, $namespace)
     {
         return $namespace . '\\' . $subNamespace . '\\' . $class;
-    }
-
-    /**
-     * Returns the file name (including path) where the given class resides.
-     *
-     * @param string $fqClass
-     *   Fully qualified class name.
-     *
-     * @return string
-     *   The file name (including path) where the given class resides.
-     */
-    protected function getFileName($fqClass)
-    {
-        return $this->baseDir . str_replace('\\',DIRECTORY_SEPARATOR, substr($fqClass, strlen(static::baseNamespace))) . '.php';
     }
 }

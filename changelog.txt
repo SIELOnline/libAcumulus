@@ -1,22 +1,19 @@
 Changelog Acumulus webkoppelingen
 =================================
 
-ALL = Alle webshops.
+ALL = Alle web shops.
 HS  = HikaShop (Joomla)
 JOO = Joomla (HikaShop + VirtueMart3)
-MA  = Magento (alle ondersteunde versies)
-MA1 = Magento 1 (wordt niet meer ondersteund sinds 6.0.0)
-MA2 = Magento 2 (MA20, MA21, ... = specifieke minor versie binnen major versie 2)
+MA  = Magento (alle ondersteunde versies: >= 2.3)
 OC  = OpenCart (alle ondersteunde versies)
 OC1 = OpenCart 1 (sinds 6.3.0 wordt OC1 niet meer actief onderhouden en getest.)
       Sowieso werd al alleen OpenCart 1.5.6.4 nog ondersteund.
 OC2 = OpenCart 2 (sinds 6.3.0 wordt OC2 niet meer actief onderhouden en getest.)
       Sowieso werd al alleen OpenCart 2.3.0.2 nog ondersteund.
 OC3 = OpenCart 3
-PS  = PrestaShop (1.7.6+) (1.6.x- wordt niet meer ondersteund sinds 6.0.0)
+PS  = PrestaShop (1.7.6+)
 VM3 = VirtueMart3 (Joomla)
 WC  = WooCommerce 5 (WC 4 en 3 zullen waarschijnlijk ook werken)
-WC2 = WooCommerce 2 (wordt niet meer ondersteund vanaf onze versie 5.5.2)
 
 7.0.0-alpha1 (2022-02-??)
 -------------------------
@@ -57,9 +54,12 @@ Refactorings:
 - PS: Use of deprecated Tab::getIdFromClassName() replaced.
 - PS: Config upgrades do not have to be repeated in install files: removed all
   but the latest call to Config(Upgrade)->upgrade().
-- Removed MA1 specific code and constructions needed for MA1
-  (Container::setBaseDir()). Merged code, classes and meethod overides, in
+- MA1: Removed MA1 specific code and constructions needed for MA1
+  (Container::setBaseDir()). Merged code, classes and method overrides, in
   namespace \Siel\Acumulus\Magento\Magento2 into \Siel\Acumulus\Magento.
+- WC2: Removed WC2 specific code (\Siel\Acumulus\WooCommerce\WooCommerce2
+  namespace) and constructions needed for WC2 (version checks, hooks, argument
+  number and order passed to hooks, ...
 
 6.4.1 (2022-02-23) (MA2 only)
 -----------------------------

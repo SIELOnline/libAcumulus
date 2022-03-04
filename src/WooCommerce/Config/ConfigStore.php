@@ -11,7 +11,7 @@ class ConfigStore extends BaSeConfigStore
     /**
      * {@inheritdoc}
      */
-    public function load()
+    public function load(): array
     {
       return get_option('acumulus');
     }
@@ -19,7 +19,7 @@ class ConfigStore extends BaSeConfigStore
     /**
      * {@inheritdoc}
      */
-    public function save(array $values)
+    public function save(array $values): bool
     {
         // WP: update_option() also returns false when there are no changes. We
         // want to return true, so we perform the same check as update_option()

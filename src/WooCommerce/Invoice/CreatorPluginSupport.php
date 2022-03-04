@@ -15,8 +15,8 @@ use WC_Product;
  * CreatorSupportForOtherPlugins contains support for other plugins.
  *
  * The WooCommerce market contains many additional plugins that add features
- * to standard WooCommerce. Supporting all these plugins is difficult and can
- * lead to hard to read and maintain code. Therefore, we try to split support
+ * to standard WooCommerce. Supporting all these plugins is difficult and
+ * results in hard to read and maintain code. Therefore, we try to split support
  * for these other plugins off into its own containers that react to the
  * Acumulus filters and actions.
  */
@@ -114,9 +114,8 @@ class CreatorPluginSupport
      * @param \Siel\Acumulus\Invoice\Result $localResult
      *
      * @return array|null
-     *
      */
-    public function acumulusInvoiceCreated($invoice, BaseSource $invoiceSource, Result $localResult)
+    public function acumulusInvoiceCreated(?array $invoice, BaseSource $invoiceSource, Result $localResult): ?array
     {
         $invoice = $this->supportBundleProducts($invoice, $invoiceSource, $localResult);
         $invoice = $this->supportTMExtraProductOptions($invoice, $invoiceSource, $localResult);
@@ -125,24 +124,19 @@ class CreatorPluginSupport
 
     /**
      * Supports the "WooCommerce Bundle Products" plugin.
-     *
      * This method supports the woocommerce-product-bundles extension that
      * stores the bundle products as separate item lines below the bundle line
      * and uses the metadata described below to link them to each other.
-     *
      * This method hierarchically groups bundled products into the bundle
      * product and can do so multi-level.
-     *
      * Metadata on bundle lines:
      * - bundle_cart_key (hash) unique identifier.
      * - bundled_items (hash[]) refers to the bundle_cart_key of the bundled
      *     products.
-     *
      * Metadata on bundled items:
      * - bundled_by (hash) refers to bundle_cart_key of the bundle line.
      * - bundle_cart_key (hash) unique identifier.
      * - bundled_item_hidden: 'yes'|'no' or absent (= 'no').
-     *
      * 1) In a 1st pass, we first add bundle metadata to each invoice line that
      *    represents a bundle or bundled item.
      * 2) In a 2nd pass, we group the bundled items as children into the parent
@@ -154,7 +148,7 @@ class CreatorPluginSupport
      *
      * @return array|null
      */
-    protected function supportBundleProducts($invoice, BaseSource $invoiceSource, /** @noinspection PhpUnusedParameterInspection */ Result $localResult)
+    protected function supportBundleProducts(?array $invoice, BaseSource $invoiceSource, /** @noinspection PhpUnusedParameterInspection */ Result $localResult): ?array
     {
         /** @var \WC_Abstract_Order $shopSource */
         $shopSource = $invoiceSource->getSource();
@@ -208,7 +202,7 @@ class CreatorPluginSupport
      *   The set of item lines but with the lines of bundled items
      *   hierarchically placed in their bundle line.
      */
-    protected function groupBundles(array $itemLines)
+    protected function groupBundles(array $itemLines): array
     {
         $result = [];
         foreach ($itemLines as &$itemLine) {
@@ -224,7 +218,7 @@ class CreatorPluginSupport
                     }
                     $parent[Meta::ChildrenLines][] = $itemLine;
                 } else {
-                    // Oops: not found. Store a message in the line meta data
+                    // Oops: not found. Store a message in the line metadata
                     // and keep it as a separate line.
                     $itemLine[Meta::BundleParentId] .= ': not found';
                     $result[] = $itemLine;
@@ -248,7 +242,7 @@ class CreatorPluginSupport
      * @return array|null
      *   The parent bundle line or null if not found.
      */
-    protected function &getParentBundle(array &$lines, $parentId)
+    protected function &getParentBundle(array &$lines, $parentId): ?array
     {
         foreach ($lines as &$line) {
             if (!empty($line[Meta::BundleId]) && $line[Meta::BundleId] === $parentId) {
@@ -268,12 +262,10 @@ class CreatorPluginSupport
 
     /**
      * Supports the "WooCommerce TM Extra Product Options" plugin.
-     *
      * This method supports the tm-woo-extra-product-options extension that
      * places its data in the metadata under keys that start wth tm_epo or
      * tmcartepo. We need the tncartepo_data value as that contains the
      * options.
-     *
      * This method adds the option data as children to the invoice line.
      *
      * @param array|null $invoice
@@ -282,8 +274,12 @@ class CreatorPluginSupport
      *
      * @return array|null
      */
-    protected function supportTMExtraProductOptions($invoice, BaseSource $invoiceSource, /** @noinspection PhpUnusedParameterInspection */ Result $localResult)
-    {
+    protected function supportTMExtraProductOptions(
+        ?array $invoice,
+        BaseSource $invoiceSource,
+        /** @noinspection PhpUnusedParameterInspection */
+        Result $localResult
+    ): ?array {
         /** @var \WC_Abstract_Order $shopSource */
         $shopSource = $invoiceSource->getSource();
         /** @var WC_Order_Item_Product[] $items */
@@ -323,12 +319,12 @@ class CreatorPluginSupport
      * @return array[]
      *   An array of lines that describes this variant.
      */
-    protected function getExtraProductOptionsLines($item, array $commonTags)
+    protected function getExtraProductOptionsLines($item, array $commonTags): array
     {
         $result = [];
 
-        // It is a bit unclear what format this meta data should have. In old
-        // versions I had an unconditional unserialize, but now I get an array
+        // It is a bit unclear what format this metadata should have. In old
+        // versions I had an unconditional unserialize(), but now I get an array
         // of options (being arrays themselves) and code of the plugin itself
         // expects an array that may contain serialized values (i.e it uses
         // maybe_unserialize() on the elements, not on the complete value.

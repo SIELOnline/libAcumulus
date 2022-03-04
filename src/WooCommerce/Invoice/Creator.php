@@ -13,6 +13,7 @@ use Siel\Acumulus\Meta;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Tag;
 use WC_Coupon;
+use WC_Order_Item_Fee;
 use WC_Order_Item_Product;
 use WC_Product;
 use WC_Tax;
@@ -22,7 +23,7 @@ use WC_Tax;
  */
 class Creator extends BaseCreator
 {
-    /** @var bool Whether the order has (non empty) item lines. */
+    /** @var bool Whether the order has (non-empty) item lines. */
     protected $hasItemLines;
 
     /**
@@ -43,7 +44,7 @@ class Creator extends BaseCreator
     /**
      * {@inheritdoc}
      */
-    protected function getItemLines()
+    protected function getItemLines(): array
     {
         $result = [];
         /** @var WC_Order_Item_Product[] $items */
@@ -62,9 +63,8 @@ class Creator extends BaseCreator
 
     /**
      * Returns 1 item line.
-     *
      * Some processing notes:
-     * - Though recently I did not see it any more, in the past I have seen
+     * - Though recently I did not see it anymore, in the past I have seen
      *   refunds where articles that were not returned were still listed but
      *   with qty = 0 (and line total = 0).
      * - It turns out that you can do partial refunds by entering a broken
@@ -83,7 +83,7 @@ class Creator extends BaseCreator
      * @return array
      *   May be empty if the line should not be sent (e.g. qty = 0 on a refund).
      */
-    protected function getItemLine($item, $product)
+    protected function getItemLine(WC_Order_Item_Product $item, $product): array
     {
         $result = [];
 
@@ -158,7 +158,7 @@ class Creator extends BaseCreator
         // Check for cost price and margin scheme.
         if (!empty($line['costPrice']) && $this->allowMarginScheme()) {
             // Margin scheme:
-            // - Do not put VAT on invoice: send price incl VAT as unitprice.
+            // - Do not put VAT on invoice: send price incl VAT as 'unitprice'.
             // - But still send the VAT rate to Acumulus.
             $result += [
                 Tag::UnitPrice => $productPriceInc,
@@ -197,7 +197,6 @@ class Creator extends BaseCreator
 
     /**
      * Looks up and returns vat rate metadata for product lines.
-     *
      * A product has a tax class. A tax class can have multiple tax rates,
      * depending on the region of the customer. We use the customers address in
      * the raw invoice that is being created, to get the possible rates.
@@ -206,6 +205,7 @@ class Creator extends BaseCreator
      *   The tax class of the product. For the default tax class it can be
      *   'standard' or the empty string. For no tax class at all, it will be
      *   PluginConfig::VatClass_Null.
+     *   @todo: can it be null?
      *
      * @return array
      *   An array with keys:
@@ -213,7 +213,7 @@ class Creator extends BaseCreator
      *   - Meta::VatRateLookup: float[]
      *   - Meta::VatRateLookupLabel: string[]
      */
-    protected function getVatRateLookupMetadataByTaxClass($taxClassId)
+    protected function getVatRateLookupMetadataByTaxClass(?string $taxClassId): array
     {
         if ($taxClassId === null) {
             $result = [
@@ -241,8 +241,8 @@ class Creator extends BaseCreator
             $args = [
                 'tax_class' => $taxClassId,
                 'country' => $this->invoice[Tag::Customer][Tag::CountryCode],
-                'city' => isset($this->invoice[Tag::Customer][Tag::City]) ? $this->invoice[Tag::Customer][Tag::City] : '',
-                'postcode' => isset($this->invoice[Tag::Customer][Tag::PostalCode]) ? $this->invoice[Tag::Customer][Tag::PostalCode] : '',
+                'city' => $this->invoice[Tag::Customer][Tag::City] ?? '',
+                'postcode' => $this->invoice[Tag::Customer][Tag::PostalCode] ?? '',
             ];
             $taxRates = WC_Tax::find_rates($args);
             foreach ($taxRates as $taxRate) {
@@ -255,20 +255,18 @@ class Creator extends BaseCreator
 
     /**
      * Returns an array of lines that describes this variant.
-     *
      * This method supports the default WooCommerce variant functionality.
-     *
-     * @todo: can $item->get_formatted_meta_data(''); be used to get this info?
      *
      * @param \WC_Order_Item_Product $item
      * @param \WC_Product $product
      * @param array $commonTags
-     *   An array of tags from the parent product to add to the child lines.
+          *   An array of tags from the parent product to add to the child lines.
      *
      * @return array[]
      *   An array of lines that describes this variant.
+     *@todo: can $item->get_formatted_meta_data(''); be used to get this info?
      */
-    protected function getVariantLines($item, WC_Product $product, array $commonTags)
+    protected function getVariantLines(WC_Order_Item_Product $item, WC_Product $product, array $commonTags): array
     {
         $result = [];
 
@@ -321,13 +319,13 @@ class Creator extends BaseCreator
                 if (taxonomy_exists(wc_sanitize_taxonomy_name($meta->key))) {
                     $term = get_term_by('slug', $meta->value, wc_sanitize_taxonomy_name($meta->key));
                     $variantLabel = wc_attribute_label(wc_sanitize_taxonomy_name($meta->key));
-                    $variantValue = isset($term->name) ? $term->name : $meta->value;
+                    $variantValue = $term->name ?? $meta->value;
                 } else {
                     $variantLabel = apply_filters('woocommerce_attribute_label', wc_attribute_label($meta->key, $product), $meta->key, $product);
                     $variantValue = $meta->value;
                 }
 
-                // @todo: why a rawurldecode here, is that a "filter" to apply?
+                // @todo: why a rawurldecode() here, is that a "filter" to apply?
                 $result[] = [
                         Tag::Product => $variantLabel . ': ' . rawurldecode($variantValue),
                         Tag::UnitPrice => 0,
@@ -344,7 +342,7 @@ class Creator extends BaseCreator
      * WooCommerce has general fee lines, so we have to override this method to
      * add these general fees (type unknown to us)
      */
-    protected function getFeeLines()
+    protected function getFeeLines(): array
     {
         $result = parent::getFeeLines();
 
@@ -367,7 +365,7 @@ class Creator extends BaseCreator
      * @return array
      *   The invoice line for the given fee line.
      */
-    protected function getFeeLine($item)
+    protected function getFeeLine(WC_Order_Item_Fee $item): array
     {
         $quantity = $item->get_quantity();
         $feeEx = $item->get_total() / $quantity;
@@ -384,7 +382,7 @@ class Creator extends BaseCreator
     /**
      * {@inheritdoc}
      */
-    protected function getShippingLines()
+    protected function getShippingLines(): array
     {
         $result = [];
         // Get the shipping lines for this order.
@@ -402,7 +400,7 @@ class Creator extends BaseCreator
     /**
      * {@inheritdoc}
      */
-    protected function getShippingLine()
+    protected function getShippingLine(): array
     {
         /** @var \WC_Order_Item_Shipping $item */
         $item = func_get_arg(0);
@@ -458,15 +456,10 @@ class Creator extends BaseCreator
 
     /**
      * Looks up and returns vat rate metadata for shipping lines.
-     *
      * In WooCommerce, a shipping line can have multiple taxes. I am not sure if
      * that is possible for Dutch web shops, but if a shipping line does have
      * multiple taxes we fall back to the tax class setting for shipping
-     * methods, that can have multiple tax rates itself (@see
-     * getVatRateLookupMetadataByTaxClass()). Anyway, this method will only
-     * return metadata if only 1 rate was found.
-     *
-     * @param array[]|array|null $taxes
+     * methods, that can have multiple tax rates itself (@param array|array[]|null $taxes
      *   The taxes applied to a shipping line.
      *
      * @return array
@@ -475,8 +468,11 @@ class Creator extends BaseCreator
      *   - Meta::VatRateLookup (*)
      *   - Meta::VatRateLookupLabel (*)
      *   - Meta::VatRateLookupSource (*)
+     *@see
+     * getVatRateLookupMetadataByTaxClass()). Anyway, this method will only
+     * return metadata if only 1 rate was found.
      */
-    protected function getShippingVatRateLookupMetadata($taxes)
+    protected function getShippingVatRateLookupMetadata(?array $taxes): array
     {
         $result = [];
         if (is_array($taxes)) {
@@ -546,7 +542,7 @@ class Creator extends BaseCreator
     /**
      * {@inheritdoc}
      */
-    protected function getDiscountLines()
+    protected function getDiscountLines(): array
     {
         $result = [];
 
@@ -584,7 +580,7 @@ class Creator extends BaseCreator
      *
      * @return array
      */
-    protected function getDiscountLine(WC_Coupon $coupon)
+    protected function getDiscountLine(WC_Coupon $coupon): array
     {
         // Get a description for the value of this coupon. Entered discount
         // amounts follow the productPricesIncludeTax() setting. Use that info
@@ -636,7 +632,7 @@ class Creator extends BaseCreator
      *   True if the prices as entered by an admin include VAT, false if they are
      *   entered ex VAT.
      */
-    protected function productPricesIncludeTax()
+    protected function productPricesIncludeTax(): bool
     {
         return wc_prices_include_tax();
     }
@@ -644,10 +640,8 @@ class Creator extends BaseCreator
 
     /**
      * Returns whether the price inc can be considered realistic.
-     *
      * Precondition: product prices as entered by the shop manager include tax
      *  and thus can be considered to be expressed in cents.
-     *
      * If a price inc is not considered realistic, we should not recalculate the
      * product price ex based on the product price inc after we have obtained a
      * corrected vat rate.
@@ -663,7 +657,7 @@ class Creator extends BaseCreator
      * @return string
      *   true if the price inc can be considered realistic, false otherwise.
      */
-    protected function isPriceIncRealistic($productPriceInc, array $taxes, $product)
+    protected function isPriceIncRealistic(float $productPriceInc, array $taxes, ?WC_Product $product): string
     {
         $reason = '';
         // Given the precondition that product prices as entered include vat, we

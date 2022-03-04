@@ -98,8 +98,10 @@ class Source extends BaseSource
      * @return int
      *   \Siel\Acumulus\Api::PaymentStatus_Paid or
      *   \Siel\Acumulus\Api::PaymentStatus_Due
+     *
+     * @noinspection PhpUnused : called via getPaymentStatus().
      */
-    protected function getPaymentStatusOrder()
+    protected function getPaymentStatusOrder(): int
     {
         return $this->source->is_paid() ? Api::PaymentStatus_Paid : Api::PaymentStatus_Due;
     }
@@ -107,7 +109,7 @@ class Source extends BaseSource
     /**
      * Returns whether the order refund has been paid or not.
      *
-     * For now we assume that a refund is paid back on creation.
+     * For now, we assume that a refund is paid back on creation.
      *
      * @return int
      *   \Siel\Acumulus\Api::PaymentStatus_Paid or
@@ -115,7 +117,7 @@ class Source extends BaseSource
      *
      * @noinspection PhpUnused Called via callTypeSpecificMethod().
      */
-    protected function getPaymentStatusCreditNote()
+    protected function getPaymentStatusCreditNote(): int
     {
         return Api::PaymentStatus_Paid;
     }
@@ -125,8 +127,10 @@ class Source extends BaseSource
      *
      * @return string
      *   The payment date of the order (yyyy-mm-dd).
+     *
+     * @noinspection PhpUnused : called via getPaymentDate().
      */
-    protected function getPaymentDateOrder()
+    protected function getPaymentDateOrder(): string
     {
         // This returns a WC_DateTime but that class has a _toString() method.
         $string = $this->source->get_date_paid();
@@ -135,13 +139,14 @@ class Source extends BaseSource
 
     /**
      * Returns the payment date of the order refund.
-     *
      * We take the last modified date as pay date.
      *
      * @return string
      *   The payment date of the order refund (yyyy-mm-dd).
+     *
+     * @noinspection PhpUnused : called via getPaymentDate().
      */
-    protected function getPaymentDateCreditNote()
+    protected function getPaymentDateCreditNote(): string
     {
         // This returns a WC_DateTime but that class has a _toString() method.
         $string = $this->source->get_date_modified();
@@ -151,7 +156,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    public function getCountryCode()
+    public function getCountryCode(): string
     {
         // Billing information is not stored for credit notes, so it is expected
         // to be the same as for its order.
@@ -177,7 +182,7 @@ class Source extends BaseSource
      * (probably) still be in euro's. So, we will not have to convert the
      * amounts and this meta info is thus purely informative.
      */
-    public function getCurrency()
+    public function getCurrency(): array
     {
         return [
             Meta::Currency => 'EUR',
@@ -192,7 +197,7 @@ class Source extends BaseSource
      * This override provides the values meta-invoice-amountinc and
      * meta-invoice-vatamount.
      */
-    protected function getAvailableTotals()
+    protected function getAvailableTotals(): array
     {
         return [
             Meta::InvoiceAmountInc => $this->source->get_total(),
@@ -203,7 +208,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      *
-     * @return \WC_Order|int
+     * @return int
      */
     protected function getShopOrderOrId()
     {

@@ -38,7 +38,7 @@ class Log extends BaseLog
      *   - 'info': Informational messages.
      *   - 'debug': Debug-level messages.
      */
-    protected function getWooCommerceSeverity($severity)
+    protected function getWooCommerceSeverity(int $severity): string
     {
         switch ($severity) {
             case Severity::Exception:

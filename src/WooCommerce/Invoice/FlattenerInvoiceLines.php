@@ -19,7 +19,7 @@ class FlattenerInvoiceLines extends BaseFlattenerInvoiceLines
      * This plugin allows to define a base price for the parent but to keep
      * price info on the children, so this should all be added.
      */
-    protected function collectInfoFromChildren(array $parent, array $children)
+    protected function collectInfoFromChildren(array $parent, array $children): array
     {
         if (isset($parent[Meta::BundleId])) {
             $childrenLineAmount = 0.0;
@@ -44,7 +44,7 @@ class FlattenerInvoiceLines extends BaseFlattenerInvoiceLines
 
                 // Collect vat rate data.
                 if (empty($child[Tag::VatRate])) {
-                    // No vatrate on 1 of the children: do not assume they are
+                    // No vat rate on 1 of the children: do not assume they are
                     // all the same. However, we may ignore this line if it is
                     // an empty price line, i.e. just an informative line.
                     if (!Number::isZero($child[Tag::UnitPrice])) {

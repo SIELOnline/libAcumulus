@@ -33,7 +33,7 @@ abstract class ConfigStore
      * @return array
      *   An array with any stored configuration values keyed by their name.
      */
-    abstract public function load();
+    abstract public function load(): array;
 
     /**
      * Stores the values to the actual configuration provider.
@@ -45,5 +45,5 @@ abstract class ConfigStore
      * @return bool
      *   Success.
      */
-    abstract public function save(array $values);
+    abstract public function save(array $values): bool;
 }

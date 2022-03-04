@@ -35,11 +35,9 @@ class Token extends BaseToken
 
     /**
      * Extracts a value from a WooCommerce data object data array.
-     *
-     * A WooCommerce data array (array with key value pairs returned from the
+     * A WooCommerce data array (array with key value pairs) returned from the
      * WC_Data::get_data() method may contain recursive data sets, e.g.
      * 'billing' for the billing address, and a separate meta_data set.
-     *
      * This method recursively searches for the property by stripping it into
      * separate pieces delimited by underscores. E.g. billing_email may be found
      * in $data['billing']['email'].
@@ -55,14 +53,14 @@ class Token extends BaseToken
      *   empty string). The return value may be a scalar (numeric type) that can
      *   be converted to a string.
      */
-    protected function getDataValue(array $data, $property)
+    protected function getDataValue(array $data, string $property): ?string
     {
         $value = null;
         if (array_key_exists($property, $data)) {
             // Found: return the value.
             $value = $data[$property];
         } else {
-            // Not found: check in meta data or descend recursively.
+            // Not found: check in metadata or descend recursively.
             if (isset($data['meta_data'])) {
                 $value = $this->getMetaDataValue($data['meta_data'], $property);
             }
@@ -78,15 +76,14 @@ class Token extends BaseToken
     }
 
     /**
-     * Extracts a value from a set of WooCommerce meta data objects.
-     *
-     * WooCommerce meta data is stored in objects having twice the set of
-     * properties id, key, and value, once in the property current_value and
-     * once in the property data. If 1 of the properties id, key or value is
-     * retrieved, its value from the current_value set is returned.
+     * Extracts a value from a set of WooCommerce metadata objects.
+     * WooCommerce's metadata is stored in objects having twice the set of
+     * properties 'id', 'key', and 'value', once in the property 'current_value'
+     * and once in the property 'data'. If 1 of the properties 'id', 'key' or
+     * 'value' is retrieved, its value from the 'current_value' set is returned.
      *
      * @param object[] $metaData
-     *   The meta data set to search in.
+     *   The metadata set to search in.
      * @param string $property
      *   The name of the property to search for. May be with or without a
      *   leading underscore.
@@ -97,7 +94,7 @@ class Token extends BaseToken
      *   empty string). The return value may be a scalar (numeric type) that can
      *   be converted to a string.
      */
-    protected function getMetaDataValue(array $metaData, $property)
+    protected function getMetaDataValue(array $metaData, string $property): ?string
     {
 	    $property = ltrim($property, '_');
         $value = null;

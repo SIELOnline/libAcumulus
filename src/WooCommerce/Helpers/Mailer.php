@@ -23,7 +23,7 @@ class Mailer extends BaseMailer
     /**
      * {@inheritdoc}
      */
-    protected function getFrom()
+    protected function getFrom(): string
     {
         return get_bloginfo('admin_email');
     }
@@ -31,7 +31,7 @@ class Mailer extends BaseMailer
     /**
      * {@inheritdoc}
      */
-    protected function getFromName()
+    protected function getFromName(): string
     {
         return get_bloginfo('name');
     }

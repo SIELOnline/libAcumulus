@@ -14,7 +14,7 @@ use WP_Query;
  *
  * SECURITY REMARKS
  * ----------------
- * In WooCommerce/WordPress the acumulus entries are stored as post meta data,
+ * In WooCommerce/WordPress the acumulus entries are stored as post metadata,
  * saving and querying is done via the WordPress API which takes care of
  * sanitizing.
  */
@@ -36,7 +36,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      *
      * @return string
      */
-    protected function shopTypeToSourceType($shopType)
+    protected function shopTypeToSourceType(string $shopType): string
     {
         switch ($shopType) {
             case 'shop_order':
@@ -88,8 +88,8 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
                 // incorrect "not found" result: use a key that will never
                 // contain a null value.
                 if (isset($postMeta[static::$keyCreated])) {
-                    // Acumulus meta data found: add source id and type as these
-                    // are not stored in the meta data.
+                    // Acumulus metadata found: add source id and type as these
+                    // are not stored in the metadata.
                     $postMeta[static::$keySourceType] = $invoiceSourceType;
                     $postMeta[static::$keySourceId] = $invoiceSourceId;
                     $result = $this->convertDbResultToAcumulusEntries([$postMeta], $ignoreLock);
@@ -106,7 +106,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    protected function insert(Source $invoiceSource, $entryId, $token, $created)
+    protected function insert(Source $invoiceSource, $entryId, $token, $created): bool
     {
         $now = $this->sqlNow();
         $postId = $invoiceSource->getId();
@@ -121,7 +121,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    protected function update(BaseAcumulusEntry $entry, $entryId, $token, $updated)
+    protected function update(BaseAcumulusEntry $entry, $entryId, $token, $updated): bool
     {
         $postId = $entry->getSourceId();
         // Overwrite fields. To be able to return a correct success value, we
@@ -139,7 +139,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * @inheritDoc
      */
-    public function delete(BaseAcumulusEntry $entry)
+    public function delete(BaseAcumulusEntry $entry): bool
     {
         $postId = $entry->getSourceId();
         delete_post_meta($postId, static::$keyEntryId);
@@ -163,7 +163,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      * We use the WordPress metadata API which is readily available, so nothing
      * has to be done here.
      */
-    public function install()
+    public function install(): bool
     {
         return true;
     }
@@ -174,10 +174,10 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      * We use the WordPress metadata API which is readily available, so nothing
      * has to be done here.
      */
-    public function uninstall()
+    public function uninstall(): bool
     {
         // We do not delete the Acumulus metadata, not even via a confirmation
-        // page. If we would want to do so, we can use this code:
+        // page. If we want to do so, we can use this code:
         // delete_post_meta_by_key('_acumulus_entry_id'); // for other keys as well.
         return true;
     }

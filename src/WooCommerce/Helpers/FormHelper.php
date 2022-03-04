@@ -14,7 +14,7 @@ class FormHelper extends BaseFormHelper
     /**
      * {@inheritdoc}
      */
-    protected function getMeta()
+    protected function getMeta(): ?array
     {
         if (empty($this->meta) && $this->isSubmitted() && isset($_POST[static::Meta])) {
             $this->setMeta(json_decode(stripslashes($_POST[static::Meta])));
@@ -25,7 +25,7 @@ class FormHelper extends BaseFormHelper
     /**
      * {@inheritdoc}
      */
-    protected function alterPostedValues(array $postedValues)
+    protected function alterPostedValues(array $postedValues): array
     {
         return stripslashes_deep($postedValues);
     }

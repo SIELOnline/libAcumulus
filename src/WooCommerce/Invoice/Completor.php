@@ -2,7 +2,7 @@
 namespace Siel\Acumulus\WooCommerce\Invoice;
 
 use Siel\Acumulus\Api;
-use \Siel\Acumulus\Invoice\Completor as BaseCompletor;
+use Siel\Acumulus\Invoice\Completor as BaseCompletor;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
 
@@ -14,7 +14,7 @@ class Completor extends BaseCompletor
     /**
      * {@inheritdoc}
      *
-     * This override checks the is_vat_exempt meta data from the WooCommerce EU
+     * This override checks the is_vat_exempt metadata from the WooCommerce EU
      * vat assistant plugin  to see if the invoice might be a reversed vat one.
      */
     protected function guessVatType(array $possibleVatTypes)

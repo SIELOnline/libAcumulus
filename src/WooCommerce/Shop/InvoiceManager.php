@@ -1,5 +1,8 @@
 <?php
-/** @noinspection SqlNoDataSourceInspection */
+/**
+ * @noinspection SqlDialectInspection
+ * @noinspection SqlNoDataSourceInspection
+ */
 
 namespace Siel\Acumulus\WooCommerce\Shop;
 
@@ -16,7 +19,7 @@ use WP_Query;
  * ----------------
  * In WooCommerce/WordPress querying orders is done via the WordPress
  * WP_Query::get_posts() method or via self constructed queries. In the latter
- * case we use the prepare() method of the wpdb isntance to sanitize arguments.
+ * case we use the $wpdb->prepare() method to sanitize arguments.
  */
 class InvoiceManager extends BaseInvoiceManager
 {
@@ -27,7 +30,7 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * @return string
      */
-    protected function sourceTypeToShopType($invoiceSourceType)
+    protected function sourceTypeToShopType(string $invoiceSourceType): string
     {
         switch ($invoiceSourceType) {
             case Source::Order:
@@ -43,15 +46,14 @@ class InvoiceManager extends BaseInvoiceManager
     /**
      * {@inheritdoc}
      */
-    public function getInvoiceSourcesByIdRange($invoiceSourceType, $InvoiceSourceIdFrom, $InvoiceSourceIdTo)
+    public function getInvoiceSourcesByIdRange($invoiceSourceType, $InvoiceSourceIdFrom, $InvoiceSourceIdTo): array
     {
         // We use our own query here as defining a range of post ids based on a
         // between does not seem to be possible with the query syntax.
         global $wpdb;
         $key = 'ID';
-        /** @noinspection SqlResolve */
         $invoiceSourceIds = $wpdb->get_col($wpdb->prepare(
-            "SELECT `$key` FROM `{$wpdb->posts}` WHERE `$key` BETWEEN %d AND %d AND `post_type` = %s",
+            "SELECT `$key` FROM `$wpdb->posts` WHERE `$key` BETWEEN %d AND %d AND `post_type` = %s",
             $InvoiceSourceIdFrom,
             $InvoiceSourceIdTo,
             $this->sourceTypeToShopType($invoiceSourceType)
@@ -79,7 +81,7 @@ class InvoiceManager extends BaseInvoiceManager
      * These plugins mostly only store the number part, not the prefix, suffix
      * or date part. If so, you will have to search for the number part only.
      */
-    public function getInvoiceSourcesByReferenceRange($invoiceSourceType, $invoiceSourceReferenceFrom, $invoiceSourceReferenceTo)
+    public function getInvoiceSourcesByReferenceRange($invoiceSourceType, $invoiceSourceReferenceFrom, $invoiceSourceReferenceTo): array
     {
         // To be able to define the query we need to know under which meta key
         // the order number/reference is stored.
@@ -116,7 +118,7 @@ class InvoiceManager extends BaseInvoiceManager
                         // We assume non formatted search arguments.
                         $key = '_order_number';
                     } else {
-                        // Formatted numeric search arguments: e.g. yyyynnnn
+                        // Formatted numeric search arguments: e.g. 'yyyynnnn'
                         $key = '_order_number_formatted';
                     }
                     $type = 'UNSIGNED';
@@ -163,7 +165,7 @@ class InvoiceManager extends BaseInvoiceManager
     /**
      * {@inheritdoc}
      */
-    public function getInvoiceSourcesByDateRange($invoiceSourceType, DateTime $dateFrom, DateTime $dateTo)
+    public function getInvoiceSourcesByDateRange($invoiceSourceType, DateTime $dateFrom, DateTime $dateTo): array
     {
         $args = [
             'date_query' => [
@@ -225,7 +227,7 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * @return \Siel\Acumulus\Invoice\Source[]
      */
-    protected function query2Sources(array $args, $invoiceSourceType, $sort = true)
+    protected function query2Sources(array $args, string $invoiceSourceType, bool $sort = true): array
     {
         $this->getLog()->info('WooCommerce\InvoiceManager::query2Sources: args = %s', str_replace([' ', "\r", "\n", "\t"], '', var_export($args, true)));
         // Add default arguments.

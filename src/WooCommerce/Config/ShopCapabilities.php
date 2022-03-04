@@ -7,14 +7,14 @@ use Siel\Acumulus\Config\Config;
 use WC_Tax;
 
 /**
- * Defines the WooCommerce webshop specific capabilities.
+ * Defines the WooCommerce web shop specific capabilities.
  */
 class ShopCapabilities extends ShopCapabilitiesBase
 {
     /**
      * {@inheritdoc}
      */
-    public function getShopEnvironment()
+    public function getShopEnvironment(): array
     {
         global $wp_version, $woocommerce;
         /** @var \WooCommerce $woocommerce */
@@ -30,7 +30,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    protected function getTokenInfoSource()
+    protected function getTokenInfoSource(): array
     {
         $source = [
             'date_created',
@@ -60,7 +60,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    protected function getTokenInfoRefund()
+    protected function getTokenInfoRefund(): array
     {
         $refund = [
             'amount',
@@ -79,7 +79,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    protected function getTokenInfoOrder()
+    protected function getTokenInfoOrder(): array
     {
         $order = [
             'order_number',
@@ -132,7 +132,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    protected function getTokenInfoShopProperties()
+    protected function getTokenInfoShopProperties(): array
     {
         $meta = [
             'vat_number (With EU VAT plugin only)',
@@ -229,7 +229,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getShopDefaults()
+    public function getShopDefaults(): array
     {
         return [
             // Customer defaults.
@@ -259,7 +259,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getShopOrderStatuses()
+    public function getShopOrderStatuses(): array
     {
         $result = [];
         $orderStatuses = wc_get_order_statuses();
@@ -278,7 +278,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
      * This override removes the 'Use invoice #' option as WC does not have
      * separate invoices.
      */
-    public function getInvoiceNrSourceOptions()
+    public function getInvoiceNrSourceOptions(): array
     {
         $result = parent::getInvoiceNrSourceOptions();
         unset($result[Config::InvoiceNrSource_ShopInvoice]);
@@ -291,7 +291,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
      * This override removes the 'Use invoice date' option as WC does not have
      * separate invoices.
      */
-    public function getDateToUseOptions()
+    public function getDateToUseOptions(): array
     {
         $result = parent::getDateToUseOptions();
         unset($result[Config::InvoiceDate_InvoiceCreate]);
@@ -301,7 +301,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getPaymentMethods()
+    public function getPaymentMethods(): array
     {
         $result = [];
         $paymentGateways = wc()->payment_gateways->payment_gateways();
@@ -316,7 +316,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * @inheritDoc
      */
-    public function getVatClasses()
+    public function getVatClasses(): array
     {
         // Standard tax class is not stored in table wc_tax_rate_classes.
         $labels = WC_Tax::get_tax_classes();
@@ -327,7 +327,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getLink($linkType)
+    public function getLink(string $linkType): string
     {
         switch ($linkType) {
             case 'register':

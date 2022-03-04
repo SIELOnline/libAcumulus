@@ -34,7 +34,7 @@ class Log extends BaseLog
      * @return int
      *   The PrestaShop equivalent of the severity.
      */
-    protected function getPrestaShopSeverity($severity)
+    protected function getPrestaShopSeverity(int $severity): int
     {
         switch ($severity) {
             case Severity::Error:
@@ -50,16 +50,14 @@ class Log extends BaseLog
         }
     }
 
-    protected function getLogger()
+    protected function getLogger(): FileLogger
     {
         if ($this->logger === null) {
 
             if (version_compare(_PS_VERSION_, '1.7.5', '>=')) {
                 $logDirectory = 'var/logs';
-            } elseif (version_compare(_PS_VERSION_, '1.7', '>=')) {
-                $logDirectory = 'app/logs';
             } else {
-                $logDirectory = 'log';
+                $logDirectory = 'app/logs';
             }
             $this->logger = new FileLogger(AbstractLogger::DEBUG);
             $this->logger->setFilename(_PS_ROOT_DIR_ . '/'. $logDirectory . '/acumulus.log');

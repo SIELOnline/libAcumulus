@@ -9,14 +9,14 @@ use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
 use TaxRulesGroup;
 
 /**
- * Defines the PrestaShop webshop specific capabilities.
+ * Defines the PrestaShop web shop specific capabilities.
  */
 class ShopCapabilities extends ShopCapabilitiesBase
 {
     /**
      * {@inheritdoc}
      */
-    public function getShopEnvironment()
+    public function getShopEnvironment(): array
     {
         $environment = [
             //'moduleVersion' => Acumulus::$module_version,
@@ -30,7 +30,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    protected function getTokenInfoSource()
+    protected function getTokenInfoSource(): array
     {
         $source = [
             'id',
@@ -51,7 +51,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    protected function getTokenInfoRefund()
+    protected function getTokenInfoRefund(): array
     {
         $refund = [
             'id_order',
@@ -77,7 +77,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    protected function getTokenInfoOrder()
+    protected function getTokenInfoOrder(): array
     {
         $order = [
             'current_state',
@@ -122,7 +122,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    protected function getTokenInfoShopProperties()
+    protected function getTokenInfoShopProperties(): array
     {
         return [
             'address_invoice' => [
@@ -260,7 +260,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getShopDefaults()
+    public function getShopDefaults(): array
     {
         return [
             'contactYourId' => '[id]', // Customer
@@ -284,9 +284,9 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getShopOrderStatuses()
+    public function getShopOrderStatuses(): array
     {
-        $statuses = OrderState::getOrderStates((int) Context::getContext()->language->id);
+        $statuses = OrderState::getOrderStates(Context::getContext()->language->id);
         $result = [];
         foreach ($statuses as $status) {
             $result[$status['id_order_state']] = $status['name'];
@@ -297,7 +297,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getPaymentMethods()
+    public function getPaymentMethods(): array
     {
         $paymentModules = PaymentModule::getInstalledPaymentModules();
         $result = [];
@@ -312,7 +312,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getVatClasses()
+    public function getVatClasses(): array
     {
         $result = [];
         /** @var \stdClass[] $taxClasses */
@@ -326,7 +326,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getLink($linkType)
+    public function getLink(string $linkType): string
     {
         switch ($linkType) {
             case 'config':

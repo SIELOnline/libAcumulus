@@ -41,7 +41,7 @@ class FormHelper extends BaseFormHelper
     /**
      * {@inheritdoc}
      */
-    public function isSubmitted()
+    public function isSubmitted(): bool
     {
         return Tools::isSubmit('submitAdd') || Tools::isSubmit('submit' . $this->moduleName) || Tools::getValue('ajax') !== false;
     }
@@ -52,10 +52,10 @@ class FormHelper extends BaseFormHelper
      * Prestashop requires field sets at the top level: move the meta field to
      * the first field collection.
      */
-    public function addMetaField(array $fields)
+    public function addMetaField(array $fields): array
     {
         $fields = parent::addMetaField($fields);
-        foreach ($fields as $key => &$field) {
+        foreach ($fields as &$field) {
             if (isset($field['fields'])) {
                 $field['fields'][static::Meta] = $fields[static::Meta];
                 unset($fields[static::Meta]);
@@ -70,7 +70,7 @@ class FormHelper extends BaseFormHelper
      *
      * Prestashop prepends checkboxes with their collection name.
      */
-    protected function alterPostedValues(array $postedValues)
+    protected function alterPostedValues(array $postedValues): array
     {
         foreach ($this->getMeta() as $key => $fieldMeta) {
             /** @var \stdClass $fieldMeta */
@@ -90,7 +90,7 @@ class FormHelper extends BaseFormHelper
      *
      * Prestashop prepends checkboxes with their collection name.
      */
-    public function alterFormValues(array $formValues)
+    public function alterFormValues(array $formValues): array
     {
         foreach ($this->getMeta() as $key => $fieldMeta) {
             /** @var \stdClass $fieldMeta */
@@ -110,7 +110,7 @@ class FormHelper extends BaseFormHelper
      * This override adds a "details" class to all details fields, thereby
      * allowing a js solution.
      */
-    public function processField(array $field, $key)
+    public function processField(array $field, $key): array
     {
         $field = parent::processField($field, $key);
 

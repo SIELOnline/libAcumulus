@@ -9,12 +9,10 @@ use Siel\Acumulus\Config\ConfigStore as BaseConfigStore;
  */
 class ConfigStore extends BaSeConfigStore
 {
-    const CONFIG_KEY = 'ACUMULUS_';
-
     /**
      * {@inheritdoc}
      */
-    public function load()
+    public function load(): array
     {
         $values = Configuration::get(strtoupper($this->configKey));
         $values = unserialize($values);
@@ -24,39 +22,9 @@ class ConfigStore extends BaSeConfigStore
     /**
      * {@inheritdoc}
      */
-    public function save(array $values)
+    public function save(array $values): bool
     {
         $values = serialize($values);
-        $result = Configuration::updateValue(strtoupper($this->configKey), $values);
-        return $result;
-    }
-
-    /**
-     * @deprecated Only still here for use during update.
-     *
-     * @param array $keys
-     *
-     * @return array
-     */
-    public function loadOld(array $keys)
-    {
-        $result = [];
-        // Load the values from the web shop specific configuration.
-        foreach ($keys as $key) {
-            $dbKey = substr('ACUMULUS_' . $key, 0, 32);
-            $value = Configuration::get($dbKey);
-            Configuration::deleteByName($dbKey);
-            // Do not overwrite defaults if no value is stored.
-            if ($value !== false) {
-                if (is_string($value) && strpos($value, '{') !== false) {
-                    $unserialized = @unserialize($value);
-                    if ($unserialized !== false) {
-                        $value = $unserialized;
-                    }
-                }
-                $result[$key] = $value;
-            }
-        }
-        return $result;
+        return Configuration::updateValue(strtoupper($this->configKey), $values);
     }
 }

@@ -26,12 +26,13 @@ class Mailer extends BaseMailer
         $this->templateName = 'acumulus-message';
         $this->writeTemplateFiles($bodyText, $bodyHtml);
 
+        /** @noinspection PhpUnhandledExceptionInspection */
         $languageId = Language::getIdByIso($this->translator->getLanguage());
         $templateVars = [];
 
         $result = Mail::Send($languageId, $this->templateName, $subject, $templateVars, $to, '', $from, $fromName, null, null, $this->templateDir);
 
-        // Clear the template files as they contain privacy sensitive data.
+        // Clear the template files as they contain privacy-sensitive data.
         $this->writeTemplateFiles('', '');
 
         if ($result === true) {
@@ -46,7 +47,7 @@ class Mailer extends BaseMailer
     /**
      * {@inheritdoc}
      */
-    protected function getFrom()
+    protected function getFrom(): string
     {
         return Configuration::get('PS_SHOP_EMAIL');
     }
@@ -54,7 +55,7 @@ class Mailer extends BaseMailer
     /**
      * {@inheritdoc}
      */
-    protected function getFromName()
+    protected function getFromName(): string
     {
         return Configuration::get('PS_SHOP_NAME');
     }
@@ -62,11 +63,8 @@ class Mailer extends BaseMailer
     /**
      * Writes the mail bodies (html and text) to template files as used by the
      * PrestaShop mailer.
-     *
-     * @param string $bodyText
-     * @param string $bodyHtml
      */
-    protected function writeTemplateFiles($bodyText, $bodyHtml)
+    protected function writeTemplateFiles(string $bodyText, string $bodyHtml)
     {
         $languageIso = $this->translator->getLanguage();
         $templateBaseName = $this->templateDir . $languageIso . '/' . $this->templateName;

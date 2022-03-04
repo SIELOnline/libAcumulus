@@ -25,9 +25,6 @@ use TaxRulesGroup;
  *   because as soon as an existing tax rate gets updated it will get a new id,
  *   so old order details still point to a tax record with the tax rate as was
  *   used at the moment the order was placed.
- * - Fixed in 1.6.1.1: bug in partial refund, not executed the hook
- *   actionOrderSlipAdd #PSCSX-6287. So before 1.6.1.1, partial refunds will not
- *   be automatically sent to Acumulus.
  * - Credit notes can get a correction line. They get one if the total amount
  *   does not match the sum of the lines added so far. This can happen if an
  *   amount was entered manually, or if discount(s) applied during the sale were
@@ -97,7 +94,7 @@ class Creator extends BaseCreator
     /**
      * {@inheritdoc}
      */
-    protected function getItemLines()
+    protected function getItemLines(): array
     {
         $result = [];
         if ($this->invoiceSource->getType() === Source::Order) {
@@ -123,7 +120,7 @@ class Creator extends BaseCreator
      *
      * @return array
      */
-    public function mergeProductLines(array $productLines, array $taxLines)
+    public function mergeProductLines(array $productLines, array $taxLines): array
     {
         $result = [];
         // Key the product lines on id_order_detail, so we can easily add the
@@ -148,7 +145,7 @@ class Creator extends BaseCreator
      *
      * @return array
      */
-    protected function getItemLine(array $item)
+    protected function getItemLine(array $item): array
     {
         $result = [];
 
@@ -160,7 +157,7 @@ class Creator extends BaseCreator
         // Check for cost price and margin scheme.
         if (!empty($line['costPrice']) && $this->allowMarginScheme()) {
             // Margin scheme:
-            // - Do not put VAT on invoice: send price incl VAT as unitprice.
+            // - Do not put VAT on invoice: send price incl VAT as 'unitprice'.
             // - But still send the VAT rate to Acumulus.
             $result[Tag::UnitPrice] = $sign * $item['unit_price_tax_incl'];
         } else {
@@ -205,13 +202,13 @@ class Creator extends BaseCreator
     /**
      * {@inheritdoc}
      */
-    protected function getShippingLine()
+    protected function getShippingLine(): array
     {
         $sign = $this->invoiceSource->getSign();
         $carrier = new Carrier($this->order->id_carrier);
         // total_shipping_tax_excl is not very precise (rounded to the cent) and
         // often leads to 1 cent off invoices in Acumulus (assuming that the
-        // amount entered is based on a nice rounded amount incl tax. So we
+        // amount entered is based on a nicely rounded amount incl tax). So we
         // recalculate this ourselves.
         $vatRate = $this->order->carrier_tax_rate;
         $shippingInc = $sign * $this->invoiceSource->getSource()->total_shipping_tax_incl;
@@ -236,11 +233,11 @@ class Creator extends BaseCreator
      * This override returns can return an invoice line for orders. Credit slips
      * cannot have a wrapping line.
      */
-    protected function getGiftWrappingLine()
+    protected function getGiftWrappingLine(): array
     {
         // total_wrapping_tax_excl is not very precise (rounded to the cent) and
         // can easily lead to 1 cent off invoices in Acumulus (assuming that the
-        // amount entered is based on a nice rounded amount incl tax. So we
+        // amount entered is based on a nicely rounded amount incl tax). So we
         // recalculate this ourselves by looking up the tax rate.
         $result = [];
 
@@ -277,8 +274,8 @@ class Creator extends BaseCreator
     /**
      * {@inheritdoc}
      *
-     * This override checks if the fields payment_fee and payment_fee_rate are
-     * set and, if so, uses them to add a payment fee line.
+     * This override checks if the fields 'payment_fee' and 'payment_fee_rate'
+     * are set and, if so, uses them to add a payment fee line.
      *
      * These fields are set by the PayPal with a fee module but seem generic
      * enough to also be used by other modules that allow for payment fees.
@@ -287,7 +284,7 @@ class Creator extends BaseCreator
      * but if in future versions payment fees can appear on order slips as well
      * the code can already handle that.
      */
-    protected function getPaymentFeeLine()
+    protected function getPaymentFeeLine(): array
     {
         /** @var \Order|\OrderSlip $source */
         $source = $this->invoiceSource->getSource();
@@ -327,7 +324,7 @@ class Creator extends BaseCreator
      *
      * @return array[]
      */
-    protected function getDiscountLinesOrder()
+    protected function getDiscountLinesOrder(): array
     {
         $result = [];
 
@@ -345,12 +342,12 @@ class Creator extends BaseCreator
      * - value_tax_excl: total amount ex VAT
      *
      * @param array $line
-     *   A PrestaShop discount line (ie: a order_cart_rule record).
+     *   A PrestaShop discount line (ie: an order_cart_rule record).
      *
      * @return array
      *   An Acumulus order item line.
      */
-    protected function getDiscountLineOrder(array $line)
+    protected function getDiscountLineOrder(array $line): array
     {
         $sign = $this->invoiceSource->getSign();
         $discountInc = -$sign * $line['value'];
@@ -381,9 +378,9 @@ class Creator extends BaseCreator
      *
      * @return array[]
      *
-     * @noinspection PhpUnused Called via Creator::callSourceTypeSpecificMethod().
+     * @noinspection PhpUnused : Called via getDiscountLines().
      */
-    protected function getDiscountLinesCreditNote()
+    protected function getDiscountLinesCreditNote(): array
     {
         $result = [];
 
@@ -459,7 +456,7 @@ class Creator extends BaseCreator
      *   - Meta::VatRateLookup: float
      *   - Meta::VatRateLookupLabel: string
      */
-    protected function getVatRateLookupMetadata($addressId, $taxRulesGroupId)
+    protected function getVatRateLookupMetadata(int $addressId, int $taxRulesGroupId): array
     {
         try {
             if (!empty($taxRulesGroupId)) {

@@ -46,7 +46,7 @@ class FormRenderer extends BaseFormRenderer
      *
      * This override adds the markup to show the icon.
      */
-    protected function fieldsetBegin(array $field)
+    protected function fieldsetBegin(array $field): string
     {
         if (isset($field['icon'])) {
             $titleTag = $field['type'] === 'fieldset' ? 'legend' : 'summary';

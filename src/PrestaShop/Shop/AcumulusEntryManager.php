@@ -73,7 +73,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    protected function insert(Source $invoiceSource, $entryId, $token, $created)
+    protected function insert(Source $invoiceSource, $entryId, $token, $created): bool
     {
         if ($invoiceSource->getType() === Source::Order) {
             $shopId = $invoiceSource->getSource()->id_shop;
@@ -98,7 +98,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    protected function update(BaseAcumulusEntry $entry, $entryId, $token, $updated)
+    protected function update(BaseAcumulusEntry $entry, $entryId, $token, $updated): bool
     {
         $record = $entry->getRecord();
         return $this->getDb()->execute(sprintf(
@@ -114,11 +114,11 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    public function delete(BaseAcumulusEntry $entry)
+    public function delete(BaseAcumulusEntry $entry): bool
     {
         $record = $entry->getRecord();
         /** @noinspection PhpUnhandledExceptionInspection */
-        return (bool) $this->getDb()->execute(sprintf(
+        return $this->getDb()->execute(sprintf(
             "DELETE FROM `%s` WHERE id = %u",
             $this->tableName,
             $record['id']
@@ -136,9 +136,9 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    public function install()
+    public function install(): bool
     {
-        return $this->getDb()->execute("CREATE TABLE IF NOT EXISTS `{$this->tableName}` (
+        return $this->getDb()->execute("CREATE TABLE IF NOT EXISTS `$this->tableName` (
         `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
         `id_shop` int(11) UNSIGNED NOT NULL DEFAULT '1',
         `id_shop_group` int(11) UNSIGNED NOT NULL DEFAULT '1',
@@ -157,17 +157,15 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    public function uninstall()
+    public function uninstall(): bool
     {
-        return $this->getDb()->execute("DROP TABLE `{$this->tableName}`");
+        return $this->getDb()->execute("DROP TABLE `$this->tableName`");
     }
 
     /**
      * Wrapper method around the Db instance.
-     *
-     * @return \Db
      */
-    protected function getDb()
+    protected function getDb(): Db
     {
         return Db::getInstance();
     }

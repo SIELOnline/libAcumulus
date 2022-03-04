@@ -24,14 +24,14 @@ class Source extends BaseSource
 
     /**
      * {@inheritdoc}
+     *
+     * @throws \PrestaShopException
      */
     protected function setSource()
     {
         if ($this->getType() === Source::Order) {
-            /** @noinspection PhpUnhandledExceptionInspection */
             $this->source = new Order($this->id);
         } else {
-            /** @noinspection PhpUnhandledExceptionInspection */
             $this->source = new OrderSlip($this->id);
             $this->addProperties();
         }
@@ -51,6 +51,8 @@ class Source extends BaseSource
 
     /**
      * Sets the id based on the loaded Order.
+     *
+     * @throws \PrestaShopDatabaseException
      */
     protected function setId()
     {
@@ -73,7 +75,7 @@ class Source extends BaseSource
      *
      * @return int
      */
-    protected function getStatusOrder()
+    protected function getStatusOrder(): int
     {
         return $this->source->current_state;
     }
@@ -82,6 +84,8 @@ class Source extends BaseSource
      * Returns the status of this credit note.
      *
      * @return null
+     *
+     * @noinspection PhpUnused : Called via getStatus().
      */
     protected function getStatusCreditNote()
     {
@@ -106,7 +110,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    public function getPaymentStatus()
+    public function getPaymentStatus(): ?int
     {
         // Assumption: credit slips are always in a paid status.
         if (($this->getType() === Source::Order && $this->source->hasBeenPaid()) || $this->getType() === Source::CreditNote) {
@@ -156,7 +160,7 @@ class Source extends BaseSource
      * PrestaShop stores the internal currency id, so look up the currency
      * object first then extract the ISO code for it.
      */
-    public function getCurrency()
+    public function getCurrency(): array
     {
         $currency = Currency::getCurrencyInstance($this->getOrder()->source->id_currency);
         $result = array (
@@ -173,7 +177,7 @@ class Source extends BaseSource
      * This override provides the values meta-invoice-amountinc and
      * meta-invoice-amount.
      */
-    protected function getAvailableTotals()
+    protected function getAvailableTotals(): array
     {
         $sign = $this->getSign();
         if ($this->getType() === Source::Order) {
@@ -202,9 +206,9 @@ class Source extends BaseSource
     }
 
     /**
-     * {@inheritdoc}
+     * Returns the invoice reference for an order
      */
-    public function getInvoiceReferenceOrder()
+    public function getInvoiceReferenceOrder(): ?string
     {
         return !empty($this->source->invoice_number)
             ? Configuration::get('PS_INVOICE_PREFIX', (int) $this->getSource()->id_lang, null, $this->getSource()->id_shop) . sprintf('%06d', $this->getSource()->invoice_number)
@@ -212,9 +216,9 @@ class Source extends BaseSource
     }
 
     /**
-     * {@inheritdoc}
+     * Returns the invoice date for an order
      */
-    public function getInvoiceDateOrder()
+    public function getInvoiceDateOrder(): ?string
     {
         return !empty($this->getSource()->invoice_number)
             ? substr($this->getSource()->invoice_date, 0, strlen('2000-01-01'))
@@ -247,8 +251,9 @@ class Source extends BaseSource
      * OrderSlip does store but not load the values total_products_tax_excl,
      * total_shipping_tax_excl, total_products_tax_incl, and
      * total_shipping_tax_incl. As we need them, we load them ourselves.
-     *
      * Remove in the far future.
+     *
+     * @throws \PrestaShopDatabaseException
      */
     protected function addProperties()
     {

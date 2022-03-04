@@ -33,7 +33,7 @@ class ConfigForm extends BaseConfigForm
      * This override ensures that array values are passed with the correct key
      * to the PS form renderer.
      */
-    public function getFormValues()
+    public function getFormValues(): array
     {
         $result = parent::getFormValues();
         $result['euVatClasses[]'] = $result['euVatClasses'];

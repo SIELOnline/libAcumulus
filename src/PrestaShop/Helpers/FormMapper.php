@@ -16,7 +16,7 @@ class FormMapper extends BaseFormMapper
      *
      * @return array[]
      */
-    public function map(Form $form)
+    public function map(Form $form): array
     {
         return $this->fields($form->getFields());
     }
@@ -28,7 +28,7 @@ class FormMapper extends BaseFormMapper
      *
      * @return array[]
      */
-    protected function fields(array $fields)
+    protected function fields(array $fields): array
     {
         $result = [];
         foreach ($fields as $id => $field) {
@@ -51,7 +51,7 @@ class FormMapper extends BaseFormMapper
      *
      * @return array
      */
-    protected function field(array $field)
+    protected function field(array $field): array
     {
         if (!empty($field['fields'])) {
             $result = $this->fieldset($field);
@@ -68,7 +68,7 @@ class FormMapper extends BaseFormMapper
      *
      * @return array[]
      */
-    protected function fieldset(array $field)
+    protected function fieldset(array $field): array
     {
         $result = [
             'form' => [
@@ -80,7 +80,7 @@ class FormMapper extends BaseFormMapper
             ],
         ];
 
-        // Add description at the start of the fieldset as an html element.
+        // Add description at the start of the fieldset as an HTML element.
         if (isset($field['description'])) {
             array_unshift($result['form']['input'], ['type' => 'html', 'name' => $field['name'] . '_description', 'html_content' => '<div class="help-block">' . $field['description'] . '</div>']);
         }
@@ -94,20 +94,15 @@ class FormMapper extends BaseFormMapper
 
     /**
      * Returns a mapped simple element.
-     *
-     * @param array $field
-     *
-     * @return array
-     *
      */
-    protected function element(array $field)
+    protected function element(array $field): array
     {
         $result = [
             'type' => $this->getPrestaShopType($field['type']),
-            'label' => isset($field['label']) ? $field['label'] : '',
+            'label' => $field['label'] ?? '',
             'name' => $field['name'],
-            'required' => isset($field['attributes']['required']) ? $field['attributes']['required'] : false,
-            'multiple' => isset($field['attributes']['multiple']) ? $field['attributes']['multiple'] : false,
+            'required' => $field['attributes']['required'] ?? false,
+            'multiple' => $field['attributes']['multiple'] ?? false,
         ];
 
         if (!empty($field['attributes'])) {
@@ -133,12 +128,8 @@ class FormMapper extends BaseFormMapper
 
     /**
      * Returns the PrestaShop form element type for the given Acumulus type string.
-     *
-     * @param string $type
-     *
-     * @return string
      */
-    protected function getPrestaShopType($type)
+    protected function getPrestaShopType(string $type): string
     {
         switch ($type) {
             case 'fieldset':
@@ -160,14 +151,8 @@ class FormMapper extends BaseFormMapper
     /**
      * Converts a list of Acumulus field options to a list of PrestaShop radio
      * button values.
-     *
-     * @param string $id
-     * @param array $options
-     *
-     * @return array
-     *   A list of PrestaShop radio button options.
      */
-    protected function getPrestaShopValues($id, array $options)
+    protected function getPrestaShopValues(string $id, array $options): array
     {
         $result = [];
         foreach ($options as $value => $label) {
@@ -181,29 +166,22 @@ class FormMapper extends BaseFormMapper
     }
 
     /**
-     * Converts a list of Acumulus field options to a list of PrestaShop radio
-     * button values.
-     *
-     * @param array $options
-     *
-     * @return array
-     *   A list of PrestaShop radio button options.
+     * Converts a list of Acumulus field options to a set of PrestaShop check
+     * box values or select options.
      */
-    protected function getPrestaShopOptions(array $options)
+    protected function getPrestaShopOptions(array $options): array
     {
         $result = [
             'query' => [],
             'id' => 'id',
             'name' => 'name',
         ];
-
         foreach ($options as $value => $label) {
             $result['query'][] = [
                 'id' => $value,
                 'name' => $label,
             ];
         }
-
         return $result;
     }
 }

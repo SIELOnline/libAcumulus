@@ -67,7 +67,7 @@ class Creator extends BaseCreator
     protected $shopInvoice = [];
 
     /**
-     * Precision of amounts stored in VM. In VM you can enter either the price
+     * Precision of amounts stored in VM. In VM, you can enter either the price
      * inc or ex vat. The other amount will be calculated and stored with 4
      * digits precision. So 0.001 is on the pessimistic side.
      *
@@ -124,7 +124,7 @@ class Creator extends BaseCreator
     /**
      * {@inheritdoc}
      */
-    protected function getItemLines()
+    protected function getItemLines(): array
     {
         return array_map([$this, 'getItemLine'], $this->order['items']);
     }
@@ -136,7 +136,7 @@ class Creator extends BaseCreator
      *
      * @return array
      */
-    protected function getItemLine(stdClass $item)
+    protected function getItemLine(stdClass $item): array
     {
         $result = [];
         $this->addPropertySource('item', $item);
@@ -151,7 +151,7 @@ class Creator extends BaseCreator
         // Check for cost price and margin scheme.
         if (!empty($line['costPrice']) && $this->allowMarginScheme()) {
             // Margin scheme:
-            // - Do not put VAT on invoice: send price incl VAT as unitprice.
+            // - Do not put VAT on invoice: send price incl VAT as 'unitprice'.
             // - But still send the VAT rate to Acumulus.
             $result[Tag::UnitPrice] = $productPriceInc;
         } else {
@@ -185,12 +185,12 @@ class Creator extends BaseCreator
      * @return array[]
      *   An array of lines that describes this variant.
      */
-    protected function getVariantLines(stdClass $item, $parentQuantity, $vatRangeTags)
+    protected function getVariantLines(stdClass $item, int $parentQuantity, array $vatRangeTags): array
     {
         $result = [];
 
-        // It is not possible (other then by copying a lot of awful code) to get
-        // a list of separate attribute and value values. So we stick with
+        // It is not possible (other than by copying a lot of awful code) to get
+        // a list of separate attribute and value pairs. So we stick with
         // calling some code that prints the attributes on an order and
         // "disassemble" that code...
         if (!class_exists('VirtueMartModelCustomfields')) {
@@ -208,7 +208,6 @@ class Creator extends BaseCreator
                 // the actual text, ignore it and only process the lowest level
                 // spans.
                 if ($span->getElementsByTagName('span')->length === 0) {
-                    $text[] = $span->textContent;
                     $result[] = [
                         Tag::Product => $span->textContent,
                         Tag::UnitPrice => 0,
@@ -224,7 +223,7 @@ class Creator extends BaseCreator
     /**
      * {@inheritdoc}
      */
-    protected function getShippingLine()
+    protected function getShippingLine(): array
     {
         $result = [];
         // We are checking on empty, assuming that a null value will be used to
@@ -247,7 +246,7 @@ class Creator extends BaseCreator
     /**
      * {@inheritdoc}
      */
-    protected function getShippingMethodName()
+    protected function getShippingMethodName(): string
     {
         /** @var \VirtueMartModelShipmentmethod $shipmentMethodsModel */
         $shipmentMethodsModel = VmModel::getModel('shipmentmethod');
@@ -261,7 +260,7 @@ class Creator extends BaseCreator
     /**
      * {@inheritdoc}
      */
-    protected function getDiscountLines()
+    protected function getDiscountLines(): array
     {
         $result = [];
 
@@ -292,7 +291,7 @@ class Creator extends BaseCreator
      * @return bool
      *   True if the calculation rule is a discount rule.
      */
-    protected function isDiscountCalcRule(stdClass $calcRule)
+    protected function isDiscountCalcRule(stdClass $calcRule): bool
     {
         return $calcRule->calc_amount < 0.0
                && !in_array($calcRule->calc_kind, ['VatTax', 'shipment', 'payment']);
@@ -310,7 +309,7 @@ class Creator extends BaseCreator
      * @return array
      *   An item line for the invoice.
      */
-    protected function getCalcRuleDiscountLine(stdClass $calcRule)
+    protected function getCalcRuleDiscountLine(stdClass $calcRule): array
     {
         return [
             Tag::Product => $calcRule->calc_rule_name,
@@ -329,7 +328,7 @@ class Creator extends BaseCreator
      * @return array
      *   An item line array.
      */
-    protected function getCouponCodeDiscountLine()
+    protected function getCouponCodeDiscountLine(): array
     {
         return [
             Tag::ItemNumber => $this->order['details']['BT']->coupon_code,
@@ -345,7 +344,7 @@ class Creator extends BaseCreator
     /**
      * {@inheritdoc}
      */
-    protected function getPaymentFeeLine()
+    protected function getPaymentFeeLine(): array
     {
         $result = [];
         if (!empty($this->order['details']['BT']->order_payment)) {
@@ -375,7 +374,7 @@ class Creator extends BaseCreator
      *   The (1st) calculation rule for the given reference, or null if none
      *   found.
      */
-    protected function getCalcRule($calcKind, $orderItemId = 0)
+    protected function getCalcRule(string $calcKind, int $orderItemId = 0)
     {
         foreach ($this->order['calc_rules'] as $calcRule) {
             if ($calcRule->calc_kind == $calcKind) {
@@ -388,7 +387,7 @@ class Creator extends BaseCreator
     }
 
     /**
-     * Returns vat data and vat lookup meta data for the current order (item).
+     * Returns vat data and vat lookup metadata for the current order (item).
      *
      * @param string $calcRuleType
      *   Type of calc rule to search for: 'VatTax', 'shipment' or 'payment'.
@@ -399,9 +398,9 @@ class Creator extends BaseCreator
      *   level if left empty.
      *
      * @return array
-     *   Vat data and vat lookup meta data to add to the Acumulus invoice line.
+     *   Vat data and vat lookup metadata to add to the Acumulus invoice line.
      */
-    protected function getVatData($calcRuleType, $amountEx, $vatAmount, $orderItemId = 0)
+    protected function getVatData(string $calcRuleType, float $amountEx, float $vatAmount, int $orderItemId = 0): array
     {
         $calcRule = $this->getCalcRule($calcRuleType, $orderItemId);
         if (!empty($calcRule->calc_value)) {

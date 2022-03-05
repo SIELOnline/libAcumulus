@@ -17,6 +17,8 @@ class Source extends BaseSource
 
     /**
      * Loads an Order source for the set id.
+     *
+     * @noinspection PhpUnused : called via setSource().
      */
     protected function setSourceOrder()
     {
@@ -27,6 +29,8 @@ class Source extends BaseSource
 
     /**
      * Sets the id based on the loaded Order.
+     *
+     * @noinspection PhpUnused : called via setId().
      */
     protected function setIdOrder()
     {
@@ -54,7 +58,7 @@ class Source extends BaseSource
      *
      * @return string
      */
-    public function getStatus()
+    public function getStatus(): string
     {
         return $this->source->order_status;
     }
@@ -75,7 +79,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    public function getPaymentStatus()
+    public function getPaymentStatus(): ?int
     {
         /** @var \hikashopConfigClass $config */
         $config = hikashop_config();
@@ -90,9 +94,9 @@ class Source extends BaseSource
      */
     public function getPaymentDate()
     {
-        // Scan through the history and look for a non empty history_payment_id.
-        // The order of this array is by history_created DESC, we take the one that
-        // is furthest away in time.
+        // Scan through the history and look for a non-empty
+        // 'history_payment_id'. The order of this array is by 'history_created'
+        //  DESC, we take the one that is the furthest away in time.
         $date = null;
         foreach ($this->source->history as $history) {
             if (!empty($history->history_payment_id)) {
@@ -100,8 +104,8 @@ class Source extends BaseSource
             }
         }
         if (!$date) {
-            // Scan through the history and look for a non unpaid order status.
-            // We take the one that is furthest away in time.
+            // Scan through the history and look for a non-unpaid order status.
+            // We take the one that is the furthest away in time.
             /** @var \hikashopConfigClass $config */
             $config = hikashop_config();
             $unpaidStatuses = explode(',', $config->get('order_unpaid_statuses', 'created'));
@@ -117,7 +121,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    public function getCountryCode()
+    public function getCountryCode(): string
     {
         return !empty($this->source->billing_address->address_country_code_2) ? $this->source->billing_address->address_country_code_2 : '';
     }
@@ -126,13 +130,13 @@ class Source extends BaseSource
      * {@inheritdoc}
      *
      * HikaShop stores the currency info in a serialized object in the field
-     * order_currency_info, so unserialize to get the info.
+     * order_currency_info, so {@see unserialize()} to get the info.
      *
      * If you do show but not publicise a currency, the currency info and
      * amounts are stored as if the order was placed in the default currency,
      * thus we can no longer find out so at this point.
      */
-    public function getCurrency()
+    public function getCurrency(): array
     {
         $result = [];
         if (!empty($this->source->order_currency_info)) {
@@ -149,13 +153,13 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      *
-     * This override provides the values meta-invoice-amountinc and
-     * meta-invoice-vatamount.
+     * This override provides the values 'meta-invoice-amountinc' and
+     * 'meta-invoice-vatamount'.
      */
-    protected function getAvailableTotals()
+    protected function getAvailableTotals(): array
     {
+        // No order_tax_info => no tax (?) => vat amount = 0.
         $vatAmount = 0.0;
-        // No order_tax_info => no tax (?) => vatamount = 0.
         if (!empty($this->source->order_tax_info)) {
             foreach ($this->source->order_tax_info as $taxInfo) {
                 if (!empty($taxInfo->tax_amount)) {

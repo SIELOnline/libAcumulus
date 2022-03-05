@@ -27,6 +27,8 @@ class Source extends BaseSource
 
     /**
      * Sets the id based on the loaded Order.
+     *
+     * @noinspection PhpUnused : called via setId().
      */
     protected function setIdOrder()
     {
@@ -55,7 +57,7 @@ class Source extends BaseSource
      * @return string
      *   A single character indicating the order status.
      */
-    public function getStatus()
+    public function getStatus(): string
     {
         return $this->source['details']['BT']->order_status;
     }
@@ -63,7 +65,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      *
-     * This override returns the virtuemart_paymentmethod_id.
+     * This override returns the 'virtuemart_paymentmethod_id'.
      */
     public function getPaymentMethod()
     {
@@ -76,7 +78,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    public function getPaymentStatus()
+    public function getPaymentStatus(): ?int
     {
         return in_array($this->source['details']['BT']->order_status, $this->getPaidStatuses())
             ? Api::PaymentStatus_Paid
@@ -105,7 +107,7 @@ class Source extends BaseSource
      *
      * @return array
      */
-    protected function getPaidStatuses()
+    protected function getPaidStatuses(): array
     {
         return ['C', 'S', 'R'];
     }
@@ -113,7 +115,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    public function getCountryCode()
+    public function getCountryCode(): string
     {
         if (!empty($this->source['details']['BT']->virtuemart_country_id)) {
             /** @var \VirtueMartModelCountry $countryModel */
@@ -127,30 +129,29 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      *
-     * VirtueMart stores the currency info in the fields a serialzied object in the field
-     * order_currency_info, so unserialize to get the info.
+     * VirtueMart stores the currency info as a serialised object in the field
+     * 'order_currency_info', so {@see unserialize()} to get the info.
      *
      * VirtueMart stores the internal currency id of the currency used by the
-     * customer in the field user_currency_id, so look up the currency object
+     * customer in the field 'user_currency_id', so look up the currency object
      * first then extract the ISO code for it.
      *
      * However, the amounts stored are in the shop's default currency, even if
      * another currency was presented to the customer, so we will not have to
      * convert the amounts and this meta info is thus purely informative.
      */
-    public function getCurrency()
+    public function getCurrency(): array
     {
         // Load the currency.
         /** @var \VirtueMartModelCurrency $currency_model */
         $currency_model = VmModel::getModel('currency');
         /** @var \TableCurrencies $currency */
         $currency = $currency_model->getCurrency($this->source['details']['BT']->user_currency_id);
-        $result = array (
+        return array (
             Meta::Currency => $currency->currency_code_3,
             Meta::CurrencyRate => (float) $this->source['details']['BT']->user_currency_rate,
             Meta::CurrencyDoConvert => false,
         );
-        return $result;
     }
 
     /**
@@ -159,7 +160,7 @@ class Source extends BaseSource
      * This override provides the values meta-invoice-amountinc and
      * meta-invoice-vatamount as they may be needed by the Completor.
      */
-    protected function getAvailableTotals()
+    protected function getAvailableTotals(): array
     {
         return [
             Meta::InvoiceAmountInc => $this->source['details']['BT']->order_total,

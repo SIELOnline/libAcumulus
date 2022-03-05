@@ -11,7 +11,7 @@ class InvoiceStatusForm extends BaseInvoiceStatusForm
     /**
      * {@inheritdoc}
      */
-    public function getFieldDefinitions()
+    public function getFieldDefinitions(): array
     {
         $result = parent::getFieldDefinitions();
 
@@ -32,7 +32,8 @@ class InvoiceStatusForm extends BaseInvoiceStatusForm
                 $allFields[$key] = $field;
             }
         }
-        $result = [
+
+        return [
             'acumulus' => [
                 'type' => 'fieldset',
                 'legend' => 'Acumulus',
@@ -40,7 +41,5 @@ class InvoiceStatusForm extends BaseInvoiceStatusForm
                 'fields' => $allFields,
             ]
         ];
-
-        return $result;
     }
 }

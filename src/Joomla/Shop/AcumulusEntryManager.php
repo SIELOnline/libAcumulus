@@ -1,10 +1,12 @@
 <?php
 namespace Siel\Acumulus\Joomla\Shop;
 
+use AcumulusTableAcumulusEntry;
 use DateTimeZone;
 use JDate;
 use JFactory;
 use JTable;
+use RuntimeException;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Shop\AcumulusEntryManager as BaseAcumulusEntryManager;
 use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
@@ -19,17 +21,16 @@ use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
  */
 class AcumulusEntryManager extends BaseAcumulusEntryManager
 {
-    /**
-     * @return \AcumulusTableAcumulusEntry
-     */
-    protected function newTable()
+    protected function newTable(): AcumulusTableAcumulusEntry
     {
         /**
          * @var bool|\AcumulusTableAcumulusEntry $table
          */
         $table = JTable::getInstance('AcumulusEntry', 'AcumulusTable');
         if ($table === false) {
-            $this->log->error('AcumulusEntryManager::newTable(): table not created');
+            $e = new RuntimeException('AcumulusEntryManager::newTable(): table not created');
+            $this->log->error($e->getMessage());
+            throw $e;
         }
         return $table;
     }
@@ -57,7 +58,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    protected function insert(Source $invoiceSource, $entryId, $token, $created)
+    protected function insert(Source $invoiceSource, $entryId, $token, $created): bool
     {
         // Start with new table class to not overwrite any loaded record.
         $table = $this->newTable();
@@ -73,7 +74,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    protected function update(BaseAcumulusEntry $entry, $entryId, $token, $updated)
+    protected function update(BaseAcumulusEntry $entry, $entryId, $token, $updated): bool
     {
         // Continue with existing table object with already loaded record.
         /** @var \AcumulusTableAcumulusEntry $table */
@@ -84,7 +85,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         return $table->store(true);
     }
 
-    public function delete(BaseAcumulusEntry $entry)
+    public function delete(BaseAcumulusEntry $entry): bool
     {
         /** @var \AcumulusTableAcumulusEntry $table */
         $table = $entry->getRecord();
@@ -106,9 +107,9 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      *
-     * Joomla has separate install scripts, so nothing has to be done here.
+     * Joomla has separate installation scripts, so nothing has to be done here.
      */
-    public function install()
+    public function install(): bool
     {
         return false;
     }
@@ -116,9 +117,9 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      *
-     * Joomla has separate install scripts, so nothing has to be done here.
+     * Joomla has separate installation scripts, so nothing has to be done here.
      */
-    public function uninstall()
+    public function uninstall(): bool
     {
         return false;
     }

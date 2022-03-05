@@ -6,8 +6,6 @@ use Siel\Acumulus\Invoice\Source as Source;
 use Siel\Acumulus\Joomla\Shop\InvoiceManager as BaseInvoiceManager;
 
 /**
- * {@inheritdoc}
- *
  * This override provides HikaShop specific queries.
  *
  * SECURITY REMARKS
@@ -23,7 +21,7 @@ class InvoiceManager extends BaseInvoiceManager
     /**
      * {@inheritdoc}
      */
-    public function getInvoiceSourcesByIdRange($invoiceSourceType, $InvoiceSourceIdFrom, $InvoiceSourceIdTo)
+    public function getInvoiceSourcesByIdRange($invoiceSourceType, $InvoiceSourceIdFrom, $InvoiceSourceIdTo): array
     {
         if ($invoiceSourceType === Source::Order) {
             $query = sprintf(
@@ -39,12 +37,12 @@ class InvoiceManager extends BaseInvoiceManager
     /**
      * {@inheritdoc}
      *
-     * By default, HikaShop order numbers are non sequential random strings.
-     * So getting a range is not logical. However, extensions may exists that do
+     * By default, HikaShop order numbers are non-sequential random strings.
+     * So getting a range is not logical. However, extensions may exist that do
      * introduce sequential order numbers in which case this query should be
      * adapted.
      */
-    public function getInvoiceSourcesByReferenceRange($invoiceSourceType, $invoiceSourceReferenceFrom, $invoiceSourceReferenceTo)
+    public function getInvoiceSourcesByReferenceRange($invoiceSourceType, $invoiceSourceReferenceFrom, $invoiceSourceReferenceTo): array
     {
         if ($invoiceSourceType === Source::Order) {
             $query = sprintf(
@@ -60,7 +58,7 @@ class InvoiceManager extends BaseInvoiceManager
     /**
      * {@inheritdoc}
      */
-    public function getInvoiceSourcesByDateRange($invoiceSourceType, DateTime $dateFrom, DateTime $dateTo)
+    public function getInvoiceSourcesByDateRange($invoiceSourceType, DateTime $dateFrom, DateTime $dateTo): array
     {
         if ($invoiceSourceType === Source::Order) {
             $query = sprintf(

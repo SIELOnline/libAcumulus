@@ -15,7 +15,7 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getShopEnvironment()
+    public function getShopEnvironment(): array
     {
         /** @var JTableExtension $extension */
         $extension = JTable::getInstance('extension');
@@ -34,19 +34,17 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
 
         $joomlaVersion = JVERSION;
 
-        $environment = [
+        return [
             'moduleVersion' => $moduleVersion,
             'shopName' => $this->shopName,
             'shopVersion' => "$shopVersion (CMS: Joomla $joomlaVersion)",
         ];
-
-        return $environment;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getLink($linkType)
+    public function getLink(string $linkType): string
     {
         switch ($linkType) {
             case 'config':

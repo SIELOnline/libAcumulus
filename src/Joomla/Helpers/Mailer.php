@@ -3,6 +3,7 @@ namespace Siel\Acumulus\Joomla\Helpers;
 
 use JFactory;
 use JText;
+use RuntimeException;
 use Siel\Acumulus\Helpers\Mailer as BaseMailer;
 
 /**
@@ -13,7 +14,7 @@ class Mailer extends BaseMailer
     /**
      * {@inheritdoc}
      */
-    public function sendMail($from, $fromName, $to, $subject, $bodyText, $bodyHtml)
+    public function sendMail($from, $fromName, $to, $subject, $bodyText, $bodyHtml): bool
     {
         $mailer = JFactory::getMailer();
         $mailer->isHtml(true);
@@ -27,7 +28,7 @@ class Mailer extends BaseMailer
                 $result = JText::_('JLIB_MAIL_FUNCTION_OFFLINE');
             }
         }
-        catch (\RuntimeException $e){
+        catch (RuntimeException $e){
             $result = $e->getMessage();
         }
         return $result;
@@ -36,8 +37,9 @@ class Mailer extends BaseMailer
     /**
      * {@inheritdoc}
      */
-    protected function getFrom()
+    protected function getFrom(): string
     {
+        /** @noinspection PhpUnhandledExceptionInspection */
         $app = JFactory::getApplication();
         return $app->get('mailfrom');
     }

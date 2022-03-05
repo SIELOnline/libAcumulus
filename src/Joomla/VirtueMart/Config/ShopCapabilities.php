@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\Joomla\VirtueMart\Config;
 
+use JText;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Joomla\Config\ShopCapabilities as ShopCapabilitiesBase;
 use VirtueMartModelCalc;
@@ -8,14 +9,14 @@ use VirtueMartModelOrderstatus;
 use VmModel;
 
 /**
- * Defines the VirtueMart webshop specific capabilities.
+ * Defines the VirtueMart web shop specific capabilities.
  */
 class ShopCapabilities extends ShopCapabilitiesBase
 {
     /**
      * {@inheritdoc}
      */
-    public function getTokenInfoSource()
+    public function getTokenInfoSource(): array
     {
         return [
             'more-info' => $this->t('see_properties_below'),
@@ -26,7 +27,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    protected function getTokenInfoShopProperties()
+    protected function getTokenInfoShopProperties(): array
     {
         return [
             'BT' => [
@@ -156,7 +157,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getShopDefaults()
+    public function getShopDefaults(): array
     {
         return [
             'contactYourId' => '[virtuemart_user_id]', // Order BT
@@ -183,7 +184,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
      * This default implementation returns order and credit note. Override if
      * the specific shop supports other types or does not support credit notes.
      */
-    public function getSupportedInvoiceSourceTypes()
+    public function getSupportedInvoiceSourceTypes(): array
     {
         $result = parent::getSupportedInvoiceSourceTypes();
         unset($result[Source::CreditNote]);
@@ -193,14 +194,14 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getShopOrderStatuses()
+    public function getShopOrderStatuses(): array
     {
         /** @var VirtueMartModelOrderstatus $orderStatusModel */
         $orderStatusModel = VmModel::getModel('orderstatus');
         /** @var array[] $orderStatuses Method getOrderStatusNames() has an incorrect @return type ... */
         $orderStatuses = $orderStatusModel->getOrderStatusNames();
-        foreach ($orderStatuses as $code => &$value) {
-            $value = \JText::_($value['order_status_name']);
+        foreach ($orderStatuses as &$value) {
+            $value = JText::_($value['order_status_name']);
         }
         return $orderStatuses;
     }
@@ -216,7 +217,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
      * otherwise this plugin might still not be able to distinguish between
      * Dutch and Belgium 21% vat.
      */
-    public function getVatClasses()
+    public function getVatClasses(): array
     {
         $result = [];
         /** @var \TableCalcs[] $taxes */
@@ -231,7 +232,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getPaymentMethods()
+    public function getPaymentMethods(): array
     {
         $result = [];
         /** @var \VirtueMartModelPaymentmethod $model */

@@ -13,7 +13,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    protected function getTokenInfoSource()
+    protected function getTokenInfoSource(): array
     {
         $source = [
             'order_id',
@@ -64,7 +64,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getTokenInfoShopProperties()
+    public function getTokenInfoShopProperties(): array
     {
         return [
             'billing_address' => [
@@ -150,7 +150,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getShopDefaults()
+    public function getShopDefaults(): array
     {
         return [
             'contactYourId' => '[order_user_id]', // order
@@ -176,7 +176,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
      *
      * HikaShop does not know refunds.
      */
-    public function getSupportedInvoiceSourceTypes()
+    public function getSupportedInvoiceSourceTypes(): array
     {
         $result = parent::getSupportedInvoiceSourceTypes();
         unset($result[Source::CreditNote]);
@@ -186,7 +186,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getShopOrderStatuses()
+    public function getShopOrderStatuses(): array
     {
         /** @var \hikashopCategoryClass $class */
         $class = hikashop_get('class.category');
@@ -205,7 +205,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
      * This override removes the 'Use shop invoice number' option as HikaShop
      * does not have invoices.
      */
-    public function getDateToUseOptions()
+    public function getDateToUseOptions(): array
     {
         $result = parent::getDateToUseOptions();
         unset($result[Config::InvoiceDate_InvoiceCreate]);
@@ -219,7 +219,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
      * and payment tables store the category_id. So which one we sue is a bit
      * arbitrary, but we use the category_namekey as id.
      */
-    public function getVatClasses()
+    public function getVatClasses(): array
     {
         $result = [];
         /** @var \hikashopCategoryClass $categoryClass */
@@ -237,7 +237,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getPaymentMethods()
+    public function getPaymentMethods(): array
     {
         $result = [];
         /** @var \hikashopPluginsClass $pluginClass */

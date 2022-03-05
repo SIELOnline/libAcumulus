@@ -2,6 +2,7 @@
 namespace Siel\Acumulus\Joomla\Shop;
 
 use DateTimeZone;
+use JDatabaseDriver;
 use JDate;
 use JEventDispatcher;
 use JFactory;
@@ -11,8 +12,6 @@ use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
 use Siel\Acumulus\Invoice\Result;
 
 /**
- * {@inheritdoc}
- *
  * This override provides Joomla specific db helper methods and defines
  * and dispatches Joomla events for the events defined by our library.
  */
@@ -28,7 +27,7 @@ abstract class InvoiceManager extends BaseInvoiceManager
      * @return \Siel\Acumulus\Invoice\Source[]
      *   A non keyed array with invoice Sources.
      */
-    protected function getSourcesByQuery($invoiceSourceType, $query)
+    protected function getSourcesByQuery(string $invoiceSourceType, string $query): array
     {
         $sourceIds = $this->loadColumn($query);
         return $this->getSourcesByIdsOrSources($invoiceSourceType, $sourceIds);
@@ -43,7 +42,7 @@ abstract class InvoiceManager extends BaseInvoiceManager
      * @return int[]
      *   A non keyed array with the values of the 1st results of the query result.
      */
-    protected function loadColumn($query)
+    protected function loadColumn(string $query): array
     {
         return $this->getDb()->setQuery($query)->loadColumn();
     }
@@ -53,7 +52,7 @@ abstract class InvoiceManager extends BaseInvoiceManager
      *
      * @return \JDatabaseDriver
      */
-    protected function getDb()
+    protected function getDb(): JDatabaseDriver
     {
         return JFactory::getDbo();
     }
@@ -65,10 +64,11 @@ abstract class InvoiceManager extends BaseInvoiceManager
 	 *   Date in yyyy-mm-dd format.
 	 *
 	 * @return string
-	 *
+     *   The date string SQL datetime format.
+     *
 	 * @throws \Exception
 	 */
-    protected function toSql($date)
+    protected function toSql(string $date): string
     {
         $tz = new DateTimeZone(JFactory::getApplication()->get('offset'));
         $date = new JDate($date);

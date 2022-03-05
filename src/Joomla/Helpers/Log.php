@@ -43,7 +43,7 @@ class Log extends BaseLog
      * @return int
      *   the Joomla equivalent of the severity.
      */
-    protected function getJoomlaSeverity($severity)
+    protected function getJoomlaSeverity(int $severity): int
     {
         switch ($severity) {
             case Severity::Error:

@@ -1,4 +1,9 @@
 <?php
+/**
+ * @noinspection SqlNoDataSourceInspection
+ * @noinspection SqlDialectInspection
+ */
+
 namespace Siel\Acumulus\Joomla\VirtueMart\Shop;
 
 use DateTime;
@@ -6,8 +11,6 @@ use Siel\Acumulus\Invoice\Source as Source;
 use Siel\Acumulus\Joomla\Shop\InvoiceManager as BaseInvoiceManager;
 
 /**
- * {@inheritdoc}
- *
  * This override provides the VirtueMart specific queries.
  *
  * SECURITY REMARKS
@@ -23,7 +26,7 @@ class InvoiceManager extends BaseInvoiceManager
     /**
      * {@inheritdoc}
      */
-    public function getInvoiceSourcesByIdRange($invoiceSourceType, $InvoiceSourceIdFrom, $InvoiceSourceIdTo)
+    public function getInvoiceSourcesByIdRange($invoiceSourceType, $InvoiceSourceIdFrom, $InvoiceSourceIdTo): array
     {
         if ($invoiceSourceType === Source::Order) {
             $query = sprintf(
@@ -39,12 +42,12 @@ class InvoiceManager extends BaseInvoiceManager
     /**
      * {@inheritdoc}
      *
-     * By default, VirtueMart order numbers are non sequential random strings.
+     * By default, VirtueMart order numbers are non-sequential random strings.
      * So getting a range is not logical. However, extensions exists that do
      * introduce sequential order numbers, E.g:
      * http://extensions.joomla.org/profile/extension/extension-specific/virtuemart-extensions/human-readable-order-numbers
      */
-    public function getInvoiceSourcesByReferenceRange($invoiceSourceType, $invoiceSourceReferenceFrom, $invoiceSourceReferenceTo)
+    public function getInvoiceSourcesByReferenceRange($invoiceSourceType, $invoiceSourceReferenceFrom, $invoiceSourceReferenceTo): array
     {
         if ($invoiceSourceType === Source::Order) {
             if (ctype_digit($invoiceSourceReferenceFrom) && ctype_digit($invoiceSourceReferenceTo)) {
@@ -67,7 +70,7 @@ class InvoiceManager extends BaseInvoiceManager
     /**
      * {@inheritdoc}
      */
-    public function getInvoiceSourcesByDateRange($invoiceSourceType, DateTime $dateFrom, DateTime $dateTo)
+    public function getInvoiceSourcesByDateRange($invoiceSourceType, DateTime $dateFrom, DateTime $dateTo): array
     {
         if ($invoiceSourceType === Source::Order) {
             /** @noinspection PhpUnhandledExceptionInspection */

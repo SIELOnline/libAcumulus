@@ -10,18 +10,18 @@ use Siel\Acumulus\Tag;
 use stdClass;
 
 /**
- * Allows to create arrays in the Acumulus invoice structure from a HikaShop
+ * Allows creating arrays in the Acumulus invoice structure from a HikaShop
  * order
  *
  * Notes:
  * - HikaShop knows discounts in the form of coupons or unrestricted discounts.
  *   Coupons can be without vat (to be seen as partial payment, which was
  *   probably not meant, thus incorrect) or with a fixed vat rate, independent
- *   from the products in the cart, thus also incorrect.
+ *   of the products in the cart, thus also incorrect.
  * - When a cart with a coupon contains products with another vat rate, the
  *   shown vat amount breakdown is incorrect. The Acumulus invoice will be
  *   correct, but may differ from the shop invoice, though the overall amount
- *   tends to be equal. It is the meta data in the invoice (as sent to Acumulus)
+ *   tends to be equal. It is the metadata in the invoice (as sent to Acumulus)
  *   that shows the differences.
  */
 class Creator extends BaseCreator
@@ -70,7 +70,7 @@ class Creator extends BaseCreator
     /**
      * {@inheritdoc}
      */
-    protected function getItemLines()
+    protected function getItemLines(): array
     {
         return array_map([$this, 'getItemLine'], $this->order->products);
     }
@@ -82,7 +82,7 @@ class Creator extends BaseCreator
      *
      * @return array
      */
-    protected function getItemLine(stdClass $item)
+    protected function getItemLine(stdClass $item): array
     {
         $result = [];
         $this->addPropertySource('item', $item);
@@ -99,7 +99,7 @@ class Creator extends BaseCreator
         // Check for cost price and margin scheme.
         if (!empty($line['costPrice']) && $this->allowMarginScheme()) {
             // Margin scheme:
-            // - Do not put VAT on invoice: send price incl VAT as unitprice.
+            // - Do not put VAT on invoice: send price incl VAT as 'unitprice'.
             // - But still send the VAT rate to Acumulus.
             $result[Tag::UnitPrice] = $productPriceEx + $productVat;
         } else {
@@ -150,7 +150,7 @@ class Creator extends BaseCreator
                 $result[Meta::VatClassName] = $category->category_name;
             }
 
-            // Add vat rate meta data.
+            // Add vat rate metadata.
             // We can use hikashopCurrencyClass::getTax() to get a tax rate.
             // This method wants:
             // - The zone - state or country - where the customer lives.
@@ -209,7 +209,7 @@ class Creator extends BaseCreator
      * @return array[]
      *   An array of lines that describes this variant.
      */
-    protected function getVariantLines(stdClass $item, $parentQuantity, $vatRangeTags)
+    protected function getVariantLines(stdClass $item, int $parentQuantity, array $vatRangeTags): array
     {
         $result = [];
 
@@ -263,7 +263,7 @@ class Creator extends BaseCreator
      *   the contents of the cart) this array contains the proportion of the
      *   (total) tax per tax class.
      */
-    protected function getShippingLines()
+    protected function getShippingLines(): array
     {
         $result = [];
         if (Number::isZero($this->order->order_shipping_price)) {
@@ -318,7 +318,7 @@ class Creator extends BaseCreator
                         ];
                 } elseif (count($price->taxes) === 1) {
                     // Single tax applied, add the same fields as above but with
-                    // some additional meta data.
+                    // some additional metadata.
                     reset($price->taxes);
                     $taxNameKey = key($price->taxes);
                     $result[] = $shippingLine + [
@@ -392,7 +392,7 @@ class Creator extends BaseCreator
     /**
      * {@inheritdoc}
      */
-    protected function getShippingLine()
+    protected function getShippingLine(): array
     {
         throw new RuntimeException(__METHOD__ . ' should never be called');
     }
@@ -400,7 +400,7 @@ class Creator extends BaseCreator
     /**
      * {@inheritdoc}
      */
-    protected function getShippingMethodName()
+    protected function getShippingMethodName(): string
     {
         $shipping_id = func_num_args() > 0 ? func_get_arg(0) : $this->order->order_shipping_id;
 
@@ -416,7 +416,7 @@ class Creator extends BaseCreator
     /**
      * {@inheritdoc}
      */
-    protected function getDiscountLines()
+    protected function getDiscountLines(): array
     {
         $result = [];
 
@@ -450,7 +450,7 @@ class Creator extends BaseCreator
     /**
      * {@inheritdoc}
      */
-    protected function getPaymentFeeLine()
+    protected function getPaymentFeeLine(): array
     {
         // @todo check (return on refund?)
         $result = [];

@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\OpenCart\Helpers;
 
+use Exception;
 use Mail;
 use Siel\Acumulus\Helpers\Mailer as BaseMailer;
 
@@ -40,10 +41,7 @@ class Mailer extends BaseMailer
             $mail->setHtml($bodyHtml);
             $mail->send();
         }
-        catch (\Exception $e) {
-            // Note: OC1 and OC2.0 use trigger_error() and thus in those
-            // versions, errors will be logged in error.log. OC2.2+ throws
-            // exceptions, so we will log it.
+        catch (Exception $e) {
             $result = $e;
         }
         return $result;

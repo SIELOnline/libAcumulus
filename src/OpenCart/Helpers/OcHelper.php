@@ -172,7 +172,7 @@ class OcHelper
      * Returns the intermediate breadcrumb for the config screen.
      *
      * The config screen is normally accessed via the extensions part of
-     * OpenCart. Therefore an intermediate level is added to the breadcrumb,
+     * OpenCart. Therefore, an intermediate level is added to the breadcrumb,
      * consisting of the extensions page.
      *
      * @return array
@@ -240,7 +240,7 @@ class OcHelper
     /**
      * Explicit confirmation step to allow to retain the settings.
      *
-     * The normal uninstall action will unconditionally delete all settings.
+     * The normal uninstallation action will unconditionally delete all settings.
      *
      * @throws \Exception
      */
@@ -266,7 +266,7 @@ class OcHelper
     }
 
     /**
-     * Returns the url to redirect to after the uninstall action completes.
+     * Returns the url to redirect to after the uninstallation action completes.
      *
      * @return string
      *   The url to redirect to after uninstall.
@@ -279,54 +279,37 @@ class OcHelper
     /**
      * Extracts the order id of the parameters as passed to the event handler.
      *
-     * Event handling has undergone a lot of changes in OC, so where the order
-     * id can be found depends on the version. However we do not check the
-     * version itself but the (number and type of the) parameters passed in.
-     *
-     * Parameters for OC2.0:
-     * param int $order_id
-     *
-     * Parameters for OC 2.2:
-     * param string $route
-     * param mixed $output
-     * param int $order_id
-     * param int $order_status_id
-     *
-     * Parameters for OC 2.3+:
-     * param string $route
-     *   checkout/order/addOrder or checkout/order/addOrderHistory.
-     * param array $args
-     *   Array with numeric indices containing the arguments as passed to the
-     *   model method.
-     *   When route = checkout/order/addOrder it contains: order (but without
-     *   order_id as that will be created and assigned by the method).
-     *   When route = checkout/order/addOrderHistory it contains: order_id,
-     *   order_status_id, comment, notify, override.
-     * param mixed $output
-     *   If passed by event checkout/order/addOrder it contains the order_id of
-     *   the just created order. It is null for checkout/order/addOrderHistory.
+     * Where the order id can be found depends on the route.
      *
      * @param array $args
-     *   The arguments passed to the event handler.
+     *   The arguments passed to the event handler. $args will contain:
+     *   - string, route: ('checkout/order/addOrder' or
+     *     'checkout/order/addOrderHistory').
+     *   - array, args: array with numeric indices containing the arguments as
+     *     passed to the model method (that is triggering the event):
+     *     - route = checkout/order/addOrder:
+     *       * order (but without order_id as that will be created and assigned
+     *         by the method).
+     *     - route = checkout/order/addOrderHistory:
+     *       * order_id
+     *       * order_status_id
+     *       * comment
+     *       * notify
+     *       * override.
+     *   - mixed, $output (what the model method that is triggering the event
+     *     is about to return.
+     *     - route = checkout/order/addOrder: order_id of the just created order.
+     *     - route = checkout/order/addOrderHistory: null.
      *
      * @return int
      *   The id of the order that triggered the event.
      */
     public function extractOrderId(array $args)
     {
-        if (is_numeric($args[0])) {
-            // OC 2.0.
-            $order_id = $args[0];
-        } elseif (is_array($args[1])) {
-            // OC 2.3.
-            $route = $args[0];
-            $event_args = $args[1];
-            $output = $args[2];
-            $order_id = substr($route, -strlen('/addOrder')) ===  '/addOrder' ? $output : $event_args[0];
-        } else {
-            // OC 2.2.
-            $order_id = $args[2];
-        }
+        $route = $args[0];
+        $event_args = $args[1];
+        $output = $args[2];
+        $order_id = substr($route, -strlen('/addOrder')) ===  '/addOrder' ? $output : $event_args[0];
         return (int) $order_id;
     }
 
@@ -448,7 +431,7 @@ class OcHelper
     }
 
     /**
-     * Adds the common parts (header, footer, column(s) to the display.
+     * Adds the common parts (header, footer, column(s)) to the display.
      */
     protected function displayCommonParts()
     {

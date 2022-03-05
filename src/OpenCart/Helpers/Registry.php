@@ -1,14 +1,21 @@
 <?php
+/**
+ * @noinspection PhpMissingParamTypeInspection
+ * @noinspection PhpMissingReturnTypeInspection
+ * @noinspection PhpIssetCanBeReplacedWithCoalesceInspection
+ * @noinspection PhpUndefinedClassInspection
+ * @noinspection PhpMultipleClassDeclarationsInspection
+ */
+
 namespace Siel\Acumulus\OpenCart\Helpers;
 
-/** @noinspection PhpUndefinedClassInspection */
 /**
  * Registry is a wrapper around the registry instance which is not directly
  * accessible as the single instance is passed to each constructor in the
  * OpenCart classes.
  *
  * @property \Config config
- * @property \DBMySQLi|\DB\MySQLi db
+ * @property \DB db
  * @property \Document document
  * @property \Event event
  * @property \Language language
@@ -93,30 +100,6 @@ class Registry
     }
 
     /**
-     * Returns whether we are in main version 1.
-     *
-     * @return bool
-     *   True if the main version is 1, false otherwise.
-     *
-     */
-    public function isOc1()
-    {
-        return version_compare(VERSION, '2', '<');
-    }
-
-    /**
-     * Returns whether we are in version 3+.
-     *
-     * @return bool
-     *   True if the version is 3 or higher, false otherwise.
-     *
-     */
-    public function isOc3()
-    {
-        return version_compare(VERSION, '3', '>=');
-    }
-
-    /**
      * Returns the location of the extension's files.
      *
      * @return string
@@ -159,7 +142,7 @@ class Registry
      * And in admin only:
      * - getOrder()
      *
-     * In catalog we need another model to call getOrder(), so we have a
+     * In Catalog, we need another model to call getOrder(), so we have a
      * separate method getOrder() for that here.
      *
      * @return \ModelAccountOrder|\ModelSaleOrder
@@ -182,7 +165,6 @@ class Registry
         return $this->orderModel;
     }
 
-    /** @noinspection PhpUndefinedClassInspection */
     /**
      * Returns the extension model that can be used to retrieve payment methods.
      *
@@ -200,7 +182,6 @@ class Registry
         return $this->extensionModel;
     }
 
-    /** @noinspection PhpUndefinedClassInspection */
     /**
      * Returns the extension model that can be used to retrieve payment methods.
      *
@@ -229,7 +210,6 @@ class Registry
     public function getLink($route)
     {
         $token = 'user_token';
-        $secure = true;
-        return $this->url->link($route, $token . '=' . $this->session->data[$token], $secure);
+        return $this->url->link($route, $token . '=' . $this->session->data[$token], true);
     }
 }

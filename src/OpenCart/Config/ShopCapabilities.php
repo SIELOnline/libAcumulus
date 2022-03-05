@@ -8,28 +8,27 @@ use Siel\Acumulus\OpenCart\Helpers\Registry;
 use const Siel\Acumulus\Version;
 
 /**
- * Defines the OpenCart webshop specific capabilities.
+ * Defines the OpenCart web shop specific capabilities.
  */
 class ShopCapabilities extends ShopCapabilitiesBase
 {
     /**
      * {@inheritdoc}
      */
-    public function getShopEnvironment()
+    public function getShopEnvironment(): array
     {
-        $environment = [
+        return [
             // Module has same version as library.
             'moduleVersion' => Version,
             'shopName' => $this->shopName,
             'shopVersion' => VERSION,
         ];
-        return $environment;
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function getTokenInfoSource()
+    protected function getTokenInfoSource(): array
     {
         $catalogOrder = [
             'order_id',
@@ -184,7 +183,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    protected function getTokenInfoShopProperties()
+    protected function getTokenInfoShopProperties(): array
     {
         return [
             'item' => [
@@ -247,7 +246,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getShopDefaults()
+    public function getShopDefaults(): array
     {
         return [
             'contactYourId' => '[customer_id]', // Order
@@ -274,7 +273,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
      * This default implementation returns order and credit note. Override if
      * the specific shop supports other types or does not support credit notes.
      */
-    public function getSupportedInvoiceSourceTypes()
+    public function getSupportedInvoiceSourceTypes(): array
     {
         $result = parent::getSupportedInvoiceSourceTypes();
         unset($result[Source::CreditNote]);
@@ -284,7 +283,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getShopOrderStatuses()
+    public function getShopOrderStatuses(): array
     {
         $registry = $this->getRegistry();
         /** @noinspection PhpUnhandledExceptionInspection */
@@ -304,7 +303,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
      * This override removes the 'Use shop invoice date' option as OpenCart
      * does not store the creation date of the invoice.
      */
-    public function getDateToUseOptions()
+    public function getDateToUseOptions(): array
     {
         $result = parent::getDateToUseOptions();
         unset($result[Config::InvoiceDate_InvoiceCreate]);
@@ -314,10 +313,10 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getPaymentMethods()
+    public function getPaymentMethods(): array
     {
         $registry = $this->getRegistry();
-        $prefix = $registry->isOc3() ? 'payment_' : '';
+        $prefix = 'payment_';
         $enabled = [];
         /** @noinspection PhpUnhandledExceptionInspection */
         $extensions = $registry->getExtensionModel()->getInstalled('payment');
@@ -330,18 +329,18 @@ class ShopCapabilities extends ShopCapabilitiesBase
     }
 
     /**
-     * Turns the list into a translated list of options for a select.
+     * Turns the list into a translated list of select options.
      *
      * @param array $extensions
      *
      * @return array
-     *   an array with the extensions as key and their translated name as value.
+     *   An array with the extensions as key and their translated name as value.
      */
-    protected function paymentMethodToOptions(array $extensions)
+    protected function paymentMethodToOptions(array $extensions): array
     {
         $results = [];
         $registry = $this->getRegistry();
-        $directory = !$registry->isOc1() ? 'extension/payment/' : 'payment/';
+        $directory = 'extension/payment/';
         foreach ($extensions as $extension) {
             $registry->language->load($directory . $extension);
             $results[$extension] = $registry->language->get('heading_title');
@@ -352,7 +351,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getVatClasses()
+    public function getVatClasses(): array
     {
         $result = [];
         $registry = $this->getRegistry();
@@ -368,7 +367,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getLink($linkType)
+    public function getLink(string $linkType): string
     {
         $registry = $this->getRegistry();
         switch ($linkType) {
@@ -389,13 +388,9 @@ class ShopCapabilities extends ShopCapabilitiesBase
     }
 
     /**
-     * Returns the registry.
-     *
      * Wrapper around Registry::getInstance().
-     *
-     * @return \Siel\Acumulus\OpenCart\Helpers\Registry
      */
-    protected function getRegistry()
+    protected function getRegistry(): Registry
     {
         return Registry::getInstance();
     }

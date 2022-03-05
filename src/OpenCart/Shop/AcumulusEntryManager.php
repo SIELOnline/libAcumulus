@@ -1,6 +1,12 @@
 <?php
+/**
+ * @noinspection PhpMultipleClassDeclarationsInspection
+ * @noinspection SqlDialectInspection
+ */
+
 namespace Siel\Acumulus\OpenCart\Shop;
 
+use DB;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
@@ -45,7 +51,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      */
     public function getByEntryId($entryId)
     {
-        /** @noinspection PhpUnhandledExceptionInspection */
+        /** @var \stdClass $result  (documentation error in DB) */
         $result = $this->getDb()->query(sprintf(
             "SELECT * FROM `%s` WHERE entry_id %s %s",
             $this->tableName,
@@ -60,7 +66,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      */
     public function getByInvoiceSource(Source $invoiceSource, $ignoreLock = true)
     {
-        /** @noinspection PhpUnhandledExceptionInspection */
+        /** @var \stdClass $result  (documentation error in DB) */
         $result = $this->getDb()->query(sprintf(
             "SELECT * FROM `%s` WHERE source_type = '%s' AND source_id = %u",
             $this->tableName,
@@ -73,7 +79,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    protected function insert(Source $invoiceSource, $entryId, $token, $created)
+    protected function insert(Source $invoiceSource, $entryId, $token, $created): bool
     {
         if ($invoiceSource->getType() === Source::Order) {
             $order = $invoiceSource->getSource();
@@ -81,7 +87,6 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         } else {
             $storeId = 0;
         }
-        /** @noinspection PhpUnhandledExceptionInspection */
         return (bool) $this->getDb()->query(sprintf(
             "INSERT INTO `%s` (store_id, entry_id, token, source_type, source_id, updated) VALUES (%u, %s, %s, '%s', %u, '%s')",
             $this->tableName,
@@ -97,10 +102,9 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    protected function update(BaseAcumulusEntry $entry, $entryId, $token, $updated)
+    protected function update(BaseAcumulusEntry $entry, $entryId, $token, $updated): bool
     {
         $record = $entry->getRecord();
-        /** @noinspection PhpUnhandledExceptionInspection */
         return (bool) $this->getDb()->query(sprintf(
             "UPDATE `%s` SET entry_id = %s, token = %s, updated = '%s' WHERE id = %u",
             $this->tableName,
@@ -114,10 +118,9 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    public function delete(BaseAcumulusEntry $entry)
+    public function delete(BaseAcumulusEntry $entry): bool
     {
         $record = $entry->getRecord();
-        /** @noinspection PhpUnhandledExceptionInspection */
         return (bool) $this->getDb()->query(sprintf(
             "DELETE FROM `%s` WHERE id = %u",
             $this->tableName,
@@ -125,13 +128,12 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         ));
     }
 
-    /** @noinspection PhpUndefinedClassInspection */
     /**
      * Helper method to get the db object.
      *
-     * @return \DBMySQLi|\DB\MySQLi
+     * @return \DB
      */
-    protected function getDb()
+    protected function getDb(): DB
     {
         return Registry::getInstance()->db;
     }
@@ -146,28 +148,23 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
 
     /**
      * {@inheritdoc}
-     *
-     * @throws \Exception
      */
-    public function install()
+    public function install(): bool
     {
-        /** @noinspection PhpUnhandledExceptionInspection */
-        $queryResult = $this->getDb()->query("show tables like '{$this->tableName}'");
+        $queryResult = $this->getDb()->query("show tables like '$this->tableName'");
         $tableExists = !empty($queryResult->num_rows);
         if (!$tableExists) {
             // Table does not exist: create it.
             $result = $this->createTable();
         } else {
             // Table does exist: but in old or current data model?
-            /** @noinspection PhpUnhandledExceptionInspection */
-            $columnExists = $this->getDb()->query("show columns from `{$this->tableName}` like 'source_type'");
+            $columnExists = $this->getDb()->query("show columns from `$this->tableName` like 'source_type'");
             $columnExists = !empty($columnExists->num_rows);
             if (!$columnExists) {
                 // Table exists but in old data model: alter table
                 // Rename currently existing table.
                 $oldTableName = $this->tableName . '_old';
-                /** @noinspection PhpUnhandledExceptionInspection */
-                $result = $this->getDb()->query("ALTER TABLE `{$this->tableName}` RENAME `$oldTableName`;");
+                $result = $this->getDb()->query("ALTER TABLE `$this->tableName` RENAME `$oldTableName`;");
 
                 // Create table in new data model.
                 $result = $this->createTable() && $result;
@@ -175,14 +172,12 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
                 // Copy data from old to new table.
                 // Orders only, credit slips were not supported in that version.
                 // Nor did we support multi store shops (though a join could add that).
-                /** @noinspection PhpUnhandledExceptionInspection */
-                $result = $result && $this->getDb()->query("insert into `{$this->tableName}`
+                $result = $result && $this->getDb()->query("insert into `$this->tableName`
                     (entry_id, token, source_type, source_id, created, updated)
                     select entry_id, token, 'Order' as source_type, order_id as source_id, created, updated
                     from `$oldTableName``;");
 
                 // Delete old table.
-                /** @noinspection PhpUnhandledExceptionInspection */
                 $result = $result && $this->getDb()->query("DROP TABLE `$oldTableName`");
             } else {
                 // Table exists in current data model.
@@ -195,21 +190,14 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    public function uninstall()
+    public function uninstall(): bool
     {
-        /** @noinspection PhpUnhandledExceptionInspection */
-        return (bool) $this->getDb()->query("DROP TABLE `{$this->tableName}`");
+        return (bool) $this->getDb()->query("DROP TABLE `$this->tableName`");
     }
 
-    /**
-     * @return bool
-     *
-     * @throws \Exception
-     */
-    protected function createTable()
+    protected function createTable(): bool
     {
-        /** @noinspection PhpUnhandledExceptionInspection */
-        return (bool) $this->getDb()->query("CREATE TABLE IF NOT EXISTS `{$this->tableName}` (
+        return (bool) $this->getDb()->query("CREATE TABLE IF NOT EXISTS `$this->tableName` (
             `id` int(11) NOT NULL AUTO_INCREMENT,
             `store_id` int(11) NOT NULL DEFAULT '0',
             `entry_id` int(11) DEFAULT NULL,
@@ -232,17 +220,15 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         $result = true;
 
         if (version_compare($currentVersion, '4.4.0', '<')) {
-            /** @noinspection PhpUnhandledExceptionInspection */
-            $result = $this->getDb()->query("ALTER TABLE `{$this->tableName}`
+            $result = $this->getDb()->query("ALTER TABLE `$this->tableName`
                 CHANGE COLUMN `entry_id` `entry_id` INT(11) NULL DEFAULT NULL,
                 CHANGE COLUMN `token` `token` CHAR(32) NULL DEFAULT NULL");
         }
 
         // Drop and recreate index (to make it non-unique).
         if (version_compare($currentVersion, '6.0.0', '<')) {
-            /** @noinspection PhpUnhandledExceptionInspection */
-            $result = $this->getDb()->query("ALTER TABLE `{$this->tableName}` DROP INDEX `acumulus_idx_entry_id`")
-                  AND $this->getDb()->query("CREATE INDEX `acumulus_idx_entry_id` ON `{$this->tableName}` (`entry_id`)");
+            $result = $this->getDb()->query("ALTER TABLE `$this->tableName` DROP INDEX `acumulus_idx_entry_id`")
+                  AND $this->getDb()->query("CREATE INDEX `acumulus_idx_entry_id` ON `$this->tableName` (`entry_id`)");
         }
 
         return $result;

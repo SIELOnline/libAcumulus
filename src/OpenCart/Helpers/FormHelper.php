@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\OpenCart\Helpers;
 
+use Request;
 use Siel\Acumulus\Helpers\FormHelper as BaseFormHelper;
 
 /**
@@ -11,7 +12,7 @@ class FormHelper extends BaseFormHelper
     /**
      * {@inheritdoc}
      */
-    public function isSubmitted()
+    public function isSubmitted(): bool
     {
         return $this->getRequest()->server['REQUEST_METHOD'] === 'POST';
     }
@@ -19,7 +20,7 @@ class FormHelper extends BaseFormHelper
     /**
      * return \Request
      */
-    private function getRequest()
+    private function getRequest(): Request
     {
         return Registry::getInstance()->request;
     }

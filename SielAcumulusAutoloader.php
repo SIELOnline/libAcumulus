@@ -10,16 +10,16 @@ class SielAcumulusAutoloader
   /**
    * Registers an autoloader for the Siel\Acumulus namespace.
    *
-   * As not all web shops support auto-loading based on namespaces or have
-   * other glitches, eg. expecting lower cased file names, we define our own
+   * As not all web shops support autoloading based on namespaces or have
+   * other glitches, e.g. expecting lower cased file names, we define our own
    * autoloader. If the module cannot use the autoloader of the web shop, this
-   * method should be called during bootstrapping of the module.
+   * method should be called when bootstrapping the module.
    *
    * Thanks to https://gist.github.com/mageekguy/8300961
    */
     public static function register()
     {
-        // In some shops (OpenCart1) there's not one central entry point and
+        // In some shops (OpenCart1) there's not one central entry point, and
         // we may risk registering twice.
         static $hasBeenRegistered = false;
 
@@ -31,7 +31,6 @@ class SielAcumulusAutoloader
                 if (strncmp($class, $ourNamespace, $ourNamespaceLen) === 0) {
                     $fileName = $dir . str_replace('\\', DIRECTORY_SEPARATOR, substr($class, $ourNamespaceLen)) . '.php';
                     if (is_readable($fileName)) {
-                        /** @noinspection PhpIncludeInspection */
                         include($fileName);
                     }
                 }

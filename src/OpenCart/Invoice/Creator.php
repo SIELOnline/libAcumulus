@@ -1,4 +1,8 @@
 <?php
+/**
+ * @noinspection SqlDialectInspection
+ */
+
 namespace Siel\Acumulus\OpenCart\Invoice;
 
 use RuntimeException;
@@ -9,13 +13,13 @@ use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Tag;
 
 /**
- * Allows to create arrays in the Acumulus invoice structure from an OpenCart
+ * Allows creating arrays in the Acumulus invoice structure from an OpenCart
  * order.
  */
 class Creator extends BaseCreator
 {
     // More specifically typed property.
-    /** @var Source */
+    /** @var \Siel\Acumulus\OpenCart\Invoice\Source */
     protected $invoiceSource;
 
     /** @var array */
@@ -59,13 +63,11 @@ class Creator extends BaseCreator
      *
      * @throws \Exception
      */
-    protected function getInvoiceLines()
+    protected function getInvoiceLines(): array
     {
         $itemLines = $this->getItemLines();
         $itemLines = $this->addLineType($itemLines, static::LineType_OrderItem);
-
         $totalLines = $this->getTotalLines();
-
         return array_merge($itemLines, $totalLines);
     }
 
@@ -74,15 +76,13 @@ class Creator extends BaseCreator
      *
      * @throws \Exception
      */
-    protected function getItemLines()
+    protected function getItemLines(): array
     {
         $result = [];
-
         $orderProducts = $this->getOrderModel()->getOrderProducts($this->invoiceSource->getId());
         foreach ($orderProducts as $line) {
             $result[] = $this->getItemLine($line);
         }
-
         return $result;
     }
 
@@ -92,13 +92,9 @@ class Creator extends BaseCreator
      * This method may return child lines if there are options/variants.
      * These lines will be informative, their price will be 0.
      *
-     * @param array $item
-     *
-     * @return array
-     *
      * @throws \Exception
      */
-    protected function getItemLine(array $item)
+    protected function getItemLine(array $item): array
     {
         $result = [];
 
@@ -122,7 +118,7 @@ class Creator extends BaseCreator
         // Check for cost price and margin scheme.
         if (!empty($line['costPrice']) && $this->allowMarginScheme()) {
             // Margin scheme:
-            // - Do not put VAT on invoice: send price incl VAT as unitprice.
+            // - Do not put VAT on invoice: send price incl VAT as 'unitprice'.
             // - But still send the VAT rate to Acumulus.
             $result[Tag::UnitPrice] = $productPriceEx + $productVat;
         } else {
@@ -171,7 +167,7 @@ class Creator extends BaseCreator
      *
      * @throws \Exception
      */
-    protected function getVatRateLookupMetadata($taxClassId)
+    protected function getVatRateLookupMetadata(?int $taxClassId): array
     {
         $result = [];
 
@@ -212,7 +208,7 @@ class Creator extends BaseCreator
      *
      * @throws \Exception
      */
-    protected function getTotalLines()
+    protected function getTotalLines(): array
     {
         $result = [];
 
@@ -227,7 +223,7 @@ class Creator extends BaseCreator
         foreach ($totalLines as $totalLine) {
             switch ($totalLine['code']) {
                 case 'sub_total':
-                    // Sub total of all product lines: ignore.
+                    // Subtotal of all product lines: ignore.
                     $line = null;
                     break;
                 case 'shipping':
@@ -265,7 +261,7 @@ class Creator extends BaseCreator
     }
 
     /**
-     * Returns a line based on a "order total line".
+     * Returns a line based on an "order total line".
      *
      * @param array $line
      *   The total line.
@@ -274,10 +270,9 @@ class Creator extends BaseCreator
      *
      * @return array
      *   An Acumulus invoice line.
-     *
      * @throws \Exception
      */
-    protected function getTotalLine(array $line, $exVat)
+    protected function getTotalLine(array $line, bool $exVat): array
     {
         $result = [
             Tag::Product => $line['title'],
@@ -319,8 +314,7 @@ class Creator extends BaseCreator
     }
 
     /**
-     * Tries to lookup and return vat rate meta data for the given line type.
-     *
+     * Tries to lookup and return vat rate metadata for the given line type.
      * This is quite hard. The total line (table order_total) contains a code
      * (= line type) and title field, the latter being a translated and possibly
      * formatted descriptive string of the shipping or handling method applied,
@@ -334,12 +328,12 @@ class Creator extends BaseCreator
      *   known types).
      *
      * @return array
-     *   A, possibly empty, array with vat rate lookup meta data. Empty if no or
+     *   A, possibly empty, array with vat rate lookup metadata. Empty if no or
      *   multiple tax rates were found.
      *
      * @throws \Exception
      */
-    protected function getVatRateLookupByTotalLineType($code)
+    protected function getVatRateLookupByTotalLineType(string $code): array
     {
         $result = [];
         $query = $this->getTotalLineTaxClassLookupQuery($code);
@@ -367,7 +361,7 @@ class Creator extends BaseCreator
      *
      * @throws \Exception
      */
-    protected function isAddressInGeoZone(array $order, $addressType, $geoZoneId)
+    protected function isAddressInGeoZone(array $order, string $addressType, int $geoZoneId): bool
     {
         $fallbackAddressType = $addressType === 'payment' ? 'shipping' : 'payment';
         if (!empty($order["{$addressType}_country_id"])) {
@@ -397,7 +391,6 @@ class Creator extends BaseCreator
 
     /**
      * Returns the query to get the tax class id for a given total type.
-     *
      * In OC3 the tax class ids for total lines are either stored under:
      * - key = 'total_{$code}_tax_class_id', e.g. total_handling_tax_class_id or
      *   total_low_order_fee_tax_class_id.
@@ -405,103 +398,102 @@ class Creator extends BaseCreator
      *   or shipping_weight_tax_class_id.
      *
      * @param string $code
-     *   The type of total line, e.g. shipping, handling or low_order_fee
+     *   The type of total line, e.g. shipping, handling or low_order_fee.
      *
      * @return string
      *   The query to execute.
      */
-    protected function getTotalLineTaxClassLookupQuery($code)
+    protected function getTotalLineTaxClassLookupQuery(string $code): string
     {
         $prefix = DB_PREFIX;
         $code = $this->getRegistry()->db->escape($code);
-        /** @noinspection SqlResolve */
         return "SELECT `value` FROM {$prefix}setting where `key` = 'total_{$code}_tax_class_id' OR `key` LIKE '{$code}_%_tax_class_id'";
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function getShippingLine()
+    protected function getShippingLine(): array
     {
         throw new RuntimeException(__METHOD__ . ' should never be called');
     }
 
     /**
      * Copy of ModelLocalisationTaxClass::getTaxClass().
-     *
-     * The above mentioned model cannot be used on the catalog side, so I just
-     * copied the code.
+     * This model cannot be used on the catalog side, so I just copied the code.
      *
      * @param int $tax_class_id
      *
-     * @return array[]
+     * @return array
+     *   The tax class record for the given $tax_class_id.
      *
      * @throws \Exception
      */
-    protected function getTaxClass($tax_class_id)
+    protected function getTaxClass(int $tax_class_id): array
     {
-        /** @noinspection SqlResolve */
-        $query = $this->getRegistry()->db->query("SELECT * FROM " . DB_PREFIX . "tax_class WHERE tax_class_id = '" . (int) $tax_class_id . "'");
+        /** @var \stdClass $query  (documentation error in DB) */
+        $query = $this->getRegistry()->db->query("SELECT * FROM " . DB_PREFIX . "tax_class WHERE tax_class_id = '" . $tax_class_id . "'");
         return $query->row;
     }
 
     /**
      * Copy of ModelLocalisationTaxClass::getTaxRules().
-     *
-     * The above mentioned model cannot be used on the catalog side, so I just
-     * copied the code.
+     * This model cannot be used on the catalog side, so I just copied the code.
      *
      * @param int $tax_class_id
      *
      * @return array[]
+     *   A list of tax rules belonging to the given $tax_class_id.
      *
      * @throws \Exception
      */
-    protected function getTaxRules($tax_class_id)
+    protected function getTaxRules(int $tax_class_id): array
     {
-        /** @noinspection SqlResolve */
-        $query = $this->getRegistry()->db->query("SELECT * FROM " . DB_PREFIX . "tax_rule WHERE tax_class_id = '" . (int) $tax_class_id . "'");
+        /** @var \stdClass $query  (documentation error in DB) */
+        $query = $this->getRegistry()->db->query("SELECT * FROM " . DB_PREFIX . "tax_rule WHERE tax_class_id = '" . $tax_class_id . "'");
         return $query->rows;
     }
 
     /**
      * Copy of ModelLocalisationTaxRate::getTaxRate().
-     *
-     * The above mentioned model cannot be used on the catalog side, so I just
-     * copied the code.
+     * This model cannot be used on the catalog side, so I just copied the code.
      *
      * @param int $tax_rate_id
      *
      * @return array
+     *   The tax rate record for the given $tax_rate_id.
      *
      * @throws \Exception
      */
-    protected function getTaxRate($tax_rate_id)
+    protected function getTaxRate(int $tax_rate_id): array
     {
-        /** @noinspection SqlResolve */
-        $query = $this->getRegistry()->db->query("SELECT tr.tax_rate_id, tr.name AS name, tr.rate, tr.type, tr.geo_zone_id, gz.name AS geo_zone, tr.date_added, tr.date_modified FROM " . DB_PREFIX . "tax_rate tr LEFT JOIN " . DB_PREFIX . "geo_zone gz ON (tr.geo_zone_id = gz.geo_zone_id) WHERE tr.tax_rate_id = '" . (int) $tax_rate_id . "'");
+        /** @var \stdClass $query  (documentation error in DB) */
+        $query = $this->getRegistry()->db->query("SELECT tr.tax_rate_id, tr.name AS name, tr.rate, tr.type, tr.geo_zone_id,
+            gz.name AS geo_zone, tr.date_added, tr.date_modified
+            FROM " . DB_PREFIX . "tax_rate tr
+            LEFT JOIN " . DB_PREFIX . "geo_zone gz ON (tr.geo_zone_id = gz.geo_zone_id)
+            WHERE tr.tax_rate_id = '" . $tax_rate_id . "'");
         return $query->row;
     }
 
     /**
      * Copy of \ModelLocalisationGeoZone::getZoneToGeoZones().
-     *
-     * The above mentioned model cannot be used on the catalog side, so I just
-     * copied the code.
+     * This model cannot be used on the catalog side, so I just copied the code.
      *
      * @param int $geo_zone_id
      *
      * @return array[]
+     *   A List of zone_to_geo_zone records for the given $geo_geo_zone_id.
      *
      * @throws \Exception
      */
-    protected function getZoneToGeoZones($geo_zone_id)
+    protected function getZoneToGeoZones(int $geo_zone_id): array
     {
         static $geoZonesCache = [];
 
         if (!isset($geoZonesCache[$geo_zone_id])) {
-            /** @noinspection SqlResolve */
-            $query = $this->getRegistry()->db->query("SELECT * FROM " . DB_PREFIX . "zone_to_geo_zone WHERE geo_zone_id = '" . (int) $geo_zone_id . "'");
+            /** @var \stdClass $query  (documentation error in DB) */
+            $query = $this->getRegistry()->db->query("SELECT * FROM " . DB_PREFIX . "zone_to_geo_zone WHERE geo_zone_id = '" . $geo_zone_id . "'");
             $geoZonesCache[$geo_zone_id] = $query->rows;
         }
         return $geoZonesCache[$geo_zone_id];
@@ -514,17 +506,13 @@ class Creator extends BaseCreator
      */
     protected function getOrderModel()
     {
-        /** @noinspection PhpUnhandledExceptionInspection */
         return $this->getRegistry()->getOrderModel();
     }
 
     /**
      * Wrapper method that returns the OpenCart registry class.
-     *
-     * @return \Siel\Acumulus\OpenCart\Helpers\Registry
-     *
      */
-    protected function getRegistry()
+    protected function getRegistry(): Registry
     {
         return Registry::getInstance();
     }

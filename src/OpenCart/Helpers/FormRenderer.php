@@ -30,7 +30,7 @@ class FormRenderer extends BaseFormRenderer
     /**
      * {@inheritdoc}
      */
-    protected function renderSimpleField(array $field)
+    protected function renderSimpleField(array $field): string
     {
         $oldElementWrapperClass = $this->elementWrapperClass;
         $this->handleRequired($field);

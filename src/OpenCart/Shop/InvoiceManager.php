@@ -1,7 +1,14 @@
 <?php
+/**
+ * @noinspection SqlDialectInspection
+ * @noinspection PhpMultipleClassDeclarationsInspection
+ */
+
 namespace Siel\Acumulus\OpenCart\Shop;
 
 use DateTime;
+use DB;
+use Event;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Invoice\Result;
 use Siel\Acumulus\Invoice\Source as Source;
@@ -25,12 +32,6 @@ class InvoiceManager extends BaseInvoiceManager
     /** @var array */
     protected $tableInfo;
 
-    /** @var string */
-    protected $orderTableName;
-
-    /** @var string */
-    protected $returnTableName;
-
     /**
      * {@inheritdoc}
      */
@@ -49,14 +50,10 @@ class InvoiceManager extends BaseInvoiceManager
         ];
     }
 
-    /** @noinspection PhpUndefinedNamespaceInspection */
-    /** @noinspection PhpUndefinedClassInspection */
     /**
      * Helper method to get the db object.
-     *
-     * @return \DBMySQLi|\DB\MySQLi
      */
-    protected function getDb()
+    protected function getDb(): DB
     {
         return Registry::getInstance()->db;
     }
@@ -64,10 +61,10 @@ class InvoiceManager extends BaseInvoiceManager
     /**
      * {@inheritdoc}
      */
-    public function getInvoiceSourcesByIdRange($invoiceSourceType, $InvoiceSourceIdFrom, $InvoiceSourceIdTo)
+    public function getInvoiceSourcesByIdRange($invoiceSourceType, $InvoiceSourceIdFrom, $InvoiceSourceIdTo): array
     {
         $key = $this->tableInfo[$invoiceSourceType]['key'];
-        /** @noinspection PhpUnhandledExceptionInspection */
+        /** @var \stdClass $result  (documentation error in DB) */
         $result = $this->getDb()->query(sprintf(
             "SELECT `%s` FROM `%s` WHERE `%s` BETWEEN %u AND %u",
             $key,
@@ -82,10 +79,10 @@ class InvoiceManager extends BaseInvoiceManager
     /**
      * {@inheritdoc}
      */
-    public function getInvoiceSourcesByDateRange($invoiceSourceType, DateTime $dateFrom, DateTime $dateTo)
+    public function getInvoiceSourcesByDateRange($invoiceSourceType, DateTime $dateFrom, DateTime $dateTo): array
     {
         $key = $this->tableInfo[$invoiceSourceType]['key'];
-        /** @noinspection PhpUnhandledExceptionInspection */
+        /** @var \stdClass $result  (documentation error in DB) */
         $result = $this->getDb()->query(sprintf(
             "SELECT `%s` FROM `%s` WHERE `date_modified` BETWEEN '%s' AND '%s'",
             $key,
@@ -134,10 +131,8 @@ class InvoiceManager extends BaseInvoiceManager
 
     /**
      * Wrapper around the event class instance.
-     *
-     * @return \Event
      */
-    private function getEvent()
+    private function getEvent(): Event
     {
         return Registry::getInstance()->event;
     }

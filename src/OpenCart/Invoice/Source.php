@@ -48,7 +48,7 @@ class Source extends BaseSource
      *
      * @return int
      */
-    public function getStatus()
+    public function getStatus(): int
     {
         return $this->source['order_status_id'];
     }
@@ -77,7 +77,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    public function getPaymentStatus()
+    public function getPaymentStatus(): ?int
     {
         // The 'config_complete_status' setting contains a set of statuses that,
         //  according to the help on the settings form:
@@ -93,7 +93,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    public function getPaymentDate()
+    public function getPaymentDate(): ?string
     {
         // @todo: Can we determine this based on history (and optionally payment_code)?
         // Will default to the issue date.
@@ -107,7 +107,7 @@ class Source extends BaseSource
      * another currency was presented to the customer, so we will not have to
      * convert the amounts and this meta info is thus purely informative.
      */
-    public function getCurrency()
+    public function getCurrency(): array
     {
         return [
             Meta::Currency => $this->source['currency_code'],
@@ -122,7 +122,7 @@ class Source extends BaseSource
      * This override provides the values meta-invoice-amountinc,
      * meta-invoice-vatamount and a vat breakdown in meta-invoice-vat.
      */
-    protected function getAvailableTotals()
+    protected function getAvailableTotals(): array
     {
         $result = [
             Meta::InvoiceAmountInc => $this->source['total'],
@@ -130,7 +130,6 @@ class Source extends BaseSource
             Meta::InvoiceVatBreakdown => [],
         ];
 
-        /** @noinspection PhpUnhandledExceptionInspection */
         $orderTotals = $this->getOrderTotalLines();
         foreach ($orderTotals as $totalLine) {
             if ($totalLine['code'] === 'tax') {
@@ -151,11 +150,12 @@ class Source extends BaseSource
      *   sort_order, meaning that lines before the tax line are amounts ex vat
      *   and lines after are inc vat.
      *
-     * @throws \Exception
+     * @noinspection PhpDocMissingThrowsInspection
      */
-    public function getOrderTotalLines()
+    public function getOrderTotalLines(): array
     {
         if (!$this->orderTotalLines) {
+            /** @noinspection PhpUnhandledExceptionInspection */
             $orderModel = $this->getRegistry()->getOrderModel();
             $this->orderTotalLines = $orderModel->getOrderTotals($this->source['order_id']);
         }
@@ -176,11 +176,8 @@ class Source extends BaseSource
 
     /**
      * Wrapper method that returns the OpenCart registry class.
-     *
-     * @return \Siel\Acumulus\OpenCart\Helpers\Registry
-     *
      */
-    protected function getRegistry()
+    protected function getRegistry(): Registry
     {
         return Registry::getInstance();
     }

@@ -1,4 +1,8 @@
 <?php
+/**
+ * @noinspection PhpMultipleClassDeclarationsInspection
+ */
+
 namespace Siel\Acumulus\OpenCart\Config;
 
 use Siel\Acumulus\Config\ConfigStore as BaseConfigStore;
@@ -14,16 +18,16 @@ class ConfigStore extends BaSeConfigStore
     /**
      * {@inheritdoc}
      */
-    public function load()
+    public function load(): array
     {
         $values = $this->getSettings()->getSetting($this->configCode);
-        return isset($values[$this->configCode . '_' . $this->configKey]) ? $values[$this->configCode . '_' . $this->configKey] : [];
+        return $values[$this->configCode . '_' . $this->configKey] ?? [];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function save(array $values)
+    public function save(array $values): bool
     {
         $modelSettingSetting = $this->getSettings();
         $setting = $modelSettingSetting->getSetting($this->configCode);
@@ -36,38 +40,14 @@ class ConfigStore extends BaSeConfigStore
      * @return \ModelSettingSetting
      *
      * @noinspection PhpDocMissingThrowsInspection
+     * @noinspection PhpMissingReturnTypeInspection : actually a {@see Proxy} is
+     *   returned that proxies a {@see \ModelSettingSetting}. So for us, the
+     *   type is a \ModelSettingSetting.
      */
     protected function getSettings()
     {
         /** @noinspection PhpUnhandledExceptionInspection */
         Registry::getInstance()->load->model('setting/setting');
         return Registry::getInstance()->model_setting_setting;
-    }
-
-    /**
-     * @deprecated Only still here for use during update.
-     *
-     * @param array $keys
-     *
-     * @return array
-     */
-    public function loadOld(array $keys)
-    {
-        $result = [];
-        // Load the values from the web shop specific configuration.
-        $configurationValues = $this->getSettings()->getSetting($this->configCode);
-        $values = isset($configurationValues['acumulus_siel_module']) ? $configurationValues['acumulus_siel_module'] : [];
-        foreach ($keys as $key) {
-            if (array_key_exists($key, $values)) {
-                $result[$key] = $values[$key];
-            }
-        }
-
-        // Delete the value, this will only be used one more time: during
-        // updating to 5.4.0.
-        unset($configurationValues['acumulus_siel_module']);
-        $this->getSettings()->editSetting('acumulus_siel', $configurationValues);
-
-        return $result;
     }
 }

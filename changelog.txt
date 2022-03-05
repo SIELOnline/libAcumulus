@@ -1,21 +1,21 @@
 Changelog Acumulus webkoppelingen
 =================================
 
+Supported shops and versions
+----------------------------
+The tags below are also used further on in the changelog to indicate to which
+shop(s) a change applies.
+
 ALL = Alle web shops.
 HS  = HikaShop (Joomla)
 JOO = Joomla (HikaShop + VirtueMart3)
-MA  = Magento (alle ondersteunde versies: >= 2.3)
-OC  = OpenCart (alle ondersteunde versies)
-OC1 = OpenCart 1 (sinds 6.3.0 wordt OC1 niet meer actief onderhouden en getest.)
-      Sowieso werd al alleen OpenCart 1.5.6.4 nog ondersteund.
-OC2 = OpenCart 2 (sinds 6.3.0 wordt OC2 niet meer actief onderhouden en getest.)
-      Sowieso werd al alleen OpenCart 2.3.0.2 nog ondersteund.
-OC3 = OpenCart 3
-PS  = PrestaShop (1.7.6+)
+MA  = Magento (supported versions: >= 2.3)
+OC  = OpenCart (supported versions: >= 3.0)
+PS  = PrestaShop (supported versions: >= 1.7.6+)
 VM3 = VirtueMart3 (Joomla)
-WC  = WooCommerce 5 (WC 4 en 3 zullen waarschijnlijk ook werken)
+WC  = WooCommerce (supported versions: >= 5.0 (WC 4 en 3 probably will work)
 
-7.0.0-alpha1 (2022-02-??)
+7.0.0-alpha1 (2022-03-??)
 -------------------------
 Features:
 - OC: The Acumulus settings form now also appears as a menu-item under "Sales -
@@ -60,6 +60,16 @@ Refactorings:
 - WC2: Removed WC2 specific code (\Siel\Acumulus\WooCommerce\WooCommerce2
   namespace) and constructions needed for WC2 (version checks, hooks, argument
   number and order passed to hooks, ...
+- OC1|OC23: Removed OC1 and OC23 specific code (their namespaces and
+  constructions needed to determine version, ...).
+- Defined parameter and return types to methods where applicable and according
+  to PHP 7.1 language constructs, i.e:
+  - nullable types, void return type.
+  - And thus not: object instead of StdClass (7.2), co and contravariance (7.4),
+    typed properties (7.4).)
+  - AND NOT classes: Container, Requirements, and Log, This is to be able to
+    present proper messages about not satisfying the PHP version requirement.
+- TODO: Added visibility to class constants, except for the classes above.
 
 6.4.1 (2022-02-23) (MA2 only)
 -----------------------------

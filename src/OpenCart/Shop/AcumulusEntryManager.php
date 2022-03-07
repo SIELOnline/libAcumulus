@@ -204,8 +204,8 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
             `token` char(32) DEFAULT NULL,
             `source_type` varchar(32) NOT NULL,
             `source_id` int(11) NOT NULL,
-            `created` timestamp DEFAULT CURRENT_TIMESTAMP,
-            `updated` timestamp NOT NULL,
+            `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (`id`),
             UNIQUE INDEX `acumulus_idx_entry_id` (`entry_id`),
             UNIQUE INDEX `acumulus_idx_source` (`source_id`, `source_type`)

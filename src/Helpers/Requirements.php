@@ -1,9 +1,14 @@
 <?php
 /**
- * Note: Do not use PHP7 language constructs as long as we want the Requirements
- * class to check for that and present and log a proper warning.
+ * Note: Do not use PHP7 language constructs in the {@see Container} class as
+ * long as we want the {@see Requirements} class to check for that, initiated by
+ * the {@see \Siel\Acumulus\Config\ConfigUpgrade} class, and present and
+ * {@see Log} proper warnings.
  *
+ * @noinspection PhpMissingParamTypeInspection
  * @noinspection PhpMissingReturnTypeInspection
+ * @noinspection PhpMissingFieldTypeInspection
+ * @noinspection PhpMissingVisibilityInspection
  */
 
 namespace Siel\Acumulus\Helpers;
@@ -23,24 +28,22 @@ class Requirements
      *
      * @return string[]
      *   An array with messages regarding missing requirements, empty if all
-     *   requirements are met. The keys are the translations keys, the values are
-     *   the English translations.
+     *   requirements are met. The keys can be used as translation keys, but
+     *   currently, no Dutch translations are available. The values are in
+     *   English.
      */
     public function check()
     {
         $result = [];
 
-        // PHP 5.3 is a requirement as well because we use namespaces. But as
-        // the parser will already have failed fatally before we get here, it
-        // makes no sense to check that here.
-        if (version_compare(PHP_VERSION, '5.6', '<')) {
-            $result['message_error_req_php'] = 'The minimally required PHP version for the Acumulus module is PHP 5.6.';
+        if (version_compare(PHP_VERSION, '7.1', '<')) {
+            $result['message_error_req_php'] = 'The minimally required PHP version for the Acumulus module is PHP 7.1 (and soon to become 7.4).';
         }
         if (!extension_loaded('json')) {
             $result['message_error_req_json'] = 'The JSON PHP extension needs to be activated on your server for the Acumulus module to be able to work with the json format.';
         }
         if (!extension_loaded('curl')) {
-            $result['message_error_req_curl'] = 'The CURL PHP extension needs to be activated on your server for the Acumulus module to beable to connect with the Acumulus server.';
+            $result['message_error_req_curl'] = 'The CURL PHP extension needs to be activated on your server for the Acumulus module to be able to connect with the Acumulus server.';
         }
         if (!extension_loaded('libxml')) {
             $result['message_error_req_libxml'] = 'The libxml extension needs to be activated on your server for the Acumulus module to be able to work with the XML format.';

@@ -1,4 +1,15 @@
 <?php
+/**
+ * Note: Do not use PHP7 language constructs in the {@see Container} class as
+ * long as we want the {@see Requirements} class to check for that, initiated by
+ * the {@see \Siel\Acumulus\Config\ConfigUpgrade} class, and present and
+ * {@see Log} proper warnings.
+ *
+ * @noinspection PhpMissingParamTypeInspection
+ * @noinspection PhpMissingReturnTypeInspection
+ * @noinspection PhpMissingFieldTypeInspection
+ * @noinspection PhpMissingVisibilityInspection
+ */
 
 namespace Siel\Acumulus\Config;
 
@@ -101,13 +112,24 @@ class ConfigUpgrade
      *   method of Config.
      *
      * @param string $currentVersion
-     *   The current version of the config.
+     *   The current version of the config. Has already been confirmed to be
+     *   less than the current version.
      *
      * @return bool
      *   Success.
      */
     public function applyUpgrades(string $currentVersion): bool
     {
+        // Let's start with a Requirements check and fail if not all are met.
+        $requirements = $this->getContainer()->getRequirements();
+        $messages = $requirements->check();
+        foreach ($messages as $message) {
+            $this->getLog()->error("Requirement check failed: $message");
+        }
+        if (!empty($messages)) {
+            throw new RuntimeException('Requirement check failed: ' . implode('; ', $messages));
+        }
+
         $result = true;
 
         if (version_compare($currentVersion, '4.5.0', '<')) {
@@ -325,7 +347,6 @@ class ConfigUpgrade
         // ConfigStore::save should store all settings in 1 serialized value.
         $configStore = $this->getConfigStore();
         if (method_exists($configStore, 'loadOld')) {
-            /** @noinspection PhpDeprecationInspection */
             $values = $configStore->loadOld($this->getConfig()->getKeys());
             $result = $this->getConfig()->save($values);
         }
@@ -407,15 +428,6 @@ class ConfigUpgrade
      */
     protected function upgrade600(): bool
     {
-        $requirements = $this->getContainer()->getRequirements();
-        $messages = $requirements->check();
-        foreach ($messages as $message) {
-            $this->getLog()->error($message);
-        }
-        if (!empty($messages)) {
-            throw new RuntimeException(implode(';', $messages));
-        }
-
         $configStore = $this->getConfigStore();
         $values = $configStore->load();
         $newSettings = [];

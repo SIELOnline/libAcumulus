@@ -1,10 +1,14 @@
 <?php
 /**
- * Note: Do not use PHP7 language constructs as long as we want the Requirements
- * class to check for that and present and log a proper warning.
+ * Note: Do not use PHP7 language constructs in the {@see Container} class as
+ * long as we want the {@see Requirements} class to check for that, initiated by
+ * the {@see \Siel\Acumulus\Config\ConfigUpgrade} class, and present and
+ * {@see Log} proper warnings.
  *
  * @noinspection PhpMissingParamTypeInspection
  * @noinspection PhpMissingReturnTypeInspection
+ * @noinspection PhpMissingFieldTypeInspection
+ * @noinspection PhpMissingVisibilityInspection
  */
 
 namespace Siel\Acumulus\Helpers;

@@ -82,8 +82,6 @@ abstract class ShopCapabilities
      * 'desc_tokens' in siel/acumulus/src/Shop/ConfigFormTranslations.php for
      * more info about the possible options to define combinations or a
      * selection of various tokens.
-     *
-     * @return array
      */
     abstract public function getShopDefaults(): array;
 
@@ -122,7 +120,7 @@ abstract class ShopCapabilities
      * class is defined, file may also be defined.
      *
      * @return array[]
-     *   An array of token infos keyed by the "property source" name.
+     *   A multi-level array of token infos keyed by the "property source" name.
      */
     public function getTokenInfo(): array
     {
@@ -195,12 +193,12 @@ abstract class ShopCapabilities
     }
 
     /**
-     * Returns shop specific token info for the 'order' property.
+     * Returns shop specific token info for the 'refundedOrder' property.
      *
      * Override if your shop supports refunds.
      *
      * @return array
-     *   An array with shop specific token info for the 'order' property.
+     *   An array with token info for the 'refundedOrder' property.
      */
     protected function getTokenInfoOrder(): array
     {
@@ -208,10 +206,16 @@ abstract class ShopCapabilities
     }
 
     /**
-     * Returns token info for shop specific properties.
+     * Returns token info for any additional properties.
+     *
+     * Think of properties like:
+     * - Billing or sending address
+     * - Customer
+     * - Order item or line
+     * - Product
      *
      * @return array
-     *   An array with token info for shop specific properties.
+     *   An array with token info for additional properties.
      */
     abstract protected function getTokenInfoShopProperties(): array;
 
@@ -391,6 +395,9 @@ abstract class ShopCapabilities
     /**
      * Returns whether our module for this shop (already) implements the
      * InvoiceStatus screen.
+     *
+     * At this moment all shops implements this screen, so this method returns
+     * true and is not overridden.
      *
      * @return bool
      */

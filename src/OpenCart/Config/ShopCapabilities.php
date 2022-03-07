@@ -270,8 +270,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      *
-     * This default implementation returns order and credit note. Override if
-     * the specific shop supports other types or does not support credit notes.
+     * This override unsets CreditNote as it does not support credit notes.
      */
     public function getSupportedInvoiceSourceTypes(): array
     {

@@ -19,9 +19,6 @@ use const Siel\Acumulus\Version;
  *
  * Configuration is stored in the host environment bridged via the ConfigStore
  * class.
- *
- * This class also provides an {@see Config::update()) method to update the
- * stored config values when changes in these are made between versions.
  */
 class Config
 {

@@ -1,8 +1,9 @@
 <?php
 /**
  * Note: As long as we want to check for a minimal PHP version via the
- * Requirements checking process provided by the classes below, we should not
- * use PHP7 language constructs in the following classes:
+ * Requirements checking process provided by the classes below, and we want to
+ * properly log and inform the user, we should not use PHP7 language constructs
+ * in the following classes (and its child classes):
  * - {@see Container}: creates instances of the below classes.
  * - {@see Requirements}: executes the checks.
  * - {@see \Siel\Acumulus\Config\ConfigUpgrade}: initiates the check.

@@ -8,9 +8,6 @@ use Siel\Acumulus\Helpers\FormRenderer as BaseFormRenderer;
  */
 class FormRenderer extends BaseFormRenderer
 {
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         // Default OpenCart template seems to use html 5.

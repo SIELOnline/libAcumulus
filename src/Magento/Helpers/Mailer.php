@@ -1,7 +1,7 @@
 <?php
 namespace Siel\Acumulus\Magento\Helpers;
 
-use Magento\Backend\App\ConfigInterface;
+use Magento\Backend\App\ConfigInterface as MagentoAppConfigInterface;
 use Siel\Acumulus\Helpers\Mailer as BaseMailer;
 use Zend_Mail;
 use Zend_Mail_Transport_Exception;
@@ -14,15 +14,21 @@ class Mailer extends BaseMailer
 
     /**
      * {@inheritdoc}
-     *
-     * @throws \Zend_Mail_Exception
      */
-    public function sendMail(string $from, string $fromName, $to, $subject, $bodyText, $bodyHtml)
-    {
+    public function sendMail(
+        string $from,
+        string $fromName,
+        string $to,
+        string $subject,
+        string $bodyText,
+        string $bodyHtml
+    ) {
         try {
             $email = new Zend_Mail('utf-8');
+            /** @noinspection PhpUnhandledExceptionInspection */
             $email->setFrom($from, $fromName);
             $email->addTo($to);
+            /** @noinspection PhpUnhandledExceptionInspection */
             $email->setSubject($subject);
             $email->setBodyText($bodyText);
             $email->setBodyHtml($bodyHtml);
@@ -34,9 +40,9 @@ class Mailer extends BaseMailer
         }
     }
 
-    protected function getConfig(): ConfigInterface
+    protected function getConfig(): MagentoAppConfigInterface
     {
-        return Registry::getInstance()->get(ConfigInterface::class);
+        return Registry::getInstance()->get(MagentoAppConfigInterface::class);
     }
 
     /**

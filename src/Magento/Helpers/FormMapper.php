@@ -285,17 +285,11 @@ class FormMapper extends BaseFormMapper
                 break;
         }
 
-        // Handle
         return $config;
     }
 
     /**
      * Converts a list of Acumulus field options to a list of Magento options.
-     *
-     * @param array $options
-     *
-     * @return array
-     *   A list of Magento form element options.
      */
     protected function getMagentoOptions(array $options): array
     {
@@ -315,11 +309,6 @@ class FormMapper extends BaseFormMapper
      * These classes are typically used to:
      * - Add styling from the admin theme.
      * - Add behavior.
-     *
-     * @param array $config
-     * @param array $field
-     *
-     * @return array
      */
     protected function addMagentoAdminClasses(array $config, array $field): array
     {

@@ -14,8 +14,14 @@ class Mailer extends BaseMailer
     /**
      * {@inheritdoc}
      */
-    public function sendMail(string $from, string $fromName, $to, $subject, $bodyText, $bodyHtml): bool
-    {
+    public function sendMail(
+        string $from,
+        string $fromName,
+        string $to,
+        string $subject,
+        string $bodyText,
+        string $bodyHtml
+    ): bool {
         $mailer = JFactory::getMailer();
         $mailer->isHtml(true);
         $mailer->setSender([$from, $fromName]);

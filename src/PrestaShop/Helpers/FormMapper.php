@@ -13,8 +13,10 @@ class FormMapper extends BaseFormMapper
      * Maps a set of field definitions.
      *
      * @param Form $form
+     *   The Acumulus form definition to map.
      *
      * @return array[]
+     *   The PrestaShop form definition for the given Acumulus form.
      */
     public function map(Form $form): array
     {
@@ -25,8 +27,11 @@ class FormMapper extends BaseFormMapper
      * Maps a set of field definitions.
      *
      * @param array[] $fields
+     *   A set of Acumulus form fields.
      *
      * @return array[]
+     *   The set of PrestaShop field definitions for the given Acumulus form
+     *   fields.
      */
     protected function fields(array $fields): array
     {
@@ -47,9 +52,10 @@ class FormMapper extends BaseFormMapper
      * Maps a single field definition, possibly a fieldset.
      *
      * @param array $field
-     *   Field(set) definition.
+     *   An Acumulus form field.
      *
      * @return array
+     *   The PrestaShop field definition for the given Acumulus form field.
      */
     protected function field(array $field): array
     {
@@ -62,11 +68,13 @@ class FormMapper extends BaseFormMapper
     }
 
     /**
-     * Returns a mapped fieldset.
+     * Maps a fieldset.
      *
      * @param array $field
+     *   An Acumulus form fieldset.
      *
-     * @return array[]
+     * @return array
+     *   The PrestaShop field definition for the given Acumulus fieldset.
      */
     protected function fieldset(array $field): array
     {
@@ -93,7 +101,13 @@ class FormMapper extends BaseFormMapper
     }
 
     /**
-     * Returns a mapped simple element.
+     * Maps a simple element.
+     *
+     * @param array $field
+     *   An Acumulus form field.
+     *
+     * @return array
+     *   The PrestaShop field definition for the given Acumulus form field.
      */
     protected function element(array $field): array
     {
@@ -127,7 +141,7 @@ class FormMapper extends BaseFormMapper
     }
 
     /**
-     * Returns the PrestaShop form element type for the given Acumulus type string.
+     * Returns the PrestaShop form element type for the given Acumulus type.
      */
     protected function getPrestaShopType(string $type): string
     {

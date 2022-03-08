@@ -1,8 +1,14 @@
 <?php
 /**
+ * Note: we should not use PHP7 language constructs in this class. See e.g.
+ * {@see \Siel\Acumulus\Helpers\Log} for more information.
+ *
+ * The PHP7 language constructs we suppress the warnings for:
+ *
  * @noinspection PhpMissingParamTypeInspection
  * @noinspection PhpMissingReturnTypeInspection
- * @noinspection PhpIssetCanBeReplacedWithCoalesceInspection
+ * @noinspection PhpMissingFieldTypeInspection
+ * @noinspection PhpMissingVisibilityInspection
  * @noinspection PhpConcatenationWithEmptyStringCanBeInlinedInspection
  */
 
@@ -19,12 +25,12 @@ use stdClass;
 use const Siel\Acumulus\Version;
 
 /**
- * OcHelper contains functionality shared between the OC1, OC2 and OC3
- * controllers and models, for both admin and catalog.
+ * Class OcHelper contains functionality shared between the controllers and
+ * models of the different OC versions, for both admin and catalog.
  *
- * NOTE: To let this class check the (PHP version) requirements on installing
- *  or upgrading, this file itself should not contain PHP 7 language constructs,
- *  nor should Container, Requirements or Log!
+ * However, even if at this moment we are only supporting 1 OC version, we keep
+ * this functionality in the library to keep the code in the weird OC structure
+ * to a minimum.
  */
 class OcHelper
 {
@@ -599,14 +605,10 @@ class OcHelper
         /** @noinspection PhpUnhandledExceptionInspection */
         $this->registry->load->model('setting/setting');
         $setting = $this->registry->model_setting_setting->getSetting('acumulus_siel');
-        if (isset($setting['acumulus_siel_datamodel_version'])) {
-            $currentDataModelVersion = $setting['acumulus_siel_datamodel_version'];
-        } else {
-            // We must be coming from a version before the introduction of
-            // 'acumulus_siel_datamodel_version', no idea when that was, but
-            // let's say we pick every update as of version 4.0:
-            $currentDataModelVersion = '4.0.0-beta1';
-        }
+        // if  'acumulus_siel_datamodel_version' is not set, we must be coming
+        // from a version before it was introduced. I have no idea when that
+        // was, but let's say we pick every update as of version 4.0:
+        $currentDataModelVersion = $setting['acumulus_siel_datamodel_version'] ?? '4.0.0-beta1';
 
         // Update or even install table.
         if ($currentDataModelVersion === '' || version_compare($currentDataModelVersion, '4.0', '<')) {

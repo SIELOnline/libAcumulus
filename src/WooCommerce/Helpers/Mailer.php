@@ -11,8 +11,14 @@ class Mailer extends BaseMailer
     /**
      * {@inheritdoc}
      */
-    public function sendMail(string $from, string $fromName, $to, $subject, $bodyText, $bodyHtml)
-    {
+    public function sendMail(
+        string $from,
+        string $fromName,
+        string $to,
+        string $subject,
+        string $bodyText,
+        string $bodyHtml
+    ) {
         $headers = [
             "from: $fromName <$from>",
             'Content-Type: text/html; charset=UTF-8',

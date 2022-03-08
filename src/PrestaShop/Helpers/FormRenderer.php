@@ -13,7 +13,6 @@ class FormRenderer extends BaseFormRenderer
      */
     public function __construct()
     {
-        // Default OpenCart template seems to use html 5.
         $this->fieldsetWrapperTag = 'div';
         $this->fieldsetWrapperClass = 'panel';
         $this->legendWrapperTag = 'div';

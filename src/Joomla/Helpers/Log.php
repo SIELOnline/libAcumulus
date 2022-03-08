@@ -1,4 +1,15 @@
 <?php
+/**
+ * Note: we should not use PHP7 language constructs in this child class. See its
+ * parent for more information.
+ *
+ * The PHP7 language constructs we suppress the warnings for:
+ * @noinspection PhpMissingParamTypeInspection
+ * @noinspection PhpMissingReturnTypeInspection
+ * @noinspection PhpMissingFieldTypeInspection
+ * @noinspection PhpMissingVisibilityInspection
+ */
+
 namespace Siel\Acumulus\Joomla\Helpers;
 
 use JLog;
@@ -43,7 +54,7 @@ class Log extends BaseLog
      * @return int
      *   the Joomla equivalent of the severity.
      */
-    protected function getJoomlaSeverity(int $severity): int
+    protected function getJoomlaSeverity($severity)
     {
         switch ($severity) {
             case Severity::Error:

@@ -1,4 +1,15 @@
 <?php
+/**
+ * Note: we should not use PHP7 language constructs in this child class. See its
+ * parent for more information.
+ *
+ * The PHP7 language constructs we suppress the warnings for:
+ * @noinspection PhpMissingParamTypeInspection
+ * @noinspection PhpMissingReturnTypeInspection
+ * @noinspection PhpMissingFieldTypeInspection
+ * @noinspection PhpMissingVisibilityInspection
+ */
+
 namespace Siel\Acumulus\OpenCart\Helpers;
 
 use Siel\Acumulus\Helpers\Log as BaseLog;

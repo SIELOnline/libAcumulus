@@ -58,7 +58,14 @@ abstract class Mailer
      * @return mixed
      *   Success (true); error message, error object or just false otherwise.
      */
-    abstract public function sendMail(string $from, string $fromName, string $to, string $subject, string $bodyText, string $bodyHtml);
+    abstract public function sendMail(
+        string $from,
+        string $fromName,
+        string $to,
+        string $subject,
+        string $bodyText,
+        string $bodyHtml
+    );
 
     /**
      * Sends an email with the results of sending an invoice to Acumulus.

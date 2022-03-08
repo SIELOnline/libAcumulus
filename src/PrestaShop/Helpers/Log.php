@@ -1,4 +1,15 @@
 <?php
+/**
+ * Note: we should not use PHP7 language constructs in this child class. See its
+ * parent for more information.
+ *
+ * The PHP7 language constructs we suppress the warnings for:
+ * @noinspection PhpMissingParamTypeInspection
+ * @noinspection PhpMissingReturnTypeInspection
+ * @noinspection PhpMissingFieldTypeInspection
+ * @noinspection PhpMissingVisibilityInspection
+ */
+
 namespace Siel\Acumulus\PrestaShop\Helpers;
 
 use AbstractLogger;
@@ -34,7 +45,7 @@ class Log extends BaseLog
      * @return int
      *   The PrestaShop equivalent of the severity.
      */
-    protected function getPrestaShopSeverity(int $severity): int
+    protected function getPrestaShopSeverity($severity)
     {
         switch ($severity) {
             case Severity::Error:

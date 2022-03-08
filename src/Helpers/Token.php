@@ -323,7 +323,7 @@ class Token
      *   empty string). The return value may be a scalar (numeric type) that can
      *   be converted to a string.
      */
-    protected function getObjectProperty(object $variable, string $property, array $args): ?string
+    protected function getObjectProperty($variable, string $property, array $args): ?string
     {
         $value = null;
         $method1 = $property;

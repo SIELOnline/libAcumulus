@@ -13,8 +13,14 @@ class Mailer extends BaseMailer
     /**
      * {@inheritdoc}
      */
-    public function sendMail(string $from, string $fromName, $to, $subject, $bodyText, $bodyHtml)
-    {
+    public function sendMail(
+        string $from,
+        string $fromName,
+        string $to,
+        string $subject,
+        string $bodyText,
+        string $bodyHtml
+    ) {
         $result = true;
         try {
             $config = Registry::getInstance()->config;
@@ -50,7 +56,7 @@ class Mailer extends BaseMailer
     /**
      * {@inheritdoc}
      */
-    protected function getFrom()
+    protected function getFrom(): string
     {
         $config = Registry::getInstance()->config;
         return $config->get('config_email');

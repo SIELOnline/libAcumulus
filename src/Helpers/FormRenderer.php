@@ -1,13 +1,14 @@
 <?php
-/** @noinspection PhpUnused Many properties are used via property name
- *    construction.
+/**
+ * @noinspection PhpUnused : Many properties are used via property name
+ *   construction.
  */
 
 namespace Siel\Acumulus\Helpers;
 
 /**
  * Provides form element rendering functionality. This basic implementation
- * renders the elements as wrapped html input elements. To comply with shop
+ * renders the elements as wrapped HTML input elements. To comply with shop
  * specific styling, it is supposed to be overridden per shop that uses this
  * way of rendering. For now those are: HikaShop/VirtueMart (Joomla), OpenCart,
  * and WooCommerce (WordPress).
@@ -19,15 +20,16 @@ namespace Siel\Acumulus\Helpers;
  * - The exceptions being:
  *     * A label prefix and postfix that come from code and may contain html.
  *       See {@see FormRenderer::renderLabel()}.
- *     * Label text if indicated as containing html by a label attribute 'html'
+ *     * Label text if indicated as containing HTML by a label attribute 'html'
  *       (which comes from code).
- *     * markup is rendered as is, as it may contain html (therefore its name
+ *     * markup is rendered as is, as it may contain HTML (therefore its name
  *       markup ...). See {@see FormRenderer::markup()};
  * - All tags come from object properties or are hard coded and thus present no
- *   security risk but they are passed through htmlspecialchars() anyway. See
- *   {@see FormRenderer::getOpenTag()} and {@see FormRenderer::getCloseTag()}.
- * - All attributes, name and value are passed through htmlpecialchars(). See
- *   {@see FormRenderer::renderAttributes()}.
+ *   security risk, but they are passed through {@see htmlspecialchars()}
+ *   anyway. See {@see FormRenderer::getOpenTag()} and
+ *   {@see FormRenderer::getCloseTag()}.
+ * - All attributes, name and value are passed through {@see htmlpecialchars()}.
+ *   See {@see FormRenderer::renderAttributes()}.
  */
 class FormRenderer
 {
@@ -175,15 +177,11 @@ class FormRenderer
 
     /**
      * Sets the value of a property of this object.
-     *
      * The property must exist as property
-     *
-     * @param string $property
-     * @param mixed $value
      *
      * @return $this
      */
-    public function setProperty($property, $value)
+    public function setProperty(string $property, $value): FormRenderer
     {
         if (property_exists($this, $property) && $property !== 'form') {
             $this->$property = $value;
@@ -194,11 +192,10 @@ class FormRenderer
     /**
      * Renders the form.
      *
-     * @param \Siel\Acumulus\Helpers\Form $form
-     *
      * @return string
+     *   The HTML for the form.
      */
-    public function render(Form $form)
+    public function render(Form $form): string
     {
         $this->htmlSpecialCharsFlag = ENT_NOQUOTES;
         if (defined('ENT_HTML5')) {
@@ -211,12 +208,8 @@ class FormRenderer
 
     /**
      * Renders a set of field definitions.
-     *
-     * @param array[] $fields
-     *
-     * @return string
      */
-    protected function renderFields(array $fields)
+    protected function renderFields(array $fields): string
     {
         $output = '';
         foreach ($fields as $id => $field) {
@@ -239,13 +232,10 @@ class FormRenderer
      * Renders 1 field definition (which may be a fieldset with multiple fields).
      *
      * @param array $field
-     *   Array with the form field definition. the keys id, name, and attributes
-     *   are expected to be set.
-     *
-     * @return string
-     *   The rendered form field.
+     *   Array with the form field definition. the keys 'id', 'name', and
+     *  'attributes' are expected to be set.
      */
-    protected function renderField(array $field)
+    protected function renderField(array $field): string
     {
         $output = '';
         $output .= isset($field['fields']) ? $this->renderFieldset($field) : $this->renderSimpleField($field);
@@ -253,14 +243,9 @@ class FormRenderer
     }
 
     /**
-     * Renders a fieldset or details form element.
-     *
-     * @param array $field
-     *
-     * @return string
-     *   The rendered fieldset or details form element.
+     * Renders a <fieldset> or <details> form element.
      */
-    protected function renderFieldset(array $field)
+    protected function renderFieldset(array $field): string
     {
         $output = '';
         $output .= $this->fieldsetBegin($field);
@@ -272,11 +257,13 @@ class FormRenderer
     /**
      * Outputs the beginning of a fieldset.
      *
-     * @param array $field
-     *
-     * @return string
+     * The beginning constitutes:
+     * - The <fieldset> or <details> tag.
+     * - The <legend> or <summary> tag.
+     * - A wrapper tag for the fieldset contents.
+     * - The description for the fieldset.
      */
-    protected function fieldsetBegin(array $field)
+    protected function fieldsetBegin(array $field): string
     {
         $output = '';
         $output .= $this->getWrapper($field['type'], $field['attributes']);
@@ -296,11 +283,11 @@ class FormRenderer
     /**
      * Outputs the end of a fieldset.
      *
-     * @param array $field
-     *
-     * @return string
+     * The end constitutes:
+     * - A wrapper closing tag for the fieldset contents.
+     * - The </fieldset> or </details> tag.
      */
-    protected function fieldsetEnd(array $field)
+    protected function fieldsetEnd(array $field): string
     {
         $output = '';
         $output .= $this->getWrapperEnd('fieldsetContent');
@@ -310,13 +297,8 @@ class FormRenderer
 
     /**
      * Renders a form field including its label and description.
-     *
-     * @param array $field
-     *
-     * @return string
-     *   Html for this form field.
      */
-    protected function renderSimpleField(array $field)
+    protected function renderSimpleField(array $field): string
     {
         $output = '';
 
@@ -351,13 +333,8 @@ class FormRenderer
 
     /**
      * Renders a form field itself, ie without label and description.
-     *
-     * @param $field
-     *
-     * @return string
-     *   The html for the form element.
      */
-    protected function renderElement($field)
+    protected function renderElement($field): string
     {
         $type = $field['type'];
         switch ($type) {
@@ -374,14 +351,8 @@ class FormRenderer
 
     /**
      * Renders a descriptive help text.
-     *
-     * @param string $text
-     * @param bool $isFieldset
-     *
-     * @return string
-     *   The rendered description.
      */
-    protected function renderDescription($text, $isFieldset = false)
+    protected function renderDescription(string $text, bool $isFieldset = false): string
     {
         $output = '';
 
@@ -401,7 +372,7 @@ class FormRenderer
      * Renders a label.
      *
      * @param string $text
-     *   The label text.
+     *   The text for the label.
      * @param string $id
      *   The value of the for attribute. If the empty string, not a label tag
      *   but a span with a class="label" will be rendered.
@@ -422,8 +393,14 @@ class FormRenderer
      * @return string The rendered label.
      *   The rendered label.
      */
-    protected function renderLabel($text, $id, array $attributes, $wrapLabel, $prefix = '', $postfix = '')
-    {
+    protected function renderLabel(
+        string $text,
+        string $id,
+        array $attributes,
+        bool $wrapLabel,
+        string $prefix = '',
+        string $postfix = ''
+    ): string {
         $output = '';
 
         if ($this->renderEmptyLabel || !empty($text)) {
@@ -464,13 +441,8 @@ class FormRenderer
 
     /**
      * Renders an input field.
-     *
-     * @param array $field
-     *
-     * @return string
-     *   The rendered input field.
      */
-    protected function input(array $field)
+    protected function input(array $field): string
     {
         $output = '';
 
@@ -496,13 +468,8 @@ class FormRenderer
 
     /**
      * Renders a textarea field.
-     *
-     * @param $field
-     *
-     * @return string
-     *   The rendered textarea field.
      */
-    protected function textarea(array $field)
+    protected function textarea(array $field): string
     {
         $output = '';
 
@@ -523,13 +490,8 @@ class FormRenderer
 
     /**
      * Renders a markup (free format output) element.
-     *
-     * @param array $field
-     *
-     * @return string
-     *   The rendered markup.
      */
-    protected function markup(array $field)
+    protected function markup(array $field): string
     {
         $attributes = $field['attributes'];
         $attributes = $this->addAttribute($attributes, 'id', $field['id']);
@@ -543,13 +505,8 @@ class FormRenderer
 
     /**
      * Renders a select element.
-     *
-     * @param array $field
-     *
-     * @return string
-     *   The rendered select element.
      */
-    protected function select(array $field)
+    protected function select(array $field): string
     {
         $output = '';
 
@@ -583,13 +540,8 @@ class FormRenderer
 
     /**
      * Renders a list of radio buttons.
-     *
-     * @param array $field
-     *
-     * @return string
-     *   The rendered radio buttons.
      */
-    protected function radio(array $field)
+    protected function radio(array $field): string
     {
         $output = '';
 
@@ -631,13 +583,8 @@ class FormRenderer
 
     /**
      * Renders a list of checkboxes.
-     *
-     * @param array $field
-     *
-     * @return string
-     *   The rendered checkboxes.
      */
-    protected function checkbox(array $field)
+    protected function checkbox(array $field): string
     {
         $output = '';
 
@@ -674,13 +621,8 @@ class FormRenderer
 
     /**
      * Returns the open tag for a wrapper element.
-     *
-     * @param string $type
-     * @param array $attributes
-     *
-     * @return string
      */
-    protected function getWrapper($type, array $attributes = [])
+    protected function getWrapper(string $type, array $attributes = []): string
     {
         $tag = "{$type}WrapperTag";
         $class = "{$type}WrapperClass";
@@ -696,12 +638,8 @@ class FormRenderer
 
     /**
      * Returns the closing tag for a wrapper element.
-     *
-     * @param string $type
-     *
-     * @return string
      */
-    protected function getWrapperEnd($type)
+    protected function getWrapperEnd(string $type): string
     {
         $tag = "{$type}WrapperTag";
         $output = '';
@@ -712,26 +650,26 @@ class FormRenderer
     }
 
     /**
-     * Returns a secured html open tag string.
+     * Returns a secure HTML open tag string.
      *
      * @param string $tag
      *   The html tag.
      * @param array $attributes
      *   The attributes to render.
      * @param bool $selfClosing
-     *   Whether the tag is self closing. Only in html4 this will add a /
+     *   Whether the tag is self-closing. Only in HTML4 this will add a /
      *   character before the closing > character.
      *
      * @return string
      *   The rendered open tag.
      */
-    protected function getOpenTag($tag, array $attributes = [], $selfClosing = false)
+    protected function getOpenTag(string $tag, array $attributes = [], bool $selfClosing = false): string
     {
         return '<' . htmlspecialchars($tag, ENT_QUOTES, 'ISO-8859-1') . $this->renderAttributes($attributes) . ($selfClosing && !$this->html5 ? '/' : '') . '>';
     }
 
     /**
-     * Returns a secured html close tag string.
+     * Returns a secure HTML close tag string.
      *
      * @param string $tag
      *   The html tag.
@@ -739,7 +677,7 @@ class FormRenderer
      * @return string
      *   The rendered closing tag.
      */
-    protected function getCloseTag($tag)
+    protected function getCloseTag(string $tag): string
     {
         return '</' . htmlspecialchars($tag, ENT_QUOTES, 'ISO-8859-1') .'>';
     }
@@ -752,7 +690,7 @@ class FormRenderer
      * @return string
      *   html string with the rendered attributes and 1 space in front of it.
      */
-    protected function renderAttributes(array $attributes)
+    protected function renderAttributes(array $attributes): string
     {
         $attributeString = '';
         foreach ($attributes as $key => $value) {
@@ -777,7 +715,6 @@ class FormRenderer
 
     /**
      * Adds (or overwrites) an attribute.
-     *
      * If the attribute already exists and $multiple is false, the existing
      * value will be overwritten. If it is true, or null while $attribute is
      * 'class', it will be added.
@@ -789,13 +726,13 @@ class FormRenderer
      * @param string|string[] $value
      *   The value(s) of the attribute to add or set.
      * @param bool|null $multiple
-     *   Allow multiple values for the given attribute. By default (null) this
+     *   Allow multiple values for the given attribute. By default, (null) this
      *   is only allowed for the class attribute.
      *
      * @return array
      *   The set of attributes with the value added.
      */
-    protected function addAttribute(array $attributes, $attribute, $value, $multiple = null)
+    protected function addAttribute(array $attributes, string $attribute, $value, ?bool $multiple = null): array
     {
         // Do add false and 0, but not an empty string, empty array or null.
         if ($value !== null && $value !== '' && $value !== []) {
@@ -824,13 +761,8 @@ class FormRenderer
 
     /**
      * Adds a set of attributes specific for a label.
-     *
-     * @param array $attributes
-     * @param string $id
-     *
-     * @return array
      */
-    protected function addLabelAttributes(array $attributes, $id)
+    protected function addLabelAttributes(array $attributes, string $id): array
     {
         $attributes = $this->addAttribute($attributes, 'for', $id);
         if (!empty($id)) {
@@ -843,18 +775,15 @@ class FormRenderer
 
     /**
      * Returns a set of attributes for a single checkbox.
-     *
-     * @param string $id
-     * @param string $name
-     * @param string $value
-     *
-     * @return array
      */
-    protected function getCheckboxAttributes(/** @noinspection PhpUnusedParameterInspection */$id, $name, $value)
-    {
+    protected function getCheckboxAttributes(
+        /** @noinspection PhpUnusedParameterInspection */ string $id,
+        string $name,
+        string $value
+    ): array {
         return [
             'type' => 'checkbox',
-            'id' => "{$name}_{$value}",
+            'id' => "{$name}_$value",
             'name' => $value,
             'value' => 1,
         ];
@@ -862,18 +791,12 @@ class FormRenderer
 
     /**
      * Returns a set of attributes for a single radio button.
-     *
-     * @param string $id
-     * @param string $name
-     * @param string $value
-     *
-     * @return array
      */
-    protected function getRadioAttributes($id, $name, $value)
+    protected function getRadioAttributes(string $id, string $name, string $value): array
     {
         return [
             'type' => 'radio',
-            'id' => "{$id}_{$value}",
+            'id' => "{$id}_$value",
             'name' => $name,
             'value' => $value,
         ];
@@ -890,7 +813,7 @@ class FormRenderer
      * @return bool
      *   If this option is part of the selected values.
      */
-    protected function isOptionSelected($selectedValues, $option)
+    protected function isOptionSelected($selectedValues, $option): bool
     {
         return is_array($selectedValues) ? in_array((string) $option, $selectedValues,false) : (string) $option === (string) $selectedValues;
     }

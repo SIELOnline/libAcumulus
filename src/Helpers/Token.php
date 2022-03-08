@@ -16,12 +16,12 @@ use Exception;
  * A property specification in its simplest form is just a property name, but to
  * cater for some special cases it can be made more complex. See the syntax
  * definition below:
- * - `token = '[' property-specification ']'`
- * - `property-specification = property-alternative('|'property-alternative)?`
- * - `property-alternative = space-separated-property('+'space-separated-property)?`
- * - `space-separated-property = full-property-name('&'full-property-name)?`
- * - `full-property-name = (variable-name'::)?property-name|literal-text`
- * - `literal-text = "text"`
+ * - token = '[' property-specification ']'
+ * - property-specification = property-alternative('|'property-alternative)?
+ * - property-alternative = space-separated-property('+'space-separated-property)?
+ * - space-separated-property = full-property-name('&'full-property-name)?
+ * - full-property-name' = ('variable-name'::)?property-name|literal-text
+ * - literal-text = "text"
  *
  * Alternatives are expanded left to right until a property alternative is found
  * that is not empty.
@@ -29,7 +29,7 @@ use Exception;
  * Example 1:
  * <pre>
  *   $propertySpec = sku|ean|isbn; sku = empty; ean = 'Hello'; isbn = 'World';
- *   Result: 'Hello"
+ *   Result: 'Hello'
  * </pre>
  *
  * Properties that are joined with a + in between them, are all expanded, where
@@ -56,7 +56,7 @@ use Exception;
  * </pre>
  *
  * A full property name may contain the variable name (followed by :: to
- * distinguish it from the property name itself) to allow to specify which
+ * distinguish it from the property name itself) to allow specifying which
  * object/variable should be taken when the property appears in multiple
  * objects/variables.
  *
@@ -64,7 +64,7 @@ use Exception;
  * <pre>
  *   variables = [
  *     'order => Order(id = 3, date_created = 2016-02-03, ...),
- *     'customer' => Customer(id = 5, , date_created = 2016-01-01, name = 'Doe', ...),
+ *     'customer' => Customer(id = 5, date_created = 2016-01-01, name = 'Doe', ...),
  *    ];
  *   pattern = '[id] [customer::date_created] [name]'
  *   result = '3 2016-01-01 Doe'
@@ -99,11 +99,6 @@ class Token
     /** @var \Siel\Acumulus\Helpers\Log */
     protected $log;
 
-    /**
-     * Constructor
-     *
-     * @param \Siel\Acumulus\Helpers\Log $log
-     */
     public function __construct(Log $log)
     {
         $this->log = $log;
@@ -111,7 +106,6 @@ class Token
 
     /**
      * Expands a string that can contain token patterns.
-     *
      * Tokens are found using a regular expression. Each token found is expanded
      * by searching the provided variables for a property with the token name.
      *
@@ -126,7 +120,7 @@ class Token
      *   The pattern with tokens expanded with their actual value. The return
      *   value may be a scalar (numeric type) that can be converted to a string.
      */
-    public function expand($pattern, array $variables)
+    public function expand(string $pattern, array $variables): string
     {
         $this->variables = $variables;
         return preg_replace_callback('/\[([^]]+)]/', [$this, 'tokenMatch'], $pattern);
@@ -134,7 +128,6 @@ class Token
 
     /**
      * Callback for preg_replace_callback in Creator::getTokenizedValue().
-     *
      * This callback tries to expand the token found in $matches[1].
      *
      * @param array $matches
@@ -145,7 +138,7 @@ class Token
      *   The expanded value for this token. The return value may be a scalar
      *   (numeric type) that can be converted to a string.
      */
-    protected function tokenMatch($matches)
+    protected function tokenMatch(array $matches): string
     {
         return $this->searchPropertySpec($matches[1]);
     }
@@ -161,7 +154,7 @@ class Token
      *   return value may be a scalar (numeric type) that can be converted to
      *   a string.
      */
-    protected function searchPropertySpec($propertySpec)
+    protected function searchPropertySpec(string $propertySpec): string
     {
         $value = null;
         $propertyAlternatives = explode('|', $propertySpec);
@@ -207,11 +200,10 @@ class Token
      *
      * @return null|string
      *   The value of the property, may be the empty string or null if the
-     *   property was not found (or really equals null or the empty string). The
-     *   return value may be a scalar (numeric type) that can be converted to a
-     *   string.
+     *   property was not found (or really equals null or the empty string).
+     *   The return value may be a scalar (numeric type) converted to a string.
      */
-    protected function searchProperty($property)
+    protected function searchProperty(string $property): ?string
     {
         $value = null;
         $fullPropertyName = explode('::', $property);
@@ -259,7 +251,7 @@ class Token
      *   empty string). The return value may be a scalar (numeric type) that can
      *   be converted to a string.
      */
-    protected function getProperty($variable, $property)
+    protected function getProperty($variable, string $property): ?string
     {
         $value = null;
 
@@ -298,7 +290,7 @@ class Token
                         if ($result !== '') {
                             $result .= ' ';
                         }
-                        $result .= (string) $item;
+                        $result .= $item;
                     }
                 }
                 $value = $result !== '' ? $result : null;
@@ -313,9 +305,8 @@ class Token
 
     /**
      * Looks up a property in a web shop specific object.
-     *
-     * This part is extracted into a separate method so it can be overridden
-     * with webshop specific ways to access properties. The base implementation
+     * This part is extracted into a separate method, so it can be overridden
+     * with web shop specific ways to access properties. The base implementation
      * will probably get the property anyway, so override mainly to prevent
      * notices or warnings.
      *
@@ -332,7 +323,7 @@ class Token
      *   empty string). The return value may be a scalar (numeric type) that can
      *   be converted to a string.
      */
-    protected function getObjectProperty($variable, $property, array $args)
+    protected function getObjectProperty(object $variable, string $property, array $args): ?string
     {
         $value = null;
         $method1 = $property;
@@ -375,7 +366,6 @@ class Token
 
     /**
      * Concatenates a list of values using a glue between them.
-     *
      * Literal strings are only used if they are followed by a non-empty
      * property value. A literal string at the end is only used if the result so
      * far is not empty.
@@ -388,7 +378,7 @@ class Token
      *   Returns a type-value pair containing as value a string representation
      *   of all the values with the glue string between each value.
      */
-    protected function implodeValues($glue, $values)
+    protected function implodeValues(string $glue, array $values): array
     {
         $result = '';
         $hasProperty = false;

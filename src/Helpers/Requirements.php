@@ -1,10 +1,17 @@
 <?php
 /**
- * Note: Do not use PHP7 language constructs in the {@see Container} class as
- * long as we want the {@see Requirements} class to check for that, initiated by
- * the {@see \Siel\Acumulus\Config\ConfigUpgrade} class, and present and
- * {@see Log} proper warnings.
+ * Note: As long as we want to check for a minimal PHP version via the
+ * Requirements checking process provided by the classes below, we should not
+ * use PHP7 language constructs in the following classes:
+ * - {@see Container}: creates instances of the below classes.
+ * - {@see Requirements}: executes the checks.
+ * - {@see \Siel\Acumulus\Config\ConfigUpgrade}: initiates the check.
+ * - {@see \Siel\Acumulus\Helpers\Severity}: part of a failed check.
+ * - {@see \Siel\Acumulus\Helpers\Message}: represents a failed check.
+ * - {@see \Siel\Acumulus\Helpers\MessageCollection}: represents failed checks.
+ * - {@see Log}: Logs failed checks.
  *
+ * The PHP7 language constructs we suppress the warnings for:
  * @noinspection PhpMissingParamTypeInspection
  * @noinspection PhpMissingReturnTypeInspection
  * @noinspection PhpMissingFieldTypeInspection
@@ -23,8 +30,7 @@ class Requirements
     /**
      * Checks if the requirements for the environment are met.
      *
-     * Note: we cannot use MessageCollection as we use php 5.6 specific features
-     * in its dependencies.
+     * @todo: switch to MessageCollection.
      *
      * @return string[]
      *   An array with messages regarding missing requirements, empty if all

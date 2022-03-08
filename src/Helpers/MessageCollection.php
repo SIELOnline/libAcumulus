@@ -1,20 +1,29 @@
 <?php
+/**
+ * Note: As long as we want to check for a minimal PHP version via the
+ * Requirements checking process provided by the classes below, we should not
+ * use PHP7 language constructs in the following classes:
+ * - {@see Container}: creates instances of the below classes.
+ * - {@see Requirements}: executes the checks.
+ * - {@see \Siel\Acumulus\Config\ConfigUpgrade}: initiates the check.
+ * - {@see \Siel\Acumulus\Helpers\Severity}: part of a failed check.
+ * - {@see \Siel\Acumulus\Helpers\Message}: represents a failed check.
+ * - {@see \Siel\Acumulus\Helpers\MessageCollection}: represents failed checks.
+ * - {@see Log}: Logs failed checks.
+ *
+ * The PHP7 language constructs we suppress the warnings for:
+ * @noinspection PhpMissingParamTypeInspection
+ * @noinspection PhpMissingReturnTypeInspection
+ * @noinspection PhpMissingFieldTypeInspection
+ * @noinspection PhpMissingVisibilityInspection
+ */
+
 namespace Siel\Acumulus\Helpers;
 
 use Exception;
 
 /**
- * Class MessageCollection wraps an Acumulus web service result into an object.
- *
- * A Result object will contain the:
- * - result status (internal code: one of the self::Status_... constants).
- * - exception, if one was thrown.
- * - any error messages, local and/or remote.
- * - any warnings, local and/or remote.
- * - any notices, local.
- * - message sent, for logging purposes.
- * - (raw) message received, for logging purposes.
- * - result array.
+ * Class MessageCollection contains a set of {@see Message}s.
  */
 class MessageCollection
 {
@@ -24,7 +33,7 @@ class MessageCollection
     protected $messages = [];
 
     /**
-     * Constructs and adds a Message to the collection.
+     * Constructs a {@see Message} and adds it to the collection.
      *
      * NOTE: This is an "overloaded" method. Parameter naming is based on the
      * case where all parameters are supplied.
@@ -90,13 +99,13 @@ class MessageCollection
      *   - An array of Message objects.
      *   - A (numerically indexed) array of Acumulus API messages.
      *   - A (numerically indexed) array of message strings
-     *   - An Acumulus API message array (with keys code, codetag and message).
-     *     This edge case is supported because of the json conversion of an API
-     *     call result might result in just 1 API message instead of an array
-     *     with 1 api message.
+     *   - An Acumulus API message array (with keys 'code', 'codetag' and
+     *     'message'). This edge case is supported because of the json
+     *     conversion of an API call result might result in just 1 API message
+     *     instead of an array with 1 api message.
      * @param int $severity
      *   - If $messages does not contain the severity for the individual
-     *     messages (i.e they are not Message objects) the severity is used for
+     *     messages (i.e. they are not Message objects) the severity is used for
      *     all messages.
      *   - If $messages are Message objects, Severity might indicate the maximum
      *     severity with which to add the messages. This can be used to merge
@@ -251,8 +260,8 @@ class MessageCollection
 
     /**
      * @param int $severity
-     *   A severity level to get the messages for. May be a bitwise combination
-     *   of multiple severities.
+     *   A severity level to get the messages for. This may be a bitwise
+     *   combination of multiple severities.
      *
      * @return \Siel\Acumulus\Helpers\Message[]
      */

@@ -1,10 +1,4 @@
 <?php
-/**
- * @noinspection PhpMissingReturnTypeInspection
- * @noinspection PhpMissingParamTypeInspection
- * @noinspection PhpMissingVisibilityInspection
- */
-
 namespace Siel\Acumulus\Helpers;
 
 use Exception;
@@ -17,9 +11,8 @@ use Siel\Acumulus\Tag;
  *
  * This abstract base class defines functionality to create a mail that
  * communicates the result of sending invoice data to Acumulus (method
- * Mailer::sendInvoiceAddMailResult). It must be overridden per webs hop to
- * define the bridge between this library and the web shop's specific mail
- * subsystem.
+ * Mailer::sendInvoiceAddMailResult). It must be overridden per web shop to
+ * define the bridge between this library and the web shop's mail subsystem.
  *
  * If you want to send other mails, just use the Mailer::sendMail() method.
  */
@@ -34,11 +27,6 @@ abstract class Mailer
     /** @var \Siel\Acumulus\Helpers\Log */
     protected $log;
 
-    /**
-     * @param \Siel\Acumulus\Config\Config $config
-     * @param Translator $translator
-     * @param \Siel\Acumulus\Helpers\Log $log
-     */
     public function __construct(Config $config, Translator $translator, Log $log)
     {
         $this->config = $config;
@@ -59,7 +47,7 @@ abstract class Mailer
      *   The translation for the given key or the key itself if no translation
      *   could be found.
      */
-    protected function t($key)
+    protected function t(string $key): string
     {
         return $this->translator->get($key);
     }
@@ -67,31 +55,16 @@ abstract class Mailer
     /**
      * Sends an email.
      *
-     * @param string $from
-     * @param string $fromName
-     * @param string $to
-     * @param string $subject
-     * @param string $bodyText
-     * @param string $bodyHtml
-     *
      * @return mixed
      *   Success (true); error message, error object or just false otherwise.
      */
-    abstract public function sendMail($from, $fromName, $to, $subject, $bodyText, $bodyHtml);
+    abstract public function sendMail(string $from, string $fromName, string $to, string $subject, string $bodyText, string $bodyHtml);
 
     /**
-     * Sends an email with the results of a sent invoice.
-     *
-     * The mail is sent to the shop administrator (emailonerror setting).
-     *
-     * @param \Siel\Acumulus\Invoice\Result $invoiceSendResult
-     * @param string $invoiceSourceType
-     * @param string $invoiceSourceReference
-     *
-     * @return bool
-     *   Success.
+     * Sends an email with the results of sending an invoice to Acumulus.
+     * The mail is sent to the shop administrator ('emailonerror' setting).
      */
-    public function sendInvoiceAddMailResult(Result $invoiceSendResult, $invoiceSourceType, $invoiceSourceReference)
+    public function sendInvoiceAddMailResult(Result $invoiceSendResult, string $invoiceSourceType, string $invoiceSourceReference): bool
     {
         $from = $this->getFrom();
         $fromName = $this->getFromName();
@@ -125,10 +98,8 @@ abstract class Mailer
      * Returns the mail from address.
      *
      * This base implementation returns 'webshop@<hostname>'.
-     *
-     * @return string
      */
-    protected function getFrom()
+    protected function getFrom(): string
     {
         $env = $this->config->getEnvironment();
         return 'webshop@' . $env['hostName'];
@@ -136,10 +107,8 @@ abstract class Mailer
 
     /**
      * Returns the mail from name.
-     *
-     * @return string
      */
-    protected function getFromName()
+    protected function getFromName(): string
     {
         return $this->t('mail_sender_name');
     }
@@ -147,12 +116,10 @@ abstract class Mailer
     /**
      * Returns the mail to address.
      *
-     * This base implementation returns the configured emailonerror address,
+     * This base implementation returns the configured 'emailonerror' address,
      * which normally is exactly what we want.
-     *
-     * @return string
      */
-    protected function getTo()
+    protected function getTo(): string
     {
         $credentials = $this->config->getCredentials();
         if (isset($credentials[Tag::EmailOnError])) {
@@ -170,12 +137,8 @@ abstract class Mailer
      * - whether the invoice was sent in test mode.
      * - whether the invoice was sent as concept.
      * - the emailAsPdf setting.
-     *
-     * @param \Siel\Acumulus\Invoice\Result $invoiceSendResult
-     *
-     * @return string
      */
-    protected function getSubject(Result $invoiceSendResult)
+    protected function getSubject(Result $invoiceSendResult): string
     {
         $pluginSettings = $this->config->getPluginSettings();
         $isTestMode = $pluginSettings['debug'] === Config::Send_TestMode;
@@ -221,16 +184,13 @@ abstract class Mailer
     }
 
     /**
-     * Returns the mail body as text and as html.
-     *
-     * @param \Siel\Acumulus\Invoice\Result $result
-     * @param string $invoiceSourceType
-     * @param string $invoiceSourceReference
+     * Returns the mail body as text and as HTML.
      *
      * @return string[]
-     *   An array with keys text and html.
+     *   An array with the body text in 2 formats,
+     *   keyed by 'text' resp. 'html'.
      */
-    protected function getBody(Result $result, $invoiceSourceType, $invoiceSourceReference)
+    protected function getBody(Result $result, string $invoiceSourceType, string $invoiceSourceReference): array
     {
         $resultInvoice = $result->getResponse();
         $bodyTexts = $this->getStatusSpecificBody($result);
@@ -239,7 +199,7 @@ abstract class Mailer
         $replacements = [
             '{invoice_source_type}' => $this->t($invoiceSourceType),
             '{invoice_source_reference}' => $invoiceSourceReference,
-            '{acumulus_invoice_id}' => isset($resultInvoice['invoicenumber']) ? $resultInvoice['invoicenumber'] : $this->t('message_no_invoice'),
+            '{acumulus_invoice_id}' => $resultInvoice['invoicenumber'] ?? $this->t('message_no_invoice'),
             '{status}' => $result->getStatus(),
             '{status_message}' => $result->getStatusText(),
             '{status_specific_text}' => $bodyTexts['text'],
@@ -257,9 +217,9 @@ abstract class Mailer
     }
 
     /**
-     * Returns the body for the mail.
+     * Returns the status specific part of the body for the mail.
      *
-     * The body depends on:
+     * This body part depends on:
      * - the result status.
      * - whether the invoice was sent in test mode
      * - whether the invoice was sent as concept
@@ -268,8 +228,10 @@ abstract class Mailer
      * @param \Siel\Acumulus\Invoice\Result $invoiceSendResult
      *
      * @return string[]
+     *   An array with the status specific part of the body text in 2 formats,
+     *   keyed by 'text' resp. 'html'.
      */
-    protected function getStatusSpecificBody(Result $invoiceSendResult)
+    protected function getStatusSpecificBody(Result $invoiceSendResult): array
     {
         $pluginSettings = $this->config->getPluginSettings();
         $isTestMode = $pluginSettings['debug'] === Config::Send_TestMode;
@@ -284,7 +246,8 @@ abstract class Mailer
         switch ($invoiceSendResult->getStatus()) {
             case Severity::Exception:
                 $sentences[] = 'mail_body_exception';
-                $sentences[] = $invoiceSendResult->getHttpRequest() !== null
+                // @todo: check this: we want to know what was set just before executing the curl request.
+                $sentences[] = $invoiceSendResult->getHttpResponse() !== null
                     ? 'mail_body_exception_invoice_maybe_created'
                     : 'mail_body_exception_invoice_not_created';
                 break;
@@ -340,15 +303,13 @@ abstract class Mailer
     }
 
     /**
-     * Returns the  messages along with some descriptive text.
-     *
-     * @param \Siel\Acumulus\Invoice\Result $result
+     * Returns the messages along with some descriptive text.
      *
      * @return string[]
-     *   An array with a plain text (key='text') and an HTML string (key='html')
-     *   containing the messages with some descriptive text.
+     *   An array with the messages part of the body text in 2 formats,
+     *   keyed by 'text' resp. 'html'.
      */
-    protected function getMessages(Result $result)
+    protected function getMessages(Result $result): array
     {
         $messages = [
             'text' => '',
@@ -372,13 +333,11 @@ abstract class Mailer
     /**
      * Returns the support messages along with some descriptive text.
      *
-     * @param \Siel\Acumulus\Invoice\Result $result
-     *
      * @return string[]
-     *   An array with a plain text (key='text') and an HTML string (key='html')
-     *   containing the support messages with some descriptive text.
+     *   An array with the support messages part of the body text in 2 formats,
+     *   keyed by 'text' resp. 'html'.
      */
-    protected function getSupportMessages(Result $result)
+    protected function getSupportMessages(Result $result): array
     {
         $messages = [
             'text' => '',

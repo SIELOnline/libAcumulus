@@ -17,7 +17,7 @@ class Mailer extends BaseMailer
      *
      * @throws \Zend_Mail_Exception
      */
-    public function sendMail($from, $fromName, $to, $subject, $bodyText, $bodyHtml)
+    public function sendMail(string $from, string $fromName, $to, $subject, $bodyText, $bodyHtml)
     {
         try {
             $email = new Zend_Mail('utf-8');

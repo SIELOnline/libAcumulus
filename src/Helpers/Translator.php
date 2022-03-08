@@ -16,7 +16,7 @@ namespace Siel\Acumulus\Helpers;
  * - This single Translator object should be fed with translations by adding 1
  *   or more {@see TranslationCollection} objects.
  * - If multiple {@see TranslationCollection} objects are added, the latter will
- *   not overwrite already existing translations. This allows to define webshop
+ *   not overwrite already existing translations. This allows to define web shop
  *   specific vocabulary and add it directly upon instantiating the
  *  {@see Container} and before the request is handed of to the library.
  *
@@ -38,7 +38,7 @@ namespace Siel\Acumulus\Helpers;
  * How to use translations:
  * - If you need to translate texts in a given class, have the Translator Object
  *   injected into it via the constructor. If you are overriding a base class,
- *   most of the times the base class will already have done so. If not, ask for
+ *   most of the time, the base class will already have done so. If not, ask for
  *   a change in the library.
  * - Normally, when the Translator object is injected into a class, also a
  *   wrapper method t() is defined to get a translation.
@@ -49,6 +49,7 @@ class Translator
 {
     /**
      * @var \Siel\Acumulus\Helpers\Translator
+     *
      * @todo: deprecate and create messages by passing translator along the
      *   other values.
      * @deprecated
@@ -65,7 +66,7 @@ class Translator
      * @param string $language
      *   The 2 character language code.
      */
-    public function __construct($language)
+    public function __construct(string $language)
     {
         $this->language = $language;
         $this->translations = [];
@@ -85,10 +86,8 @@ class Translator
 
     /**
      * Returns the current (2 character) language (code).
-     *
-     * @return string
      */
-    public function getLanguage()
+    public function getLanguage(): string
     {
         return $this->language;
     }
@@ -105,8 +104,8 @@ class Translator
      *   - The string in Dutch for the given key.
      *   - The key itself.
      */
-    public function get($key)
+    public function get(string $key): string
     {
-        return (isset($this->translations[$key]) ? $this->translations[$key] : $key);
+        return ($this->translations[$key] ?? $key);
     }
 }

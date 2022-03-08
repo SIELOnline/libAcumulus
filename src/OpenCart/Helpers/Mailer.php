@@ -13,7 +13,7 @@ class Mailer extends BaseMailer
     /**
      * {@inheritdoc}
      */
-    public function sendMail($from, $fromName, $to, $subject, $bodyText, $bodyHtml)
+    public function sendMail(string $from, string $fromName, $to, $subject, $bodyText, $bodyHtml)
     {
         $result = true;
         try {

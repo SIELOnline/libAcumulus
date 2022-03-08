@@ -11,7 +11,7 @@ class Mailer extends BaseMailer
     /**
      * {@inheritdoc}
      */
-    public function sendMail($from, $fromName, $to, $subject, $bodyText, $bodyHtml)
+    public function sendMail(string $from, string $fromName, $to, $subject, $bodyText, $bodyHtml)
     {
         // @todo: adapt to MyWebshop's way of creating a mailer, a "mail object", and having the "mail object" sent by the mailer.
         $result = Mail::Send($this->translator->getLanguage(), $from, $fromName, $subject, $to, $bodyHtml);

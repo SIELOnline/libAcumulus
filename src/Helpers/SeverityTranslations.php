@@ -4,7 +4,7 @@ namespace Siel\Acumulus\Helpers;
 /**
  * Contains translations for classes in the \Siel\Acumulus\ApiClient namespace.
  *
- * @noinspection PhpUnused Loaded by the Container
+ * @noinspection PhpUnused : Loaded by the Container
  */
 class SeverityTranslations extends TranslationCollection
 {

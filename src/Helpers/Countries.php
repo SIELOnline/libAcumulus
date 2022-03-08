@@ -12,7 +12,6 @@ class Countries
 {
     /**
      * Returns whether the country is the Netherlands.
-     *
      * For now only the alpha-2 codes are allowed. Other notations will be added
      * as soon we support a web shop with a different way of storing countries.
      *
@@ -21,14 +20,13 @@ class Countries
      *
      * @return bool
      */
-    public function isNl($countryCode)
+    public function isNl(string $countryCode): bool
     {
         return strtoupper($countryCode) === 'NL';
     }
 
     /**
      * Converts EU country codes to their ISO equivalent:
-     *
      * The EU has 2 country codes that differ from ISO:
      * - UK instead of GB
      * - EL instead of GR.
@@ -39,7 +37,7 @@ class Countries
      * @return string
      *   The ISO country code.
      */
-    public function convertEuCountryCode($countryCode)
+    public function convertEuCountryCode(string $countryCode): string
     {
         if (strtoupper($countryCode) === 'EL') {
             $countryCode = 'GR';
@@ -53,17 +51,16 @@ class Countries
     /**
      * Returns the Dutch name for the given country code.
      *
-     * @param $countryCode
+     * @param string $countryCode
      *   ISO country code (2 characters).
      *
      * @return string
      *   The (Dutch) name of the country or the empty string if the code could
      *   not be looked up.
-     *
-     * @todo: deprecate by replacing it with using countryautoname or a call to
-     *   https://www.siel.nl/acumulus/API/Picklists/Countries/ (cache results)
+     * @todo: deprecate by replacing it with using 'countryautoname' or calling
+     *   https://www.siel.nl/acumulus/API/Picklists/Countries/ (cache results).
      */
-    public function getCountryName($countryCode)
+    public function getCountryName(string $countryCode): string
     {
         $countryNames = [
             'AF' => 'Afghanistan',
@@ -316,6 +313,6 @@ class Countries
             'SE' => 'Zweden',
             'CH' => 'Zwitserland',
         ];
-        return isset($countryNames[$countryCode]) ? $countryNames[$countryCode] : '';
+        return $countryNames[$countryCode] ?? '';
     }
 }

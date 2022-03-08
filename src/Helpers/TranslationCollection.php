@@ -17,12 +17,10 @@ abstract class TranslationCollection
      * translations if no translation for the given language for some key was
      * defined.
      *
-     * @param string $language
-     *
-     * @return array
+     * @return string[]
      *   A keyed array with translations.
      */
-    public function get($language)
+    public function get(string $language): array
     {
         $result = [];
         if (isset($this->{$language})) {

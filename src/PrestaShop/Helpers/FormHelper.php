@@ -110,7 +110,7 @@ class FormHelper extends BaseFormHelper
      * This override adds a "details" class to all details fields, thereby
      * allowing a js solution.
      */
-    public function processField(array $field, $key): array
+    public function processField(array $field, string $key): array
     {
         $field = parent::processField($field, $key);
 

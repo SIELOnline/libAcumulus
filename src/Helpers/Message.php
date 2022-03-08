@@ -1,4 +1,23 @@
 <?php
+/**
+ * Note: As long as we want to check for a minimal PHP version via the
+ * Requirements checking process provided by the classes below, we should not
+ * use PHP7 language constructs in the following classes:
+ * - {@see Container}: creates instances of the below classes.
+ * - {@see Requirements}: executes the checks.
+ * - {@see \Siel\Acumulus\Config\ConfigUpgrade}: initiates the check.
+ * - {@see \Siel\Acumulus\Helpers\Severity}: part of a failed check.
+ * - {@see \Siel\Acumulus\Helpers\Message}: represents a failed check.
+ * - {@see \Siel\Acumulus\Helpers\MessageCollection}: represents failed checks.
+ * - {@see Log}: Logs failed checks.
+ *
+ * The PHP7 language constructs we suppress the warnings for:
+ * @noinspection PhpMissingParamTypeInspection
+ * @noinspection PhpMissingReturnTypeInspection
+ * @noinspection PhpMissingFieldTypeInspection
+ * @noinspection PhpMissingVisibilityInspection
+ */
+
 namespace Siel\Acumulus\Helpers;
 
 use Exception;
@@ -212,7 +231,7 @@ class Message
     /**
      * @return \Exception|null
      *   The exception used to construct this message, or null if this message
-     *   is not an Message::Exception level message.
+     *   is not a Severity::Exception level message.
      */
     public function getException()
     {

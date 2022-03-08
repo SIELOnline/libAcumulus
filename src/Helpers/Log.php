@@ -1,10 +1,17 @@
 <?php
 /**
- * Note: Do not use PHP7 language constructs in the {@see Container} class as
- * long as we want the {@see Requirements} class to check for that, initiated by
- * the {@see \Siel\Acumulus\Config\ConfigUpgrade} class, and present and
- * {@see Log} proper warnings.
+ * Note: As long as we want to check for a minimal PHP version via the
+ * Requirements checking process provided by the classes below, we should not
+ * use PHP7 language constructs in the following classes:
+ * - {@see Container}: creates instances of the below classes.
+ * - {@see Requirements}: executes the checks.
+ * - {@see \Siel\Acumulus\Config\ConfigUpgrade}: initiates the check.
+ * - {@see \Siel\Acumulus\Helpers\Severity}: part of a failed check.
+ * - {@see \Siel\Acumulus\Helpers\Message}: represents a failed check.
+ * - {@see \Siel\Acumulus\Helpers\MessageCollection}: represents failed checks.
+ * - {@see Log}: Logs failed checks.
  *
+ * The PHP7 language constructs we suppress the warnings for:
  * @noinspection PhpMissingParamTypeInspection
  * @noinspection PhpMissingReturnTypeInspection
  * @noinspection PhpMissingFieldTypeInspection
@@ -36,6 +43,8 @@ class Log
      * Log constructor.
      *
      * @param string $libraryVersion
+     *   The version of the library. It will be logged with each log message,
+     *   allowing to better interpret old log messages when giving support.
      */
     public function __construct($libraryVersion)
     {
@@ -75,12 +84,6 @@ class Log
 
     /**
      * Returns a textual representation of the severity.
-     *
-     * @param int $severity
-     *   One of the Severity::... constants.
-     *
-     * @return string
-     *   A textual representation of the severity.
      */
     protected function getSeverityString($severity)
     {
@@ -120,16 +123,17 @@ class Log
      *   The message to log, optionally followed by arguments. If there are
      *   arguments the $message is passed through vsprintf().
      * @param array $args
+     *   Any arguments to replace % placeholders in $message.
      *
      * @return string
      *   The full formatted message whether it got logged or not.
      */
     public function log($severity, $message, array $args = [])
     {
+        if (count($args) > 0) {
+            $message = vsprintf($message, $args);
+        }
         if ($severity >= $this->getLogLevel()) {
-            if (count($args) > 0) {
-                $message = vsprintf($message, $args);
-            }
             $this->write($message, $severity);
         }
         return $message;
@@ -147,9 +151,7 @@ class Log
      */
     public function debug($message)
     {
-        $args = func_get_args();
-        array_shift($args);
-        return $this->log(Severity::Log, $message, $args);
+        return $this->log(Severity::Log, ...func_get_args());
     }
 
     /**
@@ -164,9 +166,7 @@ class Log
      */
     public function info($message)
     {
-        $args = func_get_args();
-        array_shift($args);
-        return $this->log(Severity::Info, $message, $args);
+        return $this->log(Severity::Info, ...func_get_args());
     }
 
     /**
@@ -181,9 +181,7 @@ class Log
      */
     public function notice($message)
     {
-        $args = func_get_args();
-        array_shift($args);
-        return $this->log(Severity::Notice, $message, $args);
+        return $this->log(Severity::Notice, ...func_get_args());
     }
 
     /**
@@ -198,9 +196,7 @@ class Log
      */
     public function warning($message)
     {
-        $args = func_get_args();
-        array_shift($args);
-        return $this->log(Severity::Warning, $message, $args);
+        return $this->log(Severity::Warning, ...func_get_args());
     }
 
     /**
@@ -215,9 +211,7 @@ class Log
      */
     public function error($message)
     {
-        $args = func_get_args();
-        array_shift($args);
-        return $this->log(Severity::Error, $message, $args);
+        return $this->log(Severity::Error, ...func_get_args());
     }
 
     /**

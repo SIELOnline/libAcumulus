@@ -1,7 +1,6 @@
 <?php
 namespace Siel\Acumulus\Helpers;
 
-use Siel\Acumulus\Tag;
 use stdClass;
 
 /**
@@ -28,7 +27,7 @@ class FormHelper
     protected $translator;
 
     /**
-     * Meta data about the fields on the form.
+     * Metadata about the fields on the form.
      *
      * This info is added to the form in a hidden field and thus can come from
      * the posted values (if we are processing a submitted form) or from the
@@ -38,11 +37,6 @@ class FormHelper
      */
     protected $meta = [];
 
-    /**
-     * FormHelper constructor.
-     *
-     * @param \Siel\Acumulus\Helpers\Translator $translator
-     */
     public function __construct(Translator $translator)
     {
         $this->translator = $translator;
@@ -58,7 +52,7 @@ class FormHelper
      *   The translation for the given key or the key itself if no translation
      *   could be found.
      */
-    protected function t($key)
+    protected function t(string $key): string
     {
         return $this->translator->get($key);
     }
@@ -66,7 +60,7 @@ class FormHelper
     /**
      * @return object[]|null
      */
-    protected function getMeta()
+    protected function getMeta(): ?array
     {
         if (empty($this->meta) && $this->isSubmitted() && isset($_POST[static::Meta])) {
             $meta = json_decode($_POST[static::Meta]);
@@ -92,10 +86,8 @@ class FormHelper
 
     /**
      * Indicates whether the current form handling is a form submission.
-     *
-     * @return bool
      */
-    public function isSubmitted()
+    public function isSubmitted(): bool
     {
         return $_SERVER['REQUEST_METHOD'] === 'POST';
     }
@@ -110,7 +102,7 @@ class FormHelper
      * @return array
      *   Array of key names, keyed by these names.
      */
-    public function addMetaField(array $fields)
+    public function addMetaField(array $fields): array
     {
         $this->setMeta($this->constructFieldMeta($fields));
         $fields[static::Meta] = [
@@ -121,7 +113,7 @@ class FormHelper
     }
 
     /**
-     * Returns meta data about the given fields.
+     * Returns metadata about the given fields.
      *
      * Internal method, do not call directly.
      *
@@ -130,11 +122,11 @@ class FormHelper
      * @return array
      *   Associative array of field names and their types.
      */
-    protected function constructFieldMeta(array $fields)
+    protected function constructFieldMeta(array $fields): array
     {
         $result = [];
         foreach ($fields as $key => $field) {
-            $name = isset($field['name']) ? $field['name'] : (isset($field['id']) ? $field['id'] : $key);
+            $name = $field['name'] ?? $field['id'] ?? $key;
             $type = $field['type'];
             if ($type === 'checkbox') {
                 foreach ($field['options'] as $checkboxKey => $option) {
@@ -166,22 +158,15 @@ class FormHelper
      * @return string[]
      *   Array of key names.
      */
-    public function getKeys()
+    public function getKeys(): array
     {
         return array_keys($this->getMeta());
     }
 
     /**
      * Indicates whether the given key defines a field on the posted form.
-     *
-     * @param string $key
-     *   The name of the field.
-     *
-     * @return bool
-     *   true if the given key defines a field that was rendered on the posted
-     *   form, false otherwise.
      */
-    public function isKey($key)
+    public function isKey(string $key): bool
     {
         $fieldMeta = $this->getMeta();
         return isset($fieldMeta[$key]);
@@ -189,14 +174,8 @@ class FormHelper
 
     /**
      * Indicates whether the given key defines an array field.
-     *
-     * @param string $key
-     *   The name of the field.
-     *
-     * @return bool
-     *   Whether the given key defines an array field.
      */
-    public function isArray($key)
+    public function isArray(string $key): bool
     {
         $fieldMeta = $this->getMeta();
         return isset($fieldMeta[$key]) && substr($fieldMeta[$key]->name, -strlen('[]')) === '[]';
@@ -204,14 +183,8 @@ class FormHelper
 
     /**
      * Indicates whether the given key defines a checkbox field.
-     *
-     * @param string $key
-     *   The name of the field.
-     *
-     * @return bool
-     *   Whether the given key defines a checkbox field.
      */
-    public function isCheckbox($key)
+    public function isCheckbox(string $key): bool
     {
         $fieldMeta = $this->getMeta();
         return isset($fieldMeta[$key]) && $fieldMeta[$key]->type === 'checkbox';
@@ -220,13 +193,11 @@ class FormHelper
     /**
      * Returns a flat array of the posted values.
      *
-     * As especially checkbox handling differs per webshop, often resulting in
+     * As especially checkbox handling differs per web shop, often resulting in
      * an array of checkbox values, this method returns a flattened version of
      * the posted values.
-     *
-     * @return array
      */
-    public function getPostedValues()
+    public function getPostedValues(): array
     {
         $result = $_POST;
         $result = $this->removeUnique($result);
@@ -244,7 +215,7 @@ class FormHelper
      * @return array
      *   The altered posted values.
      */
-    protected function removeUnique(array $postedValues)
+    protected function removeUnique(array $postedValues): array
     {
         array_walk_recursive($postedValues, function(&$postedValue/*, $key*/) {
             if (in_array(substr($postedValue, 0 , strlen(self::Unique . 'i:')), [self::Unique . 'i:', self::Unique . 's:'])) {
@@ -257,13 +228,9 @@ class FormHelper
     /**
      * Allows to alter the posted values in a web shop specific way.
      *
-     * @param array $postedValues
-     *   The set of posted values to alter.
-     *
-     * @return array
-     *   The altered posted values.
+     * This basic implementation returns the unaltered set of posted values.
      */
-    protected function alterPostedValues(array $postedValues)
+    protected function alterPostedValues(array $postedValues): array
     {
         return $postedValues;
     }
@@ -271,32 +238,21 @@ class FormHelper
     /**
      * Allows to alter the form values in a web shop specific way.
      *
-     * This basic implementation returns the set of form values unaltered.
-     *
-     * @param array $formValues
-     *   The set of form values to alter.
-     *
-     * @return array
-     *   The altered form values.
+     * This basic implementation returns the unaltered set of form values.
      */
-    public function alterFormValues(array $formValues)
+    public function alterFormValues(array $formValues): array
     {
         return $formValues;
     }
 
     /**
      * Adds a severity css class to form fields that do have a message.
-     *
-     * @param array[] $fields
-     * @param Message[] $messages
-     *
-     * @return array[]
      */
-    public function addSeverityClassToFields(array $fields, array $messages)
+    public function addSeverityClassToFields(array $fields, array $messages): array
     {
         foreach ($messages as $message) {
             if (!empty($message->getField())) {
-                $this->addSeverityClassToField($fields, $message->getField(), $this->severityToClass($message->getSeverity()));
+                $this->addSeverityClassToField($fields, $message->getField(), $this->severityToCssClass($message->getSeverity()));
             }
         }
         return $fields;
@@ -304,12 +260,8 @@ class FormHelper
 
     /**
      * Adds a severity css class to a form field.
-     *
-     * @param array[] $fields
-     * @param string $id
-     * @param string $severityClass
      */
-    protected function addSeverityClassToField(array &$fields, $id, $severityClass)
+    protected function addSeverityClassToField(array &$fields, string $id, string $severityClass)
     {
         foreach ($fields as $key => &$field) {
             if ($key === $id) {
@@ -330,12 +282,8 @@ class FormHelper
 
     /**
      * Returns a css class for a given severity.
-     *
-     * @param int $severity
-     *
-     * @return string
      */
-    protected function severityToClass($severity)
+    protected function severityToCssClass(int $severity): string
     {
         switch ($severity) {
             case Severity::Exception:
@@ -360,9 +308,9 @@ class FormHelper
      * @param array $fields
      *
      * @return array[]
-     *   The fields with the details processed
+     *   The processed fields.
      */
-    public function processFields(array $fields)
+    public function processFields(array $fields): array
     {
         foreach ($fields as $key => &$field) {
             $field = $this->processField($field, $key);
@@ -376,16 +324,10 @@ class FormHelper
 
     /**
      * (Non recursively) processes 1 field.
-     *
-     * @param array $field
-     * @param string $key
-     *
-     * @return array
-     *   The processed field.
      */
-    protected function processField(array $field, $key)
+    protected function processField(array $field, string $key): array
     {
-        // Add help text to details fields.
+        // Add help text to 'details' fields.
         if ($field['type'] === 'details') {
             if (!empty($field['summary'])) {
                 $field['summary'] .= $this->t('click_to_toggle');

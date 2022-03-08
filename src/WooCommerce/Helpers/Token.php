@@ -12,10 +12,9 @@ class Token extends BaseToken
 {
     /**
      * {@inheritdoc}
-     *
      * @param object $variable
      */
-    protected function getObjectProperty($variable, $property, array $args)
+    protected function getObjectProperty(object $variable, string $property, array $args)
     {
         if ($variable instanceof WC_Data) {
             $method1 = $property;

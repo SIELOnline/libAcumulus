@@ -97,10 +97,16 @@ abstract class Form extends MessageCollection
     /** @var bool */
     protected $formValuesSet;
 
-    /** @var array The values to be placed on the configuration form. */
+    /**
+     * @var array
+     *   The values to be placed on the configuration form.
+     */
     protected $formValues;
 
-    /** @var string[] The values as filled in on form submission. */
+    /**
+     * @var string[]
+     *   The values as filled in on form submission.
+     */
     protected $submittedValues;
 
     /**
@@ -180,9 +186,6 @@ abstract class Form extends MessageCollection
 
     /**
      * Returns the type of the form.
-     *
-     * @return string
-     *   The type of the form.
      */
     public function getType(): string
     {
@@ -190,9 +193,8 @@ abstract class Form extends MessageCollection
     }
 
     /**
-     * @return bool
-     *   Whether this form is a full page form, thus surrounded by a <form> tag
-     *   and having a possibly standardized submit button.
+     * returns whether this form is a full page form, thus surrounded by a
+     * <form> tag and having a possibly standardized submit button.
      */
     public function isFullPage(): bool
     {
@@ -201,8 +203,6 @@ abstract class Form extends MessageCollection
 
     /**
      * Indicates whether the current form handling is a form submission.
-     *
-     * @return bool
      */
     public function isSubmitted(): bool
     {
@@ -211,8 +211,6 @@ abstract class Form extends MessageCollection
 
     /**
      * Returns whether the submitted form values are valid.
-     *
-     * @return bool
      */
     public function isValid(): bool
     {
@@ -306,11 +304,6 @@ abstract class Form extends MessageCollection
 
     /**
      * Sets the value for a specific form field.
-     *
-     * @param string $name
-     *   The name of the form field.
-     * @param mixed $value
-     *   The value for the form field.
      */
     protected function setFormValue(string $name, $value)
     {
@@ -335,10 +328,6 @@ abstract class Form extends MessageCollection
      *
      * This internal version of addValues() passes the fields as a parameter to
      * allow to recursively process field sets.
-     *
-     * @param array[] $fields
-     *
-     * @return array[]
      */
     protected function addValuesToFields(array $fields): array
     {
@@ -369,9 +358,6 @@ abstract class Form extends MessageCollection
      *
      * This default implementation returns an empty array, i.e. all form fields
      * are empty, not selected, or unchecked.
-     *
-     * @return array
-     *   An array of default values keyed by the form field names.
      */
     protected function getDefaultFormValues(): array
     {
@@ -381,11 +367,6 @@ abstract class Form extends MessageCollection
     /**
      * Returns the set of values directly assigned to the field definitions.
      * These take precedence over default values
-     *
-     * @param array[] $fields
-     *
-     * @return array
-     *   An array of values keyed by the form field names.
      */
     protected function getFieldValues(array $fields): array
     {
@@ -853,9 +834,6 @@ abstract class Form extends MessageCollection
 
     /**
      * Returns a list of field ids/keys appearing in the form.
-     *
-     * @return string[]
-     *   Array of key names appearing in the form, keyed by these names.
      */
     protected function getKeys(): array
     {
@@ -864,13 +842,6 @@ abstract class Form extends MessageCollection
 
     /**
      * Indicates whether the given key defines a field on the posted form.
-     *
-     * @param string $key
-     *   The name of the field.
-     *
-     * @return bool
-     *   true if the given key defines a field that was rendered on the posted
-     *   form, false otherwise.
      */
     protected function isKey(string $key): bool
     {
@@ -879,12 +850,6 @@ abstract class Form extends MessageCollection
 
     /**
      * Indicates whether the given key defines an array field.
-     *
-     * @param string $key
-     *   The name of the field.
-     *
-     * @return bool
-     *   Whether the given key defines an array field.
      */
     protected function isArray(string $key): bool
     {
@@ -893,12 +858,6 @@ abstract class Form extends MessageCollection
 
     /**
      * Indicates whether the given key defines a checkbox field.
-     *
-     * @param string $key
-     *   The name of the field.
-     *
-     * @return bool
-     *   Whether the given key defines a checkbox field.
      */
     protected function isCheckbox(string $key): bool
     {
@@ -908,12 +867,9 @@ abstract class Form extends MessageCollection
     /**
      * Helper method to copy a value from one array to another array.
      *
-     * @param array $target
-     * @param string $key
-     * @param array $source
-     *
      * @return bool
-     *   True if the value is set and has been copied, false otherwise.
+     *   True if the value is set in the source array and thus has been copied
+     *   to the target array, false otherwise(value not set in thr source array.
      */
     protected function addIfIsset(array &$target, string $key, array $source): bool
     {
@@ -924,6 +880,9 @@ abstract class Form extends MessageCollection
         return false;
     }
 
+    /**
+     * Loads the translations for the info block.
+     */
     protected function loadInfoBlockTranslations()
     {
         static $translationsAdded = false;

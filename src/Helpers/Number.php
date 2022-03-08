@@ -12,7 +12,7 @@ namespace Siel\Acumulus\Helpers;
  * Some web shops do not store the used vat percentage with orders but store
  * the product price ex vat and the vat amount. As these amounts are often
  * stored with limited precision, typically 1 cent, the exact vat rate cannot
- * be calculated. Instead a range within which the vat rate falls can be
+ * be calculated. Instead, a range within which the vat rate falls can be
  * calculated. This library uses this range to determine the actual vat rate
  * later on after knowing which vat rates may apply (Dutch vat rates, foreign
  * vat rates).
@@ -20,8 +20,8 @@ namespace Siel\Acumulus\Helpers;
 class Number
 {
     /**
-     * Returns the range within which the result of the division should fall given
-     * the precision range for the 2 numbers to divide.
+     * Returns the range within which the result of a division should fall,
+     * given the precision range for the 2 numbers to divide.
      *
      * @param float $numerator
      * @param float $denominator
@@ -35,28 +35,28 @@ class Number
      *   direction.
      *
      * @return array
-     *   Array of floats with keys min, max and calculated.
+     *   Array of floats with keys 'min', 'max' and 'calculated'.
      */
-    public static function getDivisionRange($numerator, $denominator, $numeratorPrecision, $denominatorPrecision)
+    public static function getDivisionRange(float $numerator, float $denominator, float $numeratorPrecision, float $denominatorPrecision): array
     {
         // The actual value can be half the precision lower or higher.
         // To err on the save side, we take 60% of it (instead of 50%).
-        $numeratorHalfRange = 0.6 * (float) $numeratorPrecision;
-        $denominatorHalfRange = 0.6 * (float) $denominatorPrecision;
+        $numeratorHalfRange = 0.6 * $numeratorPrecision;
+        $denominatorHalfRange = 0.6 * $denominatorPrecision;
 
         // The min values should be closer to 0 then the value.
         // The max values should be further from 0 then the value.
         if ($numerator < 0.0) {
             $numeratorHalfRange = -$numeratorHalfRange;
         }
-        $minNumerator = (float) $numerator - $numeratorHalfRange;
-        $maxNumerator = (float) $numerator + $numeratorHalfRange;
+        $minNumerator = $numerator - $numeratorHalfRange;
+        $maxNumerator = $numerator + $numeratorHalfRange;
 
         if ($denominator < 0.0) {
             $denominatorHalfRange = -$denominatorHalfRange;
         }
-        $minDenominator = (float) $denominator - $denominatorHalfRange;
-        $maxDenominator = (float) $denominator + $denominatorHalfRange;
+        $minDenominator = $denominator - $denominatorHalfRange;
+        $maxDenominator = $denominator + $denominatorHalfRange;
 
         // We get the min value of the division by dividing the minimum
         // numerator by the maximum denominator and vice versa.
@@ -68,34 +68,23 @@ class Number
     }
 
     /**
-     * Helper method to do a float comparison.
+     * Helper method to do a float comparison
      *
-     * @param float $f1
-     * @param float $f2
-     * @param float $maxDiff
-     *
-     * @return bool
-     *   True if the floats are "equal", i.e. do not differ more than the
-     *   specified maximum difference.
+     * Comparison is based on a maximum difference, as exact bit by bit equality
+     * for "equal" floats is often not the case.
      */
-    public static function floatsAreEqual($f1, $f2, $maxDiff = 0.0051)
+    public static function floatsAreEqual(float $f1, float $f2, float $maxDiff = 0.0051): bool
     {
-        return abs((float) $f2 - (float) $f1) < $maxDiff;
+        return abs($f2 - $f1) < $maxDiff;
     }
 
     /**
-     * indicates if a float is to be considered zero.
+     * Indicates if a float is to be considered zero.
      *
      * This is a wrapper around floatsAreEqual() for the often used case where
      * an amount is checked for being 0.0.
-     *
-     * @param float  $f1
-     * @param float $maxDiff
-     *
-     * @return bool
-     *   True if the float is (almost) zero, false otherwise.
      */
-    public static function isZero($f1, $maxDiff = 0.0011)
+    public static function isZero(float $f1, float $maxDiff = 0.0011): bool
     {
         return static::floatsAreEqual($f1, 0.0, $maxDiff);
     }
@@ -115,16 +104,16 @@ class Number
      *   true if $f is a number that appears to be rounded to the given
      *   precision, false otherwise.
      */
-    public static function isRounded($f, $precision)
+    public static function isRounded($f, int $precision): bool
     {
         if (is_string($f)) {
-            // For strings we look at the number of digits after the decimal
-            // point (ignoring trailing 0's).
+            // If $f is a string, we look at the number of digits after the
+            // decimal point (ignoring trailing 0's).
             $pos = strrpos($f, '.');
             return $pos === false || strlen(rtrim($f, '0')) - $pos - strlen('.') <= $precision;
         } else {
-            // For floats we use the round() function and look at the difference
-            // (testing floats for equality within a given margin).
+            // f $f is a float, we use the round() function and look at the
+            // difference (testing floats for equality within a given margin).
             return static::floatsAreEqual($f, round($f, $precision), (10 ** -($precision + 2)) / 2.0);
         }
     }
@@ -144,7 +133,7 @@ class Number
      *   true if all numbers in $fs appear to be rounded to the given
      *   precision, false otherwise.
      */
-    public static function areRounded(array $fs, $precision)
+    public static function areRounded(array $fs, int $precision): bool
     {
         foreach ($fs as $f) {
             if (!static::isRounded($f, $precision)) {

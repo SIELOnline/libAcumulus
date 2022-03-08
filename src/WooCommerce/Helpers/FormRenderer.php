@@ -37,7 +37,7 @@ class FormRenderer extends BaseFormRenderer
      * This override adds an information icon as label for descriptions at the
      * fieldset level.
      */
-    protected function renderDescription($text, $isFieldset = false): string
+    protected function renderDescription(string $text, bool $isFieldset = false): string
     {
         $output = '';
         $wrapperType = $isFieldset ? 'fieldsetDescription' : 'description';

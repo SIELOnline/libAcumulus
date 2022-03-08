@@ -195,6 +195,19 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         return (bool) $this->getDb()->query("DROP TABLE `$this->tableName`");
     }
 
+    /**
+     * Creates the acumulus_entry table.
+     *
+     * For some background info about 2 timestamp columns see:
+     * - {@see https://dev.mysql.com/doc/relnotes/mysql/5.6/en/news-5-6-5.html#mysqld-5-6-5-data-types}.
+     * - {@see https://dev.mysql.com/doc/refman/5.6/en/timestamp-initialization.html}.
+     * - {@see https://dev.mysql.com/doc/refman/8.0/en/sql-mode.html#sqlmode_no_zero_date}.
+     *
+     * @return bool
+     *   Success.
+     *
+     * @throws \Exception
+     */
     protected function createTable(): bool
     {
         return (bool) $this->getDb()->query("CREATE TABLE IF NOT EXISTS `$this->tableName` (

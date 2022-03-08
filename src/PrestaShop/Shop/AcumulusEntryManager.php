@@ -135,23 +135,37 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
 
     /**
      * {@inheritdoc}
+     *
+     * Creates the acumulus_entry table.
+     *
+     * For some background info about 2 timestamp columns see:
+     * - {@see https://dev.mysql.com/doc/relnotes/mysql/5.6/en/news-5-6-5.html#mysqld-5-6-5-data-types}.
+     * - {@see https://dev.mysql.com/doc/refman/5.6/en/timestamp-initialization.html}.
+     * - {@see https://dev.mysql.com/doc/refman/8.0/en/sql-mode.html#sqlmode_no_zero_date}.
+     *
+     * @return bool
+     *   Success.
+     *
+     * @throws \Exception
      */
     public function install(): bool
     {
-        return $this->getDb()->execute("CREATE TABLE IF NOT EXISTS `$this->tableName` (
-        `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-        `id_shop` int(11) UNSIGNED NOT NULL DEFAULT '1',
-        `id_shop_group` int(11) UNSIGNED NOT NULL DEFAULT '1',
-        `id_entry` int(11) UNSIGNED DEFAULT NULL,
-        `token` char(32) DEFAULT NULL,
-        `source_type` varchar(32) NOT NULL,
-        `source_id` int(11) UNSIGNED NOT NULL,
-        `created` timestamp DEFAULT CURRENT_TIMESTAMP,
-        `updated` timestamp NOT NULL,
-        PRIMARY KEY (`id`),
-        UNIQUE INDEX `acumulus_idx_entry_id` (`id_entry`),
-        UNIQUE INDEX `acumulus_idx_source` (`source_id`, `source_type`)
-        )");
+        return $this->getDb()->execute(
+        "CREATE TABLE IF NOT EXISTS `{$this->tableName}` (
+            `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+            `id_shop` int(11) UNSIGNED NOT NULL DEFAULT '1',
+            `id_shop_group` int(11) UNSIGNED NOT NULL DEFAULT '1',
+            `id_entry` int(11) UNSIGNED DEFAULT NULL,
+            `token` char(32) DEFAULT NULL,
+            `source_type` varchar(32) NOT NULL,
+            `source_id` int(11) UNSIGNED NOT NULL,
+            `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (`id`),
+            UNIQUE INDEX `acumulus_idx_entry_id` (`id_entry`),
+            UNIQUE INDEX `acumulus_idx_source` (`source_id`, `source_type`)
+            )"
+        );
     }
 
     /**

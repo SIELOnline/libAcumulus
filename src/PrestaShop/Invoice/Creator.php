@@ -286,7 +286,7 @@ class Creator extends BaseCreator
      */
     protected function getPaymentFeeLine(): array
     {
-        /** @var \Order|\OrderSlip $source */
+        /** @var Order|OrderSlip $source */
         $source = $this->invoiceSource->getSource();
         if (isset($source->payment_fee)
             && isset($source->payment_fee_rate)

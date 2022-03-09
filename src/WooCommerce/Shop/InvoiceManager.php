@@ -46,7 +46,11 @@ class InvoiceManager extends BaseInvoiceManager
     /**
      * {@inheritdoc}
      */
-    public function getInvoiceSourcesByIdRange(string $invoiceSourceType, string $InvoiceSourceIdFrom, string $InvoiceSourceIdTo): array
+    public function getInvoiceSourcesByIdRange(
+        string $invoiceSourceType,
+        string $InvoiceSourceIdFrom,
+        string $InvoiceSourceIdTo
+    ): array
     {
         // We use our own query here as defining a range of post ids based on a
         // between does not seem to be possible with the query syntax.
@@ -81,7 +85,11 @@ class InvoiceManager extends BaseInvoiceManager
      * These plugins mostly only store the number part, not the prefix, suffix
      * or date part. If so, you will have to search for the number part only.
      */
-    public function getInvoiceSourcesByReferenceRange(string $invoiceSourceType, string $invoiceSourceReferenceFrom, string $invoiceSourceReferenceTo): array
+    public function getInvoiceSourcesByReferenceRange(
+        string $invoiceSourceType,
+        string $invoiceSourceReferenceFrom,
+        string $invoiceSourceReferenceTo
+    ): array
     {
         // To be able to define the query we need to know under which meta key
         // the order number/reference is stored.
@@ -107,7 +115,9 @@ class InvoiceManager extends BaseInvoiceManager
                   ],
                 ];
                 return $this->query2Sources($args, $invoiceSourceType);
-            } elseif (is_plugin_active('woocommerce-sequential-order-numbers-pro/woocommerce-sequential-order-numbers.php')
+            } elseif (is_plugin_active(
+                    'woocommerce-sequential-order-numbers-pro/woocommerce-sequential-order-numbers.php'
+                )
               || is_plugin_active('wc-sequential-order-numbers/Sequential_Order_Numbers.php')) {
                 // Search by the order number as assigned by the plugin. Note
                 // that these plugins allow for text prefixes and suffixes,
@@ -159,7 +169,11 @@ class InvoiceManager extends BaseInvoiceManager
                 return $this->query2Sources($args, $invoiceSourceType);
             }
         }
-        return parent::getInvoiceSourcesByReferenceRange($invoiceSourceType, $invoiceSourceReferenceFrom, $invoiceSourceReferenceTo);
+        return parent::getInvoiceSourcesByReferenceRange(
+            $invoiceSourceType,
+            $invoiceSourceReferenceFrom,
+            $invoiceSourceReferenceTo
+        );
     }
 
     /**
@@ -229,7 +243,10 @@ class InvoiceManager extends BaseInvoiceManager
      */
     protected function query2Sources(array $args, string $invoiceSourceType, bool $sort = true): array
     {
-        $this->getLog()->info('WooCommerce\InvoiceManager::query2Sources: args = %s', str_replace([' ', "\r", "\n", "\t"], '', var_export($args, true)));
+        $this->getLog()->info(
+            'WooCommerce\InvoiceManager::query2Sources: args = %s',
+            str_replace([' ', "\r", "\n", "\t"], '', var_export($args, true))
+        );
         // Add default arguments.
         $args = $args + [
                 'fields' => 'ids',

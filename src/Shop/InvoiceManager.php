@@ -744,21 +744,6 @@ abstract class InvoiceManager
     }
 
     /**
-     * Helper method to retrieve the values from 1 column of a query result.
-     *
-     * @param array $dbResults
-     * @param string $key
-     *
-     * @return int[]
-     *
-     * @deprecated inline this method now we can use array_column().
-     */
-    protected function getCol(array $dbResults, string $key): array
-    {
-        return array_column($dbResults, $key);
-    }
-
-    /**
      * Returns a string that details the result of the invoice sending.
      *
      * @param \Siel\Acumulus\Invoice\Source $invoiceSource

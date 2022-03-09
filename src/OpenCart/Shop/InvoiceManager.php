@@ -73,7 +73,7 @@ class InvoiceManager extends BaseInvoiceManager
             $InvoiceSourceIdFrom,
             $InvoiceSourceIdTo
         ));
-        return $this->getSourcesByIdsOrSources($invoiceSourceType, $this->getCol($result->rows, $key));
+        return $this->getSourcesByIdsOrSources($invoiceSourceType, array_column($result->rows, $key));
     }
 
     /**
@@ -90,7 +90,7 @@ class InvoiceManager extends BaseInvoiceManager
             $this->getSqlDate($dateFrom),
             $this->getSqlDate($dateTo)
         ));
-        return $this->getSourcesByIdsOrSources($invoiceSourceType, $this->getCol($result->rows, $key));
+        return $this->getSourcesByIdsOrSources($invoiceSourceType, array_column($result->rows, $key));
     }
 
     /**

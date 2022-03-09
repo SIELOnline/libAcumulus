@@ -46,7 +46,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    public function getDate()
+    public function getDate(): string
     {
         return date(Api::DateFormat_Iso, strtotime($this->source['details']['BT']->created_on));
     }
@@ -78,7 +78,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    public function getPaymentStatus(): ?int
+    public function getPaymentStatus(): int
     {
         return in_array($this->source['details']['BT']->order_status, $this->getPaidStatuses())
             ? Api::PaymentStatus_Paid
@@ -88,7 +88,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    public function getPaymentDate()
+    public function getPaymentDate(): ?string
     {
         $date = null;
         $previousStatus = '';

@@ -74,7 +74,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    public function getByInvoiceSource(Source $invoiceSource, bool $ignoreLock = true)
+    public function getByInvoiceSource(Source $invoiceSource, bool $ignoreLock = true): ?BaseAcumulusEntry
     {
         /** @var \Siel\AcumulusMa2\Model\Entry $result */
         $result = $this->getResourceCollection()
@@ -86,17 +86,24 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
 
     /**
      * {@inheritdoc}
+     *
+     * @throws \Exception
      */
-    protected function insert(Source $invoiceSource, ?int $entryId, ?string $token, $created)
+    protected function insert(Source $invoiceSource, ?int $entryId, ?string $token, $created): bool
     {
-        $record = $this->getModel()
-            ->setEntryId($entryId)
-            ->setToken($token)
-            ->setSourceType($invoiceSource->getType())
-            ->setSourceId($invoiceSource->getId())
-            ->setUpdated($created);
-        /** @noinspection PhpUnhandledExceptionInspection */
-        return $this->getResourceModel()->save($record);
+        try {
+            $record = $this->getModel()
+                ->setEntryId($entryId)
+                ->setToken($token)
+                ->setSourceType($invoiceSource->getType())
+                ->setSourceId($invoiceSource->getId())
+                ->setUpdated($created);
+            $this->getResourceModel()->save($record);
+        } catch (Exception $e) {
+            $this->log->error(__CLASS__ . '::' . __METHOD__ . ': '. $e->getMessage());
+            throw $e;
+        }
+        return true;
     }
 
     /**
@@ -104,15 +111,21 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      *
      * @throws \Exception
      */
-    protected function update(BaseAcumulusEntry $entry, ?int $entryId, ?string $token, $updated)
+    protected function update(BaseAcumulusEntry $entry, ?int $entryId, ?string $token, $updated): bool
     {
         /** @var \Siel\AcumulusMa2\Model\Entry $record */
-        $record = $entry
-            ->getRecord()
-            ->setEntryId($entryId)
-            ->setToken($token)
-            ->setUpdated($updated);
-        return $this->getResourceModel()->save($record);
+        try {
+            $record = $entry
+                ->getRecord()
+                ->setEntryId($entryId)
+                ->setToken($token)
+                ->setUpdated($updated);
+            $this->getResourceModel()->save($record);
+        } catch (Exception $e) {
+            $this->log->error(__CLASS__ . '::' . __METHOD__ . ': '. $e->getMessage());
+            throw $e;
+        }
+        return true;
     }
 
     /**

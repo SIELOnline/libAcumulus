@@ -1,10 +1,16 @@
 <?php
+/**
+ * @noinspection HtmlUnknownTarget
+ */
+
 namespace Siel\Acumulus\Joomla\VirtueMart\Helpers;
 
 use Siel\Acumulus\Joomla\Helpers\ModuleSpecificTranslations as BaseModuleSpecificTranslations;
 
 /**
  * Contains plugin specific overrides.
+ *
+ * @noinspection PhpUnused
  */
 class ModuleSpecificTranslations extends BaseModuleSpecificTranslations
 {

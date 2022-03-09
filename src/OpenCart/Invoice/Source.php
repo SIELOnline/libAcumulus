@@ -38,7 +38,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    public function getDate()
+    public function getDate(): string
     {
         return substr($this->source['date_added'], 0, strlen('2000-01-01'));
     }
@@ -56,7 +56,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    public function getCountryCode()
+    public function getCountryCode(): string
     {
         return !empty($this->source['payment_iso_code_2']) ? $this->source['payment_iso_code_2'] : '';
     }
@@ -77,7 +77,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    public function getPaymentStatus(): ?int
+    public function getPaymentStatus(): int
     {
         // The 'config_complete_status' setting contains a set of statuses that,
         //  according to the help on the settings form:

@@ -488,7 +488,7 @@ class Creator extends BaseCreator
     /**
      * {@inheritdoc}
      */
-    protected function getShippingMethodName()
+    protected function getShippingMethodName(): string
     {
         $name = $this->order->getShippingDescription();
         if (!empty($name)) {

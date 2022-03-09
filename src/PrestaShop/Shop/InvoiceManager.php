@@ -59,7 +59,7 @@ class InvoiceManager extends BaseInvoiceManager
                     $InvoiceSourceIdFrom,
                     $InvoiceSourceIdTo
                 ));
-                return $this->getSourcesByIdsOrSources($invoiceSourceType, $this->getCol($ids, $key));
+                return $this->getSourcesByIdsOrSources($invoiceSourceType, array_column($ids, $key));
             case Source::CreditNote:
                 $key = pSql(OrderSlip::$definition['primary']);
                 /** @noinspection PhpUnhandledExceptionInspection */
@@ -71,7 +71,7 @@ class InvoiceManager extends BaseInvoiceManager
                     $InvoiceSourceIdFrom,
                     $InvoiceSourceIdTo
                 ));
-                return $this->getSourcesByIdsOrSources($invoiceSourceType, $this->getCol($ids, $key));
+                return $this->getSourcesByIdsOrSources($invoiceSourceType, array_column($ids, $key));
         }
         return [];
     }
@@ -93,7 +93,7 @@ class InvoiceManager extends BaseInvoiceManager
                         pSQL($invoiceSourceReferenceTo)
                     )
                 );
-                return $this->getSourcesByIdsOrSources($invoiceSourceType, $this->getCol($ids, $key));
+                return $this->getSourcesByIdsOrSources($invoiceSourceType, array_column($ids, $key));
             case Source::CreditNote:
                 return $this->getInvoiceSourcesByIdRange($invoiceSourceType, $invoiceSourceReferenceFrom, $invoiceSourceReferenceTo);
         }

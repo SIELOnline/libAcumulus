@@ -2,6 +2,7 @@
 namespace Siel\Acumulus\PrestaShop\Shop;
 
 use Db;
+use Exception;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
@@ -50,7 +51,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
             "SELECT * FROM `%s` WHERE id_entry %s %s",
             $this->tableName,
             $entryId === null ? 'is' : '=',
-            $entryId === null ? 'null' : (string) (int) $entryId
+            $entryId === null ? 'null' : (string) $entryId
         ));
         return $this->convertDbResultToAcumulusEntries($result);
     }
@@ -58,7 +59,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    public function getByInvoiceSource(Source $invoiceSource, bool $ignoreLock = true)
+    public function getByInvoiceSource(Source $invoiceSource, bool $ignoreLock = true): ?BaseAcumulusEntry
     {
         /** @noinspection PhpUnhandledExceptionInspection */
         $result = $this->getDb()->executeS(sprintf(
@@ -87,7 +88,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
             $this->tableName,
             $shopId,
             $shopGroupId,
-            $entryId === null ? 'null' : (string) (int) $entryId,
+            $entryId === null ? 'null' : (string) $entryId,
             $token === null ? 'null' : ("'" . pSql($token) . "'"),
             pSql($invoiceSource->getType()),
             $invoiceSource->getId(),
@@ -104,7 +105,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         return $this->getDb()->execute(sprintf(
             "UPDATE `%s` SET id_entry = %s, token = %s, updated = '%s' WHERE id = %u",
             $this->tableName,
-            $entryId === null ? 'null' : (string) (int) $entryId,
+            $entryId === null ? 'null' : (string) $entryId,
             $token === null ? 'null' : ("'" . pSql($token) . "'"),
             pSql($updated),
             $record['id']
@@ -146,12 +147,12 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      * @return bool
      *   Success.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function install(): bool
     {
         return $this->getDb()->execute(
-        "CREATE TABLE IF NOT EXISTS `{$this->tableName}` (
+        "CREATE TABLE IF NOT EXISTS `$this->tableName` (
             `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
             `id_shop` int(11) UNSIGNED NOT NULL DEFAULT '1',
             `id_shop_group` int(11) UNSIGNED NOT NULL DEFAULT '1',

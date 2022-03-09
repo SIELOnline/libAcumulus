@@ -6,11 +6,9 @@ use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
 /**
  * Implements the PrestaShop specific acumulus entry model class.
  *
- * In WooCommerce this data is stored as metadata. As such, the "records"
- * returned here are an array of all metadata values, thus not filtered by
- * Acumulus keys.
+ * PrestaShop has its own way of naming id columns, and that is the only change.
  */
 class AcumulusEntry extends BaseAcumulusEntry
 {
-    static protected $keyEntryId = 'id_entry';
+    protected static $keyEntryId = 'id_entry';
 }

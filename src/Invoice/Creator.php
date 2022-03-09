@@ -638,7 +638,7 @@ abstract class Creator
         $this->addNature($line);
         if (!empty($invoiceSettings['costPrice'])) {
             $value = $this->getTokenizedValue($invoiceSettings['costPrice']);
-            if (!Number::isZero($value)) {
+            if (!empty($value) && !Number::isZero($value)) {
                 // If we have a cost price we add it, even if this is no margin
                 // invoice.
                 $line[Tag::CostPrice] = $value;

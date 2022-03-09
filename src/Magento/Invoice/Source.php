@@ -77,7 +77,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    public function getDate()
+    public function getDate(): string
     {
         // createdAt returns yyyy-mm-dd hh:mm:ss, take date part.
         return substr($this->source->getCreatedAt(), 0, strlen('yyyy-mm-dd'));
@@ -96,15 +96,9 @@ class Source extends BaseSource
      *
      * @return int
      *   1 of
-     *   In Magento 1:
-     *   Mage_Sales_Model_Order_Creditmemo::STATE_OPEN         = 1;
-     *   Mage_Sales_Model_Order_Creditmemo::STATE_REFUNDED     = 2;
-     *   Mage_Sales_Model_Order_Creditmemo::STATE_CANCELED     = 3;
-     *   or in Magento 2:
      *   \Magento\Sales\Model\Order\Creditmemo::STATE_OPEN     = 1;
      *   \Magento\Sales\Model\Order\Creditmemo::STATE_REFUNDED = 2;
      *   \Magento\Sales\Model\Order\Creditmemo::STATE_CANCELED = 3;
-
      */
     protected function getStatusCreditNote(): int
     {

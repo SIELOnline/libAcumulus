@@ -129,7 +129,7 @@ class Log
      * @return string
      *   The full formatted message whether it got logged or not.
      */
-    public function log($severity, $message, array $args = [])
+    public function log($severity, $message, ... $args)
     {
         if (count($args) > 0) {
             $message = vsprintf($message, $args);

@@ -48,7 +48,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    public function getDate()
+    public function getDate(): string
     {
         return date(Api::DateFormat_Iso, $this->source->order_created);
     }
@@ -79,7 +79,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    public function getPaymentStatus(): ?int
+    public function getPaymentStatus(): int
     {
         /** @var \hikashopConfigClass $config */
         $config = hikashop_config();
@@ -92,7 +92,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    public function getPaymentDate()
+    public function getPaymentDate(): ?string
     {
         // Scan through the history and look for a non-empty
         // 'history_payment_id'. The order of this array is by 'history_created'
@@ -184,7 +184,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    public function getInvoiceDate()
+    public function getInvoiceDate(): ?string
     {
         return !empty($this->source->order_invoice_created) ? date(Api::DateFormat_Iso, $this->source->order_invoice_created) : parent::getInvoiceDate();
     }

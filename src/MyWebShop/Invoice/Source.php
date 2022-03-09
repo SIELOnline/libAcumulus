@@ -72,7 +72,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    public function getDate()
+    public function getDate(): string
     {
         // @todo: override or implement both getDateOrder() and getDateCreditNote()
     }
@@ -104,7 +104,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    public function getPaymentStatus()
+    public function getPaymentStatus(): int
     {
         // @todo: override or implement both getPaymentStatusOrder() and getPaymentStatusCreditNote()
         // Assumption: credit slips are always in a paid status.
@@ -119,7 +119,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    public function getPaymentDate()
+    public function getPaymentDate(): ?string
     {
         // @todo
     }

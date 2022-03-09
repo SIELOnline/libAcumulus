@@ -65,7 +65,7 @@ class Source extends BaseSource
     /**
      * @inheritDoc
      */
-    public function getDate()
+    public function getDate(): string
     {
         return substr($this->source->get_date_created(), 0, strlen('2000-01-01'));
     }
@@ -73,7 +73,7 @@ class Source extends BaseSource
     /**
      * @inheritDoc
      */
-    public function getStatus()
+    public function getStatus(): string
     {
         return $this->source->get_status();
     }
@@ -83,7 +83,7 @@ class Source extends BaseSource
      *
      * This override returns the id of a WC_Payment_Gateway.
      */
-    public function getPaymentMethod()
+    public function getPaymentMethod(): ?string
     {
         // Payment method is not stored for credit notes, so it is expected to
         // be the same as for its order.
@@ -210,7 +210,7 @@ class Source extends BaseSource
      *
      * @return int
      */
-    protected function getShopOrderOrId()
+    protected function getShopOrderOrId(): int
     {
         /** @var \WC_Order_Refund $refund */
         $refund = $this->source;
@@ -219,8 +219,10 @@ class Source extends BaseSource
 
     /**
      * {@inheritdoc}
+     *
+     * @return \WC_Order_Refund[]
      */
-    protected function getShopCreditNotesOrIds()
+    protected function getShopCreditNotesOrIds(): array
     {
         /** @var \WC_Order $order */
         $order = $this->source;

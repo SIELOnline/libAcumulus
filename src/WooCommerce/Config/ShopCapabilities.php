@@ -304,6 +304,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function getPaymentMethods(): array
     {
         $result = [];
+        /** @noinspection PhpUndefinedFieldInspection */
         $paymentGateways = wc()->payment_gateways->payment_gateways();
         foreach ($paymentGateways as $id => $paymentGateway) {
             if (isset($paymentGateway->enabled) && $paymentGateway->enabled === 'yes') {

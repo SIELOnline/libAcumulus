@@ -118,6 +118,7 @@ class CreatorPluginSupport
     public function acumulusInvoiceCreated(?array $invoice, BaseSource $invoiceSource, Result $localResult): ?array
     {
         $invoice = $this->supportBundleProducts($invoice, $invoiceSource, $localResult);
+        /** @noinspection PhpUnnecessaryLocalVariableInspection */
         $invoice = $this->supportTMExtraProductOptions($invoice, $invoiceSource, $localResult);
         return $invoice;
     }

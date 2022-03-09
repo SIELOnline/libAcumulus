@@ -65,7 +65,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    public function getDate()
+    public function getDate(): string
     {
         return substr($this->source->date_add, 0, strlen('2000-01-01'));
     }
@@ -110,7 +110,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    public function getPaymentStatus(): ?int
+    public function getPaymentStatus(): int
     {
         // Assumption: credit slips are always in a paid status.
         if (($this->getType() === Source::Order && $this->source->hasBeenPaid()) || $this->getType() === Source::CreditNote) {
@@ -124,7 +124,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    public function getPaymentDate()
+    public function getPaymentDate(): ?string
     {
         if ($this->getType() === Source::Order) {
             $paymentDate = null;
@@ -148,7 +148,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    public function getCountryCode()
+    public function getCountryCode(): string
     {
         $invoiceAddress = new Address($this->getOrder()->source->id_address_invoice);
         return !empty($invoiceAddress->id_country) ? Country::getIsoById($invoiceAddress->id_country) : '';
@@ -163,6 +163,7 @@ class Source extends BaseSource
     public function getCurrency(): array
     {
         $currency = Currency::getCurrencyInstance($this->getOrder()->source->id_currency);
+        /** @noinspection PhpCastIsUnnecessaryInspection */
         $result = array (
             Meta::Currency => $currency->iso_code,
             Meta::CurrencyRate => (float) $this->source->conversion_rate,

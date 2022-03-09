@@ -150,7 +150,7 @@ abstract class Source
      * @return string
      *   The order (or credit memo) date: yyyy-mm-dd.
      */
-    public function getDate(): ?string
+    public function getDate(): string
     {
         return $this->callTypeSpecificMethod(__FUNCTION__);
     }
@@ -207,7 +207,7 @@ abstract class Source
      *   \Siel\Acumulus\Api::PaymentStatus_Paid or
      *   \Siel\Acumulus\Api::PaymentStatus_Due
      */
-    public function getPaymentStatus(): ?int
+    public function getPaymentStatus(): int
     {
         return $this->callTypeSpecificMethod(__FUNCTION__);
     }

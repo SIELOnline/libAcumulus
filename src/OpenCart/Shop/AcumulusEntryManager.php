@@ -56,7 +56,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
             "SELECT * FROM `%s` WHERE entry_id %s %s",
             $this->tableName,
             $entryId === null ? 'is' : '=',
-            $entryId === null ? 'null' : (string) (int) $entryId
+            $entryId === null ? 'null' : (string) $entryId
         ));
         return $this->convertDbResultToAcumulusEntries($result->rows);
     }
@@ -64,7 +64,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    public function getByInvoiceSource(Source $invoiceSource, bool $ignoreLock = true)
+    public function getByInvoiceSource(Source $invoiceSource, bool $ignoreLock = true): BaseAcumulusEntry
     {
         /** @var \stdClass $result  (documentation error in DB) */
         $result = $this->getDb()->query(sprintf(
@@ -91,7 +91,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
             "INSERT INTO `%s` (store_id, entry_id, token, source_type, source_id, updated) VALUES (%u, %s, %s, '%s', %u, '%s')",
             $this->tableName,
             $storeId,
-            $entryId === null ? 'null' : (string) (int) $entryId,
+            $entryId === null ? 'null' : (string) $entryId,
             $token === null ? 'null' : ("'" . $this->getDb()->escape($token) . "'"),
             $this->getDb()->escape($invoiceSource->getType()),
             $invoiceSource->getId(),
@@ -108,7 +108,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         return (bool) $this->getDb()->query(sprintf(
             "UPDATE `%s` SET entry_id = %s, token = %s, updated = '%s' WHERE id = %u",
             $this->tableName,
-            $entryId === null ? 'null' : (string) (int) $entryId,
+            $entryId === null ? 'null' : (string) $entryId,
             $token === null ? 'null' : "'" . $this->getDb()->escape($token) . "'",
             $this->getDb()->escape($updated),
             $record['id']
@@ -148,6 +148,8 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
 
     /**
      * {@inheritdoc}
+     *
+     * @throws \Exception
      */
     public function install(): bool
     {
@@ -228,7 +230,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritDoc}
      */
-    public function upgrade(string $currentVersion)
+    public function upgrade(string $currentVersion): bool
     {
         $result = true;
 

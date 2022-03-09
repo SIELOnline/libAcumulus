@@ -98,8 +98,10 @@ abstract class Form extends MessageCollection
     protected $formValuesSet;
 
     /**
-     * @var array
-     *   The values to be placed on the configuration form.
+     * @var (string|int|float|bool|array|null)[]
+     *   The values to be placed on the configuration form. The values that come
+     *   from the submitted values are cast to their expected types. Thus, in
+     *   contrast with $submittedValues, these are not only strings.
      */
     protected $formValues;
 
@@ -242,8 +244,8 @@ abstract class Form extends MessageCollection
                 } elseif (is_array($defaultFormValue)) {
                     // Distribute keyed arrays over separate values if existing.
                     foreach ($defaultFormValue as $arrayKey => $arrayValue) {
-                        /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
-                        $fullKey = "{$key}[{$arrayKey}]";
+                        /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection : https://youtrack.jetbrains.com/issue/WI-60044 */
+                        $fullKey = "{$key}[$arrayKey]";
                         if (array_key_exists($fullKey, $this->formValues)) {
                             $this->formValues[$fullKey] = $arrayValue;
                         }
@@ -293,10 +295,10 @@ abstract class Form extends MessageCollection
      * @param string $name
      *   The name of the form field.
      *
-     * @return string
+     * @return string|int|float|bool|array|null
      *   The value for this form field or the empty string if not set.
      */
-    protected function getFormValue(string $name): string
+    protected function getFormValue(string $name)
     {
         $this->setFormValues();
         return $this->formValues[$name] ?? '';

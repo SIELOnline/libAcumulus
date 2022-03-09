@@ -7,7 +7,7 @@ use Siel\Acumulus\Helpers\TranslationCollection;
 /**
  * Contains translations for invoice send result logging.
  *
- * @noinspection PhpUnused Loaded by the Container
+ * @noinspection PhpUnused : Loaded by the Container.
  */
 class ResultTranslations extends TranslationCollection
 {

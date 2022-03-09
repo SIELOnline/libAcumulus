@@ -46,7 +46,7 @@ class Creator extends BaseCreator
      * This override also initializes HS specific properties related to the
      * source.
      */
-    protected function setInvoiceSource($invoiceSource)
+    protected function setInvoiceSource(\Siel\Acumulus\Invoice\Source $invoiceSource)
     {
         parent::setInvoiceSource($invoiceSource);
         $this->order = $this->invoiceSource->getSource();

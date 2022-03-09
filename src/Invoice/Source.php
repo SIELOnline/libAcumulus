@@ -1,5 +1,4 @@
 <?php
-
 namespace Siel\Acumulus\Invoice;
 
 use RuntimeException;
@@ -15,9 +14,9 @@ use Siel\Acumulus\Meta;
 abstract class Source
 {
     // Invoice source type constants.
-    const Order = 'Order';
-    const CreditNote = 'CreditNote';
-    const Other = 'Other';
+    public const Order = 'Order';
+    public const CreditNote = 'CreditNote';
+    public const Other = 'Other';
 
     /** @var string */
     protected $type;
@@ -32,12 +31,12 @@ abstract class Source
     protected $invoice;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param string $type
      * @param int|string|array|object $idOrSource
      */
-    public function __construct($type, $idOrSource)
+    public function __construct(string $type, $idOrSource)
     {
         $this->type = $type;
         if (empty($idOrSource)) {
@@ -80,7 +79,7 @@ abstract class Source
      *
      * @noinspection PhpUnused
      */
-    public function isValid()
+    public function isValid(): bool
     {
         return $this->id !== null && $this->source !== null;
     }
@@ -91,7 +90,7 @@ abstract class Source
      * @return string
      *   One of the constants Source::Order or Source::CreditNote.
      */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
@@ -113,7 +112,7 @@ abstract class Source
      * @return int
      *   The internal id of the web shop's invoice source.
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -140,7 +139,7 @@ abstract class Source
      *   1 for orders, -1 for credit notes (unless the amounts or quantities on
      *   the web shop's credit notes are already negative).
      */
-    public function getSign()
+    public function getSign(): float
     {
         return $this->getType() === static::CreditNote ? -1.0 : 1.0;
     }
@@ -151,7 +150,7 @@ abstract class Source
      * @return string
      *   The order (or credit memo) date: yyyy-mm-dd.
      */
-    public function getDate()
+    public function getDate(): ?string
     {
         return $this->callTypeSpecificMethod(__FUNCTION__);
     }
@@ -208,7 +207,7 @@ abstract class Source
      *   \Siel\Acumulus\Api::PaymentStatus_Paid or
      *   \Siel\Acumulus\Api::PaymentStatus_Due
      */
-    public function getPaymentStatus()
+    public function getPaymentStatus(): ?int
     {
         return $this->callTypeSpecificMethod(__FUNCTION__);
     }
@@ -224,7 +223,7 @@ abstract class Source
      *   The payment date (yyyy-mm-dd) or null if the order has not been (fully)
      *   paid yet.
      */
-    public function getPaymentDate()
+    public function getPaymentDate(): ?string
     {
         return $this->callTypeSpecificMethod(__FUNCTION__);
     }
@@ -236,7 +235,7 @@ abstract class Source
      *   The 2-letter country code for the current order or the empty string if
      *   not set.
      */
-    abstract public function getCountryCode();
+    abstract public function getCountryCode(): string;
 
     /**
      * Returns metadata about the used currency on the invoice.
@@ -251,7 +250,7 @@ abstract class Source
      * @return array
      *   An array with the currency meta tags.
      */
-    abstract public function getCurrency();
+    abstract public function getCurrency(): array;
 
     /**
      * Returns an array with the totals fields.
@@ -260,15 +259,15 @@ abstract class Source
      *
      * @return array
      *   An array with the following possible keys:
-     *   - meta-invoice-amount: the total invoice amount excluding VAT.
-     *   - meta-invoice-amountinc: the total invoice amount including VAT.
-     *   - meta-invoice-vatamount: the total vat amount for the invoice.
+     *   - 'meta-invoice-amount': the total invoice amount excluding VAT.
+     *   - 'meta-invoice-amountinc': the total invoice amount including VAT.
+     *   - 'meta-invoice-vatamount': the total vat amount for the invoice.
      *
      *   This one is really optional: so far only filled by OpenCart and
      *   purely for reasons of support:
-     *   - meta-invoice-vat-breakdown: a vat breakdown per vat rate.
+     *   - 'meta-invoice-vat-breakdown': a vat breakdown per vat rate.
      */
-    public function getTotals()
+    public function getTotals(): array
     {
         return $this->completeTotals($this->getAvailableTotals());
     }
@@ -282,15 +281,15 @@ abstract class Source
      *
      * @return array
      *   An array with the following possible keys:
-     *   - meta-invoice-amount: the total invoice amount excluding VAT.
-     *   - meta-invoice-amountinc: the total invoice amount including VAT.
-     *   - meta-invoice-vatamount: the total vat amount for the invoice.
+     *   - 'meta-invoice-amount': the total invoice amount excluding VAT.
+     *   - 'meta-invoice-amountinc': the total invoice amount including VAT.
+     *   - 'meta-invoice-vatamount': the total vat amount for the invoice.
      *
      *   This one is really optional: so far only filled by OpenCart and
      *   purely for reasons of support:
-     *   - meta-invoice-vat-breakdown: a vat breakdown per vat rate.
+     *   - 'meta-invoice-vat-breakdown': a vat breakdown per vat rate.
      */
-    abstract protected function getAvailableTotals();
+    abstract protected function getAvailableTotals(): array;
 
     /**
      * Completes the set of invoice totals as set by getInvoiceTotals.
@@ -306,7 +305,7 @@ abstract class Source
      * @return array
      *   The invoice totals with all invoice total fields.
      */
-    protected function completeTotals(array $totals)
+    protected function completeTotals(array $totals): array
     {
         if (!isset($totals[Meta::InvoiceAmount])) {
             $totals[Meta::InvoiceAmount] = $totals[Meta::InvoiceAmountInc] - $totals[Meta::InvoiceVatAmount];
@@ -373,7 +372,7 @@ abstract class Source
      *   Date of the (web shop) invoice linked to this source: yyyy-mm-dd, or
      *   null if no web shop invoice is linked to this source.
      */
-    public function getInvoiceDate()
+    public function getInvoiceDate(): ?string
     {
         return $this->callTypeSpecificMethod(__FUNCTION__);
     }
@@ -383,7 +382,7 @@ abstract class Source
      *
      * @noinspection PhpUnused
      */
-    public function getInvoiceDateCreditNote()
+    public function getInvoiceDateCreditNote(): ?string
     {
         // A credit note is to be considered an invoice on its own.
         return $this->getDate();
@@ -398,7 +397,7 @@ abstract class Source
      *   If the invoice source is a credit note, its original order is returned,
      *   otherwise, the invoice source is an order itself and $this is returned.
      */
-    public function getOrder()
+    public function getOrder(): Source
     {
         return $this->getType() === static::CreditNote ? new static(static::Order, $this->getShopOrderOrId()) : $this;
     }
@@ -431,7 +430,7 @@ abstract class Source
      *   If the invoice source is an order, an array of refunds is returned,
      *   null otherwise.
      */
-    public function getCreditNotes()
+    public function getCreditNotes(): ?array
     {
         $result = null;
         if ($this->getType() === static::Order) {
@@ -464,25 +463,26 @@ abstract class Source
 
     /**
      * Calls a "sub" method whose logic depends on the type of invoice source.
-     *
      * This allows to separate logic for different source types into different
      * methods.
-     *
      * The method name is expected to be the original method name suffixed with
      * the source type (Order or CreditNote).
      *
      * @param string $method
-     *   The original method called.
+     *   The name of the base method for which to call the Source type specific
+     *   variant.
      * @param array $args
-     *   The parameters to pass to the type specific method.
+     *   The arguments to pass to the method to call.
      *
      * @return mixed
+     *   The return value of that method call, or null if the method does not
+     *   exist.
      */
-    protected function callTypeSpecificMethod($method, $args = [])
+    protected function callTypeSpecificMethod(string $method, array $args = [])
     {
         $method .= $this->getType();
         if (method_exists($this, $method)) {
-            return call_user_func_array([$this, $method], $args);
+            return $this->$method(... $args);
         }
         return null;
     }

@@ -1,4 +1,8 @@
 <?php
+/**
+ * @noinspection PhpStaticAsDynamicMethodCallInspection
+ */
+
 namespace Siel\Acumulus\Invoice;
 
 use Siel\Acumulus\Api;
@@ -83,7 +87,7 @@ class CompletorInvoiceLines
      * @return array
      *   The completed invoice.
      */
-    public function complete(array $invoice, array $possibleVatTypes, array $possibleVatRates)
+    public function complete(array $invoice, array $possibleVatTypes, array $possibleVatRates): array
     {
         $this->possibleVatTypes = $possibleVatTypes;
         $this->possibleVatRates = $possibleVatRates;
@@ -111,7 +115,7 @@ class CompletorInvoiceLines
      * @return array[]
      *   The invoice with the completed invoice lines.
      */
-    protected function completeInvoiceLinesRecursive(array $invoice)
+    protected function completeInvoiceLinesRecursive(array $invoice): array
     {
         $lines = $invoice[Tag::Customer][Tag::Invoice][Tag::Line];
 
@@ -129,12 +133,12 @@ class CompletorInvoiceLines
         //   rate.
         //   This would allow to combine VatRateSource_Calculated and
         //   VatRateSource_Completor.
-        // correctCalculatedVatRates() only uses vatrate, meta-vatrate-min, and
-        // meta-vatrate-max and may lead to more (required) data filled in, so
-        // should be called before completeLineRequiredData().
+        // correctCalculatedVatRates() only uses 'vatrate', 'meta-vatrate-min',
+        // and 'meta-vatrate-max' and may lead to more (required) data filled
+        // in, so should be called before completeLineRequiredData().
         $lines = $this->correctCalculatedVatRates($lines);
-        // addVatRateUsingLookupData() only uses meta-vat-rate-lookup and may lead
-        // to more (required) data filled in, so should be called before
+        // addVatRateUsingLookupData() only uses 'meta-vat-rate-lookup' and may
+        // lead to more (required) data filled in, so should be called before
         // completeLineRequiredData().
         $lines = $this->addVatRateUsingLookupData($lines);
         $lines = $this->completeLineRequiredData($lines);
@@ -156,7 +160,7 @@ class CompletorInvoiceLines
      * @return array[]
      *   The completed invoice lines.
      */
-    protected function completeInvoiceLines(array $lines)
+    protected function completeInvoiceLines(array $lines): array
     {
         $lines = $this->addNatureToNonItemLines($lines);
         $lines = $this->addVatRateTo0PriceLines($lines);
@@ -167,7 +171,6 @@ class CompletorInvoiceLines
 
     /**
      * Converts amounts to euro if another currency was used.
-     *
      * This method only converts amounts at the line level. The invoice level
      * is handled by the completor and already has been converted.
      *
@@ -178,7 +181,7 @@ class CompletorInvoiceLines
      * @return array[]
      *   The completed invoice lines.
      */
-    protected function convertToEuro(array $lines, $conversionRate)
+    protected function convertToEuro(array $lines, float $conversionRate): array
     {
         foreach ($lines as &$line) {
             $this->completor->convertAmount($line, Tag::UnitPrice, $conversionRate);
@@ -213,7 +216,7 @@ class CompletorInvoiceLines
      * @return array[]
      *   The corrected invoice lines.
      */
-    protected function correctCalculatedVatRates(array $lines)
+    protected function correctCalculatedVatRates(array $lines): array
     {
         foreach ($lines as &$line) {
             if (!empty($line[Meta::VatRateSource]) && $line[Meta::VatRateSource] === Creator::VatRateSource_Calculated) {
@@ -229,11 +232,11 @@ class CompletorInvoiceLines
     /**
      * Checks and corrects a 'calculated' vat rate to an allowed vat rate.
      *
-     * The meta-vatrate-source must be Creator::VatRateSource_Calculated.
+     * The 'meta-vatrate-source' must be Creator::VatRateSource_Calculated.
      *
      * The check is done on comparing allowed vat rates with the
-     * meta-vatrate-min and meta-vatrate-max values. If only 1 match is found
-     * that will be used.
+     * 'meta-vatrate-min' and 'meta-vatrate-max' values. If only 1 match is
+     * found that will be used.
      *
      * If multiple matches are found with all equal rates - e.g. Dutch and
      * Belgium 21% - the vat rate will be corrected, but the VAT Type will
@@ -251,7 +254,7 @@ class CompletorInvoiceLines
      * @return array
      *   The invoice line with a corrected vat rate.
      */
-    public function correctVatRateByRange(array $line)
+    public function correctVatRateByRange(array $line): array
     {
         $line[Meta::VatRateRangeMatches] = $this->filterVatRateInfosByRange($line[Meta::VatRateMin], $line[Meta::VatRateMax]);
         $vatRate = $this->getUniqueVatRate($line[Meta::VatRateRangeMatches]);
@@ -266,7 +269,7 @@ class CompletorInvoiceLines
                 $line[Tag::VatRate] = null;
                 $line[Meta::VatRateSource] = Creator::VatRateSource_Strategy;
             } else {
-                // Set vatrate to null and try to use lookup data to get a vat
+                // Set vat rate to null and try to use lookup data to get a vat
                 // rate. It will be invalid but may be better than the "setting
                 // to standard 21%".
                 $line[Tag::VatRate] = null;
@@ -278,7 +281,7 @@ class CompletorInvoiceLines
                 //   concept.
             }
         } elseif ($vatRate === false) {
-            // Multiple matches: set vatrate to null and try to use lookup data.
+            // Multiple matches: set vat rate to null and try to use lookup data.
             $line[Tag::VatRate] = null;
             $line[Meta::VatRateSource] = Creator::VatRateSource_Completor;
         } else {
@@ -291,9 +294,9 @@ class CompletorInvoiceLines
     }
 
     /**
-     * Completes lines that have meta-vatrate-lookup(-...) data.
+     * Completes lines that have 'meta-vatrate-lookup(-...)' data.
      *
-     * Meta-vatrate-lookup data is added by the Creator class using vat rates
+     * Vat rate lookup metadata is added by the Creator class using vat rates
      * from the product info. However, as VAT rates may have changed between the
      * date of the order and now, we cannot fully rely on it and use it only as
      * a(n almost) last resort.
@@ -320,7 +323,7 @@ class CompletorInvoiceLines
      * @return array[]
      *   The corrected invoice lines.
      */
-    protected function addVatRateUsingLookupData(array $lines)
+    protected function addVatRateUsingLookupData(array $lines): array
     {
         foreach ($lines as &$line) {
             if ($line[Meta::VatRateSource] === Creator::VatRateSource_Completor) {
@@ -387,9 +390,9 @@ class CompletorInvoiceLines
      *
      * The creator filled in the fields that are directly available from the
      * shops' data store. This method completes (if not filled in):
-     * - unitprice.
-     * - vatamount
-     * - unitpriceinc
+     * - 'unitprice'
+     * - 'vatamount'
+     * - 'unitpriceinc'
      *
      * @param array[] $lines
      *   The invoice lines to complete with required data.
@@ -400,7 +403,7 @@ class CompletorInvoiceLines
      * @return array[]
      *   The completed invoice lines.
      */
-    protected function completeLineRequiredData(array $lines, array $parent = null)
+    protected function completeLineRequiredData(array $lines, array $parent = null): array
     {
         foreach ($lines as &$line) {
             // Easy gains first. Known usages: Magento.
@@ -417,8 +420,8 @@ class CompletorInvoiceLines
 
 
             if (!isset($line[Tag::UnitPrice])) {
-                // With margin scheme, the unitprice should be known but may
-                // have ended up in the unitpriceinc.
+                // With margin scheme, the unit price should be known but may
+                // have ended up in the unit price inc.
                 if (isset($line[Tag::CostPrice])) {
                     if (isset($line[Meta::UnitPriceInc])) {
                         $line[Tag::UnitPrice] = $line[Meta::UnitPriceInc];
@@ -431,16 +434,16 @@ class CompletorInvoiceLines
                          $line[Tag::UnitPrice] = $line[Meta::UnitPriceInc] / (100.0 + $line[Tag::VatRate]) * 100.0;
                     } elseif (isset($line[Meta::VatAmount])) {
                         $line[Tag::UnitPrice] = $line[Meta::UnitPriceInc] - $line[Meta::VatAmount];
-                    } //else {
-                        // We cannot fill in unitprice reliably, so better to
+                    } // else {
+                        // We cannot fill in unit price reliably, so better to
                         // leave it empty and fail clearly.
-                    //}
+                    // }
                     $line[Meta::FieldsCalculated][] = Tag::UnitPrice;
                 }
             }
 
             if (!isset($line[Meta::UnitPriceInc])) {
-                // With margin scheme, the unitpriceinc equals unitprice.
+                // With margin scheme, the unit price inc equals unit price.
                 if (isset($line[Tag::CostPrice])) {
                     if (isset($line[Tag::UnitPrice])) {
                         $line[Meta::UnitPriceInc] = $line[Tag::UnitPrice];
@@ -455,9 +458,9 @@ class CompletorInvoiceLines
                             : $line[Tag::UnitPrice] * (100.0 + $line[Tag::VatRate]) / 100.0;
                     } elseif (isset($line[Meta::VatAmount])) {
                         $line[Meta::UnitPriceInc] = $line[Tag::UnitPrice] + $line[Meta::VatAmount];
-                    } //else {
-                        // We cannot fill in unitpriceinc reliably, so we leave
-                        // it empty as it is metadata after all.
+                    } // else {
+                        // We cannot fill in unit price inc reliably, so we
+                        // leave it empty as it is metadata after all.
                     // }
                     $line[Meta::FieldsCalculated][] = Meta::UnitPriceInc;
                 }
@@ -476,7 +479,7 @@ class CompletorInvoiceLines
                     }
                 } elseif (isset($line[Meta::VatAmount]) && isset($line[Tag::UnitPrice])) {
                     // This may use the easy gain, so known usages: Magento.
-                    // Set (overwrite the tag vatrate-source) vatrate and
+                    // Set (overwrite the tag vatrate-source) 'vatrate' and
                     // accompanying tags.
                     $precision = 0.01;
                     // If the amounts are the sum of amounts taken from
@@ -529,18 +532,18 @@ class CompletorInvoiceLines
     }
 
     /**
-     * Adds the nature tag to the non item lines.
+     * Adds the nature tag to the non-item lines.
      *
      * The nature tag indicates the nature of the order line: product or
-     * service. However for accompanying services like shipping or payment fees,
-     * the nature should follow the major part of the "real" order items.
+     * service. However, for accompanying services like shipping or payment
+     * fees, the nature should follow the major part of the "real" order items.
      *
      * @param array[] $lines
      *
      * @return array[]
-     *   The lines with the nature field completed for non item lines.
+     *   The lines with the nature field completed for non-item lines.
      */
-    protected function addNatureToNonItemLines(array $lines)
+    protected function addNatureToNonItemLines(array $lines): array
     {
         $nature = $this->getMaxAppearingNature($lines);
         if (!empty($nature)) {
@@ -562,8 +565,8 @@ class CompletorInvoiceLines
      * - If discounts appear on separate lines, they won't have a nature field.
      *   If such a discount was meant for certain lines only, it should get the
      *   nature of these lines (and subsequently be used to calculate the major
-     *   part). However we do not know for which lines it was meant, so we treat
-     *   them like the other extra lines.
+     *   part). However, we do not know for which lines it was meant, so we
+     *   treat them like the other extra lines.
      *
      * @param array[] $lines
      *   The invoice lines to search.
@@ -573,10 +576,10 @@ class CompletorInvoiceLines
      *   lines (hoofdbestanddeel). Can be the empty string to indicate that no
      *   nature is known for the major part.
      */
-    public function getMaxAppearingNature(array $lines)
+    public function getMaxAppearingNature(array $lines): string
     {
         $amountPerNature = ['' => 0.0, Api::Nature_Product => 0.0, Api::Nature_Service => 0.0];
-        foreach ($lines as $key => $line) {
+        foreach ($lines as $line) {
             if (isset($line[Meta::LineType]) && $line[Meta::LineType] === Creator::LineType_OrderItem) {
                 $nature = !empty($line[Tag::Nature]) ? $line[Tag::Nature] : '';
                 $amount = abs($line[Tag::Quantity] * $line[Tag::UnitPrice]);
@@ -584,7 +587,6 @@ class CompletorInvoiceLines
             }
         }
         arsort($amountPerNature, SORT_NUMERIC);
-        reset($amountPerNature);
         return key($amountPerNature);
     }
 
@@ -602,7 +604,7 @@ class CompletorInvoiceLines
      * @return array[]
      *   The corrected invoice lines.
      */
-    protected function addVatRateTo0PriceLines(array $lines)
+    protected function addVatRateTo0PriceLines(array $lines): array
     {
         // Get the highest appearing vat rate. We could get the most often
         // appearing vat rate, but IMO the highest vat rate will be more likely
@@ -610,7 +612,7 @@ class CompletorInvoiceLines
         $maxVatRate = $this->getMaxAppearingVatRate($lines);
 
         foreach ($lines as &$line) {
-            $price = isset($line[Tag::UnitPrice]) ? $line[Tag::UnitPrice] : $line[Meta::UnitPriceInc];
+            $price = $line[Tag::UnitPrice] ?? $line[Meta::UnitPriceInc];
             if ($line[Meta::VatRateSource] === Creator::VatRateSource_Completor && Number::isZero($price)) {
                 if ($maxVatRate !== null) {
                     $line[Tag::VatRate] = $maxVatRate;
@@ -628,14 +630,14 @@ class CompletorInvoiceLines
      *
      * @param array[] $lines
      *   The invoice lines to search.
-     * @param int $index
+     * @param ?int $index
      *   If passed, the index of the max vat rate is returned via this parameter.
      *
      * @return float|null
      *   The maximum vat rate in the given set of lines or null if no vat rates
      *   could be found.
      */
-    public static function getMaxAppearingVatRate(array $lines, &$index = 0)
+    public static function getMaxAppearingVatRate(array $lines, ?int &$index = 0): ?float
     {
         $index = null;
         $maxVatRate = -1.0;
@@ -661,7 +663,7 @@ class CompletorInvoiceLines
      *   The, possibly empty, set of vat rate infos that have a vat rate that
      *   falls within the given vat range.
      */
-    protected function filterVatRateInfosByRange($min, $max, array $vatRateInfos = null)
+    protected function filterVatRateInfosByRange(float $min, float $max, array $vatRateInfos = null): array
     {
         if ($vatRateInfos === null) {
             $vatRateInfos = $this->possibleVatRates;
@@ -691,7 +693,7 @@ class CompletorInvoiceLines
      *   The, possibly empty, set of $vatRateInfos that have a vat rate that
      *   appears within the set of $vatRates.
      */
-    protected function filterVatRateInfosByVatRates($vatRates, array $vatRateInfos = null)
+    protected function filterVatRateInfosByVatRates($vatRates, array $vatRateInfos = null): array
     {
         $vatRates = (array) $vatRates;
         if ($vatRateInfos === null) {
@@ -723,10 +725,10 @@ class CompletorInvoiceLines
      *   $this->possibleVatRates is used.
      *
      * @return array[]
-     *   The, possibly empty, set of vat rate infos that indicate (or not) a
+     *   The, possibly empty, set of vat rate infos that indicate (or not) an
      *   EU vat type.
      */
-    protected function filterVatRateInfosByEuVat($isEuVatType, array $vatRateInfos = null)
+    protected function filterVatRateInfosByEuVat(bool $isEuVatType, array $vatRateInfos = null): array
     {
         if ($vatRateInfos === null) {
             $vatRateInfos = $this->possibleVatRates;
@@ -742,27 +744,27 @@ class CompletorInvoiceLines
     }
 
     /**
-     * Recalculates the unitprice(inc) for lines that indicate so.
+     * Recalculates the 'unitprice(inc)' for lines that indicate so.
      *
-     * PRE: All non strategy invoice lines have unitprice and vatrate filled in
-     * and should by now have correct(ed) VAT rates. In some shops the unitprice
-     * or unitpriceinc is imprecise because they are returned rounded to the
-     * cent.
+     * PRE: All non strategy invoice lines have 'unitprice' and 'vatrate' filled
+     * in and should by now have correct(ed) VAT rates. In some shops the
+     * 'unitprice' or 'unitpriceinc' is imprecise because they are returned
+     * rounded to the cent.
      *
      * To prevent differences between the Acumulus and shop invoice (or between
-     * the invoice and line totals) we recompute the unitprice if:
-     * - vatrate is correct.
-     * - meta-recalculate-price is set to Tag::UnitPrice. (Shops should set
+     * the invoice and line totals) we recompute the 'unitprice' if:
+     * - Vat rate is correct.
+     * - 'meta-recalculate-price' is set to Tag::UnitPrice. (Shops should set
      *   so, if prices are entered inc vat and the price ex vat as obtained by
      *   this plugin is known to have a precision worse than 0.0001.
-     * - unitpriceinc is available.
+     * - Unit price inc is available.
      *
-     * We recompute the unitpriceinc if:
-     * - vatrate is correct.
-     * - meta-recalculate-price is set to Meta:UnitPriceInc. (Shops should set
+     * We recompute the unit price inc if:
+     * - Vat rate is correct.
+     * - 'meta-recalculate-price' is set to Meta:UnitPriceInc. (Shops should set
      *   so, if prices are entered ex vat and the price inc vat as obtained by
      *   this plugin is known to have a precision worse than 0.0001.
-     * - unitprice is available.
+     * - Unit price is available.
      *
      * @param array[] $lines
      *   The invoice lines to recalculate.
@@ -770,7 +772,7 @@ class CompletorInvoiceLines
      * @return array[]
      *   The recalculated invoice lines.
      */
-    protected function recalculateLineData(array $lines)
+    protected function recalculateLineData(array $lines): array
     {
         foreach ($lines as &$line) {
             if (!empty($line[Meta::RecalculatePrice]) && Completor::isCorrectVatRate($line[Meta::VatRateSource]) && isset($line[Meta::UnitPriceInc])) {
@@ -791,24 +793,24 @@ class CompletorInvoiceLines
     /**
      * Completes each (non-strategy) invoice line with missing (meta) info.
      *
-     * All non strategy invoice lines have unitprice and vatrate filled in and
-     * should by now have correct(ed) VAT rates. In some shops these non
-     * strategy invoice lines may have a meta-line-discount-vatamount or
-     * meta-line-discount-amountinc field, that can be used with the
+     * All non strategy invoice lines have 'unitprice' and 'vatrate' filled in
+     * and should by now have correct(ed) VAT rates. In some shops these non
+     * strategy invoice lines may have a 'meta-line-discount-vatamount' or
+     * 'meta-line-discount-amountinc' field, that can be used with the
      * SplitKnownDiscountLine strategy.
      *
      * Complete (if missing):
-     * - unitpriceinc
-     * - vatamount
-     * - meta-line-discount-amountinc (if meta-line-discount-vatamount is
+     * - 'unitpriceinc'
+     * - 'vatamount'
+     * - 'meta-line-discount-amountinc' (if 'meta-line-discount-vatamount' is
      *   available).
      *
      * For strategy invoice lines that may be split with the SplitNonMatching
      * line strategy, we need to know the line totals.
      *
      * Complete (if missing):
-     * - meta-line-price
-     * - meta-line-priceinc
+     * - 'meta-line-price'
+     * - 'meta-line-priceinc'
      *
      * @param array[] $lines
      *   The invoice lines to complete with meta data.
@@ -816,7 +818,7 @@ class CompletorInvoiceLines
      * @return array[]
      *   The completed invoice lines.
      */
-    protected function completeLineMetaData(array $lines)
+    protected function completeLineMetaData(array $lines): array
     {
         foreach ($lines as &$line) {
             if (Completor::isCorrectVatRate($line[Meta::VatRateSource])) {

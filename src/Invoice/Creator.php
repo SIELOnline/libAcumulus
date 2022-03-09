@@ -43,7 +43,7 @@ use Siel\Acumulus\Tag;
  * - Contains all customer tags (as far as they should or can be set), even if
  *   the use configured to not send customer data to Acumulus.
  * - Contains most invoice tags (as far as they should or can be set), except
- *   vattype and concept.
+ *   'vattype' and 'concept'.
  * - Contains all invoice lines (based on order data), but:
  *     - Possibly hierarchically structured.
  *     - Does not have to be complete or correct.
@@ -58,8 +58,8 @@ use Siel\Acumulus\Tag;
  *
  * ad 1)
  * For each option or variant you add a child line. Set the meta tag
- * meta-vatrate-source to Creator::VatRateSource_Parent. Copy the quantity from
- * the parent to the child. Price info is probably on the parent line only,
+ * 'meta-vatrate-source' to Creator::VatRateSource_Parent. Copy the quantity
+ * from the parent to the child. Price info is probably on the parent line only,
  * unless your shop administers additional or reduced costs for a given option
  * on the child lines.
  *
@@ -80,24 +80,24 @@ use Siel\Acumulus\Tag;
  */
 abstract class Creator
 {
-    const VatRateSource_Exact = 'exact';
-    const VatRateSource_Exact0 = 'exact-0';
-    const VatRateSource_Calculated = 'calculated';
-    const VatRateSource_Completor = 'completor';
-    const VatRateSource_Strategy = 'strategy';
-    const VatRateSource_Parent = 'parent';
-    const VatRateSource_Child = 'child';
-    const VatRateSource_Creator_Lookup = 'creator-lookup';
+    public const VatRateSource_Exact = 'exact';
+    public const VatRateSource_Exact0 = 'exact-0';
+    public const VatRateSource_Calculated = 'calculated';
+    public const VatRateSource_Completor = 'completor';
+    public const VatRateSource_Strategy = 'strategy';
+    public const VatRateSource_Parent = 'parent';
+    public const VatRateSource_Child = 'child';
+    public const VatRateSource_Creator_Lookup = 'creator-lookup';
 
-    const LineType_OrderItem = 'order-item';
-    const LineType_Shipping = 'shipping';
-    const LineType_PaymentFee = 'payment';
-    const LineType_GiftWrapping = 'gift';
-    const LineType_Manual = 'manual';
-    const LineType_Discount = 'discount';
-    const LineType_Voucher = 'voucher';
-    const LineType_Other = 'other';
-    const LineType_Corrector = 'missing-amount-corrector';
+    public const LineType_OrderItem = 'order-item';
+    public const LineType_Shipping = 'shipping';
+    public const LineType_PaymentFee = 'payment';
+    public const LineType_GiftWrapping = 'gift';
+    public const LineType_Manual = 'manual';
+    public const LineType_Discount = 'discount';
+    public const LineType_Voucher = 'voucher';
+    public const LineType_Other = 'other';
+    public const LineType_Corrector = 'missing-amount-corrector';
 
     /** @var \Siel\Acumulus\Config\Config */
     protected $config;
@@ -177,7 +177,7 @@ abstract class Creator
      *   The translation for the given key or the key itself if no translation
      *   could be found.
      */
-    protected function t($key)
+    protected function t(string $key): string
     {
         return $this->translator->get($key);
     }
@@ -187,7 +187,7 @@ abstract class Creator
      *
      * @param Source $invoiceSource
      */
-    protected function setInvoiceSource($invoiceSource)
+    protected function setInvoiceSource(Source $invoiceSource)
     {
         $this->invoiceSource = $invoiceSource;
         if (!in_array($invoiceSource->getType(), [Source::Order, Source::CreditNote], true)) {
@@ -220,8 +220,7 @@ abstract class Creator
 
     /**
      * Adds an object as property source.
-     *
-     * The object is added to the start of the array. thus upon token expansion,
+     * The object is added to the start of the array. Thus upon token expansion,
      * it will be searched before other (already added) property sources.
      *
      * @param string $name
@@ -229,7 +228,7 @@ abstract class Creator
      * @param object|array $property
      *   The source object to add.
      */
-    public function addPropertySource($name, $property)
+    public function addPropertySource(string $name, $property)
     {
         $this->propertySources = [$name => $property] + $this->propertySources;
     }
@@ -240,7 +239,7 @@ abstract class Creator
      * @param string $name
      *   The name of the source to remove.
      */
-    public function removePropertySource($name)
+    public function removePropertySource(string $name)
     {
         unset($this->propertySources[$name]);
     }
@@ -254,7 +253,7 @@ abstract class Creator
      * @return array
      *   The acumulus invoice for this order.
      */
-    public function create($source)
+    public function create(Source $source): array
     {
         $this->setInvoiceSource($source);
         $this->setPropertySources();
@@ -273,37 +272,38 @@ abstract class Creator
      * Returns the 'customer' part of the invoice add structure.
      *
      * The following keys are allowed/expected by the API:
-     * - type
-     * - contactid: will not be set. Acumulus id for this customer, in the
+     * - 'type'
+     * - 'contactid': will not be set. Acumulus id for this customer, in the
      *   absence of this value, the API uses the email address as identifying
      *   value.
-     * - contactyourid: webshop customer id.
-     * - contactstatus
-     * - companyname1
-     * - companyname2
-     * - vatnumber
-     * - fullname
-     * - salutation
-     * - address1
-     * - address2
-     * - postalcode
-     * - city
-     * - countrycode
-     * - country
-     * - telephone
-     * - fax
-     * - email: used to identify clients.
-     * - overwriteifexists
-     * - bankaccountnumber: will not be set: no webshop software provides this.
-     * - mark
-     * - disableduplicates: not (yet) supported.
+     * - 'contactyourid': web shop customer id.
+     * - 'contactstatus'
+     * - 'companyname1'
+     * - 'companyname2'
+     * - 'vatnumber'
+     * - 'fullname'
+     * - 'salutation'
+     * - 'address1'
+     * - 'address2'
+     * - 'postalcode'
+     * - 'city'
+     * - 'countrycode'
+     * - 'country'
+     * - 'telephone'
+     * - 'fax'
+     * - 'email': used to identify clients.
+     * - 'overwriteifexists'
+     * - 'bankaccountnumber': will not be set: no web shop software provides
+     *    this.
+     * - 'mark'
+     * - 'disableduplicates': not (yet) supported.
      *
      * At the customer level no meta tags are defined.
      *
      * Extending classes should normally not have to override this method as all
      * values are fetched via configurable settings that may contain tokens
-     * (veldverwijzingen (Dutch)) that refer to properties of objects in the
-     * webshop (property sources). The exception is the (ISO) country code which
+     * (Dutch: veldverwijzingen) that refer to properties of objects in the web
+     * shop (property sources). The exception is the (ISO) country code which
      * may not be easy to fetch via a property source as this might include a
      * database lookup to a "Countries" table. This is fetched via
      * Source::getCountryCode().
@@ -311,7 +311,7 @@ abstract class Creator
      * @return array
      *   A keyed array with the customer data.
      */
-    protected function getCustomer()
+    protected function getCustomer(): array
     {
         $customer = [];
         $customerSettings = $this->config->getCustomerSettings();
@@ -348,48 +348,49 @@ abstract class Creator
      * Returns the 'invoice' part of the invoice add structure.
      *
      * The following keys are allowed/expected by the API:
-     * - concept: in case of errors or warnings this may be overridden by the
+     * - 'concept': in case of errors or warnings this may be overridden by the
      *   Completor to make it a concept.
-     * - concepttype : not (yet) used.
-     * - number
-     * - vattype: will be filled by the Completor.
-     * - issuedate
-     * - costcenter
-     * - accountnumber
-     * - paymentstatus
-     * - paymentdate
-     * - description
-     * - descriptiontext
-     * - template
-     * - invoicenotes
+     * - 'concepttype' : not (yet) used.
+     * - 'number'
+     * - 'vattype': will be filled by the Completor.
+     * - 'issuedate'
+     * - 'costcenter'
+     * - 'accountnumber'
+     * - 'paymentstatus'
+     * - 'paymentdate'
+     * - 'description'
+     * - 'descriptiontext'
+     * - 'template'
+     * - 'invoicenotes'
      *
-     * Meta data (not recognised by the API but used later on by the
-     * Creator or Completor, or for support and debugging purposes):
+     * Metadata (not recognised by the API but used later on by the Creator or
+     * Completor, or for support and debugging purposes):
      * - See {@see Source::getCurrency()}:
-     *     - currency
-     *     - currency-rate
-     *     - currency-do-convert
+     *     - 'currency'
+     *     - 'currency-rate'
+     *     - 'currency-do-convert'
      * - See {@see Source::getPaymentMethod()}:
-     *     - meta-payment-method: an id of the payment method used.
+     *     - 'meta-payment-method': an id of the payment method used.
      * - See {@see Source::getTotals()}:
-     *     - meta-invoice-amount: the total invoice amount excluding VAT.
-     *     - meta-invoice-amountinc: the total invoice amount including VAT.
-     *     - meta-invoice-vatamount: the total vat amount for the invoice.
+     *     - 'meta-invoice-amount': the total invoice amount excluding VAT.
+     *     - 'meta-invoice-amountinc': the total invoice amount including VAT.
+     *     - 'meta-invoice-vatamount': the total vat amount for the invoice.
      * - These will be added in the completor phase by
      *   {@see Completor::completeLineTotals()}:
-     *     - meta-lines-amount
-     *     - meta-lines-amountinc
-     *     - meta-lines-vatamount
+     *     - 'meta-lines-amount'
+     *     - 'meta-lines-amountinc'
+     *     - 'meta-lines-vatamount'
      *
      * Extending classes should normally not have to override this method, but
-     * should instead implement getInvoiceNumber(), getInvoiceDate(),
-     * getPaymentStatus(), getPaymentDate(), and, optionally, getDescription().
+     * should instead implement {@see getInvoiceNumber()},
+     * {@see getInvoiceDate()}, {@see getPaymentStatus()},
+     * {@see getPaymentDate()}, and, optionally, {@see getDescription()}.
      *
      * @return array
      *   A keyed array with the invoice data (without the invoice lines and the
-     *   emailaspdf tag).
+     *   'emailaspdf' tag).
      */
-    protected function getInvoice()
+    protected function getInvoice(): array
     {
         $invoice = [];
 
@@ -479,7 +480,7 @@ abstract class Creator
      *   that Acumulus expects a number and does not accept string prefixes or
      *   such.
      */
-    protected function getInvoiceNumber($invoiceNumberSource)
+    protected function getInvoiceNumber(int $invoiceNumberSource): ?int
     {
         $result = $invoiceNumberSource === Config::InvoiceNrSource_ShopInvoice ? $this->invoiceSource->getInvoiceReference() : null;
         if (empty($result)) {
@@ -498,7 +499,7 @@ abstract class Creator
      * @return string
      *   Date to use as invoice date on the Acumulus invoice: yyyy-mm-dd.
      */
-    protected function getInvoiceDate($dateToUse)
+    protected function getInvoiceDate(int $dateToUse): string
     {
         $result = $this->invoiceSource->getInvoiceDate();
         /** @noinspection TypeUnsafeComparisonInspection */
@@ -512,83 +513,83 @@ abstract class Creator
      * Returns the 'invoice''line' parts of the invoice add structure.
      *
      * Each invoice line is a keyed array.
-     * The following keys are allowed or expected (*) by the API:
-     * - itemnumber
-     * - product
-     * - nature
-     * * unitprice
-     * * vatrate
-     * * quantity
-     * - costprice: optional, this triggers margin invoices.
+     * The following keys are allowed or even required (*) by the API:
+     * - 'itemnumber'
+     * - 'product'
+     * - 'nature'
+     * - 'unitprice' (*)
+     * - 'vatrate' (*)
+     * - 'quantity' (*)
+     * - 'costprice': optional, this triggers margin invoices.
      *
-     * Meta data (not recognised by the API but used later on by the Creator or
-     * Completor, or for support and debugging purposes), see
+     * Metadata (not recognised by the API but used later on by the Creator or
+     * {@see Completor}, or for support and debugging purposes), see
      * {@see \Siel\Acumulus\Meta}:
-     * - Complementary  to amount and vatrate:
-     *     - unitpriceinc
-     *     - vatamount
-     * * meta-line-type: type of line: 1 of the LineType_... constants.
+     * - Complementary to 'amount' and 'vatrate':
+     *     - 'unitpriceinc'
+     *     - 'vatamount'
+     * - 'meta-line-type': type of line: 1 of the LineType_... constants.
      * - vat rate related:
-     *     * meta-vatrate-source, 1 of the VatRateSource_... constants:
+     *     * 'meta-vatrate-source', 1 of the VatRateSource_... constants:
      *         - exact: should exactly equal an existing VAT rate.
      *         - exact-0: should exactly equal the 0 VAT rate.
-     *         - calculated: based on dividing vatamount and unitprice which
+     *         - calculated: based on dividing vat amount and unit price which
      *           both may have a limited precision and therefore probably will
      *           not exactly match an existing vat rate.
      *         - completor: to be filled in by the completor.
      *         - strategy: to be completed in by a tax divide strategy. This may
      *           lead to this line being split into multiple lines.
      *         - parent: copied from the parent.
-     *     * meta-vatrate-min: required if meta-vatrate-source is calculated.
-     *       The minimum value for the vat rate, based on the precision of the
-     *       vatamount and unitprice.
-     *     * meta-vatrate-max: required if meta-vatrate-source is calculated.
-     *       The maximum value for the vat rate, based on the precision of the
-     *       vatamount and unitprice.
-     * - meta-strategy-split: true or false (absent = false)
+     *     * 'meta-vatrate-min': required if 'meta-vatrate-source' is
+     *       calculated. The minimum value for the vat rate, based on the
+     *       precision of the 'vatamount' and 'unitprice'.
+     *     * 'meta-vatrate-max': required if 'meta-vatrate-source' is
+     *       calculated. The maximum value for the vat rate, based on the
+     *       precision of the 'vatamount' and 'unitprice'.
+     * - 'meta-strategy-split': true or false (absent = false)
      * - Totals per line:
-     *     - meta-line-price
-     *     - meta-line-priceinc
-     *     - meta-line-vatamount
-     * - Parent - children line meta data:
-     *     - meta-children
-     *     - meta-children-count
-     *     - meta-parent-index
-     *     - meta-children-merged
-     *     - meta-children-not-shown
-     *     - meta-parent
+     *     - 'meta-line-price'
+     *     - 'meta-line-priceinc'
+     *     - 'meta-line-vatamount'
+     * - Parent - children line metadata:
+     *     - 'meta-children'
+     *     - 'meta-children-count'
+     *     - 'meta-parent-index'
+     *     - 'meta-children-merged'
+     *     - 'meta-children-not-shown'
+     *     - 'meta-parent'
      * -
      * These keys can be used to complete missing values or to assist in
      * correcting rounding errors in the values that are present.
      *
      * The base CompletorInvoiceLines expects:
-     * - meta-vatrate-source to be filled
-     * - If meta-vatrate-source = exact: no other keys expected
-     * - If meta-vatrate-source = calculated: meta-vatrate-min and
-     *   meta-vatrate-max are expected to be filled. These values should come
+     * - 'meta-vatrate-source' to be filled
+     * - If 'meta-vatrate-source' = exact: no other keys expected.
+     * - If 'meta-vatrate-source' = calculated: 'meta-vatrate-min' and
+     *   'meta-vatrate-ma'x are expected to be filled. These values should come
      *   from calling the helper method getVatRangeTags() with the values used
      *   to calculate the vat rate and their precision.
-     * - If meta-vatrate-source = completor: vatrate should be null and
-     *   unitprice should be 0. The completor will typically fill vatrate with
+     * - If 'meta-vatrate-source' = completor: vat rate should be null and
+     *   unit price should be 0. The completor will typically fill vat rate with
      *   the highest or most appearing vat rate, looking at the exact and
      *   calculated (after correcting them for rounding errors) vat rates.
-     * - If meta-vatrate-source = strategy: vat rate should be null and either
-     *   unitprice or unitpriceinc should be filled wit a non-0 amount
+     * - If 'meta-vatrate-source' = strategy: vat rate should be null and either
+     *   unit price or unit price inc should be filled wit a non-0 amount
      *   (typically a negative amount as this is mostly used for spreading
-     *   discounts over tax rates). Moreover, on the invoice level
-     *   meta-invoice-amount and meta-invoice-vatamount should be filled in.
+     *   discounts over tax rates). Moreover, on the invoice level,
+     *   'meta-invoice-amount' and 'meta-invoice-vatamount' should be filled in.
      *   The completor will use a tax divide strategy to arrive at valid values
      *   for the missing fields.
      *
      * Extending classes should normally not have to override this method, but
-     * should instead implement getItemLines(), getShippingLine(),
-     * getPaymentFeeLine(), getGiftWrappingLine(), getDiscountLines(), and
-     * getManualLines().
+     * should instead implement {@see getItemLines()}, {@see getShippingLine()},
+     * {@see getPaymentFeeLine()}, {@see getGiftWrappingLine()},
+     * {@see getDiscountLines()}, and {@see getManualLines()}.
      *
      * @return array[]
      *   A non keyed array with all invoice lines.
      */
-    protected function getInvoiceLines()
+    protected function getInvoiceLines(): array
     {
         $itemLines = $this->getItemLines();
         $itemLines = $this->addLineType($itemLines, static::LineType_OrderItem);
@@ -613,7 +614,7 @@ abstract class Creator
      * @return array[]
      *   An array of item line arrays.
      */
-    protected function getItemLines()
+    protected function getItemLines(): array
     {
         return $this->callSourceTypeSpecificMethod(__FUNCTION__, func_get_args());
     }
@@ -683,15 +684,15 @@ abstract class Creator
      * Returns all the fee lines for the order.
      *
      * Override this method if it is easier to return all fee lines at once.
-     * If you do so, you are responsible for adding the line Meta::LineType meta
-     * data. Otherwise, override the methods getShippingLines() (or
+     * If you do so, you are responsible for adding the line Meta::LineType
+     * metadata. Otherwise, override the methods getShippingLines() (or
      * getShippingLine()), getPaymentFeeLine() (if applicable), and
      * getGiftWrappingLine() (if available).
      *
      * @return array[]
      *   A, possibly empty, array of fee line arrays.
      */
-    protected function getFeeLines()
+    protected function getFeeLines(): array
     {
         $result = [];
 
@@ -727,7 +728,7 @@ abstract class Creator
      * @return array[]
      *   A, possibly empty, array of shipping line arrays.
      */
-    protected function getShippingLines()
+    protected function getShippingLines(): array
     {
         $result = [];
         $line = $this->getShippingLine();
@@ -746,7 +747,7 @@ abstract class Creator
      * @return array
      *   A line array, empty if there is no shipping fee line.
      */
-    abstract protected function getShippingLine();
+    abstract protected function getShippingLine(): array;
 
     /**
      * Returns the shipment method name.
@@ -759,7 +760,7 @@ abstract class Creator
      * @return string
      *   The name of the shipping method used for the current order.
      */
-    protected function getShippingMethodName()
+    protected function getShippingMethodName(): string
     {
         return $this->t('shipping_costs');
     }
@@ -772,7 +773,7 @@ abstract class Creator
      * @return array
      *   A line array, empty if there is no payment fee line.
      */
-    protected function getPaymentFeeLine()
+    protected function getPaymentFeeLine(): array
     {
         return [];
     }
@@ -785,7 +786,7 @@ abstract class Creator
      * @return array
      *   A line array, empty if there is no gift wrapping fee line.
      */
-    protected function getGiftWrappingLine()
+    protected function getGiftWrappingLine(): array
     {
         return [];
     }
@@ -799,7 +800,7 @@ abstract class Creator
      * Notes:
      * - In all cases you have to return an array of line arrays, even if your
      *   shop only allows 1 discount per order or stores all discount
-     *   information as 1 total and you can only return 1 line.
+     *   information as 1 total, and you can only return 1 line.
      * - if your shop already divided the discount amount over the eligible
      *   products, it is better to still return a separate discount line
      *   describing the discount code applied and the discount amount, but
@@ -810,7 +811,7 @@ abstract class Creator
      * @return array[]
      *   A, possibly empty, array of discount line arrays.
      */
-    protected function getDiscountLines()
+    protected function getDiscountLines(): array
     {
         return $this->callSourceTypeSpecificMethod(__FUNCTION__, func_get_args());
     }
@@ -827,13 +828,13 @@ abstract class Creator
      * @return array[]
      *   A, possibly empty, array of manual line arrays.
      */
-    protected function getManualLines()
+    protected function getManualLines(): array
     {
         return [];
     }
 
     /**
-     * Constructs and returns the emailaspdf section (if enabled).
+     * Constructs and returns the 'emailaspdf' section (if enabled).
      *
      * @param string $fallbackEmailTo
      *   An email address to use as fallback when the emailTo setting is empty.
@@ -841,7 +842,7 @@ abstract class Creator
      * @return array
      *   The emailAsPdf section, possibly empty.
      */
-    protected function getEmailAsPdf($fallbackEmailTo)
+    protected function getEmailAsPdf(string $fallbackEmailTo): array
     {
         $emailAsPdf = [];
         $emailAsPdfSettings = $this->config->getEmailAsPdfSettings();
@@ -867,7 +868,7 @@ abstract class Creator
      *   move it to the completor phase. This will aid in simplifying the
      *   creators towards raw data collectors.
      */
-    protected function allowMarginScheme()
+    protected function allowMarginScheme(): bool
     {
         $shopSettings = $this->config->getShopSettings();
         return $shopSettings['marginProducts'] !== Config::MarginProducts_No;
@@ -875,7 +876,6 @@ abstract class Creator
 
     /**
      * Helper method to add a non-empty possibly tokenized value to an array.
-     *
      * This method will not overwrite existing values.
      *
      * @param array $array
@@ -886,7 +886,7 @@ abstract class Creator
      * @return bool
      *   Whether the default was added.
      */
-    protected function addTokenDefault(array &$array, $key, $token)
+    protected function addTokenDefault(array &$array, string $key, string $token): bool
     {
         if (empty($array[$key]) && !empty($token)) {
             $value = $this->getTokenizedValue($token);
@@ -906,7 +906,7 @@ abstract class Creator
      * @return string
      *   The pattern with tokens expanded with their actual value.
      */
-    protected function getTokenizedValue($pattern)
+    protected function getTokenizedValue(string $pattern): string
     {
         return $this->token->expand($pattern, $this->propertySources);
     }
@@ -922,7 +922,7 @@ abstract class Creator
      *   True if the value was not empty and thus has been added, false
      *   otherwise.
      */
-    protected function addIfNotEmpty(array &$array, $key, $value)
+    protected function addIfNotEmpty(array &$array, string $key, $value): bool
     {
         if (!empty($value)) {
             $array[$key] = $value;
@@ -933,7 +933,6 @@ abstract class Creator
 
     /**
      * Helper method to add a default non-empty value to an array.
-     *
      * This method will not overwrite existing values.
      *
      * @param array $array
@@ -943,7 +942,7 @@ abstract class Creator
      * @return bool
      *   Whether the default was added.
      */
-    protected function addDefault(array &$array, $key, $value)
+    protected function addDefault(array &$array, string $key, $value): bool
     {
         if (empty($array[$key]) && !empty($value)) {
             $array[$key] = $value;
@@ -954,7 +953,6 @@ abstract class Creator
 
     /**
      * Helper method to add a possibly empty default value to an array.
-     *
      * This method will not overwrite existing values.
      *
      * @param array $array
@@ -964,7 +962,7 @@ abstract class Creator
      * @return bool
      *   Whether the default was added.
      */
-    protected function addDefaultEmpty(array &$array, $key, $value)
+    protected function addDefaultEmpty(array &$array, string $key, $value): bool
     {
         if (!isset($array[$key])) {
             $array[$key] = $value;
@@ -975,7 +973,6 @@ abstract class Creator
 
     /**
      * Helper method to add a warning to an array.
-     *
      * Warnings are placed in the $array under the key Meta::Warning. If no
      * warning is set, $warning is added as a string, otherwise it becomes an
      * array of warnings to which this $warning is added.
@@ -983,7 +980,7 @@ abstract class Creator
      * @param array $array
      * @param string $warning
      */
-    protected function addWarning(array &$array, $warning)
+    protected function addWarning(array &$array, string $warning)
     {
         if (!isset($array[Meta::Warning])) {
             $array[Meta::Warning] = $warning;
@@ -999,14 +996,14 @@ abstract class Creator
      * Adds a meta-line-type tag to the line(s) and its children, if any.
      *
      * @param array|array[] $lines
-     *   May be a single line not placed in an array.
+     *   This may be a single line not placed in an array.
      * @param string $lineType
      *   The line type to add to the line.
      *
      * @return array|array[]
      *   The line(s) with the line type meta tag added.
      */
-    protected function addLineType(array $lines, $lineType)
+    protected function addLineType(array $lines, string $lineType): array
     {
         if (!empty($lines)) {
             // reset(), so key() does not return null if the array is not empty.
@@ -1029,23 +1026,21 @@ abstract class Creator
 
     /**
      * Returns the range in which the vat rate will lie.
-     *
-     * If a webshop does not store the vat rates used in the order, we must
+     * If a web shop does not store the vat rates used in the order, we must
      * calculate them using a (product) price and the vat on it. But as web
      * shops often store these numbers rounded to cents, the vat rate
-     * calculation becomes imprecise. Therefore we compute the range in which
+     * calculation becomes imprecise. Therefore, we compute the range in which
      * it will lie and will let the Completor do a comparison with the actual
      * vat rates that an order can have (one of the Dutch or, for electronic
      * services, other EU country VAT rates).
-     *
-     * - If $denominator = 0 (free product), the vatrate will be set to null
+     * - If $denominator = 0 (free product), the vat rate will be set to null
      *   and the Completor will try to get this line listed under the correct
      *   vat rate.
-     * - If $numerator = 0 the vatrate will be set to 0 and be treated as if it
+     * - If $numerator = 0 the vat rate will be set to 0 and be treated as if it
      *   is an exact vat rate, not a vat range.
      *
      * @param float $numerator
-     *   The amount of VAT as received from the web shop.
+          *   The amount of VAT as received from the web shop.
      * @param float $denominator
      *   The price of a product excluding VAT as received from the web shop.
      * @param float $numeratorPrecision
@@ -1057,19 +1052,22 @@ abstract class Creator
      *
      * @return array
      *   Array with keys (not all keys will always be available):
-     *   - vatrate
-     *   - vatamount
-     *   - meta-vatrate-min
-     *   - meta-vatrate-max
-     *   - meta-vatamount-precision
-     *   - meta-vatrate-source
-     *
+     *   - 'vatrate'
+     *   - 'vatamount'
+     *   - 'meta-vatrate-min'
+     *   - 'meta-vatrate-max'
+     *   - 'meta-vatamount-precision'
+     *   - 'meta-vatrate-source'
      * @todo: can we move this from the (plugin specific) creators to the
      *   completor phase? This would aid in simplifying the creators towards raw
      *   data collectors.
      */
-    public static function getVatRangeTags($numerator, $denominator, $numeratorPrecision = 0.01, $denominatorPrecision = 0.01)
-    {
+    public static function getVatRangeTags(
+        float $numerator,
+        float $denominator,
+        float $numeratorPrecision = 0.01,
+        float $denominatorPrecision = 0.01
+    ): array {
         if (Number::isZero($denominator, 0.0001)) {
             $result = [
                 Tag::VatRate => null,
@@ -1099,7 +1097,6 @@ abstract class Creator
 
     /**
      * Calls a method constructed of the method name and the source type.
-     *
      * If the implementation/override of a method depends on the type of invoice
      * source it might be better to implement 1 method per source type. This
      * method calls such a method assuming it is named {method}{source-type}.
@@ -1108,13 +1105,21 @@ abstract class Creator
      * methods getLineItemOrder($line) and getLineItemCreditNote($line).
      *
      * @param string $method
+     *   The name of the base method for which to call the Source type specific
+     *   variant.
      * @param array $args
+     *   The arguments to pass to the method to call.
      *
      * @return mixed
+     *   The return value of that method call, or null if the method does not
+     *   exist.
      */
-    protected function callSourceTypeSpecificMethod($method, $args = [])
+    protected function callSourceTypeSpecificMethod(string $method, array $args = [])
     {
         $method .= $this->invoiceSource->getType();
-        return call_user_func_array([$this, $method], $args);
+        if (method_exists($this, $method)) {
+            return $this->$method(... $args);
+        }
+        return null;
     }
 }

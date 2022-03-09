@@ -22,7 +22,7 @@ abstract class CompletorStrategyBase
     protected $translator;
 
     /** @var int Indication of the order of execution of the strategy. */
-    static $tryOrder = 50;
+    public static $tryOrder = 50;
 
     /**
      * The invoice according to the Acumulus API definition.
@@ -77,10 +77,10 @@ abstract class CompletorStrategyBase
     /**
      * An overview of the vat broken down into separate vat rates.
      *
-     * Each entry is keyed by íts vatrate (%.3f formatted to get correct
+     * Each entry is keyed by íts vat rate (%.3f formatted to get correct
      * comparisons on equality) and contains an array with the following
      * information:
-     * - 'vatrate' => the vatrate,
+     * - 'vatrate' => the vat rate,
      * - 'vatamount' => vat amount on all lines having this vat rate.
      * - 'amount' => amount (ex vat) of all lines having this vat rate,
      * - 'count' => number of lines having this vat rate.
@@ -92,16 +92,14 @@ abstract class CompletorStrategyBase
     /** @var \Siel\Acumulus\Invoice\Source */
     protected $source;
 
-    /**
-     * @param \Siel\Acumulus\Config\Config $config
-     * @param \Siel\Acumulus\Helpers\Translator $translator
-     * @param array $invoice
-     * @param array $possibleVatTypes
-     * @param array $possibleVatRates
-     * @param \Siel\Acumulus\Invoice\Source $source
-     */
-    public function __construct(Config $config, Translator $translator, array $invoice, array $possibleVatTypes, array $possibleVatRates, Source $source)
-    {
+    public function __construct(
+        Config $config,
+        Translator $translator,
+        array $invoice,
+        array $possibleVatTypes,
+        array $possibleVatRates,
+        Source $source
+    ) {
         $this->config = $config;
         $this->translator = $translator;
         $this->invoice = $invoice;
@@ -123,45 +121,42 @@ abstract class CompletorStrategyBase
      *   The translation for the given key or the key itself if no translation
      *   could be found.
      */
-    protected function t($key)
+    protected function t(string $key): string
     {
         return $this->translator->get($key);
     }
 
     /**
      * Returns the non namespaced name of the current strategy.
-     *
-     * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         $nsClass = get_class($this);
-        $nsClass = substr($nsClass, strrpos($nsClass, '\\') + 1);
-        return $nsClass;
+        return substr($nsClass, strrpos($nsClass, '\\') + 1);
     }
 
     /**
      * Returns the (parameterised) description of the latest tried strategy.
-     *
-     * @return string
      */
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }
 
     /**
-     * @return float
+     * returns the amount of vat to divide over the lines
      */
-    public function getVat2Divide()
+    public function getVat2Divide(): float
     {
         return $this->vat2Divide;
     }
 
     /**
-     * @return array
+     * Returns a breakdown of the vat per vat rate.
+     *
+     * @returns array[]
      */
-    public function getVatBreakdown()
+    public function getVatBreakdown(): array
     {
         return $this->vatBreakdown;
     }
@@ -174,7 +169,7 @@ abstract class CompletorStrategyBase
      *
      * @return int[]
      */
-    public function getLinesCompleted()
+    public function getLinesCompleted(): array
     {
         return $this->linesCompleted;
     }
@@ -186,7 +181,7 @@ abstract class CompletorStrategyBase
      *
      * @return array[]
      */
-    public function getReplacingLines()
+    public function getReplacingLines(): array
     {
         return $this->replacingLines;
     }
@@ -195,14 +190,14 @@ abstract class CompletorStrategyBase
      * Initializes the amount properties.
      *
      * to be able to calculate the amounts, at least 2 of the 3 meta amounts
-     * meta-invoice-vatamount, meta-invoice-amountinc, or meta-invoice-amount must
-     * be known.
+     * 'meta-invoice-vatamount', 'meta-invoice-amountinc', or
+     * 'meta-invoice-amount' must be known.
      */
     protected function initAmounts()
     {
         $invoicePart = &$this->invoice[Tag::Customer][Tag::Invoice];
-        $this->vatAmount = isset($invoicePart[Meta::InvoiceVatAmount]) ? $invoicePart[Meta::InvoiceVatAmount] : $invoicePart[Meta::InvoiceAmountInc] - $invoicePart[Meta::InvoiceAmount];
-        $this->invoiceAmount = isset($invoicePart[Meta::InvoiceAmount]) ? $invoicePart[Meta::InvoiceAmount] : $invoicePart[Meta::InvoiceAmountInc] - $invoicePart[Meta::InvoiceVatAmount];
+        $this->vatAmount = $invoicePart[Meta::InvoiceVatAmount] ?? $invoicePart[Meta::InvoiceAmountInc] - $invoicePart[Meta::InvoiceAmount];
+        $this->invoiceAmount = $invoicePart[Meta::InvoiceAmount] ?? $invoicePart[Meta::InvoiceAmountInc] - $invoicePart[Meta::InvoiceVatAmount];
 
         // The vat amount to divide over the non completed lines is the total vat
         // amount of the invoice minus all known vat amounts per line.
@@ -251,7 +246,7 @@ abstract class CompletorStrategyBase
                     ? 0.0
                     : $line[Tag::VatRate] / 100.0 * $amount;
                 $vatRate = sprintf('%.3f', $line[Tag::VatRate]);
-                // Add amount to existing vatrate line or create a new line.
+                // Add amount to existing vat rate line or create a new line.
                 if (isset($this->vatBreakdown[$vatRate])) {
                     $breakdown = &$this->vatBreakdown[$vatRate];
                     $breakdown[Meta::VatAmount] += $vatAmount;
@@ -273,9 +268,10 @@ abstract class CompletorStrategyBase
      * Returns the minimum vat rate on the invoice.
      *
      * @return array
-     *   A vat rate overview: array with keys vatrate, vatamount, amount, count.
+     *   A vat rate overview: array with keys 'vatrate', 'vatamount', 'amount',
+     *   and 'count'.
      */
-    protected function getVatBreakDownMinRate()
+    protected function getVatBreakDownMinRate(): array
     {
         $result = [Tag::VatRate => PHP_INT_MAX];
         foreach ($this->vatBreakdown as $breakDown) {
@@ -290,9 +286,10 @@ abstract class CompletorStrategyBase
      * Returns the maximum vat rate on the invoice.
      *
      * @return array
-     *   A vat rate overview: array with keys vatrate, vatamount, amount, count.
+     *   A vat rate overview: array with keys 'vatrate', 'vatamount', 'amount',
+     *   and 'count'.
      */
-    protected function getVatBreakDownMaxRate()
+    protected function getVatBreakDownMaxRate(): array
     {
         $result = [Tag::VatRate => -PHP_INT_MAX];
         foreach ($this->vatBreakdown as $breakDown) {
@@ -307,9 +304,10 @@ abstract class CompletorStrategyBase
      * Returns the key component vat rate on the invoice (NL: hoofdbestanddeel).
      *
      * @return array
-     *   A vat rate overview: array with keys vatrate, vatamount, amount, count.
+     *   A vat rate overview: array with keys 'vatrate', 'vatamount', 'amount',
+     *   and 'count'.
      */
-    protected function getVatBreakDownMaxAmount()
+    protected function getVatBreakDownMaxAmount(): array
     {
         $result = ['amount' => -PHP_INT_MAX];
         foreach ($this->vatBreakdown as $breakDown) {
@@ -326,7 +324,7 @@ abstract class CompletorStrategyBase
      * @return bool
      *   Success.
      */
-    public function apply()
+    public function apply(): bool
     {
         $this->replacingLines = [];
         $this->init();
@@ -362,7 +360,7 @@ abstract class CompletorStrategyBase
      * @return bool
      *   True if this strategy might be used, false otherwise.
      */
-    protected function checkPreconditions()
+    protected function checkPreconditions(): bool
     {
         return true;
     }
@@ -381,19 +379,22 @@ abstract class CompletorStrategyBase
      * @return bool
      *   true the strategy has been applied successfully, false otherwise.
      */
-    abstract protected function execute();
+    abstract protected function execute(): bool;
 
     /**
      * Completes a line by filling in the given vat rate and calculating other
-     * possibly missing fields (vatamount, unitprice).
+     * possibly missing fields ('vatamount', 'unitprice').
      *
      * @param array $line2Complete
+     *   The invoice line to complete. After it has been completed it is added
+     *   to {@see $replacingLines}
      * @param float $vatRate
+     *   The vat rate to add to the line.
      *
      * @return float
      *   The vat amount for the completed line.
      */
-    protected function completeLine($line2Complete, $vatRate)
+    protected function completeLine(array $line2Complete, float $vatRate): float
     {
         if (!isset($line2Complete[Tag::Quantity])) {
             $line2Complete[Tag::Quantity] = 1;
@@ -426,9 +427,15 @@ abstract class CompletorStrategyBase
      *   Percentage between 0 and 100.
      *
      * @return float[]
+     *   A numerically indexed array with the amount for the low vat rate and
+     *   the amount for the high vat rate.
      */
-    protected function splitAmountOver2VatRates($amount, $vatAmount, $lowVatRate, $highVatRate)
-    {
+    protected function splitAmountOver2VatRates(
+        float $amount,
+        float $vatAmount,
+        float $lowVatRate,
+        float $highVatRate
+    ): array {
         $lowVatRate /= 100;
         $highVatRate /= 100;
         $highAmount = ($vatAmount - $amount * $lowVatRate) / ($highVatRate - $lowVatRate);
@@ -436,12 +443,7 @@ abstract class CompletorStrategyBase
         return [$lowAmount, $highAmount];
     }
 
-    /**
-     * @param $vatRate
-     *
-     * @return bool
-     */
-    protected function isNoVat($vatRate): bool
+    protected function isNoVat(float $vatRate): bool
     {
         return Number::isZero($vatRate) || Number::floatsAreEqual($vatRate, Api::VatFree);
     }

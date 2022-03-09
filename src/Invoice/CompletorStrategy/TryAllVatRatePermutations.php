@@ -13,7 +13,7 @@ use Siel\Acumulus\Tag;
  * Current known usages:
  * - ???
  *
- * @noinspection PhpUnused
+ * @noinspection PhpUnused : instantiated via a variable containing the name.
  */
 class TryAllVatRatePermutations extends CompletorStrategyBase
 {
@@ -23,7 +23,7 @@ class TryAllVatRatePermutations extends CompletorStrategyBase
      *
      * @var int
      */
-    static public $tryOrder = 50;
+    public static $tryOrder = 50;
 
     /** @var float[] */
     protected $vatRates;
@@ -34,7 +34,7 @@ class TryAllVatRatePermutations extends CompletorStrategyBase
     /**
      * {@inheritdoc}
      */
-    public function execute()
+    public function execute(): bool
     {
         $this->countLines = count($this->lines2Complete);
 
@@ -55,11 +55,8 @@ class TryAllVatRatePermutations extends CompletorStrategyBase
 
     /**
      * Initializes the array of vat rates to use for this permutation.
-     *
-     * @param float $vatType
-     * @param bool $include0
      */
-    protected function setVatRates($vatType, $include0)
+    protected function setVatRates(float $vatType, bool $include0)
     {
         $this->vatRates = [];
         foreach ($this->possibleVatRates as $vatRate) {
@@ -72,12 +69,7 @@ class TryAllVatRatePermutations extends CompletorStrategyBase
         }
     }
 
-    /**
-     * @param array $permutation
-     *
-     * @return bool
-     */
-    protected function tryAllPermutations(array $permutation)
+    protected function tryAllPermutations(array $permutation): bool
     {
         if (count($permutation) === $this->countLines) {
             // Try this (complete) permutation.
@@ -96,12 +88,7 @@ class TryAllVatRatePermutations extends CompletorStrategyBase
         return false;
     }
 
-    /**
-     * @param array $permutation
-     *
-     * @return bool
-     */
-    protected function try1Permutation(array $permutation)
+    protected function try1Permutation(array $permutation): bool
     {
         $this->description = 'TryAllVatRatePermutations(' . implode(', ', $permutation) . ')';
         $this->replacingLines = [];
@@ -112,7 +99,11 @@ class TryAllVatRatePermutations extends CompletorStrategyBase
             $i++;
         }
 
-        $this->invoice[Tag::Customer][Tag::Invoice][Meta::CompletorStrategy . $this->getName()] = sprintf("try1Permutation([%s]): %f", implode(', ', $permutation), $vatAmount);
+        $this->invoice[Tag::Customer][Tag::Invoice][Meta::CompletorStrategy . $this->getName()] = sprintf(
+            'try1Permutation([%s]): %f',
+            implode(', ', $permutation),
+            $vatAmount
+        );
         // The strategy worked if the vat totals equals the vat to divide.
         return Number::floatsAreEqual($vatAmount, $this->vat2Divide);
     }

@@ -44,7 +44,7 @@ class Creator extends BaseCreator
     /**
      * {@inheritdoc}
      */
-    protected function setInvoiceSource($invoiceSource)
+    protected function setInvoiceSource(\Siel\Acumulus\Invoice\Source $invoiceSource)
     {
         // @todo: add objects from your webshop as property source (for use in tokenized values)
         parent::setInvoiceSource($invoiceSource);

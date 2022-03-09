@@ -27,32 +27,32 @@ use Siel\Acumulus\Tag;
  *
  * Strategy:
  * Only lines that satisfy the following conditions are corrected:
- * - To prevent "correcting" errors that lead to this non matching VAT rate,
+ * - To prevent "correcting" errors that lead to this non-matching VAT rate,
  *   only lines that are marked with the value meta-strategy-split are
  *   corrected.
- * - Each line2complete must have at least 2 of the values vatamount, unitprice,
- *   or unitpriceinc, meaning that it can be divided on its own!
+ * - Each line2complete must have at least 2 of the values 'vatamount',
+ *   'unitprice', or 'unitpriceinc', meaning that it can be divided on its own!
  * - They have gone through the correction phase, but no matching VAT rate was
- *   found, so the value meta-vatrate-matches is set to 'none'.
+ *   found, so the value 'meta-vatrate-matches' is set to 'none'.
  * These lines are split in such a way over the 2 allowed vat rates, that the
  * values in the completed lines add up to the values in the line to be split.
  *
  * Current (known) usages:
  * - PrestaShop (discount lines)
  *
- * @noinspection PhpUnused
+ * @noinspection PhpUnused : instantiated via a variable containing the name.
  */
 class SplitNonMatchingLine extends CompletorStrategyBase
 {
     /**
      * Split strategies should be tried first, as they can deliver partial
      * solutions in a controlled way. Controlled in the sense that it will only
-     * be applied to lines where it can and should be applied. So no chance of
-     * returning a false positive.
+     * be applied to invoice lines where it can and should be applied. So no
+     * chance of returning a false positive.
      *
      * @var int
      */
-    static public $tryOrder = 20;
+    public static $tryOrder = 20;
 
     /** @var array */
     protected $minVatRate;
@@ -71,7 +71,7 @@ class SplitNonMatchingLine extends CompletorStrategyBase
     /**
      * {@inheritdoc}
      */
-    protected function checkPreconditions()
+    protected function checkPreconditions(): bool
     {
         $result = count($this->vatBreakdown) === 2;
         if (!$result) {
@@ -94,7 +94,7 @@ class SplitNonMatchingLine extends CompletorStrategyBase
     /**
      * {@inheritdoc}
      */
-    public function execute()
+    public function execute(): bool
     {
         $this->minVatRate = $this->getVatBreakDownMinRate();
         $this->maxVatRate = $this->getVatBreakDownMaxRate();
@@ -112,12 +112,7 @@ class SplitNonMatchingLine extends CompletorStrategyBase
         return $result;
     }
 
-    /**
-     * @param array $line
-     *
-     * @return bool
-     */
-    protected function splitNonMatchingLine(array $line)
+    protected function splitNonMatchingLine(array $line): bool
     {
         list($lowAmount, $highAmount) = $this->splitAmountOver2VatRates($line[Meta::LineAmount],
             $line[Meta::LineAmountInc] - $line[Meta::LineAmount],

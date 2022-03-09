@@ -63,10 +63,9 @@ class FlattenerInvoiceLines
      * @return array[]
      *   The flattened invoice lines.
      */
-    public function complete(array $invoiceLines)
+    public function complete(array $invoiceLines): array
     {
-        $invoiceLines = $this->flattenInvoiceLines($invoiceLines);
-        return $invoiceLines;
+        return $this->flattenInvoiceLines($invoiceLines);
     }
 
     /**
@@ -74,7 +73,7 @@ class FlattenerInvoiceLines
      *
      * Invoice lines may recursively contain other invoice lines to indicate
      * that a product has variant lines or is a composed product (if supported
-     * by the webshop).
+     * by the web shop).
      *
      * With composed or variant child lines, amounts may appear twice. This will
      * also be corrected by this method.
@@ -85,7 +84,7 @@ class FlattenerInvoiceLines
      * @return array[]
      *   The flattened lines.
      */
-    protected function flattenInvoiceLines(array $lines)
+    protected function flattenInvoiceLines(array $lines): array
     {
         $result = [];
 
@@ -102,14 +101,15 @@ class FlattenerInvoiceLines
                 if ($this->keepSeparateLines($line, $children)) {
                     // Keep them separate but perform the following actions:
                     // - Allow for some web shop specific corrections.
-                    // - Add meta data to relate parent and children.
+                    // - Add metadata to relate parent and children.
                     // - Indent product descriptions.
                     $this->correctInfoBetweenParentAndChildren($line, $children);
                 } else {
                     // Merge the children into the parent product:
                     // - Allow for some web shop specific corrections.
-                    // - Add meta data about removed children.
-                    // - Add text from children, eg. chosen variants, to parent.
+                    // - Add metadata about removed children.
+                    // - Add text from children, e.g. the chosen variants, to
+                    //   the parent.
                     $line = $this->collectInfoFromChildren($line, $children);
                     // Delete children as their info is merged into the parent.
                     $children = null;
@@ -147,7 +147,7 @@ class FlattenerInvoiceLines
      * @return bool
      *   True if the lines should remain separate, false otherwise.
      */
-    protected function keepSeparateLines(array $parent, array $children)
+    protected function keepSeparateLines(array $parent, array $children): bool
     {
         $invoiceSettings = $this->config->getInvoiceSettings();
         if (!$this->haveSameVatRate($children)) {
@@ -178,7 +178,7 @@ class FlattenerInvoiceLines
      * @return string
      *   The concatenated product texts.
      */
-    protected function getMergedLinesText(array $parent, array $children)
+    protected function getMergedLinesText(array $parent, array $children): string
     {
         $childrenTexts = [];
         foreach ($children as $child) {
@@ -189,13 +189,14 @@ class FlattenerInvoiceLines
     }
 
     /**
-     * Allows to correct or remove info between or from parent and child lines.
+     * Allows correcting or removing info between or from parent and child
+     * lines.
      *
      * This method is called before the child lines are added to the set of
      * invoice lines.
      *
      * This base implementation performs the following actions:
-     * - Add meta data to parent and children to link them to each other.
+     * - Add metadata to parent and children to link them to each other.
      * - Indent product descriptions of the children.
      *
      * Situations that may have to be covered by web shop specific overrides:
@@ -204,7 +205,8 @@ class FlattenerInvoiceLines
      * - Price info both on parent and children and the amounts are doubled.
      *   (price on parent is the sum of the prices of the children).
      * - Price info both on parent and children but the amounts are not doubled
-     *   (base price on parent plus extra/less charges for options on children).
+     *   (base price on parent plus extra/fewer charges for options on
+     *   children).
      *
      * @param array $parent
      *   The parent invoice line.
@@ -225,7 +227,7 @@ class FlattenerInvoiceLines
     }
 
     /**
-     * Allows to collect info from the child lines and add it to the parent.
+     * Allows collecting info from the child lines and add it to the parent.
      *
      * This method is called before the child lines are merged into the parent
      * invoice line.
@@ -253,7 +255,7 @@ class FlattenerInvoiceLines
      * @return array
      *   The parent line extended with the collected info.
      */
-    protected function collectInfoFromChildren(array $parent, array $children)
+    protected function collectInfoFromChildren(array $parent, array $children): array
     {
         $invoiceSettings = $this->config->getInvoiceSettings();
         if (!$invoiceSettings['optionsShow']) {
@@ -273,12 +275,12 @@ class FlattenerInvoiceLines
      * - Price info only on parent.
      *
      * What do we do in this situation:
-     * - Copy vat rate info from parent to children (may be empty on the
+     * - Copy vat rate info from parent to children (as it may be empty on the
      *   children).
      * - Remove price info from children (just to be sure).
      *
      * Known usages:
-     * - Magento (2.1+ only?).
+     * - Magento.
      *
      * @param array $parent
      *   The parent invoice line.
@@ -299,7 +301,7 @@ class FlattenerInvoiceLines
      * - Price info is on the children, not on the parent.
      *
      * What do we do in this situation:
-     * - Copy vat rate info from 1 child to the parent (as in eg. Magento, it
+     * - Copy vat rate info from 1 child to the parent (as in e.g. Magento, it
      *   may be empty on the parent).
      * - Remove price info from parent (just to be sure).
      *
@@ -391,7 +393,7 @@ class FlattenerInvoiceLines
      * @return array[]
      *   The child invoice lines with vat info copied form the parent.
      */
-    protected function copyVatInfoToChildren(array $parent, array $children)
+    protected function copyVatInfoToChildren(array $parent, array $children): array
     {
         static $vatMetaInfoTags = [
             Meta::VatRateMin,
@@ -417,7 +419,7 @@ class FlattenerInvoiceLines
                 $child[Meta::VatRateSource] = Completor::VatRateSource_Copied_From_Parent;
             } else {
                 // The parent does not yet have correct vat rate info, so also
-                // copy the meta data to the child, so later phases can also
+                // copy the metadata to the child, so later phases can also
                 // correct the children.
                 $child[Meta::VatRateSource] = $parent[Meta::VatRateSource];
                 foreach ($vatMetaInfoTags as $tag) {
@@ -446,7 +448,7 @@ class FlattenerInvoiceLines
      * @return array
      *   The parent invoice line with price info removed.
      */
-    protected function copyVatInfoToParent(array $parent, array $children)
+    protected function copyVatInfoToParent(array $parent, array $children): array
     {
         $parent[Meta::VatAmount] = 0;
         // Copy vat rate info from a child when the parent has no vat rate info.
@@ -484,7 +486,7 @@ class FlattenerInvoiceLines
      * @return array[]
      *   The child invoice lines with price info removed.
      */
-    protected function removePriceInfoFromChildren(array $children)
+    protected function removePriceInfoFromChildren(array $children): array
     {
         foreach ($children as &$child) {
             $child[Tag::UnitPrice] = 0;
@@ -508,7 +510,7 @@ class FlattenerInvoiceLines
      * @return array
      *   The parent invoice line with price info removed.
      */
-    protected function removePriceInfoFromParent(array $parent)
+    protected function removePriceInfoFromParent(array $parent): array
     {
         $parent[Tag::UnitPrice] = 0;
         $parent[Meta::UnitPriceInc] = 0;
@@ -528,7 +530,7 @@ class FlattenerInvoiceLines
      * @return string
      *   The indented product description.
      */
-    protected function indentDescription($description)
+    protected function indentDescription(string $description): string
     {
         if (preg_match('/^ *- /', $description)) {
             $description = '  ' . $description;
@@ -548,7 +550,7 @@ class FlattenerInvoiceLines
      *   An array with the vat rates as key and the number of times they appear
      *   in the invoice lines as value.
      */
-    protected function getAppearingVatRates(array $lines)
+    protected function getAppearingVatRates(array $lines): array
     {
         $vatRates = [];
         foreach ($lines as $line) {
@@ -573,7 +575,7 @@ class FlattenerInvoiceLines
      * @return bool
      *   True if the lines have different vat rates.
      */
-    protected function haveSameVatRate(array $lines)
+    protected function haveSameVatRate(array $lines): bool
     {
         $vatRates = $this->getAppearingVatRates($lines);
         return count($vatRates) === 1;

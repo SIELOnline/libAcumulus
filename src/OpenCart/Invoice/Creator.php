@@ -42,7 +42,7 @@ class Creator extends BaseCreator
      *
      * @throws \Exception
      */
-    protected function setInvoiceSource($invoiceSource)
+    protected function setInvoiceSource(\Siel\Acumulus\Invoice\Source $invoiceSource)
     {
         parent::setInvoiceSource($invoiceSource);
 

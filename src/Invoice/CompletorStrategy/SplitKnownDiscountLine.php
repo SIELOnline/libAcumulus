@@ -34,15 +34,15 @@ use Siel\Acumulus\Tag;
  *   - if no discount on shipping and other fees as these do not end up in table
  *     order_detail_tax.
  *
- * @noinspection PhpUnused
+ * @noinspection PhpUnused : instantiated via a variable containing the name.
  */
 class SplitKnownDiscountLine extends CompletorStrategyBase
 {
     /**
      * This strategy should be tried first as it is a controlled but possibly
      * partial solution. Controlled in the sense that it will only be applied to
-     * lines where it can and should be applied. So no chance of returning a
-     * false positive.
+     * invoice lines where it can and should be applied. So no chance of
+     * returning a false positive.
      *
      * It should come before the SplitNonMatchingLine as this one depends on
      * more specific information being available and thus is more controlled
@@ -50,7 +50,7 @@ class SplitKnownDiscountLine extends CompletorStrategyBase
      *
      * @var int
      */
-    static public $tryOrder = 10;
+    public static $tryOrder = 10;
 
     /** @var float */
     protected $knownDiscountAmountInc;
@@ -106,7 +106,7 @@ class SplitKnownDiscountLine extends CompletorStrategyBase
     /**
      * {@inheritdoc}
      */
-    protected function checkPreconditions()
+    protected function checkPreconditions(): bool
     {
         $result = false;
         if ($this->splitLineCount === 1) {
@@ -122,16 +122,13 @@ class SplitKnownDiscountLine extends CompletorStrategyBase
     /**
      * {@inheritdoc}
      */
-    public function execute()
+    public function execute(): bool
     {
         $this->linesCompleted = [$this->splitLineKey];
         return $this->splitDiscountLine();
     }
 
-    /**
-     * @return bool
-     */
-    protected function splitDiscountLine()
+    protected function splitDiscountLine(): bool
     {
         $this->description = "SplitKnownDiscountLine({$this->knownDiscountAmountInc}, {$this->knownDiscountVatAmount})";
         $this->replacingLines = [];

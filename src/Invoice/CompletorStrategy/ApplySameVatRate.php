@@ -11,7 +11,7 @@ use Siel\Acumulus\Tag;
  * same vat rate to each line to complete.
  *
  * It also tries a vat rate of 0%. If that works, the system might be
- * misconfigured or we have prepaid vouchers, but as we have to follow the
+ * misconfigured OR we have prepaid vouchers, but as we have to follow the
  * system anyway, we will return it as is.
  *
  * Current known usages:
@@ -21,7 +21,7 @@ use Siel\Acumulus\Tag;
  *   Doing so, we can prevent adding 6% to a free shipping line on an all 21%
  *   invoice.
  *
- * @noinspection PhpUnused
+ * @noinspection PhpUnused : instantiated via a variable containing the name.
  */
 class ApplySameVatRate extends CompletorStrategyBase
 {
@@ -30,12 +30,12 @@ class ApplySameVatRate extends CompletorStrategyBase
      *
      * @var int
      */
-    static public $tryOrder = 30;
+    public static $tryOrder = 30;
 
     /**
      * {@inheritdoc}
      */
-    protected function execute()
+    protected function execute(): bool
     {
         // Try all vat rates.
         foreach ($this->possibleVatRates as $vatRate) {
@@ -52,12 +52,8 @@ class ApplySameVatRate extends CompletorStrategyBase
 
     /**
      * Tries 1 of the possible vat rates.
-     *
-     * @param float $vatRate
-     *
-     * @return bool
      */
-    protected function tryVatRate($vatRate)
+    protected function tryVatRate(float $vatRate): bool
     {
         $this->description = "ApplySameVatRate($vatRate)";
         $this->replacingLines = [];

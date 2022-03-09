@@ -26,12 +26,12 @@ use Siel\Acumulus\Tag;
  * over the split lines.
  *
  * If there are multiple split lines, we cannot arrive at a correct division
- * for all theses line separately, so we combine them into 1 discount line and
+ * for all these lines separately, so we combine them into 1 discount line and
  * split that line in 2.
  *
  * As this strategy has a lot of freedom it will probably succeed with the first
- * try. Therefore we should start with the "most correct" vat rate for the fee
- * lines, being the key component (hoofdbestanddeel). But as no known shop
+ * try. Therefore, we should start with the "most correct" vat rate for the fee
+ * lines, being the key component (NL: hoofdbestanddeel). But as no known shop
  * implements this, we start with the maximum rate (this is used by most shops)
  * followed by the minimum rate but only if it is the key component.
  *
@@ -61,7 +61,7 @@ use Siel\Acumulus\Tag;
  * Current known usages:
  * - OpenCart discount coupons
  *
- * @noinspection PhpUnused
+ * @noinspection PhpUnused : instantiated via a variable containing the name.
  */
 class SplitLine extends CompletorStrategyBase
 {
@@ -70,7 +70,7 @@ class SplitLine extends CompletorStrategyBase
      *   This strategy should be tried last before the fail strategy as there
      *   are chances of returning a wrong true result.
      */
-    static public $tryOrder = 40;
+    public static $tryOrder = 40;
 
     /** @var array[] */
     protected $splitLines;
@@ -129,7 +129,7 @@ class SplitLine extends CompletorStrategyBase
     /**
      * {@inheritdoc}
      */
-    protected function checkPreconditions()
+    protected function checkPreconditions(): bool
     {
         return count($this->vatBreakdown) === 2 && count($this->splitLines) >= 1;
     }
@@ -137,7 +137,7 @@ class SplitLine extends CompletorStrategyBase
     /**
      * {@inheritdoc}
      */
-    public function execute()
+    public function execute(): bool
     {
         if ($this->tryVatRate($this->maxVatRate[Tag::VatRate])) {
             return true;
@@ -153,15 +153,7 @@ class SplitLine extends CompletorStrategyBase
         return false;
     }
 
-    /**
-     *
-     *
-     * @param float $vatRateForOtherLines
-     *
-     * @return bool
-     *
-     */
-    protected function tryVatRate($vatRateForOtherLines)
+    protected function tryVatRate(float $vatRateForOtherLines): bool
     {
         $this->description = "SplitLine($vatRateForOtherLines, {$this->minVatRate[Tag::VatRate]}, {$this->maxVatRate[Tag::VatRate]})";
         $this->replacingLines = [];
@@ -179,18 +171,14 @@ class SplitLine extends CompletorStrategyBase
      * $highVatRate such that the vat amount for those 2 lines equals the
      * Given an amount and a vat over that amount, split that amount over 2 given
      * vat rates such that the total vat amount remains equal.
-     *
      * Example €15,- with €2.40 vat and vat rates of 21% and 6% results in €10,-
      * at 21% vat and €5,- at 6% vat.
-     *
      * The math:
      * 1) highAmount + LowAmount = Amount
      * 2) highRate * highAmount + lowRate * lowAmount = VatAmount
-     *
      * This results in:
      * 1) highAmount = (vatAmount - Amount * lowRate) / (highRate - lowRate)
      * 2) lowAmount = Amount - highAmount
-     *
      * This may be considered successful if the sign of all 3 amounts is the same
      * and both low and high amount are not 0 (this is a split strategy, not
      * splitting but using 1 vat rate is tried by another strategy).
@@ -206,11 +194,16 @@ class SplitLine extends CompletorStrategyBase
      *
      * @noinspection DuplicatedCode
      */
-    protected function divideAmountOver2VatRates($splitVatAmount, $lowVatRate, $highVatRate)
+    protected function divideAmountOver2VatRates(float $splitVatAmount, float $lowVatRate, float $highVatRate): bool
     {
         // Divide the amount over the 2 vat rates, such that the sum of the divided
         // amounts and the sum of the vat amounts equals the total amount and vat.
-        list($lowAmount, $highAmount) = $this->splitAmountOver2VatRates($this->splitLinesAmount, $splitVatAmount, $lowVatRate, $highVatRate);
+        [$lowAmount, $highAmount] = $this->splitAmountOver2VatRates(
+            $this->splitLinesAmount,
+            $splitVatAmount,
+            $lowVatRate,
+            $highVatRate
+        );
 
         // Dividing was possible if both amounts have the same sign.
         if (($highAmount < -0.005 && $lowAmount < -0.005 && $this->splitLinesAmount < -0.005)

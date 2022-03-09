@@ -1,10 +1,4 @@
 <?php
-/**
- * @noinspection PhpMissingReturnTypeInspection
- * @noinspection PhpMissingParamTypeInspection
- * @noinspection PhpMissingVisibilityInspection
- */
-
 namespace Siel\Acumulus\Invoice;
 
 use Siel\Acumulus\Helpers\Log;
@@ -24,31 +18,30 @@ use Siel\Acumulus\Helpers\Translator;
 class Result extends AcumulusResult
 {
     // Whether to add the raw request and response to mails or log messages.
-    const AddReqResp_Never = 1;
-    const AddReqResp_Always = 2;
-    const AddReqResp_WithOther = 3;
-
-    const SendStatus_Unknown = 0;
+    public const AddReqResp_Never = 1;
+    public const AddReqResp_Always = 2;
+    public const AddReqResp_WithOther = 3;
+    public const SendStatus_Unknown = 0;
     // Invoice send handling related constants.
     // Reason for not sending
-    const NotSent_EventInvoiceCreated = 0x1;
-    const NotSent_EventInvoiceCompleted = 0x2;
-    const NotSent_AlreadySent = 0x3;
-    const NotSent_WrongStatus = 0x4;
-    const NotSent_EmptyInvoice = 0x5;
-    const NotSent_TriggerInvoiceCreateNotEnabled = 0x6;
-    const NotSent_TriggerInvoiceSentNotEnabled = 0x7;
-    const NotSent_LocalErrors = 0x8;
-    const NotSent_DryRun = 0x9;
-    const NotSent_TriggerCreditNoteEventNotEnabled = 0xa;
-    const NotSent_LockedForSending = 0xb;
-    const NotSent_Mask = 0xf;
+    public const NotSent_EventInvoiceCreated = 0x1;
+    public const NotSent_EventInvoiceCompleted = 0x2;
+    public const NotSent_AlreadySent = 0x3;
+    public const NotSent_WrongStatus = 0x4;
+    public const NotSent_EmptyInvoice = 0x5;
+    public const NotSent_TriggerInvoiceCreateNotEnabled = 0x6;
+    public const NotSent_TriggerInvoiceSentNotEnabled = 0x7;
+    public const NotSent_LocalErrors = 0x8;
+    public const NotSent_DryRun = 0x9;
+    public const NotSent_TriggerCreditNoteEventNotEnabled = 0xa;
+    public const NotSent_LockedForSending = 0xb;
+    public const NotSent_Mask = 0xf;
     // Reason for sending
-    const Send_New = 0x10;
-    const Send_Forced = 0x20;
-    const Send_TestMode = 0x30;
-    const Send_LockExpired = 0x40;
-    const Send_Mask = 0xf0;
+    public const Send_New = 0x10;
+    public const Send_Forced = 0x20;
+    public const Send_TestMode = 0x30;
+    public const Send_LockExpired = 0x40;
+    public const Send_Mask = 0xf0;
 
     /**
      * @var int
@@ -94,7 +87,7 @@ class Result extends AcumulusResult
      *   contain 1 of the Result::Sent_... or Result::Invoice_NotSent_...
      *   constants.
      */
-    public function getSendStatus()
+    public function getSendStatus(): int
     {
         return $this->sendStatus;
     }
@@ -109,7 +102,7 @@ class Result extends AcumulusResult
      *
      * @return $this
      */
-    public function setSendStatus($sendStatus, $arguments = [])
+    public function setSendStatus(int $sendStatus, array $arguments = []): Result
     {
         $this->sendStatus = $sendStatus;
         $this->sendStatusArguments = $arguments;
@@ -123,7 +116,7 @@ class Result extends AcumulusResult
      *   True if the invoice has been sent, false if sending was prevented or
      *   if the sendStatus has not yet been set.
      */
-    public function hasBeenSent()
+    public function hasBeenSent(): bool
     {
         return ($this->sendStatus & self::Send_Mask) !== 0;
     }
@@ -135,7 +128,7 @@ class Result extends AcumulusResult
      *   True if the invoice has been prevented from sensing, false if it has
      *   been sent or if the sendStatus has not yet been set.
      */
-    public function isSendingPrevented()
+    public function isSendingPrevented(): bool
     {
         return ($this->sendStatus & self::NotSent_Mask) !== 0;
     }
@@ -145,7 +138,7 @@ class Result extends AcumulusResult
      *   A string indicating the function that triggered the sending, e.g.
      *   InvoiceManager::sourceStatusChange().
      */
-    public function getTrigger()
+    public function getTrigger(): string
     {
         return $this->trigger;
     }
@@ -156,10 +149,9 @@ class Result extends AcumulusResult
      *   InvoiceManager::sourceStatusChange().
      *
      * @return $this
-     *
      * @noinspection PhpUnused
      */
-    public function setTrigger($trigger)
+    public function setTrigger(string $trigger): Result
     {
         $this->trigger = $trigger;
         return $this;
@@ -171,7 +163,7 @@ class Result extends AcumulusResult
      *
      * @return string
      */
-    protected function getActionText()
+    protected function getActionText(): string
     {
         if ($this->hasBeenSent()) {
             $action = 'action_sent';
@@ -188,7 +180,7 @@ class Result extends AcumulusResult
      *
      * @return string
      */
-    protected function getSendStatusText()
+    protected function getSendStatusText(): string
     {
         switch ($this->sendStatus) {
             case self::NotSent_WrongStatus:
@@ -251,7 +243,6 @@ class Result extends AcumulusResult
 
     /**
      * Returns a translated sentence that can be used for logging.
-     *
      * The returned sentence indicates what happened and why. If the invoice was
      * sent or local errors prevented it being sent, then the returned string
      * also includes any messages.
@@ -262,7 +253,7 @@ class Result extends AcumulusResult
      *
      * @return string
      */
-    public function getLogText($addReqResp)
+    public function getLogText(int $addReqResp): string
     {
         $action = $this->getActionText();
         $reason = $this->getSendStatusText();

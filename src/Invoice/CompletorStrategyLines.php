@@ -11,9 +11,8 @@ use Siel\Acumulus\Tag;
  * complete invoice lines before sending them to Acumulus.
  *
  * This class:
- * - Adds vat rates to lines that need a strategy to compute their vat rates.
- *
- * @package Siel\Acumulus
+ * - Adds vat rates to invoice lines that need a strategy to compute their vat
+ *   rates.
  */
 class CompletorStrategyLines
 {
@@ -70,7 +69,7 @@ class CompletorStrategyLines
      * @return array
      *   The completed invoice.
      */
-    public function complete(array $invoice, Source $source, array $possibleVatTypes, array $possibleVatRates)
+    public function complete(array $invoice, Source $source, array $possibleVatTypes, array $possibleVatRates): array
     {
         $this->invoice = $invoice;
         $this->invoiceLines = &$this->invoice[Tag::Customer][Tag::Invoice][Tag::Line];
@@ -108,8 +107,9 @@ class CompletorStrategyLines
                     } else {
                         $this->invoice[Tag::Customer][Tag::Invoice][Meta::CompletorStrategyUsed] .= '; ' . $strategy->getDescription();
                     }
-                    // Allow for partial solutions: a strategy may correct only some of
-                    // the strategy lines and leave the rest up to other strategies.
+                    // Allow for partial solutions: a strategy may correct only
+                    // some strategy lines and leave the rest up to other
+                    // strategies.
                     if (!$this->invoiceHasStrategyLine()) {
                         break;
                     }
@@ -121,10 +121,8 @@ class CompletorStrategyLines
     /**
      * Returns whether the invoice has lines that are to be completed using a tax
      * divide strategy.
-     *
-     * @return bool
      */
-    public function invoiceHasStrategyLine()
+    public function invoiceHasStrategyLine(): bool
     {
         $result = false;
         foreach ($this->invoiceLines as $line) {
@@ -141,7 +139,7 @@ class CompletorStrategyLines
      *
      * @return string[]
      */
-    protected function getStrategyClasses()
+    protected function getStrategyClasses(): array
     {
         $result = [];
 
@@ -168,7 +166,7 @@ class CompletorStrategyLines
      *   An array of completed invoice lines to replace the strategy lines with.
      * @param string $strategyName
      */
-    protected function replaceLinesCompleted(array $linesCompleted, array $completedLines, $strategyName)
+    protected function replaceLinesCompleted(array $linesCompleted, array $completedLines, string $strategyName)
     {
         // Remove old strategy lines that are now completed.
         $lines = [];

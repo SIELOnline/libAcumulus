@@ -8,7 +8,8 @@ use Siel\Acumulus\Helpers\TranslationCollection;
  */
 class Translations extends TranslationCollection
 {
-    const sharedNl = 'De factuur is als concept opgeslagen. In Acumulus zijn deze onder "Overzichten » Concept-facturen / offertes" terug te vinden. Controleer en corrigeer daar de factuur.';
+    public const sharedNl = 'De factuur is als concept opgeslagen. In Acumulus zijn deze onder "Overzichten » Concept-facturen / offertes" terug te vinden. Controleer en corrigeer daar de factuur.';
+
     protected $nl = [
         Source::Order => 'bestelling',
         Source::CreditNote => 'creditnota',

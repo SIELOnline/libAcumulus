@@ -1,10 +1,16 @@
 <?php
+/**
+ * @noinspection HtmlUnknownTarget
+ */
+
 namespace Siel\Acumulus\WooCommerce\Helpers;
 
 use Siel\Acumulus\Helpers\TranslationCollection;
 
 /**
  * Contains plugin specific overrides.
+ *
+ * @noinspection PhpUnused
  */
 class ModuleSpecificTranslations extends TranslationCollection
 {

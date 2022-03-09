@@ -103,7 +103,7 @@ class RegisterForm extends Form
     /**
      * @inheritDoc
      */
-    protected function execute()
+    protected function execute(): bool
     {
         $tags = [
             Tag::CompanyTypeId,
@@ -161,7 +161,7 @@ class RegisterForm extends Form
      * @return bool
      *   True on success, false on failure.
      */
-    protected function setAccountInfo(array $signUpResponse)
+    protected function setAccountInfo(array $signUpResponse): bool
     {
         $accountValues = [
             Tag::ContractCode => $signUpResponse[Tag::ContractCode],
@@ -175,7 +175,7 @@ class RegisterForm extends Form
     /**
      * @inheritDoc
      */
-    protected function getFieldDefinitions()
+    protected function getFieldDefinitions(): array
     {
         // Test success screen
 //        $this->signUpResponse = [
@@ -238,7 +238,7 @@ class RegisterForm extends Form
      * @return array[]
      *   The set of intro fields.
      */
-    protected function getIntroFields()
+    protected function getIntroFields(): array
     {
         return [
             'intro' => [
@@ -258,16 +258,16 @@ class RegisterForm extends Form
      * Returns the set of personal related fields.
      *
      * The fields returned:
-     * - gender
-     * - fullname
-     * - loginname
-     * - email
-     * - telephone
+     * - 'gender'
+     * - 'fullname'
+     * - 'loginname'
+     * - 'email'
+     * - 'telephone'
      *
      * @return array[]
      *   The set of personal related fields.
      */
-    protected function getPersonFields()
+    protected function getPersonFields(): array
     {
         return [
             Tag::Gender => [
@@ -308,16 +308,16 @@ class RegisterForm extends Form
      * Returns the set of company related fields.
      *
      * The fields returned:
-     * - companyname
-     * - address
-     * - postalcode
-     * - city
-     * - bankaccount
+     * - 'companyname'
+     * - 'address'
+     * - 'postalcode'
+     * - 'city'
+     * - 'bankaccount'
      *
      * @return array[]
-     *   The set of notes related fields.
+     *   The set of company related fields.
      */
-    protected function getCompanyFields()
+    protected function getCompanyFields(): array
     {
         return [
             Tag::CompanyTypeId => [
@@ -392,12 +392,12 @@ class RegisterForm extends Form
      * Returns the set of notes related fields.
      *
      * The fields returned:
-     * - notes
+     * - 'notes'
      *
      * @return array[]
      *   The set of notes related fields.
      */
-    protected function getNotesFields()
+    protected function getNotesFields(): array
     {
         return [
             Tag::Notes => [
@@ -415,16 +415,16 @@ class RegisterForm extends Form
      * Returns text about the successful creation of the temporary account.
      *
      * @return array[]
-     *   Markup that gives more information about the the test account that has
-     *   been created.
+     *   Markup that gives more information about the test account that has been
+     *   created.
      */
-    protected function getCongratulationsFields()
+    protected function getCongratulationsFields(): array
     {
         return [
             'congratulations' => [
                 'type' => 'fieldset',
                 'legend' => $this->t('congratulationsHeader'),
-                'description' => sprintf($this->t('congratulationsDesc'), DateTime::createFromFormat(API::DateFormat_Iso, $this->signUpResponse['contractenddate'])->format('d-m-Y')),
+                'description' => sprintf($this->t('congratulationsDesc'), DateTime::createFromFormat(Api::DateFormat_Iso, $this->signUpResponse['contractenddate'])->format('d-m-Y')),
                 'fields' => [],
             ],
         ];
@@ -434,11 +434,12 @@ class RegisterForm extends Form
      * Returns explanatory text about the test account that has been created.
      *
      * @return array[]
-     *   Markup that gives more information about the the account that has
-     *   been created.
+     *   Markup that gives more information about the account that has been
+     *   created.
      */
-    protected function getCreatedAccountFields()
+    protected function getCreatedAccountFields(): array
     {
+        /** @noinspection PhpRedundantOptionalArgumentInspection */
         $line1 = sprintf($this->t('loginDesc_1'), htmlspecialchars($this->getSubmittedValue(Tag::Email), ENT_NOQUOTES | ENT_HTML5, 'UTF-8'));
         $line2 = $this->t('loginDesc_2');
         return [
@@ -483,10 +484,10 @@ class RegisterForm extends Form
      * Returns explanatory text about the test account that has been created.
      *
      * @return array[]
-     *   Markup that gives more information about the the test account that has
-     *   been created.
+     *   Markup that gives more information about the test account that has been
+     *   created.
      */
-    protected function getCreatedApiAccountFields()
+    protected function getCreatedApiAccountFields(): array
     {
         $line1 = sprintf($this->t('apiLoginDesc'), $this->t('module'));
         return [
@@ -537,7 +538,7 @@ class RegisterForm extends Form
      * @return array[]
      *   Markup that explains what to do next.
      */
-    protected function getNextSteps()
+    protected function getNextSteps(): array
     {
         return [
             'whatsNext' => [

@@ -23,7 +23,7 @@ class InvoiceManager extends BaseInvoiceManager
     /**
      * {@inheritdoc}
      */
-    public function getInvoiceSourcesByIdRange($invoiceSourceType, $InvoiceSourceIdFrom, $InvoiceSourceIdTo): array
+    public function getInvoiceSourcesByIdRange(string $invoiceSourceType, string $InvoiceSourceIdFrom, string $InvoiceSourceIdTo): array
     {
         $field = 'entity_id';
         $condition = [
@@ -36,7 +36,7 @@ class InvoiceManager extends BaseInvoiceManager
     /**
      * {@inheritdoc}
      */
-    public function getInvoiceSourcesByReferenceRange($invoiceSourceType, $invoiceSourceReferenceFrom, $invoiceSourceReferenceTo): array
+    public function getInvoiceSourcesByReferenceRange(string $invoiceSourceType, string $invoiceSourceReferenceFrom, string $invoiceSourceReferenceTo): array
     {
         $field = 'increment_id';
         $condition = [
@@ -49,7 +49,7 @@ class InvoiceManager extends BaseInvoiceManager
     /**
      * {@inheritdoc}
      */
-    public function getInvoiceSourcesByDateRange($invoiceSourceType, DateTime $dateFrom, DateTime $dateTo): array
+    public function getInvoiceSourcesByDateRange(string $invoiceSourceType, DateTime $dateFrom, DateTime $dateTo): array
     {
         $dateFrom = $this->getSqlDate($dateFrom);
         $dateTo = $this->getSqlDate($dateTo);

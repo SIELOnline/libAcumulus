@@ -9,7 +9,7 @@ use Siel\Acumulus\Invoice\Source;
  * Manages {@see AcumulusEntry} records/objects.
  *
  * This manager class performs CRU(D) operations on Acumulus entries in the
- * webshop database. The features of this class include:
+ * web shop database. The features of this class include:
  * - Retrieval of an Acumulus entry record for an invoice source (orders or
  *   refunds).
  * - Retrieval of an Acumulus entry record for a given entry id.
@@ -47,7 +47,7 @@ abstract class AcumulusEntryManager
      *   Acumulus entry record for the given entry id or null if the entry id is
      *   unknown.
      */
-    abstract public function getByEntryId($entryId);
+    abstract public function getByEntryId(?int $entryId);
 
     /**
      * Returns the Acumulus entry record for the given invoice source.
@@ -55,14 +55,14 @@ abstract class AcumulusEntryManager
      * @param \Siel\Acumulus\Invoice\Source $invoiceSource
      *   The source object for which the invoice was created.
      * @param bool $ignoreLock
-     *   Whether to return an entry that serves as a send lock (false) or ignore
+     *   Whether to return an entry that serves as a send-lock (false) or ignore
      *   it (true)
      *
      * @return \Siel\Acumulus\Shop\AcumulusEntry|null
      *   Acumulus entry record for the given invoice source or null if no
      *   invoice has yet been created in Acumulus for this invoice source.
      */
-    abstract public function getByInvoiceSource(Source $invoiceSource, $ignoreLock = true);
+    abstract public function getByInvoiceSource(Source $invoiceSource, bool $ignoreLock = true): ?AcumulusEntry;
 
     /**
      * Converts the results of a DB query to AcumulusEntries.
@@ -75,7 +75,7 @@ abstract class AcumulusEntryManager
      *
      * @return \Siel\Acumulus\Shop\AcumulusEntry|\Siel\Acumulus\Shop\AcumulusEntry[]|null
      */
-    protected function convertDbResultToAcumulusEntries($result, $ignoreLock = true)
+    protected function convertDbResultToAcumulusEntries($result, bool $ignoreLock = true)
     {
         if (empty($result)) {
             $result = null;
@@ -115,7 +115,7 @@ abstract class AcumulusEntryManager
      * @return bool
      *   Whether the lock was successfully acquired.
      */
-    public function lockForSending(Source $invoiceSource)
+    public function lockForSending(Source $invoiceSource): bool
     {
         return $this->insert($invoiceSource, AcumulusEntry::lockEntryId, AcumulusEntry::lockToken, $this->sqlNow());
     }
@@ -130,7 +130,7 @@ abstract class AcumulusEntryManager
      *   One of the AcumulusEntry::Lock_... constants describing the status of
      *   the lock.
      */
-    public function deleteLock(Source $invoiceSource)
+    public function deleteLock(Source $invoiceSource): int
     {
         $entry = $this->getByInvoiceSource($invoiceSource, false);
         if ($entry === null) {
@@ -152,17 +152,15 @@ abstract class AcumulusEntryManager
 
     /**
      * Saves the Acumulus entry for the given order in the web shop's database.
-     *
      * This default implementation calls getByInvoiceSource() to determine
      * whether to subsequently call insert() or update().
-     *
      * So normally, a child class should implement insert() and update() and not
      * override this method.
      *
      * @param \Siel\Acumulus\Invoice\Source $invoiceSource
      *   The source object for which the invoice was created.
      * @param int|null $entryId
-     *   The Acumulus entry Id assigned to the invoice for this order.
+     *   The Acumulus entry id assigned to the invoice for this order.
      * @param string|null $token
      *   The Acumulus token to be used to access the invoice for this order via
      *   the Acumulus API.
@@ -170,7 +168,7 @@ abstract class AcumulusEntryManager
      * @return bool
      *   Success.
      */
-    public function save(Source $invoiceSource, $entryId, $token)
+    public function save(Source $invoiceSource, ?int $entryId, ?string $token): bool
     {
         $now = $this->sqlNow();
         $record = $this->getByInvoiceSource($invoiceSource, false);
@@ -196,7 +194,7 @@ abstract class AcumulusEntryManager
      * @param \Siel\Acumulus\Invoice\Source $invoiceSource
      *   The source object for which the invoice was created.
      * @param int|null $entryId
-     *   The Acumulus entry Id assigned to the invoice for this order.
+     *   The Acumulus entry id assigned to the invoice for this order.
      * @param string|null $token
      *   The Acumulus token to be used to access the invoice for this order via
      *   the Acumulus API.
@@ -207,7 +205,7 @@ abstract class AcumulusEntryManager
      * @return bool
      *   Success.
      */
-    abstract protected function insert(Source $invoiceSource, $entryId, $token, $created);
+    abstract protected function insert(Source $invoiceSource, ?int $entryId, ?string $token, $created): bool;
 
     /**
      * Updates the Acumulus entry for the given invoice source.
@@ -225,7 +223,7 @@ abstract class AcumulusEntryManager
      * @return bool
      *   Success.
      */
-    abstract protected function update(AcumulusEntry $entry, $entryId, $token, $updated);
+    abstract protected function update(AcumulusEntry $entry, ?int $entryId, ?string $token, $updated): bool;
 
     /**
      * Deletes the Acumulus entry for the given entry id.
@@ -238,9 +236,8 @@ abstract class AcumulusEntryManager
      *
      * @noinspection PhpUnused
      */
-    public function deleteByEntryId($entryId)
+    public function deleteByEntryId(int $entryId): bool
     {
-        $entryId = (int) $entryId;
         if ($entryId >= 2) {
             $entry = $this->getByEntryId($entryId);
             if ($entry instanceof AcumulusEntry) {
@@ -259,7 +256,7 @@ abstract class AcumulusEntryManager
      * @return bool
      *   Success.
      */
-    abstract public function delete(AcumulusEntry $entry);
+    abstract public function delete(AcumulusEntry $entry): bool;
 
     /**
      * Installs the data model. Called when the module gets installed.
@@ -267,7 +264,7 @@ abstract class AcumulusEntryManager
      * @return bool
      *   Success.
      */
-    abstract public function install();
+    abstract public function install(): bool;
 
     /**
      * Upgrades the data model. Called when the module gets updated.
@@ -278,7 +275,7 @@ abstract class AcumulusEntryManager
      * @return bool
      *   Success.
      */
-    public function upgrade($currentVersion)
+    public function upgrade(string $currentVersion): bool
     {
         return true;
     }
@@ -289,5 +286,5 @@ abstract class AcumulusEntryManager
      * @return bool
      *   Success.
      */
-    abstract public function uninstall();
+    abstract public function uninstall(): bool;
 }

@@ -1,5 +1,7 @@
 <?php
-/** @noinspection HtmlUnknownTarget */
+/**
+ * @noinspection HtmlUnknownTarget
+ */
 
 namespace Siel\Acumulus\Shop;
 

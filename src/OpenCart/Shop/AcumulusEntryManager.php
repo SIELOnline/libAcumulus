@@ -49,7 +49,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    public function getByEntryId($entryId)
+    public function getByEntryId(?int $entryId)
     {
         /** @var \stdClass $result  (documentation error in DB) */
         $result = $this->getDb()->query(sprintf(
@@ -64,7 +64,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    public function getByInvoiceSource(Source $invoiceSource, $ignoreLock = true)
+    public function getByInvoiceSource(Source $invoiceSource, bool $ignoreLock = true)
     {
         /** @var \stdClass $result  (documentation error in DB) */
         $result = $this->getDb()->query(sprintf(
@@ -79,7 +79,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    protected function insert(Source $invoiceSource, $entryId, $token, $created): bool
+    protected function insert(Source $invoiceSource, ?int $entryId, ?string $token, $created): bool
     {
         if ($invoiceSource->getType() === Source::Order) {
             $order = $invoiceSource->getSource();
@@ -102,7 +102,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    protected function update(BaseAcumulusEntry $entry, $entryId, $token, $updated): bool
+    protected function update(BaseAcumulusEntry $entry, ?int $entryId, ?string $token, $updated): bool
     {
         $record = $entry->getRecord();
         return (bool) $this->getDb()->query(sprintf(
@@ -228,7 +228,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritDoc}
      */
-    public function upgrade($currentVersion)
+    public function upgrade(string $currentVersion)
     {
         $result = true;
 

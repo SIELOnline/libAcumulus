@@ -594,7 +594,7 @@ abstract class Form extends MessageCollection
                     $this->t('field_companyName') => $myData['mycompanyname'] ?? $this->t('unknown'),
                 ];
                 if (!empty($myData['mycontractenddate'])) {
-                    $endDate = DateTimeImmutable::createFromFormat(API::DateFormat_Iso, $myData['mycontractenddate']);
+                    $endDate = DateTimeImmutable::createFromFormat(Api::DateFormat_Iso, $myData['mycontractenddate']);
                     if ($endDate) {
                         $now = new DateTimeImmutable();
                         $days = $now->diff($endDate)->days;

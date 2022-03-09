@@ -7,7 +7,7 @@ use Siel\Acumulus\Api;
 /**
  * Ties web shop orders or credit notes to entries in Acumulus.
  *
- * Acumulus identifies entries by their entry id (boekstuknummer in dutch) or,
+ * Acumulus identifies entries by their entry id (Dutch: boekstuknummer) or,
  * for a number of API calls, a token. Both the entry id and token are stored
  * together with information that identifies the shop invoice source (order or
  * credit note) and create and last updated timestamps.
@@ -44,32 +44,31 @@ class AcumulusEntry
 {
     // Access to the fields, differs per web shop as we follow db naming
     // conventions from the web shop.
-    static protected $keyEntryId = 'entry_id';
-    static protected $keyToken = 'token';
-    static protected $keySourceType = 'source_type';
-    static protected $keySourceId = 'source_id';
-    static protected $keyCreated = 'created';
-    static protected $keyUpdated = 'updated';
+    protected static $keyEntryId = 'entry_id';
+    protected static $keyToken = 'token';
+    protected static $keySourceType = 'source_type';
+    protected static $keySourceId = 'source_id';
+    protected static $keyCreated = 'created';
+    protected static $keyUpdated = 'updated';
 
     // The format of the created and updated timestamps, when saved as a string.
-    static protected $timestampFormat = Api::Format_TimeStamp;
+    protected static $timestampFormat = Api::Format_TimeStamp;
 
     // Constants to enable some kind of locking and thereby preventing sending
     // invoices twice.
-    static protected $maxLockTimeS = 40;
-    const lockEntryId = 1;
-    const lockToken = 'Send locked, delete if too old';
-    const conceptIdUnknown = 0;
+    protected static $maxLockTimeS = 40;
+    public const lockEntryId = 1;
+    public const lockToken = 'Send locked, delete if too old';
+    public const conceptIdUnknown = 0;
 
     // Constants that define the various delete lock results.
-    const Lock_NoLongerExists = 1;
-    const Lock_Deleted = 2;
-    const Lock_BecameRealEntry = 3;
+    public const Lock_NoLongerExists = 1;
+    public const Lock_Deleted = 2;
+    public const Lock_BecameRealEntry = 3;
 
     /**
      * @var array|object
-     *
-     * The web shop specific data holder for the Acumulus entry.
+     *   The web shop specific data holder for the Acumulus entry.
      */
     protected $record;
 
@@ -92,7 +91,7 @@ class AcumulusEntry
      *   The entry id of this Acumulus entry or null if it was stored as a
      *   concept.
      */
-    public function getEntryId()
+    public function getEntryId(): ?int
     {
         // Is it a real entry id or a concept id.
         $token = $this->getToken();
@@ -111,7 +110,7 @@ class AcumulusEntry
      *   The concept id of this Acumulus entry, 0 if it was not stored, or null
      *   if it is a real entry (i.e. not a concept).
      */
-    public function getConceptId()
+    public function getConceptId(): ?int
     {
         // Is it a concept id or a real entry id.
         $token = $this->getToken();
@@ -126,7 +125,7 @@ class AcumulusEntry
      *   The token for this Acumulus entry or null if it was stored as a
      *   concept.
      */
-    public function getToken()
+    public function getToken(): ?string
     {
         return $this->get(static::$keyToken);
     }
@@ -139,7 +138,7 @@ class AcumulusEntry
      *
      * @noinspection PhpUnused
      */
-    public function getSourceType()
+    public function getSourceType(): ?string
     {
         return $this->get(static::$keySourceType);
     }
@@ -150,7 +149,7 @@ class AcumulusEntry
      * @return int
      *   The id of the shop source.
      */
-    public function getSourceId()
+    public function getSourceId(): ?int
     {
         return $this->get(static::$keySourceId);
     }
@@ -160,12 +159,12 @@ class AcumulusEntry
      *
      * @param bool $raw
      *   Whether to return the raw value as stored in the database, or a
-     *   Datetime object. The raw value will differ per webshop.
+     *   Datetime object. The raw value will differ per web shop.
      *
      * @return string|int|\DateTime
      *   The timestamp when this record was created.
      */
-    public function getCreated($raw = false)
+    public function getCreated(bool $raw = false)
     {
         $result = $this->get(static::$keyCreated);
         if (!$raw) {
@@ -179,12 +178,12 @@ class AcumulusEntry
      *
      * @param bool $raw
      *   Whether to return the raw value as stored in the database, or a
-     *   Datetime object. The raw value will differ per webshop.
+     *   Datetime object. The raw value will differ per web shop.
      *
      * @return string|int|\DateTime
      *   The timestamp when this record was last updated.
      */
-    public function getUpdated($raw = false)
+    public function getUpdated(bool $raw = false)
     {
         $result = $this->get(static::$keyUpdated);
         if (!$raw) {
@@ -229,10 +228,9 @@ class AcumulusEntry
 
     /**
      * Returns the value of the given field in the given acumulus entry record.
-     *
-     * As different webshops may use different field and property names in their
-     * tables and models, we abstracted accessing a field of a record into this
-     * method.
+     * As different web shops may use different field and property names in
+     * their tables and models, we abstracted accessing a field of a record into
+     * this method.
      *
      * @param string $field
      *   The field to search for.
@@ -240,7 +238,7 @@ class AcumulusEntry
      * @return mixed|null
      *   The value of the given field in this acumulus entry record.
      */
-    protected function get($field)
+    protected function get(string $field)
     {
         $value = null;
         if (is_array($this->record)) {
@@ -257,6 +255,7 @@ class AcumulusEntry
             } elseif (method_exists($this->record, $field)) {
                 $value = call_user_func([$this->record, $field]);
             } elseif (method_exists($this->record, '__get')) {
+                /** @noinspection PhpVariableVariableInspection */
                 @$value = $this->record->$field;
             } elseif (method_exists($this->record, '__call')) {
                 @$value = $this->record->$field();
@@ -276,7 +275,7 @@ class AcumulusEntry
      *   True if the entry serves as a lock on sending instead of as a reference
      *   to the invoice in Acumulus, false otherwise.
      */
-    public function isSendLock()
+    public function isSendLock(): bool
     {
         return $this->getToken() === static::lockToken;
     }
@@ -289,7 +288,7 @@ class AcumulusEntry
      *   True if the entry indicates that there is a lock on sending the
      *   invoice, but has expired, false otherwise.
      */
-    public function hasLockExpired()
+    public function hasLockExpired(): bool
     {
         return $this->isSendLock() && time() - $this->getCreated()->getTimestamp() > static::$maxLockTimeS;
     }

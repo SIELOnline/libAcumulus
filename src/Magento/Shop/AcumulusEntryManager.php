@@ -62,7 +62,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    public function getByEntryId($entryId)
+    public function getByEntryId(?int $entryId)
     {
         /** @var \Siel\AcumulusMa2\Model\Entry[] $result */
         $result = $this->getResourceCollection()
@@ -74,7 +74,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    public function getByInvoiceSource(Source $invoiceSource, $ignoreLock = true)
+    public function getByInvoiceSource(Source $invoiceSource, bool $ignoreLock = true)
     {
         /** @var \Siel\AcumulusMa2\Model\Entry $result */
         $result = $this->getResourceCollection()
@@ -87,7 +87,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    protected function insert(Source $invoiceSource, $entryId, $token, $created)
+    protected function insert(Source $invoiceSource, ?int $entryId, ?string $token, $created)
     {
         $record = $this->getModel()
             ->setEntryId($entryId)
@@ -104,7 +104,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      *
      * @throws \Exception
      */
-    protected function update(BaseAcumulusEntry $entry, $entryId, $token, $updated)
+    protected function update(BaseAcumulusEntry $entry, ?int $entryId, ?string $token, $updated)
     {
         /** @var \Siel\AcumulusMa2\Model\Entry $record */
         $record = $entry

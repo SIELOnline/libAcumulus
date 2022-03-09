@@ -38,7 +38,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    public function getByEntryId($entryId)
+    public function getByEntryId(?int $entryId)
     {
         $table = $this->newTable();
         $result = $table->loadMultiple(['entry_id' => $entryId]);
@@ -48,7 +48,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    public function getByInvoiceSource(Source $invoiceSource, $ignoreLock = true)
+    public function getByInvoiceSource(Source $invoiceSource, bool $ignoreLock = true)
     {
         $table = $this->newTable();
         $result = $table->load(['source_type' => $invoiceSource->getType(), 'source_id' => $invoiceSource->getId()], true);
@@ -58,7 +58,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    protected function insert(Source $invoiceSource, $entryId, $token, $created): bool
+    protected function insert(Source $invoiceSource, ?int $entryId, ?string $token, $created): bool
     {
         // Start with new table class to not overwrite any loaded record.
         $table = $this->newTable();
@@ -74,7 +74,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    protected function update(BaseAcumulusEntry $entry, $entryId, $token, $updated): bool
+    protected function update(BaseAcumulusEntry $entry, ?int $entryId, ?string $token, $updated): bool
     {
         // Continue with existing table object with already loaded record.
         /** @var \AcumulusTableAcumulusEntry $table */

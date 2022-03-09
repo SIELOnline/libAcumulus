@@ -21,7 +21,7 @@ class InvoiceStatusFormTranslations extends TranslationCollection
         InvoiceStatusForm::Invoice_NonExisting => 'Verzonden op %1$s maar niet meer bestaand in Acumulus, ook niet in de prullenbak.',
         InvoiceStatusForm::Invoice_CommunicationError => 'Verzonden, maar door een communicatiefout met Acumulus kunnen we niet meer informatie tonen. Probeer het later nog eens.',
         InvoiceStatusForm::Invoice_LocalError => 'Verzonden, maar door een interne fout kunnen we niet meer informatie tonen. Probeer het later nog eens.',
-        'invoice_status_ok' => "De factuur lijkt in orde, er zijn geen onregelmatigheden gevonden",
+        'invoice_status_ok' => 'De factuur lijkt in orde, er zijn geen onregelmatigheden gevonden',
         'concept_no_conceptid' => 'Helaas kan van deze conceptfactuur niet meer informatie getoond worden, ook niet als u deze definitief gemaakt heeft.',
         'concept_conceptid_deleted' => 'Deze conceptfactuur is verwijderd voordat deze definitief gemaakt is.',
         'concept_multiple_invoiceid' => 'Van deze conceptfactuur zijn meerdere definitieve facturen gemaakt, we weten dus niet aan welke definitieve factuur deze te koppelen.',

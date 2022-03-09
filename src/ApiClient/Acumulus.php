@@ -461,8 +461,8 @@ class Acumulus
      * @param int $entryId
      *   The id of the entry.
      * @param int $deleteStatus
-     *   The delete action to perform: one of the API::Entry_Delete or
-     *   API::Entry_UnDelete constants. API::Entry_UnDelete does not work for
+     *   The delete action to perform: one of the Api::Entry_Delete or
+     *   Api::Entry_UnDelete constants. Api::Entry_UnDelete does not work for
      *   now.
      *
      * @return \Siel\Acumulus\ApiClient\Result
@@ -525,11 +525,11 @@ class Acumulus
      * @param string $token
      *   The token for the invoice.
      * @param int $paymentStatus
-     *   The new payment status, 1 of the API::PaymentStatus_Paid or
-     *   API::PaymentStatus_Due constants.
+     *   The new payment status, 1 of the Api::PaymentStatus_Paid or
+     *   Api::PaymentStatus_Due constants.
      * @param string $paymentDate
      *   ISO date string (yyyy-mm-dd) for the date to set as payment date, may
-     *   be empty for today or if the payment status is API::PaymentStatus_Due.
+     *   be empty for today or if the payment status is Api::PaymentStatus_Due.
      *
      * @return \Siel\Acumulus\ApiClient\Result
      *   The result of the webservice call. The structured response will contain
@@ -573,7 +573,7 @@ class Acumulus
      *   - message
      *   - confirmreading
      * @param int|null $invoiceType
-     *   One of the constants API::Email_Normal (default) or API::Email_Reminder.
+     *   One of the constants Api::Email_Normal (default) or Api::Email_Reminder.
      * @param string $invoiceNotes
      *   Multiline field for additional remarks. Use \n for newlines and \t for
      *   tabs. Contents is placed in notes/comments section of the invoice.

@@ -52,7 +52,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    public function getByEntryId($entryId)
+    public function getByEntryId(?int $entryId)
     {
         $metaQuery = [
             'posts_per_page' => 1,
@@ -75,7 +75,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    public function getByInvoiceSource(Source $invoiceSource, $ignoreLock = true)
+    public function getByInvoiceSource(Source $invoiceSource, bool $ignoreLock = true)
     {
         $result = null;
         $invoiceSourceType = $invoiceSource->getType();
@@ -106,7 +106,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    protected function insert(Source $invoiceSource, $entryId, $token, $created): bool
+    protected function insert(Source $invoiceSource, ?int $entryId, ?string $token, $created): bool
     {
         $now = $this->sqlNow();
         $postId = $invoiceSource->getId();
@@ -121,7 +121,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    protected function update(BaseAcumulusEntry $entry, $entryId, $token, $updated): bool
+    protected function update(BaseAcumulusEntry $entry, ?int $entryId, ?string $token, $updated): bool
     {
         $postId = $entry->getSourceId();
         // Overwrite fields. To be able to return a correct success value, we

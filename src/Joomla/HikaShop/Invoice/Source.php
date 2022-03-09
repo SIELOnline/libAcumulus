@@ -50,7 +50,7 @@ class Source extends BaseSource
      */
     public function getDate()
     {
-        return date(API::DateFormat_Iso, $this->source->order_created);
+        return date(Api::DateFormat_Iso, $this->source->order_created);
     }
 
     /**
@@ -115,7 +115,7 @@ class Source extends BaseSource
                 }
             }
         }
-        return $date ? date(API::DateFormat_Iso, $date) : $date;
+        return $date ? date(Api::DateFormat_Iso, $date) : $date;
     }
 
     /**
@@ -186,6 +186,6 @@ class Source extends BaseSource
      */
     public function getInvoiceDate()
     {
-        return !empty($this->source->order_invoice_created) ? date(API::DateFormat_Iso, $this->source->order_invoice_created) : parent::getInvoiceDate();
+        return !empty($this->source->order_invoice_created) ? date(Api::DateFormat_Iso, $this->source->order_invoice_created) : parent::getInvoiceDate();
     }
 }

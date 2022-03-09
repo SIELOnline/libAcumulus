@@ -14,7 +14,7 @@ class AcumulusEntry extends BaseAcumulusEntry
     /**
      * {@inheritdoc}
      */
-    protected function get($field)
+    protected function get(string $field)
     {
         /** @var \Siel\AcumulusMa2\Model\Entry $entry */
         $entry = $this->getRecord();

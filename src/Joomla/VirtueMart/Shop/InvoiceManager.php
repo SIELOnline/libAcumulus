@@ -26,7 +26,7 @@ class InvoiceManager extends BaseInvoiceManager
     /**
      * {@inheritdoc}
      */
-    public function getInvoiceSourcesByIdRange($invoiceSourceType, $InvoiceSourceIdFrom, $InvoiceSourceIdTo): array
+    public function getInvoiceSourcesByIdRange(string $invoiceSourceType, string $InvoiceSourceIdFrom, string $InvoiceSourceIdTo): array
     {
         if ($invoiceSourceType === Source::Order) {
             $query = sprintf(
@@ -47,7 +47,7 @@ class InvoiceManager extends BaseInvoiceManager
      * introduce sequential order numbers, E.g:
      * http://extensions.joomla.org/profile/extension/extension-specific/virtuemart-extensions/human-readable-order-numbers
      */
-    public function getInvoiceSourcesByReferenceRange($invoiceSourceType, $invoiceSourceReferenceFrom, $invoiceSourceReferenceTo): array
+    public function getInvoiceSourcesByReferenceRange(string $invoiceSourceType, string $invoiceSourceReferenceFrom, string $invoiceSourceReferenceTo): array
     {
         if ($invoiceSourceType === Source::Order) {
             if (ctype_digit($invoiceSourceReferenceFrom) && ctype_digit($invoiceSourceReferenceTo)) {
@@ -70,7 +70,7 @@ class InvoiceManager extends BaseInvoiceManager
     /**
      * {@inheritdoc}
      */
-    public function getInvoiceSourcesByDateRange($invoiceSourceType, DateTime $dateFrom, DateTime $dateTo): array
+    public function getInvoiceSourcesByDateRange(string $invoiceSourceType, DateTime $dateFrom, DateTime $dateTo): array
     {
         if ($invoiceSourceType === Source::Order) {
             /** @noinspection PhpUnhandledExceptionInspection */

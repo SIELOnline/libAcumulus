@@ -51,7 +51,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    public function getByEntryId($entryId)
+    public function getByEntryId(?int $entryId)
     {
         // @todo
     }
@@ -59,7 +59,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    public function getByInvoiceSource(Source $invoiceSource, $ignoreLock = true)
+    public function getByInvoiceSource(Source $invoiceSource, bool $ignoreLock = true)
     {
         // @todo
     }
@@ -67,7 +67,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    protected function insert(Source $invoiceSource, $entryId, $token, $created)
+    protected function insert(Source $invoiceSource, ?int $entryId, ?string $token, $created)
     {
         // @todo: insert a new entry (note that save() takes care of distinguishing between insert and update).
     }
@@ -75,7 +75,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    protected function update(BaseAcumulusEntry $entry, $entryId, $token, $updated)
+    protected function update(BaseAcumulusEntry $entry, ?int $entryId, ?string $token, $updated)
     {
         // @todo: update an existing entry (note that save() takes care of distinguishing between insert and update).
     }

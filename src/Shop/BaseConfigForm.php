@@ -62,7 +62,7 @@ abstract class BaseConfigForm extends Form
      *
      * This is the set of values as are stored in the config.
      */
-    protected function getDefaultFormValues()
+    protected function getDefaultFormValues(): array
     {
         return $this->acumulusConfig->getCredentials()
                + $this->acumulusConfig->getShopSettings()
@@ -79,7 +79,7 @@ abstract class BaseConfigForm extends Form
      *
      * Saves the submitted and validated form values in the configuration store.
      */
-    protected function execute()
+    protected function execute(): bool
     {
         $submittedValues = $this->submittedValues;
         return $this->acumulusConfig->save($submittedValues);
@@ -88,12 +88,12 @@ abstract class BaseConfigForm extends Form
     /**
      * Checks the account settings for correctness and sufficient authorization.
      *
-     * This is done by calling the about API call and checking the result.
+     * This is done by calling the 'About' API call and checking the result.
      *
      * @return string
      *   Message to show in the 2nd and 3rd fieldset. Empty if successful.
      */
-    protected function checkAccountSettings()
+    protected function checkAccountSettings(): string
     {
         // Check if we can retrieve a picklist. This indicates if the account
         // settings are correct.
@@ -130,14 +130,9 @@ abstract class BaseConfigForm extends Form
     }
 
     /**
-     * Translate and format message.
-     *
-     * @param $message
-     *
-     * @return string
-     *
+     * Translates and formats an account based error message.
      */
-    protected function translateAccountMessage($message)
+    protected function translateAccountMessage(string $message): string
     {
         if (!empty($message)) {
             $formType = $this->isAdvancedConfigForm() ? 'advanced' : 'config';
@@ -152,7 +147,7 @@ abstract class BaseConfigForm extends Form
      * @return array[]
      *   The register field.
      */
-    protected function getRegisterFields()
+    protected function getRegisterFields(): array
     {
         return [
             'register_text' => [
@@ -168,26 +163,29 @@ abstract class BaseConfigForm extends Form
 
     /**
      * Creates a hidden or an option field
-     *
      * If there is only 1 option, a hidden value with a fixed value will be
      * created, an option field that gives the user th choice otherwise.
      *
      * @param string $name
-     *   The field name.
+     *   The name of the field.
      * @param string $type
-     *   The field type: radio or select.
+     *   The type of the field: radio or select.
      * @param bool $required
      *   Whether the required attribute should be rendered.
      * @param array|null $options
-     *   An array with value =>label pairs that can be used as an option set.
-     *   If null, a similarly as $name named method on $this->shopCapabilities
-     *   wil be called to get the options.
+     *   An array with value => label pairs that can be used as an option set.
+     *   If null, a method on $this->shopCapabilities named after $name will be
+     *   called to get the options.
      *
      * @return array
      *   A form field definition.
      */
-    protected function getOptionsOrHiddenField($name, $type, $required = true, array $options = null)
-    {
+    protected function getOptionsOrHiddenField(
+        string $name,
+        string $type,
+        bool $required = true,
+        array $options = null
+    ): array {
         if ($options === null) {
             $methodName = 'get' . ucfirst($name) . 'Options';
             $options = $this->shopCapabilities->$methodName();
@@ -218,7 +216,7 @@ abstract class BaseConfigForm extends Form
      * @return array
      *   An options array of all order statuses.
      */
-    protected function getOrderStatusesList()
+    protected function getOrderStatusesList(): array
     {
         $result = [];
 
@@ -236,7 +234,7 @@ abstract class BaseConfigForm extends Form
      * @return bool
      *   True if this form instance is an advanced config form.
      */
-    protected function isAdvancedConfigForm()
+    protected function isAdvancedConfigForm(): bool
     {
         return $this instanceof AdvancedConfigForm;
     }

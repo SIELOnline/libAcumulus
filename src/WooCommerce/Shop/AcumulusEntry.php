@@ -27,7 +27,7 @@ class AcumulusEntry extends BaseAcumulusEntry
     /**
      * @inheritDoc
      */
-    protected function get($field)
+    protected function get(string $field)
     {
         $result = parent::get($field);
         if (is_array($result)) {

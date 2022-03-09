@@ -1,4 +1,8 @@
 <?php
+/**
+ * @noinspection HtmlUnknownTarget
+ */
+
 namespace Siel\Acumulus\MyWebShop\Helpers;
 
 use Siel\Acumulus\Helpers\TranslationCollection;
@@ -7,10 +11,12 @@ use Siel\Acumulus\Helpers\TranslationCollection;
  * Contains plugin specific translation overrides.
  *
  * @todo: You can override any text you want to make it conform with the
- *  vocabulary as used in yor webshop. The examples below are ones you probably
+ *  vocabulary as used in yor web shop. The examples below are ones you probably
  *  should override anyway (but not all of them). If you see any text that you
  *  want to rephrase, search for it, and copy the key over here and give it
  *  your own value.
+ *
+ * @noinspection PhpUnused
  */
 class ModuleSpecificTranslations extends TranslationCollection
 {

@@ -11,8 +11,8 @@ use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Helpers\Translator;
 
 /**
- * Defines a message that asks the user to rate the Acumulus plugin on the
- * webshop specific marketplace.
+ * Defines a message that asks the user to rate the Acumulus plugin on the web
+ * shop specific marketplace.
  *
  * This form contains only text and 2 buttons.
  *
@@ -59,7 +59,7 @@ class RatePluginForm extends Form
      * This override handles the case that this message is displayed on another
      * Acumulus form and the post thus is meant for that form not this one.
      */
-    public function isSubmitted()
+    public function isSubmitted(): bool
     {
         return parent::isSubmitted() && isset($_POST['clicked']);
     }
@@ -67,8 +67,8 @@ class RatePluginForm extends Form
     /**
      * @inheritDoc
      *
-     * This override adds sanitation to the values and already combines some of
-     * the values to retrieve  a Source object
+     * This override adds sanitation to the values and already combines some
+     * values to retrieve a Source object
      */
     protected function setSubmittedValues()
     {
@@ -83,20 +83,19 @@ class RatePluginForm extends Form
      *
      * Performs the given action on the Acumulus invoice for the given Source.
      */
-    protected function execute()
+    protected function execute(): bool
     {
-        $result = false;
-
         $this->action = $this->getSubmittedValue('service');
         switch ($this->action) {
             case 'later':
-                $this->acumulusConfig->save(['showRatePluginMessage' => time() + 7 * 24 * 60 * 60]);
+                $result = $this->acumulusConfig->save(['showRatePluginMessage' => time() + 7 * 24 * 60 * 60]);
                 break;
             case 'done':
-                $this->acumulusConfig->save(['showRatePluginMessage' => PHP_INT_MAX]);
+                $result = $this->acumulusConfig->save(['showRatePluginMessage' => PHP_INT_MAX]);
                 break;
             default:
                 $this->addMessage(sprintf($this->t('unknown_action'), $this->action), Severity::Error);
+                $result = false;
                 break;
         }
 
@@ -106,7 +105,7 @@ class RatePluginForm extends Form
     /**
      * {@inheritdoc}
      */
-    protected function getFieldDefinitions()
+    protected function getFieldDefinitions(): array
     {
         switch ($this->action) {
             case 'done':
@@ -137,7 +136,7 @@ class RatePluginForm extends Form
      *
      * @return array[];
      */
-    protected function getFieldDefinitionsFull()
+    protected function getFieldDefinitionsFull(): array
     {
         return [
             'acumulus-rate' => [

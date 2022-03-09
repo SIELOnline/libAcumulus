@@ -95,7 +95,7 @@ class AdvancedConfigForm extends BaseConfigForm
      * account settings. If these are OK, the other settings are included as
      * well.
      */
-    public function getFieldDefinitions()
+    public function getFieldDefinitions(): array
     {
         $fields = [];
 
@@ -180,7 +180,7 @@ class AdvancedConfigForm extends BaseConfigForm
      * @return array
      *   The set of possible tokens per object
      */
-    protected function getTokenFields()
+    protected function getTokenFields(): array
     {
         return $this->tokenInfo2Fields($this->shopCapabilities->getTokenInfo());
     }
@@ -193,7 +193,7 @@ class AdvancedConfigForm extends BaseConfigForm
      * @return array
      *   Form fields.
      */
-    protected function tokenInfo2Fields(array $tokenInfo)
+    protected function tokenInfo2Fields(array $tokenInfo): array
     {
         $fields = [];
         foreach ($tokenInfo as $variableName => $variableInfo) {
@@ -211,7 +211,7 @@ class AdvancedConfigForm extends BaseConfigForm
      * @return array Form fields.
      * Form fields.
      */
-    protected function get1TokenField($variableName, array $variableInfo)
+    protected function get1TokenField(string $variableName, array $variableInfo): array
     {
         $value = "<p class='property-name'><strong>$variableName</strong>";
 
@@ -260,7 +260,7 @@ class AdvancedConfigForm extends BaseConfigForm
     }
 
     /**
-     * Converts the contents of $list1 and $list2 to a human readable string.
+     * Converts the contents of $list1 and $list2 to a human-readable string.
      *
      * @param string $keySingle
      * @param string $keyPlural
@@ -269,7 +269,7 @@ class AdvancedConfigForm extends BaseConfigForm
      *
      * @return string
      */
-    protected function see2Lists($keySingle, $keyPlural, $list1, $list2)
+    protected function see2Lists(string $keySingle, string $keyPlural, $list1, $list2): string
     {
         $sList1 = $this->listToString($list1);
         $sList2 = $this->listToString($list2);
@@ -278,7 +278,7 @@ class AdvancedConfigForm extends BaseConfigForm
     }
 
     /**
-     * Converts the contents of $list to a human readable string.
+     * Converts the contents of $list to a human-readable string.
      *
      * @param string $keySingle
      * @param string $keyPlural
@@ -286,7 +286,7 @@ class AdvancedConfigForm extends BaseConfigForm
      *
      * @return string
      */
-    protected function seeList($keySingle, $keyPlural, $list)
+    protected function seeList(string $keySingle, string $keyPlural, $list): string
     {
         $key = is_array($list) && count($list) > 1 ? $keyPlural : $keySingle;
         $sList = $this->listToString($list);
@@ -300,13 +300,13 @@ class AdvancedConfigForm extends BaseConfigForm
      *
      * @return string
      */
-    protected function listToString($list)
+    protected function listToString($list): string
     {
         if (is_array($list)) {
             if (count($list) > 1) {
                 $listLast = array_pop($list);
                 $listBeforeLast = array_pop($list);
-                array_push($list, $listBeforeLast . ' ' . $this->t('and') . ' ' . $listLast);
+                $list[] = $listBeforeLast . ' ' . $this->t('and') . ' ' . $listLast;
             }
         } else {
             $list = [$list];
@@ -318,29 +318,29 @@ class AdvancedConfigForm extends BaseConfigForm
      * Returns the set of relation management fields.
      *
      * The fields returned:
-     * - sendCustomer
-     * - overwriteIfExists
-     * - defaultCustomerType
-     * - contactStatus
-     * - contactYourId
-     * - companyName1
-     * - companyName2
-     * - vatNumber
-     * - fullName
-     * - salutation
-     * - address1
-     * - address2
-     * - postalCode
-     * - city
-     * - telephone
-     * - fax
-     * - email
-     * - mark
+     * - 'sendCustomer'
+     * - 'overwriteIfExists'
+     * - 'defaultCustomerType'
+     * - 'contactStatus'
+     * - 'contactYourId'
+     * - 'companyName1'
+     * - 'companyName2'
+     * - 'vatNumber'
+     * - 'fullName'
+     * - 'salutation'
+     * - 'address1'
+     * - 'address2'
+     * - 'postalCode'
+     * - 'city'
+     * - 'telephone'
+     * - 'fax'
+     * - 'email'
+     * - 'mark'
      *
      * @return array[]
      *   The set of relation management fields.
      */
-    protected function getRelationFields()
+    protected function getRelationFields(): array
     {
         return [
             'clientData' => [
@@ -480,16 +480,19 @@ class AdvancedConfigForm extends BaseConfigForm
      * Returns the set of invoice related fields.
      *
      * The fields returned:
-     * - sendEmptyInvoice
-     * - sendEmptyShipping
-     * - description
-     * - descriptionText
-     * - invoiceNotes
+     * - 'sendEmptyInvoice'
+     * - 'sendEmptyShipping'
+     * - 'description'
+     * - 'descriptionText'
+     * - 'invoiceNotes'
      *
      * @return array[]
      *   The set of invoice related fields.
+     *
+     * @noinspection PhpMemberCanBePulledUpInspection : ConfigForm has a
+     *   method with the same name but a different result.
      */
-    protected function getInvoiceFields()
+    protected function getInvoiceFields(): array
     {
         return [
             'concept' => [
@@ -567,15 +570,15 @@ class AdvancedConfigForm extends BaseConfigForm
      * Returns the set of invoice line related fields.
      *
      * The fields returned:
-     * - itemNumber
-     * - productName
-     * - nature
-     * - costPrice
+     * - 'itemNumber'
+     * - 'productName'
+     * - 'nature'
+     * - 'costPrice'
      *
      * @return array[]
      *   The set of invoice line related fields.
      */
-    protected function getInvoiceLinesFields()
+    protected function getInvoiceLinesFields(): array
     {
         return [
             'itemNumber' => [
@@ -617,14 +620,14 @@ class AdvancedConfigForm extends BaseConfigForm
      * Returns the set of options related fields.
      *
      * The fields returned:
-     * - optionsAllOn1Line
-     * - optionsAllOnOwnLine
-     * - optionsMaxLength
+     * - 'optionsAllOn1Line'
+     * - 'optionsAllOnOwnLine'
+     * - 'optionsMaxLength'
      *
      * @return array[]
      *   The set of options related fields.
      */
-    protected function getOptionsFields()
+    protected function getOptionsFields(): array
     {
         return [
             'showOptions' => [
@@ -663,18 +666,18 @@ class AdvancedConfigForm extends BaseConfigForm
     }
 
     /**
-     * Returns the set of 'email invoice as PDF' related fields.
+     * Returns the set of "email invoice as PDF" related fields.
      *
      * The fields returned:
-     * - emailAsPdf
-     * - emailFrom
-     * - emailBcc
-     * - subject
+     * - 'emailAsPdf'
+     * - 'emailFrom'
+     * - 'emailBcc'
+     * - 'subject'
      *
      * @return array[]
-     *   The set of 'email invoice as PDF' related fields.
+     *   The set of "email invoice as PDF" related fields.
      */
-    protected function getEmailAsPdfFields()
+    protected function getEmailAsPdfFields(): array
     {
         return [
             'emailAsPdf_cb' => [
@@ -726,13 +729,13 @@ class AdvancedConfigForm extends BaseConfigForm
      * Returns the set of fields introducing the advanced config forms.
      *
      * The fields returned:
-     * - tellAboutAdvancedSettings
-     * - advancedSettingsLink
+     * - 'tellAboutAdvancedSettings'
+     * - 'advancedSettingsLink'
      *
      * @return array[]
      *   The set of fields introducing the advanced config form.
      */
-    protected function getConfigLinkFields()
+    protected function getConfigLinkFields(): array
     {
         return [
             'tellAboutBasicSettings' => [
@@ -754,7 +757,7 @@ class AdvancedConfigForm extends BaseConfigForm
      *   value to use in the API and translated labels as the values.
      *
      */
-    protected function getContactStatusOptions()
+    protected function getContactStatusOptions(): array
     {
         return [
             Api::ContactStatus_Active => $this->t('option_contactStatus_Active'),

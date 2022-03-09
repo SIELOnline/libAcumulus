@@ -14,18 +14,16 @@ use Siel\Acumulus\Tag;
 class ConfigForm extends BaseConfigForm
 {
     /**
-     * Array of key => value pairs that can be used in a select and that
-     * represent all costcenters defined in Acumulus for the given account.
-     *
      * @var array
+     *   Array of key => value pairs that can be used in a select and that
+     *   represents all cost centers defined in Acumulus for the given account.
      */
     protected $costCenterOptions;
 
     /**
-     * Array of key => value pairs that can be used in a select and that
-     * represent all (bank) accounts defined in Acumulus for the given account.
-     *
      * @var array
+     *   Array of key => value pairs that can be used in a select and that
+     *   represents all bank accounts defined in Acumulus for the given account.
      */
     protected $accountNumberOptions;
 
@@ -50,7 +48,7 @@ class ConfigForm extends BaseConfigForm
         } elseif (!ctype_digit($this->submittedValues[Tag::ContractCode])) {
             $this->addMessage($this->t('message_validate_contractcode_1'), Severity::Error, Tag::ContractCode);
         } else {
-            // Prevent errors where a copy & paste of the contractcode from the
+            // Prevent errors where a copy & paste of the contract code from the
             // welcome mail includes spaces or tabs before or after the code.
             $this->submittedValues[Tag::ContractCode] = trim($this->submittedValues[Tag::ContractCode]);
         }
@@ -154,7 +152,7 @@ class ConfigForm extends BaseConfigForm
      * account settings. If these are OK, the other settings are included as
      * well.
      */
-    public function getFieldDefinitions()
+    public function getFieldDefinitions(): array
     {
         $fields = [];
 
@@ -243,15 +241,14 @@ class ConfigForm extends BaseConfigForm
 
     /**
      * Returns the set of account related fields.
-     *
      * The fields returned:
-     * - optional: register button + explanation
-     * - description (replaces the legend, as it should come below the optional
-     *   register button)
-     * - contractcode
-     * - username
-     * - password
-     * - emailonerror
+     * - optional: 'Register' button + explanation.
+     * - 'description': replaces the legend, as it should come below the
+     *   optional 'Register' button.
+     * - 'contractcode'
+     * - 'username'
+     * - 'password'
+     * - 'emailonerror'
      *
      * @param bool|null $accountStatus
      *   null: no account settings filled in yet.
@@ -263,7 +260,7 @@ class ConfigForm extends BaseConfigForm
      * @return array[]
      *   The set of account related fields.
      */
-    protected function getAccountFields($accountStatus, $message)
+    protected function getAccountFields(?bool $accountStatus, string $message): array
     {
         $desc2 = '';
         if ($accountStatus === null) {
@@ -334,15 +331,15 @@ class ConfigForm extends BaseConfigForm
      *
      * The fields returned:
      * - nature_shop
-     * - marginProducts
-     * - euVatClasses
-     * - vatFreeClass
-     * - zeroVatClass
+     * - 'marginProducts'
+     * - 'euVatClasses'
+     * - 'vatFreeClass'
+     * - 'zeroVatClass'
      *
      * @return array[]
      *   The set of shop related fields.
      */
-    protected function getShopFields()
+    protected function getShopFields(): array
     {
         $vatClasses = $this->shopCapabilities->getVatClasses();
 
@@ -417,13 +414,13 @@ class ConfigForm extends BaseConfigForm
      * Returns the set of trigger related fields.
      *
      * The fields returned:
-     * - triggerOrderStatus
-     * - triggerInvoiceEvent
+     * - 'triggerOrderStatus'
+     * - 'triggerInvoiceEvent'
      *
      * @return array[]
      *   The set of trigger related fields.
      */
-    protected function getTriggerFields()
+    protected function getTriggerFields(): array
     {
         $orderStatusesList = $this->getOrderStatusesList();
 
@@ -446,22 +443,24 @@ class ConfigForm extends BaseConfigForm
 
     /**
      * Returns the set of invoice related fields.
-     *
      * The fields returned:
-     * - invoiceNrSource
-     * - dateToUse
-     * - defaultCustomerType
-     * - salutation
-     * - clientData
-     * - defaultAccountNumber
-     * - defaultCostCenter
-     * - defaultInvoiceTemplate
-     * - defaultInvoicePaidTemplate
+     * - 'invoiceNrSource'
+     * - 'dateToUse'
+     * - 'defaultCustomerType'
+     * - 'salutation'
+     * - 'clientData'
+     * - 'defaultAccountNumber'
+     * - 'defaultCostCenter'
+     * - 'defaultInvoiceTemplate'
+     * - 'defaultInvoicePaidTemplate'
      *
      * @return array[]
      *   The set of invoice related fields.
+     *
+     * @noinspection PhpMemberCanBePulledUpInspection : AdvancedConfigForm has a
+     *   method with the same name but a different result.
      */
-    protected function getInvoiceFields()
+    protected function getInvoiceFields(): array
     {
         $this->accountNumberOptions = $this->picklistToOptions($this->acumulusApiClient->getPicklistAccounts(), 0, $this->t('option_empty'));
         $this->costCenterOptions = $this->picklistToOptions($this->acumulusApiClient->getPicklistCostCenters(), 0, $this->t('option_empty'));
@@ -495,7 +494,7 @@ class ConfigForm extends BaseConfigForm
         ];
     }
 
-    protected function getInvoiceStatusScreenFields()
+    protected function getInvoiceStatusScreenFields(): array
     {
         $fields = [];
         if ($this->shopCapabilities->hasInvoiceStatusScreen()) {
@@ -517,15 +516,15 @@ class ConfigForm extends BaseConfigForm
      * Returns the set of plugin related fields.
      *
      * The fields returned:
-     * - debug
-     * - logLevel
-     * - versionInformation
-     * - versionInformationDesc
+     * - 'debug'
+     * - 'logLevel'
+     * - 'versionInformation'
+     * - 'versionInformationDesc'
      *
      * @return array[]
      *   The set of plugin related fields.
      */
-    protected function getPluginFields()
+    protected function getPluginFields(): array
     {
         return [
             'debug' => [
@@ -561,13 +560,13 @@ class ConfigForm extends BaseConfigForm
      * Returns the set of fields introducing the advanced config forms.
      *
      * The fields returned:
-     * - tellAboutAdvancedSettings
-     * - advancedSettingsLink
+     * - 'tellAboutAdvancedSettings'
+     * - 'advancedSettingsLink'
      *
      * @return array[]
      *   The set of fields introducing the advanced config form.
      */
-    protected function getAdvancedConfigLinkFields()
+    protected function getAdvancedConfigLinkFields(): array
     {
         return [
             'tellAboutAdvancedSettings' => [
@@ -594,7 +593,7 @@ class ConfigForm extends BaseConfigForm
      * @return array
      *   The fieldset definition.
      */
-    protected function getPaymentMethodsFieldset(array $paymentMethods, $key, array $options)
+    protected function getPaymentMethodsFieldset(array $paymentMethods, string $key, array $options): array
     {
         $fieldset = [
             'type' => 'fieldset',
@@ -622,7 +621,7 @@ class ConfigForm extends BaseConfigForm
      *   An array keyed by the option values and having translated descriptions
      *   as values.
      */
-    protected function getNatureOptions()
+    protected function getNatureOptions(): array
     {
         return [
             Config::Nature_Both => $this->t('option_nature_1'),
@@ -638,7 +637,7 @@ class ConfigForm extends BaseConfigForm
      *   An array keyed by the option values and having translated descriptions
      *   as values.
      */
-    protected function getMarginProductsOptions()
+    protected function getMarginProductsOptions(): array
     {
         return [
             Config::MarginProducts_Both => $this->t('option_marginProducts_1'),

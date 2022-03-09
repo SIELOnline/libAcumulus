@@ -25,7 +25,6 @@ const Version = '7.0.0-alpha1';
 namespace Siel\Acumulus\Helpers;
 
 use InvalidArgumentException;
-use ReflectionClass;
 use const Siel\Acumulus\Version;
 
 /**
@@ -616,6 +615,10 @@ class Container
                 break;
             case 'rate':
                 $class = 'RatePlugin';
+                break;
+            case 'uninstall':
+                $class = 'ConfirmUninstall';
+                $arguments[] = $this->getAcumulusApiClient();
                 break;
             default;
                 throw new InvalidArgumentException("Unknown form type $type");

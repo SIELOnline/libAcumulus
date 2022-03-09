@@ -1,4 +1,8 @@
 <?php
+/**
+ * @noinspection HtmlUnknownTarget
+ */
+
 namespace Siel\Acumulus\Shop;
 
 use Siel\Acumulus\Helpers\TranslationCollection;

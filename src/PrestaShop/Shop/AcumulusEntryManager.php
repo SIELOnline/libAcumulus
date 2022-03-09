@@ -43,7 +43,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    public function getByEntryId($entryId)
+    public function getByEntryId(?int $entryId)
     {
         /** @noinspection PhpUnhandledExceptionInspection */
         $result = $this->getDb()->executeS(sprintf(
@@ -58,7 +58,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    public function getByInvoiceSource(Source $invoiceSource, $ignoreLock = true)
+    public function getByInvoiceSource(Source $invoiceSource, bool $ignoreLock = true)
     {
         /** @noinspection PhpUnhandledExceptionInspection */
         $result = $this->getDb()->executeS(sprintf(
@@ -73,7 +73,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    protected function insert(Source $invoiceSource, $entryId, $token, $created): bool
+    protected function insert(Source $invoiceSource, ?int $entryId, ?string $token, $created): bool
     {
         if ($invoiceSource->getType() === Source::Order) {
             $shopId = $invoiceSource->getSource()->id_shop;
@@ -98,7 +98,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    protected function update(BaseAcumulusEntry $entry, $entryId, $token, $updated): bool
+    protected function update(BaseAcumulusEntry $entry, ?int $entryId, ?string $token, $updated): bool
     {
         $record = $entry->getRecord();
         return $this->getDb()->execute(sprintf(

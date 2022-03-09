@@ -154,7 +154,7 @@ abstract class CompletorStrategyBase
     /**
      * Returns a breakdown of the vat per vat rate.
      *
-     * @returns array[]
+     * @return array[]
      */
     public function getVatBreakdown(): array
     {

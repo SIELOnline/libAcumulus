@@ -1,4 +1,9 @@
 <?php
+/**
+ * @noinspection PhpUnnecessaryLocalVariableInspection
+ * @noinspection PhpConcatenationWithEmptyStringCanBeInlinedInspection
+ */
+
 namespace Siel\Acumulus\Shop;
 
 use DateTime;
@@ -28,32 +33,32 @@ use Siel\Acumulus\Helpers\Severity;
  * SECURITY REMARKS
  * ----------------
  * The info received from an external API call should not be trusted, so it
- * should be sanitized. As most info from this API call is placed in markup
- * fields we cannot rely on the FormRenderer or the webshop's form API, who do
- * not sanitize markup fields. so we do this in this form.
+ * should be sanitised. As most info from this API call is placed in markup
+ * fields we cannot rely on the FormRenderer or the web shop's form API, who do
+ * not sanitise markup fields. so we do this in this form.
  *
  * This form uses ajax calls, values received from an ajax call are to be
- * treated as user input and thus should be sanitized and checked as all user
+ * treated as user input and thus should be sanitised and checked as all user
  * input.
  */
 class InvoiceStatusForm extends Form
 {
     // Constants representing the status of the Acumulus invoice for a given
     // shop order or refund.
-    const Invoice_NotSent = 'invoice_not_sent';
-    const Invoice_Sent = 'invoice_sent';
-    const Invoice_SentConcept  = 'invoice_sent_concept';
-    const Invoice_SentConceptNoInvoice  = 'invoice_sent_concept_no_invoice';
-    const Invoice_Deleted = 'invoice_deleted';
-    const Invoice_NonExisting = 'invoice_non_existing';
-    const Invoice_CommunicationError = 'invoice_communication_error';
-    const Invoice_LocalError = 'invoice_local_error';
+    public const Invoice_NotSent = 'invoice_not_sent';
+    public const Invoice_Sent = 'invoice_sent';
+    public const Invoice_SentConcept = 'invoice_sent_concept';
+    public const Invoice_SentConceptNoInvoice = 'invoice_sent_concept_no_invoice';
+    public const Invoice_Deleted = 'invoice_deleted';
+    public const Invoice_NonExisting = 'invoice_non_existing';
+    public const Invoice_CommunicationError = 'invoice_communication_error';
+    public const Invoice_LocalError = 'invoice_local_error';
 
-    const Status_Unknown = 0;
-    const Status_Success = 1;
-    const Status_Info = 2;
-    const Status_Warning = 3;
-    const Status_Error = 4;
+    public const Status_Unknown = 0;
+    public const Status_Success = 1;
+    public const Status_Info = 2;
+    public const Status_Warning = 3;
+    public const Status_Error = 4;
 
     /** @var \Siel\Acumulus\Helpers\Container*/
     protected $container;
@@ -141,7 +146,7 @@ class InvoiceStatusForm extends Form
      *
      * @noinspection PhpUnused
      */
-    public function hasSource()
+    public function hasSource(): bool
     {
         return $this->source !== null;
     }
@@ -154,7 +159,7 @@ class InvoiceStatusForm extends Form
      * @param string $message
      *   Optionally, a message indicating what is wrong may be given.
      */
-    protected function setStatus($status, $message = '')
+    protected function setStatus(int $status, string $message = '')
     {
         if ($status > $this->status) {
             $this->status = $status;
@@ -176,12 +181,8 @@ class InvoiceStatusForm extends Form
 
     /**
      * Returns a string to use as css class for the current status.
-     *
-     * @param int $status
-     *
-     * @return string
      */
-    public function getStatusClass($status)
+    public function getStatusClass(int $status): string
     {
         switch ($status) {
             case static::Status_Success:
@@ -204,12 +205,10 @@ class InvoiceStatusForm extends Form
     /**
      * Returns an icon character that represents the current status.
      *
-     * @param int $status
-     *
      * @return string
      *   An icon character that represents the status.
      */
-    protected function getStatusIcon($status)
+    protected function getStatusIcon(int $status): string
     {
         switch ($status) {
             case static::Status_Success:
@@ -232,13 +231,10 @@ class InvoiceStatusForm extends Form
     /**
      * Returns a set of label attributes for the current status.
      *
-     * @param int $status
-     * @param string $statusMessage
-     *
      * @return array
      *   A set of attributes to add to the label.
      */
-    protected function getStatusLabelAttributes($status, $statusMessage)
+    protected function getStatusLabelAttributes(int $status, string $statusMessage): array
     {
         $statusClass = $this->getStatusClass($status);
         $attributes = [
@@ -253,12 +249,10 @@ class InvoiceStatusForm extends Form
     /**
      * Returns a description of the amount status.
      *
-     * @param int $status
-     *
      * @return string
      *   A description of the amount status.
      */
-    protected function getAmountStatusTitle($status)
+    protected function getAmountStatusTitle(int $status): string
     {
         $result = '';
         if ($status > static::Status_Success) {
@@ -273,7 +267,7 @@ class InvoiceStatusForm extends Form
      * This override handles the case that also the initial form load may be
      * done via ajax, thus being a post but not submitted.
      */
-    public function isSubmitted()
+    public function isSubmitted(): bool
     {
         return parent::isSubmitted() && isset($_POST['clicked']);
     }
@@ -281,8 +275,8 @@ class InvoiceStatusForm extends Form
     /**
      * @inheritDoc
      *
-     * This override adds sanitation to the values and already combines some of
-     * the values to retrieve a Source object
+     * This override adds sanitation to the values and already combines some
+     * values to retrieve a Source object
      */
     protected function setSubmittedValues()
     {
@@ -360,7 +354,7 @@ class InvoiceStatusForm extends Form
                 $idPrefix = $this->getIdPrefix($source);
                 if ((int) $this->getSubmittedValue($idPrefix . 'payment_status_new') === Api::PaymentStatus_Paid) {
                     $dateFieldName = $idPrefix . 'payment_date';
-                    if (!DateTime::createFromFormat(API::DateFormat_Iso, $this->getSubmittedValue($dateFieldName))) {
+                    if (!DateTime::createFromFormat(Api::DateFormat_Iso, $this->getSubmittedValue($dateFieldName))) {
                         // Date is not a valid date.
                         $this->addMessage(sprintf($this->t('message_validate_batch_bad_payment_date'), $this->t('date_format')), Severity::Error,
                             $dateFieldName);
@@ -375,7 +369,7 @@ class InvoiceStatusForm extends Form
      *
      * Performs the given action on the Acumulus invoice for the given Source.
      */
-    protected function execute()
+    protected function execute(): bool
     {
         $result = false;
 
@@ -439,7 +433,7 @@ class InvoiceStatusForm extends Form
     /**
      * {@inheritdoc}
      */
-    protected function getFieldDefinitions()
+    protected function getFieldDefinitions(): array
     {
         $fields = [];
         $source = $this->source;
@@ -497,7 +491,7 @@ class InvoiceStatusForm extends Form
      * @return array[]
      *   The fields that describe the status for 1 source.
      */
-    protected function getFields1Source(Source $source, $localEntry)
+    protected function getFields1Source(Source $source, ?AcumulusEntry $localEntry): array
     {
         $this->resetStatus();
         // Get invoice status field and other invoice status related info.
@@ -581,7 +575,7 @@ class InvoiceStatusForm extends Form
      *   - entry (array?): the (main) response part of the getEntry API call.
      *   - statusField (array): a form field array representing the status.
      */
-    protected function getInvoiceInfo(Source $source, &$localEntry)
+    protected function getInvoiceInfo(Source $source, ?AcumulusEntry &$localEntry): array
     {
         $result = null;
         $entry = null;
@@ -605,7 +599,7 @@ class InvoiceStatusForm extends Form
                     // Entry saved with support for concept ids.
                     // Has the concept been changed into an invoice?
                     $result = $this->acumulusApiClient->getConceptInfo($localEntry->getConceptId());
-                    $conceptInfo = $this->sanitizeConceptInfo($result->getResponse());
+                    $conceptInfo = $this->sanitiseConceptInfo($result->getResponse());
                     if (empty($conceptInfo)) {
                         $invoiceStatus = static::Invoice_CommunicationError;
                         $statusSeverity = static::Status_Error;
@@ -634,7 +628,7 @@ class InvoiceStatusForm extends Form
                         // Concept turned into 1 definitive invoice: update
                         // acumulus entry to have it refer to that invoice.
                         $result = $this->acumulusApiClient->getEntry($conceptInfo['entryid']);
-                        $entry = $this->sanitizeEntry($result->getResponse());
+                        $entry = $this->sanitiseEntry($result->getResponse());
                         if (!$result->hasError() && !empty($entry['token'])) {
                             if ($this->acumulusEntryManager->save($source, $conceptInfo['entryid'], $entry['token'])) {
                                 $newLocalEntry = $this->acumulusEntryManager->getByInvoiceSource($source);
@@ -662,7 +656,7 @@ class InvoiceStatusForm extends Form
 
             if ($localEntry->getEntryId() !== null) {
                 $result = $this->acumulusApiClient->getEntry($localEntry->getEntryId());
-                $entry = $this->sanitizeEntry($result->getResponse());
+                $entry = $this->sanitiseEntry($result->getResponse());
                 if ($result->getByCodeTag('XGYBSN000')) {
                     $invoiceStatus = static::Invoice_NonExisting;
                     $statusSeverity = static::Status_Error;
@@ -709,7 +703,7 @@ class InvoiceStatusForm extends Form
      * @return array[]
      *   Array of form fields.
      */
-    protected function getNotSentFields()
+    protected function getNotSentFields(): array
     {
         return [
             'invoice_add' => [
@@ -730,7 +724,7 @@ class InvoiceStatusForm extends Form
      * @return array[]
      *   Array of form fields.
      */
-    protected function getConceptFields()
+    protected function getConceptFields(): array
     {
         return $this->getSendAgainFields();
     }
@@ -745,7 +739,7 @@ class InvoiceStatusForm extends Form
      * @return array[]
      *   Array of form fields.
      */
-    protected function getCommunicationErrorFields(Result $result)
+    protected function getCommunicationErrorFields(Result $result): array
     {
         return [
             'messages' => [
@@ -763,7 +757,7 @@ class InvoiceStatusForm extends Form
      * @return array[]
      *   Array of form fields.
      */
-    protected function getNonExistingFields()
+    protected function getNonExistingFields(): array
     {
         return $this->getSendAgainFields();
     }
@@ -775,7 +769,7 @@ class InvoiceStatusForm extends Form
      * @return array[]
      *   Array of form fields.
      */
-    protected function getDeletedFields()
+    protected function getDeletedFields(): array
     {
         return [
                    'entry_deletestatus_set' => [
@@ -785,7 +779,7 @@ class InvoiceStatusForm extends Form
                            'class' => 'acumulus-ajax',
                        ],
                    ],
-                   'delete_status' => $this->getHiddenField(API::Entry_UnDelete),
+                   'delete_status' => $this->getHiddenField(Api::Entry_UnDelete),
                ]
                + $this->getSendAgainFields();
     }
@@ -799,7 +793,7 @@ class InvoiceStatusForm extends Form
      * @return array[]
      *   Array of form fields.
      */
-    protected function getEntryFields(Source $source, array $entry)
+    protected function getEntryFields(Source $source, array $entry): array
     {
         $fields = $this->getVatTypeField($entry)
                + $this->getAmountFields($source, $entry)
@@ -813,28 +807,23 @@ class InvoiceStatusForm extends Form
 
     /**
      * Returns the vat type field.
-     *
-     * @param array $entry
-     *
-     * @return array
-     *    The vattype field.
      */
-    protected function getVatTypeField(array $entry)
+    protected function getVatTypeField(array $entry): array
     {
         if (!empty($entry['vatreversecharge'])) {
             if (!empty($entry['foreigneu'])) {
-                $vatType = API::VatType_EuReversed;
+                $vatType = Api::VatType_EuReversed;
             } else {
-                $vatType = API::VatType_NationalReversed;
+                $vatType = Api::VatType_NationalReversed;
             }
         } elseif (!empty($entry['marginscheme'])) {
-            $vatType = API::VatType_MarginScheme;
+            $vatType = Api::VatType_MarginScheme;
         } elseif (!empty($entry['foreignvat'])) {
-            $vatType = API::VatType_EuVat;
+            $vatType = Api::VatType_EuVat;
         } elseif (!empty($entry['foreignnoneu'])) {
-            $vatType = API::VatType_RestOfWorld;
+            $vatType = Api::VatType_RestOfWorld;
         } else {
-            $vatType = API::VatType_National;
+            $vatType = Api::VatType_National;
         }
         return [
             'vat_type' => [
@@ -848,24 +837,21 @@ class InvoiceStatusForm extends Form
     /**
      * Returns the payment status fields for the given Acumulus invoice.
      *
-     * @param \Siel\Acumulus\Invoice\Source $source
-     * @param array $entry
-     *
      * @return array[]
      *   An array with form fields:
      *   - Actual payment status (and date if paid) of the invoice in Acumulus.
      *   - [Optional] date field to define the date to set the payment date to.
      *   - Button to change the payment status of the invoice in Acumulus.
      */
-    protected function getPaymentStatusFields(Source $source, array $entry)
+    protected function getPaymentStatusFields(Source $source, array $entry): array
     {
         $fields = [];
         $paymentStatus = $entry['paymentstatus'];
         $paymentDate = $entry['paymentdate'];
-        $defaultPaymentDate = date(API::DateFormat_Iso);
+        $defaultPaymentDate = date(Api::DateFormat_Iso);
 
         $paymentStatusText = $paymentStatus !== 0 ? ('payment_status_' . $paymentStatus) : 'unknown';
-        if ($paymentStatus === API::PaymentStatus_Paid && !empty($paymentDate)) {
+        if ($paymentStatus === Api::PaymentStatus_Paid && !empty($paymentDate)) {
             $paymentStatusText .= '_date';
         }
         $paymentStatusText = sprintf($this->t($paymentStatusText), $paymentDate);
@@ -875,7 +861,7 @@ class InvoiceStatusForm extends Form
             $paymentCompareStatus = static::Status_Warning;
             $paymentCompareStatusText = $this->t('payment_status_not_equal');
             $this->setStatus($paymentCompareStatus, $paymentCompareStatusText);
-            if ($localPaymentStatus === API::PaymentStatus_Paid) {
+            if ($localPaymentStatus === Api::PaymentStatus_Paid) {
                 $shopSettings = $this->acumulusConfig->getShopSettings();
                 $dateToUse = $shopSettings['dateToUse'];
                 if ($dateToUse != Config::InvoiceDate_Transfer) {
@@ -901,7 +887,7 @@ class InvoiceStatusForm extends Form
             ];
         }
 
-        if ($paymentStatus === API::PaymentStatus_Paid) {
+        if ($paymentStatus === Api::PaymentStatus_Paid) {
             $fields += [
                 'invoice_paymentstatus_set' => [
                     'type' => 'button',
@@ -944,24 +930,24 @@ class InvoiceStatusForm extends Form
      * same, which Acumulus didn't in the past, but does since the new EU
      * commerce rules:
      * New order:
-     *   "foreignvat": "1",
-     *   "totalvalueexclvat": "161.14",
-     *   "totalvalue": "193.37",
-     *   "totalvalueforeignvat": "32.23",
+     *   'foreignvat': '1',
+     *   'totalvalueexclvat': '161.14',
+     *   'totalvalue': '193.37',
+     *   'totalvalueforeignvat': '32.23',
      * Old order:
-     *   "foreignvat": "1",
-     *   "totalvalueexclvat": "193.37",
-     *   "totalvalue": "193.37",
-     *   "totalvalueforeignvat": "32.23",
+     *   'foreignvat': '1',
+     *   'totalvalueexclvat': '193.37',
+     *   'totalvalue': '193.37',
+     *   'totalvalueforeignvat': '32.23',
      *
      * @param \Siel\Acumulus\Invoice\Source $source
      * @param array $entry
-     *   The sanitized remote entry, i.e. the response of the getEntry API call.
+     *   The sanitised remote entry, i.e. the response of the getEntry API call.
      *
      * @return array[]
      *   Array with form fields with the invoice amounts.
      */
-    protected function getAmountFields(Source $source, array $entry)
+    protected function getAmountFields(Source $source, array $entry): array
     {
         $fields = [];
         if (!empty($entry['totalvalue']) && !empty($entry['totalvalueexclvat'])) {
@@ -1015,7 +1001,6 @@ class InvoiceStatusForm extends Form
 
     /**
      * Returns the status of an amount by comparing it with its local value.
-     *
      * If the amounts differ:
      * - < 0.5 cent, they are considered equal and 'success' will be returned.
      * - < 2 cents, it is considered a mere rounding error and 'info' will be returned.
@@ -1028,7 +1013,7 @@ class InvoiceStatusForm extends Form
      * @return int
      *   One of the Status_... constants.
      */
-    protected function getAmountStatus($amount, $amountLocal)
+    protected function getAmountStatus(float $amount, float $amountLocal): int
     {
         if (Number::floatsAreEqual($amount, $amountLocal)) {
             $status = static::Status_Success;
@@ -1050,9 +1035,9 @@ class InvoiceStatusForm extends Form
      *   One of the Status_... constants.
      *
      * @return string
-     *   An html string representing the amount and its status.
+     *   An HTML string representing the amount and its status.
      */
-    protected function getFormattedAmount($amount, $status)
+    protected function getFormattedAmount(float $amount, int $status): string
     {
         $currency = '€';
         $sign = $amount < 0.0 ? '-' : '';
@@ -1069,22 +1054,21 @@ class InvoiceStatusForm extends Form
         $result .= '<span class="sign">' . $sign . '</span>';
         $result .= '<span class="currency">' . $currency . '</span>';
         $result .= number_format($amount, 2, ',', '.');
-        // Prevents warning "There should be a space between attribute ...
+        // Prevents warning "There should be a space between attribute ..."
         $wrapperBegin = "<span class=\"amount notice-$statusClass\"" . $statusMessage . '>';
         $result = $wrapperBegin . $result . '</span>';
+
         return $result;
     }
 
     /**
      * Returns links to the invoice and packing slip documents.
      *
-     * @param string $token
-     *
      * @return array[]
-     *   Array with form field that contains links to documents related to this
+     *   Form field array that contains links to the documents related to this
      *   invoice.
      */
-    protected function getLinksField($token)
+    protected function getLinksField(string $token): array
     {
         $result = [];
         $links = [];
@@ -1125,7 +1109,7 @@ class InvoiceStatusForm extends Form
      * @return array[]
      *   Array of form fields.
      */
-    protected function getSendAgainFields()
+    protected function getSendAgainFields(): array
     {
         return [
             'invoice_add' => [
@@ -1141,12 +1125,8 @@ class InvoiceStatusForm extends Form
 
     /**
      * Returns a hidden field.
-     *
-     * @param mixed $value
-     *
-     * @return array
      */
-    protected function getHiddenField($value)
+    protected function getHiddenField(string $value): array
     {
         return [
             'type' => 'hidden',
@@ -1156,32 +1136,23 @@ class InvoiceStatusForm extends Form
 
     /**
      * Returns a formatted date.
-     *
-     * @param \DateTime $date
-     *
-     * @return string
      */
-    protected function getDate($date)
+    protected function getDate(DateTime $date): string
     {
-        return $date->format(API::DateFormat_Iso);
+        return $date->format(Api::DateFormat_Iso);
     }
 
     /**
      * Returns a prefix for ids and names to make them unique if multiple
      * invoices (an order and its credit notes) are shown at the same time.
-     *
-     * @param \Siel\Acumulus\Invoice\Source $source
-     *
-     * @return string
      */
-    protected function getIdPrefix(Source $source)
+    protected function getIdPrefix(Source $source): string
     {
         return $source->getType() . '_' . $source->getId() . '_';
     }
 
     /**
      * Adds a prefix to all keys in the set of $fields.
-     *
      * This is done to ensure unique id's in case of repeating fieldsets.
      *
      * @param array[] $fields
@@ -1190,7 +1161,7 @@ class InvoiceStatusForm extends Form
      * @return array[]
      *   The set of fields with their ids prefixed.
      */
-    protected function addIdPrefix($fields, $idPrefix)
+    protected function addIdPrefix(array $fields, string $idPrefix): array
     {
         $result = [];
         foreach ($fields as $key => $field) {
@@ -1204,14 +1175,14 @@ class InvoiceStatusForm extends Form
     }
 
     /**
-     * Sanitizes an entry struct received via a getEntry API call.
+     * sanitises an entry struct received via a getEntry API call.
      *
      * The info received from an external API call should not be trusted, so it
-     * should be sanitized. As most info from this API call is placed in markup
-     * fields we cannot rely on the FormRenderer or the webshop's form API
-     * (which do not sanitize markup fields).
+     * should be sanitised. As most info from this API call is placed in markup
+     * fields we cannot rely on the FormRenderer or the web shop's form API
+     * (which do not sanitise markup fields).
      *
-     * So we sanitize the values in the struct itself before using them:
+     * So we sanitise the values in the struct itself before using them:
      * - Int, float, and bool fields are cast to their proper type.
      * - Date strings are parsed to a DateTime and formatted back to a date
      *   string.
@@ -1219,63 +1190,63 @@ class InvoiceStatusForm extends Form
      *   against that set and emptied if not part of it.
      * - Free string values are escaped to save html.
      * - Keys we don't use are not returned. This keeps the output safe when a
-     *   future API version returns additional fields and we forget to sanitize
+     *   future API version returns additional fields, and we forget to sanitise
      *   it and thus use it non sanitised.
      *
-     * Keys in $entry array (* are sanitized):
-     *   * token
-     *   * entryid
-     *   * entrydate: yy-mm-dd
-     *   - entrytype
-     *   - entrydescription
-     *   - entrynote
-     *   - fiscaltype
-     *   * vatreversecharge: 0 or 1
-     *   * foreigneu: 0 or 1
-     *   * foreignnoneu: 0 or 1
-     *   * marginscheme: 0 or 1
-     *   * foreignvat: 0 or 1
-     *   - contactid
-     *   - accountnumber
-     *   - costcenterid
-     *   - costtypeid
-     *   * invoicenumber
-     *   - invoicenote
-     *   - descriptiontext
-     *   - invoicelayoutid
-     *   - paymenttoken
-     *   * totalvalueexclvat
-     *   * totalvalue
-     *   * totalvalueforeignvat
-     *   - paymenttermdays
-     *   * paymentdate: yy-mm-dd
-     *   * paymentstatus: 1 or 2
-     *   * deleted: timestamp
+     * Keys in $entry array (* are sanitised):
+     (*) - 'token' (*)
+     (*) - 'entryid' (*)
+     (*) - 'entrydate' (*): yy-mm-dd
+     (*) - 'entrytype'
+     (*) - 'entrydescription'
+     (*) - 'entrynote'
+     (*) - 'fiscaltype'
+     (*) - 'vatreversecharge' (*): 0 or 1
+     (*) - 'foreigneu' (*): 0 or 1
+     (*) - 'foreignnoneu' (*): 0 or 1
+     (*) - 'marginscheme' (*): 0 or 1
+     (*) - 'foreignvat' (*): 0 or 1
+     (*) - 'contactid'
+     (*) - 'accountnumber'
+     (*) - 'costcenterid'
+     (*) - 'costtypeid'
+     (*) - 'invoicenumber' (*)
+     (*) - 'invoicenote'
+     (*) - 'descriptiontext'
+     (*) - 'invoicelayoutid'
+     (*) - 'paymenttoken'
+     (*) - 'totalvalueexclvat' (*)
+     (*) - 'totalvalue' (*)
+     (*) - 'totalvalueforeignvat' (*)
+     (*) - 'paymenttermdays'
+     (*) - 'paymentdate' (*): yy-mm-dd
+     (*) - 'paymentstatus' (*): 1 or 2
+     (*) - 'deleted' (*): timestamp
      *
      * @param array $entry
-     *
+     *   The entry to sanitise.
      * @return array
-     *   The sanitized entry struct.
+     *   The sanitised entry struct.
      */
-    protected function sanitizeEntry(array $entry)
+    protected function sanitiseEntry(array $entry): array
     {
         if (!empty($entry)) {
             $result = [];
-            $result['entryid'] = $this->sanitizeIntValue($entry, 'entryid');
-            $result['token'] = $this->sanitizeStringValue($entry, 'token', '/^[0-9a-zA-Z]{32}$/');
-            $result['entrydate'] = $this->sanitizeDateValue($entry, 'entrydate');
-            $result['vatreversecharge'] = $this->sanitizeBoolValue($entry, 'vatreversecharge');
-            $result['foreigneu'] = $this->sanitizeBoolValue($entry, 'foreigneu');
-            $result['foreignnoneu'] = $this->sanitizeBoolValue($entry, 'foreignnoneu');
-            $result['marginscheme'] = $this->sanitizeBoolValue($entry, 'marginscheme');
-            $result['foreignvat'] = $this->sanitizeBoolValue($entry, 'foreignvat');
-            $result['invoicenumber'] = $this->sanitizeIntValue($entry, 'invoicenumber');
-            $result['totalvalueexclvat'] = $this->sanitizeFloatValue($entry, 'totalvalueexclvat');
-            $result['totalvalue'] = $this->sanitizeFloatValue($entry, 'totalvalue');
-            $result['totalvalueforeignvat'] = $this->sanitizeFloatValue($entry, 'totalvalueforeignvat');
-            $result['paymentstatus'] = $this->sanitizeIntValue($entry, 'paymentstatus');
-            $result['paymentdate'] = $this->sanitizeDateValue($entry, 'paymentdate');
-            $result['deleted'] = $this->sanitizeDateTimeValue($entry, 'deleted');
+            $result['entryid'] = $this->sanitiseIntValue($entry, 'entryid');
+            $result['token'] = $this->sanitiseStringValue($entry, 'token', '/^[0-9a-zA-Z]{32}$/');
+            $result['entrydate'] = $this->sanitiseDateValue($entry, 'entrydate');
+            $result['vatreversecharge'] = $this->sanitiseBoolValue($entry, 'vatreversecharge');
+            $result['foreigneu'] = $this->sanitiseBoolValue($entry, 'foreigneu');
+            $result['foreignnoneu'] = $this->sanitiseBoolValue($entry, 'foreignnoneu');
+            $result['marginscheme'] = $this->sanitiseBoolValue($entry, 'marginscheme');
+            $result['foreignvat'] = $this->sanitiseBoolValue($entry, 'foreignvat');
+            $result['invoicenumber'] = $this->sanitiseIntValue($entry, 'invoicenumber');
+            $result['totalvalueexclvat'] = $this->sanitiseFloatValue($entry, 'totalvalueexclvat');
+            $result['totalvalue'] = $this->sanitiseFloatValue($entry, 'totalvalue');
+            $result['totalvalueforeignvat'] = $this->sanitiseFloatValue($entry, 'totalvalueforeignvat');
+            $result['paymentstatus'] = $this->sanitiseIntValue($entry, 'paymentstatus');
+            $result['paymentdate'] = $this->sanitiseDateValue($entry, 'paymentdate');
+            $result['deleted'] = $this->sanitiseDateTimeValue($entry, 'deleted');
         } else {
             $result = null;
         }
@@ -1283,14 +1254,14 @@ class InvoiceStatusForm extends Form
     }
 
     /**
-     * Sanitizes an concept info struct received via a getConceptInfo API call.
+     * Sanitises a concept info struct received via a getConceptInfo API call.
      *
      * The info received from an external API call should not be trusted, so it
-     * should be sanitized. As most info from this API call is placed in markup
-     * fields we cannot rely on the FormRenderer or the webshop's form API as
-     * these do not sanitize markup fields.
+     * should be sanitised. As most info from this API call is placed in markup
+     * fields we cannot rely on the FormRenderer or the web shop's form API as
+     * these do not sanitise markup fields.
      *
-     * So we sanitize the values in the struct itself before using them:
+     * So we sanitise the values in the struct itself before using them:
      * - Int, float, and bool fields are cast to their proper type.
      * - Date strings are parsed to a DateTime and formatted back to a date
      *   string.
@@ -1298,24 +1269,24 @@ class InvoiceStatusForm extends Form
      *   against that set and emptied if not part of it.
      * - Free string values are escaped to save html.
      * - Keys we don't use are not returned. This keeps the output safe when a
-     *   future API version returns additional fields and we forget to sanitize
+     *   future API version returns additional fields, and we forget to sanitise
      *   it and thus use it non sanitised.
      *
      * Keys in $entry array:
-     *   - conceptid: int
-     *   - entryid: int|int[]
+     *   - 'conceptid': int
+     *   - 'entryid': int|int[]
      *
      * @param array $conceptInfo
      *
      * @return array|null
-     *   The sanitized entry struct.
+     *   The sanitised entry struct.
      */
-    protected function sanitizeConceptInfo(array $conceptInfo)
+    protected function sanitiseConceptInfo(array $conceptInfo): ?array
     {
         if (!empty($conceptInfo)) {
             $result = [];
-            $result['conceptid'] = $this->sanitizeIntValue($conceptInfo, 'conceptid');
-            $result['entryid'] = $this->sanitizeIntValue($conceptInfo, 'entryid', true);
+            $result['conceptid'] = $this->sanitiseIntValue($conceptInfo, 'conceptid');
+            $result['entryid'] = $this->sanitiseIntValue($conceptInfo, 'entryid', true);
         } else {
             $result = null;
         }
@@ -1337,7 +1308,7 @@ class InvoiceStatusForm extends Form
      *   The html safe version of the value under this key or the empty string
      *   if not set.
      */
-    protected function sanitizeStringValue(array $entry, $key, $additionalRestriction = null)
+    protected function sanitiseStringValue(array $entry, string $key, $additionalRestriction = null): string
     {
         $result = '';
         if (!empty($entry[$key])) {
@@ -1358,17 +1329,13 @@ class InvoiceStatusForm extends Form
     }
 
     /**
-     * Returns a sanitized integer value of an entry record.
-     *
-     * @param array $entry
-     * @param string $key
-     * @param bool $allowArray
+     * Returns a sanitised integer value of an entry record.
      *
      * @return int|int[]
      *   The int value of the value under this key or 0 if not provided. If
      *   $allowArray is set, an empty array is returned, if no value is set.
      */
-    protected function sanitizeIntValue(array $entry, $key, $allowArray = false)
+    protected function sanitiseIntValue(array $entry, string $key, bool $allowArray = false)
     {
         if (isset($entry[$key])) {
             if ($allowArray && is_array($entry[$key])) {
@@ -1386,50 +1353,41 @@ class InvoiceStatusForm extends Form
     }
 
     /**
-     * Returns a sanitized float value of an entry record.
-     *
-     * @param array $entry
-     * @param string $key
+     * Returns a sanitised float value of an entry record.
      *
      * @return float
      *   The float value of the value under this key.
      */
-    protected function sanitizeFloatValue(array $entry, $key)
+    protected function sanitiseFloatValue(array $entry, string $key): float
     {
         return !empty($entry[$key]) ? (float) $entry[$key] : 0.0;
     }
 
     /**
-     * Returns a sanitized bool value of an entry record.
-     *
-     * @param array $entry
-     * @param string $key
+     * Returns a sanitised bool value of an entry record.
      *
      * @return bool
      *   The bool value of the value under this key. True values are represented
      *   by 1, false values by 0.
      */
-    protected function sanitizeBoolValue(array $entry, $key)
+    protected function sanitiseBoolValue(array $entry, string $key): bool
     {
         /** @noinspection TypeUnsafeComparisonInspection */
         return isset($entry[$key]) && $entry[$key] == 1;
     }
 
     /**
-     * Returns a sanitized date value of an entry record.
-     *
-     * @param array $entry
-     * @param string $key
+     * Returns a sanitised date value of an entry record.
      *
      * @return string
      *   The date value (yyyy-mm-dd) of the value under this key or the empty
      *   string, if the string is not in the valid date format (yyyy-mm-dd).
      */
-    protected function sanitizeDateValue(array $entry, $key)
+    protected function sanitiseDateValue(array $entry, string $key): string
     {
         $date = '';
         if (!empty($entry[$key])) {
-            $date = DateTime::createFromFormat(API::DateFormat_Iso, $entry[$key]);
+            $date = DateTime::createFromFormat(Api::DateFormat_Iso, $entry[$key]);
             if ($date instanceof DateTime) {
                 $date = $date->format(Api::DateFormat_Iso);
             } else {
@@ -1440,10 +1398,7 @@ class InvoiceStatusForm extends Form
     }
 
     /**
-     * Returns a sanitized date time value of an entry record.
-     *
-     * @param array $entry
-     * @param string $key
+     * Returns a sanitised date time value of an entry record.
      *
      * @return DateTime|null
      *   The date time value of the value under this key or null if the string
@@ -1451,11 +1406,11 @@ class InvoiceStatusForm extends Form
      *   Note that the API might return 0000-00-00 00:00:00 which should not be
      *   accepted (recognised by a negative timestamp).
      */
-    protected function sanitizeDateTimeValue(array $entry, $key)
+    protected function sanitiseDateTimeValue(array $entry, string $key): ?DateTime
     {
         $timeStamp = null;
         if (!empty($entry[$key])) {
-            $timeStamp = DateTime::createFromFormat(API::Format_TimeStamp, $entry[$key]);
+            $timeStamp = DateTime::createFromFormat(Api::Format_TimeStamp, $entry[$key]);
             if (!$timeStamp instanceof DateTime || $timeStamp->getTimestamp() < 0) {
                 $timeStamp = null;
             }

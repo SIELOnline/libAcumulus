@@ -4,8 +4,14 @@ namespace Siel\Acumulus\Shop;
 use DateTime;
 use Exception;
 use Siel\Acumulus\Api;
+use Siel\Acumulus\ApiClient\Acumulus;
 use Siel\Acumulus\Helpers\Container;
+use Siel\Acumulus\Helpers\Log;
+use Siel\Acumulus\Helpers\Mailer;
 use Siel\Acumulus\Helpers\Number;
+use Siel\Acumulus\Helpers\Translator;
+use Siel\Acumulus\Invoice\Completor;
+use Siel\Acumulus\Invoice\Creator;
 use Siel\Acumulus\Invoice\Result;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Meta;
@@ -17,7 +23,7 @@ use Siel\Acumulus\Helpers\Severity;
  * Provides functionality to manage invoices.
  *
  * The features of this class include:
- * - Retrieval of webshop invoice sources (orders or refunds).
+ * - Retrieval of web shop invoice sources (orders or refunds).
  * - Handle order status changes.
  * - Handle refund creation or credit memo sending.
  * - Handle batch sending
@@ -47,7 +53,7 @@ abstract class InvoiceManager
      *   The translation for the given key or the key itself if no translation
      *   could be found.
      */
-    protected function t($key)
+    protected function t(string $key): string
     {
         return $this->getTranslator()->get($key);
     }
@@ -57,7 +63,7 @@ abstract class InvoiceManager
      *
      * @return \Siel\Acumulus\Helpers\Translator
      */
-    protected function getTranslator()
+    protected function getTranslator(): Translator
     {
         return $this->container->getTranslator();
     }
@@ -67,7 +73,7 @@ abstract class InvoiceManager
      *
      * @return \Siel\Acumulus\Helpers\Log
      */
-    protected function getLog()
+    protected function getLog(): Log
     {
         return $this->container->getLog();
     }
@@ -77,7 +83,7 @@ abstract class InvoiceManager
      *
      * @return \Siel\Acumulus\Config\Config
      */
-    protected function getConfig()
+    protected function getConfig(): Config
     {
         return $this->container->getConfig();
     }
@@ -87,7 +93,7 @@ abstract class InvoiceManager
      *
      * @return \Siel\Acumulus\Shop\AcumulusEntryManager
      */
-    protected function getAcumulusEntryManager()
+    protected function getAcumulusEntryManager(): AcumulusEntryManager
     {
         return $this->container->getAcumulusEntryManager();
     }
@@ -97,7 +103,7 @@ abstract class InvoiceManager
      *
      * @return \Siel\Acumulus\ApiClient\Acumulus
      */
-    protected function getAcumulusApiClient()
+    protected function getAcumulusApiClient(): Acumulus
     {
         return $this->container->getAcumulusApiClient();
     }
@@ -107,7 +113,7 @@ abstract class InvoiceManager
      *
      * @return \Siel\Acumulus\Helpers\Mailer
      */
-    protected function getMailer()
+    protected function getMailer(): Mailer
     {
         return $this->container->getMailer();
     }
@@ -121,7 +127,7 @@ abstract class InvoiceManager
      *
      * @return \Siel\Acumulus\Invoice\Source
      */
-    protected function getSource($invoiceSourceType, $idOrSource)
+    protected function getSource(string $invoiceSourceType, $idOrSource): Source
     {
         return $this->container->getSource($invoiceSourceType, $idOrSource);
     }
@@ -130,7 +136,7 @@ abstract class InvoiceManager
      *
      * @return \Siel\Acumulus\Invoice\Creator
      */
-    protected function getCreator()
+    protected function getCreator(): Creator
     {
         return $this->container->getCreator();
     }
@@ -140,7 +146,7 @@ abstract class InvoiceManager
      *
      * @return \Siel\Acumulus\Invoice\Completor
      */
-    protected function getCompletor()
+    protected function getCompletor(): Completor
     {
         return $this->container->getCompletor();
     }
@@ -152,7 +158,7 @@ abstract class InvoiceManager
      *
      * @return \Siel\Acumulus\Invoice\Result
      */
-    protected function getInvoiceResult($trigger)
+    protected function getInvoiceResult(string $trigger): Result
     {
         return $this->container->getInvoiceResult($trigger);
     }
@@ -163,7 +169,7 @@ abstract class InvoiceManager
      * @return bool
      *   True if we ar ein test mode, false otherwise
      */
-    protected function isTestMode()
+    protected function isTestMode(): bool
     {
         $pluginSettings = $this->getConfig()->getPluginSettings();
 
@@ -174,43 +180,41 @@ abstract class InvoiceManager
     /**
      * Returns a list of existing invoice sources for the given id range.
      *
-     * @param string $invoiceSourceType
-     * @param string $InvoiceSourceIdFrom
-     * @param string $InvoiceSourceIdTo
-     *
      * @return \Siel\Acumulus\Invoice\Source[]
      *   An array of invoice sources of the given source type.
      */
-    abstract public function getInvoiceSourcesByIdRange($invoiceSourceType, $InvoiceSourceIdFrom, $InvoiceSourceIdTo);
+    abstract public function getInvoiceSourcesByIdRange(
+        string $invoiceSourceType,
+        string $InvoiceSourceIdFrom,
+        string $InvoiceSourceIdTo
+    ): array;
 
     /**
      * Returns a list of existing invoice sources for the given reference range.
-     *
      * Should be overridden when the reference is not the internal id.
-     *
-     * @param string $invoiceSourceType
-     * @param string $invoiceSourceReferenceFrom
-     * @param string $invoiceSourceReferenceTo
      *
      * @return \Siel\Acumulus\Invoice\Source[]
      *   An array of invoice sources of the given source type.
      */
-    public function getInvoiceSourcesByReferenceRange($invoiceSourceType, $invoiceSourceReferenceFrom, $invoiceSourceReferenceTo)
-    {
+    public function getInvoiceSourcesByReferenceRange(
+        string $invoiceSourceType,
+        string $invoiceSourceReferenceFrom,
+        string $invoiceSourceReferenceTo
+    ): array {
         return $this->getInvoiceSourcesByIdRange($invoiceSourceType, $invoiceSourceReferenceFrom, $invoiceSourceReferenceTo);
     }
 
     /**
      * Returns a list of existing invoice sources for the given date range.
      *
-     * @param string $invoiceSourceType
-     * @param DateTime $dateFrom
-     * @param DateTime $dateTo
-     *
      * @return \Siel\Acumulus\Invoice\Source[]
      *   An array of invoice sources of the given source type.
      */
-    abstract public function getInvoiceSourcesByDateRange($invoiceSourceType, DateTime $dateFrom, DateTime $dateTo);
+    abstract public function getInvoiceSourcesByDateRange(
+        string $invoiceSourceType,
+        DateTime $dateFrom,
+        DateTime $dateTo
+    ): array;
 
     /**
      * Creates a set of Invoice Sources given their ids or shop specific sources.
@@ -222,7 +226,7 @@ abstract class InvoiceManager
      * @return \Siel\Acumulus\Invoice\Source[]
      *   A non keyed array with invoice Sources.
      */
-    public function getSourcesByIdsOrSources($invoiceSourceType, array $idsOrSources)
+    public function getSourcesByIdsOrSources(string $invoiceSourceType, array $idsOrSources): array
     {
         $results = [];
         foreach ($idsOrSources as $sourceId) {
@@ -241,7 +245,7 @@ abstract class InvoiceManager
      * @return \Siel\Acumulus\Invoice\Source
      *   An invoice Source.
      */
-    protected function getSourceByIdOrSource($invoiceSourceType, $idOrSource)
+    protected function getSourceByIdOrSource(string $invoiceSourceType, $idOrSource): Source
     {
         return $this->getSource($invoiceSourceType, $idOrSource);
     }
@@ -250,7 +254,6 @@ abstract class InvoiceManager
      * Sends multiple invoices to Acumulus.
      *
      * @param \Siel\Acumulus\Invoice\Source[] $invoiceSources
-     * @todo: change parameter $forceSend to an int: the 3 options of the batch form field 'send_mode'.
      * @param bool $forceSend
      *   If true, force sending the invoices even if an invoice has already been
      *   sent for a given invoice source.
@@ -261,8 +264,9 @@ abstract class InvoiceManager
      *
      * @return bool
      *   Success.
+     *@todo: change parameter $forceSend to an int: the 3 options of the batch form field 'send_mode'.
      */
-    public function sendMultiple(array $invoiceSources, $forceSend, $dryRun, array &$log)
+    public function sendMultiple(array $invoiceSources, bool $forceSend, bool $dryRun, array &$log): bool
     {
         $errorLogged = false;
         $success = true;
@@ -299,7 +303,7 @@ abstract class InvoiceManager
      * @return bool
      *   Success.
      */
-    public function send1(Source $invoiceSource, $forceSend)
+    public function send1(Source $invoiceSource, bool $forceSend): bool
     {
         $result = $this->getInvoiceResult('InvoiceManager::send1()');
         $result = $this->createAndSend($invoiceSource, $result, $forceSend);
@@ -320,7 +324,7 @@ abstract class InvoiceManager
      * @return \Siel\Acumulus\Invoice\Result
      *   The result of sending (or not sending) the invoice.
      */
-    public function sourceStatusChange(Source $invoiceSource)
+    public function sourceStatusChange(Source $invoiceSource): Result
     {
         $result = $this->getInvoiceResult('InvoiceManager::sourceStatusChange()');
         $status = $invoiceSource->getStatus();
@@ -357,7 +361,7 @@ abstract class InvoiceManager
      *
      * @noinspection PhpUnused
      */
-    public function invoiceCreate(Source $invoiceSource)
+    public function invoiceCreate(Source $invoiceSource): Result
     {
         $result = $this->getInvoiceResult('InvoiceManager::invoiceCreate()');
         $shopEventSettings = $this->getConfig()->getShopEventSettings();
@@ -384,7 +388,7 @@ abstract class InvoiceManager
      *
      * @noinspection PhpUnused
      */
-    public function invoiceSend(Source $invoiceSource)
+    public function invoiceSend(Source $invoiceSource): Result
     {
         $result = $this->getInvoiceResult('InvoiceManager::invoiceSend()');
         $shopEventSettings = $this->getConfig()->getShopEventSettings();
@@ -414,8 +418,12 @@ abstract class InvoiceManager
      * @return \Siel\Acumulus\Invoice\Result
      *   The result of sending (or not sending) the invoice.
      */
-    protected function createAndSend(Source $invoiceSource, Result $result, $forceSend = false, $dryRun = false)
-    {
+    protected function createAndSend(
+        Source $invoiceSource,
+        Result $result,
+        bool $forceSend = false,
+        bool $dryRun = false
+    ): Result {
         if ($this->isTestMode()) {
             $result->setSendStatus(Result::Send_TestMode);
         } elseif (($acumulusEntry = $this->getAcumulusEntryManager()->getByInvoiceSource($invoiceSource, false)) === null) {
@@ -495,7 +503,7 @@ abstract class InvoiceManager
      *   The result structure of the invoice add API call merged with any local
      *   messages.
      */
-    protected function lockAndSend(array $invoice, Source $invoiceSource, Result $result)
+    protected function lockAndSend(array $invoice, Source $invoiceSource, Result $result): Result
     {
         $doLock = !$this->isTestMode() && in_array($result->getSendStatus(), [Result::Send_New, Result::Send_LockExpired]);
 
@@ -562,10 +570,10 @@ abstract class InvoiceManager
      *   The result structure of the invoice add API call merged with any local
      *   messages.
      */
-    protected function doSend(array $invoice, Source $invoiceSource, Result $result)
+    protected function doSend(array $invoice, Source $invoiceSource, Result $result): Result
     {
         /** @var \Siel\Acumulus\Invoice\Result $result */
-        $result = $this->getAcumulusApiClient()->invoiceAdd($invoice, $result);// Store the reference between the source of the webshop invoice and the
+        $result = $this->getAcumulusApiClient()->invoiceAdd($invoice, $result);
 
         // Save Acumulus entry:
         // - If we were sending in test mode or there were errors, no invoice
@@ -595,14 +603,14 @@ abstract class InvoiceManager
             $saved = $acumulusEntryManager->save($invoiceSource, $id, $token);
 
             // If we successfully saved the new entry, we may delete the old one
-            // if there is one and it's not a concept.
+            // if there is one, and it's not a concept.
             if ($saved && $oldEntry && $oldEntry->getEntryId()) {
                 $entryId = $oldEntry->getEntryId();
                 // @todo: clean up on receiving P2XFELO12?
-                $deleteResult = $this->getAcumulusApiClient()->setDeleteStatus($entryId, API::Entry_Delete);
+                $deleteResult = $this->getAcumulusApiClient()->setDeleteStatus($entryId, Api::Entry_Delete);
                 if ($deleteResult->hasRealMessages()) {
                     // Add messages to result but not if the entry has already
-                    // the delete status or does not exist at all (anymore).
+                    // been deleted or does not exist at all (anymore).
                     if ($deleteResult->getByCodeTag('P2XFELO12')) {
                         // Could not delete the old entry (already deleted or
                         // does not exist at all (anymore)): add as a warning so
@@ -629,9 +637,9 @@ abstract class InvoiceManager
     }
 
     /**
-     * Sends an email with the results of a sent invoice.
+     * Sends an email with the results of sending an invoice.
      *
-     * The mail is sent to the shop administrator (emailonerror setting).
+     * The mail is sent to the shop administrator ('emailonerror' setting).
      *
      * @param \Siel\Acumulus\Invoice\Result $result
      * @param \Siel\Acumulus\Invoice\Source $invoiceSource
@@ -639,9 +647,10 @@ abstract class InvoiceManager
      * @return bool
      *   Success.
      */
-    protected function mailInvoiceAddResult(Result $result, Source $invoiceSource)
+    protected function mailInvoiceAddResult(Result $result, Source $invoiceSource): bool
     {
         $pluginSettings = $this->getConfig()->getPluginSettings();
+        // @todo: inspection seems correct: refactor these lines.
         $addReqResp = $pluginSettings['debug'] === Config::Send_SendAndMailOnError ? Result::AddReqResp_WithOther : Result::AddReqResp_Always;
         if ($addReqResp === Result::AddReqResp_Always || ($addReqResp === Result::AddReqResp_WithOther && $result->hasRealMessages())) {
             return $this->getMailer()->sendInvoiceAddMailResult($result, $invoiceSource->getType(), $invoiceSource->getReference());
@@ -652,12 +661,10 @@ abstract class InvoiceManager
     /**
      * Returns whether an invoice is empty (free products only).
      *
-     * @param array $invoice
-     *
      * @return bool
      *   True if the invoice amount (inc. VAT) is €0,-.
      */
-    protected function isEmptyInvoice(array $invoice)
+    protected function isEmptyInvoice(array $invoice): bool
     {
         return Number::isZero($invoice[Tag::Customer][Tag::Invoice][Meta::InvoiceAmountInc]);
     }
@@ -730,12 +737,8 @@ abstract class InvoiceManager
      *
      * This default implementation returns the DateTime as a string in ISO format
      * (yyyy-mm-dd hh:mm:ss).
-     *
-     * @param \DateTime $date
-     *
-     * @return string
      */
-    protected function getSqlDate(DateTime $date)
+    protected function getSqlDate(DateTime $date): string
     {
         return $date->format(Api::Format_TimeStamp);
     }
@@ -747,14 +750,12 @@ abstract class InvoiceManager
      * @param string $key
      *
      * @return int[]
+     *
+     * @deprecated inline this method now we can use array_column().
      */
-    protected function getCol(array $dbResults, $key)
+    protected function getCol(array $dbResults, string $key): array
     {
-        $results = [];
-        foreach ($dbResults as $dbResult) {
-            $results[] = (int) $dbResult[$key];
-        }
-        return $results;
+        return array_column($dbResults, $key);
     }
 
     /**
@@ -762,15 +763,17 @@ abstract class InvoiceManager
      *
      * @param \Siel\Acumulus\Invoice\Source $invoiceSource
      * @param \Siel\Acumulus\Invoice\Result $result
-     *
      * @param int $addReqResp
      *   Whether to add the raw request and response.
      *   One of the Result::AddReqResp_... constants
      *
      * @return string
      */
-    protected function getSendResultLogText(Source $invoiceSource, Result $result, $addReqResp = Result::AddReqResp_WithOther)
-    {
+    protected function getSendResultLogText(
+        Source $invoiceSource,
+        Result $result,
+        int $addReqResp = Result::AddReqResp_WithOther
+    ): string {
         $invoiceSourceText = sprintf($this->t('message_invoice_source'),
             $this->t($invoiceSource->getType()),
             $invoiceSource->getReference()

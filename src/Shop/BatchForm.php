@@ -68,7 +68,7 @@ class BatchForm extends Form
      * This override adds the log messages from the $log property to the log
      * field.
      */
-    protected function getDefaultFormValues()
+    protected function getDefaultFormValues(): array
     {
         $result = parent::getDefaultFormValues();
         $result['send_mode'] = 'send_normal';
@@ -108,19 +108,19 @@ class BatchForm extends Form
             // Single id or range of ids?
             if ($this->submittedValues['invoice_source_reference_to'] !== ''
                 && $this->submittedValues['invoice_source_reference_to'] < $this->submittedValues['invoice_source_reference_from']) {
-                // order id to is smaller than order id from.
+                // "order id to" is smaller than "order id from".
                 $this->addMessage($this->t('message_validate_batch_bad_order_range'), Severity::Error, 'invoice_source_reference_to');
             }
         } else /*if ($this->submittedValues['date_to'] !== '') */ {
             // Range of dates has been filled in.
             // We ignore any order # to value.
-            if (!DateTime::createFromFormat(API::DateFormat_Iso, $this->submittedValues['date_from'])) {
+            if (!DateTime::createFromFormat(Api::DateFormat_Iso, $this->submittedValues['date_from'])) {
                 // Date from not a valid date.
                 $this->addMessage(sprintf($this->t('message_validate_batch_bad_date_from'), $this->t('date_format')),
                     Severity::Error, 'date_from');
             }
             if ($this->submittedValues['date_to']) {
-                if (!DateTime::createFromFormat(API::DateFormat_Iso, $this->submittedValues['date_to'])) {
+                if (!DateTime::createFromFormat(Api::DateFormat_Iso, $this->submittedValues['date_to'])) {
                     // Date to not a valid date.
                     $this->addMessage(sprintf($this->t('message_validate_batch_bad_date_to'), $this->t('date_format')),
                     Severity::Error, 'date_to');
@@ -138,7 +138,7 @@ class BatchForm extends Form
      *
      * Sends the invoices as defined by the form values to Acumulus.
      */
-    protected function execute()
+    protected function execute(): bool
     {
         $type = $this->getFormValue('invoice_source_type');
         if ($this->getFormValue('invoice_source_reference_from') !== '') {
@@ -155,11 +155,11 @@ class BatchForm extends Form
             }
         } else {
             // Retrieve by order date.
-            $from = DateTime::createFromFormat(API::DateFormat_Iso, $this->getFormValue('date_from'));
+            $from = DateTime::createFromFormat(Api::DateFormat_Iso, $this->getFormValue('date_from'));
             $from->setTime(0, 0, 0);
-            $to = $this->getFormValue('date_to') ? DateTime::createFromFormat(API::DateFormat_Iso, $this->getFormValue('date_to')) : clone $from;
+            $to = $this->getFormValue('date_to') ? DateTime::createFromFormat(Api::DateFormat_Iso, $this->getFormValue('date_to')) : clone $from;
             $to->setTime(23, 59, 59);
-            $this->screenLog['range'] = sprintf($this->t('message_form_range_date'), $this->t("plural_$type"), $from->format((API::DateFormat_Iso)), $to->format(API::DateFormat_Iso));
+            $this->screenLog['range'] = sprintf($this->t('message_form_range_date'), $this->t("plural_$type"), $from->format((Api::DateFormat_Iso)), $to->format(Api::DateFormat_Iso));
             $invoiceSources = $this->invoiceManager->getInvoiceSourcesByDateRange($type, $from, $to);
         }
 
@@ -190,7 +190,7 @@ class BatchForm extends Form
     /**
      * {@inheritdoc}
      */
-    public function getFieldDefinitions()
+    public function getFieldDefinitions(): array
     {
         $fields = [];
 
@@ -319,7 +319,7 @@ class BatchForm extends Form
      * @return string
      *   A loggable (formatted) string with a list of ids of the sources.
      */
-    protected function getInvoiceSourceReferenceList(array $invoiceSources)
+    protected function getInvoiceSourceReferenceList(array $invoiceSources): string
     {
         $result = [];
         foreach ($invoiceSources as $invoiceSource) {

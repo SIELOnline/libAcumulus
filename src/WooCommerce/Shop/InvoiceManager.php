@@ -46,7 +46,7 @@ class InvoiceManager extends BaseInvoiceManager
     /**
      * {@inheritdoc}
      */
-    public function getInvoiceSourcesByIdRange($invoiceSourceType, $InvoiceSourceIdFrom, $InvoiceSourceIdTo): array
+    public function getInvoiceSourcesByIdRange(string $invoiceSourceType, string $InvoiceSourceIdFrom, string $InvoiceSourceIdTo): array
     {
         // We use our own query here as defining a range of post ids based on a
         // between does not seem to be possible with the query syntax.
@@ -81,7 +81,7 @@ class InvoiceManager extends BaseInvoiceManager
      * These plugins mostly only store the number part, not the prefix, suffix
      * or date part. If so, you will have to search for the number part only.
      */
-    public function getInvoiceSourcesByReferenceRange($invoiceSourceType, $invoiceSourceReferenceFrom, $invoiceSourceReferenceTo): array
+    public function getInvoiceSourcesByReferenceRange(string $invoiceSourceType, string $invoiceSourceReferenceFrom, string $invoiceSourceReferenceTo): array
     {
         // To be able to define the query we need to know under which meta key
         // the order number/reference is stored.
@@ -165,7 +165,7 @@ class InvoiceManager extends BaseInvoiceManager
     /**
      * {@inheritdoc}
      */
-    public function getInvoiceSourcesByDateRange($invoiceSourceType, DateTime $dateFrom, DateTime $dateTo): array
+    public function getInvoiceSourcesByDateRange(string $invoiceSourceType, DateTime $dateFrom, DateTime $dateTo): array
     {
         $args = [
             'date_query' => [

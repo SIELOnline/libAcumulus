@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\Shop;
 
+use Siel\Acumulus\ApiClient\Acumulus;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\ShopCapabilities;
 use Siel\Acumulus\Helpers\Form;
@@ -13,19 +14,15 @@ use Siel\Acumulus\Helpers\Translator;
  */
 class ConfirmUninstallForm extends Form
 {
-
-    /**
-     * Constructor.
-     *
-     * @param \Siel\Acumulus\Helpers\FormHelper $formHelper
-     * @param \Siel\Acumulus\Config\ShopCapabilities $shopCapabilities
-     * @param \Siel\Acumulus\Config\Config $config
-     * @param \Siel\Acumulus\Helpers\Translator $translator
-     * @param \Siel\Acumulus\Helpers\Log $log
-     */
-    public function __construct(FormHelper $formHelper, ShopCapabilities $shopCapabilities, Config $config, Translator $translator, Log $log)
-    {
-        parent::__construct($formHelper, $shopCapabilities, $config, $translator, $log);
+    public function __construct(
+        ?Acumulus $acumulusApiClient,
+        FormHelper $formHelper,
+        ShopCapabilities $shopCapabilities,
+        Config $config,
+        Translator $translator,
+        Log $log
+    ) {
+        parent::__construct($acumulusApiClient, $formHelper, $shopCapabilities, $config, $translator, $log);
 
         $translations = new ConfirmUninstallFormTranslations();
         $this->translator->add($translations);
@@ -39,7 +36,7 @@ class ConfirmUninstallForm extends Form
      * @return bool
      *   Success.
      */
-    protected function execute()
+    protected function execute(): bool
     {
         // @todo: Implement execute() method.
         return true;
@@ -48,7 +45,7 @@ class ConfirmUninstallForm extends Form
     /**
      * {@inheritdoc}
      */
-    protected function getFieldDefinitions()
+    protected function getFieldDefinitions(): array
     {
         $fields = [];
 

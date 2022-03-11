@@ -17,7 +17,7 @@ class ConfigStore extends BaSeConfigStore
     /**
      * {@inheritdoc}
      */
-    public function load()
+    public function load(): array
     {
         return is_readable($this->configFile) ? json_decode(file_get_contents($this->configFile), true) : [];
     }
@@ -25,7 +25,7 @@ class ConfigStore extends BaSeConfigStore
     /**
      * {@inheritdoc}
      */
-    public function save(array $values)
+    public function save(array $values): bool
     {
         file_put_contents($this->configFile, json_encode($values));
         return true;

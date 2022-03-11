@@ -1,4 +1,8 @@
 <?php
+/**
+ * @noinspection PhpClassConstantAccessedViaChildClassInspection
+ */
+
 namespace Siel\Acumulus\TestWebShop\Invoice;
 
 use Siel\Acumulus\Helpers\Number;
@@ -46,7 +50,7 @@ class Creator extends BaseCreator
      */
     protected function setInvoiceSource(\Siel\Acumulus\Invoice\Source $invoiceSource)
     {
-        // @todo: add objects from your webshop as property source (for use in tokenized values)
+        // @todo: add objects from your web shop as property source (for use in tokenized values)
         parent::setInvoiceSource($invoiceSource);
         switch ($this->invoiceSource->getType()) {
             case Source::Order:
@@ -64,7 +68,7 @@ class Creator extends BaseCreator
      */
     protected function setPropertySources()
     {
-        // @todo: add objects from your webshop as property source (for use in tokenized values)
+        // @todo: add objects from your web shop as property source (for use in tokenized values)
         parent::setPropertySources();
         $this->propertySources['address_invoice'] = new Address($this->order->id_address_invoice);
         $this->propertySources['address_delivery'] = new Address($this->order->id_address_delivery);
@@ -74,10 +78,10 @@ class Creator extends BaseCreator
     /**
      * {@inheritdoc}
      */
-    protected function getItemLines()
+    protected function getItemLines(): array
     {
         // @todo: override or implement both addItemLinesOrder() and addItemLinesCreditNote()
-        $result = array();
+        $result = [];
         $lines = $this->invoiceSource->getSource()->getItemLines();
         foreach ($lines as $line) {
             $result[] = $this->getItemLine($line);
@@ -94,9 +98,10 @@ class Creator extends BaseCreator
      *
      * @return array
      */
-    protected function getItemLine($item)
+    protected function getItemLine($item): array
     {
-        $result = array();
+        /** @noinspection DuplicatedCode */
+        $result = [];
 
         // @todo: add property source(s) for this item line.
         $this->addPropertySource('item', $item);
@@ -133,11 +138,11 @@ class Creator extends BaseCreator
             // - But still send the VAT rate to Acumulus.
             $result[Tag::UnitPrice] = $productPriceInc;
         } else {
-            $result += array(
+            $result += [
                 Tag::UnitPrice => $productPriceEx,
                 Meta::UnitPriceInc => $productPriceInc,
                 Meta::RecalculatePrice => $productPricesIncludeTax ? Tag::UnitPrice : Meta::UnitPriceInc,
-            );
+            ];
         }
         $result[Tag::Quantity] = $quantity;
 
@@ -153,9 +158,9 @@ class Creator extends BaseCreator
     /**
      * {@inheritdoc}
      */
-    protected function getShippingLine()
+    protected function getShippingLine(): array
     {
-        $result = array();
+        $result = [];
 
         $sign = $this->invoiceSource->getSign();
 
@@ -165,7 +170,7 @@ class Creator extends BaseCreator
     }
 
     /**
-     * Looks up and returns vat rate meta data.
+     * Looks up and returns vat rate metadata.
      *
      * @todo: add any necessary parameters, e.g. the product object
      *
@@ -181,12 +186,13 @@ class Creator extends BaseCreator
      *     followed.
      *   Keys are optional, but the more keys you can fill, the better.
      */
-    protected function getVatRateLookupMetadata()
+    protected function getVatRateLookupMetadata(): array
     {
         // @todo: implement if you can't provide exact vat rates, while you may
         //   have a way to look it up, e.g via the current Product object.
         //   As the actual rate may differ from the rate a the moment the order
         //   was placed,we call this lookup data, that only will be used by the
         //   Completor if all else fail.
+        return [];
     }
 }

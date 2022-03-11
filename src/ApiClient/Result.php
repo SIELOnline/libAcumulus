@@ -521,7 +521,7 @@ class Result extends MessageCollection
             $message = (array) $message;
             foreach ($message as $message1) {
                 $message1 = "$what: $message1";
-                $result[] = $message1;
+                $result[$what] = $message1;
                 if ($log) {
                     $this->log->log($logLevel, $message1);
                 }

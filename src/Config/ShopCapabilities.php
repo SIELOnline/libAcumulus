@@ -19,11 +19,6 @@ abstract class ShopCapabilities
     /** @var \Siel\Acumulus\Helpers\Log */
     protected $log;
 
-    /**
-     * @param string $shopNamespace
-     * @param \Siel\Acumulus\Helpers\Translator $translator
-     * @param \Siel\Acumulus\Helpers\Log $log
-     */
     public function __construct(string $shopNamespace, Translator $translator, Log $log)
     {
         $this->log = $log;

@@ -11,7 +11,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getShopEnvironment()
+    public function getShopEnvironment(): array
     {
         return [
             'moduleVersion' => '4.0',
@@ -23,7 +23,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * @inheritDoc
      */
-    protected function getTokenInfoSource()
+    protected function getTokenInfoSource(): array
     {
         return [];
     }
@@ -31,7 +31,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * @inheritDoc
      */
-    protected function getTokenInfoShopProperties()
+    protected function getTokenInfoShopProperties(): array
     {
         return [];
     }
@@ -39,7 +39,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getShopDefaults()
+    public function getShopDefaults(): array
     {
         return [];
     }
@@ -47,7 +47,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getShopOrderStatuses()
+    public function getShopOrderStatuses(): array
     {
         return [];
     }
@@ -55,12 +55,12 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getPaymentMethods()
+    public function getPaymentMethods(): array
     {
         return [];
     }
 
-    public function getVatClasses()
+    public function getVatClasses(): array
     {
         return [];
     }
@@ -69,7 +69,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getLink($linkType)
+    public function getLink($linkType): string
     {
         return '';
     }

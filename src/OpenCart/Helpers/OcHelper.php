@@ -302,7 +302,7 @@ class OcHelper
      *       * comment
      *       * notify
      *       * override.
-     *   - mixed, $output (what the model method that is triggering the event
+     *   - mixed, $output: what the model method that is triggering the event
      *     is about to return.
      *     - route = checkout/order/addOrder: order_id of the just created order.
      *     - route = checkout/order/addOrderHistory: null.

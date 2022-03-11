@@ -15,7 +15,7 @@ class Log extends BaseLog
      *
      * This override logs to the WooCommerce logger facility.
      */
-    protected function write($message, $severity)
+    protected function write(string $message, int $severity)
     {
         (new WC_Logger())->log($this->getWooCommerceSeverity($severity), $message, ['source' => 'acumulus']);
     }

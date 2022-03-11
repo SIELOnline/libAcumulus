@@ -1,24 +1,4 @@
 <?php
-/**
- * Note: As long as we want to check for a minimal PHP version via the
- * Requirements checking process provided by the classes below, and we want to
- * properly log and inform the user, we should not use PHP7 language constructs
- * in the following classes (and its child classes):
- * - {@see Container}: creates instances of the below classes.
- * - {@see Requirements}: executes the checks.
- * - {@see \Siel\Acumulus\Config\ConfigUpgrade}: initiates the check.
- * - {@see \Siel\Acumulus\Helpers\Severity}: part of a failed check.
- * - {@see \Siel\Acumulus\Helpers\Message}: represents a failed check.
- * - {@see \Siel\Acumulus\Helpers\MessageCollection}: represents failed checks.
- * - {@see Log}: Logs failed checks.
- *
- * The PHP7 language constructs we suppress the warnings for:
- * @noinspection PhpMissingParamTypeInspection
- * @noinspection PhpMissingReturnTypeInspection
- * @noinspection PhpMissingFieldTypeInspection
- * @noinspection PhpMissingVisibilityInspection
- */
-
 namespace Siel\Acumulus\Helpers;
 
 use Exception;
@@ -36,21 +16,21 @@ class Message
 {
     // Formats in which to return messages.
     /** @var int Format as plain text */
-    const Format_Plain = 0;
+    public const Format_Plain = 0;
     /** @var int Format as html. */
-    const Format_Html = 1;
+    public const Format_Html = 1;
     // PHP7.1: These 2 could become protected.
     /** @var int Format as list item */
-    const Format_ListItem = 2;
+    public const Format_ListItem = 2;
     /** @var int Format with the severity level prepended. */
-    const Format_AddSeverity = 4;
+    public const Format_AddSeverity = 4;
     // Combinations of the above.
-    const Format_PlainWithSeverity = self::Format_Plain | self::Format_AddSeverity;
-    const Format_HtmlWithSeverity = self::Format_Html | self::Format_AddSeverity;
-    const Format_PlainList = self::Format_Plain | self::Format_ListItem;
-    const Format_HtmlList = self::Format_Html | self::Format_ListItem;
-    const Format_PlainListWithSeverity = self::Format_Plain | self::Format_ListItem | self::Format_AddSeverity;
-    const Format_HtmlListWithSeverity = self::Format_Html | self::Format_ListItem | self::Format_AddSeverity;
+    public const Format_PlainWithSeverity = self::Format_Plain | self::Format_AddSeverity;
+    public const Format_HtmlWithSeverity = self::Format_Html | self::Format_AddSeverity;
+    public const Format_PlainList = self::Format_Plain | self::Format_ListItem;
+    public const Format_HtmlList = self::Format_Html | self::Format_ListItem;
+    public const Format_PlainListWithSeverity = self::Format_Plain | self::Format_ListItem | self::Format_AddSeverity;
+    public const Format_HtmlListWithSeverity = self::Format_Html | self::Format_ListItem | self::Format_AddSeverity;
 
     /** @var string */
     protected $text;
@@ -97,7 +77,7 @@ class Message
      *   createFormFieldMessage, CreateApiMessage, createInternalMessage to
      *   simplify this constructor.
      */
-    public function __construct($message, $severity = Severity::Unknown, $fieldOrCodeOrTag = '', $code = 0)
+    public function __construct($message, int $severity = Severity::Unknown, string $fieldOrCodeOrTag = '', $code = 0)
     {
         // PHP7: instanceof Throwable.
         if ($message instanceof Exception) {
@@ -150,7 +130,7 @@ class Message
      *   The translation for the given key or the key itself if no translation
      *   could be found.
      */
-    protected function t($key)
+    protected function t(string $key): string
     {
         return Translator::$instance instanceof Translator ? Translator::$instance->get($key) : $key;
     }
@@ -168,7 +148,7 @@ class Message
      * @return int
      *   One of the Severity::... constants.
      */
-    public function getSeverity()
+    public function getSeverity(): int
     {
         return $this->severity;
     }
@@ -178,7 +158,7 @@ class Message
      *
      * @return string
      */
-    public function getSeverityText()
+    public function getSeverityText(): string
     {
         switch ($this->getSeverity()) {
             case Severity::Success:
@@ -215,7 +195,7 @@ class Message
      *   see {@see https://www.siel.nl/acumulus/API/Basic_Response/}. For
      *   messages with another source, it will be empty.
      */
-    public function getCodeTag()
+    public function getCodeTag(): string
     {
         return $this->codeTag;
     }
@@ -224,7 +204,7 @@ class Message
      * @return string
      *   The (form) field name at which this message points.
      */
-    public function getField()
+    public function getField(): string
     {
         return $this->field;
     }
@@ -234,7 +214,7 @@ class Message
      *   The exception used to construct this message, or null if this message
      *   is not a Severity::Exception level message.
      */
-    public function getException()
+    public function getException(): ?Exception
     {
         return $this->exception;
     }
@@ -257,7 +237,7 @@ class Message
      * @return string
      *   The formatted message.
      */
-    public function format($format)
+    public function format(int $format): string
     {
         $isHtml = ($format & self::Format_Html) !== 0;
         $text = '';

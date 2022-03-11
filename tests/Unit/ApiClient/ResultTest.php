@@ -226,7 +226,7 @@ class ResultTest extends TestCase
         $messages = $result->toLogMessages(false);
         $this->assertArrayHasKey('Request', $messages);
         $this->assertArrayHasKey('Response', $messages);
-        $this->assertArrayNotHasKey('exception', $messages);
+        $this->assertArrayNotHasKey('Exception', $messages);
         $this->assertStringNotContainsString('mysecret', $messages['Request']);
         $this->assertStringContainsString('REMOVED FOR SECURITY', $messages['Request']);
     }
@@ -250,7 +250,7 @@ class ResultTest extends TestCase
         $messages = $result->toLogMessages(false);
         $this->assertArrayHasKey('Request', $messages);
         $this->assertArrayHasKey('Response', $messages);
-        $this->assertArrayNotHasKey('exception', $messages);
+        $this->assertArrayNotHasKey('Exception', $messages);
         $this->assertStringNotContainsString('mysecret', $messages['Response']);
         $this->assertStringContainsString('REMOVED FOR SECURITY', $messages['Response']);
     }

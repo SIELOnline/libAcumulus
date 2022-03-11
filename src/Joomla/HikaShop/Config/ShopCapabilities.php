@@ -6,7 +6,7 @@ use Siel\Acumulus\Joomla\Config\ShopCapabilities as ShopCapabilitiesBase;
 use Siel\Acumulus\Config\Config;
 
 /**
- * Defines the HikaShop webshop specific capabilities.
+ * Defines the HikaShop web shop specific capabilities.
  */
 class ShopCapabilities extends ShopCapabilitiesBase
 {

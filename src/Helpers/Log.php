@@ -1,24 +1,4 @@
 <?php
-/**
- * Note: As long as we want to check for a minimal PHP version via the
- * Requirements checking process provided by the classes below, and we want to
- * properly log and inform the user, we should not use PHP7 language constructs
- * in the following classes (and its child classes):
- * - {@see Container}: creates instances of the below classes.
- * - {@see Requirements}: executes the checks.
- * - {@see \Siel\Acumulus\Config\ConfigUpgrade}: initiates the check.
- * - {@see \Siel\Acumulus\Helpers\Severity}: part of a failed check.
- * - {@see \Siel\Acumulus\Helpers\Message}: represents a failed check.
- * - {@see \Siel\Acumulus\Helpers\MessageCollection}: represents failed checks.
- * - {@see Log}: Logs failed checks.
- *
- * The PHP7 language constructs we suppress the warnings for:
- * @noinspection PhpMissingParamTypeInspection
- * @noinspection PhpMissingReturnTypeInspection
- * @noinspection PhpMissingFieldTypeInspection
- * @noinspection PhpMissingVisibilityInspection
- */
-
 namespace Siel\Acumulus\Helpers;
 
 /**
@@ -47,7 +27,7 @@ class Log
      *   The version of the library. It will be logged with each log message,
      *   allowing to better interpret old log messages when giving support.
      */
-    public function __construct($libraryVersion)
+    public function __construct(string $libraryVersion)
     {
         $this->libraryVersion = $libraryVersion;
     }
@@ -58,7 +38,7 @@ class Log
      * @return int
      *   One of the Severity::... constants.
      */
-    public function getLogLevel()
+    public function getLogLevel(): int
     {
         return $this->logLevel;
     }
@@ -70,7 +50,7 @@ class Log
      *   One of the Severity::... constants: Log, Info, Notice, Warning, Error,
      *   or Exception
      */
-    public function setLogLevel($logLevel)
+    public function setLogLevel(int $logLevel)
     {
         $this->logLevel = $logLevel;
     }
@@ -78,7 +58,7 @@ class Log
     /**
      * @return string
      */
-    protected function getLibraryVersion()
+    protected function getLibraryVersion(): string
     {
         return $this->libraryVersion;
     }
@@ -86,7 +66,7 @@ class Log
     /**
      * Returns a textual representation of the severity.
      */
-    protected function getSeverityString($severity)
+    protected function getSeverityString($severity): string
     {
         $severity = (int) $severity;
         switch ($severity) {
@@ -115,24 +95,24 @@ class Log
      * informational messages are also logged.
      *
      * Formatting involves:
-     * - calling vsprintf() if $args is not empty.
+     * - calling {@see vsprintf()} if $args is not empty.
      * - adding "Acumulus {version} {severity}: " in front of the message.
      *
      * @param int $severity
      *   One of the Severity::... constants.
      * @param string $message
      *   The message to log, optionally followed by arguments. If there are
-     *   arguments the $message is passed through vsprintf().
-     * @param array $args
-     *   Any arguments to replace % placeholders in $message.
+     *   arguments the $message is passed through {@see vsprintf()}.
+     * @param mixed $values
+     *   Any values to replace %-placeholders in $message.
      *
      * @return string
      *   The full formatted message whether it got logged or not.
      */
-    public function log($severity, $message, ... $args)
+    public function log(int $severity, string $message, ... $values): string
     {
-        if (count($args) > 0) {
-            $message = vsprintf($message, $args);
+        if (count($values) > 0) {
+            $message = vsprintf($message, $values);
         }
         if ($severity >= $this->getLogLevel()) {
             $this->write($message, $severity);
@@ -145,14 +125,16 @@ class Log
      *
      * @param string $message,...
      *   The message to log, optionally followed by arguments. If there are
-     *   arguments the $message is passed through vsprintf().
+     *   arguments the $message is passed through {@see vsprintf()}.
+     * @param mixed ...$values
+     *   Any values to replace %-placeholders in $message.
      *
      * @return string
      *   The full formatted message whether it got logged or not.
      */
-    public function debug($message)
+    public function debug(string $message, ... $values): string
     {
-        return $this->log(Severity::Log, ...func_get_args());
+        return $this->log(Severity::Log, $message, $values);
     }
 
     /**
@@ -160,14 +142,16 @@ class Log
      *
      * @param string $message,...
      *   The message to log, optionally followed by arguments. If there are
-     *   arguments the $message is passed through vsprintf().
+     *   arguments the $message is passed through {@see vsprintf()}.
+     * @param mixed ...$values
+     *   Any values to replace %-placeholders in $message.
      *
      * @return string
      *   The full formatted message whether it got logged or not.
      */
-    public function info($message)
+    public function info(string $message, ... $values): string
     {
-        return $this->log(Severity::Info, ...func_get_args());
+        return $this->log(Severity::Info, $message, $values);
     }
 
     /**
@@ -175,14 +159,16 @@ class Log
      *
      * @param string $message,...
      *   The message to log, optionally followed by arguments. If there are
-     *   arguments the $message is passed through vsprintf().
+     *   arguments the $message is passed through {@see vsprintf()}.
+     * @param mixed ...$values
+     *   Any values to replace %-placeholders in $message.
      *
      * @return string
      *   The full formatted message whether it got logged or not.
      */
-    public function notice($message)
+    public function notice(string $message, ... $values): string
     {
-        return $this->log(Severity::Notice, ...func_get_args());
+        return $this->log(Severity::Notice, $message, $values);
     }
 
     /**
@@ -190,14 +176,16 @@ class Log
      *
      * @param string $message,...
      *   The message to log, optionally followed by arguments. If there are
-     *   arguments the $message is passed through vsprintf().
+     *   arguments the $message is passed through {@see vsprintf()}.
+     * @param mixed ...$values
+     *   Any values to replace %-placeholders in $message.
      *
      * @return string
      *   The full formatted message whether it got logged or not.
      */
-    public function warning($message)
+    public function warning(string $message, ... $values): string
     {
-        return $this->log(Severity::Warning, ...func_get_args());
+        return $this->log(Severity::Warning, $message, $values);
     }
 
     /**
@@ -205,14 +193,16 @@ class Log
      *
      * @param string $message,...
      *   The message to log, optionally followed by arguments. If there are
-     *   arguments the $message is passed through vsprintf().
+     *   arguments the $message is passed through {@see vsprintf()}.
+     * @param mixed ...$values
+     *   Any values to replace %-placeholders in $message.
      *
      * @return string
      *   The full formatted message whether it got logged or not.
      */
-    public function error($message)
+    public function error(string $message, ... $values): string
     {
-        return $this->log(Severity::Error, ...func_get_args());
+        return $this->log(Severity::Error, $message, $values);
     }
 
     /**
@@ -228,7 +218,7 @@ class Log
      * @param int $severity
      *   One of the Severity::... constants.
      */
-    protected function write($message, $severity)
+    protected function write(string $message, int $severity)
     {
         $message = sprintf('Acumulus %s: %s - %s', $this->getLibraryVersion(), $this->getSeverityString($severity), $message);
         error_log($message);

@@ -1,24 +1,4 @@
 <?php
-/**
- * Note: As long as we want to check for a minimal PHP version via the
- * Requirements checking process provided by the classes below, and we want to
- * properly log and inform the user, we should not use PHP7 language constructs
- * in the following classes (and its child classes):
- * - {@see Container}: creates instances of the below classes.
- * - {@see Requirements}: executes the checks.
- * - {@see \Siel\Acumulus\Config\ConfigUpgrade}: initiates the check.
- * - {@see \Siel\Acumulus\Helpers\Severity}: part of a failed check.
- * - {@see \Siel\Acumulus\Helpers\Message}: represents a failed check.
- * - {@see \Siel\Acumulus\Helpers\MessageCollection}: represents failed checks.
- * - {@see Log}: Logs failed checks.
- *
- * The PHP7 language constructs we suppress the warnings for:
- * @noinspection PhpMissingParamTypeInspection
- * @noinspection PhpMissingReturnTypeInspection
- * @noinspection PhpMissingFieldTypeInspection
- * @noinspection PhpMissingVisibilityInspection
- */
-
 namespace Siel\Acumulus\Helpers;
 
 use Exception;
@@ -59,7 +39,12 @@ class MessageCollection
      *
      * @return $this
      */
-    public function addMessage($message, $severity = Severity::Unknown, $fieldOrCodeOrTag = '', $code = 0)
+    public function addMessage(
+        $message,
+        int $severity = Severity::Unknown,
+        $fieldOrCodeOrTag = '',
+        $code = 0
+    ): MessageCollection
     {
         if (!$message instanceof Message) {
             switch (func_num_args()) {
@@ -115,13 +100,17 @@ class MessageCollection
      *
      * @return $this
      */
-    public function addMessages($messages, $severity = Severity::Unknown)
+    public function addMessages($messages, int $severity = Severity::Unknown): MessageCollection
     {
         // Process $messages so that it becomes an array of messages in
         // whichever form.
         if ($messages instanceof MessageCollection) {
             $messages = $messages->getMessages();
-        } elseif (count($messages) === 3 && isset($messages['code']) && isset($messages['codetag']) && isset($messages['message'])) {
+        } elseif (count($messages) === 3
+            && isset($messages['code'])
+            && isset($messages['codetag'])
+            && isset($messages['message'])
+        ) {
             // 1 Acumulus API message array.
             $messages = [$messages];
         }
@@ -159,7 +148,7 @@ class MessageCollection
      * @return int
      *   1 of the Severity::... constants.
      */
-    public function getSeverity()
+    public function getSeverity(): int
     {
         $result = Severity::Unknown;
         foreach ($this->getMessages() as $message) {
@@ -175,7 +164,7 @@ class MessageCollection
      *   True if the result contains at least 1 notice, warning, error or
      *   exception, false otherwise.
      */
-    public function hasRealMessages()
+    public function hasRealMessages(): bool
     {
         return $this->getSeverity() >= Severity::Info;
     }
@@ -187,7 +176,7 @@ class MessageCollection
      *   True if the result status indicates if there were errors or an
      *   exception, false otherwise.
      */
-    public function hasError()
+    public function hasError(): bool
     {
         return $this->getSeverity() >= Severity::Error;
     }
@@ -207,7 +196,7 @@ class MessageCollection
      *   The message with the given code if the result contains such a message,
      *   null otherwise.
      */
-    public function getByCode($code)
+    public function getByCode($code): ?Message
     {
         foreach ($this->getMessages() as $message) {
             if ($message->getCode() == $code) {
@@ -230,7 +219,7 @@ class MessageCollection
      *   The message with the given code tag if the result contains such a
      *   message, null otherwise.
      */
-    public function getByCodeTag($codeTag)
+    public function getByCodeTag(string $codeTag): ?Message
     {
         foreach ($this->getMessages() as $message) {
             if ($message->getCodeTag() === $codeTag) {
@@ -248,7 +237,7 @@ class MessageCollection
      * @return Message[]
      *   The messages for the given field, may be empty.
      */
-    public function getByField($field)
+    public function getByField(string $field): array
     {
         $result = [];
         foreach ($this->getMessages() as $message) {
@@ -266,7 +255,7 @@ class MessageCollection
      *
      * @return \Siel\Acumulus\Helpers\Message[]
      */
-    public function getMessages($severity = Severity::All)
+    public function getMessages(int $severity = Severity::All): array
     {
         if ($severity === Severity::All) {
             $result = $this->messages;
@@ -299,7 +288,7 @@ class MessageCollection
      *
      * @see Message::format()
      */
-    public function formatMessages($format, $severity = Severity::All)
+    public function formatMessages(int $format, int $severity = Severity::All)
     {
         $result = [];
         foreach ($this->getMessages($severity) as $message) {

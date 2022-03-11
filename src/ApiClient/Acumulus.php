@@ -1,9 +1,6 @@
 <?php
 /**
- * @noinspection PhpMissingParamTypeInspection
- * @noinspection PhpMissingReturnTypeInspection
- * @noinspection PhpMissingFieldTypeInspection
- * @noinspection PhpClassHasTooManyDeclaredMembersInspection
+ * @noinspection SpellCheckingInspection
  */
 
 namespace Siel\Acumulus\ApiClient;
@@ -69,7 +66,7 @@ class Acumulus
      *   - 403 A8N403GCN: Forbidden - Insufficient credential level for
      *     general/general_about.php. Not authorized to perform request.
      */
-    public function getAbout()
+    public function getAbout(): Result
     {
         return $this->callApiFunction('general/general_about', [])->setMainResponseKey('general');
     }
@@ -82,29 +79,29 @@ class Acumulus
      * @return \Siel\Acumulus\ApiClient\Result
      *   The result of the webservice call. The structured response will contain
      *   1 "mydata" array, being a keyed array with keys:
-     *   - myaddress
-     *   - mycity
-     *   - mycompanyname
-     *   - mycontactperson
-     *   - mycontractcode
-     *   - mycontractenddate
-     *   - mydebt
-     *   - myemail
-     *   - myemailstatusid
-     *   - myemailstatusreferenceid
-     *   - myentries
-     *   - myentriesleft
-     *   - myiban
-     *   - mymaxentries
-     *   - mypostalcode
-     *   - mysalutation
-     *   - mysepamandatenr
-     *   - mystatusid
-     *   - mytelephone
-     *   - myvatnumber
+     * - 'myaddress'
+     * - 'mycity'
+     * - 'mycompanyname'
+     * - 'mycontactperson'
+     * - 'mycontractcode'
+     * - 'mycontractenddate'
+     * - 'mydebt'
+     * - 'myemail'
+     * - 'myemailstatusid'
+     * - 'myemailstatusreferenceid'
+     * - 'myentries'
+     * - 'myentriesleft'
+     * - 'myiban'
+     * - 'mymaxentries'
+     * - 'mypostalcode'
+     * - 'mysalutation'
+     * - 'mysepamandatenr'
+     * - 'mystatusid'
+     * - 'mytelephone'
+     * - 'myvatnumber'
      *   Possible errors: todo.
      */
-    public function getMyAcumulus()
+    public function getMyAcumulus(): Result
     {
         return $this->callApiFunction('general/my_acumulus', [])->setMainResponseKey('mydata');
     }
@@ -122,14 +119,14 @@ class Acumulus
      *   The result of the webservice call. The structured response will contain
      *   a non-keyed array of "account" arrays, each "account" array being a
      *   keyed array with keys:
-     *   - accountid
-     *   - accountnumber
-     *   - accountdescription
-     *   - accountorderid
-     *   - accountstatus
-     *   - accounttypeid
+     * - 'accountid'
+     * - 'accountnumber'
+     * - 'accountdescription'
+     * - 'accountorderid'
+     * - 'accountstatus'
+     * - 'accounttypeid'
      */
-    public function getPicklistAccounts($enabled = true)
+    public function getPicklistAccounts(bool $enabled = true): Result
     {
         $filters = [
             'accountstatus' => $enabled ? 1 : 0,
@@ -146,11 +143,11 @@ class Acumulus
      *   The result of the webservice call. The structured response will contain
      *   a non-keyed array of "companytype" arrays, each "companytype"
      *   array being a keyed array with keys:
-     *   - companytypeid
-     *   - companytypename
-     *   - companytypenamenl
+     * - 'companytypeid'
+     * - 'companytypename'
+     * - 'companytypenamenl'
      */
-    public function getPicklistCompanyTypes()
+    public function getPicklistCompanyTypes(): Result
     {
         return $this->getPicklist('companytypes', [], false);
     }
@@ -164,10 +161,10 @@ class Acumulus
      *   The result of the webservice call. The structured response will contain
      *   a non-keyed array of "contacttype" arrays, each "contacttype" array
      *   being a keyed array with keys:
-     *   - contacttypeid
-     *   - contacttypename
+     * - 'contacttypeid'
+     * - 'contacttypename'
      */
-    public function getPicklistContactTypes()
+    public function getPicklistContactTypes(): Result
     {
         return $this->getPicklist('contacttypes');
     }
@@ -181,10 +178,10 @@ class Acumulus
      *   The result of the webservice call. The structured response will contain
      *   a non-keyed array of "costcenter" arrays, each "costcenter" array being
      *   a keyed array with keys:
-     *   - costcenterid
-     *   - costcentername
+     * - 'costcenterid'
+     * - 'costcentername'
      */
-    public function getPicklistCostCenters()
+    public function getPicklistCostCenters(): Result
     {
         return $this->getPicklist('costcenters');
     }
@@ -198,10 +195,10 @@ class Acumulus
      *   The result of the webservice call. The structured response will contain
      *   a non-keyed array of "invoicetemplate" arrays, each "invoicetemplate"
      *   array being a keyed array with keys:
-     *   - invoicetemplateid
-     *   - invoicetemplatename
+     * - 'invoicetemplateid'
+     * - 'invoicetemplatename'
      */
-    public function getPicklistInvoiceTemplates()
+    public function getPicklistInvoiceTemplates(): Result
     {
         return $this->getPicklist('invoicetemplates');
     }
@@ -227,18 +224,18 @@ class Acumulus
      *   The result of the webservice call. The structured response will contain
      *   a non-keyed array of "product" arrays, each "product"
      *   array being a keyed array with keys:
-     *   - productid
-     *   - productnature
-     *   - productdescription
-     *   - producttagid
-     *   - productcontactid
-     *   - productprice
-     *   - productvatrate
-     *   - productsku
-     *   - productstockamount
-     *   - productean
-     *   - producthash
-     *   - productnotes
+     * - 'productid'
+     * - 'productnature'
+     * - 'productdescription'
+     * - 'producttagid'
+     * - 'productcontactid'
+     * - 'productprice'
+     * - 'productvatrate'
+     * - 'productsku'
+     * - 'productstockamount'
+     * - 'productean'
+     * - 'producthash'
+     * - 'productnotes'
      *
      * @noinspection PhpUnused  Not yet used, but this is a library that,
      *   eventually, should cover all web services provided.
@@ -282,7 +279,7 @@ class Acumulus
      *   a non-keyed array of "picklist" arrays, each 'picklist' array being a
      *   keyed array with keys that depend on the requested picklist.
      */
-    protected function getPicklist($picklist, array $filters = [], $needContract = true)
+    protected function getPicklist(string $picklist, array $filters = [], bool $needContract = true): Result
     {
         // For picklists, the main result is found under the name of the
         // picklist but in singular form, i.e. without the s at the end.
@@ -309,7 +306,7 @@ class Acumulus
      *     100)
      *   - countryregion: (int) one of the Api::Region_... constants.
      */
-    public function getVatInfo($countryCode, $date = '')
+    public function getVatInfo(string $countryCode, string $date = ''): Result
     {
         if (empty($date)) {
             $date = date(Api::DateFormat_Iso);
@@ -326,7 +323,7 @@ class Acumulus
      *
      * See {@see https://www.siel.nl/acumulus/API/Reports/EU_eCommerce_Threshold/}
      *
-     * @param int $year
+     * @param int|null $year
      *   The year to get a report for. Leave empty for the current year.
      *
      * @return \Siel\Acumulus\ApiClient\Result
@@ -341,11 +338,11 @@ class Acumulus
      *   Possible errors:
      *   - AAC37EAA: Ongeldig year. EU regelgeving van toepassing vanaf 2021.
      */
-    public function reportThresholdEuCommerce($year = null)
+    public function reportThresholdEuCommerce(int $year = null): Result
     {
         $message = [];
         if (!empty($year)) {
-            $message['year'] = (int) $year;
+            $message['year'] = $year;
         }
         return $this->callApiFunction('reports/report_threshold_eu_ecommerce', $message)->setMainResponseKey('');
     }
@@ -368,12 +365,12 @@ class Acumulus
      * response array with key:
      * - invoice: an array of information about the created invoice, being an
      *   array with keys:
-     *   - invoicenumber
-     *   - token
-     *   - entryid
-     *   - conceptid
+     * - 'invoicenumber'
+     * - 'token'
+     * - 'entryid'
+     * - 'conceptid'
      */
-    public function invoiceAdd(array $invoice, Result $result = null)
+    public function invoiceAdd(array $invoice, Result $result = null): Result
     {
         return $this->callApiFunction('invoices/invoice_add', $invoice, true, $result)->setMainResponseKey('invoice');
     }
@@ -397,10 +394,10 @@ class Acumulus
      *   - FGYBSN048: Information not available for $conceptId older than 127466.
      *   - todo: others?
      */
-    public function getConceptInfo($conceptId)
+    public function getConceptInfo(int $conceptId): Result
     {
         $message = [
-            'conceptid' => (int) $conceptId,
+            'conceptid' => $conceptId,
         ];
         return $this->callApiFunction('invoices/invoice_concept_info', $message)->setMainResponseKey('concept');
     }
@@ -416,39 +413,39 @@ class Acumulus
      * @return \Siel\Acumulus\ApiClient\Result
      *   The result of the webservice call. The structured response will contain
      *   1 "entry" array, being a keyed array with keys:
-     *   - entryid
-     *   - entrydate
-     *   - entrytype
-     *   - entrydescription
-     *   - entrynote
-     *   - fiscaltype
-     *   - vatreversecharge
-     *   - foreigneu
-     *   - foreignnoneu
-     *   - marginscheme
-     *   - foreignvat
-     *   - contactid
-     *   - accountnumber
-     *   - costcenterid
-     *   - costtypeid
-     *   - invoicenumber
-     *   - invoicenote
-     *   - descriptiontext
-     *   - invoicelayoutid
-     *   - totalvalueexclvat
-     *   - totalvalue
-     *   - paymenttermdays
-     *   - paymentdate
-     *   - paymentstatus
-     *   - deleted
+     * - 'entryid'
+     * - 'entrydate'
+     * - 'entrytype'
+     * - 'entrydescription'
+     * - 'entrynote'
+     * - 'fiscaltype'
+     * - 'vatreversecharge'
+     * - 'foreigneu'
+     * - 'foreignnoneu'
+     * - 'marginscheme'
+     * - 'foreignvat'
+     * - 'contactid'
+     * - 'accountnumber'
+     * - 'costcenterid'
+     * - 'costtypeid'
+     * - 'invoicenumber'
+     * - 'invoicenote'
+     * - 'descriptiontext'
+     * - 'invoicelayoutid'
+     * - 'totalvalueexclvat'
+     * - 'totalvalue'
+     * - 'paymenttermdays'
+     * - 'paymentdate'
+     * - 'paymentstatus'
+     * - 'deleted'
      *   Possible errors:
      *   - XGYBSN000: Requested invoice for entry $entryId not found: $entryId
      *     does not exist.
      */
-    public function getEntry($entryId)
+    public function getEntry(int $entryId): Result
     {
         $message = [
-            'entryid' => (int) $entryId,
+            'entryid' => $entryId,
         ];
         return $this->callApiFunction('entry/entry_info', $message)->setMainResponseKey('entry');
     }
@@ -468,7 +465,7 @@ class Acumulus
      * @return \Siel\Acumulus\ApiClient\Result
      *   The result of the webservice call. The structured response will contain
      *   1 "entry" array, being a keyed array with keys:
-     *   - entryid
+     * - 'entryid'
      *   - entryproc: (description new status): 'removed', 'recovered' or 'no
      *     changes made'.
      *   Possible errors:
@@ -479,11 +476,11 @@ class Acumulus
      *   - P2XFELO12: Requested for entryid: $entryId not found or forbidden:
      *     $entryId does not exist or already has requested status.
      */
-    public function setDeleteStatus($entryId, $deleteStatus)
+    public function setDeleteStatus(int $entryId, int $deleteStatus): Result
     {
         $message = [
-            'entryid' => (int) $entryId,
-            'entrydeletestatus' => (int) $deleteStatus,
+            'entryid' => $entryId,
+            'entrydeletestatus' => $deleteStatus,
         ];
         return $this->callApiFunction('entry/entry_deletestatus_set', $message)->setMainResponseKey('entry');
     }
@@ -499,20 +496,20 @@ class Acumulus
      * @return \Siel\Acumulus\ApiClient\Result
      *   The result of the webservice call. The structured response will contain
      *   1 "invoice" array, being a keyed array with keys:
-     *   - entryid
-     *   - token
-     *   - paymentstatus
-     *   - paymentdate
+     * - 'entryid'
+     * - 'token'
+     * - 'paymentstatus'
+     * - 'paymentdate'
      *   Possible errors:
      *   - XGYTTNF04: Requested invoice for $token not found: $token does not
      *     exist.
      *
      * @noinspection PhpUnused
      */
-    public function getPaymentStatus($token)
+    public function getPaymentStatus(string $token): Result
     {
         $message = [
-            'token' => (string) $token,
+            'token' => $token,
         ];
         return $this->callApiFunction('invoices/invoice_paymentstatus_get', $message)->setMainResponseKey('invoice');
     }
@@ -534,24 +531,24 @@ class Acumulus
      * @return \Siel\Acumulus\ApiClient\Result
      *   The result of the webservice call. The structured response will contain
      *   1 "invoice" array, being a keyed array with keys:
-     *   - entryid
-     *   - token
-     *   - paymentstatus
-     *   - paymentdate
+     * - 'entryid'
+     * - 'token'
+     * - 'paymentstatus'
+     * - 'paymentdate'
      *   Possible errors:
      *   - DATE590ZW: Missing mandatory paymentdate field. Unable to proceed."
      *   - DATE590ZW: Incorrect date range (2000-01-01 to 2099-12-31) or invalid
      *     date format (YYYY-MM-DD) used in paymentdate field. We received:
      *     $paymentDate. Unable to proceed."
      */
-    public function setPaymentStatus($token, $paymentStatus, $paymentDate = '')
+    public function setPaymentStatus(string $token, int $paymentStatus, string $paymentDate = ''): Result
     {
         if (empty($paymentDate)) {
             $paymentDate = date(Api::DateFormat_Iso);
         }
         $message = [
-            'token' => (string) $token,
-            'paymentstatus' => (int) $paymentStatus,
+            'token' => $token,
+            'paymentstatus' => $paymentStatus,
             'paymentdate' => (string) $paymentDate,
         ];
         return $this->callApiFunction('invoices/invoice_paymentstatus_set', $message)->setMainResponseKey('invoice');
@@ -566,12 +563,12 @@ class Acumulus
      *   The token for the invoice.
      * @param array $emailAsPdf
      *   An array with the fields:
-     *   - emailto
-     *   - emailbcc
-     *   - emailfrom
-     *   - subject
-     *   - message
-     *   - confirmreading
+     * - 'emailto'
+     * - 'emailbcc'
+     * - 'emailfrom'
+     * - 'subject'
+     * - 'message'
+     * - 'confirmreading'
      * @param int|null $invoiceType
      *   One of the constants Api::Email_Normal (default) or Api::Email_Reminder.
      * @param string $invoiceNotes
@@ -582,8 +579,8 @@ class Acumulus
      * @return \Siel\Acumulus\ApiClient\Result
      *   The result of the webservice call. The structured response will contain
      *   1 "invoice" array, being a keyed array with keys:
-     *   - token
-     *   - invoicetype
+     * - 'token'
+     * - 'invoicetype'
      *   Possible errors/warnings:
      *   - GK6FKHU52: Incorrect invoicetype value used (9) in invoicetype tag as
      *     part of invoice section in the XML. Using default value of 0 normal."
@@ -594,17 +591,17 @@ class Acumulus
      *
      * @noinspection PhpUnused
      */
-    public function emailInvoiceAsPdf($token, array $emailAsPdf, $invoiceType = null, $invoiceNotes = '')
+    public function emailInvoiceAsPdf(string $token, array $emailAsPdf, int $invoiceType = null, string $invoiceNotes = ''): Result
     {
         $message = [
-            'token' => (string) $token,
+            'token' => $token,
             'emailaspdf' => $emailAsPdf,
         ];
         if ($invoiceType !== null) {
-            $message['invoicetype'] = (int) $invoiceType;
+            $message['invoicetype'] = $invoiceType;
         }
         if (!empty($invoiceNotes)) {
-            $message['invoicenotes'] = (string) $invoiceNotes;
+            $message['invoicenotes'] = $invoiceNotes;
         }
         return $this->callApiFunction('invoices/invoice_mail', $message)->setMainResponseKey('invoice');
     }
@@ -628,7 +625,7 @@ class Acumulus
      *   - address (mandatory) Address including house number.
      *   - postalcode (mandatory)
      *   - city (mandatory)
-     *   - telephone
+     * - 'telephone'
      *   - bankaccount Preference is to use a valid IBAN-code so Acumulus can
      *     improve preparation of the (trial) sign up.
      *   - email (mandatory)
@@ -643,11 +640,11 @@ class Acumulus
      * @return \Siel\Acumulus\ApiClient\Result
      *   The result of the webservice call. The structured response will contain
      *   1 "signup" array, being a keyed array with keys:
-     *   - contractcode
-     *   - contractloginname
-     *   - contractpassword
-     *   - contractapiuserloginname
-     *   - contractapiuserpassword
+     * - 'contractcode'
+     * - 'contractloginname'
+     * - 'contractpassword'
+     * - 'contractapiuserloginname'
+     * - 'contractapiuserpassword'
      *
      *   Possible errors/warnings:
      *   - AA7E10AA: Verplichte companyname ontbreekt
@@ -660,7 +657,7 @@ class Acumulus
      *
      * @noinspection PhpUnused
      */
-    public function signUp(array $signUp)
+    public function signUp(array $signUp): Result
     {
         $message = [
             'signup' => $signUp,
@@ -683,26 +680,26 @@ class Acumulus
      *   The description to store with the stock update. Ideally, this field
      *   should identify the system and transaction that triggered the update
      *   In this context thus probably shop and order/refund number.
-     * @param string $date
+     * @param string|null $date
      *   ISO date string (yyyy-mm-dd) for the date to set as update date for the
      *   stock update.
      *
      * @return \Siel\Acumulus\ApiClient\Result
      *   The result of the webservice call. The structured response will contain
      *   1 "stock" array, being a keyed array with keys:
-     *   - productid
+     * - 'productid'
      *   - stockamount (the new stock level for this product)
      *   Possible errors:
      */
-    public function stockAdd($productId, $quantity, $description, $date = null)
+    public function stockAdd(int $productId, float $quantity, string $description, string $date = null): Result
     {
         if (empty($date)) {
             $date = date(Api::DateFormat_Iso);
         }
         $message = [
             'stock' => [
-                'productid' => (int) $productId,
-                'stockamount' => (float) $quantity,
+                'productid' => $productId,
+                'stockamount' => $quantity,
                 'stockdescription' => $description,
                 'stockdate' => $date,
             ]
@@ -727,7 +724,7 @@ class Acumulus
      *   - PDFATNF04: Requested invoice for $token not found: $token does not
      *     exist.
      */
-    public function getInvoicePdfUri($token, $applyGraphics = true)
+    public function getInvoicePdfUri(string $token, bool $applyGraphics = true): string
     {
         $uri = $this->constructUri('invoices/invoice_get_pdf');
         $uri .= "?token=$token";
@@ -751,7 +748,7 @@ class Acumulus
      *   - ZKFATNF04: Requested packing slip for $token not found or no longer
      *     available.
      */
-    public function getPackingSlipUri($token)
+    public function getPackingSlipUri(string $token): string
     {
         $uri = $this->constructUri('delivery/packing_slip_get_pdf');
         $uri .= "?token=$token";
@@ -767,7 +764,7 @@ class Acumulus
      * @return string
      *   The uri to the requested API service.
      */
-    protected function constructUri($apiFunction)
+    protected function constructUri(string $apiFunction): string
     {
         $environment = $this->config->getEnvironment();
         return $environment['baseUri'] . '/' . $environment['apiVersion'] . '/' . $apiFunction . '.php';
@@ -795,7 +792,7 @@ class Acumulus
      * @return \Siel\Acumulus\ApiClient\Result
      *   A Result object containing the results.
      */
-    protected function callApiFunction($apiFunction, array $message, $needContract = true, Result $result = null)
+    protected function callApiFunction(string $apiFunction, array $message, bool $needContract = true, Result $result = null): Result
     {
         $acumulusRequest = $this->container->getAcumulusRequest();
         $uri = $this->constructUri($apiFunction);

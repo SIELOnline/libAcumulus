@@ -1,9 +1,4 @@
 <?php
-/**
- * @noinspection PhpMissingParamTypeInspection
- * @noinspection PhpMissingReturnTypeInspection
- */
-
 namespace Siel\Acumulus\Config;
 
 use Siel\Acumulus\Api;
@@ -22,52 +17,52 @@ use const Siel\Acumulus\Version;
  */
 class Config
 {
-    const configVersion = 'configVersion';
+    public const configVersion = 'configVersion';
 
-    const Concept_Plugin = 2;
+    public const Concept_Plugin = 2;
 
-    const Send_SendAndMailOnError = 1;
-    const Send_SendAndMail = 2;
-    const Send_TestMode = 3;
+    public const Send_SendAndMailOnError = 1;
+    public const Send_SendAndMail = 2;
+    public const Send_TestMode = 3;
 
-    const MissingAmount_Ignore = 1;
-    const MissingAmount_Warn = 2;
-    const MissingAmount_AddLine = 3;
+    public const MissingAmount_Ignore = 1;
+    public const MissingAmount_Warn = 2;
+    public const MissingAmount_AddLine = 3;
 
-    const InvoiceNrSource_ShopInvoice = 1;
-    const InvoiceNrSource_ShopOrder = 2;
-    const InvoiceNrSource_Acumulus = 3;
+    public const InvoiceNrSource_ShopInvoice = 1;
+    public const InvoiceNrSource_ShopOrder = 2;
+    public const InvoiceNrSource_Acumulus = 3;
 
-    const InvoiceDate_InvoiceCreate = 1;
-    const InvoiceDate_OrderCreate = 2;
-    const InvoiceDate_Transfer = 3;
+    public const InvoiceDate_InvoiceCreate = 1;
+    public const InvoiceDate_OrderCreate = 2;
+    public const InvoiceDate_Transfer = 3;
 
-    const Nature_Unknown = 0;
-    const Nature_Services = 1;
-    const Nature_Products = 2;
-    const Nature_Both = 3;
+    public const Nature_Unknown = 0;
+    public const Nature_Services = 1;
+    public const Nature_Products = 2;
+    public const Nature_Both = 3;
 
-    const MarginProducts_Unknown = 0;
-    const MarginProducts_Both = 1;
-    const MarginProducts_No = 2;
-    const MarginProducts_Only = 3;
+    public const MarginProducts_Unknown = 0;
+    public const MarginProducts_Both = 1;
+    public const MarginProducts_No = 2;
+    public const MarginProducts_Only = 3;
 
-    const VatClass_NotApplicable = 'vat_class_not_applicable';
+    public  const VatClass_NotApplicable = 'vat_class_not_applicable';
     // Note: used both as value in Config and as value for Meta::VatClassId.
-    const VatClass_Null = 'vat_class_null';
+    public const VatClass_Null = 'vat_class_null';
 
-    const TriggerInvoiceEvent_None = 0;
-    const TriggerInvoiceEvent_Create = 1;
-    const TriggerInvoiceEvent_Send = 2;
+    public const TriggerInvoiceEvent_None = 0;
+    public const TriggerInvoiceEvent_Create = 1;
+    public const TriggerInvoiceEvent_Send = 2;
 
-    const TriggerCreditNoteEvent_None = 0;
-    const TriggerCreditNoteEvent_Create = 1;
+    public const TriggerCreditNoteEvent_None = 0;
+    public const TriggerCreditNoteEvent_Create = 1;
 
     /** @var \Siel\Acumulus\Config\ConfigStore */
-    protected $configStore;
+    private $configStore;
 
     /** @var \Siel\Acumulus\Config\ShopCapabilities */
-    protected $shopCapabilities;
+    private $shopCapabilities;
 
     /** @var \Siel\Acumulus\Helpers\Container */
     protected $container;
@@ -92,16 +87,13 @@ class Config
     /** @var array */
     protected $values;
 
-    /**
-     * Config constructor.
-     *
-     * @param \Siel\Acumulus\Config\ConfigStore $configStore
-     * @param \Siel\Acumulus\Config\ShopCapabilities $shopCapabilities
-     * @param \Siel\Acumulus\Helpers\Container $container
-     * @param \Siel\Acumulus\Helpers\Translator $translator
-     * @param \Siel\Acumulus\Helpers\Log $log
-     */
-    public function __construct(ConfigStore $configStore, ShopCapabilities $shopCapabilities, Container $container, Translator $translator, Log $log)
+    public function __construct(
+        ConfigStore $configStore,
+        ShopCapabilities $shopCapabilities,
+        Container $container,
+        Translator $translator,
+        Log $log
+    )
     {
         $this->configStore = $configStore;
         $this->shopCapabilities = $shopCapabilities;
@@ -124,7 +116,7 @@ class Config
      *   The translation for the given key or the key itself if no translation
      *   could be found.
      */
-    protected function t($key)
+    protected function t(string $key): string
     {
         return $this->translator->get($key);
     }
@@ -134,7 +126,7 @@ class Config
      *
      * @return \Siel\Acumulus\Config\ConfigStore
      */
-    protected function getConfigStore()
+    protected function getConfigStore(): ConfigStore
     {
         return $this->configStore;
     }
@@ -144,7 +136,7 @@ class Config
      *
      * @return \Siel\Acumulus\Config\ShopCapabilities
      */
-    protected function getShopCapabilities()
+    protected function getShopCapabilities(): ShopCapabilities
     {
         return $this->shopCapabilities;
     }
@@ -187,7 +179,7 @@ class Config
      * @return bool
      *   Success.
      */
-    public function save(array $values)
+    public function save(array $values): bool
     {
         // Log values in a notice but without the password.
         $copy = $values;
@@ -229,7 +221,7 @@ class Config
      * @return array
      *   Array with cast values.
      */
-    protected function castValues(array $values)
+    protected function castValues(array $values): array
     {
         $keyInfos = $this->getKeyInfo();
         foreach ($keyInfos as $key => $keyInfo) {
@@ -280,7 +272,7 @@ class Config
      * @return array
      *   The set of values passed in reduced to those values to be stored.
      */
-    protected function removeValuesNotToBeStored(array $values)
+    protected function removeValuesNotToBeStored(array $values): array
     {
         $result = [];
         $keys = $this->getKeys();
@@ -300,7 +292,7 @@ class Config
      *
      * @noinspection PhpUnused
      */
-    public function getShowRatePluginMessage()
+    public function getShowRatePluginMessage(): ?int
     {
         return $this->get('showRatePluginMessage');
     }
@@ -328,7 +320,7 @@ class Config
      *   will be a simple type (string, int, bool) or a keyed array with simple
      *   values.
      */
-    public function get($key)
+    public function get(string $key)
     {
         $this->load();
         return $this->values[$key] ?? null;
@@ -337,7 +329,7 @@ class Config
     /**
      * Sets the internal value of the specified configuration key.
      *
-     * This value will not be stored, use save() for that.
+     * NOTE: This value will not be stored, use save() for that.
      *
      * @param string $key
      *   The configuration value to set.
@@ -345,9 +337,9 @@ class Config
      *   The new value for the configuration key.
      *
      * @return mixed
-     *   The old value.
+     *   The old value, or null if it was not yet set.
      */
-    public function set($key, $value)
+    public function set(string $key, $value)
     {
         $this->load();
         $oldValue = $this->values[$key] ?? null;
@@ -360,19 +352,19 @@ class Config
      *
      * @return array
      *   A keyed array with information about the environment of this library:
-     *   - baseUri
-     *   - apiVersion
-     *   - libraryVersion
-     *   - moduleVersion
-     *   - shopName
-     *   - shopVersion
-     *   - hostName
-     *   - phpVersion
-     *   - os
-     *   - curlVersion
-     *   - jsonVersion
+     *   - 'baseUri'
+     *   - 'apiVersion'
+     *   - 'libraryVersion'
+     *   - 'moduleVersion'
+     *   - 'shopName'
+     *   - 'shopVersion'
+     *   - 'hostName'
+     *   - 'phpVersion'
+     *   - 'os'
+     *   - 'curlVersion'
+     *   - 'jsonVersion'
      */
-    public function getEnvironment()
+    public function getEnvironment(): array
     {
         return $this->getSettingsByGroup('environment');
     }
@@ -382,13 +374,13 @@ class Config
      *
      * @return array
      *   A keyed array with the keys:
-     *   - contractcode
-     *   - username
-     *   - password
-     *   - emailonerror
-     *   - emailonwarning
+     *   - 'contractcode'
+     *   - 'username'
+     *   - 'password'
+     *   - 'emailonerror'
+     *   - 'emailonwarning'
      */
-    public function getCredentials()
+    public function getCredentials(): array
     {
         $result = $this->getSettingsByGroup('credentials');
         // No separate key for now.
@@ -401,11 +393,11 @@ class Config
      *
      * @return array
      *   A keyed array with the keys:
-     *   - debug
-     *   - logLevel
-     *   - outputFormat
+     *   - 'debug'
+     *   - 'logLevel'
+     *   - 'outputFormat'
      */
-    public function getPluginSettings()
+    public function getPluginSettings(): array
     {
         return $this->getSettingsByGroup('plugin');
     }
@@ -415,12 +407,12 @@ class Config
      *
      * @return array
      *   A keyed array with the keys:
-     *   - triggerOrderStatus
-     *   - triggerInvoiceEvent
-     *   - triggerCreditNoteEvent
-     *   - sendEmptyInvoice
+     *   - 'triggerOrderStatus'
+     *   - 'triggerInvoiceEvent'
+     *   - 'triggerCreditNoteEvent'
+     *   - 'sendEmptyInvoice'
      */
-    public function getShopEventSettings()
+    public function getShopEventSettings(): array
     {
         return $this->getSettingsByGroup('event');
     }
@@ -433,14 +425,14 @@ class Config
      * @return array
      *   A keyed array with the keys:
      *   - nature_shop
-     *   - marginProducts
-     *   - euVatClasses
-     *   - vatFreeClass
-     *   - zeroVatClass
-     *   - invoiceNrSource
-     *   - dateToUse
+     *   - 'marginProducts'
+     *   - 'euVatClasses'
+     *   - 'vatFreeClass'
+     *   - 'zeroVatClass'
+     *   - 'invoiceNrSource'
+     *   - 'dateToUse'
      */
-    public function getShopSettings()
+    public function getShopSettings(): array
     {
         return $this->getSettingsByGroup('shop');
     }
@@ -450,27 +442,27 @@ class Config
      *
      * @return array
      *   A keyed array with the keys:
-     *   - sendCustomer
-     *   - overwriteIfExists
-     *   - defaultCustomerType
-     *   - contactStatus
-     *   - contactYourId
-     *   - companyName1
-     *   - companyName2
-     *   - vatNumber
-     *   - fullName
-     *   - salutation
-     *   - address1
-     *   - address2
-     *   - postalCode
-     *   - city
-     *   - telephone
-     *   - fax
-     *   - email
-     *   - mark
-     *   - genericCustomerEmail
+     *   - 'sendCustomer'
+     *   - 'overwriteIfExists'
+     *   - 'defaultCustomerType'
+     *   - 'contactStatus'
+     *   - 'contactYourId'
+     *   - 'companyName1'
+     *   - 'companyName2'
+     *   - 'vatNumber'
+     *   - 'fullName'
+     *   - 'salutation'
+     *   - 'address1'
+     *   - 'address2'
+     *   - 'postalCode'
+     *   - 'city'
+     *   - 'telephone'
+     *   - 'fax'
+     *   - 'email'
+     *   - 'mark'
+     *   - 'genericCustomerEmail'
      */
-    public function getCustomerSettings()
+    public function getCustomerSettings(): array
     {
         return $this->getSettingsByGroup(Tag::Customer);
     }
@@ -480,29 +472,29 @@ class Config
      *
      * @return array
      *   A keyed array with the keys:
-     *   - concept
-     *   - euCommerceThresholdPercentage
-     *   - missingAmount
-     *   - defaultAccountNumber
-     *   - defaultCostCenter
-     *   - defaultInvoiceTemplate
-     *   - defaultInvoicePaidTemplate
-     *   - paymentMethodAccountNumber
-     *   - paymentMethodCostCenter
-     *   - sendEmptyShipping
-     *   - description
-     *   - descriptionText
-     *   - invoiceNotes
-     *   - optionsShow
-     *   - optionsAllOn1Line
-     *   - optionsAllOnOwnLine
-     *   - optionsMaxLength
-     *   - itemNumber
-     *   - productName
-     *   - nature
-     *   - costPrice
+     *   - 'concept'
+     *   - 'euCommerceThresholdPercentage'
+     *   - 'missingAmount'
+     *   - 'defaultAccountNumber'
+     *   - 'defaultCostCenter'
+     *   - 'defaultInvoiceTemplate'
+     *   - 'defaultInvoicePaidTemplate'
+     *   - 'paymentMethodAccountNumber'
+     *   - 'paymentMethodCostCenter'
+     *   - 'sendEmptyShipping'
+     *   - 'description'
+     *   - 'descriptionText'
+     *   - 'invoiceNotes'
+     *   - 'optionsShow'
+     *   - 'optionsAllOn1Line'
+     *   - 'optionsAllOnOwnLine'
+     *   - 'optionsMaxLength'
+     *   - 'itemNumber'
+     *   - 'productName'
+     *   - 'nature'
+     *   - 'costPrice'
      */
-    public function getInvoiceSettings()
+    public function getInvoiceSettings(): array
     {
         return $this->getSettingsByGroup(Tag::Invoice);
     }
@@ -512,13 +504,13 @@ class Config
      *
      * @return array
      *   A keyed array with the keys:
-     *   - emailAsPdf
-     *   - emailBcc
-     *   - emailFrom
-     *   - subject
-     *   - confirmReading
+     *   - 'emailAsPdf'
+     *   - 'emailBcc'
+     *   - 'emailFrom'
+     *   - 'subject'
+     *   - 'confirmReading'
      */
-    public function getEmailAsPdfSettings()
+    public function getEmailAsPdfSettings(): array
     {
         return $this->getSettingsByGroup(Tag::EmailAsPdf);
     }
@@ -528,11 +520,11 @@ class Config
      *
      * @return array
      *   A keyed array with the keys:
-     *   - showInvoiceStatus
-     *   - showPdfInvoice
-     *   - showPdfPackingSlip
+     *   - 'showInvoiceStatus'
+     *   - 'showPdfInvoice'
+     *   - 'showPdfPackingSlip'
      */
-    public function getInvoiceStatusSettings()
+    public function getInvoiceStatusSettings(): array
     {
         return $this->getSettingsByGroup('status');
     }
@@ -545,7 +537,7 @@ class Config
      * @return array
      *   An array of settings.
      */
-    protected function getSettingsByGroup($group)
+    protected function getSettingsByGroup(string $group): array
     {
         $result = [];
         foreach ($this->getKeyInfo() as $key => $keyInfo) {
@@ -561,7 +553,7 @@ class Config
      *
      * @return array
      */
-    public function getKeys()
+    public function getKeys(): array
     {
         $result = $this->getKeyInfo();
         array_filter($result, function ($item) {
@@ -575,7 +567,7 @@ class Config
      *
      * @return array
      */
-    public function getDefaults()
+    public function getDefaults(): array
     {
         return array_merge($this->getConfigDefaults(), $this->getShopDefaults());
     }
@@ -587,7 +579,7 @@ class Config
      *
      * @return array
      */
-    protected function getConfigDefaults()
+    protected function getConfigDefaults(): array
     {
         $result = $this->getKeyInfo();
         return array_map(function ($item) {
@@ -602,7 +594,7 @@ class Config
      *
      * @return array
      */
-    protected function getShopDefaults()
+    protected function getShopDefaults(): array
     {
         return $this->getShopCapabilities()->getShopDefaults();
     }
@@ -616,7 +608,7 @@ class Config
      * @return string
      *   The hostname of the current request.
      */
-    protected function getHostName()
+    protected function getHostName(): string
     {
         if (!empty($_SERVER['REQUEST_URI'])) {
             $hostName = parse_url($_SERVER['REQUEST_URI'], PHP_URL_HOST);
@@ -639,7 +631,7 @@ class Config
      *   A keyed array with information (group and type) about the keys that are
      *   stored in the store config.
      */
-    protected function getKeyInfo()
+    protected function getKeyInfo(): ?array
     {
         if ($this->keyInfo === null) {
             $curlVersion = curl_version();

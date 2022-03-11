@@ -2,7 +2,7 @@
 namespace Siel\Acumulus\TestWebShop\TestDoubles\ApiClient;
 
 use Siel\Acumulus\Helpers\Severity;
-use \Siel\Acumulus\ApiClient\Result as BaseResult;
+use Siel\Acumulus\ApiClient\Result as BaseResult;
 
 class Result extends BaseResult
 {

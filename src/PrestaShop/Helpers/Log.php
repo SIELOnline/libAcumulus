@@ -30,7 +30,7 @@ class Log extends BaseLog
      *
      * This override uses the PrestaShopLogger.
      */
-    protected function write($message, $severity)
+    protected function write(string $message, int $severity)
     {
         $logger = $this->getLogger();
         $logger->log($message, $this->getPrestaShopSeverity($severity));

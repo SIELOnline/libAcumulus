@@ -1,4 +1,8 @@
 <?php
+/**
+ * @noinspection PhpStaticAsDynamicMethodCallInspection
+ */
+
 namespace Siel\Acumulus\Unit\Helpers;
 
 use PHPUnit\Framework\TestCase;
@@ -17,7 +21,7 @@ class MessageTest extends TestCase
         $translator->add(new SeverityTranslations());
     }
 
-    public function testCreateWithAllParams1()
+    public function testCreateWithAllParams1(): Message
     {
         $message = new Message('Message 701', Severity::Error, 'S1', 0);
         $this->assertEquals('Message 701', $message->getText());
@@ -29,7 +33,7 @@ class MessageTest extends TestCase
         return $message;
     }
 
-    public function testCreateWithAllParams2()
+    public function testCreateWithAllParams2(): Message
     {
         $message = new Message('Message 701 empty codes', Severity::Success, '', 0);
         $this->assertEquals('Message 701 empty codes', $message->getText());
@@ -41,7 +45,7 @@ class MessageTest extends TestCase
         return $message;
     }
 
-    public function testCreateWithArray()
+    public function testCreateWithArray(): Message
     {
         $message = new Message(['code' => 702, 'codetag' => 'W2', 'message' => 'Message 702'], Severity::Warning);
         $this->assertEquals('Message 702', $message->getText());
@@ -53,7 +57,7 @@ class MessageTest extends TestCase
         return $message;
     }
 
-    public function testCreateWithException()
+    public function testCreateWithException(): Message
     {
         $e = new RuntimeException('Message 703', 703);
         $message = new Message($e);
@@ -66,7 +70,7 @@ class MessageTest extends TestCase
         return $message;
     }
 
-    public function testCreateFormFieldError()
+    public function testCreateFormFieldError(): Message
     {
         $message = new Message('Not a valid e-mail address', Severity::Error, 'email');
         $this->assertEquals('Not a valid e-mail address', $message->getText());

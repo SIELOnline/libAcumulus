@@ -19,7 +19,7 @@ class Log extends BaseLog
     /**
      * {@inheritdoc}
      */
-    protected function write($message, $severity)
+    protected function write(string $message, int $severity)
     {
         // @todo: adapt to MyWebshop's way of logging.
         // @todo: If you do not log to a separate Acumulus log file, you may want to add 'Acumulus' (and the library version) to the message to log.

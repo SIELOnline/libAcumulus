@@ -1,4 +1,9 @@
 <?php
+/**
+ * @noinspection PhpStaticAsDynamicMethodCallInspection
+ * @noinspection DuplicatedCode
+ */
+
 namespace Siel\Acumulus\Unit\Helpers;
 
 use PHPUnit\Framework\TestCase;
@@ -22,7 +27,7 @@ class MessageCollectionTest extends TestCase
         $this->translator->add(new SeverityTranslations());
     }
 
-    public function testCreateMessageCollection()
+    public function testCreateMessageCollection(): MessageCollection
     {
         $collection = new MessageCollection();
         $this->assertEquals(Severity::Unknown, $collection->getSeverity());
@@ -49,7 +54,7 @@ class MessageCollectionTest extends TestCase
      *
      * @return \Siel\Acumulus\Helpers\MessageCollection
      */
-    public function testAddLogMessage(MessageCollection $collection)
+    public function testAddLogMessage(MessageCollection $collection): MessageCollection
     {
         $collection->addMessage('log', Severity::Log);
 
@@ -77,7 +82,7 @@ class MessageCollectionTest extends TestCase
      *
      * @return \Siel\Acumulus\Helpers\MessageCollection
      */
-    public function testAddMessage(MessageCollection $collection)
+    public function testAddMessage(MessageCollection $collection): MessageCollection
     {
         $collection->addMessage('suc6', Severity::Success);
 
@@ -105,7 +110,7 @@ class MessageCollectionTest extends TestCase
      *
      * @return \Siel\Acumulus\Helpers\MessageCollection
      */
-    public function testAddMessage2(MessageCollection $collection)
+    public function testAddMessage2(MessageCollection $collection): MessageCollection
     {
         $collection->addMessage(new Message('Message 702', Severity::Error, 'E2', '403 Forbidden'));
 
@@ -134,7 +139,7 @@ class MessageCollectionTest extends TestCase
      *
      * @return \Siel\Acumulus\Helpers\MessageCollection
      */
-    public function testAddMessages(MessageCollection $collection)
+    public function testAddMessages(MessageCollection $collection): MessageCollection
     {
         $messages = [
             new Message('Message 703', Severity::Info, 'I0', 700),

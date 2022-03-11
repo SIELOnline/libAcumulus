@@ -1,24 +1,4 @@
 <?php
-/**
- * Note: As long as we want to check for a minimal PHP version via the
- * Requirements checking process provided by the classes below, and we want to
- * properly log and inform the user, we should not use PHP7 language constructs
- * in the following classes (and its child classes):
- * - {@see Container}: creates instances of the below classes.
- * - {@see Requirements}: executes the checks.
- * - {@see \Siel\Acumulus\Config\ConfigUpgrade}: initiates the check.
- * - {@see \Siel\Acumulus\Helpers\Severity}: part of a failed check.
- * - {@see \Siel\Acumulus\Helpers\Message}: represents a failed check.
- * - {@see \Siel\Acumulus\Helpers\MessageCollection}: represents failed checks.
- * - {@see Log}: Logs failed checks.
- *
- * The PHP7 language constructs we suppress the warnings for:
- * @noinspection PhpMissingParamTypeInspection
- * @noinspection PhpMissingReturnTypeInspection
- * @noinspection PhpMissingFieldTypeInspection
- * @noinspection PhpMissingVisibilityInspection
- */
-
 namespace Siel\Acumulus\Config;
 
 use RuntimeException;
@@ -126,7 +106,7 @@ class ConfigUpgrade
      * @return bool
      *   Success.
      */
-    public function applyUpgrades(string $currentVersion): bool
+    protected function applyUpgrades(string $currentVersion): bool
     {
         // Let's start with a Requirements check and fail if not all are met.
         $requirements = $this->getContainer()->getRequirements();
@@ -194,7 +174,6 @@ class ConfigUpgrade
 
         return $result;
     }
-
 
     /**
      * 4.5.0 upgrade.

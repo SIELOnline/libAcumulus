@@ -4,6 +4,7 @@
 namespace Siel\Acumulus\Integration\ApiClient;
 
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use Siel\Acumulus\ApiClient\HttpRequest;
 
 /**
@@ -114,7 +115,7 @@ class HttpRequestResponseTest extends TestCase
 
     public function testInvalidDomain()
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $uri = 'https://example0987654321.com/';
         $this->httpRequest->get($uri);
     }

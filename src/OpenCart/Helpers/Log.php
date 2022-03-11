@@ -24,7 +24,7 @@ class Log extends BaseLog
      *
      * This override uses the OpenCart Log class.
      */
-    protected function write($message, $severity)
+    protected function write(string $message, int $severity)
     {
         $log = new \Log('acumulus.log');
         $message = sprintf('%s - %s', $this->getSeverityString($severity), $message);

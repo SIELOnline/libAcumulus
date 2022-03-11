@@ -19,7 +19,7 @@ class Mailer extends BaseMailer
     /**
      * {@inheritdoc}
      */
-    protected function getFrom()
+    protected function getFrom(): string
     {
         return 'unit.test@burorader.com';
     }
@@ -27,7 +27,7 @@ class Mailer extends BaseMailer
     /**
      * {@inheritdoc}
      */
-    protected function getFromName()
+    protected function getFromName(): string
     {
         return 'Unit Test | Buro RaDer';
     }

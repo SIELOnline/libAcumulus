@@ -1,23 +1,4 @@
 <?php
-/**
- * Note: As long as we want to check for a minimal PHP version via the
- * Requirements checking process provided by the classes below, we should not
- * use PHP7 language constructs in the following classes:
- * - {@see Container}: creates instances of the below classes.
- * - {@see Requirements}: executes the checks.
- * - {@see \Siel\Acumulus\Config\ConfigUpgrade}: initiates the check.
- * - {@see \Siel\Acumulus\Helpers\Severity}: part of a failed check.
- * - {@see \Siel\Acumulus\Helpers\Message}: represents a failed check.
- * - {@see \Siel\Acumulus\Helpers\MessageCollection}: represents failed checks.
- * - {@see Log}: Logs failed checks.
- *
- * The PHP7 language constructs we suppress the warnings for:
- * @noinspection PhpMissingParamTypeInspection
- * @noinspection PhpMissingReturnTypeInspection
- * @noinspection PhpMissingFieldTypeInspection
- * @noinspection PhpMissingVisibilityInspection
- */
-
 namespace Siel\Acumulus;
 
 const Version = '7.0.0-alpha1';
@@ -25,6 +6,27 @@ const Version = '7.0.0-alpha1';
 namespace Siel\Acumulus\Helpers;
 
 use InvalidArgumentException;
+use Siel\Acumulus\ApiClient\Acumulus;
+use Siel\Acumulus\ApiClient\AcumulusRequest;
+use Siel\Acumulus\ApiClient\Result;
+use Siel\Acumulus\Config\Config;
+
+use Siel\Acumulus\Config\ConfigStore;
+use Siel\Acumulus\Config\ConfigUpgrade;
+use Siel\Acumulus\Config\ShopCapabilities;
+use Siel\Acumulus\Invoice\Completor;
+use Siel\Acumulus\Invoice\CompletorInvoiceLines;
+use Siel\Acumulus\Invoice\CompletorStrategyLines;
+use Siel\Acumulus\Invoice\Creator;
+use Siel\Acumulus\Invoice\FlattenerInvoiceLines;
+use Siel\Acumulus\Invoice\Result as InvoiceResult;
+use Siel\Acumulus\Invoice\Source;
+use Siel\Acumulus\Shop\AcumulusEntry;
+
+use Siel\Acumulus\Shop\AcumulusEntryManager;
+
+use Siel\Acumulus\Shop\InvoiceManager;
+
 use const Siel\Acumulus\Version;
 
 /**
@@ -133,7 +135,7 @@ use const Siel\Acumulus\Version;
 class Container
 {
     /** @const string */
-    const baseNamespace = '\\Siel\\Acumulus';
+    public const baseNamespace = '\\Siel\\Acumulus';
 
     /**
      * The namespace for the current shop.
@@ -171,7 +173,7 @@ class Container
      *   A language or locale code, e.g. nl, nl-NL, or en-UK. Only the first 2
      *   characters will be used.
      */
-    public function __construct($shopNamespace, $language = 'nl')
+    public function __construct(string $shopNamespace, string $language = 'nl')
     {
         $this->shopNamespace = '';
         if (strpos($shopNamespace, 'Acumulus') === false) {
@@ -184,7 +186,7 @@ class Container
     /**
      * @return string
      */
-    public function getLanguage()
+    public function getLanguage(): string
     {
         return $this->language;
     }
@@ -198,7 +200,7 @@ class Container
      *
      * @return $this
      */
-    public function setLanguage($language)
+    public function setLanguage(string $language): Container
     {
         $this->language = substr($language, 0, 2);
         return $this;
@@ -213,7 +215,7 @@ class Container
      *   It should start with a \, but not end with it.
      *
      */
-    public function setCustomNamespace($customNamespace)
+    public function setCustomNamespace(string $customNamespace)
     {
         $this->customNamespace = $customNamespace;
     }
@@ -221,7 +223,7 @@ class Container
     /**
      * @return \Siel\Acumulus\Helpers\Translator
      */
-    public function getTranslator()
+    public function getTranslator(): Translator
     {
         /** @var \Siel\Acumulus\Helpers\Translator $translator */
         $translator = $this->getInstance('Translator', 'Helpers', [$this->getLanguage()]);
@@ -246,139 +248,82 @@ class Container
      *
      * @param string $class
      *   The name of the class to search. The class should extend
-     *   {@see \Siel\Acumulus\Helpers\TranslationCollection}.
+     *   {@see TranslationCollection}.
      * @param string $subNameSpace
      *   The namespace in which $class resides.
      *
      * @throws \InvalidArgumentException
      */
-    public function addTranslations($class, $subNameSpace)
+    public function addTranslations(string $class, string $subNameSpace)
     {
         /** @noinspection PhpParamsInspection */
         $this->getTranslator()->add($this->getInstance($class, $subNameSpace));
     }
 
-    /**
-     * @return \Siel\Acumulus\Helpers\Log
-     *
-     * @noinspection PhpReturnDocTypeMismatchInspection
-     */
-    public function getLog()
+    public function getLog(): Log
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('Log', 'Helpers', [Version]);
     }
 
-    /**
-     * @return \Siel\Acumulus\Helpers\Requirements
-     *
-     * @noinspection PhpReturnDocTypeMismatchInspection
-     */
-    public function getRequirements()
+    public function getRequirements(): Requirements
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('Requirements', 'Helpers');
     }
 
-    /**
-     * @return \Siel\Acumulus\Helpers\Countries
-     *
-     * @noinspection PhpReturnDocTypeMismatchInspection
-     */
-    public function getCountries()
+    public function getCountries(): Countries
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('Countries', 'Helpers');
     }
 
-    /**
-     * @return \Siel\Acumulus\Helpers\Mailer
-     *
-     * @noinspection PhpReturnDocTypeMismatchInspection
-     */
-    public function getMailer()
+    public function getMailer(): Mailer
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('Mailer', 'Helpers', [$this->getConfig(), $this->getTranslator(), $this->getLog()]);
     }
 
-    /**
-     * @return \Siel\Acumulus\Helpers\Token
-     *
-     * @noinspection PhpReturnDocTypeMismatchInspection
-     */
-    public function getToken()
+    public function getToken(): Token
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('Token', 'Helpers', [$this->getLog()]);
     }
 
-    /**
-     * @return \Siel\Acumulus\Helpers\FormHelper
-     *
-     * @noinspection PhpReturnDocTypeMismatchInspection
-     */
-    public function getFormHelper()
+    public function getFormHelper(): FormHelper
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('FormHelper', 'Helpers', [$this->getTranslator()]);
     }
 
-    /**
-     * @param bool $newInstance
-     *
-     * @return \Siel\Acumulus\Helpers\FormRenderer
-     *
-     * @noinspection PhpReturnDocTypeMismatchInspection
-     */
-    public function getFormRenderer($newInstance = false)
+    public function getFormRenderer(bool $newInstance = false): FormRenderer
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('FormRenderer', 'Helpers', [], $newInstance);
     }
 
     /**
-     * @return \Siel\Acumulus\Helpers\FormMapper
-     *
-     * @noinspection PhpReturnDocTypeMismatchInspection
      * @noinspection PhpUnused
      */
-    public function getFormMapper()
+    public function getFormMapper(): FormMapper
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('FormMapper', 'Helpers', [$this->getLog()]);
     }
 
-    /**
-     * @return \Siel\Acumulus\ApiClient\Acumulus
-     *
-     * @noinspection PhpReturnDocTypeMismatchInspection
-     */
-    public function getAcumulusApiClient()
+    public function getAcumulusApiClient(): Acumulus
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('Acumulus', 'ApiClient', [$this, $this->getConfig()]);
     }
 
-    /**
-     * Creates and returns a new \Siel\Acumulus\ApiClient\Result instance.
-     *
-     * @return \Siel\Acumulus\ApiClient\Result
-     *
-     * @noinspection PhpReturnDocTypeMismatchInspection
-     */
-    public function getResult()
+    public function getResult(): Result
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('Result', 'ApiClient', [$this->getTranslator(), $this->getLog()], true);
     }
 
-    /**
-     * @return \Siel\Acumulus\ApiClient\AcumulusRequest
-     *
-     * @noinspection PhpReturnDocTypeMismatchInspection
-     */
-    public function getAcumulusRequest()
+    public function getAcumulusRequest(): AcumulusRequest
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('AcumulusRequest', 'ApiClient', [$this, $this->getConfig(), $this->getLanguage(), $this->getLog()], true);
@@ -395,10 +340,8 @@ class Container
      *
      * @return \Siel\Acumulus\Invoice\Source
      *   A wrapper object around a shop specific invoice source object.
-     *
-     * @noinspection PhpReturnDocTypeMismatchInspection
      */
-    public function getSource($invoiceSourceType, $invoiceSourceOrId)
+    public function getSource(string $invoiceSourceType, $invoiceSourceOrId): Source
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('Source', 'Invoice', [$invoiceSourceType, $invoiceSourceOrId], true);
@@ -413,21 +356,14 @@ class Container
      *
      * @return \Siel\Acumulus\Invoice\Result
      *   A wrapper object around an Acumulus invoice-add service result.
-     *
-     * @noinspection PhpReturnDocTypeMismatchInspection
      */
-    public function getInvoiceResult($trigger)
+    public function getInvoiceResult(string $trigger): InvoiceResult
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('Result', 'Invoice', [$trigger, $this->getTranslator(), $this->getLog()], true);
     }
 
-    /**
-     * @return \Siel\Acumulus\Invoice\Completor
-     *
-     * @noinspection PhpReturnDocTypeMismatchInspection
-     */
-    public function getCompletor()
+    public function getCompletor(): Completor
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('Completor', 'Invoice', [
@@ -441,55 +377,32 @@ class Container
         ], true);
     }
 
-    /**
-     * @return \Siel\Acumulus\Invoice\CompletorInvoiceLines
-     *
-     * @noinspection PhpReturnDocTypeMismatchInspection
-     */
-    public function getCompletorInvoiceLines()
+    public function getCompletorInvoiceLines(): CompletorInvoiceLines
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('CompletorInvoiceLines', 'Invoice', [$this->getFlattenerInvoiceLines(), $this->getConfig()]);
     }
 
-    /**
-     * @return \Siel\Acumulus\Invoice\FlattenerInvoiceLines
-     *
-     * @noinspection PhpReturnDocTypeMismatchInspection
-     */
-    public function getFlattenerInvoiceLines()
+    public function getFlattenerInvoiceLines(): FlattenerInvoiceLines
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('FlattenerInvoiceLines', 'Invoice', [$this->getConfig()]);
     }
 
-    /**
-     * @return \Siel\Acumulus\Invoice\CompletorStrategyLines
-     *
-     * @noinspection PhpReturnDocTypeMismatchInspection
-     */
-    public function getCompletorStrategyLines()
+    public function getCompletorStrategyLines(): CompletorStrategyLines
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('CompletorStrategyLines', 'Invoice', [$this->getConfig(), $this->getTranslator()]);
     }
 
-    /**
-     * @return \Siel\Acumulus\Invoice\Creator
-     *
-     * @noinspection PhpReturnDocTypeMismatchInspection
-     */
-    public function getCreator()
+    public function getCreator(): Creator
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('Creator', 'Invoice',
             [$this->getToken(), $this->getCountries(), $this->getShopCapabilities(), $this, $this->getConfig(), $this->getTranslator(), $this->getLog()]);
     }
 
-    /**
-     * @return \Siel\Acumulus\Config\Config
-     */
-    public function getConfig()
+    public function getConfig(): Config
     {
         static $is1stTime = true;
 
@@ -504,56 +417,31 @@ class Container
         return $config;
     }
 
-    /**
-     * @return \Siel\Acumulus\Config\ConfigUpgrade
-     *
-     * @noinspection PhpReturnDocTypeMismatchInspection
-     */
-    public function getConfigUpgrade()
+    public function getConfigUpgrade(): ConfigUpgrade
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('ConfigUpgrade', 'Config', [$this->getConfig(), $this->getConfigStore(), $this, $this->getLog()]);
     }
 
-    /**
-     * @return \Siel\Acumulus\Config\ConfigStore
-     *
-     * @noinspection PhpReturnDocTypeMismatchInspection
-     */
-    public function getConfigStore()
+    public function getConfigStore(): ConfigStore
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('ConfigStore', 'Config');
     }
 
-    /**
-     * @return \Siel\Acumulus\Config\ShopCapabilities
-     *
-     * @noinspection PhpReturnDocTypeMismatchInspection
-     */
-    public function getShopCapabilities()
+    public function getShopCapabilities(): ShopCapabilities
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('ShopCapabilities', 'Config', [$this->shopNamespace, $this->getTranslator(), $this->getLog()]);
     }
 
-    /**
-     * @return \Siel\Acumulus\Shop\InvoiceManager
-     *
-     * @noinspection PhpReturnDocTypeMismatchInspection
-     */
-    public function getInvoiceManager()
+    public function getInvoiceManager(): InvoiceManager
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('InvoiceManager', 'Shop', [$this]);
     }
 
-    /**
-     * @return \Siel\Acumulus\Shop\AcumulusEntryManager
-     *
-     * @noinspection PhpReturnDocTypeMismatchInspection
-     */
-    public function getAcumulusEntryManager()
+    public function getAcumulusEntryManager(): AcumulusEntryManager
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('AcumulusEntryManager', 'Shop', [$this, $this->getLog()]);
@@ -566,10 +454,8 @@ class Container
      *   The Acumulus entry data to populate the object with.
      *
      * @return \Siel\Acumulus\Shop\AcumulusEntry
-     *
-     * @noinspection PhpReturnDocTypeMismatchInspection
      */
-    public function getAcumulusEntry($record)
+    public function getAcumulusEntry($record): AcumulusEntry
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('AcumulusEntry', 'Shop', [$record], true);
@@ -582,10 +468,8 @@ class Container
      *   The type of form requested.
      *
      * @return \Siel\Acumulus\Helpers\Form
-     *
-     * @noinspection PhpReturnDocTypeMismatchInspection
      */
-    public function getForm($type)
+    public function getForm(string $type): Form
     {
         $arguments = [];
         switch (strtolower($type)) {
@@ -663,8 +547,12 @@ class Container
      *
      * @throws \InvalidArgumentException
      */
-    public function getInstance($class, $subNamespace, array $constructorArgs = [], $newInstance = false)
-    {
+    public function getInstance(
+        string $class,
+        string $subNamespace,
+        array $constructorArgs = [],
+        bool $newInstance = false
+    ): object {
         $instanceKey = "$subNamespace\\$class";
         if (!isset($this->instances[$instanceKey]) || $newInstance) {
             // Try custom namespace.
@@ -715,7 +603,7 @@ class Container
      *   The full name of the class or the empty string if it does not exist in
      *   the given namespace.
      */
-    protected function tryNsInstance($class, $subNamespace, $namespace)
+    protected function tryNsInstance($class, $subNamespace, $namespace): string
     {
         $fqClass = $this->getFqClass($class, $subNamespace, $namespace);
         // Checking if the file exists prevents warnings in Magento whose own
@@ -738,7 +626,7 @@ class Container
      *   The fully qualified class name based on the base namespace, sub
      *   namespace and the class name.
      */
-    protected function getFqClass($class, $subNamespace, $namespace)
+    protected function getFqClass(string $class, string $subNamespace, string $namespace): string
     {
         return $namespace . '\\' . $subNamespace . '\\' . $class;
     }

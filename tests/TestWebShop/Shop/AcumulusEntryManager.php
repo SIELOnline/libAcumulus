@@ -4,7 +4,6 @@ namespace Siel\Acumulus\TestWebShop\Shop;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Invoice\Source;
-use Siel\Acumulus\PluginConfig;
 use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
 use Siel\Acumulus\Shop\AcumulusEntryManager as BaseAcumulusEntryManager;
 
@@ -59,15 +58,16 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    public function getByInvoiceSource(Source $invoiceSource, bool $ignoreLock = true)
+    public function getByInvoiceSource(Source $invoiceSource, bool $ignoreLock = true): ?BaseAcumulusEntry
     {
         // @todo
+        return null;
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function insert(Source $invoiceSource, ?int $entryId, ?string $token, $created)
+    protected function insert(Source $invoiceSource, ?int $entryId, ?string $token, $created): bool
     {
         // @todo: insert a new entry (note that save() takes care of distinguishing between insert and update).
     }
@@ -75,7 +75,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    protected function update(BaseAcumulusEntry $entry, ?int $entryId, ?string $token, $updated)
+    protected function update(BaseAcumulusEntry $entry, ?int $entryId, ?string $token, $updated): bool
     {
         // @todo: update an existing entry (note that save() takes care of distinguishing between insert and update).
     }
@@ -83,7 +83,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * @inheritDoc
      */
-    public function delete(BaseAcumulusEntry $entry)
+    public function delete(BaseAcumulusEntry $entry): bool
     {
         // @todo: delete an existing entry.
     }
@@ -99,7 +99,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    public function install()
+    public function install(): bool
     {
         // @todo: adapt to the way TestWebShop lets you define tables. Just return true if this is done in a separate script.
         return $this->getDb()->execute("CREATE TABLE IF NOT EXISTS `{$this->tableName}` (
@@ -110,8 +110,8 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         `token` char(32) DEFAULT NULL,
         `source_type` varchar(32) NOT NULL,
         `source_id` int(11) UNSIGNED NOT NULL,
-        `created` timestamp DEFAULT CURRENT_TIMESTAMP,
-        `updated` timestamp NOT NULL,
+        `created` timestamp NOt NULL DEFAULT CURRENT_TIMESTAMP,
+        `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         PRIMARY KEY (`id`),
         UNIQUE INDEX `acumulus_idx_entry_id` (`id_entry`),
         UNIQUE INDEX `acumulus_idx_source` (`source_id`, `source_type`)
@@ -121,7 +121,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    public function uninstall()
+    public function uninstall(): bool
     {
         // @todo: adapt to the way TestWebShop lets you delete tables. Just return true if this is done in a separate script.
         return $this->getDb()->execute("DROP TABLE `{$this->tableName}`");
@@ -132,7 +132,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      *
      * @return \Db
      */
-    protected function getDb()
+    protected function getDb(): \Db
     {
         return Db::getInstance();
     }

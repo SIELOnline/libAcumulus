@@ -40,7 +40,7 @@ class Log extends BaseLog
      *
      * This override uses a PSR3 logger based on MonoLog.
      */
-    protected function write($message, $severity)
+    protected function write(string $message, int $severity)
     {
         /** @noinspection PhpUnhandledExceptionInspection */
         $this->getLogger()->log($this->getMagentoSeverity($severity), $message);

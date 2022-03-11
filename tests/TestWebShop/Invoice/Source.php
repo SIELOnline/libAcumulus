@@ -72,9 +72,10 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    public function getDate()
+    public function getDate(): string
     {
         // @todo: override or implement both getDateOrder() and getDateCreditNote()
+        return '';
     }
 
     /**
@@ -104,7 +105,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    public function getPaymentStatus()
+    public function getPaymentStatus(): int
     {
         // @todo: override or implement both getPaymentStatusOrder() and getPaymentStatusCreditNote()
         // Assumption: credit slips are always in a paid status.
@@ -119,7 +120,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    public function getPaymentDate()
+    public function getPaymentDate(): string
     {
         // @todo
     }
@@ -127,7 +128,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    public function getCountryCode()
+    public function getCountryCode(): string
     {
         // @todo
     }
@@ -138,7 +139,7 @@ class Source extends BaseSource
      * TestWebShop stores the internal currency id, so look up the currency
      * object first then extract the ISO code for it.
      */
-    public function getCurrency()
+    public function getCurrency(): array
     {
         // @todo
         $result = array (
@@ -152,25 +153,21 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    protected function getAvailableTotals()
+    protected function getAvailableTotals(): array
     {
         // @todo
+        return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getInvoiceReferenceOrder()
     {
         // @todo: implement if TestWebShop has separate Invoice numbers and references,, otherwise remove.
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getInvoiceDateOrder()
+    public function getInvoiceDateOrder(): string
     {
         // @todo: implement if TestWebShop has separate Invoice dates, otherwise remove.
+        return '';
     }
 
     /**

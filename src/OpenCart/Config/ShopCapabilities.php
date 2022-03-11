@@ -320,7 +320,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
         /** @noinspection PhpUnhandledExceptionInspection */
         $extensions = $registry->getExtensionModel()->getInstalled('payment');
         foreach ($extensions as $extension) {
-            if ((bool) $registry->config->get($prefix . $extension . '_status')) {
+            if ($registry->config->get($prefix . $extension . '_status')) {
                 $enabled[] = $extension;
             }
         }

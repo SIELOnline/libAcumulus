@@ -118,9 +118,8 @@ class AcumulusRequest
         try {
             $this->uri= $uri;
             $this->submit = $this->constructFullSubmit($submit, $needContract);
-            $this->httpRequest = new HttpRequest();
             $result->setAcumulusRequest($this);
-            $result->setHttpResponse($this->executeWithHttp());
+            $result->setHttpResponse($this->executeWithPostXmlStringApproach());
         } catch (RuntimeException $e) {
             // Any errors during:
             // - conversion of the message to xml
@@ -156,14 +155,25 @@ class AcumulusRequest
      *   Note that errors at the application level will be set as messages when
      *   the response is interpreted.
      */
-    protected function executeWithHttp(): HttpResponse
+    protected function executeWithPostXmlStringApproach(): HttpResponse
     {
         // - Convert message to XML. XML requires 1 top level tag, so add one.
         //   The top tag name is ignored by the Acumulus API, we use <acumulus>.
         // - 'xmlstring' is the post field that Acumulus expects.
+        $options = [CURLOPT_USERAGENT => $this->getUserAgent()];
+        $this->httpRequest = new HttpRequest($options);
         $body = ['xmlstring' => trim($this->convertArrayToXml(['acumulus' => $this->submit]))];
-        $this->httpRequest = new HttpRequest();
         return $this->httpRequest->post($this->uri, $body);
+    }
+
+    protected function getUserAgent(): string
+    {
+        $environment = $this->config->getEnvironment();
+        $library = "libAcumulus/{$environment['libraryVersion']}";
+        $shop = " {$environment['shopName']}/{$environment['shopVersion']}";
+        $cms = !empty($environment['cmsName']) ? " {$environment['cmsName']}/{$environment['cmsVersion']}" : '';
+        $php = " PHP/{$environment['phpVersion']}";
+        return $library . $shop . $cms . $php;
     }
 
     /**
@@ -226,7 +236,8 @@ class AcumulusRequest
             'testmode' => $pluginSettings['debug'] === Config::Send_TestMode ? Api::TestMode_Test : Api::TestMode_Normal,
             'lang' => $this->userLanguage,
             'connector' => [
-                'application' => "{$environment['shopName']} {$environment['shopVersion']}",
+                'application' => "{$environment['shopName']} {$environment['shopVersion']}" .
+                    (!empty($environment['cmsName']) ? " {$environment['cmsName']} {$environment['cmsVersion']}" : ''),
                 'webkoppel' => "Acumulus {$environment['moduleVersion']}",
                 'development' => 'SIEL - Buro RaDer',
                 'remark' => "Library {$environment['libraryVersion']} - PHP {$environment['phpVersion']}",

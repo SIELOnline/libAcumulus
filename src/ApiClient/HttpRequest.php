@@ -19,11 +19,21 @@ class HttpRequest
     protected /*bool*/ $hasExecuted = false;
     protected /*?string*/ $method = null;
     protected /*?string*/ $uri = null;
+    protected /*array*/ $options = [];
     /**
      * @var array|string|null
      *   See {@see HttpRequest::getBody()}.
      */
     protected $body = null;
+
+    /**
+     * @param array $options
+     *   A set of Curl option-value pairs.
+     */
+    public function __construct(array $options = [])
+    {
+        $this->options = $options;
+    }
 
     /**
      * @return string|null
@@ -168,28 +178,56 @@ class HttpRequest
         $start = microtime(TRUE);
 
         // Get and configure the curl connection.
-        // Since 2017-09-19 the Acumulus web service only accepts TLS 1.2.
-        // - Apparently, some curl libraries do support this version but do not
-        //   use it by default, so we force it.
-        // - Apparently, some up-to-date curl libraries do not define this
-        //   constant, so we define it, if not defined.
         $handle = $this->getHandle();
-        if (!defined('CURL_SSLVERSION_TLSv1_2')) {
-            define('CURL_SSLVERSION_TLSv1_2', 6);
+        $options = $this->getCurlOptions();
+        if (!curl_setopt_array($handle, $options)) {
+            $this->raiseCurlError($handle, 'curl_setopt_array(defaults)');
         }
+
+        // Send and receive over the curl connection.
+        $response = curl_exec($handle);
+        $responseInfo = curl_getinfo($handle);
+        // We only check for errors at the communication level, not for
+        // responses that indicate an error.
+        // @todo: check if header_size is set when curlopt_header option is set to false.
+        if (!is_string($response) || empty($response) || curl_errno($handle) !== 0 || !isset($responseInfo['header_size'])) {
+            $this->raiseCurlError($handle, 'curl_exec()');
+        }
+
+        if ($options[CURLOPT_HEADER]) {
+            $header_size = (int) $responseInfo['header_size'];
+            $headers = substr($response, 0, $header_size);
+            $body = substr($response, $header_size);
+        } else {
+            $headers = '';
+            $body = $response;
+        }
+        return new HttpResponse(
+            $headers,
+            $body,
+            $responseInfo + ['method_time' => microtime(true) - $start],
+            $this
+        );
+    }
+
+    /**
+     * Collects and returns all Curl options.
+     *
+     * The Curl options consist of:
+     * 1) options fixed by this class and that may not be overridden.
+     * 2) Options passed in by the caller.
+     * 3) Defaults, that may be overridden by the options passed in.
+     *
+     * @return array
+     *  The assembled Curl options.
+     */
+    protected function getCurlOptions(): array
+    {
+        // 1) Fixed.
         $options = [
             CURLOPT_URL => $this->getUri(),
+            // Return the response instead of a bool indicating success.
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_HEADER => true,
-            CURLINFO_HEADER_OUT => true,
-            // This is a requirement for the Acumulus web service but should be
-            // good for all servers.
-            CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1_2,
-            CURLOPT_CONNECTTIMEOUT => 15,
-            CURLOPT_TIMEOUT => 15,
-            // Follow redirects (maximum of 5).
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_MAXREDIRS => 5,
             //CURLOPT_PROXY => '127.0.0.1:8888', // Uncomment to debug with Fiddler.
             //CURLOPT_SSL_VERIFYPEER => false, // Uncomment to debug with Fiddler.
         ];
@@ -204,28 +242,34 @@ class HttpRequest
                 }
                 break;
         }
-        if (!curl_setopt_array($handle, $options)) {
-            $this->raiseCurlError($handle, 'curl_setopt_array(defaults)');
-        }
 
-        // Send and receive over the curl connection.
-        $response = curl_exec($handle);
-        $responseInfo = curl_getinfo($handle);
-        // We only check for errors at the communication level, not for
-        // responses that indicate an error.
-        if (!is_string($response) || empty($response) || curl_errno($handle) !== 0 || !isset($responseInfo['header_size'])) {
-            $this->raiseCurlError($handle, 'curl_exec()');
-        }
+        // 2) Options passed in by the caller.
+        $options += $this->options;
 
-        $header_size = (int) $responseInfo['header_size'];
-        $headers = substr($response, 0, $header_size);
-        $body = substr($response, $header_size);
-        return new HttpResponse(
-            $headers,
-            $body,
-            $responseInfo + ['method_time' => microtime(true) - $start],
-            $this
-        );
+        // 3) Defaults.
+        // Since 2017-09-19 the Acumulus web service only accepts TLS 1.2.
+        // - Apparently, some curl libraries do support this version but do not
+        //   use it by default, so we force it.
+        // - Apparently, some up-to-date curl libraries do not define this
+        //   constant, so we define it, if not defined.
+        if (!defined('CURL_SSLVERSION_TLSv1_2')) {
+            define('CURL_SSLVERSION_TLSv1_2', 6);
+        }
+        $options += [
+            // Return the response headers with the response.
+            CURLOPT_HEADER => true,
+            // Return request headers in the response of {@see \curl_getinfo()}.
+            CURLINFO_HEADER_OUT => true,
+            // This is a requirement for the Acumulus web service, but should be
+            // good for all servers.
+            CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1_2,
+            CURLOPT_CONNECTTIMEOUT => 15,
+            CURLOPT_TIMEOUT => 15,
+            // Follow redirects (with a maximum of 5).
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_MAXREDIRS => 5,
+        ];
+        return $options;
     }
 
     /**

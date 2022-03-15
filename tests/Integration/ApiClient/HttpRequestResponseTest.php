@@ -13,30 +13,25 @@ use Siel\Acumulus\ApiClient\HttpRequest;
  */
 class HttpRequestResponseTest extends TestCase
 {
-    private /*HttpRequest*/ $httpRequest;
-
-    protected function setUp(): void
-    {
-        $this->httpRequest = new HttpRequest();
-    }
-
     public function testGet()
     {
+        $httpRequest = new HttpRequest();
         $uri = 'http://localhost/lib-acumulus/readme.md';
-        $response = $this->httpRequest->get($uri);
+        $response = $httpRequest->get($uri);
 
         // Request and response are linked
-        $this->assertSame($this->httpRequest, $response->getRequest());
+        $this->assertSame($httpRequest, $response->getRequest());
 
         // Properties of request.
-        $this->assertSame('GET', $this->httpRequest->getMethod());
-        $this->assertSame($uri, $this->httpRequest->getUri());
-        $this->assertNull($this->httpRequest->getBody());
+        $this->assertSame('GET', $httpRequest->getMethod());
+        $this->assertSame($uri, $httpRequest->getUri());
+        $this->assertNull($httpRequest->getBody());
 
         // Properties of response.
         $this->assertSame(200, $response->getHttpCode());
         $this->assertIsString($response->getHeaders());
         $this->assertSame(file_get_contents(__DIR__ . '/../../../readme.md'), $response->getBody());
+        /** @noinspection DuplicatedCode */
         $this->assertIsArray($response->getInfo());
         $this->assertIsString($response->getRequestHeaders());
 
@@ -50,22 +45,24 @@ class HttpRequestResponseTest extends TestCase
 
     public function testPost()
     {
+        $httpRequest = new HttpRequest();
         $uri = 'http://localhost/lib-acumulus/resources/siel-logo.png';
         $post = ['my_post' => 'my_value'];
-        $response = $this->httpRequest->post($uri, $post);
+        $response = $httpRequest->post($uri, $post);
 
         // Request and response are linked
-        $this->assertSame($this->httpRequest, $response->getRequest());
+        $this->assertSame($httpRequest, $response->getRequest());
 
         // Properties of request.
-        $this->assertSame('POST', $this->httpRequest->getMethod());
-        $this->assertSame($uri, $this->httpRequest->getUri());
-        $this->assertSame($post, $this->httpRequest->getBody());
+        $this->assertSame('POST', $httpRequest->getMethod());
+        $this->assertSame($uri, $httpRequest->getUri());
+        $this->assertSame($post, $httpRequest->getBody());
 
         // Properties of response.
         $this->assertSame(200, $response->getHttpCode());
         $this->assertIsString($response->getHeaders());
         $this->assertSame(file_get_contents(__DIR__ . '/../../../resources/siel-logo.png'), $response->getBody());
+        /** @noinspection DuplicatedCode */
         $this->assertIsArray($response->getInfo());
         $this->assertIsString($response->getRequestHeaders());
 
@@ -87,21 +84,23 @@ class HttpRequestResponseTest extends TestCase
 
     public function test404()
     {
+        $httpRequest = new HttpRequest();
         $uri = 'http://localhost/lib-acumulus/mot-existing';
-        $response = $this->httpRequest->get($uri);
+        $response = $httpRequest->get($uri);
 
         // Request and response are linked
-        $this->assertSame($this->httpRequest, $response->getRequest());
+        $this->assertSame($httpRequest, $response->getRequest());
 
         // Properties of request.
-        $this->assertSame('GET', $this->httpRequest->getMethod());
-        $this->assertSame($uri, $this->httpRequest->getUri());
-        $this->assertNull($this->httpRequest->getBody());
+        $this->assertSame('GET', $httpRequest->getMethod());
+        $this->assertSame($uri, $httpRequest->getUri());
+        $this->assertNull($httpRequest->getBody());
 
         // Properties of response.
         $this->assertSame(404, $response->getHttpCode());
         $this->assertIsString($response->getHeaders());
         $this->assertStringContainsString('<title>404 Not Found</title>', $response->getBody());
+        /** @noinspection DuplicatedCode */
         $this->assertIsArray($response->getInfo());
         $this->assertIsString($response->getRequestHeaders());
 
@@ -116,7 +115,32 @@ class HttpRequestResponseTest extends TestCase
     public function testInvalidDomain()
     {
         $this->expectException(RuntimeException::class);
+        $httpRequest = new HttpRequest();
         $uri = 'https://example0987654321.com/';
-        $this->httpRequest->get($uri);
+        $httpRequest->get($uri);
+    }
+
+    public function testPassingOptions()
+    {
+        $ua = 'my_useragent/1.0';
+        $httpRequest = new HttpRequest([CURLOPT_USERAGENT => $ua]);
+        $uri = 'http://localhost/lib-acumulus/resources/siel-logo.png';
+        $post = ['my_post' => 'my_value'];
+        $response = $httpRequest->post($uri, $post);
+
+        // Properties that (can) come from info.
+        $this->assertStringContainsString("User-Agent: $ua", $response->getRequestHeaders());
+    }
+
+    public function testOverridingOptions()
+    {
+        $httpRequest = new HttpRequest([CURLOPT_HEADER => false, CURLINFO_HEADER_OUT => false]);
+        $uri = 'http://localhost/lib-acumulus/resources/siel-logo.png';
+        $post = ['my_post' => 'my_value'];
+        $response = $httpRequest->post($uri, $post);
+
+        // Properties that are overridden not to be present.
+        $this->assertEmpty($response->getHeaders());
+        $this->assertEmpty($response->getRequestHeaders());
     }
 }

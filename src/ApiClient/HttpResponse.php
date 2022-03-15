@@ -37,7 +37,8 @@ class HttpResponse
      *
      * @return string
      *   The HTTP response headers as 1 string. Each header is separated by a
-     *   new line (\r\n) and the headers end with a double new line.
+     *   new line (\r\n) and the headers end with a double new line. The return
+     *   will be the empty string if the headers were not returned.
      */
     public function getHeaders(): string
     {

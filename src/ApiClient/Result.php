@@ -37,8 +37,6 @@ class Result extends MessageCollection
     protected  /*Translator*/ $translator;
     protected /*Log*/ $log;
 
-    protected /*bool*/ $isAcumulusRequestSet = false;
-    protected /*bool*/ $isHttpResponseSet = false;
     protected /*?AcumulusRequest*/ $acumulusRequest = null;
     protected /*?HttpResponse*/ $httpResponse = null;
     protected /*?int*/ $apiStatus = null;
@@ -87,6 +85,10 @@ class Result extends MessageCollection
      * @return string
      *   The translation for the given key or the key itself if no translation
      *   could be found.
+     *
+     * @todo: inspection says: method can be pulled up. That might be an idea:
+     *   MessageCollections are never instantiated alone but always part of a
+     *   Result or Form (or a future "RequirementsResults"?)
      */
     protected function t(string $key): string
     {
@@ -182,11 +184,9 @@ class Result extends MessageCollection
 
     public function setAcumulusRequest(?AcumulusRequest $acumulusRequest): void
     {
-        if ($this->isAcumulusRequestSet) {
+        if ($this->acumulusRequest !== null) {
             throw new LogicException('AcumulusResult::setAcumulusRequest() may only be called once.');
         }
-        $this->isAcumulusRequestSet = true;
-
         $this->acumulusRequest = $acumulusRequest;
     }
 
@@ -205,11 +205,10 @@ class Result extends MessageCollection
      */
     public function setHttpResponse(HttpResponse $httpResponse): void
     {
-        if ($this->isHttpResponseSet) {
+        if ($this->httpResponse !== null) {
             throw new LogicException('AcumulusResult::setHttpResponse() may only be called once.');
         }
-        $this->isHttpResponseSet = true;
-        if (!$this->isAcumulusRequestSet) {
+        if ($this->getAcumulusRequest() === null) {
             throw new LogicException('AcumulusResult::setHttpResponse() may only be called after AcumulusResult::setAcumulusRequest()');
         } elseif ($this->getAcumulusRequest()->getSubmit() === null) {
             throw new LogicException('AcumulusResult::setHttpResponse() may only be called after AcumulusResult::setAcumulusRequest() with its submit property set');

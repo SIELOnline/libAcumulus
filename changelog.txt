@@ -18,8 +18,12 @@ WC  = WooCommerce (supported versions: >= 5.0 (WC 4 en 3 probably will work)
 7.0.0-alpha1 (2022-03-??)
 -------------------------
 Features:
+- ALL: At the HTTP level we now send a User-Agent header. For that, we added
+  keys cmsName and cmsConfig to the Config. Class ShopCapabilities gives it a
+  value for Joomla and  WordPress. Presenting it to the user on forms has also
+  been adapted accordingly.
 - OC: The Acumulus settings form now also appears as a menu-item under "Sales -
-  Acumulus". Before it could only be accessed via "Extensions - Modules - Edit
+  Acumulus". Before, it could only be accessed via "Extensions - Modules - Edit
   (Acumulus module)", so this makes it easier to access the basic settings.
 
 Refactorings:

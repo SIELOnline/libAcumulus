@@ -574,7 +574,8 @@ abstract class Form extends MessageCollection
         $env = $this->acumulusConfig->getEnvironment();
         $module = $this->t('module');
         $environment = [
-            'Shop' => "{$env['shopName']} {$env['shopVersion']}",
+            'Shop' => "{$env['shopName']} {$env['shopVersion']}"
+                . (!empty($env['cmsName']) ? " {$env['cmsName']} {$env['cmsVersion']}" : ''),
             "Application" => "Acumulus $module {$env['moduleVersion']}; Library: {$env['libraryVersion']}",
             "System" => "PHP {$env['phpVersion']}; Curl: {$env['curlVersion']}; JSON: {$env['jsonVersion']}; OS: {$env['os']}",
             'Server' => $env['hostName'],

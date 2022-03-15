@@ -17,6 +17,8 @@ class ShopCapabilities extends ShopCapabilitiesBase
             'moduleVersion' => '4.0',
             'shopName' => 'TestWebShop',
             'shopVersion' => '0.1',
+            'cmsName' => 'TestCms',
+            'cmsVersion' => '0.1',
         ];
     }
 

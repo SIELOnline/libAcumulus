@@ -23,7 +23,9 @@ class ShopCapabilities extends ShopCapabilitiesBase
           // called when the config gets actually queried.
           'moduleVersion' => Acumulus::create()->getVersionNumber(),
           'shopName' => $this->shopName,
-          'shopVersion' => (isset($woocommerce) ? $woocommerce->version : 'unknown') . ' (WordPress: ' . $wp_version . ')',
+          'shopVersion' => isset($woocommerce) ? $woocommerce->version : 'unknown',
+          'cmsName' => 'WordPress',
+          'cmsVersion' => $wp_version,
       ];
     }
 

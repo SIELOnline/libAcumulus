@@ -37,7 +37,9 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
         return [
             'moduleVersion' => $moduleVersion,
             'shopName' => $this->shopName,
-            'shopVersion' => "$shopVersion (CMS: Joomla $joomlaVersion)",
+            'shopVersion' => $shopVersion,
+            'cmsName' => 'Joomla',
+            'cmsVersion' => $joomlaVersion,
         ];
     }
 

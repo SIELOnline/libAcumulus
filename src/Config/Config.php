@@ -14,6 +14,9 @@ use const Siel\Acumulus\Version;
  *
  * Configuration is stored in the host environment bridged via the ConfigStore
  * class.
+ *
+ * @todo: Add separate cmsName and cmsVersion config keys (empty if shop is not
+ *   embedded in a CMS).
  */
 class Config
 {
@@ -358,6 +361,8 @@ class Config
      *   - 'moduleVersion'
      *   - 'shopName'
      *   - 'shopVersion'
+     *   - 'cmsName'
+     *   - 'cmsVersion'
      *   - 'hostName'
      *   - 'phpVersion'
      *   - 'os'
@@ -637,7 +642,7 @@ class Config
             $curlVersion = curl_version();
             $environment = $this->getShopCapabilities()->getShopEnvironment();
             $hostName = $this->getHostName();
-            // remove TLD.
+            // remove TLD, like .com or .nl, from hostname.
             $pos = strrpos($hostName, '.');
             if ($pos !== false) {
                 $hostName = substr($hostName, 0, $pos);
@@ -688,6 +693,16 @@ class Config
                     'group' => 'environment',
                     'type' => 'string',
                     'default' => $environment['shopVersion'],
+                ],
+                'cmsName' => [
+                    'group' => 'environment',
+                    'type' => 'string',
+                    'default' => $environment['cmsName'] ?? '',
+                ],
+                'cmsVersion' => [
+                    'group' => 'environment',
+                    'type' => 'string',
+                    'default' => $environment['cmsVersion'] ?? '',
                 ],
                 'hostName' => [
                     'group' => 'environment',

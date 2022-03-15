@@ -17,7 +17,9 @@ class ShopCapabilities extends ShopCapabilitiesBase
         $environment = [
             'moduleVersion' => 'todo',
             'shopName' => 'MyWebShop',
-            'shopVersion' => 'todo' . ' (MyCMS: ' . 'todo' . ')',
+            'shopVersion' => 'todo',
+            'cmsName' => 'MyCms',
+            'cmsVersion' => 'todo',
         ];
         return $environment;
     }

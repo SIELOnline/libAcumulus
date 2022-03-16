@@ -35,6 +35,9 @@ class HttpResponse
     /**
      * Returns the HTTP response headers.
      *
+     * As for now there's not a great use for inspecting the headers, we return
+     * the header as a string and leave processing it up to the calling side.
+     *
      * @return string
      *   The HTTP response headers as 1 string. Each header is separated by a
      *   new line (\r\n) and the headers end with a double new line. The return
@@ -42,7 +45,6 @@ class HttpResponse
      */
     public function getHeaders(): string
     {
-        // @todo: return as string[]? (split on \r\n, double \r\n\r\n at end!)
         return $this->headers;
     }
 
@@ -87,14 +89,16 @@ class HttpResponse
      * {@see \Siel\Acumulus\ApiClient\HttpResponse} class, not of the
      * {@see \Siel\Acumulus\ApiClient\HttpRequest} class.
      *
+     * As for now there's not a great use for inspecting the headers, we return
+     * the header as a string and leave processing it up to the calling side.
+     *
      * @return string
      *   The HTTP request headers as 1 string. Each header is separated by a
      *   new line (\r\n) and the headers end with a double new line. If the
-     *   request headers are not known, the empty string is returned.
+     *   request headers are not known, an empty string is returned.
      */
     public function getRequestHeaders(): string
     {
-        // @todo: return as string[]? (split on \r\n, double \r\n\r\n at end!)
         return $this->info['request_header'] ?? '';
     }
 

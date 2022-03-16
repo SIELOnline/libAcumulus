@@ -186,21 +186,26 @@ class HttpRequest
 
         // Send and receive over the curl connection.
         $response = curl_exec($handle);
-        $responseInfo = curl_getinfo($handle);
         // We only check for errors at the communication level, not for
         // responses that indicate an error.
-        // @todo: check if header_size is set when curlopt_header option is set to false.
-        if (!is_string($response) || empty($response) || curl_errno($handle) !== 0 || !isset($responseInfo['header_size'])) {
+        if (curl_errno($handle) !== 0) {
             $this->raiseCurlError($handle, 'curl_exec()');
         }
+        if ($options[CURLOPT_RETURNTRANSFER] && !is_string($response)) {
+            $this->raiseCurlError($handle, 'curl_exec() return');
+        }
 
+        $responseInfo = curl_getinfo($handle);
         if ($options[CURLOPT_HEADER]) {
             $header_size = (int) $responseInfo['header_size'];
+            if (!is_string($response) || strlen($response) < $responseInfo['header_size']) {
+                $this->raiseCurlError($handle, 'curl_exec() response');
+            }
             $headers = substr($response, 0, $header_size);
             $body = substr($response, $header_size);
         } else {
             $headers = '';
-            $body = $response;
+            $body = is_string($response) ? $response : '';
         }
         return new HttpResponse(
             $headers,

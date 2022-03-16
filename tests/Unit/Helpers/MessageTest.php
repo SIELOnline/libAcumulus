@@ -14,20 +14,24 @@ use Siel\Acumulus\Helpers\Severity;
 
 class MessageTest extends TestCase
 {
+    /**
+     * @var \Siel\Acumulus\Helpers\Translator
+     */
+    protected $translator;
+
     protected function setUp(): void
     {
-        $translator = new Translator('nl');
-        Translator::$instance = $translator;
-        $translator->add(new SeverityTranslations());
+        $this->translator = new Translator('nl');
+        $this->translator->add(new SeverityTranslations());
     }
 
     public function testCreateWithAllParams1(): Message
     {
-        $message = new Message('Message 701', Severity::Error, 'S1', 0);
+        $message = Message::create('Message 701', Severity::Error, 'S1')->setTranslator($this->translator);
         $this->assertEquals('Message 701', $message->getText());
         $this->assertEquals(Severity::Error, $message->getSeverity());
-        $this->assertEquals(0, $message->getCode());
-        $this->assertEquals('S1', $message->getCodeTag());
+        $this->assertEquals('S1', $message->getCode());
+        $this->assertEquals('', $message->getCodeTag());
         $this->assertEquals('', $message->getField());
         $this->assertNull($message->getException());
         return $message;
@@ -35,7 +39,7 @@ class MessageTest extends TestCase
 
     public function testCreateWithAllParams2(): Message
     {
-        $message = new Message('Message 701 empty codes', Severity::Success, '', 0);
+        $message = Message::create('Message 701 empty codes', Severity::Success)->setTranslator($this->translator);
         $this->assertEquals('Message 701 empty codes', $message->getText());
         $this->assertEquals(Severity::Success, $message->getSeverity());
         $this->assertEquals(0, $message->getCode());
@@ -47,7 +51,7 @@ class MessageTest extends TestCase
 
     public function testCreateWithArray(): Message
     {
-        $message = new Message(['code' => 702, 'codetag' => 'W2', 'message' => 'Message 702'], Severity::Warning);
+        $message = Message::createFromApiMessage(['code' => 702, 'codetag' => 'W2', 'message' => 'Message 702'], Severity::Warning)->setTranslator($this->translator);
         $this->assertEquals('Message 702', $message->getText());
         $this->assertEquals(Severity::Warning, $message->getSeverity());
         $this->assertEquals(702, $message->getCode());
@@ -60,7 +64,7 @@ class MessageTest extends TestCase
     public function testCreateWithException(): Message
     {
         $e = new RuntimeException('Message 703', 703);
-        $message = new Message($e);
+        $message = Message::createFromException($e)->setTranslator($this->translator);
         $this->assertEquals('Message 703', $message->getText());
         $this->assertEquals(Severity::Exception, $message->getSeverity());
         $this->assertEquals(703, $message->getCode());
@@ -72,7 +76,7 @@ class MessageTest extends TestCase
 
     public function testCreateFormFieldError(): Message
     {
-        $message = new Message('Not a valid e-mail address', Severity::Error, 'email');
+        $message = Message::createForFormField('Not a valid e-mail address', Severity::Error, 'email')->setTranslator($this->translator);
         $this->assertEquals('Not a valid e-mail address', $message->getText());
         $this->assertEquals(Severity::Error, $message->getSeverity());
         $this->assertEquals(0, $message->getCode());
@@ -117,7 +121,7 @@ class MessageTest extends TestCase
         $this->assertEquals('Ernstige fout: 703: Message 703', $message4->format(Message::Format_PlainWithSeverity));
         $this->assertEquals('<span>Waarschuwing:</span> <span>702, W2:</span> <span>Message 702</span>', $message3->format(Message::Format_HtmlWithSeverity));
 
-        $this->assertEquals("• S1: Message 701", $message1->format(Message::Format_PlainList));
+        $this->assertEquals('• S1: Message 701', $message1->format(Message::Format_PlainList));
         $this->assertEquals('<li><span>702, W2:</span> <span>Message 702</span></li>', $message3->format(Message::Format_HtmlList));
 
         $this->assertEquals('Not a valid e-mail address', $message5->format(Message::Format_Plain));

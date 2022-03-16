@@ -126,7 +126,7 @@ class AcumulusRequest
             // - communication with the Acumulus web service
             // - converting the answer to an array
             // are returned as a RuntimeException.
-            $result->addMessage($e);
+            $result->addException($e);
         }
 
         $result->toLogMessages();

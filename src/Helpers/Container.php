@@ -227,7 +227,6 @@ class Container
     {
         /** @var \Siel\Acumulus\Helpers\Translator $translator */
         $translator = $this->getInstance('Translator', 'Helpers', [$this->getLanguage()]);
-        Translator::$instance = $translator;
         if (!$this->baseTranslationsAdded) {
             // Add some basic translations that are hard to add just-in-time.
             // @todo: add a hasTranslations interface to (largely) automate this on getInstance?

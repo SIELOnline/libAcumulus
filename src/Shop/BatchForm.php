@@ -85,20 +85,20 @@ class BatchForm extends Form
     {
         $invoiceSourceTypes = $this->shopCapabilities->getSupportedInvoiceSourceTypes();
         if (empty($this->submittedValues['invoice_source_type'])) {
-            $this->addMessage($this->t('message_validate_batch_source_type_required'), Severity::Error, 'invoice_source_type');
+            $this->addFormMessage($this->t('message_validate_batch_source_type_required'), Severity::Error, 'invoice_source_type');
         } elseif (!array_key_exists($this->submittedValues['invoice_source_type'], $invoiceSourceTypes)) {
-            $this->addMessage($this->t('message_validate_batch_source_type_invalid'), Severity::Error, 'invoice_source_type');
+            $this->addFormMessage($this->t('message_validate_batch_source_type_invalid'), Severity::Error, 'invoice_source_type');
         }
 
         if ($this->submittedValues['invoice_source_reference_from'] === '' && $this->submittedValues['date_from'] === '') {
             // Either a range of order id's or a range of dates should be entered.
-            $this->addMessage(
+            $this->addFormMessage(
                 $this->t(count($invoiceSourceTypes) === 1 ? 'message_validate_batch_reference_or_date_1' : 'message_validate_batch_reference_or_date_2'),
                 Severity::Error,
                 'invoice_source_reference_from');
         } elseif ($this->submittedValues['invoice_source_reference_from'] !== '' && $this->submittedValues['date_from'] !== '') {
             // Not both ranges should be entered.
-            $this->addMessage(
+            $this->addFormMessage(
                 $this->t(count($invoiceSourceTypes) === 1 ? 'message_validate_batch_reference_and_date_1' : 'message_validate_batch_reference_and_date_2'),
                 Severity::Error,
                 'date_from');
@@ -109,24 +109,24 @@ class BatchForm extends Form
             if ($this->submittedValues['invoice_source_reference_to'] !== ''
                 && $this->submittedValues['invoice_source_reference_to'] < $this->submittedValues['invoice_source_reference_from']) {
                 // "order id to" is smaller than "order id from".
-                $this->addMessage($this->t('message_validate_batch_bad_order_range'), Severity::Error, 'invoice_source_reference_to');
+                $this->addFormMessage($this->t('message_validate_batch_bad_order_range'), Severity::Error, 'invoice_source_reference_to');
             }
         } else /*if ($this->submittedValues['date_to'] !== '') */ {
             // Range of dates has been filled in.
             // We ignore any order # to value.
             if (!DateTime::createFromFormat(Api::DateFormat_Iso, $this->submittedValues['date_from'])) {
                 // Date from not a valid date.
-                $this->addMessage(sprintf($this->t('message_validate_batch_bad_date_from'), $this->t('date_format')),
+                $this->addFormMessage(sprintf($this->t('message_validate_batch_bad_date_from'), $this->t('date_format')),
                     Severity::Error, 'date_from');
             }
             if ($this->submittedValues['date_to']) {
                 if (!DateTime::createFromFormat(Api::DateFormat_Iso, $this->submittedValues['date_to'])) {
                     // Date to not a valid date.
-                    $this->addMessage(sprintf($this->t('message_validate_batch_bad_date_to'), $this->t('date_format')),
+                    $this->addFormMessage(sprintf($this->t('message_validate_batch_bad_date_to'), $this->t('date_format')),
                     Severity::Error, 'date_to');
                 } elseif ($this->submittedValues['date_to'] < $this->submittedValues['date_from']) {
                     // date to is smaller than date from
-                    $this->addMessage($this->t('message_validate_batch_bad_date_range'),
+                    $this->addFormMessage($this->t('message_validate_batch_bad_date_range'),
                     Severity::Error, 'date_to');
                 }
             }

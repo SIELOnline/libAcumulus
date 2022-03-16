@@ -55,6 +55,8 @@ Refactorings:
     version of a plugin is still needed together with an update of the library.
   - Update methods are separated into its own class ConfigUpgrade, it became too
     much code to remain part of Config.
+- ALL: Refactored Message creation, copying and collection and, in doing so,
+  removed the need for the static Translator::$instance property.
 - PS: Use of deprecated Tab::getIdFromClassName() replaced.
 - PS: Config upgrades do not have to be repeated in install files: removed all
   but the latest call to Config(Upgrade)->upgrade().

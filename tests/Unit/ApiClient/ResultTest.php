@@ -12,7 +12,6 @@ use Siel\Acumulus\ApiClient\HttpRequest;
 use Siel\Acumulus\ApiClient\HttpResponse;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\SeverityTranslations;
-use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Helpers\Message;
 use Siel\Acumulus\ApiClient\Result;
 use Siel\Acumulus\Helpers\Severity;
@@ -40,8 +39,7 @@ class ResultTest extends TestCase
     {
         $language = 'nl';
         $this->container = new Container('TestWebShop\TestDoubles', $language);
-        Translator::$instance = $this->container->getTranslator();
-        $this->translator = Translator::$instance;
+        $this->translator = $this->container->getTranslator();
         $this->translator->add(new SeverityTranslations());
         $this->translator->add(new ResultTranslations());
         $this->examples = new ApiRequestResponseExamples();

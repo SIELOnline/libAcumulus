@@ -73,9 +73,6 @@ abstract class Form extends MessageCollection
      */
     protected $type;
 
-    /** @var \Siel\Acumulus\Helpers\Translator */
-    protected $translator;
-
     /** @var \Siel\Acumulus\Helpers\Log */
     protected $log;
 
@@ -153,13 +150,13 @@ abstract class Form extends MessageCollection
         Log $log
     )
     {
+        parent::__construct($translator);
         $this->formValuesSet = false;
         $this->submittedValues = [];
 
         $this->acumulusApiClient = $acumulusApiClient;
         $this->formHelper = $formHelper;
         $this->shopCapabilities = $shopCapabilities;
-        $this->translator = $translator;
         $this->acumulusConfig = $config;
         $this->log = $log;
         $this->fields = [];
@@ -169,21 +166,6 @@ abstract class Form extends MessageCollection
         $class = $pos !== false ? substr($class, $pos + 1) : $class;
         $classParts = preg_split('/([[:upper:]][[:lower:]]+)/', $class, null, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
         $this->type = strtolower(is_array($classParts) && !empty($classParts) ? reset($classParts) : $class);
-    }
-
-    /**
-     * Helper method to translate strings.
-     *
-     * @param string $key
-     *  The key to get a translation for.
-     *
-     * @return string
-     *   The translation for the given key or the key itself if no translation
-     *   could be found.
-     */
-    protected function t(string $key): string
-    {
-        return $this->translator->get($key);
     }
 
     /**
@@ -576,8 +558,8 @@ abstract class Form extends MessageCollection
         $environment = [
             'Shop' => "{$env['shopName']} {$env['shopVersion']}"
                 . (!empty($env['cmsName']) ? " {$env['cmsName']} {$env['cmsVersion']}" : ''),
-            "Application" => "Acumulus $module {$env['moduleVersion']}; Library: {$env['libraryVersion']}",
-            "System" => "PHP {$env['phpVersion']}; Curl: {$env['curlVersion']}; JSON: {$env['jsonVersion']}; OS: {$env['os']}",
+            'Application' => "Acumulus $module {$env['moduleVersion']}; Library: {$env['libraryVersion']}",
+            'System' => "PHP {$env['phpVersion']}; Curl: {$env['curlVersion']}; JSON: {$env['jsonVersion']}; OS: {$env['os']}",
             'Server' => $env['hostName'],
         ];
         $support = strtolower(rtrim($env['shopName'], '0123456789')) . '@acumulus.nl';

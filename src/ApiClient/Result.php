@@ -34,9 +34,7 @@ use Siel\Acumulus\Helpers\Translator;
  */
 class Result extends MessageCollection
 {
-    protected  /*Translator*/ $translator;
     protected /*Log*/ $log;
-
     protected /*?AcumulusRequest*/ $acumulusRequest = null;
     protected /*?HttpResponse*/ $httpResponse = null;
     protected /*?int*/ $apiStatus = null;
@@ -66,33 +64,10 @@ class Result extends MessageCollection
      */
     protected /*bool*/ $isList = false;
 
-    /**
-     * @param \Siel\Acumulus\Helpers\Translator $translator
-     * @param \Siel\Acumulus\Helpers\Log $log
-     */
     public function __construct(Translator $translator, Log $log)
     {
+        parent::__construct($translator);
         $this->log = $log;
-        $this->translator = $translator;
-    }
-
-    /**
-     * Helper method to translate strings.
-     *
-     * @param string $key
-     *  The key to get a translation for.
-     *
-     * @return string
-     *   The translation for the given key or the key itself if no translation
-     *   could be found.
-     *
-     * @todo: inspection says: method can be pulled up. That might be an idea:
-     *   MessageCollections are never instantiated alone but always part of a
-     *   Result or Form (or a future "RequirementsResults"?)
-     */
-    protected function t(string $key): string
-    {
-        return $this->translator->get($key);
     }
 
     /**
@@ -222,7 +197,7 @@ class Result extends MessageCollection
             // Curl did return a non-empty response, otherwise we would not be
             // here. So, apparently that only contained headers.
             // @todo: Is this a non 200 response or can we consider this as a critical error?
-            $this->addMessage('Empty response body', Severity::Error, '', 701);
+            $this->addMessage('Empty response body', Severity::Error, 701);
         } elseif ($this->isHtmlResponse($body)) {
             // When the API is gone we might receive an HTML error message page.
             $this->raiseHtmlReceivedError($body);
@@ -284,16 +259,16 @@ class Result extends MessageCollection
             $this->setApiStatus($response['status']);
             unset($response['status']);
         } else {
-            $this->addMessage(new RuntimeException('Status not set in response'));
+            $this->addException(new RuntimeException('Status not set in response'));
         }
 
         if (!empty($response['errors']['error'])) {
-            $this->addMessages($response['errors']['error'], Severity::Error);
+            $this->addApiMessages($response['errors']['error'], Severity::Error);
         }
         unset($response['errors']);
 
         if (!empty($response['warnings']['warning'])) {
-            $this->addMessages($response['warnings']['warning'], Severity::Warning);
+            $this->addApiMessages($response['warnings']['warning'], Severity::Warning);
         }
         unset($response['warnings']);
 

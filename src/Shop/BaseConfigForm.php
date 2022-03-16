@@ -105,7 +105,7 @@ abstract class BaseConfigForm extends Form
             $about = $this->acumulusApiClient->getAbout();
             if ($about->hasError()) {
                 $message = $about->getByCode(403) ? 'message_error_auth' : 'message_error_comm';
-                $this->addMessages($about->getMessages(Severity::WarningOrWorse));
+                $this->copyMessages($about->getMessages(Severity::WarningOrWorse));
             } else {
                 // Check role.
                 $response = $about->getResponse();
@@ -115,13 +115,13 @@ abstract class BaseConfigForm extends Form
                         // Correct role: no additional message.
                         break;
                     case Api::RoleApiCreator:
-                        $this->addMessage($this->t('message_warning_role_insufficient'), Severity::Warning, Tag::UserName);
+                        $this->addFormMessage($this->t('message_warning_role_insufficient'), Severity::Warning, Tag::UserName);
                         break;
                     case Api::RoleApiManager:
-                        $this->addMessage($this->t('message_warning_role_overkill'), Severity::Warning, Tag::UserName);
+                        $this->addFormMessage($this->t('message_warning_role_overkill'), Severity::Warning, Tag::UserName);
                         break;
                     default:
-                        $this->addMessage($this->t('message_warning_role_deprecated'), Severity::Warning, Tag::UserName);
+                        $this->addFormMessage($this->t('message_warning_role_deprecated'), Severity::Warning, Tag::UserName);
                         break;
                 }
             }

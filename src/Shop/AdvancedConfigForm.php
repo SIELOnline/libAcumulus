@@ -30,7 +30,7 @@ class AdvancedConfigForm extends BaseConfigForm
     protected function validateRelationFields()
     {
         if (empty($this->submittedValues['sendCustomer']) && !empty($this->submittedValues['emailAsPdf'])) {
-            $this->addMessage($this->t('message_validate_conflicting_options'), Severity::Warning);
+            $this->addFormMessage($this->t('message_validate_conflicting_options'), Severity::Warning);
         }
     }
 
@@ -43,7 +43,7 @@ class AdvancedConfigForm extends BaseConfigForm
             $regex = '/^((\d{1,2}(\.\d{1,3})?)|(100))%?$/';
             if (preg_match($regex, $this->submittedValues['euCommerceThresholdPercentage']) !== 1) {
                 $message = sprintf($this->t('message_validate_percentage_0'), $this->t('field_eu_commerce_threshold_percentage'));
-                $this->addMessage($message, Severity::Error, 'euCommerceThresholdPercentage');
+                $this->addFormMessage($message, Severity::Error, 'euCommerceThresholdPercentage');
             }
         }
     }
@@ -54,14 +54,14 @@ class AdvancedConfigForm extends BaseConfigForm
     protected function validateOptionsFields()
     {
         if ($this->submittedValues['optionsAllOn1Line'] == PHP_INT_MAX && $this->submittedValues['optionsAllOnOwnLine'] == 1) {
-            $this->addMessage($this->t('message_validate_options_0'), Severity::Error, 'optionsAllOnOwnLine');
+            $this->addFormMessage($this->t('message_validate_options_0'), Severity::Error, 'optionsAllOnOwnLine');
         }
         if ($this->submittedValues['optionsAllOn1Line'] > $this->submittedValues['optionsAllOnOwnLine'] && $this->submittedValues['optionsAllOnOwnLine'] > 1) {
-            $this->addMessage($this->t('message_validate_options_1'), Severity::Error, 'optionsAllOnOwnLine');
+            $this->addFormMessage($this->t('message_validate_options_1'), Severity::Error, 'optionsAllOnOwnLine');
         }
 
         if (isset($this->submittedValues['optionsMaxLength']) && !ctype_digit($this->submittedValues['optionsMaxLength'])) {
-            $this->addMessage($this->t('message_validate_options_2'), Severity::Error, 'optionsMaxLength');
+            $this->addFormMessage($this->t('message_validate_options_2'), Severity::Error, 'optionsMaxLength');
         }
     }
 
@@ -73,18 +73,18 @@ class AdvancedConfigForm extends BaseConfigForm
         // Check for valid email address if no token syntax is used.
         $regexpEmail = '/^[^@<>,; "\']+@([^.@ ,;]+\.)+[^.@ ,;]+$/';
         if (!empty($this->submittedValues['emailTo']) && strpos($this->submittedValues['emailTo'], '[') === false && !preg_match($regexpEmail, $this->submittedValues['emailTo'])) {
-            $this->addMessage($this->t('message_validate_email_5'), Severity::Error, 'emailTo');
+            $this->addFormMessage($this->t('message_validate_email_5'), Severity::Error, 'emailTo');
         }
 
         // Check for valid email addresses if no token syntax is used.
         $regexpMultiEmail = '/^[^@<>,; "\']+@([^.@ ,;]+\.)+[^.@ ,;]+([,;][^@<>,; "\']+@([^.@ ,;]+\.)+[^.@ ,;]+)*$/';
         if (!empty($this->submittedValues['emailBcc']) && strpos($this->submittedValues['emailBcc'], '[') === false && !preg_match($regexpMultiEmail, $this->submittedValues['emailBcc'])) {
-            $this->addMessage($this->t('message_validate_email_3'), Severity::Error, 'emailBcc');
+            $this->addFormMessage($this->t('message_validate_email_3'), Severity::Error, 'emailBcc');
         }
 
         // Check for valid email address if no token syntax is used.
         if (!empty($this->submittedValues['emailFrom']) && strpos($this->submittedValues['emailFrom'], '[') === false && !preg_match($regexpEmail, $this->submittedValues['emailFrom'])) {
-            $this->addMessage($this->t('message_validate_email_4'), Severity::Error, 'emailFrom');
+            $this->addFormMessage($this->t('message_validate_email_4'), Severity::Error, 'emailFrom');
         }
     }
 

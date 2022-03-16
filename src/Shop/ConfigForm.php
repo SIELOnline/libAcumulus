@@ -44,9 +44,9 @@ class ConfigForm extends BaseConfigForm
         $regexpEmail = '/^[^@<>,; "\']+@([^.@ ,;]+\.)+[^.@ ,;]+$/';
 
         if (empty($this->submittedValues[Tag::ContractCode])) {
-            $this->addMessage($this->t('message_validate_contractcode_0'), Severity::Error, Tag::ContractCode);
+            $this->addFormMessage($this->t('message_validate_contractcode_0'), Severity::Error, Tag::ContractCode);
         } elseif (!ctype_digit($this->submittedValues[Tag::ContractCode])) {
-            $this->addMessage($this->t('message_validate_contractcode_1'), Severity::Error, Tag::ContractCode);
+            $this->addFormMessage($this->t('message_validate_contractcode_1'), Severity::Error, Tag::ContractCode);
         } else {
             // Prevent errors where a copy & paste of the contract code from the
             // welcome mail includes spaces or tabs before or after the code.
@@ -54,23 +54,23 @@ class ConfigForm extends BaseConfigForm
         }
 
         if (empty($this->submittedValues[Tag::UserName])) {
-            $this->addMessage($this->t('message_validate_username_0'), Severity::Error, Tag::UserName);
+            $this->addFormMessage($this->t('message_validate_username_0'), Severity::Error, Tag::UserName);
         } elseif ($this->submittedValues[Tag::UserName] !== trim($this->submittedValues[Tag::UserName])) {
-            $this->addMessage($this->t('message_validate_username_1'), Severity::Warning, Tag::UserName);
+            $this->addFormMessage($this->t('message_validate_username_1'), Severity::Warning, Tag::UserName);
         }
 
         if (empty($this->submittedValues[Tag::Password])) {
-            $this->addMessage($this->t('message_validate_password_0'), Severity::Error, Tag::Password);
+            $this->addFormMessage($this->t('message_validate_password_0'), Severity::Error, Tag::Password);
         } elseif ($this->submittedValues[Tag::Password] !== trim($this->submittedValues[Tag::Password])) {
-            $this->addMessage($this->t('message_validate_password_1'), Severity::Warning, Tag::Password);
+            $this->addFormMessage($this->t('message_validate_password_1'), Severity::Warning, Tag::Password);
         } elseif (strpbrk($this->submittedValues[Tag::Password], '`\'"#%&;<>\\') !== false) {
-            $this->addMessage($this->t('message_validate_password_2'), Severity::Warning, Tag::Password);
+            $this->addFormMessage($this->t('message_validate_password_2'), Severity::Warning, Tag::Password);
         }
 
         if (empty($this->submittedValues[Tag::EmailOnError])) {
-            $this->addMessage($this->t('message_validate_email_1'), Severity::Error, Tag::EmailOnError);
+            $this->addFormMessage($this->t('message_validate_email_1'), Severity::Error, Tag::EmailOnError);
         } elseif (!preg_match($regexpEmail, $this->submittedValues[Tag::EmailOnError])) {
-            $this->addMessage($this->t('message_validate_email_0'), Severity::Error, Tag::EmailOnError);
+            $this->addFormMessage($this->t('message_validate_email_0'), Severity::Error, Tag::EmailOnError);
         }
     }
 
@@ -87,34 +87,34 @@ class ConfigForm extends BaseConfigForm
         // Check that required fields are filled.
         if (!isset($this->submittedValues['nature_shop'])) {
             $message = sprintf($this->t('message_validate_required_field'), $this->t('field_nature_shop'));
-            $this->addMessage($message, Severity::Error, 'nature_shop');
+            $this->addFormMessage($message, Severity::Error, 'nature_shop');
         }
         if (!isset($this->submittedValues['marginProducts'])) {
             $message = sprintf($this->t('message_validate_required_field'), $this->t('field_marginProducts'));
-            $this->addMessage($message, Severity::Error, 'marginProducts');
+            $this->addFormMessage($message, Severity::Error, 'marginProducts');
         }
         if (empty($this->submittedValues['euVatClasses'])) {
             $field = sprintf($this->t('field_euVatClasses'), $this->t('vat_classes'));
             $message = sprintf($this->t('message_validate_eu_vat_classes_0'), $field);
-            $this->addMessage($message, Severity::Error, 'euVatClasses');
+            $this->addFormMessage($message, Severity::Error, 'euVatClasses');
         } else {
             // Check that Not applicable is not selected with other classes for EU vat classes
             if (count($this->submittedValues['euVatClasses']) >= 2 && in_array(Config::VatClass_NotApplicable, $this->submittedValues['euVatClasses'])) {
                 $field = sprintf($this->t('field_euVatClasses'), $this->t('vat_classes'));
                 $message = sprintf($this->t('message_validate_eu_vat_classes_1'), $field, $this->t('vat_class_not_applicable'));
-                $this->addMessage($message, Severity::Error, 'euVatClasses');
+                $this->addFormMessage($message, Severity::Error, 'euVatClasses');
             }
         }
 
         if (empty($this->submittedValues['vatFreeClass'])) {
             $field = sprintf($this->t('field_vatFreeClass'), $this->t('vat_class'));
             $message = sprintf($this->t('message_validate_required_field'), $field);
-            $this->addMessage($message, Severity::Error, 'vatFreeClass');
+            $this->addFormMessage($message, Severity::Error, 'vatFreeClass');
         }
         if (empty($this->submittedValues['zeroVatClass'])) {
             $field = sprintf($this->t('field_zeroVatClass'), $this->t('vat_class'));
             $message = sprintf($this->t('message_validate_required_field'), $field);
-            $this->addMessage($message, Severity::Error, 'zeroVatClass');
+            $this->addFormMessage($message, Severity::Error, 'zeroVatClass');
         }
 
         // Check that vatFreeClass and zeroVatClass do not point to the same (real) vat class.
@@ -123,7 +123,7 @@ class ConfigForm extends BaseConfigForm
                 $this->submittedValues['zeroVatClass'] != Config::VatClass_NotApplicable
                 && $this->submittedValues['vatFreeClass'] == $this->submittedValues['zeroVatClass']
             ) {
-                $this->addMessage(sprintf($this->t('message_validate_zero_vat_class_0'), $this->t('vat_classes')),
+                $this->addFormMessage(sprintf($this->t('message_validate_zero_vat_class_0'), $this->t('vat_classes')),
                     Severity::Error, 'zeroVatClass');
             }
         }
@@ -136,11 +136,11 @@ class ConfigForm extends BaseConfigForm
             // If we only sell articles with nature Services, we cannot (also)
             // sell margin goods.
             if ($this->submittedValues['nature_shop'] == Config::Nature_Services && $this->submittedValues['marginProducts'] != Config::MarginProducts_No) {
-                $this->addMessage($this->t('message_validate_conflicting_shop_options_1'), Severity::Error, 'nature_shop');
+                $this->addFormMessage($this->t('message_validate_conflicting_shop_options_1'), Severity::Error, 'nature_shop');
             }
             // If we only sell margin goods, the nature of all we sell is Products.
             if ($this->submittedValues['marginProducts'] == Config::MarginProducts_Only && $this->submittedValues['nature_shop'] != Config::Nature_Products) {
-                $this->addMessage($this->t('message_validate_conflicting_shop_options_2'), Severity::Error, 'nature_shop');
+                $this->addFormMessage($this->t('message_validate_conflicting_shop_options_2'), Severity::Error, 'nature_shop');
             }
         }
     }

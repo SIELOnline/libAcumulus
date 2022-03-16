@@ -527,7 +527,7 @@ abstract class InvoiceManager
         try {
             $result = $this->doSend($invoice, $invoiceSource, $result);
         } catch (Exception $e) {
-            $result->addMessage($e);
+            $result->addException($e);
         }
 
         // When everything went well, the lock will have been replaced by a real
@@ -541,7 +541,8 @@ abstract class InvoiceManager
                 $code = $lockStatus === AcumulusEntry::Lock_NoLongerExists ? 903 : 904;
                 $result->addMessage(
                     sprintf($this->t('message_warning_delete_lock_failed'), $this->t($invoiceSource->getType())),
-                    Severity::Warning, '', $code
+                    Severity::Warning,
+                    $code
                 );
             }
         }
@@ -617,17 +618,19 @@ abstract class InvoiceManager
                         // this info will be mailed to the user.
                         $result->addMessage(
                             sprintf($this->t('message_warning_old_entry_not_deleted'), $this->t($invoiceSource->getType()), $entryId),
-                            Severity::Warning, '', 902
+                            Severity::Warning,
+                            902
                         );
                     } else {
-                        $result->addMessages($deleteResult->getMessages(Severity::InfoOrWorse), true);
+                        $result->copyMessages($deleteResult->getMessages(Severity::InfoOrWorse));
                     }
                 } else {
                     // Successfully deleted the old entry: add a notice so this
                     // info will be mailed to the user.
                     $result->addMessage(
                         sprintf($this->t('message_warning_old_entry_deleted'), $this->t($invoiceSource->getType()), $entryId),
-                        Severity::Notice, '', 901
+                        Severity::Notice,
+                        901
                     );
                 }
             }

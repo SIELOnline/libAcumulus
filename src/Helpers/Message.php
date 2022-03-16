@@ -1,7 +1,7 @@
 <?php
 namespace Siel\Acumulus\Helpers;
 
-use Exception;
+use Throwable;
 
 /**
  * Class Message defines a message.
@@ -11,6 +11,11 @@ use Exception;
  *
  * Therefore, we define 1 class that wraps messages of all possible sources and
  * possible places to show.
+ *
+ * Messages are kind of immutable, though the severity can be changed when
+ * copied to another message collection because an error in a sub-call may not
+ * be more than a warning for the overall result. The translator can/should also
+ * be set after construction, but is not considered data.
  */
 class Message
 {
@@ -32,6 +37,42 @@ class Message
     public const Format_PlainListWithSeverity = self::Format_Plain | self::Format_ListItem | self::Format_AddSeverity;
     public const Format_HtmlListWithSeverity = self::Format_Html | self::Format_ListItem | self::Format_AddSeverity;
 
+    public static function createFromException(Throwable $e): Message
+    {
+        return new Message($e->getMessage(), Severity::Exception, $e->getCode(), '', '', $e);
+    }
+
+    /**
+     * @param array $apiMessage
+     *   An array with keys 'message', 'code', and 'codetag'.
+     * @param int $severity
+     *   One of the Severity::... constants.
+     */
+    public static function createFromApiMessage(array $apiMessage, int $severity): Message
+    {
+        return new Message($apiMessage['message'], $severity, $apiMessage['code'], $apiMessage['codetag']);
+    }
+
+    public static function createForFormField(string $message, int $severity, string $field): Message
+    {
+        return new Message($message, $severity, 0, '', $field);
+    }
+
+    /**
+     * @param string $message
+     * @param int $severity
+     * @param int|string $code
+     *
+     * @return \Siel\Acumulus\Helpers\Message
+     */
+    public static function create(string $message, int $severity, $code = 0): Message
+    {
+        return new Message($message, $severity, $code);
+    }
+
+    /** @var \Siel\Acumulus\Helpers\Translator|null */
+    protected $translator = null;
+
     /** @var string */
     protected $text;
 
@@ -47,77 +88,42 @@ class Message
     /** @var string */
     protected $field;
 
-    /** @var \Exception|null */
+    /** @var \Throwable|null */
     protected $exception;
 
     /**
      * Message constructor.
      *
-     * NOTE: This is an "overloaded" method. Parameter naming is based on the
-     * case where all parameters are supplied.
-     *
-     * @param string|Exception|array $message
-     *   Either:
-     *   - A human-readable, thus possibly translated, text.
-     *   - An \Exception object, in which case other parameters are ignored.
-     *   - An Acumulus API message array,
-     *     see {@link https://www.siel.nl/acumulus/API/Basic_Response/}, in which
-     *     case the 2nd parameter should be present to indicate the severity.
-     * @param int $severity
-     *   One of the Severity constants (except Severity::Exception).
-     * @param string $fieldOrCodeOrTag
-     *   Either:
-     *   - The 'codetag' part of an Acumulus API message.
-     *   - The form field name.
-     *   - An integer code. THe 4th parameter should be absent.
-     * @param int|string $code
-     *   The code, typically an int, but a string is allowed as well.
-     *
-     * @todo: create separate message create functions (createExceptionMessage,
-     *   createFormFieldMessage, CreateApiMessage, createInternalMessage to
-     *   simplify this constructor.
+     * It is protected as the static create methods should be used to create a
+     * specific type of message (exception, api, form, simple text message).
      */
-    public function __construct($message, int $severity = Severity::Unknown, string $fieldOrCodeOrTag = '', $code = 0)
+    protected function __construct(
+        string $text,
+        int $severity,
+        $code = 0,
+        string $codeTag = '',
+        string $field = '',
+        ?Throwable $exception = null
+    ) {
+        $this->text = $text;
+        $this->severity = $severity;
+        $this->code = $code;
+        $this->codeTag = $codeTag;
+        $this->field = $field;
+        $this->exception = $exception;
+    }
+
+    /**
+     * The creating party should also set a translator.
+     *
+     * @param \Siel\Acumulus\Helpers\Translator $translator
+     *
+     * @return $this
+     */
+    public function setTranslator(Translator $translator): Message
     {
-        // PHP7: instanceof Throwable.
-        if ($message instanceof Exception) {
-            // Only 1 argument: an Exception.
-            $this->text = $message->getMessage();
-            $this->severity = Severity::Exception;
-            $this->code = $message->getCode();
-            $this->codeTag = '';
-            $this->exception = $message;
-            $this->field = '';
-        } else {
-            $this->severity = $severity;
-            $this->exception = null;
-            if (is_array($message)) {
-                // Only 1 argument: a Message to be cloned.
-                $this->text = $message['message'];
-                $this->code = $message['code'];
-                $this->codeTag = $message['codetag'];
-                $this->field = '';
-            } else {
-                $this->text = $message;
-                if (is_int($fieldOrCodeOrTag)) {
-                    // It's an integer, thus a code.
-                    $this->code = $fieldOrCodeOrTag;
-                    $this->codeTag = '';
-                    $this->field = '';
-                } elseif (func_num_args() === 3) {
-                    // 3 parameters passed, 3rd parameter is a string indicating
-                    // a form field.
-                    $this->field = $fieldOrCodeOrTag;
-                    $this->code = 0;
-                    $this->codeTag = '';
-                } else {
-                    // 2 or 4 parameters passed: 3 and 4 are codeTag resp. code.
-                    $this->code = $code;
-                    $this->codeTag = $fieldOrCodeOrTag;
-                    $this->field = '';
-                }
-            }
-        }
+        $this->translator = $translator;
+        return $this;
     }
 
     /**
@@ -132,14 +138,14 @@ class Message
      */
     protected function t(string $key): string
     {
-        return Translator::$instance instanceof Translator ? Translator::$instance->get($key) : $key;
+        return $this->translator instanceof Translator ? $this->translator->get($key) : $key;
     }
 
     /**
      * @return string
      *   A human-readable, thus possibly translated, text.
      */
-    public function getText()
+    public function getText(): string
     {
         return $this->text;
     }
@@ -154,11 +160,20 @@ class Message
     }
 
     /**
-     * Returns a textual representation of the status.
+     * Overrides the severity of the message.
      *
-     * @return string
+     * @param int $severity
+     *   One of the Severity::... constants.
      */
-    public function getSeverityText(): string
+    public function setSeverity(int $severity)
+    {
+        $this->severity = $severity;
+    }
+
+    /**
+     * Returns a textual representation of the status.
+     */
+    protected function getSeverityText(): string
     {
         switch ($this->getSeverity()) {
             case Severity::Success:
@@ -210,11 +225,11 @@ class Message
     }
 
     /**
-     * @return \Exception|null
+     * @return \Throwable|null
      *   The exception used to construct this message, or null if this message
      *   is not a Severity::Exception level message.
      */
-    public function getException(): ?Exception
+    public function getException(): ?Throwable
     {
         return $this->exception;
     }

@@ -1,145 +1,132 @@
 <?php
 namespace Siel\Acumulus\Helpers;
 
-use Exception;
+use Throwable;
 
 /**
  * Class MessageCollection contains a set of {@see Message}s.
  */
 class MessageCollection
 {
+    protected /*Translator*/ $translator;
     /**
      * @var Message[]
      */
     protected $messages = [];
 
+    public function __construct(Translator $translator)
+    {
+        $this->translator = $translator;
+    }
+
     /**
-     * Constructs a {@see Message} and adds it to the collection.
+     * Helper method to translate strings.
      *
-     * NOTE: This is an "overloaded" method. Parameter naming is based on the
-     * case where all parameters are supplied.
+     * @param string $key
+     *  The key to get a translation for.
      *
-     * @param string|Exception|array $message
-     *   Either:
-     *   - A human-readable, thus possibly translated, text.
-     *   - An \Exception object, in which case other parameters are ignored.
-     *   - An Acumulus API message array,
-     *     see {@see https://www.siel.nl/acumulus/API/Basic_Response/}, in which
-     *     case the 2nd parameter should be present to indicate the severity.
-     * @param int $severity
-     *   One of the Severity constants (except Severity::Exception).
-     * @param string|int $fieldOrCodeOrTag
-     *   Either:
-     *   - The code tag part of an Acumulus API message (string) .
-     *   - The form field name (string) .
-     *   - The code (int) when no code tag is provided in combination with the
-     *     code and the code is not a string.
-     * @param int|string $code
-     *   The code, typically an int, but a string is allowed as well.
+     * @return string
+     *   The translation for the given key or the key itself if no translation
+     *   could be found.
+     *
+    */
+    protected function t(string $key): string
+    {
+        return $this->translator->get($key);
+    }
+
+    /**
+     * Adds a {@see Message} to the collection.
      *
      * @return $this
      */
-    public function addMessage(
-        $message,
-        int $severity = Severity::Unknown,
-        $fieldOrCodeOrTag = '',
-        $code = 0
-    ): MessageCollection
+    private function add1Message(Message $message): MessageCollection
     {
-        if (!$message instanceof Message) {
-            switch (func_num_args()) {
-                case 2:
-                    $message = new Message($message, $severity);
-                    break;
-                case 3:
-                    $message = new Message($message, $severity, $fieldOrCodeOrTag);
-                    break;
-                case 4:
-                default:
-                    $message = new Message($message, $severity, $fieldOrCodeOrTag, $code);
-                    break;
-            }
+        $this->messages[] = $message->setTranslator($this->translator);
+        return $this;
+    }
+
+    public function addException(Throwable $e): MessageCollection
+    {
+        return $this->add1Message(Message::createFromException($e));
+    }
+
+    /**
+     * @param array $apiMessages
+     *   An array with keys 'message', 'code', and 'codetag'.
+     * @param int $severity
+     *   One of the Severity::... constants.
+     *
+     * @return $this
+     */
+    public function addApiMessages(array $apiMessages, int $severity): MessageCollection
+    {
+        if (count($apiMessages) === 3
+            && isset($apiMessages['code'])
+            && isset($apiMessages['codetag'])
+            && isset($apiMessages['message'])
+        ) {
+            // 1 Acumulus API message array.
+            $apiMessages = [$apiMessages];
         }
-        $this->messages[] = $message;
+        foreach ($apiMessages as $apiMessage) {
+            $this->add1Message(Message::createFromApiMessage($apiMessage, $severity));
+        }
         return $this;
     }
 
     /**
-     * Adds messages to this collection.
+     * Adds a form message.
      *
-     * NOTE: This is an "overloaded" method. Parameter naming is based on the
-     * first case described.
-     *
-     * The message(s) can be passed in 3 formats:
-     * 1) Adding a single Acumulus API message(s), see
-     *    {@see https://www.siel.nl/acumulus/API/Basic_Response/}.
-     * 2) Adding an array of Acumulus API message(s).
-     * 3) Merging 2 MessageCollection objects. This allows to inform the user
-     *    about errors and warnings that occurred during additional API calls,
-     *    e.g. querying VAT rates or deleting old entries.
-     * 4) Adding an array of text messages, giving them the passed severity.
-     *
-     * @param \Siel\Acumulus\Helpers\MessageCollection|\Siel\Acumulus\Helpers\Message[]|string[]|array[]|array $messages
-     *   The message(s) to add. Either:
-     *   - A MessageCollection to be merged into this one.
-     *   - An array of Message objects.
-     *   - A (numerically indexed) array of Acumulus API messages.
-     *   - A (numerically indexed) array of message strings
-     *   - An Acumulus API message array (with keys 'code', 'codetag' and
-     *     'message'). This edge case is supported because of the json
-     *     conversion of an API call result might result in just 1 API message
-     *     instead of an array with 1 api message.
+     * @param string $message
      * @param int $severity
-     *   - If $messages does not contain the severity for the individual
-     *     messages (i.e. they are not Message objects) the severity is used for
-     *     all messages.
-     *   - If $messages are Message objects, Severity might indicate the maximum
-     *     severity with which to add the messages. This can be used to merge
-     *     errors as mere warnings because the main result is not really
-     *     influenced by these errors.
+     *   One of the Severity::... constants.
+     * @param string $field
+     *   The id of the form field. Does not have to be specified if multiple
+     *   fields are involved
      *
      * @return $this
      */
-    public function addMessages($messages, int $severity = Severity::Unknown): MessageCollection
+    public function addFormMessage(string $message, int $severity, string $field = ''): MessageCollection
     {
-        // Process $messages so that it becomes an array of messages in
-        // whichever form.
-        if ($messages instanceof MessageCollection) {
-            $messages = $messages->getMessages();
-        } elseif (count($messages) === 3
-            && isset($messages['code'])
-            && isset($messages['codetag'])
-            && isset($messages['message'])
-        ) {
-            // 1 Acumulus API message array.
-            $messages = [$messages];
-        }
+        return $this->add1Message(Message::createForFormField($message, $severity, $field));
+    }
 
-        foreach ($messages as $key => $message) {
-            if (is_string($message)) {
-                if (is_string($key)) {
-                    // Text message for a field.
-                    $this->addMessage($message, $severity, $key);
-                } else {
-                    // Just a text message.
-                    $this->addMessage($message, $severity);
-                }
-            } elseif (is_array($message)) {
-                // An Acumulus API message.
-                $this->addMessage($message, $severity);
-            } elseif ($severity !== Severity::Unknown && $message->getSeverity() > $severity) {
-                // Message object but restrict severity
-                if ($message->getField() !== '') {
-                    // A Message object with a field.
-                    $this->addMessage($message->getText(), $severity, $message->getField());
-                } else {
-                    // A Message object without a field.
-                    $this->addMessage($message->getText(), $severity, $message->getCodeTag(), $message->getCode());
-                }
-            } else {
-                // A message object and no changing of severity.
-                $this->addMessage($message);
+    /**
+     * Adds a simple message based on its text, severity, and optional code.
+     *
+     * @param string $message
+     *   The text of the message.
+     * @param int $severity
+     *   One of the Severity::... constants.
+     * @param int|string $code
+     *   A code to better identify the source of the message.
+     *
+     * @return $this
+     */
+    public function addMessage(string $message, int $severity, $code = 0): MessageCollection
+    {
+        return $this->add1Message(Message::create($message, $severity, $code));
+    }
+
+    /**
+     * Merges a set of {@see Message}s into this MessageCollection.
+     *
+     * @param Message[] $messages
+     * @param int $severity
+     *   If passed, it indicates the maximum severity with which to add the
+     *   messages. This can be used, e.g., to merge errors as mere warnings
+     *   because the main result is not really influenced by these errors.
+     *
+     * @return $this
+     */
+    public function copyMessages(array $messages, int $severity = Severity::Unknown): MessageCollection
+    {
+        foreach ($messages as $message) {
+            if ($severity !== Severity::Unknown && $message->getSeverity() > $severity) {
+                $message->setSeverity($severity);
             }
+            $this->messages[] = $message;
         }
         return $this;
     }

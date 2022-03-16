@@ -337,14 +337,14 @@ class InvoiceStatusForm extends Form
     {
         if ($this->source === null) {
             // Use a basic filtering on the wrong user input.
-            $this->addMessage(sprintf($this->t('unknown_source'),
+            $this->addFormMessage(sprintf($this->t('unknown_source'),
                 preg_replace('/[^a-z0-9_\-]/', '', $this->getSubmittedValue('acumulus_main_source_type')),
                 preg_replace('/[^a-z0-9_\-]/', '', $this->getSubmittedValue('acumulus_main_source_id'))),
                 Severity::Error);
         } elseif ($this->getSubmittedValue('service') !== 'invoice_show') {
             if ($this->getSubmittedValue('source') === null) {
                 // Use a basic filtering on the wrong user input.
-                $this->addMessage(sprintf($this->t('unknown_source'),
+                $this->addFormMessage(sprintf($this->t('unknown_source'),
                     preg_replace('/[^a-z0-9_\-]/', '', $this->getSubmittedValue('source_type')),
                     preg_replace('/[^a-z0-9_\-]/', '', $this->getSubmittedValue('source_id'))),
                     Severity::Error);
@@ -356,7 +356,8 @@ class InvoiceStatusForm extends Form
                     $dateFieldName = $idPrefix . 'payment_date';
                     if (!DateTime::createFromFormat(Api::DateFormat_Iso, $this->getSubmittedValue($dateFieldName))) {
                         // Date is not a valid date.
-                        $this->addMessage(sprintf($this->t('message_validate_batch_bad_payment_date'), $this->t('date_format')), Severity::Error,
+                        $this->addFormMessage(sprintf($this->t('message_validate_batch_bad_payment_date'), $this->t('date_format')),
+                            Severity::Error,
                             $dateFieldName);
                     }
                 }

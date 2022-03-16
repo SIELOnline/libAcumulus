@@ -47,15 +47,6 @@ namespace Siel\Acumulus\Helpers;
  */
 class Translator
 {
-    /**
-     * @var \Siel\Acumulus\Helpers\Translator
-     *
-     * @todo: deprecate and create messages by passing translator along the
-     *   other values.
-     * @deprecated
-     */
-    public static $instance;
-
     /** @var string */
     protected $language;
 

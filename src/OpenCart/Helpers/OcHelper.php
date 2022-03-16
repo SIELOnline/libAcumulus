@@ -534,7 +534,7 @@ class OcHelper
         $requirements = $this->acumulusContainer->getRequirements();
         $messages = $requirements->check();
         foreach ($messages as $message) {
-            $this->addMessages([new Message($message, Severity::Error)]);
+            $this->addMessages([Message::create($message, Severity::Error)]);
             $this->acumulusContainer->getLog()->error($message);
         }
         if (!empty($messages)) {
@@ -618,7 +618,7 @@ class OcHelper
             $requirements = $this->acumulusContainer->getRequirements();
             $messages = $requirements->check();
             foreach ($messages as $message) {
-                $this->addMessages([new Message($message, Severity::Error)]);
+                $this->addMessages([Message::create($message, Severity::Error)]);
                 $this->acumulusContainer->getLog()->error($message);
             }
             if (!empty($messages)) {

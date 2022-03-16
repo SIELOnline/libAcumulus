@@ -58,45 +58,45 @@ class RegisterForm extends Form
         $regexpEmail = '/^[^@<>,; "\']+@([^.@ ,;]+\.)+[^.@ ,;]+$/';
 
         if (empty($this->submittedValues[Tag::Gender])) {
-            $this->addMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_gender')), Severity::Error, Tag::Gender);
+            $this->addFormMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_gender')), Severity::Error, Tag::Gender);
         }
 
         if (empty($this->submittedValues[Tag::FullName])) {
-            $this->addMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_fullName')), Severity::Error, Tag::FullName);
+            $this->addFormMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_fullName')), Severity::Error, Tag::FullName);
         }
 
         if (empty($this->submittedValues[Tag::LoginName])) {
-            $this->addMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_loginName')), Severity::Error, Tag::LoginName);
+            $this->addFormMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_loginName')), Severity::Error, Tag::LoginName);
         } elseif (mb_strlen($this->submittedValues[Tag::LoginName]) < 6) {
-            $this->addMessage(sprintf($this->t('message_validate_loginname_0'), $this->t('field_loginName')), Severity::Error, Tag::LoginName);
+            $this->addFormMessage(sprintf($this->t('message_validate_loginname_0'), $this->t('field_loginName')), Severity::Error, Tag::LoginName);
         }
 
         if (empty($this->submittedValues[Tag::CompanyTypeId]) && $this->submittedValues[Tag::CompanyTypeId] !== 0) {
-            $this->addMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_companyTypeId')), Severity::Error, Tag::CompanyTypeId);
+            $this->addFormMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_companyTypeId')), Severity::Error, Tag::CompanyTypeId);
         }
 
         if (empty($this->submittedValues[Tag::CompanyName])) {
-            $this->addMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_companyName')), Severity::Error, Tag::CompanyName);
+            $this->addFormMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_companyName')), Severity::Error, Tag::CompanyName);
         }
 
         if (empty($this->submittedValues[Tag::Address])) {
-            $this->addMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_address')), Severity::Error, Tag::Address);
+            $this->addFormMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_address')), Severity::Error, Tag::Address);
         }
 
         if (empty($this->submittedValues[Tag::PostalCode])) {
-            $this->addMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_postalCode')), Severity::Error, Tag::PostalCode);
+            $this->addFormMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_postalCode')), Severity::Error, Tag::PostalCode);
         } elseif (!preg_match('/^\d{4}\s*[a-zA-Z]{2}$/', $this->submittedValues[Tag::PostalCode])) {
-            $this->addMessage($this->t('message_validate_postalCode_0'), Severity::Error, Tag::PostalCode);
+            $this->addFormMessage($this->t('message_validate_postalCode_0'), Severity::Error, Tag::PostalCode);
         }
 
         if (empty($this->submittedValues[Tag::City])) {
-            $this->addMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_city')), Severity::Error, Tag::City);
+            $this->addFormMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_city')), Severity::Error, Tag::City);
         }
 
         if (empty($this->submittedValues[Tag::Email])) {
-            $this->addMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_email')), Severity::Error, Tag::Email);
+            $this->addFormMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_email')), Severity::Error, Tag::Email);
         } elseif (!preg_match($regexpEmail, $this->submittedValues[Tag::Email])) {
-            $this->addMessage($this->t('message_validate_email_0'), Severity::Error, Tag::Email);
+            $this->addFormMessage($this->t('message_validate_email_0'), Severity::Error, Tag::Email);
         }
     }
 
@@ -133,7 +133,7 @@ class RegisterForm extends Form
 
         $result = $this->acumulusApiClient->signUp($signUp);
 
-        $this->addMessages($result->getMessages(Severity::WarningOrWorse));
+        $this->copyMessages($result->getMessages(Severity::WarningOrWorse));
         $formSuccess = !$result->hasError();
         if ($formSuccess) {
             $this->signUpResponse = $result->getResponse();

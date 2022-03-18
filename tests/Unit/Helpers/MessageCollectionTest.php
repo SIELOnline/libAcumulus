@@ -56,7 +56,7 @@ class MessageCollectionTest extends TestCase
      */
     public function testAddLogMessage(MessageCollection $collection): MessageCollection
     {
-        $collection->addMessage('log', Severity::Log);
+        $collection->createAndAdd('log', Severity::Log);
 
         $this->assertEquals(Severity::Log, $collection->getSeverity());
         $this->assertFalse($collection->hasRealMessages());
@@ -84,7 +84,7 @@ class MessageCollectionTest extends TestCase
      */
     public function testAddMessage(MessageCollection $collection): MessageCollection
     {
-        $collection->addMessage('suc6', Severity::Success);
+        $collection->createAndAdd('suc6', Severity::Success);
 
         $this->assertEquals(Severity::Success, $collection->getSeverity());
         $this->assertFalse($collection->hasRealMessages());
@@ -112,7 +112,7 @@ class MessageCollectionTest extends TestCase
      */
     public function testAddMessage2(MessageCollection $collection): MessageCollection
     {
-        $collection->copyMessages([Message::create('Message 702', Severity::Error, '403 Forbidden')]);
+        $collection->addMessages([Message::create('Message 702', Severity::Error, '403 Forbidden')]);
 
         $this->assertEquals(Severity::Error, $collection->getSeverity());
         $this->assertTrue($collection->hasError());
@@ -146,7 +146,7 @@ class MessageCollectionTest extends TestCase
             Message::createForFormField('Not a valid e-mail address', Severity::Notice, 'email'),
             Message::createFromApiMessage(['code' => 705, 'codetag' => 'W2', 'message' => 'Message 705'],Severity::Warning),
         ];
-        $collection->copyMessages($messages, Severity::Warning);
+        $collection->addMessages($messages, Severity::Warning);
 
         $this->assertEquals(Severity::Error, $collection->getSeverity());
         $this->assertTrue($collection->hasError());

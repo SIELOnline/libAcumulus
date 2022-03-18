@@ -1,9 +1,14 @@
 <?php
 namespace Siel\Acumulus\TestWebShop\TestDoubles\ApiClient;
 
+use Siel\Acumulus\Api;
 use Siel\Acumulus\ApiClient\AcumulusRequest as BaseAcumulusRequest;
 use Siel\Acumulus\ApiClient\HttpRequest;
 use Siel\Acumulus\ApiClient\HttpResponse;
+use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Helpers\Container;
+use Siel\Acumulus\Helpers\Log;
+use Siel\Acumulus\Unit\ApiClient\ApiRequestResponseExamples;
 
 /**
  * Communicator implements the communication with the Acumulus web API.
@@ -18,14 +23,19 @@ use Siel\Acumulus\ApiClient\HttpResponse;
  */
 class AcumulusRequest extends BaseAcumulusRequest
 {
-    protected function executeWithPostXmlStringApproach(): HttpResponse
+    /**
+     * @var \Siel\Acumulus\Unit\ApiClient\ApiRequestResponseExamples
+     */
+    private $examples;
+
+    public function __construct(Container $container, Config $config, string $userLanguage, Log $log)
     {
-        $this->httpRequest = new HttpRequest();
-        $httpCode = 200;
-        $requestHeaders = "request-headers1\r\nrequest-headers2\r\n\r\n";
-        $responseHeaders = "response-headers1\r\nresponse-headers2\r\n\r\n";
-        $responseBody = '{"vatinfo":{"vat":[{"vattype":"normal","vatrate":"21.0000"},{"vattype":"reduced","vatrate":"9.0000"},{"vattype":"reduced","vatrate":"0.0000"}]},"errors":{"count_errors":"0"},"warnings":{"count_warnings":"0"},"status":"0"}';
-        $info = ['http_code' => $httpCode, 'request_header' => $requestHeaders, 'method_time' => 0.00123];
-        return new HttpResponse($responseHeaders, $responseBody, $info, $this->httpRequest);
+        parent::__construct($container, $config, $userLanguage, $log);
+        $this->examples = new ApiRequestResponseExamples();
+    }
+
+    protected function getBasicSubmit(bool $needContract): array
+    {
+        return $this->examples->getBasicSubmit($needContract);
     }
 }

@@ -20,7 +20,7 @@ use Siel\Acumulus\Helpers\Log;
  *   create a complete request structure.
  * - Conversion from the request structure array to XML.
  * - Sending the request.
- * - Creating the {@see \Siel\Acumulus\ApiClient\Result} from the
+ * - Creating the {@see \Siel\Acumulus\ApiClient\AcumulusResult} from the
  *   {@see \Siel\Acumulus\ApiClient\HttpResponse}.
  * - Good error handling, including:
  *     - Detecting HTML responses from the proxy before the actual web service.
@@ -35,7 +35,6 @@ class AcumulusRequest
     protected /*Log*/ $log;
     protected /*string*/ $userLanguage;
 
-    protected /*bool*/ $hasExecuted = false;
     protected /*?string*/ $uri = null;
     protected /*?array*/ $submit = null;
     protected /*?HttpRequest*/ $httpRequest = null;
@@ -88,13 +87,8 @@ class AcumulusRequest
      *   Indicates whether this api function needs the contract details. Most
      *   API functions do, but for some general listing functions, like vat
      *   info, it is optional, and for signUp it is even not allowed.
-     * @param \Siel\Acumulus\ApiClient\Result|null $result
-     *   It is possible to already create a Result object before calling the
-     *   api-client to store local messages. By passing this Result object these
-     *   local messages will be merged with any remote messages in the returned
-     *   Result object.
      *
-     * @return \Siel\Acumulus\ApiClient\Result
+     * @return \Siel\Acumulus\ApiClient\AcumulusResult
      *   The result of the web service call. See
      *   {@see https://www.siel.nl/acumulus/API/Basic_Response/} for the
      *   structure of a response. In case of errors, an exception or error
@@ -104,32 +98,26 @@ class AcumulusRequest
      * @throws \LogicException
      *   This request has already been executed.
      */
-    public function execute(string $uri, array $submit, bool $needContract, ?Result $result = null): Result
+    public function execute(string $uri, array $submit, bool $needContract): AcumulusResult
     {
-        if ($this->hasExecuted) {
-            throw new LogicException('AcumulusRequest::execute() may only be called once.');
-        }
-        $this->hasExecuted = true;
-
-        if ($result === null) {
-            $result = $this->container->getResult();
-        }
+        assert($this->uri === null, new LogicException('AcumulusRequest::execute() may only be called once.'));
 
         try {
             $this->uri= $uri;
             $this->submit = $this->constructFullSubmit($submit, $needContract);
-            $result->setAcumulusRequest($this);
-            $result->setHttpResponse($this->executeWithPostXmlStringApproach());
+            $httpResponse = $this->executeWithPostXmlStringApproach();
+            $result = $this->container->getAcumulusResult($this, $httpResponse);
         } catch (RuntimeException $e) {
             // Any errors during:
-            // - conversion of the message to xml
-            // - communication with the Acumulus web service
-            // - converting the answer to an array
+            // - Conversion of the message to xml.
+            // - communication with the Acumulus web service.
+            // - Converting the response to an array.
             // are returned as a RuntimeException.
+            $result = $this->container->getAcumulusResult($this, null);
             $result->addException($e);
         }
 
-        $result->toLogMessages();
+        $result->toLogMessages(true);
         return $result;
     }
 
@@ -152,8 +140,8 @@ class AcumulusRequest
      *   An error occurred at:
      *   - The internal level, e.g. an out of memory error.
      *   - The communication level, e.g. time-out or no response received.
-     *   Note that errors at the application level will be set as messages when
-     *   the response is interpreted.
+     *   Note that errors at the application level will be detected when the
+     *   response is interpreted.
      */
     protected function executeWithPostXmlStringApproach(): HttpResponse
     {
@@ -161,9 +149,15 @@ class AcumulusRequest
         //   The top tag name is ignored by the Acumulus API, we use <acumulus>.
         // - 'xmlstring' is the post field that Acumulus expects.
         $options = [CURLOPT_USERAGENT => $this->getUserAgent()];
-        $this->httpRequest = new HttpRequest($options);
         $body = ['xmlstring' => trim($this->convertArrayToXml(['acumulus' => $this->submit]))];
-        return $this->httpRequest->post($this->uri, $body);
+        $this->httpRequest = $this->container->getHttpRequest($options);
+        $httpResponse = $this->httpRequest->post($this->uri, $body);
+
+        assert($httpResponse->getRequest() === $this->httpRequest);
+        assert($this->httpRequest->getUri() === $this->uri);
+        assert($this->httpRequest->getBody() === $body);
+
+        return $httpResponse;
     }
 
     protected function getUserAgent(): string
@@ -194,22 +188,24 @@ class AcumulusRequest
      */
     protected function constructFullSubmit(array $submit, bool $needContract): array
     {
-        $commonMessagePart = $this->getBasicSubmit($needContract);
-        return array_merge($commonMessagePart, $submit);
+        $basicSubmit = $this->getBasicSubmit($needContract);
+        return array_merge($basicSubmit, $submit);
     }
 
     /**
-     * Returns the common part of each API message.
+     * Returns the basic submit part of each API message.
      *
-     * The common part consists of the following tags:
-     * - contract (optional).
-     * - format: 'json' or 'xml'.
-     * - testmode: 0 (real) or 1 (test mode).
-     * - lang: Language for error and warning in responses.
-     * - inodes: List of ";"-separated XML-node identifiers which should be
-     *     included in the response. Defaults to full response when left out or
-     *     empty.
-     * - connector: information about the client.
+     * The basic submit part is defined at
+     * {@see https://www.siel.nl/acumulus/API/Basic_Submit/}
+     * and consists of the following tags:
+     * - 'contract' (optional): authentication and authorisation credentials.
+     * - 'format': 'json' or 'xml'.
+     * - 'testmode': 0 (real) or 1 (test mode).
+     * - 'lang': Language for error and warning in responses.
+     * - 'inodes' (ignored): List of ";"-separated XML-node identifiers which
+     *   should be included in the response. Defaults to full response when left
+     *   out or empty.
+     * - 'connector': information about the client software.
      *
      * @param bool $needContract
      *   Indicates whether this api function needs the contract details. Most
@@ -218,9 +214,7 @@ class AcumulusRequest
      *   not allowed.
      *
      * @return array
-     *   The common part of an API message.
-     *
-     * @see https://www.siel.nl/acumulus/API/Basic_Submit/
+     *   The basic submit part of an API message.
      */
     protected function getBasicSubmit(bool $needContract): array
     {
@@ -244,6 +238,7 @@ class AcumulusRequest
                 'sourceuri' => 'https://github.com/SIELOnline/libAcumulus',
             ],
         ];
+
         return $result;
     }
 

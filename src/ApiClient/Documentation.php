@@ -7,7 +7,7 @@
  *   supported API calls may be called via a PHP method with the arguments for
  *   that call passed as its parameters, mostly being keyed arrays or scalars
  *   that map more or less directly to the API call arguments.
- * - {@see Result}: The result of an API call is returned as a {@see Result}.
+ * - {@see AcumulusResult}: The result of an API call is returned as a {@see AcumulusResult}.
  *   It contains:
  *     - The actual response (if the call returned correctly).
  *     - The parts of the
@@ -55,7 +55,7 @@
  *     - A reference to the {@see HttpRequest}.
  *
  * The latter 2 classes are typically only used by an {@see AcumulusRequest}
- * and a {@see Result}, except perhaps for future support of other web services,
+ * and a {@see AcumulusResult}, except perhaps for future support of other web services,
  * e.g. looking for newer versions at GitHub or validating VAT numbers with the
  * VIES service.
  *

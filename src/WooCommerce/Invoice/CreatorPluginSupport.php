@@ -2,7 +2,7 @@
 
 namespace Siel\Acumulus\WooCommerce\Invoice;
 
-use Siel\Acumulus\Invoice\Result;
+use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Invoice\Source as BaseSource;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
@@ -111,11 +111,11 @@ class CreatorPluginSupport
      *
      * @param array|null $invoice
      * @param \Siel\Acumulus\Invoice\Source $invoiceSource
-     * @param \Siel\Acumulus\Invoice\Result $localResult
+     * @param \Siel\Acumulus\Invoice\InvoiceAddResult $localResult
      *
      * @return array|null
      */
-    public function acumulusInvoiceCreated(?array $invoice, BaseSource $invoiceSource, Result $localResult): ?array
+    public function acumulusInvoiceCreated(?array $invoice, BaseSource $invoiceSource, InvoiceAddResult $localResult): ?array
     {
         $invoice = $this->supportBundleProducts($invoice, $invoiceSource, $localResult);
         /** @noinspection PhpUnnecessaryLocalVariableInspection */
@@ -145,11 +145,11 @@ class CreatorPluginSupport
      *
      * @param array|null $invoice
      * @param \Siel\Acumulus\Invoice\Source $invoiceSource
-     * @param \Siel\Acumulus\Invoice\Result $localResult
+     * @param \Siel\Acumulus\Invoice\InvoiceAddResult $localResult
      *
      * @return array|null
      */
-    protected function supportBundleProducts(?array $invoice, BaseSource $invoiceSource, /** @noinspection PhpUnusedParameterInspection */ Result $localResult): ?array
+    protected function supportBundleProducts(?array $invoice, BaseSource $invoiceSource, /** @noinspection PhpUnusedParameterInspection */ InvoiceAddResult $localResult): ?array
     {
         /** @var \WC_Abstract_Order $shopSource */
         $shopSource = $invoiceSource->getSource();
@@ -271,7 +271,7 @@ class CreatorPluginSupport
      *
      * @param array|null $invoice
      * @param \Siel\Acumulus\Invoice\Source $invoiceSource
-     * @param \Siel\Acumulus\Invoice\Result $localResult
+     * @param \Siel\Acumulus\Invoice\InvoiceAddResult $localResult
      *
      * @return array|null
      */
@@ -279,7 +279,7 @@ class CreatorPluginSupport
         ?array $invoice,
         BaseSource $invoiceSource,
         /** @noinspection PhpUnusedParameterInspection */
-        Result $localResult
+        InvoiceAddResult $localResult
     ): ?array {
         /** @var \WC_Abstract_Order $shopSource */
         $shopSource = $invoiceSource->getSource();

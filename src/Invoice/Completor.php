@@ -14,7 +14,6 @@ use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
-use Siel\Acumulus\ApiClient\Result as WebResult;
 use Siel\Acumulus\ApiClient\Acumulus;
 use Siel\Acumulus\Helpers\Severity;
 
@@ -97,7 +96,7 @@ class Completor
     /** @var \Siel\Acumulus\Helpers\Countries */
     protected $countries;
 
-    /** @var \Siel\Acumulus\ApiClient\Result */
+    /** @var \Siel\Acumulus\ApiClient\AcumulusResult */
     protected $result;
 
     /** @var array */
@@ -193,13 +192,13 @@ class Completor
      *   The invoice to complete.
      * @param Source $source
      *   The source object for which this invoice was created.
-     * @param \Siel\Acumulus\ApiClient\Result $result
+     * @param \Siel\Acumulus\Invoice\InvoiceAddResult $result
      *   A Result object where local errors and warnings can be added.
      *
      * @return array
      *   The completed invoice.
      */
-    public function complete(array $invoice, Source $source, WebResult $result): array
+    public function complete(array $invoice, Source $source, InvoiceAddResult $result): array
     {
         $this->invoice = $invoice;
         $this->source = $source;
@@ -538,7 +537,7 @@ class Completor
         if (empty($this->invoice[Tag::Customer][Tag::Email])) {
             $customerSettings = $this->config->getCustomerSettings();
             $this->invoice[Tag::Customer][Tag::Email] = $customerSettings['emailIfAbsent'];
-            $this->result->addMessage($this->t('message_warning_no_email'), Severity::Warning, 801);
+            $this->result->createAndAdd($this->t('message_warning_no_email'), Severity::Warning, 801);
         } else {
             $email = $this->invoice[Tag::Customer][Tag::Email];
             $at = strpos($email, '@');
@@ -1369,7 +1368,7 @@ class Completor
                     } elseif ($percentage > $warningPercentage) {
                         // Send mail with notice, xml message will not be added
                         // if there are no warnings or worse.
-                        $this->result->addMessage(
+                        $this->result->createAndAdd(
                             sprintf($this->t('eu_commerce_threshold_warning'), $percentage),
                             Severity::Notice,
                             832
@@ -1508,7 +1507,7 @@ class Completor
                 $result = $this->acumulusApiClient->getVatInfo('GB', $date);
             }
             if ($result->hasRealMessages()) {
-                $this->result->copyMessages($result->getMessages(Severity::InfoOrWorse));
+                $this->result->addMessages($result->getMessages(Severity::InfoOrWorse));
                 $result = [];
             } else {
                 $result = $result->getResponse();
@@ -1916,7 +1915,7 @@ class Completor
             if (!empty($args)) {
                 $message = sprintf($message, ...$args);
             }
-            $this->result->addMessage($message, Severity::Warning, $code);
+            $this->result->createAndAdd($message, Severity::Warning, $code);
             $this->addWarning($array, $this->result->getByCode($code)->format(Message::Format_Plain));
         }
     }

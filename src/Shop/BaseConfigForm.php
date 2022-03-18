@@ -105,7 +105,7 @@ abstract class BaseConfigForm extends Form
             $about = $this->acumulusApiClient->getAbout();
             if ($about->hasError()) {
                 $message = $about->getByCode(403) ? 'message_error_auth' : 'message_error_comm';
-                $this->copyMessages($about->getMessages(Severity::WarningOrWorse));
+                $this->addMessages($about->getMessages(Severity::WarningOrWorse));
             } else {
                 // Check role.
                 $response = $about->getResponse();

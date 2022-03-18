@@ -5,7 +5,7 @@ use DateTime;
 use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
 use Magento\Sales\Model\ResourceModel\Order\Collection as OrderCollection;
 use Magento\Sales\Model\ResourceModel\Order\Creditmemo\Collection as CreditmemoCollection;
-use Siel\Acumulus\Invoice\Result;
+use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Magento\Helpers\Registry;
 use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
@@ -98,7 +98,7 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * This Magento override dispatches the 'acumulus_invoice_created' event.
      */
-    protected function triggerInvoiceCreated(array &$invoice, Source $invoiceSource, Result $localResult)
+    protected function triggerInvoiceCreated(array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult)
     {
         $this->dispatchEvent('acumulus_invoice_created', ['invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult]);
     }
@@ -108,7 +108,7 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * This Magento override dispatches the 'acumulus_invoice_completed' event.
      */
-    protected function triggerInvoiceSendBefore(array &$invoice, Source $invoiceSource, Result $localResult)
+    protected function triggerInvoiceSendBefore(array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult)
     {
         $this->dispatchEvent('acumulus_invoice_send_before', ['invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult]);
     }
@@ -118,7 +118,7 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * This Magento override dispatches the 'acumulus_invoice_sent' event.
      */
-    protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, Result $result)
+    protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, InvoiceAddResult $result)
     {
         $this->dispatchEvent('acumulus_invoice_send_after', ['invoice' => $invoice, 'source' => $invoiceSource, 'result' => $result]);
     }

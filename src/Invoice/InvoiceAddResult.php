@@ -1,29 +1,26 @@
 <?php
 namespace Siel\Acumulus\Invoice;
 
-use Siel\Acumulus\Helpers\Log;
+use Siel\Acumulus\ApiClient\AcumulusResult;
 use Siel\Acumulus\Helpers\Message;
-use Siel\Acumulus\ApiClient\Result as AcumulusResult;
+use Siel\Acumulus\Helpers\MessageCollection;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Helpers\Translator;
 
 /**
  * Extends Result with properties and features specific to the InvoiceAdd web
  * service call.
- *
- * @todo: do not extend it from AcumulusResult, so we do not have to create an
- *   AcumulusResult up front, that makes things in the ApiClient namespace
- *   simpler and more elegant.
  */
-class Result extends AcumulusResult
+class InvoiceAddResult extends MessageCollection
 {
     // Whether to add the raw request and response to mails or log messages.
     public const AddReqResp_Never = 1;
     public const AddReqResp_Always = 2;
     public const AddReqResp_WithOther = 3;
-    public const SendStatus_Unknown = 0;
+
     // Invoice send handling related constants.
-    // Reason for not sending
+    public const SendStatus_Unknown = 0;
+    // Reasons for not sending.
     public const NotSent_EventInvoiceCreated = 0x1;
     public const NotSent_EventInvoiceCompleted = 0x2;
     public const NotSent_AlreadySent = 0x3;
@@ -36,12 +33,19 @@ class Result extends AcumulusResult
     public const NotSent_TriggerCreditNoteEventNotEnabled = 0xa;
     public const NotSent_LockedForSending = 0xb;
     public const NotSent_Mask = 0xf;
-    // Reason for sending
+    // Reasons for sending
     public const Send_New = 0x10;
     public const Send_Forced = 0x20;
     public const Send_TestMode = 0x30;
     public const Send_LockExpired = 0x40;
     public const Send_Mask = 0xf0;
+
+    /**
+     * @var string
+     *   A string indicating the function that triggered the sending, e.g.
+     *   InvoiceManager::sourceStatusChange().
+     */
+    protected $trigger;
 
     /**
      * @var int
@@ -58,11 +62,9 @@ class Result extends AcumulusResult
     protected $sendStatusArguments;
 
     /**
-     * @var string
-     *   A string indicating the function that triggered the sending, e.g.
-     *   InvoiceManager::sourceStatusChange().
+     * @var \Siel\Acumulus\ApiClient\AcumulusResult|null
      */
-    protected $trigger;
+    protected $apiResult = null;
 
     /**
      * InvoiceSendResult constructor.
@@ -71,11 +73,10 @@ class Result extends AcumulusResult
      *   A string indicating the function that triggered the sending, e.g.
      *   InvoiceManager::sourceStatusChange().
      * @param \Siel\Acumulus\Helpers\Translator $translator
-     * @param \Siel\Acumulus\Helpers\Log $log
      */
-    public function __construct($trigger, Translator $translator, Log $log)
+    public function __construct($trigger, Translator $translator)
     {
-        parent::__construct($translator, $log);
+        parent::__construct($translator);
         $this->trigger = $trigger;
         $this->sendStatus = self::SendStatus_Unknown;
         $this->sendStatusArguments = [];
@@ -102,7 +103,7 @@ class Result extends AcumulusResult
      *
      * @return $this
      */
-    public function setSendStatus(int $sendStatus, array $arguments = []): Result
+    public function setSendStatus(int $sendStatus, array $arguments = []): InvoiceAddResult
     {
         $this->sendStatus = $sendStatus;
         $this->sendStatusArguments = $arguments;
@@ -151,7 +152,7 @@ class Result extends AcumulusResult
      * @return $this
      * @noinspection PhpUnused
      */
-    public function setTrigger(string $trigger): Result
+    public function setTrigger(string $trigger): InvoiceAddResult
     {
         $this->trigger = $trigger;
         return $this;
@@ -241,6 +242,22 @@ class Result extends AcumulusResult
         return $message;
     }
 
+    public function getApiResult(): ?AcumulusResult
+    {
+        return $this->apiResult;
+    }
+
+    /**
+     * Sets the AcumulusResult and copies its messages to this object
+     *
+     * @param \Siel\Acumulus\ApiClient\AcumulusResult $acumulusResult
+     */
+    public function setApiResult(AcumulusResult $acumulusResult): void
+    {
+        $this->apiResult = $acumulusResult;
+        $this->addMessages($acumulusResult->getMessages());
+    }
+
     /**
      * Returns a translated sentence that can be used for logging.
      * The returned sentence indicates what happened and why. If the invoice was
@@ -260,15 +277,15 @@ class Result extends AcumulusResult
         $message = sprintf($this->t('message_invoice_reason'), $action, $reason);
 
         if ($this->hasBeenSent() || $this->getSendStatus() === self::NotSent_LocalErrors) {
-            if ($this->hasBeenSent()) {
-                $message .= ' ' . $this->getStatusText();
+            if ($this->getApiResult() !== null) {
+                $message .= ' ' . $this->getApiResult()->getStatusText();
             }
             if ($this->hasRealMessages()) {
                 $message .= "\n" . $this->formatMessages(Message::Format_PlainListWithSeverity, Severity::RealMessages);
             }
-            if ($addReqResp === Result::AddReqResp_Always || ($addReqResp === Result::AddReqResp_WithOther && $this->hasRealMessages())) {
+            if ($addReqResp === InvoiceAddResult::AddReqResp_Always || ($addReqResp === InvoiceAddResult::AddReqResp_WithOther && $this->hasRealMessages())) {
                 $message = rtrim($message);
-                $logMessages = $this->toLogMessages(false);
+                $logMessages = $this->getApiResult()->toLogMessages();
                 foreach ($logMessages as $logMessage) {
                     $message .= "\n$logMessage";
                 }

@@ -10,7 +10,7 @@ use DateTime;
 use DB;
 use Event;
 use Siel\Acumulus\Helpers\Container;
-use Siel\Acumulus\Invoice\Result;
+use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Invoice\Source as Source;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
 use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
@@ -98,7 +98,7 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * This OpenCart override triggers the 'acumulus.invoice.created' event.
      */
-    protected function triggerInvoiceCreated(array &$invoice, Source $invoiceSource, Result $localResult)
+    protected function triggerInvoiceCreated(array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult)
     {
 	    $route = 'model/' . Registry::getInstance()->getLocation() . '/invoiceCreated/after';
         $args = ['invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult];
@@ -110,7 +110,7 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * This OpenCart override triggers the 'acumulus.invoice.completed' event.
      */
-    protected function triggerInvoiceSendBefore(array &$invoice, Source $invoiceSource, Result $localResult)
+    protected function triggerInvoiceSendBefore(array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult)
     {
 	    $route = 'model/' . Registry::getInstance()->getLocation() . '/invoiceSend/before';
         $args = ['invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult];
@@ -122,7 +122,7 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * This OpenCart override triggers the 'acumulus.invoice.sent' event.
      */
-    protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, Result $result)
+    protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, InvoiceAddResult $result)
     {
 	    $route = 'model/' . Registry::getInstance()->getLocation() . '/invoiceSend/after';
         $args = ['invoice' => $invoice, 'source' => $invoiceSource, 'result' => $result];

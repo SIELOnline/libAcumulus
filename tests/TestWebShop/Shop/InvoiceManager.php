@@ -5,7 +5,7 @@ use DateTime;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
-use Siel\Acumulus\Invoice\Result;
+use Siel\Acumulus\Invoice\InvoiceAddResult;
 
 /**
  * Implements the TestWebShop specific parts of the invoice manager.
@@ -81,7 +81,7 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * This TestWebShop override executes the 'actionAcumulusInvoiceCreated' hook.
      */
-    protected function triggerInvoiceCreated(array &$invoice, Source $invoiceSource, Result $localResult)
+    protected function triggerInvoiceCreated(array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult)
     {
         // @todo: adapt to the way TestWebShop triggers events (and passes parameters (by value and reference) to the event handlers).
         Hook::exec('actionAcumulusInvoiceCreated', array('invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult));
@@ -92,7 +92,7 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * This TestWebShop override executes the 'actionAcumulusInvoiceSendBefore' hook.
      */
-    protected function triggerInvoiceSendBefore(array &$invoice, Source $invoiceSource, Result $localResult)
+    protected function triggerInvoiceSendBefore(array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult)
     {
         // @todo: adapt to the way TestWebShop triggers events (and passes parameters (by value and reference) to the event handlers).
         Hook::exec('actionAcumulusInvoiceSendBefore', array('invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult));
@@ -103,7 +103,7 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * This TestWebShop override executes the 'actionAcumulusInvoiceSentAfter' hook.
      */
-    protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, Result $result)
+    protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, InvoiceAddResult $result)
     {
         // @todo: adapt to the way TestWebShop triggers events (and passes parameters (by value) to the event handlers).
         Hook::exec('actionAcumulusInvoiceSendAfter', array('invoice' => $invoice, 'source' => $invoiceSource, 'result' => $result));

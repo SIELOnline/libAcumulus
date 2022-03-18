@@ -19,57 +19,72 @@ use Siel\Acumulus\Helpers\Container;
  */
 class AcumulusRequestTest extends TestCase
 {
-    private $acumulusRequest;
+    /**
+     * @var \Siel\Acumulus\ApiClient\AcumulusRequest
+     */
+    protected $acumulusRequest;
+    /**
+     * @var \Siel\Acumulus\ApiClient\AcumulusResult
+     */
+    protected $acumulusResult;
+    private /*Container*/ $container;
+    private /*ApiRequestResponseExamples*/ $examples;
 
     protected function setUp(): void
     {
         $language = 'nl';
-        $container = new Container('TestWebShop\TestDoubles', $language);
-        $this->acumulusRequest = $container->getAcumulusRequest();
+        $this->container = new Container('TestWebShop\TestDoubles', $language);
+        $this->examples = new ApiRequestResponseExamples();
     }
 
-    public function testGettersBefore()
+    private function createAcumulusRequest()
     {
+        $this->acumulusRequest = $this->container->getAcumulusRequest();
+
         $this->assertNull($this->acumulusRequest->getUri());
         $this->assertNull($this->acumulusRequest->getSubmit());
         $this->assertNull($this->acumulusRequest->getHttpRequest());
     }
 
+    private function getAcumulusRequest($uri)
+    {
+        $this->createAcumulusRequest();
+        $submit = $this->examples->getSubmit($uri);
+        $needContract = $this->examples->needContract($uri);
+        $this->acumulusResult =  $this->acumulusRequest->execute($uri, $submit, $needContract);
+
+        $this->assertEquals($uri, $this->acumulusRequest->getUri());
+        $fullSubmit = $this->acumulusRequest->getSubmit();
+        $this->assertArrayHasKey('format', $fullSubmit);
+        $this->assertArrayHasKey('testmode', $fullSubmit);
+        $this->assertArrayHasKey('lang', $fullSubmit);
+        $this->assertArrayHasKey('connector', $fullSubmit);
+        $this->assertEqualsCanonicalizing(
+            $submit,
+            array_intersect_assoc($fullSubmit, $submit)
+        );
+        $this->assertNotNull($this->acumulusRequest->getHttpRequest());
+        $this->assertSame('POST', $this->acumulusRequest->getHttpRequest()->getMethod());
+        $this->assertSame($uri, $this->acumulusRequest->getHttpRequest()->getUri());
+        $this->assertIsArray($this->acumulusRequest->getHttpRequest()->getBody());
+        $this->assertCount(1, $this->acumulusRequest->getHttpRequest()->getBody());
+        $this->assertArrayHasKey('xmlstring', $this->acumulusRequest->getHttpRequest()->getBody());
+        $this->assertStringContainsString('<acumulus>', $this->acumulusRequest->getHttpRequest()->getBody()['xmlstring']);
+    }
+
     public function testExecuteNoContract()
     {
-        $uri = 'uri';
-        $message = ['key' => 'value'];
-        $this->acumulusRequest->execute($uri, $message, false);
-        $this->assertEquals($uri, $this->acumulusRequest->getUri());
-        $submit = $this->acumulusRequest->getSubmit();
-        $this->assertArrayNotHasKey('contract', $submit);
-        $this->assertArrayHasKey('format', $submit);
-        $this->assertArrayHasKey('testmode', $submit);
-        $this->assertArrayHasKey('lang', $submit);
-        $this->assertArrayHasKey('connector', $submit);
-        $this->assertEqualsCanonicalizing($message, array_intersect_assoc($submit, $message));
-        $this->assertNotNull($this->acumulusRequest->getHttpRequest());
+        $uri = 'vatinfo';
+        $this->getAcumulusRequest($uri);
+
+        $this->assertArrayNotHasKey('contract', $this->acumulusRequest->getSubmit());
     }
 
     public function testExecuteContract()
     {
-        $uri = 'uri';
-        $message = ['key' => 'value'];
-        $this->acumulusRequest->execute($uri, $message, true);
-        $this->assertEquals($uri, $this->acumulusRequest->getUri());
-        $submit = $this->acumulusRequest->getSubmit();
-        $this->assertArrayHasKey('contract', $submit);
-        $this->assertIsArray($submit['contract']);
-        $this->assertArrayHasKey('contractcode', $submit['contract']);
-        $this->assertArrayHasKey('username', $submit['contract']);
-        $this->assertArrayHasKey('password', $submit['contract']);
-        $this->assertArrayHasKey('emailonerror', $submit['contract']);
-        $this->assertArrayHasKey('emailonwarning', $submit['contract']);
-        $this->assertArrayHasKey('format', $submit);
-        $this->assertArrayHasKey('testmode', $submit);
-        $this->assertArrayHasKey('lang', $submit);
-        $this->assertArrayHasKey('connector', $submit);
-        $this->assertEqualsCanonicalizing($message, array_intersect_assoc($submit, $message));
-        $this->assertNotNull($this->acumulusRequest->getHttpRequest());
+        $uri = 'accounts';
+        $this->getAcumulusRequest($uri);
+
+        $this->assertArrayHasKey('contract', $this->acumulusRequest->getSubmit());
     }
 }

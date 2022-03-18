@@ -133,7 +133,7 @@ class RegisterForm extends Form
 
         $result = $this->acumulusApiClient->signUp($signUp);
 
-        $this->copyMessages($result->getMessages(Severity::WarningOrWorse));
+        $this->addMessages($result->getMessages(Severity::WarningOrWorse));
         $formSuccess = !$result->hasError();
         if ($formSuccess) {
             $this->signUpResponse = $result->getResponse();

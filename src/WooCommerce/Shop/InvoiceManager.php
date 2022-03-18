@@ -9,7 +9,7 @@ namespace Siel\Acumulus\WooCommerce\Shop;
 use DateTime;
 use Siel\Acumulus\Invoice\Source as Source;
 use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
-use Siel\Acumulus\Invoice\Result;
+use Siel\Acumulus\Invoice\InvoiceAddResult;
 use WP_Query;
 
 /**
@@ -207,7 +207,7 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * This WooCommerce override applies the 'acumulus_invoice_created' filter.
      */
-    protected function triggerInvoiceCreated(array &$invoice, Source $invoiceSource, Result $localResult)
+    protected function triggerInvoiceCreated(array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult)
     {
         $invoice = apply_filters('acumulus_invoice_created', $invoice, $invoiceSource, $localResult);
     }
@@ -217,7 +217,7 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * This WooCommerce override applies the 'acumulus_invoice_send_before' filter.
      */
-    protected function triggerInvoiceSendBefore(array &$invoice, Source $invoiceSource, Result $localResult)
+    protected function triggerInvoiceSendBefore(array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult)
     {
         $invoice = apply_filters('acumulus_invoice_send_before', $invoice, $invoiceSource, $localResult);
     }
@@ -227,7 +227,7 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * This WooCommerce override executes the 'acumulus_invoice_send_after' action.
      */
-    protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, Result $result)
+    protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, InvoiceAddResult $result)
     {
         do_action('acumulus_invoice_send_after', $invoice, $invoiceSource, $result);
     }

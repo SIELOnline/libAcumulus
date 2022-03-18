@@ -94,7 +94,7 @@ class RatePluginForm extends Form
                 $result = $this->acumulusConfig->save(['showRatePluginMessage' => PHP_INT_MAX]);
                 break;
             default:
-                $this->addMessage(sprintf($this->t('unknown_action'), $this->action), Severity::Error);
+                $this->createAndAdd(sprintf($this->t('unknown_action'), $this->action), Severity::Error);
                 $result = false;
                 break;
         }

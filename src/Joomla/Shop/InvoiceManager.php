@@ -9,7 +9,7 @@ use JFactory;
 use JPluginHelper;
 use Siel\Acumulus\Invoice\Source as Source;
 use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
-use Siel\Acumulus\Invoice\Result;
+use Siel\Acumulus\Invoice\InvoiceAddResult;
 
 /**
  * This override provides Joomla specific db helper methods and defines
@@ -81,7 +81,7 @@ abstract class InvoiceManager extends BaseInvoiceManager
      *
      * This Joomla override dispatches the 'onAcumulusInvoiceCreated' event.
      */
-    protected function triggerInvoiceCreated(array &$invoice, Source $invoiceSource, Result $localResult)
+    protected function triggerInvoiceCreated(array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult)
     {
         JPluginHelper::importPlugin('acumulus');
         $results = JEventDispatcher::getInstance()->trigger('onAcumulusInvoiceCreated', [&$invoice, $invoiceSource, $localResult]);
@@ -98,7 +98,7 @@ abstract class InvoiceManager extends BaseInvoiceManager
      *
      * This Joomla override dispatches the 'onAcumulusInvoiceSendBefore' event.
      */
-    protected function triggerInvoiceSendBefore(array &$invoice, Source $invoiceSource, Result $localResult)
+    protected function triggerInvoiceSendBefore(array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult)
     {
         JPluginHelper::importPlugin('acumulus');
         $results = JEventDispatcher::getInstance()->trigger('onAcumulusInvoiceSendBefore', [&$invoice, $invoiceSource, $localResult]);
@@ -115,7 +115,7 @@ abstract class InvoiceManager extends BaseInvoiceManager
      *
      * This Joomla override dispatches the 'onAcumulusInvoiceSent' event.
      */
-    protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, Result $result)
+    protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, InvoiceAddResult $result)
     {
         JPluginHelper::importPlugin('acumulus');
         JEventDispatcher::getInstance()->trigger('onAcumulusInvoiceSendAfter', [$invoice, $invoiceSource, $result]);

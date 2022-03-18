@@ -7,28 +7,46 @@ use Siel\Acumulus\Tag;
 class ApiRequestResponseExamples
 {
 
+    private function getContract(): array
+    {
+        return [
+            'contract' => [
+                'contractcode' => '288252',
+                'username' => 'APIGebruiker12345',
+                'password' => 'mysecret',
+                'emailonerror' => 'erwin@burorader.com',
+                'emailonwarning' => 'erwin@burorader.com',
+            ],
+        ];
+    }
+
+    public function getBasicSubmit(bool $needContract): array
+    {
+        $submit = [
+            'format' => 'json',
+            'testmode' => '0',
+            'lang' => 'nl',
+            'connector' => [
+                'application' => 'WooCommerce 4.0.1 (WordPress: 5.4)',
+                'webkoppel' => 'Acumulus 5.9.0',
+                'development' => 'SIEL - Buro RaDer',
+                'remark' => 'Library 5.10.0-alpha1 - PHP 7.1.33',
+                'sourceuri' => 'https://www.siel.nl/',
+            ],
+        ];
+        if ($needContract) {
+            $submit = $this->getContract() + $submit;
+        }
+        return $submit;
+    }
+
     private $sets = [
         'accounts' => [
-            'submit' => [
-                'contract' => [
-                    'contractcode' => '288252',
-                    'username' => 'APIGebruiker12345',
-                    'password' => 'mysecret',
-                    'emailonerror' => 'erwin@burorader.com',
-                    'emailonwarning' => 'erwin@burorader.com',
-                ],
-                'format' => 'json',
-                'testmode' => '0',
-                'lang' => 'nl',
-                'connector' => [
-                    'application' => 'WooCommerce 4.0.1 (WordPress: 5.4)',
-                    'webkoppel' => 'Acumulus 5.9.0',
-                    'development' => 'SIEL - Buro RaDer',
-                    'remark' => 'Library 5.10.0-alpha1 - PHP 7.1.33',
-                    'sourceuri' => 'https://www.siel.nl/',
-                ],
-            ],
+            'needContract' => true,
+            'submit' => [],
             'response body' => '{"accounts":{"account":[{"accountid":"70582","accountnumber":"4911764","accountdescription":"Giro","accounttypeid":"1"},{"accountid":"70583","accountnumber":{},"accountdescription":"Kas","accounttypeid":"1"},{"accountid":"147659","accountnumber":"123456789","accountdescription":{},"accounttypeid":"1"}]},"errors":{"count_errors":"0"},"warnings":{"count_warnings":"0"},"status":"0"}',
+            'mainResponseKey' => 'accounts',
+            'isList' => true,
             'main response' => [
                 ['accountid' => '70582', 'accountnumber' => '4911764', 'accountdescription' => 'Giro', 'accounttypeid' => '1'],
                 ['accountid' => '70583', 'accountnumber' => [], 'accountdescription' => 'Kas', 'accounttypeid' => '1'],
@@ -37,26 +55,11 @@ class ApiRequestResponseExamples
         ],
 
         'costcenters' => [
-            'submit' => [
-                'contract' => [
-                    'contractcode' => '288252',
-                    'username' => 'APIGebruiker12345',
-                    'password' => 'mysecret',
-                    'emailonerror' => 'erwin@burorader.com',
-                    'emailonwarning' => 'erwin@burorader.com',
-                ],
-                'format' => 'json',
-                'testmode' => '0',
-                'lang' => 'nl',
-                'connector' => [
-                    'application' => 'WooCommerce 4.0.1 (WordPress: 5.4)',
-                    'webkoppel' => 'Acumulus 5.9.0',
-                    'development' => 'SIEL - Buro RaDer',
-                    'remark' => 'Library 5.10.0-alpha1 - PHP 7.1.33',
-                    'sourceuri' => 'https://www.siel.nl/',
-                ],
-            ],
+            'needContract' => true,
+            'submit' => [],
             'resonse body' => '{"costcenters":{"costcenter":[{"costcenterid":"48663","costcentername":"Algemeen"},{"costcenterid":"56074","costcentername":"kostenplaats 1"},{"costcenterid":"56075","costcentername":"kostenplaats 2"}]},"errors":{"count_errors":"0"},"warnings":{"count_warnings":"0"},"status":"0"}',
+            'mainResponseKey' => 'costcenters',
+            'isList' => true,
             'main response' => [
                 ['costcenterid' => '48663', 'costcentername' => 'Algemeen'],
                 ['costcenterid' => '56074', 'costcentername' => 'kostenplaats 1'],
@@ -64,96 +67,45 @@ class ApiRequestResponseExamples
             ],
         ],
 
-        'no_contract' => [
+        'no-contract' => [
+            'needContract' => false,
             'submit' => [
-                'format' => 'json',
-                'testmode' => '1',
-                'lang' => 'nl',
-                'connector' => [
-                    'application' => 'WooCommerce 4.0.1 (WordPress: 5.4)',
-                    'webkoppel' => 'Acumulus 5.9.0',
-                    'development' => 'SIEL - Buro RaDer',
-                    'remark' => 'Library 5.10.0-alpha1 - PHP 7.1.33',
-                    'sourceuri' => 'https://www.siel.nl/',
-                ],
                 'vatdate' => '2020-02-05',
                 'vatcountry' => 'nl',
             ],
             'response body' => '{"errors":{"error":{"code":"403 Forbidden","codetag":"AF1001MCS","message":"Verplichte contract sectie ontbreekt"},"count_errors":"1"},"warnings":{"count_warnings":"0"},"status":"1"}',
+            'mainResponseKey' => 'costcenters',
+            'isList' => true,
             'main response' => [],
         ],
 
         'vatinfo' => [
+            'needContract' => false,
             'submit' => [
-                'contract' => [
-                    'contractcode' => '288252',
-                    'username' => 'APIGebruiker12345',
-                    'password' => 'mysecret',
-                    'emailonerror' => 'erwin@burorader.com',
-                    'emailonwarning' => 'erwin@burorader.com',
-                ],
-                'format' => 'json',
-                'testmode' => '1',
-                'lang' => 'nl',
-                'connector' => [
-                    'application' => 'WooCommerce 4.0.1 (WordPress: 5.4)',
-                    'webkoppel' => 'Acumulus 5.9.0',
-                    'development' => 'SIEL - Buro RaDer',
-                    'remark' => 'Library 5.10.0-alpha1 - PHP 7.1.33',
-                    'sourceuri' => 'https://www.siel.nl/',
-                ],
                 'vatdate' => '2020-02-05',
                 'vatcountry' => 'nl',
             ],
             'response body' => '{"vatinfo":{"vat":[{"vattype":"normal","vatrate":"21.0000"},{"vattype":"reduced","vatrate":"9.0000"}]},"errors":{"count_errors":"0"},"warnings":{"count_warnings":"0"},"status":"0"}',
+            'mainResponseKey' => 'vatinfo',
+            'isList' => true,
             'main response' => [['vattype' => 'normal', 'vatrate' => '21.0000'], ['vattype' => 'reduced', 'vatrate' => '9.0000']],
         ],
 
         'vatinfo-empty-return' => [
+            'needContract' => false,
             'submit' => [
-                'contract' => [
-                    'contractcode' => '288252',
-                    'username' => 'APIGebruiker12345',
-                    'password' => 'mysecret',
-                    'emailonerror' => 'erwin@burorader.com',
-                    'emailonwarning' => 'erwin@burorader.com',
-                ],
-                'format' => 'json',
-                'testmode' => '1',
-                'lang' => 'nl',
-                'connector' => [
-                    'application' => 'WooCommerce 4.0.1 (WordPress: 5.4)',
-                    'webkoppel' => 'Acumulus 5.9.0',
-                    'development' => 'SIEL - Buro RaDer',
-                    'remark' => 'Library 5.10.0-alpha1 - PHP 7.1.33',
-                    'sourceuri' => 'https://www.siel.nl/',
-                ],
                 'vatdate' => '2014-01-01',
                 'vatcountry' => 'fr',
             ],
             'response body' => '{"vatinfo":{},"errors":{"count_errors":"0"},"warnings":{"count_warnings":"0"},"status":"0"}',
+            'mainResponseKey' => 'vatinfo',
+            'isList' => true,
             'main response' => [],
         ],
 
         'invoice-add' => [
+            'needContract' => true,
             'submit' => [
-                'contract' => [
-                    'contractcode' => '288252',
-                    'username' => 'APIGebruiker12345',
-                    'password' => 'mysecret',
-                    'emailonerror' => 'erwin@burorader.com',
-                    'emailonwarning' => 'erwin@burorader.com',
-                ],
-                'format' => 'json',
-                'testmode' => '1',
-                'lang' => 'nl',
-                'connector' => [
-                    'application' => 'WooCommerce 4.0.1 (WordPress: 5.4)',
-                    'webkoppel' => 'Acumulus 5.9.0',
-                    'development' => 'SIEL - Buro RaDer',
-                    'remark' => 'Library 5.10.0-alpha1 - PHP 7.1.33',
-                    'sourceuri' => 'https://www.siel.nl/',
-                ],
                 'customer' => [
                     'type' => '3',
                     'contactstatus' => '0',
@@ -248,10 +200,13 @@ class ApiRequestResponseExamples
                 ],
             ],
             'response body' => '{"invoice":{"conceptid":{}},"errors":{"count_errors":"0"},"warnings":{"count_warnings":"0"},"status":"0"}',
+            'mainResponseKey' => 'invoice',
+            'isList' => false,
             'main response' => ['conceptid' => []],
         ],
 
         'signup' => [
+            'needContract' => false,
             'submit' => [
                 Tag::CompanyTypeId => 1,
                 Tag::CompanyName => 'My Company',
@@ -264,6 +219,8 @@ class ApiRequestResponseExamples
                 Tag::Email => 'john.doe@example.com',
             ],
             'response body' => '{"signup:":{"contractcode":"123456","contractloginname":"myuser","contractpassword":"mysecret","contractstartdate":"2022-02-22","contractenddate":"","contractapiuserloginname":"myapiuser","contractapiuserpassword":"mysecret"},"errors":{"count_errors":"0"},"warnings":{"count_warnings":"0"},"status":"0"}',
+            'mainResponseKey' => 'signup',
+            'isList' => false,
             'main response' => [
                 'contractcode' => '123456',
                 'contractloginname' => 'myuser',
@@ -276,17 +233,32 @@ class ApiRequestResponseExamples
         ],
     ];
 
-    public function getSubmit($key)
+    public function needContract(string $key): bool
+    {
+        return $this->sets[$key]['needContract'];
+    }
+
+    public function getSubmit(string $key): array
     {
         return $this->sets[$key]['submit'];
     }
 
-    public function getResponseBody($key)
+    public function getResponseBody(string $key): string
     {
         return $this->sets[$key]['response body'];
     }
 
-    public function getMainResponse($key)
+    public function getMainResponseKey(string $key): string
+    {
+        return $this->sets[$key]['mainResponseKey'];
+    }
+
+    public function isList(string $key): bool
+    {
+        return $this->sets[$key]['isList'];
+    }
+
+    public function getMainResponse(string $key): array
     {
         return $this->sets[$key]['main response'];
     }

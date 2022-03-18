@@ -1,6 +1,8 @@
 <?php
 /**
- * @noinspection SpellCheckingInspection
+ * @noinspection SpellCheckingInspection : all fields in the Acumulus API are in
+ *   lowercase, and as many fields consists of jined words this leads to
+ *   hundreds of spell error inspection problems.
  */
 
 namespace Siel\Acumulus\ApiClient;
@@ -23,6 +25,8 @@ use Siel\Acumulus\Helpers\Container;
  * The ApiClient API call wrappers return their information as a keyed array,
  * which is a simplified version of the call specific part of the response
  * structure.
+ *
+ * @noinspection PhpClassHasTooManyDeclaredMembersInspection
  */
 class Acumulus
 {
@@ -48,8 +52,9 @@ class Acumulus
      * Retrieves the "about information".
      *
      * See {@see https://www.siel.nl/acumulus/API/Misc/About/}.
+ *
 
-     * @return \Siel\Acumulus\ApiClient\Result
+     * @return \Siel\Acumulus\ApiClient\AcumulusResult
      *   The result of the webservice call. The structured response will contain
      *   1 "about" array, being a keyed array with keys:
      *   - about: General name for the API.
@@ -66,7 +71,7 @@ class Acumulus
      *   - 403 A8N403GCN: Forbidden - Insufficient credential level for
      *     general/general_about.php. Not authorized to perform request.
      */
-    public function getAbout(): Result
+    public function getAbout(): AcumulusResult
     {
         return $this->callApiFunction('general/general_about', [])->setMainResponseKey('general');
     }
@@ -76,7 +81,7 @@ class Acumulus
      *
      * See {@see https://www.siel.nl/acumulus/API/Misc/My_Acumulus/}
      *
-     * @return \Siel\Acumulus\ApiClient\Result
+     * @return \Siel\Acumulus\ApiClient\AcumulusResult
      *   The result of the webservice call. The structured response will contain
      *   1 "mydata" array, being a keyed array with keys:
      * - 'myaddress'
@@ -101,7 +106,7 @@ class Acumulus
      * - 'myvatnumber'
      *   Possible errors: todo.
      */
-    public function getMyAcumulus(): Result
+    public function getMyAcumulus(): AcumulusResult
     {
         return $this->callApiFunction('general/my_acumulus', [])->setMainResponseKey('mydata');
     }
@@ -115,7 +120,7 @@ class Acumulus
      *
      * See {@see https://www.siel.nl/acumulus/API/Accounts/List_Accounts/}
      *
-     * @return \Siel\Acumulus\ApiClient\Result
+     * @return \Siel\Acumulus\ApiClient\AcumulusResult
      *   The result of the webservice call. The structured response will contain
      *   a non-keyed array of "account" arrays, each "account" array being a
      *   keyed array with keys:
@@ -126,7 +131,7 @@ class Acumulus
      * - 'accountstatus'
      * - 'accounttypeid'
      */
-    public function getPicklistAccounts(bool $enabled = true): Result
+    public function getPicklistAccounts(bool $enabled = true): AcumulusResult
     {
         $filters = [
             'accountstatus' => $enabled ? 1 : 0,
@@ -139,7 +144,7 @@ class Acumulus
      *
      * See {@see https://www.siel.nl/acumulus/API/Picklists/Company_Types/}.
      *
-     * @return \Siel\Acumulus\ApiClient\Result
+     * @return \Siel\Acumulus\ApiClient\AcumulusResult
      *   The result of the webservice call. The structured response will contain
      *   a non-keyed array of "companytype" arrays, each "companytype"
      *   array being a keyed array with keys:
@@ -147,7 +152,7 @@ class Acumulus
      * - 'companytypename'
      * - 'companytypenamenl'
      */
-    public function getPicklistCompanyTypes(): Result
+    public function getPicklistCompanyTypes(): AcumulusResult
     {
         return $this->getPicklist('companytypes', [], false);
     }
@@ -157,14 +162,14 @@ class Acumulus
      *
      * See {@see https://www.siel.nl/acumulus/API/Picklists/Contact_Types/}.
      *
-     * @return \Siel\Acumulus\ApiClient\Result
+     * @return \Siel\Acumulus\ApiClient\AcumulusResult
      *   The result of the webservice call. The structured response will contain
      *   a non-keyed array of "contacttype" arrays, each "contacttype" array
      *   being a keyed array with keys:
      * - 'contacttypeid'
      * - 'contacttypename'
      */
-    public function getPicklistContactTypes(): Result
+    public function getPicklistContactTypes(): AcumulusResult
     {
         return $this->getPicklist('contacttypes');
     }
@@ -174,14 +179,14 @@ class Acumulus
      *
      * See {@see https://www.siel.nl/acumulus/API/Picklists/Cost_Centers/}
      *
-     * @return \Siel\Acumulus\ApiClient\Result
+     * @return \Siel\Acumulus\ApiClient\AcumulusResult
      *   The result of the webservice call. The structured response will contain
      *   a non-keyed array of "costcenter" arrays, each "costcenter" array being
      *   a keyed array with keys:
      * - 'costcenterid'
      * - 'costcentername'
      */
-    public function getPicklistCostCenters(): Result
+    public function getPicklistCostCenters(): AcumulusResult
     {
         return $this->getPicklist('costcenters');
     }
@@ -191,14 +196,14 @@ class Acumulus
      *
      * See {@see https://www.siel.nl/acumulus/API/Invoicing/Invoice_Templates/}
      *
-     * @return \Siel\Acumulus\ApiClient\Result
+     * @return \Siel\Acumulus\ApiClient\AcumulusResult
      *   The result of the webservice call. The structured response will contain
      *   a non-keyed array of "invoicetemplate" arrays, each "invoicetemplate"
      *   array being a keyed array with keys:
      * - 'invoicetemplateid'
      * - 'invoicetemplatename'
      */
-    public function getPicklistInvoiceTemplates(): Result
+    public function getPicklistInvoiceTemplates(): AcumulusResult
     {
         return $this->getPicklist('invoicetemplates');
     }
@@ -220,7 +225,7 @@ class Acumulus
      * @param int|null $offset
      * @param int|null $rowcount
      *
-     * @return \Siel\Acumulus\ApiClient\Result
+     * @return \Siel\Acumulus\ApiClient\AcumulusResult
      *   The result of the webservice call. The structured response will contain
      *   a non-keyed array of "product" arrays, each "product"
      *   array being a keyed array with keys:
@@ -274,12 +279,12 @@ class Acumulus
      * @param bool $needContract
      *   Whether the contract part needs to be sent with the request.
      *
-     * @return \Siel\Acumulus\ApiClient\Result
+     * @return \Siel\Acumulus\ApiClient\AcumulusResult
      *   The result of the webservice call. The structured response will contain
      *   a non-keyed array of "picklist" arrays, each 'picklist' array being a
      *   keyed array with keys that depend on the requested picklist.
      */
-    protected function getPicklist(string $picklist, array $filters = [], bool $needContract = true): Result
+    protected function getPicklist(string $picklist, array $filters = [], bool $needContract = true): AcumulusResult
     {
         // For picklists, the main result is found under the name of the
         // picklist but in singular form, i.e. without the s at the end.
@@ -296,7 +301,7 @@ class Acumulus
      * @param string $date
      *   ISO date string (yyyy-mm-dd) for the date to retrieve the VAT info for.
      *
-     * @return \Siel\Acumulus\ApiClient\Result
+     * @return \Siel\Acumulus\ApiClient\AcumulusResult
      *   The result of the webservice call. The structured response will contain
      *   a non-keyed array of "vatinfo" arrays, each "vatinfo" array being a
      *   keyed array with keys:
@@ -306,7 +311,7 @@ class Acumulus
      *     100)
      *   - countryregion: (int) one of the Api::Region_... constants.
      */
-    public function getVatInfo(string $countryCode, string $date = ''): Result
+    public function getVatInfo(string $countryCode, string $date = ''): AcumulusResult
     {
         if (empty($date)) {
             $date = date(Api::DateFormat_Iso);
@@ -326,7 +331,7 @@ class Acumulus
      * @param int|null $year
      *   The year to get a report for. Leave empty for the current year.
      *
-     * @return \Siel\Acumulus\ApiClient\Result
+     * @return \Siel\Acumulus\ApiClient\AcumulusResult
      *   The result of the webservice call. The structured response will contain
      *   an array with keys:
      *   - year: int, Year to which information in response is applicable.
@@ -338,7 +343,7 @@ class Acumulus
      *   Possible errors:
      *   - AAC37EAA: Ongeldig year. EU regelgeving van toepassing vanaf 2021.
      */
-    public function reportThresholdEuCommerce(int $year = null): Result
+    public function reportThresholdEuCommerce(int $year = null): AcumulusResult
     {
         $message = [];
         if (!empty($year)) {
@@ -354,13 +359,8 @@ class Acumulus
      *
      * @param array $invoice
      *   The invoice to send.
-     * @param ?\Siel\Acumulus\ApiClient\Result $result
-     *   It is possible to already create a Result object before calling this
-     *   api-client to store local messages. By passing this Result object these
-     *   local messages will be merged with any remote messages in the returned
-     *   Result object.
      *
-     * @return \Siel\Acumulus\ApiClient\Result
+     * @return \Siel\Acumulus\ApiClient\AcumulusResult
      * The Result of the webservice call. A successful call will contain a
      * response array with key:
      * - invoice: an array of information about the created invoice, being an
@@ -370,9 +370,9 @@ class Acumulus
      * - 'entryid'
      * - 'conceptid'
      */
-    public function invoiceAdd(array $invoice, Result $result = null): Result
+    public function invoiceAdd(array $invoice): AcumulusResult
     {
-        return $this->callApiFunction('invoices/invoice_add', $invoice, true, $result)->setMainResponseKey('invoice');
+        return $this->callApiFunction('invoices/invoice_add', $invoice)->setMainResponseKey('invoice');
     }
 
     /**
@@ -383,7 +383,7 @@ class Acumulus
      * @param int $conceptId
      *   The id of the concept.
      *
-     * @return \Siel\Acumulus\ApiClient\Result
+     * @return \Siel\Acumulus\ApiClient\AcumulusResult
      *   The result of the webservice call. The structured response will contain
      *   1 "concept" array, being a keyed array with keys:
      *   - conceptid: int
@@ -394,7 +394,7 @@ class Acumulus
      *   - FGYBSN048: Information not available for $conceptId older than 127466.
      *   - todo: others?
      */
-    public function getConceptInfo(int $conceptId): Result
+    public function getConceptInfo(int $conceptId): AcumulusResult
     {
         $message = [
             'conceptid' => $conceptId,
@@ -410,7 +410,7 @@ class Acumulus
      * @param int $entryId
      *   The id of the entry.
      *
-     * @return \Siel\Acumulus\ApiClient\Result
+     * @return \Siel\Acumulus\ApiClient\AcumulusResult
      *   The result of the webservice call. The structured response will contain
      *   1 "entry" array, being a keyed array with keys:
      * - 'entryid'
@@ -442,7 +442,7 @@ class Acumulus
      *   - XGYBSN000: Requested invoice for entry $entryId not found: $entryId
      *     does not exist.
      */
-    public function getEntry(int $entryId): Result
+    public function getEntry(int $entryId): AcumulusResult
     {
         $message = [
             'entryid' => $entryId,
@@ -462,7 +462,7 @@ class Acumulus
      *   Api::Entry_UnDelete constants. Api::Entry_UnDelete does not work for
      *   now.
      *
-     * @return \Siel\Acumulus\ApiClient\Result
+     * @return \Siel\Acumulus\ApiClient\AcumulusResult
      *   The result of the webservice call. The structured response will contain
      *   1 "entry" array, being a keyed array with keys:
      * - 'entryid'
@@ -476,7 +476,7 @@ class Acumulus
      *   - P2XFELO12: Requested for entryid: $entryId not found or forbidden:
      *     $entryId does not exist or already has requested status.
      */
-    public function setDeleteStatus(int $entryId, int $deleteStatus): Result
+    public function setDeleteStatus(int $entryId, int $deleteStatus): AcumulusResult
     {
         $message = [
             'entryid' => $entryId,
@@ -493,7 +493,7 @@ class Acumulus
      * @param string $token
      *   The token for the invoice.
      *
-     * @return \Siel\Acumulus\ApiClient\Result
+     * @return \Siel\Acumulus\ApiClient\AcumulusResult
      *   The result of the webservice call. The structured response will contain
      *   1 "invoice" array, being a keyed array with keys:
      * - 'entryid'
@@ -506,7 +506,7 @@ class Acumulus
      *
      * @noinspection PhpUnused
      */
-    public function getPaymentStatus(string $token): Result
+    public function getPaymentStatus(string $token): AcumulusResult
     {
         $message = [
             'token' => $token,
@@ -528,7 +528,7 @@ class Acumulus
      *   ISO date string (yyyy-mm-dd) for the date to set as payment date, may
      *   be empty for today or if the payment status is Api::PaymentStatus_Due.
      *
-     * @return \Siel\Acumulus\ApiClient\Result
+     * @return \Siel\Acumulus\ApiClient\AcumulusResult
      *   The result of the webservice call. The structured response will contain
      *   1 "invoice" array, being a keyed array with keys:
      * - 'entryid'
@@ -541,7 +541,7 @@ class Acumulus
      *     date format (YYYY-MM-DD) used in paymentdate field. We received:
      *     $paymentDate. Unable to proceed."
      */
-    public function setPaymentStatus(string $token, int $paymentStatus, string $paymentDate = ''): Result
+    public function setPaymentStatus(string $token, int $paymentStatus, string $paymentDate = ''): AcumulusResult
     {
         if (empty($paymentDate)) {
             $paymentDate = date(Api::DateFormat_Iso);
@@ -576,7 +576,7 @@ class Acumulus
      *   tabs. Contents is placed in notes/comments section of the invoice.
      *   Content will not appear on the actual invoice or associated emails.
      *
-     * @return \Siel\Acumulus\ApiClient\Result
+     * @return \Siel\Acumulus\ApiClient\AcumulusResult
      *   The result of the webservice call. The structured response will contain
      *   1 "invoice" array, being a keyed array with keys:
      * - 'token'
@@ -591,7 +591,7 @@ class Acumulus
      *
      * @noinspection PhpUnused
      */
-    public function emailInvoiceAsPdf(string $token, array $emailAsPdf, int $invoiceType = null, string $invoiceNotes = ''): Result
+    public function emailInvoiceAsPdf(string $token, array $emailAsPdf, int $invoiceType = null, string $invoiceNotes = ''): AcumulusResult
     {
         $message = [
             'token' => $token,
@@ -637,7 +637,7 @@ class Acumulus
      *     request. If filled, a ticket will be opened with the notes as
      *     content, so can be used as a request for comment by customer support.
      *
-     * @return \Siel\Acumulus\ApiClient\Result
+     * @return \Siel\Acumulus\ApiClient\AcumulusResult
      *   The result of the webservice call. The structured response will contain
      *   1 "signup" array, being a keyed array with keys:
      * - 'contractcode'
@@ -657,7 +657,7 @@ class Acumulus
      *
      * @noinspection PhpUnused
      */
-    public function signUp(array $signUp): Result
+    public function signUp(array $signUp): AcumulusResult
     {
         $message = [
             'signup' => $signUp,
@@ -684,14 +684,14 @@ class Acumulus
      *   ISO date string (yyyy-mm-dd) for the date to set as update date for the
      *   stock update.
      *
-     * @return \Siel\Acumulus\ApiClient\Result
+     * @return \Siel\Acumulus\ApiClient\AcumulusResult
      *   The result of the webservice call. The structured response will contain
      *   1 "stock" array, being a keyed array with keys:
      * - 'productid'
      *   - stockamount (the new stock level for this product)
      *   Possible errors:
      */
-    public function stockAdd(int $productId, float $quantity, string $description, string $date = null): Result
+    public function stockAdd(int $productId, float $quantity, string $description, string $date = null): AcumulusResult
     {
         if (empty($date)) {
             $date = date(Api::DateFormat_Iso);
@@ -783,19 +783,14 @@ class Acumulus
      *   API functions do, do the default is true, but for some general listing
      *   functions, like vat info, it is optional, and for signUp, it is even
      *   not allowed.
-     * @param \Siel\Acumulus\ApiClient\Result|null $result
-     *   It is possible to already create a Result object before calling the
-     *   api-client to store local messages. By passing this Result object these
-     *   local messages will be merged with any remote messages in the returned
-     *   Result object.
      *
-     * @return \Siel\Acumulus\ApiClient\Result
+     * @return \Siel\Acumulus\ApiClient\AcumulusResult
      *   A Result object containing the results.
      */
-    protected function callApiFunction(string $apiFunction, array $message, bool $needContract = true, Result $result = null): Result
+    protected function callApiFunction(string $apiFunction, array $message, bool $needContract = true): AcumulusResult
     {
         $acumulusRequest = $this->container->getAcumulusRequest();
         $uri = $this->constructUri($apiFunction);
-        return $acumulusRequest->execute($uri, $message, $needContract, $result);
+        return $acumulusRequest->execute($uri, $message, $needContract);
     }
 }

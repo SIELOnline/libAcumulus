@@ -2,7 +2,6 @@
 namespace Siel\Acumulus\Shop;
 
 use DateTime;
-use Exception;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\ApiClient\Acumulus;
 use Siel\Acumulus\Helpers\Container;
@@ -12,7 +11,7 @@ use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Invoice\Completor;
 use Siel\Acumulus\Invoice\Creator;
-use Siel\Acumulus\Invoice\Result;
+use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Config\Config;
@@ -156,11 +155,11 @@ abstract class InvoiceManager
      *
      * @param string $trigger
      *
-     * @return \Siel\Acumulus\Invoice\Result
+     * @return \Siel\Acumulus\Invoice\InvoiceAddResult
      */
-    protected function getInvoiceResult(string $trigger): Result
+    protected function getInvoiceAddResult(string $trigger): InvoiceAddResult
     {
-        return $this->container->getInvoiceResult($trigger);
+        return $this->container->getInvoiceAddResult($trigger);
     }
 
     /**
@@ -264,7 +263,8 @@ abstract class InvoiceManager
      *
      * @return bool
      *   Success.
-     *@todo: change parameter $forceSend to an int: the 3 options of the batch form field 'send_mode'.
+     *
+     * @todo: change parameter $forceSend to an int: the 3 options of the batch form field 'send_mode'.
      */
     public function sendMultiple(array $invoiceSources, bool $forceSend, bool $dryRun, array &$log): bool
     {
@@ -282,15 +282,15 @@ abstract class InvoiceManager
                 $errorLogged = true;
             }
 
-            $result = $this->getInvoiceResult('InvoiceManager::sendMultiple()');
+            $result = $this->getInvoiceAddResult('InvoiceManager::sendMultiple()');
             $result = $this->createAndSend($invoiceSource, $result, $forceSend, $dryRun);
             $success = $success && !$result->hasError();
             $this->getLog()->notice($this->getSendResultLogText($invoiceSource, $result));
-            // @todo: we are kind of loosing error messages here.
-            $log[$invoiceSource->getId()] = $this->getSendResultLogText($invoiceSource, $result,Result::AddReqResp_Never);
+            $log[$invoiceSource->getId()] = $this->getSendResultLogText($invoiceSource, $result,InvoiceAddResult::AddReqResp_Never);
         }
         return $success;
     }
+
     /**
      * Sends 1 invoice to Acumulus.
      *
@@ -305,11 +305,10 @@ abstract class InvoiceManager
      */
     public function send1(Source $invoiceSource, bool $forceSend): bool
     {
-        $result = $this->getInvoiceResult('InvoiceManager::send1()');
+        $result = $this->getInvoiceAddResult('InvoiceManager::send1()');
         $result = $this->createAndSend($invoiceSource, $result, $forceSend);
         $success = !$result->hasError();
         $this->getLog()->notice($this->getSendResultLogText($invoiceSource, $result));
-        // @todo: we are loosing error messages here.
         return $success;
     }
 
@@ -321,22 +320,22 @@ abstract class InvoiceManager
      * @param \Siel\Acumulus\Invoice\Source $invoiceSource
      *   The source whose status has changed.
      *
-     * @return \Siel\Acumulus\Invoice\Result
+     * @return \Siel\Acumulus\Invoice\InvoiceAddResult
      *   The result of sending (or not sending) the invoice.
      */
-    public function sourceStatusChange(Source $invoiceSource): Result
+    public function sourceStatusChange(Source $invoiceSource): InvoiceAddResult
     {
-        $result = $this->getInvoiceResult('InvoiceManager::sourceStatusChange()');
+        $result = $this->getInvoiceAddResult('InvoiceManager::sourceStatusChange()');
         $status = $invoiceSource->getStatus();
         $shopEventSettings = $this->getConfig()->getShopEventSettings();
         if ($invoiceSource->getType() === Source::Order) {
             $doSend = in_array($status, $shopEventSettings['triggerOrderStatus']);
             $arguments = [$status, implode(',', $shopEventSettings['triggerOrderStatus'])];
-            $notSendReason = Result::NotSent_WrongStatus;
+            $notSendReason = InvoiceAddResult::NotSent_WrongStatus;
         } else {
             $doSend = $shopEventSettings['triggerCreditNoteEvent'] === Config::TriggerCreditNoteEvent_Create;
             $arguments = [];
-            $notSendReason = Result::NotSent_TriggerCreditNoteEventNotEnabled;
+            $notSendReason = InvoiceAddResult::NotSent_TriggerCreditNoteEventNotEnabled;
         }
         if ($doSend) {
             $result = $this->createAndSend($invoiceSource, $result);
@@ -356,19 +355,19 @@ abstract class InvoiceManager
      * @param \Siel\Acumulus\Invoice\Source $invoiceSource
      *   The source for which a shop invoice was created.
      *
-     * @return \Siel\Acumulus\Invoice\Result
+     * @return \Siel\Acumulus\Invoice\InvoiceAddResult
      *   The result of sending (or not sending) the invoice.
      *
      * @noinspection PhpUnused
      */
-    public function invoiceCreate(Source $invoiceSource): Result
+    public function invoiceCreate(Source $invoiceSource): InvoiceAddResult
     {
-        $result = $this->getInvoiceResult('InvoiceManager::invoiceCreate()');
+        $result = $this->getInvoiceAddResult('InvoiceManager::invoiceCreate()');
         $shopEventSettings = $this->getConfig()->getShopEventSettings();
         if ($shopEventSettings['triggerInvoiceEvent'] == Config::TriggerInvoiceEvent_Create) {
             $result = $this->createAndSend($invoiceSource, $result);
         } else {
-            $result->setSendStatus(Result::NotSent_TriggerInvoiceCreateNotEnabled);
+            $result->setSendStatus(InvoiceAddResult::NotSent_TriggerInvoiceCreateNotEnabled);
         }
         $this->getLog()->notice($this->getSendResultLogText($invoiceSource, $result));
         return $result;
@@ -383,19 +382,19 @@ abstract class InvoiceManager
      * @param \Siel\Acumulus\Invoice\Source $invoiceSource
      *   The source for which a shop invoice was created.
      *
-     * @return \Siel\Acumulus\Invoice\Result
+     * @return \Siel\Acumulus\Invoice\InvoiceAddResult
      *   The result of sending (or not sending) the invoice.
      *
      * @noinspection PhpUnused
      */
-    public function invoiceSend(Source $invoiceSource): Result
+    public function invoiceSend(Source $invoiceSource): InvoiceAddResult
     {
-        $result = $this->getInvoiceResult('InvoiceManager::invoiceSend()');
+        $result = $this->getInvoiceAddResult('InvoiceManager::invoiceSend()');
         $shopEventSettings = $this->getConfig()->getShopEventSettings();
         if ($shopEventSettings['triggerInvoiceEvent'] == Config::TriggerInvoiceEvent_Send) {
             $result = $this->createAndSend($invoiceSource, $result);
         } else {
-            $result->setSendStatus(Result::NotSent_TriggerInvoiceSentNotEnabled);
+            $result->setSendStatus(InvoiceAddResult::NotSent_TriggerInvoiceSentNotEnabled);
         }
         $this->getLog()->notice($this->getSendResultLogText($invoiceSource, $result));
         return $result;
@@ -407,7 +406,7 @@ abstract class InvoiceManager
      * @param \Siel\Acumulus\Invoice\Source $invoiceSource
      *   The source object (order, credit note) for which the invoice was
      *   created.
-     * @param \Siel\Acumulus\Invoice\Result $result
+     * @param \Siel\Acumulus\Invoice\InvoiceAddResult $result
      * @param bool $forceSend
      *   If true, force sending the invoice even if an invoice has already been
      *   sent for the given invoice source.
@@ -415,30 +414,30 @@ abstract class InvoiceManager
      *   If true, return the reason/status only but do not actually send the
      *   invoice, nor mail the result or store the result.
      *
-     * @return \Siel\Acumulus\Invoice\Result
+     * @return \Siel\Acumulus\Invoice\InvoiceAddResult
      *   The result of sending (or not sending) the invoice.
      */
     protected function createAndSend(
         Source $invoiceSource,
-        Result $result,
+        InvoiceAddResult $result,
         bool $forceSend = false,
         bool $dryRun = false
-    ): Result {
+    ): InvoiceAddResult {
         if ($this->isTestMode()) {
-            $result->setSendStatus(Result::Send_TestMode);
+            $result->setSendStatus(InvoiceAddResult::Send_TestMode);
         } elseif (($acumulusEntry = $this->getAcumulusEntryManager()->getByInvoiceSource($invoiceSource, false)) === null) {
-            $result->setSendStatus(Result::Send_New);
+            $result->setSendStatus(InvoiceAddResult::Send_New);
         } elseif ($forceSend) {
-            $result->setSendStatus(Result::Send_Forced);
+            $result->setSendStatus(InvoiceAddResult::Send_Forced);
         } elseif ($acumulusEntry->hasLockExpired()) {
-            $result->setSendStatus(Result::Send_LockExpired);
+            $result->setSendStatus(InvoiceAddResult::Send_LockExpired);
         } elseif ($acumulusEntry->isSendLock()) {
-            $result->setSendStatus(Result::NotSent_LockedForSending);
+            $result->setSendStatus(InvoiceAddResult::NotSent_LockedForSending);
         } else {
-            $result->setSendStatus(Result::NotSent_AlreadySent);
+            $result->setSendStatus(InvoiceAddResult::NotSent_AlreadySent);
         }
 
-        if (($result->getSendStatus() & Result::Send_Mask) !== 0) {
+        if (($result->getSendStatus() & InvoiceAddResult::Send_Mask) !== 0) {
             $invoice = $this->getCreator()->create($invoiceSource);
 
             // Do not send 0-amount invoices, if set so.
@@ -462,19 +461,19 @@ abstract class InvoiceManager
                             if (!$dryRun) {
                                 $result = $this->lockAndSend($invoice, $invoiceSource, $result);
                             } else {
-                                $result->setSendStatus(Result::NotSent_DryRun);
+                                $result->setSendStatus(InvoiceAddResult::NotSent_DryRun);
                             }
                         } else {
-                            $result->setSendStatus(Result::NotSent_LocalErrors);
+                            $result->setSendStatus(InvoiceAddResult::NotSent_LocalErrors);
                         }
                     } else {
-                        $result->setSendStatus(Result::NotSent_EventInvoiceCompleted);
+                        $result->setSendStatus(InvoiceAddResult::NotSent_EventInvoiceCompleted);
                     }
                 } else {
-                    $result->setSendStatus(Result::NotSent_EventInvoiceCreated);
+                    $result->setSendStatus(InvoiceAddResult::NotSent_EventInvoiceCreated);
                 }
             } else {
-                $result->setSendStatus(Result::NotSent_EmptyInvoice);
+                $result->setSendStatus(InvoiceAddResult::NotSent_EmptyInvoice);
             }
         }
 
@@ -497,38 +496,34 @@ abstract class InvoiceManager
      *
      * @param \Siel\Acumulus\Invoice\Source $invoiceSource
      * @param array $invoice
-     * @param \Siel\Acumulus\Invoice\Result $result
+     * @param \Siel\Acumulus\Invoice\InvoiceAddResult $result
      *
-     * @return \Siel\Acumulus\Invoice\Result
+     * @return \Siel\Acumulus\Invoice\InvoiceAddResult
      *   The result structure of the invoice add API call merged with any local
      *   messages.
      */
-    protected function lockAndSend(array $invoice, Source $invoiceSource, Result $result): Result
+    protected function lockAndSend(array $invoice, Source $invoiceSource, InvoiceAddResult $result): InvoiceAddResult
     {
-        $doLock = !$this->isTestMode() && in_array($result->getSendStatus(), [Result::Send_New, Result::Send_LockExpired]);
+        $doLock = !$this->isTestMode() && in_array($result->getSendStatus(), [InvoiceAddResult::Send_New, InvoiceAddResult::Send_LockExpired]);
 
         if ($doLock) {
             // Check if we may expect an expired lock and, if so, remove it.
-            if ($result->getSendStatus() === Result::Send_LockExpired) {
+            if ($result->getSendStatus() === InvoiceAddResult::Send_LockExpired) {
                 $lockStatus = $this->getAcumulusEntryManager()->deleteLock($invoiceSource);
                 if ($lockStatus === AcumulusEntry::Lock_BecameRealEntry) {
                     // Bail out: invoice already sent after all.
-                    return $result->setSendStatus(Result::NotSent_AlreadySent);
+                    return $result->setSendStatus(InvoiceAddResult::NotSent_AlreadySent);
                 }
             }
 
             // Acquire lock.
             if (!$this->getAcumulusEntryManager()->lockForSending($invoiceSource)) {
                 // Bail out: Lock not acquired.
-                return $result->setSendStatus(Result::NotSent_LockedForSending);
+                return $result->setSendStatus(InvoiceAddResult::NotSent_LockedForSending);
             }
         }
 
-        try {
-            $result = $this->doSend($invoice, $invoiceSource, $result);
-        } catch (Exception $e) {
-            $result->addException($e);
-        }
+        $result = $this->doSend($invoice, $invoiceSource, $result);
 
         // When everything went well, the lock will have been replaced by a real
         // entry. So we only delete the lock in case of errors.
@@ -539,7 +534,7 @@ abstract class InvoiceManager
             // in Acumulus: tell user to check.
             if (($lockStatus = $this->getAcumulusEntryManager()->deleteLock($invoiceSource)) !== AcumulusEntry::Lock_Deleted) {
                 $code = $lockStatus === AcumulusEntry::Lock_NoLongerExists ? 903 : 904;
-                $result->addMessage(
+                $result->createAndAdd(
                     sprintf($this->t('message_warning_delete_lock_failed'), $this->t($invoiceSource->getType())),
                     Severity::Warning,
                     $code
@@ -565,29 +560,29 @@ abstract class InvoiceManager
      *
      * @param \Siel\Acumulus\Invoice\Source $invoiceSource
      * @param array $invoice
-     * @param \Siel\Acumulus\Invoice\Result $result
+     * @param \Siel\Acumulus\Invoice\InvoiceAddResult $result
      *
-     * @return \Siel\Acumulus\Invoice\Result
+     * @return \Siel\Acumulus\Invoice\InvoiceAddResult
      *   The result structure of the invoice add API call merged with any local
      *   messages.
      */
-    protected function doSend(array $invoice, Source $invoiceSource, Result $result): Result
+    protected function doSend(array $invoice, Source $invoiceSource, InvoiceAddResult $result): InvoiceAddResult
     {
-        /** @var \Siel\Acumulus\Invoice\Result $result */
-        $result = $this->getAcumulusApiClient()->invoiceAdd($invoice, $result);
+        $apiResult = $this->getAcumulusApiClient()->invoiceAdd($invoice);
+        $result->setApiResult($apiResult);
 
         // Save Acumulus entry:
         // - If we were sending in test mode or there were errors, no invoice
         //   will have been created in Acumulus: nothing to store.
         // - If the invoice was sent as a concept, the entry id and token will
         //   be empty, but we will receive a concept id and store that instead.
-        if (!$this->isTestMode() && !$result->hasError()) {
+        if (!$this->isTestMode() && !$apiResult->hasError()) {
             // If we are going to overwrite an existing entry, we want to delete
             // that from Acumulus.
             $acumulusEntryManager = $this->getAcumulusEntryManager();
             $oldEntry = $acumulusEntryManager->getByInvoiceSource($invoiceSource, true);
 
-            $response = $result->getResponse();
+            $response = $apiResult->getResponse();
             if (!empty($response['token']) && !empty('entryid')) {
                 // A real entry.
                 $token = $response['token'];
@@ -616,18 +611,20 @@ abstract class InvoiceManager
                         // Could not delete the old entry (already deleted or
                         // does not exist at all (anymore)): add as a warning so
                         // this info will be mailed to the user.
-                        $result->addMessage(
+                        $result->createAndAdd(
                             sprintf($this->t('message_warning_old_entry_not_deleted'), $this->t($invoiceSource->getType()), $entryId),
                             Severity::Warning,
                             902
                         );
                     } else {
-                        $result->copyMessages($deleteResult->getMessages(Severity::InfoOrWorse));
+                        // Add other "real" messages also as warning, but
+                        // untranslated.
+                        $result->addMessages($deleteResult->getMessages(Severity::InfoOrWorse), Severity::Warning);
                     }
                 } else {
                     // Successfully deleted the old entry: add a notice so this
                     // info will be mailed to the user.
-                    $result->addMessage(
+                    $result->createAndAdd(
                         sprintf($this->t('message_warning_old_entry_deleted'), $this->t($invoiceSource->getType()), $entryId),
                         Severity::Notice,
                         901
@@ -644,18 +641,17 @@ abstract class InvoiceManager
      *
      * The mail is sent to the shop administrator ('emailonerror' setting).
      *
-     * @param \Siel\Acumulus\Invoice\Result $result
+     * @param \Siel\Acumulus\Invoice\InvoiceAddResult $result
      * @param \Siel\Acumulus\Invoice\Source $invoiceSource
      *
      * @return bool
      *   Success.
      */
-    protected function mailInvoiceAddResult(Result $result, Source $invoiceSource): bool
+    protected function mailInvoiceAddResult(InvoiceAddResult $result, Source $invoiceSource): bool
     {
         $pluginSettings = $this->getConfig()->getPluginSettings();
-        // @todo: inspection seems correct: refactor these lines.
-        $addReqResp = $pluginSettings['debug'] === Config::Send_SendAndMailOnError ? Result::AddReqResp_WithOther : Result::AddReqResp_Always;
-        if ($addReqResp === Result::AddReqResp_Always || ($addReqResp === Result::AddReqResp_WithOther && $result->hasRealMessages())) {
+        $addReqResp = $pluginSettings['debug'] === Config::Send_SendAndMailOnError ? InvoiceAddResult::AddReqResp_WithOther : InvoiceAddResult::AddReqResp_Always;
+        if ($addReqResp === InvoiceAddResult::AddReqResp_Always || $result->hasRealMessages()) {
             return $this->getMailer()->sendInvoiceAddMailResult($result, $invoiceSource->getType(), $invoiceSource->getReference());
         }
         return true;
@@ -690,10 +686,10 @@ abstract class InvoiceManager
      *   The invoice that has been created.
      * @param Source $invoiceSource
      *   The source object (order, credit note) for which the invoice was created.
-     * @param \Siel\Acumulus\Invoice\Result $localResult
+     * @param \Siel\Acumulus\Invoice\InvoiceAddResult $localResult
      *   Any locally generated messages.
      */
-    protected function triggerInvoiceCreated(array &$invoice, Source $invoiceSource, Result $localResult)
+    protected function triggerInvoiceCreated(array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult)
     {
         // Default implementation: no event.
     }
@@ -709,10 +705,10 @@ abstract class InvoiceManager
      *   The invoice that has been created and completed.
      * @param Source $invoiceSource
      *   The source object (order, credit note) for which the invoice was created.
-     * @param \Siel\Acumulus\Invoice\Result $localResult
+     * @param \Siel\Acumulus\Invoice\InvoiceAddResult $localResult
      *   Any locally generated messages.
      */
-    protected function triggerInvoiceSendBefore(array &$invoice, Source $invoiceSource, Result $localResult)
+    protected function triggerInvoiceSendBefore(array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult)
     {
         // Default implementation: no event.
     }
@@ -726,10 +722,10 @@ abstract class InvoiceManager
      *   The invoice that has been sent.
      * @param Source $invoiceSource
      *   The source object (order, credit note) for which the invoice was sent.
-     * @param \Siel\Acumulus\Invoice\Result $result
+     * @param \Siel\Acumulus\Invoice\InvoiceAddResult $result
      *   The result as sent back by Acumulus.
      */
-    protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, Result $result)
+    protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, InvoiceAddResult $result)
     {
         // Default implementation: no event.
     }
@@ -750,7 +746,7 @@ abstract class InvoiceManager
      * Returns a string that details the result of the invoice sending.
      *
      * @param \Siel\Acumulus\Invoice\Source $invoiceSource
-     * @param \Siel\Acumulus\Invoice\Result $result
+     * @param \Siel\Acumulus\Invoice\InvoiceAddResult $result
      * @param int $addReqResp
      *   Whether to add the raw request and response.
      *   One of the Result::AddReqResp_... constants
@@ -759,8 +755,8 @@ abstract class InvoiceManager
      */
     protected function getSendResultLogText(
         Source $invoiceSource,
-        Result $result,
-        int $addReqResp = Result::AddReqResp_WithOther
+        InvoiceAddResult $result,
+        int $addReqResp = InvoiceAddResult::AddReqResp_WithOther
     ): string {
         $invoiceSourceText = sprintf($this->t('message_invoice_source'),
             $this->t($invoiceSource->getType()),

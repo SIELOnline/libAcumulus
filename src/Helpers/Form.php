@@ -4,7 +4,7 @@ namespace Siel\Acumulus\Helpers;
 use DateTimeImmutable;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\ApiClient\Acumulus;
-use Siel\Acumulus\ApiClient\Result;
+use Siel\Acumulus\ApiClient\AcumulusResult;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\ShopCapabilities;
 use Siel\Acumulus\Shop\MoreAcumulusTranslations;
@@ -423,7 +423,7 @@ abstract class Form extends MessageCollection
                     // Add a success message if one was defined for this form.
                     $message = $this->t("message_form_{$this->type}_success");
                     if (!empty($message) && $message !== "message_form_{$this->type}_success") {
-                        $this->addMessage($message, Severity::Success);
+                        $this->createAndAdd($message, Severity::Success);
                     }
                 } else {
                     // Add a generic error message if one was defined for this
@@ -431,7 +431,7 @@ abstract class Form extends MessageCollection
                     // error messages and thus will not define this one.
                     $message = $this->t("message_form_{$this->type}_error");
                     if (!empty($message) && $message !== "message_form_{$this->type}_error") {
-                        $this->addMessage($message, Severity::Error);
+                        $this->createAndAdd($message, Severity::Error);
                     }
                 }
             }
@@ -526,6 +526,23 @@ abstract class Form extends MessageCollection
      *   The definition of the form.
      */
     abstract protected function getFieldDefinitions(): array;
+
+    /**
+     * Adds a form message.
+     *
+     * @param string $message
+     * @param int $severity
+     *   One of the Severity::... constants.
+     * @param string $field
+     *   The id of the form field. Does not have to be specified if multiple
+     *   fields are involved
+     *
+     * @return $this
+     */
+    public function addFormMessage(string $message, int $severity, string $field = ''): MessageCollection
+    {
+        return $this->add(Message::createForFormField($message, $severity, $field));
+    }
 
     /**
      * Returns whether (at least one of) the credentials are (is) empty.
@@ -732,7 +749,7 @@ abstract class Form extends MessageCollection
      * - The company type picklist contains an english resp Dutch description in
      *   the 2nd and 3rd entry.
      *
-     * @param \Siel\Acumulus\ApiClient\Result $picklist
+     * @param \Siel\Acumulus\ApiClient\AcumulusResult $picklist
      *   The picklist result structure.
      * @param string|null $emptyValue
      *   The value to use for an empty selection.
@@ -741,7 +758,7 @@ abstract class Form extends MessageCollection
      *
      * @return array
      */
-    protected function picklistToOptions(Result $picklist, ?string $emptyValue = null, ?string $emptyText = null): array
+    protected function picklistToOptions(AcumulusResult $picklist, ?string $emptyValue = null, ?string $emptyText = null): array
     {
         $result = [];
 

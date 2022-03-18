@@ -16,7 +16,6 @@ use RuntimeException;
  */
 class HttpRequest
 {
-    protected /*bool*/ $hasExecuted = false;
     protected /*?string*/ $method = null;
     protected /*?string*/ $uri = null;
     protected /*array*/ $options = [];
@@ -146,15 +145,16 @@ class HttpRequest
      */
     protected function execute(string $method, string $uri, $body = null): HttpResponse
     {
-        if ($this->hasExecuted) {
-            throw new LogicException('HttpRequest::execute() may only be called once.');
-        }
-        $this->hasExecuted = true;
+        assert($this->uri === null, new LogicException('HttpRequest::execute() may only be called once.'));
 
         $this->uri = $uri;
         $this->method = $method;
         $this->body = $body;
-        return $this->executeWithCurl();
+        $httpResponse = $this->executeWithCurl();
+
+        assert($httpResponse->getRequest() === $this);
+
+        return $httpResponse;
     }
 
     /**

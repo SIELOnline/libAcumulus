@@ -8,7 +8,9 @@ namespace Siel\Acumulus\Helpers;
 use InvalidArgumentException;
 use Siel\Acumulus\ApiClient\Acumulus;
 use Siel\Acumulus\ApiClient\AcumulusRequest;
-use Siel\Acumulus\ApiClient\Result;
+use Siel\Acumulus\ApiClient\AcumulusResult;
+use Siel\Acumulus\ApiClient\HttpRequest;
+use Siel\Acumulus\ApiClient\HttpResponse;
 use Siel\Acumulus\Config\Config;
 
 use Siel\Acumulus\Config\ConfigStore;
@@ -19,7 +21,7 @@ use Siel\Acumulus\Invoice\CompletorInvoiceLines;
 use Siel\Acumulus\Invoice\CompletorStrategyLines;
 use Siel\Acumulus\Invoice\Creator;
 use Siel\Acumulus\Invoice\FlattenerInvoiceLines;
-use Siel\Acumulus\Invoice\Result as InvoiceResult;
+use Siel\Acumulus\Invoice\InvoiceAddResult as InvoiceResult;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Shop\AcumulusEntry;
 
@@ -316,16 +318,23 @@ class Container
         return $this->getInstance('Acumulus', 'ApiClient', [$this, $this->getConfig()]);
     }
 
-    public function getResult(): Result
-    {
-        /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('Result', 'ApiClient', [$this->getTranslator(), $this->getLog()], true);
-    }
-
     public function getAcumulusRequest(): AcumulusRequest
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('AcumulusRequest', 'ApiClient', [$this, $this->getConfig(), $this->getLanguage(), $this->getLog()], true);
+    }
+
+
+    public function getHttpRequest(array $options): HttpRequest
+    {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return $this->getInstance('HttpRequest', 'ApiClient', [$options], true);
+    }
+
+    public function getAcumulusResult(AcumulusRequest $acumulusRequest, ?HttpResponse $httpResponse): AcumulusResult
+    {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return $this->getInstance('AcumulusResult', 'ApiClient', [$acumulusRequest, $httpResponse, $this->getTranslator(), $this->getLog()], true);
     }
 
     /**
@@ -353,10 +362,10 @@ class Container
      *   A string indicating the situation that triggered the need to get a new
      *   instance.
      *
-     * @return \Siel\Acumulus\Invoice\Result
+     * @return \Siel\Acumulus\Invoice\InvoiceAddResult
      *   A wrapper object around an Acumulus invoice-add service result.
      */
-    public function getInvoiceResult(string $trigger): InvoiceResult
+    public function getInvoiceAddResult(string $trigger): InvoiceResult
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('Result', 'Invoice', [$trigger, $this->getTranslator(), $this->getLog()], true);

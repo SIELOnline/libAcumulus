@@ -12,27 +12,23 @@ use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Helpers\Translator;
 
 /**
- * Class Result wraps an Acumulus web service result into an object.
+ * Class AcumulusResult wraps an Acumulus web service result into an object.
  *
- * A Result object will contain
+ * An AcumulusResult object contains
  * Most important:
- * - The received result, without any warnings or errors, converted to an array.
- *
+ * - The received response, without the basic response part, converted to an
+ *   array.
  * But also a lot of other info:
  * - Result status (internal code: one of the Severity::... constants).
  * - Exception, if one was thrown.
  * - Any error messages, local and/or remote.
  * - Any warnings, local and/or remote.
  * - Any notices, local.
- * - Http request and response objects, for logging purposes.
+ * - HttpRequest and HttpResponse objects, for logging purposes.
  *
- * @todo: - rename to AcumulusResult
- *   - complete error handling, especially http codes and error values in response
- *   - Make InvoiceResult use this class not extend it, so we can create it in this layer =>
- *       - pass AcumulusRequest and HttpResponse in constructor (and remove setters)
- *       - call simplifyResponse() only after setMainResponseKey()
+ * @todo: complete error handling, especially http codes and error values in response
  */
-class Result extends MessageCollection
+class AcumulusResult extends MessageCollection
 {
     protected /*Log*/ $log;
     protected /*?AcumulusRequest*/ $acumulusRequest = null;
@@ -64,18 +60,26 @@ class Result extends MessageCollection
      */
     protected /*bool*/ $isList = false;
 
-    public function __construct(Translator $translator, Log $log)
-    {
+    public function __construct(
+        AcumulusRequest $acumulusRequest,
+        ?HttpResponse $httpResponse,
+        Translator $translator,
+        Log $log
+    ) {
         parent::__construct($translator);
         $this->log = $log;
+        $this->acumulusRequest = $acumulusRequest;
+        if ($httpResponse !== null) {
+            $this->setHttpResponse($httpResponse);
+        }
     }
 
     /**
      * @return int
      *   The status is the result of taking the worst of:
-     *   - the response.
-     *   - the severity of the message collection.
-     *   - ignoring messages of Severity::Log
+     *   - The response API status.
+     *   - The severity of the message collection.
+     *   - While ignoring messages of Severity::Log.
      */
     public function getStatus(): int
     {
@@ -157,14 +161,6 @@ class Result extends MessageCollection
         return $this->acumulusRequest;
     }
 
-    public function setAcumulusRequest(?AcumulusRequest $acumulusRequest): void
-    {
-        if ($this->acumulusRequest !== null) {
-            throw new LogicException('AcumulusResult::setAcumulusRequest() may only be called once.');
-        }
-        $this->acumulusRequest = $acumulusRequest;
-    }
-
     public function getHttpResponse(): ?HttpResponse
     {
         return $this->httpResponse;
@@ -177,8 +173,15 @@ class Result extends MessageCollection
      * properties. After doing so, this property remains for logging purposes.
      *
      * @param \Siel\Acumulus\ApiClient\HttpResponse $httpResponse
+     *
+     * @throws \LogicException
+     * @throws \RuntimeException
+     *   Either we received:
+     *   - An HTML response (probably an error page).
+     *   - An invalid json message.
+     *   - An invalid xml message.
      */
-    public function setHttpResponse(HttpResponse $httpResponse): void
+    protected function setHttpResponse(HttpResponse $httpResponse): void
     {
         if ($this->httpResponse !== null) {
             throw new LogicException('AcumulusResult::setHttpResponse() may only be called once.');
@@ -197,7 +200,7 @@ class Result extends MessageCollection
             // Curl did return a non-empty response, otherwise we would not be
             // here. So, apparently that only contained headers.
             // @todo: Is this a non 200 response or can we consider this as a critical error?
-            $this->addMessage('Empty response body', Severity::Error, 701);
+            $this->createAndAdd('Empty response body', Severity::Error, 701);
         } elseif ($this->isHtmlResponse($body)) {
             // When the API is gone we might receive an HTML error message page.
             $this->raiseHtmlReceivedError($body);
@@ -257,6 +260,9 @@ class Result extends MessageCollection
         // Move the common parts into their respective properties.
         if (isset($response['status'])) {
             $this->setApiStatus($response['status']);
+            if ($response['status'] === Api::Status_Exception) {
+                $this->addException(new RuntimeException($this->getStatusText()));
+            }
             unset($response['status']);
         } else {
             $this->addException(new RuntimeException('Status not set in response'));
@@ -272,7 +278,6 @@ class Result extends MessageCollection
         }
         unset($response['warnings']);
 
-        $response = $this->simplifyResponse($response);
         $this->response = $response;
 
         return $this;
@@ -284,13 +289,11 @@ class Result extends MessageCollection
      *
      * @return $this
      */
-    public function setMainResponseKey(string $mainResponseKey, bool $isList = false): Result
+    public function setMainResponseKey(string $mainResponseKey, bool $isList = false): AcumulusResult
     {
         $this->mainResponseKey = $mainResponseKey;
         $this->isList = $isList;
-        if (!empty($this->response)) {
-            $this->response = $this->simplifyResponse($this->response);
-        }
+        $this->response = $this->simplifyResponse($this->response);
         return $this;
     }
 
@@ -325,8 +328,6 @@ class Result extends MessageCollection
                 // Not set: probably an error occurred. This object offers ways
                 // to discover so. Therefore, we return an empty list if it
                 // should have been a list.
-                // @todo: should we return null or an empty array for a non list
-                //   response?
                 if ($this->isList) {
                     $response = [];
                 }
@@ -334,6 +335,30 @@ class Result extends MessageCollection
         }
 
         return $response;
+    }
+
+    /**
+     * @param array $apiMessages
+     *   An array with keys 'message', 'code', and 'codetag'.
+     * @param int $severity
+     *   One of the Severity::... constants.
+     *
+     * @return $this
+     */
+    public function addApiMessages(array $apiMessages, int $severity): MessageCollection
+    {
+        if (count($apiMessages) === 3
+            && isset($apiMessages['code'])
+            && isset($apiMessages['codetag'])
+            && isset($apiMessages['message'])
+        ) {
+            // 1 Acumulus API message array.
+            $apiMessages = [$apiMessages];
+        }
+        foreach ($apiMessages as $apiMessage) {
+            $this->add(Message::createFromApiMessage($apiMessage, $severity));
+        }
+        return $this;
     }
 
     /**
@@ -350,24 +375,25 @@ class Result extends MessageCollection
     }
 
     /**
-     * Returns an error message containing the received HTML.
+     * Throws an exception containing the received HTML.
      *
-     * @param string $response
-     *   String containing an HTML document.
+     * @param string $html
+     *   String containing an HTML document which is probably an error page.
      *
      * @trows \RuntimeException
      *   Always
      */
-    protected function raiseHtmlReceivedError(string $response)
+    protected function raiseHtmlReceivedError(string $html)
     {
         libxml_use_internal_errors(true);
         $doc = new DOMDocument('1.0', 'utf-8');
-        $doc->loadHTML($response);
+        $doc->loadHTML($html);
         $body = $doc->getElementsByTagName('body');
         if ($body->length > 0) {
             $body = $body->item(0)->textContent;
         } else {
-            $body = '';
+            // No <body> tag, probably just a message with markup
+            $body = $doc->textContent;
         }
         throw new RuntimeException("HTML response received: $body", 702);
     }
@@ -382,6 +408,11 @@ class Result extends MessageCollection
      *  An array representation of the XML string.
      *
      * @throws \RuntimeException
+     *   Either:
+     *   - The $xml string is not valid xml
+     *   - The $xml string could not be converted to an (associative) array
+     *     (we use json_encode() and json_decode() to convert to an array, so
+     *     this would probably mean a structure that is too deep).
      */
     protected function convertXmlToArray(string $xml): array
     {
@@ -466,8 +497,7 @@ class Result extends MessageCollection
      * Returns the masked raw request, response, and exception. if one occurred.
      *
      * @param bool $log
-     *   if true, the non-empty messages are also logged with the given
-     *   $logLevel.
+     *   if true, the non-empty messages are logged with the given $logLevel.
      * @param int $logLevel
      *    The log level to log the messages with (if $log = true).
      *
@@ -480,7 +510,7 @@ class Result extends MessageCollection
      *   - 'Exception': The exception message. Non-present if no exception was
      *     thrown.
      */
-    public function toLogMessages(bool $log = true, int $logLevel = Severity::Log): array
+    public function toLogMessages(bool $log = false, int $logLevel = Severity::Log): array
     {
         $messages = array_filter([
             'Request' => $this->getMaskedRequest(),
@@ -512,19 +542,17 @@ class Result extends MessageCollection
     protected function getMaskedRequest(): string
     {
         $acumulusRequest = $this->getAcumulusRequest();
-        if ($acumulusRequest !== null) {
-            $submit = $acumulusRequest->getSubmit();
-            if ($submit !== null) {
-                array_walk_recursive($submit, function (&$value, $key) {
-                    if (strpos(strtolower($key), 'password') !== false) {
-                        $value = 'REMOVED FOR SECURITY';
-                    }
-                });
-                $maskedSubmit = var_export($submit, true);
-            }
-            $request = sprintf("%s\n%s", $acumulusRequest->getUri(), $maskedSubmit ?? '');
+        $submit = $acumulusRequest->getSubmit();
+        if ($submit !== null) {
+            // Mask all values that have 'password' in their key.
+            array_walk_recursive($submit, function (&$value, $key) {
+                if (strpos(strtolower($key), 'password') !== false) {
+                    $value = 'REMOVED FOR SECURITY';
+                }
+            });
+            $maskedSubmit = var_export($submit, true);
         }
-        return $request ?? '';
+        return sprintf("%s\n%s", $acumulusRequest->getUri(), $maskedSubmit ?? '');
     }
 
     /**
@@ -537,8 +565,20 @@ class Result extends MessageCollection
         if ($this->getHttpResponse() !== null) {
             $code = $this->getHttpResponse()->getHttpCode();
             $body = $this->getHttpResponse()->getBody();
-            $body = preg_replace('|<([a-z]*)password>.*</[a-z]*password>|', '<$1password>REMOVED FOR SECURITY</$1password>', $body);
-            $body = preg_replace('|"([a-z]*)password"(\s*):(\s*)"[^"]+"|', '"$1password"$2:$3"REMOVED FOR SECURITY"', $body);
+            // If the response is XML, mask all values of tags that end with
+            // 'password'.
+            $body = preg_replace(
+                '|<([a-z]*)password>.*</[a-z]*password>|',
+                '<$1password>REMOVED FOR SECURITY</$1password>',
+                $body
+            );
+            // If the response is Json, mask all values of properties that end
+            // with 'password'.
+            $body = preg_replace(
+                '!"([a-z]*)password"(\s*):(\s*)"(((\\\\.)|[^\\\\"])*)"!',
+                '"$1password"$2:$3"REMOVED FOR SECURITY"',
+                $body
+            );
             $response = sprintf('%d - %s', $code, $body);
         }
         return $response ?? '';

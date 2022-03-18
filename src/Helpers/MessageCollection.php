@@ -40,56 +40,10 @@ class MessageCollection
      *
      * @return $this
      */
-    private function add1Message(Message $message): MessageCollection
+    public function add(Message $message): MessageCollection
     {
         $this->messages[] = $message->setTranslator($this->translator);
         return $this;
-    }
-
-    public function addException(Throwable $e): MessageCollection
-    {
-        return $this->add1Message(Message::createFromException($e));
-    }
-
-    /**
-     * @param array $apiMessages
-     *   An array with keys 'message', 'code', and 'codetag'.
-     * @param int $severity
-     *   One of the Severity::... constants.
-     *
-     * @return $this
-     */
-    public function addApiMessages(array $apiMessages, int $severity): MessageCollection
-    {
-        if (count($apiMessages) === 3
-            && isset($apiMessages['code'])
-            && isset($apiMessages['codetag'])
-            && isset($apiMessages['message'])
-        ) {
-            // 1 Acumulus API message array.
-            $apiMessages = [$apiMessages];
-        }
-        foreach ($apiMessages as $apiMessage) {
-            $this->add1Message(Message::createFromApiMessage($apiMessage, $severity));
-        }
-        return $this;
-    }
-
-    /**
-     * Adds a form message.
-     *
-     * @param string $message
-     * @param int $severity
-     *   One of the Severity::... constants.
-     * @param string $field
-     *   The id of the form field. Does not have to be specified if multiple
-     *   fields are involved
-     *
-     * @return $this
-     */
-    public function addFormMessage(string $message, int $severity, string $field = ''): MessageCollection
-    {
-        return $this->add1Message(Message::createForFormField($message, $severity, $field));
     }
 
     /**
@@ -104,9 +58,14 @@ class MessageCollection
      *
      * @return $this
      */
-    public function addMessage(string $message, int $severity, $code = 0): MessageCollection
+    public function createAndAdd(string $message, int $severity, $code = 0): MessageCollection
     {
-        return $this->add1Message(Message::create($message, $severity, $code));
+        return $this->add(Message::create($message, $severity, $code));
+    }
+
+    public function addException(Throwable $e): MessageCollection
+    {
+        return $this->add(Message::createFromException($e));
     }
 
     /**
@@ -120,7 +79,7 @@ class MessageCollection
      *
      * @return $this
      */
-    public function copyMessages(array $messages, int $severity = Severity::Unknown): MessageCollection
+    public function addMessages(array $messages, int $severity = Severity::Unknown): MessageCollection
     {
         foreach ($messages as $message) {
             if ($severity !== Severity::Unknown && $message->getSeverity() > $severity) {

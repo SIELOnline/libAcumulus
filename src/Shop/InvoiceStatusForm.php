@@ -20,7 +20,7 @@ use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Invoice\Translations as InvoiceTranslations;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Helpers\Message;
-use Siel\Acumulus\ApiClient\Result;
+use Siel\Acumulus\ApiClient\AcumulusResult;
 use Siel\Acumulus\ApiClient\Acumulus;
 use Siel\Acumulus\Helpers\Severity;
 
@@ -401,7 +401,7 @@ class InvoiceStatusForm extends Form
                     }
                     $result = $this->acumulusApiClient->setPaymentStatus($localEntry->getToken(), $paymentStatus, $paymentDate);
                 } else {
-                    $this->addMessage(
+                    $this->createAndAdd(
                         sprintf($this->t('unknown_entry'), strtolower($this->t($source->getType())),$source->getId()),
                         Severity::Error);
                 }
@@ -414,7 +414,7 @@ class InvoiceStatusForm extends Form
                     // @todo: clean up on receiving P2XFELO12?
                     $result = $this->acumulusApiClient->setDeleteStatus($localEntry->getEntryId(), $deleteStatus);
                 } else {
-                    $this->addMessage(
+                    $this->createAndAdd(
                         sprintf($this->t('unknown_entry'), strtolower($this->t($source->getType())), $source->getId()),
                         Severity::Error);
                 }
@@ -422,7 +422,7 @@ class InvoiceStatusForm extends Form
 
             default:
                 // Use a basic filtering on the wrong user input.
-                $this->addMessage(
+                $this->createAndAdd(
                     sprintf($this->t('unknown_action'), preg_replace('/[^a-z0-9_\-]/', '', $service)),
                     Severity::Error);
                 break;
@@ -505,7 +505,7 @@ class InvoiceStatusForm extends Form
         $statusText = $invoiceInfo['text'];
         /** @var string $statusDescription */
         $statusDescription = $invoiceInfo['description'];
-        /** @var Result|null $result */
+        /** @var AcumulusResult|null $result */
         $result = $invoiceInfo['result'];
         /** @var array $entry */
         $entry = $invoiceInfo['entry'];
@@ -734,13 +734,13 @@ class InvoiceStatusForm extends Form
      * Returns additional form fields to show when the invoice has been sent but
      * a communication error occurred in retrieving the entry.
      *
-     * @param \Siel\Acumulus\ApiClient\Result $result
+     * @param \Siel\Acumulus\ApiClient\AcumulusResult $result
      *   The result that details the error.
      *
      * @return array[]
      *   Array of form fields.
      */
-    protected function getCommunicationErrorFields(Result $result): array
+    protected function getCommunicationErrorFields(AcumulusResult $result): array
     {
         return [
             'messages' => [

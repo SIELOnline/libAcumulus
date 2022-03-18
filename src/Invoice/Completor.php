@@ -895,7 +895,7 @@ class Completor
                     $invoice[Tag::VatType] = reset($vatTypeInfo['union']);
                     $message = 'message_warning_no_vattype_incorrect_lines';
                     $code = 812;
-                } else {
+                } /** @noinspection PhpSeparateElseIfInspection */ else {
                     // Separate lines could be matched with possible vat types,
                     // but not all with the same vat type.
                     // Possible causes:
@@ -1631,8 +1631,11 @@ class Completor
     public function shouldConvertCurrency(array &$invoice): bool
     {
         $invoicePart = &$invoice[Tag::Customer][Tag::Invoice];
-        $shouldConvert = isset($invoicePart[Meta::Currency]) && isset($invoicePart[Meta::CurrencyRate]) && isset($invoicePart[Meta::CurrencyDoConvert]);
-        $shouldConvert = $shouldConvert && (float) $invoicePart[Meta::CurrencyRate] != 1.0;
+        $currencyMetaAvailable = isset($invoicePart[Meta::Currency])
+            && isset($invoicePart[Meta::CurrencyRate])
+            && isset($invoicePart[Meta::CurrencyDoConvert]);
+        $shouldConvert = $currencyMetaAvailable
+            && !Number::floatsAreEqual($invoicePart[Meta::CurrencyRate], 1.0, 0.0001);
         if ($shouldConvert) {
             if ($invoicePart[Meta::Currency] !== 'EUR') {
                 // Order/refund is not in euro's: convert if amounts are stored
@@ -1700,6 +1703,7 @@ class Completor
     {
         $shopSettings = $this->config->getShopSettings();
         $foreignVatEuClasses = $shopSettings['euVatClasses'];
+        /** @noinspection PhpStrictComparisonWithOperandsOfDifferentTypesInspection  error in type engine */
         return reset($foreignVatEuClasses) !== Config::VatClass_NotApplicable;
     }
 

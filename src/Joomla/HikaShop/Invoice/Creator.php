@@ -258,10 +258,10 @@ class Creator extends BaseCreator
      *   properties:
      * - float price_with_tax: price including tax for this shipment
      * - float tax: (total) tax for this shipment
-     * - (optional) float[]: array of float (tax amount) keyed by tax class
-     *   name. If a shipping method has proportional tax rates (i.e. following
-     *   the contents of the cart) this array contains the proportion of the
-     *   (total) tax per tax class.
+     * - (optional) float[] taxes: array of tax amounts keyed by tax class name.
+     *   If a shipping method has proportional tax rates (i.e. following the
+     *   contents of the cart) this array contains the proportion of the (total)
+     *   tax per tax class.
      */
     protected function getShippingLines(): array
     {
@@ -281,7 +281,6 @@ class Creator extends BaseCreator
         } elseif (empty($this->order->order_shipping_params)) {
             // If the property order_shipping_params is not set, we use the
             // order_shipping_* properties at the order level.
-            // @nth: can we distinguish between free shipping and in-store pickup?
             $result[] = [
                 Tag::Product => $this->getShippingMethodName($this->order->order_shipping_id),
                 Tag::Quantity => 1,

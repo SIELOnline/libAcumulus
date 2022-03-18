@@ -1,4 +1,8 @@
 <?php
+/**
+ * @noinspection PhpUnused
+ */
+
 namespace Siel\Acumulus;
 
 /**
@@ -12,81 +16,81 @@ interface Api
      *
      * @var string
      */
-    const DateFormat_Iso = 'Y-m-d';
-    const Format_TimeStamp = 'Y-m-d H:i:s';
+    public const DateFormat_Iso = 'Y-m-d';
+    public const Format_TimeStamp = 'Y-m-d H:i:s';
 
     // API role ids
-    const RoleManager = 1;
-    const RoleUser = 2;
-    const RoleCreator = 3;
-    const RoleApiManager = 4;
-    const RoleApiUser = 5;
-    const RoleApiCreator = 6;
+    public const RoleManager = 1;
+    public const RoleUser = 2;
+    public const RoleCreator = 3;
+    public const RoleApiManager = 4;
+    public const RoleApiUser = 5;
+    public const RoleApiCreator = 6;
 
     // API result codes. Note that internally I want an increasing order of
     // worseness, so these constants are not used internally but mapped to the
     // Severity::... constants.
-    const Status_Success = 0;
-    const Status_Warnings = 2;
-    const Status_Errors = 1;
-    const Status_Exception = 3;
+    public const Status_Success = 0;
+    public const Status_Warnings = 2;
+    public const Status_Errors = 1;
+    public const Status_Exception = 3;
 
     // ApiClient service related defaults.
-    const baseUri = 'https://api.sielsystems.nl/acumulus';
-    const apiVersion = 'stable';
-    const apiVersionTest = 'dev';
-    const outputFormat = 'json';
+    public const baseUri = 'https://api.sielsystems.nl/acumulus';
+    public const apiVersion = 'stable';
+    public const apiVersionTest = 'dev';
+    public const outputFormat = 'json';
 
     // API related constants.
-    const TestMode_Normal = 0;
-    const TestMode_Test = 1;
+    public const TestMode_Normal = 0;
+    public const TestMode_Test = 1;
 
-    const PaymentStatus_Due = 1;
-    const PaymentStatus_Paid = 2;
+    public const PaymentStatus_Due = 1;
+    public const PaymentStatus_Paid = 2;
 
-    const Concept_No = 0;
-    const Concept_Yes = 1;
+    public const Concept_No = 0;
+    public const Concept_Yes = 1;
 
-    const ContactStatus_Disabled = 0;
-    const ContactStatus_Active = 1;
+    public const ContactStatus_Disabled = 0;
+    public const ContactStatus_Active = 1;
 
-    const OverwriteIfExists_No = 0;
-    const OverwriteIfExists_Yes = 1;
+    public const OverwriteIfExists_No = 0;
+    public const OverwriteIfExists_Yes = 1;
 
-    const ConfirmReading_No = 0;
-    const ConfirmReading_Yes = 1;
+    public const ConfirmReading_No = 0;
+    public const ConfirmReading_Yes = 1;
 
-    const VatTypeId_Private = 1; // or vat exempt business.
-    const VatTypeId_Business = 2;
+    public const VatTypeId_Private = 1; // or vat exempt business.
+    public const VatTypeId_Business = 2;
 
-    const Region_NotSet = 0;
-    const Region_Netherlands = 1;
-    const Region_EU = 2;
-    const Region_World = 3;
+    public const Region_NotSet = 0;
+    public const Region_Netherlands = 1;
+    public const Region_EU = 2;
+    public const Region_World = 3;
 
-    const VatType_National = 1;
-    const VatType_NationalReversed = 2;
-    const VatType_EuReversed = 3;
-    const VatType_RestOfWorld = 4;
-    const VatType_MarginScheme = 5;
-    const VatType_EuVat = 6;
-    const VatType_OtherForeignVat = 7;
+    public const VatType_National = 1;
+    public const VatType_NationalReversed = 2;
+    public const VatType_EuReversed = 3;
+    public const VatType_RestOfWorld = 4;
+    public const VatType_MarginScheme = 5;
+    public const VatType_EuVat = 6;
+    public const VatType_OtherForeignVat = 7;
 
-    const VatFree = -1;
+    public const VatFree = -1;
 
-    const Nature_Product = 'Product';
-    const Nature_Service = 'Service';
+    public const Nature_Product = 'Product';
+    public const Nature_Service = 'Service';
 
-    const Entry_Delete = 1;
-    const Entry_UnDelete = 0;
+    public const Entry_Delete = 1;
+    public const Entry_UnDelete = 0;
 
-    const Email_Normal = 0;
-    const Email_Reminder = 1;
+    public const Email_Normal = 0;
+    public const Email_Reminder = 1;
 
-    const Gender_Female = 'F';
-    const Gender_Male = 'M';
-    const Gender_Neutral = 'X';
+    public const Gender_Female = 'F';
+    public const Gender_Male = 'M';
+    public const Gender_Neutral = 'X';
 
-    const CreateApiUser_No = 0;
-    const CreateApiUser_Yes = 1;
+    public const CreateApiUser_No = 0;
+    public const CreateApiUser_Yes = 1;
 }

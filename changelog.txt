@@ -6,17 +6,22 @@ Supported shops and versions
 The tags below are also used further on in the changelog to indicate to which
 shop(s) a change applies.
 
-ALL = Alle web shops.
-HS  = HikaShop (Joomla)
-JOO = Joomla (HikaShop + VirtueMart3)
-MA  = Magento (supported versions: >= 2.3)
-OC  = OpenCart (supported versions: >= 3.0)
-PS  = PrestaShop (supported versions: >= 1.7.6+)
-VM3 = VirtueMart3 (Joomla)
-WC  = WooCommerce (supported versions: >= 5.0 (WC 4 en 3 probably will work)
+Tag  Shop                 Actual version     Supported versions
+--------------------------------------------------------------------------------
+ALL  All web shops.
+HS   HikaShop (Joomla)   4.5.0 (HS Starter)  >= 3.0.0
+JOO  Joomla (HS + VM)    3.10.6              >= 3.10
+MA   Magento             2.4.2               >= 2.3
+OC   OpenCart            ?.?.?.?             >= 3.0
+PS   PrestaShop          ?.?.?               >= 1.7.6
+VM   VirtueMart (Joomla) ?.?
+WC   WooCommerce                             >= 5.0 (3 and 4 will probably work)
+     WordPress           5.9.2               >= ?.?
+--------------------------------------------------------------------------------
 
-7.0.0-alpha1 (2022-03-??)
--------------------------
+
+7.0.0-alpha1 (2022-03-18) (not released)
+----------------------------------------
 Features:
 - ALL: At the HTTP level we now send a User-Agent header. For that, we added
   keys cmsName and cmsConfig to the Config. Class ShopCapabilities gives it a
@@ -77,8 +82,8 @@ Refactorings:
     typed properties (7.4).)
 - Added visibility to class constants.
 
-6.4.x (2022-03-??)
-------------------
+6.4.x (2022-03-08) (not released: merged into 7.0.0-alpha1)
+-----------------------------------------------------------
 Bugs:
 - JOO,OC,PS: Error "Error: Invalid default value for 'updated' Error No: 1067
   CREATE TABLE IF NOT EXISTS `acumulus_entry`" in MySql when NO_ZERO_DATE and

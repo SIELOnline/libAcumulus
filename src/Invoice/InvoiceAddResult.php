@@ -242,6 +242,11 @@ class InvoiceAddResult extends MessageCollection
         return $message;
     }
 
+    public function getMainApiResponse(): ?array
+    {
+        return $this->getApiResult() !== null ? $this->getApiResult()->getMainResponse() : null ;
+    }
+
     public function getApiResult(): ?AcumulusResult
     {
         return $this->apiResult;
@@ -260,6 +265,7 @@ class InvoiceAddResult extends MessageCollection
 
     /**
      * Returns a translated sentence that can be used for logging.
+     *
      * The returned sentence indicates what happened and why. If the invoice was
      * sent or local errors prevented it being sent, then the returned string
      * also includes any messages.

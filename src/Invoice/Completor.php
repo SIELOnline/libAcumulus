@@ -537,7 +537,7 @@ class Completor
         if (empty($this->invoice[Tag::Customer][Tag::Email])) {
             $customerSettings = $this->config->getCustomerSettings();
             $this->invoice[Tag::Customer][Tag::Email] = $customerSettings['emailIfAbsent'];
-            $this->result->createAndAdd($this->t('message_warning_no_email'), Severity::Warning, 801);
+            $this->result->createAndAddMessage($this->t('message_warning_no_email'), Severity::Warning, 801);
         } else {
             $email = $this->invoice[Tag::Customer][Tag::Email];
             $at = strpos($email, '@');
@@ -1012,18 +1012,24 @@ class Completor
                         //   - one of the no-vat vat types.
                         //   - vat type national with client outside EU.
                         if ($this->lineHasNoVat($line)) {
-                            $zeroOrVatFreeClass = $this->is0VatClass($line) || $this->isVatFreeClass($line);
-                            $zeroOrVatFreeRate = !empty($line[Meta::VatRateLookup]) && $this->metaDataHasANoVat($line[Meta::VatRateLookup]);
-                            if (!($zeroOrVatFreeClass || $zeroOrVatFreeRate)) {
-                                // This article cannot be intrinsically 0% or
-                                // vat free. So the vat type must be a vat type
-                                // allowing no vat, i.e. a no-vat vat type or
-                                // national vat for a customer outside the EU.
-                                if (!in_array($vatType, static::$zeroVatVatTypes) && !($vatType === Api::VatType_National && $this->isOutsideEu())) {
-                                    $doAdd = false;
+                            if (!empty($line[Meta::VatClassId]) || !empty($line[Meta::VatRateLookup])) {
+                                $zeroOrVatFreeClass = $this->is0VatClass($line) || $this->isVatFreeClass($line);
+                                $zeroOrVatFreeRate = !empty($line[Meta::VatRateLookup])
+                                    && $this->metaDataHasANoVat($line[Meta::VatRateLookup]);
+                                if (!($zeroOrVatFreeClass || $zeroOrVatFreeRate)) {
+                                    // According to the available lookup data,
+                                    // this article cannot be intrinsically 0%
+                                    // or vat free. So the vat type must be a
+                                    // vat type allowing no vat, i.e. a no-vat
+                                    // vat type or national vat for a customer
+                                    // outside the EU.
+                                    if (!in_array($vatType,static::$zeroVatVatTypes)
+                                        && !($vatType === Api::VatType_National && $this->isOutsideEu())
+                                    ) {
+                                        $doAdd = false;
+                                    }
                                 }
                             }
-
                             // If the customer is outside the EU AND we do not
                             // charge vat, goods should get vat type 4 and
                             // services vat type 1. However, we only look at
@@ -1357,7 +1363,7 @@ class Completor
             $year = (int) substr($this->getInvoiceDate(), 0, 4);
             $result = $this->acumulusApiClient->reportThresholdEuCommerce($year);
             if (!$result->hasError()) {
-                $euCommerceReport = $result->getResponse();
+                $euCommerceReport = $result->getMainResponse();
                 if ($euCommerceReport['reached'] == 1) {
                     $this->changeInvoiceToConcept($invoice, 'eu_commerce_threshold_passed', 830);
                 } else {
@@ -1368,7 +1374,7 @@ class Completor
                     } elseif ($percentage > $warningPercentage) {
                         // Send mail with notice, xml message will not be added
                         // if there are no warnings or worse.
-                        $this->result->createAndAdd(
+                        $this->result->createAndAddMessage(
                             sprintf($this->t('eu_commerce_threshold_warning'), $percentage),
                             Severity::Notice,
                             832
@@ -1510,7 +1516,7 @@ class Completor
                 $this->result->addMessages($result->getMessages(Severity::InfoOrWorse));
                 $result = [];
             } else {
-                $result = $result->getResponse();
+                $result = $result->getMainResponse();
             }
             $this->vatRatesCache[$cacheKey] = $result;
         }
@@ -1759,7 +1765,7 @@ class Completor
     protected function is0VatClass($vatClassId): bool
     {
         if (is_array($vatClassId)) {
-            $vatClassId = array_key_exists(Meta::VatClassId, $vatClassId) ? $vatClassId[Meta::VatClassId] : null;
+            $vatClassId = $vatClassId[Meta::VatClassId] ?? null;
         }
         $shopSettings = $this->config->getShopSettings();
         $zeroVatClass = $shopSettings['zeroVatClass'];
@@ -1919,7 +1925,7 @@ class Completor
             if (!empty($args)) {
                 $message = sprintf($message, ...$args);
             }
-            $this->result->createAndAdd($message, Severity::Warning, $code);
+            $this->result->createAndAddMessage($message, Severity::Warning, $code);
             $this->addWarning($array, $this->result->getByCode($code)->format(Message::Format_Plain));
         }
     }

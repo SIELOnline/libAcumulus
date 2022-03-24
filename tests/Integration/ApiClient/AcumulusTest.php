@@ -152,7 +152,7 @@ class AcumulusTest extends TestCase
         $vatType = array_column($expected, 'vattype');
         array_multisort($vatRate, SORT_DESC, $vatType, SORT_ASC, $expected);
 
-        $actual = $result->getResponse();
+        $actual = $result->getMainResponse();
         $vatRate  = array_column($actual, 'vatrate');
         $vatType = array_column($actual, 'vattype');
         array_multisort($vatRate, SORT_DESC, $vatType, SORT_ASC, $actual);
@@ -177,7 +177,7 @@ class AcumulusTest extends TestCase
     {
         $result = $this->acumulusClient->reportThresholdEuCommerce(2021);
         $this->assertSame(Severity::Success, $result->getStatus());
-        $actual = $result->getResponse();
+        $actual = $result->getMainResponse();
         $threshold = $actual['threshold'];
         $this->assertEquals(10000, $threshold);
     }
@@ -199,7 +199,7 @@ class AcumulusTest extends TestCase
     {
         $result = $this->acumulusClient->reportThresholdEuCommerce(2099);
         $this->assertSame(Severity::Success, $result->getStatus());
-        $actual = $result->getResponse();
+        $actual = $result->getMainResponse();
         $threshold = $actual['threshold'];
         $this->assertEquals(10000, $threshold);
     }
@@ -221,7 +221,7 @@ class AcumulusTest extends TestCase
         $result = $this->acumulusClient->stockAdd(... $args);
 
         $this->assertSame(Severity::Success, $result->getStatus());
-        $actual = $result->getResponse();
+        $actual = $result->getMainResponse();
         $this->assertEqualsCanonicalizing($expected, $actual);
     }
 

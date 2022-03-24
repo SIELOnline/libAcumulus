@@ -559,16 +559,16 @@ abstract class InvoiceManager
      *
      * @param \Siel\Acumulus\Invoice\Source $invoiceSource
      * @param array $invoice
-     * @param \Siel\Acumulus\Invoice\InvoiceAddResult $result
+     * @param \Siel\Acumulus\Invoice\InvoiceAddResult $invoiceAddResult
      *
      * @return \Siel\Acumulus\Invoice\InvoiceAddResult
      *   The result structure of the invoice add API call merged with any local
      *   messages.
      */
-    protected function doSend(array $invoice, Source $invoiceSource, InvoiceAddResult $result): InvoiceAddResult
+    protected function doSend(array $invoice, Source $invoiceSource, InvoiceAddResult $invoiceAddResult): InvoiceAddResult
     {
         $apiResult = $this->getAcumulusApiClient()->invoiceAdd($invoice);
-        $result->setApiResult($apiResult);
+        $invoiceAddResult->setApiResult($apiResult);
 
         // Save Acumulus entry:
         // - If we were sending in test mode or there were errors, no invoice
@@ -581,15 +581,15 @@ abstract class InvoiceManager
             $acumulusEntryManager = $this->getAcumulusEntryManager();
             $oldEntry = $acumulusEntryManager->getByInvoiceSource($invoiceSource);
 
-            $response = $apiResult->getResponse();
-            if (!empty($response['token']) && !empty('entryid')) {
+            $invoiceInfo = $apiResult->getMainResponse();
+            if (!empty($invoiceInfo['token']) && !empty('entryid')) {
                 // A real entry.
-                $token = $response['token'];
-                $id = $response['entryid'];
-            } elseif (!empty($response['conceptid'])) {
+                $token = $invoiceInfo['token'];
+                $id = $invoiceInfo['entryid'];
+            } elseif (!empty($invoiceInfo['conceptid'])) {
                 // A concept.
                 $token = null;
-                $id = $response['conceptid'];
+                $id = $invoiceInfo['conceptid'];
             } else {
                 // An error (or old API version).
                 $token = null;
@@ -610,7 +610,7 @@ abstract class InvoiceManager
                         // Could not delete the old entry (already deleted or
                         // does not exist at all (anymore)): add as a warning so
                         // this info will be mailed to the user.
-                        $result->createAndAddMessage(
+                        $invoiceAddResult->createAndAddMessage(
                             sprintf($this->t('message_warning_old_entry_not_deleted'), $this->t($invoiceSource->getType()), $entryId),
                             Severity::Warning,
                             902
@@ -618,12 +618,12 @@ abstract class InvoiceManager
                     } else {
                         // Add other "real" messages also as warning, but
                         // untranslated.
-                        $result->addMessages($deleteResult->getMessages(Severity::InfoOrWorse), Severity::Warning);
+                        $invoiceAddResult->addMessages($deleteResult->getMessages(Severity::InfoOrWorse), Severity::Warning);
                     }
                 } else {
                     // Successfully deleted the old entry: add a notice so this
                     // info will be mailed to the user.
-                    $result->createAndAddMessage(
+                    $invoiceAddResult->createAndAddMessage(
                         sprintf($this->t('message_warning_old_entry_deleted'), $this->t($invoiceSource->getType()), $entryId),
                         Severity::Notice,
                         901
@@ -632,7 +632,7 @@ abstract class InvoiceManager
             }
         }
 
-        return $result;
+        return $invoiceAddResult;
     }
 
     /**

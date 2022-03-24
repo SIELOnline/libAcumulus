@@ -77,7 +77,18 @@ class InvoiceStatusForm extends Form
      *
      * @var \Siel\Acumulus\Invoice\Source
      */
-    protected $source;
+    protected $source = null;
+
+    /**
+     * The submitted source for this execution.
+     *
+     * This form can handle an order and its credit notes at the same time, the
+     * order being the "main" source, the submitted source being the Source to
+     * act on.
+     *
+     * @var \Siel\Acumulus\Invoice\Source
+     */
+    protected $submittedSource = null;
 
     /**
      * One of the Result::Status_... constants.
@@ -151,6 +162,17 @@ class InvoiceStatusForm extends Form
         return $this->source !== null;
     }
 
+    public function getSubmittedSource(): ?Source
+    {
+        return $this->submittedSource;
+    }
+
+    public function setSubmittedSource(?Source $submittedSource): void
+    {
+        $this->submittedSource = $submittedSource;
+    }
+
+
     /**
      * Sets the status, but only if it is "worse" than the current status.
      *
@@ -159,7 +181,7 @@ class InvoiceStatusForm extends Form
      * @param string $message
      *   Optionally, a message indicating what is wrong may be given.
      */
-    protected function setStatus(int $status, string $message = '')
+    protected function setStatus(int $status, string $message)
     {
         if ($status > $this->status) {
             $this->status = $status;
@@ -308,17 +330,18 @@ class InvoiceStatusForm extends Form
         if (count($parts) === 3) {
             $this->submittedValues['service'] = $parts[2];
             $this->submittedValues['source_type'] = $parts[0];
-            $this->submittedValues['source_id'] = (int) $parts[1];
-            $this->submittedValues['source'] = null;
+            $this->submittedValues['source_id'] = $parts[1];
+            $this->setSubmittedSource(null);
             if ($this->source->getType() === $this->getSubmittedValue('source_type')
-                && $this->source->getId() === $this->getSubmittedValue('source_id')) {
-                $this->submittedValues['source'] = $this->source;
+                && $this->source->getId() === (int) $this->getSubmittedValue('source_id')
+            ) {
+                $this->setSubmittedSource($this->source);
             } else {
                 $creditNotes = $this->source->getCreditNotes();
                 foreach ($creditNotes as $creditNote) {
                     if ($creditNote->getType() === $this->getSubmittedValue('source_type')
-                        && $creditNote->getId() ===$this->getSubmittedValue('source_id')) {
-                        $this->submittedValues['source'] = $creditNote;
+                        && $creditNote->getId() === (int) $this->getSubmittedValue('source_id')) {
+                        $this->setSubmittedSource($creditNote);
                     }
                 }
             }
@@ -326,7 +349,7 @@ class InvoiceStatusForm extends Form
             $this->submittedValues['service'] = '';
             $this->submittedValues['source_type'] = 'unknown';
             $this->submittedValues['source_id'] = 'unknown';
-            $this->submittedValues['source'] = null;
+            $this->setSubmittedSource(null);
         }
     }
 
@@ -342,7 +365,7 @@ class InvoiceStatusForm extends Form
                 preg_replace('/[^a-z0-9_\-]/', '', $this->getSubmittedValue('acumulus_main_source_id'))),
                 Severity::Error);
         } elseif ($this->getSubmittedValue('service') !== 'invoice_show') {
-            if ($this->getSubmittedValue('source') === null) {
+            if ($this->getSubmittedSource() === null) {
                 // Use a basic filtering on the wrong user input.
                 $this->addFormMessage(sprintf($this->t('unknown_source'),
                     preg_replace('/[^a-z0-9_\-]/', '', $this->getSubmittedValue('source_type')),
@@ -350,7 +373,7 @@ class InvoiceStatusForm extends Form
                     Severity::Error);
             } elseif ($this->getSubmittedValue('service') === 'invoice_paymentstatus_set') {
                 /** @var Source $source */
-                $source = $this->getSubmittedValue('source');
+                $source = $this->getSubmittedSource();
                 $idPrefix = $this->getIdPrefix($source);
                 if ((int) $this->getSubmittedValue($idPrefix . 'payment_status_new') === Api::PaymentStatus_Paid) {
                     $dateFieldName = $idPrefix . 'payment_date';
@@ -376,7 +399,7 @@ class InvoiceStatusForm extends Form
 
         $service = $this->getSubmittedValue('service');
         /** @var Source $source */
-        $source = $this->getSubmittedValue('source');
+        $source = $this->getSubmittedSource();
         $idPrefix = $this->getIdPrefix($source);
         switch ($service) {
             case 'invoice_show':
@@ -386,7 +409,10 @@ class InvoiceStatusForm extends Form
 
             case 'invoice_add':
                 $forceSend = (bool) $this->getSubmittedValue($idPrefix . 'force_send');
-                $result = $this->invoiceManager->send1($source, $forceSend);
+                $invoiceAddResult = $this->invoiceManager->send1($source, $forceSend);
+                $this->addMessages($invoiceAddResult->getMessages());
+                // @todo: is the result or are these messages displayed?
+                $result = !$invoiceAddResult->hasError();
                 break;
 
             case 'invoice_paymentstatus_set':
@@ -394,14 +420,14 @@ class InvoiceStatusForm extends Form
                 if ($localEntry) {
                     if ((int) $this->getSubmittedValue($idPrefix . 'payment_status_new') === Api::PaymentStatus_Paid) {
                         $paymentStatus = Api::PaymentStatus_Paid;
-                        $paymentDate =$this->getSubmittedValue($idPrefix . 'payment_date');
+                        $paymentDate = $this->getSubmittedValue($idPrefix . 'payment_date');
                     } else {
                         $paymentStatus = Api::PaymentStatus_Due;
                         $paymentDate = '';
                     }
                     $result = $this->acumulusApiClient->setPaymentStatus($localEntry->getToken(), $paymentStatus, $paymentDate);
                 } else {
-                    $this->createAndAdd(
+                    $this->createAndAddMessage(
                         sprintf($this->t('unknown_entry'), strtolower($this->t($source->getType())),$source->getId()),
                         Severity::Error);
                 }
@@ -410,11 +436,13 @@ class InvoiceStatusForm extends Form
             case 'entry_deletestatus_set':
                 $localEntry = $this->acumulusEntryManager->getByInvoiceSource($source);
                 if ($localEntry && $localEntry->getEntryId() !== null) {
-                    $deleteStatus = $this->getSubmittedValue($idPrefix . 'delete_status') === Api::Entry_Delete ? Api::Entry_Delete : Api::Entry_UnDelete;
+                    $deleteStatus = (int) $this->getSubmittedValue($idPrefix . 'delete_status') === Api::Entry_Delete
+                        ? Api::Entry_Delete
+                        : Api::Entry_UnDelete;
                     // @todo: clean up on receiving P2XFELO12?
                     $result = $this->acumulusApiClient->setDeleteStatus($localEntry->getEntryId(), $deleteStatus);
                 } else {
-                    $this->createAndAdd(
+                    $this->createAndAddMessage(
                         sprintf($this->t('unknown_entry'), strtolower($this->t($source->getType())), $source->getId()),
                         Severity::Error);
                 }
@@ -422,7 +450,7 @@ class InvoiceStatusForm extends Form
 
             default:
                 // Use a basic filtering on the wrong user input.
-                $this->createAndAdd(
+                $this->createAndAddMessage(
                     sprintf($this->t('unknown_action'), preg_replace('/[^a-z0-9_\-]/', '', $service)),
                     Severity::Error);
                 break;
@@ -570,11 +598,11 @@ class InvoiceStatusForm extends Form
      *
      * @return array
      *   Keyed array with keys:
-     *   - status (string): 1 of the InvoiceStatusForm::Status_ constants.
-     *   - send-status (string): 1 of the InvoiceStatusForm::Invoice_ constants.
-     *   - result (\Siel\Acumulus\ApiClient\Result?): result of the getEntry API call.
-     *   - entry (array?): the (main) response part of the getEntry API call.
-     *   - statusField (array): a form field array representing the status.
+     *   - 'status' (string): 1 of the InvoiceStatusForm::Status_ constants.
+     *   - 'send-status' (string): 1 of the InvoiceStatusForm::Invoice_ constants.
+     *   - 'result' (\Siel\Acumulus\ApiClient\Result?): result of the getEntry API call.
+     *   - 'entry' (array?): the (main) response part of the getEntry API call.
+     *   - 'statusField' (array): a form field array representing the status.
      */
     protected function getInvoiceInfo(Source $source, ?AcumulusEntry &$localEntry): array
     {
@@ -583,7 +611,7 @@ class InvoiceStatusForm extends Form
         $arg1 = null;
         $arg2 = null;
         $description = '';
-        $statusMessage = null;
+        $statusMessage = '';
         if ($localEntry === null) {
             $invoiceStatus = static::Invoice_NotSent;
             $statusSeverity = static::Status_Info;
@@ -600,7 +628,7 @@ class InvoiceStatusForm extends Form
                     // Entry saved with support for concept ids.
                     // Has the concept been changed into an invoice?
                     $result = $this->acumulusApiClient->getConceptInfo($localEntry->getConceptId());
-                    $conceptInfo = $this->sanitiseConceptInfo($result->getResponse());
+                    $conceptInfo = $this->sanitiseConceptInfo($result->getMainResponse());
                     if (empty($conceptInfo)) {
                         $invoiceStatus = static::Invoice_CommunicationError;
                         $statusSeverity = static::Status_Error;
@@ -629,7 +657,7 @@ class InvoiceStatusForm extends Form
                         // Concept turned into 1 definitive invoice: update
                         // acumulus entry to have it refer to that invoice.
                         $result = $this->acumulusApiClient->getEntry($conceptInfo['entryid']);
-                        $entry = $this->sanitiseEntry($result->getResponse());
+                        $entry = $this->sanitiseEntry($result->getMainResponse());
                         if (!$result->hasError() && !empty($entry['token'])) {
                             if ($this->acumulusEntryManager->save($source, $conceptInfo['entryid'], $entry['token'])) {
                                 $newLocalEntry = $this->acumulusEntryManager->getByInvoiceSource($source);
@@ -657,7 +685,7 @@ class InvoiceStatusForm extends Form
 
             if ($localEntry->getEntryId() !== null) {
                 $result = $this->acumulusApiClient->getEntry($localEntry->getEntryId());
-                $entry = $this->sanitiseEntry($result->getResponse());
+                $entry = $this->sanitiseEntry($result->getMainResponse());
                 if ($result->getByCodeTag('XGYBSN000')) {
                     $invoiceStatus = static::Invoice_NonExisting;
                     $statusSeverity = static::Status_Error;
@@ -947,6 +975,8 @@ class InvoiceStatusForm extends Form
      *
      * @return array[]
      *   Array with form fields with the invoice amounts.
+     *
+     * @noinspection PhpSeparateElseIfInspection
      */
     protected function getAmountFields(Source $source, array $entry): array
     {

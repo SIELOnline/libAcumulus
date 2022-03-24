@@ -149,7 +149,7 @@ abstract class Mailer
     {
         $pluginSettings = $this->config->getPluginSettings();
         $isTestMode = $pluginSettings['debug'] === Config::Send_TestMode;
-        $resultInvoice = $invoiceSendResult->getResponse();
+        $resultInvoice = $invoiceSendResult->getMainApiResponse();
         $isConcept = !$invoiceSendResult->hasError() && empty($resultInvoice['entryid']);
 
         $subjectBase = 'mail_subject';
@@ -161,7 +161,7 @@ abstract class Mailer
         $subject = $this->t($subjectBase);
 
         $subjectResult = 'mail_subject';
-        switch ($invoiceSendResult->getStatus()) {
+        switch ($invoiceSendResult->getSeverity()) {
             case Severity::Exception:
                 $subjectResult .= '_exception';
                 break;
@@ -199,16 +199,19 @@ abstract class Mailer
      */
     protected function getBody(InvoiceAddResult $result, string $invoiceSourceType, string $invoiceSourceReference): array
     {
-        $resultInvoice = $result->getResponse();
+        $acumulusResult = $result->getApiResult();
+        $invoiceInfo = $result->getMainApiResponse();
         $bodyTexts = $this->getStatusSpecificBody($result);
         $messagesTexts = $this->getMessages($result);
         $supportTexts = $this->getSupportMessages($result);
         $replacements = [
             '{invoice_source_type}' => $this->t($invoiceSourceType),
             '{invoice_source_reference}' => $invoiceSourceReference,
-            '{acumulus_invoice_id}' => $resultInvoice['invoicenumber'] ?? $this->t('message_no_invoice'),
-            '{status}' => $result->getStatus(),
-            '{status_message}' => $result->getStatusText(),
+            '{acumulus_invoice_id}' => $invoiceInfo !== null && isset($invoiceInfo['invoicenumber'])
+                ? $invoiceInfo['invoicenumber']
+                : $this->t('message_no_invoice'),
+            '{status}' => $result->getSeverity(),
+            '{status_message}' => $acumulusResult !== null ? $acumulusResult->getStatusText() : '',
             '{status_specific_text}' => $bodyTexts['text'],
             '{status_specific_html}' => $bodyTexts['html'],
             '{messages_text}' => $messagesTexts['text'],
@@ -232,29 +235,29 @@ abstract class Mailer
      * - whether the invoice was sent as concept
      * - the emailAsPdf setting
      *
-     * @param \Siel\Acumulus\Invoice\InvoiceAddResult $invoiceSendResult
+     * @param \Siel\Acumulus\Invoice\InvoiceAddResult $invoiceAddResult
      *
      * @return string[]
      *   An array with the status specific part of the body text in 2 formats,
      *   keyed by 'text' resp. 'html'.
      */
-    protected function getStatusSpecificBody(InvoiceAddResult $invoiceSendResult): array
+    protected function getStatusSpecificBody(InvoiceAddResult $invoiceAddResult): array
     {
         $pluginSettings = $this->config->getPluginSettings();
         $isTestMode = $pluginSettings['debug'] === Config::Send_TestMode;
-        $resultInvoice = $invoiceSendResult->getResponse();
+        $invoiceInfo = $invoiceAddResult->getMainApiResponse();
         // @refactor: can be taken from invoice array if that would be part of the Result
-        $isConcept = !$invoiceSendResult->hasError() && empty($resultInvoice['entryid']);
+        $isConcept = !$invoiceAddResult->hasError() && empty($invoiceInfo['entryid']);
         $emailAsPdfSettings = $this->config->getEmailAsPdfSettings();
         $isEmailAsPdf = (bool) $emailAsPdfSettings['emailAsPdf'];
 
         // Collect the messages.
         $sentences = [];
-        switch ($invoiceSendResult->getStatus()) {
+        switch ($invoiceAddResult->getSeverity()) {
             case Severity::Exception:
                 $sentences[] = 'mail_body_exception';
                 // @todo: check this: we want to know what was set just before executing the curl request.
-                $sentences[] = $invoiceSendResult->getHttpResponse() !== null
+                $sentences[] = $invoiceAddResult->getApiResult()->getHttpResponse() !== null
                     ? 'mail_body_exception_invoice_maybe_created'
                     : 'mail_body_exception_invoice_not_created';
                 break;
@@ -343,6 +346,8 @@ abstract class Mailer
      * @return string[]
      *   An array with the support messages part of the body text in 2 formats,
      *   keyed by 'text' resp. 'html'.
+     *
+     * @todo: should we use InvoiceAddResult::getLogText()?
      */
     protected function getSupportMessages(InvoiceAddResult $result): array
     {
@@ -355,20 +360,23 @@ abstract class Mailer
         // We add the request and response messages when set so or if there were
         // warnings or severer messages, thus not with notices.
         $addReqResp = $pluginSettings['debug'] === Config::Send_SendAndMailOnError ? InvoiceAddResult::AddReqResp_WithOther : InvoiceAddResult::AddReqResp_Always;
-        if ($addReqResp === InvoiceAddResult::AddReqResp_Always || $result->getStatus() >= Severity::Warning) {
-            $logMessages = new MessageCollection($this->translator);
-            foreach ($result->toLogMessages(false) as $message) {
-                $logMessages->createAndAdd($message, Severity::Log);
-            }
-            if (!empty($logMessages->getMessages())) {
-                $header = $this->t('mail_support_header');
-                $description = $this->t('mail_support_desc');
-                $supportMessagesText = $logMessages->formatMessages(Message::Format_PlainList);
-                $supportMessagesHtml = $logMessages->formatMessages(Message::Format_HtmlList);
-                $messages = [
-                    'text' => "\n$header\n\n$description\n\n$supportMessagesText\n",
-                    'html' => "<details><summary>$header</summary><p>$description</p>$supportMessagesHtml</details>",
-                ];
+        if ($addReqResp === InvoiceAddResult::AddReqResp_Always || $result->getSeverity() >= Severity::Warning) {
+            $acumulusResult = $result->getApiResult();
+            if ($acumulusResult !== null) {
+                $logMessages = new MessageCollection($this->translator);
+                foreach ($acumulusResult->toLogMessages() as $message) {
+                    $logMessages->createAndAddMessage($message, Severity::Log);
+                }
+                if (!empty($logMessages->getMessages())) {
+                    $header = $this->t('mail_support_header');
+                    $description = $this->t('mail_support_desc');
+                    $supportMessagesText = $logMessages->formatMessages(Message::Format_PlainList);
+                    $supportMessagesHtml = $logMessages->formatMessages(Message::Format_HtmlList);
+                    $messages = [
+                        'text' => "\n$header\n\n$description\n\n$supportMessagesText\n",
+                        'html' => "<details><summary>$header</summary><p>$description</p>$supportMessagesHtml</details>",
+                    ];
+                }
             }
         }
         return $messages;

@@ -399,8 +399,7 @@ abstract class Creator
 
         // Invoice type.
         $concept = $invoiceSettings['concept'];
-        /** @noinspection TypeUnsafeComparisonInspection */
-        if ($concept == Config::Concept_Plugin) {
+        if ($concept === Config::Concept_Plugin) {
             $concept = Api::Concept_No;
         }
         $this->addDefaultEmpty($invoice, Tag::Concept, $concept);
@@ -410,13 +409,11 @@ abstract class Creator
 
         // Invoice number and date.
         $sourceToUse = $shopSettings['invoiceNrSource'];
-        /** @noinspection TypeUnsafeComparisonInspection */
-        if ($sourceToUse != Config::InvoiceNrSource_Acumulus) {
+        if ($sourceToUse !== Config::InvoiceNrSource_Acumulus) {
             $invoice[Tag::Number] = $this->getInvoiceNumber($sourceToUse);
         }
         $dateToUse = $shopSettings['dateToUse'];
-        /** @noinspection TypeUnsafeComparisonInspection */
-        if ($dateToUse != Config::InvoiceDate_Transfer) {
+        if ($dateToUse !== Config::InvoiceDate_Transfer) {
             $invoice[Tag::IssueDate] = $this->getInvoiceDate($dateToUse);
         }
 
@@ -475,7 +472,7 @@ abstract class Creator
      *   \Siel\Acumulus\PluginConfig::InvoiceNrSource_ShopInvoice or
      *   \Siel\Acumulus\PluginConfig::InvoiceNrSource_ShopOrder.
      *
-     * @return int
+     * @return int|null
      *   The number to use as invoice "number" on the Acumulus invoice. Note
      *   that Acumulus expects a number and does not accept string prefixes or
      *   such.
@@ -485,6 +482,11 @@ abstract class Creator
         $result = $invoiceNumberSource === Config::InvoiceNrSource_ShopInvoice ? $this->invoiceSource->getInvoiceReference() : null;
         if (empty($result)) {
             $result = $this->invoiceSource->getReference();
+        }
+        if (is_string($result)) {
+            // Filter to an int. Just casting to an int would result in 0 with
+            // any invoice number that has a prefix.
+            $result = preg_replace('/[^0-9]/', '', $result);
         }
         return $result;
     }

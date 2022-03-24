@@ -240,7 +240,7 @@ class AcumulusResult extends MessageCollection
      *   errors and warnings are removed. In case of errors, this array may be
      *   empty.
      */
-    public function getResponse(): array
+    public function getMainResponse(): array
     {
         return $this->response;
     }
@@ -303,6 +303,8 @@ class AcumulusResult extends MessageCollection
      * @param array $response
      *
      * @return array
+     *
+     * @noinspection PhpSeparateElseIfInspection
      */
     protected function simplifyResponse(array $response): array
     {
@@ -328,7 +330,6 @@ class AcumulusResult extends MessageCollection
                 // Not set: probably an error occurred. This object offers ways
                 // to discover so. Therefore, we return an empty list if it
                 // should have been a list.
-                /** @noinspection PhpSeparateElseIfInspection */
                 if ($this->isList) {
                     $response = [];
                 }

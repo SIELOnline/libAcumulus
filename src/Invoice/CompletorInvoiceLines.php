@@ -1,5 +1,6 @@
 <?php
 /**
+ * @noinspection PhpUnnecessaryLocalVariableInspection
  * @noinspection PhpStaticAsDynamicMethodCallInspection
  */
 
@@ -328,8 +329,12 @@ class CompletorInvoiceLines
         foreach ($lines as &$line) {
             if ($line[Meta::VatRateSource] === Creator::VatRateSource_Completor) {
                 // Do we have lookup data and not the exception for situation 2?
+                // Required data is not guaranteed to be available at this
+                // stage, so use the price that is available: both will be zero
+                // or both will be not zero.
+                $price = $line[Tag::UnitPrice] ?? $line[Meta::UnitPriceInc];
                 if (!empty($line[Meta::VatRateLookup])
-                    && (!Number::isZero($line[Tag::UnitPrice]) || !$this->completor->is0VatVatTypePossible())
+                    && (!Number::isZero($price) || !$this->completor->is0VatVatTypePossible())
                 ) {
                     // Filter lookup rate(s) by the rates of the possible vat types.
                     $line[Meta::VatRateLookupMatches] = $this->filterVatRateInfosByVatRates($line[Meta::VatRateLookup]);

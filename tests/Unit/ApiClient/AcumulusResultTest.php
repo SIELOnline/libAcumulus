@@ -97,7 +97,7 @@ class AcumulusResultTest extends TestCase
         $result = $this->getAcumulusResult($uri);
         $result->setMainResponseKey($this->examples->getMainResponseKey($uri), $this->examples->isList($uri));
 
-        $this->assertSame($this->examples->getMainResponse($uri), $result->getResponse());
+        $this->assertSame($this->examples->getMainResponse($uri), $result->getMainResponse());
     }
 
     public function testSetMainResponseKeyList()
@@ -106,7 +106,7 @@ class AcumulusResultTest extends TestCase
         $result = $this->getAcumulusResult($uri);
         $result->setMainResponseKey($this->examples->getMainResponseKey($uri), $this->examples->isList($uri));
 
-        $this->assertSame($this->examples->getMainResponse($uri), $result->getResponse());
+        $this->assertSame($this->examples->getMainResponse($uri), $result->getMainResponse());
     }
 
     public function testSetMainResponseKeyEmptyList()
@@ -115,7 +115,7 @@ class AcumulusResultTest extends TestCase
         $result = $this->getAcumulusResult($uri);
         $result->setMainResponseKey($this->examples->getMainResponseKey($uri), $this->examples->isList($uri));
 
-        $this->assertSame($this->examples->getMainResponse($uri), $result->getResponse());
+        $this->assertSame($this->examples->getMainResponse($uri), $result->getMainResponse());
     }
 
     public function testNoContract()
@@ -124,7 +124,7 @@ class AcumulusResultTest extends TestCase
         $result = $this->getAcumulusResult($uri);
         $result->setMainResponseKey($this->examples->getMainResponseKey($uri), $this->examples->isList($uri));
 
-        $this->assertSame($this->examples->getMainResponse($uri), $result->getResponse());
+        $this->assertSame($this->examples->getMainResponse($uri), $result->getMainResponse());
     }
 
     public function testMaskPasswordsRequest()

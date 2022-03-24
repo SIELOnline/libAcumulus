@@ -9,8 +9,8 @@ class AcumulusResult extends BaseResult
     public function setMainResponseKey(string $mainResponseKey, bool $isList = false): BaseResult
     {
         // Add messages for the parameters that were passed in, so they can be checked.
-        $this->createAndAdd($mainResponseKey, Severity::Log, 'mainResponseKey');
-        $this->createAndAdd($isList ? 'true' : 'false', Severity::Log, 'isList');
+        $this->createAndAddMessage($mainResponseKey, Severity::Log, 'mainResponseKey');
+        $this->createAndAddMessage($isList ? 'true' : 'false', Severity::Log, 'isList');
         return parent::setMainResponseKey($mainResponseKey, $isList);
     }
 }

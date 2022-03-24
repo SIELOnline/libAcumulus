@@ -300,16 +300,15 @@ abstract class InvoiceManager
      *   If true, force sending the invoices even if an invoice has already been
      *   sent for a given invoice source.
      *
-     * @return bool
-     *   Success.
+     * @return InvoiceAddResult
+     *   The InvoiceAddResult of sending the invoice for this Source to Acumulus.
      */
-    public function send1(Source $invoiceSource, bool $forceSend): bool
+    public function send1(Source $invoiceSource, bool $forceSend): InvoiceAddResult
     {
         $result = $this->getInvoiceAddResult('InvoiceManager::send1()');
         $result = $this->createAndSend($invoiceSource, $result, $forceSend);
-        $success = !$result->hasError();
         $this->getLog()->notice($this->getSendResultLogText($invoiceSource, $result));
-        return $success;
+        return $result;
     }
 
     /**
@@ -534,7 +533,7 @@ abstract class InvoiceManager
             // in Acumulus: tell user to check.
             if (($lockStatus = $this->getAcumulusEntryManager()->deleteLock($invoiceSource)) !== AcumulusEntry::Lock_Deleted) {
                 $code = $lockStatus === AcumulusEntry::Lock_NoLongerExists ? 903 : 904;
-                $result->createAndAdd(
+                $result->createAndAddMessage(
                     sprintf($this->t('message_warning_delete_lock_failed'), $this->t($invoiceSource->getType())),
                     Severity::Warning,
                     $code
@@ -580,7 +579,7 @@ abstract class InvoiceManager
             // If we are going to overwrite an existing entry, we want to delete
             // that from Acumulus.
             $acumulusEntryManager = $this->getAcumulusEntryManager();
-            $oldEntry = $acumulusEntryManager->getByInvoiceSource($invoiceSource, true);
+            $oldEntry = $acumulusEntryManager->getByInvoiceSource($invoiceSource);
 
             $response = $apiResult->getResponse();
             if (!empty($response['token']) && !empty('entryid')) {
@@ -611,7 +610,7 @@ abstract class InvoiceManager
                         // Could not delete the old entry (already deleted or
                         // does not exist at all (anymore)): add as a warning so
                         // this info will be mailed to the user.
-                        $result->createAndAdd(
+                        $result->createAndAddMessage(
                             sprintf($this->t('message_warning_old_entry_not_deleted'), $this->t($invoiceSource->getType()), $entryId),
                             Severity::Warning,
                             902
@@ -624,7 +623,7 @@ abstract class InvoiceManager
                 } else {
                     // Successfully deleted the old entry: add a notice so this
                     // info will be mailed to the user.
-                    $result->createAndAdd(
+                    $result->createAndAddMessage(
                         sprintf($this->t('message_warning_old_entry_deleted'), $this->t($invoiceSource->getType()), $entryId),
                         Severity::Notice,
                         901

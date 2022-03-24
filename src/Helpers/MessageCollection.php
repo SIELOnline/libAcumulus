@@ -40,7 +40,7 @@ class MessageCollection
      *
      * @return $this
      */
-    public function add(Message $message): MessageCollection
+    public function addMessage(Message $message): MessageCollection
     {
         $this->messages[] = $message->setTranslator($this->translator);
         return $this;
@@ -58,14 +58,14 @@ class MessageCollection
      *
      * @return $this
      */
-    public function createAndAdd(string $message, int $severity, $code = 0): MessageCollection
+    public function createAndAddMessage(string $message, int $severity, $code = 0): MessageCollection
     {
-        return $this->add(Message::create($message, $severity, $code));
+        return $this->addMessage(Message::create($message, $severity, $code));
     }
 
     public function addException(Throwable $e): MessageCollection
     {
-        return $this->add(Message::createFromException($e));
+        return $this->addMessage(Message::createFromException($e));
     }
 
     /**
@@ -243,11 +243,16 @@ class MessageCollection
             }
         }
         if (($format & Message::Format_ListItem) !== 0) {
+            // We are making 1 sting of it.
             $result = implode("\n", $result);
-            if (($format & Message::Format_Html) !== 0) {
-                $result = "<ul>\n" . $result . "</ul>\n";
-            } else {
-                $result = $result . "\n";
+            // Add additional markup/newline, but only if there actually are
+            // messages.
+            if (!empty($result)) {
+                if (($format & Message::Format_Html) !== 0) {
+                    $result = "<ul>\n" . $result . "</ul>\n";
+                } else {
+                    $result = $result . "\n";
+                }
             }
         }
         return $result;

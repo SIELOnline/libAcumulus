@@ -423,7 +423,7 @@ abstract class Form extends MessageCollection
                     // Add a success message if one was defined for this form.
                     $message = $this->t("message_form_{$this->type}_success");
                     if (!empty($message) && $message !== "message_form_{$this->type}_success") {
-                        $this->createAndAdd($message, Severity::Success);
+                        $this->createAndAddMessage($message, Severity::Success);
                     }
                 } else {
                     // Add a generic error message if one was defined for this
@@ -431,7 +431,7 @@ abstract class Form extends MessageCollection
                     // error messages and thus will not define this one.
                     $message = $this->t("message_form_{$this->type}_error");
                     if (!empty($message) && $message !== "message_form_{$this->type}_error") {
-                        $this->createAndAdd($message, Severity::Error);
+                        $this->createAndAddMessage($message, Severity::Error);
                     }
                 }
             }
@@ -541,7 +541,7 @@ abstract class Form extends MessageCollection
      */
     public function addFormMessage(string $message, int $severity, string $field = ''): MessageCollection
     {
-        return $this->add(Message::createForFormField($message, $severity, $field));
+        return $this->addMessage(Message::createForFormField($message, $severity, $field));
     }
 
     /**
@@ -644,6 +644,7 @@ abstract class Form extends MessageCollection
                         $message = $this->t('info_block_eu_commerce_threshold_passed');
                         $status = 'error';
                     } else {
+                        /** @noinspection PhpSeparateElseIfInspection */
                         if ($percentage < $warningPercentage) {
                             $message = $this->t('info_block_eu_commerce_threshold_ok');
                             $status = 'ok';

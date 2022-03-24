@@ -200,7 +200,7 @@ class AcumulusResult extends MessageCollection
             // Curl did return a non-empty response, otherwise we would not be
             // here. So, apparently that only contained headers.
             // @todo: Is this a non 200 response or can we consider this as a critical error?
-            $this->createAndAdd('Empty response body', Severity::Error, 701);
+            $this->createAndAddMessage('Empty response body', Severity::Error, 701);
         } elseif ($this->isHtmlResponse($body)) {
             // When the API is gone we might receive an HTML error message page.
             $this->raiseHtmlReceivedError($body);
@@ -328,6 +328,7 @@ class AcumulusResult extends MessageCollection
                 // Not set: probably an error occurred. This object offers ways
                 // to discover so. Therefore, we return an empty list if it
                 // should have been a list.
+                /** @noinspection PhpSeparateElseIfInspection */
                 if ($this->isList) {
                     $response = [];
                 }
@@ -356,7 +357,7 @@ class AcumulusResult extends MessageCollection
             $apiMessages = [$apiMessages];
         }
         foreach ($apiMessages as $apiMessage) {
-            $this->add(Message::createFromApiMessage($apiMessage, $severity));
+            $this->addMessage(Message::createFromApiMessage($apiMessage, $severity));
         }
         return $this;
     }

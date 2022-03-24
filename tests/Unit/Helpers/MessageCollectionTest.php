@@ -56,7 +56,7 @@ class MessageCollectionTest extends TestCase
      */
     public function testAddLogMessage(MessageCollection $collection): MessageCollection
     {
-        $collection->createAndAdd('log', Severity::Log);
+        $collection->createAndAddMessage('log', Severity::Log);
 
         $this->assertEquals(Severity::Log, $collection->getSeverity());
         $this->assertFalse($collection->hasRealMessages());
@@ -84,7 +84,7 @@ class MessageCollectionTest extends TestCase
      */
     public function testAddMessage(MessageCollection $collection): MessageCollection
     {
-        $collection->createAndAdd('suc6', Severity::Success);
+        $collection->createAndAddMessage('suc6', Severity::Success);
 
         $this->assertEquals(Severity::Success, $collection->getSeverity());
         $this->assertFalse($collection->hasRealMessages());

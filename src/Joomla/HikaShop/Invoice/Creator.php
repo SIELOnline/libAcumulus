@@ -258,10 +258,10 @@ class Creator extends BaseCreator
      *   properties:
      * - float price_with_tax: price including tax for this shipment
      * - float tax: (total) tax for this shipment
-     * - (optional) float[]: array of float (tax amount) keyed by tax class
-     *   name. If a shipping method has proportional tax rates (i.e. following
-     *   the contents of the cart) this array contains the proportion of the
-     *   (total) tax per tax class.
+     * - (optional) float[] taxes: array of tax amounts keyed by tax class name.
+     *   If a shipping method has proportional tax rates (i.e. following the
+     *   contents of the cart) this array contains the proportion of the (total)
+     *   tax per tax class.
      */
     protected function getShippingLines()
     {
@@ -278,10 +278,11 @@ class Creator extends BaseCreator
                     Meta::VatRateSource => static::VatRateSource_Completor,
                 ];
             }
-        } elseif (empty($this->order->order_shipping_params)) {
-            // If the property order_shipping_params is not set, we use the
-            // order_shipping_* properties at the order level.
-            // @nth: can we distinguish between free shipping and in-store pickup?
+        } elseif (empty($this->order->order_shipping_params)
+            || count($this->order->order_shipping_params->prices) === 0) {
+            // If the property order_shipping_params is "empty" (no info to
+            // extract from), we use the order_shipping_* properties at the
+            // order level.
             $result[] = [
                 Tag::Product => $this->getShippingMethodName($this->order->order_shipping_id),
                 Tag::Quantity => 1,
@@ -292,41 +293,41 @@ class Creator extends BaseCreator
             ];
         } else {
             // For each shipment we are going to add 1 or more shipping lines.
-            /** @var \hikashopTaxClass $taxClass */
-            $taxClass = hikashop_get('class.tax');
+            /** @var \hikashopTaxClass $taxClassManager */
+            $taxClassManager = hikashop_get('class.tax');
 
             $shippingAmountIncTotal = 0.0;
             $shippingVatTotal = 0.0;
             $warningAdded = false;
 
             foreach ($this->order->order_shipping_params->prices as $key => $price) {
-                list($shipping_id, $index) = explode('@', $key);
-                $shippingLine = [
+                [$shipping_id, $index] = explode('@', $key);
+                $shippingLineDefaults = [
                     Tag::Product => $this->getShippingMethodName($shipping_id),
                     Tag::Quantity => 1,
                 ];
                 if ($index > 0) {
-                    $shippingLine[Tag::Product] .= sprintf(' %d', $index + 1);
+                    $shippingLineDefaults[Tag::Product] .= sprintf(' %d', $index + 1);
                 }
 
                 if (!isset($price->taxes)) {
                     // No tax breakdown (probably because there's no tax).
-                    $result[] = $shippingLine + [
+                    $result[] = $shippingLineDefaults + [
                             Meta::UnitPriceInc => $price->price_with_tax,
                             Meta::VatAmount => $price->tax,
                             Meta::VatRateSource => static::VatRateSource_Completor,
                         ];
                 } elseif (count($price->taxes) === 1) {
                     // Single tax applied, add the same fields as above but with
-                    // some additional meta data.
+                    // some additional metadata.
                     reset($price->taxes);
                     $taxNameKey = key($price->taxes);
-                    $result[] = $shippingLine + [
+                    $result[] = $shippingLineDefaults + [
                             Meta::UnitPriceInc => $price->price_with_tax,
                             Meta::VatAmount => $price->tax,
                             Meta::VatRateSource => static::VatRateSource_Completor,
                             Meta::VatClassName => $taxNameKey,
-                            Meta::VatRateLookup => (float) $taxClass->get($taxNameKey)->tax_rate,
+                            Meta::VatRateLookup => (float) $taxClassManager->get($taxNameKey)->tax_rate,
                         ];
                 } else {
                     // Multiple taxes applied to this shipment: add a line per
@@ -334,24 +335,38 @@ class Creator extends BaseCreator
                     $shippingMethodAmountIncTotal = 0.0;
                     $addMissingAmountIndex = null;
                     foreach ($price->taxes as $taxNameKey => $shippingVat) {
-                        $vatRate = (float) $taxClass->get($taxNameKey)->tax_rate;
-                        if (!Number::isZero($vatRate)) {
+                        $taxClass = $taxClassManager->get($taxNameKey);
+                        $vatRate = $taxClass ? (float) $taxClass->tax_rate : null;
+                        if ($vatRate !== null && !Number::isZero($vatRate)) {
                             $shippingEx = $shippingVat / $vatRate;
                         } else {
-                            // If the rate = 0, we can not compute the price ex,
-                            // so we fill in 0.0 for now and will fill it with
-                            // the missing amount at the end of this loop.
-                            $shippingEx = 0.0;
+                            // Either $vatRate = null or $vatRate = 0.0: in both
+                            // cases we cannot compute the price ex, so we fill
+                            // in null or 0.0 for now and will fill it with the
+                            // missing amount at the end of this loop.
+                            $shippingEx = $vatRate;
                             $addMissingAmountIndex = count($result);
                         }
-                        $result[] = $shippingLine + [
-                                Tag::UnitPrice => $shippingEx,
-                                Meta::VatAmount => $shippingVat,
+                        $shippingLine = $shippingLineDefaults + [
+                            Tag::UnitPrice => $shippingEx,
+                            Meta::VatAmount => $shippingVat,
+                        ];
+
+                        if ($taxClass !== null) {
+                            $shippingLine += [
                                 Tag::VatRate => 100.0 * $vatRate,
                                 Meta::VatRateSource => static::VatRateSource_Creator_Lookup,
                                 Meta::VatClassName => $taxNameKey,
                                 Meta::VatRateLookup => 100.0 * $vatRate,
                             ];
+                        } else {
+                            $shippingLine += [
+                                Tag::VatRate => null,
+                                Meta::VatRateSource => static::VatRateSource_Completor,
+                                Meta::Warning => "Tax class '$taxNameKey' does no longer exist",
+                            ];
+                        }
+                        $result[] = $shippingLine;
                         $shippingMethodAmountIncTotal += $shippingEx + $shippingVat;
                     }
                     // Fill in the missing amount if we had a 0 rate.

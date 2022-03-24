@@ -368,7 +368,8 @@ class Container
     public function getInvoiceAddResult(string $trigger): InvoiceResult
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('Result', 'Invoice', [$trigger, $this->getTranslator(), $this->getLog()], true);
+        return $this->getInstance('InvoiceAddResult', 'Invoice', [$trigger, $this->getTranslator(), $this->getLog()],
+            true);
     }
 
     public function getCompletor(): Completor

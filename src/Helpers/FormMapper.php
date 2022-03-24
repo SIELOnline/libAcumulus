@@ -45,5 +45,5 @@ abstract class FormMapper
      *   the Acumulus form definition. May be void if the actual rendering takes
      *   place in the mapping phase.
      */
-    abstract function map(Form $form);
+    abstract public function map(Form $form);
 }

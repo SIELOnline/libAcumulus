@@ -232,7 +232,7 @@ De eigenschappen die uw webshop kent worden hieronder opgesomd.</p>
         'desc_mark' => 'U knt hier extra informatie over de klant versturen, bv het BSN. Dit veld komt overeen met het veld "kenmerk" op blad 2 van het relatiebeheer.',
 
         'field_clientData' => 'Klantadresgegevens',
-        'option_sendCustomer' => 'Uw (niet zakelijke) klanten automatisch aan uw relaties in Acumulus toevoegen.',
+        'option_sendCustomer' => 'Uw niet zakelijke klanten automatisch aan uw relaties in Acumulus toevoegen.',
         'option_overwriteIfExists' => 'Overschrijf bestaande adresgegevens.',
         'desc_clientData' => 'Binnen Acumulus is het mogelijk om uw klantrelaties te beheren.
 Deze koppeling voegt automatisch uw klanten aan het relatieoverzicht van Acumulus toe.

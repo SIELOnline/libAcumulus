@@ -16,12 +16,12 @@ class FormHelper
     /**
      * Name of the hidden meta field.
      */
-    const Meta = 'meta';
+    public const Meta = 'meta';
 
     /**
      * Name of the hidden meta field.
      */
-    const Unique = 'UNIQUE_';
+    public const Unique = 'UNIQUE_';
 
     /** @var \Siel\Acumulus\Helpers\Translator */
     protected $translator;

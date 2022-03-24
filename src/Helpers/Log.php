@@ -103,13 +103,13 @@ class Log
      * @param string $message
      *   The message to log, optionally followed by arguments. If there are
      *   arguments the $message is passed through {@see vsprintf()}.
-     * @param mixed $values
+     * @param array $values
      *   Any values to replace %-placeholders in $message.
      *
      * @return string
      *   The full formatted message whether it got logged or not.
      */
-    public function log(int $severity, string $message, ... $values): string
+    public function log(int $severity, string $message, array $values = []): string
     {
         if (count($values) > 0) {
             $message = vsprintf($message, $values);
@@ -132,7 +132,7 @@ class Log
      * @return string
      *   The full formatted message whether it got logged or not.
      */
-    public function debug(string $message, ... $values): string
+    public function debug(string $message, ...$values): string
     {
         return $this->log(Severity::Log, $message, $values);
     }

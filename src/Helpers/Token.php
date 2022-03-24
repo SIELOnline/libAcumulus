@@ -90,8 +90,8 @@ use Exception;
  */
 class Token
 {
-    const TypeLiteral = 1;
-    const TypeProperty = 2;
+    public const TypeLiteral = 1;
+    public const TypeProperty = 2;
 
     /** @var array */
     protected $variables;
@@ -323,7 +323,7 @@ class Token
      *   empty string). The return value may be a scalar (numeric type) that can
      *   be converted to a string.
      */
-    protected function getObjectProperty($variable, string $property, array $args): ?string
+    protected function getObjectProperty(object $variable, string $property, array $args): ?string
     {
         $value = null;
         $method1 = $property;

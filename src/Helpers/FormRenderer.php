@@ -1,5 +1,7 @@
 <?php
 /**
+ * @noinspection PhpRedundantOptionalArgumentInspection
+ * @noinspection PhpConcatenationWithEmptyStringCanBeInlinedInspection
  * @noinspection PhpUnused : Many properties are used via property name
  *   construction.
  */
@@ -33,7 +35,7 @@ namespace Siel\Acumulus\Helpers;
  */
 class FormRenderer
 {
-    const RequiredMarkup = '<span class="required">*</span>';
+    public const RequiredMarkup = '<span class="required">*</span>';
 
     /** @var bool */
     protected $html5 = true;

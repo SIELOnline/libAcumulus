@@ -395,7 +395,7 @@ class InvoiceStatusForm extends Form
      */
     protected function execute(): bool
     {
-        $result = false;
+        $success = false;
 
         $service = $this->getSubmittedValue('service');
         /** @var Source $source */
@@ -404,15 +404,14 @@ class InvoiceStatusForm extends Form
         switch ($service) {
             case 'invoice_show':
                 // Just show(/refresh) the form (Ajax based lazy load).
-                $result = true;
+                $success = true;
                 break;
 
             case 'invoice_add':
                 $forceSend = (bool) $this->getSubmittedValue($idPrefix . 'force_send');
                 $invoiceAddResult = $this->invoiceManager->send1($source, $forceSend);
                 $this->addMessages($invoiceAddResult->getMessages());
-                // @todo: is the result or are these messages displayed?
-                $result = !$invoiceAddResult->hasError();
+                $success = !$invoiceAddResult->hasError();
                 break;
 
             case 'invoice_paymentstatus_set':
@@ -425,7 +424,13 @@ class InvoiceStatusForm extends Form
                         $paymentStatus = Api::PaymentStatus_Due;
                         $paymentDate = '';
                     }
-                    $result = $this->acumulusApiClient->setPaymentStatus($localEntry->getToken(), $paymentStatus, $paymentDate);
+                    $acumulusResult = $this->acumulusApiClient->setPaymentStatus(
+                        $localEntry->getToken(),
+                        $paymentStatus,
+                        $paymentDate
+                    );
+                    $this->addMessages($acumulusResult->getMessages());
+                    $success = !$acumulusResult->hasError();
                 } else {
                     $this->createAndAddMessage(
                         sprintf($this->t('unknown_entry'), strtolower($this->t($source->getType())),$source->getId()),
@@ -440,7 +445,9 @@ class InvoiceStatusForm extends Form
                         ? Api::Entry_Delete
                         : Api::Entry_UnDelete;
                     // @todo: clean up on receiving P2XFELO12?
-                    $result = $this->acumulusApiClient->setDeleteStatus($localEntry->getEntryId(), $deleteStatus);
+                    $acumulusResult = $this->acumulusApiClient->setDeleteStatus($localEntry->getEntryId(), $deleteStatus);
+                    $this->addMessages($acumulusResult->getMessages());
+                    $success = !$acumulusResult->hasError();
                 } else {
                     $this->createAndAddMessage(
                         sprintf($this->t('unknown_entry'), strtolower($this->t($source->getType())), $source->getId()),
@@ -456,7 +463,7 @@ class InvoiceStatusForm extends Form
                 break;
         }
 
-        return $result;
+        return $success;
     }
 
     /**

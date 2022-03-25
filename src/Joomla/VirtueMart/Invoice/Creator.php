@@ -374,7 +374,7 @@ class Creator extends BaseCreator
      *   The (1st) calculation rule for the given reference, or null if none
      *   found.
      */
-    protected function getCalcRule(string $calcKind, int $orderItemId = 0)
+    protected function getCalcRule(string $calcKind, int $orderItemId = 0): ?object
     {
         foreach ($this->order['calc_rules'] as $calcRule) {
             if ($calcRule->calc_kind == $calcKind) {

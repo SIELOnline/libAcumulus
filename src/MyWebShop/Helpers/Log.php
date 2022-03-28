@@ -61,7 +61,7 @@ class Log extends BaseLog
     protected function getLogger()
     {
         if ($this->logger === null) {
-            // @todo: Instantiate a webshop specific log object that logs to a separate Acumulus log file.
+            // @todo: Instantiate a web shop specific log object that logs to a separate Acumulus log file.
             $this->logger = new FileLogger(AbstractLogger::DEBUG);
             $this->logger->setFilename(_ROOT_DIR_ . '/'. $logDirectory . '/acumulus.log');
         }

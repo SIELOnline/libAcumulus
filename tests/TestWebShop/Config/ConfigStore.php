@@ -8,7 +8,7 @@ use Siel\Acumulus\Config\ConfigStore as BaseConfigStore;
  *
  * Create your own config.json with the following properties (values to be
  * filled in):
- * {"contractcode":"","username":"","password":"","emailonerror":""}
+ * {"contractcode":"","username":"","password":"","emailonerror":"","logLevel":1}
  */
 class ConfigStore extends BaSeConfigStore
 {

@@ -4,7 +4,7 @@ namespace Siel\Acumulus\MyWebShop\Config;
 use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
 
 /**
- * Defines the MyWebShop webshop specific capabilities.
+ * Defines the MyWebShop web shop specific capabilities.
  */
 class ShopCapabilities extends ShopCapabilitiesBase
 {

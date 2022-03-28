@@ -20,8 +20,8 @@ WC   WooCommerce                             >= 5.0 (3 and 4 will probably work)
 --------------------------------------------------------------------------------
 
 
-7.0.0-alpha1 (2022-03-18) (not released)
-----------------------------------------
+7.0.0-beta1 (2022-03-??) (not released)
+---------------------------------------
 Features:
 - ALL: At the HTTP level we now send a User-Agent header. For that, we added
   keys cmsName and cmsConfig to the Config. Class ShopCapabilities gives it a

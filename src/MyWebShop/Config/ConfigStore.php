@@ -13,11 +13,11 @@ class ConfigStore extends BaSeConfigStore
      */
     public function load()
     {
-        // @todo: Access your webhop's or CMS's config and get the Acumulus config
+        // @todo: Access your web shop's or CMS's config and get the Acumulus settings.
         $values = $shopConfig->get($this->configKey);
-        // @todo; remove this line if your configuration sub system accepts arrays as value.
-        $result = unserialize($values);
-        return $result;
+        // @todo: remove this line if your configuration sub system accepts arrays as value.
+        $values = json_decode($values);
+        return $values;
     }
 
     /**
@@ -25,10 +25,8 @@ class ConfigStore extends BaSeConfigStore
      */
     public function save(array $values)
     {
-        // @todo; remove this line if your configuration sub system accepts arrays as value.
-        $setting = serialize($values);
-        // @todo: Access your webhop's or CMS's config and store the Acumulus setting
-        $result = $shopConfig->set($this->configKey, $setting);
-        return $result;
+        // @todo: remove this line if your configuration sub system accepts arrays as value.
+        $values = json_encode($values);
+        return $shopConfig->set($this->configKey, $values);
     }
 }

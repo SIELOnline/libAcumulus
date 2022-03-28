@@ -4,7 +4,7 @@ namespace Siel\Acumulus\TestWebShop\Config;
 use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
 
 /**
- * Defines the TestWebShop webshop specific capabilities.
+ * Defines the TestWebShop web shop specific capabilities.
  */
 class ShopCapabilities extends ShopCapabilitiesBase
 {
@@ -17,6 +17,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
             'moduleVersion' => '4.0',
             'shopName' => 'TestWebShop',
             'shopVersion' => '0.1',
+            // Optional:
             'cmsName' => 'TestCms',
             'cmsVersion' => '0.1',
         ];

@@ -13,9 +13,9 @@ namespace Siel\Acumulus\Helpers;
 abstract class TranslationCollection
 {
     /**
-     * Returns a set of translations for the given language, completed with Dutch
-     * translations if no translation for the given language for some key was
-     * defined.
+     * Returns a set of translations for the given language, completed with
+     * Dutch translations if no translation for the given language for some key
+     * was defined.
      *
      * @return string[]
      *   A keyed array with translations.

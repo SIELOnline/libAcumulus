@@ -242,7 +242,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
             'address2' => '[billing_address_2]', // WC_Abstract_order
             'postalCode' => '[billing_postcode]', // WC_Abstract_order
             'city' => '[billing_city]', // WC_Abstract_order
-            // The EU VAT Number plugin allows customers to indicate their VAT
+            // The EU VAT Number plugin allows customers to indicate their VAT-
             // number with which they can apply for the reversed VAT scheme. The
             // vat number is stored under the '_vat_number' meta key, though
             // older versions did so under the 'VAT Number' key.

@@ -28,8 +28,8 @@ class AcumulusTest extends TestCase
         // Use the TestWebShop test doubles.
         $this->container = new Container('TestWebShop\TestDoubles', 'nl');
         $this->acumulusClient = $this->container->getAcumulusApiClient();
-        $acumulusRequest = $this->container->getAcumulusRequest();
-        $this->result = $this->container->getAcumulusResult($acumulusRequest, null);
+        $acumulusRequest = $this->container->createAcumulusRequest();
+        $this->result = $this->container->createAcumulusResult($acumulusRequest, null);
     }
 
     /**

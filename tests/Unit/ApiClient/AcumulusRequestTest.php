@@ -39,7 +39,7 @@ class AcumulusRequestTest extends TestCase
 
     private function createAcumulusRequest()
     {
-        $this->acumulusRequest = $this->container->getAcumulusRequest();
+        $this->acumulusRequest = $this->container->createAcumulusRequest();
 
         $this->assertNull($this->acumulusRequest->getUri());
         $this->assertNull($this->acumulusRequest->getSubmit());

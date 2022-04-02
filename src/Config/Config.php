@@ -5,7 +5,6 @@ use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Helpers\Log;
-use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Tag;
 use const Siel\Acumulus\Version;
 
@@ -17,6 +16,8 @@ use const Siel\Acumulus\Version;
  *
  * @todo: Add separate cmsName and cmsVersion config keys (empty if shop is not
  *   embedded in a CMS).
+ *
+ * @noinspection PhpClassHasTooManyDeclaredMembersInspection
  */
 class Config
 {
@@ -94,34 +95,17 @@ class Config
         ConfigStore $configStore,
         ShopCapabilities $shopCapabilities,
         Container $container,
-        Translator $translator,
         Log $log
     )
     {
         $this->configStore = $configStore;
         $this->shopCapabilities = $shopCapabilities;
         $this->container = $container;
-        $this->translator = $translator;
         $this->log = $log;
 
         $this->keyInfo = null;
         $this->isConfigurationLoaded = false;
         $this->values = [];
-    }
-
-    /**
-     * Helper method to translate strings.
-     *
-     * @param string $key
-     *  The key to get a translation for.
-     *
-     * @return string
-     *   The translation for the given key or the key itself if no translation
-     *   could be found.
-     */
-    protected function t(string $key): string
-    {
-        return $this->translator->get($key);
     }
 
     /**

@@ -9,7 +9,6 @@ use RuntimeException;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Helpers\Container;
-use Siel\Acumulus\Helpers\Log;
 
 /**
  * AcumulusRequest turns a call to {@see \Siel\Acumulus\ApiClient\Acumulus} into
@@ -32,19 +31,17 @@ class AcumulusRequest
 {
     protected /*Container*/ $container;
     protected /*Config*/ $config;
-    protected /*Log*/ $log;
     protected /*string*/ $userLanguage;
 
     protected /*?string*/ $uri = null;
     protected /*?array*/ $submit = null;
     protected /*?HttpRequest*/ $httpRequest = null;
 
-    public function __construct(Container $container, Config $config, string $userLanguage, Log $log)
+    public function __construct(Container $container, Config $config, string $userLanguage)
     {
         $this->container = $container;
         $this->config = $config;
         $this->userLanguage = $userLanguage;
-        $this->log = $log;
     }
 
     public function getUri(): ?string
@@ -106,14 +103,14 @@ class AcumulusRequest
             $this->uri= $uri;
             $this->submit = $this->constructFullSubmit($submit, $needContract);
             $httpResponse = $this->executeWithPostXmlStringApproach();
-            $result = $this->container->getAcumulusResult($this, $httpResponse);
+            $result = $this->container->createAcumulusResult($this, $httpResponse);
         } catch (RuntimeException $e) {
             // Any errors during:
             // - Conversion of the message to xml.
             // - communication with the Acumulus web service.
             // - Converting the response to an array.
             // are returned as a RuntimeException.
-            $result = $this->container->getAcumulusResult($this, null);
+            $result = $this->container->createAcumulusResult($this, null);
             $result->addException($e);
         }
 
@@ -150,7 +147,7 @@ class AcumulusRequest
         // - 'xmlstring' is the post field that Acumulus expects.
         $options = [CURLOPT_USERAGENT => $this->getUserAgent()];
         $body = ['xmlstring' => trim($this->convertArrayToXml(['acumulus' => $this->submit]))];
-        $this->httpRequest = $this->container->getHttpRequest($options);
+        $this->httpRequest = $this->container->createHttpRequest($options);
         $httpResponse = $this->httpRequest->post($this->uri, $body);
 
         assert($httpResponse->getRequest() === $this->httpRequest);

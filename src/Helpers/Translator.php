@@ -18,7 +18,7 @@ namespace Siel\Acumulus\Helpers;
  * - If multiple {@see TranslationCollection} objects are added, the latter will
  *   not overwrite already existing translations. This allows to define web shop
  *   specific vocabulary and add it directly upon instantiating the
- *  {@see Container} and before the request is handed of to the library.
+ *   {@see Container}, thus before the request is handed off to the library.
  *
  * How to define translations:
  * - Create a class that extends {@see TranslationCollection}. Create a class
@@ -30,7 +30,7 @@ namespace Siel\Acumulus\Helpers;
  *   keys used in the calling code when a translated text is needed and the
  *   values being the translated text.
  * - If a text needs to be parameterised, use ordered arguments, like %1$s, as
- *   the appearing order may differ between languages.
+ *   the order may differ between languages.
  * - Typically, this library is translated into Dutch and English, Dutch being
  *   the main language.
 

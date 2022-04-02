@@ -4,7 +4,10 @@ namespace Siel\Acumulus\TestWebShop\Config;
 use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
 
 /**
- * Defines the TestWebShop web shop specific capabilities.
+ * Defines the TestWebShop specific capabilities.
+ *
+ * For now, we only have a more or less real implementation for
+ * getShopEnvironment(), other abstract methods have a minimal implementation.
  */
 class ShopCapabilities extends ShopCapabilitiesBase
 {
@@ -66,14 +69,5 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function getVatClasses(): array
     {
         return [];
-    }
-
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getLink($linkType): string
-    {
-        return '';
     }
 }

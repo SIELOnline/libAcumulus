@@ -85,7 +85,7 @@ abstract class AcumulusEntryManager
             }
             // Now, it's a non-empty array of results.
             foreach ($result as &$record) {
-                $record = $this->container->getAcumulusEntry($record);
+                $record = $this->container->createAcumulusEntry($record);
                 if ($ignoreLock && $record->isSendLock()) {
                     $record = null;
                 }

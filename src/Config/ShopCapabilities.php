@@ -1,7 +1,7 @@
 <?php
 namespace Siel\Acumulus\Config;
 
-use Siel\Acumulus\Helpers\Log;
+use InvalidArgumentException;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Invoice\Source;
 
@@ -16,12 +16,8 @@ abstract class ShopCapabilities
     /** @var string */
     protected $shopName;
 
-    /** @var \Siel\Acumulus\Helpers\Log */
-    protected $log;
-
-    public function __construct(string $shopNamespace, Translator $translator, Log $log)
+    public function __construct(string $shopNamespace, Translator $translator)
     {
-        $this->log = $log;
         $this->translator = $translator;
         $pos = strrpos($shopNamespace, '\\');
         $this->shopName = $pos !== false ? substr($shopNamespace, $pos + 1) : $shopNamespace;
@@ -380,11 +376,13 @@ abstract class ShopCapabilities
      *
      * @return string
      *   The link to the requested form page.
+     *
+     * @throws \InvalidArgumentException
+     *   Unknown link type.
      */
     public function getLink(string $linkType): string
     {
-        $this->log->error("ShopCapabilities::getLink('$linkType'): unknown link type");
-        return '#';
+        throw new InvalidArgumentException(__METHOD__ . "('$linkType'): unknown link type");
     }
 
     /**

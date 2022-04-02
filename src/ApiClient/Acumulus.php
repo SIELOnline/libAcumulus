@@ -789,7 +789,7 @@ class Acumulus
      */
     protected function callApiFunction(string $apiFunction, array $message, bool $needContract = true): AcumulusResult
     {
-        $acumulusRequest = $this->container->getAcumulusRequest();
+        $acumulusRequest = $this->container->createAcumulusRequest();
         $uri = $this->constructUri($apiFunction);
         return $acumulusRequest->execute($uri, $message, $needContract);
     }

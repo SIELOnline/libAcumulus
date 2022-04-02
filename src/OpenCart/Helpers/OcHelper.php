@@ -326,7 +326,7 @@ class OcHelper
      */
     public function eventOrderUpdate($order_id)
     {
-        $source = $this->acumulusContainer->getSource(Source::Order, $order_id);
+        $source = $this->acumulusContainer->createSource(Source::Order, $order_id);
         $this->acumulusContainer->getInvoiceManager()->sourceStatusChange($source);
     }
 
@@ -497,7 +497,7 @@ class OcHelper
             $orderId = (int) $orderId;
             /** @var \Siel\Acumulus\Shop\InvoiceStatusForm $form */
             $form = $this->data['form'];
-            $form->setSource($this->acumulusContainer->getSource(Source::Order, $orderId));
+            $form->setSource($this->acumulusContainer->createSource(Source::Order, $orderId));
         }
         $this->renderFormCommon($type);
 

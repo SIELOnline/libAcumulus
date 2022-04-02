@@ -105,6 +105,8 @@ class ConfigUpgrade
      *
      * @return bool
      *   Success.
+     *
+     * @noinspection PhpFunctionCyclomaticComplexityInspection
      */
     protected function applyUpgrades(string $currentVersion): bool
     {

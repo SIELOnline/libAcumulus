@@ -50,7 +50,7 @@ class AcumulusResultTest extends TestCase
     {
         $submit = $this->examples->getSubmit($uri);
         $needContract = $this->examples->needContract($uri);
-        $this->acumulusRequest = $this->container->getAcumulusRequest();
+        $this->acumulusRequest = $this->container->createAcumulusRequest();
         $acumulusResult = $this->acumulusRequest->execute($uri, $submit, $needContract);
 
         $this->assertSame($this->acumulusRequest, $acumulusResult->getAcumulusRequest());
@@ -82,9 +82,9 @@ class AcumulusResultTest extends TestCase
 
     public function testCreateError()
     {
-        $acumulusRequest = $this->container->getAcumulusRequest();
+        $acumulusRequest = $this->container->createAcumulusRequest();
         $httpResponse = null;
-        $result = $this->container->getAcumulusResult($acumulusRequest, $httpResponse);
+        $result = $this->container->createAcumulusResult($acumulusRequest, $httpResponse);
 
         $this->assertSame($httpResponse, $result->getHttpResponse());
         $this->assertSame(Severity::Unknown, $result->getStatus());

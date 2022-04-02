@@ -49,7 +49,7 @@ use const Siel\Acumulus\Version;
  *   on each subsequent request for an instance of that type. The strongly typed
  *   getters do know when this behaviour is not wanted (mostly when specific
  *   arguments have to be passed) and will create fresh instances in those
- *   cases.
+ *   cases. This makes this container a Service Locator as well as a Factory.
  *
  * Creating the container
  * ----------------------
@@ -133,6 +133,8 @@ use const Siel\Acumulus\Version;
  * to update this library to a newer version without loosing your
  * customisations. Note that, also in this case, you are responsible that this
  * class gets autoloaded.
+ *
+ * @noinspection PhpClassHasTooManyDeclaredMembersInspection
  */
 class Container
 {
@@ -318,20 +320,20 @@ class Container
         return $this->getInstance('Acumulus', 'ApiClient', [$this, $this->getConfig()]);
     }
 
-    public function getAcumulusRequest(): AcumulusRequest
+    public function createAcumulusRequest(): AcumulusRequest
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('AcumulusRequest', 'ApiClient', [$this, $this->getConfig(), $this->getLanguage(), $this->getLog()], true);
+        return $this->getInstance('AcumulusRequest', 'ApiClient', [$this, $this->getConfig(), $this->getLanguage()], true);
     }
 
 
-    public function getHttpRequest(array $options): HttpRequest
+    public function createHttpRequest(array $options): HttpRequest
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('HttpRequest', 'ApiClient', [$options], true);
     }
 
-    public function getAcumulusResult(AcumulusRequest $acumulusRequest, ?HttpResponse $httpResponse): AcumulusResult
+    public function createAcumulusResult(AcumulusRequest $acumulusRequest, ?HttpResponse $httpResponse): AcumulusResult
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('AcumulusResult', 'ApiClient', [$acumulusRequest, $httpResponse, $this->getTranslator(), $this->getLog()], true);
@@ -349,7 +351,7 @@ class Container
      * @return \Siel\Acumulus\Invoice\Source
      *   A wrapper object around a shop specific invoice source object.
      */
-    public function getSource(string $invoiceSourceType, $invoiceSourceOrId): Source
+    public function createSource(string $invoiceSourceType, $invoiceSourceOrId): Source
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('Source', 'Invoice', [$invoiceSourceType, $invoiceSourceOrId], true);
@@ -365,7 +367,7 @@ class Container
      * @return \Siel\Acumulus\Invoice\InvoiceAddResult
      *   A wrapper object around an Acumulus invoice-add service result.
      */
-    public function getInvoiceAddResult(string $trigger): InvoiceResult
+    public function createInvoiceAddResult(string $trigger): InvoiceResult
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('InvoiceAddResult', 'Invoice', [$trigger, $this->getTranslator(), $this->getLog()],
@@ -417,7 +419,7 @@ class Container
 
         $log = $this->getLog();
         /** @var \Siel\Acumulus\Config\Config $config */
-        $config = $this->getInstance('Config', 'Config', [$this->getConfigStore(), $this->getShopCapabilities(), $this, $this->getTranslator(), $log]);
+        $config = $this->getInstance('Config', 'Config', [$this->getConfigStore(), $this->getShopCapabilities(), $log]);
         if ($is1stTime) {
             $pluginSettings = $config->getPluginSettings();
             $log->setLogLevel($pluginSettings['logLevel']);
@@ -441,7 +443,7 @@ class Container
     public function getShopCapabilities(): ShopCapabilities
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('ShopCapabilities', 'Config', [$this->shopNamespace, $this->getTranslator(), $this->getLog()]);
+        return $this->getInstance('ShopCapabilities', 'Config', [$this->shopNamespace, $this->getTranslator()]);
     }
 
     public function getInvoiceManager(): InvoiceManager
@@ -464,7 +466,7 @@ class Container
      *
      * @return \Siel\Acumulus\Shop\AcumulusEntry
      */
-    public function getAcumulusEntry($record): AcumulusEntry
+    public function createAcumulusEntry($record): AcumulusEntry
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('AcumulusEntry', 'Shop', [$record], true);

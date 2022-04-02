@@ -128,7 +128,7 @@ abstract class InvoiceManager
      */
     protected function getSource(string $invoiceSourceType, $idOrSource): Source
     {
-        return $this->container->getSource($invoiceSourceType, $idOrSource);
+        return $this->container->createSource($invoiceSourceType, $idOrSource);
     }
     /**
      * Returns a Creator instance.
@@ -159,7 +159,7 @@ abstract class InvoiceManager
      */
     protected function getInvoiceAddResult(string $trigger): InvoiceAddResult
     {
-        return $this->container->getInvoiceAddResult($trigger);
+        return $this->container->createInvoiceAddResult($trigger);
     }
 
     /**

@@ -2,7 +2,6 @@
 namespace Siel\Acumulus\Config;
 
 use Siel\Acumulus\Api;
-use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Tag;
@@ -68,8 +67,8 @@ class Config
     /** @var \Siel\Acumulus\Config\ShopCapabilities */
     private $shopCapabilities;
 
-    /** @var \Siel\Acumulus\Helpers\Container */
-    protected $container;
+    /** @var callable */
+    protected $getConfigUpgrade;
 
     /** @var \Siel\Acumulus\Helpers\Translator */
     protected $translator;
@@ -94,13 +93,13 @@ class Config
     public function __construct(
         ConfigStore $configStore,
         ShopCapabilities $shopCapabilities,
-        Container $container,
+        callable $getConfigUpgrade,
         Log $log
     )
     {
         $this->configStore = $configStore;
         $this->shopCapabilities = $shopCapabilities;
-        $this->container = $container;
+        $this->getConfigUpgrade = $getConfigUpgrade;
         $this->log = $log;
 
         $this->keyInfo = null;
@@ -150,7 +149,7 @@ class Config
                 && !$this->isUpgrading
             ) {
                 $this->isUpgrading = true;
-                $this->container->getConfigUpgrade()->upgrade($this->values[Config::configVersion]);
+                ($this->getConfigUpgrade)()->upgrade($this->values[Config::configVersion]);
                 $this->isUpgrading = false;
             }
         }

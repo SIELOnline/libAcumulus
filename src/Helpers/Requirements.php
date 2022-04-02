@@ -31,8 +31,6 @@ class Requirements
     /**
      * Checks if the requirements for the environment are met.
      *
-     * @todo: switch to MessageCollection.
-     *
      * @return string[]
      *   An array with messages regarding missing requirements, empty if all
      *   requirements are met. The keys can be used as translation keys, but
@@ -43,8 +41,8 @@ class Requirements
     {
         $result = [];
 
-        if (version_compare(PHP_VERSION, '7.1', '<')) {
-            $result['message_error_req_php'] = 'The minimally required PHP version for the Acumulus module is PHP 7.1 (and soon to become 7.4).';
+        if (version_compare(PHP_VERSION, '7.2', '<')) {
+            $result['message_error_req_php'] = 'The minimally required PHP version for the Acumulus module is PHP 7.2 (and soon to become 7.4).';
         }
         if (!extension_loaded('json')) {
             $result['message_error_req_json'] = 'The JSON PHP extension needs to be activated on your server for the Acumulus module to be able to work with the json format.';

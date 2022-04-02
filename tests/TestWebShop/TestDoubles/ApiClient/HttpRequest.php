@@ -3,9 +3,6 @@ namespace Siel\Acumulus\TestWebShop\TestDoubles\ApiClient;
 
 use Siel\Acumulus\ApiClient\HttpRequest as BaseHttpRequest;
 use Siel\Acumulus\ApiClient\HttpResponse;
-use Siel\Acumulus\Config\Config;
-use Siel\Acumulus\Helpers\Container;
-use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Unit\ApiClient\ApiRequestResponseExamples;
 
 /**

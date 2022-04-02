@@ -1,13 +1,9 @@
 <?php
 namespace Siel\Acumulus\TestWebShop\TestDoubles\ApiClient;
 
-use Siel\Acumulus\Api;
 use Siel\Acumulus\ApiClient\AcumulusRequest as BaseAcumulusRequest;
-use Siel\Acumulus\ApiClient\HttpRequest;
-use Siel\Acumulus\ApiClient\HttpResponse;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Helpers\Container;
-use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Unit\ApiClient\ApiRequestResponseExamples;
 
 /**
@@ -28,9 +24,9 @@ class AcumulusRequest extends BaseAcumulusRequest
      */
     private $examples;
 
-    public function __construct(Container $container, Config $config, string $userLanguage, Log $log)
+    public function __construct(Container $container, Config $config, string $userLanguage)
     {
-        parent::__construct($container, $config, $userLanguage, $log);
+        parent::__construct($container, $config, $userLanguage);
         $this->examples = new ApiRequestResponseExamples();
     }
 

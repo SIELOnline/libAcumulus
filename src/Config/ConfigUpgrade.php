@@ -2,8 +2,8 @@
 namespace Siel\Acumulus\Config;
 
 use RuntimeException;
-use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
+use Siel\Acumulus\Helpers\Requirements;
 use Siel\Acumulus\Helpers\Severity;
 
 use const Siel\Acumulus\Version;
@@ -15,14 +15,14 @@ class ConfigUpgrade
 {
     protected /*Config*/ $config;
     protected /*ConfigStore*/ $configStore;
-    protected /*Container*/ $container;
+    protected /*Requirements*/ $requirements;
     protected /*Log*/ $log;
 
-    public function __construct(Config $config, ConfigStore $configStore, Container $container, Log $log)
+    public function __construct(Config $config, ConfigStore $configStore, Requirements $requirements, Log $log)
     {
         $this->config = $config;
         $this->configStore = $configStore;
-        $this->container = $container;
+        $this->requirements = $requirements;
         $this->log = $log;
     }
 
@@ -36,9 +36,9 @@ class ConfigUpgrade
         return $this->configStore;
     }
 
-    public function getContainer(): Container
+    public function getRequirements(): Requirements
     {
-        return $this->container;
+        return $this->requirements;
     }
 
     public function getLog(): Log
@@ -111,8 +111,7 @@ class ConfigUpgrade
     protected function applyUpgrades(string $currentVersion): bool
     {
         // Let's start with a Requirements check and fail if not all are met.
-        $requirements = $this->getContainer()->getRequirements();
-        $messages = $requirements->check();
+        $messages = $this->getRequirements()->check();
         foreach ($messages as $message) {
             $this->getLog()->error("Requirement check failed: $message");
         }

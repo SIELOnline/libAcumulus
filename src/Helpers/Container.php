@@ -419,11 +419,16 @@ class Container
 
         $log = $this->getLog();
         /** @var \Siel\Acumulus\Config\Config $config */
-        $config = $this->getInstance('Config', 'Config', [$this->getConfigStore(), $this->getShopCapabilities(), $log]);
+        $config = $this->getInstance('Config', 'Config', [
+            $this->getConfigStore(),
+            $this->getShopCapabilities(),
+            [$this, 'getConfigUpgrade'],
+            $log,
+        ]);
         if ($is1stTime) {
+            $is1stTime = false;
             $pluginSettings = $config->getPluginSettings();
             $log->setLogLevel($pluginSettings['logLevel']);
-            $is1stTime = false;
         }
         return $config;
     }
@@ -431,7 +436,12 @@ class Container
     public function getConfigUpgrade(): ConfigUpgrade
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('ConfigUpgrade', 'Config', [$this->getConfig(), $this->getConfigStore(), $this, $this->getLog()]);
+        return $this->getInstance('ConfigUpgrade', 'Config', [
+            $this->getConfig(),
+            $this->getConfigStore(),
+            $this->getRequirements(),
+            $this->getLog(),
+        ]);
     }
 
     public function getConfigStore(): ConfigStore
@@ -536,7 +546,7 @@ class Container
      * they know (and hide) what arguments to inject into the constructor.
      *
      * The class is looked for in multiple namespaces, starting with the
-     * $customNameSpace properties, continuing with the $shopNamespace property
+     * $customNameSpace properties, continuing with the $shopNamespace property,
      * and finally the base namespace (\Siel\Acumulus).
      *
      * Normally, only 1 instance is created per class but the $newInstance
@@ -592,9 +602,6 @@ class Container
             }
 
             // Create a new instance.
-            // As PHP5.3 produces a fatal error when a class has no constructor
-            // and newInstanceArgs() is called, we have to differentiate between
-            // no arguments and arguments.
             $this->instances[$instanceKey] = new $fqClass(...$constructorArgs);
         }
         return $this->instances[$instanceKey];

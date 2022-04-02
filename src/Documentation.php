@@ -133,56 +133,62 @@
  *
  * Developing a new extension
  * --------------------------
- * If you want to develop an extension for another webshop these are the steps
+ * If you want to develop an extension for another web shop these are the steps
  * to follow:
- * - Use only PHP language constructs that are available in PHP 5.6 and have not
- *   been deprecated since. Even though PHP5 is hardly used anymore, e.g.
- *   WordPress still (might) validate(s) on it when checking in code.
- * - We advice using PhpStorm. This IDE guards you against numerous errors that
- *   are simply to make in not strongly typed languages.
- * - Document all your code, especially parameter, return and variable types.
- *   This allows other developers and IDEs to better follow what is going on
+ * - Use only PHP language constructs that are available in PHP 7.2 and have not
+ *   been deprecated since, even though PHP 7.2 is hardly used anymore. We will
+ *   advance this requirement to PHP 7.4 in the nearby future, but being a
+ *   library that can be used by a wide range of users in a wide range of host
+ *   system and hosting environments, we should not be too modern.
+ * - We advise using PhpStorm. This IDE guards you against numerous errors that
+ *   are simply to make in not strongly typed languages. Moreover, the code uses
+ *   many no-inspection hints provided by PhpStorm to document "false"
+ *   positives.
+ * - Document and type hint all your code, especially parameters, properties,
+ *   return types and, where useful, local variables. This allows other
+ *   developers and IDEs to better follow what is going on.
  * - Use the inheritdoc tag where possible, only adding documentation to
  *   describe what the override does different from the base implementation.
  * - Set up a new namespace that will contain all classes that extend, implement
  *   and override the functionality of the libAcumulus classes. The namespace
- *   should preferably contain levels for the CMS (if the webshop resides in a
- *   CMS), the webshop, and, if needed, the major version of the webshop. See
+ *   should preferably contain levels for the CMS (if the web shop resides in a
+ *   CMS), the web shop, and, if needed, the major version of the web shop. See
  *   {@see \Siel\Acumulus\Helpers\Container} for a detailed explanation of the
  *   expected namespace structure and how that will be used by the container.
- *   Use the {@see \Siel\Acumulus\MyWebShop} example code for a quick start and
- *   lots of advice on what and what not to do.
+ *   Use the {@see \Siel\Acumulus\MyWebShop} example code or the MyTestWebShop
+ *   test code for a quick start and lots of advice on what and what not to do.
  * - Follow the detailed tips and advice from the MyWebShop example code to
- *   adapt it to the Webshop you are implementing the extension for.
+ *   adapt it to the web shop you are implementing the extension for.
  * - The code in the library contains almost no private members, allowing
  *   extension developers to override each and every part of the code as
  *   necessary. However, try to use this sparingly, following advice in the
  *   MyWebShop example code about which method to override and which not.
  * - When you are more or less finished with the library based part of your
- *   extension, you need to hook it into your webshop. This part is very webshop
- *   specific but generally speaking you should:
- *     - Create a full fledged module adhering to the webshop architecture.
+ *   extension, you need to hook it into your web shop. This part is very web
+ *   shop specific but generally speaking you should:
+ *     - Create a full-fledged module adhering to the web shop architecture.
  *     - Including install code that checks any (additional) requirements,
  *       creates the Acumulus entry table, and subscribes to the relevant
  *       events.
  *     - Including uninstall code that removes the event subscriptions and
  *       Acumulus entry table.
- *     - Initialization code that adds the library's namespace to the webshop
- *       autoloader, or, if no autoloader is present in the webshop or it cannot
- *       be used (not PSR4 compliant), defines an autoloader by including
+ *     - Write initialization code that adds the library's namespace to the web
+ *       shop autoloader, or, if no autoloader is present in the web shop, or it
+ *       cannot be used (not PSR4 compliant), defines an autoloader by including
  *       SielAcumulusAutoloader.php and calling the static
  *       {@see SielAcumulusAutoloader::register()} method.
- *     - Initialization code that creates the Container (passing in the correct
- *       arguments)
- *     - That defines and handles 3 admin form pages, the settings page, the
- *       advanced settings page, and the batch send page. The settings page may
- *       be the default extension settings page, that normally can be reached
- *       via something like "Modules - select Acumulus module - Configure".
- *       These pages/forms probably need their own menu-item, a route definition
+ *     - Write initialization code that creates the Container (passing in the
+ *       correct arguments).
+ *     - Define the 3 admin form pages: the settings page, the advanced settings
+ *       page, and the batch send page. The settings page may be the default
+ *       settings page for an extension, that normally can be reached via
+ *       something like "Modules - select Acumulus module - Configure".  These
+ *       pages/forms probably need their own menu-item, a route definition
  *       and/or a controller, a renderer part, a form submission part, and
- *       sometimes, depending on the webshop, a view or something like that.
- *     - Event handling code to forward the events to the library.
- *     - See existing code on https://github.com/SIELOnline, where all webshop
+ *       sometimes, depending on the web shop, a view or something like that.
+ *     - Event handling code to forward create or status change events of orders
+ *       and credit notes to the library.
+ *     - See existing code on https://github.com/SIELOnline, where all web shop
  *       specific projects are also viewable.
  */
 namespace Siel\Acumulus;

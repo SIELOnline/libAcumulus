@@ -69,9 +69,10 @@ class AcumulusTest extends TestCase
      */
     public function testServicesKeysInResponse(string $method, array $args, bool $isList, array $expectedKeys)
     {
+        /** @var \Siel\Acumulus\ApiClient\AcumulusResult $result */
         $result = $this->acumulusClient->$method(... $args);
         $this->assertSame(Severity::Success, $result->getStatus());
-        $response = $result->getResponse();
+        $response = $result->getMainResponse();
         if ($isList) {
             $this->assertIsArray($response);
             $this->assertNotEmpty($response);

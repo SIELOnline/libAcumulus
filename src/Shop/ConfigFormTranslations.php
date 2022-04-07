@@ -503,8 +503,8 @@ Also note that VAT free differs from the 0%% VAT rate below. This difference mai
         'field_zeroVatClass' => 'Which %1$s defines the 0%% vat rate?',
         'desc_zeroVatClass' => 'Indicate which %1$s you use to indicate that a product or service is subject to the 0%% vat rate.<br>
 Select the 1st option ("%2$s") if you do not sell goods or services at the 0%% rate.<br>
-NOTE 1: the 0%% rate differs from vat free as above and is not common in the Netherlands. E.g, currently (early 2021), masks fall under the 0% vat rate.<br>
-NOTE 2: this setting concerns whether the products or services you offer are inherently subject to the 0% vat rate, not if you make invoices without vat (e.g. sometimes when selling abroad) or reversed vat.',
+NOTE 1: the 0%% rate differs from vat free as above and is not common in the Netherlands. E.g, currently (early 2021), masks fall under the 0%% vat rate.<br>
+NOTE 2: this setting concerns whether the products or services you offer are inherently subject to the 0%% vat rate, not if you make invoices without vat (e.g. sometimes when selling abroad) or reversed vat.',
 
         // Trigger settings.
         'triggerSettingsHeader' => 'When to have your invoices sent to Acumulus.',

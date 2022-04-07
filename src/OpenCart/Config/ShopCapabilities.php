@@ -1,4 +1,5 @@
-<?php
+<?php /** @noinspection PhpMultipleClassDeclarationsInspection */
+
 namespace Siel\Acumulus\OpenCart\Config;
 
 use Siel\Acumulus\Config\Config;
@@ -290,7 +291,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
         $statuses = $registry->model_localisation_order_status->getOrderStatuses();
         $result = [];
         foreach ($statuses as $status) {
-            list($optionValue, $optionText) = array_values($status);
+            [$optionValue, $optionText] = array_values($status);
             $result[$optionValue] = $optionText;
         }
         return $result;
@@ -317,8 +318,9 @@ class ShopCapabilities extends ShopCapabilitiesBase
         $registry = $this->getRegistry();
         $prefix = 'payment_';
         $enabled = [];
-        /** @noinspection PhpUnhandledExceptionInspection */
-        $extensions = $registry->getExtensionModel()->getInstalled('payment');
+        /** @var \ModelSettingExtension $model */
+        $model = $registry->getModel('setting/extension');
+        $extensions = $model->getInstalled('payment');
         foreach ($extensions as $extension) {
             if ($registry->config->get($prefix . $extension . '_status')) {
                 $enabled[] = $extension;
@@ -354,9 +356,9 @@ class ShopCapabilities extends ShopCapabilitiesBase
     {
         $result = [];
         $registry = $this->getRegistry();
-        /** @noinspection PhpUnhandledExceptionInspection */
-        $registry->load->model('localisation/tax_class');
-        $taxClasses = $registry->model_localisation_tax_class->getTaxClasses();
+        /** @var \ModelLocalisationTaxClass $model */
+        $model = $registry->getModel('localisation/tax_class');
+        $taxClasses = $model->getTaxClasses();
         foreach ($taxClasses as $taxClass) {
             $result[$taxClass['tax_class_id']] = $taxClass['title'];
         }

@@ -39,15 +39,14 @@ class ConfigStore extends BaSeConfigStore
     /**
      * @return \ModelSettingSetting
      *
-     * @noinspection PhpDocMissingThrowsInspection
      * @noinspection PhpMissingReturnTypeInspection : actually a {@see Proxy} is
      *   returned that proxies a {@see \ModelSettingSetting}. So for us, the
      *   type is a \ModelSettingSetting.
+     * @noinspection PhpIncompatibleReturnTypeInspection
+     * @noinspection PhpReturnDocTypeMismatchInspection
      */
     protected function getSettings()
     {
-        /** @noinspection PhpUnhandledExceptionInspection */
-        Registry::getInstance()->load->model('setting/setting');
-        return Registry::getInstance()->model_setting_setting;
+        return Registry::getInstance()->getModel('setting/setting');
     }
 }

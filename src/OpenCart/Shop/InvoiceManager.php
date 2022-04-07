@@ -51,14 +51,6 @@ class InvoiceManager extends BaseInvoiceManager
     }
 
     /**
-     * Helper method to get the db object.
-     */
-    protected function getDb(): DB
-    {
-        return Registry::getInstance()->db;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getInvoiceSourcesByIdRange(string $invoiceSourceType, string $InvoiceSourceIdFrom, string $InvoiceSourceIdTo): array
@@ -100,7 +92,7 @@ class InvoiceManager extends BaseInvoiceManager
      */
     protected function triggerInvoiceCreated(array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult)
     {
-	    $route = 'model/' . Registry::getInstance()->getLocation() . '/invoiceCreated/after';
+	    $route = 'model/' . $this->getLocation() . '/invoiceCreated/after';
         $args = ['invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult];
 	    $this->getEvent()->trigger($route, [&$route, $args]);
     }
@@ -112,7 +104,7 @@ class InvoiceManager extends BaseInvoiceManager
      */
     protected function triggerInvoiceSendBefore(array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult)
     {
-	    $route = 'model/' . Registry::getInstance()->getLocation() . '/invoiceSend/before';
+	    $route = 'model/' . $this->getLocation() . '/invoiceSend/before';
         $args = ['invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult];
 	    $this->getEvent()->trigger($route, [&$route, $args]);
     }
@@ -124,7 +116,7 @@ class InvoiceManager extends BaseInvoiceManager
      */
     protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, InvoiceAddResult $result)
     {
-	    $route = 'model/' . Registry::getInstance()->getLocation() . '/invoiceSend/after';
+	    $route = 'model/' . $this->getLocation() . '/invoiceSend/after';
         $args = ['invoice' => $invoice, 'source' => $invoiceSource, 'result' => $result];
 	    $this->getEvent()->trigger($route, [&$route, $args]);
     }
@@ -134,6 +126,31 @@ class InvoiceManager extends BaseInvoiceManager
      */
     private function getEvent(): Event
     {
-        return Registry::getInstance()->event;
+        return $this->getRegistry()->event;
+    }
+
+    /**
+     * Helper method to get the db object.
+     */
+    protected function getDb(): DB
+    {
+        return $this->getRegistry()->db;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getLocation(): string
+    {
+        return $this->getRegistry()->getLocation();
+    }
+
+    /**
+     * @return \Siel\Acumulus\OpenCart\Helpers\Registry
+     *
+     */
+    protected function getRegistry(): Registry
+    {
+        return Registry::getInstance();
     }
 }

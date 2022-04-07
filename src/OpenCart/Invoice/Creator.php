@@ -1,10 +1,12 @@
 <?php
 /**
+ * @noinspection PhpMultipleClassDeclarationsInspection
  * @noinspection SqlDialectInspection
  */
 
 namespace Siel\Acumulus\OpenCart\Invoice;
 
+use DB;
 use RuntimeException;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\Meta;
@@ -99,7 +101,9 @@ class Creator extends BaseCreator
         $result = [];
 
         // $product can be empty if the product has been deleted.
-        $product = $this->getRegistry()->model_catalog_product->getProduct($item['product_id']);
+        /** @var \ModelCatalogProduct $model */
+        $model = $this->getRegistry()->getModel('Catalog/Product');
+        $product = $model->getProduct($item['product_id']);
         if (!empty($product)) {
             $this->addPropertySource('product', $product);
         }
@@ -304,10 +308,10 @@ class Creator extends BaseCreator
             // or just the highest appearing vat rate, or wil pass it to the
             // strategy phase.
             $result += [
-                Tag::VatRate => null,
-                Meta::VatRateSource => Creator::VatRateSource_Completor,
-                Meta::StrategySplit => false,
-                       ] + $vatRateLookupMetaData;
+                    Tag::VatRate => null,
+                    Meta::VatRateSource => Creator::VatRateSource_Completor,
+                    Meta::StrategySplit => false,
+                ] + $vatRateLookupMetaData;
         }
 
         return $result;
@@ -324,11 +328,10 @@ class Creator extends BaseCreator
      * that this results in only 1 tax rate.
      *
      * @param string $code
-     *   The total line type: shipping, handling, low_order_fee, ... (no other
-     *   known types).
+     *   The total line type: shipping, handling, low_order_fee, .....
      *
      * @return array
-     *   A, possibly empty, array with vat rate lookup metadata. Empty if no or
+     *   A, possibly empty, array with vat rate lookup metadata. Empty if no OR
      *   multiple tax rates were found.
      *
      * @throws \Exception
@@ -337,7 +340,7 @@ class Creator extends BaseCreator
     {
         $result = [];
         $query = $this->getTotalLineTaxClassLookupQuery($code);
-        $queryResult = $this->getRegistry()->db->query($query);
+        $queryResult = $this->getDb()->query($query);
         if (!empty($queryResult->row)) {
             $taxClassId = reset($queryResult->row);
             $result = $this->getVatRateLookupMetadata($taxClassId);
@@ -406,7 +409,7 @@ class Creator extends BaseCreator
     protected function getTotalLineTaxClassLookupQuery(string $code): string
     {
         $prefix = DB_PREFIX;
-        $code = $this->getRegistry()->db->escape($code);
+        $code = $this->getDb()->escape($code);
         return "SELECT `value` FROM {$prefix}setting where `key` = 'total_{$code}_tax_class_id' OR `key` LIKE '{$code}_%_tax_class_id'";
     }
 
@@ -432,7 +435,7 @@ class Creator extends BaseCreator
     protected function getTaxClass(int $tax_class_id): array
     {
         /** @var \stdClass $query  (documentation error in DB) */
-        $query = $this->getRegistry()->db->query("SELECT * FROM " . DB_PREFIX . "tax_class WHERE tax_class_id = '" . $tax_class_id . "'");
+        $query = $this->getDb()->query("SELECT * FROM " . DB_PREFIX . "tax_class WHERE tax_class_id = '" . $tax_class_id . "'");
         return $query->row;
     }
 
@@ -450,7 +453,7 @@ class Creator extends BaseCreator
     protected function getTaxRules(int $tax_class_id): array
     {
         /** @var \stdClass $query  (documentation error in DB) */
-        $query = $this->getRegistry()->db->query("SELECT * FROM " . DB_PREFIX . "tax_rule WHERE tax_class_id = '" . $tax_class_id . "'");
+        $query = $this->getDb()->query("SELECT * FROM " . DB_PREFIX . "tax_rule WHERE tax_class_id = '" . $tax_class_id . "'");
         return $query->rows;
     }
 
@@ -468,7 +471,7 @@ class Creator extends BaseCreator
     protected function getTaxRate(int $tax_rate_id): array
     {
         /** @var \stdClass $query  (documentation error in DB) */
-        $query = $this->getRegistry()->db->query("SELECT tr.tax_rate_id, tr.name AS name, tr.rate, tr.type, tr.geo_zone_id,
+        $query = $this->getDb()->query("SELECT tr.tax_rate_id, tr.name AS name, tr.rate, tr.type, tr.geo_zone_id,
             gz.name AS geo_zone, tr.date_added, tr.date_modified
             FROM " . DB_PREFIX . "tax_rate tr
             LEFT JOIN " . DB_PREFIX . "geo_zone gz ON (tr.geo_zone_id = gz.geo_zone_id)
@@ -493,20 +496,26 @@ class Creator extends BaseCreator
 
         if (!isset($geoZonesCache[$geo_zone_id])) {
             /** @var \stdClass $query  (documentation error in DB) */
-            $query = $this->getRegistry()->db->query("SELECT * FROM " . DB_PREFIX . "zone_to_geo_zone WHERE geo_zone_id = '" . $geo_zone_id . "'");
+            $query = $this->getDb()->query("SELECT * FROM " . DB_PREFIX . "zone_to_geo_zone WHERE geo_zone_id = '" . $geo_zone_id . "'");
             $geoZonesCache[$geo_zone_id] = $query->rows;
         }
         return $geoZonesCache[$geo_zone_id];
     }
 
     /**
-     * @return \ModelAccountOrder|\ModelSaleOrder
-     *
-     * @throws \Exception
+     * @return \ModelCheckoutOrder|\ModelSaleOrder
      */
     protected function getOrderModel()
     {
         return $this->getRegistry()->getOrderModel();
+    }
+
+    /**
+     * @return \DB
+     */
+    protected function getDb(): DB
+    {
+        return $this->getRegistry()->db;
     }
 
     /**

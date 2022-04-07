@@ -1,8 +1,5 @@
 <?php
 /**
- * @noinspection PhpMissingParamTypeInspection
- * @noinspection PhpMissingReturnTypeInspection
- * @noinspection PhpIssetCanBeReplacedWithCoalesceInspection
  * @noinspection PhpUndefinedClassInspection
  * @noinspection PhpMultipleClassDeclarationsInspection
  */
@@ -24,13 +21,6 @@ namespace Siel\Acumulus\OpenCart\Helpers;
  * @property \Response response
  * @property \Session session
  * @property \Url url
- * @property \ModelAccountOrder model_account_order
- * @property \ModelCatalogProduct model_catalog_product
- * @property \ModelCheckoutOrder model_checkout_order
- * @property \ModelSaleOrder model_sale_order
- * @property \ModelLocalisationOrderStatus model_localisation_order_status
- * @property \ModelLocalisationTaxClass model_localisation_tax_class
- * @property \ModelSettingSetting model_setting_setting
  */
 class Registry
 {
@@ -40,7 +30,7 @@ class Registry
     /** @var \Registry */
     protected $registry;
 
-    /** @var \ModelAccountOrder|\ModelSaleOrder */
+    /** @var \ModelCheckoutOrder|\ModelSaleOrder */
     protected $orderModel;
 
     /** @noinspection PhpUndefinedClassInspection */
@@ -70,7 +60,7 @@ class Registry
      *
      * @return \Siel\Acumulus\OpenCart\Helpers\Registry
      */
-    public static function getInstance()
+    public static function getInstance(): Registry
     {
         return static::$instance;
     }
@@ -89,12 +79,18 @@ class Registry
         static::setInstance($this);
     }
 
-    public function __get($key)
+    /**
+     * Magic method __get must be declared public.
+     */
+    public function __get(string $key)
     {
         return $this->registry->get($key);
     }
 
-    public function __set($key, $value)
+    /**
+     * Magic method __set must be declared public.
+     */
+    public function __set(string $key, $value)
     {
         $this->registry->set($key, $value);
     }
@@ -105,7 +101,7 @@ class Registry
      * @return string
      *   The location of the extension's files.
      */
-    public function getLocation()
+    public function getLocation(): string
     {
         return 'extension/module/acumulus';
     }
@@ -119,84 +115,55 @@ class Registry
      *
      * @throws \Exception
      */
-    public function getOrder($orderId)
+    public function getOrder(int $orderId)
     {
-        if (strrpos(str_replace('\\', '/', DIR_APPLICATION), '/catalog/') === strlen(DIR_APPLICATION) - strlen('/catalog/')) {
-            // We are in the catalog section, use the checkout/order model as
-            // ModelAccountOrder::getOrder() also checks on user_id!
-            if ($this->model_checkout_order === null) {
-                $this->load->model('checkout/order');
-            }
-            return $this->model_checkout_order->getOrder($orderId);
-        } else {
-            // We are in the admin section, we can use the normal order model.
-            return $this->getOrderModel()->getOrder($orderId);
-        }
+        return $this->getOrderModel()->getOrder($orderId);
     }
 
     /**
      * Returns the order model that can be used to call:
+     * - getOrder()
      * - getOrderProducts()
      * - getOrderOptions()
-     * - GetOrderTotals()
-     * And in admin only:
-     * - getOrder()
+     * - getOrderTotals()
      *
-     * In Catalog, we need another model to call getOrder(), so we have a
-     * separate method getOrder() for that here.
-     *
-     * @return \ModelAccountOrder|\ModelSaleOrder
-     *
-     * @throws \Exception
+     * @return \ModelCheckoutOrder|\ModelSaleOrder
      */
     public function getOrderModel()
     {
         if ($this->orderModel === null) {
             if (strrpos(DIR_APPLICATION, '/catalog/') === strlen(DIR_APPLICATION) - strlen('/catalog/')) {
-                // We are in the catalog section, use the account/order model.
-                $this->load->model('account/order');
-                $this->orderModel = $this->model_account_order;
+                // We are in the catalog section, use the checkout/order model.
+                $modelName = 'checkout/order';
             } else {
                 // We are in the admin section, use the sale/order model.
-                $this->load->model('sale/order');
-                $this->orderModel = $this->model_sale_order;
+                $modelName = 'sale/order';
             }
+            $this->orderModel = $this->getModel($modelName);
         }
         return $this->orderModel;
     }
 
     /**
-     * Returns the extension model that can be used to retrieve payment methods.
+     * Returns the model that can be used to add or remove events.
      *
-     * @return \ModelSettingExtension|\ModelExtensionExtension
+     * @param string $modelName
+     *  The model to get: should be of the form 'namespace/[subnamespace/]model'.
      *
-     * @throws \Exception
+     * @return \Model
+     *
+     * @noinspection PhpMissingReturnTypeInspection : actually a {@see Proxy} is
+     *   returned that proxies a \ModelGroup1Group2Model class.
+     * @noinspection PhpDocMissingThrowsInspection  Will throw an \Exception
+     *   when the model class is not found, but that should be considered a
+     *   development error.
      */
-    public function getExtensionModel()
+    public function getModel(string $modelName)
     {
-        if ($this->extensionModel === null) {
-            $this->load->model('setting/extension');
-            /** @noinspection PhpUndefinedFieldInspection */
-            $this->extensionModel = $this->model_setting_extension;
-        }
-        return $this->extensionModel;
-    }
-
-    /**
-     * Returns the extension model that can be used to retrieve payment methods.
-     *
-     * @return \ModelSettingEvent|\ModelExtensionEvent
-     *
-     * @throws \Exception
-     */
-    public function getEventModel()
-    {
-        if ($this->eventModel === null) {
-            $this->load->model('setting/event');
-            /** @noinspection PhpUndefinedFieldInspection */
-            $this->eventModel = $this->model_setting_event;
-        }
-        return $this->eventModel;
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $this->load->model($modelName);
+        $modelProperty = str_replace('/', '_', "model_$modelName");
+        return $this->registry->get($modelProperty);
     }
 
     /**
@@ -207,7 +174,7 @@ class Registry
      * @return string
      *   The link to the given route, including standard arguments.
      */
-    public function getLink($route)
+    public function getLink(string $route): string
     {
         $token = 'user_token';
         return $this->url->link($route, $token . '=' . $this->session->data[$token], true);

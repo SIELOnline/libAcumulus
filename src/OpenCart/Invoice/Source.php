@@ -24,7 +24,7 @@ class Source extends BaseSource
     protected function setSource()
     {
         /** @noinspection PhpUnhandledExceptionInspection */
-        $this->source = Registry::getInstance()->getOrder($this->id);
+        $this->source = $this->getRegistry()->getOrder($this->id);
     }
 
     /**
@@ -149,15 +149,11 @@ class Source extends BaseSource
      *   The set of order total lines for this order. This set is ordered by
      *   sort_order, meaning that lines before the tax line are amounts ex vat
      *   and lines after are inc vat.
-     *
-     * @noinspection PhpDocMissingThrowsInspection
      */
     public function getOrderTotalLines(): array
     {
         if (!$this->orderTotalLines) {
-            /** @noinspection PhpUnhandledExceptionInspection */
-            $orderModel = $this->getRegistry()->getOrderModel();
-            $this->orderTotalLines = $orderModel->getOrderTotals($this->source['order_id']);
+            $this->orderTotalLines = $this->getOrderModel()->getOrderTotals($this->source['order_id']);
         }
         return $this->orderTotalLines;
     }
@@ -172,6 +168,14 @@ class Source extends BaseSource
             $result = $this->source['invoice_prefix'] . $this->source['invoice_no'];
         }
         return $result;
+    }
+
+    /**
+     * @return \ModelCheckoutOrder|\ModelSaleOrder
+     */
+    protected function getOrderModel()
+    {
+        return $this->getRegistry()->getOrderModel();
     }
 
     /**

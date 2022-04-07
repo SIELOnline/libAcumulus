@@ -102,7 +102,7 @@ class Registry
                 $directoryRead = $readFactory->create($path);
                 $composerJsonData = $directoryRead->readFile('composer.json');
                 $data = json_decode($composerJsonData);
-                $result = $data === null ? 'JSON ERROR' : !empty($data->version) ? $data->version : 'NOT SET';
+                $result = $data === null ? 'JSON ERROR' : (!empty($data->version) ? $data->version : 'NOT SET');
             } else {
                 $result = 'MODULE ERROR';
             }

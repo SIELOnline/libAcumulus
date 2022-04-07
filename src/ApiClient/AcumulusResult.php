@@ -1,7 +1,6 @@
 <?php
 namespace Siel\Acumulus\ApiClient;
 
-use DOMDocument;
 use LogicException;
 use RuntimeException;
 use Siel\Acumulus\Api;
@@ -10,6 +9,7 @@ use Siel\Acumulus\Helpers\Message;
 use Siel\Acumulus\Helpers\MessageCollection;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Helpers\Translator;
+use Siel\Acumulus\Helpers\Util;
 
 /**
  * Class AcumulusResult wraps an Acumulus web service result into an object.
@@ -30,6 +30,7 @@ use Siel\Acumulus\Helpers\Translator;
  */
 class AcumulusResult extends MessageCollection
 {
+    protected /*Util*/ $util;
     protected /*Log*/ $log;
     protected /*?AcumulusRequest*/ $acumulusRequest = null;
     protected /*?HttpResponse*/ $httpResponse = null;
@@ -63,10 +64,12 @@ class AcumulusResult extends MessageCollection
     public function __construct(
         AcumulusRequest $acumulusRequest,
         ?HttpResponse $httpResponse,
+        Util $util,
         Translator $translator,
         Log $log
     ) {
         parent::__construct($translator);
+        $this->util = $util;
         $this->log = $log;
         $this->acumulusRequest = $acumulusRequest;
         if ($httpResponse !== null) {
@@ -201,9 +204,9 @@ class AcumulusResult extends MessageCollection
             // here. So, apparently that only contained headers.
             // @todo: Is this a non 200 response or can we consider this as a critical error?
             $this->createAndAddMessage('Empty response body', Severity::Error, 701);
-        } elseif ($this->isHtmlResponse($body)) {
+        } elseif ($this->util->isHtmlResponse($body)) {
             // When the API is gone we might receive an HTML error message page.
-            $this->raiseHtmlReceivedError($body);
+            $this->util->raiseHtmlReceivedError($body);
         } else {
             // Decode the response as either json or xml.
             $response = [];
@@ -216,12 +219,12 @@ class AcumulusResult extends MessageCollection
             // $response = null, we also try to decode $body as XML.
             if ($outputFormat === 'xml' || !is_array($response)) {
                 try {
-                    $response = $this->convertXmlToArray($body);
+                    $response = $this->util->convertXmlToArray($body);
                 } catch (RuntimeException $e) {
                     // Not an XML response. Treat it as a json error if we were
                     // expecting a json response.
                     if ($outputFormat === 'json') {
-                        $this->raiseJsonError();
+                        $this->util->raiseJsonError();
                     }
                     // Otherwise, treat it as the XML exception that was raised.
                     throw $e;
@@ -364,138 +367,6 @@ class AcumulusResult extends MessageCollection
     }
 
     /**
-     * @param string $response
-     *
-     * @return bool
-     *   True if the response is HTML, false otherwise.
-     */
-    protected function isHtmlResponse(string $response): bool
-    {
-        return strtolower(substr($response, 0, strlen('<!doctype html'))) === '<!doctype html'
-               || strtolower(substr($response, 0, strlen('<html'))) === '<html'
-               || strtolower(substr($response, 0, strlen('<body'))) === '<body';
-    }
-
-    /**
-     * Throws an exception containing the received HTML.
-     *
-     * @param string $html
-     *   String containing an HTML document which is probably an error page.
-     *
-     * @trows \RuntimeException
-     *   Always
-     */
-    protected function raiseHtmlReceivedError(string $html)
-    {
-        libxml_use_internal_errors(true);
-        $doc = new DOMDocument('1.0', 'utf-8');
-        $doc->loadHTML($html);
-        $body = $doc->getElementsByTagName('body');
-        if ($body->length > 0) {
-            $body = $body->item(0)->textContent;
-        } else {
-            // No <body> tag, probably just a message with markup
-            $body = $doc->textContent;
-        }
-        throw new RuntimeException("HTML response received: $body", 702);
-    }
-
-    /**
-     * Converts an XML string to an array.
-     *
-     * @param string $xml
-     *   A string containing XML.
-     *
-     * @return array
-     *  An array representation of the XML string.
-     *
-     * @throws \RuntimeException
-     *   Either:
-     *   - The $xml string is not valid xml
-     *   - The $xml string could not be converted to an (associative) array
-     *     (we use json_encode() and json_decode() to convert to an array, so
-     *     this would probably mean a structure that is too deep).
-     */
-    protected function convertXmlToArray(string $xml): array
-    {
-        // Convert the response to an array via a 3-way conversion:
-        // - create a simplexml object
-        // - convert that to json
-        // - convert json to array
-        libxml_use_internal_errors(true);
-        if (!($result = simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA))) {
-            $this->raiseLibxmlError();
-        }
-
-        if (!($result = json_encode($result))) {
-            $this->raiseJsonError();
-        }
-        if (($result = json_decode($result, true)) === null) {
-            $this->raiseJsonError();
-        }
-
-        return $result;
-    }
-
-    /**
-     * Throws an exception with all libxml error messages as message.
-     *
-     * @throws \RuntimeException
-     *   Always.
-     */
-    protected function raiseLibxmlError()
-    {
-        $errors = libxml_get_errors();
-        $messages = [];
-        $code = 704;
-        foreach ($errors as $error) {
-            // Overwrite our own code with the 1st code we get from libxml.
-            if ($code === 704) {
-                $code = $error->code;
-            }
-            $messages[] = sprintf('Line %d, column: %d: %s %d - %s', $error->line, $error->column, $error->level === LIBXML_ERR_WARNING ? 'warning' : 'error', $error->code, trim($error->message));
-        }
-        throw new RuntimeException(implode("\n", $messages), $code);
-    }
-
-    /**
-     * Throws an exception with an error message based on the last json error.
-     *
-     * @throws \RuntimeException
-     *   Always.
-     */
-    protected function raiseJsonError()
-    {
-        $code = json_last_error();
-        switch ($code) {
-            case JSON_ERROR_NONE:
-                $message = 'No error';
-                break;
-            case JSON_ERROR_DEPTH:
-                $message = 'Maximum stack depth exceeded';
-                break;
-            case JSON_ERROR_STATE_MISMATCH:
-                $message = 'Underflow or the modes mismatch';
-                break;
-            case JSON_ERROR_CTRL_CHAR:
-                $message = 'Unexpected control character found';
-                break;
-            case JSON_ERROR_SYNTAX:
-                $message = 'Syntax error, malformed JSON';
-                break;
-            case JSON_ERROR_UTF8:
-                $message = 'Malformed UTF-8 characters, possibly incorrectly encoded';
-                break;
-            default:
-                $code = 705;
-                $message = 'Unknown error';
-                break;
-        }
-        $message = sprintf('json (%s): %d - %s', phpversion('json'), $code, $message);
-        throw new RuntimeException($message, $code);
-    }
-
-    /**
      * Returns the masked raw request, response, and exception. if one occurred.
      *
      * @param bool $log
@@ -545,16 +416,11 @@ class AcumulusResult extends MessageCollection
     {
         $acumulusRequest = $this->getAcumulusRequest();
         $submit = $acumulusRequest->getSubmit();
-        if ($submit !== null) {
-            // Mask all values that have 'password' in their key.
-            array_walk_recursive($submit, function (&$value, $key) {
-                if (strpos(strtolower($key), 'password') !== false) {
-                    $value = 'REMOVED FOR SECURITY';
-                }
-            });
-            $maskedSubmit = var_export($submit, true);
-        }
-        return sprintf("%s\n%s", $acumulusRequest->getUri(), $maskedSubmit ?? '');
+        // Mask all values that have 'password' in their key.
+        $submit = $submit !== null
+            ? var_export($this->util->maskArray($submit), true)
+            : '';
+        return sprintf("%s\n%s", $acumulusRequest->getUri(), $submit);
     }
 
     /**
@@ -567,20 +433,8 @@ class AcumulusResult extends MessageCollection
         if ($this->getHttpResponse() !== null) {
             $code = $this->getHttpResponse()->getHttpCode();
             $body = $this->getHttpResponse()->getBody();
-            // If the response is XML, mask all values of tags that end with
-            // 'password'.
-            $body = preg_replace(
-                '|<([a-z]*)password>.*</[a-z]*password>|',
-                '<$1password>REMOVED FOR SECURITY</$1password>',
-                $body
-            );
-            // If the response is Json, mask all values of properties that end
-            // with 'password'.
-            $body = preg_replace(
-                '!"([a-z]*)password"(\s*):(\s*)"(((\\\\.)|[^\\\\"])*)"!',
-                '"$1password"$2:$3"REMOVED FOR SECURITY"',
-                $body
-            );
+            // Mask all values of tags that end with 'password'.
+            $body = $this->util->maskJson($this->util->maskXml($body));
             $response = sprintf('%d - %s', $code, $body);
         }
         return $response ?? '';

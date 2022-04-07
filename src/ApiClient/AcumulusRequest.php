@@ -1,14 +1,12 @@
 <?php
 namespace Siel\Acumulus\ApiClient;
 
-use DOMDocument;
-use DOMElement;
-use DOMException;
 use LogicException;
 use RuntimeException;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Helpers\Container;
+use Siel\Acumulus\Helpers\Util;
 
 /**
  * AcumulusRequest turns a call to {@see \Siel\Acumulus\ApiClient\Acumulus} into
@@ -31,16 +29,19 @@ class AcumulusRequest
 {
     protected /*Container*/ $container;
     protected /*Config*/ $config;
+
+    protected /*Util*/ $util;
     protected /*string*/ $userLanguage;
 
     protected /*?string*/ $uri = null;
     protected /*?array*/ $submit = null;
     protected /*?HttpRequest*/ $httpRequest = null;
 
-    public function __construct(Container $container, Config $config, string $userLanguage)
+    public function __construct(Container $container, Config $config, Util $util, string $userLanguage)
     {
         $this->container = $container;
         $this->config = $config;
+        $this->util = $util;
         $this->userLanguage = $userLanguage;
     }
 
@@ -146,7 +147,7 @@ class AcumulusRequest
         //   The top tag name is ignored by the Acumulus API, we use <acumulus>.
         // - 'xmlstring' is the post field that Acumulus expects.
         $options = [CURLOPT_USERAGENT => $this->getUserAgent()];
-        $body = ['xmlstring' => trim($this->convertArrayToXml(['acumulus' => $this->submit]))];
+        $body = ['xmlstring' => trim($this->util->convertArrayToXml(['acumulus' => $this->submit]))];
         $this->httpRequest = $this->container->createHttpRequest($options);
         $httpResponse = $this->httpRequest->post($this->uri, $body);
 
@@ -237,88 +238,5 @@ class AcumulusRequest
         ];
 
         return $result;
-    }
-
-    /**
-     * Converts a keyed, optionally multi-level, array to XML.
-     *
-     * Each key is converted to a tag, no attributes are used. Numeric
-     * sub-arrays are repeated using the same key.
-     *
-     * @param array $values
-     *   The array to convert to XML.
-     *
-     * @return string
-     *   The XML string
-     *
-     * @throws \RuntimeException
-     */
-    protected function convertArrayToXml(array $values): string
-    {
-        $dom = new DOMDocument('1.0', 'utf-8');
-        $dom->xmlStandalone = true;
-        $dom->formatOutput = true;
-
-        try {
-            $dom = $this->convertToDom($values, $dom);
-            $result = $dom->saveXML();
-            if (!$result) {
-                throw new RuntimeException('DOMDocument::saveXML failed');
-            }
-            // Backslashes get lost between here and the Acumulus API, but
-            // encoding them makes them get through. Solve here until the
-            // real error has been found and solved.
-            /** @noinspection PhpUnnecessaryLocalVariableInspection */
-            $result = str_replace('\\', '&#92;', $result);
-            return $result;
-        } catch (DOMException $e) {
-            // Convert a DOMException to a RuntimeException, so we only have to
-            // handle RuntimeExceptions.
-            throw new RuntimeException($e->getMessage(), $e->getCode(), $e);
-        }
-    }
-
-    /**
-     * Recursively converts a value to a DOMDocument|DOMElement.
-     *
-     * @param mixed $values
-     *   A keyed array, a numerically indexed array, or a scalar type.
-     * @param DOMDocument|DOMElement $element
-     *   The element to append the values to.
-     *
-     * @return DOMDocument|DOMElement
-     *
-     * @throws \DOMException
-     */
-    protected function convertToDom($values, $element)
-    {
-        /** @var DOMDocument $document */
-        static $document = null;
-        $isFirstElement = true;
-
-        if ($element instanceof DOMDocument) {
-            $document = $element;
-        }
-        if (is_array($values)) {
-            foreach ($values as $key => $value) {
-                if (is_int($key)) {
-                    if ($isFirstElement) {
-                        $node = $element;
-                        $isFirstElement = false;
-                    } else {
-                        $node = $document->createElement($element->tagName);
-                        $element->parentNode->appendChild($node);
-                    }
-                } else {
-                    $node = $document->createElement($key);
-                    $element->appendChild($node);
-                }
-                $this->convertToDom($value, $node);
-            }
-        } else {
-            $element->appendChild($document->createTextNode(is_bool($values) ? ($values ? 'true' : 'false') : $values));
-        }
-
-        return $element;
     }
 }

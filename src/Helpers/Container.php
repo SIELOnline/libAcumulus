@@ -275,6 +275,12 @@ class Container
         return $this->getInstance('Requirements', 'Helpers');
     }
 
+    public function getUtil(): Util
+    {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return $this->getInstance('Util', 'Helpers');
+    }
+
     public function getCountries(): Countries
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
@@ -323,7 +329,12 @@ class Container
     public function createAcumulusRequest(): AcumulusRequest
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('AcumulusRequest', 'ApiClient', [$this, $this->getConfig(), $this->getLanguage()], true);
+        return $this->getInstance(
+            'AcumulusRequest',
+            'ApiClient',
+            [$this, $this->getConfig(), $this->getUtil(), $this->getLanguage()],
+            true
+        );
     }
 
 
@@ -336,7 +347,13 @@ class Container
     public function createAcumulusResult(AcumulusRequest $acumulusRequest, ?HttpResponse $httpResponse): AcumulusResult
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('AcumulusResult', 'ApiClient', [$acumulusRequest, $httpResponse, $this->getTranslator(), $this->getLog()], true);
+        return $this->getInstance('AcumulusResult', 'ApiClient', [
+            $acumulusRequest,
+            $httpResponse,
+            $this->getUtil(),
+            $this->getTranslator(),
+            $this->getLog(),
+        ], true);
     }
 
     /**
@@ -370,8 +387,12 @@ class Container
     public function createInvoiceAddResult(string $trigger): InvoiceResult
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('InvoiceAddResult', 'Invoice', [$trigger, $this->getTranslator(), $this->getLog()],
-            true);
+        return $this->getInstance(
+            'InvoiceAddResult',
+            'Invoice',
+            [$trigger, $this->getTranslator(), $this->getLog()],
+            true
+        );
     }
 
     public function getCompletor(): Completor
@@ -391,7 +412,11 @@ class Container
     public function getCompletorInvoiceLines(): CompletorInvoiceLines
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('CompletorInvoiceLines', 'Invoice', [$this->getFlattenerInvoiceLines(), $this->getConfig()]);
+        return $this->getInstance(
+            'CompletorInvoiceLines',
+            'Invoice',
+            [$this->getFlattenerInvoiceLines(), $this->getConfig()]
+        );
     }
 
     public function getFlattenerInvoiceLines(): FlattenerInvoiceLines
@@ -409,8 +434,19 @@ class Container
     public function getCreator(): Creator
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('Creator', 'Invoice',
-            [$this->getToken(), $this->getCountries(), $this->getShopCapabilities(), $this, $this->getConfig(), $this->getTranslator(), $this->getLog()]);
+        return $this->getInstance(
+            'Creator',
+            'Invoice',
+            [
+                $this->getToken(),
+                $this->getCountries(),
+                $this->getShopCapabilities(),
+                $this,
+                $this->getConfig(),
+                $this->getTranslator(),
+                $this->getLog(),
+            ]
+        );
     }
 
     public function getConfig(): Config

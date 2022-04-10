@@ -130,7 +130,7 @@ class SplitKnownDiscountLine extends CompletorStrategyBase
 
     protected function splitDiscountLine(): bool
     {
-        $this->description = "SplitKnownDiscountLine({$this->knownDiscountAmountInc}, {$this->knownDiscountVatAmount})";
+        $this->description = "SplitKnownDiscountLine($this->knownDiscountAmountInc, $this->knownDiscountVatAmount)";
         $this->replacingLines = [];
         foreach ($this->discountsPerVatRate as $vatRate => $discountAmountInc) {
             $line = $this->splitLine;

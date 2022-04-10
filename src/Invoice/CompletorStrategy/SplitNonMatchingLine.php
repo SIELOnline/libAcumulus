@@ -73,14 +73,14 @@ class SplitNonMatchingLine extends CompletorStrategyBase
      */
     protected function checkPreconditions(): bool
     {
-        $result = count($this->vatBreakdown) === 2;
+        $result = count($this->getVatBreakdown()) === 2;
         if (!$result) {
             $shopSettings = $this->config->getShopSettings();
             if ($shopSettings['vatFreeClass'] === Config::VatClass_NotApplicable) {
                 // If there are only 2 positive vat rates that will do as well.
                 // See note above in class doc.
                 $positiveVatRates = 0;
-                foreach ($this->vatBreakdown as $vatRate => $vatInfo) {
+                foreach ($this->getVatBreakdown() as $vatRate => $vatInfo) {
                     if ((float)$vatRate > 0) {
                         $positiveVatRates++;
                     }

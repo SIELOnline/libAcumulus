@@ -131,7 +131,7 @@ class SplitLine extends CompletorStrategyBase
      */
     protected function checkPreconditions(): bool
     {
-        return count($this->vatBreakdown) === 2 && count($this->splitLines) >= 1;
+        return count($this->getVatBreakdown()) === 2 && count($this->splitLines) >= 1;
     }
 
     /**

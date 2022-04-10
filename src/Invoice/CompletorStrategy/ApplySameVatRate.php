@@ -10,16 +10,18 @@ use Siel\Acumulus\Tag;
  * Class ApplySameVatRate implements a vat completor strategy by applying the
  * same vat rate to each line to complete.
  *
- * It also tries a vat rate of 0%. If that works, the system might be
- * misconfigured OR we have prepaid vouchers, but as we have to follow the
- * system anyway, we will return it as is.
+ * It will try all vat rates in property $possibleVatRates, including a vat rate
+ * of 0%. If that works, the system might be misconfigured OR we have prepaid
+ * vouchers, but as we have to follow the system anyway, we will return it as
+ * is.
+ *
+ * The order in which vat rates are tried is based on the number of times the
+ * vat rate appears in the other lines, thereby preventing introducing
+ * non-appearing vat rates on zero amount lines (where every vat rate tried will
+ * succeed).
  *
  * Current known usages:
- * - Magento free shipping lines
- *
- * @todo: try this first with vat rates that actually appear in the invoice.
- *   Doing so, we can prevent adding 6% to a free shipping line on an all 21%
- *   invoice.
+ * - Magento free shipping lines.
  *
  * @noinspection PhpUnused : instantiated via a variable containing the name.
  */
@@ -37,16 +39,16 @@ class ApplySameVatRate extends CompletorStrategyBase
      */
     protected function execute(): bool
     {
-        // Try all vat rates.
-        foreach ($this->possibleVatRates as $vatRate) {
-            $vatRate = $vatRate[Tag::VatRate];
+        // Try all possible vat rates.
+        foreach ($this->getVatBreakdown() as $vatRateInfo) {
+            $vatRate = $vatRateInfo[Tag::VatRate];
             if ($this->tryVatRate($vatRate)) {
                 return true;
             }
         }
 
-        // Try with a 0 tax rate as prepaid vouchers have 0 vat rate this might be a
-        // valid situation if the only lines to complete are voucher lines.
+        // Try with a 0 vat rate. As prepaid vouchers have 0 vat rate this might
+        // be a valid situation if the only lines to complete are voucher lines.
         return $this->tryVatRate(0.0);
     }
 

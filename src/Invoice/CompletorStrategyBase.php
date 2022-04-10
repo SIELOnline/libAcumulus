@@ -87,7 +87,7 @@ abstract class CompletorStrategyBase
      *
      * @var array[]
      */
-    protected $vatBreakdown;
+    private $vatBreakdown;
 
     /** @var \Siel\Acumulus\Invoice\Source */
     protected $source;
@@ -239,6 +239,21 @@ abstract class CompletorStrategyBase
     protected function initVatBreakdown()
     {
         $this->vatBreakdown = [];
+
+        // Initialize by adding all possible vat rates.
+        foreach ($this->possibleVatRates as $possibleVatRate) {
+            $vatRate = sprintf('%.3f', $possibleVatRate[Tag::VatRate]);
+            if (!isset($this->vatBreakdown[$vatRate])) {
+                $this->vatBreakdown[$vatRate] = [
+                    Tag::VatRate => (float) $vatRate,
+                    Meta::VatAmount => 0.0,
+                    'amount' => 0.0,
+                    'count' => 0,
+                ];
+            }
+        }
+
+        // Add amounts and count for appearing vat rates.
         foreach ($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] as $line) {
             if ($line[Meta::VatRateSource] !== Creator::VatRateSource_Strategy && isset($line[Tag::VatRate])) {
                 $amount = $line[Tag::UnitPrice] * $line[Tag::Quantity];
@@ -247,21 +262,16 @@ abstract class CompletorStrategyBase
                     : $line[Tag::VatRate] / 100.0 * $amount;
                 $vatRate = sprintf('%.3f', $line[Tag::VatRate]);
                 // Add amount to existing vat rate line or create a new line.
-                if (isset($this->vatBreakdown[$vatRate])) {
-                    $breakdown = &$this->vatBreakdown[$vatRate];
-                    $breakdown[Meta::VatAmount] += $vatAmount;
-                    $breakdown['amount'] += $amount;
-                    $breakdown['count']++;
-                } else {
-                    $this->vatBreakdown[$vatRate] = [
-                        Tag::VatRate => (float) $vatRate,
-                        Meta::VatAmount => $vatAmount,
-                        'amount' => $amount,
-                        'count' => 1,
-                    ];
-                }
+                $this->vatBreakdown[$vatRate][Meta::VatAmount] += $vatAmount;
+                $this->vatBreakdown[$vatRate]['amount'] += $amount;
+                $this->vatBreakdown[$vatRate]['count']++;
             }
         }
+
+        // Sort high to low.
+        usort($this->vatBreakdown, function ($a, $b) {
+            return $b['count'] <=> $a['count'];
+        });
     }
 
     /**
@@ -274,7 +284,7 @@ abstract class CompletorStrategyBase
     protected function getVatBreakDownMinRate(): array
     {
         $result = [Tag::VatRate => PHP_INT_MAX];
-        foreach ($this->vatBreakdown as $breakDown) {
+        foreach ($this->getVatBreakdown() as $breakDown) {
             if ($breakDown[Tag::VatRate] < $result[Tag::VatRate]) {
                 $result = $breakDown;
             }
@@ -292,7 +302,7 @@ abstract class CompletorStrategyBase
     protected function getVatBreakDownMaxRate(): array
     {
         $result = [Tag::VatRate => -PHP_INT_MAX];
-        foreach ($this->vatBreakdown as $breakDown) {
+        foreach ($this->getVatBreakdown() as $breakDown) {
             if ($breakDown[Tag::VatRate] > $result[Tag::VatRate]) {
                 $result = $breakDown;
             }
@@ -310,7 +320,7 @@ abstract class CompletorStrategyBase
     protected function getVatBreakDownMaxAmount(): array
     {
         $result = ['amount' => -PHP_INT_MAX];
-        foreach ($this->vatBreakdown as $breakDown) {
+        foreach ($this->getVatBreakdown() as $breakDown) {
             if ($breakDown['amount'] > $result['amount']) {
                 $result = $breakDown;
             }

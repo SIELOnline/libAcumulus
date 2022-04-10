@@ -28,7 +28,7 @@ use Exception;
  *
  * Example 1:
  * <pre>
- *   $propertySpec = sku|ean|isbn; sku = empty; ean = 'Hello'; isbn = 'World';
+ *   $propertySpec = sku|ean|isbn; sku = ''; ean = 'Hello'; isbn = 'World';
  *   Result: 'Hello'
  * </pre>
  *

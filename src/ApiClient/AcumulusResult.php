@@ -410,13 +410,15 @@ class AcumulusResult extends MessageCollection
     /**
      * Returns the submit-structure as a string, with passwords masked.
      *
-     * Can be used for logging purposes.
+     * - We use var_export() that returns parsable text, so we may use it, e.g,
+     *   to create test input.
+     * - We mask all values that have 'password' in their key, so it can be used
+     *   for logging purposes.
      */
     protected function getMaskedRequest(): string
     {
         $acumulusRequest = $this->getAcumulusRequest();
         $submit = $acumulusRequest->getSubmit();
-        // Mask all values that have 'password' in their key.
         $submit = $submit !== null
             ? var_export($this->util->maskArray($submit), true)
             : '';
@@ -426,14 +428,16 @@ class AcumulusResult extends MessageCollection
     /**
      * Returns the response from the Acumulus API, with passwords masked.
      *
-     * Can be used for logging purposes.
+     * - We mask all values of tags that end with 'password'.
+     * - The plugins default to json output format, but we also accept a string
+     *   in XML format.
+     * - By masking any password, the result can be used for logging purposes.
      */
     protected function getMaskedResponse(): string
     {
         if ($this->getHttpResponse() !== null) {
             $code = $this->getHttpResponse()->getHttpCode();
             $body = $this->getHttpResponse()->getBody();
-            // Mask all values of tags that end with 'password'.
             $body = $this->util->maskJson($this->util->maskXml($body));
             $response = sprintf('%d - %s', $code, $body);
         }

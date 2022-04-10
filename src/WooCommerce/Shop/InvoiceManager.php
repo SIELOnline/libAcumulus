@@ -245,7 +245,7 @@ class InvoiceManager extends BaseInvoiceManager
     {
         $this->getLog()->info(
             'WooCommerce\InvoiceManager::query2Sources: args = %s',
-            str_replace([' ', "\r", "\n", "\t"], '', var_export($args, true))
+            str_replace(["\r", "\n"], '', json_encode($args))
         );
         // Add default arguments.
         $args = $args + [

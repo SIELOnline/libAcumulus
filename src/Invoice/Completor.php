@@ -77,7 +77,7 @@ class Completor
 
     /**
      * @var int[]
-     *   A list of vat types that do not charge vat.
+     *   A list of vat types that do not charge vat at all.
      */
     protected static $zeroVatVatTypes = [Api::VatType_NationalReversed, Api::VatType_EuReversed, Api::VatType_RestOfWorld];
 
@@ -1279,14 +1279,17 @@ class Completor
      * - Reversed vat invoices, EU or national (vat type = 2 or 3).
      * - Products outside the EU (vat type = 4).
      * Vat free should be used for:
-     * - Small companies that use the KOR.
+     * - Small companies that use the KOR: All products in their catalog should
+     *   use the vat free tax class.
      * - Vat free products and services, e.g. care, education (vat type = 1 or
-     *   5).
-     * - Services invoiced to companies outside the EU (vat type = 1).
-     * - Digital services outside the EU, consumers or companies (vat type = 1).
+     *   5): The vat free products in their catalog should use the vat free tax
+     *   class.
+     * - Services outside the EU, consumers or companies (vat type = 1): The
+     *   product/service should have a "normal" vat class, but the rate should
+     *   be 0 anyway and the customer should be outside the EU.
      *
      * However, both will typically be stored as a €0,- amount or 0% rate. To
-     * correct these line, we use the shop settings about vat classes used for
+     * correct these lines, we use the shop settings about vat classes used for
      * 0% and vat free; the vat class of the product; and the vat type.
      *
      * Note: to do this correctly, especially choosing between vat type 1 and 4
@@ -1311,12 +1314,14 @@ class Completor
                     $line[Tag::VatRate] = 0.0;
                     $line[Meta::VatRateSource] .= ',' . self::VatRateSource_Corrected_NoVat;
                 }
-            }
-            if ($this->is0VatRate($line)) {
+            } elseif ($this->is0VatRate($line)) {
                 // Change if the vat class indicates a vat free rate and vat
-                // free is allowed for the vat type.
-                if ($this->isVatFreeClass($line) && in_array($vatType, static::$vatTypesAllowingVatFree)) {
-                        $line[Tag::VatRate] = Api::VatFree;
+                // free is allowed for the vat type, or if 0% is not an allowed
+                // vat rate.
+                if (($this->isVatFreeClass($line) && in_array($vatType, static::$vatTypesAllowingVatFree))
+                    || !$this->is0VatPossibleForVatType($vatType)
+                ) {
+                    $line[Tag::VatRate] = Api::VatFree;
                     $line[Meta::VatRateSource] .= ',' . self::VatRateSource_Corrected_NoVat;
                 }
             }
@@ -1709,7 +1714,6 @@ class Completor
     {
         $shopSettings = $this->config->getShopSettings();
         $foreignVatEuClasses = $shopSettings['euVatClasses'];
-        /** @noinspection PhpStrictComparisonWithOperandsOfDifferentTypesInspection  error in type engine */
         return reset($foreignVatEuClasses) !== Config::VatClass_NotApplicable;
     }
 
@@ -1838,6 +1842,20 @@ class Completor
             }
         }
         return true;
+    }
+
+    /**
+     * Returns whether the 0% vat rate is a possible vat rate for this vat type
+     * in the given circumstances
+     */
+    protected function is0VatPossibleForVatType(?int $vatType): bool
+    {
+        foreach ($this->possibleVatRates as $possibleVatRate) {
+            if ($possibleVatRate['vattype'] === $vatType && Number::isZero($possibleVatRate['vatrate'])) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

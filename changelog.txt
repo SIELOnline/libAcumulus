@@ -20,8 +20,18 @@ WC   WooCommerce                             >= 5.0 (3 and 4 will probably work)
 --------------------------------------------------------------------------------
 
 
-7.0.0-beta1 (2022-03-??) (not released)
+7.0.0-beta1 (2022-04-??) (not released)
 ---------------------------------------
+Bugs:
+- ALL: Correcting 0% vat to vat free (one of the last phases during invoice
+  completion) was not done when 0% is not allowed in the given situation.
+- MA (possibly others as well): Free shipping on foreign invoices could get
+  Dutch default vat rate assigned (wrong order in strategy ApplySameVatRate).
+- MA: PHP7.4 Error : Unparenthesized `a ? b : c ? d : e` is deprecated.
+  Use either `(a ? b : c) ? d : e` or `a ? b : (c ? d : e)`.
+- ALL: Error in help text for 0% vat rate class setting: %-sign not properly
+  printed.
+
 Features:
 - ALL: At the HTTP level we now send a User-Agent header. For that, we added
   keys cmsName and cmsConfig to the Config. Class ShopCapabilities gives it a
@@ -74,7 +84,8 @@ Refactorings:
   namespace) and constructions needed for WC2 (version checks, hooks, argument
   number and order passed to hooks, ...
 - OC1|OC23: Removed OC1 and OC23 specific code (their namespaces and
-  constructions needed to determine version, ...).
+  constructions needed to determine version, ...). Refactored the registry
+  accordingly.
 - Defined parameter and return types to methods where applicable and according
   to PHP 7.1 language constructs, i.e:
   - nullable types, void return type.
@@ -82,8 +93,8 @@ Refactorings:
     typed properties (7.4).)
 - Added visibility to class constants.
 
-6.4.2 (2022-03-24) (JOO only)
------------------------------
+6.4.2 (2022-03-24) (JOO only, but retracted)
+--------------------------------------------
 Bugs:
 - HS: property order->order_shipping_params may be present but be an "empty"
   object (order->order_shipping_params->prices is an empty array).

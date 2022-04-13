@@ -35,15 +35,15 @@ Bugs:
 Features:
 - ALL: At the HTTP level we now send a User-Agent header. For that, we added
   keys cmsName and cmsConfig to the Config. Class ShopCapabilities gives it a
-  value for Joomla and  WordPress. Presenting it to the user on forms has also
+  value for Joomla and WordPress. Presenting it to the user on forms has also
   been adapted accordingly.
 - OC: The Acumulus settings form now also appears as a menu-item under "Sales -
   Acumulus". Before, it could only be accessed via "Extensions - Modules - Edit
   (Acumulus module)", so this makes it easier to access the basic settings.
 
 Refactorings:
-- PHP 7.1 is now the minimal requirement. we DO use language constructs that are
-  new to PHP 7.1, so this module WILL fail fatally when you are still running an
+- PHP 7.2 is now the minimal requirement. we DO use language constructs that are
+  new to PHP 7.2, so this module WILL fail fatally when you are still running an
   older PHP version.
 - Refactored the ApiClient namespace to better separate the different layers and
   concerns:

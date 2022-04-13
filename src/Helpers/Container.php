@@ -1,7 +1,7 @@
 <?php
 namespace Siel\Acumulus;
 
-const Version = '7.0.0-beta1';
+const Version = '7.0.0';
 
 namespace Siel\Acumulus\Helpers;
 
@@ -21,7 +21,7 @@ use Siel\Acumulus\Invoice\CompletorInvoiceLines;
 use Siel\Acumulus\Invoice\CompletorStrategyLines;
 use Siel\Acumulus\Invoice\Creator;
 use Siel\Acumulus\Invoice\FlattenerInvoiceLines;
-use Siel\Acumulus\Invoice\InvoiceAddResult as InvoiceResult;
+use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Shop\AcumulusEntry;
 
@@ -32,7 +32,7 @@ use Siel\Acumulus\Shop\InvoiceManager;
 use const Siel\Acumulus\Version;
 
 /**
- * Container defines a dependency injector pattern for this library.
+ * Container defines a dependency injector and factory pattern for this library.
  *
  * Principles
  * ----------
@@ -43,13 +43,12 @@ use const Siel\Acumulus\Version;
  *   will be instantiated and returned. See below how this is done.
  * * Container::getInstance() is the weakly typed instance getting method, but
  *   for almost all known classes in this library, a strongly typed getter is
- *   available as well. These getters also takes care of getting the constructor
+ *   available as well. These getters also take care of getting the constructor
  *   arguments.
  * * By default only a single instance is created and this instance is returned
- *   on each subsequent request for an instance of that type. The strongly typed
- *   getters do know when this behaviour is not wanted (mostly when specific
- *   arguments have to be passed) and will create fresh instances in those
- *   cases. This makes this container a Service Locator as well as a Factory.
+ *   on each subsequent request for an instance of that type.
+ * * The strongly typed create... methods return a new instance on each call,
+ *   turning this container also into a factory.
  *
  * Creating the container
  * ----------------------
@@ -384,7 +383,7 @@ class Container
      * @return \Siel\Acumulus\Invoice\InvoiceAddResult
      *   A wrapper object around an Acumulus invoice-add service result.
      */
-    public function createInvoiceAddResult(string $trigger): InvoiceResult
+    public function createInvoiceAddResult(string $trigger): InvoiceAddResult
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance(

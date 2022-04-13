@@ -275,7 +275,7 @@ class Creator extends BaseCreator
         $result = array_merge($result, array_map([$this, 'getCalcRuleDiscountLine'],
             array_filter($this->order['calc_rules'], [$this, 'isDiscountCalcRule'])));
 
-        // Coupon codes are not stored in a calc rules, so handle them separately.
+        // Coupon codes are not stored in calc rules, so handle them separately.
         if (!Number::isZero($this->order['details']['BT']->coupon_discount)) {
             $result[] = $this->getCouponCodeDiscountLine();
         }

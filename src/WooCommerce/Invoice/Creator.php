@@ -424,13 +424,11 @@ class Creator extends BaseCreator
         }
         // Instance id is the zone, will return an empty value if not present.
         $instanceId = $item->get_instance_id();
-        if (!empty($instanceId)) {
-            $optionName = "woocommerce_{$methodId}_{$instanceId}_settings";
-        } else {
-            $optionName = "woocommerce_{$methodId}_settings";
-        }
+        $optionName = !empty($instanceId)
+            ? "woocommerce_{$methodId}_{$instanceId}_settings"
+            : "woocommerce_{$methodId}_settings";
         $option = get_option($optionName);
-        if (isset($option['cost'])) {
+        if (!empty($option['cost'])) {
             // Cost may be entered with a comma ...
             $cost = str_replace(',', '.', $option['cost']);
             if (Number::floatsAreEqual($cost, $shippingEx)) {

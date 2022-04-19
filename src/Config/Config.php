@@ -13,9 +13,6 @@ use const Siel\Acumulus\Version;
  * Configuration is stored in the host environment bridged via the ConfigStore
  * class.
  *
- * @todo: Add separate cmsName and cmsVersion config keys (empty if shop is not
- *   embedded in a CMS).
- *
  * @noinspection PhpClassHasTooManyDeclaredMembersInspection
  */
 class Config

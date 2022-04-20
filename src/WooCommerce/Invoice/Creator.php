@@ -89,7 +89,9 @@ class Creator extends BaseCreator
 
         // Return if this "really" is an empty line, not when this is a line
         // with free products or an amount but without a quantity.
-        if (Number::isZero($item->get_quantity()) && Number::isZero($item->get_total())) {
+        $quantity = (float) $item->get_quantity();
+        $total = (float) $item->get_total();
+        if (Number::isZero($quantity) && Number::isZero($total)) {
             return $result;
         }
 
@@ -110,7 +112,6 @@ class Creator extends BaseCreator
 
         // Add quantity: quantity is negative on refunds, the unit price will be
         // positive.
-        $quantity = $item->get_quantity();
         // Correct if 0.
         if (Number::isZero($quantity)) {
             $quantity = $this->invoiceSource->getSign();
@@ -122,7 +123,7 @@ class Creator extends BaseCreator
         // discount. get_taxes() returns non-rounded tax amounts per tax class
         // id, whereas get_total_tax() returns either a rounded or non-rounded
         // amount, depending on the 'woocommerce_tax_round_at_subtotal' setting.
-        $productPriceEx = $item->get_total() / $quantity;
+        $productPriceEx = $total / $quantity;
         $taxes = $item->get_taxes()['total'];
         $productVat = array_sum($taxes) / $quantity;
         $productPriceInc = $productPriceEx + $productVat;
@@ -482,7 +483,7 @@ class Creator extends BaseCreator
             /** @noinspection NotOptimalIfConditionsInspection */
             if (is_array($taxes)) {
                 foreach ($taxes as $taxRateId => $amount) {
-                    if (!Number::isZero($amount)) {
+                    if (!empty($amount) && !Number::isZero($amount)) {
                         $taxRate = WC_Tax::_get_tax_rate($taxRateId, OBJECT);
                         if ($taxRate) {
                             if (count($result) === 0) {

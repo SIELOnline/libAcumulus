@@ -18,6 +18,16 @@ VM   VirtueMart (Joomla) ?.?
 WC   WooCommerce                             >= 5.0 (3 and 4 will probably work)
      WordPress           5.9.2               >= ?.?
 --------------------------------------------------------------------------------
+
+7.0.2 (2022-04-20) (WC only)
+----------------------------
+Bugs:
+- WC: "Je site heeft een technisch probleem: Een fout van het type E_ERROR werd
+  veroorzaakt op regelnummer 87 van het bestand .../Number.php. Foutmelding:
+  Uncaught TypeError: Argument 1 passed to Number::floatsAreEqual() must be of
+  the type float, string given, called in .../WooCommerce/Invoice/Creator.php on
+  line 487 and ..."
+
 7.0.1 (2022-04-19) (WC only)
 ----------------------------
 Bugs:

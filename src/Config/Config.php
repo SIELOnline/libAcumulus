@@ -133,11 +133,7 @@ class Config
     protected function load()
     {
         if (!$this->isConfigurationLoaded) {
-            $this->values = $this->getDefaults();
-            $values = $this->getConfigStore()->load();
-            if (is_array($values)) {
-                $this->values = array_merge($this->getDefaults(), $values);
-            }
+            $this->values = $this->getConfigStore()->load() + $this->getDefaults();
             $this->values = $this->castValues($this->values);
             $this->isConfigurationLoaded = true;
 

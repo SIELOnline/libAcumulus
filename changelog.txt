@@ -19,6 +19,12 @@ WC   WooCommerce                             >= 5.0 (3 and 4 will probably work)
      WordPress           5.9.2               >= ?.?
 --------------------------------------------------------------------------------
 
+7.0.3 (2022-04-20) (WC only)
+----------------------------
+Bugs:
+- PHP Fatal error:  Uncaught TypeError: Return value of ConfigStore::load() must
+  be of the type array, bool returned in WooCommerce/Config/ConfigStore.php:16.
+
 7.0.2 (2022-04-20) (WC only)
 ----------------------------
 Bugs:

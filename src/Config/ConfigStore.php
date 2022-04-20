@@ -31,7 +31,7 @@ abstract class ConfigStore
      * Loads the configuration from the actual configuration provider.
      *
      * @return array
-     *   An array with any stored configuration values keyed by their name.
+     *   An array with the stored configuration values keyed by their name.
      */
     abstract public function load(): array;
 

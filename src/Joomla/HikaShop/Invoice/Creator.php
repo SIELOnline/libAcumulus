@@ -280,7 +280,8 @@ class Creator extends BaseCreator
                 ];
             }
         } elseif (empty($this->order->order_shipping_params)
-            || count($this->order->order_shipping_params->prices) === 0) {
+            || count($this->order->order_shipping_params->prices) === 0
+        ) {
             // If the property order_shipping_params is "empty" (no info to
             // extract from), we use the order_shipping_* properties at the
             // order level.

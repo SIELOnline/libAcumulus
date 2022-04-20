@@ -361,15 +361,15 @@ class InvoiceStatusForm extends Form
         if ($this->source === null) {
             // Use a basic filtering on the wrong user input.
             $this->addFormMessage(sprintf($this->t('unknown_source'),
-                preg_replace('/[^a-z0-9_\-]/', '', $this->getSubmittedValue('acumulus_main_source_type')),
-                preg_replace('/[^a-z0-9_\-]/', '', $this->getSubmittedValue('acumulus_main_source_id'))),
+                preg_replace('/[^a-z\d_\-]/', '', $this->getSubmittedValue('acumulus_main_source_type')),
+                preg_replace('/[^a-z\d_\-]/', '', $this->getSubmittedValue('acumulus_main_source_id'))),
                 Severity::Error);
         } elseif ($this->getSubmittedValue('service') !== 'invoice_show') {
             if ($this->getSubmittedSource() === null) {
                 // Use a basic filtering on the wrong user input.
                 $this->addFormMessage(sprintf($this->t('unknown_source'),
-                    preg_replace('/[^a-z0-9_\-]/', '', $this->getSubmittedValue('source_type')),
-                    preg_replace('/[^a-z0-9_\-]/', '', $this->getSubmittedValue('source_id'))),
+                    preg_replace('/[^a-z\d_\-]/', '', $this->getSubmittedValue('source_type')),
+                    preg_replace('/[^a-z\d_\-]/', '', $this->getSubmittedValue('source_id'))),
                     Severity::Error);
             } elseif ($this->getSubmittedValue('service') === 'invoice_paymentstatus_set') {
                 /** @var Source $source */
@@ -458,7 +458,7 @@ class InvoiceStatusForm extends Form
             default:
                 // Use a basic filtering on the wrong user input.
                 $this->createAndAddMessage(
-                    sprintf($this->t('unknown_action'), preg_replace('/[^a-z0-9_\-]/', '', $service)),
+                    sprintf($this->t('unknown_action'), preg_replace('/[^a-z\d_\-]/', '', $service)),
                     Severity::Error);
                 break;
         }
@@ -476,7 +476,7 @@ class InvoiceStatusForm extends Form
 
         // Add base information in hidden fields:
         // - Source (type and id) for the main source on this form. This will be
-        //   an order. Fieldsets with children, credit notes, may follow.
+        //   an order. Field sets with children, credit notes, may follow.
         $fields['acumulus_main_source_type'] = $this->getHiddenField($source->getType());
         $fields['acumulus_main_source_id'] = $this->getHiddenField($source->getId());
 
@@ -501,7 +501,7 @@ class InvoiceStatusForm extends Form
                 'fields' => $fields1Source,
             ];
 
-            // Other fieldsets: credit notes.
+            // Other field sets: credit notes.
             $creditNotes = $source->getCreditNotes();
             foreach ($creditNotes as $creditNote) {
                 $localEntry = $this->acumulusEntryManager->getByInvoiceSource($creditNote);
@@ -639,7 +639,7 @@ class InvoiceStatusForm extends Form
                     if (empty($conceptInfo)) {
                         $invoiceStatus = static::Invoice_CommunicationError;
                         $statusSeverity = static::Status_Error;
-                    } elseif ($result->getByCodeTag('FGYBSN040') || $result->getByCodeTag('FGYBSN048')) {
+                     } elseif ($result->getByCodeTag('FGYBSN040') || $result->getByCodeTag('FGYBSN048')) {
                         // FGYBSN040: concept id does not exist (anymore) or no access.
                         // FGYBSN048: concept id to old, cannot be tracked.
                         $invoiceStatus = static::Invoice_SentConcept;
@@ -716,7 +716,7 @@ class InvoiceStatusForm extends Form
             } elseif (empty($invoiceStatus)) {
                 $invoiceStatus = static::Invoice_LocalError;
                 $statusSeverity = static::Status_Error;
-                $description = 'entry_concept_noid';
+                $description = 'entry_concept_not_id';
             }
         }
 
@@ -1271,7 +1271,7 @@ class InvoiceStatusForm extends Form
         if (!empty($entry)) {
             $result = [];
             $result['entryid'] = $this->sanitiseIntValue($entry, 'entryid');
-            $result['token'] = $this->sanitiseStringValue($entry, 'token', '/^[0-9a-zA-Z]{32}$/');
+            $result['token'] = $this->sanitiseStringValue($entry, 'token', '/^[a-zA-Z\d]{32}$/');
             $result['entrydate'] = $this->sanitiseDateValue($entry, 'entrydate');
             $result['vatreversecharge'] = $this->sanitiseBoolValue($entry, 'vatreversecharge');
             $result['foreigneu'] = $this->sanitiseBoolValue($entry, 'foreigneu');

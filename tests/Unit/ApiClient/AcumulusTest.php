@@ -86,7 +86,7 @@ class AcumulusTest extends TestCase
         // method we mock it.
         $stub = $this->getMockBuilder(Acumulus::class)
             ->onlyMethods(['callApiFunction'])
-            ->setConstructorArgs([$this->container, $this->container->getConfig()])
+            ->setConstructorArgs([$this->container, $this->container->getEnvironment()])
             ->getMock();
         $stub->expects($this->once())
             ->method('callApiFunction')
@@ -106,7 +106,7 @@ class AcumulusTest extends TestCase
      */
     public function testGetInvoicePdfUri()
     {
-        $environment = $this->container->getConfig()->getEnvironment();
+        $environment = $this->container->getEnvironment()->get();
         $apiAddress = $environment['baseUri'] . '/' . $environment['apiVersion'];
         $this->assertSame("$apiAddress/invoices/invoice_get_pdf.php?token=TOKEN", $this->acumulusClient->getInvoicePdfUri('TOKEN'));
         $this->assertSame("$apiAddress/invoices/invoice_get_pdf.php?token=TOKEN", $this->acumulusClient->getInvoicePdfUri('TOKEN', true));
@@ -119,7 +119,7 @@ class AcumulusTest extends TestCase
      */
     public function testGetPackingSlipUri()
     {
-        $environment = $this->container->getConfig()->getEnvironment();
+        $environment = $this->container->getEnvironment()->get();
         $apiAddress = $environment['baseUri'] . '/' . $environment['apiVersion'];
         $this->assertSame("$apiAddress/delivery/packing_slip_get_pdf.php?token=TOKEN", $this->acumulusClient->getPackingSlipUri('TOKEN'));
     }

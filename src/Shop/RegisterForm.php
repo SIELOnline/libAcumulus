@@ -6,6 +6,7 @@ use DateTime;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\ApiClient\Acumulus;
 use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Config\ShopCapabilities;
 use Siel\Acumulus\Helpers\Form;
 use Siel\Acumulus\Helpers\FormHelper;
@@ -33,19 +34,24 @@ class RegisterForm extends Form
      */
     protected $signUpResponse;
 
-    /**
-     * RegisterForm constructor.
-     *
-     * @param \Siel\Acumulus\ApiClient\Acumulus $acumulusApiClient
-     * @param \Siel\Acumulus\Helpers\FormHelper $formHelper
-     * @param \Siel\Acumulus\Config\ShopCapabilities $shopCapabilities
-     * @param \Siel\Acumulus\Config\Config $config
-     * @param \Siel\Acumulus\Helpers\Translator $translator
-     * @param \Siel\Acumulus\Helpers\Log $log
-     */
-    public function __construct(Acumulus $acumulusApiClient, FormHelper $formHelper, ShopCapabilities $shopCapabilities, Config $config, Translator $translator, Log $log)
-    {
-        parent::__construct($acumulusApiClient, $formHelper, $shopCapabilities, $config, $translator, $log);
+    public function __construct(
+        Acumulus $acumulusApiClient,
+        FormHelper $formHelper,
+        ShopCapabilities $shopCapabilities,
+        Config $config,
+        Environment $environment,
+        Translator $translator,
+        Log $log
+    ) {
+        parent::__construct(
+            $acumulusApiClient,
+            $formHelper,
+            $shopCapabilities,
+            $config,
+            $environment,
+            $translator,
+            $log
+        );
         $this->translator->add(new RegisterFormTranslations());
         $this->signUpResponse = null;
     }
@@ -323,7 +329,11 @@ class RegisterForm extends Form
             Tag::CompanyTypeId => [
                 'type' => 'select',
                 'label' => $this->t('field_companyTypeId'),
-                'options' => $this->picklistToOptions($this->acumulusApiClient->getPicklistCompanyTypes(), '', $this->t('option_empty')),
+                'options' => $this->picklistToOptions(
+                    $this->acumulusApiClient->getPicklistCompanyTypes(),
+                    '',
+                    $this->t('option_empty')
+                ),
                 'attributes' => [
                     'required' => true,
                 ],
@@ -424,7 +434,11 @@ class RegisterForm extends Form
             'congratulations' => [
                 'type' => 'fieldset',
                 'legend' => $this->t('congratulationsHeader'),
-                'description' => sprintf($this->t('congratulationsDesc'), DateTime::createFromFormat(Api::DateFormat_Iso, $this->signUpResponse['contractenddate'])->format('d-m-Y')),
+                'description' => sprintf(
+                    $this->t('congratulationsDesc'),
+                    DateTime::createFromFormat(Api::DateFormat_Iso, $this->signUpResponse['contractenddate'])
+                        ->format('d-m-Y')
+                ),
                 'fields' => [],
             ],
         ];
@@ -439,8 +453,10 @@ class RegisterForm extends Form
      */
     protected function getCreatedAccountFields(): array
     {
-        /** @noinspection PhpRedundantOptionalArgumentInspection */
-        $line1 = sprintf($this->t('loginDesc_1'), htmlspecialchars($this->getSubmittedValue(Tag::Email), ENT_NOQUOTES | ENT_HTML5, 'UTF-8'));
+        $line1 = sprintf(
+            $this->t('loginDesc_1'),
+            htmlspecialchars($this->getSubmittedValue(Tag::Email), ENT_NOQUOTES | ENT_HTML5, 'UTF-8')
+        );
         $line2 = $this->t('loginDesc_2');
         return [
             'loginDetails' => [

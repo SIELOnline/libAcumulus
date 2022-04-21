@@ -3,6 +3,7 @@ namespace Siel\Acumulus\Helpers;
 
 use Exception;
 use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Tag;
 
@@ -21,15 +22,19 @@ abstract class Mailer
     /** @var \Siel\Acumulus\Config\Config */
     protected $config;
 
+    /** @var \Siel\Acumulus\Config\Environment */
+    protected $environment;
+
     /** @var \Siel\Acumulus\Helpers\Translator */
     protected $translator;
 
     /** @var \Siel\Acumulus\Helpers\Log */
     protected $log;
 
-    public function __construct(Config $config, Translator $translator, Log $log)
+    public function __construct(Config $config, Environment $environment, Translator $translator, Log $log)
     {
         $this->config = $config;
+        $this->environment = $environment;
         $this->log = $log;
 
         $this->translator = $translator;
@@ -108,7 +113,7 @@ abstract class Mailer
      */
     protected function getFrom(): string
     {
-        $env = $this->config->getEnvironment();
+        $env = $this->environment->get();
         return 'webshop@' . $env['hostName'];
     }
 
@@ -132,7 +137,7 @@ abstract class Mailer
         if (isset($credentials[Tag::EmailOnError])) {
             return $credentials[Tag::EmailOnError];
         }
-        $env = $this->config->getEnvironment();
+        $env = $this->environment->get();
         return 'webshop@' . $env['hostName'];
     }
 

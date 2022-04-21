@@ -5,6 +5,7 @@ use LogicException;
 use RuntimeException;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Util;
 
@@ -29,6 +30,7 @@ class AcumulusRequest
 {
     protected /*Container*/ $container;
     protected /*Config*/ $config;
+    protected /*Environment*/ $environment;
 
     protected /*Util*/ $util;
     protected /*string*/ $userLanguage;
@@ -37,10 +39,11 @@ class AcumulusRequest
     protected /*?array*/ $submit = null;
     protected /*?HttpRequest*/ $httpRequest = null;
 
-    public function __construct(Container $container, Config $config, Util $util, string $userLanguage)
+    public function __construct(Container $container, Config $config, Environment $environment, Util $util, string $userLanguage)
     {
         $this->container = $container;
         $this->config = $config;
+        $this->environment = $environment;
         $this->util = $util;
         $this->userLanguage = $userLanguage;
     }
@@ -160,7 +163,7 @@ class AcumulusRequest
 
     protected function getUserAgent(): string
     {
-        $environment = $this->config->getEnvironment();
+        $environment = $this->environment->get();
         $library = "libAcumulus/{$environment['libraryVersion']}";
         $shop = " {$environment['shopName']}/{$environment['shopVersion']}";
         $cms = !empty($environment['cmsName']) ? " {$environment['cmsName']}/{$environment['cmsVersion']}" : '';
@@ -216,7 +219,7 @@ class AcumulusRequest
      */
     protected function getBasicSubmit(bool $needContract): array
     {
-        $environment = $this->config->getEnvironment();
+        $environment = $this->environment->get();
         $pluginSettings = $this->config->getPluginSettings();
 
         $result = [];

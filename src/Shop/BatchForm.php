@@ -5,6 +5,7 @@ use DateTime;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\ApiClient\Acumulus;
 use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Config\ShopCapabilities;
 use Siel\Acumulus\Helpers\Form;
 use Siel\Acumulus\Helpers\FormHelper;
@@ -46,11 +47,20 @@ class BatchForm extends Form
         FormHelper $formHelper,
         ShopCapabilities $shopCapabilities,
         Config $config,
+        Environment $environment,
         Translator $translator,
         Log $log
     )
     {
-        parent::__construct($acumulusApiClient, $formHelper, $shopCapabilities, $config, $translator, $log);
+        parent::__construct(
+            $acumulusApiClient,
+            $formHelper,
+            $shopCapabilities,
+            $config,
+            $environment,
+            $translator,
+            $log
+        );
 
         $translations = new InvoiceTranslations();
         $this->translator->add($translations);

@@ -6,6 +6,7 @@ use Siel\Acumulus\Api;
 use Siel\Acumulus\ApiClient\Acumulus;
 use Siel\Acumulus\ApiClient\AcumulusResult;
 use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Config\ShopCapabilities;
 use Siel\Acumulus\Shop\MoreAcumulusTranslations;
 use Siel\Acumulus\Tag;
@@ -85,6 +86,9 @@ abstract class Form extends MessageCollection
     /** @var \Siel\Acumulus\Config\Config */
     protected $acumulusConfig;
 
+    /** @var \Siel\Acumulus\Config\Environment */
+    protected $environment;
+
     /** @var \Siel\Acumulus\ApiClient\Acumulus */
     protected $acumulusApiClient;
 
@@ -146,6 +150,7 @@ abstract class Form extends MessageCollection
         FormHelper $formHelper,
         ShopCapabilities $shopCapabilities,
         Config $config,
+        Environment $environment,
         Translator $translator,
         Log $log
     )
@@ -158,6 +163,7 @@ abstract class Form extends MessageCollection
         $this->formHelper = $formHelper;
         $this->shopCapabilities = $shopCapabilities;
         $this->acumulusConfig = $config;
+        $this->environment = $environment;
         $this->log = $log;
         $this->fields = [];
 
@@ -570,17 +576,19 @@ abstract class Form extends MessageCollection
     {
         $this->loadInfoBlockTranslations();
 
-        $env = $this->acumulusConfig->getEnvironment();
+        $environment = $this->environment->get();
         $module = $this->t('module');
-        $environment = [
-            'Shop' => "{$env['shopName']} {$env['shopVersion']}"
-                . (!empty($env['cmsName']) ? " {$env['cmsName']} {$env['cmsVersion']}" : ''),
-            'Application' => "Acumulus $module {$env['moduleVersion']}; Library: {$env['libraryVersion']}",
-            'System' => "PHP {$env['phpVersion']}; Curl: {$env['curlVersion']}; JSON: {$env['jsonVersion']}; OS: {$env['os']}",
-            'Server' => $env['hostName'],
+        $environmentLines = [
+            'Shop' => "{$environment['shopName']} {$environment['shopVersion']}"
+                . (!empty($environment['cmsName']) ? " on {$environment['cmsName']} {$environment['cmsVersion']}" : ''),
+            $module => "Acumulus {$environment['moduleVersion']}; Library: {$environment['libraryVersion']}",
+            'PHP' => "{$environment['phpVersion']};" . " (Curl: {$environment['curlVersion']})",
+            'Database' => "{$environment['dbName']} {$environment['dbVersion']}",
+            'Server' => $environment['hostName'],
+            'OS' => $environment['os'],
         ];
-        $support = strtolower(rtrim($env['shopName'], '0123456789')) . '@acumulus.nl';
-        $subject = sprintf($this->t('support_subject'), $env['shopName'], $this->t('module'));
+        $support = strtolower(rtrim($environment['shopName'], '0123456789')) . '@acumulus.nl';
+        $subject = sprintf($this->t('support_subject'), $environment['shopName'], $this->t('module'));
         if ($this->emptyCredentials()) {
             $contractMsg = $this->t('no_contract_data_local') . "\n";
             $contract = [];
@@ -668,7 +676,7 @@ abstract class Form extends MessageCollection
             $contractMsg,
             $this->arrayToList($contract, false),
             $this->t('environment'),
-            $this->arrayToList($environment, false),
+            $this->arrayToList($environmentLines, false),
             $this->t('support_body'),
             $this->t('regards'),
             $myData['mycontactperson'] ?? $this->t('your_name')
@@ -698,7 +706,8 @@ abstract class Form extends MessageCollection
         $fields += [
             'environmentInformation' => [
                 'type' => 'markup',
-                'value' => '<h3>' . $this->t('environment') . '</h3>' . $this->arrayToList($environment, true) . $this->t('desc_environmentInformation'),
+                'value' => '<h3>' . $this->t('environment') . '</h3>' . $this->arrayToList($environmentLines, true) .
+                    $this->t('desc_environmentInformation'),
             ],
             'moreAcumulusInformation' => [
                 'type' => 'markup',

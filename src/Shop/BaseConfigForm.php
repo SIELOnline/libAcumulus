@@ -3,6 +3,7 @@ namespace Siel\Acumulus\Shop;
 
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Config\ShopCapabilities;
 use Siel\Acumulus\Helpers\Form;
 use Siel\Acumulus\Helpers\FormHelper;
@@ -17,19 +18,16 @@ use Siel\Acumulus\Helpers\Severity;
  */
 abstract class BaseConfigForm extends Form
 {
-    /**
-     * Constructor.
-     *
-     * @param \Siel\Acumulus\ApiClient\Acumulus $acumulusApiClient
-     * @param \Siel\Acumulus\Helpers\FormHelper $formHelper
-     * @param \Siel\Acumulus\Config\ShopCapabilities $shopCapabilities
-     * @param \Siel\Acumulus\Config\Config $config
-     * @param \Siel\Acumulus\Helpers\Translator $translator
-     * @param \Siel\Acumulus\Helpers\Log $log
-     */
-    public function __construct(Acumulus $acumulusApiClient, FormHelper $formHelper, ShopCapabilities $shopCapabilities, Config $config, Translator $translator, Log $log)
-    {
-        parent::__construct($acumulusApiClient, $formHelper, $shopCapabilities, $config, $translator, $log);
+    public function __construct(
+        Acumulus $acumulusApiClient,
+        FormHelper $formHelper,
+        ShopCapabilities $shopCapabilities,
+        Config $config,
+        Environment $environment,
+        Translator $translator,
+        Log $log
+    ) {
+        parent::__construct($acumulusApiClient, $formHelper, $shopCapabilities, $config, $environment, $translator, $log);
         $this->translator->add(new ConfigFormTranslations());
     }
 

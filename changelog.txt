@@ -19,6 +19,12 @@ WC   WooCommerce                             >= 5.0 (3 and 4 will probably work)
      WordPress           5.9.2               >= ?.?
 --------------------------------------------------------------------------------
 
+7.1.0-beta1 (2022-04-??)
+------------------------
+Refactorings:
+- Extracted the environment part out of Config into its own class Environment,
+  added database name and version to it, and removed json version from it.
+
 7.0.3 (2022-04-20) (WC only)
 ----------------------------
 Bugs:

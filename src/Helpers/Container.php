@@ -15,6 +15,7 @@ use Siel\Acumulus\Config\Config;
 
 use Siel\Acumulus\Config\ConfigStore;
 use Siel\Acumulus\Config\ConfigUpgrade;
+use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Config\ShopCapabilities;
 use Siel\Acumulus\Invoice\Completor;
 use Siel\Acumulus\Invoice\CompletorInvoiceLines;
@@ -289,7 +290,8 @@ class Container
     public function getMailer(): Mailer
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('Mailer', 'Helpers', [$this->getConfig(), $this->getTranslator(), $this->getLog()]);
+        return $this->getInstance('Mailer', 'Helpers', [$this->getConfig(), $this->getEnvironment(), $this->getTranslator(),
+            $this->getLog()]);
     }
 
     public function getToken(): Token
@@ -322,7 +324,7 @@ class Container
     public function getAcumulusApiClient(): Acumulus
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('Acumulus', 'ApiClient', [$this, $this->getConfig()]);
+        return $this->getInstance('Acumulus', 'ApiClient', [$this, $this->getEnvironment()]);
     }
 
     public function createAcumulusRequest(): AcumulusRequest
@@ -331,7 +333,7 @@ class Container
         return $this->getInstance(
             'AcumulusRequest',
             'ApiClient',
-            [$this, $this->getConfig(), $this->getUtil(), $this->getLanguage()],
+            [$this, $this->getConfig(), $this->getEnvironment(), $this->getUtil(), $this->getLanguage()],
             true
         );
     }
@@ -448,6 +450,12 @@ class Container
         );
     }
 
+    public function getEnvironment(): Environment
+    {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return $this->getInstance('Environment', 'Config', [$this->shopNamespace]);
+    }
+
     public function getConfig(): Config
     {
         static $is1stTime = true;
@@ -458,6 +466,7 @@ class Container
             $this->getConfigStore(),
             $this->getShopCapabilities(),
             [$this, 'getConfigUpgrade'],
+            $this->getEnvironment(),
             $log,
         ]);
         if ($is1stTime) {
@@ -567,6 +576,7 @@ class Container
             $this->getFormHelper(),
             $this->getShopCapabilities(),
             $this->getConfig(),
+            $this->getEnvironment(),
             $this->getTranslator(),
             $this->getLog(),
         ]);

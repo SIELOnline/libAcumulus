@@ -65,7 +65,10 @@ class Config
     private $shopCapabilities;
 
     /** @var callable */
-    protected $getConfigUpgrade;
+    private $getConfigUpgradeInstance;
+
+    /** @var \Siel\Acumulus\Config\Environment */
+    private $environment;
 
     /** @var \Siel\Acumulus\Helpers\Translator */
     protected $translator;
@@ -91,12 +94,14 @@ class Config
         ConfigStore $configStore,
         ShopCapabilities $shopCapabilities,
         callable $getConfigUpgrade,
+        Environment $environment,
         Log $log
     )
     {
         $this->configStore = $configStore;
         $this->shopCapabilities = $shopCapabilities;
-        $this->getConfigUpgrade = $getConfigUpgrade;
+        $this->getConfigUpgradeInstance = $getConfigUpgrade;
+        $this->environment = $environment;
         $this->log = $log;
 
         $this->keyInfo = null;
@@ -125,6 +130,16 @@ class Config
     }
 
     /**
+     * Wrapper around the getConfigUpdateInstance callable.
+     *
+     * @return \Siel\Acumulus\Config\ConfigUpgrade
+     */
+    protected function getConfigUpgrade(): ConfigUpgrade
+    {
+        return ($this->getConfigUpgradeInstance)();
+    }
+
+    /**
      * Loads the configuration from the actual configuration provider.
      *
      * After loading this method checks if the stored values need an upgrade
@@ -137,12 +152,14 @@ class Config
             $this->values = $this->castValues($this->values);
             $this->isConfigurationLoaded = true;
 
-            if (!empty($this->values[Config::configVersion])
-                && version_compare($this->values[Config::configVersion], Version, '<')
-                && !$this->isUpgrading
+            if (!$this->isUpgrading
             ) {
+//            if (!empty($this->values[Config::configVersion])
+//                && version_compare($this->values[Config::configVersion], Version, '<')
+//                && !$this->isUpgrading
+//            ) {
                 $this->isUpgrading = true;
-                ($this->getConfigUpgrade)()->upgrade($this->values[Config::configVersion]);
+                $this->getConfigUpgrade()->upgrade($this->values[Config::configVersion]);
                 $this->isUpgrading = false;
             }
         }
@@ -324,30 +341,6 @@ class Config
         $oldValue = $this->values[$key] ?? null;
         $this->values[$key] = $value;
         return $oldValue;
-    }
-
-    /**
-     * Returns information about the environment of this library.
-     *
-     * @return array
-     *   A keyed array with information about the environment of this library:
-     *   - 'baseUri'
-     *   - 'apiVersion'
-     *   - 'libraryVersion'
-     *   - 'moduleVersion'
-     *   - 'shopName'
-     *   - 'shopVersion'
-     *   - 'cmsName'
-     *   - 'cmsVersion'
-     *   - 'hostName'
-     *   - 'phpVersion'
-     *   - 'os'
-     *   - 'curlVersion'
-     *   - 'jsonVersion'
-     */
-    public function getEnvironment(): array
-    {
-        return $this->getSettingsByGroup('environment');
     }
 
     /**
@@ -591,17 +584,8 @@ class Config
      */
     protected function getHostName(): string
     {
-        if (!empty($_SERVER['REQUEST_URI'])) {
-            $hostName = parse_url($_SERVER['REQUEST_URI'], PHP_URL_HOST);
-        }
-        if (!empty($hostName)) {
-            if (($pos = strpos($hostName, 'www.')) !== false) {
-                $hostName = substr($hostName, $pos + strlen('www.'));
-            }
-        } else {
-            $hostName = 'example.com';
-        }
-        return $hostName;
+        $environment = $this->environment->get();
+        return $environment['hostName'];
     }
 
     /**
@@ -615,8 +599,6 @@ class Config
     protected function getKeyInfo(): ?array
     {
         if ($this->keyInfo === null) {
-            $curlVersion = curl_version();
-            $environment = $this->getShopCapabilities()->getShopEnvironment();
             $hostName = $this->getHostName();
             // remove TLD, like .com or .nl, from hostname.
             $pos = strrpos($hostName, '.');
@@ -639,71 +621,6 @@ class Config
                     'group' => 'config',
                     'type' => 'string',
                     'default' => '',
-                ],
-                'baseUri' => [
-                    'group' => 'environment',
-                    'type' => 'string',
-                    'default' => Api::baseUri,
-                ],
-                'apiVersion' => [
-                    'group' => 'environment',
-                    'type' => 'string',
-                    'default' => Api::apiVersion,
-                ],
-                'libraryVersion' => [
-                    'group' => 'environment',
-                    'type' => 'string',
-                    'default' => Version,
-                ],
-                'moduleVersion' => [
-                    'group' => 'environment',
-                    'type' => 'string',
-                    'default' => $environment['moduleVersion'],
-                ],
-                'shopName' => [
-                    'group' => 'environment',
-                    'type' => 'string',
-                    'default' => $environment['shopName'],
-                ],
-                'shopVersion' => [
-                    'group' => 'environment',
-                    'type' => 'string',
-                    'default' => $environment['shopVersion'],
-                ],
-                'cmsName' => [
-                    'group' => 'environment',
-                    'type' => 'string',
-                    'default' => $environment['cmsName'] ?? '',
-                ],
-                'cmsVersion' => [
-                    'group' => 'environment',
-                    'type' => 'string',
-                    'default' => $environment['cmsVersion'] ?? '',
-                ],
-                'hostName' => [
-                    'group' => 'environment',
-                    'type' => 'string',
-                    'default' => $this->getHostName(),
-                ],
-                'phpVersion' => [
-                    'group' => 'environment',
-                    'type' => 'string',
-                    'default' => phpversion(),
-                ],
-                'os' => [
-                    'group' => 'environment',
-                    'type' => 'string',
-                    'default' => php_uname(),
-                ],
-                'curlVersion' => [
-                    'group' => 'environment',
-                    'type' => 'string',
-                    'default' => "{$curlVersion['version']} (ssl: {$curlVersion['ssl_version']}; zlib: {$curlVersion['libz_version']})",
-                ],
-                'jsonVersion' => [
-                    'group' => 'environment',
-                    'type' => 'string',
-                    'default' => phpversion('json'),
                 ],
                 'debug' => [
                     'group' => 'plugin',

@@ -8,7 +8,7 @@
 namespace Siel\Acumulus\ApiClient;
 
 use Siel\Acumulus\Api;
-use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Helpers\Container;
 
 /**
@@ -30,8 +30,8 @@ use Siel\Acumulus\Helpers\Container;
  */
 class Acumulus
 {
-    /** @var \Siel\Acumulus\Config\Config */
-    protected /*Config*/ $config;
+    /** @var \Siel\Acumulus\Config\Environment */
+    protected /*Environment*/ $environment;
 
     /** @var \Siel\Acumulus\Helpers\Container */
     protected /*Container*/ $container;
@@ -40,11 +40,11 @@ class Acumulus
      * Constructor.
      *
      * @param \Siel\Acumulus\Helpers\Container $container
-     * @param \Siel\Acumulus\Config\Config $config
+     * @param \Siel\Acumulus\Config\Environment $environment
      */
-    public function __construct(Container $container, Config $config)
+    public function __construct(Container $container, Environment $environment)
     {
-        $this->config = $config;
+        $this->environment = $environment;
         $this->container = $container;
     }
 
@@ -766,7 +766,7 @@ class Acumulus
      */
     protected function constructUri(string $apiFunction): string
     {
-        $environment = $this->config->getEnvironment();
+        $environment = $this->environment->get();
         return $environment['baseUri'] . '/' . $environment['apiVersion'] . '/' . $apiFunction . '.php';
     }
 

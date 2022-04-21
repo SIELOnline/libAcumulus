@@ -1,45 +1,48 @@
 <?php
 namespace Siel\Acumulus\Joomla\Config;
 
-use JRoute;
+use JFactory;
 use JTable;
 use JTableExtension;
-use JUri;
 use Siel\Acumulus\Config\Environment as EnvironmentBase;
 
 /**
- * Defines common Joomla capabilities for web shops running on Joomla.
+ * Defines common Joomla environment values for web shops running on Joomla.
  */
 class Environment extends EnvironmentBase
 {
     /**
      * {@inheritdoc}
      */
-    public function getShopEnvironment(): array
+    public function setShopEnvironment(): void
     {
         /** @var JTableExtension $extension */
         $extension = JTable::getInstance('extension');
 
         $id = $extension->find(['element' => 'com_acumulus', 'type' => 'component']);
-        $extension->load($id);
-        /** @noinspection PhpUndefinedFieldInspection */
-        $componentInfo = json_decode($extension->manifest_cache, true);
-        $moduleVersion = $componentInfo['version'];
+        if (!empty($id)) {
+            if ($extension->load($id)) {
+                /** @noinspection PhpUndefinedFieldInspection */
+                $componentInfo = json_decode($extension->manifest_cache, true);
+                $this->data['moduleVersion'] = $componentInfo['version'];
+            }
+        }
 
-        $id = $extension->find(['element' => 'com_' . strtolower($this->shopName), 'type' => 'component']);
-        $extension->load($id);
-        /** @noinspection PhpUndefinedFieldInspection */
-        $componentInfo = json_decode($extension->manifest_cache, true);
-        $shopVersion = $componentInfo['version'];
+        $id = $extension->find(['element' => 'com_' . strtolower($this->data['shopName']), 'type' => 'component']);
+        if (!empty($id)) {
+            if ($extension->load($id)) {
+                /** @noinspection PhpUndefinedFieldInspection */
+                $componentInfo = json_decode($extension->manifest_cache, true);
+                $this->data['shopVersion'] = $componentInfo['version'];
+            }
+        }
 
-        $joomlaVersion = JVERSION;
+        $this->data['cmsName'] = 'Joomla';
+        $this->data['cmsVersion'] = JVERSION;
+    }
 
-        return [
-            'moduleVersion' => $moduleVersion,
-            'shopName' => $this->shopName,
-            'shopVersion' => $shopVersion,
-            'cmsName' => 'Joomla',
-            'cmsVersion' => $joomlaVersion,
-        ];
+    protected function executeQuery(string $query): array
+    {
+        return JFactory::getDbo()->setQuery($query)->loadAssocList();
     }
 }

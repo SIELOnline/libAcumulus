@@ -74,7 +74,7 @@ class Creator extends BaseCreator
     /**
      * {@inheritdoc}
      */
-    protected function getItemLines()
+    protected function getItemLines(): array
     {
         // @todo: override or implement both addItemLinesOrder() and addItemLinesCreditNote()
         $result = [];
@@ -94,7 +94,7 @@ class Creator extends BaseCreator
      *
      * @return array
      */
-    protected function getItemLine($item)
+    protected function getItemLine($item): array
     {
         $result = [];
 
@@ -153,7 +153,7 @@ class Creator extends BaseCreator
     /**
      * {@inheritdoc}
      */
-    protected function getShippingLine()
+    protected function getShippingLine(): array
     {
         $result = [];
 
@@ -181,7 +181,7 @@ class Creator extends BaseCreator
      *     followed.
      *   Keys are optional, but the more keys you can fill, the better.
      */
-    protected function getVatRateLookupMetadata()
+    protected function getVatRateLookupMetadata(): array
     {
         // @todo: implement if you can't provide exact vat rates, while you may
         //   have a way to look it up, e.g via the current Product object.

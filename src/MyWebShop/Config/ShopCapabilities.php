@@ -11,7 +11,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * @inheritDoc
      */
-    protected function getTokenInfoSource()
+    protected function getTokenInfoSource(): array
     {
         // @todo: fill in the common properties of your order and refund class.
         // @todo: If MyWebShop does not support refunds, fill in the properties of your Order class.
@@ -37,7 +37,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * @inheritDoc
      */
-    protected function getTokenInfoRefund()
+    protected function getTokenInfoRefund(): array
     {
         // @todo: fill in the properties that are unique to your Refund class (i.e. do not appear in orders),
         // @todo: remove if MyWebShop does not support refunds.
@@ -59,7 +59,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * @inheritDoc
      */
-    protected function getTokenInfoOrder()
+    protected function getTokenInfoOrder(): array
     {
         // @todo: fill in the properties that are unique to your Order class (i.e. do not appear in refunds),
         // @todo: remove if MyWebShop does not support refunds.
@@ -86,7 +86,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * @inheritDoc
      */
-    protected function getTokenInfoShopProperties()
+    protected function getTokenInfoShopProperties(): array
     {
         // @todo: define the properties of other objects that may be used to fetch info from.
         // @todo: ensure that your Creator class calls addPropertySource() to all properties defined here.
@@ -185,7 +185,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getShopDefaults()
+    public function getShopDefaults(): array
     {
         // @todo: fill in the appropriate property names, remove a line when no appropriate default exists.
         // @todo: ensure that all these objects are defined in the method getTokenInfoShopProperties() above.
@@ -225,9 +225,9 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getShopOrderStatuses()
+    public function getShopOrderStatuses(): array
     {
-        // @todo: adapt to MyWebshop's way of retrieving the list of order statuses.
+        // @todo: adapt to MyWebShop's way of retrieving the list of order statuses.
         $statuses = OrderState::getOrderStates($this->translator->getLanguage());
         $result = [];
         foreach ($statuses as $status) {
@@ -239,9 +239,9 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getPaymentMethods()
+    public function getPaymentMethods(): array
     {
-        // @todo: adapt to MyWebshop's way of retrieving the list of (active) payment methods.
+        // @todo: adapt to MyWebShop's way of retrieving the list of (active) payment methods.
         $paymentModules = PaymentModule::getInstalledPaymentModules();
         $result = [];
         foreach($paymentModules as $paymentModule)
@@ -252,9 +252,9 @@ class ShopCapabilities extends ShopCapabilitiesBase
         return $result;
     }
 
-    public function getVatClasses()
+    public function getVatClasses(): array
     {
-        // @todo: adapt to MyWebshop's way of retrieving the list of (active) tax classes.
+        // @todo: adapt to MyWebShop's way of retrieving the list of (active) tax classes.
         $result = [];
         $taxClasses = TaxRulesGroup::getTaxRulesGroups();
         foreach ($taxClasses as $taxClass) {
@@ -266,9 +266,9 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getLink($linkType)
+    public function getLink($linkType): string
     {
-        // @todo: adapt to MyWebshop's way of creating links.
+        // @todo: adapt to MyWebShop's way of creating links.
         switch ($linkType) {
             case 'config':
                 return Context::getContext()->link->getAdminLink('AdminModules', true, [], ['configure' => 'acumulus']);

@@ -66,7 +66,7 @@ class Source extends BaseSource
      */
     public function getReference()
     {
-        // @todo: override if MyWebshop assigns a separate reference number or string to its orders or credit notes, otherwise remove.
+        // @todo: override if MyWebShop assigns a separate reference number or string to its orders or credit notes, otherwise remove.
     }
 
     /**
@@ -127,7 +127,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    public function getCountryCode()
+    public function getCountryCode(): string
     {
         // @todo
     }
@@ -138,21 +138,21 @@ class Source extends BaseSource
      * MyWebShop stores the internal currency id, so look up the currency
      * object first then extract the ISO code for it.
      */
-    public function getCurrency()
+    public function getCurrency(): array
     {
         // @todo
-        $result = array (
+        $result = [
             Meta::Currency => $this->source->currency_code,
             Meta::CurrencyRate => (float) $this->source->conversion_rate,
             Meta::CurrencyDoConvert => true,
-        );
+        ];
         return $result;
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function getAvailableTotals()
+    protected function getAvailableTotals(): array
     {
         // @todo
     }

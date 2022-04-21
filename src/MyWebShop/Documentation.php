@@ -14,14 +14,14 @@
  *   SielAcumulusAutoloader.php and calls the
  *   SielAcumulusAutoloader::register() function.
  * - Add uninstall code that removes the acumulus entry table.
- * - Complete {@see Siel\Acumulus\MyWebshop\Helpers\Log}.
- * - Complete {@see Siel\Acumulus\MyWebshop\Helpers\Mailer}.
- * - Complete {@see Siel\Acumulus\MyWebshop\Config\ConfigStore}.
- * - Complete {@see Siel\Acumulus\MyWebshop\Config\Environment}
- * - Complete {@see Siel\Acumulus\MyWebshop\Config\ShopCapabilities}
+ * - Complete {@see Siel\Acumulus\MyWebShop\Helpers\Log}.
+ * - Complete {@see Siel\Acumulus\MyWebShop\Helpers\Mailer}.
+ * - Complete {@see Siel\Acumulus\MyWebShop\Config\ConfigStore}.
+ * - Complete {@see Siel\Acumulus\MyWebShop\Config\Environment}
+ * - Complete {@see Siel\Acumulus\MyWebShop\Config\ShopCapabilities}
  *   (getTokenInfo() may be deferred until later).
- * - Choose between {@see Siel\Acumulus\MyWebshop\Helpers\FormMapper} and
- *   {@see Siel\Acumulus\MyWebshop\Helpers\FormRenderer}. A FormMapper is
+ * - Choose between {@see Siel\Acumulus\MyWebShop\Helpers\FormMapper} and
+ *   {@see Siel\Acumulus\MyWebShop\Helpers\FormRenderer}. A FormMapper is
  *   preferred, but your shop needs something like a Form API.
  * - Complete the FormMapper, if chosen. note: the FormRenderer will basically
  *   do its job without any changes made by you. Moreover, it is easier to adapt
@@ -69,11 +69,11 @@
  * should work, but submitting a correctly filled in form will give errors.
  *
  * You should now continue with the invoice handling and sending parts:
- * - Complete {@see Siel\Acumulus\MyWebshop\Shop\AcumulusEntry}.
- * - Complete {@see Siel\Acumulus\MyWebshop\Shop\AcumulusEntryManager}.
- * - Complete {@see Siel\Acumulus\MyWebshop\Shop\InvoiceManager}.
- * - Complete {@see Siel\Acumulus\MyWebshop\Invoice\Source}.
- * - Complete {@see Siel\Acumulus\MyWebshop\Invoice\Creator}.
+ * - Complete {@see Siel\Acumulus\MyWebShop\Shop\AcumulusEntry}.
+ * - Complete {@see Siel\Acumulus\MyWebShop\Shop\AcumulusEntryManager}.
+ * - Complete {@see Siel\Acumulus\MyWebShop\Shop\InvoiceManager}.
+ * - Complete {@see Siel\Acumulus\MyWebShop\Invoice\Source}.
+ * - Complete {@see Siel\Acumulus\MyWebShop\Invoice\Creator}.
  * - You will now know what objects should be documented in
  *   ShopCapabilities::getTokenInfo(), so correct that method now as well.
  *

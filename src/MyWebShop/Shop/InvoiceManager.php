@@ -11,14 +11,14 @@ use Siel\Acumulus\Invoice\InvoiceAddResult;
  * Implements the MyWebShop specific parts of the invoice manager.
  *
  * @todo:
- * - Define the connection between this library and MyWebshop's database
+ * - Define the connection between this library and MyWebShop's database
  *   (e.g. OpenCart, PrestaShop) or model architecture (e.g. Magento).
  * - Implement the retrieval methods getInvoiceSourcesByIdRange(),
  *   getInvoiceSourcesByReferenceRange() and getInvoiceSourcesByDateRange().
  *   The 2nd one, only when MyWebShop has references that differ from the
  *   (internal) ID.
  * - Implement the methods triggerInvoiceCreated(), triggerInvoiceSendBefore(),
- *   and triggerInvoiceSendAfter(). NOTE: follow MyWebshop's naming practices
+ *   and triggerInvoiceSendAfter(). NOTE: follow MyWebShop's naming practices
  *   regarding events.
  *
  * SECURITY REMARKS
@@ -40,13 +40,17 @@ class InvoiceManager extends BaseInvoiceManager
     public function __construct(Container $container)
     {
         parent::__construct($container);
-        // @todo: Define the connection between this library and MyWebshop's database (e.g. OpenCart, PrestaShop) or model architecture (e.g. Magento).
+        // @todo: Define the connection between this library and MyWebShop's database (e.g. OpenCart, PrestaShop) or model architecture (e.g. Magento).
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getInvoiceSourcesByIdRange(string $invoiceSourceType, string $InvoiceSourceIdFrom, string $InvoiceSourceIdTo)
+    public function getInvoiceSourcesByIdRange(
+        string $invoiceSourceType,
+        string $InvoiceSourceIdFrom,
+        string $InvoiceSourceIdTo
+    ): array
     {
         // @todo
     }
@@ -54,7 +58,11 @@ class InvoiceManager extends BaseInvoiceManager
     /**
      * {@inheritdoc}
      */
-    public function getInvoiceSourcesByReferenceRange(string $invoiceSourceType, string $invoiceSourceReferenceFrom, string $invoiceSourceReferenceTo)
+    public function getInvoiceSourcesByReferenceRange(
+        string $invoiceSourceType,
+        string $invoiceSourceReferenceFrom,
+        string $invoiceSourceReferenceTo
+    ): array
     {
         // @todo: implement if MyWebShop has order/refund references (external facing) that differ from the (internal) ID. Otherwise remove this method.
     }
@@ -62,7 +70,7 @@ class InvoiceManager extends BaseInvoiceManager
     /**
      * {@inheritdoc}
      */
-    public function getInvoiceSourcesByDateRange(string $invoiceSourceType, DateTime $dateFrom, DateTime $dateTo)
+    public function getInvoiceSourcesByDateRange(string $invoiceSourceType, DateTime $dateFrom, DateTime $dateTo): array
     {
         // @todo
     }

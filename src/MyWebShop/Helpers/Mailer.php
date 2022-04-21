@@ -13,7 +13,7 @@ class Mailer extends BaseMailer
      */
     public function sendMail(string $from, string $fromName, $to, $subject, $bodyText, $bodyHtml)
     {
-        // @todo: adapt to MyWebshop's way of creating a mailer, a "mail object", and having the "mail object" sent by the mailer.
+        // @todo: adapt to MyWebShop's way of creating a mailer, a "mail object", and having the "mail object" sent by the mailer.
         $result = Mail::Send($this->translator->getLanguage(), $from, $fromName, $subject, $to, $bodyHtml);
         // @todo: if necessary, cast the result to a bool indicating success.
         return $result;
@@ -22,18 +22,18 @@ class Mailer extends BaseMailer
     /**
      * {@inheritdoc}
      */
-    protected function getFrom()
+    protected function getFrom(): string
     {
-        // @todo: adapt to MyWebshop's way of getting the from email address to use.
+        // @todo: adapt to MyWebShop's way of getting the from email address to use.
         return Configuration::get('SHOP_EMAIL');
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function getFromName()
+    protected function getFromName(): string
     {
-        // @todo: adapt to MyWebshop's way of getting the webshop name.
+        // @todo: adapt to MyWebShop's way of getting the webshop name.
         return Configuration::get('SHOP_NAME');
     }
 }

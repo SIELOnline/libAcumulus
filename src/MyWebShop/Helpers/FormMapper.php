@@ -7,14 +7,14 @@ use Siel\Acumulus\Helpers\FormMapper as BaseFormMapper;
 /**
  * FormMapper maps an Acumulus form definition to a MyWebShop form definition.
  *
- * @todo: delete ths file if MyWebshop does not provide its own form subsystem,use a FormRenderer in that case.
+ * @todo: delete ths file if MyWebShop does not provide its own form subsystem,use a FormRenderer in that case.
  *
  * You may want to have a look at how the PrestaShop or Magneto mapper do
  * their work. The PrestaShop mapper has to return an array of field
  * definitions, while the Magento mapper gets a Magento Form object to which is
  * has to add the fields.
  *
- * However, whatever MyWebshop expects, you probably best follow the top-down
+ * However, whatever MyWebShop expects, you probably best follow the top-down
  * approach by:
  * * keeping and adapting the fields() and field() methods
  * * creating a method per (group of) form field type(s), like e.g. fieldset(),
@@ -27,7 +27,7 @@ class FormMapper extends BaseFormMapper
      */
     public function map(Form $form)
     {
-        // @todo: adapt to the way MyWebshop wants you to create a form.
+        // @todo: adapt to the way MyWebShop wants you to create a form.
         return $this->fields($form->getFields());
     }
 
@@ -38,9 +38,9 @@ class FormMapper extends BaseFormMapper
      *
      * @return array[]
      */
-    protected function fields(array $fields)
+    protected function fields(array $fields): array
     {
-        // @todo: adapt to the way MyWebshop wants you to create a form,
+        // @todo: adapt to the way MyWebShop wants you to create a form,
         //  e.g. adding the Form object as parameter, or creating and returning
         //  a Form object.
         $result = [];
@@ -64,9 +64,9 @@ class FormMapper extends BaseFormMapper
      *
      * @return array
      */
-    protected function field(array $field)
+    protected function field(array $field): array
     {
-        // @todo: adapt to the way MyWebshop wants you to create a form,
+        // @todo: adapt to the way MyWebShop wants you to create a form,
         //  e.g. adding the Form object as parameter, or creating and returning
         //  a FormField object.
         if ($field['type'] === 'fieldset') {
@@ -86,11 +86,11 @@ class FormMapper extends BaseFormMapper
      * @return array[]
      *   A MyWebShop fieldset definition, including its fields.
      */
-    protected function fieldset(array $field)
+    protected function fieldset(array $field): array
     {
         $result = [];
 
-        // @todo: adapt to the way MyWebshop wants you to define a fieldset.
+        // @todo: adapt to the way MyWebShop wants you to define a fieldset.
 
         return $result;
     }
@@ -104,11 +104,11 @@ class FormMapper extends BaseFormMapper
      * @return array
      *   A MyWebShop form field definition.
      */
-    protected function element(array $field)
+    protected function element(array $field): array
     {
         $result = [];
 
-        // @todo: adapt to the way MyWebshop wants you to define a simple form field.
+        // @todo: adapt to the way MyWebShop wants you to define a simple form field.
 
         return $result;
     }

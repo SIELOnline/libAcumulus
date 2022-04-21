@@ -6,10 +6,10 @@ use Siel\Acumulus\Helpers\FormRenderer as BaseFormRenderer;
 /**
  * FormRenderer renders an Acumulus form definition like a MyWebShop form.
  *
- * @todo: delete ths file if MyWebshop provides its own form subsystem,
+ * @todo: delete ths file if MyWebShop provides its own form subsystem,
  *   use a FormMapper in that case.
  * @todo: setting all the properties might not be enough to get a form that
- *  looks like the other forms in MyWebshop. In that case you probably have
+ *  looks like the other forms in MyWebShop. In that case you probably have
  *  to change the generated html. If so, override the necessary methods.
  *
  * Note: beware of possible security issues:
@@ -24,7 +24,7 @@ class FormRenderer extends BaseFormRenderer
      */
     public function __construct()
     {
-        // @todo: define if MyWebshop's templating system renders html5.
+        // @todo: define if MyWebShop's templating system renders html5.
         $this->html5 = true;
 
         // @todo: define tags and classes to use around form elements like a fieldset, details, legend, summary, label, input, radio button input, select and description.

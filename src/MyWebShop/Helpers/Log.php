@@ -7,7 +7,7 @@ use Siel\Acumulus\Helpers\Severity;
 /**
  * Extends the base log class to log any library logging to the MyWebShop log.
  *
- * Most overrides log to an Acumulus specific log file. If MyWebshop
+ * Most overrides log to an Acumulus specific log file. If MyWebShop
  * supports so as well, prefer that. Otherwise, you may want to add 'Acumulus'
  * (and the library version) to the message to log.
  */
@@ -21,7 +21,7 @@ class Log extends BaseLog
      */
     protected function write(string $message, int $severity)
     {
-        // @todo: adapt to MyWebshop's way of logging.
+        // @todo: adapt to MyWebShop's way of logging.
         // @todo: If you do not log to a separate Acumulus log file, you may want to add 'Acumulus' (and the library version) to the message to log.
         $logger = $this->getLogger();
         $logger->log($message, $this->getMyWebShopSeverity($severity));
@@ -36,7 +36,7 @@ class Log extends BaseLog
      * @return int
      *   The MyWebShop equivalent of the severity.
      */
-    protected function getMyWebShopSeverity($severity)
+    protected function getMyWebShopSeverity(int $severity): int
     {
         switch ($severity) {
             case Severity::Error:

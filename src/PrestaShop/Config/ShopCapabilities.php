@@ -16,20 +16,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getShopEnvironment(): array
-    {
-        $environment = [
-            //'moduleVersion' => Acumulus::$module_version,
-            'moduleVersion' => Module::getInstanceByName('acumulus')->version,
-            'shopName' => $this->shopName,
-            'shopVersion' => _PS_VERSION_,
-        ];
-        return $environment;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     protected function getTokenInfoSource(): array
     {
         $source = [

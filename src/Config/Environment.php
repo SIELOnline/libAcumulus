@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\Config;
 
+use RuntimeException;
 use Siel\Acumulus\Api;
 
 use const Siel\Acumulus\Version;
@@ -102,7 +103,10 @@ abstract class Environment
      *
      * @return array[]
      */
-    abstract protected function executeQuery(string $query): array;
+    protected function executeQuery(string $query): array
+    {
+        throw new RuntimeException(__METHOD__ . ' not implemented');
+    }
 
     /**
      * Returns information about the environment of this plugin.

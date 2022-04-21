@@ -1,7 +1,6 @@
 <?php
 namespace Siel\Acumulus\WooCommerce\Config;
 
-use Acumulus;
 use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
 use Siel\Acumulus\Config\Config;
 use WC_Tax;
@@ -11,24 +10,6 @@ use WC_Tax;
  */
 class ShopCapabilities extends ShopCapabilitiesBase
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getShopEnvironment(): array
-    {
-        global $wp_version, $woocommerce;
-        /** @var \WooCommerce $woocommerce */
-      return [
-          // Lazy load is no longer needed (as in L3) as this method will only be
-          // called when the config gets actually queried.
-          'moduleVersion' => Acumulus::create()->getVersionNumber(),
-          'shopName' => $this->shopName,
-          'shopVersion' => isset($woocommerce) ? $woocommerce->version : 'unknown',
-          'cmsName' => 'WordPress',
-          'cmsVersion' => $wp_version,
-      ];
-    }
-
     /**
      * {@inheritdoc}
      */

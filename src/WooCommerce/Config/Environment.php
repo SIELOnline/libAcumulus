@@ -35,5 +35,4 @@ class Environment extends EnvironmentBase
         $variables['version'] = WP_Debug_Data::get_mysql_var('version');
         return $variables;
     }
-
 }

@@ -39,20 +39,6 @@ abstract class ShopCapabilities
     }
 
     /**
-     * Returns an array with shop specific environment settings.
-     *
-     * @return array
-     *   An array with keys:
-     *   - moduleVersion: Version of the module (not the library, though it may
-     *       simply follow the library).
-     *   - shopName: Name of the shop to use in support requests.
-     *   - shopVersion: Version of the web shop software. If embedded in a CMS,
-     *       it should also contain the name and version of the CMS between
-     *       brackets.
-     */
-    abstract public function getShopEnvironment(): array;
-
-    /**
      * Returns an array with shop specific configuration defaults.
      *
      * Any key defined in {@see ShopCapabilities::getKeyInfo()} that can be

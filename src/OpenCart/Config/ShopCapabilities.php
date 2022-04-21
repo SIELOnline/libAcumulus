@@ -6,26 +6,12 @@ use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
-use const Siel\Acumulus\Version;
 
 /**
  * Defines the OpenCart web shop specific capabilities.
  */
 class ShopCapabilities extends ShopCapabilitiesBase
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getShopEnvironment(): array
-    {
-        return [
-            // Module has same version as library.
-            'moduleVersion' => Version,
-            'shopName' => $this->shopName,
-            'shopVersion' => VERSION,
-        ];
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -285,10 +271,9 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     public function getShopOrderStatuses(): array
     {
-        $registry = $this->getRegistry();
-        /** @noinspection PhpUnhandledExceptionInspection */
-        $registry->load->model('localisation/order_status');
-        $statuses = $registry->model_localisation_order_status->getOrderStatuses();
+        /** @var \ModelLocalisationOrderStatus $model */
+        $model = $this->getRegistry()->getModel('localisation/order_status');
+        $statuses = $model->getOrderStatuses();
         $result = [];
         foreach ($statuses as $status) {
             [$optionValue, $optionText] = array_values($status);
@@ -355,9 +340,8 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function getVatClasses(): array
     {
         $result = [];
-        $registry = $this->getRegistry();
         /** @var \ModelLocalisationTaxClass $model */
-        $model = $registry->getModel('localisation/tax_class');
+        $model = $this->getRegistry()->getModel('localisation/tax_class');
         $taxClasses = $model->getTaxClasses();
         foreach ($taxClasses as $taxClass) {
             $result[$taxClass['tax_class_id']] = $taxClass['title'];

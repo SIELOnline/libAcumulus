@@ -4,19 +4,20 @@
  * The MyWebShop namespace contains template/example code for developers who
  * wish to create an Acumulus extension for another WebShop.
  *
- * Things to do when developing an extension for another webshop:
- * - Rename the namespace MyWebShop to your webshop's name.
- * - Create an empty module according to the rules of your webshop.
- * - Add libAcumulus to your webshop, as a separate library or within the
+ * Things to do when developing an extension for another web shop:
+ * - Rename the namespace MyWebShop to your web shop's name.
+ * - Create an empty module according to the rules of your web shop.
+ * - Add libAcumulus to your web shop, as a separate library or within the
  *   module.
  * - Have the namespace registered for autoloading. Via composer, if used by
- *   your webshop, or by some initializing code in your module that includes
+ *   your web shop, or by some initializing code in your module that includes
  *   SielAcumulusAutoloader.php and calls the
  *   SielAcumulusAutoloader::register() function.
  * - Add uninstall code that removes the acumulus entry table.
  * - Complete {@see Siel\Acumulus\MyWebshop\Helpers\Log}.
  * - Complete {@see Siel\Acumulus\MyWebshop\Helpers\Mailer}.
  * - Complete {@see Siel\Acumulus\MyWebshop\Config\ConfigStore}.
+ * - Complete {@see Siel\Acumulus\MyWebshop\Config\Environment}
  * - Complete {@see Siel\Acumulus\MyWebshop\Config\ShopCapabilities}
  *   (getTokenInfo() may be deferred until later).
  * - Choose between {@see Siel\Acumulus\MyWebshop\Helpers\FormMapper} and
@@ -29,14 +30,14 @@
  * - In your module's code, create menu-items, routes and/or controllers for the
  *   3 forms of this module: config, advanced config and batch. Basically these
  *   controllers should initialise the Container, get a form from it, and have
- *   it processed. Example code is not in this library but in the Webshop
+ *   it processed. Example code is not in this library but in the web shop
  *   specific module parts for existing modules, these can all be found on
- *   github on https://github.com/SIELOnline.
- * - If your webshop provides something like a form token to protect against
- *   CSRF attacks, handle it in the webshop specific part. Handling consists of
+ *   GitHub on https://github.com/SIELOnline.
+ * - If your web shop provides something like a form token to protect against
+ *   CSRF attacks, handle it in the web shop specific part. Handling consists of
  *   rendering it in your views and checking it in your controllers.
- * - Add install/enable code that creates the acumulus entry table. If your
- *   webshop expects separate (sql) scripts for this, add it over there, if not,
+ * - Add install/enable code that creates the acumulus entry table. If your web
+ *   shop expects separate (sql) scripts for this, add it over there, if not,
  *   have the module's install method/function initialize the Container, get the
  *   AcumulusEntryManager from it, and call the
  *   {@see Siel\Acumulus\MyWebShop\Shop\AcumulusEntryManager::install()} method.
@@ -48,9 +49,9 @@
  * table crated. After enabling the module you should also be able to go to the
  * config and advanced config form now.
  *
- * - If you have the config form on your screen and you have chosen to use a
+ * - If you have the config form on your screen, and you have chosen to use a
  *   FormRenderer, you can now set properties and, where necessary, override
- *   methods to get the form to display as the other forms in your webshop's
+ *   methods to get the form to display as the other forms in your web shop's
  *   backend.
  * - Whether you use the FormRenderer or FormMapper, you might need some
  *   additional css, to get it all perfect. If so, create a css file and have it
@@ -64,7 +65,7 @@
  *
  * You should have a "working" module now that can create and drop the table on
  * install resp. uninstall and that has 2 working forms, including saving config
- * to your webshop's config store. The batch form should display and validation
+ * to your web shop's config store. The batch form should display and validation
  * should work, but submitting a correctly filled in form will give errors.
  *
  * You should now continue with the invoice handling and sending parts:
@@ -98,14 +99,14 @@
  *     - Siel\Acumulus\Shop\InvoiceManager::invoiceSend()
  *
  * This should conclude the development of an Acumulus extension for your
- * webshop based on this library. Any questions, support and suggestions
+ * web shop based on this library. Any questions, support and suggestions
  * can be directed at support at burorader dot com.
  *
  * A final note
  * ------------
- * If you are proficient with developing modules for the webshop you want to
+ * If you are proficient with developing modules for the web shop you want to
  * implement the Acumulus module for, you may implement the forms fully in the
- * webshop specific part and use this library only for creating and sending
+ * web shop specific part and use this library only for creating and sending
  * invoices to Acumulus. In this case you may skip all above steps regarding the
  * FormMapper, FormRenderer and overriding Forms. The step regarding
  * ShopCapabilities::getTokenInfo() is normally still needed in your own

@@ -152,12 +152,10 @@ class Config
             $this->values = $this->castValues($this->values);
             $this->isConfigurationLoaded = true;
 
-            if (!$this->isUpgrading
+            if (!empty($this->values[Config::configVersion])
+                && version_compare($this->values[Config::configVersion], Version, '<')
+                && !$this->isUpgrading
             ) {
-//            if (!empty($this->values[Config::configVersion])
-//                && version_compare($this->values[Config::configVersion], Version, '<')
-//                && !$this->isUpgrading
-//            ) {
                 $this->isUpgrading = true;
                 $this->getConfigUpgrade()->upgrade($this->values[Config::configVersion]);
                 $this->isUpgrading = false;
@@ -529,11 +527,7 @@ class Config
      */
     public function getKeys(): array
     {
-        $result = $this->getKeyInfo();
-        array_filter($result, function ($item) {
-            return $item['group'] !== 'environment';
-        });
-        return array_keys($result);
+        return array_keys($this->getKeyInfo());
     }
 
     /**

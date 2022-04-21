@@ -9,22 +9,6 @@ use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
 class ShopCapabilities extends ShopCapabilitiesBase
 {
     /**
-     * {@inheritdoc}
-     */
-    public function getShopEnvironment()
-    {
-        // @todo: adapt by retrieving your module, webshop, and - optionally - CMS version.
-        $environment = [
-            'moduleVersion' => 'todo',
-            'shopName' => 'MyWebShop',
-            'shopVersion' => 'todo',
-            'cmsName' => 'MyCms',
-            'cmsVersion' => 'todo',
-        ];
-        return $environment;
-    }
-
-    /**
      * @inheritDoc
      */
     protected function getTokenInfoSource()

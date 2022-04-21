@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\TestWebShop\Config;
 
+use mysqli;
 use Siel\Acumulus\Config\Environment as EnvironmentBase;
 
 use const Siel\Acumulus\Version;
@@ -27,7 +28,7 @@ class Environment extends EnvironmentBase
     protected function executeQuery(string $query): array
     {
         $parameters = $this->loadConfig();
-        $mysqli = new \mysqli($parameters->hostName, $parameters->user, $parameters->password);
+        $mysqli = new mysqli($parameters->hostName, $parameters->user, $parameters->password);
         return $mysqli->query($query)->fetch_all();
     }
 

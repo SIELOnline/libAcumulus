@@ -1,8 +1,6 @@
 <?php
 namespace Siel\Acumulus\Magento\Config;
 
-use Exception;
-use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\UrlInterface;
 use Magento\Framework\View\Asset\Repository as AssetRepository;
 use Magento\Sales\Model\ResourceModel\Status\Collection as OrderStatusCollection;
@@ -208,29 +206,6 @@ class ShopCapabilities extends ShopCapabilitiesBase
         'comments',
         'extensionAttributes',
     ];
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getShopEnvironment(): array
-    {
-        /** @var \Magento\Framework\App\ProductMetadataInterface $productMetadata */
-        $productMetadata = Registry::getInstance()->get(ProductMetadataInterface::class);
-        try {
-            $version = $productMetadata->getVersion();
-        } catch (Exception $e) {
-            // In CLI mode (php bin/magento ...) getVersion() throws an
-            // exception.
-            $version = 'UNKNOWN';
-        }
-
-        return [
-            'moduleVersion' => Registry::getInstance()->getModuleVersion('Siel_AcumulusMa2'),
-            'schemaVersion' => Registry::getInstance()->getSchemaVersion('Siel_AcumulusMa2'),
-            'shopName' => $this->shopName,
-            'shopVersion' => $version,
-        ];
-    }
 
     /**
      * {@inheritdoc}

@@ -29,7 +29,7 @@ class RegisterForm extends Form
     /**
      * @var array
      *   The response structure of a successful sign-up call,
-     *   {@see https://www.siel.nl/acumulus/API/Sign_Up/Sign_Up/} for more
+     *   {@link https://www.siel.nl/acumulus/API/Sign_Up/Sign_Up/} for more
      *   details.
      */
     protected $signUpResponse;
@@ -161,7 +161,7 @@ class RegisterForm extends Form
      *   - 'contractenddate'
      *   - 'contractapiuserloginname'
      *   - 'contractapiuserpassword'
-     *   {@see https://www.siel.nl/acumulus/API/Sign_Up/Sign_Up/} for more
+     *   {@link https://www.siel.nl/acumulus/API/Sign_Up/Sign_Up/} for more
      *   details.
      *
      * @return bool

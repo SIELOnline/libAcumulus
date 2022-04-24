@@ -19,8 +19,8 @@ use Siel\Acumulus\Helpers\Container;
  * specific interfaces can be more rapidly developed.
  *
  * More info:
- * - {@see https://www.siel.nl/acumulus/API/}
- * - {@see http://www.siel.nl/acumulus/koppelingen/}
+ * - {@link https://www.siel.nl/acumulus/API/}
+ * - {@link https://www.siel.nl/acumulus/koppelingen/}
  *
  * The ApiClient API call wrappers return their information as a keyed array,
  * which is a simplified version of the call specific part of the response
@@ -51,7 +51,7 @@ class Acumulus
     /**
      * Retrieves the "about information".
      *
-     * See {@see https://www.siel.nl/acumulus/API/Misc/About/}.
+     * See {@link https://www.siel.nl/acumulus/API/Misc/About/}.
  *
 
      * @return \Siel\Acumulus\ApiClient\AcumulusResult
@@ -79,7 +79,7 @@ class Acumulus
     /**
      * Retrieves the "My Acumulus" information.
      *
-     * See {@see https://www.siel.nl/acumulus/API/Misc/My_Acumulus/}
+     * See {@link https://www.siel.nl/acumulus/API/Misc/My_Acumulus/}
      *
      * @return \Siel\Acumulus\ApiClient\AcumulusResult
      *   The result of the webservice call. The structured response will contain
@@ -118,7 +118,7 @@ class Acumulus
      *   Whether to retrieve enabled (true, default) or disabled (false)
      *   accounts.
      *
-     * See {@see https://www.siel.nl/acumulus/API/Accounts/List_Accounts/}
+     * See {@link https://www.siel.nl/acumulus/API/Accounts/List_Accounts/}
      *
      * @return \Siel\Acumulus\ApiClient\AcumulusResult
      *   The result of the webservice call. The structured response will contain
@@ -142,7 +142,7 @@ class Acumulus
     /**
      * Retrieves a list of invoice templates.
      *
-     * See {@see https://www.siel.nl/acumulus/API/Picklists/Company_Types/}.
+     * See {@link https://www.siel.nl/acumulus/API/Picklists/Company_Types/}.
      *
      * @return \Siel\Acumulus\ApiClient\AcumulusResult
      *   The result of the webservice call. The structured response will contain
@@ -160,7 +160,7 @@ class Acumulus
     /**
      * Retrieves a list of contact types.
      *
-     * See {@see https://www.siel.nl/acumulus/API/Picklists/Contact_Types/}.
+     * See {@link https://www.siel.nl/acumulus/API/Picklists/Contact_Types/}.
      *
      * @return \Siel\Acumulus\ApiClient\AcumulusResult
      *   The result of the webservice call. The structured response will contain
@@ -177,7 +177,7 @@ class Acumulus
     /**
      * Retrieves a list of cost centers.
      *
-     * See {@see https://www.siel.nl/acumulus/API/Picklists/Cost_Centers/}
+     * See {@link https://www.siel.nl/acumulus/API/Picklists/Cost_Centers/}
      *
      * @return \Siel\Acumulus\ApiClient\AcumulusResult
      *   The result of the webservice call. The structured response will contain
@@ -194,7 +194,7 @@ class Acumulus
     /**
      * Retrieves a list of invoice templates.
      *
-     * See {@see https://www.siel.nl/acumulus/API/Invoicing/Invoice_Templates/}
+     * See {@link https://www.siel.nl/acumulus/API/Invoicing/Invoice_Templates/}
      *
      * @return \Siel\Acumulus\ApiClient\AcumulusResult
      *   The result of the webservice call. The structured response will contain
@@ -211,7 +211,7 @@ class Acumulus
     /**
      * Retrieves a list of products.
      *
-     * See {@see https://www.siel.nl/acumulus/API/Products/List_Products/}
+     * See {@link https://www.siel.nl/acumulus/API/Products/List_Products/}
      *
      * @param string|null $filter
      *   Free search param, checks against the productid, description, type,
@@ -294,7 +294,7 @@ class Acumulus
     /**
      * Retrieves a list of VAT rates for the given country at the given date.
      *
-     * See {@see https://www.siel.nl/acumulus/API/Picklists/VAT_Info/}
+     * See {@link https://www.siel.nl/acumulus/API/Picklists/VAT_Info/}
      *
      * @param string $countryCode
      *   Country code of the country to retrieve the VAT info for.
@@ -326,7 +326,7 @@ class Acumulus
     /**
      * Retrieves a report on the threshold for EU commerce.
      *
-     * See {@see https://www.siel.nl/acumulus/API/Reports/EU_eCommerce_Threshold/}
+     * See {@link https://www.siel.nl/acumulus/API/Reports/EU_eCommerce_Threshold/}
      *
      * @param int|null $year
      *   The year to get a report for. Leave empty for the current year.
@@ -355,7 +355,7 @@ class Acumulus
     /**
      * Sends an invoice to Acumulus.
      *
-     * See {@see https://www.siel.nl/acumulus/API/Invoicing/Add_Invoice/}
+     * See {@link https://www.siel.nl/acumulus/API/Invoicing/Add_Invoice/}
      *
      * @param array $invoice
      *   The invoice to send.
@@ -378,7 +378,7 @@ class Acumulus
     /**
      * Retrieves information about a concept.
      *
-     * See {@see https://www.siel.nl/acumulus/API/Invoicing/Concept_Info/}
+     * See {@link https://www.siel.nl/acumulus/API/Invoicing/Concept_Info/}
      *
      * @param int $conceptId
      *   The id of the concept.
@@ -405,7 +405,7 @@ class Acumulus
     /**
      * Retrieves Entry (Boeking) Details.
      *
-     * See {@see https://siel.nl/acumulus/API/Entry/Get_Entry_Details/}
+     * See {@link https://siel.nl/acumulus/API/Entry/Get_Entry_Details/}
      *
      * @param int $entryId
      *   The id of the entry.
@@ -453,7 +453,7 @@ class Acumulus
     /**
      * Moves the entry into or out of the trash bin.
      *
-     * See {@see https://siel.nl/acumulus/API/Entry/Set_Delete_Status/}
+     * See {@link https://siel.nl/acumulus/API/Entry/Set_Delete_Status/}
      *
      * @param int $entryId
      *   The id of the entry.
@@ -488,7 +488,7 @@ class Acumulus
     /**
      * Retrieves the payment status for an invoice.
      *
-     * See {@see https://www.siel.nl/acumulus/API/Invoicing/Payment_Get_Status/}
+     * See {@link https://www.siel.nl/acumulus/API/Invoicing/Payment_Get_Status/}
      *
      * @param string $token
      *   The token for the invoice.
@@ -517,7 +517,7 @@ class Acumulus
     /**
      * Sets the payment status for an invoice.
      *
-     * See {@see https://www.siel.nl/acumulus/API/Invoicing/Payment_Set_Status/}
+     * See {@link https://www.siel.nl/acumulus/API/Invoicing/Payment_Set_Status/}
      *
      * @param string $token
      *   The token for the invoice.
@@ -557,7 +557,7 @@ class Acumulus
     /**
      * Sends out an invoice or reminder as PDF.
      *
-     * See {@see https://siel.nl/acumulus/API/Invoicing/Email/}
+     * See {@link https://siel.nl/acumulus/API/Invoicing/Email/}
      *
      * @param string $token
      *   The token for the invoice.
@@ -587,7 +587,7 @@ class Acumulus
      *   - TNFE4035G: Requested token not found or invalid token supplied.
      *     Unable to proceed."
      *
-     * See {@see https://siel.nl/acumulus/API/Invoicing/Email/}
+     * See {@link https://siel.nl/acumulus/API/Invoicing/Email/}
      *
      * @noinspection PhpUnused
      */
@@ -609,7 +609,7 @@ class Acumulus
     /**
      * Signs up for a 30-day trial and receive credentials.
      *
-     * See {@see https://www.siel.nl/acumulus/API/Sign_Up/Sign_Up/}
+     * See {@link https://www.siel.nl/acumulus/API/Sign_Up/Sign_Up/}
      *
      * @param array $signUp
      *   An array with the fields:
@@ -668,7 +668,7 @@ class Acumulus
     /**
      * Updates the stock for a product.
      *
-     * See {@see https://www.siel.nl/acumulus/API/Stock/Add_Stock_Transaction/}
+     * See {@link https://www.siel.nl/acumulus/API/Stock/Add_Stock_Transaction/}
      *
      * @param int $productId
      *   The id of the product for which to update the stock.
@@ -710,7 +710,7 @@ class Acumulus
     /**
      * Returns the uri to download the invoice PDF.
      *
-     * See {@see https://siel.nl/acumulus/API/Invoicing/Get_PDF_Invoice/}
+     * See {@link https://siel.nl/acumulus/API/Invoicing/Get_PDF_Invoice/}
      *
      * @param string $token
      *   The token for the invoice.
@@ -737,7 +737,7 @@ class Acumulus
     /**
      * Returns the uri to download the packing slip PDF.
      *
-     * See {@see https://siel.nl/acumulus/API/Delivery/Get_PDF_Packing_Slip/}
+     * See {@link https://siel.nl/acumulus/API/Delivery/Get_PDF_Packing_Slip/}
      *
      * @param string $token
      *   The token for the invoice to get the packing slip for.
@@ -772,7 +772,7 @@ class Acumulus
 
     /**
      * Wrapper around
-     * {@see \Siel\Acumulus\ApiClient\AcumulusRequest::callApiFunction()}.
+     * {@see \Siel\Acumulus\ApiClient\AcumulusRequest::execute()}.
      *
      * @param string $apiFunction
      *   The API function to invoke.
@@ -785,12 +785,22 @@ class Acumulus
      *   not allowed.
      *
      * @return \Siel\Acumulus\ApiClient\AcumulusResult
-     *   A Result object containing the results.
+     *   An AcumulusResult object containing the results.
      */
     protected function callApiFunction(string $apiFunction, array $message, bool $needContract = true): AcumulusResult
     {
-        $acumulusRequest = $this->container->createAcumulusRequest();
+        $acumulusRequest = $this->createAcumulusRequest();
         $uri = $this->constructUri($apiFunction);
         return $acumulusRequest->execute($uri, $message, $needContract);
+    }
+
+    /**
+     * Wrapper around the factory method that creates an AcumulusRequest.
+     *
+     * @return \Siel\Acumulus\ApiClient\AcumulusRequest
+     */
+    public function createAcumulusRequest(): AcumulusRequest
+    {
+        return $this->container->createAcumulusRequest();
     }
 }

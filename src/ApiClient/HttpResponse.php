@@ -27,7 +27,7 @@ class HttpResponse
      * @return int
      *   The HTTP response status code, or 0 if unknown.
      */
-    public function getHttpCode(): int
+    public function getHttpStatusCode(): int
     {
         return (int) $this->info['http_code'] ?? 0;
     }

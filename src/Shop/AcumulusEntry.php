@@ -23,7 +23,7 @@ use Siel\Acumulus\Api;
  * more or less the same time.
  *
  * Summarising, each entry characterises one of the following:
- * - Entry: entryIOd= entry id AND token = token
+ * - Entry: entryId = entry id AND token = token
  * - Concept old style: entryId = null AND token = null
  * - Concept new style: entryId = concept id AND token = null
  * - Lock record: entryId = const lockEntryId AND token = const lockToken

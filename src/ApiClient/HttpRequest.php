@@ -26,8 +26,10 @@ class HttpRequest
     protected $body = null;
 
     /**
+     * Constructor.
+     *
      * @param array $options
-     *   A set of Curl option-value pairs.
+     *   An optional set of Curl option-value pairs.
      */
     public function __construct(array $options = [])
     {
@@ -123,7 +125,8 @@ class HttpRequest
      * Executes the HTTP request.
      *
      * @param string $method
-     *   The HTTP method to use for this request.
+     *   The HTTP method to use for this request. for now, we only support GET
+     *   and POST
      * @param string $uri
      *   The uri to send the HTTP request to.
      * @param array|string|null $body
@@ -145,7 +148,9 @@ class HttpRequest
      */
     protected function execute(string $method, string $uri, $body = null): HttpResponse
     {
-        assert($this->uri === null, new LogicException('HttpRequest::execute() may only be called once.'));
+        $method = strtoupper($method);
+        assert(in_array($method, ['GET', 'POST']), new LogicException('HttpRequest::execute(): non-supported method.'));
+        assert($this->uri === null, new LogicException('HttpRequest::execute(): may only be called once.'));
 
         $this->uri = $uri;
         $this->method = $method;
@@ -181,7 +186,7 @@ class HttpRequest
         $handle = $this->getHandle();
         $options = $this->getCurlOptions();
         if (!curl_setopt_array($handle, $options)) {
-            $this->raiseCurlError($handle, 'curl_setopt_array(defaults)');
+            $this->raiseCurlError($handle, 'curl_setopt_array()');
         }
 
         // Send and receive over the curl connection.
@@ -207,12 +212,9 @@ class HttpRequest
             $headers = '';
             $body = is_string($response) ? $response : '';
         }
-        return new HttpResponse(
-            $headers,
-            $body,
-            $responseInfo + ['method_time' => microtime(true) - $start],
-            $this
-        );
+
+        $responseInfo += ['method_time' => microtime(true) - $start];
+        return new HttpResponse($headers, $body, $responseInfo, $this);
     }
 
     /**
@@ -248,7 +250,7 @@ class HttpRequest
                 break;
         }
 
-        // 2) Options passed in by the caller.
+        // 2) Options passed in by the caller, will overwrite our defaults.
         $options += $this->options;
 
         // 3) Defaults.

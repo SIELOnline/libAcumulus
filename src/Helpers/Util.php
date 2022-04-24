@@ -12,14 +12,18 @@ use RuntimeException;
  * - HTML: check if a string is an HTML string
  * - JSON: Check for json decoding or encoding errors
  * - Password masking (for logging purposes)
+ *
+ * Though the utility methods in this class are meant to be generally usable,
+ * they may contain some knowledge about Acumulus API details.
  */
 class Util
 {
-   /**
+    /**
      * Converts a keyed, optionally multi-level, array to XML.
      *
+     * Acumulus specific:
      * Each key is converted to a tag, no attributes are used. Numeric
-     * sub-arrays are repeated using the same key.
+     * sub-arrays are repeated using the same key (not their numeric index).
      *
      * @param array $values
      *   The array to convert to XML.
@@ -152,10 +156,11 @@ class Util
 
     /**
      * Recursively masks passwords in an array.
+     *
+     * Acumulus API specific: passwords fields contain 'password' in their name.
      */
     public function maskArray(array $subject): array
     {
-        // Mask all values that have 'password' in their key.
         array_walk_recursive($subject, function (&$value, $key) {
             if (strpos(strtolower($key), 'password') !== false) {
                 $value = 'REMOVED FOR SECURITY';
@@ -166,6 +171,8 @@ class Util
 
     /**
      * Masks passwords in an XML string
+     *
+     * Acumulus API specific: passwords fields end with 'password'.
      */
     public function maskXml(string $subject): string
     {
@@ -179,6 +186,8 @@ class Util
 
     /**
      * Masks passwords in a Json string
+     *
+     * Acumulus API specific: passwords fields end with 'password'.
      */
     public function maskJson(string $subject): string
     {
@@ -217,8 +226,8 @@ class Util
      * @param string $html
      *   String containing an HTML document which is probably an error page.
      *
-     * @trows \RuntimeException
-     *   Always
+     * @throws  \RuntimeException
+     *   Always.
      */
     public function raiseHtmlReceivedError(string $html)
     {

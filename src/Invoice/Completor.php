@@ -262,7 +262,7 @@ class Completor
      * - The shop settings (using EU vat or selling vat free products).
      * - Optionally, the date of the invoice.
      *
-     * See also: {@see https://wiki.acumulus.nl/index.php?page=facturen-naar-het-buitenland}.
+     * See also: {@link https://wiki.acumulus.nl/index.php?page=facturen-naar-het-buitenland}.
      */
     protected function initPossibleVatTypes()
     {
@@ -1299,8 +1299,8 @@ class Completor
      * If not filled in, we act as if the line invoices a product.
      *
      * See:
-     * - {@see https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/tarieven_en_vrijstellingen/}
-     * - {@see https://wiki.acumulus.nl/index.php?page=facturen-naar-het-buitenland}:
+     * - {@link https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/tarieven_en_vrijstellingen/}
+     * - {@link https://wiki.acumulus.nl/index.php?page=facturen-naar-het-buitenland}:
      */
     protected function correctNoVatLines()
     {
@@ -1594,7 +1594,7 @@ class Completor
      * - Country code XI is always Northern Ireland
      * - Country code GB only if the postal code starts with BT. See how to
      *   distinguish NI within country code UK:
-     *   {@see https://www.webmasterworld.com/forum22/4514.htm}.
+     *   {@link https://www.webmasterworld.com/forum22/4514.htm}.
      */
     protected function isNorthernIreland(): bool
     {

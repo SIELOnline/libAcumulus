@@ -196,7 +196,7 @@ class Message
      *   - An http response code.
      *   - The exception code.
      *   - The Acumulus API message code, usually a number 4xx, 5xx, or 6xx,
-     *     see {@see https://www.siel.nl/acumulus/API/Basic_Response/}.
+     *     see {@link https://www.siel.nl/acumulus/API/Basic_Response/}.
      *   - A 7xx number used internally to define messages.
      */
     public function getCode()
@@ -207,7 +207,7 @@ class Message
     /**
      * @return string
      *   A code tag used by the Acumulus API to report errors or warnings,
-     *   see {@see https://www.siel.nl/acumulus/API/Basic_Response/}. For
+     *   see {@link https://www.siel.nl/acumulus/API/Basic_Response/}. For
      *   messages with another source, it will be empty.
      */
     public function getCodeTag(): string

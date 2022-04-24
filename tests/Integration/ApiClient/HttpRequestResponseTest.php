@@ -28,7 +28,7 @@ class HttpRequestResponseTest extends TestCase
         $this->assertNull($httpRequest->getBody());
 
         // Properties of response.
-        $this->assertSame(200, $response->getHttpCode());
+        $this->assertSame(200, $response->getHttpStatusCode());
         $this->assertIsString($response->getHeaders());
         $this->assertSame(file_get_contents(__DIR__ . '/../../../readme.md'), $response->getBody());
         /** @noinspection DuplicatedCode */
@@ -37,7 +37,7 @@ class HttpRequestResponseTest extends TestCase
 
         // Properties that (can) come from info.
         $info = $response->getInfo();
-        $this->assertSame($info['http_code'], $response->getHttpCode());
+        $this->assertSame($info['http_code'], $response->getHttpStatusCode());
         $this->assertSame($info['request_header'], $response->getRequestHeaders());
         $this->assertArrayHasKey('method_time', $info);
         $this->assertSame($response->getRequest()->getMethod(), explode(' ', $info['request_header'], 2)[0]);
@@ -59,7 +59,7 @@ class HttpRequestResponseTest extends TestCase
         $this->assertSame($post, $httpRequest->getBody());
 
         // Properties of response.
-        $this->assertSame(200, $response->getHttpCode());
+        $this->assertSame(200, $response->getHttpStatusCode());
         $this->assertIsString($response->getHeaders());
         $this->assertSame(file_get_contents(__DIR__ . '/../../../resources/siel-logo.png'), $response->getBody());
         /** @noinspection DuplicatedCode */
@@ -68,14 +68,14 @@ class HttpRequestResponseTest extends TestCase
 
         // Properties that (can) come from info.
         $info = $response->getInfo();
-        $this->assertSame($info['http_code'], $response->getHttpCode());
+        $this->assertSame($info['http_code'], $response->getHttpStatusCode());
         $this->assertSame($info['request_header'], $response->getRequestHeaders());
         $this->assertArrayHasKey('method_time', $info);
         $this->assertSame($response->getRequest()->getMethod(), explode(' ', $info['request_header'], 2)[0]);
 
         // Properties that (can) come from info.
         $info = $response->getInfo();
-        $this->assertSame($info['http_code'], $response->getHttpCode());
+        $this->assertSame($info['http_code'], $response->getHttpStatusCode());
         $this->assertSame($info['request_header'], $response->getRequestHeaders());
         $this->assertSame('image/png', $info['content_type']);
         $this->assertArrayHasKey('method_time', $info);
@@ -97,7 +97,7 @@ class HttpRequestResponseTest extends TestCase
         $this->assertNull($httpRequest->getBody());
 
         // Properties of response.
-        $this->assertSame(404, $response->getHttpCode());
+        $this->assertSame(404, $response->getHttpStatusCode());
         $this->assertIsString($response->getHeaders());
         $this->assertStringContainsString('<title>404 Not Found</title>', $response->getBody());
         /** @noinspection DuplicatedCode */
@@ -106,7 +106,7 @@ class HttpRequestResponseTest extends TestCase
 
         // Properties that (can) come from info.
         $info = $response->getInfo();
-        $this->assertSame($info['http_code'], $response->getHttpCode());
+        $this->assertSame($info['http_code'], $response->getHttpStatusCode());
         $this->assertSame($info['request_header'], $response->getRequestHeaders());
         $this->assertArrayHasKey('method_time', $info);
         $this->assertSame($response->getRequest()->getMethod(), explode(' ', $info['request_header'], 2)[0]);

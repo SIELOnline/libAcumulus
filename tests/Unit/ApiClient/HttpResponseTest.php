@@ -21,7 +21,7 @@ class HttpResponseTest extends TestCase
         $info = ['http_code' => $httpCode, 'request_header' => $requestHeaders];
         $response = new HttpResponse($responseHeaders, $responseBody, $info, $request);
 
-        $this->assertSame($httpCode, $response->getHttpCode());
+        $this->assertSame($httpCode, $response->getHttpStatusCode());
         $this->assertSame($responseHeaders, $response->getHeaders());
         $this->assertSame($responseBody, $response->getBody());
         $this->assertSame($info, $response->getInfo());

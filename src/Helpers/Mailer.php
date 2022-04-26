@@ -204,7 +204,7 @@ abstract class Mailer
      */
     protected function getBody(InvoiceAddResult $result, string $invoiceSourceType, string $invoiceSourceReference): array
     {
-        $acumulusResult = $result->getApiResult();
+        $acumulusResult = $result->getAcumulusResult();
         $invoiceInfo = $result->getMainApiResponse();
         $bodyTexts = $this->getStatusSpecificBody($result);
         $messagesTexts = $this->getMessages($result);
@@ -262,7 +262,7 @@ abstract class Mailer
             case Severity::Exception:
                 $sentences[] = 'mail_body_exception';
                 // @todo: check this: we want to know what was set just before executing the curl request.
-                $sentences[] = $invoiceAddResult->getApiResult()->getHttpResponse() !== null
+                $sentences[] = $invoiceAddResult->getAcumulusResult()->getHttpResponse() !== null
                     ? 'mail_body_exception_invoice_maybe_created'
                     : 'mail_body_exception_invoice_not_created';
                 break;
@@ -363,25 +363,24 @@ abstract class Mailer
 
         $pluginSettings = $this->config->getPluginSettings();
         // We add the request and response messages when set so or if there were
-        // warnings or severer messages, thus not with notices.
-        $addReqResp = $pluginSettings['debug'] === Config::Send_SendAndMailOnError ? InvoiceAddResult::AddReqResp_WithOther : InvoiceAddResult::AddReqResp_Always;
+        // warnings or worse messages, thus not with notices.
+        $addReqResp = $pluginSettings['debug'] === Config::Send_SendAndMailOnError
+            ? InvoiceAddResult::AddReqResp_WithOther
+            : InvoiceAddResult::AddReqResp_Always;
         if ($addReqResp === InvoiceAddResult::AddReqResp_Always || $result->getSeverity() >= Severity::Warning) {
-            $acumulusResult = $result->getApiResult();
+            $acumulusResult = $result->getAcumulusResult();
             if ($acumulusResult !== null) {
                 $logMessages = new MessageCollection($this->translator);
-                foreach ($acumulusResult->toLogMessages() as $message) {
-                    $logMessages->createAndAddMessage($message, Severity::Log);
-                }
-                if (!empty($logMessages->getMessages())) {
-                    $header = $this->t('mail_support_header');
-                    $description = $this->t('mail_support_desc');
-                    $supportMessagesText = $logMessages->formatMessages(Message::Format_PlainList);
-                    $supportMessagesHtml = $logMessages->formatMessages(Message::Format_HtmlList);
-                    $messages = [
-                        'text' => "\n$header\n\n$description\n\n$supportMessagesText\n",
-                        'html' => "<details><summary>$header</summary><p>$description</p>$supportMessagesHtml</details>",
-                    ];
-                }
+                $logMessages->createAndAddMessage('Request: ' . $acumulusResult->getAcumulusRequest()->getMaskedRequest(), Severity::Log);
+                $logMessages->createAndAddMessage('Response: ' . $acumulusResult->getMaskedResponse(), Severity::Log);
+                $header = $this->t('mail_support_header');
+                $description = $this->t('mail_support_desc');
+                $supportMessagesText = $logMessages->formatMessages(Message::Format_PlainList);
+                $supportMessagesHtml = $logMessages->formatMessages(Message::Format_HtmlList);
+                $messages = [
+                    'text' => "\n$header\n\n$description\n\n$supportMessagesText\n",
+                    'html' => "<details><summary>$header</summary><p>$description</p>$supportMessagesHtml</details>",
+                ];
             }
         }
         return $messages;

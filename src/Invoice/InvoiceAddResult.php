@@ -64,7 +64,7 @@ class InvoiceAddResult extends MessageCollection
     /**
      * @var \Siel\Acumulus\ApiClient\AcumulusResult|null
      */
-    protected $apiResult = null;
+    protected $acumulusResult = null;
 
     /**
      * InvoiceSendResult constructor.
@@ -244,12 +244,12 @@ class InvoiceAddResult extends MessageCollection
 
     public function getMainApiResponse(): ?array
     {
-        return $this->getApiResult() !== null ? $this->getApiResult()->getMainResponse() : null ;
+        return $this->getAcumulusResult() !== null ? $this->getAcumulusResult()->getMainAcumulusResponse() : null ;
     }
 
-    public function getApiResult(): ?AcumulusResult
+    public function getAcumulusResult(): ?AcumulusResult
     {
-        return $this->apiResult;
+        return $this->acumulusResult;
     }
 
     /**
@@ -257,9 +257,9 @@ class InvoiceAddResult extends MessageCollection
      *
      * @param \Siel\Acumulus\ApiClient\AcumulusResult $acumulusResult
      */
-    public function setApiResult(AcumulusResult $acumulusResult): void
+    public function setAcumulusResult(AcumulusResult $acumulusResult): void
     {
-        $this->apiResult = $acumulusResult;
+        $this->acumulusResult = $acumulusResult;
         $this->addMessages($acumulusResult->getMessages());
     }
 
@@ -283,18 +283,16 @@ class InvoiceAddResult extends MessageCollection
         $message = sprintf($this->t('message_invoice_reason'), $action, $reason);
 
         if ($this->hasBeenSent() || $this->getSendStatus() === self::NotSent_LocalErrors) {
-            if ($this->getApiResult() !== null) {
-                $message .= ' ' . $this->getApiResult()->getStatusText();
+            if ($this->getAcumulusResult() !== null) {
+                $message .= ' ' . $this->getAcumulusResult()->getStatusText();
             }
             if ($this->hasRealMessages()) {
                 $message .= "\n" . $this->formatMessages(Message::Format_PlainListWithSeverity, Severity::RealMessages);
             }
             if ($addReqResp === InvoiceAddResult::AddReqResp_Always || ($addReqResp === InvoiceAddResult::AddReqResp_WithOther && $this->hasRealMessages())) {
                 $message = rtrim($message);
-                $logMessages = $this->getApiResult()->toLogMessages();
-                foreach ($logMessages as $logMessage) {
-                    $message .= "\n$logMessage";
-                }
+                $message .= "\nRequest: " . $this->getAcumulusResult()->getAcumulusRequest()->getMaskedRequest();
+                $message .= "\nResponse: " . $this->getAcumulusResult()->getMaskedResponse();
                 $message .= "\n";
             }
         }

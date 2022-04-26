@@ -1,10 +1,8 @@
 <?php
 namespace Siel\Acumulus\ApiClient;
 
-use LogicException;
 use RuntimeException;
 use Siel\Acumulus\Api;
-use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Message;
 use Siel\Acumulus\Helpers\MessageCollection;
 use Siel\Acumulus\Helpers\Severity;
@@ -12,7 +10,7 @@ use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Helpers\Util;
 
 /**
- * Class AcumulusResult wraps an Acumulus web service result into an object.
+ * Class AcumulusResult processes and wraps an Acumulus web service result.
  *
  * An AcumulusResult object contains
  * Most important:
@@ -20,27 +18,120 @@ use Siel\Acumulus\Helpers\Util;
  *   array.
  * But also a lot of other info:
  * - Result status (internal code: one of the Severity::... constants).
- * - Exception, if one was thrown.
  * - Any error messages, local and/or remote.
  * - Any warnings, local and/or remote.
  * - Any notices, local.
  * - HttpRequest and HttpResponse objects, for logging purposes.
  *
- * @todo: complete error handling, especially http codes and error values in response
+ * Error handling
+ * --------------
+ * The basic strategy is to distinguish between:
+ * - Errors at the protocol/communication level. These will be thrown as
+ *   {@see \Siel\Acumulus\ApiClient\AcumulusException}s or
+ *   {@see \Siel\Acumulus\ApiClient\AcumulusResponseException}s.
+ * - Application (domain) level errors. Think of things like input validation
+ *   errors, or object does no(t) (longer) exist. These will be set as error
+ *   messages in this AcumulusResult object. No exception will be thrown,
+ *   calling code should thus check for errors and act accordingly, e.g. showing
+ *   form error messages to the user, deleting no longer valid concept or entry
+ *   id's, or send a mail to inform the user that errors occurred.
+ * - Success (optionally with warnings). Any warnings will be set as warning
+ *   messages in this AcumulusResult object. The calling code should happily
+ *   process the response.
+ *
+ * Also see {@link https://www.siel.nl/acumulus/API/Basic_Response/}.
+ *
+ * To distinguish the above situations we look at the following conditions (each
+ * condition assumes the negation of all former conditions):
+ * 1. No response was obtained: httpResponse = null: protocol level error.
+ * 2. status code indicates a protocol level error.
+ * 3. status code indicates either a protocol or application level error.
+ * 4. status code indicates an application level error.
+ * 5. status code indicates success.
+ *
+ * Ad 1.
+ *
+ * Executing the request resulted in an exception on our side.
+ * We will not handle this exception at the ApiClient level, but will catch it,
+ * to log and rethrow it. No AcumulusResult is constructed, so this situation is
+ * not handled here.
+ *
+ * Most probably, other layers will also not handle these exceptions, so the
+ * user request will fail completely. If a request can be handled in a
+ * reasonable way, without the result of a specific API call, likely an
+ * additional information retrieving call, higher layers may catch it and
+ * continue its work.
+ *
+ * Ad 2.
+ *
+ * The HTTP request was executed but something went wrong on the server side.
+ * The status code is not one of {200, 400, 404}. (403 can be seen as an
+ * application level error, but we treat it as a protocol level error:
+ * - Response might be from another part of the server, e.g. the load balancer,
+ *   or web server daemon. In this case, the body is probably an HTML error
+ *   page, thus having a 'Content-type: text/html[; ...]' header.
+ * - The response might also be from the API server in which case a JSON (or
+ *   XML) formatted error message is expected in the body (and an accompanying
+ *   Content-Type header).
+ *
+ * We will throw an exception from code called during the construction of this
+ * class, so no AcumulusResult object will be returned.
+ *
+ * Ad 3.
+ *
+ * The status code is 404, for now the only code that can indicate a protocol or
+ * domain level error.
+ * - A 404 indicating a protocol level error indicates an incorrect uri
+ *   ("impossible" with tested code) and will have an HTML body.
+ * - A 404 with a properly formatted Acumulus API response indicates that a
+ *   requested object was not found. The basic response will contain:
+ *     - 'status' = 1 (errors).
+ *     - Non-empty 'errors' with at least one 'error' with its 'code' being
+ *      something like '404 {Not Found}' (may be translated?).
+ * - It may contain additional properties that specify which of the values that
+ *   were sent caused the error (id not found).
+ *
+ * Ad 4.
+ *
+ * Status code 400 is used for all domain level errors.
+ * - A properly formatted Acumulus API response will be found in the body, whose
+ *   basic response will contain:
+ *     - 'status' = 1 (errors).
+ *     - Non-empty 'errors' with at least one 'error' with its 'code' being
+ *      something like '400 {Bad Request}' (may be translated?).
+ * - It may contain additional properties that specify which of the values that
+ *   were sent caused the error (validation error, not found/existing error).
+ *
+ * Ad 5.
+ *
+ * The status code will be 200. The request was executed successfully, but may
+ * contain warnings. The (basic) response is expected to contain:
+ * - 'status' to be 0 (success) or 2 (warnings).
+ * - if 'status' = 2, 'warnings' is expected to be non-empty
+ * - 'errors' is expected to be empty.
+ * - Other properties (outside the basic response) will contain the actual API
+ *   response to the request, accessible by calling code via the method
+ *   {@see \Siel\Acumulus\ApiClient\AcumulusResult::getMainAcumulusResponse()}.
  */
 class AcumulusResult extends MessageCollection
 {
     protected /*Util*/ $util;
     protected /*Log*/ $log;
-    protected /*?AcumulusRequest*/ $acumulusRequest = null;
-    protected /*?HttpResponse*/ $httpResponse = null;
+    protected /*AcumulusRequest*/ $acumulusRequest;
+    protected /*HttpResponse*/ $httpResponse;
     protected /*?int*/ $apiStatus = null;
 
     /**
      * @var array
-     *   The structured response as was received from the web service.
+     *   The full structured response as was received from the web service.
      */
-    protected /*array*/ $response = [];
+    protected /*array*/ $fullAcumulusResponse = [];
+
+    /**
+     * @var array
+     *   The main response as was received from the web service.
+     */
+    protected /*array*/ $mainAcumulusResponse = [];
 
     /**
      * @var string
@@ -53,36 +144,60 @@ class AcumulusResult extends MessageCollection
      *   retrieve the main result without the need to know more details than
      *   strictly needed of the Acumulus API.
      */
-    protected /*string*/ $mainResponseKey = '';
+    protected /*string*/ $mainAcumulusResponseKey = '';
 
     /**
      * @var bool
      *   Indicates if the main response should be a list.
      */
     protected /*bool*/ $isList = false;
+    /**
+     * @var int[]
+     *   A list of http status codes that indicate that no unexpected exceptions
+     *   occurred. Domain level errors, like input validation errors or
+     *   non-existing id's, may be returned under these codes.
+     */
+    protected /*array*/ $validHttpStatusCodes = [200, 400];
+    protected /*array*/ $possiblyValidHttpStatusCodes = [404];
 
+    /**
+     * Constructs an AcumulusResult.
+     *
+     * @throws \Siel\Acumulus\ApiClient\AcumulusResponseException
+     */
     public function __construct(
         AcumulusRequest $acumulusRequest,
-        ?HttpResponse $httpResponse,
+        HttpResponse $httpResponse,
         Util $util,
-        Translator $translator,
-        Log $log
+        Translator $translator
     ) {
         parent::__construct($translator);
         $this->util = $util;
-        $this->log = $log;
         $this->acumulusRequest = $acumulusRequest;
-        if ($httpResponse !== null) {
-            $this->setHttpResponse($httpResponse);
-        }
+        $this->httpResponse = $httpResponse;
+        $this->processHttpResponse();
+    }
+
+    /**
+     * Returns the structured main response part of the received response.
+     *
+     * @return array
+     *   The main response part of the response as received from the Acumulus
+     *   web service converted to a(n array of) keyed array(s). The status,
+     *   errors and warnings are removed. In case of errors, this array may be
+     *   empty or may contain the parameters that caused the error.
+     */
+    public function getMainAcumulusResponse(): array
+    {
+        return $this->mainAcumulusResponse;
     }
 
     /**
      * @return int
      *   The status is the result of taking the worst of:
-     *   - The response API status.
-     *   - The severity of the message collection.
-     *   - While ignoring messages of Severity::Log.
+     *   - The response API status (converted to a Severity).
+     *   - The severity of the message collection (while ignoring messages of
+     *     Severity::Log).
      */
     public function getStatus(): int
     {
@@ -159,131 +274,266 @@ class AcumulusResult extends MessageCollection
         }
     }
 
-    public function getAcumulusRequest(): ?AcumulusRequest
+    public function getAcumulusRequest(): AcumulusRequest
     {
         return $this->acumulusRequest;
     }
 
-    public function getHttpResponse(): ?HttpResponse
+    public function getHttpResponse(): HttpResponse
     {
         return $this->httpResponse;
     }
 
     /**
-     * Sets the http response.
+     * Returns the status code and password masked response from the Acumulus API.
      *
-     * Information from the http response is extracted and placed in the other
-     * properties. After doing so, this property remains for logging purposes.
-     *
-     * @param \Siel\Acumulus\ApiClient\HttpResponse $httpResponse
-     *
-     * @throws \LogicException
-     * @throws \RuntimeException
-     *   Either we received:
-     *   - An HTML response (probably an error page).
-     *   - An invalid json message.
-     *   - An invalid xml message.
+     * We mask all values of tags/keys that have 'password' in their name.
+     * By masking any password, this result can be used for logging purposes.
      */
-    protected function setHttpResponse(HttpResponse $httpResponse): void
+    public function getMaskedResponse(): string
     {
-        if ($this->httpResponse !== null) {
-            throw new LogicException('AcumulusResult::setHttpResponse() may only be called once.');
-        }
-        if ($this->getAcumulusRequest() === null) {
-            throw new LogicException('AcumulusResult::setHttpResponse() may only be called after AcumulusResult::setAcumulusRequest()');
-        } elseif ($this->getAcumulusRequest()->getSubmit() === null) {
-            throw new LogicException('AcumulusResult::setHttpResponse() may only be called after AcumulusResult::setAcumulusRequest() with its submit property set');
-        }
+        $code = $this->getHttpResponse()->getHttpStatusCode();
+        $body = $this->util->maskArray($this->fullAcumulusResponse);
+        return sprintf("Response: status=%s\nbody=%s", json_encode($code), json_encode($body));
+    }
 
-        $this->httpResponse = $httpResponse;
-        // @todo: start using http codes (403, 429, 500, ...)
+    /**
+     * Convenience method to get the Content-Type header of the HTTP response.
+     *
+     * @return string
+     */
+    protected function getHttpContentType(): string
+    {
+        return $this->getHttpResponse()->getHeader('Content-Type');
+    }
 
-        $body = $this->httpResponse->getBody();
-        if (empty($body)) {
-            // Curl did return a non-empty response, otherwise we would not be
-            // here. So, apparently that only contained headers.
-            // @todo: Is this a non 200 response or can we consider this as a critical error?
-            $this->createAndAddMessage('Empty response body', Severity::Error, 701);
-        } elseif ($this->util->isHtmlResponse($body)) {
-            // When the API is gone we might receive an HTML error message page.
-            $this->util->raiseHtmlReceivedError($body);
-        } else {
-            // Decode the response as either json or xml.
-            $response = [];
-            $outputFormat = $this->getAcumulusRequest()->getSubmit()['format'] ?? 'xml';
-            if ($outputFormat === 'json') {
-                $response = json_decode($body, true);
-            }
-            // Even if we pass json as <format> we might receive an XML response
-            // in case the request was rejected before or during parsing. So, if
-            // $response = null, we also try to decode $body as XML.
-            if ($outputFormat === 'xml' || !is_array($response)) {
-                try {
-                    $response = $this->util->convertXmlToArray($body);
-                } catch (RuntimeException $e) {
-                    // Not an XML response. Treat it as a json error if we were
-                    // expecting a json response.
-                    if ($outputFormat === 'json') {
-                        $this->util->raiseJsonError();
-                    }
-                    // Otherwise, treat it as the XML exception that was raised.
-                    throw $e;
-                }
-            }
-            $this->setResponse($response);
+    /**
+     * Returns the format the contents should be in.
+     *
+     * Expect one of the following values ot be returned:
+     * - 'json': If the 'format' tag was set to 'json' and we have a (domain
+     *   level) response from the API server.
+     * - 'xml': If 'format' was set to 'xml' and we have a (domain level)
+     *   response from the API server OR if the API server encountered an error
+     *   before parsing the 'format' tag, e.g. invalid xml.
+     * - 'html': If the response came from another system, e.g. the load
+     *   balancer (429) or http daemon (404)
+     * - '': Absent ot incorrect Content-Type header or plain text
+     */
+    protected function getContentFormat(): string
+    {
+        $contentType = $this->getHttpContentType();
+        return preg_match('|[^/]+(/([^ ;]*))?|', $contentType, $matches) ? strtolower($matches[2]) : '';
+    }
+
+    /**
+     * Returns the format as requested per the 'format' tag in the request.
+     */
+    protected function getRequestedFormat(): string
+    {
+        return $this->getAcumulusRequest()->getSubmit()['format'] ?? 'xml';
+    }
+
+    /**
+     * Processes the (non-null) http response.
+     *
+     * See also the section about error handling in the
+     * {@see \Siel\Acumulus\ApiClient\AcumulusResult documentation for this class}.
+     * We are not in situation 1 (client side runtime errors that are thrown as
+     * an exception). But are we in situation 2, 3, 4, or 5?
+     *
+     * @throws \Siel\Acumulus\ApiClient\AcumulusResponseException
+     *   If any (non domain level) error occurred during the execution of the
+     *   request (situation 2 or 3 in the documentation on error handling).
+     */
+    protected function processHttpResponse(): void
+    {
+        try {
+            // Inspect the http status code and body to see if we have a
+            // situation 2, or 3 protocol level error (=> exception).
+            $this->checkHttpStatusCode();
+            // We now know that we are in situation 3 application level error,
+            // 4, or 5: extract and process the Acumulus API response and do
+            // some sanity checks. (Failing checks will throw an exception, but
+            // this is not to be expected as it would indicate bugs or changed
+            // behaviour in the API server).
+            $this->convertHttpBodyToFullAcumulusResponse();
+            $this->assertBasicResponse();
+            $this->processAcumulusResponse();
+            $this->assertConsistentAcumulusResponse();
+        } catch (AcumulusException $e) {
+            $body = $this->util->maskXmlOrJsonString($this->getHttpResponse()->getBody());
+            $code = $this->getHttpResponse()->getHttpStatusCode();
+            throw new AcumulusResponseException($body, $code, $e);
         }
     }
 
     /**
-     * Returns the structured main response part of the received response.
+     * Checks if the http status code denotes a valid "successful" response.
      *
-     * @return array
-     *   The main response part of the response as received from the Acumulus
-     *   web service converted to a(n array of) keyed array(s). The status,
-     *   errors and warnings are removed. In case of errors, this array may be
-     *   empty.
+     * Note that domain level errors are seen as a successful response. Most
+     * domain level errors are returned as a 400, but, e.g, an "entry not found"
+     * error will be thrown as a 404.
+     *
+     * So, a 404 is a possibly valid http status code. It will be considered
+     * valid if we have a properly formatted answer, otherwise it will be seen
+     * as a true 404, i.e. an incorrect uri.
+     *
+     * @throws \Siel\Acumulus\ApiClient\AcumulusResponseException
+     *   If the http status code denotes an unexpected runtime error.
      */
-    public function getMainResponse(): array
+    protected function checkHttpStatusCode(): void
     {
-        return $this->response;
+        $code = $this->getHttpResponse()->getHttpStatusCode();
+        $body = $this->getHttpResponse()->getBody();
+        if (!in_array($code, $this->validHttpStatusCodes)
+            && (!in_array($code, $this->possiblyValidHttpStatusCodes)
+                || $this->getContentFormat() !== $this->getRequestedFormat())
+        ) {
+            if ($this->getContentFormat() === 'html') {
+                $body = $this->util->convertHtmlToPlainText($body);
+            } else {
+                $body = $this->util->maskXmlOrJsonString($body);
+            }
+            throw new AcumulusResponseException($body, $code);
+        }
     }
 
     /**
-     * Sets the (structured) response as was received from the web service. See
-     * {@link https://www.siel.nl/acumulus/API/Basic_Response/} for the common
-     * parts of a response.
+     * Converts the HTTP body to a full Acumulus response.
      *
-     * @param array $response
-     *   The structured response (json or xml string converted to an array).
-     *
-     * @return $this
+     * @throws \Siel\Acumulus\ApiClient\AcumulusException
+     *   Errors during JSON or XML conversion without access to the http
+     *   response to add the http body to the message.
+     * @throws \Siel\Acumulus\ApiClient\AcumulusResponseException
+     *   Errors during converting the http response to an AcumulusResponse,
+     *   with access to the http response, so the http body cold be added to the
+     *   message.
      */
-    protected function setResponse(array $response): self
+    protected function convertHttpBodyToFullAcumulusResponse()
     {
-        // Move the common parts into their respective properties.
-        if (isset($response['status'])) {
-            $this->setApiStatus($response['status']);
-            if ($response['status'] === Api::Status_Exception) {
-                $this->addException(new RuntimeException($this->getStatusText()));
-            }
-            unset($response['status']);
-        } else {
-            $this->addException(new RuntimeException('Status not set in response'));
+        $contentFormat = $this->getContentFormat();
+        $body = $this->getHttpResponse()->getBody();
+        if ($contentFormat === 'json') {
+            $acumulusResponse = $this->util->convertJsonToArray($body);
+        } elseif ($contentFormat === 'xml') {
+            $acumulusResponse = $this->util->convertXmlToArray($body);
         }
-
-        if (!empty($response['errors']['error'])) {
-            $this->addApiMessages($response['errors']['error'], Severity::Error);
+        if (!isset($acumulusResponse)) {
+            // Contradiction between Content-type and expected format.
+            $body = $this->util->maskXmlOrJsonString($body);
+            $code = $this->getHttpResponse()->getHttpStatusCode();
+            $contentType = $this->getHttpContentType();
+            throw new AcumulusResponseException($body, $code, "Content-Type: $contentType");
         }
-        unset($response['errors']);
+        $this->fullAcumulusResponse = $acumulusResponse;
+    }
 
-        if (!empty($response['warnings']['warning'])) {
-            $this->addApiMessages($response['warnings']['warning'], Severity::Warning);
+    /**
+     * Asserts that the basic response is part of the response.
+     *
+     * More info about the basic response:
+     * {@link https://www.siel.nl/acumulus/API/Basic_Response/}.
+     *
+     * @throws \Siel\Acumulus\ApiClient\AcumulusResponseException
+     *   If $this->fullAcumulusResponse does not contain the basic response.
+     */
+    protected function assertBasicResponse()
+    {
+        $response = $this->fullAcumulusResponse;
+        if (!array_key_exists('status', $response)
+            || !array_key_exists('errors', $response)
+            || !array_key_exists('warnings', $response)
+        ) {
+            $body = $this->util->maskXmlOrJsonString($this->getHttpResponse()->getBody());
+            $code = $this->getHttpResponse()->getHttpStatusCode();
+            throw new AcumulusResponseException($body, $code, 'Basic response not found');
         }
-        unset($response['warnings']);
+    }
 
-        $this->response = $response;
+    /**
+     * Processes the - well formatted - HTTP response body.
+     *
+     * - The parts of the basic response are extracted into separate properties,
+     *   accessible via e.g. {@see getStatus()}, {@see getMessages()}, or
+     *   {@see hasError()}.
+     * - The remainder, the "real" response to the request, is set in the
+     *   (protected) property {@see $mainAcumulusResponse}. This will be further
+     *   processed and simplified when {@see setMainAcumulusResponseKey()} gets
+     *   called, after which it becomes available to the calling side via
+     *   {@see getMainAcumulusResponse()}.
+     *
+     * See:
+     * - {@link https://www.siel.nl/acumulus/API/Basic_Response/} for the common
+     *   parts of a response.
+     * - The section about error handling in the
+     *   {@see \Siel\Acumulus\ApiClient\AcumulusResult documentation for this class}.
+     *   We are not in situation 1 or 2 (runtime errors that are thrown as an
+     *   exception). But in situation 3, 4, or 5.
+     *
+     */
+    protected function processAcumulusResponse(): void
+    {
+        $fullResponse = $this->fullAcumulusResponse;
 
-        return $this;
+        // Move the basic response parts into their properties.
+        $this->setApiStatus($fullResponse['status']);
+        if ($fullResponse['status'] === Api::Status_Exception) {
+            // @todo: status = exception => any (error) message or code in the answer?
+            $this->addException(new AcumulusException($this->getStatusText()));
+        }
+        unset($fullResponse['status']);
+
+        if (!empty($fullResponse['errors']['error'])) {
+            $this->addApiMessages($fullResponse['errors']['error'], Severity::Error);
+        }
+        unset($fullResponse['errors']);
+
+        if (!empty($fullResponse['warnings']['warning'])) {
+            $this->addApiMessages($fullResponse['warnings']['warning'], Severity::Warning);
+        }
+        unset($fullResponse['warnings']);
+
+        // What is left is the main response, but that will be further
+        // simplified when the main response key is set.
+        $this->mainAcumulusResponse = $fullResponse;
+    }
+
+    /**
+     * Performs a sanity check on the full Acumulus response.
+     *
+     * @throws \Siel\Acumulus\ApiClient\AcumulusResponseException
+     */
+    protected function assertConsistentAcumulusResponse()
+    {
+        $this->assertResponseFormat();
+        if (($this->hasError() && $this->getHttpResponse()->getHttpStatusCode() === 200)
+            || ($this->getSeverity() <= Severity::Warning && $this->getHttpResponse()->getHttpStatusCode() !== 200)
+        ) {
+            $body = $this->util->maskXmlOrJsonString($this->getHttpResponse()->getBody());
+            $code = $this->getHttpResponse()->getHttpStatusCode();
+            throw new AcumulusResponseException($body, $code, 'Inconsistent status code');
+        }
+    }
+
+    /**
+     * Asserts that the format of the HTTP body is correct.
+     *
+     * We check that the format as requested per the 'format' tag in the request
+     * has been used in the response. We do so by comparing the Content-Type
+     * header to the requested format. If not the same, we must have an error
+     * response as, probably, the server could not parse the XML request and
+     * defaulted to an XML response.
+     *
+     * @throws \Siel\Acumulus\ApiClient\AcumulusResponseException
+     */
+    protected function assertResponseFormat(): void
+    {
+        if ($this->getContentFormat() !== $this->getRequestedFormat() && !$this->hasError()) {
+            $body = $this->util->maskXmlOrJsonString($this->getHttpResponse()->getBody());
+            $code = $this->getHttpResponse()->getHttpStatusCode();
+            throw new AcumulusResponseException($body, $code, 'Inconsistent response format');
+        }
     }
 
     /**
@@ -292,11 +542,11 @@ class AcumulusResult extends MessageCollection
      *
      * @return $this
      */
-    public function setMainResponseKey(string $mainResponseKey, bool $isList = false): AcumulusResult
+    public function setMainAcumulusResponseKey(string $mainResponseKey, bool $isList = false): AcumulusResult
     {
-        $this->mainResponseKey = $mainResponseKey;
+        $this->mainAcumulusResponseKey = $mainResponseKey;
         $this->isList = $isList;
-        $this->response = $this->simplifyResponse($this->response);
+        $this->mainAcumulusResponse = $this->simplifyMainResponse($this->mainAcumulusResponse);
         return $this;
     }
 
@@ -309,33 +559,33 @@ class AcumulusResult extends MessageCollection
      *
      * @noinspection PhpSeparateElseIfInspection
      */
-    protected function simplifyResponse(array $response): array
+    protected function simplifyMainResponse(array $response): array
     {
-        // Simplify response by removing main key (which should be the only
-        // remaining one).
-        if (!empty($this->mainResponseKey)) {
-            if (isset($response[$this->mainResponseKey])) {
-                $response = $response[$this->mainResponseKey];
+        // Simplify response by removing main key, which should be the only
+        // remaining key, except in case of errors, when there may be a number
+        // of keys indicating the erroneous parameter values.
+        if (isset($response[$this->mainAcumulusResponseKey])) {
+            $response = $response[$this->mainAcumulusResponseKey];
 
-                if ($this->isList) {
-                    // Check for an empty list result.
-                    if (!empty($response)) {
-                        // Not empty: remove further indirection, i.e. get value of
-                        // "singular", which will be the first (and only) key.
-                        $response = reset($response);
-                        // If there was only 1 list result, it wasn't put in an array.
-                        if (!is_array(reset($response))) {
-                            $response = [$response];
-                        }
+            if ($this->isList) {
+                // Check for an empty list result.
+                if (!empty($response)) {
+                    // Not empty: remove further indirection, i.e. get value of
+                    // "singular", which will be the first (and only) key.
+                    $response = reset($response);
+                    // If there was only 1 list result, it wasn't put in an array.
+                    if (!is_array(reset($response))) {
+                        $response = [$response];
                     }
                 }
-            } else {
-                // Not set: probably an error occurred. This object offers ways
-                // to discover so. Therefore, we return an empty list if it
-                // should have been a list.
-                if ($this->isList) {
-                    $response = [];
-                }
+            }
+        } else {
+            // Not set: probably an error occurred. This object offers ways
+            // to discover so. Therefore, we return an empty list if it
+            // should have been a list.
+            // @todo: we loose access to any additional error information...
+            if ($this->isList) {
+                $response = [];
             }
         }
 
@@ -344,103 +594,26 @@ class AcumulusResult extends MessageCollection
 
     /**
      * @param array $apiMessages
-     *   An array with keys 'message', 'code', and 'codetag'.
+     *   Either:
+     *   - A single api message, being an array with keys 'message', 'code', and
+     *    'codetag'.
+     *   - An array of API messages.
+     *
      * @param int $severity
      *   One of the Severity::... constants.
-     *
-     * @return $this
      */
-    public function addApiMessages(array $apiMessages, int $severity): MessageCollection
+    protected function addApiMessages(array $apiMessages, int $severity)
     {
         if (count($apiMessages) === 3
             && isset($apiMessages['code'])
             && isset($apiMessages['codetag'])
             && isset($apiMessages['message'])
         ) {
-            // 1 Acumulus API message array.
+            // A single Acumulus API message: make it an array of API messages.
             $apiMessages = [$apiMessages];
         }
         foreach ($apiMessages as $apiMessage) {
             $this->addMessage(Message::createFromApiMessage($apiMessage, $severity));
         }
-        return $this;
-    }
-
-    /**
-     * Returns the masked raw request, response, and exception. if one occurred.
-     *
-     * @param bool $log
-     *   if true, the non-empty messages are logged with the given $logLevel.
-     * @param int $logLevel
-     *    The log level to log the messages with (if $log = true).
-     *
-     * @return string[]
-     *   An array of non-empty messages keyed by the keys:
-     *   - 'Request': The uri and a string representation of the
-     *     submit-structure.
-     *   - 'Response': The http response status code and the response body.
-     *     Non-present if no http response was received.
-     *   - 'Exception': The exception message. Non-present if no exception was
-     *     thrown.
-     */
-    public function toLogMessages(bool $log = false, int $logLevel = Severity::Log): array
-    {
-        $messages = array_filter([
-            'Request' => $this->getMaskedRequest(),
-            'Response' => $this->getMaskedResponse(),
-            'Exception' => $this->formatMessages(Message::Format_Plain, Severity::Exception),
-        ]);
-
-        $result = [];
-        foreach ($messages as $what => $message) {
-            // formatMessages() will always return an array: treat all entries
-            // as an array (of probably just 1 entry).
-            $message = (array) $message;
-            foreach ($message as $message1) {
-                $message1 = "$what: $message1";
-                $result[$what] = $message1;
-                if ($log) {
-                    $this->log->log($logLevel, $message1);
-                }
-            }
-        }
-        return $result;
-    }
-
-    /**
-     * Returns the submit-structure as a string, with passwords masked.
-     *
-     * - We use var_export() that returns parsable text, so we may use it, e.g,
-     *   to create test input.
-     * - We mask all values that have 'password' in their key, so it can be used
-     *   for logging purposes.
-     */
-    protected function getMaskedRequest(): string
-    {
-        $acumulusRequest = $this->getAcumulusRequest();
-        $submit = $acumulusRequest->getSubmit();
-        $submit = $submit !== null
-            ? var_export($this->util->maskArray($submit), true)
-            : '';
-        return sprintf("%s\n%s", $acumulusRequest->getUri(), $submit);
-    }
-
-    /**
-     * Returns the response from the Acumulus API, with passwords masked.
-     *
-     * - We mask all values of tags that end with 'password'.
-     * - The plugins default to json output format, but we also accept a string
-     *   in XML format.
-     * - By masking any password, the result can be used for logging purposes.
-     */
-    protected function getMaskedResponse(): string
-    {
-        if ($this->getHttpResponse() !== null) {
-            $code = $this->getHttpResponse()->getHttpCode();
-            $body = $this->getHttpResponse()->getBody();
-            $body = $this->util->maskJson($this->util->maskXml($body));
-            $response = sprintf('%d - %s', $code, $body);
-        }
-        return $response ?? '';
     }
 }

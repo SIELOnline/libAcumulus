@@ -1,7 +1,7 @@
 <?php
 namespace Siel\Acumulus;
 
-const Version = '7.0.3';
+const Version = '7.1.0-beta1';
 
 namespace Siel\Acumulus\Helpers;
 
@@ -324,7 +324,7 @@ class Container
     public function getAcumulusApiClient(): Acumulus
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('Acumulus', 'ApiClient', [$this, $this->getEnvironment()]);
+        return $this->getInstance('Acumulus', 'ApiClient', [$this, $this->getEnvironment(), $this->getUtil(), $this->getLog()]);
     }
 
     public function createAcumulusRequest(): AcumulusRequest
@@ -345,7 +345,16 @@ class Container
         return $this->getInstance('HttpRequest', 'ApiClient', [$options], true);
     }
 
-    public function createAcumulusResult(AcumulusRequest $acumulusRequest, ?HttpResponse $httpResponse): AcumulusResult
+    /**
+     * @param \Siel\Acumulus\ApiClient\AcumulusRequest $acumulusRequest
+     * @param \Siel\Acumulus\ApiClient\HttpResponse $httpResponse
+     *
+     * @return \Siel\Acumulus\ApiClient\AcumulusResult
+     *
+     * @throws \Siel\Acumulus\ApiClient\AcumulusResponseException
+     *   If the $httpResponse cannot be properly parsed.
+     */
+    public function createAcumulusResult(AcumulusRequest $acumulusRequest, HttpResponse $httpResponse): AcumulusResult
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance('AcumulusResult', 'ApiClient', [
@@ -353,7 +362,6 @@ class Container
             $httpResponse,
             $this->getUtil(),
             $this->getTranslator(),
-            $this->getLog(),
         ], true);
     }
 

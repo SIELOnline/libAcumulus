@@ -1,5 +1,5 @@
-Changelog Acumulus webkoppelingen
-=================================
+Changelog Acumulus web shop extensions
+======================================
 
 Supported shops and versions
 ----------------------------
@@ -24,6 +24,15 @@ WC   WooCommerce                             >= 5.0 (3 and 4 will probably work)
 Refactorings:
 - Extracted the environment part out of Config into its own class Environment,
   added database name and version to it, and removed json version from it.
+- Redesigned the error handling around the communication with the Acumulus API
+  server. The library now better recognises and distinguishes errors at the
+  protocol and the application level. By encapsulating this in the ApiClient
+  namespace layer, the other code can become more robust as it becomes less
+  dependent on specific error codes (that changed form API v4 to v5).
+- Introduced AcumulusException and AcumulusResponseException to handle
+  communication errors.
+- Code documentation: changed {@see ...} with external links to {@link ...}.
+
 
 7.0.3 (2022-04-20) (WC only)
 ----------------------------

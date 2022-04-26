@@ -1,8 +1,8 @@
 <?php
 /**
- * @noinspection SpellCheckingInspection : all fields in the Acumulus API are in
- *   lowercase, and as many fields consists of jined words this leads to
- *   hundreds of spell error inspection problems.
+ * @noinspection SpellCheckingInspection : fields in the Acumulus API are in
+ *   all lowercase with no underscore as separator. As many fields consists of
+ *   joined words this leads to hundreds of spell error inspection problems.
  */
 
 namespace Siel\Acumulus\ApiClient;
@@ -10,6 +10,9 @@ namespace Siel\Acumulus\ApiClient;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Helpers\Container;
+use Siel\Acumulus\Helpers\Log;
+use Siel\Acumulus\Helpers\Severity;
+use Siel\Acumulus\Helpers\Util;
 
 /**
  * Provides an easy interface towards the different API calls of the Acumulus
@@ -30,10 +33,9 @@ use Siel\Acumulus\Helpers\Container;
  */
 class Acumulus
 {
-    /** @var \Siel\Acumulus\Config\Environment */
     protected /*Environment*/ $environment;
-
-    /** @var \Siel\Acumulus\Helpers\Container */
+    protected /*Util*/ $util;
+    protected /*Log*/ $log;
     protected /*Container*/ $container;
 
     /**
@@ -42,10 +44,12 @@ class Acumulus
      * @param \Siel\Acumulus\Helpers\Container $container
      * @param \Siel\Acumulus\Config\Environment $environment
      */
-    public function __construct(Container $container, Environment $environment)
+    public function __construct(Container $container, Environment $environment, Util $util, Log $log)
     {
         $this->environment = $environment;
         $this->container = $container;
+        $this->util = $util;
+        $this->log = $log;
     }
 
     /**
@@ -73,7 +77,7 @@ class Acumulus
      */
     public function getAbout(): AcumulusResult
     {
-        return $this->callApiFunction('general/general_about', [])->setMainResponseKey('general');
+        return $this->callApiFunction('general/general_about', [])->setMainAcumulusResponseKey('general');
     }
 
     /**
@@ -108,7 +112,7 @@ class Acumulus
      */
     public function getMyAcumulus(): AcumulusResult
     {
-        return $this->callApiFunction('general/my_acumulus', [])->setMainResponseKey('mydata');
+        return $this->callApiFunction('general/my_acumulus', [])->setMainAcumulusResponseKey('mydata');
     }
 
     /**
@@ -288,7 +292,7 @@ class Acumulus
     {
         // For picklists, the main result is found under the name of the
         // picklist but in singular form, i.e. without the s at the end.
-        return $this->callApiFunction("picklists/picklist_$picklist", $filters, $needContract)->setMainResponseKey($picklist, true);
+        return $this->callApiFunction("picklists/picklist_$picklist", $filters, $needContract)->setMainAcumulusResponseKey($picklist, true);
     }
 
     /**
@@ -320,7 +324,7 @@ class Acumulus
             'vatcountry' => $countryCode,
             'vatdate' => $date,
         ];
-        return $this->callApiFunction('lookups/lookup_vatinfo', $message)->setMainResponseKey('vatinfo', true);
+        return $this->callApiFunction('lookups/lookup_vatinfo', $message)->setMainAcumulusResponseKey('vatinfo', true);
     }
 
     /**
@@ -349,7 +353,7 @@ class Acumulus
         if (!empty($year)) {
             $message['year'] = $year;
         }
-        return $this->callApiFunction('reports/report_threshold_eu_ecommerce', $message)->setMainResponseKey('');
+        return $this->callApiFunction('reports/report_threshold_eu_ecommerce', $message)->setMainAcumulusResponseKey('');
     }
 
     /**
@@ -372,7 +376,7 @@ class Acumulus
      */
     public function invoiceAdd(array $invoice): AcumulusResult
     {
-        return $this->callApiFunction('invoices/invoice_add', $invoice)->setMainResponseKey('invoice');
+        return $this->callApiFunction('invoices/invoice_add', $invoice)->setMainAcumulusResponseKey('invoice');
     }
 
     /**
@@ -399,7 +403,7 @@ class Acumulus
         $message = [
             'conceptid' => $conceptId,
         ];
-        return $this->callApiFunction('invoices/invoice_concept_info', $message)->setMainResponseKey('concept');
+        return $this->callApiFunction('invoices/invoice_concept_info', $message)->setMainAcumulusResponseKey('concept');
     }
 
     /**
@@ -447,7 +451,7 @@ class Acumulus
         $message = [
             'entryid' => $entryId,
         ];
-        return $this->callApiFunction('entry/entry_info', $message)->setMainResponseKey('entry');
+        return $this->callApiFunction('entry/entry_info', $message)->setMainAcumulusResponseKey('entry');
     }
 
     /**
@@ -482,7 +486,7 @@ class Acumulus
             'entryid' => $entryId,
             'entrydeletestatus' => $deleteStatus,
         ];
-        return $this->callApiFunction('entry/entry_deletestatus_set', $message)->setMainResponseKey('entry');
+        return $this->callApiFunction('entry/entry_deletestatus_set', $message)->setMainAcumulusResponseKey('entry');
     }
 
     /**
@@ -511,7 +515,7 @@ class Acumulus
         $message = [
             'token' => $token,
         ];
-        return $this->callApiFunction('invoices/invoice_paymentstatus_get', $message)->setMainResponseKey('invoice');
+        return $this->callApiFunction('invoices/invoice_paymentstatus_get', $message)->setMainAcumulusResponseKey('invoice');
     }
 
     /**
@@ -551,7 +555,7 @@ class Acumulus
             'paymentstatus' => $paymentStatus,
             'paymentdate' => (string) $paymentDate,
         ];
-        return $this->callApiFunction('invoices/invoice_paymentstatus_set', $message)->setMainResponseKey('invoice');
+        return $this->callApiFunction('invoices/invoice_paymentstatus_set', $message)->setMainAcumulusResponseKey('invoice');
     }
 
     /**
@@ -603,7 +607,7 @@ class Acumulus
         if (!empty($invoiceNotes)) {
             $message['invoicenotes'] = $invoiceNotes;
         }
-        return $this->callApiFunction('invoices/invoice_mail', $message)->setMainResponseKey('invoice');
+        return $this->callApiFunction('invoices/invoice_mail', $message)->setMainAcumulusResponseKey('invoice');
     }
 
     /**
@@ -662,7 +666,7 @@ class Acumulus
         $message = [
             'signup' => $signUp,
         ];
-        return $this->callApiFunction('signup/signup', $message, false)->setMainResponseKey('signup');
+        return $this->callApiFunction('signup/signup', $message, false)->setMainAcumulusResponseKey('signup');
     }
 
     /**
@@ -704,7 +708,7 @@ class Acumulus
                 'stockdate' => $date,
             ]
         ];
-        return $this->callApiFunction('stock/stock_add', $message)->setMainResponseKey('stock');
+        return $this->callApiFunction('stock/stock_add', $message)->setMainAcumulusResponseKey('stock');
     }
 
     /**
@@ -786,12 +790,38 @@ class Acumulus
      *
      * @return \Siel\Acumulus\ApiClient\AcumulusResult
      *   An AcumulusResult object containing the results.
+     *
+     * @throws \Siel\Acumulus\ApiClient\AcumulusException|\Siel\Acumulus\ApiClient\AcumulusResponseException
+     *   A communication level erorr occurred.
+     *   - AcumulusRequest will be set;
+     *   - HttpRequest will probably also be set;
+     *   - HttpResponse might be set or not;
+     *   - AcumulusResult will not be set.
      */
     protected function callApiFunction(string $apiFunction, array $message, bool $needContract = true): AcumulusResult
     {
         $acumulusRequest = $this->createAcumulusRequest();
         $uri = $this->constructUri($apiFunction);
-        return $acumulusRequest->execute($uri, $message, $needContract);
+        $logLevel = Severity::Error;
+        try {
+            $acumulusResult = $acumulusRequest->execute($uri, $message, $needContract);
+            // We will log the request and response, as debug messages in case
+            // of success but as error messages in case of errors.
+            $logLevel = $acumulusResult->hasError() ? Severity::Error : Severity::Log;
+            return $acumulusResult;
+        } catch (AcumulusException|AcumulusResponseException $e) {
+            // Situation 1 or 2. We will log the situation and rethrow.
+            $exception = $e;
+            throw $e;
+        } finally {
+            $this->log->log($logLevel, $acumulusRequest->getMaskedRequest());
+            if (isset($acumulusResult)) {
+                $this->log->log($logLevel, $acumulusResult->getMaskedResponse());
+            }
+            if (isset($exception)) {
+                $this->log->error($e->getMessage());
+            }
+        }
     }
 
     /**
@@ -799,7 +829,7 @@ class Acumulus
      *
      * @return \Siel\Acumulus\ApiClient\AcumulusRequest
      */
-    public function createAcumulusRequest(): AcumulusRequest
+    protected function createAcumulusRequest(): AcumulusRequest
     {
         return $this->container->createAcumulusRequest();
     }

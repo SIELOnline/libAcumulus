@@ -80,78 +80,61 @@ class AcumulusResultTest extends TestCase
         return $result;
     }
 
-    public function testCreateError()
-    {
-        $acumulusRequest = $this->container->createAcumulusRequest();
-        $httpResponse = null;
-        $result = $this->container->createAcumulusResult($acumulusRequest, $httpResponse);
-
-        $this->assertSame($httpResponse, $result->getHttpResponse());
-        $this->assertSame(Severity::Unknown, $result->getStatus());
-        $this->assertSame($this->t('request_not_yet_sent'), $result->getStatusText());
-    }
-
     public function testSetMainResponseKeyNoList()
     {
         $uri = 'invoice-add';
         $result = $this->getAcumulusResult($uri);
-        $result->setMainResponseKey($this->examples->getMainResponseKey($uri), $this->examples->isList($uri));
+        $result->setMainAcumulusResponseKey($this->examples->getMainResponseKey($uri), $this->examples->isList($uri));
 
-        $this->assertSame($this->examples->getMainResponse($uri), $result->getMainResponse());
+        $this->assertSame($this->examples->getMainResponse($uri), $result->getMainAcumulusResponse());
     }
 
     public function testSetMainResponseKeyList()
     {
         $uri = 'vatinfo';
         $result = $this->getAcumulusResult($uri);
-        $result->setMainResponseKey($this->examples->getMainResponseKey($uri), $this->examples->isList($uri));
+        $result->setMainAcumulusResponseKey($this->examples->getMainResponseKey($uri), $this->examples->isList($uri));
 
-        $this->assertSame($this->examples->getMainResponse($uri), $result->getMainResponse());
+        $this->assertSame($this->examples->getMainResponse($uri), $result->getMainAcumulusResponse());
     }
 
     public function testSetMainResponseKeyEmptyList()
     {
         $uri = 'vatinfo-empty-return';
         $result = $this->getAcumulusResult($uri);
-        $result->setMainResponseKey($this->examples->getMainResponseKey($uri), $this->examples->isList($uri));
+        $result->setMainAcumulusResponseKey($this->examples->getMainResponseKey($uri), $this->examples->isList($uri));
 
-        $this->assertSame($this->examples->getMainResponse($uri), $result->getMainResponse());
+        $this->assertSame($this->examples->getMainResponse($uri), $result->getMainAcumulusResponse());
     }
 
     public function testNoContract()
     {
         $uri = 'no-contract';
         $result = $this->getAcumulusResult($uri);
-        $result->setMainResponseKey($this->examples->getMainResponseKey($uri), $this->examples->isList($uri));
+        $result->setMainAcumulusResponseKey($this->examples->getMainResponseKey($uri), $this->examples->isList($uri));
 
-        $this->assertSame($this->examples->getMainResponse($uri), $result->getMainResponse());
+        $this->assertSame($this->examples->getMainResponse($uri), $result->getMainAcumulusResponse());
     }
 
     public function testMaskPasswordsRequest()
     {
         $uri = 'invoice-add';
         $result = $this->getAcumulusResult($uri);
-        $result->setMainResponseKey($this->examples->getMainResponseKey($uri), $this->examples->isList($uri));
+        $result->setMainAcumulusResponseKey($this->examples->getMainResponseKey($uri), $this->examples->isList($uri));
 
-        $messages = $result->toLogMessages();
-        $this->assertArrayHasKey('Request', $messages);
-        $this->assertArrayHasKey('Response', $messages);
-        $this->assertArrayNotHasKey('Exception', $messages);
-        $this->assertStringNotContainsString('mysecret', $messages['Request']);
-        $this->assertStringContainsString('REMOVED FOR SECURITY', $messages['Request']);
+        $message = $result->getAcumulusRequest()->getMaskedRequest();
+        $this->assertStringNotContainsString('mysecret', $message);
+        $this->assertStringContainsString('REMOVED FOR SECURITY', $message);
     }
 
     public function testMaskPasswordsResponse()
     {
         $uri = 'signup';
         $result = $this->getAcumulusResult($uri);
-        $result->setMainResponseKey($this->examples->getMainResponseKey($uri), $this->examples->isList($uri));
+        $result->setMainAcumulusResponseKey($this->examples->getMainResponseKey($uri), $this->examples->isList($uri));
 
-        $messages = $result->toLogMessages();
-        $this->assertArrayHasKey('Request', $messages);
-        $this->assertArrayHasKey('Response', $messages);
-        $this->assertArrayNotHasKey('Exception', $messages);
-        $this->assertStringNotContainsString('mysecret', $messages['Response']);
-        $this->assertStringContainsString('REMOVED FOR SECURITY', $messages['Response']);
+        $message = $result->getMaskedResponse();
+        $this->assertStringNotContainsString('mysecret', $message);
+        $this->assertStringContainsString('REMOVED FOR SECURITY', $message);
     }
 }

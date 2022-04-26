@@ -1,7 +1,6 @@
 <?php
 namespace Siel\Acumulus\ApiClient;
 
-use LogicException;
 use RuntimeException;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
@@ -76,6 +75,24 @@ class AcumulusRequest
     }
 
     /**
+     * Returns the uri and submit structure as a loggable string.
+     *
+     * - We use json_encode() to turn submit into a string, so we may use it,
+     *   e.g, to create test input.
+     * - We mask all values that have 'password' in their key, so we can safely
+     *   log it.
+     */
+    public function getMaskedRequest(): string
+    {
+        $uri = $this->getUri();
+        $submit = $this->getSubmit();
+        if ($submit !== null) {
+            $submit = $this->util->maskArray($this->getSubmit());
+        }
+        return sprintf("Request: uri=%s\nsubmit=%s", json_encode($uri), json_encode($submit));
+    }
+
+    /**
      * Sends the message to the given API function and returns the results.
      * Any errors (or warnings) in the response structure of the web service are
      * returned via the result value and should be handled at a higher level.
@@ -91,35 +108,36 @@ class AcumulusRequest
      *
      * @return \Siel\Acumulus\ApiClient\AcumulusResult
      *   The result of the web service call. See
-     *   {@see https://www.siel.nl/acumulus/API/Basic_Response/} for the
+     *   {@link https://www.siel.nl/acumulus/API/Basic_Response/} for the
      *   structure of a response. In case of errors, an exception or error
      *   message will have been added to the Result and the main response may be
      *   empty.
      *
-     * @throws \LogicException
-     *   This request has already been executed.
+     * @throws \Siel\Acumulus\ApiClient\AcumulusException|\Siel\Acumulus\ApiClient\AcumulusResponseException
+     *   An error occurred:
+     *   - At the internal level, e.g. an out of memory error.
+     *   - At the communication level, e.g. time-out or no response received.
+     *   - While converting the {@see \Siel\Acumulus\ApiClient\HttpResponse}
+     *     into an {@see \Siel\Acumulus\ApiClient\AcumulusResult}.
+     *     This conversion is done during the construction of the
+     *     {@see \Siel\Acumulus\ApiClient\AcumulusResult}, so no result object
+     *     will be created in the case of errors.
+     *   Note that errors at the application level will not be thrown as an
+     *   exception, but will have to be handled by the calling code.
      */
     public function execute(string $uri, array $submit, bool $needContract): AcumulusResult
     {
-        assert($this->uri === null, new LogicException('AcumulusRequest::execute() may only be called once.'));
+        assert($this->uri === null);
 
-        try {
-            $this->uri= $uri;
-            $this->submit = $this->constructFullSubmit($submit, $needContract);
-            $httpResponse = $this->executeWithPostXmlStringApproach();
-            $result = $this->container->createAcumulusResult($this, $httpResponse);
-        } catch (RuntimeException $e) {
-            // Any errors during:
-            // - Conversion of the message to xml.
-            // - communication with the Acumulus web service.
-            // - Converting the response to an array.
-            // are returned as a RuntimeException.
-            $result = $this->container->createAcumulusResult($this, null);
-            $result->addException($e);
-        }
+        $this->uri = $uri;
+        $this->submit = $this->constructFullSubmit($submit, $needContract);
+        $httpResponse = $this->executeWithPostXmlStringApproach();
+        $acumulusResult = $this->container->createAcumulusResult($this, $httpResponse);
 
-        $result->toLogMessages(true);
-        return $result;
+        assert($acumulusResult->getAcumulusRequest() === $this);
+        assert($acumulusResult->getHttpResponse() === $httpResponse);
+
+        return $acumulusResult;
     }
 
     /**
@@ -137,7 +155,7 @@ class AcumulusRequest
      *
      * @return \Siel\Acumulus\ApiClient\HttpResponse
      *
-     * @throws \RuntimeException
+     * @throws \Siel\Acumulus\ApiClient\AcumulusException
      *   An error occurred at:
      *   - The internal level, e.g. an out of memory error.
      *   - The communication level, e.g. time-out or no response received.
@@ -149,16 +167,30 @@ class AcumulusRequest
         // - Convert message to XML. XML requires 1 top level tag, so add one.
         //   The top tag name is ignored by the Acumulus API, we use <acumulus>.
         // - 'xmlstring' is the post field that Acumulus expects.
-        $options = [CURLOPT_USERAGENT => $this->getUserAgent()];
+        $options = $this->getCurlOptions();
         $body = ['xmlstring' => trim($this->util->convertArrayToXml(['acumulus' => $this->submit]))];
         $this->httpRequest = $this->container->createHttpRequest($options);
-        $httpResponse = $this->httpRequest->post($this->uri, $body);
+        try {
+            $httpResponse = $this->httpRequest->post($this->uri, $body);
+        } catch (RuntimeException $e) {
+            // Rethrow as an AcumulusException for logging higher up.
+            throw new AcumulusException($e->getMessage(), $e->getCode(), $e);
+        }
 
         assert($httpResponse->getRequest() === $this->httpRequest);
         assert($this->httpRequest->getUri() === $this->uri);
         assert($this->httpRequest->getBody() === $body);
 
         return $httpResponse;
+    }
+
+    /**
+     * Returns an array with Curl options we want for requests to the Acumulus
+     * API server.
+     */
+    protected function getCurlOptions(): array
+    {
+        return [CURLOPT_USERAGENT => $this->getUserAgent()];
     }
 
     protected function getUserAgent(): string
@@ -197,7 +229,7 @@ class AcumulusRequest
      * Returns the basic submit part of each API message.
      *
      * The basic submit part is defined at
-     * {@see https://www.siel.nl/acumulus/API/Basic_Submit/}
+     * {@link https://www.siel.nl/acumulus/API/Basic_Submit/}
      * and consists of the following tags:
      * - 'contract' (optional): authentication and authorisation credentials.
      * - 'format': 'json' or 'xml'.

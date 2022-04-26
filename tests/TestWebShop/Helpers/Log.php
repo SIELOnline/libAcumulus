@@ -12,6 +12,14 @@ use Siel\Acumulus\Helpers\Log as BaseLog;
  */
 class Log extends BaseLog
 {
+    public $loggedMessages = [];
+
+    public function log(int $severity, string $message, array $values = []): string
+    {
+        $this->loggedMessages[] = ['message' => parent::log($severity, $message, $values), 'severity' => $severity];
+        return end($this->loggedMessages)['message'];
+    }
+
     /**
      * {@inheritdoc}
      */

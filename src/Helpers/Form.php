@@ -596,7 +596,7 @@ abstract class Form extends MessageCollection
             $euCommerceMessage = $this->t('no_contract_data_local');
         } else {
             $myAcumulus = $this->acumulusApiClient->getMyAcumulus();
-            $myData = $myAcumulus->getMainResponse();
+            $myData = $myAcumulus->getMainAcumulusResponse();
             if (!empty($myData)) {
                 $contractMsg = '';
                 $contract = [
@@ -643,7 +643,7 @@ abstract class Form extends MessageCollection
             if ($warningPercentage !== '') {
                 $euCommerceReport = $this->acumulusApiClient->reportThresholdEuCommerce();
                 if (!$euCommerceReport->hasError()) {
-                    $euCommerceReport = $euCommerceReport->getMainResponse();
+                    $euCommerceReport = $euCommerceReport->getMainAcumulusResponse();
                     $reached = $euCommerceReport['reached'] == 1;
                     $nlTaxed = (float) $euCommerceReport['nltaxed'];
                     $threshold = (float) $euCommerceReport['threshold'];
@@ -778,7 +778,7 @@ abstract class Form extends MessageCollection
         }
 
         // Other values follow, we do not change the order.
-        $pickListItems = $picklist->getMainResponse();
+        $pickListItems = $picklist->getMainAcumulusResponse();
         foreach ($pickListItems as $picklistItem) {
             // Option value, may not clash with the "empty value" in a weak
             // comparison (Magento uses in_array with the strict parameter set

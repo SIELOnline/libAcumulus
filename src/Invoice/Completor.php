@@ -1368,7 +1368,7 @@ class Completor
             $year = (int) substr($this->getInvoiceDate(), 0, 4);
             $result = $this->acumulusApiClient->reportThresholdEuCommerce($year);
             if (!$result->hasError()) {
-                $euCommerceReport = $result->getMainResponse();
+                $euCommerceReport = $result->getMainAcumulusResponse();
                 if ($euCommerceReport['reached'] == 1) {
                     $this->changeInvoiceToConcept($invoice, 'eu_commerce_threshold_passed', 830);
                 } else {
@@ -1521,7 +1521,7 @@ class Completor
                 $this->result->addMessages($result->getMessages(Severity::InfoOrWorse));
                 $result = [];
             } else {
-                $result = $result->getMainResponse();
+                $result = $result->getMainAcumulusResponse();
             }
             $this->vatRatesCache[$cacheKey] = $result;
         }

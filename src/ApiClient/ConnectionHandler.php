@@ -1,8 +1,6 @@
 <?php
 namespace Siel\Acumulus\ApiClient;
 
-use RuntimeException;
-
 /**
  * ConnectionHandler handles HTTP connections.
  *
@@ -82,7 +80,7 @@ class ConnectionHandler
             $this->curlHandles[$key] = curl_init();
             if (empty($this->curlHandles[$key])) {
                 unset($this->curlHandles[$key]);
-                throw new RuntimeException(__METHOD__ . "($uri): curl_init() failed");
+                throw new AcumulusException(__METHOD__ . "($uri): curl_init() failed");
             }
         }
         else {
@@ -120,7 +118,7 @@ class ConnectionHandler
     {
         $parts = parse_url($uri);
         if (!is_array($parts) || empty($parts['scheme']) || empty($parts['host'])) {
-            throw new RuntimeException(__METHOD__ . "($uri): not a valid uri");
+            throw new AcumulusException(__METHOD__ . "($uri): not a valid uri");
         }
         $key = $parts['scheme'] . '://' . $parts['host'];
         if ((!empty($parts['port']))) {

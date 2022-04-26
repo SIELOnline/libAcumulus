@@ -142,7 +142,7 @@ class RegisterForm extends Form
         $this->addMessages($result->getMessages(Severity::WarningOrWorse));
         $formSuccess = !$result->hasError();
         if ($formSuccess) {
-            $this->signUpResponse = $result->getMainResponse();
+            $this->signUpResponse = $result->getMainAcumulusResponse();
             $this->setAccountInfo($this->signUpResponse);
         }
 

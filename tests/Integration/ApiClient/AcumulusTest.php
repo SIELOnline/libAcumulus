@@ -72,7 +72,7 @@ class AcumulusTest extends TestCase
         /** @var \Siel\Acumulus\ApiClient\AcumulusResult $result */
         $result = $this->acumulusClient->$method(... $args);
         $this->assertSame(Severity::Success, $result->getStatus());
-        $response = $result->getMainResponse();
+        $response = $result->getMainAcumulusResponse();
         if ($isList) {
             $this->assertIsArray($response);
             $this->assertNotEmpty($response);
@@ -153,7 +153,7 @@ class AcumulusTest extends TestCase
         $vatType = array_column($expected, 'vattype');
         array_multisort($vatRate, SORT_DESC, $vatType, SORT_ASC, $expected);
 
-        $actual = $result->getMainResponse();
+        $actual = $result->getMainAcumulusResponse();
         $vatRate  = array_column($actual, 'vatrate');
         $vatType = array_column($actual, 'vattype');
         array_multisort($vatRate, SORT_DESC, $vatType, SORT_ASC, $actual);
@@ -178,7 +178,7 @@ class AcumulusTest extends TestCase
     {
         $result = $this->acumulusClient->reportThresholdEuCommerce(2021);
         $this->assertSame(Severity::Success, $result->getStatus());
-        $actual = $result->getMainResponse();
+        $actual = $result->getMainAcumulusResponse();
         $threshold = $actual['threshold'];
         $this->assertEquals(10000, $threshold);
     }
@@ -200,7 +200,7 @@ class AcumulusTest extends TestCase
     {
         $result = $this->acumulusClient->reportThresholdEuCommerce(2099);
         $this->assertSame(Severity::Success, $result->getStatus());
-        $actual = $result->getMainResponse();
+        $actual = $result->getMainAcumulusResponse();
         $threshold = $actual['threshold'];
         $this->assertEquals(10000, $threshold);
     }
@@ -222,7 +222,7 @@ class AcumulusTest extends TestCase
         $result = $this->acumulusClient->stockAdd(... $args);
 
         $this->assertSame(Severity::Success, $result->getStatus());
-        $actual = $result->getMainResponse();
+        $actual = $result->getMainAcumulusResponse();
         $this->assertEqualsCanonicalizing($expected, $actual);
     }
 

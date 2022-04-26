@@ -1,5 +1,6 @@
 <?php
 /**
+ * @noinspection DuplicatedCode
  * @noinspection PhpStaticAsDynamicMethodCallInspection
  */
 
@@ -7,280 +8,149 @@ namespace Siel\Acumulus\ApiBehaviour\ApiClient;
 
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Api;
+use Siel\Acumulus\ApiClient\AcumulusException;
+use Siel\Acumulus\ApiClient\AcumulusResponseException;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Severity;
 
-class AcumulusTest extends TestCase
+/**
+ * This class tests the actual behaviour of the Acumulus API Server in case of
+ * errors.
+ *
+ * This library attempts to react to all possible types of errors that
+ * can occur when communicating with the API server. For severe errors,
+ * exceptions, it is important that all information that may help in researching
+ * the error is logged. So this text class forces a number of error situations
+ * and checks that the:
+ * - Library acts as designed, throwing the right exception type
+ * - Exceptions contains the message and code as intended
+ * - Exceptions and underlying communications are logged.
+ */
+class AcumulusErrorHandlingTest extends TestCase
 {
     protected /*Container*/ $container;
+    protected /*Environment*/ $environment;
+    /** @var \Siel\Acumulus\TestWebShop\ApiClient\Acumulus  */
     protected /*Acumulus*/ $acumulusClient;
+    /** @var \Siel\Acumulus\TestWebShop\Helpers\Log */
+    protected $log;
 
     protected function setUp(): void
     {
         // Using TestWebShop would give us test classes, but we want real ones
         // here.
         $this->container = new Container('TestWebShop', 'nl');
+        $this->environment = $this->container->getEnvironment();
+        $this->log = $this->container->getLog();
         $this->acumulusClient = $this->container->getAcumulusApiClient();
     }
 
     /**
-     * Kunnen we hier nog wat mee?
-     *
-     * @return array[]
+     * Test the reaction on a request for a non-existing uri.
      */
-    public function argumentsPassedDeprecated(): array
+    public function testTimeout()
     {
-        // See for the meaning of each entry the parameter list of testApiCalls.
-        return [
-            'About' => ['getAbout', [], 'general/general_about', true, 'general', false],
-            'Accounts' => ['getPicklistAccounts', [], 'picklists/picklist_accounts', true, 'accounts', true],
-            'ContactTypes' => ['getPicklistContactTypes', [], 'picklists/picklist_contacttypes', true, 'contacttypes', true],
-            'CostCenters' => ['getPicklistCostCenters', [], 'picklists/picklist_costcenters', true, 'costcenters', true],
-            'InvoiceTemplates' => ['getPicklistInvoiceTemplates', [], 'picklists/picklist_invoicetemplates', true, 'invoicetemplates', true],
-            'VatInfo' => ['getVatInfo', ['nl'], 'lookups/lookup_vatinfo', true, 'vatinfo', true],
-            'InvoiceAdd' => ['invoiceAdd', [['customer' => []]], 'invoices/invoice_add', true, 'invoice', false, ['customer' => []]],
-            'ConceptInfo' => ['getConceptInfo', [12345], 'invoices/invoice_concept_info', true, 'concept', false, ['conceptid' => 12345]],
-            'Entry' => ['getEntry', [12345], 'entry/entry_info', true, 'entry', false, ['entryid' => 12345]],
-            'SetDeleteStatus1' => ['setDeleteStatus', [12345, true], 'entry/entry_deletestatus_set', true, 'entry', false, ['entryid' => 12345, 'entrydeletestatus' => 1]],
-            'SetDeleteStatus0' => ['setDeleteStatus', [12345, false], 'entry/entry_deletestatus_set', true, 'entry', false, ['entryid' => 12345, 'entrydeletestatus' => 0]],
-            'GetPaymentStatus' => ['getPaymentStatus', ['TOKEN'], 'invoices/invoice_paymentstatus_get', true, 'invoice', false, ['token' => 'TOKEN']],
-            'SetPaymentStatus' => ['setPaymentStatus', ['TOKEN', Api::PaymentStatus_Paid, '2020-02-02'], 'invoices/invoice_paymentstatus_set', true, 'invoice', false, ['token' => 'TOKEN', 'paymentstatus' => Api::PaymentStatus_Paid, 'paymentdate' => '2020-02-02']],
-            'Signup' => ['signup', [['companyname' => 'BR']], 'signup/signup', false, 'signup', false, ['signup' => ['companyname' => 'BR']]],
-        ];
-    }
-
-
-    public function responseKeysProvider(): array
-    {
-        return [
-            'About' => ['getAbout', [], false, ['about', 'role', 'roleapi', 'roleid', 'rolenl']],
-            'MyAcumulus' => ['getMyAcumulus', [], false, ['myaddress', 'mycity', 'mycompanyname', 'mycontactperson', 'mycontractcode', 'mycontractenddate', 'mydebt', 'myemail', 'myemailstatusid', 'myemailstatusreferenceid', 'myentries', 'myentriesleft', 'myiban', 'mymaxentries', 'mypostalcode', 'mysalutation', 'mysepamandatenr', 'mystatusid', 'mytelephone', 'myvatnumber']],
-            'Accounts enabled' => ['getPicklistAccounts', [true], true, ['accountid', 'accountnumber', 'accountdescription', 'accountorderid', 'accountstatus', 'accounttypeid']],
-            'CompanyTypes' => ['getPicklistCompanyTypes', [], true, ['companytypeid', 'companytypename', 'companytypenamenl']],
-            'ContactTypes' => ['getPicklistContactTypes', [], true, ['contacttypeid', 'contacttypename', 'contacttypenamenl']],
-            'CostCenters' => ['getPicklistCostCenters', [], true, ['costcenterid', 'costcentername']],
-            'InvoiceTemplates' => ['getPicklistInvoiceTemplates', [], true, ['invoicetemplateid', 'invoicetemplatename']],
-            'Products' => ['getPicklistProducts', [], true, ['productid', 'productnature', 'productdescription', 'producttagid', 'productcontactid', 'productprice', 'productvatrate', 'productsku', 'productstockamount', 'productean', 'producthash', 'productnotes']],
-            'VatInfo' => ['getVatInfo', ['nl'], true, ['vattype', 'vatrate', 'countryregion']],
-            'ThresholdEuCommerce' => ['reportThresholdEuCommerce', [], false, ['year', 'threshold', 'nltaxed', 'reached']],
-        ];
-    }
-
-    /**
-     * @dataProvider responseKeysProvider
-     */
-    public function testServicesKeysInResponse(string $method, array $args, bool $isList, array $expectedKeys)
-    {
-        /** @var \Siel\Acumulus\ApiClient\AcumulusResult $result */
-        $result = $this->acumulusClient->$method(... $args);
-        $this->assertSame(Severity::Success, $result->getStatus());
-        $response = $result->getMainResponse();
-        if ($isList) {
-            $this->assertIsArray($response);
-            $this->assertNotEmpty($response);
-            $singleResponse = reset($response);
-            $this->assertIsInt(key($response));
-        } else {
-            $singleResponse = $response;
+        try {
+            $this->acumulusClient->timeout();
+            $this->fail('Should not arrive here');
+        } catch (AcumulusException $e) {
+            $this->assertCount(2, $this->log->loggedMessages);
+            $this->assertMessageLoggedIsSubmittedRequest(reset($this->log->loggedMessages), Severity::Error);
+            $loggedMessage2 = end($this->log->loggedMessages);
+            $lastMessage = $loggedMessage2['message'];
+            $lastSeverity = $loggedMessage2['severity'];
+            $this->assertStringStartsWith('curl_exec()', $lastMessage);
+            $this->assertStringContainsString(CURLE_OPERATION_TIMEDOUT, $lastMessage);
+            $this->assertEquals(Severity::Error, $lastSeverity);
         }
-
-        $this->assertIsArray($singleResponse);
-        $this->assertNotEmpty($singleResponse);
-        $this->assertEqualsCanonicalizing($expectedKeys, array_keys($singleResponse));
-    }
-
-    public function vatInfoProvider(): array
-    {
-        return [
-            'nl' => [['nl', '2015-01-01'],
-                [
-                    ['vattype' => 'reduced', 'vatrate' => '0.0000', 'countryregion' => '1'],
-                    ['vattype' => 'reduced', 'vatrate' => '6.0000', 'countryregion' => '1'],
-                    ['vattype' => 'normal', 'vatrate' => '21.0000', 'countryregion' => '1'],
-                ],
-            ],
-            'nl-no-date' => [['nl'],
-                [
-                    ['vattype' => 'reduced', 'vatrate' => '0.0000', 'countryregion' => '1'],
-                    ['vattype' => 'reduced', 'vatrate' => '9.0000', 'countryregion' => '1'],
-                    ['vattype' => 'normal', 'vatrate' => '21.0000', 'countryregion' => '1'],
-                ],
-            ],
-            'eu' => [['be', '2015-12-01'],
-                [
-                    ['vattype' => 'reduced', 'vatrate' => '6.0000', 'countryregion' => '2'],
-                    ['vattype' => 'reduced', 'vatrate' => '12.0000', 'countryregion' => '2'],
-                    ['vattype' => 'normal', 'vatrate' => '21.0000', 'countryregion' => '2'],
-                    ['vattype' => 'parked', 'vatrate' => '12.0000', 'countryregion' => '2'],
-                    ['vattype' => 'reduced', 'vatrate' => '0.0000', 'countryregion' => '2'],
-                ],
-            ],
-            'eu-no-date' => [['be'],
-                [
-                    ['vattype' => 'reduced', 'vatrate' => '6.0000', 'countryregion' => '2'],
-                    ['vattype' => 'reduced', 'vatrate' => '12.0000', 'countryregion' => '2'],
-                    ['vattype' => 'normal', 'vatrate' => '21.0000', 'countryregion' => '2'],
-                    ['vattype' => 'parked', 'vatrate' => '12.0000', 'countryregion' => '2'],
-                    ['vattype' => 'reduced', 'vatrate' => '0.0000', 'countryregion' => '2'],
-                ],
-            ],
-            'eu-wrong-date' => [['be', '2014-12-01'], []],
-            'gb-eu' => [['gb', '2020-12-01'],
-                [
-                    ['vattype' => 'reduced', 'vatrate' => '0.0000', 'countryregion' => '2'],
-                    ['vattype' => 'reduced', 'vatrate' => '5.0000', 'countryregion' => '2'],
-                    ['vattype' => 'normal', 'vatrate' => '20.0000', 'countryregion' => '2'],
-                ],
-            ],
-            'gb-no-eu' => [['gb', '2021-01-01'],
-                [
-                    ['vattype' => 'reduced', 'vatrate' => '0.0000', 'countryregion' => '3'],
-                    ['vattype' => 'reduced', 'vatrate' => '5.0000', 'countryregion' => '3'],
-                    ['vattype' => 'normal', 'vatrate' => '20.0000', 'countryregion' => '3'],
-                ],
-            ],
-            'no-eu' => [['af', '2020-12-01'], []],
-        ];
     }
 
     /**
-     * @dataProvider vatInfoProvider
+     * Test the reaction on a request for a non-existing uri.
      */
-    public function testGetVatInfo(array $args, array $expected)
+    public function test404()
     {
-        $result = $this->acumulusClient->getVatInfo(... $args);
-        $this->assertSame(Severity::Success, $result->getStatus());
-
-        $vatRate  = array_column($expected, 'vatrate');
-        $vatType = array_column($expected, 'vattype');
-        array_multisort($vatRate, SORT_DESC, $vatType, SORT_ASC, $expected);
-
-        $actual = $result->getMainResponse();
-        $vatRate  = array_column($actual, 'vatrate');
-        $vatType = array_column($actual, 'vattype');
-        array_multisort($vatRate, SORT_DESC, $vatType, SORT_ASC, $actual);
-
-        $this->assertSame($expected, $actual);
+        try {
+            $this->acumulusClient->notExisting();
+            $this->fail('Should not arrive here');
+        } catch (AcumulusResponseException $e) {
+            $this->assertCount(2, $this->log->loggedMessages);
+            $this->assertMessageLoggedIsSubmittedRequest(reset($this->log->loggedMessages), Severity::Error);
+            $this->assertMessageLoggedIsHttpLevelError(end($this->log->loggedMessages), 404, 'Not Found', Severity::Error);
+        }
     }
 
     /**
-     * Tests call to get VAT info with an invalid country code.
+     * Test the reaction on a request for a non-existing uri.
      */
-    public function testGetVatInfoInvalidCountryCode()
+    public function test403()
     {
-        $result = $this->acumulusClient->getVatInfo('ln', '2020-12-01');
-        $this->assertSame(Severity::Error, $result->getStatus());
-        $this->assertNotEmpty($result->getByCodeTag('AA6A45AA'));
+        try {
+            $this->acumulusClient->noContract();
+            $this->fail('Should not arrive here');
+        } catch (AcumulusResponseException $e) {
+            $this->assertCount(2, $this->log->loggedMessages);
+            $this->assertMessageLoggedIsSubmittedRequest(reset($this->log->loggedMessages), Severity::Error);
+            $this->assertMessageLoggedIsHttpLevelError(end($this->log->loggedMessages), 403, '"error":{"code":"403', Severity::Error);
+        }
     }
 
-    /**
-     * Tests call to get the threshold for 2021.
-     */
-    public function testReportThresholdEuCommerce()
+    public function testEntryNotfound()
     {
-        $result = $this->acumulusClient->reportThresholdEuCommerce(2021);
-        $this->assertSame(Severity::Success, $result->getStatus());
-        $actual = $result->getMainResponse();
-        $threshold = $actual['threshold'];
-        $this->assertEquals(10000, $threshold);
+        $result = $this->acumulusClient->getEntry(1);
+        $this->assertTrue($result->hasError());
+        $this->assertCount(2, $this->log->loggedMessages);
+        $this->assertMessageLoggedIsSubmittedRequest(reset($this->log->loggedMessages), Severity::Error);
+        $this->assertMessageLoggedIsApplicationLevelError(end($this->log->loggedMessages), 404,  Severity::Error);
     }
 
-    /**
-     * Tests call to report threshold EU commerce with an old year before it was introduced.
-     */
-    public function testReportThresholdEuCommerceOldYear()
+    public function testConceptNotFound()
     {
-        $result = $this->acumulusClient->reportThresholdEuCommerce(2020);
-        $this->assertSame(Severity::Error, $result->getStatus());
-        $this->assertNotEmpty($result->getByCodeTag('AAC37EAA'));
+        $result = $this->acumulusClient->getConceptInfo(123);
+        $this->assertTrue($result->hasError());
+        $this->assertCount(2, $this->log->loggedMessages);
+        $this->assertMessageLoggedIsSubmittedRequest(reset($this->log->loggedMessages), Severity::Error);
+        $this->assertMessageLoggedIsApplicationLevelError(end($this->log->loggedMessages), 400,  Severity::Error);
     }
 
-    /**
-     * Tests call to report threshold EU commerce with a future year.
-     */
-    public function testReportThresholdEuCommerceFutureYear()
+    public function testInvalidToken()
     {
-        $result = $this->acumulusClient->reportThresholdEuCommerce(2099);
-        $this->assertSame(Severity::Success, $result->getStatus());
-        $actual = $result->getMainResponse();
-        $threshold = $actual['threshold'];
-        $this->assertEquals(10000, $threshold);
+        $result = $this->acumulusClient->setPaymentStatus('INVALID_TOKEN', Api::PaymentStatus_Paid);
+        $this->assertTrue($result->hasError());
+        $this->assertCount(2, $this->log->loggedMessages);
+        $this->assertMessageLoggedIsSubmittedRequest(reset($this->log->loggedMessages), Severity::Error);
+        $this->assertMessageLoggedIsApplicationLevelError(end($this->log->loggedMessages), 400,  Severity::Error);
     }
 
-    public function stockAddProvider(): array
+    public function assertMessageLoggedIsSubmittedRequest(array $loggedMessage, int $expectedSeverity): void
     {
-        $productId = 1833636;
-        return [ // $productId, $quantity, $description, $date
-            'buy' => [[$productId, -2, 'Bestelling 123', '2020-12-11'], ['productid' => $productId, 'stockamount' => 18]],
-            'refund' => [[$productId, 2, 'Refund bestelling 123'], ['productid' => $productId, 'stockamount' => 20]]
-        ];
+        $message = $loggedMessage['message'];
+        $severity = $loggedMessage['severity'];
+        $this->assertStringStartsWith('Request: ', $message);
+        $this->assertStringContainsString('uri="', $message);
+        $this->assertStringContainsString('submit={', $message);
+        $this->assertEquals($expectedSeverity, $severity);
     }
 
-    /**
-     * @dataProvider stockAddProvider
-     */
-    public function testStockAdd(array $args, array $expected)
-    {
-        $result = $this->acumulusClient->stockAdd(... $args);
-
-        $this->assertSame(Severity::Success, $result->getStatus());
-        $actual = $result->getMainResponse();
-        $this->assertEqualsCanonicalizing($expected, $actual);
+    public function assertMessageLoggedIsHttpLevelError(
+        array $loggedMessage,
+        int $expectedCode,
+        string $expectedPhrase,
+        int $expectedSeverity
+    ): void {
+        $message = $loggedMessage['message'];
+        $severity = $loggedMessage['severity'];
+        $this->assertStringStartsWith("HTTP status code=$expectedCode", $message);
+        $this->assertStringContainsString($expectedPhrase, $message);
+        $this->assertEquals($expectedSeverity, $severity);
     }
 
-
-    public function testGetConceptInfo()
+    public function assertMessageLoggedIsApplicationLevelError(array $loggedMessage, int $expectedCode, int $expectedSeverity):void
     {
-        $responseExisting = $this->acumulusClient->getConceptInfo(171866);
-        $responseNonExisting = $this->acumulusClient->getConceptInfo(58132921999);
-        $responseToOld = $this->acumulusClient->getConceptInfo(1);
-        $this->assertNotNull($responseExisting);
+        $message = $loggedMessage['message'];
+        $severity = $loggedMessage['severity'];
+        $this->assertStringStartsWith("Response: status=$expectedCode", $message);
+        $this->assertStringContainsString("\"error\":{\"code\":\"$expectedCode ", $message);
+        $this->assertEquals($expectedSeverity, $severity);
     }
-
-    /*
-    public function testInvoiceAdd()
-    {
-
-    }
-
-    public function testGetEntry()
-    {
-
-    }
-
-    public function testSetDeleteStatus()
-    {
-
-    }
-
-    public function testGetPaymentStatus()
-    {
-
-    }
-
-    public function testSetPaymentStatus()
-    {
-
-    }
-
-    public function testEmailInvoiceAsPdf()
-    {
-
-    }
-
-    public function testSignUp()
-    {
-
-    }
-
-    public function testGetInvoicePdfUri()
-    {
-
-    }
-
-    public function testGetPackingSlipUri()
-    {
-
-    }
-*/
 }

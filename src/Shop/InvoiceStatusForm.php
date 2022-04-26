@@ -634,7 +634,7 @@ class InvoiceStatusForm extends Form
                     // Entry saved with support for concept ids.
                     // Has the concept been changed into an invoice?
                     $result = $this->acumulusApiClient->getConceptInfo($localEntry->getConceptId());
-                    $conceptInfo = $this->sanitiseConceptInfo($result->getMainResponse());
+                    $conceptInfo = $this->sanitiseConceptInfo($result->getMainAcumulusResponse());
                     if (empty($conceptInfo)) {
                         $invoiceStatus = static::Invoice_CommunicationError;
                         $statusSeverity = static::Status_Error;
@@ -663,7 +663,7 @@ class InvoiceStatusForm extends Form
                         // Concept turned into 1 definitive invoice: update
                         // acumulus entry to have it refer to that invoice.
                         $result = $this->acumulusApiClient->getEntry($conceptInfo['entryid']);
-                        $entry = $this->sanitiseEntry($result->getMainResponse());
+                        $entry = $this->sanitiseEntry($result->getMainAcumulusResponse());
                         if (!$result->hasError() && !empty($entry['token'])) {
                             if ($this->acumulusEntryManager->save($source, $conceptInfo['entryid'], $entry['token'])) {
                                 $newLocalEntry = $this->acumulusEntryManager->getByInvoiceSource($source);
@@ -691,7 +691,7 @@ class InvoiceStatusForm extends Form
 
             if ($localEntry->getEntryId() !== null) {
                 $result = $this->acumulusApiClient->getEntry($localEntry->getEntryId());
-                $entry = $this->sanitiseEntry($result->getMainResponse());
+                $entry = $this->sanitiseEntry($result->getMainAcumulusResponse());
                 if ($result->getByCodeTag('XGYBSN000')) {
                     $invoiceStatus = static::Invoice_NonExisting;
                     $statusSeverity = static::Status_Error;

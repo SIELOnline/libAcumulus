@@ -14,11 +14,6 @@ class AcumulusTest extends TestCase
 {
 
     /**
-     * @var object|\Siel\Acumulus\ApiClient\AcumulusResult
-     */
-    private $result;
-
-    /**
      * @var \Siel\Acumulus\Helpers\Container
      */
     private $container;
@@ -28,8 +23,6 @@ class AcumulusTest extends TestCase
         // Use the TestWebShop test doubles.
         $this->container = new Container('TestWebShop\TestDoubles', 'nl');
         $this->acumulusClient = $this->container->getAcumulusApiClient();
-        $acumulusRequest = $this->container->createAcumulusRequest();
-        $this->result = $this->container->createAcumulusResult($acumulusRequest, null);
     }
 
     /**
@@ -86,7 +79,12 @@ class AcumulusTest extends TestCase
         // method we mock it.
         $stub = $this->getMockBuilder(Acumulus::class)
             ->onlyMethods(['callApiFunction'])
-            ->setConstructorArgs([$this->container, $this->container->getEnvironment()])
+            ->setConstructorArgs([
+                $this->container,
+                $this->container->getEnvironment(),
+                $this->container->getUtil(),
+                $this->container->getLog(),
+            ])
             ->getMock();
         $stub->expects($this->once())
             ->method('callApiFunction')
@@ -94,8 +92,7 @@ class AcumulusTest extends TestCase
                 $this->equalTo($apiFunction),
                 $this->equalTo($message),
                 $this->equalTo($needContract)
-            )
-            ->willReturn($this->result);
+            );
 
         $stub->$method(... $args);
     }
@@ -109,6 +106,7 @@ class AcumulusTest extends TestCase
         $environment = $this->container->getEnvironment()->get();
         $apiAddress = $environment['baseUri'] . '/' . $environment['apiVersion'];
         $this->assertSame("$apiAddress/invoices/invoice_get_pdf.php?token=TOKEN", $this->acumulusClient->getInvoicePdfUri('TOKEN'));
+        /** @noinspection PhpRedundantOptionalArgumentInspection */
         $this->assertSame("$apiAddress/invoices/invoice_get_pdf.php?token=TOKEN", $this->acumulusClient->getInvoicePdfUri('TOKEN', true));
         $this->assertSame("$apiAddress/invoices/invoice_get_pdf.php?token=TOKEN&gfx=0", $this->acumulusClient->getInvoicePdfUri('TOKEN', false));
     }

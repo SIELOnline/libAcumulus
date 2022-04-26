@@ -106,7 +106,7 @@ abstract class BaseConfigForm extends Form
                 $this->addMessages($about->getMessages(Severity::WarningOrWorse));
             } else {
                 // Check role.
-                $response = $about->getMainResponse();
+                $response = $about->getMainAcumulusResponse();
                 $roleId = (int) $response['roleid'];
                 switch ($roleId) {
                     case Api::RoleApiUser:

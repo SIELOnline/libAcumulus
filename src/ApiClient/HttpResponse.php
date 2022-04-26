@@ -9,6 +9,7 @@ namespace Siel\Acumulus\ApiClient;
 class HttpResponse
 {
     protected /*string*/ $headers;
+    protected /*array*/ $parsedHeaders = [];
     protected /*string*/ $body;
     protected /*array*/ $info;
     protected /*HttpRequest*/ $request;
@@ -29,7 +30,7 @@ class HttpResponse
      */
     public function getHttpStatusCode(): int
     {
-        return (int) $this->info['http_code'] ?? 0;
+        return (int) ($this->info['http_code'] ?? 0);
     }
 
     /**
@@ -49,10 +50,38 @@ class HttpResponse
     }
 
     /**
+     * Returns the value of an HTTP response header.
+     *
+     * @param string $name
+     *   The name of the header to return the value for.
+     *
+     * @return string
+     *   The value for the requested header, or '' if not set.
+     */
+    public function getHeader(string $name): string
+    {
+        if (count($this->parsedHeaders) === 0 && !empty($this->headers)) {
+            $headerLines = explode("\r\n", $this->headers);
+            foreach ($headerLines as $headerLine) {
+                $headerLine = trim($headerLine);
+                if (!empty($headerLine)) {
+                    $parts = explode(':', $headerLine, 2);
+                    if (count($parts) === 2) {
+                        $this->parsedHeaders[trim(strtolower($parts[0]))] = trim($parts[1]);
+                    } else {
+                        $this->parsedHeaders['status-line'] = $headerLine;
+                    }
+                }
+            }
+        }
+        return $this->parsedHeaders[strtolower($name)] ?? '';
+    }
+
+    /**
      * Returns the body of the HTTP response.
      *
-     * Note that this may contain unmasked sensitive data (e.g. a password) and
-     * thus should not be logged unprocessed.
+     * Note that this may contain sensitive data (e.g. a password) and should
+     * not be logged unprocessed.
      *
      * @return string
      *   The body of the HTTP response.
@@ -72,6 +101,9 @@ class HttpResponse
      *   method.
      * In reality, it will contain all info as returned by {@see curl_getinfo()}
      * (plus that extra key method_time).
+     *
+     * Note that this may contain sensitive data (e.g. a password) and should
+     * not be logged unprocessed.
      *
      * @return array
      *   A set of informative values about the HTTP request/response.

@@ -5,6 +5,7 @@ use DOMDocument;
 use DOMElement;
 use DOMException;
 use RuntimeException;
+use Siel\Acumulus\ApiClient\AcumulusException;
 
 /**
  * Class Util offers some utility functions:
@@ -32,6 +33,10 @@ class Util
      *   The XML string
      *
      * @throws \RuntimeException
+     *   An error occurred during the conversion to an XML string. This is in no
+     *   way to be expected, so we throw a {@see \RuntimeException}, not an
+     *   {@see \Siel\Acumulus\ApiClient\AcumulusException} which will not be
+     *   caught during the request-response cycle.
      */
     public function convertArrayToXml(array $values): string
     {
@@ -111,7 +116,7 @@ class Util
      * @return array
      *  An array representation of the XML string.
      *
-     * @throws \RuntimeException
+     * @throws \Siel\Acumulus\ApiClient\AcumulusException
      *   Either:
      *   - The $xml string is not valid xml
      *   - The $xml string could not be converted to an (associative) array
@@ -125,17 +130,60 @@ class Util
         // - convert that to json
         // - convert json to array
         libxml_use_internal_errors(true);
-        if (!($result = simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA))) {
+        $result = simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA);
+        if (!$result) {
             $this->raiseLibxmlError();
         }
+        return $this->convertJsonToArray($this->convertToJson($result));
+    }
 
-        if (!($result = json_encode($result))) {
+    /**
+     * Converts an object or array to JSON.
+     *
+     * @param object|array $objectOrArray
+     *
+     * @return string
+     *   The JSON representation for the given object or array.
+     *
+     * @throws \Siel\Acumulus\ApiClient\AcumulusException
+     *   The parameter is not an object or array or an error occurred during
+     *   conversion.
+     */
+    public function convertToJson($objectOrArray): string
+    {
+        if (!is_object($objectOrArray) && !is_array($objectOrArray)) {
+            throw new AcumulusException('Not an object or array');
+        }
+        $result = json_encode($objectOrArray);
+        if (!$result) {
             $this->raiseJsonError();
         }
-        if (($result = json_decode($result, true)) === null) {
-            $this->raiseJsonError();
-        }
+        return $result;
+    }
 
+    /**
+     * Converts a JSON string to an (associative) array.
+     *
+     * @param string $json
+     *   A string containing JSON.
+     *
+     * @return array
+     *  An (associative) array representation of the JSON string.
+     *
+     * @throws \Siel\Acumulus\ApiClient\AcumulusException
+     *   Either:
+     *   - The $json string is not valid JSON.
+     *   - The $json string could not be converted to an (associative) array
+     *     because it is either not an object, or it is too deep.
+     */
+    public function convertJsonToArray(string $json): array
+    {
+        $result = json_decode($json, true);
+        if ($result === null) {
+            $this->raiseJsonError();
+        } elseif (!is_array($result)) {
+            throw new AcumulusException('Not a JSON structure');
+        }
         return $result;
     }
 
@@ -155,6 +203,26 @@ class Util
     }
 
     /**
+     * Throws an exception containing the received HTML.
+     *
+     * @param string $body
+     *   HTML string, probably containing an error page.
+     *
+     * @returns string
+     *   The plain text of this page.
+     */
+    public function convertHtmlToPlainText(string $body): string
+    {
+        libxml_use_internal_errors(true);
+        $doc = new DOMDocument('1.0', 'utf-8');
+        if ($doc->loadHTML($body, LIBXML_NOERROR | LIBXML_NOWARNING | LIBXML_HTML_NOIMPLIED)) {
+            $body = $doc->textContent;
+        }
+        $lines = preg_split('/[\r\n]/', $body, -1, PREG_SPLIT_NO_EMPTY);
+        return implode("\n", array_filter(array_map('trim', $lines)));
+    }
+
+    /**
      * Recursively masks passwords in an array.
      *
      * Acumulus API specific: passwords fields contain 'password' in their name.
@@ -167,6 +235,19 @@ class Util
             }
         });
         return $subject;
+    }
+
+    /**
+     * Masks passwords in an XML or json string
+     *
+     * To be used when logging raw http responses instead of the fullResponse
+     * property from an {@see \Siel\Acumulus\ApiClient\AcumulusResult}.
+     *
+     * Acumulus API specific: passwords fields end with 'password'.
+     */
+    public function maskXmlOrJsonString(string $subject): string
+    {
+        return $this->maskJson($this->maskXml($subject));
     }
 
     /**
@@ -202,52 +283,24 @@ class Util
     /**
      * Throws an exception with all libxml error messages as message.
      *
-     * @throws \RuntimeException
+     * @throws \Siel\Acumulus\ApiClient\AcumulusException
      *   Always.
      */
     protected function raiseLibxmlError()
     {
         $errors = libxml_get_errors();
         $messages = [];
-        $code = 704;
         foreach ($errors as $error) {
             // Overwrite our own code with the 1st code we get from libxml.
-            if ($code === 704) {
-                $code = $error->code;
-            }
             $messages[] = sprintf('Line %d, column: %d: %s %d - %s', $error->line, $error->column, $error->level === LIBXML_ERR_WARNING ? 'warning' : 'error', $error->code, trim($error->message));
         }
-        throw new RuntimeException(implode("\n", $messages), $code);
-    }
-
-    /**
-     * Throws an exception containing the received HTML.
-     *
-     * @param string $html
-     *   String containing an HTML document which is probably an error page.
-     *
-     * @throws  \RuntimeException
-     *   Always.
-     */
-    public function raiseHtmlReceivedError(string $html)
-    {
-        libxml_use_internal_errors(true);
-        $doc = new DOMDocument('1.0', 'utf-8');
-        $doc->loadHTML($html);
-        $body = $doc->getElementsByTagName('body');
-        if ($body->length > 0) {
-            $body = $body->item(0)->textContent;
-        } else {
-            // No <body> tag, probably just a message with markup
-            $body = $doc->textContent;
-        }
-        throw new RuntimeException("HTML response received: $body", 702);
+        throw new AcumulusException(implode("\n", $messages));
     }
 
     /**
      * Throws an exception with an error message based on the last json error.
      *
-     * @throws \RuntimeException
+     * @throws \Siel\Acumulus\ApiClient\AcumulusException
      *   Always.
      */
     public function raiseJsonError()
@@ -278,6 +331,6 @@ class Util
                 break;
         }
         $message = sprintf('json (%s): %d - %s', phpversion('json'), $code, $message);
-        throw new RuntimeException($message, $code);
+        throw new AcumulusException($message);
     }
 }

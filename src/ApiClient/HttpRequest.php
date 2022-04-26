@@ -1,7 +1,6 @@
 <?php
 namespace Siel\Acumulus\ApiClient;
 
-use LogicException;
 use RuntimeException;
 
 /**
@@ -24,6 +23,7 @@ class HttpRequest
      *   See {@see HttpRequest::getBody()}.
      */
     protected $body = null;
+    protected /*?HttpResponse*/ $httpResponse = null;
 
     /**
      * Constructor.
@@ -39,7 +39,7 @@ class HttpRequest
     /**
      * @return string|null
      *   Returns the HTTP method to be used for this request: 'POST' or 'GET',
-     *   or null if not yet set.
+     *   or null if not yet executed.
      */
     public function getMethod(): ?string
     {
@@ -48,7 +48,7 @@ class HttpRequest
 
     /**
      * @return string|null
-     *   Returns the uri for this request, or null if not yet set.
+     *   Returns the uri for this request, or null if not yet executed.
      */
     public function getUri(): ?string
     {
@@ -76,6 +76,21 @@ class HttpRequest
     }
 
     /**
+     * Returns the result of this request, or null if not yet executed.
+     *
+     * This "forward-linking" is ony used to be able to log what we have in case
+     * of exceptions thrown during the execution of this request or the
+     * processing of it.
+     *
+     * @return \Siel\Acumulus\ApiClient\HttpResponse|null
+     *   The result of this request, or null if not yet executed.
+     */
+    public function getHttpResponse(): ?HttpResponse
+    {
+        return $this->httpResponse;
+    }
+
+    /**
      * Sets up an HTTP get request.
      *
      * @param string $uri
@@ -83,8 +98,6 @@ class HttpRequest
      *
      * @return \Siel\Acumulus\ApiClient\HttpResponse
      *
-     * @throws \LogicException
-     *   This request has already been executed.
      * @throws \RuntimeException
      *   An error occurred at:
      *   - The Curl internals level, e.g. an out of memory error.
@@ -109,8 +122,6 @@ class HttpRequest
      *
      * @return \Siel\Acumulus\ApiClient\HttpResponse
      *
-     * @throws \LogicException
-     *   This request has already been executed.
      * @throws \RuntimeException
      *   An error occurred at:
      *   - The Curl internals level, e.g. an out of memory error.
@@ -139,8 +150,6 @@ class HttpRequest
      * @return \Siel\Acumulus\ApiClient\HttpResponse
      *  The HTTP response.
      *
-     * @throws \LogicException
-     *   This request has already been executed.
      * @throws \RuntimeException
      *   An error occurred at:
      *   - The Curl internals level, e.g. an out of memory error.
@@ -149,17 +158,17 @@ class HttpRequest
     protected function execute(string $method, string $uri, $body = null): HttpResponse
     {
         $method = strtoupper($method);
-        assert(in_array($method, ['GET', 'POST']), new LogicException('HttpRequest::execute(): non-supported method.'));
-        assert($this->uri === null, new LogicException('HttpRequest::execute(): may only be called once.'));
+        assert(in_array($method, ['GET', 'POST']), 'HttpRequest::execute(): non-supported method.');
+        assert($this->uri === null, 'HttpRequest::execute(): may only be called once.');
 
         $this->uri = $uri;
         $this->method = $method;
         $this->body = $body;
-        $httpResponse = $this->executeWithCurl();
+        $this->httpResponse = $this->executeWithCurl();
 
-        assert($httpResponse->getRequest() === $this);
+        assert($this->httpResponse->getRequest() === $this);
 
-        return $httpResponse;
+        return $this->httpResponse;
     }
 
     /**
@@ -257,8 +266,8 @@ class HttpRequest
         // Since 2017-09-19 the Acumulus web service only accepts TLS 1.2.
         // - Apparently, some curl libraries do support this version but do not
         //   use it by default, so we force it.
-        // - Apparently, some up-to-date curl libraries do not define this
-        //   constant, so we define it, if not defined.
+        // - Apparently, some up-to-date curl libraries do (did?) not define
+        //   this constant, so we define it, if not defined.
         if (!defined('CURL_SSLVERSION_TLSv1_2')) {
             define('CURL_SSLVERSION_TLSv1_2', 6);
         }
@@ -270,8 +279,8 @@ class HttpRequest
             // This is a requirement for the Acumulus web service, but should be
             // good for all servers.
             CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1_2,
-            CURLOPT_CONNECTTIMEOUT => 15,
-            CURLOPT_TIMEOUT => 15,
+            CURLOPT_CONNECTTIMEOUT_MS => 15000,
+            CURLOPT_TIMEOUT_MS => 15000,
             // Follow redirects (with a maximum of 5).
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_MAXREDIRS => 5,

@@ -568,7 +568,7 @@ abstract class InvoiceManager
     protected function doSend(array $invoice, Source $invoiceSource, InvoiceAddResult $invoiceAddResult): InvoiceAddResult
     {
         $apiResult = $this->getAcumulusApiClient()->invoiceAdd($invoice);
-        $invoiceAddResult->setApiResult($apiResult);
+        $invoiceAddResult->setAcumulusResult($apiResult);
 
         // Save Acumulus entry:
         // - If we were sending in test mode or there were errors, no invoice
@@ -581,7 +581,7 @@ abstract class InvoiceManager
             $acumulusEntryManager = $this->getAcumulusEntryManager();
             $oldEntry = $acumulusEntryManager->getByInvoiceSource($invoiceSource);
 
-            $invoiceInfo = $apiResult->getMainResponse();
+            $invoiceInfo = $apiResult->getMainAcumulusResponse();
             if (!empty($invoiceInfo['token']) && !empty('entryid')) {
                 // A real entry.
                 $token = $invoiceInfo['token'];

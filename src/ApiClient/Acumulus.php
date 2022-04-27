@@ -56,8 +56,7 @@ class Acumulus
      * Retrieves the "about information".
      *
      * See {@link https://www.siel.nl/acumulus/API/Misc/About/}.
- *
-
+     *
      * @return \Siel\Acumulus\ApiClient\AcumulusResult
      *   The result of the webservice call. The structured response will contain
      *   1 "about" array, being a keyed array with keys:
@@ -74,6 +73,8 @@ class Acumulus
      *     API-compliant role or change the role for the current user.
      *   - 403 A8N403GCN: Forbidden - Insufficient credential level for
      *     general/general_about.php. Not authorized to perform request.
+     *
+     * @throws \Siel\Acumulus\ApiClient\AcumulusException|\Siel\Acumulus\ApiClient\AcumulusResponseException
      */
     public function getAbout(): AcumulusResult
     {
@@ -109,6 +110,8 @@ class Acumulus
      * - 'mytelephone'
      * - 'myvatnumber'
      *   Possible errors: todo.
+     *
+     * @throws \Siel\Acumulus\ApiClient\AcumulusException|\Siel\Acumulus\ApiClient\AcumulusResponseException
      */
     public function getMyAcumulus(): AcumulusResult
     {
@@ -134,6 +137,8 @@ class Acumulus
      * - 'accountorderid'
      * - 'accountstatus'
      * - 'accounttypeid'
+     *
+     * @throws \Siel\Acumulus\ApiClient\AcumulusException|\Siel\Acumulus\ApiClient\AcumulusResponseException
      */
     public function getPicklistAccounts(bool $enabled = true): AcumulusResult
     {
@@ -155,6 +160,8 @@ class Acumulus
      * - 'companytypeid'
      * - 'companytypename'
      * - 'companytypenamenl'
+     *
+     * @throws \Siel\Acumulus\ApiClient\AcumulusException|\Siel\Acumulus\ApiClient\AcumulusResponseException
      */
     public function getPicklistCompanyTypes(): AcumulusResult
     {
@@ -172,6 +179,8 @@ class Acumulus
      *   being a keyed array with keys:
      * - 'contacttypeid'
      * - 'contacttypename'
+     *
+     * @throws \Siel\Acumulus\ApiClient\AcumulusException|\Siel\Acumulus\ApiClient\AcumulusResponseException
      */
     public function getPicklistContactTypes(): AcumulusResult
     {
@@ -189,6 +198,8 @@ class Acumulus
      *   a keyed array with keys:
      * - 'costcenterid'
      * - 'costcentername'
+     *
+     * @throws \Siel\Acumulus\ApiClient\AcumulusException|\Siel\Acumulus\ApiClient\AcumulusResponseException
      */
     public function getPicklistCostCenters(): AcumulusResult
     {
@@ -206,6 +217,8 @@ class Acumulus
      *   array being a keyed array with keys:
      * - 'invoicetemplateid'
      * - 'invoicetemplatename'
+     *
+     * @throws \Siel\Acumulus\ApiClient\AcumulusException|\Siel\Acumulus\ApiClient\AcumulusResponseException
      */
     public function getPicklistInvoiceTemplates(): AcumulusResult
     {
@@ -248,6 +261,8 @@ class Acumulus
      *
      * @noinspection PhpUnused  Not yet used, but this is a library that,
      *   eventually, should cover all web services provided.
+     *
+     * @throws \Siel\Acumulus\ApiClient\AcumulusException|\Siel\Acumulus\ApiClient\AcumulusResponseException
      */
     public function getPicklistProducts($filter = null, $productTagId = null, $offset = null, $rowcount = null)
     {
@@ -287,6 +302,8 @@ class Acumulus
      *   The result of the webservice call. The structured response will contain
      *   a non-keyed array of "picklist" arrays, each 'picklist' array being a
      *   keyed array with keys that depend on the requested picklist.
+     *
+     * @throws \Siel\Acumulus\ApiClient\AcumulusException|\Siel\Acumulus\ApiClient\AcumulusResponseException
      */
     protected function getPicklist(string $picklist, array $filters = [], bool $needContract = true): AcumulusResult
     {
@@ -314,6 +331,8 @@ class Acumulus
      *   - vatrate: (float (as a string)) the vat rate (number between 0 and
      *     100)
      *   - countryregion: (int) one of the Api::Region_... constants.
+     *
+     * @throws \Siel\Acumulus\ApiClient\AcumulusException|\Siel\Acumulus\ApiClient\AcumulusResponseException
      */
     public function getVatInfo(string $countryCode, string $date = ''): AcumulusResult
     {
@@ -346,6 +365,8 @@ class Acumulus
      *   - reached: int, 0 when threshold not reached. 1 when so.
      *   Possible errors:
      *   - AAC37EAA: Ongeldig year. EU regelgeving van toepassing vanaf 2021.
+     *
+     * @throws \Siel\Acumulus\ApiClient\AcumulusException|\Siel\Acumulus\ApiClient\AcumulusResponseException
      */
     public function reportThresholdEuCommerce(int $year = null): AcumulusResult
     {
@@ -373,6 +394,8 @@ class Acumulus
      * - 'token'
      * - 'entryid'
      * - 'conceptid'
+     *
+     * @throws \Siel\Acumulus\ApiClient\AcumulusException|\Siel\Acumulus\ApiClient\AcumulusResponseException
      */
     public function invoiceAdd(array $invoice): AcumulusResult
     {
@@ -397,6 +420,8 @@ class Acumulus
      *     definitive invoice has yet been created for this concept.
      *   - FGYBSN048: Information not available for $conceptId older than 127466.
      *   - todo: others?
+     *
+     * @throws \Siel\Acumulus\ApiClient\AcumulusException|\Siel\Acumulus\ApiClient\AcumulusResponseException
      */
     public function getConceptInfo(int $conceptId): AcumulusResult
     {
@@ -445,6 +470,8 @@ class Acumulus
      *   Possible errors:
      *   - XGYBSN000: Requested invoice for entry $entryId not found: $entryId
      *     does not exist.
+     *
+     * @throws \Siel\Acumulus\ApiClient\AcumulusException|\Siel\Acumulus\ApiClient\AcumulusResponseException
      */
     public function getEntry(int $entryId): AcumulusResult
     {
@@ -479,6 +506,8 @@ class Acumulus
      *     is not one of the indicated constants.
      *   - P2XFELO12: Requested for entryid: $entryId not found or forbidden:
      *     $entryId does not exist or already has requested status.
+     *
+     * @throws \Siel\Acumulus\ApiClient\AcumulusException|\Siel\Acumulus\ApiClient\AcumulusResponseException
      */
     public function setDeleteStatus(int $entryId, int $deleteStatus): AcumulusResult
     {
@@ -507,6 +536,8 @@ class Acumulus
      *   Possible errors:
      *   - XGYTTNF04: Requested invoice for $token not found: $token does not
      *     exist.
+     *
+     * @throws \Siel\Acumulus\ApiClient\AcumulusException|\Siel\Acumulus\ApiClient\AcumulusResponseException
      *
      * @noinspection PhpUnused
      */
@@ -544,6 +575,8 @@ class Acumulus
      *   - DATE590ZW: Incorrect date range (2000-01-01 to 2099-12-31) or invalid
      *     date format (YYYY-MM-DD) used in paymentdate field. We received:
      *     $paymentDate. Unable to proceed."
+     *
+     * @throws \Siel\Acumulus\ApiClient\AcumulusException|\Siel\Acumulus\ApiClient\AcumulusResponseException
      */
     public function setPaymentStatus(string $token, int $paymentStatus, string $paymentDate = ''): AcumulusResult
     {
@@ -593,9 +626,11 @@ class Acumulus
      *
      * See {@link https://siel.nl/acumulus/API/Invoicing/Email/}
      *
+     * @throws \Siel\Acumulus\ApiClient\AcumulusException|\Siel\Acumulus\ApiClient\AcumulusResponseException
+     *
      * @noinspection PhpUnused
      */
-    public function emailInvoiceAsPdf(string $token, array $emailAsPdf, int $invoiceType = null, string $invoiceNotes = ''): AcumulusResult
+    public function emailInvoiceAsPdf(string $token, array $emailAsPdf, ?int $invoiceType = null, string $invoiceNotes = ''): AcumulusResult
     {
         $message = [
             'token' => $token,
@@ -659,7 +694,7 @@ class Acumulus
      *   - AA6894AA: Onjuiste postalcode
      *   - AABC1FAA: Verplichte city ontbreekt
      *
-     * @noinspection PhpUnused
+     * @throws \Siel\Acumulus\ApiClient\AcumulusException|\Siel\Acumulus\ApiClient\AcumulusResponseException
      */
     public function signUp(array $signUp): AcumulusResult
     {
@@ -694,6 +729,8 @@ class Acumulus
      * - 'productid'
      *   - stockamount (the new stock level for this product)
      *   Possible errors:
+     *
+     * @throws \Siel\Acumulus\ApiClient\AcumulusException|\Siel\Acumulus\ApiClient\AcumulusResponseException
      */
     public function stockAdd(int $productId, float $quantity, string $description, string $date = null): AcumulusResult
     {
@@ -727,6 +764,8 @@ class Acumulus
      *   Possible errors (in download, not in return value):
      *   - PDFATNF04: Requested invoice for $token not found: $token does not
      *     exist.
+     *
+     * @todo: add invoicetype and options to not add the optional parameters.
      */
     public function getInvoicePdfUri(string $token, bool $applyGraphics = true): string
     {

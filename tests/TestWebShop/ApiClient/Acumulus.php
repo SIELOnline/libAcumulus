@@ -30,4 +30,12 @@ class Acumulus extends BaseAcumulus
     {
         return $this->getPicklist('invoicetemplates', [], false);
     }
+
+    /**
+     * @throws \Siel\Acumulus\ApiClient\AcumulusException|\Siel\Acumulus\ApiClient\AcumulusResponseException
+     */
+    public function getPicklistDiscountProfiles(): AcumulusResult
+    {
+        return $this->getPicklist('discountprofiles', [], true);
+    }
 }

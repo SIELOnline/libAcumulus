@@ -104,8 +104,18 @@ class AcumulusErrorHandlingTest extends TestCase
         $this->assertMessageLoggedIsApplicationLevelError(end($this->log->loggedMessages), 404,  Severity::Error);
     }
 
+    public function testSetDeleteStatusEntryNotfound()
+    {
+        $result = $this->acumulusClient->setDeleteStatus(1, Api::Entry_Delete);
+        $this->assertTrue($result->hasError());
+        $this->assertCount(2, $this->log->loggedMessages);
+        $this->assertMessageLoggedIsSubmittedRequest(reset($this->log->loggedMessages), Severity::Error);
+        $this->assertMessageLoggedIsApplicationLevelError(end($this->log->loggedMessages), 404,  Severity::Error);
+    }
+
     public function testConceptNotFound()
     {
+        //  valid ConceptId: 171866
         $result = $this->acumulusClient->getConceptInfo(123);
         $this->assertTrue($result->hasError());
         $this->assertCount(2, $this->log->loggedMessages);
@@ -113,13 +123,42 @@ class AcumulusErrorHandlingTest extends TestCase
         $this->assertMessageLoggedIsApplicationLevelError(end($this->log->loggedMessages), 400,  Severity::Error);
     }
 
-    public function testInvalidToken()
+    public function testSetPaymentStatusInvalidToken()
     {
         $result = $this->acumulusClient->setPaymentStatus('INVALID_TOKEN', Api::PaymentStatus_Paid);
         $this->assertTrue($result->hasError());
         $this->assertCount(2, $this->log->loggedMessages);
         $this->assertMessageLoggedIsSubmittedRequest(reset($this->log->loggedMessages), Severity::Error);
         $this->assertMessageLoggedIsApplicationLevelError(end($this->log->loggedMessages), 400,  Severity::Error);
+    }
+
+    public function testEmailAsPdfInvalidToken()
+    {
+        $result = $this->acumulusClient->emailInvoiceAsPdf('INVALID_TOKEN', ['emailto' => 'erwin@burorader.com']);
+        $this->assertTrue($result->hasError());
+        $this->assertCount(2, $this->log->loggedMessages);
+        $this->assertMessageLoggedIsSubmittedRequest(reset($this->log->loggedMessages), Severity::Error);
+        $this->assertMessageLoggedIsApplicationLevelError(end($this->log->loggedMessages), 400,  Severity::Error);
+    }
+
+    public function testEmptyPicklistProducts()
+    {
+        $result = $this->acumulusClient->getPicklistProducts('This will not match any product');
+        $this->assertFalse($result->hasError());
+        $this->assertCount(0, $result->getMainAcumulusResponse());
+        $this->assertCount(2, $this->log->loggedMessages);
+        $this->assertMessageLoggedIsSubmittedRequest(reset($this->log->loggedMessages), Severity::Log);
+        $this->assertMessageLoggedIsApplicationLevelSuccess(end($this->log->loggedMessages));
+    }
+
+    public function testEmptyPicklistDiscountProfiles()
+    {
+        $result = $this->acumulusClient->getPicklistDiscountProfiles();
+        $this->assertFalse($result->hasError());
+        $this->assertCount(0, $result->getMainAcumulusResponse());
+        $this->assertCount(2, $this->log->loggedMessages);
+        $this->assertMessageLoggedIsSubmittedRequest(reset($this->log->loggedMessages), Severity::Log);
+        $this->assertMessageLoggedIsApplicationLevelSuccess(end($this->log->loggedMessages));
     }
 
     public function assertMessageLoggedIsSubmittedRequest(array $loggedMessage, int $expectedSeverity): void
@@ -152,5 +191,14 @@ class AcumulusErrorHandlingTest extends TestCase
         $this->assertStringStartsWith("Response: status=$expectedCode", $message);
         $this->assertStringContainsString("\"error\":{\"code\":\"$expectedCode ", $message);
         $this->assertEquals($expectedSeverity, $severity);
+    }
+
+    public function assertMessageLoggedIsApplicationLevelSuccess(array $loggedMessage):void
+    {
+        $message = $loggedMessage['message'];
+        $severity = $loggedMessage['severity'];
+        $this->assertStringStartsWith('Response: status=200', $message);
+        $this->assertStringContainsString('"status":"0"', $message);
+        $this->assertEquals(Severity::Log, $severity);
     }
 }

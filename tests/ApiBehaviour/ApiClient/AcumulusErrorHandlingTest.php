@@ -28,6 +28,9 @@ use Siel\Acumulus\Helpers\Severity;
  */
 class AcumulusErrorHandlingTest extends TestCase
 {
+    protected const ValidToken = 'JrJ8bS0aTBxFOLn7ClNBYBHNdMJR8d96';
+    protected const InvalidToken = 'JrJ8bS0aTBxFOLn7ClNBYBHNdMJR8d97';
+
     protected /*Container*/ $container;
     protected /*Environment*/ $environment;
     /** @var \Siel\Acumulus\TestWebShop\ApiClient\Acumulus  */
@@ -125,7 +128,7 @@ class AcumulusErrorHandlingTest extends TestCase
 
     public function testSetPaymentStatusInvalidToken()
     {
-        $result = $this->acumulusClient->setPaymentStatus('INVALID_TOKEN', Api::PaymentStatus_Paid);
+        $result = $this->acumulusClient->setPaymentStatus(static::InvalidToken, Api::PaymentStatus_Paid);
         $this->assertTrue($result->hasError());
         $this->assertCount(2, $this->log->loggedMessages);
         $this->assertMessageLoggedIsSubmittedRequest(reset($this->log->loggedMessages), Severity::Error);
@@ -134,7 +137,7 @@ class AcumulusErrorHandlingTest extends TestCase
 
     public function testEmailAsPdfInvalidToken()
     {
-        $result = $this->acumulusClient->emailInvoiceAsPdf('INVALID_TOKEN', ['emailto' => 'erwin@burorader.com']);
+        $result = $this->acumulusClient->emailInvoiceAsPdf(static::InvalidToken, ['emailto' => 'erwin@burorader.com']);
         $this->assertTrue($result->hasError());
         $this->assertCount(2, $this->log->loggedMessages);
         $this->assertMessageLoggedIsSubmittedRequest(reset($this->log->loggedMessages), Severity::Error);

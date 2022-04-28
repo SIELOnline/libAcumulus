@@ -601,25 +601,29 @@ abstract class InvoiceManager
             // if there is one, and it's not a concept.
             if ($saved && $oldEntry && $oldEntry->getEntryId()) {
                 $entryId = $oldEntry->getEntryId();
-                // @todo: clean up on receiving P2XFELO12?
                 $deleteResult = $this->getAcumulusApiClient()->setDeleteStatus($entryId, Api::Entry_Delete);
-                if ($deleteResult->hasRealMessages()) {
-                    // Add messages to result but not if the entry has already
+                if ($deleteResult->hasError()) {
+                    // Add message(s) to result but not if the entry has already
                     // been deleted or does not exist at all (anymore).
-                    if ($deleteResult->getByCodeTag('P2XFELO12')) {
-                        // Could not delete the old entry (already deleted or
-                        // does not exist at all (anymore)): add as a warning so
-                        // this info will be mailed to the user.
+                    if ($deleteResult->isNotFound()) {
+                        // Could not delete the old entry: does no longer exist.
                         $invoiceAddResult->createAndAddMessage(
-                            sprintf($this->t('message_warning_old_entry_not_deleted'), $this->t($invoiceSource->getType()), $entryId),
+                            sprintf($this->t('message_warning_old_entry_not_found'), $this->t($invoiceSource->getType())),
                             Severity::Warning,
                             902
                         );
                     } else {
-                        // Add other "real" messages also as warning, but
-                        // untranslated.
-                        $invoiceAddResult->addMessages($deleteResult->getMessages(Severity::InfoOrWorse), Severity::Warning);
+                        // Could not delete the old entry: already moved to the waste bin.
+                        $invoiceAddResult->createAndAddMessage(
+                            sprintf($this->t('message_warning_old_entry_already_deleted'), $this->t($invoiceSource->getType()),
+                                $entryId),
+                            Severity::Warning,
+                            902
+                        );
                     }
+                } elseif ($deleteResult->hasRealMessages()) {
+                    // Add other messages as well but do not try to interpret them.
+                    $invoiceAddResult->addMessages($deleteResult->getMessages(Severity::InfoOrWorse), Severity::Warning);
                 } else {
                     // Successfully deleted the old entry: add a notice so this
                     // info will be mailed to the user.

@@ -443,7 +443,6 @@ class InvoiceStatusForm extends Form
                     $deleteStatus = (int) $this->getSubmittedValue($idPrefix . 'delete_status') === Api::Entry_Delete
                         ? Api::Entry_Delete
                         : Api::Entry_UnDelete;
-                    // @todo: clean up on receiving P2XFELO12?
                     $acumulusResult = $this->acumulusApiClient->setDeleteStatus($localEntry->getEntryId(), $deleteStatus);
                     $this->addMessages($acumulusResult->getMessages());
                     $success = !$acumulusResult->hasError();
@@ -624,6 +623,8 @@ class InvoiceStatusForm extends Form
         } else {
             $arg1 = $this->getDate($localEntry->getUpdated());
             if ($localEntry->getConceptId() !== null) {
+                // Invoice was sent as an invoice: can we find out if it has
+                // been turned into a definitive invoice?
                 if ($localEntry->getConceptId() === AcumulusEntry::conceptIdUnknown) {
                     // Old entry: no concept id stored, we cannot show more
                     // information.
@@ -634,56 +635,64 @@ class InvoiceStatusForm extends Form
                     // Entry saved with support for concept ids.
                     // Has the concept been changed into an invoice?
                     $result = $this->acumulusApiClient->getConceptInfo($localEntry->getConceptId());
-                    $conceptInfo = $this->sanitiseConceptInfo($result->getMainAcumulusResponse());
-                    if (empty($conceptInfo)) {
-                        $invoiceStatus = static::Invoice_CommunicationError;
-                        $statusSeverity = static::Status_Error;
-                     } elseif ($result->getByCodeTag('FGYBSN040') || $result->getByCodeTag('FGYBSN048')) {
-                        // FGYBSN040: concept id does not exist (anymore) or no access.
-                        // FGYBSN048: concept id to old, cannot be tracked.
-                        $invoiceStatus = static::Invoice_SentConcept;
-                        $statusSeverity = static::Status_Warning;
-                        $description = $result->getByCodeTag('FGYBSN040') ? 'concept_conceptid_deleted' : 'concept_no_conceptid';
-                        // Prevent this API call in the future, it will return
-                        // the same result.
-                        $this->acumulusEntryManager->save($source, null, null);
-                    } elseif (empty($conceptInfo['entryid'])) {
-                        // Concept has not yet been turned into a definitive
-                        // invoice.
-                        $invoiceStatus = static::Invoice_SentConceptNoInvoice;
-                        $statusSeverity = static::Status_Warning;
-                    } elseif (is_array($conceptInfo['entryid']) && count($conceptInfo['entryid']) >= 2) {
-                        // Multiple real invoices created out of this concept:
-                        // cannot link concept to just 1 invoice.
-                        // @nth: unless all but 1 are deleted ...
-                        $invoiceStatus = static::Invoice_SentConcept;
-                        $description = 'concept_multiple_invoiceid';
-                        $statusSeverity = static::Status_Warning;
-                    } else {
-                        // Concept turned into 1 definitive invoice: update
-                        // acumulus entry to have it refer to that invoice.
-                        $result = $this->acumulusApiClient->getEntry($conceptInfo['entryid']);
-                        $entry = $this->sanitiseEntry($result->getMainAcumulusResponse());
-                        if (!$result->hasError() && !empty($entry['token'])) {
-                            if ($this->acumulusEntryManager->save($source, $conceptInfo['entryid'], $entry['token'])) {
-                                $newLocalEntry = $this->acumulusEntryManager->getByInvoiceSource($source);
-                                if ($newLocalEntry === null) {
-                                    $invoiceStatus = static::Invoice_LocalError;
-                                    $statusSeverity = static::Status_Error;
-                                    $description = 'entry_concept_not_loaded';
-                                } else {
-                                    $localEntry = $newLocalEntry;
-                                    // Status and severity will be overwritten
-                                    // below based on the found real invoice.
-                                }
-                            } else {
-                                $invoiceStatus = static::Invoice_LocalError;
-                                $statusSeverity = static::Status_Error;
-                                $description = 'entry_concept_not_updated';
-                            }
-                        } else {
+                    if ($result->hasError()) {
+                        if ($result->isNotFound()) {
+                            $invoiceStatus = static::Invoice_SentConcept;
+                            $statusSeverity = static::Status_Warning;
+                            $description = 'concept_conceptid_deleted';
+                            // Prevent this API call in the future, it will return
+                            // the same result.
+                            $this->acumulusEntryManager->save($source, null, null);
+                        } elseif ($result->getByCodeTag('FGYBSN048') !== null) {
+                            //  'Helaas kan van deze conceptfactuur niet meer informatie getoond worden, ook niet als u deze definitief gemaakt heeft.'
+                            $invoiceStatus = static::Invoice_SentConcept;
+                            $statusSeverity = static::Status_Warning;
+                            $description = 'concept_no_conceptid';
+                        } else  {
                             $invoiceStatus = static::Invoice_CommunicationError;
                             $statusSeverity = static::Status_Error;
+                        }
+                    } else {
+                        $conceptInfo = $this->sanitiseConceptInfo($result->getMainAcumulusResponse());
+                        if (count($conceptInfo['entryid']) === 0) {
+                            // Concept has not yet been turned into a definitive
+                            // invoice.
+                            $invoiceStatus = static::Invoice_SentConceptNoInvoice;
+                            $statusSeverity = static::Status_Warning;
+                        } elseif (count($conceptInfo['entryid']) >= 2) {
+                            // Multiple real invoices created out of this concept:
+                            // cannot link concept to just 1 invoice.
+                            // @nth: unless all but 1 are deleted ...
+                            $invoiceStatus = static::Invoice_SentConcept;
+                            $description = 'concept_multiple_invoiceid';
+                            $statusSeverity = static::Status_Warning;
+                        } else {
+                            // Concept turned into 1 definitive invoice: update the
+                            // local acumulus entry, so it refers to that invoice.
+                            $result = $this->acumulusApiClient->getEntry($conceptInfo['entryid']);
+                            if (!$result->hasError() && !empty($entry['token'])) {
+                                $entry = $this->sanitiseEntry($result->getMainAcumulusResponse());
+                                if ($this->acumulusEntryManager->save($source, $conceptInfo['entryid'], $entry['token'])) {
+                                    $newLocalEntry = $this->acumulusEntryManager->getByInvoiceSource($source);
+                                    if ($newLocalEntry === null) {
+                                        $invoiceStatus = static::Invoice_LocalError;
+                                        $statusSeverity = static::Status_Error;
+                                        $description = 'entry_concept_not_loaded';
+                                    } else {
+                                        $localEntry = $newLocalEntry;
+                                        // Status and severity will be overwritten
+                                        // below based on the found real invoice.
+                                    }
+                                } else {
+                                    $invoiceStatus = static::Invoice_LocalError;
+                                    $statusSeverity = static::Status_Error;
+                                    $description = 'entry_concept_not_updated';
+                                }
+                            } else {
+                                $invoiceStatus = static::Invoice_CommunicationError;
+                                $statusSeverity = static::Status_Error;
+                                $entry = [];
+                            }
                         }
                     }
                 }
@@ -691,26 +700,34 @@ class InvoiceStatusForm extends Form
 
             if ($localEntry->getEntryId() !== null) {
                 $result = $this->acumulusApiClient->getEntry($localEntry->getEntryId());
-                $entry = $this->sanitiseEntry($result->getMainAcumulusResponse());
-                if ($result->getByCodeTag('XGYBSN000')) {
-                    $invoiceStatus = static::Invoice_NonExisting;
-                    $statusSeverity = static::Status_Error;
-                    // To prevent this error in the future, we delete the local
-                    // entry.
-                    $this->acumulusEntryManager->delete($localEntry);
-                } elseif (empty($entry)) {
-                    $invoiceStatus = static::Invoice_CommunicationError;
-                    $statusSeverity = static::Status_Error;
-                } elseif ($entry['deleted'] instanceof DateTime) {
-                    $invoiceStatus = static::Invoice_Deleted;
-                    $statusSeverity = static::Status_Warning;
-                    $arg2 = $entry['deleted']->format(Api::Format_TimeStamp);
+                if (!$result->hasError()) {
+                    $entry = $this->sanitiseEntry($result->getMainAcumulusResponse());
+                    if ($entry['deleted'] instanceof DateTime) {
+                        // Entry has status "deleted".
+                        $invoiceStatus = static::Invoice_Deleted;
+                        $statusSeverity = static::Status_Warning;
+                        $arg2 = $entry['deleted']->format(Api::Format_TimeStamp);
+                    } else {
+                        // Normal entry, still existing.
+                        $invoiceStatus = static::Invoice_Sent;
+                        $arg1 = $entry['invoicenumber'];
+                        $arg2 = $entry['entrydate'];
+                        $statusSeverity = static::Status_Success;
+                        $statusMessage = $this->t('invoice_status_ok');
+                    }
                 } else {
-                    $invoiceStatus = static::Invoice_Sent;
-                    $arg1 = $entry['invoicenumber'];
-                    $arg2 = $entry['entrydate'];
-                    $statusSeverity = static::Status_Success;
-                    $statusMessage = $this->t('invoice_status_ok');
+                    if ($result->isNotFound()) {
+                        // Entry is no(t) (longer) existing.
+                        $invoiceStatus = static::Invoice_NonExisting;
+                        $statusSeverity = static::Status_Error;
+                        // To prevent this error in the future, we delete the
+                        // local entry.
+                        $this->acumulusEntryManager->delete($localEntry);
+                    } elseif (empty($entry)) {
+                        // Other error.
+                        $invoiceStatus = static::Invoice_CommunicationError;
+                        $statusSeverity = static::Status_Error;
+                    }
                 }
             } elseif (empty($invoiceStatus)) {
                 $invoiceStatus = static::Invoice_LocalError;
@@ -1264,6 +1281,8 @@ class InvoiceStatusForm extends Form
      *   The entry to sanitise.
      * @return array
      *   The sanitised entry struct.
+     *
+     * @todo: Move this and all following methods to separate Sanitise class.
      */
     protected function sanitiseEntry(array $entry): array
     {

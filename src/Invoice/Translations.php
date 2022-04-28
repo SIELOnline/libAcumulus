@@ -62,11 +62,14 @@ class Translations extends TranslationCollection
         'amount_ex' => 'bedrag (ex. btw)',
         'amount_inc' => 'bedrag (incl. btw)',
         'amount_vat' => 'btw-bedrag',
+
         'message_warning_no_pdf' => 'Vanwege deze waarschuwing is er ook geen PDF factuur naar de klant verstuurd. U dient dit handmatig alsnog te doen.',
         'message_warning_old_entry_deleted' => 'De factuur heeft een oudere boeking voor deze %1$s in Acumulus overschreven. Deze oudere boeking met boeknummer %2$d is in Acumulus naar de prullenbak verplaatst en is daar nu terug te vinden onder "Overzichten » Laatste boekingen » Verwijderde boekingen".',
-        'message_warning_old_entry_not_deleted' => 'De factuur heeft een oudere boeking voor deze %1$s in Acumulus overschreven. We hebben geprobeerd deze oudere boeking met boeknummer %2$d in Acumulus naar de prullenbak te verplaatsen, maar dit is niet gelukt omdat de oude factuur waarschijnlijk al verwijderd was. Deze oude factuur kan misschien nog steeds teruggevonden worden onder "Overzichten » Laatste boekingen » Verwijderde boekingen".',
+        'message_warning_old_entry_already_deleted' => 'De factuur heeft een oudere boeking voor deze %1$s in Acumulus overschreven. We hebben geprobeerd deze oudere boeking met boeknummer %2$d in Acumulus naar de prullenbak te verplaatsen, maar dit is niet gelukt omdat de oude factuur waarschijnlijk al naar de prullenbak was verplaatst. Deze oude factuur kan teruggevonden worden onder "Overzichten » Laatste boekingen » Verwijderde boekingen".',
+        'message_warning_old_entry_not_found' => 'De factuur heeft een oudere boeking voor deze %1$s in Acumulus overschreven. We hebben geprobeerd deze oudere boeking met boeknummer %2$d in Acumulus naar de prullenbak te verplaatsen, maar dit is niet gelukt omdat de oude factuur is volledig verwijderd.',
         'message_warning_lock_no_longer_exists' => 'De controle op dubbel verzenden kan niet bepalen of dit wel of niet gebeurd is. Controleer of Acumulus meerdere facturen voor deze %1$s heeft.',
         'message_warning_delete_lock_failed' => 'Het verwijderen van een lock op een %s is mislukt.',
+
         'eu_commerce_threshold_passed' => 'U bent de drempel van verkopen binnen de EU tot aan waar u Nederlandse btw mag berekenen gepasseerd. U dient vanaf nu, tot aan het eind van het jaar, op alle facturen naar particulieren of btw-vrijgestelden binnen de EU het btw tarief van het land van afname te berekenen. Pas direct uw webshop hierop aan. ' . self::sharedNl,
         'eu_commerce_threshold_will_pass' => 'Met deze factuur zou u de drempel van verkopen binnen de EU tot aan waar u Nederlandse btw mag berekenen passeren. U dient vanaf nu, tot aan het eind van het jaar, op alle facturen naar particulieren of btw-vrijgestelden binnen de EU - dus ook op deze factuur - het btw tarief van het land van afname te berekenen. Pas uw webshop hierop aan. ' . self::sharedNl,
         'eu_commerce_threshold_warning' => 'U zit op %.1f%% van de drempel van verkopen binnen de EU tot aan waar u Nederlandse btw mag berekenen. Begin op tijd aan de voorbereidingen tot het aanpassen van de belastinginstellingen van uw webwinkel en overige verkoopkanalen.',
@@ -126,7 +129,8 @@ class Translations extends TranslationCollection
 
         'message_warning_no_pdf' => 'Because of this warning no invoice PDF has been sent. You will have to do so manually.',
         'message_warning_old_entry_deleted' => 'The invoice has overwritten an older invoice for this %1$s in Acumulus. In Acumulus, this older invoice with entry = %2$d has been moved to the waste bin and can be found under "Views » Latest entries » Deleted entries".',
-        'message_warning_old_entry_not_deleted' => 'The invoice has overwritten an older invoice for this %1$s in Acumulus. In Acumulus, we tried to move this older invoice to the waste bin but did not succeed probably because the older invoice has already been deleted. This older invoice with entry = %2$d may or may not still be found under "Views » Latest entries » Deleted entries".',
+        'message_warning_old_entry_already_deleted' => 'The invoice has overwritten an older invoice for this %1$s in Acumulus. In Acumulus, we tried to move this older invoice to the waste bin but did not succeed probably because the older invoice has already been moved to the waste bin. This older invoice with entry = %2$d may be found under "Views » Latest entries » Deleted entries".',
+        'message_warning_old_entry_not_found' => 'The invoice has overwritten an older invoice for this %1$s in Acumulus. In Acumulus, we tried to move this older invoice to the waste bin but did not succeed because the older invoice has already been completely deleted.',
         'message_warning_lock_no_longer_exists' => 'The check on double sending could not determine whether this happened or not. Check if Acumulus has multiple entries for this %1$s.',
         'message_warning_delete_lock_failed' => 'Failed to delete the lock on the %s.',
 

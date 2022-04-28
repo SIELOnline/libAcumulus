@@ -571,6 +571,8 @@ abstract class Form extends MessageCollection
      *
      * @return array[]
      *   The set of version related informational fields.
+     *
+     * @todo: sanitise external data (i.e. data coming from server)
      */
     protected function getInformationBlock(): array
     {

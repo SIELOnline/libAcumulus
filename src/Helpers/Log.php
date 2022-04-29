@@ -1,6 +1,8 @@
 <?php
 namespace Siel\Acumulus\Helpers;
 
+use Throwable;
+
 /**
  * Allows logging messages to a log.
  *
@@ -10,7 +12,7 @@ namespace Siel\Acumulus\Helpers;
  * @todo: log a Message
  * @todo: log a Message[]
  * @todo: log a MessageCollection
- * @todo: log an exception?
+ * @todo: start using logging an exception?
  */
 class Log
 {
@@ -19,6 +21,11 @@ class Log
 
     /** @var string */
     protected $libraryVersion;
+
+    /**
+     * @var array[]
+     */
+    protected $loggedMessages = [];
 
     /**
      * Log constructor.
@@ -56,8 +63,21 @@ class Log
     }
 
     /**
-     * @return string
+     * Returns a list of all logged messages.
+     *
+     * This can be used to prevent logging some messages more than once.
+     *
+     * @return array[]
+     *  An array with all messages logged during this request. Each entry is an
+     *  array with keys:
+     *  - message (string): the formatted message that has been logged
+     *  - severity (int): the severity with which this message was logged.
      */
+    public function getLoggedMessages(): array
+    {
+        return $this->loggedMessages;
+    }
+
     protected function getLibraryVersion(): string
     {
         return $this->libraryVersion;
@@ -88,39 +108,6 @@ class Log
     }
 
     /**
-     * Formats and logs the message if the log level indicates so.
-     *
-     * Errors, warnings and notices are always logged, other levels only if the
-     * log level is set to do so. Before the log level is set from config,
-     * informational messages are also logged.
-     *
-     * Formatting involves:
-     * - calling {@see vsprintf()} if $args is not empty.
-     * - adding "Acumulus {version} {severity}: " in front of the message.
-     *
-     * @param int $severity
-     *   One of the Severity::... constants.
-     * @param string $message
-     *   The message to log, optionally followed by arguments. If there are
-     *   arguments the $message is passed through {@see vsprintf()}.
-     * @param array $values
-     *   Any values to replace %-placeholders in $message.
-     *
-     * @return string
-     *   The full formatted message whether it got logged or not.
-     */
-    public function log(int $severity, string $message, array $values = []): string
-    {
-        if (count($values) > 0) {
-            $message = vsprintf($message, $values);
-        }
-        if ($severity >= $this->getLogLevel()) {
-            $this->write($message, $severity);
-        }
-        return $message;
-    }
-
-    /**
      * Logs a debug message
      *
      * @param string $message,...
@@ -130,11 +117,28 @@ class Log
      *   Any values to replace %-placeholders in $message.
      *
      * @return string
-     *   The full formatted message whether it got logged or not.
+     *   The formatted message whether it got logged or not.
      */
     public function debug(string $message, ...$values): string
     {
         return $this->log(Severity::Log, $message, $values);
+    }
+
+    /**
+     * Logs a success message.
+     *
+     * @param string $message,...
+     *   The message to log, optionally followed by arguments. If there are
+     *   arguments the $message is passed through {@see vsprintf()}.
+     * @param mixed ...$values
+     *   Any values to replace %-placeholders in $message.
+     *
+     * @return string
+     *   The formatted message whether it got logged or not.
+     */
+    public function success(string $message, ... $values): string
+    {
+        return $this->log(Severity::Success, $message, $values);
     }
 
     /**
@@ -147,7 +151,7 @@ class Log
      *   Any values to replace %-placeholders in $message.
      *
      * @return string
-     *   The full formatted message whether it got logged or not.
+     *   The formatted message whether it got logged or not.
      */
     public function info(string $message, ... $values): string
     {
@@ -164,7 +168,7 @@ class Log
      *   Any values to replace %-placeholders in $message.
      *
      * @return string
-     *   The full formatted message whether it got logged or not.
+     *   The formatted message whether it got logged or not.
      */
     public function notice(string $message, ... $values): string
     {
@@ -181,7 +185,7 @@ class Log
      *   Any values to replace %-placeholders in $message.
      *
      * @return string
-     *   The full formatted message whether it got logged or not.
+     *   The formatted message whether it got logged or not.
      */
     public function warning(string $message, ... $values): string
     {
@@ -198,11 +202,42 @@ class Log
      *   Any values to replace %-placeholders in $message.
      *
      * @return string
-     *   The full formatted message whether it got logged or not.
+     *   The formatted message whether it got logged or not.
      */
     public function error(string $message, ... $values): string
     {
         return $this->log(Severity::Error, $message, $values);
+    }
+
+    /**
+     * Logs an exception message.
+     *
+     * @param \Throwable $e
+     *   The "exception" to log.
+     *
+     * @return string
+     *   The formatted message whether it got logged or not.
+     */
+    public function exception(Throwable $e): string
+    {
+        $callingFunction = $e->getTrace()[0]['function'];
+        $callingLine = $e->getLine();
+        $class = get_class($e);
+        $pos = strrpos($class, '\\');
+        if ($pos !== false) {
+            $class = substr($class, $pos + 1);
+        }
+        $message = $class . ': ';
+        if (!empty($e->getCode())) {
+            $message .= $e->getCode() . ': ';
+        }
+        $message .= $e->getMessage();
+        $message .= " in $callingFunction:$callingLine";
+        if (empty($e->hasBeenLogged)) {
+            $this->log(Severity::Exception, $message);
+
+        }
+        return $message;
     }
 
     /**
@@ -222,5 +257,40 @@ class Log
     {
         $message = sprintf('Acumulus %s: %s - %s', $this->getLibraryVersion(), $this->getSeverityString($severity), $message);
         error_log($message);
+    }
+
+    /**
+     * Formats and logs the message if the log level indicates so.
+     *
+     * Errors, warnings and notices are always logged, other levels only if the
+     * log level is set to do so. Before the log level is set from config,
+     * informational messages are also logged.
+     *
+     * Formatting involves:
+     * - calling {@see vsprintf()} if $args is not empty.
+     * - adding "Acumulus {version} {severity}: " in front of the message.
+     *
+     * @param int $severity
+     *   One of the Severity::... constants.
+     * @param string $message
+     *   The message to log, optionally followed by arguments. If there are
+     *   arguments the $message is passed through {@see vsprintf()}.
+     * @param array $values
+     *   Any values to replace %-placeholders in $message.
+     *
+     * @return string
+     *   The formatted message whether it got logged or not.
+     */
+    public function log(int $severity, string $message, array $values = []): string
+    {
+        $format = $message;
+        if (count($values) > 0) {
+            $message = vsprintf($format, $values);
+        }
+        $this->loggedMessages[] = ['message' => $message, 'severity' => $severity, 'format' => $format, 'values' => $values];
+        if ($severity >= $this->getLogLevel()) {
+            $this->write($message, $severity);
+        }
+        return $message;
     }
 }

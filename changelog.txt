@@ -31,6 +31,9 @@ Refactorings:
   dependent on specific error codes (that changed form API v4 to v5).
 - Introduced AcumulusException and AcumulusResponseException to handle
   communication errors.
+- Log class now allows to log exceptions and 'success' messages. A method has
+  been added to retrieve all logged messages. This can be used to prevent
+  logging messages twice.
 - Code documentation: changed {@see ...} with external links to {@link ...}.
 
 

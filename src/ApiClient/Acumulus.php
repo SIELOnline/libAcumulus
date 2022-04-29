@@ -7,13 +7,13 @@
 
 namespace Siel\Acumulus\ApiClient;
 
+use RuntimeException;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Helpers\Util;
-
 /**
  * Provides an easy interface towards the different API calls of the Acumulus
  * web API.
@@ -841,16 +841,14 @@ class Acumulus
     {
         $acumulusRequest = $this->createAcumulusRequest();
         $uri = $this->constructUri($apiFunction);
-        $logLevel = Severity::Error;
         try {
             $acumulusResult = $acumulusRequest->execute($uri, $message, $needContract);
-            // We will log the request and response, as debug messages in case
-            // of success but as error messages in case of errors.
-            $logLevel = $acumulusResult->hasError() ? Severity::Error : Severity::Log;
+            $logLevel = $acumulusResult->getStatus();
             return $acumulusResult;
-        } catch (AcumulusException|AcumulusResponseException $e) {
+        } catch (RuntimeException $e) {
             // Situation 1 or 2. We will log the situation and rethrow.
             $exception = $e;
+            $logLevel = Severity::Exception;
             throw $e;
         } finally {
             $this->log->log($logLevel, $acumulusRequest->getMaskedRequest());
@@ -858,7 +856,7 @@ class Acumulus
                 $this->log->log($logLevel, $acumulusResult->getMaskedResponse());
             }
             if (isset($exception)) {
-                $this->log->error($e->getMessage());
+                $this->log->exception($e);
             }
         }
     }

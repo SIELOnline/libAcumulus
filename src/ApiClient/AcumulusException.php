@@ -13,7 +13,7 @@ use RuntimeException;
  *   {@see \Siel\Acumulus\ApiClient\HttpResponse}).
  * - An exception that occurred during format conversion on a place that does
  *   not have access to the http request or response. To log the exception
- *   together with the request sent and, if any, received response, these
+ *   together with the request and, if any, received response, these
  *   exceptions should be caught and rethrown on a higher level
  */
 class AcumulusException extends RuntimeException {}

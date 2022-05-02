@@ -41,7 +41,6 @@ class Log extends BaseLog
      */
     protected function write(string $message, int $severity)
     {
-        jimport('joomla.log.log');
         JLog::add($message, $this->getJoomlaSeverity($severity), 'com_acumulus');
     }
 

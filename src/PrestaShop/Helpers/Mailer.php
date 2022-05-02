@@ -66,6 +66,16 @@ class Mailer extends BaseMailer
         return Configuration::get('PS_SHOP_NAME');
     }
 
+    public function getTo(): string
+    {
+        $return = parent::getTo();
+        if (empty($return)) {
+            // @todo: does this shop configure an administrator address?
+            $return = $this->getFrom();
+        }
+        return $return;
+    }
+
     /**
      * Writes the mail bodies (html and text) to template files as used by the
      * PrestaShop mailer.

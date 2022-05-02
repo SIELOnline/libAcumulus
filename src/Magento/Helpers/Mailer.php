@@ -61,4 +61,14 @@ class Mailer extends BaseMailer
         $result = $this->getConfig()->getValue('general/store_information/name');
         return $result ?: parent::getFromName();
     }
+
+    public function getTo(): string
+    {
+        $return = parent::getTo();
+        if (empty($return)) {
+            // @todo: does this shop configure an administrator address?
+            $return = $this->getFrom();
+        }
+        return $return;
+    }
 }

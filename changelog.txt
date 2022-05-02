@@ -42,6 +42,9 @@ Refactorings:
   logging messages twice. Log::exception() will already check if an exception
   has already been logged by adding a dynamic property $hasBeenLogged to an
   exception that gets logged.
+- Changes to the mailer: getFrom(), getFromName(), and getTo() are now public
+  and getTo() is to be overridden to return some kind of administrator e-mail
+  address.
 - Code documentation: changed {@see ...} with external links to {@link ...}.
 
 

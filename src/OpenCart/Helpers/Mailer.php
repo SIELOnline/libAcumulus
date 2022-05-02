@@ -56,9 +56,19 @@ class Mailer extends BaseMailer
     /**
      * {@inheritdoc}
      */
-    protected function getFrom(): string
+    public function getFrom(): string
     {
         $config = Registry::getInstance()->config;
         return $config->get('config_email');
+    }
+
+    public function getTo(): string
+    {
+        $return = parent::getTo();
+        if (empty($return)) {
+            // @todo: does this shop configure an administrator address?
+            $return = $this->getFrom();
+        }
+        return $return;
     }
 }

@@ -41,4 +41,14 @@ class Mailer extends BaseMailer
     {
         return get_bloginfo('name');
     }
+
+    public function getTo(): string
+    {
+        $return = parent::getTo();
+        if (empty($return)) {
+            // @todo: does this shop configure an administrator address?
+            $return = $this->getFrom();
+        }
+        return $return;
+    }
 }

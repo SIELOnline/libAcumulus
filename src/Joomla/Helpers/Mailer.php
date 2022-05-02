@@ -50,4 +50,16 @@ class Mailer extends BaseMailer
         $app = JFactory::getApplication();
         return $app->get('mailfrom');
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTo(): string
+    {
+        $return = parent::getTo();
+        if (empty($return)) {
+            $return = $this->getFrom();
+        }
+        return $return;
+    }
 }

@@ -129,17 +129,15 @@ abstract class Mailer
      * Returns the mail to address.
      *
      * This base implementation returns the configured 'emailonerror' address,
-     * which normally is exactly what we want.
+     * which normally is exactly what we want but will be empty if not yet set.
+     * So web shops should override this method and try to return an
+     * administrator e-mail address if this base implementation returns an empty
+     * string.
      */
     public function getTo(): string
     {
         $credentials = $this->config->getCredentials();
-        if (isset($credentials[Tag::EmailOnError])) {
-            return $credentials[Tag::EmailOnError];
-        }
-        $env = $this->environment->get();
-        // @todo: shops can do a better job: override this
-        return 'webshop@' . $env['hostName'];
+        return $credentials[Tag::EmailOnError];
     }
 
     /**
@@ -252,10 +250,9 @@ abstract class Mailer
         $pluginSettings = $this->config->getPluginSettings();
         $isTestMode = $pluginSettings['debug'] === Config::Send_TestMode;
         $invoiceInfo = $invoiceAddResult->getMainApiResponse();
-        // @refactor: can be taken from invoice array if that would be part of the Result
-        $isConcept = !$invoiceAddResult->hasError() && empty($invoiceInfo['entryid']);
+        $isConcept = $invoiceInfo !== null && !empty($invoiceInfo['conceptid']);
         $emailAsPdfSettings = $this->config->getEmailAsPdfSettings();
-        $isEmailAsPdf = (bool) $emailAsPdfSettings['emailAsPdf'];
+        $isEmailAsPdf = $emailAsPdfSettings['emailAsPdf'];
 
         // Collect the messages.
         $sentences = [];

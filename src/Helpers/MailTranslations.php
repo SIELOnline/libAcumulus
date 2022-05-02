@@ -65,6 +65,12 @@ LONGSTRING
 {support_messages_html}
 LONGSTRING
     ,
+
+        'crash_mail_subject' => 'Je %1$s %2$s heeft een technisch probleem',
+        'crash_mail_body_start' => "De %1\$s %2\$s in jouw webshop is tegen een technisch probleem aangelopen. "
+            . "Dit kan een tijdelijk probleem zijn omdat b.v. de Acumulus server even niet bereikbaar is. "
+            . "Als het probleem blijft aanhouden, stuur deze mail dan door naar Acumulus support: %3\$s. "
+            . "Stuur onderstaande gegevens dan mee, want deze zijn nodig om het probleem goed te kunnen onderzoeken.\n",
     ];
 
     protected $en = [

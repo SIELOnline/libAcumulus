@@ -290,8 +290,23 @@ class Container
     public function getMailer(): Mailer
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('Mailer', 'Helpers', [$this->getConfig(), $this->getEnvironment(), $this->getTranslator(),
-            $this->getLog()]);
+        return $this->getInstance('Mailer', 'Helpers', [
+            $this->getConfig(),
+            $this->getEnvironment(),
+            $this->getTranslator(),
+            $this->getLog(),
+        ]);
+    }
+
+    public function getCrashReporter(): CrashReporter
+    {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return $this->getInstance('CrashReporter', 'Helpers', [
+            $this->getMailer(),
+            $this->getEnvironment(),
+            $this->getTranslator(),
+            $this->getLog(),
+        ]);
     }
 
     public function getToken(): Token

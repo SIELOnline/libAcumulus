@@ -579,28 +579,75 @@ abstract class Form extends MessageCollection
         $this->loadInfoBlockTranslations();
 
         $environment = $this->environment->get();
-        $module = $this->t('module');
-        $environmentLines = [
-            'Shop' => "{$environment['shopName']} {$environment['shopVersion']}"
-                . (!empty($environment['cmsName']) ? " on {$environment['cmsName']} {$environment['cmsVersion']}" : ''),
-            $module => "Acumulus {$environment['moduleVersion']}; Library: {$environment['libraryVersion']}",
-            'PHP' => "{$environment['phpVersion']};" . " (Curl: {$environment['curlVersion']})",
-            'Database' => "{$environment['dbName']} {$environment['dbVersion']}",
-            'Server' => $environment['hostName'],
-            'OS' => $environment['os'],
-        ];
-        $support = strtolower(rtrim($environment['shopName'], '0123456789')) . '@acumulus.nl';
+        $environmentLines = $this->environment->getAsLines();
+        $support = $environment['supportEmail'];
         $subject = sprintf($this->t('support_subject'), $environment['shopName'], $this->t('module'));
+        $contract = $this->getContractList();
+        $contractMsg = array_shift($contract);
+        $contractContact = array_pop($contract);
+        [$euCommerceProgressBar, $euCommerceMessage] = $this->getEuCommerceInfo();
+        $body = sprintf("%s:\n%s%s%s:\n%s%s\n%s\n%s\n",
+            $this->t('contract'),
+            $contractMsg,
+            $this->arrayToList($contract, false),
+            $this->t('about_environment'),
+            $this->arrayToList($environmentLines, false),
+            $this->t('support_body'),
+            $this->t('regards'),
+            $contractContact
+        );
+        $moreAcumulus = [
+            $this->t('link_login') . '.',
+            $this->t('link_app') . '.',
+            $this->t('link_manual') . '.',
+            $this->t('link_forum') . '.',
+            $this->t('link_website') . '.',
+            sprintf($this->t('link_support'), rawurldecode($support), rawurlencode($subject), rawurlencode($body)) . '.',
+        ];
+
+        $fields = [
+            'contractInformation' => [
+                'type' => 'markup',
+                'value' => '<h3>' . $this->t('contract') . '</h3>' . $contractMsg . $this->arrayToList($contract, true),
+            ],
+        ];
+        if (!empty($euCommerceMessage)) {
+            $fields['euCommerce'] = [
+                'type' => 'markup',
+                'value' => '<h3>' . $this->t('euCommerce') . '</h3>' . "<p>$euCommerceProgressBar<br>$euCommerceMessage</p>",
+            ];
+        }
+        $fields += [
+            'environmentInformation' => [
+                'type' => 'markup',
+                'value' => '<h3>' . $this->t('about_environment') . '</h3>' . $this->arrayToList($environmentLines, true) .
+                    $this->t('desc_environmentInformation'),
+            ],
+            'moreAcumulusInformation' => [
+                'type' => 'markup',
+                'value' => '<h3>' . $this->t('moreAcumulusTitle') . '</h3>' . $this->arrayToList($moreAcumulus, true),
+            ],
+        ];
+
+        $wrapperType = $this->getType() === 'batch' ? 'details' : 'fieldset';
+        $wrapperTitleType = $this->getType() === 'batch' ? 'summary' : 'legend';
+        return [
+            'type' => $wrapperType,
+            $wrapperTitleType => sprintf($this->t('informationBlockHeader'), $this->t('module')),
+            'fields' => $fields,
+            'collapsable' => false,
+        ];
+    }
+
+    protected function getContractList(): array
+    {
+        $contractContact = $this->t('your_name');
         if ($this->emptyCredentials()) {
-            $contractMsg = $this->t('no_contract_data_local') . "\n";
-            $contract = [];
-            $euCommerceProgressBar = $this->addProgressBar($this->t('unknown'), $this->t('unknown'), 0, 'warning');
-            $euCommerceMessage = $this->t('no_contract_data_local');
+            $contract = [$this->t('no_contract_data_local')];
         } else {
             $myAcumulus = $this->acumulusApiClient->getMyAcumulus();
             $myData = $myAcumulus->getMainAcumulusResponse();
             if (!empty($myData)) {
-                $contractMsg = '';
                 $contract = [
                     $this->t('field_code') => $myData['mycontractcode'] ?? $this->t('unknown'),
                     $this->t('field_companyName') => $myData['mycompanyname'] ?? $this->t('unknown'),
@@ -637,10 +684,24 @@ abstract class Form extends MessageCollection
                         ? sprintf($this->t('email_status_text_reason'), $reason)
                         : $contract[$this->t('email_status_label')] = $this->t('email_status_text');
                 }
+                if (!empty($myData['mycontactperson'])) {
+                    $contractContact = $myData['mycontactperson'];
+                }
             } else {
-                $contractMsg = $this->t('no_contract_data') . "\n";
-                $contract = $myAcumulus->formatMessages(Message::Format_PlainWithSeverity, Severity::RealMessages);
+                $contract = array_merge([$this->t('no_contract_data')],
+                    $myAcumulus->formatMessages(Message::Format_PlainWithSeverity, Severity::RealMessages));
             }
+        }
+        $contract[] = $contractContact;
+        return $contract;
+    }
+
+    protected function getEuCommerceInfo(): array
+    {
+        if ($this->emptyCredentials()) {
+            $euCommerceProgressBar = $this->addProgressBar($this->t('unknown'), $this->t('unknown'), 0, 'warning');
+            $euCommerceMessage = $this->t('no_contract_data_local');
+        } else {
             $warningPercentage = $this->acumulusConfig->getInvoiceSettings()['euCommerceThresholdPercentage'];
             if ($warningPercentage !== '') {
                 $euCommerceReport = $this->acumulusApiClient->reportThresholdEuCommerce();
@@ -653,15 +714,12 @@ abstract class Form extends MessageCollection
                     if ($reached) {
                         $message = $this->t('info_block_eu_commerce_threshold_passed');
                         $status = 'error';
+                    } elseif ($percentage >= $warningPercentage) {
+                        $message = sprintf($this->t('info_block_eu_commerce_threshold_warning'), $percentage);
+                        $status = 'warning';
                     } else {
-                        /** @noinspection PhpSeparateElseIfInspection */
-                        if ($percentage < $warningPercentage) {
-                            $message = $this->t('info_block_eu_commerce_threshold_ok');
-                            $status = 'ok';
-                        } else {
-                            $message = sprintf($this->t('info_block_eu_commerce_threshold_warning'), $percentage);
-                            $status = 'warning';
-                        }
+                        $message = $this->t('info_block_eu_commerce_threshold_ok');
+                        $status = 'ok';
                     }
                     $percentage = (int) round($percentage);
                     $euCommerceProgressBar = $this->addProgressBar($nlTaxed, $threshold, $percentage, $status);
@@ -673,58 +731,7 @@ abstract class Form extends MessageCollection
                 }
             }
         }
-        $body = sprintf("%s:\n%s%s%s:\n%s%s\n%s\n%s\n",
-            $this->t('contract'),
-            $contractMsg,
-            $this->arrayToList($contract, false),
-            $this->t('environment'),
-            $this->arrayToList($environmentLines, false),
-            $this->t('support_body'),
-            $this->t('regards'),
-            $myData['mycontactperson'] ?? $this->t('your_name')
-        );
-        $moreAcumulus = [
-            $this->t('link_login') . '.',
-            $this->t('link_app') . '.',
-            $this->t('link_manual') . '.',
-            $this->t('link_forum') . '.',
-            $this->t('link_website') . '.',
-            sprintf($this->t('link_support'), rawurldecode($support), rawurlencode($subject), rawurlencode($body)) . '.',
-        ];
-
-        $fields = [
-            'contractInformation' => [
-                'type' => 'markup',
-                'value' => '<h3>' . $this->t('contract') . '</h3>' . $contractMsg . $this->arrayToList($contract, true),
-            ],
-        ];
-        if (isset($euCommerceMessage)) {
-            /** @noinspection PhpUndefinedVariableInspection */
-            $fields['euCommerce'] = [
-                'type' => 'markup',
-                'value' => '<h3>' . $this->t('euCommerce') . '</h3>' . "<p>$euCommerceProgressBar<br>$euCommerceMessage</p>",
-            ];
-        }
-        $fields += [
-            'environmentInformation' => [
-                'type' => 'markup',
-                'value' => '<h3>' . $this->t('environment') . '</h3>' . $this->arrayToList($environmentLines, true) .
-                    $this->t('desc_environmentInformation'),
-            ],
-            'moreAcumulusInformation' => [
-                'type' => 'markup',
-                'value' => '<h3>' . $this->t('moreAcumulusTitle') . '</h3>' . $this->arrayToList($moreAcumulus, true),
-            ],
-        ];
-
-        $wrapperType = $this->getType() === 'batch' ? 'details' : 'fieldset';
-        $wrapperTitleType = $this->getType() === 'batch' ? 'summary' : 'legend';
-        return [
-            'type' => $wrapperType,
-            $wrapperTitleType => sprintf($this->t('informationBlockHeader'), $this->t('module')),
-            'fields' => $fields,
-            'collapsable' => false,
-        ];
+        return [$euCommerceProgressBar ?? '', $euCommerceMessage ?? ''];
     }
 
     protected function addProgressBar($nlTaxed, $threshold, $percentage, $status): string
@@ -734,10 +741,12 @@ abstract class Form extends MessageCollection
 
     protected function arrayToList(array $list, bool $isHtml): string
     {
+        /** @noinspection DuplicatedCode  also used in CrashReporter::arrayToList */
         $result = '';
         if (!empty($list)) {
             foreach ($list as $key => $line) {
                 if (is_string($key) && !ctype_digit($key)) {
+                    $key = $this->t($key);
                     $line = "$key: $line";
                 }
                 $result .= $isHtml ? "<li>$line</li>" : "• $line";

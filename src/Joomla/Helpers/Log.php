@@ -57,6 +57,7 @@ class Log extends BaseLog
     protected function getJoomlaSeverity($severity)
     {
         switch ($severity) {
+            case Severity::Exception:
             case Severity::Error:
                 return JLog::ERROR;
             case Severity::Warning:
@@ -65,6 +66,7 @@ class Log extends BaseLog
                 return JLog::NOTICE;
             case Severity::Info:
                 return JLog::INFO;
+            case Severity::Success:
             case Severity::Log:
             default:
                 return JLog::DEBUG;

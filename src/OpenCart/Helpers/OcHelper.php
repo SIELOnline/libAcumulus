@@ -263,7 +263,7 @@ class OcHelper
 //
 //        // Add an intermediate level to the breadcrumb.
 //        $this->data['breadcrumbs'][] = [
-//            'text' => $this->t('modules'),
+//            'text' => $this->t('extensions'),
 //            'href' => $this->registry->getLink('extension/module',),
 //            'separator' => ' :: '
 //        ];

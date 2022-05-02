@@ -30,7 +30,6 @@ class MoreAcumulusTranslations extends TranslationCollection
         'no_contract_data' => 'Contractdata niet beschikbaar, meldingen:',
         'euCommerce' => 'EU verkopen',
         'no_eu_commerce_data' => 'Informatie over EU verkopen niet beschikbaar, meldingen:',
-        'environment' => 'Over uw webwinkel',
 
         'field_companyName' => 'Bedrijfsnaam',
         'field_code' => 'Contractcode',
@@ -65,7 +64,6 @@ class MoreAcumulusTranslations extends TranslationCollection
         'contract' => 'Your contract',
         'no_contract_data_local' => 'Contract data not yet set.',
         'no_contract_data' => 'Contract data not available, messages:',
-        'environment' => 'About your webshop',
 
         'field_companyName' => 'Company name',
         'field_code' => 'Contract code',

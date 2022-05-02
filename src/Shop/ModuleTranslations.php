@@ -18,8 +18,10 @@ class ModuleTranslations extends TranslationCollection
     protected $nl = [
         // Linking into the shop's extension system, standard buttons and
         // messages.
+        'shop' => 'Webwinkel',
+        'about_environment' => 'Over uw webwinkel',
+        'about_error' => 'Foutmelding',
         'extensions' => 'Extensies',
-        'modules' => 'Modules',
         'module_name' => 'Acumulus',
         'module_description' => 'Verstuurt uw facturen automatisch naar Acumulus',
         'text_home' => 'Home',
@@ -42,11 +44,14 @@ class ModuleTranslations extends TranslationCollection
         'option_empty' => 'Maak uw keuze',
         'click_to_toggle' => '<span>(klik om te tonen of te verbergen)</span>',
         'date_format' => 'jjjj-mm-dd',
+        'crash_admin_message' => 'Er is een fout opgetreden. De foutmelding is gelogd en als mail verstuurd. Als de fout blijft aanhouden neem dan contact op met support. Foutmelding: %s',
     ];
 
     protected $en = [
+        'shop' => 'Web shop',
+        'about_environment' => 'About your webshop',
+        'about_error' => 'Error message',
         'extensions' => 'Extensions',
-        'modules' => 'Modules',
         'module_name' => 'Acumulus',
         'module_description' => 'Automatically sends your invoices to Acumulus',
         'text_home' => 'Home',
@@ -63,7 +68,7 @@ class ModuleTranslations extends TranslationCollection
         'unknown' => 'unknown',
         'option_empty' => 'Select one',
         'click_to_toggle' => '<span>(click to show or hide)</span>',
-
         'date_format' => 'yyyy-mm-dd',
+        'crash_admin_message' => 'An error occurred. the error message has been logged and mailed. If the error keeps occurring, please contact support. Error message: %s',
     ];
 }

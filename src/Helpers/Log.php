@@ -227,17 +227,14 @@ class Log
         if ($pos !== false) {
             $class = substr($class, $pos + 1);
         }
-        $message = $class . ': ';
-        if (!empty($e->getCode())) {
-            $message .= $e->getCode() . ': ';
-        }
-        $message .= $e->getMessage();
-        $message .= " in $callingFunction:$callingLine";
+        $code = !empty($e->getCode()) && strpos($e->getMessage(), $e->getCode()) === false ? $e->getCode() . ': ' : '';
+        $message = $e->getMessage();
+        $fullMessage = "$class: $code$message in $callingFunction:$callingLine";
         if (empty($e->hasBeenLogged)) {
-            $this->log(Severity::Exception, $message);
-
+            $this->log(Severity::Exception, $fullMessage);
+            $e->hasBeenLogged = true;
         }
-        return $message;
+        return $fullMessage;
     }
 
     /**

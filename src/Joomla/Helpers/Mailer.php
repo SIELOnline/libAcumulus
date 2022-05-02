@@ -23,6 +23,7 @@ class Mailer extends BaseMailer
         string $bodyHtml
     ): bool {
         $mailer = JFactory::getMailer();
+        /** @noinspection PhpRedundantOptionalArgumentInspection */
         $mailer->isHtml(true);
         $mailer->setSender([$from, $fromName]);
         $mailer->addRecipient($to);
@@ -43,7 +44,7 @@ class Mailer extends BaseMailer
     /**
      * {@inheritdoc}
      */
-    protected function getFrom(): string
+    public function getFrom(): string
     {
         /** @noinspection PhpUnhandledExceptionInspection */
         $app = JFactory::getApplication();

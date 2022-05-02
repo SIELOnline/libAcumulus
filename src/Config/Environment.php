@@ -42,6 +42,7 @@ abstract class Environment
         $this->data['moduleVersion'] = Version;
         $this->data['cmsName'] = '';
         $this->data['cmsVersion'] = '';
+        $this->data['supportEmail'] = strtolower(rtrim($this->data['shopName'], '0123456789')) . '@acumulus.nl';
         $this->setShopEnvironment();
     }
 
@@ -127,6 +128,7 @@ abstract class Environment
      *   - 'curlVersion'
      *   - 'db'
      *   - 'dbVersion'
+     *   - 'supportEmail'
      */
     public function get(): array
     {
@@ -134,5 +136,31 @@ abstract class Environment
             $this->set($this->shopNamespace);
         }
         return $this->data;
+    }
+
+    /**
+     * @return string[]
+     *   A set of text lines that describe the environment. Can be used to
+     *   display the environment as a bullet list. The lines are keyed by what
+     *   can be seen as a 'header' for that line. The keys 'shop' and 'module'
+     *   can be translated (using shop specific terminology).
+     */
+    public function getAsLines(): array
+    {
+        $environment = $this->get();
+        return [
+            'shop' => "{$environment['shopName']} {$environment['shopVersion']}"
+                . (!empty($environment['cmsName']) ? " on {$environment['cmsName']} {$environment['cmsVersion']}" : ''),
+            'module' => "Acumulus {$environment['moduleVersion']}; Library: {$environment['libraryVersion']}",
+            'PHP' => "{$environment['phpVersion']};" . " (Curl: {$environment['curlVersion']})",
+            'Database' => "{$environment['dbName']} {$environment['dbVersion']}",
+            'Server' => $environment['hostName'],
+            'OS' => $environment['os'],
+        ];
+    }
+
+    public function getContract()
+    {
+
     }
 }

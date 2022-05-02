@@ -89,7 +89,7 @@ class AcumulusRequest
         if ($submit !== null) {
             $submit = $this->util->maskArray($this->getSubmit());
         }
-        return sprintf("Request: uri=%s\nsubmit=%s", json_encode($uri), json_encode($submit));
+        return sprintf("Request: uri=%s\nsubmit=%s", $uri ?? 'null', json_encode($submit, JSON_PRETTY_PRINT));
     }
 
     /**

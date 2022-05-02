@@ -138,7 +138,7 @@ class AcumulusErrorHandlingTest extends TestCase
 
     public function testEmailAsPdfInvalidToken()
     {
-        $result = $this->acumulusClient->emailInvoiceAsPdf(static::InvalidToken, ['emailto' => 'erwin@burorader.com']);
+        $result = $this->acumulusClient->emailInvoiceAsPdf(static::InvalidToken, ['emailto' => 'unit.test@burorader.com']);
         $this->assertTrue($result->hasError());
         $this->assertCount(2, $this->log->getLoggedMessages());
         $this->assertSubmittedRequestHasBeenLogged(0, Severity::Error);

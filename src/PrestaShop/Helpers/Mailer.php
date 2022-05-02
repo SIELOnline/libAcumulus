@@ -53,7 +53,7 @@ class Mailer extends BaseMailer
     /**
      * {@inheritdoc}
      */
-    protected function getFrom(): string
+    public function getFrom(): string
     {
         return Configuration::get('PS_SHOP_EMAIL');
     }
@@ -61,7 +61,7 @@ class Mailer extends BaseMailer
     /**
      * {@inheritdoc}
      */
-    protected function getFromName(): string
+    public function getFromName(): string
     {
         return Configuration::get('PS_SHOP_NAME');
     }

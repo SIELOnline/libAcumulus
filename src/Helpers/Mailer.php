@@ -111,7 +111,7 @@ abstract class Mailer
      *
      * This base implementation returns 'webshop@<hostname>'.
      */
-    protected function getFrom(): string
+    public function getFrom(): string
     {
         $env = $this->environment->get();
         return 'webshop@' . $env['hostName'];
@@ -120,7 +120,7 @@ abstract class Mailer
     /**
      * Returns the mail from name.
      */
-    protected function getFromName(): string
+    public function getFromName(): string
     {
         return $this->t('mail_sender_name');
     }
@@ -131,13 +131,14 @@ abstract class Mailer
      * This base implementation returns the configured 'emailonerror' address,
      * which normally is exactly what we want.
      */
-    protected function getTo(): string
+    public function getTo(): string
     {
         $credentials = $this->config->getCredentials();
         if (isset($credentials[Tag::EmailOnError])) {
             return $credentials[Tag::EmailOnError];
         }
         $env = $this->environment->get();
+        // @todo: shops can do a better job: override this
         return 'webshop@' . $env['hostName'];
     }
 

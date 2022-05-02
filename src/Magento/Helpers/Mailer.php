@@ -48,7 +48,7 @@ class Mailer extends BaseMailer
     /**
      * {@inheritdoc}
      */
-    protected function getFrom(): string
+    public function getFrom(): string
     {
         return $this->getConfig()->getValue('trans_email/ident_general/email');
     }
@@ -56,7 +56,7 @@ class Mailer extends BaseMailer
     /**
      * {@inheritdoc}
      */
-    protected function getFromName(): string
+    public function getFromName(): string
     {
         $result = $this->getConfig()->getValue('general/store_information/name');
         return $result ?: parent::getFromName();

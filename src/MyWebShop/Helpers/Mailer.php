@@ -22,7 +22,7 @@ class Mailer extends BaseMailer
     /**
      * {@inheritdoc}
      */
-    protected function getFrom(): string
+    public function getFrom(): string
     {
         // @todo: adapt to MyWebShop's way of getting the from email address to use.
         return Configuration::get('SHOP_EMAIL');
@@ -31,7 +31,7 @@ class Mailer extends BaseMailer
     /**
      * {@inheritdoc}
      */
-    protected function getFromName(): string
+    public function getFromName(): string
     {
         // @todo: adapt to MyWebShop's way of getting the webshop name.
         return Configuration::get('SHOP_NAME');

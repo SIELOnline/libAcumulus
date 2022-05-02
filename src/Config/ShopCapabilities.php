@@ -361,7 +361,7 @@ abstract class ShopCapabilities
      *   batch, or logo.
      *
      * @return string
-     *   The link to the requested form page.
+     *   The link to the requested form page (or image).
      *
      * @throws \InvalidArgumentException
      *   Unknown link type.

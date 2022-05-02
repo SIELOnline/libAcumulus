@@ -294,7 +294,7 @@ class AcumulusResult extends MessageCollection
     {
         $code = $this->getHttpResponse()->getHttpStatusCode();
         $body = $this->util->maskArray($this->fullAcumulusResponse);
-        return sprintf("Response: status=%s\nbody=%s", json_encode($code), json_encode($body));
+        return sprintf("Response: status=%d\nbody=%s", $code, json_encode($body));
     }
 
     /**

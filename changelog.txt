@@ -19,8 +19,14 @@ WC   WooCommerce                             >= 5.0 (3 and 4 will probably work)
      WordPress           5.9.2               >= ?.?
 --------------------------------------------------------------------------------
 
-7.1.0-beta1 (2022-04-??)
+7.1.0-beta1 (2022-05-??)
 ------------------------
+Features:
+- JOO: We now look for uncaught errors at the highest level of our operations,
+  controller tasks or event handlers, and log and mail those errors. On Admin
+  screens we also display a short error message. The mail should facilitate
+  support. Other plugins will follow in future versions.
+
 Refactorings:
 - Extracted the environment part out of Config into its own class Environment,
   added database name and version to it, and removed json version from it.
@@ -33,7 +39,9 @@ Refactorings:
   communication errors.
 - Log class now allows to log exceptions and 'success' messages. A method has
   been added to retrieve all logged messages. This can be used to prevent
-  logging messages twice.
+  logging messages twice. Log::exception() will already check if an exception
+  has already been logged by adding a dynamic property $hasBeenLogged to an
+  exception that gets logged.
 - Code documentation: changed {@see ...} with external links to {@link ...}.
 
 

@@ -4,7 +4,7 @@ Changelog Acumulus web shop extensions
 Supported shops and versions
 ----------------------------
 The tags below are also used further on in the changelog to indicate to which
-shop(s) a change applies.
+shop(s) a change applies (if no tag is mentioned, ALL may be assumed).
 
 Tag  Shop                 Actual version     Supported versions
 --------------------------------------------------------------------------------
@@ -18,6 +18,11 @@ VM   VirtueMart (Joomla) ?.?
 WC   WooCommerce                             >= 5.0 (3 and 4 will probably work)
      WordPress           5.9.2               >= ?.?
 --------------------------------------------------------------------------------
+
+7.1.2-beta (2022-05-??)
+-----------------------
+Bugs:
+- Text unknown severity in Log for success messages.
 
 7.1.1 (2022-05-03) (JOO only)
 -----------------------------

@@ -92,6 +92,8 @@ class Log
         switch ($severity) {
             case Severity::Log:
                 return 'Debug';
+            case Severity::Success:
+                return 'Success';
             case Severity::Info:
                 return 'Info';
             case Severity::Notice:

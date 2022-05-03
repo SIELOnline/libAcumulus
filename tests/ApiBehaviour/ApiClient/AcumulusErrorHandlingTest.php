@@ -30,6 +30,8 @@ class AcumulusErrorHandlingTest extends TestCase
 {
     protected const ValidToken = 'JrJ8bS0aTBxFOLn7ClNBYBHNdMJR8d96';
     protected const InvalidToken = 'JrJ8bS0aTBxFOLn7ClNBYBHNdMJR8d97';
+    protected const ValidEntryId = 45967305;
+    protected const InvalidEntryId = 1;
 
     protected /*Container*/ $container;
     protected /*Environment*/ $environment;
@@ -54,7 +56,7 @@ class AcumulusErrorHandlingTest extends TestCase
     public function testTimeout()
     {
         try {
-            $this->acumulusClient->timeout();
+            $this->acumulusClient->timeout(static::ValidEntryId);
             $this->fail('Should not arrive here');
         } catch (AcumulusException $e) {
             $this->assertCount(2, $this->log->getLoggedMessages());
@@ -63,8 +65,8 @@ class AcumulusErrorHandlingTest extends TestCase
             $loggedMessage2 = end($loggedMessages);
             $lastMessage = $loggedMessage2['message'];
             $lastSeverity = $loggedMessage2['severity'];
-            $this->assertStringStartsWith('AcumulusException: '. CURLE_OPERATION_TIMEDOUT . ': curl_exec()', $lastMessage);
-            $this->assertStringContainsString(CURLE_OPERATION_TIMEDOUT, $lastMessage);
+            $this->assertStringStartsWith('AcumulusException: curl_exec()', $lastMessage);
+            $this->assertStringContainsString((string) CURLE_OPERATION_TIMEDOUT, $lastMessage);
             $this->assertEquals(Severity::Exception, $lastSeverity);
         }
     }
@@ -97,6 +99,32 @@ class AcumulusErrorHandlingTest extends TestCase
             $this->assertSubmittedRequestHasBeenLogged(0, Severity::Exception);
             $this->assertHttpLevelErrorHasBeenLogged(-1, 403, '"error":{"code":"403', Severity::Exception);
         }
+    }
+
+    /**
+     * Test the reaction on a request with a non-complete 'contract' section.
+     */
+    public function testNoEmailOnError()
+    {
+        $result = $this->acumulusClient->noEmailOnError(static::ValidEntryId);
+        $this->assertFalse($result->hasError());
+        $this->assertArrayHasKey('entryid', $result->getMainAcumulusResponse());
+        $this->assertCount(2, $this->log->getLoggedMessages());
+        $this->assertSubmittedRequestHasBeenLogged(0, Severity::Success);
+        $this->assertApplicationLevelSuccessHasBeenLogged(-1);
+    }
+
+    /**
+     * Test the reaction on a request with a non-complete 'contract' section.
+     */
+    public function testNoEmailOnWarning()
+    {
+        $result = $this->acumulusClient->noEmailOnWarning(static::ValidEntryId);
+        $this->assertFalse($result->hasError());
+        $this->assertArrayHasKey('entryid', $result->getMainAcumulusResponse());
+        $this->assertCount(2, $this->log->getLoggedMessages());
+        $this->assertSubmittedRequestHasBeenLogged(0, Severity::Success);
+        $this->assertApplicationLevelSuccessHasBeenLogged(-1);
     }
 
     public function testEntryNotfound()
@@ -172,8 +200,7 @@ class AcumulusErrorHandlingTest extends TestCase
         $loggedMessage = $loggedMessages[$index];
         $message = $loggedMessage['message'];
         $severity = $loggedMessage['severity'];
-        $this->assertStringStartsWith('Request: ', $message);
-        $this->assertStringContainsString('uri="', $message);
+        $this->assertStringStartsWith('Request: uri=', $message);
         $this->assertStringContainsString('submit={', $message);
         $this->assertEquals($expectedSeverity, $severity);
     }

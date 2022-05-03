@@ -168,7 +168,7 @@ class AdvancedConfigForm extends BaseConfigForm
             ];
         }
 
-        $fields['versionInformation'] = $this->getInformationBlock();
+        $fields['versionInformation'] = $this->getInformationBlock($accountStatus);
 
         return $fields;
     }

@@ -2,7 +2,7 @@
 namespace Siel\Acumulus\ApiClient;
 
 use Exception;
-use RuntimeException;
+use Throwable;
 
 /**
  * Class AcumulusResponseException represents errors based on inspecting the
@@ -11,25 +11,30 @@ use RuntimeException;
  * The message will be constructed based on the $body, http status $code, and,
  * if passed, the $additionalInfo.
  */
-class AcumulusResponseException extends RuntimeException
+class AcumulusResponseException extends AcumulusException
 {
     /**
      * @param string $body
      * @param int $code
-     * @param string|\Exception $additionalInfo
+     * @param string|\Throwable $additionalInfo
      */
     public function __construct(string $body, int $code, $additionalInfo = '')
     {
         $message = "HTTP status code=$code";
         $message .= $this->getAdditionalInfo($additionalInfo);
         $message .= "\nHTTP body=$body";
-        parent::__construct($message, $code, $additionalInfo instanceof Exception ? $additionalInfo: null);
+        parent::__construct($message, $code, $additionalInfo instanceof Throwable ? $additionalInfo: null);
     }
 
+    /**
+     * @param string|\Throwable $additionalInfo
+     *
+     * @return string
+     */
     private function getAdditionalInfo($additionalInfo): string
     {
         $result = '';
-        if ($additionalInfo instanceof Exception) {
+        if ($additionalInfo instanceof Throwable) {
             $additionalInfo = $additionalInfo->getMessage();
         }
         if (!empty($additionalInfo)) {

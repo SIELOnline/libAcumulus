@@ -364,7 +364,7 @@ class AcumulusResult extends MessageCollection
         } catch (AcumulusException $e) {
             $body = $this->util->maskXmlOrJsonString($this->getHttpResponse()->getBody());
             $code = $this->getHttpResponse()->getHttpStatusCode();
-            throw new AcumulusResponseException($body, $code, $e);
+            throw new AcumulusResponseException($body, $code, $e->getPrevious() ?? $e);
         }
     }
 

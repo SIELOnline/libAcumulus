@@ -224,7 +224,7 @@ class ConfigForm extends BaseConfigForm
                 'legend' => $this->t('pluginSettingsHeader'),
                 'fields' => $this->getPluginFields(),
             ],
-            'versionInformation' => $this->getInformationBlock(),
+            'versionInformation' => $this->getInformationBlock($accountStatus),
         ];
         if ($accountStatus) {
             $fields += [

@@ -845,12 +845,12 @@ class Acumulus
             $acumulusResult = $acumulusRequest->execute($uri, $message, $needContract);
             $logLevel = $acumulusResult->getStatus();
             return $acumulusResult;
-        } catch (RuntimeException $e) {
+        } catch (AcumulusException $e) {
             // Situation 1 or 2. We will log the situation and rethrow.
             $exception = $e;
-            $logLevel = Severity::Exception;
             throw $e;
         } finally {
+            $logLevel ??= Severity::Exception;
             $this->log->log($logLevel, $acumulusRequest->getMaskedRequest());
             if (isset($acumulusResult)) {
                 $this->log->log($logLevel, $acumulusResult->getMaskedResponse());

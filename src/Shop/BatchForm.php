@@ -38,6 +38,7 @@ class BatchForm extends Form
      * @param \Siel\Acumulus\Helpers\FormHelper $formHelper
      * @param \Siel\Acumulus\Config\ShopCapabilities $shopCapabilities
      * @param \Siel\Acumulus\Config\Config $config
+     * @param \Siel\Acumulus\Config\Environment $environment
      * @param \Siel\Acumulus\Helpers\Translator $translator
      * @param \Siel\Acumulus\Helpers\Log $log
      */
@@ -317,7 +318,9 @@ class BatchForm extends Form
         ];
 
         // 4rd fieldset: More Acumulus.
-        $fields['versionInformation'] = $this->getInformationBlock();
+        $message = $this->checkAccountSettings();
+        $accountStatus = $this->emptyCredentials() ? null : empty($message);
+        $fields['versionInformation'] = $this->getInformationBlock($accountStatus);
 
         return $fields;
     }

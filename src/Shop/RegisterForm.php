@@ -230,7 +230,7 @@ class RegisterForm extends Form
             $fields += $this->getCreatedAccountFields();
             $fields += $this->getCreatedApiAccountFields();
             $fields += $this->getNextSteps();
-            $fields['versionInformation'] = $this->getInformationBlock();
+            $fields['versionInformation'] = $this->getInformationBlock(null);
         }
         return $fields;
     }

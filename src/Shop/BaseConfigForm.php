@@ -1,7 +1,6 @@
 <?php
 namespace Siel\Acumulus\Shop;
 
-use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Config\ShopCapabilities;
@@ -9,9 +8,7 @@ use Siel\Acumulus\Helpers\Form;
 use Siel\Acumulus\Helpers\FormHelper;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Translator;
-use Siel\Acumulus\Tag;
 use Siel\Acumulus\ApiClient\Acumulus;
-use Siel\Acumulus\Helpers\Severity;
 
 /**
  * Provides basic config form handling.
@@ -81,50 +78,6 @@ abstract class BaseConfigForm extends Form
     {
         $submittedValues = $this->submittedValues;
         return $this->acumulusConfig->save($submittedValues);
-    }
-
-    /**
-     * Checks the account settings for correctness and sufficient authorization.
-     *
-     * This is done by calling the 'About' API call and checking the result.
-     *
-     * @return string
-     *   Message to show in the 2nd and 3rd fieldset. Empty if successful.
-     */
-    protected function checkAccountSettings(): string
-    {
-        // Check if we can retrieve a picklist. This indicates if the account
-        // settings are correct.
-        $message = '';
-        if ($this->emptyCredentials()) {
-            // First fill in your account details.
-            $message = 'message_auth_unknown';
-        } else {
-            $about = $this->acumulusApiClient->getAbout();
-            if ($about->hasError()) {
-                $message = $about->getByCode(403) ? 'message_error_auth' : 'message_error_comm';
-                $this->addMessages($about->getMessages(Severity::WarningOrWorse));
-            } else {
-                // Check role.
-                $response = $about->getMainAcumulusResponse();
-                $roleId = (int) $response['roleid'];
-                switch ($roleId) {
-                    case Api::RoleApiUser:
-                        // Correct role: no additional message.
-                        break;
-                    case Api::RoleApiCreator:
-                        $this->addFormMessage($this->t('message_warning_role_insufficient'), Severity::Warning, Tag::UserName);
-                        break;
-                    case Api::RoleApiManager:
-                        $this->addFormMessage($this->t('message_warning_role_overkill'), Severity::Warning, Tag::UserName);
-                        break;
-                    default:
-                        $this->addFormMessage($this->t('message_warning_role_deprecated'), Severity::Warning, Tag::UserName);
-                        break;
-                }
-            }
-        }
-        return $message;
     }
 
     /**

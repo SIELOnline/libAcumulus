@@ -4,6 +4,7 @@ namespace Siel\Acumulus\Helpers;
 use DateTimeImmutable;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\ApiClient\Acumulus;
+use Siel\Acumulus\ApiClient\AcumulusResponseException;
 use Siel\Acumulus\ApiClient\AcumulusResult;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\Environment;
@@ -551,6 +552,54 @@ abstract class Form extends MessageCollection
     }
 
     /**
+     * Checks the account settings for correctness and sufficient authorization.
+     *
+     * This is done by calling the 'About' API call and checking the result.
+     *
+     * @return string
+     *   Message to show in the 2nd and 3rd fieldset. Empty if successful.
+     */
+    protected function checkAccountSettings(): string
+    {
+        // Check if we can retrieve a picklist. This indicates if the account
+        // settings are correct.
+        if ($this->emptyCredentials()) {
+            // First fill in your account details.
+            $message = 'message_auth_unknown';
+        } else {
+            try {
+                $about = $this->acumulusApiClient->getAbout();
+                $message = '';
+                if ($about->hasError()) {
+                    $this->addMessages($about->getMessages(Severity::WarningOrWorse));
+                } else {
+                    // Check role.
+                    $response = $about->getMainAcumulusResponse();
+                    $roleId = (int)$response['roleid'];
+                    switch ($roleId) {
+                        case Api::RoleApiUser:
+                            // Correct role: no additional message.
+                            break;
+                        case Api::RoleApiCreator:
+                            $this->addFormMessage($this->t('message_warning_role_insufficient'), Severity::Warning, Tag::UserName);
+                            break;
+                        case Api::RoleApiManager:
+                            $this->addFormMessage($this->t('message_warning_role_overkill'), Severity::Warning, Tag::UserName);
+                            break;
+                        default:
+                            $this->addFormMessage($this->t('message_warning_role_deprecated'), Severity::Warning, Tag::UserName);
+                            break;
+                    }
+                }
+            } catch (AcumulusResponseException $e) {
+                $message = $e->getCode() === 403 ? 'message_error_auth' : 'message_error_comm';
+                $this->addException($e);
+            }
+        }
+        return $message;
+    }
+
+    /**
      * Returns whether (at least one of) the credentials are (is) empty.
      *
      * @return bool
@@ -569,12 +618,17 @@ abstract class Form extends MessageCollection
      * - versionInformation
      * - versionInformationDesc
      *
+     * @param bool|null $accountStatus
+     *   null: no account data set.
+     *   false: incorrect account data set.
+     *   true: correct account data set.
+     *
      * @return array[]
      *   The set of version related informational fields.
      *
      * @todo: sanitise external data (i.e. data coming from server)
      */
-    protected function getInformationBlock(): array
+    protected function getInformationBlock(?bool $accountStatus): array
     {
         $this->loadInfoBlockTranslations();
 
@@ -582,10 +636,10 @@ abstract class Form extends MessageCollection
         $environmentLines = $this->environment->getAsLines();
         $support = $environment['supportEmail'];
         $subject = sprintf($this->t('support_subject'), $environment['shopName'], $this->t('module'));
-        $contract = $this->getContractList();
+        $contract = $this->getContractList($accountStatus);
         $contractMsg = array_shift($contract);
         $contractContact = array_pop($contract);
-        [$euCommerceProgressBar, $euCommerceMessage] = $this->getEuCommerceInfo();
+        [$euCommerceProgressBar, $euCommerceMessage] = $this->getEuCommerceInfo($accountStatus);
         $body = sprintf("%s:\n%s%s%s:\n%s%s\n%s\n%s\n",
             $this->t('contract'),
             $contractMsg,
@@ -605,12 +659,12 @@ abstract class Form extends MessageCollection
             sprintf($this->t('link_support'), rawurldecode($support), rawurlencode($subject), rawurlencode($body)) . '.',
         ];
 
-        $fields = [
-            'contractInformation' => [
+        $fields = [];
+        // @todo: if ()
+        $fields['contractInformation'] = [
                 'type' => 'markup',
                 'value' => '<h3>' . $this->t('contract') . '</h3>' . $contractMsg . $this->arrayToList($contract, true),
-            ],
-        ];
+            ];
         if (!empty($euCommerceMessage)) {
             $fields['euCommerce'] = [
                 'type' => 'markup',
@@ -639,77 +693,108 @@ abstract class Form extends MessageCollection
         ];
     }
 
-    protected function getContractList(): array
+    /**
+     * Loads the translations for the info block.
+     */
+    protected function loadInfoBlockTranslations()
+    {
+        static $translationsAdded = false;
+        if (!$translationsAdded) {
+            $this->translator->add(new MoreAcumulusTranslations());
+            $translationsAdded = true;
+        }
+    }
+
+    /**
+     * @param bool|null $accountStatus
+     *   null: no account data set.
+     *   false: incorrect account data set.
+     *   true: correct account data set.
+     *
+     * @return string[]
+     *   Array of strings with
+     *   - 0: message indicating contract status, empty if all correct.
+     *   - set of info lines keyed by their label
+     *   - last index: name known for the contract or a general string like '[your name]'
+     */
+    protected function getContractList(?bool $accountStatus): array
     {
         $contractContact = $this->t('your_name');
-        if ($this->emptyCredentials()) {
+        if ($accountStatus === null) {
             $contract = [$this->t('no_contract_data_local')];
+        } elseif ($accountStatus === false) {
+            $contract = [$this->t('no_contract_data')];
         } else {
+            $contract = [''];
             $myAcumulus = $this->acumulusApiClient->getMyAcumulus();
             $myData = $myAcumulus->getMainAcumulusResponse();
-            if (!empty($myData)) {
-                $contract = [
-                    $this->t('field_code') => $myData['mycontractcode'] ?? $this->t('unknown'),
-                    $this->t('field_companyName') => $myData['mycompanyname'] ?? $this->t('unknown'),
-                ];
-                if (!empty($myData['mycontractenddate'])) {
-                    $endDate = DateTimeImmutable::createFromFormat(Api::DateFormat_Iso, $myData['mycontractenddate']);
-                    if ($endDate) {
-                        $now = new DateTimeImmutable();
-                        $days = $now->diff($endDate)->days;
-                        if ($days < 40) {
-                            $contract[$this->t('contract_end_date')] = $endDate->format('j F Y');
-                        }
+            $contract[$this->t('field_code')] = $myData['mycontractcode'] ?? $this->t('unknown');
+            $contract[$this->t('field_companyName')] = $myData['mycompanyname'] ?? $this->t('unknown');
+            if (!empty($myData['mycontractenddate'])) {
+                $endDate = DateTimeImmutable::createFromFormat(Api::DateFormat_Iso, $myData['mycontractenddate']);
+                if ($endDate) {
+                    $now = new DateTimeImmutable();
+                    $days = $now->diff($endDate)->days;
+                    if ($days < 40) {
+                        $contract[$this->t('contract_end_date')] = $endDate->format('j F Y');
                     }
                 }
-                if ($myData['mymaxentries'] != -1) {
-                    $contract[$this->t('entries_about')] = sprintf(
-                        $this->t('entries_numbers'),
-                        $myData['myentries'],
-                        $myData['mymaxentries'],
-                        $myData['myentriesleft']
-                    );
+            }
+            if ($myData['mymaxentries'] != -1) {
+                $contract[$this->t('entries_about')] = sprintf(
+                    $this->t('entries_numbers'),
+                    $myData['myentries'],
+                    $myData['mymaxentries'],
+                    $myData['myentriesleft']
+                );
+            }
+            if ($myData['myemailstatusid'] !== '0') {
+                if ($this->translator->getLanguage() === 'nl' && !empty($myData['myemailstatus_nl'])) {
+                    $reason = $myData['myemailstatus_nl'];
+                } elseif ($this->translator->getLanguage() === 'en' && !empty($myData['myemailstatus_en'])) {
+                    $reason = $myData['myemailstatus_en'];
+                } elseif (!empty($myData['myemailstatus'])) {
+                    $reason = $myData['myemailstatus'];
+                } else {
+                    $reason = '';
                 }
-                if ($myData['myemailstatusid'] !== '0') {
-                    if ($this->translator->getLanguage() === 'nl' && !empty($myData['myemailstatus_nl'])) {
-                        $reason = $myData['myemailstatus_nl'];
-                    } elseif ($this->translator->getLanguage() === 'en' && !empty($myData['myemailstatus_en'])) {
-                        $reason = $myData['myemailstatus_en'];
-                    } elseif (!empty($myData['myemailstatus'])) {
-                        $reason = $myData['myemailstatus'];
-                    } else {
-                        $reason = '';
-                    }
-                    $contract[$this->t('email_status_label')] = !empty($reason)
-                        ? sprintf($this->t('email_status_text_reason'), $reason)
-                        : $contract[$this->t('email_status_label')] = $this->t('email_status_text');
-                }
-                if (!empty($myData['mycontactperson'])) {
-                    $contractContact = $myData['mycontactperson'];
-                }
-            } else {
-                $contract = array_merge([$this->t('no_contract_data')],
-                    $myAcumulus->formatMessages(Message::Format_PlainWithSeverity, Severity::RealMessages));
+                $contract[$this->t('email_status_label')] = !empty($reason)
+                    ? sprintf($this->t('email_status_text_reason'), $reason)
+                    : $contract[$this->t('email_status_label')] = $this->t('email_status_text');
+            }
+            if (!empty($myData['mycontactperson'])) {
+                $contractContact = $myData['mycontactperson'];
             }
         }
         $contract[] = $contractContact;
         return $contract;
     }
 
-    protected function getEuCommerceInfo(): array
+    /**
+     * @param bool|null $accountStatus
+     *   null: no account data set.
+     *   false: incorrect account data set.
+     *   true: correct account data set.
+     *
+     * @return array
+     */
+    protected function getEuCommerceInfo(?bool $accountStatus): array
     {
-        if ($this->emptyCredentials()) {
-            $euCommerceProgressBar = $this->addProgressBar($this->t('unknown'), $this->t('unknown'), 0, 'warning');
-            $euCommerceMessage = $this->t('no_contract_data_local');
-        } else {
-            $warningPercentage = $this->acumulusConfig->getInvoiceSettings()['euCommerceThresholdPercentage'];
-            if ($warningPercentage !== '') {
+        $warningPercentage = $this->acumulusConfig->getInvoiceSettings()['euCommerceThresholdPercentage'];
+        if ($warningPercentage !== '') {
+            if ($accountStatus === null) {
+                $euCommerceProgressBar = $this->addProgressBar($this->t('unknown'), $this->t('unknown'), 0, 'warning');
+                $euCommerceMessage = $this->t('no_contract_data_local');
+            } elseif ($accountStatus === false) {
+                $euCommerceProgressBar = $this->addProgressBar($this->t('unknown'), $this->t('unknown'), 0, 'warning');
+                $euCommerceMessage = $this->t('no_contract_data');
+            } else {
                 $euCommerceReport = $this->acumulusApiClient->reportThresholdEuCommerce();
                 if (!$euCommerceReport->hasError()) {
                     $euCommerceReport = $euCommerceReport->getMainAcumulusResponse();
                     $reached = $euCommerceReport['reached'] == 1;
-                    $nlTaxed = (float) $euCommerceReport['nltaxed'];
-                    $threshold = (float) $euCommerceReport['threshold'];
+                    $nlTaxed = (float)$euCommerceReport['nltaxed'];
+                    $threshold = (float)$euCommerceReport['threshold'];
                     $percentage = min($nlTaxed / $threshold * 100.0, 100.0);
                     if ($reached) {
                         $message = $this->t('info_block_eu_commerce_threshold_passed');
@@ -721,13 +806,16 @@ abstract class Form extends MessageCollection
                         $message = $this->t('info_block_eu_commerce_threshold_ok');
                         $status = 'ok';
                     }
-                    $percentage = (int) round($percentage);
+                    $percentage = (int)round($percentage);
                     $euCommerceProgressBar = $this->addProgressBar($nlTaxed, $threshold, $percentage, $status);
                     $euCommerceMessage = $message;
                 } else {
                     $euCommerceProgressBar = $this->addProgressBar($this->t('unknown'), $this->t('unknown'), 0, 'error');
                     $euCommerceMessage = $this->t('no_eu_commerce_data') . "\n";
-                    $euCommerceMessage .= $this->arrayToList($euCommerceReport->formatMessages(Message::Format_PlainWithSeverity, Severity::RealMessages), true);
+                    $euCommerceMessage .= $this->arrayToList(
+                        $euCommerceReport->formatMessages(Message::Format_PlainWithSeverity, Severity::RealMessages),
+                        true
+                    );
                 }
             }
         }
@@ -901,17 +989,5 @@ abstract class Form extends MessageCollection
             return true;
         }
         return false;
-    }
-
-    /**
-     * Loads the translations for the info block.
-     */
-    protected function loadInfoBlockTranslations()
-    {
-        static $translationsAdded = false;
-        if (!$translationsAdded) {
-            $this->translator->add(new MoreAcumulusTranslations());
-            $translationsAdded = true;
-        }
     }
 }

@@ -227,7 +227,7 @@ class Log
         if ($pos !== false) {
             $class = substr($class, $pos + 1);
         }
-        $code = !empty($e->getCode()) && strpos($e->getMessage(), $e->getCode()) === false ? $e->getCode() . ': ' : '';
+        $code = !empty($e->getCode()) && strpos($e->getMessage(), (string) $e->getCode()) === false ? $e->getCode() . ': ' : '';
         $message = $e->getMessage();
         $fullMessage = "$class: $code$message in $callingFunction:$callingLine";
         if (empty($e->hasBeenLogged)) {

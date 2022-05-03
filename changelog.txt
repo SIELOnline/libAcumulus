@@ -19,6 +19,20 @@ WC   WooCommerce                             >= 5.0 (3 and 4 will probably work)
      WordPress           5.9.2               >= ?.?
 --------------------------------------------------------------------------------
 
+7.1.1 (2022-05-03) (JOO only)
+-----------------------------
+Bugs:
+- Error checking on forms was not yet adapted to new way of error reporting from
+  the communication layer. Impossible to enter account details on the config
+  form.
+- JOO: Extended error catching to also cover the display() phase of our forms.
+- ALL: PHP Deprecated: strpos(): Non-string needles will be interpreted as
+  strings in the future. Use an explicit chr() call to preserve the current
+  behavior in Helpers\Log.php on line 230.
+
+Refactorings:
+- Pulled method checkAccountSettings() from BaseConfigForm up to Form.
+
 7.1.0 (2022-05-02) (JOO only)
 -----------------------------
 Features:

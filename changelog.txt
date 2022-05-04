@@ -31,6 +31,7 @@ Features:
   invoice) in the Acumulus::getInvoicePdfUri() method.
   NOTE for developers: this makes this call backwards incompatible if you did
   call it with the $applyGraphics parameter set!
+- WC: Added crash reporting.
 
 Bugs:
 - Text unknown severity in Log for success messages.

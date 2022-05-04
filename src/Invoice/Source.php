@@ -35,6 +35,8 @@ abstract class Source
      *
      * @param string $type
      * @param int|string|array|object $idOrSource
+     *
+     * @todo: throw an exception if we cannot find the source.
      */
     public function __construct(string $type, $idOrSource)
     {

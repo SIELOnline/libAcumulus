@@ -67,10 +67,11 @@ LONGSTRING
     ,
 
         'crash_mail_subject' => 'Je %1$s %2$s heeft een technisch probleem',
-        'crash_mail_body_start' => "De %1\$s %2\$s in jouw webshop is tegen een technisch probleem aangelopen. "
-            . "Dit kan een tijdelijk probleem zijn omdat b.v. de Acumulus server even niet bereikbaar is. "
-            . "Als het probleem blijft aanhouden, stuur deze mail dan door naar Acumulus support: %3\$s. "
-            . "Stuur onderstaande gegevens dan mee, want deze zijn nodig om het probleem goed te kunnen onderzoeken.\n",
+        'crash_mail_body_start' => 'De %1$s %2$s in jouw webshop is tegen een technisch probleem aangelopen. '
+            . 'Dit kan een tijdelijk probleem zijn omdat b.v. de Acumulus server even niet bereikbaar is. '
+            . 'Als het probleem blijft aanhouden, stuur deze mail dan door naar Acumulus support.'
+            . 'Stuur in dat geval onderstaande gegevens mee, want deze zijn nodig om het probleem goed te kunnen onderzoeken.'
+            . "\n\nJe kunt support bereiken op: %3\$s\n",
     ];
 
     protected $en = [
@@ -132,5 +133,12 @@ LONGSTRING
 {support_messages_html}
 LONGSTRING
     ,
+
+        'crash_mail_subject' => 'Your %1$s %2$s is experiencing a technical issue',
+        'crash_mail_body_start' => 'The %1$s %2$s in your web shop is experienced a technical issue. '
+            . 'This can be a temporary problem e.g. because the Acumulus server cannot be reached. '
+            . 'If the problem remains, please forward this mail to Acumulus support. '
+            . 'If you forward this mail, please let the information below intact because we need it to research the problem.'
+            . "\n\nYou can reach support at: %3\$s\n",
     ];
 }

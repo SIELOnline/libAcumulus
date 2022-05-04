@@ -105,10 +105,18 @@ class AcumulusTest extends TestCase
     {
         $environment = $this->container->getEnvironment()->get();
         $apiAddress = $environment['baseUri'] . '/' . $environment['apiVersion'];
-        $this->assertSame("$apiAddress/invoices/invoice_get_pdf.php?token=TOKEN", $this->acumulusClient->getInvoicePdfUri('TOKEN'));
-        /** @noinspection PhpRedundantOptionalArgumentInspection */
-        $this->assertSame("$apiAddress/invoices/invoice_get_pdf.php?token=TOKEN", $this->acumulusClient->getInvoicePdfUri('TOKEN', true));
-        $this->assertSame("$apiAddress/invoices/invoice_get_pdf.php?token=TOKEN&gfx=0", $this->acumulusClient->getInvoicePdfUri('TOKEN', false));
+        $this->assertSame("$apiAddress/invoices/invoice_get_pdf.php?token=TOKEN",
+            $this->acumulusClient->getInvoicePdfUri('TOKEN'));
+        $this->assertSame("$apiAddress/invoices/invoice_get_pdf.php?token=TOKEN&invoicetype=1",
+            $this->acumulusClient->getInvoicePdfUri('TOKEN', true));
+        $this->assertSame("$apiAddress/invoices/invoice_get_pdf.php?token=TOKEN&invoicetype=0",
+            $this->acumulusClient->getInvoicePdfUri('TOKEN', false));
+        $this->assertSame("$apiAddress/invoices/invoice_get_pdf.php?token=TOKEN&gfx=1",
+            $this->acumulusClient->getInvoicePdfUri('TOKEN', null, true));
+        $this->assertSame("$apiAddress/invoices/invoice_get_pdf.php?token=TOKEN&gfx=0",
+            $this->acumulusClient->getInvoicePdfUri('TOKEN', null, false));
+        $this->assertSame("$apiAddress/invoices/invoice_get_pdf.php?token=TOKEN&invoicetype=1&gfx=1",
+            $this->acumulusClient->getInvoicePdfUri('TOKEN', true, true));
     }
 
     /**

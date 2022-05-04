@@ -569,11 +569,14 @@ abstract class Form extends MessageCollection
         } else {
             try {
                 $about = $this->acumulusApiClient->getAbout();
-                $message = '';
-                if ($about->hasError()) {
+                if ($about->getByCode(403) !== null) {
+                    $message = 'message_error_auth';
+                } elseif ($about->hasError()) {
+                    $message = 'message_error_comm';
                     $this->addMessages($about->getMessages(Severity::WarningOrWorse));
                 } else {
                     // Check role.
+                    $message = '';
                     $response = $about->getMainAcumulusResponse();
                     $roleId = (int)$response['roleid'];
                     switch ($roleId) {
@@ -592,7 +595,7 @@ abstract class Form extends MessageCollection
                     }
                 }
             } catch (AcumulusResponseException $e) {
-                $message = $e->getCode() === 403 ? 'message_error_auth' : 'message_error_comm';
+                $message = 'message_error_comm';
                 $this->addException($e);
             }
         }
@@ -660,7 +663,6 @@ abstract class Form extends MessageCollection
         ];
 
         $fields = [];
-        // @todo: if ()
         $fields['contractInformation'] = [
                 'type' => 'markup',
                 'value' => '<h3>' . $this->t('contract') . '</h3>' . $contractMsg . $this->arrayToList($contract, true),

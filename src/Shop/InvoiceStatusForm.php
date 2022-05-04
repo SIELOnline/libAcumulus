@@ -7,6 +7,7 @@
 namespace Siel\Acumulus\Shop;
 
 use DateTime;
+use RuntimeException;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\Environment;
@@ -396,69 +397,76 @@ class InvoiceStatusForm extends Form
     {
         $success = false;
 
-        $service = $this->getSubmittedValue('service');
-        /** @var Source $source */
-        $source = $this->getSubmittedSource();
-        $idPrefix = $this->getIdPrefix($source);
-        switch ($service) {
-            case 'invoice_show':
-                // Just show(/refresh) the form (Ajax based lazy load).
-                $success = true;
-                break;
+        try {
+            $service = $this->getSubmittedValue('service');
+            /** @var Source $source */
+            $source = $this->getSubmittedSource();
+            $idPrefix = $this->getIdPrefix($source);
+            switch ($service) {
+                case 'invoice_show':
+                    // Just show(/refresh) the form (Ajax based lazy load).
+                    $success = true;
+                    break;
 
-            case 'invoice_add':
-                $forceSend = (bool) $this->getSubmittedValue($idPrefix . 'force_send');
-                $invoiceAddResult = $this->invoiceManager->send1($source, $forceSend);
-                $this->addMessages($invoiceAddResult->getMessages());
-                $success = !$invoiceAddResult->hasError();
-                break;
+                case 'invoice_add':
+                    $forceSend = (bool) $this->getSubmittedValue($idPrefix . 'force_send');
+                    $invoiceAddResult = $this->invoiceManager->send1($source, $forceSend);
+                    $this->addMessages($invoiceAddResult->getMessages());
+                    $success = !$invoiceAddResult->hasError();
+                    break;
 
-            case 'invoice_paymentstatus_set':
-                $localEntry = $this->acumulusEntryManager->getByInvoiceSource($source);
-                if ($localEntry) {
-                    if ((int) $this->getSubmittedValue($idPrefix . 'payment_status_new') === Api::PaymentStatus_Paid) {
-                        $paymentStatus = Api::PaymentStatus_Paid;
-                        $paymentDate = $this->getSubmittedValue($idPrefix . 'payment_date');
+                case 'invoice_paymentstatus_set':
+                    $localEntry = $this->acumulusEntryManager->getByInvoiceSource($source);
+                    if ($localEntry) {
+                        if ((int) $this->getSubmittedValue($idPrefix . 'payment_status_new') === Api::PaymentStatus_Paid) {
+                            $paymentStatus = Api::PaymentStatus_Paid;
+                            $paymentDate = $this->getSubmittedValue($idPrefix . 'payment_date');
+                        } else {
+                            $paymentStatus = Api::PaymentStatus_Due;
+                            $paymentDate = '';
+                        }
+                        $acumulusResult = $this->acumulusApiClient->setPaymentStatus(
+                            $localEntry->getToken(),
+                            $paymentStatus,
+                            $paymentDate
+                        );
+                        $this->addMessages($acumulusResult->getMessages());
+                        $success = !$acumulusResult->hasError();
                     } else {
-                        $paymentStatus = Api::PaymentStatus_Due;
-                        $paymentDate = '';
+                        $this->createAndAddMessage(
+                            sprintf($this->t('unknown_entry'), strtolower($this->t($source->getType())), $source->getId()),
+                            Severity::Error
+                        );
                     }
-                    $acumulusResult = $this->acumulusApiClient->setPaymentStatus(
-                        $localEntry->getToken(),
-                        $paymentStatus,
-                        $paymentDate
+                    break;
+
+                case 'entry_deletestatus_set':
+                    $localEntry = $this->acumulusEntryManager->getByInvoiceSource($source);
+                    if ($localEntry && $localEntry->getEntryId() !== null) {
+                        $deleteStatus = (int) $this->getSubmittedValue($idPrefix . 'delete_status') === Api::Entry_Delete
+                            ? Api::Entry_Delete
+                            : Api::Entry_UnDelete;
+                        $acumulusResult = $this->acumulusApiClient->setDeleteStatus($localEntry->getEntryId(), $deleteStatus);
+                        $this->addMessages($acumulusResult->getMessages());
+                        $success = !$acumulusResult->hasError();
+                    } else {
+                        $this->createAndAddMessage(
+                            sprintf($this->t('unknown_entry'), strtolower($this->t($source->getType())), $source->getId()),
+                            Severity::Error
+                        );
+                    }
+                    break;
+
+                default:
+                    // Use a basic filtering on the wrong user input.
+                    $this->createAndAddMessage(
+                        sprintf($this->t('unknown_action'), preg_replace('/[^a-z\d_\-]/', '', $service)),
+                        Severity::Error
                     );
-                    $this->addMessages($acumulusResult->getMessages());
-                    $success = !$acumulusResult->hasError();
-                } else {
-                    $this->createAndAddMessage(
-                        sprintf($this->t('unknown_entry'), strtolower($this->t($source->getType())),$source->getId()),
-                        Severity::Error);
-                }
-                break;
-
-            case 'entry_deletestatus_set':
-                $localEntry = $this->acumulusEntryManager->getByInvoiceSource($source);
-                if ($localEntry && $localEntry->getEntryId() !== null) {
-                    $deleteStatus = (int) $this->getSubmittedValue($idPrefix . 'delete_status') === Api::Entry_Delete
-                        ? Api::Entry_Delete
-                        : Api::Entry_UnDelete;
-                    $acumulusResult = $this->acumulusApiClient->setDeleteStatus($localEntry->getEntryId(), $deleteStatus);
-                    $this->addMessages($acumulusResult->getMessages());
-                    $success = !$acumulusResult->hasError();
-                } else {
-                    $this->createAndAddMessage(
-                        sprintf($this->t('unknown_entry'), strtolower($this->t($source->getType())), $source->getId()),
-                        Severity::Error);
-                }
-                break;
-
-            default:
-                // Use a basic filtering on the wrong user input.
-                $this->createAndAddMessage(
-                    sprintf($this->t('unknown_action'), preg_replace('/[^a-z\d_\-]/', '', $service)),
-                    Severity::Error);
-                break;
+                    break;
+            }
+        } catch (RuntimeException $e) {
+            $this->addException($e);
         }
 
         return $success;

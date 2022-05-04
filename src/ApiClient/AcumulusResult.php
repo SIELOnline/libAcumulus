@@ -54,19 +54,18 @@ use Siel\Acumulus\Helpers\Util;
  * Executing the request resulted in an exception on our side.
  * We will not handle this exception at the ApiClient level, but will catch it,
  * to log and rethrow it. No AcumulusResult is constructed, so this situation is
- * not handled here.
+ * not handled here, but in {@see Acumulus::callApiFunction()}
  *
  * Most probably, other layers will also not handle these exceptions, so the
  * user request will fail completely. If a request can be handled in a
  * reasonable way, without the result of a specific API call, likely an
- * additional information retrieving call, higher layers may catch it and
- * continue its work.
+ * additional information retrieving call, higher layers may catch and dispose
+ * the error and continue their work.
  *
  * Ad 2.
  *
  * The HTTP request was executed but something went wrong on the server side.
- * The status code is not one of {200, 400, 404}. (403 can be seen as an
- * application level error, but we treat it as a protocol level error:
+ * The status code is not one of {200, 400, 403, 404}:
  * - Response might be from another part of the server, e.g. the load balancer,
  *   or web server daemon. In this case, the body is probably an HTML error
  *   page, thus having a 'Content-type: text/html[; ...]' header.
@@ -79,17 +78,18 @@ use Siel\Acumulus\Helpers\Util;
  *
  * Ad 3.
  *
- * The status code is 404, for now the only code that can indicate a protocol or
- * domain level error.
+ * The status code is 404 (or 403). For now the only code that indicates a
+ * protocol or domain level error.
  * - A 404 indicating a protocol level error indicates an incorrect uri
  *   ("impossible" with tested code) and will have an HTML body.
  * - A 404 with a properly formatted Acumulus API response indicates that a
  *   requested object was not found. The basic response will contain:
  *     - 'status' = 1 (errors).
- *     - Non-empty 'errors' with at least one 'error' with its 'code' being
- *      something like '404 {Not Found}' (may be translated?).
+ *     - Non-empty 'errors' with (at least) one 'error' with its 'code' being
+ *      something like '404 {Not Found}' (though it may be translated?).
  * - It may contain additional properties that specify which of the values that
- *   were sent caused the error (id not found).
+ *   were sent caused the error (the "id-field" that contains an id that was not
+ *   found).
  *
  * Ad 4.
  *
@@ -158,7 +158,7 @@ class AcumulusResult extends MessageCollection
      *   non-existing id's, may be returned under these codes.
      */
     protected /*array*/ $validHttpStatusCodes = [200, 400];
-    protected /*array*/ $possiblyValidHttpStatusCodes = [404];
+    protected /*array*/ $possiblyValidHttpStatusCodes = [403, 404];
 
     /**
      * Constructs an AcumulusResult.

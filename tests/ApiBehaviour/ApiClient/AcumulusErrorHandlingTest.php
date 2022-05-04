@@ -55,11 +55,14 @@ class AcumulusErrorHandlingTest extends TestCase
      */
     public function testTimeout()
     {
+        // With a version change, automated testing might fail as 3 messages get
+        // logged.
+        $offset = count($this->log->getLoggedMessages());
         try {
             $this->acumulusClient->timeout(static::ValidEntryId);
             $this->fail('Should not arrive here');
         } catch (AcumulusException $e) {
-            $this->assertCount(2, $this->log->getLoggedMessages());
+            $this->assertCount(2 + $offset, $this->log->getLoggedMessages());
             $this->assertSubmittedRequestHasBeenLogged(0, Severity::Exception);
             $loggedMessages = $this->log->getLoggedMessages();
             $loggedMessage2 = end($loggedMessages);
@@ -91,14 +94,12 @@ class AcumulusErrorHandlingTest extends TestCase
      */
     public function test403()
     {
-        try {
-            $this->acumulusClient->noContract();
-            $this->fail('Should not arrive here');
-        } catch (AcumulusResponseException $e) {
-            $this->assertCount(2, $this->log->getLoggedMessages());
-            $this->assertSubmittedRequestHasBeenLogged(0, Severity::Exception);
-            $this->assertHttpLevelErrorHasBeenLogged(-1, 403, '"error":{"code":"403', Severity::Exception);
-        }
+        $result = $this->acumulusClient->noContract();
+        $this->assertTrue($result->hasError());
+        $this->assertNotNull($result->getByCode(403));
+        $this->assertCount(2, $this->log->getLoggedMessages());
+        $this->assertSubmittedRequestHasBeenLogged(0, Severity::Error);
+        $this->assertApplicationLevelErrorHasBeenLogged(-1, 403,  Severity::Error);
     }
 
     /**
@@ -131,6 +132,7 @@ class AcumulusErrorHandlingTest extends TestCase
     {
         $result = $this->acumulusClient->getEntry(1);
         $this->assertTrue($result->hasError());
+        $this->assertNotNull($result->getByCode(404));
         $this->assertCount(2, $this->log->getLoggedMessages());
         $this->assertSubmittedRequestHasBeenLogged(0, Severity::Error);
         $this->assertApplicationLevelErrorHasBeenLogged(-1, 404,  Severity::Error);
@@ -140,6 +142,7 @@ class AcumulusErrorHandlingTest extends TestCase
     {
         $result = $this->acumulusClient->setDeleteStatus(1, Api::Entry_Delete);
         $this->assertTrue($result->hasError());
+        $this->assertNotNull($result->getByCode(404));
         $this->assertCount(2, $this->log->getLoggedMessages());
         $this->assertSubmittedRequestHasBeenLogged(0, Severity::Error);
         $this->assertApplicationLevelErrorHasBeenLogged(-1, 404,  Severity::Error);
@@ -150,6 +153,7 @@ class AcumulusErrorHandlingTest extends TestCase
         //  valid ConceptId: 171866
         $result = $this->acumulusClient->getConceptInfo(123);
         $this->assertTrue($result->hasError());
+        $this->assertNotNull($result->getByCode(400));
         $this->assertCount(2, $this->log->getLoggedMessages());
         $this->assertSubmittedRequestHasBeenLogged(0, Severity::Error);
         $this->assertApplicationLevelErrorHasBeenLogged(-1, 400,  Severity::Error);
@@ -159,6 +163,7 @@ class AcumulusErrorHandlingTest extends TestCase
     {
         $result = $this->acumulusClient->setPaymentStatus(static::InvalidToken, Api::PaymentStatus_Paid);
         $this->assertTrue($result->hasError());
+        $this->assertNotNull($result->getByCode(400));
         $this->assertCount(2, $this->log->getLoggedMessages());
         $this->assertSubmittedRequestHasBeenLogged(0, Severity::Error);
         $this->assertApplicationLevelErrorHasBeenLogged(-1, 400,  Severity::Error);
@@ -168,6 +173,7 @@ class AcumulusErrorHandlingTest extends TestCase
     {
         $result = $this->acumulusClient->emailInvoiceAsPdf(static::InvalidToken, ['emailto' => 'unit.test@burorader.com']);
         $this->assertTrue($result->hasError());
+        $this->assertNotNull($result->getByCode(400));
         $this->assertCount(2, $this->log->getLoggedMessages());
         $this->assertSubmittedRequestHasBeenLogged(0, Severity::Error);
         $this->assertApplicationLevelErrorHasBeenLogged(-1, 400,  Severity::Error);

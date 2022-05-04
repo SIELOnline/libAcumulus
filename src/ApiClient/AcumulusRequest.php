@@ -231,7 +231,13 @@ class AcumulusRequest
      * The basic submit part is defined at
      * {@link https://www.siel.nl/acumulus/API/Basic_Submit/}
      * and consists of the following tags:
-     * - 'contract' (optional): authentication and authorisation credentials.
+     * - 'contract' (optional): authentication and authorisation credentials. It
+     *   will have the following child tags:
+     *   - 'contractcode'
+     *   - 'user'
+     *   - 'password'
+     *   - 'emailonerror' : 'plugins@siel.nl'     (the server won't send e-mails
+     *   - 'emailonwarning' : 'plugins@siel.nl'    on error or warnings)
      * - 'format': 'json' or 'xml'.
      * - 'testmode': 0 (real) or 1 (test mode).
      * - 'lang': Language for error and warning in responses.
@@ -256,7 +262,8 @@ class AcumulusRequest
 
         $result = [];
         if ($needContract) {
-            $result['contract'] = $this->config->getCredentials();
+            $result['contract'] = ['emailonerror' => 'plugins@siel.nl', 'emailonwarning' => 'plugins@siel.nl']
+                + $this->config->getCredentials();
         }
         $result += [
             'format' => $pluginSettings['outputFormat'],

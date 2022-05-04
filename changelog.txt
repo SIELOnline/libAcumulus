@@ -19,8 +19,19 @@ WC   WooCommerce                             >= 5.0 (3 and 4 will probably work)
      WordPress           5.9.2               >= ?.?
 --------------------------------------------------------------------------------
 
-7.1.2-beta (2022-05-??)
+7.2.0-beta (2022-05-??)
 -----------------------
+Features:
+- ALL: The API web server will no longer send e-mails on errors or warnings. The
+  error handling of this plugin is robust enough to catch and communicate all
+  errors and warnings issued by the API web server. So we do not any longer send
+  the e-mail address as provided by you to the server. The plugin will continue
+  to use it to send e-mails from your web shop to you.
+- ALL: Added support for the 'invoicetype' parameter (reminder or normal
+  invoice) in the Acumulus::getInvoicePdfUri() method.
+  NOTE for developers: this makes this call backwards incompatible if you did
+  call it with the $applyGraphics parameter set!
+
 Bugs:
 - Text unknown severity in Log for success messages.
 
@@ -97,6 +108,15 @@ Note: Due to the large number of changes, especially the PHP7 strict typing
 introduced in many places, this version has only been released for WooCommerce.
 Other web shops will follow soon.
 
+Features:
+- ALL: At the HTTP level we now send a User-Agent header. For that, we added
+  keys cmsName and cmsConfig to the Config. Class ShopCapabilities gives it a
+  value for Joomla and WordPress. Presenting it to the user on forms has also
+  been adapted accordingly.
+- OC: The Acumulus settings form now also appears as a menu-item under "Sales -
+  Acumulus". Before, it could only be accessed via "Extensions - Modules - Edit
+  (Acumulus module)", so this makes it easier to access the basic settings.
+
 Bugs:
 - ALL: Correcting 0% vat to vat free (one of the last phases during invoice
   completion) was not done when 0% is not allowed in the given situation.
@@ -106,15 +126,6 @@ Bugs:
   Use either `(a ? b : c) ? d : e` or `a ? b : (c ? d : e)`.
 - ALL: Error in help text for 0% vat rate class setting: %-sign not properly
   printed.
-
-Features:
-- ALL: At the HTTP level we now send a User-Agent header. For that, we added
-  keys cmsName and cmsConfig to the Config. Class ShopCapabilities gives it a
-  value for Joomla and WordPress. Presenting it to the user on forms has also
-  been adapted accordingly.
-- OC: The Acumulus settings form now also appears as a menu-item under "Sales -
-  Acumulus". Before, it could only be accessed via "Extensions - Modules - Edit
-  (Acumulus module)", so this makes it easier to access the basic settings.
 
 Refactorings:
 - PHP 7.2 is now the minimal requirement. we DO use language constructs that are

@@ -1,7 +1,7 @@
 <?php
 namespace Siel\Acumulus;
 
-const Version = '7.1.2-beta';
+const Version = '7.2.0-beta';
 
 namespace Siel\Acumulus\Helpers;
 
@@ -298,6 +298,7 @@ class Container
         ]);
     }
 
+    /** @noinspection PhpUnused  mostly called from shop specific code */
     public function getCrashReporter(): CrashReporter
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */

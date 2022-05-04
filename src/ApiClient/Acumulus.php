@@ -755,24 +755,29 @@ class Acumulus
      *
      * @param string $token
      *   The token for the invoice.
-     * @param bool $applyGraphics
+     * @param ?bool $reminder
+     *   False, null or absent to retrieve the normal invoice, true to retrieve
+     *   a reminder invoice.
+     * @param ?bool $applyGraphics
      *   False to prevent any embedded graphics from being applied to the
-     *   document, true otherwise.
+     *   document; true, null, or absent otherwise.
      *
      * @return string
      *   The uri to download the invoice PDF.
-     *   Possible errors (in download, not in return value):
+     *   Possible errors (in download from the retunned uri, not in this
+     *   method's return value):
      *   - PDFATNF04: Requested invoice for $token not found: $token does not
-     *     exist.
-     *
-     * @todo: add invoicetype and options to not add the optional parameters.
+     *     exist. @todo: check code tag.
      */
-    public function getInvoicePdfUri(string $token, bool $applyGraphics = true): string
+    public function getInvoicePdfUri(string $token, ?bool $reminder = null, ?bool $applyGraphics = null): string
     {
         $uri = $this->constructUri('invoices/invoice_get_pdf');
         $uri .= "?token=$token";
-        if (!$applyGraphics) {
-            $uri .= '&gfx=0';
+        if ($reminder !== null) {
+            $uri .= '&invoicetype=' . ($reminder ? '1' : '0');
+        }
+        if ($applyGraphics !== null) {
+            $uri .= '&gfx=' . ($applyGraphics ? '1' : '0');
         }
         return $uri;
     }

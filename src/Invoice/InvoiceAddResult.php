@@ -279,23 +279,27 @@ class InvoiceAddResult extends MessageCollection
     public function getLogText(int $addReqResp): string
     {
         $action = $this->getActionText();
-        $reason = $this->getSendStatusText();
-        $message = sprintf($this->t('message_invoice_reason'), $action, $reason);
+        $reason = sprintf($this->t('message_invoice_reason'), $action, $this->getSendStatusText());
 
+        $status = '';
+        $messages = '';
+        $requestResponse = '';
         if ($this->hasBeenSent() || $this->getSendStatus() === self::NotSent_LocalErrors) {
             if ($this->getAcumulusResult() !== null) {
-                $message .= ' ' . $this->getAcumulusResult()->getStatusText();
+                $status = ' ' . $this->getAcumulusResult()->getStatusText();
+                if ($addReqResp === InvoiceAddResult::AddReqResp_Always
+                    || ($addReqResp === InvoiceAddResult::AddReqResp_WithOther && $this->hasRealMessages())
+                ) {
+                    $requestResponse = "\nRequest: " . $this->getAcumulusResult()->getAcumulusRequest()->getMaskedRequest()
+                        . "\nResponse: " . $this->getAcumulusResult()->getMaskedResponse()
+                        . "\n";
+                }
             }
             if ($this->hasRealMessages()) {
-                $message .= "\n" . $this->formatMessages(Message::Format_PlainListWithSeverity, Severity::RealMessages);
-            }
-            if ($addReqResp === InvoiceAddResult::AddReqResp_Always || ($addReqResp === InvoiceAddResult::AddReqResp_WithOther && $this->hasRealMessages())) {
-                $message = rtrim($message);
-                $message .= "\nRequest: " . $this->getAcumulusResult()->getAcumulusRequest()->getMaskedRequest();
-                $message .= "\nResponse: " . $this->getAcumulusResult()->getMaskedResponse();
-                $message .= "\n";
+                $messages = "\n" . $this->formatMessages(Message::Format_PlainListWithSeverity, Severity::RealMessages);
             }
         }
-        return rtrim($message);
+
+        return $reason . $status . $messages . $requestResponse;
     }
 }

@@ -1,4 +1,8 @@
 <?php
+/**
+ * @noinspection PhpMultipleClassDeclarationsInspection
+ */
+
 namespace Siel\Acumulus\Helpers;
 
 use Throwable;
@@ -186,7 +190,7 @@ class Message
             case Severity::Unknown:
                 return $this->t($this->getSeverity());
             default:
-                return sprintf($this->t('severity_unknown'), $this->getSeverity());
+                assert(false, sprintf($this->t('severity_unknown'), $this->getSeverity()));
         }
     }
 

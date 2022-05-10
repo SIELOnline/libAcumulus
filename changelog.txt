@@ -31,10 +31,12 @@ Features:
   invoice) in the Acumulus::getInvoicePdfUri() method.
   NOTE for developers: this makes this call backwards incompatible if you did
   call it with the $applyGraphics parameter set!
-- WC: Added crash reporting.
+- WC, MA: Added crash reporting.
 
 Bugs:
 - Text unknown severity in Log for success messages.
+- CRITICAL Uncaught Error: Call to a member function toLogMessages() on null in
+  InvoiceAddResult.php:294.
 
 7.1.1 (2022-05-03) (JOO only)
 -----------------------------

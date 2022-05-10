@@ -19,8 +19,8 @@ WC   WooCommerce                             >= 5.0 (3 and 4 will probably work)
      WordPress           5.9.2               >= ?.?
 --------------------------------------------------------------------------------
 
-7.2.0-beta (2022-05-??)
------------------------
+7.2.0 (2022-05-10)
+------------------
 Features:
 - ALL: The API web server will no longer send e-mails on errors or warnings. The
   error handling of this plugin is robust enough to catch and communicate all
@@ -31,7 +31,7 @@ Features:
   invoice) in the Acumulus::getInvoicePdfUri() method.
   NOTE for developers: this makes this call backwards incompatible if you did
   call it with the $applyGraphics parameter set!
-- WC, MA: Added crash reporting.
+- WC, MA: Added crash reporting (explained in the notes for 7.1.0).
 
 Bugs:
 - Text unknown severity in Log for success messages.

@@ -19,6 +19,13 @@ WC   WooCommerce                             >= 5.0 (3 and 4 will probably work)
      WordPress           5.9.2               >= ?.?
 --------------------------------------------------------------------------------
 
+7.2.1 (2022-05-12)
+------------------
+bugs:
+- MA: Magento coding standards: The use of function assert() is forbidden.
+- WC: PHP Fatal error: Uncaught Error: Class 'Siel\\Acumulus\\Invoice\\Source'
+  not found in acumulus.php:788.
+
 7.2.0 (2022-05-10)
 ------------------
 Features:

@@ -22,6 +22,8 @@ use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Invoice\Source;
 use stdClass;
 
+use Throwable;
+
 use const Siel\Acumulus\Version;
 
 /**
@@ -71,6 +73,7 @@ class OcHelper
     {
         foreach ($messages as $message) {
             switch ($message->getSeverity()) {
+                case Severity::Log:
                 case Severity::Success:
                 case Severity::Info:
                 case Severity::Notice:
@@ -151,27 +154,280 @@ class OcHelper
     {
         // "Disable" (delete) events, regardless the confirmation answer.
         $this->uninstallEvents();
-        $this->registry->response->redirect($this->registry->getLink($this->getLocation() . '/confirmUninstall'));
+        $this->doUninstall();
+        $this->registry->response->redirect($this->registry->getLink($this->getRedirectUrl()));
     }
 
     /**
      * Controller action: show/process the settings form.
      *
-     * @throws \Exception
+     * @throws \Throwable
      */
     public function config()
     {
-        $this->displayFormCommon('config');
+        $this->handleForm('config');
+    }
 
+    /**
+     * Controller action: show/process the advanced settings form.
+     *
+     * @throws \Throwable
+     */
+    public function advancedConfig()
+    {
+        $this->handleForm('advanced');
+    }
+
+    /**
+     * Controller action: show/process the batch form.
+     *
+     * @throws \Throwable
+     */
+    public function batch()
+    {
+        $this->handleForm('batch');
+    }
+
+    /**
+     * Controller action: show/process the register form.
+     *
+     * @throws \Throwable
+     */
+    public function register()
+    {
+        $this->handleForm('register');
+    }
+
+    /**
+     * Handles a form controller action.
+     *
+     * @throws \Throwable
+     */
+    public function handleForm(string $type): void
+    {
+        try {
+            $this->initFormFullPage($type);
+            $this->processFormCommon();
+            $this->renderFormCommon();
+        } catch (Throwable $e) {
+            $this->reportCrash($e);
+        }
+        $this->outputForm();
+    }
+
+    /**
+     * Adds our status overview as a tab to the order info view.
+     *
+     * @param int $orderId
+     *   The order id to show the Acumulus invoice status for.
+     * @param array $tabs
+     *   The tabs that will be displayed along the 'History' and 'Additional'
+     *   tabs.
+     *
+     * @throws \Throwable
+     */
+    public function eventViewSaleOrderInfo(int $orderId, array &$tabs)
+    {
+        if ($this->acumulusContainer->getConfig()->getInvoiceStatusSettings()['showInvoiceStatus']) {
+            try {
+                $type = 'invoice';
+                $this->initFormInvoice();// Set order.
+                /** @var \Siel\Acumulus\Shop\InvoiceStatusForm $form */
+                $form = $this->data['form'];
+                $form->setSource($this->acumulusContainer->createSource(Source::Order, $orderId));
+                $this->processFormCommon();
+                $this->renderFormCommon();
+            } catch (Throwable $e) {
+                $this->reportCrash($e);
+            }
+
+            $tab = new stdClass();
+            $tab->code = "acumulus-$type";
+            $tab->title = $this->t("{$type}_form_title");
+            $tab->content = $this->outputForm(true);
+            $tabs[] = $tab;
+        }
+    }
+
+    /**
+     * Controller ajax action: process and refresh the invoice status form.
+     *
+     * @throws \Throwable
+     */
+    public function invoice()
+    {
+        try {
+            $this->initFormInvoice();
+            $this->processFormCommon();
+            $this->renderFormCommon();
+        } catch (Throwable $e) {
+            $this->reportCrash($e);
+        }
+        // Send the output.
+        $this->registry->response->addHeader('Content-Type: application/json;charset=utf-8');
+        $this->registry->response->setOutput(json_encode(['content' => $this->outputForm(true)]));
+    }
+
+    /**
+     * @throws \Throwable
+     */
+    public function reportCrash(Throwable $e): void
+    {
+        // We handle our "own" exceptions but only when we can process them as
+        // we want, i.e. show it as an error at the beginning of the form.
+        // That's why we handle only when we have a form, and stop catching
+        // just before outputForm(). If we do not have a form we rethrow the
+        // exception.
+        if (isset($this->data['form'])) {
+            try {
+                $form = $this->data['form'];
+                $crashReporter = $this->acumulusContainer->getCrashReporter();
+                $message = $crashReporter->logAndMail($e);
+                $form->createAndAddMessage($message, Severity::Exception);
+            } catch (Throwable $inner) {
+                // We do not know if we have informed the user per mail or
+                // screen, so assume not, and rethrow the original exception.
+                throw $e;
+            }
+        } else {
+            throw $e;
+        }
+    }
+
+    protected function initFormInvoice(): void
+    {
+        $type = 'invoice';
+        $this->initFormCommon($type);
+        $this->data['id'] = "acumulus-$type";
+        $this->data['action'] = $this->acumulusContainer->getShopCapabilities()->getLink($type);
+        $this->data['wait'] = $this->t('wait');
+    }
+
+    /**
+     * Performs the common tasks when displaying a form.
+     */
+    protected function initFormFullPage(string $type)
+    {
+        $this->initFormCommon($type);
+
+        $this->registry->document->addStyle('view/stylesheet/acumulus.css');
+
+        $this->data['header'] = $this->registry->load->controller('common/header');
+        $this->data['column_left'] = $this->registry->load->controller('common/column_left');
+        $this->data['footer'] = $this->registry->load->controller('common/footer');
+
+        // Set headers and titles.
+        $this->registry->document->setTitle($this->t("{$type}_form_title"));
+        $this->data["page_title"] = $this->t("{$type}_form_title");
+        $this->data["text_edit"] = $this->t("{$type}_form_header");
+
+        $link = $this->getLocation();
+        if ($type !== 'config') {
+            $link .= "/$type";
+        }
+
+        // Set up breadcrumb.
+        $this->data['breadcrumbs'] = [];
+        $this->data['breadcrumbs'][] = [
+            'text' => $this->t('text_home'),
+            'href' => $this->registry->getLink('common/dashboard'),
+            'separator' => false
+        ];
+        // Add an intermediate level to the config breadcrumb.
+        if ($type === 'config') {
+            $this->data['breadcrumbs'][] = $this->getExtensionsBreadcrumb();
+        }
+        $this->data['breadcrumbs'][] = [
+            'text' => $this->t("{$type}_form_header"),
+            'href' => $this->registry->getLink($link),
+            'separator' => ' :: '
+        ];
+
+        // Set the action buttons (action + text).
+        $this->data['action'] = $this->registry->getLink($link);
+        $this->data['button_icon'] = $type === 'batch' ? 'fa-envelope-o' : ($type === 'uninstall' ? 'fa-delete' : ($type === 'register' ? 'fa-plus' : 'fa-save'));
+        $this->data['button_save'] = $this->t("button_submit_$type");
+        $this->data['cancel'] = $this->registry->getLink('common/dashboard');
+        $this->data['button_cancel'] = $type === 'uninstall' ? $this->t('button_cancel_uninstall') : $this->t('button_cancel');
+    }
+
+    /**
+     * @param string $type
+     *
+     * @return void
+     */
+    public function initFormCommon(string $type): void
+    {
         // Are we posting? If not so, handle this as a trigger to update.
         if ($this->registry->request->server['REQUEST_METHOD'] !== 'POST') {
             $this->doUpgrade();
         }
 
-        // Add an intermediate level to the breadcrumb.
-        $this->data['breadcrumbs'][] = $this->getExtensionsBreadcrumb();
+        // This will initialize the form translations.
+        $this->data['form'] = $this->acumulusContainer->getForm($type);
+        $this->data['formRenderer'] = $this->acumulusContainer->getFormRenderer();
 
-        $this->renderFormCommon('config');
+        $this->data['success_messages'] = [];
+        $this->data['warning_messages'] = [];
+        $this->data['error_messages'] = [];
+
+        $this->data['heading_title'] = $this->t("{$type}_form_header");
+    }
+
+    /**
+     * Processes the form if it was submitted.
+     */
+    public function processFormCommon(): void
+    {
+        /** @var \Siel\Acumulus\Helpers\Form $form */
+        $form = $this->data['form'];
+        $form->process();
+    }
+
+    /**
+     * Renders the form using the view.
+     */
+    protected function renderFormCommon(): void
+    {
+        /** @var \Siel\Acumulus\Helpers\FormRenderer $formRenderer */
+        $formRenderer = $this->data['formRenderer'];
+        $this->data['formHtml'] = $formRenderer->render($this->data['form']);
+    }
+
+    /**
+     * Outputs the form.
+     */
+    protected function outputForm(bool $return = false): ?string
+    {
+        // Pass messages to twig template.
+        /** @var \Siel\Acumulus\Helpers\Form $form */
+        $form = $this->data['form'];
+        $this->addMessages($form->getMessages());
+
+        $route = $this->getLocation();
+        if ($form->getType() === 'invoice') {
+            $route .= '_invoice';
+        }
+        $route .= '_form';
+        $output = $this->registry->load->view($route, $this->data);
+        // Send or return the output.
+        if ($return) {
+            return $output;
+        } else {
+            $this->registry->response->setOutput($output);
+            return null;
+        }
+    }
+
+    /**
+     * Returns the url to redirect to after the uninstallation action completes.
+     *
+     * @return string
+     *   The url to redirect to after uninstall.
+     */
+    protected function getRedirectUrl()
+    {
+        return 'marketplace/extension';
     }
 
     /**
@@ -191,95 +447,6 @@ class OcHelper
             'href' => Registry::getInstance()->getLink('marketplace/extension'),
             'separator' => ' :: '
         ];
-    }
-
-    /**
-     * Controller action: show/process the settings form.
-     */
-    public function advancedConfig()
-    {
-        $this->displayFormCommon('advanced');
-
-        // Are we posting? If not so, handle this as a trigger to update.
-        if ($this->registry->request->server['REQUEST_METHOD'] !== 'POST') {
-            $this->doUpgrade();
-        }
-
-        $this->renderFormCommon('advanced');
-    }
-
-    /**
-     * Controller action: show/process the settings form.
-     */
-    public function batch()
-    {
-        $this->displayFormCommon('batch');
-
-        // Are we posting? If not so, handle this as a trigger to update.
-        if ($this->registry->request->server['REQUEST_METHOD'] !== 'POST') {
-            $this->doUpgrade();
-        }
-
-        $this->renderFormCommon('batch');
-    }
-
-    /**
-     * Controller action: show/process the register form.
-     */
-    public function register()
-    {
-        $this->displayFormCommon('register');
-        $this->renderFormCommon('register');
-    }
-
-    /**
-     * Controller action: process and refresh the register form.
-     */
-    public function invoice()
-    {
-        $output = $this->renderFormInvoice(null);
-        // Send the output.
-        $this->registry->response->addHeader('Content-Type: application/json;charset=utf-8');
-        $this->registry->response->setOutput(json_encode(['content' => $output]));
-    }
-
-    /**
-     * Explicit confirmation step to allow to retain the settings.
-     *
-     * The normal uninstallation action will unconditionally delete all settings.
-     *
-     * @throws \Exception
-     */
-    public function confirmUninstall()
-    {
-        // @todo: implement uninstall form
-//        $this->displayFormCommon('uninstall');
-//
-//        // Are we confirming, or should we show the confirm message?
-//        if ($this->registry->request->server['REQUEST_METHOD'] === 'POST') {
-            $this->doUninstall();
-            $this->registry->response->redirect($this->registry->getLink($this->getRedirectUrl()));
-//        }
-//
-//        // Add an intermediate level to the breadcrumb.
-//        $this->data['breadcrumbs'][] = [
-//            'text' => $this->t('extensions'),
-//            'href' => $this->registry->getLink('extension/module',),
-//            'separator' => ' :: '
-//        ];
-//
-//        $this->renderFormCommon('confirmUninstall', 'button_confirm_uninstall');
-    }
-
-    /**
-     * Returns the url to redirect to after the uninstallation action completes.
-     *
-     * @return string
-     *   The url to redirect to after uninstall.
-     */
-    protected function getRedirectUrl()
-    {
-        return 'marketplace/extension';
     }
 
     /**
@@ -374,151 +541,6 @@ class OcHelper
             $this->registry->document->addStyle('view/stylesheet/acumulus.css');
             $this->registry->document->addScript('view/javascript/acumulus/acumulus-ajax.js');
         }
-    }
-
-    /**
-     * Adds our status overview as a tab to the order info view.
-     *
-     * @param int $orderId
-     *   The order id to show the Acumulus invoice status for.
-     * @param array $tabs
-     *   The tabs that will be displayed along the 'History' and 'Additional'
-     *   tabs.
-     */
-    public function eventViewSaleOrderInfo($orderId, &$tabs)
-    {
-        if ($this->acumulusContainer->getConfig()->getInvoiceStatusSettings()['showInvoiceStatus']) {
-            $type = 'invoice';
-            $id = "acumulus-$type";
-            $output = $this->renderFormInvoice($orderId);
-
-            $tab = new stdClass();
-            $tab->code = $id;
-            $tab->title = $this->t("{$type}_form_title");
-            $tab->content = $output;
-            $tabs[] = $tab;
-        }
-    }
-
-    /**
-     * Performs the common tasks when displaying a form.
-     *
-     * @param string $type
-     *   The type of the form to display.
-     */
-    protected function displayFormCommon($type)
-    {
-        // This will initialize the form translations.
-        $this->data['form'] = $this->acumulusContainer->getForm($type);
-
-        $this->data['success_messages'] = [];
-        $this->data['warning_messages'] = [];
-        $this->data['error_messages'] = [];
-
-        if ($this->data['form']->isFullPage()) {
-            $this->registry->document->addStyle('view/stylesheet/acumulus.css');
-
-            // Set the page title.
-            $this->registry->document->setTitle($this->t("{$type}_form_title"));
-            $this->data["page_title"] = $this->t("{$type}_form_title");
-            $this->data["heading_title"] = $this->t("{$type}_form_header");
-            $this->data["text_edit"] = $this->t("{$type}_form_header");
-
-            // Set up breadcrumb.
-            $this->data['breadcrumbs'] = [];
-            $this->data['breadcrumbs'][] = [
-                'text' => $this->t('text_home'),
-                'href' => $this->registry->getLink('common/dashboard'),
-                'separator' => false
-            ];
-
-            $this->displayCommonParts();
-        }
-    }
-
-    /**
-     * Adds the common parts (header, footer, column(s)) to the display.
-     */
-    protected function displayCommonParts()
-    {
-        $this->data['header'] = $this->registry->load->controller('common/header');
-        $this->data['column_left'] = $this->registry->load->controller('common/column_left');
-        $this->data['footer'] = $this->registry->load->controller('common/footer');
-    }
-
-    /**
-     * Performs the common tasks when processing and rendering a form.
-     *
-     * @param string $type
-     *   The type of the form to display.
-     */
-    protected function renderFormCommon($type)
-    {
-        // Process the form if it was submitted and render it again.
-        /** @var \Siel\Acumulus\Helpers\Form $form */
-        $form = $this->data['form'];
-        $form->process();
-        // Force the creation of the fields to get connection error messages
-        // shown.
-        $form->getFields();
-
-        // Show messages.
-        $this->addMessages($form->getMessages());
-
-        $this->data['formRenderer'] = $this->acumulusContainer->getFormRenderer();
-
-        if ($form->isFullPage()) {
-            // Complete the breadcrumb with the current path.
-            $link = $this->getLocation();
-            if ($type !== 'config') {
-                $link .= "/$type";
-            }
-            $this->data['breadcrumbs'][] = [
-                'text' => $this->t("{$type}_form_header"),
-                'href' => $this->registry->getLink($link),
-                'separator' => ' :: '
-            ];
-
-            // Set the action buttons (action + text).
-            $this->data['action'] = $this->registry->getLink($link);
-            $this->data['button_icon'] = $type === 'batch' ? 'fa-envelope-o' : ($type === 'uninstall' ? 'fa-delete' : ($type === 'register' ? 'fa-plus' : 'fa-save'));
-            $this->data['button_save'] = $this->t("button_submit_$type");
-            $this->data['cancel'] = $this->registry->getLink('common/dashboard');
-            $this->data['button_cancel'] = $type === 'uninstall' ? $this->t('button_cancel_uninstall') : $this->t('button_cancel');
-            $this->setOutput();
-        }
-    }
-
-    protected function renderFormInvoice($orderId)
-    {
-        $type = 'invoice';
-        $this->displayFormCommon($type);
-        if ($orderId !== null) {
-            $orderId = (int) $orderId;
-            /** @var \Siel\Acumulus\Shop\InvoiceStatusForm $form */
-            $form = $this->data['form'];
-            $form->setSource($this->acumulusContainer->createSource(Source::Order, $orderId));
-        }
-        $this->renderFormCommon($type);
-
-        $id = "acumulus-$type";
-        $url = $this->acumulusContainer->getShopCapabilities()->getLink('invoice');
-        $wait = $this->t('wait');
-        $output = '';
-        $output .= "<form method='POST' action='$url' id='$id' class='form-horizontal acumulus-area' data-acumulus-wait='$wait'>";
-        $output .= '<h3>' . $this->t("{$type}_form_header") . '</h3>';
-        $output .= $this->data['formRenderer']->render($this->data['form']);
-        $output .= '</form>';
-        return $output;
-    }
-
-    /**
-     * Outputs the form.
-     */
-    protected function setOutput()
-    {
-        // Send the output.
-        $this->registry->response->setOutput($this->registry->load->view($this->getLocation() . '_form', $this->data));
     }
 
     /**

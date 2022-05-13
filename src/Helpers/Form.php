@@ -571,6 +571,7 @@ abstract class Form extends MessageCollection
                 $about = $this->acumulusApiClient->getAbout();
                 if ($about->getByCode(403) !== null) {
                     $message = 'message_error_auth';
+                    $this->addFormMessage($this->t('message_error_auth_form'), Severity::Error, Tag::ContractCode);
                 } elseif ($about->hasError()) {
                     $message = 'message_error_comm';
                     $this->addMessages($about->getMessages(Severity::WarningOrWorse));

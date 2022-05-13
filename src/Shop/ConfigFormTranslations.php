@@ -36,6 +36,7 @@ class ConfigFormTranslations extends TranslationCollection
         'message_uninstall' => 'Wilt u de configuratie-instellingen verwijderen?',
 
         'message_error_header' => 'Fout in uw Acumulus accountgegevens',
+        'message_error_auth_form' => 'Uw Acumulus accountgegevens zijn onjuist.',
         'message_error_auth' => 'Uw Acumulus accountgegevens zijn onjuist. Zodra u %2$s de correcte gegevens hebt ingevuld, worden hier de %1$s instellingen getoond.',
         'message_error_forb' => 'Uw Acumulus accountgegevens zijn juist maar staan geen toegang via de web service toe. Zodra u %2$s correcte gegevens hebt ingevuld, worden hier de %1$s instellingen getoond.',
         'message_error_comm' => 'Er is een fout opgetreden bij het ophalen van uw gegevens van Acumulus. Probeer het later nog eens. Zodra de verbinding hersteld is worden hier de %1$s instellingen getoond.',
@@ -420,6 +421,7 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'message_uninstall' => 'Are you sure to delete the configuration settings?',
 
         'message_error_header' => 'Error in your Acumulus connection settings',
+        'message_error_auth_form' => 'Your Acumulus connection settings are incorrect. Please check them.',
         'message_error_auth' => 'Your Acumulus connection settings are incorrect. Please check them. After you have entered the correct connection settings %2$s, the %1$s settings will be shown.',
         'message_error_forb' => 'Your Acumulus connection settings are correct but do not allow access via the web service. After you have entered correct connection settings %2$s, the %1$s settings will be shown.',
         'message_error_comm' => 'The module encountered an error retrieving your Acumulus configuration. Please try again. When the connection is restored the %1$s settings will be shown as well.',

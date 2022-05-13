@@ -855,7 +855,7 @@ class Acumulus
             $exception = $e;
             throw $e;
         } finally {
-            $logLevel ??= Severity::Exception;
+            $logLevel = $logLevel ?? Severity::Exception;
             $this->log->log($logLevel, $acumulusRequest->getMaskedRequest());
             if (isset($acumulusResult)) {
                 $this->log->log($logLevel, $acumulusResult->getMaskedResponse());

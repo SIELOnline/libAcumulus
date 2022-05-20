@@ -158,9 +158,4 @@ abstract class Environment
             'OS' => $environment['os'],
         ];
     }
-
-    public function getContract()
-    {
-
-    }
 }

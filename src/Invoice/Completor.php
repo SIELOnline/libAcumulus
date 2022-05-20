@@ -1211,8 +1211,7 @@ class Completor
      */
     protected function completeVatTypeId()
     {
-        $vatTypeId = $this->invoice[Tag::Customer][Tag::VatTypeId];
-        if (empty($vatTypeId)) {
+        if (empty($this->invoice[Tag::Customer][Tag::VatTypeId])) {
             $vatTypeId = $this->isCompany() ? Api::VatTypeId_Business : Api::VatTypeId_Private;
             if ($this->isCompany() && $this->isEu()) {
                 if (!empty($this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType])
@@ -1221,8 +1220,8 @@ class Completor
                     $vatTypeId = Api::VatTypeId_Private;
                 }
             }
+            $this->invoice[Tag::Customer][Tag::VatTypeId] = $vatTypeId;
         }
-        $this->invoice[Tag::Customer][Tag::VatTypeId] = $vatTypeId;
     }
 
     /**

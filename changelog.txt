@@ -19,6 +19,15 @@ WC   WooCommerce                             >= 5.0 (3 and 4 will probably work)
      WordPress           5.9.2               >= ?.?
 --------------------------------------------------------------------------------
 
+7.3.0 (2022-05-??)
+------------------
+Bugs:
+- ALL: PHP Warning:  Undefined array key "vattypeid" in Invoice/Completor.php on
+ line 1214.
+
+Features:
+
+
 7.2.2 (2022-05-13) (OC, PS only)
 --------------------------------
 Features:

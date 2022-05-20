@@ -29,7 +29,7 @@ Bugs:
   WooCommerce/Invoice/Creator.php on line 435.
 
 Features:
-
+- ALL: Allow also warnings when checking requirements.
 
 7.2.2 (2022-05-13) (OC, PS only)
 --------------------------------

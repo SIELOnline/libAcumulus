@@ -112,8 +112,9 @@ class ConfigUpgrade
     {
         // Let's start with a Requirements check and fail if not all are met.
         $messages = $this->getRequirements()->check();
-        foreach ($messages as $message) {
-            $this->getLog()->error("Requirement check failed: $message");
+        foreach ($messages as $key => $message) {
+            $severity = strpos($key, 'warning') !== false ? Severity::Warning : Severity::Error;
+            $this->getLog()->log($severity, "Requirement check warning: $message");
         }
         if (!empty($messages)) {
             throw new RuntimeException('Requirement check failed: ' . implode('; ', $messages));

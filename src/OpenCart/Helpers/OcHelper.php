@@ -637,11 +637,13 @@ class OcHelper
             // Check requirements before we continue upgrading from such an old
             // version, because this also means that the previous requirements
             // check also dates back from the PHP 5.3 era.
+            // @todo: extract into separate method.
             $requirements = $this->acumulusContainer->getRequirements();
             $messages = $requirements->check();
-            foreach ($messages as $message) {
-                $this->addMessages([Message::create($message, Severity::Error)]);
-                $this->acumulusContainer->getLog()->error($message);
+            foreach ($messages as $key => $message) {
+                $severity = strpos($key, 'warning') !== false ? Severity::Warning : Severity::Error;
+                $this->addMessages([Message::create($message, $severity)]);
+                $this->acumulusContainer->getLog()->log($severity, $message);
             }
             if (!empty($messages)) {
                 return false;

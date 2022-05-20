@@ -429,12 +429,20 @@ class Creator extends BaseCreator
             ? "woocommerce_{$methodId}_{$instanceId}_settings"
             : "woocommerce_{$methodId}_settings";
         $option = get_option($optionName);
+
         if (!empty($option['cost'])) {
-            // Cost may be entered with a comma ...
+            // Cost may be a formula or be entered with a comma: 'Vul een bedrag
+            // (excl. btw) in of een berekening zoals 10.00 * [qty]. Gebruik
+            // [qty] voor het aantal artikelen, [cost] voor de totale prijs van
+            // alle artikelen, en [fee percent="10" min_fee="20" max_fee=""]
+            // voor prijzen gebaseerd op percentage.'
             $cost = str_replace(',', '.', $option['cost']);
-            if (Number::floatsAreEqual($cost, $shippingEx)) {
-                $shippingEx = (float) $cost;
-                $precisionShippingEx = 0.001;
+            if (is_numeric($cost)) {
+                $cost = (float) $cost;
+                if (Number::floatsAreEqual($cost, $shippingEx)) {
+                    $shippingEx = $cost;
+                    $precisionShippingEx = 0.001;
+                }
             }
         }
 

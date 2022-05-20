@@ -24,6 +24,9 @@ WC   WooCommerce                             >= 5.0 (3 and 4 will probably work)
 Bugs:
 - ALL: PHP Warning:  Undefined array key "vattypeid" in Invoice/Completor.php on
  line 1214.
+- WC: TypeError: Argument 1 passed to Siel\Acumulus\Helpers\Number::floatsAreEqual()
+  must be of the type float, string given, called in
+  WooCommerce/Invoice/Creator.php on line 435.
 
 Features:
 

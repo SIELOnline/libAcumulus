@@ -678,7 +678,7 @@ class InvoiceStatusForm extends Form
                             // Concept turned into 1 definitive invoice: update the
                             // local acumulus entry, so it refers to that invoice.
                             $result = $this->acumulusApiClient->getEntry($conceptInfo['entryid']);
-                            if (!$result->hasError() && !empty($entry['token'])) {
+                            if (!$result->hasError()) {
                                 $entry = $this->sanitiseEntry($result->getMainAcumulusResponse());
                                 if ($this->acumulusEntryManager->save($source, $conceptInfo['entryid'], $entry['token'])) {
                                     $newLocalEntry = $this->acumulusEntryManager->getByInvoiceSource($source);

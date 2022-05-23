@@ -24,9 +24,14 @@ WC   WooCommerce                             >= 5.0 (3 and 4 will probably work)
 Bugs:
 - ALL: PHP Warning:  Undefined array key "vattypeid" in Invoice/Completor.php on
  line 1214.
-- WC: TypeError: Argument 1 passed to Siel\Acumulus\Helpers\Number::floatsAreEqual()
-  must be of the type float, string given, called in
-  WooCommerce/Invoice/Creator.php on line 435.
+- WC: Argument 1 passed to Siel\Acumulus\Helpers\Number::floatsAreEqual() must
+  be of the type float, string given, called in WooCommerce/Invoice/Creator.php
+  on line 435.
+- ALL: PHP Warning: count(): Parameter must be an array or an object that
+  implements Countable in Shop/InvoiceStatusForm.php on line 670.
+  You will notice this error when turning a concept into a definitive invoice
+  and then visiting the order page. The Acumulus tab or box  will show an error
+  message instead of the details of the definitive invoice.
 
 Features:
 - ALL: Allow also warnings when checking requirements.

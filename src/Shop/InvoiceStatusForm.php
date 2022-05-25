@@ -662,19 +662,7 @@ class InvoiceStatusForm extends Form
                         }
                     } else {
                         $conceptInfo = $this->sanitiseConceptInfo($result->getMainAcumulusResponse());
-                        if (count($conceptInfo['entryid']) === 0) {
-                            // Concept has not yet been turned into a definitive
-                            // invoice.
-                            $invoiceStatus = static::Invoice_SentConceptNoInvoice;
-                            $statusSeverity = static::Status_Warning;
-                        } elseif (count($conceptInfo['entryid']) >= 2) {
-                            // Multiple real invoices created out of this concept:
-                            // cannot link concept to just 1 invoice.
-                            // @nth: unless all but 1 are deleted ...
-                            $invoiceStatus = static::Invoice_SentConcept;
-                            $description = 'concept_multiple_invoiceid';
-                            $statusSeverity = static::Status_Warning;
-                        } else {
+                        if (is_numeric($conceptInfo['entryid'])) {
                             // Concept turned into 1 definitive invoice: update the
                             // local acumulus entry, so it refers to that invoice.
                             $result = $this->acumulusApiClient->getEntry($conceptInfo['entryid']);
@@ -701,6 +689,19 @@ class InvoiceStatusForm extends Form
                                 $statusSeverity = static::Status_Error;
                                 $entry = [];
                             }
+                        } elseif (count($conceptInfo['entryid']) === 0) {
+                            // Concept has not yet been turned into a definitive
+                            // invoice.
+                            $invoiceStatus = static::Invoice_SentConceptNoInvoice;
+                            $description = 'concept_no_invoice';
+                            $statusSeverity = static::Status_Warning;
+                        } else /*if (count($conceptInfo['entryid']) >= 2)*/ {
+                            // Multiple real invoices created out of this concept:
+                            // cannot link concept to just 1 invoice.
+                            // @nth: unless all but 1 are deleted ...
+                            $invoiceStatus = static::Invoice_SentConcept;
+                            $description = 'concept_multiple_invoiceid';
+                            $statusSeverity = static::Status_Warning;
                         }
                     }
                 }

@@ -1,8 +1,8 @@
 <?php
 namespace Siel\Acumulus\Joomla\Config;
 
-use JRoute;
-use JUri;
+use Joomla\CMS\Router\Route;
+use Joomla\CMS\Uri\Uri;
 use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
 
 /**
@@ -17,17 +17,17 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
     {
         switch ($linkType) {
             case 'config':
-                return JRoute::_('index.php?option=com_acumulus&task=config');
+                return Route::_('index.php?option=com_acumulus&task=config');
             case 'advanced':
-                return JRoute::_('index.php?option=com_acumulus&task=advanced');
+                return Route::_('index.php?option=com_acumulus&task=advanced');
             case 'batch':
-                return JRoute::_('index.php?option=com_acumulus&task=batch');
+                return Route::_('index.php?option=com_acumulus&task=batch');
             case 'register':
-                return JRoute::_('index.php?option=com_acumulus&task=register');
+                return Route::_('index.php?option=com_acumulus&task=register');
             case 'invoice':
-                return JRoute::_('index.php?option=com_acumulus&task=invoice');
+                return Route::_('index.php?option=com_acumulus&task=invoice');
             case 'logo':
-                return JURI::root(true) . '/administrator/components/com_acumulus/media/siel-logo.svg';
+                return URI::root(true) . '/administrator/components/com_acumulus/media/siel-logo.svg';
         }
         return parent::getLink($linkType);
     }

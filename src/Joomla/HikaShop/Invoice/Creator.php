@@ -1,4 +1,7 @@
 <?php
+/**
+ * @noinspection PhpClassConstantAccessedViaChildClassInspection
+ */
 
 namespace Siel\Acumulus\Joomla\HikaShop\Invoice;
 

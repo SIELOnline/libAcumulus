@@ -1,8 +1,8 @@
 <?php
 namespace Siel\Acumulus\Joomla\Config;
 
-use JFactory;
-use JTableExtension;
+use Joomla\CMS\Factory;
+use Joomla\CMS\Table\Extension;
 use Siel\Acumulus\Config\ConfigStore as BaseConfigStore;
 
 /**
@@ -15,7 +15,8 @@ class ConfigStore extends BaSeConfigStore
      */
     public function load(): array
     {
-        $extensionTable = new JtableExtension(JFactory::getDbo());
+        /** @noinspection PhpDeprecationInspection : Deprecated as of J4 */
+        $extensionTable = new Extension(Factory::getDbo());
         $extensionTable->load(array('element' => 'com_acumulus'));
         $values = $extensionTable->get('custom_data');
         return !empty($values) ? json_decode($values, true) : [];
@@ -26,7 +27,8 @@ class ConfigStore extends BaSeConfigStore
      */
     public function save(array $values): bool
     {
-        $extensionTable = new JtableExtension(JFactory::getDbo());
+        /** @noinspection PhpDeprecationInspection : Deprecated as of J4 */
+        $extensionTable = new Extension(Factory::getDbo());
         $extensionTable->load(['element' => 'com_acumulus']);
         $extensionTable->set('custom_data', json_encode($values, JSON_FORCE_OBJECT));
         return $extensionTable->store();

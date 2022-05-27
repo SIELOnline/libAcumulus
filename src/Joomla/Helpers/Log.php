@@ -1,18 +1,7 @@
 <?php
-/**
- * Note: we should not use PHP7 language constructs in this child class. See its
- * parent for more information.
- *
- * The PHP7 language constructs we suppress the warnings for:
- * @noinspection PhpMissingParamTypeInspection
- * @noinspection PhpMissingReturnTypeInspection
- * @noinspection PhpMissingFieldTypeInspection
- * @noinspection PhpMissingVisibilityInspection
- */
-
 namespace Siel\Acumulus\Joomla\Helpers;
 
-use JLog;
+use Joomla\CMS\Log\Log as JoomlaLog;
 use Siel\Acumulus\Helpers\Log as BaseLog;
 use Siel\Acumulus\Helpers\Severity;
 
@@ -21,15 +10,14 @@ use Siel\Acumulus\Helpers\Severity;
  */
 class Log extends BaseLog
 {
-
     /**
      * {@inheritdoc}
      */
     public function __construct($libraryVersion)
     {
         parent::__construct($libraryVersion);
-        JLog::addLogger(['text_file' => 'acumulus.log.php'],
-            JLog::ALL,
+        JoomlaLog::addLogger(['text_file' => 'acumulus.log.php'],
+            JoomlaLog::ALL,
             ['com_acumulus ' . $this->getLibraryVersion()]
         );
     }
@@ -37,11 +25,11 @@ class Log extends BaseLog
     /**
      * {@inheritdoc}
      *
-     * This override uses JLog.
+     * This override uses JoomlaLog.
      */
     protected function write(string $message, int $severity)
     {
-        JLog::add($message, $this->getJoomlaSeverity($severity), 'com_acumulus');
+        JoomlaLog::add($message, $this->getJoomlaSeverity($severity), 'com_acumulus');
     }
 
     /**
@@ -53,22 +41,22 @@ class Log extends BaseLog
      * @return int
      *   the Joomla equivalent of the severity.
      */
-    protected function getJoomlaSeverity($severity)
+    protected function getJoomlaSeverity(int $severity): int
     {
         switch ($severity) {
             case Severity::Exception:
             case Severity::Error:
-                return JLog::ERROR;
+                return JoomlaLog::ERROR;
             case Severity::Warning:
-                return JLog::WARNING;
+                return JoomlaLog::WARNING;
             case Severity::Notice:
-                return JLog::NOTICE;
+                return JoomlaLog::NOTICE;
             case Severity::Info:
-                return JLog::INFO;
+                return JoomlaLog::INFO;
             case Severity::Success:
             case Severity::Log:
             default:
-                return JLog::DEBUG;
+                return JoomlaLog::DEBUG;
         }
     }
 }

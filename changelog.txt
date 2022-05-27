@@ -34,6 +34,8 @@ Bugs:
   message instead of the details of the definitive invoice.
 
 Features:
+- JOO: Changed Joomla specific parts to run on Joomla 4. Note: VirtueMart will
+  NOT run on Joomla 4, even not VM4! HikaShop: yet to be tested.
 - ALL: Allow also warnings when checking requirements.
 
 7.2.2 (2022-05-13) (OC, PS only)

@@ -3,9 +3,9 @@ namespace Siel\Acumulus\Joomla\Shop;
 
 use AcumulusTableAcumulusEntry;
 use DateTimeZone;
-use JDate;
-use JFactory;
-use JTable;
+use Joomla\CMS\Date\Date;
+use Joomla\CMS\Factory;
+use Joomla\CMS\Table\Table;
 use RuntimeException;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Shop\AcumulusEntry;
@@ -26,8 +26,9 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     {
         /**
          * @var bool|\AcumulusTableAcumulusEntry $table
+         * @noinspection PhpDeprecationInspection : Deprecated as of J4
          */
-        $table = JTable::getInstance('AcumulusEntry', 'AcumulusTable');
+        $table = Table::getInstance('AcumulusEntry', 'AcumulusTable');
         if ($table === false) {
             $e = new RuntimeException('AcumulusEntryManager::newTable(): table not created');
             $this->log->error($e->getMessage());
@@ -52,6 +53,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     public function getByInvoiceSource(Source $invoiceSource, bool $ignoreLock = true): ?AcumulusEntry
     {
         $table = $this->newTable();
+        /** @noinspection PhpRedundantOptionalArgumentInspection */
         $result = $table->load(['source_type' => $invoiceSource->getType(), 'source_id' => $invoiceSource->getId()], true);
         return $result ? $this->convertDbResultToAcumulusEntries($table, $ignoreLock) : null;
     }
@@ -99,8 +101,8 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     protected function sqlNow()
     {
         /** @noinspection PhpUnhandledExceptionInspection */
-        $tz = new DateTimeZone(JFactory::getApplication()->get('offset'));
-        $date = new JDate();
+        $tz = new DateTimeZone(Factory::getApplication()->get('offset'));
+        $date = new Date();
         $date->setTimezone($tz);
         return $date->toSql(true);
     }

@@ -1,4 +1,9 @@
 <?php
+/**
+ * @noinspection SqlDialectInspection
+ * @noinspection SqlNoDataSourceInspection
+ */
+
 namespace Siel\Acumulus\Joomla\HikaShop\Shop;
 
 use DateTime;

@@ -1,9 +1,8 @@
 <?php
 namespace Siel\Acumulus\Joomla\Config;
 
-use JFactory;
-use JTable;
-use JTableExtension;
+use Joomla\CMS\Factory;
+use Joomla\CMS\Table\Table;
 use Siel\Acumulus\Config\Environment as EnvironmentBase;
 
 /**
@@ -16,8 +15,9 @@ class Environment extends EnvironmentBase
      */
     public function setShopEnvironment(): void
     {
-        /** @var JTableExtension $extension */
-        $extension = JTable::getInstance('extension');
+        /** @var \Joomla\CMS\Table\Extension $extension */
+        /** @noinspection PhpDeprecationInspection : Deprecated as of J4 */
+        $extension = Table::getInstance('extension');
 
         $id = $extension->find(['element' => 'com_acumulus', 'type' => 'component']);
         if (!empty($id)) {
@@ -43,6 +43,7 @@ class Environment extends EnvironmentBase
 
     protected function executeQuery(string $query): array
     {
-        return JFactory::getDbo()->setQuery($query)->loadAssocList();
+        /** @noinspection PhpDeprecationInspection : Deprecated as of J4 */
+        return Factory::getDbo()->setQuery($query)->loadAssocList();
     }
 }

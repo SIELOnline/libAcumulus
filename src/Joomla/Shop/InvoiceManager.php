@@ -2,11 +2,9 @@
 namespace Siel\Acumulus\Joomla\Shop;
 
 use DateTimeZone;
-use JDatabaseDriver;
-use JDate;
-use JEventDispatcher;
-use JFactory;
-use JPluginHelper;
+use Joomla\CMS\Date\Date;
+use Joomla\CMS\Factory;
+use Joomla\CMS\Plugin\PluginHelper;
 use Siel\Acumulus\Invoice\Source as Source;
 use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
@@ -50,11 +48,14 @@ abstract class InvoiceManager extends BaseInvoiceManager
     /**
      * Helper method to get the db object.
      *
-     * @return \JDatabaseDriver
+     * @noinspection PhpUndefinedClassInspection : J3: JDatabaseDriver
+     * @noinspection PhpReturnDocTypeMismatchInspection
+     * @return \Joomla\Database\DatabaseDriver|\JDatabaseDriver|null $db
      */
-    protected function getDb(): JDatabaseDriver
+    protected function getDb()
     {
-        return JFactory::getDbo();
+        /** @noinspection PhpDeprecationInspection : Deprecated as of J4 */
+        return Factory::getDbo();
     }
 
 	/**
@@ -70,8 +71,8 @@ abstract class InvoiceManager extends BaseInvoiceManager
 	 */
     protected function toSql(string $date): string
     {
-        $tz = new DateTimeZone(JFactory::getApplication()->get('offset'));
-        $date = new JDate($date);
+        $tz = new DateTimeZone(Factory::getApplication()->get('offset'));
+        $date = new Date($date);
         $date->setTimezone($tz);
         return $date->toSql(true);
     }
@@ -80,11 +81,14 @@ abstract class InvoiceManager extends BaseInvoiceManager
      * {@inheritdoc}
      *
      * This Joomla override dispatches the 'onAcumulusInvoiceCreated' event.
+     *
+     * @throws \Exception
      */
     protected function triggerInvoiceCreated(array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult)
     {
-        JPluginHelper::importPlugin('acumulus');
-        $results = JEventDispatcher::getInstance()->trigger('onAcumulusInvoiceCreated', [&$invoice, $invoiceSource, $localResult]);
+        PluginHelper::importPlugin('acumulus');
+        /** @noinspection PhpDeprecationInspection : Deprecated as of J4 */
+        $results = Factory::getApplication()->triggerEvent('onAcumulusInvoiceCreated', [&$invoice, $invoiceSource, $localResult]);
         if (count(array_filter($results, function ($value) {
                 return $value === false;
             })) >= 1
@@ -97,11 +101,14 @@ abstract class InvoiceManager extends BaseInvoiceManager
      * {@inheritdoc}
      *
      * This Joomla override dispatches the 'onAcumulusInvoiceSendBefore' event.
+     *
+     * @throws \Exception
      */
     protected function triggerInvoiceSendBefore(array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult)
     {
-        JPluginHelper::importPlugin('acumulus');
-        $results = JEventDispatcher::getInstance()->trigger('onAcumulusInvoiceSendBefore', [&$invoice, $invoiceSource, $localResult]);
+        PluginHelper::importPlugin('acumulus');
+        /** @noinspection PhpDeprecationInspection : Deprecated as of J4 */
+        $results = Factory::getApplication()->triggerEvent('onAcumulusInvoiceSendBefore', [&$invoice, $invoiceSource, $localResult]);
         if (count(array_filter($results, function ($value) {
                 return $value === false;
             })) >= 1
@@ -114,10 +121,13 @@ abstract class InvoiceManager extends BaseInvoiceManager
      * {@inheritdoc}
      *
      * This Joomla override dispatches the 'onAcumulusInvoiceSent' event.
+     *
+     * @throws \Exception
      */
     protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, InvoiceAddResult $result)
     {
-        JPluginHelper::importPlugin('acumulus');
-        JEventDispatcher::getInstance()->trigger('onAcumulusInvoiceSendAfter', [$invoice, $invoiceSource, $result]);
+        PluginHelper::importPlugin('acumulus');
+        /** @noinspection PhpDeprecationInspection : Deprecated as of J4 */
+        Factory::getApplication()->triggerEvent('onAcumulusInvoiceSendAfter', [$invoice, $invoiceSource, $result]);
     }
 }

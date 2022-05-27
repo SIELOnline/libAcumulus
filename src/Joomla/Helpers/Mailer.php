@@ -1,8 +1,8 @@
 <?php
 namespace Siel\Acumulus\Joomla\Helpers;
 
-use JFactory;
-use JText;
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
 use RuntimeException;
 use Siel\Acumulus\Helpers\Mailer as BaseMailer;
 
@@ -13,6 +13,9 @@ class Mailer extends BaseMailer
 {
     /**
      * {@inheritdoc}
+     *
+     * @throws \PHPMailer\PHPMailer\Exception
+     *   J4 exception type
      */
     public function sendMail(
         string $from,
@@ -22,7 +25,7 @@ class Mailer extends BaseMailer
         string $bodyText,
         string $bodyHtml
     ): bool {
-        $mailer = JFactory::getMailer();
+        $mailer = Factory::getMailer();
         /** @noinspection PhpRedundantOptionalArgumentInspection */
         $mailer->isHtml(true);
         $mailer->setSender([$from, $fromName]);
@@ -32,7 +35,7 @@ class Mailer extends BaseMailer
         try {
             $result = $mailer->Send();
             if ($result === false) {
-                $result = JText::_('JLIB_MAIL_FUNCTION_OFFLINE');
+                $result = Text::_('JLIB_MAIL_FUNCTION_OFFLINE');
             }
         }
         catch (RuntimeException $e){
@@ -47,7 +50,7 @@ class Mailer extends BaseMailer
     public function getFrom(): string
     {
         /** @noinspection PhpUnhandledExceptionInspection */
-        $app = JFactory::getApplication();
+        $app = Factory::getApplication();
         return $app->get('mailfrom');
     }
 

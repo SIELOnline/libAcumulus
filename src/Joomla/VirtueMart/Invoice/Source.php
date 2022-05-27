@@ -17,6 +17,8 @@ class Source extends BaseSource
 
     /**
      * Loads an Order source for the set id.
+     *
+     * @noinspection PhpUnused : called via setSource().
      */
     protected function setSourceOrder()
     {

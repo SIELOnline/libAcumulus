@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\Joomla\Helpers;
 
+use Joomla\CMS\Version;
 use Siel\Acumulus\Helpers\FormRenderer as BaseFormRenderer;
 
 /**
@@ -13,17 +14,25 @@ class FormRenderer extends BaseFormRenderer
      */
     public function __construct()
     {
-        // Default Joomla template seems to use xhtml.
-        $this->html5 = false;
-        $this->fieldsetWrapperClass = 'adminform';
+        $majorJoomlaVersion = Version::MAJOR_VERSION;
+
         $this->elementWrapperClass = 'control-group';
-        $this->requiredMarkup = '<span class="star"> *</span>';
         $this->labelWrapperTag = 'div';
         $this->labelWrapperClass = 'control-label';
+        $this->requiredMarkup = '<span class="star" aria_hidden="true"> *</span>';
         $this->inputWrapperTag = 'div';
         $this->inputWrapperClass = 'controls';
-        $this->multiLabelClass = 'control-label';
-        $this->descriptionWrapperClass = ['controls', 'description'];
-        $this->markupWrapperClass = 'controls';
+
+        if ($majorJoomlaVersion >= 4) {
+            $this->fieldsetWrapperClass = 'options-form';
+            $this->fieldsetContentWrapperTag = 'div';
+            $this->fieldsetContentWrapperClass = 'form-grid';
+            $this->descriptionWrapperClass = ['small', 'text-muted'];
+        } else {
+            $this->fieldsetWrapperClass = 'adminform';
+            $this->multiLabelClass = 'control-label';
+            $this->descriptionWrapperClass = ['text-muted', 'controls'];
+            $this->markupWrapperClass = 'controls';
+        }
     }
 }

@@ -19,8 +19,8 @@ WC   WooCommerce                             >= 5.0 (3 and 4 will probably work)
      WordPress           5.9.2               >= ?.?
 --------------------------------------------------------------------------------
 
-7.3.0 (2022-05-??)
-------------------
+7.3.0 (to be released)
+----------------------
 Bugs:
 - ALL: PHP Warning:  Undefined array key "vattypeid" in Invoice/Completor.php on
  line 1214.
@@ -40,6 +40,12 @@ Features:
 
 7.2.2 (2022-05-13) (OC, PS only)
 --------------------------------
+Bugs:
+- PHP 7.4 syntax: ParseError: syntax error, unexpected '=' in
+  ApiClient/Acumulus.php:858.
+  To solve: upgrade to PHP 7.4 or change the given line to:
+    $logLevel = $logLevel ?? Severity::Exception;
+
 Features:
 - PS, OC: Added crash reporting (explained in the notes for 7.1.0).
 

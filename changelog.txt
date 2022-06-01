@@ -9,14 +9,16 @@ shop(s) a change applies (if no tag is mentioned, ALL may be assumed).
 Tag  Shop                 Actual version     Supported versions
 --------------------------------------------------------------------------------
 ALL  All web shops.
-HS   HikaShop (Joomla)   4.5.0 (HS Starter)  >= 3.0.0
-JOO  Joomla (HS + VM)    3.10.6              >= 3.10
+HS   HikaShop (Joomla)   4.6.0 (HS Starter)  >= 3.0.0
+JOO  Joomla (HS + VM)    4.1.4               >= 3.6
 MA   Magento             2.4.2               >= 2.3
-OC   OpenCart            ?.?.?.?             >= 3.0
-PS   PrestaShop          ?.?.?               >= 1.7.6
-VM   VirtueMart (Joomla) ?.?
-WC   WooCommerce                             >= 5.0 (3 and 4 will probably work)
-     WordPress           5.9.2               >= ?.?
+OC   OpenCart            3.0.3.7             >= 3.0
+PS   PrestaShop          1.7.8.5             >= 1.7.6
+VM   VirtueMart (Joomla) 3.8.8               >= 3.0
+                         4.0.2               Does not work with Joomla 4.1.4,
+                                             not tested with Joomla 3.10
+WC   WooCommerce         6.5.1               >= 5.0 (3 and 4 will probably work)
+     WordPress           6.0                 >= 5.0 (WP 4 will probably work)
 --------------------------------------------------------------------------------
 
 7.3.0 (to be released)
@@ -30,7 +32,7 @@ Bugs:
 - ALL: PHP Warning: count(): Parameter must be an array or an object that
   implements Countable in Shop/InvoiceStatusForm.php on line 670.
   You will notice this error when turning a concept into a definitive invoice
-  and then visiting the order page. The Acumulus tab or box  will show an error
+  and then visiting the order page. The Acumulus tab or box will show an error
   message instead of the details of the definitive invoice.
 
 Features:
@@ -54,8 +56,8 @@ Features:
 --------------------------------
 Bugs:
 - MA: Magento coding standards: The use of function assert() is forbidden.
-- WC: PHP Fatal error: Uncaught Error: Class 'Siel\\Acumulus\\Invoice\\Source'
-  not found in acumulus.php:788.
+- WC: PHP Fatal error: Uncaught Error: Class 'Siel\Acumulus\Invoice\Source' not
+  found in acumulus.php:788.
 
 7.2.0 (2022-05-10)
 ------------------

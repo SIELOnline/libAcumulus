@@ -18,8 +18,14 @@ VM   VirtueMart (Joomla) 3.8.8               >= 3.0
                          4.0.2               Does not work with Joomla 4.1.4,
                                              not tested with Joomla 3.10
 WC   WooCommerce         6.5.1               >= 5.0 (3 and 4 will probably work)
-     WordPress           6.0                 >= 5.0 (WP 4 will probably work)
+     WordPress           6.0                 >= 5.9
 --------------------------------------------------------------------------------
+
+Next version
+------------
+Bugs:
+- ALL: The server name was not correctly extracted from the $_SERVER info and
+  always resulted in example.com.
 
 7.2.3 (2022-06-01) (HS, WM only)
 --------------------------------

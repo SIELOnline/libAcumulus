@@ -57,15 +57,9 @@ abstract class Environment
      */
     protected function getHostName(): string
     {
-        if (!empty($_SERVER['REQUEST_URI'])) {
-            $hostName = parse_url($_SERVER['REQUEST_URI'], PHP_URL_HOST);
-        }
-        if (!empty($hostName)) {
-            if (($pos = strpos($hostName, 'www.')) !== false) {
-                $hostName = substr($hostName, $pos + strlen('www.'));
-            }
-        } else {
-            $hostName = 'example.com';
+        $hostName = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? 'example.com';
+        if (($pos = strpos($hostName, 'www.')) !== false) {
+            $hostName = substr($hostName, $pos + strlen('www.'));
         }
         return $hostName;
     }

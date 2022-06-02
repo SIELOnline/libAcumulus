@@ -541,15 +541,17 @@ class Completor
         } else {
             $email = $this->invoice[Tag::Customer][Tag::Email];
             $at = strpos($email, '@');
-            // Comma (,) used as separator?
-            $comma = strpos($email, ',', $at);
-            if ($at < $comma) {
-                $email = trim(substr($email, 0, $comma));
-            }
-            // Semicolon (;) used as separator?
-            $semicolon = strpos($email, ';', $at);
-            if ($at < $semicolon) {
-                $email = trim(substr($email, 0, $semicolon));
+            if ($at !== false) {
+                // Comma (,) used as separator?
+                $comma = strpos($email, ',', $at);
+                if ($comma !== false && $at < $comma) {
+                    $email = trim(substr($email, 0, $comma));
+                }
+                // Semicolon (;) used as separator?
+                $semicolon = strpos($email, ';', $at);
+                if ($semicolon !== false && $at < $semicolon) {
+                    $email = trim(substr($email, 0, $semicolon));
+                }
             }
 
             // Display name used in single remaining address?

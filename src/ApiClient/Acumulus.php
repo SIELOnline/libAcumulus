@@ -89,26 +89,34 @@ class Acumulus
      * @return \Siel\Acumulus\ApiClient\AcumulusResult
      *   The result of the webservice call. The structured response will contain
      *   1 "mydata" array, being a keyed array with keys:
-     * - 'myaddress'
-     * - 'mycity'
-     * - 'mycompanyname'
-     * - 'mycontactperson'
-     * - 'mycontractcode'
-     * - 'mycontractenddate'
-     * - 'mydebt'
-     * - 'myemail'
-     * - 'myemailstatusid'
-     * - 'myemailstatusreferenceid'
-     * - 'myentries'
-     * - 'myentriesleft'
-     * - 'myiban'
-     * - 'mymaxentries'
-     * - 'mypostalcode'
-     * - 'mysalutation'
-     * - 'mysepamandatenr'
-     * - 'mystatusid'
-     * - 'mytelephone'
-     * - 'myvatnumber'
+     *   - 'mycontractcode'
+     *   - 'mycompanyname'
+     *   - 'mycontactperson'
+     *   - 'myaddress'
+     *   - 'mypostalcode'
+     *   - 'mycity'
+     *   - 'mytelephone'
+     *   - 'myemail'
+     *   - 'myiban'
+     *   - 'mysepamandatenr'
+     *   - 'mycontractenddate'
+     *   - 'mysalutation'
+     *   - 'myemailstatusid'
+     *   - 'myemailstatusreferenceid'
+     *   - 'myvatnumber'
+     *   - 'mystatusid'
+     *   - 'myentries'
+     *   - 'mymaxentries'
+     *   - 'myentriesleft'
+     *   - 'mydebt'
+     *   - 'mysupport': optinal array with 1 key:
+     *     - 'item': 1 "item" or a numerical array with "items", an "item"
+     *       being a keyed array with keys:
+     *       - 'description': type of support bought.
+     *       - 'location': The server for which the support is bought.
+     *       - 'token': Acumulus token: 30 hex characters.
+     *       - 'startdate' yyyy-mm-dd
+     *       - 'enddate': yyyy-mm-dd
      *   Possible errors: todo.
      *
      * @throws \Siel\Acumulus\ApiClient\AcumulusException|\Siel\Acumulus\ApiClient\AcumulusResponseException
@@ -702,6 +710,47 @@ class Acumulus
             'signup' => $signUp,
         ];
         return $this->callApiFunction('signup/signup', $message, false)->setMainAcumulusResponseKey('signup');
+    }
+
+    /**
+     * Registers a support token for the current webshop.
+     *
+     * The webshop will be identified by the servername, note that 1 shop may
+     * run on multiple domain names and that the actual server name (the one
+     * used by this admin user to connect) will be used.
+     *
+     * @param string $token
+     *   The token as received after buying pro-support in the Siel shop.
+     *
+     * @param string $location
+     *   A string that serves to identify the website, typically the domain
+     *   name.
+     *
+     * @return \Siel\Acumulus\ApiClient\AcumulusResult
+     *   The result of the webservice call. The structured response will contain
+     *   1 'support' array, being a keyed array with keys:
+     *   - 'token': the token as sent with the request
+     *   - 'startdate': the date (yyyy-mm-dd) the support starts, which will be
+     *     today.
+     *   - 'enddate': the date (yyyy-mm-dd) the support ends, 1 year ahead.
+     *   Example:
+     *   {
+     *     "support": {
+     *       "token": "wdo1m8RVt2tcCC3gECNGlzznbm8dsGQN",
+     *       "startdate":"2022-06-07",
+     *       "enddate":"2023-06-08"
+     *     }
+     *     ... "basic response fields" ...
+     *   }
+     *
+     */
+    public function registerSupport(string $token, string $location): AcumulusResult
+    {
+        $message = [
+            'token' => $token,
+            'location' => $location,
+        ];
+        return $this->callApiFunction('support/register', $message, true)->setMainAcumulusResponseKey('support');
     }
 
     /**

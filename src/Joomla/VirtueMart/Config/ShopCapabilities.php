@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\Joomla\VirtueMart\Config;
 
+use Joomla\CMS\Uri\Uri;
 use JText;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Joomla\Config\ShopCapabilities as ShopCapabilitiesBase;
@@ -242,5 +243,16 @@ class ShopCapabilities extends ShopCapabilitiesBase
             $result[$paymentMethod->virtuemart_paymentmethod_id] = $paymentMethod->payment_name;
         }
         return $result;
+    }
+
+    public function getLink(string $linkType): string
+    {
+        switch ($linkType) {
+            case 'pro-support-image':
+                return URI::root(true) . '/administrator/components/com_acumulus/media/pro-support-virtuemart.png';
+            case 'pro-support-link':
+                return 'https://pay.siel.nl/?p=t7jYwPSWYgFJdWQuWVJmC0R6d6LWHKmNVsNUlgtv82TIhgNS';
+        }
+        return parent::getLink($linkType);
     }
 }

@@ -315,15 +315,18 @@ class ShopCapabilities extends ShopCapabilitiesBase
     {
         switch ($linkType) {
             case 'register':
-                return admin_url('admin.php?page=acumulus_register');
-            case 'config':
-                return admin_url('options-general.php?page=acumulus_config');
-            case 'advanced':
-                return admin_url('options-general.php?page=acumulus_advanced');
+            case 'activate':
             case 'batch':
-                return admin_url('admin.php?page=acumulus_batch');
+                return admin_url("admin.php?page=acumulus_$linkType");
+            case 'config':
+            case 'advanced':
+                return admin_url("options-general.php?page=acumulus_$linkType");
             case 'logo':
                 return home_url('wp-content/plugins/acumulus/siel-logo.svg');
+            case 'pro-support-image':
+                return home_url('wp-content/plugins/acumulus/pro-support-woocommerce.png');
+            case 'pro-support-link':
+                return 'https://pay.siel.nl/?p=3t0EasGQCcX0lPlraqMiGkTxFRmRo3zicBbhMtmD69bGozBl';
         }
         return parent::getLink($linkType);
     }

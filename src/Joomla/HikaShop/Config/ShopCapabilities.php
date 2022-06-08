@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\Joomla\HikaShop\Config;
 
+use Joomla\CMS\Uri\Uri;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Joomla\Config\ShopCapabilities as ShopCapabilitiesBase;
 use Siel\Acumulus\Config\Config;
@@ -249,5 +250,16 @@ class ShopCapabilities extends ShopCapabilitiesBase
             }
         }
         return $result;
+    }
+
+    public function getLink(string $linkType): string
+    {
+        switch ($linkType) {
+            case 'pro-support-image':
+                return URI::root(true) . '/administrator/components/com_acumulus/media/pro-support-hikashop.png';
+            case 'pro-support-link':
+                return 'https://pay.siel.nl/?p=b5TeLbPw6BtNXRioORwnUtNbpU3yhUAgXLuuEMgk5zcttHbU';
+        }
+        return parent::getLink($linkType);
     }
 }

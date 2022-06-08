@@ -2,6 +2,7 @@
 namespace Siel\Acumulus\PrestaShop\Config;
 
 use Context;
+use Joomla\CMS\Uri\Uri;
 use Module;
 use OrderState;
 use PaymentModule;
@@ -315,19 +316,21 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function getLink(string $linkType): string
     {
         switch ($linkType) {
-            case 'config':
-                // Does not work in PS1.6.
-                return Context::getContext()->link->getAdminLink('AdminModules', true, [], ['configure' => 'acumulus']);
-            case 'advanced':
-                return Context::getContext()->link->getAdminLink('AdminAcumulusAdvanced', true);
-            case 'batch':
-                return Context::getContext()->link->getAdminLink('AdminAcumulusBatch', true);
             case 'register':
-                return Context::getContext()->link->getAdminLink('AdminAcumulusRegister', true);
+            case 'activate':
+            case 'advanced':
+            case 'batch':
             case 'invoice':
-                return Context::getContext()->link->getAdminLink('AdminAcumulusInvoice', true);
+                $action = ucfirst($linkType);
+                return Context::getContext()->link->getAdminLink("AdminAcumulus$action", true);
+            case 'config':
+                return Context::getContext()->link->getAdminLink('AdminModules', true, [], ['configure' => 'acumulus']);
             case 'logo':
                 return  __PS_BASE_URI__ . 'modules/acumulus/views/img/siel-logo.svg';
+            case 'pro-support-image':
+                return  __PS_BASE_URI__ . 'modules/acumulus/views/img/pro-support-prestashop.png';
+            case 'pro-support-link':
+                return 'https://pay.siel.nl/?p=KL9pPSIIdMzqIieXB0FA56mTgyOvlEfUEosWM3ODsTZODa0P';
         }
         return parent::getLink($linkType);
     }

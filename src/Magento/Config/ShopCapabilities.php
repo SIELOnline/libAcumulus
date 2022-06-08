@@ -561,16 +561,20 @@ class ShopCapabilities extends ShopCapabilitiesBase
         $urlInterface = $registry->get(UrlInterface::class);
         switch ($linkType) {
             case 'register':
-                return $urlInterface->getUrl('acumulus/register');
+            case 'activate':
             case 'config':
-                return $urlInterface->getUrl('acumulus/config');
+            case 'batch':
+                return $urlInterface->getUrl("acumulus/$linkType");
             case 'advanced':
                 return $urlInterface->getUrl('acumulus/config/advanced');
-            case 'batch':
-                return $urlInterface->getUrl('acumulus/batch');
             case 'logo':
                 $repository = Registry::getInstance()->get(AssetRepository::class);
                 return $repository->getUrl('Siel_AcumulusMa2::images/siel-logo.svg');
+            case 'pro-support-image':
+                $repository = Registry::getInstance()->get(AssetRepository::class);
+                return $repository->getUrl('Siel_AcumulusMa2::images/pro-support-magento.png');
+            case 'pro-support-link':
+                return 'https://pay.siel.nl/?p=GWFrqaYs68gnhRGP2UAHkXhvGQqWEDmP46DMuxa5BPXvpjmu';
         }
         return parent::getLink($linkType);
     }

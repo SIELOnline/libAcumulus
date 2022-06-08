@@ -16,16 +16,13 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
     public function getLink(string $linkType): string
     {
         switch ($linkType) {
-            case 'config':
-                return Route::_('index.php?option=com_acumulus&task=config');
-            case 'advanced':
-                return Route::_('index.php?option=com_acumulus&task=advanced');
-            case 'batch':
-                return Route::_('index.php?option=com_acumulus&task=batch');
             case 'register':
-                return Route::_('index.php?option=com_acumulus&task=register');
+            case 'activate':
+            case 'config':
+            case 'advanced':
+            case 'batch':
             case 'invoice':
-                return Route::_('index.php?option=com_acumulus&task=invoice');
+                return Route::_("index.php?option=com_acumulus&task=$linkType");
             case 'logo':
                 return URI::root(true) . '/administrator/components/com_acumulus/media/siel-logo.svg';
         }

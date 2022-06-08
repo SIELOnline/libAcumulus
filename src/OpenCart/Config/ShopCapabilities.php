@@ -358,16 +358,18 @@ class ShopCapabilities extends ShopCapabilitiesBase
         switch ($linkType) {
             case 'config':
                 return $registry->getLink($registry->getLocation());
-            case 'advanced':
-                return $registry->getLink($registry->getLocation() . '/advanced');
-            case 'batch':
-                return $registry->getLink($registry->getLocation() . '/batch');
             case 'register':
-                return $registry->getLink($registry->getLocation() . '/register');
+            case 'activate':
+            case 'advanced':
+            case 'batch':
             case 'invoice':
-                return $registry->getLink($registry->getLocation() . '/invoice');
+                return $registry->getLink($registry->getLocation() . '/' . $linkType);
             case 'logo':
                 return (defined('HTTPS_SERVER') ? HTTPS_SERVER : HTTP_SERVER) . 'view/image/acumulus/siel-logo.png';
+            case 'pro-support-image':
+                return (defined('HTTPS_SERVER') ? HTTPS_SERVER : HTTP_SERVER) . 'view/image/acumulus/pro-support-opencart.png';
+            case 'pro-support-link':
+                return 'https://pay.siel.nl/?p=0nKmWpoNV0wtqeac43dqc5YUAcaHFJkldwy1alKD1G3EJHmC';
         }
         return parent::getLink($linkType);
     }

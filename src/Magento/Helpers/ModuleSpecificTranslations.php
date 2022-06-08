@@ -32,6 +32,8 @@ class ModuleSpecificTranslations extends TranslationCollection
         // Rate our plugin message.
         'review_on_marketplace' => 'Zou jij ons een review willen geven op Magento Marketplace?',
         'review_url' => 'https://marketplace.magento.com/siel-acumulus-ma2.html',
+
+        'click_to_toggle' => '',
     ];
 
     protected $en = [
@@ -49,5 +51,7 @@ class ModuleSpecificTranslations extends TranslationCollection
 
         // Rate our plugin message.
         'review_on_marketplace' => 'Would you please give us a review on Magento Marketplace?',
+
+        'click_to_toggle' => '',
     ];
 }

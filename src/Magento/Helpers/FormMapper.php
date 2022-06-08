@@ -196,21 +196,20 @@ class FormMapper extends BaseFormMapper
                     $config['collapsable'] = true;
                     $config['opened'] = true;
                 } elseif ($value === 'details') {
-                    $config['before_element_html'] = '<details>';
-                    $config['after_element_html'] = '</details>';
+                    $config['collapsable'] = true;
+                    $config['opened'] = false;
                 } elseif ($value === 'date') {
                     $config['format'] = static::DateFormat;
                     $config['date_format'] = static::DateFormat;
                 }
-
                 break;
             case 'summary':
-                $config['before_element_html'] .= '<summary>' . $value . '</summary>';
+                $config['legend'] = $value;
                 break;
             case 'collapsable':
             case 'opened':
                 // Do overwrite, as it has explicitly been set.
-                $config['collapsable'] = $value;
+                $config[$key] = $value;
                 break;
             case 'name':
                 if ($type === 'checkbox') {

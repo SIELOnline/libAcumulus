@@ -35,6 +35,7 @@ class RegisterForm extends Form
     protected $signUpResponse;
 
     public function __construct(
+        AboutForm $aboutForm,
         Acumulus $acumulusApiClient,
         FormHelper $formHelper,
         ShopCapabilities $shopCapabilities,
@@ -52,6 +53,7 @@ class RegisterForm extends Form
             $translator,
             $log
         );
+        $this->aboutForm = $aboutForm;
         $this->translator->add(new RegisterFormTranslations());
         $this->signUpResponse = null;
     }
@@ -224,13 +226,12 @@ class RegisterForm extends Form
             ];
         } else {
             // Successfully submitted: show details of the created account.
-            $this->loadInfoBlockTranslations();
             $this->isFullPage = false;
             $fields += $this->getCongratulationsFields();
             $fields += $this->getCreatedAccountFields();
             $fields += $this->getCreatedApiAccountFields();
             $fields += $this->getNextSteps();
-            $fields['versionInformation'] = $this->getInformationBlock(null);
+            $fields['versionInformation'] = $this->getAboutBlock(null);
         }
         return $fields;
     }

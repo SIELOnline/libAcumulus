@@ -32,17 +32,8 @@ class BatchForm extends Form
     /** @var string[] */
     protected $screenLog;
 
-    /**
-     * @param \Siel\Acumulus\Shop\InvoiceManager $invoiceManager
-     * @param \Siel\Acumulus\ApiClient\Acumulus $acumulusApiClient
-     * @param \Siel\Acumulus\Helpers\FormHelper $formHelper
-     * @param \Siel\Acumulus\Config\ShopCapabilities $shopCapabilities
-     * @param \Siel\Acumulus\Config\Config $config
-     * @param \Siel\Acumulus\Config\Environment $environment
-     * @param \Siel\Acumulus\Helpers\Translator $translator
-     * @param \Siel\Acumulus\Helpers\Log $log
-     */
     public function __construct(
+        AboutForm $aboutForm,
         InvoiceManager $invoiceManager,
         Acumulus $acumulusApiClient,
         FormHelper $formHelper,
@@ -62,6 +53,7 @@ class BatchForm extends Form
             $translator,
             $log
         );
+        $this->aboutForm = $aboutForm;
 
         $translations = new InvoiceTranslations();
         $this->translator->add($translations);
@@ -317,10 +309,10 @@ class BatchForm extends Form
             ],
         ];
 
-        // 4rd fieldset: More Acumulus.
+        // 4th fieldset: More Acumulus.
         $message = $this->checkAccountSettings();
         $accountStatus = $this->emptyCredentials() ? null : empty($message);
-        $fields['versionInformation'] = $this->getInformationBlock($accountStatus);
+        $fields['versionInformation'] = $this->getAboutBlock($accountStatus);
 
         return $fields;
     }

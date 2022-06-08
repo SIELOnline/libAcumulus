@@ -1,7 +1,6 @@
 <?php
 namespace Siel\Acumulus\Helpers;
 
-use DateTimeImmutable;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\ApiClient\Acumulus;
 use Siel\Acumulus\ApiClient\AcumulusResponseException;
@@ -9,7 +8,6 @@ use Siel\Acumulus\ApiClient\AcumulusResult;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Config\ShopCapabilities;
-use Siel\Acumulus\Shop\MoreAcumulusTranslations;
 use Siel\Acumulus\Tag;
 
 /**
@@ -71,12 +69,16 @@ abstract class Form extends MessageCollection
      * @var string
      *   The type of this form, the class could also be used to determine so,
      *   but as a simple type string is already used on creation, that is used.
-     *   Should be one of: register, config, advanced, batch, invoice, rate.
+     *   Should be one of: register, config, advanced, activate, batch, invoice,
+     *   rate.
      */
     protected $type;
 
     /** @var \Siel\Acumulus\Helpers\Log */
     protected $log;
+
+    /** @var \Siel\Acumulus\Shop\AboutForm|null */
+    protected $aboutForm = null;
 
     /** @var \Siel\Acumulus\Helpers\FormHelper */
     protected $formHelper;
@@ -616,242 +618,6 @@ abstract class Form extends MessageCollection
     }
 
     /**
-     * Returns version information.
-     *
-     * The fields returned:
-     * - versionInformation
-     * - versionInformationDesc
-     *
-     * @param bool|null $accountStatus
-     *   null: no account data set.
-     *   false: incorrect account data set.
-     *   true: correct account data set.
-     *
-     * @return array[]
-     *   The set of version related informational fields.
-     *
-     * @todo: sanitise external data (i.e. data coming from server)
-     */
-    protected function getInformationBlock(?bool $accountStatus): array
-    {
-        $this->loadInfoBlockTranslations();
-
-        $environment = $this->environment->get();
-        $environmentLines = $this->environment->getAsLines();
-        $support = $environment['supportEmail'];
-        $subject = sprintf($this->t('support_subject'), $environment['shopName'], $this->t('module'));
-        $contract = $this->getContractList($accountStatus);
-        $contractMsg = array_shift($contract);
-        $contractContact = array_pop($contract);
-        [$euCommerceProgressBar, $euCommerceMessage] = $this->getEuCommerceInfo($accountStatus);
-        $body = sprintf("%s:\n%s%s%s:\n%s%s\n%s\n%s\n",
-            $this->t('contract'),
-            $contractMsg,
-            $this->arrayToList($contract, false),
-            $this->t('about_environment'),
-            $this->arrayToList($environmentLines, false),
-            $this->t('support_body'),
-            $this->t('regards'),
-            $contractContact
-        );
-        $moreAcumulus = [
-            $this->t('link_login') . '.',
-            $this->t('link_app') . '.',
-            $this->t('link_manual') . '.',
-            $this->t('link_forum') . '.',
-            $this->t('link_website') . '.',
-            sprintf($this->t('link_support'), rawurldecode($support), rawurlencode($subject), rawurlencode($body)) . '.',
-        ];
-
-        $fields = [];
-        $fields['contractInformation'] = [
-                'type' => 'markup',
-                'value' => '<h3>' . $this->t('contract') . '</h3>' . $contractMsg . $this->arrayToList($contract, true),
-            ];
-        if (!empty($euCommerceMessage)) {
-            $fields['euCommerce'] = [
-                'type' => 'markup',
-                'value' => '<h3>' . $this->t('euCommerce') . '</h3>' . "<p>$euCommerceProgressBar<br>$euCommerceMessage</p>",
-            ];
-        }
-        $fields += [
-            'environmentInformation' => [
-                'type' => 'markup',
-                'value' => '<h3>' . $this->t('about_environment') . '</h3>' . $this->arrayToList($environmentLines, true) .
-                    $this->t('desc_environmentInformation'),
-            ],
-            'moreAcumulusInformation' => [
-                'type' => 'markup',
-                'value' => '<h3>' . $this->t('moreAcumulusTitle') . '</h3>' . $this->arrayToList($moreAcumulus, true),
-            ],
-        ];
-
-        $wrapperType = $this->getType() === 'batch' ? 'details' : 'fieldset';
-        $wrapperTitleType = $this->getType() === 'batch' ? 'summary' : 'legend';
-        return [
-            'type' => $wrapperType,
-            $wrapperTitleType => sprintf($this->t('informationBlockHeader'), $this->t('module')),
-            'fields' => $fields,
-            'collapsable' => false,
-        ];
-    }
-
-    /**
-     * Loads the translations for the info block.
-     */
-    protected function loadInfoBlockTranslations()
-    {
-        static $translationsAdded = false;
-        if (!$translationsAdded) {
-            $this->translator->add(new MoreAcumulusTranslations());
-            $translationsAdded = true;
-        }
-    }
-
-    /**
-     * @param bool|null $accountStatus
-     *   null: no account data set.
-     *   false: incorrect account data set.
-     *   true: correct account data set.
-     *
-     * @return string[]
-     *   Array of strings with
-     *   - 0: message indicating contract status, empty if all correct.
-     *   - set of info lines keyed by their label
-     *   - last index: name known for the contract or a general string like '[your name]'
-     */
-    protected function getContractList(?bool $accountStatus): array
-    {
-        $contractContact = $this->t('your_name');
-        if ($accountStatus === null) {
-            $contract = [$this->t('no_contract_data_local')];
-        } elseif ($accountStatus === false) {
-            $contract = [$this->t('no_contract_data')];
-        } else {
-            $contract = [''];
-            $myAcumulus = $this->acumulusApiClient->getMyAcumulus();
-            $myData = $myAcumulus->getMainAcumulusResponse();
-            $contract[$this->t('field_code')] = $myData['mycontractcode'] ?? $this->t('unknown');
-            $contract[$this->t('field_companyName')] = $myData['mycompanyname'] ?? $this->t('unknown');
-            if (!empty($myData['mycontractenddate'])) {
-                $endDate = DateTimeImmutable::createFromFormat(Api::DateFormat_Iso, $myData['mycontractenddate']);
-                if ($endDate) {
-                    $now = new DateTimeImmutable();
-                    $days = $now->diff($endDate)->days;
-                    if ($days < 40) {
-                        $contract[$this->t('contract_end_date')] = $endDate->format('j F Y');
-                    }
-                }
-            }
-            if ($myData['mymaxentries'] != -1) {
-                $contract[$this->t('entries_about')] = sprintf(
-                    $this->t('entries_numbers'),
-                    $myData['myentries'],
-                    $myData['mymaxentries'],
-                    $myData['myentriesleft']
-                );
-            }
-            if ($myData['myemailstatusid'] !== '0') {
-                if ($this->translator->getLanguage() === 'nl' && !empty($myData['myemailstatus_nl'])) {
-                    $reason = $myData['myemailstatus_nl'];
-                } elseif ($this->translator->getLanguage() === 'en' && !empty($myData['myemailstatus_en'])) {
-                    $reason = $myData['myemailstatus_en'];
-                } elseif (!empty($myData['myemailstatus'])) {
-                    $reason = $myData['myemailstatus'];
-                } else {
-                    $reason = '';
-                }
-                $contract[$this->t('email_status_label')] = !empty($reason)
-                    ? sprintf($this->t('email_status_text_reason'), $reason)
-                    : $contract[$this->t('email_status_label')] = $this->t('email_status_text');
-            }
-            if (!empty($myData['mycontactperson'])) {
-                $contractContact = $myData['mycontactperson'];
-            }
-        }
-        $contract[] = $contractContact;
-        return $contract;
-    }
-
-    /**
-     * @param bool|null $accountStatus
-     *   null: no account data set.
-     *   false: incorrect account data set.
-     *   true: correct account data set.
-     *
-     * @return array
-     */
-    protected function getEuCommerceInfo(?bool $accountStatus): array
-    {
-        $warningPercentage = $this->acumulusConfig->getInvoiceSettings()['euCommerceThresholdPercentage'];
-        if ($warningPercentage !== '') {
-            if ($accountStatus === null) {
-                $euCommerceProgressBar = $this->addProgressBar($this->t('unknown'), $this->t('unknown'), 0, 'warning');
-                $euCommerceMessage = $this->t('no_contract_data_local');
-            } elseif ($accountStatus === false) {
-                $euCommerceProgressBar = $this->addProgressBar($this->t('unknown'), $this->t('unknown'), 0, 'warning');
-                $euCommerceMessage = $this->t('no_contract_data');
-            } else {
-                $euCommerceReport = $this->acumulusApiClient->reportThresholdEuCommerce();
-                if (!$euCommerceReport->hasError()) {
-                    $euCommerceReport = $euCommerceReport->getMainAcumulusResponse();
-                    $reached = $euCommerceReport['reached'] == 1;
-                    $nlTaxed = (float)$euCommerceReport['nltaxed'];
-                    $threshold = (float)$euCommerceReport['threshold'];
-                    $percentage = min($nlTaxed / $threshold * 100.0, 100.0);
-                    if ($reached) {
-                        $message = $this->t('info_block_eu_commerce_threshold_passed');
-                        $status = 'error';
-                    } elseif ($percentage >= $warningPercentage) {
-                        $message = sprintf($this->t('info_block_eu_commerce_threshold_warning'), $percentage);
-                        $status = 'warning';
-                    } else {
-                        $message = $this->t('info_block_eu_commerce_threshold_ok');
-                        $status = 'ok';
-                    }
-                    $percentage = (int)round($percentage);
-                    $euCommerceProgressBar = $this->addProgressBar($nlTaxed, $threshold, $percentage, $status);
-                    $euCommerceMessage = $message;
-                } else {
-                    $euCommerceProgressBar = $this->addProgressBar($this->t('unknown'), $this->t('unknown'), 0, 'error');
-                    $euCommerceMessage = $this->t('no_eu_commerce_data') . "\n";
-                    $euCommerceMessage .= $this->arrayToList(
-                        $euCommerceReport->formatMessages(Message::Format_PlainWithSeverity, Severity::RealMessages),
-                        true
-                    );
-                }
-            }
-        }
-        return [$euCommerceProgressBar ?? '', $euCommerceMessage ?? ''];
-    }
-
-    protected function addProgressBar($nlTaxed, $threshold, $percentage, $status): string
-    {
-        return "<span class='acumulus-progressbar'><span class='acumulus-progress acumulus-$status' style='min-width:$percentage%'>$nlTaxed €</span></span><span class='acumulus-threshold'>$threshold €</span>";
-    }
-
-    protected function arrayToList(array $list, bool $isHtml): string
-    {
-        /** @noinspection DuplicatedCode  also used in CrashReporter::arrayToList */
-        $result = '';
-        if (!empty($list)) {
-            foreach ($list as $key => $line) {
-                if (is_string($key) && !ctype_digit($key)) {
-                    $key = $this->t($key);
-                    $line = "$key: $line";
-                }
-                $result .= $isHtml ? "<li>$line</li>" : "• $line";
-                $result .= "\n";
-            }
-            if ($isHtml) {
-                $result = "<ul>$result</ul>";
-            }
-            $result .= "\n";
-        }
-        return $result;
-    }
-
-    /**
      * Converts a picklist response into a set of options, e.g. for a dropdown.
      * A picklist is a list of items that have the following structure:
      * - Each picklist item contains an identifying value in the 1st entry.
@@ -992,5 +758,19 @@ abstract class Form extends MessageCollection
             return true;
         }
         return false;
+    }
+
+    /**
+     * Returns the About block to add to this form.
+     */
+    protected function getAboutBlock(?bool $accountStatus): array
+    {
+        if ($this->aboutForm === null) {
+            throw new \RuntimeException('About block not available');
+        }
+        return $this->aboutForm->getAboutBlock(
+            $accountStatus,
+            in_array($this->getType(), ['activate', 'batch']) ? 'details' : 'fieldset'
+        );
     }
 }

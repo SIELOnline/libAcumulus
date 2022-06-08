@@ -16,6 +16,7 @@ use Siel\Acumulus\ApiClient\Acumulus;
 abstract class BaseConfigForm extends Form
 {
     public function __construct(
+        AboutForm $aboutForm,
         Acumulus $acumulusApiClient,
         FormHelper $formHelper,
         ShopCapabilities $shopCapabilities,
@@ -25,6 +26,7 @@ abstract class BaseConfigForm extends Form
         Log $log
     ) {
         parent::__construct($acumulusApiClient, $formHelper, $shopCapabilities, $config, $environment, $translator, $log);
+        $this->aboutForm = $aboutForm;
         $this->translator->add(new ConfigFormTranslations());
     }
 

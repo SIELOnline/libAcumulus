@@ -24,6 +24,7 @@ use Siel\Acumulus\Invoice\Creator;
 use Siel\Acumulus\Invoice\FlattenerInvoiceLines;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Invoice\Source;
+use Siel\Acumulus\Shop\AboutForm;
 use Siel\Acumulus\Shop\AcumulusEntry;
 
 use Siel\Acumulus\Shop\AcumulusEntryManager;
@@ -550,6 +551,18 @@ class Container
         return $this->getInstance('AcumulusEntry', 'Shop', [$record], true);
     }
 
+    public function getAboutBlockForm(): AboutForm
+    {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return $this->getInstance('AboutForm', 'Shop', [
+            $this->getAcumulusApiClient(),
+            $this->getShopCapabilities(),
+            $this->getConfig(),
+            $this->getEnvironment(),
+            $this->getTranslator(),
+        ]);
+    }
+
     /**
      * Returns a form instance of the given type.
      *
@@ -564,18 +577,27 @@ class Container
         switch (strtolower($type)) {
             case 'register':
                 $class = 'Register';
+                $arguments[] = $this->getAboutBlockForm();
                 $arguments[] = $this->getAcumulusApiClient();
                 break;
             case 'config':
                 $class = 'Config';
+                $arguments[] = $this->getAboutBlockForm();
                 $arguments[] = $this->getAcumulusApiClient();
                 break;
             case 'advanced':
                 $class = 'AdvancedConfig';
+                $arguments[] = $this->getAboutBlockForm();
+                $arguments[] = $this->getAcumulusApiClient();
+                break;
+            case 'activate':
+                $class = 'ActivateSupport';
+                $arguments[] = $this->getAboutBlockForm();
                 $arguments[] = $this->getAcumulusApiClient();
                 break;
             case 'batch':
                 $class = 'Batch';
+                $arguments[] = $this->getAboutBlockForm();
                 $arguments[] = $this->getInvoiceManager();
                 $arguments[] = $this->getAcumulusApiClient();
                 break;

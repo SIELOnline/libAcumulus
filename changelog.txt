@@ -1,6 +1,19 @@
 Changelog Acumulus web shop extensions
 ======================================
 
+System Requirements:
+- PHP:
+  * Minimum version: 7.2, older versions WILL fail.
+  * Recommended version: 7.4, soon - probably pluginversion 7.4, this will
+    become the minimally required version and older versions WILL fail.
+  * Note: due to an error in plugin version 7.2, all PHP versions below 7.4 WILL
+    fail in that plugin version (solved in plugin version7.3)
+  * Note: PHP 8.0 and 8.1 are not yet fully tested, but should work and are
+    supported.
+- Database:
+  * MySql: 5.6 or later.
+  * MariaDb: 10.0 or later.
+
 Supported shops and versions
 ----------------------------
 The tags below are also used further on in the changelog to indicate to which
@@ -18,7 +31,7 @@ VM   VirtueMart (Joomla) 3.8.8               >= 3.0
                          4.0.2               Does not work with Joomla 4.1.4,
                                              not tested with Joomla 3.10
 WC   WooCommerce         6.5.1               >= 5.0 (3 and 4 will probably work)
-     WordPress           6.0                 >= 5.9
+     WordPress           6.0                 >= 5.9 (earlier version WILL fail)
 --------------------------------------------------------------------------------
 
 Next version
@@ -26,6 +39,17 @@ Next version
 Bugs:
 - ALL: The server name was not correctly extracted from the $_SERVER info and
   always resulted in example.com.
+
+Features:
+- Added Pro-support:
+  * An "Activate pro-support" form to register your pro-support token bought
+    from Siel Acumulus.
+  * Added pro-support info to the "About" block.
+  * Added pro-info support to the mail-template when creating an issue from the
+    "About" block.
+- Extracted Form::getInformationBlock() into a separate class AboutForm and
+  renamed it to getAboutBlock.
+
 
 7.2.3 (2022-06-01) (HS, WM only)
 --------------------------------

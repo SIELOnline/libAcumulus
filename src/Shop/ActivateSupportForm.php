@@ -48,12 +48,8 @@ class ActivateSupportForm extends Form
         );
         $this->aboutForm = $aboutForm;
 
-        $translations = new InvoiceTranslations();
+        $translations = new ActivateSupportFormTranslations();
         $this->translator->add($translations);
-
-        $translations = new BatchFormTranslations();
-        $this->translator->add($translations);
-
     }
 
     /**

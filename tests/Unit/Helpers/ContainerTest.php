@@ -16,6 +16,7 @@ use Siel\Acumulus\Invoice\Completor;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Shop\AcumulusEntry;
 use Siel\Acumulus\Shop\AdvancedConfigForm;
+use Siel\Acumulus\Shop\BatchForm;
 use Siel\Acumulus\Shop\ConfigForm;
 use Siel\Acumulus\Shop\RatePluginForm;
 use Siel\Acumulus\Shop\RegisterForm;
@@ -109,6 +110,7 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(ConfigForm::class, $object);
         $object = $container->getForm('advanced');
         $this->assertInstanceOf(AdvancedConfigForm::class, $object);
+        // Error : Cannot instantiate abstract class Siel\Acumulus\Shop\InvoiceManager
 //        $object = $container->getForm('batch');
 //        $this->assertInstanceOf(BatchForm::class, $object);
         $object = $container->getForm('register');

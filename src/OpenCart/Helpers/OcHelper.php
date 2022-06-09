@@ -193,6 +193,16 @@ class OcHelper
      *
      * @throws \Throwable
      */
+    public function activate()
+    {
+        $this->handleForm('activate');
+    }
+
+    /**
+     * Controller action: show/process the register form.
+     *
+     * @throws \Throwable
+     */
     public function register()
     {
         $this->handleForm('register');
@@ -345,7 +355,10 @@ class OcHelper
 
         // Set the action buttons (action + text).
         $this->data['action'] = $this->registry->getLink($link);
-        $this->data['button_icon'] = $type === 'batch' ? 'fa-envelope-o' : ($type === 'uninstall' ? 'fa-delete' : ($type === 'register' ? 'fa-plus' : 'fa-save'));
+        $this->data['button_icon'] = $type === 'batch' ? 'fa-envelope-o'
+            : ($type === 'uninstall' ? 'fa-delete'
+            : (in_array($type,['activate', 'register']) ? 'fa-plus'
+            : 'fa-save'));
         $this->data['button_save'] = $this->t("button_submit_$type");
         $this->data['cancel'] = $this->registry->getLink('common/dashboard');
         $this->data['button_cancel'] = $type === 'uninstall' ? $this->t('button_cancel_uninstall') : $this->t('button_cancel');
@@ -524,6 +537,11 @@ class OcHelper
                         [
                             'name' => $this->t('advanced_form_link_text'),
                             'href' => $this->acumulusContainer->getShopCapabilities()->getLink('advanced'),
+                            'children' => [],
+                        ],
+                        [
+                            'name' => $this->t('activate_form_link_text'),
+                            'href' => $this->acumulusContainer->getShopCapabilities()->getLink('activate'),
                             'children' => [],
                         ],
                     ],

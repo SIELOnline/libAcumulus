@@ -39,6 +39,7 @@ Next version
 Bugs:
 - ALL: The server name was not correctly extracted from the $_SERVER info and
   always resulted in example.com.
+- MA: Form <details> rendering went wrong.
 
 Features:
 - Added Pro-support:

@@ -4,10 +4,10 @@ Changelog Acumulus web shop extensions
 System Requirements:
 - PHP:
   * Minimum version: 7.2, older versions WILL fail.
-  * Recommended version: 7.4, soon - probably pluginversion 7.4, this will
+  * Recommended version: 7.4, soon - probably plugin version 7.4, this will
     become the minimally required version and older versions WILL fail.
   * Note: due to an error in plugin version 7.2, all PHP versions below 7.4 WILL
-    fail in that plugin version (solved in plugin version7.3)
+    already fail in that plugin version (solved in plugin version 7.3.0)
   * Note: PHP 8.0 and 8.1 are not yet fully tested, but should work and are
     supported.
 - Database:
@@ -34,13 +34,8 @@ WC   WooCommerce         6.5.1               >= 5.0 (3 and 4 will probably work)
      WordPress           6.0                 >= 5.9 (earlier version WILL fail)
 --------------------------------------------------------------------------------
 
-Next version
-------------
-Bugs:
-- ALL: The server name was not correctly extracted from the $_SERVER info and
-  always resulted in example.com.
-- MA: Form <details> rendering went wrong.
-
+7.3.0 (2022-06-13)
+------------------
 Features:
 - Added Pro-support:
   * An "Activate pro-support" form to register your pro-support token bought
@@ -51,9 +46,19 @@ Features:
 - Extracted Form::getInformationBlock() into a separate class AboutForm and
   renamed it to getAboutBlock.
 
+Bugs:
+- ALL: The server name was not correctly extracted from the $_SERVER info and
+  always resulted in example.com.
+- MA: Form <details> rendering went wrong.
+
 
 7.2.3 (2022-06-01) (HS, WM only)
 --------------------------------
+Features:
+- JOO: Changed Joomla specific parts to run on Joomla 4. Note: VirtueMart will
+  NOT run on Joomla 4, even not VM4! HikaShop: yet to be tested.
+- ALL: Allow also warnings when checking requirements.
+
 Bugs:
 - ALL: PHP Warning:  Undefined array key "vattypeid" in Invoice/Completor.php on
  line 1214.
@@ -66,21 +71,17 @@ Bugs:
   and then visiting the order page. The Acumulus tab or box will show an error
   message instead of the details of the definitive invoice.
 
-Features:
-- JOO: Changed Joomla specific parts to run on Joomla 4. Note: VirtueMart will
-  NOT run on Joomla 4, even not VM4! HikaShop: yet to be tested.
-- ALL: Allow also warnings when checking requirements.
 
 7.2.2 (2022-05-13) (OC, PS only)
 --------------------------------
+Features:
+- PS, OC: Added crash reporting (explained in the notes for 7.1.0).
+
 Bugs:
 - PHP 7.4 syntax: ParseError: syntax error, unexpected '=' in
   ApiClient/Acumulus.php:858.
   To solve: upgrade to PHP 7.4 or change the given line to:
     $logLevel = $logLevel ?? Severity::Exception;
-
-Features:
-- PS, OC: Added crash reporting (explained in the notes for 7.1.0).
 
 
 7.2.1 (2022-05-12) (MA, WC only)
@@ -89,6 +90,7 @@ Bugs:
 - MA: Magento coding standards: The use of function assert() is forbidden.
 - WC: PHP Fatal error: Uncaught Error: Class 'Siel\Acumulus\Invoice\Source' not
   found in acumulus.php:788.
+
 
 7.2.0 (2022-05-10)
 ------------------
@@ -109,6 +111,7 @@ Bugs:
 - CRITICAL Uncaught Error: Call to a member function toLogMessages() on null in
   InvoiceAddResult.php:294.
 
+
 7.1.1 (2022-05-03) (JOO only)
 -----------------------------
 Bugs:
@@ -122,6 +125,7 @@ Bugs:
 
 Refactorings:
 - Pulled method checkAccountSettings() from BaseConfigForm up to Form.
+
 
 7.1.0 (2022-05-02) (JOO only)
 -----------------------------
@@ -167,6 +171,7 @@ Bugs:
   the type float, string given, called in .../WooCommerce/Invoice/Creator.php on
   line 487 and ..."
 
+
 7.0.1 (2022-04-19) (WC only)
 ----------------------------
 Bugs:
@@ -175,6 +180,7 @@ Bugs:
   Uncaught TypeError: Argument 1 passed to Number::floatsAreEqual() must be of
   the type float, string given, called in .../WooCommerce/Invoice/Creator.php on
   line 436 and ..."
+
 
 7.0.0 (2022-04-14) (WC only)
 ----------------------------
@@ -252,6 +258,7 @@ Refactorings:
   - And thus not: object instead of StdClass (7.2), co and contravariance (7.4),
     typed properties (7.4).)
 - Added visibility to class constants.
+
 
 6.4.2 (2022-03-24) (JOO only, but retracted)
 --------------------------------------------

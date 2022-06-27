@@ -173,7 +173,7 @@ abstract class Form extends MessageCollection
         $class = get_class($this);
         $pos = strrpos($class, '\\');
         $class = $pos !== false ? substr($class, $pos + 1) : $class;
-        $classParts = preg_split('/([[:upper:]][[:lower:]]+)/', $class, null, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+        $classParts = preg_split('/([[:upper:]][[:lower:]]+)/', $class, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
         $this->type = strtolower(is_array($classParts) && !empty($classParts) ? reset($classParts) : $class);
     }
 

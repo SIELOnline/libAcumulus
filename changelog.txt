@@ -34,6 +34,16 @@ WC   WooCommerce         6.5.1               >= 5.0 (3 and 4 will probably work)
      WordPress           6.0                 >= 5.9 (earlier version WILL fail)
 --------------------------------------------------------------------------------
 
+7.3.1 (2022-06-27)
+------------------
+Bugs:
+- VM, but probably ALL: TypeError: Argument 1 passed to
+   Siel\Acumulus\Invoice\CompletorStrategy\ApplySameVatRate::tryVatRate()
+  must be of the type float, null given, called in ApplySameVatRate.php on line
+  45 and defined in ApplySameVatRate.php:58.
+- ALL (PHP 8.1): Deprecated Functionality: preg_split(): Passing null to
+  parameter #3 ($limit) of type int is deprecated.
+
 7.3.0 (2022-06-13)
 ------------------
 Features:

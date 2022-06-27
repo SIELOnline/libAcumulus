@@ -262,9 +262,11 @@ abstract class CompletorStrategyBase
                     : $line[Tag::VatRate] / 100.0 * $amount;
                 $vatRate = sprintf('%.3f', $line[Tag::VatRate]);
                 // Add amount to existing vat rate line or create a new line.
-                $this->vatBreakdown[$vatRate][Meta::VatAmount] += $vatAmount;
-                $this->vatBreakdown[$vatRate]['amount'] += $amount;
-                $this->vatBreakdown[$vatRate]['count']++;
+                if (isset($this->vatBreakdown[$vatRate])) {
+                    $this->vatBreakdown[$vatRate][Meta::VatAmount] += $vatAmount;
+                    $this->vatBreakdown[$vatRate]['amount'] += $amount;
+                    $this->vatBreakdown[$vatRate]['count']++;
+                }
             }
         }
 

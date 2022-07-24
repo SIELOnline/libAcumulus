@@ -115,6 +115,9 @@ class ConfigUpgrade
         foreach ($messages as $key => $message) {
             $severity = strpos($key, 'warning') !== false ? Severity::Warning : Severity::Error;
             $this->getLog()->log($severity, "Requirement check warning: $message");
+            if ($severity === Severity::Warning) {
+                unset($messages[$key]);
+            }
         }
         if (!empty($messages)) {
             throw new RuntimeException('Requirement check failed: ' . implode('; ', $messages));

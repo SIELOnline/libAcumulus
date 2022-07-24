@@ -30,9 +30,19 @@ PS   PrestaShop          1.7.8.5             >= 1.7.6
 VM   VirtueMart (Joomla) 3.8.8               >= 3.0
                          4.0.2               Does not work with Joomla 4.1.4,
                                              not tested with Joomla 3.10
-WC   WooCommerce         6.5.1               >= 5.0 (3 and 4 will probably work)
+WC   WooCommerce         6.6.1               >= 5.0 (3 and 4 will probably work)
      WordPress           6.0                 >= 5.9 (earlier version WILL fail)
 --------------------------------------------------------------------------------
+
+7.3.2 (2022-07-25)
+------------------
+Bugs:
+- Een fout van het type E_ERROR werd veroorzaakt op regel 120 van het bestand
+  wp-content/plugins/acumulus/lib/siel/acumulus/src/Config/ConfigUpgrade.php.
+  Foutmelding: Uncaught RuntimeException: Requirement check failed: The
+  minimally required PHP version for the Acumulus module will soon be raised to
+  PHP 7.4. Start upgrading your PHP version now ...
+
 
 7.3.1 (2022-06-27)
 ------------------

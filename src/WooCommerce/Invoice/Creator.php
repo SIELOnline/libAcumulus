@@ -644,7 +644,6 @@ class Creator extends BaseCreator
         return wc_prices_include_tax();
     }
 
-
     /**
      * Returns whether the price inc can be considered realistic.
      * Precondition: product prices as entered by the shop manager include tax
@@ -658,13 +657,13 @@ class Creator extends BaseCreator
      *   any discount.
      * @param float[] $taxes
      *   May be passed as strings.
-     * @param \WC_Product|null $product
+     * @param \WC_Product|bool|null $product
      *   The product that has the given price inc and taxes.
      *
      * @return string
      *   true if the price inc can be considered realistic, false otherwise.
      */
-    protected function isPriceIncRealistic(float $productPriceInc, array $taxes, ?WC_Product $product): string
+    protected function isPriceIncRealistic(float $productPriceInc, array $taxes, $product): string
     {
         $reason = '';
         // Given the precondition that product prices as entered include vat, we

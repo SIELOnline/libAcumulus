@@ -29,7 +29,7 @@ class CreatorPluginSupport
      * @param WC_Order_Item_Product $item
      *   An array representing an order item line, meta values are already
      *   available under their own names and as an array under key 'item_meta'.
-     * @param WC_Product|bool $product
+     * @param WC_Product|bool|null $product
      *   The product that was sold on this line, may also be a bool according to
      *   the WC3 php documentation. I guess it will be false if the product has
      *   been deleted since.
@@ -48,7 +48,7 @@ class CreatorPluginSupport
      * @param WC_Order_Item_Product $item
      *   An array representing an order item line, meta values are already
      *   available under their own names and as an array under key 'item_meta'.
-     * @param WC_Product|bool $product
+     * @param WC_Product|bool|null $product
      *   The product that was sold on this line, may also be a bool according to
      *   the WC3 php documentation. I guess it will be false if the product has
      *   been deleted since.
@@ -71,7 +71,7 @@ class CreatorPluginSupport
      *
      * @param \Siel\Acumulus\WooCommerce\Invoice\Creator $creator
      * @param WC_Order_Item_Product $item
-     * @param WC_Product|bool $product
+     * @param WC_Product|bool|null $product
      */
     public function getItemLineBeforeBookings(Creator $creator, WC_Order_Item_Product $item, $product)
     {

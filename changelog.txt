@@ -34,7 +34,7 @@ WC   WooCommerce         6.7.0               >= 5.0 (3 and 4 will probably work)
      WordPress           6.0                 >= 5.9 (earlier version WILL fail)
 --------------------------------------------------------------------------------
 
-7.3.2 (2022-08-05)
+7.3.2 (2022-08-08)
 ------------------
 Bugs:
 - TypeError: Argument 3 passed to

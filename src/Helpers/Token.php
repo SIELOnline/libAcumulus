@@ -213,6 +213,7 @@ class Token
         } else {
             $variableName = '';
         }
+
         foreach ($this->variables as $key => $variable) {
             if ($variable !== null && (empty($variableName) || $key === $variableName)) {
                 $value = $this->getProperty($variable, $property);
@@ -269,11 +270,16 @@ class Token
             }
         } elseif (is_object($variable)) {
             // It's an object: try to get the property.
-            // Safest way is via the get_object_vars() function.
+            // Safest and fastest way is via the get_object_vars() function.
             $properties = get_object_vars($variable);
             if (!empty($properties) && array_key_exists($property, $properties)) {
                 $value = $properties[$property];
-            } else {
+            }
+            // WooCommerce can have the property customer_id set to null, while
+            // the data store does contain a non-null value: so if value is
+            // still null, even if it is in the get_object_vars() result, we
+            // try to get it the more difficult way.
+            if ($value === null) {
                 // Try some other ways.
                 $value = $this->getObjectProperty($variable, $property, $args);
             }

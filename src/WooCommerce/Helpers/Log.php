@@ -17,7 +17,12 @@ class Log extends BaseLog
      */
     protected function write(string $message, int $severity)
     {
-        (new WC_Logger())->log($this->getWooCommerceSeverity($severity), $message, ['source' => 'acumulus']);
+        if (class_exists('WC_Logger')) {
+            (new WC_Logger())->log($this->getWooCommerceSeverity($severity), $message, ['source' => 'acumulus']);
+        } else {
+            // WooCommerce not activated?
+            parent::write($message, $severity);
+        }
     }
 
     /**

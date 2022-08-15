@@ -216,7 +216,8 @@ class ShopCapabilities extends ShopCapabilitiesBase
     {
         return [
             // Customer defaults.
-            'contactYourId' => '[customer_user]', // WC_Abstract_order
+            //legacy: 'contactYourId' => '[customer_user]', // WC_Abstract_order
+            'contactYourId' => '[customer_id]', // WC_Abstract_order
             'companyName1' => '[billing_company]', // WC_Abstract_order
             'fullName' => '[billing_first_name+billing_last_name]', // WC_Abstract_order
             'address1' => '[billing_address_1]', // WC_Abstract_order

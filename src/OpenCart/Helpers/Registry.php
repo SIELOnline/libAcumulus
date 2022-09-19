@@ -33,18 +33,6 @@ class Registry
     /** @var \ModelCheckoutOrder|\ModelSaleOrder */
     protected $orderModel;
 
-    /** @noinspection PhpUndefinedClassInspection */
-    /**
-     * @var \ModelSettingExtension|\ModelExtensionExtension
-     */
-    protected $extensionModel;
-
-    /** @noinspection PhpUndefinedClassInspection */
-    /**
-     * @var \ModelSettingEvent|\ModelExtensionEvent
-     */
-    protected $eventModel;
-
     /**
      * Sets the OC Registry.
      *
@@ -74,8 +62,6 @@ class Registry
     {
         $this->registry = $registry;
         $this->orderModel = null;
-        $this->extensionModel = null;
-        $this->eventModel = null;
         static::setInstance($this);
     }
 

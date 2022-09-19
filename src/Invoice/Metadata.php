@@ -73,11 +73,11 @@ abstract class Metadata
         if (!array_key_exists($name, $this->metadata)) {
             $this->metadata[$name] = ['count' => 1, 'value' => $value];
         } else {
-            if ($this->metadata['count'] === 1) {
-                $this->metadata['value'] = [$this->metadata['value']];
+            if ($this->metadata[$name]['count'] === 1) {
+                $this->metadata[$name]['value'] = [$this->metadata[$name]['value']];
             }
-            $this->metadata['count']++;
-            $this->metadata['value'][] = $value;
+            $this->metadata[$name]['count']++;
+            $this->metadata[$name]['value'][] = $value;
         }
     }
 

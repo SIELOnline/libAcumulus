@@ -61,7 +61,7 @@ use Siel\Acumulus\Api;/**
  */
 class Customer extends AcumulusObject
 {
-    static protected array $propertyDefinitions = [
+    protected static array $propertyDefinitions = [
         ['name' => 'contactId', 'type' =>'string'],
         ['name' => 'type', 'type' =>'int', 'allowedValues' => [Api::CustomerType_Debtor, Api::CustomerType_Creditor, Api::CustomerType_Both]],
         ['name' => 'vatTypeId', 'type' =>'int', 'allowedValues' => [Api::VatTypeId_Private, Api::VatTypeId_Business]],

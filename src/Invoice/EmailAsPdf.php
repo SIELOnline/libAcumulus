@@ -15,7 +15,7 @@ use Siel\Acumulus\Api;
  */
 class EmailAsPdf extends AcumulusObject
 {
-    static protected array $propertyDefinitions = [
+    protected static array $propertyDefinitions = [
         ['name' => 'emailTo', 'type' =>'string', 'required' => true],
         ['name' => 'emailBcc', 'type' =>'string'],
         ['name' => 'emailFrom', 'type' =>'string'],

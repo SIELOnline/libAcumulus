@@ -11,7 +11,7 @@ use Siel\Acumulus\Helpers\Number;
 class AcumulusProperty
 {
     /** @var string[] */
-    static protected array $allowedTypes = ['string', 'int', 'float', 'date', 'id'];
+    protected static array $allowedTypes = ['string', 'int', 'float', 'date', 'id'];
 
     protected string $name;
     protected bool $required;
@@ -28,10 +28,11 @@ class AcumulusProperty
         if (!isset($propertyDefinition['name'])) {
             throw new DomainException('Property name must be defined');
         }
-        if (!is_string($propertyDefinition['name'])) {
+        if (!is_string($propertyDefinition['name']) || empty($propertyDefinition['name'])) {
             throw new DomainException("Property name must be a string: {$propertyDefinition['name']}");
         }
         $this->name = $propertyDefinition['name'];
+
         if (!isset($propertyDefinition['type'])) {
             throw new DomainException('Property type must be defined');
         }
@@ -39,7 +40,15 @@ class AcumulusProperty
             throw new DomainException("Property type not allowed: {$propertyDefinition['type']}");
         }
         $this->type = $propertyDefinition['type'];
+
+        if (isset($propertyDefinition['required']) && !is_bool($propertyDefinition['required'])) {
+            throw new DomainException('Property required must be a bool');
+        }
         $this->required = $propertyDefinition['required'] ?? false;
+
+        if (isset($propertyDefinition['allowedValues']) && !is_array($propertyDefinition['allowedValues'])) {
+            throw new DomainException('Property allowedValues must be an array');
+        }
         $this->allowedValues = $propertyDefinition['allowedValues'] ?? [];
 
         $this->value = null;
@@ -81,17 +90,17 @@ class AcumulusProperty
                 case 'int':
                 case 'id':
                     if (!is_numeric($value)) {
-                        throw new DomainException("$this->name: not a valid $this->type: $value");
+                        throw new DomainException("$this->name: not a valid $this->type: " . var_export($value, true));
                     }
-                    $iResult = (int) $value;
+                    $iResult = (int) round($value);
                     if (!Number::floatsAreEqual($iResult, $value, 0.0002) || ($this->type === 'id' && $iResult <= 0)) {
-                        throw new DomainException("$this->name: not a valid $this->type value: $value");
+                        throw new DomainException("$this->name: not a valid $this->type value: " . var_export($value, true));
                     }
                     $value = $iResult;
                     break;
                 case 'float':
                     if (!is_numeric($value)) {
-                        throw new DomainException("$this->name: not a valid $this->type: $value");
+                        throw new DomainException("$this->name: not a valid $this->type:" . var_export($value, true));
                     }
                     $value = (float) $value;
                     break;
@@ -107,10 +116,7 @@ class AcumulusProperty
                         $date = $value;
                     }
                     if ($date === false) {
-                        if (!is_scalar($value)) {
-                            $value = var_export($value);
-                        }
-                        throw new DomainException("$this->name: not a valid $this->type value: $value");
+                        throw new DomainException("$this->name: not a valid $this->type value: " . var_export($value, true));
                     }
                     $value = $date;
                     break;
@@ -118,7 +124,7 @@ class AcumulusProperty
                     throw new UnexpectedValueException("$this->name: not a valid type: $this->type");
             }
             if (count($this->allowedValues) > 0 && !in_array($value, $this->allowedValues)) {
-                throw new DomainException("$this->name: not an allowed value: $value");
+                throw new DomainException("$this->name: not an allowed value:" . var_export($value, true));
             }
         }
         $this->value = $value;

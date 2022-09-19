@@ -45,28 +45,36 @@ interface Api
     public const TestMode_Normal = 0;
     public const TestMode_Test = 1;
 
-    public const PaymentStatus_Due = 1;
-    public const PaymentStatus_Paid = 2;
-
-    public const Concept_No = 0;
-    public const Concept_Yes = 1;
-
     public const ContactStatus_Disabled = 0;
     public const ContactStatus_Active = 1;
 
     public const OverwriteIfExists_No = 0;
     public const OverwriteIfExists_Yes = 1;
 
-    public const ConfirmReading_No = 0;
-    public const ConfirmReading_Yes = 1;
+    public const CustomerType_Debtor = 1;
+    public const CustomerType_Creditor = 2;
+    public const CustomerType_Both = 3;
 
     public const VatTypeId_Private = 1; // or vat exempt business.
     public const VatTypeId_Business = 2;
+
+    public const AutoName_No  = 0;
+    public const AutoName_OnlyForeign  = 1;
+    public const AutoName_Yes  = 2;
+
+    public const DisableDuplicates_No  = 0;
+    public const DisableDuplicates_Yes  = 1;
 
     public const Region_NotSet = 0;
     public const Region_Netherlands = 1;
     public const Region_EU = 2;
     public const Region_World = 3;
+
+    public const Concept_No = 0;
+    public const Concept_Yes = 1;
+
+    public const PaymentStatus_Due = 1;
+    public const PaymentStatus_Paid = 2;
 
     public const VatType_National = 1;
     public const VatType_NationalReversed = 2;
@@ -86,6 +94,12 @@ interface Api
 
     public const Email_Normal = 0;
     public const Email_Reminder = 1;
+
+    public const ConfirmReading_No = 0;
+    public const ConfirmReading_Yes = 1;
+
+    public const UblInclude_No = 0;
+    public const UblInclude_Yes = 1;
 
     public const Gender_Female = 'F';
     public const Gender_Male = 'M';

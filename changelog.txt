@@ -34,6 +34,25 @@ WC   WooCommerce         6.7.0               >= 5.0 (3 and 4 will probably work)
      WordPress           6.0                 >= 5.9 (earlier version WILL fail)
 --------------------------------------------------------------------------------
 
+8.0.0-alpha1
+------------
+This version is in a "Proof of Concept" phase, the old code is still there and
+is for now still the code that gets called when invoked by an actual plugin.
+
+Requirements:
+- PHP 7.4 is now the minimally required version
+
+Refactorings:
+- Introduced "smart" objects for the invoice-add array parts (customer, invoice,
+  line, emailaspdf) on top of the abstract classes Metadata, AcumulusObject and
+  AcumulusProperty.
+- Redefined the creator and completor phase into a collector and a completor
+  phase, where the collector phase is dumber and only contains "all" the shop
+  specific data retrieval, enriched with metadata to guide the completor phase.
+  The completor phase now only acts on the collected data, possibly guided by
+  the metadata, to create the Acumulus invoice. This phase should now be fully
+  shop independent.
+
 7.3.3 (2022-08-??)
 ------------------
 Bugs:

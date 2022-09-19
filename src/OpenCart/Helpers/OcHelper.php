@@ -10,6 +10,7 @@
  * @noinspection PhpMissingFieldTypeInspection
  * @noinspection PhpMissingVisibilityInspection
  * @noinspection PhpConcatenationWithEmptyStringCanBeInlinedInspection
+ * @noinspection PhpMultipleClassDeclarationsInspection
  */
 
 namespace Siel\Acumulus\OpenCart\Helpers;
@@ -716,7 +717,8 @@ class OcHelper
     {
         $this->uninstallEvents();
         $location = $this->getLocation();
-        $model = $this->registry->getEventModel();
+        /** @var \ModelSettingEvent $model */
+        $model = $this->registry->getModel('setting/event');
         $model->addEvent('acumulus','catalog/model/*/addOrder/after',$location . '/eventOrderUpdate');
         $model->addEvent('acumulus','catalog/model/*/addOrderHistory/after',$location . '/eventOrderUpdate');
         $model->addEvent('acumulus','admin/model/*/addOrder/after',$location . '/eventOrderUpdate');
@@ -733,6 +735,8 @@ class OcHelper
      */
     protected function uninstallEvents()
     {
-        $this->registry->getEventModel()->deleteEventByCode('acumulus');
+        /** @var \ModelSettingEvent $model */
+        $model = $this->registry->getModel('setting/event');
+        $model->deleteEventByCode('acumulus');
     }
 }

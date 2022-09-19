@@ -34,11 +34,14 @@ WC   WooCommerce         6.7.0               >= 5.0 (3 and 4 will probably work)
      WordPress           6.0                 >= 5.9 (earlier version WILL fail)
 --------------------------------------------------------------------------------
 
-7.3.3 (2022-08-??)
+7.3.3 (2022-09-??)
 ------------------
 Bugs:
 - WC: SearchToken: WooCommerce can have the property customer_id set to null,
   while the data store does contain a non-null value.
+- OC: Uncaught Error: Call to undefined method
+  Siel\Acumulus\OpenCart\Helpers\Registry::getEventModel() in
+  /system/library/siel/acumulus/src/OpenCart/Helpers/OcHelper.php:736.
 
 Refactorings:
 - WC: Property customer_user is legacy, is now customer_id.

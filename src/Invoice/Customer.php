@@ -46,6 +46,49 @@ use Siel\Acumulus\Api;/**
  *  @property ?string $bankAccountNumber
  *  @property ?string $mark
  *  @property ?int $disableDuplicates
+ *
+ *  @method bool setContactId(?string $value, int $mode = AcumulusProperty::Set_Always)
+ *  @method bool setType(?int $value, int $mode = AcumulusProperty::Set_Always)
+ *  @method bool setVatTypeId(?int $value, int $mode = AcumulusProperty::Set_Always)
+ *  @method bool setContactYourId(?string $value, int $mode = AcumulusProperty::Set_Always)
+ *  @method bool setContactStatus(?int $value, int $mode = AcumulusProperty::Set_Always)
+ *
+ *  @method bool setCompanyName1(?string $value, int $mode = AcumulusProperty::Set_Always)
+ *  @method bool setCompanyName2(?string $value, int $mode = AcumulusProperty::Set_Always)
+ *  @method bool setFullName(?string $value, int $mode = AcumulusProperty::Set_Always)
+ *  @method bool setSalutation(?string $value, int $mode = AcumulusProperty::Set_Always)
+ *  @method bool setAddress1(?string $value, int $mode = AcumulusProperty::Set_Always)
+ *  @method bool setAddress2(?string $value, int $mode = AcumulusProperty::Set_Always)
+ *  @method bool setPostalCode(?string $value, int $mode = AcumulusProperty::Set_Always)
+ *  @method bool setCity(?string $value, int $mode = AcumulusProperty::Set_Always)
+ *  @method bool setCountry(?string $value, int $mode = AcumulusProperty::Set_Always)
+ *  @method bool setCountryCode(?string $value, int $mode = AcumulusProperty::Set_Always)
+ *  @method bool setCountryAutoName(?int $value, int $mode = AcumulusProperty::Set_Always)
+ *  @method bool setCountryAutoNameLang(?string $value, int $mode = AcumulusProperty::Set_Always)
+ *
+ *  @method bool setAltCompanyName1(?string $value, int $mode = AcumulusProperty::Set_Always)
+ *  @method bool setAltCompanyName2(?string $value, int $mode = AcumulusProperty::Set_Always)
+ *  @method bool setAltFullName(?string $value, int $mode = AcumulusProperty::Set_Always)
+ *  @method bool setAltAddress1(?string $value, int $mode = AcumulusProperty::Set_Always)
+ *  @method bool setAltAddress2(?string $value, int $mode = AcumulusProperty::Set_Always)
+ *  @method bool setAltPostalCode(?string $value, int $mode = AcumulusProperty::Set_Always)
+ *  @method bool setAltCity(?string $value, int $mode = AcumulusProperty::Set_Always)
+ *  @method bool setAltCountry(?string $value, int $mode = AcumulusProperty::Set_Always)
+ *  @method bool setAltCountryCode(?int $value, int $mode = AcumulusProperty::Set_Always)
+ *  @method bool setAltCountryAutoName(?int $value, int $mode = AcumulusProperty::Set_Always)
+ *  @method bool setAltCountryAutoNameLang(?string $value, int $mode = AcumulusProperty::Set_Always)
+ *
+ *  @method bool setWebsite(?string $value, int $mode = AcumulusProperty::Set_Always)
+ *  @method bool setVatNumber(?string $value, int $mode = AcumulusProperty::Set_Always)
+ *  @method bool setTelephone(?string $value, int $mode = AcumulusProperty::Set_Always)
+ *  @method bool setTelephone2(?string $value, int $mode = AcumulusProperty::Set_Always)
+ *  @method bool setFax(?string $value, int $mode = AcumulusProperty::Set_Always)
+ *  @method bool setEmail(?string $value, int $mode = AcumulusProperty::Set_Always)
+ *  @method bool setOverwriteIfExists(?int $value, int $mode = AcumulusProperty::Set_Always)
+ *  @method bool setBankAccountNumber(?string $value, int $mode = AcumulusProperty::Set_Always)
+ *  @method bool setMark(?string $value, int $mode = AcumulusProperty::Set_Always)
+ *  @method bool setDisableDuplicates(?int $value, int $mode = AcumulusProperty::Set_Always)
+ *
  * The definition of the fields is based on the
  * {@link https://www.siel.nl/acumulus/API/Invoicing/Add_Invoice/ Invoice Add API call},
  * NOT the
@@ -55,9 +98,10 @@ use Siel\Acumulus\Api;/**
  * {@see Invoice}.
  *
  * Field names are copied from the API, though capitals are introduced for
- * readability (and to satisfy the PhpStorm inspections).
+ * readability (and to prevent PhpStorm typo inspections).
  *
- * Metadata can be added via the metadata interface
+ * Metadata can be added via the {@see \Siel\Acumulus\Invoice\Metadata}
+ * interface.
  */
 class Customer extends AcumulusObject
 {
@@ -67,6 +111,7 @@ class Customer extends AcumulusObject
         ['name' => 'vatTypeId', 'type' =>'int', 'allowedValues' => [Api::VatTypeId_Private, Api::VatTypeId_Business]],
         ['name' => 'contactYourId', 'type' =>'string'],
         ['name' => 'contactStatus', 'type' =>'int', 'allowedValues' => [Api::ContactStatus_Disabled, Api::ContactStatus_Active]],
+
         ['name' => 'companyName1', 'type' =>'string'],
         ['name' => 'companyName2', 'type' =>'string'],
         ['name' => 'fullName', 'type' =>'string'],

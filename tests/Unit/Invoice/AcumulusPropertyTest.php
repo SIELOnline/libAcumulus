@@ -70,9 +70,9 @@ class AcumulusPropertyTest extends TestCase
             'float-int' => ['float', 1, 1.0],
             'float-string' => ['float', '1.234e2', 123.4],
             'float-negative' => ['float', -3.5, -3.5],
-            'date-string' => ['date', '2022-09-01', DateTime::createFromFormat('Y-m-d', '2022-09-01')],
-            'date-int' => ['date', $now, DateTime::createFromFormat('U', $now)],
-            'date-float' => ['date', $floatNow, DateTime::createFromFormat('U.u', $floatNow)],
+            'date-string' => ['date', '2022-09-01', DateTime::createFromFormat('Y-m-d', '2022-09-01')->setTime(0, 0, 0)],
+            'date-int' => ['date', $now, DateTime::createFromFormat('U', $now)->setTime(0, 0, 0)],
+            'date-float' => ['date', $floatNow, DateTime::createFromFormat('U.u', $floatNow)->setTime(0, 0, 0)],
         ];
     }
 
@@ -98,7 +98,7 @@ class AcumulusPropertyTest extends TestCase
             'float-array' => ['int', [1.2]],
             'float-string' => ['float', 'a'],
             'float-bool' => ['float', true],
-            'date-array' => ['int', ['2022-09-01']],
+            'date-array' => ['date', ['2022-09-01']],
             'date-string' => ['date', '200220901'],
         ];
     }

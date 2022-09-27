@@ -17,6 +17,7 @@ use Siel\Acumulus\Config\ConfigStore;
 use Siel\Acumulus\Config\ConfigUpgrade;
 use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Config\ShopCapabilities;
+use Siel\Acumulus\Invoice\Collect;
 use Siel\Acumulus\Invoice\Completor;
 use Siel\Acumulus\Invoice\CompletorInvoiceLines;
 use Siel\Acumulus\Invoice\CompletorStrategyLines;
@@ -473,6 +474,34 @@ class Container
                 $this->getLog(),
             ]
         );
+    }
+
+    /**
+     * Returns a collector instance of the given type.
+     *
+     * @param string $type
+     *   The type of form requested.
+     *
+     * @return \Siel\Acumulus\Invoice\Collect
+     */
+    public function getCollect(string $type): Collect
+    {
+        $arguments = [
+            $this->getToken(),
+            $this->getConfig(),
+        ];
+        switch (strtolower($type)) {
+            case 'customer':
+            case 'invoice':
+            case 'line':
+            case 'emailAsPdf':
+                $class = lcfirst($type);
+                break;
+            default;
+                throw new InvalidArgumentException("Unknown collector type $type");
+        }
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return $this->getInstance('Collect' . $class, 'Invoice', $arguments);
     }
 
     public function getEnvironment(): Environment

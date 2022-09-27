@@ -8,8 +8,34 @@ use UnexpectedValueException;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Number;
 
+/**
+ * AcumulusProperty represents a scalar value that is sent as part of an API
+ * call.
+ *
+ * Value sent with Acumulus API messages can be of type 'string', 'int',
+ * 'float', or 'date'. Note that the AcumulusAPI does not use booleans,
+ * properties that represent a "yes/no" value are mostly represented by an int
+ * with allowed values 0 and 1.
+ *
+ * Additional restrictions may hold, and the basic and most used restrictions
+ * are supported by this class:
+ * - Required: even required values are initialized as null, only when trying to
+ *   use it to construct a message will a required but empty value throw an
+ *   error.
+ * - Positive integer: modeled with a separate type 'id'.
+ * - Enumerations: modeled with the allowedValues property of this class.
+ *
+ * Other restrictions, e.g. a string that should contain an e-mail address, are
+ * not (yet) supported by this class and can(/should) be checked ona higher
+ * level.
+ */
 class AcumulusProperty
 {
+    public const Set_Always = 0;
+    public const Set_NotOverwrite = 1;
+    public const Set_NotEmpty = 2;
+    public const Set_NotOverwriteNotEmpty = self::Set_NotOverwrite | self::Set_NotEmpty;
+
     /** @var string[] */
     protected static array $allowedTypes = ['string', 'int', 'float', 'date', 'id'];
 
@@ -21,7 +47,20 @@ class AcumulusProperty
     protected $value;
 
     /**
+     * Creates a property based on the passed-in definition.
+     *
      * @param array $propertyDefinition
+     *   A property definition defines the:
+     *   - 'name': (string, required) the name of the property, may contain
+     *     upper case characters but when added to an Acumulus API message, it
+     *     will be added in all lower case.
+     *   - 'type': (string ,required) 1 of the allowed types.
+     *   - 'required': (bool, optional, default = false) whether the property
+     *     must be present in the Acumulus API message.
+     *   - 'allowedValues': (array, optional, default = no restrictions) the set
+     *     of allowed values for this property, each allowed value must be of
+     *     the given type, typically an int, but string enumerations also appear
+     *     in the Acumulus API.
      */
     public function __construct(array $propertyDefinition)
     {
@@ -74,14 +113,25 @@ class AcumulusProperty
     }
 
     /**
+     * Assigns a value to the property.
      *
-     * @param mixed $value
-     *   The value to assign to this property
+     * @param string|int|float|\DateTime|null $value
+     *   The value to assign to this property, null and 'null' are valid values
+     *   and will "unset" this property (it will not appear in the Acumulus API
+     *   message).
+     * @param int $mode
+     *   1 of the AcumulusProperty::Set_... constants to prevent setting an
+     *   empty value and/or overwriting an already set value. Default is to
+     *   unconditionally set the value.
      *
-     * @throws \DomainException|\UnexpectedValueException
+     * @return bool
+     *   true if the value was actually set, false otherwise.
      */
-    public function setValue($value)
+    public function setValue($value, int $mode = AcumulusProperty::Set_Always): bool
     {
+        if ($value === 'null') {
+            $value = null;
+        }
         if ($value !== null) {
             switch ($this->type) {
                 case 'string':
@@ -118,6 +168,7 @@ class AcumulusProperty
                     if ($date === false) {
                         throw new DomainException("$this->name: not a valid $this->type value: " . var_export($value, true));
                     }
+                    $date->setTime(0, 0, 0, 0);
                     $value = $date;
                     break;
                 default:
@@ -127,6 +178,13 @@ class AcumulusProperty
                 throw new DomainException("$this->name: not an allowed value:" . var_export($value, true));
             }
         }
+        if (($mode & AcumulusProperty::Set_NotOverwrite) !== 0 && $this->value !== null) {
+            return false;
+        }
+        if (($mode & AcumulusProperty::Set_NotEmpty) !== 0 && empty($value)) {
+            return false;
+        }
         $this->value = $value;
+        return true;
     }
 }

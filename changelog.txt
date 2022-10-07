@@ -34,9 +34,12 @@ WC   WooCommerce         6.7.0               >= 5.0 (3 and 4 will probably work)
      WordPress           6.0                 >= 5.9 (earlier version WILL fail)
 --------------------------------------------------------------------------------
 
-7.3.3 (2022-09-??)
+7.3.3 (2022-10-??)
 ------------------
 Bugs:
+- All: It might be possible to determine the vat rate for a line that has
+  multiple vat range matches, if and after the vat type has been determined.
+  Use this to prevent warnings/errors for this edge case.
 - WC: SearchToken: WooCommerce can have the property customer_id set to null,
   while the data store does contain a non-null value.
 - OC: Uncaught Error: Call to undefined method

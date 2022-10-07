@@ -231,6 +231,8 @@ class Completor
         // Determine the VAT type for the invoice and warn if multiple vat types
         // are possible.
         $this->completeVatType();
+        // Correct NULL vat lines.
+        $this->correctNullVatLines();
         // Correct 0% and vat free rates where applicable.
         $this->correctNoVatLines();
         // Determine the vat type id for the customer
@@ -1268,6 +1270,43 @@ class Completor
                     // have a warning.
                 //   }
             }
+        }
+    }
+
+    /**
+     * Correct vat lines that have a NULL vat rate.
+     *
+     * Some lines may still have null for vat rate because earlier on, no choice
+     * could be made. However, if we were able to choose a vat type (in
+     * completeVatType()), we now might be able to reduce the possibilities
+     * to a single choice.
+     */
+    protected function correctNullVatLines()
+    {
+        if (empty($this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType])) {
+            return;
+        }
+        $vatType = $this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType];
+        foreach ($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] as &$line) {
+            if ($line[Tag::VatRate] === null && is_array($line[Meta::VatRateRangeMatches])) {
+                // See if we can find a single match based on vat type.
+                $vatRate = null;
+                foreach ($line[Meta::VatRateRangeMatches] as $vatRateMatch) {
+                    if ($vatRateMatch[Tag::VatType] === $vatType) {
+                        if ($vatRate === null) {
+                            // First match: set.
+                            $vatRate = $vatRateMatch[Tag::VatRate];
+                        } else {
+                            // 2nd match: unset, we cannot choose.
+                            $vatRate = false;
+                        }
+                    }
+                }
+                if (!empty($vatRate)) {
+                    // We have a single match, choose and set.
+                    $line[Tag::VatRate] = $vatRate;
+                }
+           }
         }
     }
 

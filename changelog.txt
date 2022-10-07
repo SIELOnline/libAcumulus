@@ -37,7 +37,6 @@ WC   WooCommerce         6.7.0               >= 5.0 (3 and 4 will probably work)
 7.4.0 (2022-10-??)
 ------------------
 Features:
-- Added support for the email invoice as pdf API call.
 - Added support for the email packing slip as pdf API call.
 
 Bugs:

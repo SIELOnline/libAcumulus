@@ -1145,7 +1145,7 @@ class InvoiceStatusForm extends Form
         }
 
         if ($invoiceStatusSettings['showPdfPackingSlip']) {
-            $uri = $this->acumulusApiClient->getPackingSlipUri($token);
+            $uri = $this->acumulusApiClient->getPackingSlipPdfUri($token);
             $text = ucfirst($this->t('packing_slip'));
             $title = sprintf($this->t('open_as_pdf'), $text);
             /** @noinspection HtmlUnknownTarget */

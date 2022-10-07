@@ -614,6 +614,7 @@ class Acumulus
      * - 'subject'
      * - 'message'
      * - 'confirmreading'
+     * - 'ubl'
      * @param int|null $invoiceType
      *   One of the constants Api::Email_Normal (default) or Api::Email_Reminder.
      * @param string $invoiceNotes
@@ -632,8 +633,6 @@ class Acumulus
      *   - TNFE4035G: Requested token not found or invalid token supplied.
      *     Unable to proceed."
      *
-     * See {@link https://siel.nl/acumulus/API/Invoicing/Email/}
-     *
      * @throws \Siel\Acumulus\ApiClient\AcumulusException|\Siel\Acumulus\ApiClient\AcumulusResponseException
      *
      * @noinspection PhpUnused
@@ -651,6 +650,46 @@ class Acumulus
             $message['invoicenotes'] = $invoiceNotes;
         }
         return $this->callApiFunction('invoices/invoice_mail', $message)->setMainAcumulusResponseKey('invoice');
+    }
+
+    /**
+     * Sends out the packing slip as PDF.
+     *
+     * See {@link https://siel.nl/acumulus/API/Delivery/Email/}
+     *
+     * @param string $token
+     *   The token for the invoice.
+     * @param array $emailAsPdf
+     *   An array with the fields:
+     *   - 'emailto'
+     *   - 'emailbcc'
+     *   - 'emailfrom'
+     *   - 'subject'
+     *   - 'message'
+     * @param string $deliveryNotes
+     *   Multiline field for additional remarks. Use \n for newlines and \t for
+     *   tabs. Contents is placed in notes/comments section of the invoice.
+     *   Content will not appear on the actual packing slip or associated emails.
+     *
+     * @return \Siel\Acumulus\ApiClient\AcumulusResult
+     *   The result of the webservice call. The structured response will contain
+     *   1 "packingslip" array, being a keyed array with keys:
+     *   - 'token'
+     *
+     * @throws \Siel\Acumulus\ApiClient\AcumulusException|\Siel\Acumulus\ApiClient\AcumulusResponseException
+     *
+     * @noinspection PhpUnused
+     */
+    public function emailPackingSlipAsPdf(string $token, array $emailAsPdf, string $deliveryNotes = ''): AcumulusResult
+    {
+        $message = [
+            'token' => $token,
+            'emailaspdf' => $emailAsPdf,
+        ];
+        if (!empty($deliveryNotes)) {
+            $message['deliverynotes'] = $deliveryNotes;
+        }
+        return $this->callApiFunction('delivery/packing_slip_mail_pdf', $message)->setMainAcumulusResponseKey('packingslip');
     }
 
     /**
@@ -845,7 +884,7 @@ class Acumulus
      *   - ZKFATNF04: Requested packing slip for $token not found or no longer
      *     available.
      */
-    public function getPackingSlipUri(string $token): string
+    public function getPackingSlipPdfUri(string $token): string
     {
         $uri = $this->constructUri('delivery/packing_slip_get_pdf');
         $uri .= "?token=$token";

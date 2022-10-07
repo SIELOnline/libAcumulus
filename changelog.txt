@@ -34,8 +34,12 @@ WC   WooCommerce         6.7.0               >= 5.0 (3 and 4 will probably work)
      WordPress           6.0                 >= 5.9 (earlier version WILL fail)
 --------------------------------------------------------------------------------
 
-7.3.3 (2022-10-??)
+7.4.0 (2022-10-??)
 ------------------
+Features:
+- Added support for the email invoice as pdf API call.
+- Added support for the email packing slip as pdf API call.
+
 Bugs:
 - All: It might be possible to determine the vat rate for a line that has
   multiple vat range matches, if and after the vat type has been determined.
@@ -50,6 +54,7 @@ Refactorings:
 - WC: Property customer_user is legacy, is now customer_id.
 - WC: Do not crash (e.g. with a "Class 'WC_Logger' not found" if WC has not yet
   been activated.
+- Renamed Acumulus::getPackingSlipUri() to Acumulus::getPackingSlipPdfUri().
 
 7.3.2 (2022-08-08)
 ------------------

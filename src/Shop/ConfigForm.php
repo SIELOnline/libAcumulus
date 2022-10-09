@@ -215,6 +215,12 @@ class ConfigForm extends BaseConfigForm
                     'description' => $this->t('desc_invoiceStatusScreenSettings') . ' ' . $this->t('desc_invoiceStatusScreenSettings2'),
                     'fields' => $this->getInvoiceStatusScreenFields(),
                 ],
+                'orderListSettingsHeader' => [
+                    'type' => 'fieldset',
+                    'legend' => $this->t('orderListSettingsHeader'),
+                    'description' => $this->t('desc_orderListSettings'),
+                    'fields' => $this->getOrderListFields(),
+                ],
             ];
         }
 
@@ -504,8 +510,25 @@ class ConfigForm extends BaseConfigForm
                 'description' => $this->t('desc_invoiceStatusScreen'),
                 'options' => [
                     'showInvoiceStatus' => $this->t('option_showInvoiceStatus'),
-                    'showPdfInvoice' => $this->t('option_showPdfInvoice'),
-                    'showPdfPackingSlip' => $this->t('option_showPdfPackingSlip'),
+                    'showPdfInvoiceDetail' => $this->t('option_showPdfInvoiceDetail'),
+                    'showPdfPackingSlipDetail' => $this->t('option_showPdfPackingSlipDetail'),
+                ],
+            ];
+        }
+        return $fields;
+    }
+
+    protected function getOrderListFields(): array
+    {
+        $fields = [];
+        if ($this->shopCapabilities->hasOrderList()) {
+            $fields['orderList'] = [
+                'type' => 'checkbox',
+                'label' => $this->t('field_orderList'),
+                'description' => $this->t('desc_orderList'),
+                'options' => [
+                    'showPdfInvoiceDetail' => $this->t('option_showPdfInvoiceList'),
+                    'showPdfPackingSlipDetail' => $this->t('option_showPdfPackingSlipList'),
                 ],
             ];
         }

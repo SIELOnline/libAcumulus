@@ -367,12 +367,20 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         // Invoice status screen settings.
         'invoiceStatusScreenSettingsHeader' => 'Factuurstatusoverzicht',
         'desc_invoiceStatusScreenSettings' => 'Acumulus kan op de detailpagina van een bestelling de status tonen van de bijbehorende factuur in Acumulus.',
-        'desc_invoiceStatusScreenSettings2' => 'Hierdoor ziet u in een oogopslag of de factuur correct is verstuurd naar Acumulus en of de betaalstatus correct is. Ook kunt u de factuurgegevens opnieuw naar Acumulus versturen of de betaalstatus aanpassen.',
+        'desc_invoiceStatusScreenSettings2' => 'Hierdoor ziet u in een oogopslag of de factuurgegevens correct zijn verstuurd naar Acumulus en of de betaalstatus correct is. Ook kunt u de factuurgegevens opnieuw naar Acumulus versturen of de betaalstatus aanpassen.',
         'desc_invoiceStatusScreen' => '• Met de eerste optie geeft u aan of u dit scherm getoond wil hebben.<br>•  Met de 2e en 3e optie geeft u aan of u downloadlinks naar deze pdf bestanden op dit scherm getoond wilt hebben. Dit zijn de pdf bestanden die Acumulus maakt, niet die van de webwinkel zelf. Als u deze bestanden niet gebruikt kun u opties 2 en 3 beter uitvinken.',
         'field_invoiceStatusScreen' => 'Welke onderdelen wilt u tonen.',
         'option_showInvoiceStatus' => 'Toon dit scherm.',
-        'option_showPdfInvoice' => 'Toon de link naar de factuur.',
-        'option_showPdfPackingSlip' => 'Toon de link naar de pakbon.',
+        'option_showPdfInvoiceDetail' => 'Toon de link naar de factuur.',
+        'option_showPdfPackingSlipDetail' => 'Toon de link naar de pakbon.',
+
+        // Order list settings.
+        'orderListSettingsHeader' => 'Bestellingenoverzicht',
+        'desc_orderListSettings' => 'Acumulus kan op de overzichtspagina van de bestellingen icons tonen om de bijbehorende factuur en/of pakbon van Acumulus te tonen.',
+        'field_orderList' => 'Welke icons wilt u tonen.',
+        'desc_orderList' => 'TODO.',
+        'option_showPdfInvoiceList' => 'Toon de link naar de factuur.',
+        'option_showPdfPackingSlipList' => 'Toon de link naar de pakbon.',
 
         // Plugin settings.
         'pluginSettingsHeader' => 'Plugin instellingen',

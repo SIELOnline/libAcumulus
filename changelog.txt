@@ -34,6 +34,15 @@ WC   WooCommerce         6.7.0               >= 5.0 (3 and 4 will probably work)
      WordPress           6.0                 >= 5.9 (earlier version WILL fail)
 --------------------------------------------------------------------------------
 
+7.4.0 (2022-10-??)
+------------------
+Features:
+- Added support for the email packing slip as pdf API call.
+
+Refactorings:
+- Renamed Acumulus::getPackingSlipUri() to Acumulus::getPackingSlipPdfUri().
+
+
 7.3.3 (2022-10-09)
 ------------------
 Bugs:
@@ -50,6 +59,7 @@ Refactorings:
 - WC: Property customer_user is legacy, is now customer_id.
 - WC: Do not crash (e.g. with a "Class 'WC_Logger' not found" if WC has not yet
   been activated.
+
 
 7.3.2 (2022-08-08)
 ------------------
@@ -76,6 +86,7 @@ Bugs:
   45 and defined in ApplySameVatRate.php:58.
 - ALL (PHP 8.1): Deprecated Functionality: preg_split(): Passing null to
   parameter #3 ($limit) of type int is deprecated.
+
 
 7.3.0 (2022-06-13)
 ------------------

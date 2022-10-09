@@ -238,7 +238,7 @@ class Config
                         break;
                     case 'bool':
                         if (!is_bool($values[$key])) {
-                            $values[$key] =  $values[$key] === '' ? '' : (bool) $values[$key];
+                            $values[$key] = $values[$key] === '' ? '' : (bool) $values[$key];
                         }
                         break;
                     case 'array':
@@ -493,10 +493,23 @@ class Config
      * @return array
      *   A keyed array with the keys:
      *   - 'showInvoiceStatus'
-     *   - 'showPdfInvoice'
-     *   - 'showPdfPackingSlip'
+     *   - 'showPdfInvoiceDetail'
+     *   - 'showPdfPackingSlipDetail'
      */
     public function getInvoiceStatusSettings(): array
+    {
+        return $this->getSettingsByGroup('status');
+    }
+
+    /**
+     * Returns the set of settings related to the invoice status tab/box.
+     *
+     * @return array
+     *   A keyed array with the keys:
+     *   - 'showPdfInvoiceList'
+     *   - 'showPdfPackingSlipList'
+     */
+    public function getSourceListSettings(): array
     {
         return $this->getSettingsByGroup('status');
     }
@@ -948,13 +961,23 @@ class Config
                     'type' => 'bool',
                     'default' => true,
                 ],
-                'showPdfInvoice' => [
+                'showPdfInvoiceDetail' => [
                     'group' => 'status',
                     'type' => 'bool',
                     'default' => true,
                 ],
-                'showPdfPackingSlip' => [
+                'showPdfInvoiceList' => [
+                    'group' => 'list',
+                    'type' => 'bool',
+                    'default' => true,
+                ],
+                'showPdfPackingSlipDetail' => [
                     'group' => 'status',
+                    'type' => 'bool',
+                    'default' => true,
+                ],
+                'showPdfPackingSlipList' => [
+                    'group' => 'list',
                     'type' => 'bool',
                     'default' => true,
                 ],

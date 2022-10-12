@@ -64,7 +64,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    public function getByInvoiceSource(Source $invoiceSource, bool $ignoreLock = true): BaseAcumulusEntry
+    public function getByInvoiceSource(Source $invoiceSource, bool $ignoreLock = true): ?BaseAcumulusEntry
     {
         /** @var \stdClass $result  (documentation error in DB) */
         $result = $this->getDb()->query(sprintf(

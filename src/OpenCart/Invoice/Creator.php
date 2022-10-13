@@ -102,7 +102,7 @@ class Creator extends BaseCreator
 
         // $product can be empty if the product has been deleted.
         /** @var \ModelCatalogProduct $model */
-        $model = $this->getRegistry()->getModel('Catalog/Product');
+        $model = $this->getRegistry()->getModel('catalog/product');
         $product = $model->getProduct($item['product_id']);
         if (!empty($product)) {
             $this->addPropertySource('product', $product);

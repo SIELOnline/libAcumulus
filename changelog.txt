@@ -44,6 +44,7 @@ Features:
 Bugs:
 - OC: Siel\Acumulus\OpenCart\Shop\AcumulusEntryManager::getByInvoiceSource():
   Return value must be of type Siel\Acumulus\Shop\AcumulusEntry, null given.
+- OC: Exception: Error: Could not load model Catalog/Product! in model:97.
 
 Refactorings:
 - Renamed Acumulus::getPackingSlipUri() to Acumulus::getPackingSlipPdfUri().

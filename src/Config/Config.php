@@ -511,7 +511,7 @@ class Config
      */
     public function getSourceListSettings(): array
     {
-        return $this->getSettingsByGroup('status');
+        return $this->getSettingsByGroup('list');
     }
 
     /**

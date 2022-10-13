@@ -38,6 +38,8 @@ WC   WooCommerce         6.7.0               >= 5.0 (3 and 4 will probably work)
 ------------------
 Features:
 - Added support for the email packing slip as pdf API call.
+- WC: Added icons to open the Acumulus invoice or packing slip from the order
+  list page.
 
 Bugs:
 - OC: Siel\Acumulus\OpenCart\Shop\AcumulusEntryManager::getByInvoiceSource():

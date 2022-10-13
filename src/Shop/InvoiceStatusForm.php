@@ -1136,7 +1136,7 @@ class InvoiceStatusForm extends Form
         $result = [];
         $links = [];
         $invoiceStatusSettings = $this->container->getConfig()->getInvoiceStatusSettings();
-        if ($invoiceStatusSettings['showPdfInvoice']) {
+        if ($invoiceStatusSettings['showPdfInvoiceDetail']) {
             $uri = $this->acumulusApiClient->getInvoicePdfUri($token);
             $text = ucfirst($this->t('invoice'));
             $title = sprintf($this->t('open_as_pdf'), $text);
@@ -1144,7 +1144,7 @@ class InvoiceStatusForm extends Form
             $links[] = sprintf('<a class="%4$s" href="%1$s" title="%3$s">%2$s</a>', $uri, $text, $title, 'pdf');
         }
 
-        if ($invoiceStatusSettings['showPdfPackingSlip']) {
+        if ($invoiceStatusSettings['showPdfPackingSlipDetail']) {
             $uri = $this->acumulusApiClient->getPackingSlipPdfUri($token);
             $text = ucfirst($this->t('packing_slip'));
             $title = sprintf($this->t('open_as_pdf'), $text);

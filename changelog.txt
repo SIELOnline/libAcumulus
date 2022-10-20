@@ -41,6 +41,11 @@ Features:
 - WC: Added icons to open the Acumulus invoice or packing slip from the order
   list page.
 
+Known problems:
+- Field references (token expansion) when manually e-mailing invoice or packing
+  slip.
+- InvoiceStatusForm contains WooCommerce specific code: refactor!
+
 Bugs:
 - OC: Siel\Acumulus\OpenCart\Shop\AcumulusEntryManager::getByInvoiceSource():
   Return value must be of type Siel\Acumulus\Shop\AcumulusEntry, null given.

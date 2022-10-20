@@ -481,6 +481,7 @@ class Config
      *   - 'emailFrom'
      *   - 'subject'
      *   - 'confirmReading'
+     *   - 'packingSlipEmailTo'
      */
     public function getEmailAsPdfSettings(): array
     {
@@ -493,8 +494,6 @@ class Config
      * @return array
      *   A keyed array with the keys:
      *   - 'showInvoiceStatus'
-     *   - 'showPdfInvoiceDetail'
-     *   - 'showPdfPackingSlipDetail'
      */
     public function getInvoiceStatusSettings(): array
     {
@@ -502,16 +501,22 @@ class Config
     }
 
     /**
-     * Returns the set of settings related to the invoice status tab/box.
+     * Returns the set of settings related to the pdf documents.
      *
      * @return array
      *   A keyed array with the keys:
-     *   - 'showPdfInvoiceList'
-     *   - 'showPdfPackingSlipList'
+     *   - 'showInvoiceDetail'
+     *   - 'mailInvoiceDetail'
+     *   - 'showPackingSlipDetail'
+     *   - 'mailPackingSlipDetail'
+     *   - 'showInvoiceList'
+     *   - 'mailInvoiceList'
+     *   - 'showPackingSlipList'
+     *   - 'mailPackingSlipList'
      */
-    public function getSourceListSettings(): array
+    public function getDocumentsSettings(): array
     {
-        return $this->getSettingsByGroup('list');
+        return $this->getSettingsByGroup('documents');
     }
 
     /**
@@ -924,15 +929,60 @@ class Config
                     'type' => 'bool',
                     'default' => true,
                 ],
+                'showInvoiceStatus' => [
+                    'group' => 'status',
+                    'type' => 'bool',
+                    'default' => true,
+                ],
+                'showInvoiceDetail' => [
+                    'group' => 'documents',
+                    'type' => 'bool',
+                    'default' => true,
+                ],
+                'mailInvoiceDetail' => [
+                    'group' => 'documents',
+                    'type' => 'bool',
+                    'default' => false,
+                ],
+                'showPackingSlipDetail' => [
+                    'group' => 'documents',
+                    'type' => 'bool',
+                    'default' => true,
+                ],
+                'mailPackingSlipDetail' => [
+                    'group' => 'documents',
+                    'type' => 'bool',
+                    'default' => false,
+                ],
+                'showInvoiceList' => [
+                    'group' => 'documents',
+                    'type' => 'bool',
+                    'default' => true,
+                ],
+                'mailInvoiceList' => [
+                    'group' => 'documents',
+                    'type' => 'bool',
+                    'default' => false,
+                ],
+                'showPackingSlipList' => [
+                    'group' => 'documents',
+                    'type' => 'bool',
+                    'default' => true,
+                ],
+                'mailPackingSlipList' => [
+                    'group' => 'documents',
+                    'type' => 'bool',
+                    'default' => false,
+                ],
                 'emailAsPdf' => [
                     'group' => Tag::EmailAsPdf,
                     'type' => 'bool',
                     'default' => false,
                 ],
                 'emailFrom' => [
-                  'group' => Tag::EmailAsPdf,
-                  'type' => 'string',
-                  'default' => '',
+                    'group' => Tag::EmailAsPdf,
+                    'type' => 'string',
+                    'default' => '',
                 ],
                 'emailTo' => [
                     'group' => Tag::EmailAsPdf,
@@ -956,30 +1006,10 @@ class Config
                     'type' => 'bool',
                     'default' => false,
                 ],
-                'showInvoiceStatus' => [
-                    'group' => 'status',
-                    'type' => 'bool',
-                    'default' => true,
-                ],
-                'showPdfInvoiceDetail' => [
-                    'group' => 'status',
-                    'type' => 'bool',
-                    'default' => true,
-                ],
-                'showPdfInvoiceList' => [
-                    'group' => 'list',
-                    'type' => 'bool',
-                    'default' => true,
-                ],
-                'showPdfPackingSlipDetail' => [
-                    'group' => 'status',
-                    'type' => 'bool',
-                    'default' => true,
-                ],
-                'showPdfPackingSlipList' => [
-                    'group' => 'list',
-                    'type' => 'bool',
-                    'default' => true,
+                'packingSlipEmailTo' => [
+                    'group' => Tag::EmailAsPdf,
+                    'type' => 'string',
+                    'default' => '',
                 ],
                 'showRatePluginMessage' => [
                     'group' => 'other',

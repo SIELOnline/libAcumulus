@@ -16,7 +16,6 @@ class RatePluginFormTranslations extends TranslationCollection
         'later' => 'Liever niet nu',
         'done_thanks' => 'Bedankt voor het beoordelen van de Acumulus %1$s.',
         'no_problem' => 'OK, geen probleem.',
-        'wait' => 'Even wachten',
         'unknown_action' => "Onbekende actie '%s'",
     ];
 
@@ -28,7 +27,6 @@ class RatePluginFormTranslations extends TranslationCollection
         'later' => 'Not now',
         'done_thanks' => 'Thank you for taking the time to review the Acumulus %1$s.',
         'no_problem' => 'OK, no problem.',
-        'wait' => 'Please wait',
         'unknown_action' => "Unknown action '%s'",
     ];
 }

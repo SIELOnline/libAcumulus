@@ -41,6 +41,8 @@ class ModuleTranslations extends TranslationCollection
         'document_show' => 'Acumulus %1$s openen in uw browser',
         'document_mail' => 'Acumulus %1$s mailen',
 
+        'wait' => 'Even wachten',
+
         // @todo: start using these 3 parameters, for now this text is
         //   overridden in all shops with only 2 parameters.
         'button_link' => '<a href="%2$s" class="%3$s">%1$s</a>',
@@ -85,5 +87,7 @@ class ModuleTranslations extends TranslationCollection
         'document_packingSlip' => 'packing slip',
         'document_show' => 'Open Acumulus %1$s in your browser',
         'document_mail' => 'Mail Acumulus %1$s',
+
+        'wait' => 'Please wait',
     ];
 }

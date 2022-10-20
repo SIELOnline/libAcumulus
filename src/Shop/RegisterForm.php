@@ -63,8 +63,6 @@ class RegisterForm extends Form
      */
     protected function validate()
     {
-        $regexpEmail = '/^[^@<>,; "\']+@([^.@ ,;]+\.)+[^.@ ,;]+$/';
-
         if (empty($this->submittedValues[Tag::Gender])) {
             $this->addFormMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_gender')), Severity::Error, Tag::Gender);
         }
@@ -103,7 +101,7 @@ class RegisterForm extends Form
 
         if (empty($this->submittedValues[Tag::Email])) {
             $this->addFormMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_email')), Severity::Error, Tag::Email);
-        } elseif (!preg_match($regexpEmail, $this->submittedValues[Tag::Email])) {
+        } elseif (!$this->isEmailAddress($this->submittedValues[Tag::Email])) {
             $this->addFormMessage($this->t('message_validate_email_0'), Severity::Error, Tag::Email);
         }
     }

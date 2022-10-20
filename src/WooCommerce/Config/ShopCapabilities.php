@@ -331,4 +331,10 @@ class ShopCapabilities extends ShopCapabilitiesBase
         }
         return parent::getLink($linkType);
     }
+
+    public function hasOrderList(): bool
+    {
+        return true;
+    }
+
 }

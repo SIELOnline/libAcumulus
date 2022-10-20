@@ -34,6 +34,8 @@ class ConfigForm extends BaseConfigForm
     {
         $this->validateAccountFields();
         $this->validateShopFields();
+        $this->validateEmailAsPdfFields();
+        $this->validateDocumentsFields();
     }
 
     /**
@@ -41,7 +43,6 @@ class ConfigForm extends BaseConfigForm
      */
     protected function validateAccountFields()
     {
-        $regexpEmail = '/^[^@<>,; "\']+@([^.@ ,;]+\.)+[^.@ ,;]+$/';
 
         if (empty($this->submittedValues[Tag::ContractCode])) {
             $this->addFormMessage($this->t('message_validate_contractcode_0'), Severity::Error, Tag::ContractCode);
@@ -69,7 +70,7 @@ class ConfigForm extends BaseConfigForm
 
         if (empty($this->submittedValues[Tag::EmailOnError])) {
             $this->addFormMessage($this->t('message_validate_email_1'), Severity::Error, Tag::EmailOnError);
-        } elseif (!preg_match($regexpEmail, $this->submittedValues[Tag::EmailOnError])) {
+        } elseif ($this->isEmailAddress($this->submittedValues[Tag::EmailOnError])) {
             $this->addFormMessage($this->t('message_validate_email_0'), Severity::Error, Tag::EmailOnError);
         }
     }
@@ -146,6 +147,65 @@ class ConfigForm extends BaseConfigForm
     }
 
     /**
+     * Validates fields in the "Email as pdf" settings fieldset.
+     */
+    protected function validateEmailAsPdfFields()
+    {
+        // Check if this fieldset was rendered.
+        if (!$this->isKey('emailTo')) {
+            return;
+        }
+
+        // Check for valid email address if no token syntax is used.
+        if (!empty($this->submittedValues['emailTo'])
+            && strpos($this->submittedValues['emailTo'], '[') === false
+            && !$this->isEmailAddress($this->submittedValues['emailTo'], true)
+        ) {
+            $this->addFormMessage($this->t('message_validate_email_5'), Severity::Error, 'emailTo');
+        }
+
+        // Check for valid email addresses if no token syntax is used.
+        if (!empty($this->submittedValues['emailBcc'])
+            && strpos($this->submittedValues['emailBcc'], '[') === false
+            && !$this->isEmailAddress($this->submittedValues['emailBcc'], true)
+        ) {
+            $this->addFormMessage($this->t('message_validate_email_3'), Severity::Error, 'emailBcc');
+        }
+
+        // Check for valid email address if no token syntax is used.
+        if (!empty($this->submittedValues['emailFrom'])
+            && strpos($this->submittedValues['emailFrom'], '[') === false
+            && !$this->isEmailAddress($this->submittedValues['emailFrom'])
+        ) {
+            $this->addFormMessage($this->t('message_validate_email_4'), Severity::Error, 'emailFrom');
+        }
+    }
+
+    /**
+     * Validates fields in the "Acumulus documents" fieldset.
+     */
+    protected function validateDocumentsFields()
+    {
+        // Check if this fieldset was rendered.
+        if (!$this->isKey('showInvoiceDetail')) {
+            return;
+        }
+
+        // Check that a mail address has been filled in when the packing slip option has been set to a mail link.
+        if (!empty($this->submittedValues['mailPackingSlipDetail']) || !empty($this->submittedValues['mailPackingSlipList'])) {
+            if (empty($this->submittedValues['packingSlipEmailTo'])) {
+                $this->addFormMessage($this->t('message_validate_packing_slip_email_0'), Severity::Error, 'packingSlipEmailTo');
+            }
+        }
+        // Check that a valid mail address has been filled in.
+        if (!empty($this->submittedValues['packingSlipEmailTo'])) {
+            if (!$this->isEmailAddress($this->submittedValues['packingSlipEmailTo'])) {
+                $this->addFormMessage($this->t('message_validate_packing_slip_email_1'), Severity::Error, 'packingSlipEmailTo');
+            }
+        }
+    }
+
+    /**
      * {@inheritdoc}
      *
      * This override returns the config form. At the minimum, this includes the
@@ -214,6 +274,12 @@ class ConfigForm extends BaseConfigForm
                     'legend' => $this->t('invoiceStatusScreenSettingsHeader'),
                     'description' => $this->t('desc_invoiceStatusScreenSettings') . ' ' . $this->t('desc_invoiceStatusScreenSettings2'),
                     'fields' => $this->getInvoiceStatusScreenFields(),
+                ],
+                'invoiceDocumentsSettingsHeader' => [
+                    'type' => 'fieldset',
+                    'legend' => $this->t('documentsSettingsHeader'),
+                    'description' => $this->t('desc_documentsSettings'),
+                    'fields' => $this->getDocumentsFields(),
                 ],
             ];
         }
@@ -504,12 +570,131 @@ class ConfigForm extends BaseConfigForm
                 'description' => $this->t('desc_invoiceStatusScreen'),
                 'options' => [
                     'showInvoiceStatus' => $this->t('option_showInvoiceStatus'),
-                    'showPdfInvoice' => $this->t('option_showPdfInvoice'),
-                    'showPdfPackingSlip' => $this->t('option_showPdfPackingSlip'),
                 ],
             ];
         }
         return $fields;
+    }
+
+    protected function getDocumentsFields(): array
+    {
+        return $this->getInvoiceDocumentFields() + $this->getPackingSlipDocumentFields();
+    }
+
+    protected function getInvoiceDocumentFields(): array
+    {
+        $fields = [];
+        $fields['invoiceSubHeader'] = [
+            'type' => 'markup',
+            'value' => '<h3>' . ucfirst($this->t("document_invoice")) . '</h3>',
+        ];
+        $fields['detailInvoice'] = [
+            'type' => 'checkbox',
+            'label' => $this->t('field_detailPage'),
+            'description' => $this->t('desc_detailPage'),
+            'options' => $this->getDocumentsOptions('Detail', 'invoice'),
+        ];
+        if ($this->shopCapabilities->hasOrderList()) {
+            $fields['listInvoice'] = [
+                'type' => 'checkbox',
+                'label' => $this->t('field_listPage'),
+                'description' => $this->t('desc_listPage'),
+                'options' => $this->getDocumentsOptions('List', 'invoice'),
+            ];
+        }
+        $fields += $this->getEmailAsPdfFields();
+        return $fields;
+    }
+
+    protected function getPackingSlipDocumentFields(): array
+    {
+        $fields = [];
+        $fields['packingSlipSubHeader'] = [
+            'type' => 'markup',
+            'value' => '<h3>' . ucfirst($this->t("document_packingSlip")) . '</h3>',
+        ];
+        $fields['detailPackingSlip'] = [
+            'type' => 'checkbox',
+            'label' => $this->t('field_detailPage'),
+            'description' => $this->t('desc_detailPage'),
+            'options' => $this->getDocumentsOptions('Detail', 'packingSlip'),
+        ];
+        if ($this->shopCapabilities->hasOrderList()) {
+            $fields['listPackingSlip'] = [
+                'type' => 'checkbox',
+                'label' => $this->t('field_listPage'),
+                'description' => $this->t('desc_listPage'),
+                'options' => $this->getDocumentsOptions('List', 'packingSlip'),
+            ];
+        }
+        $fields['packingSlipEmailTo'] = [
+            'type' => 'email',
+            'label' => $this->t('field_packingSlipEmailTo'),
+            'description' => $this->t('desc_packingSlipEmailTo') . ' ' . $this->t('msg_token'),
+            'attributes' => [
+                'size' => 30,
+            ],
+        ];
+        return $fields;
+    }
+
+    /**
+     * Returns the set of "email invoice as PDF" related fields.
+     *
+     * The fields returned:
+     * - 'emailAsPdf'
+     * - 'emailFrom'
+     * - 'emailBcc'
+     * - 'subject'
+     *
+     * @return array[]
+     *   The set of "email invoice as PDF" related fields.
+     */
+    protected function getEmailAsPdfFields(): array
+    {
+        return [
+            'emailAsPdf_cb' => [
+                'type' => 'checkbox',
+                'label' => $this->t('field_emailAsPdf'),
+                'description' => $this->t('desc_emailAsPdf'),
+                'options' => [
+                    'emailAsPdf' => $this->t('option_emailAsPdf'),
+                ],
+            ],
+            'emailTo' => [
+                'type' => 'email',
+                'label' => $this->t('field_emailTo'),
+                'description' => $this->t('desc_emailTo') . ' ' . $this->t('msg_token'),
+                'attributes' => [
+                    'size' => 60,
+                ],
+            ],
+            'emailBcc' => [
+                'type' => 'email',
+                'label' => $this->t('field_emailBcc'),
+                'description' => $this->t('desc_emailBcc') . ' ' . $this->t('msg_token'),
+                'attributes' => [
+                    'multiple' => true,
+                    'size' => 60,
+                ],
+            ],
+            'emailFrom' => [
+                'type' => 'email',
+                'label' => $this->t('field_emailFrom'),
+                'description' => $this->t('desc_emailFrom') . ' ' . $this->t('msg_token'),
+                'attributes' => [
+                    'size' => 60,
+                ],
+            ],
+            'subject' => [
+                'type' => 'text',
+                'label' => $this->t('field_subject'),
+                'description' => $this->t('desc_subject') . ' ' . $this->t('msg_token'),
+                'attributes' => [
+                    'size' => 60,
+                ],
+            ],
+        ];
     }
 
     /**
@@ -643,6 +828,20 @@ class ConfigForm extends BaseConfigForm
             Config::MarginProducts_Both => $this->t('option_marginProducts_1'),
             Config::MarginProducts_No => $this->t('option_marginProducts_2'),
             Config::MarginProducts_Only => $this->t('option_marginProducts_3'),
+        ];
+    }
+
+    protected function getDocumentsOptions(string $page, string $document): array
+    {
+
+        $label = $this->t("document_$document");
+        $show = $this->t('option_document_show');
+        $mail = $this->t('option_document_mail');
+
+        $document = ucfirst($document);
+        return [
+            "show$document$page" => sprintf($this->t('option_document'), $label, $show),
+            "mail$document$page" => sprintf($this->t('option_document'), $label, $mail),
         ];
     }
 }

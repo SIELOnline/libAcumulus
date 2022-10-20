@@ -33,6 +33,16 @@ class ModuleTranslations extends TranslationCollection
         'button_confirm_uninstall' => 'Ja, verwijder data en instellingen',
         'button_cancel_uninstall' => 'Nee, alleen uitschakelen, bewaar data en instellingen',
         'button_cancel' => 'Annuleren',
+
+        'documents' => 'Documenten',
+        'document' => 'Document',
+        'document_invoice' => 'factuur',
+        'document_packingSlip' => 'pakbon',
+        'document_show' => 'Acumulus %1$s openen in uw browser',
+        'document_mail' => 'Acumulus %1$s mailen',
+
+        'wait' => 'Even wachten',
+
         // @todo: start using these 3 parameters, for now this text is
         //   overridden in all shops with only 2 parameters.
         'button_link' => '<a href="%2$s" class="%3$s">%1$s</a>',
@@ -70,5 +80,14 @@ class ModuleTranslations extends TranslationCollection
         'click_to_toggle' => '<span>(click to show or hide)</span>',
         'date_format' => 'yyyy-mm-dd',
         'crash_admin_message' => 'An error occurred. the error message has been logged and mailed. If the error keeps occurring, please contact support. Error message: %s',
+
+        'documents' => 'Documents',
+        'document' => 'Document',
+        'document_invoice' => 'invoice',
+        'document_packingSlip' => 'packing slip',
+        'document_show' => 'Open Acumulus %1$s in your browser',
+        'document_mail' => 'Mail Acumulus %1$s',
+
+        'wait' => 'Please wait',
     ];
 }

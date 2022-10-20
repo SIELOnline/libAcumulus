@@ -859,7 +859,7 @@ class InvoiceStatusForm extends Form
         $fields = $this->getVatTypeField($entry)
                + $this->getAmountFields($source, $entry)
                + $this->getPaymentStatusFields($source, $entry)
-               + $this->getLinksField($entry['token']);
+               + $this->getLinksField($source->getId(), $entry['token']);
         if ($this->status >= self::Status_Warning) {
             $fields += $this->getSendAgainFields();
         }
@@ -1127,29 +1127,54 @@ class InvoiceStatusForm extends Form
     /**
      * Returns links to the invoice and packing slip documents.
      *
+     * @param int|string $orderId
+     * @param string $token
+     *
      * @return array[]
      *   Form field array that contains links to the documents related to this
      *   invoice.
      */
-    protected function getLinksField(string $token): array
+    protected function getLinksField($orderId, string $token): array
     {
         $result = [];
         $links = [];
-        $invoiceStatusSettings = $this->container->getConfig()->getInvoiceStatusSettings();
-        if ($invoiceStatusSettings['showPdfInvoice']) {
+        $documentsSettings = $this->container->getConfig()->getDocumentsSettings();
+
+        // @todo: change css for other webshops (so far only WC has been updated).
+        $ajaxAction = 'acumulus_ajax_action';
+        $text = ucfirst($this->t('document_invoice'));
+        if ($documentsSettings['showInvoiceDetail']) {
             $uri = $this->acumulusApiClient->getInvoicePdfUri($token);
-            $text = ucfirst($this->t('invoice'));
-            $title = sprintf($this->t('open_as_pdf'), $text);
+            $title = sprintf($this->t('document_show'), $text);
             /** @noinspection HtmlUnknownTarget */
-            $links[] = sprintf('<a class="%4$s" href="%1$s" title="%3$s">%2$s</a>', $uri, $text, $title, 'pdf');
+            $links[] = sprintf('<a class="%4$s" href="%1$s" title="%3$s">%2$s</a>', $uri, $text, $title, 'acumulus-document-invoice');
+        }
+        if ($documentsSettings['mailInvoiceDetail']) {
+            $action = 'acumulus-document-packing-slip-mail';
+            // @todo: this is woocommerce specific. Make this web shop generic!
+            $url = sprintf("admin-ajax.php?action=%s&acumulus_action=%s&order_id=%d", $ajaxAction, $action, $orderId);
+            $uri = wp_nonce_url(admin_url($url), $ajaxAction, 'acumulus_nonce');
+            $title = sprintf($this->t('document_mail'), $text);
+            /** @noinspection HtmlUnknownTarget */
+            $links[] = sprintf('<a class="%4$s" href="%1$s" title="%3$s">%2$s</a>', $uri, $text, $title, 'acumulus-ajax acumulus-document-invoice');
         }
 
-        if ($invoiceStatusSettings['showPdfPackingSlip']) {
-            $uri = $this->acumulusApiClient->getPackingSlipUri($token);
-            $text = ucfirst($this->t('packing_slip'));
-            $title = sprintf($this->t('open_as_pdf'), $text);
+        $text = ucfirst($this->t('document_packingSlip'));
+        if ($documentsSettings['showPackingSlipDetail']) {
+            $uri = $this->acumulusApiClient->getPackingSlipPdfUri($token);
+            $title = sprintf($this->t('document_show'), $text);
             /** @noinspection HtmlUnknownTarget */
-            $links[] = sprintf('<a class="%4$s" href="%1$s" title="%3$s">%2$s</a>', $uri, $text, $title, 'pdf');
+            $links[] = sprintf('<a class="%4$s" href="%1$s" title="%3$s">%2$s</a>', $uri, $text, $title, 'acumulus-document-packing-slip');
+        }
+        if ($documentsSettings['mailPackingSlipDetail']) {
+            $action = 'acumulus-document-packing-slip-mail';
+            // @todo: this is woocommerce specific. Make this web shop generic!
+            $url = sprintf("admin-ajax.php?action=%s&acumulus_action=%s&order_id=%d", $ajaxAction, $action, $orderId);
+            $uri = wp_nonce_url(admin_url($url), $ajaxAction, 'acumulus_nonce');
+
+            $title = sprintf($this->t('document_mail'), $text);
+            /** @noinspection HtmlUnknownTarget */
+            $links[] = sprintf('<a class="%4$s" href="%1$s" title="%3$s">%2$s</a>', $uri, $text, $title, 'acumulus-ajax acumulus-document-packing-slip');
         }
 
         if (!empty($links)) {

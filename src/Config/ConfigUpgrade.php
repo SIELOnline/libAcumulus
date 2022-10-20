@@ -177,6 +177,10 @@ class ConfigUpgrade
             $result = $this->upgrade640() && $result;
         }
 
+        if (version_compare($currentVersion, '7.4.0', '<')) {
+            $result = $this->upgrade740() && $result;
+        }
+
         return $result;
     }
 
@@ -522,5 +526,32 @@ class ConfigUpgrade
 
         $this->getLog()->notice('Config: updating to 6.4.0');
         return $this->getConfig()->save($values);
+    }
+
+    /**
+     * 7.4.0 upgrade.
+     *
+     * - settings to show invoice and packing slip pdf now available for
+     *   detail and list screen:
+     *   - renamed the original settings by adding 'Detail' to the end.
+     *   - introduced 2 new settings for the list page, copy value from the
+     *     original value for the detail screen.
+     *
+     * @return bool
+     */
+    protected function upgrade740(): bool
+    {
+        $newSettings = [];
+        $old = $this->getConfig()->get('showPdfInvoice');
+        if ($old !== null) {
+            $newSettings['showPdfInvoiceDetail'] = (bool) $old;
+            $newSettings['showPdfInvoiceList'] = (bool) $old;
+        }
+        $old = $this->getConfig()->get('showPdfPackingSlip');
+        if ($old !== null) {
+            $newSettings['showPdfPackingSlipDetail'] = (bool) $old;
+            $newSettings['showPdfPackingSlipList'] = (bool) $old;
+        }
+        return $this->getConfig()->save($newSettings);
     }
 }

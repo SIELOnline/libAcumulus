@@ -68,6 +68,7 @@ abstract class BaseConfigForm extends Form
                + $this->acumulusConfig->getInvoiceSettings()
                + $this->acumulusConfig->getEmailAsPdfSettings()
                + $this->acumulusConfig->getInvoiceStatusSettings()
+               + $this->acumulusConfig->getDocumentsSettings()
                + $this->acumulusConfig->getPluginSettings();
     }
 

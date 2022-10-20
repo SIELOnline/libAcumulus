@@ -85,7 +85,7 @@ class ConfigFormTranslations extends TranslationCollection
 
         // Shop settings.
         'shopSettingsHeader' => 'Over uw winkel',
-        'desc_shopSettings' => 'Met behulp van deze instellingen kan de koppeling beter: het <a href="https://wiki.acumulus.nl/index.php?page=facturen-naar-het-buitenland" target="_blank">factuurtype</a> bepalen; controles uitvoeren; en btw tarieven terugrekenen.',
+        'desc_shopSettings' => 'Met behulp van deze instellingen kan de koppeling beter: het <a href="https://wiki.acumulus.nl/index.php?page=facturen-naar-het-buitenland" target="_blank">factuurtype</a> bepalen; controles uitvoeren; en btw-tarieven terugrekenen.',
 
         'field_nature_shop' => 'Soort: wat verkoopt u?',
         'option_nature_1' => 'Zowel producten als diensten.',
@@ -97,7 +97,7 @@ class ConfigFormTranslations extends TranslationCollection
         'option_marginProducts_1' => 'Zowel nieuwe producten en/of diensten als margegoederen.',
         'option_marginProducts_2' => 'Alleen nieuwe producten en/of diensten.',
         'option_marginProducts_3' => 'Alleen margegoederen.',
-        'desc_marginProducts' => 'Geef aan of u in uw winkel margegoederen (bv. 2e-hands producten) verkoopt. Zie <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/bijzondere_regelingen/margeregeling/margeregeling" target="_blank">Margeregeling</a>.',
+        'desc_marginProducts' => 'Geef aan of u in uw winkel margegoederen (bijv. 2e-hands producten) verkoopt. Zie <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/bijzondere_regelingen/margeregeling/margeregeling" target="_blank">Margeregeling</a>.',
 
         'vat_class' => 'belastingklasse',
         'vat_classes' => 'belastingklassen',
@@ -105,33 +105,33 @@ class ConfigFormTranslations extends TranslationCollection
         'vat_class_left_empty' => '%1$s laat ik leeg',
 
         'field_euVatClasses' => 'Welke %1$s definiëren EU-btw-tarieven?',
-        'desc_euVatClasses' => 'Geef aan welke van deze %1$s gebruikt worden wanneer u EU btw berekent voor (niet btw-plichtige) EU-klanten.<br>
+        'desc_euVatClasses' => 'Geef aan welke van deze %1$s gebruikt worden wanneer u EU-btw berekent voor (niet btw-plichtige) EU-klanten.<br>
 • Kies de 1e optie ("%2$s") als u uw winkel (nog) niet hebt ingericht op deze regeling.<br>
-• Mbv de "Ctrl" toets kunt u meerdere %1$s kiezen of keuzes ongedaan maken.<br>
+• M.b.v. de "Ctrl" toets kunt u meerdere %1$s kiezen of keuzes ongedaan maken.<br>
 • NB: Sinds 1 juli 2021 gelden er <a href="https://www.belastingdienst.nl/wps/wcm/connect/nl/btw/content/e-commerce-en-diensten-in-de-eu-kijk-wat-er-verandert-voor-de-btw-x" target="_blank">nieuwe regels en drempels voor afstandsverkopen binnen de EU</a> en vallen bijna alle goederen (en diensten) hieronder.',
 
         'field_vatFreeClass' => 'Welke %1$s definieert btw-vrij?',
         'desc_vatFreeClass' => 'Geef aan welke %1$s u gebruikt om aan te geven dat een product of dienst btw-vrij is.<br>
 • Kies de 1e optie ("%2$s") als u geen btw-vrije producten of diensten aanbiedt.<br>
 • Kies de 2e optie ("%3$s") als u bij uw btw-vrije producten en diensten het veld %1$s leeg laat.<br>
-• LET OP: het gaat er om of het product of de dienst btw-vrij is, uw bedrijf voor de <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/hoe_werkt_de_btw/nieuwe-kleineondernemersregeling/kleineondernemersregeling" target="_blank"">KOR regeling</a> heeft gekozen, of een btw vrijstelling heeft. Niet of u voor specifieke situaties een factuur zonder btw opstelt.
+• LET OP: het gaat er om of het product of de dienst btw-vrij is, uw bedrijf voor de <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/hoe_werkt_de_btw/nieuwe-kleineondernemersregeling/kleineondernemersregeling" target="_blank"">KOR</a> heeft gekozen, of een btw-vrijstelling heeft. Niet of u voor specifieke situaties een factuur zonder btw opstelt.
 Ook is er een verschil met het 0%%-tarief hieronder, Dit verschil zit hem met name in de mogelijkheid tot aftrek van voorbelasting.',
 
         'field_zeroVatClass' => 'Welke %1$s definieert het 0%% btw-tarief?',
         'desc_zeroVatClass' => 'Geef aan welke %1$s u gebruikt om aan te geven dat een product of dienst onder het 0%%-tarief valt.<br>
 • Kies de 1e optie ("%2$s") als u geen producten of diensten aan aanbiedt die onder het 0%%-tarief vallen.<br>
-• LET OP 1: het 0%%-tarief is wat anders dan het btw-vrije tarief van hierboven en is in Nederland niet gebruikelijk. Momenteel (begin 2021) geldt er b.v. een uitzondering voor mondkapjes.<br>
-• LET OP 2: het gaat er om of het product of de dienst onder het 0%%-tarief valt, niet of u 0%% btw op een factuur mag noteren vanwege b.v. verkoop aan het buitenland of een factuur met verlegde btw.',
+• LET OP 1: het 0%%-tarief is wat anders dan het btw-vrije tarief van hierboven en is in Nederland niet gebruikelijk. Momenteel (begin 2021) geldt er bijv. een uitzondering voor mondkapjes.<br>
+• LET OP 2: het gaat er om of het product of de dienst onder het 0%%-tarief valt, niet of u 0%% btw op een factuur mag noteren vanwege bijv. verkoop aan het buitenland of een factuur met verlegde btw.',
 
         // Trigger settings.
         'triggerSettingsHeader' => 'Wanneer wilt u uw facturen automatisch naar Acumulus laten versturen',
-        'desc_triggerSettings' => 'Met behulp van deze instelling kunt u aangeven op welk(e) moment(en) u de factuur voor een bestelling of creditfactuur naar Acumulus wilt versturen. Als u meerdere momenten selecteert, wordt de factuur naar Acumulus verstuurd zodra de bestelling één van de gekozen statussen bereikt. Een factuur zal altijd slechts 1 keer naar Acumulus worden verstuurd. Deze koppeling gebruikt alleen gegevens van de bestelling, dus u kunt elke status kiezen. De webwinkelfactuur hoeft dus nog niet aangemaakt te zijn, tenzij u voor de factuurdatum en nummer de webwinkelfactuurdatum en nummer wilt gebruiken. Als u voor "Niet automatisch versturen" kiest, dient u de facturen zelf over te zetten m.b.v. het <a href="%s">Acumulus batchverzendformulier</a>.',
+        'desc_triggerSettings' => 'Met behulp van deze instelling kunt u aangeven op welk(e) moment(en) u de factuur voor een bestelling of creditfactuur naar Acumulus wilt versturen. Als u meerdere momenten selecteert, wordt de factuur naar Acumulus verstuurd zodra de bestelling één van de gekozen statussen bereikt. Een factuur zal altijd slechts 1 keer naar Acumulus worden verstuurd. Deze koppeling gebruikt alleen gegevens van de bestelling, dus u kunt elke status kiezen. De webwinkelfactuur hoeft dus nog niet aangemaakt te zijn, tenzij u de datum en het nummer van de webwinkelfactuur wilt gebruiken. Als u voor "Niet automatisch versturen" kiest, dient u de facturen zelf over te zetten m.b.v. het <a href="%s">Acumulus batchverzendformulier</a>.',
 
         'field_triggerOrderStatus' => 'Bestelling, op basis van bestelstatus(sen)',
-        'desc_triggerOrderStatus' => 'Mbv de "Ctrl" toets kunt u meerdere statussen kiezen.',
+        'desc_triggerOrderStatus' => 'M.b.v. de "Ctrl" toets kunt u meerdere statussen kiezen.',
         'option_empty_triggerOrderStatus' => 'Niet automatisch versturen',
 
-        'field_triggerInvoiceEvent' => 'Bestelling, op basis van webshopfactuur status',
+        'field_triggerInvoiceEvent' => 'Bestelling, op basis van webwinkelfactuur status',
         'option_triggerInvoiceEvent_0' => 'Niet automatisch versturen.',
         'option_triggerInvoiceEvent_1' => 'Als een factuur van de webwinkel wordt aangemaakt.',
         'option_triggerInvoiceEvent_2' => 'Als een factuur van de webwinkel wordt verzonden naar de klant.',
@@ -152,9 +152,9 @@ De eigenschappen die uw webshop kent worden hieronder opgesomd.</p>
 <ol class="property-list">
 <dt>[property]:</dt><dd>Eenvoudigste vorm, vervang door de waarde van deze eigenschap of method (zonder argumenten).</dd>
 <dt>[property(arguments)]:</dt><dd>Vervang door de waarde die de method property teruggeeft. Als property een method is wordt "arguments" (een komma-gescheiden reeks van argumenten zonder aanhalingstekens om tekenreeksen heen) meegegeven bij het aanroepen van de method.</dd>
-<dt>[object::property]:</dt><dd>Vervang alleen door de eigenschap als die in het opgegeven object voorkomt (zie de lijst hieronder). Gebruik dit om verwarring te voorkomen als meerdere objecten een eigenschap met dezelfde naam hebben (bv id).</dd>
-<dt>[property1|property2|...]:</dt><dd>Vervang door de waarde van property1 of als deze geen waarde heeft door die van property2, en zo verder. BV: handig om of het mobiele of het vaste telefoonnummer mee te sturen.</dd>
-<dt>[property1+property2+...]:</dt><dd>Vervang door de waarde van property1 en die van property2 en plaats tussen de properties een spatie, maar alleen als de properties niet leeg zijn. BV: handig om de volledige naam, opgebouwd uit voornaam, tussenvoegsel en achternaam, te versturen zonder dat er meerdere spaties in terecht komen.</dd>
+<dt>[object::property]:</dt><dd>Vervang alleen door de eigenschap als die in het opgegeven object voorkomt (zie de lijst hieronder). Gebruik dit om verwarring te voorkomen als meerdere objecten een eigenschap met dezelfde naam hebben (bijv. id).</dd>
+<dt>[property1|property2|...]:</dt><dd>Vervang door de waarde van property1 of als deze geen waarde heeft door die van property2, en zo verder. Bijv.: handig om of het mobiele of het vaste telefoonnummer mee te sturen.</dd>
+<dt>[property1+property2+...]:</dt><dd>Vervang door de waarde van property1 en die van property2 en plaats tussen de properties een spatie, maar alleen als de properties niet leeg zijn. Bijv.: handig om de volledige naam, opgebouwd uit voornaam, tussenvoegsel en achternaam, te versturen zonder dat er meerdere spaties in terecht komen.</dd>
 <dt>[property1&property2&...]:</dt><dd>Vervang door de waarde van property1 en die van property2 maar plaats geen spatie tussen de properties.</dd>
 <dt>["letterlijke tekst"]:</dt><dd>Vervang door de letterlijke tekst (zonder aanhalingstekens) maar alleen als het samengevoegd wordt, middels een + of &, met een andere eigenschap die niet leeg is.</dd>
 </ol>
@@ -203,7 +203,7 @@ De eigenschappen die uw webshop kent worden hieronder opgesomd.</p>
         'option_contactStatus_Disabled' => 'Nee',
 
         'field_contactYourId' => 'Klantreferentie v/d webshop',
-        'desc_contactYourId' => 'Als u van een relatie in Acumulus de webshopgegevens wilt opzoeken is het handig als Acumulus het voor de webshop unieke klantnummer ook heeft. Met behulp van dit veld wordt deze referentie in Acumulus opgeslagen. Deze kan ook op factuursjablonen gebruikt worden.',
+        'desc_contactYourId' => 'Als u van een relatie in Acumulus de webwinkelgegevens wilt opzoeken is het handig als Acumulus het voor de webwinkel unieke klantnummer ook heeft. Met behulp van dit veld wordt deze referentie in Acumulus opgeslagen. Deze kan ook op factuursjablonen gebruikt worden.',
 
         'field_companyName1' => 'Bedrijfsnaam 1',
         'field_companyName2' => 'Bedrijfsnaam 2',
@@ -230,7 +230,7 @@ De eigenschappen die uw webshop kent worden hieronder opgesomd.</p>
         'field_email' => 'Email',
 
         'field_mark' => 'Kenmerk',
-        'desc_mark' => 'U knt hier extra informatie over de klant versturen, bv het BSN. Dit veld komt overeen met het veld "kenmerk" op blad 2 van het relatiebeheer.',
+        'desc_mark' => 'U knt hier extra informatie over de klant versturen, bijv. het BSN. Dit veld komt overeen met het veld "kenmerk" op blad 2 van het relatiebeheer.',
 
         'field_clientData' => 'Klantadresgegevens',
         'option_sendCustomer' => 'Uw niet zakelijke klanten automatisch aan uw relaties in Acumulus toevoegen.',
@@ -281,20 +281,20 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
             . 'Deze %1$s kan een melding geven als u die drempel bijna heeft bereikt, en zal als u daadwerkelijk over de drempel heen gaat de factuur als concept versturen.<br>'
             . '• Vul een percentage in vanaf waar Acumulus een waarschuwing gaat geven. Gebroken percentages kunt u met een punt (.) aangeven. Het %%-teken mag u weglaten.<br>'
             . '• Vul 100 in als u geen waarschuwing vooraf wil, maar wel als u wilt dat de factuur als concept verstuurd moet worden als u met deze factuur over de drempel heen zou gaan of al bent.<br>'
-            . '• Vul 0 in als u vanaf het begin van het jaar EU btw rekent en een waarschuwing wilt ontvangen als er toch een artikel met een verkeerd btw-%% verkocht wordt.<br>'
+            . '• Vul 0 in als u vanaf het begin van het jaar EU-btw rekent en een waarschuwing wilt ontvangen als er toch een artikel met een verkeerd btw-%% verkocht wordt.<br>'
             . '• Laat leeg als u deze functie niet wilt gebruiken.',
         'message_validate_percentage_0' => 'Vul een percentage (een getal tussen 0 en 100) in voor het veld "%s".',
 
         'field_missing_amount' => 'Ontbrekend bedrag',
-        'desc_missing_amount' => 'Geef aan wat te doen als er een verschil tussen het factuurtotaal en het totaal van de factuurregels geconstateerd wordt. Normaal gesproken zal de 1e optie voldoen. Als het vaak voorkomt en de ontbrekende bedragen zjn eigenlijk altijd correct (bv. betaalkosten van een specifieke payment provider worden niet als losse regel herkend) kan de 2e optie handiger zijn. Er wordt dan al een factuurregel toegevoegd zodat de factuur alleen maar definitief gemaakt hoeft te worden. Gebruik de 3e optie als dit verschil door een instelling of andere plugin optreedt maar de factuur eigenlijk toch altijd correct is.',
+        'desc_missing_amount' => 'Geef aan wat te doen als er een verschil tussen het factuurtotaal en het totaal van de factuurregels geconstateerd wordt. Normaal gesproken zal de 1e optie voldoen. Als het vaak voorkomt en de ontbrekende bedragen zjn eigenlijk altijd correct (bijv. betaalkosten van een specifieke payment provider worden niet als losse regel herkend) kan de 2e optie handiger zijn. Er wordt dan al een factuurregel toegevoegd zodat de factuur alleen maar definitief gemaakt hoeft te worden. Gebruik de 3e optie als dit verschil door een instelling of andere plugin optreedt maar de factuur eigenlijk toch altijd correct is.',
         'option_missing_amount_2' => 'Verstuur een waarschuwing, de factuur wordt als concept verstuurd.',
         'option_missing_amount_3' => 'Voeg een correctieregel toe, de factuur zal echter nog steeds als concept verstuurd worden.',
         'option_missing_amount_1' => 'Negeer het verschil.',
 
         'field_description' => 'Toelichting',
-        'desc_description' => 'Toelichting op de factuur. Deze inhoud kan in Acumulus op een factuursjabloon getoond worden mbv de veldverwijzing [toelichting].',
+        'desc_description' => 'Toelichting op de factuur. Deze inhoud kan in Acumulus op een factuursjabloon getoond worden m.b.v. de veldverwijzing [toelichting].',
         'field_descriptionText' => 'Uitgebreide toelichting',
-        'desc_descriptionText' => 'Meerregelige toelichting op de factuur. Deze inhoud kan in Acumulus op een factuursjabloon getoond worden mbv de veldverwijzing [toelichting].',
+        'desc_descriptionText' => 'Meerregelige toelichting op de factuur. Deze inhoud kan in Acumulus op een factuursjabloon getoond worden m.b.v. de veldverwijzing [toelichting].',
         'field_invoiceNotes' => 'Notities',
         'desc_invoiceNotes' => 'Notities die u aan de factuur wilt toevoegen en die voor intern gebruik zijn bedoeld. Deze worden niet getoond op de factuursjabloon, in emails naar de klant, of op de pakbon.',
 
@@ -314,14 +314,14 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'desc_optionsSettingsHeader' => 'Een product kan opties of varianten hebben of kan samengesteld zijn. Deze opties of deelproducten kunnen op dezelfde regel als het product komen of op aparte regels daaronder. U kunt het tonen ervan ook helemaal uitzetten.',
         'desc_composedProducts' => 'NB: als het een samengesteld product betreft en de subproducten hebben verschillende btw tarieven, dan komen alle subproducten op hun eigen regel, ongeacht deze instellingen.',
         'field_showOptions' => 'Tonen',
-        'desc_showOptions' => 'Als u opties, varianten of deelproducten helemaal niet op de factuur terug wilt zien, vink deze optie dan uit. Dit kan bv. handig zijn als u de varianten of deelproducten alleen voor uw voorraadbeheer gebruikt. Als u deze instelling uitzet, dan worden de onderstaande instellingen genegeerd.',
+        'desc_showOptions' => 'Als u opties, varianten of deelproducten helemaal niet op de factuur terug wilt zien, vink deze optie dan uit. Dit kan bijv. handig zijn als u de varianten of deelproducten alleen voor uw voorraadbeheer gebruikt. Als u deze instelling uitzet, dan worden de onderstaande instellingen genegeerd.',
         'option_optionsShow' => 'Opties en deelproducten op de factuur tonen',
         'option_do_not_use' => 'Deze instelling negeren',
         'option_always' => 'Altijd',
         'field_optionsAllOn1Line' => 'T/m dit aantal opties bij hoofdproduct',
         'desc_optionsAllOn1Line' => 'Als het aantal opties van het product gelijk is aan of minder is dan deze waarde komen de opties altijd bij het hoofdproduct, ongeacht de maximale lengte die u hieronder kunt opgeven.',
         'field_optionsAllOnOwnLine' => 'Vanaf dit aantal opties op aparte regels',
-        'desc_optionsAllOnOwnLine' => 'Als het aantal opties gelijk is aan of groter is dan deze waarde komen alle opties altjd op hun eigen regel, ongeacht de maximale lengte die u hieronder kunt opgeven.',
+        'desc_optionsAllOnOwnLine' => 'Als het aantal opties gelijk is aan of groter is dan deze waarde komen alle opties altijd op hun eigen regel, ongeacht de maximale lengte die u hieronder kunt opgeven.',
         'field_optionsMaxLength' => 'Lengte omschrijving',
         'desc_optionsMaxLength' => 'Als het aantal opties tussen bovenstaande 2 waardes ligt, bepaalt de totale lengte (in aantal letters) van de omschrijvingen van de opties of deze het bij hoofdproduct geplaatst worden of toch op aparte regels.',
         'message_validate_options_0' => 'De velden "T/m dit aantal opties bij hoofdproduct" en "Vanaf dit aantal opties op aparte regels" kunnen niet allebei op "Altijd" staan.',
@@ -331,7 +331,7 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'field_sendWhat' => 'Verstuur',
         'option_sendEmptyInvoice' => 'Verstuur 0-bedrag facturen.',
         'option_sendEmptyShipping' => 'Verstuur "gratis verzending" of "zelf afhalen" regels.',
-        'desc_sendWhat' => 'Met de eerste optie geeft u aan of u 0-bedrag facturen naar Acumulus wilt versturen. Om het overzicht compleet te houden en om geen gaten in de factuurnummering te krijgen staat deze optie normaal gesproken aan. De 2e optie beperkt zicht tot het wel of niet versturen van een gratis verzending of afhelen regel binnen een factuur. Omdat Acumulus pakbonnen kan printen waar de verzendmethode op moet staan, staat deze optie normaal gesproken aan.',
+        'desc_sendWhat' => 'Met de eerste optie geeft u aan of u 0-bedrag facturen naar Acumulus wilt versturen. Om het overzicht compleet te houden en om geen gaten in de factuurnummering te krijgen staat deze optie normaal gesproken aan. De 2e optie beperkt zicht tot het wel of niet versturen van een gratis verzending of afhalen regel binnen een factuur. Omdat Acumulus pakbonnen kan printen waar de verzendmethode op moet staan, staat deze optie normaal gesproken aan.',
 
         // Settings per payment method.
         'paymentMethodAccountNumberFieldset' => 'Rekening per betaalmethode',
@@ -340,39 +340,56 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'paymentMethodCostCenterFieldset' => 'Kostenplaats per betaalmethode',
         'desc_paymentMethodCostCenterFieldset' => 'Hieronder kunt u per actieve betaalmethode een kostenplaats opgeven. De standaard kostenplaats hierboven wordt gebruikt voor betaalmethoden waarvoor u geen specifieke kostenplaats opgeeft.',
 
-        // Email as pdf settings.
-        'emailAsPdfSettingsHeader' => 'PDF Factuur',
-        'desc_emailAsPdfSettings' => 'Bij het versturen van bestellinggegevens naar Acumulus, kunt u Acumulus een PDF factuur laten versturen naar uw klant. Deze wordt dan direct verstuurd naar het opgegeven emailadres.',
-
-        'field_emailAsPdf' => 'Optie inschakelen',
-        'option_emailAsPdf' => 'Verstuur de factuur als PDF vanuit Acumulus.',
-        'desc_emailAsPdf' => 'Als u deze optie aanvinkt, kunt u de overige opties gebruiken om de emailverzending aan uw wensen aan te passen. Het bericht in de email body kunt u niet hier instellen, dat kunt u in Acumulus doen onder "Beheer - Factuur-sjablonen".',
-        'message_validate_conflicting_options' => 'Als u geen klantgegevens naar Acumulus verstuurt, kunt u Acumulus geen PDF factuur laten versturen. Pas één van beide opties aan.',
-
-        'field_emailTo' => 'Aan',
-        'desc_emailTo' => 'Het email adres waar naartoe de factur verstuurd moet worden. Als u dit leeg laat wordt het emailadres uit de klantgegevens van de factuur gebruikt. Wij adviseren dit veld leeg te laten. U mag meerdere email adressen invullen, gescheiden door een komma (,) of een punt-komma (;).',
-        'message_validate_email_5' => 'Het veld Aan bevat geen geldig e-mailadres, vul een correct e-mailadres in.',
-
-        'field_emailBcc' => 'BCC',
-        'desc_emailBcc' => 'Additioneel emailadres om de factuur naar toe te sturen, bv. het emailadres van uw eigen administratie-afdeling. Als u dit leeg laat wordt de factuur alleen naar de klant verstuurd. U mag meerdere email adressen invullen, gescheiden door een komma (,) of een punt-komma (;).',
-        'message_validate_email_3' => 'Het veld BCC bevat geen geldig e-mailadres, vul een correct e-mailadres in.',
-
-        'field_emailFrom' => 'Afzender',
-        'desc_emailFrom' => 'Het email adres dat als afzender gebruikt moet worden. Als u dit leeg laat wordt het emailadres uit het Acumulus sjabloon gebruikt.',
-        'message_validate_email_4' => 'Het veld Afzender bevat geen geldig e-mailadres, vul een correct e-mailadres in.',
-
-        'field_subject' => 'Onderwerp',
-        'desc_subject' => 'Het onderwerp van de email. Als u dit leeg laat wordt "Factuur [nummer] [omschrijving]" gebruikt. Let op: als u Acumulus het factuurnummer laat bepalen, is het helaas niet mogelijk om naar het factuurnnummer te verwijzen.',
-
         // Invoice status screen settings.
         'invoiceStatusScreenSettingsHeader' => 'Factuurstatusoverzicht',
         'desc_invoiceStatusScreenSettings' => 'Acumulus kan op de detailpagina van een bestelling de status tonen van de bijbehorende factuur in Acumulus.',
-        'desc_invoiceStatusScreenSettings2' => 'Hierdoor ziet u in een oogopslag of de factuur correct is verstuurd naar Acumulus en of de betaalstatus correct is. Ook kunt u de factuurgegevens opnieuw naar Acumulus versturen of de betaalstatus aanpassen.',
-        'desc_invoiceStatusScreen' => '• Met de eerste optie geeft u aan of u dit scherm getoond wil hebben.<br>•  Met de 2e en 3e optie geeft u aan of u downloadlinks naar deze pdf bestanden op dit scherm getoond wilt hebben. Dit zijn de pdf bestanden die Acumulus maakt, niet die van de webwinkel zelf. Als u deze bestanden niet gebruikt kun u opties 2 en 3 beter uitvinken.',
-        'field_invoiceStatusScreen' => 'Welke onderdelen wilt u tonen.',
+        'desc_invoiceStatusScreenSettings2' => 'Hierdoor ziet u in een oogopslag of de factuurgegevens correct zijn verstuurd naar Acumulus en of de betaalstatus correct is. Ook kunt u de factuurgegevens opnieuw naar Acumulus versturen of de betaalstatus aanpassen.',
+        'desc_invoiceStatusScreen' => 'Met deze optie geeft u aan of u dit overzicht getoond wil hebben.',
+        'field_invoiceStatusScreen' => 'Statusoverzicht tonen',
         'option_showInvoiceStatus' => 'Toon dit scherm.',
-        'option_showPdfInvoice' => 'Toon de link naar de factuur.',
-        'option_showPdfPackingSlip' => 'Toon de link naar de pakbon.',
+
+        // Documents handling
+        'documentsSettingsHeader' => 'Acumulus documenten',
+        'desc_documentsSettings' => 'Acumulus kan voor alle facturen die u naar Acumulus stuurt, een pdf-document voor de factuur of voor de pakbon maken. Deze documenten:<br>
+• Kunt u in uw browser openen.<br>
+• De factuur kunt u mailen naar de klant, met optioneel een bcc naar een eigen adres.<br>
+• De pakbon kunt u naar een (intern) adres mailen.<br>
+• In het profielgedeelte van de klant kunt u ook links naar deze pdf-bestanden plaatsen, maar dit valt buiten de mogelijkheden van deze plugin zelf en vergt custom code.<br>
+Hieronder kunt u instellen hoe u deze documenten wil gebruiken.
+Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel zelf. Als u deze bestanden niet gebruikt kunt u deze opties beter niet aanvinken.',
+        'field_detailPage' => 'Detailpagina',
+        'desc_detailPage' => 'Geef aan of u in het factuurstatusoverzicht, zie hierboven, buttons wil tonen voor de verschillende Acumulus documenten en hun acties.',
+        'field_listPage' => 'Overzichtspagina',
+        'desc_listPage' => 'Geef aan of u op de overzichtspagina met de lijst van bestellingen, buttons wil tonen voor de verschillende Acumulus documenten en hun acties.',
+        'option_document' => 'Toon een link om de Acumulus %1s %2s.',
+        'option_document_show' => 'in uw browser te tonen',
+        'option_document_mail' => 'te mailen',
+
+        // Email invoice settings.
+        'field_emailAsPdf' => 'Factuur automatisch versturen',
+        'option_emailAsPdf' => 'Laat Acumulus de pdf van de factuur automatisch mailen, direct nadat de factuurgegevens naar Acumulus verzonden zijn.',
+        'desc_emailAsPdf' => 'Als u mail-opties hebt aangevinkt, kunt u de verdere opties gebruiken om de e-mailverzending aan uw wensen aan te passen. Het bericht in de email body kunt u niet hier instellen, dat kunt u in Acumulus doen onder "Beheer - Factuur-sjablonen". Merk nog op dat als u geen klantgegevens naar Acumulus verstuurt (geavanceerde instelling), Acumulus geen factuur-pdf kan versturen.',
+
+        'field_emailTo' => 'Aan',
+        'desc_emailTo' => 'Het e-mailadres waar naartoe de factuur verstuurd moet worden. Als u dit leeg laat wordt het e-mailadres uit de klantgegevens van de factuur gebruikt. Wij adviseren dit veld leeg te laten. U mag meerdere e-mailadressen invullen, gescheiden door een komma (,) of een punt-komma (;).',
+        'message_validate_email_5' => 'Het veld Aan bevat geen geldig e-mailadres, vul een correct e-mailadres in.',
+
+        'field_emailBcc' => 'bcc',
+        'desc_emailBcc' => 'Additioneel e-mailadres om de factuur naar toe te sturen, bijv. het e-mailadres van uw eigen administratie-afdeling. Als u dit leeg laat wordt de factuur alleen naar de klant verstuurd. U mag meerdere e-mailadressen invullen, gescheiden door een komma (,) of een punt-komma (;).',
+        'message_validate_email_3' => 'Het veld "bcc" bevat geen geldig e-mailadres, vul een correct e-mailadres in.',
+
+        'field_emailFrom' => 'Afzender',
+        'desc_emailFrom' => 'Het e-mailadres dat als afzender gebruikt moet worden. Als u dit leeg laat wordt het e-mailadres uit het Acumulus sjabloon gebruikt.',
+        'message_validate_email_4' => 'Het veld "Afzender" bevat geen geldig e-mailadres, vul een correct e-mailadres in.',
+
+        'field_subject' => 'Onderwerp',
+        'desc_subject' => 'Het onderwerp van de email. Als u dit leeg laat wordt "Factuur [nummer] [omschrijving]" gebruikt. Let op: als u Acumulus het factuurnummer laat bepalen, is het helaas niet mogelijk om naar het factuurnummer te verwijzen.',
+
+        //  Email packing slip settings.
+        'field_packingSlipEmailTo' => 'E-mailadres voor de pakbon',
+        'desc_packingSlipEmailTo' => 'Vul het e-mailadres in waar naartoe u de pakbon wilt sturen, dit kan bijv. het e-mailadres van iemand of een printer in uw magazijn zijn. Dit veld wordt alleen gebruikt als u hierboven e-mailopties voor de pakbon hebt aangevinkt.',
+        'message_validate_packing_slip_email_0' => 'Als u de optie "Toon een link om de pdf te mailen." kiest voor de pakbon, is het veld "E-mailadres voor de pakbon" verplicht. Vul een e-mailadres in.',
+        'message_validate_packing_slip_email_1' => 'Het veld "E-mailadres voor de pakbon" bevat geen geldig e-mailadres, vul een correct e-mailadres in.',
 
         // Plugin settings.
         'pluginSettingsHeader' => 'Plugin instellingen',
@@ -380,7 +397,7 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'field_debug' => 'Factuur verzendmodus',
         'option_debug_1' => 'Ontvang alleen een mail bij fouten, waarschuwingen, of opmerkingen tijdens het verzenden van een factuur naar Acumulus.',
         'option_debug_2' => 'Ontvang altijd een mail met de resultaten bij het verzenden van een factuur naar Acumulus.',
-        'option_debug_3' => 'Verstuur facturen in testmodus naar Acumulus. Acumulus zal de factuur controleren op fouten en waarschuwingen maar zal deze niet opslaan. U ontvangt alijd een mail met de resultaten.',
+        'option_debug_3' => 'Verstuur facturen in testmodus naar Acumulus. Acumulus zal de factuur controleren op fouten en waarschuwingen maar zal deze niet opslaan. U ontvangt altijd een mail met de resultaten.',
         'option_debug_4' => 'Verzend berichten niet naar Acumulus maar ontvang wel een mail met het bericht zoals dat verstuurd zou zijn.',
         'desc_debug' => 'U kunt hier een verzendmodus kiezen. Kies voor de eerste optie tenzij u i.v.m. een supportverzoek bent geïnstrueerd om iets anders te kiezen.',
 
@@ -538,7 +555,7 @@ The properties known by your web shop are listed below.</p>
 <dt>[property]:</dt><dd>Simplest form, replace by the value of the property or method (without arguments).</dd>
 <dt>[property(arguments)]:</dt><dd>Replace by the return value of the method. "arguments" is a comma-separated list of arguments to pass to the method. Do not use quotes around strings.</dd>
 <dt>[object::property]:</dt><dd>Replace by the value of the property but only if that property is part of the given object (see list below). Use this to get the correct value if multiple objects have a property with the same name (e.g. id).</dd>
-<dt>[property1|property2|...]:</dt><dd>Replace by the value of property1, or if that does not have a value by that of property2, etc. Example: useful to get either the mobile OR land line number.</dd>
+<dt>[property1|property2|...]:</dt><dd>Replace by the value of property1, or if that does not have a value by that of property2, etc. Example: useful to get either the mobile OR landline number.</dd>
 <dt>[property1+property2+...]:</dt><dd>Replace by the value of property1 and that of property2 with 1 space between it, but only if both values are not empty. Example: useful to get the full name, constructed of first, middle and last name.</dd>
 <dt>[property1&property2&...]:</dt><dd>Replace by the value of property1 and that of property2 but with no space between it.</dd>
 <dt>["literal text"]:</dt><dd>Replace by the literal text (without quotes) but only if it is combined, using + or &, with another non-empty property.</dd>
@@ -587,7 +604,7 @@ The properties known by your web shop are listed below.</p>
         'option_contactStatus_Disabled' => 'No',
 
         'field_contactYourId' => 'Web shop customer reference',
-        'desc_contactYourId' => 'If you want to search the customer data of the webshop for a relation in Acumulus, it can be handy to have its unique reference as used by your webhop ready in Acumulus. Use this field to define which field the web shop uses as customer reference.',
+        'desc_contactYourId' => 'If you want to search the customer data of the webshop for a relation in Acumulus, it can be handy to have its unique reference as used by your webshop ready in Acumulus. Use this field to define which field the web shop uses as customer reference.',
         'field_companyName1' => 'Company name 1',
         'field_companyName2' => 'Company name 2',
 
@@ -607,9 +624,9 @@ The properties known by your web shop are listed below.</p>
         'field_postalCode' => 'Postal code',
         'field_city' => 'City',
         'field_telephone' => 'Phone',
-        'desc_telephone' => 'The phone numnber you want ot store in Acumulus. Acumulus only stores 1 phone number. So if your web shop stores both a land line and mobile number you will have to choose which one you prefer to store in Acumulus. Use the | character to list alternative phone number fields, so you get a phone number regardless in which field it was filled in.',
+        'desc_telephone' => 'The phone number you want to store in Acumulus. Acumulus only stores 1 phone number. So if your web shop stores both a land line and mobile number you will have to choose which one you prefer to store in Acumulus. Use the | character to list alternative phone number fields, so you get a phone number regardless in which field it was filled in.',
         'field_fax' => 'Fax',
-        'desc_fax' => 'Most web shops do not store a fax number. So leave empty or "use" it to store both mobile and land line mumber (if your web shop does store both).',
+        'desc_fax' => 'Most web shops do not store a fax number. So leave empty or "use" it to store both mobile and land line number (if your web shop does store both).',
         'field_email' => 'Email',
 
         'field_mark' => 'Mark',
@@ -723,14 +740,35 @@ If you unchecked the first option, the second option only applies to business cl
         'paymentMethodCostCenterFieldset' => 'Cost center per payment method',
         'desc_paymentMethodCostCenterFieldset' => 'Below you can enter a cost center to use per (active) payment method. The default above serves as fallback for payment methods for which you do not specify a cost center.',
 
-        // Email as pdf settings.
-        'emailAsPdfSettingsHeader' => 'PDF Invoice',
-        'desc_emailAsPdfSettings' => 'On sending the order details to Acumulus, Acumulus can send a PDF invoice to your customer. The mail will immediately be sent to the given email address.',
+        // Invoice status screen settings.
+        'invoiceStatusScreenSettingsHeader' => 'Invoice status overview',
+        'desc_invoiceStatusScreenSettings' => 'On the detail page of an order, Acumulus can show the status of the accompanying invoice in Acumulus.',
+        'desc_invoiceStatusScreenSettings2' => 'This allows you to easily check if the invoice was correctly sent and if the payment status is still correct. You can also resend the invoice data or change the payment status.',
+        'desc_invoiceStatusScreen' => 'This option indicates whether you want to show this screen.',
+        'field_invoiceStatusScreen' => 'Show this screen.',
+        'option_showInvoiceStatus' => 'Show invoice status screen.',
 
-        'field_emailAsPdf' => 'Enable the feature',
-        'option_emailAsPdf' => 'Have Acumulus send the invoice as PDF.',
-        'desc_emailAsPdf' => 'If you check this option, you can use the other options below to configure the emails to your preferences. However, to configure the text in the mail body, go to Acumulus to "Settings » Invoice templates".',
-        'message_validate_conflicting_options' => 'If you don\'t send customer data to Acumulus, Acumulus cannot send PDF invoices. Change one of the options.',
+        // Documents handling
+        'documentsSettingsHeader' => 'Acumulus documents',
+        'desc_documentsSettings' => 'Acumulus can create pdf documents for the invoice or packing slip for all invoices sent to Acumulus. These documents:<br>
+• Can be opened by you in your browser.<br>
+• The invoice can be mailed to your customer, with an optional bcc to one of your own addresses.<br>
+• The packing slip can be mailed to a(n internal) address.<br>
+• In the profile part of your customer, you can place links to these pdf documents, but this features falls outside the scope of this plugin and requires some custom code.<br>
+Below you can define how to use these documents.
+Please note that these documents are created by Acumulus, not the web shop. If you do not use these documents, you better not enable these options',
+        'field_detailPage' => 'Detail page',
+        'desc_detailPage' => 'Indicate if and which buttons you want to show on the "Invoice status overview", see above, for the various documents and their actions.',
+        'field_listPage' => 'Order list',
+        'desc_listPage' => 'Indicate if and which buttons you want to show on the "Order list overview" for the various documents and their actions.',
+        'option_document' => 'Show a link to %2$s the Acumulus %1s.',
+        'option_document_show' => 'open',
+        'option_document_mail' => 'mail',
+
+        // Email invoice settings.
+        'field_emailAsPdf' => 'Send invoice automatically',
+        'option_emailAsPdf' => 'Have Acumulus send the invoice, as a PDF, to your customer, directly after sending the invoice data to Acumulus.',
+        'desc_emailAsPdf' => 'If you enabled mail options, you can customise the mail sending process with the settings below. Note that the message in the mail body cannot be changed here, you can do that in Acumulus by going to menu-item "Beheer - Factuur-sjablonen". Please note that if you don\'t send customer data to Acumulus (advanced setting), Acumulus cannot send invoice-pdfs.',
 
         'field_emailTo' => 'To',
         'desc_emailTo' => 'The email address to send the invoice to. If you leave this empty the email address from the invoice\'s customer data will be used. We recommend you to leave this empty. You may enter multiple email addresses separated by a comma (,) or a semi-colon (;).',
@@ -747,6 +785,12 @@ If you unchecked the first option, the second option only applies to business cl
         'desc_emailFrom' => 'The email address to use as sender. If you leave this empty, the email address of the Acumulus template will be used. We recommend you to leave this empty.',
         'message_validate_email_4' => 'The field Sender is not a valid e-mail address, please fill in a valid e-mail address.',
 
+        //  Email packing slip settings.
+        'field_packingSlipEmailTo' => 'Email address for the packing slip',
+        'desc_packingSlipEmailTo' => 'Fill in the email address to which you want to send the packing slip. This can be, e.g, the address of someone or some printer in your warehouse. This field will only ne used if you enabled mail options for the packing slip.',
+        'message_validate_packing_slip_email_0' => 'If you enabled one or more of the options to mail a packing slip, than is the field "Email address for the packing slip" required. Fill in an e-mail address.',
+        'message_validate_packing_slip_email_1' => 'The field "Email address for the packing slip" is not a valid e-mail address, please fill in a valid e-mail address.',
+
         // Plugin settings.
         'pluginSettingsHeader' => 'Plugin settings',
 
@@ -762,16 +806,6 @@ If you unchecked the first option, the second option only applies to business cl
         'option_logLevel_4' => 'Log error messages, warnings, and operational and informational notices.',
         'option_logLevel_5' => 'Log error messages, warnings, notices, and communication messages.',
         'desc_logLevel' => 'Select a log level. Choose for the 1st or 2nd option unless otherwise instructed by support staff.',
-
-        // Invoice status screen settings.
-        'invoiceStatusScreenSettingsHeader' => 'Invoice status overview',
-        'desc_invoiceStatusScreenSettings' => 'On the detail page of an order, Acumulus can show the status of the accompanying invoice in Acumulus.',
-        'desc_invoiceStatusScreenSettings2' => 'This allows you to easily check if the invoice was correctly sent and if the payment status is still correct. You can also resend the invoice data or change the payment status.',
-        'desc_invoiceStatusScreen' => 'The 1st option indicates whether you want to show this screen at all. Use the 2nd and 3rd option to indicate whether you want to show download links to these pdf files. These are the pdf files from Acumulus, not from your webshop! If you don\'t use them, you better uncheck these options.',
-        'field_invoiceStatusScreen' => 'What parts do you want to show.',
-        'option_showInvoiceStatus' => 'Show this screen.',
-        'option_showPdfInvoice' => 'Show the link to the invoice.',
-        'option_showPdfPackingSlip' => 'Show the link to the packing slip.',
 
         // Link to other config form.
         'desc_advancedSettings' => 'This plugin is highly configurable and therefore this form does not contain all settings. You can find the other settings in the "%1$s" under "%2$s". Once you have completed and saved the settings over here, you can visit that form to fill in the advanced settings.',

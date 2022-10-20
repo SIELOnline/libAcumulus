@@ -384,4 +384,15 @@ abstract class ShopCapabilities
     {
         return true;
     }
+
+    /**
+     * Returns whether our module for this shop (already) implements the
+     * features on the Order list screen.
+     *
+     * @return bool
+     */
+    public function hasOrderList(): bool
+    {
+        return false;
+    }
 }

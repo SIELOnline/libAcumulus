@@ -193,7 +193,7 @@ class FormHelper
     /**
      * Returns a flat array of the posted values.
      *
-     * As especially checkbox handling differs per web shop, often resulting in
+     * As especially checkbox handling differs per webshop, often resulting in
      * an array of checkbox values, this method returns a flattened version of
      * the posted values.
      */

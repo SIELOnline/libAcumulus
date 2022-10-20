@@ -30,7 +30,6 @@ class InvoiceStatusFormTranslations extends TranslationCollection
         'entry_concept_not_updated' => 'Deze conceptfactuur is definitief gemaakt, maar lokaal de link aanpassen naar deze definitieve factuur is mislukt.',
         'entry_concept_not_id' => 'Deze conceptfactuur is definitief gemaakt, maar we kunnen het nieuwe boekstuknummer niet achterhalen.',
         'messages' => 'Meldingen',
-        'wait' => 'Even wachten',
         'invoice_status_unknown' => "Onbekende status '%s'",
         'unknown_action' => "Onbekende actie '%s'",
         'unknown_source' => 'Onbekende %s %u',
@@ -69,13 +68,6 @@ class InvoiceStatusFormTranslations extends TranslationCollection
         'undelete' => 'Herstel verwijderde boeking',
         'set_paid' => 'Zet op Betaald',
         'set_due' => 'Zet op Niet betaald',
-
-        // Links to pdf documents.
-        'documents' => 'Documenten',
-        'document' => 'Document',
-        'invoice' => 'factuur',
-        'packing_slip' => 'pakbon',
-        'open_as_pdf' => 'Acumulus %1$s openen als pdf',
     ];
 
     protected $en = [
@@ -100,7 +92,6 @@ class InvoiceStatusFormTranslations extends TranslationCollection
         'entry_concept_not_updated' => 'This concept invoice has been turned into a definitive invoice, but locally updating the link to the definitive invoice failed.',
         'entry_concept_not_id' => 'This concept invoice has been turned into a definitive invoice, but we cannot find out its new entry number.',
         'messages' => 'Messages',
-        'wait' => 'Please wait',
         'invoice_status_unknown' => "Unknown status '%s'",
         'unknown_action' => "Unknown action '%s'",
         'unknown_source' => 'Unknown %s %u',
@@ -139,12 +130,5 @@ class InvoiceStatusFormTranslations extends TranslationCollection
         'undelete' => 'Restore deleted invoice',
         'set_paid' => 'Set paid',
         'set_due' => 'Set due',
-
-        // Links to pdf documents.
-        'documents' => 'Documents',
-        'document' => 'Document',
-        'invoice' => 'invoice',
-        'packing_slip' => 'packing slip',
-        'open_as_pdf' => 'Open Acumulus %1$s as pdf',
     ];
 }

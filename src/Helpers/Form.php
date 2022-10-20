@@ -618,6 +618,24 @@ abstract class Form extends MessageCollection
     }
 
     /**
+     * Checks if a string is a valid (list of) e-mail address(es).
+     *
+     * @param string $submittedValue
+     *   The value to check.
+     * @param bool $multi
+     *   Whether to allow multiple e-mail addresses separated by a ',' or ';'.
+     *
+     * @return bool
+     */
+    public function isEmailAddress(string $submittedValue, bool $multi = false): bool
+    {
+        $regexpEmail = '[^@<>,; "\']+@([^.@ ,;]+\.)+[^.@ ,;]+';
+        $regexpSingle = '/^' . $regexpEmail . '$/';
+        $regexpMulti = '/^' . $regexpEmail . '([,;]' . $regexpEmail . ')*$/';
+        return !preg_match($multi ? $regexpMulti : $regexpSingle, $submittedValue);
+    }
+
+    /**
      * Converts a picklist response into a set of options, e.g. for a dropdown.
      * A picklist is a list of items that have the following structure:
      * - Each picklist item contains an identifying value in the 1st entry.

@@ -18,20 +18,8 @@ class AdvancedConfigForm extends BaseConfigForm
      */
     protected function validate()
     {
-        $this->validateRelationFields();
         $this->validateInvoiceFields();
         $this->validateOptionsFields();
-        $this->validateEmailAsPdfFields();
-    }
-
-    /**
-     * Validates fields in the relation management settings fieldset.
-     */
-    protected function validateRelationFields()
-    {
-        if (empty($this->submittedValues['sendCustomer']) && !empty($this->submittedValues['emailAsPdf'])) {
-            $this->addFormMessage($this->t('message_validate_conflicting_options'), Severity::Warning);
-        }
     }
 
     /**
@@ -62,29 +50,6 @@ class AdvancedConfigForm extends BaseConfigForm
 
         if (isset($this->submittedValues['optionsMaxLength']) && !ctype_digit($this->submittedValues['optionsMaxLength'])) {
             $this->addFormMessage($this->t('message_validate_options_2'), Severity::Error, 'optionsMaxLength');
-        }
-    }
-
-    /**
-     * Validates fields in the "Email as pdf" settings fieldset.
-     */
-    protected function validateEmailAsPdfFields()
-    {
-        // Check for valid email address if no token syntax is used.
-        $regexpEmail = '/^[^@<>,; "\']+@([^.@ ,;]+\.)+[^.@ ,;]+$/';
-        if (!empty($this->submittedValues['emailTo']) && strpos($this->submittedValues['emailTo'], '[') === false && !preg_match($regexpEmail, $this->submittedValues['emailTo'])) {
-            $this->addFormMessage($this->t('message_validate_email_5'), Severity::Error, 'emailTo');
-        }
-
-        // Check for valid email addresses if no token syntax is used.
-        $regexpMultiEmail = '/^[^@<>,; "\']+@([^.@ ,;]+\.)+[^.@ ,;]+([,;][^@<>,; "\']+@([^.@ ,;]+\.)+[^.@ ,;]+)*$/';
-        if (!empty($this->submittedValues['emailBcc']) && strpos($this->submittedValues['emailBcc'], '[') === false && !preg_match($regexpMultiEmail, $this->submittedValues['emailBcc'])) {
-            $this->addFormMessage($this->t('message_validate_email_3'), Severity::Error, 'emailBcc');
-        }
-
-        // Check for valid email address if no token syntax is used.
-        if (!empty($this->submittedValues['emailFrom']) && strpos($this->submittedValues['emailFrom'], '[') === false && !preg_match($regexpEmail, $this->submittedValues['emailFrom'])) {
-            $this->addFormMessage($this->t('message_validate_email_4'), Severity::Error, 'emailFrom');
         }
     }
 
@@ -158,12 +123,6 @@ class AdvancedConfigForm extends BaseConfigForm
                     'legend' => $this->t('optionsSettingsHeader'),
                     'description' => $this->t('desc_optionsSettingsHeader'),
                     'fields' => $this->getOptionsFields(),
-                ],
-                'emailAsPdfSettingsHeader' => [
-                    'type' => 'fieldset',
-                    'legend' => $this->t('emailAsPdfSettingsHeader'),
-                    'description' => $this->t('desc_emailAsPdfSettings'),
-                    'fields' => $this->getEmailAsPdfFields(),
                 ],
             ];
         }
@@ -664,66 +623,6 @@ class AdvancedConfigForm extends BaseConfigForm
             ],
         ];
     }
-
-    /**
-     * Returns the set of "email invoice as PDF" related fields.
-     *
-     * The fields returned:
-     * - 'emailAsPdf'
-     * - 'emailFrom'
-     * - 'emailBcc'
-     * - 'subject'
-     *
-     * @return array[]
-     *   The set of "email invoice as PDF" related fields.
-     */
-    protected function getEmailAsPdfFields(): array
-    {
-        return [
-            'emailAsPdf_cb' => [
-                'type' => 'checkbox',
-                'label' => $this->t('field_emailAsPdf'),
-                'description' => $this->t('desc_emailAsPdf'),
-                'options' => [
-                    'emailAsPdf' => $this->t('option_emailAsPdf'),
-                ],
-            ],
-            'emailTo' => [
-                'type' => 'email',
-                'label' => $this->t('field_emailTo'),
-                'description' => $this->t('desc_emailTo') . ' ' . $this->t('msg_token'),
-                'attributes' => [
-                    'size' => 60,
-                ],
-            ],
-            'emailBcc' => [
-                'type' => 'email',
-                'label' => $this->t('field_emailBcc'),
-                'description' => $this->t('desc_emailBcc') . ' ' . $this->t('msg_token'),
-                'attributes' => [
-                    'multiple' => true,
-                    'size' => 60,
-                ],
-            ],
-            'emailFrom' => [
-                'type' => 'email',
-                'label' => $this->t('field_emailFrom'),
-                'description' => $this->t('desc_emailFrom') . ' ' . $this->t('msg_token'),
-                'attributes' => [
-                    'size' => 60,
-                ],
-            ],
-            'subject' => [
-                'type' => 'text',
-                'label' => $this->t('field_subject'),
-                'description' => $this->t('desc_subject') . ' ' . $this->t('msg_token'),
-                'attributes' => [
-                    'size' => 60,
-                ],
-            ],
-        ];
-    }
-
 
     /**
      * Returns the set of fields introducing the advanced config forms.

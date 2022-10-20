@@ -63,7 +63,7 @@ class AcumulusTest extends TestCase
             'emailInvoice' => ['emailInvoiceAsPdf', ['TOKEN', ['emailto' => 'test@example.com']], 'invoices/invoice_mail', true, ['token' => 'TOKEN', 'emailaspdf' => ['emailto' => 'test@example.com']]],
             'emailInvoiceReminder' => ['emailInvoiceAsPdf', ['TOKEN', ['emailto' => 'test@example.com'], Api::Email_Reminder], 'invoices/invoice_mail', true, ['token' => 'TOKEN', 'invoicetype' => Api::Email_Reminder, 'emailaspdf' => ['emailto' => 'test@example.com']]],
             'emailInvoiceNotes' => ['emailInvoiceAsPdf', ['TOKEN', ['emailto' => 'test@example.com'], null, 'my notes'], 'invoices/invoice_mail', true, ['token' => 'TOKEN', 'emailaspdf' => ['emailto' => 'test@example.com'], 'invoicenotes' => 'my notes']],
-            'emailPackingSLip' => ['emailPackingSlipAsPdf', ['TOKEN', ['emailto' => 'test@example.com']], 'delivery/packing_slip_mail_pdf', true,
+            'emailPackingSlip' => ['emailPackingSlipAsPdf', ['TOKEN', ['emailto' => 'test@example.com']], 'delivery/packing_slip_mail_pdf', true,
                 ['token' => 'TOKEN', 'emailaspdf' => ['emailto' => 'test@example.com']]],
             'Signup' => ['signup', [['companyname' => 'BR']], 'signup/signup', false, ['signup' => ['companyname' => 'BR']]],
             'stockAdd' => ['stockAdd', [12345, 1, 'description', '2022-02-02'], 'stock/stock_add', true, ['stock' => ['productid' => 12345, 'stockamount' => 1, 'stockdescription' => 'description', 'stockdate' => '2022-02-02']]],

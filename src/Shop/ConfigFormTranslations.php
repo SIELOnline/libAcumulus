@@ -321,7 +321,7 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'field_optionsAllOn1Line' => 'T/m dit aantal opties bij hoofdproduct',
         'desc_optionsAllOn1Line' => 'Als het aantal opties van het product gelijk is aan of minder is dan deze waarde komen de opties altijd bij het hoofdproduct, ongeacht de maximale lengte die u hieronder kunt opgeven.',
         'field_optionsAllOnOwnLine' => 'Vanaf dit aantal opties op aparte regels',
-        'desc_optionsAllOnOwnLine' => 'Als het aantal opties gelijk is aan of groter is dan deze waarde komen alle opties altjd op hun eigen regel, ongeacht de maximale lengte die u hieronder kunt opgeven.',
+        'desc_optionsAllOnOwnLine' => 'Als het aantal opties gelijk is aan of groter is dan deze waarde komen alle opties altijd op hun eigen regel, ongeacht de maximale lengte die u hieronder kunt opgeven.',
         'field_optionsMaxLength' => 'Lengte omschrijving',
         'desc_optionsMaxLength' => 'Als het aantal opties tussen bovenstaande 2 waardes ligt, bepaalt de totale lengte (in aantal letters) van de omschrijvingen van de opties of deze het bij hoofdproduct geplaatst worden of toch op aparte regels.',
         'message_validate_options_0' => 'De velden "T/m dit aantal opties bij hoofdproduct" en "Vanaf dit aantal opties op aparte regels" kunnen niet allebei op "Altijd" staan.',
@@ -340,47 +340,57 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'paymentMethodCostCenterFieldset' => 'Kostenplaats per betaalmethode',
         'desc_paymentMethodCostCenterFieldset' => 'Hieronder kunt u per actieve betaalmethode een kostenplaats opgeven. De standaard kostenplaats hierboven wordt gebruikt voor betaalmethoden waarvoor u geen specifieke kostenplaats opgeeft.',
 
-        // Email as pdf settings.
-        'emailAsPdfSettingsHeader' => 'PDF Factuur',
-        'desc_emailAsPdfSettings' => 'Bij het versturen van bestellinggegevens naar Acumulus, kunt u Acumulus een PDF factuur laten versturen naar uw klant. Deze wordt dan direct verstuurd naar het opgegeven emailadres.',
+        // Invoice status screen settings.
+        'invoiceStatusScreenSettingsHeader' => 'Factuurstatusoverzicht',
+        'desc_invoiceStatusScreenSettings' => 'Acumulus kan op de detailpagina van een bestelling de status tonen van de bijbehorende factuur in Acumulus.',
+        'desc_invoiceStatusScreenSettings2' => 'Hierdoor ziet u in een oogopslag of de factuurgegevens correct zijn verstuurd naar Acumulus en of de betaalstatus correct is. Ook kunt u de factuurgegevens opnieuw naar Acumulus versturen of de betaalstatus aanpassen.',
+        'desc_invoiceStatusScreen' => 'Met deze optie geeft u aan of u dit overzicht getoond wil hebben.',
+        'field_invoiceStatusScreen' => 'Statusoverzicht tonen',
+        'option_showInvoiceStatus' => 'Toon dit scherm.',
 
-        'field_emailAsPdf' => 'Optie inschakelen',
-        'option_emailAsPdf' => 'Verstuur de factuur als PDF vanuit Acumulus.',
-        'desc_emailAsPdf' => 'Als u deze optie aanvinkt, kunt u de overige opties gebruiken om de emailverzending aan uw wensen aan te passen. Het bericht in de email body kunt u niet hier instellen, dat kunt u in Acumulus doen onder "Beheer - Factuur-sjablonen".',
+        // Documents handling
+        'documentsSettingsHeader' => 'Acumulus documenten',
+        'desc_documentsSettings' => 'Acumulus kan voor alle facturen die u naar Acumulus stuurt, een pdf-document voor de factuur of voor de pakbon maken. Deze documenten:<br>
+• Kunt u in uw browser openen.<br>
+• De factuur kunt u mailen naar de klant, met optioneel een bcc naar een eigen adres.<br>
+• De pakbon kunt u naar een (intern) adres mailen.<br>
+• In het profielgedeelte van de klant kunt u ook links naar deze pdf-bestanden plaatsen, maar dit valt buiten de mogelijkheden van deze plugin zelf en vergt custom code.<br>
+Hieronder kunt u instellen hoe u deze documenten wil gebruiken.
+Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel zelf. Als u deze bestanden niet gebruikt kunt u deze opties beter niet aanvinken.',
+        'field_detailPage' => 'Detailpagina',
+        'desc_detailPage' => 'Geef aan of u in het factuurstatusoverzicht, zie hierboven, buttons wil tonen voor de verschillende Acumulus documenten en hun acties.',
+        'field_listPage' => 'Overzichtspagina',
+        'desc_listPage' => 'Geef aan of u op de overzichtspagina met de lijst van bestellingen, buttons wil tonen voor de verschillende Acumulus documenten en hun acties.',
+        'option_document' => 'Toon een link om de Acumulus %1s %2s.',
+        'option_document_show' => 'in uw browser te tonen',
+        'option_document_mail' => 'te mailen',
+
+        // Email invoice settings.
+        'field_emailAsPdf' => 'Factuur automatisch versturen',
+        'option_emailAsPdf' => 'Laat Acumulus de pdf van de factuur automatisch mailen, direct nadat de factuurgegevens naar Acumulus verzonden zijn.',
+        'desc_emailAsPdf' => 'Als u mail-opties hebt aangevinkt, kunt u de verdere opties gebruiken om de e-mailverzending aan uw wensen aan te passen. Het bericht in de email body kunt u niet hier instellen, dat kunt u in Acumulus doen onder "Beheer - Factuur-sjablonen".',
         'message_validate_conflicting_options' => 'Als u geen klantgegevens naar Acumulus verstuurt, kunt u Acumulus geen PDF factuur laten versturen. Pas één van beide opties aan.',
 
         'field_emailTo' => 'Aan',
-        'desc_emailTo' => 'Het email adres waar naartoe de factur verstuurd moet worden. Als u dit leeg laat wordt het emailadres uit de klantgegevens van de factuur gebruikt. Wij adviseren dit veld leeg te laten. U mag meerdere email adressen invullen, gescheiden door een komma (,) of een punt-komma (;).',
+        'desc_emailTo' => 'Het e-mailadres waar naartoe de factuur verstuurd moet worden. Als u dit leeg laat wordt het e-mailadres uit de klantgegevens van de factuur gebruikt. Wij adviseren dit veld leeg te laten. U mag meerdere e-mailadressen invullen, gescheiden door een komma (,) of een punt-komma (;).',
         'message_validate_email_5' => 'Het veld Aan bevat geen geldig e-mailadres, vul een correct e-mailadres in.',
 
-        'field_emailBcc' => 'BCC',
-        'desc_emailBcc' => 'Additioneel emailadres om de factuur naar toe te sturen, bv. het emailadres van uw eigen administratie-afdeling. Als u dit leeg laat wordt de factuur alleen naar de klant verstuurd. U mag meerdere email adressen invullen, gescheiden door een komma (,) of een punt-komma (;).',
+        'field_emailBcc' => 'bcc',
+        'desc_emailBcc' => 'Additioneel e-mailadres om de factuur naar toe te sturen, bv. het e-mailadres van uw eigen administratie-afdeling. Als u dit leeg laat wordt de factuur alleen naar de klant verstuurd. U mag meerdere e-mailadressen invullen, gescheiden door een komma (,) of een punt-komma (;).',
         'message_validate_email_3' => 'Het veld BCC bevat geen geldig e-mailadres, vul een correct e-mailadres in.',
 
         'field_emailFrom' => 'Afzender',
-        'desc_emailFrom' => 'Het email adres dat als afzender gebruikt moet worden. Als u dit leeg laat wordt het emailadres uit het Acumulus sjabloon gebruikt.',
+        'desc_emailFrom' => 'Het e-mailadres dat als afzender gebruikt moet worden. Als u dit leeg laat wordt het e-mailadres uit het Acumulus sjabloon gebruikt.',
         'message_validate_email_4' => 'Het veld Afzender bevat geen geldig e-mailadres, vul een correct e-mailadres in.',
 
         'field_subject' => 'Onderwerp',
         'desc_subject' => 'Het onderwerp van de email. Als u dit leeg laat wordt "Factuur [nummer] [omschrijving]" gebruikt. Let op: als u Acumulus het factuurnummer laat bepalen, is het helaas niet mogelijk om naar het factuurnnummer te verwijzen.',
 
-        // Invoice status screen settings.
-        'invoiceStatusScreenSettingsHeader' => 'Factuurstatusoverzicht',
-        'desc_invoiceStatusScreenSettings' => 'Acumulus kan op de detailpagina van een bestelling de status tonen van de bijbehorende factuur in Acumulus.',
-        'desc_invoiceStatusScreenSettings2' => 'Hierdoor ziet u in een oogopslag of de factuurgegevens correct zijn verstuurd naar Acumulus en of de betaalstatus correct is. Ook kunt u de factuurgegevens opnieuw naar Acumulus versturen of de betaalstatus aanpassen.',
-        'desc_invoiceStatusScreen' => '• Met de eerste optie geeft u aan of u dit scherm getoond wil hebben.<br>•  Met de 2e en 3e optie geeft u aan of u downloadlinks naar deze pdf bestanden op dit scherm getoond wilt hebben. Dit zijn de pdf bestanden die Acumulus maakt, niet die van de webwinkel zelf. Als u deze bestanden niet gebruikt kun u opties 2 en 3 beter uitvinken.',
-        'field_invoiceStatusScreen' => 'Welke onderdelen wilt u tonen.',
-        'option_showInvoiceStatus' => 'Toon dit scherm.',
-        'option_showPdfInvoiceDetail' => 'Toon de link naar de factuur.',
-        'option_showPdfPackingSlipDetail' => 'Toon de link naar de pakbon.',
-
-        // Order list settings.
-        'orderListSettingsHeader' => 'Bestellingenoverzicht',
-        'desc_orderListSettings' => 'Acumulus kan op de overzichtspagina van de bestellingen icons tonen om de bijbehorende factuur en/of pakbon van Acumulus te tonen.',
-        'field_orderList' => 'Welke icons wilt u tonen.',
-        'desc_orderList' => 'TODO.',
-        'option_showPdfInvoiceList' => 'Toon de link naar de factuur.',
-        'option_showPdfPackingSlipList' => 'Toon de link naar de pakbon.',
+        //  Email packing slip settings.
+        'field_packingSlipEmailTo' => 'E-mailadres voor de pakbon',
+        'desc_packingSlipEmailTo' => 'Vul het e-mailadres in waar naartoe u de pakbon wilt sturen, dit kan bv. het e-mailadres van iemand of een printer in uw magazijn zijn. Dit veld wordt alleen gebruikt als u hierboven e-mailopties voor de pakbon hebt aangevinkt.',
+        'message_validate_packing_slip_email_0' => 'Als u de optie "Toon een link om de pdf te mailen." kiest voor de pakbon, is het veld "E-mailadres voor de pakbon" verplicht. Vul een e-mailadres in.',
+        'message_validate_packing_slip_email_1' => 'Het veld "E-mailadres voor de pakbon" bevat geen geldig e-mailadres, vul een correct e-mailadres in.',
 
         // Plugin settings.
         'pluginSettingsHeader' => 'Plugin instellingen',
@@ -731,13 +741,35 @@ If you unchecked the first option, the second option only applies to business cl
         'paymentMethodCostCenterFieldset' => 'Cost center per payment method',
         'desc_paymentMethodCostCenterFieldset' => 'Below you can enter a cost center to use per (active) payment method. The default above serves as fallback for payment methods for which you do not specify a cost center.',
 
-        // Email as pdf settings.
-        'emailAsPdfSettingsHeader' => 'PDF Invoice',
-        'desc_emailAsPdfSettings' => 'On sending the order details to Acumulus, Acumulus can send a PDF invoice to your customer. The mail will immediately be sent to the given email address.',
+        // Invoice status screen settings.
+        'invoiceStatusScreenSettingsHeader' => 'Invoice status overview',
+        'desc_invoiceStatusScreenSettings' => 'On the detail page of an order, Acumulus can show the status of the accompanying invoice in Acumulus.',
+        'desc_invoiceStatusScreenSettings2' => 'This allows you to easily check if the invoice was correctly sent and if the payment status is still correct. You can also resend the invoice data or change the payment status.',
+        'desc_invoiceStatusScreen' => 'This option indicates whether you want to show this screen.',
+        'field_invoiceStatusScreen' => 'Show this screen.',
+        'option_showInvoiceStatus' => 'Show invoice status screen.',
 
-        'field_emailAsPdf' => 'Enable the feature',
-        'option_emailAsPdf' => 'Have Acumulus send the invoice as PDF.',
-        'desc_emailAsPdf' => 'If you check this option, you can use the other options below to configure the emails to your preferences. However, to configure the text in the mail body, go to Acumulus to "Settings » Invoice templates".',
+        // Documents handling
+        'documentsSettingsHeader' => 'Acumulus documents',
+        'desc_documentsSettings' => 'Acumulus can create pdf documents for the invoice or packing slip for all invoices sent to Acumulus. These documents:<br>
+• Can be opened by you in your browser.<br>
+• The invoice can be mailed to your customer, with an optional bcc to one of your own addresses.<br>
+• The packing slip can be mailed to a(n internal) address.<br>
+• In the profile part of your customer, you can place links to these pdf documents, but this features falls outside the scope of this plugin and requires some custom code.<br>
+Below you can define how to use these documents.
+Please note that these documents are created by Acumulus, not the web shop. If you do not use these documents, you better not enable these options',
+        'field_detailPage' => 'Detail page',
+        'desc_detailPage' => 'Indicate if and which buttons you want to show on the "Invoice status overview", see above, for the various documents and their actions.',
+        'field_listPage' => 'Order list',
+        'desc_listPage' => 'Indicate if and which buttons you want to show on the "Order list overview" for the various documents and their actions.',
+        'option_document' => 'Show a link to %2$s the Acumulus %1s.',
+        'option_document_show' => 'open',
+        'option_document_mail' => 'mail',
+
+        // Email invoice settings.
+        'field_emailAsPdf' => 'Send invoice automatically',
+        'option_emailAsPdf' => 'Have Acumulus send the invoice, as a PDF, to your customer, directly after sending the invoice data to Acumulus.',
+        'desc_emailAsPdf' => 'If you enabled mail options, you can customise the mail sending process with the settings below. Note that the message in the mail body cannot be changed here, you can do that in Acumulus by going to menu-item "Beheer - Factuur-sjablonen".',
         'message_validate_conflicting_options' => 'If you don\'t send customer data to Acumulus, Acumulus cannot send PDF invoices. Change one of the options.',
 
         'field_emailTo' => 'To',
@@ -755,6 +787,12 @@ If you unchecked the first option, the second option only applies to business cl
         'desc_emailFrom' => 'The email address to use as sender. If you leave this empty, the email address of the Acumulus template will be used. We recommend you to leave this empty.',
         'message_validate_email_4' => 'The field Sender is not a valid e-mail address, please fill in a valid e-mail address.',
 
+        //  Email packing slip settings.
+        'field_packingSlipEmailTo' => 'Email address for the packing slip',
+        'desc_packingSlipEmailTo' => 'Fill in the email address to which you want to send the packing slip. This can be, e.g, the address of someone or some printer in your warehouse. This field will only ne used if you enabled mail options for the packing slip.',
+        'message_validate_packing_slip_email_0' => 'If you enabled one or more of the options to mail a packing slip, than is the field "Email address for the packing slip" required. Fill in an e-mail address.',
+        'message_validate_packing_slip_email_1' => 'The field "Email address for the packing slip" is not a valid e-mail address, please fill in a valid e-mail address.',
+
         // Plugin settings.
         'pluginSettingsHeader' => 'Plugin settings',
 
@@ -770,16 +808,6 @@ If you unchecked the first option, the second option only applies to business cl
         'option_logLevel_4' => 'Log error messages, warnings, and operational and informational notices.',
         'option_logLevel_5' => 'Log error messages, warnings, notices, and communication messages.',
         'desc_logLevel' => 'Select a log level. Choose for the 1st or 2nd option unless otherwise instructed by support staff.',
-
-        // Invoice status screen settings.
-        'invoiceStatusScreenSettingsHeader' => 'Invoice status overview',
-        'desc_invoiceStatusScreenSettings' => 'On the detail page of an order, Acumulus can show the status of the accompanying invoice in Acumulus.',
-        'desc_invoiceStatusScreenSettings2' => 'This allows you to easily check if the invoice was correctly sent and if the payment status is still correct. You can also resend the invoice data or change the payment status.',
-        'desc_invoiceStatusScreen' => 'The 1st option indicates whether you want to show this screen at all. Use the 2nd and 3rd option to indicate whether you want to show download links to these pdf files. These are the pdf files from Acumulus, not from your webshop! If you don\'t use them, you better uncheck these options.',
-        'field_invoiceStatusScreen' => 'What parts do you want to show.',
-        'option_showInvoiceStatus' => 'Show this screen.',
-        'option_showPdfInvoice' => 'Show the link to the invoice.',
-        'option_showPdfPackingSlip' => 'Show the link to the packing slip.',
 
         // Link to other config form.
         'desc_advancedSettings' => 'This plugin is highly configurable and therefore this form does not contain all settings. You can find the other settings in the "%1$s" under "%2$s". Once you have completed and saved the settings over here, you can visit that form to fill in the advanced settings.',

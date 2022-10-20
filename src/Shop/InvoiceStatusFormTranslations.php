@@ -69,13 +69,6 @@ class InvoiceStatusFormTranslations extends TranslationCollection
         'undelete' => 'Herstel verwijderde boeking',
         'set_paid' => 'Zet op Betaald',
         'set_due' => 'Zet op Niet betaald',
-
-        // Links to pdf documents.
-        'documents' => 'Documenten',
-        'document' => 'Document',
-        'invoice' => 'factuur',
-        'packing_slip' => 'pakbon',
-        'open_as_pdf' => 'Acumulus %1$s openen als pdf',
     ];
 
     protected $en = [
@@ -139,12 +132,5 @@ class InvoiceStatusFormTranslations extends TranslationCollection
         'undelete' => 'Restore deleted invoice',
         'set_paid' => 'Set paid',
         'set_due' => 'Set due',
-
-        // Links to pdf documents.
-        'documents' => 'Documents',
-        'document' => 'Document',
-        'invoice' => 'invoice',
-        'packing_slip' => 'packing slip',
-        'open_as_pdf' => 'Open Acumulus %1$s as pdf',
     ];
 }

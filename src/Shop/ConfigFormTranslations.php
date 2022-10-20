@@ -368,8 +368,7 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
         // Email invoice settings.
         'field_emailAsPdf' => 'Factuur automatisch versturen',
         'option_emailAsPdf' => 'Laat Acumulus de pdf van de factuur automatisch mailen, direct nadat de factuurgegevens naar Acumulus verzonden zijn.',
-        'desc_emailAsPdf' => 'Als u mail-opties hebt aangevinkt, kunt u de verdere opties gebruiken om de e-mailverzending aan uw wensen aan te passen. Het bericht in de email body kunt u niet hier instellen, dat kunt u in Acumulus doen onder "Beheer - Factuur-sjablonen".',
-        'message_validate_conflicting_options' => 'Als u geen klantgegevens naar Acumulus verstuurt, kunt u Acumulus geen PDF factuur laten versturen. Pas één van beide opties aan.',
+        'desc_emailAsPdf' => 'Als u mail-opties hebt aangevinkt, kunt u de verdere opties gebruiken om de e-mailverzending aan uw wensen aan te passen. Het bericht in de email body kunt u niet hier instellen, dat kunt u in Acumulus doen onder "Beheer - Factuur-sjablonen". Merk nog op dat als u geen klantgegevens naar Acumulus verstuurt (geavanceerde instelling), Acumulus geen factuur-pdf kan versturen.',
 
         'field_emailTo' => 'Aan',
         'desc_emailTo' => 'Het e-mailadres waar naartoe de factuur verstuurd moet worden. Als u dit leeg laat wordt het e-mailadres uit de klantgegevens van de factuur gebruikt. Wij adviseren dit veld leeg te laten. U mag meerdere e-mailadressen invullen, gescheiden door een komma (,) of een punt-komma (;).',
@@ -377,11 +376,11 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
 
         'field_emailBcc' => 'bcc',
         'desc_emailBcc' => 'Additioneel e-mailadres om de factuur naar toe te sturen, bijv. het e-mailadres van uw eigen administratie-afdeling. Als u dit leeg laat wordt de factuur alleen naar de klant verstuurd. U mag meerdere e-mailadressen invullen, gescheiden door een komma (,) of een punt-komma (;).',
-        'message_validate_email_3' => 'Het veld BCC bevat geen geldig e-mailadres, vul een correct e-mailadres in.',
+        'message_validate_email_3' => 'Het veld "bcc" bevat geen geldig e-mailadres, vul een correct e-mailadres in.',
 
         'field_emailFrom' => 'Afzender',
         'desc_emailFrom' => 'Het e-mailadres dat als afzender gebruikt moet worden. Als u dit leeg laat wordt het e-mailadres uit het Acumulus sjabloon gebruikt.',
-        'message_validate_email_4' => 'Het veld Afzender bevat geen geldig e-mailadres, vul een correct e-mailadres in.',
+        'message_validate_email_4' => 'Het veld "Afzender" bevat geen geldig e-mailadres, vul een correct e-mailadres in.',
 
         'field_subject' => 'Onderwerp',
         'desc_subject' => 'Het onderwerp van de email. Als u dit leeg laat wordt "Factuur [nummer] [omschrijving]" gebruikt. Let op: als u Acumulus het factuurnummer laat bepalen, is het helaas niet mogelijk om naar het factuurnummer te verwijzen.',
@@ -769,8 +768,7 @@ Please note that these documents are created by Acumulus, not the web shop. If y
         // Email invoice settings.
         'field_emailAsPdf' => 'Send invoice automatically',
         'option_emailAsPdf' => 'Have Acumulus send the invoice, as a PDF, to your customer, directly after sending the invoice data to Acumulus.',
-        'desc_emailAsPdf' => 'If you enabled mail options, you can customise the mail sending process with the settings below. Note that the message in the mail body cannot be changed here, you can do that in Acumulus by going to menu-item "Beheer - Factuur-sjablonen".',
-        'message_validate_conflicting_options' => 'If you don\'t send customer data to Acumulus, Acumulus cannot send PDF invoices. Change one of the options.',
+        'desc_emailAsPdf' => 'If you enabled mail options, you can customise the mail sending process with the settings below. Note that the message in the mail body cannot be changed here, you can do that in Acumulus by going to menu-item "Beheer - Factuur-sjablonen". Please note that if you don\'t send customer data to Acumulus (advanced setting), Acumulus cannot send invoice-pdfs.',
 
         'field_emailTo' => 'To',
         'desc_emailTo' => 'The email address to send the invoice to. If you leave this empty the email address from the invoice\'s customer data will be used. We recommend you to leave this empty. You may enter multiple email addresses separated by a comma (,) or a semi-colon (;).',

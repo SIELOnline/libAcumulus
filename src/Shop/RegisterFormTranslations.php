@@ -40,7 +40,7 @@ class RegisterFormTranslations extends TranslationCollection
         'desc_loginName' => 'De gebruikersnaam, minimaal 6 tekens, die u wilt gebruiken om zelf in te loggen op Acumulus. Deze %s zal een eigen gebruikersnaam en wachtwoord krijgen.',
 
         'companySettingsHeader' => 'Over uw bedrijf',
-        'desc_companySettings' => 'Met onderstaande informatie kunnen we uw proefaccount beter inrichten, zo kunnen we b.v. een factuursjabloon maken. Uiteraard kunt u deze gegevens later nog aanpassen.',
+        'desc_companySettings' => 'Met onderstaande informatie kunnen we uw proefaccount beter inrichten, zo kunnen we bijv. een factuursjabloon maken. Uiteraard kunt u deze gegevens later nog aanpassen.',
 
         'field_companyName' => 'Bedrijfsnaam',
         'field_companyTypeId' => 'Rechtsvorm',
@@ -63,10 +63,10 @@ class RegisterFormTranslations extends TranslationCollection
         'field_notes' => 'Opmerkingen',
         'desc_notes' => 'Als u een vraag of opmerking heeft over Acumulus of deze %s, dan kunt u deze hier invullen. Er wordt dan een ticket geopend in ons supportsysteem en u krijgt antwoord op het door u opgegeven e-mailadres.',
 
-        'message_validate_required_field' => 'Het veld %s is verplicht.',
+        'message_validate_required_field' => 'Het veld "%s" is verplicht.',
         'message_validate_loginname_0' => 'Uw gebruikersnaam moet tenminste 6 karakters lang zijn.',
-        'message_validate_email_0' => 'Het veld E-mail bevat geen geldig e-mailadres, vul uw eigen e-mailadres in.',
-        'message_validate_postalCode_0' => 'Het veld postcode bevat geen geldige postcode, vul uw postcode in: formaat: "1234 AB".',
+        'message_validate_email_0' => 'Het veld "E-mail" bevat geen geldig e-mailadres, vul uw eigen e-mailadres in.',
+        'message_validate_postalCode_0' => 'Het veld "Postcode" bevat geen geldige postcode, vul uw postcode in: formaat: "1234 AB".',
 
         'congratulationsHeader' => 'Hartelijk dank voor uw aanmelding!',
         'congratulationsDesc' => 'U kunt Acumulus 30 dagen (tot %s) gratis en vrijblijvend proberen. Uw proefaccount is volledig functioneel met een maximum van 50 boekingen. Indien u vragen hebt, vernemen wij dat graag.',

@@ -440,6 +440,18 @@ class InvoiceStatusForm extends Form
                     }
                     break;
 
+                case 'invoice_mail':
+                    $mailResult = $this->invoiceManager->emailInvoiceAsPdf($source);
+                    $this->addMessages($mailResult->getMessages());
+                    $success = !$mailResult->hasError();
+                    break;
+
+                case 'packing_slip_mail':
+                    $mailResult = $this->invoiceManager->emailPackingSlipAsPdf($source);
+                    $this->addMessages($mailResult->getMessages());
+                    $success = !$mailResult->hasError();
+                    break;
+
                 case 'entry_deletestatus_set':
                     $localEntry = $this->acumulusEntryManager->getByInvoiceSource($source);
                     if ($localEntry && $localEntry->getEntryId() !== null) {
@@ -859,7 +871,7 @@ class InvoiceStatusForm extends Form
         $fields = $this->getVatTypeField($entry)
                + $this->getAmountFields($source, $entry)
                + $this->getPaymentStatusFields($source, $entry)
-               + $this->getLinksField($source->getId(), $entry['token']);
+               + $this->getLinksField($entry['token']);
         if ($this->status >= self::Status_Warning) {
             $fields += $this->getSendAgainFields();
         }
@@ -1125,58 +1137,63 @@ class InvoiceStatusForm extends Form
     }
 
     /**
-     * Returns links to the invoice and packing slip documents.
+     * Returns links and buttons to the invoice and packing slip documents.
      *
-     * @param int|string $orderId
      * @param string $token
      *
      * @return array[]
-     *   Form field array that contains links to the documents related to this
-     *   invoice.
+     *   Form field array that, depending on config and availability contains:
+     *   - buttons to mail the documents related to this order.
+     *   - links to show the documents related to this order.
      */
-    protected function getLinksField($orderId, string $token): array
+    protected function getLinksField(string $token): array
     {
         $result = [];
+        $actions = [];
         $links = [];
         $documentsSettings = $this->container->getConfig()->getDocumentsSettings();
 
-        // @todo: change css for other webshops (so far only WC has been updated).
-        $ajaxAction = 'acumulus_ajax_action';
-        $text = ucfirst($this->t('document_invoice'));
+        $document = ucfirst($this->t('document_invoice'));
         if ($documentsSettings['showInvoiceDetail']) {
             $uri = $this->acumulusApiClient->getInvoicePdfUri($token);
-            $title = sprintf($this->t('document_show'), $text);
+            $text = sprintf($this->t('document_show'), $document);
+            $title = sprintf($this->t('document_show_title'), $document);
             /** @noinspection HtmlUnknownTarget */
             $links[] = sprintf('<a class="%4$s" href="%1$s" title="%3$s">%2$s</a>', $uri, $text, $title, 'acumulus-document-invoice');
         }
         if ($documentsSettings['mailInvoiceDetail']) {
-            $action = 'acumulus-document-packing-slip-mail';
-            // @todo: this is woocommerce specific. Make this web shop generic!
-            $url = sprintf("admin-ajax.php?action=%s&acumulus_action=%s&order_id=%d", $ajaxAction, $action, $orderId);
-            $uri = wp_nonce_url(admin_url($url), $ajaxAction, 'acumulus_nonce');
-            $title = sprintf($this->t('document_mail'), $text);
-            /** @noinspection HtmlUnknownTarget */
-            $links[] = sprintf('<a class="%4$s" href="%1$s" title="%3$s">%2$s</a>', $uri, $text, $title, 'acumulus-ajax acumulus-document-invoice');
+            $actions['invoice_mail'] = [
+                'type' => 'button',
+                'value' => sprintf($this->t('document_mail'), $document),
+                'attributes' => [
+                    'class' => ['acumulus-ajax', 'acumulus-document-invoice'],
+                    'title' => sprintf($this->t('document_mail_title'), $document),
+                ],
+            ];
         }
 
-        $text = ucfirst($this->t('document_packingSlip'));
+        $document = ucfirst($this->t('document_packing_slip'));
         if ($documentsSettings['showPackingSlipDetail']) {
             $uri = $this->acumulusApiClient->getPackingSlipPdfUri($token);
-            $title = sprintf($this->t('document_show'), $text);
+            $text = sprintf($this->t('document_show'), $document);
+            $title = sprintf($this->t('document_show_title'), $document);
             /** @noinspection HtmlUnknownTarget */
             $links[] = sprintf('<a class="%4$s" href="%1$s" title="%3$s">%2$s</a>', $uri, $text, $title, 'acumulus-document-packing-slip');
         }
         if ($documentsSettings['mailPackingSlipDetail']) {
-            $action = 'acumulus-document-packing-slip-mail';
-            // @todo: this is woocommerce specific. Make this web shop generic!
-            $url = sprintf("admin-ajax.php?action=%s&acumulus_action=%s&order_id=%d", $ajaxAction, $action, $orderId);
-            $uri = wp_nonce_url(admin_url($url), $ajaxAction, 'acumulus_nonce');
-
-            $title = sprintf($this->t('document_mail'), $text);
-            /** @noinspection HtmlUnknownTarget */
-            $links[] = sprintf('<a class="%4$s" href="%1$s" title="%3$s">%2$s</a>', $uri, $text, $title, 'acumulus-ajax acumulus-document-packing-slip');
+            $actions['packing_slip_mail'] = [
+                'type' => 'button',
+                'value' => sprintf($this->t('document_mail'), $document),
+                'attributes' => [
+                    'class' => ['acumulus-ajax', 'acumulus-document-packing-slip'],
+                    'title' => sprintf($this->t('document_mail_title'), $document),
+                ],
+            ];
         }
 
+        if (!empty($actions)) {
+            $result += $actions;
+        }
         if (!empty($links)) {
             $result['links'] = [
                 'type' => 'markup',

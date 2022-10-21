@@ -611,20 +611,20 @@ class ConfigForm extends BaseConfigForm
         $fields = [];
         $fields['packingSlipSubHeader'] = [
             'type' => 'markup',
-            'value' => '<h3>' . ucfirst($this->t("document_packingSlip")) . '</h3>',
+            'value' => '<h3>' . ucfirst($this->t("document_packing_slip")) . '</h3>',
         ];
         $fields['detailPackingSlip'] = [
             'type' => 'checkbox',
             'label' => $this->t('field_detailPage'),
             'description' => $this->t('desc_detailPage'),
-            'options' => $this->getDocumentsOptions('Detail', 'packingSlip'),
+            'options' => $this->getDocumentsOptions('Detail', 'packing_slip'),
         ];
         if ($this->shopCapabilities->hasOrderList()) {
             $fields['listPackingSlip'] = [
                 'type' => 'checkbox',
                 'label' => $this->t('field_listPage'),
                 'description' => $this->t('desc_listPage'),
-                'options' => $this->getDocumentsOptions('List', 'packingSlip'),
+                'options' => $this->getDocumentsOptions('List', 'packing_slip'),
             ];
         }
         $fields['packingSlipEmailTo'] = [
@@ -831,14 +831,23 @@ class ConfigForm extends BaseConfigForm
         ];
     }
 
+    /**
+     * @param string $page
+     *   'Detail' or 'List'.
+     * @param string $document
+     *   'invoice' or 'packing_slip'.
+     *
+     * @return array
+     *   Array with 2 options (value => label entries).
+     */
     protected function getDocumentsOptions(string $page, string $document): array
     {
-
         $label = $this->t("document_$document");
         $show = $this->t('option_document_show');
         $mail = $this->t('option_document_mail');
 
-        $document = ucfirst($document);
+        // Change to "camel case".
+        $document =  str_replace('_', '', ucwords($document, '_'));
         return [
             "show$document$page" => sprintf($this->t('option_document'), $label, $show),
             "mail$document$page" => sprintf($this->t('option_document'), $label, $mail),

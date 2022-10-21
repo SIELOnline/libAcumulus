@@ -43,8 +43,8 @@ Features:
 
 Known problems:
 - Field references (token expansion) when manually e-mailing invoice or packing
-  slip.
-- InvoiceStatusForm contains WooCommerce specific code: refactor!
+  slip does not work, i.e. no expansion is done.
+- css has only been adapted for WooCommerce, not for other webshops.
 
 Bugs:
 - OC: Siel\Acumulus\OpenCart\Shop\AcumulusEntryManager::getByInvoiceSource():

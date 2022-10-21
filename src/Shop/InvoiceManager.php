@@ -666,7 +666,7 @@ abstract class InvoiceManager
      * Sends the Acumulus invoice as a pdf to the customer.
      *
      * @param \Siel\Acumulus\Invoice\Source $invoiceSource
-     *   The invoice source, should be used to extract the to e-mail address from.
+     *   The invoice source for which to mail the invoice to the customer.
      *
      * @return AcumulusResult
      *
@@ -715,7 +715,7 @@ abstract class InvoiceManager
      * Sends the Acumulus invoice as a pdf to the customer.
      *
      * @param \Siel\Acumulus\Invoice\Source $invoiceSource
-     *   The invoice source, should be used to extract the to e-mail address from.
+     *   The invoice source for which to mail the packing slip.
      *
      * @return AcumulusResult
      *

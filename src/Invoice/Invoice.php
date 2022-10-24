@@ -36,7 +36,7 @@ use Siel\Acumulus\Api;
 class Invoice extends AcumulusObject
 {
     protected static array $propertyDefinitions = [
-        ['name' => 'concept', 'type' =>'int', 'required' => true, 'allowedValues' => [Api::Concept_No, Api::Concept_Yes]],
+        ['name' => 'concept', 'type' =>'bool', 'required' => true, 'allowedValues' => [Api::Concept_No, Api::Concept_Yes]],
         ['name' => 'conceptType', 'type' =>'string'],
         ['name' => 'number', 'type' =>'int'],
         [

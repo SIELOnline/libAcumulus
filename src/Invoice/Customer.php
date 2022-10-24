@@ -110,7 +110,7 @@ class Customer extends AcumulusObject
         ['name' => 'type', 'type' =>'int', 'allowedValues' => [Api::CustomerType_Debtor, Api::CustomerType_Creditor, Api::CustomerType_Both]],
         ['name' => 'vatTypeId', 'type' =>'int', 'allowedValues' => [Api::VatTypeId_Private, Api::VatTypeId_Business]],
         ['name' => 'contactYourId', 'type' =>'string'],
-        ['name' => 'contactStatus', 'type' =>'int', 'allowedValues' => [Api::ContactStatus_Disabled, Api::ContactStatus_Active]],
+        ['name' => 'contactStatus', 'type' =>'bool', 'allowedValues' => [Api::ContactStatus_Disabled, Api::ContactStatus_Active]],
 
         ['name' => 'companyName1', 'type' =>'string'],
         ['name' => 'companyName2', 'type' =>'string'],
@@ -143,9 +143,9 @@ class Customer extends AcumulusObject
         ['name' => 'telephone2', 'type' =>'string'],
         ['name' => 'fax', 'type' =>'string'],
         ['name' => 'email', 'type' =>'string'],
-        ['name' => 'overwriteIfExists', 'type' =>'int', 'allowedValues' => [Api::OverwriteIfExists_No, Api::OverwriteIfExists_Yes]],
+        ['name' => 'overwriteIfExists', 'type' =>'bool', 'allowedValues' => [Api::OverwriteIfExists_No, Api::OverwriteIfExists_Yes]],
         ['name' => 'bankAccountNumber', 'type' =>'string'],
         ['name' => 'mark', 'type' =>'string'],
-        ['name' => 'disableDuplicates', 'type' =>'int', 'allowedValues' => [Api::DisableDuplicates_No, Api::DisableDuplicates_Yes]],
+        ['name' => 'disableDuplicates', 'type' =>'bool', 'allowedValues' => [Api::DisableDuplicates_No, Api::DisableDuplicates_Yes]],
     ];
 }

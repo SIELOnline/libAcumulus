@@ -101,6 +101,9 @@ interface Api
     public const UblInclude_No = 0;
     public const UblInclude_Yes = 1;
 
+    public const ApplyGraphics_No = 0;
+    public const ApplyGraphics_Yes = 1;
+
     public const Gender_Female = 'F';
     public const Gender_Male = 'M';
     public const Gender_Neutral = 'X';

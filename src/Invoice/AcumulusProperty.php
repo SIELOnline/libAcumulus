@@ -13,9 +13,10 @@ use Siel\Acumulus\Helpers\Number;
  * call.
  *
  * Value sent with Acumulus API messages can be of type 'string', 'int',
- * 'float', or 'date'. Note that the AcumulusAPI does not use booleans,
+ * 'float', 'date', or 'bool'. Note that the AcumulusAPI does not use booleans,
  * properties that represent a "yes/no" value are mostly represented by an int
- * with allowed values 0 and 1.
+ * with allowed values 0 and 1. Internally we do work with booleans for these
+ * values.
  *
  * Additional restrictions may hold, and the basic and most used restrictions
  * are supported by this class:
@@ -23,10 +24,12 @@ use Siel\Acumulus\Helpers\Number;
  *   use it to construct a message will a required but empty value throw an
  *   error.
  * - Positive integer: modeled with a separate type 'id'.
- * - Enumerations: modeled with the allowedValues property of this class.
+ * - Enumerations: modeled with the allowedValues property of this class. For
+ *   properties of type bool the allowedValues property of this class is used to
+ *   map the 2 boolean values to their value on the Acumulus API.
  *
  * Other restrictions, e.g. a string that should contain an e-mail address, are
- * not (yet) supported by this class and can(/should) be checked ona higher
+ * not (yet) supported by this class and can(/should) be checked on a higher
  * level.
  */
 class AcumulusProperty
@@ -37,7 +40,7 @@ class AcumulusProperty
     public const Set_NotOverwriteNotEmpty = self::Set_NotOverwrite | self::Set_NotEmpty;
 
     /** @var string[] */
-    protected static array $allowedTypes = ['string', 'int', 'float', 'date', 'id'];
+    protected static array $allowedTypes = ['string', 'int', 'float', 'date', 'id', 'bool'];
 
     protected string $name;
     protected bool $required;
@@ -85,8 +88,13 @@ class AcumulusProperty
         }
         $this->required = $propertyDefinition['required'] ?? false;
 
-        if (isset($propertyDefinition['allowedValues']) && !is_array($propertyDefinition['allowedValues'])) {
-            throw new DomainException('Property allowedValues must be an array');
+        if (isset($propertyDefinition['allowedValues'])) {
+            if (!is_array($propertyDefinition['allowedValues'])) {
+                throw new DomainException('Property allowedValues must be an array');
+            }
+        }
+        if ($this->type === 'bool' && (!isset($propertyDefinition['allowedValues']) || count($propertyDefinition['allowedValues']) !== 2)) {
+            throw new DomainException('Property allowedValues must define an array of 2 values for type bool');
         }
         $this->allowedValues = $propertyDefinition['allowedValues'] ?? [];
 
@@ -170,6 +178,12 @@ class AcumulusProperty
                     }
                     $date->setTime(0, 0, 0, 0);
                     $value = $date;
+                    break;
+                case 'bool':
+                    if (!is_bool($value) && !in_array($value, $this->allowedValues, true)) {
+                        throw new DomainException("$this->name: not a valid $this->type:" . var_export($value, true));
+                    }
+                    $value = is_bool($value) ? $this->allowedValues[$value ? 1 : 0] : $value;
                     break;
                 default:
                     throw new UnexpectedValueException("$this->name: not a valid type: $this->type");

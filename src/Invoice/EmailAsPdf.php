@@ -29,7 +29,8 @@ class EmailAsPdf extends AcumulusObject
         ['name' => 'emailFrom', 'type' =>'string'],
         ['name' => 'subject', 'type' =>'string'],
         ['name' => 'message', 'type' =>'string'],
-        ['name' => 'confirmReading', 'type' =>'int', 'allowedValues' => [Api::ConfirmReading_No, Api::ConfirmReading_Yes]],
-        ['name' => 'ubl', 'type' =>'int', 'allowedValues' => [Api::UblInclude_No, Api::UblInclude_Yes]],
+        ['name' => 'confirmReading', 'type' =>'bool', 'allowedValues' => [Api::ConfirmReading_No, Api::ConfirmReading_Yes]],
+        ['name' => 'ubl', 'type' =>'bool', 'allowedValues' => [Api::UblInclude_No, Api::UblInclude_Yes]],
+        ['name' => 'gfx', 'type' =>'bool', 'allowedValues' => [Api::ApplyGraphics_No, Api::ApplyGraphics_Yes]],
     ];
 }

@@ -124,6 +124,7 @@ class ConfigUpgrade
         }
 
         $result = true;
+        $this->getLog()->notice("Config: start upgrading from $currentVersion");
 
         if (version_compare($currentVersion, '4.5.0', '<')) {
             $result = $this->upgrade450();
@@ -181,6 +182,7 @@ class ConfigUpgrade
             $result = $this->upgrade740() && $result;
         }
 
+        $this->getLog()->notice('Config: finished upgrading to %s (%s)', Version, $result ? 'success' : 'failure');
         return $result;
     }
 
@@ -524,7 +526,6 @@ class ConfigUpgrade
             $values['euVatClasses'] = $values['foreignVatClasses'];
         }
 
-        $this->getLog()->notice('Config: updating to 6.4.0');
         return $this->getConfig()->save($values);
     }
 
@@ -542,16 +543,19 @@ class ConfigUpgrade
     protected function upgrade740(): bool
     {
         $newSettings = [];
+
         $old = $this->getConfig()->get('showPdfInvoice');
         if ($old !== null) {
-            $newSettings['showPdfInvoiceDetail'] = (bool) $old;
-            $newSettings['showPdfInvoiceList'] = (bool) $old;
+            $newSettings['showInvoiceDetail'] = (bool) $old;
+            $newSettings['showInvoiceList'] = (bool) $old;
         }
+
         $old = $this->getConfig()->get('showPdfPackingSlip');
         if ($old !== null) {
-            $newSettings['showPdfPackingSlipDetail'] = (bool) $old;
-            $newSettings['showPdfPackingSlipList'] = (bool) $old;
+            $newSettings['showPackingSlipDetail'] = (bool) $old;
+            $newSettings['showPackingSlipList'] = (bool) $old;
         }
+
         return $this->getConfig()->save($newSettings);
     }
 }

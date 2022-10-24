@@ -37,9 +37,12 @@ WC   WooCommerce         6.7.0               >= 5.0 (3 and 4 will probably work)
 7.4.0 (2022-10-??)
 ------------------
 Features:
-- Added support for the email packing slip as pdf API call.
-- WC: Added icons to open the Acumulus invoice or packing slip from the order
-  list page.
+- Added support for the email packing slip as pdf API call. (Note: this is not
+  an end user feature.)
+- WC: Added icons to mail the Acumulus invoice or packing slip pdf on both the
+  order list and detail page.
+- WC: Added icons to open the Acumulus invoice or packing slip pdf from the
+  order list page.
 
 Known problems:
 - Field references (token expansion) when manually e-mailing invoice or packing

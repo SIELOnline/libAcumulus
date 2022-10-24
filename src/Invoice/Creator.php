@@ -261,11 +261,50 @@ abstract class Creator
         $this->invoice[Tag::Customer] = $this->getCustomer();
         $this->invoice[Tag::Customer][Tag::Invoice] = $this->getInvoice();
         $this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] = $this->getInvoiceLines();
-        $emailAsPdf = $this->getEmailAsPdf(!empty($this->invoice[Tag::Customer][Tag::Email]) ? $this->invoice[Tag::Customer][Tag::Email] : '');
+        $emailAsPdfSettings = $this->config->getEmailAsPdfSettings();
+        if ($emailAsPdfSettings['emailAsPdf']) {
+            $emailTo = !empty($this->invoice[Tag::Customer][Tag::Email]) ? $this->invoice[Tag::Customer][Tag::Email] : '';
+            $emailAsPdf = $this->getEmailAsPdf($emailTo);
+        }
         if (!empty($emailAsPdf)) {
             $this->invoice[Tag::Customer][Tag::Invoice][Tag::EmailAsPdf] = $emailAsPdf;
         }
         return $this->invoice;
+    }
+
+    /**
+     * Creates an Acumulus emailAsPdf structure from an order or credit note.
+     *
+     * NOTE: This is a temporary function, added in 7.4.0, to allow the new
+     * mail invoice buttons (on the order list or detail page) to also use token
+     * expansion. For 8.0, we are already working on new "Collectors" that will
+     * replace this Creator and are more fine-grained, so we wil have a ready to
+     * use separate emailAsPdf Collector.
+     *
+     * @param Source $source
+     *  The web shop order.
+     * @param bool $forInvoice
+     *   True if we want the emailAsPdf section for mailing an invoice, false if
+     *   we want to email the packing slip.
+     *
+     * @return array
+     *   The acumulus emailAsPdf structure for this order.
+     */
+    public function createEmailAsPdf(Source $source, bool $forInvoice = true): array
+    {
+        $this->setInvoiceSource($source);
+        $this->setPropertySources();
+        $emailTo = '';
+        if ($forInvoice) {
+            $customerSettings = $this->config->getCustomerSettings();
+            if (!empty($customerSettings['email'])) {
+                $value = $this->getTokenizedValue($customerSettings['email']);
+                if (!empty($value)) {
+                    $emailTo = $value;
+                }
+            }
+        }
+        return $this->getEmailAsPdf($emailTo, $forInvoice);
     }
 
     /**
@@ -840,18 +879,27 @@ abstract class Creator
      *
      * @param string $fallbackEmailTo
      *   An email address to use as fallback when the emailTo setting is empty.
+     * @param bool $forInvoice
+     *   True if we want the emailAsPdf section for mailing an invoice, false if
+     *   we want to email the packing slip.
      *
      * @return array
      *   The emailAsPdf section, possibly empty.
      */
-    protected function getEmailAsPdf(string $fallbackEmailTo): array
+    protected function getEmailAsPdf(string $fallbackEmailTo, bool $forInvoice = true): array
     {
         $emailAsPdf = [];
         $emailAsPdfSettings = $this->config->getEmailAsPdfSettings();
-        if ($emailAsPdfSettings['emailAsPdf']) {
-            $emailTo = !empty($emailAsPdfSettings['emailTo']) ? $this->getTokenizedValue($emailAsPdfSettings['emailTo']) : $fallbackEmailTo;
-            if (!empty($emailTo)) {
-                $emailAsPdf[Tag::EmailTo] = $emailTo;
+        if ($forInvoice) {
+            $emailTo = !empty($emailAsPdfSettings['emailTo'])
+                ? $this->getTokenizedValue($emailAsPdfSettings['emailTo'])
+                : $fallbackEmailTo;
+        } else {
+            $emailTo = $this->getTokenizedValue($emailAsPdfSettings['packingSlipEmailTo']);
+        }
+        if (!empty($emailTo)) {
+            $emailAsPdf[Tag::EmailTo] = $emailTo;
+            if ($forInvoice) {
                 $this->addTokenDefault($emailAsPdf, Tag::EmailBcc, $emailAsPdfSettings['emailBcc']);
                 $this->addTokenDefault($emailAsPdf, Tag::EmailFrom, $emailAsPdfSettings['emailFrom']);
                 $this->addTokenDefault($emailAsPdf, Tag::Subject, $emailAsPdfSettings['subject']);

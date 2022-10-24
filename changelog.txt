@@ -34,7 +34,7 @@ WC   WooCommerce         6.7.0               >= 5.0 (3 and 4 will probably work)
      WordPress           6.0                 >= 5.9 (earlier version WILL fail)
 --------------------------------------------------------------------------------
 
-7.4.0 (2022-10-??)
+7.4.0 (2022-10-24)
 ------------------
 Features:
 - Added support for the email packing slip as pdf API call. (Note: this is not
@@ -45,9 +45,9 @@ Features:
   order list page.
 
 Known problems:
-- Field references (token expansion) when manually e-mailing invoice or packing
-  slip does not work, i.e. no expansion is done.
-- css has only been adapted for WooCommerce, not for other webshops.
+- When manually mailing the invoice or packing slip for an order, no visual
+  feedback will be given in the user interface, not on success, nor on error.
+- Css has only been adapted for WooCommerce, not for other webshops.
 
 Bugs:
 - OC: Siel\Acumulus\OpenCart\Shop\AcumulusEntryManager::getByInvoiceSource():

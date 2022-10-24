@@ -686,28 +686,7 @@ abstract class InvoiceManager
         if ($token === null) {
             throw new RuntimeException('No Acumulus token for $invoiceSource');
         }
-        $emailAsPdf = [];
-        // @todo: These settings may contain field references, so we ought to
-        //   set up token expansion (define property sources, expand values).
-        $emailAsPdfSettings = $this->getConfig()->getEmailAsPdfSettings();
-//        $emailTo = !empty($emailAsPdfSettings['emailTo']) ? $this->getTokenizedValue($emailAsPdfSettings['emailTo']) : '';
-//        $this->addTokenDefault($emailAsPdf, Tag::EmailBcc, $emailAsPdfSettings['emailBcc']);
-//        $this->addTokenDefault($emailAsPdf, Tag::EmailFrom, $emailAsPdfSettings['emailFrom']);
-//        $this->addTokenDefault($emailAsPdf, Tag::Subject, $emailAsPdfSettings['subject']);
-        if (!empty($emailAsPdfSettings['emailTo'])) {
-            $emailAsPdf[Tag::EmailTo] = $emailAsPdfSettings['emailTo'];
-        }
-        if (!empty($emailAsPdfSettings['emailBcc'])) {
-            $emailAsPdf[Tag::EmailBcc] = $emailAsPdfSettings['emailBcc'];
-        }
-        if (!empty($emailAsPdfSettings['emailFrom'])) {
-            $emailAsPdf[Tag::EmailFrom] = $emailAsPdfSettings['emailFrom'];
-        }
-        if (!empty($emailAsPdfSettings['subject'])) {
-            $emailAsPdf[Tag::Subject] = $emailAsPdfSettings['subject'];
-        }
-        $emailAsPdf[Tag::ConfirmReading] = $emailAsPdfSettings['confirmReading'] ? Api::ConfirmReading_Yes : Api::ConfirmReading_No;
-
+        $emailAsPdf = $this->getCreator()->createEmailAsPdf($invoiceSource);
         return $this->getAcumulusApiClient()->emailInvoiceAsPdf($token, $emailAsPdf);
     }
 
@@ -736,11 +715,7 @@ abstract class InvoiceManager
             throw new RuntimeException('No Acumulus token for $invoiceSource');
         }
 
-        $emailAsPdfSettings = $this->getConfig()->getEmailAsPdfSettings();
-        $emailAsPdf = [
-            Tag::EmailTo => $emailAsPdfSettings['packingSlipEmailTo']
-        ];
-
+        $emailAsPdf = $this->getCreator()->createEmailAsPdf($invoiceSource, false);
         return $this->getAcumulusApiClient()->emailPackingSlipAsPdf($token, $emailAsPdf);
     }
 

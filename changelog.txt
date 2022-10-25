@@ -34,8 +34,13 @@ WC   WooCommerce         6.7.0               >= 5.0 (3 and 4 will probably work)
      WordPress           6.0                 >= 5.9 (earlier version WILL fail)
 --------------------------------------------------------------------------------
 
-7.4.0 (2022-10-24)
-------------------
+7.4.1 (2022-10-25) (WC only)
+----------------------------
+Bugs:
+- Error in e-mail address validation on forms.
+
+7.4.0 (2022-10-24) (WC only)
+----------------------------
 Features:
 - Added support for the email packing slip as pdf API call. (Note: this is not
   an end user feature.)

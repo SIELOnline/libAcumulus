@@ -70,7 +70,7 @@ class ConfigForm extends BaseConfigForm
 
         if (empty($this->submittedValues[Tag::EmailOnError])) {
             $this->addFormMessage($this->t('message_validate_email_1'), Severity::Error, Tag::EmailOnError);
-        } elseif ($this->isEmailAddress($this->submittedValues[Tag::EmailOnError])) {
+        } elseif (!$this->isEmailAddress($this->submittedValues[Tag::EmailOnError])) {
             $this->addFormMessage($this->t('message_validate_email_0'), Severity::Error, Tag::EmailOnError);
         }
     }

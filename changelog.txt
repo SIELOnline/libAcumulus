@@ -26,18 +26,37 @@ HS   HikaShop (Joomla)   4.6.0 (HS Starter)  >= 3.0.0
 JOO  Joomla (HS + VM)    4.1.4               >= 3.6
 MA   Magento             2.4.2               >= 2.3
 OC   OpenCart            3.0.3.7             >= 3.0
+                                             Not yet tested with 4.0.x.y.
 PS   PrestaShop          1.7.8.5             >= 1.7.6
 VM   VirtueMart (Joomla) 3.8.8               >= 3.0
                          4.0.2               Does not work with Joomla 4.1.4,
-                                             not tested with Joomla 3.10
+                                             VM4 not tested with Joomla 3.10.
 WC   WooCommerce         6.7.0               >= 5.0 (3 and 4 will probably work)
      WordPress           6.0                 >= 5.9 (earlier version WILL fail)
 --------------------------------------------------------------------------------
+
+7.4.2 (2022-10-25) (OC only)
+----------------------------
+Bugs:
+- Note that this is the first version released for OC that contains the bug
+  solutions from 7.4.0.
+
+Features:
+- OC: Added mail (pdf document) buttons on Acumulus invoice status overview.
+  This includes styling and using the new icons.
+- To improve showing the documents links and buttons on the invoice status
+  overview (on the order detail page), the 'markup' field type of our own form
+  handling now accepts an array of 'inputs'. These will be rendered (by our own
+  form rendering) as the 'contents' of the 'markup' field. This allows to place
+  multiple buttons on 1 line. (Feature added to FormRenderer only, not yet to
+  FormMapper).
+
 
 7.4.1 (2022-10-25) (WC only)
 ----------------------------
 Bugs:
 - Error in e-mail address validation on forms.
+
 
 7.4.0 (2022-10-24) (WC only)
 ----------------------------

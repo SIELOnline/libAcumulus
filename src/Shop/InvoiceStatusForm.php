@@ -871,7 +871,7 @@ class InvoiceStatusForm extends Form
         $fields = $this->getVatTypeField($entry)
                + $this->getAmountFields($source, $entry)
                + $this->getPaymentStatusFields($source, $entry)
-               + $this->getLinksField($entry['token']);
+               + $this->getDocumentsFields($entry['token']);
         if ($this->status >= self::Status_Warning) {
             $fields += $this->getSendAgainFields();
         }
@@ -1146,7 +1146,7 @@ class InvoiceStatusForm extends Form
      *   - buttons to mail the documents related to this order.
      *   - links to show the documents related to this order.
      */
-    protected function getLinksField(string $token): array
+    protected function getDocumentsFields(string $token): array
     {
         $result = [];
         $actions = [];
@@ -1191,15 +1191,17 @@ class InvoiceStatusForm extends Form
             ];
         }
 
-        if (!empty($actions)) {
-            $result += $actions;
-        }
-        if (!empty($links)) {
-            $result['links'] = [
+        if (!empty($actions) || !empty($links)) {
+            $result['documents'] = [
                 'type' => 'markup',
                 'label' => $this->t(count($links) === 1 ? 'document' : 'documents'),
-                'value' => implode(' ', $links),
             ];
+            if (!empty($links)) {
+                $result['documents']['value-before'] = implode(' ', $links);
+            }
+            if (!empty($actions)) {
+                $result['documents']['inputs'] = $actions;
+            }
         }
         return $result;
     }
@@ -1274,6 +1276,9 @@ class InvoiceStatusForm extends Form
             $result[$newKey] = $field;
             if (isset($field['fields'])) {
                 $result[$newKey]['fields'] = $this->addIdPrefix($field['fields'], $idPrefix);
+            }
+            if (isset($field['inputs'])) {
+                $result[$newKey]['inputs'] = $this->addIdPrefix($field['inputs'], $idPrefix);
             }
         }
         return $result;

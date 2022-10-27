@@ -198,10 +198,11 @@ class ConfigForm extends BaseConfigForm
             }
         }
         // Check that a valid mail address has been filled in.
-        if (!empty($this->submittedValues['packingSlipEmailTo'])) {
-            if (!$this->isEmailAddress($this->submittedValues['packingSlipEmailTo'])) {
+        if (!empty($this->submittedValues['packingSlipEmailTo'])
+            && strpos($this->submittedValues['packingSlipEmailTo'], '[') === false
+            && !$this->isEmailAddress($this->submittedValues['packingSlipEmailTo'], true)
+        ) {
                 $this->addFormMessage($this->t('message_validate_packing_slip_email_1'), Severity::Error, 'packingSlipEmailTo');
-            }
         }
     }
 
@@ -628,11 +629,11 @@ class ConfigForm extends BaseConfigForm
             ];
         }
         $fields['packingSlipEmailTo'] = [
-            'type' => 'email',
+            'type' => 'text',
             'label' => $this->t('field_packingSlipEmailTo'),
             'description' => $this->t('desc_packingSlipEmailTo') . ' ' . $this->t('msg_token'),
             'attributes' => [
-                'size' => 30,
+                'size' => 60,
             ],
         ];
         return $fields;
@@ -662,7 +663,7 @@ class ConfigForm extends BaseConfigForm
                 ],
             ],
             'emailTo' => [
-                'type' => 'email',
+                'type' => 'text',
                 'label' => $this->t('field_emailTo'),
                 'description' => $this->t('desc_emailTo') . ' ' . $this->t('msg_token'),
                 'attributes' => [
@@ -670,7 +671,7 @@ class ConfigForm extends BaseConfigForm
                 ],
             ],
             'emailBcc' => [
-                'type' => 'email',
+                'type' => 'text',
                 'label' => $this->t('field_emailBcc'),
                 'description' => $this->t('desc_emailBcc') . ' ' . $this->t('msg_token'),
                 'attributes' => [
@@ -679,7 +680,7 @@ class ConfigForm extends BaseConfigForm
                 ],
             ],
             'emailFrom' => [
-                'type' => 'email',
+                'type' => 'text',
                 'label' => $this->t('field_emailFrom'),
                 'description' => $this->t('desc_emailFrom') . ' ' . $this->t('msg_token'),
                 'attributes' => [

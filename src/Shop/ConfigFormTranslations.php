@@ -187,6 +187,7 @@ De eigenschappen die uw webshop kent worden hieronder opgesomd.</p>
         'internal_id' => 'intern ID, ook wel technische sleutel genoemd',
         'external_id' => 'de voor iedereen zichtbare referentie',
         'internal_not_label' => 'waarde zoals die wordt opgeslagen in de database, geen (vertaald) label',
+        'label' => 'Vertaalde naam voor "%s" of "%s"',
         'invoice_lines_only' => 'alleen beschikbaar bij de factuurregels',
         'payment_status_1' => 'Nog niet betaald',
         'payment_status_2' => 'Betaald',
@@ -387,7 +388,7 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
 
         //  Email packing slip settings.
         'field_packingSlipEmailTo' => 'E-mailadres voor de pakbon',
-        'desc_packingSlipEmailTo' => 'Vul het e-mailadres in waar naartoe u de pakbon wilt sturen, dit kan bijv. het e-mailadres van iemand of een printer in uw magazijn zijn. Dit veld wordt alleen gebruikt als u hierboven e-mailopties voor de pakbon hebt aangevinkt.',
+        'desc_packingSlipEmailTo' => 'Vul het e-mailadres in waar naartoe u de pakbon wilt sturen, dit kan bijv. het e-mailadres van iemand of een printer in uw magazijn zijn. U mag meerdere e-mailadressen invullen, gescheiden door een komma (,) of een punt-komma (;) Dit veld wordt alleen gebruikt als u hierboven e-mailopties voor de pakbon hebt aangevinkt.',
         'message_validate_packing_slip_email_0' => 'Als u de optie "Toon een link om de pdf te mailen." kiest voor de pakbon, is het veld "E-mailadres voor de pakbon" verplicht. Vul een e-mailadres in.',
         'message_validate_packing_slip_email_1' => 'Het veld "E-mailadres voor de pakbon" bevat geen geldig e-mailadres, vul een correct e-mailadres in.',
 
@@ -588,6 +589,7 @@ The properties known by your web shop are listed below.</p>
         'internal_id' => 'internal ID, the so-called technical key',
         'external_id' => 'A reference used in external communication',
         'internal_not_label' => 'value as stored in the database, not a (translated) label',
+        'label' => 'Translated name for "%s" of "%s"',
         'invoice_lines_only' => 'only available with the invoice lines',
         'payment_status_1' => 'Due',
         'payment_status_2' => 'Paid',
@@ -787,7 +789,7 @@ Please note that these documents are created by Acumulus, not the web shop. If y
 
         //  Email packing slip settings.
         'field_packingSlipEmailTo' => 'Email address for the packing slip',
-        'desc_packingSlipEmailTo' => 'Fill in the email address to which you want to send the packing slip. This can be, e.g, the address of someone or some printer in your warehouse. This field will only ne used if you enabled mail options for the packing slip.',
+        'desc_packingSlipEmailTo' => 'Fill in the email address(es) to which you want to send the packing slip. This can be, e.g, the address of someone or some printer in your warehouse. You may enter multiple email addresses separated by a comma (,) or a semi-colon (;). This field will only ne used if you enabled mail options for the packing slip.',
         'message_validate_packing_slip_email_0' => 'If you enabled one or more of the options to mail a packing slip, than is the field "Email address for the packing slip" required. Fill in an e-mail address.',
         'message_validate_packing_slip_email_1' => 'The field "Email address for the packing slip" is not a valid e-mail address, please fill in a valid e-mail address.',
 

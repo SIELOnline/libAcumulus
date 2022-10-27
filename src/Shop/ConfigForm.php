@@ -204,6 +204,14 @@ class ConfigForm extends BaseConfigForm
         ) {
                 $this->addFormMessage($this->t('message_validate_packing_slip_email_1'), Severity::Error, 'packingSlipEmailTo');
         }
+
+        // Check that valid bcc mail addresses have been filled in.
+        if (!empty($this->submittedValues['packingSlipEmailBcc'])
+            && strpos($this->submittedValues['packingSlipEmailBcc'], '[') === false
+            && !$this->isEmailAddress($this->submittedValues['packingSlipEmailBcc'], true)
+        ) {
+                $this->addFormMessage($this->t('message_validate_packing_slip_email_2'), Severity::Error, 'packingSlipEmailBcc');
+        }
     }
 
     /**
@@ -632,6 +640,14 @@ class ConfigForm extends BaseConfigForm
             'type' => 'text',
             'label' => $this->t('field_packingSlipEmailTo'),
             'description' => $this->t('desc_packingSlipEmailTo') . ' ' . $this->t('msg_token'),
+            'attributes' => [
+                'size' => 60,
+            ],
+        ];
+        $fields['packingSlipEmailBcc'] = [
+            'type' => 'text',
+            'label' => $this->t('field_packingSlipEmailBcc'),
+            'description' => $this->t('desc_packingSlipEmailBcc') . ' ' . $this->t('msg_token'),
             'attributes' => [
                 'size' => 60,
             ],

@@ -910,6 +910,13 @@ abstract class Creator
                 $this->addTokenDefault($emailAsPdf, Tag::EmailFrom, $emailAsPdfSettings['emailFrom']);
                 $this->addTokenDefault($emailAsPdf, Tag::Subject, $emailAsPdfSettings['subject']);
                 $emailAsPdf[Tag::ConfirmReading] = $emailAsPdfSettings['confirmReading'] ? Api::ConfirmReading_Yes : Api::ConfirmReading_No;
+            } else {
+                $this->addTokenDefault($emailAsPdf, Tag::EmailBcc, $emailAsPdfSettings['packingSlipEmailBcc']);
+                $this->addTokenDefault($emailAsPdf, Tag::EmailFrom, $emailAsPdfSettings['packingSlipEmailFrom']);
+                $this->addTokenDefault($emailAsPdf, Tag::Subject, $emailAsPdfSettings['packingSlipSubject']);
+                $emailAsPdf[Tag::ConfirmReading] = $emailAsPdfSettings['packingSlipConfirmReading']
+                    ? Api::ConfirmReading_Yes
+                    : Api::ConfirmReading_No;
             }
         }
         return $emailAsPdf;

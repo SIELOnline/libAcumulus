@@ -999,17 +999,41 @@ class Config
                     'type' => 'string',
                     'default' => '',
                 ],
-                // For now, we do not make message configurable...
+                // For now, we do not make the invoice message configurable...
                 // For now, we don't present the confirmReading option in the UI.
                 'confirmReading' => [
                     'group' => Tag::EmailAsPdf,
                     'type' => 'bool',
                     'default' => false,
                 ],
+                // For now, we don't present the packingSlipEmailFrom option in the UI.
+                'packingSlipEmailFrom' => [
+                    'group' => Tag::EmailAsPdf,
+                    'type' => 'string',
+                    'default' => '',
+                ],
                 'packingSlipEmailTo' => [
                     'group' => Tag::EmailAsPdf,
                     'type' => 'string',
                     'default' => '',
+                ],
+                'packingSlipEmailBcc' => [
+                    'group' => Tag::EmailAsPdf,
+                    'type' => 'string',
+                    'default' => '',
+                ],
+                // For now, we don't present the packingSlipSubject option in the UI.
+                'packingSlipSubject' => [
+                    'group' => Tag::EmailAsPdf,
+                    'type' => 'string',
+                    'default' => '',
+                ],
+                // For now, we do not make packing slip mail message configurable...
+                // For now, we don't present the packingSlipConfirmReading option in the UI.
+                'packingSlipConfirmReading' => [
+                    'group' => Tag::EmailAsPdf,
+                    'type' => 'bool',
+                    'default' => false,
                 ],
                 'showRatePluginMessage' => [
                     'group' => 'other',

@@ -228,7 +228,7 @@ De eigenschappen die uw webshop kent worden hieronder opgesomd.</p>
         'desc_telephone' => 'Het telefoonnummer dat u in Acumulus wilt opslaan. Acumulus kan maar 1 nummer opslaan. Dus als uw webshop wel een vast en mobiel nummer opslaat, dient u te kiezen welk nummer uw voorkeur heeft. Gebruik het | teken voor als de klant maar 1 nummer heeft ingevuld.',
         'field_fax' => 'Fax',
         'desc_fax' => 'De meeste webshops slaan geen fax nummer meer op. U kunt dit veld dan evt. gebruiken om een vast EN een mobiel nummer in Acumulus op te slaan (als uw webshop die wel allebei opslaat).',
-        'field_email' => 'Email',
+        'field_email' => 'E-mail',
 
         'field_mark' => 'Kenmerk',
         'desc_mark' => 'U knt hier extra informatie over de klant versturen, bijv. het BSN. Dit veld komt overeen met het veld "kenmerk" op blad 2 van het relatiebeheer.',
@@ -297,7 +297,7 @@ Als u de eerste optie heeft uitgezet, geldt de tweede optie alleen voor uw zakel
         'field_descriptionText' => 'Uitgebreide toelichting',
         'desc_descriptionText' => 'Meerregelige toelichting op de factuur. Deze inhoud kan in Acumulus op een factuursjabloon getoond worden m.b.v. de veldverwijzing [toelichting].',
         'field_invoiceNotes' => 'Notities',
-        'desc_invoiceNotes' => 'Notities die u aan de factuur wilt toevoegen en die voor intern gebruik zijn bedoeld. Deze worden niet getoond op de factuursjabloon, in emails naar de klant, of op de pakbon.',
+        'desc_invoiceNotes' => 'Notities die u aan de factuur wilt toevoegen en die voor intern gebruik zijn bedoeld. Deze worden niet getoond op de factuursjabloon, in e-mails naar de klant, of op de pakbon.',
 
         // Invoice lines settings.
         'invoiceLinesSettingsHeader' => 'Uw factuurregelinstellingen',
@@ -369,7 +369,7 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
         // Email invoice settings.
         'field_emailAsPdf' => 'Factuur automatisch versturen',
         'option_emailAsPdf' => 'Laat Acumulus de pdf van de factuur automatisch mailen, direct nadat de factuurgegevens naar Acumulus verzonden zijn.',
-        'desc_emailAsPdf' => 'Als u mail-opties hebt aangevinkt, kunt u de verdere opties gebruiken om de e-mailverzending aan uw wensen aan te passen. Het bericht in de email body kunt u niet hier instellen, dat kunt u in Acumulus doen onder "Beheer - Factuur-sjablonen". Merk nog op dat als u geen klantgegevens naar Acumulus verstuurt (geavanceerde instelling), Acumulus geen factuur-pdf kan versturen.',
+        'desc_emailAsPdf' => 'Als u mail-opties hebt aangevinkt, kunt u de verdere opties gebruiken om de e-mailverzending aan uw wensen aan te passen. Het bericht in de e-mail body kunt u niet hier instellen, dat kunt u in Acumulus doen onder "Beheer - Factuur-sjablonen". Merk nog op dat als u geen klantgegevens naar Acumulus verstuurt (geavanceerde instelling), Acumulus geen factuur-pdf kan versturen.',
 
         'field_emailTo' => 'Aan',
         'desc_emailTo' => 'Het e-mailadres waar naartoe de factuur verstuurd moet worden. Als u dit leeg laat wordt het e-mailadres uit de klantgegevens van de factuur gebruikt. Wij adviseren dit veld leeg te laten. U mag meerdere e-mailadressen invullen, gescheiden door een komma (,) of een punt-komma (;).',
@@ -384,13 +384,16 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
         'message_validate_email_4' => 'Het veld "Afzender" bevat geen geldig e-mailadres, vul een correct e-mailadres in.',
 
         'field_subject' => 'Onderwerp',
-        'desc_subject' => 'Het onderwerp van de email. Als u dit leeg laat wordt "Factuur [nummer] [omschrijving]" gebruikt. Let op: als u Acumulus het factuurnummer laat bepalen, is het helaas niet mogelijk om naar het factuurnummer te verwijzen.',
+        'desc_subject' => 'Het onderwerp van de e-mail. Als u dit leeg laat wordt "Factuur [nummer] [omschrijving]" gebruikt. Let op: als u Acumulus het factuurnummer laat bepalen, is het helaas niet mogelijk om naar het factuurnummer te verwijzen.',
 
         //  Email packing slip settings.
         'field_packingSlipEmailTo' => 'E-mailadres voor de pakbon',
-        'desc_packingSlipEmailTo' => 'Vul het e-mailadres in waar naartoe u de pakbon wilt sturen, dit kan bijv. het e-mailadres van iemand of een printer in uw magazijn zijn. U mag meerdere e-mailadressen invullen, gescheiden door een komma (,) of een punt-komma (;) Dit veld wordt alleen gebruikt als u hierboven e-mailopties voor de pakbon hebt aangevinkt.',
+        'desc_packingSlipEmailTo' => 'Vul het e-mailadres in waar naartoe u de pakbon wilt sturen, dit kan bijv. het e-mailadres van iemand of een printer in uw magazijn zijn. U mag meerdere e-mailadressen invullen, gescheiden door een komma (,) of een punt-komma (;). Dit veld wordt alleen gebruikt als u hierboven e-mailopties voor de pakbon hebt aangevinkt.',
+        'field_packingSlipEmailBcc' => 'Bcc e-mailadres voor de pakbon',
+        'desc_packingSlipEmailBcc' => 'Vul extra e-mailadressen in waar naartoe u de pakbon wilt sturen. U mag meerdere e-mailadressen invullen, gescheiden door een komma (,) of een punt-komma (;). Dit veld wordt alleen gebruikt als u hierboven e-mailopties voor de pakbon hebt aangevinkt.',
         'message_validate_packing_slip_email_0' => 'Als u de optie "Toon een link om de pdf te mailen." kiest voor de pakbon, is het veld "E-mailadres voor de pakbon" verplicht. Vul een e-mailadres in.',
         'message_validate_packing_slip_email_1' => 'Het veld "E-mailadres voor de pakbon" bevat geen geldig e-mailadres, vul een correct e-mailadres in.',
+        'message_validate_packing_slip_email_2' => 'Het veld "Bcc e-mailadres voor de pakbon" bevat geen geldig e-mailadres, vul een correct e-mailadres in.',
 
         // Plugin settings.
         'pluginSettingsHeader' => 'Plugin instellingen',
@@ -629,7 +632,7 @@ The properties known by your web shop are listed below.</p>
         'desc_telephone' => 'The phone number you want to store in Acumulus. Acumulus only stores 1 phone number. So if your web shop stores both a land line and mobile number you will have to choose which one you prefer to store in Acumulus. Use the | character to list alternative phone number fields, so you get a phone number regardless in which field it was filled in.',
         'field_fax' => 'Fax',
         'desc_fax' => 'Most web shops do not store a fax number. So leave empty or "use" it to store both mobile and land line number (if your web shop does store both).',
-        'field_email' => 'Email',
+        'field_email' => 'E-mail',
 
         'field_mark' => 'Mark',
         'desc_mark' => 'Use this field to send any additional information about your customer, e.g. its BSN. This field fills the "kenmerk" on page 2 of the Acumulus relation management dialog.',
@@ -698,7 +701,7 @@ If you unchecked the first option, the second option only applies to business cl
         'field_descriptionText' => 'Extended description',
         'desc_descriptionText' => 'Multi line invoice description. In Acumulus, you can use the contents of this field in invoice templates using the field reference [toelichting].',
         'field_invoiceNotes' => 'Notes',
-        'desc_invoiceNotes' => 'Internal notes that you want to add to the invoice. These notes will not be shown on invoice templates, emails to the client, or on the packing slip.',
+        'desc_invoiceNotes' => 'Internal notes that you want to add to the invoice. These notes will not be shown on invoice templates, e-mails to the client, or on the packing slip.',
 
         // Invoice lines settings.
         'invoiceLinesSettingsHeader' => 'Your invoice lines settings',
@@ -773,25 +776,28 @@ Please note that these documents are created by Acumulus, not the web shop. If y
         'desc_emailAsPdf' => 'If you enabled mail options, you can customise the mail sending process with the settings below. Note that the message in the mail body cannot be changed here, you can do that in Acumulus by going to menu-item "Beheer - Factuur-sjablonen". Please note that if you don\'t send customer data to Acumulus (advanced setting), Acumulus cannot send invoice-pdfs.',
 
         'field_emailTo' => 'To',
-        'desc_emailTo' => 'The email address to send the invoice to. If you leave this empty the email address from the invoice\'s customer data will be used. We recommend you to leave this empty. You may enter multiple email addresses separated by a comma (,) or a semi-colon (;).',
+        'desc_emailTo' => 'The e-mail address to send the invoice to. If you leave this empty the e-mail address from the invoice\'s customer data will be used. We recommend you to leave this empty. You may enter multiple e-mail addresses separated by a comma (,) or a semi-colon (;).',
         'message_validate_email_5' => 'The field To is not a valid e-mail address, please fill in a valid e-mail address.',
 
         'field_subject' => 'Subject',
-        'desc_subject' => 'The subject line of the email. If you leave this empty "Invoice [number] [description]" will be used. Note: if you have Acumulus assign the invoice number, it is unfortunately not possible to refer to that invoice number in the subject.',
+        'desc_subject' => 'The subject line of the e-mail. If you leave this empty "Invoice [number] [description]" will be used. Note: if you have Acumulus assign the invoice number, it is unfortunately not possible to refer to that invoice number in the subject.',
 
         'field_emailBcc' => 'BCC',
-        'desc_emailBcc' => 'Additional email addresses to send the invoice to, e.g. the email address of your own administration department. If you leave this empty the invoice email will only be sent to your client. You may enter multiple email addresses separated by a comma (,) or a semi-colon (;).',
+        'desc_emailBcc' => 'Additional e-mail addresses to send the invoice to, e.g. the e-mail address of your own administration department. If you leave this empty the invoice e-mail will only be sent to your client. You may enter multiple e-mail addresses separated by a comma (,) or a semi-colon (;).',
         'message_validate_email_3' => 'The field BCC is not a valid e-mail address, please fill in a valid e-mail address.',
 
         'field_emailFrom' => 'Sender',
-        'desc_emailFrom' => 'The email address to use as sender. If you leave this empty, the email address of the Acumulus template will be used. We recommend you to leave this empty.',
+        'desc_emailFrom' => 'The e-mail address to use as sender. If you leave this empty, the e-mail address of the Acumulus template will be used. We recommend you to leave this empty.',
         'message_validate_email_4' => 'The field Sender is not a valid e-mail address, please fill in a valid e-mail address.',
 
         //  Email packing slip settings.
-        'field_packingSlipEmailTo' => 'Email address for the packing slip',
-        'desc_packingSlipEmailTo' => 'Fill in the email address(es) to which you want to send the packing slip. This can be, e.g, the address of someone or some printer in your warehouse. You may enter multiple email addresses separated by a comma (,) or a semi-colon (;). This field will only ne used if you enabled mail options for the packing slip.',
-        'message_validate_packing_slip_email_0' => 'If you enabled one or more of the options to mail a packing slip, than is the field "Email address for the packing slip" required. Fill in an e-mail address.',
-        'message_validate_packing_slip_email_1' => 'The field "Email address for the packing slip" is not a valid e-mail address, please fill in a valid e-mail address.',
+        'field_packingSlipEmailTo' => 'E-mail address for the packing slip',
+        'desc_packingSlipEmailTo' => 'Fill in the e-mail address to which you want to send the packing slip. This can be, e.g, the address of someone or some printer in your warehouse. You may enter multiple e-mail addresses separated by a comma (,) or a semi-colon (;). This field will only ne used if you enabled mail options for the packing slip.',
+        'field_packingSlipEmailBcc' => 'Bcc e-mail address for the packing slip',
+        'desc_packingSlipEmailBcc' => 'Fill in additional e-mail addresses to which you want to send the packing slip. You may enter multiple e-mail addresses separated by a comma (,) or a semi-colon (;). This field will only ne used if you enabled mail options for the packing slip.',
+        'message_validate_packing_slip_email_0' => 'If you enabled one or more of the options to mail a packing slip, than is the field "E-mail address for the packing slip" required. Fill in an e-mail address.',
+        'message_validate_packing_slip_email_1' => 'The field "E-mail address for the packing slip" is not a valid e-mail address, please fill in a valid e-mail address.',
+        'message_validate_packing_slip_email_2' => 'The field "Bcc e-mail address for the packing slip" is not a valid e-mail address, please fill in a valid e-mail address.',
 
         // Plugin settings.
         'pluginSettingsHeader' => 'Plugin settings',

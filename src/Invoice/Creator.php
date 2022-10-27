@@ -202,8 +202,12 @@ abstract class Creator
     {
         $this->propertySources = [];
         $this->propertySources['invoiceSource'] = $this->invoiceSource;
+        $this->propertySources['invoiceSourceType'] = ['label' => $this->t($this->propertySources['invoiceSource']->getType())];
+
         if (array_key_exists(Source::CreditNote, $this->shopCapabilities->getSupportedInvoiceSourceTypes())) {
             $this->propertySources['originalInvoiceSource'] = $this->invoiceSource->getOrder();
+            $this->propertySources['originalInvoiceSourceType'] =
+                ['label' => $this->t($this->propertySources['originalInvoiceSource']->getType())];
         }
         $this->propertySources['source'] = $this->invoiceSource->getSource();
         if (array_key_exists(Source::CreditNote, $this->shopCapabilities->getSupportedInvoiceSourceTypes())) {
@@ -213,6 +217,8 @@ abstract class Creator
             $this->propertySources['order'] = $this->invoiceSource->getOrder()->getSource();
             if ($this->invoiceSource->getType() === Source::CreditNote) {
                 $this->propertySources['refundedInvoiceSource'] = $this->invoiceSource->getOrder();
+                $this->propertySources['refundedInvoiceSourceType'] =
+                    ['label' => $this->t($this->propertySources['refundedInvoiceSource']->getType())];
                 $this->propertySources['refundedOrder'] = $this->invoiceSource->getOrder()->getSource();
             }
         }

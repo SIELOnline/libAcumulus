@@ -842,7 +842,7 @@ class Config
                 'description' => [
                     'group' => Tag::Invoice,
                     'type' => 'string',
-                    'default' => '[invoiceSource::type+invoiceSource::reference+"-"+refundedInvoiceSource::type+refundedInvoiceSource::reference]',
+                    'default' => '[invoiceSourceType::label+invoiceSource::reference+"-"+refundedInvoiceSourceType::label+refundedInvoiceSource::reference]',
                 ],
                 'descriptionText' => [
                     'group' => Tag::Invoice,

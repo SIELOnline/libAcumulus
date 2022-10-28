@@ -19,7 +19,7 @@ class FormRenderer extends BaseFormRenderer
         $this->elementWrapperClass = 'control-group';
         $this->labelWrapperTag = 'div';
         $this->labelWrapperClass = 'control-label';
-        $this->requiredMarkup = '<span class="star" aria_hidden="true"> *</span>';
+        $this->requiredMarkup = '<span class="star" aria-hidden="true"> *</span>';
         $this->inputWrapperTag = 'div';
         $this->inputWrapperClass = 'controls';
 
@@ -35,4 +35,23 @@ class FormRenderer extends BaseFormRenderer
             $this->markupWrapperClass = 'controls';
         }
     }
+
+    protected function input(array $field): string
+    {
+        if ($field['type'] !== 'button') {
+            return parent::input($field);
+        }
+
+        $output = '';
+        $output .= $this->getWrapper('input');
+        $attributes = $field['attributes'];
+        $attributes = $this->addAttribute($attributes, 'id', $field['id']);
+        $attributes = $this->addAttribute($attributes, 'name', $field['name']);
+        $output .= $this->getOpenTag('button', $attributes);
+        $output .= $field['value'];
+        $output .= $this->getCloseTag('button');
+        $output .= $this->getWrapperEnd('input');
+        return $output;
+    }
+
 }

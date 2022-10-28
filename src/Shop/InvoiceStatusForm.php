@@ -1197,7 +1197,7 @@ class InvoiceStatusForm extends Form
                 'label' => $this->t(count($links) === 1 ? 'document' : 'documents'),
             ];
             if (!empty($links)) {
-                $result['documents']['value-before'] = implode('', $links);
+                $result['documents']['value-before'] = sprintf('<div class="acumulus-links">%s</div>', implode('', $links));
             }
             if (!empty($actions)) {
                 $result['documents']['inputs'] = $actions;

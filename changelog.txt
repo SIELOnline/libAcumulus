@@ -51,8 +51,8 @@ Features:
 - Added a field "Bcc e-mail address for the packing slip" to the"Documents" -
   "Packing slip" section of the Acumulus settings. The "To address" now also
   accepts multiple addresses.
-- PS: Added mail (pdf document) buttons on Acumulus invoice status overview.
-- WC: Improved styling of document links and buttons on status overview.
+- PS+JOO: Added mail (pdf document) buttons on Acumulus invoice status overview.
+- WC+OC: Improved styling of document links and buttons on status overview.
 
 Bugs:
 - All: configuration fields for mail-addresses that allow field references

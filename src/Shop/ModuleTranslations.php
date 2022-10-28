@@ -37,9 +37,11 @@ class ModuleTranslations extends TranslationCollection
         'documents' => 'Documenten',
         'document' => 'Document',
         'document_invoice' => 'factuur',
-        'document_packingSlip' => 'pakbon',
-        'document_show' => 'Acumulus %1$s openen in uw browser',
-        'document_mail' => 'Acumulus %1$s mailen',
+        'document_packing_slip' => 'pakbon',
+        'document_show' => '%1$s tonen',
+        'document_mail' => '%1$s mailen',
+        'document_show_title' => 'Acumulus %1$s openen in uw browser',
+        'document_mail_title' => 'Acumulus %1$s mailen',
 
         'wait' => 'Even wachten',
 
@@ -84,9 +86,11 @@ class ModuleTranslations extends TranslationCollection
         'documents' => 'Documents',
         'document' => 'Document',
         'document_invoice' => 'invoice',
-        'document_packingSlip' => 'packing slip',
-        'document_show' => 'Open Acumulus %1$s in your browser',
-        'document_mail' => 'Mail Acumulus %1$s',
+        'document_packing_slip' => 'packing slip',
+        'document_show' => 'Show %1$s',
+        'document_mail' => 'Mail %1$s',
+        'document_show_title' => 'Open Acumulus %1$s in your browser',
+        'document_mail_title' => 'Mail Acumulus %1$s',
 
         'wait' => 'Please wait',
     ];

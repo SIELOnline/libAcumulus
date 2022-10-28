@@ -632,7 +632,9 @@ abstract class Form extends MessageCollection
         $regexpEmail = '[^@<>,; "\']+@([^.@ ,;]+\.)+[^.@ ,;]+';
         $regexpSingle = '/^' . $regexpEmail . '$/';
         $regexpMulti = '/^' . $regexpEmail . '([,;]' . $regexpEmail . ')*$/';
-        return !preg_match($multi ? $regexpMulti : $regexpSingle, $submittedValue);
+        $regex = $multi ? $regexpMulti : $regexpSingle;
+        $result = preg_match($regex, $submittedValue);
+        return $result;
     }
 
     /**

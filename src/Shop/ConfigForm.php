@@ -70,7 +70,7 @@ class ConfigForm extends BaseConfigForm
 
         if (empty($this->submittedValues[Tag::EmailOnError])) {
             $this->addFormMessage($this->t('message_validate_email_1'), Severity::Error, Tag::EmailOnError);
-        } elseif ($this->isEmailAddress($this->submittedValues[Tag::EmailOnError])) {
+        } elseif (!$this->isEmailAddress($this->submittedValues[Tag::EmailOnError])) {
             $this->addFormMessage($this->t('message_validate_email_0'), Severity::Error, Tag::EmailOnError);
         }
     }
@@ -198,10 +198,19 @@ class ConfigForm extends BaseConfigForm
             }
         }
         // Check that a valid mail address has been filled in.
-        if (!empty($this->submittedValues['packingSlipEmailTo'])) {
-            if (!$this->isEmailAddress($this->submittedValues['packingSlipEmailTo'])) {
+        if (!empty($this->submittedValues['packingSlipEmailTo'])
+            && strpos($this->submittedValues['packingSlipEmailTo'], '[') === false
+            && !$this->isEmailAddress($this->submittedValues['packingSlipEmailTo'], true)
+        ) {
                 $this->addFormMessage($this->t('message_validate_packing_slip_email_1'), Severity::Error, 'packingSlipEmailTo');
-            }
+        }
+
+        // Check that valid bcc mail addresses have been filled in.
+        if (!empty($this->submittedValues['packingSlipEmailBcc'])
+            && strpos($this->submittedValues['packingSlipEmailBcc'], '[') === false
+            && !$this->isEmailAddress($this->submittedValues['packingSlipEmailBcc'], true)
+        ) {
+                $this->addFormMessage($this->t('message_validate_packing_slip_email_2'), Severity::Error, 'packingSlipEmailBcc');
         }
     }
 
@@ -611,28 +620,36 @@ class ConfigForm extends BaseConfigForm
         $fields = [];
         $fields['packingSlipSubHeader'] = [
             'type' => 'markup',
-            'value' => '<h3>' . ucfirst($this->t("document_packingSlip")) . '</h3>',
+            'value' => '<h3>' . ucfirst($this->t("document_packing_slip")) . '</h3>',
         ];
         $fields['detailPackingSlip'] = [
             'type' => 'checkbox',
             'label' => $this->t('field_detailPage'),
             'description' => $this->t('desc_detailPage'),
-            'options' => $this->getDocumentsOptions('Detail', 'packingSlip'),
+            'options' => $this->getDocumentsOptions('Detail', 'packing_slip'),
         ];
         if ($this->shopCapabilities->hasOrderList()) {
             $fields['listPackingSlip'] = [
                 'type' => 'checkbox',
                 'label' => $this->t('field_listPage'),
                 'description' => $this->t('desc_listPage'),
-                'options' => $this->getDocumentsOptions('List', 'packingSlip'),
+                'options' => $this->getDocumentsOptions('List', 'packing_slip'),
             ];
         }
         $fields['packingSlipEmailTo'] = [
-            'type' => 'email',
+            'type' => 'text',
             'label' => $this->t('field_packingSlipEmailTo'),
             'description' => $this->t('desc_packingSlipEmailTo') . ' ' . $this->t('msg_token'),
             'attributes' => [
-                'size' => 30,
+                'size' => 60,
+            ],
+        ];
+        $fields['packingSlipEmailBcc'] = [
+            'type' => 'text',
+            'label' => $this->t('field_packingSlipEmailBcc'),
+            'description' => $this->t('desc_packingSlipEmailBcc') . ' ' . $this->t('msg_token'),
+            'attributes' => [
+                'size' => 60,
             ],
         ];
         return $fields;
@@ -662,7 +679,7 @@ class ConfigForm extends BaseConfigForm
                 ],
             ],
             'emailTo' => [
-                'type' => 'email',
+                'type' => 'text',
                 'label' => $this->t('field_emailTo'),
                 'description' => $this->t('desc_emailTo') . ' ' . $this->t('msg_token'),
                 'attributes' => [
@@ -670,7 +687,7 @@ class ConfigForm extends BaseConfigForm
                 ],
             ],
             'emailBcc' => [
-                'type' => 'email',
+                'type' => 'text',
                 'label' => $this->t('field_emailBcc'),
                 'description' => $this->t('desc_emailBcc') . ' ' . $this->t('msg_token'),
                 'attributes' => [
@@ -679,7 +696,7 @@ class ConfigForm extends BaseConfigForm
                 ],
             ],
             'emailFrom' => [
-                'type' => 'email',
+                'type' => 'text',
                 'label' => $this->t('field_emailFrom'),
                 'description' => $this->t('desc_emailFrom') . ' ' . $this->t('msg_token'),
                 'attributes' => [
@@ -831,14 +848,23 @@ class ConfigForm extends BaseConfigForm
         ];
     }
 
+    /**
+     * @param string $page
+     *   'Detail' or 'List'.
+     * @param string $document
+     *   'invoice' or 'packing_slip'.
+     *
+     * @return array
+     *   Array with 2 options (value => label entries).
+     */
     protected function getDocumentsOptions(string $page, string $document): array
     {
-
         $label = $this->t("document_$document");
         $show = $this->t('option_document_show');
         $mail = $this->t('option_document_mail');
 
-        $document = ucfirst($document);
+        // Change to "camel case".
+        $document =  str_replace('_', '', ucwords($document, '_'));
         return [
             "show$document$page" => sprintf($this->t('option_document'), $label, $show),
             "mail$document$page" => sprintf($this->t('option_document'), $label, $mail),

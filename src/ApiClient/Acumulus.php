@@ -802,6 +802,7 @@ class Acumulus
      * @param ?bool $applyGraphics
      *   False to prevent any embedded graphics from being applied to the
      *   document; true, null, or absent otherwise.
+     *   @todo: not used for now, will become part of emailAsPdf structure?
      *
      * @return \Siel\Acumulus\ApiClient\AcumulusResult
      *   The result of the webservice call. The structured response will contain
@@ -881,6 +882,7 @@ class Acumulus
      * @param ?bool $applyGraphics
      *   False to prevent any embedded graphics from being applied to the
      *   document; true, null, or absent otherwise.
+     *   @todo: not used for now, will become part of emailAsPdf structure?
      *
      * @return \Siel\Acumulus\ApiClient\AcumulusResult
      *   The result of the webservice call. The structured response will contain

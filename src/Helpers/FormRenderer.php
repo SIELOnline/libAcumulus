@@ -319,7 +319,7 @@ class FormRenderer
         if ($field['type'] !== 'hidden') {
             $output .= $this->getWrapper('element');
             // Do not use a <label> with an "id" attribute on the label for a
-            // set of radio buttons, a set of checkboxes (, or on markup).
+            // set of radio buttons, a set of checkboxes, or on markup.
             $id = in_array($field['type'], ['radio', 'checkbox']) ? '' : $field['id'];
             $output .= $this->renderLabel($field['label'], $id, $labelAttributes, true);
             $output .= $this->getWrapper('inputDescription');
@@ -500,7 +500,29 @@ class FormRenderer
         $attributes = $this->addAttribute($attributes, 'name', $field['name']);
         $output = '';
         $output .= $this->getWrapper('markup', $attributes);
-        $output .= $field['value'];
+        if (!empty($field['value-before'])) {
+            $output .= $field['value-before'];
+        }
+        if (!empty($field['value'])) {
+            $output .= $field['value'];
+        }
+        if (!empty($field['inputs'])) {
+            foreach ($field['inputs'] as $id => $input) {
+                $input += [
+                    'id' => $id,
+                    'name' => $id,
+                    'label' => '',
+                    'value' => '',
+                    'description' => '',
+                    'attributes' => [],
+                    'options' => [],
+                ];
+                $output .= $this->input($input);
+            }
+        }
+        if (!empty($field['value-after'])) {
+            $output .= $field['value-after'];
+        }
         $output .= $this->getWrapperEnd('markup');
         return $output;
     }

@@ -106,7 +106,8 @@ abstract class ShopCapabilities
             'more-info' => ucfirst($this->t('invoice_source')),
             'class' => '\Siel\Acumulus\Invoice\Source',
             'properties' => [
-                'type (' . $this->t(Source::Order) . ' ' . $this->t('or') . ' ' . $this->t(Source::CreditNote) . ')',
+                'type (' . $this->t(Source::Order) . ' ' . $this->t('or') . ' ' . $this->t(Source::CreditNote) . ', ' .
+                    $this->t('internal_not_label') . ')',
                 'id (' . $this->t('internal_id') . ')',
                 'reference (' . $this->t('external_id') . ')',
                 'date',
@@ -121,6 +122,12 @@ abstract class ShopCapabilities
             ],
             'properties-more' => false,
         ];
+        $result['invoiceSourceType'] = [
+            'properties' => [
+                'label (' . sprintf($this->t('label'), Source::Order, Source::CreditNote) . ')',
+            ],
+            'properties-more' => false,
+        ];
         if (array_key_exists(Source::CreditNote, $this->getSupportedInvoiceSourceTypes())) {
             $result['originalInvoiceSource'] = [
                 'more-info' => ucfirst($this->t('original_invoice_source')),
@@ -128,6 +135,12 @@ abstract class ShopCapabilities
                 'properties-more' => false,
             ];
         }
+        $result['originalInvoiceSourceType'] = [
+            'properties' => [
+                'label (' . sprintf($this->t('label'), Source::Order, Source::CreditNote) . ')',
+            ],
+            'properties-more' => false,
+        ];
         $result['source'] = array_merge(['more-info' => ucfirst($this->t('order_or_refund'))], $this->getTokenInfoSource());
         if (array_key_exists(Source::CreditNote, $this->getSupportedInvoiceSourceTypes())) {
             $result['refund'] = array_merge(['more-info' => ucfirst($this->t('refund_only'))], $this->getTokenInfoRefund());
@@ -135,6 +148,12 @@ abstract class ShopCapabilities
             $result['refundedInvoiceSource'] = [
                 'more-info' => ucfirst($this->t('original_invoice_source') . ' ' . ucfirst($this->t('refund_only'))),
                 'properties' => [$this->t('see_invoice_source_above')],
+                'properties-more' => false,
+            ];
+            $result['refundedInvoiceSourceType'] = [
+                'properties' => [
+                    'label (' . sprintf($this->t('label'), Source::Order, Source::CreditNote) . ')',
+                ],
                 'properties-more' => false,
             ];
             $result['refundedOrder'] = [

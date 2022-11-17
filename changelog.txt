@@ -47,7 +47,7 @@ Features:
     otherwise.
   The default configuration value for the "description" field will use these new
   values.
-- Added a field "Bcc e-mail address for the packing slip" to the"Documents" -
+- Added a field "Bcc e-mail address for the packing slip" to the "Documents" -
   "Packing slip" section of the Acumulus settings. The "To address" now also
   accepts multiple addresses.
 - PS+JOO: Added mail (pdf document) buttons on Acumulus invoice status overview.

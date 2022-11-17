@@ -37,8 +37,7 @@ class SielAcumulusAutoloader
             };
             // Prepend this autoloader: it will not throw, nor warn, while the
             // shop specific autoloader might do so.
-            spl_autoload_register($autoloadFunction, true, true);
-            $hasBeenRegistered = true;
+            $hasBeenRegistered = spl_autoload_register($autoloadFunction, true, true);
         }
     }
 }

@@ -1,7 +1,8 @@
 Changelog Acumulus web shop extensions
 ======================================
 
-System Requirements:
+System Requirements
+-------------------
 - PHP:
   * Minimum version: 7.2, older versions WILL fail.
   * Recommended version: 7.4, soon - probably plugin version 7.4, this will
@@ -19,21 +20,21 @@ Supported shops and versions
 The tags below are also used further on in the changelog to indicate to which
 shop(s) a change applies (if no tag is mentioned, ALL may be assumed).
 
-Tag  Shop                 Actual version     Supported versions
---------------------------------------------------------------------------------
-ALL  All web shops.
-HS   HikaShop (Joomla)   4.6.0 (HS Starter)  >= 3.0.0
-JOO  Joomla (HS + VM)    4.1.4               >= 3.6
-MA   Magento             2.4.2               >= 2.3
-OC   OpenCart            3.0.3.7             >= 3.0
-                                             Not yet tested with 4.0.x.y.
-PS   PrestaShop          1.7.8.5             >= 1.7.6
-VM   VirtueMart (Joomla) 3.8.8               >= 3.0
-                         4.0.2               Does not work with Joomla 4.1.4,
-                                             VM4 not tested with Joomla 3.10.
-WC   WooCommerce         6.7.0               >= 5.0 (3 and 4 will probably work)
-     WordPress           6.0                 >= 5.9 (earlier version WILL fail)
---------------------------------------------------------------------------------
+|Tag | Shop             | Version used | Supported versions                 |
+|    |                  | for testing  |                                    |
+|----|------------------|--------------|------------------------------------|
+|ALL | All web shops.   |              |                                    |
+|JOO | Joomla (HS + VM) | 4.1.4        | >= 3.6                             |
+|HS  | HikaShop (JOO)   | 4.6.0 (Starter) | >= 3.0.0                        |
+|MA  | Magento          | 2.4.2        | >= 2.3                             |
+|OC  | OpenCart         | 3.0.3.7      | >= 3.0                             |
+|    |                  |              | Not yet tested with 4.0.x.y.       |
+|PS  | PrestaShop       | 1.7.8.5      | >= 1.7.6                           |
+|VM  | VirtueMart (JOO) | 4.0.4        | >= 3.0                             |
+|    |                  |              | VM4 not tested with Joomla 4.      |
+|WC  | WooCommerce      | 7.1.0        | >= 5.0 (3 and 4 will probably work)|
+|    | WordPress        | 6.1.1        | >= 5.9 (earlier version WILL fail) |
+
 
 8.0.0-alpha1
 ------------
@@ -55,7 +56,7 @@ Refactorings:
   shop independent.
 
 
-7.4.3 (2022-10-??) (All but MA)
+7.4.3 (2022-10-31) (All but MA)
 -------------------------------
 Features:
 - All: Added possibility to refer to the translated term for "Order" or
@@ -68,7 +69,7 @@ Features:
     otherwise.
   The default configuration value for the "description" field will use these new
   values.
-- Added a field "Bcc e-mail address for the packing slip" to the"Documents" -
+- Added a field "Bcc e-mail address for the packing slip" to the "Documents" -
   "Packing slip" section of the Acumulus settings. The "To address" now also
   accepts multiple addresses.
 - PS+JOO: Added mail (pdf document) buttons on Acumulus invoice status overview.
@@ -137,7 +138,7 @@ Bugs:
 
 Refactorings:
 - WC: Property customer_user is legacy, is now customer_id.
-- WC: Do not crash (e.g. with a "Class 'WC_Logger' not found" if WC has not yet
+- WC: Do not crash, e.g. with a "Class 'WC_Logger' not found" if WC has not yet
   been activated.
 
 
@@ -361,7 +362,7 @@ Refactorings:
     methods.
 - Refactored upgrading config values: we now store the actual config version
   with the other config values:
-  - We check for an update on every load() of the config, thus independent from
+  - We check for an update on every load() of the config, thus independent of
     a plugin update.
   - The version of the config is now in line with the library version, not the
     plugin version. Again, this allows to separately update the library.
@@ -382,7 +383,7 @@ Refactorings:
   namespace \Siel\Acumulus\Magento\Magento2 into \Siel\Acumulus\Magento.
 - WC2: Removed WC2 specific code (\Siel\Acumulus\WooCommerce\WooCommerce2
   namespace) and constructions needed for WC2 (version checks, hooks, argument
-  number and order passed to hooks, ...
+  number and order passed to hooks, ...)
 - OC1|OC23: Removed OC1 and OC23 specific code (their namespaces and
   constructions needed to determine version, ...). Refactored the registry
   accordingly.
@@ -412,7 +413,7 @@ Bugs:
 - MA24: Data patches are also applied on install: automated installation failed
   because no config was stored yet (Fatal error: Uncaught TypeError: Argument 1
   passed to Config::save() must be of the type array, bool given, called in
-  Config.php on line 1469.
+  Config.php on line 1469).
 
 Refactorings:
 - MA: Removed a number of warnings generated by the automated technical review.
@@ -472,7 +473,7 @@ Refactorings:
   vat infos instead of an array of vat rates.
 - ALL: Result::simplifyResponse() now changed to return an empty list when
   a list is expected but the main response key was not found: This probably
-  indicates an error but that should be found out e.g by checking the status or
+  indicates an error but that should be found out e.g. by checking the status or
   the messages. simplifyResponse() is an internal method but influences the
   return value of Result::getResponse().
 
@@ -494,10 +495,10 @@ Bugs:
 - VM: In some cases amounts are calculated based on vat rates. The "vat free"
   vat rate is stored as -1, to be able to differ it from the "0% vat rate". But
   this means that the calculations should use 0% instead of -1%. This affects
-  all plugins but it looks like that only for VM it can really cause problems.
+  all plugins, but it looks like that only for VM it can really cause problems.
 - VM: Use of is_numeric() replaced by ctype_digit() (or other more or less
   similar functions) as is_numeric()'s definition of a string being numeric is
-  too accepting for our case. This affects all plugins but it looks like that
+  too accepting for our case. This affects all plugins, but it looks like that
   only for VM it can really cause problems.
 - WOO: When creating variant lines, we should ignore order item metadata that is
   an array (like we already do for serialized data) or starts with an underscore
@@ -505,7 +506,7 @@ Bugs:
 
 Refactorings:
 - Documentation typos.
-- Tag <sourceuri> now points to github instead of www.siel.nl.
+- Tag <sourceuri> now points to GitHub instead of www.siel.nl.
 
 6.3.5 (2021-11-15) (WC only)
 ----------------------------
@@ -515,11 +516,11 @@ Bugs:
 - WC|MA (and maybe others): een factuur met verlegde btw en gratis verzending
   levert een waarschuwing en dus een conceptfactuur op omdat ten onrechte het
   `standaard btw-tarief van verzendkosten aan de gratis verzending word
-  toegekend ipv 0%.
+  toegekend i.p.v. 0%.
 
 Refactorings:
 - WC: de method WC_Logger::add() is deprecated. Onze log helper is hier op
-  aangepast Zichtbaar gevolg: de datum wordt nu in de ISO standaard afgedrukt.
+  aangepast Zichtbaar gevolg: de datum wordt nu in de ISO-standaard afgedrukt.
 
 6.3.4 (2021-10-22)
 ------------------
@@ -532,7 +533,7 @@ Bugs:
 Bugs:
 - WC: Regression: the solution regarding the problem with our "please rate our
   plugin" message introduced another error in the "invoice status overview box"
-  with as result that it did no longer auto-load the actual content.
+  with as result that it did no longer autoload the actual content.
 - WC: Notice: undefined index 'class' ...
 - ALL: Message "Bedankt voor het beoordelen van de Acumulus plugin/module"
   verscheen 2 keer.
@@ -540,7 +541,7 @@ Bugs:
 6.3.2 (2021-09-21)
 ------------------
 Bugs:
-- ALL: Invoice status overview: Acumulus no longer distinguishes between dutch
+- ALL: Invoice status overview: Acumulus no longer distinguishes between Dutch
   and EU vat. As a result, the amounts in the get_entry API call changed,
   leading to warnings about incorrect vat and amount ex vat.
 - ALL: ajax event handlers where not refreshed after an ajax (partial) page
@@ -557,7 +558,7 @@ Bugs:
 6.3.1 (2021-07-27)
 ------------------
 Features:
-- ALL: The internal order/refund id is now added as meta info to the invoice
+- ALL: The internal order/refund id is now added as metadata to the invoice
   data sent to Acumulus.
 
 Bugs:
@@ -582,7 +583,7 @@ Features:
 - ALL: Changed the settings under "About your shop":
   * For the fields related to the different tax classes (foreign vat, vat free,
     0 vat) there is now just 1 (drop down) setting instead of the former radio
-    button + dropdown. A "Not applicable" value has been added to the drop down.
+    button + dropdown. A "Not applicable" value has been added to the drop-down.
   * Labels and descriptions for the foreign vat classes have been changed to
     reflect the new rules regarding international sales in the EU that apply as
     of 1 july 2021.
@@ -602,7 +603,7 @@ Bugs:
   rounded to the cent. If so, the price ex has a higher precision than the price
   inc, even if prices are entered including vat. So, in these cases we should
   not recalculate the price ex after we have obtained a corrected vat rate.
-- ALL: Leaving config settings empty was not well supported. This has been
+- ALL: Leaving config settings empty was not well-supported. This has been
   improved to better distinguish between e.g. 0 and empty.
 
 Refactorings:
@@ -650,15 +651,15 @@ Features:
     determining the vat type with absolute certainty. Example: the WooCommerce
     EU Vat assistant stores if an invoice is vat exempt.
   * Code has been added to guess the vat type if the standard effort results in
-    2 possible vat types, e.g. an order for vat-free services to a EU company.
+    2 possible vat types, e.g. an order for vat-free services to an EU company.
     If this guess results in assigning a vat type, the invoice will no longer be
     sent as concept.
 - WC: The completor phase now makes an even greater effort to determine the vat
   type by looking at the result of the 'woocommerce_order_is_vat_exempt' filter
-  (mostly based on the 'is_vat_exempt' meta data as set by (a.o.) the
-  woocommerce-eu-vat-assistant plugin.
+  (mostly based on the 'is_vat_exempt' metadata as set by (a.o.) the
+  woocommerce-eu-vat-assistant plugin).
 - HS: Look up the "non vat exempt" vat rate of the product for this customer's
-  location as vat rate meta data.
+  location as vat rate metadata.
 
 Bugs:
 - ALL: Due to changes on the API server, a 0% vat rate is now returned for all
@@ -681,7 +682,7 @@ Bugs:
 ------------------
 Important new features:
 - ALL: Maak de plugin brexit-proof door geen gebruik meer te maken van een hard
-  gecodeerde lijst van EU landen. Dit wordt nu aan de API gevraagd zodat de
+  gecodeerde lijst van EU-landen. Dit wordt nu aan de API gevraagd zodat de
   plugin in de toekomst niet meer bijgewerkt hoeft te worden bij een wijziging
   hierin.
 - PS|OC|VM|HS: Het factuurstatusoverzicht is nu ook aan PrestaShop, OpenCart,
@@ -710,8 +711,8 @@ Features:
 Bugs:
 - PS: PS1.7.7.0 introduced a property Module::confirmUninstall that we already
   use in our AcumulusModule, so we had to rename our (internal) property.
-- PS: Instellingenformulier: password wordt niet meegestuurd, dus maak het niet
-  verplicht en accepteer leeg als "geen verandering".
+- PS: Instellingenformulier: wachtwoord wordt niet meegestuurd, dus maak het
+  niet verplicht en accepteer leeg als "geen verandering".
 - PS: Het registratieformulier dient niet zichtbaar te zijn in het admin menu.
 - JOO: Each instance of AcumulusModelAcumulus created its own instance of the
   Acumulus Container.
@@ -763,7 +764,7 @@ Bugs:
 6.0.2 (2020-09-03)
 ------------------
 Features:
-- ALL: Nature van additionele services bepalen adhv hoofdbestanddeel van de
+- ALL: Nature van additionele services bepalen a.d.h.v. hoofdbestanddeel van de
   factuur.
 - JOO: Added the registration form to JOO.
 
@@ -779,12 +780,12 @@ Refactorings:
 - ALL: Due to incorporating unit tests to libAcumulus, the copy and hard linking
   process to get install packages and development environments for the various
   supported web shops has been overhauled. No visible changes for users, other
-  then that some readme or license files may have been renamed or moved.
+  than that some readme or license files may have been renamed or moved.
 
 6.0.1 (2020-08-06)
 ------------------
 Bugs:
-- WC: Buttons op het statusoverzicht werken niet meer (en een button met als
+- WC: Knoppen op het statusoverzicht werken niet meer (en een knop met als
   tekst "button_submit_invoice" verschijnt onderaan het overzicht).
 
 6.0.0 (2020-08-05)
@@ -888,7 +889,7 @@ Refactorings:
 - MA2|WC: Changed labels on the Acumulus invoice status overview page, as it has
   much more space than in WooCommerce. For Woocommerce these labels are now
   overridden to remain short.
-- ALL: Tightened Source creation to cover for non validated input.
+- ALL: Tightened Source creation to cover for non-validated input.
 - WC: Refactored ajax handling to make it usable in other shops as well.
 - ALL: Move class Siel\Acumulus\WooCommerce\Shop\InvoiceStatusOverviewForm (and
   Siel\Acumulus\WooCommerce\Shop\InvoiceStatusOverviewFormTranslations) to
@@ -958,10 +959,10 @@ Bugs:
 - MA2: Versie die getoond werd bij de support-informatie was de databaseschema-
   versie (uit module.xml), niet de moduleversie van de module (uit
   composer.json).
-- MA2: Kortingen worden niet goed doorgegeven als prijzen ex btw zijn ingevoerd.
-  getBaseShippingDiscountAmount() is inc of ex btw afhankelijk van of korting
-  voor of na btw verrekend wordt. MA1 heeft dit waarschijnlijk ook, maar daar
-  gaat de winkel ook de fout in.
+- MA2: Kortingen worden niet goed doorgegeven als prijzen excl. btw zijn 
+  ingevoerd. getBaseShippingDiscountAmount() is inc of excl. btw afhankelijk van
+  of korting voor of na btw verrekend wordt. MA1 heeft dit waarschijnlijk ook,
+  maar daar gaat de winkel ook de fout in.
 - WC: CRITICAL Uncaught ArgumentCountError: Too few arguments to function
   ...::woocommerce_attribute_label(), 2 passed and exactly 3 expected.
 - WC: Acumulus info box op bestellingspagina verdwijnt bij handmatige sortering
@@ -982,7 +983,7 @@ Features:
 5.7.2 (2019-05-15) (JOO only)
 -----------------------------
 Bugs:
-- Errors in the install process:
+- Errors in the installation process:
   * syntax error in <version> tag in xml files.
   * class inheritance dependency on VirtueMart.
 
@@ -995,7 +996,7 @@ Refactorings:
 Bugs:
 - WC: tweaked the precision settings again.
 - WC: Acumulus info box op bestellingspagina toont verkeerde status voor credit
-  facturen (nl dezelfde status als voor de oorspronkelijke bestelling).
+  facturen (namelijk dezelfde status als voor de oorspronkelijke bestelling).
 - WC: Acumulus info box op bestellingspagina stuurt de oorspronkelijke factuur
   bij klik op "Opnieuw verzenden" bij een credit factuur.
 
@@ -1099,8 +1100,8 @@ Features:
 - WC: Added actions to the 'invoice status overview' meta box on the edit order
   screen.
 - WC: Added support for the 'Custom Order Numbers for WooCommerce' plugin.
-- ALL: Verander de factuur in een concept als een regel een onbekend btw
-  percentage bevat.
+- ALL: Verander de factuur in een concept als een regel een onbekend
+  btw-percentage bevat.
 - ALL: To prevent recurring "404 - Error - Bad Request - Requested invoice for
   entry 123456 not found. - XGYBSN000", the data for a no longer existing
   Acumulus entry are deleted from the local database.
@@ -1130,9 +1131,9 @@ Refactorings:
 5.5.1 (2018-12-13)
 ------------------
 Features:
-- ALL: Make better use of available vat class meta data to reduce the possible
+- ALL: Make better use of available vat class metadata to reduce the possible
   vat types of a line.
-- ALL: Make better use of available meta data (by combining them) to get the vat
+- ALL: Make better use of available metadata (by combining them) to get the vat
   rate of a line.
 - WC3: WC seems to return amounts with an increased precision (was: rounded to
   the cent. now: it seems not any longer rounded).
@@ -1144,7 +1145,7 @@ Features:
 Bugs:
 - ALL: only use the setting that defines EU vat classes when the shop might sell
   articles subject to EU vat.
-- ALL: looked up vat rate meta data may be an empty array: use empty() instead
+- ALL: looked up vat rate metadata may be an empty array: use empty() instead
   of isset().
 - ALL: looked up vat rate may still be a single float, not necessarily an array:
   'array' type hint in Completor::metaDataHas0VatRate() is incorrect.
@@ -1174,9 +1175,9 @@ Features:
   * Add vat class information as metadata.
   * Add method ShopCapabilities::getVatClasses().
   * Add setting foreignVatClasses (default, UI on config form).
-  * Use setting foreignVatClasses and vat class meta data to select between vat
+  * Use setting foreignVatClasses and vat class metadata to select between vat
     type 1 and 6.
-- OC: Improved filling vat class/rate lookup meta data by matching zones of
+- OC: Improved filling vat class/rate lookup metadata by matching zones of
   order address with geo zones of tax rates.
 - ALL: Support for new roles and permissions to access the web server API.
 - ALL: Added logging to execution stage of batch form.
@@ -1196,12 +1197,12 @@ Bugs:
 - WC3: Since WC3, the shipping tax class can be "inherited" from the product
   items (which should be the preferred value for this setting). The plugin did
   not handle this value correctly.
-- WC3: Code to get the vat rate lookup meta data did not use customer location
+- WC3: Code to get the vat rate lookup metadata did not use customer location
   and would therefore be based on shop location.
 - WC3: Code to improve precision of shipping costs ex vat ignores zone based
   shipping method settings of WC3.
 - ALL: Warning: implode(): Invalid arguments passed in Completor.php on line 835.
-- ALL: module specific translations were not loaded on case sensitive systems
+- ALL: module specific translations were not loaded on case-sensitive systems
   (e.g. linux).
 - ALL: Warning 511: Incorrect vattype value used (false) in vattype tag as part
   of invoice section in the XML. Using default value of 1(national, regular
@@ -1382,8 +1383,8 @@ Changes:
 5.3.0 (2018-04-09)
 ------------------
 - WC: statusoverzicht uitgeschakeld voor deze versie.
-- ALL: Gebruik de opgezochte btw percentages van de productinformatie als de
-  berekende btw bandbreedte zo wijd is dat er meerdere btw percentages mogelijk
+- ALL: Gebruik de opgezochte btw-percentages van de productinformatie als de
+  berekende btw bandbreedte zo wijd is dat er meerdere btw-percentages mogelijk
   zijn.
 - ALL: Do not render the for attribute with a label for a markup element.
 - ALL: Controls op Batchscherm aangepast: radio buttons voor verzendwijzen en
@@ -1436,11 +1437,11 @@ Changes:
   waarschuwing bij geforceerd verzenden is aangepast.
 - ALL: Het te gebruiken factuursjabloon wordt nu pas bepaald na het
   invoice_created event zodat het eventueel corrigeren van de betaalstatus in
-  dat event doorwerkt in de factuursjabloon keuze.
+  dat event doorwerkt in de keuze van het factuursjabloon.
 - ALL: meerdere spelfouten uit de NL en EN vertalingen gehaald.
-- ALL: fouten en waarschuwingen van een ander API request (vooralsnog opvragen
-  btw tarieven en verwijderen oude entry) worden toegevoegd aan het
-  overall resultaat van de hoofdbewerking (add invoice).
+- ALL: fouten en waarschuwingen van een ander API-request (vooralsnog opvragen
+  btw-tarieven en verwijderen oude entry) worden toegevoegd aan het
+  overall-resultaat van de hoofdbewerking (add invoice).
 - ALL: toegang op veldniveau tot acumulus entry records is nu beter geregeld
   door het wrappen van een db record/object in een nieuwe class AcumulusEntry.
 - ALL: Rename AcumulusEntryModel naar AcumulusEntryManager.
@@ -1456,22 +1457,22 @@ Changes:
 
 5.1.2 (2018-02-14)
 ------------------
-- ALL: currency meta informatie wordt nu gebruikt om bestellingen in andere
+- ALL: currency metadata wordt nu gebruikt om bestellingen in andere
   currencies te converteren naar euro's. Dit werkt voor zover de shop de meta
   info correct weet aan te leveren.
-- ALL: Als de standaard currency v/d shop geen euro is, maar de order wel, maar
-  bedragen worden opgeslagen in de standaard valuta wordt de factuur ook
+- ALL: Als de standaard currency van de shop geen euro is, maar de order wel, 
+  maar bedragen worden opgeslagen in de standaard valuta wordt de factuur ook
   geconverteerd naar euros.
-- VM: Ondersteuning voor andere currencies. Alleen meta-info, opslag is altijd
+- VM: Ondersteuning voor andere currencies. Alleen metadata, opslag is altijd
   in base currency.
 - HS: Ondersteuning voor andere currencies. Er zit een fout in HS zelf als je
-  een getoonde maar niet gepubliceerde valuta gebruikt: de verzendkosten worden
+  een getoonde, maar niet gepubliceerde valuta gebruikt: de verzendkosten worden
   dan fout getoond en opgeslagen.
-- WC: Ondersteuning voor andere currencies. Alleen meta info, WC ondersteunt
+- WC: Ondersteuning voor andere currencies. Alleen metadata, WC ondersteunt
   geen andere currencies.
-- MA: Ondersteuning voor andere currencies. Alleen meta-info, opslag is altijd
+- MA: Ondersteuning voor andere currencies. Alleen metadata, opslag is altijd
   in base currency.
-- OC: Ondersteuning voor andere currencies. Alleen meta-info, opslag is altijd
+- OC: Ondersteuning voor andere currencies. Alleen metadata, opslag is altijd
   in default currency.
 - PS: Ondersteuning voor andere currencies.
 - PS: FatalThrowableError: Access to undeclared static property: Acumulus::$module_version
@@ -1488,7 +1489,7 @@ Changes:
   betaalproviders.
 - WC: Moved support for other plugins to a separate class.
 - ALL: Maak (waar mogelijk) onderscheid tussen 0% btw en btw-vrij.
-- ALL: Als een factuur niet verzonden wordt omdat het totaal 0 is, werdt
+- ALL: Als een factuur niet verzonden wordt omdat het totaal 0 is, werd het
  'verzenden tegengehouden door het event "AcumulusInvoiceCreated' gelogd.
 
 5.0.5 (2018-01-25)

@@ -2,7 +2,7 @@
 namespace Siel\Acumulus;
 
 /**
- * TaFld defines string constants for the fields used in the Acumulus API messages.
+ * Fld defines string constants for the fields used in the Acumulus API messages.
  *
  * Mainly the tags used in the invoice-add and signup api call are added here.
  */

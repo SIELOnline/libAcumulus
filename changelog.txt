@@ -54,6 +54,11 @@ Refactorings:
   The completor phase now only acts on the collected data, possibly guided by
   the metadata, to create the Acumulus invoice. This phase should now be fully
   shop independent.
+- Created an empty ModuleSpecificTranslations base class, to be overridden by
+  the webshops.
+- So far the phpdoc comments in this code were only used within PhpStorm. They
+  have now been fed to a phpdoc generator, which revealed sone changes that 
+  needed to be made.
 
 
 7.4.3 (2022-10-31) (All but MA)

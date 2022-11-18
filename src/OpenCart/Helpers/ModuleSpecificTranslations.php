@@ -5,14 +5,14 @@
 
 namespace Siel\Acumulus\OpenCart\Helpers;
 
-use Siel\Acumulus\Helpers\TranslationCollection;
+use Siel\Acumulus\Helpers\ModuleSpecificTranslations as BaseModuleSpecificTranslations;
 
 /**
  * Contains plugin specific overrides.
  *
  * @noinspection PhpUnused
  */
-class ModuleSpecificTranslations extends TranslationCollection
+class ModuleSpecificTranslations extends BaseModuleSpecificTranslations
 {
     protected $nl = [
         'module' => 'extensie',
@@ -25,7 +25,7 @@ class ModuleSpecificTranslations extends TranslationCollection
         'desc_advancedSettings' => 'Deze plugin kent veel instellingen en daarom bevat deze pagina niet alle instellingen. Een aantal minder gebruikte instellingen vindt u in het "%1$s". Nadat u hier de gegevens hebt ingevuld en opgeslagen, kunt u het andere formulier bezoeken:',
         'menu_basicSettings' => 'Extensies → Modules → Acumulus → Wijzigen',
 
-        'desc_triggerSettings' => 'Met behulp van deze instelling kunt u aangeven op welk(e) moment(en) u de factuur voor een bestelling naar Acumulus wilt versturen. Als u meerdere momenten selecteert, wordt de factuur naar Acumulus verstuurd zodra de bestelling één van de gekozen statussen bereikt. Een factuur zal altijd slechts 1 keer naar Acumulus worden verstuurd. Deze koppeling gebruikt alleen gegevens van de bestelling, dus u kunt elke status kiezen. De webwinkelfactuur hoeft dus nog niet aangemaakt te zijn, tenzij u voor de factuurdatum en nummer de webwinkelfactuurdatum en nummer wilt gebruiken. Als u voor "Niet automatisch versturen" kiest, dient u de facturen zelf over te zetten m.b.v. het <a href="%s">Acumulus batchverzendformulier</a>.',
+        'desc_triggerSettings' => 'Met behulp van deze instelling kunt u aangeven op welk(e) moment(en) u de factuur voor een bestelling naar Acumulus wilt versturen. Als u meerdere momenten selecteert, wordt de factuur naar Acumulus verstuurd zodra de bestelling één van de gekozen statussen bereikt. Een factuur zal altijd slechts 1 keer naar Acumulus worden verstuurd. Deze koppeling gebruikt alleen gegevens van de bestelling, dus u kunt elke status kiezen. De factuur van de webwinkel hoeft dus nog niet aangemaakt te zijn, tenzij u voor factuurdatum en nummer de gegevens van die factuur van de webwinkel wilt gebruiken. Als u voor "Niet automatisch versturen" kiest, dient u de facturen zelf over te zetten m.b.v. het <a href="%s">Acumulus batch-formulier</a>.',
 
         'vat_class' => 'belastinggroep',
         'vat_classes' => 'belastinggroepen',

@@ -8,7 +8,7 @@ namespace Siel\Acumulus\Helpers;
 use Throwable;
 
 /**
- * Class Message defines a message.
+ * Class Message defines a - human-readable - message.
  *
  * Messages may appear in any part of the system and need often be transferred
  * through the system layers and displayed on screen, in log files or in mails.
@@ -18,8 +18,11 @@ use Throwable;
  *
  * Messages are kind of immutable, though the severity can be changed when
  * copied to another message collection because an error in a sub-call may not
- * be more than a warning for the overall result. The translator can/should also
- * be set after construction, but is not considered data.
+ * be more than a warning for the overall result. Furthermore, as a message is
+ * not created via the {@see Container}, the {@see translator} cannot be
+ * injected upon construction, but should be set afterwards.
+ * {@see MessageCollection} will normally do so, as all messages are normally
+ * part of a {@see MessageCollection}.
  */
 class Message
 {

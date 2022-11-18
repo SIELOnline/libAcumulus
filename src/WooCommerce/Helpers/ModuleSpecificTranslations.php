@@ -5,14 +5,14 @@
 
 namespace Siel\Acumulus\WooCommerce\Helpers;
 
-use Siel\Acumulus\Helpers\TranslationCollection;
+use Siel\Acumulus\Helpers\ModuleSpecificTranslations as BaseModuleSpecificTranslations;
 
 /**
  * Contains plugin specific overrides.
  *
  * @noinspection PhpUnused
  */
-class ModuleSpecificTranslations extends TranslationCollection
+class ModuleSpecificTranslations extends BaseModuleSpecificTranslations
 {
     protected $nl = [
         'button_link' => '<a href="%2$s" class="button button-primary button-large">%1$s</a>',
@@ -20,10 +20,10 @@ class ModuleSpecificTranslations extends TranslationCollection
         'meta_original_order_for_refund' => 'Post meta-waardes van de oorspronkelijke bestelling, alleen beschikbaar bij credit nota\'s',
 
         'Standaard' => 'Standaard',
-        'vat_class_left_empty' => 'Ik zet "Btw status" op "Geen"',
+        'vat_class_left_empty' => 'Ik zet "Btw-status" op "Geen"',
         'desc_vatFreeClass' => 'Geef aan welke %1$s u gebruikt om aan te geven dat een product of dienst btw-vrij is.<br>
 Kies de 1e optie ("%2$s") als u geen btw-vrije producten of diensten aanbiedt.<br>
-Kies de 2e optie ("%3$s") als u bij uw btw-vrije producten en diensten de "Btw status" op "Geen" zet.<br>
+Kies de 2e optie ("%3$s") als u bij uw btw-vrije producten en diensten de "Btw-status" op "Geen" zet.<br>
 LET OP: het gaat er om of het product of de dienst btw-vrij is, uw bedrijf voor de <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/hoe_werkt_de_btw/nieuwe-kleineondernemersregeling/kleineondernemersregeling" target="_blank"">KOR</a> heeft gekozen, of een btw-vrijstelling heeft. Niet of u voor specifieke situaties een factuur zonder btw opstelt.
 Ook is er een verschil met het 0%%-tarief hieronder, Dit verschil zit hem met name in de mogelijkheid tot aftrek van voorbelasting.',
 

@@ -5,14 +5,14 @@
 
 namespace Siel\Acumulus\Magento\Helpers;
 
-use Siel\Acumulus\Helpers\TranslationCollection;
+use Siel\Acumulus\Helpers\ModuleSpecificTranslations as BaseModuleSpecificTranslations;
 
 /**
  * Contains plugin specific overrides.
  *
  * @noinspection PhpUnused
  */
-class ModuleSpecificTranslations extends TranslationCollection
+class ModuleSpecificTranslations extends BaseModuleSpecificTranslations
 {
     protected $nl = [
         'module' => 'extensie',
@@ -27,7 +27,8 @@ class ModuleSpecificTranslations extends TranslationCollection
         'vat_classes' => 'BTW-tariefgroepen',
 
         // Advanced config form.
-        'see_billing_address' => 'Verzendadresgegevens, bevat dezelfde eigenschappen als het "billingAddress" object hierboven',
+        // @todo: is dit Engels hier correct?
+        'see_billing_address' => 'Verzendadres, bevat dezelfde eigenschappen als het "billingAddress" object hierboven',
 
         // Rate our plugin message.
         'review_on_marketplace' => 'Zou jij ons een review willen geven op Magento Marketplace?',

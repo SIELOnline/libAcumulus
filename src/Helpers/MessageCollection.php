@@ -4,7 +4,17 @@ namespace Siel\Acumulus\Helpers;
 use Throwable;
 
 /**
- * Class MessageCollection contains a set of {@see Message}s.
+ * Class MessageCollection contains a set of Messages.
+ *
+ * A MessageCollection is a set of {@see Message}s that allow to group,
+ * retrieve, and display multiple messages.
+ *
+ * {@see Message} and MessageCollection contain a peculiarity: As a
+ * {@see Message} is one of the few objects that does not get created via the
+ * {@see Container|, it is not possible to inject the {@see Translator} to a
+ * single {@see Message} upon construction. However, as messages will only be
+ * created as part of a MessageCollection, the MessageCollection will inject the
+ * {@see Translator} before a {@see Message} gets displayed or logged.
  */
 class MessageCollection
 {

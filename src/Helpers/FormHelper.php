@@ -10,6 +10,13 @@ use stdClass;
  * web shop software. By extracting these into a separate form helper, the base
  * form class remains shop independent, so that all actual forms (config, batch,
  * ...) can inherit from it.
+ *
+ * ### Note to developers
+ * You probably want to override:
+ * - {@see \Siel\Acumulus\Helpers\FormHelper::severityToCssClass()
+ *
+ * But may want to override some other as well, a.o:
+ * - {@see \Siel\Acumulus\Helpers\FormHelper::isSubmitted()
  */
 class FormHelper
 {

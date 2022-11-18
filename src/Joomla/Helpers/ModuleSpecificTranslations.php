@@ -5,14 +5,14 @@
 
 namespace Siel\Acumulus\Joomla\Helpers;
 
-use Siel\Acumulus\Helpers\TranslationCollection;
+use Siel\Acumulus\Helpers\ModuleSpecificTranslations as BaseModuleSpecificTranslations;
 
 /**
  * Contains plugin specific overrides.
  *
  * @noinspection PhpUnused
  */
-class ModuleSpecificTranslations extends TranslationCollection
+class ModuleSpecificTranslations extends BaseModuleSpecificTranslations
 {
     protected $nl = [
         'module' => 'extensie',

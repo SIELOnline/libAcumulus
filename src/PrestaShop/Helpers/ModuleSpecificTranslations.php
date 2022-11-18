@@ -5,14 +5,14 @@
 
 namespace Siel\Acumulus\PrestaShop\Helpers;
 
-use Siel\Acumulus\Helpers\TranslationCollection;
+use Siel\Acumulus\Helpers\ModuleSpecificTranslations as BaseModuleSpecificTranslations;
 
 /**
  * Contains plugin specific overrides.
  *
  * @noinspection PhpUnused
  */
-class ModuleSpecificTranslations extends TranslationCollection
+class ModuleSpecificTranslations extends BaseModuleSpecificTranslations
 {
     protected $nl = [
         'module' => 'module',
@@ -21,7 +21,8 @@ class ModuleSpecificTranslations extends TranslationCollection
         'menu_advancedSettings' => 'Geavanceerde instellingen → Acumulus geavanceerde instellingen',
         'menu_basicSettings' => 'Instellingen → Acumulus → Configureer',
 
-        'see_billing_address' => 'Verzendadresgegevens, bevat dezelfde eigenschappen als het "address_invoice" object hierboven',
+        // @todo: is dit Engels hier correct?
+        'see_billing_address' => 'Verzendadres, bevat dezelfde eigenschappen als het "address_invoice" object hierboven',
 
         'vat_class' => 'belastingregel',
         'vat_classes' => 'belastingregels',

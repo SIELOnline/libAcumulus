@@ -1,16 +1,24 @@
 <?php
 /**
+ * @noinspection PhpUnused
+ */
+
+namespace Siel\Acumulus;
+
+/**
+ * Documentation for the Acumulus application
+ *
  * The \Siel\Acumulus namespace contains libAcumulus, a PHP library that
  * supports the Acumulus web service API.
  *
- * Some vocabulary
- * ---------------
+ * ### Some vocabulary
+ *
  * - (Acumulus) invoice: the representation of invoice data as presented to
  *   Acumulus web service API and that can be used to create a new invoice in
  *   Acumulus.
- * - Shop invoice: The webshop's own representation of an invoice. Not all
- *   webshops support a fully fledged notion and storage of an invoice. Many see
- *   an order with price (and tax) info as an invoice.
+ * - Shop invoice: The shop's representation of an invoice. Not all webshops
+ *   support a fully fledged notion and storage of an invoice. Many see an order
+ *   with price (and tax) info as an invoice.
  * - Source or invoice source: a webshop object that can serve as a source for
  *   the creation of an (Acumulus) invoice. This library supports orders and
  *   refunds (credit memos) as invoice source, the latter of course only as far
@@ -21,19 +29,19 @@
  *   webshop or CMS system. Clients/buyers/visitors are thus not users and this
  *   library will never present messages or any other texts to visitors.
  *
- * Introduction
- * ------------
+ * ### Introduction
+ *
  * LibAcumulus was written to simplify development of client side code that
  * communicates with the Acumulus web service and that resides within the
- * ecosystem of a webshop or CMS with a webshop extension. Therefore this
+ * ecosystem of a webshop or CMS with a webshop extension. Therefore, this
  * library does not:
  * - Contain controller like classes as they normally have to fit within the
- *   webshop's architecture.
+ *   architecture of the webshop.
  * - Directly output forms, views or messages as normally webshop specific ways
  *   to do so exist.
  * - Contain explicit install or update code as normally webshop specific ways
  *   to invoke this exists. However, it does contain code that can be called by
- *   the webshop's install or update code.
+ *   the installation or update code of the webshop.
  *
  * It is currently used by the extensions for the webshop software of HikaShop,
  * Magento, PrestaShop, OpenCart, VirtueMart and WooCommerce, but was built to
@@ -41,8 +49,8 @@
  * part of the code for these extensions can also be found in this library under
  * Siel\Acumulus\\{webshop}.
  *
- * Sub namespaces
- * --------------
+ * ### Sub namespaces
+ *
  * \Siel\Acumulus contains 5 sub namespaces to logically group functionality:
  * - {@see \Siel\Acumulus\Config}: configuration related classes.
  * - {@see \Siel\Acumulus\Helpers}: general utility classes.
@@ -54,22 +62,23 @@
  * More detail about these sub namespaces and their classes can be found in the
  * documentation per sub-namespace or per class.
  *
- * Sub namespaces per existing extension
- * -------------------------------------
+ * ### Sub namespaces per existing extension
+ *
  * \Siel\Acumulus also contains sub namespaces per existing webshop/CMS
  * implementation:
- * - {@see \Siel\Acumulus\Joomla} (VirtueMart and HikaShop)
+ * - {@see \Siel\Acumulus\Joomla} (with sub sub namespaces VirtueMart and
+ *   HikaShop)
  * - {@see \Siel\Acumulus\Magento}
  * - {@see \Siel\Acumulus\OpenCart}
  * - {@see \Siel\Acumulus\PrestaShop}
  * - {@see \Siel\Acumulus\WooCommerce}
- * - {@see \Siel\Acumulus\MyWebShop}: example an template code to implement the
+ * - {@see \Siel\Acumulus\MyWebShop}: example and template code to implement the
  *   Acumulus plugin for your own webshop.
  *
  * These sub namespaces only contain shop/CMS specific code.
  *
- * General principles
- * ------------------
+ * ### General principles
+ *
  * This library applies/adheres/follows the following general principles:
  * - PSR-2 coding standards.
  * - PHPDoc to fully document each and every part of the code.
@@ -81,20 +90,21 @@
  *   English and Dutch, see {@see \Siel\Acumulus\Helpers\Translator} for more
  *   information about translation.
  * - Its own way of defining forms, and subsequently rendering them or mapping
- *   them to the webshop's form system, see {@see \Siel\Acumulus\Helpers\Form},
+ *   them to the form system of the webshop itself, see
+ *   {@see \Siel\Acumulus\Helpers\Form},
  *   {@see \Siel\Acumulus\Helpers\FormRenderer}, and
  *   {@see \Siel\Acumulus\Helpers\FormMapper} for more information about form
  *   handling.
  * - Dependency injection: our container uses a namespace based (instead of
- *   configuration based) way of finding an instantiating the right class and it
- *   knows what arguments the constructors want,
- *   see {@see \Siel\Acumulus\Helpers\Container} for more information about our
+ *   configuration based) way of finding an instantiating the right class, and
+ *   it knows what arguments the constructors want. See
+ *   {@see \Siel\Acumulus\Helpers\Container} for more information about our
  *   container.
  * - Support friendly: lots of logging, emailing, clear and explicative user
  *   messages, built in dry-run, allows easy use of the API test mode.
  *
- * Invoice creation details
- * ------------------------
+ * ### Invoice creation details
+ *
  * - The extension should support invoices for orders and refunds, the latter of
  *   course only if supported by the webshop.
  * - 2 ways of sending an invoice to Acumulus are supported:
@@ -105,7 +115,7 @@
  *       This support consists of: the configuration form allows to define at
  *       what order statuses and/or what events the invoice should be sent and
  *       to handle the status change to see if the invoice has to be sent and
- *       has not already be sent.
+ *       has not already been sent.
  *     - Manual: the library defines a batch send form where the user can define
  *       a range of orders or refunds to send to Acumulus as well as some other
  *       options to influence if and how the invoices are sent.
@@ -131,8 +141,8 @@
  *   record is stored to prevent sending it again, if not a mail is sent
  *   informing the admin about any errors and/or warnings.
  *
- * Developing a new extension
- * --------------------------
+ * ### Developing a new extension
+ *
  * If you want to develop an extension for another web shop these are the steps
  * to follow:
  * - Use only PHP language constructs that are available in PHP 7.2 and have not
@@ -191,4 +201,4 @@
  *     - See existing code on https://github.com/SIELOnline, where all web shop
  *       specific projects are also viewable.
  */
-namespace Siel\Acumulus;
+interface _Documentation {}

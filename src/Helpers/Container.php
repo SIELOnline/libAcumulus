@@ -237,9 +237,7 @@ class Container
             // Add some basic translations that are hard to add just-in-time.
             // @todo: add a hasTranslations interface to (largely) automate this on getInstance?
             $this->baseTranslationsAdded = true;
-            try {
-                $this->addTranslations('ModuleSpecificTranslations', 'Helpers');
-            } catch (InvalidArgumentException $e) {}
+            $this->addTranslations('ModuleSpecificTranslations', 'Helpers');
             $this->addTranslations('ModuleTranslations', 'Shop');
             $this->addTranslations('SeverityTranslations', 'Helpers');
             $this->addTranslations('ResultTranslations', 'ApiClient');

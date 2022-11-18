@@ -1,6 +1,13 @@
 <?php
+/**
+ * @noinspection PhpUnused
+ */
+
+namespace Siel\Acumulus\Invoice\CompletorStrategy;
 
 /**
+ * Documentation for the Invoice\CompletorStrategy namespace
+ *
  * The CompletorStrategy namespace contains implementations for several
  * strategies that can be used to correct/complete invoice lines that cannot be
  * easily corrected/completed.
@@ -16,10 +23,12 @@
  *   the missing vat amount must be divided over the lines that do not have this
  *   information.
  *
- * Some of the strategies are used for multiple webshops, others for only 1.
+ * Some strategies are used for multiple webshops, others for only 1.
+ *
+ * ### Note to developers
+ * When implementing a new extension, you probably should not have to override
+ * or add a strategy, as most cases are already handled by this set.
  *
  * @todo: list all strategies including how it works and what plugins use it.
  */
-namespace Siel\Acumulus\Invoice\CompletorStrategy;
-
-
+interface _Documentation {}

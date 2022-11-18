@@ -1,14 +1,17 @@
 <?php
+/**
+ * @noinspection PhpUnused
+ */
+
+namespace Siel\Acumulus\Invoice;
 
 /**
- * The Invoice namespace contains the invoice handling related classes.
+ * Documentation for the Invoice namespace
  *
- * This namespace can be considered to be the centre of each Acumulus extension
- * as it is the place where orders (and refunds) are transformed into the
- * invoice structure as sent to Acumulus.
- *
- * Classes
- * -------
+ * The Invoice namespace contains the invoice handling related classes. This
+ * namespace can be considered to be the centre of each Acumulus extension as it
+ * is the place where orders (and refunds) are transformed into the invoice
+ * structure as sent to Acumulus.
  *
  * The most important classes are:
  * - {@see Source}: A wrapper around a webshop order or refund.
@@ -16,12 +19,14 @@
  *   invoice structure based on a {@see Source}.
  * - {@see Completor}: The class that completes the Acumulus invoice structure
  *   given a raw version as created by the {@see Creator}.
- * - {@see AcumulusResult}: An extension of the ApiClient {@see Siel\Acumulus\ApiClient\Result}
- *   class with additional methods specific for handling the result of sending
- *   an Invoice over the Acumulus API.
+ * - {@see InvoiceAddResult}: A class that contains and handles the result of
+ *   sending an Invoice over the Acumulus API. So, even if it does not inherit
+ *   from, it can be seen as a superset of
+ *   {@see \Siel\Acumulus\ApiClient\AcumulusResult}.
  *
- * Other classes, including the {@see CompletorStrategy} sub namespace are part
- * of the Completor phase and are called via the {@see Completor}. These are:
+ * Other classes, including the {@see CompletorStrategy\_Documentation}
+ * sub namespace are part of the Completor phase and are called via the
+ * {@see Completor}. These are:
  * - {@see CompletorInvoiceLines}: Completes the invoice at the line level.
  * - {@see FlattenerInvoiceLines}: Composed and Bundled products, but also the
  *   options (e.g. size, color) are created as child lines for the base product.
@@ -36,19 +41,18 @@
  *   used to correct "strategy" lines. The various strategies are found in the
  *   {@see CompletorStrategy} sub namespace.
  *
- * The invoice creation process
- * ----------------------------
+ * ### The invoice creation process
  *
  * Creating an Acumulus invoice, given a webshop order or refund, is **not** a
  * trivial task. Even though a large part of the fields may be simply mapped to
  * properties, getters or other methods of some webshop defined object or array,
- * the difficulty is in the details and in getting the invoice complete and
- * correctly complete.
+ * the difficulty is in the details and in getting the invoice complete and get
+ * it complete correctly.
  *
  * The process to create an Acumulus invoice exists of 2 phases:
  * - Creator phase: in the creator phase a "raw" version of the Acumulus invoice
  *   is created by a Creator class that derives from the base {@see Creator}
- *   class.This derived class will be highly webshop dependent.
+ *   class. This derived class will be highly webshop dependent.
  * - Completor phase: in the completor phase, the "raw" invoice is completed
  *   by filling in missing fields and by correcting fields based on e.g.
  *   settings (e.g. "do not send a free shipping line").
@@ -67,12 +71,12 @@
  *   methods.
  * - The base Creator class has been structured to take the structural work out
  *   of the derived classes and have those only implement small methods with
- *   well defined results. This is the so-called template pattern.
+ *   well-defined results. This is the so-called template pattern.
  * - As already documented above, the creation of the invoice has been split in
  *   2 phases: the creator phase, being highly webshop dependent but relatively
  *   simple, and the completor phase, being almost webshop independent but
  *   highly complex.
- * - To let the completor phase do its work, its needs (quite) some meta data.
+ * - To let the completor phase do its work, its needs (quite) some metadata.
  *   this is to be delivered by the creator phase, thus unfortunately adding
  *   some work to do in that phase. To have this meta information available for
  *   support as well, it is added to the invoice structure using additional
@@ -81,6 +85,13 @@
  *   The Acumulus webservice ignores any not defined tags, giving this library
  *   the freedom to add what it wants.
  *
+ * ### Note to developers
+ * When implementing a new extension, you must override the `abstract` classes:
+ * - {@see Source}
+ * - {@see Creator}
+ *
+ * And you should probably/hopefully not have to override other classes.
+ *
  * @link https://www.siel.nl/acumulus/API/Invoicing/Add_Invoice/
  */
-namespace Siel\Acumulus\Invoice;
+interface _Documentation {}

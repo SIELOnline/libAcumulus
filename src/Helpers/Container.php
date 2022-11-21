@@ -341,7 +341,7 @@ class Container
     public function getAcumulusApiClient(): Acumulus
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('Acumulus', 'ApiClient', [$this, $this->getEnvironment(), $this->getUtil(), $this->getLog()]);
+        return $this->getInstance('Acumulus', 'ApiClient', [$this, $this->getEnvironment(), $this->getLog()]);
     }
 
     public function createAcumulusRequest(): AcumulusRequest

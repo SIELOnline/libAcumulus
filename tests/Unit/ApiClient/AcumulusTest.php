@@ -84,7 +84,6 @@ class AcumulusTest extends TestCase
             ->setConstructorArgs([
                 $this->container,
                 $this->container->getEnvironment(),
-                $this->container->getUtil(),
                 $this->container->getLog(),
             ])
             ->getMock();

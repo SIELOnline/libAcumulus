@@ -13,10 +13,10 @@ use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Severity;
-use Siel\Acumulus\Helpers\Util;
+
 /**
- * Provides an easy interface towards the different API calls of the Acumulus
- * web API.
+ * Acumulus provides an easy interface towards the different API calls of the
+ * Acumulus web API.
  *
  * This class simplifies the communication so that the different web shop
  * specific interfaces can be more rapidly developed.
@@ -34,7 +34,6 @@ use Siel\Acumulus\Helpers\Util;
 class Acumulus
 {
     protected /*Environment*/ $environment;
-    protected /*Util*/ $util;
     protected /*Log*/ $log;
     protected /*Container*/ $container;
 
@@ -44,11 +43,10 @@ class Acumulus
      * @param \Siel\Acumulus\Helpers\Container $container
      * @param \Siel\Acumulus\Config\Environment $environment
      */
-    public function __construct(Container $container, Environment $environment, Util $util, Log $log)
+    public function __construct(Container $container, Environment $environment, Log $log)
     {
         $this->environment = $environment;
         $this->container = $container;
-        $this->util = $util;
         $this->log = $log;
     }
 

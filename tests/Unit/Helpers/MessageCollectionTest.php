@@ -30,7 +30,7 @@ class MessageCollectionTest extends TestCase
     public function testCreateMessageCollection(): MessageCollection
     {
         $collection = new MessageCollection($this->translator);
-        $this->assertEquals(Severity::Unknown, $collection->getSeverity());
+        $this->assertSame(Severity::Unknown, $collection->getSeverity());
         $this->assertFalse($collection->hasRealMessages());
         $this->assertFalse($collection->hasError());
         $this->assertNull($collection->getByCode(403));
@@ -58,7 +58,7 @@ class MessageCollectionTest extends TestCase
     {
         $collection->createAndAddMessage('log', Severity::Log);
 
-        $this->assertEquals(Severity::Log, $collection->getSeverity());
+        $this->assertSame(Severity::Log, $collection->getSeverity());
         $this->assertFalse($collection->hasRealMessages());
         $this->assertFalse($collection->hasError());
         $this->assertNull($collection->getByCode(403));
@@ -86,7 +86,7 @@ class MessageCollectionTest extends TestCase
     {
         $collection->createAndAddMessage('suc6', Severity::Success);
 
-        $this->assertEquals(Severity::Success, $collection->getSeverity());
+        $this->assertSame(Severity::Success, $collection->getSeverity());
         $this->assertFalse($collection->hasRealMessages());
         $this->assertFalse($collection->hasError());
         $this->assertNull($collection->getByCode(403));
@@ -114,7 +114,7 @@ class MessageCollectionTest extends TestCase
     {
         $collection->addMessages([Message::create('Message 702', Severity::Error, '403 Forbidden')]);
 
-        $this->assertEquals(Severity::Error, $collection->getSeverity());
+        $this->assertSame(Severity::Error, $collection->getSeverity());
         $this->assertTrue($collection->hasError());
         $this->assertNull($collection->getByCode(701));
         $this->assertInstanceOf(Message::class, $collection->getByCode(403));
@@ -148,7 +148,7 @@ class MessageCollectionTest extends TestCase
         ];
         $collection->addMessages($messages, Severity::Warning);
 
-        $this->assertEquals(Severity::Error, $collection->getSeverity());
+        $this->assertSame(Severity::Error, $collection->getSeverity());
         $this->assertTrue($collection->hasError());
         $this->assertInstanceOf(Message::class, $collection->getByCode(700));
         $this->assertNull($collection->getByCode(701));
@@ -180,8 +180,8 @@ class MessageCollectionTest extends TestCase
         $format = $collection->formatMessages(Message::Format_Plain);
 
         $this->assertCount(7, $format);
-        $this->assertEquals('log', $format[0]);
-        $this->assertEquals('suc6', $format[1]);
+        $this->assertSame('log', $format[0]);
+        $this->assertSame('suc6', $format[1]);
 
         $format = $collection->formatMessages(Message::Format_HtmlList);
 

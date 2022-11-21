@@ -28,11 +28,11 @@ class MessageTest extends TestCase
     public function testCreateWithAllParams1(): Message
     {
         $message = Message::create('Message 701', Severity::Error, 'S1')->setTranslator($this->translator);
-        $this->assertEquals('Message 701', $message->getText());
-        $this->assertEquals(Severity::Error, $message->getSeverity());
-        $this->assertEquals('S1', $message->getCode());
-        $this->assertEquals('', $message->getCodeTag());
-        $this->assertEquals('', $message->getField());
+        $this->assertSame('Message 701', $message->getText());
+        $this->assertSame(Severity::Error, $message->getSeverity());
+        $this->assertSame('S1', $message->getCode());
+        $this->assertSame('', $message->getCodeTag());
+        $this->assertSame('', $message->getField());
         $this->assertNull($message->getException());
         return $message;
     }
@@ -40,11 +40,11 @@ class MessageTest extends TestCase
     public function testCreateWithAllParams2(): Message
     {
         $message = Message::create('Message 701 empty codes', Severity::Success)->setTranslator($this->translator);
-        $this->assertEquals('Message 701 empty codes', $message->getText());
-        $this->assertEquals(Severity::Success, $message->getSeverity());
-        $this->assertEquals(0, $message->getCode());
-        $this->assertEquals('', $message->getCodeTag());
-        $this->assertEquals('', $message->getField());
+        $this->assertSame('Message 701 empty codes', $message->getText());
+        $this->assertSame(Severity::Success, $message->getSeverity());
+        $this->assertSame(0, $message->getCode());
+        $this->assertSame('', $message->getCodeTag());
+        $this->assertSame('', $message->getField());
         $this->assertNull($message->getException());
         return $message;
     }
@@ -52,11 +52,11 @@ class MessageTest extends TestCase
     public function testCreateWithArray(): Message
     {
         $message = Message::createFromApiMessage(['code' => 702, 'codetag' => 'W2', 'message' => 'Message 702'], Severity::Warning)->setTranslator($this->translator);
-        $this->assertEquals('Message 702', $message->getText());
-        $this->assertEquals(Severity::Warning, $message->getSeverity());
-        $this->assertEquals(702, $message->getCode());
-        $this->assertEquals('W2', $message->getCodeTag());
-        $this->assertEquals('', $message->getField());
+        $this->assertSame('Message 702', $message->getText());
+        $this->assertSame(Severity::Warning, $message->getSeverity());
+        $this->assertSame(702, $message->getCode());
+        $this->assertSame('W2', $message->getCodeTag());
+        $this->assertSame('', $message->getField());
         $this->assertNull($message->getException());
         return $message;
     }
@@ -65,23 +65,23 @@ class MessageTest extends TestCase
     {
         $e = new RuntimeException('Message 703', 703);
         $message = Message::createFromException($e)->setTranslator($this->translator);
-        $this->assertEquals('Message 703', $message->getText());
-        $this->assertEquals(Severity::Exception, $message->getSeverity());
-        $this->assertEquals(703, $message->getCode());
-        $this->assertEquals('', $message->getCodeTag());
-        $this->assertEquals('', $message->getField());
-        $this->assertEquals($e, $message->getException());
+        $this->assertSame('Message 703', $message->getText());
+        $this->assertSame(Severity::Exception, $message->getSeverity());
+        $this->assertSame(703, $message->getCode());
+        $this->assertSame('', $message->getCodeTag());
+        $this->assertSame('', $message->getField());
+        $this->assertSame($e, $message->getException());
         return $message;
     }
 
     public function testCreateFormFieldError(): Message
     {
         $message = Message::createForFormField('Not a valid e-mail address', Severity::Error, 'email')->setTranslator($this->translator);
-        $this->assertEquals('Not a valid e-mail address', $message->getText());
-        $this->assertEquals(Severity::Error, $message->getSeverity());
-        $this->assertEquals(0, $message->getCode());
-        $this->assertEquals('', $message->getCodeTag());
-        $this->assertEquals('email', $message->getField());
+        $this->assertSame('Not a valid e-mail address', $message->getText());
+        $this->assertSame(Severity::Error, $message->getSeverity());
+        $this->assertSame(0, $message->getCode());
+        $this->assertSame('', $message->getCodeTag());
+        $this->assertSame('email', $message->getField());
         $this->assertNull($message->getException());
         return $message;
     }
@@ -95,8 +95,8 @@ class MessageTest extends TestCase
      */
     public function testToString(Message $message1, Message $message2)
     {
-        $this->assertEquals('S1: Message 701', (string) $message1);
-        $this->assertEquals('Message 701 empty codes', (string) $message2);
+        $this->assertSame('S1: Message 701', (string) $message1);
+        $this->assertSame('Message 701 empty codes', (string) $message2);
     }
 
     /**
@@ -114,17 +114,17 @@ class MessageTest extends TestCase
      */
     public function testFormat(Message $message1, Message $message2, Message $message3, Message $message4, Message $message5)
     {
-        $this->assertEquals('S1: Message 701', $message1->format(Message::Format_Plain));
-        $this->assertEquals('Message 701 empty codes', $message2->format(Message::Format_Plain));
-        $this->assertEquals('<span>702, W2:</span> <span>Message 702</span>', $message3->format(Message::Format_Html));
+        $this->assertSame('S1: Message 701', $message1->format(Message::Format_Plain));
+        $this->assertSame('Message 701 empty codes', $message2->format(Message::Format_Plain));
+        $this->assertSame('<span>702, W2:</span> <span>Message 702</span>', $message3->format(Message::Format_Html));
 
-        $this->assertEquals('Ernstige fout: 703: Message 703', $message4->format(Message::Format_PlainWithSeverity));
-        $this->assertEquals('<span>Waarschuwing:</span> <span>702, W2:</span> <span>Message 702</span>', $message3->format(Message::Format_HtmlWithSeverity));
+        $this->assertSame('Ernstige fout: 703: Message 703', $message4->format(Message::Format_PlainWithSeverity));
+        $this->assertSame('<span>Waarschuwing:</span> <span>702, W2:</span> <span>Message 702</span>', $message3->format(Message::Format_HtmlWithSeverity));
 
-        $this->assertEquals('• S1: Message 701', $message1->format(Message::Format_PlainList));
-        $this->assertEquals('<li><span>702, W2:</span> <span>Message 702</span></li>', $message3->format(Message::Format_HtmlList));
+        $this->assertSame('• S1: Message 701', $message1->format(Message::Format_PlainList));
+        $this->assertSame('<li><span>702, W2:</span> <span>Message 702</span></li>', $message3->format(Message::Format_HtmlList));
 
-        $this->assertEquals('Not a valid e-mail address', $message5->format(Message::Format_Plain));
-        $this->assertEquals('Fout: Not a valid e-mail address', $message5->format(Message::Format_PlainWithSeverity));
+        $this->assertSame('Not a valid e-mail address', $message5->format(Message::Format_Plain));
+        $this->assertSame('Fout: Not a valid e-mail address', $message5->format(Message::Format_PlainWithSeverity));
     }
 }

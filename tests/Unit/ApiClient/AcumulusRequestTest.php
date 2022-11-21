@@ -53,7 +53,7 @@ class AcumulusRequestTest extends TestCase
         $needContract = $this->examples->needContract($uri);
         $this->acumulusResult =  $this->acumulusRequest->execute($uri, $submit, $needContract);
 
-        $this->assertEquals($uri, $this->acumulusRequest->getUri());
+        $this->assertSame($uri, $this->acumulusRequest->getUri());
         $fullSubmit = $this->acumulusRequest->getSubmit();
         $this->assertArrayHasKey('format', $fullSubmit);
         $this->assertArrayHasKey('testmode', $fullSubmit);

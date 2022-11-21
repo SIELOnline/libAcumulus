@@ -1,15 +1,15 @@
 <?php
 
-namespace Siel\Acumulus\Invoice;
+namespace Siel\Acumulus\Collectors;
 
+use Siel\Acumulus\Data\AcumulusObject;
+use Siel\Acumulus\Data\AcumulusProperty;
 use Siel\Acumulus\Helpers\Token;
 
-abstract class Collect
+abstract class Collector
 {
     protected Token $token;
     protected array $propertySources;
-    protected array $fieldMappings;
-    protected AcumulusObject $acumulusObject;
 
     public function __construct(Token $token)
     {
@@ -17,9 +17,9 @@ abstract class Collect
     }
 
     /**
-     * Returns an {@see \Siel\Acumulus\Invoice\AcumulusObject}
+     * Returns an {@see \Siel\Acumulus\Data\AcumulusObject}
      *
-     * Creates an {@see \Siel\Acumulus\Invoice\AcumulusObject} by collecting
+     * Creates an {@see \Siel\Acumulus\Data\AcumulusObject} by collecting
      * values for all its fields and metadata that might be added to the object.
      *
      * Values for fields may come from:
@@ -42,44 +42,43 @@ abstract class Collect
      * @param array $propertySources
      *   The objects to use with field mappings (token expansion).
      * @param array $fieldMappings
-     *   The patterns for these fields that can be retrieved via a field
-     *   mapping.
+     *   The patterns for the fields that can be collected via a simple mapping.
      *
-     * @return \Siel\Acumulus\Invoice\AcumulusObject
-     *   The AcumulusObject with its fields filled based on the $propertySources
-     *   and the $fieldMappings, or the logic of, a more specialised child of,
-     *   this class.
+     * @return \Siel\Acumulus\Data\AcumulusObject
+     *   The AcumulusObject with its fields filled based on the
+     *   $propertySources, the $fieldMappings, and the logic of a more
+     *   specialised child of this class.
      */
     public function collect(array $propertySources, array $fieldMappings): AcumulusObject
     {
         $this->propertySources = $propertySources;
-        $this->fieldMappings = $fieldMappings;
-        $this->acumulusObject = $this->createAcumulusObject();
-        $this->collectMappedFields($this->acumulusObject);
-        $this->collectLogicFields($this->acumulusObject);
-        return $this->acumulusObject;
+        $acumulusObject = $this->createAcumulusObject();
+        $this->collectMappedFields($acumulusObject, $fieldMappings);
+        $this->collectLogicFields($acumulusObject);
+        return $acumulusObject;
     }
 
     /**
-     * Creates a new {@see \Siel\Acumulus\Invoice\AcumulusObject} that will
+     * Creates a new {@see \Siel\Acumulus\Data\AcumulusObject} that will
      * contain the collected values.
      *
-     * @return \Siel\Acumulus\Invoice\AcumulusObject
+     * @return \Siel\Acumulus\Data\AcumulusObject
      */
     abstract protected function createAcumulusObject(): AcumulusObject;
 
     /**
-     * @param \Siel\Acumulus\Invoice\AcumulusObject $acumulusObject
+     * @param \Siel\Acumulus\Data\AcumulusObject $acumulusObject
+     * @param array $fieldMappings
      */
-    protected function collectMappedFields(AcumulusObject $acumulusObject)
+    protected function collectMappedFields(AcumulusObject $acumulusObject, array $fieldMappings)
     {
-        foreach ($this->fieldMappings as $field => $pattern) {
+        foreach ($fieldMappings as $field => $pattern) {
             $this->expandAndSet($acumulusObject, $field, $pattern);
         }
     }
 
     /**
-     * @param \Siel\Acumulus\Invoice\AcumulusObject $acumulusObject
+     * @param \Siel\Acumulus\Data\AcumulusObject $acumulusObject
      */
     abstract protected function collectLogicFields(AcumulusObject $acumulusObject);
 
@@ -93,7 +92,7 @@ abstract class Collect
      * - If the expanded value is empty the property will be set (with that
      *   empty value).
      *
-     * @param \Siel\Acumulus\Invoice\AcumulusObject $object
+     * @param \Siel\Acumulus\Data\AcumulusObject $object
      *   An object to set the property on.
      * @param string $property
      *   The name of the property to set.
@@ -114,8 +113,8 @@ abstract class Collect
     /**
      * Wrapper method around Token::expand().
      *
-     * The values of variables in $pattern are taken from 1 the property sources
-     * known to this collector.
+     * The values of variables in $pattern are taken from 1 of the property
+     * sources known to this collector.
      *
      * @param string $pattern
      *  The value that may contain dynamic variables.

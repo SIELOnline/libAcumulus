@@ -1,6 +1,6 @@
 <?php
 
-namespace Siel\Acumulus\Invoice;
+namespace Siel\Acumulus\Data;
 
 use DateTime;
 use DomainException;
@@ -13,10 +13,10 @@ use Siel\Acumulus\Helpers\Number;
  * call.
  *
  * Value sent with Acumulus API messages can be of type 'string', 'int',
- * 'float', 'date', or 'bool'. Note that the AcumulusAPI does not use booleans,
- * properties that represent a "yes/no" value are mostly represented by an int
- * with allowed values 0 and 1. Internally we do work with booleans for these
- * values.
+ * 'float', 'date', or 'bool'. Note that the Acumulus API does not use booleans.
+ * Properties that represent a "yes/no" value are mostly represented by an int
+ * with allowed values 0 and 1. However, internally we do work with booleans for
+ * these values.
  *
  * Additional restrictions may hold, and the basic and most used restrictions
  * are supported by this class:

@@ -3,11 +3,11 @@
  * @noinspection PhpStaticAsDynamicMethodCallInspection
  */
 
-namespace Siel\Acumulus\Unit\Invoice;
+namespace Siel\Acumulus\Unit\Data;
 
 use DateTime;
 use DomainException;
-use Siel\Acumulus\Invoice\AcumulusProperty;
+use Siel\Acumulus\Data\AcumulusProperty;
 use PHPUnit\Framework\TestCase;
 
 class AcumulusPropertyTest extends TestCase
@@ -52,15 +52,13 @@ class AcumulusPropertyTest extends TestCase
     {
         $pd = ['name' => 'property', 'type' => 'int', 'required' => true, 'allowedValues' => [1,2]];
         $p = new AcumulusProperty($pd);
-        $this->assertEquals('property', $p->getName());
-        $this->assertEquals(true, $p->isRequired());
+        $this->assertSame('property', $p->getName());
+        $this->assertSame(true, $p->isRequired());
         $this->assertNull($p->getValue());
     }
 
     public function setValueDataProvider(): array
     {
-        $now = time();
-        $floatNow = ((float) $now) + 0.5;
         return [
             'int-int' => ['int', 1, 1],
             'int-string' => ['int', '2', 2],
@@ -70,6 +68,25 @@ class AcumulusPropertyTest extends TestCase
             'float-int' => ['float', 1, 1.0],
             'float-string' => ['float', '1.234e2', 123.4],
             'float-negative' => ['float', -3.5, -3.5],
+        ];
+    }
+
+    /**
+     * @dataProvider setValueDataProvider
+     */
+    public function testSetValue(string $type, $value, $castValue)
+    {
+        $pd = ['name' => 'property', 'type' => $type];
+        $p = new AcumulusProperty($pd);
+        $p->setValue($value);
+        $this->assertSame($castValue, $p->getValue());
+    }
+
+    public function setDateValueDataProvider(): array
+    {
+        $now = time();
+        $floatNow = ((float) $now) + 0.5;
+        return [
             'date-string' => ['date', '2022-09-01', DateTime::createFromFormat('Y-m-d', '2022-09-01')->setTime(0, 0, 0)],
             'date-int' => ['date', $now, DateTime::createFromFormat('U', $now)->setTime(0, 0, 0)],
             'date-float' => ['date', $floatNow, DateTime::createFromFormat('U.u', $floatNow)->setTime(0, 0, 0)],
@@ -79,7 +96,7 @@ class AcumulusPropertyTest extends TestCase
     /**
      * @dataProvider setValueDataProvider
      */
-    public function testSetValue(string $type, $value, $castValue)
+    public function testDateSetValue(string $type, $value, $castValue)
     {
         $pd = ['name' => 'property', 'type' => $type];
         $p = new AcumulusProperty($pd);

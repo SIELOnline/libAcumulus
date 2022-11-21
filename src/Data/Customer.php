@@ -1,6 +1,6 @@
 <?php
 
-namespace Siel\Acumulus\Invoice;
+namespace Siel\Acumulus\Data;
 
 use Siel\Acumulus\Api;/**
  * Represents an Acumulus API customer object.
@@ -90,7 +90,7 @@ use Siel\Acumulus\Api;/**
  *  @method bool setDisableDuplicates(?int $value, int $mode = AcumulusProperty::Set_Always)
  *
  * The definition of the fields is based on the
- * {@link https://www.siel.nl/acumulus/API/Invoicing/Add_Invoice/ Invoice Add API call},
+ * {@link https://www.siel.nl/acumulus/API/Invoicing/Add_Invoice/ Data Add API call},
  * NOT the
  * {@link https://www.siel.nl/acumulus/API/Contacts/Manage_Contact/ Manage Contact call}.
  * However, whereas in the API structures, the {@see Invoice} object is part of
@@ -100,7 +100,7 @@ use Siel\Acumulus\Api;/**
  * Field names are copied from the API, though capitals are introduced for
  * readability (and to prevent PhpStorm typo inspections).
  *
- * Metadata can be added via the {@see \Siel\Acumulus\Invoice\Metadata}
+ * Metadata can be added via the {@see \Siel\Acumulus\Data\MetadataCollection}
  * interface.
  */
 class Customer extends AcumulusObject

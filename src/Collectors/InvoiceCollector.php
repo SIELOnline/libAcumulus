@@ -1,15 +1,18 @@
 <?php
-namespace Siel\Acumulus\Invoice;
+namespace Siel\Acumulus\Collectors;
 
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\ShopCapabilities;
+use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Countries;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Helpers\Token;
 use Siel\Acumulus\Helpers\Translator;
+use Siel\Acumulus\Invoice\Source;
+use Siel\Acumulus\Invoice\Translations;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
 
@@ -42,12 +45,12 @@ use Siel\Acumulus\Tag;
  * The input of a collection phase is an invoice {@see Source}, typically an
  * order, a refund, or, if supported by the webshop, an invoice from the webshop
  * itself. The output of a collection phase is an
- * {@see \Siel\Acumulus\Invoice\Invoice}, an object that contains all necessary
+ * {@see \Siel\Acumulus\Invoice\Data}, an object that contains all necessary
  * data, so that the subsequent {@see Completor} phase can create a complete and
  * correct Acumulus invoice to send to Acumulus. Note that in fact an
- * {@see \Siel\Acumulus\Invoice\Invoice} object is an object that contains all
+ * {@see \Siel\Acumulus\Invoice\Data} object is an object that contains all
  * possible fields as defined in the
- * {@link https://www.siel.nl/acumulus/API/Invoicing/Add_Invoice/ Acumulus API Invoice Add call}
+ * {@link https://www.siel.nl/acumulus/API/Invoicing/Add_Invoice/ Acumulus API Data Add call}
  * augmented with metadata fields.
  *
  * This base class:
@@ -97,7 +100,7 @@ use Siel\Acumulus\Tag;
  * {@see FlattenerInvoiceLines}
  *
  */
-abstract class Collector
+abstract class InvoiceCollector extends Collector
 {
     public const VatRateSource_Exact = 'exact';
     public const VatRateSource_Exact0 = 'exact-0';
@@ -237,7 +240,7 @@ abstract class Collector
 
     /**
      * Adds an object as property source.
-     * The object is added to the start of the array. Thus upon token expansion,
+     * The object is added to the start of the array. Thus, upon token expansion
      * it will be searched before other (already added) property sources.
      *
      * @param string $name
@@ -267,7 +270,7 @@ abstract class Collector
      * @param Source $source
      *  The web shop order or refund.
      *
-     * @return \Siel\Acumulus\Invoice\Invoice
+     * @return \Siel\Acumulus\Data\Invoice
      *   The acumulus invoice for this invoice source.
      */
     public function collect(Source $source): Invoice
@@ -275,9 +278,11 @@ abstract class Collector
         $this->setInvoiceSource($source);
         $this->setPropertySources();
         $invoice = new Invoice();
-        /** @var \Siel\Acumulus\Invoice\CollectCustomer $collector */
-        $collector = $this->container->getCollect('Customer');
-        $customer = $collector->collect($this->getPropertySources());
+        /** @var \Siel\Acumulus\Collectors\CustomerCollector $collector */
+        $collector = $this->container->getCollector('Customer');
+        $customerSettings = $this->config->getCustomerSettings();
+        /** @var \Siel\Acumulus\Data\Customer $customer */
+        $customer = $collector->collect($this->getPropertySources(), $customerSettings);
         $invoice->setCustomer($customer);
 //        $this->getInvoice($invoice);
 //        $this->getInvoiceLines($invoice);
@@ -338,7 +343,7 @@ abstract class Collector
         $shopSettings = $this->config->getShopSettings();
         $invoiceSettings = $this->config->getInvoiceSettings();
 
-        // Invoice type.
+        // Data type.
         $concept = $invoiceSettings['concept'];
         if ($concept === Config::Concept_Plugin) {
             $concept = Api::Concept_No;
@@ -348,7 +353,7 @@ abstract class Collector
         // Meta info: internal order/refund id
         $invoice[Meta::Id] = $this->invoiceSource->getId();
 
-        // Invoice number and date.
+        // Data number and date.
         $sourceToUse = $shopSettings['invoiceNrSource'];
         if ($sourceToUse !== Config::InvoiceNrSource_Acumulus) {
             $invoice[Tag::Number] = $this->getInvoiceNumber($sourceToUse);
@@ -391,7 +396,7 @@ abstract class Collector
         // be assumed to be correct.
         $invoice[Tag::Template] = '';
 
-        // Invoice notes.
+        // Data notes.
         $this->addTokenDefault($invoice, Tag::InvoiceNotes, $invoiceSettings['invoiceNotes']);
         // Change newlines to the literal \n and tabs to \t.
         if (!empty($invoice[Tag::InvoiceNotes])) {
@@ -597,7 +602,7 @@ abstract class Collector
      *
      * The nature can come from the:
      * - Shop settings: the nature_shop setting.
-     * - Invoice settings: The nature field reference.
+     * - Data settings: The nature field reference.
      *
      * It will be left undefined when no value can be given to it based on these
      * settings.

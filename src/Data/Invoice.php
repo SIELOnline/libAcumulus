@@ -1,6 +1,6 @@
 <?php
 
-namespace Siel\Acumulus\Invoice;
+namespace Siel\Acumulus\Data;
 
 use Siel\Acumulus\Api;
 
@@ -69,7 +69,7 @@ class Invoice extends AcumulusObject
     protected ?Customer $customer;
 
     /**
-     * @return \Siel\Acumulus\Invoice\Customer|null
+     * @return \Siel\Acumulus\Data\Customer|null
      */
     public function getCustomer(): ?Customer
     {
@@ -77,7 +77,7 @@ class Invoice extends AcumulusObject
     }
 
     /**
-     * @param \Siel\Acumulus\Invoice\Customer $customer
+     * @param \Siel\Acumulus\Data\Customer $customer
      */
     public function setCustomer(Customer $customer): void
     {
@@ -101,7 +101,7 @@ class Invoice extends AcumulusObject
     }
 
     /**
-     * @return \Siel\Acumulus\Invoice\EmailAsPdf|null
+     * @return \Siel\Acumulus\Data\EmailAsPdf|null
      */
     public function getEmailAsPdf(): ?EmailAsPdf
     {
@@ -109,7 +109,7 @@ class Invoice extends AcumulusObject
     }
 
     /**
-     * @param \Siel\Acumulus\Invoice\EmailAsPdf $emailAsPdf
+     * @param \Siel\Acumulus\Data\EmailAsPdf $emailAsPdf
      */
     public function setEmailAsPdf(EmailAsPdf $emailAsPdf): void
     {

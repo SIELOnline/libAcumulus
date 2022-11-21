@@ -1,6 +1,6 @@
 <?php
 
-namespace Siel\Acumulus\Invoice;
+namespace Siel\Acumulus\Data;
 
 use Siel\Acumulus\Api;
 
@@ -33,11 +33,11 @@ class Line extends AcumulusObject
         ['name' => 'costPrice', 'type' => 'float'],
     ];
 
-    /** @var \Siel\Acumulus\Invoice\Line[] */
+    /** @var \Siel\Acumulus\Data\Line[] */
     protected array $children = [];
 
     /**
-     * @return \Siel\Acumulus\Invoice\Line[]
+     * @return \Siel\Acumulus\Data\Line[]
      */
     public function getChildren(): array
     {
@@ -45,7 +45,7 @@ class Line extends AcumulusObject
     }
 
     /**
-     * @param \Siel\Acumulus\Invoice\Line $child
+     * @param \Siel\Acumulus\Data\Line $child
      */
     public function addChild(Line $child): void
     {

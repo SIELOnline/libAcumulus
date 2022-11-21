@@ -1,6 +1,6 @@
 <?php
 
-namespace Siel\Acumulus\Invoice;
+namespace Siel\Acumulus\Data;
 
 use Siel\Acumulus\Api;
 

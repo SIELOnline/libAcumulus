@@ -11,13 +11,13 @@ use Siel\Acumulus\ApiClient\AcumulusRequest;
 use Siel\Acumulus\ApiClient\AcumulusResult;
 use Siel\Acumulus\ApiClient\HttpRequest;
 use Siel\Acumulus\ApiClient\HttpResponse;
+use Siel\Acumulus\Collectors\Collector;
 use Siel\Acumulus\Config\Config;
 
 use Siel\Acumulus\Config\ConfigStore;
 use Siel\Acumulus\Config\ConfigUpgrade;
 use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Config\ShopCapabilities;
-use Siel\Acumulus\Invoice\Collect;
 use Siel\Acumulus\Invoice\Completor;
 use Siel\Acumulus\Invoice\CompletorInvoiceLines;
 use Siel\Acumulus\Invoice\CompletorStrategyLines;
@@ -96,8 +96,9 @@ use const Siel\Acumulus\Version;
  *
  * At whatever level you are overriding classes from this library, you always
  * have to place them in the same sub namespace as where they are placed in this
- * library. That is, in 1 of the namespaces Config, Helpers, Invoice, or Shop.
- * Note that there should be no need to override classes in ApiClient.
+ * library. That is, in 1 of the namespaces Collectors, Config, Helpers,
+ * Invoice, or Shop. Note that there should be no need to override classes in
+ * ApiClient or Data.
  *
  * If you do not want to use \Siel\Acumulus as starting part of your namespace,
  * you may replace Siel by your own vendor name and/or your department name, but
@@ -478,11 +479,11 @@ class Container
      * Returns a collector instance of the given type.
      *
      * @param string $type
-     *   The type of form requested.
+     *   The type of collector requested.
      *
-     * @return \Siel\Acumulus\Invoice\Collect
+     * @return \Siel\Acumulus\Collectors\Collector
      */
-    public function getCollect(string $type): Collect
+    public function getCollector(string $type): Collector
     {
         $arguments = [
             $this->getToken(),
@@ -493,13 +494,13 @@ class Container
             case 'invoice':
             case 'line':
             case 'emailAsPdf':
-                $class = lcfirst($type);
+                $class = ucfirst($type);
                 break;
             default;
                 throw new InvalidArgumentException("Unknown collector type $type");
         }
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getInstance('Collect' . $class, 'Invoice', $arguments);
+        return $this->getInstance($class . 'Collector', 'Collectors', $arguments);
     }
 
     public function getEnvironment(): Environment

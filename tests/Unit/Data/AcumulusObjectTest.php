@@ -11,13 +11,13 @@ use Siel\Acumulus\Api;
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Data\AcumulusProperty;
 use Siel\Acumulus\Data\MetadataCollection;
-use Siel\Acumulus\TestWebShop\Data\TestAcumulusObject;
+use Siel\Acumulus\TestWebShop\Data\SimpleTestObject;
 
 class AcumulusObjectTest extends TestCase
 {
     public function testConstructor1()
     {
-        $ao = new TestAcumulusObject();
+        $ao = new SimpleTestObject();
         $this->assertNull($ao->itemNumber);
         $this->assertNull($ao->nature);
         $this->assertNull($ao->unitPrice);
@@ -27,7 +27,7 @@ class AcumulusObjectTest extends TestCase
     public function testConstructor2()
     {
         $this->expectException(RuntimeException::class);
-        $ao = new TestAcumulusObject();
+        $ao = new SimpleTestObject();
         /** @noinspection PhpUndefinedFieldInspection */
         /** @noinspection PhpUnusedLocalVariableInspection */
         $v = $ao->notExisting;
@@ -35,7 +35,7 @@ class AcumulusObjectTest extends TestCase
 
     public function testSetAndGetProperties()
     {
-        $ao = new TestAcumulusObject();
+        $ao = new SimpleTestObject();
         $this->assertFalse(isset($ao->itemNumber));
 
         $value1 = 'PRD0001';
@@ -57,7 +57,7 @@ class AcumulusObjectTest extends TestCase
 
     public function testUnsetProperties()
     {
-        $ao = new TestAcumulusObject();
+        $ao = new SimpleTestObject();
         $this->assertFalse(isset($ao->itemNumber));
 
         $value1 = 'PRD0001';
@@ -72,7 +72,7 @@ class AcumulusObjectTest extends TestCase
 
     public function testSetterAndGetter()
     {
-        $ao = new TestAcumulusObject();
+        $ao = new SimpleTestObject();
         $this->assertNull($ao->getItemNumber());
 
         $value1 = 'PRD0001';
@@ -113,7 +113,7 @@ class AcumulusObjectTest extends TestCase
     public function testArgumentsException1()
     {
         $this->expectException(LogicException::class);
-        $ao = new TestAcumulusObject();
+        $ao = new SimpleTestObject();
         /** @noinspection PhpUnusedLocalVariableInspection */
         $v = $ao->getUnitPrice(1);
     }
@@ -121,7 +121,7 @@ class AcumulusObjectTest extends TestCase
     public function testArgumentsException2()
     {
         $this->expectException(LogicException::class);
-        $ao = new TestAcumulusObject();
+        $ao = new SimpleTestObject();
         /** @noinspection PhpUnusedLocalVariableInspection */
         /** @noinspection PhpParamsInspection */
         $v = $ao->setUnitPrice();
@@ -130,7 +130,7 @@ class AcumulusObjectTest extends TestCase
     public function testArgumentsException3()
     {
         $this->expectException(LogicException::class);
-        $ao = new TestAcumulusObject();
+        $ao = new SimpleTestObject();
         /** @noinspection PhpUnusedLocalVariableInspection */
         /** @noinspection PhpMethodParametersCountMismatchInspection */
         $v = $ao->setUnitPrice(19.99, AcumulusProperty::Set_Always, true);

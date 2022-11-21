@@ -7,7 +7,7 @@ namespace Siel\Acumulus\Unit\Data;
 
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Data\MetadataValue;
-use Siel\Acumulus\TestWebShop\Data\TestAcumulusObject;
+use Siel\Acumulus\TestWebShop\Data\SimpleTestObject;
 
 class MetadataValueTest extends TestCase
 {

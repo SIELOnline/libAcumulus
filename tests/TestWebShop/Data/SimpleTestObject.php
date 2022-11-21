@@ -21,7 +21,7 @@ use Siel\Acumulus\Data\AcumulusProperty;
  * @method setNature(string $value, int $mode = AcumulusProperty::Set_Always): void
  * @method setUnitPrice(float $value, int $mode = AcumulusProperty::Set_Always): void
  */
-class TestAcumulusObject extends AcumulusObject
+class SimpleTestObject extends AcumulusObject
 {
     protected static array $propertyDefinitions = [
         ['name' => 'itemNumber', 'type' => 'string'],

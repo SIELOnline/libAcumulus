@@ -20,20 +20,19 @@ Supported shops and versions
 The tags below are also used further on in the changelog to indicate to which
 shop(s) a change applies (if no tag is mentioned, ALL may be assumed).
 
-|Tag | Shop             | Version used | Supported versions                 |
-|    |                  | for testing  |                                    |
-|----|------------------|--------------|------------------------------------|
-|ALL | All web shops.   |              |                                    |
-|JOO | Joomla (HS + VM) | 4.1.4        | >= 3.6                             |
-|HS  | HikaShop (JOO)   | 4.6.0 (Starter) | >= 3.0.0                        |
-|MA  | Magento          | 2.4.2        | >= 2.3                             |
-|OC  | OpenCart         | 3.0.3.7      | >= 3.0                             |
-|    |                  |              | Not yet tested with 4.0.x.y.       |
-|PS  | PrestaShop       | 1.7.8.5      | >= 1.7.6                           |
-|VM  | VirtueMart (JOO) | 4.0.4        | >= 3.0                             |
-|    |                  |              | VM4 not tested with Joomla 4.      |
-|WC  | WooCommerce      | 7.1.0        | >= 5.0 (3 and 4 will probably work)|
-|    | WordPress        | 6.1.1        | >= 5.9 (earlier version WILL fail) |
+|Tag | Shop             | Version used for testing | Supported versions        |
+|----|------------------|----------------|-------------------------------------|
+|ALL | All web shops.   |                |                                     |
+|JOO | Joomla (HS + VM) | 4.1.4          | >= 3.6                              |
+|HS  | HikaShop (JOO)   | 4.6.0 (Starter) | >= 3.0.0                           |
+|MA  | Magento          | 2.4.2          | >= 2.3                              |
+|OC  | OpenCart         | 3.0.3.7        | >= 3.0                              |
+|    |                  |                | Not yet tested with 4.0.x.y.        |
+|PS  | PrestaShop       | 1.7.8.5        | >= 1.7.6                            |
+|VM  | VirtueMart (JOO) | 4.0.4          | >= 3.0                              |
+|    |                  |                | VM4 not tested with Joomla 4.       |
+|WC  | WooCommerce      | 7.1.0          | >= 5.0 (3 and 4 will probably work) |
+|    | WordPress        | 6.1.1          | >= 5.9 (earlier versions WILL fail) |
 
 
 8.0.0-alpha1
@@ -42,22 +41,24 @@ This version is in a "Proof of Concept" phase, the old code is still there and
 is for now still the code that gets called when invoked by an actual plugin.
 
 Requirements:
-- PHP 7.4 is now the minimally required version
+- PHP 7.4 is now the minimally required version.
 
 Refactorings:
 - Introduced "smart" objects for the invoice-add array parts (customer, invoice,
-  line, emailaspdf) on top of the abstract classes Metadata, AcumulusObject and
-  AcumulusProperty.
-- Redefined the creator and completor phase into a collector and a completor
-  phase, where the collector phase is dumber and only contains "all" the shop
-  specific data retrieval, enriched with metadata to guide the completor phase.
+  line, emailaspdf) on top of the base classes AcumulusObject, AcumulusProperty,
+  MetadataProperty, and MetadataValue. Unused as long as the next point has not
+  been realised.
+- TODO:
+  Redefined the creator and completor phase into a collector and a completor
+  phase, where the collector phase is dumber and only contains the shop specific
+  data retrieval, enriched with metadata to guide the completor phase.
   The completor phase now only acts on the collected data, possibly guided by
   the metadata, to create the Acumulus invoice. This phase should now be fully
   shop independent.
 - Created an empty ModuleSpecificTranslations base class, to be overridden by
   the webshops.
 - So far the phpdoc comments in this code were only used within PhpStorm. They
-  have now been fed to a phpdoc generator, which revealed sone changes that 
+  have now been fed to a phpdoc generator, which revealed that some changes 
   needed to be made.
 
 

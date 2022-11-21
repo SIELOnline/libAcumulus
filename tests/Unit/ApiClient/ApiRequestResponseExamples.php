@@ -73,6 +73,7 @@ class ApiRequestResponseExamples
                 'vatdate' => '2020-02-05',
                 'vatcountry' => 'nl',
             ],
+            'http status code' => 403,
             'response body' => '{"errors":{"error":{"code":"403 Forbidden","codetag":"AF1001MCS","message":"Verplichte contract sectie ontbreekt"},"count_errors":"1"},"warnings":{"count_warnings":"0"},"status":"1"}',
             'mainResponseKey' => 'costcenters',
             'isList' => true,
@@ -241,6 +242,11 @@ class ApiRequestResponseExamples
     public function getSubmit(string $key): array
     {
         return $this->sets[$key]['submit'];
+    }
+
+    public function getHttpStatusCode(string $key): string
+    {
+        return $this->sets[$key]['http status code'] ?? 200;
     }
 
     public function getResponseBody(string $key): string

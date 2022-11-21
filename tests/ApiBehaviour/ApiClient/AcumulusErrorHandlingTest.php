@@ -8,9 +8,12 @@ namespace Siel\Acumulus\ApiBehaviour\ApiClient;
 
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Api;
+use Siel\Acumulus\ApiClient\Acumulus;
 use Siel\Acumulus\ApiClient\AcumulusException;
 use Siel\Acumulus\ApiClient\AcumulusResponseException;
+use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Helpers\Container;
+use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Severity;
 
 /**
@@ -33,12 +36,12 @@ class AcumulusErrorHandlingTest extends TestCase
     protected const ValidEntryId = 45967305;
     protected const InvalidEntryId = 1;
 
-    protected /*Container*/ $container;
-    protected /*Environment*/ $environment;
-    /** @var \Siel\Acumulus\TestWebShop\ApiClient\Acumulus  */
-    protected /*Acumulus*/ $acumulusClient;
+    protected Container $container;
+    protected Environment $environment;
+    /** @var \Siel\Acumulus\TestWebshop\ApiClient\Acumulus  */
+    protected Acumulus $acumulusClient;
     /** @var \Siel\Acumulus\Helpers\Log */
-    protected $log;
+    protected Log $log;
 
     protected function setUp(): void
     {
@@ -97,6 +100,7 @@ class AcumulusErrorHandlingTest extends TestCase
         $result = $this->acumulusClient->noContract();
         $this->assertTrue($result->hasError());
         $this->assertNotNull($result->getByCode(403));
+        $this->assertSame(403, $result->getHttpResponse()->getHttpStatusCode());
         $this->assertCount(2, $this->log->getLoggedMessages());
         $this->assertSubmittedRequestHasBeenLogged(0, Severity::Error);
         $this->assertApplicationLevelErrorHasBeenLogged(-1, 403,  Severity::Error);
@@ -109,6 +113,7 @@ class AcumulusErrorHandlingTest extends TestCase
     {
         $result = $this->acumulusClient->noEmailOnError(static::ValidEntryId);
         $this->assertFalse($result->hasError());
+        $this->assertSame(200, $result->getHttpResponse()->getHttpStatusCode());
         $this->assertArrayHasKey('entryid', $result->getMainAcumulusResponse());
         $this->assertCount(2, $this->log->getLoggedMessages());
         $this->assertSubmittedRequestHasBeenLogged(0, Severity::Success);
@@ -122,6 +127,7 @@ class AcumulusErrorHandlingTest extends TestCase
     {
         $result = $this->acumulusClient->noEmailOnWarning(static::ValidEntryId);
         $this->assertFalse($result->hasError());
+        $this->assertSame(200, $result->getHttpResponse()->getHttpStatusCode());
         $this->assertArrayHasKey('entryid', $result->getMainAcumulusResponse());
         $this->assertCount(2, $this->log->getLoggedMessages());
         $this->assertSubmittedRequestHasBeenLogged(0, Severity::Success);
@@ -132,6 +138,7 @@ class AcumulusErrorHandlingTest extends TestCase
     {
         $result = $this->acumulusClient->getEntry(1);
         $this->assertTrue($result->hasError());
+        $this->assertSame(404, $result->getHttpResponse()->getHttpStatusCode());
         $this->assertNotNull($result->getByCode(404));
         $this->assertCount(2, $this->log->getLoggedMessages());
         $this->assertSubmittedRequestHasBeenLogged(0, Severity::Error);
@@ -142,6 +149,7 @@ class AcumulusErrorHandlingTest extends TestCase
     {
         $result = $this->acumulusClient->setDeleteStatus(1, Api::Entry_Delete);
         $this->assertTrue($result->hasError());
+        $this->assertSame(404, $result->getHttpResponse()->getHttpStatusCode());
         $this->assertNotNull($result->getByCode(404));
         $this->assertCount(2, $this->log->getLoggedMessages());
         $this->assertSubmittedRequestHasBeenLogged(0, Severity::Error);
@@ -153,6 +161,7 @@ class AcumulusErrorHandlingTest extends TestCase
         //  valid ConceptId: 171866
         $result = $this->acumulusClient->getConceptInfo(123);
         $this->assertTrue($result->hasError());
+        $this->assertSame(400, $result->getHttpResponse()->getHttpStatusCode());
         $this->assertNotNull($result->getByCode(400));
         $this->assertCount(2, $this->log->getLoggedMessages());
         $this->assertSubmittedRequestHasBeenLogged(0, Severity::Error);
@@ -163,6 +172,7 @@ class AcumulusErrorHandlingTest extends TestCase
     {
         $result = $this->acumulusClient->setPaymentStatus(static::InvalidToken, Api::PaymentStatus_Paid);
         $this->assertTrue($result->hasError());
+        $this->assertSame(400, $result->getHttpResponse()->getHttpStatusCode());
         $this->assertNotNull($result->getByCode(400));
         $this->assertCount(2, $this->log->getLoggedMessages());
         $this->assertSubmittedRequestHasBeenLogged(0, Severity::Error);
@@ -183,6 +193,7 @@ class AcumulusErrorHandlingTest extends TestCase
     {
         $result = $this->acumulusClient->getPicklistProducts('This will not match any product');
         $this->assertFalse($result->hasError());
+        $this->assertSame(200, $result->getHttpResponse()->getHttpStatusCode());
         $this->assertCount(0, $result->getMainAcumulusResponse());
         $this->assertCount(2, $this->log->getLoggedMessages());
         $this->assertSubmittedRequestHasBeenLogged(0, Severity::Success);
@@ -193,6 +204,7 @@ class AcumulusErrorHandlingTest extends TestCase
     {
         $result = $this->acumulusClient->getPicklistDiscountProfiles();
         $this->assertFalse($result->hasError());
+        $this->assertSame(200, $result->getHttpResponse()->getHttpStatusCode());
         $this->assertCount(0, $result->getMainAcumulusResponse());
         $this->assertCount(2, $this->log->getLoggedMessages());
         $this->assertSubmittedRequestHasBeenLogged(0, Severity::Success);
@@ -202,7 +214,7 @@ class AcumulusErrorHandlingTest extends TestCase
     public function assertSubmittedRequestHasBeenLogged(int $index, int $expectedSeverity): void
     {
         $loggedMessages = $this->log->getLoggedMessages();
-        $index = $index >=0 ? $index : count($loggedMessages) - $index;
+        $index = $index >= 0 ? $index : count($loggedMessages) - $index;
         $loggedMessage = $loggedMessages[$index];
         $message = $loggedMessage['message'];
         $severity = $loggedMessage['severity'];

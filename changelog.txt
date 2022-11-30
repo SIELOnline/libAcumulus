@@ -71,7 +71,8 @@ Refactorings:
 
 Bugs:
 - MA2.4: Finally tested with Magento 2.4:
-  - <details> sections cold not be opened and remained closed
+- MA2: <details> sections cold not be opened and remained closed
+- MA2: config form: Error: Payment model name is not provided in config!
 
 7.4.3 (2022-10-31) (All but MA)
 -------------------------------

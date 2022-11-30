@@ -519,19 +519,18 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function getPaymentMethods(): array
     {
         $result = [];
-        /** @var \Magento\Payment\Helper\Data $paymentHelper */
-        $paymentHelper = Registry::getInstance()->get('Magento\Payment\Helper\Data');
-        $paymentMethods = $paymentHelper->getPaymentMethods();
-        foreach ($paymentMethods as $code => $paymentMethodData) {
-            /** @noinspection PhpUnhandledExceptionInspection */
-            $instance = $paymentHelper->getMethodInstance($code);
-            if ($instance->isActive()) {
-                $title = $instance->getTitle();
-                if (empty($title)) {
-                    $title = $code;
-                }
-                $result[$code] = $title;
+        /** @var \Magento\Payment\Model\PaymentMethodList $paymentMethodListModel */
+        $paymentMethodListModel = Registry::getInstance()->get('Magento\Payment\Model\PaymentMethodList');
+        // @todo: get active store/all stores
+        $paymentMethods = $paymentMethodListModel->getActiveList(null);
+        foreach ($paymentMethods as $paymentMethod) {
+            /** @var \Magento\Payment\Api\Data\PaymentMethodInterface $paymentMethod */
+            $code = $paymentMethod->getCode();
+            $title = $paymentMethod->getTitle();
+            if (empty($title)) {
+                $title = $code;
             }
+            $result[$code] = $title;
         }
         return $result;
     }

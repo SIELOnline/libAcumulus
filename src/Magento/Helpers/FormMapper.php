@@ -23,6 +23,7 @@ class FormMapper extends BaseFormMapper
      *   The slug-name of the settings page on which to show the section.
      */
     protected $magentoForm;
+    protected $isFirstElement;
 
     /**
      * @return $this
@@ -38,6 +39,7 @@ class FormMapper extends BaseFormMapper
      */
     public function map(Form $form)
     {
+        $this->isFirstElement = true;
         $this->fields($this->magentoForm, $form->getFields());
     }
 
@@ -71,6 +73,7 @@ class FormMapper extends BaseFormMapper
         // some the settings passed into the constructor, so we add our settings
         // after the element has been constructed...
         $element = $parent->addField($field['id'], $magentoType, [])->addData($magentoElementSettings);
+        $this->isFirstElement = false;
 
         if ($magentoType === 'note') {
             // Attributes are ignored by an element of type note, we add them to
@@ -104,6 +107,9 @@ class FormMapper extends BaseFormMapper
 
     /**
      * Returns the Magento form element type for the given Acumulus type string.
+     *
+     * Note that we define a details element ourselves. It inherits from
+     * fieldset, it just changes the fieldset and legend tags.
      */
     protected function getMagentoType(array $field): string
     {
@@ -125,11 +131,11 @@ class FormMapper extends BaseFormMapper
                 $type = empty($field['attributes']['multiple']) ? 'select' : 'multiselect';
                 break;
             case 'details':
-                $type = 'fieldset';
+                $type = 'Siel\AcumulusMa2\Data\Form\Element\Details';
                 break;
             default:
-                // Other types are returned as is: fieldset, text, password,
-                // date, button.
+                // Other types are returned as is: text, password, date, button,
+                // fieldset,
                 $type = $field['type'];
                 break;
         }
@@ -192,12 +198,10 @@ class FormMapper extends BaseFormMapper
                 $config[$key] = $value;
                 break;
             case 'type':
-                if ($value === 'fieldset') {
-                    $config['collapsable'] = true;
-                    $config['opened'] = true;
-                } elseif ($value === 'details') {
-                    $config['collapsable'] = true;
-                    $config['opened'] = false;
+                if ($value === 'details') {
+                    if ($this->isFirstElement) {
+                        $config['open'] = true;
+                    }
                 } elseif ($value === 'date') {
                     $config['format'] = static::DateFormat;
                     $config['date_format'] = static::DateFormat;
@@ -205,11 +209,6 @@ class FormMapper extends BaseFormMapper
                 break;
             case 'summary':
                 $config['legend'] = $value;
-                break;
-            case 'collapsable':
-            case 'opened':
-                // Do overwrite, as it has explicitly been set.
-                $config[$key] = $value;
                 break;
             case 'name':
                 if ($type === 'checkbox') {
@@ -221,7 +220,7 @@ class FormMapper extends BaseFormMapper
                 break;
             case 'description':
                 // Note that the description of a fieldset is handled elsewhere.
-                if (!empty($value) && $type !== 'fieldset') {
+                if (!empty($value) && !in_Array($type, ['fieldset', 'details'])) {
                     $config['after_element_html'] = '<p class="note">' . $value . '</p>';
                 }
                 break;

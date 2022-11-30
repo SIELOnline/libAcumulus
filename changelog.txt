@@ -43,6 +43,11 @@ is for now still the code that gets called when invoked by an actual plugin.
 Requirements:
 - PHP 7.4 is now the minimally required version.
 
+Features:
+- ALL: The About block on our forms will show less sections when the account
+  data has not yet been completed or is incorrect. This prevents duplicate
+  messages saying "no contract data yet".
+
 Refactorings:
 - Introduced "smart" objects for the invoice-add array parts (customer, invoice,
   line, emailaspdf) on top of the base classes AcumulusObject, AcumulusProperty,
@@ -58,9 +63,15 @@ Refactorings:
 - Created an empty ModuleSpecificTranslations base class, to be overridden by
   the webshops.
 - So far the phpdoc comments in this code were only used within PhpStorm. They
-  have now been fed to a phpdoc generator, which revealed that some changes 
+  have now been fed to a phpdoc generator, which revealed that some changes
   needed to be made.
+- ALL: The meta field on our forms is now placed in the first fieldset/details
+  element to prevent problems with rendering. PrestaShop requires this anyway,
+  so that code was lifted to the general FormHelper.
 
+Bugs:
+- MA2.4: Finally tested with Magento 2.4:
+  - <details> sections cold not be opened and remained closed
 
 7.4.3 (2022-10-31) (All but MA)
 -------------------------------
@@ -965,7 +976,7 @@ Bugs:
 - MA2: Versie die getoond werd bij de support-informatie was de databaseschema-
   versie (uit module.xml), niet de moduleversie van de module (uit
   composer.json).
-- MA2: Kortingen worden niet goed doorgegeven als prijzen excl. btw zijn 
+- MA2: Kortingen worden niet goed doorgegeven als prijzen excl. btw zijn
   ingevoerd. getBaseShippingDiscountAmount() is inc of excl. btw afhankelijk van
   of korting voor of na btw verrekend wordt. MA1 heeft dit waarschijnlijk ook,
   maar daar gaat de winkel ook de fout in.
@@ -1466,7 +1477,7 @@ Changes:
 - ALL: currency metadata wordt nu gebruikt om bestellingen in andere
   currencies te converteren naar euro's. Dit werkt voor zover de shop de meta
   info correct weet aan te leveren.
-- ALL: Als de standaard currency van de shop geen euro is, maar de order wel, 
+- ALL: Als de standaard currency van de shop geen euro is, maar de order wel,
   maar bedragen worden opgeslagen in de standaard valuta wordt de factuur ook
   geconverteerd naar euros.
 - VM: Ondersteuning voor andere currencies. Alleen metadata, opslag is altijd

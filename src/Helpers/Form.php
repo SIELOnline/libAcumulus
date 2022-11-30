@@ -1,6 +1,7 @@
 <?php
 namespace Siel\Acumulus\Helpers;
 
+use RuntimeException;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\ApiClient\Acumulus;
 use Siel\Acumulus\ApiClient\AcumulusResponseException;
@@ -786,11 +787,22 @@ abstract class Form extends MessageCollection
     protected function getAboutBlock(?bool $accountStatus): array
     {
         if ($this->aboutForm === null) {
-            throw new \RuntimeException('About block not available');
+            throw new RuntimeException('About block not available');
         }
-        return $this->aboutForm->getAboutBlock(
-            $accountStatus,
-            in_array($this->getType(), ['activate', 'batch']) ? 'details' : 'fieldset'
-        );
+
+        switch ($this->getType()) {
+            case 'register':
+            case 'activate':
+            case 'batch':
+                $wrapperType = 'details';
+                break;
+            case 'config':
+            case 'advanced':
+                $wrapperType = empty($accountStatus) ? 'details' : 'fieldset';
+                break;
+            default:
+                throw new RuntimeException('Unexpected form type ' . $this->getType());
+        }
+        return $this->aboutForm->getAboutBlock($accountStatus, $wrapperType);
     }
 }

@@ -140,25 +140,27 @@ class AboutForm
         ];
 
         $proSupportList = $this->getProSupportList($accountStatus);
-        $fields['proSupportListHeader'] = [
-            'type' => 'markup',
-            'value' => '<h3>' . $this->t('pro_support_list_header') . '</h3>',
-        ];
-        $fields['proSupportListInformation'] = [
-            'type' => 'markup',
-            'value' => $this->arrayToList($proSupportList, true),
-        ];
+        if ($accountStatus) {
+            $fields['proSupportListHeader'] = [
+                'type' => 'markup',
+                'value' => '<h3>' . $this->t('pro_support_list_header') . '</h3>',
+            ];
+            $fields['proSupportListInformation'] = [
+                'type' => 'markup',
+                'value' => $this->arrayToList($proSupportList, true),
+            ];
 
-        [$euCommerceProgressBar, $euCommerceMessage] = $this->getEuCommerceInfo($accountStatus);
-        if (!empty($euCommerceMessage)) {
-            $fields['euCommerceHeader'] = [
-                'type' => 'markup',
-                'value' => '<h3>' . $this->t('euCommerce') . '</h3>',
-            ];
-            $fields['euCommerceInformation'] = [
-                'type' => 'markup',
-                'value' => "<p>$euCommerceProgressBar<br>$euCommerceMessage</p>",
-            ];
+            [$euCommerceProgressBar, $euCommerceMessage] = $this->getEuCommerceInfo($accountStatus);
+            if (!empty($euCommerceMessage)) {
+                $fields['euCommerceHeader'] = [
+                    'type' => 'markup',
+                    'value' => '<h3>' . $this->t('euCommerce') . '</h3>',
+                ];
+                $fields['euCommerceInformation'] = [
+                    'type' => 'markup',
+                    'value' => "<p>$euCommerceProgressBar<br>$euCommerceMessage</p>",
+                ];
+            }
         }
 
         $fields['proSupportHeader'] = [
@@ -225,7 +227,6 @@ class AboutForm
             $wrapperTitleType => sprintf($this->t('informationBlockHeader'), $this->t('module')),
             'description' => sprintf($this->t('informationBlockDescription'), $this->t('module')),
             'fields' => $fields,
-            'collapsable' => true,
         ];
     }
 

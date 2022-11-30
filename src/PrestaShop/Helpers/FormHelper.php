@@ -49,25 +49,6 @@ class FormHelper extends BaseFormHelper
     /**
      * {@inheritdoc}
      *
-     * Prestashop requires field sets at the top level: move the meta field to
-     * the first field collection.
-     */
-    public function addMetaField(array $fields): array
-    {
-        $fields = parent::addMetaField($fields);
-        foreach ($fields as &$field) {
-            if (isset($field['fields'])) {
-                $field['fields'][static::Meta] = $fields[static::Meta];
-                unset($fields[static::Meta]);
-                break;
-            }
-        }
-        return $fields;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
      * Prestashop prepends checkboxes with their collection name.
      */
     protected function alterPostedValues(array $postedValues): array

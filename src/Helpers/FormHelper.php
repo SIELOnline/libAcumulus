@@ -100,22 +100,34 @@ class FormHelper
     }
 
     /**
-     * Returns the keys of the fields in the given array.
+     * Adds the meta field to the form fields.
      *
-     * Internal method, do not call directly.
+     * The meta field is added into the first fieldset or details set of fields
+     * to prevent problems with rendering and with PrestaShop that only allows
+     * fieldsets at the top.
      *
      * @param array[] $fields
      *
-     * @return array
-     *   Array of key names, keyed by these names.
+     * @return array[]
+     *   The $fields with the meta field added.
      */
     public function addMetaField(array $fields): array
     {
         $this->setMeta($this->constructFieldMeta($fields));
-        $fields[static::Meta] = [
+        $metaField = [
             'type' => 'hidden',
             'value' => json_encode($this->getMeta()),
         ];
+        foreach ($fields as &$field) {
+            if (isset($field['fields'])) {
+                $field['fields'][static::Meta] = $metaField;
+                $metaField = null;
+                break;
+            }
+        }
+        if ($metaField !== null) {
+            $fields[static::Meta] = $metaField;
+        }
         return $fields;
     }
 

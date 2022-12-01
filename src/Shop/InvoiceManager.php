@@ -330,22 +330,23 @@ abstract class InvoiceManager
         $status = $invoiceSource->getStatus();
         $shopEventSettings = $this->getConfig()->getShopEventSettings();
         if ($invoiceSource->getType() === Source::Order) {
-            $doSend = in_array($status, $shopEventSettings['triggerOrderStatus']);
+            // Set $arguments, this will add the current status and the set of
+            // statuses on which to send to the log line.
             $arguments = [$status, implode(',', $shopEventSettings['triggerOrderStatus'])];
-            $notSendReason = InvoiceAddResult::NotSent_WrongStatus;
+            $sendStatus = in_array($status, $shopEventSettings['triggerOrderStatus'])
+                ? InvoiceAddResult::SendStatus_Unknown
+                : InvoiceAddResult::NotSent_WrongStatus;
         } else {
-            $doSend = $shopEventSettings['triggerCreditNoteEvent'] === Config::TriggerCreditNoteEvent_Create;
             $arguments = [];
-            $notSendReason = InvoiceAddResult::NotSent_TriggerCreditNoteEventNotEnabled;
+            $sendStatus = $shopEventSettings['triggerCreditNoteEvent'] === Config::TriggerCreditNoteEvent_Create
+                ? InvoiceAddResult::SendStatus_Unknown
+                : InvoiceAddResult::NotSent_TriggerCreditNoteEventNotEnabled;
         }
-        if ($doSend) {
+        if ($sendStatus === InvoiceAddResult::SendStatus_Unknown) {
             $result = $this->createAndSend($invoiceSource, $result);
-            // Add argument to send status, this will add the current status and
-            // the set of statuses on which to send to the log line.
-            $result->setSendStatus($result->getSendStatus(), $arguments);
-        } else {
-            $result->setSendStatus($notSendReason, $arguments);
+            $sendStatus = $result->getSendStatus();
         }
+        $result->setSendStatus($sendStatus, $arguments);
         $this->getLog()->notice($this->getSendResultLogText($invoiceSource, $result));
         return $result;
     }

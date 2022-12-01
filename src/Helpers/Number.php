@@ -81,11 +81,19 @@ class Number
     /**
      * Indicates if a float is to be considered zero.
      *
-     * This is a wrapper around floatsAreEqual() for the often used case where
-     * an amount is checked for being 0.0.
+     * This is a wrapper around floatsAreEqual() for the case where an amount is
+     * checked for being 0.0 or empty, meaning that $f1 does not necessarily
+     * have to be a float but may be an empty value as well. Known examples:
+     * - Magento: getBaseDiscountAmount(), and many other getters, may return
+     *   null.
+     * - WooCommerce: A 0 amount may be stored as an empty string in the
+     *   database.
      */
-    public static function isZero(float $f1, float $maxDiff = 0.0011): bool
+    public static function isZero($f1, float $maxDiff = 0.0011): bool
     {
+        if (!is_float($f1) && empty($f1)) {
+            $f1 = 0.0;
+        }
         return static::floatsAreEqual($f1, 0.0, $maxDiff);
     }
 

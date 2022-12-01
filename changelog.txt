@@ -73,6 +73,11 @@ Bugs:
 - MA2.4: Finally tested with Magento 2.4:
 - MA2: <details> sections cold not be opened and remained closed
 - MA2: config form: Error: Payment model name is not provided in config!
+- MA2: Automatically sending invoice data to Acumulus on Magento invoice
+  creation (instead of order status change) did not work.
+- MA2: TypeError: Siel\Acumulus\Helpers\Number::isZero(): Argument #1 ($f1) must
+  be of type float, null given
+
 
 7.4.3 (2022-10-31) (All but MA)
 -------------------------------

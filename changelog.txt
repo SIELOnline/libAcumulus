@@ -48,6 +48,16 @@ Features:
   data has not yet been completed or is incorrect. This prevents duplicate
   messages saying "no contract data yet".
 
+Bugs:
+- MA2.4: Finally tested with Magento 2.4 and PHP 8.1. Below the findings:
+- MA2: <details> sections could not be opened and remained closed.
+- MA2: config form: Error: Payment model name is not provided in config!
+- MA2: Automatically sending invoice data to Acumulus on Magento invoice
+  creation (instead of order status change) did not work.
+- MA2: TypeError: Siel\Acumulus\Helpers\Number::isZero(): Argument #1 ($f1) must
+  be of type float, null given.
+- MA2: Our severity "exception" had no mapping to a Magento severity.
+
 Refactorings:
 - Introduced "smart" objects for the invoice-add array parts (customer, invoice,
   line, emailaspdf) on top of the base classes AcumulusObject, AcumulusProperty,
@@ -68,15 +78,6 @@ Refactorings:
 - ALL: The meta field on our forms is now placed in the first fieldset/details
   element to prevent problems with rendering. PrestaShop requires this anyway,
   so that code was lifted to the general FormHelper.
-
-Bugs:
-- MA2.4: Finally tested with Magento 2.4:
-- MA2: <details> sections cold not be opened and remained closed
-- MA2: config form: Error: Payment model name is not provided in config!
-- MA2: Automatically sending invoice data to Acumulus on Magento invoice
-  creation (instead of order status change) did not work.
-- MA2: TypeError: Siel\Acumulus\Helpers\Number::isZero(): Argument #1 ($f1) must
-  be of type float, null given
 
 
 7.4.3 (2022-10-31) (All but MA)

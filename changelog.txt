@@ -48,6 +48,7 @@ Features:
   data has not yet been completed or is incorrect. This prevents duplicate
   messages saying "no contract data yet".
 
+
 Bugs:
 - MA2.4: Finally tested with Magento 2.4 and PHP 8.1. Below the findings:
 - MA2: <details> sections could not be opened and remained closed.
@@ -59,6 +60,19 @@ Bugs:
 - MA2: Our severity "exception" had no mapping to a Magento severity.
 
 Refactorings:
+- ALL: Introduces a 'collection' form element that is treated as a simple
+  element, thus 1 label and description and the collection of subfields is
+  rendered without additional markup. This was needed to be able to show the
+  documents part on the InvoiceStatusOverview block in Magento.
+- ALL: The meta field on our forms is now placed in the first fieldset/details
+  element to prevent problems with rendering. PrestaShop requires this anyway,
+  so that code was lifted to the general FormHelper.
+- ALL: Created an empty ModuleSpecificTranslations base class, to be overridden
+  by the webshops.
+- ALL: So far the phpdoc comments in this code were only used within PhpStorm.
+  They have now been fed to a phpdoc generator, which revealed that some changes
+  needed to be made.
+
 - Introduced "smart" objects for the invoice-add array parts (customer, invoice,
   line, emailaspdf) on top of the base classes AcumulusObject, AcumulusProperty,
   MetadataProperty, and MetadataValue. Unused as long as the next point has not
@@ -70,14 +84,6 @@ Refactorings:
   The completor phase now only acts on the collected data, possibly guided by
   the metadata, to create the Acumulus invoice. This phase should now be fully
   shop independent.
-- Created an empty ModuleSpecificTranslations base class, to be overridden by
-  the webshops.
-- So far the phpdoc comments in this code were only used within PhpStorm. They
-  have now been fed to a phpdoc generator, which revealed that some changes
-  needed to be made.
-- ALL: The meta field on our forms is now placed in the first fieldset/details
-  element to prevent problems with rendering. PrestaShop requires this anyway,
-  so that code was lifted to the general FormHelper.
 
 
 7.4.3 (2022-10-31) (All but MA)
@@ -1451,8 +1457,8 @@ Changes:
 - ALL: Als een factuur als concept wordt opgeslagen voeg dan een verwijzing naar
   waar deze te vinden toe aan de waarschuwingstekst.
 - ALL: Als er een bedrag mist wordt er nu een waarschuwing en, indien mogelijk,
-  een correctieregel toegvoegd. Dit kan gebeuren als bv een betaalmodule die
-  (nog) niet door ons wordt ondersteund een betaalfee toevoegt.
+  een correctieregel toegevoegd. Dit kan gebeuren als bv een betaalmodule die
+  (nog) niet door ons wordt ondersteund betaalkosten toevoegt.
 - ALL: een 0-factuur kon bij een aantal shops leiden tot een onterechte
   waarschuwing en dus een concept-factuur. Deze situatie wordt nu beter
   aangepakt waardoor de waarschuwing niet meer gegeven zal worden.

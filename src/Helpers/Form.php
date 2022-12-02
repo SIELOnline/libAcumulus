@@ -21,13 +21,13 @@ use Siel\Acumulus\Tag;
  * renderer/mapper to the web shop specific way of form handling.
  *
  * This base Form class defines a way to:
- * - Define the form elements.
+ * - Define the form elements, see {@see getFields()}.
  * - Render the form, including assigning values to form elements based on
  *   POSTed values, configuration settings, and defaults.
  * - Process a form submission:
  *     * Recognise form submission form just rendering a form.
  *     * Perform form (submission) validation.
- *     * Execute a task on valid form submission.
+ *     * {@see Execute} a task on valid form submission.
  *     * Show success and/or error messages.
  *
  * Usage:
@@ -484,29 +484,33 @@ abstract class Form extends MessageCollection
      *   processing.
      *
      * This is a recursive, keyed array defining each form field. The key
-     * defines the name of the form field, to be used for the name, and possibly
-     * id, attribute. The values are a keyed array, that can have the following
+     * defines the name of the form field, to be used for the name and  id
+     * attribute. The values are a keyed array, that can have the following
      * keys:
-     * - type: (required, string) fieldset, details, text, email, password,
-     *   date, textarea, select, radio, checkbox, markup.
+     * - type: (required, string): fieldset, details, text, number, password,
+     *   email, date, textarea, select, radio, checkbox, markup, hidden, or
+     *   collection.
      * - legend/summary: (string) human-readable title for a fieldset/details.
      * - label: (string) human-readable label, legend or summary.
      * - description: (string) human-readable help text.
-     * - value: (string) the value for the form field.
+     * - value: (string) the value for the form field. Will normally be set by
+     *   the form processing, the developer of a form should override
+     *   {@see getDefaultFormValues()}. The exceptions are markup and,
+     *   probably, hidden fields.
      * - attributes: (array) keyed array with other, possibly html5, attributes
      *   to be rendered. Possible keys include e.g:
      *     - size
      *     - class
      *     - required: (bool) whether the field is required.
      *     - disabled: (bool) whether the field is disabled.
-     * - fields: (array) If the type = 'fieldset' or 'details', this value
-     *   defines the (possibly recursive) fields of a fieldset/details element.
+     * - fields: (array) If type = 'fieldset' or 'details', this value defines
+     *   the (possibly recursive) fields of a fieldset/details element.
      * - options: (array) If the type = checkbox, select or radio, this value
      *   contains the options as a keyed array, the keys being the value to
      *   submit if that choice is selected and the value being the label to
      *   show.
      *
-     * Do NOT override this method, instead override getFieldDefinitions().
+     * Do NOT override this method, instead override {@see getFieldDefinitions()}.
      *
      * @return array[]
      *   The definition of the form.
@@ -527,10 +531,11 @@ abstract class Form extends MessageCollection
     }
 
     /**
-     * Internal version of getFields();
+     * Internal version of {@see getFields()}.
      *
-     * - Internal method, do not call directly but call getFields() instead.
-     * - Do override this method, not getFields().
+     * - Internal method, do not call directly but call {@see getFields()}
+     *   instead.
+     * - Do override this method, not {@see getFields()}.
      *
      * @return array[]
      *   The definition of the form.

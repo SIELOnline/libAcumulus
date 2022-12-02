@@ -21,17 +21,16 @@ namespace Siel\Acumulus\Helpers;
  *   through {@see htmlspecialchars()}.
  * - The exceptions being:
  *     * A label prefix and postfix that come from code and may contain html.
- *       See {@see FormRenderer::renderLabel()}.
+ *       See {@see renderLabel()}.
  *     * Label text if indicated as containing HTML by a label attribute 'html'
  *       (which comes from code).
  *     * markup is rendered as is, as it may contain HTML (therefore its name
- *       markup ...). See {@see FormRenderer::markup()};
+ *       markup ...). See {@see markup()};
  * - All tags come from object properties or are hard coded and thus present no
  *   security risk, but they are passed through {@see htmlspecialchars()}
- *   anyway. See {@see FormRenderer::getOpenTag()} and
- *   {@see FormRenderer::getCloseTag()}.
+ *   anyway. See {@see getOpenTag()} and {@see getCloseTag()}.
  * - All attributes, name and value are passed through {@see htmlpecialchars()}.
- *   See {@see FormRenderer::renderAttributes()}.
+ *   See {@see renderAttributes()}.
  */
 class FormRenderer
 {
@@ -240,7 +239,7 @@ class FormRenderer
     protected function renderField(array $field): string
     {
         $output = '';
-        $output .= isset($field['fields']) ? $this->renderFieldset($field) : $this->renderSimpleField($field);
+        $output .= $this->isFieldset($field) ? $this->renderFieldset($field) : $this->renderSimpleField($field);
         return $output;
     }
 
@@ -257,7 +256,7 @@ class FormRenderer
     }
 
     /**
-     * Outputs the beginning of a fieldset.
+     * Outputs the beginning of a fieldset or details.
      *
      * The beginning constitutes:
      * - The <fieldset> or <details> tag.
@@ -345,10 +344,42 @@ class FormRenderer
             case 'select':
             case 'radio':
             case 'checkbox':
+            case 'collection':
                 return $this->$type($field);
             default:
                 return $this->input($field);
         }
+    }
+
+    /**
+     * Renders a collection of elements.
+     *
+     * A collection differs from a fieldset or details in that only 1 'label'
+     * and 'description' will be rendered and that the collection of fields
+     * will be rendered as 1 element, that is:
+     * - No labels or descriptions for the subfields.
+     * - No form element markup around the subfields.
+     * - Input element specific wrappers will be rendered, but this is often
+     *   empty, except for selections (select, radio, checkboxes).
+     */
+    protected function collection(array $field): string
+    {
+        $output = '';
+
+        foreach ($field['fields'] as $id => $subField) {
+            $subField += [
+                'id' => $id,
+                'name' => $id,
+                'label' => '',
+                'value' => '',
+                'description' => '',
+                'attributes' => [],
+                'options' => [],
+            ];
+            $output .= $this->renderElement($subField);
+        }
+
+        return $output;
     }
 
     /**
@@ -360,7 +391,7 @@ class FormRenderer
 
         // Help text.
         if (!empty($text)) {
-            // Allow for links in the help text, so no filtering anymore.
+            // Allow for html links in the help text, so no filtering.
             $wrapperType = $isFieldset ? 'fieldsetDescription' : 'description';
             $output .= $this->getWrapper($wrapperType);
             $output .= $text;
@@ -495,35 +526,17 @@ class FormRenderer
      */
     protected function markup(array $field): string
     {
+        $output = '';
+
         $attributes = $field['attributes'];
         $attributes = $this->addAttribute($attributes, 'id', $field['id']);
         $attributes = $this->addAttribute($attributes, 'name', $field['name']);
-        $output = '';
         $output .= $this->getWrapper('markup', $attributes);
-        if (!empty($field['value-before'])) {
-            $output .= $field['value-before'];
-        }
         if (!empty($field['value'])) {
             $output .= $field['value'];
         }
-        if (!empty($field['inputs'])) {
-            foreach ($field['inputs'] as $id => $input) {
-                $input += [
-                    'id' => $id,
-                    'name' => $id,
-                    'label' => '',
-                    'value' => '',
-                    'description' => '',
-                    'attributes' => [],
-                    'options' => [],
-                ];
-                $output .= $this->input($input);
-            }
-        }
-        if (!empty($field['value-after'])) {
-            $output .= $field['value-after'];
-        }
         $output .= $this->getWrapperEnd('markup');
+
         return $output;
     }
 
@@ -840,5 +853,15 @@ class FormRenderer
     protected function isOptionSelected($selectedValues, $option): bool
     {
         return is_array($selectedValues) ? in_array((string) $option, $selectedValues,false) : (string) $option === (string) $selectedValues;
+    }
+
+    /**
+     * Returns whether the element is a fieldset or details element.
+     *
+     * Note that a collection is handled as a simple element.
+     */
+    public function isFieldset(array $field): bool
+    {
+        return in_array($field['type'], ['fieldset', 'details']);
     }
 }

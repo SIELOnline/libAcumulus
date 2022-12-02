@@ -94,9 +94,9 @@ class FormMapper extends BaseFormMapper
         }
 
         if (!empty($field['fields'])) {
-            // Add description at the start of the fieldset/summary as a Note
-            // element.
-            if (!empty($field['description'])) {
+            // Add description at the start of the fieldset/details as a Note
+            // element. descriptions for simple elements are handled elsewhere.
+            if (!empty($field['description']) && !in_array($field['type'], ['fieldset', 'details'])) {
                 $element->addField($field['id'] . '-note', 'note', ['text' => '<p class="note">' . $field['description'] . '</p>']);
             }
 
@@ -133,9 +133,21 @@ class FormMapper extends BaseFormMapper
             case 'details':
                 $type = 'Siel\AcumulusMa2\Data\Form\Element\Details';
                 break;
+            case 'collection':
+                $type = 'Siel\AcumulusMa2\Data\Form\Element\Collection';
+                break;
+            case 'textarea':
+            case 'text':
+            case 'password':
+            case 'date':
+            case 'button':
+            case 'fieldset':
+            case 'hidden':
+                // These types are returned as they are.
+                $type = $field['type'];
+                break;
             default:
-                // Other types are returned as is: text, password, date, button,
-                // fieldset,
+                $this->log->warning(__METHOD__ . ": Unknown type '{$field['type']}'");
                 $type = $field['type'];
                 break;
         }
@@ -220,15 +232,8 @@ class FormMapper extends BaseFormMapper
                 break;
             case 'description':
                 // Note that the description of a fieldset is handled elsewhere.
-                if (!empty($value) && !in_Array($type, ['fieldset', 'details'])) {
+                if (!empty($value) && !in_array($type, ['fieldset', 'details'])) {
                     $config['after_element_html'] = '<p class="note">' . $value . '</p>';
-                }
-                break;
-            case 'value':
-                if ($type === 'markup') {
-                    $config['text'] = $value;
-                } else { // $type === 'hidden'
-                    $config['value'] = $value;
                 }
                 break;
             case 'attributes':
@@ -276,6 +281,13 @@ class FormMapper extends BaseFormMapper
                 break;
             case 'options':
                 $config['values'] = $this->getMagentoOptions($value);
+                break;
+            case 'value':
+                if ($type === 'markup') {
+                    $config['text'] = $value;
+                } else { // $type === 'hidden'
+                    $config['value'] = $value;
+                }
                 break;
             default:
                 $this->log->warning(__METHOD__ . ": Unknown key '$key'");

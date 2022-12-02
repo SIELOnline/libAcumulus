@@ -964,6 +964,7 @@ class InvoiceStatusForm extends Form
             $fields += [
                 'invoice_paymentstatus_set' => [
                     'type' => 'button',
+                    'label' => '',
                     'value' => $this->t('set_due'),
                     'attributes' => [
                         'class' => 'acumulus-ajax',
@@ -1158,8 +1159,11 @@ class InvoiceStatusForm extends Form
             $uri = $this->acumulusApiClient->getInvoicePdfUri($token);
             $text = sprintf($this->t('document_show'), $document);
             $title = sprintf($this->t('document_show_title'), $document);
-            /** @noinspection HtmlUnknownTarget */
-            $links[] = sprintf('<a class="%4$s" href="%1$s" title="%3$s">%2$s</a>', $uri, $text, $title, 'acumulus-document-invoice');
+            $links['invoice_show'] = [
+                'type' => 'markup',
+                'value' => sprintf('<a class="%4$s" href="%1$s" title="%3$s">%2$s</a>',
+                    $uri, $text, $title, 'acumulus-document-invoice'),
+            ];
         }
         if ($documentsSettings['mailInvoiceDetail']) {
             $actions['invoice_mail'] = [
@@ -1177,8 +1181,11 @@ class InvoiceStatusForm extends Form
             $uri = $this->acumulusApiClient->getPackingSlipPdfUri($token);
             $text = sprintf($this->t('document_show'), $document);
             $title = sprintf($this->t('document_show_title'), $document);
-            /** @noinspection HtmlUnknownTarget */
-            $links[] = sprintf('<a class="%4$s" href="%1$s" title="%3$s">%2$s</a>', $uri, $text, $title, 'acumulus-document-packing-slip');
+            $links['packing_slip_show'] = [
+                'type' => 'markup',
+                'value' => sprintf('<a class="%4$s" href="%1$s" title="%3$s">%2$s</a>',
+                    $uri, $text, $title, 'acumulus-document-packing-slip'),
+            ];
         }
         if ($documentsSettings['mailPackingSlipDetail']) {
             $actions['packing_slip_mail'] = [
@@ -1193,16 +1200,26 @@ class InvoiceStatusForm extends Form
 
         if (!empty($actions) || !empty($links)) {
             $result['documents'] = [
-                'type' => 'markup',
+                'type' => 'collection',
                 'label' => $this->t(count($links) === 1 ? 'document' : 'documents'),
+                'fields' => [],
             ];
             if (!empty($links)) {
-                $result['documents']['value-before'] = sprintf('<div class="acumulus-links">%s</div>', implode('', $links));
+                $result['documents']['fields']['linksBefore'] = [
+                    'type' => 'markup',
+                    'value' => '<div class="acumulus-links">',
+                ];
+                $result['documents']['fields'] += $links;
+                $result['documents']['fields']['linksAfter'] = [
+                    'type' => 'markup',
+                    'value' => '</div>',
+                ];
             }
             if (!empty($actions)) {
-                $result['documents']['inputs'] = $actions;
+                $result['documents']['fields'] += $actions;
             }
         }
+
         return $result;
     }
 

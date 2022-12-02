@@ -72,7 +72,7 @@ class InvoiceManager extends BaseInvoiceManager
     protected function getByCondition(string $invoiceSourceType, $field, $condition): array
     {
         $items = $this
-            ->getInvoiceSourceTypeCollection($invoiceSourceType)
+            ->createInvoiceSourceTypeCollection($invoiceSourceType)
             ->addFieldToFilter($field, $condition)
             ->getItems();
         return $this->getSourcesByIdsOrSources($invoiceSourceType, $items);
@@ -86,9 +86,9 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * @return \Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection
      */
-    protected function getInvoiceSourceTypeCollection(string $invoiceSourceType): AbstractCollection
+    protected function createInvoiceSourceTypeCollection(string $invoiceSourceType): AbstractCollection
     {
-        return Registry::getInstance()->get($invoiceSourceType == Source::Order
+        return Registry::getInstance()->create($invoiceSourceType == Source::Order
             ? OrderCollection::class
             : CreditmemoCollection::class);
     }

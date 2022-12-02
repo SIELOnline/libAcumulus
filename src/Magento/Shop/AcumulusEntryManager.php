@@ -2,8 +2,6 @@
 namespace Siel\Acumulus\Magento\Shop;
 
 use Exception;
-use Siel\Acumulus\Helpers\Container;
-use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Magento\Helpers\Registry;
 use Siel\Acumulus\Shop\AcumulusEntryManager as BaseAcumulusEntryManager;
@@ -24,39 +22,19 @@ use Siel\AcumulusMa2\Model\ResourceModel\Entry\Collection;
  */
 class AcumulusEntryManager extends BaseAcumulusEntryManager
 {
-    /** @var \Siel\AcumulusMa2\Model\Entry */
-    protected $model;
-
-    /** @var \Siel\AcumulusMa2\Model\ResourceModel\Entry */
-    protected $resourceModel;
-
-    /** @var \Siel\AcumulusMa2\Model\ResourceModel\Entry\Collection */
-    protected $resourceCollection;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function __construct(Container $container, Log $log)
-    {
-        parent::__construct($container, $log);
-        $this->model = Registry::getInstance()->get(Entry::class);
-        $this->resourceModel = Registry::getInstance()->get(\Siel\AcumulusMa2\Model\ResourceModel\Entry::class);
-        $this->resourceCollection = Registry::getInstance()->get(Collection::class);
-    }
-
     protected function getModel(): Entry
     {
-        return $this->model;
+        return Registry::getInstance()->create(Entry::class);
     }
 
     protected function getResourceModel(): \Siel\AcumulusMa2\Model\ResourceModel\Entry
     {
-        return $this->resourceModel;
+        return Registry::getInstance()->get(\Siel\AcumulusMa2\Model\ResourceModel\Entry::class);
     }
 
     public function getResourceCollection(): Collection
     {
-        return $this->resourceCollection;
+        return Registry::getInstance()->create(Collection::class);
     }
 
     /**
@@ -66,8 +44,8 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     {
         /** @var \Siel\AcumulusMa2\Model\Entry[] $result */
         $result = $this->getResourceCollection()
-           ->addFieldToFilter('entry_id', $entryId)
-           ->getItems();
+            ->addFieldToFilter('entry_id', $entryId)
+            ->getItems();
         return $this->convertDbResultToAcumulusEntries($result);
     }
 

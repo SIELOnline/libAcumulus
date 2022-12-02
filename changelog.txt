@@ -4,8 +4,8 @@ Changelog Acumulus web shop extensions
 System Requirements
 -------------------
 - PHP:
-  * Minimum version: 7.2, older versions WILL fail.
-  * Recommended version: 7.4, soon - probably plugin version 7.4, this will
+  * Minimum version: 7.4, older versions WILL fail.
+  * Recommended version: 8.0, soon - probably plugin version 8.0, this will
     become the minimally required version and older versions WILL fail.
   * Note: due to an error in plugin version 7.2, all PHP versions below 7.4 WILL
     already fail in that plugin version (solved in plugin version 7.3.0)
@@ -25,7 +25,7 @@ shop(s) a change applies (if no tag is mentioned, ALL may be assumed).
 |ALL | All web shops.   |                |                                     |
 |JOO | Joomla (HS + VM) | 4.1.4          | >= 3.6                              |
 |HS  | HikaShop (JOO)   | 4.6.0 (Starter) | >= 3.0.0                           |
-|MA  | Magento          | 2.4.2          | >= 2.3                              |
+|MA  | Magento          | 2.4.5          | >= 2.4, 2.3 might still work        |
 |OC  | OpenCart         | 3.0.3.7        | >= 3.0                              |
 |    |                  |                | Not yet tested with 4.0.x.y.        |
 |PS  | PrestaShop       | 1.7.8.5        | >= 1.7.6                            |
@@ -35,11 +35,8 @@ shop(s) a change applies (if no tag is mentioned, ALL may be assumed).
 |    | WordPress        | 6.1.1          | >= 5.9 (earlier versions WILL fail) |
 
 
-8.0.0-alpha1
+7.5.0-alpha1
 ------------
-This version is in a "Proof of Concept" phase, the old code is still there and
-is for now still the code that gets called when invoked by an actual plugin.
-
 Requirements:
 - PHP 7.4 is now the minimally required version.
 
@@ -47,20 +44,26 @@ Features:
 - ALL: The About block on our forms will show less sections when the account
   data has not yet been completed or is incorrect. This prevents duplicate
   messages saying "no contract data yet".
-
+- MA: Added buttons to the invoice status screen to mail the Acumulus invoice or
+  packing slip.
 
 Bugs:
 - MA2.4: Finally tested with Magento 2.4 and PHP 8.1. Below the findings:
-- MA2: <details> sections could not be opened and remained closed.
-- MA2: config form: Error: Payment model name is not provided in config!
-- MA2: Automatically sending invoice data to Acumulus on Magento invoice
+- MA: <details> sections could not be opened and remained closed.
+- MA: config form: Error: Payment model name is not provided in config!
+- MA: Automatically sending invoice data to Acumulus on Magento invoice
   creation (instead of order status change) did not work.
-- MA2: TypeError: Siel\Acumulus\Helpers\Number::isZero(): Argument #1 ($f1) must
+- MA: TypeError: Siel\Acumulus\Helpers\Number::isZero(): Argument #1 ($f1) must
   be of type float, null given.
-- MA2: Our severity "exception" had no mapping to a Magento severity.
+- MA: Our severity "exception" had no mapping to a Magento severity.
+- MA: ResourceCollection instance for Acumulus entries was reused instead of
+  recreated, leading to same results being returned for each subsequent query.
+- MA: ResourceCollection instances for orders or credit notes were reused
+  instead of recreated, leading to same results being returned for each
+  subsequent query.
 
 Refactorings:
-- ALL: Introduces a 'collection' form element that is treated as a simple
+- ALL: Introduced a 'collection' form element that is treated as a simple
   element, thus 1 label and description and the collection of subfields is
   rendered without additional markup. This was needed to be able to show the
   documents part on the InvoiceStatusOverview block in Magento.
@@ -73,14 +76,17 @@ Refactorings:
   They have now been fed to a phpdoc generator, which revealed that some changes
   needed to be made.
 
+- The refactorings below are in a "Development/Proof of Concept" phase. The old
+  (creator/completor) code is still there and is still the code that gets called
+  when invoked by an actual plugin:
 - Introduced "smart" objects for the invoice-add array parts (customer, invoice,
   line, emailaspdf) on top of the base classes AcumulusObject, AcumulusProperty,
   MetadataProperty, and MetadataValue. Unused as long as the next point has not
   been realised.
 - TODO:
   Redefined the creator and completor phase into a collector and a completor
-  phase, where the collector phase is dumber and only contains the shop specific
-  data retrieval, enriched with metadata to guide the completor phase.
+  phase, where the collector phase is dumber and only contains data retrieval
+  from the shop data, enriched with metadata to guide the completor phase.
   The completor phase now only acts on the collected data, possibly guided by
   the metadata, to create the Acumulus invoice. This phase should now be fully
   shop independent.
@@ -136,9 +142,11 @@ Bugs:
 7.4.0 (2022-10-24) (WC only)
 ----------------------------
 Features:
-- Added support for the email packing slip as pdf API call.
+- WC: Added buttons to the invoice status screen to mail the Acumulus invoice or
+  packing slip.
 - WC: Added icons to open the Acumulus invoice or packing slip from the order
   list page.
+- Added support for the email packing slip as pdf API call.
 
 Known problems:
 - Field references (token expansion) when manually e-mailing invoice or packing

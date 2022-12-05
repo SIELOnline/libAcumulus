@@ -25,7 +25,7 @@ package. We ask for your understanding in these.
 
 This library uses:
 
- - The PSR-2 coding standards.
+ - The PSR-12 coding standards.
  - Phpdoc to fully document each and every part of the code.
  - When needed, its own PSR-4 autoloader to circumvent the fact that many
    web shop/CMS systems still live in the pre PSR4 autoloading era, meaning that

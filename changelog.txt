@@ -1,6 +1,9 @@
 Changelog Acumulus web shop extensions
 ======================================
 
+This file not only presents the changes in our own code, but also changes in the
+requirements and supported versions of the shops.
+
 System Requirements
 -------------------
 - PHP:
@@ -9,8 +12,8 @@ System Requirements
     become the minimally required version and older versions WILL fail.
   * Note: due to an error in plugin version 7.2, all PHP versions below 7.4 WILL
     already fail in that plugin version (solved in plugin version 7.3.0)
-  * Note: PHP 8.0 and 8.1 are not yet fully tested, but should work and are
-    supported.
+  * Note: See the PHP  versions table furthe below. for which PHP version can be
+    used for which shop.
 - Database:
   * MySql: 5.6 or later.
   * MariaDb: 10.0 or later.
@@ -20,19 +23,56 @@ Supported shops and versions
 The tags below are also used further on in the changelog to indicate to which
 shop(s) a change applies (if no tag is mentioned, ALL may be assumed).
 
-|Tag | Shop             | Version used for testing | Supported versions        |
-|----|------------------|----------------|-------------------------------------|
-|ALL | All web shops.   |                |                                     |
-|JOO | Joomla (HS + VM) | 4.1.4          | >= 3.6                              |
-|HS  | HikaShop (JOO)   | 4.6.0 (Starter) | >= 3.0.0                           |
-|MA  | Magento          | 2.4.5          | >= 2.4, 2.3 might still work        |
-|OC  | OpenCart         | 3.0.3.7        | >= 3.0                              |
-|    |                  |                | Not yet tested with 4.0.x.y.        |
-|PS  | PrestaShop       | 1.7.8.5        | >= 1.7.6                            |
-|VM  | VirtueMart (JOO) | 4.0.4          | >= 3.0                              |
-|    |                  |                | VM4 not tested with Joomla 4.       |
-|WC  | WooCommerce      | 7.1.0          | >= 5.0 (3 and 4 will probably work) |
-|    | WordPress        | 6.1.1          | >= 5.9 (earlier versions WILL fail) |
+Notes:
+- This table will be updated regularly, but will be out-of-date even faster.
+  Normally you may assume that our plugin works with newer versions of your
+  shop and/or CMS, unless it is a "major" new version, i.e. the 1st number in a
+  version, or the 1st or 2nd number for PrestaShop.
+- The supported versions column is tricky. We only use the latest (locally
+  installed) version of a shop for testing. New features of uor module may use
+  features of the shop as were available when our new feature was developed.
+  As it is often not clear when a new API feature became available, this may
+  unknowingly lead to our module failing on older versions of the shop (before
+  that now used feature was available), and thus to us not updating the column
+  "Supported versions" below.
+
+| Tag | Shop             | Version used for testing | Supported versions                  |
+|-----|------------------|--------------------------|-------------------------------------|
+| ALL | All web shops.   |                          |                                     |
+| JOO | Joomla (HS + VM) | 4.2.5                    | >= 3.6                              |
+| HS  | HikaShop (JOO)   | 4.6.2 (starter)          | >= 3.0.0                            |
+| MA  | Magento          | 2.4.5 (community)        | >= 2.4, 2.3 might still work        |
+| OC  | OpenCart         | 3.0.3.7                  | >= 3.0                              |
+|     |                  | 4.x.y.z                  | Not yet tested/supported            |
+| PS  | PrestaShop       | 1.7.8.7                  | >= 1.7.6                            |
+| VM  | VirtueMart (JOO) | 4.0.4                    | >= 3.0                              |
+|     |                  |                          | VM4 not tested with Joomla 4.       |
+| WC  | WooCommerce      | 7.1.0                    | >= 5.0 (3 and 4 will probably work) |
+|     | WordPress        | 6.1.1                    | >= 5.9 (earlier versions WILL fail) |
+
+Supported PHP versions
+----------------------
+This is an incomplete, and probably outdated, overview of which PHP version can
+be used with the supported shops.
+
+Notes:
+- Latest, or almost latest, point releases are used of the listed PHP versions.
+- HikaShop and VirtueMart are listed in combination with Joomla 4.
+- WooCommerce is listed in combination with WordPress 6.1.x.
+- Other installed plugins/modules may not have been updated to the latest
+  PHP version as supported by the shop, or, on the contrary, already require a
+  higher version than the shop does. This table cannot keep track of that.
+
+| Tag | Shop Version      | 7.4 | 8.0 | 8.1 | Remarks                   |
+|-----|-------------------|-----|-----|-----|---------------------------|
+| JOO | 4.2.5             | ✔   | ✔   | ❓   |                           |
+| HS  | 4.6.2 (starter)   | ✔   | ✔   | ❓   |                           |
+| MA  | 2.4.5 (community) | ❌   | ✔   | ✔   | Contains PHP 8 constructs |
+| OC  | 3.0.3.7           | ✔   | ✔   | ❓   |                           |
+|     | 4.x.y.z           | ❓   | ❓   | ❓   | Not yet supported         |
+| PS  | 1.7.8.7           | ✔   | ❌   | ❌   | Fatal runtime errors      |
+| VM  | 4.0.4             | ✔   | ✔   | ❓   |                           |
+| WC  | 7.1.0             | ✔   | ✔   | ❓   |                           |
 
 
 7.5.0-alpha1
@@ -41,7 +81,7 @@ Requirements:
 - PHP 7.4 is now the minimally required version.
 
 Features:
-- ALL: The About block on our forms will show less sections when the account
+- ALL: The "About" block on our forms will show fewer sections when the account
   data has not yet been completed or is incorrect. This prevents duplicate
   messages saying "no contract data yet".
 - MA: Added buttons to the invoice status screen to mail the Acumulus invoice or
@@ -61,6 +101,11 @@ Bugs:
 - MA: ResourceCollection instances for orders or credit notes were reused
   instead of recreated, leading to same results being returned for each
   subsequent query.
+- ALL: Edge case: If an order has no order lines, an invoice without invoice
+  lines would be sent, which is not permitted by the Acumulus API.
+- ALL: PHP Warning: Undefined array key "meta-vatrate-range-matches" in
+  Invoice\Completor.php on line 1291.
+- OC: Styling improvement on our forms (markup element).
 
 Refactorings:
 - ALL: Introduced a 'collection' form element that is treated as a simple
@@ -75,6 +120,8 @@ Refactorings:
 - ALL: So far the phpdoc comments in this code were only used within PhpStorm.
   They have now been fed to a phpdoc generator, which revealed that some changes
   needed to be made.
+- ALL: Refactored InvoiceManager::createAndSend() from a large set of nested
+  if-else constructs to a set of early returns.
 
 - The refactorings below are in a "Development/Proof of Concept" phase. The old
   (creator/completor) code is still there and is still the code that gets called
@@ -270,8 +317,8 @@ Bugs:
 Features:
 - ALL: The API web server will no longer send e-mails on errors or warnings. The
   error handling of this plugin is robust enough to catch and communicate all
-  errors and warnings issued by the API web server. So we do not any longer send
-  the e-mail address as provided by you to the server. The plugin will continue
+  errors and warnings issued by the API web server. So we do no longer send the
+ e-mail address as provided by you to the server. The plugin will continue
   to use it to send e-mails from your web shop to you.
 - ALL: Added support for the 'invoicetype' parameter (reminder or normal
   invoice) in the Acumulus::getInvoicePdfUri() method.
@@ -552,9 +599,9 @@ Bugs:
 - WC: Ignore hidden metadata from the "WooCommerce TM Extra Product Options"
   plugin when adding child lines for variants/options.
 - WC|MA (and maybe others): een factuur met verlegde btw en gratis verzending
-  levert een waarschuwing en dus een conceptfactuur op omdat ten onrechte het
-  `standaard btw-tarief van verzendkosten aan de gratis verzending word
-  toegekend i.p.v. 0%.
+  levert een waarschuwing en dus een conceptfactuur op omdat het 'standaard'
+  btw-tarief van verzendkosten aan de gratis verzending word toegekend i.p.v.
+  0%.
 
 Refactorings:
 - WC: de method WC_Logger::add() is deprecated. Onze log helper is hier op

@@ -38,11 +38,13 @@ class FormRenderer extends BaseFormRenderer
 
     protected function input(array $field): string
     {
-        if ($field['type'] !== 'button') {
-            return parent::input($field);
-        }
+        return $field['type'] === 'button' ? $this->button($field) : parent::input($field);
+    }
 
+    protected function button(array $field): string
+    {
         $output = '';
+
         $output .= $this->getWrapper('input');
         $attributes = $field['attributes'];
         $attributes = $this->addAttribute($attributes, 'id', $field['id']);
@@ -51,7 +53,7 @@ class FormRenderer extends BaseFormRenderer
         $output .= $field['value'];
         $output .= $this->getCloseTag('button');
         $output .= $this->getWrapperEnd('input');
+
         return $output;
     }
-
 }

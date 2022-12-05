@@ -21,7 +21,8 @@ class FormRenderer extends BaseFormRenderer
         $this->labelWrapperClass = 'form-group';
         $this->labelClass = ['col-sm-2', 'control-label'];
         $this->multiLabelClass = ['col-sm-2', 'control-label'];
-        $this->descriptionWrapperClass = 'col-sm-offset-2 description';
+        $this->descriptionWrapperClass = ['col-sm-offset-2', 'description'];
+        $this->markupWrapperClass = ['col-sm-offset-2', 'message'];
     }
 
     /**

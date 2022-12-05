@@ -366,6 +366,12 @@ class FormRenderer
     {
         $output = '';
 
+        $oldMarkupWrapperTag = $this->markupWrapperTag;
+        $this->markupWrapperTag = '';
+        $attributes = $field['attributes'];
+        $attributes = $this->addAttribute($attributes, 'id', $field['id']);
+        $attributes = $this->addAttribute($attributes, 'name', $field['name']);
+        $output .= $this->getWrapper('collection', $attributes);
         foreach ($field['fields'] as $id => $subField) {
             $subField += [
                 'id' => $id,
@@ -378,6 +384,8 @@ class FormRenderer
             ];
             $output .= $this->renderElement($subField);
         }
+        $output .= $this->getWrapperEnd('collection');
+        $this->markupWrapperTag = $oldMarkupWrapperTag;
 
         return $output;
     }

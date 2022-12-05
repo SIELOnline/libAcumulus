@@ -270,18 +270,16 @@ abstract class InvoiceManager
      */
     public function sendMultiple(array $invoiceSources, bool $forceSend, bool $dryRun, array &$log): bool
     {
-        $errorLogged = false;
+        $canResetTimer = true;
         $success = true;
         $time_limit = ini_get('max_execution_time');
         foreach ($invoiceSources as $invoiceSource) {
             // Try to keep the script running, but note that other systems
             // involved, like the (Apache) web server, may have their own
-            // time-out. Use @ to prevent messages like "Warning:
-            // set_time_limit(): Cannot set max execution time limit due to
-            // system policy in ...".
-            if (!@set_time_limit($time_limit) && !$errorLogged) {
+            // time-out.
+            if ($canResetTimer && !ini_set('max_execution_time', $time_limit)) {
                 $this->getLog()->warning('InvoiceManager::sendMultiple(): could not set time limit.');
-                $errorLogged = true;
+                $canResetTimer = false;
             }
 
             $result = $this->getInvoiceAddResult('InvoiceManager::sendMultiple()');
@@ -425,6 +423,7 @@ abstract class InvoiceManager
         bool $forceSend = false,
         bool $dryRun = false
     ): InvoiceAddResult {
+        // Get the basic reason for sending or not sending.
         if ($this->isTestMode()) {
             $result->setSendStatus(InvoiceAddResult::Send_TestMode);
         } elseif (($acumulusEntry = $this->getAcumulusEntryManager()->getByInvoiceSource($invoiceSource, false)) === null) {
@@ -434,52 +433,49 @@ abstract class InvoiceManager
         } elseif ($acumulusEntry->hasLockExpired()) {
             $result->setSendStatus(InvoiceAddResult::Send_LockExpired);
         } elseif ($acumulusEntry->isSendLock()) {
-            $result->setSendStatus(InvoiceAddResult::NotSent_LockedForSending);
+            return $result->setSendStatus(InvoiceAddResult::NotSent_LockedForSending);
         } else {
-            $result->setSendStatus(InvoiceAddResult::NotSent_AlreadySent);
+            return $result->setSendStatus(InvoiceAddResult::NotSent_AlreadySent);
         }
 
-        if (($result->getSendStatus() & InvoiceAddResult::Send_Mask) !== 0) {
-            $invoice = $this->getCreator()->create($invoiceSource);
-
-            // Do not send 0-amount invoices, if set so.
-            $shopEventSettings = $this->getConfig()->getShopEventSettings();
-            if ($shopEventSettings['sendEmptyInvoice'] || !$this->isEmptyInvoice($invoice)) {
-                // Trigger the InvoiceCreated event.
-                $this->triggerInvoiceCreated($invoice, $invoiceSource, $result);
-
-                // If the invoice is not set to null, we continue by completing it.
-                if ($invoice !== null) {
-                    // @todo: handle verification errors here. Currently they
-                    //  get severity Error, should perhaps become Exception.
-                    $invoice = $this->getCompletor()->complete($invoice, $invoiceSource, $result);
-
-                    // Trigger the InvoiceCompleted event.
-                    $this->triggerInvoiceSendBefore($invoice, $invoiceSource, $result);
-
-                    // If the invoice is not set to null, we continue by sending it.
-                    if ($invoice !== null) {
-                        if (!$result->hasError()) {
-                            if (!$dryRun) {
-                                $result = $this->lockAndSend($invoice, $invoiceSource, $result);
-                            } else {
-                                $result->setSendStatus(InvoiceAddResult::NotSent_DryRun);
-                            }
-                        } else {
-                            $result->setSendStatus(InvoiceAddResult::NotSent_LocalErrors);
-                        }
-                    } else {
-                        $result->setSendStatus(InvoiceAddResult::NotSent_EventInvoiceCompleted);
-                    }
-                } else {
-                    $result->setSendStatus(InvoiceAddResult::NotSent_EventInvoiceCreated);
-                }
-            } else {
-                $result->setSendStatus(InvoiceAddResult::NotSent_EmptyInvoice);
-            }
+        // Create the raw invoice.
+        $invoice = $this->getCreator()->create($invoiceSource);
+        $this->triggerInvoiceCreated($invoice, $invoiceSource, $result);
+        // If the invoice is set to null, we do not send it.
+        if ($invoice === null) {
+            return $result->setSendStatus(InvoiceAddResult::NotSent_EventInvoiceCreated);
         }
 
-        return $result;
+        // @todo: handle verification errors here. Currently they
+        //   get severity Error, should perhaps become Exception.
+        $invoice = $this->getCompletor()->complete($invoice, $invoiceSource, $result);
+        $this->triggerInvoiceSendBefore($invoice, $invoiceSource, $result);
+        // If the invoice is set to null, we do not send it.
+        if ($invoice === null) {
+            return $result->setSendStatus(InvoiceAddResult::NotSent_EventInvoiceCompleted);
+        }
+
+        // Some last checks that can prevent sending:
+        // - If an error was set by the completor (or the event).
+        if ($result->hasError()) {
+            return $result->setSendStatus(InvoiceAddResult::NotSent_LocalErrors);
+        }
+        // - Edge case: no invoice lines, will fail on the API.
+        if (count($invoice[Tag::Customer][Tag::Invoice][Tag::Line]) <= 0) {
+            return $result->setSendStatus(InvoiceAddResult::NotSent_NoInvoiceLines);
+        }
+        // - If the invoice has a 0 total amount, and the user does  not
+        //   want to send those.
+        $shopEventSettings = $this->getConfig()->getShopEventSettings();
+        if (!$shopEventSettings['sendEmptyInvoice'] && $this->isEmptyInvoice($invoice)) {
+            return $result->setSendStatus(InvoiceAddResult::NotSent_EmptyInvoice);
+        }
+        // - If we are doing a dry-run.
+        if ($dryRun) {
+            return $result->setSendStatus(InvoiceAddResult::NotSent_DryRun);
+        }
+
+        return $this->lockAndSend($invoice, $invoiceSource, $result);
     }
 
     /**

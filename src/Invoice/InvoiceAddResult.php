@@ -32,6 +32,7 @@ class InvoiceAddResult extends MessageCollection
     public const NotSent_DryRun = 0x9;
     public const NotSent_TriggerCreditNoteEventNotEnabled = 0xa;
     public const NotSent_LockedForSending = 0xb;
+    public const NotSent_NoInvoiceLines = 0xc;
     public const NotSent_Mask = 0xf;
     // Reasons for sending
     public const Send_New = 0x10;
@@ -203,6 +204,9 @@ class InvoiceAddResult extends MessageCollection
                 break;
             case self::NotSent_EmptyInvoice:
                 $message = 'reason_not_sent_empty_invoice';
+                break;
+            case self::NotSent_NoInvoiceLines:
+                $message = 'reason_not_sent_no_invoice_lines';
                 break;
             case self::NotSent_TriggerInvoiceCreateNotEnabled:
                 $message = 'reason_not_sent_not_enabled_triggerInvoiceCreate';

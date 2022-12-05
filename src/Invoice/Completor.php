@@ -123,10 +123,10 @@ class Completor
     protected $possibleVatRates;
 
     /** @var \Siel\Acumulus\Invoice\CompletorInvoiceLines */
-    protected $LineCompletor = null;
+    protected $LineCompletor;
 
     /** @var \Siel\Acumulus\Invoice\CompletorStrategyLines */
-    protected $strategyLineCompletor = null;
+    protected $strategyLineCompletor;
 
     /** @var (string|int)[][] */
     protected $lineTotalsStates;
@@ -1288,7 +1288,7 @@ class Completor
         }
         $vatType = $this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType];
         foreach ($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] as &$line) {
-            if ($line[Tag::VatRate] === null && is_array($line[Meta::VatRateRangeMatches])) {
+            if ($line[Tag::VatRate] === null && isset($line[Meta::VatRateRangeMatches]) && is_array($line[Meta::VatRateRangeMatches])) {
                 // See if we can find a single match based on vat type.
                 $vatRate = null;
                 foreach ($line[Meta::VatRateRangeMatches] as $vatRateMatch) {

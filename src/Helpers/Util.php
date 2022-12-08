@@ -7,6 +7,12 @@ use DOMException;
 use RuntimeException;
 use Siel\Acumulus\ApiClient\AcumulusException;
 
+use function is_array;
+use function is_bool;
+use function is_int;
+use function is_object;
+use function strlen;
+
 /**
  * Class Util offers some utility functions:
  * - XML: convert an array from or to XML.
@@ -101,7 +107,12 @@ class Util
                 $this->convertToDom($value, $node);
             }
         } else {
-            $element->appendChild($document->createTextNode(is_bool($values) ? ($values ? 'true' : 'false') : $values));
+            if (is_bool($values)) {
+                $text = $values ? 'true' : 'false';
+            } else {
+                $text = (string) $values;
+            }
+            $element->appendChild($document->createTextNode($text));
         }
 
         return $element;
@@ -197,6 +208,7 @@ class Util
      */
     public function isHtmlResponse(string $response): bool
     {
+        // @todo: PHP 8 str_starts_with()
         return strtolower(substr($response, 0, strlen('<!doctype html'))) === '<!doctype html'
             || strtolower(substr($response, 0, strlen('<html'))) === '<html'
             || strtolower(substr($response, 0, strlen('<body'))) === '<body';
@@ -230,7 +242,7 @@ class Util
     public function maskArray(array $subject): array
     {
         array_walk_recursive($subject, function (&$value, $key) {
-            if (strpos(strtolower($key), 'password') !== false) {
+            if (stripos($key, 'password') !== false) {
                 $value = 'REMOVED FOR SECURITY';
             }
         });
@@ -259,7 +271,7 @@ class Util
     {
         // Mask all values that have 'password' in their key.
         return preg_replace(
-            '|<([a-z]*)password>.*</[a-z]*password>|',
+            '|<([a-z]*)password>.*</[a-z]*password>|s',
             '<$1password>REMOVED FOR SECURITY</$1password>',
             $subject
         );
@@ -286,13 +298,20 @@ class Util
      * @throws \Siel\Acumulus\ApiClient\AcumulusException
      *   Always.
      */
-    protected function raiseLibxmlError()
+    protected function raiseLibxmlError(): void
     {
         $errors = libxml_get_errors();
         $messages = [];
         foreach ($errors as $error) {
             // Overwrite our own code with the 1st code we get from libxml.
-            $messages[] = sprintf('Line %d, column: %d: %s %d - %s', $error->line, $error->column, $error->level === LIBXML_ERR_WARNING ? 'warning' : 'error', $error->code, trim($error->message));
+            $messages[] = sprintf(
+                'Line %d, column: %d: %s %d - %s',
+                $error->line,
+                $error->column,
+                $error->level === LIBXML_ERR_WARNING ? 'warning' : 'error',
+                $error->code,
+                trim($error->message)
+            );
         }
         throw new AcumulusException(implode("\n", $messages));
     }
@@ -303,7 +322,7 @@ class Util
      * @throws \Siel\Acumulus\ApiClient\AcumulusException
      *   Always.
      */
-    public function raiseJsonError()
+    public function raiseJsonError(): void
     {
         $code = json_last_error();
         switch ($code) {

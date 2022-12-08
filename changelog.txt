@@ -39,14 +39,16 @@ Notes:
 | Tag | Shop             | Version used for testing | Supported versions                  |
 |-----|------------------|--------------------------|-------------------------------------|
 | ALL | All web shops.   |                          |                                     |
-| JOO | Joomla (HS + VM) | 4.2.5                    | >= 3.6                              |
 | HS  | HikaShop (JOO)   | 4.6.2 (starter)          | >= 3.0.0                            |
+| JOO | Joomla (HS)      | 4.2.5                    | >= 3.6                              |
 | MA  | Magento          | 2.4.5 (community)        | >= 2.4, 2.3 might still work        |
 | OC  | OpenCart         | 3.0.3.7                  | >= 3.0                              |
 |     |                  | 4.x.y.z                  | Not yet tested/supported            |
 | PS  | PrestaShop       | 1.7.8.7                  | >= 1.7.6                            |
-| VM  | VirtueMart (JOO) | 4.0.4                    | >= 3.0                              |
-|     |                  |                          | VM4 not tested with Joomla 4.       |
+| VM  | VirtueMart (JOO) | 3                        | >= 3.0                              |
+|     |                  | 4.0.6                    | Events do not work on Joomla 4.     |
+| JOO | Joomla (VM)      | 3.10                     | >= 3.6                              |
+|     |                  |                          | VM Events do not work on Joomla 4.  |
 | WC  | WooCommerce      | 7.1.0                    | >= 5.0 (3 and 4 will probably work) |
 |     | WordPress        | 6.1.1                    | >= 5.9 (earlier versions WILL fail) |
 
@@ -57,7 +59,7 @@ be used with the supported shops.
 
 Notes:
 - Latest, or almost latest, point releases are used of the listed PHP versions.
-- HikaShop and VirtueMart are listed in combination with Joomla 4.
+- PHP 8.0 and 8.1 are only tested with Joomla 4.
 - WooCommerce is listed in combination with WordPress 6.1.x.
 - Other installed plugins/modules may not have been updated to the latest
   PHP version as supported by the shop, or, on the contrary, already require a
@@ -65,13 +67,13 @@ Notes:
 
 | Tag | Shop Version      | 7.4 | 8.0 | 8.1 | Remarks                   |
 |-----|-------------------|-----|-----|-----|---------------------------|
-| JOO | 4.2.5             | ✔   | ✔   | ❓   |                           |
-| HS  | 4.6.2 (starter)   | ✔   | ✔   | ❓   |                           |
+| JOO | 4.2.5             | ✔   | ✔   | ✔   |                           |
+| HS  | 4.6.2 (starter)   | ✔   | ✔   | ✔   |                           |
 | MA  | 2.4.5 (community) | ❌   | ✔   | ✔   | Contains PHP 8 constructs |
-| OC  | 3.0.3.7           | ✔   | ✔   | ❓   |                           |
+| OC  | 3.0.3.7           | ✔   | ✔   | ❌   | Many warnings on 8.1      |
 |     | 4.x.y.z           | ❓   | ❓   | ❓   | Not yet supported         |
 | PS  | 1.7.8.7           | ✔   | ❌   | ❌   | Fatal runtime errors      |
-| VM  | 4.0.4             | ✔   | ✔   | ❓   |                           |
+| VM  | 4.0.4             | ✔   | ✔   | ✔   |                           |
 | WC  | 7.1.0             | ✔   | ✔   | ❓   |                           |
 
 
@@ -104,8 +106,11 @@ Bugs:
 - ALL: Edge case: If an order has no order lines, an invoice without invoice
   lines would be sent, which is not permitted by the Acumulus API.
 - ALL: PHP Warning: Undefined array key "meta-vatrate-range-matches" in
-  Invoice\Completor.php on line 1291.
+  .../Invoice/Completor.php on line 1291.
 - OC: Styling improvement on our forms (markup element).
+- JOO: The 'cancel' button gave a fatal, will now redirect to the dashboard.
+- ALL: PHP 8.1: Deprecated: DOMDocument::createTextNode(): Passing null to
+  parameter #1 ($data) of type string is deprecated in .../Util.php on line 104.
 
 Refactorings:
 - ALL: Introduced a 'collection' form element that is treated as a simple
@@ -122,6 +127,7 @@ Refactorings:
   needed to be made.
 - ALL: Refactored InvoiceManager::createAndSend() from a large set of nested
   if-else constructs to a set of early returns.
+- ALL: - Use full path on include/require[_once] (do not rely on include_path).
 
 - The refactorings below are in a "Development/Proof of Concept" phase. The old
   (creator/completor) code is still there and is still the code that gets called

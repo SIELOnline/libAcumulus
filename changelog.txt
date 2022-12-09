@@ -88,6 +88,7 @@ Features:
   messages saying "no contract data yet".
 - MA: Added buttons to the invoice status screen to mail the Acumulus invoice or
   packing slip.
+- ALL: The messages on the batch form are now more precise and clearer.
 
 Bugs:
 - MA2.4: Finally tested with Magento 2.4 and PHP 8.1. Below the findings:

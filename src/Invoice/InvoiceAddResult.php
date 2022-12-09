@@ -7,6 +7,8 @@ use Siel\Acumulus\Helpers\MessageCollection;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Helpers\Translator;
 
+use function count;
+
 /**
  * Extends Result with properties and features specific to the InvoiceAdd web
  * service call.
@@ -186,7 +188,7 @@ class InvoiceAddResult extends MessageCollection
     {
         switch ($this->sendStatus) {
             case self::NotSent_WrongStatus:
-                $message = empty($this->sendStatusArguments)
+                $message = count($this->sendStatusArguments) === 0
                     ? 'reason_not_sent_triggerCreditNoteEvent_None'
                     : 'reason_not_sent_wrongStatus';
                 break;
@@ -224,7 +226,7 @@ class InvoiceAddResult extends MessageCollection
                 $message = 'reason_sent_testMode';
                 break;
             case self::Send_New:
-                $message = empty($this->sendStatusArguments)
+                $message = count($this->sendStatusArguments) === 0
                     ? 'reason_sent_new'
                     : 'reason_sent_new_status_change';
                 break;
@@ -240,7 +242,7 @@ class InvoiceAddResult extends MessageCollection
                 break;
         }
         $message = $this->t($message);
-        if (!empty($this->sendStatusArguments)) {
+        if (count($this->sendStatusArguments) !== 0) {
             $message = vsprintf($message, $this->sendStatusArguments);
         }
         return $message;
@@ -291,8 +293,8 @@ class InvoiceAddResult extends MessageCollection
         if ($this->hasBeenSent() || $this->getSendStatus() === self::NotSent_LocalErrors) {
             if ($this->getAcumulusResult() !== null) {
                 $status = ' ' . $this->getAcumulusResult()->getStatusText();
-                if ($addReqResp === InvoiceAddResult::AddReqResp_Always
-                    || ($addReqResp === InvoiceAddResult::AddReqResp_WithOther && $this->hasRealMessages())
+                if ($addReqResp === self::AddReqResp_Always
+                    || ($addReqResp === self::AddReqResp_WithOther && $this->hasRealMessages())
                 ) {
                     $requestResponse = "\nRequest: " . $this->getAcumulusResult()->getAcumulusRequest()->getMaskedRequest()
                         . "\nResponse: " . $this->getAcumulusResult()->getMaskedResponse()

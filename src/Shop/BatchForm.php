@@ -14,6 +14,9 @@ use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Invoice\Translations as InvoiceTranslations;
 
+use function array_key_exists;
+use function count;
+
 /**
  * Provides batch form handling.
  *
@@ -75,7 +78,7 @@ class BatchForm extends Form
     {
         $result = parent::getDefaultFormValues();
         $result['send_mode'] = 'send_normal';
-        if (!empty($this->screenLog)) {
+        if (count($this->screenLog) !== 0) {
             $result['log'] = implode("\n", $this->screenLog);
         }
         return $result;
@@ -143,14 +146,14 @@ class BatchForm extends Form
      */
     protected function execute(): bool
     {
-        $type = $this->getFormValue('invoice_source_type');
+        $type = (string) $this->getFormValue('invoice_source_type');
         if ($this->getFormValue('invoice_source_reference_from') !== '') {
             // Retrieve by order/refund reference range.
             $from = $this->getFormValue('invoice_source_reference_from');
-            $to = $this->getFormValue('invoice_source_reference_to') ? $this->getFormValue('invoice_source_reference_to') : $from;
+            $to = $this->getFormValue('invoice_source_reference_to') ?: $from;
             $this->screenLog['range'] = sprintf($this->t('message_form_range_reference'), $this->t("plural_{$type}_ref"), $from, $to);
             $invoiceSources = $this->invoiceManager->getInvoiceSourcesByReferenceRange($type, $from, $to);
-            if (empty($invoiceSources)) {
+            if (count($invoiceSources) === 0) {
                 // Empty set when searching on references: retrieve by order/
                 // refund id range.
                 $invoiceSources = $this->invoiceManager->getInvoiceSourcesByIdRange($type, $from, $to);
@@ -170,6 +173,7 @@ class BatchForm extends Form
         if (count($invoiceSources) === 0) {
             $rangeList = sprintf($this->t('message_form_range_empty'), $this->t($type));
             $this->screenLog[$type] = $rangeList;
+            $this->addFormMessage($rangeList, Severity::Warning, 'invoice_source_reference_from');
             $this->setFormValue('result', $this->screenLog[$type]);
             $this->log->info('BatchForm::execute(): ' . $this->screenLog['range'] . $rangeList);
             $result = true;
@@ -183,6 +187,11 @@ class BatchForm extends Form
             // Do the sending (and some info/debug logging).
             $this->log->info('BatchForm::execute(): ' . $this->screenLog['range'] . ' ' . $rangeList);
             $result = $this->invoiceManager->sendMultiple($invoiceSources, $sendMode === 'send_force', (bool) $this->getFormValue('dry_run'), $this->screenLog);
+            $plural = count($invoiceSources) > 1 ? 'plural_' : '';
+            $translatedType = $this->t($plural . $type);
+            $translatedIs = $this->t($plural . 'is');
+            $message = sprintf($this->t('message_form_range_success'), $translatedType, $translatedIs, count($invoiceSources));
+            $this->createAndAddMessage($message, Severity::Success);
         }
 
         // Set formValue for log in case form values are already queried.
@@ -194,7 +203,7 @@ class BatchForm extends Form
     /**
      * {@inheritdoc}
      */
-    public function getFieldDefinitions(): array
+    protected function getFieldDefinitions(): array
     {
         $fields = [];
 
@@ -271,7 +280,7 @@ class BatchForm extends Form
         ];
 
         // 2nd fieldset: Batch log.
-        if ($this->isSubmitted() && !empty($this->submittedValues) && $this->isValid()) {
+        if ($this->isSubmitted() && count($this->submittedValues) !== 0 && $this->isValid()) {
             // Set formValue for log as value in case form values are not yet queried.
             $fields['batchLog'] = [
                 'type' => 'fieldset',
@@ -287,7 +296,7 @@ class BatchForm extends Form
                     ],
                 ],
             ];
-            if (!empty($this->screenLog)) {
+            if (count($this->screenLog) !== 0) {
                 $logText = implode("\n", $this->screenLog);
                 $this->formValues['log'] = $logText;
                 $fields['batchLog']['fields']['log']['value'] = $logText;

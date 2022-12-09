@@ -262,6 +262,7 @@ abstract class InvoiceManager
      *   If true, return the reason/status only but do not actually send the
      *   invoice, nor mail the result or store the result.
      * @param string[] $log
+     *   An array to add a (human-readable) send result per invoice sent to.
      *
      * @return bool
      *   Success.
@@ -817,12 +818,13 @@ abstract class InvoiceManager
         InvoiceAddResult $result,
         int $addReqResp = InvoiceAddResult::AddReqResp_WithOther
     ): string {
-        $invoiceSourceText = sprintf($this->t('message_invoice_source'),
+        $invoiceSourceText = sprintf(
+            $this->t('message_invoice_source'),
             $this->t($invoiceSource->getType()),
             $invoiceSource->getReference()
         );
-
-        return sprintf($this->t('message_invoice_send'),
+        return sprintf(
+            $this->t('message_invoice_send'),
             $result->getTrigger(),
             $invoiceSourceText,
             $result->getLogText($addReqResp)

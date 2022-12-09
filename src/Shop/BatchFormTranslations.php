@@ -43,7 +43,7 @@ Dit is vooral handig als u deze koppeling net heeft geïnstalleerd want normaal
 gesproken heeft het automatisch versturen de voorkeur.</p>
 <p><strong>Performance: het versturen van een factuur kan tot enige seconden
 duren.
-Geef daarom niet teveel facturen in één keer op.
+Geef daarom niet te veel facturen in één keer op.
 U kunt dan een time-out krijgen, waardoor het resultaat van de laatst verstuurde
 factuur niet opgeslagen wordt.</strong></p>
 <p>Het versturen van orders gaat net als het automatisch versturen:</p>
@@ -76,9 +76,10 @@ LONGSTRING
         'message_form_range_date' => 'Reeks: %1$s tussen %2$s en %3$s.',
         'message_form_range_empty' => 'De door u opgegeven reeks bevat geen enkele %1$s.',
         'message_form_range_list' => 'Gevonden %1$s.',
-        'message_form_batch_success' => 'De facturen zijn succesvol verzonden. Zie het resultatenoverzicht voor eventuele opmerkingen en waarschuwingen.',
+        'message_form_range_success' => '%3$d %1$s %2$s verwerkt. Zie het resultatenoverzicht voor meer details.',
         'message_form_batch_error' => 'Er zijn fouten opgetreden bij het versturen van de facturen. Zie het resultatenoverzicht voor meer informatie over de fouten.',
-
+        'is' => 'is',
+        'plural_is' => 'zijn',
     ];
 
     protected $en = [
@@ -146,8 +147,9 @@ LONGSTRING
         'message_form_range_date' => 'Range: %1$s between %2$s and %3$s.',
         'message_form_range_empty' => 'The range you defined does not contain any %1$s.',
         'message_form_range_list' => 'Found %1$s.',
-        'message_form_batch_success' => 'The invoices were sent successfully. See the results overview for any remarks or warnings.',
+        'message_form_range_success' => '%2$d %1$s %2$s processed. See the results overview for more details.',
         'message_form_batch_error' => 'Errors during sending the invoices. See the results overview for more information on the errors.',
-
+        'is' => 'was',
+        'plural_is' => 'were',
     ];
 }

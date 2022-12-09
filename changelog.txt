@@ -40,15 +40,15 @@ Notes:
 |-----|------------------|--------------------------|-------------------------------------|
 | ALL | All web shops.   |                          |                                     |
 | HS  | HikaShop (JOO)   | 4.6.2 (starter)          | >= 3.0.0                            |
-| JOO | Joomla (HS)      | 4.2.5                    | >= 3.6                              |
+| JOO | Joomla + HS      | 4.2.5                    | >= 3.6                              |
 | MA  | Magento          | 2.4.5 (community)        | >= 2.4, 2.3 might still work        |
 | OC  | OpenCart         | 3.0.3.7                  | >= 3.0                              |
 |     |                  | 4.x.y.z                  | Not yet tested/supported            |
 | PS  | PrestaShop       | 1.7.8.7                  | >= 1.7.6                            |
 | VM  | VirtueMart (JOO) | 3                        | >= 3.0                              |
-|     |                  | 4.0.6                    | Events do not work on Joomla 4.     |
-| JOO | Joomla (VM)      | 3.10                     | >= 3.6                              |
-|     |                  |                          | VM Events do not work on Joomla 4.  |
+|     |                  | 4.0.6                    | Events do not work on Joomla 4!     |
+| JOO | Joomla + VM      | 3.10                     | >= 3.6                              |
+|     |                  |                          | VM Events do not work on Joomla 4!  |
 | WC  | WooCommerce      | 7.1.0                    | >= 5.0 (3 and 4 will probably work) |
 |     | WordPress        | 6.1.1                    | >= 5.9 (earlier versions WILL fail) |
 
@@ -60,10 +60,13 @@ be used with the supported shops.
 Notes:
 - Latest, or almost latest, point releases are used of the listed PHP versions.
 - PHP 8.0 and 8.1 are only tested with Joomla 4.
-- WooCommerce is listed in combination with WordPress 6.1.x.
+- WooCommerce is listed in combination with WordPress 6.1.x. Other plugins gave
+  warnings in my test environment, but those were paid plugins that I cannot
+  upgrade, and thus for which I have an outdated version.
 - Other installed plugins/modules may not have been updated to the latest
-  PHP version as supported by the shop, or, on the contrary, already require a
-  higher version than the shop does. This table cannot keep track of that.
+  PHP version as supported by the shop or our plugin, or may, on the contrary,
+  already require a newer version than the shop does. This table cannot keep
+  track of that.
 
 | Tag | Shop Version      | 7.4 | 8.0 | 8.1 | Remarks                   |
 |-----|-------------------|-----|-----|-----|---------------------------|
@@ -74,13 +77,15 @@ Notes:
 |     | 4.x.y.z           | ❓   | ❓   | ❓   | Not yet supported         |
 | PS  | 1.7.8.7           | ✔   | ❌   | ❌   | Fatal runtime errors      |
 | VM  | 4.0.4             | ✔   | ✔   | ✔   |                           |
-| WC  | 7.1.0             | ✔   | ✔   | ❓   |                           |
+| WC  | 7.1.0             | ✔   | ✔   | ❓   | Many warnings from other plugins |
 
 
-7.5.0-alpha1
-------------
+7.5.0 (2022-12-09)
+------------------
 Requirements:
 - PHP 7.4 is now the minimally required version.
+- PHP 8.0 and 8.1 have been tested and do work.
+- PHP 8.2 has not yet been tested.
 
 Features:
 - ALL: The "About" block on our forms will show fewer sections when the account
@@ -89,6 +94,7 @@ Features:
 - MA: Added buttons to the invoice status screen to mail the Acumulus invoice or
   packing slip.
 - ALL: The messages on the batch form are now more precise and clearer.
+- WC: Support for the WooCommerce EU VAT Number plugin.
 
 Bugs:
 - MA2.4: Finally tested with Magento 2.4 and PHP 8.1. Below the findings:

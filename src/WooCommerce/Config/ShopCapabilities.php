@@ -211,6 +211,16 @@ class ShopCapabilities extends ShopCapabilitiesBase
 
     /**
      * {@inheritdoc}
+     *
+     * WooCommerce core does not support entering a VAT number. However, various
+     * plugins exists that do allow so, and that also allow for the reversed VAT
+     * and EU-VAT schemes. These plugins use different keys to store the vat
+     * number in the order post meta:
+     * - WooCommerce EU VAT assistent: 'vat_number', or in older versions
+     *   'VAT Number'. Note that this plugin is no longer supported (mid 2022).
+     * - WooCommerce EU VAT number: _vat_number, see
+     *   http://docs.woothemes.com/document/eu-vat-number-2/.
+     * - current WooCommerce EU VAT number: billing_vat_number
      */
     public function getShopDefaults(): array
     {
@@ -224,12 +234,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
             'address2' => '[billing_address_2]', // WC_Abstract_order
             'postalCode' => '[billing_postcode]', // WC_Abstract_order
             'city' => '[billing_city]', // WC_Abstract_order
-            // The EU VAT Number plugin allows customers to indicate their VAT-
-            // number with which they can apply for the reversed VAT scheme. The
-            // vat number is stored under the '_vat_number' meta key, though
-            // older versions did so under the 'VAT Number' key.
-            // See http://docs.woothemes.com/document/eu-vat-number-2/
-            'vatNumber' => '[vat_number|VAT Number]', // Post meta
+            'vatNumber' => '[billing_vat_number|_vat_number|vat_number|VAT Number]', // Post meta
             'telephone' => '[billing_phone]', // WC_Abstract_order
             'email' => '[billing_email]', // WC_Abstract_order
 

@@ -1,5 +1,6 @@
 <?php
 /**
+ * @noinspection PhpMissingStrictTypesDeclarationInspection
  * @noinspection PhpUnused
  */
 
@@ -46,4 +47,6 @@ namespace Siel\Acumulus\Shop;
  * the PrestaShop namespace has such an override:
  * {@see \Siel\Acumulus\PrestaShop\Shop\ConfigForm}.
  */
-interface _Documentation {}
+interface _Documentation
+{
+}

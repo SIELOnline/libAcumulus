@@ -1,5 +1,6 @@
 <?php
 /**
+ * @noinspection PhpMissingStrictTypesDeclarationInspection
  * @noinspection PhpUnused
  */
 
@@ -61,4 +62,6 @@ namespace Siel\Acumulus\Helpers;
  * form classes {@see ConfigForm}, {@see AdvancedConfigFrom}, and
  * {@see BatchForm}, not {@see Form}.
  */
-interface _Documentation {}
+interface _Documentation
+{
+}

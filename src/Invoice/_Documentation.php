@@ -1,5 +1,6 @@
 <?php
 /**
+ * @noinspection PhpMissingStrictTypesDeclarationInspection
  * @noinspection PhpUnused
  */
 
@@ -94,4 +95,6 @@ namespace Siel\Acumulus\Invoice;
  *
  * @link https://www.siel.nl/acumulus/API/Invoicing/Add_Invoice/
  */
-interface _Documentation {}
+interface _Documentation
+{
+}

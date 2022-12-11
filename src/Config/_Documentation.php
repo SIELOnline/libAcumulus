@@ -1,5 +1,6 @@
 <?php
 /**
+ * @noinspection PhpMissingStrictTypesDeclarationInspection
  * @noinspection PhpUnused
  */
 
@@ -30,4 +31,6 @@ namespace Siel\Acumulus\Config;
  * - {@see Config}
  * - {@see ConfigUpgrade}
  */
-interface _Documentation {}
+interface _Documentation
+{
+}

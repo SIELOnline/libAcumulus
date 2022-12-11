@@ -1,5 +1,6 @@
 <?php
 /**
+ * @noinspection PhpMissingStrictTypesDeclarationInspection
  * @noinspection PhpUnused
  */
 
@@ -75,7 +76,10 @@ namespace Siel\Acumulus\ApiClient;
  * support of other web services, e.g. looking for newer versions at GitHub or
  * validating VAT numbers with the VIES service.
  *
- * Note to developers: when implementing a new extension, normally, you should
- * not have to override any of the classes in this namespace.
+ * ### Note to developers
+ * When implementing a new extension you should not have to override any of the
+ * classes in this namespace.
  */
-interface _Documentation {}
+interface _Documentation
+{
+}

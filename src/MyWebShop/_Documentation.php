@@ -1,4 +1,10 @@
 <?php
+/**
+ * @noinspection PhpMissingStrictTypesDeclarationInspection
+ * @noinspection PhpUnused
+ */
+
+namespace Siel\Acumulus\MyWebShop;
 
 /**
  * The MyWebShop namespace contains template/example code for developers who
@@ -14,14 +20,14 @@
  *   SielAcumulusAutoloader.php and calls the
  *   SielAcumulusAutoloader::register() function.
  * - Add uninstall code that removes the acumulus entry table.
- * - Complete {@see Siel\Acumulus\MyWebShop\Helpers\Log}.
- * - Complete {@see Siel\Acumulus\MyWebShop\Helpers\Mailer}.
- * - Complete {@see Siel\Acumulus\MyWebShop\Config\ConfigStore}.
- * - Complete {@see Siel\Acumulus\MyWebShop\Config\Environment}
- * - Complete {@see Siel\Acumulus\MyWebShop\Config\ShopCapabilities}
+ * - Complete {@see Helpers\Log}.
+ * - Complete {@see Helpers\Mailer}.
+ * - Complete {@see Config\ConfigStore}.
+ * - Complete {@see Config\Environment}
+ * - Complete {@see Config\ShopCapabilities}
  *   (getTokenInfo() may be deferred until later).
- * - Choose between {@see Siel\Acumulus\MyWebShop\Helpers\FormMapper} and
- *   {@see Siel\Acumulus\MyWebShop\Helpers\FormRenderer}. A FormMapper is
+ * - Choose between {@see Helpers\FormMapper} and
+ *   {@see Helpers\FormRenderer}. A FormMapper is
  *   preferred, but your shop needs something like a Form API.
  * - Complete the FormMapper, if chosen. note: the FormRenderer will basically
  *   do its job without any changes made by you. Moreover, it is easier to adapt
@@ -40,7 +46,7 @@
  *   shop expects separate (sql) scripts for this, add it over there, if not,
  *   have the module's install method/function initialize the Container, get the
  *   AcumulusEntryManager from it, and call the
- *   {@see Siel\Acumulus\MyWebShop\Shop\AcumulusEntryManager::install()} method.
+ *   {@see Shop\AcumulusEntryManager::install()} method.
  * - If needed (install not in a separate script), implement this install()
  *   method, and its counterpart uninstall() in your AcumulusEntryManager.
  *   Implement other missing abstract methods with empty stubs for now.
@@ -69,11 +75,11 @@
  * should work, but submitting a correctly filled in form will give errors.
  *
  * You should now continue with the invoice handling and sending parts:
- * - Complete {@see Siel\Acumulus\MyWebShop\Shop\AcumulusEntry}.
- * - Complete {@see Siel\Acumulus\MyWebShop\Shop\AcumulusEntryManager}.
- * - Complete {@see Siel\Acumulus\MyWebShop\Shop\InvoiceManager}.
- * - Complete {@see Siel\Acumulus\MyWebShop\Invoice\Source}.
- * - Complete {@see Siel\Acumulus\MyWebShop\Invoice\Creator}.
+ * - Complete {@see Shop\AcumulusEntry}.
+ * - Complete {@see Shop\AcumulusEntryManager}.
+ * - Complete {@see Shop\InvoiceManager}.
+ * - Complete {@see Invoice\Source}.
+ * - Complete {@see Invoice\Creator}.
  * - You will now know what objects should be documented in
  *   ShopCapabilities::getTokenInfo(), so correct that method now as well.
  *
@@ -112,6 +118,6 @@
  * ShopCapabilities::getTokenInfo() is normally still needed in your own
  * advanced config form
  */
-namespace Siel\Acumulus\MyWebShop;
-
-
+interface _Documentation
+{
+}

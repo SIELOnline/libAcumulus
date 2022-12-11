@@ -27,9 +27,14 @@ class Environment extends EnvironmentBase
      */
     protected function executeQuery(string $query): array
     {
-        $parameters = $this->loadConfig();
-        $mysqli = new mysqli($parameters->hostName, $parameters->user, $parameters->password);
-        return $mysqli->query($query)->fetch_all();
+        // 'show variables where Variable_name in ("version", "version_comment")'
+        return [
+          ['Variable_name' => 'version', 'Value' => '8.0.27'],
+          ['Variable_name' => 'version_comment', 'Value' => 'MySQL Community Server - GPL'],
+        ];
+//        $parameters = $this->loadConfig();
+//        $mysqli = new mysqli($parameters->hostName, $parameters->user, $parameters->password);
+//        return $mysqli->query($query)->fetch_all();
     }
 
     private function loadConfig(): object

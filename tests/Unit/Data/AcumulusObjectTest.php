@@ -21,7 +21,7 @@ class AcumulusObjectTest extends TestCase
         $this->assertNull($ao->itemNumber);
         $this->assertNull($ao->nature);
         $this->assertNull($ao->unitPrice);
-        $this->assertInstanceOf(MetadataCollection::class, $ao->metadata());
+        $this->assertInstanceOf(MetadataCollection::class, $ao->getMetadata());
     }
 
     public function testConstructor2()

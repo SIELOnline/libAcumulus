@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Collectors;
 
 use Siel\Acumulus\Api;
@@ -9,19 +11,22 @@ use Siel\Acumulus\Data\Customer;
 use Siel\Acumulus\Fld;
 use Siel\Acumulus\Helpers\Token;
 
+/**
+ * Creates a {@see Customer} object
+ */
 class CustomerCollector extends Collector
 {
-    protected function createAcumulusObject(): AcumulusObject
+    /** @noinspection PhpEnforceDocCommentInspection */
+    public function __construct(Token $token)
     {
-        return new Customer();
+        parent::__construct(Customer::class, $token);
     }
 
     /**
      * @param \Siel\Acumulus\Data\Customer $acumulusObject
      */
-    public function collectLogicFields(AcumulusObject $acumulusObject)
+    protected function collectLogicFields(AcumulusObject $acumulusObject): void
     {
-
         /** @var \Siel\Acumulus\Invoice\Source $invoiceSource */
         $invoiceSource = $this->propertySources['invoiceSource'];
 
@@ -45,9 +50,11 @@ class CustomerCollector extends Collector
         // @todo: website?
         // @todo: telephone2? (use fax?)
         // @todo: overwriteIfExists: this is not collecting but completing.
-        $acumulusObject->setOverwriteIfExists($customerSettings['overwriteIfExists']
-            ? Api::OverwriteIfExists_Yes
-            : Api::OverwriteIfExists_No);
+        $acumulusObject->setOverwriteIfExists(
+            $customerSettings['overwriteIfExists']
+                ? Api::OverwriteIfExists_Yes
+                : Api::OverwriteIfExists_No
+        );
         // @todo: bankAccountNumber?
         // @todo: disableDuplicates?
     }

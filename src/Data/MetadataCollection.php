@@ -1,7 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Data;
 
+/**
+ * MetadataCollection represents a collection of {@see MetadataValue}s.
+ */
 class MetadataCollection
 {
     /** @var \Siel\Acumulus\Data\MetadataValue[]  */
@@ -34,6 +39,7 @@ class MetadataCollection
      */
     public function getValue(string $name)
     {
+        /** @noinspection NullPointerExceptionInspection */
         return $this->exists($name) ? $this->get($name)->get() : null;
     }
 

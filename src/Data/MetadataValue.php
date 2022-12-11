@@ -1,6 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Data;
+
+use function is_string;
 
 /**
  * MetadataValue represents a metadata value.
@@ -75,9 +79,12 @@ class MetadataValue
         $this->count++;
     }
 
+    /**
+     * @throws \JsonException
+     */
     public function __toString(): string
     {
-        $value = $this->get(0);
-        return is_string($value) ? $value : json_encode($value);
+        $value = $this->get();
+        return is_string($value) ? $value : json_encode($value, JSON_THROW_ON_ERROR);
     }
 }

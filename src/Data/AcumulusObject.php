@@ -1,11 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Data;
 
-use ArgumentCountError;
 use ArrayAccess;
 use BadMethodCallException;
 use RuntimeException;
+
+use function array_key_exists;
+use function count;
+use function strlen;
 
 /**
  * AcumulusObject represents an Acumulus API call message structure.
@@ -49,8 +54,9 @@ abstract class AcumulusObject implements ArrayAccess
         $this->metadata = new MetadataCollection();
     }
 
-    // PHP8.1: a read-only property suffices here.
-    public function metadata(): MetadataCollection
+    // PHP 8.1: a read-only property suffices here.
+    /** @noinspection PhpEnforceDocCommentInspection */
+    public function getMetadata(): MetadataCollection
     {
         return $this->metadata;
     }
@@ -111,23 +117,23 @@ abstract class AcumulusObject implements ArrayAccess
      */
     public function __call(string $name, array $arguments)
     {
-        $method = substr($name, 0, strlen('get'));
-        if (!in_array($method, ['get', 'set'])) {
-            throw new BadMethodCallException("Undefined method '$name'");
-        }
-        $propertyName = lcfirst(substr($name, strlen('get')));
+        $method = substr($name, 0, 3);
+        $propertyName = lcfirst(substr($name, 3));
         $count = count($arguments);
-        if ($method === 'get') {
-            if ($count !== 0) {
-                throw new BadMethodCallException("No arguments expected for method '$name', $count passed");
-            }
-            return $this->__get($propertyName);
-        } else {
-            if ($count !== 1 && $count !== 2) {
-                throw new BadMethodCallException("Expected 1 or 2 arguments for method $name, $count passed'");
-            }
-            $propertyName = lcfirst(substr($name, strlen('get')));
-            return $this->set($propertyName, ...$arguments);
+        switch ($method) {
+            case 'get':
+                if ($count !== 0) {
+                    throw new BadMethodCallException("No arguments expected for method '$name', $count passed");
+                }
+                return $this->__get($propertyName);
+            case 'set':
+                if ($count !== 1 && $count !== 2) {
+                    throw new BadMethodCallException("Expected 1 or 2 arguments for method $name, $count passed'");
+                }
+                $propertyName = lcfirst(substr($name, strlen('get')));
+                return $this->set($propertyName, ...$arguments);
+            default:
+                throw new BadMethodCallException("Undefined method '$name'");
         }
     }
 

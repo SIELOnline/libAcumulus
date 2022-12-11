@@ -5,6 +5,8 @@
  *   directly, only internally in this trait.
  */
 
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Data;
 
 use RuntimeException;
@@ -21,68 +23,78 @@ use RuntimeException;
  * {@see AcumulusObject::set} method, and remove this code.
  *
  * Note: as the old Acumulus arrays are already strict string key based arrays,
- * we don't allow numeric or null offsets
+ * we don't allow numeric or null offsets.
  */
 trait AcumulusObjectArrayAccessTrait
 {
-    public function offsetSet($offset, $value)
+    /**
+     * @inheritdoc
+     */
+    public function offsetSet($offset, $value): void
     {
         $this->checkOffset($offset);
-        if ($this->isProperty($offset))
-        {
+        if ($this->isProperty($offset)) {
             $this->set($offset, $value);
-        } elseif (property_exists($this, $offset) ) {
+        } elseif (property_exists($this, $offset)) {
             /** @noinspection PhpVariableVariableInspection */
             $this->$offset = $value;
         } else {
-            // Metadata
+            // Metadata.
             $this->metadata->set($offset, $value);
         }
     }
 
+    /**
+     * @inheritdoc
+     */
     public function offsetExists($offset): bool
     {
         $this->checkOffset($offset);
-        if ($this->isProperty($offset))
-        {
-            return $this->__isset($offset);
-        } elseif (property_exists($this, $offset) ) {
+        if ($this->isProperty($offset)) {
+            $result = $this->__isset($offset);
+        } elseif (property_exists($this, $offset)) {
             /** @noinspection PhpVariableVariableInspection */
-            return isset($this->$offset);
+            $result = isset($this->$offset);
         } else {
-            // Metadata
-            return $this->metadata->exists($offset);
+            // Metadata.
+            $result = $this->metadata->exists($offset);
         }
+        return $result;
     }
 
-    public function offsetUnset($offset)
+    /**
+     * @inheritdoc
+     */
+    public function offsetUnset($offset): void
     {
         $this->checkOffset($offset);
-        if ($this->isProperty($offset))
-        {
+        if ($this->isProperty($offset)) {
             $this->__unset($offset);
-        } elseif (property_exists($this, $offset) ) {
+        } elseif (property_exists($this, $offset)) {
             /** @noinspection PhpVariableVariableInspection */
             unset($this->$offset);
         } else {
-            // Metadata
+            // Metadata.
             $this->metadata->remove($offset);
         }
     }
 
+    /**
+     * @inheritdoc
+     */
     public function offsetGet($offset)
     {
         $this->checkOffset($offset);
-        if ($this->isProperty($offset))
-        {
-            return $this->__get($offset);
-        } elseif (property_exists($this, $offset) ) {
+        if ($this->isProperty($offset)) {
+            $result = $this->__get($offset);
+        } elseif (property_exists($this, $offset)) {
             /** @noinspection PhpVariableVariableInspection */
-            return $this->$offset;
+            $result = $this->$offset;
         } else {
-            // Metadata
-            return $this->metadata->getValue($offset);
+            // Metadata.
+            $result = $this->metadata->getValue($offset);
         }
+        return $result;
     }
 
     /**

@@ -1,59 +1,56 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Collectors;
 
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\AcumulusProperty;
 use Siel\Acumulus\Helpers\Token;
 
-abstract class Collector
+use function is_string;
+
+/**
+ * Collector is the abstract base class for a collector.
+ *
+ * It defines a strategy for collecting the requested data by dividing it into
+ * This base class divides the collector phase into 2 smaller phases:
+ * - Collecting based on pure field mappings.
+ * - Collecting based on specialised logic that considers the host environment
+ *   API and data models and the fields of the target {@see AcumulusObject}.
+ *
+ * Child classes should typically do the following:
+ * - Pass the type of the {@see AcumlusObject} to be collected and returned to
+ *   the parent constructor.
+ * - Define the logic based phase by implementing {@see collectLogicFields()}.
+ */
+abstract class Collector implements CollectorInterface
 {
+    protected string $acumulusObjectType;
     protected Token $token;
     protected array $propertySources;
 
-    public function __construct(Token $token)
+    /** @noinspection PhpEnforceDocCommentInspection */
+    public function __construct(string $acumulusObjectType, Token $token)
     {
+        $this->acumulusObjectType = $acumulusObjectType;
         $this->token = $token;
     }
 
     /**
-     * Returns an {@see \Siel\Acumulus\Data\AcumulusObject}
+     * {@inheritDoc}
      *
-     * Creates an {@see \Siel\Acumulus\Data\AcumulusObject} by collecting
-     * values for all its fields and metadata that might be added to the object.
-     *
-     * Values for fields may come from:
-     * - A field pattern. In most cases, a field pattern will come from the
-     *   module configuration. Field patterns may be as simple as a literal
-     *   string; the value of 1 property from one of the property sources; to a
-     *   (complex) combination of these. The {@see \Siel\Acumulus\Helpers\Token}
-     *   class is used to compute a value given a field pattern. As this option
-     *   gives a lot of flexibility to the user to override default behavior via
-     *   simple configuration, this way should, if possible, be preferred over
-     *   the next one.
-     * - Internal logic. If getting a value based on a field pattern may not
-     *   suffice, normally when database lookups or multiple calls to the
-     *   internal webshop API are required, getting the value for a field will
-     *   be hardcoded in a - webshop specific - child class of this class.
-     *   Think of things like looking up an ISO country code based on an
-     *   internal country id, or getting a tax rate based on tax class id of the
-     *   product and address data from the customer.
-     *
-     * @param array $propertySources
-     *   The objects to use with field mappings (token expansion).
-     * @param array $fieldMappings
-     *   The patterns for the fields that can be collected via a simple mapping.
-     *
-     * @return \Siel\Acumulus\Data\AcumulusObject
-     *   The AcumulusObject with its fields filled based on the
-     *   $propertySources, the $fieldMappings, and the logic of a more
-     *   specialised child of this class.
+     * This base class divides the collector phase into 2 smaller phases:
+     * - Collecting based on simple field mappings.
+     * - Collecting based on specialised logic that can use all the API methods
+     *   and data models of the host environment to get the (missing) values for
+     *   the fields of the target {@see AcumulusObject}.
      */
-    public function collect(array $propertySources, array $fieldMappings): AcumulusObject
+    public function collect(array $propertySources, array $fieldDefinitions): AcumulusObject
     {
         $this->propertySources = $propertySources;
         $acumulusObject = $this->createAcumulusObject();
-        $this->collectMappedFields($acumulusObject, $fieldMappings);
+        $this->collectMappedFields($acumulusObject, $fieldDefinitions);
         $this->collectLogicFields($acumulusObject);
         return $acumulusObject;
     }
@@ -63,14 +60,19 @@ abstract class Collector
      * contain the collected values.
      *
      * @return \Siel\Acumulus\Data\AcumulusObject
+     *   Returns a new child class object
      */
-    abstract protected function createAcumulusObject(): AcumulusObject;
+    protected function createAcumulusObject(): AcumulusObject
+    {
+        return new $this->acumulusObjectType();
+    }
 
     /**
+     * Collects the fields that can be extracted using simple field mappings
      * @param \Siel\Acumulus\Data\AcumulusObject $acumulusObject
      * @param array $fieldMappings
      */
-    protected function collectMappedFields(AcumulusObject $acumulusObject, array $fieldMappings)
+    protected function collectMappedFields(AcumulusObject $acumulusObject, array $fieldMappings): void
     {
         foreach ($fieldMappings as $field => $pattern) {
             $this->expandAndSet($acumulusObject, $field, $pattern);
@@ -97,7 +99,9 @@ abstract class Collector
      * @param string $property
      *   The name of the property to set.
      * @param mixed $value
-     *   The value to set the property to that may contain variable fields.
+     *   The value to set the property to, or a pattern that may contain
+     *   property or method names that are to be extracted from the
+     *   {@see $propertySources}.
      *
      * @return bool
      *   Whether the value was set.
@@ -105,7 +109,12 @@ abstract class Collector
     protected function expandAndSet(AcumulusObject $object, string $property, $value, int $mode = AcumulusProperty::Set_Always): bool
     {
         if ($value !== null && $value !== 'null') {
-            return $object->set($property, $this->expand($value), $mode);
+            if (is_string($value)) {
+                $value = $this->expand($value);
+            }
+            // The set() method will take care of casting the value to the
+            // correct type.
+            return $object->set($property, $value, $mode);
         }
         return false;
     }
@@ -113,14 +122,16 @@ abstract class Collector
     /**
      * Wrapper method around Token::expand().
      *
-     * The values of variables in $pattern are taken from 1 of the property
+     * The values of variables in $pattern are taken from one of the property
      * sources known to this collector.
      *
      * @param string $pattern
-     *  The value that may contain dynamic variables.
+     *  The value that may contain field references.
      *
      * @return string
-     *   The pattern with variables expanded with their actual value.
+     *   The pattern with variables expanded with their actual value. Note that
+     *   this will always be a string, even if the pattern refers to a single
+     *   property which is not a string.
      */
     protected function expand(string $pattern): string
     {

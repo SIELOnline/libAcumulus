@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Data;
 
 use DateTime;
@@ -7,6 +9,15 @@ use DomainException;
 use UnexpectedValueException;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Number;
+
+use function count;
+use function in_array;
+use function is_array;
+use function is_bool;
+use function is_float;
+use function is_int;
+use function is_string;
+use function strlen;
 
 /**
  * AcumulusProperty represents a scalar value that is sent as part of an API
@@ -78,7 +89,7 @@ class AcumulusProperty
         if (!isset($propertyDefinition['type'])) {
             throw new DomainException('Property type must be defined');
         }
-        if (!in_array($propertyDefinition['type'], static::$allowedTypes)) {
+        if (!in_array($propertyDefinition['type'], static::$allowedTypes, true)) {
             throw new DomainException("Property type not allowed: {$propertyDefinition['type']}");
         }
         $this->type = $propertyDefinition['type'];
@@ -88,10 +99,8 @@ class AcumulusProperty
         }
         $this->required = $propertyDefinition['required'] ?? false;
 
-        if (isset($propertyDefinition['allowedValues'])) {
-            if (!is_array($propertyDefinition['allowedValues'])) {
-                throw new DomainException('Property allowedValues must be an array');
-            }
+        if (isset($propertyDefinition['allowedValues']) && !is_array($propertyDefinition['allowedValues'])) {
+            throw new DomainException('Property allowedValues must be an array');
         }
         if ($this->type === 'bool' && (!isset($propertyDefinition['allowedValues']) || count($propertyDefinition['allowedValues']) !== 2)) {
             throw new DomainException('Property allowedValues must define an array of 2 values for type bool');
@@ -134,13 +143,14 @@ class AcumulusProperty
      *
      * @return bool
      *   true if the value was actually set, false otherwise.
+     *
+     * @noinspection PhpFunctionCyclomaticComplexityInspection
      */
     public function setValue($value, int $mode = AcumulusProperty::Set_Always): bool
     {
         if ($value === 'null') {
             $value = null;
-        }
-        if ($value !== null) {
+        } else {
             switch ($this->type) {
                 case 'string':
                     $value = (string) $value;
@@ -151,7 +161,7 @@ class AcumulusProperty
                         throw new DomainException("$this->name: not a valid $this->type: " . var_export($value, true));
                     }
                     $iResult = (int) round($value);
-                    if (!Number::floatsAreEqual($iResult, $value, 0.0002) || ($this->type === 'id' && $iResult <= 0)) {
+                    if (($this->type === 'id' && $iResult <= 0) || !Number::floatsAreEqual($iResult, $value, 0.0002)) {
                         throw new DomainException("$this->name: not a valid $this->type value: " . var_export($value, true));
                     }
                     $value = $iResult;
@@ -176,10 +186,11 @@ class AcumulusProperty
                     if ($date === false) {
                         throw new DomainException("$this->name: not a valid $this->type value: " . var_export($value, true));
                     }
-                    $date->setTime(0, 0, 0, 0);
+                    $date->setTime(0, 0, 0);
                     $value = $date;
                     break;
                 case 'bool':
+                    /** @noinspection CallableParameterUseCaseInTypeContextInspection */
                     if (!is_bool($value) && !in_array($value, $this->allowedValues, true)) {
                         throw new DomainException("$this->name: not a valid $this->type:" . var_export($value, true));
                     }
@@ -188,14 +199,14 @@ class AcumulusProperty
                 default:
                     throw new UnexpectedValueException("$this->name: not a valid type: $this->type");
             }
-            if (count($this->allowedValues) > 0 && !in_array($value, $this->allowedValues)) {
+            if (count($this->allowedValues) > 0 && !in_array($value, $this->allowedValues, true)) {
                 throw new DomainException("$this->name: not an allowed value:" . var_export($value, true));
             }
         }
-        if (($mode & AcumulusProperty::Set_NotOverwrite) !== 0 && $this->value !== null) {
+        if (($mode & self::Set_NotOverwrite) !== 0 && $this->value !== null) {
             return false;
         }
-        if (($mode & AcumulusProperty::Set_NotEmpty) !== 0 && empty($value)) {
+        if (($mode & self::Set_NotEmpty) !== 0 && empty($value)) {
             return false;
         }
         $this->value = $value;

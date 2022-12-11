@@ -3,7 +3,7 @@
  * @noinspection PhpStaticAsDynamicMethodCallInspection
  */
 
-namespace Siel\Acumulus\Unit\ApiClient;
+namespace Siel\Acumulus\Tests\Unit\ApiClient;
 
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Helpers\Container;
@@ -33,7 +33,7 @@ class AcumulusRequestTest extends TestCase
     protected function setUp(): void
     {
         $language = 'nl';
-        $this->container = new Container('TestWebShop\TestDoubles', $language);
+        $this->container = new Container('Tests\TestWebShop\TestDoubles', $language);
         $this->examples = new ApiRequestResponseExamples();
     }
 

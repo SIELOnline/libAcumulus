@@ -3,11 +3,11 @@
  * @noinspection PhpStaticAsDynamicMethodCallInspection
  */
 
-namespace Siel\Acumulus\Unit\Data;
+namespace Siel\Acumulus\Tests\Unit\Data;
 
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Data\MetadataValue;
-use Siel\Acumulus\TestWebShop\Data\SimpleTestObject;
+use Siel\Acumulus\Tests\TestWebShop\Data\SimpleTestObject;
 
 class MetadataValueTest extends TestCase
 {

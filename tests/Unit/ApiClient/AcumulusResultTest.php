@@ -5,7 +5,7 @@
  * @noinspection DuplicatedCode
  */
 
-namespace Siel\Acumulus\Unit\ApiClient;
+namespace Siel\Acumulus\Tests\Unit\ApiClient;
 
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Helpers\Container;
@@ -39,7 +39,7 @@ class AcumulusResultTest extends TestCase
     protected function setUp(): void
     {
         $language = 'nl';
-        $this->container = new Container('TestWebShop\TestDoubles', $language);
+        $this->container = new Container('Tests\TestWebShop\TestDoubles', $language);
         $this->translator = $this->container->getTranslator();
         $this->translator->add(new SeverityTranslations());
         $this->translator->add(new ResultTranslations());

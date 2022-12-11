@@ -18,7 +18,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Siel\\Acumulus\\": "tests/"
+            "Siel\\Acumulus\\Tests\\": "tests/"
         }
     },
     "require-dev": {

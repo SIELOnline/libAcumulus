@@ -1,6 +1,6 @@
 <?php
 
-namespace Siel\Acumulus\TestWebShop\ApiClient;
+namespace Siel\Acumulus\Tests\TestWebShop\ApiClient;
 
 use Siel\Acumulus\ApiClient\AcumulusRequest as BaseAcumulusRequest;
 

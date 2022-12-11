@@ -1,6 +1,6 @@
 <?php
 
-namespace Siel\Acumulus\Unit\ApiClient;
+namespace Siel\Acumulus\Tests\Unit\ApiClient;
 
 use Siel\Acumulus\Tag;
 

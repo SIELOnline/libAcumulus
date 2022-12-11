@@ -1,7 +1,7 @@
 <?php
 /** @noinspection PhpStaticAsDynamicMethodCallInspection */
 
-namespace Siel\Acumulus\Integration\ApiClient;
+namespace Siel\Acumulus\Tests\Integration\ApiClient;
 
 use PHPUnit\Framework\TestCase;
 use RuntimeException;

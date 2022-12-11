@@ -3,7 +3,7 @@
  * @noinspection PhpStaticAsDynamicMethodCallInspection
  */
 
-namespace Siel\Acumulus\Unit\Data;
+namespace Siel\Acumulus\Tests\Unit\Data;
 
 use LogicException;
 use RuntimeException;
@@ -11,7 +11,7 @@ use Siel\Acumulus\Api;
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Data\AcumulusProperty;
 use Siel\Acumulus\Data\MetadataCollection;
-use Siel\Acumulus\TestWebShop\Data\SimpleTestObject;
+use Siel\Acumulus\Tests\TestWebShop\Data\SimpleTestObject;
 
 class AcumulusObjectTest extends TestCase
 {

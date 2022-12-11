@@ -1,5 +1,5 @@
 <?php
-namespace Siel\Acumulus\TestWebShop\Helpers;
+namespace Siel\Acumulus\Tests\TestWebShop\Helpers;
 
 use Siel\Acumulus\Helpers\Log as BaseLog;
 

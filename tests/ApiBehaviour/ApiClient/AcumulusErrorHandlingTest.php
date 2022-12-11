@@ -4,7 +4,7 @@
  * @noinspection PhpStaticAsDynamicMethodCallInspection
  */
 
-namespace Siel\Acumulus\ApiBehaviour\ApiClient;
+namespace Siel\Acumulus\Tests\ApiBehaviour\ApiClient;
 
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Api;
@@ -38,7 +38,7 @@ class AcumulusErrorHandlingTest extends TestCase
 
     protected Container $container;
     protected Environment $environment;
-    /** @var \Siel\Acumulus\TestWebshop\ApiClient\Acumulus  */
+    /** @var \Siel\Acumulus\Tests\TestWebShop\ApiClient\Acumulus  */
     protected Acumulus $acumulusClient;
     /** @var \Siel\Acumulus\Helpers\Log */
     protected Log $log;
@@ -47,7 +47,7 @@ class AcumulusErrorHandlingTest extends TestCase
     {
         // Using TestWebShop would give us test classes, but we want real ones
         // here.
-        $this->container = new Container('TestWebShop', 'nl');
+        $this->container = new Container('Tests\\TestWebShop', 'nl');
         $this->environment = $this->container->getEnvironment();
         $this->log = $this->container->getLog();
         $this->acumulusClient = $this->container->getAcumulusApiClient();

@@ -3,7 +3,7 @@
  * @noinspection PhpStaticAsDynamicMethodCallInspection
  */
 
-namespace Siel\Acumulus\Unit\Data;
+namespace Siel\Acumulus\Tests\Unit\Data;
 
 use DateTime;
 use DomainException;

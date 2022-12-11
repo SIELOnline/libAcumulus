@@ -1,7 +1,7 @@
 <?php
 /** @noinspection PhpStaticAsDynamicMethodCallInspection */
 
-namespace Siel\Acumulus\Integration\ApiClient;
+namespace Siel\Acumulus\Tests\ApiBehaviour\ApiClient;
 
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Api;
@@ -17,7 +17,7 @@ class AcumulusTest extends TestCase
     {
         // Using TestWebShop would give us test classes, but we want real ones
         // here.
-        $this->container = new Container('TestWebShop', 'nl');
+        $this->container = new Container('Tests\\TestWebShop', 'nl');
         $this->acumulusClient = $this->container->getAcumulusApiClient();
     }
 

@@ -1,12 +1,12 @@
 <?php
-namespace Siel\Acumulus\TestWebShop\TestDoubles\ApiClient;
+namespace Siel\Acumulus\Tests\TestWebShop\TestDoubles\ApiClient;
 
 use Siel\Acumulus\ApiClient\AcumulusRequest as BaseAcumulusRequest;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Util;
-use Siel\Acumulus\Unit\ApiClient\ApiRequestResponseExamples;
+use Siel\Acumulus\Tests\Unit\ApiClient\ApiRequestResponseExamples;
 
 /**
  * Communicator implements the communication with the Acumulus web API.
@@ -22,7 +22,7 @@ use Siel\Acumulus\Unit\ApiClient\ApiRequestResponseExamples;
 class AcumulusRequest extends BaseAcumulusRequest
 {
     /**
-     * @var \Siel\Acumulus\Unit\ApiClient\ApiRequestResponseExamples
+     * @var \Siel\Acumulus\Tests\Unit\ApiClient\ApiRequestResponseExamples
      */
     private $examples;
 

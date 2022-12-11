@@ -4,7 +4,7 @@
  * @noinspection DuplicatedCode
  */
 
-namespace Siel\Acumulus\Unit\Helpers;
+namespace Siel\Acumulus\Tests\Unit\Helpers;
 
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Helpers\Message;

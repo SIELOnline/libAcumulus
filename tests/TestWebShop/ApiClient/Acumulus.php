@@ -1,6 +1,6 @@
 <?php
 
-namespace Siel\Acumulus\TestWebShop\ApiClient;
+namespace Siel\Acumulus\Tests\TestWebShop\ApiClient;
 
 use Siel\Acumulus\ApiClient\Acumulus as BaseAcumulus;
 use Siel\Acumulus\ApiClient\AcumulusResult;
@@ -9,7 +9,7 @@ class Acumulus extends BaseAcumulus
 {
     /**
      * $apiFunction = "entry/timeout" will set additional curl options in
-     * {@see \Siel\Acumulus\TestWebShop\ApiClient\AcumulusRequest::getCurlOptions()}
+     * {@see \Siel\Acumulus\Tests\TestWebShop\ApiClient\AcumulusRequest::getCurlOptions()}
      * that will result in a timeout.
      *
      * @throws \Siel\Acumulus\ApiClient\AcumulusException|\Siel\Acumulus\ApiClient\AcumulusResponseException

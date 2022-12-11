@@ -3,7 +3,7 @@
  * @noinspection PhpStaticAsDynamicMethodCallInspection
  */
 
-namespace Siel\Acumulus\Unit\Helpers;
+namespace Siel\Acumulus\Tests\Unit\Helpers;
 
 use PHPUnit\Framework\TestCase;
 use RuntimeException;

@@ -3,7 +3,7 @@
  * @noinspection PhpStaticAsDynamicMethodCallInspection
  */
 
-namespace Siel\Acumulus\Unit\ApiClient;
+namespace Siel\Acumulus\Tests\Unit\ApiClient;
 
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Api;
@@ -21,7 +21,7 @@ class AcumulusTest extends TestCase
     protected function setUp(): void
     {
         // Use the TestWebShop test doubles.
-        $this->container = new Container('TestWebShop\TestDoubles', 'nl');
+        $this->container = new Container('Tests\TestWebShop\TestDoubles', 'nl');
         $this->acumulusClient = $this->container->getAcumulusApiClient();
     }
 

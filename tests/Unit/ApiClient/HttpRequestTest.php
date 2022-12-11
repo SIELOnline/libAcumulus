@@ -3,10 +3,10 @@
  * @noinspection PhpStaticAsDynamicMethodCallInspection
  */
 
-namespace Siel\Acumulus\Unit\ApiClient;
+namespace Siel\Acumulus\Tests\Unit\ApiClient;
 
 use PHPUnit\Framework\TestCase;
-use Siel\Acumulus\TestWebShop\TestDoubles\ApiClient\HttpRequest;
+use Siel\Acumulus\Tests\TestWebShop\TestDoubles\ApiClient\HttpRequest;
 
 class HttpRequestTest extends TestCase
 {

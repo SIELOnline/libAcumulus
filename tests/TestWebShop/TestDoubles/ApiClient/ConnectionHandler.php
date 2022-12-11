@@ -1,5 +1,5 @@
 <?php
-namespace Siel\Acumulus\TestWebShop\TestDoubles\ApiClient;
+namespace Siel\Acumulus\Tests\TestWebShop\TestDoubles\ApiClient;
 
 /**
  * A child class of Siel\Acumulus\ApiClient\HttpCommunicator to get access to

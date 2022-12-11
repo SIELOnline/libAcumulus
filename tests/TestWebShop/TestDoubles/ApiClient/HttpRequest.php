@@ -1,9 +1,9 @@
 <?php
-namespace Siel\Acumulus\TestWebShop\TestDoubles\ApiClient;
+namespace Siel\Acumulus\Tests\TestWebShop\TestDoubles\ApiClient;
 
 use Siel\Acumulus\ApiClient\HttpRequest as BaseHttpRequest;
 use Siel\Acumulus\ApiClient\HttpResponse;
-use Siel\Acumulus\Unit\ApiClient\ApiRequestResponseExamples;
+use Siel\Acumulus\Tests\Unit\ApiClient\ApiRequestResponseExamples;
 
 /**
  * {@inhertidoc}
@@ -11,7 +11,7 @@ use Siel\Acumulus\Unit\ApiClient\ApiRequestResponseExamples;
 class HttpRequest extends BaseHttpRequest
 {
     /**
-     * @var \Siel\Acumulus\Unit\ApiClient\ApiRequestResponseExamples
+     * @var \Siel\Acumulus\Tests\Unit\ApiClient\ApiRequestResponseExamples
      */
     private $examples;
 

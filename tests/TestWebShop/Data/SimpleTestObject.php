@@ -1,6 +1,6 @@
 <?php
 
-namespace Siel\Acumulus\TestWebShop\Data;
+namespace Siel\Acumulus\Tests\TestWebShop\Data;
 
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Data\AcumulusObject;

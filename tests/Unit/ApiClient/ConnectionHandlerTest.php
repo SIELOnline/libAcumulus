@@ -1,10 +1,10 @@
 <?php
 /** @noinspection PhpStaticAsDynamicMethodCallInspection */
 
-namespace Siel\Acumulus\Unit\ApiClient;
+namespace Siel\Acumulus\Tests\Unit\ApiClient;
 
 use PHPUnit\Framework\TestCase;
-use Siel\Acumulus\TestWebShop\TestDoubles\ApiClient\ConnectionHandler;
+use Siel\Acumulus\Tests\TestWebShop\TestDoubles\ApiClient\ConnectionHandler;
 
 /**
  * Test curl handle creation and reuse based on scheme + host.
@@ -12,7 +12,7 @@ use Siel\Acumulus\TestWebShop\TestDoubles\ApiClient\ConnectionHandler;
 class ConnectionHandlerTest extends TestCase
 {
     /**
-     * @return \Siel\Acumulus\TestWebShop\TestDoubles\ApiClient\ConnectionHandler
+     * @return \Siel\Acumulus\Tests\TestWebShop\TestDoubles\ApiClient\ConnectionHandler
      */
     protected function getConnectionHandler(): ConnectionHandler
     {

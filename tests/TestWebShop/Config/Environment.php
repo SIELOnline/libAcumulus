@@ -1,5 +1,5 @@
 <?php
-namespace Siel\Acumulus\TestWebShop\Config;
+namespace Siel\Acumulus\Tests\TestWebShop\Config;
 
 use mysqli;
 use Siel\Acumulus\Config\Environment as EnvironmentBase;

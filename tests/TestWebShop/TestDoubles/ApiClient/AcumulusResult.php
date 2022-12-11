@@ -1,5 +1,5 @@
 <?php
-namespace Siel\Acumulus\TestWebShop\TestDoubles\ApiClient;
+namespace Siel\Acumulus\Tests\TestWebShop\TestDoubles\ApiClient;
 
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\ApiClient\AcumulusResult as BaseResult;

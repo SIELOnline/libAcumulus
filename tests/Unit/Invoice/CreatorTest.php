@@ -3,7 +3,7 @@
  * @noinspection PhpStaticAsDynamicMethodCallInspection
  */
 
-namespace Siel\Acumulus\Unit\Invoice;
+namespace Siel\Acumulus\Tests\Unit\Invoice;
 
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Invoice\Creator;

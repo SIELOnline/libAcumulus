@@ -510,9 +510,12 @@ class AcumulusResult extends MessageCollection
         if (($this->hasError() && $this->getHttpResponse()->getHttpStatusCode() === 200)
             || ($this->getSeverity() <= Severity::Warning && $this->getHttpResponse()->getHttpStatusCode() !== 200)
         ) {
-            $body = $this->util->maskXmlOrJsonString($this->getHttpResponse()->getBody());
             $code = $this->getHttpResponse()->getHttpStatusCode();
-            throw new AcumulusResponseException($body, $code, 'Inconsistent status code');
+            $this->createAndAddMessage("Inconsistent HTTP status code $code", Severity::Notice);
+            // We do not throw an exception as the Acumulus API does contain
+            // inconsistencies between response status and HTTP status code.
+//            $body = $this->util->maskXmlOrJsonString($this->getHttpResponse()->getBody());
+//            throw new AcumulusResponseException($body, $code, 'Inconsistent status code');
         }
     }
 

@@ -80,6 +80,13 @@ Notes:
 | WC  | 7.1.0             | ✔   | ✔   | ❓   | Many warnings from other plugins |
 
 
+7.6.0 (202?-??-??)
+------------------
+Bugs:
+- We do no longer throw an exception when the HTTP status code and the response
+  status are inconsistent. The Acumulus API does contain inconsistencies.  
+
+
 7.5.0 (2022-12-09)
 ------------------
 Requirements:

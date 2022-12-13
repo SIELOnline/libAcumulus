@@ -3,6 +3,8 @@
  * @noinspection HtmlUnknownTarget
  */
 
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Shop;
 
 use Siel\Acumulus\Helpers\TranslationCollection;
@@ -12,7 +14,7 @@ use Siel\Acumulus\Helpers\TranslationCollection;
  */
 class RegisterFormTranslations extends TranslationCollection
 {
-    protected $nl = [
+    protected array $nl = [
         'register_form_title' => 'Acumulus | Vrijblijvend proefaccount aanmaken',
         'register_form_header' => 'Een vrijblijvend Acumulus proefaccount aanmaken',
         'button_submit_register'=> 'Gratis account aanmaken',
@@ -92,7 +94,7 @@ class RegisterFormTranslations extends TranslationCollection
            Om al afgeronde bestellingen alsnog toe te voegen aan uw administratie, kunt u het batchverzendformulier van deze %1$s gebruiken.',
     ];
 
-    protected $en = [
+    protected array $en = [
         'register_form_title' => 'Acumulus | Apply for a free trial account',
         'register_form_header' => 'Apply for a free trial account for Acumulus',
         'button_submit_register'=> 'Create free account',

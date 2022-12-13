@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Helpers;
 
 /**
@@ -22,10 +25,8 @@ abstract class TranslationCollection
      */
     public function get(string $language): array
     {
-        $result = [];
-        if (isset($this->{$language})) {
-            $result = $this->{$language};
-        }
+        /** @noinspection PhpVariableVariableInspection */
+        $result = $this->$language ?? [];
         if ($language !== 'nl' && isset($this->nl)) {
             $result += $this->nl;
         }

@@ -3,6 +3,8 @@
  * @noinspection HtmlUnknownTarget
  */
 
+declare(strict_types=1);
+
 namespace Siel\Acumulus\OpenCart\Helpers;
 
 use Siel\Acumulus\Helpers\ModuleSpecificTranslations as BaseModuleSpecificTranslations;
@@ -14,7 +16,7 @@ use Siel\Acumulus\Helpers\ModuleSpecificTranslations as BaseModuleSpecificTransl
  */
 class ModuleSpecificTranslations extends BaseModuleSpecificTranslations
 {
-    protected $nl = [
+    protected array $nl = [
         'module' => 'extensie',
         'button_link' => '<a href="%2$s" class="button btn btn-primary"><i class="fa fa-cog"></i> %1$s</a>',
         'config_form_link_text' => 'Instellingen',
@@ -31,7 +33,7 @@ class ModuleSpecificTranslations extends BaseModuleSpecificTranslations
         'vat_classes' => 'belastinggroepen',
     ];
 
-    protected $en = [
+    protected array $en = [
         'module' => 'extension',
         'config_form_link_text' => 'Settings',
         'advanced_form_link_text' => 'Advanced settings',

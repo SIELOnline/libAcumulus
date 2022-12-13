@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Shop;
 
 use Siel\Acumulus\Helpers\TranslationCollection;
@@ -8,7 +11,7 @@ use Siel\Acumulus\Helpers\TranslationCollection;
  */
 class BatchFormTranslations extends TranslationCollection
 {
-    protected $nl = [
+    protected array $nl = [
         'batch_form_title' => 'Acumulus | Batchverzending',
         'batch_form_header' => 'Verzend facturen naar Acumulus',
         'batch_form_link_text' => 'Acumulus batchverzending',
@@ -82,7 +85,7 @@ LONGSTRING
         'plural_is' => 'zijn',
     ];
 
-    protected $en = [
+    protected array $en = [
         'batch_form_title' => 'Acumulus | Send batch',
         'batch_form_header' => 'Send a batch of invoices to Acumulus',
         'batch_form_link_text' => 'Acumulus batch',

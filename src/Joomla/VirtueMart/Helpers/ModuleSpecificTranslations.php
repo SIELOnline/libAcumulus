@@ -3,6 +3,8 @@
  * @noinspection HtmlUnknownTarget
  */
 
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Joomla\VirtueMart\Helpers;
 
 use Siel\Acumulus\Joomla\Helpers\ModuleSpecificTranslations as BaseModuleSpecificTranslations;

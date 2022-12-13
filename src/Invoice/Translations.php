@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Invoice;
 
 use Siel\Acumulus\Helpers\TranslationCollection;
@@ -10,7 +13,7 @@ class Translations extends TranslationCollection
 {
     public const sharedNl = 'De factuur is als concept opgeslagen. In Acumulus zijn deze onder "Overzichten » Concept-facturen / offertes" terug te vinden. Controleer en corrigeer daar de factuur.';
 
-    protected $nl = [
+    protected array $nl = [
         Source::Order => 'bestelling',
         Source::CreditNote => 'creditnota',
         Source::Other => 'overig',
@@ -19,7 +22,7 @@ class Translations extends TranslationCollection
         'plural_CreditNote' => 'creditnota\'s',
         'plural_Other' => 'overige',
         'plural_Order_ref'  => 'bestellingreferenties',
-        'plural_CreditNote_ref' => 'creditnotareferenties',
+        'plural_CreditNote_ref' => 'creditnota-referenties',
         'plural_Order_id'  => 'bestellingnummers',
         'plural_CreditNote_id' => 'creditnotanummers',
 
@@ -55,7 +58,7 @@ class Translations extends TranslationCollection
         'message_warning_no_vattype_must_split' => '%1$s U dient de factuur te splitsen in verschillende factuurtypes.',
         'message_warning_no_vattype_multiple_possible' => '%1$s Waarschijnlijk komt dit door een gebrek aan informatie over de aard van de bestelde artikelen. Het volledig invullen van de "Over uw winkel" instellingen zou kunnen helpen.',
         'message_warning_line_without_vat' => 'Één of meer van de factuurregels hebben geen btw terwijl is ingesteld dat er "Alleen aan btw onderhevige producten en/of diensten" aangeboden worden. ' . self::sharedNl,
-        'message_warning_strategies_failed' => 'Door een fout in uw instellingen of btw tarieven, konden niet alle fatuurregels correct gecompleteerd worden. ' . self::sharedNl,
+        'message_warning_strategies_failed' => 'Door een fout in uw instellingen of btw tarieven, konden niet alle factuurregels correct gecompleteerd worden. ' . self::sharedNl,
         'message_warning_missing_amount_added' => 'Het factuurbedrag klopt niet met het totaal van de regels. Daarom is er een correctieregel toegevoegd met een bedrag (ex. btw) van €%1$.2f en een btw bedrag van €%2$.2f. ' . self::sharedNl,
         'message_warning_missing_amount_warn' => 'Het factuurbedrag klopt niet met het totaal van de regels. %1$s. ' . self::sharedNl,
         'message_warning_missing_amount_spec' => 'het %1$s wijkt €%2$.2f af',
@@ -75,7 +78,7 @@ class Translations extends TranslationCollection
         'eu_commerce_threshold_warning' => 'U zit op %.1f%% van de drempel van verkopen binnen de EU tot aan waar u Nederlandse btw mag berekenen. Begin op tijd aan de voorbereidingen tot het aanpassen van de belastinginstellingen van uw webwinkel en overige verkoopkanalen.',
     ];
 
-    protected $en = [
+    protected array $en = [
         Source::Order => 'order',
         Source::CreditNote => 'credit note',
         Source::Other => 'other',

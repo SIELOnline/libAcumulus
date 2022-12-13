@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Helpers;
 
 /**
@@ -6,7 +9,7 @@ namespace Siel\Acumulus\Helpers;
  */
 class MailTranslations extends TranslationCollection
 {
-    protected $nl = [
+    protected array $nl = [
         // Mails.
         'mail_subject' => 'Factuur verzonden naar Acumulus',
         'mail_subject_concept' => 'Conceptfactuur verzonden naar Acumulus',
@@ -74,7 +77,7 @@ LONGSTRING
             . "\n\nJe kunt support bereiken op: %3\$s\n",
     ];
 
-    protected $en = [
+    protected array $en = [
         // Mails.
         'mail_subject' => 'Invoice sent to Acumulus',
         'mail_subject_concept' => 'Concept invoice sent to Acumulus',

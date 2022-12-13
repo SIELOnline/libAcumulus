@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Shop;
 
 use Siel\Acumulus\Helpers\TranslationCollection;
@@ -8,7 +11,7 @@ use Siel\Acumulus\Helpers\TranslationCollection;
  */
 class InvoiceStatusFormTranslations extends TranslationCollection
 {
-    protected $nl = [
+    protected array $nl = [
         // Invoice status.
         'invoice_form_title' => 'Acumulus',
         'invoice_form_header' => 'Status van de factuur in Acumulus voor deze bestelling',
@@ -70,7 +73,7 @@ class InvoiceStatusFormTranslations extends TranslationCollection
         'set_due' => 'Zet op Niet betaald',
     ];
 
-    protected $en = [
+    protected array $en = [
         // Invoice status.
         'invoice_form_title' => 'Acumulus',
         'invoice_form_header' => 'Status of the invoice in Acumulus for this order',

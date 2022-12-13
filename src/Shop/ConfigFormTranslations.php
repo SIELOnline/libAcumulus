@@ -3,6 +3,8 @@
  * @noinspection HtmlUnknownTarget
  */
 
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Shop;
 
 use Siel\Acumulus\Helpers\TranslationCollection;
@@ -12,7 +14,7 @@ use Siel\Acumulus\Helpers\TranslationCollection;
  */
 class ConfigFormTranslations extends TranslationCollection
 {
-    protected $nl = [
+    protected array $nl = [
         // Titles, headers, links, buttons and messages.
         'config_form_title' => 'Acumulus | Instellingen',
         'config_form_header' => 'Acumulus instellingen',
@@ -419,7 +421,7 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
         'menu_basicSettings' => 'Instellingen → Acumulus',
     ];
 
-    protected $en = [
+    protected array $en = [
         // Titles, headers, links, buttons and messages.
         'config_form_title' => 'Acumulus | Settings',
         'config_form_header' => 'Acumulus settings',

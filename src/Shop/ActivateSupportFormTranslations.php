@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Shop;
 
 use Siel\Acumulus\Helpers\TranslationCollection;
@@ -8,7 +11,7 @@ use Siel\Acumulus\Helpers\TranslationCollection;
  */
 class ActivateSupportFormTranslations extends TranslationCollection
 {
-    protected $nl = [
+    protected array $nl = [
         'activate_form_title' => 'Acumulus | Activeer Pro-support',
         'activate_form_header' => 'Activeer Pro-support voor uw Acumulus webshopkoppeling',
         'activate_form_link_text' => 'Activeer Acumulus pro-support',
@@ -27,7 +30,7 @@ class ActivateSupportFormTranslations extends TranslationCollection
         'message_validate_activate_hostname_changed' => 'De domeinnaam van uw website is anders dan tijdens het invullen van dit formulier.',
    ];
 
-    protected $en = [
+    protected array $en = [
         'activate_form_title' => 'Acumulus | Activate Pro-support',
         'activate_form_header' => 'Activate Pro-support for your Acumulus webshop connector',
         'activate_form_link_text' => 'Activate Acumulus pro-support',

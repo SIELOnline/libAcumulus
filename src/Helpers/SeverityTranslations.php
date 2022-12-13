@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Helpers;
 
 /**
@@ -8,7 +11,7 @@ namespace Siel\Acumulus\Helpers;
  */
 class SeverityTranslations extends TranslationCollection
 {
-    protected $nl = [
+    protected array $nl = [
         Severity::Exception => 'Ernstige fout',
         Severity::Error => 'Fout',
         Severity::Warning => 'Waarschuwing',
@@ -20,7 +23,7 @@ class SeverityTranslations extends TranslationCollection
         'severity_unknown' => 'Onbekend bericht-ernstniveau %d',
     ];
 
-    protected $en = [
+    protected array $en = [
         Severity::Exception => 'Exception',
         Severity::Error => 'Error',
         Severity::Warning => 'Warning',

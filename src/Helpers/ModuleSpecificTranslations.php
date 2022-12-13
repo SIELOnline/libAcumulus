@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Helpers;
 
 /**
@@ -14,6 +17,4 @@ namespace Siel\Acumulus\Helpers;
  */
 class ModuleSpecificTranslations extends TranslationCollection
 {
-    protected $nl = [];
-    protected $en = [];
 }

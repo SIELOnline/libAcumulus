@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Invoice;
 
 use Siel\Acumulus\Helpers\TranslationCollection;
@@ -11,7 +13,7 @@ use Siel\Acumulus\Helpers\TranslationCollection;
  */
 class ResultTranslations extends TranslationCollection
 {
-    protected $nl = [
+    protected array $nl = [
         'message_invoice_send' => '%1$s: %2$s is %3$s',
         'message_invoice_source' => 'Factuur voor %1$s %2$s',
         'message_invoice_reason' => '%1$s (reden: %2$s)',
@@ -38,7 +40,7 @@ class ResultTranslations extends TranslationCollection
         'reason_unknown' => 'onbekende reden: %d',
     ];
 
-    protected $en = [
+    protected array $en = [
         'message_invoice_send' => '%1$s: %2$s was %3$s',
         'message_invoice_source' => 'Invoice for %1$s %2$s',
         'message_invoice_reason' => '%1$s (reason: %2$s)',

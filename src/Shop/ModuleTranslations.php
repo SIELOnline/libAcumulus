@@ -15,7 +15,7 @@ use Siel\Acumulus\Helpers\TranslationCollection;
  */
 class ModuleTranslations extends TranslationCollection
 {
-    protected $nl = [
+    protected array $nl = [
         // Linking into the shop's extension system, standard buttons and
         // messages.
         'shop' => 'Webwinkel',
@@ -59,7 +59,7 @@ class ModuleTranslations extends TranslationCollection
         'crash_admin_message' => 'Er is een fout opgetreden. De foutmelding is gelogd en als mail verstuurd. Als de fout blijft aanhouden neem dan contact op met support. Foutmelding: %s',
     ];
 
-    protected $en = [
+    protected array $en = [
         'shop' => 'Web shop',
         'about_environment' => 'About your webshop',
         'about_error' => 'Error message',

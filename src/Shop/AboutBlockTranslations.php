@@ -1,4 +1,10 @@
 <?php
+/**
+ * @noinspection HtmlUnknownTarget
+ */
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Shop;
 
 use Siel\Acumulus\Helpers\TranslationCollection;
@@ -8,7 +14,7 @@ use Siel\Acumulus\Helpers\TranslationCollection;
  */
 class AboutBlockTranslations extends TranslationCollection
 {
-    protected $nl = [
+    protected array $nl = [
         // About block.
         'informationBlockHeader' => 'Over',
         'informationBlockDescription' => 'Informatie over Acumulus, uw contract, uw support-opties, en uw webshop met deze %1$s',
@@ -70,7 +76,7 @@ LONGSTRING
         'your_name' => '[Uw naam]',
     ];
 
-    protected $en = [
+    protected array $en = [
         // About block.
         'informationBlockHeader' => 'About',
         'informationBlockDescription' => 'Information about Acumulus, your contract, your support options, and your webshop with this %1$s',

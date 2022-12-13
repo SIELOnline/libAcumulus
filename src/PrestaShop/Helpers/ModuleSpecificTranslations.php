@@ -3,6 +3,12 @@
  * @noinspection HtmlUnknownTarget
  */
 
+declare(strict_types=1);
+
+/**
+ * @noinspection HtmlUnknownTarget
+ */
+
 namespace Siel\Acumulus\PrestaShop\Helpers;
 
 use Siel\Acumulus\Helpers\ModuleSpecificTranslations as BaseModuleSpecificTranslations;
@@ -14,7 +20,7 @@ use Siel\Acumulus\Helpers\ModuleSpecificTranslations as BaseModuleSpecificTransl
  */
 class ModuleSpecificTranslations extends BaseModuleSpecificTranslations
 {
-    protected $nl = [
+    protected array $nl = [
         'module' => 'module',
         'button_link' => '<a href="%2$s" class="btn btn-default"><i class="process-icon-cogs"></i>%1$s</a>',
         'button_class' => 'btn btn-primary',
@@ -28,7 +34,7 @@ class ModuleSpecificTranslations extends BaseModuleSpecificTranslations
         'vat_classes' => 'belastingregels',
     ];
 
-    protected $en = [
+    protected array $en = [
         'module' => 'module',
         'menu_advancedSettings' => 'Advanced Parameters → Acumulus advanced settings',
         'menu_basicSettings' => 'Settings → Acumulus → Configure',

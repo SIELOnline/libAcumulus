@@ -3,6 +3,8 @@
  * @noinspection HtmlUnknownTarget
  */
 
+declare(strict_types=1);
+
 namespace Siel\Acumulus\WooCommerce\Helpers;
 
 use Siel\Acumulus\Helpers\ModuleSpecificTranslations as BaseModuleSpecificTranslations;
@@ -14,7 +16,7 @@ use Siel\Acumulus\Helpers\ModuleSpecificTranslations as BaseModuleSpecificTransl
  */
 class ModuleSpecificTranslations extends BaseModuleSpecificTranslations
 {
-    protected $nl = [
+    protected array $nl = [
         'button_link' => '<a href="%2$s" class="button button-primary button-large">%1$s</a>',
         'see_post_meta' => 'Zie de tabel "postmeta" voor posts van het type "order" of "refund"',
         'meta_original_order_for_refund' => 'Post meta-waardes van de oorspronkelijke bestelling, alleen beschikbaar bij credit nota\'s',
@@ -44,7 +46,7 @@ Ook is er een verschil met het 0%%-tarief hieronder, Dit verschil zit hem met na
         'review_url' => 'https://wordpress.org/support/plugin/acumulus/reviews/#new-post',
     ];
 
-    protected $en = [
+    protected array $en = [
         'see_post_meta' => 'See the table "postmeta" for posts of the type "order" of "refund"',
         'meta_original_order_for_refund' => 'Post metadata of the original order, only available with credit notes',
 

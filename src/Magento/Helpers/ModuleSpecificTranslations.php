@@ -3,6 +3,8 @@
  * @noinspection HtmlUnknownTarget
  */
 
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Magento\Helpers;
 
 use Siel\Acumulus\Helpers\ModuleSpecificTranslations as BaseModuleSpecificTranslations;
@@ -14,7 +16,7 @@ use Siel\Acumulus\Helpers\ModuleSpecificTranslations as BaseModuleSpecificTransl
  */
 class ModuleSpecificTranslations extends BaseModuleSpecificTranslations
 {
-    protected $nl = [
+    protected array $nl = [
         'module' => 'extensie',
         'button_link' => '<a href="%2$s" class="action-secondary">%1$s</a>',
         'button_class' => 'action-secondary',
@@ -37,7 +39,7 @@ class ModuleSpecificTranslations extends BaseModuleSpecificTranslations
         'click_to_toggle' => '',
     ];
 
-    protected $en = [
+    protected array $en = [
         'module' => 'extension',
         'menu_advancedSettings' => 'Stores → Other settings → Acumulus Advanced Config',
         'menu_basicSettings' => 'Stores → Other settings → Acumulus Config',

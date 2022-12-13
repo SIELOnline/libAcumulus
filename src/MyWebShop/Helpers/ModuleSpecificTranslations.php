@@ -3,6 +3,8 @@
  * @noinspection HtmlUnknownTarget
  */
 
+declare(strict_types=1);
+
 namespace Siel\Acumulus\MyWebShop\Helpers;
 
 use Siel\Acumulus\Helpers\ModuleSpecificTranslations as BaseModuleSpecificTranslations;
@@ -20,14 +22,14 @@ use Siel\Acumulus\Helpers\ModuleSpecificTranslations as BaseModuleSpecificTransl
  */
 class ModuleSpecificTranslations extends BaseModuleSpecificTranslations
 {
-    protected $nl = [
+    protected array $nl = [
         'button_link' => '<a href="%2$s" class="btn btn-default"><i class="process-icon-cogs"></i>%1$s</a>',
 
         'menu_advancedSettings' => 'Geavanceerde instellingen → Acumulus geavanceerde instellingen',
         'menu_basicSettings' => 'Instellingen → Acumulus → Configureer',
     ];
 
-    protected $en = [
+    protected array $en = [
         'menu_advancedSettings' => 'Advanced Parameters → Acumulus advanced settings',
         'menu_basicSettings' => 'Settings → Acumulus → Configure',
     ];

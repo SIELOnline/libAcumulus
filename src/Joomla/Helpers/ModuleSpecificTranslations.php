@@ -3,6 +3,8 @@
  * @noinspection HtmlUnknownTarget
  */
 
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Joomla\Helpers;
 
 use Siel\Acumulus\Helpers\ModuleSpecificTranslations as BaseModuleSpecificTranslations;
@@ -14,7 +16,7 @@ use Siel\Acumulus\Helpers\ModuleSpecificTranslations as BaseModuleSpecificTransl
  */
 class ModuleSpecificTranslations extends BaseModuleSpecificTranslations
 {
-    protected $nl = [
+    protected array $nl = [
         'module' => 'extensie',
         'button_link' => '<a href="%2$s" class="btn btn-default"><span class="icon-cog"></span> %1$s</a>',
         'button_class' => 'btn btn-primary',
@@ -23,7 +25,7 @@ class ModuleSpecificTranslations extends BaseModuleSpecificTranslations
         'menu_basicSettings' => 'Componenten → Acumulus → Instellingen',
     ];
 
-    protected $en = [
+    protected array $en = [
         'module' => 'extension',
     ];
 }

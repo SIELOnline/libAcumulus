@@ -18,6 +18,7 @@ use Siel\Acumulus\Config\ConfigStore;
 use Siel\Acumulus\Config\ConfigUpgrade;
 use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Config\ShopCapabilities;
+use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Invoice\Completor;
 use Siel\Acumulus\Invoice\CompletorInvoiceLines;
 use Siel\Acumulus\Invoice\CompletorStrategyLines;
@@ -476,10 +477,12 @@ class Container
     }
 
     /**
-     * Returns a collector instance of the given type.
+     * Returns a {@see \Siel\Acumulus\Collectors\Collector} instance of the
+     * given type.
      *
      * @param string $type
-     *   The type of collector requested.
+     *   The (child) type of the {@see \Siel\Acumulus\Collectors\Collector}
+     *   requested.
      *
      * @return \Siel\Acumulus\Collectors\Collector
      */
@@ -487,12 +490,13 @@ class Container
     {
         $arguments = [
             $this->getToken(),
-            $this->getConfig(),
+            $this,
         ];
         switch (strtolower($type)) {
             case 'customer':
             case 'invoice':
             case 'line':
+            case 'address':
             case 'emailAsPdf':
                 $class = ucfirst($type);
                 break;
@@ -501,6 +505,33 @@ class Container
         }
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getInstance($class . 'Collector', 'Collectors', $arguments);
+    }
+
+    /**
+     * Returns a {@see \Siel\Acumulus\Data\AcumulusObject} instance of the
+     * given type.
+     *
+     * @param string $type
+     *   The (child) type of the {@see \Siel\Acumulus\Data\AcumulusObject}
+     *   requested.
+     *
+     * @return \Siel\Acumulus\Data\AcumulusObject
+     */
+    public function createAcumulusObject(string $type): AcumulusObject
+    {
+        switch (strtolower($type)) {
+            case 'customer':
+            case 'invoice':
+            case 'line':
+            case 'address':
+            case 'emailAsPdf':
+                $class = ucfirst($type);
+                break;
+            default;
+                throw new InvalidArgumentException("Unknown collector type $type");
+        }
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return $this->getInstance($class, 'Data', [], true);
     }
 
     public function getEnvironment(): Environment

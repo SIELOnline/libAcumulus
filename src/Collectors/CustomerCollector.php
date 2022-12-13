@@ -9,17 +9,15 @@ use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\AcumulusProperty;
 use Siel\Acumulus\Data\Customer;
 use Siel\Acumulus\Fld;
-use Siel\Acumulus\Helpers\Token;
 
 /**
  * Creates a {@see Customer} object
  */
 class CustomerCollector extends Collector
 {
-    /** @noinspection PhpEnforceDocCommentInspection */
-    public function __construct(Token $token)
+    protected function getAcumulusObjectType(): string
     {
-        parent::__construct(Customer::class, $token);
+        return Customer::class;
     }
 
     /**

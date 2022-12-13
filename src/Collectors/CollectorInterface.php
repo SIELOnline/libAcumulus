@@ -8,8 +8,9 @@ use Siel\Acumulus\Data\AcumulusObject;
 
 /**
  * A Collector collects information from the host environment to place it into
- * an {@see AcumulusObject}. Each child class of {@see AcumulusObject} will have
- * an accompanying Collector class.
+ * an {@see \Siel\Acumulus\Data\AcumulusObject}. Each child class of
+ * {@see \Siel\Acumulus\Data\AcumulusObject} will have an accompanying Collector
+ * class.
  */
 interface CollectorInterface
 {

@@ -6,6 +6,7 @@ namespace Siel\Acumulus\Collectors;
 
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\AcumulusProperty;
+use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Token;
 
 use function is_string;
@@ -14,8 +15,8 @@ use function is_string;
  * Collector is the abstract base class for a collector.
  *
  * It defines a strategy for collecting the requested data by dividing it into
- * This base class divides the collector phase into 2 smaller phases:
- * - Collecting based on pure field mappings.
+ * 2 smaller phases:
+ * - Collecting based on field mappings.
  * - Collecting based on specialised logic that considers the host environment
  *   API and data models and the fields of the target
  *   {@see \Siel\Acumulus\Data\AcumulusObject}.
@@ -27,16 +28,33 @@ use function is_string;
  */
 abstract class Collector implements CollectorInterface
 {
-    protected string $acumulusObjectType;
     protected Token $token;
+    protected Container $container;
     protected array $propertySources;
 
-    /** @noinspection PhpEnforceDocCommentInspection */
-    public function __construct(string $acumulusObjectType, Token $token)
+    public function __construct(Token $token, Container $container)
     {
-        $this->acumulusObjectType = $acumulusObjectType;
         $this->token = $token;
+        $this->container = $container;
     }
+
+    /**
+     * Creates a new {@see \Siel\Acumulus\Data\AcumulusObject} that will
+     * contain the collected values.
+     *
+     * @return \Siel\Acumulus\Data\AcumulusObject
+     *   Returns a new object that is a child class of AcumulusObject.
+     */
+    protected function createAcumulusObject(): AcumulusObject
+    {
+        return $this->container->createAcumulusObject($this->getAcumulusObjectType());
+    }
+
+    /**
+     * Returns the type of {@see \Siel\Acumulus\Data\AcumulusObject} that gets
+     * collected.
+     */
+    abstract protected function getAcumulusObjectType(): string;
 
     /**
      * {@inheritDoc}
@@ -57,19 +75,6 @@ abstract class Collector implements CollectorInterface
     }
 
     /**
-     * Creates a new {@see \Siel\Acumulus\Data\AcumulusObject} that will
-     * contain the collected values.
-     *
-     * @return \Siel\Acumulus\Data\AcumulusObject
-     *   Returns a new object of type {@see $acumulusObjectType}, being a child
-     *   class of AcumulusObject.
-     */
-    protected function createAcumulusObject(): AcumulusObject
-    {
-        return new $this->acumulusObjectType();
-    }
-
-    /**
      * Collects the fields that can be extracted using simple field mappings
      */
     protected function collectMappedFields(AcumulusObject $acumulusObject, array $fieldMappings): void
@@ -82,7 +87,7 @@ abstract class Collector implements CollectorInterface
     /**
      * @param \Siel\Acumulus\Data\AcumulusObject $acumulusObject
      */
-    abstract protected function collectLogicFields(AcumulusObject $acumulusObject);
+    abstract protected function collectLogicFields(AcumulusObject $acumulusObject): void;
 
     /**
      * Expands and sets a possibly dynamic value to an Acumulus object.

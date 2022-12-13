@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\ApiClient;
 
 use RuntimeException;
@@ -8,17 +11,17 @@ use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Util;
 
+use function assert;
+
 /**
- * AcumulusRequest turns a call to {@see \Siel\Acumulus\ApiClient\Acumulus} into
- * an {@see \Siel\Acumulus\ApiClient\HttpRequest}.
+ * AcumulusRequest turns a call to {@see Acumulus} into an {@see HttpRequest}.
  *
  * It offers:
  * - Adding the basic submit structure - contract, connector, testmode, ... - to
  *   create a complete request structure.
  * - Conversion from the request structure array to XML.
  * - Sending the request.
- * - Creating the {@see \Siel\Acumulus\ApiClient\AcumulusResult} from the
- *   {@see \Siel\Acumulus\ApiClient\HttpResponse}.
+ * - Creating the {@see AcumulusResult} from the {@see HttpResponse}.
  * - Good error handling, including:
  *     - Detecting HTML responses from the proxy before the actual web service.
  *     - Detecting XML responses when an error occurred before the <format> was
@@ -27,16 +30,16 @@ use Siel\Acumulus\Helpers\Util;
  */
 class AcumulusRequest
 {
-    protected /*Container*/ $container;
-    protected /*Config*/ $config;
-    protected /*Environment*/ $environment;
+    protected Container $container;
+    protected Config $config;
+    protected Environment $environment;
 
-    protected /*Util*/ $util;
-    protected /*string*/ $userLanguage;
+    protected Util $util;
+    protected string $userLanguage;
 
-    protected /*?string*/ $uri = null;
-    protected /*?array*/ $submit = null;
-    protected /*?HttpRequest*/ $httpRequest = null;
+    protected ?string $uri = null;
+    protected ?array $submit = null;
+    protected ?HttpRequest $httpRequest = null;
 
     public function __construct(Container $container, Config $config, Environment $environment, Util $util, string $userLanguage)
     {
@@ -62,8 +65,7 @@ class AcumulusRequest
      *
      * The full submit structure consists of the:
      * - basic submit: see {@link https://www.siel.nl/acumulus/API/Basic_Submit/}.
-     * - submit: the API call specific part as passed to
-     *   {@see \Siel\Acumulus\TestWebShop\TestDoubles\ApiClient\AcumulusRequest::execute()}.
+     * - submit: the API call specific part as passed to {@see execute()}.
      *
      * @return array|null
      *    The full submit structure as has been sent to Acumulus, or null if
@@ -81,6 +83,8 @@ class AcumulusRequest
      *   e.g, to create test input.
      * - We mask all values that have 'password' in their key, so we can safely
      *   log it.
+     *
+     * @throws \JsonException
      */
     public function getMaskedRequest(): string
     {
@@ -89,7 +93,7 @@ class AcumulusRequest
         if ($submit !== null) {
             $submit = $this->util->maskArray($this->getSubmit());
         }
-        return sprintf("Request: uri=%s\nsubmit=%s", $uri ?? 'null', json_encode($submit, JSON_PRETTY_PRINT));
+        return sprintf("Request: uri=%s\nsubmit=%s", $uri ?? 'null', json_encode($submit, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT));
     }
 
     /**
@@ -106,22 +110,21 @@ class AcumulusRequest
      *   API functions do, but for some general listing functions, like vat
      *   info, it is optional, and for signUp it is even not allowed.
      *
-     * @return \Siel\Acumulus\ApiClient\AcumulusResult
+     * @return AcumulusResult
      *   The result of the web service call. See
      *   {@link https://www.siel.nl/acumulus/API/Basic_Response/} for the
      *   structure of a response. In case of errors, an exception or error
      *   message will have been added to the Result and the main response may be
      *   empty.
      *
-     * @throws \Siel\Acumulus\ApiClient\AcumulusException|\Siel\Acumulus\ApiClient\AcumulusResponseException
+     * @throws AcumulusException|AcumulusResponseException
      *   An error occurred:
      *   - At the internal level, e.g. an out of memory error.
      *   - At the communication level, e.g. time-out or no response received.
-     *   - While converting the {@see \Siel\Acumulus\ApiClient\HttpResponse}
-     *     into an {@see \Siel\Acumulus\ApiClient\AcumulusResult}.
-     *     This conversion is done during the construction of the
-     *     {@see \Siel\Acumulus\ApiClient\AcumulusResult}, so no result object
-     *     will be created in the case of errors.
+     *   - While converting the {@see HttpResponse} into an
+     *     {@see AcumulusResult}. This conversion is done during the
+     *     construction of the {@see AcumulusResult}, so no result object will
+     *     be created in the case of errors.
      *   Note that errors at the application level will not be thrown as an
      *   exception, but will have to be handled by the calling code.
      */
@@ -153,9 +156,9 @@ class AcumulusRequest
      * POST request in multipart/form-data format. Note: by passing an array to
      * Curl, we let Curl do the formatting and encoding.
      *
-     * @return \Siel\Acumulus\ApiClient\HttpResponse
+     * @return HttpResponse
      *
-     * @throws \Siel\Acumulus\ApiClient\AcumulusException
+     * @throws AcumulusException
      *   An error occurred at:
      *   - The internal level, e.g. an out of memory error.
      *   - The communication level, e.g. time-out or no response received.

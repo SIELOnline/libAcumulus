@@ -1,7 +1,17 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\ApiClient;
 
 use RuntimeException;
+
+use function assert;
+use function define;
+use function defined;
+use function in_array;
+use function is_string;
+use function strlen;
 
 /**
  * HttpCommunicator implements the communication with the Acumulus web API at the
@@ -15,15 +25,15 @@ use RuntimeException;
  */
 class HttpRequest
 {
-    protected /*?string*/ $method = null;
-    protected /*?string*/ $uri = null;
-    protected /*array*/ $options = [];
+    protected ?string $method = null;
+    protected ?string $uri = null;
+    protected array $options = [];
     /**
      * @var array|string|null
-     *   See {@see HttpRequest::getBody()}.
+     *   See {@see getBody()}.
      */
-    protected $body = null;
-    protected /*?HttpResponse*/ $httpResponse = null;
+    protected $body;
+    protected ?HttpResponse $httpResponse = null;
 
     /**
      * Constructor.
@@ -82,8 +92,10 @@ class HttpRequest
      * of exceptions thrown during the execution of this request or the
      * processing of it.
      *
-     * @return \Siel\Acumulus\ApiClient\HttpResponse|null
+     * @return HttpResponse|null
      *   The result of this request, or null if not yet executed.
+     *
+     * @noinspection PhpUnused
      */
     public function getHttpResponse(): ?HttpResponse
     {
@@ -96,7 +108,7 @@ class HttpRequest
      * @param string $uri
      *   The uri to send the HTTP request to.
      *
-     * @return \Siel\Acumulus\ApiClient\HttpResponse
+     * @return HttpResponse
      *
      * @throws \RuntimeException
      *   An error occurred at:
@@ -120,7 +132,7 @@ class HttpRequest
      *   - An url-encoded string that contains all the POST values.
      *   - Null when the body is to remain empty (mostly for GET requests).
      *
-     * @return \Siel\Acumulus\ApiClient\HttpResponse
+     * @return HttpResponse
      *
      * @throws \RuntimeException
      *   An error occurred at:
@@ -147,7 +159,7 @@ class HttpRequest
      *   - An url-encoded string that contains all the POST values.
      *   - Null when the body is to remain empty (mostly for GET requests).
      *
-     * @return \Siel\Acumulus\ApiClient\HttpResponse
+     * @return HttpResponse
      *  The HTTP response.
      *
      * @throws \RuntimeException
@@ -172,8 +184,7 @@ class HttpRequest
     }
 
     /**
-     * Executes an HTTP request using Curl and returns the
-     * {@see \Siel\Acumulus\ApiClient\HttpResponse}.
+     * Executes an HTTP request using Curl and returns the {@see HttpResponse}.
      *
      * All details regarding the fact we are using Curl are contained in this
      * single method (except perhaps, the info array passed to the HttpResponse
@@ -181,7 +192,7 @@ class HttpRequest
      * to be able to unit test this class (by just mocking this 1 method) while
      * not going so far as to inject a "communication library".
      *
-     * @return \Siel\Acumulus\ApiClient\HttpResponse
+     * @return HttpResponse
      *
      * @throws \RuntimeException
      *   An error occurred at the Curl - e.g. memory error - or communication
@@ -302,7 +313,8 @@ class HttpRequest
     {
         $curlVersion = curl_version();
         $code = curl_errno($handle);
-        $message = sprintf('%s (curl: %s): %d - %s', $function, $curlVersion['version'], $code, curl_error($handle));
+        /** @noinspection OffsetOperationsInspection */
+        $message = sprintf('%s (curl: %s): %d - %s', $function, $curlVersion['version'] ?? 'unknown', $code, curl_error($handle));
         $this->closeHandle();
         throw new RuntimeException($message, $code);
     }

@@ -1,5 +1,10 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\ApiClient;
+
+use function count;
 
 /**
  * Class HttpResponse contains an HTTP response: http code, (response) headers,
@@ -8,11 +13,11 @@ namespace Siel\Acumulus\ApiClient;
  */
 class HttpResponse
 {
-    protected /*string*/ $headers;
-    protected /*array*/ $parsedHeaders = [];
-    protected /*string*/ $body;
-    protected /*array*/ $info;
-    protected /*HttpRequest*/ $request;
+    protected string $headers;
+    protected array $parsedHeaders = [];
+    protected string $body;
+    protected array $info;
+    protected HttpRequest $request;
 
     public function __construct(string $headers, string $body, array $info, HttpRequest $request)
     {
@@ -67,7 +72,7 @@ class HttpResponse
                 if (!empty($headerLine)) {
                     $parts = explode(':', $headerLine, 2);
                     if (count($parts) === 2) {
-                        $this->parsedHeaders[trim(strtolower($parts[0]))] = trim($parts[1]);
+                        $this->parsedHeaders[strtolower(trim($parts[0]))] = trim($parts[1]);
                     } else {
                         $this->parsedHeaders['status-line'] = $headerLine;
                     }
@@ -117,9 +122,8 @@ class HttpResponse
      * Returns the set of HTTP request headers.
      *
      * The headers sent with the request are only known after executing the
-     * request and are, therefore, made part of this
-     * {@see \Siel\Acumulus\ApiClient\HttpResponse} class, not of the
-     * {@see \Siel\Acumulus\ApiClient\HttpRequest} class.
+     * request and are, therefore, made part of this {@see HttpResponse} class,
+     * not of the {@see HttpRequest} class.
      *
      * As for now there's not a great use for inspecting the headers, we return
      * the header as a string and leave processing it up to the calling side.
@@ -135,10 +139,10 @@ class HttpResponse
     }
 
     /**
-     * Returns the {@see \Siel\Acumulus\ApiClient\HttpRequest} that was executed
-     * to get this {@see \Siel\Acumulus\ApiClient\HttpResponse}.
+     * Returns the {@see HttpRequest} that was executed to get this
+     * {@see HttpResponse}.
      *
-     * @return \Siel\Acumulus\ApiClient\HttpRequest
+     * @return HttpRequest
      *   The HttpRequest belonging that lead to this response.
      */
     public function getRequest(): HttpRequest

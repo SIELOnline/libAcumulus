@@ -1,7 +1,12 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\ApiClient;
 
 use RuntimeException;
+
+use function is_array;
 
 /**
  * ConnectionHandler handles HTTP connections.
@@ -17,7 +22,7 @@ use RuntimeException;
  */
 class ConnectionHandler
 {
-    private static /*?ConnectionHandler*/ $instance = null;
+    private static ?ConnectionHandler $instance = null;
 
     /**
      * Singleton pattern.
@@ -37,13 +42,15 @@ class ConnectionHandler
     /**
      * @var resource[] (PHP8: CurlHandle[])
      */
-    protected /*array*/ $curlHandles = [];
+    protected array $curlHandles = [];
 
     /**
      * Protected constructor: use
-     * {@see \Siel\Acumulus\ApiClient\ConnectionHandler::getInstance()}.
+     * {@see getInstance()}.
      */
-    protected function __construct() {}
+    protected function __construct()
+    {
+    }
 
     /**
      * Closes all open Curl handles.
@@ -84,8 +91,7 @@ class ConnectionHandler
                 unset($this->curlHandles[$key]);
                 throw new RuntimeException(__METHOD__ . "($uri): curl_init() failed");
             }
-        }
-        else {
+        } else {
             // We can reuse the handle, but reset the options.
             curl_reset($this->curlHandles[$key]);
         }

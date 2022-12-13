@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\ApiClient;
 
 use RuntimeException;
@@ -9,8 +12,7 @@ use RuntimeException;
  *
  * It can be:
  * - A caught and repacked {@see \RuntimeException} from the
- *   {@see \Siel\Acumulus\ApiClient\HttpRequest} (or
- *   {@see \Siel\Acumulus\ApiClient\HttpResponse}).
+ *   {@see HttpRequest} (or {@see HttpResponse}).
  * - An exception that occurred during format conversion on a place that does
  *   not have access to the http request or response. To log the exception
  *   together with the request and, if any, received response, these

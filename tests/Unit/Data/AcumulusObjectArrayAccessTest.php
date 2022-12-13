@@ -1,7 +1,10 @@
 <?php
 /**
+ * @noinspection PhpMissingDocCommentInspection
  * @noinspection PhpStaticAsDynamicMethodCallInspection
  */
+
+declare(strict_types=1);
 
 namespace Siel\Acumulus\Tests\Unit\Data;
 
@@ -15,7 +18,7 @@ class AcumulusObjectArrayAccessTest extends TestCase
     private const nature = 'nature';
     private const unitPrice = 'unitPrice';
 
-    public function testIsset()
+    public function testIsset(): void
     {
         $ao = new SimpleTestObject();
         $this->assertFalse(isset($ao[self::itemNumber]));
@@ -23,7 +26,7 @@ class AcumulusObjectArrayAccessTest extends TestCase
         $this->assertFalse(isset($ao[self::unitPrice]));
     }
 
-    public function testGetEmpty()
+    public function testGetEmpty(): void
     {
         $ao = new SimpleTestObject();
         $this->assertNull($ao[self::itemNumber]);
@@ -31,7 +34,7 @@ class AcumulusObjectArrayAccessTest extends TestCase
         $this->assertNull($ao[self::unitPrice]);
     }
 
-    public function testSetThenGetThenUnset()
+    public function testSetThenGetThenUnset(): void
     {
         $value1 = 'PRD0001';
         $value2 = Api::Nature_Product;

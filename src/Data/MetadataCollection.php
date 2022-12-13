@@ -85,6 +85,8 @@ class MetadataCollection
     }
 
     /**
+     * @todo: has this a use outside testing?
+     *
      * @return string[]
      */
     public function getKeys(): array

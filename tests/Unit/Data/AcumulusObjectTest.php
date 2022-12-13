@@ -1,7 +1,10 @@
 <?php
 /**
+ * @noinspection PhpMissingDocCommentInspection
  * @noinspection PhpStaticAsDynamicMethodCallInspection
  */
+
+declare(strict_types=1);
 
 namespace Siel\Acumulus\Tests\Unit\Data;
 
@@ -10,21 +13,19 @@ use RuntimeException;
 use Siel\Acumulus\Api;
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Data\AcumulusProperty;
-use Siel\Acumulus\Data\MetadataCollection;
 use Siel\Acumulus\Tests\TestWebShop\Data\SimpleTestObject;
 
 class AcumulusObjectTest extends TestCase
 {
-    public function testConstructor1()
+    public function testConstructor1(): void
     {
         $ao = new SimpleTestObject();
         $this->assertNull($ao->itemNumber);
         $this->assertNull($ao->nature);
         $this->assertNull($ao->unitPrice);
-        $this->assertInstanceOf(MetadataCollection::class, $ao->getMetadata());
     }
 
-    public function testConstructor2()
+    public function testConstructor2(): void
     {
         $this->expectException(RuntimeException::class);
         $ao = new SimpleTestObject();
@@ -33,7 +34,7 @@ class AcumulusObjectTest extends TestCase
         $v = $ao->notExisting;
     }
 
-    public function testSetAndGetProperties()
+    public function testSetAndGetProperties(): void
     {
         $ao = new SimpleTestObject();
         $this->assertFalse(isset($ao->itemNumber));
@@ -55,7 +56,7 @@ class AcumulusObjectTest extends TestCase
         $this->assertSame($value3, $ao->unitPrice);
     }
 
-    public function testUnsetProperties()
+    public function testUnsetProperties(): void
     {
         $ao = new SimpleTestObject();
         $this->assertFalse(isset($ao->itemNumber));
@@ -70,7 +71,7 @@ class AcumulusObjectTest extends TestCase
         $this->assertNull($ao->itemNumber);
     }
 
-    public function testSetterAndGetter()
+    public function testSetterAndGetter(): void
     {
         $ao = new SimpleTestObject();
         $this->assertNull($ao->getItemNumber());
@@ -110,15 +111,16 @@ class AcumulusObjectTest extends TestCase
         $this->assertSame($value6, $ao->getUnitPrice());
     }
 
-    public function testArgumentsException1()
+    public function testArgumentsException1(): void
     {
         $this->expectException(LogicException::class);
         $ao = new SimpleTestObject();
         /** @noinspection PhpUnusedLocalVariableInspection */
+        /** @noinspection PhpMethodParametersCountMismatchInspection */
         $v = $ao->getUnitPrice(1);
     }
 
-    public function testArgumentsException2()
+    public function testArgumentsException2(): void
     {
         $this->expectException(LogicException::class);
         $ao = new SimpleTestObject();
@@ -127,7 +129,7 @@ class AcumulusObjectTest extends TestCase
         $v = $ao->setUnitPrice();
     }
 
-    public function testArgumentsException3()
+    public function testArgumentsException3(): void
     {
         $this->expectException(LogicException::class);
         $ao = new SimpleTestObject();

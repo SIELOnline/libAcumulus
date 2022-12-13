@@ -1,17 +1,19 @@
 <?php
 /**
+ * @noinspection PhpMissingDocCommentInspection
  * @noinspection PhpStaticAsDynamicMethodCallInspection
  */
+
+declare(strict_types=1);
 
 namespace Siel\Acumulus\Tests\Unit\Data;
 
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Data\MetadataValue;
-use Siel\Acumulus\Tests\TestWebShop\Data\SimpleTestObject;
 
 class MetadataValueTest extends TestCase
 {
-    public function testEmpty()
+    public function testEmpty(): void
     {
         $mdv = new MetadataValue();
         $this->assertSame(0, $mdv->count());
@@ -19,7 +21,7 @@ class MetadataValueTest extends TestCase
         $this->assertSame('null', (string) $mdv);
     }
 
-    public function test1Value()
+    public function test1Value(): void
     {
         $value1 = 'value1';
         $value2 = 2;
@@ -34,7 +36,17 @@ class MetadataValueTest extends TestCase
         $this->assertSame((string) $value2, (string) $mdv);
     }
 
-    public function testMultipleValues()
+    public function testNullValue(): void
+    {
+        $value1 = null;
+
+        $mdv = new MetadataValue($value1);
+        $this->assertSame(1, $mdv->count());
+        $this->assertNull($mdv->get());
+        $this->assertSame('null', (string) $mdv);
+    }
+
+    public function testMultipleValues(): void
     {
         $value1 = 'value1';
         $value2 = 2;
@@ -46,7 +58,7 @@ class MetadataValueTest extends TestCase
         $this->assertJsonStringEqualsJsonString('["value1",2]', (string) $mdv);
     }
 
-    public function testAdd()
+    public function testAdd(): void
     {
         $value1 = 'value1';
         $value2 = 2;

@@ -1,7 +1,10 @@
 <?php
 /**
+ * @noinspection PhpMissingDocCommentInspection
  * @noinspection PhpStaticAsDynamicMethodCallInspection
  */
+
+declare(strict_types=1);
 
 namespace Siel\Acumulus\Tests\Unit\Data;
 
@@ -13,47 +16,47 @@ use PHPUnit\Framework\TestCase;
 class AcumulusPropertyTest extends TestCase
 {
 
-    public function testConstructorValidationName1()
+    public function testConstructorValidationName1(): void
     {
         $this->expectException(DomainException::class);
         $pd = ['type' => 'int', 'allowedValues' => [1,2]];
         new AcumulusProperty($pd);
     }
 
-    public function testConstructorValidationName2()
+    public function testConstructorValidationName2(): void
     {
         $this->expectException(DomainException::class);
         $pd = ['name' => 3, 'type' => 'int', 'allowedValues' => [1,2]];
         new AcumulusProperty($pd);
     }
 
-    public function testConstructorValidationType()
+    public function testConstructorValidationType(): void
     {
         $this->expectException(DomainException::class);
         $pd = ['name' => 'property', 'type' => 'error', 'allowedValues' => [1,2]];
         new AcumulusProperty($pd);
     }
 
-    public function testConstructorValidationRequired()
+    public function testConstructorValidationRequired(): void
     {
         $this->expectException(DomainException::class);
         $pd = ['name' => 'property', 'type' => 'int', 'required' => 1, 'allowedValues' => [1,2]];
         new AcumulusProperty($pd);
     }
 
-    public function testConstructorValidationAllowedValues()
+    public function testConstructorValidationAllowedValues(): void
     {
         $this->expectException(DomainException::class);
         $pd = ['name' => 'property', 'type' => 'int', 'required' => true, 'allowedValues' => true];
         new AcumulusProperty($pd);
     }
 
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $pd = ['name' => 'property', 'type' => 'int', 'required' => true, 'allowedValues' => [1,2]];
         $p = new AcumulusProperty($pd);
         $this->assertSame('property', $p->getName());
-        $this->assertSame(true, $p->isRequired());
+        $this->assertTrue($p->isRequired());
         $this->assertNull($p->getValue());
     }
 
@@ -74,7 +77,7 @@ class AcumulusPropertyTest extends TestCase
     /**
      * @dataProvider setValueDataProvider
      */
-    public function testSetValue(string $type, $value, $castValue)
+    public function testSetValue(string $type, $value, $castValue): void
     {
         $pd = ['name' => 'property', 'type' => $type];
         $p = new AcumulusProperty($pd);
@@ -88,15 +91,15 @@ class AcumulusPropertyTest extends TestCase
         $floatNow = ((float) $now) + 0.5;
         return [
             'date-string' => ['date', '2022-09-01', DateTime::createFromFormat('Y-m-d', '2022-09-01')->setTime(0, 0, 0)],
-            'date-int' => ['date', $now, DateTime::createFromFormat('U', $now)->setTime(0, 0, 0)],
-            'date-float' => ['date', $floatNow, DateTime::createFromFormat('U.u', $floatNow)->setTime(0, 0, 0)],
+            'date-int' => ['date', $now, DateTime::createFromFormat('U', (string) $now)->setTime(0, 0, 0)],
+            'date-float' => ['date', $floatNow, DateTime::createFromFormat('U.u', (string) $floatNow)->setTime(0, 0, 0)],
         ];
     }
 
     /**
      * @dataProvider setDateValueDataProvider
      */
-    public function testDateSetValue(string $type, $value, $castValue)
+    public function testDateSetValue(string $type, $value, $castValue): void
     {
         $pd = ['name' => 'property', 'type' => $type];
         $p = new AcumulusProperty($pd);
@@ -123,7 +126,7 @@ class AcumulusPropertyTest extends TestCase
     /**
      * @dataProvider setValueWrongTypeDataProvider
      */
-    public function testSetValueWrongValue(string $type, $value)
+    public function testSetValueWrongValue(string $type, $value): void
     {
         $this->expectException(DomainException::class);
         $pd = ['name' => 'property', 'type' => $type];
@@ -131,7 +134,7 @@ class AcumulusPropertyTest extends TestCase
         $p->setValue($value);
     }
 
-    public function testSetValueNotAllowedValue()
+    public function testSetValueNotAllowedValue(): void
     {
         $this->expectException(DomainException::class);
         $pd = ['name' => 'property', 'type' => 'int', 'allowedValues' => [1,2]];

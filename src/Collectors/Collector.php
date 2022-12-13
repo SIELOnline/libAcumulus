@@ -17,11 +17,12 @@ use function is_string;
  * This base class divides the collector phase into 2 smaller phases:
  * - Collecting based on pure field mappings.
  * - Collecting based on specialised logic that considers the host environment
- *   API and data models and the fields of the target {@see AcumulusObject}.
+ *   API and data models and the fields of the target
+ *   {@see \Siel\Acumulus\Data\AcumulusObject}.
  *
  * Child classes should typically do the following:
- * - Pass the type of the {@see AcumlusObject} to be collected and returned to
- *   the parent constructor.
+ * - Pass the type of the {@see \Siel\Acumulus\Data\AcumulusObject} to be
+ *   collected and returned to the parent constructor.
  * - Define the logic based phase by implementing {@see collectLogicFields()}.
  */
 abstract class Collector implements CollectorInterface
@@ -44,7 +45,7 @@ abstract class Collector implements CollectorInterface
      * - Collecting based on simple field mappings.
      * - Collecting based on specialised logic that can use all the API methods
      *   and data models of the host environment to get the (missing) values for
-     *   the fields of the target {@see AcumulusObject}.
+     *   the fields of the target {@see \Siel\Acumulus\Data\AcumulusObject}.
      */
     public function collect(array $propertySources, array $fieldDefinitions): AcumulusObject
     {
@@ -60,7 +61,8 @@ abstract class Collector implements CollectorInterface
      * contain the collected values.
      *
      * @return \Siel\Acumulus\Data\AcumulusObject
-     *   Returns a new child class object
+     *   Returns a new object of type {@see $acumulusObjectType}, being a child
+     *   class of AcumulusObject.
      */
     protected function createAcumulusObject(): AcumulusObject
     {
@@ -69,8 +71,6 @@ abstract class Collector implements CollectorInterface
 
     /**
      * Collects the fields that can be extracted using simple field mappings
-     * @param \Siel\Acumulus\Data\AcumulusObject $acumulusObject
-     * @param array $fieldMappings
      */
     protected function collectMappedFields(AcumulusObject $acumulusObject, array $fieldMappings): void
     {

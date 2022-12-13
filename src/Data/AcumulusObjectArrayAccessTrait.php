@@ -1,6 +1,6 @@
 <?php
 /**
- * @noinspection PhpUnused  The methods here are part of an interface tha maps
+ * noinspection PhpUnused  The methods here are part of an interface tha maps
  *   array access syntax to these methods, so they will never be called
  *   directly, only internally in this trait.
  */
@@ -20,7 +20,7 @@ use RuntimeException;
  * transformed, we do implement the array acces way. However, we do so in a
  * separate trait as, eventually, we want to convert all usages of array access
  * to property access, direct or via a getter or setter, or the ominous
- * {@see AcumulusObject::set} method, and remove this code.
+ * {@see AcumulusObject::set()} method, and remove this code.
  *
  * Note: as the old Acumulus arrays are already strict string key based arrays,
  * we don't allow numeric or null offsets.
@@ -98,9 +98,11 @@ trait AcumulusObjectArrayAccessTrait
     }
 
     /**
-     * @param $offset
+     * @param mixed $offset
+     *   We only allow string-keyed access, thus this should be a string. If not
+     *   a {@see \RuntimeException} will be thrown.
      *
-     * @return void
+     * @throws \RuntimeException
      */
     private function checkOffset($offset): void
     {

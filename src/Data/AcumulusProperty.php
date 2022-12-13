@@ -148,7 +148,7 @@ class AcumulusProperty
      */
     public function setValue($value, int $mode = AcumulusProperty::Set_Always): bool
     {
-        if ($value === 'null') {
+        if ($value === null || $value === 'null') {
             $value = null;
         } else {
             switch ($this->type) {
@@ -161,7 +161,7 @@ class AcumulusProperty
                         throw new DomainException("$this->name: not a valid $this->type: " . var_export($value, true));
                     }
                     $iResult = (int) round($value);
-                    if (($this->type === 'id' && $iResult <= 0) || !Number::floatsAreEqual($iResult, $value, 0.0002)) {
+                    if (($this->type === 'id' && $iResult <= 0) || !Number::floatsAreEqual($iResult, (float) $value, 0.0002)) {
                         throw new DomainException("$this->name: not a valid $this->type value: " . var_export($value, true));
                     }
                     $value = $iResult;
@@ -177,9 +177,9 @@ class AcumulusProperty
                     if (is_string($value)) {
                         $date = DateTime::createFromFormat(Api::DateFormat_Iso, substr($value, 0, strlen('2000-01-01')));
                     } elseif (is_int($value)) {
-                        $date = DateTime::createFromFormat('U', $value);
+                        $date = DateTime::createFromFormat('U', (string) $value);
                     } elseif (is_float($value)) {
-                        $date = DateTime::createFromFormat('U.u', $value);
+                        $date = DateTime::createFromFormat('U.u', (string) $value);
                     } elseif ($value instanceof DateTime) {
                         $date = $value;
                     }

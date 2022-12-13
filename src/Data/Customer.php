@@ -100,8 +100,7 @@ use Siel\Acumulus\Api;/**
  * Field names are copied from the API, though capitals are introduced for
  * readability (and to prevent PhpStorm typo inspections).
  *
- * Metadata can be added via the {@see \Siel\Acumulus\Data\MetadataCollection}
- * interface.
+ * Metadata can be added via the {@see MetadataCollection} methods.
  */
 class Customer extends AcumulusObject
 {

@@ -13,21 +13,42 @@ use function count;
 use function strlen;
 
 /**
- * AcumulusObject represents an Acumulus API call message structure.
+ * AcumulusObjects represent Acumulus API message structures.
  *
- * The structure may be a part of a full API call message structure, e.g. the
- * parts 'contract' and 'connector' of the basic submit structure are
+ * An AcumulusObject may represent only a part of a full API message structure,
+ * e.g. the parts 'contract' and 'connector' of the basic submit structure are
  * represented as separate objects here.
  *
+ * AcumulusObjects are made of:
+ * - Elements of the message are represented by
+ *   {@see AcumulusProperty AcumulusProperties}: a single (scalar) value data
+ *   container that will check and cast values.
+ * - Repeating elements are represented by an array of sub-AcumulusObjects.
+ * - The Acumulus API accepts messages with additional fields, it just ignores
+ *   them. We use this to add metadata, data that is thus not part of the
+ *   specified message structure but contains additional information used in
+ *   later stages, logging, or debugging.
+ *
+ * AcumulusObjects are easy to use:
+ * - All message elements are accessible as a (magic) property: you can read,
+ *   write, and unset them.
+ * - They are also accessible via (magic) getters and setters methods.
+ * - And they can be set via the {@see set()} method.
+ * - Metadata is easily added via the {@see MetadataCollection} interface.
+ * - For backwards compatibility, accessing elements is also possible via array
+ *   access syntax.
  * In some parts of the Acumulus API specification, not sending a tag differs in
  * meaning from sending that tag with no value:
- * - In the 'customer' part of the Data add call this is  handled as leaving
- *   an existing value as is vs clearing an existing value.
+ * - In the 'customer' part of the Data add call this is handled as leaving an
+ *   existing value as is vs clearing an existing value.
  * - Tags having a default value can be given that default value by not sending
  *   that tag, not by sending that tag without value.
- *
- * Therefore, {@see AcumulusObject} and {@see AcumulusProperty} will handle not
- * set values and empty values differently.
+ * Therefore:
+ * - {@see AcumulusObject} and {@see AcumulusProperty} will handle not set
+ *   values and empty values differently
+ * - The (magic) setters and the {@see set()} method accept an optional flag
+ *   that defines how toh andle overwriting already set values and if to set
+ *   empty values.
  */
 abstract class AcumulusObject implements ArrayAccess
 {
@@ -41,7 +62,7 @@ abstract class AcumulusObject implements ArrayAccess
      */
     protected static array $propertyDefinitions = [];
 
-    /** @var \Siel\Acumulus\Data\AcumulusProperty[] $data */
+    /** @var \Siel\Acumulus\Data\AcumulusProperty[] */
     private array $data = [];
     private MetadataCollection $metadata;
 
@@ -140,7 +161,7 @@ abstract class AcumulusObject implements ArrayAccess
     /**
      * Implements direct property unset access , but only for
      * {@see AcumulusProperty}s, not properties referring to another
-     * {@see Acumulusobject}, nor {@see MetadataCollection} properties.
+     * {@see AcumulusObject}, nor {@see MetadataCollection} properties.
      *
      * @param string $name
      *   The name of the property
@@ -155,7 +176,7 @@ abstract class AcumulusObject implements ArrayAccess
     }
 
     /**
-     * Returns whether $name is an {@see AcumulusPorperty} of this
+     * Returns whether $name is an {@see AcumulusProperty} of this
      * {@see AcumulusObject}
      */
     protected function isProperty(string $name): bool

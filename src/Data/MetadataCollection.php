@@ -4,21 +4,23 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Data;
 
+use function array_key_exists;
+
 /**
  * MetadataCollection represents a collection of {@see MetadataValue}s.
  */
 class MetadataCollection
 {
-    /** @var \Siel\Acumulus\Data\MetadataValue[]  */
+    /** @var MetadataValue[]  */
     private array $metadata = [];
 
     public function exists(string $name): bool
     {
-        return isset($this->metadata[$name]);
+        return array_key_exists($name, $this->metadata);
     }
 
     /**
-     * Returns the MetadataValue for $name, or null if not set.
+     * Returns the {@see MetadataValue} object for $name, or null if not set.
      */
     public function get(string $name): ?MetadataValue
     {
@@ -33,9 +35,8 @@ class MetadataCollection
      * distinguish these 2 situations. For these cases, use
      * {@see MetadataValue::count()}.
      *
-     * @param string $name
-     *
      * @return mixed|null
+     *   The value for the given metadata name, or null if not set.
      */
     public function getValue(string $name)
     {
@@ -56,7 +57,7 @@ class MetadataCollection
      *
      * @param string $name
      *   The name for the metadata field.
-     * @param $value
+     * @param mixed $value
      *   The value for the metadata field.
      */
     public function set(string $name, $value): void
@@ -67,15 +68,15 @@ class MetadataCollection
     /**
      * Adds a value to a metadata field, creating it if it not already exists.
      *
-     * If the metadata name does not already exist, it will be set to this value.
-     * If the metadata name already exists and has 1 value, the metadata value
-     * will be changed to an array with its current value and this value as
-     * entries. If the metadata name has already multiple values, this value will
-     * be added to the set of values (without checking for double entries).
+     * - If the metadata name does not already exist, it will be set to this
+     *   value.
+     * - If the metadata name already exists, this value will be added to it
+     *   (without checking for double entries). A metadata field can thus
+     *   contain multiple values.
      *
      * @param string $name
      *   The name for the metadata field.
-     * @param $value
+     * @param mixed $value
      *   The value to add to (or set for) the metadata field.
      */
     public function add(string $name, $value): void

@@ -94,7 +94,7 @@ class AcumulusPropertyTest extends TestCase
     }
 
     /**
-     * @dataProvider setValueDataProvider
+     * @dataProvider setDateValueDataProvider
      */
     public function testDateSetValue(string $type, $value, $castValue)
     {

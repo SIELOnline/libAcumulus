@@ -16,11 +16,11 @@ interface CollectorInterface
     /**
      * Populates and returns an {@see \Siel\Acumulus\Data\AcumulusObject}.
      *
-     * - Creates an {@see AcumulusObject}.
+     * - Creates an {@see \Siel\Acumulus\Data\AcumulusObject}.
      * - Populates its fields as far as possible.
      * - Adds metadata that might be used in the completor phase, or for logging
      *   or support.
-     * - Returns the {@see AcumulusObject}.
+     * - Returns the {@see \Siel\Acumulus\Data\AcumulusObject}.
      *
      * Values for fields may come from:
      * - A field pattern. In most cases, a field pattern will come from the

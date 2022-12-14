@@ -17,7 +17,7 @@ class CustomerCollector extends Collector
 {
     protected function getAcumulusObjectType(): string
     {
-        return Customer::class;
+        return 'Customer';
     }
 
     /**

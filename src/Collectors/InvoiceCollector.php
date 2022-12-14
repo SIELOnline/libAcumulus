@@ -175,9 +175,9 @@ abstract class InvoiceCollector extends Collector
         $this->translator->add($invoiceHelperTranslations);
     }
 
-    public function getAcumulusObjectType(): string
+    protected function getAcumulusObjectType(): string
     {
-        return Invoice::class;
+        return 'Invoice';
     }
 
 

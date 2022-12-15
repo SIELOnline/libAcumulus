@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Data;
 
+use Siel\Acumulus\Meta;
+
 use function is_string;
 
 /**
@@ -81,12 +83,9 @@ class MetadataValue
         $this->count++;
     }
 
-    /**
-     * @throws \JsonException
-     */
     public function __toString(): string
     {
         $value = $this->get();
-        return is_string($value) ? $value : json_encode($value, JSON_THROW_ON_ERROR);
+        return is_string($value) ? $value : json_encode($value, Meta::JsonFlags);
     }
 }

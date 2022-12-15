@@ -17,6 +17,18 @@ namespace Siel\Acumulus;
  */
 interface Meta
 {
+    /**
+     * Enhanced set of json_encode flags we use to improve readability of
+     * metadata in xml messages.
+     * See {@see \Siel\Acumulus\Helpers\Log::JsonFlags} and
+     * {@see \Siel\Acumulus\Helpers\Util::JsonFlags}.
+     */
+    public const JsonFlags = JSON_UNESCAPED_SLASHES |
+        JSON_UNESCAPED_UNICODE |
+        JSON_NUMERIC_CHECK |
+        JSON_PRESERVE_ZERO_FRACTION |
+        JSON_THROW_ON_ERROR;
+
     // Tags that may be used on multiple levels.
     /**
      * The internal id of the level it is part of:

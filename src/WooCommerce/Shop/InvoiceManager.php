@@ -7,6 +7,8 @@
 namespace Siel\Acumulus\WooCommerce\Shop;
 
 use DateTime;
+use Siel\Acumulus\Helpers\Log;
+use Siel\Acumulus\Helpers\Util;
 use Siel\Acumulus\Invoice\Source as Source;
 use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
@@ -245,7 +247,7 @@ class InvoiceManager extends BaseInvoiceManager
     {
         $this->getLog()->info(
             'WooCommerce\InvoiceManager::query2Sources: args = %s',
-            str_replace(["\r", "\n"], '', json_encode($args))
+            str_replace(["\r", "\n"], '', json_encode($args, Log::JsonFlags))
         );
         // Add default arguments.
         $args = $args + [

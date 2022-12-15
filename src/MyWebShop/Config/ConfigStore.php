@@ -2,6 +2,7 @@
 namespace Siel\Acumulus\MyWebShop\Config;
 
 use Siel\Acumulus\Config\ConfigStore as BaseConfigStore;
+use Siel\Acumulus\Helpers\Util;
 
 /**
  * Implements the connection to the MyWebShop config component.
@@ -25,7 +26,7 @@ class ConfigStore extends BaSeConfigStore
     public function save(array $values): bool
     {
         // @todo: remove this line if your configuration sub system accepts arrays as value.
-        $values = json_encode($values);
-        return $shopConfig->set($this->configKey, $values);
+        $configValue = json_encode($values, JSON_FORCE_OBJECT | Util::JsonFlags);
+        return $shopConfig->set($this->configKey, $configValue);
     }
 }

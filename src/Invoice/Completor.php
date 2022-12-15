@@ -1442,29 +1442,29 @@ class Completor
     protected function processMetaData()
     {
         if (isset($this->invoice[Tag::Customer][Meta::Warning]) && is_array($this->invoice[Tag::Customer][Meta::Warning])) {
-            $this->invoice[Tag::Customer][Meta::Warning] = json_encode($this->invoice[Tag::Customer][Meta::Warning]);
+            $this->invoice[Tag::Customer][Meta::Warning] = json_encode($this->invoice[Tag::Customer][Meta::Warning], Meta::JsonFlags);
         }
         if (isset($this->invoice[Tag::Customer][Tag::Invoice][Meta::Warning]) && is_array($this->invoice[Tag::Customer][Tag::Invoice][Meta::Warning])) {
-            $this->invoice[Tag::Customer][Tag::Invoice][Meta::Warning] = json_encode($this->invoice[Tag::Customer][Tag::Invoice][Meta::Warning]);
+            $this->invoice[Tag::Customer][Tag::Invoice][Meta::Warning] = json_encode($this->invoice[Tag::Customer][Tag::Invoice][Meta::Warning], Meta::JsonFlags);
         }
         foreach ($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] as &$line) {
             if (isset($line[Meta::VatRateLookup]) && is_array($line[Meta::VatRateLookup])) {
-                $line[Meta::VatRateLookup] = json_encode($line[Meta::VatRateLookup]);
+                $line[Meta::VatRateLookup] = json_encode($line[Meta::VatRateLookup], Meta::JsonFlags);
             }
             if (isset($line[Meta::VatRateLookupLabel]) && is_array($line[Meta::VatRateLookupLabel])) {
-                $line[Meta::VatRateLookupLabel] = json_encode($line[Meta::VatRateLookupLabel]);
+                $line[Meta::VatRateLookupLabel] = json_encode($line[Meta::VatRateLookupLabel], Meta::JsonFlags);
             }
             if (isset($line[Meta::FieldsCalculated]) && is_array($line[Meta::FieldsCalculated])) {
-                $line[Meta::FieldsCalculated] = json_encode(array_unique($line[Meta::FieldsCalculated]));
+                $line[Meta::FieldsCalculated] = json_encode(array_unique($line[Meta::FieldsCalculated]), Meta::JsonFlags);
             }
             if (isset($line[Meta::VatRateLookupMatches]) && is_array($line[Meta::VatRateLookupMatches])) {
-                $line[Meta::VatRateLookupMatches] = json_encode($line[Meta::VatRateLookupMatches]);
+                $line[Meta::VatRateLookupMatches] = json_encode($line[Meta::VatRateLookupMatches], Meta::JsonFlags);
             }
             if (isset($line[Meta::VatRateRangeMatches]) && is_array($line[Meta::VatRateRangeMatches])) {
-                $line[Meta::VatRateRangeMatches] = json_encode($line[Meta::VatRateRangeMatches]);
+                $line[Meta::VatRateRangeMatches] = json_encode($line[Meta::VatRateRangeMatches], Meta::JsonFlags);
             }
             if (isset($line[Meta::Warning]) && is_array($line[Meta::Warning])) {
-                $line[Meta::Warning] = json_encode($line[Meta::Warning]);
+                $line[Meta::Warning] = json_encode($line[Meta::Warning], Meta::JsonFlags);
             }
         }
     }

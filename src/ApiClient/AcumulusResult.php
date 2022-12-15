@@ -299,14 +299,12 @@ class AcumulusResult extends MessageCollection
      *
      * We mask all values of tags/keys that have 'password' in their name.
      * By masking any password, this result can be used for logging purposes.
-     *
-     * @throws JsonException
      */
     public function getMaskedResponse(): string
     {
         $code = $this->getHttpResponse()->getHttpStatusCode();
         $body = $this->util->maskArray($this->fullAcumulusResponse);
-        return sprintf("Response: status=%d\nbody=%s", $code, json_encode($body, JSON_THROW_ON_ERROR));
+        return sprintf("Response: status=%d\nbody=%s", $code, json_encode($body, Log::JsonFlags));
     }
 
     /**

@@ -16,6 +16,13 @@ use Throwable;
  */
 class Log
 {
+    /**
+     * Enhanced set of json_encode flags we use to improve readability of log
+     * messages.
+     * See {@see \Siel\Acumulus\Meta::JsonFlags} and {@see Util::JsonFlags}.
+     */
+    public const JsonFlags = JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR;
+
     /** @var int */
     protected $logLevel = Severity::Info;
 

@@ -9,6 +9,7 @@ use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Helpers\Container;
+use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Util;
 
 use function assert;
@@ -83,8 +84,6 @@ class AcumulusRequest
      *   e.g, to create test input.
      * - We mask all values that have 'password' in their key, so we can safely
      *   log it.
-     *
-     * @throws \JsonException
      */
     public function getMaskedRequest(): string
     {
@@ -93,7 +92,7 @@ class AcumulusRequest
         if ($submit !== null) {
             $submit = $this->util->maskArray($this->getSubmit());
         }
-        return sprintf("Request: uri=%s\nsubmit=%s", $uri ?? 'null', json_encode($submit, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT));
+        return sprintf("Request: uri=%s\nsubmit=%s", $uri ?? 'null', json_encode($submit, Log::JsonFlags));
     }
 
     /**

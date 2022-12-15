@@ -7,7 +7,6 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\ApiClient;
 
-use JsonException;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Helpers\Container;
@@ -66,7 +65,7 @@ class Acumulus
      *   - 403 A8N403GCN: Forbidden - Insufficient credential level for
      *     general/general_about.php. Not authorized to perform request.
      *
-     * @throws AcumulusException|AcumulusResponseException|JsonException
+     * @throws AcumulusException|AcumulusResponseException
      */
     public function getAbout(): AcumulusResult
     {
@@ -111,7 +110,7 @@ class Acumulus
      *       - 'enddate': yyyy-mm-dd
      *   Possible errors: todo.
      *
-     * @throws AcumulusException|AcumulusResponseException|JsonException
+     * @throws AcumulusException|AcumulusResponseException
      */
     public function getMyAcumulus(): AcumulusResult
     {
@@ -138,7 +137,7 @@ class Acumulus
      * - 'accountstatus'
      * - 'accounttypeid'
      *
-     * @throws AcumulusException|AcumulusResponseException|JsonException
+     * @throws AcumulusException|AcumulusResponseException
      */
     public function getPicklistAccounts(bool $enabled = true): AcumulusResult
     {
@@ -161,7 +160,7 @@ class Acumulus
      * - 'companytypename'
      * - 'companytypenamenl'
      *
-     * @throws AcumulusException|AcumulusResponseException|JsonException
+     * @throws AcumulusException|AcumulusResponseException
      */
     public function getPicklistCompanyTypes(): AcumulusResult
     {
@@ -180,7 +179,7 @@ class Acumulus
      * - 'contacttypeid'
      * - 'contacttypename'
      *
-     * @throws AcumulusException|AcumulusResponseException|JsonException
+     * @throws AcumulusException|AcumulusResponseException
      */
     public function getPicklistContactTypes(): AcumulusResult
     {
@@ -199,7 +198,7 @@ class Acumulus
      * - 'costcenterid'
      * - 'costcentername'
      *
-     * @throws AcumulusException|AcumulusResponseException|JsonException
+     * @throws AcumulusException|AcumulusResponseException
      */
     public function getPicklistCostCenters(): AcumulusResult
     {
@@ -218,7 +217,7 @@ class Acumulus
      * - 'invoicetemplateid'
      * - 'invoicetemplatename'
      *
-     * @throws AcumulusException|AcumulusResponseException|JsonException
+     * @throws AcumulusException|AcumulusResponseException
      */
     public function getPicklistInvoiceTemplates(): AcumulusResult
     {
@@ -262,7 +261,7 @@ class Acumulus
      * @noinspection PhpUnused  Not yet used, but this is a library that,
      *   eventually, should cover all web services provided.
      *
-     * @throws AcumulusException|AcumulusResponseException|JsonException
+     * @throws AcumulusException|AcumulusResponseException
      */
     public function getPicklistProducts($filter = null, $productTagId = null, $offset = null, $rowcount = null)
     {
@@ -303,7 +302,7 @@ class Acumulus
      *   a non-keyed array of "picklist" arrays, each 'picklist' array being a
      *   keyed array with keys that depend on the requested picklist.
      *
-     * @throws AcumulusException|AcumulusResponseException|JsonException
+     * @throws AcumulusException|AcumulusResponseException
      */
     protected function getPicklist(string $picklist, array $filters = [], bool $needContract = true): AcumulusResult
     {
@@ -332,7 +331,7 @@ class Acumulus
      *     100)
      *   - countryregion: (int) one of the Api::Region_... constants.
      *
-     * @throws AcumulusException|AcumulusResponseException|JsonException
+     * @throws AcumulusException|AcumulusResponseException
      */
     public function getVatInfo(string $countryCode, string $date = ''): AcumulusResult
     {
@@ -366,7 +365,7 @@ class Acumulus
      *   Possible errors:
      *   - AAC37EAA: Ongeldig year. EU regelgeving van toepassing vanaf 2021.
      *
-     * @throws AcumulusException|AcumulusResponseException|JsonException
+     * @throws AcumulusException|AcumulusResponseException
      */
     public function reportThresholdEuCommerce(?int $year = null): AcumulusResult
     {
@@ -395,7 +394,7 @@ class Acumulus
      * - 'entryid'
      * - 'conceptid'
      *
-     * @throws AcumulusException|AcumulusResponseException|JsonException
+     * @throws AcumulusException|AcumulusResponseException
      */
     public function invoiceAdd(array $invoice): AcumulusResult
     {
@@ -421,7 +420,7 @@ class Acumulus
      *   - FGYBSN048: Information not available for $conceptId older than 127466.
      *   - todo: others?
      *
-     * @throws AcumulusException|AcumulusResponseException|JsonException
+     * @throws AcumulusException|AcumulusResponseException
      */
     public function getConceptInfo(int $conceptId): AcumulusResult
     {
@@ -471,7 +470,7 @@ class Acumulus
      *   - XGYBSN000: Requested invoice for entry $entryId not found: $entryId
      *     does not exist.
      *
-     * @throws AcumulusException|AcumulusResponseException|JsonException
+     * @throws AcumulusException|AcumulusResponseException
      */
     public function getEntry(int $entryId): AcumulusResult
     {
@@ -507,7 +506,7 @@ class Acumulus
      *   - P2XFELO12: Requested for entryid: $entryId not found or forbidden:
      *     $entryId does not exist or already has requested status.
      *
-     * @throws AcumulusException|AcumulusResponseException|JsonException
+     * @throws AcumulusException|AcumulusResponseException
      */
     public function setDeleteStatus(int $entryId, int $deleteStatus): AcumulusResult
     {
@@ -537,7 +536,7 @@ class Acumulus
      *   - XGYTTNF04: Requested invoice for $token not found: $token does not
      *     exist.
      *
-     * @throws AcumulusException|AcumulusResponseException|JsonException
+     * @throws AcumulusException|AcumulusResponseException
      *
      * @noinspection PhpUnused
      */
@@ -576,7 +575,7 @@ class Acumulus
      *     date format (YYYY-MM-DD) used in paymentdate field. We received:
      *     $paymentDate. Unable to proceed."
      *
-     * @throws AcumulusException|AcumulusResponseException|JsonException
+     * @throws AcumulusException|AcumulusResponseException
      */
     public function setPaymentStatus(string $token, int $paymentStatus, string $paymentDate = ''): AcumulusResult
     {
@@ -640,7 +639,7 @@ class Acumulus
      *   - AA6894AA: Onjuiste postalcode
      *   - AABC1FAA: Verplichte city ontbreekt
      *
-     * @throws AcumulusException|AcumulusResponseException|JsonException
+     * @throws AcumulusException|AcumulusResponseException
      */
     public function signUp(array $signUp): AcumulusResult
     {
@@ -680,8 +679,6 @@ class Acumulus
      *     }
      *     ... "basic response fields" ...
      *   }
-     *
-     * @throws JsonException
      */
     public function registerSupport(string $token, string $location): AcumulusResult
     {
@@ -718,7 +715,7 @@ class Acumulus
      *   - stockamount (the new stock level for this product)
      *   Possible errors:
      *
-     * @throws AcumulusException|AcumulusResponseException|JsonException
+     * @throws AcumulusException|AcumulusResponseException
      */
     public function stockAdd(int $productId, float $quantity, string $description, string $date = null): AcumulusResult
     {
@@ -795,9 +792,8 @@ class Acumulus
      * @param ?bool $applyGraphics
      *   False to prevent any embedded graphics from being applied to the
      *   document; true, null, or absent otherwise.
-     *   @todo: not used for now, will become part of emailAsPdf structure?
      *
-     * @return AcumulusResult
+     *   @return AcumulusResult
      *   The result of the webservice call. The structured response will contain
      *   1 "invoice" array, being a keyed array with keys:
      * - 'token'
@@ -808,9 +804,11 @@ class Acumulus
      *   - TNFE4035G: Requested token not found or invalid token supplied.
      *     Unable to proceed."
      *
-     * @throws AcumulusException|AcumulusResponseException|JsonException
+     * @throws AcumulusException|AcumulusResponseException
      *
      * @noinspection PhpUnused
+     * @noinspection PhpUnusedParameterInspection
+     * @todo: not used for now, will become part of emailAsPdf structure?
      */
     public function emailInvoiceAsPdf(string $token, array $emailAsPdf, ?int $invoiceType = null, string $invoiceNotes = '', ?bool $applyGraphics = null): AcumulusResult
     {
@@ -882,9 +880,11 @@ class Acumulus
      *   1 "packingslip" array, being a keyed array with keys:
      *   - 'token'
      *
-     * @throws AcumulusException|AcumulusResponseException|JsonException
+     * @throws AcumulusException|AcumulusResponseException
      *
      * @noinspection PhpUnused
+     * @noinspection PhpUnusedParameterInspection
+     * @todo: not used for now, will become part of emailAsPdf structure?
      */
     public function emailPackingSlipAsPdf(string $token, array $emailAsPdf, string $deliveryNotes = '', ?bool $applyGraphics = null): AcumulusResult
     {
@@ -930,7 +930,7 @@ class Acumulus
      * @return AcumulusResult
      *   An AcumulusResult object containing the results.
      *
-     * @throws AcumulusException|AcumulusResponseException|JsonException|JsonException
+     * @throws AcumulusException|AcumulusResponseException
      *   A communication level error occurred.
      *   - {@see AcumulusRequest} will be set;
      *   - {@see HttpRequest} will probably also be set;

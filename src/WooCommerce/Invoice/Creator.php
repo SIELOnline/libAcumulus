@@ -682,7 +682,7 @@ class Creator extends BaseCreator
             }
         }
         if (!Number::areRounded($taxes, 2)) {
-            $reason = 'not all taxes are rounded => taxes are realistic (' . json_encode($taxes) . ')';
+            $reason = 'not all taxes are rounded => taxes are realistic (' . json_encode($taxes, Meta::JsonFlags) . ')';
         }
         return $reason;
     }

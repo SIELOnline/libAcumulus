@@ -20,6 +20,7 @@ use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Helpers\Message;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Helpers\Container;
+use Siel\Acumulus\Helpers\Util;
 use Siel\Acumulus\Invoice\Source;
 use stdClass;
 
@@ -276,7 +277,7 @@ class OcHelper
         }
         // Send the output.
         $this->registry->response->addHeader('Content-Type: application/json;charset=utf-8');
-        $this->registry->response->setOutput(json_encode(['content' => $this->outputForm(true)]));
+        $this->registry->response->setOutput(json_encode(['content' => $this->outputForm(true)], Util::JsonFlags));
     }
 
     /**

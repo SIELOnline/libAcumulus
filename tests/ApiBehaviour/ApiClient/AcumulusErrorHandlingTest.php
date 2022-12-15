@@ -244,10 +244,10 @@ class AcumulusErrorHandlingTest extends TestCase
         $loggedMessages = $this->log->getLoggedMessages();
         $index = $index >=0 ? $index : (count($loggedMessages) + $index);
         $loggedMessage = $loggedMessages[$index];
-        $message = $loggedMessage['message'];
+        $message = str_replace(["\r", "\n", "\t", ' '], '', $loggedMessage['message']);
         $severity = $loggedMessage['severity'];
-        $this->assertStringStartsWith("Response: status=$expectedCode", $message);
-        $this->assertStringContainsString("\"error\":{\"code\":\"$expectedCode ", $message);
+        $this->assertStringStartsWith("Response:status=$expectedCode", $message);
+        $this->assertStringContainsString("\"error\":{\"code\":\"$expectedCode", $message);
         $this->assertEquals($expectedSeverity, $severity);
     }
 
@@ -256,9 +256,9 @@ class AcumulusErrorHandlingTest extends TestCase
         $loggedMessages = $this->log->getLoggedMessages();
         $index = $index >=0 ? $index : (count($loggedMessages) + $index);
         $loggedMessage = $loggedMessages[$index];
-        $message = $loggedMessage['message'];
+        $message = str_replace(["\r", "\n", "\t", ' '], '', $loggedMessage['message']);
         $severity = $loggedMessage['severity'];
-        $this->assertStringContainsString('Response: status=200', $message);
+        $this->assertStringContainsString('Response:status=200', $message);
         $this->assertStringContainsString('"status":"0"', $message);
         $this->assertEquals(Severity::Success, $severity);
     }

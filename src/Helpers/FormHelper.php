@@ -116,7 +116,7 @@ class FormHelper
         $this->setMeta($this->constructFieldMeta($fields));
         $metaField = [
             'type' => 'hidden',
-            'value' => json_encode($this->getMeta()),
+            'value' => json_encode($this->getMeta(), Util::JsonFlags),
         ];
         foreach ($fields as &$field) {
             if (isset($field['fields'])) {

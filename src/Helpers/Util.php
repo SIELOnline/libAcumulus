@@ -26,6 +26,13 @@ use function strlen;
 class Util
 {
     /**
+     * Minimal set of json_encode flags we use. For logging and metadata logging
+     * we use even more flags that enhance human readability.
+     * See {@see Log::JsonFlags} and {@see \Siel\Acumulus\Meta::JsonFlags}.
+     */
+    public const JsonFlags = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR;
+
+    /**
      * Converts a keyed, optionally multi-level, array to XML.
      *
      * Acumulus specific:
@@ -159,13 +166,15 @@ class Util
      * @throws \Siel\Acumulus\ApiClient\AcumulusException
      *   The parameter is not an object or array or an error occurred during
      *   conversion.
+     *
+     * @todo: extract Json class with stricter error handling and common flags.
      */
     public function convertToJson($objectOrArray): string
     {
         if (!is_object($objectOrArray) && !is_array($objectOrArray)) {
             throw new AcumulusException('Not an object or array');
         }
-        $result = json_encode($objectOrArray);
+        $result = json_encode($objectOrArray, static::JsonFlags);
         if (!$result) {
             $this->raiseJsonError();
         }
@@ -205,10 +214,13 @@ class Util
      *
      * @return bool
      *   True if the response is HTML, false otherwise.
+     *
+     * @noinspection PhpUnused @todo: is this indeed no longer used?
      */
     public function isHtmlResponse(string $response): bool
     {
         // @todo: PHP 8 str_starts_with()
+        /** @noinspection SubStrUsedAsStrPosInspection */
         return strtolower(substr($response, 0, strlen('<!doctype html'))) === '<!doctype html'
             || strtolower(substr($response, 0, strlen('<html'))) === '<html'
             || strtolower(substr($response, 0, strlen('<body'))) === '<body';
@@ -241,7 +253,7 @@ class Util
      */
     public function maskArray(array $subject): array
     {
-        array_walk_recursive($subject, function (&$value, $key) {
+        array_walk_recursive($subject, static function (&$value, $key) {
             if (stripos($key, 'password') !== false) {
                 $value = 'REMOVED FOR SECURITY';
             }
@@ -321,6 +333,9 @@ class Util
      *
      * @throws \Siel\Acumulus\ApiClient\AcumulusException
      *   Always.
+     *
+     * @deprecated: we now throw on error: look at uses and see if we have to
+     *   replace that with a try-catch.
      */
     public function raiseJsonError(): void
     {

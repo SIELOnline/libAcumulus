@@ -384,7 +384,7 @@ class Creator extends BaseCreator
                         $this->$this->addWarning($result[count($result) - 1],
                             'Amounts for this shipping method do not add up: rates have probably changed.'
                             . ' (order_shipping_params->prices = '
-                            . json_encode($this->order->order_shipping_params->prices)
+                            . json_encode($this->order->order_shipping_params->prices, Meta::JsonFlags)
                             . ')');
                         $warningAdded = true;
                     }
@@ -401,7 +401,7 @@ class Creator extends BaseCreator
                     $this->addWarning($result[count($result) - 1],
                         'Amounts for the shipping method(s) do not add up: lost too much precision?'
                         . ' (order_shipping_params->prices = '
-                        . json_encode($this->order->order_shipping_params->prices)
+                        . json_encode($this->order->order_shipping_params->prices, Meta::JsonFlags)
                         . ')');
                 }
             }

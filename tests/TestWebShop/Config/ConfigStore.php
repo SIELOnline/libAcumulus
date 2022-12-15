@@ -2,6 +2,7 @@
 namespace Siel\Acumulus\Tests\TestWebShop\Config;
 
 use Siel\Acumulus\Config\ConfigStore as BaseConfigStore;
+use Siel\Acumulus\Helpers\Util;
 
 /**
  * Implements the connection to the TestWebShop config component.
@@ -27,7 +28,7 @@ class ConfigStore extends BaSeConfigStore
      */
     public function save(array $values): bool
     {
-        file_put_contents($this->configFile, json_encode($values));
+        file_put_contents($this->configFile, json_encode($values, JSON_FORCE_OBJECT | Util::JsonFlags));
         return true;
     }
 }

@@ -1,7 +1,11 @@
 <?php
 /**
+ * @noinspection PhpMissingDocCommentInspection
  * @noinspection PhpStaticAsDynamicMethodCallInspection
+ * @noinspection DuplicatedCode
  */
+
+declare(strict_types=1);
 
 namespace Siel\Acumulus\Tests\Unit\ApiClient;
 
@@ -11,7 +15,7 @@ use Siel\Acumulus\ApiClient\HttpResponse;
 
 class HttpResponseTest extends TestCase
 {
-    public function testHttpResponse()
+    public function testHttpResponse(): void
     {
         $request = new HttpRequest();
         $httpCode = 200;

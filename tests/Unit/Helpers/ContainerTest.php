@@ -1,4 +1,12 @@
-<?php /** @noinspection PhpStaticAsDynamicMethodCallInspection */
+<?php /** @noinspection EfferentObjectCouplingInspection */
+
+/**
+ * @noinspection PhpMissingDocCommentInspection
+ * @noinspection PhpStaticAsDynamicMethodCallInspection
+ * @noinspection DuplicatedCode
+ */
+
+declare(strict_types=1);
 
 namespace Siel\Acumulus\Tests\Unit\Helpers;
 
@@ -16,7 +24,6 @@ use Siel\Acumulus\Invoice\Completor;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Shop\AcumulusEntry;
 use Siel\Acumulus\Shop\AdvancedConfigForm;
-use Siel\Acumulus\Shop\BatchForm;
 use Siel\Acumulus\Shop\ConfigForm;
 use Siel\Acumulus\Shop\RatePluginForm;
 use Siel\Acumulus\Shop\RegisterForm;
@@ -42,7 +49,7 @@ class ContainerTest extends TestCase
     /**
      * Tests the (almost) independent classes in the Helpers namespace.
      */
-    public function testHelpersNamespace1()
+    public function testHelpersNamespace1(): void
     {
         $container = new Container('WooCommerce');
         $object = $container->getLog();
@@ -59,7 +66,7 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(Countries::class, $object);
     }
 
-    public function testConfigNamespace()
+    public function testConfigNamespace(): void
     {
         $container = new Container('Tests\\TestWebShop');
         $object = $container->getConfigStore();
@@ -74,7 +81,7 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(Config::class, $object);
     }
 
-    public function testApiClientNamespace()
+    public function testApiClientNamespace(): void
     {
         $container = new Container('Tests\\TestWebShop');
         $object = $container->getAcumulusApiClient();
@@ -87,7 +94,7 @@ class ContainerTest extends TestCase
     /**
      * Tests the dependent classes in the Helpers namespace.
      */
-    public function testHelpersNamespace2()
+    public function testHelpersNamespace2(): void
     {
         $container = new Container('Tests\\TestWebShop');
         $object = $container->getMailer();
@@ -103,7 +110,7 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(FormRenderer::class, $object);
     }
 
-    public function testGetForms()
+    public function testGetForms(): void
     {
         $container = new Container('Tests\\TestWebShop');
         $object = $container->getForm('config');
@@ -121,7 +128,7 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(RatePluginForm::class, $object);
     }
 
-    public function testInvoiceNamespace()
+    public function testInvoiceNamespace(): void
     {
         $container = new Container('Tests\\TestWebShop');
 //        $object = $container->createSource(Source::Order, []);
@@ -134,13 +141,13 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(InvoiceAddResult::class, $object);
     }
 
-    public function testShopNamespace()
+    public function testShopNamespace(): void
     {
         $container = new Container('Tests\\TestWebShop');
 //        $object = $container->getAcumulusEntryManager();
 //        $this->assertInstanceOf(AcumulusEntryManager::class, $object);
         $object = $container->createAcumulusEntry([]);
-        $this->assertInstanceOf(AcumulusEntry::class, $object);
+        $this->assertSame(AcumulusEntry::class, get_class($object));
 //        $object = $container->getInvoiceManager();
 //        $this->assertInstanceOf(InvoiceManager::class, $object);
     }

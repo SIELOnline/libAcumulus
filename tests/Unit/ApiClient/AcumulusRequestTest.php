@@ -1,11 +1,17 @@
 <?php
 /**
+ * @noinspection PhpMissingDocCommentInspection
  * @noinspection PhpStaticAsDynamicMethodCallInspection
+ * @noinspection DuplicatedCode
  */
+
+declare(strict_types=1);
 
 namespace Siel\Acumulus\Tests\Unit\ApiClient;
 
 use PHPUnit\Framework\TestCase;
+use Siel\Acumulus\ApiClient\AcumulusRequest;
+use Siel\Acumulus\ApiClient\AcumulusResult;
 use Siel\Acumulus\Helpers\Container;
 
 /**
@@ -19,17 +25,12 @@ use Siel\Acumulus\Helpers\Container;
  */
 class AcumulusRequestTest extends TestCase
 {
-    /**
-     * @var \Siel\Acumulus\ApiClient\AcumulusRequest
-     */
-    protected $acumulusRequest;
-    /**
-     * @var \Siel\Acumulus\ApiClient\AcumulusResult
-     */
-    protected $acumulusResult;
-    private /*Container*/ $container;
-    private /*ApiRequestResponseExamples*/ $examples;
+    protected AcumulusRequest $acumulusRequest;
+    protected AcumulusResult $acumulusResult;
+    private Container $container;
+    private ApiRequestResponseExamples $examples;
 
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function setUp(): void
     {
         $language = 'nl';
@@ -37,7 +38,7 @@ class AcumulusRequestTest extends TestCase
         $this->examples = new ApiRequestResponseExamples();
     }
 
-    private function createAcumulusRequest()
+    private function createAcumulusRequest(): void
     {
         $this->acumulusRequest = $this->container->createAcumulusRequest();
 
@@ -46,7 +47,7 @@ class AcumulusRequestTest extends TestCase
         $this->assertNull($this->acumulusRequest->getHttpRequest());
     }
 
-    private function getAcumulusRequest($uri)
+    private function getAcumulusRequest($uri): void
     {
         $this->createAcumulusRequest();
         $submit = $this->examples->getSubmit($uri);
@@ -72,7 +73,7 @@ class AcumulusRequestTest extends TestCase
         $this->assertStringContainsString('<acumulus>', $this->acumulusRequest->getHttpRequest()->getBody()['xmlstring']);
     }
 
-    public function testExecuteNoContract()
+    public function testExecuteNoContract(): void
     {
         $uri = 'vatinfo';
         $this->getAcumulusRequest($uri);
@@ -80,7 +81,7 @@ class AcumulusRequestTest extends TestCase
         $this->assertArrayNotHasKey('contract', $this->acumulusRequest->getSubmit());
     }
 
-    public function testExecuteContract()
+    public function testExecuteContract(): void
     {
         $uri = 'accounts';
         $this->getAcumulusRequest($uri);

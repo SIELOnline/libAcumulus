@@ -1,8 +1,11 @@
 <?php
 /**
+ * @noinspection PhpMissingDocCommentInspection
  * @noinspection PhpStaticAsDynamicMethodCallInspection
  * @noinspection DuplicatedCode
  */
+
+declare(strict_types=1);
 
 namespace Siel\Acumulus\Tests\Unit\Helpers;
 
@@ -15,12 +18,9 @@ use Siel\Acumulus\Helpers\Translator;
 
 class MessageCollectionTest extends TestCase
 {
+    protected Translator $translator;
 
-    /**
-     * @var \Siel\Acumulus\Helpers\Translator
-     */
-    protected $translator;
-
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function setUp(): void
     {
         $this->translator = new Translator('nl');
@@ -175,7 +175,7 @@ class MessageCollectionTest extends TestCase
      *
      * @param \Siel\Acumulus\Helpers\MessageCollection $collection
      */
-    public function testFormatMessages(MessageCollection $collection)
+    public function testFormatMessages(MessageCollection $collection): void
     {
         $format = $collection->formatMessages(Message::Format_Plain);
 

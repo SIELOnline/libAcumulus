@@ -2,6 +2,8 @@
 /**
  * @noinspection PhpMissingDocCommentInspection
  * @noinspection PhpStaticAsDynamicMethodCallInspection
+ * @noinspection DuplicatedCode
+ * @noinspection PropertyCanBeStaticInspection
  */
 
 declare(strict_types=1);

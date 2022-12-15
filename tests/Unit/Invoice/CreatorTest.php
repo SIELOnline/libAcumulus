@@ -1,7 +1,11 @@
 <?php
 /**
+ * @noinspection PhpMissingDocCommentInspection
  * @noinspection PhpStaticAsDynamicMethodCallInspection
+ * @noinspection DuplicatedCode
  */
+
+declare(strict_types=1);
 
 namespace Siel\Acumulus\Tests\Unit\Invoice;
 
@@ -12,7 +16,7 @@ use Siel\Acumulus\Meta;
 class CreatorTest extends TestCase
 {
 
-    public function testGetVatRangeTags()
+    public function testGetVatRangeTags(): void
     {
         $test1 = Creator::getVatRangeTags(7.18378, 34.22, 0.0001, 0.0001);
         $this->assertLessThanOrEqual(21, $test1[Meta::VatRateMin]);

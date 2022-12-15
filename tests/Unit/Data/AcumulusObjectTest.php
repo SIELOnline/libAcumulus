@@ -2,6 +2,7 @@
 /**
  * @noinspection PhpMissingDocCommentInspection
  * @noinspection PhpStaticAsDynamicMethodCallInspection
+ * @noinspection DuplicatedCode
  */
 
 declare(strict_types=1);
@@ -107,6 +108,7 @@ class AcumulusObjectTest extends TestCase
         $ao->setUnitPrice($value4, AcumulusProperty::Set_NotOverwrite);
         $this->assertSame($value4, $ao->getUnitPrice());
 
+        /** @noinspection PhpRedundantOptionalArgumentInspection */
         $ao->setUnitPrice($value6, AcumulusProperty::Set_Always);
         $this->assertSame($value6, $ao->getUnitPrice());
     }

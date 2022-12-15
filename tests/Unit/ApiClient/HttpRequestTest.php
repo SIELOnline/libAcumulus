@@ -1,7 +1,11 @@
 <?php
 /**
+ * @noinspection PhpMissingDocCommentInspection
  * @noinspection PhpStaticAsDynamicMethodCallInspection
+ * @noinspection DuplicatedCode
  */
+
+declare(strict_types=1);
 
 namespace Siel\Acumulus\Tests\Unit\ApiClient;
 
@@ -10,11 +14,7 @@ use Siel\Acumulus\Tests\TestWebShop\TestDoubles\ApiClient\HttpRequest;
 
 class HttpRequestTest extends TestCase
 {
-    protected function setUp(): void
-    {
-    }
-
-    public function testBefore()
+    public function testBefore(): void
     {
         $httpRequest = new HttpRequest();
         $this->assertNull($httpRequest->getMethod());
@@ -22,7 +22,7 @@ class HttpRequestTest extends TestCase
         $this->assertNull($httpRequest->getBody());
     }
 
-    public function testGet()
+    public function testGet(): void
     {
         $httpRequest = new HttpRequest();
         $uri = 'accounts';
@@ -33,7 +33,7 @@ class HttpRequestTest extends TestCase
         $this->assertSame($httpRequest, $httpResponse->getRequest());
     }
 
-    public function testPost()
+    public function testPost(): void
     {
         $httpRequest = new HttpRequest();
         $uri = 'accounts';

@@ -1,7 +1,12 @@
 <?php
 /**
+ * @noinspection PhpMissingDocCommentInspection
  * @noinspection PhpStaticAsDynamicMethodCallInspection
+ * @noinspection DuplicatedCode
+ * @noinspection SpellCheckingInspection
  */
+
+declare(strict_types=1);
 
 namespace Siel\Acumulus\Tests\Unit\ApiClient;
 
@@ -12,12 +17,9 @@ use Siel\Acumulus\Helpers\Container;
 
 class AcumulusTest extends TestCase
 {
+    private Container $container;
 
-    /**
-     * @var \Siel\Acumulus\Helpers\Container
-     */
-    private $container;
-
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function setUp(): void
     {
         // Use the TestWebShop test doubles.
@@ -32,8 +34,6 @@ class AcumulusTest extends TestCase
      * 2: apiFunction (string): the api function to call.
      * 3: needContract (bool): whether authorisation is required.
      * 4: message (array): submit as expected by Acumulus, created from args.
-     *
-     * @return array[]
      */
     public function argumentsPassed(): array
     {
@@ -56,15 +56,14 @@ class AcumulusTest extends TestCase
             'InvoiceAdd' => ['invoiceAdd', [['customer' => []]], 'invoices/invoice_add', true, ['customer' => []]],
             'ConceptInfo' => ['getConceptInfo', [12345], 'invoices/invoice_concept_info', true, ['conceptid' => 12345]],
             'Entry' => ['getEntry', [12345], 'entry/entry_info', true, ['entryid' => 12345]],
-            'SetDeleteStatus1' => ['setDeleteStatus', [12345, true], 'entry/entry_deletestatus_set', true, ['entryid' => 12345, 'entrydeletestatus' => 1]],
-            'SetDeleteStatus0' => ['setDeleteStatus', [12345, false], 'entry/entry_deletestatus_set', true, ['entryid' => 12345, 'entrydeletestatus' => 0]],
+            'SetDeleteStatus1' => ['setDeleteStatus', [12345, Api::Entry_Delete], 'entry/entry_deletestatus_set', true, ['entryid' => 12345, 'entrydeletestatus' => 1]],
+            'SetDeleteStatus0' => ['setDeleteStatus', [12345, Api::Entry_UnDelete], 'entry/entry_deletestatus_set', true, ['entryid' => 12345, 'entrydeletestatus' => 0]],
             'GetPaymentStatus' => ['getPaymentStatus', ['TOKEN'], 'invoices/invoice_paymentstatus_get', true, ['token' => 'TOKEN']],
             'SetPaymentStatus' => ['setPaymentStatus', ['TOKEN', Api::PaymentStatus_Paid, '2020-02-02'], 'invoices/invoice_paymentstatus_set', true, ['token' => 'TOKEN', 'paymentstatus' => Api::PaymentStatus_Paid, 'paymentdate' => '2020-02-02']],
             'emailInvoice' => ['emailInvoiceAsPdf', ['TOKEN', ['emailto' => 'test@example.com']], 'invoices/invoice_mail', true, ['token' => 'TOKEN', 'emailaspdf' => ['emailto' => 'test@example.com']]],
             'emailInvoiceReminder' => ['emailInvoiceAsPdf', ['TOKEN', ['emailto' => 'test@example.com'], Api::Email_Reminder], 'invoices/invoice_mail', true, ['token' => 'TOKEN', 'invoicetype' => Api::Email_Reminder, 'emailaspdf' => ['emailto' => 'test@example.com']]],
             'emailInvoiceNotes' => ['emailInvoiceAsPdf', ['TOKEN', ['emailto' => 'test@example.com'], null, 'my notes'], 'invoices/invoice_mail', true, ['token' => 'TOKEN', 'emailaspdf' => ['emailto' => 'test@example.com'], 'invoicenotes' => 'my notes']],
-            'emailPackingSlip' => ['emailPackingSlipAsPdf', ['TOKEN', ['emailto' => 'test@example.com']], 'delivery/packing_slip_mail_pdf', true,
-                ['token' => 'TOKEN', 'emailaspdf' => ['emailto' => 'test@example.com']]],
+            'emailPackingSlip' => ['emailPackingSlipAsPdf', ['TOKEN', ['emailto' => 'test@example.com']], 'delivery/packing_slip_mail_pdf', true, ['token' => 'TOKEN', 'emailaspdf' => ['emailto' => 'test@example.com']]],
             'Signup' => ['signup', [['companyname' => 'BR']], 'signup/signup', false, ['signup' => ['companyname' => 'BR']]],
             'stockAdd' => ['stockAdd', [12345, 1, 'description', '2022-02-02'], 'stock/stock_add', true, ['stock' => ['productid' => 12345, 'stockamount' => 1, 'stockdescription' => 'description', 'stockdate' => '2022-02-02']]],
         ];
@@ -75,7 +74,7 @@ class AcumulusTest extends TestCase
      *
      * @dataProvider argumentsPassed
      */
-    public function testArgumentPassingToCallApiFunction(string $method, array $args, string $apiFunction, $needContract, array $message)
+    public function testArgumentPassingToCallApiFunction(string $method, array $args, string $apiFunction, $needContract, array $message): void
     {
         // To test the arguments passed to the protected callApiFunction()
         // method we mock it.
@@ -102,7 +101,7 @@ class AcumulusTest extends TestCase
      * Tests that the correct arguments are passed to ApiCommunicator::getUri
      * and that the correct query arguments are concatenated.
      */
-    public function testGetInvoicePdfUri()
+    public function testGetInvoicePdfUri(): void
     {
         $environment = $this->container->getEnvironment()->get();
         $apiAddress = $environment['baseUri'] . '/' . $environment['apiVersion'];
@@ -124,7 +123,7 @@ class AcumulusTest extends TestCase
      * Tests that the correct arguments are passed to ApiCommunicator::getUri
      * and that the correct query arguments are concatenated.
      */
-    public function testGetPackingSlipPdfUri()
+    public function testGetPackingSlipPdfUri(): void
     {
         $environment = $this->container->getEnvironment()->get();
         $apiAddress = $environment['baseUri'] . '/' . $environment['apiVersion'];

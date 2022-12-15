@@ -1,7 +1,11 @@
 <?php
 /**
+ * @noinspection PhpMissingDocCommentInspection
  * @noinspection PhpStaticAsDynamicMethodCallInspection
+ * @noinspection DuplicatedCode
  */
+
+declare(strict_types=1);
 
 namespace Siel\Acumulus\Tests\Unit\Helpers;
 
@@ -14,11 +18,9 @@ use Siel\Acumulus\Helpers\Severity;
 
 class MessageTest extends TestCase
 {
-    /**
-     * @var \Siel\Acumulus\Helpers\Translator
-     */
-    protected $translator;
+    protected Translator $translator;
 
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function setUp(): void
     {
         $this->translator = new Translator('nl');
@@ -93,7 +95,7 @@ class MessageTest extends TestCase
      * @param \Siel\Acumulus\Helpers\Message $message1
      * @param \Siel\Acumulus\Helpers\Message $message2
      */
-    public function testToString(Message $message1, Message $message2)
+    public function testToString(Message $message1, Message $message2): void
     {
         $this->assertSame('S1: Message 701', (string) $message1);
         $this->assertSame('Message 701 empty codes', (string) $message2);
@@ -112,7 +114,7 @@ class MessageTest extends TestCase
      * @param \Siel\Acumulus\Helpers\Message $message4
      * @param \Siel\Acumulus\Helpers\Message $message5
      */
-    public function testFormat(Message $message1, Message $message2, Message $message3, Message $message4, Message $message5)
+    public function testFormat(Message $message1, Message $message2, Message $message3, Message $message4, Message $message5): void
     {
         $this->assertSame('S1: Message 701', $message1->format(Message::Format_Plain));
         $this->assertSame('Message 701 empty codes', $message2->format(Message::Format_Plain));

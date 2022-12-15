@@ -2,6 +2,7 @@
 /**
  * @noinspection PhpMissingDocCommentInspection
  * @noinspection PhpStaticAsDynamicMethodCallInspection
+ * @noinspection DuplicatedCode
  */
 
 declare(strict_types=1);
@@ -85,6 +86,9 @@ class AcumulusPropertyTest extends TestCase
         $this->assertSame($castValue, $p->getValue());
     }
 
+    /**
+     * @noinspection PhpRedundantOptionalArgumentInspection
+     */
     public function setDateValueDataProvider(): array
     {
         $now = time();

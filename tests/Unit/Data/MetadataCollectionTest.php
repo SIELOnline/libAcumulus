@@ -1,6 +1,7 @@
 <?php
 /**
  * @noinspection PhpMissingDocCommentInspection
+ * @noinspection DuplicatedCode
  * @noinspection PhpStaticAsDynamicMethodCallInspection
  */
 

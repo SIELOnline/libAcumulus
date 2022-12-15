@@ -1,18 +1,22 @@
 <?php
 /**
+ * @noinspection PhpMissingDocCommentInspection
  * @noinspection PhpStaticAsDynamicMethodCallInspection
- * @noinspection PhpDocSignatureInspection
  * @noinspection DuplicatedCode
  */
+
+declare(strict_types=1);
 
 namespace Siel\Acumulus\Tests\Unit\ApiClient;
 
 use PHPUnit\Framework\TestCase;
+use Siel\Acumulus\ApiClient\AcumulusRequest;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\SeverityTranslations;
 use Siel\Acumulus\ApiClient\AcumulusResult;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\ApiClient\ResultTranslations;
+use Siel\Acumulus\Helpers\Translator;
 
 /**
  * An AcumulusResult has the following features that we want to test:
@@ -28,14 +32,12 @@ use Siel\Acumulus\ApiClient\ResultTranslations;
  */
 class AcumulusResultTest extends TestCase
 {
-    /**
-     * @var \Siel\Acumulus\ApiClient\AcumulusRequest
-     */
-    protected $acumulusRequest;
-    private /*Container*/ $container;
-    private /*Translator*/ $translator;
-    private /*ApiRequestResponseExamples*/ $examples;
+    protected AcumulusRequest $acumulusRequest;
+    private Container $container;
+    private Translator $translator;
+    private ApiRequestResponseExamples $examples;
 
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function setUp(): void
     {
         $language = 'nl';
@@ -80,7 +82,7 @@ class AcumulusResultTest extends TestCase
         return $result;
     }
 
-    public function testSetMainResponseKeyNoList()
+    public function testSetMainResponseKeyNoList(): void
     {
         $uri = 'invoice-add';
         $result = $this->getAcumulusResult($uri);
@@ -89,7 +91,7 @@ class AcumulusResultTest extends TestCase
         $this->assertSame($this->examples->getMainResponse($uri), $result->getMainAcumulusResponse());
     }
 
-    public function testSetMainResponseKeyList()
+    public function testSetMainResponseKeyList(): void
     {
         $uri = 'vatinfo';
         $result = $this->getAcumulusResult($uri);
@@ -98,7 +100,7 @@ class AcumulusResultTest extends TestCase
         $this->assertSame($this->examples->getMainResponse($uri), $result->getMainAcumulusResponse());
     }
 
-    public function testSetMainResponseKeyEmptyList()
+    public function testSetMainResponseKeyEmptyList(): void
     {
         $uri = 'vatinfo-empty-return';
         $result = $this->getAcumulusResult($uri);
@@ -107,7 +109,7 @@ class AcumulusResultTest extends TestCase
         $this->assertSame($this->examples->getMainResponse($uri), $result->getMainAcumulusResponse());
     }
 
-    public function testNoContract()
+    public function testNoContract(): void
     {
         $uri = 'no-contract';
         $result = $this->getAcumulusResult($uri);
@@ -116,7 +118,7 @@ class AcumulusResultTest extends TestCase
         $this->assertSame($this->examples->getMainResponse($uri), $result->getMainAcumulusResponse());
     }
 
-    public function testMaskPasswordsRequest()
+    public function testMaskPasswordsRequest(): void
     {
         $uri = 'invoice-add';
         $result = $this->getAcumulusResult($uri);
@@ -127,7 +129,7 @@ class AcumulusResultTest extends TestCase
         $this->assertStringContainsString('REMOVED FOR SECURITY', $message);
     }
 
-    public function testMaskPasswordsResponse()
+    public function testMaskPasswordsResponse(): void
     {
         $uri = 'signup';
         $result = $this->getAcumulusResult($uri);

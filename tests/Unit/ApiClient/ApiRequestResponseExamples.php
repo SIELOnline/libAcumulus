@@ -1,4 +1,11 @@
 <?php
+/**
+ * @noinspection PhpMissingDocCommentInspection
+ * @noinspection PropertyCanBeStaticInspection
+ * @noinspection SpellCheckingInspection
+ */
+
+declare(strict_types=1);
 
 namespace Siel\Acumulus\Tests\Unit\ApiClient;
 
@@ -6,7 +13,6 @@ use Siel\Acumulus\Tag;
 
 class ApiRequestResponseExamples
 {
-
     private function getContract(): array
     {
         return [
@@ -40,7 +46,7 @@ class ApiRequestResponseExamples
         return $submit;
     }
 
-    private $sets = [
+    private array $sets = [
         'accounts' => [
             'needContract' => true,
             'submit' => [],
@@ -244,7 +250,7 @@ class ApiRequestResponseExamples
         return $this->sets[$key]['submit'];
     }
 
-    public function getHttpStatusCode(string $key): string
+    public function getHttpStatusCode(string $key): int
     {
         return $this->sets[$key]['http status code'] ?? 200;
     }

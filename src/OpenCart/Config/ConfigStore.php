@@ -3,6 +3,8 @@
  * @noinspection PhpMultipleClassDeclarationsInspection
  */
 
+declare(strict_types=1);
+
 namespace Siel\Acumulus\OpenCart\Config;
 
 use Siel\Acumulus\Config\ConfigStore as BaseConfigStore;
@@ -13,7 +15,7 @@ use Siel\Acumulus\OpenCart\Helpers\Registry;
  */
 class ConfigStore extends BaSeConfigStore
 {
-    protected $configCode = 'acumulus_siel';
+    protected string $configCode = 'acumulus_siel';
 
     /**
      * {@inheritdoc}

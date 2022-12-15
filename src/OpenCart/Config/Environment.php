@@ -1,9 +1,14 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\OpenCart\Config;
 
 use DB;
 use Siel\Acumulus\Config\Environment as EnvironmentBase;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
+
+use function is_object;
 
 use const Siel\Acumulus\Version;
 
@@ -15,7 +20,7 @@ class Environment extends EnvironmentBase
     /**
      * {@inheritdoc}
      */
-    public function setShopEnvironment(): void
+    protected function setShopEnvironment(): void
     {
         // Module has same version as library.
         $this->data['moduleVersion'] = Version;

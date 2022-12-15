@@ -1,20 +1,23 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Config;
 
 use InvalidArgumentException;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Invoice\Source;
 
+use function array_key_exists;
+use function in_array;
+
 /**
  * Defines an interface to access the shop specific's capabilities.
  */
 abstract class ShopCapabilities
 {
-    /** @var \Siel\Acumulus\Helpers\Translator */
-    protected $translator;
-
-    /** @var string */
-    protected $shopName;
+    protected Translator $translator;
+    protected string $shopName;
 
     public function __construct(string $shopNamespace, Translator $translator)
     {
@@ -41,18 +44,18 @@ abstract class ShopCapabilities
     /**
      * Returns an array with shop specific configuration defaults.
      *
-     * Any key defined in {@see ShopCapabilities::getKeyInfo()} that can be
+     * Any key defined in {@see getKeyInfo()} that can be
      * given a more logical value given that the library is running in a given
      * web shop software, should be returned here.
      *
      * This base method is abstract, because at least these keys that allow
      * tokens (veldverwijzingen) to get customer, invoice and invoice line fields
      * should be returned.
-     * * See {@see \Siel\Acumulus\Invoice\Creator::getCustomer()} to get a list
+     * - See {@see \Siel\Acumulus\Invoice\Creator::getCustomer()} to get a list
      *   of fields at the customer level that use tokens.
-     * * See {@see \Siel\Acumulus\Invoice\Creator::getInvoice()} to get a list
+     * - See {@see \Siel\Acumulus\Invoice\Creator::getInvoice()} to get a list
      *   of fields at the invoice level that use tokens.
-     * * At the item line level, the fields 'itemnumber', 'product', 'nature',
+     * - At the item line level, the fields 'itemnumber', 'product', 'nature',
      *   and 'costprice' may use tokens.
      *
      * See{@see \Siel\Acumulus\Helpers\Token} or the help text under key
@@ -79,22 +82,23 @@ abstract class ShopCapabilities
      *
      * This method returns an array of token infos keyed by the "property
      * source" name. A token info is an array that can have the following keys:
-     * * more-info (string, optional): free text to tell the use where to look
+     * - more-info (string, optional): free text to tell the use where to look
      *   for more info.
-     * * class (string|string[], optional): class or array of class names where
+     * - class (string|string[], optional): class or array of class names where
      *   the properties come from.
-     * * file (string|string[], optional): file or array of file names where
+     * - file (string|string[], optional): file or array of file names where
      *   the properties come from.
-     * * table (string|string[], optional): database table or array of table
+     * - table (string|string[], optional): database table or array of table
      *   names where the properties come from.
-     * * additional-info (string, optional): free text to give the user
+     * - additional-info (string, optional): free text to give the user
      *   additional info.
-     * * properties (string[], required): array of property and method names
+     * - properties (string[], required): array of property and method names
      *   that can be used as token.
-     * * properties-more: bool indicating if not all properties were listed and
+     * - properties-more: bool indicating if not all properties were listed and
      *   a message indicating where to look for more properties should be shown.
-     * It is expected that 1 of the keys class, file, or table is defined. If
-     * class is defined, file may also be defined.
+     *
+     * It is expected that 1 of the keys 'class', 'file', or 'table' is defined.
+     * If 'class' is defined, 'file' may also be defined.
      *
      * @return array[]
      *   A multi-level array of token infos keyed by the "property source" name.
@@ -104,7 +108,7 @@ abstract class ShopCapabilities
         $result = [];
         $result['invoiceSource'] = [
             'more-info' => ucfirst($this->t('invoice_source')),
-            'class' => '\Siel\Acumulus\Invoice\Source',
+            'class' => Source::class,
             'properties' => [
                 'type (' . $this->t(Source::Order) . ' ' . $this->t('or') . ' ' . $this->t(Source::CreditNote) . ', ' .
                     $this->t('internal_not_label') . ')',
@@ -169,9 +173,6 @@ abstract class ShopCapabilities
 
     /**
      * Returns shop specific token info for the 'source' property.
-     *
-     * @return array
-     *   An array with shop specific token info for the 'source' property.
      */
     abstract protected function getTokenInfoSource(): array;
 
@@ -179,9 +180,6 @@ abstract class ShopCapabilities
      * Returns shop specific token info for the 'refund' property.
      *
      * Override if your shop supports refunds.
-     *
-     * @return array
-     *   An array with shop specific token info for the 'refund' property.
      */
     protected function getTokenInfoRefund(): array
     {
@@ -192,9 +190,6 @@ abstract class ShopCapabilities
      * Returns shop specific token info for the 'refundedOrder' property.
      *
      * Override if your shop supports refunds.
-     *
-     * @return array
-     *   An array with token info for the 'refundedOrder' property.
      */
     protected function getTokenInfoOrder(): array
     {
@@ -209,9 +204,6 @@ abstract class ShopCapabilities
      * - Customer
      * - Order item or line
      * - Product
-     *
-     * @return array
-     *   An array with token info for additional properties.
      */
     abstract protected function getTokenInfoShopProperties(): array;
 
@@ -255,9 +247,9 @@ abstract class ShopCapabilities
      *
      * @return string[]
      *   An array of all shop invoice related events, with the key being the ID
-     *   for the dropdown item, 1 of the {@see \Siel\Acumulus\Config}
-     *   TriggerInvoiceEvent_... constants, and the value being the label for
-     *   the dropdown item.
+     *   for the dropdown item, 1 of the
+     *  {@see \Siel\Acumulus\Config}::TriggerInvoiceEvent_... constants,
+     *  and the value being the label for the dropdown item.
      */
     public function getTriggerInvoiceEventOptions(): array
     {
@@ -308,7 +300,7 @@ abstract class ShopCapabilities
      *
      * Overrides should typically return a subset of the constants defined in
      * this base implementation, but including at least
-     * {@see \Siel\Acumulus\Config::InvoiceNrSource_Acumulus}.
+     * {@see Config::InvoiceNrSource_Acumulus}.
      *
      * @return string[]
      *   An array keyed by the option values and having translated descriptions
@@ -331,7 +323,7 @@ abstract class ShopCapabilities
      *
      * Overrides should typically return a subset of the constants defined in
      * this base implementation, but including at least
-     * {@see \Siel\Acumulus\Config::InvoiceDate_Transfer}.
+     * {@see Config::InvoiceDate_Transfer}.
      *
      * @return string[]
      *   An array keyed by the option values and having translated descriptions
@@ -370,7 +362,7 @@ abstract class ShopCapabilities
     abstract public function getVatClasses(): array;
 
     /**
-     * Returns a link to a form page.
+     * Returns a link to a form page or an image.
      *
      * If the web shop adds a session token or something like that to
      * administrative links, the returned link should contain so as well.
@@ -378,9 +370,6 @@ abstract class ShopCapabilities
      * @param string $linkType
      *   The form or resource to get the link to: 'config', 'advanced', 'batch',
      *   'activate', 'register', 'logo', 'pro-support-link', 'pro-support-img'.
-     *
-     * @return string
-     *   The link to the requested form page (or image).
      *
      * @throws \InvalidArgumentException
      *   Unknown link type.
@@ -397,7 +386,7 @@ abstract class ShopCapabilities
      * At this moment all shops implements this screen, so this method returns
      * true and is not overridden.
      *
-     * @return bool
+     * @return true
      */
     public function hasInvoiceStatusScreen(): bool
     {
@@ -407,8 +396,6 @@ abstract class ShopCapabilities
     /**
      * Returns whether our module for this shop (already) implements the
      * features on the Order list screen.
-     *
-     * @return bool
      */
     public function hasOrderList(): bool
     {

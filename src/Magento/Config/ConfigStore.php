@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Magento\Config;
 
 use Magento\Backend\App\ConfigInterface;
@@ -8,12 +11,15 @@ use Magento\Framework\App\ObjectManager;
 use Siel\Acumulus\Magento\Helpers\Registry;
 use Siel\Acumulus\Config\ConfigStore as BaseConfigStore;
 
+use function is_array;
+use function is_string;
+
 /**
  * Implements the connection to the Magento 2 config component.
  */
 class ConfigStore extends BaSeConfigStore
 {
-    protected $configPath = 'siel_acumulus/';
+    protected string $configPath = 'siel_acumulus/';
 
     /**
      * {@inheritdoc}

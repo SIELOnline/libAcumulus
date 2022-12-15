@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\MyWebShop\Config;
 
 use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
@@ -90,7 +93,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     {
         // @todo: define the properties of other objects that may be used to fetch info from.
         // @todo: ensure that your Creator class calls addPropertySource() to all properties defined here.
-        return parent::getTokenInfo() + [
+        return [
             // @todo: complete the class and file name.
             'address_invoice' => [
                 'class' => 'Address',

@@ -1,9 +1,15 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\WooCommerce\Config;
 
 use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
 use Siel\Acumulus\Config\Config;
 use WC_Tax;
+
+use function function_exists;
+use function strlen;
 
 /**
  * Defines the WooCommerce web shop specific capabilities.
@@ -253,6 +259,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
         $result = [];
         $orderStatuses = wc_get_order_statuses();
         foreach ($orderStatuses as $key => $label) {
+            // PHP8: str_starts_with()
             if (substr($key, 0, strlen('wc-')) === 'wc-') {
                 $key = substr($key, strlen('wc-'));
             }

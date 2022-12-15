@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\WooCommerce\Config;
 
 use Siel\Acumulus\Config\ConfigStore as BaseConfigStore;

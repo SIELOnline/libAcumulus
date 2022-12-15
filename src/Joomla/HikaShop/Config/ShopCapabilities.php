@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Joomla\HikaShop\Config;
 
 use Joomla\CMS\Uri\Uri;
@@ -65,7 +68,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getTokenInfoShopProperties(): array
+    protected function getTokenInfoShopProperties(): array
     {
         return [
             'billing_address' => [

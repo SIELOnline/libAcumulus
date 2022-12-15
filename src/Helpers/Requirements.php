@@ -41,9 +41,9 @@ class Requirements
     {
         $result = [];
 
-        if (version_compare(PHP_VERSION, '7.4', '<')) {
+        if (version_compare(phpversion(), '7.4', '<')) {
             $result['message_error_req_php'] = 'The minimally required PHP version for the Acumulus module is PHP 7.4 (and soon to become 8.0).';
-        } elseif (version_compare(PHP_VERSION, '8.0', '<')) {
+        } elseif (version_compare(phpversion(), '8.0', '<')) {
             $result['message_warning_req_php'] = 'The minimally required PHP version for the Acumulus module will soon be raised to PHP 8.0. Start upgrading your PHP version now';
         }
         if (!extension_loaded('json')) {

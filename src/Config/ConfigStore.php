@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Config;
 
 /**
@@ -22,10 +25,8 @@ abstract class ConfigStore
 {
     /**
      * Name of the config key.
-     *
-     * @var string
      */
-    protected $configKey = 'acumulus';
+    protected string $configKey = 'acumulus';
 
     /**
      * Loads the configuration from the actual configuration provider.

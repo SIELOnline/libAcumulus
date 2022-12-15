@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Magento\Config;
 
 use Exception;
@@ -34,7 +37,6 @@ class Environment extends EnvironmentBase
     {
         /** @var \Magento\Framework\App\ResourceConnection $resource */
         $resource = Registry::getInstance()->get(ResourceConnection::class);
-        $connection = $resource->getConnection();
-        return $connection->fetchAll($query);
+        return $resource->getConnection()->fetchAll($query);
     }
 }

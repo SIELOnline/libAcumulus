@@ -1,10 +1,27 @@
 <?php
+/**
+ * @noinspection SelfClassReferencingInspection
+ *   I prefer to refer to these constants as Config constants, and so, for me,
+ *   it is irrelevant that this happens to be the Config class.
+ */
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Config;
 
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Helpers\Log;
+use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Tag;
+
+use function array_key_exists;
+use function is_array;
+use function is_bool;
+use function is_float;
+use function is_int;
+use function is_string;
+
 use const Siel\Acumulus\Version;
 
 /**
@@ -17,7 +34,7 @@ use const Siel\Acumulus\Version;
  */
 class Config
 {
-    public const configVersion = 'configVersion';
+    public const VersionKey = 'configVersion';
 
     public const Concept_Plugin = 2;
 
@@ -58,37 +75,17 @@ class Config
     public const TriggerCreditNoteEvent_None = 0;
     public const TriggerCreditNoteEvent_Create = 1;
 
-    /** @var \Siel\Acumulus\Config\ConfigStore */
-    private $configStore;
-
-    /** @var \Siel\Acumulus\Config\ShopCapabilities */
-    private $shopCapabilities;
-
+    private ConfigStore $configStore;
+    private ShopCapabilities $shopCapabilities;
     /** @var callable */
     private $getConfigUpgradeInstance;
-
-    /** @var \Siel\Acumulus\Config\Environment */
-    private $environment;
-
-    /** @var \Siel\Acumulus\Helpers\Translator */
-    protected $translator;
-
-    /** @var \Siel\Acumulus\Helpers\Log */
-    protected $log;
-
-    /** @var array[]|null */
-    protected $keyInfo;
-
-    /** @var bool */
-    protected $isConfigurationLoaded;
-
-    /**
-     * @var bool
-     */
-    protected $isUpgrading;
-
-    /** @var array */
-    protected $values;
+    private Environment $environment;
+    protected Translator $translator;
+    protected Log $log;
+    protected array $keyInfo;
+    protected bool $isConfigurationLoaded;
+    protected bool $isUpgrading;
+    protected array $values;
 
     public function __construct(
         ConfigStore $configStore,
@@ -104,15 +101,12 @@ class Config
         $this->environment = $environment;
         $this->log = $log;
 
-        $this->keyInfo = null;
         $this->isConfigurationLoaded = false;
         $this->values = [];
     }
 
     /**
      * Wrapper getter around the config store object.
-     *
-     * @return \Siel\Acumulus\Config\ConfigStore
      */
     protected function getConfigStore(): ConfigStore
     {
@@ -121,8 +115,6 @@ class Config
 
     /**
      * Wrapper getter around the store capabilities object.
-     *
-     * @return \Siel\Acumulus\Config\ShopCapabilities
      */
     protected function getShopCapabilities(): ShopCapabilities
     {
@@ -131,8 +123,6 @@ class Config
 
     /**
      * Wrapper around the getConfigUpdateInstance callable.
-     *
-     * @return \Siel\Acumulus\Config\ConfigUpgrade
      */
     protected function getConfigUpgrade(): ConfigUpgrade
     {
@@ -145,19 +135,19 @@ class Config
      * After loading this method checks if the stored values need an upgrade
      * and, if so, will trigger that update.
      */
-    protected function load()
+    protected function load(): void
     {
         if (!$this->isConfigurationLoaded) {
             $this->values = $this->getConfigStore()->load() + $this->getDefaults();
             $this->values = $this->castValues($this->values);
             $this->isConfigurationLoaded = true;
 
-            if (!empty($this->values[Config::configVersion])
-                && version_compare($this->values[Config::configVersion], Version, '<')
+            if (!empty($this->values[Config::VersionKey])
+                && version_compare($this->values[Config::VersionKey], Version, '<')
                 && !$this->isUpgrading
             ) {
                 $this->isUpgrading = true;
-                $this->getConfigUpgrade()->upgrade($this->values[Config::configVersion]);
+                $this->getConfigUpgrade()->upgrade($this->values[Config::VersionKey]);
                 $this->isUpgrading = false;
             }
         }
@@ -211,6 +201,7 @@ class Config
      * cast the values to their expected types.
      *
      * @param array $values
+     *   Array with values to cast.
      *
      * @return array
      *   Array with cast values.
@@ -282,9 +273,8 @@ class Config
     /**
      * Returns the ShowRatePluginMessage config setting.
      *
-     * @return int
-     *
      * @noinspection PhpUnused
+     *    Called form shop specific code outside this library.
      */
     public function getShowRatePluginMessage(): ?int
     {
@@ -525,7 +515,7 @@ class Config
      * @param string $group
      *
      * @return array
-     *   An array of settings.
+     *   An array with all settings belonging to the given group.
      */
     protected function getSettingsByGroup(string $group): array
     {
@@ -540,8 +530,6 @@ class Config
 
     /**
      * Returns a list of keys that are stored in the shop specific config store.
-     *
-     * @return array
      */
     public function getKeys(): array
     {
@@ -550,8 +538,6 @@ class Config
 
     /**
      * Returns a set of default values for the various config settings.
-     *
-     * @return array
      */
     public function getDefaults(): array
     {
@@ -562,13 +548,11 @@ class Config
      * Returns a set of default values for the various config settings.
      *
      * Not to be used in isolation, use geDefaults() instead.
-     *
-     * @return array
      */
     protected function getConfigDefaults(): array
     {
         $result = $this->getKeyInfo();
-        return array_map(function ($item) {
+        return array_map(static function ($item) {
             return $item['default'];
         }, $result);
     }
@@ -577,8 +561,6 @@ class Config
      * Returns a set of default values that are specific for the shop.
      *
      * Not to be used in isolation, use geDefaults() instead.
-     *
-     * @return array
      */
     protected function getShopDefaults(): array
     {
@@ -590,9 +572,6 @@ class Config
      *
      * The hostname is returned without www. so it can be used as domain name
      * in constructing e-mail addresses.
-     *
-     * @return string
-     *   The hostname of the current request.
      */
     protected function getHostName(): string
     {
@@ -608,9 +587,9 @@ class Config
      *   A keyed array with information (group and type) about the keys that are
      *   stored in the store config.
      */
-    protected function getKeyInfo(): ?array
+    protected function getKeyInfo(): array
     {
-        if ($this->keyInfo === null) {
+        if (!isset($this->keyInfo)) {
             $hostName = $this->getHostName();
             // remove TLD, like .com or .nl, from hostname.
             $pos = strrpos($hostName, '.');
@@ -629,7 +608,7 @@ class Config
                 // renaming config keys, etc. and be able to execute an update
                 // function without being dependent on the host system to
                 // provide the current "data model" version.
-                Config::configVersion => [
+                Config::VersionKey => [
                     'group' => 'config',
                     'type' => 'string',
                     'default' => '',

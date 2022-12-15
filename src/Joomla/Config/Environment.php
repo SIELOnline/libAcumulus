@@ -13,7 +13,7 @@ class Environment extends EnvironmentBase
     /**
      * {@inheritdoc}
      */
-    public function setShopEnvironment(): void
+    protected function setShopEnvironment(): void
     {
         /** @var \Joomla\CMS\Table\Extension $extension */
         /** @noinspection PhpDeprecationInspection : Deprecated as of J4 */

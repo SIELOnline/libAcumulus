@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\MyWebShop\Config;
 
 use Siel\Acumulus\Config\ConfigStore as BaseConfigStore;

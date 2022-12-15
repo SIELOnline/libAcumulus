@@ -1,10 +1,15 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Config;
 
 use RuntimeException;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Requirements;
 use Siel\Acumulus\Helpers\Severity;
+
+use function is_string;
 
 use const Siel\Acumulus\Version;
 
@@ -13,10 +18,10 @@ use const Siel\Acumulus\Version;
  */
 class ConfigUpgrade
 {
-    protected /*Config*/ $config;
-    protected /*ConfigStore*/ $configStore;
-    protected /*Requirements*/ $requirements;
-    protected /*Log*/ $log;
+    protected Config $config;
+    protected ConfigStore $configStore;
+    protected Requirements $requirements;
+    protected Log $log;
 
     public function __construct(Config $config, ConfigStore $configStore, Requirements $requirements, Log $log)
     {
@@ -84,7 +89,7 @@ class ConfigUpgrade
         $result = true;
         if (version_compare($currentVersion, Version, '<')) {
             $result = $this->applyUpgrades($currentVersion);
-            $this->getConfig()->save([Config::configVersion => Version]);
+            $this->getConfig()->save([Config::VersionKey => Version]);
         }
         return $result;
     }
@@ -194,8 +199,6 @@ class ConfigUpgrade
      * - Debug mode: the values of test mode and stay local are switched. Stay
      *   local is no longer used, so both these 2 values become the new test
      *   mode.
-     *
-     * @return bool
      */
     protected function upgrade450(): bool
     {
@@ -236,14 +239,12 @@ class ConfigUpgrade
      *
      * - setting triggerInvoiceSendEvent removed.
      * - setting triggerInvoiceEvent introduced.
-     *
-     * @return bool
      */
     protected function upgrade453(): bool
     {
         // Keep track of settings that should be updated.
         $newSettings = [];
-        if ($this->getConfig()->get('triggerInvoiceSendEvent') == 2) {
+        if ($this->getConfig()->get('triggerInvoiceSendEvent') === 2) {
             $newSettings['triggerInvoiceEvent'] = Config::TriggerInvoiceEvent_Create;
         } else {
             $newSettings['triggerInvoiceEvent'] = Config::TriggerInvoiceEvent_None;
@@ -256,8 +257,6 @@ class ConfigUpgrade
      * 4.6.0 upgrade.
      *
      * - setting removeEmptyShipping inverted.
-     *
-     * @return bool
      */
     protected function upgrade460(): bool
     {
@@ -278,8 +277,6 @@ class ConfigUpgrade
      * 4.7.0 upgrade.
      *
      * - salutation could already use token, but with old syntax: remove # after [.
-     *
-     * @return bool
      */
     protected function upgrade470(): bool
     {
@@ -300,8 +297,6 @@ class ConfigUpgrade
      * 4.7.3 upgrade.
      *
      * - subject could already use token, but with #b and #f replace by new token syntax.
-     *
-     * @return bool
      */
     protected function upgrade473(): bool
     {
@@ -323,8 +318,6 @@ class ConfigUpgrade
      * 4.9.6 upgrade.
      *
      * - 4.7.3 update was never called (due to a typo 4.7.0 update was called).
-     *
-     * @return bool
      */
     protected function upgrade496(): bool
     {
@@ -335,8 +328,6 @@ class ConfigUpgrade
      * 5.4.0 upgrade.
      *
      * - ConfigStore->save should store all settings in 1 serialized value.
-     *
-     * @return bool
      */
     protected function upgrade540(): bool
     {
@@ -356,15 +347,13 @@ class ConfigUpgrade
      * 5.4.1 upgrade.
      *
      * - property source originalInvoiceSource renamed to order.
-     *
-     * @return bool
      */
     protected function upgrade541(): bool
     {
         $result = true;
         $doSave = false;
         $values = $this->getConfig()->getAll();
-        array_walk_recursive($values, function(&$value) use (&$doSave) {
+        array_walk_recursive($values, static function(&$value) use (&$doSave) {
             if (is_string($value) && strpos($value, 'originalInvoiceSource::') !== false) {
                 $value = str_replace('originalInvoiceSource::', 'order::', $value);
                 $doSave = true;
@@ -381,8 +370,6 @@ class ConfigUpgrade
      * 5.4.2 upgrade.
      *
      * - property paymentState renamed to paymentStatus.
-     *
-     * @return bool
      */
     protected function upgrade542(): bool
     {
@@ -390,7 +377,7 @@ class ConfigUpgrade
         $doSave = false;
         $configStore = $this->getConfigStore();
         $values = $configStore->load();
-        array_walk_recursive($values, function(&$value) use (&$doSave) {
+        array_walk_recursive($values, static function(&$value) use (&$doSave) {
             if (is_string($value) && strpos($value, 'paymentState') !== false) {
                 $value = str_replace('paymentState', 'paymentStatus', $value);
                 $doSave = true;
@@ -407,8 +394,6 @@ class ConfigUpgrade
      * 5.5.0 upgrade.
      *
      * - setting digitalServices extended and therefore renamed to foreignVat.
-     *
-     * @return bool
      */
     protected function upgrade550(): bool
     {
@@ -421,8 +406,6 @@ class ConfigUpgrade
      * 6.0.0 upgrade.
      *
      * - Log level is now a Severity constant.
-     *
-     * @return bool
      */
     protected function upgrade600(): bool
     {
@@ -450,8 +433,6 @@ class ConfigUpgrade
      * 6.3.0 upgrade.
      *
      * - Only 1 setting for type of tax and its classes (foreign, free, 0).
-     *
-     * @return bool
      */
     protected function upgrade631(): bool
     {
@@ -499,8 +480,6 @@ class ConfigUpgrade
      *
      * - values for setting nature_shop changed into combinable bit values.
      * - foreignVatClasses renamed to euVatClasses.
-     *
-     * @return bool
      */
     protected function upgrade640(): bool
     {
@@ -537,8 +516,6 @@ class ConfigUpgrade
      *   - renamed the original settings by adding 'Detail' to the end.
      *   - introduced 2 new settings for the list page, copy value from the
      *     original value for the detail screen.
-     *
-     * @return bool
      */
     protected function upgrade740(): bool
     {

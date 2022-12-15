@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Magento\Config;
 
 use Magento\Framework\UrlInterface;
@@ -14,7 +17,7 @@ use Siel\Acumulus\Config\Config;
  */
 class ShopCapabilities extends ShopCapabilitiesBase
 {
-    private $order = [
+    private array $order = [
         'adjustmentNegative',
         'adjustmentPositive',
         'appliedRuleIds',
@@ -153,7 +156,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
         'statusHistories',
         'extensionAttributes',
     ];
-    private $creditMemo = [
+    private array $creditMemo = [
         'adjustment',
         'adjustmentNegative',
         'adjustmentPositive',

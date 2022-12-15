@@ -601,7 +601,7 @@ class OcHelper
 
         // Install initial config.
         if ($result) {
-            $this->acumulusContainer->getConfig()->save([Config::configVersion => Version]);
+            $this->acumulusContainer->getConfig()->save([Config::VersionKey => Version]);
         }
 
         $this->acumulusContainer->getLog()->info('%s: installed version = %s, $result = %s', __METHOD__, Version, $result ? 'true' : 'false');
@@ -637,7 +637,7 @@ class OcHelper
      */
     protected function doUpgrade()
     {
-        if (!empty($this->acumulusContainer->getConfig()->get(Config::configVersion))) {
+        if (!empty($this->acumulusContainer->getConfig()->get(Config::VersionKey))) {
             // Config updates are now done in the config itself and, for now, no
             // data model changes have been made since the introduction of
             // configVersion, so we can return.

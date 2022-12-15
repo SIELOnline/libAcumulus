@@ -24,7 +24,7 @@ class ConnectionHandlerTest extends TestCase
 
     public function testCreate(): void
     {
-        $isPHP8 = version_compare(PHP_VERSION, '8', '>=');
+        $isPHP8 = version_compare(phpversion(), '8', '>=');
 
         $connectionHandler = $this->getConnectionHandler();
         $ch1 = $connectionHandler->get('https://www.example.com/example-resource');

@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Joomla\VirtueMart\Config;
 
 use Joomla\CMS\Uri\Uri;
@@ -17,7 +20,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getTokenInfoSource(): array
+    protected function getTokenInfoSource(): array
     {
         return [
             'more-info' => $this->t('see_properties_below'),

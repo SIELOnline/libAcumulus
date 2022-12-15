@@ -1,4 +1,9 @@
-<?php /** @noinspection PhpMultipleClassDeclarationsInspection */
+<?php
+/**
+ * @noinspection PhpMultipleClassDeclarationsInspection
+ */
+
+declare(strict_types=1);
 
 namespace Siel\Acumulus\OpenCart\Config;
 
@@ -6,6 +11,8 @@ use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
+
+use function defined;
 
 /**
  * Defines the OpenCart web shop specific capabilities.

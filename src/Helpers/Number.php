@@ -1,5 +1,13 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Helpers;
+
+use InvalidArgumentException;
+
+use function is_string;
+use function strlen;
 
 /**
  * Number contains features to work with float numbers, especially amounts.
@@ -23,8 +31,6 @@ class Number
      * Returns the range within which the result of a division should fall,
      * given the precision range for the 2 numbers to divide.
      *
-     * @param float $numerator
-     * @param float $denominator
      * @param float $numeratorPrecision
      *   The precision used when rounding the number. This means that the
      *   original numerator will not differ more than half of this in any
@@ -37,12 +43,16 @@ class Number
      * @return array
      *   Array of floats with keys 'min', 'max' and 'calculated'.
      */
-    public static function getDivisionRange(float $numerator, float $denominator, float $numeratorPrecision, float $denominatorPrecision): array
-    {
+    public static function getDivisionRange(
+        float $numerator,
+        float $denominator,
+        float $numeratorPrecision,
+        float $denominatorPrecision
+    ): array {
         // The actual value can be half the precision lower or higher.
-        // To err on the save side, we take 60% of it (instead of 50%).
-        $numeratorHalfRange = 0.6 * $numeratorPrecision;
-        $denominatorHalfRange = 0.6 * $denominatorPrecision;
+        // To err on the save side, we take 56% of it (instead of 50%).
+        $numeratorHalfRange = 0.56 * $numeratorPrecision;
+        $denominatorHalfRange = 0.56 * $denominatorPrecision;
 
         // The min values should be closer to 0 then the value.
         // The max values should be further from 0 then the value.
@@ -64,37 +74,63 @@ class Number
         $max = $maxNumerator / $minDenominator;
         $calculated = $numerator / $denominator;
 
-        return ['min' => $min, 'calculated' => $calculated, 'max' => $max];
+        return compact('min', 'calculated', 'max');
     }
 
     /**
      * Helper method to do a float comparison
      *
-     * Comparison is based on a maximum difference, as exact bit by bit equality
+     * Comparison is based on a maximum delta, as exact bit by bit equality
      * for "equal" floats is often not the case.
+     *
+     * @param $f1
+     *   A value that can be converted to a float.
+     * @param $f2
+     *   A value that can be converted to a float.
      */
-    public static function floatsAreEqual(float $f1, float $f2, float $maxDiff = 0.0051): bool
+    public static function floatsAreEqual($f1, $f2, float $delta = 0.0051): bool
     {
-        return abs($f2 - $f1) < $maxDiff;
+        $f1 = static::turnIntoFloat($f1);
+        $f2 = static::turnIntoFloat($f2);
+        return abs($f2 - $f1) < $delta;
     }
 
     /**
      * Indicates if a float is to be considered zero.
      *
      * This is a wrapper around floatsAreEqual() for the case where an amount is
-     * checked for being 0.0 or empty, meaning that $f1 does not necessarily
-     * have to be a float but may be an empty value as well. Known examples:
-     * - Magento: getBaseDiscountAmount(), and many other getters, may return
-     *   null.
-     * - WooCommerce: A 0 amount may be stored as an empty string in the
-     *   database.
+     * checked for being 0.0.
      */
     public static function isZero($f1, float $maxDiff = 0.0011): bool
     {
-        if (!is_float($f1) && empty($f1)) {
-            $f1 = 0.0;
-        }
         return static::floatsAreEqual($f1, 0.0, $maxDiff);
+    }
+
+    /**
+     * Converts a value into a float.
+     *
+     * Values passed to {@see floatsAreEqual()} are not necessarily floats, but
+     * may be a numeric string or an empty value indicating 0. Known examples:
+     * - Magento: getBaseDiscountAmount(), and many other getters, may return
+     *   null for 0 amounts.
+     * - WooCommerce: A 0 amount may be stored as an empty string in the
+     *   database. Non 0 amounts may be stored as their string representation.
+     *
+     * @param mixed $f
+     *  A value to be converted into a float
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected static function turnIntoFloat($f): float
+    {
+        if ($f !== null && $f !== '' && !is_numeric($f)) {
+            /** @noinspection JsonEncodingApiUsageInspection */
+            throw new InvalidArgumentException(sprintf(
+                '%s is not considered a numeric value',
+                json_encode($f)
+            ));
+        }
+        return (float) $f;
     }
 
     /**
@@ -120,7 +156,7 @@ class Number
             $pos = strrpos($f, '.');
             return $pos === false || strlen(rtrim($f, '0')) - $pos - strlen('.') <= $precision;
         } else {
-            // f $f is a float, we use the round() function and look at the
+            // If $f is a float, we use the round() function and look at the
             // difference (testing floats for equality within a given margin).
             return static::floatsAreEqual($f, round($f, $precision), (10 ** -($precision + 2)) / 2.0);
         }

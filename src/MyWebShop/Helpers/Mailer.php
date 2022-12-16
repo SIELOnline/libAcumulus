@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\MyWebShop\Helpers;
 
 use Siel\Acumulus\Helpers\Mailer as BaseMailer;
@@ -14,9 +17,8 @@ class Mailer extends BaseMailer
     public function sendMail(string $from, string $fromName, $to, $subject, $bodyText, $bodyHtml)
     {
         // @todo: adapt to MyWebShop's way of creating a mailer, a "mail object", and having the "mail object" sent by the mailer.
-        $result = Mail::Send($this->translator->getLanguage(), $from, $fromName, $subject, $to, $bodyHtml);
         // @todo: if necessary, cast the result to a bool indicating success.
-        return $result;
+        return Mail::Send($this->translator->getLanguage(), $from, $fromName, $subject, $to, $bodyHtml);
     }
 
     /**

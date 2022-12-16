@@ -1,6 +1,10 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\MyWebShop\Helpers;
 
+use AbstractLogger;
 use Siel\Acumulus\Helpers\Log as BaseLog;
 use Siel\Acumulus\Helpers\Severity;
 
@@ -13,13 +17,12 @@ use Siel\Acumulus\Helpers\Severity;
  */
 class Log extends BaseLog
 {
-    /** @var \AbstractLogger */
-    protected $logger = null;
+    protected AbstractLogger $logger;
 
     /**
      * {@inheritdoc}
      */
-    protected function write(string $message, int $severity)
+    protected function write(string $message, int $severity): void
     {
         // @todo: adapt to MyWebShop's way of logging.
         // @todo: If you do not log to a separate Acumulus log file, you may want to add 'Acumulus' (and the library version) to the message to log.
@@ -60,7 +63,7 @@ class Log extends BaseLog
      */
     protected function getLogger()
     {
-        if ($this->logger === null) {
+        if (!isset($this->logger)) {
             // @todo: Instantiate a web shop specific log object that logs to a separate Acumulus log file.
             $this->logger = new FileLogger(AbstractLogger::DEBUG);
             $this->logger->setFilename(_ROOT_DIR_ . '/'. $logDirectory . '/acumulus.log');

@@ -1,25 +1,27 @@
 <?php
 /**
+ * Note: even though the note below is true, we ignore it. So a failing minimal
+ * PHP version requirement will fail before it gets here.
+ *
  * Note: As long as we want to check for a minimal PHP version via the
  * Requirements checking process provided by the classes below, and we want to
- * properly log and inform the user, we should not use PHP7 language constructs
- * in the following classes (and its child classes):
+ * properly log and inform the user, we should not use language constructs
+ * that are only available as of that minimum version in the following classes
+ * (and their child classes):
  * - {@see Container}: creates instances of the below classes.
  * - {@see Requirements}: executes the checks.
  * - {@see \Siel\Acumulus\Config\ConfigUpgrade}: initiates the check.
- * - {@see \Siel\Acumulus\Helpers\Severity}: part of a failed check.
- * - {@see \Siel\Acumulus\Helpers\Message}: represents a failed check.
- * - {@see \Siel\Acumulus\Helpers\MessageCollection}: represents failed checks.
+ * - {@see Severity}: part of a failed check.
+ * - {@see Message}: represents a failed check.
+ * - {@see MessageCollection}: represents failed checks.
  * - {@see Log}: Logs failed checks.
- *
- * The PHP7 language constructs we suppress the warnings for:
- * @noinspection PhpMissingParamTypeInspection
- * @noinspection PhpMissingReturnTypeInspection
- * @noinspection PhpMissingFieldTypeInspection
- * @noinspection PhpMissingVisibilityInspection
  */
 
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Helpers;
+
+use function extension_loaded;
 
 /**
  * Defines and checks the requirements for this library. Used on installation.
@@ -37,7 +39,7 @@ class Requirements
      *   currently, no Dutch translations are available. The values are in
      *   English.
      */
-    public function check()
+    public function check(): array
     {
         $result = [];
 

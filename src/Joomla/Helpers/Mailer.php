@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Joomla\Helpers;
 
 use Joomla\CMS\Factory;
@@ -24,7 +27,7 @@ class Mailer extends BaseMailer
         string $subject,
         string $bodyText,
         string $bodyHtml
-    ): bool {
+    ) {
         $mailer = Factory::getMailer();
         /** @noinspection PhpRedundantOptionalArgumentInspection */
         $mailer->isHtml(true);
@@ -37,8 +40,7 @@ class Mailer extends BaseMailer
             if ($result === false) {
                 $result = Text::_('JLIB_MAIL_FUNCTION_OFFLINE');
             }
-        }
-        catch (RuntimeException $e){
+        } catch (RuntimeException $e) {
             $result = $e->getMessage();
         }
         return $result;
@@ -50,8 +52,7 @@ class Mailer extends BaseMailer
     public function getFrom(): string
     {
         /** @noinspection PhpUnhandledExceptionInspection */
-        $app = Factory::getApplication();
-        return $app->get('mailfrom');
+        return Factory::getApplication()->get('mailfrom');
     }
 
     /**

@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Helpers;
 
 use DOMDocument;
@@ -334,7 +337,7 @@ class Util
      * @throws \Siel\Acumulus\ApiClient\AcumulusException
      *   Always.
      *
-     * @deprecated: we now throw on error: look at uses and see if we have to
+     * @deprecated We now throw on error: look at usages and see if we have to
      *   replace that with a try-catch.
      */
     public function raiseJsonError(): void

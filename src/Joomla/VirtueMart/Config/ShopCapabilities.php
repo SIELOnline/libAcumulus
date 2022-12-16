@@ -203,7 +203,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
         /** @var VirtueMartModelOrderstatus $orderStatusModel */
         $orderStatusModel = VmModel::getModel('orderstatus');
         /** @var array[] $orderStatuses Method getOrderStatusNames() has an incorrect @return type ... */
-        $orderStatuses = $orderStatusModel->getOrderStatusNames();
+        $orderStatuses = $orderStatusModel::getOrderStatusNames();
         foreach ($orderStatuses as &$value) {
             $value = JText::_($value['order_status_name']);
         }
@@ -252,7 +252,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     {
         switch ($linkType) {
             case 'pro-support-image':
-                return URI::root(true) . '/administrator/components/com_acumulus/media/pro-support-virtuemart.png';
+                return Uri::root(true) . '/administrator/components/com_acumulus/media/pro-support-virtuemart.png';
             case 'pro-support-link':
                 return 'https://pay.siel.nl/?p=t7jYwPSWYgFJdWQuWVJmC0R6d6LWHKmNVsNUlgtv82TIhgNS';
         }

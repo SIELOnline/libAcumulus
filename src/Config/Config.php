@@ -144,7 +144,7 @@ class Config
 
             if (!empty($this->values[Config::VersionKey])
                 && version_compare($this->values[Config::VersionKey], Version, '<')
-                && !$this->isUpgrading
+                && !isset($this->isUpgrading)
             ) {
                 $this->isUpgrading = true;
                 $this->getConfigUpgrade()->upgrade($this->values[Config::VersionKey]);

@@ -18,7 +18,7 @@ class ConfigStore extends BaSeConfigStore
     public function load(): array
     {
         $values = Configuration::get(strtoupper($this->configKey));
-        return unserialize($values);
+        return unserialize($values, ['allow_classes' => false]);
     }
 
     /**
@@ -26,7 +26,7 @@ class ConfigStore extends BaSeConfigStore
      */
     public function save(array $values): bool
     {
-        $values = serialize($values);
-        return Configuration::updateValue(strtoupper($this->configKey), $values);
+        $serializedValues = serialize($values);
+        return Configuration::updateValue(strtoupper($this->configKey), $serializedValues);
     }
 }

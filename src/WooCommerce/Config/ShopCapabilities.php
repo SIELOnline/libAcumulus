@@ -263,6 +263,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
             if (substr($key, 0, strlen('wc-')) === 'wc-') {
                 $key = substr($key, strlen('wc-'));
             }
+            /** @noinspection OffsetOperationsInspection */
             $result[$key] = $label;
         }
         return $result;
@@ -301,7 +302,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     {
         $result = [];
         /** @noinspection PhpUndefinedFieldInspection */
-        $paymentGateways = wc()->payment_gateways->payment_gateways();
+        $paymentGateways = WC()->payment_gateways->payment_gateways();
         foreach ($paymentGateways as $id => $paymentGateway) {
             if (isset($paymentGateway->enabled) && $paymentGateway->enabled === 'yes') {
                 $result[$id] = $paymentGateway->title;

@@ -46,6 +46,7 @@ class ConfigStore extends BaSeConfigStore
      *   type is a \ModelSettingSetting.
      * @noinspection PhpIncompatibleReturnTypeInspection
      * @noinspection PhpReturnDocTypeMismatchInspection
+     * @noinspection ReturnTypeCanBeDeclaredInspection
      */
     protected function getSettings()
     {

@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Joomla\Helpers;
 
 use Joomla\CMS\Log\Log as JoomlaLog;
@@ -16,7 +19,8 @@ class Log extends BaseLog
     public function __construct($libraryVersion)
     {
         parent::__construct($libraryVersion);
-        JoomlaLog::addLogger(['text_file' => 'acumulus.log.php'],
+        JoomlaLog::addLogger(
+            ['text_file' => 'acumulus.log.php'],
             JoomlaLog::ALL,
             ['com_acumulus ' . $this->getLibraryVersion()]
         );
@@ -27,7 +31,7 @@ class Log extends BaseLog
      *
      * This override uses JoomlaLog.
      */
-    protected function write(string $message, int $severity)
+    protected function write(string $message, int $severity): void
     {
         JoomlaLog::add($message, $this->getJoomlaSeverity($severity), 'com_acumulus');
     }

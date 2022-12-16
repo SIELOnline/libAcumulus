@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\PrestaShop\Helpers;
 
 use Configuration;
@@ -6,16 +9,15 @@ use Language;
 use Mail;
 use Siel\Acumulus\Helpers\Mailer as BaseMailer;
 
+use function is_int;
+
 /**
  * Extends the base mailer class to send a mail using the PrestaShop mailer.
  */
 class Mailer extends BaseMailer
 {
-    /** @var string */
-    protected $templateDir;
-
-    /** @var string */
-    protected $templateName;
+    protected string $templateDir;
+    protected string $templateName;
 
     /**
      * {@inheritdoc}
@@ -36,7 +38,7 @@ class Mailer extends BaseMailer
         $languageId = Language::getIdByIso($this->translator->getLanguage());
         $templateVars = [];
 
-        $result = Mail::Send($languageId, $this->templateName, $subject, $templateVars, $to, '', $from, $fromName, null, null, $this->templateDir);
+        $result = Mail::send($languageId, $this->templateName, $subject, $templateVars, $to, '', $from, $fromName, null, null, $this->templateDir);
 
         // Clear the template files as they contain privacy-sensitive data.
         $this->writeTemplateFiles('', '');
@@ -80,7 +82,7 @@ class Mailer extends BaseMailer
      * Writes the mail bodies (html and text) to template files as used by the
      * PrestaShop mailer.
      */
-    protected function writeTemplateFiles(string $bodyText, string $bodyHtml)
+    protected function writeTemplateFiles(string $bodyText, string $bodyHtml): void
     {
         $languageIso = $this->translator->getLanguage();
         $templateBaseName = $this->templateDir . $languageIso . '/' . $this->templateName;

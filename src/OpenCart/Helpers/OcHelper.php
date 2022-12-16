@@ -1,17 +1,10 @@
 <?php
 /**
- * Note: we should not use PHP7 language constructs in this class. See e.g.
- * {@see \Siel\Acumulus\Helpers\Log} for more information.
- *
- * The PHP7 language constructs we suppress the warnings for:
- *
- * @noinspection PhpMissingParamTypeInspection
- * @noinspection PhpMissingReturnTypeInspection
- * @noinspection PhpMissingFieldTypeInspection
- * @noinspection PhpMissingVisibilityInspection
- * @noinspection PhpConcatenationWithEmptyStringCanBeInlinedInspection
  * @noinspection PhpMultipleClassDeclarationsInspection
+ * @noinspection PhpClassHasTooManyDeclaredMembersInspection
  */
+
+declare(strict_types=1);
 
 namespace Siel\Acumulus\OpenCart\Helpers;
 
@@ -26,6 +19,10 @@ use stdClass;
 
 use Throwable;
 
+use function count;
+use function in_array;
+use function strlen;
+
 use const Siel\Acumulus\Version;
 
 /**
@@ -38,24 +35,14 @@ use const Siel\Acumulus\Version;
  */
 class OcHelper
 {
-    /** @var \Siel\Acumulus\Helpers\Container */
-    protected $acumulusContainer = null;
+    protected Container $acumulusContainer;
+    public array $data;
+    protected Registry $registry;
 
-    /** @var array */
-    public $data;
-
-    /** @var \Siel\Acumulus\OpenCart\Helpers\Registry */
-    protected $registry;
-
-    /**
-     * OcHelper constructor.
-     *
-     * @param \Registry $registry
-     * @param \Siel\Acumulus\Helpers\Container $acumulusContainer
-     */
     public function __construct(\Registry $registry, Container $acumulusContainer)
     {
         $this->acumulusContainer = $acumulusContainer;
+        /** @noinspection PhpFieldAssignmentTypeMismatchInspection */
         $this->registry = $this->acumulusContainer->getInstance('Registry', 'Helpers', [$registry]);
         $this->data = [];
 
@@ -71,7 +58,7 @@ class OcHelper
      *
      * @param Message[] $messages
      */
-    protected function addMessages($messages)
+    protected function addMessages(array $messages): void
     {
         foreach ($messages as $message) {
             switch ($message->getSeverity()) {
@@ -101,14 +88,14 @@ class OcHelper
     /**
      * Helper method to translate strings.
      *
-     * @param string $key
+     * @param string|int $key
      *  The key to get a translation for.
      *
      * @return string
      *   The translation for the given key or the key itself if no translation
      *   could be found.
      */
-    protected function t($key)
+    private function t($key): string
     {
         return $this->acumulusContainer->getTranslator()->get($key);
     }
@@ -119,7 +106,7 @@ class OcHelper
      * @return string
      *   The location of the module.
      */
-    public function getLocation()
+    public function getLocation(): string
     {
         return $this->registry->getLocation();
     }
@@ -131,18 +118,18 @@ class OcHelper
      *
      * @throws \Exception
      */
-    public function install()
+    public function install(): bool
     {
         $this->registry->load->model('setting/setting');
         $setting = $this->registry->model_setting_setting->getSetting('acumulus_siel');
         $isAlreadyInstalled = count($setting) > 0;
 
-        if (!$isAlreadyInstalled) {
-            // Call the actual install method.
-            $result = $this->doInstall();
-        } else {
+        if ($isAlreadyInstalled) {
             // Config already exists:this is not a clean install: upgrade.
             $result = $this->doUpgrade();
+        } else {
+            // Call the actual install method.
+            $result = $this->doInstall();
         }
         return $result;
     }
@@ -152,7 +139,7 @@ class OcHelper
      *
      * @throws \Exception
      */
-    public function uninstall()
+    public function uninstall(): void
     {
         // "Disable" (delete) events, regardless the confirmation answer.
         $this->uninstallEvents();
@@ -165,7 +152,7 @@ class OcHelper
      *
      * @throws \Throwable
      */
-    public function config()
+    public function config(): void
     {
         $this->handleForm('config');
     }
@@ -175,7 +162,7 @@ class OcHelper
      *
      * @throws \Throwable
      */
-    public function advancedConfig()
+    public function advancedConfig(): void
     {
         $this->handleForm('advanced');
     }
@@ -185,7 +172,7 @@ class OcHelper
      *
      * @throws \Throwable
      */
-    public function batch()
+    public function batch(): void
     {
         $this->handleForm('batch');
     }
@@ -195,7 +182,7 @@ class OcHelper
      *
      * @throws \Throwable
      */
-    public function activate()
+    public function activate(): void
     {
         $this->handleForm('activate');
     }
@@ -205,7 +192,7 @@ class OcHelper
      *
      * @throws \Throwable
      */
-    public function register()
+    public function register(): void
     {
         $this->handleForm('register');
     }
@@ -238,7 +225,7 @@ class OcHelper
      *
      * @throws \Throwable
      */
-    public function eventViewSaleOrderInfo(int $orderId, array &$tabs)
+    public function eventViewSaleOrderInfo(int $orderId, array &$tabs): void
     {
         if ($this->acumulusContainer->getConfig()->getInvoiceStatusSettings()['showInvoiceStatus']) {
             try {
@@ -266,7 +253,7 @@ class OcHelper
      *
      * @throws \Throwable
      */
-    public function invoice()
+    public function invoice(): void
     {
         try {
             $this->initFormInvoice();
@@ -318,7 +305,7 @@ class OcHelper
     /**
      * Performs the common tasks when displaying a form.
      */
-    protected function initFormFullPage(string $type)
+    protected function initFormFullPage(string $type): void
     {
         $this->initFormCommon($type);
 
@@ -330,8 +317,8 @@ class OcHelper
 
         // Set headers and titles.
         $this->registry->document->setTitle($this->t("{$type}_form_title"));
-        $this->data["page_title"] = $this->t("{$type}_form_title");
-        $this->data["text_edit"] = $this->t("{$type}_form_header");
+        $this->data['page_title'] = $this->t("{$type}_form_title");
+        $this->data['text_edit'] = $this->t("{$type}_form_header");
 
         $link = $this->getLocation();
         if ($type !== 'config') {
@@ -357,10 +344,15 @@ class OcHelper
 
         // Set the action buttons (action + text).
         $this->data['action'] = $this->registry->getLink($link);
-        $this->data['button_icon'] = $type === 'batch' ? 'fa-envelope-o'
-            : ($type === 'uninstall' ? 'fa-delete'
-            : (in_array($type,['activate', 'register']) ? 'fa-plus'
-            : 'fa-save'));
+        if ($type === 'batch') {
+            $this->data['button_icon'] = 'fa-envelope-o';
+        } elseif ($type === 'uninstall') {
+            $this->data['button_icon'] = 'fa-delete';
+        } elseif (in_array($type, ['activate', 'register'])) {
+            $this->data['button_icon'] = 'fa-plus';
+        } else {
+            $this->data['button_icon'] = 'fa-save';
+        }
         $this->data['button_save'] = $this->t("button_submit_$type");
         $this->data['cancel'] = $this->registry->getLink('common/dashboard');
         $this->data['button_cancel'] = $type === 'uninstall' ? $this->t('button_cancel_uninstall') : $this->t('button_cancel');
@@ -440,7 +432,7 @@ class OcHelper
      * @return string
      *   The url to redirect to after uninstall.
      */
-    protected function getRedirectUrl()
+    protected function getRedirectUrl(): string
     {
         return 'marketplace/extension';
     }
@@ -455,7 +447,7 @@ class OcHelper
      * @return array
      *   The intermediate breadcrumb for the config screen.
      */
-    protected function getExtensionsBreadcrumb()
+    protected function getExtensionsBreadcrumb(): array
     {
         return [
             'text' => $this->t('extensions'),
@@ -492,11 +484,9 @@ class OcHelper
      * @return int
      *   The id of the order that triggered the event.
      */
-    public function extractOrderId(array $args)
+    public function extractOrderId(array $args): int
     {
-        $route = $args[0];
-        $event_args = $args[1];
-        $output = $args[2];
+        [$route, $event_args, $output] = $args;
         $order_id = substr($route, -strlen('/addOrder')) ===  '/addOrder' ? $output : $event_args[0];
         return (int) $order_id;
     }
@@ -506,7 +496,7 @@ class OcHelper
      *
      * @param int $order_id
      */
-    public function eventOrderUpdate($order_id)
+    public function eventOrderUpdate(int $order_id): void
     {
         $source = $this->acumulusContainer->createSource(Source::Order, $order_id);
         $this->acumulusContainer->getInvoiceManager()->sourceStatusChange($source);
@@ -518,7 +508,7 @@ class OcHelper
      * @param array $menus
      *   The menus part of the data as will be passed to the view.
      */
-    public function eventViewColumnLeft(&$menus)
+    public function eventViewColumnLeft(array &$menus): void
     {
         foreach ($menus as &$menu) {
             if ($menu['id'] === 'menu-sale') {
@@ -555,7 +545,7 @@ class OcHelper
     /**
      * Adds css and js to our status overview on the order info view.
      */
-    public function eventControllerSaleOrderInfo()
+    public function eventControllerSaleOrderInfo(): void
     {
         if ($this->acumulusContainer->getConfig()->getInvoiceStatusSettings()['showInvoiceStatus']) {
             $this->registry->document->addStyle('view/stylesheet/acumulus.css');
@@ -571,7 +561,7 @@ class OcHelper
      *   Success.
      *
      * @noinspection PhpDocMissingThrowsInspection*/
-    protected function doInstall()
+    protected function doInstall(): bool
     {
         $requirements = $this->acumulusContainer->getRequirements();
         $messages = $requirements->check();
@@ -616,7 +606,7 @@ class OcHelper
      *
      * @throws \Exception
      */
-    protected function doUninstall()
+    protected function doUninstall(): bool
     {
         $this->acumulusContainer->getAcumulusEntryManager()->uninstall();
 
@@ -635,7 +625,7 @@ class OcHelper
      *
      * @noinspection PhpDocMissingThrowsInspection
      */
-    protected function doUpgrade()
+    protected function doUpgrade(): bool
     {
         if (!empty($this->acumulusContainer->getConfig()->get(Config::VersionKey))) {
             // Config updates are now done in the config itself and, for now, no
@@ -714,7 +704,7 @@ class OcHelper
      *
      * @throws \Exception
      */
-    protected function installEvents()
+    protected function installEvents(): void
     {
         $this->uninstallEvents();
         $location = $this->getLocation();
@@ -734,7 +724,7 @@ class OcHelper
      *
      * @throws \Exception
      */
-    protected function uninstallEvents()
+    protected function uninstallEvents(): void
     {
         /** @var \ModelSettingEvent $model */
         $model = $this->registry->getModel('setting/event');

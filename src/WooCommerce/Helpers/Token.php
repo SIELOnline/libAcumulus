@@ -1,9 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Siel\Acumulus\WooCommerce\Helpers;
 
 use Siel\Acumulus\Helpers\Token as BaseToken;
 use WC_Data;
+
+use function array_key_exists;
+use function call_user_func_array;
+use function count;
+use function is_array;
 
 /**
  * WC3 override of Token.
@@ -13,7 +20,7 @@ class Token extends BaseToken
     /**
      * {@inheritdoc}
      */
-    protected function getObjectProperty(object $variable, string $property, array $args): ?string
+    protected function getObjectProperty(object $variable, string $property, array $args)
     {
         if ($variable instanceof WC_Data) {
             $method1 = $property;
@@ -45,13 +52,16 @@ class Token extends BaseToken
      * @param string $property
      *   The name of the property to search for.
      *
-     * @return null|string
+     * @return mixed
      *   The value for the property of the given name, or null or the empty
      *   string if not available (or the property really equals null or the
      *   empty string). The return value may be a scalar (numeric type) that can
      *   be converted to a string.
+     *
+     * @noinspection OffsetOperationsInspection
+     *   explode can return false but won't.
      */
-    protected function getDataValue(array $data, string $property): ?string
+    protected function getDataValue(array $data, string $property)
     {
         $value = null;
         if (array_key_exists($property, $data)) {

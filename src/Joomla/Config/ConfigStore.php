@@ -21,7 +21,7 @@ class ConfigStore extends BaSeConfigStore
     {
         /** @noinspection PhpDeprecationInspection : Deprecated as of J4 */
         $extensionTable = new Extension(Factory::getDbo());
-        $extensionTable->load(array('element' => 'com_acumulus'));
+        $extensionTable->load(['element' => 'com_acumulus']);
         $values = $extensionTable->get('custom_data');
         return !empty($values) ? json_decode($values, true) : [];
     }

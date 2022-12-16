@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Magento\Helpers;
 
 use Exception;
@@ -8,6 +11,7 @@ use Magento\Framework\Component\ComponentRegistrarInterface;
 use Magento\Framework\Filesystem\Directory\ReadFactory;
 use Magento\Framework\Locale\ResolverInterface;
 use Magento\Framework\Module\ResourceInterface;
+use Magento\Framework\ObjectManagerInterface;
 
 /**
  * Registry is a wrapper around the Magento2 ObjectManager to get objects of all
@@ -15,20 +19,9 @@ use Magento\Framework\Module\ResourceInterface;
  */
 class Registry
 {
-    /**
-     * @var \Siel\Acumulus\Magento\Helpers\Registry
-     */
-    protected static $instance;
-
-    /**
-     * @var \Magento\Framework\ObjectManagerInterface
-     */
-    protected $objectManager;
-
-    /**
-     * @var string
-     */
-    protected $locale;
+    protected static Registry $instance;
+    protected ObjectManagerInterface $objectManager;
+    protected string $locale;
 
     /**
      * Returns the Registry instance.
@@ -46,7 +39,7 @@ class Registry
      */
     protected function __construct()
     {
-        /** @var \Magento\Framework\App\Bootstrap */
+        /** @var \Magento\Framework\App\Bootstrap $bootstrap */
         global $bootstrap;
 
         if ($bootstrap) {
@@ -56,7 +49,6 @@ class Registry
             $root = substr(__DIR__, 0, $pos);
             $localBootstrap = Bootstrap::create($root, $_SERVER);
         }
-        /** @var \Magento\Framework\ObjectManagerInterface */
         $this->objectManager = $localBootstrap->getObjectManager();
     }
 
@@ -101,6 +93,7 @@ class Registry
                 $readFactory = $this->get(ReadFactory::class);
                 $directoryRead = $readFactory->create($path);
                 $composerJsonData = $directoryRead->readFile('composer.json');
+                // @todo: json error handling: switch to throw.
                 $data = json_decode($composerJsonData);
                 $result = $data === null ? 'JSON ERROR' : (!empty($data->version) ? $data->version : 'NOT SET');
             } else {

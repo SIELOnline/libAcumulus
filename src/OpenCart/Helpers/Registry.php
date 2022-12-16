@@ -4,7 +4,11 @@
  * @noinspection PhpMultipleClassDeclarationsInspection
  */
 
+declare(strict_types=1);
+
 namespace Siel\Acumulus\OpenCart\Helpers;
+
+use function strlen;
 
 /**
  * Registry is a wrapper around the registry instance which is not directly
@@ -24,21 +28,15 @@ namespace Siel\Acumulus\OpenCart\Helpers;
  */
 class Registry
 {
-    /** @var \Siel\Acumulus\OpenCart\Helpers\Registry */
-    protected static $instance;
-
-    /** @var \Registry */
-    protected $registry;
-
+    protected static Registry $instance;
+    protected \Registry $registry;
     /** @var \ModelCheckoutOrder|\ModelSaleOrder */
     protected $orderModel;
 
     /**
      * Sets the OC Registry.
-     *
-     * @param Registry $registry
      */
-    protected static function setInstance(Registry $registry)
+    protected static function setInstance(Registry $registry): void
     {
         static::$instance = $registry;
     }
@@ -75,7 +73,8 @@ class Registry
 
     /**
      * Magic method __set must be declared public.
-     */
+     *
+     * @noinspection MagicMethodsValidityInspection*/
     public function __set(string $key, $value)
     {
         $this->registry->set($key, $value);
@@ -94,8 +93,6 @@ class Registry
 
     /**
      * Returns the order.
-     *
-     * @param int $orderId
      *
      * @return array|false
      *
@@ -143,6 +140,7 @@ class Registry
      * @noinspection PhpDocMissingThrowsInspection  Will throw an \Exception
      *   when the model class is not found, but that should be considered a
      *   development error.
+     * @noinspection ReturnTypeCanBeDeclaredInspection
      */
     public function getModel(string $modelName)
     {

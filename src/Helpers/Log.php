@@ -1,7 +1,13 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Helpers;
 
 use Throwable;
+
+use function count;
+use function get_class;
 
 /**
  * Allows logging messages to a log.
@@ -23,16 +29,12 @@ class Log
      */
     public const JsonFlags = JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR;
 
-    /** @var int */
-    protected $logLevel = Severity::Info;
-
-    /** @var string */
-    protected $libraryVersion;
-
+    protected int $logLevel = Severity::Info;
+    protected string $libraryVersion;
     /**
      * @var array[]
      */
-    protected $loggedMessages = [];
+    protected array $loggedMessages = [];
 
     /**
      * Log constructor.
@@ -64,7 +66,7 @@ class Log
      *   One of the Severity::... constants: Log, Info, Notice, Warning, Error,
      *   or Exception
      */
-    public function setLogLevel(int $logLevel)
+    public function setLogLevel(int $logLevel): void
     {
         $this->logLevel = $logLevel;
     }
@@ -259,9 +261,10 @@ class Log
      * @param int $severity
      *   One of the Severity::... constants.
      */
-    protected function write(string $message, int $severity)
+    protected function write(string $message, int $severity): void
     {
         $message = sprintf('Acumulus %s: %s - %s', $this->getLibraryVersion(), $this->getSeverityString($severity), $message);
+        /** @noinspection ForgottenDebugOutputInspection */
         error_log($message);
     }
 

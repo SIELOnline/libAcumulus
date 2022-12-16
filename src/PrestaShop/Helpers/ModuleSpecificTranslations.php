@@ -5,10 +5,6 @@
 
 declare(strict_types=1);
 
-/**
- * @noinspection HtmlUnknownTarget
- */
-
 namespace Siel\Acumulus\PrestaShop\Helpers;
 
 use Siel\Acumulus\Helpers\ModuleSpecificTranslations as BaseModuleSpecificTranslations;

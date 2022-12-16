@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Helpers;
 
 /**
@@ -226,7 +229,7 @@ class Countries
             'NU' => 'Niue',
             'MP' => 'Noordelijke Marianen',
             'KP' => 'Noord-Korea',
-            "NO" => 'Noorwegen',
+            'NO' => 'Noorwegen',
             'NF' => 'Norfolk',
             'UG' => 'Oeganda',
             'UA' => 'Oekraïne',

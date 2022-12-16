@@ -1,30 +1,39 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Helpers;
 
 use Siel\Acumulus\Config\Environment;
 use Throwable;
 
+use function function_exists;
+use function is_string;
+use function strlen;
+
+/**
+ * CrashReporter logs and mails a fatal crash.
+ *
+ * At the highest levels of code execution paths in this library, catch-all
+ * exception handling has been placed. If a fatal error occurs which did not
+ * get caught and handled on lower levels, this error will be logged and
+ * mailed to the "admin" of this site (the 'emailonerror' setting).
+ *
+ * This catch-all exception handling has been introduced or the following
+ * reasons:
+ * - If our code fails, we allow the request to continue until its end. We think
+ *   this is better than a WSOD, especially on the user-side.
+ * - May webshops have suboptimal error handling. By doing this ourselves we
+ *   ensure that errors in or code are actually loggend and reported (instead of
+ *   ignored) and thus can be solved faster.
+ */
 class CrashReporter
 {
-    /** @var \Siel\Acumulus\Helpers\Translator */
-    protected $translator;
+    protected Translator $translator;
+    protected Log $log;
+    protected Environment $environment;
+    protected Mailer $mailer;
 
-    /** @var \Siel\Acumulus\Helpers\Log */
-    protected $log;
-
-    /** @var \Siel\Acumulus\Config\Environment */
-    protected $environment;
-
-    /** @var \Siel\Acumulus\Helpers\Mailer */
-    protected $mailer;
-
-    /**
-     * @param \Siel\Acumulus\Helpers\Mailer $mailer
-     * @param \Siel\Acumulus\Config\Environment $environment
-     * @param \Siel\Acumulus\Helpers\Translator $translator
-     * @param \Siel\Acumulus\Helpers\Log $log
-     */
     public function __construct(Mailer $mailer, Environment $environment, Translator $translator, Log $log)
     {
         $this->translator = $translator;
@@ -81,15 +90,13 @@ class CrashReporter
             if (mb_strlen($message) > 150) {
                 $message = mb_substr($message, 0, 147) . '...';
             }
-        } else {
-            if (strlen($message) > 150) {
-                $message = substr($message, 0, 147) . '...';
-            }
+        } elseif (strlen($message) > 150) {
+            $message = substr($message, 0, 147) . '...';
         }
         return sprintf($this->t('crash_admin_message'), $message);
     }
 
-    protected function mailException(string $errorMessage)
+    protected function mailException(string $errorMessage): void
     {
         $environment = $this->environment->get();
         $moduleName = $this->t('module_name');

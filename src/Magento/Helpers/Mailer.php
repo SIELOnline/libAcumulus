@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Magento\Helpers;
 
 use Magento\Backend\App\ConfigInterface as MagentoAppConfigInterface;
@@ -26,13 +29,14 @@ class Mailer extends BaseMailer
         try {
             $email = new Zend_Mail('utf-8');
             /** @noinspection PhpUnhandledExceptionInspection */
-            $email->setFrom($from, $fromName);
-            $email->addTo($to);
-            /** @noinspection PhpUnhandledExceptionInspection */
-            $email->setSubject($subject);
-            $email->setBodyText($bodyText);
-            $email->setBodyHtml($bodyHtml);
-            $email->send();
+            $email
+                ->setFrom($from, $fromName)
+                ->addTo($to)
+                ->setSubject($subject)
+                ->setBodyText($bodyText)
+                ->setBodyHtml($bodyHtml)
+                ->send();
+            // @todo: error handling?
             return true;
         }
         catch (Zend_Mail_Transport_Exception $e) {

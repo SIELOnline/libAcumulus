@@ -1,8 +1,11 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Magento\Helpers\Logger;
 
 /**
- * Class Logger
+ * Logger ...
  *
  * @todo: what does this class do?
  */

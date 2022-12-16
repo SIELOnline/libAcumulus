@@ -27,7 +27,7 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
             case 'invoice':
                 return Route::_("index.php?option=com_acumulus&task=$linkType");
             case 'logo':
-                return URI::root(true) . '/administrator/components/com_acumulus/media/siel-logo.svg';
+                return Uri::root(true) . '/administrator/components/com_acumulus/media/siel-logo.svg';
         }
         return parent::getLink($linkType);
     }

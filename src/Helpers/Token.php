@@ -1,7 +1,18 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Helpers;
 
 use Exception;
+
+use function array_key_exists;
+use function call_user_func_array;
+use function count;
+use function is_array;
+use function is_callable;
+use function is_object;
+use function strlen;
 
 /**
  * Contains functionality to expand a string that may contain tokens.
@@ -93,11 +104,8 @@ class Token
     public const TypeLiteral = 1;
     public const TypeProperty = 2;
 
-    /** @var array */
-    protected $variables;
-
-    /** @var \Siel\Acumulus\Helpers\Log */
-    protected $log;
+    protected array $variables;
+    protected Log $log;
 
     public function __construct(Log $log)
     {
@@ -165,7 +173,7 @@ class Token
                 $nonSeparatedProperties = explode('&', $spaceSeparatedProperty);
                 $nonSeparatedValues = [];
                 foreach ($nonSeparatedProperties as $nonSeparatedProperty) {
-                    if (substr($nonSeparatedProperty, 0, 1) === '"' && substr($nonSeparatedProperty, -1, 1) === '"') {
+                    if ($nonSeparatedProperty[0] === '"' && $nonSeparatedProperty[strlen($nonSeparatedProperty) - 1] === '"') {
                         $nonSeparatedValue = substr($nonSeparatedProperty, 1, -1);
                         $valueType = self::TypeLiteral;
                     } else {
@@ -181,7 +189,7 @@ class Token
             if (!empty($value['value'])) {
                 $value = $value['value'];
                 break;
-            } else {
+            }  else {
                 $value = null;
             }
         }
@@ -190,26 +198,22 @@ class Token
             $this->log->debug("Token::searchProperty('%s'): not found", $propertySpec);
         }
 
-        return $value !== null ? $value : '';
+        return (string) $value;
     }
 
     /**
-     * Searches for a single property in the variables in $propertySources.
+     * Searches for a single property in the "objects" in $propertySources.
      *
-     * @param string $property
-     *
-     * @return null|string
-     *   The value of the property, may be the empty string or null if the
-     *   property was not found (or really equals null or the empty string).
-     *   The return value may be a scalar (numeric type) converted to a string.
+     * @return mixed
+     *   The value of the property, or the empty string or null if the property
+     *   was not found (or really equals null or the empty string).
      */
-    protected function searchProperty(string $property): ?string
+    protected function searchProperty(string $property)
     {
         $value = null;
-        $fullPropertyName = explode('::', $property);
-        if (count($fullPropertyName) > 1) {
-            $variableName = $fullPropertyName[0];
-            $property = $fullPropertyName[1];
+        $fullPropertyName = explode('::', $property, 2);
+        if (count($fullPropertyName) === 2) {
+            [$variableName, $property] = $fullPropertyName;
         } else {
             $variableName = '';
         }
@@ -246,13 +250,12 @@ class Token
      * @param string $property
      *   The property to extract from the variable.
      *
-     * @return null|string
+     * @return mixed
      *   The value for the property of the given name, or null or the empty
      *   string if not available (or the property really equals null or the
-     *   empty string). The return value may be a scalar (numeric type) that can
-     *   be converted to a string.
+     *   empty string).
      */
-    protected function getProperty($variable, string $property): ?string
+    protected function getProperty($variable, string $property)
     {
         $value = null;
 
@@ -272,7 +275,7 @@ class Token
             // It's an object: try to get the property.
             // Safest and fastest way is via the get_object_vars() function.
             $properties = get_object_vars($variable);
-            if (!empty($properties) && array_key_exists($property, $properties)) {
+            if (array_key_exists($property, $properties)) {
                 $value = $properties[$property];
             }
             // WooCommerce can have the property customer_id set to null, while
@@ -304,6 +307,7 @@ class Token
                 $value = (string) $value;
             }
         } catch (Exception $e) {
+            // @todo: log something.
         }
 
         return $value;
@@ -323,13 +327,15 @@ class Token
      * @param array $args
      *   Optional arguments to pass if it is a function.
      *
-     * @return null|string
+     * @return mixed
      *   The value for the property of the given name, or null or the empty
      *   string if not available (or the property really equals null or the
      *   empty string). The return value may be a scalar (numeric type) that can
      *   be converted to a string.
+     *
+     * @noinspection PhpUsageOfSilenceOperatorInspection
      */
-    protected function getObjectProperty(object $variable, string $property, array $args): ?string
+    protected function getObjectProperty(object $variable, string $property, array $args)
     {
         $value = null;
         $method1 = $property;
@@ -342,6 +348,7 @@ class Token
         } elseif (method_exists($variable, $method3)) {
             $value = call_user_func_array([$variable, $method3], $args);
         } elseif (method_exists($variable, '__get')) {
+            /** @noinspection PhpVariableVariableInspection */
             @$value = $variable->$property;
         } elseif (method_exists($variable, '__call')) {
             try {

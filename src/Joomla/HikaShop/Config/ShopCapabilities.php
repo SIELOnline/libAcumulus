@@ -259,7 +259,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     {
         switch ($linkType) {
             case 'pro-support-image':
-                return URI::root(true) . '/administrator/components/com_acumulus/media/pro-support-hikashop.png';
+                return Uri::root(true) . '/administrator/components/com_acumulus/media/pro-support-hikashop.png';
             case 'pro-support-link':
                 return 'https://pay.siel.nl/?p=b5TeLbPw6BtNXRioORwnUtNbpU3yhUAgXLuuEMgk5zcttHbU';
         }

@@ -1,14 +1,6 @@
 <?php
-/**
- * Note: we should not use PHP7 language constructs in this child class. See its
- * parent for more information.
- *
- * The PHP7 language constructs we suppress the warnings for:
- * @noinspection PhpMissingParamTypeInspection
- * @noinspection PhpMissingReturnTypeInspection
- * @noinspection PhpMissingFieldTypeInspection
- * @noinspection PhpMissingVisibilityInspection
- */
+
+declare(strict_types=1);
 
 namespace Siel\Acumulus\OpenCart\Helpers;
 
@@ -24,7 +16,7 @@ class Log extends BaseLog
      *
      * This override uses the OpenCart Log class.
      */
-    protected function write(string $message, int $severity)
+    protected function write(string $message, int $severity): void
     {
         $log = new \Log('acumulus.log');
         $message = sprintf('%s - %s', $this->getSeverityString($severity), $message);

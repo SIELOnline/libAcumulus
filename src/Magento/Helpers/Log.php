@@ -3,11 +3,13 @@
  * @noinspection PhpMultipleClassDeclarationsInspection
  */
 
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Magento\Helpers;
 
 use Magento\Framework\Filesystem\Driver\File;
 use Monolog\Logger;
-use Psr\Log\LoggerInterface as LoggerInterface;
+use Psr\Log\LoggerInterface;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Magento\Helpers\Logger\Handler;
 use Siel\Acumulus\Helpers\Log as BaseLog;
@@ -17,19 +19,11 @@ use Siel\Acumulus\Helpers\Log as BaseLog;
  */
 class Log extends BaseLog
 {
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
+    protected LoggerInterface $logger;
 
-    /**
-     * @return LoggerInterface
-     *
-     * @throws \Exception
-     */
     protected function getLogger(): LoggerInterface
     {
-        if (!$this->logger) {
+        if (!isset($this->logger)) {
             $this->logger = new Logger('acumulus', [new Handler(new File())]);
         }
         return $this->logger;
@@ -40,9 +34,8 @@ class Log extends BaseLog
      *
      * This override uses a PSR3 logger based on MonoLog.
      */
-    protected function write(string $message, int $severity)
+    protected function write(string $message, int $severity): void
     {
-        /** @noinspection PhpUnhandledExceptionInspection */
         $this->getLogger()->log($this->getMagentoSeverity($severity), $message);
     }
 

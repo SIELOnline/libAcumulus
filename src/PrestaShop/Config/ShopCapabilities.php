@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Siel\Acumulus\PrestaShop\Config;
 
 use Context;
-use Joomla\CMS\Uri\Uri;
 use Module;
 use OrderState;
 use PaymentModule;
@@ -305,7 +304,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function getVatClasses(): array
     {
         $result = [];
-        /** @var \stdClass[] $taxClasses */
+        /** @var array[] $taxClasses */
         $taxClasses = TaxRulesGroup::getTaxRulesGroups();
         foreach ($taxClasses as $taxClass) {
             $result[$taxClass['id_tax_rules_group']] = $taxClass['name'];

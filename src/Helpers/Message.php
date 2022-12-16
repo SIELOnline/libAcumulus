@@ -3,9 +3,13 @@
  * @noinspection PhpMultipleClassDeclarationsInspection
  */
 
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Helpers;
 
 use Throwable;
+
+use function assert;
 
 /**
  * Class Message defines a - human-readable - message.
@@ -19,7 +23,7 @@ use Throwable;
  * Messages are kind of immutable, though the severity can be changed when
  * copied to another message collection because an error in a sub-call may not
  * be more than a warning for the overall result. Furthermore, as a message is
- * not created via the {@see Container}, the {@see translator} cannot be
+ * not created via the {@see Container}, the {@see Translator} cannot be
  * injected upon construction, but should be set afterwards.
  * {@see MessageCollection} will normally do so, as all messages are normally
  * part of a {@see MessageCollection}.
@@ -77,26 +81,15 @@ class Message
         return new Message($message, $severity, $code);
     }
 
-    /** @var \Siel\Acumulus\Helpers\Translator|null */
-    protected $translator = null;
-
-    /** @var string */
-    protected $text;
-
-    /** @var int */
-    protected $severity;
-
+    protected ?Translator $translator = null;
+    protected string $text;
+    protected int $severity;
     /** @var int|string */
     protected $code;
-
-    /** @var string */
-    protected $codeTag;
-
-    /** @var string */
-    protected $field;
-
+    protected string $codeTag;
+    protected string $field;
     /** @var \Throwable|null */
-    protected $exception;
+    protected ?Throwable $exception;
 
     /**
      * Message constructor.
@@ -172,7 +165,7 @@ class Message
      * @param int $severity
      *   One of the Severity::... constants.
      */
-    public function setSeverity(int $severity)
+    public function setSeverity(int $severity): void
     {
         $this->severity = $severity;
     }
@@ -191,7 +184,7 @@ class Message
             case Severity::Error:
             case Severity::Exception:
             case Severity::Unknown:
-                return $this->t($this->getSeverity());
+                return $this->t((string) $this->getSeverity());
             default:
                 assert(false, sprintf($this->t('severity_unknown'), $this->getSeverity()));
         }

@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\OpenCart\Helpers;
 
 use Exception;
@@ -12,6 +15,8 @@ class Mailer extends BaseMailer
 {
     /**
      * {@inheritdoc}
+     *
+     * @noinspection PhpDynamicFieldDeclarationInspection
      */
     public function sendMail(
         string $from,
@@ -25,18 +30,12 @@ class Mailer extends BaseMailer
         try {
             $config = Registry::getInstance()->config;
             $mail = new Mail();
-            /** @noinspection PhpUndefinedFieldInspection */
             $mail->protocol = $config->get('config_mail_protocol');
             $mail->parameter = $config->get('config_mail_parameter');
-            /** @noinspection PhpUndefinedFieldInspection */
             $mail->smtp_hostname = $config->get('config_mail_smtp_hostname');
-            /** @noinspection PhpUndefinedFieldInspection */
             $mail->smtp_username = $config->get('config_mail_smtp_username');
-            /** @noinspection PhpUndefinedFieldInspection */
             $mail->smtp_password = html_entity_decode($config->get('config_mail_smtp_password'), ENT_QUOTES, 'UTF-8');
-            /** @noinspection PhpUndefinedFieldInspection */
             $mail->smtp_port = $config->get('config_mail_smtp_port');
-            /** @noinspection PhpUndefinedFieldInspection */
             $mail->smtp_timeout = $config->get('config_mail_smtp_timeout');
 
             $mail->setTo($to);
@@ -58,8 +57,7 @@ class Mailer extends BaseMailer
      */
     public function getFrom(): string
     {
-        $config = Registry::getInstance()->config;
-        return $config->get('config_email');
+        return Registry::getInstance()->config->get('config_email');
     }
 
     public function getTo(): string

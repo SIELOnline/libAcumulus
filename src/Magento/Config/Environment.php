@@ -17,6 +17,8 @@ class Environment extends EnvironmentBase
 {
     /**
      * {@inheritdoc}
+     *
+     * @noinspection BadExceptionsProcessingInspection
      */
     protected function setShopEnvironment(): void
     {

@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Helpers;
 
 use Throwable;
@@ -18,11 +21,11 @@ use Throwable;
  */
 class MessageCollection
 {
-    protected /*Translator*/ $translator;
+    protected Translator $translator;
     /**
      * @var Message[]
      */
-    protected $messages = [];
+    protected array $messages = [];
 
     public function __construct(Translator $translator)
     {
@@ -68,12 +71,15 @@ class MessageCollection
      *
      * @return $this
      */
-    public function createAndAddMessage(string $message, int $severity, $code = 0): MessageCollection
+    public function createAndAddMessage(string $message, int $severity, $code = 0): self
     {
         return $this->addMessage(Message::create($message, $severity, $code));
     }
 
-    public function addException(Throwable $e): MessageCollection
+    /**
+     * @return $this
+     */
+    public function addException(Throwable $e): self
     {
         return $this->addMessage(Message::createFromException($e));
     }
@@ -89,7 +95,7 @@ class MessageCollection
      *
      * @return $this
      */
-    public function addMessages(array $messages, int $severity = Severity::Unknown): MessageCollection
+    public function addMessages(array $messages, int $severity = Severity::Unknown): self
     {
         foreach ($messages as $message) {
             if ($severity !== Severity::Unknown && $message->getSeverity() > $severity) {
@@ -102,7 +108,7 @@ class MessageCollection
 
     /**
      * @return int
-     *   1 of the Severity::... constants.
+     *   1 of the {@see Severity}::... constants.
      */
     public function getSeverity(): int
     {
@@ -114,10 +120,11 @@ class MessageCollection
     }
 
     /**
-     * Returns whether the result contains a warning, error or exception.
+     * Returns whether the result contains a notice, warning, error, or
+     * exception.
      *
      * @return bool
-     *   True if the result contains at least 1 notice, warning, error or
+     *   True if the result contains at least 1 notice, warning, error, or
      *   exception, false otherwise.
      */
     public function hasRealMessages(): bool
@@ -155,6 +162,7 @@ class MessageCollection
     public function getByCode($code): ?Message
     {
         foreach ($this->getMessages() as $message) {
+            /** @noinspection TypeUnsafeComparisonInspection */
             if ($message->getCode() == $code) {
                 return $message;
             }
@@ -168,8 +176,6 @@ class MessageCollection
      * Though it is expected that codes and code tags are unique, this is not
      * imposed. If multiple messages with the same code or code tag exists, the
      * 1st found will be returned.
-     *
-     * @param string $codeTag
      *
      * @return Message|null
      *   The message with the given code tag if the result contains such a
@@ -187,8 +193,6 @@ class MessageCollection
 
     /**
      * Returns the Messages in the collection for the given field.
-     *
-     * @param string $field
      *
      * @return Message[]
      *   The messages for the given field, may be empty.
@@ -261,7 +265,7 @@ class MessageCollection
                 if (($format & Message::Format_Html) !== 0) {
                     $result = "<ul>\n" . $result . "</ul>\n";
                 } else {
-                    $result = $result . "\n";
+                    $result .= "\n";
                 }
             }
         }

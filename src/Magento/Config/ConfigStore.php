@@ -28,7 +28,7 @@ class ConfigStore extends BaSeConfigStore
     {
         $values = $this->getConfigInterface()->getValue($this->configPath . $this->configKey);
         if (!empty($values) && is_string($values)) {
-            $values = unserialize($values);
+            $values = unserialize($values, ['allowed_classes' => false]);
         }
         return is_array($values) ? $values : [];
     }
@@ -39,8 +39,8 @@ class ConfigStore extends BaSeConfigStore
     public function save(array $values): bool
     {
         // @todo: switch to json.
-        $values = serialize($values);
-        $this->getResourceConfig()->saveConfig($this->configPath . $this->configKey, $values, 'default', 0);
+        $serializedValues = serialize($values);
+        $this->getResourceConfig()->saveConfig($this->configPath . $this->configKey, $serializedValues, 'default', 0);
 
         // Force a cache clear.
         /** @var \Magento\Framework\App\Config $config */

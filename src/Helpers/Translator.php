@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Helpers;
 
 /**
@@ -47,11 +50,8 @@ namespace Siel\Acumulus\Helpers;
  */
 class Translator
 {
-    /** @var string */
-    protected $language;
-
-    /** @var array */
-    protected $translations;
+    protected string $language;
+    protected array $translations;
 
     /**
      * @param string $language
@@ -66,11 +66,11 @@ class Translator
     /**
      * Adds a collection of translations to this translator.
      *
-     * @param \Siel\Acumulus\Helpers\TranslationCollection $translationCollection
+     * @param TranslationCollection $translationCollection
      *   A possibly multilingual set of translations. The translations for the
      *   current language are added.
      */
-    public function add(TranslationCollection $translationCollection)
+    public function add(TranslationCollection $translationCollection): void
     {
         $this->translations += $translationCollection->get($this->getLanguage());
     }

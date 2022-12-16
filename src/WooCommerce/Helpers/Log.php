@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\WooCommerce\Helpers;
 
 use Siel\Acumulus\Helpers\Log as BaseLog;
@@ -15,7 +18,7 @@ class Log extends BaseLog
      *
      * This override logs to the WooCommerce logger facility.
      */
-    protected function write(string $message, int $severity)
+    protected function write(string $message, int $severity): void
     {
         if (class_exists('WC_Logger')) {
             (new WC_Logger())->log($this->getWooCommerceSeverity($severity), $message, ['source' => 'acumulus']);

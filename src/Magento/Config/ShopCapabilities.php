@@ -4,8 +4,14 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Magento\Config;
 
+use Magento\Customer\Model\Customer;
 use Magento\Framework\UrlInterface;
 use Magento\Framework\View\Asset\Repository as AssetRepository;
+use Magento\Payment\Model\PaymentMethodList;
+use Magento\Sales\Model\Order;
+use Magento\Sales\Model\Order\Address;
+use Magento\Sales\Model\Order\Creditmemo;
+use Magento\Sales\Model\Order\Creditmemo\Item;
 use Magento\Sales\Model\ResourceModel\Status\Collection as OrderStatusCollection;
 use Magento\Tax\Model\ResourceModel\TaxClass\Collection as TaxClassCollection;
 use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
@@ -216,7 +222,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     protected function getTokenInfoSource(): array
     {
         return [
-            'class' => ['\Magento\Sales\Model\Order', '\Magento\Sales\Model\Order\CreditMemo'],
+            'class' => [Order::class, Creditmemo::class],
             'file' => ['vendor/magento/module-sales/Model/Order.php', 'vendor/magento/module-sales/Model/Order/Creditmemo.php'],
             'properties' => array_intersect($this->order, $this->creditMemo),
             'properties-more' => true,
@@ -386,7 +392,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
         ];
         return [
             'billingAddress' => [
-                'class' => '\Magento\Sales\Model\Order\Address',
+                'class' => Address::class,
                 'file' => 'vendor/magento/module-sales/Model/Order/Address.php',
                 'properties' => [
                     'addressType',
@@ -421,7 +427,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
             ],
             'shippingAddress' => [
                 'more-info' => $this->t('see_billing_address'),
-                'class' => '\Magento\Sales\Model\Order\Address',
+                'class' => Address::class,
                 'file' => 'vendor/magento/module-sales/Model/Order/Address.php',
                 'properties' => [
                     $this->t('see_above'),
@@ -429,7 +435,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 'properties-more' => false,
             ],
             'customer' => [
-                'class' => '\Magento\Customer\Model\Customer',
+                'class' => Customer::class,
                 'file' => 'vendor/magento/module-customer/Model/Customer.php',
                 'properties' => [
                     'name',
@@ -457,7 +463,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
                 'properties-more' => true,
             ],
             'item' => [
-                'class' => ['\Magento\Sales\Model\Order\Item', '\Magento\Sales\Model\Order\Creditmemo\Item'],
+                'class' => [Order\Item::class, Item::class],
                 'file' => ['vendor/magento/module-sales/Model/Order/Item.php', 'vendor/magento/module-sales/Model/Order/Creditmemo/Item.php'],
                 'properties' => array_unique(array_merge($orderItem, $creditMemoItem)),
                 'properties-more' => true,
@@ -523,8 +529,9 @@ class ShopCapabilities extends ShopCapabilitiesBase
     {
         $result = [];
         /** @var \Magento\Payment\Model\PaymentMethodList $paymentMethodListModel */
-        $paymentMethodListModel = Registry::getInstance()->get('Magento\Payment\Model\PaymentMethodList');
+        $paymentMethodListModel = Registry::getInstance()->get(PaymentMethodList::class);
         // @todo: get active store/all stores
+        /** @noinspection PhpParamsInspection   Wrong phpdoc */
         $paymentMethods = $paymentMethodListModel->getActiveList(null);
         foreach ($paymentMethods as $paymentMethod) {
             /** @var \Magento\Payment\Api\Data\PaymentMethodInterface $paymentMethod */

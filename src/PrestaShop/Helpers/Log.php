@@ -1,14 +1,9 @@
 <?php
 /**
- * Note: we should not use PHP7 language constructs in this child class. See its
- * parent for more information.
- *
- * The PHP7 language constructs we suppress the warnings for:
- * @noinspection PhpMissingParamTypeInspection
- * @noinspection PhpMissingReturnTypeInspection
- * @noinspection PhpMissingFieldTypeInspection
- * @noinspection PhpMissingVisibilityInspection
+ * @noinspection PhpClassConstantAccessedViaChildClassInspection
  */
+
+declare(strict_types=1);
 
 namespace Siel\Acumulus\PrestaShop\Helpers;
 
@@ -22,15 +17,14 @@ use Siel\Acumulus\Helpers\Severity;
  */
 class Log extends BaseLog
 {
-    /** @var \AbstractLogger */
-    protected $logger = null;
+    protected AbstractLogger $logger;
 
     /**
      * {@inheritdoc}
      *
      * This override uses the PrestaShopLogger.
      */
-    protected function write(string $message, int $severity)
+    protected function write(string $message, int $severity): void
     {
         $logger = $this->getLogger();
         $logger->log($message, $this->getPrestaShopSeverity($severity));
@@ -45,7 +39,7 @@ class Log extends BaseLog
      * @return int
      *   The PrestaShop equivalent of the severity.
      */
-    protected function getPrestaShopSeverity($severity)
+    protected function getPrestaShopSeverity(int $severity): int
     {
         switch ($severity) {
             case Severity::Error:
@@ -63,7 +57,7 @@ class Log extends BaseLog
 
     protected function getLogger(): FileLogger
     {
-        if ($this->logger === null) {
+        if (!isset($this->logger)) {
 
             if (version_compare(_PS_VERSION_, '1.7.5', '>=')) {
                 $logDirectory = 'var/logs';

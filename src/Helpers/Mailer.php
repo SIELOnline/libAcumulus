@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Helpers;
 
 use Exception;
@@ -6,6 +9,8 @@ use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Tag;
+
+use function is_string;
 
 /**
  * Mailer allows sending mails.
@@ -19,17 +24,10 @@ use Siel\Acumulus\Tag;
  */
 abstract class Mailer
 {
-    /** @var \Siel\Acumulus\Config\Config */
-    protected $config;
-
-    /** @var \Siel\Acumulus\Config\Environment */
-    protected $environment;
-
-    /** @var \Siel\Acumulus\Helpers\Translator */
-    protected $translator;
-
-    /** @var \Siel\Acumulus\Helpers\Log */
-    protected $log;
+    protected Config $config;
+    protected Environment $environment;
+    protected Translator $translator;
+    protected Log $log;
 
     public function __construct(Config $config, Environment $environment, Translator $translator, Log $log)
     {
@@ -95,7 +93,7 @@ abstract class Mailer
                 $message = $result->getMessage();
             } elseif (!is_string($result)) {
                 $message = print_r($result, true);
-            } else {
+            } /** @noinspection InvertedIfElseConstructsInspection */ else {
                 $message = $result;
             }
             $this->log->error('%s: failed: %s', $logMessage, $message);

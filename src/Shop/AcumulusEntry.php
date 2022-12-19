@@ -1,11 +1,20 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Shop;
 
 use DateTime;
 use Siel\Acumulus\Api;
 
+use function array_key_exists;
+use function call_user_func;
+use function is_array;
+use function is_object;
+
 /**
- * Ties web shop orders or credit notes to entries in Acumulus.
+ * An AcumulusEntry links a webshop order or credit note to an entry in
+ * Acumulus.
  *
  * Acumulus identifies entries by their entry id (Dutch: boekstuknummer) or,
  * for a number of API calls, a token. Both the entry id and token are stored
@@ -42,30 +51,40 @@ use Siel\Acumulus\Api;
  */
 class AcumulusEntry
 {
-    // Access to the fields, differs per web shop as we follow db naming
-    // conventions from the web shop.
-    protected static $keyEntryId = 'entry_id';
-    protected static $keyToken = 'token';
-    protected static $keySourceType = 'source_type';
-    protected static $keySourceId = 'source_id';
-    protected static $keyCreated = 'created';
-    protected static $keyUpdated = 'updated';
-
-    // The format of the created and updated timestamps, when saved as a string.
-    protected static $timestampFormat = Api::Format_TimeStamp;
-
-    // Constants to enable some kind of locking and thereby preventing sending
-    // invoices twice.
-    protected static $maxLockTimeS = 40;
+    /**
+     * Constants to enable some kind of locking, thereby preventing sending
+     * invoices twice.
+     */
     public const lockEntryId = 1;
     public const lockToken = 'Send locked, delete if too old';
     public const conceptIdUnknown = 0;
-
-    // Constants that define the various delete lock results.
+    /**
+     * Constants that define the various delete lock results.
+     */
     public const Lock_NoLongerExists = 1;
     public const Lock_Deleted = 2;
     public const Lock_BecameRealEntry = 3;
 
+
+    /**
+     * Access to the fields, may differ per web shop as we follow db naming
+     * conventions from the web shop.
+     */
+    protected static string $keyEntryId = 'entry_id';
+    protected static string $keyToken = 'token';
+    protected static string $keySourceType = 'source_type';
+    protected static string $keySourceId = 'source_id';
+    protected static string $keyCreated = 'created';
+    protected static string $keyUpdated = 'updated';
+    /**
+     * The format of the created and updated timestamps, when saved as a string.
+     */
+    protected static string $timestampFormat = Api::Format_TimeStamp;
+    /**
+     * Constants to enable some kind of locking and thereby preventing sending
+     * invoices twice.
+     */
+    protected static int $maxLockTimeS = 40;
     /**
      * @var array|object
      *   The web shop specific data holder for the Acumulus entry.
@@ -73,7 +92,7 @@ class AcumulusEntry
     protected $record;
 
     /**
-     * AcumulusEntryManager constructor.
+     * constructor.
      *
      * @param array|object $record
      *   A web shop specific record object or array that holds an Acumulus entry
@@ -205,7 +224,7 @@ class AcumulusEntry
         if (is_numeric($timestamp)) {
             // Unix timestamp.
             $result = new DateTime();
-            $result->setTimestamp($timestamp);
+            $result->setTimestamp((int) $timestamp);
         } else {
             // Formatted timestamp, e.g. yyyy-mm-dd hh:mm:ss.
             $result = DateTime::createFromFormat(static::$timestampFormat, $timestamp);
@@ -237,6 +256,8 @@ class AcumulusEntry
      *
      * @return mixed|null
      *   The value of the given field in this acumulus entry record.
+     *
+     * @noinspection PhpUsageOfSilenceOperatorInspection
      */
     protected function get(string $field)
     {
@@ -290,6 +311,7 @@ class AcumulusEntry
      */
     public function hasLockExpired(): bool
     {
+        /** @noinspection NullPointerExceptionInspection */
         return $this->isSendLock() && time() - $this->getCreated()->getTimestamp() > static::$maxLockTimeS;
     }
 }

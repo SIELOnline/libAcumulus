@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Magento\Shop;
 
 use Exception;
@@ -108,6 +111,8 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
 
     /**
      * @inheritDoc
+     *
+     * @noinspection BadExceptionsProcessingInspection
      */
     public function delete(BaseAcumulusEntry $entry): bool
     {
@@ -117,6 +122,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         try {
             $this->getResourceModel()->delete($record);
         } catch (Exception $e) {
+            // @todo: log exception?
             $result = false;
         }
 

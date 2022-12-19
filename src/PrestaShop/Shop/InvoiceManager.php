@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\PrestaShop\Shop;
 
 use DateTime;
@@ -26,15 +29,9 @@ use Siel\Acumulus\Invoice\InvoiceAddResult;
  */
 class InvoiceManager extends BaseInvoiceManager
 {
-    /** @var string */
-    protected $orderTableName;
+    protected string $orderTableName;
+    protected string $orderSlipTableName;
 
-    /** @var string */
-    protected $orderSlipTableName;
-
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(Container $container)
     {
         parent::__construct($container);
@@ -49,24 +46,24 @@ class InvoiceManager extends BaseInvoiceManager
     {
         switch ($invoiceSourceType) {
             case Source::Order:
-                $key = pSql(Order::$definition['primary']);
+                $key = pSQL(Order::$definition['primary']);
                 /** @noinspection PhpUnhandledExceptionInspection */
                 $ids = Db::getInstance()->executeS(sprintf(
-                    "SELECT `%s` FROM `%s` WHERE `%s` BETWEEN %u AND %u",
+                    'SELECT `%s` FROM `%s` WHERE `%s` BETWEEN %u AND %u',
                     $key,
-                    pSql($this->orderTableName),
+                    pSQL($this->orderTableName),
                     $key,
                     $InvoiceSourceIdFrom,
                     $InvoiceSourceIdTo
                 ));
                 return $this->getSourcesByIdsOrSources($invoiceSourceType, array_column($ids, $key));
             case Source::CreditNote:
-                $key = pSql(OrderSlip::$definition['primary']);
+                $key = pSQL(OrderSlip::$definition['primary']);
                 /** @noinspection PhpUnhandledExceptionInspection */
                 $ids = Db::getInstance()->executeS(sprintf(
-                "SELECT `%s` FROM `%s` WHERE `%s` BETWEEN %u AND %u",
+                'SELECT `%s` FROM `%s` WHERE `%s` BETWEEN %u AND %u',
                     $key,
-                    pSql($this->orderSlipTableName),
+                    pSQL($this->orderSlipTableName),
                     $key,
                     $InvoiceSourceIdFrom,
                     $InvoiceSourceIdTo
@@ -86,7 +83,7 @@ class InvoiceManager extends BaseInvoiceManager
                 $key = Order::$definition['primary'];
                 /** @noinspection PhpUnhandledExceptionInspection */
                 $ids = Db::getInstance()->executeS(sprintf("SELECT `%s` FROM `%s` WHERE `%s` BETWEEN '%s' AND '%s'",
-                        pSql($key),
+                        pSQL($key),
                         $this->orderTableName,
                         'reference',
                         pSQL($invoiceSourceReferenceFrom),
@@ -105,11 +102,11 @@ class InvoiceManager extends BaseInvoiceManager
      */
     public function getInvoiceSourcesByDateRange(string $invoiceSourceType, DateTime $dateFrom, DateTime $dateTo): array
     {
-        $dateFrom = $dateFrom->format('c');
-        $dateTo = $dateTo->format('c');
+        $dateFromStr = $dateFrom->format('c');
+        $dateToStr = $dateTo->format('c');
         switch ($invoiceSourceType) {
             case Source::Order:
-                $ids = Order::getOrdersIdByDate($dateFrom, $dateTo);
+                $ids = Order::getOrdersIdByDate($dateFromStr, $dateToStr);
                 return $this->getSourcesByIdsOrSources($invoiceSourceType, $ids);
             case Source::CreditNote:
                 $ids = OrderSlip::getSlipsIdByDate($dateFrom, $dateTo);
@@ -123,7 +120,7 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * This PrestaShop override executes the 'actionAcumulusInvoiceCreated' hook.
      */
-    protected function triggerInvoiceCreated(array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult)
+    protected function triggerInvoiceCreated(?array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
     {
         /** @noinspection PhpUnhandledExceptionInspection */
         Hook::exec('actionAcumulusInvoiceCreated', ['invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult]);
@@ -134,7 +131,7 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * This PrestaShop override executes the 'actionAcumulusInvoiceSendBefore' hook.
      */
-    protected function triggerInvoiceSendBefore(array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult)
+    protected function triggerInvoiceSendBefore(?array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
     {
         /** @noinspection PhpUnhandledExceptionInspection */
         Hook::exec('actionAcumulusInvoiceSendBefore', ['invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult]);
@@ -145,7 +142,7 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * This PrestaShop override executes the 'actionAcumulusInvoiceSentAfter' hook.
      */
-    protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, InvoiceAddResult $result)
+    protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, InvoiceAddResult $result): void
     {
         /** @noinspection PhpUnhandledExceptionInspection */
         Hook::exec('actionAcumulusInvoiceSendAfter', ['invoice' => $invoice, 'source' => $invoiceSource, 'result' => $result]);

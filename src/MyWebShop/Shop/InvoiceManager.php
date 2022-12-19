@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\MyWebShop\Shop;
 
 use DateTime;
@@ -34,9 +37,6 @@ use Siel\Acumulus\Invoice\InvoiceAddResult;
  */
 class InvoiceManager extends BaseInvoiceManager
 {
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(Container $container)
     {
         parent::__construct($container);
@@ -80,7 +80,7 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * This MyWebShop override executes the 'actionAcumulusInvoiceCreated' hook.
      */
-    protected function triggerInvoiceCreated(array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult)
+    protected function triggerInvoiceCreated(?array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
     {
         // @todo: adapt to the way MyWebShop triggers events (and passes parameters (by value and reference) to the event handlers).
         Hook::exec('actionAcumulusInvoiceCreated', ['invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult]);
@@ -91,7 +91,7 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * This MyWebShop override executes the 'actionAcumulusInvoiceSendBefore' hook.
      */
-    protected function triggerInvoiceSendBefore(array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult)
+    protected function triggerInvoiceSendBefore(?array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
     {
         // @todo: adapt to the way MyWebShop triggers events (and passes parameters (by value and reference) to the event handlers).
         Hook::exec('actionAcumulusInvoiceSendBefore', ['invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult]);
@@ -102,7 +102,7 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * This MyWebShop override executes the 'actionAcumulusInvoiceSentAfter' hook.
      */
-    protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, InvoiceAddResult $result)
+    protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, InvoiceAddResult $result): void
     {
         // @todo: adapt to the way MyWebShop triggers events (and passes parameters (by value) to the event handlers).
         Hook::exec('actionAcumulusInvoiceSendAfter', ['invoice' => $invoice, 'source' => $invoiceSource, 'result' => $result]);

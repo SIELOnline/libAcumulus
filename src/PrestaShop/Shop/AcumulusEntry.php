@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\PrestaShop\Shop;
 
 use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
@@ -10,5 +13,5 @@ use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
  */
 class AcumulusEntry extends BaseAcumulusEntry
 {
-    protected static $keyEntryId = 'id_entry';
+    protected static string $keyEntryId = 'id_entry';
 }

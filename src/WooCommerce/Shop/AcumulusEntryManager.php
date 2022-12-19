@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\WooCommerce\Shop;
 
 use Siel\Acumulus\Invoice\Source;
@@ -20,21 +23,17 @@ use WP_Query;
  */
 class AcumulusEntryManager extends BaseAcumulusEntryManager
 {
-    static public $keyEntryId = '_acumulus_entry_id';
-    static public $keyToken = '_acumulus_token';
+    public static string $keyEntryId = '_acumulus_entry_id';
+    public static string $keyToken = '_acumulus_token';
     // Note: these 2 meta keys are not actually stored as the post_id and
     // post_type give us that information.
-    static public $keySourceId = '_acumulus_id';
-    static public $keySourceType = '_acumulus_type';
-    static public $keyCreated = '_acumulus_created';
-    static public $keyUpdated = '_acumulus_updated';
+    public static string $keySourceId = '_acumulus_id';
+    public static string $keySourceType = '_acumulus_type';
+    public static string $keyCreated = '_acumulus_created';
+    public static string $keyUpdated = '_acumulus_updated';
 
     /**
      * Helper method that converts a WP/WC post type to a source type constant.
-     *
-     * @param string $shopType
-     *
-     * @return string
      */
     protected function shopTypeToSourceType(string $shopType): string
     {

@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\MyWebShop\Shop;
 
 use Siel\Acumulus\Api;
@@ -40,9 +43,6 @@ use Siel\Acumulus\Shop\AcumulusEntryManager as BaseAcumulusEntryManager;
  */
 class AcumulusEntryManager extends BaseAcumulusEntryManager
 {
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(Container $container, Log $log)
     {
         parent::__construct($container, $log);
@@ -104,7 +104,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     {
         // @todo: adapt to the way MyWebShop lets you define tables. Just return true if this is done in a separate script.
         /** @noinspection SqlNoDataSourceInspection */
-        return $this->getDb()->execute("CREATE TABLE IF NOT EXISTS `{$this->tableName}` (
+        return $this->getDb()->execute("CREATE TABLE IF NOT EXISTS `$this->tableName` (
         `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
         `id_shop` int(11) UNSIGNED NOT NULL DEFAULT '1',
         `id_shop_group` int(11) UNSIGNED NOT NULL DEFAULT '1',
@@ -126,7 +126,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     public function uninstall(): bool
     {
         // @todo: adapt to the way MyWebShop lets you delete tables. Just return true if this is done in a separate script.
-        return $this->getDb()->execute("DROP TABLE `{$this->tableName}`");
+        return $this->getDb()->execute("DROP TABLE `$this->tableName`");
     }
 
     /**

@@ -4,15 +4,18 @@
  * @noinspection SqlNoDataSourceInspection
  */
 
+declare(strict_types=1);
+
 namespace Siel\Acumulus\WooCommerce\Shop;
 
 use DateTime;
 use Siel\Acumulus\Helpers\Log;
-use Siel\Acumulus\Helpers\Util;
-use Siel\Acumulus\Invoice\Source as Source;
+use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
 use WP_Query;
+
+use function strlen;
 
 /**
  * Implements the WooCommerce specific parts of the invoice manager.
@@ -102,7 +105,7 @@ class InvoiceManager extends BaseInvoiceManager
         // All only work with orders, not refunds.
         if ($invoiceSourceType === Source::Order) {
             if (is_plugin_active('woocommerce-sequential-order-numbers/woocommerce-sequential-order-numbers.php')) {
-                // Search by the order number as assigned by the plugin.
+                // Search by the order number assigned by this plugin.
                 $args = [
                   'meta_query' => [
                     [
@@ -117,20 +120,19 @@ class InvoiceManager extends BaseInvoiceManager
                   ],
                 ];
                 return $this->query2Sources($args, $invoiceSourceType);
-            } elseif (is_plugin_active(
-                    'woocommerce-sequential-order-numbers-pro/woocommerce-sequential-order-numbers.php'
-                )
-              || is_plugin_active('wc-sequential-order-numbers/Sequential_Order_Numbers.php')) {
-                // Search by the order number as assigned by the plugin. Note
-                // that these plugins allow for text prefixes and suffixes,
-                // therefore, we allow for a lexicographical or a purely numeric
+            } elseif (is_plugin_active('woocommerce-sequential-order-numbers-pro/woocommerce-sequential-order-numbers.php')
+              || is_plugin_active('wc-sequential-order-numbers/Sequential_Order_Numbers.php')
+            ) {
+                // Search by the order number assigned by this plugin. Note that
+                // these plugins allow for text prefixes and suffixes.
+                // Therefore, we allow for a lexicographical or a purely numeric
                 // comparison.
                 if (ctype_digit($invoiceSourceReferenceFrom) && ctype_digit($invoiceSourceReferenceTo)) {
                     if (strlen($invoiceSourceReferenceFrom) < 6 && strlen($invoiceSourceReferenceTo) < 6) {
                         // We assume non formatted search arguments.
                         $key = '_order_number';
                     } else {
-                        // Formatted numeric search arguments: e.g. 'yyyynnnn'
+                        // Formatted numeric search arguments: e.g. 'yyyynnnn'.
                         $key = '_order_number_formatted';
                     }
                     $type = 'UNSIGNED';
@@ -153,8 +155,9 @@ class InvoiceManager extends BaseInvoiceManager
                 ];
                 return $this->query2Sources($args, $invoiceSourceType);
             } elseif (is_plugin_active('custom-order-numbers-for-woocommerce-pro/custom-order-numbers-for-woocommerce-pro.php')
-                      || is_plugin_active('custom-order-numbers-for-woocommerce/custom-order-numbers-for-woocommerce.php')) {
-                // Search by the order number as assigned by the plugin.
+                || is_plugin_active('custom-order-numbers-for-woocommerce/custom-order-numbers-for-woocommerce.php')
+            ) {
+                // Search by the order number assigned by this plugin.
                 $args = [
                     'meta_query' => [
                         [
@@ -209,7 +212,7 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * This WooCommerce override applies the 'acumulus_invoice_created' filter.
      */
-    protected function triggerInvoiceCreated(array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult)
+    protected function triggerInvoiceCreated(?array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
     {
         $invoice = apply_filters('acumulus_invoice_created', $invoice, $invoiceSource, $localResult);
     }
@@ -219,7 +222,7 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * This WooCommerce override applies the 'acumulus_invoice_send_before' filter.
      */
-    protected function triggerInvoiceSendBefore(array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult)
+    protected function triggerInvoiceSendBefore(?array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
     {
         $invoice = apply_filters('acumulus_invoice_send_before', $invoice, $invoiceSource, $localResult);
     }
@@ -229,7 +232,7 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * This WooCommerce override executes the 'acumulus_invoice_send_after' action.
      */
-    protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, InvoiceAddResult $result)
+    protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, InvoiceAddResult $result): void
     {
         do_action('acumulus_invoice_send_after', $invoice, $invoiceSource, $result);
     }
@@ -250,12 +253,12 @@ class InvoiceManager extends BaseInvoiceManager
             str_replace(["\r", "\n"], '', json_encode($args, Log::JsonFlags))
         );
         // Add default arguments.
-        $args = $args + [
-                'fields' => 'ids',
-                'posts_per_page' => -1,
-                'post_type' => $this->sourceTypeToShopType($invoiceSourceType),
-                'post_status' => array_keys(wc_get_order_statuses()),
-            ];
+        $args += [
+            'fields' => 'ids',
+            'posts_per_page' => -1,
+            'post_type' => $this->sourceTypeToShopType($invoiceSourceType),
+            'post_status' => array_keys(wc_get_order_statuses()),
+        ];
         $query = new WP_Query($args);
         $ids = $query->get_posts();
         if ($sort) {

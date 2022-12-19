@@ -1,9 +1,15 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Shop;
 
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Invoice\Source;
+
+use function count;
+use function is_object;
 
 /**
  * Manages {@see AcumulusEntry} records/objects.
@@ -18,18 +24,9 @@ use Siel\Acumulus\Invoice\Source;
  */
 abstract class AcumulusEntryManager
 {
-    /** @var \Siel\Acumulus\Helpers\Log */
-    protected $log;
+    protected Log $log;
+    protected Container $container;
 
-    /** @var \Siel\Acumulus\Helpers\Container */
-    protected $container;
-
-    /**
-     * AcumulusEntryManager constructor.
-     *
-     * @param \Siel\Acumulus\Helpers\Container $container
-     * @param \Siel\Acumulus\Helpers\Log $log
-     */
     public function __construct(Container $container, Log $log)
     {
         $this->container = $container;
@@ -43,7 +40,7 @@ abstract class AcumulusEntryManager
      *   The entry id to look up. If $entryId === null, multiple records may be
      *   found, in which case a numerically indexed array will be returned.
      *
-     * @return \Siel\Acumulus\Shop\AcumulusEntry|\Siel\Acumulus\Shop\AcumulusEntry[]|null
+     * @return AcumulusEntry|AcumulusEntry[]|null
      *   Acumulus entry record for the given entry id or null if the entry id is
      *   unknown.
      */
@@ -58,7 +55,7 @@ abstract class AcumulusEntryManager
      *   Whether to return an entry that serves as a send-lock (false) or ignore
      *   it (true)
      *
-     * @return \Siel\Acumulus\Shop\AcumulusEntry|null
+     * @return AcumulusEntry|null
      *   Acumulus entry record for the given invoice source or null if no
      *   invoice has yet been created in Acumulus for this invoice source.
      */
@@ -73,7 +70,7 @@ abstract class AcumulusEntryManager
      *   Whether to return an entry that serves as a send-lock (false) or ignore
      *   it (true).
      *
-     * @return \Siel\Acumulus\Shop\AcumulusEntry|\Siel\Acumulus\Shop\AcumulusEntry[]|null
+     * @return AcumulusEntry|AcumulusEntry[]|null
      */
     protected function convertDbResultToAcumulusEntries($result, bool $ignoreLock = true)
     {

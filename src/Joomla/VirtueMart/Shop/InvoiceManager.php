@@ -4,10 +4,12 @@
  * @noinspection SqlDialectInspection
  */
 
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Joomla\VirtueMart\Shop;
 
 use DateTime;
-use Siel\Acumulus\Invoice\Source as Source;
+use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Joomla\Shop\InvoiceManager as BaseInvoiceManager;
 
 /**
@@ -30,7 +32,7 @@ class InvoiceManager extends BaseInvoiceManager
     {
         if ($invoiceSourceType === Source::Order) {
             $query = sprintf(
-                "select virtuemart_order_id from #__virtuemart_orders where virtuemart_order_id between %d and %d",
+                'select virtuemart_order_id from #__virtuemart_orders where virtuemart_order_id between %d and %d',
                 $InvoiceSourceIdFrom,
                 $InvoiceSourceIdTo
             );
@@ -46,6 +48,9 @@ class InvoiceManager extends BaseInvoiceManager
      * So getting a range is not logical. However, extensions exists that do
      * introduce sequential order numbers, E.g:
      * http://extensions.joomla.org/profile/extension/extension-specific/virtuemart-extensions/human-readable-order-numbers
+     *
+     * @noinspection NullPointerExceptionInspection
+     *   getDb() won't fail anymore when we arrived here.
      */
     public function getInvoiceSourcesByReferenceRange(string $invoiceSourceType, string $invoiceSourceReferenceFrom, string $invoiceSourceReferenceTo): array
     {

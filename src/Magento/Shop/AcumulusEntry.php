@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Magento\Shop;
 
 use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;

@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Magento\Shop;
 
 use DateTime;
@@ -9,6 +12,7 @@ use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Magento\Helpers\Registry;
 use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
+use Magento\Framework\Event\ManagerInterface;
 
 /**
  * Implements the Magento specific invoice manager.
@@ -51,10 +55,11 @@ class InvoiceManager extends BaseInvoiceManager
      */
     public function getInvoiceSourcesByDateRange(string $invoiceSourceType, DateTime $dateFrom, DateTime $dateTo): array
     {
-        $dateFrom = $this->getSqlDate($dateFrom);
-        $dateTo = $this->getSqlDate($dateTo);
         $field = 'updated_at';
-        $condition = ['from' => $dateFrom, 'to' => $dateTo];
+        $condition = [
+            'from' => $this->getSqlDate($dateFrom),
+            'to' => $this->getSqlDate($dateTo)
+        ];
         return $this->getByCondition($invoiceSourceType, $field, $condition);
     }
 
@@ -81,14 +86,10 @@ class InvoiceManager extends BaseInvoiceManager
     /**
      * Returns a Collection cass that can return filtered lists of objects of
      * the type of the given invoice source (Orders or CreditMemos).
-     *
-     * @param string $invoiceSourceType
-     *
-     * @return \Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection
      */
     protected function createInvoiceSourceTypeCollection(string $invoiceSourceType): AbstractCollection
     {
-        return Registry::getInstance()->create($invoiceSourceType == Source::Order
+        return Registry::getInstance()->create($invoiceSourceType === Source::Order
             ? OrderCollection::class
             : CreditmemoCollection::class);
     }
@@ -98,7 +99,7 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * This Magento override dispatches the 'acumulus_invoice_created' event.
      */
-    protected function triggerInvoiceCreated(array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult)
+    protected function triggerInvoiceCreated(?array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
     {
         $this->dispatchEvent('acumulus_invoice_created', ['invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult]);
     }
@@ -108,7 +109,7 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * This Magento override dispatches the 'acumulus_invoice_completed' event.
      */
-    protected function triggerInvoiceSendBefore(array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult)
+    protected function triggerInvoiceSendBefore(?array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
     {
         $this->dispatchEvent('acumulus_invoice_send_before', ['invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult]);
     }
@@ -118,7 +119,7 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * This Magento override dispatches the 'acumulus_invoice_sent' event.
      */
-    protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, InvoiceAddResult $result)
+    protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, InvoiceAddResult $result): void
     {
         $this->dispatchEvent('acumulus_invoice_send_after', ['invoice' => $invoice, 'source' => $invoiceSource, 'result' => $result]);
     }
@@ -130,13 +131,11 @@ class InvoiceManager extends BaseInvoiceManager
      *   The name of the event.
      * @param array $parameters
      *   The parameters to the event that cannot be changed.
-     *
-     * @return void
      */
-    protected function dispatchEvent(string $name, array $parameters)
+    protected function dispatchEvent(string $name, array $parameters): void
     {
         /** @var \Magento\Framework\Event\ManagerInterface $dispatcher */
-        $dispatcher = Registry::getInstance()->get('Magento\Framework\Event\ManagerInterface');
+        $dispatcher = Registry::getInstance()->get(ManagerInterface::class);
         $dispatcher->dispatch($name, $parameters);
     }
 }

@@ -4,6 +4,8 @@
  * @noinspection SqlDialectInspection
  */
 
+declare(strict_types=1);
+
 namespace Siel\Acumulus\OpenCart\Shop;
 
 use DB;
@@ -34,12 +36,8 @@ use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
  */
 class AcumulusEntryManager extends BaseAcumulusEntryManager
 {
-    /** @var string */
-    protected $tableName;
+    protected string $tableName;
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(Container $container, Log $log)
     {
         parent::__construct($container, $log);
@@ -53,7 +51,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     {
         /** @var \stdClass $result  (documentation error in DB) */
         $result = $this->getDb()->query(sprintf(
-            "SELECT * FROM `%s` WHERE entry_id %s %s",
+            'SELECT * FROM `%s` WHERE entry_id %s %s',
             $this->tableName,
             $entryId === null ? 'is' : '=',
             $entryId === null ? 'null' : (string) $entryId
@@ -122,7 +120,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     {
         $record = $entry->getRecord();
         return (bool) $this->getDb()->query(sprintf(
-            "DELETE FROM `%s` WHERE id = %u",
+            'DELETE FROM `%s` WHERE id = %u',
             $this->tableName,
             $record['id']
         ));

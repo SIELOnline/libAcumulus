@@ -4,10 +4,12 @@
  * @noinspection SqlNoDataSourceInspection
  */
 
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Joomla\HikaShop\Shop;
 
 use DateTime;
-use Siel\Acumulus\Invoice\Source as Source;
+use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Joomla\Shop\InvoiceManager as BaseInvoiceManager;
 
 /**
@@ -30,7 +32,7 @@ class InvoiceManager extends BaseInvoiceManager
     {
         if ($invoiceSourceType === Source::Order) {
             $query = sprintf(
-                "select order_id from #__hikashop_order where order_id between %d and %d",
+                'select order_id from #__hikashop_order where order_id between %d and %d',
                 $InvoiceSourceIdFrom,
                 $InvoiceSourceIdTo
             );
@@ -46,6 +48,8 @@ class InvoiceManager extends BaseInvoiceManager
      * So getting a range is not logical. However, extensions may exist that do
      * introduce sequential order numbers in which case this query should be
      * adapted.
+     *
+     * @noinspection NullPointerExceptionInspection
      */
     public function getInvoiceSourcesByReferenceRange(string $invoiceSourceType, string $invoiceSourceReferenceFrom, string $invoiceSourceReferenceTo): array
     {
@@ -67,7 +71,7 @@ class InvoiceManager extends BaseInvoiceManager
     {
         if ($invoiceSourceType === Source::Order) {
             $query = sprintf(
-                "select order_id from #__hikashop_order where order_modified between %u and %u",
+                'select order_id from #__hikashop_order where order_modified between %u and %u',
                 $dateFrom->getTimestamp(),
                 $dateTo->getTimestamp()
             );

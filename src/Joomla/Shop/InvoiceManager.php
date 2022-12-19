@@ -1,13 +1,18 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Joomla\Shop;
 
 use DateTimeZone;
 use Joomla\CMS\Date\Date;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Plugin\PluginHelper;
-use Siel\Acumulus\Invoice\Source as Source;
+use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
+
+use function count;
 
 /**
  * This override provides Joomla specific db helper methods and defines
@@ -42,26 +47,32 @@ abstract class InvoiceManager extends BaseInvoiceManager
      */
     protected function loadColumn(string $query): array
     {
+        /** @noinspection NullPointerExceptionInspection */
         return $this->getDb()->setQuery($query)->loadColumn();
     }
 
     /**
      * Helper method to get the db object.
      *
-     * @noinspection PhpUndefinedClassInspection : J3: JDatabaseDriver
+     * @noinspection PhpUndefinedNamespaceInspection
+     * @noinspection PhpUndefinedClassInspection
+     *   J3: JDatabaseDriver
      * @noinspection PhpReturnDocTypeMismatchInspection
+     *
      * @return \Joomla\Database\DatabaseDriver|\JDatabaseDriver|null $db
      */
     protected function getDb()
     {
-        /** @noinspection PhpDeprecationInspection : Deprecated as of J4 */
+        /** @noinspection PhpDeprecationInspection
+         *    Deprecated as of J4.
+         */
         return Factory::getDbo();
     }
 
 	/**
 	 * Helper method that returns a date in the correct and escaped sql format.
 	 *
-	 * @param string $date
+	 * @param string $dateStr
 	 *   Date in yyyy-mm-dd format.
 	 *
 	 * @return string
@@ -69,10 +80,11 @@ abstract class InvoiceManager extends BaseInvoiceManager
      *
 	 * @throws \Exception
 	 */
-    protected function toSql(string $date): string
+    protected function toSql(string $dateStr): string
     {
+        /** @noinspection NullPointerExceptionInspection */
         $tz = new DateTimeZone(Factory::getApplication()->get('offset'));
-        $date = new Date($date);
+        $date = new Date($dateStr);
         $date->setTimezone($tz);
         return $date->toSql(true);
     }
@@ -83,13 +95,16 @@ abstract class InvoiceManager extends BaseInvoiceManager
      * This Joomla override dispatches the 'onAcumulusInvoiceCreated' event.
      *
      * @throws \Exception
+     *
+     * @noinspection PhpDeprecationInspection
+     *   Deprecated as of J4
      */
-    protected function triggerInvoiceCreated(array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult)
+    protected function triggerInvoiceCreated(?array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
     {
         PluginHelper::importPlugin('acumulus');
-        /** @noinspection PhpDeprecationInspection : Deprecated as of J4 */
+        /** @noinspection NullPointerExceptionInspection */
         $results = Factory::getApplication()->triggerEvent('onAcumulusInvoiceCreated', [&$invoice, $invoiceSource, $localResult]);
-        if (count(array_filter($results, function ($value) {
+        if (count(array_filter($results, static function ($value) {
                 return $value === false;
             })) >= 1
         ) {
@@ -103,13 +118,16 @@ abstract class InvoiceManager extends BaseInvoiceManager
      * This Joomla override dispatches the 'onAcumulusInvoiceSendBefore' event.
      *
      * @throws \Exception
+     *
+     * @noinspection PhpDeprecationInspection
+     *   Deprecated as of J4.
+     * @noinspection NullPointerExceptionInspection
      */
-    protected function triggerInvoiceSendBefore(array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult)
+    protected function triggerInvoiceSendBefore(?array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
     {
         PluginHelper::importPlugin('acumulus');
-        /** @noinspection PhpDeprecationInspection : Deprecated as of J4 */
         $results = Factory::getApplication()->triggerEvent('onAcumulusInvoiceSendBefore', [&$invoice, $invoiceSource, $localResult]);
-        if (count(array_filter($results, function ($value) {
+        if (count(array_filter($results, static function ($value) {
                 return $value === false;
             })) >= 1
         ) {
@@ -123,11 +141,14 @@ abstract class InvoiceManager extends BaseInvoiceManager
      * This Joomla override dispatches the 'onAcumulusInvoiceSent' event.
      *
      * @throws \Exception
+     *
+     * @noinspection PhpDeprecationInspection
+     *   Deprecated as of J4.
+     * @noinspection NullPointerExceptionInspection
      */
-    protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, InvoiceAddResult $result)
+    protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, InvoiceAddResult $result): void
     {
         PluginHelper::importPlugin('acumulus');
-        /** @noinspection PhpDeprecationInspection : Deprecated as of J4 */
         Factory::getApplication()->triggerEvent('onAcumulusInvoiceSendAfter', [$invoice, $invoiceSource, $result]);
     }
 }

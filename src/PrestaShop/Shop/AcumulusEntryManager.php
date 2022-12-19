@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\PrestaShop\Shop;
 
 use Db;
@@ -29,12 +32,8 @@ use Siel\Acumulus\Shop\AcumulusEntryManager as BaseAcumulusEntryManager;
  */
 class AcumulusEntryManager extends BaseAcumulusEntryManager
 {
-    /** @var string */
-    protected $tableName;
+    protected string $tableName;
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(Container $container, Log $log)
     {
         parent::__construct($container, $log);
@@ -48,7 +47,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     {
         /** @noinspection PhpUnhandledExceptionInspection */
         $result = $this->getDb()->executeS(sprintf(
-            "SELECT * FROM `%s` WHERE id_entry %s %s",
+            'SELECT * FROM `%s` WHERE id_entry %s %s',
             $this->tableName,
             $entryId === null ? 'is' : '=',
             $entryId === null ? 'null' : (string) $entryId
@@ -65,7 +64,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         $result = $this->getDb()->executeS(sprintf(
             "SELECT * FROM `%s` WHERE source_type = '%s' AND source_id = %u",
             $this->tableName,
-            pSql($invoiceSource->getType()),
+            pSQL($invoiceSource->getType()),
             $invoiceSource->getId()
         ));
         return $this->convertDbResultToAcumulusEntries($result, $ignoreLock);
@@ -89,10 +88,10 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
             $shopId,
             $shopGroupId,
             $entryId === null ? 'null' : (string) $entryId,
-            $token === null ? 'null' : ("'" . pSql($token) . "'"),
-            pSql($invoiceSource->getType()),
+            $token === null ? 'null' : ("'" . pSQL($token) . "'"),
+            pSQL($invoiceSource->getType()),
             $invoiceSource->getId(),
-            pSql($created)
+            pSQL($created)
         ));
     }
 
@@ -106,8 +105,8 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
             "UPDATE `%s` SET id_entry = %s, token = %s, updated = '%s' WHERE id = %u",
             $this->tableName,
             $entryId === null ? 'null' : (string) $entryId,
-            $token === null ? 'null' : ("'" . pSql($token) . "'"),
-            pSql($updated),
+            $token === null ? 'null' : ("'" . pSQL($token) . "'"),
+            pSQL($updated),
             $record['id']
         ));
     }
@@ -120,7 +119,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         $record = $entry->getRecord();
         /** @noinspection PhpUnhandledExceptionInspection */
         return $this->getDb()->execute(sprintf(
-            "DELETE FROM `%s` WHERE id = %u",
+            'DELETE FROM `%s` WHERE id = %u',
             $this->tableName,
             $record['id']
         ));

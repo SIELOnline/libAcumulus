@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Joomla\Shop;
 
 use AcumulusTableAcumulusEntry;
@@ -26,7 +29,9 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     {
         /**
          * @var bool|\AcumulusTableAcumulusEntry $table
-         * @noinspection PhpDeprecationInspection : Deprecated as of J4
+         *
+         * @noinspection PhpDeprecationInspection
+         *   Deprecated as of J4.
          */
         $table = Table::getInstance('AcumulusEntry', 'AcumulusTable');
         if ($table === false) {
@@ -101,6 +106,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     protected function sqlNow()
     {
         /** @noinspection PhpUnhandledExceptionInspection */
+        /** @noinspection NullPointerExceptionInspection */
         $tz = new DateTimeZone(Factory::getApplication()->get('offset'));
         $date = new Date();
         $date->setTimezone($tz);

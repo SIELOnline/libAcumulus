@@ -708,6 +708,7 @@ abstract class Form extends MessageCollection
                     }
                 }
             }
+            /** @noinspection OffsetOperationsInspection */
             $result[$optionId] = $optionText;
         }
 

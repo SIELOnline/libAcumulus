@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Joomla\Shop;
 
 use Siel\Acumulus\Shop\InvoiceStatusForm as BaseInvoiceStatusForm;
@@ -11,7 +14,7 @@ class InvoiceStatusForm extends BaseInvoiceStatusForm
     /**
      * {@inheritdoc}
      */
-    public function getFieldDefinitions(): array
+    protected function getFieldDefinitions(): array
     {
         $result = parent::getFieldDefinitions();
 

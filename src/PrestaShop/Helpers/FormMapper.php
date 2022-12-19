@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\PrestaShop\Helpers;
 
 use Siel\Acumulus\Helpers\Form;

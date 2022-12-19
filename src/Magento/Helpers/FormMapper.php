@@ -1,9 +1,16 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Magento\Helpers;
 
 use Magento\Framework\Data\Form\AbstractForm;
 use Siel\Acumulus\Helpers\Form;
 use Siel\Acumulus\Helpers\FormMapper as BaseFormMapper;
+
+use function in_array;
+use Siel\AcumulusMa2\Data\Form\Element\Details;
+use Siel\AcumulusMa2\Data\Form\Element\Collection;
 
 /**
  * Class FormMapper maps an Acumulus form definition to a Magento form
@@ -13,17 +20,14 @@ class FormMapper extends BaseFormMapper
 {
     /**
      * The date format as Magento uses it.
-     *
-     * @var string
      */
-    const DateFormat = 'yyyy-MM-dd';
+    public const DateFormat = 'yyyy-MM-dd';
 
     /**
-     * @var \Magento\Framework\Data\Form\AbstractForm
-     *   The slug-name of the settings page on which to show the section.
+     * The slug-name of the settings page on which to show the section.
      */
-    protected $magentoForm;
-    protected $isFirstElement;
+    protected AbstractForm $magentoForm;
+    protected bool $isFirstElement;
 
     /**
      * @return $this
@@ -46,7 +50,7 @@ class FormMapper extends BaseFormMapper
     /**
      * Maps a set of field definitions.
      */
-    public function fields(AbstractForm $parent, array $fields)
+    public function fields(AbstractForm $parent, array $fields): void
     {
         foreach ($fields as $id => $field) {
             if (!isset($field['id'])) {
@@ -62,7 +66,7 @@ class FormMapper extends BaseFormMapper
     /**
      * Maps a single field definition.
      */
-    public function field(AbstractForm $parent, array $field)
+    public function field(AbstractForm $parent, array $field): void
     {
         if (!isset($field['attributes'])) {
             $field['attributes'] = [];
@@ -83,7 +87,7 @@ class FormMapper extends BaseFormMapper
             /** @noinspection PhpUndefinedMethodInspection */
             if (!empty($element->getLabelIsHtml())) {
                 /** @noinspection PhpUndefinedMethodInspection */
-                $label = preg_replace('|<span>.+</span>|U', '<span>' . $element->getLabel() . '</span>', $label);
+                $label = preg_replace('|<span>.+</span>|Us', '<span>' . $element->getLabel() . '</span>', $label);
             }
             /** @noinspection PhpUndefinedMethodInspection */
             $element->setBeforeElementHtml('<div ' . $element->serialize($htmlAttributes) . '>' . $label);
@@ -131,10 +135,10 @@ class FormMapper extends BaseFormMapper
                 $type = empty($field['attributes']['multiple']) ? 'select' : 'multiselect';
                 break;
             case 'details':
-                $type = 'Siel\AcumulusMa2\Data\Form\Element\Details';
+                $type = Details::class;
                 break;
             case 'collection':
-                $type = 'Siel\AcumulusMa2\Data\Form\Element\Collection';
+                $type = Collection::class;
                 break;
             case 'textarea':
             case 'text':
@@ -195,6 +199,8 @@ class FormMapper extends BaseFormMapper
      *
      * @return array
      *   The Magento settings.
+     *
+     * @noinspection PhpFunctionCyclomaticComplexityInspection
      */
     protected function getMagentoProperty(array $config, string $key, $value, string $type): array
     {
@@ -305,10 +311,7 @@ class FormMapper extends BaseFormMapper
     {
         $config = [];
         foreach ($options as $value => $label) {
-            $config[] = [
-                'value' => $value,
-                'label' => $label,
-            ];
+            $config[] = compact('value', 'label');
         }
         return $config;
     }

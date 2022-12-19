@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\PrestaShop\Helpers;
 
 use Siel\Acumulus\Helpers\FormHelper as BaseFormHelper;
@@ -10,10 +13,8 @@ use Tools;
  */
 class FormHelper extends BaseFormHelper
 {
-    /** @var string */
-    protected $moduleName = 'acumulus';
-
-    protected $icons = [
+    protected string$moduleName = 'acumulus';
+    protected array $icons = [
         'accountSettings' => 'icon-user',
         'shopSettings' => 'icon-shopping-cart',
         'triggerSettings' => 'icon-exchange',
@@ -75,11 +76,9 @@ class FormHelper extends BaseFormHelper
     {
         foreach ($this->getMeta() as $key => $fieldMeta) {
             /** @var \stdClass $fieldMeta */
-            if ($fieldMeta->type === 'checkbox') {
-                if (isset($formValues[$key])) {
-                    $prestaShopName = $fieldMeta->collection . '_' . $key;
-                    $formValues[$prestaShopName] = $formValues[$key];
-                }
+            if (($fieldMeta->type === 'checkbox') && isset($formValues[$key])) {
+                $prestaShopName = $fieldMeta->collection . '_' . $key;
+                $formValues[$prestaShopName] = $formValues[$key];
             }
         }
         return $formValues;
@@ -91,7 +90,7 @@ class FormHelper extends BaseFormHelper
      * This override adds a "details" class to all details fields, thereby
      * allowing a js solution.
      */
-    public function processField(array $field, string $key): array
+    protected function processField(array $field, string $key): array
     {
         $field = parent::processField($field, $key);
 

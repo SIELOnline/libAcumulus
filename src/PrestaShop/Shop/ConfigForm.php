@@ -1,8 +1,13 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\PrestaShop\Shop;
 
 use Siel\Acumulus\Shop\ConfigForm as BaseConfigForm;
 use Siel\Acumulus\Tag;
+
+use function array_key_exists;
 
 /**
  * Provides PrestaShop specific handling for the Config form.
@@ -16,7 +21,7 @@ class ConfigForm extends BaseConfigForm
      * its current value when the user did not fill it in (not fill it = leave
      * unchanged).
      */
-    protected function setSubmittedValues()
+    protected function setSubmittedValues(): void
     {
         parent::setSubmittedValues();
         if (array_key_exists(Tag::Password, $this->submittedValues) && $this->submittedValues[Tag::Password] === '') {

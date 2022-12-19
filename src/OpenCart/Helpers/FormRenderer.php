@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\OpenCart\Helpers;
 
 use Siel\Acumulus\Helpers\FormRenderer as BaseFormRenderer;
@@ -42,13 +45,14 @@ class FormRenderer extends BaseFormRenderer
      *
      * @param array $field
      */
-    protected function handleRequired(array $field)
+    protected function handleRequired(array $field): void
     {
         if (!empty($field['attributes']['required'])) {
             if (empty($this->elementWrapperClass)) {
                 $this->elementWrapperClass = 'required';
             } else {
                 $this->elementWrapperClass = (array) $this->elementWrapperClass;
+                /** @noinspection UnsupportedStringOffsetOperationsInspection */
                 $this->elementWrapperClass[] = 'required';
             }
         }

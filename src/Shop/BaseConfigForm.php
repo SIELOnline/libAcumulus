@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Shop;
 
 use Siel\Acumulus\Config\Config;
@@ -9,6 +12,8 @@ use Siel\Acumulus\Helpers\FormHelper;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\ApiClient\Acumulus;
+
+use function count;
 
 /**
  * Provides basic config form handling.
@@ -35,7 +40,7 @@ abstract class BaseConfigForm extends Form
      *
      * The results are restricted to the known config keys.
      */
-    protected function setSubmittedValues()
+    protected function setSubmittedValues(): void
     {
         parent::setSubmittedValues();
         $submittedValues = $this->submittedValues;

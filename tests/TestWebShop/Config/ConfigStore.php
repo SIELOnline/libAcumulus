@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Tests\TestWebShop\Config;
 
 use Siel\Acumulus\Config\ConfigStore as BaseConfigStore;
@@ -13,7 +16,7 @@ use Siel\Acumulus\Helpers\Util;
  */
 class ConfigStore extends BaSeConfigStore
 {
-    private $configFile = __DIR__ . '/../../../../config/config.json';
+    private string $configFile = __DIR__ . '/../../../../config/config.json';
 
     /**
      * {@inheritdoc}

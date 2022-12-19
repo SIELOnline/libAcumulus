@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Tests\TestWebShop\TestDoubles\ApiClient;
 
 use Siel\Acumulus\ApiClient\HttpRequest as BaseHttpRequest;
@@ -10,10 +13,7 @@ use Siel\Acumulus\Tests\Unit\ApiClient\ApiRequestResponseExamples;
  */
 class HttpRequest extends BaseHttpRequest
 {
-    /**
-     * @var \Siel\Acumulus\Tests\Unit\ApiClient\ApiRequestResponseExamples
-     */
-    private $examples;
+    private ApiRequestResponseExamples $examples;
 
     public function __construct()
     {
@@ -23,7 +23,7 @@ class HttpRequest extends BaseHttpRequest
 
     protected function executeWithCurl(): HttpResponse
     {
-        $httpCode = $this->examples->getHttpStatusCode($this->getUri());;
+        $httpCode = $this->examples->getHttpStatusCode($this->getUri());
         $requestHeaders = "request-headers1\r\nrequest-headers2\r\n\r\n";
         $responseHeaders = "response-headers1\r\nresponse-headers2\r\n\r\n";
         $responseBody = $this->examples->getResponseBody($this->getUri());

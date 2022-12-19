@@ -1,7 +1,15 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Helpers;
 
 use stdClass;
+
+use function in_array;
+use function is_array;
+use function is_object;
+use function strlen;
 
 /**
  * Provides basic form helper features.
@@ -13,10 +21,10 @@ use stdClass;
  *
  * ### Note to developers
  * You probably want to override:
- * - {@see \Siel\Acumulus\Helpers\FormHelper::severityToCssClass()
+ * - {@see severityToCssClass()
  *
  * But may want to override some other as well, a.o:
- * - {@see \Siel\Acumulus\Helpers\FormHelper::isSubmitted()
+ * - {@see isSubmitted()
  */
 class FormHelper
 {
@@ -24,15 +32,12 @@ class FormHelper
      * Name of the hidden meta field.
      */
     public const Meta = 'meta';
-
     /**
      * Name of the hidden meta field.
      */
     public const Unique = 'UNIQUE_';
 
-    /** @var \Siel\Acumulus\Helpers\Translator */
-    protected $translator;
-
+    protected Translator $translator;
     /**
      * Metadata about the fields on the form.
      *
@@ -42,7 +47,7 @@ class FormHelper
      *
      * @var object[]|null
      */
-    protected $meta = [];
+    protected ?array $meta;
 
     public function __construct(Translator $translator)
     {
@@ -81,7 +86,7 @@ class FormHelper
     /**
      * @param object|object[]|null $meta
      */
-    protected function setMeta($meta)
+    protected function setMeta($meta): void
     {
         // json must change an associative array into an object, we reverse that
         // here.
@@ -236,8 +241,8 @@ class FormHelper
      */
     protected function removeUnique(array $postedValues): array
     {
-        array_walk_recursive($postedValues, function(&$postedValue/*, $key*/) {
-            if (in_array(substr($postedValue, 0 , strlen(self::Unique . 'i:')), [self::Unique . 'i:', self::Unique . 's:'])) {
+        array_walk_recursive($postedValues, static function(&$postedValue/*, $key*/) {
+            if (in_array(substr($postedValue, 0, strlen(self::Unique . 'i:')), [self::Unique . 'i:', self::Unique . 's:'], true)) {
                 $postedValue = unserialize(substr($postedValue, strlen(self::Unique)));
             }
         });
@@ -280,7 +285,7 @@ class FormHelper
     /**
      * Adds a severity css class to a form field.
      */
-    protected function addSeverityClassToField(array &$fields, string $id, string $severityClass)
+    protected function addSeverityClassToField(array &$fields, string $id, string $severityClass): void
     {
         foreach ($fields as $key => &$field) {
             if ($key === $id) {
@@ -324,7 +329,7 @@ class FormHelper
     /**
      * Process all fields.
      *
-     * @param array $fields
+     * @param array[] $fields
      *
      * @return array[]
      *   The processed fields.

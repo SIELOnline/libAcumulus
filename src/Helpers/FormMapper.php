@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Helpers;
 
 /**
@@ -16,8 +19,8 @@ namespace Siel\Acumulus\Helpers;
  *
  * SECURITY REMARKS
  * ----------------
- * - A FormMapper uses the web shop's or CMS's form sub system and as such it
- *   may assume safe rendering is the responsibility of the CMS/web shop.
+ * - A FormMapper uses the web shop's or CMS's form subsystem and as such it may
+ *   assume safe rendering is the responsibility of the CMS/web shop.
  * - If however, the form sub system declines this responsibility, our form
  *   mapper will have to sanitize texts, values, options and such before
  *   handing them over to the form sub system.
@@ -27,8 +30,7 @@ namespace Siel\Acumulus\Helpers;
  */
 abstract class FormMapper
 {
-    /** @var \Siel\Acumulus\Helpers\Log */
-    protected $log;
+    protected Log $log;
 
     public function __construct(Log $log)
     {

@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Tests\TestWebShop\Config;
 
 use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;

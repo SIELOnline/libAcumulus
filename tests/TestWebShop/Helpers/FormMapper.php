@@ -1,9 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Tests\TestWebShop\Helpers;
 
 use Siel\Acumulus\Helpers\Form;
 
+/**
+ * FormMapper for our (unit) tests.
+ */
 class FormMapper extends \Siel\Acumulus\Helpers\FormMapper
 {
 

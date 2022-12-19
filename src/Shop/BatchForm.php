@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Shop;
 
 use DateTime;
@@ -29,11 +32,9 @@ use function count;
  */
 class BatchForm extends Form
 {
-    /** @var \Siel\Acumulus\Shop\InvoiceManager */
-    protected $invoiceManager;
-
+    protected InvoiceManager $invoiceManager;
     /** @var string[] */
-    protected $screenLog;
+    protected array $screenLog;
 
     public function __construct(
         AboutForm $aboutForm,
@@ -45,8 +46,7 @@ class BatchForm extends Form
         Environment $environment,
         Translator $translator,
         Log $log
-    )
-    {
+    ) {
         parent::__construct(
             $acumulusApiClient,
             $formHelper,
@@ -87,7 +87,7 @@ class BatchForm extends Form
     /**
      * {@inheritdoc}
      */
-    protected function validate()
+    protected function validate(): void
     {
         $invoiceSourceTypes = $this->shopCapabilities->getSupportedInvoiceSourceTypes();
         if (empty($this->submittedValues['invoice_source_type'])) {

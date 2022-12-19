@@ -1,7 +1,9 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Tests\TestWebShop\Config;
 
-use mysqli;
 use Siel\Acumulus\Config\Environment as EnvironmentBase;
 
 use const Siel\Acumulus\Version;
@@ -11,7 +13,7 @@ use const Siel\Acumulus\Version;
  */
 class Environment extends EnvironmentBase
 {
-    private $configFile = __DIR__ . '/../../../../config/db.json';
+    private string $configFile = __DIR__ . '/../../../../config/db.json';
 
     /**
      * {@inheritdoc}
@@ -23,7 +25,8 @@ class Environment extends EnvironmentBase
     }
 
     /**
-     * Returns the values of the database variables 'version' and 'version_comment'.
+     * Returns values for the database variables 'version' and
+     * 'version_comment'.
      */
     protected function executeQuery(string $query): array
     {
@@ -32,13 +35,5 @@ class Environment extends EnvironmentBase
           ['Variable_name' => 'version', 'Value' => '8.0.27'],
           ['Variable_name' => 'version_comment', 'Value' => 'MySQL Community Server - GPL'],
         ];
-//        $parameters = $this->loadConfig();
-//        $mysqli = new mysqli($parameters->hostName, $parameters->user, $parameters->password);
-//        return $mysqli->query($query)->fetch_all();
-    }
-
-    private function loadConfig(): object
-    {
-        return json_decode(file_get_contents($this->configFile), false);
     }
 }

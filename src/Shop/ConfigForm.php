@@ -1,9 +1,15 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Shop;
 
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Tag;
+
+use function count;
+use function in_array;
 
 /**
  * Provides basic config form handling.
@@ -18,19 +24,19 @@ class ConfigForm extends BaseConfigForm
      *   Array of key => value pairs that can be used in a select and that
      *   represents all cost centers defined in Acumulus for the given account.
      */
-    protected $costCenterOptions;
+    protected array $costCenterOptions;
 
     /**
      * @var array
      *   Array of key => value pairs that can be used in a select and that
      *   represents all bank accounts defined in Acumulus for the given account.
      */
-    protected $accountNumberOptions;
+    protected array $accountNumberOptions;
 
     /**
      * {@inheritdoc}
      */
-    protected function validate()
+    protected function validate(): void
     {
         $this->validateAccountFields();
         $this->validateShopFields();
@@ -40,8 +46,10 @@ class ConfigForm extends BaseConfigForm
 
     /**
      * Validates fields in the account settings fieldset.
+     *
+     * @noinspection InvertedIfElseConstructsInspection
      */
-    protected function validateAccountFields()
+    protected function validateAccountFields(): void
     {
 
         if (empty($this->submittedValues[Tag::ContractCode])) {
@@ -78,7 +86,7 @@ class ConfigForm extends BaseConfigForm
     /**
      * Validates fields in the shop settings fieldset.
      */
-    protected function validateShopFields()
+    protected function validateShopFields(): void
     {
         // Check if this fieldset was rendered.
         if (!$this->isKey('nature_shop')) {
@@ -98,13 +106,12 @@ class ConfigForm extends BaseConfigForm
             $field = sprintf($this->t('field_euVatClasses'), $this->t('vat_classes'));
             $message = sprintf($this->t('message_validate_eu_vat_classes_0'), $field);
             $this->addFormMessage($message, Severity::Error, 'euVatClasses');
-        } else {
-            // Check that Not applicable is not selected with other classes for EU vat classes
-            if (count($this->submittedValues['euVatClasses']) >= 2 && in_array(Config::VatClass_NotApplicable, $this->submittedValues['euVatClasses'])) {
-                $field = sprintf($this->t('field_euVatClasses'), $this->t('vat_classes'));
-                $message = sprintf($this->t('message_validate_eu_vat_classes_1'), $field, $this->t('vat_class_not_applicable'));
-                $this->addFormMessage($message, Severity::Error, 'euVatClasses');
-            }
+        } elseif (count($this->submittedValues['euVatClasses']) >= 2 && in_array(Config::VatClass_NotApplicable, $this->submittedValues['euVatClasses'], false)) {
+            // Check that Not applicable is not selected with other classes for
+            // EU vat classes.
+            $field = sprintf($this->t('field_euVatClasses'), $this->t('vat_classes'));
+            $message = sprintf($this->t('message_validate_eu_vat_classes_1'), $field, $this->t('vat_class_not_applicable'));
+            $this->addFormMessage($message, Severity::Error, 'euVatClasses');
         }
 
         if (empty($this->submittedValues['vatFreeClass'])) {
@@ -118,28 +125,32 @@ class ConfigForm extends BaseConfigForm
             $this->addFormMessage($message, Severity::Error, 'zeroVatClass');
         }
 
-        // Check that vatFreeClass and zeroVatClass do not point to the same (real) vat class.
-        if (!empty($this->submittedValues['vatFreeClass']) && !empty($this->submittedValues['zeroVatClass'])) {
-            if (
-                $this->submittedValues['zeroVatClass'] != Config::VatClass_NotApplicable
-                && $this->submittedValues['vatFreeClass'] == $this->submittedValues['zeroVatClass']
-            ) {
-                $this->addFormMessage(sprintf($this->t('message_validate_zero_vat_class_0'), $this->t('vat_classes')),
-                    Severity::Error, 'zeroVatClass');
-            }
+        // Check that vatFreeClass and zeroVatClass do not point to the same
+        // (real) vat class.
+        /** @noinspection TypeUnsafeComparisonInspection */
+        if (!empty($this->submittedValues['vatFreeClass'])
+            && !empty($this->submittedValues['zeroVatClass'])
+            && $this->submittedValues['zeroVatClass'] != Config::VatClass_NotApplicable
+            && $this->submittedValues['vatFreeClass'] == $this->submittedValues['zeroVatClass']
+        ) {
+            $this->addFormMessage(
+                sprintf($this->t('message_validate_zero_vat_class_0'), $this->t('vat_classes')),
+                Severity::Error, 'zeroVatClass');
         }
 
         // Check the marginProducts setting in combination with other settings.
         // NOTE: it is debatable whether margin articles can be services, e.g.
         // selling 2nd hand software licenses. So the validations may be removed
         // in the future.
-        if (isset($this->submittedValues['nature_shop']) && isset($this->submittedValues['marginProducts'])) {
+        if (isset($this->submittedValues['nature_shop'], $this->submittedValues['marginProducts'])) {
             // If we only sell articles with nature Services, we cannot (also)
             // sell margin goods.
+            /** @noinspection TypeUnsafeComparisonInspection */
             if ($this->submittedValues['nature_shop'] == Config::Nature_Services && $this->submittedValues['marginProducts'] != Config::MarginProducts_No) {
                 $this->addFormMessage($this->t('message_validate_conflicting_shop_options_1'), Severity::Error, 'nature_shop');
             }
             // If we only sell margin goods, the nature of all we sell is Products.
+            /** @noinspection TypeUnsafeComparisonInspection */
             if ($this->submittedValues['marginProducts'] == Config::MarginProducts_Only && $this->submittedValues['nature_shop'] != Config::Nature_Products) {
                 $this->addFormMessage($this->t('message_validate_conflicting_shop_options_2'), Severity::Error, 'nature_shop');
             }
@@ -149,7 +160,7 @@ class ConfigForm extends BaseConfigForm
     /**
      * Validates fields in the "Email as pdf" settings fieldset.
      */
-    protected function validateEmailAsPdfFields()
+    protected function validateEmailAsPdfFields(): void
     {
         // Check if this fieldset was rendered.
         if (!$this->isKey('emailTo')) {
@@ -184,7 +195,7 @@ class ConfigForm extends BaseConfigForm
     /**
      * Validates fields in the "Acumulus documents" fieldset.
      */
-    protected function validateDocumentsFields()
+    protected function validateDocumentsFields(): void
     {
         // Check if this fieldset was rendered.
         if (!$this->isKey('showInvoiceDetail')) {
@@ -221,7 +232,7 @@ class ConfigForm extends BaseConfigForm
      * account settings. If these are OK, the other settings are included as
      * well.
      */
-    public function getFieldDefinitions(): array
+    protected function getFieldDefinitions(): array
     {
         $fields = [];
 
@@ -595,7 +606,7 @@ class ConfigForm extends BaseConfigForm
         $fields = [];
         $fields['invoiceSubHeader'] = [
             'type' => 'markup',
-            'value' => '<h3>' . ucfirst($this->t("document_invoice")) . '</h3>',
+            'value' => '<h3>' . ucfirst($this->t('document_invoice')) . '</h3>',
         ];
         $fields['detailInvoice'] = [
             'type' => 'checkbox',
@@ -620,7 +631,7 @@ class ConfigForm extends BaseConfigForm
         $fields = [];
         $fields['packingSlipSubHeader'] = [
             'type' => 'markup',
-            'value' => '<h3>' . ucfirst($this->t("document_packing_slip")) . '</h3>',
+            'value' => '<h3>' . ucfirst($this->t('document_packing_slip')) . '</h3>',
         ];
         $fields['detailPackingSlip'] = [
             'type' => 'checkbox',

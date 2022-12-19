@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Tests\TestWebShop\Helpers;
 
 use Siel\Acumulus\Helpers\Mailer as BaseMailer;

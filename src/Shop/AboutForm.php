@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Shop;
 
 use DateTimeImmutable;
@@ -11,25 +14,18 @@ use Siel\Acumulus\Helpers\Message;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Helpers\Translator;
 
+use function is_string;
+
 /**
  * Provides the About block that is shown on most of our forms.
  */
 class AboutForm
 {
-    /** @var \Siel\Acumulus\Helpers\Translator */
-    protected $translator;
-
-    /** @var \Siel\Acumulus\Config\ShopCapabilities */
-    protected $shopCapabilities;
-
-    /** @var \Siel\Acumulus\Config\Config */
-    protected $acumulusConfig;
-
-    /** @var \Siel\Acumulus\Config\Environment */
-    protected $environment;
-
-    /** @var \Siel\Acumulus\ApiClient\Acumulus */
-    protected $acumulusApiClient;
+    protected Translator $translator;
+    protected ShopCapabilities $shopCapabilities;
+    protected Config $acumulusConfig;
+    protected Environment $environment;
+    protected Acumulus $acumulusApiClient;
 
     public function __construct(
         Acumulus $acumulusApiClient,
@@ -49,7 +45,7 @@ class AboutForm
     /**
      * Loads the translations for the info block.
      */
-    protected function loadAboutBlockTranslations()
+    protected function loadAboutBlockTranslations(): void
     {
         static $translationsAdded = false;
         if (!$translationsAdded) {
@@ -242,6 +238,8 @@ class AboutForm
      *   - set of info lines keyed by their label.
      *   - last index: name known for the contract or a general string like
      *     '[your name]'.
+     *
+     * @noinspection InvertedIfElseConstructsInspection
      */
     protected function getContractList(?bool $accountStatus): array
     {
@@ -265,6 +263,7 @@ class AboutForm
                     }
                 }
             }
+            /** @noinspection TypeUnsafeComparisonInspection */
             if ($myData['mymaxentries'] != -1) {
                 $contract[$this->t('entries_about')] = sprintf(
                     $this->t('entries_numbers'),
@@ -322,7 +321,7 @@ class AboutForm
                 // 1 item: make it an array with 1 item
                 $mySupportItems = [$mySupportItems];
             }
-            usort($mySupportItems, function ($a, $b) {
+            usort($mySupportItems, static function ($a, $b) {
                 return [$a['startdate'], $a['location']] <=> [$b['startdate'], $b['location']];
             });
             foreach ($mySupportItems as $mySupportItem) {
@@ -344,24 +343,28 @@ class AboutForm
      *   true: correct account data set.
      *
      * @return array
+     *
+     * @noinspection InvertedIfElseConstructsInspection
      */
     protected function getEuCommerceInfo(?bool $accountStatus): array
     {
         $warningPercentage = $this->getAcumulusConfig()->getInvoiceSettings()['euCommerceThresholdPercentage'];
+        $percentage = '0';
         if ($warningPercentage !== '') {
             if ($accountStatus === null) {
-                $euCommerceProgressBar = $this->addProgressBar($this->t('unknown'), $this->t('unknown'), 0, 'warning');
+                $euCommerceProgressBar = $this->addProgressBar($this->t('unknown'), $this->t('unknown'), $percentage, 'warning');
                 $euCommerceMessage = $this->t('no_contract_data_local');
             } elseif ($accountStatus === false) {
-                $euCommerceProgressBar = $this->addProgressBar($this->t('unknown'), $this->t('unknown'), 0, 'warning');
+                $euCommerceProgressBar = $this->addProgressBar($this->t('unknown'), $this->t('unknown'), $percentage, 'warning');
                 $euCommerceMessage = $this->t('no_contract_data');
             } else {
                 $euCommerceReport = $this->getAcumulusApiClient()->reportThresholdEuCommerce();
                 if (!$euCommerceReport->hasError()) {
                     $euCommerceReport = $euCommerceReport->getMainAcumulusResponse();
+                    /** @noinspection TypeUnsafeComparisonInspection */
                     $reached = $euCommerceReport['reached'] == 1;
-                    $nlTaxed = (float)$euCommerceReport['nltaxed'];
-                    $threshold = (float)$euCommerceReport['threshold'];
+                    $nlTaxed = sprintf('%.0f', $euCommerceReport['nltaxed']);
+                    $threshold = sprintf('%.0f', $euCommerceReport['threshold']);
                     $percentage = min($nlTaxed / $threshold * 100.0, 100.0);
                     if ($reached) {
                         $message = $this->t('info_block_eu_commerce_threshold_passed');
@@ -373,11 +376,11 @@ class AboutForm
                         $message = $this->t('info_block_eu_commerce_threshold_ok');
                         $status = 'ok';
                     }
-                    $percentage = (int)round($percentage);
+                    $percentage = (string) (int) round($percentage);
                     $euCommerceProgressBar = $this->addProgressBar($nlTaxed, $threshold, $percentage, $status);
                     $euCommerceMessage = $message;
                 } else {
-                    $euCommerceProgressBar = $this->addProgressBar($this->t('unknown'), $this->t('unknown'), 0, 'error');
+                    $euCommerceProgressBar = $this->addProgressBar($this->t('unknown'), $this->t('unknown'), $percentage, 'error');
                     $euCommerceMessage = $this->t('no_eu_commerce_data') . "\n";
                     $euCommerceMessage .= $this->arrayToList(
                         $euCommerceReport->formatMessages(Message::Format_PlainWithSeverity, Severity::RealMessages),
@@ -389,11 +392,37 @@ class AboutForm
         return [$euCommerceProgressBar ?? '', $euCommerceMessage ?? ''];
     }
 
-    protected function addProgressBar($nlTaxed, $threshold, $percentage, $status): string
+    /**
+     * Returns the HTML for a progress bar indicating the  progress of sales at
+     * NL taxed compared to the EU threshold.
+     * @param string $nlTaxed
+     *   The amount of sales taxed with Dutch tax, or 'unknown'.
+     * @param string $threshold
+     *   The threshold at which a seller has to switch to EU tax, or 'unknown'.
+     *   Note: this threshold is currently 10.000,-€, but is queried from the
+     *   API, not hard coded, so it may be 'unknown'.
+     * @param string $percentage
+     *   The ratio of $nlTaxed / $threshold, as a whole number (between 0 and
+     *   100), or 'unknown'.
+     * @param string $status
+     *   'ok', 'warning', or 'error'.
+     *
+     * @return string
+     */
+    protected function addProgressBar(string $nlTaxed, string $threshold, string $percentage, string $status): string
     {
         return "<span class='acumulus-progressbar'><span class='acumulus-progress acumulus-$status' style='min-width:$percentage%'>$nlTaxed €</span></span><span class='acumulus-threshold'>$threshold €</span>";
     }
 
+    /**
+     * Converts an array with texts to a(n HTML) list.
+     *
+     * @param string[] $list
+     *   List of strings, if the key is s a string, it serves as a
+     *   (translatable) label.
+     * @param bool $isHtml
+     *   Return HTML or plain text.
+     */
     protected function arrayToList(array $list, bool $isHtml): string
     {
         /** @noinspection DuplicatedCode  also used in CrashReporter::arrayToList */

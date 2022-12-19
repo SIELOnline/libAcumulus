@@ -3,6 +3,8 @@
  * @noinspection HtmlUnknownTarget
  */
 
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Shop;
 
 use Siel\Acumulus\Helpers\TranslationCollection;

@@ -1,8 +1,12 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Shop;
 
 use Siel\Acumulus\ApiClient\Acumulus;
 use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Config\ShopCapabilities;
 use Siel\Acumulus\Helpers\Form;
 use Siel\Acumulus\Helpers\FormHelper;
@@ -15,14 +19,15 @@ use Siel\Acumulus\Helpers\Translator;
 class ConfirmUninstallForm extends Form
 {
     public function __construct(
-        ?Acumulus $acumulusApiClient,
+        Acumulus $acumulusApiClient,
         FormHelper $formHelper,
         ShopCapabilities $shopCapabilities,
         Config $config,
+        Environment $environment,
         Translator $translator,
         Log $log
     ) {
-        parent::__construct($acumulusApiClient, $formHelper, $shopCapabilities, $config, $translator, $log);
+        parent::__construct($acumulusApiClient, $formHelper, $shopCapabilities, $config, $environment,$translator, $log);
 
         $translations = new ConfirmUninstallFormTranslations();
         $this->translator->add($translations);
@@ -32,9 +37,6 @@ class ConfirmUninstallForm extends Form
      * Executes the form action on valid form submission.
      *
      * Override to implement the actual form handling, like saving values.
-     *
-     * @return bool
-     *   Success.
      */
     protected function execute(): bool
     {

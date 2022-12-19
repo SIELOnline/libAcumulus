@@ -1,13 +1,20 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Tests\TestWebShop\TestDoubles\ApiClient;
+
+use Siel\Acumulus\ApiClient\ConnectionHandler as BaseConnectionHandler;
+
+use function count;
 
 /**
  * A child class of Siel\Acumulus\ApiClient\HttpCommunicator to get access to
  * the count of connections.
  */
-class ConnectionHandler extends \Siel\Acumulus\ApiClient\ConnectionHandler
+class ConnectionHandler extends BaseConnectionHandler
 {
-    private static /*?ConnectionHandler*/ $instance = null;
+    private static ConnectionHandler $instance;
 
     /**
      * Singleton pattern.
@@ -16,9 +23,9 @@ class ConnectionHandler extends \Siel\Acumulus\ApiClient\ConnectionHandler
      *
      * @return static
      */
-    public static function getInstance(): \Siel\Acumulus\ApiClient\ConnectionHandler
+    public static function getInstance(): BaseConnectionHandler
     {
-        if (static::$instance === null) {
+        if (!isset(static::$instance)) {
             static::$instance = new static();
         }
         return static::$instance;

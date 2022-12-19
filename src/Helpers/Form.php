@@ -1,4 +1,11 @@
 <?php
+/**
+ * @noinspection EfferentObjectCouplingInspection
+ * @noinspection PhpClassHasTooManyDeclaredMembersInspection
+ */
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Helpers;
 
 use RuntimeException;
@@ -9,7 +16,14 @@ use Siel\Acumulus\ApiClient\AcumulusResult;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Config\ShopCapabilities;
+use Siel\Acumulus\Shop\AboutForm;
 use Siel\Acumulus\Tag;
+
+use function array_key_exists;
+use function count;
+use function get_class;
+use function in_array;
+use function is_array;
 
 /**
  * Provides basic form handling.
@@ -27,7 +41,7 @@ use Siel\Acumulus\Tag;
  * - Process a form submission:
  *     * Recognise form submission form just rendering a form.
  *     * Perform form (submission) validation.
- *     * {@see Execute} a task on valid form submission.
+ *     * {@see execute()} a task on valid form submission.
  *     * Show success and/or error messages.
  *
  * Usage:
@@ -73,49 +87,29 @@ abstract class Form extends MessageCollection
      *   Should be one of: register, config, advanced, activate, batch, invoice,
      *   rate.
      */
-    protected $type;
-
-    /** @var \Siel\Acumulus\Helpers\Log */
-    protected $log;
-
-    /** @var \Siel\Acumulus\Shop\AboutForm|null */
-    protected $aboutForm = null;
-
-    /** @var \Siel\Acumulus\Helpers\FormHelper */
-    protected $formHelper;
-
-    /** @var \Siel\Acumulus\Config\ShopCapabilities */
-    protected $shopCapabilities;
-
-    /** @var \Siel\Acumulus\Config\Config */
-    protected $acumulusConfig;
-
-    /** @var \Siel\Acumulus\Config\Environment */
-    protected $environment;
-
-    /** @var \Siel\Acumulus\ApiClient\Acumulus */
-    protected $acumulusApiClient;
-
+    protected string $type;
+    protected Log $log;
+    protected ?AboutForm $aboutForm = null;
+    protected FormHelper $formHelper;
+    protected ShopCapabilities $shopCapabilities;
+    protected Config $acumulusConfig;
+    protected Environment $environment;
+    protected ?Acumulus $acumulusApiClient;
     /** @var array[] */
-    protected $fields;
-
-    /** @var bool */
-    protected $formValuesSet;
-
+    protected array $fields;
+    protected bool $formValuesSet;
     /**
      * @var (string|int|float|bool|array|null)[]
      *   The values to be placed on the configuration form. The values that come
      *   from the submitted values are cast to their expected types. Thus, in
      *   contrast with $submittedValues, these are not only strings.
      */
-    protected $formValues;
-
+    protected array $formValues;
     /**
      * @var string[]
      *   The values as filled in on form submission.
      */
-    protected $submittedValues;
-
+    protected array $submittedValues;
     /**
      * @var bool
      *   For some forms it is important to know which fields were rendered and
@@ -128,8 +122,7 @@ abstract class Form extends MessageCollection
      *   For other forms it turned out to be a hindrance, so a property now
      *   guides whether the meta field is rendered or not.
      */
-    protected $addMeta = true;
-
+    protected bool $addMeta = true;
     /**
      * @var bool
      *   Whether this form is a full page form, thus surrounded by a <form> tag
@@ -140,14 +133,13 @@ abstract class Form extends MessageCollection
      *   "submit" button rendered following the standards of the specific
      *   web shop/CMS).
      */
-    protected $isFullPage = true;
-
+    protected bool $isFullPage = true;
     /**
      * @var bool
      *   Whether to add a css class to fields that indicates the severity of
      *   any message linked to this field.
      */
-    protected $addSeverityClassToFields = true;
+    protected bool $addSeverityClassToFields = true;
 
     public function __construct(
         ?Acumulus $acumulusApiClient,
@@ -189,6 +181,9 @@ abstract class Form extends MessageCollection
     /**
      * returns whether this form is a full page form, thus surrounded by a
      * <form> tag and having a possibly standardized submit button.
+     *
+     * @noinspection PhpUnused
+     *   Used in shop webshop specific projects.
      */
     public function isFullPage(): bool
     {
@@ -217,7 +212,7 @@ abstract class Form extends MessageCollection
      * This is typically the union of the default values, any submitted values,
      * and explicitly set field values.
      */
-    protected function setFormValues()
+    protected function setFormValues(): void
     {
         if (!$this->formValuesSet) {
             // Start by assuring the field definitions are constructed.
@@ -299,7 +294,7 @@ abstract class Form extends MessageCollection
     /**
      * Sets the value for a specific form field.
      */
-    protected function setFormValue(string $name, $value)
+    protected function setFormValue(string $name, $value): void
     {
         $this->formValues[$name] = $value;
     }
@@ -312,7 +307,7 @@ abstract class Form extends MessageCollection
      * including their value attribute instead of binding values to a form and
      * rendering the form.
      */
-    public function addValues()
+    public function addValues(): void
     {
         $this->fields = $this->addValuesToFields($this->getFields());
     }
@@ -383,7 +378,7 @@ abstract class Form extends MessageCollection
      * Override to restrict the POST values to expected values and to do any
      * sanitation.
      */
-    protected function setSubmittedValues()
+    protected function setSubmittedValues(): void
     {
         $this->submittedValues = $this->formHelper->getPostedValues();
     }
@@ -459,7 +454,7 @@ abstract class Form extends MessageCollection
      * This default implementation does no validation at all. Override to add
      * form specific validation.
      */
-    protected function validate()
+    protected function validate(): void
     {
     }
 
@@ -639,8 +634,7 @@ abstract class Form extends MessageCollection
         $regexpSingle = '/^' . $regexpEmail . '$/';
         $regexpMulti = '/^' . $regexpEmail . '([,;]' . $regexpEmail . ')*$/';
         $regex = $multi ? $regexpMulti : $regexpSingle;
-        $result = preg_match($regex, $submittedValue);
-        return $result;
+        return preg_match($regex, $submittedValue);
     }
 
     /**
@@ -655,14 +649,14 @@ abstract class Form extends MessageCollection
      *
      * @param \Siel\Acumulus\ApiClient\AcumulusResult $picklist
      *   The picklist result structure.
-     * @param string|null $emptyValue
+     * @param string|int|null $emptyValue
      *   The value to use for an empty selection.
      * @param string|null $emptyText
      *   The label to use for an empty selection.
      *
      * @return array
      */
-    protected function picklistToOptions(AcumulusResult $picklist, ?string $emptyValue = null, ?string $emptyText = null): array
+    protected function picklistToOptions(AcumulusResult $picklist, $emptyValue = null, ?string $emptyText = null): array
     {
         $result = [];
 
@@ -681,6 +675,7 @@ abstract class Form extends MessageCollection
             if (ctype_digit((string) $optionId)) {
                 $optionId = (int) $optionId;
             }
+            /** @noinspection TypeUnsafeComparisonInspection */
             if ($optionId == $emptyValue) {
                 if ($optionId === $emptyValue) {
                     $this->log->warning('%s: option "%s" (picklist key: %s) equals empty option "%s"', __METHOD__, $optionId, key($picklistItem), $emptyValue);
@@ -775,7 +770,8 @@ abstract class Form extends MessageCollection
      *
      * @return bool
      *   True if the value is set in the source array and thus has been copied
-     *   to the target array, false otherwise(value not set in thr source array.
+     *   to the target array, false otherwise (value not set in the source
+     *   array).
      */
     protected function addIfIsset(array &$target, string $key, array $source): bool
     {
@@ -803,7 +799,7 @@ abstract class Form extends MessageCollection
                 break;
             case 'config':
             case 'advanced':
-                $wrapperType = empty($accountStatus) ? 'details' : 'fieldset';
+                $wrapperType = in_array($accountStatus, [null, false], true) ? 'details' : 'fieldset';
                 break;
             default:
                 throw new RuntimeException('Unexpected form type ' . $this->getType());

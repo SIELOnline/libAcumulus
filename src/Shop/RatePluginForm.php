@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Shop;
 
 use Siel\Acumulus\Config\Config;
@@ -27,10 +29,7 @@ use Siel\Acumulus\Helpers\Translator;
  */
 class RatePluginForm extends Form
 {
-    /**
-     * @var string
-     */
-    protected $action = '';
+    protected string $action = '';
 
     public function __construct(
         FormHelper $formHelper,
@@ -65,7 +64,7 @@ class RatePluginForm extends Form
      * This override adds sanitation to the values and already combines some
      * values to retrieve a Source object
      */
-    protected function setSubmittedValues()
+    protected function setSubmittedValues(): void
     {
         parent::setSubmittedValues();
 

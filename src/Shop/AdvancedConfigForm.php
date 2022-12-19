@@ -1,9 +1,15 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Shop;
 
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Config\Config;
+
+use function count;
+use function is_array;
 
 /**
  * Provides advanced config form handling.
@@ -16,7 +22,7 @@ class AdvancedConfigForm extends BaseConfigForm
     /**
      * {@inheritdoc}
      */
-    protected function validate()
+    protected function validate(): void
     {
         $this->validateInvoiceFields();
         $this->validateOptionsFields();
@@ -25,7 +31,7 @@ class AdvancedConfigForm extends BaseConfigForm
     /**
      * Validates fields in the "Invoice" settings fieldset.
      */
-    protected function validateInvoiceFields()
+    protected function validateInvoiceFields(): void
     {
         if (!empty($this->submittedValues['euCommerceThresholdPercentage'])) {
             $regex = '/^((\d{1,2}(\.\d{1,3})?)|(100))%?$/';
@@ -39,8 +45,9 @@ class AdvancedConfigForm extends BaseConfigForm
     /**
      * Validates fields in the "Options" settings fieldset.
      */
-    protected function validateOptionsFields()
+    protected function validateOptionsFields(): void
     {
+        /** @noinspection TypeUnsafeComparisonInspection */
         if ($this->submittedValues['optionsAllOn1Line'] == PHP_INT_MAX && $this->submittedValues['optionsAllOnOwnLine'] == 1) {
             $this->addFormMessage($this->t('message_validate_options_0'), Severity::Error, 'optionsAllOnOwnLine');
         }
@@ -60,7 +67,7 @@ class AdvancedConfigForm extends BaseConfigForm
      * account settings. If these are OK, the other settings are included as
      * well.
      */
-    public function getFieldDefinitions(): array
+    protected function getFieldDefinitions(): array
     {
         $fields = [];
 

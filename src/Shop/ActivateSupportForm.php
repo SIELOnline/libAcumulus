@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Shop;
 
 use Siel\Acumulus\ApiClient\Acumulus;
@@ -10,7 +13,6 @@ use Siel\Acumulus\Helpers\FormHelper;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Helpers\Translator;
-use Siel\Acumulus\Invoice\Translations as InvoiceTranslations;
 
 /**
  * Provides the "Activate pro support" form.
@@ -24,7 +26,7 @@ use Siel\Acumulus\Invoice\Translations as InvoiceTranslations;
  */
 class ActivateSupportForm extends Form
 {
-    const RegExp_Token = '[0-9a-zA-Z]{32}';
+    protected const RegExp_Token = '[0-9a-zA-Z]{32}';
 
     public function __construct(
         AboutForm $aboutForm,
@@ -55,7 +57,7 @@ class ActivateSupportForm extends Form
     /**
      * {@inheritdoc}
      */
-    protected function validate()
+    protected function validate(): void
     {
         $hostName = $this->environment->get()['hostName'];
         if (preg_match('/^'. self::RegExp_Token . '$/', $this->submittedValues['support_token']) === false) {
@@ -86,7 +88,7 @@ class ActivateSupportForm extends Form
     /**
      * {@inheritdoc}
      */
-    public function getFieldDefinitions(): array
+    protected function getFieldDefinitions(): array
     {
         $fields = [];
 

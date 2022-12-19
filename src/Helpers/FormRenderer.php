@@ -1,4 +1,5 @@
-<?php
+<?php /** @noinspection PhpClassHasTooManyDeclaredMembersInspection */
+
 /**
  * @noinspection PhpRedundantOptionalArgumentInspection
  * @noinspection PhpConcatenationWithEmptyStringCanBeInlinedInspection
@@ -6,7 +7,13 @@
  *   construction.
  */
 
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Helpers;
+
+use function defined;
+use function in_array;
+use function is_array;
 
 /**
  * Provides form element rendering functionality. This basic implementation
@@ -36,145 +43,74 @@ class FormRenderer
 {
     public const RequiredMarkup = '<span class="required">*</span>';
 
-    /** @var bool */
-    protected $html5 = true;
-
-    /** @var string */
-    protected $elementWrapperTag = 'div';
-
+    protected bool $html5 = true;
+   protected string $elementWrapperTag = 'div';
     /** @var string|string[] */
     protected $elementWrapperClass = 'form-element';
-
-    /** @var string */
-    protected $fieldsetWrapperTag = 'fieldset';
-
+    protected string $fieldsetWrapperTag = 'fieldset';
     /** @var string|string[] */
     protected $fieldsetWrapperClass = '';
-
-    /** @var string */
-    protected $detailsWrapperTag = 'details';
-
+    protected string $detailsWrapperTag = 'details';
     /** @var string|string[] */
     protected $detailsWrapperClass = '';
-
-    /** @var string */
-    protected $legendWrapperTag = 'legend';
-
+    protected string $legendWrapperTag = 'legend';
     /** @var string|string[] */
     protected $legendWrapperClass = '';
-
-    /** @var string */
-    protected $summaryWrapperTag = 'summary';
-
+    protected string $summaryWrapperTag = 'summary';
     /** @var string|string[] */
     protected $summaryWrapperClass = '';
-
-    /** @var string */
-    protected $fieldsetDescriptionWrapperTag = 'div';
-
+    protected string $fieldsetDescriptionWrapperTag = 'div';
     /** @var string|string[] */
     protected $fieldsetDescriptionWrapperClass = 'fieldset-description';
-
     /**
-     * Also used for details content.
-     *
-     * @var string
+     *   Also used for details content.
      */
-    protected $fieldsetContentWrapperTag = '';
-
+    protected string $fieldsetContentWrapperTag = '';
     /**
-     * Also used for details content.
-     *
      * @var string|string[]
+     *   Also used for details content.
      */
     protected $fieldsetContentWrapperClass = 'fieldset-content';
-
-    /** @var string */
-    protected $labelWrapperTag = '';
-
+    protected string $labelWrapperTag = '';
     /** @var string|string[] */
     protected $labelWrapperClass = '';
-
-    /** @var string */
-    protected $markupWrapperTag = 'div';
-
+    protected string $markupWrapperTag = 'div';
     /** @var string|string[] */
     protected $markupWrapperClass = 'message';
-
-    /** @var string */
-    protected $inputDescriptionWrapperTag = '';
-
+    protected string $inputDescriptionWrapperTag = '';
     /** @var string|string[] */
     protected $inputDescriptionWrapperClass = '';
-
-    /** @var string */
-    protected $inputWrapperTag = '';
-
+    protected string $inputWrapperTag = '';
     /** @var string|string[] */
     protected $inputWrapperClass = '';
-
-    /** @var string */
-    protected $radioWrapperTag = 'div';
-
+    protected string $radioWrapperTag = 'div';
     /** @var string|string[] */
     protected $radioWrapperClass = 'radio';
-
-    /** @var string */
-    protected $radio1WrapperTag = '';
-
+    protected string $radio1WrapperTag = '';
     /** @var string|string[] */
     protected $radio1WrapperClass = '';
-
-    /** @var string */
-    protected $checkboxWrapperTag = 'div';
-
+    protected string $checkboxWrapperTag = 'div';
     /** @var string|string[] */
     protected $checkboxWrapperClass = 'checkbox';
-
-    /** @var string */
-    protected $checkbox1WrapperTag = '';
-
+    protected string $checkbox1WrapperTag = '';
     /** @var string|string[] */
     protected $checkbox1WrapperClass = '';
-
-    /** @var string */
-    protected $renderEmptyLabel = true;
-
-    /** @var string */
-    protected $labelTag = 'label';
-
-    /** @var string */
-    protected $multiLabelTag = 'label';
-
+    protected bool $renderEmptyLabel = true;
+    protected string $labelTag = 'label';
+    protected string $multiLabelTag = 'label';
     /** @var string|string[] */
     protected $labelClass = '';
-
     /** @var string|string[] */
     protected $multiLabelClass = '';
-
-    /** @var string */
-    protected $descriptionWrapperTag = 'div';
-
+    protected string $descriptionWrapperTag = 'div';
     /** @var string|string[] */
     protected $descriptionWrapperClass = 'description';
-
-    /** @var bool */
-    protected $radioInputInLabel = false;
-
-    /** @var bool */
-    protected $checkboxInputInLabel = false;
-
-    /** @var string */
-    protected $requiredMarkup = self::RequiredMarkup;
-
-    /** @var bool */
-    protected $usePopupDescription = false;
-
-    /** @var int */
-    protected $htmlSpecialCharsFlag;
-
-    /** @var Form */
-    protected $form;
+    protected bool $radioInputInLabel = false;
+    protected bool $checkboxInputInLabel = false;
+    protected string $requiredMarkup = self::RequiredMarkup;
+    protected bool $usePopupDescription = false;
+    protected int $htmlSpecialCharsFlag;
+    protected Form $form;
 
     /**
      * Sets the value of a property of this object.
@@ -182,9 +118,10 @@ class FormRenderer
      *
      * @return $this
      */
-    public function setProperty(string $property, $value): FormRenderer
+    public function setProperty(string $property, $value): self
     {
         if (property_exists($this, $property) && $property !== 'form') {
+            /** @noinspection PhpVariableVariableInspection */
             $this->$property = $value;
         }
         return $this;
@@ -666,6 +603,8 @@ class FormRenderer
 
     /**
      * Returns the open tag for a wrapper element.
+     *
+     * @noinspection PhpVariableVariableInspection
      */
     protected function getWrapper(string $type, array $attributes = []): string
     {
@@ -683,6 +622,8 @@ class FormRenderer
 
     /**
      * Returns the closing tag for a wrapper element.
+     *
+     * @noinspection PhpVariableVariableInspection
      */
     protected function getWrapperEnd(string $type): string
     {

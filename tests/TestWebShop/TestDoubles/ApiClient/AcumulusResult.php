@@ -1,9 +1,16 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Tests\TestWebShop\TestDoubles\ApiClient;
 
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\ApiClient\AcumulusResult as BaseResult;
 
+/**
+ * AcumulusResult adds some features used in testing the behaviour of its parent
+ * class.
+ */
 class AcumulusResult extends BaseResult
 {
     protected function getContentFormat(): string

@@ -1,8 +1,15 @@
 <?php
 /**
+ * @noinspection EfferentObjectCouplingInspection
+ */
+
+/**
  * @noinspection PhpUnnecessaryLocalVariableInspection
  * @noinspection PhpConcatenationWithEmptyStringCanBeInlinedInspection
+ * @noinspection PhpClassHasTooManyDeclaredMembersInspection
  */
+
+declare(strict_types=1);
 
 namespace Siel\Acumulus\Shop;
 
@@ -25,6 +32,11 @@ use Siel\Acumulus\Helpers\Message;
 use Siel\Acumulus\ApiClient\AcumulusResult;
 use Siel\Acumulus\ApiClient\Acumulus;
 use Siel\Acumulus\Helpers\Severity;
+
+use function count;
+use function in_array;
+use function is_array;
+use function is_string;
 
 /**
  * Defines the Acumulus invoice status overview form.
@@ -62,49 +74,32 @@ class InvoiceStatusForm extends Form
     public const Status_Warning = 3;
     public const Status_Error = 4;
 
-    /** @var \Siel\Acumulus\Helpers\Container*/
-    protected $container;
-
-    /** @var \Siel\Acumulus\Shop\InvoiceManager */
-    protected $invoiceManager;
-
-    /** @var \Siel\Acumulus\Shop\AcumulusEntryManager */
-    protected $acumulusEntryManager;
-
+    protected Container $container;
+    protected InvoiceManager $invoiceManager;
+    protected AcumulusEntryManager $acumulusEntryManager;
     /**
      * The main Source for this form.
      *
      * This form can handle an order and its credit notes at the same time, the
      * order being the "main" source.
-     *
-     * @var \Siel\Acumulus\Invoice\Source
      */
-    protected $source = null;
-
+    protected ?Source $source = null;
     /**
      * The submitted source for this execution.
      *
      * This form can handle an order and its credit notes at the same time, the
      * order being the "main" source, the submitted source being the Source to
      * act on.
-     *
-     * @var \Siel\Acumulus\Invoice\Source
      */
-    protected $submittedSource = null;
-
+    protected ?Source $submittedSource = null;
     /**
      * One of the Result::Status_... constants.
-     *
-     * @var int
      */
-    protected $status;
-
+    protected int $status;
     /**
      * A message indicating why the status is not OK.
-     *
-     * @var string
      */
-    protected $statusMessage;
+    protected string $statusMessage;
 
     public function __construct(
         InvoiceManager $invoiceManager,
@@ -117,8 +112,7 @@ class InvoiceStatusForm extends Form
         Environment $environment,
         Translator $translator,
         Log $log
-    )
-    {
+    ) {
         parent::__construct(
             $acumulusApiClient,
             $formHelper,
@@ -143,10 +137,7 @@ class InvoiceStatusForm extends Form
         $this->resetStatus();
     }
 
-    /**
-     * @param \Siel\Acumulus\Invoice\Source $source
-     */
-    public function setSource(Source $source)
+    public function setSource(Source $source): void
     {
         $this->source = $source;
     }
@@ -181,7 +172,7 @@ class InvoiceStatusForm extends Form
      * @param string $message
      *   Optionally, a message indicating what is wrong may be given.
      */
-    protected function setStatus(int $status, string $message)
+    protected function setStatus(int $status, string $message): void
     {
         if ($status > $this->status) {
             $this->status = $status;
@@ -195,7 +186,7 @@ class InvoiceStatusForm extends Form
     /**
      * Resets the status.
      */
-    protected function resetStatus()
+    protected function resetStatus(): void
     {
         $this->status = static::Status_Unknown;
         $this->statusMessage = '';
@@ -300,7 +291,7 @@ class InvoiceStatusForm extends Form
      * This override adds sanitation to the values and already combines some
      * values to retrieve a Source object
      */
-    protected function setSubmittedValues()
+    protected function setSubmittedValues(): void
     {
         parent::setSubmittedValues();
 
@@ -312,7 +303,7 @@ class InvoiceStatusForm extends Form
     /**
      * Extracts the source on which the submitted action is targeted.
      */
-    protected function setServiceAndSubmittedSource()
+    protected function setServiceAndSubmittedSource(): void
     {
         // Get base source. The action may be on one of its children, a credit
         // note, but we also have to set the base source,so we can fully
@@ -356,7 +347,7 @@ class InvoiceStatusForm extends Form
     /**
      * @inheritDoc
      */
-    protected function validate()
+    protected function validate(): void
     {
         if ($this->source === null) {
             // Use a basic filtering on the wrong user input.
@@ -486,6 +477,7 @@ class InvoiceStatusForm extends Form
 
     /**
      * {@inheritdoc}
+     * @noinspection InvertedIfElseConstructsInspection
      */
     protected function getFieldDefinitions(): array
     {
@@ -628,6 +620,7 @@ class InvoiceStatusForm extends Form
      *   - 'result' (\Siel\Acumulus\ApiClient\Result?): result of the getEntry API call.
      *   - 'entry' (array?): the (main) response part of the getEntry API call.
      *   - 'statusField' (array): a form field array representing the status.
+     * @noinspection InvertedIfElseConstructsInspection
      */
     protected function getInvoiceInfo(Source $source, ?AcumulusEntry &$localEntry): array
     {
@@ -736,19 +729,17 @@ class InvoiceStatusForm extends Form
                         $statusSeverity = static::Status_Success;
                         $statusMessage = $this->t('invoice_status_ok');
                     }
-                } else {
-                    if ($result->isNotFound()) {
-                        // Entry is no(t) (longer) existing.
-                        $invoiceStatus = static::Invoice_NonExisting;
-                        $statusSeverity = static::Status_Error;
-                        // To prevent this error in the future, we delete the
-                        // local entry.
-                        $this->acumulusEntryManager->delete($localEntry);
-                    } elseif (empty($entry)) {
-                        // Other error.
-                        $invoiceStatus = static::Invoice_CommunicationError;
-                        $statusSeverity = static::Status_Error;
-                    }
+                } elseif ($result->isNotFound()) {
+                    // Entry is no(t) (longer) existing.
+                    $invoiceStatus = static::Invoice_NonExisting;
+                    $statusSeverity = static::Status_Error;
+                    // To prevent this error in the future, we delete the
+                    // local entry.
+                    $this->acumulusEntryManager->delete($localEntry);
+                } elseif (empty($entry)) {
+                    // Other error.
+                    $invoiceStatus = static::Invoice_CommunicationError;
+                    $statusSeverity = static::Status_Error;
                 }
             } elseif (empty($invoiceStatus)) {
                 $invoiceStatus = static::Invoice_LocalError;
@@ -937,9 +928,9 @@ class InvoiceStatusForm extends Form
             if ($localPaymentStatus === Api::PaymentStatus_Paid) {
                 $shopSettings = $this->acumulusConfig->getShopSettings();
                 $dateToUse = $shopSettings['dateToUse'];
-                if ($dateToUse != Config::InvoiceDate_Transfer) {
+                if ($dateToUse !== Config::InvoiceDate_Transfer) {
                     $defaultPaymentDate = $source->getInvoiceDate();
-                    if ($dateToUse != Config::InvoiceDate_InvoiceCreate || empty($defaultPaymentDate)) {
+                    if ($dateToUse !== Config::InvoiceDate_InvoiceCreate || empty($defaultPaymentDate)) {
                         $defaultPaymentDate = $source->getDate();
                     }
                 }
@@ -1020,8 +1011,6 @@ class InvoiceStatusForm extends Form
      *
      * @return array[]
      *   Array with form fields with the invoice amounts.
-     *
-     * @noinspection PhpSeparateElseIfInspection
      */
     protected function getAmountFields(Source $source, array $entry): array
     {
@@ -1042,13 +1031,11 @@ class InvoiceStatusForm extends Form
                     // Old (or zero vat): correct the vat and ex amount.
                     $amountVatAcumulus += $amountForeignEuVatAcumulus;
                     $amountExAcumulus -= $amountForeignEuVatAcumulus;
-                } else {
+                } elseif (!Number::floatsAreEqual($amountVatAcumulus, $amountForeignEuVatAcumulus)) {
                     // New (or mixed): the difference should be all tax paid.
                     // We just do a check on mixed vat, which, I think, should
                     // not be possible.
-                    if (!Number::floatsAreEqual($amountVatAcumulus, $amountForeignEuVatAcumulus)) {
-                        $vatType = $this->t('foreign_national_vat');
-                    }
+                    $vatType = $this->t('foreign_national_vat');
                 }
             } else {
                 $vatType = $this->t('vat');
@@ -1083,11 +1070,8 @@ class InvoiceStatusForm extends Form
      * - < 5 cents, it is considered a probable error and 'warning' will be returned.
      * - >= 5 cents, it is considered an error and 'error' will be returned.
      *
-     * @param float $amount
-     * @param float $amountLocal
-     *
      * @return int
-     *   One of the Status_... constants.
+     *   One of the {@see InvoiceStatusForm}::Status_... constants.
      */
     protected function getAmountStatus(float $amount, float $amountLocal): int
     {
@@ -1106,9 +1090,8 @@ class InvoiceStatusForm extends Form
     /**
      * Formats an amount in html, adding classes given the status.
      *
-     * @param float $amount
      * @param int $status
-     *   One of the Status_... constants.
+     *   One of the {@see InvoiceStatusForm}::Status_... constants.
      *
      * @return string
      *   An HTML string representing the amount and its status.
@@ -1140,12 +1123,10 @@ class InvoiceStatusForm extends Form
     /**
      * Returns links and buttons to the invoice and packing slip documents.
      *
-     * @param string $token
-     *
      * @return array[]
      *   Form field array that, depending on config and availability contains:
-     *   - buttons to mail the documents related to this order.
      *   - links to show the documents related to this order.
+     *   - buttons to mail the documents related to this order.
      */
     protected function getDocumentsFields(string $token): array
     {
@@ -1159,6 +1140,7 @@ class InvoiceStatusForm extends Form
             $uri = $this->acumulusApiClient->getInvoicePdfUri($token);
             $text = sprintf($this->t('document_show'), $document);
             $title = sprintf($this->t('document_show_title'), $document);
+            /** @noinspection HtmlUnknownTarget */
             $links['invoice_show'] = [
                 'type' => 'markup',
                 'value' => sprintf('<a class="%4$s" href="%1$s" title="%3$s">%2$s</a>',
@@ -1181,6 +1163,7 @@ class InvoiceStatusForm extends Form
             $uri = $this->acumulusApiClient->getPackingSlipPdfUri($token);
             $text = sprintf($this->t('document_show'), $document);
             $title = sprintf($this->t('document_show_title'), $document);
+            /** @noinspection HtmlUnknownTarget */
             $links['packing_slip_show'] = [
                 'type' => 'markup',
                 'value' => sprintf('<a class="%4$s" href="%1$s" title="%3$s">%2$s</a>',
@@ -1249,8 +1232,11 @@ class InvoiceStatusForm extends Form
 
     /**
      * Returns a hidden field.
+     *
+     * @param string|int $value
+     *   The value for the hidden field.
      */
-    protected function getHiddenField(string $value): array
+    protected function getHiddenField($value): array
     {
         return [
             'type' => 'hidden',
@@ -1447,7 +1433,7 @@ class InvoiceStatusForm extends Form
                     $result = $value;
                 }
             } elseif (is_array($additionalRestriction)) {
-                if (in_array($value, $additionalRestriction)) {
+                if (in_array($value, $additionalRestriction, true)) {
                     $result = $value;
                 }
             } else {

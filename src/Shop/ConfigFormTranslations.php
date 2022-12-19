@@ -178,8 +178,8 @@ De eigenschappen die uw webshop kent worden hieronder opgesomd.</p>
         'see_classes_more' => 'zie de classes %1$s voor mogelijke andere properties en methods die als veldverwijzing gebruikt kunnen worden',
         'see_table_more' => 'zie de tabel %1$s voor mogelijke andere velden die als veldverwijzing gebruikt kunnen worden',
         'see_tables_more' => 'zie de tabellen %1$s voor mogelijke andere velden die als veldverwijzing gebruikt kunnen worden',
-        'invoice_source' => "een Acumulus specifieke representatie van een bestelling of creditnota.",
-        'original_invoice_source' => "een Acumulus specifieke representatie van een bestelling zelf of de oorspronkelijke bestelling bij een creditnota.",
+        'invoice_source' => 'een Acumulus specifieke representatie van een bestelling of creditnota.',
+        'original_invoice_source' => 'een Acumulus specifieke representatie van een bestelling zelf of de oorspronkelijke bestelling bij een creditnota.',
         'see_above' => 'zie hierboven.',
         'see_order_above' => "zie hierboven bij 'order'.",
         'see_invoice_source_above' => "zie hierboven bij 'invoiceSource'.",
@@ -553,14 +553,14 @@ NOTE 2: this setting concerns whether the products or services you offer are inh
         // Tokens
         'tokenHelpHeader' => 'Explanation of field references',
         'desc_tokens' => '<p>This form contains a number of fields that may contain "field references".
-This means that besides free literal text, these fields can contain data from the order, customer and customer address.
+This means that besides free literal text, these fields can contain data from the order, order lines, customer and customer address(es).
 Field references are denoted by placing the name of the property between square brackets, ie. [ and ].
 The properties known by your web shop are listed below.</p>
 <p>To handle some special situations, field references can be combined as follows:</p>
 <ol class="property-list">
 <dt>[property]:</dt><dd>Simplest form, replace by the value of the property or method (without arguments).</dd>
 <dt>[property(arguments)]:</dt><dd>Replace by the return value of the method. "arguments" is a comma-separated list of arguments to pass to the method. Do not use quotes around strings.</dd>
-<dt>[object::property]:</dt><dd>Replace by the value of the property but only if that property is part of the given object (see list below). Use this to get the correct value if multiple objects have a property with the same name (e.g. id).</dd>
+<dt>[object::property]:</dt><dd>Replace by the value of the property but only if that property is part of the given object (see list below). Use this to get the valuefrom the correct object  if multiple objects have a property with the same name (e.g. id).</dd>
 <dt>[property1|property2|...]:</dt><dd>Replace by the value of property1, or if that does not have a value by that of property2, etc. Example: useful to get either the mobile OR landline number.</dd>
 <dt>[property1+property2+...]:</dt><dd>Replace by the value of property1 and that of property2 with 1 space between it, but only if both values are not empty. Example: useful to get the full name, constructed of first, middle and last name.</dd>
 <dt>[property1&property2&...]:</dt><dd>Replace by the value of property1 and that of property2 but with no space between it.</dd>
@@ -584,7 +584,7 @@ The properties known by your web shop are listed below.</p>
         'see_classes_more' => 'see the classes %1$s for possible other properties and methods that can be used as field reference',
         'see_table_more' => 'see the table %1$s for possible other fields that can be used as field reference',
         'see_tables_more' => 'see the tables %1$s for possible other fields that can be used as field reference',
-        'invoice_source' => "An Acumulus specific representation of an order or credit note.",
+        'invoice_source' => 'An Acumulus specific representation of an order or credit note.',
         'see_above' => 'see above.',
         'see_order_above' => "see above with 'order'.",
         'see_invoice_source_above' => "see above with 'invoiceSource'.",

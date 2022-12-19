@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Shop;
 
 use DateTime;
@@ -32,7 +34,7 @@ class RegisterForm extends Form
      *   {@link https://www.siel.nl/acumulus/API/Sign_Up/Sign_Up/} for more
      *   details.
      */
-    protected $signUpResponse;
+    protected array $signUpResponse;
 
     public function __construct(
         AboutForm $aboutForm,
@@ -55,13 +57,12 @@ class RegisterForm extends Form
         );
         $this->aboutForm = $aboutForm;
         $this->translator->add(new RegisterFormTranslations());
-        $this->signUpResponse = null;
     }
 
     /**
      * @inheritDoc
      */
-    protected function validate()
+    protected function validate(): void
     {
         if (empty($this->submittedValues[Tag::Gender])) {
             $this->addFormMessage(sprintf($this->t('message_validate_required_field'), $this->t('field_gender')), Severity::Error, Tag::Gender);
@@ -197,7 +198,7 @@ class RegisterForm extends Form
         // End test success screen
 
         $fields = [];
-        if ($this->signUpResponse === null) {
+        if (!isset($this->signUpResponse)) {
             // Not submitted or errors: render register form.
             $fields += [
                 'introContainer' => [

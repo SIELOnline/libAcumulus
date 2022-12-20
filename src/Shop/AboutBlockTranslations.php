@@ -21,7 +21,7 @@ class AboutBlockTranslations extends TranslationCollection
 
         // About your contract.
         'contract' => 'Uw contract',
-        'no_contract_data_local' => 'Contractdata nog niet ingevuld.',
+        'no_contract_data_local' => 'Contractdata (nog) niet beschikbaar.',
         'no_contract_data' => 'Contractdata niet beschikbaar',
         'field_companyName' => 'Bedrijfsnaam',
         'field_code' => 'Contractcode',
@@ -83,7 +83,7 @@ LONGSTRING
 
         // About your contract.
         'contract' => 'Your contract',
-        'no_contract_data_local' => 'Contract data not yet set.',
+        'no_contract_data_local' => 'Contract data not (yet) available.',
         'no_contract_data' => 'Contract data not available',
         'field_companyName' => 'Company name',
         'field_code' => 'Contract code',

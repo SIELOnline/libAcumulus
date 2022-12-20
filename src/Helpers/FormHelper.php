@@ -25,6 +25,8 @@ use function strlen;
  *
  * But may want to override some other as well, a.o:
  * - {@see isSubmitted()
+ *
+ * @noinspection PhpClassHasTooManyDeclaredMembersInspection
  */
 class FormHelper
 {
@@ -52,6 +54,7 @@ class FormHelper
     public function __construct(Translator $translator)
     {
         $this->translator = $translator;
+        $this->meta = null;
     }
 
     /**
@@ -243,7 +246,7 @@ class FormHelper
     {
         array_walk_recursive($postedValues, static function(&$postedValue/*, $key*/) {
             if (in_array(substr($postedValue, 0, strlen(self::Unique . 'i:')), [self::Unique . 'i:', self::Unique . 's:'], true)) {
-                $postedValue = unserialize(substr($postedValue, strlen(self::Unique)));
+                $postedValue = unserialize(substr($postedValue, strlen(self::Unique)), ['allowed_classes' => false]);
             }
         });
         return $postedValues;

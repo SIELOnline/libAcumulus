@@ -167,7 +167,7 @@ abstract class Form extends MessageCollection
         $pos = strrpos($class, '\\');
         $class = $pos !== false ? substr($class, $pos + 1) : $class;
         $classParts = preg_split('/([[:upper:]][[:lower:]]+)/', $class, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
-        $this->type = strtolower(is_array($classParts) && !empty($classParts) ? reset($classParts) : $class);
+        $this->type = strtolower(is_array($classParts) && count($classParts) !== 0 ? reset($classParts) : $class);
     }
 
     /**
@@ -241,7 +241,7 @@ abstract class Form extends MessageCollection
             }
 
             // 3: Overwrite with the submitted values.
-            if (!empty($this->submittedValues)) {
+            if (count($this->submittedValues) !== 0) {
                 $this->formValues = array_merge($this->formValues, $this->submittedValues);
             }
 
@@ -396,7 +396,7 @@ abstract class Form extends MessageCollection
      */
     protected function getSubmittedValue(string $name, string $default = null): ?string
     {
-        if (empty($this->submittedValues)) {
+        if (count($this->submittedValues) === 0) {
             $this->setSubmittedValues();
         }
         return array_key_exists($name, $this->submittedValues) ? $this->submittedValues[$name] : $default;
@@ -512,7 +512,7 @@ abstract class Form extends MessageCollection
      */
     public function getFields(): array
     {
-        if (empty($this->fields)) {
+        if (count($this->fields) === 0) {
             $this->fields = $this->getFieldDefinitions();
             if ($this->addMeta) {
                 $this->fields = $this->formHelper->addMetaField($this->fields);
@@ -634,7 +634,7 @@ abstract class Form extends MessageCollection
         $regexpSingle = '/^' . $regexpEmail . '$/';
         $regexpMulti = '/^' . $regexpEmail . '([,;]' . $regexpEmail . ')*$/';
         $regex = $multi ? $regexpMulti : $regexpSingle;
-        return preg_match($regex, $submittedValue);
+        return (bool) preg_match($regex, $submittedValue);
     }
 
     /**

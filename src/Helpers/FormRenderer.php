@@ -1,10 +1,11 @@
-<?php /** @noinspection PhpClassHasTooManyDeclaredMembersInspection */
-
+<?php
 /**
+ * @noinspection PhpLackOfCohesionInspection
+ * @noinspection PhpClassHasTooManyDeclaredMembersInspection
  * @noinspection PhpRedundantOptionalArgumentInspection
  * @noinspection PhpConcatenationWithEmptyStringCanBeInlinedInspection
- * @noinspection PhpUnused : Many properties are used via property name
- *   construction.
+ * @noinspection PhpUnused
+ *   Many properties are used via property name construction.
  */
 
 declare(strict_types=1);
@@ -457,7 +458,7 @@ class FormRenderer
         $attributes = $this->addAttribute($attributes, 'id', $field['id']);
         $attributes = $this->addAttribute($attributes, 'name', $field['name']);
         $output .= $this->getOpenTag('textarea', $attributes);
-        $output .= htmlspecialchars($field['value'], $this->htmlSpecialCharsFlag, 'UTF-8');
+        $output .= htmlspecialchars((string) $field['value'], $this->htmlSpecialCharsFlag, 'UTF-8');
         $output .= $this->getCloseTag('textarea');
 
         // Tag around input element.
@@ -508,7 +509,7 @@ class FormRenderer
                 $optionAttributes['selected'] = true;
             }
             $output .= $this->getOpenTag('option', $optionAttributes);
-            $output .= htmlspecialchars($text, $this->htmlSpecialCharsFlag, 'UTF-8');
+            $output .= htmlspecialchars((string) $text, $this->htmlSpecialCharsFlag, 'UTF-8');
             $output .= $this->getCloseTag('option');
         }
 
@@ -692,7 +693,7 @@ class FormRenderer
                     $value = $key;
                 }
                 if ($value !== true) {
-                    $attributeString .= '="' . htmlspecialchars($value, ENT_COMPAT, 'UTF-8') . '"';
+                    $attributeString .= '="' . htmlspecialchars((string) $value, ENT_COMPAT, 'UTF-8') . '"';
                 }
             }
         }
@@ -777,14 +778,16 @@ class FormRenderer
 
     /**
      * Returns a set of attributes for a single radio button.
+     *
+     * @param string|int $value
      */
-    protected function getRadioAttributes(string $id, string $name, string $value): array
+    protected function getRadioAttributes(string $id, string $name, $value): array
     {
         return [
             'type' => 'radio',
             'id' => "{$id}_$value",
             'name' => $name,
-            'value' => $value,
+            'value' => (string) $value,
         ];
     }
 

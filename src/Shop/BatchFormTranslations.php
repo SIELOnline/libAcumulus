@@ -150,7 +150,7 @@ LONGSTRING
         'message_form_range_date' => 'Range: %1$s between %2$s and %3$s.',
         'message_form_range_empty' => 'The range you defined does not contain any %1$s.',
         'message_form_range_list' => 'Found %1$s.',
-        'message_form_range_success' => '%2$d %1$s %2$s processed. See the results overview for more details.',
+        'message_form_range_success' => '%3$d %1$s %2$s processed. See the results overview for more details.',
         'message_form_batch_error' => 'Errors during sending the invoices. See the results overview for more information on the errors.',
         'is' => 'was',
         'plural_is' => 'were',

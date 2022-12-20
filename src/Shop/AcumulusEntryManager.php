@@ -156,8 +156,9 @@ abstract class AcumulusEntryManager
      *
      * @param \Siel\Acumulus\Invoice\Source $invoiceSource
      *   The source object for which the invoice was created.
-     * @param int|null $entryId
-     *   The Acumulus entry id assigned to the invoice for this order.
+     * @param int|string|null $entryId
+     *   The Acumulus entry id assigned to the invoice for this order. This is
+     *   an int, but is returned as a string by the API.
      * @param string|null $token
      *   The Acumulus token to be used to access the invoice for this order via
      *   the Acumulus API.
@@ -165,9 +166,12 @@ abstract class AcumulusEntryManager
      * @return bool
      *   Success.
      */
-    public function save(Source $invoiceSource, ?int $entryId, ?string $token): bool
+    public function save(Source $invoiceSource, $entryId, ?string $token): bool
     {
         $now = $this->sqlNow();
+        if ($entryId !== null) {
+            $entryId = (int) $entryId;
+        }
         $record = $this->getByInvoiceSource($invoiceSource, false);
         if ($record === null) {
             $result = $this->insert($invoiceSource, $entryId, $token, $now);

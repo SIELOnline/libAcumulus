@@ -581,9 +581,11 @@ class AcumulusResult extends MessageCollection
             if ($this->isList && !empty($response)) {
                 // Not empty: remove further indirection, i.e. get value of
                 // "singular", which will be the first (and only) key.
+                /** @var array $singular */
                 $singular = reset($response);
-                // If there was only 1 list result, it wasn't put in an array.
-                $response = !is_array($singular) ? [$singular] : $singular;
+                // If there was only 1 list result, it wasn't put in a (numeric)
+                // array.
+                $response = !is_array(reset($singular)) ? [$singular] : $singular;
             }
         } else {
             // Not set: probably an error occurred. This object offers ways

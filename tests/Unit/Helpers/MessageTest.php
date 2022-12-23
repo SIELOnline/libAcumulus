@@ -18,18 +18,18 @@ use Siel\Acumulus\Helpers\Severity;
 
 class MessageTest extends TestCase
 {
-    protected Translator $translator;
+    protected static Translator $translator;
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function setUp(): void
+    public static function setUpBeforeClass(): void
     {
-        $this->translator = new Translator('nl');
-        $this->translator->add(new SeverityTranslations());
+        self::$translator = new Translator('nl');
+        self::$translator->add(new SeverityTranslations());
     }
 
     public function testCreateWithAllParams1(): Message
     {
-        $message = Message::create('Message 701', Severity::Error, 'S1')->setTranslator($this->translator);
+        $message = Message::create('Message 701', Severity::Error, 'S1')->setTranslator(self::$translator);
         $this->assertSame('Message 701', $message->getText());
         $this->assertSame(Severity::Error, $message->getSeverity());
         $this->assertSame('S1', $message->getCode());
@@ -41,7 +41,7 @@ class MessageTest extends TestCase
 
     public function testCreateWithAllParams2(): Message
     {
-        $message = Message::create('Message 701 empty codes', Severity::Success)->setTranslator($this->translator);
+        $message = Message::create('Message 701 empty codes', Severity::Success)->setTranslator(self::$translator);
         $this->assertSame('Message 701 empty codes', $message->getText());
         $this->assertSame(Severity::Success, $message->getSeverity());
         $this->assertSame(0, $message->getCode());
@@ -53,7 +53,7 @@ class MessageTest extends TestCase
 
     public function testCreateWithArray(): Message
     {
-        $message = Message::createFromApiMessage(['code' => 702, 'codetag' => 'W2', 'message' => 'Message 702'], Severity::Warning)->setTranslator($this->translator);
+        $message = Message::createFromApiMessage(['code' => 702, 'codetag' => 'W2', 'message' => 'Message 702'], Severity::Warning)->setTranslator(self::$translator);
         $this->assertSame('Message 702', $message->getText());
         $this->assertSame(Severity::Warning, $message->getSeverity());
         $this->assertSame(702, $message->getCode());
@@ -66,7 +66,7 @@ class MessageTest extends TestCase
     public function testCreateWithException(): Message
     {
         $e = new RuntimeException('Message 703', 703);
-        $message = Message::createFromException($e)->setTranslator($this->translator);
+        $message = Message::createFromException($e)->setTranslator(self::$translator);
         $this->assertSame('Message 703', $message->getText());
         $this->assertSame(Severity::Exception, $message->getSeverity());
         $this->assertSame(703, $message->getCode());
@@ -78,7 +78,7 @@ class MessageTest extends TestCase
 
     public function testCreateFormFieldError(): Message
     {
-        $message = Message::createForFormField('Not a valid e-mail address', Severity::Error, 'email')->setTranslator($this->translator);
+        $message = Message::createForFormField('Not a valid e-mail address', Severity::Error, 'email')->setTranslator(self::$translator);
         $this->assertSame('Not a valid e-mail address', $message->getText());
         $this->assertSame(Severity::Error, $message->getSeverity());
         $this->assertSame(0, $message->getCode());

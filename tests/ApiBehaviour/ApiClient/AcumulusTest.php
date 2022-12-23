@@ -67,7 +67,7 @@ class AcumulusTest extends TestCase
     /**
      * @dataProvider responseKeysProvider
      */
-    public function testServicesKeysInResponse(string $method, array $args, bool $isList, array $expectedKeys)
+    public function testServicesKeysInResponse(string $method, array $args, bool $isList, array $expectedKeys): void
     {
         /** @var \Siel\Acumulus\ApiClient\AcumulusResult $result */
         $result = $this->acumulusClient->$method(... $args);

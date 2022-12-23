@@ -305,6 +305,11 @@ class Container
         return $this->getInstance('Token', 'Helpers', [$this->getLog()]);
     }
 
+    public function getField(): Field
+    {
+        return $this->getInstance('Field', 'Helpers', [$this->getLog()]);
+    }
+
     public function getFormHelper(): FormHelper
     {
         return $this->getInstance('FormHelper', 'Helpers', [$this->getTranslator()]);

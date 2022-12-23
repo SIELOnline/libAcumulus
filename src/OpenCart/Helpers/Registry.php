@@ -18,7 +18,7 @@ use function strlen;
  * @property \Config config
  * @property \DB db
  * @property \Document document
- * @property \Event event
+ * @property \Event|\Light_Event event
  * @property \Language language
  * @property \Loader load
  * @property \Request request

@@ -10,7 +10,6 @@ namespace Siel\Acumulus\OpenCart\Shop;
 
 use DateTime;
 use DB;
-use Event;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Invoice\Source;
@@ -125,14 +124,6 @@ class InvoiceManager extends BaseInvoiceManager
     }
 
     /**
-     * Wrapper around the event class instance.
-     */
-    private function getEvent(): Event
-    {
-        return $this->getRegistry()->event;
-    }
-
-    /**
      * Helper method to get the db object.
      */
     protected function getDb(): DB
@@ -146,6 +137,17 @@ class InvoiceManager extends BaseInvoiceManager
     protected function getLocation(): string
     {
         return $this->getRegistry()->getLocation();
+    }
+
+    /**
+     * Wrapper around the event class instance.
+     *
+     * @return \Event|\Light_Event
+     *   [SIEL #194403]; https://lightning.devs.mx/ defines its own handler.
+     */
+    private function getEvent()
+    {
+        return $this->getRegistry()->event;
     }
 
     /**

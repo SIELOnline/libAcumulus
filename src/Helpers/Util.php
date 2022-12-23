@@ -14,6 +14,7 @@ use function is_array;
 use function is_bool;
 use function is_int;
 use function is_object;
+use function is_string;
 use function strlen;
 
 /**
@@ -257,7 +258,7 @@ class Util
     public function maskArray(array $subject): array
     {
         array_walk_recursive($subject, static function (&$value, $key) {
-            if (stripos($key, 'password') !== false) {
+            if (is_string($key) && stripos($key, 'password') !== false) {
                 $value = 'REMOVED FOR SECURITY';
             }
         });
@@ -284,7 +285,8 @@ class Util
      */
     public function maskXml(string $subject): string
     {
-        // Mask all values that have 'password' in their key.
+        // Mask all values that have 'password' in their tag.
+        // @todo: use back reference in closing tag, but test it (is this still used, is it tested?)
         return preg_replace(
             '|<([a-z]*)password>.*</[a-z]*password>|s',
             '<$1password>REMOVED FOR SECURITY</$1password>',

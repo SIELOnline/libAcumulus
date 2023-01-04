@@ -68,15 +68,15 @@ Notes:
   already require a newer version than the shop does. This table cannot keep
   track of that.
 
-| Tag | Shop Version      | 7.4 | 8.0 | 8.1 | Remarks                   |
-|-----|-------------------|-----|-----|-----|---------------------------|
-| JOO | 4.2.5             | ✔   | ✔   | ✔   |                           |
-| HS  | 4.6.2 (starter)   | ✔   | ✔   | ✔   |                           |
-| MA  | 2.4.5 (community) | ❌   | ✔   | ✔   | Contains PHP 8 constructs |
-| OC  | 3.0.3.7           | ✔   | ✔   | ❌   | Many warnings on 8.1      |
-|     | 4.x.y.z           | ❓   | ❓   | ❓   | Not yet supported         |
-| PS  | 1.7.8.7           | ✔   | ❌   | ❌   | Fatal runtime errors      |
-| VM  | 4.0.4             | ✔   | ✔   | ✔   |                           |
+| Tag | Shop Version      | 7.4 | 8.0 | 8.1 | Remarks                          |
+|-----|-------------------|-----|-----|-----|----------------------------------|
+| JOO | 4.2.5             | ✔   | ✔   | ✔   |                                  |
+| HS  | 4.6.2 (starter)   | ✔   | ✔   | ✔   |                                  |
+| MA  | 2.4.5 (community) | ❌   | ✔   | ✔   | Contains PHP 8 constructs        |
+| OC  | 3.0.3.7           | ✔   | ✔   | ❌   | Many warnings on 8.1             |
+|     | 4.x.y.z           | ❓   | ❓   | ❓   | Not yet supported                |
+| PS  | 1.7.8.7           | ✔   | ❌   | ❌   | Fatal runtime errors             |
+| VM  | 4.0.4             | ✔   | ✔   | ✔   |                                  |
 | WC  | 7.1.0             | ✔   | ✔   | ❓   | Many warnings from other plugins |
 
 
@@ -91,6 +91,9 @@ Bugs:
   TypeError: Argument 2 passed to Number::floatsAreEqual() must be of the type
   float, string given, defined in Number.php:76.
 
+Refactorings:
+- Copied (and improved) class Token to Field and added tests for it. However,
+  this new class is not yet used in the rest of the code.
 
 7.5.0 (2022-12-09)
 ------------------

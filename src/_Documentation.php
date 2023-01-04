@@ -1,5 +1,6 @@
 <?php
 /**
+ * @noinspection PhpMissingStrictTypesDeclarationInspection
  * @noinspection PhpUnused
  */
 
@@ -52,12 +53,16 @@ namespace Siel\Acumulus;
  * ### Sub namespaces
  *
  * \Siel\Acumulus contains 5 sub namespaces to logically group functionality:
- * - {@see \Siel\Acumulus\Config}: configuration related classes.
- * - {@see \Siel\Acumulus\Helpers}: general utility classes.
- * - {@see \Siel\Acumulus\Invoice}: invoice handling related classes.
- * - {@see \Siel\Acumulus\Shop}: Entity handling, form handling, and managing
- *   (controller like) classes.
- * - {@see \Siel\Acumulus\ApiClient}: web service and communication related classes.
+ * - {@see \Siel\Acumulus\Config\_Documentation \Siel\Acumulus\Config}:
+ *   configuration related classes.
+ * - {@see \Siel\Acumulus\Helpers\_Documentation \Siel\Acumulus\Helpers}:
+ *   general utility classes.
+ * - {@see \Siel\Acumulus\Invoice\_Documentation \Siel\Acumulus\Invoice}:
+ *   invoice handling related classes.
+ * - {@see \Siel\Acumulus\Shop\_Documentation \Siel\Acumulus\Shop}:
+ *   entity handling, form handling, and managing (controller like) classes.
+ * - {@see \Siel\Acumulus\ApiClient\_Documentation \Siel\Acumulus\ApiClient}:
+ *   web service and communication related classes.
  *
  * More detail about these sub namespaces and their classes can be found in the
  * documentation per sub-namespace or per class.
@@ -66,21 +71,25 @@ namespace Siel\Acumulus;
  *
  * \Siel\Acumulus also contains sub namespaces per existing webshop/CMS
  * implementation:
- * - {@see \Siel\Acumulus\Joomla} (with sub sub namespaces VirtueMart and
- *   HikaShop)
+ * - {@see \Siel\Acumulus\Joomla} (with sub sub namespaces
+ *   {@see \Siel\Acumulus\Joomla\VirtueMart} and
+ *   {@see \Siel\Acumulus\Joomla\HikaShop}).
  * - {@see \Siel\Acumulus\Magento}
  * - {@see \Siel\Acumulus\OpenCart}
  * - {@see \Siel\Acumulus\PrestaShop}
  * - {@see \Siel\Acumulus\WooCommerce}
  * - {@see \Siel\Acumulus\MyWebShop}: example and template code to implement the
  *   Acumulus plugin for your own webshop.
+ * - {@see \Siel\Acumulus\Tests\TestWebShop\_Documentation \Siel\Acumulus\Tests\TestWebShop}
+ *   A minimalist implementation to allow the tests to run in a "functional"
+ *   shop environment.
  *
  * These sub namespaces only contain shop/CMS specific code.
  *
  * ### General principles
  *
  * This library applies/adheres/follows the following general principles:
- * - PSR-2 coding standards.
+ * - PSR-12 coding standards.
  * - PHPDoc to fully document each and every part of the code.
  * - When needed, its own PSR-4 autoloader to circumvent the fact that many
  *   webshop/CMS systems still live in the pre PSR-4 autoloading era, meaning

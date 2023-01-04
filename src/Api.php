@@ -1,7 +1,11 @@
 <?php
 /**
+ * Not all constants may have actual usages, in that case they are here for
+ * completeness and future use/auto-completion.
  * @noinspection PhpUnused
  */
+
+declare(strict_types=1);
 
 namespace Siel\Acumulus;
 

@@ -1,10 +1,9 @@
 <?php
-
 /**
+ * @noinspection PhpMissingStrictTypesDeclarationInspection
  * @noinspection PhpUnused
  * @noinspection PhpUndefinedNamespaceInspection
  */
-declare(strict_types=1);
 
 namespace Siel\Acumulus\Tests\TestWebShop;
 
@@ -34,6 +33,4 @@ namespace Siel\Acumulus\Tests\TestWebShop;
  * - You will now know what objects should be documented in
  *   ShopCapabilities::getTokenInfo(), so correct that method now as well.
  */
-interface _Documentation
-{
-}
+interface _Documentation {}

@@ -1,18 +1,26 @@
 <?php
+/**
+ * Not all constants may have actual usages, in that case they are here for
+ * completeness and future use/auto-completion.
+ * @noinspection PhpUnused
+ */
+
+declare(strict_types=1);
 
 namespace Siel\Acumulus;
 
 /**
  * Meta defines string constants for meta tags used in Acumulus API messages.
  *
- * Meta data can be added to the Acumulus invoice structure for reasons of
+ * Metadata can be added to the Acumulus invoice structure for reasons of
  * support or to pass additional information from the creator phase to the
- * completor phase. In the latter case, some of the meta data is required or
- * is required in some cases, e.g. when a vat rate is missing.
+ * completor phase. In the latter case, some metadata is expected to be present
+ * though perhaps only under certainc onditions,  e.g. when a vat rate is
+ * missing.
  *
- * Meta tags start with 'meta-', with the exception of 'unitpriceinc' and
- * 'vatamount', for which one could imagine that the Acumulus API would accept
- * these instead of 'unitprice' and 'vatrate'. With either choice, Acumulus can
+ * Meta tags start with 'meta-', except the tags 'unitpriceinc' and 'vatamount',
+ * for which one could imagine that one day the Acumulus API would accept these
+ * instead of 'unitprice' and 'vatrate'. With either choice, Acumulus can
  * correctly process the invoice line.
  */
 interface Meta

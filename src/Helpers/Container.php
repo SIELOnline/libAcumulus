@@ -719,7 +719,7 @@ class Container
      *   The sub namespace where the class belongs to, e.g. helpers, invoice or
      *   shop.
      * @param string $namespace
-     *   THe "base" namespace where the class belongs to
+     *   THe "base" namespace where the class belongs to.
      *
      * @return string
      *   The fully qualified class name based on the base namespace, sub

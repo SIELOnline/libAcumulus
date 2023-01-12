@@ -1,8 +1,17 @@
 <?php
 /**
- * @noinspection NullPointerExceptionInspection
- *   $this->invoiceSource->getSource() will not return null in this object's
- *   context.
+ * Although we would like to use strict equality, i.e. including type equality,
+ * unconditionally changing each comparison in this file will lead to problems
+ * - API responses return each value as string, even if it is an int or float.
+ * - The shop environment may be lax in its typing by, e.g. using strings for
+ *   each value coming from the database.
+ * - Our own config object is type aware, but, e.g, uses string for a vat class
+ *   regardless the type for vat class ids as used by the shop itself.
+ * So for now, we will ignore the warnings about non strictly typed comparisons
+ * in this code, and we won't use strict_types=1.
+ * @noinspection TypeUnsafeComparisonInspection
+ * @noinspection PhpMissingStrictTypesDeclarationInspection
+ * @noinspection PhpStaticAsDynamicMethodCallInspection
  */
 
 namespace Siel\Acumulus\WooCommerce\Invoice;
@@ -18,13 +27,23 @@ use WC_Order_Item_Product;
 use WC_Product;
 use WC_Tax;
 
+use function count;
+use function in_array;
+use function is_array;
+use function is_string;
+use function strlen;
+
 /**
- * Allows to create an Acumulus invoice from a WooCommerce order or refund.
+ * Creates a raw version of the Acumulus invoice from a WooCommerce {@see Source}.
+ *
+ * @property \Siel\Acumulus\WooCommerce\Invoice\Source $invoiceSource
  */
 class Creator extends BaseCreator
 {
-    /** @var bool Whether the order has (non-empty) item lines. */
-    protected $hasItemLines;
+    /**
+     * Whether the order has (non-empty) item lines.
+     */
+    protected bool $hasItemLines;
 
     /**
      * Product price precision in WC3: one of the prices is entered by the
@@ -36,10 +55,8 @@ class Creator extends BaseCreator
      * However, we still get reports of missed vat rates because they are out of
      * range, so we remain on the safe side and only use higher precision when
      * possible.
-     *
-     * @var float
      */
-    protected $precision = 0.01;
+    protected float $precision = 0.01;
 
     /**
      * {@inheritdoc}
@@ -206,7 +223,8 @@ class Creator extends BaseCreator
      *   The tax class of the product. For the default tax class it can be
      *   'standard' or the empty string. For no tax class at all, it will be
      *   PluginConfig::VatClass_Null.
-     *   @todo: can it be null?
+     * @todo
+     *   can it be null?
      *
      * @return array
      *   An array with keys:
@@ -221,7 +239,7 @@ class Creator extends BaseCreator
                 Meta::VatClassId => Config::VatClass_Null,
             ];
         } else {
-            // '' denotes the 'standard' tax class, use 'standard' in meta data,
+            // '' denotes the 'standard' tax class, use 'standard' in metadata,
             // '' when searching.
             if ($taxClassId === '') {
                 $taxClassId = 'standard';
@@ -308,7 +326,7 @@ class Creator extends BaseCreator
                 //   is also the case for woocommerce order item metadata, see
                 //   their own list versus the documentation on
                 //   https://developer.wordpress.org/plugins/metadata/managing-post-metadata/#hidden-custom-fields
-                if (in_array($meta->key, $hiddenOrderItemMeta)
+                if (in_array($meta->key, $hiddenOrderItemMeta, true)
                     || is_array($meta->value)
                     || is_serialized($meta->value)
                     || substr($meta->key, 0, strlen('_')) === '_'
@@ -420,7 +438,7 @@ class Creator extends BaseCreator
         // zones), storage of order item metadata has changed. Therefore, we
         // have to try several option names.
         $methodId = $item->get_method_id();
-        if (strpos($methodId, 'legacy_') === 0) {
+        if (str_starts_with($methodId, 'legacy_')) {
             $methodId = substr($methodId, strlen('legacy_'));
         }
         // Instance id is the zone, will return an empty value if not present.
@@ -431,11 +449,11 @@ class Creator extends BaseCreator
         $option = get_option($optionName);
 
         if (!empty($option['cost'])) {
-            // Cost may be a formula or be entered with a comma: 'Vul een bedrag
-            // (excl. btw) in of een berekening zoals 10.00 * [qty]. Gebruik
-            // [qty] voor het aantal artikelen, [cost] voor de totale prijs van
-            // alle artikelen, en [fee percent="10" min_fee="20" max_fee=""]
-            // voor prijzen gebaseerd op percentage.'
+            // Note that "Cost" may contain a formula or use commas: 'Vul een
+            // bedrag(excl. btw) in of een berekening zoals 10.00 * [qty].
+            // Gebruik [qty] voor het aantal artikelen, [cost] voor de totale
+            // prijs van alle artikelen, en [fee percent="10" min_fee="20"
+            // max_fee=""] voor prijzen gebaseerd op percentage.'
             $cost = str_replace(',', '.', $option['cost']);
             if (is_numeric($cost)) {
                 $cost = (float) $cost;

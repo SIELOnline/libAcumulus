@@ -1,10 +1,27 @@
 <?php
+/**
+ * Although we would like to use strict equality, i.e. including type equality,
+ * unconditionally changing each comparison in this file will lead to problems
+ * - API responses return each value as string, even if it is an int or float.
+ * - The shop environment may be lax in its typing by, e.g. using strings for
+ *   each value coming from the database.
+ * - Our own config object is type aware, but, e.g, uses string for a vat class
+ *   regardless the type for vat class ids as used by the shop itself.
+ * So for now, we will ignore the warnings about non strictly typed comparisons
+ * in this code, and we won't use strict_types=1.
+ * @noinspection TypeUnsafeComparisonInspection
+ * @noinspection PhpMissingStrictTypesDeclarationInspection
+ * @noinspection PhpStaticAsDynamicMethodCallInspection
+ */
+
 namespace Siel\Acumulus\Invoice;
 
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
+
+use function in_array;
 
 /**
  * The strategy lines completor class provides functionality to correct and
@@ -16,39 +33,23 @@ use Siel\Acumulus\Tag;
  */
 class CompletorStrategyLines
 {
-    /** @var \Siel\Acumulus\Config\Config */
-    protected $config;
-
-    /** @var \Siel\Acumulus\Helpers\Translator */
-    protected $translator;
-
+    protected Config $config;
+    protected Translator $translator;
     /** @var array[] */
-    protected $invoice;
-
+    protected array $invoice;
     /** @var array[] */
-    protected $invoiceLines;
-
-    /** @var Source */
-    protected $source;
-
+    protected array $invoiceLines;
+    protected Source $source;
     /**
-     * The list of possible vat types, initially filled with possible vat types
-     * based on client country, invoiceHasLineWithVat(), is_company(), and the
-     * EU vat setting.
-     *
      * @var int[]
+     *   The list of possible vat types, initially filled with possible vat
+     *   types based on client country, invoiceHasLineWithVat(), is_company(),
+     *   and the EU vat setting.
      */
-    protected $possibleVatTypes;
-
+    protected array $possibleVatTypes;
     /** @var array[] */
-    protected $possibleVatRates;
+    protected array $possibleVatRates;
 
-    /**
-     * Constructor.
-     *
-     * @param \Siel\Acumulus\Config\Config $config
-     * @param \Siel\Acumulus\Helpers\Translator $translator
-     */
     public function __construct(Config $config, Translator $translator)
     {
         $this->config = $config;
@@ -85,7 +86,7 @@ class CompletorStrategyLines
      * Complete all lines that need a vat divide strategy to compute correct
      * values.
      */
-    protected function completeStrategyLines()
+    protected function completeStrategyLines(): void
     {
         if ($this->invoiceHasStrategyLine()) {
             $this->invoice[Tag::Customer][Tag::Invoice][Meta::CompletorStrategyInput]['vat-rates'] = json_encode($this->possibleVatRates, Meta::JsonFlags);
@@ -151,7 +152,7 @@ class CompletorStrategyLines
         $result[] = "$namespace\\SplitNonMatchingLine";
         $result[] = "$namespace\\TryAllVatRatePermutations";
 
-        usort($result, function($class1, $class2) {
+        usort($result, static function($class1, $class2) {
            return $class1::$tryOrder - $class2::$tryOrder;
         });
 
@@ -164,14 +165,13 @@ class CompletorStrategyLines
      * @param int[] $linesCompleted
      * @param array[] $completedLines
      *   An array of completed invoice lines to replace the strategy lines with.
-     * @param string $strategyName
      */
-    protected function replaceLinesCompleted(array $linesCompleted, array $completedLines, string $strategyName)
+    protected function replaceLinesCompleted(array $linesCompleted, array $completedLines, string $strategyName): void
     {
         // Remove old strategy lines that are now completed.
         $lines = [];
         foreach ($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] as $key => $line) {
-            if (!in_array($key, $linesCompleted)) {
+            if (!in_array($key, $linesCompleted, true)) {
                 $lines[] = $line;
             }
         }

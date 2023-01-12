@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Siel\Acumulus\WooCommerce\Invoice;
 
 use Siel\Acumulus\Invoice\InvoiceAddResult;
@@ -10,6 +12,9 @@ use WC_Booking;
 use WC_Booking_Data_Store;
 use WC_Order_Item_Product;
 use WC_Product;
+
+use function function_exists;
+use function is_string;
 
 /**
  * CreatorSupportForOtherPlugins contains support for other plugins.
@@ -36,7 +41,7 @@ class CreatorPluginSupport
      *
      * @noinspection PhpUnused
      */
-    public function getItemLineBefore(Creator $creator, WC_Order_Item_Product $item, $product)
+    public function getItemLineBefore(Creator $creator, WC_Order_Item_Product $item, $product): void
     {
         $this->getItemLineBeforeBookings($creator, $item, $product);
     }
@@ -59,7 +64,7 @@ class CreatorPluginSupport
         Creator $creator,
         /** @noinspection PhpUnusedParameterInspection */ WC_Order_Item_Product $item,
         /** @noinspection PhpUnusedParameterInspection */$product
-    ) {
+    ): void {
         $this->getItemLineAfterBookings($creator);
     }
 
@@ -73,21 +78,22 @@ class CreatorPluginSupport
      * @param WC_Order_Item_Product $item
      * @param WC_Product|bool|null $product
      */
-    public function getItemLineBeforeBookings(Creator $creator, WC_Order_Item_Product $item, $product)
+    public function getItemLineBeforeBookings(Creator $creator, WC_Order_Item_Product $item, $product): void
     {
-        if ($product instanceof WC_Product) {
-            if (function_exists('is_wc_booking_product') && is_wc_booking_product($product)) {
-                $booking_ids = WC_Booking_Data_Store::get_booking_ids_from_order_item_id($item->get_id());
-                if ($booking_ids) {
-                    // I cannot imagine multiple bookings belonging to the same
-                    // order line, but if that occurs, only the 1st booking will
-                    // be added as a property source.
-                    $booking = new WC_Booking(reset($booking_ids));
-                    $creator->addPropertySource('booking', $booking);
-                    $resource = $booking->get_resource();
-                    if ($resource) {
-                        $creator->addPropertySource('resource', $resource);
-                    }
+        if (($product instanceof WC_Product)
+            && function_exists('is_wc_booking_product')
+            && is_wc_booking_product($product)
+        ) {
+            $booking_ids = WC_Booking_Data_Store::get_booking_ids_from_order_item_id($item->get_id());
+            if ($booking_ids) {
+                // I cannot imagine multiple bookings belonging to the same
+                // order line, but if that occurs, only the 1st booking will
+                // be added as a property source.
+                $booking = new WC_Booking(reset($booking_ids));
+                $creator->addPropertySource('booking', $booking);
+                $resource = $booking->get_resource();
+                if ($resource) {
+                    $creator->addPropertySource('resource', $resource);
                 }
             }
         }
@@ -100,7 +106,7 @@ class CreatorPluginSupport
      *
      * @param \Siel\Acumulus\WooCommerce\Invoice\Creator $creator
      */
-    public function getItemLineAfterBookings(Creator $creator)
+    public function getItemLineAfterBookings(Creator $creator): void
     {
         $creator->removePropertySource('resource');
         $creator->removePropertySource('booking');
@@ -180,15 +186,15 @@ class CreatorPluginSupport
         return $invoice;
     }
 
-    protected function &getLineByMetaId(&$lines, $id)
+    protected function &getLineByMetaId(array &$lines, int $id): ?array
     {
+        $result = null;
         foreach ($lines as &$line) {
-            if ($line[Meta::Id] == $id) {
-                return $line;
+            if ($line[Meta::Id] === $id) {
+                $result = &$line;
             }
         }
         // Not found: occurs with refunds and a quantity of 0.
-        $result = null;
         return $result;
     }
 
@@ -327,13 +333,13 @@ class CreatorPluginSupport
         // It is a bit unclear what format this metadata should have. In old
         // versions I had an unconditional unserialize(), but now I get an array
         // of options (being arrays themselves) and code of the plugin itself
-        // expects an array that may contain serialized values (i.e it uses
+        // expects an array that may contain serialized values, i.e. it uses
         // maybe_unserialize() on the elements, not on the complete value.
         $options = $item['tmcartepo_data'];
         if (is_string($options)) {
             $options = (array) maybe_unserialize($options);
         } else {
-            array_walk($options, function(&$value) {
+            array_walk($options, static function(&$value) {
                 if (is_string($value)) {
                     $value = maybe_unserialize($value);
                 }

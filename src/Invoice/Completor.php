@@ -1,5 +1,16 @@
 <?php
 /**
+ * Although we would like to use strict equality, i.e. including type equality,
+ * unconditionally changing each comparison in this file will lead to problems
+ * - API responses return each value as string, even if it is an int or float.
+ * - The shop environment may be lax in its typing by, e.g. using strings for
+ *   each value coming from the database.
+ * - Our own config object is type aware, but, e.g, uses string for a vat class
+ *   regardless the type for vat class ids as used by the shop itself.
+ * So for now, we will ignore the warnings about non strictly typed comparisons
+ * in this code, and we won't use strict_types=1.
+ * @noinspection TypeUnsafeComparisonInspection
+ * @noinspection PhpMissingStrictTypesDeclarationInspection
  * @noinspection PhpStaticAsDynamicMethodCallInspection
  */
 
@@ -17,6 +28,12 @@ use Siel\Acumulus\Tag;
 use Siel\Acumulus\ApiClient\Acumulus;
 use Siel\Acumulus\Helpers\Severity;
 
+use function array_key_exists;
+use function count;
+use function in_array;
+use function is_array;
+use function is_float;
+
 /**
  * The invoice completor class provides functionality to correct and complete
  * invoices before sending them to Acumulus.
@@ -33,10 +50,14 @@ use Siel\Acumulus\Helpers\Severity;
  * - Calls the invoice line completor.
  * - Calls the strategy line completor.
  *
- * @todo: this class is too large: place groups of methods in utility classes
+ * @todo this class is too large: place groups of methods in utility classes
  *   like Countries  (isNl(), isEu(), etc.) and "Knowledge" classes,e.g. a vat
  *   type class that knows which vat types are possible in a given situation
  *   and with what rates.
+ *
+ * @noinspection PhpClassHasTooManyDeclaredMembersInspection
+ * @noinspection EfferentObjectCouplingInspection
+ * @noinspection PhpLackOfCohesionInspection
  */
 class Completor
 {
@@ -55,7 +76,7 @@ class Completor
      *   A list of vat rate sources that indicate that the vat rate can be
      *   considered correct.
      */
-    protected static $CorrectVatRateSources = [
+    protected static array $CorrectVatRateSources = [
         Creator::VatRateSource_Exact,
         Creator::VatRateSource_Exact0,
         Creator::VatRateSource_Creator_Lookup,
@@ -73,38 +94,20 @@ class Completor
      * @var int[]
      *   A list of vat types that allow vat free vat rates.
      */
-    protected static $vatTypesAllowingVatFree = [Api::VatType_National, Api::VatType_MarginScheme];
-
+    protected static array $vatTypesAllowingVatFree = [Api::VatType_National, Api::VatType_MarginScheme];
     /**
      * @var int[]
      *   A list of vat types that do not charge vat at all.
      */
-    protected static $zeroVatVatTypes = [Api::VatType_NationalReversed, Api::VatType_EuReversed, Api::VatType_RestOfWorld];
-
-    /** @var \Siel\Acumulus\Config\Config */
-    protected $config;
-
-    /** @var \Siel\Acumulus\Helpers\Translator */
-    protected $translator;
-
-    /** @var \Siel\Acumulus\Helpers\Log */
-    protected $log;
-
-    /** @var \Siel\Acumulus\ApiClient\Acumulus */
-    protected $acumulusApiClient;
-
-    /** @var \Siel\Acumulus\Helpers\Countries */
-    protected $countries;
-
-    /** @var \Siel\Acumulus\ApiClient\AcumulusResult */
-    protected $result;
-
-    /** @var array */
-    protected $invoice;
-
-    /** @var Source */
-    protected $source;
-
+    protected static array $zeroVatVatTypes = [Api::VatType_NationalReversed, Api::VatType_EuReversed, Api::VatType_RestOfWorld];
+    protected Config $config;
+    protected Translator $translator;
+    protected Log $log;
+    protected Acumulus $acumulusApiClient;
+    protected Countries $countries;
+    protected InvoiceAddResult $result;
+    protected array $invoice;
+    protected Source $source;
     /**
      * @var int[]
      *   The list of possible vat types, initially filled with possible vat
@@ -112,39 +115,21 @@ class Completor
      *   and the EU vat setting. But then reduced by VAT rates we find on
      *   the order lines.
      */
-    protected $possibleVatTypes;
-
+    protected array $possibleVatTypes;
     /**
      * @var array[]
      *   The list of possible vat rates, based on the possible vat types and
      *   extended with the zero rates (0 and vat-free) if they might be
      *   applicable.
      */
-    protected $possibleVatRates;
-
-    /** @var \Siel\Acumulus\Invoice\CompletorInvoiceLines */
-    protected $LineCompletor;
-
-    /** @var \Siel\Acumulus\Invoice\CompletorStrategyLines */
-    protected $strategyLineCompletor;
-
+    protected array $possibleVatRates;
+    protected CompletorInvoiceLines $LineCompletor;
+    protected CompletorStrategyLines $strategyLineCompletor;
     /** @var (string|int)[][] */
-    protected $lineTotalsStates;
-
+    protected array $lineTotalsStates;
     /** @var float[][] */
-    protected $vatRatesCache = [];
+    protected array $vatRatesCache = [];
 
-    /**
-     * Constructor.
-     *
-     * @param \Siel\Acumulus\Invoice\CompletorInvoiceLines $completorInvoiceLines
-     * @param \Siel\Acumulus\Invoice\CompletorStrategyLines $completorStrategyLines
-     * @param \Siel\Acumulus\Helpers\Countries $countries
-     * @param \Siel\Acumulus\ApiClient\Acumulus $acumulusApiClient
-     * @param \Siel\Acumulus\Config\Config $config
-     * @param \Siel\Acumulus\Helpers\Translator $translator
-     * @param \Siel\Acumulus\Helpers\Log $log
-     */
     public function __construct(
         CompletorInvoiceLines $completorInvoiceLines,
         CompletorStrategyLines $completorStrategyLines,
@@ -266,7 +251,7 @@ class Completor
      *
      * See also: {@link https://wiki.acumulus.nl/index.php?page=facturen-naar-het-buitenland}.
      */
-    protected function initPossibleVatTypes()
+    protected function initPossibleVatTypes(): void
     {
         $possibleVatTypes = [];
         $shopSettings = $this->config->getShopSettings();
@@ -381,8 +366,10 @@ class Completor
      * vat rates. A vat rate being an array with keys 'vatrate' and 'vattype'.
      * This is done so to be able to determine to which vat type(s) a vat rate
      * belongs.
+     *
+     * @noinspection PhpFunctionCyclomaticComplexityInspection
      */
-    protected function initPossibleVatRates()
+    protected function initPossibleVatRates(): void
     {
         $possibleVatRates = [];
 
@@ -507,13 +494,13 @@ class Completor
      * - We don't do this for business clients, only consumers.
      * - We keep the country code as it is needed to determine the vat type.
      */
-    protected function fictitiousClient()
+    protected function fictitiousClient(): void
     {
         $customerSettings = $this->config->getCustomerSettings();
         if (!$customerSettings['sendCustomer'] && !$this->isCompany()) {
             $keysToKeep = [Tag::CountryCode, Tag::Invoice];
             foreach ($this->invoice[Tag::Customer] as $key => $value) {
-                if (!in_array($key, $keysToKeep)) {
+                if (!in_array($key, $keysToKeep, true)) {
                     unset($this->invoice[Tag::Customer][$key]);
                 }
             }
@@ -533,7 +520,7 @@ class Completor
      *   case a new relation will be created. To prevent both, we use a fake
      *   address AND we will set a warning.
      */
-    protected function validateEmail()
+    protected function validateEmail(): void
     {
         // Check email address.
         if (empty($this->invoice[Tag::Customer][Tag::Email])) {
@@ -571,7 +558,7 @@ class Completor
      * value only here in the completor phase to give users the chance to change
      * the payment status in the acumulus invoice created event.
      */
-    protected function invoiceTemplate()
+    protected function invoiceTemplate(): void
     {
         $invoiceSettings = $this->config->getInvoiceSettings();
 
@@ -595,7 +582,7 @@ class Completor
      * The line level is handled by the line completor and will be done before
      * the lines totals are calculated.
      */
-    protected function convertToEuro()
+    protected function convertToEuro(): void
     {
         if ($this->shouldConvertCurrency($this->invoice)) {
             // Convert all amounts at the invoice level.
@@ -610,7 +597,7 @@ class Completor
     /**
      * Checks for a missing amount and handles it.
      */
-    protected function checkMissingAmount()
+    protected function checkMissingAmount(): void
     {
         // Check if we are missing an amount and, if so, add a line for it.
         $this->completeLineTotals();
@@ -624,7 +611,7 @@ class Completor
      * Calculates the total amount and vat amount for the invoice lines and adds
      * these to the fields 'meta-lines-amount' and 'meta-lines-vatamount'.
      */
-    protected function completeLineTotals()
+    protected function completeLineTotals(): void
     {
         $linesAmount = 0.0;
         $linesAmountInc = 0.0;
@@ -687,21 +674,21 @@ class Completor
     protected function areTotalsEqual(): ?bool
     {
         $invoice = $this->invoice[Tag::Customer][Tag::Invoice];
-        if (!in_array(Meta::LinesAmount, $this->lineTotalsStates['incomplete'])) {
+        if (!in_array(Meta::LinesAmount, $this->lineTotalsStates['incomplete'], true)) {
             if (Number::floatsAreEqual($invoice[Meta::InvoiceAmount], $invoice[Meta::LinesAmount], 0.05)) {
                 $this->lineTotalsStates['equal'][Meta::LinesAmount] = Meta::InvoiceAmount;
             } else {
                 $this->lineTotalsStates['differ'][Meta::LinesAmount] = $invoice[Meta::InvoiceAmount] - $invoice[Meta::LinesAmount];
             }
         }
-        if (!in_array(Meta::LinesAmountInc, $this->lineTotalsStates['incomplete'])) {
+        if (!in_array(Meta::LinesAmountInc, $this->lineTotalsStates['incomplete'], true)) {
             if (Number::floatsAreEqual($invoice[Meta::InvoiceAmountInc], $invoice[Meta::LinesAmountInc], 0.05)) {
                 $this->lineTotalsStates['equal'][Meta::LinesAmountInc] = Meta::InvoiceAmountInc;
             } else {
                 $this->lineTotalsStates['differ'][Meta::LinesAmountInc] = $invoice[Meta::InvoiceAmountInc] - $invoice[Meta::LinesAmountInc];
             }
         }
-        if (!in_array(Meta::LinesVatAmount, $this->lineTotalsStates['incomplete'])) {
+        if (!in_array(Meta::LinesVatAmount, $this->lineTotalsStates['incomplete'], true)) {
             if (Number::floatsAreEqual($invoice[Meta::InvoiceVatAmount], $invoice[Meta::LinesVatAmount], 0.05)) {
                 $this->lineTotalsStates['equal'][Meta::LinesVatAmount] = Meta::InvoiceVatAmount;
             } else {
@@ -746,7 +733,7 @@ class Completor
      *
      * PRECONDITION: areTotalsEqual() returned false;
      */
-    protected function addMissingAmountLine()
+    protected function addMissingAmountLine(): void
     {
         $invoice = &$this->invoice[Tag::Customer][Tag::Invoice];
 
@@ -849,7 +836,7 @@ class Completor
      * If multiple vat types are possible, the invoice is sent as concept, so
      * that it may be corrected in Acumulus.
      */
-    protected function completeVatType()
+    protected function completeVatType(): void
     {
         $invoice = &$this->invoice[Tag::Customer][Tag::Invoice];
         $this->checkForKnownVatType();
@@ -872,7 +859,7 @@ class Completor
                     //   settings or the vat rates assigned to your products.'
                     // - Vat rates are incorrect for given country (and date).
                     //   Message: 'Did you configure the correct settings for
-                    //   country ..?' or 'Were there recent changes in tax
+                    //   country ...?' or 'Were there recent changes in tax
                     //   rates?'.
                     // - Vat rates are for EU VAT but the shop does not use EU
                     //   VAT. Message 'Check "about your shop" settings'.
@@ -893,13 +880,13 @@ class Completor
                     // - Non-matching lines have no vat. Message: 'Manual line
                     //   entered without vat' or 'Check vat settings on those
                     //   products.'.
-                    // - Non matching lines have vat. Message: 'Manual line
+                    // - Non-matching lines have vat. Message: 'Manual line
                     //   entered with incorrect vat' or 'Check vat settings on
                     //   those products.'.
                     $invoice[Tag::VatType] = reset($vatTypeInfo['union']);
                     $message = 'message_warning_no_vattype_incorrect_lines';
                     $code = 812;
-                } /** @noinspection PhpSeparateElseIfInspection */ else {
+                } else {
                     // Separate lines could be matched with possible vat types,
                     // but not all with the same vat type.
                     // Possible causes:
@@ -912,6 +899,7 @@ class Completor
                     // - Mix of margin scheme and normal vat: this can be solved
                     //   by making it a margin scheme invoice and adding
                     //   costprice = 0 to all normal lines.
+                    /** @noinspection NestedPositiveIfStatementsInspection */
                     if (in_array(Api::VatType_MarginScheme, $vatTypeInfo['union'])) {
                         $invoice[Tag::VatType] = Api::VatType_MarginScheme;
                         $invoice[Meta::VatTypeSource] = 'Completor::completeVatType: Convert all lines to margin scheme';
@@ -981,7 +969,9 @@ class Completor
      *   by the line index, the inner array is keyed by vat type. In addition to
      *   the line indices, the outer array also contains 2 keys 'union' and
      *  'intersection', containing resp. the union and intersection of the other
-     *   array values
+     *   array values.
+     *
+     * @noinspection PhpFunctionCyclomaticComplexityInspection
      */
     protected function getInvoiceLinesVatTypeInfo(): array
     {
@@ -1004,10 +994,8 @@ class Completor
                         $doAdd = true;
 
                         // 1) Vat type margin scheme requires a cost price.
-                        if ($vatType === Api::VatType_MarginScheme) {
-                            if (empty($line[Tag::CostPrice])) {
-                                $doAdd = false;
-                            }
+                        if (($vatType === Api::VatType_MarginScheme) && empty($line[Tag::CostPrice])) {
+                            $doAdd = false;
                         }
 
                         // 2) If this is a 0 vat rate while the lookup vat rate
@@ -1020,18 +1008,20 @@ class Completor
                                 $zeroOrVatFreeClass = $this->is0VatClass($line) || $this->isVatFreeClass($line);
                                 $zeroOrVatFreeRate = !empty($line[Meta::VatRateLookup])
                                     && $this->metaDataHasANoVat($line[Meta::VatRateLookup]);
-                                if (!($zeroOrVatFreeClass || $zeroOrVatFreeRate)) {
-                                    // According to the available lookup data,
-                                    // this article cannot be intrinsically 0%
-                                    // or vat free. So the vat type must be a
-                                    // vat type allowing no vat, i.e. a no-vat
-                                    // vat type or national vat for a customer
-                                    // outside the EU.
-                                    if (!in_array($vatType,static::$zeroVatVatTypes)
-                                        && !($vatType === Api::VatType_National && $this->isOutsideEu())
-                                    ) {
+                                // According to the available lookup data, this
+                                // article cannot be intrinsically 0% or vat
+                                // free. So the vat type must be a vat type
+                                // allowing no vat, i.e. a no-vat vat type or
+                                // national vat for a customer outside the EU.
+                                /**
+                                 * @noinspection TypeUnsafeArraySearchInspection
+                                 *   Not sure if $vatType may actually be a string.
+                                 */
+                                if (!($zeroOrVatFreeClass || $zeroOrVatFreeRate)
+                                    && !in_array($vatType, static::$zeroVatVatTypes)
+                                    && !($vatType === Api::VatType_National && $this->isOutsideEu())
+                                ) {
                                         $doAdd = false;
-                                    }
                                 }
                             }
                             // If the customer is outside the EU AND we do not
@@ -1053,10 +1043,15 @@ class Completor
 
                         // 3) In EU: If the vat class is known and denotes EU
                         //    vat, we do not add the Dutch vat type.
-                        if ($this->isEu() && !empty($line[Meta::VatClassId]) && $this->isEuVatClass($line[Meta::VatClassId])) {
-                            if ($vatType === Api::VatType_National) {
-                                $doAdd = false;
-                            }
+                        // @todo
+                        //   if people switch from dutch to EU vat during the
+                        //   year we won't be able to match proper dutch vat on
+                        //   invoices from before that switch!
+                        if ($this->isEu() && !empty($line[Meta::VatClassId])
+                            && $this->isEuVatClass($line[Meta::VatClassId])
+                            && $vatType === Api::VatType_National
+                        ) {
+                            $doAdd = false;
                         }
 
                         // 4) If the vat class is known and does not denote EU
@@ -1065,14 +1060,20 @@ class Completor
                         //   when there's a fee line at NL vat rate which
                         //   happens to be the foreign vat rate as well, we only
                         //   do this for item lines.
-                        if ($line[Meta::LineType] === Creator::LineType_OrderItem && !empty($line[Meta::VatClassId]) && !$this->isEuVatClass($line[Meta::VatClassId])) {
-                            if ($vatType === Api::VatType_EuVat) {
-                                $doAdd = false;
-                            }
+                        // @todo
+                        //   if people switch back from EU to dutch vat at the
+                        //   start of a new year, we won't be able to match
+                        //   proper EU vat on invoices from last year!
+                        if ($line[Meta::LineType] === Creator::LineType_OrderItem
+                            && !empty($line[Meta::VatClassId])
+                            && !$this->isEuVatClass($line[Meta::VatClassId])
+                            && $vatType === Api::VatType_EuVat
+                        ) {
+                            $doAdd = false;
                         }
 
                         if ($doAdd) {
-                            // Ensure unique entries
+                            // Ensure unique entries by also using the value as key.
                             $possibleLineVatTypes[$vatType] = $vatType;
                         }
                     }
@@ -1112,7 +1113,7 @@ class Completor
      *   geeft u aan dat de dienst in het land van uw afnemer onder een
      *   vrijstelling of het 0%-tarief valt.".
      */
-    protected function checkForKnownVatType()
+    protected function checkForKnownVatType(): void
     {
         $possibleVatTypes = $this->possibleVatTypes;
         sort($possibleVatTypes, SORT_NUMERIC);
@@ -1150,7 +1151,7 @@ class Completor
      *   A list of vat types that are possible for each invoice line (as found
      *   by Completor::completeVatType()).
      */
-    protected function guessVatType(array $possibleVatTypes)
+    protected function guessVatType(array $possibleVatTypes): void
     {
         sort($possibleVatTypes, SORT_NUMERIC);
         if ($possibleVatTypes == [Api::VatType_National, Api::VatType_EuReversed]) {
@@ -1213,16 +1214,17 @@ class Completor
      *   and the invoice type is not EU reversed and the invoice is not vat-free
      *   as vat-free trumps reversed vat.
      */
-    protected function completeVatTypeId()
+    protected function completeVatTypeId(): void
     {
         if (empty($this->invoice[Tag::Customer][Tag::VatTypeId])) {
             $vatTypeId = $this->isCompany() ? Api::VatTypeId_Business : Api::VatTypeId_Private;
-            if ($this->isCompany() && $this->isEu()) {
-                if (!empty($this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType])
-                        && $this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType] !== Api::VatType_EuReversed
-                        && !$this->isVatFreeInvoice()) {
-                    $vatTypeId = Api::VatTypeId_Private;
-                }
+            if ($this->isCompany()
+                && $this->isEu()
+                && !empty($this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType])
+                && $this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType] !== Api::VatType_EuReversed
+                && !$this->isVatFreeInvoice()
+            ) {
+                $vatTypeId = Api::VatTypeId_Private;
             }
             $this->invoice[Tag::Customer][Tag::VatTypeId] = $vatTypeId;
         }
@@ -1240,7 +1242,7 @@ class Completor
      * be converted to the margin scheme (cost price tag and change of unit
      * price).
      */
-    protected function correctMarginInvoice()
+    protected function correctMarginInvoice(): void
     {
         if (isset($this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType]) && $this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType] === Api::VatType_MarginScheme) {
             foreach ($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] as &$line) {
@@ -1281,7 +1283,7 @@ class Completor
      * completeVatType()), we now might be able to reduce the possibilities
      * to a single choice.
      */
-    protected function correctNullVatLines()
+    protected function correctNullVatLines(): void
     {
         if (empty($this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType])) {
             return;
@@ -1342,13 +1344,17 @@ class Completor
      * - {@link https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/tarieven_en_vrijstellingen/}
      * - {@link https://wiki.acumulus.nl/index.php?page=facturen-naar-het-buitenland}:
      */
-    protected function correctNoVatLines()
+    protected function correctNoVatLines(): void
     {
         $vatType = $this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType] ?? null;
         foreach ($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] as &$line) {
             if ($this->isFreeVatRate($line)) {
                 // Change if the vat class indicates a 0% vat-rate or if vat
                 // free is not allowed for the vat type
+                /**
+                 * @noinspection TypeUnsafeArraySearchInspection
+                 *   Not sure if $vatType may actually be a string.
+                 */
                 if ($this->is0VatClass($line) || !in_array($vatType, static::$vatTypesAllowingVatFree))
                 {
                     $line[Tag::VatRate] = 0.0;
@@ -1358,6 +1364,10 @@ class Completor
                 // Change if the vat class indicates a vat free rate and vat
                 // free is allowed for the vat type, or if 0% is not an allowed
                 // vat rate.
+                /**
+                 * @noinspection TypeUnsafeArraySearchInspection
+                 *   Not sure if $vatType may actually be a string.
+                 */
                 if (($this->isVatFreeClass($line) && in_array($vatType, static::$vatTypesAllowingVatFree))
                     || !$this->is0VatPossibleForVatType($vatType)
                 ) {
@@ -1371,12 +1381,12 @@ class Completor
     /**
      * Removes an empty shipping line (if so configured).
      */
-    protected function removeEmptyShipping()
+    protected function removeEmptyShipping(): void
     {
         $invoiceSettings = $this->config->getInvoiceSettings();
         if (!$invoiceSettings['sendEmptyShipping']) {
             $this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] = array_filter($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line],
-                function ($line) {
+                static function ($line) {
                     return $line[Meta::LineType] !== Creator::LineType_Shipping || !Number::isZero($line[Tag::UnitPrice]);
                 });
         }
@@ -1395,7 +1405,7 @@ class Completor
      *   - If the warning percentage is or will be passed, the invoice will be
      *     sent as is, but a notice will be mailed to the user.
      */
-    protected function checkEuCommerceThreshold()
+    protected function checkEuCommerceThreshold(): void
     {
         $warningPercentage = $this->config->getInvoiceSettings()['euCommerceThresholdPercentage'];
         $invoice = &$this->invoice[Tag::Customer][Tag::Invoice];
@@ -1439,7 +1449,7 @@ class Completor
      *   Meta::VatRateRangeMatches are converted to a json string if they are an
      *   array.
      */
-    protected function processMetaData()
+    protected function processMetaData(): void
     {
         if (isset($this->invoice[Tag::Customer][Meta::Warning]) && is_array($this->invoice[Tag::Customer][Meta::Warning])) {
             $this->invoice[Tag::Customer][Meta::Warning] = json_encode($this->invoice[Tag::Customer][Meta::Warning], Meta::JsonFlags);
@@ -1473,7 +1483,7 @@ class Completor
      * Returns whether the given line has a no-vat vat rate (0% or vat free).
      *
      * @param array $line
-     *   The invoice line.
+     *   The invoice line to check.
      *
      * @return bool
      *   True if the given line has a no-vat vat rate (0% or vat free), false
@@ -1567,7 +1577,7 @@ class Completor
         }
         $result = $this->vatRatesCache[$cacheKey];
         if ($region !== Api::Region_NotSet) {
-            $result = array_filter($result, function($value) use ($region) {
+            $result = array_filter($result, static function($value) use ($region) {
                 return $value['countryregion'] == $region;
             });
         }
@@ -1642,7 +1652,7 @@ class Completor
                || (
                    $this->isUk()
                    && isset($this->invoice[Tag::Customer][Tag::PostalCode])
-                   && strtoupper(substr($this->invoice[Tag::Customer][Tag::PostalCode], 0, strlen('BT'))) === 'BT'
+                   && strncasecmp($this->invoice[Tag::Customer][Tag::PostalCode], 'BT', 2) === 0
                   );
     }
 
@@ -1682,9 +1692,11 @@ class Completor
     public function shouldConvertCurrency(array &$invoice): bool
     {
         $invoicePart = &$invoice[Tag::Customer][Tag::Invoice];
-        $currencyMetaAvailable = isset($invoicePart[Meta::Currency])
-            && isset($invoicePart[Meta::CurrencyRate])
-            && isset($invoicePart[Meta::CurrencyDoConvert]);
+        $currencyMetaAvailable = isset(
+            $invoicePart[Meta::Currency],
+            $invoicePart[Meta::CurrencyRate],
+            $invoicePart[Meta::CurrencyDoConvert]
+        );
         $shouldConvert = $currencyMetaAvailable
             && !Number::floatsAreEqual($invoicePart[Meta::CurrencyRate], 1.0, 0.0001);
         if ($shouldConvert) {
@@ -1738,7 +1750,7 @@ class Completor
      */
     public static function isCorrectVatRate(string $source): bool
     {
-        return in_array($source, self::$CorrectVatRateSources);
+        return in_array($source, self::$CorrectVatRateSources, true);
     }
 
     /**
@@ -1747,7 +1759,7 @@ class Completor
      * @return bool
      *   True if the shop might sell using EU vat, false otherwise.
      *
-     * @todo: this and the following methods are actually config related
+     * @todo this and the following methods are actually config related
      *   questions and thus should be part of Config
      */
     public function usesEuVat(): bool
@@ -1770,13 +1782,17 @@ class Completor
     {
         $shopSettings = $this->config->getShopSettings();
         $foreignVatEuClasses = $shopSettings['euVatClasses'];
+        /**
+         * @noinspection TypeUnsafeArraySearchInspection
+         *   Not sure if $vatClassId may actually be a string.
+         */
         return in_array($vatClassId, $foreignVatEuClasses);
     }
 
     /**
      * Returns whether the vat class id denotes vat free.
      *
-     * @param int|string|array $vatClassId
+     * @param int|string|array $lineOrVatClassId
      *   The vat class to check or an invoice line that may contain the key
      *   Meta::VatClassId that refers to a vat class.
      *
@@ -1785,11 +1801,11 @@ class Completor
      *   given and denotes the vat free class (or is left empty), false
      *   otherwise.
      */
-    protected function isVatFreeClass($vatClassId): bool
+    protected function isVatFreeClass($lineOrVatClassId): bool
     {
-        if (is_array($vatClassId)) {
-            $vatClassId = array_key_exists(Meta::VatClassId, $vatClassId) ? $vatClassId[Meta::VatClassId] : null;
-        }
+        $vatClassId = is_array($lineOrVatClassId)
+            ? $lineOrVatClassId[Meta::VatClassId] ?? null
+            : $lineOrVatClassId;
         $shopSettings = $this->config->getShopSettings();
         $vatFreeClass = $shopSettings['vatFreeClass'];
         return $vatClassId == $vatFreeClass;
@@ -1798,7 +1814,7 @@ class Completor
     /**
      * Returns whether the vat class id denotes the 0% vat rat.
      *
-     * @param int|string|array $vatClassId
+     * @param int|string|array $lineOrVatClassId
      *   The vat class to check or an invoice line that may contain the key
      *   Meta::VatClassId that refers to a vat class.
      *
@@ -1806,11 +1822,11 @@ class Completor
      *   True if the shop might sell 0% vat articles and the vat class id
      *   denotes the 0% vat rate class, false otherwise.
      */
-    protected function is0VatClass($vatClassId): bool
+    protected function is0VatClass($lineOrVatClassId): bool
     {
-        if (is_array($vatClassId)) {
-            $vatClassId = $vatClassId[Meta::VatClassId] ?? null;
-        }
+        $vatClassId = is_array($lineOrVatClassId)
+            ? $lineOrVatClassId[Meta::VatClassId] ?? null
+            : $lineOrVatClassId;
         $shopSettings = $this->config->getShopSettings();
         $zeroVatClass = $shopSettings['zeroVatClass'];
         return $vatClassId == $zeroVatClass;
@@ -1834,36 +1850,36 @@ class Completor
     /**
      * Returns whether the $vatRate is the 0% or the vat free vat rate.
      *
-     * @param float|array $vatRate
+     * @param float|array $lineOrVatRate
      *   A float (or numeric string), or an array containing a Tag::VatRate key
      *   and that contains a vat rate.
      *
      * @return bool
-     *   True if $vatRate is the 0% or the vat free vat rate, false otherwise.
+     *   True if $vatRate is the 0% vat rate, false otherwise.
      */
-    protected function is0VatRate($vatRate): bool
+    protected function is0VatRate($lineOrVatRate): bool
     {
-        if (is_array($vatRate)) {
-            $vatRate = $vatRate[Tag::VatRate] ?? null;
-        }
+        $vatRate = is_array($lineOrVatRate)
+            ? $lineOrVatRate[Tag::VatRate] ?? null
+            : $lineOrVatRate;
         return isset($vatRate) && Number::isZero($vatRate);
     }
 
     /**
      * Returns whether the $vatRate is the 0% or the vat free vat rate.
      *
-     * @param float|array $vatRate
+     * @param float|array $lineOrVatRate
      *   A float (or numeric string), or an array containing a Tag::VatRate key
      *   and that contains a vat rate.
      *
      * @return bool
-     *   True if $vatRate is the 0% or the vat free vat rate, false otherwise.
+     *   True if $vatRate is the vat free vat rate, false otherwise.
      */
-    protected function isFreeVatRate($vatRate): bool
+    protected function isFreeVatRate($lineOrVatRate): bool
     {
-        if (is_array($vatRate)) {
-            $vatRate = $vatRate[Tag::VatRate] ?? null;
-        }
+        $vatRate = is_array($lineOrVatRate)
+            ? $lineOrVatRate[Tag::VatRate] ?? null
+            : $lineOrVatRate;
         return isset($vatRate) && Number::floatsAreEqual($vatRate, Api::VatFree);
     }
 
@@ -1965,12 +1981,12 @@ class Completor
      * @param string ...$args
      *   Additional arguments to format the message.
      */
-    public function changeInvoiceToConcept(array &$array, string $messageKey, int $code, string ...$args)
+    public function changeInvoiceToConcept(array &$array, string $messageKey, int $code, string ...$args): void
     {
         $pdfMessage = '';
         $invoiceSettings = $this->config->getInvoiceSettings();
         $concept = $invoiceSettings['concept'];
-        if ($concept == Config::Concept_Plugin) {
+        if ($concept === Config::Concept_Plugin) {
             $this->invoice[Tag::Customer][Tag::Invoice][Tag::Concept] = Api::Concept_Yes;
             $emailAsPdfSettings = $this->config->getEmailAsPdfSettings();
             if ($emailAsPdfSettings['emailAsPdf']) {
@@ -1980,10 +1996,11 @@ class Completor
 
         if ($messageKey !== '') {
             $message = $this->t($messageKey) . $pdfMessage;
-            if (!empty($args)) {
+            if (count($args) !== 0) {
                 $message = sprintf($message, ...$args);
             }
             $this->result->createAndAddMessage($message, Severity::Warning, $code);
+            /** @noinspection NullPointerExceptionInspection */
             $this->addWarning($array, $this->result->getByCode($code)->format(Message::Format_Plain));
         }
     }
@@ -2006,11 +2023,12 @@ class Completor
 
     /**
      * Helper method to add a warning to an array.
+     *
      * Warnings are placed in the $array under the key Meta::Warning. If no
      * warning is set, $warning is added as a string, otherwise it becomes an
      * array of warnings to which this $warning is added.
      */
-    protected function addWarning(array &$array, string $warning)
+    protected function addWarning(array &$array, string $warning): void
     {
         if (!isset($array[Meta::Warning])) {
             $array[Meta::Warning] = $warning;
@@ -2018,9 +2036,9 @@ class Completor
             if (!is_array($array[Meta::Warning])) {
                 $array[Meta::Warning] = (array) $array[Meta::Warning];
             }
-            // @todo: find out why a warning could be added multiple times and
+            // @todo find out why a warning could be added multiple times and
             //   try to prevent it in the first place.
-            if (in_array($warning, $array[Meta::Warning])) {
+            if (in_array($warning, $array[Meta::Warning], true)) {
                 $array[Meta::Warning][] = $warning;
             }
         }

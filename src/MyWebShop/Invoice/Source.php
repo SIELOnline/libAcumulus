@@ -42,7 +42,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    protected function setSource()
+    protected function setSource(): void
     {
         // @todo: set the source, given an id (and type).
         if ($this->getType() === Source::Order) {
@@ -55,7 +55,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    protected function setId()
+    protected function setId(): void
     {
         // @todo: set the id, given a loaded source.
         $this->id = $this->source->id;

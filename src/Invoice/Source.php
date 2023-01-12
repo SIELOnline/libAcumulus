@@ -1,8 +1,13 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Invoice;
 
 use RuntimeException;
 use Siel\Acumulus\Meta;
+
+use function get_class;
 
 /**
  * A wrapper around a web shop order or refund.
@@ -10,6 +15,8 @@ use Siel\Acumulus\Meta;
  * Source is used to pass an order or refund object (or array) around in a
  * strongly typed way and to provide unified access to information about the
  * order or refund.
+ *
+ * @noinspection PhpClassHasTooManyDeclaredMembersInspection
  */
 abstract class Source
 {
@@ -18,15 +25,15 @@ abstract class Source
     public const CreditNote = 'CreditNote';
     public const Other = 'Other';
 
-    /** @var string */
-    protected $type;
-
-    /** @var int */
-    protected $id;
-
+    protected string $type;
+    /**
+     * @todo
+     *   Make these an int resp. array|object, thus not null. This means, we
+     *   should probably throw when we cannot construct a valid instance
+     */
+    protected ?int $id;
     /** @var array|object|null */
     protected $source;
-
     /** @var array|object|null */
     protected $invoice;
 
@@ -36,7 +43,8 @@ abstract class Source
      * @param string $type
      * @param int|string|array|object $idOrSource
      *
-     * @todo: throw an exception if we cannot find the source.
+     * @todo
+     *   Throw an exception if we cannot find the source.
      */
     public function __construct(string $type, $idOrSource)
     {
@@ -57,17 +65,17 @@ abstract class Source
     /**
      * Sets the source based on type and id.
      */
-    protected function setSource()
+    protected function setSource(): void
     {
-        return $this->callTypeSpecificMethod(__FUNCTION__);
+        $this->callTypeSpecificMethod(__FUNCTION__);
     }
 
     /**
      * Sets the id based on type and source.
      */
-    protected function setId()
+    protected function setId(): void
     {
-        return $this->callTypeSpecificMethod(__FUNCTION__);
+        $this->callTypeSpecificMethod(__FUNCTION__);
     }
 
     /**
@@ -100,7 +108,7 @@ abstract class Source
     /**
      * Returns the web shop specific source for an invoice.
      *
-     * @return array|object
+     * @return array|object|null
      *   The web shop specific source for an invoice.
      */
     public function getSource()
@@ -327,7 +335,7 @@ abstract class Source
     /**
      * Loads and sets the web shop invoice linked to this source.
      */
-    protected function setInvoice()
+    protected function setInvoice(): void
     {
         $this->invoice = null;
     }

@@ -1,8 +1,12 @@
-<?php /** @noinspection PhpClassConstantAccessedViaChildClassInspection */
+<?php
+/**
+ * @noinspection PhpClassConstantAccessedViaChildClassInspection
+ */
+
+declare(strict_types=1);
 
 namespace Siel\Acumulus\Magento\Invoice;
 
-use Exception;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Creditmemo;
 use Siel\Acumulus\Api;
@@ -11,19 +15,23 @@ use Siel\Acumulus\Invoice\Source as BaseSource;
 use Siel\Acumulus\Magento\Helpers\Registry;
 use Siel\Acumulus\Meta;
 
+use Throwable;
+
+use function in_array;
+use function strlen;
+
 /**
  * Wraps a Magento order or credit memo in an invoice source object.
+ *
+ * @property Order|Creditmemo $source
+ * @method Order|Creditmemo getSource()
  */
 class Source extends BaseSource
 {
-    // More specifically typed properties.
-    /** @var \Magento\Sales\Model\Order|\Magento\Sales\Model\Order\Creditmemo */
-    protected $source;
-
     /**
      * {@inheritdoc}
      */
-    protected function setId()
+    protected function setId(): void
     {
         $this->id = $this->source->getId();
     }
@@ -31,7 +39,7 @@ class Source extends BaseSource
     /**
      * Loads an Order source for the set id.
      */
-    protected function setSourceOrder()
+    protected function setSourceOrder(): void
     {
         $this->source = Registry::getInstance()->create(Order::class);
         /** @var \Magento\Sales\Model\ResourceModel\Order $loader */
@@ -42,7 +50,7 @@ class Source extends BaseSource
     /**
      * Loads a Credit memo source for the set id.
      */
-    protected function setSourceCreditNote()
+    protected function setSourceCreditNote(): void
     {
         $this->source = Registry::getInstance()->create(Creditmemo::class);
         /** @var \Magento\Sales\Model\ResourceModel\Order $loader */
@@ -110,14 +118,16 @@ class Source extends BaseSource
      *
      * This override returns the internal method name of the chosen payment
      * method.
+     *
+     * @noinspection BadExceptionsProcessingInspection
      */
     public function getPaymentMethod()
     {
         try {
             return $this->getOrder()->source->getPayment()->getMethod();
+        } catch (Throwable $e) {
+            return parent::getPaymentMethod();
         }
-        catch (Exception $e) {}
-        return parent::getPaymentMethod();
     }
 
     /**
@@ -143,7 +153,7 @@ class Source extends BaseSource
      */
     protected function getPaymentStatusCreditNote(): int
     {
-        return $this->source->getState() == Creditmemo::STATE_REFUNDED
+        return $this->source->getState() === Creditmemo::STATE_REFUNDED
             ? Api::PaymentStatus_Paid
             : Api::PaymentStatus_Due;
     }
@@ -196,11 +206,11 @@ class Source extends BaseSource
 
     public function getCurrency(): array
     {
-        return array (
+        return [
             Meta::Currency => $this->source->getOrderCurrencyCode(),
             Meta::CurrencyRate => (float) $this->source->getBaseToOrderRate(),
             Meta::CurrencyDoConvert => false,
-        );
+        ];
 
     }
 
@@ -222,7 +232,7 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      */
-    protected function setInvoice()
+    protected function setInvoice(): void
     {
         parent::setInvoice();
         if ($this->getType() === Source::Order) {

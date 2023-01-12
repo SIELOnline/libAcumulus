@@ -1,4 +1,22 @@
 <?php
+/**
+ */
+
+/**
+ * Although we would like to use strict equality, i.e. including type equality,
+ * unconditionally changing each comparison in this file will lead to problems
+ * - API responses return each value as string, even if it is an int or float.
+ * - The shop environment may be lax in its typing by, e.g. using strings for
+ *   each value coming from the database.
+ * - Our own config object is type aware, but, e.g, uses string for a vat class
+ *   regardless the type for vat class ids as used by the shop itself.
+ * So for now, we will ignore the warnings about non strictly typed comparisons
+ * in this code, and we won't use strict_types=1.
+ * @noinspection TypeUnsafeComparisonInspection
+ * @noinspection PhpMissingStrictTypesDeclarationInspection
+ * @noinspection PhpStaticAsDynamicMethodCallInspection
+ */
+
 namespace Siel\Acumulus\PrestaShop\Invoice;
 
 use Address;
@@ -16,9 +34,10 @@ use Siel\Acumulus\Tag;
 use TaxManagerFactory;
 use TaxRulesGroup;
 
+use function array_slice;
+
 /**
- * Allows creating arrays in the Acumulus invoice structure from a PrestaShop
- * order or order slip.
+ * Creates a raw version of the Acumulus invoice from a PrestaShop {@see Source}.
  *
  * Notes:
  * - If needed, PrestaShop allows us to get tax rates by querying the tax table
@@ -37,28 +56,27 @@ use TaxRulesGroup;
  *     to use them.
  *   - shipping_cost_amount is excl. vat.
  *   So this is never going to work in all situations!!!
+ *
+ * @property \Siel\Acumulus\PrestaShop\Invoice\Source $invoiceSource
+ *
+ * @noinspection EfferentObjectCouplingInspection
  */
 class Creator extends BaseCreator
 {
-    /** @var Order */
-    protected $order;
-
-    /** @var OrderSlip */
-    protected $creditSlip;
-
+    protected Order $order;
+    protected OrderSlip $creditSlip;
     /**
-     * @var float
-     *   Precision: 1 of the amounts, probably the prince incl tax, is entered
-     *   by the admin and can thus be considered exact. The other is calculated
-     *   by the system and not rounded and can thus be considered to have a
-     *   precision better than 0.0001.
+     * Precision: 1 of the amounts, probably the prince incl tax, is entered by
+     * the admin and can thus be considered exact. The other is calculated by
+     * the system and not rounded and can thus be considered to have a precision
+     * better than 0.0001.
      *
-     *   However, we have had a support call where the precision, for a credit
-     *   note, turned out to be only 0.002. This was, apparently, with a price
-     *   entered excl. vat: excl: 34,22; incl: 41,40378; (computed) vat: 7,18378.
-     *   The max-vat rate was just below 21%, so no match was made.
+     * However, we have had a support call where the precision, for a credit
+     * note, turned out to be only 0.002. This was, apparently, with a price
+     * entered excl. vat: excl: 34,22; incl: 41,40378; (computed) vat: 7,18378.
+     * The max-vat rate was just below 21%, so no match was made.
      */
-    protected $precision = 0.005;
+    protected float $precision = 0.005;
 
     /**
      * {@inheritdoc}
@@ -66,7 +84,7 @@ class Creator extends BaseCreator
      * This override also initializes WooCommerce specific properties related to
      * the source.
      */
-    protected function setInvoiceSource(\Siel\Acumulus\Invoice\Source $invoiceSource)
+    protected function setInvoiceSource(\Siel\Acumulus\Invoice\Source $invoiceSource): void
     {
         parent::setInvoiceSource($invoiceSource);
         switch ($this->invoiceSource->getType()) {
@@ -83,7 +101,7 @@ class Creator extends BaseCreator
     /**
      * {@inheritdoc}
      */
-    protected function setPropertySources()
+    protected function setPropertySources(): void
     {
         parent::setPropertySources();
         $this->propertySources['address_invoice'] = new Address($this->order->id_address_invoice);
@@ -167,10 +185,10 @@ class Creator extends BaseCreator
             $result[Meta::LineAmountInc] = $sign * $item['total_price_tax_incl'];
             // 'unit_amount' (table order_detail_tax) is not always set: assume
             // no discount if not set, so not necessary to add the value.
-            if (isset($item['unit_amount'])) {
-                if (!Number::floatsAreEqual($item['unit_amount'], $result[Meta::UnitPriceInc] - $result[Tag::UnitPrice])) {
-                    $result[Meta::LineDiscountVatAmount] = $item['unit_amount'] - ($result[Meta::UnitPriceInc] - $result[Tag::UnitPrice]);
-                }
+            if (isset($item['unit_amount']) &&
+                !Number::floatsAreEqual($item['unit_amount'], $result[Meta::UnitPriceInc] - $result[Tag::UnitPrice])
+            ) {
+                $result[Meta::LineDiscountVatAmount] = $item['unit_amount'] - ($result[Meta::UnitPriceInc] - $result[Tag::UnitPrice]);
             }
         }
         $result[Tag::Quantity] = $item['product_quantity'];
@@ -193,6 +211,7 @@ class Creator extends BaseCreator
         $taxRulesGroupId = isset($item['id_tax_rules_group']) ? (int) $item['id_tax_rules_group'] : 0;
         $result += $this->getVatRateLookupMetadata($this->order->id_address_invoice, $taxRulesGroupId);
 
+        /** @noinspection UnsupportedStringOffsetOperationsInspection */
         $result[Meta::FieldsCalculated][] = Meta::VatAmount;
 
         $this->removePropertySource('item');
@@ -288,10 +307,8 @@ class Creator extends BaseCreator
     {
         /** @var Order|OrderSlip $source */
         $source = $this->invoiceSource->getSource();
-        if (isset($source->payment_fee)
-            && isset($source->payment_fee_rate)
-            && (float) $source->payment_fee !== 0.0)
-        {
+        /** @noinspection MissingIssetImplementationInspection */
+        if (isset($source->payment_fee, $source->payment_fee_rate) && (float) $source->payment_fee !== 0.0) {
             $sign = $this->invoiceSource->getSign();
             $paymentInc = $sign * $source->payment_fee;
             $paymentVatRate = (float) $source->payment_fee_rate;
@@ -389,7 +406,7 @@ class Creator extends BaseCreator
 
         // Get sum of product lines.
         $lines = $this->creditSlip->getOrdersSlipProducts($this->invoiceSource->getId(), $this->order);
-        $detailsAmountInc = array_reduce($lines, function ($sum, $item) {
+        $detailsAmountInc = array_reduce($lines, static function ($sum, $item) {
             $sum += $item['total_price_tax_incl'];
             return $sum;
         }, 0.0);
@@ -413,7 +430,8 @@ class Creator extends BaseCreator
             foreach ($orderDiscounts as $key => $orderDiscount) {
                 if (Number::floatsAreEqual($orderDiscount[Meta::UnitPriceInc], $discountAmountInc)) {
                     // Return this single line.
-                    $from = $to = $key;
+                    $from = $key;
+                    $to = $key;
                     break;
                 }
                 $totalOrderDiscountInc += $orderDiscount[Meta::UnitPriceInc];
@@ -425,10 +443,10 @@ class Creator extends BaseCreator
                 }
             }
 
-            if (isset($from) && isset($to)) {
+            if (isset($from, $to)) {
                 $result = array_slice($orderDiscounts, $from, $to - $from + 1);
                 // Correct meta-invoice-amount.
-                $totalOrderDiscountEx = array_reduce($result, function ($sum, $item) {
+                $totalOrderDiscountEx = array_reduce($result, static function ($sum, $item) {
                     $sum += $item[Tag::Quantity] * $item[Tag::UnitPrice];
                     return $sum;
                 }, 0.0);

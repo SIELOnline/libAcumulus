@@ -1,4 +1,19 @@
 <?php
+/**
+ * Although we would like to use strict equality, i.e. including type equality,
+ * unconditionally changing each comparison in this file will lead to problems
+ * - API responses return each value as string, even if it is an int or float.
+ * - The shop environment may be lax in its typing by, e.g. using strings for
+ *   each value coming from the database.
+ * - Our own config object is type aware, but, e.g, uses string for a vat class
+ *   regardless the type for vat class ids as used by the shop itself.
+ * So for now, we will ignore the warnings about non strictly typed comparisons
+ * in this code, and we won't use strict_types=1.
+ * @noinspection TypeUnsafeComparisonInspection
+ * @noinspection PhpMissingStrictTypesDeclarationInspection
+ * @noinspection PhpStaticAsDynamicMethodCallInspection
+ */
+
 namespace Siel\Acumulus\Invoice;
 
 use Siel\Acumulus\Api;
@@ -13,8 +28,15 @@ use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
 
+use function array_key_exists;
+use function func_get_args;
+use function in_array;
+use function is_array;
+use function is_int;
+use function is_string;
+
 /**
- * Creates a raw version of the Acumulus invoice based on a {@see Source}.
+ * Creates a raw version of the Acumulus invoice from a {@see Source}.
  *
  * Introduction
  * ------------
@@ -77,6 +99,8 @@ use Siel\Acumulus\Tag;
  * Hierarchical lines are "corrected" in the Completor phase, see
  * {@see FlattenerInvoiceLines}
  *
+ * @noinspection PhpClassHasTooManyDeclaredMembersInspection
+ * @noinspection EfferentObjectCouplingInspection
  */
 abstract class Creator
 {
@@ -99,32 +123,19 @@ abstract class Creator
     public const LineType_Other = 'other';
     public const LineType_Corrector = 'missing-amount-corrector';
 
-    /** @var \Siel\Acumulus\Config\Config */
-    protected $config;
-
-    /** @var \Siel\Acumulus\Config\ShopCapabilities */
-    protected $shopCapabilities;
-
-    /** @var \Siel\Acumulus\Helpers\Token */
-    protected $token;
-
-    /** @var \Siel\Acumulus\Helpers\Translator */
-    protected $translator;
-
-    /** @var \Siel\Acumulus\Helpers\Log */
-    protected $log;
-
-    /** @var \Siel\Acumulus\Helpers\Countries */
-    protected $countries;
-
-    /** @var \Siel\Acumulus\Helpers\Container*/
-    protected $container;
-
+    protected Config $config;
+    protected ShopCapabilities $shopCapabilities;
+    protected Token $token;
+    protected Translator $translator;
+    protected Log $log;
+    protected Countries $countries;
+    protected Container $container;
     /**
      * @var array
      *   Resulting Acumulus invoice.
      *
-     * @todo: This really should become an object that can be passed around like
+     * @todo
+     *   This really should become an object that can be passed around like
      *   Source. We could add a lot of simple query methods to this object. And
      *   if we are going to extract groups of methods into separate "knowledge"
      *   classes, it will be easier to pass it around. To keep current code
@@ -132,28 +143,13 @@ abstract class Creator
      *   array like interfaces (Countable, Iterator, Traversable) are probably
      *   not needed.
      */
-    protected $invoice = [];
-
-    /** @var Source */
-    protected $invoiceSource;
-
+    protected array $invoice = [];
+    protected Source $invoiceSource;
     /**
-     * @var array
-     *   The list of sources to search for properties.
+     * The list of sources to search for properties.
      */
-    protected $propertySources;
+    protected array $propertySources;
 
-    /**
-     * Constructor.
-     *
-     * @param \Siel\Acumulus\Helpers\Token $token
-     * @param \Siel\Acumulus\Helpers\Countries $countries
-     * @param \Siel\Acumulus\Config\ShopCapabilities $shopCapabilities
-     * @param \Siel\Acumulus\Helpers\Container $container
-     * @param \Siel\Acumulus\Config\Config $config
-     * @param \Siel\Acumulus\Helpers\Translator $translator
-     * @param \Siel\Acumulus\Helpers\Log $log
-     */
     public function __construct(Token $token, Countries $countries, ShopCapabilities $shopCapabilities, Container $container, Config $config, Translator $translator, Log $log)
     {
         $this->token = $token;
@@ -187,7 +183,7 @@ abstract class Creator
      *
      * @param Source $invoiceSource
      */
-    protected function setInvoiceSource(Source $invoiceSource)
+    protected function setInvoiceSource(Source $invoiceSource): void
     {
         $this->invoiceSource = $invoiceSource;
         if (!in_array($invoiceSource->getType(), [Source::Order, Source::CreditNote], true)) {
@@ -198,7 +194,7 @@ abstract class Creator
     /**
      * Sets the list of sources to search for a property when expanding tokens.
      */
-    protected function setPropertySources()
+    protected function setPropertySources(): void
     {
         $this->propertySources = [];
         $this->propertySources['invoiceSource'] = $this->invoiceSource;
@@ -226,7 +222,8 @@ abstract class Creator
 
     /**
      * Adds an object as property source.
-     * The object is added to the start of the array. Thus upon token expansion,
+     *
+     * The object is added to the start of the array. So, upon token expansion,
      * it will be searched before other (already added) property sources.
      *
      * @param string $name
@@ -234,7 +231,7 @@ abstract class Creator
      * @param object|array $property
      *   The source object to add.
      */
-    public function addPropertySource(string $name, $property)
+    public function addPropertySource(string $name, $property): void
     {
         $this->propertySources = [$name => $property] + $this->propertySources;
     }
@@ -245,7 +242,7 @@ abstract class Creator
      * @param string $name
      *   The name of the source to remove.
      */
-    public function removePropertySource(string $name)
+    public function removePropertySource(string $name): void
     {
         unset($this->propertySources[$name]);
     }
@@ -531,7 +528,7 @@ abstract class Creator
         if (is_string($result)) {
             // Filter to an int. Just casting to an int would result in 0 with
             // any invoice number that has a prefix.
-            $result = preg_replace('/[^0-9]/', '', $result);
+            $result = preg_replace('/\D/', '', $result);
         }
         return $result;
     }
@@ -677,7 +674,7 @@ abstract class Creator
      *
      * @param array $line
      */
-    protected function addProductInfo(array &$line)
+    protected function addProductInfo(array &$line): void
     {
         $invoiceSettings = $this->config->getInvoiceSettings();
         $this->addTokenDefault($line, Tag::ItemNumber, $invoiceSettings['itemNumber']);
@@ -708,7 +705,7 @@ abstract class Creator
      *
      * @param array $line
      */
-    protected function addNature(array &$line)
+    protected function addNature(array &$line): void
     {
         if (empty($line[Tag::Nature])) {
             $shopSettings = $this->config->getShopSettings();
@@ -927,7 +924,8 @@ abstract class Creator
      *
      * @return bool
      *
-     * @todo: remove margin scheme handling from (plugin specific) creators and
+     * @todo
+     *   Remove margin scheme handling from (plugin specific) creators and
      *   move it to the completor phase. This will aid in simplifying the
      *   creators towards raw data collectors.
      */
@@ -1043,7 +1041,7 @@ abstract class Creator
      * @param array $array
      * @param string $warning
      */
-    protected function addWarning(array &$array, string $warning)
+    protected function addWarning(array &$array, string $warning): void
     {
         if (!isset($array[Meta::Warning])) {
             $array[Meta::Warning] = $warning;
@@ -1121,9 +1119,10 @@ abstract class Creator
      *   - 'meta-vatrate-max'
      *   - 'meta-vatamount-precision'
      *   - 'meta-vatrate-source'
-     * @todo: can we move this from the (plugin specific) creators to the
-     *   completor phase? This would aid in simplifying the creators towards raw
-     *   data collectors.
+     * @todo
+     *   Can we move this from the (plugin specific) creators to the completor
+     *   phase? This would aid in simplifying the creators towards raw data
+     *   collectors.
      */
     public static function getVatRangeTags(
         float $numerator,

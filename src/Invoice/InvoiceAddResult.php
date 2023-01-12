@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Invoice;
 
 use Siel\Acumulus\ApiClient\AcumulusResult;
@@ -44,38 +47,28 @@ class InvoiceAddResult extends MessageCollection
     public const Send_Mask = 0xf0;
 
     /**
-     * @var string
-     *   A string indicating the function that triggered the sending, e.g.
-     *   InvoiceManager::sourceStatusChange().
+     * A string indicating the function that triggered the sending, e.g.
+     * {@see \Siel\Acumulus\Magento\Invoice\SourceInvoiceManager::sourceStatusChange()}.
      */
-    protected $trigger;
+    protected string $trigger;
+    /**
+     * A status indicating if and why an invoice was or was not sent. It will
+     * contain 1 of the {@see InvoiceAddResult}::Send_... or
+     * {@see InvoiceAddResult}::NotSent_... constants.
+     */
+    protected int $sendStatus;
+    /**
+     * A list of parameters to use when getting the send-status as text.
+     */
+    protected array $sendStatusArguments;
+    protected ?AcumulusResult $acumulusResult = null;
 
     /**
-     * @var int
-     *   A status indicating if and why an invoice was or was not sent. It will
-     *   contain 1 of the Result::Sent_... or Result::Invoice_NotSent_...
-     *   constants.
-     */
-    protected $sendStatus;
-
-    /**
-     * @var array
-     *   A list of parameters to use when getting the send-status as text.
-     */
-    protected $sendStatusArguments;
-
-    /**
-     * @var \Siel\Acumulus\ApiClient\AcumulusResult|null
-     */
-    protected $acumulusResult = null;
-
-    /**
-     * InvoiceSendResult constructor.
+     * InvoiceAddResult constructor.
      *
      * @param string $trigger
      *   A string indicating the function that triggered the sending, e.g.
      *   InvoiceManager::sourceStatusChange().
-     * @param \Siel\Acumulus\Helpers\Translator $translator
      */
     public function __construct($trigger, Translator $translator)
     {
@@ -88,8 +81,8 @@ class InvoiceAddResult extends MessageCollection
     /**
      * @return int
      *   A status indicating if and why an invoice was sent or not sent. It will
-     *   contain 1 of the Result::Sent_... or Result::Invoice_NotSent_...
-     *   constants.
+     *   contain 1 of the {@see InvoiceAddResult}::Send_... or
+     *   {@see InvoiceAddResult}::NotSent_... constants.
      */
     public function getSendStatus(): int
     {
@@ -153,6 +146,7 @@ class InvoiceAddResult extends MessageCollection
      *   InvoiceManager::sourceStatusChange().
      *
      * @return $this
+     *
      * @noinspection PhpUnused
      */
     public function setTrigger(string $trigger): InvoiceAddResult
@@ -164,8 +158,6 @@ class InvoiceAddResult extends MessageCollection
 
     /**
      * Returns a translated string indicating the action taken (sent or not sent).
-     *
-     * @return string
      */
     protected function getActionText(): string
     {
@@ -181,8 +173,6 @@ class InvoiceAddResult extends MessageCollection
 
     /**
      * Returns a translated string indicating the reason for the action taken.
-     *
-     * @return string
      */
     protected function getSendStatusText(): string
     {
@@ -260,8 +250,6 @@ class InvoiceAddResult extends MessageCollection
 
     /**
      * Sets the AcumulusResult and copies its messages to this object
-     *
-     * @param \Siel\Acumulus\ApiClient\AcumulusResult $acumulusResult
      */
     public function setAcumulusResult(AcumulusResult $acumulusResult): void
     {
@@ -278,9 +266,7 @@ class InvoiceAddResult extends MessageCollection
      *
      * @param int $addReqResp
      *   Whether to add the raw request and response.
-     *   One of the Result::AddReqResp_... constants
-     *
-     * @return string
+     *   One of the {@see InvoiceAddResult}::AddReqResp_... constants
      */
     public function getLogText(int $addReqResp): string
     {

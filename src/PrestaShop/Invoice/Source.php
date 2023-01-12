@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\PrestaShop\Invoice;
 
 use Address;
@@ -13,21 +16,22 @@ use Siel\Acumulus\Api;
 use Siel\Acumulus\Invoice\Source as BaseSource;
 use Siel\Acumulus\Meta;
 
+use function strlen;
+
 /**
  * Wraps a PrestaShop order in an invoice source object.
+ *
+ * @property Order|OrderSlip $source;
+ * @method Order|OrderSlip getSource()
  */
 class Source extends BaseSource
 {
-    // More specifically typed properties.
-    /** @var \Order|\OrderSlip */
-    protected $source;
-
     /**
      * {@inheritdoc}
      *
      * @throws \PrestaShopException
      */
-    protected function setSource()
+    protected function setSource(): void
     {
         if ($this->getType() === Source::Order) {
             $this->source = new Order($this->id);
@@ -54,7 +58,7 @@ class Source extends BaseSource
      *
      * @throws \PrestaShopDatabaseException
      */
-    protected function setId()
+    protected function setId(): void
     {
         $this->id = $this->source->id;
         if ($this->getType() === Source::CreditNote) {
@@ -73,7 +77,8 @@ class Source extends BaseSource
     /**
      * Returns the status of this order.
      *
-     * @return int
+     * @noinspection PhpUnused
+     *   Called via getStatus().
      */
     protected function getStatusOrder(): int
     {
@@ -83,9 +88,10 @@ class Source extends BaseSource
     /**
      * Returns the status of this credit note.
      *
-     * @return null
-     *
-     * @noinspection PhpUnused : Called via getStatus().
+     * @noinspection PhpUnused
+     *   Called via getStatus().
+     * @noinspection ReturnTypeCanBeDeclaredInspection
+     *   null !== void
      */
     protected function getStatusCreditNote()
     {
@@ -101,10 +107,7 @@ class Source extends BaseSource
     {
         /** @var \Order $order */
         $order = $this->getOrder()->source;
-        if (isset($order->module)) {
-            return $order->module;
-        }
-        return parent::getPaymentMethod();
+        return $order->module ?? parent::getPaymentMethod();
     }
 
     /**
@@ -141,8 +144,7 @@ class Source extends BaseSource
             $paymentDate = $this->source->date_upd;
         }
 
-        $result = $paymentDate ? substr($paymentDate, 0, strlen('2000-01-01')) : null;
-        return $result;
+        return $paymentDate ? substr($paymentDate, 0, strlen('2000-01-01')) : null;
     }
 
     /**
@@ -164,12 +166,11 @@ class Source extends BaseSource
     {
         $currency = Currency::getCurrencyInstance($this->getOrder()->source->id_currency);
         /** @noinspection PhpCastIsUnnecessaryInspection */
-        $result = array (
+        return [
             Meta::Currency => $currency->iso_code,
             Meta::CurrencyRate => (float) $this->source->conversion_rate,
             Meta::CurrencyDoConvert => true,
-        );
-        return $result;
+        ];
     }
 
     /**
@@ -208,6 +209,9 @@ class Source extends BaseSource
 
     /**
      * Returns the invoice reference for an order
+     *
+     * @noinspection PhpUnused
+     *   Called via getInvoiceReference().
      */
     public function getInvoiceReferenceOrder(): ?string
     {
@@ -218,6 +222,9 @@ class Source extends BaseSource
 
     /**
      * Returns the invoice date for an order
+     *
+     * @noinspection PhpUnused
+     *   Called via getInvoiceDate().
      */
     public function getInvoiceDateOrder(): ?string
     {
@@ -256,7 +263,7 @@ class Source extends BaseSource
      *
      * @throws \PrestaShopDatabaseException
      */
-    protected function addProperties()
+    protected function addProperties(): void
     {
         if (version_compare(_PS_VERSION_, '1.7.5', '<')) {
             $row = Db::getInstance()->executeS(sprintf('SELECT * FROM `%s` WHERE `%s` = %u',
@@ -264,9 +271,8 @@ class Source extends BaseSource
             // Get 1st (and only) result.
             $row = reset($row);
             foreach ($row as $key => $value) {
-                if (!isset($this->source->$key)) {
-                    $this->source->$key = $value;
-                }
+                /** @noinspection PhpVariableVariableInspection */
+                $this->source->$key ??= $value;
             }
         }
     }

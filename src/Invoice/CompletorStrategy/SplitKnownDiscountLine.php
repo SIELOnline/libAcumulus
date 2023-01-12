@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Invoice\CompletorStrategy;
 
 use Siel\Acumulus\Helpers\Number;
@@ -34,7 +37,8 @@ use Siel\Acumulus\Tag;
  *   - if no discount on shipping and other fees as these do not end up in table
  *     order_detail_tax.
  *
- * @noinspection PhpUnused : instantiated via a variable containing the name.
+ * @noinspection PhpUnused
+ *   Instantiated via a variable containing the name.
  */
 class SplitKnownDiscountLine extends CompletorStrategyBase
 {
@@ -47,33 +51,22 @@ class SplitKnownDiscountLine extends CompletorStrategyBase
      * It should come before the SplitNonMatchingLine as this one depends on
      * more specific information being available and thus is more controlled
      * than that other split strategy.
-     *
-     * @var int
      */
-    public static $tryOrder = 10;
+    public static int $tryOrder = 10;
 
-    /** @var float */
-    protected $knownDiscountAmountInc;
-
-    /** @var float */
-    protected $knownDiscountVatAmount;
-
+    protected float $knownDiscountAmountInc;
+    protected float $knownDiscountVatAmount;
     /** @var float[] */
-    protected $discountsPerVatRate;
-
-    /** @var array */
-    protected $splitLine;
-
-    /** @var int */
-    protected $splitLineKey;
-
-    /** @var int */
-    protected $splitLineCount;
+    protected array $discountsPerVatRate;
+    /** @var array[] */
+    protected array $splitLine;
+    protected int $splitLineKey;
+    protected int $splitLineCount;
 
     /**
      * {@inheritdoc}
      */
-    protected function init()
+    protected function init(): void
     {
         $this->splitLineCount = 0;
         foreach ($this->lines2Complete as $key => $line2Complete) {
@@ -122,7 +115,7 @@ class SplitKnownDiscountLine extends CompletorStrategyBase
     /**
      * {@inheritdoc}
      */
-    public function execute(): bool
+    protected function execute(): bool
     {
         $this->linesCompleted = [$this->splitLineKey];
         return $this->splitDiscountLine();

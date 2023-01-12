@@ -1,10 +1,15 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Invoice\CompletorStrategy;
 
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Invoice\CompletorStrategyBase;
 use Siel\Acumulus\Tag;
+
+use function count;
 
 /**
  * Class SplitNonMatchingLine implements a vat completor strategy by recognizing
@@ -20,7 +25,7 @@ use Siel\Acumulus\Tag;
  *
  * Note:
  * - This strategy should be executed early as it is an almost sure win and is
- *   used as a partial solution for only some of the strategy lines.
+ *   used as a partial solution for only some strategy lines.
  * - (*) In 1 case we had an order with 3 rates, 1 of them being 0 on a €0,01
  *   discount line. So, if the shop only sells VAT liable products, we actually
  *   look at the number of positive vat rates and ignore any 0 vat rate.
@@ -40,7 +45,8 @@ use Siel\Acumulus\Tag;
  * Current (known) usages:
  * - PrestaShop (discount lines)
  *
- * @noinspection PhpUnused : instantiated via a variable containing the name.
+ * @noinspection PhpUnused
+ *   Instantiated via a variable containing the name.
  */
 class SplitNonMatchingLine extends CompletorStrategyBase
 {
@@ -49,21 +55,16 @@ class SplitNonMatchingLine extends CompletorStrategyBase
      * solutions in a controlled way. Controlled in the sense that it will only
      * be applied to invoice lines where it can and should be applied. So no
      * chance of returning a false positive.
-     *
-     * @var int
      */
-    public static $tryOrder = 20;
+    public static int $tryOrder = 20;
 
-    /** @var array */
-    protected $minVatRate;
-
-    /** @var array */
-    protected $maxVatRate;
+    protected array $minVatRate;
+    protected array $maxVatRate;
 
     /**
      * {@inheritdoc}
      */
-    protected function init()
+    protected function init(): void
     {
         $this->linesCompleted = [];
     }
@@ -94,19 +95,21 @@ class SplitNonMatchingLine extends CompletorStrategyBase
     /**
      * {@inheritdoc}
      */
-    public function execute(): bool
+    protected function execute(): bool
     {
         $this->minVatRate = $this->getVatBreakDownMinRate();
         $this->maxVatRate = $this->getVatBreakDownMaxRate();
         $this->description = sprintf('"SplitNonMatchingLine(%f, %f)', $this->minVatRate[Tag::VatRate], $this->maxVatRate[Tag::VatRate]);
         $result = false;
         foreach ($this->lines2Complete as $key => $line2Complete) {
-            if (!empty($line2Complete[Meta::StrategySplit]) && isset($line2Complete[Meta::VatRateRangeMatches]) && empty($line2Complete[Meta::VatRateRangeMatches])) {
-                // Line may be split and line does not have a matching vat rate.
-                if ($this->splitNonMatchingLine($line2Complete)) {
-                    $result = true;
-                    $this->linesCompleted[] = $key;
-                }
+            // Line may be split and line does not have a matching vat rate.
+            if (!empty($line2Complete[Meta::StrategySplit])
+                && isset($line2Complete[Meta::VatRateRangeMatches])
+                && empty($line2Complete[Meta::VatRateRangeMatches])
+                && $this->splitNonMatchingLine($line2Complete)
+            ) {
+                $result = true;
+                $this->linesCompleted[] = $key;
             }
         }
         return $result;
@@ -114,7 +117,7 @@ class SplitNonMatchingLine extends CompletorStrategyBase
 
     protected function splitNonMatchingLine(array $line): bool
     {
-        list($lowAmount, $highAmount) = $this->splitAmountOver2VatRates($line[Meta::LineAmount],
+        [$lowAmount, $highAmount] = $this->splitAmountOver2VatRates($line[Meta::LineAmount],
             $line[Meta::LineAmountInc] - $line[Meta::LineAmount],
             $this->minVatRate[Tag::VatRate],
             $this->maxVatRate[Tag::VatRate]);

@@ -1,10 +1,15 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Invoice\CompletorStrategy;
 
 use Siel\Acumulus\Invoice\CompletorStrategyBase;
 use Siel\Acumulus\Invoice\Creator;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
+
+use function count;
 
 /**
  * Class SplitLine implements a vat completor strategy by recognizing that a
@@ -61,45 +66,31 @@ use Siel\Acumulus\Tag;
  * Current known usages:
  * - OpenCart discount coupons
  *
- * @noinspection PhpUnused : instantiated via a variable containing the name.
+ * @noinspection PhpUnused
+ *   Instantiated via a variable containing the name.
  */
 class SplitLine extends CompletorStrategyBase
 {
     /**
-     * @var int
-     *   This strategy should be tried last before the fail strategy as there
-     *   are chances of returning a wrong true result.
+     * This strategy should be tried last before the fail strategy as there are
+     * chances of returning a wrong true result.
      */
-    public static $tryOrder = 40;
-
+    public static int $tryOrder = 40;
     /** @var array[] */
-    protected $splitLines;
-
-    /** @var float */
-    protected $splitLinesAmount;
-
+    protected array $splitLines;
+    protected float $splitLinesAmount;
     /** @var array[] */
-    protected $otherLines;
-
-    /** @var float */
-    protected $otherLinesAmount;
-
-    /** @var float */
-    protected $nonStrategyAmount;
-
-    /** @var array */
-    protected $minVatRate;
-
-    /** @var array */
-    protected $maxVatRate;
-
-    /** @var array */
-    protected $keyComponent;
+    protected array $otherLines;
+    protected float $otherLinesAmount;
+    protected float $nonStrategyAmount;
+    protected array $minVatRate;
+    protected array $maxVatRate;
+    protected array $keyComponent;
 
     /**
      * {@inheritdoc}
      */
-    protected function init()
+    protected function init(): void
     {
         $this->splitLines = [];
         $this->otherLines = [];
@@ -137,15 +128,13 @@ class SplitLine extends CompletorStrategyBase
     /**
      * {@inheritdoc}
      */
-    public function execute(): bool
+    protected function execute(): bool
     {
         if ($this->tryVatRate($this->maxVatRate[Tag::VatRate])) {
             return true;
         }
-        if ($this->maxVatRate !== $this->keyComponent) {
-            if ($this->tryVatRate($this->keyComponent[Tag::VatRate])) {
-                return true;
-            }
+        if (($this->maxVatRate !== $this->keyComponent) && $this->tryVatRate($this->keyComponent[Tag::VatRate])) {
+            return true;
         }
 
         // Try a rate of 0% for all other lines.

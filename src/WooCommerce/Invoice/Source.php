@@ -1,10 +1,18 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\WooCommerce\Invoice;
 
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Invoice\Source as BaseSource;
 use Siel\Acumulus\Meta;
 use WC_Abstract_Order;
+use WC_Order;
+use WC_Order_Refund;
+
+use function is_object;
+use function strlen;
 
 /**
  * Wraps a WooCommerce order in an invoice source object.
@@ -13,19 +21,18 @@ use WC_Abstract_Order;
  * wc_register_order_type() and wc_get_order_types(). WooCommerce itself defines
  * 'shop_order' and 'shop_order_refund'. The base class for all these types of
  * orders is WC_Abstract_Order
+ *
+ * @property WC_Order|WC_Order_Refund $source
+ * @method WC_Order|WC_Order_Refund getSource()
  */
 class Source extends BaseSource
 {
-    // More specifically typed properties.
-    /** @var \WC_Order|\WC_Order_Refund */
-    protected $source;
-
     /**
      * Loads an Order or refund source for the set id.
      */
-    protected function setSource()
+    protected function setSource(): void
     {
-        $this->source = WC()->order_factory->get_order($this->id);
+        $this->source = WC()->order_factory::get_order($this->id);
         if (!is_object($this->source)) {
             $this->source = null;
             $this->id = null;
@@ -35,7 +42,7 @@ class Source extends BaseSource
     /**
      * Sets the id based on the loaded Order or Order refund.
      */
-    protected function setId()
+    protected function setId(): void
     {
         if ($this->source instanceof WC_Abstract_Order) {
             $this->id = $this->source->get_id();
@@ -67,7 +74,8 @@ class Source extends BaseSource
      */
     public function getDate(): string
     {
-        return substr($this->source->get_date_created(), 0, strlen('2000-01-01'));
+        // get_date_created() returns a WC_DateTime which has a _toString() method.
+        return substr((string) $this->source->get_date_created(), 0, strlen('2000-01-01'));
     }
 
     /**
@@ -132,9 +140,8 @@ class Source extends BaseSource
      */
     protected function getPaymentDateOrder(): string
     {
-        // This returns a WC_DateTime but that class has a _toString() method.
-        $string = $this->source->get_date_paid();
-        return substr($string, 0, strlen('2000-01-01'));
+        // get_date_paid() returns a WC_DateTime which has a _toString() method.
+        return substr((string) $this->source->get_date_paid(), 0, strlen('2000-01-01'));
     }
 
     /**
@@ -148,9 +155,8 @@ class Source extends BaseSource
      */
     protected function getPaymentDateCreditNote(): string
     {
-        // This returns a WC_DateTime but that class has a _toString() method.
-        $string = $this->source->get_date_modified();
-        return substr($string, 0, strlen('2000-01-01'));
+        // get_date_modified() returns a WC_DateTime which has a _toString() method.
+        return substr((string) $this->source->get_date_modified(), 0, strlen('2000-01-01'));
     }
 
     /**

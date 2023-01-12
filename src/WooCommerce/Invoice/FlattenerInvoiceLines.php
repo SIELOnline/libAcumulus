@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\WooCommerce\Invoice;
 
 use Siel\Acumulus\Helpers\Number;
@@ -52,8 +55,8 @@ class FlattenerInvoiceLines extends BaseFlattenerInvoiceLines
                     }
                 } elseif ($childrenVatRate === null) {
                     // 1st vat rate encountered: set it to this vat rate.
-                    $childrenVatRate = $child[Tag::VatRate];
-                } elseif ($childrenVatRate != $child[Tag::VatRate]) {
+                    $childrenVatRate = (float) $child[Tag::VatRate];
+                } elseif (!Number::floatsAreEqual((float) $childrenVatRate, (float) $child[Tag::VatRate])) {
                     // Different vat rates on children: do not use.
                     $childrenVatRate = false;
                 }

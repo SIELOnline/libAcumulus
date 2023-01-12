@@ -1,6 +1,19 @@
 <?php
 /**
- * @noinspection PhpMultipleClassDeclarationsInspection
+ * Although we would like to use strict equality, i.e. including type equality,
+ * unconditionally changing each comparison in this file will lead to problems
+ * - API responses return each value as string, even if it is an int or float.
+ * - The shop environment may be lax in its typing by, e.g. using strings for
+ *   each value coming from the database.
+ * - Our own config object is type aware, but, e.g, uses string for a vat class
+ *   regardless the type for vat class ids as used by the shop itself.
+ * So for now, we will ignore the warnings about non strictly typed comparisons
+ * in this code, and we won't use strict_types=1.
+ *
+ * @noinspection TypeUnsafeComparisonInspection
+ * @noinspection PhpMissingStrictTypesDeclarationInspection
+ * @noinspection PhpStaticAsDynamicMethodCallInspection
+ * @noinspection StaticInvocationViaThisInspection
  * @noinspection SqlDialectInspection
  */
 
@@ -15,26 +28,19 @@ use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Tag;
 
 /**
- * Allows creating arrays in the Acumulus invoice structure from an OpenCart
- * order.
+ * Creates a raw version of the Acumulus invoice from an OpenCart {@see Source}.
+ *
+ * @property \Siel\Acumulus\OpenCart\Invoice\Source $invoiceSource
  */
 class Creator extends BaseCreator
 {
-    // More specifically typed property.
-    /** @var \Siel\Acumulus\OpenCart\Invoice\Source */
-    protected $invoiceSource;
-
-    /** @var array */
-    protected $order;
-
+    protected array $order;
     /**
      * Precision of amounts stored in OC. In OC you enter prices inc vat. The
      * price ex vat and vat amount will be calculated and stored with 4
      * digits precision. So 0.001 is on the pessimistic side.
-     *
-     * @var float
      */
-    protected $precision = 0.001;
+    protected float $precision = 0.001;
 
     /**
      * {@inheritdoc}
@@ -44,7 +50,7 @@ class Creator extends BaseCreator
      *
      * @throws \Exception
      */
-    protected function setInvoiceSource(\Siel\Acumulus\Invoice\Source $invoiceSource)
+    protected function setInvoiceSource(\Siel\Acumulus\Invoice\Source $invoiceSource): void
     {
         parent::setInvoiceSource($invoiceSource);
 
@@ -95,6 +101,8 @@ class Creator extends BaseCreator
      * These lines will be informative, their price will be 0.
      *
      * @throws \Exception
+     *
+     * @noinspection PhpMultipleClassDeclarationsInspection
      */
     protected function getItemLine(array $item): array
     {
@@ -175,7 +183,7 @@ class Creator extends BaseCreator
     {
         $result = [];
 
-        if (!empty($taxClassId)) {
+        if ($taxClassId > 0) {
             $taxClass = $this->getTaxClass($taxClassId);
             if ($taxClass) {
                 $result += [
@@ -188,11 +196,11 @@ class Creator extends BaseCreator
                 $taxRules = $this->getTaxRules($taxClassId);
                 foreach ($taxRules as $taxRule) {
                     $taxRate = $this->getTaxRate($taxRule['tax_rate_id']);
-                    if (!empty($taxRate)) {
-                        if ($this->isAddressInGeoZone($this->order, $taxRule['based'], $taxRate['geo_zone_id'])) {
-                            $result[Meta::VatRateLookup][] = $taxRate['rate'];
-                            $result[Meta::VatRateLookupLabel][] = $taxRate['name'];
-                        }
+                    if (!empty($taxRate)
+                        && $this->isAddressInGeoZone($this->order, $taxRule['based'], $taxRate['geo_zone_id'])
+                    ) {
+                        $result[Meta::VatRateLookup][] = $taxRate['rate'];
+                        $result[Meta::VatRateLookupLabel][] = $taxRate['name'];
                     }
                 }
             }
@@ -435,7 +443,7 @@ class Creator extends BaseCreator
     protected function getTaxClass(int $tax_class_id): array
     {
         /** @var \stdClass $query  (documentation error in DB) */
-        $query = $this->getDb()->query("SELECT * FROM " . DB_PREFIX . "tax_class WHERE tax_class_id = '" . $tax_class_id . "'");
+        $query = $this->getDb()->query('SELECT * FROM ' . DB_PREFIX . "tax_class WHERE tax_class_id = '" . $tax_class_id . "'");
         return $query->row;
     }
 
@@ -453,7 +461,7 @@ class Creator extends BaseCreator
     protected function getTaxRules(int $tax_class_id): array
     {
         /** @var \stdClass $query  (documentation error in DB) */
-        $query = $this->getDb()->query("SELECT * FROM " . DB_PREFIX . "tax_rule WHERE tax_class_id = '" . $tax_class_id . "'");
+        $query = $this->getDb()->query('SELECT * FROM ' . DB_PREFIX . "tax_rule WHERE tax_class_id = '" . $tax_class_id . "'");
         return $query->rows;
     }
 
@@ -471,10 +479,11 @@ class Creator extends BaseCreator
     protected function getTaxRate(int $tax_rate_id): array
     {
         /** @var \stdClass $query  (documentation error in DB) */
-        $query = $this->getDb()->query("SELECT tr.tax_rate_id, tr.name AS name, tr.rate, tr.type, tr.geo_zone_id,
+        $query = $this->getDb()->query(
+            'SELECT tr.tax_rate_id, tr.name AS name, tr.rate, tr.type, tr.geo_zone_id,
             gz.name AS geo_zone, tr.date_added, tr.date_modified
-            FROM " . DB_PREFIX . "tax_rate tr
-            LEFT JOIN " . DB_PREFIX . "geo_zone gz ON (tr.geo_zone_id = gz.geo_zone_id)
+            FROM ' . DB_PREFIX . 'tax_rate tr
+            LEFT JOIN ' . DB_PREFIX . "geo_zone gz ON (tr.geo_zone_id = gz.geo_zone_id)
             WHERE tr.tax_rate_id = '" . $tax_rate_id . "'");
         return $query->row;
     }
@@ -496,7 +505,7 @@ class Creator extends BaseCreator
 
         if (!isset($geoZonesCache[$geo_zone_id])) {
             /** @var \stdClass $query  (documentation error in DB) */
-            $query = $this->getDb()->query("SELECT * FROM " . DB_PREFIX . "zone_to_geo_zone WHERE geo_zone_id = '" . $geo_zone_id . "'");
+            $query = $this->getDb()->query('SELECT * FROM ' . DB_PREFIX . "zone_to_geo_zone WHERE geo_zone_id = '" . $geo_zone_id . "'");
             $geoZonesCache[$geo_zone_id] = $query->rows;
         }
         return $geoZonesCache[$geo_zone_id];

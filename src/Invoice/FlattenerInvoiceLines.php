@@ -1,10 +1,29 @@
 <?php
+/**
+* Although we would like to use strict equality, i.e. including type equality,
+* unconditionally changing each comparison in this file will lead to problems
+* - API responses return each value as string, even if it is an int or float.
+* - The shop environment may be lax in its typing by, e.g. using strings for
+*   each value coming from the database.
+* - Our own config object is type aware, but, e.g, uses string for a vat class
+*   regardless the type for vat class ids as used by the shop itself.
+* So for now, we will ignore the warnings about non strictly typed comparisons
+* in this code, and we won't use strict_types=1.
+* @noinspection TypeUnsafeComparisonInspection
+* @noinspection PhpMissingStrictTypesDeclarationInspection
+* @noinspection PhpStaticAsDynamicMethodCallInspection
+*/
+
 namespace Siel\Acumulus\Invoice;
 
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
+
+use function array_key_exists;
+use function count;
+use function strlen;
 
 /**
  * The invoice lines flattener flattens hierarchical invoice lines.
@@ -34,21 +53,15 @@ use Siel\Acumulus\Tag;
  *   adding price info) already implemented. You might have to override the
  *   flattener to select the strategy that applies to your shop.
  *
- * @todo: shortly describe strategies and its methods to simplify overriding and
+ * @todo
+ *   shortly describe strategies and its methods to simplify overriding and
  *   choosing the correct strategy.
  */
 class FlattenerInvoiceLines
 {
-    /** @var \Siel\Acumulus\Config\Config  */
-    protected $config;
+    protected Config $config;
+    protected int $parentIndex = 1;
 
-    protected $parentIndex = 1;
-
-    /**
-     * Constructor.
-     *
-     * @param \Siel\Acumulus\Config\Config $config
-     */
     public function __construct(Config $config)
     {
         $this->config = $config;
@@ -119,6 +132,7 @@ class FlattenerInvoiceLines
             // Add the line and its children, if any.
             $result[] = $line;
             if (!empty($children)) {
+                /** @noinspection SlowArrayOperationsInLoopInspection */
                 $result = array_merge($result, $children);
             }
         }
@@ -213,7 +227,7 @@ class FlattenerInvoiceLines
      * @param array[] $children
      *   The child invoice lines.
      */
-    protected function correctInfoBetweenParentAndChildren(array &$parent, array &$children)
+    protected function correctInfoBetweenParentAndChildren(array &$parent, array &$children): void
     {
         if (!empty($children)) {
             $parent[Meta::Parent] = $this->parentIndex;
@@ -287,7 +301,7 @@ class FlattenerInvoiceLines
      * @param array[] $children
      *   The child invoice lines.
      */
-    protected function keepChildrenAndPriceOnParentOnly(array $parent, array &$children)
+    protected function keepChildrenAndPriceOnParentOnly(array $parent, array &$children): void
     {
        $children = $this->copyVatInfoToChildren($parent, $children);
        $children = $this->removePriceInfoFromChildren($children);
@@ -313,7 +327,7 @@ class FlattenerInvoiceLines
      * @param array[] $children
      *   The child invoice lines.
      */
-    protected function keepChildrenAndPriceOnChildrenOnly(array &$parent, array $children)
+    protected function keepChildrenAndPriceOnChildrenOnly(array &$parent, array $children): void
     {
         $parent = $this->copyVatInfoToParent($parent, $children);
         $parent = $this->removePriceInfoFromParent($parent);
@@ -345,7 +359,7 @@ class FlattenerInvoiceLines
      *
      * @noinspection PhpUnused
      */
-    protected function keepChildrenAndPriceOnParentAndChildren(array &$parent, array $children)
+    protected function keepChildrenAndPriceOnParentAndChildren(array &$parent, array $children): void
     {
         if (!Completor::isCorrectVatRate($parent[Meta::VatRateSource]) || Number::isZero($parent[Tag::VatRate])) {
             $parent = $this->copyVatInfoToParent($parent, $children);
@@ -375,7 +389,7 @@ class FlattenerInvoiceLines
      *
      * @noinspection PhpUnused
      */
-    protected function keepChildrenAndPriceOnParentPlusChildren(array &$parent, array &$children)
+    protected function keepChildrenAndPriceOnParentPlusChildren(array &$parent, array &$children): void
     {
     }
 
@@ -491,10 +505,11 @@ class FlattenerInvoiceLines
         foreach ($children as &$child) {
             $child[Tag::UnitPrice] = 0;
             $child[Meta::UnitPriceInc] = 0;
-            unset($child[Meta::LineAmount]);
-            unset($child[Meta::LineAmountInc]);
-            unset($child[Meta::LineDiscountAmount]);
-            unset($child[Meta::LineDiscountAmountInc]);
+            unset($child[Meta::LineAmount],
+                $child[Meta::LineAmountInc],
+                $child[Meta::LineDiscountAmount],
+                $child[Meta::LineDiscountAmountInc]
+            );
         }
         return $children;
     }
@@ -514,10 +529,7 @@ class FlattenerInvoiceLines
     {
         $parent[Tag::UnitPrice] = 0;
         $parent[Meta::UnitPriceInc] = 0;
-        unset($parent[Meta::LineAmount]);
-        unset($parent[Meta::LineAmountInc]);
-        unset($parent[Meta::LineDiscountAmount]);
-        unset($parent[Meta::LineDiscountAmountInc]);
+        unset($parent[Meta::LineAmount], $parent[Meta::LineAmountInc], $parent[Meta::LineDiscountAmount], $parent[Meta::LineDiscountAmountInc]);
         return $parent;
     }
 

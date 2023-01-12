@@ -1,4 +1,20 @@
 <?php
+
+/**
+ * Although we would like to use strict equality, i.e. including type equality,
+ * unconditionally changing each comparison in this file will lead to problems
+ * - API responses return each value as string, even if it is an int or float.
+ * - The shop environment may be lax in its typing by, e.g. using strings for
+ *   each value coming from the database.
+ * - Our own config object is type aware, but, e.g, uses string for a vat class
+ *   regardless the type for vat class ids as used by the shop itself.
+ * So for now, we will ignore the warnings about non strictly typed comparisons
+ * in this code, and we won't use strict_types=1.
+ * @noinspection TypeUnsafeComparisonInspection
+ * @noinspection PhpMissingStrictTypesDeclarationInspection
+ * @noinspection PhpStaticAsDynamicMethodCallInspection
+ */
+
 namespace Siel\Acumulus\Joomla\VirtueMart\Invoice;
 
 use DOMDocument;
@@ -12,9 +28,10 @@ use stdClass;
 use VirtueMartModelCustomfields;
 use VmModel;
 
+use function in_array;
+
 /**
- * Allows creating arrays in the Acumulus invoice structure from a VirtueMart
- * order
+ * Creates a raw version of the Acumulus invoice from a virtueMart {@see Source}.
  *
  * Notes:
  * - Calculation rules used, e.g, to give a certain customer group, a discount
@@ -81,11 +98,10 @@ class Creator extends BaseCreator
      * This override also initializes VM specific properties related to the
      * source.
      */
-    protected function setInvoiceSource(\Siel\Acumulus\Invoice\Source $invoiceSource)
+    protected function setInvoiceSource(\Siel\Acumulus\Invoice\Source $invoiceSource): void
     {
         parent::setInvoiceSource($invoiceSource);
         $this->order = $this->invoiceSource->getSource();
-        /** @var \VirtueMartModelOrders orderModel */
         $this->orderModel = VmModel::getModel('orders');
         /** @var \TableInvoices $invoicesTable */
         $invoicesTable = $this->orderModel->getTable('invoices');
@@ -110,7 +126,7 @@ class Creator extends BaseCreator
     /**
      * {@inheritdoc}
      */
-    protected function setPropertySources()
+    protected function setPropertySources(): void
     {
         // As the source array does not contain scalar properties itself, only
         // sub arrays, we remove it as a property source.
@@ -123,6 +139,8 @@ class Creator extends BaseCreator
 
     /**
      * {@inheritdoc}
+     *
+     * @noinspection PhpMissingParentCallCommonInspection
      */
     protected function getItemLines(): array
     {
@@ -250,8 +268,9 @@ class Creator extends BaseCreator
     {
         /** @var \VirtueMartModelShipmentmethod $shipmentMethodsModel */
         $shipmentMethodsModel = VmModel::getModel('shipmentmethod');
+        /** @var \TableShipmentmethods $shipmentMethod */
         $shipmentMethod = $shipmentMethodsModel->getShipment($this->order['details']['BT']->virtuemart_shipmentmethod_id);
-        if (!empty($shipmentMethod) && isset($shipmentMethod->shipment_name)) {
+        if (!empty($shipmentMethod->shipment_name)) {
             return $shipmentMethod->shipment_name;
         }
         return parent::getShippingMethodName();
@@ -259,6 +278,8 @@ class Creator extends BaseCreator
 
     /**
      * {@inheritdoc}
+     *
+     * @noinspection PhpMissingParentCallCommonInspection
      */
     protected function getDiscountLines(): array
     {
@@ -297,14 +318,12 @@ class Creator extends BaseCreator
                && !in_array($calcRule->calc_kind, ['VatTax', 'shipment', 'payment']);
     }
 
-    /*
+    /**
      * Returns a discount item line for the discount calculation rule.
      *
      * The returned line will only contain a discount amount including tax.
      * The completor will have to divide this amount over vat rates that are used
      * in this invoice.
-     *
-     * @param \stdClass $calcRule
      *
      * @return array
      *   An item line for the invoice.
@@ -343,6 +362,8 @@ class Creator extends BaseCreator
 
     /**
      * {@inheritdoc}
+     *
+     * @noinspection PhpMissingParentCallCommonInspection
      */
     protected function getPaymentFeeLine(): array
     {
@@ -391,8 +412,6 @@ class Creator extends BaseCreator
      *
      * @param string $calcRuleType
      *   Type of calc rule to search for: 'VatTax', 'shipment' or 'payment'.
-     * @param float $amountEx
-     * @param float $vatAmount
      * @param int $orderItemId
      *   The order item to search the calc rule for, or search at the order
      *   level if left empty.
@@ -403,7 +422,7 @@ class Creator extends BaseCreator
     protected function getVatData(string $calcRuleType, float $amountEx, float $vatAmount, int $orderItemId = 0): array
     {
         $calcRule = $this->getCalcRule($calcRuleType, $orderItemId);
-        if (!empty($calcRule->calc_value)) {
+        if ($calcRule !== null && !empty($calcRule->calc_value)) {
             $vatInfo = [
                 Tag::VatRate => (float) $calcRule->calc_value,
                 Meta::VatRateSource => Number::isZero($vatAmount) ? static::VatRateSource_Exact0 : static::VatRateSource_Exact,

@@ -1,4 +1,12 @@
 <?php
+/**
+ * @noinspection PhpMissingParentCallCommonInspection
+ *   Most parent methods are more or less empty stubs or return a default when
+ *   the child does not override it.
+ */
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Joomla\VirtueMart\Invoice;
 
 use Siel\Acumulus\Api;
@@ -6,21 +14,22 @@ use Siel\Acumulus\Invoice\Source as BaseSource;
 use Siel\Acumulus\Meta;
 use VmModel;
 
+use function in_array;
+
 /**
  * Wraps a VirtueMart order in an invoice source object.
+ *
+ * @property array $order
  */
 class Source extends BaseSource
 {
-    // More specifically typed properties.
-    /** @var array */
-    protected $source;
-
     /**
      * Loads an Order source for the set id.
      *
-     * @noinspection PhpUnused : called via setSource().
+     * @noinspection PhpUnused
+     *   Called via setSource().
      */
-    protected function setSourceOrder()
+    protected function setSourceOrder(): void
     {
         /** @var \VirtueMartModelOrders $orders */
         $orders = VmModel::getModel('orders');
@@ -32,7 +41,7 @@ class Source extends BaseSource
      *
      * @noinspection PhpUnused : called via setId().
      */
-    protected function setIdOrder()
+    protected function setIdOrder(): void
     {
         $this->id = $this->source['details']['BT']->virtuemart_order_id;
     }
@@ -71,10 +80,7 @@ class Source extends BaseSource
      */
     public function getPaymentMethod()
     {
-        if (isset($this->source['details']['BT']->virtuemart_paymentmethod_id)) {
-            return $this->source['details']['BT']->virtuemart_paymentmethod_id;
-        }
-        return parent::getPaymentMethod();
+        return $this->source['details']['BT']->virtuemart_paymentmethod_id ?? parent::getPaymentMethod();
     }
 
     /**
@@ -82,7 +88,7 @@ class Source extends BaseSource
      */
     public function getPaymentStatus(): int
     {
-        return in_array($this->source['details']['BT']->order_status, $this->getPaidStatuses())
+        return in_array($this->source['details']['BT']->order_status, $this->getPaidStatuses(), false)
             ? Api::PaymentStatus_Paid
             : Api::PaymentStatus_Due;
     }
@@ -95,7 +101,9 @@ class Source extends BaseSource
         $date = null;
         $previousStatus = '';
         foreach ($this->source['history'] as $orderHistory) {
-            if (in_array($orderHistory->order_status_code, $this->getPaidStatuses()) && !in_array($previousStatus, $this->getPaidStatuses())) {
+            if (in_array($orderHistory->order_status_code, $this->getPaidStatuses(), false)
+                && !in_array($previousStatus, $this->getPaidStatuses(), false)
+            ) {
                 $date = $orderHistory->created_on;
             }
             $previousStatus = $orderHistory->order_status_code;
@@ -131,9 +139,6 @@ class Source extends BaseSource
     /**
      * {@inheritdoc}
      *
-     * VirtueMart stores the currency info as a serialised object in the field
-     * 'order_currency_info', so {@see unserialize()} to get the info.
-     *
      * VirtueMart stores the internal currency id of the currency used by the
      * customer in the field 'user_currency_id', so look up the currency object
      * first then extract the ISO code for it.
@@ -149,11 +154,11 @@ class Source extends BaseSource
         $currency_model = VmModel::getModel('currency');
         /** @var \TableCurrencies $currency */
         $currency = $currency_model->getCurrency($this->source['details']['BT']->user_currency_id);
-        return array (
+        return [
             Meta::Currency => $currency->currency_code_3,
             Meta::CurrencyRate => (float) $this->source['details']['BT']->user_currency_rate,
             Meta::CurrencyDoConvert => false,
-        );
+        ];
     }
 
     /**
@@ -173,7 +178,7 @@ class Source extends BaseSource
     /**
      * @inheritDoc
      */
-    protected function setInvoice()
+    protected function setInvoice(): void
     {
         $orderModel = VmModel::getModel('orders');
         /** @var \TableInvoices $invoicesTable */

@@ -1,4 +1,19 @@
 <?php
+/**
+ * Although we would like to use strict equality, i.e. including type equality,
+ * unconditionally changing each comparison in this file will lead to problems
+ * - API responses return each value as string, even if it is an int or float.
+ * - The shop environment may be lax in its typing by, e.g. using strings for
+ *   each value coming from the database.
+ * - Our own config object is type aware, but, e.g, uses string for a vat class
+ *   regardless the type for vat class ids as used by the shop itself.
+ * So for now, we will ignore the warnings about non strictly typed comparisons
+ * in this code, and we won't use strict_types=1.
+ * @noinspection TypeUnsafeComparisonInspection
+ * @noinspection PhpMissingStrictTypesDeclarationInspection
+ * @noinspection PhpStaticAsDynamicMethodCallInspection
+ */
+
 namespace Siel\Acumulus\Invoice;
 
 use Siel\Acumulus\Api;
@@ -8,6 +23,8 @@ use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
 
+use function get_class;
+
 /**
  * CompletorStrategyBase is the base class for all strategies that might
  * be able to complete invoice lines by applying a strategy to divide a
@@ -15,82 +32,58 @@ use Siel\Acumulus\Tag;
  */
 abstract class CompletorStrategyBase
 {
-    /** @var \Siel\Acumulus\Config\Config */
-    protected $config;
-
-    /** @var \Siel\Acumulus\Helpers\Translator */
-    protected $translator;
-
-    /** @var int Indication of the order of execution of the strategy. */
-    public static $tryOrder = 50;
-
+    protected Config $config;
+    protected Translator $translator;
     /**
-     * The invoice according to the Acumulus API definition.
-     *
-     * @var array[]
+     * Indication of the order of execution of the strategy.
      */
-    protected $invoice;
-
-    /** @var array[] */
-    protected $possibleVatTypes;
-
-    /** @var array[] */
-    protected $possibleVatRates;
-
+    public static int $tryOrder;
     /**
-     * The indices of the completed lines. As a line2complete may be split over
-     * multiple new lines we must store the indices separately.
-     *
+     * @var array[]
+     *   The invoice according to the Acumulus API definition.
+     */
+    protected array $invoice;
+    /** @var array[] */
+    protected array $possibleVatTypes;
+    /** @var array[] */
+    protected array $possibleVatRates;
+    /**
      * @var int[]
+     *   The indices of the completed lines. As a line2complete may be split
+     *   over multiple new lines we must store the indices separately.
      */
-    protected $linesCompleted;
-
+    protected array $linesCompleted;
     /**
-     * The lines that are to be completed by the strategy.
-     *
      * @var array[]
+     *   The lines that are to be completed by the strategy.
      */
-    protected $lines2Complete;
-
+    protected array $lines2Complete;
     /**
-     * The lines that replace (some of) the $lines2Complete.
-     *
-     * $linesCompleted indicates which lines in $lines2Complete are completed
-     * and are to be replaced by the $replacingLines.
-     *
      * @var array[]
+     *   The lines that replace (some of) the $lines2Complete.
+     *
+     *   $linesCompleted indicates which lines in $lines2Complete are completed
+     *   and are to be replaced by the $replacingLines.
      */
-    protected $replacingLines;
-
-    /** @var float */
-    protected $vat2Divide;
-
-    /** @var float */
-    protected $vatAmount;
-
-    /** @var float */
-    protected $invoiceAmount;
-
-    /** @var string */
-    protected $description = 'Not yet set';
-
+    protected array $replacingLines;
+    protected float $vat2Divide;
+    protected float $vatAmount;
+    protected float $invoiceAmount;
+    protected string $description = 'Not yet set';
     /**
-     * An overview of the vat broken down into separate vat rates.
-     *
-     * Each entry is keyed by íts vat rate (%.3f formatted to get correct
-     * comparisons on equality) and contains an array with the following
-     * information:
-     * - 'vatrate' => the vat rate,
-     * - 'vatamount' => vat amount on all lines having this vat rate.
-     * - 'amount' => amount (ex vat) of all lines having this vat rate,
-     * - 'count' => number of lines having this vat rate.
-     *
      * @var array[]
+     *   An overview of the vat broken down into separate vat rates.
+     *
+     *   Each entry is keyed by íts vat rate (%.3f formatted to get correct
+     *   comparisons on equality) and contains an array with the following
+     *   information:
+     *   - 'vatrate' => the vat rate,
+     *   - 'vatamount' => vat amount on all lines having this vat rate.
+     *   - 'amount' => amount (ex vat) of all lines having this vat rate,
+     *   - 'count' => number of lines having this vat rate.
      */
-    private $vatBreakdown;
-
-    /** @var \Siel\Acumulus\Invoice\Source */
-    protected $source;
+    private array $vatBreakdown;
+    protected Source $source;
 
     public function __construct(
         Config $config,
@@ -144,7 +137,7 @@ abstract class CompletorStrategyBase
     }
 
     /**
-     * returns the amount of vat to divide over the lines
+     * Returns the amount of vat to divide over the lines
      */
     public function getVat2Divide(): float
     {
@@ -193,7 +186,7 @@ abstract class CompletorStrategyBase
      * 'meta-invoice-vatamount', 'meta-invoice-amountinc', or
      * 'meta-invoice-amount' must be known.
      */
-    protected function initAmounts()
+    protected function initAmounts(): void
     {
         $invoicePart = &$this->invoice[Tag::Customer][Tag::Invoice];
         $this->vatAmount = $invoicePart[Meta::InvoiceVatAmount] ?? $invoicePart[Meta::InvoiceAmountInc] - $invoicePart[Meta::InvoiceAmount];
@@ -220,7 +213,7 @@ abstract class CompletorStrategyBase
     /**
      * Initializes $this->lines2Complete with all strategy lines.
      */
-    protected function initLines2Complete()
+    protected function initLines2Complete(): void
     {
         $this->linesCompleted = [];
         $this->lines2Complete = [];
@@ -236,7 +229,7 @@ abstract class CompletorStrategyBase
      * Initializes $this->vatBreakdown with a breakdown of vat rates and amounts
      * occurring on the invoice (and not being strategy lines).
      */
-    protected function initVatBreakdown()
+    protected function initVatBreakdown(): void
     {
         $this->vatBreakdown = [];
 
@@ -271,7 +264,7 @@ abstract class CompletorStrategyBase
         }
 
         // Sort high to low.
-        usort($this->vatBreakdown, function ($a, $b) {
+        usort($this->vatBreakdown, static function ($a, $b) {
             return $b['count'] <=> $a['count'];
         });
     }
@@ -358,7 +351,7 @@ abstract class CompletorStrategyBase
      *
      * This base implementation does nothing.
      */
-    protected function init()
+    protected function init(): void
     {
     }
 
@@ -431,12 +424,10 @@ abstract class CompletorStrategyBase
      * taxed with the $lowVatRate and the 2nd amount is taxed with the
      * $highVatRate, the sum of the 2 vat amounts add up to the given vat amount.
      *
-     * @param float $amount
-     * @param float $vatAmount
      * @param float $lowVatRate
-     *   Percentage between 0 and 100.
+     *   Percentage as a value between 0 and 100.
      * @param float $highVatRate
-     *   Percentage between 0 and 100.
+     *   Percentage as a value between 0 and 100.
      *
      * @return float[]
      *   A numerically indexed array with the amount for the low vat rate and

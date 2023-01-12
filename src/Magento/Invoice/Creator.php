@@ -1,14 +1,29 @@
 <?php
 /**
- * @noinspection PhpClassConstantAccessedViaChildClassInspection
+ * Although we would like to use strict equality, i.e. including type equality,
+ * unconditionally changing each comparison in this file will lead to problems
+ * - API responses return each value as string, even if it is an int or float.
+ * - The shop environment may be lax in its typing by, e.g. using strings for
+ *   each value coming from the database.
+ * - Our own config object is type aware, but, e.g, uses string for a vat class
+ *   regardless the type for vat class ids as used by the shop itself.
+ * So for now, we will ignore the warnings about non strictly typed comparisons
+ * in this code, and we won't use strict_types=1.
+ * @noinspection TypeUnsafeComparisonInspection
+ * @noinspection PhpMissingStrictTypesDeclarationInspection
+ * @noinspection PhpStaticAsDynamicMethodCallInspection
  */
 
 namespace Siel\Acumulus\Magento\Invoice;
 
 use Magento\Catalog\Model\Product;
 use Magento\Customer\Model\Customer;
+use Magento\Sales\Model\Order;
+use Magento\Sales\Model\Order\Creditmemo;
 use Magento\Sales\Model\Order\Creditmemo\Item as CreditmemoItem;
+use Magento\Sales\Model\Order\Invoice;
 use Magento\Sales\Model\Order\Item;
+use Magento\Sales\Model\ResourceModel\Order\Invoice\Collection;
 use Magento\Tax\Model\ClassModel as TaxClass;
 use Magento\Tax\Model\Config as MagentoTaxConfig;
 use Siel\Acumulus\Config\Config;
@@ -21,20 +36,17 @@ use Siel\Acumulus\Tag;
 /**
  * Allows creating arrays in the Acumulus invoice structure from a Magento
  * order or credit memo.
+ *
+ * @property \Siel\Acumulus\Magento\Invoice\Source $invoiceSource
+ *
+ * @noinspection EfferentObjectCouplingInspection
  */
 class Creator extends BaseCreator
 {
-    /** @var \Magento\Sales\Model\Order */
-    protected $order;
-
-    /** @var \Magento\Sales\Model\Order\Creditmemo */
-    protected $creditNote;
-
-    /** @var \Magento\Sales\Model\ResourceModel\Order\Invoice\Collection */
-    protected $shopInvoices;
-
-    /** @var \Magento\Sales\Model\Order\Invoice */
-    protected $shopInvoice;
+    protected Order $order;
+    protected ?Creditmemo $creditNote;
+    protected Collection $shopInvoices;
+    protected ?Invoice $shopInvoice;
 
     /**
      * {@inheritdoc}
@@ -42,7 +54,7 @@ class Creator extends BaseCreator
      * This override also initializes Magento specific properties related to the
      * source.
      */
-    protected function setInvoiceSource(\Siel\Acumulus\Invoice\Source $invoiceSource)
+    protected function setInvoiceSource(\Siel\Acumulus\Invoice\Source $invoiceSource): void
     {
         parent::setInvoiceSource($invoiceSource);
         switch ($this->invoiceSource->getType()) {
@@ -62,7 +74,7 @@ class Creator extends BaseCreator
     /**
      * {@inheritdoc}
      */
-    protected function setPropertySources()
+    protected function setPropertySources(): void
     {
         parent::setPropertySources();
 
@@ -100,8 +112,11 @@ class Creator extends BaseCreator
 
     /**
      * Returns an item line for 1 main product line.
+     *
+     * @noinspection PhpComplexFunctionInspection
+     * @noinspection PhpFunctionCyclomaticComplexityInspection
      */
-    protected function getItemLineOrder(Item $item, $isChild = false): ?array
+    protected function getItemLineOrder(Item $item, bool $isChild = false): ?array
     {
         $result = [];
 
@@ -363,8 +378,7 @@ class Creator extends BaseCreator
         $orderItemId = $item->getOrderItemId();
         $vat_rate = null;
         if (!empty($orderItemId)) {
-            $orderItem = $item->getOrderItem();
-            $vat_rate = $orderItem->getTaxPercent();
+            $vat_rate = $item->getOrderItem()->getTaxPercent();
         }
         $lineVat = -(float) $item->getBaseTaxAmount();
         if (!Number::isZero($item->getBaseDiscountAmount())) {

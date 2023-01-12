@@ -1,10 +1,15 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Invoice\CompletorStrategy;
 
 use Siel\Acumulus\Helpers\Number;
 use Siel\Acumulus\Invoice\CompletorStrategyBase;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
+
+use function count;
 
 /**
  * Class TryAllTaxRatePermutations implements a vat completor strategy by trying
@@ -13,28 +18,25 @@ use Siel\Acumulus\Tag;
  * Current known usages:
  * - ???
  *
- * @noinspection PhpUnused : instantiated via a variable containing the name.
+ * @noinspection PhpUnused
+ *   Instantiated via a variable containing the name.
  */
 class TryAllVatRatePermutations extends CompletorStrategyBase
 {
     /**
      * This strategy should be tried last after lines that may be split and
      * could be split, have been split.
-     *
-     * @var int
      */
-    public static $tryOrder = 50;
+    public static int $tryOrder = 50;
 
     /** @var float[] */
-    protected $vatRates;
-
-    /** @var int */
-    protected $countLines;
+    protected array $vatRates;
+    protected int $countLines;
 
     /**
      * {@inheritdoc}
      */
-    public function execute(): bool
+    protected function execute(): bool
     {
         $this->countLines = count($this->lines2Complete);
 
@@ -56,7 +58,7 @@ class TryAllVatRatePermutations extends CompletorStrategyBase
     /**
      * Initializes the array of vat rates to use for this permutation.
      */
-    protected function setVatRates(float $vatType, bool $include0)
+    protected function setVatRates(float $vatType, bool $include0): void
     {
         $this->vatRates = [];
         foreach ($this->possibleVatRates as $vatRate) {

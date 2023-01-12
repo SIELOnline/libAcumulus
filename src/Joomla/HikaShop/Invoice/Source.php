@@ -1,26 +1,30 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Joomla\HikaShop\Invoice;
 
 use hikashopOrderClass;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Invoice\Source as BaseSource;
 use Siel\Acumulus\Meta;
+use stdClass;
+
+use function in_array;
 
 /**
  * Wraps a HikaShop order in an invoice source object.
+ *
+ * @property object $order
  */
 class Source extends BaseSource
 {
-    // More specifically typed properties.
-    /** @var object */
-    protected $source;
-
     /**
      * Loads an Order source for the set id.
      *
      * @noinspection PhpUnused : called via setSource().
      */
-    protected function setSourceOrder()
+    protected function setSourceOrder(): void
     {
         /** @var hikashopOrderClass $class */
         $class = hikashop_get('class.order');
@@ -32,7 +36,7 @@ class Source extends BaseSource
      *
      * @noinspection PhpUnused : called via setId().
      */
-    protected function setIdOrder()
+    protected function setIdOrder(): void
     {
         $this->id = $this->source->order_id;
     }
@@ -70,10 +74,7 @@ class Source extends BaseSource
      */
     public function getPaymentMethod()
     {
-        if (isset($this->source->order_payment_id)) {
-            return $this->source->order_payment_id;
-        }
-        return parent::getPaymentMethod();
+        return $this->source->order_payment_id ?? parent::getPaymentMethod();
     }
 
     /**
@@ -84,7 +85,7 @@ class Source extends BaseSource
         /** @var \hikashopConfigClass $config */
         $config = hikashop_config();
         $unpaidStatuses = explode(',', $config->get('order_unpaid_statuses', 'created'));
-        return in_array($this->source->order_status, $unpaidStatuses)
+        return in_array($this->source->order_status, $unpaidStatuses, true)
             ? Api::PaymentStatus_Due
             : Api::PaymentStatus_Paid;
     }
@@ -110,7 +111,9 @@ class Source extends BaseSource
             $config = hikashop_config();
             $unpaidStatuses = explode(',', $config->get('order_unpaid_statuses', 'created'));
             foreach ($this->source->history as $history) {
-                if (!empty($history->history_new_status) && !in_array($history->history_new_status, $unpaidStatuses)) {
+                if (!empty($history->history_new_status)
+                    && !in_array($history->history_new_status, $unpaidStatuses, true)
+                ) {
                     $date = $history->history_created;
                 }
             }
@@ -140,7 +143,7 @@ class Source extends BaseSource
     {
         $result = [];
         if (!empty($this->source->order_currency_info)) {
-            $currency = unserialize($this->source->order_currency_info);
+            $currency = unserialize($this->source->order_currency_info, ['allowed_classes' => stdClass::class]);
             $result = [
                 Meta::Currency => $currency->currency_code,
                 Meta::CurrencyRate => (float) $currency->currency_rate,

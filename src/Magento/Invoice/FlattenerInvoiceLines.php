@@ -1,4 +1,19 @@
 <?php
+/**
+ * Although we would like to use strict equality, i.e. including type equality,
+ * unconditionally changing each comparison in this file will lead to problems
+ * - API responses return each value as string, even if it is an int or float.
+ * - The shop environment may be lax in its typing by, e.g. using strings for
+ *   each value coming from the database.
+ * - Our own config object is type aware, but, e.g, uses string for a vat class
+ *   regardless the type for vat class ids as used by the shop itself.
+ * So for now, we will ignore the warnings about non strictly typed comparisons
+ * in this code, and we won't use strict_types=1.
+ * @noinspection TypeUnsafeComparisonInspection
+ * @noinspection PhpMissingStrictTypesDeclarationInspection
+ * @noinspection PhpStaticAsDynamicMethodCallInspection
+ */
+
 namespace Siel\Acumulus\Magento\Invoice;
 
 use Siel\Acumulus\Helpers\Number;
@@ -22,19 +37,18 @@ class FlattenerInvoiceLines extends BaseFlattenerInvoiceLines
      * We keep the info on the parent and remove it from the children to prevent
      * accounting amounts twice.
      */
-    protected function correctInfoBetweenParentAndChildren(array &$parent, array &$children)
+    protected function correctInfoBetweenParentAndChildren(array &$parent, array &$children): void
     {
         parent::correctInfoBetweenParentAndChildren($parent, $children);
 
         $useParentInfo = false;
         $vatRates = $this->getAppearingVatRates($children);
         if (count($vatRates) === 1) {
-            reset($vatRates);
-            $childrenVatRate = key($vatRates);
-            if ((Number::isZero($childrenVatRate) || $childrenVatRate == $parent[Tag::VatRate])) {
-                if (!Number::isZero($parent[Tag::UnitPrice])) {
-                    $useParentInfo = true;
-                }
+            $childrenVatRate = array_key_first($vatRates);
+            if ((Number::isZero($childrenVatRate) || $childrenVatRate == $parent[Tag::VatRate])
+                && !Number::isZero($parent[Tag::UnitPrice])
+            ) {
+                $useParentInfo = true;
             }
         }
 

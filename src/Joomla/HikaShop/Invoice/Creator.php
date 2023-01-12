@@ -1,7 +1,10 @@
 <?php
 /**
+ * @noinspection StaticInvocationViaThisInspection
  * @noinspection PhpClassConstantAccessedViaChildClassInspection
  */
+
+declare(strict_types=1);
 
 namespace Siel\Acumulus\Joomla\HikaShop\Invoice;
 
@@ -13,9 +16,13 @@ use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Tag;
 use stdClass;
 
+use function count;
+use function func_num_args;
+use function is_array;
+use function is_string;
+
 /**
- * Allows creating arrays in the Acumulus invoice structure from a HikaShop
- * order
+ * Creates a raw version of the Acumulus invoice from a HikaShop {@see Source}.
  *
  * Notes:
  * - HikaShop knows discounts in the form of coupons or unrestricted discounts.
@@ -30,19 +37,13 @@ use stdClass;
  */
 class Creator extends BaseCreator
 {
-    /**
-     * @var object
-     */
-    protected $order;
-
+    protected object $order;
     /**
      * Precision of amounts stored in HS. In HS you can enter either the price
      * inc or ex vat. The other amount will be calculated and stored with 5
      * digits precision. So 0.0001 is on the pessimistic side.
-     *
-     * @var float
      */
-    protected $precision = 0.0002;
+    protected float $precision = 0.0002;
 
     /**
      * {@inheritdoc}
@@ -50,7 +51,7 @@ class Creator extends BaseCreator
      * This override also initializes HS specific properties related to the
      * source.
      */
-    protected function setInvoiceSource(\Siel\Acumulus\Invoice\Source $invoiceSource)
+    protected function setInvoiceSource(\Siel\Acumulus\Invoice\Source $invoiceSource): void
     {
         parent::setInvoiceSource($invoiceSource);
         $this->order = $this->invoiceSource->getSource();
@@ -59,7 +60,7 @@ class Creator extends BaseCreator
     /**
      * {@inheritdoc}
      */
-    protected function setPropertySources()
+    protected function setPropertySources(): void
     {
         parent::setPropertySources();
         if (!empty($this->order->billing_address)) {
@@ -85,6 +86,8 @@ class Creator extends BaseCreator
      * @param stdClass $item
      *
      * @return array
+     *
+     * @noinspection PhpFunctionCyclomaticComplexityInspection
      */
     protected function getItemLine(stdClass $item): array
     {
@@ -381,7 +384,7 @@ class Creator extends BaseCreator
                     }
                     if (!Number::floatsAreEqual($shippingMethodAmountIncTotal, $price->price_with_tax)) {
                         // Problem: rates have probably changed.
-                        $this->$this->addWarning($result[count($result) - 1],
+                        $this->addWarning($result[count($result) - 1],
                             'Amounts for this shipping method do not add up: rates have probably changed.'
                             . ' (order_shipping_params->prices = '
                             . json_encode($this->order->order_shipping_params->prices, Meta::JsonFlags)

@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\OpenCart\Invoice;
 
 use Siel\Acumulus\Api;
@@ -6,22 +9,26 @@ use Siel\Acumulus\Invoice\Source as BaseSource;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\OpenCart\Helpers\Registry;
 
+use function in_array;
+use function strlen;
+
 /**
  * Wraps an OpenCart order in an invoice source object.
+ *
+ * @property array $source
  */
 class Source extends BaseSource
 {
-    // More specifically typed properties.
-    /** @var array */
-    protected $source;
-
-    /** @var array[] List of OpenCart order total records. */
-    protected $orderTotalLines = null;
+    /**
+     * @var array[]
+     *   List of OpenCart order total records.
+     */
+    protected array $orderTotalLines;
 
     /**
      * {@inheritdoc}
      */
-    protected function setSource()
+    protected function setSource(): void
     {
         /** @noinspection PhpUnhandledExceptionInspection */
         $this->source = $this->getRegistry()->getOrder($this->id);
@@ -30,7 +37,7 @@ class Source extends BaseSource
     /**
      * Sets the id based on the loaded Order.
      */
-    protected function setId()
+    protected function setId(): void
     {
         $this->id = $this->source['order_id'];
     }
@@ -68,10 +75,7 @@ class Source extends BaseSource
      */
     public function getPaymentMethod()
     {
-        if (isset($this->source['payment_code'])) {
-            return $this->source['payment_code'];
-        }
-        return parent::getPaymentMethod();
+        return $this->source['payment_code'] ?? parent::getPaymentMethod();
     }
 
     /**
@@ -87,7 +91,9 @@ class Source extends BaseSource
         // completed...
         $orderStatuses = (array) $this->getRegistry()->config->get('config_complete_status');
 
-        return (empty($orderStatuses) || in_array($this->source['order_status_id'], $orderStatuses)) ? Api::PaymentStatus_Paid : Api::PaymentStatus_Due;
+        return (empty($orderStatuses) || in_array($this->source['order_status_id'], $orderStatuses, true))
+            ? Api::PaymentStatus_Paid
+            : Api::PaymentStatus_Due;
     }
 
     /**
@@ -95,7 +101,8 @@ class Source extends BaseSource
      */
     public function getPaymentDate(): ?string
     {
-        // @todo: Can we determine this based on history (and optionally payment_code)?
+        // @todo
+        //  Can we determine this based on history (and optionally payment_code)?
         // Will default to the issue date.
         return null;
     }
@@ -152,7 +159,7 @@ class Source extends BaseSource
      */
     public function getOrderTotalLines(): array
     {
-        if (!$this->orderTotalLines) {
+        if (!isset($this->orderTotalLines)) {
             $this->orderTotalLines = $this->getOrderModel()->getOrderTotals($this->source['order_id']);
         }
         return $this->orderTotalLines;

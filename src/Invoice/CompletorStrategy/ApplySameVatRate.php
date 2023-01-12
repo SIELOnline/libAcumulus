@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Invoice\CompletorStrategy;
 
 use Siel\Acumulus\Helpers\Number;
@@ -23,7 +26,8 @@ use Siel\Acumulus\Tag;
  * Current known usages:
  * - Magento free shipping lines.
  *
- * @noinspection PhpUnused : instantiated via a variable containing the name.
+ * @noinspection PhpUnused
+ *   Instantiated via a variable containing the name.
  */
 class ApplySameVatRate extends CompletorStrategyBase
 {
@@ -32,7 +36,7 @@ class ApplySameVatRate extends CompletorStrategyBase
      *
      * @var int
      */
-    public static $tryOrder = 30;
+    public static int $tryOrder = 30;
 
     /**
      * {@inheritdoc}

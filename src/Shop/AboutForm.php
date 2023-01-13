@@ -14,6 +14,7 @@ use Siel\Acumulus\Helpers\Message;
 use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Helpers\Translator;
 
+use function count;
 use function is_string;
 
 /**
@@ -45,11 +46,11 @@ class AboutForm
     /**
      * Loads the translations for the info block.
      */
-    protected function loadAboutBlockTranslations(): void
+    protected function loadAboutFormTranslations(): void
     {
         static $translationsAdded = false;
         if (!$translationsAdded) {
-            $this->translator->add(new AboutBlockTranslations());
+            $this->translator->add(new AboutFormTranslations());
             $translationsAdded = true;
         }
     }
@@ -120,7 +121,7 @@ class AboutForm
      */
     public function getAboutBlock(?bool $accountStatus, string $wrapperType): array
     {
-        $this->loadAboutBlockTranslations();
+        $this->loadAboutFormTranslations();
         $fields = [];
 
         $contract = $this->getContractList($accountStatus);
@@ -427,7 +428,7 @@ class AboutForm
     {
         /** @noinspection DuplicatedCode  also used in CrashReporter::arrayToList */
         $result = '';
-        if (!empty($list)) {
+        if (count($list) !== 0) {
             foreach ($list as $key => $line) {
                 if (is_string($key) && !ctype_digit($key)) {
                     $key = $this->t($key);

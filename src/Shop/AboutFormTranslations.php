@@ -12,7 +12,7 @@ use Siel\Acumulus\Helpers\TranslationCollection;
 /**
  * Contains translations for the "About" section on the Acumulus forms.
  */
-class AboutBlockTranslations extends TranslationCollection
+class AboutFormTranslations extends TranslationCollection
 {
     protected array $nl = [
         // About block.

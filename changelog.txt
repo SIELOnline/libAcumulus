@@ -86,14 +86,15 @@ Bugs:
 - We do no longer throw an exception when the HTTP status code and the response
   status are inconsistent. The Acumulus API can return inconsistent status codes
   for some calls.
-- We do no longer require float values to be strict floats, but they must be
-  convertible to float (in a rather strict sense). This will prevent errors like
-  TypeError: Argument 2 passed to Number::floatsAreEqual() must be of the type
-  float, string given, defined in Number.php:76.
+- Number class: We do no longer require float values to be strict floats, but
+  they must be convertible to float (in a rather strict sense). This will
+  prevent errors like TypeError: Argument 2 passed to Number::floatsAreEqual()
+  must be of the type float, string given, defined in Number.php:76.
 
 Refactorings:
 - Copied (and improved) class Token to Field and added tests for it. However,
   this new class is not yet used in the rest of the code.
+- Renamed AboutBlockTranslations to AboutFormTranslations.
 
 7.5.0 (2022-12-09)
 ------------------

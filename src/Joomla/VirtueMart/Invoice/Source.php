@@ -170,8 +170,8 @@ class Source extends BaseSource
     protected function getAvailableTotals(): array
     {
         return [
-            Meta::InvoiceAmountInc => $this->source['details']['BT']->order_total,
-            Meta::InvoiceVatAmount => $this->source['details']['BT']->order_billTaxAmount,
+            Meta::InvoiceAmountInc => (float) $this->source['details']['BT']->order_total,
+            Meta::InvoiceVatAmount => (float) $this->source['details']['BT']->order_billTaxAmount,
         ];
     }
 

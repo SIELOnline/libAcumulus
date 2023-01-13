@@ -202,12 +202,17 @@ class Source extends BaseSource
      *
      * This override provides the values meta-invoice-amountinc and
      * meta-invoice-vatamount.
+     *
+     * @noinspection PhpCastIsUnnecessaryInspection
+     *   WooCommerce is not so strict when it comes to documenting its "@return"
+     *   types. So many return values advertised as float, will be strings
+     *   representing a float.
      */
     protected function getAvailableTotals(): array
     {
         return [
-            Meta::InvoiceAmountInc => $this->source->get_total(),
-            Meta::InvoiceVatAmount => $this->source->get_total_tax(),
+            Meta::InvoiceAmountInc => (float) $this->source->get_total(),
+            Meta::InvoiceVatAmount => (float) $this->source->get_total_tax(),
         ];
     }
 

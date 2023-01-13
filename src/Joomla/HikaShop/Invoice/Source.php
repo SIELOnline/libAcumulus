@@ -171,7 +171,7 @@ class Source extends BaseSource
             }
         }
         return [
-            Meta::InvoiceAmountInc => $this->source->order_full_price,
+            Meta::InvoiceAmountInc => (float) $this->source->order_full_price,
             Meta::InvoiceVatAmount => $vatAmount,
         ];
     }

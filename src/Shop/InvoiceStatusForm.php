@@ -1,12 +1,10 @@
 <?php
 /**
+ * @noinspection PhpLackOfCohesionInspection
  * @noinspection EfferentObjectCouplingInspection
- */
-
-/**
+ * @noinspection PhpClassHasTooManyDeclaredMembersInspection
  * @noinspection PhpUnnecessaryLocalVariableInspection
  * @noinspection PhpConcatenationWithEmptyStringCanBeInlinedInspection
- * @noinspection PhpClassHasTooManyDeclaredMembersInspection
  */
 
 declare(strict_types=1);
@@ -1020,8 +1018,8 @@ class InvoiceStatusForm extends Form
             // @todo: invoice status form:
             //   - getEntry API call also handles other foreign vat?
             //   - $entry['foreignvat'] what does it contain for UK invoice?
-            $amountExAcumulus = $entry['totalvalueexclvat'];
-            $amountIncAcumulus = $entry['totalvalue'];
+            $amountExAcumulus = (float) $entry['totalvalueexclvat'];
+            $amountIncAcumulus = (float) $entry['totalvalue'];
             $amountVatAcumulus = $amountIncAcumulus - $amountExAcumulus;
             if ($entry['foreignvat']) {
                 $vatType = $this->t('foreign_vat');
@@ -1181,13 +1179,13 @@ class InvoiceStatusForm extends Form
             ];
         }
 
-        if (!empty($actions) || !empty($links)) {
+        if (count($actions) !== 0 || count($links) !== 0) {
             $result['documents'] = [
                 'type' => 'collection',
                 'label' => $this->t(count($links) === 1 ? 'document' : 'documents'),
                 'fields' => [],
             ];
-            if (!empty($links)) {
+            if (count($links) !== 0) {
                 $result['documents']['fields']['linksBefore'] = [
                     'type' => 'markup',
                     'value' => '<div class="acumulus-links">',
@@ -1198,7 +1196,7 @@ class InvoiceStatusForm extends Form
                     'value' => '</div>',
                 ];
             }
-            if (!empty($actions)) {
+            if (count($actions) !== 0) {
                 $result['documents']['fields'] += $actions;
             }
         }
@@ -1345,7 +1343,7 @@ class InvoiceStatusForm extends Form
      */
     protected function sanitiseEntry(array $entry): array
     {
-        if (!empty($entry)) {
+        if (count($entry) !== 0) {
             $result = [];
             $result['entryid'] = $this->sanitiseIntValue($entry, 'entryid');
             $result['token'] = $this->sanitiseStringValue($entry, 'token', '/^[a-zA-Z\d]{32}$/');
@@ -1398,7 +1396,7 @@ class InvoiceStatusForm extends Form
      */
     protected function sanitiseConceptInfo(array $conceptInfo): ?array
     {
-        if (!empty($conceptInfo)) {
+        if (count($conceptInfo) !== 0) {
             $result = [];
             $result['conceptid'] = $this->sanitiseIntValue($conceptInfo, 'conceptid');
             $result['entryid'] = $this->sanitiseIntValue($conceptInfo, 'entryid', true);

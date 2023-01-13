@@ -10,9 +10,9 @@ System Requirements
   * Minimum version: 7.4, older versions WILL fail.
   * Recommended version: 8.0, soon - probably plugin version 8.0, this will
     become the minimally required version and older versions WILL fail.
-  * Note: due to an error in plugin version 7.2, all PHP versions below 7.4 WILL
+  * Note: due to an error in plugin version 7.2, all PHP versions below 7.4 will
     already fail in that plugin version (solved in plugin version 7.3.0)
-  * Note: See the PHP  versions table furthe below. for which PHP version can be
+  * Note: See the PHP versions table further below. for which PHP version can be
     used for which shop.
 - Database:
   * MySql: 5.6 or later.
@@ -80,7 +80,7 @@ Notes:
 | WC  | 7.1.0             | ✔   | ✔   | ❓   | Many warnings from other plugins |
 
 
-7.6.0 (202?-??-??)
+7.6.0 (2023-01-??)
 ------------------
 Bugs:
 - We do no longer throw an exception when the HTTP status code and the response
@@ -92,6 +92,15 @@ Bugs:
   must be of the type float, string given, defined in Number.php:76.
 
 Refactorings:
+- Introduced PHP 7.4 syntax constructions all over the code. So running an older
+  version of PHP is guaranteed to fail fatally (before we can warn you with a
+  warning message.
+- We are now using "declare(strict_types=1);" in almost all source files. This
+  will almost certainly lead to fatal errors that were not discovered during
+  testing. During testing we discovered a number of places where strings
+  representing a float (or integer) are returned and that are now explicitly
+  cast to a float. However, we probably did not find all those places, so errors
+  might occur.
 - Copied (and improved) class Token to Field and added tests for it. However,
   this new class is not yet used in the rest of the code.
 - Renamed AboutBlockTranslations to AboutFormTranslations.
@@ -1734,7 +1743,7 @@ Changes:
   * Event InvoiceCompleted hernoemd naar InvoiceSendBefore.
   * Event InvoiceSent hernoemd naar InvoiceSendAfter.
     (Noot: de webshop specifieke events/filters/... die worden aangeroepen
-	volgen de naamgeving zoals gebruikelijk in die webshop).
+    volgen de naamgeving zoals gebruikelijk in die webshop).
   * Parametervolgorde van de events InvoiceCreated InvoiceSendBefore
     veranderd.
   * InvoiceSendAfter event wordt nu aangeroepen voor het mailen van het

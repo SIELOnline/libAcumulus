@@ -351,7 +351,7 @@ class Acumulus
      * See {@link https://www.siel.nl/acumulus/API/Reports/EU_eCommerce_Threshold/}
      *
      * @param int|null $year
-     *   The year to get a report for. Leave empty for the current year.
+     *   The year to get a report for or null for the current year.
      *
      * @return AcumulusResult
      *   The result of the webservice call. The structured response will contain
@@ -810,7 +810,13 @@ class Acumulus
      * @noinspection PhpUnusedParameterInspection
      * @todo: not used for now, will become part of emailAsPdf structure?
      */
-    public function emailInvoiceAsPdf(string $token, array $emailAsPdf, ?int $invoiceType = null, string $invoiceNotes = '', ?bool $applyGraphics = null): AcumulusResult
+    public function emailInvoiceAsPdf(
+        string $token,
+        array $emailAsPdf,
+        ?int $invoiceType = null,
+        string $invoiceNotes = '',
+        ?bool $applyGraphics = null
+    ): AcumulusResult
     {
         $message = [
             'token' => $token,
@@ -886,8 +892,12 @@ class Acumulus
      * @noinspection PhpUnusedParameterInspection
      * @todo: not used for now, will become part of emailAsPdf structure?
      */
-    public function emailPackingSlipAsPdf(string $token, array $emailAsPdf, string $deliveryNotes = '', ?bool $applyGraphics = null): AcumulusResult
-    {
+    public function emailPackingSlipAsPdf(
+        string $token,
+        array $emailAsPdf,
+        string $deliveryNotes = '',
+        ?bool $applyGraphics = null
+    ): AcumulusResult {
         $message = [
             'token' => $token,
             'emailaspdf' => $emailAsPdf,

@@ -134,8 +134,7 @@ abstract class Creator
      * @var array
      *   Resulting Acumulus invoice.
      *
-     * @todo
-     *   This really should become an object that can be passed around like
+     * @todo: This really should become an object that can be passed around like
      *   Source. We could add a lot of simple query methods to this object. And
      *   if we are going to extract groups of methods into separate "knowledge"
      *   classes, it will be easier to pass it around. To keep current code
@@ -924,8 +923,7 @@ abstract class Creator
      *
      * @return bool
      *
-     * @todo
-     *   Remove margin scheme handling from (plugin specific) creators and
+     * @todo: Remove margin scheme handling from (plugin specific) creators and
      *   move it to the completor phase. This will aid in simplifying the
      *   creators towards raw data collectors.
      */
@@ -1119,10 +1117,9 @@ abstract class Creator
      *   - 'meta-vatrate-max'
      *   - 'meta-vatamount-precision'
      *   - 'meta-vatrate-source'
-     * @todo
-     *   Can we move this from the (plugin specific) creators to the completor
-     *   phase? This would aid in simplifying the creators towards raw data
-     *   collectors.
+     * @todo: Can we move this from the (plugin specific) creators to the
+     *   completor phase? This would aid in simplifying the creators towards raw
+     *   data collectors.
      */
     public static function getVatRangeTags(
         float $numerator,

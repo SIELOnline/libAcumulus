@@ -475,7 +475,7 @@ class Creator extends BaseCreator
      */
     protected function getPaymentFeeLine(): array
     {
-        // @todo check (return on refund?)
+        // @todo: check (return on refund?)
         $result = [];
         if (!Number::isZero($this->order->order_payment_price)) {
             $paymentInc = (float) $this->order->order_payment_price;

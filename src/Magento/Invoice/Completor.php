@@ -27,8 +27,7 @@ class Completor extends BaseCompletor
     /**
      * {@inheritdoc}
      *
-     * @todo
-     *   Still the same in Magento 2?
+     * @todo: Still the same in Magento 2?
      * !Magento bug!
      * In credit memos, the discount amount from discount lines may differ from
      * the summed discount amounts per line. This occurs because refunded

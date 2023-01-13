@@ -223,8 +223,7 @@ class Creator extends BaseCreator
      *   The tax class of the product. For the default tax class it can be
      *   'standard' or the empty string. For no tax class at all, it will be
      *   PluginConfig::VatClass_Null.
-     * @todo
-     *   can it be null?
+     * @todo: Can it be null?
      *
      * @return array
      *   An array with keys:
@@ -279,11 +278,11 @@ class Creator extends BaseCreator
      * @param \WC_Order_Item_Product $item
      * @param \WC_Product $product
      * @param array $commonTags
-          *   An array of tags from the parent product to add to the child lines.
+     *   An array of tags from the parent product to add to the child lines.
      *
      * @return array[]
      *   An array of lines that describes this variant.
-     *@todo: can $item->get_formatted_meta_data(''); be used to get this info?
+     * @todo: Can $item->get_formatted_meta_data(''); be used to get this info?
      */
     protected function getVariantLines(WC_Order_Item_Product $item, WC_Product $product, array $commonTags): array
     {
@@ -340,15 +339,20 @@ class Creator extends BaseCreator
                     $variantLabel = wc_attribute_label(wc_sanitize_taxonomy_name($meta->key));
                     $variantValue = $term->name ?? $meta->value;
                 } else {
-                    $variantLabel = apply_filters('woocommerce_attribute_label', wc_attribute_label($meta->key, $product), $meta->key, $product);
+                    $variantLabel = apply_filters(
+                        'woocommerce_attribute_label',
+                        wc_attribute_label($meta->key, $product),
+                        $meta->key,
+                        $product
+                    );
                     $variantValue = $meta->value;
                 }
 
-                // @todo: why a rawurldecode() here, is that a "filter" to apply?
+                // @todo: Why a rawurldecode() here, is that a "filter" to apply?
                 $result[] = [
                         Tag::Product => $variantLabel . ': ' . rawurldecode($variantValue),
                         Tag::UnitPrice => 0,
-                            ] + $commonTags;
+                    ] + $commonTags;
             }
         }
 
@@ -391,11 +395,11 @@ class Creator extends BaseCreator
         $feeVat = $item->get_total_tax() / $quantity;
 
         return [
-                   Tag::Product => $this->t($item->get_name()),
-                   Tag::UnitPrice => $feeEx,
-                   Tag::Quantity => $item->get_quantity(),
-                   Meta::Id => $item->get_id(),
-               ] + self::getVatRangeTags($feeVat, $feeEx, $this->precision, $this->precision);
+                Tag::Product => $this->t($item->get_name()),
+                Tag::UnitPrice => $feeEx,
+                Tag::Quantity => $item->get_quantity(),
+                Meta::Id => $item->get_id(),
+            ] + self::getVatRangeTags($feeVat, $feeEx, $this->precision, $this->precision);
     }
 
     /**
@@ -470,13 +474,13 @@ class Creator extends BaseCreator
         $precisionVat = 0.01;
 
         return [
-                   Tag::Product => $item->get_name(),
-                   Tag::UnitPrice => $shippingEx,
-                   Tag::Quantity => $quantity,
-                   Meta::Id => $item->get_id(),
-               ]
-               + self::getVatRangeTags($shippingVat, $shippingEx, $precisionVat, $precisionShippingEx)
-               + $vatLookupTags;
+                Tag::Product => $item->get_name(),
+                Tag::UnitPrice => $shippingEx,
+                Tag::Quantity => $quantity,
+                Meta::Id => $item->get_id(),
+            ]
+            + self::getVatRangeTags($shippingVat, $shippingEx, $precisionVat, $precisionShippingEx)
+            + $vatLookupTags;
     }
 
     /**
@@ -493,7 +497,7 @@ class Creator extends BaseCreator
      *   - Meta::VatRateLookup (*)
      *   - Meta::VatRateLookupLabel (*)
      *   - Meta::VatRateLookupSource (*)
-     *@see
+     * @see
      * getVatRateLookupMetadataByTaxClass()). Anyway, this method will only
      * return metadata if only 1 rate was found.
      */
@@ -578,9 +582,9 @@ class Creator extends BaseCreator
         if ($this->invoiceSource->getType() !== Source::CreditNote || $this->hasItemLines) {
             // Add a line for all coupons applied. Coupons are only stored on
             // the order, not on refunds, so use the order.
-	        /** @var \WC_Order $order */
+            /** @var \WC_Order $order */
             $order = $this->invoiceSource->getOrder()->getSource();
-	        $usedCoupons = $order->get_coupon_codes();
+            $usedCoupons = $order->get_coupon_codes();
             foreach ($usedCoupons as $code) {
                 $coupon = new WC_Coupon($code);
                 $result[] = $this->getDiscountLine($coupon);
@@ -617,7 +621,11 @@ class Creator extends BaseCreator
             if (in_array($coupon->get_discount_type(), ['fixed_product', 'fixed_cart'])) {
                 $amount = $this->invoiceSource->getSign() * $coupon->get_amount();
                 if (!Number::isZero($amount)) {
-                    $description .= sprintf('€%.2f (%s)', $amount, $this->productPricesIncludeTax() ? $this->t('inc_vat') : $this->t('ex_vat'));
+                    $description .= sprintf(
+                        '€%.2f (%s)',
+                        $amount,
+                        $this->productPricesIncludeTax() ? $this->t('inc_vat') : $this->t('ex_vat')
+                    );
                 }
                 if ($coupon->get_free_shipping()) {
                     if (!Number::isZero($amount)) {
@@ -693,7 +701,7 @@ class Creator extends BaseCreator
         // realistic. Note that there may be valid reasons that the price differs
         // from the actual price, e.g. a price change since the order was placed,
         // or a discount that has been applied to the item line.
-        if ($product instanceof WC_Product ) {
+        if ($product instanceof WC_Product) {
             $productPriceOrg = $product->get_price();
             if (Number::floatsAreEqual($productPriceInc, $productPriceOrg, 0.000051)) {
                 $reason = "item price inc ($productPriceInc) = product price inc ($productPriceOrg)";

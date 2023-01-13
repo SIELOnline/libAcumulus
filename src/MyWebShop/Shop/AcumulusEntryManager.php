@@ -15,7 +15,7 @@ use Siel\Acumulus\Shop\AcumulusEntryManager as BaseAcumulusEntryManager;
 /**
  * Implements the MyWebShop specific acumulus entry manager class.
  *
- * @todo:
+ * @todo: from the following list:
  * - Define the connection between this library and MyWebShop's database
  *   (e.g. OpenCart, PrestaShop) or model architecture (e.g. Magento).
  * - Implement the retrieval methods getByEntryId() and getByInvoiceSource().
@@ -28,7 +28,8 @@ use Siel\Acumulus\Shop\AcumulusEntryManager as BaseAcumulusEntryManager;
  *
  * SECURITY REMARKS
  * ----------------
- * @todo: document why this class is considered safe. Below is sample text from the PrestaShop module, so do not leave as is.
+ * @todo: document why this class is considered safe.
+ *   Below is sample text from the PrestaShop module, so do not leave as is.
  * In MyWebShop saving and querying acumulus entries is done via self
  * constructed queries, therefore this class takes care of sanitizing itself.
  * - Numbers are cast by using numeric formatters (like %u, %d, %f) with
@@ -46,7 +47,9 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     public function __construct(Container $container, Log $log)
     {
         parent::__construct($container, $log);
-        // @todo: Define the connection between this library and MyWebShop's database (e.g. OpenCart, PrestaShop) or model architecture (e.g. Magento).
+        // @todo: Define the connection between this library and MyWebShop's
+        //   database (e.g. OpenCart, PrestaShop) or model architecture (e.g.
+        //   Magento).
     }
 
     /**
@@ -54,7 +57,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      */
     public function getByEntryId(?int $entryId)
     {
-        // @todo
+        // @todo: provide implementation.
     }
 
     /**
@@ -62,7 +65,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      */
     public function getByInvoiceSource(Source $invoiceSource, bool $ignoreLock = true): ?AcumulusEntry
     {
-        // @todo
+        // @todo: provide implementation.
     }
 
     /**
@@ -102,7 +105,8 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      */
     public function install(): bool
     {
-        // @todo: adapt to the way MyWebShop lets you define tables. Just return true if this is done in a separate script.
+        // @todo: adapt to the way MyWebShop lets you define tables. Just return
+        // true if this is done in a separate script.
         /** @noinspection SqlNoDataSourceInspection */
         return $this->getDb()->execute("CREATE TABLE IF NOT EXISTS `$this->tableName` (
         `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,

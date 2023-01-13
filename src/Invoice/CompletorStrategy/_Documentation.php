@@ -29,6 +29,6 @@ namespace Siel\Acumulus\Invoice\CompletorStrategy;
  * When implementing a new extension, you probably should not have to override
  * or add a strategy, as most cases are already handled by this set.
  *
- * @todo: list all strategies including how it works and what plugins use it.
+ * @todo: list all strategies including how it works and which plugins use it.
  */
 interface _Documentation {}

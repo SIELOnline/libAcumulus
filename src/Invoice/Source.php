@@ -27,8 +27,7 @@ abstract class Source
 
     protected string $type;
     /**
-     * @todo
-     *   Make these an int resp. array|object, thus not null. This means, we
+     * @todo: Make these an int resp. array|object, thus not null. This means, we
      *   should probably throw when we cannot construct a valid instance
      */
     protected ?int $id;
@@ -43,8 +42,7 @@ abstract class Source
      * @param string $type
      * @param int|string|array|object $idOrSource
      *
-     * @todo
-     *   Throw an exception if we cannot find the source.
+     * @todo: Throw an exception if we cannot find the source.
      */
     public function __construct(string $type, $idOrSource)
     {

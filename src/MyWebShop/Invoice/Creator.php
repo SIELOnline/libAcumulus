@@ -10,7 +10,7 @@ use Siel\Acumulus\Tag;
  * Creates a raw version of the Acumulus invoice based on a MyWebShop invoice
  * source.
  *
- * @todo:
+ * @todo: from the following list:
  * - for reasons of readability (shorter expressions) and autocomplete in your
  *   IDE, you might want to introduce properties for the webshop order and/or
  *   refund.

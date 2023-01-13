@@ -53,8 +53,7 @@ use function strlen;
  *   adding price info) already implemented. You might have to override the
  *   flattener to select the strategy that applies to your shop.
  *
- * @todo
- *   shortly describe strategies and its methods to simplify overriding and
+ * @todo: Shortly describe strategies and its methods to simplify overriding and
  *   choosing the correct strategy.
  */
 class FlattenerInvoiceLines

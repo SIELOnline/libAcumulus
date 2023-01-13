@@ -659,7 +659,7 @@ class AcumulusResult extends MessageCollection
                     case 'stock':
                         // Stock add
                         // Search is on product id.
-                        // @todo
+                        // @todo: get the tag for this case
                         $result = $this->getByCodeTag('@todo') !== null;
                         break;
                     case '':

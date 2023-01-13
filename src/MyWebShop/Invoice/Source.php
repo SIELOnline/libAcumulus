@@ -8,7 +8,7 @@ use Siel\Acumulus\Meta;
 /**
  * Wraps a MyWebShop order or refund in an invoice source object.
  *
- * @todo:
+ *  @todo: from the following list:
  * - for reasons of autocomplete in your IDE, you might want to override the
  *   $source property and define its possible type(s) (using @var).
  * - setId(): override or implement both setIdOrder() and setIdCreditNote().
@@ -121,7 +121,7 @@ class Source extends BaseSource
      */
     public function getPaymentDate(): ?string
     {
-        // @todo
+        // @todo: provide implementation.
     }
 
     /**
@@ -129,7 +129,7 @@ class Source extends BaseSource
      */
     public function getCountryCode(): string
     {
-        // @todo
+        // @todo: provide implementation.
     }
 
     /**
@@ -140,7 +140,7 @@ class Source extends BaseSource
      */
     public function getCurrency(): array
     {
-        // @todo
+        // @todo: provide implementation.
         $result = [
             Meta::Currency => $this->source->currency_code,
             Meta::CurrencyRate => (float) $this->source->conversion_rate,
@@ -154,7 +154,7 @@ class Source extends BaseSource
      */
     protected function getAvailableTotals(): array
     {
-        // @todo
+        // @todo: provide implementation.
     }
 
     /**

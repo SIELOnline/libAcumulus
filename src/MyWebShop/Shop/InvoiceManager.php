@@ -13,7 +13,7 @@ use Siel\Acumulus\Invoice\InvoiceAddResult;
 /**
  * Implements the MyWebShop specific parts of the invoice manager.
  *
- * @todo:
+ * @todo: from the following list:
  * - Define the connection between this library and MyWebShop's database
  *   (e.g. OpenCart, PrestaShop) or model architecture (e.g. Magento).
  * - Implement the retrieval methods getInvoiceSourcesByIdRange(),
@@ -52,7 +52,7 @@ class InvoiceManager extends BaseInvoiceManager
         string $InvoiceSourceIdTo
     ): array
     {
-        // @todo
+        // @todo: provide implementation.
     }
 
     /**
@@ -64,7 +64,9 @@ class InvoiceManager extends BaseInvoiceManager
         string $invoiceSourceReferenceTo
     ): array
     {
-        // @todo: implement if MyWebShop has order/refund references (external facing) that differ from the (internal) ID. Otherwise remove this method.
+        // @todo: implement if MyWebShop has order/refund references (external
+        //   facing) that differ from the (internal) ID. Otherwise remove this
+        //   method.
     }
 
     /**
@@ -72,7 +74,7 @@ class InvoiceManager extends BaseInvoiceManager
      */
     public function getInvoiceSourcesByDateRange(string $invoiceSourceType, DateTime $dateFrom, DateTime $dateTo): array
     {
-        // @todo
+        // @todo: provide implementation.
     }
 
     /**

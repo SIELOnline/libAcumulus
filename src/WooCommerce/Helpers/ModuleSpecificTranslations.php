@@ -1,5 +1,6 @@
 <?php
 /**
+ * @noinspection LongLine
  * @noinspection HtmlUnknownTarget
  */
 
@@ -30,7 +31,7 @@ LET OP: het gaat er om of het product of de dienst btw-vrij is, uw bedrijf voor 
 Ook is er een verschil met het 0%%-tarief hieronder, Dit verschil zit hem met name in de mogelijkheid tot aftrek van voorbelasting.',
 
         // Invoice status overview: shorter labels due to very limited available space.
-        'vat_type' => 'Soort',
+        'vat_type' => 'soort',
         'foreign_vat' => 'EU btw',
         'foreign_national_vat' => '(EU) btw',
         'payment_status' => 'Status',
@@ -59,7 +60,7 @@ NOTE: this setting concerns whether the goods or services you offer are inherent
 Also note that VAT free differs from the 0%% VAT rate below. This difference mainly concerns the right to deduct VAT paid on your purchases.',
 
         // Invoice status overview: shorter labels due to available space.
-        'vat_type' => 'Type',
+        'vat_type' => 'type',
         'payment_status' => 'Status',
         'documents' => 'Pdfs',
         'document' => 'Pdf',

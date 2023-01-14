@@ -1,5 +1,6 @@
 <?php
 /**
+ * @noinspection LongLine
  * @noinspection HtmlUnknownTarget
  */
 
@@ -36,6 +37,7 @@ class ModuleTranslations extends TranslationCollection
         'button_cancel_uninstall' => 'Nee, alleen uitschakelen, bewaar data en instellingen',
         'button_cancel' => 'Annuleren',
 
+        // Documents.
         'documents' => 'Documenten',
         'document' => 'Document',
         'document_invoice' => 'factuur',
@@ -44,6 +46,18 @@ class ModuleTranslations extends TranslationCollection
         'document_mail' => '%1$s mailen',
         'document_show_title' => 'Acumulus %1$s openen in uw browser',
         'document_mail_title' => 'Acumulus %1$s mailen',
+
+        // Vat type.
+        'vat_type' => 'soort factuur',
+        'vat_type_1' => 'Normaal, Nederlandse btw',
+        'vat_type_2' => 'Btw-verlegd binnen Nederland',
+        'vat_type_3' => 'Btw-verlegd in de EU',
+        'vat_type_4' => 'Goederen buiten de EU',
+        'vat_type_5' => 'Margeregeling (2e-hands producten)',
+        'vat_type_6' => 'EU btw',
+        'vat_type_7' => 'Andere buitenlandse (b.v. GB) btw',
+        'field_euVatClasses' => 'Welke %1$s definiëren EU-btw-tarieven?',
+        'netherlands' => 'Nederland',
 
         'wait' => 'Even wachten',
 
@@ -85,6 +99,7 @@ class ModuleTranslations extends TranslationCollection
         'date_format' => 'yyyy-mm-dd',
         'crash_admin_message' => 'An error occurred. the error message has been logged and mailed. If the error keeps occurring, please contact support. Error message: %s',
 
+        // Documents.
         'documents' => 'Documents',
         'document' => 'Document',
         'document_invoice' => 'invoice',
@@ -93,6 +108,18 @@ class ModuleTranslations extends TranslationCollection
         'document_mail' => 'Mail %1$s',
         'document_show_title' => 'Open Acumulus %1$s in your browser',
         'document_mail_title' => 'Mail Acumulus %1$s',
+
+        // Vat type.
+        'vat_type' => 'invoice type',
+        'vat_type_1' => 'Normal, Dutch vat',
+        'vat_type_2' => 'Reversed vat within the Netherlands',
+        'vat_type_3' => 'Reversed vat within the EU',
+        'vat_type_4' => 'Goods outside the EU',
+        'vat_type_5' => 'Margin invoice (2nd hand goods)',
+        'vat_type_6' => 'EU vat',
+        'vat_type_7' => 'Other foreign (e.g. GB) vat',
+        'field_euVatClasses' => 'Which %1$s define EU vat rates?',
+        'netherlands' => 'the Netherlands',
 
         'wait' => 'Please wait',
     ];

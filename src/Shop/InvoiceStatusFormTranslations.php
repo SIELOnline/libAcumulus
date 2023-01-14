@@ -1,4 +1,7 @@
 <?php
+/**
+ * @noinspection LongLine
+ */
 
 declare(strict_types=1);
 
@@ -37,15 +40,6 @@ class InvoiceStatusFormTranslations extends TranslationCollection
         'unknown_action' => "Onbekende actie '%s'",
         'unknown_source' => 'Onbekende %s %u',
         'unknown_entry' => 'Onbekende Acumulus factuur voor %s %u',
-
-        // Vat type.
-        'vat_type' => 'Soort factuur',
-        'vat_type_1' => 'Normaal, Nederlandse btw',
-        'vat_type_2' => 'Btw-verlegd binnen Nederland',
-        'vat_type_3' => 'Btw-verlegd in de EU',
-        'vat_type_4' => 'Goederen buiten de EU',
-        'vat_type_5' => 'Margeregeling (2e-hands producten)',
-        'vat_type_6' => 'Buitenlandse (EU) btw',
 
         // Amounts.
         'invoice_amount' => 'Bedrag',
@@ -99,15 +93,6 @@ class InvoiceStatusFormTranslations extends TranslationCollection
         'unknown_action' => "Unknown action '%s'",
         'unknown_source' => 'Unknown %s %u',
         'unknown_entry' => 'Unknown Acumulus invoice for %s %u',
-
-        // Vat type.
-        'vat_type' => 'Invoice type',
-        'vat_type_1' => 'Normal, Dutch vat',
-        'vat_type_2' => 'Reversed vat within the Netherlands',
-        'vat_type_3' => 'Reversed vat within the EU',
-        'vat_type_4' => 'Goods outside the EU',
-        'vat_type_5' => 'Margin invoice (2nd hand goods)',
-        'vat_type_6' => 'Electronic services within the EU',
 
         // Amounts.
         'invoice_amount' => 'Amount',

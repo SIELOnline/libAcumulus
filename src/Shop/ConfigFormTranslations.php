@@ -1,5 +1,6 @@
 <?php
 /**
+ * @noinspection LongLine
  * @noinspection HtmlUnknownTarget
  */
 
@@ -106,7 +107,6 @@ class ConfigFormTranslations extends TranslationCollection
         'vat_class_not_applicable' => 'niet van toepassing',
         'vat_class_left_empty' => '%1$s laat ik leeg',
 
-        'field_euVatClasses' => 'Welke %1$s definiëren EU-btw-tarieven?',
         'desc_euVatClasses' => 'Geef aan welke van deze %1$s gebruikt worden wanneer u EU-btw berekent voor (niet btw-plichtige) EU-klanten.<br>
 • Kies de 1e optie ("%2$s") als u uw winkel (nog) niet hebt ingericht op deze regeling.<br>
 • M.b.v. de "Ctrl" toets kunt u meerdere %1$s kiezen of keuzes ongedaan maken.<br>
@@ -512,7 +512,6 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
         'vat_class_not_applicable' => 'not applicable',
         'vat_class_left_empty' => 'I leave the %1$s empty',
 
-        'field_euVatClasses' => 'Which %1$s define EU vat rates?',
         'desc_euVatClasses' => 'Indicate which of these %1$s are used when you charge EU VAT to (non vat subjected) EU customers.
 Select the 1st option ("%2$s") when you have not (yet) configured your shop to use EU vat.<br>
 Using the "Ctrl" key, you can select/deselect multiple %1$s.<br>

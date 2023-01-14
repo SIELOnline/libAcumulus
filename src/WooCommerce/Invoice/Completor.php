@@ -31,8 +31,11 @@ class Completor extends BaseCompletor
     /**
      * {@inheritdoc}
      *
-     * This override checks the is_vat_exempt metadata from the WooCommerce EU
-     * vat assistant plugin  to see if the invoice might be a reversed vat one.
+     * This override checks the:
+     * - 'is_vat_exempt' metadata from the "WooCommerce EU vat assistant" plugin
+     *   to see if the invoice might be a reversed vat one.
+     * - 'is_variable_eu_vat' metadata from the "EU/UK VAT Compliance for
+     *   WooCommerce" plugin to make a choice between vat types 6 and 1.
      */
     protected function guessVatType(array $possibleVatTypes): void
     {
@@ -46,7 +49,27 @@ class Completor extends BaseCompletor
                 && apply_filters('woocommerce_order_is_vat_exempt', $order->get_meta('is_vat_exempt') === 'yes', $order))
             {
                 $this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType] = Api::VatType_EuReversed;
-                $this->invoice[Tag::Customer][Tag::Invoice][Meta::VatTypeSource] = 'WooCommerce\Completor::guessVatType: order is vat exempt';
+                $this->invoice[Tag::Customer][Tag::Invoice][Meta::VatTypeSource]
+                    = 'WooCommerce\Completor::guessVatType: order is vat exempt';
+            }
+
+            if (in_array(Api::VatType_National, $possibleVatTypes,true)
+                && in_array(Api::VatType_EuVat, $possibleVatTypes, true)
+            ) {
+                $vatPaid = $order->get_meta('vat_compliance_vat_paid', true);
+                if (!empty($vatPaid)) {
+                    $vatPaid = maybe_unserialize($vatPaid);
+                    if (isset($vatPaid['by_rates']) && count($vatPaid['by_rates']) === 1) {
+                        $vat = reset($vatPaid['by_rates']);
+                        if (isset($vat['is_variable_eu_vat'])) {
+                            $this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType] = $vat['is_variable_eu_vat']
+                                ? Api::VatType_EuVat
+                                : Api::VatType_National;
+                            $this->invoice[Tag::Customer][Tag::Invoice][Meta::VatTypeSource]
+                                = 'WooCommerce\Completor::guessVatType: is_variable_eu_vat';
+                        }
+                    }
+                }
             }
         }
     }

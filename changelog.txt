@@ -113,13 +113,26 @@ Requirements:
 - PHP 8.2 has not yet been tested.
 
 Features:
+- ALL: changed the algorithm to determine the vat type of an invoice in the case
+  an EU country has the same vat rate(s) as the Netherlands. The old setting
+  'Which tax classes define EU vat rates?' defines the actual situation, not
+  necessarily the situation at the time when the invoice was created.
+- MA: Added buttons to the invoice status screen to mail the Acumulus invoice or
+  packing slip.
+- WC: Support for the "WooCommerce EU VAT Number" plugin (from WooCommerce).
+- WC: Support for the free version of the "EU/UK VAT Compliance for WooCommerce"
+  plugin (from David Anderson). Especially the setting "Tax classes used for
+  customer place-of-supply goods" is used to select the vat type for an invoice
+  where the vat rates of the country-of-supply are the same as in the
+  Netherlands. So, please update this setting when you change from Dutch to
+  Foreign VAT or back.
+  NOTE: vat exempt invoices are part of the premium version of this invoice. We
+  don't currently have the code of that version, so we cannot know what meta key
+  is used to store vat numbers. Please let us know if you have this plugin.
+- ALL: The messages on the batch form are now more precise and clearer.
 - ALL: The "About" block on our forms will show fewer sections when the account
   data has not yet been completed or is incorrect. This prevents duplicate
   messages saying "no contract data yet".
-- MA: Added buttons to the invoice status screen to mail the Acumulus invoice or
-  packing slip.
-- ALL: The messages on the batch form are now more precise and clearer.
-- WC: Support for the WooCommerce EU VAT Number plugin.
 
 Bugs:
 - MA2.4: Finally tested with Magento 2.4 and PHP 8.1. Below the findings:

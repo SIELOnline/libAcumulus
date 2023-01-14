@@ -890,7 +890,7 @@ class InvoiceStatusForm extends Form
         return [
             'vat_type' => [
             'type' => 'markup',
-            'label' => $this->t('vat_type'),
+            'label' => ucfirst($this->t('vat_type')),
             'value' => $this->t('vat_type_' . $vatType),
             ],
         ];

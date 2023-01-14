@@ -1,4 +1,7 @@
 <?php
+/**
+ * @noinspection LongLine
+ */
 
 declare(strict_types=1);
 
@@ -57,6 +60,7 @@ class Translations extends TranslationCollection
         'message_warning_no_vattype_may_split' => '%1$s Hoogstwaarschijnlijk dient u de factuur te splitsen in verschillende factuurtypes. Echter, controleer voor de zekerheid ook de "Over uw winkel" instellingen.',
         'message_warning_no_vattype_must_split' => '%1$s U dient de factuur te splitsen in verschillende factuurtypes.',
         'message_warning_no_vattype_multiple_possible' => '%1$s Waarschijnlijk komt dit door een gebrek aan informatie over de aard van de bestelde artikelen. Het volledig invullen van de "Over uw winkel" instellingen zou kunnen helpen.',
+        'message_notice_multiple_possible_vattype_chose_one' => 'Omdat %3$s hetzelfde btw-tarief heeft als %4$s, kan het %1$s niet met zekerheid bepaald worden. Op basis van uw huidige instelling voor "%5$s" is een factuur met %2$s aangemaakt. Als dit niet klopt dient u de factuur in Acumulus aan te passen.',
         'message_warning_line_without_vat' => 'Één of meer van de factuurregels hebben geen btw terwijl is ingesteld dat er "Alleen aan btw onderhevige producten en/of diensten" aangeboden worden. ' . self::sharedNl,
         'message_warning_strategies_failed' => 'Door een fout in uw instellingen of btw tarieven, konden niet alle factuurregels correct gecompleteerd worden. ' . self::sharedNl,
         'message_warning_missing_amount_added' => 'Het factuurbedrag klopt niet met het totaal van de regels. Daarom is er een correctieregel toegevoegd met een bedrag (ex. btw) van €%1$.2f en een btw bedrag van €%2$.2f. ' . self::sharedNl,
@@ -121,6 +125,7 @@ class Translations extends TranslationCollection
         'message_warning_no_vattype_may_split' => '%1$s You likely have to split the invoice over multiple invoice types. However, please also check your "About your shop" settings.',
         'message_warning_no_vattype_must_split' => '%1$s You have to split the invoice over multiple invoice types.',
         'message_warning_no_vattype_multiple_possible' => '%1$s This is likely due to lack of information about the nature of the items sold. Completing the "About your shop" settings, if possible, may help.',
+        'message_notice_multiple_possible_vattype_chose_one' => 'Since %3$s has the same VAT rate as %4$s, the %1$s cannot be determined with certainty. Based on your current setting for "%5$s", an invoice with %2$s has been created. If this is not correct, you need to adjust the invoice in Acumulus.',
         'message_warning_line_without_vat' => 'One or more of your invoice lines do not have VAT while you configured that you sell "Only products or services that are VAT liable.". The invoice has been saved as concept. Correct the invoice in Acumulus and check your settings.',
         'message_warning_strategies_failed' => 'Due to an error in your settings or VAT rates, we could not complete all invoice lines correctly. The invoice has been saved as concept. Correct the invoice in Acumulus.',
         'message_warning_missing_amount_added' => 'The invoice total does not match with the lines total. Therefore a corrective line was added with an amount (ex. vat) of €%1$.2f and a vat amount of €%2$.2f. The invoice has been saved as concept. Check and correct the invoice in Acumulus.',

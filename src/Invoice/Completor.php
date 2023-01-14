@@ -935,8 +935,9 @@ class Completor
                 // Guess which one to take or add a warning.
                 // Possible causes:
                 // - Client country has same VAT rates as the Netherlands and
-                //   shop uses foreign and NL VAT rates. Solvable by correct
-                //   shop settings.
+                //   shop uses foreign and NL VAT rates. Kind of solvable by
+                //   correct shop settings, but those are the current settings
+                //   that may not hold for older invoices.
                 // - Invoice has no vat and the client is outside the EU, and it
                 //   is unknown whether the invoice lines contain services or
                 //   goods. Perhaps solvable by correct shop settings.
@@ -948,6 +949,20 @@ class Completor
                 if (empty($invoice[Tag::VatType])) {
                     if (in_array(Api::VatType_MarginScheme, $vatTypeInfo['union'])) {
                         $invoice[Tag::VatType] = Api::VatType_MarginScheme;
+                    } elseif (($vatType = $this->isInvoiceWithNlOrBeProblem($vatTypeInfo['intersection'], $invoice)) !== null) {
+                        $invoice[Tag::VatType] = $vatType;
+                        // @todo: complete notice construction, including sprintf, etc.
+                        $notice = sprintf(
+                            $this->t('message_notice_multiple_possible_vattype_chose_one'),
+                            $this->t('vat_type'),
+                            $this->t('vat_type_' . $vatType),
+                            $this->invoice[Tag::Customer][Tag::Country] ?? $this->invoice[Tag::Customer][Tag::CountryCode],
+                            $this->t('netherlands'),
+                            sprintf($this->t('field_euVatClasses'), $this->t('vat_classes'))
+                        );
+                        $code = 813;
+                        $this->result->createAndAddMessage($notice, Severity::Notice, 813);
+                        $this->addWarning($invoice, $notice);
                     } else {
                         // Take the first vat type as a guess but add a warning.
                         $invoice[Tag::VatType] = reset($vatTypeInfo['intersection']);
@@ -1046,8 +1061,10 @@ class Completor
                             // are part of the delivery as a whole and should
                             // not change the vat type just because they are a
                             // service.
-                            if ($this->isOutsideEu(
-                                ) && $line[Meta::LineType] === Creator::LineType_OrderItem && !empty($line[Tag::Nature])) {
+                            if ($this->isOutsideEu()
+                                && $line[Meta::LineType] === Creator::LineType_OrderItem
+                                && !empty($line[Tag::Nature])
+                            ) {
                                 if ($vatType === Api::VatType_National && $line[Tag::Nature] === Api::Nature_Product) {
                                     $doAdd = false;
                                 }
@@ -1055,35 +1072,6 @@ class Completor
                                     $doAdd = false;
                                 }
                             }
-                        }
-
-                        // 3) In EU: If the vat class is known and denotes EU
-                        //    vat, we do not add the Dutch vat type.
-                        // @todo: if people switch from dutch to EU vat during
-                        //   the year we won't be able to match proper dutch vat
-                        //   on invoices from before that switch!
-                        if ($this->isEu() && !empty($line[Meta::VatClassId])
-                            && $this->isEuVatClass($line[Meta::VatClassId])
-                            && $vatType === Api::VatType_National
-                        ) {
-                            $doAdd = false;
-                        }
-
-                        // 4) If the vat class is known and does not denote EU
-                        //   vat, we do not add the EU vat type.
-                        //   Note that as this can prevent finding vat type 6
-                        //   when there's a fee line at NL vat rate which
-                        //   happens to be the foreign vat rate as well, we only
-                        //   do this for item lines.
-                        // @todo: if people switch back from EU to dutch vat at
-                        //   the start of a new year, we won't be able to match
-                        //   proper EU vat on invoices from last year!
-                        if ($line[Meta::LineType] === Creator::LineType_OrderItem
-                            && !empty($line[Meta::VatClassId])
-                            && !$this->isEuVatClass($line[Meta::VatClassId])
-                            && $vatType === Api::VatType_EuVat
-                        ) {
-                            $doAdd = false;
                         }
 
                         if ($doAdd) {
@@ -1991,6 +1979,56 @@ class Completor
     public function is0VatVatTypePossible(): bool
     {
         return count(array_intersect($this->possibleVatTypes, static::$zeroVatVatTypes)) !== 0;
+    }
+
+    /**
+     * Returns whether this invoice suffers from the "NL or BE" vat rate problem.
+     *
+     * For invoices to EU countries that have the same vat rate(s) as the
+     * Netherlands it cannot (always) be decided whether EU or Dutch vat was
+     * applied. This will be the case when the web shop data does not allow to
+     * uniquely distinguish these vat rates, especially for older orders.
+     *
+     * In these cases, the current setting for what defines EU vat classes and
+     * the metadata regarding the vat class for each line will be compared to
+     * make an educated guess.
+     *
+     * Note: Belgium is known to have the same high vat rate as the Netherlands,
+     * but other countries do have same vat rate(s) as well. Thus, despite its
+     * name, this method is not restricted to Belgium only.
+     *
+     * @param int[] $possibleVatTypes
+     *
+     * @return int|null
+     *   Either Api::VatType_National, Api::VatType_EuVat, or null.
+     */
+    protected function isInvoiceWithNlOrBeProblem(array $possibleVatTypes, array $invoice): ?int
+    {
+        $euVatClassLines = 0;
+        $nlVatClassLines = 0;
+        if (count($possibleVatTypes) === 2
+            && in_array(Api::VatType_National, $possibleVatTypes)
+            && in_array(Api::VatType_EuVat, $possibleVatTypes)
+        ) {
+            // Take the vat type based on whether the tax class id
+            // denotes EU vat or not.
+            foreach ($invoice[Tag::Line] as $line) {
+                if ($line[Meta::LineType] === Creator::LineType_OrderItem && isset($line[Meta::VatClassId])) {
+                    if ($this->isEuVatClass($line[Meta::VatClassId])) {
+                        $euVatClassLines++;
+                    } else {
+                        $nlVatClassLines++;
+                    }
+                }
+            }
+        }
+        if ($euVatClassLines > 0 && $nlVatClassLines === 0) {
+            return Api::VatType_EuVat;
+        } elseif ($euVatClassLines === 0 && $nlVatClassLines > 0) {
+            return Api::VatType_National;
+        } else {
+            return null;
+        }
     }
 
     /**

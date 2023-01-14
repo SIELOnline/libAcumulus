@@ -37,6 +37,8 @@ use function is_array;
  *   web shops can fill in a vat rate).
  * - Completes metadata that may be used in the strategy phase or just for
  *   support purposes.
+ *
+ * @noinspection PhpClassHasTooManyDeclaredMembersInspection
  */
 class CompletorInvoiceLines
 {
@@ -364,7 +366,6 @@ class CompletorInvoiceLines
                     }
                 }
 
-                /** @noinspection NotOptimalIfConditionsInspection */
                 if ($line[Meta::VatRateSource] === Creator::VatRateSource_Completor) {
                     // We either do not have lookup data, the looked up vat rate
                     // is not possible, or we have a 0-price line with multiple
@@ -493,7 +494,10 @@ class CompletorInvoiceLines
                         $precision *= count($line[Meta::ChildrenLines]);
                     }
                     /** @noinspection SlowArrayOperationsInLoopInspection */
-                    $line = array_merge($line, Creator::getVatRangeTags($line[Meta::VatAmount], $line[Tag::UnitPrice], $precision, $precision));
+                    $line = array_merge(
+                        $line,
+                        Creator::getVatRangeTags($line[Meta::VatAmount], $line[Tag::UnitPrice], $precision, $precision)
+                    );
                     $line[Meta::FieldsCalculated][] = Tag::VatRate;
                 }
             }
@@ -847,7 +851,8 @@ class CompletorInvoiceLines
                     $line[Meta::FieldsCalculated][] = Meta::LineDiscountAmountInc;
                 }
                 elseif (isset($line[Meta::LineDiscountVatAmount]) && !isset($line[Meta::LineDiscountAmountInc])) {
-                    $line[Meta::LineDiscountAmountInc] = $line[Meta::LineDiscountVatAmount] / $line[Tag::VatRate] * (100 + $line[Tag::VatRate]);
+                    $line[Meta::LineDiscountAmountInc] = $line[Meta::LineDiscountVatAmount]
+                        / $line[Tag::VatRate] * (100 + $line[Tag::VatRate]);
                     $line[Meta::FieldsCalculated][] = Meta::LineDiscountAmountInc;
                 }
             } elseif ($line[Meta::VatRateSource] == Creator::VatRateSource_Strategy && !empty($line[Meta::StrategySplit])) {

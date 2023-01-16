@@ -27,8 +27,6 @@ use Siel\Acumulus\Helpers\Severity;
  * The ApiClient API call wrappers return their information as a keyed array,
  * which is a simplified version of the call specific part of the response
  * structure.
- *
- * @noinspection PhpClassHasTooManyDeclaredMembersInspection
  */
 class Acumulus
 {
@@ -386,7 +384,7 @@ class Acumulus
      *
      * @return AcumulusResult
      * The Result of the webservice call. A successful call will contain a
-     * response array with key:
+     * response array with keys:
      * - invoice: an array of information about the created invoice, being an
      *   array with keys:
      * - 'invoicenumber'

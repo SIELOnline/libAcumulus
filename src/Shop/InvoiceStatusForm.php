@@ -2,7 +2,6 @@
 /**
  * @noinspection PhpLackOfCohesionInspection
  * @noinspection EfferentObjectCouplingInspection
- * @noinspection PhpClassHasTooManyDeclaredMembersInspection
  * @noinspection PhpUnnecessaryLocalVariableInspection
  * @noinspection PhpConcatenationWithEmptyStringCanBeInlinedInspection
  */

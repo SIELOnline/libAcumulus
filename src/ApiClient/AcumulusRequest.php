@@ -34,10 +34,8 @@ class AcumulusRequest
     protected Container $container;
     protected Config $config;
     protected Environment $environment;
-
     protected Util $util;
     protected string $userLanguage;
-
     protected ?string $uri = null;
     protected ?array $submit = null;
     protected ?HttpRequest $httpRequest = null;

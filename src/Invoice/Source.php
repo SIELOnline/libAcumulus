@@ -15,8 +15,6 @@ use function get_class;
  * Source is used to pass an order or refund object (or array) around in a
  * strongly typed way and to provide unified access to information about the
  * order or refund.
- *
- * @noinspection PhpClassHasTooManyDeclaredMembersInspection
  */
 abstract class Source
 {

@@ -9,6 +9,7 @@ use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Requirements;
 use Siel\Acumulus\Helpers\Severity;
 
+use function count;
 use function is_string;
 
 use const Siel\Acumulus\Version;
@@ -124,7 +125,7 @@ class ConfigUpgrade
                 unset($messages[$key]);
             }
         }
-        if (!empty($messages)) {
+        if (count($messages) !== 0) {
             throw new RuntimeException('Requirement check failed: ' . implode('; ', $messages));
         }
 
@@ -228,7 +229,7 @@ class ConfigUpgrade
                 break;
         }
 
-        if (!empty($newSettings)) {
+        if (count($newSettings) !== 0) {
             $result = $this->getConfig()->save($newSettings);
         }
         return $result;
@@ -267,7 +268,7 @@ class ConfigUpgrade
             $newSettings['sendEmptyShipping'] = !$this->getConfig()->get('removeEmptyShipping');
         }
 
-        if (!empty($newSettings)) {
+        if (count($newSettings) !== 0) {
             $result = $this->getConfig()->save($newSettings);
         }
         return $result;
@@ -287,7 +288,7 @@ class ConfigUpgrade
             $newSettings['salutation'] = str_replace('[#', '[', $this->getConfig()->get('salutation'));
         }
 
-        if (!empty($newSettings)) {
+        if (count($newSettings) !== 0) {
             $result = $this->getConfig()->save($newSettings);
         }
         return $result;
@@ -304,11 +305,12 @@ class ConfigUpgrade
         $newSettings = [];
 
         if ($this->getConfig()->get('subject') && strpos($this->getConfig()->get('subject'), '[#') !== false) {
-            str_replace('[#b]', '[invoiceSource::reference]', $this->getConfig()->get('subject'));
-            str_replace('[#f]', '[invoiceSource::invoiceNumber]', $this->getConfig()->get('subject'));
+            $newSettings['subject'] = str_replace(['[#b]', '#f'],
+                ['[invoiceSource::reference]', '[invoiceSource::invoiceNumber]'],
+                $this->getConfig()->get('subject'));
         }
 
-        if (!empty($newSettings)) {
+        if (count($newSettings) !== 0) {
             $result = $this->getConfig()->save($newSettings);
         }
         return $result;

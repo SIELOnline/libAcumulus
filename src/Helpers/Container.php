@@ -143,8 +143,6 @@ use const Siel\Acumulus\Version;
  * to update this library to a newer version without loosing your
  * customisations. Note that, also in this case, you are responsible that this
  * class gets autoloaded.
- *
- * @noinspection PhpClassHasTooManyDeclaredMembersInspection
  */
 class Container
 {

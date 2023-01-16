@@ -1,7 +1,6 @@
 <?php
 /**
  * @noinspection PhpLackOfCohesionInspection
- * @noinspection PhpClassHasTooManyDeclaredMembersInspection
  * @noinspection PhpRedundantOptionalArgumentInspection
  * @noinspection PhpConcatenationWithEmptyStringCanBeInlinedInspection
  * @noinspection PhpUnused

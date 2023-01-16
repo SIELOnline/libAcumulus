@@ -25,8 +25,6 @@ use function strlen;
  *
  * But may want to override some other as well, a.o:
  * - {@see isSubmitted()
- *
- * @noinspection PhpClassHasTooManyDeclaredMembersInspection
  */
 class FormHelper
 {

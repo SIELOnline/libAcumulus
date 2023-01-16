@@ -30,7 +30,7 @@ use const Siel\Acumulus\Version;
  * Configuration is stored in the host environment bridged via the ConfigStore
  * class.
  *
- * @noinspection PhpClassHasTooManyDeclaredMembersInspection
+ * @noinspection PhpLackOfCohesionInspection
  */
 class Config
 {
@@ -63,6 +63,11 @@ class Config
     public const MarginProducts_Both = 1;
     public const MarginProducts_No = 2;
     public const MarginProducts_Only = 3;
+
+    public const EuVat_Unknown = 0;
+    public const EuVat_Yes = 1;
+    public const EuVat_SwitchOnLimit = 2;
+    public const EuVat_No = 3;
 
     public  const VatClass_NotApplicable = 'vat_class_not_applicable';
     // Note: used both as value in Config and as value for Meta::VatClassId.
@@ -388,7 +393,7 @@ class Config
      *   A keyed array with the keys:
      *   - nature_shop
      *   - 'marginProducts'
-     *   - 'euVatClasses'
+     *   - 'euVat'
      *   - 'vatFreeClass'
      *   - 'zeroVatClass'
      *   - 'invoiceNrSource'
@@ -821,7 +826,8 @@ class Config
                 'description' => [
                     'group' => Tag::Invoice,
                     'type' => 'string',
-                    'default' => '[invoiceSourceType::label+invoiceSource::reference+"-"+refundedInvoiceSourceType::label+refundedInvoiceSource::reference]',
+                    'default' => '[invoiceSourceType::label+invoiceSource::reference'
+                        . '+"-"+refundedInvoiceSourceType::label+refundedInvoiceSource::reference]',
                 ],
                 'descriptionText' => [
                     'group' => Tag::Invoice,
@@ -863,10 +869,10 @@ class Config
                     'type' => 'int',
                     'default' => Config::MarginProducts_Unknown,
                 ],
-                'euVatClasses' => [
+                'euVat' => [
                     'group' => 'shop',
-                    'type' => 'array',
-                    'default' => [],
+                    'type' => 'int',
+                    'default' => Config::EuVat_Unknown,
                 ],
                 'vatFreeClass' => [
                     'group' => 'shop',

@@ -37,8 +37,6 @@ use function is_array;
  *   web shops can fill in a vat rate).
  * - Completes metadata that may be used in the strategy phase or just for
  *   support purposes.
- *
- * @noinspection PhpClassHasTooManyDeclaredMembersInspection
  */
 class CompletorInvoiceLines
 {
@@ -347,15 +345,6 @@ class CompletorInvoiceLines
                             $line[Meta::VatRateRangeMatches],
                             $line[Meta::VatRateLookupMatches]);
                         $vatRateSource = Completor::VatRateSource_Completor_Range_Lookup;
-                    }
-
-                    // Try to reduce the set by filtering on foreign or national
-                    // vat type using the vat class lookup data.
-                    if (!$this->getUniqueVatRate($line[Meta::VatRateLookupMatches]) && !empty($line[Meta::VatClassId])) {
-                        $line[Meta::VatRateLookupMatches] = $this->filterVatRateInfosByEuVat(
-                            $this->completor->isEuVatClass($line[Meta::VatClassId]),
-                            $line[Meta::VatRateLookupMatches]);
-                        $vatRateSource = Completor::VatRateSource_Completor_Range_Lookup_Foreign;
                     }
 
                     if ($this->getUniqueVatRate($line[Meta::VatRateLookupMatches])) {

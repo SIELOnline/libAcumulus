@@ -55,7 +55,6 @@ use function is_float;
  *   type class that knows which vat types are possible in a given situation
  *   and with what rates.
  *
- * @noinspection PhpClassHasTooManyDeclaredMembersInspection
  * @noinspection EfferentObjectCouplingInspection
  * @noinspection PhpLackOfCohesionInspection
  */
@@ -70,6 +69,12 @@ class Completor
     public const VatRateSource_Copied_From_Children = 'copied-from-children';
     public const VatRateSource_Copied_From_Parent = 'copied-from-parent';
     public const VatRateSource_Corrected_NoVat = 'corrected-no-vat';
+
+    private const EuSales_Unknown = 0;
+    private const EuSales_Safe = 1;
+    private const EuSales_Warning = 2;
+    private const EuSales_WillReach = 3;
+    private const EuSales_Passed = 4;
 
     /**
      * @var array
@@ -262,6 +267,7 @@ class Completor
         $shopSettings = $this->config->getShopSettings();
         $margin = $shopSettings['marginProducts'];
         $nature = $this->getNature();
+        $euVat = $shopSettings['euVat'];
 
         if (!empty($this->invoice[Tag::Customer][Tag::Invoice][Tag::VatType])) {
             // If shop specific code or an event handler has already set the vat
@@ -277,14 +283,15 @@ class Completor
                     $possibleVatTypes[] = Api::VatType_NationalReversed;
                 }
             } elseif ($this->isEu()) {
-                // It can be normal vat.
-                // @todo: unless we know that is not used.
-                $possibleVatTypes[] = Api::VatType_National;
+                // Can it be Dutch vat?
+                if ($euVat !== Config::EuVat_Yes) {
+                    $possibleVatTypes[] = Api::VatType_National;
+                }
                 // Can it be EU vat?
-                if ($this->usesEuVat()) {
+                if ($euVat !== Config::EuVat_No) {
                     $possibleVatTypes[] = Api::VatType_EuVat;
                 }
-                // Can it be EU reversed VAT. Note that reversed vat should not
+                // Can it be EU reversed VAT? Note that reversed vat should not
                 // be used with vat free items.
                 if ($this->isCompany()) {
                     $possibleVatTypes[] = Api::VatType_EuReversed;
@@ -298,40 +305,36 @@ class Completor
                         // Nature = Products => treat Northern Ireland as EU.
                         $this->invoice[Tag::Customer][Tag::CountryCode] = 'XI';
                         // @nth: remove duplication (with case isEu()).
-                        // It can be normal vat.
-                        $possibleVatTypes[] = Api::VatType_National;
+                        // Can it be Dutch vat?
+                        if ($euVat !== Config::EuVat_Yes) {
+                            $possibleVatTypes[] = Api::VatType_National;
+                        }
                         // Can it be EU vat?
-                        if ($this->usesEuVat()) {
+                        if ($euVat !== Config::EuVat_No) {
                             $possibleVatTypes[] = Api::VatType_EuVat;
                         }
-                        // Can it be EU reversed VAT. Note that reversed vat
+                        // Can it be EU reversed VAT? Note that reversed vat
                         // should not be used with vat free items.
                         if ($this->isCompany()) {
                             $possibleVatTypes[] = Api::VatType_EuReversed;
                         }
                     }
-                    if (($nature & Config::Nature_Services) !== 0) {
-                        // Nature = Services => treat Northern Ireland as UK,
-                        // thus as rest of world.
-                        // Services should use vat type = 1 with vat free.
-                        $possibleVatTypes[] = Api::VatType_National;
-                    }
-                } else {
-                    if (($nature & Config::Nature_Products) !== 0) {
-                        // Nature = Products =>
-                        // - Up to 135 GBP: seller pays VAT (vat type = 7).
-                        // - Above 135 GBP: buyer pays VAT, for seller it
-                        //   becomes vat type = 4, unless ..., see below at
-                        //   outsideEu. However, seller may decide to pay VAT on
-                        //   behalf of buyer: vat type = 7.
-                        $possibleVatTypes[] = Api::VatType_OtherForeignVat;
-                        $possibleVatTypes[] = Api::VatType_National;
-                        $possibleVatTypes[] = Api::VatType_RestOfWorld;
-                    }
-                    if (($nature & Config::Nature_Services) !== 0) {
-                        // Nature = Services => treat as outside EU.
-                        $possibleVatTypes[] = Api::VatType_National;
-                    }
+                } elseif (($nature & Config::Nature_Products) !== 0) {
+                    // Nature = Products =>
+                    // - Up to 135 GBP: seller pays VAT (vat type = 7).
+                    // - Above 135 GBP: buyer pays VAT, for seller it becomes
+                    //   vat type = 4, unless ..., see below at outsideEu.
+                    //   However, seller may decide to pay VAT on behalf of
+                    //   buyer: vat type = 7.
+                    $possibleVatTypes[] = Api::VatType_OtherForeignVat;
+                    $possibleVatTypes[] = Api::VatType_National;
+                    $possibleVatTypes[] = Api::VatType_RestOfWorld;
+                }
+                if (($nature & Config::Nature_Services) !== 0) {
+                    // Nature = Services => treat Northern Ireland as UK, i.e.
+                    // as rest of world.
+                    // Services should use vat type = 1 with vat free.
+                    $possibleVatTypes[] = Api::VatType_National;
                 }
             } elseif ($this->isOutsideEu()) {
                 // Can it be national vat? Services should use vat type = 1 with
@@ -489,14 +492,17 @@ class Completor
                     $this->log->error('Completor::initPossibleVatRates(): unknown vat type %d', $vatType);
                     break;
             }
-            // Convert the list of vat rates to a list of vat rate infos.
+            // Remove duplicates and convert the list of vat rates to a list of
+            // vat rate infos.
+            $vatTypeVatRates = array_unique($vatTypeVatRates, SORT_NUMERIC);
             foreach ($vatTypeVatRates as &$vatRate) {
                 $vatRate = [Tag::VatRate => $vatRate, Tag::VatType => $vatType];
             }
             /** @noinspection SlowArrayOperationsInLoopInspection */
             $possibleVatRates = array_merge($possibleVatRates, $vatTypeVatRates);
         }
-        $this->possibleVatRates = $possibleVatRates;
+        // Removing duplicates may have created holes in the indexing: re-index.
+        $this->possibleVatRates = array_values($possibleVatRates);
     }
 
     /**
@@ -850,6 +856,8 @@ class Completor
      *
      * If multiple vat types are possible, the invoice is sent as concept, so
      * that it may be corrected in Acumulus.
+     *
+     * @noinspection PhpFunctionCyclomaticComplexityInspection
      */
     protected function completeVatType(): void
     {
@@ -949,21 +957,68 @@ class Completor
                 if (empty($invoice[Tag::VatType])) {
                     if (in_array(Api::VatType_MarginScheme, $vatTypeInfo['union'])) {
                         $invoice[Tag::VatType] = Api::VatType_MarginScheme;
-                    } elseif (($vatType = $this->isInvoiceWithNlOrBeProblem($vatTypeInfo['intersection'], $invoice)) !== null) {
-                        $invoice[Tag::VatType] = $vatType;
-                        // @todo: complete notice construction, including sprintf, etc.
-                        $notice = sprintf(
-                            $this->t('message_notice_multiple_possible_vattype_chose_one'),
-                            $this->t('vat_type'),
-                            $this->t('vat_type_' . $vatType),
-                            $this->invoice[Tag::Customer][Tag::Country] ?? $this->invoice[Tag::Customer][Tag::CountryCode],
-                            $this->t('netherlands'),
-                            sprintf($this->t('field_euVatClasses'), $this->t('vat_classes'))
-                        );
-                        $code = 813;
-                        $this->result->createAndAddMessage($notice, Severity::Notice, 813);
-                        $this->addWarning($invoice, $notice);
-                    } else {
+                    } elseif ($this->isEuWithSameVatRate($vatTypeInfo['intersection'])) {
+                        $shopSettings = $this->config->getShopSettings();
+                        $euVat = $shopSettings['euVat'];
+                        if ($euVat === Config::EuVat_No) {
+                            $vatType = Api::VatType_National;
+                        } elseif ($euVat === Config::EuVat_Yes) {
+                            $vatType = Api::VatType_EuVat;
+                        } elseif ($euVat === Config::EuVat_SwitchOnLimit) {
+                            $year = (int) substr($this->getInvoiceDate(), 0, 4);
+                            $currentYear = (int) date('Y');
+                            if ($year < $currentYear) {
+                                // Older year: we can only be sure if we did
+                                // not pass the limit at all.
+                                $vatType = Api::VatType_National;
+                                if (!in_array($this->getEuSalesReport($year), [Completor::EuSales_Safe, Completor::EuSales_Warning])) {
+                                    // We chose one, but should warn.
+                                    $notice = sprintf(
+                                        $this->t('message_notice_multiple_possible_vattype_chose_one'),
+                                        $this->t('vat_type'),
+                                        $this->t('vat_type_' . $vatType),
+                                        $this->invoice[Tag::Customer][Tag::Country] ?? $this->invoice[Tag::Customer][Tag::CountryCode],
+                                        $this->t('netherlands'),
+                                        $this->t('field_euVat')
+                                    );
+                                    $this->result->createAndAddMessage($notice, Severity::Notice, 814);
+                                    $this->addWarning($invoice, $notice);
+                                }
+                            } else {
+                                // Current year: we can assume to be sure when
+                                // below the warning or above the limit,
+                                // otherwise we should warn.
+                                switch ($this->getEuSalesReport($year)) {
+                                    case Completor::EuSales_Passed:
+                                    case Completor::EuSales_WillReach:
+                                        $vatType = Api::VatType_EuVat;
+                                        break;
+                                    case Completor::EuSales_Safe:
+                                        $vatType = Api::VatType_National;
+                                        break;
+                                    case Completor::EuSales_Warning:
+                                        // Choose one but warn.
+                                        $vatType = Api::VatType_National;
+                                        $notice = sprintf(
+                                            $this->t('message_notice_multiple_possible_vattype_chose_one'),
+                                            $this->t('vat_type'),
+                                            $this->t('vat_type_' . $vatType),
+                                            $this->invoice[Tag::Customer][Tag::Country] ?? $this->invoice[Tag::Customer][Tag::CountryCode],
+                                            $this->t('netherlands'),
+                                            $this->t('field_euVat')
+                                        );
+                                        $this->result->createAndAddMessage($notice, Severity::Notice, 813);
+                                        $this->addWarning($invoice, $notice);
+                                        break;
+                                }
+                            }
+                        }
+                        if (isset($vatType)) {
+                            $invoice[Tag::VatType] = $vatType;
+                        }
+                    }
+
+                    if (empty($invoice[Tag::VatType])) {
                         // Take the first vat type as a guess but add a warning.
                         $invoice[Tag::VatType] = reset($vatTypeInfo['intersection']);
                         $message = 'message_warning_no_vattype_multiple_possible';
@@ -1423,26 +1478,18 @@ class Completor
             && $invoice[Tag::VatType] === Api::VatType_National
         ) {
             $year = (int) substr($this->getInvoiceDate(), 0, 4);
-            $result = $this->acumulusApiClient->reportThresholdEuCommerce($year);
-            if (!$result->hasError()) {
-                $euSales = $result->getMainAcumulusResponse();
-                if ($euSales['reached'] == 1) {
+            switch ($this->getEuSalesReport($year)) {
+                case Completor::EuSales_Passed:
                     $this->changeInvoiceToConcept($invoice, 'eu_commerce_threshold_passed', 830);
-                } else {
-                    $invoiceAmount = $invoice[Meta::InvoiceAmount];
-                    $percentage = ((float) $euSales['nltaxed'] + (float) $invoiceAmount) / ((float) $euSales['threshold']) * 100.0;
-                    if ($percentage > 100.0) {
-                        $this->changeInvoiceToConcept($invoice, 'eu_commerce_threshold_will_pass', 831);
-                    } elseif ($percentage > $warningPercentage) {
-                        // Send mail with notice, xml message will not be added
-                        // if there are no warnings or worse.
-                        $this->result->createAndAddMessage(
-                            sprintf($this->t('eu_commerce_threshold_warning'), $percentage),
-                            Severity::Notice,
-                            832
-                        );
-                    }
-                }
+                    break;
+                case Completor::EuSales_WillReach:
+                    $this->changeInvoiceToConcept($invoice, 'eu_commerce_threshold_will_pass', 831);
+                    break;
+                case Completor::EuSales_Warning:
+                    // Send mail with notice, xml message will not be added if
+                    // there are no warnings or worse.
+                    $this->result->createAndAddMessage($this->t('eu_commerce_threshold_warning'), Severity::Notice, 832);
+                    break;
             }
         }
     }
@@ -1461,9 +1508,9 @@ class Completor
         if (isset($this->invoice[Tag::Customer][Meta::Warning]) && is_array($this->invoice[Tag::Customer][Meta::Warning])) {
             $this->invoice[Tag::Customer][Meta::Warning] = json_encode($this->invoice[Tag::Customer][Meta::Warning], Meta::JsonFlags);
         }
-        if (isset($this->invoice[Tag::Customer][Tag::Invoice][Meta::Warning]) && is_array(
-                $this->invoice[Tag::Customer][Tag::Invoice][Meta::Warning]
-            )) {
+        if (isset($this->invoice[Tag::Customer][Tag::Invoice][Meta::Warning])
+            && is_array($this->invoice[Tag::Customer][Tag::Invoice][Meta::Warning])
+        ) {
             $this->invoice[Tag::Customer][Tag::Invoice][Meta::Warning] = json_encode(
                 $this->invoice[Tag::Customer][Tag::Invoice][Meta::Warning],
                 Meta::JsonFlags
@@ -1766,42 +1813,6 @@ class Completor
     }
 
     /**
-     * Returns whether the shop uses EU vat.
-     *
-     * @return bool
-     *   True if the shop might sell using EU vat, false otherwise.
-     *
-     * @todo: this and the following methods are actually config related
-     *   questions and thus should be part of Config
-     */
-    public function usesEuVat(): bool
-    {
-        $shopSettings = $this->config->getShopSettings();
-        $foreignVatEuClasses = $shopSettings['euVatClasses'];
-        return reset($foreignVatEuClasses) !== Config::VatClass_NotApplicable;
-    }
-
-    /**
-     * Returns whether the vat class id denotes EU vat.
-     *
-     * @param int|string $vatClassId
-     *   The vat class to check.
-     *
-     * @return bool
-     *   True if the vat class id denotes an EU vat class, false otherwise.
-     */
-    public function isEuVatClass($vatClassId): bool
-    {
-        $shopSettings = $this->config->getShopSettings();
-        $foreignVatEuClasses = $shopSettings['euVatClasses'];
-        /**
-         * @noinspection TypeUnsafeArraySearchInspection
-         *   Not sure if $vatClassId may actually be a string.
-         */
-        return in_array($vatClassId, $foreignVatEuClasses);
-    }
-
-    /**
      * Returns whether the vat class id denotes vat free.
      *
      * @param int|string|array $lineOrVatClassId
@@ -1982,53 +1993,24 @@ class Completor
     }
 
     /**
-     * Returns whether this invoice suffers from the "NL or BE" vat rate problem.
+     * Returns whether this invoice suffers from the "NL or BE" vat problem.
      *
      * For invoices to EU countries that have the same vat rate(s) as the
      * Netherlands it cannot (always) be decided whether EU or Dutch vat was
      * applied. This will be the case when the web shop data does not allow to
      * uniquely distinguish these vat rates, especially for older orders.
      *
-     * In these cases, the current setting for what defines EU vat classes and
-     * the metadata regarding the vat class for each line will be compared to
-     * make an educated guess.
-     *
-     * Note: Belgium is known to have the same high vat rate as the Netherlands,
-     * but other countries do have same vat rate(s) as well. Thus, despite its
-     * name, this method is not restricted to Belgium only.
-     *
      * @param int[] $possibleVatTypes
+     *   the set of possible vat type for each line (the intersection).
      *
-     * @return int|null
-     *   Either Api::VatType_National, Api::VatType_EuVat, or null.
+     * @return bool
+     *   True if vat types 1 and 6 are possible for each line.
      */
-    protected function isInvoiceWithNlOrBeProblem(array $possibleVatTypes, array $invoice): ?int
+    protected function isEuWithSameVatRate(array $possibleVatTypes): bool
     {
-        $euVatClassLines = 0;
-        $nlVatClassLines = 0;
-        if (count($possibleVatTypes) === 2
+        return count($possibleVatTypes) === 2
             && in_array(Api::VatType_National, $possibleVatTypes)
-            && in_array(Api::VatType_EuVat, $possibleVatTypes)
-        ) {
-            // Take the vat type based on whether the tax class id
-            // denotes EU vat or not.
-            foreach ($invoice[Tag::Line] as $line) {
-                if ($line[Meta::LineType] === Creator::LineType_OrderItem && isset($line[Meta::VatClassId])) {
-                    if ($this->isEuVatClass($line[Meta::VatClassId])) {
-                        $euVatClassLines++;
-                    } else {
-                        $nlVatClassLines++;
-                    }
-                }
-            }
-        }
-        if ($euVatClassLines > 0 && $nlVatClassLines === 0) {
-            return Api::VatType_EuVat;
-        } elseif ($euVatClassLines === 0 && $nlVatClassLines > 0) {
-            return Api::VatType_National;
-        } else {
-            return null;
-        }
+            && in_array(Api::VatType_EuVat, $possibleVatTypes);
     }
 
     /**
@@ -2106,5 +2088,41 @@ class Completor
                 $array[Meta::Warning][] = $warning;
             }
         }
+    }
+
+    /**
+     * @param int $year
+     *
+     * @return int
+     *   One of the {@see Completor}::EuSales_... constants.
+     */
+    protected function getEuSalesReport(int $year): int
+    {
+        static $reports = [];
+
+        if (!array_key_exists($year, $reports)) {
+            $result = $this->acumulusApiClient->reportThresholdEuCommerce($year);
+            if ($result->hasError()) {
+                $reports[$year] = Completor::EuSales_Unknown;
+            } else {
+                $euSales = $result->getMainAcumulusResponse();
+                if ($euSales['reached'] == 1) {
+                    $reports[$year] = Completor::EuSales_Passed;
+                } else {
+                    $warningPercentage = $this->config->getInvoiceSettings()['euCommerceThresholdPercentage'];
+                    $invoiceAmount = $this->invoice[Tag::Customer][Tag::Invoice][Meta::InvoiceAmount];
+                    $percentage = ((float) $euSales['nltaxed'] + (float) $invoiceAmount) / ((float) $euSales['threshold']) * 100.0;
+                    if ($percentage > 100.0) {
+                        $reports[$year] = Completor::EuSales_WillReach;
+                    } elseif ($percentage >= $warningPercentage) {
+                        $reports[$year] = Completor::EuSales_Warning;
+                    } else {
+                        $reports[$year] = Completor::EuSales_Safe;
+                    }
+                }
+            }
+        }
+
+        return $reports[$year];
     }
 }

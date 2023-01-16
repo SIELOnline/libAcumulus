@@ -60,7 +60,7 @@ class Translations extends TranslationCollection
         'message_warning_no_vattype_may_split' => '%1$s Hoogstwaarschijnlijk dient u de factuur te splitsen in verschillende factuurtypes. Echter, controleer voor de zekerheid ook de "Over uw winkel" instellingen.',
         'message_warning_no_vattype_must_split' => '%1$s U dient de factuur te splitsen in verschillende factuurtypes.',
         'message_warning_no_vattype_multiple_possible' => '%1$s Waarschijnlijk komt dit door een gebrek aan informatie over de aard van de bestelde artikelen. Het volledig invullen van de "Over uw winkel" instellingen zou kunnen helpen.',
-        'message_notice_multiple_possible_vattype_chose_one' => 'Omdat %3$s hetzelfde btw-tarief heeft als %4$s, kan het %1$s niet met zekerheid bepaald worden. Op basis van uw huidige instelling voor "%5$s" is een factuur met %2$s aangemaakt. Als dit niet klopt dient u de factuur in Acumulus aan te passen.',
+        'message_notice_multiple_possible_vattype_chose_one' => 'Omdat %3$s hetzelfde btw-tarief heeft als %4$s, kan het %1$s niet met zekerheid bepaald worden. Op basis van (onder andere) uw instelling voor "%5$s" is een factuur met %2$s aangemaakt. Als dit niet klopt dient u de factuur in Acumulus aan te passen.',
         'message_warning_line_without_vat' => 'Één of meer van de factuurregels hebben geen btw terwijl is ingesteld dat er "Alleen aan btw onderhevige producten en/of diensten" aangeboden worden. ' . self::sharedNl,
         'message_warning_strategies_failed' => 'Door een fout in uw instellingen of btw tarieven, konden niet alle factuurregels correct gecompleteerd worden. ' . self::sharedNl,
         'message_warning_missing_amount_added' => 'Het factuurbedrag klopt niet met het totaal van de regels. Daarom is er een correctieregel toegevoegd met een bedrag (ex. btw) van €%1$.2f en een btw bedrag van €%2$.2f. ' . self::sharedNl,
@@ -79,7 +79,7 @@ class Translations extends TranslationCollection
 
         'eu_commerce_threshold_passed' => 'U bent de drempel van verkopen binnen de EU tot aan waar u Nederlandse btw mag berekenen gepasseerd. U dient vanaf nu, tot aan het eind van het jaar, op alle facturen naar particulieren of btw-vrijgestelden binnen de EU het btw tarief van het land van afname te berekenen. Pas direct uw webshop hierop aan. ' . self::sharedNl,
         'eu_commerce_threshold_will_pass' => 'Met deze factuur zou u de drempel van verkopen binnen de EU tot aan waar u Nederlandse btw mag berekenen passeren. U dient vanaf nu, tot aan het eind van het jaar, op alle facturen naar particulieren of btw-vrijgestelden binnen de EU - dus ook op deze factuur - het btw tarief van het land van afname te berekenen. Pas uw webshop hierop aan. ' . self::sharedNl,
-        'eu_commerce_threshold_warning' => 'U zit op %.1f%% van de drempel van verkopen binnen de EU tot aan waar u Nederlandse btw mag berekenen. Begin op tijd aan de voorbereidingen tot het aanpassen van de belastinginstellingen van uw webwinkel en overige verkoopkanalen.',
+        'eu_commerce_threshold_warning' => 'U zit bijna op de drempel van verkopen binnen de EU tot aan waar u Nederlandse btw mag berekenen. Begin nu aan de voorbereidingen tot het aanpassen van de belastinginstellingen van uw webwinkel en overige verkoopkanalen.',
     ];
 
     protected array $en = [

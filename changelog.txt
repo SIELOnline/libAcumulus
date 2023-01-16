@@ -82,6 +82,21 @@ Notes:
 
 7.6.0 (2023-01-??)
 ------------------
+Features:
+- ALL: A new setting "Do you charge EU VAT?" replaces the setting "Which tax
+  classes define EU vat rates?" and this new setting is only used in case no
+  choice can be made between EU VAT and dutch VAT.
+- WC: Support for the free version of the "EU/UK VAT Compliance for WooCommerce"
+  plugin (from David Anderson). Especially the setting "Tax classes used for
+  customer place-of-supply goods" is used to select the vat type for an invoice
+  where the vat rates of the country-of-supply are the same as in the
+  Netherlands.
+  NOTE: This setting trumps the new setting introduced above, so, please update
+  this setting when you change from Dutch to Foreign VAT or back!!!
+  NOTE: vat exempt invoices are part of the premium version of this invoice. We
+  don't currently have the code of that version, so we cannot know what meta key
+  is used to store vat numbers. Please let us know if you have this plugin.
+
 Bugs:
 - We do no longer throw an exception when the HTTP status code and the response
   status are inconsistent. The Acumulus API can return inconsistent status codes
@@ -92,15 +107,12 @@ Bugs:
   must be of the type float, string given, defined in Number.php:76.
 
 Refactorings:
-- Introduced PHP 7.4 syntax constructions all over the code. So running an older
-  version of PHP is guaranteed to fail fatally (before we can warn you with a
-  warning message.
+- Introduced PHP 7.4 syntax constructions all over the code meaning an older
+  version of PHP now will fail fatally (without a proper warning).
 - We are now using "declare(strict_types=1);" in almost all source files. This
-  will almost certainly lead to fatal errors that were not discovered during
-  testing. During testing we discovered a number of places where strings
-  representing a float (or integer) are returned and that are now explicitly
-  cast to a float. However, we probably did not find all those places, so errors
-  might occur.
+  may lead to error messages that were not discovered during testing, even
+  though we did test a lot and we did discover quite some places where this
+  error might occur.
 - Copied (and improved) class Token to Field and added tests for it. However,
   this new class is not yet used in the rest of the code.
 - Renamed AboutBlockTranslations to AboutFormTranslations.
@@ -113,26 +125,13 @@ Requirements:
 - PHP 8.2 has not yet been tested.
 
 Features:
-- ALL: changed the algorithm to determine the vat type of an invoice in the case
-  an EU country has the same vat rate(s) as the Netherlands. The old setting
-  'Which tax classes define EU vat rates?' defines the actual situation, not
-  necessarily the situation at the time when the invoice was created.
 - MA: Added buttons to the invoice status screen to mail the Acumulus invoice or
   packing slip.
-- WC: Support for the "WooCommerce EU VAT Number" plugin (from WooCommerce).
-- WC: Support for the free version of the "EU/UK VAT Compliance for WooCommerce"
-  plugin (from David Anderson). Especially the setting "Tax classes used for
-  customer place-of-supply goods" is used to select the vat type for an invoice
-  where the vat rates of the country-of-supply are the same as in the
-  Netherlands. So, please update this setting when you change from Dutch to
-  Foreign VAT or back.
-  NOTE: vat exempt invoices are part of the premium version of this invoice. We
-  don't currently have the code of that version, so we cannot know what meta key
-  is used to store vat numbers. Please let us know if you have this plugin.
 - ALL: The messages on the batch form are now more precise and clearer.
 - ALL: The "About" block on our forms will show fewer sections when the account
   data has not yet been completed or is incorrect. This prevents duplicate
   messages saying "no contract data yet".
+- WC: Support for the "WooCommerce EU VAT Number" plugin (from WooCommerce).
 
 Bugs:
 - MA2.4: Finally tested with Magento 2.4 and PHP 8.1. Below the findings:

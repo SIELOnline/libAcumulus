@@ -102,16 +102,10 @@ class ConfigForm extends BaseConfigForm
             $message = sprintf($this->t('message_validate_required_field'), $this->t('field_marginProducts'));
             $this->addFormMessage($message, Severity::Error, 'marginProducts');
         }
-        if (empty($this->submittedValues['euVatClasses'])) {
-            $field = sprintf($this->t('field_euVatClasses'), $this->t('vat_classes'));
-            $message = sprintf($this->t('message_validate_eu_vat_classes_0'), $field);
-            $this->addFormMessage($message, Severity::Error, 'euVatClasses');
-        } elseif (count($this->submittedValues['euVatClasses']) >= 2 && in_array(Config::VatClass_NotApplicable, $this->submittedValues['euVatClasses'], false)) {
-            // Check that Not applicable is not selected with other classes for
-            // EU vat classes.
-            $field = sprintf($this->t('field_euVatClasses'), $this->t('vat_classes'));
-            $message = sprintf($this->t('message_validate_eu_vat_classes_1'), $field, $this->t('vat_class_not_applicable'));
-            $this->addFormMessage($message, Severity::Error, 'euVatClasses');
+        if (empty($this->submittedValues['euVat'])) {
+            $field = $this->t('field_euVat');
+            $message = sprintf($this->t('message_validate_eu_vat_0'), $field);
+            $this->addFormMessage($message, Severity::Error, 'euVat');
         }
 
         if (empty($this->submittedValues['vatFreeClass'])) {
@@ -146,12 +140,16 @@ class ConfigForm extends BaseConfigForm
             // If we only sell articles with nature Services, we cannot (also)
             // sell margin goods.
             /** @noinspection TypeUnsafeComparisonInspection */
-            if ($this->submittedValues['nature_shop'] == Config::Nature_Services && $this->submittedValues['marginProducts'] != Config::MarginProducts_No) {
+            if ($this->submittedValues['nature_shop'] == Config::Nature_Services
+                && $this->submittedValues['marginProducts'] != Config::MarginProducts_No
+            ) {
                 $this->addFormMessage($this->t('message_validate_conflicting_shop_options_1'), Severity::Error, 'nature_shop');
             }
             // If we only sell margin goods, the nature of all we sell is Products.
             /** @noinspection TypeUnsafeComparisonInspection */
-            if ($this->submittedValues['marginProducts'] == Config::MarginProducts_Only && $this->submittedValues['nature_shop'] != Config::Nature_Products) {
+            if ($this->submittedValues['marginProducts'] == Config::MarginProducts_Only
+                && $this->submittedValues['nature_shop'] != Config::Nature_Products
+            ) {
                 $this->addFormMessage($this->t('message_validate_conflicting_shop_options_2'), Severity::Error, 'nature_shop');
             }
         }
@@ -281,10 +279,18 @@ class ConfigForm extends BaseConfigForm
             ];
 
             $paymentMethods = $this->shopCapabilities->getPaymentMethods();
-            if (!empty($paymentMethods)) {
+            if (count($paymentMethods) !== 0) {
                 $fields += [
-                    'paymentMethodAccountNumberFieldset' => $this->getPaymentMethodsFieldset($paymentMethods, 'paymentMethodAccountNumber', $this->accountNumberOptions),
-                    'paymentMethodCostCenterFieldset' => $this->getPaymentMethodsFieldset($paymentMethods, 'paymentMethodCostCenter', $this->costCenterOptions),
+                    'paymentMethodAccountNumberFieldset' => $this->getPaymentMethodsFieldset(
+                        $paymentMethods,
+                        'paymentMethodAccountNumber',
+                        $this->accountNumberOptions
+                    ),
+                    'paymentMethodCostCenterFieldset' => $this->getPaymentMethodsFieldset(
+                        $paymentMethods,
+                        'paymentMethodCostCenter',
+                        $this->costCenterOptions
+                    ),
                 ];
             }
 
@@ -418,7 +424,7 @@ class ConfigForm extends BaseConfigForm
      * The fields returned:
      * - nature_shop
      * - 'marginProducts'
-     * - 'euVatClasses'
+     * - 'euVat'
      * - 'vatFreeClass'
      * - 'zeroVatClass'
      *
@@ -448,18 +454,13 @@ class ConfigForm extends BaseConfigForm
                     'required' => true,
                 ],
             ],
-            'euVatClasses' => [
-                'name' => 'euVatClasses[]',
-                'type' => 'select',
-                'label' => sprintf($this->t('field_euVatClasses'), $this->t('vat_classes')),
-                'description' => sprintf($this->t('desc_euVatClasses'), $this->t('vat_classes'), $this->t('vat_class_not_applicable')),
-                'options' => [
-                                 Config::VatClass_NotApplicable => ucfirst($this->t('vat_class_not_applicable')),
-                             ] + $vatClasses,
+            'euVat' => [
+                'type' => 'radio',
+                'label' => $this->t('field_euVat'),
+                'description' => $this->t('desc_euVat'),
+                'options' => $this->getEuVatOptions(),
                 'attributes' => [
                     'required' => true,
-                    'multiple' => true,
-                    'size' => min(count($vatClasses) + 1, 8),
                 ],
             ],
             'vatFreeClass' => [
@@ -548,8 +549,16 @@ class ConfigForm extends BaseConfigForm
      */
     protected function getInvoiceFields(): array
     {
-        $this->accountNumberOptions = $this->picklistToOptions($this->acumulusApiClient->getPicklistAccounts(), 0, $this->t('option_empty'));
-        $this->costCenterOptions = $this->picklistToOptions($this->acumulusApiClient->getPicklistCostCenters(), 0, $this->t('option_empty'));
+        $this->accountNumberOptions = $this->picklistToOptions(
+            $this->acumulusApiClient->getPicklistAccounts(),
+            0,
+            $this->t('option_empty')
+        );
+        $this->costCenterOptions = $this->picklistToOptions(
+            $this->acumulusApiClient->getPicklistCostCenters(),
+            0,
+            $this->t('option_empty')
+        );
 
         return [
             'invoiceNrSource' => $this->getOptionsOrHiddenField('invoiceNrSource', 'radio'),
@@ -569,7 +578,11 @@ class ConfigForm extends BaseConfigForm
             'defaultInvoiceTemplate' => [
                 'type' => 'select',
                 'label' => $this->t('field_defaultInvoiceTemplate'),
-                'options' => $this->picklistToOptions($invoiceTemplates = $this->acumulusApiClient->getPicklistInvoiceTemplates(), 0, $this->t('option_empty')),
+                'options' => $this->picklistToOptions(
+                    $invoiceTemplates = $this->acumulusApiClient->getPicklistInvoiceTemplates(),
+                    0,
+                    $this->t('option_empty')
+                ),
             ],
             'defaultInvoicePaidTemplate' => [
                 'type' => 'select',
@@ -784,11 +797,19 @@ class ConfigForm extends BaseConfigForm
         return [
             'tellAboutAdvancedSettings' => [
                 'type' => 'markup',
-                'value' => sprintf($this->t('desc_advancedSettings'), $this->t('advanced_form_link_text'), $this->t('menu_advancedSettings')),
+                'value' => sprintf(
+                    $this->t('desc_advancedSettings'),
+                    $this->t('advanced_form_link_text'),
+                    $this->t('menu_advancedSettings')
+                ),
             ],
             'advancedSettingsLink' => [
                 'type' => 'markup',
-                'value' => sprintf($this->t('button_link'), $this->t('advanced_form_link_text'), $this->shopCapabilities->getLink('advanced')),
+                'value' => sprintf(
+                    $this->t('button_link'),
+                    $this->t('advanced_form_link_text'),
+                    $this->shopCapabilities->getLink('advanced')
+                ),
             ],
         ];
     }
@@ -856,6 +877,22 @@ class ConfigForm extends BaseConfigForm
             Config::MarginProducts_Both => $this->t('option_marginProducts_1'),
             Config::MarginProducts_No => $this->t('option_marginProducts_2'),
             Config::MarginProducts_Only => $this->t('option_marginProducts_3'),
+        ];
+    }
+
+    /**
+     * Returns a list of options for the EU vat field.
+     *
+     * @return string[]
+     *   An array keyed by the option values and having translated descriptions
+     *   as values.
+     */
+    protected function getEuVatOptions(): array
+    {
+        return [
+            Config::EuVat_Yes => $this->t('option_euVat_1'),
+            Config::EuVat_SwitchOnLimit => $this->t('option_euVat_2'),
+            Config::EuVat_No => $this->t('option_euVat_3'),
         ];
     }
 

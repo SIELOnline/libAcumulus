@@ -80,8 +80,7 @@ class ConfigFormTranslations extends TranslationCollection
         'message_validate_email_0' => 'Het veld E-mail bevat geen geldig e-mailadres, vul uw eigen e-mailadres in.',
         'message_validate_email_1' => 'Het veld E-mail is verplicht, vul uw eigen e-mailadres in.',
         'message_validate_required_field' => 'Het veld "%1$s" is verplicht, kies een waarde.',
-        'message_validate_eu_vat_classes_0' => 'Het veld "%1$s" is verplicht, kies één of meer waardes.',
-        'message_validate_eu_vat_classes_1' => 'De keuze "%2$s" voor het veld "%1$s" kan niet gecombineerd worden met andere waardes.',
+        'message_validate_eu_vat_0' => 'Het veld "%1$s" is verplicht, kies een waarde.',
         'message_validate_zero_vat_class_0' => 'U moet verschillende %1$s gebruiken om onderscheid te maken tussen producten of diensten aan 0%% btw en die zijn vrijgesteld van btw.',
         'message_validate_conflicting_shop_options_1' => 'Als u alleen diensten verkoopt, kunt u geen margegoederen verkopen. Pas één van deze opties aan.',
         'message_validate_conflicting_shop_options_2' => 'Als u alleen margegoederen verkoopt, vink dan bij "Soort" aan dat u alleen producten verkoopt.',
@@ -107,10 +106,18 @@ class ConfigFormTranslations extends TranslationCollection
         'vat_class_not_applicable' => 'niet van toepassing',
         'vat_class_left_empty' => '%1$s laat ik leeg',
 
-        'desc_euVatClasses' => 'Geef aan welke van deze %1$s gebruikt worden wanneer u EU-btw berekent voor (niet btw-plichtige) EU-klanten.<br>
-• Kies de 1e optie ("%2$s") als u uw winkel (nog) niet hebt ingericht op deze regeling.<br>
-• M.b.v. de "Ctrl" toets kunt u meerdere %1$s kiezen of keuzes ongedaan maken.<br>
-• NB: Sinds 1 juli 2021 gelden er <a href="https://www.belastingdienst.nl/wps/wcm/connect/nl/btw/content/e-commerce-en-diensten-in-de-eu-kijk-wat-er-verandert-voor-de-btw-x" target="_blank">nieuwe regels en drempels voor afstandsverkopen binnen de EU</a> en vallen bijna alle goederen (en diensten) hieronder.',
+        'field_euVat' => 'Berekent u EU-btw',
+        'desc_euVat' => 'Geef aan of en wanneer u EU-btw berekent voor (niet btw-plichtige) EU-klanten.<br>
+• Kies de 1e optie als u die altijd, dus al vanaf het begin van het jaar, berekent.<br>
+• Kies de 2e optie als u die pas berekent zodra u de drempel passeert.<br>
+• Kies de 3e optie als u tot nu toe, en om wat voor een reden dan ook, nog geen EU-btw hebt berekend.<br>
+• LET OP: het gaat dus niet om de actuele instelling, deze waarde wordt ook gebruikt voor het versturen van gegevens van oudere facturen.<br>
+• NB1: Deze waarde wordt alleen gebruikt als er twijfel is omdat het land van de klant hetzelfde btw-tarief heeft als Nederland.<br>
+• NB2: Sinds 1 juli 2021 gelden er <a href="https://www.belastingdienst
+.nl/wps/wcm/connect/nl/btw/content/e-commerce-en-diensten-in-de-eu-kijk-wat-er-verandert-voor-de-btw-x" target="_blank">nieuwe regels en drempels voor afstandsverkopen binnen de EU</a> en vallen bijna alle goederen (en diensten) hieronder.',
+        'option_euVat_1' => 'Altijd, dus vanaf het begin van het jaar',
+        'option_euVat_2' => 'Zodra wij de drempel passeren',
+        'option_euVat_3' => 'Nee, nog nooit gebruikt',
 
         'field_vatFreeClass' => 'Welke %1$s definieert btw-vrij?',
         'desc_vatFreeClass' => 'Geef aan welke %1$s u gebruikt om aan te geven dat een product of dienst btw-vrij is.<br>
@@ -485,8 +492,7 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
         'message_validate_email_0' => 'The field E-mail is not a valid e-mail address, please fill in your own e-mail address.',
         'message_validate_email_1' => 'The field E-mail is required, please fill in your own e-mail address.',
         'message_validate_required_field' => 'the field "%1$s" is required, please select a value.',
-        'message_validate_eu_vat_classes_0' => 'The field \'%1$s\' is required, please select one or more values.',
-        'message_validate_eu_vat_classes_1' => 'The choice "%2$s" for the field "%1$s" cannot be combined with other values.',
+        'message_validate_eu_vat_0' => 'The field \'%1$s\' is required, please select a value.',
         'message_validate_zero_vat_class_0' => 'You must use different %1$s to distinguish between products or services subject to the 0%% VAT rate and those that are VAT free.',
         'message_validate_conflicting_shop_options_1' => 'If you only sell services, you cannot sell using the margin scheme. Change one of these options.',
         'message_validate_conflicting_shop_options_2' => 'If you only sell using the margin scheme, you should select that you only sell goods on the "Nature" field.',
@@ -512,23 +518,31 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
         'vat_class_not_applicable' => 'not applicable',
         'vat_class_left_empty' => 'I leave the %1$s empty',
 
-        'desc_euVatClasses' => 'Indicate which of these %1$s are used when you charge EU VAT to (non vat subjected) EU customers.
-Select the 1st option ("%2$s") when you have not (yet) configured your shop to use EU vat.<br>
-Using the "Ctrl" key, you can select/deselect multiple %1$s.<br>
-NB: As of 1 july 2021 <a href="https://www.belastingdienst.nl/wps/wcm/connect/nl/btw/content/e-commerce-en-diensten-in-de-eu-kijk-wat-er-verandert-voor-de-btw-x" target="_blank">new rules and thresholds for E-commerce sales within the EU (in Dutch)</a> apply to almost all goods (and services).',
+        'field_euVat' => 'Do you charge EU VAT?',
+        'desc_euVat' => 'Indicate if and when you charge EU VAT to (non vat subjected) EU customers.<br>
+• Select the 1st option if you always charge it, thus as of the start of the year.<br>
+• Select the 2nd option if you charge it only when you pass the threshold.<br>
+• Select the 3rd option if, until now, you never charged it..<br>
+• NOTE: This is not about the actual state of charging it, as this setting is also used for sending data for older invoices.<br>
+• NB1: his value is only used in case of conflict because the country of the customer uses the same VAT rate as the Netherlands.<br>
+• NB2: As of july 2021 <a href="https://www.belastingdienst
+.nl/wps/wcm/connect/nl/btw/content/e-commerce-en-diensten-in-de-eu-kijk-wat-er-verandert-voor-de-btw-x" target="_blank">new regulations and thresholds for EU sales (in Dutch)</a> apply.',
+        'option_euVat_1' => 'Always, thus as of the start of the year',
+        'option_euVat_2' => 'When we pass the threshold',
+        'option_euVat_3' => 'No, so far we never used it',
 
         'field_vatFreeClass' => 'Which %1$s defines VAT free?',
         'desc_vatFreeClass' => 'Indicate which %1$s you use to indicate that a product or service is VAT free.<br>
-Select the 1st option ("%2$s") if you do not sell VAT free goods or services.<br>
-Select the 2nd option ("%3$s") if you leave the field %1$s empty on VAT free products.<br>
-NOTE: this setting concerns whether the goods or services you offer are inherently VAT free, or because your company has chosen to use the <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/hoe_werkt_de_btw/nieuwe-kleineondernemersregeling/kleineondernemersregeling" target="_blank"">KOR regulations (in Dutch)</a>, or is for some other reason not VAT liable. Not whether you create an invoice with no or reversed VAT.
-Also note that VAT free differs from the 0%% VAT rate below. This difference mainly concerns the right to deduct VAT paid on your purchases.',
+• Select the 1st option ("%2$s") if you do not sell VAT free goods or services.<br>
+• Select the 2nd option ("%3$s") if you leave the field %1$s empty on VAT free products.<br>
+• NOTE: this setting concerns whether the goods or services you offer are inherently VAT free, or because your company has chosen to use the <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/hoe_werkt_de_btw/nieuwe-kleineondernemersregeling/kleineondernemersregeling" target="_blank"">KOR regulations (in Dutch)</a>, or is for some other reason not VAT liable. Not whether you create an invoice with no or reversed VAT.
+• Also note that VAT free differs from the 0%% VAT rate below. This difference mainly concerns the right to deduct VAT paid on your purchases.',
 
         'field_zeroVatClass' => 'Which %1$s defines the 0%% vat rate?',
         'desc_zeroVatClass' => 'Indicate which %1$s you use to indicate that a product or service is subject to the 0%% vat rate.<br>
-Select the 1st option ("%2$s") if you do not sell goods or services at the 0%% rate.<br>
-NOTE 1: the 0%% rate differs from vat free as above and is not common in the Netherlands. E.g, currently (early 2021), masks fall under the 0%% vat rate.<br>
-NOTE 2: this setting concerns whether the products or services you offer are inherently subject to the 0%% vat rate, not if you make invoices without vat (e.g. sometimes when selling abroad) or reversed vat.',
+• Select the 1st option ("%2$s") if you do not sell goods or services at the 0%% rate.<br>
+• NOTE 1: the 0%% rate differs from vat free as above and is not common in the Netherlands. E.g, early 2021, masks fell under the 0%% vat rate.<br>
+• NOTE 2: this setting concerns whether the products or services you offer are inherently subject to the 0%% vat rate, not if you make invoices without vat (e.g. sometimes when selling abroad) or reversed vat.',
 
         // Trigger settings.
         'triggerSettingsHeader' => 'When to have your invoices sent to Acumulus.',

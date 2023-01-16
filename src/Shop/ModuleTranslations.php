@@ -56,7 +56,6 @@ class ModuleTranslations extends TranslationCollection
         'vat_type_5' => 'Margeregeling (2e-hands producten)',
         'vat_type_6' => 'EU btw',
         'vat_type_7' => 'Andere buitenlandse (b.v. GB) btw',
-        'field_euVatClasses' => 'Welke %1$s definiëren EU-btw-tarieven?',
         'netherlands' => 'Nederland',
 
         'wait' => 'Even wachten',
@@ -118,7 +117,6 @@ class ModuleTranslations extends TranslationCollection
         'vat_type_5' => 'Margin invoice (2nd hand goods)',
         'vat_type_6' => 'EU vat',
         'vat_type_7' => 'Other foreign (e.g. GB) vat',
-        'field_euVatClasses' => 'Which %1$s define EU vat rates?',
         'netherlands' => 'the Netherlands',
 
         'wait' => 'Please wait',

@@ -243,7 +243,7 @@ class Completor
         $this->checkEuCommerceThreshold();
 
         // Massages the metadata before sending the invoice.
-        $this->processMetaData();
+        $this->invoice = $this->processMetaData($this->invoice);
 
         return $this->invoice;
     }
@@ -1035,9 +1035,9 @@ class Completor
                     : 'message_warning_multiple_vattypes';
                 $this->changeInvoiceToConcept($invoice, $message, $code, $this->t($startSentence));
             }
-            $invoice[Meta::VatTypesPossibleInvoice] = implode(',', $this->possibleVatTypes);
-            $invoice[Meta::VatTypesPossibleInvoiceLinesIntersection] = implode(',', $vatTypeInfo['intersection']);
-            $invoice[Meta::VatTypesPossibleInvoiceLinesUnion] = implode(',', $vatTypeInfo['union']);
+            $invoice[Meta::VatTypesPossibleInvoice] = $this->possibleVatTypes;
+            $invoice[Meta::VatTypesPossibleInvoiceLinesIntersection] = $vatTypeInfo['intersection'];
+            $invoice[Meta::VatTypesPossibleInvoiceLinesUnion] = $vatTypeInfo['union'];
         }
     }
 
@@ -1137,7 +1137,7 @@ class Completor
                 }
                 // Add meta info to Acumulus invoice.
                 $possibleLineVatTypes = array_values($possibleLineVatTypes);
-                $line[Meta::VatTypesPossible] = implode(',', $possibleLineVatTypes);
+                $line[Meta::VatTypesPossible] = $possibleLineVatTypes;
                 // Add to result, union and intersection.
                 $list[$index] = $possibleLineVatTypes;
                 /** @noinspection SlowArrayOperationsInLoopInspection */
@@ -1503,39 +1503,18 @@ class Completor
      *   Meta::VatRateRangeMatches are converted to a json string if they are an
      *   array.
      */
-    protected function processMetaData(): void
+    protected function processMetaData(array $object): array
     {
-        if (isset($this->invoice[Tag::Customer][Meta::Warning]) && is_array($this->invoice[Tag::Customer][Meta::Warning])) {
-            $this->invoice[Tag::Customer][Meta::Warning] = json_encode($this->invoice[Tag::Customer][Meta::Warning], Meta::JsonFlags);
-        }
-        if (isset($this->invoice[Tag::Customer][Tag::Invoice][Meta::Warning])
-            && is_array($this->invoice[Tag::Customer][Tag::Invoice][Meta::Warning])
-        ) {
-            $this->invoice[Tag::Customer][Tag::Invoice][Meta::Warning] = json_encode(
-                $this->invoice[Tag::Customer][Tag::Invoice][Meta::Warning],
-                Meta::JsonFlags
-            );
-        }
-        foreach ($this->invoice[Tag::Customer][Tag::Invoice][Tag::Line] as &$line) {
-            if (isset($line[Meta::VatRateLookup]) && is_array($line[Meta::VatRateLookup])) {
-                $line[Meta::VatRateLookup] = json_encode($line[Meta::VatRateLookup], Meta::JsonFlags);
-            }
-            if (isset($line[Meta::VatRateLookupLabel]) && is_array($line[Meta::VatRateLookupLabel])) {
-                $line[Meta::VatRateLookupLabel] = json_encode($line[Meta::VatRateLookupLabel], Meta::JsonFlags);
-            }
-            if (isset($line[Meta::FieldsCalculated]) && is_array($line[Meta::FieldsCalculated])) {
-                $line[Meta::FieldsCalculated] = json_encode(array_unique($line[Meta::FieldsCalculated]), Meta::JsonFlags);
-            }
-            if (isset($line[Meta::VatRateLookupMatches]) && is_array($line[Meta::VatRateLookupMatches])) {
-                $line[Meta::VatRateLookupMatches] = json_encode($line[Meta::VatRateLookupMatches], Meta::JsonFlags);
-            }
-            if (isset($line[Meta::VatRateRangeMatches]) && is_array($line[Meta::VatRateRangeMatches])) {
-                $line[Meta::VatRateRangeMatches] = json_encode($line[Meta::VatRateRangeMatches], Meta::JsonFlags);
-            }
-            if (isset($line[Meta::Warning]) && is_array($line[Meta::Warning])) {
-                $line[Meta::Warning] = json_encode($line[Meta::Warning], Meta::JsonFlags);
+        foreach ($object as $key => &$value) {
+            if (is_array($value)) {
+                if (strncmp($key, 'meta-', 5) === 0) {
+                    $value = str_replace('"', "'", json_encode(array_unique($value, SORT_REGULAR), Meta::JsonFlags));
+                } else {
+                    $value = $this->processMetaData($value);
+                }
             }
         }
+        return $object;
     }
 
     /**

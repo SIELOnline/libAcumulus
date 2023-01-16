@@ -116,6 +116,8 @@ Refactorings:
 - Copied (and improved) class Token to Field and added tests for it. However,
   this new class is not yet used in the rest of the code.
 - Renamed AboutBlockTranslations to AboutFormTranslations.
+- Prettier logging (prevent escaped double quotes in meta values).
+
 
 7.5.0 (2022-12-09)
 ------------------

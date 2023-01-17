@@ -4,16 +4,15 @@ Acumulus web service API library
 @author: Buro RaDer https://burorader.com/  
 @copyright: SIEL BV https://www.siel.nl/acumulus/  
 @license: GPLv3  
-@support: https://forum.acumulus.nl/index.php?board=17.0  
+@support: https://forum.acumulus.nl/index.php?board=17.0
 
 Inleiding
 ---------
-Deze Acumulus web service API library is bedoeld om het ontwikkelen van client
-side code die communiceert met de Acumulus API te vereenvoudigen. De library is
+Deze Acumulus web service API-library is bedoeld om het ontwikkelen van client
+side code die gebruik maakt van de Acumulus API te vereenvoudigen. De library is
 in eerste instantie ontwikkeld voor gebruik door de koppelingen voor de webshop
 software van HikaShop, Magento, OpenCart, PrestaShop, VirtueMart en WooCommerce,
-maar is dusdanig opgezet dat ook andere koppelingen er hun voordeel mee kunnen
-doen.
+maar is zo opgezet dat ook andere koppelingen er hun voordeel mee kunnen doen.
 
 Dit is dus een cross-CMS/webshop library. Daarom kan de code in deze library
 niet voldoen aan programming guidelines voor een specifieke webshop of CMS. Denk
@@ -37,7 +36,7 @@ Ontwikkeling
 ------------
 Deze library is in ontwikkeling en zal:
 
-- waar nodig aangepast worden aan veranderende fiscale wetgeving. 
+- waar nodig aangepast worden aan veranderende fiscale wetgeving.
 - waar nodig aangepast worden om met nog meer webshops om te kunnen gaan.
 - uitgebreid worden met nieuwe functies.
 - waar mogelijk en zinvol nog verder geabstraheerd worden.

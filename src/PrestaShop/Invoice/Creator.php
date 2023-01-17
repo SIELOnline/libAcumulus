@@ -1,8 +1,5 @@
 <?php
 /**
- */
-
-/**
  * Although we would like to use strict equality, i.e. including type equality,
  * unconditionally changing each comparison in this file will lead to problems
  * - API responses return each value as string, even if it is an int or float.
@@ -12,6 +9,7 @@
  *   regardless the type for vat class ids as used by the shop itself.
  * So for now, we will ignore the warnings about non strictly typed comparisons
  * in this code, and we won't use strict_types=1.
+ *
  * @noinspection TypeUnsafeComparisonInspection
  * @noinspection PhpMissingStrictTypesDeclarationInspection
  * @noinspection PhpStaticAsDynamicMethodCallInspection

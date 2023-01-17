@@ -45,13 +45,10 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      */
     public function getByEntryId(?int $entryId)
     {
+        $operator = $entryId === null ? 'is' : '=';
+        $value = $entryId === null ? 'null' : (string) $entryId;
         /** @noinspection PhpUnhandledExceptionInspection */
-        $result = $this->getDb()->executeS(sprintf(
-            'SELECT * FROM `%s` WHERE id_entry %s %s',
-            $this->tableName,
-            $entryId === null ? 'is' : '=',
-            $entryId === null ? 'null' : (string) $entryId
-        ));
+        $result = $this->getDb()->executeS("SELECT * FROM `$this->tableName` WHERE id_entry $operator $value");
         return $this->convertDbResultToAcumulusEntries($result);
     }
 

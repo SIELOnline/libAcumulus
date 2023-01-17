@@ -358,7 +358,7 @@ class Completor
                 $possibleVatTypes[] = Api::VatType_MarginScheme;
             }
         }
-        $this->possibleVatTypes = array_unique($possibleVatTypes, SORT_NUMERIC);
+        $this->possibleVatTypes = array_values(array_unique($possibleVatTypes, SORT_NUMERIC));
     }
 
     /**
@@ -858,6 +858,7 @@ class Completor
      * that it may be corrected in Acumulus.
      *
      * @noinspection PhpFunctionCyclomaticComplexityInspection
+     * @noinspection PhpComplexFunctionInspection
      */
     protected function completeVatType(): void
     {

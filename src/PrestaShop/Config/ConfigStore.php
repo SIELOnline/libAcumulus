@@ -18,7 +18,7 @@ class ConfigStore extends BaSeConfigStore
     public function load(): array
     {
         $values = Configuration::get(strtoupper($this->configKey));
-        return unserialize($values, ['allow_classes' => false]);
+        return !empty($values) ? unserialize($values, ['allow_classes' => false]) : [];
     }
 
     /**

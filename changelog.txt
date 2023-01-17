@@ -3,8 +3,16 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our own code.
 
-7.6.0 (2023-01-17)
-------------------
+7.6.1 (2023-01-??) (PS only?)
+----------------------------
+Bugs:
+- PS: Error after fresh install: Type Error: Return value of
+  \Siel\Acumulus\PrestaShop\Config\ConfigStore::load() must be of the type
+  array, bool returned.
+
+
+7.6.0 (2023-01-17) (WC only)
+----------------------------
 Features:
 - ALL: A new setting "Do you charge EU VAT?" replaces the setting "Which tax
   classes define EU vat rates?" and this new setting is only used in case no

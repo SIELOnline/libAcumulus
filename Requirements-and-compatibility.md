@@ -75,8 +75,9 @@ Notes:
 | JOO | 4.2.5             | ✅   | ✅   | ✅   |                                  |
 | HS  | 4.6.2 (starter)   | ✅   | ✅   | ✅   |                                  |
 | MA  | 2.4.5 (community) | ❌   | ✅   | ✅   | Contains PHP 8 constructs        |
-| OC  | 3.0.3.7           | ✅   | ✅   | ❌   | Many warnings on 8.1             |
+| OC  | 3.0.3.7           | ✅   | ✅   | ❌   | Many warnings on PHP 8.1         |
 |     | 4.x.y.z           | ❓   | ❓   | ❓   | Not yet supported                |
-| PS  | 1.7.8.7           | ✅   | ❌   | ❌   | Fatal runtime errors             |
+| PS  | 1.7.8.7           | ✅   | ❌   | ❌   | Fatal runtime errors on PHP 8    |
+|     | 8.0.1             | ✅   | ✅   | ✅   | Warnings get logged on PHP 8.1   |
 | VM  | 4.0.4             | ✅   | ✅   | ✅   |                                  |
 | WC  | 7.1.0             | ✅   | ✅   | ❓   | Many warnings from other plugins |

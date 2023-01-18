@@ -33,19 +33,20 @@ class FormHelper
      */
     public const Meta = 'meta';
     /**
-     * Name of the hidden meta field.
+     * Prefix to add to option values (select or radio) to distinguish them from
+     * the empty value in a weak comparison.
      */
     public const Unique = 'UNIQUE_';
 
     protected Translator $translator;
     /**
-     * Metadata about the fields on the form.
-     *
-     * This info is added to the form in a hidden field and thus can come from
-     * the posted values (if we are processing a submitted form) or from the
-     * defined fields.
-     *
      * @var object[]|null
+     *   Metadata about the fields on the form.
+     *
+     *   This info is added to forms having the property {@see Form::$addMeta} set
+     *   to true. The info is stored in a hidden field and thus comes from the
+     *   posted values if we are processing a submitted form, otherwise it is
+     *   constructed from the defined fields.
      */
     protected ?array $meta;
 
@@ -76,7 +77,7 @@ class FormHelper
     protected function getMeta(): ?array
     {
         if (empty($this->meta) && $this->isSubmitted() && isset($_POST[static::Meta])) {
-            $meta = json_decode($_POST[static::Meta]);
+            $meta = json_decode($_POST[static::Meta], false);
             if (is_object($meta) || is_array($meta)) {
                 $this->setMeta($meta);
             }

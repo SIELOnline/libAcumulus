@@ -54,13 +54,16 @@ class FormHelper extends BaseFormHelper
      */
     protected function alterPostedValues(array $postedValues): array
     {
-        foreach ($this->getMeta() as $key => $fieldMeta) {
-            /** @var \stdClass $fieldMeta */
-            if ($fieldMeta->type === 'checkbox') {
-                $prestaShopName = $fieldMeta->collection . '_' . $key;
-                if (isset($postedValues[$prestaShopName])) {
-                    $postedValues[$key] = $postedValues[$prestaShopName];
-                    unset($postedValues[$prestaShopName]);
+        /** @var object[]|null $meta */
+        $meta = $this->getMeta();
+        if ($meta !== null) {
+            foreach ($meta as $key => $fieldMeta) {
+                if ($fieldMeta->type === 'checkbox') {
+                    $prestaShopName = $fieldMeta->collection . '_' . $key;
+                    if (isset($postedValues[$prestaShopName])) {
+                        $postedValues[$key] = $postedValues[$prestaShopName];
+                        unset($postedValues[$prestaShopName]);
+                    }
                 }
             }
         }

@@ -170,7 +170,7 @@ abstract class Source
      * Should either be overridden or both getStatusOrder() and
      * getStatusCreditNote() should be implemented.
      *
-     * @return mixed
+     * @return int|string
      *   The status for this invoice source.
      */
     public function getStatus()
@@ -433,8 +433,8 @@ abstract class Source
      * Do not override this method but override getShopCreditNotes() instead.
      *
      * @return Source[]|null
-     *   If the invoice source is an order, an array of refunds is returned,
-     *   null otherwise.
+     *   If the invoice source is an order, a, possibly empty, array of refunds
+     *   is returned, null otherwise.
      */
     public function getCreditNotes(): ?array
     {

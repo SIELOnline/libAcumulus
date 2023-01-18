@@ -82,7 +82,7 @@ class Source extends BaseSource
      */
     protected function getStatusOrder(): int
     {
-        return $this->source->current_state;
+        return (int) $this->source->current_state;
     }
 
     /**
@@ -116,12 +116,9 @@ class Source extends BaseSource
     public function getPaymentStatus(): int
     {
         // Assumption: credit slips are always in a paid status.
-        if (($this->getType() === Source::Order && $this->source->hasBeenPaid()) || $this->getType() === Source::CreditNote) {
-            $result = Api::PaymentStatus_Paid;
-        } else {
-            $result = Api::PaymentStatus_Due;
-        }
-        return $result;
+        return ($this->getType() === Source::Order && $this->source->hasBeenPaid()) || $this->getType() === Source::CreditNote
+            ? Api::PaymentStatus_Paid
+            : Api::PaymentStatus_Due;
     }
 
     /**

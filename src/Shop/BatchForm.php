@@ -84,6 +84,17 @@ class BatchForm extends Form
         return $result;
     }
 
+    protected function setSubmittedValues(): void
+    {
+        parent::setSubmittedValues();
+        // Trim the from-to fields, can e.g. be copied from the order list,
+        // and therefore contain spaces or tabs before or after the value.
+        $this->submittedValues['invoice_source_reference_from'] = trim($this->submittedValues['invoice_source_reference_from']);
+        $this->submittedValues['invoice_source_reference_to'] = trim($this->submittedValues['invoice_source_reference_to']);
+        $this->submittedValues['date_from'] = trim($this->submittedValues['date_from']);
+        $this->submittedValues['date_to'] = trim($this->submittedValues['date_to']);
+    }
+
     /**
      * {@inheritdoc}
      */

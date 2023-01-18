@@ -26,7 +26,7 @@ class Token extends BaseToken
             $method1 = $property;
             $method3 = 'get_' . $property;
             if (method_exists($variable, $method1)) {
-                $value = call_user_func_array([$variable , $method1], $args);
+                $value = call_user_func_array([$variable, $method1], $args);
             } elseif (method_exists($variable, $method3)) {
                 $value = call_user_func_array([$variable, $method3], $args);
             } else {
@@ -104,10 +104,10 @@ class Token extends BaseToken
      */
     protected function getMetaDataValue(array $metaData, string $property): ?string
     {
-	    $property = ltrim($property, '_');
+        $property = ltrim($property, '_');
         $value = null;
         foreach ($metaData as $metaItem) {
-        	$key = ltrim($metaItem->key, '_');
+            $key = ltrim($metaItem->key, '_');
             if ($property === $key) {
                 $value = $metaItem->value;
                 break;

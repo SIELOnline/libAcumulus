@@ -16,6 +16,9 @@ Bugs:
   array, bool returned.
 - PS: Some changes had to be made to be compatible with PS 8.0.
 
+Refactorings:
+- ALL: Shop/InvoiceManager.php: made trigger... methods abstract, as all shops
+  implement them.
 
 7.6.0 (2023-01-17) (WC only)
 ----------------------------

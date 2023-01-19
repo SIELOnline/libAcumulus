@@ -701,10 +701,7 @@ abstract class InvoiceManager
      * @param \Siel\Acumulus\Invoice\InvoiceAddResult $localResult
      *   Any locally generated messages.
      */
-    protected function triggerInvoiceCreated(?array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
-    {
-        // Default implementation: no event.
-    }
+    abstract protected function triggerInvoiceCreated(?array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult): void;
 
     /**
      * Triggers an event that an invoice for Acumulus has been created and
@@ -720,10 +717,7 @@ abstract class InvoiceManager
      * @param \Siel\Acumulus\Invoice\InvoiceAddResult $localResult
      *   Any locally generated messages.
      */
-    protected function triggerInvoiceSendBefore(?array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
-    {
-        // Default implementation: no event.
-    }
+    abstract protected function triggerInvoiceSendBefore(?array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult): void;
 
     /**
      * Triggers an event after an invoice for Acumulus has been sent.
@@ -737,10 +731,7 @@ abstract class InvoiceManager
      * @param \Siel\Acumulus\Invoice\InvoiceAddResult $result
      *   The result as sent back by Acumulus.
      */
-    protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, InvoiceAddResult $result): void
-    {
-        // Default implementation: no event.
-    }
+    abstract protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, InvoiceAddResult $result): void;
 
     /**
      * Returns the given DateTime in a format that the actual database layer

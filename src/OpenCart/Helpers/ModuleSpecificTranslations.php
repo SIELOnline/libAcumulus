@@ -1,5 +1,6 @@
 <?php
 /**
+ * @noinspection LongLine
  * @noinspection HtmlUnknownTarget
  */
 

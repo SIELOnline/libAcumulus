@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Registers an autoloader for the Siel\Acumulus namespace.
  *
@@ -17,7 +19,7 @@ class SielAcumulusAutoloader
    *
    * Thanks to https://gist.github.com/mageekguy/8300961
    */
-    public static function register()
+    public static function register(): void
     {
         // In some shops (OpenCart1) there's not one central entry point, and
         // we may risk registering twice.

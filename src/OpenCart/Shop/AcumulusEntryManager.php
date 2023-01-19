@@ -49,13 +49,10 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
      */
     public function getByEntryId(?int $entryId)
     {
+        $operator = $entryId === null ? 'is' : '=';
+        $value = $entryId === null ? 'null' : (string) $entryId;
         /** @var \stdClass $result  (documentation error in DB) */
-        $result = $this->getDb()->query(sprintf(
-            'SELECT * FROM `%s` WHERE entry_id %s %s',
-            $this->tableName,
-            $entryId === null ? 'is' : '=',
-            $entryId === null ? 'null' : (string) $entryId
-        ));
+        $result = $this->getDb()->query("SELECT * FROM `$this->tableName` WHERE entry_id $operator $value");
         return $this->convertDbResultToAcumulusEntries($result->rows);
     }
 
@@ -227,6 +224,8 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
 
     /**
      * {@inheritDoc}
+     *
+     * @noinspection PhpMissingParentCallCommonInspection
      */
     public function upgrade(string $currentVersion): bool
     {

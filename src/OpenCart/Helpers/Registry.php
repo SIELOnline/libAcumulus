@@ -59,7 +59,6 @@ class Registry
     public function __construct(\Registry $registry)
     {
         $this->registry = $registry;
-        $this->orderModel = null;
         static::setInstance($this);
     }
 
@@ -114,7 +113,7 @@ class Registry
      */
     public function getOrderModel()
     {
-        if ($this->orderModel === null) {
+        if (!isset($this->orderModel)) {
             if (strrpos(DIR_APPLICATION, '/catalog/') === strlen(DIR_APPLICATION) - strlen('/catalog/')) {
                 // We are in the catalog section, use the checkout/order model.
                 $modelName = 'checkout/order';

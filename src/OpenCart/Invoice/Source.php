@@ -1,4 +1,8 @@
 <?php
+/**
+ * @noinspection PhpMissingParentCallCommonInspection  many parent methods are
+ *   no-ops or call {@see Source::callTypeSpecificMethod()}.
+ */
 
 declare(strict_types=1);
 

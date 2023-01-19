@@ -6,14 +6,14 @@
 
 declare(strict_types=1);
 
-namespace Siel\Acumulus\OpenCart\Shop;
+namespace Siel\Acumulus\OpenCart\OpenCart3\Shop;
 
 use DateTime;
 use DB;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Invoice\Source;
-use Siel\Acumulus\OpenCart\Helpers\Registry;
+use Siel\Acumulus\OpenCart\OpenCart3\Helpers\Registry;
 use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
 
 /**
@@ -151,7 +151,7 @@ class InvoiceManager extends BaseInvoiceManager
     }
 
     /**
-     * @return \Siel\Acumulus\OpenCart\Helpers\Registry
+     * @return \Siel\Acumulus\OpenCart\OpenCart3\Helpers\Registry
      *
      */
     protected function getRegistry(): Registry

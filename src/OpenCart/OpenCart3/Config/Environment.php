@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Siel\Acumulus\OpenCart\Config;
+namespace Siel\Acumulus\OpenCart\OpenCart3\Config;
 
 use DB;
 use Siel\Acumulus\Config\Environment as EnvironmentBase;
-use Siel\Acumulus\OpenCart\Helpers\Registry;
+use Siel\Acumulus\OpenCart\OpenCart3\Helpers\Registry;
 
 use function is_object;
 

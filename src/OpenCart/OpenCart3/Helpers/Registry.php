@@ -6,7 +6,7 @@
 
 declare(strict_types=1);
 
-namespace Siel\Acumulus\OpenCart\Helpers;
+namespace Siel\Acumulus\OpenCart\OpenCart3\Helpers;
 
 use function strlen;
 
@@ -43,8 +43,6 @@ class Registry
 
     /**
      * Returns the Registry instance.
-     *
-     * @return \Siel\Acumulus\OpenCart\Helpers\Registry
      */
     public static function getInstance(): Registry
     {
@@ -55,6 +53,7 @@ class Registry
      * Registry constructor.
      *
      * @param \Registry $registry
+     *   The OpenCart Registry object.
      */
     public function __construct(\Registry $registry)
     {
@@ -73,7 +72,8 @@ class Registry
     /**
      * Magic method __set must be declared public.
      *
-     * @noinspection MagicMethodsValidityInspection*/
+     * @noinspection MagicMethodsValidityInspection
+     */
     public function __set(string $key, $value)
     {
         $this->registry->set($key, $value);
@@ -133,13 +133,14 @@ class Registry
      *  The model to get: should be of the form 'namespace/[subnamespace/]model'.
      *
      * @return \Model
+     *  Actually a {@see Proxy} is returned that proxies a
+     *  \ModelGroup1Group2Model class... (aka Duck typing)
      *
-     * @noinspection PhpMissingReturnTypeInspection : actually a {@see Proxy} is
-     *   returned that proxies a \ModelGroup1Group2Model class.
+     * @noinspection ReturnTypeCanBeDeclaredInspection  Actually a {@see Proxy}
+     *   is returned that proxies a \ModelGroup1Group2Model class.
      * @noinspection PhpDocMissingThrowsInspection  Will throw an \Exception
      *   when the model class is not found, but that should be considered a
      *   development error.
-     * @noinspection ReturnTypeCanBeDeclaredInspection
      */
     public function getModel(string $modelName)
     {

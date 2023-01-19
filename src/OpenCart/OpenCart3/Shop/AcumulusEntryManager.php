@@ -6,16 +6,16 @@
 
 declare(strict_types=1);
 
-namespace Siel\Acumulus\OpenCart\Shop;
+namespace Siel\Acumulus\OpenCart\OpenCart3\Shop;
 
 use DB;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Invoice\Source;
-use Siel\Acumulus\OpenCart\Helpers\Registry;
-use Siel\Acumulus\Shop\AcumulusEntryManager as BaseAcumulusEntryManager;
+use Siel\Acumulus\OpenCart\OpenCart3\Helpers\Registry;
 use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
+use Siel\Acumulus\Shop\AcumulusEntryManager as BaseAcumulusEntryManager;
 
 /**
  * Implements the OpenCart specific acumulus entry model class.

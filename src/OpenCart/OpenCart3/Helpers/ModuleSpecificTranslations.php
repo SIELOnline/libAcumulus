@@ -6,7 +6,7 @@
 
 declare(strict_types=1);
 
-namespace Siel\Acumulus\OpenCart\Helpers;
+namespace Siel\Acumulus\OpenCart\OpenCart3\Helpers;
 
 use Siel\Acumulus\Helpers\ModuleSpecificTranslations as BaseModuleSpecificTranslations;
 

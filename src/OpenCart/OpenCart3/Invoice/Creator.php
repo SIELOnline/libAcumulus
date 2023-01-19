@@ -17,20 +17,20 @@
  * @noinspection SqlDialectInspection
  */
 
-namespace Siel\Acumulus\OpenCart\Invoice;
+namespace Siel\Acumulus\OpenCart\OpenCart3\Invoice;
 
 use DB;
 use RuntimeException;
+use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
 use Siel\Acumulus\Meta;
-use Siel\Acumulus\OpenCart\Helpers\Registry;
-use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\OpenCart\OpenCart3\Helpers\Registry;
 use Siel\Acumulus\Tag;
 
 /**
  * Creates a raw version of the Acumulus invoice from an OpenCart {@see Source}.
  *
- * @property \Siel\Acumulus\OpenCart\Invoice\Source $invoiceSource
+ * @property \Siel\Acumulus\OpenCart\OpenCart3\Invoice\Source $invoiceSource
  */
 class Creator extends BaseCreator
 {

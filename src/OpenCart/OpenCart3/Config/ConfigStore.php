@@ -5,10 +5,10 @@
 
 declare(strict_types=1);
 
-namespace Siel\Acumulus\OpenCart\Config;
+namespace Siel\Acumulus\OpenCart\OpenCart3\Config;
 
 use Siel\Acumulus\Config\ConfigStore as BaseConfigStore;
-use Siel\Acumulus\OpenCart\Helpers\Registry;
+use Siel\Acumulus\OpenCart\OpenCart3\Helpers\Registry;
 
 /**
  * Implements the connection to the OpenCart config component.

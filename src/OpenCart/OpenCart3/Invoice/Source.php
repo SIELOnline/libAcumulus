@@ -1,17 +1,17 @@
 <?php
 /**
  * @noinspection PhpMissingParentCallCommonInspection  many parent methods are
- *   no-ops or call {@see Source::callTypeSpecificMethod()}.
+ *   no-ops or call {@see \Siel\Acumulus\OpenCart\OpenCart3\Invoice\Source::callTypeSpecificMethod()}.
  */
 
 declare(strict_types=1);
 
-namespace Siel\Acumulus\OpenCart\Invoice;
+namespace Siel\Acumulus\OpenCart\OpenCart3\Invoice;
 
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Invoice\Source as BaseSource;
 use Siel\Acumulus\Meta;
-use Siel\Acumulus\OpenCart\Helpers\Registry;
+use Siel\Acumulus\OpenCart\OpenCart3\Helpers\Registry;
 
 use function in_array;
 use function strlen;

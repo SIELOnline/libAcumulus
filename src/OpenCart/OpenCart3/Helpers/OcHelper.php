@@ -5,17 +5,16 @@
 
 declare(strict_types=1);
 
-namespace Siel\Acumulus\OpenCart\Helpers;
+namespace Siel\Acumulus\OpenCart\OpenCart3\Helpers;
 
 use Exception;
 use Siel\Acumulus\Config\Config;
+use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Message;
 use Siel\Acumulus\Helpers\Severity;
-use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Util;
 use Siel\Acumulus\Invoice\Source;
 use stdClass;
-
 use Throwable;
 
 use function count;
@@ -593,7 +592,9 @@ class OcHelper
             $this->acumulusContainer->getConfig()->save([Config::VersionKey => Version]);
         }
 
-        $this->acumulusContainer->getLog()->info('%s: installed version = %s, $result = %s', __METHOD__, Version, $result ? 'true' : 'false');
+        $this->acumulusContainer->getLog()->info('%s: installed version = %s, $result = %s',
+            __METHOD__, Version, $result ? 'true' : 'false'
+        );
         return $result;
     }
 
@@ -682,7 +683,9 @@ class OcHelper
             $this->registry->model_setting_setting->editSetting('acumulus_siel', $setting);
         }
 
-        $this->acumulusContainer->getLog()->info('%s: updated to version = %s, $result = %s', __METHOD__, Version, $result ? 'true' : 'false');
+        $this->acumulusContainer->getLog()->info('%s: updated to version = %s, $result = %s',
+            __METHOD__, Version, $result ? 'true' : 'false'
+        );
         return $result;
     }
 

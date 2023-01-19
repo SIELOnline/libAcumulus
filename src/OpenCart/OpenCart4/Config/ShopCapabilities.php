@@ -5,12 +5,12 @@
 
 declare(strict_types=1);
 
-namespace Siel\Acumulus\OpenCart\OpenCart3\Config;
+namespace Siel\Acumulus\OpenCart\OpenCart4\Config;
 
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
 use Siel\Acumulus\Invoice\Source;
-use Siel\Acumulus\OpenCart\OpenCart3\Helpers\Registry;
+use Siel\Acumulus\OpenCart\OpenCart4\Helpers\Registry;
 
 use function defined;
 
@@ -372,7 +372,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
             case 'invoice':
                 return $registry->getLink($registry->getLocation() . '/' . $linkType);
             case 'logo':
-                // @todo: return relative to admin folder like alipay does.
+                // @todo: no longer correct
                 return (defined('HTTPS_SERVER') ? HTTPS_SERVER : HTTP_SERVER) . 'view/image/acumulus/siel-logo.png';
             case 'pro-support-image':
                 return (defined('HTTPS_SERVER') ? HTTPS_SERVER : HTTP_SERVER) . 'view/image/acumulus/pro-support-opencart.png';

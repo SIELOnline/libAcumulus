@@ -473,7 +473,7 @@ Merk op dat dit pdf-bestanden zijn die Acumulus maakt, niet die van de webwinkel
         'desc_accountSettings_N' => 'If you already do have an Acumulus account, you can fill in your details below.',
         'desc_accountSettings_F' => 'The entered account details are not correct, please correct them.',
         'desc_accountSettings_auth' => 'If you do not have an account yet, you can <a href="%1$s">register a free trial account</a>.',
-        'desc_accountSettings_T' => 'The %s could successfully connect to Acumulus with these details.',
+        'desc_accountSettings_T' => 'This %s could successfully connect to Acumulus with these details.',
 
         'field_code' => 'Contract code',
         'field_username' => 'User name',

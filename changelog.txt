@@ -6,19 +6,24 @@ This file contains a historical overview of changes in our own code.
 7.6.1 (2023-01-??) (PS only?)
 ----------------------------
 Features;
-- ALL: The batch form now allows white space (at the start or end) in the from-to
-  fields which will be removed. This allows for easier copy & paste from order
-  lists.
+- ALL: The batch form now allows white space (at the start or end) in the
+  from-to fields which will be removed. This allows for easier copy & paste from
+  order lists.
 
 Bugs:
 - PS: Error after fresh install: Type Error: Return value of
   \Siel\Acumulus\PrestaShop\Config\ConfigStore::load() must be of the type
   array, bool returned.
 - PS: Some changes had to be made to be compatible with PS 8.0.
+- ALL: TypeError: Mailer::sendInvoiceAddMailResult(): Argument #3
+  ($invoiceSourceReference) must be of type string, int given.
 
 Refactorings:
 - ALL: Shop/InvoiceManager.php: made trigger... methods abstract, as all shops
   implement them.
+- ALL: protected method InvoiceManager::getInvoiceAddResult() renamed to
+  createInvoiceAddResult().
+
 
 7.6.0 (2023-01-17) (WC only)
 ----------------------------

@@ -73,8 +73,12 @@ abstract class Mailer
     /**
      * Sends an email with the results of sending an invoice to Acumulus.
      * The mail is sent to the shop administrator ('emailonerror' setting).
+     *
+     * @param string|int $invoiceSourceReference
+     *
+     * @return bool
      */
-    public function sendInvoiceAddMailResult(InvoiceAddResult $invoiceSendResult, string $invoiceSourceType, string $invoiceSourceReference): bool
+    public function sendInvoiceAddMailResult(InvoiceAddResult $invoiceSendResult, string $invoiceSourceType, $invoiceSourceReference): bool
     {
         $from = $this->getFrom();
         $fromName = $this->getFromName();
@@ -195,11 +199,13 @@ abstract class Mailer
     /**
      * Returns the mail body as text and as HTML.
      *
+     * @param string|int $invoiceSourceReference
+     *
      * @return string[]
      *   An array with the body text in 2 formats,
      *   keyed by 'text' resp. 'html'.
      */
-    protected function getBody(InvoiceAddResult $result, string $invoiceSourceType, string $invoiceSourceReference): array
+    protected function getBody(InvoiceAddResult $result, string $invoiceSourceType, $invoiceSourceReference): array
     {
         $acumulusResult = $result->getAcumulusResult();
         $invoiceInfo = $result->getMainApiResponse();
@@ -257,7 +263,7 @@ abstract class Mailer
         switch ($invoiceAddResult->getSeverity()) {
             case Severity::Exception:
                 $sentences[] = 'mail_body_exception';
-                // @todo: check this: we want to know what was set just before executing the curl request.
+                /** @noinspection NullPointerExceptionInspection  If we get here, there will be an Acumulus\Result */
                 $sentences[] = $invoiceAddResult->getAcumulusResult()->getHttpResponse() !== null
                     ? 'mail_body_exception_invoice_maybe_created'
                     : 'mail_body_exception_invoice_not_created';

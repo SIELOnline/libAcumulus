@@ -15,6 +15,8 @@ use function count;
 /**
  * Extends Result with properties and features specific to the InvoiceAdd web
  * service call.
+ *
+ * @noinspection PhpLackOfCohesionInspection
  */
 class InvoiceAddResult extends MessageCollection
 {
@@ -61,7 +63,7 @@ class InvoiceAddResult extends MessageCollection
      * A list of parameters to use when getting the send-status as text.
      */
     protected array $sendStatusArguments;
-    protected ?AcumulusResult $acumulusResult = null;
+    protected ?AcumulusResult $acumulusResult;
 
     /**
      * InvoiceAddResult constructor.

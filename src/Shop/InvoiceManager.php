@@ -121,7 +121,7 @@ abstract class InvoiceManager
      *   A human-readable text explaining the reason why this invoice should or
      *   should not be sent.
      */
-    protected function getInvoiceAddResult(string $trigger): InvoiceAddResult
+    protected function createInvoiceAddResult(string $trigger): InvoiceAddResult
     {
         return $this->container->createInvoiceAddResult($trigger);
     }
@@ -244,7 +244,7 @@ abstract class InvoiceManager
                 $canResetTimer = false;
             }
 
-            $result = $this->getInvoiceAddResult('InvoiceManager::sendMultiple()');
+            $result = $this->createInvoiceAddResult('InvoiceManager::sendMultiple()');
             $result = $this->createAndSend($invoiceSource, $result, $forceSend, $dryRun);
             $success = $success && !$result->hasError();
             $this->getLog()->notice($this->getSendResultLogText($invoiceSource, $result));
@@ -267,7 +267,7 @@ abstract class InvoiceManager
      */
     public function send1(Source $invoiceSource, bool $forceSend): InvoiceAddResult
     {
-        $result = $this->getInvoiceAddResult('InvoiceManager::send1()');
+        $result = $this->createInvoiceAddResult('InvoiceManager::send1()');
         $result = $this->createAndSend($invoiceSource, $result, $forceSend);
         $this->getLog()->notice($this->getSendResultLogText($invoiceSource, $result));
         return $result;
@@ -286,7 +286,7 @@ abstract class InvoiceManager
      */
     public function sourceStatusChange(Source $invoiceSource): InvoiceAddResult
     {
-        $result = $this->getInvoiceAddResult('InvoiceManager::sourceStatusChange()');
+        $result = $this->createInvoiceAddResult('InvoiceManager::sourceStatusChange()');
         $status = $invoiceSource->getStatus();
         $shopEventSettings = $this->getConfig()->getShopEventSettings();
         if ($invoiceSource->getType() === Source::Order) {
@@ -324,7 +324,7 @@ abstract class InvoiceManager
      */
     public function invoiceCreate(Source $invoiceSource): InvoiceAddResult
     {
-        $result = $this->getInvoiceAddResult('InvoiceManager::invoiceCreate()');
+        $result = $this->createInvoiceAddResult('InvoiceManager::invoiceCreate()');
         $shopEventSettings = $this->getConfig()->getShopEventSettings();
         if ($shopEventSettings['triggerInvoiceEvent'] === Config::TriggerInvoiceEvent_Create) {
             $result = $this->createAndSend($invoiceSource, $result);
@@ -351,7 +351,7 @@ abstract class InvoiceManager
      */
     public function invoiceSend(Source $invoiceSource): InvoiceAddResult
     {
-        $result = $this->getInvoiceAddResult('InvoiceManager::invoiceSend()');
+        $result = $this->createInvoiceAddResult('InvoiceManager::invoiceSend()');
         $shopEventSettings = $this->getConfig()->getShopEventSettings();
         if ($shopEventSettings['triggerInvoiceEvent'] === Config::TriggerInvoiceEvent_Send) {
             $result = $this->createAndSend($invoiceSource, $result);

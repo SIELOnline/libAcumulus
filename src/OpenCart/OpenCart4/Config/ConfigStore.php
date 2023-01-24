@@ -1,6 +1,6 @@
 <?php
 /**
- * @noinspection PhpMultipleClassDeclarationsInspection
+ * @noinspection DuplicatedCode  Remove when extracting code common for OC3 and OC4
  */
 
 declare(strict_types=1);
@@ -39,14 +39,13 @@ class ConfigStore extends BaSeConfigStore
     }
 
     /**
-     * @return \ModelSettingSetting
+     * @return \Opencart\Admin\Model\Setting\Setting|\Opencart\Catalog\Model\Setting\Setting
      *
      * @noinspection PhpMissingReturnTypeInspection : actually a {@see Proxy} is
-     *   returned that proxies a {@see \ModelSettingSetting}. So for us, the
-     *   type is a \ModelSettingSetting.
+     *   returned that proxies (one of) the setting model(s). So for us, the
+     *   type is a Setting.
      * @noinspection PhpIncompatibleReturnTypeInspection
      * @noinspection PhpReturnDocTypeMismatchInspection
-     * @noinspection ReturnTypeCanBeDeclaredInspection
      */
     protected function getSettings()
     {

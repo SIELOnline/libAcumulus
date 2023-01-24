@@ -1,5 +1,6 @@
 <?php
 /**
+ * @noinspection DuplicatedCode  Remove when extracting code common for OC3 and OC4
  * @noinspection LongLine
  * @noinspection HtmlUnknownTarget
  */

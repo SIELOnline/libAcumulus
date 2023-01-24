@@ -1,7 +1,6 @@
 <?php
 /**
- * @noinspection SqlDialectInspection
- * @noinspection PhpMultipleClassDeclarationsInspection
+ * @noinspection DuplicatedCode  Remove when extracting code common for OC3 and OC4
  */
 
 declare(strict_types=1);
@@ -9,7 +8,7 @@ declare(strict_types=1);
 namespace Siel\Acumulus\OpenCart\OpenCart4\Shop;
 
 use DateTime;
-use DB;
+use Opencart\System\Library\DB;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Invoice\InvoiceAddResult;
 use Siel\Acumulus\Invoice\Source;
@@ -74,7 +73,7 @@ class InvoiceManager extends BaseInvoiceManager
     public function getInvoiceSourcesByDateRange(string $invoiceSourceType, DateTime $dateFrom, DateTime $dateTo): array
     {
         $key = $this->tableInfo[$invoiceSourceType]['key'];
-        /** @var \stdClass $result (documentation error in DB) */
+        /** @var \stdClass $result (documentation error in class DB) */
         $result = $this->getDb()->query(
             sprintf(
                 "SELECT `%s` FROM `%s` WHERE `date_modified` BETWEEN '%s' AND '%s'",
@@ -136,14 +135,16 @@ class InvoiceManager extends BaseInvoiceManager
      */
     protected function getLocation(): string
     {
-        return $this->getRegistry()->getLocation();
+        return $this->getRegistry()->getExtensionRoute();
     }
 
     /**
      * Wrapper around the event class instance.
      *
-     * @return \Event|\Light_Event
-     *   [SIEL #194403]; https://lightning.devs.mx/ defines its own handler.
+     * @return \Opencart\System\Engine\Event
+     *
+     * @noinspection ReturnTypeCanBeDeclaredInspection [SIEL #194403]:
+     *   https://lightning.devs.mx/ defines its own event class.
      */
     private function getEvent()
     {

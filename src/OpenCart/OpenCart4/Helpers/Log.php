@@ -15,10 +15,13 @@ class Log extends BaseLog
      * {@inheritdoc}
      *
      * This override uses the OpenCart Log class.
+     *
+     * @noinspection PhpMissingParentCallCommonInspection parent is default
+     *   fall back.
      */
     protected function write(string $message, int $severity): void
     {
-        $log = new \Log('acumulus.log');
+        $log = new \Opencart\System\Library\Log('acumulus.log');
         $message = sprintf('%s - %s', $this->getSeverityString($severity), $message);
         $log->write($message);
     }

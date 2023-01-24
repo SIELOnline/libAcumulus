@@ -1,6 +1,6 @@
 <?php
 /**
- * @noinspection PhpMultipleClassDeclarationsInspection
+ * @noinspection DuplicatedCode  Remove when extracting code common for OC3 and OC4
  */
 
 declare(strict_types=1);
@@ -11,8 +11,6 @@ use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\OpenCart\OpenCart4\Helpers\Registry;
-
-use function defined;
 
 /**
  * Defines the OpenCart web shop specific capabilities.
@@ -278,7 +276,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
      */
     public function getShopOrderStatuses(): array
     {
-        /** @var \ModelLocalisationOrderStatus $model */
+        /** @var \Opencart\Admin\Model\Localisation\OrderStatus $model */
         $model = $this->getRegistry()->getModel('localisation/order_status');
         $statuses = $model->getOrderStatuses();
         $result = [];
@@ -310,11 +308,12 @@ class ShopCapabilities extends ShopCapabilitiesBase
         $registry = $this->getRegistry();
         $prefix = 'payment_';
         $enabled = [];
-        /** @var \ModelSettingExtension $model */
+        /** @var \Opencart\Admin\Model\Setting\Extension $model */
         $model = $registry->getModel('setting/extension');
-        $extensions = $model->getInstalled('payment');
+        $extensions = $model->getExtensionsByType('payment');
         foreach ($extensions as $extension) {
-            if ($registry->config->get($prefix . $extension . '_status')) {
+            $code = $extension['code'];
+            if ($registry->config->get($prefix . $code . '_status')) {
                 $enabled[] = $extension;
             }
         }
@@ -324,7 +323,9 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * Turns the list into a translated list of select options.
      *
-     * @param array $extensions
+     * @param array[] $extensions
+     *   A list with information about the enabled payment extensions. Keys:
+     *   extension-id, extension, type (= payment), code.
      *
      * @return array
      *   An array with the extensions as key and their translated name as value.
@@ -333,10 +334,10 @@ class ShopCapabilities extends ShopCapabilitiesBase
     {
         $results = [];
         $registry = $this->getRegistry();
-        $directory = 'extension/payment/';
         foreach ($extensions as $extension) {
-            $registry->language->load($directory . $extension);
-            $results[$extension] = $registry->language->get('heading_title');
+            $directory = "extension/{$extension['extension']}/payment/";
+            $registry->language->load($directory . $extension['code']);
+            $results[$extension['code']] = $registry->language->get('heading_title');
         }
         return $results;
     }
@@ -347,7 +348,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     public function getVatClasses(): array
     {
         $result = [];
-        /** @var \ModelLocalisationTaxClass $model */
+        /** @var \Opencart\Admin\Model\Localisation\TaxClass $model */
         $model = $this->getRegistry()->getModel('localisation/tax_class');
         $taxClasses = $model->getTaxClasses();
         foreach ($taxClasses as $taxClass) {
@@ -364,18 +365,17 @@ class ShopCapabilities extends ShopCapabilitiesBase
         $registry = $this->getRegistry();
         switch ($linkType) {
             case 'config':
-                return $registry->getLink($registry->getLocation());
+                return $registry->getExtensionPageUrl('');
             case 'register':
             case 'activate':
             case 'advanced':
             case 'batch':
             case 'invoice':
-                return $registry->getLink($registry->getLocation() . '/' . $linkType);
+                return $registry->getExtensionPageUrl($linkType);
             case 'logo':
-                // @todo: no longer correct
-                return (defined('HTTPS_SERVER') ? HTTPS_SERVER : HTTP_SERVER) . 'view/image/acumulus/siel-logo.png';
+                return $registry->getExtensionFileUrl('view/image/siel-logo.png');
             case 'pro-support-image':
-                return (defined('HTTPS_SERVER') ? HTTPS_SERVER : HTTP_SERVER) . 'view/image/acumulus/pro-support-opencart.png';
+                return $registry->getExtensionFileUrl('view/image/pro-support-opencart.png');
             case 'pro-support-link':
                 return 'https://pay.siel.nl/?p=0nKmWpoNV0wtqeac43dqc5YUAcaHFJkldwy1alKD1G3EJHmC';
         }

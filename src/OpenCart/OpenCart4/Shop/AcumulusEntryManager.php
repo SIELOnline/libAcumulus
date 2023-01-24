@@ -1,14 +1,13 @@
 <?php
 /**
- * @noinspection PhpMultipleClassDeclarationsInspection
- * @noinspection SqlDialectInspection
+ * @noinspection DuplicatedCode  Remove when extracting code common for OC3 and OC4
  */
 
 declare(strict_types=1);
 
 namespace Siel\Acumulus\OpenCart\OpenCart4\Shop;
 
-use DB;
+use Opencart\System\Library\DB;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
@@ -126,7 +125,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * Helper method to get the db object.
      *
-     * @return \DB
+     * @return \Opencart\System\Library\DB
      */
     protected function getDb(): DB
     {

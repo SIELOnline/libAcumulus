@@ -1,6 +1,6 @@
 <?php
 /**
- * @noinspection PhpMultipleClassDeclarationsInspection
+ * @noinspection DuplicatedCode  Remove when extracting code common for OC3 and OC4
  */
 
 declare(strict_types=1);
@@ -37,7 +37,7 @@ class OcHelper
     public array $data;
     protected Registry $registry;
 
-    public function __construct(\Registry $registry, Container $acumulusContainer)
+    public function __construct(\Opencart\System\Engine\Registry $registry, Container $acumulusContainer)
     {
         $this->acumulusContainer = $acumulusContainer;
         /** @noinspection PhpFieldAssignmentTypeMismatchInspection */
@@ -106,7 +106,7 @@ class OcHelper
      */
     public function getLocation(): string
     {
-        return $this->registry->getLocation();
+        return 'extension/acumulus/';
     }
 
     /**
@@ -307,7 +307,7 @@ class OcHelper
     {
         $this->initFormCommon($type);
 
-        $this->registry->document->addStyle('view/stylesheet/acumulus.css');
+        $this->registry->document->addStyle($this->registry->getExtensionFileUrl('view/stylesheet/acumulus.css'));
 
         $this->data['header'] = $this->registry->load->controller('common/header');
         $this->data['column_left'] = $this->registry->load->controller('common/column_left');
@@ -316,14 +316,10 @@ class OcHelper
         // Set headers and titles.
         $this->registry->document->setTitle($this->t("{$type}_form_title"));
         $this->data['page_title'] = $this->t("{$type}_form_title");
-        $this->data['text_edit'] = $this->t("{$type}_form_header");
-
-        $link = $this->getLocation();
-        if ($type !== 'config') {
-            $link .= "/$type";
-        }
+        $this->data['text_form'] = $this->t("{$type}_form_header");
 
         // Set up breadcrumb.
+        $action = $type === 'config' ? '' : $type;
         $this->data['breadcrumbs'] = [];
         $this->data['breadcrumbs'][] = [
             'text' => $this->t('text_home'),
@@ -336,12 +332,12 @@ class OcHelper
         }
         $this->data['breadcrumbs'][] = [
             'text' => $this->t("{$type}_form_header"),
-            'href' => $this->registry->getLink($link),
+            'href' => $this->registry->getExtensionPageUrl($action),
             'separator' => ' :: '
         ];
 
         // Set the action buttons (action + text).
-        $this->data['action'] = $this->registry->getLink($link);
+        $this->data['action'] = $this->registry->getExtensionPageUrl($action);
         if ($type === 'batch') {
             $this->data['button_icon'] = 'fa-envelope-o';
         } elseif ($type === 'uninstall') {
@@ -409,7 +405,8 @@ class OcHelper
         $form = $this->data['form'];
         $this->addMessages($form->getMessages());
 
-        $route = $this->getLocation();
+        // Route to the view: extension/{extension_name}/
+        $route = $this->getLocation() . 'module/acumulus';
         if ($form->getType() === 'invoice') {
             $route .= '_invoice';
         }
@@ -546,8 +543,8 @@ class OcHelper
     public function eventControllerSaleOrderInfo(): void
     {
         if ($this->acumulusContainer->getConfig()->getInvoiceStatusSettings()['showInvoiceStatus']) {
-            $this->registry->document->addStyle('view/stylesheet/acumulus.css');
-            $this->registry->document->addScript('view/javascript/acumulus/acumulus-ajax.js');
+            $this->registry->document->addStyle($this->registry->getExtensionFileUrl('view/stylesheet/acumulus.css'));
+            $this->registry->document->addScript($this->registry->getExtensionFileUrl('view/javascript/acumulus/acumulus-ajax.js'));
         }
     }
 
@@ -709,18 +706,30 @@ class OcHelper
     protected function installEvents(): void
     {
         $this->uninstallEvents();
-        $location = $this->getLocation();
-        /** @var \ModelSettingEvent $model */
-        $model = $this->registry->getModel('setting/event');
-        $model->addEvent('acumulus','catalog/model/*/addOrder/after',$location . '/eventOrderUpdate');
-        $model->addEvent('acumulus','catalog/model/*/addOrderHistory/after',$location . '/eventOrderUpdate');
-        $model->addEvent('acumulus','admin/model/*/addOrder/after',$location . '/eventOrderUpdate');
-        $model->addEvent('acumulus','admin/model/*/addOrderHistory/after',$location . '/eventOrderUpdate');
-        $model->addEvent('acumulus','admin/view/common/column_left/before',$location . '/eventViewColumnLeft');
-        $model->addEvent('acumulus','admin/controller/sale/order/info/before',$location . '/eventControllerSaleOrderInfo');
-        $model->addEvent('acumulus','admin/view/sale/order_info/before',$location . '/eventViewSaleOrderInfo');
+        // @todo: check the triggers.
+        $this->addEvent('acumulus','catalog/model/*/addOrder/after','/eventOrderUpdate');
+        $this->addEvent('acumulus','catalog/model/*/addOrderHistory/after','/eventOrderUpdate');
+        $this->addEvent('acumulus','admin/model/*/addOrder/after','/eventOrderUpdate');
+        $this->addEvent('acumulus','admin/model/*/addOrderHistory/after','/eventOrderUpdate');
+        $this->addEvent('acumulus','admin/view/common/column_left/before','/eventViewColumnLeft');
+        $this->addEvent('acumulus','admin/controller/sale/order/info/before','/eventControllerSaleOrderInfo');
+        $this->addEvent('acumulus','admin/view/sale/order_info/before','/eventViewSaleOrderInfo');
     }
 
+    protected function addEvent(string $code, string $trigger, string $action, bool $status = true, int $sort_order = 1): void
+    {
+        $location = $this->getLocation();
+        /** @var \Opencart\Admin\Model\Setting\Event $model */
+        $model = $this->registry->getModel('setting/event');
+        $model->addEvent([
+            'code' => $code,
+            'description' => '',
+            'trigger' => $trigger,
+            'action' => $location . $action,
+            'status' => $status,
+            'order' => $sort_order,
+        ]);
+    }
     /**
      * Removes the Acumulus event handlers from the event table.
      *
@@ -728,7 +737,7 @@ class OcHelper
      */
     protected function uninstallEvents(): void
     {
-        /** @var \ModelSettingEvent $model */
+        /** @var \Opencart\Admin\Model\Setting\Event $model */
         $model = $this->registry->getModel('setting/event');
         $model->deleteEventByCode('acumulus');
     }

@@ -15,11 +15,12 @@
  * @noinspection PhpStaticAsDynamicMethodCallInspection
  * @noinspection StaticInvocationViaThisInspection
  * @noinspection SqlDialectInspection
+ * @noinspection DuplicatedCode  Remove when extracting code common for OC3 and OC4
  */
 
 namespace Siel\Acumulus\OpenCart\OpenCart4\Invoice;
 
-use DB;
+use Opencart\System\Library\DB;
 use RuntimeException;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Invoice\Creator as BaseCreator;
@@ -70,6 +71,9 @@ class Creator extends BaseCreator
      * {@inheritdoc}
      *
      * @throws \Exception
+     *
+     * @noinspection PhpMissingParentCallCommonInspection parent is default
+     *   fall back.
      */
     protected function getInvoiceLines(): array
     {
@@ -83,11 +87,14 @@ class Creator extends BaseCreator
      * {@inheritdoc}
      *
      * @throws \Exception
+     *
+     * @noinspection PhpMissingParentCallCommonInspection parent is default
+     *   fall back.
      */
     protected function getItemLines(): array
     {
         $result = [];
-        $orderProducts = $this->getOrderModel()->getOrderProducts($this->invoiceSource->getId());
+        $orderProducts = $this->getOrderModel()->getProducts($this->invoiceSource->getId());
         foreach ($orderProducts as $line) {
             $result[] = $this->getItemLine($line);
         }
@@ -101,15 +108,13 @@ class Creator extends BaseCreator
      * These lines will be informative, their price will be 0.
      *
      * @throws \Exception
-     *
-     * @noinspection PhpMultipleClassDeclarationsInspection
      */
     protected function getItemLine(array $item): array
     {
         $result = [];
 
         // $product can be empty if the product has been deleted.
-        /** @var \ModelCatalogProduct $model */
+        /** @var \Opencart\Admin\Model\Catalog\Product $model */
         $model = $this->getRegistry()->getModel('catalog/product');
         $product = $model->getProduct($item['product_id']);
         if (!empty($product)) {
@@ -141,7 +146,7 @@ class Creator extends BaseCreator
         $result += $vatInfo;
 
         // Options (variants).
-        $options = $this->getOrderModel()->getOrderOptions($item['order_id'], $item['order_product_id']);
+        $options = $this->getOrderModel()->getOptions($item['order_id'], $item['order_product_id']);
         if (!empty($options)) {
             // Add options as children.
             $result[Meta::ChildrenLines] = [];
@@ -512,7 +517,7 @@ class Creator extends BaseCreator
     }
 
     /**
-     * @return \ModelCheckoutOrder|\ModelSaleOrder
+     * @return \Opencart\Catalog\Model\Checkout\Order|\Opencart\Admin\Model\Sale\Order
      */
     protected function getOrderModel()
     {
@@ -520,7 +525,7 @@ class Creator extends BaseCreator
     }
 
     /**
-     * @return \DB
+     * @return \Opencart\System\Library\DB
      */
     protected function getDb(): DB
     {

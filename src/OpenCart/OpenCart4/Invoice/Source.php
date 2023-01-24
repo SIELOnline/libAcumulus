@@ -1,7 +1,8 @@
 <?php
 /**
  * @noinspection PhpMissingParentCallCommonInspection  many parent methods are
- *   no-ops or call {@see \Siel\Acumulus\OpenCart\OpenCart4\Invoice\Source::callTypeSpecificMethod()}.
+ *   no-ops or call {@see Source::callTypeSpecificMethod()}.
+ * @noinspection DuplicatedCode  Remove when extracting code common for OC3 and OC4
  */
 
 declare(strict_types=1);
@@ -61,7 +62,7 @@ class Source extends BaseSource
      */
     public function getStatus(): int
     {
-        return $this->source['order_status_id'];
+        return (int) $this->source['order_status_id'];
     }
 
     /**
@@ -77,7 +78,7 @@ class Source extends BaseSource
      *
      * This override returns the code of the selected payment method.
      */
-    public function getPaymentMethod()
+    public function getPaymentMethod(): ?string
     {
         return $this->source['payment_code'] ?? parent::getPaymentMethod();
     }
@@ -105,8 +106,8 @@ class Source extends BaseSource
      */
     public function getPaymentDate(): ?string
     {
-        // @todo
-        //  Can we determine this based on history (and optionally payment_code)?
+        // @todo Can we determine this based on history (and optionally
+        //   payment_code)?
         // Will default to the issue date.
         return null;
     }
@@ -164,7 +165,7 @@ class Source extends BaseSource
     public function getOrderTotalLines(): array
     {
         if (!isset($this->orderTotalLines)) {
-            $this->orderTotalLines = $this->getOrderModel()->getOrderTotals($this->source['order_id']);
+            $this->orderTotalLines = $this->getOrderModel()->getTotals($this->source['order_id']);
         }
         return $this->orderTotalLines;
     }
@@ -182,7 +183,7 @@ class Source extends BaseSource
     }
 
     /**
-     * @return \ModelCheckoutOrder|\ModelSaleOrder
+     * @return \Opencart\Catalog\Model\Checkout\Order|\Opencart\Admin\Model\Sale\Order
      */
     protected function getOrderModel()
     {

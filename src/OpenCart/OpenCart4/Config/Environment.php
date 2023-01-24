@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\OpenCart\OpenCart4\Config;
 
-use DB;
+use Opencart\System\Library\DB;
 use Siel\Acumulus\Config\Environment as EnvironmentBase;
 use Siel\Acumulus\OpenCart\OpenCart4\Helpers\Registry;
 

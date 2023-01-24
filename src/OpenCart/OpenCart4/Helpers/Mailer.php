@@ -1,11 +1,14 @@
 <?php
+/**
+ * @noinspection DuplicatedCode  Remove when extracting code common for OC3 and OC4
+ */
 
 declare(strict_types=1);
 
 namespace Siel\Acumulus\OpenCart\OpenCart4\Helpers;
 
 use Exception;
-use Mail;
+use Opencart\System\Library\Mail;
 use Siel\Acumulus\Helpers\Mailer as BaseMailer;
 
 /**
@@ -54,6 +57,9 @@ class Mailer extends BaseMailer
 
     /**
      * {@inheritdoc}
+     *
+     * @noinspection PhpMissingParentCallCommonInspection parent is default
+     *   fall back.
      */
     public function getFrom(): string
     {

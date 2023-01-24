@@ -80,6 +80,20 @@ class Registry
     }
 
     /**
+     * Returns a link to the given route.
+     *
+     * @param string $route
+     *
+     * @return string
+     *   The link to the given route, including standard arguments.
+     */
+    public function getLink(string $route): string
+    {
+        $token = 'user_token';
+        return $this->url->link($route, $token . '=' . $this->session->data[$token], true);
+    }
+
+    /**
      * Returns the location of the extension's files.
      *
      * @return string
@@ -148,19 +162,5 @@ class Registry
         $this->load->model($modelName);
         $modelProperty = str_replace('/', '_', "model_$modelName");
         return $this->registry->get($modelProperty);
-    }
-
-    /**
-     * Returns a link to the given route.
-     *
-     * @param string $route
-     *
-     * @return string
-     *   The link to the given route, including standard arguments.
-     */
-    public function getLink(string $route): string
-    {
-        $token = 'user_token';
-        return $this->url->link($route, $token . '=' . $this->session->data[$token], true);
     }
 }

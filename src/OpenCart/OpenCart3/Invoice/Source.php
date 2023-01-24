@@ -61,7 +61,7 @@ class Source extends BaseSource
      */
     public function getStatus(): int
     {
-        return $this->source['order_status_id'];
+        return (int) $this->source['order_status_id'];
     }
 
     /**
@@ -77,7 +77,7 @@ class Source extends BaseSource
      *
      * This override returns the code of the selected payment method.
      */
-    public function getPaymentMethod()
+    public function getPaymentMethod(): ?string
     {
         return $this->source['payment_code'] ?? parent::getPaymentMethod();
     }

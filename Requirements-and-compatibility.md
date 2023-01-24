@@ -72,11 +72,12 @@ Notes:
 
 | Tag | Shop Version      | 7.4 | 8.0 | 8.1 | Remarks                          |
 |-----|-------------------|-----|-----|-----|----------------------------------|
-| JOO | 4.2.5             | ✅   | ✅   | ✅   |                                  |
+| JOO | 3.10.x            | ✅   | ❌   | ❌   |                                  |
+| JOO | 4.2.5             | ❓   | ✅   | ✅   | Not tested on PHP 7.4            |
 | HS  | 4.6.2 (starter)   | ✅   | ✅   | ✅   |                                  |
 | MA  | 2.4.5 (community) | ❌   | ✅   | ✅   | Contains PHP 8 constructs        |
 | OC  | 3.0.3.7           | ✅   | ✅   | ❌   | Many warnings on PHP 8.1         |
-|     | 4.x.y.z           | ❓   | ❓   | ❓   | Not yet supported                |
+|     | 4.x.y.z           | ❌   | ❓   | ❓   | Not yet supported                |
 | PS  | 1.7.8.7           | ✅   | ❌   | ❌   | Fatal runtime errors on PHP 8    |
 |     | 8.0.1             | ✅   | ✅   | ✅   | Warnings get logged on PHP 8.1   |
 | VM  | 4.0.4             | ✅   | ✅   | ✅   |                                  |

@@ -244,13 +244,11 @@ class ShopCapabilities extends ShopCapabilitiesBase
             'contactYourId' => '[customer_id]', // Order
             'companyName1' => '[payment_company]', // Order
             'fullName' => '[firstname+lastname]', // Order
-            'address1' => '[payment_address_1]', // Order
-            'address2' => '[payment_address_2]', // Order
-            'postalCode' => '[payment_postcode]', // Order
-            'city' => '[payment_city]', // Order
-            'vatNumber' => '[payment_tax_id]', // Order
+            'address1' => '[payment_address_1|shipping_address_1]', // Order
+            'address2' => '[payment_address_2|shipping_address_2]', // Order
+            'postalCode' => '[payment_postcode|shipping_postcode]', // Order
+            'city' => '[payment_city|shipping_city]', // Order
             'telephone' => '[telephone]', // Order
-            'fax' => '[fax]', // Order
             'email' => '[email]', // Order
 
             // Invoice lines defaults.

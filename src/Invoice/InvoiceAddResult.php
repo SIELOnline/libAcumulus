@@ -63,7 +63,7 @@ class InvoiceAddResult extends MessageCollection
      * A list of parameters to use when getting the send-status as text.
      */
     protected array $sendStatusArguments;
-    protected ?AcumulusResult $acumulusResult;
+    protected ?AcumulusResult $acumulusResult = null;
 
     /**
      * InvoiceAddResult constructor.

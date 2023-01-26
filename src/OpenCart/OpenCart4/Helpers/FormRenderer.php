@@ -9,6 +9,7 @@ namespace Siel\Acumulus\OpenCart\OpenCart4\Helpers;
 
 use Siel\Acumulus\Helpers\FormRenderer as BaseFormRenderer;
 
+use function in_array;
 use function is_string;
 
 /**
@@ -61,7 +62,7 @@ class FormRenderer extends BaseFormRenderer
     protected function input(array $field): string
     {
         // Tag around input element.
-        if ($field['type'] !== 'hidden') {
+        if (!in_array($field['type'], ['hidden', 'button'])) {
             if (empty($field['attributes']['class'])) {
                 $field['attributes']['class'] = [];
             } elseif (is_string($field['attributes']['class'])) {

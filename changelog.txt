@@ -3,6 +3,14 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our own code.
 
+7.6.2 (2023-01-??) (OC only?)
+----------------------------
+Features:
+- OC: Support for OpenCart 4. Note that OpenCart 4 will only run on PHP 8 and
+  seems to contain some errors regarding tax totals not including tax on
+  shipping costs (and therefore not in the amount to be paid).
+
+
 7.6.1 (2023-01-24) (PS only)
 ----------------------------
 Features;

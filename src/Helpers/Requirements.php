@@ -35,9 +35,11 @@ class Requirements
      *
      * @return string[]
      *   An array with messages regarding missing requirements, empty if all
-     *   requirements are met. The keys can be used as translation keys, but
-     *   currently, no Dutch translations are available. The values are in
-     *   English.
+     *   requirements are met.
+     *   The keys can be used as translation keys, but currently, no Dutch
+     *   translations are available. The values (the messages) are in English.
+     *   If a key start with message_error_, it is a fatal missing requirement,
+     *   if it starts with message_warning_, it is a recommended requirement.
      */
     public function check(): array
     {

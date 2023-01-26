@@ -47,7 +47,7 @@ class Mailer extends BaseMailer
             $mail->setSubject($subject);
             $mail->setText($bodyText);
             $mail->setHtml($bodyHtml);
-            $mail->send();
+            $result = $mail->send();
         }
         catch (Exception $e) {
             $result = $e;

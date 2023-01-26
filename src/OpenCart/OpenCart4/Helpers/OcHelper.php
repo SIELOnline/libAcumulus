@@ -102,11 +102,11 @@ class OcHelper
      * Returns the location of the module.
      *
      * @return string
-     *   The location of the module.
+     *   The route of the module's controller.
      */
-    public function getLocation(): string
+    public function getExtensionRoute(string $extension = 'acumulus'): string
     {
-        return 'extension/acumulus/';
+        return $this->registry->getExtensionRoute($extension);
     }
 
     /**
@@ -228,7 +228,7 @@ class OcHelper
         if ($this->acumulusContainer->getConfig()->getInvoiceStatusSettings()['showInvoiceStatus']) {
             try {
                 $type = 'invoice';
-                $this->initFormInvoice();// Set order.
+                $this->initFormInvoice(); // Set order.
                 /** @var \Siel\Acumulus\Shop\InvoiceStatusForm $form */
                 $form = $this->data['form'];
                 $form->setSource($this->acumulusContainer->createSource(Source::Order, $orderId));
@@ -339,7 +339,7 @@ class OcHelper
         // Set the action buttons (action + text).
         $this->data['action'] = $this->registry->getExtensionPageUrl($action);
         if ($type === 'batch') {
-            $this->data['button_icon'] = 'fa-envelope-o';
+            $this->data['button_icon'] = 'fa-envelope';
         } elseif ($type === 'uninstall') {
             $this->data['button_icon'] = 'fa-delete';
         } elseif (in_array($type, ['activate', 'register'])) {
@@ -405,13 +405,17 @@ class OcHelper
         $form = $this->data['form'];
         $this->addMessages($form->getMessages());
 
-        // Route to the view: extension/{extension_name}/
-        $route = $this->getLocation() . 'module/acumulus';
+        // Create the path to the view: route plus part of template name after
+        // 'acumulus'.
+        $route = $this->getExtensionRoute();
         if ($form->getType() === 'invoice') {
             $route .= '_invoice';
         }
         $route .= '_form';
         $output = $this->registry->load->view($route, $this->data);
+        if ($form->getType() === 'invoice') {
+            $output = str_replace('acumulus-links', 'acumulus-links col-sm-10', $output);
+        }
         // Send or return the output.
         if ($return) {
             return $output;
@@ -539,12 +543,16 @@ class OcHelper
 
     /**
      * Adds css and js to our status overview on the order info view.
+     *
+     * As the html page header will already have been rendered when the view
+     * gets rendered, we need to add our  stylesheets and javascript earlier, so
+     * we do so in the before event of the controller action.
      */
     public function eventControllerSaleOrderInfo(): void
     {
         if ($this->acumulusContainer->getConfig()->getInvoiceStatusSettings()['showInvoiceStatus']) {
             $this->registry->document->addStyle($this->registry->getExtensionFileUrl('view/stylesheet/acumulus.css'));
-            $this->registry->document->addScript($this->registry->getExtensionFileUrl('view/javascript/acumulus/acumulus-ajax.js'));
+            $this->registry->document->addScript($this->registry->getExtensionFileUrl('view/javascript/acumulus-ajax.js'));
         }
     }
 
@@ -560,9 +568,14 @@ class OcHelper
     {
         $requirements = $this->acumulusContainer->getRequirements();
         $messages = $requirements->check();
-        foreach ($messages as $message) {
+        foreach ($messages as $key => $message) {
             $this->addMessages([Message::create($message, Severity::Error)]);
-            $this->acumulusContainer->getLog()->error($message);
+            if (strpos($key, 'warning') !== false) {
+                $this->acumulusContainer->getLog()->warning($message);
+                unset($messages[$key]);
+            } else {
+                $this->acumulusContainer->getLog()->error($message);
+            }
         }
         if (!empty($messages)) {
             return false;
@@ -706,28 +719,25 @@ class OcHelper
     protected function installEvents(): void
     {
         $this->uninstallEvents();
-        // @todo: check the triggers.
-        $this->addEvent('acumulus','catalog/model/*/addOrder/after','/eventOrderUpdate');
-        $this->addEvent('acumulus','catalog/model/*/addOrderHistory/after','/eventOrderUpdate');
-        $this->addEvent('acumulus','admin/model/*/addOrder/after','/eventOrderUpdate');
-        $this->addEvent('acumulus','admin/model/*/addOrderHistory/after','/eventOrderUpdate');
-        $this->addEvent('acumulus','admin/view/common/column_left/before','/eventViewColumnLeft');
-        $this->addEvent('acumulus','admin/controller/sale/order/info/before','/eventControllerSaleOrderInfo');
-        $this->addEvent('acumulus','admin/view/sale/order_info/before','/eventViewSaleOrderInfo');
+        $this->addEvent('acumulus','catalog/model/checkout/order/addOrder/after','eventOrderUpdate');
+        $this->addEvent('acumulus','catalog/model/checkout/order/addHistory/after','eventOrderUpdate');
+        $this->addEvent('acumulus','admin/view/common/column_left/before','eventViewColumnLeft');
+        $this->addEvent('acumulus','admin/controller/sale/order|info/before','eventControllerSaleOrderInfo');
+        $this->addEvent('acumulus','admin/view/sale/order_info/before','eventViewSaleOrderInfo');
     }
 
-    protected function addEvent(string $code, string $trigger, string $action, bool $status = true, int $sort_order = 1): void
+    protected function addEvent(string $code, string $trigger, string $method, bool $status = true, int $sort_order = 1): void
     {
-        $location = $this->getLocation();
+        $controller = $this->registry->getExtensionRoute($code);
         /** @var \Opencart\Admin\Model\Setting\Event $model */
         $model = $this->registry->getModel('setting/event');
         $model->addEvent([
             'code' => $code,
             'description' => '',
             'trigger' => $trigger,
-            'action' => $location . $action,
+            'action' => "$controller|$method",
             'status' => $status,
-            'order' => $sort_order,
+            'sort_order' => $sort_order,
         ]);
     }
     /**

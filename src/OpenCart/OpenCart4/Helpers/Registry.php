@@ -128,7 +128,7 @@ class Registry
      */
     public function getExtensionFileUrl(string $file = '', string $extension = 'acumulus'): string
     {
-        return HTTP_CATALOG . substr(DIR_EXTENSION, strlen(DIR_OPENCART)) . $extension . '/' . strtolower(APPLICATION) . ' /' . $file;
+        return HTTP_CATALOG . substr(DIR_EXTENSION, strlen(DIR_OPENCART)) . $extension . '/' . strtolower(APPLICATION) . '/' . $file;
     }
     /**
      * Returns the order.

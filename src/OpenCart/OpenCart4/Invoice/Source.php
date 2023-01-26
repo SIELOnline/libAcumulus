@@ -70,7 +70,13 @@ class Source extends BaseSource
      */
     public function getCountryCode(): string
     {
-        return !empty($this->source['payment_iso_code_2']) ? $this->source['payment_iso_code_2'] : '';
+        if (!empty($this->source['payment_iso_code_2'])) {
+            return $this->source['payment_iso_code_2'];
+        } elseif (!empty($this->source['shipping_iso_code_2'])) {
+            return $this->source['shipping_iso_code_2'];
+        } else {
+            return '';
+        }
     }
 
     /**

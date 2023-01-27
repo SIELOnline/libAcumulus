@@ -1,12 +1,16 @@
 <?php
+/**
+ * @noinspection PhpMultipleClassDeclarationsInspection OC3 has many double class definitions
+ * @noinspection PhpUndefinedClassInspection Mix of OC4 and OC3 classes
+ * @noinspection PhpUndefinedNamespaceInspection Mix of OC4 and OC3 classes
+ */
 
 declare(strict_types=1);
 
-namespace Siel\Acumulus\OpenCart\OpenCart4\Config;
+namespace Siel\Acumulus\OpenCart\Config;
 
-use Opencart\System\Library\DB;
 use Siel\Acumulus\Config\Environment as EnvironmentBase;
-use Siel\Acumulus\OpenCart\OpenCart4\Helpers\Registry;
+use Siel\Acumulus\OpenCart\Helpers\Registry;
 
 use function is_object;
 
@@ -38,8 +42,10 @@ class Environment extends EnvironmentBase
 
     /**
      * Helper method to get the db object.
+     *
+     * @return \Opencart\System\Library\DB|\DB
      */
-    protected function getDb(): DB
+    protected function getDb()
     {
         return Registry::getInstance()->db;
     }

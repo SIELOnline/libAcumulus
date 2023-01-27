@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
-namespace Siel\Acumulus\OpenCart\OpenCart3\Helpers;
+namespace Siel\Acumulus\OpenCart\Helpers;
 
-use Request;
 use Siel\Acumulus\Helpers\FormHelper as BaseFormHelper;
 
 /**
@@ -14,6 +13,9 @@ class FormHelper extends BaseFormHelper
 {
     /**
      * {@inheritdoc}
+     *
+     * @noinspection PhpMissingParentCallCommonInspection parent is default
+     *   fall back.
      */
     public function isSubmitted(): bool
     {
@@ -21,9 +23,9 @@ class FormHelper extends BaseFormHelper
     }
 
     /**
-     * return \Request
+     * return \Opencart\System\Library\Request|\Request
      */
-    private function getRequest(): Request
+    private function getRequest()
     {
         return Registry::getInstance()->request;
     }

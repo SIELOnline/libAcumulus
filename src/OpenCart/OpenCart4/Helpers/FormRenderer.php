@@ -1,25 +1,22 @@
 <?php
-/**
- * @noinspection DuplicatedCode  Remove when extracting code common for OC3 and OC4
- */
 
 declare(strict_types=1);
 
 namespace Siel\Acumulus\OpenCart\OpenCart4\Helpers;
 
-use Siel\Acumulus\Helpers\FormRenderer as BaseFormRenderer;
+use Siel\Acumulus\OpenCart\Helpers\FormRenderer as BaseFormRenderer;
 
 use function in_array;
 use function is_string;
 
 /**
- * FormRenderer renders an Acumulus form definition like an OpenCart form.
+ * OC4 specific form render handling.
  */
 class FormRenderer extends BaseFormRenderer
 {
     public function __construct()
     {
-        $this->requiredMarkup = '';
+        parent::__construct();
         $this->elementWrapperClass = 'row mb-3';
         $this->labelClass = ['col-sm-2', 'col-form-label'];
         $this->multiLabelClass = ['col-sm-2', 'col-form-label'];
@@ -27,36 +24,6 @@ class FormRenderer extends BaseFormRenderer
         $this->inputWrapperClass = 'col-sm-10';
         $this->descriptionWrapperClass = ['offset-sm-2', 'col-sm-10', 'form-text'];
         $this->markupWrapperClass = ['offset-sm-2', 'col-sm-10', 'message'];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function renderSimpleField(array $field): string
-    {
-        $oldElementWrapperClass = $this->elementWrapperClass;
-        $this->handleRequired($field);
-        $result = parent::renderSimpleField($field);
-        $this->elementWrapperClass = $oldElementWrapperClass;
-        return $result;
-    }
-
-    /**
-     * Handles required fields.
-     *
-     * @param array $field
-     */
-    protected function handleRequired(array $field): void
-    {
-        if (!empty($field['attributes']['required'])) {
-            if (empty($this->elementWrapperClass)) {
-                $this->elementWrapperClass = 'required';
-            } else {
-                $this->elementWrapperClass = (array) $this->elementWrapperClass;
-                /** @noinspection UnsupportedStringOffsetOperationsInspection */
-                $this->elementWrapperClass[] = 'required';
-            }
-        }
     }
 
     protected function input(array $field): string

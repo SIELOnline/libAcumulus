@@ -1,19 +1,19 @@
 <?php
 /**
- * @noinspection DuplicatedCode  Remove when extracting code common for OC3 and OC4
+ * @noinspection PhpUndefinedClassInspection Mix of OC4 and OC3 classes
+ * @noinspection PhpUndefinedNamespaceInspection Mix of OC4 and OC3 classes
  */
 
 declare(strict_types=1);
 
-namespace Siel\Acumulus\OpenCart\OpenCart4\Shop;
+namespace Siel\Acumulus\OpenCart\Shop;
 
-use Opencart\System\Library\DB;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Invoice\Source;
-use Siel\Acumulus\OpenCart\OpenCart4\Helpers\Registry;
-use Siel\Acumulus\Shop\AcumulusEntry as BaseAcumulusEntry;
+use Siel\Acumulus\OpenCart\Helpers\Registry;
+use Siel\Acumulus\Shop\AcumulusEntry;
 use Siel\Acumulus\Shop\AcumulusEntryManager as BaseAcumulusEntryManager;
 
 /**
@@ -58,7 +58,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    public function getByInvoiceSource(Source $invoiceSource, bool $ignoreLock = true): ?BaseAcumulusEntry
+    public function getByInvoiceSource(Source $invoiceSource, bool $ignoreLock = true): ?AcumulusEntry
     {
         /** @var \stdClass $result  (documentation error in DB) */
         $result = $this->getDb()->query(sprintf(
@@ -96,7 +96,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    protected function update(BaseAcumulusEntry $entry, ?int $entryId, ?string $token, $updated): bool
+    protected function update(AcumulusEntry $entry, ?int $entryId, ?string $token, $updated): bool
     {
         $record = $entry->getRecord();
         return (bool) $this->getDb()->query(sprintf(
@@ -112,7 +112,7 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     /**
      * {@inheritdoc}
      */
-    public function delete(BaseAcumulusEntry $entry): bool
+    public function delete(AcumulusEntry $entry): bool
     {
         $record = $entry->getRecord();
         return (bool) $this->getDb()->query(sprintf(
@@ -120,16 +120,6 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
             $this->tableName,
             $record['id']
         ));
-    }
-
-    /**
-     * Helper method to get the db object.
-     *
-     * @return \Opencart\System\Library\DB
-     */
-    protected function getDb(): DB
-    {
-        return Registry::getInstance()->db;
     }
 
     /**
@@ -243,5 +233,23 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
         }
 
         return $result;
+    }
+
+    /**
+     * Wrapper method to get {@see Registry::$db}.
+     *
+     * @return \Opencart\System\Library\DB|\DB
+     */
+    protected function getDb()
+    {
+        return $this->getRegistry()->db;
+    }
+
+    /**
+     * Wrapper method that returns the OpenCart registry class.
+     */
+    protected function getRegistry(): Registry
+    {
+        return Registry::getInstance();
     }
 }

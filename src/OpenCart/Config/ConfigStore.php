@@ -1,14 +1,16 @@
 <?php
 /**
- * @noinspection DuplicatedCode  Remove when extracting code common for OC3 and OC4
+ * @noinspection PhpMultipleClassDeclarationsInspection OC3 has many double class definitions
+ * @noinspection PhpUndefinedClassInspection Mix of OC4 and OC3 classes
+ * @noinspection PhpUndefinedNamespaceInspection Mix of OC4 and OC3 classes
  */
 
 declare(strict_types=1);
 
-namespace Siel\Acumulus\OpenCart\OpenCart4\Config;
+namespace Siel\Acumulus\OpenCart\Config;
 
 use Siel\Acumulus\Config\ConfigStore as BaseConfigStore;
-use Siel\Acumulus\OpenCart\OpenCart4\Helpers\Registry;
+use Siel\Acumulus\OpenCart\Helpers\Registry;
 
 /**
  * Implements the connection to the OpenCart config component.
@@ -39,7 +41,7 @@ class ConfigStore extends BaSeConfigStore
     }
 
     /**
-     * @return \Opencart\Admin\Model\Setting\Setting|\Opencart\Catalog\Model\Setting\Setting
+     * @return \Opencart\Admin\Model\Setting\Setting|\Opencart\Catalog\Model\Setting\Setting|\ModelSettingSetting
      *
      * @noinspection PhpMissingReturnTypeInspection : actually a {@see Proxy} is
      *   returned that proxies (one of) the setting model(s). So for us, the

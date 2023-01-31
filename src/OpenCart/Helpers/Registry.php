@@ -9,8 +9,6 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\OpenCart\Helpers;
 
-use function strlen;
-
 /**
  * Registry is a wrapper around the OpenCart registry instance which is not
  * directly accessible as the single instance is passed to each constructor in
@@ -30,9 +28,13 @@ use function strlen;
 abstract class Registry
 {
     protected static Registry $instance;
-    protected \Opencart\System\Engine\Registry $registry;
-    // was: \ModelCheckoutOrder|\ModelSaleOrder
-    /** @var \Opencart\Catalog\Model\Checkout\Order|\Opencart\Admin\Model\Sale\Order|\ModelCheckoutOrder|\ModelSaleOrder */
+    /**
+     * @var \Opencart\System\Engine\Registry|\Registry
+     */
+    protected $registry;
+    /**
+     * @var \Opencart\Catalog\Model\Checkout\Order|\Opencart\Admin\Model\Sale\Order|\ModelCheckoutOrder|\ModelSaleOrder
+     */
     protected $orderModel;
 
     /**
@@ -65,8 +67,6 @@ abstract class Registry
 
     /**
      * Magic method __get must be declared public.
-     *
-     * @refactor should we make explicit getters for all uses of __get
      */
     public function __get(string $key)
     {
@@ -76,8 +76,6 @@ abstract class Registry
     /**
      * Magic method __set must be declared public.
      *
-     * @refactor should we make explicit setters for all uses of __set
-     *
      * @noinspection MagicMethodsValidityInspection
      */
     public function __set(string $key, $value)
@@ -86,55 +84,89 @@ abstract class Registry
     }
 
     /**
-     * Returns a link to the given route.
+     * Returns the full route for the given method and extension.
      *
-     * @param string $route
+     * In OpenCart, routes are used in the following places:
+     * - Controller actions: via a URL.
+     * - Events: when registering for one of the default 'before' or
+     *   'after' events on controller and model methods.
+     * - Events: to define the action (i.e. method) to be executed when
+     *   registering for an event.
+     * - Loader: to load a model, or view. This is handled by
+     *   {@see getLoadRoute()}.
+     * - Access: each controller route is also a value to determine access or
+     *   modification rights.
+     *
+     * @param string $method
+     *   The part of the route within the given $extension, may be empty for the
+     *   default action index().
+     * @param string $extension
+     *   The extension that implements the $action, or empty for OpenCart core
+     *   controller routes.
+     * @param string $extensionType
+     *   The type of extension: e.g. 'module' or 'payment'.
      *
      * @return string
-     *   The link to the given route, including standard arguments.
+     *   The full route for the given action (will not end with a /).
      */
-    public function getLink(string $route): string
+    abstract public function getRoute(string $method, string $extension = 'acumulus', string $extensionType = 'module'): string;
+
+    /**
+     * Returns the full route to load the given object (view, language).
+     *
+     * @param string $object
+     *   The view or language file to load.
+     * @param string $extension
+     *   The extension that contains the object, or empty for OpenCart core
+     *   controller routes.
+     * @param string $extensionType
+     *   The type of extension: e.g. 'module' or 'payment'.
+     *
+     * @return string
+     *   The full route for the given action (will not end with a /).
+     */
+    abstract public function getLoadRoute(string $object, string $extension = 'acumulus', string $extensionType = 'module'): string;
+
+    /**
+     * Returns the url to the given action.
+     *
+     * @param string $method
+     *   The action, within the given $extension, to execute.
+     * @param string $extension
+     *   The extension that implements the $action, or empty for OpenCart core
+     *   controller routes.
+     * @param string $type
+     *   The type of extension: e.g. 'module' or 'payment'. Ignored for core
+     *   controller routes.
+     *
+     * @return string
+     *   The url including the full route to the given action and the
+     *   user_token.
+     */
+    public function getRouteUrl(string $method, string $extension = 'acumulus', string $type = 'module'): string
     {
         $token = 'user_token';
+        $route = $this->getRoute($method, $extension, $type);
         return $this->url->link($route, $token . '=' . $this->session->data[$token], true);
     }
 
     /**
-     * Returns the URL for a file of an extension.
+     * Returns a full URL to the given $file.
      *
-     * Typically, this file is an image, js, or css file.
+     * This will typically be an image, css, or js file.
      *
-     * @todo: make abstract and implement in OC3? omove this one to OC4.
+     * @param string $file
+     *   The sub-path of the file within the extension folder. Will typically
+     *   start with 'view/' and in OC3 that means the 'view' folder under the
+     *   'admin' folder.
+     * @param string $extension
+     *   The extension providing the file.
+     *
+     * @return string
+     *   The full URL to the requested file, does not (need to) contain a
+     *   user_token.
      */
-    public function getExtensionFileUrl(string $file = '', string $extension = 'acumulus'): string
-    {
-        return HTTP_CATALOG . substr(DIR_EXTENSION, strlen(DIR_OPENCART)) . $extension . '/' . strtolower(APPLICATION) . '/' . $file;
-    }
-
-    /**
-     * Returns the order.
-     *
-     * @return array|false
-     *
-     * @throws \Exception
-     */
-    public function getOrder(int $orderId)
-    {
-        return $this->getOrderModel()->getOrder($orderId);
-    }
-
-    /**
-     * Returns the order model that can be used to call:
-     * - getOrder()
-     * - getOrderProducts()
-     * - getOrderOptions()
-     * - getOrderTotals()
-     *
-     * @return \Opencart\Admin\Model\Sale\Order|\Opencart\Catalog\Model\Checkout\Order|\ModelCheckoutOrder|\ModelSaleOrder
-     * @noinspection ReturnTypeCanBeDeclaredInspection
-     *   Actually, this method returns a @see \Opencart\System\Engine\Proxy}.
-     */
-    abstract public function getOrderModel();
+    abstract public function getFileUrl(string $file = '', string $extension = 'acumulus'): string;
 
     /**
      * Returns a model based on the given name.
@@ -162,4 +194,44 @@ abstract class Registry
         $modelProperty = str_replace('/', '_', "model_$modelName");
         return $this->registry->get($modelProperty);
     }
+
+    /**
+     * Returns the order model that can be used to call:
+     * - getOrder()
+     * - getOrderProducts()
+     * - getOrderOptions()
+     * - getOrderTotals()
+     *
+     * As this model differs depending on whether we are in the Catalog or Admin
+     * section, we cannot use getModel(), so this is a separate method.
+     *
+     * @return \Opencart\Admin\Model\Sale\Order|\Opencart\Catalog\Model\Checkout\Order|\ModelCheckoutOrder|\ModelSaleOrder
+     *
+     * @noinspection ReturnTypeCanBeDeclaredInspection
+     *   Actually, this method returns a @see \Opencart\System\Engine\Proxy}.
+     */
+    public function getOrderModel()
+    {
+        if (!isset($this->orderModel)) {
+            $this->orderModel = $this->getModel($this->inAdmin() ? 'sale/order' : 'checkout/order');
+        }
+        return $this->orderModel;
+    }
+
+    /**
+     * Returns the order.
+     *
+     * @return array|false
+     *
+     * @throws \Exception
+     */
+    public function getOrder(int $orderId)
+    {
+        return $this->getOrderModel()->getOrder($orderId);
+    }
+
+    /**
+     * indicates whether we are in Admin (true) or Catalog (false).
+     */
+    abstract protected function inAdmin(): bool;
 }

@@ -69,35 +69,10 @@ class ShopCapabilities extends ShopCapabilitiesBase
         $results = [];
         $registry = $this->getRegistry();
         foreach ($extensions as $extension) {
-            $directory = "extension/{$extension['extension']}/payment/";
-            $registry->language->load($directory . $extension['code']);
+            $route = $registry->getLoadRoute($extension['code'], $extension['extension'], 'payment');
+            $registry->language->load($route);
             $results[$extension['code']] = $registry->language->get('heading_title');
         }
         return $results;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getLink(string $linkType): string
-    {
-        $registry = $this->getRegistry();
-        switch ($linkType) {
-            case 'config':
-                return $registry->getExtensionPageUrl('');
-            case 'register':
-            case 'activate':
-            case 'advanced':
-            case 'batch':
-            case 'invoice':
-                return $registry->getExtensionPageUrl($linkType);
-            case 'logo':
-                return $registry->getExtensionFileUrl('view/image/siel-logo.png');
-            case 'pro-support-image':
-                return $registry->getExtensionFileUrl('view/image/pro-support-opencart.png');
-            case 'pro-support-link':
-                return 'https://pay.siel.nl/?p=0nKmWpoNV0wtqeac43dqc5YUAcaHFJkldwy1alKD1G3EJHmC';
-        }
-        return parent::getLink($linkType);
     }
 }

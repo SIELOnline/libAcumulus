@@ -9,8 +9,6 @@ namespace Siel\Acumulus\OpenCart\OpenCart3\Config;
 
 use Siel\Acumulus\OpenCart\Config\ShopCapabilities as ShopCapabilitiesBase;
 
-use function defined;
-
 /**
  * OC3 webshop specific capabilities.
  */
@@ -73,34 +71,10 @@ class ShopCapabilities extends ShopCapabilitiesBase
         $registry = $this->getRegistry();
         $directory = 'extension/payment/';
         foreach ($extensions as $extension) {
-            $registry->language->load($directory . $extension);
+            $route = $registry->getLoadRoute($extension, '', 'payment');
+            $registry->language->load($route);
             $results[$extension] = $registry->language->get('heading_title');
         }
         return $results;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getLink(string $linkType): string
-    {
-        $registry = $this->getRegistry();
-        switch ($linkType) {
-            case 'config':
-                return $registry->getLink($registry->getLocation());
-            case 'register':
-            case 'activate':
-            case 'advanced':
-            case 'batch':
-            case 'invoice':
-                return $registry->getLink($registry->getLocation() . '/' . $linkType);
-            case 'logo':
-                return (defined('HTTPS_SERVER') ? HTTPS_SERVER : HTTP_SERVER) . 'view/image/acumulus/siel-logo.png';
-            case 'pro-support-image':
-                return (defined('HTTPS_SERVER') ? HTTPS_SERVER : HTTP_SERVER) . 'view/image/acumulus/pro-support-opencart.png';
-            case 'pro-support-link':
-                return 'https://pay.siel.nl/?p=0nKmWpoNV0wtqeac43dqc5YUAcaHFJkldwy1alKD1G3EJHmC';
-        }
-        return parent::getLink($linkType);
     }
 }

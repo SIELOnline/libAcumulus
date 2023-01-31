@@ -27,7 +27,7 @@ use Siel\Acumulus\Shop\InvoiceManager as BaseInvoiceManager;
  * - Strings are escaped using the escape() method on a db instance, unless they
  *   are hard coded or internal variables.
  */
-abstract class InvoiceManager extends BaseInvoiceManager
+class InvoiceManager extends BaseInvoiceManager
 {
     /** @var array[] */
     protected array $tableInfo;
@@ -94,7 +94,7 @@ abstract class InvoiceManager extends BaseInvoiceManager
     protected function triggerInvoiceCreated(?array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
     {
         // @todo: test this on OC4!
-        $route = 'model/' . $this->getLocation() . '/invoiceCreated/after';
+        $route = 'model/' . Registry::getInstance()->getRoute('invoiceCreated/after');
         $args = ['invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult];
         $this->getEvent()->trigger($route, [&$route, $args]);
     }
@@ -106,7 +106,7 @@ abstract class InvoiceManager extends BaseInvoiceManager
      */
     protected function triggerInvoiceSendBefore(?array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
     {
-        $route = 'model/' . $this->getLocation() . '/invoiceSend/before';
+        $route = 'model/' . Registry::getInstance()->getRoute('invoiceSend/before');
         $args = ['invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult];
         $this->getEvent()->trigger($route, [&$route, $args]);
     }
@@ -118,12 +118,10 @@ abstract class InvoiceManager extends BaseInvoiceManager
      */
     protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, InvoiceAddResult $result): void
     {
-        $route = 'model/' . $this->getLocation() . '/invoiceSend/after';
+        $route = 'model/' . Registry::getInstance()->getRoute('invoiceSend/after');
         $args = ['invoice' => $invoice, 'source' => $invoiceSource, 'result' => $result];
         $this->getEvent()->trigger($route, [&$route, $args]);
     }
-
-    abstract protected function getLocation(): string;
 
     /**
      * Wrapper around the event class instance.

@@ -8,48 +8,52 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\OpenCart\OpenCart3\Helpers;
 
+use function defined;
 use function strlen;
 
 /**
- * OC3 specific code for Registry.
+ * OC3 specific Registry code.
  */
 class Registry extends \Siel\Acumulus\OpenCart\Helpers\Registry
 {
     /**
-     * Returns the location of the extension's files.
-     *
-     * @return string
-     *   The location of the extension's files.
-     *
-     * @todo: somehow merge this with OC4 getExtensionRoute() to prevent
-     *   possible polymorphic calls.
+     * {@inheritDoc}
      */
-    public function getLocation(): string
+    public function getRoute(string $method, string $extension = 'acumulus', string $extensionType = 'module'): string
     {
-        return 'extension/module/acumulus';
+        if ($extension === '') {
+            // OpenCart core controller action: use unchanged.
+            $route = $method;
+        } else {
+            $route = "extension/$extensionType/$extension";
+            if ($method !== '') {
+                $route .= '/' . $method;
+            }
+        }
+        return $route;
     }
 
     /**
-     * Returns the order model that can be used to call:
-     * - getOrder()
-     * - getOrderProducts()
-     * - getOrderOptions()
-     * - getOrderTotals()
-     *
-     * @return \ModelCheckoutOrder|\ModelSaleOrder
+     * {@inheritDoc}
      */
-    public function getOrderModel()
+    public function getLoadRoute(string $object = '', string $extension = 'acumulus', string $extensionType = 'module'): string
     {
-        if (!isset($this->orderModel)) {
-            if (strrpos(DIR_APPLICATION, '/catalog/') === strlen(DIR_APPLICATION) - strlen('/catalog/')) {
-                // We are in the catalog section, use the checkout/order model.
-                $modelName = 'checkout/order';
-            } else {
-                // We are in the admin section, use the sale/order model.
-                $modelName = 'sale/order';
-            }
-            $this->orderModel = $this->getModel($modelName);
-        }
-        return $this->orderModel;
+        return "extension/$extensionType/$object";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getFileUrl(string $file = '', string $extension = 'acumulus'): string
+    {
+        return (defined('HTTPS_SERVER') ? HTTPS_SERVER : HTTP_SERVER) . $file;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function inAdmin(): bool
+    {
+        return strrpos(DIR_APPLICATION, '/admin/') === strlen(DIR_APPLICATION) - strlen('/admin/');
     }
 }

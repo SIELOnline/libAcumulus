@@ -316,4 +316,28 @@ abstract class ShopCapabilities extends ShopCapabilitiesBase
      *   value.
      */
     abstract protected function paymentMethodToOptions(array $extensions): array;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getLink(string $linkType): string
+    {
+        $registry = $this->getRegistry();
+        switch ($linkType) {
+            case 'config':
+            case 'register':
+            case 'activate':
+            case 'advanced':
+            case 'batch':
+            case 'invoice':
+                return $registry->getRouteUrl($linkType);
+            case 'logo':
+                return $registry->getFileUrl('view/image/acumulus/siel-logo.png');
+            case 'pro-support-image':
+                return $registry->getFileUrl('view/image/acumulus/pro-support-opencart.png');
+            case 'pro-support-link':
+                return 'https://pay.siel.nl/?p=0nKmWpoNV0wtqeac43dqc5YUAcaHFJkldwy1alKD1G3EJHmC';
+        }
+        return parent::getLink($linkType);
+    }
 }

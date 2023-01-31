@@ -45,5 +45,8 @@ class ModuleSpecificTranslations extends BaseModuleSpecificTranslations
         'menu_basicSettings' => 'Extensions → Modules → Acumulus → Edit',
 
         'desc_triggerSettings' => 'This setting determines at what instants the invoice for an order should be sent to Acumulus. If you select multiple instants, the invoice wil be sent as soon as the order reaches one of the selected statuses. Note that an invoice will only be sent once to Acumulus. This extension only uses order data, so you may select any status, the webshop invoice does not already have to be created,unless you want to use the webshop\'s invoice date and number as invoice date and number for the Acumulus invoice. If you select "Do not send automatically" you will have to use the <a href="%s">Acumulus batch send form</a>.',
+
+        'vat_class' => 'tax class',
+        'vat_classes' => 'tax classes',
     ];
 }

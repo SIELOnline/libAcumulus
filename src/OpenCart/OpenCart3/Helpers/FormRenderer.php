@@ -18,7 +18,6 @@ class FormRenderer extends BaseFormRenderer
         $this->fieldsetWrapperClass = 'adminform';
         $this->legendWrapperClass = 'form-group';
         $this->summaryWrapperClass = 'form-group';
-        $this->inputWrapperClass = 'form-control';
         $this->elementWrapperClass = 'form-group';
         $this->labelWrapperClass = 'form-group';
         $this->labelClass = ['col-sm-2', 'control-label'];

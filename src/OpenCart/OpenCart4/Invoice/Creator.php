@@ -7,8 +7,7 @@ namespace Siel\Acumulus\OpenCart\OpenCart4\Invoice;
 use Siel\Acumulus\OpenCart\Invoice\Creator as BaseCreator;
 
 /**
- * Creates a raw version of the Acumulus invoice from an OpenCart
- * {@see \Siel\Acumulus\OpenCart\Invoice\Source}.
+ * OC4 specific invoice Creator code.
  */
 class Creator extends BaseCreator
 {
@@ -21,7 +20,7 @@ class Creator extends BaseCreator
     }
 
     /**
-     * @return array
+     * {@inheritDoc}
      */
     protected function getOrderProducts(): array
     {

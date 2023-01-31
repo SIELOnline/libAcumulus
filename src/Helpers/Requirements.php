@@ -1,20 +1,6 @@
 <?php
 /**
- * Note: even though the note below is true, we ignore it. So a failing minimal
- * PHP version requirement will fail before it gets here.
- *
- * Note: As long as we want to check for a minimal PHP version via the
- * Requirements checking process provided by the classes below, and we want to
- * properly log and inform the user, we should not use language constructs
- * that are only available as of that minimum version in the following classes
- * (and their child classes):
- * - {@see Container}: creates instances of the below classes.
- * - {@see Requirements}: executes the checks.
- * - {@see \Siel\Acumulus\Config\ConfigUpgrade}: initiates the check.
- * - {@see Severity}: part of a failed check.
- * - {@see Message}: represents a failed check.
- * - {@see MessageCollection}: represents failed checks.
- * - {@see Log}: Logs failed checks.
+ * @noinspection LongLine
  */
 
 declare(strict_types=1);

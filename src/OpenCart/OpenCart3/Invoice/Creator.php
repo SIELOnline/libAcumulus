@@ -7,8 +7,7 @@ namespace Siel\Acumulus\OpenCart\OpenCart3\Invoice;
 use Siel\Acumulus\OpenCart\Invoice\Creator as BaseCreator;
 
 /**
- * Creates a raw version of the Acumulus invoice from an OpenCart
- * {@see \Siel\Acumulus\OpenCart\Invoice\Source}.
+ * OC3 specific invoice Creator code.
  */
 class Creator extends BaseCreator
 {
@@ -20,6 +19,9 @@ class Creator extends BaseCreator
         return $this->getOrderModel()->getOrderOptions($item['order_id'], $item['order_product_id']);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected function getOrderProducts(): array
     {
         return $this->getOrderModel()->getOrderProducts($this->invoiceSource->getId());

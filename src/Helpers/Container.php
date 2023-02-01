@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus;
 
-const Version = '7.6.1';
+const Version = '7.6.2';
 
 namespace Siel\Acumulus\Helpers;
 
@@ -146,6 +146,28 @@ use const Siel\Acumulus\Version;
  */
 class Container
 {
+    private static Container $instance;
+
+    /**
+     * Returns the already created instance.
+     *
+     * Try not to use this: there should be only 1 instance of this class, but
+     * that instance should be passed to the constructor, if a class needs
+     * access. Current exception is the separate Acumulus Customise Invoice
+     * module, that may not get the instance passed via a constructor.
+     *
+     * (PHP8: define return type as static)
+     *
+     * @return static
+     *
+     * @noinspection PhpUnused Should only be used in module own code, not in
+     *   the library itself.
+     */
+    public static function getContainer(): Container
+    {
+        return static::$instance;
+    }
+
     public const baseNamespace = '\\Siel\\Acumulus';
     /**
      * The namespace for the current shop.
@@ -185,6 +207,7 @@ class Container
         }
         $this->shopNamespace .= '\\' . $shopNamespace;
         $this->setLanguage($language);
+        static::$instance = $this;
     }
 
     public function getLanguage(): string

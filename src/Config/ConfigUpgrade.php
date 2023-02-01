@@ -62,9 +62,9 @@ class ConfigUpgrade
      *
      * Notes:
      * - $currentVersion can be empty if the host environment cannot deliver
-     *   this value (MA2.4). If so, we switch to using a new key 'configVersion'
+     *   this value (MA2.4). If so, we switch to using a new key 'VersionKey'
      *   in the set of config values.
-     * - 'configVersion' was introduced in 6.4.1. So when upgrading from an
+     * - 'VersionKey' was introduced in 6.4.1. So when upgrading from an
      *   older version it will not be set and if $currentVersion is also not
      *   passed in, we have to guess it. The 6.0.0 update is not idempotent,
      *   whereas the 6.3.1 update is, so we "guess" 6.3.0, making this work for
@@ -74,7 +74,7 @@ class ConfigUpgrade
 
      * @param string $currentVersion
      *   The current version of the config data. This will be replaced by the
-     *   config value 'configVersion'. But as long as that key is not set, this
+     *   config value 'VersionKey'. But as long as that key is not set, this
      *   'external' value (often a separate value in the host's config table)
      *   should be used.
      *

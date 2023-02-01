@@ -621,7 +621,7 @@ abstract class OcHelper
         if (!empty($this->acumulusContainer->getConfig()->get(Config::VersionKey))) {
             // Config updates are now done in the config itself and, for now, no
             // data model changes have been made since the introduction of
-            // configVersion, so we can return.
+            // VersionKey, so we can return.
             return true;
         }
 
@@ -664,7 +664,7 @@ abstract class OcHelper
             $result = false;
         }
 
-        // Update config values, this should set configVersion.
+        // Update config values, this should set VersionKey.
         $result = $this->acumulusContainer->getConfigUpgrade()->upgrade($currentDataModelVersion) && $result;
         if ($result) {
             // Delete setting 'acumulus_siel_datamodel_version' without

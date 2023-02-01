@@ -3,7 +3,7 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our own code.
 
-7.6.2 (2023-01-??) (OC+WC only)
+7.6.2 (2023-02-01) (OC+WC only)
 -------------------------------
 Features:
 - OC: Support for OpenCart 4. Note that OpenCart 4 will only run on PHP 8 and

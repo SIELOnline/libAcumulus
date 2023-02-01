@@ -680,10 +680,7 @@ class Acumulus
      */
     public function registerSupport(string $token, string $location): AcumulusResult
     {
-        $message = [
-            'token' => $token,
-            'location' => $location,
-        ];
+        $message = compact('token', 'location');
         return $this->callApiFunction('support/register', $message, true)->setMainAcumulusResponseKey('support');
     }
 

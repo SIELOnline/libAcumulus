@@ -3,17 +3,27 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our own code.
 
-7.6.2 (2023-01-??) (OC only?)
-----------------------------
+7.6.2 (2023-01-??) (OC+WC only)
+-------------------------------
 Features:
 - OC: Support for OpenCart 4. Note that OpenCart 4 will only run on PHP 8 and
   seems to contain some errors regarding tax totals not including tax on
   shipping costs (and therefore not in the amount to be paid).
+- ALL: Acumulus customise invoice module may need access to container without
+  having creating it, place the instance in a public static property.
+
+bugs:
+- WC: Error after fresh install: Plugin kon niet worden geactiveerd omdat hij
+  een fatale fout veroorzaakt.
+- OC (and perhaps others): test to see if new order status is in set of order
+  statuses on which to send the invoice data to Acumulus should not use strict
+  typing.
+- OC: Define title for back button.
 
 
 7.6.1 (2023-01-24) (PS only)
 ----------------------------
-Features;
+Features:
 - ALL: The batch form now allows white space (at the start or end) in the
   from-to fields which will be removed. This allows for easier copy & paste from
   order lists.

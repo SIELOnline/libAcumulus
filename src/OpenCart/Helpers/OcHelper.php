@@ -20,6 +20,7 @@ use stdClass;
 use Throwable;
 
 use function count;
+use function in_array;
 use function strlen;
 
 use const Siel\Acumulus\Version;
@@ -342,8 +343,8 @@ abstract class OcHelper
             $this->data['button_icon'] = 'fa-save';
         }
         $this->data['button_save'] = $this->t("button_submit_$type");
-        $this->data['cancel'] = $this->registry->getRouteUrl('common/dashboard', '');
-        $this->data['button_cancel'] = $type === 'uninstall' ? $this->t('button_cancel_uninstall') : $this->t('button_cancel');
+        $this->data['button_cancel'] = $this->t('button_cancel');
+        $this->data['back'] = $this->registry->getRouteUrl('common/dashboard', '');
     }
 
     /**

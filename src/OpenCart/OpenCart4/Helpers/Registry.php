@@ -39,6 +39,19 @@ class Registry extends \Siel\Acumulus\OpenCart\Helpers\Registry
     /**
      * {@inheritDoc}
      */
+    public function getAcumulusTrigger(string $trigger, string $moment): string
+    {
+        $extension = 'acumulus';
+        $extensionType = 'module';
+        if ($moment !== '') {
+            $moment = '/' . $moment;
+        }
+        return "system/extension/$extensionType/$extension/$trigger$moment";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getFileUrl(string $file = '', string $extension = 'acumulus'): string
     {
         return HTTP_CATALOG . substr(DIR_EXTENSION, strlen(DIR_OPENCART)) . $extension . '/' . strtolower(APPLICATION) . '/' . $file;

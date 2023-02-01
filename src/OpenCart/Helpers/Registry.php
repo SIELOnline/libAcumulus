@@ -128,6 +128,19 @@ abstract class Registry
     abstract public function getLoadRoute(string $object, string $extension = 'acumulus', string $extensionType = 'module'): string;
 
     /**
+     * Returns the trigger for an Acumulus event.
+     *
+     * @param string $trigger
+     *   The local part of the trigger.
+     * @param string $moment
+     *   Normally, one of 'before' or 'after'.
+     *
+     * @return string
+     *   The full trigger to which other extensions can subscribe.
+     */
+    abstract public function getAcumulusTrigger(string $trigger, string $moment): string;
+
+    /**
      * Returns the url to the given action.
      *
      * @param string $method

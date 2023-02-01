@@ -93,8 +93,7 @@ class InvoiceManager extends BaseInvoiceManager
      */
     protected function triggerInvoiceCreated(?array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
     {
-        // @todo: test this on OC4!
-        $route = 'model/' . Registry::getInstance()->getRoute('invoiceCreated/after');
+        $route = Registry::getInstance()->getAcumulusTrigger('invoiceCreated', 'after');
         $args = ['invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult];
         $this->getEvent()->trigger($route, [&$route, $args]);
     }
@@ -106,7 +105,7 @@ class InvoiceManager extends BaseInvoiceManager
      */
     protected function triggerInvoiceSendBefore(?array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
     {
-        $route = 'model/' . Registry::getInstance()->getRoute('invoiceSend/before');
+        $route = Registry::getInstance()->getAcumulusTrigger('invoiceSend', 'before');
         $args = ['invoice' => &$invoice, 'source' => $invoiceSource, 'localResult' => $localResult];
         $this->getEvent()->trigger($route, [&$route, $args]);
     }
@@ -118,7 +117,7 @@ class InvoiceManager extends BaseInvoiceManager
      */
     protected function triggerInvoiceSendAfter(array $invoice, Source $invoiceSource, InvoiceAddResult $result): void
     {
-        $route = 'model/' . Registry::getInstance()->getRoute('invoiceSend/after');
+        $route = Registry::getInstance()->getAcumulusTrigger('invoiceSend', 'after');
         $args = ['invoice' => $invoice, 'source' => $invoiceSource, 'result' => $result];
         $this->getEvent()->trigger($route, [&$route, $args]);
     }

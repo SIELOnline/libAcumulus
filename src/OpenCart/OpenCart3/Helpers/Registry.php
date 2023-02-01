@@ -27,7 +27,7 @@ class Registry extends \Siel\Acumulus\OpenCart\Helpers\Registry
         } else {
             $route = "extension/$extensionType/$extension";
             if ($method !== '') {
-                $route .= '/' . $method;
+                $route .= "/$method";
             }
         }
         return $route;
@@ -39,6 +39,17 @@ class Registry extends \Siel\Acumulus\OpenCart\Helpers\Registry
     public function getLoadRoute(string $object = '', string $extension = 'acumulus', string $extensionType = 'module'): string
     {
         return "extension/$extensionType/$object";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getAcumulusTrigger(string $trigger, string $moment): string
+    {
+        if ($moment !== '') {
+            $moment = "/$moment";
+        }
+        return $this->getRoute("$trigger$moment");
     }
 
     /**

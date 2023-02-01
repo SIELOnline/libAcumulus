@@ -143,7 +143,7 @@ class Source extends BaseSource
     {
         $result = [];
         if (!empty($this->source->order_currency_info)) {
-            $currency = unserialize($this->source->order_currency_info, ['allowed_classes' => stdClass::class]);
+            $currency = unserialize($this->source->order_currency_info, ['allowed_classes' => [stdClass::class]]);
             $result = [
                 Meta::Currency => $currency->currency_code,
                 Meta::CurrencyRate => (float) $currency->currency_rate,

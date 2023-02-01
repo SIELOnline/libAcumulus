@@ -293,7 +293,7 @@ abstract class InvoiceManager
             // Set $arguments, this will add the current status and the set of
             // statuses on which to send to the log line.
             $arguments = [$status, implode(',', $shopEventSettings['triggerOrderStatus'])];
-            $sendStatus = in_array($status, $shopEventSettings['triggerOrderStatus'], true)
+            $sendStatus = in_array($status, $shopEventSettings['triggerOrderStatus'], false)
                 ? InvoiceAddResult::SendStatus_Unknown
                 : InvoiceAddResult::NotSent_WrongStatus;
         } else {

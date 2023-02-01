@@ -45,8 +45,7 @@ class ConnectionHandler
     protected array $curlHandles = [];
 
     /**
-     * Protected constructor: use
-     * {@see getInstance()}.
+     * Protected constructor: use {@see getInstance()}.
      */
     protected function __construct()
     {

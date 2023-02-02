@@ -1,14 +1,13 @@
 <?php
 /**
- * noinspection PhpUnused  The methods here are part of an interface tha maps
- *   array access syntax to these methods, so they will never be called
- *   directly, only internally in this trait.
+ * @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection
  */
 
 declare(strict_types=1);
 
 namespace Siel\Acumulus\Data;
 
+use ReturnTypeWillChange;
 use RuntimeException;
 
 /**
@@ -81,7 +80,10 @@ trait AcumulusObjectArrayAccessTrait
 
     /**
      * @inheritdoc
+     *
+     * @noinspection PhpLanguageLevelInspection
      */
+    #[ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         $this->checkOffset($offset);

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\ApiClient;
 
-use JsonException;
 use RuntimeException;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Log;

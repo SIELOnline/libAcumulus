@@ -1,6 +1,6 @@
 <?php
 /**
- * @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection  SensitiveParameter.
+ * @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection  SensitiveParameter, CurlHandle is PHP8+
  * @noinspection PhpLanguageLevelInspection  An attribute is a comment in 7.4.
  */
 
@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\ApiClient;
 
+use CurlHandle;
 use RuntimeException;
 use SensitiveParameter;
 
@@ -314,19 +315,21 @@ class HttpRequest
     /**
      * Raises a runtime exception with the curl error message.
      *
-     * @param resource $handle (PHP8: CurlHandle)
-     * @param string $function
+     * @param CurlHandle|resource $handle
+     * @param string $functionName
      *   The name of the Curl function that failed.
      *
      * @throws \RuntimeException
      *   Always.
+     *
+     * @noinspection PhpMissingParamTypeInspection false positive?
      */
-    protected function raiseCurlError($handle, string $function): void
+    protected function raiseCurlError($handle, string $functionName): void
     {
         $curlVersion = curl_version();
         $code = curl_errno($handle);
         /** @noinspection OffsetOperationsInspection */
-        $message = sprintf('%s (curl: %s): %d - %s', $function, $curlVersion['version'] ?? 'unknown', $code, curl_error($handle));
+        $message = sprintf('%s (curl: %s): %d - %s', $functionName, $curlVersion['version'] ?? 'unknown', $code, curl_error($handle));
         $this->closeHandle();
         throw new RuntimeException($message, $code);
     }
@@ -336,7 +339,7 @@ class HttpRequest
      *
      * This method is a wrapper around access to the ConnectionHandler.
      *
-     * @return resource
+     * @return CurlHandle|resource
      */
     protected function getHandle()
     {

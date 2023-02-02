@@ -1,9 +1,13 @@
 <?php
+/**
+ * @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection  CurlHandle is PHP8+
+ */
 
 declare(strict_types=1);
 
 namespace Siel\Acumulus\ApiClient;
 
+use CurlHandle;
 use RuntimeException;
 
 use function is_array;
@@ -28,7 +32,6 @@ class ConnectionHandler
      * Singleton pattern.
      *
      * (PHP8: define return type as static)
-     *
      * @return static
      */
     public static function getInstance(): ConnectionHandler
@@ -40,7 +43,7 @@ class ConnectionHandler
     }
 
     /**
-     * @var resource[] (PHP8: CurlHandle[])
+     * @var resource[]|CurlHandle[]
      */
     protected array $curlHandles = [];
 
@@ -72,7 +75,7 @@ class ConnectionHandler
      *     already an open connection to that host.
      *   - set the CURLOPT_URL option.
      *
-     * @return resource (CurlHandle PHP8)
+     * @return resource|CurlHandle
      *   A, possibly already open, curl handle with the CURLOPT_URL option
      *   set to $uri.
      *

@@ -16,8 +16,6 @@ use Throwable;
 class AcumulusResponseException extends AcumulusException
 {
     /**
-     * @param string $body
-     * @param int $code
      * @param string|Throwable $additionalInfo
      */
     public function __construct(string $body, int $code, $additionalInfo = '')
@@ -29,9 +27,7 @@ class AcumulusResponseException extends AcumulusException
     }
 
     /**
-     * @param string|\Throwable $additionalInfo
-     *
-     * @return string
+     * @param string|Throwable $additionalInfo
      */
     private function getAdditionalInfo($additionalInfo): string
     {

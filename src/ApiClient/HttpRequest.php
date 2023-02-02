@@ -1,10 +1,15 @@
 <?php
+/**
+ * @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection  SensitiveParameter.
+ * @noinspection PhpLanguageLevelInspection  An attribute is a comment in 7.4.
+ */
 
 declare(strict_types=1);
 
 namespace Siel\Acumulus\ApiClient;
 
 use RuntimeException;
+use SensitiveParameter;
 
 use function assert;
 use function define;
@@ -139,8 +144,11 @@ class HttpRequest
      *   - The Curl internals level, e.g. an out of memory error.
      *   - The communication level, e.g. time-out or no response received.
      */
-    public function post(string $uri, $postFields): HttpResponse
-    {
+    public function post(
+        string $uri,
+        #[SensitiveParameter]
+        $postFields
+    ): HttpResponse {
         return $this->execute('POST', $uri, $postFields);
     }
 
@@ -167,8 +175,12 @@ class HttpRequest
      *   - The Curl internals level, e.g. an out of memory error.
      *   - The communication level, e.g. time-out or no response received.
      */
-    protected function execute(string $method, string $uri, $body = null): HttpResponse
-    {
+    protected function execute(
+        string $method,
+        string $uri,
+        #[SensitiveParameter]
+        $body = null
+    ): HttpResponse {
         $method = strtoupper($method);
         assert(in_array($method, ['GET', 'POST']), 'HttpRequest::execute(): non-supported method.');
         assert($this->uri === null, 'HttpRequest::execute(): may only be called once.');

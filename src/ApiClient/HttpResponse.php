@@ -1,8 +1,13 @@
 <?php
-
+/**
+ * @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection  SensitiveParameter.
+ * @noinspection PhpLanguageLevelInspection  An attribute is a comment in 7.4.
+ */
 declare(strict_types=1);
 
 namespace Siel\Acumulus\ApiClient;
+
+use SensitiveParameter;
 
 use function count;
 
@@ -19,8 +24,13 @@ class HttpResponse
     protected array $info;
     protected HttpRequest $request;
 
-    public function __construct(string $headers, string $body, array $info, HttpRequest $request)
-    {
+    public function __construct(
+        string $headers,
+        string $body,
+        #[SensitiveParameter]
+        array $info,
+        HttpRequest $request
+    ) {
         $this->headers = $headers;
         $this->body = $body;
         $this->info = $info;

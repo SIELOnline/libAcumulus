@@ -3,6 +3,23 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our own code.
 
+7.6.3 (2023-02-??)
+-------------------------------
+Features:
+- Added the #[SensitiveParameter] attribute to all parameters that may contain
+  passwords. This syntax is seen as a comment in PHP 7.4 and ignored as an
+  attribute in PHP 8.0 and 8.1, so this is a forward compatible change.
+  Notes:
+  - It is unclear whether this attribute needs to be repeated on overriding
+    methods. For now this is not done, so this might turn out to be a
+    documentation-only feature. We will test this on PHP 8.2 when possible.
+  - For now, only the password used to connect to the Acumulus API is considered
+    sensitive. Privacy-related client data, e.g. (e-mail) addresses, are not
+    protected intrinsically, though, the parameter being the whole message to
+    send to Acumulus, they will often be protected as well.
+  - For years, our own logging already masks passwords. This will not change by
+    this feature.
+
 7.6.2 (2023-02-01) (OC+WC only)
 -------------------------------
 Features:

@@ -1,8 +1,14 @@
 <?php
+/**
+ * @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection  SensitiveParameter.
+ * @noinspection PhpLanguageLevelInspection  An attribute is a comment in 7.4.
+ */
 
 declare(strict_types=1);
 
 namespace Siel\Acumulus\Config;
+
+use SensitiveParameter;
 
 /**
  * This class is the bridge between the library and the config subsystem.
@@ -46,5 +52,8 @@ abstract class ConfigStore
      * @return bool
      *   Success.
      */
-    abstract public function save(array $values): bool;
+    abstract public function save(
+        #[SensitiveParameter]
+        array $values
+    ): bool;
 }

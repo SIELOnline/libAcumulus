@@ -1,4 +1,8 @@
 <?php
+/**
+ * @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection  SensitiveParameter
+ * @noinspection PhpLanguageLevelInspection  An attribute is a comment in 7.4
+ */
 
 declare(strict_types=1);
 
@@ -8,6 +12,7 @@ use DOMDocument;
 use DOMElement;
 use DOMException;
 use RuntimeException;
+use SensitiveParameter;
 use Siel\Acumulus\ApiClient\AcumulusException;
 
 use function is_array;
@@ -255,8 +260,10 @@ class Util
      *
      * Acumulus API specific: passwords fields contain 'password' in their name.
      */
-    public function maskArray(array $subject): array
-    {
+    public function maskArray(
+        #[SensitiveParameter]
+        array $subject
+    ): array {
         array_walk_recursive($subject, static function (&$value, $key) {
             if (is_string($key) && stripos($key, 'password') !== false) {
                 $value = 'REMOVED FOR SECURITY';
@@ -273,8 +280,10 @@ class Util
      *
      * Acumulus API specific: passwords fields end with 'password'.
      */
-    public function maskXmlOrJsonString(string $subject): string
-    {
+    public function maskXmlOrJsonString(
+        #[SensitiveParameter]
+        string $subject
+    ): string {
         return $this->maskJson($this->maskXml($subject));
     }
 
@@ -283,8 +292,10 @@ class Util
      *
      * Acumulus API specific: passwords fields end with 'password'.
      */
-    public function maskXml(string $subject): string
-    {
+    public function maskXml(
+        #[SensitiveParameter]
+        string $subject
+    ): string {
         // Mask all values that have 'password' in their tag.
         // @todo: use back reference in closing tag, but test it (is this still used, is it tested?)
         return preg_replace(
@@ -299,8 +310,10 @@ class Util
      *
      * Acumulus API specific: passwords fields end with 'password'.
      */
-    public function maskJson(string $subject): string
-    {
+    public function maskJson(
+        #[SensitiveParameter]
+        string $subject
+    ): string {
         // Mask all values that have 'password' in their key.
         return preg_replace(
             '!"([a-z]*)password"(\s*):(\s*)"(((\\\\.)|[^\\\\"])*)"!',

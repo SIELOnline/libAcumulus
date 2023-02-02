@@ -111,6 +111,7 @@ abstract class Creator
     public const VatRateSource_Parent = 'parent';
     public const VatRateSource_Child = 'child';
     public const VatRateSource_Creator_Lookup = 'creator-lookup';
+    public const VatRateSource_Creator_Missing_Amount = 'creator-missing-amount';
 
     public const LineType_OrderItem = 'order-item';
     public const LineType_Shipping = 'shipping';

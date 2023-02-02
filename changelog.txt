@@ -23,6 +23,13 @@ Features:
   - For years, our own logging already masks passwords. This will not change by
     this feature.
 
+Bugs:
+- HS: Revisit/improve commit 2021-01-26 (6.2.0): HS 4+ has a setting on shipping
+  methods "Automatic taxes"/"Automatische belastingen" that determines [...].
+  Improvement: if a product line has no vat class (probably vat free) the
+  amounts of the weighed shipping lines would not add up as no line would be
+  created for the missing vat class.
+
 
 7.6.2 (2023-02-01) (OC+WC only)
 -------------------------------

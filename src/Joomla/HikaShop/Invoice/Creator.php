@@ -250,12 +250,15 @@ class Creator extends BaseCreator
      *   the item lines.
      * 2 - Highest rate/Hoogste waarde: use the highest vat rate from the item
      *   lines as vat rate for the shipping.
+     * 3 - Lowest rate/Laagste waarde: use the lowest vat rate from the item
+     *   lines as vat rate for the shipping.
      *
      * Real-life examples of order->order_shipping_params:
      * - {"prices":{"27@0":{"price_with_tax":"20.00000","tax":0}}}
      * - {"prices":{"30@0":{"price_with_tax":8,"tax":0,"taxes":{"EUICL":0}}}}
      * - {"prices":{"6@0":{"price_with_tax":4.000018,"tax":0.694218,"taxes":{"BTW":0.694218}}}}
      * - {"prices":{"5@0":{"price_with_tax":4.6177850629697,"tax":0.48558506296965,"taxes":{"BTW Laag":0.11063016598247,"BTW 0%":0,"BTW":0.37495489698718}}}}
+     * - {"prices":{"5@0":{"price_with_tax":4.617861669234271,"tax":0.485661669234271,"taxes":{"BTW":0.485661669234271}}}}
      *
      * Explanation:
      * - stdClass|null order->order_shipping_params: may only be null if no or
@@ -267,8 +270,9 @@ class Creator extends BaseCreator
      * - float tax: (total) tax for this shipment
      * - (optional) float[] taxes: array of tax amounts keyed by tax class name.
      *   If a shipping method has proportional tax rates (i.e. following the
-     *   contents of the cart) this array contains the proportion of the (total)
-     *   tax per tax class.
+     *   contents of the cart), this array contains the proportion of the
+     *   (total) tax per tax class (but thus no line for a vat free product
+     *   without tax class), see last example.
      */
     protected function getShippingLines(): array
     {
@@ -318,28 +322,15 @@ class Creator extends BaseCreator
                     $shippingLineDefaults[Tag::Product] .= sprintf(' %d', $index + 1);
                 }
 
-                if (!isset($price->taxes)) {
-                    // No tax breakdown (probably because there's no tax).
+                if (empty($price->taxes)) {
+                    // Empty or no tax breakdown, probably because there's no tax.
                     $result[] = $shippingLineDefaults + [
                             Meta::UnitPriceInc => $price->price_with_tax,
                             Meta::VatAmount => $price->tax,
                             Meta::VatRateSource => static::VatRateSource_Completor,
-                        ];
-                } elseif (count($price->taxes) === 1) {
-                    // Single tax applied, add the same fields as above but with
-                    // some additional metadata.
-                    reset($price->taxes);
-                    $taxNameKey = key($price->taxes);
-                    $result[] = $shippingLineDefaults + [
-                            Meta::UnitPriceInc => $price->price_with_tax,
-                            Meta::VatAmount => $price->tax,
-                            Meta::VatRateSource => static::VatRateSource_Completor,
-                            Meta::VatClassName => $taxNameKey,
-                            Meta::VatRateLookup => (float) $taxClassManager->get($taxNameKey)->tax_rate,
                         ];
                 } else {
-                    // Multiple taxes applied to this shipment: add a line per
-                    // vat rate.
+                    // Detailed tax breakdown is available: add a line per vat rate.
                     $shippingMethodAmountIncTotal = 0.0;
                     $addMissingAmountIndex = null;
                     foreach ($price->taxes as $taxNameKey => $shippingVat) {
@@ -383,12 +374,19 @@ class Creator extends BaseCreator
                         $shippingMethodAmountIncTotal += $result[$addMissingAmountIndex][Tag::UnitPrice];
                     }
                     if (!Number::floatsAreEqual($shippingMethodAmountIncTotal, $price->price_with_tax)) {
-                        // Problem: rates have probably changed.
-                        $this->addWarning($result[count($result) - 1],
-                            'Amounts for this shipping method do not add up: rates have probably changed.'
-                            . ' (order_shipping_params->prices = '
-                            . json_encode($this->order->order_shipping_params->prices, Meta::JsonFlags)
-                            . ')');
+                        // @todo: fill in the missing amount if we had a vat free
+                        //   rate (indicated so by the product having no tax class).
+                        $result[] = $shippingLineDefaults + [
+                                Tag::UnitPrice => $price->price_with_tax - $shippingMethodAmountIncTotal,
+                                Tag::VatRate => 0,
+                                Meta::VatAmount => 0.0,
+                                Meta::VatRateSource => static::VatRateSource_Creator_Missing_Amount,
+                                Meta::VatClassName => Config::VatClass_Null,
+                                Meta::Warning => 'Amounts for this shipping method do not add up: probably vat free product or rates have changed.'
+                                    . ' (order_shipping_params->prices = '
+                                    . json_encode($this->order->order_shipping_params->prices, Meta::JsonFlags)
+                                    . ')',
+                            ];
                         $warningAdded = true;
                     }
                 }

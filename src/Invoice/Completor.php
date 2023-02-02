@@ -1148,10 +1148,10 @@ class Completor
         }
 
         // Union can obviously contain double results.
-        $list['union'] = array_unique($union);
+        $list['union'] = array_values(array_unique($union));
         // Intersection can contain double results due to handling 0% and
         // vat-free as being the same (as they have not yet been corrected).
-        $list['intersection'] = $intersection !== null ? array_unique($intersection) : [];
+        $list['intersection'] = $intersection !== null ? array_values(array_unique($intersection)) : [];
         return $list;
     }
 

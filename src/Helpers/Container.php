@@ -687,6 +687,7 @@ class Container
             // namespaces, but stop at Acumulus.
             $namespaces = explode('\\', $this->shopNamespace);
             while (empty($fqClass) && !empty($namespaces)) {
+                /** @noinspection PhpStrictComparisonWithOperandsOfDifferentTypesInspection */
                 if (end($namespaces) === 'Acumulus') {
                     // Base level is always \Siel\Acumulus, even if
                     // \MyVendorName\Acumulus\MyWebShop was set as shopNamespace.

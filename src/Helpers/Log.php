@@ -296,7 +296,7 @@ class Log
         if (count($values) > 0) {
             $message = vsprintf($format, $values);
         }
-        $this->loggedMessages[] = ['message' => $message, 'severity' => $severity, 'format' => $format, 'values' => $values];
+        $this->loggedMessages[] = compact('message', 'severity', 'format', 'values');
         if ($severity >= $this->getLogLevel()) {
             $this->write($message, $severity);
         }

@@ -54,18 +54,11 @@ abstract class InvoiceManager extends BaseInvoiceManager
     /**
      * Helper method to get the db object.
      *
-     * @noinspection PhpUndefinedNamespaceInspection
-     * @noinspection PhpUndefinedClassInspection
-     *   J3: JDatabaseDriver
-     * @noinspection PhpReturnDocTypeMismatchInspection
-     *
-     * @return \Joomla\Database\DatabaseDriver|\JDatabaseDriver|null $db
+     * @return \Joomla\Database\DatabaseDriver|\JDatabaseDriver|null
      */
     protected function getDb()
     {
-        /** @noinspection PhpDeprecationInspection
-         *    Deprecated as of J4.
-         */
+        /** @noinspection PhpDeprecationInspection  Deprecated as of J4. */
         return Factory::getDbo();
     }
 
@@ -96,8 +89,7 @@ abstract class InvoiceManager extends BaseInvoiceManager
      *
      * @throws \Exception
      *
-     * @noinspection PhpDeprecationInspection
-     *   Deprecated as of J4
+     * @noinspection PhpDeprecationInspection  Deprecated as of J4.
      */
     protected function triggerInvoiceCreated(?array &$invoice, Source $invoiceSource, InvoiceAddResult $localResult): void
     {

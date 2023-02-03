@@ -44,8 +44,8 @@ Notes:
 | Tag | Shop             | Version used for testing | Supported versions                  |
 |-----|------------------|--------------------------|-------------------------------------|
 | ALL | All web shops.   |                          |                                     |
-| HS  | HikaShop (JOO)   | 4.6.2 (starter)          | >= 3.0.0                            |
-| JOO | Joomla (+ HS)    | 4.2.5                    | >= 3.6                              |
+| HS  | HikaShop (JOO)   | 4.7.1 (starter)          | >= 3.0.0                            |
+| JOO | Joomla (+ HS)    | 4.2.7                    | >= 3.6                              |
 | MA  | Magento          | 2.4.5 (community)        | >= 2.4, 2.3 might still work        |
 | OC  | OpenCart         | 3.0.3.7                  | >= 3.0                              |
 |     |                  | 4.x.y.z                  | Not yet tested/supported            |

@@ -13,16 +13,19 @@ use Siel\Acumulus\Helpers\Severity;
  */
 class Log extends BaseLog
 {
+    protected string $category;
+
     /**
      * {@inheritdoc}
      */
     public function __construct($libraryVersion)
     {
         parent::__construct($libraryVersion);
+        $this->category = 'com_acumulus_' . $this->getLibraryVersion();
         JoomlaLog::addLogger(
             ['text_file' => 'acumulus.log.php'],
             JoomlaLog::ALL,
-            ['com_acumulus ' . $this->getLibraryVersion()]
+            [$this->category],
         );
     }
 
@@ -30,10 +33,12 @@ class Log extends BaseLog
      * {@inheritdoc}
      *
      * This override uses JoomlaLog.
+     *
+     * @noinspection PhpMissingParentCallCommonInspection
      */
     protected function write(string $message, int $severity): void
     {
-        JoomlaLog::add($message, $this->getJoomlaSeverity($severity), 'com_acumulus');
+        JoomlaLog::add($message, $this->getJoomlaSeverity($severity), $this->category);
     }
 
     /**

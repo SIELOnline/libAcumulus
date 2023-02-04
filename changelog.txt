@@ -24,6 +24,7 @@ Features:
     this feature.
 
 Bugs:
+- JOO3: Logging did no longer work. (and JOO4?)
 - HS: Revisit/improve commit 2021-01-26 (6.2.0): HS 4+ has a setting on shipping
   methods "Automatic taxes"/"Automatische belastingen" that determines [...].
   Improvement: if a product line has no vat class (probably vat free) the

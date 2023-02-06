@@ -62,17 +62,17 @@ abstract class InvoiceManager extends BaseInvoiceManager
         return Factory::getDbo();
     }
 
-	/**
-	 * Helper method that returns a date in the correct and escaped sql format.
-	 *
-	 * @param string $dateStr
-	 *   Date in yyyy-mm-dd format.
-	 *
-	 * @return string
+    /**
+     * Helper method that returns a date in the correct and escaped sql format.
+     *
+     * @param string $dateStr
+     *   Date in yyyy-mm-dd format.
+     *
+     * @return string
      *   The date string SQL datetime format.
      *
-	 * @throws \Exception
-	 */
+     * @throws \Exception
+     */
     protected function toSql(string $dateStr): string
     {
         /** @noinspection NullPointerExceptionInspection */
@@ -96,9 +96,11 @@ abstract class InvoiceManager extends BaseInvoiceManager
         PluginHelper::importPlugin('acumulus');
         /** @noinspection NullPointerExceptionInspection */
         $results = Factory::getApplication()->triggerEvent('onAcumulusInvoiceCreated', [&$invoice, $invoiceSource, $localResult]);
-        if (count(array_filter($results, static function ($value) {
-                return $value === false;
-            })) >= 1
+        if (count(
+                array_filter($results, static function ($value) {
+                    return $value === false;
+                })
+            ) >= 1
         ) {
             $invoice = null;
         }
@@ -119,9 +121,11 @@ abstract class InvoiceManager extends BaseInvoiceManager
     {
         PluginHelper::importPlugin('acumulus');
         $results = Factory::getApplication()->triggerEvent('onAcumulusInvoiceSendBefore', [&$invoice, $invoiceSource, $localResult]);
-        if (count(array_filter($results, static function ($value) {
-                return $value === false;
-            })) >= 1
+        if (count(
+                array_filter($results, static function ($value) {
+                    return $value === false;
+                })
+            ) >= 1
         ) {
             $invoice = null;
         }

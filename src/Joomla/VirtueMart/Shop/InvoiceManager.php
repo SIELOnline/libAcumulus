@@ -1,8 +1,4 @@
 <?php
-/**
- * @noinspection SqlNoDataSourceInspection
- * @noinspection SqlDialectInspection
- */
 
 declare(strict_types=1);
 
@@ -51,8 +47,14 @@ class InvoiceManager extends BaseInvoiceManager
      *
      * @noinspection NullPointerExceptionInspection
      *   getDb() won't fail anymore when we arrived here.
+     * @noinspection PhpMissingParentCallCommonInspection
+     *   Parent is a fallback implementation.
      */
-    public function getInvoiceSourcesByReferenceRange(string $invoiceSourceType, string $invoiceSourceReferenceFrom, string $invoiceSourceReferenceTo): array
+    public function getInvoiceSourcesByReferenceRange(
+        string $invoiceSourceType,
+        string $invoiceSourceReferenceFrom,
+        string $invoiceSourceReferenceTo
+    ): array
     {
         if ($invoiceSourceType === Source::Order) {
             if (ctype_digit($invoiceSourceReferenceFrom) && ctype_digit($invoiceSourceReferenceTo)) {

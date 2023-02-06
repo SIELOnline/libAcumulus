@@ -51,9 +51,9 @@ Notes:
 |     |                  | 4.x.y.z                  | Not yet tested/supported            |
 | PS  | PrestaShop       | 1.7.8.7                  | >= 1.7.6                            |
 | VM  | VirtueMart (JOO) | 3                        | >= 3.0                              |
-|     |                  | 4.0.6                    | Events do not work on Joomla 4!     |
+|     |                  | 4.0.7                    | >= 4.0.5                            |
 | JOO | Joomla (+ VM)    | 3.10                     | >= 3.6                              |
-|     |                  |                          | VM Events do not work on Joomla 4!  |
+|     |                  | 4.2.7                    | >= 4.2.5                            |
 | WC  | WooCommerce      | 7.1.0                    | >= 5.0 (3 and 4 will probably work) |
 |     | WordPress        | 6.1.1                    | >= 5.9 (earlier versions WILL fail) |
 
@@ -76,13 +76,14 @@ Notes:
 
 | Tag | Shop Version      | 7.4 | 8.0 | 8.1 | Remarks                          |
 |-----|-------------------|-----|-----|-----|----------------------------------|
-| JOO | 3.10.x            | ✅   | ❌   | ❌   |                                  |
-| JOO | 4.2.5             | ❓   | ✅   | ✅   | Not tested on PHP 7.4            |
+| JOO | 3.10.x            | ✅   | ❌   | ❌   | Many warnings on PHP 8.1         |
+| JOO | 4.2.7             | ❓   | ✅   | ✅   | Not tested on PHP 7.4            |
 | HS  | 4.6.2 (starter)   | ✅   | ✅   | ✅   |                                  |
 | MA  | 2.4.5 (community) | ❌   | ✅   | ✅   | Contains PHP 8 constructs        |
 | OC  | 3.0.3.7           | ✅   | ✅   | ❌   | Many warnings on PHP 8.1         |
 |     | 4.x.y.z           | ❌   | ✅   | ✅   | Not yet supported                |
 | PS  | 1.7.8.7           | ✅   | ❌   | ❌   | Fatal runtime errors on PHP 8    |
 |     | 8.0.1             | ✅   | ✅   | ✅   | Warnings get logged on PHP 8.1   |
-| VM  | 4.0.4             | ✅   | ✅   | ✅   |                                  |
+| VM  | 3.x.y             | ✅   | ❌   | ❌   |                                  |
+|     | 4.0.4             | ✅   | ✅   | ✅   |                                  |
 | WC  | 7.1.0             | ✅   | ✅   | ❓   | Many warnings from other plugins |

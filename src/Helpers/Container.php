@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus;
 
-const Version = '7.6.2';
+const Version = '7.6.3';
 
 namespace Siel\Acumulus\Helpers;
 
@@ -38,6 +38,8 @@ use Siel\Acumulus\Shop\AcumulusEntry;
 use Siel\Acumulus\Shop\AcumulusEntryManager;
 
 use Siel\Acumulus\Shop\InvoiceManager;
+
+use function count;
 
 use const Siel\Acumulus\Version;
 
@@ -678,6 +680,7 @@ class Container
     ): object {
         $instanceKey = "$subNamespace\\$class";
         if (!isset($this->instances[$instanceKey]) || $newInstance) {
+            $fqClass = null;
             // Try custom namespace.
             if (!empty($this->customNamespace)) {
                 $fqClass = $this->tryNsInstance($class, $subNamespace, $this->customNamespace);
@@ -686,11 +689,10 @@ class Container
             // Try the namespace passed to the constructor and any parent
             // namespaces, but stop at Acumulus.
             $namespaces = explode('\\', $this->shopNamespace);
-            while (empty($fqClass) && !empty($namespaces)) {
-                /** @noinspection PhpStrictComparisonWithOperandsOfDifferentTypesInspection */
+            while ($fqClass === null && count($namespaces) > 0) {
                 if (end($namespaces) === 'Acumulus') {
-                    // Base level is always \Siel\Acumulus, even if
-                    // \MyVendorName\Acumulus\MyWebShop was set as shopNamespace.
+                    // We arrived at the base level (\...\Acumulus),
+                    // try the \Siel\Acumulus\ level and stop.
                     $namespace = static::baseNamespace;
                     $namespaces = [];
                 } else {
@@ -700,7 +702,7 @@ class Container
                 $fqClass = $this->tryNsInstance($class, $subNamespace, $namespace);
             }
 
-            if (empty($fqClass)) {
+            if ($fqClass === null) {
                 throw new InvalidArgumentException("Class $class not found in namespace $subNamespace");
             }
 
@@ -720,16 +722,16 @@ class Container
      * @param $namespace
      *   The namespace to search in.
      *
-     * @return string
-     *   The full name of the class if it exists in the given namespace, or the
-     *   empty string if it does not exist.
+     * @return string|null
+     *   The full name of the class if it exists in the given namespace, or null
+     *   if it does not exist.
      */
-    protected function tryNsInstance($class, $subNamespace, $namespace): string
+    protected function tryNsInstance($class, $subNamespace, $namespace): ?string
     {
         $fqClass = $this->getFqClass($class, $subNamespace, $namespace);
         // Checking if the file exists prevents warnings in Magento whose own
         // autoloader logs warnings when a class cannot be loaded.
-        return class_exists($fqClass) ? $fqClass : '';
+        return class_exists($fqClass) ? $fqClass : null;
     }
 
     /**

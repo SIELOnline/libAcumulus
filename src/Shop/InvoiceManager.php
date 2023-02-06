@@ -609,7 +609,9 @@ abstract class InvoiceManager
     protected function mailInvoiceAddResult(InvoiceAddResult $result, Source $invoiceSource): bool
     {
         $pluginSettings = $this->getConfig()->getPluginSettings();
-        $addReqResp = $pluginSettings['debug'] === Config::Send_SendAndMailOnError ? InvoiceAddResult::AddReqResp_WithOther : InvoiceAddResult::AddReqResp_Always;
+        $addReqResp = $pluginSettings['debug'] === Config::Send_SendAndMailOnError
+            ? InvoiceAddResult::AddReqResp_WithOther
+            : InvoiceAddResult::AddReqResp_Always;
         if ($addReqResp === InvoiceAddResult::AddReqResp_Always || $result->hasRealMessages()) {
             return $this->getMailer()->sendInvoiceAddMailResult($result, $invoiceSource->getType(), $invoiceSource->getReference());
         }

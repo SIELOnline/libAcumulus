@@ -58,6 +58,9 @@ class AcumulusEntryManager extends BaseAcumulusEntryManager
     public function getByInvoiceSource(Source $invoiceSource, bool $ignoreLock = true): ?AcumulusEntry
     {
         $table = $this->newTable();
+        // If we do not set it to null, it will remain undefined when we want to update
+        // or delete it later.
+        $table->id = null;
         /** @noinspection PhpRedundantOptionalArgumentInspection */
         $result = $table->load(['source_type' => $invoiceSource->getType(), 'source_id' => $invoiceSource->getId()], true);
         return $result ? $this->convertDbResultToAcumulusEntries($table, $ignoreLock) : null;

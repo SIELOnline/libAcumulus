@@ -3,8 +3,8 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our own code.
 
-7.6.3 (2023-02-??)
--------------------------------
+7.6.3 (2023-02-06) (JOO only)
+-----------------------------
 Features:
 - PHP8.1 awareness: Added the #[ReturnTypeWillChange] attribute where necessary. Turned
   out to be needed in only 1 place, code that isn't yet functional.

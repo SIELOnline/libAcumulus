@@ -61,8 +61,6 @@ bugs:
   statuses on which to send the invoice data to Acumulus should not use strict
   typing.
 - OC: Define title for back button.
-
-Refactorings:
 - ALL: Acumulus customise invoice module may need access to container without
   having creating it, place the instance in a public static property.
 

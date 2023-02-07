@@ -72,9 +72,9 @@ class FormHelper
     }
 
     /**
-     * @return object[]|null
+     * @return object[]
      */
-    protected function getMeta(): ?array
+    protected function getMeta(): array
     {
         if (empty($this->meta) && $this->isSubmitted() && isset($_POST[static::Meta])) {
             $meta = json_decode($_POST[static::Meta], false);
@@ -82,7 +82,7 @@ class FormHelper
                 $this->setMeta($meta);
             }
         }
-        return $this->meta;
+        return $this->meta ?? [];
     }
 
     /**

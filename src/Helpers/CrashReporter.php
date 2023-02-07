@@ -70,7 +70,7 @@ class CrashReporter
      */
     public function logAndMail(Throwable $e): string
     {
-        $message = $this->log->exception($e);
+        $message = $this->log->exception($e, true);
         $this->mailException($e->__toString());
         return $this->toAdminMessage($message);
     }
@@ -118,7 +118,11 @@ class CrashReporter
         $errorMessageHtml = nl2br($errorMessage, false);
         $body = [
             'text' => "$paragraphIntroductionText\n$aboutEnvironment:\n\n$environmentListText\n$aboutError:\n\n$errorMessage\n",
-            'html' => "<p>$paragraphIntroductionHtml</p>\n<h3>$aboutEnvironment</h3>\n$environmentListHtml\n<h3>$aboutError</h3>\n<p>$errorMessageHtml</p>\n",
+            'html' => "<p>$paragraphIntroductionHtml</p>
+                  <h3>$aboutEnvironment</h3>
+                  $environmentListHtml
+                  <h3>$aboutError</h3>
+                  <p>$errorMessageHtml</p>\n",
             ];
         $this->mailer->sendMail($from, $fromName, $to, $subject, $body['text'], $body['html']);
     }

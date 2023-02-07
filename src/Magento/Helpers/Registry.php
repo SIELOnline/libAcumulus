@@ -20,36 +20,40 @@ use Magento\Framework\ObjectManagerInterface;
 class Registry
 {
     protected static Registry $instance;
-    protected ObjectManagerInterface $objectManager;
-    protected string $locale;
 
     /**
      * Returns the Registry instance.
      */
     public static function getInstance(): Registry
     {
-        if (!static::$instance) {
+        if (!isset(static::$instance)) {
             static::$instance = new static();
         }
         return static::$instance;
     }
 
     /**
-     * Registry constructor.
+     * Returns the object manager
      */
-    protected function __construct()
+    protected function getObjectManager(): ObjectManagerInterface
     {
-        /** @var \Magento\Framework\App\Bootstrap $bootstrap */
-        global $bootstrap;
+        /** @var ObjectManagerInterface $objectManager */
+        static $objectManager;
 
-        if ($bootstrap) {
-            $localBootstrap = $bootstrap;
-        } else {
-            $pos = strpos(__DIR__, str_replace('/', DIRECTORY_SEPARATOR, '/app/code/Siel/Acumulus/Magento2/Helpers'));
-            $root = substr(__DIR__, 0, $pos);
-            $localBootstrap = Bootstrap::create($root, $_SERVER);
+        if (!isset($objectManager)) {
+            /** @var \Magento\Framework\App\Bootstrap $bootstrap */
+            global $bootstrap;
+
+            if ($bootstrap) {
+                $localBootstrap = $bootstrap;
+            } else {
+                $pos = strpos(__DIR__, str_replace('/', DIRECTORY_SEPARATOR, '/vendor/siel/acumulus/src/Magento/Helpers'));
+                $root = substr(__DIR__, 0, $pos);
+                $localBootstrap = Bootstrap::create($root, $_SERVER);
+            }
+            $objectManager = $localBootstrap->getObjectManager();
         }
-        $this->objectManager = $localBootstrap->getObjectManager();
+        return $objectManager;
     }
 
     /**
@@ -57,7 +61,7 @@ class Registry
      */
     public function create(string $type)
     {
-        return $this->objectManager->create($type);
+        return $this->getObjectManager()->create($type);
     }
 
     /**
@@ -65,7 +69,7 @@ class Registry
      */
     public function get(string $type)
     {
-        return $this->objectManager->get($type);
+        return $this->getObjectManager()->get($type);
     }
 
     /**
@@ -94,8 +98,16 @@ class Registry
                 $directoryRead = $readFactory->create($path);
                 $composerJsonData = $directoryRead->readFile('composer.json');
                 // @todo: json error handling: switch to throw.
-                $data = json_decode($composerJsonData);
-                $result = $data === null ? 'JSON ERROR' : (!empty($data->version) ? $data->version : 'NOT SET');
+                $data = json_decode($composerJsonData, false);
+                if ($data !== null) {
+                    if (!empty($data->version)) {
+                        $result = $data->version;
+                    } else {
+                        $result = 'NOT SET';
+                    }
+                } else {
+                    $result = 'JSON ERROR';
+                }
             } else {
                 $result = 'MODULE ERROR';
             }

@@ -3,6 +3,22 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our own code.
 
+7.6.4 (2023-02-07) (MA only)
+----------------------------
+Features:
+- PHP8.2 awareness: removed use of a dynamic property in class Log.
+- ALL: Fatal errors will now log stack trace (fallback for when mail does not work).
+
+Bugs:
+- MA (+ some other?): FormHelper::getMeta() could return null, leading to errors. This
+  method will now return an empty array when there is no meta field.
+- MA: Magento\Helpers\Registry.php(49): substr(): Argument #3 ($length) must be of type
+  ?int, bool given.
+
+Refactorings:
+- MA: Added strict typing (PHP7.4 level).
+
+
 7.6.3 (2023-02-06) (JOO only)
 -----------------------------
 Features:
@@ -22,6 +38,7 @@ Features:
   - For years, our own logging already masks passwords. This will not change by this
     feature.
 
+
 Bugs:
 - JOO3: Logging did no longer work. (and JOO4?)
 - HS: Revisit/improve commit 2021-01-26 (6.2.0): HS 4+ has a setting on shipping methods
@@ -36,8 +53,6 @@ Features:
 - OC: Support for OpenCart 4. Note that OpenCart 4 will only run on PHP 8 and
   seems to contain some errors regarding tax totals not including tax on
   shipping costs (and therefore not in the amount to be paid).
-- ALL: Acumulus customise invoice module may need access to container without
-  having creating it, place the instance in a public static property.
 
 bugs:
 - WC: Error after fresh install: Plugin kon niet worden geactiveerd omdat hij
@@ -46,6 +61,10 @@ bugs:
   statuses on which to send the invoice data to Acumulus should not use strict
   typing.
 - OC: Define title for back button.
+
+Refactorings:
+- ALL: Acumulus customise invoice module may need access to container without
+  having creating it, place the instance in a public static property.
 
 
 7.6.1 (2023-01-24) (PS only)

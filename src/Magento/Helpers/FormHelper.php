@@ -24,16 +24,14 @@ class FormHelper extends BaseFormHelper
     {
         /** @var object[]|null $meta */
         $meta = $this->getMeta();
-        if ($meta !== null) {
-            foreach ($meta as $key => $fieldMeta) {
-                if (($fieldMeta->type === 'checkbox')
-                    && isset($postedValues[$fieldMeta->collection])
-                    && is_array($postedValues[$fieldMeta->collection])
-                    // @todo: should 3rd parameter be false?
-                    && in_array($key, $postedValues[$fieldMeta->collection], false)
-                ) {
-                    $postedValues[$key] = $fieldMeta->collection;
-                }
+        foreach ($meta as $key => $fieldMeta) {
+            if (($fieldMeta->type === 'checkbox')
+                && isset($postedValues[$fieldMeta->collection])
+                && is_array($postedValues[$fieldMeta->collection])
+                // @todo: should 3rd parameter be false?
+                && in_array($key, $postedValues[$fieldMeta->collection], false)
+            ) {
+                $postedValues[$key] = $fieldMeta->collection;
             }
         }
         return $postedValues;

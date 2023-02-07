@@ -98,8 +98,6 @@ use function is_string;
  *
  * Hierarchical lines are "corrected" in the Completor phase, see
  * {@see FlattenerInvoiceLines}
- *
- * @noinspection EfferentObjectCouplingInspection
  */
 abstract class Creator
 {

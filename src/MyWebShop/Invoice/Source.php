@@ -58,7 +58,7 @@ class Source extends BaseSource
     protected function setId(): void
     {
         // @todo: set the id, given a loaded source.
-        $this->id = $this->source->id;
+        $this->id = (int) $this->source->id;
     }
 
     /**

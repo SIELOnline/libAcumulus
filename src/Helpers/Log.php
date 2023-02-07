@@ -87,6 +87,17 @@ class Log
         return $this->loggedMessages;
     }
 
+    protected function addLoggedMessage(int $severity, string $message, string $format, array $values): void
+    {
+        $this->loggedMessages[$message] = compact('message', 'severity', 'format', 'values');
+
+    }
+
+    protected function hasBeenLogged(string $message): bool
+    {
+        return isset($this->loggedMessages[$message]);
+    }
+
     protected function getLibraryVersion(): string
     {
         return $this->libraryVersion;
@@ -229,7 +240,7 @@ class Log
      * @return string
      *   The formatted message whether it got logged or not.
      */
-    public function exception(Throwable $e): string
+    public function exception(Throwable $e, bool $includeTrace = false): string
     {
         $callingFunction = $e->getTrace()[0]['function'];
         $callingLine = $e->getLine();
@@ -241,9 +252,11 @@ class Log
         $code = !empty($e->getCode()) && strpos($e->getMessage(), (string) $e->getCode()) === false ? $e->getCode() . ': ' : '';
         $message = $e->getMessage();
         $fullMessage = "$class: $code$message in $callingFunction:$callingLine";
-        if (empty($e->hasBeenLogged)) {
+        if (!$this->hasBeenLogged($fullMessage)) {
             $this->log(Severity::Exception, $fullMessage);
-            $e->hasBeenLogged = true;
+            if ($includeTrace) {
+                $this->log(Severity::Exception, $e->getTraceAsString());
+            }
         }
         return $fullMessage;
     }
@@ -296,7 +309,7 @@ class Log
         if (count($values) > 0) {
             $message = vsprintf($format, $values);
         }
-        $this->loggedMessages[] = compact('message', 'severity', 'format', 'values');
+        $this->addLoggedMessage($severity, $message, $format, $values);
         if ($severity >= $this->getLogLevel()) {
             $this->write($message, $severity);
         }

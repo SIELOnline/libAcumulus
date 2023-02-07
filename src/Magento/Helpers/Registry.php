@@ -28,7 +28,7 @@ class Registry
      */
     public static function getInstance(): Registry
     {
-        if (!static::$instance) {
+        if (!isset(static::$instance)) {
             static::$instance = new static();
         }
         return static::$instance;
@@ -94,8 +94,16 @@ class Registry
                 $directoryRead = $readFactory->create($path);
                 $composerJsonData = $directoryRead->readFile('composer.json');
                 // @todo: json error handling: switch to throw.
-                $data = json_decode($composerJsonData);
-                $result = $data === null ? 'JSON ERROR' : (!empty($data->version) ? $data->version : 'NOT SET');
+                $data = json_decode($composerJsonData, false);
+                if ($data !== null) {
+                    if (!empty($data->version)) {
+                        $result = $data->version;
+                    } else {
+                        $result = 'NOT SET';
+                    }
+                } else {
+                    $result = 'JSON ERROR';
+                }
             } else {
                 $result = 'MODULE ERROR';
             }

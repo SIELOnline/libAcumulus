@@ -33,7 +33,7 @@ class Source extends BaseSource
      */
     protected function setId(): void
     {
-        $this->id = $this->source->getId();
+        $this->id = (int) $this->source->getId();
     }
 
     /**

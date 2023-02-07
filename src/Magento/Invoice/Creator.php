@@ -405,7 +405,12 @@ class Creator extends BaseCreator
                 Meta::VatRateSource => static::VatRateSource_Exact,
             ];
         } elseif (isset($lineVat)) {
-            $result += $this->getVatRangeTags($lineVat / $result[Tag::Quantity], $productPriceEx, 0.02 / min($result[Tag::Quantity], 2), 0.01);
+            $result += $this->getVatRangeTags(
+                $lineVat / $result[Tag::Quantity],
+                $productPriceEx,
+                0.02 / min($result[Tag::Quantity], 2),
+                0.01
+            );
         } else {
             // No exact vat rate and no line vat: just use price inc - price ex.
             $result += $this->getVatRangeTags($productPriceInc - $productPriceEx, $productPriceEx, 0.02, 0.01);

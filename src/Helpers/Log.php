@@ -89,13 +89,18 @@ class Log
 
     protected function addLoggedMessage(int $severity, string $message, string $format, array $values): void
     {
-        $this->loggedMessages[$message] = compact('message', 'severity', 'format', 'values');
+        $this->loggedMessages[] = compact('message', 'severity', 'format', 'values');
 
     }
 
     protected function hasBeenLogged(string $message): bool
     {
-        return isset($this->loggedMessages[$message]);
+        foreach ($this->loggedMessages as $loggedMessage) {
+            if ($loggedMessage['message'] === $message || $loggedMessage['format'] === $message) {
+                return true;
+            }
+        }
+        return false;
     }
 
     protected function getLibraryVersion(): string

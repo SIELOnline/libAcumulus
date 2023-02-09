@@ -3,8 +3,8 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our own code.
 
-7.6.4 (2023-02-07) (MA only)
-----------------------------
+7.6.4 (2023-02-07) (MA only) (PS later)
+---------------------------------------
 Features:
 - PHP8.2 awareness: removed use of a dynamic property in class Log.
 - ALL: Fatal errors will now log stack trace (fallback for when mail does not work).
@@ -50,19 +50,18 @@ Bugs:
 7.6.2 (2023-02-01) (OC+WC only)
 -------------------------------
 Features:
-- OC: Support for OpenCart 4. Note that OpenCart 4 will only run on PHP 8 and
-  seems to contain some errors regarding tax totals not including tax on
-  shipping costs (and therefore not in the amount to be paid).
+- OC: Support for OpenCart 4. Note that OpenCart 4 will only run on PHP 8 and seems to
+  contain some errors regarding tax totals not including tax on shipping costs (and
+  therefore not in the amount to be paid).
 
 bugs:
-- WC: Error after fresh install: Plugin kon niet worden geactiveerd omdat hij
-  een fatale fout veroorzaakt.
-- OC (and perhaps others): test to see if new order status is in set of order
-  statuses on which to send the invoice data to Acumulus should not use strict
-  typing.
+- WC: Error after fresh install: Plugin kon niet worden geactiveerd omdat hij een fatale
+  fout veroorzaakt.
+- OC,PS (and perhaps others): test to see if new order status is in set of order statuses
+  on which to send the invoice data to Acumulus should not use strict typing.
 - OC: Define title for back button.
-- ALL: Acumulus customise invoice module may need access to container without
-  having creating it, place the instance in a public static property.
+- ALL: Acumulus customise invoice module may need access to container without having
+  creating it, place the instance in a public static property.
 
 
 7.6.1 (2023-01-24) (PS only)

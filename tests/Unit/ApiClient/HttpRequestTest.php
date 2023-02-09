@@ -1,6 +1,5 @@
 <?php
 /**
- * @noinspection PhpMissingDocCommentInspection
  * @noinspection PhpStaticAsDynamicMethodCallInspection
  * @noinspection DuplicatedCode
  */
@@ -12,6 +11,11 @@ namespace Siel\Acumulus\Tests\Unit\ApiClient;
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Tests\TestWebShop\TestDoubles\ApiClient\HttpRequest;
 
+/**
+ * Tests for the {@see \Siel\Acumulus\ApiClient\HttpRequest} class.
+ *
+ * A test double prevents real curl communication.
+ */
 class HttpRequestTest extends TestCase
 {
     public function testBefore(): void

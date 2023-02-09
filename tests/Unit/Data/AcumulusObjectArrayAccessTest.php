@@ -1,6 +1,5 @@
 <?php
 /**
- * @noinspection PhpMissingDocCommentInspection
  * @noinspection PhpStaticAsDynamicMethodCallInspection
  * @noinspection DuplicatedCode
  */
@@ -13,6 +12,10 @@ use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Tests\TestWebShop\Data\SimpleTestObject;
 
+/**
+ * Tests for the array access interface part of the
+ * {@see \Siel\Acumulus\Data\AcumulusObject} class.
+ */
 class AcumulusObjectArrayAccessTest extends TestCase
 {
     private const itemNumber = 'itemNumber';

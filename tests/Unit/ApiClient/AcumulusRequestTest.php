@@ -1,6 +1,5 @@
 <?php
 /**
- * @noinspection PhpMissingDocCommentInspection
  * @noinspection PhpStaticAsDynamicMethodCallInspection
  * @noinspection DuplicatedCode
  */
@@ -15,7 +14,7 @@ use Siel\Acumulus\ApiClient\AcumulusResult;
 use Siel\Acumulus\Helpers\Container;
 
 /**
- * Features to test with the AcumulusRequest:
+ * Features to test with the {@see AcumulusRequest}:
  * - execute
  * and before/after that the getters
  * - getUri
@@ -47,7 +46,7 @@ class AcumulusRequestTest extends TestCase
         $this->assertNull($this->acumulusRequest->getHttpRequest());
     }
 
-    private function getAcumulusRequest($uri): void
+    private function getAcumulusRequest(string $uri): void
     {
         $this->createAcumulusRequest();
         $submit = $this->examples->getSubmit($uri);

@@ -1,6 +1,5 @@
 <?php
 /**
- * @noinspection PhpMissingDocCommentInspection
  * @noinspection PropertyCanBeStaticInspection
  * @noinspection SpellCheckingInspection
  */
@@ -11,6 +10,9 @@ namespace Siel\Acumulus\Tests\Unit\ApiClient;
 
 use Siel\Acumulus\Tag;
 
+/**
+ * This class defines a list of realistic request and response sets.
+ */
 class ApiRequestResponseExamples
 {
     private function getContract(): array

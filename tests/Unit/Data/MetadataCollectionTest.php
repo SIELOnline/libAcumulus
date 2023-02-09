@@ -1,6 +1,5 @@
 <?php
 /**
- * @noinspection PhpMissingDocCommentInspection
  * @noinspection DuplicatedCode
  * @noinspection PhpStaticAsDynamicMethodCallInspection
  */
@@ -13,6 +12,9 @@ use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Data\MetadataCollection;
 use Siel\Acumulus\Data\MetadataValue;
 
+/**
+ * Tests for the {@see MetadataCollection} class.
+ */
 class MetadataCollectionTest extends TestCase
 {
     public function testMetadataCollection(): void

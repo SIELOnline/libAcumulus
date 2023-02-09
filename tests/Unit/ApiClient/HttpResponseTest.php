@@ -1,6 +1,5 @@
 <?php
 /**
- * @noinspection PhpMissingDocCommentInspection
  * @noinspection PhpStaticAsDynamicMethodCallInspection
  * @noinspection DuplicatedCode
  */
@@ -13,6 +12,9 @@ use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\ApiClient\HttpRequest;
 use Siel\Acumulus\ApiClient\HttpResponse;
 
+/**
+ * Tests for the {@see HttpResponse} class.
+ */
 class HttpResponseTest extends TestCase
 {
     public function testHttpResponse(): void

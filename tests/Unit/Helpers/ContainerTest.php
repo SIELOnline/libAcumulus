@@ -39,6 +39,8 @@ use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Helpers\Util;
 use Siel\Acumulus\Helpers\Token;
 
+use function get_class;
+
 class ContainerTest extends TestCase
 {
     protected function getContainer(string $namespace): Container
@@ -68,7 +70,7 @@ class ContainerTest extends TestCase
 
     public function testConfigNamespace(): void
     {
-        $container = new Container('Tests\\TestWebShop');
+        $container = new Container('Tests\TestWebShop');
         $object = $container->getConfigStore();
         $this->assertInstanceOf(ConfigStore::class, $object);
         $object = $container->getEnvironment();
@@ -83,7 +85,7 @@ class ContainerTest extends TestCase
 
     public function testApiClientNamespace(): void
     {
-        $container = new Container('Tests\\TestWebShop');
+        $container = new Container('Tests\TestWebShop');
         $object = $container->getAcumulusApiClient();
         $this->assertInstanceOf(Acumulus::class, $object);
         $object = $container->createHttpRequest([]);
@@ -96,7 +98,7 @@ class ContainerTest extends TestCase
      */
     public function testHelpersNamespace2(): void
     {
-        $container = new Container('Tests\\TestWebShop');
+        $container = new Container('Tests\TestWebShop');
         $object = $container->getMailer();
         $this->assertInstanceOf(Mailer::class, $object);
         $object = $container->getCrashReporter();
@@ -112,7 +114,7 @@ class ContainerTest extends TestCase
 
     public function testGetForms(): void
     {
-        $container = new Container('Tests\\TestWebShop');
+        $container = new Container('Tests\TestWebShop');
         $object = $container->getForm('config');
         $this->assertInstanceOf(ConfigForm::class, $object);
         $object = $container->getForm('advanced');
@@ -130,7 +132,7 @@ class ContainerTest extends TestCase
 
     public function testInvoiceNamespace(): void
     {
-        $container = new Container('Tests\\TestWebShop');
+        $container = new Container('Tests\TestWebShop');
 //        $object = $container->createSource(Source::Order, []);
 //        $this->assertInstanceOf(Creator::class, $object);
 //        $object = $container->getCreator();
@@ -143,7 +145,7 @@ class ContainerTest extends TestCase
 
     public function testShopNamespace(): void
     {
-        $container = new Container('Tests\\TestWebShop');
+        $container = new Container('Tests\TestWebShop');
 //        $object = $container->getAcumulusEntryManager();
 //        $this->assertInstanceOf(AcumulusEntryManager::class, $object);
         $object = $container->createAcumulusEntry([]);

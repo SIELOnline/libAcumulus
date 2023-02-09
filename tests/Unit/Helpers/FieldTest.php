@@ -1,6 +1,5 @@
 <?php
 /**
- * @noinspection PhpMissingDocCommentInspection
  * @noinspection PhpStaticAsDynamicMethodCallInspection
  * @noinspection DuplicatedCode
  */
@@ -15,7 +14,7 @@ use Siel\Acumulus\Helpers\Field;
 use Siel\Acumulus\Helpers\FormRenderer;
 
 /**
- * @todo: methods and magic methods on objects.
+ * Tests for the {@see Field} class.
  */
 class FieldTest extends TestCase
 {
@@ -250,7 +249,6 @@ class FieldTest extends TestCase
     public function objectsProvider(): array
     {
         return [
-            ['[container::container]', $this->getContainer()], // static method, but may be called with $this.
             ['[container::language]', self::Language],
             ['[container::translator::language]', self::Language],
             ['[container::createAcumulusObject(customer)::fullName]', null], //magic __get

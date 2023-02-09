@@ -4,6 +4,8 @@
  * @noinspection PhpStaticAsDynamicMethodCallInspection
  */
 
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Tests\ApiBehaviour\ApiClient;
 
 use PHPUnit\Framework\TestCase;
@@ -15,6 +17,8 @@ use Siel\Acumulus\Config\Environment;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Severity;
+
+use function count;
 
 /**
  * This class tests the actual behaviour of the Acumulus API Server in case of
@@ -47,7 +51,7 @@ class AcumulusErrorHandlingTest extends TestCase
     {
         // Using TestWebShop would give us test classes, but we want real ones
         // here.
-        $this->container = new Container('Tests\\TestWebShop', 'nl');
+        $this->container = new Container('Tests\TestWebShop', 'nl');
         $this->environment = $this->container->getEnvironment();
         $this->log = $this->container->getLog();
         $this->acumulusClient = $this->container->getAcumulusApiClient();
@@ -56,7 +60,7 @@ class AcumulusErrorHandlingTest extends TestCase
     /**
      * Test the reaction on a request for a non-existing uri.
      */
-    public function testTimeout()
+    public function testTimeout(): void
     {
         // With a version change, automated testing might fail as 3 messages get
         // logged.
@@ -80,7 +84,7 @@ class AcumulusErrorHandlingTest extends TestCase
     /**
      * Test the reaction on a request for a non-existing uri.
      */
-    public function test404()
+    public function test404(): void
     {
         try {
             $this->acumulusClient->notExisting();
@@ -95,7 +99,7 @@ class AcumulusErrorHandlingTest extends TestCase
     /**
      * Test the reaction on a request for a non-existing uri.
      */
-    public function test403()
+    public function test403(): void
     {
         $result = $this->acumulusClient->noContract();
         $this->assertTrue($result->hasError());
@@ -109,7 +113,7 @@ class AcumulusErrorHandlingTest extends TestCase
     /**
      * Test the reaction on a request with a non-complete 'contract' section.
      */
-    public function testNoEmailOnError()
+    public function testNoEmailOnError(): void
     {
         $result = $this->acumulusClient->noEmailOnError(static::ValidEntryId);
         $this->assertFalse($result->hasError());
@@ -123,7 +127,7 @@ class AcumulusErrorHandlingTest extends TestCase
     /**
      * Test the reaction on a request with a non-complete 'contract' section.
      */
-    public function testNoEmailOnWarning()
+    public function testNoEmailOnWarning(): void
     {
         $result = $this->acumulusClient->noEmailOnWarning(static::ValidEntryId);
         $this->assertFalse($result->hasError());
@@ -134,7 +138,7 @@ class AcumulusErrorHandlingTest extends TestCase
         $this->assertApplicationLevelSuccessHasBeenLogged(-1);
     }
 
-    public function testEntryNotfound()
+    public function testEntryNotfound(): void
     {
         $result = $this->acumulusClient->getEntry(1);
         $this->assertTrue($result->hasError());
@@ -145,7 +149,7 @@ class AcumulusErrorHandlingTest extends TestCase
         $this->assertApplicationLevelErrorHasBeenLogged(-1, 404,  Severity::Error);
     }
 
-    public function testSetDeleteStatusEntryNotfound()
+    public function testSetDeleteStatusEntryNotfound(): void
     {
         $result = $this->acumulusClient->setDeleteStatus(1, Api::Entry_Delete);
         $this->assertTrue($result->hasError());
@@ -156,7 +160,7 @@ class AcumulusErrorHandlingTest extends TestCase
         $this->assertApplicationLevelErrorHasBeenLogged(-1, 404,  Severity::Error);
     }
 
-    public function testConceptNotFound()
+    public function testConceptNotFound(): void
     {
         //  valid ConceptId: 171866
         $result = $this->acumulusClient->getConceptInfo(123);
@@ -168,7 +172,7 @@ class AcumulusErrorHandlingTest extends TestCase
         $this->assertApplicationLevelErrorHasBeenLogged(-1, 400,  Severity::Error);
     }
 
-    public function testSetPaymentStatusInvalidToken()
+    public function testSetPaymentStatusInvalidToken(): void
     {
         $result = $this->acumulusClient->setPaymentStatus(static::InvalidToken, Api::PaymentStatus_Paid);
         $this->assertTrue($result->hasError());
@@ -179,7 +183,7 @@ class AcumulusErrorHandlingTest extends TestCase
         $this->assertApplicationLevelErrorHasBeenLogged(-1, 400,  Severity::Error);
     }
 
-    public function testEmailAsPdfInvalidToken()
+    public function testEmailAsPdfInvalidToken(): void
     {
         $result = $this->acumulusClient->emailInvoiceAsPdf(static::InvalidToken, ['emailto' => 'unit.test@burorader.com']);
         $this->assertTrue($result->hasError());
@@ -189,7 +193,7 @@ class AcumulusErrorHandlingTest extends TestCase
         $this->assertApplicationLevelErrorHasBeenLogged(-1, 400,  Severity::Error);
     }
 
-    public function testEmptyPicklistProducts()
+    public function testEmptyPicklistProducts(): void
     {
         $result = $this->acumulusClient->getPicklistProducts('This will not match any product');
         $this->assertFalse($result->hasError());
@@ -200,7 +204,7 @@ class AcumulusErrorHandlingTest extends TestCase
         $this->assertApplicationLevelSuccessHasBeenLogged(-1);
     }
 
-    public function testEmptyPicklistDiscountProfiles()
+    public function testEmptyPicklistDiscountProfiles(): void
     {
         $result = $this->acumulusClient->getPicklistDiscountProfiles();
         $this->assertFalse($result->hasError());

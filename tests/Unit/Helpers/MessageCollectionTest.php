@@ -1,6 +1,5 @@
 <?php
 /**
- * @noinspection PhpMissingDocCommentInspection
  * @noinspection PhpStaticAsDynamicMethodCallInspection
  * @noinspection DuplicatedCode
  */
@@ -16,6 +15,9 @@ use Siel\Acumulus\Helpers\Severity;
 use Siel\Acumulus\Helpers\SeverityTranslations;
 use Siel\Acumulus\Helpers\Translator;
 
+/**
+ * Tests for the {@see MessageCollection} class.
+ */
 class MessageCollectionTest extends TestCase
 {
     protected Translator $translator;

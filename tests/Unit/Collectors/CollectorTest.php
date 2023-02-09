@@ -1,6 +1,5 @@
 <?php
 /**
- * @noinspection PhpMissingDocCommentInspection
  * @noinspection PhpStaticAsDynamicMethodCallInspection
  * @noinspection DuplicatedCode
  * @noinspection PropertyCanBeStaticInspection
@@ -15,6 +14,9 @@ use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Tests\TestWebShop\Data\SimpleTestObject;
 
+/**
+ * Tests for the {@see \Siel\Acumulus\Collectors\Collector} class.
+ */
 class CollectorTest extends TestCase
 {
     protected Container $container;
@@ -27,7 +29,7 @@ class CollectorTest extends TestCase
     /** @noinspection PhpMissingParentCallCommonInspection */
     protected function setUp(): void
     {
-        $this->container = new Container('Tests\\TestWebShop', 'nl');
+        $this->container = new Container('Tests\TestWebShop', 'nl');
     }
 
     public function testCollectAllEmpty(): void

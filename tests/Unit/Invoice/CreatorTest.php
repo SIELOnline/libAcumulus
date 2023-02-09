@@ -1,6 +1,5 @@
 <?php
 /**
- * @noinspection PhpMissingDocCommentInspection
  * @noinspection PhpStaticAsDynamicMethodCallInspection
  * @noinspection DuplicatedCode
  */
@@ -12,7 +11,9 @@ namespace Siel\Acumulus\Tests\Unit\Invoice;
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Invoice\Creator;
 use Siel\Acumulus\Meta;
-
+/**
+ * Test for the {@see Creator} class.
+ */
 class CreatorTest extends TestCase
 {
 

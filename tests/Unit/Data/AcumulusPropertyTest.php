@@ -1,6 +1,5 @@
 <?php
 /**
- * @noinspection PhpMissingDocCommentInspection
  * @noinspection PhpStaticAsDynamicMethodCallInspection
  * @noinspection DuplicatedCode
  */
@@ -14,6 +13,9 @@ use DomainException;
 use Siel\Acumulus\Data\AcumulusProperty;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * Tests for the {@see AcumulusProperty} class.
+ */
 class AcumulusPropertyTest extends TestCase
 {
 

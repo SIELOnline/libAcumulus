@@ -1,5 +1,9 @@
 <?php
-/** @noinspection PhpStaticAsDynamicMethodCallInspection */
+/**
+ * @noinspection PhpStaticAsDynamicMethodCallInspection
+ */
+
+declare(strict_types=1);
 
 namespace Siel\Acumulus\Tests\Integration\ApiClient;
 
@@ -13,7 +17,7 @@ use Siel\Acumulus\ApiClient\HttpRequest;
  */
 class HttpRequestResponseTest extends TestCase
 {
-    public function testGet()
+    public function testGet(): void
     {
         $httpRequest = new HttpRequest();
         $uri = 'http://localhost/lib-acumulus/readme.md';
@@ -30,7 +34,7 @@ class HttpRequestResponseTest extends TestCase
         // Properties of response.
         $this->assertSame(200, $response->getHttpStatusCode());
         $this->assertIsString($response->getHeaders());
-        $this->assertSame(file_get_contents(__DIR__ . '/../../../readme.md'), $response->getBody());
+        $this->assertStringEqualsFile(__DIR__ . '/../../../readme.md', $response->getBody());
         /** @noinspection DuplicatedCode */
         $this->assertIsArray($response->getInfo());
         $this->assertIsString($response->getRequestHeaders());
@@ -43,7 +47,7 @@ class HttpRequestResponseTest extends TestCase
         $this->assertSame($response->getRequest()->getMethod(), explode(' ', $info['request_header'], 2)[0]);
     }
 
-    public function testPost()
+    public function testPost(): void
     {
         $httpRequest = new HttpRequest();
         $uri = 'http://localhost/lib-acumulus/resources/siel-logo.png';
@@ -61,7 +65,7 @@ class HttpRequestResponseTest extends TestCase
         // Properties of response.
         $this->assertSame(200, $response->getHttpStatusCode());
         $this->assertIsString($response->getHeaders());
-        $this->assertSame(file_get_contents(__DIR__ . '/../../../resources/siel-logo.png'), $response->getBody());
+        $this->assertStringEqualsFile(__DIR__ . '/../../../resources/siel-logo.png', $response->getBody());
         /** @noinspection DuplicatedCode */
         $this->assertIsArray($response->getInfo());
         $this->assertIsString($response->getRequestHeaders());
@@ -82,7 +86,7 @@ class HttpRequestResponseTest extends TestCase
         $this->assertSame($response->getRequest()->getMethod(), explode(' ', $info['request_header'], 2)[0]);
     }
 
-    public function test404()
+    public function test404(): void
     {
         $httpRequest = new HttpRequest();
         $uri = 'http://localhost/lib-acumulus/mot-existing';
@@ -112,7 +116,7 @@ class HttpRequestResponseTest extends TestCase
         $this->assertSame($response->getRequest()->getMethod(), explode(' ', $info['request_header'], 2)[0]);
     }
 
-    public function testInvalidDomain()
+    public function testInvalidDomain(): void
     {
         $this->expectException(RuntimeException::class);
         $httpRequest = new HttpRequest();
@@ -120,7 +124,7 @@ class HttpRequestResponseTest extends TestCase
         $httpRequest->get($uri);
     }
 
-    public function testPassingOptions()
+    public function testPassingOptions(): void
     {
         $ua = 'my_useragent/1.0';
         $httpRequest = new HttpRequest([CURLOPT_USERAGENT => $ua]);
@@ -132,7 +136,7 @@ class HttpRequestResponseTest extends TestCase
         $this->assertStringContainsString("User-Agent: $ua", $response->getRequestHeaders());
     }
 
-    public function testOverridingOptions()
+    public function testOverridingOptions(): void
     {
         $httpRequest = new HttpRequest([CURLOPT_HEADER => false, CURLINFO_HEADER_OUT => false]);
         $uri = 'http://localhost/lib-acumulus/resources/siel-logo.png';

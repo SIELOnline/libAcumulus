@@ -1,41 +1,16 @@
 <?php
-namespace Siel\Acumulus\MyWebShop\Invoice;
+
+declare(strict_types=1);
+
+namespace Siel\Acumulus\Tests\TestWebShop\Invoice;
 
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Invoice\Source as BaseSource;
 use Siel\Acumulus\Meta;
+use stdClass;
 
 /**
- * Wraps a MyWebShop order or refund in an invoice source object.
- *
- *  @todo: from the following list:
- * - for reasons of autocomplete in your IDE, you might want to override the
- *   $source property and define its possible type(s) (using @var).
- * - setId(): override or implement both setIdOrder() and setIdCreditNote().
- * - setSource(): override or implement both setSourceOrder() and
- *   setSourceCreditNote().
- * - getReference(): override when this is not the internal id.
- * - getDate(): override or implement both getDateOrder() and
- *   getDateCreditNote().
- * - getStatus(): override or implement both getStatusOrder() and
- *   getStatusCreditNote().
- * - getPaymentMethod(): override if MyWebShop supports credit notes and stores
- *   a separate payment method for them.
- * - getPaymentMethodOrder(): implement if MyWebShop does not support credit
- *   notes or does not store a separate payment method for them.
- * - getPaymentStatus(): override or implement both getPaymentStatusOrder()
- *   and getPaymentStatusCreditNote().
- * - getPaymentDate(): override or implement both getPaymentDateOrder() and
- *   getPaymentDateCreditNote().
- * - getCountryCode(): implement.
- * - getCurrency(): implement.
- * - getAvailableTotals(): implement.
- * - setInvoice(): override if MyWebShop has separate invoice objects.
- * - getInvoiceReferenceOrder(): implement if MyWebShop has separate invoice
- *   numbers or references.
- * - getInvoiceDateOrder(): implement if MyWebShop has separate invoice dates.
- * - getShopOrder: override if MyWebShop supports credit notes.
- * - getShopCreditNotes(): override if MyWebShop supports credit notes.
+ * Wraps a TestWebShop order or refund in an invoice source object.
  */
 class Source extends BaseSource
 {
@@ -44,12 +19,9 @@ class Source extends BaseSource
      */
     protected function setSource(): void
     {
-        // @todo: set the source, given an id (and type).
-        if ($this->getType() === Source::Order) {
-            $this->source = new Order($this->id);
-        } else {
-            $this->source = new CreditNote($this->id);
-        }
+        $this->source = new stdClass();
+        $this->source->type = $this->getType();
+        $this->source->id = $this->id;
     }
 
     /**
@@ -57,7 +29,6 @@ class Source extends BaseSource
      */
     protected function setId(): void
     {
-        // @todo: set the id, given a loaded source.
         $this->id = (int) $this->source->id;
     }
 
@@ -66,7 +37,7 @@ class Source extends BaseSource
      */
     public function getReference()
     {
-        // @todo: override if MyWebShop assigns a separate reference number or string to its orders or credit notes, otherwise remove.
+        return $this->source->id;
     }
 
     /**
@@ -74,7 +45,7 @@ class Source extends BaseSource
      */
     public function getDate(): string
     {
-        // @todo: override or implement both getDateOrder() and getDateCreditNote()
+        return '2023-02-01';
     }
 
     /**
@@ -82,7 +53,7 @@ class Source extends BaseSource
      */
     public function getStatus()
     {
-        // @todo: override or implement both getStatusOrder() and getStatusCreditNote()
+        return 'pending';
     }
 
     /**
@@ -90,15 +61,7 @@ class Source extends BaseSource
      */
     public function getPaymentMethod()
     {
-        // @todo: override if MyWebShop supports credit notes and stores a separate payment method for them, otherwise remove.
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getPaymentMethodOrder()
-    {
-        // @todo: implement if MyWebShop does not support credit notes or does not store a separate payment method for them, otherwise remove.
+        return 3;
     }
 
     /**
@@ -106,14 +69,7 @@ class Source extends BaseSource
      */
     public function getPaymentStatus(): int
     {
-        // @todo: override or implement both getPaymentStatusOrder() and getPaymentStatusCreditNote()
-        // Assumption: credit slips are always in a paid status.
-        if (($this->getType() === Source::Order && $this->source->hasBeenPaid()) || $this->getType() === Source::CreditNote) {
-            $result = Api::PaymentStatus_Paid;
-        } else {
-            $result = Api::PaymentStatus_Due;
-        }
-        return $result;
+        return Api::PaymentStatus_Due;
     }
 
     /**
@@ -121,7 +77,7 @@ class Source extends BaseSource
      */
     public function getPaymentDate(): ?string
     {
-        // @todo: provide implementation.
+        return '2023-02-03';
     }
 
     /**
@@ -129,7 +85,7 @@ class Source extends BaseSource
      */
     public function getCountryCode(): string
     {
-        // @todo: provide implementation.
+        return 'nl';
     }
 
     /**
@@ -140,13 +96,11 @@ class Source extends BaseSource
      */
     public function getCurrency(): array
     {
-        // @todo: provide implementation.
-        $result = [
-            Meta::Currency => $this->source->currency_code,
-            Meta::CurrencyRate => (float) $this->source->conversion_rate,
-            Meta::CurrencyDoConvert => true,
+        return [
+            Meta::Currency => 'EUR',
+            Meta::CurrencyRate => 1.0,
+            Meta::CurrencyDoConvert => false,
         ];
-        return $result;
     }
 
     /**
@@ -154,23 +108,11 @@ class Source extends BaseSource
      */
     protected function getAvailableTotals(): array
     {
-        // @todo: provide implementation.
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getInvoiceReferenceOrder()
-    {
-        // @todo: implement if MyWebShop has separate Invoice numbers and references,, otherwise remove.
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getInvoiceDateOrder()
-    {
-        // @todo: implement if MyWebShop has separate Invoice dates, otherwise remove.
+        return [
+            'meta-invoice-amount' => 10.0,
+            'meta-invoice-amountinc' => 12.10,
+            'meta-invoice-vatamount' => 2.10,
+        ];
     }
 
     /**
@@ -178,14 +120,14 @@ class Source extends BaseSource
      */
     protected function getShopOrderOrId()
     {
-        // @todo: override if MyWebShop supports credit notes, otherwise remove.
+        return 3;
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function getShopCreditNotesOrIds()
+    protected function getShopCreditNotesOrIds(): array
     {
-        // @todo: override if MyWebShop supports credit notes, otherwise remove.
+        return [];
     }
 }

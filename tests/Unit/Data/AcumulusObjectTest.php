@@ -1,6 +1,5 @@
 <?php
 /**
- * @noinspection PhpMissingDocCommentInspection
  * @noinspection PhpStaticAsDynamicMethodCallInspection
  * @noinspection DuplicatedCode
  */
@@ -16,6 +15,9 @@ use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Data\AcumulusProperty;
 use Siel\Acumulus\Tests\TestWebShop\Data\SimpleTestObject;
 
+/**
+ * Tests for the basic operations of the {@see \Siel\Acumulus\Data\AcumulusObject} class.
+ */
 class AcumulusObjectTest extends TestCase
 {
     public function testConstructor1(): void

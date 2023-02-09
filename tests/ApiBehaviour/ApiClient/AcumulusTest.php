@@ -1,5 +1,10 @@
 <?php
-/** @noinspection PhpStaticAsDynamicMethodCallInspection */
+/**
+ * @noinspection PhpStaticAsDynamicMethodCallInspection
+ * @noinspection SpellCheckingInspection
+ */
+
+declare(strict_types=1);
 
 namespace Siel\Acumulus\Tests\ApiBehaviour\ApiClient;
 
@@ -7,17 +12,22 @@ use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Severity;
+use Siel\Acumulus\ApiClient\Acumulus;
 
+/**
+ * Tests the Acumulus class in combination with the Acumulus API, so we can
+ * discover new fields, regions, etc.
+ */
 class AcumulusTest extends TestCase
 {
-    protected /*Container*/ $container;
-    protected /*Acumulus*/ $acumulusClient;
+    protected Container $container;
+    protected Acumulus $acumulusClient;
 
     protected function setUp(): void
     {
         // Using TestWebShop would give us test classes, but we want real ones
         // here.
-        $this->container = new Container('Tests\\TestWebShop', 'nl');
+        $this->container = new Container('Tests\TestWebShop', 'nl');
         $this->acumulusClient = $this->container->getAcumulusApiClient();
     }
 
@@ -150,7 +160,7 @@ class AcumulusTest extends TestCase
     /**
      * @dataProvider vatInfoProvider
      */
-    public function testGetVatInfo(array $args, array $expected)
+    public function testGetVatInfo(array $args, array $expected): void
     {
         $result = $this->acumulusClient->getVatInfo(... $args);
         $this->assertSame(Severity::Success, $result->getStatus());
@@ -170,7 +180,7 @@ class AcumulusTest extends TestCase
     /**
      * Tests call to get VAT info with an invalid country code.
      */
-    public function testGetVatInfoInvalidCountryCode()
+    public function testGetVatInfoInvalidCountryCode(): void
     {
         $result = $this->acumulusClient->getVatInfo('ln', '2020-12-01');
         $this->assertSame(Severity::Error, $result->getStatus());
@@ -180,7 +190,7 @@ class AcumulusTest extends TestCase
     /**
      * Tests call to get the threshold for 2021.
      */
-    public function testReportThresholdEuCommerce()
+    public function testReportThresholdEuCommerce(): void
     {
         $result = $this->acumulusClient->reportThresholdEuCommerce(2021);
         $this->assertSame(Severity::Success, $result->getStatus());
@@ -192,7 +202,7 @@ class AcumulusTest extends TestCase
     /**
      * Tests call to report threshold EU commerce with an old year before it was introduced.
      */
-    public function testReportThresholdEuCommerceOldYear()
+    public function testReportThresholdEuCommerceOldYear(): void
     {
         $result = $this->acumulusClient->reportThresholdEuCommerce(2020);
         $this->assertSame(Severity::Error, $result->getStatus());
@@ -202,7 +212,7 @@ class AcumulusTest extends TestCase
     /**
      * Tests call to report threshold EU commerce with a future year.
      */
-    public function testReportThresholdEuCommerceFutureYear()
+    public function testReportThresholdEuCommerceFutureYear(): void
     {
         $result = $this->acumulusClient->reportThresholdEuCommerce(2099);
         $this->assertSame(Severity::Success, $result->getStatus());
@@ -223,7 +233,7 @@ class AcumulusTest extends TestCase
     /**
      * @dataProvider stockAddProvider
      */
-    public function testStockAdd(array $args, array $expected)
+    public function testStockAdd(array $args, array $expected): void
     {
         $result = $this->acumulusClient->stockAdd(... $args);
 

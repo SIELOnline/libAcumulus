@@ -1,6 +1,5 @@
 <?php
 /**
- * @noinspection PhpMissingDocCommentInspection
  * @noinspection PhpStaticAsDynamicMethodCallInspection
  * @noinspection DuplicatedCode
  */
@@ -19,7 +18,7 @@ use Siel\Acumulus\ApiClient\ResultTranslations;
 use Siel\Acumulus\Helpers\Translator;
 
 /**
- * An AcumulusResult has the following features that we want to test:
+ * An {@see AcumulusResult} has the following features that we want to test:
  * - Properties set via the constructor are returned by their getters
  *   (acumulusRequest and httpResponse) including the derived response.
  * - Other properties are null/empty after creation.
@@ -48,7 +47,7 @@ class AcumulusResultTest extends TestCase
         $this->examples = new ApiRequestResponseExamples();
     }
 
-    private function getAcumulusResult($uri): AcumulusResult
+    private function getAcumulusResult(string $uri): AcumulusResult
     {
         $submit = $this->examples->getSubmit($uri);
         $needContract = $this->examples->needContract($uri);
@@ -62,7 +61,7 @@ class AcumulusResultTest extends TestCase
         return $acumulusResult;
     }
 
-    private function t($key): string
+    private function t(string $key): string
     {
         return $this->translator->get($key);
     }

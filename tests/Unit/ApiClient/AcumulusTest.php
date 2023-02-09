@@ -1,6 +1,5 @@
 <?php
 /**
- * @noinspection PhpMissingDocCommentInspection
  * @noinspection PhpStaticAsDynamicMethodCallInspection
  * @noinspection DuplicatedCode
  * @noinspection SpellCheckingInspection
@@ -15,6 +14,9 @@ use Siel\Acumulus\Api;
 use Siel\Acumulus\ApiClient\Acumulus;
 use Siel\Acumulus\Helpers\Container;
 
+/**
+ * Test the {@see Acumulus} class without connecting to the API itself.
+ */
 class AcumulusTest extends TestCase
 {
     private Container $container;

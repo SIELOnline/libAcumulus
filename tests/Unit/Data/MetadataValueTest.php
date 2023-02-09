@@ -1,6 +1,5 @@
 <?php
 /**
- * @noinspection PhpMissingDocCommentInspection
  * @noinspection PhpStaticAsDynamicMethodCallInspection
  * @noinspection DuplicatedCode
  */
@@ -12,6 +11,9 @@ namespace Siel\Acumulus\Tests\Unit\Data;
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Data\MetadataValue;
 
+/**
+ * Tests for the {@see MetadataValue} class.
+ */
 class MetadataValueTest extends TestCase
 {
     public function testEmpty(): void

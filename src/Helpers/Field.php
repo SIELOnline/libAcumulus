@@ -1,6 +1,10 @@
 <?php
-
-declare(strict_types=1);
+/**
+ * @noinspection PhpMissingStrictTypesDeclarationInspection  We cannot enforce
+ *   strict typing as we may have to call functions/methods with literal number
+ *   constants extracted from a string and thus passed as a string instead of a
+ *   number.
+ */
 
 namespace Siel\Acumulus\Helpers;
 
@@ -53,8 +57,12 @@ use function strlen;
  * - literal-text = "text"
  *
  * Notes:
- * - This syntax is quite simple: it does not accept the special symbols ], |, &
- *   and ":
+ * - This syntax is quite simple. The following features are not possible:
+ *     - Grouping, using brackets, to override operator precedence.
+ *     - Translation of literal strings.
+ *     - Lookup based on a value of a property.
+ * - The parsing is quite simple: the special symbols - ], |, &, and " - cannot
+ *   appear otherwise:
  *     - Not as part of object or property names. This is not restricting as
  *       this is not normal for PHP object or property names, or array keys.
  *     - Not as part of literal strings. This is not considered restricting, as
@@ -64,7 +72,6 @@ use function strlen;
  * - Alternatives are expanded left to right until a property alternative is
  *   found that is not empty.
  *
- *
  * Example 1:
  * <pre>
  *   $propertySpec = sku|ean|isbn; sku = ''; ean = 'Hello'; isbn = 'World';
@@ -73,7 +80,8 @@ use function strlen;
  *
  * Properties that are joined with a + in between them, are all expanded, where
  * the + gets replaced with a space if and only if the property directly
- * following it, is not empty.
+ * following it, is not empty. (and we already have a non-empty intermediate
+ * result).
  *
  * Properties that are joined with a & in between them, are all expanded and
  * concatenated directly, thus not with a space between them like with a +.
@@ -90,13 +98,13 @@ use function strlen;
  *   $propertySpec3 = [first+middle+last];
  *   $propertySpec4 = For [middle];
  *   $propertySpec5 = ["For"+middle];
- *   $propertySpec6 = ["For"+first+middle+last];
+ *   $propertySpec6 = ["For"+middle+last];
  *   Result1: 'John  Doe'
  *   Result2: 'JohnDoe'
  *   Result3: 'John Doe'
  *   Result4: 'For '
  *   Result5: ''
- *   Result6: 'For john Doe'
+ *   Result6: 'For Doe'
  * </pre>
  *
  * A full property name may contain the "object" name followed by :: to
@@ -124,11 +132,12 @@ use function strlen;
  *   property(), getProperty(), or get_property().
  *
  * A property name may also be:
- * - Any method name that does not have required parameters
- * - Or a method that accepts scalar parameters Optionally followed by arguments between brackets, string arguments should
- *   not be quoted.
+ * - Any method name that does not have required parameters.
+ * - Or a name of a method that accepts scalar parameters, in which case literal
+ *   arguments may be added between brackets, string arguments should not be
+ *   quoted.
  *
- * A variable is:
+ * An "object" is:
  * - An array.
  * - An object.
  * - A {@see is_callable() callable}, in which case the callable is called with

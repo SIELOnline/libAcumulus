@@ -169,7 +169,8 @@ class Container
         return static::$instance;
     }
 
-    public const baseNamespace = '\\Siel\\Acumulus';
+    protected const baseNamespace = '\\Siel\\Acumulus';
+
     /**
      * The namespace for the current shop.
      */

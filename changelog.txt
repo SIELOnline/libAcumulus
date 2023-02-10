@@ -3,6 +3,12 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our own code.
 
+7.6.5 (2023-??-??)
+------------------
+bugs:
+- PS: Wrong conversion specification in sprintf in AcumulusEntryManager::insert.
+
+
 7.6.4 (2023-02-07) (MA only) (PS later)
 ---------------------------------------
 Features:

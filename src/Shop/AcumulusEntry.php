@@ -134,7 +134,7 @@ class AcumulusEntry
         // Is it a concept id or a real entry id.
         $token = $this->getToken();
 
-        return empty($token) ? (int) ($this->get(static::$keyEntryId)) : null;
+        return empty($token) ? (int) $this->get(static::$keyEntryId) : null;
     }
 
     /**

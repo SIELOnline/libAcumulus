@@ -41,7 +41,9 @@ class ConfigForm extends BaseConfigForm
     public function getFormValues(): array
     {
         $result = parent::getFormValues();
-        $result['triggerOrderStatus[]'] = $result['triggerOrderStatus'];
+        if (array_key_exists('triggerOrderStatus', $result)) {
+            $result['triggerOrderStatus[]'] = $result['triggerOrderStatus'];
+        }
         return $result;
     }
 }

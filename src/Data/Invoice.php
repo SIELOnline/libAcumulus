@@ -1,10 +1,32 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Data;
 
+use DateTime;
 use Siel\Acumulus\Api;
 
 /**
+ * Represents an Acumulus API Invoice object.
+ *
+ * The definition of the fields is based on the
+ * {@link https://www.siel.nl/acumulus/API/Invoicing/Add_Invoice/ Data Add API call},
+ * NOT the
+ * {@link https://www.siel.nl/acumulus/API/Contacts/Manage_Contact/ Manage Contact call}.
+ * However, there are some notable changes with the API structure:
+ * - A Customer is part of the {@see Invoice} instead of the other way in the
+ *   API.
+ * - We have 2 separate {@see Address} objects, an invoice and billing address.
+ *   In the API all address fields are part of the customer itself, the fields
+ *   of the 2nd address being prefixed with 'alt'. In decoupling this in the
+ *   collector phase, we allow users to relate the 1st and 2 nd address to the
+ *   invoice or shipping address as they like.
+ * - Field names are copied from the API, though capitals are introduced for
+ *   readability and to prevent PhpStorm typo inspections.
+ *
+ * Metadata can be added via the {@see MetadataCollection} methods.
+ *
  * @property ?int $concept
  * @property ?string $conceptType
  * @property ?int $number
@@ -23,11 +45,11 @@ use Siel\Acumulus\Api;
  * @method bool setConceptType(?string $value, int $mode = AcumulusProperty::Set_Always)
  * @method bool setNumber(?int $value, int $mode = AcumulusProperty::Set_Always)
  * @method bool setVatType(?int $value, int $mode = AcumulusProperty::Set_Always)
- * @method bool setIssueDate(?\DateTime $value, int $mode = AcumulusProperty::Set_Always)
+ * @method bool setIssueDate(?DateTime $value, int $mode = AcumulusProperty::Set_Always)
  * @method bool setCostCenter(?int $value, int $mode = AcumulusProperty::Set_Always)
  * @method bool setAccountNumber(?int $value, int $mode = AcumulusProperty::Set_Always)
  * @method bool setPaymentStatus(?int $value, int $mode = AcumulusProperty::Set_Always)
- * @method bool setPaymentDate(?\DateTime $value, int $mode = AcumulusProperty::Set_Always)
+ * @method bool setPaymentDate(?DateTime $value, int $mode = AcumulusProperty::Set_Always)
  * @method bool setDescription(?string $value, int $mode = AcumulusProperty::Set_Always)
  * @method bool setDescriptionText(?string $value, int $mode = AcumulusProperty::Set_Always)
  * @method bool setTemplate(?int $value, int $mode = AcumulusProperty::Set_Always)
@@ -63,25 +85,23 @@ class Invoice extends AcumulusObject
         ['name' => 'invoiceNotes', 'type' =>'string'],
     ];
 
+    protected ?Customer $customer = null;
     /** @var Line[] */
     protected array $lines = [];
-    protected ?EmailAsPdf $emailAsPdf;
-    protected ?Customer $customer;
+    protected ?EmailAsPdf $emailAsPdf = null;
 
-    /**
-     * @return \Siel\Acumulus\Data\Customer|null
-     */
     public function getCustomer(): ?Customer
     {
         return $this->customer;
     }
 
     /**
-     * @param \Siel\Acumulus\Data\Customer $customer
+     * @return $this
      */
-    public function setCustomer(Customer $customer): void
+    public function setCustomer(Customer $customer): self
     {
         $this->customer = $customer;
+        return $this;
     }
 
     /**
@@ -93,26 +113,27 @@ class Invoice extends AcumulusObject
     }
 
     /**
-     * @param Line $line
+     * @return $this
      */
-    public function addLine(Line $line): void
+    public function addLine(?Line $line): self
     {
-        $this->lines[] = $line;
+        if ($line !== null) {
+            $this->lines[] = $line;
+        }
+        return $this;
     }
 
-    /**
-     * @return \Siel\Acumulus\Data\EmailAsPdf|null
-     */
     public function getEmailAsPdf(): ?EmailAsPdf
     {
         return $this->emailAsPdf;
     }
 
     /**
-     * @param \Siel\Acumulus\Data\EmailAsPdf $emailAsPdf
+     * @return $this
      */
-    public function setEmailAsPdf(EmailAsPdf $emailAsPdf): void
+    public function setEmailAsPdf(?EmailAsPdf $emailAsPdf): self
     {
         $this->emailAsPdf = $emailAsPdf;
+        return $this;
     }
 }

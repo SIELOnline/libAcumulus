@@ -11,7 +11,7 @@ use Siel\Acumulus\Data\Customer;
 use Siel\Acumulus\Fld;
 
 /**
- * Creates a {@see Customer} object
+ * Creates a {@see Customer} object.
  */
 class CustomerCollector extends Collector
 {

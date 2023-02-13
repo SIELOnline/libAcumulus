@@ -7,7 +7,7 @@ namespace Siel\Acumulus\Collectors;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\AcumulusProperty;
 use Siel\Acumulus\Helpers\Container;
-use Siel\Acumulus\Helpers\Token;
+use Siel\Acumulus\Helpers\Field;
 
 use function is_string;
 
@@ -28,33 +28,42 @@ use function is_string;
  */
 abstract class Collector implements CollectorInterface
 {
-    protected Token $token;
+    protected Field $field;
     protected Container $container;
     protected array $propertySources;
 
-    public function __construct(Token $token, Container $container)
+    public function __construct(Field $field, Container $container)
     {
-        $this->token = $token;
+        $this->field = $field;
         $this->container = $container;
-    }
-
-    /**
-     * Creates a new {@see \Siel\Acumulus\Data\AcumulusObject} that will
-     * contain the collected values.
-     *
-     * @return \Siel\Acumulus\Data\AcumulusObject
-     *   Returns a new object that is a child class of AcumulusObject.
-     */
-    protected function createAcumulusObject(): AcumulusObject
-    {
-        return $this->container->createAcumulusObject($this->getAcumulusObjectType());
     }
 
     /**
      * Returns the type of {@see \Siel\Acumulus\Data\AcumulusObject} that gets
      * collected.
+     *
+     * @return string
+     *   The non-qualified name of the child classes of {@see AcumulusObject:
+     *   'Invoice', 'Customer', 'Address', 'Line', or 'EmailAsPdf'.
      */
     abstract protected function getAcumulusObjectType(): string;
+
+    /**
+     * @return \Siel\Acumulus\Helpers\Container
+     */
+    protected function getContainer(): Container
+    {
+        return $this->container;
+    }
+
+    /**
+     * Returns a new child class of {@see \Siel\Acumulus\Data\AcumulusObject}
+     * that will contain the collected values.
+     */
+    protected function createAcumulusObject(): AcumulusObject
+    {
+        return $this->getContainer()->createAcumulusObject($this->getAcumulusObjectType());
+    }
 
     /**
      * {@inheritDoc}
@@ -69,19 +78,27 @@ abstract class Collector implements CollectorInterface
     {
         $this->propertySources = $propertySources;
         $acumulusObject = $this->createAcumulusObject();
-        $this->collectMappedFields($acumulusObject, $fieldDefinitions);
-        $this->collectLogicFields($acumulusObject);
+        $this
+            ->collectMappedFields($acumulusObject, $fieldDefinitions)
+            ->collectLogicFields($acumulusObject);
         return $acumulusObject;
     }
 
     /**
-     * Collects the fields that can be extracted using simple field mappings
+     * Collects the fields that can be extracted using simple field mappings.
+     *
+     * @param string[] $fieldMappings
+     *   A set of field mapping definitions to fill properties of the
+     *   $acumulusObject with.
+     *
+     * @return $this
      */
-    protected function collectMappedFields(AcumulusObject $acumulusObject, array $fieldMappings): void
+    protected function collectMappedFields(AcumulusObject $acumulusObject, array $fieldMappings): self
     {
         foreach ($fieldMappings as $field => $pattern) {
             $this->expandAndSet($acumulusObject, $field, $pattern);
         }
+        return $this;
     }
 
     /**
@@ -140,6 +157,6 @@ abstract class Collector implements CollectorInterface
      */
     protected function expand(string $pattern): string
     {
-        return $this->token->expand($pattern, $this->propertySources);
+        return $this->field->expand($pattern, $this->propertySources);
     }
 }

@@ -241,7 +241,7 @@ class Util
      * @param string $body
      *   HTML string, probably containing an error page.
      *
-     * @returns string
+     * @return string
      *   The plain text of this page.
      */
     public function convertHtmlToPlainText(string $body): string

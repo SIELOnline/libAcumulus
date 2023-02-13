@@ -123,11 +123,9 @@ abstract class InvoiceCollector extends Collector
 
     protected Config $config;
     protected ShopCapabilities $shopCapabilities;
-    protected Token $token;
     protected Translator $translator;
     protected Log $log;
     protected Countries $countries;
-    protected Container $container;
 
     protected Source $invoiceSource;
 
@@ -146,15 +144,9 @@ abstract class InvoiceCollector extends Collector
     protected Invoice $invoice;
 
     /**
-     * @var array
-     *   The list of sources to search for properties.
-     */
-    protected array $propertySources;
-
-    /**
      * Constructor.
      *
-     * @param \Siel\Acumulus\Helpers\Token $token
+     * @param \Siel\Acumulus\Helpers\Token $field
      * @param \Siel\Acumulus\Helpers\Countries $countries
      * @param \Siel\Acumulus\Config\ShopCapabilities $shopCapabilities
      * @param \Siel\Acumulus\Helpers\Container $container
@@ -162,9 +154,9 @@ abstract class InvoiceCollector extends Collector
      * @param \Siel\Acumulus\Helpers\Translator $translator
      * @param \Siel\Acumulus\Helpers\Log $log
      */
-    public function __construct(Token $token, Countries $countries, ShopCapabilities $shopCapabilities, Container $container, Config $config, Translator $translator, Log $log)
+    public function __construct(Token $field, Countries $countries, ShopCapabilities $shopCapabilities, Container $container, Config $config, Translator $translator, Log $log)
     {
-        $this->token = $token;
+        $this->field = $field;
         $this->countries = $countries;
         $this->container = $container;
         $this->shopCapabilities = $shopCapabilities;
@@ -862,7 +854,7 @@ abstract class InvoiceCollector extends Collector
      */
     protected function getTokenizedValue(string $pattern): string
     {
-        return $this->token->expand($pattern, $this->propertySources);
+        return $this->field->expand($pattern, $this->propertySources);
     }
 
     /**

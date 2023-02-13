@@ -1,10 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Data;
 
 use Siel\Acumulus\Api;
 
 /**
+ * Represents an invoice line object of an Acumulus API invoice object.
+ *
+ * Field names are copied from the API, though capitals are introduced for
+ * readability and to prevent PhpStorm typo inspections.
+ *
+ * Metadata can be added via the {@see MetadataCollection} methods.
+ *
  * @property ?string $itemNumber
  * @property ?string $product
  * @property ?string $nature
@@ -45,10 +54,11 @@ class Line extends AcumulusObject
     }
 
     /**
-     * @param \Siel\Acumulus\Data\Line $child
+     * @return $this
      */
-    public function addChild(Line $child): void
+    public function addChild(Line $child): self
     {
         $this->children[] = $child;
+        return $this;
     }
 }

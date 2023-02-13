@@ -76,7 +76,6 @@ abstract class AcumulusObject implements ArrayAccess
     }
 
     // PHP 8.1: a read-only property suffices here.
-    /** @noinspection PhpEnforceDocCommentInspection */
     public function getMetadata(): MetadataCollection
     {
         return $this->metadata;

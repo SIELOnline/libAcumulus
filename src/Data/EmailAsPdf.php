@@ -1,10 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Data;
 
 use Siel\Acumulus\Api;
 
 /**
+ * Represents an emailAsPdf part of an Acumulus API invoice object.
+ *
+ * Field names are copied from the API, though capitals are introduced for
+ * readability and to prevent PhpStorm typo inspections.
+ *
+ * Metadata can be added via the {@see MetadataCollection} methods.
+ *
  * @property ?string $emailTo
  * @property ?string $emailBcc
  * @property ?string $emailFrom

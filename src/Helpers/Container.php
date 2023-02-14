@@ -483,7 +483,7 @@ class Container
     public function getCollector(string $type): CollectorInterface
     {
         $arguments = [
-            $this->getToken(),
+            $this->getField(),
             $this,
         ];
         return $this->getInstance("{$type}Collector", 'Collectors', $arguments);

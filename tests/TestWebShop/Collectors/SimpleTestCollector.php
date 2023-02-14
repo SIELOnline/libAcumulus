@@ -25,11 +25,12 @@ class SimpleTestCollector extends Collector
     /**
      * @param SimpleTestObject $acumulusObject
      */
-    protected function collectLogicFields(AcumulusObject $acumulusObject): void
+    protected function collectLogicFields(AcumulusObject $acumulusObject): self
     {
         $reduction = $this->propertySources['customer']['reduction'] ?? 0.0;
         if (isset($acumulusObject->unitPrice)) {
             $acumulusObject->unitPrice = (1 - $reduction) * $acumulusObject->unitPrice;
         }
+        return $this;
     }
 }

@@ -17,9 +17,9 @@ use Siel\Acumulus\Data\AcumulusProperty;
  * @method getNature(): string
  * @method getUnitPrice(): float
  *
- * @method setItemNumber(string $value, int $mode = AcumulusProperty::Set_Always): void
- * @method setNature(string $value, int $mode = AcumulusProperty::Set_Always): void
- * @method setUnitPrice(float $value, int $mode = AcumulusProperty::Set_Always): void
+ * @method setItemNumber(string $value, int $mode = PropertySet::Always): void
+ * @method setNature(string $value, int $mode = PropertySet::Always): void
+ * @method setUnitPrice(float $value, int $mode = PropertySet::Always): void
  */
 class SimpleTestObject extends AcumulusObject
 {

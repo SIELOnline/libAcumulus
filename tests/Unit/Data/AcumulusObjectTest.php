@@ -92,26 +92,26 @@ class AcumulusObjectTest extends TestCase
         $this->assertNull($ao->getUnitPrice());
 
         $value3 = 0.0;
-        $ao->setUnitPrice($value3, AcumulusProperty::Set_NotEmpty);
+        $ao->setUnitPrice($value3, PropertySet::NotEmpty);
         $this->assertNull($ao->getUnitPrice());
 
-        $ao->setUnitPrice($value3, AcumulusProperty::Set_NotOverwrite);
+        $ao->setUnitPrice($value3, PropertySet::NotOverwrite);
         $this->assertSame($value3, $ao->getUnitPrice());
 
         $value4 = 19.99;
-        $ao->setUnitPrice($value4, AcumulusProperty::Set_NotEmpty);
+        $ao->setUnitPrice($value4, PropertySet::NotEmpty);
         $this->assertSame($value4, $ao->getUnitPrice());
 
         $value5 = 0.0;
-        $ao->setUnitPrice($value5, AcumulusProperty::Set_NotEmpty);
+        $ao->setUnitPrice($value5, PropertySet::NotEmpty);
         $this->assertSame($value4, $ao->getUnitPrice());
 
         $value6 = 1.99;
-        $ao->setUnitPrice($value4, AcumulusProperty::Set_NotOverwrite);
+        $ao->setUnitPrice($value4, PropertySet::NotOverwrite);
         $this->assertSame($value4, $ao->getUnitPrice());
 
         /** @noinspection PhpRedundantOptionalArgumentInspection */
-        $ao->setUnitPrice($value6, AcumulusProperty::Set_Always);
+        $ao->setUnitPrice($value6, PropertySet::Always);
         $this->assertSame($value6, $ao->getUnitPrice());
     }
 
@@ -139,6 +139,6 @@ class AcumulusObjectTest extends TestCase
         $ao = new SimpleTestObject();
         /** @noinspection PhpUnusedLocalVariableInspection */
         /** @noinspection PhpMethodParametersCountMismatchInspection */
-        $v = $ao->setUnitPrice(19.99, AcumulusProperty::Set_Always, true);
+        $v = $ao->setUnitPrice(19.99, PropertySet::Always, true);
     }
 }

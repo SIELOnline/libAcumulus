@@ -47,7 +47,7 @@ use function strlen;
  * - {@see AcumulusObject} and {@see AcumulusProperty} will handle not set
  *   values and empty values differently
  * - The (magic) setters and the {@see set()} method accept an optional flag
- *   that defines how toh andle overwriting already set values and if to set
+ *   that defines how to handle overwriting already set values and if to set
  *   empty values.
  */
 abstract class AcumulusObject implements ArrayAccess
@@ -98,7 +98,7 @@ abstract class AcumulusObject implements ArrayAccess
 
     /**
      * Implements direct property set access with
-     * {@see AcumulusProperty::Set_Always} semantics for the
+     * {@see PropertySet::Always} semantics for the
      * {@see AcumulusProperty}s of this object, thus not
      * properties referring to another {@see Acumulusobject}, nor
      * {@see MetadataCollection} properties.
@@ -206,7 +206,7 @@ abstract class AcumulusObject implements ArrayAccess
      *   The value to assign to this property, null is a valid value and will
      *   "unset" this property (it will not appear in the Acumulus API message).
      * @param int $mode
-     *   One of the AcumulusProperty::Set_... constants that can be used to
+     *   One of the PropertySet::... constants that can be used to
      *   prevent setting an empty value and/or overwriting an already set value.
      *   Default is to unconditionally set the value.
      *
@@ -216,7 +216,7 @@ abstract class AcumulusObject implements ArrayAccess
      * @throws \RuntimeException
      *   $name is not an existing name of an {@see AcumulusProperty}.
      */
-    public function set(string $name, $value, int $mode = AcumulusProperty::Set_Always): bool
+    public function set(string $name, $value, int $mode = PropertySet::Always): bool
     {
         $this->checkIsProperty($name);
         return $this->data[$name]->setValue($value, $mode);

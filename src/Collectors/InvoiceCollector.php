@@ -4,17 +4,25 @@ namespace Siel\Acumulus\Collectors;
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\ShopCapabilities;
+use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Countries;
+use Siel\Acumulus\Helpers\Field;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Helpers\Number;
-use Siel\Acumulus\Helpers\Token;
 use Siel\Acumulus\Helpers\Translator;
 use Siel\Acumulus\Invoice\Source;
 use Siel\Acumulus\Invoice\Translations;
 use Siel\Acumulus\Meta;
 use Siel\Acumulus\Tag;
+
+use function array_key_exists;
+use function func_get_args;
+use function in_array;
+use function is_array;
+use function is_int;
+use function is_string;
 
 /**
  * Collects information to construct an Acumulus invoice.
@@ -102,25 +110,6 @@ use Siel\Acumulus\Tag;
  */
 abstract class InvoiceCollector extends Collector
 {
-    public const VatRateSource_Exact = 'exact';
-    public const VatRateSource_Exact0 = 'exact-0';
-    public const VatRateSource_Calculated = 'calculated';
-    public const VatRateSource_Completor = 'completor';
-    public const VatRateSource_Strategy = 'strategy';
-    public const VatRateSource_Parent = 'parent';
-    public const VatRateSource_Child = 'child';
-    public const VatRateSource_Creator_Lookup = 'creator-lookup';
-
-    public const LineType_OrderItem = 'order-item';
-    public const LineType_Shipping = 'shipping';
-    public const LineType_PaymentFee = 'payment';
-    public const LineType_GiftWrapping = 'gift';
-    public const LineType_Manual = 'manual';
-    public const LineType_Discount = 'discount';
-    public const LineType_Voucher = 'voucher';
-    public const LineType_Other = 'other';
-    public const LineType_Corrector = 'missing-amount-corrector';
-
     protected Config $config;
     protected ShopCapabilities $shopCapabilities;
     protected Translator $translator;
@@ -146,7 +135,7 @@ abstract class InvoiceCollector extends Collector
     /**
      * Constructor.
      *
-     * @param \Siel\Acumulus\Helpers\Token $field
+     * @param \Siel\Acumulus\Helpers\Field $field
      * @param \Siel\Acumulus\Helpers\Countries $countries
      * @param \Siel\Acumulus\Config\ShopCapabilities $shopCapabilities
      * @param \Siel\Acumulus\Helpers\Container $container
@@ -154,11 +143,11 @@ abstract class InvoiceCollector extends Collector
      * @param \Siel\Acumulus\Helpers\Translator $translator
      * @param \Siel\Acumulus\Helpers\Log $log
      */
-    public function __construct(Token $field, Countries $countries, ShopCapabilities $shopCapabilities, Container $container, Config $config, Translator $translator, Log $log)
+    public function __construct(Field $field, Countries $countries, ShopCapabilities $shopCapabilities, Container $container, Config
+    $config, Translator $translator, Log $log)
     {
-        $this->field = $field;
+        parent::__construct($field, $container);
         $this->countries = $countries;
-        $this->container = $container;
         $this->shopCapabilities = $shopCapabilities;
         $this->config = $config;
         $this->log = $log;
@@ -192,13 +181,16 @@ abstract class InvoiceCollector extends Collector
      * Sets the source to create the invoice for.
      *
      * @param Source $invoiceSource
+     *
+     * @return $this
      */
-    protected function setInvoiceSource(Source $invoiceSource)
+    protected function setInvoiceSource(Source $invoiceSource): self
     {
         $this->invoiceSource = $invoiceSource;
         if (!in_array($invoiceSource->getType(), [Source::Order, Source::CreditNote], true)) {
             $this->log->error('Creator::setSource(): unknown source type %s', $this->invoiceSource->getType());
         }
+        return $this;
     }
 
     /**
@@ -215,8 +207,10 @@ abstract class InvoiceCollector extends Collector
 
     /**
      * Sets the list of sources to search for a property when expanding tokens.
+     *
+     * @return $this
      */
-    protected function setPropertySources()
+    protected function setPropertySources(): self
     {
         $this->propertySources = [];
         $this->propertySources['invoiceSource'] = $this->invoiceSource;
@@ -234,6 +228,7 @@ abstract class InvoiceCollector extends Collector
                 $this->propertySources['refundedOrder'] = $this->invoiceSource->getOrder()->getSource();
             }
         }
+        return $this;
     }
 
     /**
@@ -245,10 +240,13 @@ abstract class InvoiceCollector extends Collector
      *   The name to use for the source
      * @param object|array $property
      *   The source object to add.
+     *
+     * @return $this
      */
-    public function addPropertySource(string $name, $property)
+    public function addPropertySource(string $name, $property): self
     {
         $this->propertySources = [$name => $property] + $this->propertySources;
+        return $this;
     }
 
     /**
@@ -256,36 +254,34 @@ abstract class InvoiceCollector extends Collector
      *
      * @param string $name
      *   The name of the source to remove.
+     *
+     * @return $this
      */
-    public function removePropertySource(string $name)
+    public function removePropertySource(string $name): self
     {
         unset($this->propertySources[$name]);
+        return $this;
     }
 
     /**
-     * Collects data from the hosting environment to create an Acumulus invoice.
-     *
-     * @param Source $source
-     *  The web shop order or refund.
-     *
-     * @return \Siel\Acumulus\Data\Invoice
-     *   The acumulus invoice for this invoice source.
+     * @param Invoice $acumulusObject
+     *  An Acumulus API invoice object.
      */
-    public function collect(Source $source): Invoice
+    protected function collectLogicFields(AcumulusObject $acumulusObject): self
     {
-        $this->setInvoiceSource($source);
+        $this->setInvoiceSource($this->propertySources['invoiceSource']);
         $this->setPropertySources();
         $invoice = new Invoice();
         /** @var \Siel\Acumulus\Collectors\CustomerCollector $collector */
-        $collector = $this->container->getCollector('Customer');
+        $collector = $this->getContainer()->getCollector('Customer');
         $customerSettings = $this->config->getCustomerSettings();
         /** @var \Siel\Acumulus\Data\Customer $customer */
         $customer = $collector->collect($this->getPropertySources(), $customerSettings);
         $invoice->setCustomer($customer);
-//        $this->getInvoice($invoice);
-//        $this->getInvoiceLines($invoice);
-//        $this->getEmailAsPdf($invoice);
-        return $invoice;
+        $this->getInvoice($invoice);
+        $this->getInvoiceLines($invoice);
+        $this->getEmailAsPdf($customer->email ?? '');
+        return $this;
     }
 
     /**

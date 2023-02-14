@@ -22,13 +22,13 @@ use Siel\Acumulus\Api;
  * @property ?float $quantity
  * @property ?float $costPrice
  *
- * @method bool setItemNumber(?string $value, int $mode = AcumulusProperty::Set_Always)
- * @method bool setProduct(?string $value, int $mode = AcumulusProperty::Set_Always)
- * @method bool setNature(?string $value, int $mode = AcumulusProperty::Set_Always)
- * @method bool setUnitPrice(?float $value, int $mode = AcumulusProperty::Set_Always)
- * @method bool setVatRate(?float $value, int $mode = AcumulusProperty::Set_Always)
- * @method bool setQuantity(?float $value, int $mode = AcumulusProperty::Set_Always)
- * @method bool setCostPrice(?float $value, int $mode = AcumulusProperty::Set_Always)
+ * @method bool setItemNumber(?string $value, int $mode = PropertySet::Always)
+ * @method bool setProduct(?string $value, int $mode = PropertySet::Always)
+ * @method bool setNature(?string $value, int $mode = PropertySet::Always)
+ * @method bool setUnitPrice(?float $value, int $mode = PropertySet::Always)
+ * @method bool setVatRate(?float $value, int $mode = PropertySet::Always)
+ * @method bool setQuantity(?float $value, int $mode = PropertySet::Always)
+ * @method bool setCostPrice(?float $value, int $mode = PropertySet::Always)
  */
 class Line extends AcumulusObject
 {

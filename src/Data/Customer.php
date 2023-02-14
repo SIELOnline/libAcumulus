@@ -16,10 +16,10 @@ use Siel\Acumulus\Api;
  * However, there are some notable changes with the API structure:
  * - A Customer is part of the {@see Invoice} instead of the other way in the
  *   API.
- * - We have 2 separate {@see Address} objects, an invoice and billing address.
+ * - We have 2 separate {@see Address} objects, an invoice and shipping address.
  *   In the API all address fields are part of the customer itself, the fields
  *   of the 2nd address being prefixed with 'alt'. In decoupling this in the
- *   collector phase, we allow users to relate the 1st and 2 nd address to the
+ *   collector phase, we allow users to relate the 1st and 2nd address to the
  *   invoice or shipping address as they like.
  * - Field names are copied from the API, though capitals are introduced for
  *   readability and to prevent PhpStorm typo inspections.
@@ -43,22 +43,22 @@ use Siel\Acumulus\Api;
  *  @property ?string $mark
  *  @property ?int $disableDuplicates
  *
- *  @method bool setContactId(?string $value, int $mode = AcumulusProperty::Set_Always)
- *  @method bool setType(?int $value, int $mode = AcumulusProperty::Set_Always)
- *  @method bool setVatTypeId(?int $value, int $mode = AcumulusProperty::Set_Always)
- *  @method bool setContactYourId(?string $value, int $mode = AcumulusProperty::Set_Always)
- *  @method bool setContactStatus(?int $value, int $mode = AcumulusProperty::Set_Always)
+ *  @method bool setContactId(?string $value, int $mode = PropertySet::Always)
+ *  @method bool setType(?int $value, int $mode = PropertySet::Always)
+ *  @method bool setVatTypeId(?int $value, int $mode = PropertySet::Always)
+ *  @method bool setContactYourId(?string $value, int $mode = PropertySet::Always)
+ *  @method bool setContactStatus(?int $value, int $mode = PropertySet::Always)
  *
- *  @method bool setWebsite(?string $value, int $mode = AcumulusProperty::Set_Always)
- *  @method bool setVatNumber(?string $value, int $mode = AcumulusProperty::Set_Always)
- *  @method bool setTelephone(?string $value, int $mode = AcumulusProperty::Set_Always)
- *  @method bool setTelephone2(?string $value, int $mode = AcumulusProperty::Set_Always)
- *  @method bool setFax(?string $value, int $mode = AcumulusProperty::Set_Always)
- *  @method bool setEmail(?string $value, int $mode = AcumulusProperty::Set_Always)
- *  @method bool setOverwriteIfExists(?int $value, int $mode = AcumulusProperty::Set_Always)
- *  @method bool setBankAccountNumber(?string $value, int $mode = AcumulusProperty::Set_Always)
- *  @method bool setMark(?string $value, int $mode = AcumulusProperty::Set_Always)
- *  @method bool setDisableDuplicates(?int $value, int $mode = AcumulusProperty::Set_Always)
+ *  @method bool setWebsite(?string $value, int $mode = PropertySet::Always)
+ *  @method bool setVatNumber(?string $value, int $mode = PropertySet::Always)
+ *  @method bool setTelephone(?string $value, int $mode = PropertySet::Always)
+ *  @method bool setTelephone2(?string $value, int $mode = PropertySet::Always)
+ *  @method bool setFax(?string $value, int $mode = PropertySet::Always)
+ *  @method bool setEmail(?string $value, int $mode = PropertySet::Always)
+ *  @method bool setOverwriteIfExists(?int $value, int $mode = PropertySet::Always)
+ *  @method bool setBankAccountNumber(?string $value, int $mode = PropertySet::Always)
+ *  @method bool setMark(?string $value, int $mode = PropertySet::Always)
+ *  @method bool setDisableDuplicates(?int $value, int $mode = PropertySet::Always)
  */
 class Customer extends AcumulusObject
 {
@@ -81,20 +81,20 @@ class Customer extends AcumulusObject
         ['name' => 'disableDuplicates', 'type' =>'bool', 'allowedValues' => [Api::DisableDuplicates_No, Api::DisableDuplicates_Yes]],
     ];
 
-    protected ?Address $billingAddress = null;
+    protected ?Address $invoiceAddress = null;
     protected ?Address $shippingAddress = null;
 
-    public function getBillingAddress(): ?Address
+    public function getInvoiceAddress(): ?Address
     {
-        return $this->billingAddress;
+        return $this->invoiceAddress;
     }
 
     /**
      * @return $this
      */
-    public function setBillingAddress(?Address $billingAddress): self
+    public function setInvoiceAddress(?Address $invoiceAddress): self
     {
-        $this->billingAddress = $billingAddress;
+        $this->invoiceAddress = $invoiceAddress;
         return $this;
     }
 

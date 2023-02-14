@@ -33,18 +33,18 @@ use Siel\Acumulus\Api;
  *  @property ?int $countryAutoName
  *  @property ?string $countryAutoNameLang
  *
- *  @method bool setCompanyName1(?string $value, int $mode = AcumulusProperty::Set_Always)
- *  @method bool setCompanyName2(?string $value, int $mode = AcumulusProperty::Set_Always)
- *  @method bool setFullName(?string $value, int $mode = AcumulusProperty::Set_Always)
- *  @method bool setSalutation(?string $value, int $mode = AcumulusProperty::Set_Always)
- *  @method bool setAddress1(?string $value, int $mode = AcumulusProperty::Set_Always)
- *  @method bool setAddress2(?string $value, int $mode = AcumulusProperty::Set_Always)
- *  @method bool setPostalCode(?string $value, int $mode = AcumulusProperty::Set_Always)
- *  @method bool setCity(?string $value, int $mode = AcumulusProperty::Set_Always)
- *  @method bool setCountry(?string $value, int $mode = AcumulusProperty::Set_Always)
- *  @method bool setCountryCode(?string $value, int $mode = AcumulusProperty::Set_Always)
- *  @method bool setCountryAutoName(?int $value, int $mode = AcumulusProperty::Set_Always)
- *  @method bool setCountryAutoNameLang(?string $value, int $mode = AcumulusProperty::Set_Always)
+ *  @method bool setCompanyName1(?string $value, int $mode = PropertySet::Always)
+ *  @method bool setCompanyName2(?string $value, int $mode = PropertySet::Always)
+ *  @method bool setFullName(?string $value, int $mode = PropertySet::Always)
+ *  @method bool setSalutation(?string $value, int $mode = PropertySet::Always)
+ *  @method bool setAddress1(?string $value, int $mode = PropertySet::Always)
+ *  @method bool setAddress2(?string $value, int $mode = PropertySet::Always)
+ *  @method bool setPostalCode(?string $value, int $mode = PropertySet::Always)
+ *  @method bool setCity(?string $value, int $mode = PropertySet::Always)
+ *  @method bool setCountry(?string $value, int $mode = PropertySet::Always)
+ *  @method bool setCountryCode(?string $value, int $mode = PropertySet::Always)
+ *  @method bool setCountryAutoName(?int $value, int $mode = PropertySet::Always)
+ *  @method bool setCountryAutoNameLang(?string $value, int $mode = PropertySet::Always)
  */
 class Address extends AcumulusObject
 {

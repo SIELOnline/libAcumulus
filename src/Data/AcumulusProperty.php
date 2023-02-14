@@ -45,11 +45,6 @@ use function strlen;
  */
 class AcumulusProperty
 {
-    public const Set_Always = 0;
-    public const Set_NotOverwrite = 1;
-    public const Set_NotEmpty = 2;
-    public const Set_NotOverwriteNotEmpty = self::Set_NotOverwrite | self::Set_NotEmpty;
-
     /** @var string[] */
     protected static array $allowedTypes = ['string', 'int', 'float', 'date', 'id', 'bool'];
 
@@ -137,7 +132,7 @@ class AcumulusProperty
      *   and will "unset" this property (it will not appear in the Acumulus API
      *   message).
      * @param int $mode
-     *   1 of the AcumulusProperty::Set_... constants to prevent setting an
+     *   1 of the PropertySet::... constants to prevent setting an
      *   empty value and/or overwriting an already set value. Default is to
      *   unconditionally set the value.
      *
@@ -146,7 +141,7 @@ class AcumulusProperty
      *
      * @noinspection PhpFunctionCyclomaticComplexityInspection
      */
-    public function setValue($value, int $mode = AcumulusProperty::Set_Always): bool
+    public function setValue($value, int $mode = PropertySet::Always): bool
     {
         if ($value === null || $value === 'null') {
             $value = null;
@@ -203,10 +198,10 @@ class AcumulusProperty
                 throw new DomainException("$this->name: not an allowed value:" . var_export($value, true));
             }
         }
-        if (($mode & self::Set_NotOverwrite) !== 0 && $this->value !== null) {
+        if (($mode & PropertySet::NotOverwrite) !== 0 && $this->value !== null) {
             return false;
         }
-        if (($mode & self::Set_NotEmpty) !== 0 && empty($value)) {
+        if (($mode & PropertySet::NotEmpty) !== 0 && empty($value)) {
             return false;
         }
         $this->value = $value;

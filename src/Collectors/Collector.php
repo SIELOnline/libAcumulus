@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Siel\Acumulus\Collectors;
 
 use Siel\Acumulus\Data\AcumulusObject;
-use Siel\Acumulus\Data\AcumulusProperty;
+use Siel\Acumulus\Data\PropertySet;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Field;
 
@@ -29,7 +29,7 @@ use function is_string;
 abstract class Collector implements CollectorInterface
 {
     protected Field $field;
-    protected Container $container;
+    private Container $container;
     protected array $propertySources;
 
     public function __construct(Field $field, Container $container)
@@ -66,21 +66,21 @@ abstract class Collector implements CollectorInterface
     }
 
     /**
-     * {@inheritDoc}
-     *
-     * This base class divides the collector phase into 2 smaller phases:
+     * This base implementation divides the collector phase into 3 smaller
+     * phases:
      * - Collecting based on simple field mappings.
      * - Collecting based on specialised logic that can use all the API methods
      *   and data models of the host environment to get the (missing) values for
      *   the fields of the target {@see \Siel\Acumulus\Data\AcumulusObject}.
+     * - Collecting any child objects.
      */
     public function collect(array $propertySources, array $fieldDefinitions): AcumulusObject
     {
         $this->propertySources = $propertySources;
         $acumulusObject = $this->createAcumulusObject();
-        $this
-            ->collectMappedFields($acumulusObject, $fieldDefinitions)
-            ->collectLogicFields($acumulusObject);
+        $this->collectMappedFields($acumulusObject, $fieldDefinitions)
+            ->collectLogicFields($acumulusObject)
+            ->collectChildObjects($acumulusObject, $fieldDefinitions);
         return $acumulusObject;
     }
 
@@ -102,9 +102,33 @@ abstract class Collector implements CollectorInterface
     }
 
     /**
-     * @param \Siel\Acumulus\Data\AcumulusObject $acumulusObject
+     * Collects fields using logic more complex than a simple mapping.
+     *
+     * This base implementation just returns $this as it cannot contain any
+     * logic about the properties. Override if the actual data object does have
+     * properties that cannot be set with a simple mapping, but do depend on
+     * shop data (thus not configuration only).
+     *
+     * @return $this
      */
-    abstract protected function collectLogicFields(AcumulusObject $acumulusObject): void;
+    protected function collectLogicFields(AcumulusObject $acumulusObject): self
+    {
+        return $this;
+    }
+
+    /**
+     * Collects any child objects.
+     *
+     * @param string[] $fieldMappings
+     *   A set of field mapping definitions to fill properties of the
+     *   $acumulusObject with.
+     *
+     * @return $this
+     */
+    protected function collectChildObjects(AcumulusObject $acumulusObject, array $fieldMappings): self
+    {
+        return $this;
+    }
 
     /**
      * Expands and sets a possibly dynamic value to an Acumulus object.
@@ -128,7 +152,7 @@ abstract class Collector implements CollectorInterface
      * @return bool
      *   Whether the value was set.
      */
-    protected function expandAndSet(AcumulusObject $object, string $property, $value, int $mode = AcumulusProperty::Set_Always): bool
+    protected function expandAndSet(AcumulusObject $object, string $property, $value, int $mode = PropertySet::Always): bool
     {
         if ($value !== null && $value !== 'null') {
             if (is_string($value)) {
@@ -150,12 +174,12 @@ abstract class Collector implements CollectorInterface
      * @param string $pattern
      *  The value that may contain field references.
      *
-     * @return string
-     *   The pattern with variables expanded with their actual value. Note that
-     *   this will always be a string, even if the pattern refers to a single
-     *   property which is not a string.
+     * @return mixed
+     *   The pattern with variable field definitions expanded with their actual
+     *   value, which may be empty, if the properties referred to do not exist
+     *   or are empty themselves.
      */
-    protected function expand(string $pattern): string
+    protected function expand(string $pattern)
     {
         return $this->field->expand($pattern, $this->propertySources);
     }

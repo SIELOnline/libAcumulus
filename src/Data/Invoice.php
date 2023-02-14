@@ -41,19 +41,19 @@ use Siel\Acumulus\Api;
  * @property ?int $template
  * @property ?string $invoiceNotes
  *
- * @method bool setConcept(?int $value, int $mode = AcumulusProperty::Set_Always)
- * @method bool setConceptType(?string $value, int $mode = AcumulusProperty::Set_Always)
- * @method bool setNumber(?int $value, int $mode = AcumulusProperty::Set_Always)
- * @method bool setVatType(?int $value, int $mode = AcumulusProperty::Set_Always)
- * @method bool setIssueDate(?DateTime $value, int $mode = AcumulusProperty::Set_Always)
- * @method bool setCostCenter(?int $value, int $mode = AcumulusProperty::Set_Always)
- * @method bool setAccountNumber(?int $value, int $mode = AcumulusProperty::Set_Always)
- * @method bool setPaymentStatus(?int $value, int $mode = AcumulusProperty::Set_Always)
- * @method bool setPaymentDate(?DateTime $value, int $mode = AcumulusProperty::Set_Always)
- * @method bool setDescription(?string $value, int $mode = AcumulusProperty::Set_Always)
- * @method bool setDescriptionText(?string $value, int $mode = AcumulusProperty::Set_Always)
- * @method bool setTemplate(?int $value, int $mode = AcumulusProperty::Set_Always)
- * @method bool setInvoiceNotes(?string $value, int $mode = AcumulusProperty::Set_Always)
+ * @method bool setConcept(?int $value, int $mode = PropertySet::Always)
+ * @method bool setConceptType(?string $value, int $mode = PropertySet::Always)
+ * @method bool setNumber(?int $value, int $mode = PropertySet::Always)
+ * @method bool setVatType(?int $value, int $mode = PropertySet::Always)
+ * @method bool setIssueDate(?DateTime $value, int $mode = PropertySet::Always)
+ * @method bool setCostCenter(?int $value, int $mode = PropertySet::Always)
+ * @method bool setAccountNumber(?int $value, int $mode = PropertySet::Always)
+ * @method bool setPaymentStatus(?int $value, int $mode = PropertySet::Always)
+ * @method bool setPaymentDate(?DateTime $value, int $mode = PropertySet::Always)
+ * @method bool setDescription(?string $value, int $mode = PropertySet::Always)
+ * @method bool setDescriptionText(?string $value, int $mode = PropertySet::Always)
+ * @method bool setTemplate(?int $value, int $mode = PropertySet::Always)
+ * @method bool setInvoiceNotes(?string $value, int $mode = PropertySet::Always)
  */
 class Invoice extends AcumulusObject
 {

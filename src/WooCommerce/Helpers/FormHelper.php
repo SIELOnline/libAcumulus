@@ -14,20 +14,14 @@ use Siel\Acumulus\Helpers\FormHelper as BaseFormHelper;
  */
 class FormHelper extends BaseFormHelper
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected function getMeta(): ?array
+    protected function getMeta(): array
     {
         if (empty($this->meta) && $this->isSubmitted() && isset($_POST[static::Meta])) {
-            $this->setMeta(json_decode(stripslashes($_POST[static::Meta])));
+            $this->setMeta(json_decode(stripslashes($_POST[static::Meta]), true));
         }
         return $this->meta;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function alterPostedValues(array $postedValues): array
     {
         return stripslashes_deep($postedValues);

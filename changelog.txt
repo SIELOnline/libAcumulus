@@ -7,6 +7,8 @@ This file contains a historical overview of changes in our own code.
 ------------------
 bugs:
 - PS: Wrong conversion specification in sprintf in AcumulusEntryManager::insert.
+- WC: PHP Fatal error: declaration of WooCommerce\FormHelper::getMeta() must be compatible 
+  with parent definition.
 
 
 7.6.4 (2023-02-07) (MA only) (PS later)

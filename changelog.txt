@@ -6,13 +6,15 @@ This file contains a historical overview of changes in our own code.
 7.6.5 (2023-??-??)
 ------------------
 bugs:
-- PS: Wrong conversion specification in sprintf in AcumulusEntryManager::insert.
-- WC: PHP Fatal error: declaration of WooCommerce\FormHelper::getMeta() must be compatible 
+- PS: Wrong conversion specification in sprintf() in AcumulusEntryManager::insert.
+- WC: PHP Fatal error: declaration of WooCommerce\FormHelper::getMeta() must be compatible
   with parent definition.
+- JOO4: Call to undefined method Joomla\CMS\Installer\Adapter\ComponentAdapter::get(),
+  Extension Update: Custom install routine failure.
 
 
-7.6.4 (2023-02-07) (MA only) (PS later)
----------------------------------------
+7.6.4 (2023-02-07) (MA+PS only)
+-------------------------------
 Features:
 - PHP8.2 awareness: removed use of a dynamic property in class Log.
 - ALL: Fatal errors will now log stack trace (fallback for when mail does not work).
@@ -62,7 +64,7 @@ Features:
   contain some errors regarding tax totals not including tax on shipping costs (and
   therefore not in the amount to be paid).
 
-bugs:
+Bugs:
 - WC: Error after fresh install: Plugin kon niet worden geactiveerd omdat hij een fatale
   fout veroorzaakt.
 - OC,PS (and perhaps others): test to see if new order status is in set of order statuses

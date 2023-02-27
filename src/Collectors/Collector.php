@@ -9,6 +9,9 @@ use Siel\Acumulus\Data\PropertySet;
 use Siel\Acumulus\Helpers\Container;
 use Siel\Acumulus\Helpers\Field;
 
+use Siel\Acumulus\Helpers\Log;
+
+use function get_class;
 use function is_string;
 
 /**
@@ -30,12 +33,15 @@ abstract class Collector implements CollectorInterface
 {
     private Field $field;
     private Container $container;
+    protected Log $log;
+
     protected array $propertySources;
 
-    public function __construct(Field $field, Container $container)
+    public function __construct(Field $field, Container $container, Log $log)
     {
         $this->field = $field;
         $this->container = $container;
+        $this->log = $log;
     }
 
     /**
@@ -94,7 +100,11 @@ abstract class Collector implements CollectorInterface
     protected function collectMappedFields(AcumulusObject $acumulusObject, array $fieldMappings): void
     {
         foreach ($fieldMappings as $field => $pattern) {
-            $this->expandAndSet($acumulusObject, $field, $pattern);
+            if ($acumulusObject->isProperty($field)) {
+                $this->expandAndSet($acumulusObject, $field, $pattern);
+            } else {
+                $this->log->notice('%s: %s does not have a property %s', __METHOD__, get_class($acumulusObject), $field);
+            }
         }
     }
 

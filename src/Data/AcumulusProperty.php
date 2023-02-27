@@ -163,7 +163,7 @@ class AcumulusProperty
                     break;
                 case 'float':
                     if (!is_numeric($value)) {
-                        throw new DomainException("$this->name: not a valid $this->type:" . var_export($value, true));
+                        throw new DomainException("$this->name: not a valid $this->type value: " . var_export($value, true));
                     }
                     $value = (float) $value;
                     break;
@@ -186,16 +186,18 @@ class AcumulusProperty
                     break;
                 case 'bool':
                     /** @noinspection CallableParameterUseCaseInTypeContextInspection */
-                    if (!is_bool($value) && !in_array($value, $this->allowedValues, true)) {
-                        throw new DomainException("$this->name: not a valid $this->type:" . var_export($value, true));
+                    if (!is_bool($value)) {
+                        if (!in_array($value, $this->allowedValues, true)) {
+                            throw new DomainException("$this->name: not a valid allowed bool value: " . var_export($value, true));
+                        }
+                        $value = $value === $this->allowedValues[1];
                     }
-                    $value = is_bool($value) ? $this->allowedValues[$value ? 1 : 0] : $value;
                     break;
                 default:
                     throw new UnexpectedValueException("$this->name: not a valid type: $this->type");
             }
-            if (count($this->allowedValues) > 0 && !in_array($value, $this->allowedValues, true)) {
-                throw new DomainException("$this->name: not an allowed value:" . var_export($value, true));
+            if ($this->type !== 'bool' && count($this->allowedValues) > 0 && !in_array($value, $this->allowedValues, true)) {
+                throw new DomainException("$this->name: not an allowed value: " . var_export($value, true));
             }
         }
         if (($mode & PropertySet::NotOverwrite) !== 0 && $this->value !== null) {

@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Siel\Acumulus\Tests\TestWebShop\Data;
 
 use Siel\Acumulus\Api;
 use Siel\Acumulus\Data\AcumulusObject;
-use Siel\Acumulus\Data\AcumulusProperty;
+use Siel\Acumulus\Data\PropertySet;
 
 /**
  * Used to test basics of abstract parent classes, does not add features.
@@ -23,9 +25,12 @@ use Siel\Acumulus\Data\AcumulusProperty;
  */
 class SimpleTestObject extends AcumulusObject
 {
-    protected static array $propertyDefinitions = [
-        ['name' => 'itemNumber', 'type' => 'string'],
-        ['name' => 'nature', 'type' => 'string', 'allowedValues' => [Api::Nature_Product, Api::Nature_Service]],
-        ['name' => 'unitPrice', 'type' => 'float', 'required' => true],
-    ];
+    protected function getPropertyDefinitions(): array
+    {
+        return [
+            ['name' => 'itemNumber', 'type' => 'string'],
+            ['name' => 'nature', 'type' => 'string', 'allowedValues' => [Api::Nature_Product, Api::Nature_Service]],
+            ['name' => 'unitPrice', 'type' => 'float', 'required' => true],
+        ];
+    }
 }

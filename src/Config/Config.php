@@ -25,7 +25,7 @@ use function is_float;
 use function is_int;
 use function is_string;
 
-use function strpos;
+use function strlen;
 
 use const Siel\Acumulus\Version;
 
@@ -481,7 +481,7 @@ class Config
         $settings = array_intersect_key($this->getAll(), $keys);
         $result = [];
         foreach ($settings as $key => $value) {
-            $newKey = strncmp($key, 'alt_', 4) === 0 ? substr($key, strlen('alt_')) : $key;
+            $newKey = strncmp($key, 'alt_', strlen('alt_')) === 0 ? substr($key, strlen('alt_')) : $key;
             $result[$newKey] = $value;
         }
         return $result;
@@ -564,7 +564,13 @@ class Config
             'packingSlipSubject',
             'packingSlipConfirmReading',
         ], true);
-        return array_intersect_key($this->getAll(), $keys);
+        $settings = array_intersect_key($this->getAll(), $keys);
+        $result = [];
+        foreach ($settings as $key => $value) {
+            $newKey = strncmp($key, 'packingSlip', strlen('packingSlip')) === 0 ? lcfirst(substr($key, strlen('packingSlip'))) : $key;
+            $result[$newKey] = $value;
+        }
+        return $result;
     }
 
     /**

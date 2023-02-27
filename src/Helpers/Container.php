@@ -507,6 +507,7 @@ class Container
         $arguments = [
             $this->getField(),
             $this,
+            $this->getLog(),
         ];
         return $this->getInstance("{$type}Collector", 'Collectors', $arguments);
     }

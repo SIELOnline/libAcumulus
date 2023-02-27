@@ -113,7 +113,6 @@ abstract class InvoiceCollector extends Collector
     protected Config $config;
     protected ShopCapabilities $shopCapabilities;
     protected Translator $translator;
-    protected Log $log;
     protected Countries $countries;
 
     protected Source $invoiceSource;
@@ -146,11 +145,10 @@ abstract class InvoiceCollector extends Collector
     public function __construct(Field $field, Countries $countries, ShopCapabilities $shopCapabilities, Container $container, Config
     $config, Translator $translator, Log $log)
     {
-        parent::__construct($field, $container);
+        parent::__construct($field, $container, $log);
         $this->countries = $countries;
         $this->shopCapabilities = $shopCapabilities;
         $this->config = $config;
-        $this->log = $log;
         $this->translator = $translator;
         $invoiceHelperTranslations = new Translations();
         $this->translator->add($invoiceHelperTranslations);

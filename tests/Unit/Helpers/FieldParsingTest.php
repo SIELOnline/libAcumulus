@@ -187,6 +187,6 @@ class FieldParsingTest extends TestCase
         $result = $vf->expand($field, []);
         $this->assertEqualsCanonicalizing($propertiesInObject, $vf->trace['expandPropertyInObject']);
         $this->assertEqualsCanonicalizing($properties, $vf->trace['expandProperty']);
-        $this->assertEqualsCanonicalizing($literals, $vf->trace['expandLiteral']);
+        $this->assertEqualsCanonicalizing($literals, $vf->trace['getLiteral']);
     }
 }

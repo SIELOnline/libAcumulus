@@ -186,7 +186,7 @@ abstract class AcumulusObject implements ArrayAccess
      * Returns whether $name is an {@see AcumulusProperty} of this
      * {@see AcumulusObject}
      */
-    protected function isProperty(string $name): bool
+    public function isProperty(string $name): bool
     {
         return array_key_exists($name, $this->data);
     }

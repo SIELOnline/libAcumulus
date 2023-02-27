@@ -22,28 +22,28 @@ class AcumulusPropertyTest extends TestCase
     public function testConstructorValidationName1(): void
     {
         $this->expectException(DomainException::class);
-        $pd = ['type' => 'int', 'allowedValues' => [1,2]];
+        $pd = ['type' => 'int', 'allowedValues' => [1, 2]];
         new AcumulusProperty($pd);
     }
 
     public function testConstructorValidationName2(): void
     {
         $this->expectException(DomainException::class);
-        $pd = ['name' => 3, 'type' => 'int', 'allowedValues' => [1,2]];
+        $pd = ['name' => 3, 'type' => 'int', 'allowedValues' => [1, 2]];
         new AcumulusProperty($pd);
     }
 
     public function testConstructorValidationType(): void
     {
         $this->expectException(DomainException::class);
-        $pd = ['name' => 'property', 'type' => 'error', 'allowedValues' => [1,2]];
+        $pd = ['name' => 'property', 'type' => 'error', 'allowedValues' => [1, 2]];
         new AcumulusProperty($pd);
     }
 
     public function testConstructorValidationRequired(): void
     {
         $this->expectException(DomainException::class);
-        $pd = ['name' => 'property', 'type' => 'int', 'required' => 1, 'allowedValues' => [1,2]];
+        $pd = ['name' => 'property', 'type' => 'int', 'required' => 1, 'allowedValues' => [1, 2]];
         new AcumulusProperty($pd);
     }
 
@@ -56,7 +56,7 @@ class AcumulusPropertyTest extends TestCase
 
     public function testConstructor(): void
     {
-        $pd = ['name' => 'property', 'type' => 'int', 'required' => true, 'allowedValues' => [1,2]];
+        $pd = ['name' => 'property', 'type' => 'int', 'required' => true, 'allowedValues' => [1, 2]];
         $p = new AcumulusProperty($pd);
         $this->assertSame('property', $p->getName());
         $this->assertTrue($p->isRequired());
@@ -80,12 +80,37 @@ class AcumulusPropertyTest extends TestCase
     /**
      * @dataProvider setValueDataProvider
      */
-    public function testSetValue(string $type, $value, $castValue): void
+    public function testSetValue(string $type, $value, $propertyValue): void
     {
         $pd = ['name' => 'property', 'type' => $type];
         $p = new AcumulusProperty($pd);
         $p->setValue($value);
-        $this->assertSame($castValue, $p->getValue());
+        $this->assertSame($propertyValue, $p->getValue());
+    }
+
+    public function setBoolValueDataProvider(): array
+    {
+        return [
+            'bool-true' => [[0, 1], true, true],
+            'bool-false' => [[0, 1], false, false],
+            'bool-1' => [[0, 1], 1, true],
+            'bool-0' => [[0, 1], 0, false],
+            'bool-reversed-1' => [[1, 0], 0, true],
+            'bool-reversed-0' => [[1, 0], 1, false],
+            'bool-yes' => [['no', 'yes'], 'yes', true],
+            'bool-no' => [['no', 'yes'], 'no', false],
+        ];
+    }
+
+    /**
+     * @dataProvider setBoolValueDataProvider
+     */
+    public function testSetBoolValue(array $allowedValues, $value, $propertyValue): void
+    {
+        $pd = ['name' => 'property', 'type' => 'bool', 'allowedValues' => $allowedValues];
+        $p = new AcumulusProperty($pd);
+        $p->setValue($value);
+        $this->assertSame($propertyValue, $p->getValue());
     }
 
     /**

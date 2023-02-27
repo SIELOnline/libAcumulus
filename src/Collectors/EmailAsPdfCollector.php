@@ -6,6 +6,7 @@ namespace Siel\Acumulus\Collectors;
 
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\Customer;
+use Siel\Acumulus\Data\EmailAsPdfType;
 
 /**
  * Collects emailAsPdf data from the shop and the module's settings.
@@ -27,8 +28,17 @@ use Siel\Acumulus\Data\Customer;
  */
 class EmailAsPdfCollector extends Collector
 {
+    private string $type;
+
     protected function getAcumulusObjectType(): string
     {
-        return 'EmailAsPdf';
+        return $this->type;
     }
+
+    public function collect(array $propertySources, array $fieldDefinitions): AcumulusObject
+    {
+        $this->type = $fieldDefinitions['emailAsPdfType'] ?? EmailAsPdfType::Invoice;
+        return parent::collect($propertySources, $fieldDefinitions);
+    }
+
 }

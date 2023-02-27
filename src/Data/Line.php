@@ -32,15 +32,18 @@ use Siel\Acumulus\Api;
  */
 class Line extends AcumulusObject
 {
-    protected static array $propertyDefinitions = [
-        ['name' => 'itemNumber', 'type' => 'string'],
-        ['name' => 'product', 'type' => 'string'],
-        ['name' => 'nature', 'type' => 'string', 'allowedValues' => [Api::Nature_Product, Api::Nature_Service]],
-        ['name' => 'unitPrice', 'type' => 'float', 'required' => true],
-        ['name' => 'vatRate', 'type' => 'float', 'required' => true],
-        ['name' => 'quantity', 'type' => 'float', 'required' => true],
-        ['name' => 'costPrice', 'type' => 'float'],
-    ];
+    protected function getPropertyDefinitions(): array
+    {
+        return [
+            ['name' => 'itemNumber', 'type' => 'string'],
+            ['name' => 'product', 'type' => 'string'],
+            ['name' => 'nature', 'type' => 'string', 'allowedValues' => [Api::Nature_Product, Api::Nature_Service]],
+            ['name' => 'unitPrice', 'type' => 'float', 'required' => true],
+            ['name' => 'vatRate', 'type' => 'float', 'required' => true],
+            ['name' => 'quantity', 'type' => 'float', 'required' => true],
+            ['name' => 'costPrice', 'type' => 'float'],
+        ];
+    }
 
     /** @var \Siel\Acumulus\Data\Line[] */
     protected array $children = [];
@@ -53,12 +56,8 @@ class Line extends AcumulusObject
         return $this->children;
     }
 
-    /**
-     * @return $this
-     */
-    public function addChild(Line $child): self
+    public function addChild(Line $child): void
     {
         $this->children[] = $child;
-        return $this;
     }
 }

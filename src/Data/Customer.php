@@ -30,7 +30,7 @@ use Siel\Acumulus\Api;
  *  @property ?int $type
  *  @property ?int $vatTypeId
  *  @property ?string $contactYourId
- *  @property ?int $contactStatus
+ *  @property ?bool $contactStatus
  *
  *  @property ?string $website
  *  @property ?string $vatNumber
@@ -38,16 +38,16 @@ use Siel\Acumulus\Api;
  *  @property ?string $telephone2
  *  @property ?string $fax
  *  @property ?string $email
- *  @property ?int $overwriteIfExists
+ *  @property ?bool $overwriteIfExists
  *  @property ?string $bankAccountNumber
  *  @property ?string $mark
- *  @property ?int $disableDuplicates
+ *  @property ?bool $disableDuplicates
  *
  *  @method bool setContactId(?string $value, int $mode = PropertySet::Always)
  *  @method bool setType(?int $value, int $mode = PropertySet::Always)
  *  @method bool setVatTypeId(?int $value, int $mode = PropertySet::Always)
  *  @method bool setContactYourId(?string $value, int $mode = PropertySet::Always)
- *  @method bool setContactStatus(?int $value, int $mode = PropertySet::Always)
+ *  @method bool setContactStatus(?bool $value, int $mode = PropertySet::Always)
  *
  *  @method bool setWebsite(?string $value, int $mode = PropertySet::Always)
  *  @method bool setVatNumber(?string $value, int $mode = PropertySet::Always)
@@ -55,31 +55,38 @@ use Siel\Acumulus\Api;
  *  @method bool setTelephone2(?string $value, int $mode = PropertySet::Always)
  *  @method bool setFax(?string $value, int $mode = PropertySet::Always)
  *  @method bool setEmail(?string $value, int $mode = PropertySet::Always)
- *  @method bool setOverwriteIfExists(?int $value, int $mode = PropertySet::Always)
+ *  @method bool setOverwriteIfExists(?bool $value, int $mode = PropertySet::Always)
  *  @method bool setBankAccountNumber(?string $value, int $mode = PropertySet::Always)
  *  @method bool setMark(?string $value, int $mode = PropertySet::Always)
- *  @method bool setDisableDuplicates(?int $value, int $mode = PropertySet::Always)
+ *  @method bool setDisableDuplicates(?bool $value, int $mode = PropertySet::Always)
  */
 class Customer extends AcumulusObject
 {
-    protected static array $propertyDefinitions = [
-        ['name' => 'contactId', 'type' =>'string'],
-        ['name' => 'type', 'type' =>'int', 'allowedValues' => [Api::CustomerType_Debtor, Api::CustomerType_Creditor, Api::CustomerType_Both]],
-        ['name' => 'vatTypeId', 'type' =>'int', 'allowedValues' => [Api::VatTypeId_Private, Api::VatTypeId_Business]],
-        ['name' => 'contactYourId', 'type' =>'string'],
-        ['name' => 'contactStatus', 'type' =>'bool', 'allowedValues' => [Api::ContactStatus_Disabled, Api::ContactStatus_Active]],
+    protected function getPropertyDefinitions(): array
+    {
+        return [
+            ['name' => 'contactId', 'type' => 'string'],
+            [
+                'name' => 'type',
+                'type' => 'int',
+                'allowedValues' => [Api::CustomerType_Debtor, Api::CustomerType_Creditor, Api::CustomerType_Both]
+            ],
+            ['name' => 'vatTypeId', 'type' => 'int', 'allowedValues' => [Api::VatTypeId_Private, Api::VatTypeId_Business]],
+            ['name' => 'contactYourId', 'type' => 'string'],
+            ['name' => 'contactStatus', 'type' => 'bool', 'allowedValues' => [Api::ContactStatus_Disabled, Api::ContactStatus_Active]],
 
-        ['name' => 'website', 'type' =>'string'],
-        ['name' => 'vatNumber', 'type' =>'string'],
-        ['name' => 'telephone', 'type' =>'string'],
-        ['name' => 'telephone2', 'type' =>'string'],
-        ['name' => 'fax', 'type' =>'string'],
-        ['name' => 'email', 'type' =>'string'],
-        ['name' => 'overwriteIfExists', 'type' =>'bool', 'allowedValues' => [Api::OverwriteIfExists_No, Api::OverwriteIfExists_Yes]],
-        ['name' => 'bankAccountNumber', 'type' =>'string'],
-        ['name' => 'mark', 'type' =>'string'],
-        ['name' => 'disableDuplicates', 'type' =>'bool', 'allowedValues' => [Api::DisableDuplicates_No, Api::DisableDuplicates_Yes]],
-    ];
+            ['name' => 'website', 'type' => 'string'],
+            ['name' => 'vatNumber', 'type' => 'string'],
+            ['name' => 'telephone', 'type' => 'string'],
+            ['name' => 'telephone2', 'type' => 'string'],
+            ['name' => 'fax', 'type' => 'string'],
+            ['name' => 'email', 'type' => 'string'],
+            ['name' => 'overwriteIfExists', 'type' => 'bool', 'allowedValues' => [Api::OverwriteIfExists_No, Api::OverwriteIfExists_Yes]],
+            ['name' => 'bankAccountNumber', 'type' => 'string'],
+            ['name' => 'mark', 'type' => 'string'],
+            ['name' => 'disableDuplicates', 'type' => 'bool', 'allowedValues' => [Api::DisableDuplicates_No, Api::DisableDuplicates_Yes]],
+        ];
+    }
 
     protected ?Address $invoiceAddress = null;
     protected ?Address $shippingAddress = null;
@@ -89,13 +96,9 @@ class Customer extends AcumulusObject
         return $this->invoiceAddress;
     }
 
-    /**
-     * @return $this
-     */
-    public function setInvoiceAddress(?Address $invoiceAddress): self
+    public function setInvoiceAddress(?Address $invoiceAddress): void
     {
         $this->invoiceAddress = $invoiceAddress;
-        return $this;
     }
 
     public function getShippingAddress(): ?Address
@@ -103,12 +106,8 @@ class Customer extends AcumulusObject
         return $this->shippingAddress;
     }
 
-    /**
-     * @return $this
-     */
-    public function setShippingAddress(?Address $shippingAddress): self
+    public function setShippingAddress(?Address $shippingAddress): void
     {
         $this->shippingAddress = $shippingAddress;
-        return $this;
     }
 }

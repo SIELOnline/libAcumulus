@@ -48,18 +48,21 @@ use Siel\Acumulus\Api;
  */
 class Address extends AcumulusObject
 {
-    protected static array $propertyDefinitions = [
-        ['name' => 'companyName1', 'type' =>'string'],
-        ['name' => 'companyName2', 'type' =>'string'],
-        ['name' => 'fullName', 'type' =>'string'],
-        ['name' => 'salutation', 'type' =>'string'],
-        ['name' => 'address1', 'type' =>'string'],
-        ['name' => 'address2', 'type' =>'string'],
-        ['name' => 'postalCode', 'type' =>'string'],
-        ['name' => 'city', 'type' =>'string'],
-        ['name' => 'country', 'type' =>'string'],
-        ['name' => 'countryCode', 'type' =>'string'],
-        ['name' => 'countryAutoName', 'type' =>'int', 'allowedValues' => [Api::AutoName_No, Api::AutoName_OnlyForeign, Api::AutoName_Yes]],
-        ['name' => 'countryAutoNameLang', 'type' =>'string'],
-    ];
+    protected function getPropertyDefinitions(): array
+    {
+        return [
+            ['name' => 'companyName1', 'type' =>'string'],
+            ['name' => 'companyName2', 'type' =>'string'],
+            ['name' => 'fullName', 'type' =>'string'],
+            ['name' => 'salutation', 'type' =>'string'],
+            ['name' => 'address1', 'type' =>'string'],
+            ['name' => 'address2', 'type' =>'string'],
+            ['name' => 'postalCode', 'type' =>'string'],
+            ['name' => 'city', 'type' =>'string'],
+            ['name' => 'country', 'type' =>'string'],
+            ['name' => 'countryCode', 'type' =>'string'],
+            ['name' => 'countryAutoName', 'type' =>'int', 'allowedValues' => [Api::AutoName_No, Api::AutoName_OnlyForeign, Api::AutoName_Yes]],
+            ['name' => 'countryAutoNameLang', 'type' =>'string'],
+        ];
+    }
 }

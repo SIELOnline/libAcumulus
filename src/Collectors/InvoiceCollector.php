@@ -267,7 +267,7 @@ abstract class InvoiceCollector extends Collector
      * @param Invoice $acumulusObject
      *  An Acumulus API invoice object.
      */
-    protected function collectLogicFields(AcumulusObject $acumulusObject): self
+    protected function collectLogicFields(AcumulusObject $acumulusObject): void
     {
         $this->setInvoiceSource($this->propertySources['invoiceSource']);
         $this->setPropertySources();
@@ -281,7 +281,6 @@ abstract class InvoiceCollector extends Collector
         $this->getInvoice($invoice);
         $this->getInvoiceLines($invoice);
         $this->getEmailAsPdf($customer->email ?? '');
-        return $this;
     }
 
     /**

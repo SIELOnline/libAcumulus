@@ -45,7 +45,7 @@ use function strlen;
  *   that tag, not by sending that tag without value.
  * Therefore:
  * - {@see AcumulusObject} and {@see AcumulusProperty} will handle not set
- *   values and empty values differently
+ *   values and empty values differently.
  * - The (magic) setters and the {@see set()} method accept an optional flag
  *   that defines how to handle overwriting already set values and if to set
  *   empty values.
@@ -68,12 +68,20 @@ abstract class AcumulusObject implements ArrayAccess
 
     public function __construct()
     {
-        foreach (static::$propertyDefinitions as $propertyDefinition) {
+        foreach ($this->getPropertyDefinitions() as $propertyDefinition) {
             $property = new AcumulusProperty($propertyDefinition);
             $this->data[$property->getName()] = $property;
         }
         $this->metadata = new MetadataCollection();
     }
+
+    /**
+     * @return array[]
+     *   An array of property definitions, a property definition being a keyed
+     *   array with keys 'name', 'type', 'required' (optional), and
+     *   'allowedValues' (optional).
+     */
+    abstract protected function getPropertyDefinitions(): array;
 
     // PHP 8.1: a read-only property suffices here.
     public function getMetadata(): MetadataCollection
@@ -127,9 +135,9 @@ abstract class AcumulusObject implements ArrayAccess
 
     /**
      * @param string $name
+     *   Method name.
      * @param array $arguments
-     *
-     * @return bool
+     *   Arguments to pass to the method call.
      *
      * @throws \RuntimeException
      *   $name is not an existing getter or setter of an

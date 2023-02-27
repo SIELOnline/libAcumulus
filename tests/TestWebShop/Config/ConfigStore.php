@@ -16,7 +16,13 @@ use Siel\Acumulus\Helpers\Util;
  */
 class ConfigStore extends BaSeConfigStore
 {
-    private string $configFile = __DIR__ . '/../../../../config/config.json';
+    private string $configDir = __DIR__ . '/../../../../config';
+    private string $configFile;
+
+    public function __construct()
+    {
+        $this->configFile = $this->configDir . '/config.json';
+    }
 
     /**
      * {@inheritdoc}

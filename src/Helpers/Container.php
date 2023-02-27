@@ -18,6 +18,7 @@ use Siel\Acumulus\ApiClient\AcumulusResult;
 use Siel\Acumulus\ApiClient\HttpRequest;
 use Siel\Acumulus\ApiClient\HttpResponse;
 use Siel\Acumulus\Collectors\CollectorInterface;
+use Siel\Acumulus\Collectors\CollectorManager;
 use Siel\Acumulus\Config\Config;
 use Siel\Acumulus\Config\ConfigStore;
 use Siel\Acumulus\Config\ConfigUpgrade;
@@ -469,6 +470,27 @@ class Container
                 $this->getLog(),
             ]
         );
+    }
+
+    /**
+     * Returns a {@see \Siel\Acumulus\Collectors\Collector} instance of the
+     * given type.
+     *
+     * @param string $type
+     *   The child type of the {@see \Siel\Acumulus\Collectors\Collector}
+     *   requested. The class name only, without namespace and without Collector
+     *   at the end.
+     */
+    public function getCollectorManager(): CollectorManager
+    {
+        $arguments = [
+            $this->getField(),
+            $this->getShopCapabilities(),
+            $this->getConfig(),
+            $this,
+            $this->getLog(),
+        ];
+        return $this->getInstance('CollectorManager', 'Collectors', $arguments);
     }
 
     /**

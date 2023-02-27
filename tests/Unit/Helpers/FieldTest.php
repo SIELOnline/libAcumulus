@@ -12,6 +12,7 @@ use Siel\Acumulus\Helpers\Container;
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Helpers\Field;
 use Siel\Acumulus\Helpers\FormRenderer;
+use Siel\Acumulus\Tests\Unit\GetTestData;
 
 /**
  * Tests for the {@see Field} class.
@@ -46,42 +47,9 @@ class FieldTest extends TestCase
      */
     private function getObjects(): array
     {
-        return [
-            'order' => json_decode('{
-                "id": 3,
-                "date": "2022-12-01",
-                "amount" : 19.95,
-                "paid": true,
-                "returned": null
-            }',false),
-            'customer' => json_decode('{
-                "id": 2,
-                "first_name": "Erwin",
-                "middle_name": "",
-                "last_name": "Derksen",
-                "address": {
-                    "id": 4,
-                    "street": "Lindelaan 4",
-                    "street2": "Achter de Linden",
-                    "postal_code": "1234 AB",
-                    "city": "Utrecht",
-                    "country_code": "NL"
-                }
-            }', false),
-            'invoice_address' => json_decode('{
-                "id": 5,
-                "street": "Stationsstraat 3",
-                "street2": "",
-                "postal_code": "4321 BA",
-                "city": "Amsterdam",
-                "country_code": "NL"
-            }', false),
-            'keyed_array' => [
-                'p1' => 'v1',
-                'p2' => 'v2',
-            ],
-        ];
+        return (array) (new GetTestData())->get();
     }
+
     public function fieldsNoFieldsProvider(): array
     {
         return [
@@ -123,8 +91,8 @@ class FieldTest extends TestCase
     {
         return [
             ['[id]', 3],
-            ['[customer::id]', 2],
-            ['[customer::address::id]', 4],
+            ['[invoiceSource::customer::id]', 2],
+            ['[invoiceSource::customer::invoice_address::id]', 4],
             ['[date]', '2022-12-01'],
             ['[amount]', 19.95],
             ['[paid]', true],
@@ -147,8 +115,8 @@ class FieldTest extends TestCase
         return [
             ['[street|street2]', 'Stationsstraat 3'],
             ['[street2|street]', 'Stationsstraat 3'],
-            ['[customer::address::street|customer::address::street2]', 'Lindelaan 4'],
-            ['[customer::address::street2|customer::address::street]', 'Achter de Linden'],
+            ['[invoiceSource::customer::invoice_address::street|invoiceSource::customer::invoice_address::street2]', 'Lindelaan 4'],
+            ['[invoiceSource::customer::invoice_address::street2|invoiceSource::customer::invoice_address::street]', 'Achter de Linden'],
         ];
     }
 
@@ -251,7 +219,7 @@ class FieldTest extends TestCase
         return [
             ['[container::language]', self::Language],
             ['[container::translator::language]', self::Language],
-            ['[container::createAcumulusObject(customer)::fullName]', null], //magic __get
+            ['[container::createAcumulusObject(address)::fullName]', null], //magic __get
             ['[container::createSource(order,10)::id]', 10], //magic __get
             ['[container::createSource(order,10)::date]', '2023-02-01'], //magic __get
         ];

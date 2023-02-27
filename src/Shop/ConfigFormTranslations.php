@@ -106,15 +106,16 @@ class ConfigFormTranslations extends TranslationCollection
         'vat_class_not_applicable' => 'niet van toepassing',
         'vat_class_left_empty' => '%1$s laat ik leeg',
 
-        'field_euVat' => 'Berekent u EU-btw',
+        'field_euVat' => 'Berekent u EU-btw?',
         'desc_euVat' => 'Geef aan of en wanneer u EU-btw berekent voor (niet btw-plichtige) EU-klanten.<br>
 • Kies de 1e optie als u die altijd, dus al vanaf het begin van het jaar, berekent.<br>
 • Kies de 2e optie als u die pas berekent zodra u de drempel passeert.<br>
 • Kies de 3e optie als u tot nu toe, en om wat voor een reden dan ook, nog geen EU-btw hebt berekend.<br>
-• LET OP: het gaat dus niet om de actuele instelling, deze waarde wordt ook gebruikt voor het versturen van gegevens van oudere facturen.<br>
-• NB1: Deze waarde wordt alleen gebruikt als er twijfel is omdat het land van de klant hetzelfde btw-tarief heeft als Nederland.<br>
-• NB2: Sinds 1 juli 2021 gelden er <a href="https://www.belastingdienst
-.nl/wps/wcm/connect/nl/btw/content/e-commerce-en-diensten-in-de-eu-kijk-wat-er-verandert-voor-de-btw-x" target="_blank">nieuwe regels en drempels voor afstandsverkopen binnen de EU</a> en vallen bijna alle goederen (en diensten) hieronder.',
+Deze waarde wordt gebruikt als er twijfel is omdat het land van de klant hetzelfde btw-tarief heeft als Nederland (bijv. België).
+Het gaat dus niet zozeer om de actuele instelling, want deze waarde wordt ook gebruikt voor het versturen van gegevens van oudere facturen.<br>
+NB: Sinds 1 juli 2021 gelden er
+<a href="https://www.belastingdienst.nl/wps/wcm/connect/nl/btw/content/e-commerce-en-diensten-in-de-eu-kijk-wat-er-verandert-voor-de-btw-x" target="_blank">
+nieuwe regels en drempels voor afstandsverkopen binnen de EU</a> en vallen bijna alle goederen (en diensten) hieronder.',
         'option_euVat_1' => 'Altijd, dus vanaf het begin van het jaar',
         'option_euVat_2' => 'Zodra wij de drempel passeren',
         'option_euVat_3' => 'Nee, nog nooit gebruikt',

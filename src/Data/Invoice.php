@@ -57,33 +57,41 @@ use Siel\Acumulus\Api;
  */
 class Invoice extends AcumulusObject
 {
-    protected static array $propertyDefinitions = [
-        ['name' => 'concept', 'type' =>'bool', 'required' => true, 'allowedValues' => [Api::Concept_No, Api::Concept_Yes]],
-        ['name' => 'conceptType', 'type' =>'string'],
-        ['name' => 'number', 'type' =>'int'],
-        [
-            'name' => 'vatType',
-            'type' => 'int',
-            'allowedValues' => [
-                Api::VatType_National,
-                Api::VatType_NationalReversed,
-                Api::VatType_EuReversed,
-                Api::VatType_RestOfWorld,
-                Api::VatType_MarginScheme,
-                Api::VatType_EuVat,
-                Api::VatType_OtherForeignVat,
+    protected function getPropertyDefinitions(): array
+    {
+        return [
+            ['name' => 'concept', 'type' => 'bool', 'required' => true, 'allowedValues' => [Api::Concept_No, Api::Concept_Yes]],
+            ['name' => 'conceptType', 'type' => 'string'],
+            ['name' => 'number', 'type' => 'int'],
+            [
+                'name' => 'vatType',
+                'type' => 'int',
+                'allowedValues' => [
+                    Api::VatType_National,
+                    Api::VatType_NationalReversed,
+                    Api::VatType_EuReversed,
+                    Api::VatType_RestOfWorld,
+                    Api::VatType_MarginScheme,
+                    Api::VatType_EuVat,
+                    Api::VatType_OtherForeignVat,
+                ],
             ],
-        ],
-        ['name' => 'issueDate', 'type' => 'date'],
-        ['name' => 'costCenter', 'type' =>'int'],
-        ['name' => 'accountNumber', 'type' =>'int'],
-        ['name' => 'paymentStatus', 'type' =>'int', 'required' => true, 'allowedValues' => [Api::PaymentStatus_Due, Api::PaymentStatus_Paid]],
-        ['name' => 'paymentDate', 'type' => 'date'],
-        ['name' => 'description', 'type' =>'string'],
-        ['name' => 'descriptionText', 'type' =>'string'],
-        ['name' => 'template', 'type' =>'int'],
-        ['name' => 'invoiceNotes', 'type' =>'string'],
-    ];
+            ['name' => 'issueDate', 'type' => 'date'],
+            ['name' => 'costCenter', 'type' => 'int'],
+            ['name' => 'accountNumber', 'type' => 'int'],
+            [
+                'name' => 'paymentStatus',
+                'type' => 'int',
+                'required' => true,
+                'allowedValues' => [Api::PaymentStatus_Due, Api::PaymentStatus_Paid]
+            ],
+            ['name' => 'paymentDate', 'type' => 'date'],
+            ['name' => 'description', 'type' => 'string'],
+            ['name' => 'descriptionText', 'type' => 'string'],
+            ['name' => 'template', 'type' => 'int'],
+            ['name' => 'invoiceNotes', 'type' => 'string'],
+        ];
+    }
 
     protected ?Customer $customer = null;
     /** @var Line[] */
@@ -95,13 +103,9 @@ class Invoice extends AcumulusObject
         return $this->customer;
     }
 
-    /**
-     * @return $this
-     */
-    public function setCustomer(Customer $customer): self
+    public function setCustomer(Customer $customer): void
     {
         $this->customer = $customer;
-        return $this;
     }
 
     /**
@@ -112,15 +116,11 @@ class Invoice extends AcumulusObject
         return $this->lines;
     }
 
-    /**
-     * @return $this
-     */
-    public function addLine(?Line $line): self
+    public function addLine(?Line $line): void
     {
         if ($line !== null) {
             $this->lines[] = $line;
         }
-        return $this;
     }
 
     public function getEmailAsPdf(): ?EmailAsPdf
@@ -128,12 +128,8 @@ class Invoice extends AcumulusObject
         return $this->emailAsPdf;
     }
 
-    /**
-     * @return $this
-     */
-    public function setEmailAsPdf(?EmailAsPdf $emailAsPdf): self
+    public function setEmailAsPdf(?EmailAsPdf $emailAsPdf): void
     {
         $this->emailAsPdf = $emailAsPdf;
-        return $this;
     }
 }

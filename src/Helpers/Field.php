@@ -50,15 +50,16 @@ use function strlen;
  * - property-specification = property-alternative('|'property-alternative)*
  * - property-alternative = space-concatenated-property('+'space-concatenated-property)*
  * - space-concatenated-property = single-property('&'single-property)*
- * - single-property = property-in-object|property-name|literal-text
+ * - single-property = property-in-object|property-name|literal-text|constant
  * - property-within-object = (object-name::)+property-name
  * - object-name = text
  * - property-name = text
  * - literal-text = "text"
+ * - constant = true|false|null
  *
  * Notes:
  * - This syntax is quite simple. The following features are not possible:
- *     - Grouping, using brackets, to override operator precedence.
+ *     - Grouping, e.g. by using brackets, to override operator precedence.
  *     - Translation of literal strings.
  *     - Lookup based on a value of a property.
  * - The parsing is quite simple: the special symbols - ], |, &, and " - cannot
@@ -163,6 +164,15 @@ class Field
      */
     protected array $objects;
     protected Log $log;
+    /**
+     * @var
+     *   Description.
+     */
+    protected const Constants = [
+        'true' => true,
+        'false' => false,
+        'null' => null,
+    ];
 
     public function __construct(Log $log)
     {
@@ -186,8 +196,13 @@ class Field
      *
      * @return mixed
      *   The pattern with variable field definitions expanded with their actual
-     *   value, which may be empty, if the properties referred to do not exist
+     *   value, which may be empty if the properties referred to do not exist
      *   or are empty themselves.
+     *   The type of the return value is either:
+     *   - The type of the property requested if $fieldDefinition contains
+     *     exactly 1 variable field definition, i.e. it begins with a '[' and
+     *     the first and only ']' is at the end.
+     *   - string otherwise.
      */
     public function expand(string $fieldDefinition, array $objects)
     {
@@ -310,11 +325,14 @@ class Field
     {
         if ($this->isLiteral($singleProperty)) {
             $type = self::TypeLiteral;
-            $value = $this->expandLiteral($singleProperty);
+            $value = $this->getLiteral($singleProperty);
         } elseif (strpos($singleProperty, '::') !== false) {
             $type = self::TypeProperty;
             $value = $this->expandPropertyInObject($singleProperty);
-        } else {
+        } elseif ($this->isConstant($singleProperty)) {
+            $type = self::TypeLiteral;
+            $value = $this->getConstant($singleProperty);
+        }else {
             $type = self::TypeProperty;
             $value = $this->expandProperty($singleProperty);
         }
@@ -327,16 +345,34 @@ class Field
     }
 
     /**
-     * Expands a literal string property.
+     * Gets a literal string property.
      *
      * - literal-text = "text"
      *
      * @return string
      *   The text between the quotes
      */
-    protected function expandLiteral(string $singleProperty): string
+    protected function getLiteral(string $singleProperty): string
     {
         return substr($singleProperty, 1, -1);
+    }
+
+    protected function isConstant(string $singleProperty): bool
+    {
+        return array_key_exists($singleProperty, static::Constants);
+    }
+
+    /**
+     * Gets a constant value.
+     *
+     * - constant-text = true|false|null
+     *
+     * @return mixed
+     *   The value of the constant, for now a bool or null.
+     */
+    protected function getConstant(string $singleProperty)
+    {
+        return static::Constants[$singleProperty];
     }
 
     /**

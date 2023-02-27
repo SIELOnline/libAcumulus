@@ -77,14 +77,14 @@ class Field extends BaseField
         return parent::expandSingleProperty($singleProperty);
     }
 
-    protected function expandLiteral(string $singleProperty): string
+    protected function getLiteral(string $singleProperty): string
     {
         $this->trace[__FUNCTION__] ??= [];
         $this->trace[__FUNCTION__][] = func_get_arg(0);
         if ($this->stopAt === __FUNCTION__) {
             return end($this->trace[__FUNCTION__]);
         }
-        return parent::expandLiteral($singleProperty);
+        return parent::getLiteral($singleProperty);
     }
 
     protected function expandPropertyInObject(string $propertyInObject)

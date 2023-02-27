@@ -11,9 +11,9 @@ use Siel\Acumulus\Data\PropertySet;
 use Siel\Acumulus\Fld;
 
 /**
- * Creates an {@see Address} object.
+ * Collects address data from the shop.
  *
- * The following properties are mapped:
+ * properties that are mapped:
  * - string $companyName1
  * - string $companyName2
  * - string $fullName
@@ -22,17 +22,21 @@ use Siel\Acumulus\Fld;
  * - string $address2
  * - string $postalCode
  * - string $city
+ * - string $countryCode (optional, if it can be mapped)
  *
- * And the following fields properties are computed using logic:
- * - string $countryCode
+ * Properties that are computed using logic:
+ * - string $countryCode (optional, if it cannot be mapped)
+ * - string $countryAutoNameLang (if the user wants to use the shop spelling)
+ * - string $country (if the user wants to use the shop spelling)
  *
- * These remaining properties are set in the completor phase as they are not
- * based on shop data, but on configuration:
- * - string $country
+ * Properties that are based on configuration and thus are not set here:
  * - int $countryAutoName
+ *
+ * Properties that are not set:
  * - string $countryAutoNameLang
+ * - string $country
  */
-abstract class AddressCollector extends Collector
+class AddressCollector extends Collector
 {
     protected function getAcumulusObjectType(): string
     {
@@ -42,14 +46,15 @@ abstract class AddressCollector extends Collector
     /**
      * @param \Siel\Acumulus\Data\Address $acumulusObject
      */
-    protected function collectLogicFields(AcumulusObject $acumulusObject): self
+    protected function collectLogicFields(AcumulusObject $acumulusObject): void
     {
-        /** @var \Siel\Acumulus\Invoice\Source $invoiceSource */
-        $invoiceSource = $this->propertySources['invoiceSource'];
-        // Set 'nl' as default country code, but overwrite with the real country
-        // code, if not empty.
-        $acumulusObject->setCountryCode('nl');
-        $acumulusObject->setCountryCode($invoiceSource->getCountryCode(), PropertySet::NotEmpty);
-        return $this;
+        if ($acumulusObject->countryCode === null) {
+            /** @var \Siel\Acumulus\Invoice\Source $invoiceSource */
+            $invoiceSource = $this->propertySources['invoiceSource'];
+            // Set 'nl' as default country code, but overwrite with the real country
+            // code, if not empty.
+            $acumulusObject->setCountryCode('nl');
+            $acumulusObject->setCountryCode($invoiceSource->getCountryCode(), PropertySet::NotEmpty);
+        }
     }
 }

@@ -13,7 +13,7 @@ use Siel\Acumulus\Data\EmailAsPdf;
 use Siel\Acumulus\Data\EmailAsPdfType;
 use Siel\Acumulus\Data\Invoice;
 use Siel\Acumulus\Helpers\Container;
-use Siel\Acumulus\Helpers\Field;
+use Siel\Acumulus\Helpers\FieldExpander;
 use Siel\Acumulus\Helpers\Log;
 use Siel\Acumulus\Invoice\Source;
 
@@ -35,16 +35,16 @@ use function array_key_exists;
  */
 class CollectorManager
 {
-    protected Field $field;
+    protected FieldExpander $fieldExpander;
     private ShopCapabilities $shopCapabilities;
     private Container $container;
     private Config $config;
     protected Log $log;
     protected array $propertySources;
 
-    public function __construct(Field $field, ShopCapabilities $shopCapabilities, Config $config, Container $container, Log $log)
+    public function __construct(FieldExpander $fieldExpander, ShopCapabilities $shopCapabilities, Config $config, Container $container, Log $log)
     {
-        $this->field = $field;
+        $this->fieldExpander = $fieldExpander;
         $this->shopCapabilities = $shopCapabilities;
         $this->container = $container;
         $this->config = $config;

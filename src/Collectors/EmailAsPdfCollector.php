@@ -35,10 +35,10 @@ class EmailAsPdfCollector extends Collector
         return $this->type;
     }
 
-    public function collect(array $propertySources, array $fieldDefinitions): AcumulusObject
+    public function collect(array $propertySources, array $fieldSpecifications): AcumulusObject
     {
-        $this->type = $fieldDefinitions['emailAsPdfType'] ?? EmailAsPdfType::Invoice;
-        return parent::collect($propertySources, $fieldDefinitions);
+        $this->type = $fieldSpecifications['emailAsPdfType'] ?? EmailAsPdfType::Invoice;
+        return parent::collect($propertySources, $fieldSpecifications);
     }
 
 }

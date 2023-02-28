@@ -21,41 +21,61 @@ use function is_string;
 use function strlen;
 
 /**
- * Contains functionality to expand a string that may contain variable fields.
+ * FieldExpander expands a field definition that can contain field mappings.
  *
- * - A variable field is a string that refers to a "property" of an "object".
- * - "Objects" are typically the shop order, an order line, the customer, an
- *   address, etc. Depending on the webshop these "objects" may actually be
- *   (keyed) arrays.
- * - "Properties" are the values of an "object", all elements that have or can
- *   return a value can be used: properties on real objects, key names on
+ * When creating an Acumulus API message, the values that go in that message
+ * can come from various sources:
+ * - Settings: e.g. always define a customer as active.
+ * - Logic: further split into "simple" mapping logic or "complex" computational
+ *   logic:
+ *   - Mappings: e.g. 'city' comes from the field 'city' from the customer's
+ *     address, or 'fullname' is the concatenation of 'first_name' and
+ *     'last_name' from the customer object.
+ *   - Complex logic: often involving navigating relations in a database, with
+ *     edge case handling, fallback values, and such.
+ * - Combination from settings and logic: e.g. based on the setting "invoice
+ *   number source", the invoice number is either defined by Acumulus, or comes
+ *   from the invoice for a given order with fallback to the order number itself
+ *   if no invoice is available.
+ *
+ * FieldExpander expands values based on a "field expansion specification":
+ * - A "field expansion specification" is a string that specifies how to
+ *   assemble the resulting value based on a mix of (possibly multiple) free
+ *   text parts and "field extraction specifications".
+ * - A "field extraction definition" is enclosed by square brackets, i.e. a '['
+ *   and a ']' and can refer to multiple properties, either as alternative
+ *   (fallback) or for concatenation.
+ * - A property specification is a specification that specifies where a value
+ *   should come from. Typically, it refers to a "property" of an "object".
+ * - "Objects" are "data structures", in our domain typically the shop order, an
+ *   order line, the customer, or an address. Depending on the webshop these
+ *   "objects" may actually be (keyed) arrays.
+ * - "Properties" are the values of these "objects", all elements that have or
+ *   can return a value can be used: properties on real objects, key names on
  *   arrays, or (getter) methods on real objects. Even methods with parameters
  *   can be used.
- * - Single properties are returned in the type they have, but as soon as
+ * - A "field expansion specification" that consists of a single property
+ *   specification is returned in the type of the property, but as soon as
  *   properties get concatenated they are converted to a string:
  *     - bool: to the string 'true' or 'false'.
- *     - null: empty string
+ *     - null: empty string.
  *     - number: string representation of the number. (@todo: precision?)
- *     - array: imploded with glue=' '.
+ *     - array: imploded with glue = ' '.
  *     - object: if the _toString() exists it will be called, otherwise
  *       {@see json_encode()} will be used.
  *
- * A variable field is recognised by enclosing the property specification within
- * square brackets, i.e. '[' and ']'.
- *
- * A variable field in its simplest form is just a property name, but to
- * cater for some special cases it can be made more complex. See the syntax
- * definition below:
- * - variable-field = '[' property-specification ']'
- * - property-specification = property-alternative('|'property-alternative)*
+ * The syntax specification below formalizes the description above:
+ * - field-expansion-specification = (free-text|'['expansion-specification']')*
+ * - free-text = text
+ * - expansion-specification = property-alternative('|'property-alternative)*
  * - property-alternative = space-concatenated-property('+'space-concatenated-property)*
  * - space-concatenated-property = single-property('&'single-property)*
  * - single-property = property-in-object|property-name|literal-text|constant
- * - property-within-object = (object-name::)+property-name
+ * - property-in-object = (object-name'::')+property-name
  * - object-name = text
  * - property-name = text
  * - literal-text = "text"
- * - constant = true|false|null
+ * - constant = 'true'|'false'|'null'  @todo: numeric constants?
  *
  * Notes:
  * - This syntax is quite simple. The following features are not possible:
@@ -72,26 +92,23 @@ use function strlen;
  *       definitions with (mostly) the same results.
  * - Alternatives are expanded left to right until a property alternative is
  *   found that is not empty.
+ * - Properties that are joined with a '+', are all expanded, where the '+' gets
+ *   replaced with a space if and only if the property directly following it,
+ *   is not empty (and we already have a non-empty intermediate result).
+ * - Properties that are joined with a '&', are all expanded and concatenated
+ *   directly, thus not with a space between them like with a '+'.
+ * - Literal text that is joined with "real" properties using '&' or '+' only
+ *   gets returned when at least 1 of the "real" properties have a non-empty
+ *   value. (Otherwise, you could just place it outside the variable-field
+ *   definition.)
  *
- * Example 1:
+ * Example 1: Alternatives:
  * <pre>
  *   $propertySpec = sku|ean|isbn; sku = ''; ean = 'Hello'; isbn = 'World';
  *   Result: 'Hello'
  * </pre>
  *
- * Properties that are joined with a + in between them, are all expanded, where
- * the + gets replaced with a space if and only if the property directly
- * following it, is not empty. (and we already have a non-empty intermediate
- * result).
- *
- * Properties that are joined with a & in between them, are all expanded and
- * concatenated directly, thus not with a space between them like with a +.
- *
- * Literal text that is joined with "real" properties using & or + only gets
- * returned when at least 1 of the "real" properties have a non-empty value.
- * (Otherwise, you can just place it outside the variable-field definition.)
- *
- * Example 2:
+ * Example 2: Concatenation, with ot without space:
  * <pre>
  *   first = 'John'; middle = ''; last = 'Doe';
  *   $propertySpec1 = [first] [middle] [last];
@@ -108,21 +125,32 @@ use function strlen;
  *   Result6: 'For Doe'
  * </pre>
  *
- * A full property name may contain the "object" name followed by :: to
- * distinguish it from the "property" name itself, to allow specifying which
+ * A full property name may contain the "object" name followed by '::' to
+ * distinguish it from the "property" name itself. This allows specifying which
  * object the property should be taken from. This is useful when multiple
- * "objects" have some equally named "properties".
+ * "objects" have some equally named "properties" (e.g. 'id'). This also allows
+ * to travers deeper into related objects, in which case this syntax is a
+ * necessity, as plain properties are only searched for in the "top level"
+ * "objects".
  *
  * Example 3:
  * <pre>
  *   objects = [
- *     'order => Order(id = 3, date_created = 2016-02-03, ...),
- *     'customer' => Customer(id = 5, date_created = 2016-01-01, name = 'Doe', ...),
+ *     'order => (id = 3, date_created = 2016-02-03, ...),
+ *     'customer' => (id = 5, date_created = 2016-01-01, name = 'Doe',
+ *       address => (street = 'Kalverstraat', number = '7', city = 'Amsterdam', ...),
+ *       ...
+ *     ),
  *    ];
  *   $pattern1 = '[id] [date_created] [name]'
  *   $pattern2 = '[customer::id] [customer::date_created] [name]'
- *   Result1: '3 2016-01-01 Doe'
+ *   $pattern3 = '[customer::address::street+customer::address::number]'
+ *   $pattern4 = '[street+number]'
+ *
+ *   Result1: '3 2016-02-03 Doe'
  *   Result2: '5 2016-01-01 Doe'
+ *   Result3: 'Kalverstraat 7'
+ *   Result4: ''
  * </pre>
  *
  * A property name should:
@@ -144,10 +172,17 @@ use function strlen;
  * - A {@see is_callable() callable}, in which case the callable is called with
  *   the property name passed as argument. No known usages anymore.
  */
-class Field
+class FieldExpander
 {
     protected const TypeLiteral = 1;
     protected const TypeProperty = 2;
+    protected const Constants = [
+        'true' => true,
+        'false' => false,
+        'null' => null,
+    ];
+
+    protected Log $log;
 
     /**
      * @var array
@@ -158,21 +193,11 @@ class Field
      *   objects like customer, shipping address, order line, credit note, ...,
      *   "Objects" can be objects or arrays.
      *   Internally, we see this list of "objects" as a super "object"
-     *   containing all "objects" as (named) properties. in this sense it
-     *   facilitates the recursive search algorithm when searching for a
-     *   variable field object1::object2::property.
+     *   containing all "objects" as (named) properties. In this sense it
+     *   facilitates the recursive search algorithm when searching for a mapping
+     *   like object1::object2::property.
      */
     protected array $objects;
-    protected Log $log;
-    /**
-     * @var
-     *   Description.
-     */
-    protected const Constants = [
-        'true' => true,
-        'false' => false,
-        'null' => null,
-    ];
 
     public function __construct(Log $log)
     {
@@ -180,14 +205,14 @@ class Field
     }
 
     /**
-     * Expands a string that can contain variable fields.
+     * Extracts a value based on the field mapping.
      *
-     * Variable fields are found using a regular expression. Each variable field
-     * definition is expanded by searching the given "objects" for the
-     * referenced property or properties.
+     * Mapping definitions are found using a regular expression. Each mapping
+     * is expanded by searching the given "objects" for the referenced property
+     * or properties.
      *
-     * @param string $fieldDefinition
-     *   The field definition to expand.
+     * @param string $fieldSpecification
+     *   The field expansion specification.
      * @param array $objects
      *   The "objects" to search for the properties that are referenced in the
      *   variable field parts. The key indicates the name of the "object",
@@ -195,27 +220,27 @@ class Field
      *   variable name typically used in the shop software.
      *
      * @return mixed
-     *   The pattern with variable field definitions expanded with their actual
-     *   value, which may be empty if the properties referred to do not exist
-     *   or are empty themselves.
+     *   The expanded field expansion specification, which may be empty if the
+     *   properties referred to do not exist or are empty themselves.
+     *
      *   The type of the return value is either:
-     *   - The type of the property requested if $fieldDefinition contains
-     *     exactly 1 variable field definition, i.e. it begins with a '[' and
+     *   - The type of the property requested if $fieldSpecification contains
+     *     exactly 1 variable field specification, i.e. it begins with a '[' and
      *     the first and only ']' is at the end.
      *   - string otherwise.
      */
-    public function expand(string $fieldDefinition, array $objects)
+    public function expand(string $fieldSpecification, array $objects)
     {
         $this->objects = $objects;
-        // If the definition is exactly 1 variable field definition we return
-        // the direct result of {@see expandVariableField()} so that the type
-        // may be retained.
-        if (strncmp($fieldDefinition, '[', 1) === 0
-            && strpos($fieldDefinition, ']') === strlen($fieldDefinition) - 1
+        // If the specification contains exactly 1 field expansion specification
+        // we return the direct result of {@see extractField()} so that the type
+        // of that property is retained.
+        if (strncmp($fieldSpecification, '[', 1) === 0
+            && strpos($fieldSpecification, ']') === strlen($fieldSpecification) - 1
         ) {
-            return $this->expandVariableField(substr($fieldDefinition, 1, -1));
+            return $this->expandSpecification(substr($fieldSpecification, 1, -1));
         } else {
-            return preg_replace_callback('/\[([^]]+)]/', [$this, 'variableFieldMatch'], $fieldDefinition);
+            return preg_replace_callback('/\[([^]]+)]/', [$this, 'expansionSpecificationMatch'], $fieldSpecification);
         }
     }
 
@@ -223,7 +248,7 @@ class Field
      * Expands a single variable field definition.
      *
      * This is the callback for preg_replace_callback() in {@see expand()}.
-     * This callback expands the variable field definition found in $matches[1].
+     * This callback expands the expansion specification found in $matches[1].
      *
      * @param array $matches
      *   Array containing match information, $matches[0] contains the match
@@ -231,12 +256,11 @@ class Field
      *   and ].
      *
      * @return string
-     *   The expanded value for this token. The return value may be a scalar
-     *   (numeric type) that can be converted to a string.
+     *   The expanded value (converted to a string if necessary).
      */
-    protected function variableFieldMatch(array $matches): string
+    protected function expansionSpecificationMatch(array $matches): string
     {
-        $expandedValue = $this->expandVariableField($matches[1]);
+        $expandedValue = $this->expandSpecification($matches[1]);
         if(!is_string($expandedValue)) {
             $expandedValue = $this->valueToString($expandedValue);
         }
@@ -244,24 +268,23 @@ class Field
     }
 
     /**
-     * Expands a variable field definition.
+     * Expands a single "expansion-specification".
      *
-     * - variable-field = '[' property-specification ']'
-     * - property-specification = property-alternative('|'property-alternative)*
+     * - expansion-specification = property-alternative('|'property-alternative)*
      *
      * The first alternative resulting in a non-empty value is returned.
      *
-     * @param string $variableField
-     *   The variable field to expand (without [ and ]).
+     * @param string $expansionSpecification
+     *   The specification to expand (without [ and ]).
      *
      * @return mixed
-     *   The expanded value of the variable field. This may result in null or
-     *   the empty string if the referenced property(ies) are (all) empty.
+     *   The expanded value of the specification. This may result in null or the
+     *   empty string if the referenced property(ies) is (are all) empty.
      */
-    protected function expandVariableField(string $variableField)
+    protected function expandSpecification(string $expansionSpecification)
     {
         $value = null;
-        $propertyAlternatives = explode('|', $variableField);
+        $propertyAlternatives = explode('|', $expansionSpecification);
         foreach ($propertyAlternatives as $propertyAlternative) {
             $value = $this->expandAlternative($propertyAlternative);
             // Stop as soon as an alternative resulted in a non-empty value.
@@ -271,7 +294,7 @@ class Field
         }
 
         if ($value === null || $value === '') {
-            $this->log->debug("Field::expandVariableField('%s'): not found", $variableField);
+            $this->log->debug("Field::expandSpecification('%s'): not found", $expansionSpecification);
         }
 
         return $value;
@@ -298,6 +321,13 @@ class Field
      * Expands a space concatenated property.
      *
      * - space-concatenated-property = single-property('&'single-property)*
+     *
+     * @return array
+     *   Returns an array with 2 keys:
+     *   - 'type' = self:: TypeLiteral or self::TypeProperty
+     *   - 'value': the value of the single space-concatenated-property.
+     *     If this space-concatenated-property contains exactly 1 single
+     *     property, the type of this value is that of the single property.
      */
     protected function expandSpaceConcatenatedProperty(string $spaceConcatenatedProperty): array
     {
@@ -319,20 +349,23 @@ class Field
      * - literal-text = "text"
      *
      * @return array
-     *   A keyed array with 2 keys: 'value' and 'type'.
+     *   Returns an array with 2 keys:
+     *   - 'type' = self:: TypeLiteral or self::TypeProperty
+     *   - 'value': the value of a single-property.
+     *     The type of this value is that of the single property.
      */
     protected function expandSingleProperty(string $singleProperty): array
     {
         if ($this->isLiteral($singleProperty)) {
             $type = self::TypeLiteral;
             $value = $this->getLiteral($singleProperty);
-        } elseif (strpos($singleProperty, '::') !== false) {
-            $type = self::TypeProperty;
-            $value = $this->expandPropertyInObject($singleProperty);
         } elseif ($this->isConstant($singleProperty)) {
             $type = self::TypeLiteral;
             $value = $this->getConstant($singleProperty);
-        }else {
+        } elseif (strpos($singleProperty, '::') !== false) {
+            $type = self::TypeProperty;
+            $value = $this->expandPropertyInObject($singleProperty);
+        } else {
             $type = self::TypeProperty;
             $value = $this->expandProperty($singleProperty);
         }
@@ -365,10 +398,10 @@ class Field
     /**
      * Gets a constant value.
      *
-     * - constant-text = true|false|null
+     * - constant-text = 'true'|'false'|'null'
      *
      * @return mixed
-     *   The value of the constant, for now a bool or null.
+     *   The value 'implied' by the constant, for now a bool or null.
      */
     protected function getConstant(string $singleProperty)
     {
@@ -562,8 +595,12 @@ class Field
      *   A list of type-value pairs.
      *
      * @return array
-     *   Returns a type-value pair containing as value a string representation
-     *   of all the values with the glue string between each value.
+     *   Returns an array with 2 keys:
+     *   - 'type' = self:: TypeLiteral or self::TypeProperty
+     *   - 'value': the concatenation of all the values with the glue string
+     *     between each value. If $values contains exactly 1 value, that value
+     *     is returned unaltered. So the type of this value is not necessarily a
+     *     string.
      */
     protected function implodeValues(string $glue, array $values): array
     {

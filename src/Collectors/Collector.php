@@ -7,7 +7,7 @@ namespace Siel\Acumulus\Collectors;
 use Siel\Acumulus\Data\AcumulusObject;
 use Siel\Acumulus\Data\PropertySet;
 use Siel\Acumulus\Helpers\Container;
-use Siel\Acumulus\Helpers\Field;
+use Siel\Acumulus\Helpers\FieldExpander;
 
 use Siel\Acumulus\Helpers\Log;
 
@@ -31,15 +31,15 @@ use function is_string;
  */
 abstract class Collector implements CollectorInterface
 {
-    private Field $field;
+    private FieldExpander $fieldExpander;
     private Container $container;
     protected Log $log;
 
     protected array $propertySources;
 
-    public function __construct(Field $field, Container $container, Log $log)
+    public function __construct(FieldExpander $fieldExpander, Container $container, Log $log)
     {
-        $this->field = $field;
+        $this->fieldExpander = $fieldExpander;
         $this->container = $container;
         $this->log = $log;
     }
@@ -59,9 +59,9 @@ abstract class Collector implements CollectorInterface
         return $this->container;
     }
 
-    protected function getField(): Field
+    protected function getFieldExpander(): FieldExpander
     {
-        return $this->field;
+        return $this->fieldExpander;
     }
 
     /**
@@ -81,11 +81,11 @@ abstract class Collector implements CollectorInterface
      *   and data models of the host environment to get the (missing) values for
      *   the fields of the target {@see \Siel\Acumulus\Data\AcumulusObject}.
      */
-    public function collect(array $propertySources, array $fieldDefinitions): AcumulusObject
+    public function collect(array $propertySources, array $fieldSpecifications): AcumulusObject
     {
         $this->propertySources = $propertySources;
         $acumulusObject = $this->createAcumulusObject();
-        $this->collectMappedFields($acumulusObject, $fieldDefinitions);
+        $this->collectMappedFields($acumulusObject, $fieldSpecifications);
         $this->collectLogicFields($acumulusObject);
         return $acumulusObject;
     }
@@ -93,13 +93,13 @@ abstract class Collector implements CollectorInterface
     /**
      * Collects the fields that can be extracted using simple field mappings.
      *
-     * @param string[] $fieldMappings
-     *   A set of field mapping definitions to fill properties of the
+     * @param string[] $fieldSpecifications
+     *   A set of field mapping specifications to fill properties of the
      *   $acumulusObject with.
      */
-    protected function collectMappedFields(AcumulusObject $acumulusObject, array $fieldMappings): void
+    protected function collectMappedFields(AcumulusObject $acumulusObject, array $fieldSpecifications): void
     {
-        foreach ($fieldMappings as $field => $pattern) {
+        foreach ($fieldSpecifications as $field => $pattern) {
             if ($acumulusObject->isProperty($field)) {
                 $this->expandAndSet($acumulusObject, $field, $pattern);
             } else {
@@ -156,21 +156,20 @@ abstract class Collector implements CollectorInterface
     }
 
     /**
-     * Wrapper method around {@see Field::expand()}.
+     * Wrapper method around {@see FieldExpander::expand()}.
      *
      * The values of variables in $pattern are taken from one of the property
      * sources known to this collector.
      *
-     * @param string $pattern
-     *  The value that may contain field references.
+     * @param string $fieldSpecification
+     *  A field specification that may contain field mappings.
      *
      * @return mixed
-     *   The pattern with variable field definitions expanded with their actual
-     *   value, which may be empty if the properties referred to do not exist
-     *   or are empty themselves.
+     *   The expanded field specification, which may be empty if the properties
+     *   referred to do not exist or are empty themselves.
      */
-    protected function expand(string $pattern)
+    protected function expand(string $fieldSpecification)
     {
-        return $this->getField()->expand($pattern, $this->propertySources);
+        return $this->getFieldExpander()->expand($fieldSpecification, $this->propertySources);
     }
 }

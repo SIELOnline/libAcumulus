@@ -329,9 +329,9 @@ class Container
         return $this->getInstance('Token', 'Helpers', [$this->getLog()]);
     }
 
-    public function getField(): Field
+    public function getFieldExpander(): FieldExpander
     {
-        return $this->getInstance('Field', 'Helpers', [$this->getLog()]);
+        return $this->getInstance('FieldExpander', 'Helpers', [$this->getLog()]);
     }
 
     public function getFormHelper(): FormHelper
@@ -484,7 +484,7 @@ class Container
     public function getCollectorManager(): CollectorManager
     {
         $arguments = [
-            $this->getField(),
+            $this->getFieldExpander(),
             $this->getShopCapabilities(),
             $this->getConfig(),
             $this,
@@ -505,7 +505,7 @@ class Container
     public function getCollector(string $type): CollectorInterface
     {
         $arguments = [
-            $this->getField(),
+            $this->getFieldExpander(),
             $this,
             $this->getLog(),
         ];

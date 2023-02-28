@@ -10,11 +10,11 @@ namespace Siel\Acumulus\Tests\Unit\Helpers;
 
 use PHPUnit\Framework\TestCase;
 use Siel\Acumulus\Helpers\Container;
-use Siel\Acumulus\Tests\TestWebShop\TestDoubles\Helpers\Field;
+use Siel\Acumulus\Tests\TestWebShop\TestDoubles\Helpers\FieldExpander;
 
 /**
  * FieldParsingTest tests the - internal - parsing mechanisms of the
- * {@see \Siel\Acumulus\Helpers\Field} Class.
+ * {@see \Siel\Acumulus\Helpers\FieldExpander} Class.
  *
  * These tests indicate that, if the tests with more basic field definitions
  * succeed, more complex field definitions with multiple occurrences of multiple
@@ -42,11 +42,11 @@ class FieldParsingTest extends TestCase
     /**
      * @dataProvider fieldsProvider1
      */
-    public function testExpandNoVariableFields(string $field): void
+    public function testExpandNoExpansionSpecifications(string $field): void
     {
         $log = self::$container->getLog();
-        $stopAt = 'expandVariableField';
-        $vf = new Field($log, $stopAt);
+        $stopAt = 'expandSpecification';
+        $vf = new FieldExpander($log, $stopAt);
         $result = $vf->expand($field, []);
         $this->assertSame($field, $result);
         $this->assertEmpty($vf->trace);
@@ -65,11 +65,11 @@ class FieldParsingTest extends TestCase
     /**
      * @dataProvider fieldsProvider2
      */
-    public function testExpand1VariableField(string $field, string $match): void
+    public function testExpand1ExpansionSpecification(string $field, string $match): void
     {
         $log = self::$container->getLog();
-        $stopAt = 'expandVariableField';
-        $vf = new Field($log, $stopAt);
+        $stopAt = 'expandSpecification';
+        $vf = new FieldExpander($log, $stopAt);
         /** @noinspection PhpUnusedLocalVariableInspection */
         $result = $vf->expand($field, []);
         $this->assertCount(1, $vf->trace[$stopAt]);
@@ -89,11 +89,11 @@ class FieldParsingTest extends TestCase
     /**
      * @dataProvider fieldsProvider3
      */
-    public function testExpandMultipleVariableFields(string $field, array $parts): void
+    public function testExpandMultipleExpansionSpecifications(string $field, array $parts): void
     {
         $log = self::$container->getLog();
-        $stopAt = 'expandVariableField';
-        $vf = new Field($log, $stopAt);
+        $stopAt = 'expandSpecification';
+        $vf = new FieldExpander($log, $stopAt);
         /** @noinspection PhpUnusedLocalVariableInspection */
         $result = $vf->expand($field, []);
         $this->assertEqualsCanonicalizing($parts, $vf->trace[$stopAt]);
@@ -114,7 +114,7 @@ class FieldParsingTest extends TestCase
     {
         $log = self::$container->getLog();
         $stopAt = 'expandAlternative';
-        $vf = new Field($log, $stopAt);
+        $vf = new FieldExpander($log, $stopAt);
         /** @noinspection PhpUnusedLocalVariableInspection */
         $result = $vf->expand($field, []);
         $this->assertEqualsCanonicalizing($parts, $vf->trace[$stopAt]);
@@ -136,7 +136,7 @@ class FieldParsingTest extends TestCase
     {
         $log = self::$container->getLog();
         $stopAt = 'expandSpaceConcatenatedProperty';
-        $vf = new Field($log, $stopAt);
+        $vf = new FieldExpander($log, $stopAt);
         /** @noinspection PhpUnusedLocalVariableInspection */
         $result = $vf->expand($field, []);
         $this->assertEqualsCanonicalizing($parts, $vf->trace[$stopAt]);
@@ -158,7 +158,7 @@ class FieldParsingTest extends TestCase
     {
         $log = self::$container->getLog();
         $stopAt = 'expandSingleProperty';
-        $vf = new Field($log, $stopAt);
+        $vf = new FieldExpander($log, $stopAt);
         /** @noinspection PhpUnusedLocalVariableInspection */
         $result = $vf->expand($field, []);
         $this->assertEqualsCanonicalizing($parts, $vf->trace[$stopAt]);
@@ -182,7 +182,7 @@ class FieldParsingTest extends TestCase
     {
         $log = self::$container->getLog();
         $stopAt = '';
-        $vf = new Field($log, $stopAt);
+        $vf = new FieldExpander($log, $stopAt);
         /** @noinspection PhpUnusedLocalVariableInspection */
         $result = $vf->expand($field, []);
         $this->assertEqualsCanonicalizing($propertiesInObject, $vf->trace['expandPropertyInObject']);

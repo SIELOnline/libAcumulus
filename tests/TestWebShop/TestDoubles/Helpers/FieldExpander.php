@@ -8,14 +8,13 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\Tests\TestWebShop\TestDoubles\Helpers;
 
-use Siel\Acumulus\Helpers\Field as BaseField;
+use Siel\Acumulus\Helpers\FieldExpander as BaseFieldExpander;
 use Siel\Acumulus\Helpers\Log;
 
 /**
- * Extends the real variable field expander to allow to inspect intermediate
- * results.
+ * Extends the real field expander to allow to inspect intermediate results.
  */
-class Field extends BaseField
+class FieldExpander extends BaseFieldExpander
 {
     public string $stopAt;
     public array $trace;
@@ -27,24 +26,24 @@ class Field extends BaseField
         $this->trace = [];
     }
 
-    protected function variableFieldMatch(array $matches): string
+    protected function expansionSpecificationMatch(array $matches): string
     {
         $this->trace[__FUNCTION__] ??= [];
         $this->trace[__FUNCTION__][] = $matches[1];
         if ($this->stopAt === __FUNCTION__) {
             return end($this->trace[__FUNCTION__]);
         }
-        return parent::variableFieldMatch($matches);
+        return parent::expansionSpecificationMatch($matches);
     }
 
-    protected function expandVariableField(string $variableField)
+    protected function expandSpecification(string $expansionSpecification)
     {
         $this->trace[__FUNCTION__] ??= [];
         $this->trace[__FUNCTION__][] = func_get_arg(0);
         if ($this->stopAt === __FUNCTION__) {
             return end($this->trace[__FUNCTION__]);
         }
-        return parent::expandVariableField($variableField);
+        return parent::expandSpecification($expansionSpecification);
     }
 
     protected function expandAlternative(string $propertyAlternative)

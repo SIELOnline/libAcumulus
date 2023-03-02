@@ -605,6 +605,17 @@ class Config
     }
 
     /**
+     * Returns all mappings (overridden via configuration)
+     *
+     * @return array
+     *   Description.
+     */
+    public function getMappings(): array
+    {
+        return $this->get('mappings');
+    }
+
+    /**
      * Get all settings belonging to the same group.
      *
      * @param string $group

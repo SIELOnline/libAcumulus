@@ -3,9 +3,15 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our own code.
 
-7.6.5 (2023-??-??)
+8.0.0 (2023-03-??)
 ------------------
-bugs:
+Refactorings:
+- Renamed getShopDefaults to getDefaultShopConfig.
+
+
+7.6.5 (2023-03-??)
+------------------
+Bugs:
 - PS: Wrong conversion specification in sprintf() in AcumulusEntryManager::insert.
 - WC: PHP Fatal error: declaration of WooCommerce\FormHelper::getMeta() must be compatible
   with parent definition.

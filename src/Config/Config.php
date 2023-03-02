@@ -659,7 +659,7 @@ class Config
      */
     protected function getShopDefaults(): array
     {
-        return $this->getShopCapabilities()->getShopDefaults();
+        return $this->getShopCapabilities()->getDefaultShopConfig();
     }
 
     /**

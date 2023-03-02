@@ -188,7 +188,7 @@ class ShopCapabilities extends ShopCapabilitiesBase
     /**
      * {@inheritdoc}
      */
-    public function getShopDefaults(): array
+    public function getDefaultShopConfig(): array
     {
         // @todo: fill in the appropriate property names, remove a line when no appropriate default exists.
         // @todo: ensure that all these objects are defined in the method getTokenInfoShopProperties() above.

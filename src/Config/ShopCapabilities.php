@@ -63,7 +63,7 @@ abstract class ShopCapabilities
      * more info about the possible options to define combinations or a
      * selection of various tokens.
      */
-    abstract public function getShopDefaults(): array;
+    abstract public function getDefaultShopConfig(): array;
 
     /**
      * Returns a list with the shop specific token info.

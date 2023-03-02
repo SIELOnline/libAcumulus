@@ -13,7 +13,7 @@ use function count;
 use function is_array;
 
 /**
- * WC3 override of Token.
+ * WC override of Token.
  */
 class Token extends BaseToken
 {
@@ -96,13 +96,13 @@ class Token extends BaseToken
      *   The name of the property to search for. May be with or without a
      *   leading underscore.
      *
-     * @return null|string
-     *   The value for the property of the given name, or null or the empty
-     *   string if not available (or the property really equals null or the
+     * @return mixed
+     *   The value for the metadata of the given name, or null or the empty
+     *   string if not available (or the metadata really equals null or the
      *   empty string). The return value may be a scalar (numeric type) that can
      *   be converted to a string.
      */
-    protected function getMetaDataValue(array $metaData, string $property): ?string
+    protected function getMetaDataValue(array $metaData, string $property)
     {
         $property = ltrim($property, '_');
         $value = null;

@@ -7,10 +7,12 @@ This file contains a historical overview of changes in our own code.
 ------------------
 bugs:
 - PS: Wrong conversion specification in sprintf() in AcumulusEntryManager::insert.
-- WC: PHP Fatal error: declaration of WooCommerce\FormHelper::getMeta() must be compatible
-  with parent definition.
 - JOO4: Call to undefined method Joomla\CMS\Installer\Adapter\ComponentAdapter::get(),
   Extension Update: Custom install routine failure.
+- WC: PHP Fatal error: declaration of WooCommerce\FormHelper::getMeta() must be compatible
+  with parent definition.
+- WC: TypeError: Return value of Siel\Acumulus\WooCommerce\Helpers\Token::getMetaDataValue()
+  must be of the type string or null, bool returned.
 
 
 7.6.4 (2023-02-07) (MA+PS only)

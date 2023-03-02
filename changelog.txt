@@ -3,8 +3,8 @@ Changelog Acumulus web shop extensions
 
 This file contains a historical overview of changes in our own code.
 
-7.6.5 (2023-??-??)
-------------------
+7.6.5 (2023-03-02) (JOO+PS+WC)
+------------------------------
 bugs:
 - PS: Wrong conversion specification in sprintf() in AcumulusEntryManager::insert.
 - JOO4: Call to undefined method Joomla\CMS\Installer\Adapter\ComponentAdapter::get(),

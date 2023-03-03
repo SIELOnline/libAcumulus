@@ -23,7 +23,6 @@ use function strlen;
  * 'shop_order' and 'shop_order_refund'. The base class for all these types of
  * orders is WC_Abstract_Order
  *
- * @property WC_Order|WC_Order_Refund $shopSource
  * @method WC_Order|WC_Order_Refund getShopSource()
  */
 class Source extends BaseSource
@@ -36,11 +35,9 @@ class Source extends BaseSource
      */
     protected function setShopSource(): void
     {
-        $this->shopSource = WC()->order_factory::get_order($this->id);
+        $this->shopSource = WC()->order_factory::get_order($this->getId());
         if (!is_object($this->shopSource)) {
             throw new RuntimeException("Not a valid source id ({$this->id})");
-//            $this->source = null;
-//            $this->id = null;
         }
     }
 
@@ -53,11 +50,9 @@ class Source extends BaseSource
     protected function setId(): void
     {
         if (!$this->shopSource instanceof WC_Abstract_Order) {
-            throw new RuntimeException('Not a WC_Abstract_Order');
-//            $this->source = null;
-//            $this->id = null;
+            throw new RuntimeException('Not a WC_Abstract_Order (' . get_debug_type($this->shopSource) . ')');
         }
-        $this->id = $this->shopSource->get_id();
+        $this->id = $this->getShopSource()->get_id();
     }
 
     /**
@@ -83,7 +78,7 @@ class Source extends BaseSource
     public function getDate(): string
     {
         // get_date_created() returns a WC_DateTime which has a _toString() method.
-        return substr((string) $this->shopSource->get_date_created(), 0, strlen('2000-01-01'));
+        return substr((string) $this->getShopSource()->get_date_created(), 0, strlen('2000-01-01'));
     }
 
     /**
@@ -91,7 +86,7 @@ class Source extends BaseSource
      */
     public function getStatus(): string
     {
-        return $this->shopSource->get_status();
+        return $this->getShopSource()->get_status();
     }
 
     /**
@@ -119,7 +114,7 @@ class Source extends BaseSource
      */
     protected function getPaymentStatusOrder(): int
     {
-        return $this->shopSource->is_paid() ? Api::PaymentStatus_Paid : Api::PaymentStatus_Due;
+        return $this->getShopSource()->is_paid() ? Api::PaymentStatus_Paid : Api::PaymentStatus_Due;
     }
 
     /**
@@ -149,7 +144,7 @@ class Source extends BaseSource
     protected function getPaymentDateOrder(): string
     {
         // get_date_paid() returns a WC_DateTime which has a _toString() method.
-        return substr((string) $this->shopSource->get_date_paid(), 0, strlen('2000-01-01'));
+        return substr((string) $this->getShopSource()->get_date_paid(), 0, strlen('2000-01-01'));
     }
 
     /**
@@ -164,7 +159,7 @@ class Source extends BaseSource
     protected function getPaymentDateCreditNote(): string
     {
         // get_date_modified() returns a WC_DateTime which has a _toString() method.
-        return substr((string) $this->shopSource->get_date_modified(), 0, strlen('2000-01-01'));
+        return substr((string) $this->getShopSource()->get_date_modified(), 0, strlen('2000-01-01'));
     }
 
     /**
@@ -219,8 +214,8 @@ class Source extends BaseSource
     protected function getAvailableTotals(): array
     {
         return [
-            Meta::InvoiceAmountInc => (float) $this->shopSource->get_total(),
-            Meta::InvoiceVatAmount => (float) $this->shopSource->get_total_tax(),
+            Meta::InvoiceAmountInc => (float) $this->getShopSource()->get_total(),
+            Meta::InvoiceVatAmount => (float) $this->getShopSource()->get_total_tax(),
         ];
     }
 

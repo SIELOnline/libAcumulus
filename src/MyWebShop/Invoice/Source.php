@@ -58,7 +58,7 @@ class Source extends BaseSource
     protected function setId(): void
     {
         // @todo: set the id, given a loaded source.
-        $this->id = (int) $this->shopSource->id;
+        $this->id = (int) $this->getShopSource()->id;
     }
 
     /**
@@ -108,7 +108,7 @@ class Source extends BaseSource
     {
         // @todo: override or implement both getPaymentStatusOrder() and getPaymentStatusCreditNote()
         // Assumption: credit slips are always in a paid status.
-        if (($this->getType() === Source::Order && $this->shopSource->hasBeenPaid()) || $this->getType() === Source::CreditNote) {
+        if (($this->getType() === Source::Order && $this->getShopSource()->hasBeenPaid()) || $this->getType() === Source::CreditNote) {
             $result = Api::PaymentStatus_Paid;
         } else {
             $result = Api::PaymentStatus_Due;
@@ -142,8 +142,8 @@ class Source extends BaseSource
     {
         // @todo: provide implementation.
         $result = [
-            Meta::Currency => $this->shopSource->currency_code,
-            Meta::CurrencyRate => (float) $this->shopSource->conversion_rate,
+            Meta::Currency => $this->getShopSource()->currency_code,
+            Meta::CurrencyRate => (float) $this->getShopSource()->conversion_rate,
             Meta::CurrencyDoConvert => true,
         ];
         return $result;

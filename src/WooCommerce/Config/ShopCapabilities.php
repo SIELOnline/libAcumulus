@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Siel\Acumulus\WooCommerce\Config;
 
+use Siel\Acumulus\Config\Mappings;
 use Siel\Acumulus\Config\ShopCapabilities as ShopCapabilitiesBase;
 use Siel\Acumulus\Config\Config;
 use WC_Tax;
@@ -251,6 +252,32 @@ class ShopCapabilities extends ShopCapabilitiesBase
         ];
     }
 
+    public function getDefaultShopMappings(): array
+    {
+        return [
+            Mappings::Customer => [
+            // Customer defaults.
+            //legacy: 'contactYourId' => '[customer_user]', // WC_Abstract_order
+            'contactYourId' => '[source::customer_id]', // WC_Abstract_order
+            'vatNumber' => '[billing_vat_number|_vat_number|vat_number|VAT Number]', // Post meta
+            'telephone' => '[billing_phone]', // WC_Abstract_order
+            'email' => '[billing_email]', // WC_Abstract_order
+],
+            // Address line
+            'companyName1' => '[billing_company]', // WC_Abstract_order
+            'fullName' => '[billing_first_name+billing_last_name]', // WC_Abstract_order
+            'address1' => '[billing_address_1]', // WC_Abstract_order
+            'address2' => '[billing_address_2]', // WC_Abstract_order
+            'postalCode' => '[billing_postcode]', // WC_Abstract_order
+            'city' => '[billing_city]', // WC_Abstract_order
+
+            // Invoice lines defaults.
+            'itemNumber' => '[sku]',
+            'productName' => '[name]',
+            'costPrice' => '[cost_price]',
+
+        ];
+    }
     /**
      * {@inheritdoc}
      */

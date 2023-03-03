@@ -28,7 +28,7 @@ class Source extends BaseSource
     {
         /** @var hikashopOrderClass $class */
         $class = hikashop_get('class.order');
-        $this->shopSource = $class->loadFullOrder($this->id, true, false);
+        $this->shopSource = $class->loadFullOrder($this->getId(), true, false);
     }
 
     /**
@@ -38,7 +38,7 @@ class Source extends BaseSource
      */
     protected function setIdOrder(): void
     {
-        $this->id = $this->shopSource->order_id;
+        $this->id = $this->getShopSource()->order_id;
     }
 
     /**
@@ -46,7 +46,7 @@ class Source extends BaseSource
      */
     public function getReference()
     {
-        return $this->shopSource->order_number;
+        return $this->getShopSource()->order_number;
     }
 
     /**
@@ -54,7 +54,7 @@ class Source extends BaseSource
      */
     public function getDate(): string
     {
-        return date(Api::DateFormat_Iso, $this->shopSource->order_created);
+        return date(Api::DateFormat_Iso, $this->getShopSource()->order_created);
     }
 
     /**
@@ -64,7 +64,7 @@ class Source extends BaseSource
      */
     public function getStatus(): string
     {
-        return $this->shopSource->order_status;
+        return $this->getShopSource()->order_status;
     }
 
     /**
@@ -74,7 +74,7 @@ class Source extends BaseSource
      */
     public function getPaymentMethod()
     {
-        return $this->shopSource->order_payment_id ?? parent::getPaymentMethod();
+        return $this->getShopSource()->order_payment_id ?? parent::getPaymentMethod();
     }
 
     /**
@@ -85,7 +85,7 @@ class Source extends BaseSource
         /** @var \hikashopConfigClass $config */
         $config = hikashop_config();
         $unpaidStatuses = explode(',', $config->get('order_unpaid_statuses', 'created'));
-        return in_array($this->shopSource->order_status, $unpaidStatuses, true)
+        return in_array($this->getShopSource()->order_status, $unpaidStatuses, true)
             ? Api::PaymentStatus_Due
             : Api::PaymentStatus_Paid;
     }
@@ -99,7 +99,7 @@ class Source extends BaseSource
         // 'history_payment_id'. The order of this array is by 'history_created'
         //  DESC, we take the one that is the furthest away in time.
         $date = null;
-        foreach ($this->shopSource->history as $history) {
+        foreach ($this->getShopSource()->history as $history) {
             if (!empty($history->history_payment_id)) {
                 $date = $history->history_created;
             }
@@ -110,7 +110,7 @@ class Source extends BaseSource
             /** @var \hikashopConfigClass $config */
             $config = hikashop_config();
             $unpaidStatuses = explode(',', $config->get('order_unpaid_statuses', 'created'));
-            foreach ($this->shopSource->history as $history) {
+            foreach ($this->getShopSource()->history as $history) {
                 if (!empty($history->history_new_status)
                     && !in_array($history->history_new_status, $unpaidStatuses, true)
                 ) {
@@ -126,7 +126,7 @@ class Source extends BaseSource
      */
     public function getCountryCode(): string
     {
-        return !empty($this->shopSource->billing_address->address_country_code_2) ? $this->shopSource->billing_address->address_country_code_2 : '';
+        return !empty($this->getShopSource()->billing_address->address_country_code_2) ? $this->getShopSource()->billing_address->address_country_code_2 : '';
     }
 
     /**
@@ -142,8 +142,8 @@ class Source extends BaseSource
     public function getCurrency(): array
     {
         $result = [];
-        if (!empty($this->shopSource->order_currency_info)) {
-            $currency = unserialize($this->shopSource->order_currency_info, ['allowed_classes' => [stdClass::class]]);
+        if (!empty($this->getShopSource()->order_currency_info)) {
+            $currency = unserialize($this->getShopSource()->order_currency_info, ['allowed_classes' => [stdClass::class]]);
             $result = [
                 Meta::Currency => $currency->currency_code,
                 Meta::CurrencyRate => (float) $currency->currency_rate,
@@ -163,15 +163,15 @@ class Source extends BaseSource
     {
         // No order_tax_info => no tax (?) => vat amount = 0.
         $vatAmount = 0.0;
-        if (!empty($this->shopSource->order_tax_info)) {
-            foreach ($this->shopSource->order_tax_info as $taxInfo) {
+        if (!empty($this->getShopSource()->order_tax_info)) {
+            foreach ($this->getShopSource()->order_tax_info as $taxInfo) {
                 if (!empty($taxInfo->tax_amount)) {
                     $vatAmount += $taxInfo->tax_amount;
                 }
             }
         }
         return [
-            Meta::InvoiceAmountInc => (float) $this->shopSource->order_full_price,
+            Meta::InvoiceAmountInc => (float) $this->getShopSource()->order_full_price,
             Meta::InvoiceVatAmount => $vatAmount,
         ];
     }
@@ -181,7 +181,7 @@ class Source extends BaseSource
      */
     public function getInvoiceReference()
     {
-        return !empty($this->shopSource->order_invoice_number) ? $this->shopSource->order_invoice_number : parent::getInvoiceReference();
+        return !empty($this->getShopSource()->order_invoice_number) ? $this->getShopSource()->order_invoice_number : parent::getInvoiceReference();
     }
 
     /**
@@ -189,6 +189,6 @@ class Source extends BaseSource
      */
     public function getInvoiceDate(): ?string
     {
-        return !empty($this->shopSource->order_invoice_created) ? date(Api::DateFormat_Iso, $this->shopSource->order_invoice_created) : parent::getInvoiceDate();
+        return !empty($this->getShopSource()->order_invoice_created) ? date(Api::DateFormat_Iso, $this->getShopSource()->order_invoice_created) : parent::getInvoiceDate();
     }
 }

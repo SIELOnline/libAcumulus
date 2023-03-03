@@ -46,8 +46,6 @@ abstract class Source
         $this->type = $type;
         if (empty($idOrSource)) {
             throw new RuntimeException('Empty source');
-//            $this->id = null;
-//            $this->source = null;
         } elseif (is_scalar($idOrSource)) {
             $this->id = (int) $idOrSource;
             $this->setShopSource();
@@ -100,6 +98,7 @@ abstract class Source
 
     /**
      * @deprecated  Renamed to getShopSource().
+     * @noinspection PhpUnused
      */
     public function getSource()
     {
@@ -112,7 +111,7 @@ abstract class Source
      * @return int
      *   The internal id of the web shop's invoice source.
      */
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
@@ -324,6 +323,9 @@ abstract class Source
 
     /**
      * Loads and sets the web shop invoice linked to this source.
+     *
+     * This default implementation assumes that the web shop does not have
+     * (separate) invoices. Override if your shop does offer invoices.
      */
     protected function setInvoice(): void
     {

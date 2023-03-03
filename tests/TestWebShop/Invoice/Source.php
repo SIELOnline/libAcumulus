@@ -20,8 +20,8 @@ class Source extends BaseSource
     protected function setShopSource(): void
     {
         $this->shopSource = new stdClass();
-        $this->shopSource->type = $this->getType();
-        $this->shopSource->id = $this->id;
+        $this->getShopSource()->type = $this->getType();
+        $this->getShopSource()->id = $this->id;
     }
 
     /**
@@ -29,7 +29,7 @@ class Source extends BaseSource
      */
     protected function setId(): void
     {
-        $this->id = (int) $this->shopSource->id;
+        $this->id = (int) $this->getShopSource()->id;
     }
 
     /**
@@ -37,7 +37,7 @@ class Source extends BaseSource
      */
     public function getReference()
     {
-        return $this->shopSource->id;
+        return $this->getShopSource()->id;
     }
 
     /**

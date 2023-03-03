@@ -1,6 +1,8 @@
 <?php
 /**
- * @noinspection PhpIncompatibleReturnTypeInspection
+ * @noinspection PhpIncompatibleReturnTypeInspection  The get/create...()
+ *   methods are strong typed, but the internal getInstance() not, leading to
+ *   this warning all over the place.
  */
 
 declare(strict_types=1);

@@ -26,22 +26,22 @@ use Siel\Acumulus\Api;
  *
  * Metadata can be added via the {@see MetadataCollection} methods.
  *
- *  @property ?string $contactId  // @todo: add to mappings.
- *  @property ?int $type // @todo: rename setting.
+ *  @property ?string $contactId
+ *  @property ?int $type
  *  @property ?int $vatTypeId
  *  @property ?string $contactYourId
  *  @property ?bool $contactStatus
  *
- *  @property ?string $website // @todo: add to mappings.
+ *  @property ?string $website
  *  @property ?string $vatNumber
  *  @property ?string $telephone
- *  @property ?string $telephone2 // @todo: add to mappings.
+ *  @property ?string $telephone2
  *  @property ?string $fax
  *  @property ?string $email
  *  @property ?bool $overwriteIfExists
- *  @property ?string $bankAccountNumber // @todo: add to mappings.
+ *  @property ?string $bankAccountNumber
  *  @property ?string $mark
- *  @property ?bool $disableDuplicates // @todo: add to mappings.
+ *  @property ?bool $disableDuplicates
  *
  *  @method bool setContactId(?string $value, int $mode = PropertySet::Always)
  *  @method bool setType(?int $value, int $mode = PropertySet::Always)

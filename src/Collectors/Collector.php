@@ -101,7 +101,9 @@ abstract class Collector implements CollectorInterface
     {
         foreach ($fieldSpecifications as $field => $pattern) {
             if ($acumulusObject->isProperty($field)) {
-                $this->expandAndSet($acumulusObject, $field, $pattern);
+                if ($pattern !== null) {
+                    $this->expandAndSet($acumulusObject, $field, $pattern);
+                }
             } else {
                 $this->log->notice('%s: %s does not have a property %s', __METHOD__, get_class($acumulusObject), $field);
             }

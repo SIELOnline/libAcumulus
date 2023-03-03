@@ -6,14 +6,16 @@ This file contains a historical overview of changes in our own code.
 8.0.0 (2023-03-??)
 ------------------
 Refactorings:
-- class Source:
+- Class Source:
   - Throws on construction based on an invalid source, making isValid() superfluous.
     Therefore, isValid() has been removed.
   - Renamed setSource()/getSource to setShopSource()/getShopSource().
   - Renamed getOrder to getShopOrder().
   - Added getShopCreditNote().
   - getCreditNotes() does no longer return null but this for a credit note.
-- Renamed ShopCapabilities::getShopDefaults to ShopCapabilities::getDefaultShopConfig.
+- Renamed ShopCapabilities::getShopDefaults() to ShopCapabilities::getDefaultShopConfig()
+  and added ShopCapabilities::getDefaultShopMappings(). Moved all mappings in the
+  getShopDefaults() of each shop to getDefaultShopMappings().
 
 
 7.6.5 (2023-03-02) (JOO+PS+WC)
